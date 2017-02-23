@@ -23,7 +23,8 @@ Then you can install OCTRA:
 1. Go to your octra directory via Terminal (or GitBash on Windows)
 2. Call `` npm install ``
 3. Wait.
-4. After the installation you can call `` npm start `` to start the node server.
+4. Duplicate the file ``src/app/app.config.sample.ts`` and rename it to ``src/app/app.config.ts``. In app.config.ts you can change the settings of your instance of OCTRA.
+5. After the installation you can call `` npm start `` to start the node server.
 
 ## Used third-party packages:
 * angular-cli: https://github.com/angular/angular-cli

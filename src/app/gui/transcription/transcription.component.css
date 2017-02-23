@@ -1,0 +1,48 @@
+#short-feedback{
+}
+
+#rules .modal-dialog,
+#rules .modal-content{
+    width:100%;
+}
+
+#feedback .col-xs-3{
+    text-align:center;
+}
+
+#feedback{
+    padding:10px;
+}
+
+#volume-slider{
+    width:100%;
+}
+
+.slider-descr{
+    text-align:center;
+    font-size:0.7em;
+}
+
+#shortcuts{
+    display:none;
+}
+
+.shortcut-descr{
+    font-size:0.6em;
+}
+
+#rules .table .table{
+    font-size:0.7em;
+}
+
+#overview .modal-dialog,
+#overview .modal-body{
+}
+
+#bottom-nav{
+    padding-bottom:100px;
+}
+
+#rules td{
+    height:25px;
+}

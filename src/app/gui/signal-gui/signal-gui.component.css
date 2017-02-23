@@ -1,0 +1,11 @@
+#viewer{
+    max-height:200px;
+}
+
+#editor-placeholder{
+    background-color:white;
+    border: 1px dashed gray;
+    padding:10px;
+    width:100%;
+    text-align:center;
+}

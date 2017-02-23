@@ -1,0 +1,60 @@
+<div style="width:100px;" id="">
+    <app-circleloupe #loupe [ngStyle]="{
+'position':'absolute',
+'margin-left':mini_loupecoord.x + 'px',
+'margin-top':'-20px',
+'width' : '80px',
+'height': '80px',
+'z-index':'900',
+'visibility': (loupe_hidden) ? 'hidden' : 'inherit'}"></app-circleloupe>
+</div>
+<div style="width:100px;">
+    <app-circleloupe #loupe2 [ngStyle]="{
+'position':'absolute',
+'margin-left':mini_loupecoord2.x + 'px',
+'margin-top':mini_loupecoord2.y + 'px',
+'width' : '80px',
+'height': '80px',
+'z-index':'900',
+'visibility': (loupe2_hidden) ? 'hidden' : 'inherit'}"></app-circleloupe>
+</div>
+<app-audio-navigation #nav
+                      (button_click)="onButtonClick($event)"
+                      (volumechange)="onVolumeChange($event)"
+                      (aftervolumechange)="afterVolumeChange($event)"
+                      (speedchange)="onSpeedChange($event)"
+                      (afterspeedchange)="afterSpeedChange($event)"
+>
+
+</app-audio-navigation>
+<div id="viewer">
+    <app-audioviewer #viewer (selchange)="test($event)"
+                     (segmentchange)="onSegmentChange($event)"
+                     (segmententer)="onSegmentEnter($event)"
+                     (mousecursorchange)="onMouseOver($event)"
+                     (mouseenter)="loupe_hidden = false;"
+                     (mouseleave)="loupe_hidden = true;"
+                     (mousedown)="onViewerMouseDown($event)"
+                     (shortcuttriggered)="onShortCutTriggered($event, 'signal')"
+    >
+    </app-audioviewer>
+</div>
+
+<app-loupe #loupee
+           (mousecursorchange)="onMouseOver2($event)"
+           (mouseenter)="loupe2_hidden = false;"
+           (mouseleave)="loupe2_hidden = true;"
+           (segmententer)="onLoupeSegmentEnter($event)"
+           (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
+>
+</app-loupe>
+<div *ngIf="!segmentselected" id="editor-placeholder">
+   Bitte wählen Sie ein Segment aus, indem Sie mit der Maus über den Signalausschnitt fahren und die {{segmententer_shortc}} Taste betätigen.
+</div>
+<app-transcr-editor #transcr
+                    (onkeyup)="onTranscriptionChanged($event)"
+                    (marker_insert)="onMarkerInsert($event)"
+                    (marker_click)="onMarkerClick($event)"
+                    (typing)="onEditorTyping($event)"
+                    [hidden]="!segmentselected">
+</app-transcr-editor>

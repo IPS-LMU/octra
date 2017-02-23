@@ -1,0 +1,24 @@
+.navbar ul li a:hover{
+    cursor: pointer;
+}
+.navbar ul li{
+}
+
+.navbar-nav > li > a, .navbar-brand {
+    padding-top:4px !important;
+    padding-bottom:0 !important;
+    vertical-align: middle;
+    line-height: inherit;
+    height: 30px;
+}
+.navbar {min-height:30px !important;}
+
+.navbar .navbar-brand{
+    vertical-align: middle;
+    font-size:1.3em;
+}
+
+.glyphicon{
+    font-size:50px;
+    color:#0b0080;
+}

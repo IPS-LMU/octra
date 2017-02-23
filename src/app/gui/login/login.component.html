@@ -1,0 +1,83 @@
+<modal #modal>
+    <modal-header>
+        <h4 class="modal-title">Anmeldung fehlgeschlagen</h4>
+    </modal-header>
+    <modal-body>
+        Die Anmeldung konnte leider nicht durchgeführt werden. Es sind bei dieser ID keine freien Audiodateien
+        verfügbar.
+    </modal-body>
+    <modal-footer>
+        <button type="button" class="btn btn-primary" (click)="modal.dismiss()">OK</button>
+    </modal-footer>
+</modal>
+<div>
+    <span id="logo">OCTRA</span>
+</div>
+<div class="section">
+    <div class="row">
+        <div class="col-xs-1 col-sm-3 col-md-3"></div>
+        <div class="col-xs-10 col-sm-6 col-md-6 panel panel-default" style="padding:40px;">
+            <br/>
+            <p *ngIf="!valid_platform" class="warning">
+                <b>Dein Browser ist nicht kompatibel</b>. Lade dir bitte Chrome <a
+                    href="https://www.google.de/chrome/browser/desktop/">hier</a> herunter. Öffne diese Seite in
+                Chrome erneut.
+            </p>
+
+            <p *ngIf="!valid_size" class="warning">
+                <b>Die Fensterbreite ist zu klein.</b> Bitte vergrößern Sie dieses Fenster bis die Meldung verschwindet.
+            </p>
+            <section>
+                Login function is currently deactivated. Please use OCTRA locally.
+                <form class="form-horizontal" (ngSubmit)="onSubmit(f)" #f="ngForm">
+                    <fieldset>
+                        <div>
+                            <div class="form-group">
+                                <input class="form-control" type="number" disabled="disabled" id="login-id"
+                                       name="login-id"
+                                       placeholder="Login ID" [(ngModel)]="member.id"
+                                       required
+                                       pattern="[0-9]+"
+                                />
+                                <!-- <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" id="agreement" name="agreement" [(ngModel)]="agreement_checked">
+                                    </label> <span style="font-size:1.0em;">Ich habe die <span class="link" (click)="openAgreement();">Einverständniserklärung</span> gelesen und akzeptiert</span>
+                                </div> -->
+                            </div>
+                            <div class="form-group">
+                                <input class="form-control" type="submit" id="login-submit"
+                                       class="btn btn-raised btn-primary"
+                                       [disabled]="true"
+                                       name="login-submit" value="LOGIN DISABLED"/>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+                <br/>
+            </section>
+            <section>
+                <a href="login#local" id="local-link" (click)="toggleState()">OCTRA lokal verwenden</a>
+
+                <div [@fadeToggle]="local_state">
+                    <p *ngIf="sessionService.selectedfile != null">
+                        Es wurden Daten zu einer vorherigen Transkription gefunden. Um diese fortzusetzen, ziehen Sie
+                        die folgende Datei per Drag & Drop in das graue Feld:<br/><br/>
+                        {{getDropzoneFileString(sessionService.selectedfile)}}
+                    </p>
+                    <div id="dropzone" #dropzone (dragover)="onDragOver($event)" (drop)="onFileDrop($event)">
+                        <span *ngIf="sessionfile == null">Datei hier hineinziehen</span>
+                        <span *ngIf="sessionfile != null && (sessionService.selectedfile == null || sessionfile.name == sessionService.selectedfile.name)"><span class="text-success">Datei {{getDropzoneFileString(sessionfile)}} ausgewählt</span></span>
+                        <span *ngIf="sessionfile != null && (sessionService.selectedfile != null && sessionfile.name != sessionService.selectedfile.name)"><span class="text-danger">Datei {{getDropzoneFileString(sessionfile)}} ausgewählt</span></span>
+                    </div>
+                    <input *ngIf="(sessionfile != null && (sessionService.selectedfile == null || sessionfile.name == sessionService.selectedfile.name))" type="submit" id="offline-submit"
+                           class="btn btn-raised btn-primary" value="Transkription starten" [disabled]="!(sessionfile != null && (sessionService.selectedfile == null || sessionfile.name == sessionService.selectedfile.name))" (click)="onOfflineSubmit()"/>
+
+                    <input *ngIf="(sessionfile != null && (sessionService.selectedfile != null && sessionfile.name != sessionService.selectedfile.name))" id="offline-delete-btn"
+                          class="btn btn-raised btn-danger" (click)="newTranscription()" [disabled]="!(sessionfile != null && sessionfile.name != sessionService.selectedfile.name)" value="Neue Transkription beginnen"/>
+                </div>
+            </section>
+        </div>
+        <div class="col-xs-1 col-sm-3 col-md-3"></div>
+    </div>
+</div>

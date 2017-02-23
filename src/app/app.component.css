@@ -1,0 +1,8 @@
+.container.inner{
+    padding-bottom:10px;
+    padding-top:10px;
+    -moz-box-shadow:0px 1px 6px #a0a0a0; /* Firefox */
+    -webkit-box-shadow:0px 1px 6px #a0a0a0; /* Chrome, Safari */
+    -khtml-box-shadow:0px 1px 6px #a0a0a0; /* Konqueror */
+    box-shadow:0px 1px 6px #a0a0a0; /* CSS3 */
+}

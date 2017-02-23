@@ -1,0 +1,16 @@
+.table td,
+.table th{
+    text-align:center;
+}
+
+#feedback-table td{
+    text-align:left;
+}
+
+#feedback{
+    padding:10px;
+}
+
+#transcr-submit{
+    padding:20px;
+}

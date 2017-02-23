@@ -1,0 +1,36 @@
+<div id="window" [ngStyle]="{'margin-top': pos_y + 'px'}">
+    <div class="window-nav-top"><span class="glyphicon glyphicon-remove close" (click)="close();"></span></div>
+    <app-audio-navigation #audionav
+                          (button_click)="onButtonClick($event)"
+                          (volumechange)="onVolumeChange($event)"
+                          (aftervolumechange)="afterVolumeChange($event)"
+                          (speedchange)="onSpeedChange($event)"
+                          (afterspeedchange)="afterSpeedChange($event)"
+    ></app-audio-navigation>
+    <app-loupe #loupe id="loupe"
+               (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
+    ></app-loupe>
+    <app-transcr-editor #editor id="trancr"
+                        (marker_insert)="onMarkerInsert($event)"
+                        (marker_click)="onMarkerClick($event)"
+    ></app-transcr-editor>
+    <div class="window-nav-bottom">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="btn-toolbar" role="toolbar">
+                    <div class="btn-group btn-group-justified" role="group" aria-label="...">
+                        <a class="btn btn-default btn-raised" (click)="save();goToSegment('left');"><span *ngIf="appc.RESPONSIVE" [ngClass]="{'visible-xs visible-sm visible-md': appc.RESPONSIVE}"><span class="glyphicon glyphicon-floppy-save"></span>&<span class="glyphicon glyphicon-menu-left" ></span></span><span [ngClass]="{'hidden-xs hidden-sm hidden-md': appc.RESPONSIVE}">Speichern &
+                            vorheriges Segment</span>
+                        </a>
+                        <a class="btn btn-default btn-raised" (click)="save();close();"><span *ngIf="appc.RESPONSIVE" [ngClass]="{'visible-xs visible-sm visible-md': appc.RESPONSIVE}"><span class="glyphicon glyphicon-floppy-save"></span></span><span [ngClass]="{'hidden-xs hidden-sm hidden-md': appc.RESPONSIVE}">Speichern & Schließen</span>
+                        </a>
+                        <a class="btn btn-default btn-raised" (click)="save();goToSegment('right');"><span *ngIf="appc.RESPONSIVE" [ngClass]="{'visible-xs visible-sm visible-md': appc.RESPONSIVE}"><span class="glyphicon glyphicon-floppy-save"></span>&<span class="glyphicon glyphicon-menu-right" ></span></span><span [ngClass]="{'hidden-xs hidden-sm hidden-md': appc.RESPONSIVE}">Speichern &
+                            nächstes Segment</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="black"></div>

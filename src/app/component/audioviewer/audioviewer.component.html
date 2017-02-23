@@ -1,0 +1,14 @@
+<div class="audioviewer" #audioview=audioview audioviewer>
+    <canvas class="graphicscanvas" #graphicscan canvasDir></canvas>
+    <canvas class="overlaycanvas" #overlaycan canvasDir></canvas>
+    <canvas class="playcanvas" [ngClass]="{dragable: (av.overboundary)}" #playcan canvasDir
+            (mousedown)="onClick($event)"
+            (mouseup)="onClick($event)"
+            (click)="onClick($event)"
+            (mousemove)="onMouseMove($event)"
+            (mouseleave)="av.focused = false;"
+            (mouseenter)="av.focused = true"
+            (mouseout)="av.focused = false"
+    ></canvas>
+    <canvas class="mousecanvas" #mousecan canvasDir></canvas>
+</div>

@@ -1,0 +1,281 @@
+<app-alert #alert></app-alert>
+<modal #modal>
+    <modal-header>
+        <h4 class="modal-title">Transkription Beenden?</h4>
+    </modal-header>
+    <modal-body>
+        Möchten Sie die Transkription wirklich beenden?<br><br>Ihr Fortschritt wird lokal in diesem Browser
+        gespeichert. Um später fortzufahren, sollten Sie nicht den Browserverlauf löschen und ausschließlich diesen
+        Browser nutzen.
+    </modal-body>
+    <modal-footer>
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="modal.dismiss()">Weitermachen
+        </button>
+        <button type="button" class="btn btn-primary" (click)="abortTranscription()">Beenden und Abmelden</button>
+    </modal-footer>
+</modal>
+
+<modal #overview id="overview">
+    <modal-header>
+        <h4 class="modal-title">Übersicht</h4>
+    </modal-header>
+    <modal-body>
+        <app-transcr-overview></app-transcr-overview>
+    </modal-body>
+    <modal-footer>
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="modal.dismiss()">Schließen
+        </button>
+    </modal-footer>
+</modal>
+
+<modal #modal_shortcuts>
+    <modal-header>
+        <h4 class="modal-title">Tastenkombinationen</h4>
+    </modal-header>
+    <modal-body>
+        <div *ngIf="sessService.Interface == 'audioplayer'">
+            <h3>Tastenkombinationen für den Audioplayer:</h3>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <tbody>
+                    <tr *ngFor="let entry of keyMap.getEntryList('AP')">
+                        <td>{{entry.value.title}}</td>
+                        <td>{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly" class="focus-info">(nur bei Fokusierung)</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div *ngIf="(sessService.Interface == 'signaldisplay')">
+            <h3>Tastenkombinationen für das obere Signaldisplay:</h3>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <tbody>
+                    <tr *ngFor="let entry of keyMap.getEntryList('AV')">
+                        <td>{{entry.value.title}}</td>
+                        <td>{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly" class="focus-info">(nur bei Fokusierung)</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <h3>Tastenkombinationen für die Lupe:</h3>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <tbody>
+                    <tr *ngFor="let entry of keyMap.getEntryList('Loupe')">
+                        <td>{{entry.value.title}}</td>
+                        <td>{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly" class="focus-info">(nur bei Fokusierung)</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div *ngIf="(sessService.Interface == 'overlay')">
+            <h3>Tastenkombinationen für das Overlay Interface:</h3>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <tbody>
+                    <tr *ngFor="let entry of keyMap.getEntryList('overlay')">
+                        <td>{{entry.value.title}}</td>
+                        <td>{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly" class="focus-info">(nur bei Fokusierung)</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </modal-body>
+    <modal-footer>
+        <button type="button" class="btn btn-primary" (click)="modal_shortcuts.dismiss();">Schließen</button>
+    </modal-footer>
+</modal>
+<div *ngIf="!loaded">
+    <app-loading #loading>
+
+    </app-loading>
+</div>
+<div *ngIf="loaded">
+    <table style="width:100%; font-size:12px;margin-bottom:10px;">
+        <tbody>
+        <tr>
+            <td style="text-align:center;"><span class="link" (click)="modal_shortcuts.open();">Tastenkombinationen [ALT + 8]</span>
+            </td>
+            <td style="text-align:center;"><span class='link'
+                                                 (click)="modal_rules.open();">Regeln [ALT + 9]</span></td>
+            <td style="text-align:center;"><span class='link'
+                                                 (click)="tranService.analyse();overview.open();">Übersicht [ALT + 0]</span>
+            </td>
+            <td style="text-align:center;"><a href="{{intro_link}}" target="_blank" class="link">Einführungsvideo</a></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <modal #modal_rules id="rules">
+        <modal-body>
+            <table class="table table-striped table-responsive">
+                <thead>
+                <tr>
+                    <th>Regel</th>
+                    <th>Beschreibung</th>
+                    <th>Beispiele</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td rowspan="3">Rechtschreibung</td>
+                    <td>
+                        Beachtung der deutschen Rechtschreibung
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Ziffern werden ausgeschrieben, ab 100 als einzelne Wörter</td>
+                    <td>"101" als ein hundert eins (statt einhunderteins)</td>
+                </tr>
+                <tr>
+                    <td>Buchstabierfolgen als Folge von Großbuchstaben, Rest orthografisch.</td>
+                    <td>
+                        <ul>
+                            <li>"A B B ß" als A doppel B scharfes S</li>
+                            <li>"D" als /D/</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td rowspan="2">Zeichensetzung</td>
+                    <td>keine Satzzeichen => keine Sätze im herkömmlichen Sinn<br>
+                        keine Spezialsymbole wie %, ", #
+                    </td>
+                    <td> Kein (.,!?;-)</td>
+                </tr>
+                <tr>
+                    <td><b>Ausnahme</b>: ' , / und - in Wörtern, nicht zwischen Wörtern</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td rowspan="2">Groß-Kleinschreibung</td>
+                    <td>Beachtung der Groß- und Kleinschreibung, auch bei Namen und Abkürzungen.</td>
+                    <td>Josef, GmbH, AG</td>
+                </tr>
+                <tr>
+                    <td><b>Ausnahme</b>: Personalpronomina, keine Großschreibung am Satzanfang</td>
+                    <td>Du, Sie, Ihr</td>
+                </tr>
+                <tr>
+                    <td style="vertical-align: top;">Komposita und Abkürzungen</td>
+                    <td style="vertical-align: top;">Diese sollten nicht künstlich getrennt oder in Buchstabierform geschrieben werden.</td>
+                    <td>
+                        <table class="table" style="width:400px">
+                            <tbody>
+                            <tr>
+                                <td>SPD-Fraktionsvorsitzender</td>
+                                <td>ok</td>
+                                <td rowspan="2" style="vertical-align:middle;">gelesen</td>
+                            </tr>
+                            <tr>
+                                <td>S P D Fraktionsvorsitzender</td>
+                                <td>nicht ok, wenn anders in der Vorlage</td>
+                            <tr>
+                                <td>UdSSR</td>
+                                <td>ok, wenn so in der Vorlage</td>
+                                <td>gelesen</td>
+                            <tr>
+                                <td>U D S S R</td>
+                                <td>ok, wenn so in der Vorlage</td>
+                                <td>z.B. beim Buchstabieren</td>
+                            <tr>
+                                <td>Adam J Krusenstern</td>
+                                <td>ok</td>
+                                <td rowspan="2" style="vertical-align:middle;">Eigenname</td>
+                            <tr>
+                                <td>Adam-J. Krusenstern</td>
+                                <td>nicht ok</td>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Ausssprache</td>
+                    <td>Bei falscher Aussprache, das erratene Wort mit * vorranstellen
+                    </td>
+                    <td>"achter vierter *fünfund nein sechsundneunzig" ist ok<br/>
+                        "<img src="assets/img/components/transcr-editor/default_markers/truncation_start.png" alt="trunc_start">*chter vierter oder *sechsundneunz<img src="assets/img/components/transcr-editor/default_markers/truncation_end.png" alt="trunc_end">" ist nicht ok
+                    </td>
+                </tr>
+                <tr>
+                    <td>Unverständliche Sprache</td>
+                    <td>Passagen unverständlicher Sprache mit <img src="assets/img/components/transcr-editor/default_markers/stars.png" alt="stars"> markieren</td>
+                    <td>du bist ein solches <img src="assets/img/components/transcr-editor/default_markers/stars.png" alt="stars"> wie ich noch nie eines getroffen habe</td>
+                </tr>
+                <tr>
+                    <td>Geräusche</td>
+                    <td>
+                        Bei Geräuschen müssen die Geräuschmarken verwendet werden. Ein Marker wird dabei an dem ersten Vorkommen eines Geräusches gesetzt, nicht aber zwischen Wörtern. Für weitere Informationen in der
+                        Toolbar des Editors mit der Maus über die Marker fahren.<br/>
+                        Mehrere gleiche Marker sollten nicht direkt aufeinander folgen.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </modal-body>
+        <modal-footer>
+            <button type="button" class="btn btn-default" data-dismiss="modal" (click)="modal_rules.dismiss()">Schließen
+            </button>
+        </modal-footer>
+    </modal>
+
+    <div *ngIf="!(sessService.Interface == 'overlay')">
+        <app-signal-gui #signalloupe *ngIf="sessService.Interface == 'signaldisplay'">
+        </app-signal-gui>
+        <app-audioplayer-gui #audioplayer *ngIf="sessService.Interface == 'audioplayer'"></app-audioplayer-gui>
+    </div>
+    <div *ngIf="sessService.Interface == 'overlay'">
+        <app-overlay-gui></app-overlay-gui>
+    </div>
+    <div id="bottom-nav">
+        <div class="btn-group btn-group-justified" role="group" aria-label="...">
+            <a class="btn btn-default btn-raised" (click)="modal.open()"><span
+                    class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span><span [ngClass]="{'hidden-xs hidden-sm': appc.RESPONSIVE}"> Beenden</span></a>
+            <a class="btn btn-default btn-raised"
+               (click)="submitTranscription()"><span [ngClass]="{'hidden-xs hidden-sm': appc.RESPONSIVE}"> Transkription fertigstellen</span> <span
+                    class="glyphicon glyphicon glyphicon-menu-right" aria-hidden="true"></span></a>
+        </div>
+    </div>
+    <!--{{tranService.segments.length}}
+    {{(sessService.logs != null) ? sessService.logs.length : 0}}
+    <button (click)="uiService.clear();">Clear Events</button>
+    <h3>Ereignisse</h3>
+    <div style="max-height:400px;overflow: scroll;">
+        <table class="table" style="">
+            <thead>
+            <tr>
+                <th>Zeit</th>
+                <th>Typ</th>
+                <th>Ziel</th>
+                <th>Inhalt</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let elem of UIElements">
+                <td>{{elem.timestamp | date:"dd.MM.yy HH:mm:ss"}}</td>
+                <td>{{elem.type}}</td>
+                <td>{{elem.target_name}}</td>
+                <td>
+                    {{elem.value}}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <h3>
+        Das Transkriptionsobjekt:
+    </h3>
+    <textarea style="width:100%; height:300px;">
+        {{dat}};
+    </textarea>-->
+    {{getText()}}
+</div>

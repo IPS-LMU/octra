@@ -1,0 +1,108 @@
+h1{
+    text-align:center;
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+.container{
+    /* fix this for disabling responsive*/
+    /*width:1200px;*/
+}
+
+footer{
+    text-align:center;
+    font-size:10px;
+}
+
+.icon-block {
+    padding: 0 15px;
+}
+.icon-block .material-icons {
+    font-size: inherit;
+}
+
+.waiting{
+    margin:100px auto;
+    width:64px;
+    position:relative;
+}
+
+
+.link{
+    color:#0095dd;
+    cursor: pointer;
+}
+
+#rules{
+    display:none;
+}
+
+#rules .table{
+    min-height: inherit;
+    min-width: inherit;
+}
+
+#loading{
+    text-align: center;
+    padding:20px;
+}
+
+#loading .description{
+    margin-top:20px;
+}
+
+#rules .modal-dialog,
+#overview .modal-dialog{
+    width:90%;
+}
+
+.note-popover .popover-content, .panel-heading.note-toolbar {
+    padding: 0;
+    margin: 0;
+}
+
+.transcr-editor .btn-description{
+    font-size:0.95em;
+}
+
+.transcr-editor .btn-shortcut{
+    font-size:0.7em;
+}
+
+#loading{
+    text-align:center;
+}
+
+.btn-icon-text{
+    height:16px;
+}
+
+#dropzone{
+    border: 2px dashed grey;
+    background-color: rgb(240,240,240);
+    padding: 20px;
+}
+
+.export-glyphicon{
+    font-size:50px;
+    color:#0b0080;
+}
+
+.export-button{
+    background-color: whitesmoke;
+    border:1px solid grey;
+    text-align:center;
+    padding:20px;
+}
+
+.export-a{
+    font-size:0.8em;
+}

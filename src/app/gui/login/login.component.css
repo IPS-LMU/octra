@@ -1,0 +1,40 @@
+#login{
+    padding:20px;
+    width:100%;
+    padding:0px;
+}
+
+#login .row{
+    padding-top:20px;
+}
+
+.login-id-label,
+.login-pw-label{
+    font-size:1em;
+}
+
+#login-pw,
+#login-id{
+    font-size:1.3em;
+    width:100%;
+    padding:5px;
+}
+
+#login-submit,
+#offline-submit,
+#offline-delete-btn{
+    width:100%;
+}
+
+.ng-touched .ng-invalid{
+    border-bottom:2px solid red;
+}
+
+#logo{
+    text-align:center;
+    width:100%;
+    display:block;
+    font-size:5em;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 300;
+}

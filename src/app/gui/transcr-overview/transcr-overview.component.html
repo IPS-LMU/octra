@@ -1,0 +1,34 @@
+<h4>Statistik</h4>
+<table class="table">
+  <thead>
+  <tr>
+    <th>Segmente insgesamt</th>
+    <th>Segmente transkribiert</th>
+    <th>Segmente mit Pausen</th>
+    <th>Ausgelassene Segmente</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td class="active">{{numberOfSegments}}</td>
+    <td class="success">{{transcrSegments}}</td>
+    <td class="info">{{pauseSegments}}</td>
+    <td class="danger"><b><u>{{emptySegments}}</u></b></td>
+  </tr>
+  </tbody>
+</table>
+<h4>Transkript</h4>
+<table class="table">
+  <thead>
+  <tr>
+    <th>Zeitspanne (s)</th>
+    <th>Transkription</th>
+    <th>Überprüfung auf Fehler</th>
+  </tr>
+  </thead>
+  <tr *ngFor="let segment of segments; let i = index" [ngClass]="{success: (segment.transcript != '' && segment.transcript != 'P'), info: (segment.transcript == 'P'), danger: (segment.transcript == '')}">
+    <td># {{i+1 | leadingnull: segments.length}}</td>
+    <td [innerHTML]="sanitizeHTML(segment.transcript)"></td>
+    <td [innerHTML]="sanitizeHTML(segment.validation)" [ngClass]="{warning:(segment.validation)}"></td>
+  </tr>
+</table>

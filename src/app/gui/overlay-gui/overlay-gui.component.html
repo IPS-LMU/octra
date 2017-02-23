@@ -1,0 +1,35 @@
+<!--<div style="position: fixed;background-color:white; border:2px solid black; bottom:0; right:0; z-index:2000;">
+    {{((viewer.MouseCursor) ? viewer.MouseCursor.timePos.seconds : 0)}}
+</div>-->
+<div id="overlay-transcr" style="position:relative">
+    <app-transcr-window #window (act)="onWindowAction($event)" *ngIf="showWindow"></app-transcr-window>
+    <div style="position:fixed;bottom:0;z-index:20;" [ngStyle]="{width:viewer.innerWidth + 'px'}">
+        <app-audio-navigation #audionav
+                              (button_click)="onButtonClick($event)"
+                              (volumechange)="onVolumeChange($event)"
+                              (aftervolumechange)="afterVolumeChange($event)"
+                              (speedchange)="onSpeedChange($event)"
+                              (afterspeedchange)="afterSpeedChange($event)"
+        ></app-audio-navigation>
+    </div>
+    <div style="width:100px;">
+        <app-circleloupe #loupe [ngStyle]="{
+'position':'absolute',
+'margin-left':mini_loupecoord.x + 'px',
+'margin-top':mini_loupecoord.y + 'px',
+'width' : '80px',
+'height': '80px',
+'z-index':'900',
+'visibility': (loupe_hidden) ? 'hidden' : 'inherit'}" (statechange)="onStateChange($event)"></app-circleloupe>
+    </div>
+    <app-audioviewer #viewer
+                     (selchange)="onSegmentSelected($event);"
+                     (segmententer)="onSegmentEntered($event);"
+                     (segmentchange)="onSegmentChange($event);"
+                     (mousecursorchange)="onMouseOver($event);"
+                     (mouseenter)="loupe_hidden = false;"
+                     (mouseleave)="loupe_hidden = true;"
+                     (shortcuttriggered)="onShortCutTriggered($event, 'overlay')"
+    >
+    </app-audioviewer>
+</div>

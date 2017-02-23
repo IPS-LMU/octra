@@ -1,0 +1,12 @@
+<div *ngIf="type == 'success'" [hidden]="!show" #alert class="alert alert-dismissible alert-success"
+     [@heroState]="state" (@heroState.done)="animationDone($event)">
+    {{text}}
+</div>
+<div *ngIf="type == 'error'" [hidden]="!show" #alert class="alert alert-dismissible alert-danger" [@heroState]="state">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    {{text}}
+</div>
+<div *ngIf="type == 'info'" [hidden]="!show" #alert class="alert alert-dismissible alert-info" [@heroState]="state">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    {{text}}
+</div>

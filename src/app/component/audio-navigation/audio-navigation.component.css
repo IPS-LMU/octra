@@ -1,0 +1,27 @@
+.slider-descr {
+    font-size: 0.7em;
+    vertical-align: middle;
+    display: inline-flex;
+    margin-bottom: 3px;
+}
+
+.shortcut-descr {
+    font-size: 0.6em;
+}
+
+.audio-nav {
+    width: 99.5%;
+}
+
+#audio-nav .btn-raised {
+    padding: 5px;
+    height: 10px;
+}
+
+.btn-description{
+    font-size:0.9em;
+}
+
+.slider{
+    padding:0px;
+}

@@ -1,0 +1,42 @@
+#window{
+    position:absolute;
+    width: 95%;
+    z-index:100;
+    padding:10px;
+    background-color:white;
+    margin:2.5%;
+    border:1px solid gray;
+    -webkit-box-shadow: 10px 10px 50px grey;
+    -moz-box-shadow: 10px 10px 50px grey;
+    box-shadow: 10px 10px 50px grey;
+}
+
+#black{
+    position:absolute;
+    width:100%;
+    display:block;
+    height:100%;
+    z-index:99;
+    background-color:white;
+    opacity: 0.7;
+}
+
+.window-nav-top,
+.window-nav-bottom{
+    display:block;
+    width:100%;
+    text-align:right;
+}
+
+.window-nav-top{
+    height:2em;
+}
+
+
+.window-nav-bottom{
+    bottom:0;
+}
+
+#window .audio-nav{
+    margin-bottom:-10px;
+}

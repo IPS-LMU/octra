@@ -1,0 +1,180 @@
+<modal #modal>
+    <modal-header>
+        <h4 class="modal-title">Transkription senden</h4>
+    </modal-header>
+    <modal-body>
+        Durch Klicken auf "Jetzt senden" werden Ihre Ergebnisse zentral gespeichert und können nicht mehr geändert
+        werden.
+    </modal-body>
+    <modal-footer>
+        <button type="button" class="btn btn-primary" (click)="modal.dismiss()">Abbrechen</button>
+        <button type="button" class="btn btn-default" (click)="onSendNowClick()">Jetzt senden</button>
+    </modal-footer>
+</modal>
+
+<modal #modal2>
+    <modal-header>
+        <h4 class="modal-title">Transkription wird übertragen...</h4>
+    </modal-header>
+    <modal-body>
+        Ihre Ergebnisse werden übertragen... Bitte bis zum Abschluss der Übertragung warten...<br/><br/>
+        <div style="color:red">{{send_error}}</div>
+    </modal-body>
+</modal>
+
+<div id="transcr-submit" class="panel panel-default">
+    <h3>Transkription prüfen</h3>
+    <br>
+    <p>
+        Sie möchten die Transkription dieser Audiodatei abschließen? Stellen Sie bitte folgende Punkte sicher:
+    </p>
+    <ul>
+        <li>
+            Falls verfügbar: Wurden Segmentgrenzen möglichst genau gesetzt?
+        </li>
+        <li>
+            Wurden alle definierten Segmente auf Inhalt/Pausen überprüft?
+        </li>
+        <li>
+            Wurden Marker gesetzt?
+        </li>
+    </ul>
+
+    <br>
+    <p>
+        Folgende Tabelle zeigt Ihnen einen Überblick über Ihre definierten Segmente:
+    </p>
+    <app-transcr-overview></app-transcr-overview>
+    <br><br>
+    <div *ngIf="!sessService.offline">
+        <h3>Feedback</h3>
+        <p>
+            Bitte füllen Sie kurz das Formular aus:
+        </p>
+        <section>
+            <form (ngSubmit)="onSubmit(fo)" #fo="ngForm">
+                <fieldset>
+                    <div class="form-group">
+                        <label class="control-label">Sprachverständlichkeit des Sprechers:</label>
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <div class="radio">
+                                    <label>unverständlich
+                                        <input type="radio" [(ngModel)]="feedback_data.quality_speaker"
+                                               name="quality_speaker" value="unverstaendlich" required/></label>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="radio">
+                                    <label>weniger verständlich
+                                        <input type="radio" [(ngModel)]="feedback_data.quality_speaker"
+                                               name="quality_speaker" value="weniger verstaendlich" required/></label>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="radio">
+                                    <label>verständlich
+                                        <input type="radio" [(ngModel)]="feedback_data.quality_speaker"
+                                               name="quality_speaker" value="verstaendlich" required/></label>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="radio">
+                                    <label>klar und deutlich
+                                        <input type="radio" [(ngModel)]="feedback_data.quality_speaker"
+                                               name="quality_speaker" value="klar" required/></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group"><label class="control-label">Qualität des Audiosignals:</label>
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <div class="radio">
+                                    <label>viele Störgeräusche
+                                        <input type="radio" [(ngModel)]="feedback_data.quality_audio"
+                                               name="quality_audio"
+                                               value="viele" required/></label>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="radio">
+                                    <label>wenig Störgeräusche
+                                        <input type="radio" [(ngModel)]="feedback_data.quality_audio"
+                                               name="quality_audio"
+                                               value="wenig" required/></label>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="radio">
+                                    <label>sehr wenig Störgeräusche
+                                        <input type="radio" [(ngModel)]="feedback_data.quality_audio"
+                                               name="quality_audio"
+                                               value="sehr wenig" required/></label>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="radio">
+                                    <label>keine Störgeräusche
+                                        <input type="radio" [(ngModel)]="feedback_data.quality_audio"
+                                               name="quality_audio"
+                                               value="keine" required/></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group"><label class="control-label">Kurzer Kommentar (Anmerkungen zum
+                        Arbeitsablauf,
+                        Ladezeiten, Schwierigkeiten etc.):</label>
+                        <textarea class="form-control" id="short-feedback" name="shortfeedback"
+                                  [(ngModel)]="feedback_data.comment" required
+                                  minlength="3" maxlength="500"></textarea>
+                    </div>
+                    <div id="form-group">
+                        <div class="btn-group btn-group-justified" role="group" aria-label="...">
+                            <button type="button" class="form-control" class="btn btn-raised"
+                                    style="position:relative;width:49%;"
+                                    (click)="back()"><span
+                                    class="glyphicon glyphicon-menu-left" aria-hidden="true"></span><span> Zurück</span>
+                            </button>
+                            <button type="submit" class="form-control" class="btn btn-primary btn-raised"
+                                    style="position:relative;width:49%;margin-left:2%;" [disabled]="!fo.valid"
+                                    name="send">
+                                <span>Transkript senden </span><span class="glyphicon glyphicon-send"></span></button>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </section>
+    </div>
+    <div *ngIf="this.sessService.offline">
+        <h4>Daten exportieren</h4>
+        <div class="row" style="padding:15px;">
+            <div class="col-xs-6 export-button">
+                <a download="annot.txt" [href]="sanitize(getURI('text'))">
+                    <div><span
+                            class="glyphicon glyphicon-floppy-save export-glyphicon"></span><br/>Textdatei
+                    </div>
+                </a><br/>
+                <a class="export-a"
+                   href="https://clarin.phonetik.uni-muenchen.de/BASWebServices/#/services/WebMAUSBasic"
+                   target="_blank">WebMAUS öffnen</a>
+            </div>
+            <div class="col-xs-6 export-button">
+                <a download="annot.json" [href]="sanitize(getURI('annotJSON'))">
+                    <div><span
+                            class="glyphicon glyphicon-floppy-save export-glyphicon"></span><br/>annotJSON
+                    </div>
+                </a><br/>
+                <a class="export-a"
+                   href="http://ips-lmu.github.io/EMU-webApp/"
+                   target="_blank">EMU-Webapp öffnen</a>
+            </div>
+        </div>
+        <button type="button" class="form-control" class="btn btn-raised"
+                style="position:relative;width:100%;margin-top:40px;"
+                (click)="back()"><span
+                class="glyphicon glyphicon-menu-left" aria-hidden="true"></span><span> Zurück</span>
+        </button>
+    </div>
+</div>

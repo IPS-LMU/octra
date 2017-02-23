@@ -1,0 +1,43 @@
+.audioviewer {
+    width: 100%;
+    position: relative;
+    resize: vertical;
+    display: block;
+}
+
+.audioviewer .audio-line {
+    position: relative;
+}
+
+.graphicscanvas,
+.mousecanvas,
+.playcanvas,
+.overlaycanvas {
+    position: absolute;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    /* width:100%;
+    height:100%;*/
+}
+
+.graphicscanvas {
+    z-index: 1;
+}
+
+.overlaycanvas {
+    z-index: 2;
+}
+
+.mousecanvas {
+    z-index: 3;
+}
+
+.playcanvas {
+    z-index: 4;
+    cursor: default;
+}
+
+.playcanvas.dragable {
+    cursor: move;
+}

@@ -1,0 +1,57 @@
+<modal #modalexport>
+    <modal-header>
+        <h4 class="modal-title">Daten exportieren</h4>
+    </modal-header>
+    <modal-body>
+        <div class="row">
+            <div class="col-xs-6 export-button">
+                <a download="annot.txt" [href]="sanitize(getURI('text'))">
+                    <div (mouseenter)="navbarServ.onExportButtonClick('text')"><span
+                            class="glyphicon glyphicon-floppy-save"></span><br/>Textdatei
+                    </div>
+                </a><br/>
+                <a class="export-a"
+                   href="https://clarin.phonetik.uni-muenchen.de/BASWebServices/#/services/WebMAUSBasic"
+                   target="_blank">WebMAUS öffnen</a>
+            </div>
+            <div class="col-xs-6 export-button">
+                <a download="annot.json" [href]="sanitize(getURI('annotJSON'))">
+                    <div (mouseenter)="navbarServ.onExportButtonClick('annotJSON')"><span
+                            class="glyphicon glyphicon-floppy-save"></span><br/>annotJSON
+                    </div>
+                </a><br/>
+                <a class="export-a"
+                   href="http://ips-lmu.github.io/EMU-webApp/"
+                   target="_blank">EMU-Webapp öffnen</a>
+            </div>
+        </div>
+    </modal-body>
+    <modal-footer>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="modalexport.dismiss()">Schließen
+        </button>
+    </modal-footer>
+</modal>
+<nav class="navbar navbar-inverse">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" (click)="collapsed = !collapsed;" class="navbar-toggle" data-toggle="collapse"
+                    data-target="#navbar" aria-expanded="true" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" [routerLink]="['/']">OCTRA v{{version}}</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav" (mouseleave)="coll()">
+                <li *ngIf="sessService.LoggedIn && navbarServ.show_hidden"><a (mouseup)="coll();setInterface('audioplayer')"> Editor ohne
+                    Signaldisplay</a></li>
+                <li *ngIf="sessService.LoggedIn && navbarServ.show_hidden"><a (mouseup)="coll();setInterface('signaldisplay')">Linearer Editor</a>
+                </li>
+                <li *ngIf="sessService.LoggedIn && navbarServ.show_hidden"><a (mouseup)="coll();setInterface('overlay')">2D-Editor</a></li>
+                <li *ngIf="sessService.LoggedIn && navbarServ.show_hidden"><a (mouseup)="modalexport.open()">Export</a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>

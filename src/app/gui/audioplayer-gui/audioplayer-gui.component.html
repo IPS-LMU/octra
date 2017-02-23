@@ -1,0 +1,14 @@
+<app-audio-navigation #nav
+                      (volumechange)="onVolumeChange($event)"
+                      (aftervolumechange)="afterVolumeChange($event)"
+                      (speedchange)="onSpeedChange($event)"
+                      (afterspeedchange)="afterSpeedChange($event)"
+                      (button_click)="onButtonClick($event)"
+></app-audio-navigation>
+<app-audioplayer #audioplayer (shortcuttriggered)="onShortcutTriggered($event)"></app-audioplayer>
+<app-transcr-editor #transcr
+                    (onkeyup)="updateSegment($event);"
+                    (marker_insert)="onMarkerInsert($event)"
+                    (marker_click)="onMarkerClick($event)"
+>
+</app-transcr-editor>

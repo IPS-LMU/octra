@@ -390,6 +390,7 @@ xcuserdata/
 ### LibreOffice template
 # LibreOffice locks
 .~lock.*#
-/app/*.js
-/app/*.js.map
+/src/app/*.js
+/src/app/*.js.map
 /tmp/
+/src/app/app.config.ts

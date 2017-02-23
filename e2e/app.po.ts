@@ -1,6 +1,6 @@
-import { browser, element, by } from 'protractor/globals';
+import { browser, element, by } from 'protractor';
 
-export class Octra2Page {
+export class OctraPage {
   navigateTo() {
     return browser.get('/');
   }

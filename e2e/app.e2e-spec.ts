@@ -1,10 +1,10 @@
-import { Octra2Page } from './app.po';
+import { OctraPage } from './app.po';
 
-describe('octra2 App', function() {
-  let page: Octra2Page;
+describe('octra App', () => {
+  let page: OctraPage;
 
   beforeEach(() => {
-    page = new Octra2Page();
+    page = new OctraPage();
   });
 
   it('should display message saying app works', () => {

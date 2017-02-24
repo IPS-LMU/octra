@@ -68,16 +68,12 @@
                         die folgende Datei per Drag & Drop in das graue Feld:<br/><br/>
                         {{getDropzoneFileString(sessionService.selectedfile)}}
                     </p>
-                    <div id="dropzone" #dropzone (dragover)="onDragOver($event)" (drop)="onFileDrop($event)">
-                        <span *ngIf="sessionfile == null">Datei hier hineinziehen</span>
-                        <span *ngIf="sessionfile != null && (sessionService.selectedfile == null || sessionfile.name == sessionService.selectedfile.name)"><span class="text-success">Datei {{getDropzoneFileString(sessionfile)}} ausgewählt</span></span>
-                        <span *ngIf="sessionfile != null && (sessionService.selectedfile != null && sessionfile.name != sessionService.selectedfile.name)"><span class="text-danger">Datei {{getDropzoneFileString(sessionfile)}} ausgewählt</span></span>
-                    </div>
-                    <input *ngIf="(sessionfile != null && (sessionService.selectedfile == null || sessionfile.name == sessionService.selectedfile.name))" type="submit" id="offline-submit"
-                           class="btn btn-raised btn-primary" value="Transkription starten" [disabled]="!(sessionfile != null && (sessionService.selectedfile == null || sessionfile.name == sessionService.selectedfile.name))" (click)="onOfflineSubmit()"/>
+                    <app-drop-zone [(sessionfile)]="sessionService.selectedfile" #dropzone></app-drop-zone>
+                    <input *ngIf="getFileStatus() == 'start'" type="submit" id="offline-submit"
+                           class="btn btn-raised btn-primary" value="Transkription starten" (click)="onOfflineSubmit()"/>
 
-                    <input *ngIf="(sessionfile != null && (sessionService.selectedfile != null && sessionfile.name != sessionService.selectedfile.name))" id="offline-delete-btn"
-                          class="btn btn-raised btn-danger" (click)="newTranscription()" [disabled]="!(sessionfile != null && sessionfile.name != sessionService.selectedfile.name)" value="Neue Transkription beginnen"/>
+                    <input *ngIf="getFileStatus() == 'new'" id="offline-delete-btn"
+                          class="btn btn-raised btn-danger" (click)="newTranscription()" value="Neue Transkription beginnen"/>
                 </div>
             </section>
         </div>

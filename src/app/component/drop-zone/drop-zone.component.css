@@ -1,0 +1,5 @@
+.dropzone{
+    border: 2px dashed grey;
+    background-color: rgb(240,240,240);
+    padding: 20px;
+}

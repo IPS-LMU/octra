@@ -1,0 +1,5 @@
+<div class="dropzone" #dropzone (dragover)="onDragOver($event)" (drop)="onFileDrop($event)">
+  <span *ngIf="file == null">Datei hier hineinziehen</span>
+  <span *ngIf="file != null && (sessionfile == null || sessionfile.name == file.name)"><span class="text-success">Datei {{getDropzoneFileString(sessionfile)}} ausgewählt</span></span>
+  <span *ngIf="file != null && (sessionfile != null && sessionfile.name != file.name)"><span class="text-danger">Datei {{getDropzoneFileString(sessionfile)}} ausgewählt</span></span>
+</div>

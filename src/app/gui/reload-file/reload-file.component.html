@@ -47,26 +47,20 @@
             <p>
                 <b>Gesucht wird: {{getDropzoneFileString(sessServ.selectedfile)}}</b><br/><br/>
             </p>
-            <div id="dropzone" #dropzone (dragover)="onDragOver($event)" (drop)="onFileDrop($event)">
-                <span *ngIf="selected_file == null">Datei hier hineinziehen</span>
-                <span *ngIf="selected_file != null && selected_file.name == sessServ.selectedfile.name"
-                      style="color:green;">Datei {{getDropzoneFileString(selected_file)}} ausgewählt</span>
-                <span *ngIf="selected_file != null && selected_file.name != sessServ.selectedfile.name"
-                      style="color:red;">Datei {{getDropzoneFileString(selected_file)}} ausgewählt</span>
-            </div>
+            <app-drop-zone [sessionfile]="sessServ.selectedfile" #dropzone></app-drop-zone>
             <div class="btn-group btn-group-justified" role="group" aria-label="...">
                 <div class="btn-group" role="group">
                     <button class="btn btn-default btn-raised" (click)="modal_leave.open()">Beenden
                     </button>
                 </div>
                 <div class="btn-group" role="group">
-                    <button class="btn btn-default btn-raised btn-danger" [disabled]="selected_file == null" (click)="modal_delete.open()">
+                    <button class="btn btn-default btn-raised btn-danger" [disabled]="dropzone.file == null" (click)="modal_delete.open()">
                         Neue
                         Transkription
                     </button>
                 </div>
                 <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-primary btn-raised" [disabled]="!(selected_file != null && selected_file.name == sessServ.selectedfile.name)" (click)="onOfflineSubmit()">Transkription
+                    <button type="button" class="btn btn-primary btn-raised" [disabled]="!(dropzone.file != null && dropzone.file.name == sessServ.selectedfile.name)" (click)="onOfflineSubmit()">Transkription
                         fortsetzen
                     </button>
                 </div>

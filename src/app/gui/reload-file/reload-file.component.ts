@@ -7,6 +7,8 @@ import { NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
 import { ModalComponent } from "ng2-bs3-modal/components/modal";
 import { TranscriptionService } from "../../service/transcription.service";
+import { DropZoneComponent } from "../../component/drop-zone/drop-zone.component";
+import { isNullOrUndefined } from "util";
 
 @Component({
 	selector   : 'app-reload-file',
@@ -17,12 +19,10 @@ export class ReloadFileComponent implements OnInit {
 	@ViewChild("modal_leave") modal_leave: ModalComponent;
 	@ViewChild("modal_delete") modal_delete: ModalComponent;
 	@ViewChild("modal_error") modal_error: ModalComponent;
-
-	@Output() private selected_file: SessionFile;
+	@ViewChild("dropzone") dropzone: DropZoneComponent;
 
 	private error:string = "";
 
-	private file: File;
 
 	constructor(private router: Router,
 				private sessServ: SessionService,
@@ -52,8 +52,8 @@ export class ReloadFileComponent implements OnInit {
 	}
 
 	onNewTranscription() {
-		this.sessServ.selectedfile = this.selected_file;
-		this.sessServ.file = this.file;
+		this.sessServ.selectedfile = this.getSessionFile(this.dropzone.file);
+		this.sessServ.file = this.dropzone.file;
 
 		this.sessServ.transcription = [];
 		this.transcrServ.segments = null;
@@ -62,46 +62,21 @@ export class ReloadFileComponent implements OnInit {
 		this.navigate();
 	}
 
-	onDragOver($event) {
-		$event.stopPropagation();
-		$event.preventDefault();
-		Logger.log("Drag");
-		$event.dataTransfer.dropEffect = 'copy';
-	}
-
-	onFileDrop($event) {
-		Logger.log("&Drop");
-		$event.stopPropagation();
-		$event.preventDefault();
-
-		let files = $event.dataTransfer.files; // FileList object.
-
-		if (files.length < 1) {
-			this.showErrorMessage("Etwas ist schiefgelaufen!");
-		}
-		else {
-			//select the first file
-			console.log("Name: " + files[ 0 ].name);
-			this.file = files[ 0 ];
-			this.selected_file = new SessionFile(files[ 0 ].name, files[ 0 ].size, files[ 0 ].timestamp, files[ 0 ].type);
-		}
-	}
-
 	onOfflineSubmit = () => {
 		let type: string = (this.sessServ.selectedfile.type) ? this.sessServ.selectedfile.type : "unbekannt";
 
-		if (this.selected_file != null && this.sessServ.selectedfile != null && type == "audio/wav") {
+		if (this.dropzone.file != null && this.sessServ.selectedfile != null && type == "audio/wav") {
 			if (
-				this.file.name != this.sessServ.selectedfile.name
-				|| this.file.type != this.sessServ.selectedfile.type
-				|| this.file.size != this.sessServ.selectedfile.size
+				this.dropzone.file.name != this.sessServ.selectedfile.name
+				|| this.dropzone.file.type != this.sessServ.selectedfile.type
+				|| this.dropzone.file.size != this.sessServ.selectedfile.size
 			) {
 				this.showErrorMessage("Es wurde eine andere Datei ausgewählt. Bitte wähle die gleiche Datei aus wie zuvor oder beginne eine neue Transkription.\n\nGesucht wird die Datei '" + this.getDropzoneFileString(this.sessServ.selectedfile) + "'");
 			}
 			else {
 				//navigate
-				this.sessServ.selectedfile = this.selected_file;
-				this.sessServ.file = this.file;
+				this.sessServ.selectedfile = this.getSessionFile(this.dropzone.file);
+				this.sessServ.file = this.dropzone.file;
 
 				this.sessServ.offline = true;
 				this.navigate();
@@ -115,5 +90,28 @@ export class ReloadFileComponent implements OnInit {
 	private showErrorMessage(err:string){
 		this.error = err;
 		this.modal_error.open();
+	}
+
+
+	getSessionFile(file: File) {
+		return new SessionFile(
+			file.name,
+			file.size,
+			file.lastModifiedDate,
+			file.type
+		);
+	}
+
+	getFileStatus(): string {
+		if (!isNullOrUndefined(this.dropzone.file) && (this.dropzone.file.type == "audio/wav" || this.dropzone.file.type == "audio/x-wav")) {
+			//check conditions
+			if (this.sessServ.selectedfile == null || this.dropzone.file.name == this.sessServ.selectedfile.name) {
+				return "start";
+			} else{
+				return "new";
+			}
+		}
+
+		return "unknown";
 	}
 }

@@ -52,6 +52,7 @@ import { AlertComponent } from './component/alert/alert.component';
 import { APIService } from "./service/api.service";
 import { ReloadFileComponent } from './gui/reload-file/reload-file.component';
 import { NavbarService } from "./service/navbar.service";
+import { DropZoneComponent } from './component/drop-zone/drop-zone.component';
 
 @NgModule({
 	declarations: [
@@ -83,7 +84,8 @@ import { NavbarService } from "./service/navbar.service";
 		TranscrOverviewComponent,
 		TranscrWindowComponent,
 		AlertComponent,
-		ReloadFileComponent
+		ReloadFileComponent,
+		DropZoneComponent
 	],
 	imports     : [
 		BrowserModule,

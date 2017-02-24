@@ -29,34 +29,31 @@ import { Logger } from "../../shared/Logger";
 import { SessionFile } from "../../shared/SessionFile";
 import { OCTRANIMATIONS } from "../../shared/OCTRAnimations";
 import { APP_CONFIG } from "../../app.config";
+import { DropZoneComponent } from "../../component/drop-zone/drop-zone.component";
+import { isNullOrUndefined } from "util";
+import { isUndefined } from "util";
 
 @Component({
-	selector       : 'app-login',
-	templateUrl    : 'login.component.html',
-	styleUrls      : [ 'login.component.css' ],
-	providers      : [ LoginService ],
-	animations: OCTRANIMATIONS
+	selector   : 'app-login',
+	templateUrl: 'login.component.html',
+	styleUrls  : [ 'login.component.css' ],
+	providers  : [ LoginService ],
+	animations : OCTRANIMATIONS
 })
 export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate {
 	@ViewChild('modal') modal: ModalComponent;
 	@ViewChild('agreement') agreement: ModalComponent;
-	@ViewChild('dropzone') dropzoneRef: ElementRef;
 	@ViewChild('f') loginform: NgForm;
+	@ViewChild('dropzone') dropzone: DropZoneComponent;
 
 	private valid_platform: boolean = false;
 	private valid_size: boolean = false;
 	private browser_check: BrowserCheck;
 	private agreement_checked: boolean;
 
-	private dropzone: HTMLDivElement;
-
 	private subscriptions: Subscription[] = [];
 
-	private sessionfile: SessionFile;
-
-	private file:File;
-
-	get apc():any{
+	get apc(): any {
 		return APP_CONFIG.Settings;
 	}
 
@@ -96,13 +93,11 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
 		jQuery.material.init();
 
-		console.log(this.sessionfile);
 		this.cd.markForCheck();
 		this.cd.detectChanges();
 	}
 
 	ngAfterViewInit() {
-		this.dropzone = this.dropzoneRef.nativeElement;
 		/*
 		 Logger.log("view init");
 		 this.dropzone.addEventListener('dragover', this.onDragOver, false);
@@ -139,18 +134,22 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	}
 
 	onOfflineSubmit = (form: NgForm) => {
-		if(this.sessionService.selectedfile == null)
-			this.sessionService.selectedfile = this.sessionfile;
 
-		let type: string = (this.sessionService.selectedfile.type) ? this.sessionService.selectedfile.type : "unbekannt";
+		let type: string = (this.dropzone.file.type) ? this.dropzone.file.type : "unknown";
 
-		if (this.sessionService.selectedfile != null && type == "audio/x-wav" || type == "audio/wav") {
-			//navigate
+		if (this.dropzone.file != null && type == "audio/x-wav" || type == "audio/wav") {
+
 			let res = this.sessionService.setSessionData("0", 0, "");
 			if (res.error === "") {
 				this.sessionService.offline = true;
-				this.sessionService.selectedfile = this.sessionfile;
-				this.sessionService.file = this.file;
+				this.sessionService.selectedfile = new SessionFile(
+					this.dropzone.file.name,
+					this.dropzone.file.size,
+					this.dropzone.file.lastModifiedDate,
+					this.dropzone.file.type
+				);
+
+				this.sessionService.file = this.dropzone.file;
 				this.navigate();
 			}
 			else {
@@ -183,28 +182,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 		this.agreement.open();
 	}
 
-	onDragOver($event) {
-		$event.stopPropagation();
-		$event.preventDefault();
-		Logger.log("Drag");
-		$event.dataTransfer.dropEffect = 'copy';
-	}
-
-	onFileDrop($event) {
-		Logger.log("&Drop");
-		$event.stopPropagation();
-		$event.preventDefault();
-
-		let files = $event.dataTransfer.files; // FileList object.
-
-		if (files.length < 1) {
-			alert("Etwas ist schiefgelaufen!");
-		}
-		else {
-			//select the first file
-			this.sessionfile = new SessionFile(files[ 0 ].name, files[ 0 ].size, files[ 0 ].timestamp, files[ 0 ].type);
-			this.file = files[ 0 ];
-		}
+	afterFileDrop($event) {
 	}
 
 	getDropzoneFileString(file: SessionFile) {
@@ -213,19 +191,37 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 		return Functions.buildStr("{0} ({1} {2})", [ file.name, (Math.round(fsize.size * 100) / 100), fsize.label ]);
 	}
 
-	toggleState(){
-		this.local_state = (this.local_state == "active") ? "inactive" : "active";
-	}
-
-	newTranscription(){
-		if(this.file != null) {
+	newTranscription() {
+		if (this.dropzone.file != null) {
 			this.sessionService.clearSession();
 			this.sessionService.clearLocalStorage();
 			this.sessionService.setSessionData("", 0, "");
-			this.sessionService.selectedfile = this.sessionfile;
-			this.sessionService.file = this.file;
+			this.sessionService.selectedfile = this.getSessionFile(this.dropzone.file);
+			this.sessionService.file = this.dropzone.file;
 			this.sessionService.offline = true;
 			this.navigate();
 		}
+	}
+
+	getSessionFile(file: File) {
+		return new SessionFile(
+			file.name,
+			file.size,
+			file.lastModifiedDate,
+			file.type
+		);
+	}
+
+	getFileStatus(): string {
+		if (!isNullOrUndefined(this.dropzone.file) && (this.dropzone.file.type == "audio/wav" || this.dropzone.file.type == "audio/x-wav")) {
+			//check conditions
+			if (this.sessionService.selectedfile == null || this.dropzone.file.name == this.sessionService.selectedfile.name) {
+				return "start";
+			} else{
+				return "new";
+			}
+		}
+
+		return "unknown";
 	}
 }

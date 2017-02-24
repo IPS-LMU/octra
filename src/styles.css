@@ -85,12 +85,6 @@ footer{
     height:16px;
 }
 
-#dropzone{
-    border: 2px dashed grey;
-    background-color: rgb(240,240,240);
-    padding: 20px;
-}
-
 .export-glyphicon{
     font-size:50px;
     color:#0b0080;

@@ -43,7 +43,6 @@ export class ReloadFileComponent implements OnInit {
 	//TODO A module for dropzone!
 	getDropzoneFileString(file: SessionFile) {
 		let fsize: FileSize = Functions.getFileSize(file.size);
-		console.log(file.name);
 		return Functions.buildStr("{0} ({1} {2})", [ file.name, (Math.round(fsize.size * 100) / 100), fsize.label ]);
 	}
 

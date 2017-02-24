@@ -16,9 +16,8 @@ export class FileService {
 	openFileSystem(quota: number, callback: (fs: any) => void) {
 		navigator.webkitPersistentStorage.requestQuota(quota, () => {
 			window.requestFileSystem(window.PERSISTENT, quota, callback, this.errorHandler);
-			console.log("request fs");
 		}, (e) => {
-			console.log("Error: " + e)
+			console.error("Error: " + e)
 		});
 	}
 
@@ -47,6 +46,6 @@ export class FileService {
 		}
 		;
 
-		console.log('File API - Error: ' + msg);
+		console.error('File API - Error: ' + msg);
 	}
 }

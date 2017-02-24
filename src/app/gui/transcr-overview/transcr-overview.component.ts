@@ -81,7 +81,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy {
 			let subscr = this.audio.afterloaded.subscribe(() => {
 				let subscr2 = this.transcrService.segments.onsegmentchange.subscribe(() => {
 					if (!this.updating) {
-						console.log("update segs");
 						this.updating = true;
 						setTimeout(() => {
 							this.updateSegments();
@@ -101,7 +100,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy {
 		} else{
 			let subscr2 = this.transcrService.segments.onsegmentchange.subscribe(() => {
 				if (!this.updating) {
-					console.log("update segs");
+
 					this.updating = true;
 					setTimeout(() => {
 						this.updateSegments();

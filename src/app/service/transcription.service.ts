@@ -130,7 +130,7 @@ export class TranscriptionService {
 		if (!this.sessServ.transcription) {
 			this.sessServ.transcription = [];
 		}
-		Logger.log("ok: " + this.last_sample);
+
 		this.segments = new Segments(sample_rate, this.sessServ.transcription, this._last_sample);
 
 		if (!this.sessServ.feedback) {
@@ -205,7 +205,6 @@ export class TranscriptionService {
 
 				let subscr = this.audio.afterloaded.subscribe((result) => {
 					this.last_sample = this.audio.duration.samples;
-					console.log("Samplerate: " + this.audio.samplerate);
 					this.loadSegments(this.audio.samplerate);
 
 					let subscr = this.segments.onsegmentchange.subscribe(this.saveSegments);
@@ -221,7 +220,6 @@ export class TranscriptionService {
 				//offline mode
 				let subscr = this.audio.afterloaded.subscribe((result) => {
 					this.last_sample = this.audio.duration.samples;
-					console.log("Samplerate: " + this.audio.samplerate);
 					this.loadSegments(this.audio.samplerate);
 
 					let subscr = this.segments.onsegmentchange.subscribe(this.saveSegments);
@@ -237,19 +235,14 @@ export class TranscriptionService {
 				reader.onload = ((theFile) => {
 					return function (e) {
 						// Render thumbnail.
-						console.log("Read...");
-						console.log(e);
-						console.log(this.selected_file);
 					};
 				})(this.sessServ.selectedfile);
 
 				reader.onloadend = (ev) => {
-					console.log("FINISHED");
 					let t: any = ev.target;
 
 					this.sessServ.offline = true;
 
-					console.log(this.sessServ.offline);
 					this.audio.decodeAudio(t.result);
 				};
 

@@ -35,12 +35,10 @@ export class DropZoneComponent implements OnInit {
   onDragOver($event) {
     $event.stopPropagation();
     $event.preventDefault();
-    Logger.log("Drag");
     $event.dataTransfer.dropEffect = 'copy';
   }
 
   onFileDrop($event) {
-    Logger.log("&Drop");
     $event.stopPropagation();
     $event.preventDefault();
 

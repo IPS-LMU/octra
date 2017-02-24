@@ -23,7 +23,6 @@ export class Segments {
 		this._segments = [];
 
 		if (segments.length == 0) {
-			Logger.log("Letztes Segment: " + last_sample);
 			this._segments.push(new Segment(new AudioTime(last_sample, sample_rate)));
 		}
 

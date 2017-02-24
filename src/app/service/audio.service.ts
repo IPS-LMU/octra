@@ -234,7 +234,6 @@ export class AudioService {
 			this.gainNode.connect(this.audiocontext.destination);
 
 			this._duration.sample_rate = this.samplerate;
-			console.log("new samplerate: " + this.samplerate);
 
 			this.audioplaying = true;
 			this.paused = false;
@@ -323,18 +322,11 @@ export class AudioService {
 	}) => {
 		let samplerate = this.getSampleRate(result);
 
-		console.log("SR: " + samplerate);
 		decodeAudioFile(result, samplerate).then((buffer) => {
 			this._audiobuffer = buffer;
 			this.duration = new AudioTime(buffer.length, buffer.sampleRate);
-			console.log("Vergleiche " + this.duration.seconds + " == " + buffer.duration);
-			console.log("AudioContext SR: " + this.audiocontext.sampleRate);
-			console.log("Buffer SR = " + buffer.sampleRate);
 			this.gainNode = this.audiocontext.createGain();
 			this.source = this.getSource();
-			console.log(buffer);
-			console.log(this.audiocontext.sampleRate);
-			console.log(buffer.duration);
 
 			this.loaded = true;
 			this.afterloaded.emit({ status: "success", error: "" });

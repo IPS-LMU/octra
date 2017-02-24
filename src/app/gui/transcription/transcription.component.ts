@@ -131,7 +131,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 			this.tranService.loadAudioFile();
 			this.initialized[ "audiolayer" ] = false;
 		}else{
-			console.log("reload_again");
 			this.afterAudioLoaded();
 		}
 	}

@@ -5,6 +5,7 @@ export class APP_CONFIG {
 	public static get Settings(): any {
 		return {
 			//AUDIO SERVER SETTINGS
+			LOGIN_ENABLED: false,
 			AUDIO_SERVER       : "", //server api url
 			//LOGGING
 			LOGGING: true,

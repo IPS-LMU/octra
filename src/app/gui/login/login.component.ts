@@ -28,6 +28,7 @@ import { HostListener } from "@angular/core/src/metadata/directives";
 import { Logger } from "../../shared/Logger";
 import { SessionFile } from "../../shared/SessionFile";
 import { OCTRANIMATIONS } from "../../shared/OCTRAnimations";
+import { APP_CONFIG } from "../../app.config";
 
 @Component({
 	selector       : 'app-login',
@@ -54,6 +55,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	private sessionfile: SessionFile;
 
 	private file:File;
+
+	get apc():any{
+		return APP_CONFIG.Settings;
+	}
 
 	close() {
 		this.modal.close();

@@ -7,6 +7,12 @@ export class AppConfigValidator extends ConfigValidator {
 		let prefix: string = "AppConfig Validation - ";
 
 		switch (key) {
+			case("LOGIN_ENABLED"):
+				if (typeof value === "boolean") break;
+				return {
+					success: false,
+					error  : prefix + "value of key '" + key + "' must be of type boolean"
+				};
 			case("AUDIO_SERVER"):
 				if (typeof value === "string" && (value.indexOf("https://") > -1 || value.indexOf("http://") > -1)) break;
 				return {

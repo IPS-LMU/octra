@@ -24,12 +24,15 @@
                 Chrome erneut.
             </p>
 
-            <p *ngIf="!valid_size" class="warning">
+            <p *ngIf="!apc.RESPONSIVE && !valid_size" class="warning">
                 <b>Die Fensterbreite ist zu klein.</b> Bitte vergrößern Sie dieses Fenster bis die Meldung verschwindet.
             </p>
             <section>
-                Login function is currently deactivated. Please use OCTRA locally.
-                <form class="form-horizontal" (ngSubmit)="onSubmit(f)" #f="ngForm">
+                <h4>Login</h4>
+                <div *ngIf="!apc.LOGIN_ENABLED" id="login-disabled">
+                    Login function is currently deactivated. Please use OCTRA locally.
+                </div>
+                <form *ngIf="apc.LOGIN_ENABLED" class="form-horizontal" (ngSubmit)="onSubmit(f)" #f="ngForm">
                     <fieldset>
                         <div>
                             <div class="form-group">
@@ -56,10 +59,10 @@
                 </form>
                 <br/>
             </section>
+            <hr/>
             <section>
-                <a href="login#local" id="local-link" (click)="toggleState()">OCTRA lokal verwenden</a>
-
-                <div [@fadeToggle]="local_state">
+                <h4>Use local File</h4>
+                <div>
                     <p *ngIf="sessionService.selectedfile != null">
                         Es wurden Daten zu einer vorherigen Transkription gefunden. Um diese fortzusetzen, ziehen Sie
                         die folgende Datei per Drag & Drop in das graue Feld:<br/><br/>

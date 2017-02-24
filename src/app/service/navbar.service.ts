@@ -15,6 +15,7 @@ export class NavbarService {
 	private _show_hidden:boolean = false;
 
 	public exportformats :any = {
+		filename: "",
 		text: "",
 		annotJSON: ""
 	};

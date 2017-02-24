@@ -5,7 +5,7 @@
     <modal-body>
         <div class="row">
             <div class="col-xs-6 export-button">
-                <a download="annot.txt" [href]="sanitize(getURI('text'))">
+                <a download="{{navbarServ.exportformats.filename}}.txt" [href]="sanitize(getURI('text'))">
                     <div (mouseenter)="navbarServ.onExportButtonClick('text')"><span
                             class="glyphicon glyphicon-floppy-save"></span><br/>Textdatei
                     </div>
@@ -15,7 +15,7 @@
                    target="_blank">WebMAUS öffnen</a>
             </div>
             <div class="col-xs-6 export-button">
-                <a download="annot.json" [href]="sanitize(getURI('annotJSON'))">
+                <a download="{{navbarServ.exportformats.filename}}_annot.json" [href]="sanitize(getURI('annotJSON'))">
                     <div (mouseenter)="navbarServ.onExportButtonClick('annotJSON')"><span
                             class="glyphicon glyphicon-floppy-save"></span><br/>annotJSON
                     </div>

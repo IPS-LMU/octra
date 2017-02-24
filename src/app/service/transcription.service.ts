@@ -16,7 +16,6 @@ import { TextConverter } from "../shared/Converters/TextConverter";
 import { FileService } from "./file.service";
 import { AnnotJSONConverter } from "../shared/Converters/AnnotJSONConverter";
 
-declare var BlobBuilder:any;
 
 @Injectable()
 export class TranscriptionService {
@@ -43,6 +42,8 @@ export class TranscriptionService {
 	private _segments: Segments;
 	private _last_sample: number;
 	private saving: boolean = false;
+
+	public filename:string = "";
 
 	private feedback: any = {
 		quality_speaker: "",
@@ -96,6 +97,7 @@ export class TranscriptionService {
 				//format to annotJSON file
 				this.navbarServ.exportformats.annotJSON = this.getTranscriptString(button.format);
 			}
+			this.navbarServ.exportformats.filename = this.filename;
 		});
 		this.subscriptions.push(subscr3);
 	}
@@ -202,6 +204,9 @@ export class TranscriptionService {
 		if (this.audio.audiocontext) {
 			if (this.sessServ.offline != true) {
 				let src = APP_CONFIG.Settings.AUDIO_SERVER + this.sessServ.audio_url;
+				//extract filename
+				this.filename = this.sessServ.audio_url.substr(this.sessServ.audio_url.lastIndexOf("/") + 1);
+				this.filename = this.filename.substr(0, this.filename.lastIndexOf(".") - 1);
 
 				let subscr = this.audio.afterloaded.subscribe((result) => {
 					this.last_sample = this.audio.duration.samples;
@@ -218,6 +223,8 @@ export class TranscriptionService {
 			}
 			else {
 				//offline mode
+				this.filename = this.sessServ.file.name;
+				this.filename = this.filename.substr(0, this.filename.lastIndexOf(".") - 1);
 				let subscr = this.audio.afterloaded.subscribe((result) => {
 					this.last_sample = this.audio.duration.samples;
 					this.loadSegments(this.audio.samplerate);

@@ -151,7 +151,7 @@
         <h4>Daten exportieren</h4>
         <div class="row" style="padding:15px;">
             <div class="col-xs-6 export-button">
-                <a download="annot.txt" [href]="sanitize(getURI('text'))">
+                <a download="{{transcrService.filename}}.txt" [href]="sanitize(getURI('text'))">
                     <div><span
                             class="glyphicon glyphicon-floppy-save export-glyphicon"></span><br/>Textdatei
                     </div>
@@ -161,7 +161,7 @@
                    target="_blank">WebMAUS öffnen</a>
             </div>
             <div class="col-xs-6 export-button">
-                <a download="annot.json" [href]="sanitize(getURI('annotJSON'))">
+                <a download="{{transcrService.filename}}_annot.json" [href]="sanitize(getURI('annotJSON'))">
                     <div><span
                             class="glyphicon glyphicon-floppy-save export-glyphicon"></span><br/>annotJSON
                     </div>

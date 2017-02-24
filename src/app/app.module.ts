@@ -2,7 +2,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { HttpModule, JsonpModule } from "@angular/http";
+import { HttpModule, JsonpModule, Http } from "@angular/http";
 
 
 //third-party
@@ -53,6 +53,13 @@ import { APIService } from "./service/api.service";
 import { ReloadFileComponent } from './gui/reload-file/reload-file.component';
 import { NavbarService } from "./service/navbar.service";
 import { DropZoneComponent } from './component/drop-zone/drop-zone.component';
+import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-translate/core';
+import {TranslateHttpLoader} from '@ngx-translate/http-loader';
+
+// AoT requires an exported function for factories
+export function HttpLoaderFactory(http: Http) {
+	return new TranslateHttpLoader(http);
+}
 
 @NgModule({
 	declarations: [
@@ -89,6 +96,13 @@ import { DropZoneComponent } from './component/drop-zone/drop-zone.component';
 	],
 	imports     : [
 		BrowserModule,
+		TranslateModule.forRoot({
+			loader: {
+				provide: TranslateLoader,
+				useFactory: HttpLoaderFactory,
+				deps: [Http]
+			}
+		}),
 		FormsModule,
 		HttpModule,
 		JsonpModule,
@@ -112,6 +126,7 @@ import { DropZoneComponent } from './component/drop-zone/drop-zone.component';
 		MembersAreaGuard,
 		SessionService,
 		TranscrSubmittedGuard,
+		TranslateService,
 		NavbarService
 	]
 })

@@ -28,9 +28,9 @@
                 <b>Die Fensterbreite ist zu klein.</b> Bitte vergrößern Sie dieses Fenster bis die Meldung verschwindet.
             </p>
             <section>
-                <h4>Login</h4>
+                <h4>{{ 'Login' | translate}}</h4>
                 <div *ngIf="!apc.LOGIN_ENABLED" id="login-disabled">
-                    Login function is currently deactivated. Please use OCTRA locally.
+                    {{'Login inactive' | translate}}
                 </div>
                 <form *ngIf="apc.LOGIN_ENABLED" class="form-horizontal" (ngSubmit)="onSubmit(f)" #f="ngForm">
                     <fieldset>

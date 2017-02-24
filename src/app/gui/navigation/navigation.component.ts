@@ -6,6 +6,7 @@ import { TranscriptionService } from "../../service/transcription.service";
 import { TextConverter } from "../../shared/Converters/TextConverter";
 import { NavbarService } from "../../service/navbar.service";
 import { DomSanitizer } from '@angular/platform-browser';
+import { TranslateService } from "@ngx-translate/core";
 
 @Component({
 	selector   : 'app-navigation',
@@ -23,7 +24,8 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	constructor(private sessService: SessionService,
 				private navbarServ: NavbarService,
-				private sanitizer: DomSanitizer) {
+				private sanitizer: DomSanitizer,
+				private langService:TranslateService) {
 	}
 
 	ngOnDestroy() {
@@ -88,6 +90,11 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	sanitize(url:string){
 		return this.sanitizer.bypassSecurityTrustUrl(url);
+	}
+
+	changeLanguage(lang:string){
+		this.langService.setDefaultLang(lang);
+		console.log("change to lang: " + lang);
 	}
 
 }

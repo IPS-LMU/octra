@@ -243,7 +243,7 @@ export class TranscriptionService {
 					return function (e) {
 						// Render thumbnail.
 					};
-				})(this.sessServ.selectedfile);
+				})(this.sessServ.sessionfile);
 
 				reader.onloadend = (ev) => {
 					let t: any = ev.target;

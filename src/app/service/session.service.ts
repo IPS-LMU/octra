@@ -4,6 +4,13 @@ import { SessionFile } from "../shared/SessionFile";
 
 @Injectable()
 export class SessionService {
+	set language(value: string) {
+		this._language = value;
+		this.sessStr.store("language", this._language);
+	}
+	get language(): string {
+		return this._language;
+	}
 	get sessionfile(): SessionFile {
 		return SessionFile.fromAny(this._sessionfile);
 	}
@@ -78,7 +85,7 @@ export class SessionService {
 	};
 	@SessionStorage('interface') _interface: string;
 	@SessionStorage('samplerate') _samplerate: number;
-	@LocalStorage('selectedfile') _sessionfile: any;
+
 
 	//LOCAL STORAGE
 	@LocalStorage('transcription') private _transcription: any;
@@ -88,6 +95,8 @@ export class SessionService {
 	@LocalStorage('data_id') private _data_id: number;
 	@LocalStorage('audio_url') private _audio_url: string;
 	@LocalStorage('offline') private _offline: boolean;
+	@LocalStorage('sessionfile') _sessionfile: any;
+	@LocalStorage('language') private _language: string;
 
 	//is user on the login page?
 	private login: boolean;

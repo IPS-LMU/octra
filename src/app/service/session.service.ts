@@ -4,13 +4,13 @@ import { SessionFile } from "../shared/SessionFile";
 
 @Injectable()
 export class SessionService {
-	get selectedfile(): SessionFile {
-		return SessionFile.fromAny(this._selectedfile);
+	get sessionfile(): SessionFile {
+		return SessionFile.fromAny(this._sessionfile);
 	}
 
-	set selectedfile(value: SessionFile) {
-		this._selectedfile = value.toAny();
-		this.localStr.store("selectedfile", this._selectedfile);
+	set sessionfile(value: SessionFile) {
+		this._sessionfile = value.toAny();
+		this.localStr.store("sessionfile", this._sessionfile);
 	}
 
 	get offline(): boolean {
@@ -78,7 +78,7 @@ export class SessionService {
 	};
 	@SessionStorage('interface') _interface: string;
 	@SessionStorage('samplerate') _samplerate: number;
-	@LocalStorage('selectedfile') _selectedfile: any;
+	@LocalStorage('selectedfile') _sessionfile: any;
 
 	//LOCAL STORAGE
 	@LocalStorage('transcription') private _transcription: any;

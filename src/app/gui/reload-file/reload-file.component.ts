@@ -2,8 +2,6 @@ import { Component, OnInit, ViewChild, Output } from '@angular/core';
 import { SessionService } from "../../service/session.service";
 import { SessionFile } from "../../shared/SessionFile";
 import { FileSize, Functions } from "../../shared/Functions";
-import { Logger } from "../../shared/Logger";
-import { NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
 import { ModalComponent } from "ng2-bs3-modal/components/modal";
 import { TranscriptionService } from "../../service/transcription.service";
@@ -29,8 +27,8 @@ export class ReloadFileComponent implements OnInit {
 				private transcrServ: TranscriptionService) {
 	}
 
-	get sessionfile(): File {
-		return this.sessServ.file;
+	get sessionfile(): SessionFile {
+		return this.sessServ.sessionfile;
 	}
 
 	ngOnInit() {
@@ -41,7 +39,7 @@ export class ReloadFileComponent implements OnInit {
 	}
 
 	//TODO A module for dropzone!
-	getDropzoneFileString(file: SessionFile) {
+	getDropzoneFileString(file: File | SessionFile) {
 		let fsize: FileSize = Functions.getFileSize(file.size);
 		return Functions.buildStr("{0} ({1} {2})", [ file.name, (Math.round(fsize.size * 100) / 100), fsize.label ]);
 	}
@@ -51,7 +49,7 @@ export class ReloadFileComponent implements OnInit {
 	}
 
 	onNewTranscription() {
-		this.sessServ.selectedfile = this.getSessionFile(this.dropzone.file);
+		this.sessServ.sessionfile = this.getSessionFile(this.dropzone.file);
 		this.sessServ.file = this.dropzone.file;
 
 		this.sessServ.transcription = [];
@@ -62,19 +60,19 @@ export class ReloadFileComponent implements OnInit {
 	}
 
 	onOfflineSubmit = () => {
-		let type: string = (this.sessServ.selectedfile.type) ? this.sessServ.selectedfile.type : "unbekannt";
+		let type: string = (this.sessServ.sessionfile.type) ? this.sessServ.sessionfile.type : "unbekannt";
 
-		if (this.dropzone.file != null && this.sessServ.selectedfile != null && type == "audio/wav") {
+		if (this.dropzone.file != null && this.sessServ.sessionfile != null && (type == "audio/wav" || type == "audio/x-wav")) {
 			if (
-				this.dropzone.file.name != this.sessServ.selectedfile.name
-				|| this.dropzone.file.type != this.sessServ.selectedfile.type
-				|| this.dropzone.file.size != this.sessServ.selectedfile.size
+				this.dropzone.file.name != this.sessServ.sessionfile.name
+				|| this.dropzone.file.type != this.sessServ.sessionfile.type
+				|| this.dropzone.file.size != this.sessServ.sessionfile.size
 			) {
-				this.showErrorMessage("Es wurde eine andere Datei ausgewählt. Bitte wähle die gleiche Datei aus wie zuvor oder beginne eine neue Transkription.\n\nGesucht wird die Datei '" + this.getDropzoneFileString(this.sessServ.selectedfile) + "'");
+				this.showErrorMessage("Es wurde eine andere Datei ausgewählt. Bitte wähle die gleiche Datei aus wie zuvor oder beginne eine neue Transkription.\n\nGesucht wird die Datei '" + this.getDropzoneFileString(this.sessServ.sessionfile) + "'");
 			}
 			else {
 				//navigate
-				this.sessServ.selectedfile = this.getSessionFile(this.dropzone.file);
+				this.sessServ.sessionfile = this.getSessionFile(this.dropzone.file);
 				this.sessServ.file = this.dropzone.file;
 
 				this.sessServ.offline = true;
@@ -104,7 +102,7 @@ export class ReloadFileComponent implements OnInit {
 	getFileStatus(): string {
 		if (!isNullOrUndefined(this.dropzone.file) && (this.dropzone.file.type == "audio/wav" || this.dropzone.file.type == "audio/x-wav")) {
 			//check conditions
-			if (this.sessServ.selectedfile == null || this.dropzone.file.name == this.sessServ.selectedfile.name) {
+			if (this.sessServ.sessionfile == null || this.dropzone.file.name == this.sessServ.sessionfile.name) {
 				return "start";
 			} else{
 				return "new";

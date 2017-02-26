@@ -53,6 +53,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
 	private subscriptions: Subscription[] = [];
 
+	get sessionfile():SessionFile{
+		return this.sessionService.sessionfile;
+	}
+
 	get apc(): any {
 		return APP_CONFIG.Settings;
 	}
@@ -73,8 +77,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	};
 
 	err: string = "";
-
-	local_state = "inactive";
 
 	constructor(private router: Router,
 				private loginService: LoginService,
@@ -142,7 +144,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 			let res = this.sessionService.setSessionData("0", 0, "");
 			if (res.error === "") {
 				this.sessionService.offline = true;
-				this.sessionService.selectedfile = new SessionFile(
+				this.sessionService.sessionfile = new SessionFile(
 					this.dropzone.file.name,
 					this.dropzone.file.size,
 					this.dropzone.file.lastModifiedDate,
@@ -185,7 +187,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	afterFileDrop($event) {
 	}
 
-	getDropzoneFileString(file: SessionFile) {
+	getDropzoneFileString(file: File| SessionFile) {
 		let fsize: FileSize = Functions.getFileSize(file.size);
 		return Functions.buildStr("{0} ({1} {2})", [ file.name, (Math.round(fsize.size * 100) / 100), fsize.label ]);
 	}
@@ -195,7 +197,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 			this.sessionService.clearSession();
 			this.sessionService.clearLocalStorage();
 			this.sessionService.setSessionData("", 0, "");
-			this.sessionService.selectedfile = this.getSessionFile(this.dropzone.file);
+			this.sessionService.sessionfile = this.getSessionFile(this.dropzone.file);
 			this.sessionService.file = this.dropzone.file;
 			this.sessionService.offline = true;
 			this.navigate();
@@ -214,7 +216,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	getFileStatus(): string {
 		if (!isNullOrUndefined(this.dropzone.file) && (this.dropzone.file.type == "audio/wav" || this.dropzone.file.type == "audio/x-wav")) {
 			//check conditions
-			if (this.sessionService.selectedfile == null || this.dropzone.file.name == this.sessionService.selectedfile.name) {
+			if (this.sessionService.sessionfile == null || this.dropzone.file.name == this.sessionService.sessionfile.name) {
 				return "start";
 			} else{
 				return "new";

@@ -10,6 +10,19 @@
         <button type="button" class="btn btn-primary" (click)="modal.dismiss()">OK</button>
     </modal-footer>
 </modal>
+<modal #modal_delete>
+    <modal-header>
+        <h4 class="modal-title">{{"modal.transcription.delete.header" | translate}}</h4>
+    </modal-header>
+    <modal-body>
+        <div class="modal-content" [innerHTML]="'modal.transcription.delete.text' | translate"></div>
+    </modal-body>
+    <modal-footer>
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="modal_delete.dismiss()">Abbrechen
+        </button>
+        <button type="button" class="btn btn-danger" (click)="newTranscription()">Alte Transkription löschen</button>
+    </modal-footer>
+</modal>
 <div>
     <span id="logo">OCTRA</span>
 </div>
@@ -28,9 +41,9 @@
                 <b>Die Fensterbreite ist zu klein.</b> Bitte vergrößern Sie dieses Fenster bis die Meldung verschwindet.
             </p>
             <section>
-                <h4>{{ 'Login' | translate}}</h4>
+                <h4>{{ 'login.online mode' | translate}}</h4>
                 <div *ngIf="!apc.LOGIN_ENABLED" id="login-disabled">
-                    {{'Login inactive' | translate}}
+                    {{'login.online mode disabled' | translate}}
                 </div>
                 <form *ngIf="apc.LOGIN_ENABLED" class="form-horizontal" (ngSubmit)="onSubmit(f)" #f="ngForm">
                     <fieldset>
@@ -61,19 +74,25 @@
             </section>
             <hr/>
             <section>
-                <h4>Use local File</h4>
+                <h4>{{'login.local mode' | translate}}</h4>
                 <div>
-                    <p *ngIf="sessionService.selectedfile != null">
-                        Es wurden Daten zu einer vorherigen Transkription gefunden. Um diese fortzusetzen, ziehen Sie
-                        die folgende Datei per Drag & Drop in das graue Feld:<br/><br/>
-                        {{getDropzoneFileString(sessionService.selectedfile)}}
+                    <p *ngIf="sessionService.sessionfile != null"
+                       [innerHTML]="'login.old file found' | translate:{file_label: getDropzoneFileString(sessionfile)}">
                     </p>
-                    <app-drop-zone [(sessionfile)]="sessionService.selectedfile" #dropzone></app-drop-zone>
+                    <app-drop-zone #dropzone>
+                        <span *ngIf="dropzone.file == null">{{ "dropzone.drag&drop here" | translate }}</span>
+                        <span *ngIf="dropzone.file != null && (sessionfile == null || sessionfile.name == dropzone.file.name)"><span
+                                class="text-success">{{ "dropzone.file selected" | translate:{file_label: getDropzoneFileString(dropzone.file)} }}</span></span>
+                        <span *ngIf="dropzone.file != null && (sessionfile != null && sessionfile.name != dropzone.file.name)"><span
+                                class="text-danger">{{ "dropzone.file selected" | translate:{file_label: getDropzoneFileString(dropzone.file)} }}</span></span>
+                    </app-drop-zone>
                     <input *ngIf="getFileStatus() == 'start'" type="submit" id="offline-submit"
-                           class="btn btn-raised btn-primary" value="Transkription starten" (click)="onOfflineSubmit()"/>
+                           class="btn btn-raised btn-primary" value="Transkription starten"
+                           (click)="onOfflineSubmit()"/>
 
                     <input *ngIf="getFileStatus() == 'new'" id="offline-delete-btn"
-                          class="btn btn-raised btn-danger" (click)="newTranscription()" value="Neue Transkription beginnen"/>
+                           class="btn btn-raised btn-danger" (click)="modal_delete.open()"
+                           value="Neue Transkription beginnen"/>
                 </div>
             </section>
         </div>

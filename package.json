@@ -1,15 +1,17 @@
 {
   "name": "octra",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": "Julian Pömp",
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --port 5321 --live-reload-port 5322",
+    "start": "ng serve --port 5321",
+    "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "prod": "ng build --prod"
   },
   "private": true,
   "dependencies": {
@@ -39,11 +41,11 @@
     "zone.js": "^0.7.6"
   },
   "devDependencies": {
-    "@angular/cli": "1.0.0-beta.32.3",
+    "@angular/cli": "1.0.0-rc.0",
     "@angular/compiler-cli": "^2.4.0",
     "@types/jasmine": "2.5.38",
     "@types/node": "~6.0.60",
-    "codelyzer": "~2.0.0-beta.4",
+    "codelyzer": "~2.0.0",
     "jasmine-core": "~2.5.2",
     "jasmine-spec-reporter": "~3.2.0",
     "karma": "~1.4.1",

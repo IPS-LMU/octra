@@ -1,13 +1,12 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Logger } from "../../shared/Logger";
 import { SessionFile } from "../../shared/SessionFile";
-import { FileSize, Functions } from "../../shared/Functions";
 
 @Component({
   selector: 'app-drop-zone',
   templateUrl: './drop-zone.component.html',
   styleUrls: ['./drop-zone.component.css']
 })
+
 export class DropZoneComponent implements OnInit {
   get file(): File {
     return this._file;
@@ -18,9 +17,7 @@ export class DropZoneComponent implements OnInit {
   }
 
   @Input()
-  set sessionfile(value: SessionFile) {
-    this._sessionfile = value;
-  }
+  innerhtml:string = "";
 
   private _file:File;
   private _sessionfile:SessionFile;
@@ -52,10 +49,5 @@ export class DropZoneComponent implements OnInit {
       this._file = files[ 0 ];
       this.afterdrop.emit(this._file);
     }
-  }
-
-  getDropzoneFileString() {
-    let fsize: FileSize = Functions.getFileSize(this.file.size);
-    return Functions.buildStr("{0} ({1} {2})", [ this.file.name, (Math.round(fsize.size * 100) / 100), fsize.label ]);
   }
 }

@@ -1,4 +1,20 @@
 {
-  "Login": "Login",
-  "Login inactive": "Login function is currently deactivated. Please use OCTRA locally."
+  "modal": {
+    "transcription":{
+      "delete": {
+        "header": "Create a new transcription?",
+        "text": "Do you really want to delete the previous Transcription and create a new one?<br><br>Your progress on the previous transcription will be deleted. This action can not be reverted."
+      }
+    }
+  },
+  "login":{
+    "online mode": "Online Mode",
+    "online mode disabled": "Online mode is currently deactivated. Please use OCTRA locally.",
+    "local mode": "Local Mode",
+    "old file found": "There is data from a previous transcription. If you like to continue your work, just drag & drop the following file to the gray box:<br/><br/>{{file_label}}"
+  },
+  "dropzone":{
+    "drag&drop here" : "Drag & Drop file here",
+    "file selected": "{{file_label}} selected"
+  }
 }

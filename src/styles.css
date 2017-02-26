@@ -100,3 +100,7 @@ footer{
 .export-a{
     font-size:0.8em;
 }
+
+.bg-warning{
+    padding:10px;
+}

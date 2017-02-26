@@ -94,7 +94,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	changeLanguage(lang:string){
 		this.langService.setDefaultLang(lang);
-		console.log("change to lang: " + lang);
+		this.sessService.language = lang;
 	}
 
 }

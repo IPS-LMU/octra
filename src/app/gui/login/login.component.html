@@ -1,10 +1,9 @@
 <modal #modal>
     <modal-header>
-        <h4 class="modal-title">Anmeldung fehlgeschlagen</h4>
+        <h4 class="modal-title">{{"modal.login.header" | translate}}</h4>
     </modal-header>
     <modal-body>
-        Die Anmeldung konnte leider nicht durchgeführt werden. Es sind bei dieser ID keine freien Audiodateien
-        verfügbar.
+        {{"modal.login.text" | translate}}
     </modal-body>
     <modal-footer>
         <button type="button" class="btn btn-primary" (click)="modal.dismiss()">OK</button>
@@ -14,13 +13,14 @@
     <modal-header>
         <h4 class="modal-title">{{"modal.transcription.delete.header" | translate}}</h4>
     </modal-header>
+
     <modal-body>
-        <div class="modal-content" [innerHTML]="'modal.transcription.delete.text' | translate"></div>
+        <div [innerHTML]="'modal.transcription.delete.text' | translate"></div>
     </modal-body>
     <modal-footer>
-        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="modal_delete.dismiss()">Abbrechen
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="modal_delete.dismiss()">{{"general.abort" | translate}}
         </button>
-        <button type="button" class="btn btn-danger" (click)="newTranscription()">Alte Transkription löschen</button>
+        <button type="button" class="btn btn-danger" (click)="newTranscription()">{{"modal.transcription.delete.delete old" | translate}}</button>
     </modal-footer>
 </modal>
 <div>
@@ -76,7 +76,7 @@
             <section>
                 <h4>{{'login.local mode' | translate}}</h4>
                 <div>
-                    <p *ngIf="sessionService.sessionfile != null"
+                    <p class="bg-warning" *ngIf="sessionService.sessionfile != null"
                        [innerHTML]="'login.old file found' | translate:{file_label: getDropzoneFileString(sessionfile)}">
                     </p>
                     <app-drop-zone #dropzone>
@@ -86,13 +86,13 @@
                         <span *ngIf="dropzone.file != null && (sessionfile != null && sessionfile.name != dropzone.file.name)"><span
                                 class="text-danger">{{ "dropzone.file selected" | translate:{file_label: getDropzoneFileString(dropzone.file)} }}</span></span>
                     </app-drop-zone>
-                    <input *ngIf="getFileStatus() == 'start'" type="submit" id="offline-submit"
-                           class="btn btn-raised btn-primary" value="Transkription starten"
+                    <input *ngIf="getFileStatus() != 'new'" [disabled]="!(getFileStatus() == 'start')" type="submit" id="offline-submit"
+                           class="btn btn-raised btn-primary" value="{{'general.start transcription' | translate}}"
                            (click)="onOfflineSubmit()"/>
 
                     <input *ngIf="getFileStatus() == 'new'" id="offline-delete-btn"
                            class="btn btn-raised btn-danger" (click)="modal_delete.open()"
-                           value="Neue Transkription beginnen"/>
+                           value="{{'general.start new transcription' |translate}}"/>
                 </div>
             </section>
         </div>

@@ -1,10 +1,24 @@
 {
+  "general":{
+    "abort": "Abbrechen",
+    "continue": "Weiter",
+    "close": "Schließen",
+    "open": "Öffnen",
+    "delete": "Löschen",
+    "start transcription": "Transkription beginnen",
+    "start new transcription": "Neue Transkription beginnen"
+  },
   "modal": {
     "transcription":{
       "delete": {
         "header": "Neue Transkription erstellen?",
-        "text": "Möchten Sie die alte Transkription wirklich entfernen?<br><br>Ihr Fortschritt an der vorherigen Transkription wird dabei gelöscht. Dieser Vorgang kann nicht widerrufen werden."
+        "text": "Möchten Sie die alte Transkription wirklich entfernen?<br><br>Ihr Fortschritt an der vorherigen Transkription wird dabei gelöscht. Dieser Vorgang kann nicht widerrufen werden.",
+        "delete old": "Vorherige Transkription entfernen"
       }
+    },
+    "login": {
+      "header": "Anmeldung fehlgeschlagen",
+      "text": "Die Anmeldung konnte leider nicht durchgeführt werden. Es sind bei dieser ID keine freien Audiodateien verfügbar."
     }
   },
   "login": {
@@ -14,7 +28,7 @@
     "old file found": "Es wurden Daten zu einer vorherigen Transkription gefunden. Um diese fortzusetzen, ziehen Sie die folgende Datei per Drag & Drop in das graue Feld:<br/><br/>{{file_label}}"
   },
   "dropzone": {
-    "drag&drop here": "Datei hier hineinziehen",
+    "drag&drop here": "Audiodatei (*.wav) hier hineinziehen",
     "file selected": "{{file_label}} ausgewählt"
   }
 }

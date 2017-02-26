@@ -3,6 +3,7 @@ import { APP_CONFIG } from "./app.config";
 import { APIService } from "./service/api.service";
 import { AppConfigValidator } from "./validator/AppConfigValidator";
 import { TranslateService } from "@ngx-translate/core";
+import { SessionService } from "./service/session.service";
 
 @Component({
 	selector   : 'octra',
@@ -14,11 +15,16 @@ export class AppComponent {
 	version: string = "1.0.2";
 
 	constructor(private api: APIService,
-				private langService: TranslateService) {
+				private langService: TranslateService,
+				private sessService: SessionService) {
 
 		//define languages
 		langService.addLangs(['de', 'en']);
-		langService.setDefaultLang(langService.getBrowserLang());
+
+		if(sessService.language == null || sessService.language == "")
+			langService.setDefaultLang(langService.getBrowserLang());
+		else
+			langService.setDefaultLang(sessService.language);
 
 		if (!APP_CONFIG.Settings) {
 			throw "app-config not set correctly";

@@ -2,4 +2,12 @@
     border: 2px dashed grey;
     background-color: rgb(240,240,240);
     padding: 20px;
+    min-height:100px;
+    text-align:center;
+}
+
+.dropzone .dragndrop{
+    padding:10px;
+    color:#a0a0a0;
+    font-size:30px;
 }

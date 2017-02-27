@@ -19,12 +19,12 @@ import { NavbarService } from "../../service/navbar.service";
 
 
 @Component({
-	selector   : 'app-transcription-submit',
-	templateUrl: 'transcription-submit.component.html',
-	styleUrls  : [ 'transcription-submit.component.css' ],
+	selector       : 'app-transcription-submit',
+	templateUrl    : 'transcription-submit.component.html',
+	styleUrls      : [ 'transcription-submit.component.css' ],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactivate, OnDestroy {
+export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactivate, OnDestroy, AfterViewInit {
 
 	@ViewChild('modal') modal: ModalComponent;
 	@ViewChild('modal2') modal2: ModalComponent;
@@ -33,10 +33,9 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 				private router: Router,
 				private transcrService: TranscriptionService,
 				private api: APIService,
-				private cd:ChangeDetectorRef,
-				private sanitizer:DomSanitizer,
-				private navbarServ: NavbarService
-	) {
+				private cd: ChangeDetectorRef,
+				private sanitizer: DomSanitizer,
+				private navbarServ: NavbarService) {
 	}
 
 	private feedback_data = {
@@ -55,10 +54,9 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 		}
 		this.transcrService.analyse();
 		this.feedback_data = this.sessService.feedback;
-		jQuery.material.init();
 
 		//set change detection interval
-		setInterval(()=>{
+		setInterval(() => {
 			this.cd.markForCheck();
 		}, 800);
 		this.navbarServ.show_hidden = false;
@@ -93,17 +91,24 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 		let member_id: number = Number(this.sessService.member_id);
 		let subscr = this.api.saveSession(json.transcript, json.project, json.annotator, member_id, json.id, json.status, json.comment, json.quality, json.log)
 			.catch(this.onSendError)
-			.subscribe((result)=> {
-				if(result != null && result.hasOwnProperty("statusText") && result.statusText === "OK") {
-					this.sessService.submitted = true;
-					this.modal2.close();
-					setTimeout(()=>{this.router.navigate([ '/user/transcr/submitted' ])}, 1000);
-				} else{
-					this.send_error = "Es ist ein Fehler aufgetreten. Lade diese Seite mit deinem Browser noch einmal und versuche es erneut";
+			.subscribe((result) => {
+					if (result != null && result.hasOwnProperty("statusText") && result.statusText === "OK") {
+						this.sessService.submitted = true;
+						this.modal2.close();
+						setTimeout(() => {
+							this.router.navigate([ '/user/transcr/submitted' ])
+						}, 1000);
+					}
+					else {
+						this.send_error = "Es ist ein Fehler aufgetreten. Lade diese Seite mit deinem Browser noch einmal und versuche es erneut";
+					}
 				}
-			}
-		);
+			);
 		this.subscriptions.push(subscr);
+	}
+
+	ngAfterViewInit() {
+		jQuery.material.init();
 	}
 
 	onSendError = (error) => {
@@ -111,7 +116,7 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 		return Observable.throw(error);
 	};
 
-	ngOnDestroy(){
+	ngOnDestroy() {
 		Functions.unsubscribeAll(this.subscriptions);
 	}
 
@@ -133,7 +138,7 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 		return result;
 	}
 
-	sanitize(url:string){
+	sanitize(url: string) {
 		return this.sanitizer.bypassSecurityTrustUrl(url);
 	}
 }

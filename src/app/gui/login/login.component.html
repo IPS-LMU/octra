@@ -49,7 +49,7 @@
                     <fieldset>
                         <div>
                             <div class="form-group">
-                                <input class="form-control" type="number" disabled="disabled" id="login-id"
+                                <input class="form-control" type="number" id="login-id"
                                        name="login-id"
                                        placeholder="Login ID" [(ngModel)]="member.id"
                                        required
@@ -64,7 +64,7 @@
                             <div class="form-group">
                                 <input class="form-control" type="submit" id="login-submit"
                                        class="btn btn-raised btn-primary"
-                                       [disabled]="true"
+                                       [disabled]="!f.valid"
                                        name="login-submit" value="LOGIN DISABLED"/>
                             </div>
                         </div>

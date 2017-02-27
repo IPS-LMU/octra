@@ -7,6 +7,15 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+      (function(){
+          var redirect = sessionStorage.redirect;
+          delete sessionStorage.redirect;
+          if (redirect && redirect != location.href) {
+              history.replaceState(null, null, redirect);
+          }
+      })();
+  </script>
 <link href="styles.a4f7b0a5cf8f4bcbb4fb.bundle.css" rel="stylesheet"/></head>
 <!-- 3. Display the application -->
 <body>
@@ -24,5 +33,5 @@
     </noscript>
   </div>
 </octra>
-<script type="text/javascript" src="inline.af79e1c0f5c0a2c6d64e.bundle.js"></script><script type="text/javascript" src="polyfills.fb3d919dd9c0f8a0ff31.bundle.js"></script><script type="text/javascript" src="scripts.128c9d49267f769c8d29.bundle.js"></script><script type="text/javascript" src="vendor.dcda22c1c682ddb61f8a.bundle.js"></script><script type="text/javascript" src="main.439878b9711dd5343d7a.bundle.js"></script></body>
+<script type="text/javascript" src="inline.cc498d8a5e294b653c2d.bundle.js"></script><script type="text/javascript" src="polyfills.fb3d919dd9c0f8a0ff31.bundle.js"></script><script type="text/javascript" src="scripts.128c9d49267f769c8d29.bundle.js"></script><script type="text/javascript" src="vendor.dcda22c1c682ddb61f8a.bundle.js"></script><script type="text/javascript" src="main.083844db17160269c834.bundle.js"></script></body>
 </html>

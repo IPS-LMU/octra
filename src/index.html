@@ -7,6 +7,15 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+      (function(){
+          var redirect = sessionStorage.redirect;
+          delete sessionStorage.redirect;
+          if (redirect && redirect != location.href) {
+              history.replaceState(null, null, redirect);
+          }
+      })();
+  </script>
 </head>
 <!-- 3. Display the application -->
 <body>

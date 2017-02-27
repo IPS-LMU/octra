@@ -18,7 +18,7 @@
     },
     "login": {
       "header": "Anmeldung fehlgeschlagen",
-      "text": "Die Anmeldung konnte leider nicht durchgeführt werden. Es sind bei dieser ID keine freien Audiodateien verfügbar."
+      "text": "Bitte überprüfen Sie ihren Nutzernamen und ihr Passwort."
     }
   },
   "login": {

@@ -12,7 +12,7 @@ import { SessionService } from "./service/session.service";
 })
 
 export class AppComponent {
-	version: string = "1.0.2";
+	version: string = "1.0.3";
 
 	constructor(private api: APIService,
 				private langService: TranslateService,

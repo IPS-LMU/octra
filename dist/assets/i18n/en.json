@@ -1,0 +1,34 @@
+{
+  "general":{
+    "abort": "Abort",
+    "continue": "Continue",
+    "close": "Close",
+    "open": "Open",
+    "delete": "Delete",
+    "start transcription": "Start Transcription",
+    "start new transcription": "Start new Transcription"
+  },
+  "modal": {
+    "transcription":{
+      "delete": {
+        "header": "Create a new transcription?",
+        "text": "Do you really want to delete the previous Transcription and create a new one?<br><br>Your progress on the previous transcription will be deleted. This action can not be reverted.",
+        "delete old": "Delete previous transcription"
+      }
+    },
+    "login": {
+      "header": "Login failed",
+      "text": "Please check your username and your password."
+    }
+  },
+  "login":{
+    "online mode": "Online Mode",
+    "online mode disabled": "Online mode is currently deactivated. Please use OCTRA locally.",
+    "local mode": "Local Mode",
+    "old file found": "There is data from a previous transcription. If you like to continue your work, just drag & drop the following file to the gray box:<br/><br/>{{file_label}}"
+  },
+  "dropzone":{
+    "drag&drop here" : "Drag & Drop audio file (*.wav) here",
+    "file selected": "{{file_label}} selected"
+  }
+}

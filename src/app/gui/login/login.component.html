@@ -81,9 +81,9 @@
                     </p>
                     <app-drop-zone #dropzone>
                         <span *ngIf="dropzone.file == null">{{ "dropzone.drag&drop here" | translate }}</span>
-                        <span *ngIf="dropzone.file != null && (sessionfile == null || sessionfile.name == dropzone.file.name)"><span
+                        <span *ngIf="dropzone.file != null && (getFileStatus() == 'start')"><span
                                 class="text-success">{{ "dropzone.file selected" | translate:{file_label: getDropzoneFileString(dropzone.file)} }}</span></span>
-                        <span *ngIf="dropzone.file != null && (sessionfile != null && sessionfile.name != dropzone.file.name)"><span
+                        <span *ngIf="dropzone.file != null && (getFileStatus() != 'start')"><span
                                 class="text-danger">{{ "dropzone.file selected" | translate:{file_label: getDropzoneFileString(dropzone.file)} }}</span></span>
                     </app-drop-zone>
                     <input *ngIf="getFileStatus() != 'new'" [disabled]="!(getFileStatus() == 'start')" type="submit" id="offline-submit"

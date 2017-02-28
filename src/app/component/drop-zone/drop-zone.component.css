@@ -6,6 +6,10 @@
     text-align:center;
 }
 
+.dropzone:hover{
+    cursor: pointer;
+}
+
 .dropzone .dragndrop{
     padding:10px;
     color:#a0a0a0;

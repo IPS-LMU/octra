@@ -28,7 +28,7 @@
     "old file found": "Es wurden Daten zu einer vorherigen Transkription gefunden. Um diese fortzusetzen, ziehen Sie die folgende Datei per Drag & Drop in das graue Feld:<br/><br/>{{file_label}}"
   },
   "dropzone": {
-    "drag&drop here": "Audiodatei (*.wav) hier hineinziehen",
+    "drag&drop here": "Audiodatei (*.wav) hier hineinziehen oder hier klicken",
     "file selected": "{{file_label}} ausgewählt"
   }
 }

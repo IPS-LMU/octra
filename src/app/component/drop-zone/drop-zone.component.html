@@ -1,4 +1,5 @@
-<div class="dropzone" #dropzone (dragover)="onDragOver($event)" (drop)="onFileDrop($event)">
+<div class="dropzone" #dropzone (dragover)="onDragOver($event)" (drop)="onFileDrop($event)" (click)="onClick(Event)">
   <ng-content></ng-content><br/>
   <span class="glyphicon glyphicon-folder-open dragndrop"></span>
 </div>
+<input type="file" class="fileinput" value="Select audio file" style="display:none;" #fileinput (change)="onFileChange($event)"/>

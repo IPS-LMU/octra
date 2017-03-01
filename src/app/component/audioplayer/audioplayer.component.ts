@@ -18,11 +18,13 @@ import { Observable} from 'rxjs/Rx';
 import {
 	BrowserInfo,
 	CanvasAnimation,
-	Line
+	Line,
+	SubscriptionManager
 } from "../../shared";
 import { AudioService, KeymappingService } from "../../service";
 import { AudioplayerService } from "./service/audioplayer.service";
-import { SubscriptionManager } from "../../shared/subscriptions";
+import { AudioTimeCalculator } from "../../shared/AudioTimeCalculator";
+import { Logger } from "../../shared/Logger";
 
 @Component({
 	selector       : 'app-audioplayer',
@@ -37,12 +39,17 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 	@ViewChild("ap_overlaycan") overlaynacRef: ElementRef;
 	@ViewChild("ap_playcan") playcanRef: ElementRef;
 
+	/**
+	 * after Shortcut was triggered.
+	 * @type {EventEmitter<any>}
+	 */
 	@Output() shortcuttriggered = new EventEmitter<any>();
 
-	@Output() public get BeginTime(): number {
-		return (this.ap.begintime) ? this.ap.begintime.unix : 0;
-	}
-
+	/**
+	 * gets data object that contains informations about the current state of audio playback
+	 * @returns {{distance: (number|string), duration: number, playduration: number, current: number}}
+	 * @constructor
+	 */
 	@Output('Data') get Data(): any {
 		return {
 			distance    : (this.ap && this.ap.Distance) ? this.ap.Distance : "",
@@ -52,18 +59,30 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 		};
 	}
 
-	public get Settings(): any {
+	/**
+	 * gets or sets the settings of this audioplayer component
+	 * @returns {any}
+	 * @constructor
+	 */
+	public get settings(): any {
 		return this.ap.Settings;
 	}
-
-	public set Settings(value: any) {
+	public set settings(value: any) {
 		this.ap.Settings = value;
 	}
 
+	/**
+	 * gets the total time (from start to end)
+	 * @returns {number}
+	 */
 	public get total_time(): number {
 		return this.ap.total_time;
 	}
 
+	/**
+	 * gets the current time of the audio playback
+	 * @returns {number}
+	 */
 	public get current_time(): number {
 		return this.ap.current_time;
 	}
@@ -75,18 +94,22 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 	private overlaycanvas: HTMLCanvasElement = null;
 	private playcanvas: HTMLCanvasElement = null;
 
-	//Animator for requesting AnimationFrames
+	//animation for requesting AnimationFrames
 	private anim: CanvasAnimation;
 
+	//canvas contexts
 	private context: CanvasRenderingContext2D = null;
-	private p_context: CanvasRenderingContext2D = null;
 
+	//timer for updating the time with interval of 200ms
 	private timer = null;
+
+	//size informations
 	private width: number = 0;
 	private height: number = 0;
 	private innerWidth: number = 0;
 	private oldInnerWidth: number = 0;
 	private focused = false;
+	private cursorlocked = false;
 
 	constructor(private audio: AudioService,
 				private ap: AudioplayerService,
@@ -110,7 +133,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 
 		//initailization of width and height of the control
 		this.width = this.apview.elementRef.nativeElement.clientWidth;
-		this.innerWidth = this.width - this.Settings.margin.left - this.Settings.margin.right;
+		this.innerWidth = this.width - this.settings.margin.left - this.settings.margin.right;
 		this.oldInnerWidth = this.innerWidth;
 
 		this.ap.init(this.innerWidth);
@@ -142,8 +165,8 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 	 */
 	private updateCanvasSizes() {
 		this.width = Number(this.apview.elementRef.nativeElement.clientWidth);
-		this.innerWidth = Number(this.width - this.Settings.margin.left - this.Settings.margin.right);
-		this.height = (this.Settings.margin.top + this.Settings.height + this.Settings.margin.bottom);
+		this.innerWidth = Number(this.width - this.settings.margin.left - this.settings.margin.right);
+		this.height = (this.settings.margin.top + this.settings.height + this.settings.margin.bottom);
 		//set width
 		this.graphicscanvas.width = this.width;
 		this.overlaycanvas.width = this.width;
@@ -185,13 +208,13 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 	private drawLine() {
 		this.context = this.graphicscanvas.getContext("2d");
 		this.context.globalAlpha = 1.0;
-		this.context.fillStyle = this.Settings.slider.color;
+		this.context.fillStyle = this.settings.slider.color;
 
-		let x = this.Settings.margin.left;
-		let h = this.Settings.height;
-		let middle = Math.round(h / 2) - (this.Settings.slider.height / 2);
+		let x = this.settings.margin.left;
+		let h = this.settings.height;
+		let middle = Math.round(h / 2) - (this.settings.slider.height / 2);
 
-		this.context.fillRect(x, middle, this.innerWidth, this.Settings.slider.height);
+		this.context.fillRect(x, middle, this.innerWidth, this.settings.slider.height);
 		this.context.stroke();
 	};
 
@@ -207,24 +230,24 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 
 		if (line) {
 			// --- get the appropriate context
-			this.p_context = this.playcanvas.getContext("2d");
-			this.p_context.clearRect(line.Pos.x - 1, line.Pos.y - 1, this.innerWidth + 1, line.Size.height + 1);
+			this.context = this.playcanvas.getContext("2d");
+			this.context.clearRect(line.Pos.x - 1, line.Pos.y - 1, this.innerWidth + 1, line.Size.height + 1);
 
 			// --- get the appropriate context
 			this.context = overlay_c.getContext("2d");
 			this.context.globalAlpha = 1.0;
 			this.context.clearRect(line.Pos.x - 1, line.Pos.y - 1, this.innerWidth + 1, line.Size.height + 1);
-			this.context.strokeStyle = this.Settings.cursor.color;
+			this.context.strokeStyle = this.settings.cursor.color;
 
 			this.context = play_c.getContext("2d");
 			this.context.globalAlpha = 1.0;
 			this.context.clearRect(line.Pos.x - 1, line.Pos.y - 1, this.innerWidth + 1, line.Size.height + 1);
-			this.context.strokeStyle = this.Settings.playcursor.color;
+			this.context.strokeStyle = this.settings.playcursor.color;
 
 			this.context = this.graphicscanvas.getContext("2d");
 			this.context.globalAlpha = 1.0;
-			this.context.strokeStyle = this.Settings.framecolor;
-			this.context.fillStyle = this.Settings.backgroundcolor;
+			this.context.strokeStyle = this.settings.framecolor;
+			this.context.fillStyle = this.settings.backgroundcolor;
 			this.context.fillRect(0, 0, this.width, this.height);
 			//context.strokeRect(line_obj.Pos.x, line_obj.Pos.y, w, settings.height);
 		}
@@ -264,17 +287,17 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	private onKeyDown = ($event) => {
-		if (this.Settings.shortcuts_enabled) {
+		if (this.settings.shortcuts_enabled) {
 			let comboKey = $event.comboKey;
 
 			let platform = BrowserInfo.platform;
-			if (this.Settings.shortcuts) {
+			if (this.settings.shortcuts) {
 				let key_active = false;
-				for (let shortc in this.Settings.shortcuts) {
-					let focuscheck = this.Settings.shortcuts[ "" + shortc + "" ].focusonly == false
-						|| (this.Settings.shortcuts[ "" + shortc + "" ].focusonly == this.focused == true);
+				for (let shortc in this.settings.shortcuts) {
+					let focuscheck = this.settings.shortcuts[ "" + shortc + "" ].focusonly == false
+						|| (this.settings.shortcuts[ "" + shortc + "" ].focusonly == this.focused == true);
 
-					if (focuscheck && this.Settings.shortcuts[ "" + shortc + "" ][ "keys" ][ "" + platform + "" ] === comboKey) {
+					if (focuscheck && this.settings.shortcuts[ "" + shortc + "" ][ "keys" ][ "" + platform + "" ] === comboKey) {
 						switch (shortc) {
 							case("play_pause"):
 								this.shortcuttriggered.emit({ shortcut: comboKey, value: shortc });
@@ -371,7 +394,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 	 * start playback
 	 */
 	public startPlayback() {
-		if (!this.audio.audioplaying && this.ap.MouseClickPos.absX < this.ap.AudioPxWidth - 5) {
+		if (!this.audio.audioplaying) {
 			this.playSelection();
 		}
 	}
@@ -443,19 +466,19 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 	 * @param curr_line
 	 */
 	private drawPlayCursorOnly(curr_line: Line) {
-		let relX = this.ap.PlayCursor.absX + this.Settings.margin.left;
-		let relY = Math.round((curr_line.Size.height - this.Settings.playcursor.height) / 2);
+		let relX = this.ap.PlayCursor.absX + this.settings.margin.left;
+		let relY = Math.round((curr_line.Size.height - this.settings.playcursor.height) / 2);
 
-		if (relX <= curr_line.Size.width + this.Settings.margin.left) {
-			this.p_context = this.playcanvas.getContext("2d");
-			this.p_context.clearRect(0, 0, this.width, this.height);
-			this.p_context.strokeStyle = this.Settings.playcursor.color;
-			this.p_context.beginPath();
-			this.p_context.moveTo(relX, relY + 1);
-			this.p_context.lineTo(relX, relY + this.Settings.playcursor.height);
-			this.p_context.globalAlpha = 1;
-			this.p_context.lineWidth = this.Settings.playcursor.width;
-			this.p_context.stroke();
+		if (relX <= curr_line.Size.width + this.settings.margin.left) {
+			this.context = this.playcanvas.getContext("2d");
+			this.context.clearRect(0, 0, this.width, this.height);
+			this.context.strokeStyle = this.settings.playcursor.color;
+			this.context.beginPath();
+			this.context.moveTo(relX, relY + 1);
+			this.context.lineTo(relX, relY + this.settings.playcursor.height);
+			this.context.globalAlpha = 1;
+			this.context.lineWidth = this.settings.playcursor.width;
+			this.context.stroke();
 		}
 	}
 
@@ -475,24 +498,15 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 	@HostListener('window:resize', [ '$event' ])
 	private onResize($event) {
 		this.width = this.apview.elementRef.nativeElement.clientWidth;
-		this.innerWidth = this.width - this.Settings.margin.left - this.Settings.margin.right;
+		this.innerWidth = this.width - this.settings.margin.left - this.settings.margin.right;
 
 		let ratio = this.innerWidth / this.oldInnerWidth;
 		if (this.ap.PlayCursor) {
-			this.changePlayCursorAbsX(this.ap.PlayCursor.absX * ratio);
+			let ac = new AudioTimeCalculator(this.audio.samplerate, this.ap.playduration, this.innerWidth);
+			Logger.log(""+ this.ap.current.samples);
 
-
-			if (!this.audio.audioplaying) {
-				this.ap.current.samples = this.ap.PlayCursor.time_pos.samples;
-			}
-
-			if (this.ap.PlayCursor.absX > 0) {
-				let line = this.ap.Line;
-
-				if (line) {
-					this.drawPlayCursorOnly(line);
-				}
-			}
+			this.ap.audioTCalculator = ac;
+			this.ap.PlayCursor.changeSamples(this.ap.current.samples, ac);
 
 			this.update();
 		}

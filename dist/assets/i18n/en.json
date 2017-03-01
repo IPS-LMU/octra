@@ -28,7 +28,7 @@
     "old file found": "There is data from a previous transcription. If you like to continue your work, just drag & drop the following file to the gray box:<br/><br/>{{file_label}}"
   },
   "dropzone":{
-    "drag&drop here" : "Drag & Drop audio file (*.wav) here",
+    "drag&drop here" : "Drag & Drop audio file (*.wav) here or click here.",
     "file selected": "{{file_label}} selected"
   }
 }

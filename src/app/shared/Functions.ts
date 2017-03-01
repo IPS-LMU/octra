@@ -10,15 +10,6 @@ export class Functions {
 		jQuery("html, body").scrollTop(y);
 	}
 
-	public static unsubscribeAll(subscriptions: Subscription[]) {
-		if (subscriptions) {
-			for (let i = 0; i < subscriptions.length; i++) {
-				subscriptions[ i ].unsubscribe();
-			}
-			subscriptions = [];
-		}
-	}
-
 	public static buildStr(str: string, replace_arr: any[]) {
 		let result: string = str;
 

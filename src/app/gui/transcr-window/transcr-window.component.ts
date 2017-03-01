@@ -20,6 +20,7 @@ import { Subscription } from "rxjs/Rx";
 import { AudioNavigationComponent } from "../../component/audio-navigation/audio-navigation.component";
 import { UserInteractionsService } from "../../service/userInteractions.service";
 import { APP_CONFIG } from "../../app.config";
+import { SubscriptionManager } from "../../shared/subscriptions";
 
 @Component({
 	selector   : 'app-transcr-window',
@@ -47,11 +48,12 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
 	private showWindow: boolean = false;
 	private pos_y: number = 0;
-	private subscriptions: Subscription[] = [];
+	private subscrmanager: SubscriptionManager;
 
-	get appc():any{
+	get appc(): any {
 		return APP_CONFIG.Settings;
 	}
+
 	get SelectedSegment(): Segment {
 		if (this.transcrService.selectedSegment.index > -1) {
 			return this.transcrService.segments.get(this.transcrService.selectedSegment.index);
@@ -73,21 +75,20 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 		this.editor.Settings.markers = APP_CONFIG.Settings.MARKERS;
 		this.editor.Settings.responsive = APP_CONFIG.Settings.RESPONSIVE;
 
-		let subscription = this.editor.loaded.subscribe(
+		this.subscrmanager.add(this.editor.loaded.subscribe(
 			() => {
 				let index = this.transcrService.selectedSegment.index;
 				if (index > -1 && this.transcrService.segments && index < this.transcrService.segments.length) {
 					this.editor_rawText(this.transcrService.segments.get(this.transcrService.selectedSegment.index).transcript);
 				}
 			}
-		);
+		));
 
-		this.subscriptions.push(subscription);
 		this.audionav.shortcuts = this.loupe.Settings.shortcuts;
 	}
 
 	ngOnDestroy() {
-		Functions.unsubscribeAll(this.subscriptions);
+		this.subscrmanager.destroy();
 	}
 
 	ngAfterViewInit() {
@@ -132,11 +133,11 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 		this.loupe.changeArea(absStart, absEnd);
 	}
 
-	onButtonClick(event: {type: string, timestamp: number}) {
+	onButtonClick(event: { type: string, timestamp: number }) {
 		if (APP_CONFIG.Settings.LOGGING == true)
 			this.uiService.addElementFromEvent("mouse_click", {}, event.timestamp, event.type + "_button");
 
-		if(event.type === "replay")
+		if (event.type === "replay")
 			this.audionav.replay = !this.audionav.replay;
 
 		this.loupe.onButtonClick(event);
@@ -184,20 +185,20 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 		this.uiService.addElementFromEvent("marker_click", { value: marker_code }, Date.now(), 'editor');
 	}
 
-	onSpeedChange(event: {old_value: number, new_value: number, timestamp: number}) {
+	onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
 		this.audio.speed = event.new_value;
 	}
 
-	afterSpeedChange(event: {new_value: number, timestamp: number}) {
+	afterSpeedChange(event: { new_value: number, timestamp: number }) {
 		if (APP_CONFIG.Settings.LOGGING == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "speed_change");
 	}
 
-	onVolumeChange(event: {old_value: number, new_value: number, timestamp: number}) {
+	onVolumeChange(event: { old_value: number, new_value: number, timestamp: number }) {
 		this.audio.volume = event.new_value;
 	}
 
-	afterVolumeChange(event: {new_value: number, timestamp: number}) {
+	afterVolumeChange(event: { new_value: number, timestamp: number }) {
 		if (APP_CONFIG.Settings.LOGGING == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "volume_change");
 	}

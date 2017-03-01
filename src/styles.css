@@ -13,6 +13,7 @@ main {
 }
 
 .container{
+    width:90%;
     /* fix this for disabling responsive*/
     /*width:1200px;*/
 }

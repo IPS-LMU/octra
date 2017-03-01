@@ -32,6 +32,7 @@ import { APP_CONFIG } from "../../app.config";
 import { DropZoneComponent } from "../../component/drop-zone/drop-zone.component";
 import { isNullOrUndefined } from "util";
 import { isUndefined } from "util";
+import { SubscriptionManager } from "../../shared/subscriptions";
 
 @Component({
 	selector   : 'app-login',
@@ -51,9 +52,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	private browser_check: BrowserCheck;
 	private agreement_checked: boolean;
 
-	private subscriptions: Subscription[] = [];
+	private subscrmanager: SubscriptionManager;
 
-	get sessionfile():SessionFile{
+	get sessionfile(): SessionFile {
 		return this.sessionService.sessionfile;
 	}
 
@@ -83,6 +84,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 				private sessionService: SessionService,
 				private api: APIService,
 				private cd: ChangeDetectorRef) {
+
+		this.subscrmanager = new SubscriptionManager();
 	}
 
 	ngOnInit() {
@@ -107,11 +110,11 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	}
 
 	ngOnDestroy() {
-		Functions.unsubscribeAll(this.subscriptions);
+		this.subscrmanager.destroy();
 	}
 
 	onSubmit(form: NgForm) {
-		let subscr = this.api.beginSession("transcription", "", Number(this.member.id), "").catch((error) => {
+		this.subscrmanager.add(this.api.beginSession("transcription", "", Number(this.member.id), "").catch((error) => {
 			alert("Fehler beim Aufbau der Verbindung.");
 			return Observable.throw(error);
 		}).subscribe(
@@ -130,9 +133,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 					this.modal.open();
 				}
 			}
-		);
-
-		this.subscriptions.push(subscr);
+		));
 	}
 
 	onOfflineSubmit = (form: NgForm) => {
@@ -218,7 +219,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 			//check conditions
 			if (this.sessionService.sessionfile == null || this.dropzone.file.name == this.sessionService.sessionfile.name) {
 				return "start";
-			} else{
+			}
+			else {
 				return "new";
 			}
 		}

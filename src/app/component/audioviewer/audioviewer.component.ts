@@ -27,6 +27,7 @@ import {
 import { AudioService, TranscriptionService, KeymappingService } from "../../service";
 import { AudioviewerService } from "./service/audioviewer.service";
 import { Chunk } from "../../shared/Chunk";
+import { SubscriptionManager } from "../../shared/subscriptions";
 
 declare var window: any;
 @Component({
@@ -44,7 +45,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 	 *    - using 2 canvas for animations to implement double buffering by switching canvas visibility on and off
 	 */
 
-	subscriptions: Subscription[];
+	subscrmanager: SubscriptionManager
 
 	constructor(private audio: AudioService,
 				private av: AudioviewerService,
@@ -53,9 +54,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 
 		this.av.initializeSettings();
 
-		this.subscriptions = [];
-		let subscr = this.keyMap.onkeydown.subscribe(this.onKeyDown);
-		this.subscriptions.push(subscr);
+		this.subscrmanager = new SubscriptionManager();
+		this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown));
 	}
 
 	@ViewChild("audioview") aview;
@@ -171,7 +171,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.o_context = this.overlaycanvas.getContext("2d");
 		this.m_context = this.mousecanvas.getContext("2d");
 
-		let subscr = this.audio.statechange.subscribe(
+		this.subscrmanager.add(this.audio.statechange.subscribe(
 			(state)=> {
 				if (state === "ended") {
 					if (this.av.Selection == null || (this.av.Selection.end.samples - this.av.Selection.start.samples) == 0) {
@@ -181,9 +181,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 						this.changePlayCursorSamples(this.av.Selection.start.samples, this.av.Chunk);
 					}
 				}
-			});
-
-		this.subscriptions.push(subscr);
+			}));
 	}
 
 	ngAfterViewInit() {
@@ -194,8 +192,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 	ngOnDestroy() {
 		this.stopPlayback();
 		this.av.destroy();
-		if (this.subscriptions)
-			Functions.unsubscribeAll(this.subscriptions);
+		this.subscrmanager.destroy();
 	}
 
 	public initialize() {

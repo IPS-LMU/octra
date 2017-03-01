@@ -15,6 +15,7 @@ import { NavbarService } from "./navbar.service";
 import { TextConverter } from "../shared/Converters/TextConverter";
 import { FileService } from "./file.service";
 import { AnnotJSONConverter } from "../shared/Converters/AnnotJSONConverter";
+import { SubscriptionManager } from "../shared/subscriptions";
 
 
 @Injectable()
@@ -36,7 +37,8 @@ export class TranscriptionService {
 		this._segments = value;
 	}
 
-	private subscriptions: Subscription[] = [];
+	private subscrmanager:SubscriptionManager;
+
 	public onaudioloaded = new EventEmitter<any>();
 	public dataloaded = new EventEmitter<any>();
 	private _segments: Segments;
@@ -77,17 +79,15 @@ export class TranscriptionService {
 				private uiService: UserInteractionsService,
 				private navbarServ: NavbarService
 	) {
+		this.subscrmanager = new SubscriptionManager();
 
 		if (APP_CONFIG.Settings.LOGGING) {
-			let subscr2 = this.audio.statechange.subscribe((state) => {
+			this.subscrmanager.add(this.audio.statechange.subscribe((state) => {
 				this.uiService.addElementFromEvent("audio_" + state, { value: state }, Date.now(), "audio");
-				this.subscriptions.push(subscr2);
-			});
-
-			this.subscriptions.push(subscr2);
+			}));
 		}
 
-		let subscr3 = this.navbarServ.onexportbuttonclick.subscribe((button)=>{
+		this.subscrmanager.add(this.navbarServ.onexportbuttonclick.subscribe((button)=>{
 			let result = {};
 
 			if(button.format == "text"){
@@ -98,8 +98,7 @@ export class TranscriptionService {
 				this.navbarServ.exportformats.annotJSON = this.getTranscriptString(button.format);
 			}
 			this.navbarServ.exportformats.filename = this.filename;
-		});
-		this.subscriptions.push(subscr3);
+		}));
 	}
 
 	public getTranscriptString(format:string):string{
@@ -208,16 +207,14 @@ export class TranscriptionService {
 				this.filename = this.sessServ.audio_url.substr(this.sessServ.audio_url.lastIndexOf("/") + 1);
 				this.filename = this.filename.substr(0, this.filename.lastIndexOf(".") - 1);
 
-				let subscr = this.audio.afterloaded.subscribe((result) => {
+				this.subscrmanager.add(this.audio.afterloaded.subscribe((result) => {
 					this.last_sample = this.audio.duration.samples;
 					this.loadSegments(this.audio.samplerate);
 
-					let subscr = this.segments.onsegmentchange.subscribe(this.saveSegments);
-					this.subscriptions.push(subscr);
+					this.subscrmanager.add(this.segments.onsegmentchange.subscribe(this.saveSegments));
 
 					this.onaudioloaded.emit(result);
-				});
-				this.subscriptions.push(subscr);
+				}));
 
 				this.audio.loadAudio(src);
 			}
@@ -225,16 +222,15 @@ export class TranscriptionService {
 				//offline mode
 				this.filename = this.sessServ.file.name;
 				this.filename = this.filename.substr(0, this.filename.lastIndexOf(".") - 1);
-				let subscr = this.audio.afterloaded.subscribe((result) => {
+
+				this.subscrmanager.add(this.audio.afterloaded.subscribe((result) => {
 					this.last_sample = this.audio.duration.samples;
 					this.loadSegments(this.audio.samplerate);
 
-					let subscr = this.segments.onsegmentchange.subscribe(this.saveSegments);
-					this.subscriptions.push(subscr);
+					this.subscrmanager.add(this.segments.onsegmentchange.subscribe(this.saveSegments));
 
 					this.onaudioloaded.emit(result);
-				});
-				this.subscriptions.push(subscr);
+				}));
 
 				//read file
 				let reader = new FileReader();
@@ -279,7 +275,7 @@ export class TranscriptionService {
 	};
 
 	public destroy() {
-		Functions.unsubscribeAll(this.subscriptions);
+		this.subscrmanager.destroy();
 	}
 
 	private extractUI(ui_elements: StatisticElem[]): any[] {

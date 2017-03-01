@@ -7,9 +7,7 @@ import { TranscrEditorComponent } from "../../component/transcr-editor/transcr-e
 import { TranscriptionService } from "../../service/transcription.service";
 import { UserInteractionsService } from "../../service/userInteractions.service";
 import { APP_CONFIG } from "../../app.config";
-import { timestamp } from "rxjs/operator/timestamp";
-import { Subscription } from "rxjs";
-import { Functions } from "../../shared/Functions";
+import { SubscriptionManager } from "../../shared/subscriptions";
 
 @Component({
 	selector   : 'app-audioplayer-gui',
@@ -22,7 +20,7 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 	@ViewChild("audioplayer") audioplayer: AudioplayerComponent;
 	@ViewChild('transcr') editor:TranscrEditorComponent;
 
-	private subscriptions:Subscription[] = [];
+	private subscrmanager:SubscriptionManager;
 
 	public get NavShortCuts() {
 		return this.nav.shortcuts;
@@ -45,6 +43,7 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 				private transcr:TranscriptionService,
 				private uiService:UserInteractionsService
 	) {
+		this.subscrmanager = new SubscriptionManager();
 	}
 
 	ngOnInit() {
@@ -63,7 +62,7 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 	}
 
 	ngOnDestroy(){
-		Functions.unsubscribeAll(this.subscriptions);
+		this.subscrmanager.destroy();
 	}
 
 	onButtonClick(event:{type: string, timestamp:number}) {

@@ -11,6 +11,7 @@ import { ViewChild } from "@angular/core/src/metadata/di";
 import { ModalComponent } from "ng2-bs3-modal/components/modal";
 import { Logger } from "../../shared/Logger";
 import { AudioService } from "../../service/audio.service";
+import { SubscriptionManager } from "../../shared/subscriptions";
 
 
 @Component({
@@ -19,18 +20,18 @@ import { AudioService } from "../../service/audio.service";
 	styleUrls  : [ 'transcription-submitted.component.css' ]
 })
 export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, AfterViewInit {
-	@ViewChild('success') success_modal:ModalComponent;
+	@ViewChild('success') success_modal: ModalComponent;
+
+	private subscrmanager: SubscriptionManager;
 
 	constructor(private router: Router,
 				private sessService: SessionService,
 				private tranService: TranscriptionService,
 				private uiService: UserInteractionsService,
 				private api: APIService,
-				private audio:AudioService
-	) {
+				private audio: AudioService) {
+		this.subscrmanager = new SubscriptionManager();
 	}
-
-	private subscriptions:Subscription[] = [];
 
 	ngOnInit() {
 	}
@@ -39,8 +40,8 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
 
 	}
 
-	ngOnDestroy(){
-		Functions.unsubscribeAll(this.subscriptions);
+	ngOnDestroy() {
+		this.subscrmanager.destroy();
 	}
 
 	leave() {
@@ -52,12 +53,12 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
 	}
 
 	next() {
-		let subscr = this.api.beginSession("transcription", "", Number(this.sessService.member_id), "")
-			.subscribe((result)=> {
-				if(result != null){
+		this.subscrmanager.add(this.api.beginSession("transcription", "", Number(this.sessService.member_id), "")
+			.subscribe((result) => {
+				if (result != null) {
 					let json = result.json();
 
-					if(json.data && json.data.hasOwnProperty("url") && json.data.hasOwnProperty("id")) {
+					if (json.data && json.data.hasOwnProperty("url") && json.data.hasOwnProperty("id")) {
 						this.sessService.submitted = false;
 						this.audio.audiobuffer = null;
 						this.sessService.transcription = [];
@@ -70,16 +71,15 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
 						this.sessService.data_id = json.data.id;
 
 						this.router.navigate([ '/user/transcr' ]);
-					} else{
+					}
+					else {
 						this.openSuccessModal();
 					}
 				}
-			});
-
-		this.subscriptions.push(subscr);
+			}));
 	}
 
-	openSuccessModal(){
+	openSuccessModal() {
 		this.success_modal.open();
 	}
 }

@@ -15,21 +15,13 @@ import { AudioService, AudioComponentService, TranscriptionService, KeymappingSe
 import { AudioviewerConfigValidator } from "../validator/AudioviewerConfigValidator";
 import { AudioviewerConfig } from "../config/av.config";
 import { Logger } from "../../../shared/Logger";
+import { SubscriptionManager } from "../../../shared/subscriptions";
 
 @Injectable()
 export class AudioviewerService extends AudioComponentService {
 	private _settings: AudioviewerConfig;
 
-	constructor(protected audio: AudioService,
-				protected transcrService: TranscriptionService,
-				private keyMap: KeymappingService) {
-		super(audio);
-
-		let subscr = this.keyMap.onkeyup.subscribe(this.onKeyUp);
-		this.subscriptions.push(subscr);
-	}
-
-	private subscriptions: Subscription[] = [];
+	private subscrmanager:SubscriptionManager;
 	//LINES
 	private Lines: Line[] = [];
 
@@ -94,6 +86,15 @@ export class AudioviewerService extends AudioComponentService {
 
 	get channel(): Float32Array {
 		return this._channel;
+	}
+
+	constructor(protected audio: AudioService,
+				protected transcrService: TranscriptionService,
+				private keyMap: KeymappingService) {
+		super(audio);
+
+		this.subscrmanager = new SubscriptionManager();
+		this.subscrmanager.add(this.keyMap.onkeyup.subscribe(this.onKeyUp));
 	}
 
 	/**
@@ -722,7 +723,7 @@ export class AudioviewerService extends AudioComponentService {
 	 * destroy this audioviewer object
 	 */
 	public destroy() {
-		Functions.unsubscribeAll(this.subscriptions);
+		this.subscrmanager.destroy();
 	}
 
 	onKeyUp = (event) => {

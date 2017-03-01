@@ -16,6 +16,7 @@ import { ComponentCanDeactivate } from "../../guard/login.deactivateguard";
 import { APIService } from "../../service/api.service";
 import { Functions } from "../../shared/Functions";
 import { NavbarService } from "../../service/navbar.service";
+import { SubscriptionManager } from "../../shared/subscriptions";
 
 
 @Component({
@@ -36,6 +37,8 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 				private cd: ChangeDetectorRef,
 				private sanitizer: DomSanitizer,
 				private navbarServ: NavbarService) {
+
+		this.subscrmanager = new SubscriptionManager();
 	}
 
 	private feedback_data = {
@@ -46,7 +49,7 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 
 	private send_ok = false;
 	private send_error: string = "";
-	private subscriptions: Subscription[] = [];
+	private subscrmanager: SubscriptionManager;
 
 	ngOnInit() {
 		if (!this.transcrService.segments && this.sessService.SampleRate) {
@@ -89,7 +92,8 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 
 		let json: any = this.transcrService.exportDataToJSON();
 		let member_id: number = Number(this.sessService.member_id);
-		let subscr = this.api.saveSession(json.transcript, json.project, json.annotator, member_id, json.id, json.status, json.comment, json.quality, json.log)
+
+		this.subscrmanager.add(this.api.saveSession(json.transcript, json.project, json.annotator, member_id, json.id, json.status, json.comment, json.quality, json.log)
 			.catch(this.onSendError)
 			.subscribe((result) => {
 					if (result != null && result.hasOwnProperty("statusText") && result.statusText === "OK") {
@@ -103,8 +107,7 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 						this.send_error = "Es ist ein Fehler aufgetreten. Lade diese Seite mit deinem Browser noch einmal und versuche es erneut";
 					}
 				}
-			);
-		this.subscriptions.push(subscr);
+			));
 	}
 
 	ngAfterViewInit() {
@@ -117,7 +120,7 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 	};
 
 	ngOnDestroy() {
-		Functions.unsubscribeAll(this.subscriptions);
+		this.subscrmanager.destroy();
 	}
 
 

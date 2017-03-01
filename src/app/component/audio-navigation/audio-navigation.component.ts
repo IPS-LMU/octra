@@ -3,9 +3,6 @@ import { Component, Output, EventEmitter, ChangeDetectorRef } from '@angular/cor
 import { UserInteractionsService, AudioService } from "../../service";
 import { APP_CONFIG } from "../..";
 import { BrowserInfo } from "../../shared";
-import { Functions } from "../../shared/Functions";
-import { isNumber } from "util";
-import { Logger } from "../../shared/Logger";
 
 @Component({
 	selector   : 'app-audio-navigation',
@@ -30,7 +27,7 @@ export class AudioNavigationComponent {
 		return APP_CONFIG.Settings;
 	}
 
-	@Output() button_click = new EventEmitter<{type: string, timestamp: number}>();
+	@Output() buttonclick = new EventEmitter<{type: string, timestamp: number}>();
 	@Output() volumechange = new EventEmitter<{old_value: number, new_value: number, timestamp: number}>();
 	@Output() aftervolumechange = new EventEmitter<{new_value: number, timestamp: number}>();
 	@Output() speedchange = new EventEmitter<{old_value: number, new_value: number, timestamp: number}>();
@@ -60,7 +57,7 @@ export class AudioNavigationComponent {
 	}
 
 	/**
-	 * get Shortcut for navigation
+	 * get Shortcut for labels
 	 * @param key
 	 * @returns {any}
 	 */
@@ -78,26 +75,25 @@ export class AudioNavigationComponent {
 	}
 
 	/**
-	 * called when button of navigation clicked
-	 * @param $event
+	 * called when button of navigation has been clicked
 	 * @param type "play", "pause", "stop", "replay" or "backward"
 	 */
 	onButtonClick(type: string) {
 		switch (type) {
 			case("play"):
-				this.button_click.emit({ type: "play", timestamp: Date.now() });
+				this.buttonclick.emit({ type: "play", timestamp: Date.now() });
 				break;
 			case("pause"):
-				this.button_click.emit({ type: "pause", timestamp: Date.now() });
+				this.buttonclick.emit({ type: "pause", timestamp: Date.now() });
 				break;
 			case("stop"):
-				this.button_click.emit({ type: "stop", timestamp: Date.now() });
+				this.buttonclick.emit({ type: "stop", timestamp: Date.now() });
 				break;
 			case("replay"):
-				this.button_click.emit({ type: "replay", timestamp: Date.now() });
+				this.buttonclick.emit({ type: "replay", timestamp: Date.now() });
 				break;
 			case("backward"):
-				this.button_click.emit({ type: "backward", timestamp: Date.now() });
+				this.buttonclick.emit({ type: "backward", timestamp: Date.now() });
 				break;
 			case("default"):
 				break;
@@ -105,6 +101,9 @@ export class AudioNavigationComponent {
 		this.cd.detectChanges();
 	}
 
+	/***
+	 * after value of volume was changed
+	 */
 	afterVolumeChange() {
 		this.aftervolumechange.emit({
 			new_value: this.volume,
@@ -112,6 +111,9 @@ export class AudioNavigationComponent {
 		});
 	}
 
+	/***
+	 * after value of speed was changed
+	 */
 	afterSpeedChange() {
 		this.afterspeedchange.emit({
 			new_value: this.speed,

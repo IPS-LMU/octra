@@ -5,7 +5,7 @@
     <app-transcr-window #window (act)="onWindowAction($event)" *ngIf="showWindow"></app-transcr-window>
     <div style="position:fixed;bottom:0;z-index:20;" [ngStyle]="{width:viewer.innerWidth + 'px'}">
         <app-audio-navigation #audionav
-                              (button_click)="onButtonClick($event)"
+                              (buttonclick)="onButtonClick($event)"
                               (volumechange)="onVolumeChange($event)"
                               (aftervolumechange)="afterVolumeChange($event)"
                               (speedchange)="onSpeedChange($event)"

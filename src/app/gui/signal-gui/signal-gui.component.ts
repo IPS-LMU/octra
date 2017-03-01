@@ -26,6 +26,7 @@ import { UserInteractionsService } from "../../service/userInteractions.service"
 import { BrowserInfo } from "../../shared/BrowserInfo";
 import { AudioviewerConfig } from "../../component/audioviewer/config/av.config";
 import { MessageService } from "../../service/message.service";
+import { SubscriptionManager } from "../../shared/subscriptions";
 
 @Component({
 	selector   : 'app-signal-gui',
@@ -46,7 +47,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	private segmentselected: boolean = false;
 	private activeviewer: string = "";
 
-	private subscriptions: Subscription[] = [];
+	private subscrmanager: SubscriptionManager;
 	private mini_loupecoord: any = {
 		x: 0,
 		y: 0
@@ -71,6 +72,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 				private transcrService: TranscriptionService,
 				private cd: ChangeDetectorRef,
 				private uiService: UserInteractionsService) {
+		this.subscrmanager = new SubscriptionManager();
 	}
 
 	ngOnInit() {
@@ -98,43 +100,38 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.nav.shortcuts = this.viewer.Settings.shortcuts;
 
 		//update signaldisplay on changes
-		let subscription = Observable.timer(0, 2000).subscribe(
+		this.subscrmanager.add(Observable.timer(0, 2000).subscribe(
 			() => {
 				this.viewer.drawSegments();
 				this.loupee.viewer.drawSegments();
 			}
-		);
+		));
 
-		let subscription2 = this.loupee.viewer.segmentchange.subscribe(
+		this.subscrmanager.add(this.loupee.viewer.segmentchange.subscribe(
 			($event) => {
 				this.onSegmentChange($event);
-			});
+			}));
 
-		let subscr3: Subscription = this.loupee.viewer.alerttriggered.subscribe(
+		this.subscrmanager.add(this.loupee.viewer.alerttriggered.subscribe(
 			(result) => {
 				this.msg.showMessage(result.type, result.message);
 			}
-		);
+		));
 
-		let subscr4: Subscription = this.viewer.alerttriggered.subscribe(
+		this.subscrmanager.add(this.viewer.alerttriggered.subscribe(
 			(result) => {
 				this.msg.showMessage(result.type, result.message);
 			}
-		);
-
-		this.subscriptions.push(subscription);
-		this.subscriptions.push(subscription2);
-		this.subscriptions.push(subscr3);
-		this.subscriptions.push(subscr4);
+		));
 	}
 
 	ngOnDestroy() {
-		Functions.unsubscribeAll(this.subscriptions);
+		this.subscrmanager.destroy();
 		this.keyMap.unregister("AV");
 		this.keyMap.unregister("Loupe");
 	}
 
-	onButtonClick(event: {type: string, timestamp: number}) {
+	onButtonClick(event: { type: string, timestamp: number }) {
 		if (APP_CONFIG.Settings.LOGGING == true)
 			this.uiService.addElementFromEvent("mouse_click", {}, event.timestamp, event.type + "_button");
 
@@ -255,7 +252,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	 * hits when user is typing something in the editor
 	 * @param status
 	 */
-	onEditorTyping = (status: string)=> {
+	onEditorTyping = (status: string) => {
 		if (status === "started") {
 			//if started save old config of special keys
 			this.temp = {
@@ -319,20 +316,20 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.segmentselected = false;
 	}
 
-	onSpeedChange(event: {old_value: number, new_value: number, timestamp: number}) {
+	onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
 		this.audio.speed = event.new_value;
 	}
 
-	afterSpeedChange(event: {new_value: number, timestamp: number}) {
+	afterSpeedChange(event: { new_value: number, timestamp: number }) {
 		if (APP_CONFIG.Settings.LOGGING == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "speed_change");
 	}
 
-	onVolumeChange(event: {old_value: number, new_value: number, timestamp: number}) {
+	onVolumeChange(event: { old_value: number, new_value: number, timestamp: number }) {
 		this.audio.volume = event.new_value;
 	}
 
-	afterVolumeChange(event: {new_value: number, timestamp: number}) {
+	afterVolumeChange(event: { new_value: number, timestamp: number }) {
 		if (APP_CONFIG.Settings.LOGGING == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "volume_change");
 	}

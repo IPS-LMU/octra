@@ -118,7 +118,7 @@ export class AudioplayerService extends AudioComponentService {
 	 * @param curr_line
 	 * @param innerWidth
 	 */
-	public setMouseMovePosition(type: string, x: number, y: number, curr_line: Line, innerWidth:number) {
+	public setMouseMovePosition(type: string, x: number, y: number, curr_line: Line, innerWidth: number) {
 		super.setMouseMovePosition(type, x, y, curr_line, innerWidth);
 
 		if (this.mouse_down) {

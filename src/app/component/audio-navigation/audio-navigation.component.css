@@ -1,3 +1,7 @@
+.slider{
+    padding:0px;
+}
+
 .slider-descr {
     font-size: 0.7em;
     vertical-align: middle;
@@ -20,8 +24,4 @@
 
 .btn-description{
     font-size:0.9em;
-}
-
-.slider{
-    padding:0px;
 }

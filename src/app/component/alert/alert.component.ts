@@ -1,40 +1,23 @@
 import {
 	Component,
 	OnInit,
-	AfterViewInit,
-	ViewChild,
-	ElementRef,
-	animate,
-	transition,
-	style,
-	state,
-	trigger,
 	ChangeDetectionStrategy,
 	ChangeDetectorRef
 } from '@angular/core';
+
 import { MessageService } from "../../service/message.service";
+import { OCTRANIMATIONS } from "../../shared/OCTRAnimations";
 
 @Component({
 	selector       : 'app-alert',
 	templateUrl    : './alert.component.html',
 	styleUrls      : [ './alert.component.css' ],
-	animations     : [
-		trigger('heroState', [
-			state('inactive', style({
-				opacity: 0
-			})),
-			state('active', style({
-				opacity: 1
-			})),
-			transition('active => inactive', animate('300ms ease-out'))
-		])
-	],
+	animations     : OCTRANIMATIONS,
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AlertComponent implements OnInit {
-	@ViewChild('alert') alert: ElementRef;
-
-	constructor(private cd: ChangeDetectorRef, private msgService: MessageService) {
+	constructor(private cd: ChangeDetectorRef,
+				private msgService: MessageService) {
 	}
 
 	state: string = "inactive";
@@ -45,6 +28,7 @@ export class AlertComponent implements OnInit {
 	ngOnInit() {
 		this.state = "inactive";
 		this.show = false;
+
 		this.cd.markForCheck();
 		this.msgService.showmessage.subscribe(
 			(result) => {
@@ -65,7 +49,7 @@ export class AlertComponent implements OnInit {
 		this.text = message;
 		this.cd.markForCheck();
 
-		setTimeout(()=> {
+		setTimeout(() => {
 			this.state = "inactive";
 			this.cd.markForCheck();
 		}, 3000);

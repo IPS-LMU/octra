@@ -12,17 +12,17 @@ import {
 	ChangeDetectionStrategy,
 	AfterViewInit
 } from '@angular/core';
-import { Observable, Subscription } from 'rxjs/Rx';
+import { Observable} from 'rxjs/Rx';
 
 //other
 import {
 	BrowserInfo,
 	CanvasAnimation,
-	Functions,
 	Line
 } from "../../shared";
 import { AudioService, KeymappingService } from "../../service";
 import { AudioplayerService } from "./service/audioplayer.service";
+import { SubscriptionManager } from "../../shared/subscriptions";
 
 @Component({
 	selector       : 'app-audioplayer',
@@ -32,25 +32,14 @@ import { AudioplayerService } from "./service/audioplayer.service";
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
-	constructor(private audio: AudioService,
-				private ap: AudioplayerService,
-				private changeDetectorRef: ChangeDetectorRef,
-				private keyMap: KeymappingService) {
-		let subscr = this.keyMap.onkeydown.subscribe(this.onKeyDown);
-		this.subscriptions.push(subscr);
-	}
-
 	@ViewChild("audioplay") apview;
 	@ViewChild("ap_graphicscan") graphicscanRef: ElementRef;
 	@ViewChild("ap_overlaycan") overlaynacRef: ElementRef;
 	@ViewChild("ap_playcan") playcanRef: ElementRef;
 
-	@Output() speed_disabled = new EventEmitter<boolean>();
 	@Output() shortcuttriggered = new EventEmitter<any>();
-	@Output() speed_slider_disabled: boolean = false;
 
-	@Output()
-	public get BeginTime(): number {
+	@Output() public get BeginTime(): number {
 		return (this.ap.begintime) ? this.ap.begintime.unix : 0;
 	}
 
@@ -79,8 +68,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 		return this.ap.current_time;
 	}
 
-
-	private subscriptions: Subscription[] = [];
+	private subscrmanager: SubscriptionManager;
 
 	//canvas Elements
 	private graphicscanvas: HTMLCanvasElement = null;
@@ -100,6 +88,14 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 	private oldInnerWidth: number = 0;
 	private focused = false;
 
+	constructor(private audio: AudioService,
+				private ap: AudioplayerService,
+				private changeDetectorRef: ChangeDetectorRef,
+				private keyMap: KeymappingService) {
+
+		this.subscrmanager = new SubscriptionManager();
+		this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown));
+	}
 
 	ngOnInit() {
 		this.anim = new CanvasAnimation(25);
@@ -125,7 +121,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 
 	ngOnDestroy() {
 		this.stopPlayback();
-		Functions.unsubscribeAll(this.subscriptions);
+		this.subscrmanager.destroy();
 	}
 
 	/**
@@ -384,7 +380,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 	 * starts the timer needed for updating the timestamps for the gui.
 	 */
 	private startTimer() {
-		let timerSubscription = this.timer.subscribe(
+		this.subscrmanager.add(this.timer.subscribe(
 			() => {
 				if (this.audio.audiobuffer && this.ap.PlayCursor) {
 					this.ap.current_time = Math.round(this.ap.PlayCursor.time_pos.unix);
@@ -392,9 +388,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 					this.changeDetectorRef.markForCheck();
 				}
 			}
-		);
-
-		this.subscriptions.push(timerSubscription);
+		));
 	}
 
 	//sets the loop of playback
@@ -506,6 +500,6 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 
 	@HostListener("window:beforeunload", [ "$event" ])
 	private onReload($event) {
-		Functions.unsubscribeAll(this.subscriptions);
+		this.subscrmanager.destroy();
 	}
 }

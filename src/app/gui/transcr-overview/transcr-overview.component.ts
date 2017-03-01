@@ -7,6 +7,7 @@ import { DomSanitizer } from "@angular/platform-browser";
 import { TranscriptionService, AudioService } from "../../service";
 import { Subscription } from "rxjs";
 import { Functions } from "../../shared/Functions";
+import { SubscriptionManager } from "../../shared/subscriptions";
 
 @Component({
 	selector       : 'app-transcr-overview',
@@ -32,7 +33,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy {
 	}
 
 	private segments: any[] = [];
-	private subscriptions: Subscription[] = [];
+	private subscrmanager: SubscriptionManager;
 	private updating: boolean = false;
 
 	private updateSegments() {
@@ -70,16 +71,18 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy {
 				private audio: AudioService,
 				private sanitizer: DomSanitizer,
 				private cd: ChangeDetectorRef) {
+
+		this.subscrmanager = new SubscriptionManager();
 	}
 
 	ngOnDestroy(){
-		Functions.unsubscribeAll(this.subscriptions);
+		this.subscrmanager.destroy();
 	}
 
 	ngOnInit() {
 		if(this.audio.audiobuffer == null) {
-			let subscr = this.audio.afterloaded.subscribe(() => {
-				let subscr2 = this.transcrService.segments.onsegmentchange.subscribe(() => {
+			this.subscrmanager.add(this.audio.afterloaded.subscribe(() => {
+				this.subscrmanager.add(this.transcrService.segments.onsegmentchange.subscribe(() => {
 					if (!this.updating) {
 						this.updating = true;
 						setTimeout(() => {
@@ -88,17 +91,17 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy {
 							this.updating = false;
 						}, 1000);
 					}
-				});
-				this.subscriptions.push(subscr2);
+				}));
+
 				this.updateSegments();
 				this.cd.markForCheck();
-			});
+			}));
+
 			this.updateSegments();
 			this.cd.markForCheck();
-
-			this.subscriptions.push(subscr);
 		} else{
-			let subscr2 = this.transcrService.segments.onsegmentchange.subscribe(() => {
+
+			this.subscrmanager.add(this.transcrService.segments.onsegmentchange.subscribe(() => {
 				if (!this.updating) {
 
 					this.updating = true;
@@ -108,8 +111,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy {
 						this.updating = false;
 					}, 1000);
 				}
-			});
-			this.subscriptions.push(subscr2);
+			}));
 			this.updateSegments();
 			this.cd.markForCheck();
 		}

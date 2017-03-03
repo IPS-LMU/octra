@@ -8,19 +8,11 @@ import {
 	EventEmitter,
 	AfterContentInit
 } from '@angular/core';
-import { LoupeComponent } from "../../component/loupe/loupe.component";
-import { TranscrEditorComponent } from "../../component/transcr-editor/transcr-editor.component";
-import { KeymappingService } from "../../service/keymapping.service";
-import { AudioTime } from "../../shared/AudioTime";
-import { TranscriptionService } from "../../service/transcription.service";
-import { Functions } from "../../shared/Functions";
-import { Segment } from "../../shared/Segment";
-import { AudioService } from "../../service/audio.service";
-import { Subscription } from "rxjs/Rx";
-import { AudioNavigationComponent } from "../../component/audio-navigation/audio-navigation.component";
-import { UserInteractionsService } from "../../service/userInteractions.service";
+
 import { APP_CONFIG } from "../../app.config";
-import { SubscriptionManager } from "../../shared/subscriptions";
+import { LoupeComponent, TranscrEditorComponent, AudioNavigationComponent} from "../../component";;
+import { KeymappingService, UserInteractionsService, TranscriptionService, AudioService} from "../../service";
+import { AudioTime, Functions, Segment, SubscriptionManager} from "../../shared";
 
 @Component({
 	selector   : 'app-transcr-window',
@@ -58,7 +50,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 		if (this.transcrService.selectedSegment.index > -1) {
 			return this.transcrService.segments.get(this.transcrService.selectedSegment.index);
 		}
-		else null;
+
+		return null;
 	}
 
 	set SelectedSegment(segment: Segment) {
@@ -69,6 +62,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 				private transcrService: TranscriptionService,
 				private audio: AudioService,
 				private uiService: UserInteractionsService) {
+
+		this.subscrmanager = new SubscriptionManager();
 	}
 
 	ngOnInit() {

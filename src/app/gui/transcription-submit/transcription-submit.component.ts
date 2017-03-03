@@ -16,7 +16,7 @@ import { ComponentCanDeactivate } from "../../guard/login.deactivateguard";
 import { APIService } from "../../service/api.service";
 import { Functions } from "../../shared/Functions";
 import { NavbarService } from "../../service/navbar.service";
-import { SubscriptionManager } from "../../shared/subscriptions";
+import { SubscriptionManager } from "../../shared";
 
 
 @Component({

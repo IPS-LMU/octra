@@ -11,7 +11,7 @@ import { ViewChild } from "@angular/core/src/metadata/di";
 import { ModalComponent } from "ng2-bs3-modal/components/modal";
 import { Logger } from "../../shared/Logger";
 import { AudioService } from "../../service/audio.service";
-import { SubscriptionManager } from "../../shared/subscriptions";
+import { SubscriptionManager } from "../../shared";
 
 
 @Component({

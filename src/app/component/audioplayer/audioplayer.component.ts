@@ -19,12 +19,12 @@ import {
 	BrowserInfo,
 	CanvasAnimation,
 	Line,
-	SubscriptionManager
+	SubscriptionManager,
+	AudioTimeCalculator,
+	Logger
 } from "../../shared";
 import { AudioService, KeymappingService } from "../../service";
 import { AudioplayerService } from "./service/audioplayer.service";
-import { AudioTimeCalculator } from "../../shared/AudioTimeCalculator";
-import { Logger } from "../../shared/Logger";
 
 @Component({
 	selector       : 'app-audioplayer',
@@ -109,7 +109,6 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 	private innerWidth: number = 0;
 	private oldInnerWidth: number = 0;
 	private focused = false;
-	private cursorlocked = false;
 
 	constructor(private audio: AudioService,
 				private ap: AudioplayerService,

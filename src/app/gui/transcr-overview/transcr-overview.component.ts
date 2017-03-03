@@ -7,7 +7,7 @@ import { DomSanitizer } from "@angular/platform-browser";
 import { TranscriptionService, AudioService } from "../../service";
 import { Subscription } from "rxjs";
 import { Functions } from "../../shared/Functions";
-import { SubscriptionManager } from "../../shared/subscriptions";
+import { SubscriptionManager } from "../../shared";
 
 @Component({
 	selector       : 'app-transcr-overview',

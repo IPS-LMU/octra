@@ -4,34 +4,31 @@ import {
 	AfterViewInit,
 	OnDestroy,
 	ViewChild,
-	ChangeDetectorRef,
-	Renderer,
-	Output
+	ChangeDetectorRef
 } from '@angular/core';
-import { Router } from "@angular/router";
-import { AudioviewerComponent } from "../../component/audioviewer/audioviewer.component";
-import { LoupeComponent } from "../../component/loupe/loupe.component";
-import { AudioService } from "../../service/audio.service";
-import { KeymappingService } from "../../service/keymapping.service";
-import { AVMousePos, AVSelection } from "../../shared";
-import { AudioTime } from "../../shared/AudioTime";
-import { PlayCursor } from "../../shared/PlayCursor";
-import { TranscriptionService } from "../../service/transcription.service";
-import { Subscription, Observable } from "rxjs";
-import { Functions } from "../../shared/Functions";
-import { AudioNavigationComponent } from "../../component/audio-navigation/audio-navigation.component";
-import { TranscrEditorComponent } from "../../component/transcr-editor/transcr-editor.component";
+import { Observable } from "rxjs";
+
+import {
+	AudioviewerComponent,
+	LoupeComponent,
+	AudioNavigationComponent,
+	TranscrEditorComponent
+} from "../../component";
+
 import { APP_CONFIG } from "../../app.config";
-import { UserInteractionsService } from "../../service/userInteractions.service";
-import { BrowserInfo } from "../../shared/BrowserInfo";
-import { AudioviewerConfig } from "../../component/audioviewer/config/av.config";
-import { MessageService } from "../../service/message.service";
-import { SubscriptionManager } from "../../shared/subscriptions";
+import {
+	AudioService,
+	KeymappingService,
+	TranscriptionService,
+	UserInteractionsService,
+	MessageService
+} from "../../service";
+import { AVMousePos, AVSelection, SubscriptionManager, AudioTime, Functions, BrowserInfo } from "../../shared";
 
 @Component({
-	selector   : 'app-signal-gui',
+	selector: 'app-signal-gui',
 	templateUrl: 'signal-gui.component.html',
-	styleUrls  : [ 'signal-gui.component.css' ]
+	styleUrls: [ 'signal-gui.component.css' ]
 })
 export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	@ViewChild('viewer') viewer: AudioviewerComponent;

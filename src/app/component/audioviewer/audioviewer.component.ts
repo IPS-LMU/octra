@@ -9,7 +9,6 @@ import {
 	EventEmitter,
 	HostListener
 } from '@angular/core';
-import { Subscription } from "rxjs/Rx";
 
 import {
 	Line,
@@ -19,15 +18,14 @@ import {
 	PlayCursor,
 	Segment,
 	CanvasAnimation,
-	Functions,
 	BrowserInfo,
 	AudioTimeCalculator,
-	Logger
+	Logger,
+	SubscriptionManager,
+	Chunk
 } from "../../shared";
 import { AudioService, TranscriptionService, KeymappingService } from "../../service";
 import { AudioviewerService } from "./service/audioviewer.service";
-import { Chunk } from "../../shared/Chunk";
-import { SubscriptionManager } from "../../shared/subscriptions";
 
 declare var window: any;
 @Component({

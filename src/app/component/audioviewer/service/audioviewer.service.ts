@@ -1,27 +1,26 @@
 import { Injectable } from '@angular/core';
-import { Subscription } from "rxjs";
 
 import {
-	Line,
-	AVSelection,
-	AVMousePos,
 	AudioTime,
+	AudioTimeCalculator,
+	AVMousePos,
+	AVSelection,
 	Chunk,
-	Functions,
+	Line,
 	PlayCursor,
-	AudioTimeCalculator
+	SubscriptionManager
 } from "../../../shared";
+
 import { AudioService, AudioComponentService, TranscriptionService, KeymappingService } from "../../../service";
 import { AudioviewerConfigValidator } from "../validator/AudioviewerConfigValidator";
 import { AudioviewerConfig } from "../config/av.config";
-import { Logger } from "../../../shared/Logger";
-import { SubscriptionManager } from "../../../shared/subscriptions";
 
 @Injectable()
 export class AudioviewerService extends AudioComponentService {
 	private _settings: AudioviewerConfig;
 
 	private subscrmanager:SubscriptionManager;
+
 	//LINES
 	private Lines: Line[] = [];
 

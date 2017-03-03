@@ -32,7 +32,7 @@ import { APP_CONFIG } from "../../app.config";
 import { DropZoneComponent } from "../../component/drop-zone/drop-zone.component";
 import { isNullOrUndefined } from "util";
 import { isUndefined } from "util";
-import { SubscriptionManager } from "../../shared/subscriptions";
+import { SubscriptionManager } from "../../shared";
 
 @Component({
 	selector   : 'app-login',

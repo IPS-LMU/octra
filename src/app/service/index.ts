@@ -9,3 +9,4 @@ export * from './session.service';
 export * from './transcription.service';
 export * from './userInteractions.service';
 export * from './message.service';
+export * from './navbar.service';

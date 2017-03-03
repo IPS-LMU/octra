@@ -8,22 +8,26 @@ import {
 	ChangeDetectorRef
 } from '@angular/core';
 
-import { AudioviewerComponent } from "../../component/audioviewer/audioviewer.component";
+import {
+	AudioviewerComponent,
+	AudioNavigationComponent,
+	LoupeComponent
+} from "../../component";
 import { TranscrWindowComponent } from "../transcr-window/transcr-window.component";
-import { KeymappingService } from "../../service/keymapping.service";
-import { TranscriptionService } from "../../service/transcription.service";
-import { AudioService } from "../../service/audio.service";
-import { AVMousePos, AVSelection } from "../../shared";
-import { LoupeComponent } from "../../component/loupe/loupe.component";
-import { AudioTime } from "../../shared/AudioTime";
-import { UserInteractionsService } from "../../service/userInteractions.service";
-import { AudioNavigationComponent } from "../../component/audio-navigation/audio-navigation.component";
-import { MessageService } from "../../service/message.service";
+
 import { APP_CONFIG } from "../../app.config";
-import { Functions } from "../../shared/Functions";
+import {
+	KeymappingService,
+	TranscriptionService,
+	AudioService,
+	UserInteractionsService,
+	MessageService
+} from "../../service";
+
+import { AVMousePos, AVSelection, AudioTime, Functions } from "../../shared";
+import { SubscriptionManager } from "../../shared/SubscriptionManager";
 
 @Component({
-
 	selector: 'app-overlay-gui',
 	templateUrl: 'overlay-gui.component.html',
 	styleUrls: [ 'overlay-gui.component.css' ]
@@ -35,6 +39,7 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 	@ViewChild('audionav') audionav: AudioNavigationComponent;
 
 	private showWindow: boolean = false;
+	private subscrmanager:SubscriptionManager;
 
 	constructor(private transcrService: TranscriptionService,
 				private keyMap: KeymappingService,
@@ -42,6 +47,8 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 				private uiService: UserInteractionsService,
 				private cd: ChangeDetectorRef,
 				private msg: MessageService) {
+
+		this.subscrmanager = new SubscriptionManager();
 	}
 
 	private loupe_hidden = true;
@@ -63,7 +70,7 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 		this.audionav.shortcuts = this.viewer.Settings.shortcuts;
 
 		this.viewer.alerttriggered.subscribe(
-			(result)=> {
+			(result) => {
 				this.msg.showMessage(result.type, result.message);
 			}
 		);
@@ -166,25 +173,25 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 			this.uiService.addElementFromEvent("marker_click", { value: marker_code }, Date.now(), 'editor');
 	}
 
-	onSpeedChange(event: {old_value: number, new_value: number, timestamp: number}) {
+	onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
 		this.audio.speed = event.new_value;
 	}
 
-	afterSpeedChange(event: {new_value: number, timestamp: number}) {
+	afterSpeedChange(event: { new_value: number, timestamp: number }) {
 		if (APP_CONFIG.Settings.LOGGING == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "speed_change");
 	}
 
-	onVolumeChange(event: {old_value: number, new_value: number, timestamp: number}) {
+	onVolumeChange(event: { old_value: number, new_value: number, timestamp: number }) {
 		this.audio.volume = event.new_value;
 	}
 
-	afterVolumeChange(event: {new_value: number, timestamp: number}) {
+	afterVolumeChange(event: { new_value: number, timestamp: number }) {
 		if (APP_CONFIG.Settings.LOGGING == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "volume_change");
 	}
 
-	onButtonClick(event: {type: string, timestamp: number}) {
+	onButtonClick(event: { type: string, timestamp: number }) {
 		if (APP_CONFIG.Settings.LOGGING == true)
 			this.uiService.addElementFromEvent("mouse_click", {}, event.timestamp, event.type + "_button");
 

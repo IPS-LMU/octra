@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { HttpModule, JsonpModule, Http } from "@angular/http";
+import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 
 //third-party
@@ -12,18 +14,17 @@ import { Ng2Webstorage } from 'ng2-webstorage';
 
 //other
 import {
-	AudioCanvasDirective,
-	AudioviewerComponent,
-	AudioviewerConfig,
-	AudioviewerDirective
-} from "./component/audioviewer";
-import {
 	AudioNavigationComponent,
 	AudioplayerComponent,
-	AudioplayerConfig,
 	AudioplayerDirective,
+	AudioviewerComponent,
+	AudioviewerConfig,
+	AudioviewerDirective,
 	LoupeComponent,
-	TranscrEditorComponent
+	TranscrEditorComponent,
+	CircleLoupeComponent,
+	AlertComponent,
+	DropZoneComponent
 } from "./component";
 import {
 	AudioplayerGUIComponent,
@@ -33,6 +34,7 @@ import {
 	MembersAreaComponent,
 	NavigationComponent,
 	OverlayGUIComponent,
+	ReloadFileComponent,
 	SignalGUIComponent,
 	TranscriptionComponent,
 	TranscriptionSubmitComponent,
@@ -40,31 +42,24 @@ import {
 	TranscrOverviewComponent,
 	TranscrWindowComponent
 } from "./gui";
+
 import { routing } from "./app.routes";
 import { TimespanPipe, ProcentPipe, SecondsPipe, LeadingNullPipe } from "./pipe";
-import { AudioService, DialogService, KeymappingService, SessionService, } from "./service";
-import { CircleLoupeComponent } from "./component/circleloupe";
-import { DeALoginGuard, LogoutGuard, MembersAreaGuard } from "./guard";
-import { TranscrEditorConfig } from "./component/transcr-editor";
-import { ALoginGuard, TranscrSubmittedGuard } from "./guard";
+
+import { APIService, NavbarService, AudioService, DialogService, KeymappingService, SessionService } from "./service";
+
+import { DeALoginGuard, LogoutGuard, MembersAreaGuard, TranscrSubmittedGuard, ALoginGuard } from "./guard";
+
 import { AppComponent } from "./app.component";
-import { AlertComponent } from './component/alert/alert.component';
-import { APIService } from "./service/api.service";
-import { ReloadFileComponent } from './gui/reload-file/reload-file.component';
-import { NavbarService } from "./service/navbar.service";
-import { DropZoneComponent } from './component/drop-zone/drop-zone.component';
-import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-translate/core';
-import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
-	return new TranslateHttpLoader(http,"assets/i18n/", ".json");
+	return new TranslateHttpLoader(http, "assets/i18n/", ".json");
 }
 
 @NgModule({
 	declarations: [
 		AppComponent,
-		AudioCanvasDirective,
 		AudioNavigationComponent,
 		AudioplayerComponent,
 		AudioplayerDirective,
@@ -98,9 +93,9 @@ export function HttpLoaderFactory(http: Http) {
 		BrowserModule,
 		TranslateModule.forRoot({
 			loader: {
-				provide: TranslateLoader,
+				provide   : TranslateLoader,
 				useFactory: HttpLoaderFactory,
-				deps: [Http]
+				deps      : [ Http ]
 			}
 		}),
 		FormsModule,

@@ -15,7 +15,7 @@ import { NavbarService } from "./navbar.service";
 import { TextConverter } from "../shared/Converters/TextConverter";
 import { FileService } from "./file.service";
 import { AnnotJSONConverter } from "../shared/Converters/AnnotJSONConverter";
-import { SubscriptionManager } from "../shared/subscriptions";
+import { SubscriptionManager } from "../shared";
 
 
 @Injectable()
@@ -299,14 +299,14 @@ export class TranscriptionService {
 				else if (elem instanceof KeyStatisticElem) {
 					new_elem.value = elem.char;
 				}
-				else if (elem.type == "shortcut") {
-					new_elem.value = elem.value.shortcut;
-				}
 				else {
 					new_elem.value = elem.value
 				}
-				if (new_elem.value == null)
-					new_elem.value = "";
+
+				if (new_elem.value == null) {
+					new_elem.value = "no obj";
+					console.log(elem);
+				}
 
 				result.push(new_elem);
 			}

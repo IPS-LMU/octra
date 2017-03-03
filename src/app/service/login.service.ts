@@ -1,123 +1,35 @@
 import { Injectable } from '@angular/core';
+import { Subscription } from "rxjs";
+import { SubscriptionManager } from "../shared/SubscriptionManager";
+import { Http } from "@angular/http";
 
 @Injectable()
 export class LoginService {
-	private db_data = [
-		{
-			user_id: 4,
-		}, {
-			user_id: 5,
-		}, {
-			user_id: 6,
-		},
-		{
-			user_id: 7,
-		},
+	private db_data:any[] = [];
 
-		{
-			user_id: 8,
-		},
-		{
-			user_id: 9,
-		},
-		{
-			user_id: 10,
-		},
-		{
-			user_id: 11,
-		},
-		{
-			user_id: 12,
-		},
-		{
-			user_id: 14,
-		},
-		{
-			user_id: 16,
-		},
-		{
-			user_id: 20,
-		},
-		{
-			user_id: 23,
-		},
-		{
-			user_id: 25,
-		},
-		{
-			user_id: 31,
-		},
-		{
-			user_id: 33,
-		},
-		//neu
-		{
-			user_id: 35,
-		},
-		{
-			user_id: 38,
-		},
-		{
-			user_id: 40,
-		},
-		//neu
-		{
-			user_id: 41,
-		},
-		{
-			user_id: 42,
-		},
-		//neu
-		{
-			user_id: 44,
-		},
-		//neu
-		{
-			user_id: 47,
-		},
-		{
-			user_id: 48,
-		},
-		{
-			user_id: 49,
-		},
-		{
-			user_id: 50,
-		},
-		{
-			user_id: 53,
-		},
-		{
-			user_id: 55,
-		},
-		//neu
-		{
-			user_id: 56,
-		},
-		//test
-		{
-			user_id: 57,
-		},
-		{
-			user_id:58
-		},
-		{
-			user_id:59
-		},
-		{
-			user_id: 60,
-		}
-	];
+	private subscrmanager:SubscriptionManager;
 
-	constructor() {
+	constructor(private http:Http) {
+		this.subscrmanager = new SubscriptionManager();
+		this.subscrmanager.add(this.http.request("./config/allowed_users.json").subscribe(
+			(result)=>{
+				this.db_data = result.json();
+			},
+			() => {
+				console.error("allowed_users.json not found. Please create this file in a folder named 'config'");
+			}
+		));
 	}
 
 	public checkLoginData(user_id: number) {
 		for (let i = 0; i < this.db_data.length; i++) {
-			if (user_id === this.db_data[ i ].user_id)
+			if (user_id === this.db_data[ i ].id)
 				return true;
 		}
 		return false;
 	}
 
+	public destroy(){
+		this.subscrmanager.destroy();
+	}
 }

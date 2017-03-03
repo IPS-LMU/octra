@@ -33,6 +33,7 @@ import { DropZoneComponent } from "../../component/drop-zone/drop-zone.component
 import { isNullOrUndefined } from "util";
 import { isUndefined } from "util";
 import { SubscriptionManager } from "../../shared";
+import { Http } from "@angular/http";
 
 @Component({
 	selector   : 'app-login',
@@ -66,10 +67,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 		this.modal.close();
 	}
 
-	open() {
-		this.modal.open();
-	}
-
 	valid = false;
 
 	member = {
@@ -83,8 +80,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 				private loginService: LoginService,
 				private sessionService: SessionService,
 				private api: APIService,
-				private cd: ChangeDetectorRef) {
-
+				private cd: ChangeDetectorRef,
+				private http:Http
+	) {
 		this.subscrmanager = new SubscriptionManager();
 	}
 

@@ -23,7 +23,7 @@
   },
   "login":{
     "online mode": "Online Mode",
-    "online mode disabled": "Online mode is currently deactivated. Please use OCTRA locally.",
+    "online mode disabled": "Online mode is currently inactive. Please use OCTRA locally.",
     "local mode": "Local Mode",
     "old file found": "There is data from a previous transcription. If you like to continue your work, just drag & drop the following file to the gray box:<br/><br/>{{file_label}}"
   },

@@ -1,0 +1,123 @@
+{
+  "name": "Speechdat Markers",
+  "version": "1.0.0",
+  "items": [
+    {
+      "name": "truncation marker start",
+      "code": "[~abc]",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_start.png",
+      "button_text": "~abc",
+      //title of text
+      "description": [
+        {
+          "language": "de",
+          "translation": "Diesen Marker nur am Anfang setzen, sollte die Audiosequenz mit einem abgeschnittenem Wort beginnen"
+        }
+      ],
+      "shortcut": {
+        "mac": "ALT + 1",
+        "pc": "ALT + 1"
+      }
+    },
+    {
+      "name": "filled pause",
+      "code": "[fil]",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/fil.png",
+      "button_text": "filled pause",
+      //title of text
+      "description": [
+        {
+          "language": "de",
+          "translation": "Für Zögern des Sprechers wie hm, ähm, äh und andere."
+        }
+      ],
+      "shortcut": {
+        "mac": "ALT + 2",
+        "pc": "ALT + 2"
+      }
+    },
+    {
+      "name": "intermittent noise",
+      "code": "[int]",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/int.png",
+      "button_text": "intermittent noise",
+      //title of text
+      "description": [
+        {
+          "language": "de",
+          "translation": "Für kurzes, eindeutiges Geräusch wie z.B. Türknallen, das Berühren des Mirkrofons, oder ähnliches."
+        }
+      ],
+      "shortcut": {
+        "mac": "ALT + 3",
+        "pc": "ALT + 3"
+      }
+    },
+    {
+      "name": "speaker noise",
+      "code": "[spk]",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/spk.png",
+      "button_text": "speaker noise",
+      //title of text
+      "description": [
+        {
+          "language": "de",
+          "translation": "Für Geräusche und Unterbrechungen, die der Sprecher produziert wie z.B. lautes Atmen, Lachen oder ähnliches."
+        }
+      ],
+      "shortcut": {
+        "mac": "ALT + 4",
+        "pc": "ALT + 4"
+      }
+    },
+    {
+      "name": "stationary noise",
+      "code": "[sta]",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/sta.png",
+      "button_text": "stationary noise",
+      //title of text
+      "description": [
+        {
+          "language": "de",
+          "translation": "Für lang andauerndes, lautes Geräusch wie Verkehrslärm, Musik oder Radio im Hintergrund."
+        }
+      ],
+      "shortcut": {
+        "mac": "ALT + 5",
+        "pc": "ALT + 5"
+      }
+    },
+    {
+      "name": "unclear word",
+      "code": "**",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/stars.png",
+      "button_text": "**",
+      //title of text
+      "description": [
+        {
+          "language": "de",
+          "translation": "Diesen Marker vor einem Wort setzen, welches einer unverständlichen Sprache entstammt."
+        }
+      ],
+      "shortcut": {
+        "mac": "ALT + 6",
+        "pc": "ALT + 6"
+      }
+    },
+    {
+      "name": "truncation marker end",
+      "code": "[abc~]",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_end.png",
+      "button_text": "abc~",
+      //title of text
+      "description": {
+        "language": "de",
+        "translation": "Diesen Marker nur am Ende setzen, sollte die Audiosequenz mit einem abgeschnittenem Wort enden."
+      },
+      "shortcut": {
+        "mac": "ALT + 7",
+        "pc": "ALT + 7"
+      }
+    }
+  ]
+}

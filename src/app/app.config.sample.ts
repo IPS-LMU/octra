@@ -16,7 +16,6 @@ export class APP_CONFIG {
 					name       : "Chrome"
 				}
 			],
-			DISALLOWED_BROWSERS: [],
 
 			//MARKERS
 			WRAP               : "[]",

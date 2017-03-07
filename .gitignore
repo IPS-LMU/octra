@@ -394,3 +394,4 @@ xcuserdata/
 /src/app/*.js.map
 /tmp/
 /src/app/app.config.ts
+/src/config/config.json

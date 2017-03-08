@@ -1,5 +1,5 @@
 {
-  "name": "Speechdat Markers",
+  "name": "Markers",
   "version": "1.0.0",
   "items": [
     {
@@ -7,7 +7,6 @@
       "code": "[~abc]",
       "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_start.png",
       "button_text": "~abc",
-      //title of text
       "description": [
         {
           "language": "de",
@@ -24,7 +23,6 @@
       "code": "[fil]",
       "icon_url": "assets/img/components/transcr-editor/default_markers/fil.png",
       "button_text": "filled pause",
-      //title of text
       "description": [
         {
           "language": "de",
@@ -41,7 +39,6 @@
       "code": "[int]",
       "icon_url": "assets/img/components/transcr-editor/default_markers/int.png",
       "button_text": "intermittent noise",
-      //title of text
       "description": [
         {
           "language": "de",
@@ -58,7 +55,6 @@
       "code": "[spk]",
       "icon_url": "assets/img/components/transcr-editor/default_markers/spk.png",
       "button_text": "speaker noise",
-      //title of text
       "description": [
         {
           "language": "de",
@@ -75,7 +71,6 @@
       "code": "[sta]",
       "icon_url": "assets/img/components/transcr-editor/default_markers/sta.png",
       "button_text": "stationary noise",
-      //title of text
       "description": [
         {
           "language": "de",
@@ -92,7 +87,6 @@
       "code": "**",
       "icon_url": "assets/img/components/transcr-editor/default_markers/stars.png",
       "button_text": "**",
-      //title of text
       "description": [
         {
           "language": "de",
@@ -109,11 +103,12 @@
       "code": "[abc~]",
       "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_end.png",
       "button_text": "abc~",
-      //title of text
-      "description": {
-        "language": "de",
-        "translation": "Diesen Marker nur am Ende setzen, sollte die Audiosequenz mit einem abgeschnittenem Wort enden."
-      },
+      "description": [
+        {
+          "language": "de",
+          "translation": "Diesen Marker nur am Ende setzen, sollte die Audiosequenz mit einem abgeschnittenem Wort enden."
+        }
+      ],
       "shortcut": {
         "mac": "ALT + 7",
         "pc": "ALT + 7"

@@ -4,11 +4,17 @@ import { Http } from "@angular/http";
 
 import { SubscriptionManager } from "../shared";
 import { AppConfigValidator } from "../validator/AppConfigValidator";
+import { ConfigValidator } from "../shared/ConfigValidator";
+import { MarkersConfigValidator } from "../validator/MarkersConfigValidator";
 
 @Injectable()
 export class SettingsService {
+	get markers(): any {
+		return this._markers;
+	}
+
 	get validated(): boolean {
-		return this._validated;
+		return this.validation.app && this.validation.markers;
 	}
 
 	get app_settings(): any {
@@ -16,14 +22,27 @@ export class SettingsService {
 	}
 
 	public settingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
+	private app_settingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
+	private markersloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
 
 	private subscrmanager: SubscriptionManager;
 	private _app_settings: any;
-	private _validated: boolean = false;
+	private _markers: any;
+	private validation: any = {
+		app    : false,
+		markers: false
+	};
 
 	constructor(private http: Http) {
 		this.subscrmanager = new SubscriptionManager();
+		this.subscrmanager.add(
+			this.app_settingsloaded.subscribe(this.triggerSettingsLoaded)
+		);
+		this.subscrmanager.add(
+			this.markersloaded.subscribe(this.triggerSettingsLoaded)
+		);
 		this._app_settings = this.getApplicationSettings();
+		this._markers = this.getMarkersSettings();
 	}
 
 	getApplicationSettings(): any {
@@ -32,9 +51,11 @@ export class SettingsService {
 		this.subscrmanager.add(this.http.request("./config/config.json").subscribe(
 			(result) => {
 				this._app_settings = result.json();
-				this.validate();
-				if (this._validated) {
-					this.settingsloaded.emit(this.validated);
+				this.validation.app = this.validate(new AppConfigValidator(), this._app_settings);
+				if (this.validation.app) {
+					this.app_settingsloaded.emit(true);
+				} else{
+					console.error("config.json validation error.");
 				}
 			},
 			() => {
@@ -45,20 +66,43 @@ export class SettingsService {
 		return result;
 	}
 
-	private validate() {
-		//validate app config
-		let validator: AppConfigValidator = new AppConfigValidator();
+	getMarkersSettings(): any {
+		let result: any = null;
 
-		for (let setting in this._app_settings) {
-			let result = validator.validate(setting, this._app_settings[ "" + setting + "" ]);
-			if (!result.success) {
-				this._validated = false;
-				console.error(result.error);
+		this.subscrmanager.add(this.http.request("./config/markers.json").subscribe(
+			(result) => {
+				this._markers = result.json();
+				this.validation.markers = this.validate(new MarkersConfigValidator(), this._markers);
+				if (this.validation.markers) {
+					this.markersloaded.emit(true);
+				} else{
+					console.error("markers.json validation error.");
+				}
+			},
+			() => {
+				console.error("config.json not found. Please create this file in a folder named 'config'");
 			}
-			else {
-				this._validated = true;
+		));
+
+		return result;
+	}
+
+	private triggerSettingsLoaded = () => {
+		if (this.validated)
+			this.settingsloaded.emit(true);
+	};
+
+	private validate(validator: ConfigValidator, settings:any): boolean {
+		//validate app config
+
+		for (let setting in settings) {
+			let result = validator.validate(setting, settings[ "" + setting + "" ]);
+			if (!result.success) {
+				console.error(result.error);
+				return false;
 			}
 		}
+		return true;
 	}
 
 	public destroy() {

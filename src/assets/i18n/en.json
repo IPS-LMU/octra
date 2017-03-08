@@ -30,5 +30,8 @@
   "dropzone":{
     "drag&drop here" : "Drag & Drop audio file (*.wav) here or click here.",
     "file selected": "{{file_label}} selected"
+  },
+  "browser": {
+    "invalid": "<b>Your browser is not compatible</b>. Please use one of the these browsers:"
   }
 }

@@ -239,9 +239,9 @@
     <div id="bottom-nav">
         <div class="btn-group btn-group-justified" role="group" aria-label="...">
             <a class="btn btn-default btn-raised" (click)="modal.open()"><span
-                    class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span><span [ngClass]="{'hidden-xs hidden-sm': appc.RESPONSIVE}"> Beenden</span></a>
+                    class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span><span [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> Beenden</span></a>
             <a class="btn btn-default btn-raised"
-               (click)="submitTranscription()"><span [ngClass]="{'hidden-xs hidden-sm': appc.RESPONSIVE}"> Transkription fertigstellen</span> <span
+               (click)="submitTranscription()"><span [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> Transkription fertigstellen</span> <span
                     class="glyphicon glyphicon glyphicon-menu-right" aria-hidden="true"></span></a>
         </div>
     </div>

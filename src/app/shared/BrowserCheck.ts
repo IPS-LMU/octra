@@ -13,8 +13,4 @@ export class BrowserCheck{
 
 		return false;
 	}
-
-	public isValidWindowWidth():boolean{
-		return (window.innerWidth >= 1200);
-	}
 }

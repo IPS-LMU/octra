@@ -91,9 +91,15 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 		this.browser_check = new BrowserCheck();
 		this.valid_platform = true;
 		this.agreement_checked = true;
-		//this.valid_platform = (this.browser_check.isValidBrowser());
-		this.valid_size = true;
-		//this.valid_size = this.browser_check.isValidWindowWidth();
+		if(this.apc.octra.allowed_browsers.length > 0)
+			this.valid_platform = this.browser_check.isValidBrowser(this.apc.octra.allowed_browsers);
+		else
+			this.valid_platform = true;
+
+		if(this.apc.octra.responsive.enabled == false)
+			this.valid_size = window.innerWidth >= this.apc.octra.responsive.fixedwidth;
+		else
+			this.valid_size = true;
 
 		jQuery.material.init();
 
@@ -102,10 +108,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	}
 
 	ngAfterViewInit() {
-		/*
-		 Logger.log("view init");
-		 this.dropzone.addEventListener('dragover', this.onDragOver, false);
-		 this.dropzone.addEventListener('this.sessionService.selectedfiledrop', this.onFileDrop, false);*/
 	}
 
 	ngOnDestroy() {
@@ -177,14 +179,14 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
 	@HostListener('window:resize', [ '$event' ])
 	onResize($event) {
-		this.valid_size = this.browser_check.isValidWindowWidth();
+		if(this.apc.octra.responsive.enabled == false)
+			this.valid_size = window.innerWidth >= this.apc.octra.responsive.fixedwidth;
+		else
+			this.valid_size = true;
 	}
 
 	openAgreement() {
 		this.agreement.open();
-	}
-
-	afterFileDrop($event) {
 	}
 
 	getDropzoneFileString(file: File| SessionFile) {
@@ -225,5 +227,16 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 		}
 
 		return "unknown";
+	}
+
+	getValidBrowsers():string{
+		let result = "";
+
+		for(let i = 0; i < this.apc.octra.allowed_browsers.length; i++){
+			let browser = this.apc.octra.allowed_browsers[i];
+			result += browser.name + "("+ browser.version +")";
+		}
+
+		return result;
 	}
 }

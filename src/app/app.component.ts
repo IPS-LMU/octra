@@ -41,7 +41,9 @@ export class AppComponent implements OnDestroy {
 				}
 				else {
 					if (this.settingsService.validated)
-						this.api.init(this.settingsService.app_settings.AUDIO_SERVER + "WebTranscribe");
+					{
+						this.api.init(this.settingsService.app_settings.audio_server.url + "WebTranscribe");
+					}
 
 
 					if (!this.settingsService.app_settings.octra.responsive.enabled) {
@@ -57,6 +59,8 @@ export class AppComponent implements OnDestroy {
 		));
 
 		if (this.settingsService.validated) {
+			this.api.init(this.settingsService.app_settings.audio_server.url + "WebTranscribe");
+
 			if (!this.settingsService.app_settings.octra.responsive.enabled) {
 				//set fixed width
 				let head = document.head || document.getElementsByTagName('head')[ 0 ];

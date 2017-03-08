@@ -31,21 +31,21 @@
         <div class="col-xs-1 col-sm-3 col-md-3"></div>
         <div class="col-xs-10 col-sm-6 col-md-6 panel panel-default" style="padding:40px;">
             <br/>
+            <p *ngIf="!valid_platform" class="warning" [innerHTML]="'browser.invalid' | translate">
+            </p>
             <p *ngIf="!valid_platform" class="warning">
-                <b>Dein Browser ist nicht kompatibel</b>. Lade dir bitte Chrome <a
-                    href="https://www.google.de/chrome/browser/desktop/">hier</a> herunter. Öffne diese Seite in
-                Chrome erneut.
+                {{getValidBrowsers()}}
             </p>
 
-            <p *ngIf="!apc.RESPONSIVE && !valid_size" class="warning">
+            <p *ngIf="!apc.octra.responsive.enabled && !valid_size" class="warning">
                 <b>Die Fensterbreite ist zu klein.</b> Bitte vergrößern Sie dieses Fenster bis die Meldung verschwindet.
             </p>
             <section>
                 <h4>{{ 'login.online mode' | translate}}</h4>
-                <div *ngIf="!apc.LOGIN_ENABLED" id="login-disabled">
+                <div *ngIf="!apc.octra.login_enabled" id="login-disabled">
                     {{'login.online mode disabled' | translate}}
                 </div>
-                <form *ngIf="apc.LOGIN_ENABLED" class="form-horizontal" (ngSubmit)="onSubmit(f)" #f="ngForm">
+                <form *ngIf="apc.octra.login_enabled" class="form-horizontal" (ngSubmit)="onSubmit(f)" #f="ngForm">
                     <fieldset>
                         <div>
                             <div class="form-group">

@@ -13,7 +13,9 @@ One special feature of OCTRA is that it saves your proceedings automatically in 
 At the moment, OCTRA can only be used locally. Please notice that OCTRA is still in development and could be buggy.
 
 ## Production Use
-In a production environment you don't need to install OCTRA. Just copy the content of the ``dist`` folder to your http-server.
+In a production environment you don't need to install OCTRA. Just copy the content of the ``dist`` folder to your http-server. __Do not override your old config.json and markers.json__.
+
+Before you can use OCTRA duplicate and rename `config_sample.json` to `config.json` and `markers_sample.json` to `markers.json`. If you had another config files before make sure to keep these files. To make sure that the strucure of your config files are valid in the new version please compare these with the new *_sample.json files
 
 ## Installation (Development Use)
 On the Development level OCTRA requires Node 6.9.0 or higher, together with NPM 3 or higher.
@@ -25,6 +27,7 @@ Then you can install OCTRA:
 3. Wait.
 4. Duplicate the file ``src/app/app.config.sample.ts`` and rename it to ``src/app/app.config.ts``. In app.config.ts you can change the settings of your instance of OCTRA.
 5. After the installation you can call `` npm start `` to start the node server.
+6. After that please read the notice about the config files in the production use section
 
 ## Used third-party packages:
 * angular-cli: https://github.com/angular/angular-cli

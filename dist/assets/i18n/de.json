@@ -1,5 +1,5 @@
 {
-  "general":{
+  "general": {
     "abort": "Abbrechen",
     "continue": "Weiter",
     "close": "Schließen",
@@ -9,7 +9,7 @@
     "start new transcription": "Neue Transkription beginnen"
   },
   "modal": {
-    "transcription":{
+    "transcription": {
       "delete": {
         "header": "Neue Transkription erstellen?",
         "text": "Möchten Sie die alte Transkription wirklich entfernen?<br><br>Ihr Fortschritt an der vorherigen Transkription wird dabei gelöscht. Dieser Vorgang kann nicht widerrufen werden.",
@@ -30,5 +30,8 @@
   "dropzone": {
     "drag&drop here": "Audiodatei (*.wav) hier hineinziehen oder hier klicken",
     "file selected": "{{file_label}} ausgewählt"
+  },
+  "browser": {
+    "invalid": "<b>Dein Browser ist nicht kompatibel</b>. Nutze bitte einen der folgenden Browser:"
   }
 }

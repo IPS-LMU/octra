@@ -87,8 +87,8 @@ export class Functions {
 
 	public static getFileSize(bytes: number): FileSize {
 		var result: FileSize = {
-			size:0,
-			label:"hallo"
+			size : 0,
+			label: "hallo"
 		};
 
 		if ((bytes / 1024) < 1) {
@@ -114,5 +114,23 @@ export class Functions {
 		}
 
 		return result;
+	}
+
+	public static escapeHtml(text: string): string {
+		return text
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#039;");
+	}
+
+	public static unEscapeHtml(text: string): string {
+		return text
+			.replace("&amp;", "&")
+			.replace("&lt;", "<")
+			.replace("&gt;", ">")
+			.replace("&quot;", "\"")
+			.replace("&#039;", "'");
 	}
 }

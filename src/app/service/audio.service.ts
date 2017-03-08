@@ -2,7 +2,6 @@ import { Injectable, Output, EventEmitter } from '@angular/core';
 import { Http, Headers, Response, RequestOptions, ResponseContentType } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
 import { AudioTime } from "../shared/AudioTime";
-import { APP_CONFIG } from "../app.config";
 import { Logger } from "../shared/Logger";
 import { EventTargetLike } from "rxjs/observable/FromEventObservable";
 import { decodeAudioFile } from "browser-signal-processing/ts/browser-signal-processing/browser-api/format-conversion";

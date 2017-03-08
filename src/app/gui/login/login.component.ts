@@ -28,12 +28,12 @@ import { HostListener } from "@angular/core/src/metadata/directives";
 import { Logger } from "../../shared/Logger";
 import { SessionFile } from "../../shared/SessionFile";
 import { OCTRANIMATIONS } from "../../shared/OCTRAnimations";
-import { APP_CONFIG } from "../../app.config";
 import { DropZoneComponent } from "../../component/drop-zone/drop-zone.component";
 import { isNullOrUndefined } from "util";
 import { isUndefined } from "util";
 import { SubscriptionManager } from "../../shared";
 import { Http } from "@angular/http";
+import { SettingsService } from "../../service/settings.service";
 
 @Component({
 	selector   : 'app-login',
@@ -60,7 +60,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	}
 
 	get apc(): any {
-		return APP_CONFIG.Settings;
+		return this.settingsService.app_settings;
 	}
 
 	close() {
@@ -81,7 +81,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 				private sessionService: SessionService,
 				private api: APIService,
 				private cd: ChangeDetectorRef,
-				private http:Http
+				private http:Http,
+				private settingsService:SettingsService
 	) {
 		this.subscrmanager = new SubscriptionManager();
 	}

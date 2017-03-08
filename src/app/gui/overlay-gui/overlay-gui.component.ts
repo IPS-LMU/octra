@@ -15,7 +15,6 @@ import {
 } from "../../component";
 import { TranscrWindowComponent } from "../transcr-window/transcr-window.component";
 
-import { APP_CONFIG } from "../../app.config";
 import {
 	KeymappingService,
 	TranscriptionService,
@@ -26,6 +25,7 @@ import {
 
 import { AVMousePos, AVSelection, AudioTime, Functions } from "../../shared";
 import { SubscriptionManager } from "../../shared/SubscriptionManager";
+import { SettingsService } from "../../service/settings.service";
 
 @Component({
 	selector: 'app-overlay-gui',
@@ -46,7 +46,9 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 				private audio: AudioService,
 				private uiService: UserInteractionsService,
 				private cd: ChangeDetectorRef,
-				private msg: MessageService) {
+				private msg: MessageService,
+				private settingsService:SettingsService
+	) {
 
 		this.subscrmanager = new SubscriptionManager();
 	}
@@ -59,6 +61,10 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 	};
 
 	private shortcuts: any = {};
+
+	private get app_settings():any{
+		return this.settingsService.app_settings;
+	}
 
 	ngOnInit() {
 		this.shortcuts = this.keyMap.register("overlay", this.viewer.Settings.shortcuts);
@@ -164,12 +170,12 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 	}
 
 	onMarkerInsert(marker_code: string) {
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.app_settings.octra.logging == true)
 			this.uiService.addElementFromEvent("marker_insert", { value: marker_code }, Date.now(), 'editor');
 	}
 
 	onMarkerClick(marker_code: string) {
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.app_settings.octra.logging == true)
 			this.uiService.addElementFromEvent("marker_click", { value: marker_code }, Date.now(), 'editor');
 	}
 
@@ -178,7 +184,7 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 	}
 
 	afterSpeedChange(event: { new_value: number, timestamp: number }) {
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.app_settings.octra.logging == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "speed_change");
 	}
 
@@ -187,12 +193,12 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 	}
 
 	afterVolumeChange(event: { new_value: number, timestamp: number }) {
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.app_settings.octra.logging == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "volume_change");
 	}
 
 	onButtonClick(event: { type: string, timestamp: number }) {
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.app_settings.octra.logging == true)
 			this.uiService.addElementFromEvent("mouse_click", {}, event.timestamp, event.type + "_button");
 
 		switch (event.type) {

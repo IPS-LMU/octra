@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
-import { APP_CONFIG } from "./app.config";
+import { Component, OnDestroy } from '@angular/core';
 import { APIService } from "./service/api.service";
 import { AppConfigValidator } from "./validator/AppConfigValidator";
 import { TranslateService } from "@ngx-translate/core";
 import { SessionService } from "./service/session.service";
+import { SettingsService } from "./service/settings.service";
+import { SubscriptionManager } from "./shared/SubscriptionManager";
+import { isNullOrUndefined } from "util";
 
 @Component({
 	selector   : 'octra',
@@ -11,40 +13,62 @@ import { SessionService } from "./service/session.service";
 	styleUrls  : [ 'app.component.css' ]
 })
 
-export class AppComponent {
-	version: string = "1.0.3";
+export class AppComponent implements OnDestroy {
+	version: string = "1.0.4";
+
+	private subscrmanager: SubscriptionManager;
 
 	constructor(private api: APIService,
 				private langService: TranslateService,
-				private sessService: SessionService) {
+				private sessService: SessionService,
+				private settingsService: SettingsService) {
+		this.subscrmanager = new SubscriptionManager();
 
 		//define languages
-		langService.addLangs(['de', 'en']);
+		langService.addLangs([ 'de', 'en' ]);
 
-		if(sessService.language == null || sessService.language == "")
+		if (sessService.language == null || sessService.language == "")
 			langService.setDefaultLang(langService.getBrowserLang());
 		else
-			langService.setDefaultLang(sessService.language);
+			langService.use(sessService.language);
 
-		if (!APP_CONFIG.Settings) {
-			throw "app-config not set correctly";
-		}
-		else {
-			//validate app config
-			let validator: AppConfigValidator = new AppConfigValidator();
-			let validation_ok = true;
+		//load settings
+		this.subscrmanager.add(this.settingsService.settingsloaded.subscribe(
+			() => {
+				//settings have been loaded
+				if (isNullOrUndefined(this.settingsService.app_settings)) {
+					throw "config.json not set correctly";
+				}
+				else {
+					if (this.settingsService.validated)
+						this.api.init(this.settingsService.app_settings.AUDIO_SERVER + "WebTranscribe");
 
-			for (let setting in APP_CONFIG.Settings) {
-				let result = validator.validate(setting, APP_CONFIG.Settings[ "" + setting + "" ]);
-				if (!result.success) {
-					validation_ok = false;
-					console.error(result.error);
+
+					if (!this.settingsService.app_settings.octra.responsive.enabled) {
+						//set fixed width
+						let head = document.head || document.getElementsByTagName('head')[ 0 ];
+						let style = document.createElement('style');
+						style.type = 'text/css';
+						style.innerText = ".container {width:" + this.settingsService.app_settings.octra.responsive.fixedwidth + "px}";
+						head.appendChild(style);
+					}
 				}
 			}
+		));
 
-			if (validation_ok)
-				this.api.init(APP_CONFIG.Settings.AUDIO_SERVER + "WebTranscribe");
+		if (this.settingsService.validated) {
+			if (!this.settingsService.app_settings.octra.responsive.enabled) {
+				//set fixed width
+				let head = document.head || document.getElementsByTagName('head')[ 0 ];
+				let style = document.createElement('style');
+				style.type = 'text/css';
+				style.innerText = ".container {width:" + this.settingsService.app_settings.octra.responsive.fixedwidth + "px}";
+				head.appendChild(style);
+			}
 		}
+	}
 
+	ngOnDestroy() {
+		this.subscrmanager.destroy();
 	}
 }

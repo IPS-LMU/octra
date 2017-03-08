@@ -5,8 +5,11 @@ import { KeymappingService } from "../../service/keymapping.service";
 import { KeyMapping } from "../../shared/KeyMapping";
 import { BrowserInfo } from "../../shared/BrowserInfo";
 import { Functions } from "../../shared";
-import { APP_CONFIG } from "../../app.config";
 import { TranscrEditorConfigValidator } from "./validator/TranscrEditorConfigValidator";
+import { SettingsService } from "../../service/settings.service";
+import { SessionService } from "../../service/session.service";
+import { TranslateService } from "@ngx-translate/core";
+import { SubscriptionManager } from "../../shared/SubscriptionManager";
 
 @Component({
 	selector   : 'app-transcr-editor',
@@ -19,13 +22,15 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 	get is_typing(): boolean {
 		return this._is_typing;
 	}
+
 	@Output('loaded') loaded: EventEmitter<boolean> = new EventEmitter<boolean>();
 	@Output('onkeyup') onkeyup: EventEmitter<any> = new EventEmitter<any>();
 	@Output('marker_insert') marker_insert: EventEmitter<string> = new EventEmitter<string>();
 	@Output('marker_click') marker_click: EventEmitter<string> = new EventEmitter<string>();
 	@Output('typing') typing: EventEmitter<string> = new EventEmitter<string>();
 
-	private _settings:TranscrEditorConfig;
+	private _settings: TranscrEditorConfig;
+	private subscrmanager: SubscriptionManager;
 
 	get rawText(): string {
 		return this.tidyUpRaw(this._rawText);
@@ -48,8 +53,45 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 		this._settings = value;
 	}
 
-	constructor(private cd: ChangeDetectorRef) {
+	private get markers(): any {
+		return this.settingsService.markers.items;
+	}
+
+	constructor(private cd: ChangeDetectorRef,
+				private settingsService: SettingsService,
+				private langService: TranslateService) {
 		this._settings = new TranscrEditorConfig().Settings;
+		this.subscrmanager = new SubscriptionManager();
+		this.langService.onLangChange.subscribe(
+			($event) => {
+				let navigation = this.initNavigation();
+
+				this.textfield.summernote('destroy');
+				this.textfield.summernote({
+					height             : this.Settings.height,
+					focus              : true,
+					disableDragAndDrop : true,
+					disableResizeEditor: true,
+					disableResizeImage : true,
+					popover            : [],
+					airPopover         : [],
+					toolbar            : [
+						[ 'mybutton', navigation.str_array ]
+					],
+					shortcuts          : false,
+					buttons            : navigation.buttons,
+					callbacks          : {
+						onKeydown: this.onKeyDownSummernote,
+						onKeyup  : this.onKeyUpSummernote,
+						onPaste  : function (e) {
+							//prevent copy paste
+							e.preventDefault();
+						}
+					}
+				});
+
+			}
+		);
 		this.validateConfig();
 	}
 
@@ -57,8 +99,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 	private _rawText: string = "";
 	private _html: string = "";
 	private summernote_ui: any = null;
-	private _is_typing:boolean = false;
-	private lastkeypress:number = 0;
+	private _is_typing: boolean = false;
+	private lastkeypress: number = 0;
 
 	ngOnInit() {
 		this.Settings.height = 100;
@@ -71,24 +113,23 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 	 */
 	getRawText = () => {
 		let result: string = "";
-		var html = this.textfield.summernote('code');
-		let wrap = APP_CONFIG.Settings.WRAP;
+		let html = this.textfield.summernote('code');
 
 		html = "<p>" + html + "</p>";
-		var dom = jQuery(html);
+		let dom = jQuery(html);
 
-		let replace_func = (i, elem)=> {
-			var attr = jQuery(elem).attr("data-marker-code");
+		let replace_func = (i, elem) => {
+			let attr = jQuery(elem).attr("data-marker-code");
 			if (elem.type == "select-one") {
-				var value = jQuery(elem).attr("data-value");
+				let value = jQuery(elem).attr("data-value");
 				attr += "=" + value;
 			}
 			if (attr) {
-				for (let i = 0; i < this.Settings.markers.length; i++) {
-					let marker = this.Settings.markers[ i ];
+				for (let i = 0; i < this.markers.length; i++) {
+					let marker = this.markers[ i ];
 					if (attr === marker.code) {
-						if (marker.use_wrap) jQuery(elem).replaceWith(wrap.charAt(0) + attr + wrap.charAt(1));
-						else jQuery(elem).replaceWith(attr);
+
+						jQuery(elem).replaceWith(Functions.escapeHtml(attr));
 						break;
 					}
 				}
@@ -122,12 +163,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 		this.textfield.summernote('destroy');
 		//delete tooltip overlays
 		jQuery(".tooltip").remove();
+		this.subscrmanager.destroy();
 	}
 
 	/**
 	 * initializes the editor and the containing summernote editor
 	 */
-	public initialize() {
+	public initialize = () => {
 		this.summernote_ui = jQuery.summernote.ui;
 		let Navigation = this.initNavigation();
 
@@ -163,7 +205,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 
 		this.focus();
 		this.loaded.emit(true);
-	}
+	};
 
 	/**
 	 * initializes the navigation bar of the editor
@@ -173,8 +215,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 			buttons  : {},
 			str_array: []
 		};
-		for (let i = 0; i < this.Settings.markers.length; i++) {
-			let marker = this.Settings.markers[ i ];
+
+		for (let i = 0; i < this.markers.length; i++) {
+			let marker = this.markers[ i ];
 			result.buttons[ marker.code ] = this.createButton(marker);
 			result.str_array.push(marker.code);
 		}
@@ -189,15 +232,14 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 	 */
 	createButton(marker): any {
 		let platform = BrowserInfo.platform;
-		let wrap = APP_CONFIG.Settings.WRAP;
-		let icon = "<img src='" + marker.icon_url + "' class='btn-icon' /> <span class='btn-description'>" + marker.button_text + "</span><span class='btn-shortcut'> [" + marker.shortcut[ platform ] + "]</span>";
-		if(this.Settings.responsive){
-			icon = "<img src='" + marker.icon_url + "' class='btn-icon' /> <span class='btn-description hidden-xs hidden-sm'>" + marker.button_text + "</span><span class='btn-shortcut hidden-xs hidden-sm hidden-md'> [" + marker.shortcut[ platform ] + "]</span>";
+		let icon = "<img src='" + marker.icon_url + "' class='btn-icon' style='height:16px;'/> <span class='btn-description'>" + marker.button_text + "</span><span class='btn-shortcut'> [" + marker.shortcut[ platform ] + "]</span>";
+		if (this.Settings.responsive) {
+			icon = "<img src='" + marker.icon_url + "' class='btn-icon' style='height:16px;'/> <span class='btn-description hidden-xs hidden-sm'>" + marker.button_text + "</span><span class='btn-shortcut hidden-xs hidden-sm hidden-md'> [" + marker.shortcut[ platform ] + "]</span>";
 		}
 		// create button
 		let button = this.summernote_ui.button({
 			contents: icon,
-			tooltip : marker.description + " Shortcut: " + wrap.charAt(0) + marker.shortcut[ platform ] + wrap.charAt(1),
+			tooltip : marker.description[ this.langService.currentLang ] + " Shortcut: [" + marker.shortcut[ platform ] + "]",
 			click   : () => {
 				// invoke insertText method with 'hello' on editor module.
 				this.insertMarker(marker.code, marker.icon_url);
@@ -235,8 +277,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 			if (this.isDisabledKey(comboKey))
 				$event.preventDefault();
 			else {
-				for (let i = 0; i < this.Settings.markers.length; i++) {
-					let marker: any = this.Settings.markers[ i ];
+				for (let i = 0; i < this.markers.length; i++) {
+					let marker: any = this.markers[ i ];
 					if (marker.shortcut[ platform ] == comboKey) {
 						$event.preventDefault();
 						this.insertMarker(marker.code, marker.icon_url);
@@ -259,14 +301,15 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 		this.updateTextField();
 		this.onkeyup.emit($event);
 
-		setTimeout(()=>{
-			if(Date.now() - this.lastkeypress < 500){
-				if(!this._is_typing){
+		setTimeout(() => {
+			if (Date.now() - this.lastkeypress < 500) {
+				if (!this._is_typing) {
 					this.typing.emit("started");
 				}
 				this._is_typing = true;
-			} else{
-				if(this._is_typing){
+			}
+			else {
+				if (this._is_typing) {
 					this.typing.emit("stopped");
 				}
 				this._is_typing = false;
@@ -335,27 +378,25 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 	 */
 	private rawToHTML(rawtext: string): string {
 		let result: string = rawtext;
-		let wrap = APP_CONFIG.Settings.WRAP;
 
-		if (APP_CONFIG.Settings.WRAP !== "" && APP_CONFIG.Settings.WRAP.length == 2) {
-			//replace markers with wrap
-			result = this.replaceMarkersWithHTML(result, true);
-		}
+		//replace markers with wrap
+		result = this.replaceMarkersWithHTML(result, true);
+
 		//replace markers with no wrap
-		for (let i = 0; i < this.Settings.markers.length; i++) {
-			let marker = this.Settings.markers[ i ];
-			if (!marker.use_wrap) {
-				let regex = new RegExp("(\\s)*(" + Functions.escapeRegex(marker.code) + ")(\\s)*", "g");
+		for (let i = 0; i < this.markers.length; i++) {
+			let marker = this.markers[ i ];
 
-				let replace_func = (x, g1, g2, g3)=> {
-					let s1 = (g1) ? g1 : "";
-					let s2 = (g2) ? g2 : "";
-					let s3 = (g3) ? g3 : "";
-					return s1 + "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "'/>" + s3;
-				};
+			let regex = new RegExp("(\\s)*(" + Functions.escapeRegex(marker.code) + ")(\\s)*", "g");
 
-				result = result.replace(regex, replace_func);
-			}
+			let replace_func = (x, g1, g2, g3) => {
+				let s1 = (g1) ? g1 : "";
+				let s2 = (g2) ? g2 : "";
+				let s3 = (g3) ? g3 : "";
+				return s1 + "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "'/>" + s3;
+			};
+
+			result = result.replace(regex, replace_func);
+
 		}
 
 		result = result.replace(/\s+$/g, "&nbsp;");
@@ -368,7 +409,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 	 * set focus to the very last position of the editors text
 	 */
 	public focus() {
-		setTimeout(()=> {
+		setTimeout(() => {
 			if (this.rawText != "")
 				Functions.placeAtEnd(jQuery('.note-editable.panel-body')[ 0 ]);
 			this.textfield.summernote('focus');
@@ -391,8 +432,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 		//set whitespaces before and after **
 		result = result.replace(/(\*\*)|(\s\*\*)|(\*\*\s)/g, " ** ");
 
-		//replace all remaining tags
-		result = result.replace(/[<>]+/g, "");
 		//replace all numbers of whitespaces to one
 		result = result.replace(/\s+/g, " ");
 		//replace whitespaces at start an end
@@ -411,17 +450,17 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 		let result = input;
 		let regex_str;
 		if (use_wrap) {
-			regex_str = Functions.escapeRegex(APP_CONFIG.Settings.WRAP.charAt(0)) + "([\\w~.^*-+]+)" + Functions.escapeRegex(APP_CONFIG.Settings.WRAP.charAt(1));
+			regex_str = Functions.escapeRegex("([\\w~.^*-+]+)");
 		}
 		else {
 			regex_str = "([\\w~.^*-+]+)";
 		}
 		let regex = new RegExp(regex_str, "g");
 
-		let replace_func = (x, g1)=> {
-			for (let i = 0; i < this.Settings.markers.length; i++) {
-				let marker = this.Settings.markers[ i ];
-				if (marker.code === g1 && marker.use_wrap == use_wrap) {
+		let replace_func = (x, g1) => {
+			for (let i = 0; i < this.markers.length; i++) {
+				let marker = this.markers[ i ];
+				if (marker.code === g1) {
 					return "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "'/>";
 				}
 			}

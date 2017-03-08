@@ -32,6 +32,9 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	ngOnInit() {
+		this.langService.onLangChange.subscribe(()=>{
+			console.log("okokok");
+		});
 	}
 
 	ngAfterViewInit() {
@@ -93,7 +96,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	changeLanguage(lang:string){
-		this.langService.setDefaultLang(lang);
+		this.langService.use(lang);
 		this.sessService.language = lang;
 	}
 

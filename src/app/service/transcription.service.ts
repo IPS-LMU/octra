@@ -9,13 +9,13 @@ import { UserInteractionsService } from "./userInteractions.service";
 import { StatisticElem } from "../shared/StatisticElement";
 import { MouseStatisticElem } from "../shared/MouseStatisticElem";
 import { KeyStatisticElem } from "../shared/KeyStatisticElem";
-import { APP_CONFIG } from "../app.config";
 import { Logger } from "../shared/Logger";
 import { NavbarService } from "./navbar.service";
 import { TextConverter } from "../shared/Converters/TextConverter";
 import { FileService } from "./file.service";
 import { AnnotJSONConverter } from "../shared/Converters/AnnotJSONConverter";
 import { SubscriptionManager } from "../shared";
+import { SettingsService } from "./settings.service";
 
 
 @Injectable()
@@ -37,7 +37,11 @@ export class TranscriptionService {
 		this._segments = value;
 	}
 
-	private subscrmanager:SubscriptionManager;
+	private get app_settings(): any {
+		return this.settingsService.app_settings;
+	}
+
+	private subscrmanager: SubscriptionManager;
 
 	public onaudioloaded = new EventEmitter<any>();
 	public dataloaded = new EventEmitter<any>();
@@ -45,7 +49,7 @@ export class TranscriptionService {
 	private _last_sample: number;
 	private saving: boolean = false;
 
-	public filename:string = "";
+	public filename: string = "";
 
 	private feedback: any = {
 		quality_speaker: "",
@@ -77,23 +81,24 @@ export class TranscriptionService {
 	constructor(private audio: AudioService,
 				private sessServ: SessionService,
 				private uiService: UserInteractionsService,
-				private navbarServ: NavbarService
-	) {
+				private navbarServ: NavbarService,
+				private settingsService: SettingsService) {
 		this.subscrmanager = new SubscriptionManager();
 
-		if (APP_CONFIG.Settings.LOGGING) {
+		if (this.app_settings.octra.logging) {
 			this.subscrmanager.add(this.audio.statechange.subscribe((state) => {
 				this.uiService.addElementFromEvent("audio_" + state, { value: state }, Date.now(), "audio");
 			}));
 		}
 
-		this.subscrmanager.add(this.navbarServ.onexportbuttonclick.subscribe((button)=>{
+		this.subscrmanager.add(this.navbarServ.onexportbuttonclick.subscribe((button) => {
 			let result = {};
 
-			if(button.format == "text"){
+			if (button.format == "text") {
 				//format to text file
 				this.navbarServ.exportformats.text = this.getTranscriptString(button.format);
-			} else if(button.format == "annotJSON"){
+			}
+			else if (button.format == "annotJSON") {
 				//format to annotJSON file
 				this.navbarServ.exportformats.annotJSON = this.getTranscriptString(button.format);
 			}
@@ -101,22 +106,20 @@ export class TranscriptionService {
 		}));
 	}
 
-	public getTranscriptString(format:string):string{
-		let result:string = "";
+	public getTranscriptString(format: string): string {
+		let result: string = "";
 
-		if(format == "text"){
+		let data = this.exportDataToJSON();
+		if (format == "text") {
 			//format to text file
-			let data = this.exportDataToJSON();
-
-			let tc:TextConverter = new TextConverter();
+			let tc: TextConverter = new TextConverter();
 			result = tc.convert(data);
-		} else if(format == "annotJSON"){
+		}
+		else if (format == "annotJSON") {
 			//format to text file
-			let data = this.exportDataToJSON();
-
-			let ac:AnnotJSONConverter = new AnnotJSONConverter();
+			let ac: AnnotJSONConverter = new AnnotJSONConverter();
 			result = ac.convert(data);
-			result = JSON.stringify(result,null, 4);
+			result = JSON.stringify(result, null, 4);
 		}
 
 		return result;
@@ -202,7 +205,7 @@ export class TranscriptionService {
 	public loadAudioFile() {
 		if (this.audio.audiocontext) {
 			if (this.sessServ.offline != true) {
-				let src = APP_CONFIG.Settings.AUDIO_SERVER + this.sessServ.audio_url;
+				let src = this.app_settings.audio_server.url + this.sessServ.audio_url;
 				//extract filename
 				this.filename = this.sessServ.audio_url.substr(this.sessServ.audio_url.lastIndexOf("/") + 1);
 				this.filename = this.filename.substr(0, this.filename.lastIndexOf(".") - 1);
@@ -342,52 +345,52 @@ export class TranscriptionService {
 	public rawToHTML(rawtext: string): string {
 		let result: string = rawtext;
 
-		let wrap = APP_CONFIG.Settings.WRAP;
-
-		if (APP_CONFIG.Settings.WRAP !== "" && APP_CONFIG.Settings.WRAP.length == 2) {
-			//replace markers with wrap
-			result = this.replaceMarkersWithHTML(result, true);
-		}
+		//replace markers with wrap
+		result = this.replaceMarkersWithHTML(result);
 
 		//replace markers with no wrap
-		for (let i = 0; i < APP_CONFIG.Settings.MARKERS.length; i++) {
-			let marker = APP_CONFIG.Settings.MARKERS[ i ];
-			if (!marker.use_wrap) {
-				let regex = new RegExp("(\\s)*(" + Functions.escapeRegex(marker.code) + ")(\\s)*", "g");
+		//TODO optimize as in replaceMarkersWithHTML function
+		let markers = this.settingsService.markers.items;
+		for (let i = 0; i < markers.length; i++) {
+			let marker = markers[ i ];
+			let regex = new RegExp("(\\s)*(" + Functions.escapeRegex(marker.code) + ")(\\s)*", "g");
 
-				let replace_func = (x, g1, g2, g3) => {
-					let s1 = (g1) ? g1 : "";
-					let s2 = (g2) ? g2 : "";
-					let s3 = (g3) ? g3 : "";
-					return s1 + "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "'/>" + s3;
-				};
+			let replace_func = (x, g1, g2, g3) => {
+				let s1 = (g1) ? g1 : "";
+				let s2 = (g2) ? g2 : "";
+				let s3 = (g3) ? g3 : "";
+				return s1 + "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "'/>" + s3;
+			};
 
-				result = result.replace(regex, replace_func);
-			}
+			result = result.replace(regex, replace_func);
 		}
+
 		return result;
 	}
 
-	private replaceMarkersWithHTML(input: string, use_wrap: boolean): string {
+	private replaceMarkersWithHTML(input: string): string {
 		let result = input;
-		let regex_str;
-		if (use_wrap) {
-			regex_str = Functions.escapeRegex(APP_CONFIG.Settings.WRAP.charAt(0)) + "([\\w~.^*-+]+)" + Functions.escapeRegex(APP_CONFIG.Settings.WRAP.charAt(1));
-		}
-		else {
-			regex_str = "([\\w~.^*-+]+)";
-		}
-		let regex = new RegExp(regex_str, "g");
 
+		let markers = this.settingsService.markers.items;
+
+		//because it's faster to concatenate the codes of markers:
+		let regex_str = "";
+		for (let i = 0; i < markers.length; i++) {
+			regex_str += "(" + Functions.escapeRegex(markers[ i ].code) + ")";
+			if (i < markers.length - 1)
+				regex_str += "|";
+		}
+
+		let regex = new RegExp(regex_str, "g");
 		let replace_func = (x, g1) => {
-			for (let i = 0; i < APP_CONFIG.Settings.MARKERS.length; i++) {
-				let marker = APP_CONFIG.Settings.MARKERS[ i ];
-				if (marker.code === g1 && marker.use_wrap == use_wrap) {
-					return "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "'/>";
+			for (let i = 0; i < markers.length; i++) {
+				let marker = markers[ i ];
+				if (marker.code === x) {
+					return "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + Functions.escapeHtml(marker.code) + "'/>";
 				}
 			}
 
-			return (use_wrap) ? "[MARKER NOT FOUND]" : g1;
+			return g1;
 		};
 
 		result = result.replace(regex, replace_func);
@@ -398,11 +401,11 @@ export class TranscriptionService {
 	public validateTranscription(transcript: string): string[] {
 		let result = [];
 		//check for special letters
-		let has_special_chars = (transcript.match(new RegExp("[#%,.?!`´/<>:;^°]", "g")) != null);
+		let has_special_chars = (transcript.match(new RegExp("[#%,.?!`´/;^°]", "g")) != null);
 		let has_digits = (transcript.match(new RegExp("[0-9]", "g")) != null);
 
 		if (has_special_chars)
-			result.push("- Spezielle Zeichen wie #%,.?!`´/<>:;^°");
+			result.push("- Spezielle Zeichen wie #%,.?!`´/:;^°");
 		if (has_digits)
 			result.push("- Ziffern vorhanden");
 

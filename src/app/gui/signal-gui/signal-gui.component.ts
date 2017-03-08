@@ -15,7 +15,6 @@ import {
 	TranscrEditorComponent
 } from "../../component";
 
-import { APP_CONFIG } from "../../app.config";
 import {
 	AudioService,
 	KeymappingService,
@@ -24,11 +23,12 @@ import {
 	MessageService
 } from "../../service";
 import { AVMousePos, AVSelection, SubscriptionManager, AudioTime, Functions, BrowserInfo } from "../../shared";
+import { SettingsService } from "../../service/settings.service";
 
 @Component({
-	selector: 'app-signal-gui',
+	selector   : 'app-signal-gui',
 	templateUrl: 'signal-gui.component.html',
-	styleUrls: [ 'signal-gui.component.css' ]
+	styleUrls  : [ 'signal-gui.component.css' ]
 })
 export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	@ViewChild('viewer') viewer: AudioviewerComponent;
@@ -59,6 +59,10 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 
 	private platform = BrowserInfo.platform;
 
+	private get app_settings(): any {
+		return this.settingsService.app_settings;
+	}
+
 	get segmententer_shortc(): string {
 		return (this.viewer.Settings) ? this.viewer.Settings.shortcuts.segment_enter.keys[ this.platform ] : "";
 	}
@@ -68,7 +72,8 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 				private keyMap: KeymappingService,
 				private transcrService: TranscriptionService,
 				private cd: ChangeDetectorRef,
-				private uiService: UserInteractionsService) {
+				private uiService: UserInteractionsService,
+				private settingsService: SettingsService) {
 		this.subscrmanager = new SubscriptionManager();
 	}
 
@@ -80,8 +85,8 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.viewer.Settings.shortcuts_enabled = true;
 		this.viewer.Settings.boundaries.readonly = false;
 
-		this.editor.Settings.markers = APP_CONFIG.Settings.MARKERS;
-		this.editor.Settings.responsive = APP_CONFIG.Settings.RESPONSIVE;
+		this.editor.Settings.markers = this.settingsService.markers.items;
+		this.editor.Settings.responsive = this.app_settings.octra.responsive.enabled;
 
 		this.loupee.Settings.shortcuts = this.keyMap.register("Loupe", this.loupee.Settings.shortcuts);
 		this.loupee.Settings.shortcuts.play_pause.keys.mac = "SHIFT + TAB";
@@ -129,7 +134,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	onButtonClick(event: { type: string, timestamp: number }) {
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.app_settings.octra.logging == true)
 			this.uiService.addElementFromEvent("mouse_click", {}, event.timestamp, event.type + "_button");
 
 		switch (event.type) {
@@ -229,7 +234,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	onShortCutTriggered($event, type) {
-		if (APP_CONFIG.Settings.LOGGING) {
+		if (this.app_settings.octra.logging) {
 
 			if (
 				$event.value == null || !(
@@ -299,13 +304,13 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	};
 
 	onMarkerInsert(marker_code: string) {
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.app_settings.octra.logging == true)
 			this.uiService.addElementFromEvent("marker_insert", { value: marker_code }, Date.now(), 'editor');
 	}
 
 	onMarkerClick(marker_code: string) {
 		this.onTranscriptionChanged(null);
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.app_settings.octra.logging == true)
 			this.uiService.addElementFromEvent("marker_click", { value: marker_code }, Date.now(), 'editor');
 	}
 
@@ -318,7 +323,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	afterSpeedChange(event: { new_value: number, timestamp: number }) {
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.app_settings.octra.logging == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "speed_change");
 	}
 
@@ -327,7 +332,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	afterVolumeChange(event: { new_value: number, timestamp: number }) {
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.app_settings.octra.logging == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "volume_change");
 	}
 }

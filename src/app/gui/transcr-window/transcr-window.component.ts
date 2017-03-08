@@ -9,10 +9,10 @@ import {
 	AfterContentInit
 } from '@angular/core';
 
-import { APP_CONFIG } from "../../app.config";
 import { LoupeComponent, TranscrEditorComponent, AudioNavigationComponent} from "../../component";;
 import { KeymappingService, UserInteractionsService, TranscriptionService, AudioService} from "../../service";
 import { AudioTime, Functions, Segment, SubscriptionManager} from "../../shared";
+import { SettingsService } from "../../service/settings.service";
 
 @Component({
 	selector   : 'app-transcr-window',
@@ -43,7 +43,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 	private subscrmanager: SubscriptionManager;
 
 	get appc(): any {
-		return APP_CONFIG.Settings;
+		return this.settingsService.app_settings;
 	}
 
 	get SelectedSegment(): Segment {
@@ -61,14 +61,16 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 	constructor(private keyMap: KeymappingService,
 				private transcrService: TranscriptionService,
 				private audio: AudioService,
-				private uiService: UserInteractionsService) {
+				private uiService: UserInteractionsService,
+				private settingsService:SettingsService
+	) {
 
 		this.subscrmanager = new SubscriptionManager();
 	}
 
 	ngOnInit() {
-		this.editor.Settings.markers = APP_CONFIG.Settings.MARKERS;
-		this.editor.Settings.responsive = APP_CONFIG.Settings.RESPONSIVE;
+		this.editor.Settings.markers = this.settingsService.markers.items;
+		this.editor.Settings.responsive = this.appc.octra.responsive.enabled;
 
 		this.subscrmanager.add(this.editor.loaded.subscribe(
 			() => {
@@ -129,7 +131,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 	}
 
 	onButtonClick(event: { type: string, timestamp: number }) {
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.appc.octra.logging == true)
 			this.uiService.addElementFromEvent("mouse_click", {}, event.timestamp, event.type + "_button");
 
 		if (event.type === "replay")
@@ -185,7 +187,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 	}
 
 	afterSpeedChange(event: { new_value: number, timestamp: number }) {
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.appc.octra.logging == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "speed_change");
 	}
 
@@ -194,7 +196,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 	}
 
 	afterVolumeChange(event: { new_value: number, timestamp: number }) {
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.appc.octra.logging == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "volume_change");
 	}
 }

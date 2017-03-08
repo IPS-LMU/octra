@@ -1,11 +1,13 @@
 {
+  "version": "1.0.3",
   "audio_server": {
     "url": ""
   },
   "octra": {
     "login_enabled": false,
+    "logging_enabled": true,
     "responsive": {
-      "enabled": true,
+      "enabled": false,
       "fixedwidth": 1200
     },
     "allowed_browsers": [

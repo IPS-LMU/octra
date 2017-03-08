@@ -5,11 +5,12 @@ import { MembersAreaGuard } from "../../guard/ma.activateguard";
 import { TranscriptionSubmittedComponent } from "../transcription-submitted/transcription-submitted.component";
 import { TranscrSubmittedGuard } from "../../guard/transcr-submitted.activateguard";
 import { ReloadFileComponent } from "../reload-file/reload-file.component";
+import { SettingsGuard } from "../../guard/settings.activateguard";
 
 export const MEMBER_ROUTES: Routes = [
 	{ path: '', redirectTo: 'transcr', pathMatch: 'full'},
-	{ path: 'transcr', component: TranscriptionComponent, canActivate:[MembersAreaGuard]},
+	{ path: 'transcr', component: TranscriptionComponent, canActivate:[SettingsGuard, MembersAreaGuard]},
 	{ path: 'transcr/submit', component: TranscriptionSubmitComponent},
-	{ path: 'transcr/submitted', component: TranscriptionSubmittedComponent, canActivate:[TranscrSubmittedGuard]},
-	{ path: 'transcr/reload-file', component: ReloadFileComponent},
+	{ path: 'transcr/submitted', component: TranscriptionSubmittedComponent, canActivate:[SettingsGuard, TranscrSubmittedGuard]},
+	{ path: 'transcr/reload-file', component: ReloadFileComponent, canActivate:[SettingsGuard]},
 ];

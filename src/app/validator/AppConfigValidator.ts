@@ -1,103 +1,128 @@
 import { ConfigValidator, ValidationResult } from "../shared/ConfigValidator";
-import { SecurityContext } from "@angular/core";
+import { isNullOrUndefined } from "util";
+import { isArray } from "util";
 
 export class AppConfigValidator extends ConfigValidator {
+
+	private version: string = "1.0.3";
 
 	public validate(key: string, value: any): ValidationResult {
 		let prefix: string = "AppConfig Validation - ";
 
 		switch (key) {
-			case("LOGIN_ENABLED"):
-				if (typeof value === "boolean") break;
+			case("version"):
+				if (typeof value === "string") break;
 				return {
 					success: false,
-					error  : prefix + "value of key '" + key + "' must be of type boolean"
+					error  : prefix + "value of key '" + key + "' must be of type string"
 				};
-			case("AUDIO_SERVER"):
-				if (typeof value === "string" && (value.indexOf("https://") > -1 || value.indexOf("http://") > -1)) break;
-				return {
-					success: false,
-					error  : prefix + "value of key '" + key + "' must be of type string and must contain http:// or https://"
-				};
-			case("LOGGING"):
-				if (typeof value === "boolean") break;
-				return {
-					success: false,
-					error  : prefix + "value of key '" + key + "' must be of type boolean"
-				};
-			case("RESPONSIVE"):
-				if (typeof value === "boolean") break;
-				return {
-					success: false,
-					error  : prefix + "value of key '" + key + "' must be of type boolean"
-				};
-			case("ALLOWED_BROWSERS")   :
-				let obj_ok = true;
-				if (Array.isArray(value)) {
-					for (let elem in value) {
-						if (typeof value[ "" + elem + "" ] !== "object" || typeof value[ "" + elem + "" ].name !== "string") {
-							obj_ok = false;
-							break;
-						}
-					}
-				}
-				if (!obj_ok) {
-					return {
-						success: false,
-						error  : prefix + "value of key '" + key + "' must be of array and must contain elements of {name:string}"
-					};
-				}
-				break;
-			case("DISALLOWED_BROWSERS")   :
-				let objects_ok = true;
-				if (Array.isArray(value)) {
-					for (let elem in value) {
-						if (typeof value[ "" + elem + "" ] !== "object" || typeof value[ "" + elem + "" ].name !== "string") {
-							objects_ok = false;
-							break;
-						}
-					}
-				}
-				if (!objects_ok) {
-					return {
-						success: false,
-						error  : prefix + "value of key '" + key + "' must be of array and must contain elements of {name:string}"
-					};
-				}
-				break;
-			case("WRAP"):
-				if (typeof value === "string" && (value.length == 0 || value.length == 2)) break;
-				return {
-					success: false,
-					error  : prefix + "value of key '" + key + "' must be of type string and must contain either 0 or 2 chars"
-				};
-			case("MARKERS"):
-				if (Array.isArray(value)) {
-					let validation = true;
-					for (let i = 0; i < value.length; i++) {
-						let elem = value[ i ];
-						if (typeof elem === "object") {
-							if (!elem.hasOwnProperty("name") && !elem.hasOwnProperty("code")
-								|| !elem.hasOwnProperty("icon_url") || !elem.hasOwnProperty("button_text")
-								|| !elem.hasOwnProperty("description") || !elem.hasOwnProperty("use_wrap")
-								|| !elem.hasOwnProperty("shortcut")
-								|| typeof elem.shortcut !== "object" || !elem.shortcut.hasOwnProperty("mac")
-								|| !elem.shortcut.hasOwnProperty("pc") || typeof elem.shortcut.mac !== "string"
-								|| typeof elem.shortcut.pc !== "string" || typeof elem.use_wrap !== "boolean"
-							) {
-								validation = false;
-								break;
-							}
-						}
-					}
-
-					if(validation)
+			case("audio_server")   :
+				if (typeof value === "object") {
+					if (!isNullOrUndefined(value[ "url" ]) && typeof value[ "url" ] === "string") {
 						break;
+					}
+					else {
+						return {
+							success: false,
+							error  : prefix + "value of key '" + key + "' must be of type object {url:string}"
+						};
+					}
 				}
-				return {
-					success: false,
-					error  : prefix + "value of key '" + key + "' must be an Array of markers. Compare custom config with sample config"
-				};
+				break;
+			case("octra")   :
+				if (typeof value === "object") {
+					for (let key in value) {
+						switch (key) {
+							case("login_enabled"):
+								if (typeof value[ key ] !== "boolean") {
+									return {
+										success: false,
+										error  : prefix + "key '" + key + "." + value[ key ] + "' must be of type boolean"
+									};
+								}
+								break;
+							case("logging_enabled"):
+								if (typeof value[ key ] !== "boolean") {
+									return {
+										success: false,
+										error  : prefix + "key '" + key + "." + value[ key ] + "' must be of type boolean"
+									};
+								}
+								break;
+							case("responsive"):
+								if (typeof value[ key ] !== "object") {
+									return {
+										success: false,
+										error  : prefix + "key '" + key + "." + value[ key ] + "' must be of type object {login_enabled:boolean, fixedwidth:number}"
+									};
+								}
+								else {
+									for (let ke in value[ key ]) {
+										switch (ke) {
+											case("enabled"):
+												if(typeof value[key][ke] !== "boolean"){
+													return {
+														success: false,
+														error  : prefix + "key 'octra." + key + "." + ke + "' must be of type boolean"
+													};
+												}
+												break;
+											case("fixedwidth"):
+												if(typeof value[key][ke] !== "number"){
+													return {
+														success: false,
+														error  : prefix + "key 'octra." + key + "." + ke + "' must be of type number"
+													};
+												}
+												break;
+											default:
+												return {
+													success: false,
+													error  : prefix + "key 'octra" + "." + key + "." + ke + "' not valid."
+												};
+										}
+									}
+								}
+								break;
+							case("allowed_browsers"):
+								if(!isArray(value[key])){
+									return {
+										success: false,
+										error  : prefix + "key 'octra" + "." + key + "' must be of type Array [{name:string, version:string}]"
+									};
+								} else{
+									for(let ke in value[key]){
+										if(typeof value[key][ke] !== "object"){
+											return {
+												success: false,
+												error  : prefix + "key 'octra" + "." + key + "."+ke+"' must be of type object {name:string, version:string}"
+											};
+										} else{
+											if(isNullOrUndefined(value[key][ke].name) || isNullOrUndefined(value[key][ke].version) || typeof value[key][ke].name !== "string" || typeof value[key][ke].version !== "string"){
+												return {
+													success: false,
+													error  : prefix + "key2 'octra" + "." + key + "."+ke+"' must be of type object {name:string, version:string}"
+												};
+											}
+										}
+									}
+								}
+								break;
+							default:
+								return {
+									success: false,
+									error  : prefix + "key '" + key + "' not valid in attribute 'octra' {login_enabled:boolean, logging_enabled:boolean, responsive:{enabled:boolean, fixedwidth:number}, allowed_browser:array}"
+								};
+						}
+					}
+				}
+				else {
+					return {
+						success: false,
+						error  : prefix + "value of key '" + key + "' must be of type object {login_enabled:boolean, responsive:{enabled:boolean, fixedwidth:number}, allowed_browser:array}"
+					};
+				}
+				break;
 			default:
 				return {
 					success: false,

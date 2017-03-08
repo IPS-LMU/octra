@@ -34,12 +34,12 @@ import { AudioplayerGUIComponent } from "../audioplayer-gui/audioplayer-gui.comp
 import { BrowserInfo } from "../../shared/BrowserInfo";
 import { StatisticElem } from "../../shared/StatisticElement";
 import { AudioplayerComponent } from "../../component/audioplayer/audioplayer.component";
-import { APP_CONFIG } from "../../app.config";
 import { AlertComponent } from "../../component/alert/alert.component";
 import { MessageService } from "../../service/message.service";
 import { Logger } from "../../shared/Logger";
 import { TextConverter } from "../../shared/Converters/TextConverter";
 import { NavbarService } from "../../service/navbar.service";
+import { SettingsService } from "../../service/settings.service";
 
 @Component({
 	selector       : 'app-transcription',
@@ -85,7 +85,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	}
 
 	get appc():any{
-		return APP_CONFIG.Settings;
+		return this.settingsService.app_settings;
 	}
 	user: number;
 
@@ -98,7 +98,8 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 				private sessService: SessionService,
 				private keyMap: KeymappingService,
 				private changeDetecorRef: ChangeDetectorRef,
-				private navbarServ:NavbarService
+				private navbarServ:NavbarService,
+				private settingsService:SettingsService
 	) {
 		this.subscriptions = [];
 		setInterval(() => {
@@ -114,6 +115,10 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		return this.uiService.elements;
 	}
 
+	private get app_settings(){
+		return this.settingsService.app_settings;
+	}
+
 	ngOnChanges() {
 	}
 
@@ -122,7 +127,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 			let subscr: Subscription = this.audio.afterloaded.subscribe(this.afterAudioLoaded);
 			this.subscriptions.push(subscr);
 
-			if (APP_CONFIG.Settings.LOGGING == true) {
+			if (this.app_settings.octra.logging == true) {
 				let subscr2: Subscription = this.uiService.afteradd.subscribe((elem)=> {
 					this.sessService.save("logs", this.uiService.elementsToAnyArray());
 				});
@@ -194,5 +199,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	}
 
 	getText(){
+		return this.tranService.getTranscriptString("text");
 	}
 }

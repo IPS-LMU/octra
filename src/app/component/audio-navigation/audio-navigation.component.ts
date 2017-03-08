@@ -1,8 +1,8 @@
 import { Component, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 
 import { UserInteractionsService, AudioService } from "../../service";
-import { APP_CONFIG } from "../..";
 import { BrowserInfo } from "../../shared";
+import { SettingsService } from "../../service/settings.service";
 
 @Component({
 	selector   : 'app-audio-navigation',
@@ -24,7 +24,7 @@ export class AudioNavigationComponent {
 	}
 
 	get appc():any{
-		return APP_CONFIG.Settings;
+		return this.settingsSerice.app_settings;
 	}
 
 	@Output() buttonclick = new EventEmitter<{type: string, timestamp: number}>();
@@ -53,7 +53,9 @@ export class AudioNavigationComponent {
 
 	constructor(private uiService: UserInteractionsService,
 				private audio: AudioService,
-				private cd: ChangeDetectorRef) {
+				private cd: ChangeDetectorRef,
+				private settingsSerice:SettingsService
+	) {
 	}
 
 	/**
@@ -65,7 +67,7 @@ export class AudioNavigationComponent {
 		if (this.shortcuts) {
 			let platform = BrowserInfo.platform;
 			if (this.shortcuts[ key ].keys[ platform ]) {
-				let shortc = APP_CONFIG.Settings.WRAP[ 0 ] + this.shortcuts[ key ].keys[ platform ] + APP_CONFIG.Settings.WRAP[ 1 ];
+				let shortc = "[" + this.shortcuts[ key ].keys[ platform ] + "]";
 				shortc = shortc.replace("BACKSPACE", "DEL");
 				return shortc;
 			}

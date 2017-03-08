@@ -1,9 +1,9 @@
 import { Component, OnInit, AfterViewInit, ViewChild, OnDestroy } from '@angular/core';
 
-import { APP_CONFIG } from "../../app.config";
 import { AudioNavigationComponent, AudioplayerComponent, TranscrEditorComponent } from "../../component";
 import { AudioService, KeymappingService, TranscriptionService, UserInteractionsService } from "../../service";
 import { SubscriptionManager } from "../../shared";
+import { SettingsService } from "../../service/settings.service";
 
 @Component({
 	selector   : 'app-audioplayer-gui',
@@ -34,18 +34,24 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 		this.audioplayer.settings = value;
 	}
 
+	private get app_settings():any{
+		return this.settingsService.app_settings;
+	}
+
 	constructor(private audio: AudioService,
 				private keyMap: KeymappingService,
 				private transcr: TranscriptionService,
-				private uiService: UserInteractionsService) {
+				private uiService: UserInteractionsService,
+				private settingsService:SettingsService
+	) {
 		this.subscrmanager = new SubscriptionManager();
 	}
 
 	ngOnInit() {
 		this.settings.shortcuts = this.keyMap.register("AP", this.settings.shortcuts);
 		this.nav.shortcuts = this.settings.shortcuts;
-		this.editor.Settings.markers = APP_CONFIG.Settings.MARKERS;
-		this.editor.Settings.responsive = APP_CONFIG.Settings.RESPONSIVE;
+		this.editor.Settings.markers = this.settingsService.markers.items;
+		this.editor.Settings.responsive = this.settingsService.app_settings.octra.responsive.enabled;
 	}
 
 	ngAfterViewInit() {
@@ -61,7 +67,7 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 	}
 
 	onButtonClick(event: { type: string, timestamp: number }) {
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("mouse_click", {}, event.timestamp, event.type + "_button");
 
 		switch (event.type) {
@@ -90,7 +96,7 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 	}
 
 	afterSpeedChange(event: { new_value: number, timestamp: number }) {
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "speed_change");
 	}
 
@@ -99,7 +105,7 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 	}
 
 	afterVolumeChange(event: { new_value: number, timestamp: number }) {
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "volume_change");
 	}
 
@@ -110,18 +116,18 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 	}
 
 	onShortcutTriggered(event) {
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("shortcut", event, Date.now(), 'audioplayer');
 	}
 
 	onMarkerInsert(marker_code: string) {
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("marker_insert", { value: marker_code }, Date.now(), 'editor');
 	}
 
 	onMarkerClick(marker_code: string) {
 		this.updateSegment(null);
-		if (APP_CONFIG.Settings.LOGGING == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("marker_click", { value: marker_code }, Date.now(), 'editor');
 	}
 }

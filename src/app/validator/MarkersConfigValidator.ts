@@ -52,25 +52,19 @@ export class MarkersConfigValidator extends ConfigValidator {
 							};
 						}
 
-						if(isArray(elem.description)) {
-							for (let j = 0; j < elem.description.length; j++) {
-								if (isNullOrUndefined(elem.description[ j ].language) || typeof elem.description[ j ].language !== "string") {
+						if(typeof elem.description === "object") {
+							for (let language in elem.description) {
+								if(typeof elem.description[language] !== "string"){
 									return {
 										success: false,
-										error  : prefix + "value of key items[" + i + "][" + j + "].language must be of type string"
-									};
-								}
-								if (isNullOrUndefined(elem.description[ j ].translation) || typeof elem.description[ j ].translation !== "string") {
-									return {
-										success: false,
-										error  : prefix + "value of key items[" + i + "][" + j + "].translation must be of type string"
+										error  : prefix + "value of attribute items[" + i + "].description must be of type string"
 									};
 								}
 							}
 						} else{
 							return {
 								success: false,
-								error  : prefix + "value of key description must be of type array"
+								error  : prefix + "value of key description must be of type object"
 							};
 						}
 

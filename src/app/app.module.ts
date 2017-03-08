@@ -51,6 +51,8 @@ import { APIService, NavbarService, AudioService, DialogService, KeymappingServi
 import { DeALoginGuard, LogoutGuard, MembersAreaGuard, TranscrSubmittedGuard, ALoginGuard } from "./guard";
 
 import { AppComponent } from "./app.component";
+import { SettingsService } from "./service/settings.service";
+import { SettingsGuard } from "./guard/settings.activateguard";
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
@@ -119,10 +121,12 @@ export function HttpLoaderFactory(http: Http) {
 		KeymappingService,
 		LogoutGuard,
 		MembersAreaGuard,
+		SettingsGuard,
 		SessionService,
 		TranscrSubmittedGuard,
 		TranslateService,
-		NavbarService
+		NavbarService,
+		SettingsService
 	]
 })
 

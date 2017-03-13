@@ -53,10 +53,11 @@ import { DeALoginGuard, LogoutGuard, MembersAreaGuard, TranscrSubmittedGuard, AL
 import { AppComponent } from "./app.component";
 import { SettingsService } from "./service/settings.service";
 import { SettingsGuard } from "./guard/settings.activateguard";
+import { FastbarComponent } from './gui/fastbar/fastbar.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
-	return new TranslateHttpLoader(http, "assets/i18n/", ".json");
+	return new TranslateHttpLoader(http, "./assets/i18n/", ".json");
 }
 
 @NgModule({
@@ -89,7 +90,8 @@ export function HttpLoaderFactory(http: Http) {
 		TranscrWindowComponent,
 		AlertComponent,
 		ReloadFileComponent,
-		DropZoneComponent
+		DropZoneComponent,
+		FastbarComponent
 	],
 	imports     : [
 		BrowserModule,

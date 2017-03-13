@@ -15,7 +15,7 @@
     </modal-footer>
 </modal>
 
-<modal #overview id="overview">
+<modal #mdoal_overview id="overview">
     <modal-header>
         <h4 class="modal-title">Übersicht</h4>
     </modal-header>
@@ -94,25 +94,23 @@
     </modal-footer>
 </modal>
 <div *ngIf="!loaded">
-    <app-loading #loading>
-
-    </app-loading>
+    <app-loading #loading></app-loading>
 </div>
 <div *ngIf="loaded">
-    <table style="width:100%; font-size:12px;margin-bottom:10px;">
-        <tbody>
-        <tr>
-            <td style="text-align:center;"><span class="link" (click)="modal_shortcuts.open();">Tastenkombinationen [ALT + 8]</span>
-            </td>
-            <td style="text-align:center;"><span class='link'
-                                                 (click)="modal_rules.open();">Regeln [ALT + 9]</span></td>
-            <td style="text-align:center;"><span class='link'
-                                                 (click)="tranService.analyse();overview.open();">Übersicht [ALT + 0]</span>
-            </td>
-            <td style="text-align:center;"><a href="{{intro_link}}" target="_blank" class="link">Einführungsvideo</a></td>
-        </tr>
-        </tbody>
-    </table>
+    <app-fastbar
+            [responsive]="responsive"
+            [help_url]="help_url"
+            [button_labels]="{
+            shortcuts: 'general.shortcuts' | translate,
+            guidelines: 'general.guidelines' | translate,
+            overview: 'general.overview' | translate,
+            help: 'general.help' | translate
+            }"
+
+            (shortcutbtnclicked)="modal_shortcuts.open()"
+            (guidelinesbtnclicked)="modal_rules.open()"
+            (overviewbtnclicked)="mdoal_overview.open()"
+    ></app-fastbar>
 
     <modal #modal_rules id="rules">
         <modal-body>
@@ -167,7 +165,9 @@
                 </tr>
                 <tr>
                     <td style="vertical-align: top;">Komposita und Abkürzungen</td>
-                    <td style="vertical-align: top;">Diese sollten nicht künstlich getrennt oder in Buchstabierform geschrieben werden.</td>
+                    <td style="vertical-align: top;">Diese sollten nicht künstlich getrennt oder in Buchstabierform
+                        geschrieben werden.
+                    </td>
                     <td>
                         <table class="table" style="width:400px">
                             <tbody>
@@ -203,18 +203,27 @@
                     <td>Bei falscher Aussprache, das erratene Wort mit * vorranstellen
                     </td>
                     <td>"achter vierter *fünfund nein sechsundneunzig" ist ok<br/>
-                        "<img src="assets/img/components/transcr-editor/default_markers/truncation_start.png" alt="trunc_start">*chter vierter oder *sechsundneunz<img src="assets/img/components/transcr-editor/default_markers/truncation_end.png" alt="trunc_end">" ist nicht ok
+                        "<img src="assets/img/components/transcr-editor/default_markers/truncation_start.png"
+                              alt="trunc_start">*chter vierter oder *sechsundneunz<img
+                                src="assets/img/components/transcr-editor/default_markers/truncation_end.png"
+                                alt="trunc_end">" ist nicht ok
                     </td>
                 </tr>
                 <tr>
                     <td>Unverständliche Sprache</td>
-                    <td>Passagen unverständlicher Sprache mit <img src="assets/img/components/transcr-editor/default_markers/stars.png" alt="stars"> markieren</td>
-                    <td>du bist ein solches <img src="assets/img/components/transcr-editor/default_markers/stars.png" alt="stars"> wie ich noch nie eines getroffen habe</td>
+                    <td>Passagen unverständlicher Sprache mit <img
+                            src="assets/img/components/transcr-editor/default_markers/stars.png" alt="stars"> markieren
+                    </td>
+                    <td>du bist ein solches <img src="assets/img/components/transcr-editor/default_markers/stars.png"
+                                                 alt="stars"> wie ich noch nie eines getroffen habe
+                    </td>
                 </tr>
                 <tr>
                     <td>Geräusche</td>
                     <td>
-                        Bei Geräuschen müssen die Geräuschmarken verwendet werden. Ein Marker wird dabei an dem ersten Vorkommen eines Geräusches gesetzt, nicht aber zwischen Wörtern. Für weitere Informationen in der
+                        Bei Geräuschen müssen die Geräuschmarken verwendet werden. Ein Marker wird dabei an dem ersten
+                        Vorkommen eines Geräusches gesetzt, nicht aber zwischen Wörtern. Für weitere Informationen in
+                        der
                         Toolbar des Editors mit der Maus über die Marker fahren.<br/>
                         Mehrere gleiche Marker sollten nicht direkt aufeinander folgen.
                     </td>
@@ -239,10 +248,12 @@
     <div id="bottom-nav">
         <div class="btn-group btn-group-justified" role="group" aria-label="...">
             <a class="btn btn-default btn-raised" (click)="modal.open()"><span
-                    class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span><span [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> Beenden</span></a>
+                    class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span><span
+                    [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.quit" | translate}}</span></a>
             <a class="btn btn-default btn-raised"
-               (click)="submitTranscription()"><span [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> Transkription fertigstellen</span> <span
-                    class="glyphicon glyphicon glyphicon-menu-right" aria-hidden="true"></span></a>
+               (click)="submitTranscription()"><span [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.finish transcription" | translate}}</span>
+                <span
+                        class="glyphicon glyphicon glyphicon-menu-right" aria-hidden="true"></span></a>
         </div>
     </div>
     <!-- {{tranService.segments.length}}

@@ -54,7 +54,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	@ViewChild('modal') modal: ModalComponent;
 	@ViewChild('modal_shortcuts') modal_shortcuts: ModalComponent;
 	@ViewChild('modal_rules') modal_rules: ModalComponent;
-	@ViewChild('overview') overview: ModalComponent;
+	@ViewChild('modal_overview') overview: ModalComponent;
 	@ViewChild('audioplayer') audioplayergui: AudioplayerGUIComponent;
 	@ViewChild('test') test: ViewContainerRef;
 	@ViewChild('alert') alert: AlertComponent;
@@ -66,7 +66,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
 	private viewinitialized = false;
 
-	get intro_link(): string {
+	get help_url(): string {
 		if (this.sessService.Interface === "audioplayer") {
 			return "http://www.phonetik.uni-muenchen.de/apps/octra/videos/63sd324g43qt7-interface1/"
 		}
@@ -84,9 +84,14 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		return this.audio.loaded;
 	}
 
-	get appc():any{
+	get appc(): any {
 		return this.settingsService.app_settings;
 	}
+
+	get responsive(): boolean {
+		return this.appc.octra.responsive.enabled;
+	}
+
 	user: number;
 
 	private platform = BrowserInfo.platform;
@@ -98,9 +103,8 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 				private sessService: SessionService,
 				private keyMap: KeymappingService,
 				private changeDetecorRef: ChangeDetectorRef,
-				private navbarServ:NavbarService,
-				private settingsService:SettingsService
-	) {
+				private navbarServ: NavbarService,
+				private settingsService: SettingsService) {
 		this.subscriptions = [];
 		setInterval(() => {
 			this.changeDetecorRef.markForCheck();
@@ -115,7 +119,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		return this.uiService.elements;
 	}
 
-	private get app_settings(){
+	private get app_settings() {
 		return this.settingsService.app_settings;
 	}
 
@@ -128,14 +132,15 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 			this.subscriptions.push(subscr);
 
 			if (this.app_settings.octra.logging == true) {
-				let subscr2: Subscription = this.uiService.afteradd.subscribe((elem)=> {
+				let subscr2: Subscription = this.uiService.afteradd.subscribe((elem) => {
 					this.sessService.save("logs", this.uiService.elementsToAnyArray());
 				});
 				this.subscriptions.push(subscr2);
 			}
 			this.tranService.loadAudioFile();
 			this.initialized[ "audiolayer" ] = false;
-		}else{
+		}
+		else {
 			this.afterAudioLoaded();
 		}
 	}
@@ -198,7 +203,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		}
 	}
 
-	getText(){
+	getText() {
 		return this.tranService.getTranscriptString("text");
 	}
 }

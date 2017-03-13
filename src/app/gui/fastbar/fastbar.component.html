@@ -1,0 +1,23 @@
+<div id="fastbar">
+    <div class="btn-group btn-group-justified btn-group-sm" role="group" aria-label="Justified button group">
+        <a class="btn" (click)="shortcutbtnclicked.emit()">
+            <span class="glyphicon glyphicon-open"></span>
+            <span [ngClass]="{'hidden-xs hidden-sm ': responsive}">{{button_labels.shortcuts}}</span>
+            <span [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">[ALT +
+                            8]</span></a>
+        <a class='btn' (click)="guidelinesbtnclicked.emit()">
+            <span class="glyphicon glyphicon-th-list"></span>
+            <span [ngClass]="{'hidden-xs hidden-sm ': responsive}">{{button_labels.guidelines}}</span>
+            <span [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">[ALT + 9]</span>
+        </a>
+        <a class='btn' (click)="overviewbtnclicked.emit()">
+            <span class="glyphicon glyphicon-eye-open"></span>
+            <span [ngClass]="{'hidden-xs hidden-sm ': responsive}">{{button_labels.overview}}</span>
+            <span [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">[ALT + 0]</span>
+        </a>
+        <a href="{{help_url}}" target="_blank" class="btn">
+            <span class="glyphicon glyphicon-question-sign"></span>
+            <span [ngClass]="{'hidden-xs hidden-sm ': responsive}">{{button_labels.help}}</span>
+        </a>
+    </div>
+</div>

@@ -2,11 +2,12 @@ import {
 	Component,
 	OnInit,
 	ChangeDetectionStrategy,
-	ChangeDetectorRef
+	ChangeDetectorRef, OnDestroy
 } from '@angular/core';
 
 import { MessageService } from "../../service/message.service";
 import { OCTRANIMATIONS } from "../../shared/OCTRAnimations";
+import { SubscriptionManager } from "../../shared/SubscriptionManager";
 
 @Component({
 	selector       : 'app-alert',
@@ -15,9 +16,10 @@ import { OCTRANIMATIONS } from "../../shared/OCTRAnimations";
 	animations     : OCTRANIMATIONS,
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AlertComponent implements OnInit {
+export class AlertComponent implements OnInit, OnDestroy {
 	constructor(private cd: ChangeDetectorRef,
 				private msgService: MessageService) {
+		this.subscrmanager = new SubscriptionManager();
 	}
 
 	state: string = "inactive";
@@ -25,16 +27,22 @@ export class AlertComponent implements OnInit {
 	type: string = "error";
 	show: boolean = false;
 
+	private subscrmanager: SubscriptionManager;
+
 	ngOnInit() {
 		this.state = "inactive";
 		this.show = false;
 
 		this.cd.markForCheck();
-		this.msgService.showmessage.subscribe(
+		this.subscrmanager.add(this.msgService.showmessage.subscribe(
 			(result) => {
 				this.showMessage(result.type, result.message);
 			}
-		);
+		));
+	}
+
+	ngOnDestroy() {
+		this.subscrmanager.destroy();
 	}
 
 	/**

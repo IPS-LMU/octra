@@ -4,6 +4,28 @@
                       (speedchange)="onSpeedChange($event)"
                       (afterspeedchange)="afterSpeedChange($event)"
                       (buttonclick)="onButtonClick($event)"
+                      [buttons]="{
+                        play: {
+                            label: ('general.play' | translate),
+                            shortcut: keyMap.getShortcut('AP', 'play_pause')
+                        },
+                        pause: {
+                            label: ('general.pause' | translate),
+                            shortcut: keyMap.getShortcut('AP', 'play_pause')
+                        },
+                        stop: {
+                            label: ('general.stop' | translate),
+                            shortcut: keyMap.getShortcut('AP', 'stop')
+                        },
+                        replay: {
+                            label: ('general.replay' | translate),
+                            shortcut: ''
+                        },
+                        backward: {
+                            label: ('general.backward' | translate),
+                            shortcut: keyMap.getShortcut('AP', 'step_backward')
+                        }
+                      }"
 ></app-audio-navigation>
 <app-audioplayer #audioplayer (shortcuttriggered)="onShortcutTriggered($event)"></app-audioplayer>
 <app-transcr-editor #transcr

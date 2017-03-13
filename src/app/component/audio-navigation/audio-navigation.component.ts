@@ -1,8 +1,31 @@
-import { Component, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { Component, Output, EventEmitter, ChangeDetectorRef, Input } from '@angular/core';
 
 import { UserInteractionsService, AudioService } from "../../service";
 import { BrowserInfo } from "../../shared";
 import { SettingsService } from "../../service/settings.service";
+
+export interface Buttons {
+	play: {
+		label: string,
+		shortcut: string
+	},
+	pause: {
+		label: string,
+		shortcut: string
+	},
+	stop: {
+		label: string,
+		shortcut: string
+	},
+	replay: {
+		label: string,
+		shortcut: string
+	},
+	backward: {
+		label: string,
+		shortcut: string
+	}
+};
 
 @Component({
 	selector   : 'app-audio-navigation',
@@ -23,20 +46,19 @@ export class AudioNavigationComponent {
 		this._volume = value;
 	}
 
-	get appc():any{
+	get appc(): any {
 		return this.settingsSerice.app_settings;
 	}
 
-	@Output() buttonclick = new EventEmitter<{type: string, timestamp: number}>();
-	@Output() volumechange = new EventEmitter<{old_value: number, new_value: number, timestamp: number}>();
-	@Output() aftervolumechange = new EventEmitter<{new_value: number, timestamp: number}>();
-	@Output() speedchange = new EventEmitter<{old_value: number, new_value: number, timestamp: number}>();
-	@Output() afterspeedchange = new EventEmitter<{new_value: number, timestamp: number}>();
+	@Output() buttonclick = new EventEmitter<{ type: string, timestamp: number }>();
+	@Output() volumechange = new EventEmitter<{ old_value: number, new_value: number, timestamp: number }>();
+	@Output() aftervolumechange = new EventEmitter<{ new_value: number, timestamp: number }>();
+	@Output() speedchange = new EventEmitter<{ old_value: number, new_value: number, timestamp: number }>();
+	@Output() afterspeedchange = new EventEmitter<{ new_value: number, timestamp: number }>();
 
-	public shortcuts: any;
 	private _volume: number = 1;
 	private _speed: number = 1;
-	public replay:boolean = false;
+	public replay: boolean = false;
 
 	get speed(): number {
 		return this._speed;
@@ -51,29 +73,33 @@ export class AudioNavigationComponent {
 		this._speed = value;
 	}
 
+	@Input() buttons: Buttons = {
+		play    : {
+			label   : "Play",
+			shortcut: "TAB"
+		},
+		pause   : {
+			label   : "Pause",
+			shortcut: "TAB"
+		},
+		stop    : {
+			label   : "Stop",
+			shortcut: "ESC"
+		},
+		replay  : {
+			label   : "Replay",
+			shortcut: ""
+		},
+		backward: {
+			label   : "Backward",
+			shortcut: "SHIFT + DEL"
+		}
+	};
+
 	constructor(private uiService: UserInteractionsService,
 				private audio: AudioService,
 				private cd: ChangeDetectorRef,
-				private settingsSerice:SettingsService
-	) {
-	}
-
-	/**
-	 * get Shortcut for labels
-	 * @param key
-	 * @returns {any}
-	 */
-	private getShortcut(key: string): string {
-		if (this.shortcuts) {
-			let platform = BrowserInfo.platform;
-			if (this.shortcuts[ key ].keys[ platform ]) {
-				let shortc = "[" + this.shortcuts[ key ].keys[ platform ] + "]";
-				shortc = shortc.replace("BACKSPACE", "DEL");
-				return shortc;
-			}
-		}
-
-		return "";
+				private settingsSerice: SettingsService) {
 	}
 
 	/**

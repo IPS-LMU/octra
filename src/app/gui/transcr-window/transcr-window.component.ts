@@ -80,8 +80,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 				}
 			}
 		));
-
-		this.audionav.shortcuts = this.loupe.Settings.shortcuts;
 	}
 
 	ngOnDestroy() {

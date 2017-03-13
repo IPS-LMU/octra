@@ -6,29 +6,29 @@
                     <a *ngIf="!audio.audioplaying" class="btn btn-default btn-raised" name="play"
                        (click)="onButtonClick('play'); ">
                         <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
-                        <span class="btn-description" [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}">Play </span>
-                        <span class="shortcut-descr" [ngClass]="{'hidden-xs hidden-sm hidden-md': appc.octra.responsive.enabled}"> {{getShortcut("play_pause")}}</span>
+                        <span class="btn-description" [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}">{{buttons.play.label}}</span>
+                        <span class="shortcut-descr" [ngClass]="{'hidden-xs hidden-sm hidden-md': appc.octra.responsive.enabled}"> {{buttons.play.shortcut}}</span>
                     </a>
                     <a *ngIf="audio.audioplaying" class="btn btn-default btn-raised" name="pause"
                        (click)="onButtonClick('pause')">
                         <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
-                        <span class="btn-description" [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}">Pause</span>
-                        <span class="shortcut-descr" [ngClass]="{'hidden-xs hidden-sm hidden-md': appc.octra.responsive.enabled}"> {{getShortcut("play_pause")}}</span></a>
+                        <span class="btn-description" [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}">{{buttons.pause.label}}</span>
+                        <span class="shortcut-descr" [ngClass]="{'hidden-xs hidden-sm hidden-md': appc.octra.responsive.enabled}"> {{buttons.pause.shortcut}}</span></a>
                     <a class="btn btn-default btn-raised" name="stop" (click)="onButtonClick('stop')">
                         <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
-                        <span class="btn-description" [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}">Stop </span>
-                        <span class="shortcut-descr" [ngClass]="{'hidden-xs hidden-sm hidden-md': appc.octra.responsive.enabled}"> {{getShortcut("stop")}}</span></a>
+                        <span class="btn-description" [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}">{{buttons.stop.label}}</span>
+                        <span class="shortcut-descr" [ngClass]="{'hidden-xs hidden-sm hidden-md': appc.octra.responsive.enabled}"> {{buttons.stop.shortcut}}</span></a>
                     <a class="btn btn-default btn-raised" [ngClass]="{active: replay}"
                        name="replay" (click)="onButtonClick('replay')">
                         <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
-                        <span class="btn-description" [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}">Replay</span>
+                        <span class="btn-description" [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}">{{buttons.replay.label}}</span>
                     </a>
                     <a class="btn btn-default btn-raised" name="step_back"
                        (click)="onButtonClick('backward')">
                         <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
                         <span class="btn-description"
-                              [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}">Zurück </span>
-                        <span class="shortcut-descr" [ngClass]="{'hidden-xs hidden-sm hidden-md': appc.octra.responsive.enabled}"> {{getShortcut("step_backward")}}</span></a>
+                              [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}">{{buttons.backward.label}} </span>
+                        <span class="shortcut-descr" [ngClass]="{'hidden-xs hidden-sm hidden-md': appc.octra.responsive.enabled}"> {{buttons.backward.shortcut}}</span></a>
                 </div>
             </div>
         </div>
@@ -37,13 +37,13 @@
                 <div class="btn-group btn-group-justified" role="group">
                     <div class="btn btn-raised">
                         <div class="row">
-                            <div class="col-xs-2 col-sm-4 col-md-3"><span class="glyphicon glyphicon-volume-off"></span>
+                            <div class="col-xs-1 col-sm-4 col-md-3"><span class="glyphicon glyphicon-volume-off"></span>
                             </div>
-                            <div class="col-xs-8 col-sm-4 col-md-6">
+                            <div class="col-xs-10 col-sm-4 col-md-6">
                                 <input class="slider" type="range" name="volume" min="0" max="3" step="0.2" value="1"
                                        id="volume-slider" [(ngModel)]="volume" (change)="afterVolumeChange()"/>
                             </div>
-                            <div class="col-xs-2 col-sm-4 col-md-3"><span class="glyphicon glyphicon-volume-up"></span>
+                            <div class="col-xs-1 col-sm-4 col-md-3"><span class="glyphicon glyphicon-volume-up"></span>
                                 <div class="slider-descr" [ngClass]="{'hidden-xs': appc.octra.responsive.enabled}">{{volume |
                                     procent}}%
                                 </div>
@@ -52,16 +52,16 @@
                     </div>
                     <div class="btn btn-raised">
                         <div class="row">
-                            <div class="col-xs-2 col-sm-4 col-md-3"><img
+                            <div class="col-xs-1 col-sm-4 col-md-3"><img
                                     src="assets/img/components/audio-navigation/slow.png" alt="fast">
                             </div>
-                            <div class="col-xs-8 col-sm-4 col-md-6">
+                            <div class="col-xs-10 col-sm-4 col-md-6">
                                 <input class="slider" type="range" name="speed" min="0.2" max="1.8" step="0.2" value="1"
                                        id="speed-slider"
                                        [(ngModel)]="speed" (change)="afterSpeedChange()"
                                        [disabled]="audio.audioplaying"/>
                             </div>
-                            <div class="col-xs-2 col-sm-4 col-md-3"><img
+                            <div class="col-xs-1 col-sm-4 col-md-3"><img
                                     src="assets/img/components/audio-navigation/fast.png" alt="fast">
                                 <div class="slider-descr" [ngClass]="{'hidden-xs': appc.octra.responsive.enabled}">{{speed}}x</div>
                             </div>

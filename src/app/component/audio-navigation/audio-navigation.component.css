@@ -14,12 +14,19 @@
 }
 
 .audio-nav {
-    width: 99.5%;
+    margin-bottom:10px;
 }
 
-#audio-nav .btn-raised {
-    padding: 5px;
-    height: 10px;
+.audio-nav .btn-toolbar{
+    margin-left:0px;
+}
+
+.audio-nav .btn-group{
+    margin:0;
+}
+
+.audio-nav .col-xs-1{
+    padding:0;
 }
 
 .btn-description{

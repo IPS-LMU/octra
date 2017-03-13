@@ -1,9 +1,11 @@
-import { Component, OnInit, AfterViewInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, OnDestroy, Pipe } from '@angular/core';
 
 import { AudioNavigationComponent, AudioplayerComponent, TranscrEditorComponent } from "../../component";
 import { AudioService, KeymappingService, TranscriptionService, UserInteractionsService } from "../../service";
 import { SubscriptionManager } from "../../shared";
 import { SettingsService } from "../../service/settings.service";
+import { TranslateService } from "@ngx-translate/core";
+import { BrowserInfo } from "../../shared/BrowserInfo";
 
 @Component({
 	selector   : 'app-audioplayer-gui',
@@ -18,12 +20,10 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 
 	private subscrmanager: SubscriptionManager;
 
-	public get NavShortCuts() {
-		return this.nav.shortcuts;
-	}
+	private shortcuts: any;
 
 	public set NavShortCuts(value: any) {
-		this.nav.shortcuts = value;
+		this.shortcuts = value;
 	}
 
 	public get settings(): any {
@@ -49,7 +49,7 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 
 	ngOnInit() {
 		this.settings.shortcuts = this.keyMap.register("AP", this.settings.shortcuts);
-		this.nav.shortcuts = this.settings.shortcuts;
+		this.shortcuts = this.settings.shortcuts;
 		this.editor.Settings.markers = this.settingsService.markers.items;
 		this.editor.Settings.responsive = this.settingsService.app_settings.octra.responsive.enabled;
 	}

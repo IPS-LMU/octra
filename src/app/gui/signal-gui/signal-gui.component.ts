@@ -99,8 +99,6 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.loupe2.Settings.shortcuts_enabled = false;
 		this.loupe2.Settings.boundaries.enabled = false;
 
-		this.nav.shortcuts = this.viewer.Settings.shortcuts;
-
 		//update signaldisplay on changes
 		this.subscrmanager.add(Observable.timer(0, 2000).subscribe(
 			() => {

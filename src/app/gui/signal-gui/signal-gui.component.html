@@ -24,6 +24,29 @@
                       (aftervolumechange)="afterVolumeChange($event)"
                       (speedchange)="onSpeedChange($event)"
                       (afterspeedchange)="afterSpeedChange($event)"
+
+                      [buttons]="{
+                        play: {
+                            label: ('general.play' | translate),
+                            shortcut: keyMap.getShortcut('AV', 'play_pause')
+                        },
+                        pause: {
+                            label: ('general.pause' | translate),
+                            shortcut: keyMap.getShortcut('AV', 'play_pause')
+                        },
+                        stop: {
+                            label: ('general.stop' | translate),
+                            shortcut: keyMap.getShortcut('AV', 'stop')
+                        },
+                        replay: {
+                            label: ('general.replay' | translate),
+                            shortcut: ''
+                        },
+                        backward: {
+                            label: ('general.backward' | translate),
+                            shortcut: keyMap.getShortcut('AV', 'step_backward')
+                        }
+                      }"
 >
 
 </app-audio-navigation>

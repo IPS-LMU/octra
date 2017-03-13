@@ -6,6 +6,30 @@
                           (aftervolumechange)="afterVolumeChange($event)"
                           (speedchange)="onSpeedChange($event)"
                           (afterspeedchange)="afterSpeedChange($event)"
+
+                          [buttons]="{
+                        play: {
+                            label: ('general.play' | translate),
+                            shortcut: keyMap.getShortcut('overlay', 'play_pause')
+                        },
+                        pause: {
+                            label: ('general.pause' | translate),
+                            shortcut: keyMap.getShortcut('overlay', 'play_pause')
+                        },
+                        stop: {
+                            label: ('general.stop' | translate),
+                            shortcut: keyMap.getShortcut('overlay', 'stop')
+                        },
+                        replay: {
+                            label: ('general.replay' | translate),
+                            shortcut: ''
+                        },
+                        backward: {
+                            label: ('general.backward' | translate),
+                            shortcut: keyMap.getShortcut('overlay', 'step_backward')
+                        }
+                      }"
+
     ></app-audio-navigation>
     <app-loupe #loupe id="loupe"
                (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"

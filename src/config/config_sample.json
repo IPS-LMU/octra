@@ -15,6 +15,7 @@
         "name": "Chrome",
         "version": "+23"
       }
-    ]
+    ],
+    "languages":["de", "en"]
   }
 }

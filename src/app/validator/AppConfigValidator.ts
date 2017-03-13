@@ -60,7 +60,7 @@ export class AppConfigValidator extends ConfigValidator {
 									for (let ke in value[ key ]) {
 										switch (ke) {
 											case("enabled"):
-												if(typeof value[key][ke] !== "boolean"){
+												if (typeof value[ key ][ ke ] !== "boolean") {
 													return {
 														success: false,
 														error  : prefix + "key 'octra." + key + "." + ke + "' must be of type boolean"
@@ -68,7 +68,7 @@ export class AppConfigValidator extends ConfigValidator {
 												}
 												break;
 											case("fixedwidth"):
-												if(typeof value[key][ke] !== "number"){
+												if (typeof value[ key ][ ke ] !== "number") {
 													return {
 														success: false,
 														error  : prefix + "key 'octra." + key + "." + ke + "' must be of type number"
@@ -85,27 +85,37 @@ export class AppConfigValidator extends ConfigValidator {
 								}
 								break;
 							case("allowed_browsers"):
-								if(!isArray(value[key])){
+								if (!isArray(value[ key ])) {
 									return {
 										success: false,
 										error  : prefix + "key 'octra" + "." + key + "' must be of type Array [{name:string, version:string}]"
 									};
-								} else{
-									for(let ke in value[key]){
-										if(typeof value[key][ke] !== "object"){
+								}
+								else {
+									for (let ke in value[ key ]) {
+										if (typeof value[ key ][ ke ] !== "object") {
 											return {
 												success: false,
-												error  : prefix + "key 'octra" + "." + key + "."+ke+"' must be of type object {name:string, version:string}"
+												error  : prefix + "key 'octra" + "." + key + "." + ke + "' must be of type object {name:string, version:string}"
 											};
-										} else{
-											if(isNullOrUndefined(value[key][ke].name) || isNullOrUndefined(value[key][ke].version) || typeof value[key][ke].name !== "string" || typeof value[key][ke].version !== "string"){
+										}
+										else {
+											if (isNullOrUndefined(value[ key ][ ke ].name) || isNullOrUndefined(value[ key ][ ke ].version) || typeof value[ key ][ ke ].name !== "string" || typeof value[ key ][ ke ].version !== "string") {
 												return {
 													success: false,
-													error  : prefix + "key2 'octra" + "." + key + "."+ke+"' must be of type object {name:string, version:string}"
+													error  : prefix + "key2 'octra" + "." + key + "." + ke + "' must be of type object {name:string, version:string}"
 												};
 											}
 										}
 									}
+								}
+								break;
+							case("languages"):
+								if (!isArray(value[ key ])) {
+									return {
+										success: false,
+										error  : prefix + "value of key '" + key + "' must be of type Array"
+									};
 								}
 								break;
 							default:

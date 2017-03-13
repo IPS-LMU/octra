@@ -25,51 +25,25 @@ export class AppComponent implements OnDestroy {
 				private settingsService: SettingsService) {
 		this.subscrmanager = new SubscriptionManager();
 
-		//define languages
-		langService.addLangs([ 'de', 'en' ]);
-		let browser_lang = langService.getBrowserLang();
-
-		//check if browser language is available in translations
-		if (isNullOrUndefined(sessService.language) || sessService.language == "") {
-			if (!isUndefined(langService.getLangs().find((value, index, obj) => {
-					return value == browser_lang
-				}))) {
-				langService.use(browser_lang);
-			} else{
-				langService.use("en");
-			}
-		}
-		else {
-			langService.use(sessService.language);
-		}
-
 		//load settings
 		this.subscrmanager.add(this.settingsService.settingsloaded.subscribe(
-			() => {
-				//settings have been loaded
-				if (isNullOrUndefined(this.settingsService.app_settings)) {
-					throw "config.json not set correctly";
-				}
-				else {
-					if (this.settingsService.validated) {
-						this.api.init(this.settingsService.app_settings.audio_server.url + "WebTranscribe");
-					}
-
-
-					if (!this.settingsService.app_settings.octra.responsive.enabled) {
-						//set fixed width
-						let head = document.head || document.getElementsByTagName('head')[ 0 ];
-						let style = document.createElement('style');
-						style.type = 'text/css';
-						style.innerText = ".container {width:" + this.settingsService.app_settings.octra.responsive.fixedwidth + "px}";
-						head.appendChild(style);
-					}
-				}
-			}
+			this.onSettingsLoaded
 		));
 
 		if (this.settingsService.validated) {
-			this.api.init(this.settingsService.app_settings.audio_server.url + "WebTranscribe");
+			this.onSettingsLoaded();
+		}
+	}
+
+	onSettingsLoaded = () => {
+		//settings have been loaded
+		if (isNullOrUndefined(this.settingsService.app_settings)) {
+			throw "config.json not set correctly";
+		}
+		else {
+			if (this.settingsService.validated) {
+				this.api.init(this.settingsService.app_settings.audio_server.url + "WebTranscribe");
+			}
 
 			if (!this.settingsService.app_settings.octra.responsive.enabled) {
 				//set fixed width
@@ -80,7 +54,30 @@ export class AppComponent implements OnDestroy {
 				head.appendChild(style);
 			}
 		}
-	}
+
+		//define languages
+		let languages = this.settingsService.app_settings.octra.languages;
+		let browser_lang = this.langService.getBrowserLang();
+
+		this.langService.addLangs(languages);
+
+		//check if browser language is available in translations
+		if (isNullOrUndefined(this.sessService.language) || this.sessService.language == "") {
+			if (!isUndefined(this.langService.getLangs().find((value) => {
+					return value == browser_lang
+				}))) {
+				this.langService.use(browser_lang);
+			}
+			else {
+				//use first language defined as default language
+				this.langService.use(languages[0]);
+			}
+		}
+		else {
+			this.langService.use(this.sessService.language);
+		}
+
+	};
 
 	ngOnDestroy() {
 		this.subscrmanager.destroy();

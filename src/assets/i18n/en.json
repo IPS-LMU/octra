@@ -1,5 +1,5 @@
 {
-  "general":{
+  "general": {
     "abort": "Abort",
     "continue": "Continue",
     "close": "Close",
@@ -8,6 +8,7 @@
     "start transcription": "Start transcription",
     "start new transcription": "Start new transcription",
     "finish transcription": "Finish transcription",
+    "stop transcription": "Stop transcription",
     "quit": "Quit",
     "login": "Login",
     "logout": "Logout",
@@ -19,10 +20,20 @@
     "shortcuts": "Shortcuts",
     "guidelines": "Guidelines",
     "overview": "Overview",
-    "help": "Help"
+    "help": "Help",
+    "on focus only": "on focus only",
+    "shortcuts audioplayer": "Audioplayer shortcuts",
+    "shortcuts top signaldisplay": "Shortcuts of the signaldisplay on the top",
+    "shortcuts down signaldisplay": "Shortcuts of the signaldisplay on the bottom",
+    "shortcuts 2D-Editor": "Shortcuts of the 2D-Editor"
+  },
+  "interfaces": {
+    "simple editor": "Editor without signaldisplay",
+    "linear editor": "Linear Editor",
+    "2D editor": "2D-Editor"
   },
   "modal": {
-    "transcription":{
+    "transcription": {
       "delete": {
         "header": "Create a new transcription?",
         "text": "Do you really want to delete the previous Transcription and create a new one?<br><br>Your progress on the previous transcription will be deleted. This action can not be reverted.",
@@ -32,16 +43,26 @@
     "login": {
       "header": "Login failed",
       "text": "Please check your username and your password."
+    },
+    "shortcuts": {
+      "play pause": "Play / Pause",
+      "stop playback": "Stop Playback",
+      "step backward": "Jump to the last position",
+      "set segment": "Set segment boundary",
+      "play selection": "Play selection",
+      "transcribe segment": "Transcribe segment",
+      "move cursor left": "Move cursor to the left",
+      "move cursor right": "Move cursor to the left"
     }
   },
-  "login":{
+  "login": {
     "online mode": "Online Mode",
     "online mode disabled": "Online mode is currently inactive. Please use OCTRA locally.",
     "local mode": "Local Mode",
     "old file found": "There is data from a previous transcription. If you like to continue your work, just drag & drop the following file to the gray box:<br/><br/>{{file_label}}"
   },
-  "dropzone":{
-    "drag&drop here" : "Drag & Drop audio file (*.wav) here or click here.",
+  "dropzone": {
+    "drag&drop here": "Drag & Drop audio file (*.wav) here or click here.",
     "file selected": "{{file_label}} selected"
   },
   "browser": {

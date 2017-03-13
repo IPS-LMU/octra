@@ -45,11 +45,13 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav" (mouseleave)="coll()">
-                <li *ngIf="sessService.LoggedIn && navbarServ.show_hidden"><a (mouseup)="coll();setInterface('audioplayer')"> Editor ohne
-                    Signaldisplay</a></li>
-                <li *ngIf="sessService.LoggedIn && navbarServ.show_hidden"><a (mouseup)="coll();setInterface('signaldisplay')">Linearer Editor</a>
+                <li *ngIf="sessService.LoggedIn && navbarServ.show_hidden">
+                    <a (mouseup)="coll();setInterface('audioplayer')">{{"interfaces.simple editor" | translate}}</a>
                 </li>
-                <li *ngIf="sessService.LoggedIn && navbarServ.show_hidden"><a (mouseup)="coll();setInterface('overlay')">2D-Editor</a></li>
+                <li *ngIf="sessService.LoggedIn && navbarServ.show_hidden">
+                    <a (mouseup)="coll();setInterface('signaldisplay')">{{"interfaces.linear editor" | translate}}</a>
+                </li>
+                <li *ngIf="sessService.LoggedIn && navbarServ.show_hidden"><a (mouseup)="coll();setInterface('overlay')">{{"interfaces.2D editor" | translate}}</a></li>
                 <li *ngIf="sessService.LoggedIn && navbarServ.show_hidden"><a (mouseup)="modalexport.open()">Export</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">

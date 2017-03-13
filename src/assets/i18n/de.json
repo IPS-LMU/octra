@@ -8,6 +8,7 @@
     "start transcription": "Transkription beginnen",
     "start new transcription": "Neue Transkription beginnen",
     "finish transcription": "Transkription fertigstellen",
+    "stop transcription": "Transkription beenden",
     "quit": "Beenden",
     "login": "Anmelden",
     "logout": "Abmelden",
@@ -19,7 +20,17 @@
     "shortcuts": "Tastenkombinationen",
     "guidelines": "Regeln",
     "overview": "Übersicht",
-    "help": "Hilfe"
+    "help": "Hilfe",
+    "on focus only" : "nur bei Fokus",
+    "shortcuts audioplayer": "Tastenkombinationen des Audioplayers",
+    "shortcuts top signaldisplay": "Tastenkombinationen des oberen Signaldsiplays",
+    "shortcuts down signaldisplay": "Tastenkombinationen des unteren Signaldsiplays",
+    "shortcuts 2D-Editor": "Tastenkombinationen des 2D-Editors"
+  },
+  "interfaces":{
+    "simple editor": "Editor ohne Signaldisplay",
+    "linear editor": "Linearer Editor",
+    "2D editor": "2D-Editor"
   },
   "modal": {
     "transcription": {
@@ -32,6 +43,16 @@
     "login": {
       "header": "Anmeldung fehlgeschlagen",
       "text": "Bitte überprüfen Sie ihren Nutzernamen und ihr Passwort."
+    },
+    "shortcuts": {
+      "play pause": "Abspielen / Pausieren",
+      "stop playback": "Wiedergabe beenden",
+      "step backward": "Zur zuletzt pausierten Stelle springen",
+      "set segment": "Segmentgrenze setzen",
+      "play selection": "Selektion abspielen",
+      "transcribe segment": "Segment transkribieren",
+      "move cursor left": "Cursor nach links bewegen",
+      "move cursor right": "Cursor nach rechts bewegen"
     }
   },
   "login": {

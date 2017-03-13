@@ -50,7 +50,7 @@ export class AudioviewerConfig {
 					pc : "TAB",
 				},
 				focusonly: false,
-				title    : "Abspielen / Pausieren",
+				title    : "play pause",
 			},
 			stop          : {
 				keys     : {
@@ -58,7 +58,7 @@ export class AudioviewerConfig {
 					pc : "ESC"
 				},
 				focusonly: false,
-				title    : "Wiedergabe beenden",
+				title    : "stop playback",
 			},
 			set_boundary  : {
 				keys     : {
@@ -66,7 +66,7 @@ export class AudioviewerConfig {
 					pc : "S"
 				},
 				focusonly: true,
-				title    : "Grenze setzen",
+				title    : "set segment",
 			},
 			play_selection: {
 				keys     : {
@@ -74,7 +74,7 @@ export class AudioviewerConfig {
 					pc : "C"
 				},
 				focusonly: true,
-				title    : "Selektion abspielen",
+				title    : "play selection",
 			},
 			step_backward : {
 				keys     : {
@@ -82,7 +82,7 @@ export class AudioviewerConfig {
 					pc : "SHIFT + BACKSPACE"
 				},
 				focusonly: false,
-				title    : "Zur zuletzt pausierten Stelle springen",
+				title    : "step backward",
 			},
 			segment_enter : {
 				keys     : {
@@ -90,7 +90,7 @@ export class AudioviewerConfig {
 					pc : "ENTER"
 				},
 				focusonly: true,
-				title    : "Segment transkribieren",
+				title    : "transcribe segment",
 			},
 			cursor_left   : {
 				keys     : {
@@ -98,7 +98,7 @@ export class AudioviewerConfig {
 					pc : "ARROWLEFT"
 				},
 				focusonly: true,
-				title    : "Cursor nach links bewegen"
+				title    : "move cursor left"
 			},
 			cursor_right  : {
 				keys     : {
@@ -106,7 +106,7 @@ export class AudioviewerConfig {
 					pc : "ARROWRIGHT"
 				},
 				focusonly: true,
-				title    : "Cursor nach rechts bewegen"
+				title    : "move cursor right"
 			}
 		},
 		disabled_keys      : [ "SHIFT + SPACE" ],

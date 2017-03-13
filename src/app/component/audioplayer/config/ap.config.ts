@@ -31,7 +31,7 @@ export class AudioplayerConfig {
 					mac: "TAB",
 					pc : "TAB"
 				},
-				title    : "Abspielen / Pausieren",
+				title    : "play pause",
 				focusonly: false
 			},
 			stop         : {
@@ -39,7 +39,7 @@ export class AudioplayerConfig {
 					mac: "ESC",
 					pc : "ESC"
 				},
-				title    : "Wiedergabe beenden",
+				title    : "stop playback",
 				focusonly: false
 			},
 			step_backward: {
@@ -47,7 +47,7 @@ export class AudioplayerConfig {
 					mac: "SHIFT + BACKSPACE",
 					pc : "SHIFT + BACKSPACE"
 				},
-				title    : "Zur zuletzt pausierten Stelle springen",
+				title    : "step backward",
 				focusonly: false
 			}
 		}

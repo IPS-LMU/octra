@@ -41,7 +41,8 @@
         <div class="col-md-10 panel" style="background-color:white;padding:20px;">
             <h3>Datei erneut einlesen</h3>
             <p>
-                Die Seite wurde zuvor geschlossen oder erneut geladen. Bitte wählen Sie erneut eine Audiodatei aus um sie
+                Die Seite wurde zuvor geschlossen oder erneut geladen. Bitte wählen Sie erneut eine Audiodatei aus um
+                sie
                 einlesen zu lassen. Nach dem Einlesen können Sie ihre Arbeit fortsetzen.
             </p>
             <p>
@@ -49,23 +50,28 @@
             </p>
             <app-drop-zone #dropzone>
                 <span *ngIf="dropzone.file == null">Datei hier hineinziehen</span>
-                <span *ngIf="dropzone.file != null && (sessionfile == null || sessionfile.name == dropzone.file.name)"><span class="text-success">Datei {{getDropzoneFileString(dropzone.file)}} ausgewählt</span></span>
-                <span *ngIf="dropzone.file != null && (sessionfile != null && sessionfile.name != dropzone.file.name)"><span class="text-danger">Datei {{getDropzoneFileString(dropzone.file)}} ausgewählt</span></span>
+                <span *ngIf="dropzone.file != null && (sessionfile == null || sessionfile.name == dropzone.file.name)"><span
+                        class="text-success">Datei {{getDropzoneFileString(dropzone.file)}} ausgewählt</span></span>
+                <span *ngIf="dropzone.file != null && (sessionfile != null && sessionfile.name != dropzone.file.name)"><span
+                        class="text-danger">Datei {{getDropzoneFileString(dropzone.file)}} ausgewählt</span></span>
             </app-drop-zone>
             <div class="btn-group btn-group-justified" role="group" aria-label="...">
                 <div class="btn-group" role="group">
-                    <button class="btn btn-default btn-raised" (click)="modal_leave.open()">Beenden
+                    <button class="btn btn-default btn-raised" (click)="modal_leave.open()">
+                        <span class="glyphicon glyphicon glyphicon-log-out"></span> <span class="hidden-xs hidden-sm hidden-md">Beenden</span>
                     </button>
                 </div>
                 <div class="btn-group" role="group">
-                    <button class="btn btn-default btn-raised btn-danger" [disabled]="dropzone.file == null" (click)="modal_delete.open()">
-                        Neue
-                        Transkription
+                    <button class="btn btn-default btn-raised btn-danger" [disabled]="dropzone.file == null"
+                            (click)="modal_delete.open()">
+                        <span class="glyphicon glyphicon-file"></span> <span class="hidden-xs hidden-sm hidden-md">Neue Transkription</span>
                     </button>
                 </div>
                 <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-primary btn-raised" [disabled]="!(dropzone.file != null && dropzone.file.name == sessionfile.name)" (click)="onOfflineSubmit()">Transkription
-                        fortsetzen
+                    <button type="button" class="btn btn-primary btn-raised"
+                            [disabled]="!(dropzone.file != null && dropzone.file.name == sessionfile.name)"
+                            (click)="onOfflineSubmit()">
+                        <span class="glyphicon glyphicon glyphicon-edit"></span> <span class="hidden-xs hidden-sm hidden-md">Transkription fortsetzen</span>
                     </button>
                 </div>
             </div>

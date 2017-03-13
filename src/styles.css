@@ -12,10 +12,11 @@ main {
     flex: 1 0 auto;
 }
 
-.container{
-    width:90%;
-    /* fix this for disabling responsive*/
-    /*width:1200px;*/
+@media(max-width:400px){
+    main .container {
+        padding-left: 0;
+        padding-right: 0;
+    }
 }
 
 footer{

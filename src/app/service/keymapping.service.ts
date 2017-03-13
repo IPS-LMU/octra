@@ -1,5 +1,6 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { KeyMapping } from "../shared/KeyMapping";
+import { BrowserInfo } from "../shared/BrowserInfo";
 
 @Injectable()
 export class KeymappingService {
@@ -107,6 +108,26 @@ export class KeymappingService {
 		}
 
 		return null;
+	}
+
+	/**
+	 * get Shortcut for labels
+	 * @param key
+	 * @returns {any}
+	 */
+	private getShortcut(identifier:string, key: string): string {
+		let shortcuts = this.getShortcuts(identifier);
+
+		if (shortcuts) {
+			let platform = BrowserInfo.platform;
+			if (shortcuts[ key ].keys[ platform ]) {
+				let shortc = "[" + shortcuts[ key ].keys[ platform ] + "]";
+				shortc = shortc.replace("BACKSPACE", "DEL");
+				return shortc;
+			}
+		}
+
+		return "";
 	}
 
 	/*private getRegist(combo:string):string{

@@ -34,6 +34,7 @@ Then you can install OCTRA:
 * summernote: https://github.com/summernote/summernote
 * bootstrap: http://getbootstrap.com/
 * bootstrap-material-design: http://fezvrasta.github.io/bootstrap-material-design/
+* glyphicons (in bootstrap package): http://glyphicons.com/
 * ng2-webstorage: https://github.com/PillowPillow/ng2-webstorage
 * browser-signal-processing: https://www.npmjs.com/package/browser-signal-processing
 * ng2-bs3-modal: https://github.com/dougludlow/ng2-bs3-modal

@@ -6,7 +6,20 @@
     "open": "Öffnen",
     "delete": "Löschen",
     "start transcription": "Transkription beginnen",
-    "start new transcription": "Neue Transkription beginnen"
+    "start new transcription": "Neue Transkription beginnen",
+    "finish transcription": "Transkription fertigstellen",
+    "quit": "Beenden",
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "play": "Abspielen",
+    "pause": "Pausieren",
+    "stop": "Stop",
+    "backward": "Zurück",
+    "replay": "Wiederholung",
+    "shortcuts": "Tastenkombinationen",
+    "guidelines": "Regeln",
+    "overview": "Übersicht",
+    "help": "Hilfe"
   },
   "modal": {
     "transcription": {

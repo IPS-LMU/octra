@@ -5,8 +5,21 @@
     "close": "Close",
     "open": "Open",
     "delete": "Delete",
-    "start transcription": "Start Transcription",
-    "start new transcription": "Start new Transcription"
+    "start transcription": "Start transcription",
+    "start new transcription": "Start new transcription",
+    "finish transcription": "Finish transcription",
+    "quit": "Quit",
+    "login": "Login",
+    "logout": "Logout",
+    "play": "Play",
+    "pause": "Pause",
+    "stop": "Stop",
+    "backward": "Back",
+    "replay": "Replay",
+    "shortcuts": "Shortcuts",
+    "guidelines": "Guidlines",
+    "overview": "Overview",
+    "help": "Help"
   },
   "modal": {
     "transcription":{

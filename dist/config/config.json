@@ -4,13 +4,14 @@
     "url": "sds"
   },
   "octra": {
-    "login_enabled": true,
+    "login_enabled": false,
     "logging_enabled": true,
     "responsive": {
       "enabled": true,
       "fixedwidth": 1200
     },
     "allowed_browsers": [
-    ]
+    ],
+    "languages":["de", "en"]
   }
 }

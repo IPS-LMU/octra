@@ -5,6 +5,7 @@
     "close": "Close",
     "open": "Open",
     "delete": "Delete",
+    "OK": "OK",
     "start transcription": "Start transcription",
     "start new transcription": "Start new transcription",
     "finish transcription": "Finish transcription",
@@ -38,6 +39,10 @@
         "header": "Create a new transcription?",
         "text": "Do you really want to delete the previous Transcription and create a new one?<br><br>Your progress on the previous transcription will be deleted. This action can not be reverted.",
         "delete old": "Delete previous transcription"
+      },
+      "stop": {
+        "header": "Stop Transcription",
+        "text": "Do you really want to stop the transcription?<br><br>Your proceedings have been saved in your Browser. If you want to continue later you do not have to delete the browser cache. Please use the same browser as at this moment."
       }
     },
     "login": {

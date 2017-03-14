@@ -7,19 +7,13 @@ import {
 	ViewContainerRef,
 	QueryList,
 	ViewChildren,
-	AfterContentChecked,
-	AfterViewChecked,
 	Output,
 	ViewChild,
 	EventEmitter,
 	HostListener,
 	OnChanges,
 	ChangeDetectorRef,
-	ReflectiveInjector,
-	ComponentRef,
-	ComponentFactoryResolver,
-	ChangeDetectionStrategy,
-	Compiler
+	ChangeDetectionStrategy
 } from '@angular/core';
 import { Router, ActivatedRoute } from "@angular/router";
 import { Subscription } from "rxjs/Rx"
@@ -40,6 +34,8 @@ import { Logger } from "../../shared/Logger";
 import { TextConverter } from "../../shared/Converters/TextConverter";
 import { NavbarService } from "../../service/navbar.service";
 import { SettingsService } from "../../service/settings.service";
+import { ModalService } from "../../service/modal.service";
+import { SubscriptionManager } from "../../shared/SubscriptionManager";
 
 @Component({
 	selector       : 'app-transcription',
@@ -49,9 +45,8 @@ import { SettingsService } from "../../service/settings.service";
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit, AfterContentInit, OnChanges {
-	private subscriptions: Subscription[];
+	private subscrmanager: SubscriptionManager;
 
-	@ViewChild('modal') modal: ModalComponent;
 	@ViewChild('modal_shortcuts') modal_shortcuts: ModalComponent;
 	@ViewChild('modal_rules') modal_rules: ModalComponent;
 	@ViewChild('modal_overview') overview: ModalComponent;
@@ -104,11 +99,21 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 				private keyMap: KeymappingService,
 				private changeDetecorRef: ChangeDetectorRef,
 				private navbarServ: NavbarService,
-				private settingsService: SettingsService) {
-		this.subscriptions = [];
+				private settingsService: SettingsService,
+				private modService: ModalService) {
+		this.subscrmanager = new SubscriptionManager();
+
 		setInterval(() => {
 			this.changeDetecorRef.markForCheck();
 		}, 2000);
+
+		this.subscrmanager.add(
+			this.modService.stoptranscriptionclick.subscribe(
+				() => {
+					this.abortTranscription();
+				}
+			)
+		);
 	}
 
 	get dat(): string {
@@ -128,14 +133,13 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
 	ngOnInit() {
 		if (this.audio.audiobuffer == null) {
-			let subscr: Subscription = this.audio.afterloaded.subscribe(this.afterAudioLoaded);
-			this.subscriptions.push(subscr);
+			this.subscrmanager.add(this.audio.afterloaded.subscribe(this.afterAudioLoaded));
 
 			if (this.app_settings.octra.logging == true) {
-				let subscr2: Subscription = this.uiService.afteradd.subscribe((elem) => {
-					this.sessService.save("logs", this.uiService.elementsToAnyArray());
-				});
-				this.subscriptions.push(subscr2);
+				this.subscrmanager.add(
+					this.uiService.afteradd.subscribe((elem) => {
+						this.sessService.save("logs", this.uiService.elementsToAnyArray());
+					}));
 			}
 			this.tranService.loadAudioFile();
 			this.initialized[ "audiolayer" ] = false;
@@ -172,6 +176,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
 	ngOnDestroy() {
 		this.tranService.destroy();
+		this.subscrmanager.destroy();
 	}
 
 	change() {

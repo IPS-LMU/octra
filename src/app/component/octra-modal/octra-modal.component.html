@@ -1,0 +1,51 @@
+<modal #login_invalid>
+    <modal-header>
+        <h4 class="modal-title">{{"modal.login.header" | translate}}</h4>
+    </modal-header>
+    <modal-body>
+        {{"modal.login.text" | translate}}
+    </modal-body>
+    <modal-footer>
+        <button type="button" class="btn btn-primary" (click)="login_invalid.dismiss()">
+            {{"general.OK" | translate}}
+        </button>
+    </modal-footer>
+</modal>
+
+<modal #transcription_delete>
+    <modal-header>
+        <h4 class="modal-title">{{"modal.transcription.delete.header" | translate}}</h4>
+    </modal-header>
+
+    <modal-body>
+        <div [innerHTML]="'modal.transcription.delete.text' | translate"></div>
+    </modal-body>
+    <modal-footer>
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="transcription_delete.dismiss()">
+            {{"general.abort" | translate}}
+        </button>
+        <button type="button" class="btn btn-danger"
+                (click)="transcription_delete.close();modService.newtranscriptionclick.emit()">
+            {{"modal.transcription.delete.delete old" | translate}}
+        </button>
+    </modal-footer>
+</modal>
+
+<modal #transcription_stop>
+    <modal-header>
+        <h4 class="modal-title">{{"modal.transcription.stop.header" | translate}}?</h4>
+    </modal-header>
+    <modal-body>
+        <div [innerHTML]="'modal.transcription.stop.text' | translate">
+        </div>
+    </modal-body>
+    <modal-footer>
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="transcription_stop.dismiss()">
+            {{"general.continue" | translate}}
+        </button>
+        <button type="button" class="btn btn-primary"
+                (click)="transcription_stop.close();modService.stoptranscriptionclick.emit()">
+            {{"general.quit" | translate}}
+        </button>
+    </modal-footer>
+</modal>

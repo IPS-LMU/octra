@@ -21,3 +21,4 @@ export * from './Logger';
 export * from './SessionFile';
 export * from './OCTRAnimations';
 export * from './SubscriptionManager';
+export * from './Converters';

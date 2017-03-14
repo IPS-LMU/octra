@@ -46,7 +46,7 @@ import {
 import { routing } from "./app.routes";
 import { TimespanPipe, ProcentPipe, SecondsPipe, LeadingNullPipe } from "./pipe";
 
-import { APIService, NavbarService, AudioService, DialogService, KeymappingService, SessionService } from "./service";
+import { APIService, NavbarService, AudioService, ModalService, KeymappingService, SessionService } from "./service";
 
 import { DeALoginGuard, LogoutGuard, MembersAreaGuard, TranscrSubmittedGuard, ALoginGuard } from "./guard";
 
@@ -54,6 +54,7 @@ import { AppComponent } from "./app.component";
 import { SettingsService } from "./service/settings.service";
 import { SettingsGuard } from "./guard/settings.activateguard";
 import { FastbarComponent } from './gui/fastbar/fastbar.component';
+import { OctraModalComponent } from './component/octra-modal/octra-modal.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
@@ -91,7 +92,8 @@ export function HttpLoaderFactory(http: Http) {
 		AlertComponent,
 		ReloadFileComponent,
 		DropZoneComponent,
-		FastbarComponent
+		FastbarComponent,
+		OctraModalComponent
 	],
 	imports     : [
 		BrowserModule,
@@ -119,7 +121,7 @@ export function HttpLoaderFactory(http: Http) {
 		AudioviewerConfig,
 		APIService,
 		DeALoginGuard,
-		DialogService,
+		ModalService,
 		KeymappingService,
 		LogoutGuard,
 		MembersAreaGuard,

@@ -1,21 +1,4 @@
 <app-alert #alert></app-alert>
-<modal #modal>
-    <modal-header>
-        <h4 class="modal-title">{{"general.stop transcription" | translate}}?</h4>
-    </modal-header>
-    <modal-body>
-        Möchten Sie die Transkription wirklich beenden?<br><br>Ihr Fortschritt wird lokal in diesem Browser
-        gespeichert. Um später fortzufahren, sollten Sie nicht den Browserverlauf löschen und ausschließlich diesen
-        Browser nutzen.
-    </modal-body>
-    <modal-footer>
-        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="modal.dismiss()">
-            {{"general.continue" | translate}}
-        </button>
-        <button type="button" class="btn btn-primary" (click)="abortTranscription()">{{"general.quit" | translate}}
-        </button>
-    </modal-footer>
-</modal>
 
 <modal #mdoal_overview id="overview">
     <modal-header>
@@ -249,7 +232,7 @@
     </div>
     <div id="bottom-nav">
         <div class="btn-group btn-group-justified" role="group" aria-label="...">
-            <a class="btn btn-default btn-raised" (click)="modal.open()"><span
+            <a class="btn btn-default btn-raised" (click)="modService.show('transcription_stop')"><span
                     class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span><span
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.quit" | translate}}</span></a>
             <a class="btn btn-default btn-raised"

@@ -1,39 +1,28 @@
 import {
 	Component,
-	Input,
-	trigger,
-	state,
-	style,
-	transition,
-	animate,
 	OnInit,
 	ViewChild,
 	OnDestroy,
-	ElementRef,
-	Output,
-	ChangeDetectionStrategy,
 	ChangeDetectorRef
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgForm, FormGroup, Form } from '@angular/forms';
+import { NgForm} from '@angular/forms';
 import { LoginService } from "../../service/login.service";
 import { SessionService } from "../../service/session.service";
 import { ComponentCanDeactivate } from "../../guard/login.deactivateguard";
-import { Observable, Subscription } from "rxjs/Rx";
-import { ModalComponent } from 'ng2-bs3-modal/ng2-bs3-modal';
+import { Observable} from "rxjs/Rx";
 import { Functions, FileSize } from "../../shared/Functions";
 import { APIService } from "../../service/api.service";
 import { BrowserCheck } from "../../shared/BrowserCheck";
 import { HostListener } from "@angular/core/src/metadata/directives";
-import { Logger } from "../../shared/Logger";
 import { SessionFile } from "../../shared/SessionFile";
 import { OCTRANIMATIONS } from "../../shared/OCTRAnimations";
 import { DropZoneComponent } from "../../component/drop-zone/drop-zone.component";
 import { isNullOrUndefined } from "util";
-import { isUndefined } from "util";
 import { SubscriptionManager } from "../../shared";
 import { Http } from "@angular/http";
 import { SettingsService } from "../../service/settings.service";
+import { ModalService } from "../../service/modal.service";
 
 @Component({
 	selector   : 'app-login',
@@ -43,8 +32,6 @@ import { SettingsService } from "../../service/settings.service";
 	animations : OCTRANIMATIONS
 })
 export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate {
-	@ViewChild('modal') modal: ModalComponent;
-	@ViewChild('agreement') agreement: ModalComponent;
 	@ViewChild('f') loginform: NgForm;
 	@ViewChild('dropzone') dropzone: DropZoneComponent;
 
@@ -63,10 +50,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 		return this.settingsService.app_settings;
 	}
 
-	close() {
-		this.modal.close();
-	}
-
 	valid = false;
 
 	member = {
@@ -82,9 +65,15 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 				private api: APIService,
 				private cd: ChangeDetectorRef,
 				private http:Http,
-				private settingsService:SettingsService
+				private settingsService:SettingsService,
+				private modService:ModalService
 	) {
 		this.subscrmanager = new SubscriptionManager();
+		this.subscrmanager.add(this.modService.newtranscriptionclick.subscribe(
+			()=>{
+				this.newTranscription();
+			}
+		));
 	}
 
 	ngOnInit() {
@@ -131,7 +120,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 						alert(res.error);
 				}
 				else {
-					this.modal.open();
+					this.modService.show("login_invalid");
 				}
 			}
 		));
@@ -186,7 +175,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	}
 
 	openAgreement() {
-		this.agreement.open();
+		//this.agreement.open();
 	}
 
 	getDropzoneFileString(file: File| SessionFile) {

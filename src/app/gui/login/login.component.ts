@@ -69,11 +69,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 				private modService:ModalService
 	) {
 		this.subscrmanager = new SubscriptionManager();
-		this.subscrmanager.add(this.modService.newtranscriptionclick.subscribe(
-			()=>{
-				this.newTranscription();
-			}
-		));
 	}
 
 	ngOnInit() {
@@ -183,7 +178,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 		return Functions.buildStr("{0} ({1} {2})", [ file.name, (Math.round(fsize.size * 100) / 100), fsize.label ]);
 	}
 
-	newTranscription() {
+	newTranscription = () =>{
 		if (this.dropzone.file != null) {
 			this.sessionService.clearSession();
 			this.sessionService.clearLocalStorage();
@@ -193,7 +188,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 			this.sessionService.offline = true;
 			this.navigate();
 		}
-	}
+	};
 
 	getSessionFile(file: File) {
 		return new SessionFile(
@@ -227,5 +222,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 		}
 
 		return result;
+	}
+
+	test(){
+		alert("OK");
 	}
 }

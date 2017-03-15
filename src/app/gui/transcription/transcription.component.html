@@ -232,7 +232,8 @@
     </div>
     <div id="bottom-nav">
         <div class="btn-group btn-group-justified" role="group" aria-label="...">
-            <a class="btn btn-default btn-raised" (click)="modService.show('transcription_stop')"><span
+            <a class="btn btn-default btn-raised"
+               (click)="modService.show('transcription_stop', '', {ok: abortTranscription})"><span
                     class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span><span
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.quit" | translate}}</span></a>
             <a class="btn btn-default btn-raised"

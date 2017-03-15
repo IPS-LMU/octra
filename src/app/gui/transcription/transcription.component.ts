@@ -106,14 +106,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		setInterval(() => {
 			this.changeDetecorRef.markForCheck();
 		}, 2000);
-
-		this.subscrmanager.add(
-			this.modService.stoptranscriptionclick.subscribe(
-				() => {
-					this.abortTranscription();
-				}
-			)
-		);
 	}
 
 	get dat(): string {
@@ -162,9 +154,9 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		jQuery.material.init();
 	}
 
-	abortTranscription() {
+	abortTranscription = () => {
 		this.router.navigate([ '/logout' ]);
-	}
+	};
 
 	ngAfterContentInit() {
 	}

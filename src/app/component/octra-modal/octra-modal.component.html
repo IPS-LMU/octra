@@ -25,7 +25,7 @@
             {{"general.abort" | translate}}
         </button>
         <button type="button" class="btn btn-danger"
-                (click)="transcription_delete.close();modService.newtranscriptionclick.emit()">
+                (click)="transcription_delete.close();functions.ok()">
             {{"modal.transcription.delete.delete old" | translate}}
         </button>
     </modal-footer>
@@ -44,7 +44,7 @@
             {{"general.continue" | translate}}
         </button>
         <button type="button" class="btn btn-primary"
-                (click)="transcription_stop.close();modService.stoptranscriptionclick.emit()">
+                (click)="transcription_stop.close();functions.ok()">
             {{"general.quit" | translate}}
         </button>
     </modal-footer>

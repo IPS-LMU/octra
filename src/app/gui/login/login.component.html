@@ -61,12 +61,14 @@
                         <span *ngIf="dropzone.file != null && (getFileStatus() != 'start')"><span
                                 class="text-danger">{{ "dropzone.file selected" | translate:{file_label: getDropzoneFileString(dropzone.file)} }}</span></span>
                     </app-drop-zone>
-                    <input *ngIf="getFileStatus() != 'new'" [disabled]="!(getFileStatus() == 'start')" type="submit" id="offline-submit"
+                    <input *ngIf="getFileStatus() != 'new'" [disabled]="!(getFileStatus() == 'start')" type="submit"
+                           id="offline-submit"
                            class="btn btn-raised btn-primary" value="{{'general.start transcription' | translate}}"
                            (click)="onOfflineSubmit()"/>
 
                     <input *ngIf="getFileStatus() == 'new'" id="offline-delete-btn"
-                           class="btn btn-raised btn-danger" (click)="modService.show('transcription_delete')"
+                           class="btn btn-raised btn-danger"
+                           (click)="modService.show('transcription_delete', '', {ok: newTranscription})"
                            value="{{'general.start new transcription' |translate}}"/>
                 </div>
             </section>

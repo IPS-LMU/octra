@@ -17,11 +17,15 @@ export class OctraModalComponent implements OnInit, OnDestroy {
 	@ViewChild("transcription_delete") transcription_delete: ModalComponent;
 	@ViewChild("transcription_stop") transcription_stop: ModalComponent;
 
+	private functions:any;
+
 	ngOnInit() {
 		this.subscrmanager = new SubscriptionManager();
 
 		this.subscrmanager.add(this.modService.showmodal.subscribe(
 			(result: any) => {
+				this.functions = result.functions;
+
 				switch(result.type){
 					case("login_invalid"):
 						this.login_invalid.open();

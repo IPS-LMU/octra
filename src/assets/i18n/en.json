@@ -6,7 +6,7 @@
     "open": "Open",
     "delete": "Delete",
     "OK": "OK",
-    "start transcription": "Start transcription",
+    "start transcription": "Continue transcription",
     "start new transcription": "Start new transcription",
     "finish transcription": "Finish transcription",
     "stop transcription": "Stop transcription",
@@ -26,7 +26,9 @@
     "shortcuts audioplayer": "Audioplayer shortcuts",
     "shortcuts top signaldisplay": "Shortcuts of the signaldisplay on the top",
     "shortcuts down signaldisplay": "Shortcuts of the signaldisplay on the bottom",
-    "shortcuts 2D-Editor": "Shortcuts of the 2D-Editor"
+    "shortcuts 2D-Editor": "Shortcuts of the 2D-Editor",
+    "wanted": "Wanted",
+    "unknown": "unknown"
   },
   "interfaces": {
     "simple editor": "Editor without signaldisplay",
@@ -42,7 +44,7 @@
       },
       "stop": {
         "header": "Stop Transcription",
-        "text": "Do you really want to stop the transcription?<br><br>Your proceedings have been saved in your Browser. If you want to continue later you do not have to delete the browser cache. Please use the same browser as at this moment."
+        "text": "Do you really want to stop the transcription?<br><br>Your proceedings have been saved in your Browser. If you want to continue later you do not have to delete the browser cache. Please use the same browser as in this moment."
       }
     },
     "login": {
@@ -72,5 +74,11 @@
   },
   "browser": {
     "invalid": "<b>Your browser is not compatible</b>. Please use one of the these browsers:"
+  },
+  "reload-file": {
+    "header": "Reload audio file",
+    "text": "This application was closed or refreshed before. Please select the same audio file again. After that you can continue your work.",
+    "file not supported": "Type of file is '{{type}}' and not supported.",
+    "another file selected": "Another file selected. Please select the same file as before or start a new transcription.\n\nWanted: '{{file}}'"
   }
 }

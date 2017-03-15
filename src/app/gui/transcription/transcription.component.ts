@@ -15,8 +15,7 @@ import {
 	ChangeDetectorRef,
 	ChangeDetectionStrategy
 } from '@angular/core';
-import { Router, ActivatedRoute } from "@angular/router";
-import { Subscription } from "rxjs/Rx"
+import { Router} from "@angular/router";
 import { AudioService } from "../../service/audio.service";
 import { UserInteractionsService } from "../../service/userInteractions.service";
 import { TranscriptionService } from "../../service/transcription.service";
@@ -27,11 +26,8 @@ import { KeymappingService } from "../../service/keymapping.service";
 import { AudioplayerGUIComponent } from "../audioplayer-gui/audioplayer-gui.component";
 import { BrowserInfo } from "../../shared/BrowserInfo";
 import { StatisticElem } from "../../shared/StatisticElement";
-import { AudioplayerComponent } from "../../component/audioplayer/audioplayer.component";
 import { AlertComponent } from "../../component/alert/alert.component";
 import { MessageService } from "../../service/message.service";
-import { Logger } from "../../shared/Logger";
-import { TextConverter } from "../../shared/Converters/TextConverter";
 import { NavbarService } from "../../service/navbar.service";
 import { SettingsService } from "../../service/settings.service";
 import { ModalService } from "../../service/modal.service";
@@ -50,15 +46,8 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	@ViewChild('modal_shortcuts') modal_shortcuts: ModalComponent;
 	@ViewChild('modal_rules') modal_rules: ModalComponent;
 	@ViewChild('modal_overview') overview: ModalComponent;
-	@ViewChild('audioplayer') audioplayergui: AudioplayerGUIComponent;
-	@ViewChild('test') test: ViewContainerRef;
-	@ViewChild('alert') alert: AlertComponent;
-	@ViewChildren('audioplayer', { read: ViewContainerRef }) viewAudioPlayerRefs: QueryList<AudioplayerGUIComponent>;
-
-	@Output() doIt = new EventEmitter<string>();
 
 	private initialized: any = {};
-
 	private viewinitialized = false;
 
 	get help_url(): string {

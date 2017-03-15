@@ -1,12 +1,12 @@
-import { Component, OnInit, ViewChild, Output } from '@angular/core';
+import { Component, OnInit, ViewChild} from '@angular/core';
 import { SessionService } from "../../service/session.service";
 import { SessionFile } from "../../shared/SessionFile";
 import { FileSize, Functions } from "../../shared/Functions";
 import { Router } from "@angular/router";
-import { ModalComponent } from "ng2-bs3-modal/components/modal";
 import { TranscriptionService } from "../../service/transcription.service";
 import { DropZoneComponent } from "../../component/drop-zone/drop-zone.component";
-import { isNullOrUndefined } from "util";
+import { ModalService } from "../../service/modal.service";
+import { TranslateService } from "@ngx-translate/core";
 
 @Component({
 	selector   : 'app-reload-file',
@@ -14,17 +14,15 @@ import { isNullOrUndefined } from "util";
 	styleUrls  : [ './reload-file.component.css' ]
 })
 export class ReloadFileComponent implements OnInit {
-	@ViewChild("modal_leave") modal_leave: ModalComponent;
-	@ViewChild("modal_delete") modal_delete: ModalComponent;
-	@ViewChild("modal_error") modal_error: ModalComponent;
 	@ViewChild("dropzone") dropzone: DropZoneComponent;
 
-	private error:string = "";
-
+	private error: string = "";
 
 	constructor(private router: Router,
 				private sessServ: SessionService,
-				private transcrServ: TranscriptionService) {
+				private transcrServ: TranscriptionService,
+				private modService: ModalService,
+				private langService: TranslateService) {
 	}
 
 	get sessionfile(): SessionFile {
@@ -38,17 +36,16 @@ export class ReloadFileComponent implements OnInit {
 		this.router.navigate([ 'user' ]);
 	}
 
-	//TODO A module for dropzone!
 	getDropzoneFileString(file: File | SessionFile) {
 		let fsize: FileSize = Functions.getFileSize(file.size);
 		return Functions.buildStr("{0} ({1} {2})", [ file.name, (Math.round(fsize.size * 100) / 100), fsize.label ]);
 	}
 
-	abortTranscription() {
+	abortTranscription = () => {
 		this.router.navigate([ '/logout' ]);
-	}
+	};
 
-	onNewTranscription() {
+	newTranscription = () => {
 		this.sessServ.sessionfile = this.getSessionFile(this.dropzone.file);
 		this.sessServ.file = this.dropzone.file;
 
@@ -57,10 +54,10 @@ export class ReloadFileComponent implements OnInit {
 
 		this.sessServ.offline = true;
 		this.navigate();
-	}
+	};
 
 	onOfflineSubmit = () => {
-		let type: string = (this.sessServ.sessionfile.type) ? this.sessServ.sessionfile.type : "unbekannt";
+		let type: string = (this.sessServ.sessionfile.type) ? this.sessServ.sessionfile.type : this.langService.instant("general.unknown");
 
 		if (this.dropzone.file != null && this.sessServ.sessionfile != null && (type == "audio/wav" || type == "audio/x-wav")) {
 			if (
@@ -68,7 +65,9 @@ export class ReloadFileComponent implements OnInit {
 				|| this.dropzone.file.type != this.sessServ.sessionfile.type
 				|| this.dropzone.file.size != this.sessServ.sessionfile.size
 			) {
-				this.showErrorMessage("Es wurde eine andere Datei ausgewählt. Bitte wähle die gleiche Datei aus wie zuvor oder beginne eine neue Transkription.\n\nGesucht wird die Datei '" + this.getDropzoneFileString(this.sessServ.sessionfile) + "'");
+				this.showErrorMessage(this.langService.instant("reload-file.another file selected",
+					{ file: this.getDropzoneFileString(this.sessServ.sessionfile) }
+				));
 			}
 			else {
 				//navigate
@@ -80,15 +79,14 @@ export class ReloadFileComponent implements OnInit {
 			}
 		}
 		else {
-			this.showErrorMessage("Die Datei ist vom Typ '" + type + "' und wird nicht unterstützt.");
+			this.showErrorMessage(this.langService.instant("reload-file.file not supported", { type: type }));
 		}
 	};
 
-	private showErrorMessage(err:string){
+	private showErrorMessage(err: string) {
 		this.error = err;
-		this.modal_error.open();
+		this.modService.show("error", err, null);
 	}
-
 
 	getSessionFile(file: File) {
 		return new SessionFile(
@@ -97,18 +95,5 @@ export class ReloadFileComponent implements OnInit {
 			file.lastModifiedDate,
 			file.type
 		);
-	}
-
-	getFileStatus(): string {
-		if (!isNullOrUndefined(this.dropzone.file) && (this.dropzone.file.type == "audio/wav" || this.dropzone.file.type == "audio/x-wav")) {
-			//check conditions
-			if (this.sessServ.sessionfile == null || this.dropzone.file.name == this.sessServ.sessionfile.name) {
-				return "start";
-			} else{
-				return "new";
-			}
-		}
-
-		return "unknown";
 	}
 }

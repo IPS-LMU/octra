@@ -6,7 +6,7 @@
     "open": "Öffnen",
     "delete": "Löschen",
     "OK": "OK",
-    "start transcription": "Transkription beginnen",
+    "start transcription": "Transkription fortsetzen",
     "start new transcription": "Neue Transkription beginnen",
     "finish transcription": "Transkription fertigstellen",
     "stop transcription": "Transkription beenden",
@@ -26,7 +26,9 @@
     "shortcuts audioplayer": "Tastenkombinationen des Audioplayers",
     "shortcuts top signaldisplay": "Tastenkombinationen des oberen Signaldsiplays",
     "shortcuts down signaldisplay": "Tastenkombinationen des unteren Signaldsiplays",
-    "shortcuts 2D-Editor": "Tastenkombinationen des 2D-Editors"
+    "shortcuts 2D-Editor": "Tastenkombinationen des 2D-Editors",
+    "wanted": "Gesucht wird",
+    "unknown": "unbekannt"
   },
   "interfaces": {
     "simple editor": "Editor ohne Signaldisplay",
@@ -72,5 +74,11 @@
   },
   "browser": {
     "invalid": "<b>Dein Browser ist nicht kompatibel</b>. Nutze bitte einen der folgenden Browser:"
+  },
+  "reload-file": {
+    "header": "Datei erneut einlesen",
+    "text": "Die Seite wurde zuvor geschlossen oder erneut geladen. Bitte wählen Sie erneut eine Audiodatei aus um sie einlesen zu lassen. Nach dem Einlesen können Sie ihre Arbeit fortsetzen.",
+    "file not supported": "Die Datei ist vom Typ '{{type}}' und wird nicht unterstützt.",
+    "another file selected": "Es wurde eine andere Datei ausgewählt. Bitte wähle die gleiche Datei aus wie zuvor oder beginne eine neue Transkription.\n\nGesucht wird die Datei '{{file}}'"
   }
 }

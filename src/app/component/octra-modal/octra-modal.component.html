@@ -25,7 +25,7 @@
             {{"general.abort" | translate}}
         </button>
         <button type="button" class="btn btn-danger"
-                (click)="transcription_delete.close();functions.ok()">
+                (click)="transcription_delete.close();data.functions.ok()">
             {{"modal.transcription.delete.delete old" | translate}}
         </button>
     </modal-footer>
@@ -44,8 +44,19 @@
             {{"general.continue" | translate}}
         </button>
         <button type="button" class="btn btn-primary"
-                (click)="transcription_stop.close();functions.ok()">
+                (click)="transcription_stop.close();data.functions.ok();">
             {{"general.quit" | translate}}
+        </button>
+    </modal-footer>
+</modal>
+
+<modal #error>
+    <modal-body>
+        <p style="text-align:center;color:red;">{{(data) ? data.text : ""}}</p>
+    </modal-body>
+    <modal-footer>
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="error.dismiss()">
+            {{"general.OK" |translate}}
         </button>
     </modal-footer>
 </modal>

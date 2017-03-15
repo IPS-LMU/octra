@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild, EventEmitter } from '@angular/
 import { SubscriptionManager } from "../../shared/SubscriptionManager";
 import { ModalComponent } from "ng2-bs3-modal/components/modal";
 import { ModalService } from "../../service/modal.service";
+import { isNullOrUndefined } from "util";
 
 @Component({
 	selector   : 'app-octra-modal',
@@ -16,27 +17,22 @@ export class OctraModalComponent implements OnInit, OnDestroy {
 	@ViewChild("login_invalid") login_invalid: ModalComponent;
 	@ViewChild("transcription_delete") transcription_delete: ModalComponent;
 	@ViewChild("transcription_stop") transcription_stop: ModalComponent;
+	@ViewChild("error") error: ModalComponent;
 
-	private functions:any;
+	private data: any;
 
 	ngOnInit() {
 		this.subscrmanager = new SubscriptionManager();
 
+
 		this.subscrmanager.add(this.modService.showmodal.subscribe(
 			(result: any) => {
-				this.functions = result.functions;
+				this.data = result;
 
-				switch(result.type){
-					case("login_invalid"):
-						this.login_invalid.open();
-						break;
-					case("transcription_delete"):
-						this.transcription_delete.open();
-						break;
-					case("transcription_stop"):
-						this.transcription_stop.open();
-						break;
+				if (!isNullOrUndefined(result.type)) {
+					this[ result.type ].open();
 				}
+				else throw "modal function not supported";
 			}));
 	}
 

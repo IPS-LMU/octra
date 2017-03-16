@@ -1,6 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
 import { APIService } from "./service/api.service";
-import { AppConfigValidator } from "./validator/AppConfigValidator";
 import { TranslateService } from "@ngx-translate/core";
 import { SessionService } from "./service/session.service";
 import { SettingsService } from "./service/settings.service";
@@ -15,7 +14,7 @@ import { isUndefined } from "util";
 })
 
 export class AppComponent implements OnDestroy {
-	version: string = "1.0.5";
+	version: string = "1.0.6";
 
 	private subscrmanager: SubscriptionManager;
 

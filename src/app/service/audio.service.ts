@@ -1,15 +1,18 @@
-import { Injectable, Output, EventEmitter } from '@angular/core';
-import { Http, Headers, Response, RequestOptions, ResponseContentType } from '@angular/http';
+import { Injectable, EventEmitter } from '@angular/core';
+import { Http, Response, RequestOptions, ResponseContentType } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
 import { AudioTime } from "../shared/AudioTime";
-import { Logger } from "../shared/Logger";
-import { EventTargetLike } from "rxjs/observable/FromEventObservable";
 import { decodeAudioFile } from "browser-signal-processing/ts/browser-signal-processing/browser-api/format-conversion";
 
 import { isNullOrUndefined } from "util";
 
 @Injectable()
 export class AudioService {
+	// REMARKS
+	// ALL time relevant variables have to be in samples which
+	// is the smallest unit and needed for precision
+	// It would be the best if you use the AudioTime class
+
 	set audiobuffer(value: AudioBuffer) {
 		this._audiobuffer = value;
 	}
@@ -17,12 +20,6 @@ export class AudioService {
 	get state(): string {
 		return this._state;
 	}
-
-	// REMARKS
-	// ALL time relevant variables have to be in samples which
-	// is the smallest unit and needed for precision
-	// It would be the best if you use the AudioTime class
-
 
 	get duration(): AudioTime {
 		return this._duration;
@@ -129,7 +126,19 @@ export class AudioService {
 		return this._audiobuffer.sampleRate;
 	}
 
-	//varaibles needed for initializing audio
+	set javascriptNode(value: any) {
+		this._javascriptNode = value;
+	}
+
+	get javascriptNode(): any {
+		return this._javascriptNode;
+	}
+
+	set paused(value: boolean) {
+		this._paused = value;
+	}
+
+	//variables needed for initializing audio
 	private _audiocontext: AudioContext = null;
 	private _audiobuffer: AudioBuffer = null;
 	private _source: AudioBufferSourceNode = null;
@@ -146,18 +155,6 @@ export class AudioService {
 	private _state: string = "stopped";
 
 	private _javascriptNode = null;
-
-	set javascriptNode(value: any) {
-		this._javascriptNode = value;
-	}
-
-	get javascriptNode(): any {
-		return this._javascriptNode;
-	}
-
-	set paused(value: boolean) {
-		this._paused = value;
-	}
 
 	private _paused: boolean = false;
 	private _stepbackward = false;

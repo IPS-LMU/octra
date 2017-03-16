@@ -25,7 +25,8 @@ import {
 	ModalService
 } from "../../service";
 
-import { BrowserInfo, StatisticElem, SubscriptionManager} from "../../shared";
+import { BrowserInfo, StatisticElem, SubscriptionManager } from "../../shared";
+import { Logger } from "../../shared/Logger";
 
 @Component({
 	selector       : 'app-transcription',
@@ -43,6 +44,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
 	private initialized: any = {};
 	private viewinitialized = false;
+	private saving = "";
 
 	get help_url(): string {
 		if (this.sessService.Interface === "audioplayer") {
@@ -86,6 +88,18 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 				private modService: ModalService) {
 		this.subscrmanager = new SubscriptionManager();
 
+		this.subscrmanager.add(this.sessService.saving.subscribe(
+			(saving) => {
+				if (saving) {
+					this.saving = "Saving...";
+				}
+				else {
+					setTimeout(() => {
+						this.saving = "";
+					}, 1000);
+				}
+			}
+		));
 		setInterval(() => {
 			this.changeDetecorRef.markForCheck();
 		}, 2000);

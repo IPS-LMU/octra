@@ -46,3 +46,9 @@
 #rules td{
     height:25px;
 }
+
+#saving{
+    position:absolute;
+    right:0;
+    margin-right:5px;
+}

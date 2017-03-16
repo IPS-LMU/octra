@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { SessionStorage, LocalStorage, SessionStorageService, LocalStorageService } from 'ng2-webstorage';
 import { SessionFile } from "../shared/SessionFile";
 
@@ -102,6 +102,7 @@ export class SessionService {
 	private login: boolean;
 
 	public file:File;
+	public saving:EventEmitter<boolean> = new EventEmitter<boolean>();
 
 	get SessionKey(): string {
 		return this.session_key;
@@ -234,6 +235,7 @@ export class SessionService {
 	}
 
 	public save(key: string, value: any): boolean {
+		this.saving.emit(true);
 		switch (key) {
 			case "transcription":
 				this.localStr.store(key, value);
@@ -247,6 +249,7 @@ export class SessionService {
 			default:
 				return false; //if key not found return false
 		}
+		this.saving.emit(false);
 		return true;
 	}
 }

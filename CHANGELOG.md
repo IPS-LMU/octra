@@ -1,5 +1,21 @@
 # Change Log
 
+## [v1.0.5](https://github.com/IPS-LMU/octra/tree/v1.0.5) (2017-03-16)
+[Full Changelog](https://github.com/IPS-LMU/octra/compare/v1.0.4...v1.0.5)
+
+**Implemented enhancements:**
+
+- show icon that displays OCTRA is saving now. [\#10](https://github.com/IPS-LMU/octra/issues/10)
+- add list of supported languages in config.json [\#9](https://github.com/IPS-LMU/octra/issues/9)
+- tool-bar: set glyphicons and apply responsive design [\#8](https://github.com/IPS-LMU/octra/issues/8)
+- upgrade angular-cli version to 1.0.0-rc.1 [\#7](https://github.com/IPS-LMU/octra/issues/7)
+
+**Fixed bugs:**
+
+- reload-file.component: allow valid file formats only [\#13](https://github.com/IPS-LMU/octra/issues/13)
+- exported file name does not contain the complete name of the original file [\#11](https://github.com/IPS-LMU/octra/issues/11)
+- language selection not visible after new session [\#4](https://github.com/IPS-LMU/octra/issues/4)
+
 ## [v1.0.4](https://github.com/IPS-LMU/octra/tree/v1.0.4) (2017-03-08)
 **Implemented enhancements:**
 

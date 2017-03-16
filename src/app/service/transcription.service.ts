@@ -205,7 +205,7 @@ export class TranscriptionService {
 				let src = this.app_settings.audio_server.url + this.sessServ.audio_url;
 				//extract filename
 				this.filename = this.sessServ.audio_url.substr(this.sessServ.audio_url.lastIndexOf("/") + 1);
-				this.filename = this.filename.substr(0, this.filename.lastIndexOf(".") - 1);
+				this.filename = this.filename.substr(0, this.filename.lastIndexOf("."));
 
 				this.subscrmanager.add(this.audio.afterloaded.subscribe((result) => {
 					this.last_sample = this.audio.duration.samples;
@@ -221,7 +221,7 @@ export class TranscriptionService {
 			else {
 				//offline mode
 				this.filename = this.sessServ.file.name;
-				this.filename = this.filename.substr(0, this.filename.lastIndexOf(".") - 1);
+				this.filename = this.filename.substr(0, this.filename.lastIndexOf("."));
 
 				this.subscrmanager.add(this.audio.afterloaded.subscribe((result) => {
 					this.last_sample = this.audio.duration.samples;

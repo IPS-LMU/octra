@@ -23,6 +23,7 @@
     "@angular/platform-browser": "^2.4.5",
     "@angular/platform-browser-dynamic": "^2.4.5",
     "@angular/router": "^3.4.5",
+    "@ng-bootstrap/ng-bootstrap": "^1.0.0-alpha.21",
     "@ngx-translate/core": "^6.0.0",
     "@ngx-translate/http-loader": "0.0.3",
     "@types/es6-promise": "0.0.32",

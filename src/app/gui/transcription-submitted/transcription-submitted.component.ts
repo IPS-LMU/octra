@@ -4,12 +4,8 @@ import { SessionService } from "../../service/session.service";
 import { TranscriptionService } from "../../service/transcription.service";
 import { UserInteractionsService } from "../../service/userInteractions.service";
 import { APIService } from "../../service/api.service";
-import { Subscribable } from "rxjs/Observable";
-import { Subscription } from "rxjs";
-import { Functions } from "../../shared/Functions";
 import { ViewChild } from "@angular/core/src/metadata/di";
 import { ModalComponent } from "ng2-bs3-modal/components/modal";
-import { Logger } from "../../shared/Logger";
 import { AudioService } from "../../service/audio.service";
 import { SubscriptionManager } from "../../shared";
 
@@ -37,7 +33,6 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
 	}
 
 	ngAfterViewInit() {
-
 	}
 
 	ngOnDestroy() {

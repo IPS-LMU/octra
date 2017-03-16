@@ -4,34 +4,28 @@ import {
 	OnDestroy,
 	AfterViewInit,
 	AfterContentInit,
-	ViewContainerRef,
-	QueryList,
-	ViewChildren,
-	Output,
 	ViewChild,
-	EventEmitter,
 	HostListener,
 	OnChanges,
 	ChangeDetectorRef,
 	ChangeDetectionStrategy
 } from '@angular/core';
-import { Router} from "@angular/router";
-import { AudioService } from "../../service/audio.service";
-import { UserInteractionsService } from "../../service/userInteractions.service";
-import { TranscriptionService } from "../../service/transcription.service";
-
-import { SessionService } from "../../service/session.service";
+import { Router } from "@angular/router";
 import { ModalComponent } from 'ng2-bs3-modal/ng2-bs3-modal';
-import { KeymappingService } from "../../service/keymapping.service";
-import { AudioplayerGUIComponent } from "../audioplayer-gui/audioplayer-gui.component";
-import { BrowserInfo } from "../../shared/BrowserInfo";
-import { StatisticElem } from "../../shared/StatisticElement";
-import { AlertComponent } from "../../component/alert/alert.component";
-import { MessageService } from "../../service/message.service";
-import { NavbarService } from "../../service/navbar.service";
-import { SettingsService } from "../../service/settings.service";
-import { ModalService } from "../../service/modal.service";
-import { SubscriptionManager } from "../../shared/SubscriptionManager";
+
+import {
+	AudioService,
+	UserInteractionsService,
+	TranscriptionService,
+	SessionService,
+	KeymappingService,
+	NavbarService,
+	SettingsService,
+	MessageService,
+	ModalService
+} from "../../service";
+
+import { BrowserInfo, StatisticElem, SubscriptionManager} from "../../shared";
 
 @Component({
 	selector       : 'app-transcription',

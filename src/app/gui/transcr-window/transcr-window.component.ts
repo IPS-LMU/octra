@@ -46,6 +46,10 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 		return this.settingsService.app_settings;
 	}
 
+	get responsive():boolean{
+		return this.settingsService.app_settings.octra.responsive.enabled;
+	}
+
 	get SelectedSegment(): Segment {
 		if (this.transcrService.selectedSegment.index > -1) {
 			return this.transcrService.segments.get(this.transcrService.selectedSegment.index);

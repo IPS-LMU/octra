@@ -1,6 +1,6 @@
 <app-alert #alert></app-alert>
 
-<modal #mdoal_overview id="overview">
+<modal #modal_overview id="overview">
     <modal-header>
         <h4 class="modal-title">{{"general.overview" | translate}}</h4>
     </modal-header>
@@ -8,8 +8,8 @@
         <app-transcr-overview></app-transcr-overview>
     </modal-body>
     <modal-footer>
-        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="modal.dismiss()">{{"general.close" |
-            translate}}
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="modal_overview.dismiss()">
+            {{"general.close" | translate}}
         </button>
     </modal-footer>
 </modal>
@@ -94,7 +94,7 @@
 
             (shortcutbtnclicked)="modal_shortcuts.open()"
             (guidelinesbtnclicked)="modal_rules.open()"
-            (overviewbtnclicked)="mdoal_overview.open()"
+            (overviewbtnclicked)="modal_overview.open()"
     ></app-fastbar>
 
     <modal #modal_rules id="rules">

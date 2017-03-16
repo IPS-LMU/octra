@@ -3,13 +3,16 @@
     "abort": "Abort",
     "continue": "Continue",
     "close": "Close",
-    "open": "Open",
+    "open": "Open {{value}}",
     "delete": "Delete",
+    "save": "Save",
+    "send now": "Send now",
     "OK": "OK",
     "start transcription": "Continue transcription",
     "start new transcription": "Start new transcription",
     "finish transcription": "Finish transcription",
     "stop transcription": "Stop transcription",
+    "check transcription": "Check transcription",
     "quit": "Quit",
     "login": "Login",
     "logout": "Logout",
@@ -28,7 +31,23 @@
     "shortcuts down signaldisplay": "Shortcuts of the signaldisplay on the bottom",
     "shortcuts 2D-Editor": "Shortcuts of the 2D-Editor",
     "wanted": "Wanted",
-    "unknown": "unknown"
+    "unknown": "unknown",
+    "please wait": "Please wait",
+    "logout successful": "Logout successfull",
+    "export data": "Export Data",
+    "export": "Export",
+    "text file": "Textdatei",
+    "statistics": "Statistics",
+    "segments total": "Total segments",
+    "segments transcribed": "Transcribed Segments",
+    "segments with breaks": "Segments with breaks",
+    "segments not transcribed": "Segments without content",
+    "segment previous": "previous segment",
+    "segment next": "next segment",
+    "transcript": "Transcript",
+    "transcription": "Transcription",
+    "timespan": "Timespan (s)",
+    "validation": "Validation"
   },
   "interfaces": {
     "simple editor": "Editor without signaldisplay",
@@ -45,6 +64,12 @@
       "stop": {
         "header": "Stop Transcription",
         "text": "Do you really want to stop the transcription?<br><br>Your proceedings have been saved in your Browser. If you want to continue later you do not have to delete the browser cache. Please use the same browser as in this moment."
+      },"send": {
+        "header": "Send transcription",
+        "text": "Clicking on 'Send now' your data will be sent to the Server to save it centrally. After this you can not change your data."
+      },"sending": {
+        "header": "Send transcription now...",
+        "text": "Your results are transmitted to the server... Please wait for the transmission to finish successfully."
       }
     },
     "login": {
@@ -73,12 +98,27 @@
     "file selected": "{{file_label}} selected"
   },
   "browser": {
-    "invalid": "<b>Your browser is not compatible</b>. Please use one of the these browsers:"
+    "invalid": "<b>Your browser is not compatible</b>. Please use one of the these browsers:",
+    "small window width": "<b>The width of this window is too small.</b> Please extend this window to hide this message."
   },
   "reload-file": {
     "header": "Reload audio file",
     "text": "This application was closed or refreshed before. Please select the same audio file again. After that you can continue your work.",
     "file not supported": "Type of file is '{{type}}' and not supported.",
     "another file selected": "Another file selected. Please select the same file as before or start a new transcription.\n\nWanted: '{{file}}'"
+  },
+  "logout":{
+    "successful text": "You are successfully logged out.",
+    "login again": "Login again"
+  },
+  "signal-gui":{
+    "selection text": "Please select one segment moving over one segment and press the {{value}} key."
+  },
+  "transcription-submit":{
+    "finish transcription": "You want to finish the transcription of this audiofile? Please make sure to keep following points:",
+    "boundaries": "If necessary: Did you set boundaries of segments exactly as possible?",
+    "breaks": "Did you check all segments for contents/breaks?",
+    "markers": "Did you set noise markers?",
+    "overview": "The next table shows an overview about your defined segments:"
   }
 }

@@ -1,4 +1,5 @@
 import { Component, OnInit, Output, Input } from '@angular/core';
+import { TranslateService } from "@ngx-translate/core";
 
 @Component({
 	selector   : 'app-loading',
@@ -7,9 +8,10 @@ import { Component, OnInit, Output, Input } from '@angular/core';
 })
 export class LoadingComponent implements OnInit {
 	@Output('loaded') loaded:boolean;
-	public text:string = "Bitte warten... Datei wird geladen";
+	public text:string = "";
 
-	constructor() {
+	constructor(private langService:TranslateService) {
+		this.text = langService.instant("general.please wait")+ "...";
 	}
 
 	ngOnInit() {

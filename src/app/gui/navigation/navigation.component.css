@@ -1,8 +1,6 @@
 .navbar ul li a:hover{
     cursor: pointer;
 }
-.navbar ul li{
-}
 
 .navbar-nav > li > a, .navbar-brand {
     padding-top:4px !important;

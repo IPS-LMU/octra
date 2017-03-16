@@ -12,8 +12,8 @@
                 {{getValidBrowsers()}}
             </p>
 
-            <p *ngIf="!apc.octra.responsive.enabled && !valid_size" class="warning">
-                <b>Die Fensterbreite ist zu klein.</b> Bitte vergrößern Sie dieses Fenster bis die Meldung verschwindet.
+            <p *ngIf="!apc.octra.responsive.enabled && !valid_size" class="warning" [innerHTML]="'browser.small window width' | translate">
+
             </p>
             <section>
                 <h4>{{ 'login.online mode' | translate}}</h4>

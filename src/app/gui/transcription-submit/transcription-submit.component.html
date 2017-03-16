@@ -1,48 +1,47 @@
 <modal #modal>
     <modal-header>
-        <h4 class="modal-title">Transkription senden</h4>
+        <h4 class="modal-title">{{"modal.transcription.send.header" | translate}}</h4>
     </modal-header>
     <modal-body>
-        Durch Klicken auf "Jetzt senden" werden Ihre Ergebnisse zentral gespeichert und können nicht mehr geändert
-        werden.
+        {{"modal.transcription.send.text" | translate}}
     </modal-body>
     <modal-footer>
-        <button type="button" class="btn btn-primary" (click)="modal.dismiss()">Abbrechen</button>
-        <button type="button" class="btn btn-default" (click)="onSendNowClick()">Jetzt senden</button>
+        <button type="button" class="btn btn-primary" (click)="modal.dismiss()">{{"general.abort" | translate}}</button>
+        <button type="button" class="btn btn-default" (click)="onSendNowClick()">{{"general.send now" | translate}}</button>
     </modal-footer>
 </modal>
 
 <modal #modal2>
     <modal-header>
-        <h4 class="modal-title">Transkription wird übertragen...</h4>
+        <h4 class="modal-title">{{"modal.transcription.sending.header" | translate}}</h4>
     </modal-header>
     <modal-body>
-        Ihre Ergebnisse werden übertragen... Bitte bis zum Abschluss der Übertragung warten...<br/><br/>
+        {{"modal.transcription.sending.text" | translate}}<br/><br/>
         <div style="color:red">{{send_error}}</div>
     </modal-body>
 </modal>
 
 <div id="transcr-submit" class="panel panel-default">
-    <h3>Transkription prüfen</h3>
+    <h3>{{"general.check transcription" | translate}}</h3>
     <br>
     <p>
-        Sie möchten die Transkription dieser Audiodatei abschließen? Stellen Sie bitte folgende Punkte sicher:
+        {{"transcription-submit.finish transcription" | translate}}
     </p>
     <ul>
         <li>
-            Falls verfügbar: Wurden Segmentgrenzen möglichst genau gesetzt?
+            {{"transcription-submit.boundaries" | translate}}
+            </li>
+        <li>
+            {{"transcription-submit.breaks" | translate}}
         </li>
         <li>
-            Wurden alle definierten Segmente auf Inhalt/Pausen überprüft?
-        </li>
-        <li>
-            Wurden Marker gesetzt?
+            {{"transcription-submit.markers" | translate}}
         </li>
     </ul>
 
     <br>
     <p>
-        Folgende Tabelle zeigt Ihnen einen Überblick über Ihre definierten Segmente:
+        {{"transcription-submit.overview" | translate}}
     </p>
     <app-transcr-overview></app-transcr-overview>
     <br><br>
@@ -148,17 +147,17 @@
         </section>
     </div>
     <div *ngIf="this.sessService.offline">
-        <h4>Daten exportieren</h4>
+        <h4>{{"general.export data"| translate}}</h4>
         <div class="row" style="padding:15px;">
             <div class="col-xs-6 export-button">
                 <a download="{{transcrService.filename}}.txt" [href]="sanitize(getURI('text'))">
                     <div><span
-                            class="glyphicon glyphicon-floppy-save export-glyphicon"></span><br/>Textdatei
+                            class="glyphicon glyphicon-floppy-save export-glyphicon"></span><br/>{{"general.text file"| translate}}
                     </div>
                 </a><br/>
                 <a class="export-a"
                    href="https://clarin.phonetik.uni-muenchen.de/BASWebServices/#/services/WebMAUSBasic"
-                   target="_blank">WebMAUS öffnen</a>
+                   target="_blank">{{"general.open"| translate:{value:"WebMAUS"} }}</a>
             </div>
             <div class="col-xs-6 export-button">
                 <a download="{{transcrService.filename}}_annot.json" [href]="sanitize(getURI('annotJSON'))">
@@ -168,7 +167,7 @@
                 </a><br/>
                 <a class="export-a"
                    href="http://ips-lmu.github.io/EMU-webApp/"
-                   target="_blank">EMU-Webapp öffnen</a>
+                   target="_blank">{{"general.open"| translate:{value:"EMU-Webapp"} }}</a>
             </div>
         </div>
         <button type="button" class="form-control" class="btn btn-raised"

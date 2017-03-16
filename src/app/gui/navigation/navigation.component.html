@@ -1,18 +1,19 @@
 <modal #modalexport>
     <modal-header>
-        <h4 class="modal-title">Daten exportieren</h4>
+        <h4 class="modal-title">{{"general.export data" | translate}}</h4>
     </modal-header>
     <modal-body>
         <div class="row">
             <div class="col-xs-6 export-button">
                 <a download="{{navbarServ.exportformats.filename}}.txt" [href]="sanitize(getURI('text'))">
                     <div (mouseenter)="navbarServ.onExportButtonClick('text')"><span
-                            class="glyphicon glyphicon-floppy-save"></span><br/>Textdatei
+                            class="glyphicon glyphicon-floppy-save"></span><br/>
+                        {{"general.text file" | translate}}
                     </div>
                 </a><br/>
                 <a class="export-a"
                    href="https://clarin.phonetik.uni-muenchen.de/BASWebServices/#/services/WebMAUSBasic"
-                   target="_blank">WebMAUS öffnen</a>
+                   target="_blank">{{"general.open" | translate:{value:"WebMAUS"} }}</a>
             </div>
             <div class="col-xs-6 export-button">
                 <a download="{{navbarServ.exportformats.filename}}_annot.json" [href]="sanitize(getURI('annotJSON'))">
@@ -22,12 +23,12 @@
                 </a><br/>
                 <a class="export-a"
                    href="http://ips-lmu.github.io/EMU-webApp/"
-                   target="_blank">EMU-Webapp öffnen</a>
+                   target="_blank">{{"general.open" | translate:{value:"EMU-WebApp"} }}</a>
             </div>
         </div>
     </modal-body>
     <modal-footer>
-        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="modalexport.dismiss()">Schließen
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="modalexport.dismiss()">{{"general.close" | translate}}
         </button>
     </modal-footer>
 </modal>
@@ -52,7 +53,7 @@
                     <a (mouseup)="coll();setInterface('signaldisplay')">{{"interfaces.linear editor" | translate}}</a>
                 </li>
                 <li *ngIf="sessService.LoggedIn && navbarServ.show_hidden"><a (mouseup)="coll();setInterface('overlay')">{{"interfaces.2D editor" | translate}}</a></li>
-                <li *ngIf="sessService.LoggedIn && navbarServ.show_hidden"><a (mouseup)="modalexport.open()">Export</a></li>
+                <li *ngIf="sessService.LoggedIn && navbarServ.show_hidden"><a (mouseup)="modalexport.open()">{{"general.export" | translate}} </a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">

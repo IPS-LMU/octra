@@ -71,8 +71,7 @@
            (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
 >
 </app-loupe>
-<div *ngIf="!segmentselected" id="editor-placeholder">
-   Bitte wählen Sie ein Segment aus, indem Sie mit der Maus über den Signalausschnitt fahren und die {{segmententer_shortc}} Taste betätigen.
+<div *ngIf="!segmentselected" id="editor-placeholder" [innerHTML]="'signal-gui.selection text' | translate:{value: segmententer_shortc}">
 </div>
 <app-transcr-editor #transcr
                     (onkeyup)="onTranscriptionChanged($event)"

@@ -3,8 +3,6 @@ import { Component } from '@angular/core';
 import { AudioService } from "../../service/audio.service";
 import { UserInteractionsService } from "../../service/userInteractions.service";
 import { TranscriptionService } from "../../service/transcription.service";
-import { MessageService } from "../../service/message.service";
-import { HostListener } from "@angular/core/src/metadata/directives";
 import { FileService } from "../../service/file.service";
 
 @Component({
@@ -15,6 +13,6 @@ import { FileService } from "../../service/file.service";
 })
 export class MembersAreaComponent{
 
-	constructor(private audio:AudioService) {
+	constructor() {
 	}
 }

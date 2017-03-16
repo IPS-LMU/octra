@@ -1,11 +1,11 @@
-<h4>Statistik</h4>
+<h4>{{"general.statistics" | translate}}</h4>
 <table class="table">
   <thead>
   <tr>
-    <th>Segmente insgesamt</th>
-    <th>Segmente transkribiert</th>
-    <th>Segmente mit Pausen</th>
-    <th>Ausgelassene Segmente</th>
+    <th>{{"general.segments total" | translate}}</th>
+    <th>{{"general.segments transcribed" | translate}}</th>
+    <th>{{"general.segments with breaks" | translate}}</th>
+    <th>{{"general.segments not transcribed" | translate}}</th>
   </tr>
   </thead>
   <tbody>
@@ -17,13 +17,13 @@
   </tr>
   </tbody>
 </table>
-<h4>Transkript</h4>
+<h4>{{"general.transcript" | translate}}</h4>
 <table class="table">
   <thead>
   <tr>
-    <th>Zeitspanne (s)</th>
-    <th>Transkription</th>
-    <th>Überprüfung auf Fehler</th>
+    <th>{{"general.timespan" | translate}}</th>
+    <th>{{"general.transcription" | translate}}</th>
+    <th>{{"general.validation" | translate}}</th>
   </tr>
   </thead>
   <tr *ngFor="let segment of segments; let i = index" [ngClass]="{success: (segment.transcript != '' && segment.transcript != 'P'), info: (segment.transcript == 'P'), danger: (segment.transcript == '')}">

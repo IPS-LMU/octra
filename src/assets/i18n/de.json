@@ -7,12 +7,14 @@
     "delete": "Löschen",
     "save": "Speichern",
     "send now": "Jetzt senden",
+    "back": "Zurück",
     "OK": "OK",
     "start transcription": "Transkription fortsetzen",
     "start new transcription": "Neue Transkription beginnen",
     "finish transcription": "Transkription fertigstellen",
     "stop transcription": "Transkription beenden",
     "check transcription": "Transkription überprüfen",
+    "send transcription": "Transkription senden",
     "quit": "Beenden",
     "login": "Anmelden",
     "logout": "Abmelden",
@@ -47,7 +49,16 @@
     "transcript": "Transkript",
     "transcription": "Transkription",
     "timespan": "Zeitspanne (s)",
-    "validation": "Validierung"
+    "validation": "Validierung",
+    "unintelligible": "unverständlich",
+    "less intelligible": "weniger verständlich",
+    "intelligible": "verständlich",
+    "very good intelligible": "sehr gut verständlich",
+    "quality of signal": "Qualität des Audiosignals",
+    "a lot of noises": "viele Störgeräusche",
+    "few noises": "wenige Störgeräusche",
+    "very few noises": "sehr wenige Störgeräusche",
+    "no noises": "keine Störgeräusche"
   },
   "interfaces": {
     "simple editor": "Editor ohne Signaldisplay",
@@ -119,6 +130,9 @@
     "boundaries": "Falls verfügbar: Wurden Segmentgrenzen möglichst genau gesetzt?",
     "breaks": "Wurden alle definierten Segmente auf Inhalt/Pausen überprüft?",
     "markers": "Wurden Marker gesetzt?",
-    "overview": "Folgende Tabelle zeigt Ihnen einen Überblick über Ihre definierten Segmente:"
+    "overview": "Folgende Tabelle zeigt Ihnen einen Überblick über Ihre definierten Segmente:",
+    "form fill out": "Bitte füllen Sie kurz das Formular aus",
+    "intelligibility of the speaker": "Sprachverständlichkeit des Sprechers",
+    "comment description": "Kurzer Kommentar (Anmerkungen zum Arbeitsablauf, Ladezeiten, Schwierigkeiten etc.)"
   }
 }

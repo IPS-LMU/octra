@@ -152,6 +152,7 @@ export class AudioviewerService extends AudioComponentService {
 
 		if (this.Settings.multi_line) {
 			this.AudioPxWidth = this.audio.duration.seconds * this.Settings.pixel_per_sec;
+			this.AudioPxWidth = (this.AudioPxWidth < innerWidth) ? innerWidth : this.AudioPxWidth;
 		}
 		else {
 			this.AudioPxWidth = innerWidth;

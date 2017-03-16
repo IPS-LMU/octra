@@ -1173,7 +1173,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 
 		//onlie resize if size has changed and resizing not in processing state
 		if (this.innerWidth !== this.oldInnerWidth) {
-			if (!this.Settings.multi_line) {
+			if (!this.Settings.multi_line || this.av.AudioPxWidth < this.innerWidth) {
 				this.av.AudioPxWidth = this.innerWidth;
 				this.av.audioTCalculator.audio_px_width = this.innerWidth;
 				let ratio = this.innerWidth / this.oldInnerWidth;

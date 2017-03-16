@@ -7,6 +7,7 @@ import { TranscriptionService } from "../../service/transcription.service";
 import { DropZoneComponent } from "../../component/drop-zone/drop-zone.component";
 import { ModalService } from "../../service/modal.service";
 import { TranslateService } from "@ngx-translate/core";
+import { isNullOrUndefined } from "util";
 
 @Component({
 	selector   : 'app-reload-file',
@@ -59,7 +60,7 @@ export class ReloadFileComponent implements OnInit {
 	onOfflineSubmit = () => {
 		let type: string = (this.sessServ.sessionfile.type) ? this.sessServ.sessionfile.type : this.langService.instant("general.unknown");
 
-		if (this.dropzone.file != null && this.sessServ.sessionfile != null && (type == "audio/wav" || type == "audio/x-wav")) {
+		if (this.dropzone.file != null && this.sessServ.sessionfile != null && this.validate(this.dropzone.file)) {
 			if (
 				this.dropzone.file.name != this.sessServ.sessionfile.name
 				|| this.dropzone.file.type != this.sessServ.sessionfile.type
@@ -94,6 +95,12 @@ export class ReloadFileComponent implements OnInit {
 			file.size,
 			file.lastModifiedDate,
 			file.type
+		);
+	}
+
+	validate(file:any):boolean{
+		return (!isNullOrUndefined(file)
+			&& (file.type == "audio/wav" || file.type == "audio/x-wav")
 		);
 	}
 }

@@ -25,14 +25,14 @@
                     </button>
                 </div>
                 <div class="btn-group" role="group">
-                    <button class="btn btn-default btn-raised btn-danger" [disabled]="dropzone.file == null"
+                    <button class="btn btn-default btn-raised btn-danger" [disabled]="!validate(dropzone.file)"
                             (click)="modService.show('transcription_delete', '', {ok: newTranscription})">
                         <span class="glyphicon glyphicon-file"></span> <span class="hidden-xs hidden-sm hidden-md">{{"general.start new transcription" | translate}}</span>
                     </button>
                 </div>
                 <div class="btn-group" role="group">
                     <button type="button" class="btn btn-primary btn-raised"
-                            [disabled]="!(dropzone.file != null && dropzone.file.name == sessionfile.name)"
+                            [disabled]="!(validate(dropzone.file) && dropzone.file.name == sessionfile.name)"
                             (click)="onOfflineSubmit()">
                         <span class="glyphicon glyphicon glyphicon-edit"></span> <span
                             class="hidden-xs hidden-sm hidden-md">{{"general.start transcription" | translate}}</span>

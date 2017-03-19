@@ -17,9 +17,21 @@ import { AudioviewerConfig } from "../config/av.config";
 
 @Injectable()
 export class AudioviewerService extends AudioComponentService {
+	get minmaxarray(): number[] {
+		return this._minmaxarray;
+	}
+
+	get zoomX(): number {
+		return this._zoomX;
+	}
+
+	get zoomY(): number {
+		return this._zoomY;
+	}
+
 	private _settings: AudioviewerConfig;
 
-	private subscrmanager:SubscriptionManager;
+	private subscrmanager: SubscriptionManager;
 
 	//LINES
 	private Lines: Line[] = [];
@@ -33,6 +45,10 @@ export class AudioviewerService extends AudioComponentService {
 	//AUDIO
 	private durtime: AudioTime = null;
 	private _channel: Float32Array = null;
+
+	private _zoomY: number = 1;
+	private _zoomX: number = 1;
+	private _minmaxarray: number[] = [];
 
 	public focused: boolean = false;
 
@@ -189,11 +205,96 @@ export class AudioviewerService extends AudioComponentService {
 		}
 	}
 
+
+	private calculateZoom(height: number, width: number, minmaxarray: number[]) {
+		if (this.Settings.justify_signal_height) {
+			//justify height to maximum top border
+			let max_zoom_x = 0;
+			let max_zoom_y = 0;
+			let timeline_height = (this.Settings.timeline.enabled) ? this.Settings.timeline.height : 0;
+			let max_zoom_y_min = height - timeline_height / 2;
+			let x_max = this.AudioPxWidth;
+
+			//get_max_signal_length
+			for (let i = 0; i <= x_max; i++) {
+				max_zoom_x = i;
+
+				if (isNaN(minmaxarray[ i ])) {
+					break;
+				}
+				max_zoom_y = Math.max(max_zoom_y, minmaxarray[ i ]);
+				max_zoom_y_min = Math.min(max_zoom_y_min, minmaxarray[ i ]);
+			}
+
+			if (max_zoom_y > 0) {
+				this._zoomY = (height - timeline_height) / ( max_zoom_y + Math.abs(max_zoom_y_min)) - 1;
+
+				this._zoomX = width / max_zoom_x;
+			}
+			else {
+				console.log("hä");
+			}
+		}
+		else {
+			this._zoomY = 1;
+		}
+	}
+
+	/**
+	 * computeDisplayData() generates an array of min-max pairs representing the
+	 * audio signal. The values of the array are float in the range -1 .. 1.
+	 * @param w
+	 * @param h
+	 * @param channel
+	 */
+	computeDisplayData(w, h, channel) {
+		w = Math.floor(w);
+		let min = 0,
+			max = 0,
+			min_maxarray = [],
+			len = channel.length,
+			val = 0,
+			offset = 0,
+			maxindex = 0;
+
+		let xZoom = len / w;
+
+		let yZoom = h / 2;
+
+		for (let i = 0; i < w; i++) {
+			offset = Math.round(i * xZoom);
+			min = channel [ offset ];
+			max = channel [ offset ];
+
+			if (isNaN(channel [ offset ]))
+				break;
+
+			if ((offset + xZoom) > len) {
+				maxindex = len;
+			}
+			else {
+				maxindex = Math.round(offset + xZoom);
+			}
+
+			for (let j = offset; j < maxindex; j++) {
+				val = channel[ j ];
+				max = Math.max(max, val);
+				min = Math.min(min, val);
+			}
+			min_maxarray.push(min * yZoom);
+			min_maxarray.push(max * yZoom);
+		}
+		this._minmaxarray = min_maxarray;
+	};
+
 	/**
 	 * after Channel was initialzed
 	 * @param innerWidth
 	 */
 	private afterChannelInititialized(innerWidth: number) {
+		this.computeDisplayData(this.AudioPxWidth / 2, this.Settings.height, this.channel);
+		this.calculateZoom(this.Settings.height, this.AudioPxWidth, this._minmaxarray);
+
 		this.updateLines(innerWidth);
 
 		this.current = new AudioTime(0, this.audio.samplerate);
@@ -341,7 +442,7 @@ export class AudioviewerService extends AudioComponentService {
 	 * addSegment() adds a boundary to the list of segments or removes the segment
 	 * @returns {any}
 	 */
-	public addSegment(): {type: string, seg_num: number, msg: {type: string, text: string}} {
+	public addSegment(): { type: string, seg_num: number, msg: { type: string, text: string } } {
 		let i = 0;
 		let line = this.last_line;
 		this.audioTCalculator.audio_px_width = this.audio_px_w;
@@ -487,7 +588,7 @@ export class AudioviewerService extends AudioComponentService {
 	 * @param innerWidth
 	 * @returns {{start: number, end: number}}
 	 */
-	public getRelativeSelectionByLine(line: Line, start_samples: number, end_samples: number, innerWidth: number): {start: number, end: number} {
+	public getRelativeSelectionByLine(line: Line, start_samples: number, end_samples: number, innerWidth: number): { start: number, end: number } {
 		let selection = this.selection;
 
 		if (selection) {
@@ -689,7 +790,7 @@ export class AudioviewerService extends AudioComponentService {
 	public moveCursor(direction: string, samples: number) {
 		let line = this.mousecursor.line;
 		if (samples > 0) {
-			if((direction === "left" || direction === "right") &&
+			if ((direction === "left" || direction === "right") &&
 				((this.mousecursor.timePos.samples >= this.Chunk.time.start.samples + samples && direction === "left") ||
 					(this.mousecursor.timePos.samples <= this.Chunk.time.end.samples - samples && direction === "right")
 				)) {

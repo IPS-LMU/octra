@@ -43,7 +43,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 	 *    - using 2 canvas for animations to implement double buffering by switching canvas visibility on and off
 	 */
 
-	subscrmanager: SubscriptionManager
+	subscrmanager: SubscriptionManager;
 
 	constructor(private audio: AudioService,
 				private av: AudioviewerService,
@@ -91,7 +91,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 	private anim: CanvasAnimation;
 
 	private drawing: boolean = false;
-	private minmaxarray: number[] = [];
 
 	public audioplaying: boolean = false;
 	private last_frame: boolean;
@@ -205,10 +204,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 	public update = (computeDisplayData?: boolean) => {
 		this.updateCanvasSizes();
 		if (this.av.channel) {
-			if (computeDisplayData)
-				this.computeDisplayData(this.av.AudioPxWidth / 2, this.Settings.height, this.av.channel);
 
-			for (var i = 0; i < this.av.LinesArray.length; i++) {
+			for (let i = 0; i < this.av.LinesArray.length; i++) {
 				this.drawSignal(i);
 
 				if (this.Settings.cropping != "none") {
@@ -253,53 +250,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	/**
-	 * computeDisplayData() generates an array of min-max pairs representing the
-	 * audio signal. The values of the array are float in the range -1 .. 1.
-	 * @param w
-	 * @param h
-	 * @param channel
-	 */
-	computeDisplayData(w, h, channel) {
-		w = Math.floor(w);
-		let min = 0,
-			max = 0,
-			min_maxarray = [],
-			len = channel.length,
-			val = 0,
-			offset = 0,
-			maxindex = 0;
-
-		let xZoom = len / w;
-
-		let yZoom = h / 2;
-
-		for (let i = 0; i < w; i++) {
-			offset = Math.round(i * xZoom);
-			min = channel [ offset ];
-			max = channel [ offset ];
-
-			if (isNaN(channel [ offset ]))
-				break;
-
-			if ((offset + xZoom) > len) {
-				maxindex = len;
-			}
-			else {
-				maxindex = Math.round(offset + xZoom);
-			}
-
-			for (let j = offset; j < maxindex; j++) {
-				val = channel[ j ];
-				max = Math.max(max, val);
-				min = Math.min(min, val);
-			}
-			min_maxarray.push(min * yZoom);
-			min_maxarray.push(max * yZoom);
-		}
-		this.minmaxarray = min_maxarray;
-	};
-
-	/**
 	 * updateCanvasSizes is needed to update the size of the canvas respective to window resizing
 	 */
 	updateCanvasSizes() {
@@ -341,8 +291,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 			let x_pos = line_num * this.innerWidth;
 			let x_max = line_obj.Size.width;
 
-			let zoomX = 1;
-			let zoomY = 1;
+			let zoomX = this.av.zoomX;
+			let zoomY = this.av.zoomY;
 
 			this.clearDisplay(line_num);
 
@@ -350,41 +300,10 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 
 			this.g_context.strokeStyle = this.Settings.data.color;
 			this.g_context.beginPath();
-			this.g_context.moveTo(line_obj.Pos.x, line_obj.Pos.y + midline - this.minmaxarray[ x_pos ]);
-
-			if (this.Settings.justifySignalHeight) {
-				//justify height to maximum top border
-				let max_zoom_x = 0;
-				let max_zoom_y = 0;
-				let max_zoom_y_min = line_obj.Size.height - timeline_height / 2;
-
-				//get_max_signal_length
-				for (var i = 0; i <= x_max; i++) {
-					max_zoom_x = i;
-
-					if (isNaN(this.minmaxarray[ i + x_pos ])) {
-						break;
-					}
-					max_zoom_y = Math.max(max_zoom_y, this.minmaxarray[ i + x_pos ]);
-					max_zoom_y_min = Math.min(max_zoom_y_min, this.minmaxarray[ i + x_pos ]);
-				}
-
-				if (max_zoom_y > 0) {
-					let max_zoom_y_new = max_zoom_y - max_zoom_y_min;
-
-
-					zoomY = max_zoom_y_new / (max_zoom_y - max_zoom_y_min);
-
-					while ((zoomY * max_zoom_y_new < line_obj.Size.height - timeline_height)) {
-						zoomY = max_zoom_y_new++ / (max_zoom_y - max_zoom_y_min);
-					}
-
-					zoomX = line_obj.Size.width / max_zoom_x;
-				}
-			}
+			this.g_context.moveTo(line_obj.Pos.x, line_obj.Pos.y + midline - this.av.minmaxarray[ x_pos ]);
 
 			for (let x = 0; x < x_max - 1; x++) {
-				this.g_context.lineTo(line_obj.Pos.x + (x * zoomX), line_obj.Pos.y + midline - (this.minmaxarray[ x + x_pos ] * zoomY));
+				this.g_context.lineTo(line_obj.Pos.x + (x * zoomX), line_obj.Pos.y + midline - (this.av.minmaxarray[ x + x_pos ] * zoomY));
 			}
 			this.g_context.stroke();
 

@@ -21,13 +21,13 @@
                     <button class="btn btn-default btn-raised"
                             (click)="modService.show('transcription_stop', '', {ok: abortTranscription})">
                         <span class="glyphicon glyphicon glyphicon-log-out"></span> <span
-                            class="hidden-xs hidden-sm hidden-md">{{"general.stop transcription" | translate}}</span>
+                            class="hidden-xs hidden-sm hidden-md">{{"transcription.stop" | translate}}</span>
                     </button>
                 </div>
                 <div class="btn-group" role="group">
                     <button class="btn btn-default btn-raised btn-danger" [disabled]="!validate(dropzone.file)"
                             (click)="modService.show('transcription_delete', '', {ok: newTranscription})">
-                        <span class="glyphicon glyphicon-file"></span> <span class="hidden-xs hidden-sm hidden-md">{{"general.start new transcription" | translate}}</span>
+                        <span class="glyphicon glyphicon-file"></span> <span class="hidden-xs hidden-sm hidden-md">{{"transcription.new" | translate}}</span>
                     </button>
                 </div>
                 <div class="btn-group" role="group">
@@ -35,7 +35,7 @@
                             [disabled]="!(validate(dropzone.file) && dropzone.file.name == sessionfile.name)"
                             (click)="onOfflineSubmit()">
                         <span class="glyphicon glyphicon glyphicon-edit"></span> <span
-                            class="hidden-xs hidden-sm hidden-md">{{"general.start transcription" | translate}}</span>
+                            class="hidden-xs hidden-sm hidden-md">{{"transcription.start" | translate}}</span>
                     </button>
                 </div>
             </div>

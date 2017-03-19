@@ -17,7 +17,7 @@
 <modal #modal_shortcuts>
     <modal-body>
         <div *ngIf="sessService.Interface == 'audioplayer'">
-            <h3>{{"general.shortcuts audioplayer" | translate}}</h3>
+            <h3>{{"modal.shortcuts.audioplayer" | translate}}</h3>
             <div class="table-responsive">
                 <table class="table table-hover">
                     <tbody>
@@ -32,7 +32,7 @@
         </div>
 
         <div *ngIf="(sessService.Interface == 'signaldisplay')">
-            <h3>{{"general.shortcuts top signaldisplay" | translate}}</h3>
+            <h3>{{"modal.shortcuts.top signaldisplay" | translate}}</h3>
             <div class="table-responsive">
                 <table class="table table-hover">
                     <tbody>
@@ -44,7 +44,7 @@
                     </tbody>
                 </table>
             </div>
-            <h3>{{"general.shortcuts down signaldisplay" | translate}}</h3>
+            <h3>{{"modal.shortcuts.down signaldisplay" | translate}}</h3>
             <div class="table-responsive">
                 <table class="table table-hover">
                     <tbody>
@@ -58,7 +58,7 @@
             </div>
         </div>
         <div *ngIf="(sessService.Interface == 'overlay')">
-            <h3>{{"general.shortcuts 2D-Editor" | translate}}</h3>
+            <h3>{{"modal.shortcuts.2D-Editor" | translate}}</h3>
             <div class="table-responsive">
                 <table class="table table-hover">
                     <tbody>
@@ -238,7 +238,7 @@
                     class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span><span
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.quit" | translate}}</span></a>
             <a class="btn btn-default btn-raised"
-               (click)="submitTranscription()"><span [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.finish transcription" | translate}}</span>
+               (click)="submitTranscription()"><span [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"transcription.finish" | translate}}</span>
                 <span
                         class="glyphicon glyphicon glyphicon-menu-right" aria-hidden="true"></span></a>
         </div>

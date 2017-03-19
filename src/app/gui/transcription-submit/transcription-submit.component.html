@@ -22,7 +22,7 @@
 </modal>
 
 <div id="transcr-submit" class="panel panel-default">
-    <h3>{{"general.check transcription" | translate}}</h3>
+    <h3>{{"transcription.check" | translate}}</h3>
     <br>
     <p>
         {{"transcription-submit.finish transcription" | translate}}
@@ -58,39 +58,39 @@
                         <div class="row">
                             <div class="col-xs-3">
                                 <div class="radio">
-                                    <label>{{"general.unintelligible" | translate}}
+                                    <label>{{"feedback.unintelligible" | translate}}
                                         <input type="radio" [(ngModel)]="feedback_data.quality_speaker"
                                                name="quality_speaker" value="unverstaendlich" required/></label>
                                 </div>
                             </div>
                             <div class="col-xs-3">
                                 <div class="radio">
-                                    <label>{{"general.less intelligible" | translate}}
+                                    <label>{{"feedback.less intelligible" | translate}}
                                         <input type="radio" [(ngModel)]="feedback_data.quality_speaker"
                                                name="quality_speaker" value="weniger verstaendlich" required/></label>
                                 </div>
                             </div>
                             <div class="col-xs-3">
                                 <div class="radio">
-                                    <label>{{"general.intelligible" | translate}}
+                                    <label>{{"feedback.intelligible" | translate}}
                                         <input type="radio" [(ngModel)]="feedback_data.quality_speaker"
                                                name="quality_speaker" value="verstaendlich" required/></label>
                                 </div>
                             </div>
                             <div class="col-xs-3">
                                 <div class="radio">
-                                    <label>{{"general.very good intelligible" | translate}}
+                                    <label>{{"feedback.very good intelligible" | translate}}
                                         <input type="radio" [(ngModel)]="feedback_data.quality_speaker"
                                                name="quality_speaker" value="klar" required/></label>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group"><label class="control-label">{{"general.quality of signal" | translate}}:</label>
+                    <div class="form-group"><label class="control-label">{{"feedback.quality of signal" | translate}}:</label>
                         <div class="row">
                             <div class="col-xs-3">
                                 <div class="radio">
-                                    <label>{{"general.a lot of noises" | translate}}
+                                    <label>{{"feedback.a lot of noises" | translate}}
                                         <input type="radio" [(ngModel)]="feedback_data.quality_audio"
                                                name="quality_audio"
                                                value="viele" required/></label>
@@ -98,7 +98,7 @@
                             </div>
                             <div class="col-xs-3">
                                 <div class="radio">
-                                    <label>{{"general.few noises" | translate}}
+                                    <label>{{"feedback.few noises" | translate}}
                                         <input type="radio" [(ngModel)]="feedback_data.quality_audio"
                                                name="quality_audio"
                                                value="wenig" required/></label>
@@ -106,7 +106,7 @@
                             </div>
                             <div class="col-xs-3">
                                 <div class="radio">
-                                    <label>{{"general.very few noises" | translate}}
+                                    <label>{{"feedback.very few noises" | translate}}
                                         <input type="radio" [(ngModel)]="feedback_data.quality_audio"
                                                name="quality_audio"
                                                value="sehr wenig" required/></label>
@@ -114,7 +114,7 @@
                             </div>
                             <div class="col-xs-3">
                                 <div class="radio">
-                                    <label>{{"general.no noises" | translate}}
+                                    <label>{{"feedback.no noises" | translate}}
                                         <input type="radio" [(ngModel)]="feedback_data.quality_audio"
                                                name="quality_audio"
                                                value="keine" required/></label>
@@ -137,7 +137,7 @@
                             <button type="submit" class="form-control" class="btn btn-primary btn-raised"
                                     style="position:relative;width:49%;margin-left:2%;" [disabled]="!fo.valid"
                                     name="send">
-                                <span>{{"general.send transcription" | translate}} </span><span class="glyphicon glyphicon-send"></span></button>
+                                <span>{{"transcription.send" | translate}} </span><span class="glyphicon glyphicon-send"></span></button>
                         </div>
                     </div>
                 </fieldset>

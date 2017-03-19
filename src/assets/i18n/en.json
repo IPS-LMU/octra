@@ -9,12 +9,6 @@
     "send now": "Send now",
     "back": "Back",
     "OK": "OK",
-    "start transcription": "Continue transcription",
-    "start new transcription": "Start new transcription",
-    "finish transcription": "Finish transcription",
-    "stop transcription": "Stop transcription",
-    "check transcription": "Check transcription",
-    "send transcription": "Send transcription",
     "quit": "Quit",
     "login": "Login",
     "logout": "Logout",
@@ -28,10 +22,6 @@
     "overview": "Overview",
     "help": "Help",
     "on focus only": "on focus only",
-    "shortcuts audioplayer": "Audioplayer shortcuts",
-    "shortcuts top signaldisplay": "Shortcuts of the signaldisplay on the top",
-    "shortcuts down signaldisplay": "Shortcuts of the signaldisplay on the bottom",
-    "shortcuts 2D-Editor": "Shortcuts of the 2D-Editor",
     "wanted": "Wanted",
     "unknown": "unknown",
     "please wait": "Please wait",
@@ -40,16 +30,28 @@
     "export": "Export",
     "text file": "Text file",
     "statistics": "Statistics",
-    "segments total": "Total segments",
-    "segments transcribed": "Transcribed Segments",
-    "segments with breaks": "Segments with breaks",
-    "segments not transcribed": "Segments without content",
-    "segment previous": "previous segment",
-    "segment next": "next segment",
     "transcript": "Transcript",
     "transcription": "Transcription",
     "timespan": "Timespan (s)",
-    "validation": "Validation",
+    "validation": "Validation"
+  },
+  "transcription":{
+    "start": "Continue transcription",
+    "new": "Start new transcription",
+    "finish": "Finish transcription",
+    "stop": "Stop transcription",
+    "check": "Check transcription",
+    "send": "Send transcription"
+  },
+  "segments":{
+    "total": "Total segments",
+    "transcribed": "Transcribed Segments",
+    "with breaks": "Segments with breaks",
+    "not transcribed": "Segments without content",
+    "previous": "previous segment",
+    "next": "next segment"
+  },
+  "feedback":{
     "unintelligible": "unintelligible",
     "less intelligible": "less intelligible",
     "intelligible": "intelligible",
@@ -95,7 +97,11 @@
       "play selection": "Play selection",
       "transcribe segment": "Transcribe segment",
       "move cursor left": "Move cursor to the left",
-      "move cursor right": "Move cursor to the left"
+      "move cursor right": "Move cursor to the left",
+      "audioplayer": "Audioplayer shortcuts",
+      "top signaldisplay": "Shortcuts of the signaldisplay on the top",
+      "down signaldisplay": "Shortcuts of the signaldisplay on the bottom",
+      "2D-Editor": "Shortcuts of the 2D-Editor"
     }
   },
   "login": {

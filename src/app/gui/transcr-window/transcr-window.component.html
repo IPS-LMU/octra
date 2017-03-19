@@ -45,14 +45,14 @@
                     <div class="btn-group btn-group-justified" role="group" aria-label="...">
                         <a class="btn btn-default btn-raised" (click)="save();goToSegment('left');"><span *ngIf="responsive" [ngClass]="{'visible-xs visible-sm visible-md': responsive}"><span class="glyphicon glyphicon-floppy-save"></span>&<span class="glyphicon glyphicon-menu-left" ></span></span><span [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">
                             {{"general.save" | translate}} &
-                            {{"general.segment previous" | translate}}</span>
+                            {{"segment previous" | translate}}</span>
                         </a>
                         <a class="btn btn-default btn-raised" (click)="save();close();"><span *ngIf="responsive" [ngClass]="{'visible-xs visible-sm visible-md': responsive}"><span class="glyphicon glyphicon-floppy-save"></span></span><span [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">
                             {{"general.save" | translate}} & {{"general.close" | translate}}</span>
                         </a>
                         <a class="btn btn-default btn-raised" (click)="save();goToSegment('right');"><span *ngIf="responsive" [ngClass]="{'visible-xs visible-sm visible-md': responsive}"><span class="glyphicon glyphicon-floppy-save"></span>&<span class="glyphicon glyphicon-menu-right" ></span></span><span [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">
                             {{"general.save" | translate}} &
-                            {{"general.segment next" | translate}}</span>
+                            {{"segment.next" | translate}}</span>
                         </a>
                     </div>
                 </div>

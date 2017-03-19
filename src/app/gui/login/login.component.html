@@ -63,13 +63,13 @@
                     </app-drop-zone>
                     <input *ngIf="getFileStatus() != 'new'" [disabled]="!(getFileStatus() == 'start')" type="submit"
                            id="offline-submit"
-                           class="btn btn-raised btn-primary" value="{{'general.start transcription' | translate}}"
+                           class="btn btn-raised btn-primary" value="{{'transcription.start' | translate}}"
                            (click)="onOfflineSubmit()"/>
 
                     <input *ngIf="getFileStatus() == 'new'" id="offline-delete-btn"
                            class="btn btn-raised btn-danger"
                            (click)="modService.show('transcription_delete', '', {ok: newTranscription})"
-                           value="{{'general.start new transcription' |translate}}"/>
+                           value="{{'transcription.new' |translate}}"/>
                 </div>
             </section>
         </div>

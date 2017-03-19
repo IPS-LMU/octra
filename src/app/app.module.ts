@@ -60,7 +60,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
-	return new TranslateHttpLoader(http, "./assets/i18n/", ".json");
+	return new TranslateHttpLoader(http, "./assets/i18n/octra/octra_", ".json");
 }
 
 @NgModule({

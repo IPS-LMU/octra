@@ -1,5 +1,18 @@
 # Change Log
 
+## [v1.0.6](https://github.com/IPS-LMU/octra/tree/v1.0.6) (2017-03-20)
+[Full Changelog](https://github.com/IPS-LMU/octra/compare/v1.0.5...v1.0.6)
+
+**Implemented enhancements:**
+
+- angular-cli: update to 1.0.0rc2 [\#15](https://github.com/IPS-LMU/octra/issues/15)
+- use ng-bootstrap package [\#12](https://github.com/IPS-LMU/octra/issues/12)
+
+**Fixed bugs:**
+
+- audioviewer: adjusting height of drawn signal to the max height doesn't work [\#19](https://github.com/IPS-LMU/octra/issues/19)
+- after switching from transcription-submit to transcription component saving data does not work [\#17](https://github.com/IPS-LMU/octra/issues/17)
+
 ## [v1.0.5](https://github.com/IPS-LMU/octra/tree/v1.0.5) (2017-03-16)
 [Full Changelog](https://github.com/IPS-LMU/octra/compare/v1.0.4...v1.0.5)
 

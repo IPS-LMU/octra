@@ -27,6 +27,9 @@ import {
 
 import { BrowserInfo, StatisticElem, SubscriptionManager } from "../../shared";
 import { Logger } from "../../shared/Logger";
+import { Observable } from "rxjs";
+import { isNull } from "util";
+import { isNullOrUndefined } from "util";
 
 @Component({
 	selector       : 'app-transcription',
@@ -87,22 +90,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 				private settingsService: SettingsService,
 				private modService: ModalService) {
 		this.subscrmanager = new SubscriptionManager();
-
-		this.subscrmanager.add(this.sessService.saving.subscribe(
-			(saving) => {
-				if (saving) {
-					this.saving = "Saving...";
-				}
-				else {
-					setTimeout(() => {
-						this.saving = "";
-					}, 1000);
-				}
-			}
-		));
-		setInterval(() => {
-			this.changeDetecorRef.markForCheck();
-		}, 2000);
 	}
 
 	get dat(): string {
@@ -121,6 +108,24 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	}
 
 	ngOnInit() {
+		setInterval(() => {
+			this.changeDetecorRef.markForCheck();
+		}, 2000);
+
+		this.subscrmanager.add(this.sessService.saving.subscribe(
+			(saving) => {
+				if (saving) {
+					this.saving = "Saving...";
+					console.log("ok");
+				}
+				else {
+					setTimeout(() => {
+						this.saving = "";
+					}, 1000);
+				}
+			}
+		));
+
 		if (this.audio.audiobuffer == null) {
 			this.subscrmanager.add(this.audio.afterloaded.subscribe(this.afterAudioLoaded));
 
@@ -135,6 +140,14 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		}
 		else {
 			this.afterAudioLoaded();
+		}
+
+		if(!isNullOrUndefined(this.tranService.segments)){
+			this.subscrmanager.add(this.tranService.segments.onsegmentchange.subscribe(this.tranService.saveSegments));
+		} else{
+			this.subscrmanager.add(this.tranService.dataloaded.subscribe(()=>{
+				this.subscrmanager.add(this.tranService.segments.onsegmentchange.subscribe(this.tranService.saveSegments));
+			}));
 		}
 	}
 

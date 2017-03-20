@@ -235,6 +235,7 @@ export class SessionService {
 	}
 
 	public save(key: string, value: any): boolean {
+		console.log("save called: " + key);
 		this.saving.emit(true);
 		switch (key) {
 			case "transcription":

@@ -55,7 +55,7 @@ export class LoupeComponent implements OnInit {
 	ngOnInit() {
 		this.viewer.Settings.multi_line = false;
 		this.viewer.Settings.height = 150;
-		this.viewer.Settings.justifySignalHeight = true;
+		this.viewer.Settings.justify_signal_height = true;
 		this.viewer.Settings.boundaries.enabled = true;
 		this.viewer.Settings.disabled_keys = [];
 		this.viewer.Settings.type = "line";

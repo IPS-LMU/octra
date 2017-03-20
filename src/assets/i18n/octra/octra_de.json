@@ -7,12 +7,8 @@
     "delete": "Löschen",
     "save": "Speichern",
     "send now": "Jetzt senden",
+    "back": "Zurück",
     "OK": "OK",
-    "start transcription": "Transkription fortsetzen",
-    "start new transcription": "Neue Transkription beginnen",
-    "finish transcription": "Transkription fertigstellen",
-    "stop transcription": "Transkription beenden",
-    "check transcription": "Transkription überprüfen",
     "quit": "Beenden",
     "login": "Anmelden",
     "logout": "Abmelden",
@@ -26,10 +22,6 @@
     "overview": "Übersicht",
     "help": "Hilfe",
     "on focus only": "nur bei Fokus",
-    "shortcuts audioplayer": "Tastenkombinationen des Audioplayers",
-    "shortcuts top signaldisplay": "Tastenkombinationen des oberen Signaldsiplays",
-    "shortcuts down signaldisplay": "Tastenkombinationen des unteren Signaldsiplays",
-    "shortcuts 2D-Editor": "Tastenkombinationen des 2D-Editors",
     "wanted": "Gesucht wird",
     "unknown": "unbekannt",
     "please wait": "Bitte warten",
@@ -38,16 +30,37 @@
     "export": "Exportieren",
     "text file": "Textdatei",
     "statistics": "Statistik",
-    "segments total": "Segmente insgesamt",
-    "segments transcribed": "Segmente transkribiert",
-    "segments with breaks": "Segmente mit Pausen",
-    "segments not transcribed": "Segmente ohne Inhalt",
-    "segment previous": "vorheriges Segment",
-    "segment next": "nächstes Segment",
     "transcript": "Transkript",
     "transcription": "Transkription",
     "timespan": "Zeitspanne (s)",
     "validation": "Validierung"
+  },
+  "transcription":{
+    "start": "Transkription fortsetzen",
+    "new": "Neue Transkription beginnen",
+    "finish": "Transkription fertigstellen",
+    "stop": "Transkription beenden",
+    "check": "Transkription überprüfen",
+    "send": "Transkription senden"
+  },
+  "segments":{
+    "total": "Segmente insgesamt",
+    "transcribed": "Segmente transkribiert",
+    "with breaks": "Segmente mit Pausen",
+    "not transcribed": "Segmente ohne Inhalt",
+    "previous": "vorheriges Segment",
+    "next": "nächstes Segment"
+  },
+  "feedback":{
+    "unintelligible": "unverständlich",
+    "less intelligible": "weniger verständlich",
+    "intelligible": "verständlich",
+    "very good intelligible": "sehr gut verständlich",
+    "quality of signal": "Qualität des Audiosignals",
+    "a lot of noises": "viele Störgeräusche",
+    "few noises": "wenige Störgeräusche",
+    "very few noises": "sehr wenige Störgeräusche",
+    "no noises": "keine Störgeräusche"
   },
   "interfaces": {
     "simple editor": "Editor ohne Signaldisplay",
@@ -85,7 +98,11 @@
     "play selection": "Selektion abspielen",
     "transcribe segment": "Segment transkribieren",
     "move cursor left": "Cursor nach links bewegen",
-    "move cursor right": "Cursor nach rechts bewegen"
+    "move cursor right": "Cursor nach rechts bewegen",
+    "audioplayer": "Tastenkombinationen des Audioplayers",
+    "top signaldisplay": "Tastenkombinationen des oberen Signaldsiplays",
+    "down signaldisplay": "Tastenkombinationen des unteren Signaldsiplays",
+    "2D-Editor": "Tastenkombinationen des 2D-Editors"
   },
   "login": {
     "online mode": "Online Modus",
@@ -119,6 +136,9 @@
     "boundaries": "Falls verfügbar: Wurden Segmentgrenzen möglichst genau gesetzt?",
     "breaks": "Wurden alle definierten Segmente auf Inhalt/Pausen überprüft?",
     "markers": "Wurden Marker gesetzt?",
-    "overview": "Folgende Tabelle zeigt Ihnen einen Überblick über Ihre definierten Segmente:"
+    "overview": "Folgende Tabelle zeigt Ihnen einen Überblick über Ihre definierten Segmente:",
+    "form fill out": "Bitte füllen Sie kurz das Formular aus",
+    "intelligibility of the speaker": "Sprachverständlichkeit des Sprechers",
+    "comment description": "Kurzer Kommentar (Anmerkungen zum Arbeitsablauf, Ladezeiten, Schwierigkeiten etc.)"
   }
 }

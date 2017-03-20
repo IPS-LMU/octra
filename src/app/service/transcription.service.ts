@@ -13,6 +13,7 @@ import { TextConverter } from "../shared/Converters/TextConverter";
 import { AnnotJSONConverter } from "../shared/Converters/AnnotJSONConverter";
 import { SubscriptionManager } from "../shared";
 import { SettingsService } from "./settings.service";
+import { isNullOrUndefined } from "util";
 
 
 @Injectable()
@@ -211,8 +212,6 @@ export class TranscriptionService {
 					this.last_sample = this.audio.duration.samples;
 					this.loadSegments(this.audio.samplerate);
 
-					this.subscrmanager.add(this.segments.onsegmentchange.subscribe(this.saveSegments));
-
 					this.onaudioloaded.emit(result);
 				}));
 
@@ -226,8 +225,6 @@ export class TranscriptionService {
 				this.subscrmanager.add(this.audio.afterloaded.subscribe((result) => {
 					this.last_sample = this.audio.duration.samples;
 					this.loadSegments(this.audio.samplerate);
-
-					this.subscrmanager.add(this.segments.onsegmentchange.subscribe(this.saveSegments));
 
 					this.onaudioloaded.emit(result);
 				}));
@@ -253,6 +250,11 @@ export class TranscriptionService {
 					//file not loaded. Load again!
 					reader.readAsArrayBuffer(this.sessServ.file);
 				}
+			}
+
+			//fixes the issue after switching from transcription-submit to transcription
+			if(!isNullOrUndefined(this.segments)){
+				this.subscrmanager.add(this.segments.onsegmentchange.subscribe(this.saveSegments));
 			}
 		}
 	}

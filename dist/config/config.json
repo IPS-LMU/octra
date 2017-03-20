@@ -1,11 +1,11 @@
 {
   "version": "1.0.5",
   "audio_server": {
-    "url": "sds"
+    "url": ""
   },
   "octra": {
     "login_enabled": false,
-    "logging_enabled": true,
+    "logging_enabled": false,
     "responsive": {
       "enabled": true,
       "fixedwidth": 1200

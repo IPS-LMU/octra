@@ -20,7 +20,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 	@Input('version') version: string;
 
 	public test: string = "ok";
-	collapsed: boolean = false;
+	collapsed: boolean = true;
 
 	constructor(private sessService: SessionService,
 				private navbarServ: NavbarService,
@@ -42,16 +42,6 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 			$(() => {
 			}); // end of document ready
 		})(jQuery); // end of jQuery name space
-	}
-
-	coll() {
-		if (this.collapsed) {
-			(($) => {
-				$(() => {
-					$('.navbar-header').find("button").click();
-				}); // end of document ready
-			})(jQuery); // end of jQuery name space
-		}
 	}
 
 	setInterface(new_interface: string) {

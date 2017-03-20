@@ -56,9 +56,11 @@ import { SettingsGuard } from "./guard/settings.activateguard";
 import { FastbarComponent } from './gui/fastbar/fastbar.component';
 import { OctraModalComponent } from './component/octra-modal/octra-modal.component';
 
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
-	return new TranslateHttpLoader(http, "./assets/i18n/", ".json");
+	return new TranslateHttpLoader(http, "./assets/i18n/octra/octra_", ".json");
 }
 
 @NgModule({
@@ -104,6 +106,7 @@ export function HttpLoaderFactory(http: Http) {
 				deps      : [ Http ]
 			}
 		}),
+		NgbModule.forRoot(),
 		FormsModule,
 		HttpModule,
 		JsonpModule,

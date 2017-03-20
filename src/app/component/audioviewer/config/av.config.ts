@@ -2,7 +2,7 @@ export class AudioviewerConfig {
 	public Settings: any = {
 		multi_line         : false,
 		pixel_per_sec      : 200, //only relevant for multiline
-		justify_signal_height: false,
+		justify_signal_height: true,
 		cropping           : "none",
 		height             : 150,
 		backgroundcolor    : "rgb(248, 248, 248)",

@@ -1,6 +1,6 @@
 {
   "name": "octra",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "author": "Julian Pömp",
   "license": "MIT",
   "angular-cli": {},
@@ -23,6 +23,7 @@
     "@angular/platform-browser": "^2.4.5",
     "@angular/platform-browser-dynamic": "^2.4.5",
     "@angular/router": "^3.4.5",
+    "@ng-bootstrap/ng-bootstrap": "^1.0.0-alpha.21",
     "@ngx-translate/core": "^6.0.0",
     "@ngx-translate/http-loader": "0.0.3",
     "@types/es6-promise": "0.0.32",
@@ -41,7 +42,7 @@
     "zone.js": "^0.7.6"
   },
   "devDependencies": {
-    "@angular/cli": "1.0.0-rc.1",
+    "@angular/cli": "^1.0.0-rc.2",
     "@angular/compiler-cli": "^2.4.5",
     "@types/jasmine": "2.5.38",
     "@types/node": "~6.0.60",
@@ -51,9 +52,9 @@
     "karma": "~1.4.1",
     "karma-chrome-launcher": "~2.0.0",
     "karma-cli": "~1.0.1",
+    "karma-coverage-istanbul-reporter": "^0.2.0",
     "karma-jasmine": "~1.1.0",
     "karma-jasmine-html-reporter": "^0.2.2",
-    "karma-coverage-istanbul-reporter": "^0.2.0",
     "protractor": "~5.1.0",
     "ts-node": "~2.0.0",
     "tslint": "~4.4.2",

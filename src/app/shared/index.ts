@@ -22,3 +22,4 @@ export * from './SessionFile';
 export * from './OCTRAnimations';
 export * from './SubscriptionManager';
 export * from './Converters';
+export * from './LanguageLoader';

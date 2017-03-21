@@ -31,6 +31,7 @@ import { Observable } from "rxjs";
 import { isNull } from "util";
 import { isNullOrUndefined } from "util";
 import { TranslateService, LangChangeEvent } from "@ngx-translate/core";
+import { TranscrGuidelinesComponent } from "../transcr-guidelines/transcr-guidelines.component";
 
 @Component({
 	selector       : 'app-transcription',
@@ -43,7 +44,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	private subscrmanager: SubscriptionManager;
 
 	@ViewChild('modal_shortcuts') modal_shortcuts: ModalComponent;
-	@ViewChild('modal_rules') modal_rules: ModalComponent;
+	@ViewChild('modal_guidelines') modal_guidelines: TranscrGuidelinesComponent;
 	@ViewChild('modal_overview') overview: ModalComponent;
 
 	private initialized: any = {};
@@ -220,9 +221,9 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 			$event.preventDefault();
 		}
 		else if ($event.altKey && $event.which == 57) {
-			if (!this.modal_rules.visible)
-				this.modal_rules.open();
-			else this.modal_rules.dismiss();
+			if (!this.modal_guidelines.visible)
+				this.modal_guidelines.open();
+			else this.modal_guidelines.close();
 			$event.preventDefault();
 		}
 		if ($event.altKey && $event.which == 48) {

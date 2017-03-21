@@ -1,0 +1,78 @@
+<modal #modal_guidelines id="rules" *ngIf="guidelines != null">
+    <modal-header>
+        <div class="row">
+            <div class="col-md-7">
+                <h3>{{"general.guidelines" | translate }}</h3>
+                <span class="project">
+                     {{"general.project" | translate }}: {{guidelines.meta.project }}
+                </span>
+                <span class="authors">
+                     {{"general.authors" | translate }}: {{ guidelines.meta.authors }}
+                </span>
+            </div>
+            <div class="col-md-5">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+                        <input type="text" id="addon1" placeholder="{{'general.search' |translate}}"
+                               class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </modal-header>
+    <modal-body>
+        <div class="row" *ngFor="let instructions of guidelines.instructions;let j = index;">
+            <div class="col-xs-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">{{instructions.group}}</div>
+                    <div class="panel-body">
+                        <div class="row select-row" *ngFor="let entry of instructions.entries;let k = index;">
+                            <div class="col-xs-1 chevron" (click)="toggle(j,k)">
+                                <span *ngIf="collapsed[j][k]" class="glyphicon glyphicon glyphicon-chevron-down"></span>
+                                <span *ngIf="!collapsed[j][k]" class="glyphicon glyphicon glyphicon-chevron-up"></span>
+                            </div>
+                            <div class="col-xs-1 code" (click)="toggle(j,k)">
+                                {{entry.code}}
+                            </div>
+                            <div class="col-xs-9">
+                                <span class="guidelines-title" (click)="toggle(j,k)">{{entry.title}}</span>
+                                <div class="row entry-row" [ngbCollapse]="collapsed[j][k]">
+                                    <div class="col-md-4">
+                                        <span class="guidelines-descr">
+                                        {{entry.description}}
+                                            </span>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div *ngFor="let example of entry.examples; let i = index;"
+                                             class="panel panel-primary panel-example">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">Example {{i + 1}}</h3>
+                                            </div>
+                                            <div class="panel-body">
+                                                <div *ngIf="example.url != ''" class="media">
+                                                    <audio src="{{example.url}}" controls></audio>
+                                                </div>
+                                                <div class="text">
+                                                    <code>{{example.annotation}}</code>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-1 hidden-xs col-priority" (click)="toggle(j,k)">
+                                <span class="label label-info">{{entry.priority}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </modal-body>
+    <modal-footer>
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="modal_guidelines.dismiss()">
+            {{"general.close" | translate}}
+        </button>
+    </modal-footer>
+</modal>

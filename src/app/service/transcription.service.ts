@@ -1,5 +1,5 @@
 import { Injectable, EventEmitter } from '@angular/core';
-import 'rxjs/Rx';
+import 'rxjs';
 import { Segments } from "../shared/Segments";
 import { AudioService } from "./audio.service";
 import { SessionService } from "./session.service";
@@ -14,10 +14,15 @@ import { AnnotJSONConverter } from "../shared/Converters/AnnotJSONConverter";
 import { SubscriptionManager } from "../shared";
 import { SettingsService } from "./settings.service";
 import { isNullOrUndefined } from "util";
+import { Http, Response} from "@angular/http";
+import { Observable, Subscription } from "rxjs";
 
 
 @Injectable()
 export class TranscriptionService {
+	get guidelines(): any {
+		return this._guidelines;
+	}
 	get last_sample(): number {
 		return this._last_sample;
 	}
@@ -43,8 +48,12 @@ export class TranscriptionService {
 
 	public onaudioloaded = new EventEmitter<any>();
 	public dataloaded = new EventEmitter<any>();
+	public guidelinesloaded = new EventEmitter<any>();
+
 	private _segments: Segments;
 	private _last_sample: number;
+	private _guidelines:any;
+
 	private saving: boolean = false;
 
 	public filename: string = "";
@@ -80,7 +89,9 @@ export class TranscriptionService {
 				private sessServ: SessionService,
 				private uiService: UserInteractionsService,
 				private navbarServ: NavbarService,
-				private settingsService: SettingsService) {
+				private settingsService: SettingsService,
+				private http:Http
+	) {
 		this.subscrmanager = new SubscriptionManager();
 
 		if (this.app_settings.octra.logging) {
@@ -409,5 +420,14 @@ export class TranscriptionService {
 			result.push("- Ziffern vorhanden");
 
 		return result;
+	}
+
+	public loadGuidelines(language:string, url:string) : Subscription{
+		return this.http.get(url).subscribe(
+			(response:Response) => {
+				this._guidelines = response.json();
+				this.guidelinesloaded.emit(this._guidelines);
+			}
+		);
 	}
 }

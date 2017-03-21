@@ -30,6 +30,7 @@ import { Logger } from "../../shared/Logger";
 import { Observable } from "rxjs";
 import { isNull } from "util";
 import { isNullOrUndefined } from "util";
+import { TranslateService, LangChangeEvent } from "@ngx-translate/core";
 
 @Component({
 	selector       : 'app-transcription',
@@ -88,7 +89,8 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 				private changeDetecorRef: ChangeDetectorRef,
 				private navbarServ: NavbarService,
 				private settingsService: SettingsService,
-				private modService: ModalService) {
+				private modService: ModalService,
+				private langService: TranslateService) {
 		this.subscrmanager = new SubscriptionManager();
 	}
 
@@ -142,10 +144,11 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 			this.afterAudioLoaded();
 		}
 
-		if(!isNullOrUndefined(this.tranService.segments)){
+		if (!isNullOrUndefined(this.tranService.segments)) {
 			this.subscrmanager.add(this.tranService.segments.onsegmentchange.subscribe(this.tranService.saveSegments));
-		} else{
-			this.subscrmanager.add(this.tranService.dataloaded.subscribe(()=>{
+		}
+		else {
+			this.subscrmanager.add(this.tranService.dataloaded.subscribe(() => {
 				this.subscrmanager.add(this.tranService.segments.onsegmentchange.subscribe(this.tranService.saveSegments));
 			}));
 		}
@@ -155,6 +158,28 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		this.sessService.SampleRate = this.audio.samplerate;
 		this.change();
 		this.navbarServ.show_hidden = true;
+
+		//load guidelines
+		this.subscrmanager.add(this.tranService.guidelinesloaded.subscribe(
+			(guidelines) => {
+				console.log("guidelines loaded in " + guidelines[ "language" ]);
+				console.log(guidelines);
+			}
+		));
+
+		this.subscrmanager.add(
+			this.tranService.loadGuidelines(this.sessService.language, "./guidelines/guidelines_" + this.sessService.language + ".json")
+		);
+
+		//load guidelines on language change
+		this.subscrmanager.add(this.langService.onLangChange.subscribe(
+			(event: LangChangeEvent) => {
+				this.subscrmanager.add(
+					this.tranService.loadGuidelines(event.lang, "./guidelines/guidelines_" + event.lang + ".json")
+				);
+			}
+		));
+
 	};
 
 	ngAfterViewInit() {

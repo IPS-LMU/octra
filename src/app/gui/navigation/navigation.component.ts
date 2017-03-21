@@ -32,9 +32,6 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	ngOnInit() {
-		this.langService.onLangChange.subscribe(()=>{
-			console.log("okokok");
-		});
 	}
 
 	ngAfterViewInit() {

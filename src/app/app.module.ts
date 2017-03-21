@@ -13,6 +13,7 @@ import { Ng2Webstorage } from 'ng2-webstorage';
 
 
 //other
+import { LanguageLoader } from './shared';
 import {
 	AudioNavigationComponent,
 	AudioplayerComponent,
@@ -24,7 +25,8 @@ import {
 	TranscrEditorComponent,
 	CircleLoupeComponent,
 	AlertComponent,
-	DropZoneComponent
+	DropZoneComponent,
+	OctraModalComponent
 } from "./component";
 import {
 	AudioplayerGUIComponent,
@@ -40,27 +42,24 @@ import {
 	TranscriptionSubmitComponent,
 	TranscriptionSubmittedComponent,
 	TranscrOverviewComponent,
-	TranscrWindowComponent
+	TranscrWindowComponent,
+	FastbarComponent
 } from "./gui";
 
 import { routing } from "./app.routes";
 import { TimespanPipe, ProcentPipe, SecondsPipe, LeadingNullPipe } from "./pipe";
 
-import { APIService, NavbarService, AudioService, ModalService, KeymappingService, SessionService } from "./service";
+import { APIService, NavbarService, AudioService, ModalService, KeymappingService, SessionService, SettingsService } from "./service";
 
-import { DeALoginGuard, LogoutGuard, MembersAreaGuard, TranscrSubmittedGuard, ALoginGuard } from "./guard";
+import { DeALoginGuard, LogoutGuard, MembersAreaGuard, TranscrSubmittedGuard, ALoginGuard,SettingsGuard } from "./guard";
 
 import { AppComponent } from "./app.component";
-import { SettingsService } from "./service/settings.service";
-import { SettingsGuard } from "./guard/settings.activateguard";
-import { FastbarComponent } from './gui/fastbar/fastbar.component';
-import { OctraModalComponent } from './component/octra-modal/octra-modal.component';
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
-	return new TranslateHttpLoader(http, "./assets/i18n/octra/octra_", ".json");
+	return new LanguageLoader(http, "./assets/i18n/octra/octra_", ".json");
 }
 
 @NgModule({

@@ -1,0 +1,61 @@
+{
+  "object_language": "deu",
+  "language": "de",
+  "project": "Sprecherinnen",
+  "authors": "Christoph Draxler (draxler@phonetik.uni-muenchen.de)",
+  "translators": "",
+  "version": "1.0",
+  "date": "2017-03-02",
+  "encoding": "UTF-8",
+  "validation_url": "http://.../(<methodname> | filename.json>)",
+  "instructions": [
+    {
+      "code": "M01",
+      "priority": 100,
+      "description": "nonverbale Sprechergeräusche werden mit '<usb>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Lachen, Husten, Schmatzen, lautes Atmen",
+      "examples": [
+        {
+          "example": "Hanna *L <usb> Hanna Lühmann",
+          "url": "guidelines/TOSC0102108_fragment.wav"
+        }
+      ]
+    },
+    {
+      "code": "M02",
+      "priority": 100,
+      "description": "Geräusche, die nicht vom Sprecher stammen, werden mit '<nib>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Türgeräusche, Klopfen",
+      "examples": [
+        {
+          "example": "Hanna *L <usb> Hanna Lühmann",
+          "url": "guidelines/TOSC0102108_fragment.wav"
+        }
+      ]
+    }
+  ],
+  "markers": [
+    {
+      "id": 1,
+      "name": "truncation marker start",
+      "code": "[~abc]",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_start.png",
+      "button_text": "~abc",
+      "description": "Diesen Marker nur am Anfang setzen, sollte die Audiosequenz mit einem abgeschnittenem Wort beginnen",
+      "shortcut": {
+        "mac": "ALT + 1",
+        "pc": "ALT + 1"
+      }
+    },
+    {
+      "id": 2,
+      "name": "filled pause",
+      "code": "[fil]",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/fil.png",
+      "button_text": "filled pause",
+      "description": "Für Zögern des Sprechers wie hm, ähm, äh und andere.",
+      "shortcut": {
+        "mac": "ALT + 2",
+        "pc": "ALT + 2"
+      }
+    }
+  ]
+}

@@ -12,3 +12,4 @@ export * from './transcription-submitted';
 export * from './transcr-overview';
 export * from './transcr-window';
 export * from './reload-file';
+export * from './fastbar';

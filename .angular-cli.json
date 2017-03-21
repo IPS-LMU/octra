@@ -11,6 +11,7 @@
       "assets": [
         "assets",
         "config",
+        "guidelines",
         "favicon.ico",
         "404.html"
       ],

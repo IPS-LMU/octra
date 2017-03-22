@@ -231,9 +231,6 @@ export class AudioviewerService extends AudioComponentService {
 
 				this._zoomX = width / max_zoom_x;
 			}
-			else {
-				console.log("hä");
-			}
 		}
 		else {
 			this._zoomY = 1;

@@ -34,7 +34,6 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 						this.entries += guidelines.instructions[ i ].entries.length;
 					}
 					this.unCollapseAll();
-					console.log("entries: " + this.entries);
 				}
 			)
 		);
@@ -64,13 +63,7 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 									"autoplay": false,
 									"preload" : "auto"
 								}, function onPlayerReady() {
-									console.log("my-player_g" + g + "i" + i + "e" + e + " loaded");
-									videojs.log('Your player is ready!');
 
-									// How about an event listener?
-									this.on('ended', function () {
-										videojs.log('Awww...over so soon?!');
-									});
 								});
 							}
 						}

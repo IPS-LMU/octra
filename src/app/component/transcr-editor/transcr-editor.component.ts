@@ -44,9 +44,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	}
 
 	set rawText(value: string) {
-		console.log("change raw Tet´");
 		this._rawText = this.tidyUpRaw(value);
-		console.log("raw: " + this._rawText);
 		this.init = 0;
 		this.textfield.summernote('code', this.rawToHTML(this._rawText));
 	}
@@ -429,7 +427,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	 */
 	public focus = ()=>{
 		if (this.rawText != "") {
-			console.log("tidy: " + this.rawText);
 			Functions.placeAtEnd(jQuery('.note-editable.panel-body')[ 0 ]);
 		}
 

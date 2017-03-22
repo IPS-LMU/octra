@@ -323,7 +323,6 @@ export class TranscriptionService {
 
 				if (new_elem.value == null) {
 					new_elem.value = "no obj";
-					console.log(elem);
 				}
 
 				result.push(new_elem);

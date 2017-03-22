@@ -119,7 +119,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 			(saving) => {
 				if (saving) {
 					this.saving = "Saving...";
-					console.log("ok");
 				}
 				else {
 					setTimeout(() => {
@@ -161,13 +160,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		this.navbarServ.show_hidden = true;
 
 		//load guidelines
-		this.subscrmanager.add(this.tranService.guidelinesloaded.subscribe(
-			(guidelines) => {
-				console.log("guidelines loaded in " + guidelines[ "language" ]);
-				console.log(guidelines);
-			}
-		));
-
 		this.subscrmanager.add(
 			this.tranService.loadGuidelines(this.sessService.language, "./guidelines/guidelines_" + this.sessService.language + ".json")
 		);

@@ -47,11 +47,6 @@ footer{
     display:none;
 }
 
-#rules .table{
-    min-height: inherit;
-    min-width: inherit;
-}
-
 #loading{
     text-align: center;
     padding:20px;
@@ -61,8 +56,8 @@ footer{
     margin-top:20px;
 }
 
-#rules .modal-dialog,
-#overview .modal-dialog{
+#overview .modal-dialog,
+#rules .modal-dialog{
     width:90%;
 }
 
@@ -105,4 +100,8 @@ footer{
 
 .bg-warning{
     padding:10px;
+}
+
+.error_underline{
+    border-bottom:2px solid red;
 }

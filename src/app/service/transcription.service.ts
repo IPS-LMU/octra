@@ -14,15 +14,17 @@ import { AnnotJSONConverter } from "../shared/Converters/AnnotJSONConverter";
 import { SubscriptionManager } from "../shared";
 import { SettingsService } from "./settings.service";
 import { isNullOrUndefined } from "util";
-import { Http, Response} from "@angular/http";
+import { Http, Response } from "@angular/http";
 import { Observable, Subscription } from "rxjs";
 
+declare var validateAnnotation: ((string) => any);
 
 @Injectable()
 export class TranscriptionService {
 	get guidelines(): any {
 		return this._guidelines;
 	}
+
 	get last_sample(): number {
 		return this._last_sample;
 	}
@@ -34,6 +36,10 @@ export class TranscriptionService {
 	get segments(): Segments {
 
 		return this._segments;
+	}
+
+	public validate(text:string):any{
+		return validateAnnotation(text);
 	}
 
 	set segments(value: Segments) {
@@ -52,7 +58,7 @@ export class TranscriptionService {
 
 	private _segments: Segments;
 	private _last_sample: number;
-	private _guidelines:any;
+	private _guidelines: any;
 
 	private saving: boolean = false;
 
@@ -90,8 +96,7 @@ export class TranscriptionService {
 				private uiService: UserInteractionsService,
 				private navbarServ: NavbarService,
 				private settingsService: SettingsService,
-				private http:Http
-	) {
+				private http: Http) {
 		this.subscrmanager = new SubscriptionManager();
 
 		if (this.app_settings.octra.logging) {
@@ -264,7 +269,7 @@ export class TranscriptionService {
 			}
 
 			//fixes the issue after switching from transcription-submit to transcription
-			if(!isNullOrUndefined(this.segments)){
+			if (!isNullOrUndefined(this.segments)) {
 				this.subscrmanager.add(this.segments.onsegmentchange.subscribe(this.saveSegments));
 			}
 		}
@@ -422,11 +427,26 @@ export class TranscriptionService {
 		return result;
 	}
 
-	public loadGuidelines(language:string, url:string) : Subscription{
+	public loadGuidelines(language: string, url: string): Subscription {
 		return this.http.get(url).subscribe(
-			(response:Response) => {
+			(response: Response) => {
 				this._guidelines = response.json();
+				this.loadValidationMethod(this._guidelines.meta.validation_url);
 				this.guidelinesloaded.emit(this._guidelines);
+			}
+		);
+	}
+
+	public loadValidationMethod(url: string): Subscription {
+		return this.http.get(url).subscribe(
+			(response: Response) => {
+				let js = document.createElement("script");
+
+				js.type = "text/javascript";
+				js.src = url;
+				js.id = "validationJS";
+
+				document.body.appendChild(js);
 			}
 		);
 	}

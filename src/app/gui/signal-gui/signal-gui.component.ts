@@ -205,7 +205,6 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	onSegmentEnter($event) {
 		let segment = this.transcrService.segments.get($event.index);
 		this.editor.rawText = segment.transcript;
-		this.editor.focus();
 		this.segmentselected = true;
 		this.transcrService.selectedSegment = $event;
 		this.loupee.changeArea(this.transcrService.segments.getStartTime($event.index), segment.time);
@@ -215,7 +214,6 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	onLoupeSegmentEnter($event) {
 		let segment = this.transcrService.segments.get($event.index);
 		this.editor.rawText = segment.transcript;
-		this.editor.focus();
 		this.segmentselected = true;
 		this.transcrService.selectedSegment = $event;
 	}

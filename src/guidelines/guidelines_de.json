@@ -7,7 +7,7 @@
     "version": "1.0",
     "date": "2017-03-02",
     "encoding": "UTF-8",
-    "validation_url": "http://.../(<methodname> | filename.json>)"
+    "validation_url": "assets/testfiles/validation.js"
   },
   "instructions": [
     {

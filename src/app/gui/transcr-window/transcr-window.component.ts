@@ -163,7 +163,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 			}
 
 			this.editor.rawText = this.transcrService.segments.get(this.transcrService.selectedSegment.index).transcript;
-			this.editor.focus();
 			this.changeArea(begin, segment.time);
 		}
 	}

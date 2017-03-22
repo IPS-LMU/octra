@@ -3,21 +3,21 @@
     "object_language": "deu",
     "language": "en",
     "project": "Speakers",
-    "authors": "Test Person (testperson@email.de)",
+    "authors": "Test Person2 (testperson2@email.de)",
     "version": "1.0",
     "date": "2017-03-02",
     "encoding": "UTF-8",
-    "validation_url": "http://.../(<methodname> | filename.json>)"
+    "validation_url": "assets/testfiles/validation.js"
   },
   "instructions": [
     {
-      "group": "Beliebige Gruppierung",
+      "group": "Random group",
       "entries": [
         {
           "code": "M01",
           "priority": 100,
-          "title": "Nonverbale Störgeräusche",
-          "description": "nonverbale Sprechergeräusche werden mit '<usb>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Lachen, Husten, Schmatzen, lautes Atmen",
+          "title": "Title in English",
+          "description": "Text in English",
           "examples": [
             {
               "annotation": "Hanna *L <usb> Hanna Lühmann",

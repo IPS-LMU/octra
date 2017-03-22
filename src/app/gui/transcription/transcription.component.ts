@@ -161,7 +161,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
 		//load guidelines
 		this.subscrmanager.add(
-			this.tranService.loadGuidelines(this.sessService.language, "./guidelines/guidelines_" + this.sessService.language + ".json")
+			this.tranService.loadGuidelines(this.sessService.language, "./guidelines/guidelines_" + this.langService.currentLang + ".json")
 		);
 
 		//load guidelines on language change

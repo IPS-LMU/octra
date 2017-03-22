@@ -1,9 +1,9 @@
 {
   "meta": {
     "object_language": "deu",
-    "language": "en",
+    "language": "de",
     "project": "Speakers",
-    "authors": "Test Person2 (testperson2@email.de)",
+    "authors": "Test Person2 (testperson@email.de)",
     "version": "1.0",
     "date": "2017-03-02",
     "encoding": "UTF-8",
@@ -11,17 +11,17 @@
   },
   "instructions": [
     {
-      "group": "Random group",
+      "group": "ENGLSIH Text",
       "entries": [
         {
           "code": "M01",
           "priority": 100,
-          "title": "Title in English",
-          "description": "Text in English",
+          "title": "Nonverbale Störgeräusche",
+          "description": "nonverbale Sprechergeräusche werden mit '<usb>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Lachen, Husten, Schmatzen, lautes Atmen",
           "examples": [
             {
               "annotation": "Hanna *L <usb> Hanna Lühmann",
-              "url": "https://webdesign.weisshart.de/audios/schoene_isabella_aus_kastilien.mp3"
+              "url": "assets/testfiles/test.mp4"
             }
           ]
         },
@@ -33,7 +33,11 @@
           "examples": [
             {
               "annotation": "Hanna *L <usb> Hanna Lühmann",
-              "url": ""
+              "url": "assets/testfiles/AAA4600C3_0_fragment.wav"
+            },
+            {
+              "annotation": "Hanna *L <usb> Hanna Lühmann",
+              "url": "assets/testfiles/test.mp4"
             }
           ]
         }
@@ -80,7 +84,7 @@
           "description": "Geräusche, die nicht vom Sprecher stammen, werden mit '<nib>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Türgeräusche, Klopfen",
           "examples": [
             {
-              "example": "Hanna *L <usb> Hanna Lühmann",
+              "annotation": "Hanna *L <usb> Hanna Lühmann",
               "url": ""
             }
           ]

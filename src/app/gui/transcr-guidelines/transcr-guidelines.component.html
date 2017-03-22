@@ -1,5 +1,8 @@
 <modal #modal_guidelines id="rules" *ngIf="guidelines != null">
     <modal-header>
+        <div style="color:red; font-weight:bold; width:100%; text-align:center;">
+            The guidelines are still in development.
+        </div>
         <div class="row">
             <div class="col-md-7">
                 <h3>{{"general.guidelines" | translate }}</h3>
@@ -50,20 +53,17 @@
                                                 <h3 class="panel-title">Example {{i + 1}}</h3>
                                             </div>
                                             <div class="panel-body">
-                                                <div *ngIf="example.url != ''" class="media">
+                                                <div *ngIf="example.url.indexOf('.wav') > -1" class="media">
                                                     <audio src="{{example.url}}" controls></audio>
                                                 </div>
-                                                <div *ngIf="example.url == ''" class="media">
+                                                <div *ngIf="example.url.indexOf('.mp4') > -1" class="media">
                                                     <video
                                                             id="my-player_g{{j}}i{{k}}e{{i}}"
-                                                            class="video-js"
+                                                            class="video-js vjs-default-skin vjs-big-play-centered"
                                                             controls
                                                             preload="auto"
-                                                            poster="//vjs.zencdn.net/v/oceans.png"
                                                             data-setup='{}'>
-                                                        <source src="//vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
-                                                        <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm">
-                                                        <source src="//vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
+                                                        <source src="{{example.url}}" type="video/mp4">
                                                         <p class="vjs-no-js">
                                                             To view this video please enable JavaScript, and consider upgrading to a
                                                             web browser that

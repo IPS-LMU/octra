@@ -22,6 +22,7 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 	private entries: number = 0;
 
 	private counter = 0;
+	private video_players: any[] = [];
 
 	constructor(private transcrService: TranscriptionService) {
 		this.subscrmanager.add(
@@ -56,15 +57,24 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 				for (let g = 0; g < this.guidelines.instructions.length; g++) {
 					for (let i = 0; i < this.guidelines.instructions[ g ].entries.length; i++) {
 						for (let e = 0; e < this.guidelines.instructions[ g ].entries[ i ].examples.length; e++) {
-							if (document.getElementById("my-player_g" + g + "i" + i + "e" + e)) {
-								console.log("load " + "my-player_g" + g + "i" + i + "e" + e);
-								let player = videojs("my-player_g" + g + "i" + i + "e" + e, {
-									"fluid"   : true,
-									"autoplay": false,
-									"preload" : "auto"
-								}, function onPlayerReady() {
+							let id_v = "my-player_g" + g + "i" + i + "e" + e;
+							if (document.getElementById(id_v)) {
 
-								});
+								let old_player = this.videoplayerExists(id_v);
+
+								if (old_player > -1) {
+								}
+								else {
+									console.log("init " + id_v);
+									let player = videojs(id_v, {
+										"fluid"   : true,
+										"autoplay": false,
+										"preload" : "auto"
+									}, function onPlayerReady() {
+									});
+
+									this.video_players.push(player);
+								}
 							}
 						}
 					}
@@ -95,5 +105,14 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 
 	private toggle(group: number, entry: number) {
 		this.collapsed[ group ][ entry ] = !this.collapsed[ group ][ entry ];
+	}
+
+	videoplayerExists(player: string): number {
+		for (let i = 0; i < this.video_players.length; i++) {
+			if (this.video_players[ i ].id_ == player) {
+				return i;
+			}
+		}
+		return -1;
 	}
 }

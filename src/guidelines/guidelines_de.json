@@ -2,7 +2,7 @@
   "meta": {
     "object_language": "deu",
     "language": "de",
-    "project": "Speakers",
+    "project": "Sprecherinnen",
     "authors": "Test Person (testperson@email.de)",
     "version": "1.0",
     "date": "2017-03-02",
@@ -21,7 +21,7 @@
           "examples": [
             {
               "annotation": "Hanna *L <usb> Hanna Lühmann",
-              "url": "https://webdesign.weisshart.de/audios/schoene_isabella_aus_kastilien.mp3"
+              "url": "assets/testfiles/test.mp4"
             }
           ]
         },
@@ -33,7 +33,11 @@
           "examples": [
             {
               "annotation": "Hanna *L <usb> Hanna Lühmann",
-              "url": ""
+              "url": "assets/testfiles/AAA4600C3_0_fragment.wav"
+            },
+            {
+              "annotation": "Hanna *L <usb> Hanna Lühmann",
+              "url": "assets/testfiles/test.mp4"
             }
           ]
         }
@@ -80,7 +84,7 @@
           "description": "Geräusche, die nicht vom Sprecher stammen, werden mit '<nib>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Türgeräusche, Klopfen",
           "examples": [
             {
-              "example": "Hanna *L <usb> Hanna Lühmann",
+              "annotation": "Hanna *L <usb> Hanna Lühmann",
               "url": ""
             }
           ]

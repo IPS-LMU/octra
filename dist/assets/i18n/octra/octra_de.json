@@ -33,7 +33,10 @@
     "transcript": "Transkript",
     "transcription": "Transkription",
     "timespan": "Zeitspanne (s)",
-    "validation": "Validierung"
+    "validation": "Validierung",
+    "search": "Suche",
+    "project": "Projekt",
+    "authors": "Authoren"
   },
   "transcription":{
     "start": "Transkription fortsetzen",

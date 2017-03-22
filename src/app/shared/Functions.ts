@@ -53,30 +53,32 @@ export class Functions {
 
 	public static placeAtEnd(element: HTMLElement) {
 		element.focus();
-		if (typeof window.getSelection !== "undefined"
-			&& typeof document.createRange !== "undefined"
-		) {
-			//get range
-			let txtRange = document.createRange();
-			txtRange.selectNodeContents(element);
-			//set range to end
-			txtRange.collapse(false);
+		if (jQuery(element).text() != "") {
+			if (typeof window.getSelection !== "undefined"
+				&& typeof document.createRange !== "undefined"
+			) {
+				//get range
+				let txtRange = document.createRange();
+				txtRange.selectNodeContents(element);
+				//set range to end
+				txtRange.collapse(false);
 
-			//get selection of the element
-			let selection = window.getSelection();
-			selection.removeAllRanges();
-			//set previous created range to the element
-			selection.addRange(txtRange);
-		}
-		else if (typeof document.body.createTextRange !== "undefined") {
-			//fix for IE and older Opera Browsers
+				//get selection of the element
+				let selection = window.getSelection();
+				selection.removeAllRanges();
+				//set previous created range to the element
+				selection.addRange(txtRange);
+			}
+			else if (typeof document.body.createTextRange !== "undefined") {
+				//fix for IE and older Opera Browsers
 
-			//create range from body
-			let txtRange = document.body.createTextRange();
-			txtRange.moveToElementText(element);
-			//set selection to end
-			txtRange.collapse(false);
-			txtRange.select();
+				//create range from body
+				let txtRange = document.body.createTextRange();
+				txtRange.moveToElementText(element);
+				//set selection to end
+				txtRange.collapse(false);
+				txtRange.select();
+			}
 		}
 	}
 

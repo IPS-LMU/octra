@@ -1,4 +1,7 @@
-import { Component, OnInit, OnDestroy, EventEmitter, Output, ChangeDetectorRef } from '@angular/core';
+import {
+	Component, OnInit, OnDestroy, EventEmitter, Output, ChangeDetectorRef, AfterViewInit,
+	Input, OnChanges
+} from '@angular/core';
 import { UserInteractionsService } from "../../service/userInteractions.service";
 import { TranscrEditorConfig } from "./config/te.config";
 import { KeymappingService } from "../../service/keymapping.service";
@@ -10,6 +13,7 @@ import { SettingsService } from "../../service/settings.service";
 import { SessionService } from "../../service/session.service";
 import { TranslateService } from "@ngx-translate/core";
 import { SubscriptionManager } from "../../shared/SubscriptionManager";
+import { isNullOrUndefined } from "util";
 
 @Component({
 	selector   : 'app-transcr-editor',
@@ -18,7 +22,7 @@ import { SubscriptionManager } from "../../shared/SubscriptionManager";
 	providers  : [ TranscrEditorConfig ]
 })
 
-export class TranscrEditorComponent implements OnInit, OnDestroy {
+export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	get is_typing(): boolean {
 		return this._is_typing;
 	}
@@ -31,13 +35,19 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 
 	private _settings: TranscrEditorConfig;
 	private subscrmanager: SubscriptionManager;
+	private init:number = 0;
+
+	@Input() visible:boolean = true;
 
 	get rawText(): string {
 		return this.tidyUpRaw(this._rawText);
 	}
 
 	set rawText(value: string) {
+		console.log("change raw Tet´");
 		this._rawText = this.tidyUpRaw(value);
+		console.log("raw: " + this._rawText);
+		this.init = 0;
 		this.textfield.summernote('code', this.rawToHTML(this._rawText));
 	}
 
@@ -60,9 +70,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 	constructor(private cd: ChangeDetectorRef,
 				private settingsService: SettingsService,
 				private langService: TranslateService) {
+
 		this._settings = new TranscrEditorConfig().Settings;
 		this.subscrmanager = new SubscriptionManager();
-		this.langService.onLangChange.subscribe(
+
+		this.subscrmanager.add(this.langService.onLangChange.subscribe(
 			($event) => {
 				let navigation = this.initNavigation();
 
@@ -91,7 +103,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 				});
 
 			}
-		);
+		));
 		this.validateConfig();
 	}
 
@@ -105,6 +117,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 	ngOnInit() {
 		this.Settings.height = 100;
 		this.initialize();
+	}
+
+	ngOnChanges(obj){
 	}
 
 	/**
@@ -193,17 +208,19 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 				onPaste  : function (e) {
 					//prevent copy paste
 					e.preventDefault();
+				},
+				onChange: ()=>{
+					this.init++;
+
+					if(this.init == 1){
+						setTimeout(this.focus, 200);
+					}
 				}
 			}
 		});
 
 		this.textfield.summernote('removeModule', 'statusbar');
 
-		jQuery(".note-btn-group").find(".note-btn").on("click", function () {
-			jQuery(".tooltip").remove();
-		});
-
-		this.focus();
 		this.loaded.emit(true);
 	};
 
@@ -379,28 +396,30 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 	private rawToHTML(rawtext: string): string {
 		let result: string = rawtext;
 
-		//replace markers with wrap
-		result = this.replaceMarkersWithHTML(result, true);
+		if(rawtext != "") {
+			//replace markers with wrap
+			result = this.replaceMarkersWithHTML(result, true);
 
-		//replace markers with no wrap
-		for (let i = 0; i < this.markers.length; i++) {
-			let marker = this.markers[ i ];
+			//replace markers with no wrap
+			for (let i = 0; i < this.markers.length; i++) {
+				let marker = this.markers[ i ];
 
-			let regex = new RegExp("(\\s)*(" + Functions.escapeRegex(marker.code) + ")(\\s)*", "g");
+				let regex = new RegExp("(\\s)*(" + Functions.escapeRegex(marker.code) + ")(\\s)*", "g");
 
-			let replace_func = (x, g1, g2, g3) => {
-				let s1 = (g1) ? g1 : "";
-				let s2 = (g2) ? g2 : "";
-				let s3 = (g3) ? g3 : "";
-				return s1 + "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "'/>" + s3;
-			};
+				let replace_func = (x, g1, g2, g3) => {
+					let s1 = (g1) ? g1 : "";
+					let s2 = (g2) ? g2 : "";
+					let s3 = (g3) ? g3 : "";
+					return s1 + "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "'/>" + s3;
+				};
 
-			result = result.replace(regex, replace_func);
+				result = result.replace(regex, replace_func);
 
+			}
+
+			result = result.replace(/\s+$/g, "&nbsp;");
+			result = (result !== "") ? "<p>" + result + "</p>" : "";
 		}
-
-		result = result.replace(/\s+$/g, "&nbsp;");
-		result = (result !== "") ? "<p>" + result + "</p>" : "";
 
 		return result;
 	}
@@ -408,13 +427,14 @@ export class TranscrEditorComponent implements OnInit, OnDestroy {
 	/**
 	 * set focus to the very last position of the editors text
 	 */
-	public focus() {
-		setTimeout(() => {
-			if (this.rawText != "")
-				Functions.placeAtEnd(jQuery('.note-editable.panel-body')[ 0 ]);
-			this.textfield.summernote('focus');
-		}, 500);
-	}
+	public focus = ()=>{
+		if (this.rawText != "") {
+			console.log("tidy: " + this.rawText);
+			Functions.placeAtEnd(jQuery('.note-editable.panel-body')[ 0 ]);
+		}
+
+		this.textfield.summernote('focus');
+	};
 
 	/**
 	 * tidy up the raw text, remove white spaces etc.

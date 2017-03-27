@@ -52,7 +52,8 @@
     "with breaks": "Segments with breaks",
     "not transcribed": "Segments without content",
     "previous": "previous segment",
-    "next": "next segment"
+    "next": "next segment",
+    "no guidelines found": "Keine Transkriptionsrichtlinien gefunden"
   },
   "feedback":{
     "unintelligible": "unintelligible",

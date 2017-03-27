@@ -1,41 +1,28 @@
-# OCTRA
+# Octra
 
-This is a web-application for the orthographic transcription of longer
-audiofiles. It uses three editors for the orthographic transcription:
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.0.0.
 
-* Editor without signaldisplay: An typical, easy-to-use editor with just a texteditor and an audioplayer.
-* Linear-Editor: This editor shows two signaldisplays: One for the whole view of the signal and one as loupe. You can set boundaries and define segments.
-* 2D-Editor: This editor breaks the whole view of the signal to pieces and shows the pieces as lines one after one. Here you can set boundaries und define segments too.
+## Development server
 
-One special feature of OCTRA is that it saves your proceedings automatically in your browser. If the browser is closed (abruptly) you can continue your transcription without data-loss.
+Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-## Remarks
-At the moment, OCTRA can only be used locally. Please notice that OCTRA is still in development and could be buggy.
+## Code scaffolding
 
-## Production Use
-In a production environment you don't need to install OCTRA. Just copy the content of the ``dist`` folder to your http-server. __Do not override your old config.json and markers.json__.
+Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive/pipe/service/class/module`.
 
-Before you can use OCTRA duplicate and rename `config_sample.json` to `config.json` and `markers_sample.json` to `markers.json`. If you had another config files before make sure to keep these files. To make sure that the strucure of your config files are valid in the new version please compare these with the new *_sample.json files
+## Build
 
-## Installation (Development Use)
-On the Development level OCTRA requires Node 6.9.0 or higher, together with NPM 3 or higher.
+Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
 
-Then you can install OCTRA:
+## Running unit tests
 
-1. Go to your octra directory via Terminal (or GitBash on Windows)
-2. Call `` npm install ``
-3. Wait.
-4. Duplicate the file ``src/app/app.config.sample.ts`` and rename it to ``src/app/app.config.ts``. In app.config.ts you can change the settings of your instance of OCTRA.
-5. After the installation you can call `` npm start `` to start the node server.
-6. After that please read the notice about the config files in the production use section
+Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
-## Used third-party packages:
-* angular-cli: https://github.com/angular/angular-cli
-* summernote: https://github.com/summernote/summernote
-* bootstrap: http://getbootstrap.com/
-* bootstrap-material-design: http://fezvrasta.github.io/bootstrap-material-design/
-* glyphicons (in bootstrap package): http://glyphicons.com/
-* ng2-webstorage: https://github.com/PillowPillow/ng2-webstorage
-* browser-signal-processing: https://www.npmjs.com/package/browser-signal-processing
-* ng2-bs3-modal: https://github.com/dougludlow/ng2-bs3-modal
-* platform: https://github.com/bestiejs/platform.js/
+## Running end-to-end tests
+
+Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+Before running the tests make sure you are serving the app via `ng serve`.
+
+## Further help
+
+To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).

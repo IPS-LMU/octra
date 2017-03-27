@@ -3,18 +3,17 @@ import {
 	OnInit,
 	ViewChild,
 	OnDestroy,
-	ChangeDetectorRef
+	ChangeDetectorRef, HostListener
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgForm} from '@angular/forms';
+import { NgForm } from '@angular/forms';
 import { LoginService } from "../../service/login.service";
 import { SessionService } from "../../service/session.service";
 import { ComponentCanDeactivate } from "../../guard/login.deactivateguard";
-import { Observable} from "rxjs/Rx";
+import { Observable } from "rxjs/Rx";
 import { Functions, FileSize } from "../../shared/Functions";
 import { APIService } from "../../service/api.service";
 import { BrowserCheck } from "../../shared/BrowserCheck";
-import { HostListener } from "@angular/core/src/metadata/directives";
 import { SessionFile } from "../../shared/SessionFile";
 import { OCTRANIMATIONS } from "../../shared/OCTRAnimations";
 import { DropZoneComponent } from "../../component/drop-zone/drop-zone.component";
@@ -64,10 +63,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 				private sessionService: SessionService,
 				private api: APIService,
 				private cd: ChangeDetectorRef,
-				private http:Http,
-				private settingsService:SettingsService,
-				private modService:ModalService
-	) {
+				private http: Http,
+				private settingsService: SettingsService,
+				private modService: ModalService) {
 		this.subscrmanager = new SubscriptionManager();
 	}
 
@@ -75,12 +73,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 		this.browser_check = new BrowserCheck();
 		this.valid_platform = true;
 		this.agreement_checked = true;
-		if(this.apc.octra.allowed_browsers.length > 0)
+		if (this.apc.octra.allowed_browsers.length > 0)
 			this.valid_platform = this.browser_check.isValidBrowser(this.apc.octra.allowed_browsers);
 		else
 			this.valid_platform = true;
 
-		if(this.apc.octra.responsive.enabled == false)
+		if (this.apc.octra.responsive.enabled == false)
 			this.valid_size = window.innerWidth >= this.apc.octra.responsive.fixedwidth;
 		else
 			this.valid_size = true;
@@ -163,7 +161,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
 	@HostListener('window:resize', [ '$event' ])
 	onResize($event) {
-		if(this.apc.octra.responsive.enabled == false)
+		if (this.apc.octra.responsive.enabled == false)
 			this.valid_size = window.innerWidth >= this.apc.octra.responsive.fixedwidth;
 		else
 			this.valid_size = true;
@@ -178,7 +176,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 		return Functions.buildStr("{0} ({1} {2})", [ file.name, (Math.round(fsize.size * 100) / 100), fsize.label ]);
 	}
 
-	newTranscription = () =>{
+	newTranscription = () => {
 		if (this.dropzone.file != null) {
 			this.sessionService.clearSession();
 			this.sessionService.clearLocalStorage();
@@ -213,18 +211,18 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 		return "unknown";
 	}
 
-	getValidBrowsers():string{
+	getValidBrowsers(): string {
 		let result = "";
 
-		for(let i = 0; i < this.apc.octra.allowed_browsers.length; i++){
-			let browser = this.apc.octra.allowed_browsers[i];
-			result += browser.name + "("+ browser.version +")";
+		for (let i = 0; i < this.apc.octra.allowed_browsers.length; i++) {
+			let browser = this.apc.octra.allowed_browsers[ i ];
+			result += browser.name + "(" + browser.version + ")";
 		}
 
 		return result;
 	}
 
-	test(){
+	test() {
 		alert("OK");
 	}
 }

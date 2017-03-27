@@ -1,5 +1,11 @@
-import { AnimationMetadata, AnimationEntryMetadata, trigger, state, style, transition, animate } from "@angular/core";
-import { type } from "os";
+import { AnimationEntryMetadata } from "@angular/core";
+import {
+	trigger,
+	state,
+	style,
+	animate,
+	transition
+} from '@angular/animations';
 
 export const OCTRANIMATIONS: AnimationEntryMetadata[] = [
 	trigger('fadeToggle', [

@@ -1,10 +1,9 @@
-import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { SessionService } from "../../service/session.service";
 import { TranscriptionService } from "../../service/transcription.service";
 import { UserInteractionsService } from "../../service/userInteractions.service";
 import { APIService } from "../../service/api.service";
-import { ViewChild } from "@angular/core/src/metadata/di";
 import { ModalComponent } from "ng2-bs3-modal/components/modal";
 import { AudioService } from "../../service/audio.service";
 import { SubscriptionManager } from "../../shared";
@@ -12,8 +11,8 @@ import { SubscriptionManager } from "../../shared";
 
 @Component({
 	selector   : 'app-transcription-submitted',
-	templateUrl: 'transcription-submitted.component.html',
-	styleUrls  : [ 'transcription-submitted.component.css' ]
+	templateUrl: './transcription-submitted.component.html',
+	styleUrls  : [ './transcription-submitted.component.css' ]
 })
 export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, AfterViewInit {
 	@ViewChild('success') success_modal: ModalComponent;

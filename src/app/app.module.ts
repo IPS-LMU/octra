@@ -57,6 +57,7 @@ import { AppComponent } from "./app.component";
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { TranscrGuidelinesComponent } from './gui/transcr-guidelines/transcr-guidelines.component';
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
@@ -100,6 +101,7 @@ export function HttpLoaderFactory(http: Http) {
 	],
 	imports     : [
 		BrowserModule,
+		BrowserAnimationsModule,
 		TranslateModule.forRoot({
 			loader: {
 				provide   : TranslateLoader,

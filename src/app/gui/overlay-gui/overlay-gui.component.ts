@@ -38,24 +38,24 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 	@ViewChild('loupe') loupe: LoupeComponent;
 	@ViewChild('audionav') audionav: AudioNavigationComponent;
 
-	private showWindow: boolean = false;
+	public showWindow: boolean = false;
 	private subscrmanager:SubscriptionManager;
 
-	constructor(private transcrService: TranscriptionService,
-				private keyMap: KeymappingService,
-				private audio: AudioService,
-				private uiService: UserInteractionsService,
-				private cd: ChangeDetectorRef,
-				private msg: MessageService,
-				private settingsService:SettingsService
+	constructor(public transcrService: TranscriptionService,
+				public keyMap: KeymappingService,
+				public audio: AudioService,
+				public uiService: UserInteractionsService,
+				public cd: ChangeDetectorRef,
+				public msg: MessageService,
+				public settingsService:SettingsService
 	) {
 
 		this.subscrmanager = new SubscriptionManager();
 	}
 
-	private loupe_hidden = true;
+	public loupe_hidden = true;
 
-	private mini_loupecoord: any = {
+	public mini_loupecoord: any = {
 		x: 0,
 		y: 0
 	};

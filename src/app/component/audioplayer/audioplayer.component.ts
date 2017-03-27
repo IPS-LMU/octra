@@ -108,7 +108,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 	private height: number = 0;
 	private innerWidth: number = 0;
 	private oldInnerWidth: number = 0;
-	private focused = false;
+	public focused = false;
 
 	constructor(private audio: AudioService,
 				private ap: AudioplayerService,
@@ -257,7 +257,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 	/**
 	 * onMouseMove sets the selection to the current x values of the mouse move
 	 */
-	private onMouseMove($event) {
+	onMouseMove($event) {
 		let x = $event.offsetX;
 		let y = $event.offsetY;
 
@@ -272,7 +272,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 	/**
 	 * onClick sets the selection to the current x values of the click
 	 */
-	private onClick($event) {
+	onClick($event) {
 		let x = $event.offsetX;
 		let y = $event.offsetY;
 
@@ -495,7 +495,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 	 * @param $event
 	 */
 	@HostListener('window:resize', [ '$event' ])
-	private onResize($event) {
+	onResize($event) {
 		this.width = this.apview.elementRef.nativeElement.clientWidth;
 		this.innerWidth = this.width - this.settings.margin.left - this.settings.margin.right;
 
@@ -512,7 +512,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	@HostListener("window:beforeunload", [ "$event" ])
-	private onReload($event) {
+	onReload($event) {
 		this.subscrmanager.destroy();
 	}
 }

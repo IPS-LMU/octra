@@ -39,7 +39,7 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 	}
 
 	constructor(private audio: AudioService,
-				private keyMap: KeymappingService,
+				public keyMap: KeymappingService,
 				private transcr: TranscriptionService,
 				private uiService: UserInteractionsService,
 				private settingsService:SettingsService

@@ -19,11 +19,11 @@ export class ReloadFileComponent implements OnInit {
 
 	private error: string = "";
 
-	constructor(private router: Router,
-				private sessServ: SessionService,
-				private transcrServ: TranscriptionService,
-				private modService: ModalService,
-				private langService: TranslateService) {
+	constructor(public router: Router,
+				public sessServ: SessionService,
+				public transcrServ: TranscriptionService,
+				public modService: ModalService,
+				public langService: TranslateService) {
 	}
 
 	get sessionfile(): SessionFile {

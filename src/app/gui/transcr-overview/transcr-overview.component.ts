@@ -16,23 +16,23 @@ import { SubscriptionManager } from "../../shared";
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TranscrOverviewComponent implements OnInit, OnDestroy {
-	private get numberOfSegments(): number {
+	public get numberOfSegments(): number {
 		return (this.transcrService.segments) ? this.transcrService.segments.length : 0;
 	}
 
-	private get transcrSegments(): number {
+	public get transcrSegments(): number {
 		return (this.transcrService.segments) ? this.transcrService.statistic.transcribed : 0;
 	}
 
-	private get pauseSegments(): number {
+	public get pauseSegments(): number {
 		return (this.transcrService.segments) ? this.transcrService.statistic.pause : 0;
 	}
 
-	private get emptySegments(): number {
+	public get emptySegments(): number {
 		return (this.transcrService.segments) ? this.transcrService.statistic.empty : 0;
 	}
 
-	private segments: any[] = [];
+	public segments: any[] = [];
 	private subscrmanager: SubscriptionManager;
 	private updating: boolean = false;
 
@@ -67,10 +67,10 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy {
 		this.segments = result;
 	}
 
-	constructor(private transcrService: TranscriptionService,
-				private audio: AudioService,
-				private sanitizer: DomSanitizer,
-				private cd: ChangeDetectorRef) {
+	constructor(public transcrService: TranscriptionService,
+				public audio: AudioService,
+				public sanitizer: DomSanitizer,
+				public cd: ChangeDetectorRef) {
 
 		this.subscrmanager = new SubscriptionManager();
 	}

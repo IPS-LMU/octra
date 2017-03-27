@@ -39,7 +39,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 	}
 
 	private showWindow: boolean = false;
-	private pos_y: number = 0;
+	public pos_y: number = 0;
 	private subscrmanager: SubscriptionManager;
 
 	get appc(): any {
@@ -62,11 +62,11 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 		this.transcrService.segments.get(this.transcrService.selectedSegment.index).transcript;
 	}
 
-	constructor(private keyMap: KeymappingService,
-				private transcrService: TranscriptionService,
-				private audio: AudioService,
-				private uiService: UserInteractionsService,
-				private settingsService:SettingsService
+	constructor(public keyMap: KeymappingService,
+				public transcrService: TranscriptionService,
+				public audio: AudioService,
+				public uiService: UserInteractionsService,
+				public settingsService:SettingsService
 	) {
 
 		this.subscrmanager = new SubscriptionManager();

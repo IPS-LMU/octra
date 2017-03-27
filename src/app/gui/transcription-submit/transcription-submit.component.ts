@@ -30,13 +30,13 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 	@ViewChild('modal') modal: ModalComponent;
 	@ViewChild('modal2') modal2: ModalComponent;
 
-	constructor(private sessService: SessionService,
-				private router: Router,
-				private transcrService: TranscriptionService,
-				private api: APIService,
-				private cd: ChangeDetectorRef,
-				private sanitizer: DomSanitizer,
-				private navbarServ: NavbarService) {
+	constructor(public sessService: SessionService,
+				public router: Router,
+				public transcrService: TranscriptionService,
+				public api: APIService,
+				public cd: ChangeDetectorRef,
+				public sanitizer: DomSanitizer,
+				public navbarServ: NavbarService) {
 
 		this.subscrmanager = new SubscriptionManager();
 	}
@@ -48,7 +48,7 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 	};
 
 	private send_ok = false;
-	private send_error: string = "";
+	public send_error: string = "";
 	private subscrmanager: SubscriptionManager;
 
 	ngOnInit() {

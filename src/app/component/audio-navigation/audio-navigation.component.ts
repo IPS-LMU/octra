@@ -97,7 +97,7 @@ export class AudioNavigationComponent {
 	};
 
 	constructor(private uiService: UserInteractionsService,
-				private audio: AudioService,
+				public audio: AudioService,
 				private cd: ChangeDetectorRef,
 				private settingsSerice: SettingsService) {
 	}

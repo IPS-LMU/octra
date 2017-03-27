@@ -39,18 +39,18 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	@ViewChild('transcr') editor: TranscrEditorComponent;
 
 	private initialized = false;
-	private loupe_hidden = true;
-	private loupe2_hidden = true;
-	private segmentselected: boolean = false;
-	private activeviewer: string = "";
+	public loupe_hidden = true;
+	public loupe2_hidden = true;
+	public segmentselected: boolean = false;
+	public activeviewer: string = "";
 
 	private subscrmanager: SubscriptionManager;
-	private mini_loupecoord: any = {
+	public mini_loupecoord: any = {
 		x: 0,
 		y: 0
 	};
 
-	private mini_loupecoord2: any = {
+	public mini_loupecoord2: any = {
 		x: 0,
 		y: 70
 	};
@@ -67,13 +67,13 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 		return (this.viewer.Settings) ? this.viewer.Settings.shortcuts.segment_enter.keys[ this.platform ] : "";
 	}
 
-	constructor(private audio: AudioService,
-				private msg: MessageService,
-				private keyMap: KeymappingService,
-				private transcrService: TranscriptionService,
-				private cd: ChangeDetectorRef,
-				private uiService: UserInteractionsService,
-				private settingsService: SettingsService) {
+	constructor(public audio: AudioService,
+				public msg: MessageService,
+				public keyMap: KeymappingService,
+				public transcrService: TranscriptionService,
+				public cd: ChangeDetectorRef,
+				public uiService: UserInteractionsService,
+				public settingsService: SettingsService) {
 		this.subscrmanager = new SubscriptionManager();
 	}
 

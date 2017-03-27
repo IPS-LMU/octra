@@ -19,7 +19,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
 	@ViewChild("transcription_stop") transcription_stop: ModalComponent;
 	@ViewChild("error") error: ModalComponent;
 
-	private data: any;
+	public data: any;
 
 	ngOnInit() {
 		this.subscrmanager = new SubscriptionManager();

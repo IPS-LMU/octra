@@ -34,10 +34,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	@ViewChild('f') loginform: NgForm;
 	@ViewChild('dropzone') dropzone: DropZoneComponent;
 
-	private valid_platform: boolean = false;
-	private valid_size: boolean = false;
-	private browser_check: BrowserCheck;
-	private agreement_checked: boolean;
+	public valid_platform: boolean = false;
+	public valid_size: boolean = false;
+	public browser_check: BrowserCheck;
+	public agreement_checked: boolean;
 
 	private subscrmanager: SubscriptionManager;
 
@@ -60,7 +60,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
 	constructor(private router: Router,
 				private loginService: LoginService,
-				private sessionService: SessionService,
+				public sessionService: SessionService,
 				private api: APIService,
 				private cd: ChangeDetectorRef,
 				private http: Http,

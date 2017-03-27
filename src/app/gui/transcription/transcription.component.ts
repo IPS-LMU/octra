@@ -81,17 +81,17 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
 	private platform = BrowserInfo.platform;
 
-	constructor(private router: Router,
-				private audio: AudioService,
-				private uiService: UserInteractionsService,
-				private tranService: TranscriptionService,
-				private sessService: SessionService,
-				private keyMap: KeymappingService,
-				private changeDetecorRef: ChangeDetectorRef,
-				private navbarServ: NavbarService,
-				private settingsService: SettingsService,
-				private modService: ModalService,
-				private langService: TranslateService) {
+	constructor(public router: Router,
+				public audio: AudioService,
+				public uiService: UserInteractionsService,
+				public tranService: TranscriptionService,
+				public sessService: SessionService,
+				public keyMap: KeymappingService,
+				public changeDetecorRef: ChangeDetectorRef,
+				public navbarServ: NavbarService,
+				public settingsService: SettingsService,
+				public modService: ModalService,
+				public langService: TranslateService) {
 		this.subscrmanager = new SubscriptionManager();
 	}
 

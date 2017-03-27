@@ -115,7 +115,7 @@ export class KeymappingService {
 	 * @param key
 	 * @returns {any}
 	 */
-	private getShortcut(identifier:string, key: string): string {
+	public getShortcut(identifier:string, key: string): string {
 		let shortcuts = this.getShortcuts(identifier);
 
 		if (shortcuts) {

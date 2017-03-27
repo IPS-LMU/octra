@@ -22,10 +22,10 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 	public test: string = "ok";
 	collapsed: boolean = true;
 
-	constructor(private sessService: SessionService,
-				private navbarServ: NavbarService,
-				private sanitizer: DomSanitizer,
-				private langService:TranslateService) {
+	constructor(public sessService: SessionService,
+				public navbarServ: NavbarService,
+				public sanitizer: DomSanitizer,
+				public langService:TranslateService) {
 	}
 
 	ngOnDestroy() {

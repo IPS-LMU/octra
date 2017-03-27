@@ -46,7 +46,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 	subscrmanager: SubscriptionManager;
 
 	constructor(private audio: AudioService,
-				private av: AudioviewerService,
+				public av: AudioviewerService,
 				private transcr: TranscriptionService,
 				private keyMap: KeymappingService) {
 

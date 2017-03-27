@@ -1,9 +1,13 @@
-import { Component, OnInit, ViewChild, Input, AfterViewInit, OnChanges } from '@angular/core';
+import {
+	Component, OnInit, ViewChild, Input, AfterViewInit, OnChanges, ChangeDetectionStrategy,
+	ChangeDetectorRef
+} from '@angular/core';
 import { ModalComponent } from "ng2-bs3-modal/components/modal";
 import { isNullOrUndefined } from "util";
-import { Observable } from "rxjs";
 import { TranscriptionService } from "../../service/transcription.service";
 import { SubscriptionManager } from "../../shared/SubscriptionManager";
+import { Observable } from "rxjs";
+import { forEach } from "@angular/router/src/utils/collection";
 
 declare var videojs: any;
 
@@ -12,10 +16,12 @@ declare var videojs: any;
 	templateUrl: './transcr-guidelines.component.html',
 	styleUrls  : [ './transcr-guidelines.component.css' ]
 })
+
 export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChanges {
 	@ViewChild('modal_guidelines') modal_guidelines: ModalComponent;
 
 	@Input() guidelines = null;
+	private shown_guidelines:any = {};
 
 	private subscrmanager: SubscriptionManager = new SubscriptionManager();
 	private collapsed: any[][] = [];
@@ -24,7 +30,8 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 	private counter = 0;
 	private video_players: any[] = [];
 
-	constructor(private transcrService: TranscriptionService) {
+	constructor(private transcrService: TranscriptionService,
+				private cd: ChangeDetectorRef) {
 		this.subscrmanager.add(
 			transcrService.guidelinesloaded.subscribe(
 				(guidelines) => {
@@ -52,6 +59,9 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 	}
 
 	ngOnChanges($event) {
+		if (!isNullOrUndefined($event.guidelines.currentValue)) {
+			this.shown_guidelines = JSON.parse(JSON.stringify($event.guidelines.currentValue));
+		}
 		if (!isNullOrUndefined($event.guidelines.previousValue)) {
 			setTimeout(() => {
 				for (let g = 0; g < this.guidelines.instructions.length; g++) {
@@ -114,5 +124,38 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 			}
 		}
 		return -1;
+	}
+
+	private search(text: string) {
+		console.log("search for " + text);
+		if (text != "") {
+			this.shown_guidelines.instructions = [];
+
+			for(let i in this.guidelines.instructions){
+				let instruction = this.guidelines.instructions[i];
+				if(instruction.group.indexOf(text) > -1){
+					this.shown_guidelines.instructions.push(instruction);
+				} else{
+					let instr = JSON.parse(JSON.stringify(instruction));
+					instr.entries = [];
+
+					for(let e in instruction.entries){
+						let entry = instruction.entries[e];
+						if(entry.title.indexOf(text) > -1
+							|| entry.description.indexOf(text) > -1
+						){
+							instr.entries.push(entry);
+						}
+					}
+
+					if(instr.entries.length > 0){
+						this.shown_guidelines.instructions.push(instr);
+					}
+				}
+			}
+		}
+		else {
+			this.shown_guidelines = JSON.parse(JSON.stringify(this.guidelines));
+		}
 	}
 }

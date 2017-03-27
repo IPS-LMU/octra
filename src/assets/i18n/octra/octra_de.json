@@ -36,7 +36,8 @@
     "validation": "Validierung",
     "search": "Suche",
     "project": "Projekt",
-    "authors": "Authoren"
+    "authors": "Authoren",
+    "no guidelines found": "Keine Transkriptionsrichtlinien gefunden"
   },
   "transcription":{
     "start": "Transkription fortsetzen",

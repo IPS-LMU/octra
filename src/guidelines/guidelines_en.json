@@ -29,7 +29,7 @@
           "code": "M02",
           "priority": 90,
           "title": "Ein anderer Titel",
-          "description": "nonverbale Sprechergeräusche werden mit '<usb>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Lachen, Husten, Schmatzen, lautes Atmen",
+          "description": "nonverbale hello werden mit '<usb>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Lachen, Husten, Schmatzen, lautes Atmen",
           "examples": [
             {
               "annotation": "Hanna *L <usb> Hanna Lühmann",

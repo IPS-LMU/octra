@@ -18,14 +18,17 @@
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
                         <input type="text" id="addon1" placeholder="{{'general.search' |translate}}"
-                               class="form-control">
+                               class="form-control" #input (keyup)="search(input.value)">
                     </div>
                 </div>
             </div>
         </div>
     </modal-header>
     <modal-body>
-        <div class="row" *ngFor="let instructions of guidelines.instructions;let j = index;">
+        <div *ngIf="shown_guidelines.instructions.length == 0" class="bg-warning">
+            {{"general.no guidelines found" | translate}}
+        </div>
+        <div class="row" *ngFor="let instructions of shown_guidelines.instructions;let j = index;">
             <div class="col-xs-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">{{instructions.group}}</div>

@@ -35,8 +35,8 @@ import { TranscrGuidelinesComponent } from "../transcr-guidelines/transcr-guidel
 
 @Component({
 	selector       : 'app-transcription',
-	templateUrl    : 'transcription.component.html',
-	styleUrls      : [ 'transcription.component.css' ],
+	templateUrl    : './transcription.component.html',
+	styleUrls      : [ './transcription.component.css' ],
 	providers      : [ MessageService ],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })

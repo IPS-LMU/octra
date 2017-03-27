@@ -21,8 +21,8 @@ import { SubscriptionManager } from "../../shared";
 
 @Component({
 	selector       : 'app-transcription-submit',
-	templateUrl    : 'transcription-submit.component.html',
-	styleUrls      : [ 'transcription-submit.component.css' ],
+	templateUrl    : './transcription-submit.component.html',
+	styleUrls      : [ './transcription-submit.component.css' ],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactivate, OnDestroy, AfterViewInit {

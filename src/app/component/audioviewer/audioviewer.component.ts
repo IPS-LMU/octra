@@ -30,8 +30,8 @@ import { AudioviewerService } from "./service/audioviewer.service";
 declare var window: any;
 @Component({
 	selector   : 'app-audioviewer',
-	templateUrl: 'audioviewer.component.html',
-	styleUrls  : [ 'audioviewer.component.css' ],
+	templateUrl: './audioviewer.component.html',
+	styleUrls  : [ './audioviewer.component.css' ],
 	providers  : [ AudioviewerService ]
 })
 

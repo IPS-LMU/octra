@@ -27,8 +27,8 @@ import { SettingsService } from "../../service/settings.service";
 
 @Component({
 	selector   : 'app-signal-gui',
-	templateUrl: 'signal-gui.component.html',
-	styleUrls  : [ 'signal-gui.component.css' ]
+	templateUrl: './signal-gui.component.html',
+	styleUrls  : [ './signal-gui.component.css' ]
 })
 export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	@ViewChild('viewer') viewer: AudioviewerComponent;

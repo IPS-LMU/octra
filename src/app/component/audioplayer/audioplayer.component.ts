@@ -28,8 +28,8 @@ import { AudioplayerService } from "./service/audioplayer.service";
 
 @Component({
 	selector       : 'app-audioplayer',
-	templateUrl    : 'audioplayer.component.html',
-	styleUrls      : [ 'audioplayer.component.css' ],
+	templateUrl    : './audioplayer.component.html',
+	styleUrls      : [ './audioplayer.component.css' ],
 	providers      : [ AudioplayerService ],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })

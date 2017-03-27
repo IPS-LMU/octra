@@ -13,8 +13,8 @@ declare var window: any;
 
 @Component({
 	selector   : 'app-circleloupe',
-	templateUrl: 'circleloupe.component.html',
-	styleUrls  : [ 'circleloupe.component.css' ],
+	templateUrl: './circleloupe.component.html',
+	styleUrls  : [ './circleloupe.component.css' ],
 	providers  : [ CircleLoupeService ]
 })
 

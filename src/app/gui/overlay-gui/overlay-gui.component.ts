@@ -29,8 +29,8 @@ import { SettingsService } from "../../service/settings.service";
 
 @Component({
 	selector: 'app-overlay-gui',
-	templateUrl: 'overlay-gui.component.html',
-	styleUrls: [ 'overlay-gui.component.css' ]
+	templateUrl: './overlay-gui.component.html',
+	styleUrls: [ './overlay-gui.component.css' ]
 })
 export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentChecked, OnChanges {
 	@ViewChild('viewer') viewer: AudioviewerComponent;

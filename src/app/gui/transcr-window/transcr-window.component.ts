@@ -16,7 +16,7 @@ import { SettingsService } from "../../service/settings.service";
 
 @Component({
 	selector   : 'app-transcr-window',
-	templateUrl: 'transcr-window.component.html',
+	templateUrl: './transcr-window.component.html',
 	styleUrls  : [ './transcr-window.component.css' ]
 })
 export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterViewInit, OnDestroy {

@@ -25,8 +25,8 @@ import { ModalService } from "../../service/modal.service";
 
 @Component({
 	selector   : 'app-login',
-	templateUrl: 'login.component.html',
-	styleUrls  : [ 'login.component.css' ],
+	templateUrl: './login.component.html',
+	styleUrls  : [ './login.component.css' ],
 	providers  : [ LoginService ],
 	animations : OCTRANIMATIONS
 })

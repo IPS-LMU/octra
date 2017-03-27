@@ -29,8 +29,8 @@ export interface Buttons {
 
 @Component({
 	selector   : 'app-audio-navigation',
-	templateUrl: 'audio-navigation.component.html',
-	styleUrls  : [ 'audio-navigation.component.css' ]
+	templateUrl: './audio-navigation.component.html',
+	styleUrls  : [ './audio-navigation.component.css' ]
 })
 export class AudioNavigationComponent {
 	get volume(): number {

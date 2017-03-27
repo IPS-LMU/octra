@@ -11,8 +11,8 @@ declare var window: any;
 
 @Component({
 	selector   : 'app-loupe',
-	templateUrl: 'loupe.component.html',
-	styleUrls  : [ 'loupe.component.css' ],
+	templateUrl: './loupe.component.html',
+	styleUrls  : [ './loupe.component.css' ],
 	providers  : [ AudioviewerService ]
 })
 

@@ -38,13 +38,14 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	@ViewChild('nav') nav: AudioNavigationComponent;
 	@ViewChild('transcr') editor: TranscrEditorComponent;
 
+	private subscrmanager: SubscriptionManager;
+
 	private initialized = false;
 	public loupe_hidden = true;
 	public loupe2_hidden = true;
 	public segmentselected: boolean = false;
 	public activeviewer: string = "";
 
-	private subscrmanager: SubscriptionManager;
 	public mini_loupecoord: any = {
 		x: 0,
 		y: 0
@@ -157,6 +158,9 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	ngAfterViewInit() {
+		console.log(this.loupee);
+		this.mini_loupecoord2.y = this.loupee.getLocation().y - this.loupee.Settings.height
+			- (this.loupe2.Settings.height/2);
 		this.initialized = true;
 		this.cd.detectChanges();
 	}
@@ -176,6 +180,8 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	onMouseOver(cursor: AVMousePos) {
+		console.log("cursor1");
+		console.log(cursor);
 		this.changeArea(this.loupe, this.viewer, this.mini_loupecoord, this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x);
 	}
 

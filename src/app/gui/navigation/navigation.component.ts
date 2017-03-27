@@ -22,7 +22,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 	public test: string = "ok";
 	collapsed: boolean = true;
 
-	constructor(public sessService: SessionService,
+	constructor(private sessService: SessionService,
 				public navbarServ: NavbarService,
 				public sanitizer: DomSanitizer,
 				public langService:TranslateService) {

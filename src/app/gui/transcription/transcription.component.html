@@ -100,6 +100,8 @@
 
     <app-transcr-guidelines #modal_guidelines [guidelines]="tranService.guidelines"></app-transcr-guidelines>
 
+
+    interface: {{sessService.Interface}}
     <div *ngIf="!(sessService.Interface == 'overlay')">
         <app-signal-gui #signalloupe *ngIf="sessService.Interface == 'signaldisplay'">
         </app-signal-gui>

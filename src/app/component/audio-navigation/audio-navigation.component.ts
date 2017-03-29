@@ -1,7 +1,6 @@
 import { Component, Output, EventEmitter, ChangeDetectorRef, Input } from '@angular/core';
 
-import { UserInteractionsService, AudioService } from "../../service";
-import { BrowserInfo } from "../../shared";
+import { UserInteractionsService } from "../../service";
 import { SettingsService } from "../../service/settings.service";
 
 export interface Buttons {
@@ -46,9 +45,8 @@ export class AudioNavigationComponent {
 		this._volume = value;
 	}
 
-	get appc(): any {
-		return this.settingsSerice.app_settings;
-	}
+	@Input() audioplaying:boolean = false;
+	@Input() responsive:boolean = false;
 
 	@Output() buttonclick = new EventEmitter<{ type: string, timestamp: number }>();
 	@Output() volumechange = new EventEmitter<{ old_value: number, new_value: number, timestamp: number }>();
@@ -96,11 +94,7 @@ export class AudioNavigationComponent {
 		}
 	};
 
-	constructor(private uiService: UserInteractionsService,
-				public audio: AudioService,
-				private cd: ChangeDetectorRef,
-				private settingsSerice: SettingsService) {
-	}
+	constructor(private cd: ChangeDetectorRef) {}
 
 	/**
 	 * called when button of navigation has been clicked

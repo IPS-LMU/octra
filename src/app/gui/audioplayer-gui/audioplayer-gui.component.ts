@@ -111,7 +111,7 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 
 	updateSegment($event) {
 		let segment = this.transcr.segments.get(0);
-		segment.transcript = this.editor.getRawText();
+		segment.transcript = this.editor.rawText;
 		this.transcr.segments.change(0, segment);
 	}
 

@@ -8,6 +8,7 @@ import { TranscriptionService, AudioService } from "../../service";
 import { Subscription } from "rxjs";
 import { Functions } from "../../shared/Functions";
 import { SubscriptionManager } from "../../shared";
+import { isNullOrUndefined } from "util";
 
 @Component({
 	selector       : 'app-transcr-overview',
@@ -47,9 +48,14 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy {
 			let obj = {
 				start     : start_time,
 				end       : segment.time.seconds,
-				transcript: this.transcrService.rawToHTML(segment.transcript),
+				transcript: segment.transcript,
 				validation: ""
 			};
+
+			if (typeof validateAnnotation === "function") {
+				obj.transcript = this.transcrService.underlineTextRed(obj.transcript, validateAnnotation(obj.transcript));
+			}
+			obj.transcript = this.transcrService.rawToHTML(obj.transcript);
 
 			let validation = this.transcrService.validateTranscription(segment.transcript);
 
@@ -75,17 +81,19 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy {
 		this.subscrmanager = new SubscriptionManager();
 	}
 
-	ngOnDestroy(){
+	ngOnDestroy() {
 		this.subscrmanager.destroy();
 	}
 
 	ngOnInit() {
-		if(this.audio.audiobuffer == null) {
+		if (this.audio.audiobuffer == null) {
 			this.subscrmanager.add(this.audio.afterloaded.subscribe(() => {
 				this.subscrmanager.add(this.transcrService.segments.onsegmentchange.subscribe(() => {
+
 					if (!this.updating) {
 						this.updating = true;
 						setTimeout(() => {
+							console.log("ok3");
 							this.updateSegments();
 							this.cd.markForCheck();
 							this.updating = false;
@@ -96,25 +104,35 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy {
 				this.updateSegments();
 				this.cd.markForCheck();
 			}));
-
+			console.log("ok1");
 			this.updateSegments();
 			this.cd.markForCheck();
-		} else{
+		}
+		else {
 
 			this.subscrmanager.add(this.transcrService.segments.onsegmentchange.subscribe(() => {
 				if (!this.updating) {
 
 					this.updating = true;
 					setTimeout(() => {
+						console.log("ok4");
 						this.updateSegments();
 						this.cd.markForCheck();
 						this.updating = false;
 					}, 1000);
 				}
 			}));
+			console.log("ok2");
 			this.updateSegments();
 			this.cd.markForCheck();
 		}
+
+		this.subscrmanager.add(this.transcrService.validationmethodloaded.subscribe(() => {
+			setTimeout(()=>{
+				this.updateSegments();
+				this.cd.markForCheck();
+			}, 1000);
+		}));
 	}
 
 	sanitizeHTML(str: string): string {

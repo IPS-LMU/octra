@@ -42,7 +42,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 	public pos_y: number = 0;
 	private subscrmanager: SubscriptionManager;
 
-	get appc(): any {
+	get app_settings(): any {
 		return this.settingsService.app_settings;
 	}
 
@@ -74,7 +74,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
 	ngOnInit() {
 		this.editor.Settings.markers = this.settingsService.markers.items;
-		this.editor.Settings.responsive = this.appc.octra.responsive.enabled;
+		this.editor.Settings.responsive = this.app_settings.octra.responsive.enabled;
 
 		this.subscrmanager.add(this.editor.loaded.subscribe(
 			() => {
@@ -133,7 +133,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 	}
 
 	onButtonClick(event: { type: string, timestamp: number }) {
-		if (this.appc.octra.logging == true)
+		if (this.app_settings.octra.logging == true)
 			this.uiService.addElementFromEvent("mouse_click", {}, event.timestamp, event.type + "_button");
 
 		if (event.type === "replay")
@@ -188,7 +188,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 	}
 
 	afterSpeedChange(event: { new_value: number, timestamp: number }) {
-		if (this.appc.octra.logging == true)
+		if (this.app_settings.octra.logging == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "speed_change");
 	}
 
@@ -197,7 +197,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 	}
 
 	afterVolumeChange(event: { new_value: number, timestamp: number }) {
-		if (this.appc.octra.logging == true)
+		if (this.app_settings.octra.logging == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "volume_change");
 	}
 }

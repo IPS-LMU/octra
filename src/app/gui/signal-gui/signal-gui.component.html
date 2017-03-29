@@ -24,7 +24,8 @@
                       (aftervolumechange)="afterVolumeChange($event)"
                       (speedchange)="onSpeedChange($event)"
                       (afterspeedchange)="afterSpeedChange($event)"
-
+                      [(audioplaying)]="audio.audioplaying"
+                      [(responsive)]="app_settings.octra.responsive.enabled"
                       [buttons]="{
                         play: {
                             label: ('general.play' | translate),
@@ -70,7 +71,8 @@
            (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
 >
 </app-loupe>
-<div *ngIf="!segmentselected" id="editor-placeholder" [innerHTML]="'signal-gui.selection text' | translate:{value: segmententer_shortc}">
+<div *ngIf="!segmentselected" id="editor-placeholder"
+     [innerHTML]="'signal-gui.selection text' | translate:{value: segmententer_shortc}">
 </div>
 <app-transcr-editor #transcr
                     (onkeyup)="onTranscriptionChanged($event)"

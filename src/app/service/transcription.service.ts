@@ -381,13 +381,11 @@ export class TranscriptionService {
 	 */
 	private replaceMarkersWithHTML(input: string): string {
 		let result = input;
-		for (let i = 0; i < this.settingsService.markers.items.length; i++) {
-			let marker = this.settingsService.markers.items[ i ];
+		for (let i = 0; i < this._guidelines.markers.length; i++) {
+			let marker = this._guidelines.markers[ i ];
 			let regex = new RegExp(Functions.escapeRegex(marker.code), "g");
 			result = result.replace(regex, "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "'/>");
 		}
-
-		console.log("M :" + result);
 		return result;
 	}
 
@@ -406,6 +404,7 @@ export class TranscriptionService {
 	}
 
 	public loadGuidelines(language: string, url: string): Subscription {
+
 		return this.http.get(url).subscribe(
 			(response: Response) => {
 				this._guidelines = response.json();

@@ -45,7 +45,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 	private updating: boolean = false;
 
 	private updateSegments() {
-		if (!this.transcrService.segments) return [];
+		if (!this.transcrService.segments || !this.transcrService.guidelines) return [];
 
 		let start_time = 0;
 		let result = [];
@@ -101,7 +101,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 					if (!this.updating) {
 						this.updating = true;
 						setTimeout(() => {
-							console.log("ok3");
 							this.updateSegments();
 							this.cd.markForCheck();
 							this.updating = false;
@@ -123,14 +122,12 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
 					this.updating = true;
 					setTimeout(() => {
-						console.log("ok4");
 						this.updateSegments();
 						this.cd.markForCheck();
 						this.updating = false;
 					}, 1000);
 				}
 			}));
-			console.log("ok2");
 			this.updateSegments();
 			this.cd.markForCheck();
 		}

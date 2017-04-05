@@ -34,5 +34,6 @@
                     (onkeyup)="updateSegment($event);"
                     (marker_insert)="onMarkerInsert($event)"
                     (marker_click)="onMarkerClick($event)"
+                    [markers]="transcrService.guidelines.markers"
 >
 </app-transcr-editor>

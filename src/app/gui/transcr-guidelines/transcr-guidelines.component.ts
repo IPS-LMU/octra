@@ -38,19 +38,14 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 		this.subscrmanager.add(
 			transcrService.guidelinesloaded.subscribe(
 				(guidelines) => {
-					this.entries = 0;
-					this.guidelines = guidelines;
-
-					for (let i = 0; i < guidelines.instructions.length; i++) {
-						this.entries += guidelines.instructions[ i ].entries.length;
-					}
-
-					this.initVideoPlayers();
-
-					this.unCollapseAll();
+					this.init();
 				}
 			)
 		);
+
+		if(!isNullOrUndefined(this.transcrService.guidelines)){
+			this.init();
+		}
 	}
 
 	get visible(): boolean {
@@ -62,6 +57,19 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 
 	ngAfterViewInit() {
 
+	}
+
+	init(){
+		this.entries = 0;
+		this.guidelines = this.transcrService.guidelines;
+
+		for (let i = 0; i < this.transcrService.guidelines.instructions.length; i++) {
+			this.entries += this.transcrService.guidelines.instructions[ i ].entries.length;
+		}
+
+		this.initVideoPlayers();
+
+		this.unCollapseAll();
 	}
 
 	ngOnChanges($event) {
@@ -88,7 +96,6 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 							//videojs(document.getElementById(id_v)).dispose();
 						}
 						else {
-							console.log("init " + id_v);
 							let player = videojs(id_v, {
 								"fluid"   : true,
 								"autoplay": false,
@@ -138,7 +145,6 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 	}
 
 	private search(text: string) {
-		console.log("search for " + text);
 		if (text != "") {
 			this.shown_guidelines.instructions = [];
 

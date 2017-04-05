@@ -40,7 +40,7 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 
 	constructor(private audio: AudioService,
 				public keyMap: KeymappingService,
-				private transcr: TranscriptionService,
+				private transcrService: TranscriptionService,
 				private uiService: UserInteractionsService,
 				private settingsService:SettingsService
 	) {
@@ -50,13 +50,13 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 	ngOnInit() {
 		this.settings.shortcuts = this.keyMap.register("AP", this.settings.shortcuts);
 		this.shortcuts = this.settings.shortcuts;
-		this.editor.Settings.markers = this.settingsService.markers.items;
+		this.editor.Settings.markers = this.transcrService.guidelines.markers.items;
 		this.editor.Settings.responsive = this.settingsService.app_settings.octra.responsive.enabled;
 	}
 
 	ngAfterViewInit() {
-		if (this.transcr.segments.length > 0) {
-			this.editor.rawText = this.transcr.segments.get(0).transcript;
+		if (this.transcrService.segments.length > 0) {
+			this.editor.rawText = this.transcrService.segments.get(0).transcript;
 		}
 		this.editor.Settings.height = 300;
 		this.editor.update();
@@ -110,9 +110,9 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 	}
 
 	updateSegment($event) {
-		let segment = this.transcr.segments.get(0);
+		let segment = this.transcrService.segments.get(0);
 		segment.transcript = this.editor.rawText;
-		this.transcr.segments.change(0, segment);
+		this.transcrService.segments.change(0, segment);
 	}
 
 	onShortcutTriggered(event) {

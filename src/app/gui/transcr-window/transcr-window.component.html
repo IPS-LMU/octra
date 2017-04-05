@@ -38,6 +38,7 @@
     <app-transcr-editor #editor id="trancr"
                         (marker_insert)="onMarkerInsert($event)"
                         (marker_click)="onMarkerClick($event)"
+                        [markers]="transcrService.guidelines.markers"
     ></app-transcr-editor>
     <div class="window-nav-bottom">
         <div class="row">

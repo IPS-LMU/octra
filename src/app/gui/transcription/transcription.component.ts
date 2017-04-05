@@ -66,7 +66,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	}
 
 	get loaded(): boolean {
-		return this.audio.loaded;
+		return (this.audio.loaded && !isNullOrUndefined(this.tranService.guidelines));
 	}
 
 	get appc(): any {

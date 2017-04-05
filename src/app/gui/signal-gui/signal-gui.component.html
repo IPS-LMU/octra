@@ -79,5 +79,7 @@
                     (marker_insert)="onMarkerInsert($event)"
                     (marker_click)="onMarkerClick($event)"
                     (typing)="onEditorTyping($event)"
-                    [visible]="segmentselected">
+                    [visible]="segmentselected"
+                    [markers]="transcrService.guidelines.markers"
+>
 </app-transcr-editor>

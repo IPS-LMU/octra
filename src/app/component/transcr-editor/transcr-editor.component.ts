@@ -8,6 +8,7 @@ import { KeyMapping, BrowserInfo, Functions, SubscriptionManager } from "../../s
 import { TranscrEditorConfigValidator } from "./validator/TranscrEditorConfigValidator";
 import { SettingsService } from "../../service/settings.service";
 import { TranscriptionService } from "../../service/transcription.service";
+import { isNullOrUndefined } from "util";
 
 @Component({
 	selector   : 'app-transcr-editor',
@@ -32,6 +33,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	private init: number = 0;
 
 	@Input() visible: boolean = true;
+	@Input() markers: any = true;
 
 	get rawText(): string {
 		return this.tidyUpRaw(this._rawText);
@@ -55,10 +57,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 		this._settings = value;
 	}
 
-	private get markers(): any {
-		return this.settingsService.markers.items;
-	}
-
 	constructor(private cd: ChangeDetectorRef,
 				private settingsService: SettingsService,
 				private langService: TranslateService,
@@ -66,37 +64,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
 		this._settings = new TranscrEditorConfig().Settings;
 		this.subscrmanager = new SubscriptionManager();
-
-		this.subscrmanager.add(this.langService.onLangChange.subscribe(
-			($event) => {
-				let navigation = this.initNavigation();
-
-				this.textfield.summernote('destroy');
-				this.textfield.summernote({
-					height             : this.Settings.height,
-					focus              : true,
-					disableDragAndDrop : true,
-					disableResizeEditor: true,
-					disableResizeImage : true,
-					popover            : [],
-					airPopover         : [],
-					toolbar            : [
-						[ 'mybutton', navigation.str_array ]
-					],
-					shortcuts          : false,
-					buttons            : navigation.buttons,
-					callbacks          : {
-						onKeydown: this.onKeyDownSummernote,
-						onKeyup  : this.onKeyUpSummernote,
-						onPaste  : function (e) {
-							//prevent copy paste
-							e.preventDefault();
-						}
-					}
-				});
-
-			}
-		));
 		this.validateConfig();
 	}
 
@@ -113,6 +80,33 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	}
 
 	ngOnChanges(obj) {
+		if (!isNullOrUndefined(obj.markers) && obj.markers.previousValue != obj.markers.newValue){
+			let navigation = this.initNavigation();
+
+			this.textfield.summernote('destroy');
+			this.textfield.summernote({
+				height             : this.Settings.height,
+				focus              : true,
+				disableDragAndDrop : true,
+				disableResizeEditor: true,
+				disableResizeImage : true,
+				popover            : [],
+				airPopover         : [],
+				toolbar            : [
+					[ 'mybutton', navigation.str_array ]
+				],
+				shortcuts          : false,
+				buttons            : navigation.buttons,
+				callbacks          : {
+					onKeydown: this.onKeyDownSummernote,
+					onKeyup  : this.onKeyUpSummernote,
+					onPaste  : function (e) {
+						//prevent copy paste
+						e.preventDefault();
+					}
+				}
+			});
+		}
 	}
 
 	/**
@@ -204,7 +198,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 				},
 				onChange : () => {
 					this.init++;
-					console.log("changed");
 
 					if (this.init == 1) {
 						this.focus(true);
@@ -254,7 +247,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 		// create button
 		let button = this.summernote_ui.button({
 			contents: icon,
-			tooltip : marker.description[ this.langService.currentLang ] + " Shortcut: [" + marker.shortcut[ platform ] + "]",
+			tooltip : marker.description + " Shortcut: [" + marker.shortcut[ platform ] + "]",
 			click   : () => {
 				// invoke insertText method with 'hello' on editor module.
 				this.insertMarker(marker.code, marker.icon_url);
@@ -297,8 +290,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 					if (marker.shortcut[ platform ] == comboKey) {
 						$event.preventDefault();
 						let test = this.textfield.summernote("createRange");
-						console.log("TEST");
-						console.log(test);
 						this.insertMarker(marker.code, marker.icon_url);
 						this.marker_insert.emit(marker.code);
 						return;
@@ -526,9 +517,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 				}
 				*/
 			}
-
-			console.log("val");
-			console.log(puffer);
 		}
 		return result;
 	}

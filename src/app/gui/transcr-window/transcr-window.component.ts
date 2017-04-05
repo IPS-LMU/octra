@@ -73,7 +73,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 	}
 
 	ngOnInit() {
-		this.editor.Settings.markers = this.settingsService.markers.items;
+		this.editor.Settings.markers = this.transcrService.guidelines.markers;
 		this.editor.Settings.responsive = this.app_settings.octra.responsive.enabled;
 
 		this.subscrmanager.add(this.editor.loaded.subscribe(

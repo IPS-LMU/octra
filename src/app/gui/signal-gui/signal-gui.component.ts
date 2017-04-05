@@ -60,7 +60,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 
 	private platform = BrowserInfo.platform;
 
-	private get app_settings(): any {
+	public get app_settings(): any {
 		return this.settingsService.app_settings;
 	}
 

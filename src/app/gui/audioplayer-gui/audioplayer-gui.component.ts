@@ -34,13 +34,13 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 		this.audioplayer.settings = value;
 	}
 
-	private get app_settings():any{
+	public get app_settings():any{
 		return this.settingsService.app_settings;
 	}
 
-	constructor(private audio: AudioService,
+	constructor(public audio: AudioService,
 				public keyMap: KeymappingService,
-				private transcrService: TranscriptionService,
+				public transcrService: TranscriptionService,
 				private uiService: UserInteractionsService,
 				private settingsService:SettingsService
 	) {

@@ -62,7 +62,7 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 
 	private shortcuts: any = {};
 
-	private get app_settings():any{
+	public get app_settings():any{
 		return this.settingsService.app_settings;
 	}
 

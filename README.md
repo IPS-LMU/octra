@@ -13,7 +13,7 @@ One special feature of OCTRA is that it saves your proceedings automatically in 
 At the moment, OCTRA can only be used locally. Please notice that OCTRA is still in development and could be buggy.
 
 ## Production Use
-In a production environment you don't need to compile OCTRA again. Just copy the content of the ``dist`` folder to your http-server. __Do not override your old config.json and markers.json__.
+In a production environment you don't need to compile OCTRA again. Just download the latest release from the releases page and copy the content of the ``dist`` folder to your http-server. __Do not override your old config.json and markers.json__.
 
 Before you can use OCTRA duplicate and rename `config_sample.json` to `config.json`.Please make sure, that you offer all translation files for any language you defined in config.json. If you had another config files before make sure to keep these files. To make sure that the strucure of your config files are valid in the new version please compare these with the new *_sample.json files
 

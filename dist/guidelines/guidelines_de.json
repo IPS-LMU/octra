@@ -1,0 +1,195 @@
+{
+  "meta": {
+    "object_language": "deu",
+    "language": "de",
+    "project": "Sprecherinnen",
+    "authors": "Test Person (testperson@email.de)",
+    "version": "1.0",
+    "date": "2017-03-02",
+    "encoding": "UTF-8",
+    "validation_url": "assets/testfiles/validation.js"
+  },
+  "instructions": [
+    {
+      "group": "Beliebige Gruppierung",
+      "entries": [
+        {
+          "code": "M01",
+          "priority": 100,
+          "title": "Nonverbale Störgeräusche",
+          "description": "nonverbale Sprechergeräusche werden mit '<usb>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Lachen, Husten, Schmatzen, lautes Atmen",
+          "examples": [
+            {
+              "annotation": "Hanna *L <usb> Hanna Lühmann",
+              "url": "assets/testfiles/test.mp4"
+            }
+          ]
+        },
+        {
+          "code": "M02",
+          "priority": 90,
+          "title": "Ein anderer Titel",
+          "description": "nonverbale Sprechergeräusche werden mit '<usb>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Lachen, Husten, Schmatzen, lautes Atmen",
+          "examples": [
+            {
+              "annotation": "Hanna *L <usb> Hanna Lühmann",
+              "url": "assets/testfiles/AAA4600C3_0_fragment.wav"
+            },
+            {
+              "annotation": "Hanna *L <usb> Hanna Lühmann",
+              "url": "assets/testfiles/test.mp4"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "",
+      "entries": [
+        {
+          "code": "M01",
+          "priority": 100,
+          "title": "Keine Gruppierung 1",
+          "description": "nonverbale Sprechergeräusche werden mit '<usb>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Lachen, Husten, Schmatzen, lautes Atmen",
+          "examples": [
+            {
+              "annotation": "Hanna *L <usb> Hanna Lühmann",
+              "url": ""
+            },
+            {
+              "annotation": "Hanna *L <usb> Hanna Lühmann",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "code": "M02",
+          "priority": 90,
+          "title": "Keine Gruppierung 2",
+          "description": "nonverbale Sprechergeräusche werden mit '<usb>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Lachen, Husten, Schmatzen, lautes Atmen",
+          "examples": [
+            {
+              "annotation": "Hanna *L <usb> Hanna Lühmann",
+              "url": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "group2",
+      "entries": [
+        {
+          "code": "M02",
+          "priority": 100,
+          "title": "Geräusche nicht vom Sprecher",
+          "description": "Geräusche, die nicht vom Sprecher stammen, werden mit '<nib>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Türgeräusche, Klopfen",
+          "examples": [
+            {
+              "annotation": "Hanna *L <usb> Hanna Lühmann",
+              "url": ""
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "markers": [
+    {
+      "id": 1,
+      "name": "truncation marker start",
+      "code": "[~abc]",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_start.png",
+      "button_text": "~abc",
+      "description": "Diesen Marker nur am Anfang setzen, sollte die Audiosequenz mit einem abgeschnittenem Wort beginnen",
+      "shortcut": {
+        "mac": "ALT + 1",
+        "pc": "ALT + 1"
+      }
+    },
+    {
+      "id": 2,
+      "name": "filled pause",
+      "code": "[fil]",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/fil.png",
+      "button_text": "Gefüllte Pause",
+      "description": "Für Zögern des Sprechers wie hm, ähm, äh und andere.",
+      "shortcut": {
+        "mac": "ALT + 2",
+        "pc": "ALT + 2"
+      }
+    },
+    {
+      "id": 3,
+      "name": "intermittent noise",
+      "code": "[int]",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/int.png",
+      "button_text": "unterbrechendes Geräusch",
+      "description": "Für kurzes, eindeutiges Geräusch wie z.B. Türknallen, das Berühren des Mirkrofons, oder ähnliches.",
+      "shortcut": {
+        "mac": "ALT + 3",
+        "pc": "ALT + 3"
+      }
+    },
+    {
+      "id": 4,
+      "name": "speaker noise",
+      "code": "[spk]",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/spk.png",
+      "button_text": "Sprechergeräusch",
+      "description": "Für Geräusche und Unterbrechungen, die der Sprecher produziert wie z.B. lautes Atmen, Lachen oder ähnliches.",
+      "shortcut": {
+        "mac": "ALT + 4",
+        "pc": "ALT + 4"
+      }
+    },
+    {
+      "id": 5,
+      "name": "stationary noise",
+      "code": "[sta]",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/sta.png",
+      "button_text": "Andauerndes Geräusch",
+      "description": "Für lang andauerndes, lautes Geräusch wie Verkehrslärm, Musik oder Radio im Hintergrund.",
+      "shortcut": {
+        "mac": "ALT + 5",
+        "pc": "ALT + 5"
+      }
+    },
+    {
+      "id": 6,
+      "name": "unclear word",
+      "code": "**",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/stars.png",
+      "button_text": "**",
+      "description": "Diesen Marker vor einem Wort setzen, welches einer unverständlichen Sprache entstammt.",
+      "shortcut": {
+        "mac": "ALT + 6",
+        "pc": "ALT + 6"
+      }
+    },
+    {
+      "id": 7,
+      "name": "truncation marker end",
+      "code": "[abc~]",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_end.png",
+      "button_text": "abc~",
+      "description": "Diesen Marker nur am Ende setzen, sollte die Audiosequenz mit einem abgeschnittenem Wort enden.",
+      "shortcut": {
+        "mac": "ALT + 7",
+        "pc": "ALT + 7"
+      }
+    },
+    {
+      "id": 8,
+      "name": "break",
+      "code": "<P>",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/break.png",
+      "button_text": "Break",
+      "description": "Dieser Marker stellt eine Pause dar, d.h. eine Sequenz in der nicht gesprochen wird",
+      "shortcut": {
+        "mac": "ALT + P",
+        "pc": "ALT + P"
+      }
+    }
+  ]
+}

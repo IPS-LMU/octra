@@ -1,14 +1,15 @@
 import {
 	Component, SecurityContext, ChangeDetectionStrategy, OnInit, ChangeDetectorRef,
-	OnDestroy
+	OnDestroy, ViewChild, AfterViewInit, ElementRef
 } from '@angular/core';
-import { DomSanitizer } from "@angular/platform-browser";
+import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 
 import { TranscriptionService, AudioService } from "../../service";
 import { Subscription } from "rxjs";
 import { Functions } from "../../shared/Functions";
 import { SubscriptionManager } from "../../shared";
 import { isNullOrUndefined } from "util";
+import { onerror } from "q";
 
 @Component({
 	selector       : 'app-transcr-overview',
@@ -16,7 +17,13 @@ import { isNullOrUndefined } from "util";
 	styleUrls      : [ './transcr-overview.component.css' ],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TranscrOverviewComponent implements OnInit, OnDestroy {
+export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewInit {
+
+	private errortooltip:any;
+
+	public selectedError:any = "";
+	private errorY:number = 0;
+
 	public get numberOfSegments(): number {
 		return (this.transcrService.segments) ? this.transcrService.segments.length : 0;
 	}
@@ -83,6 +90,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy {
 
 	ngOnDestroy() {
 		this.subscrmanager.destroy();
+		this.errortooltip.css("display", "none");
 	}
 
 	ngOnInit() {
@@ -104,7 +112,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy {
 				this.updateSegments();
 				this.cd.markForCheck();
 			}));
-			console.log("ok1");
+
 			this.updateSegments();
 			this.cd.markForCheck();
 		}
@@ -135,7 +143,42 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy {
 		}));
 	}
 
-	sanitizeHTML(str: string): string {
-		return this.sanitizer.sanitize(SecurityContext.HTML, str);
+	sanitizeHTML(str: string): SafeHtml {
+		return this.sanitizer.bypassSecurityTrustHtml(str);
+	}
+
+	onMouseOver($event){
+		let target = jQuery($event.target);
+		if(target.is(".error_underline")){
+			let errorcode = target.attr("data-errorcode");
+			this.selectedError = this.transcrService.getErrorDetails(errorcode);
+
+			let y = target.offset().top - jQuery(this.errortooltip).height() - 20;
+			let x = target.offset().left;
+			this.errortooltip.css("margin-top", y + "px");
+			this.errortooltip.css("margin-left", x + "px");
+			this.errortooltip.children(".title").text(this.selectedError.title);
+			this.errortooltip.children(".description").text(this.selectedError.description);
+			this.errortooltip.fadeIn("fast");
+		} else{
+			this.selectedError = null;
+			this.errortooltip.css("display", "none");
+		}
+	}
+
+	ngAfterViewInit(){
+		this.errortooltip = jQuery("<div></div>");
+		this.errortooltip.addClass("error-tooltip");
+		this.errortooltip.append(jQuery("<div></div>").addClass("title").text("Titel"));
+		this.errortooltip.append(jQuery("<div></div>")
+			.addClass("description").text("Beschuish difosdhfs oidhf sdihfi sdhf oisdfiosdhfo sidhf "));
+
+		this.errortooltip.on("mouseleave", function(){
+			jQuery(this).css("display", "none");
+		});
+
+		jQuery("body").append(this.errortooltip);
+
+		this.errortooltip = jQuery(".error-tooltip");
 	}
 }

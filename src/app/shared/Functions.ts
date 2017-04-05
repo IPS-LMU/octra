@@ -135,4 +135,16 @@ export class Functions {
 			.replace("&quot;", "\"")
 			.replace("&#039;", "'");
 	}
+
+	public static insertString(input:string, pos:number, insertion:string):string{
+		let result = input;
+
+		if(pos <= input.length){
+			result = result.substring(0, pos) + insertion + result.substring(pos);
+		} else{
+			throw "String cannot be inserted at position " + pos;
+		}
+
+		return result;
+	}
 }

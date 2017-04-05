@@ -17,8 +17,6 @@ import { isNullOrUndefined } from "util";
 import { Http, Response } from "@angular/http";
 import { Observable, Subscription } from "rxjs";
 
-declare var validateAnnotation: ((string) => any);
-
 @Injectable()
 export class TranscriptionService {
 	get guidelines(): any {
@@ -55,6 +53,7 @@ export class TranscriptionService {
 	public onaudioloaded = new EventEmitter<any>();
 	public dataloaded = new EventEmitter<any>();
 	public guidelinesloaded = new EventEmitter<any>();
+	public validationmethodloaded = new EventEmitter<void>();
 
 	private _segments: Segments;
 	private _last_sample: number;
@@ -356,59 +355,39 @@ export class TranscriptionService {
 		}
 	}
 
+	/**
+	 * converts raw text of markers to html
+	 * @param rawtext
+	 * @returns {string}
+	 */
 	public rawToHTML(rawtext: string): string {
 		let result: string = rawtext;
 
-		//replace markers with wrap
 		result = this.replaceMarkersWithHTML(result);
 
-		//replace markers with no wrap
-		//TODO optimize as in replaceMarkersWithHTML function
-		let markers = this.settingsService.markers.items;
-		for (let i = 0; i < markers.length; i++) {
-			let marker = markers[ i ];
-			let regex = new RegExp("(\\s)*(" + Functions.escapeRegex(marker.code) + ")(\\s)*", "g");
-
-			let replace_func = (x, g1, g2, g3) => {
-				let s1 = (g1) ? g1 : "";
-				let s2 = (g2) ? g2 : "";
-				let s3 = (g3) ? g3 : "";
-				return s1 + "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "'/>" + s3;
-			};
-
-			result = result.replace(regex, replace_func);
+		if (rawtext != "") {
+			result = result.replace(/\s+$/g, "&nbsp;");
+			result = (result !== "") ? "" + result + "" : "";
 		}
 
 		return result;
 	}
 
+	/**
+	 * replace markers of the input string with its html pojection
+	 * @param input
+	 * @param use_wrap
+	 * @returns {string}
+	 */
 	private replaceMarkersWithHTML(input: string): string {
 		let result = input;
-
-		let markers = this.settingsService.markers.items;
-
-		//because it's faster to concatenate the codes of markers:
-		let regex_str = "";
-		for (let i = 0; i < markers.length; i++) {
-			regex_str += "(" + Functions.escapeRegex(markers[ i ].code) + ")";
-			if (i < markers.length - 1)
-				regex_str += "|";
+		for (let i = 0; i < this.settingsService.markers.items.length; i++) {
+			let marker = this.settingsService.markers.items[ i ];
+			let regex = new RegExp(Functions.escapeRegex(marker.code), "g");
+			result = result.replace(regex, "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "'/>");
 		}
 
-		let regex = new RegExp(regex_str, "g");
-		let replace_func = (x, g1) => {
-			for (let i = 0; i < markers.length; i++) {
-				let marker = markers[ i ];
-				if (marker.code === x) {
-					return "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + Functions.escapeHtml(marker.code) + "'/>";
-				}
-			}
-
-			return g1;
-		};
-
-		result = result.replace(regex, replace_func);
-
+		console.log("M :" + result);
 		return result;
 	}
 
@@ -446,7 +425,84 @@ export class TranscriptionService {
 				js.id = "validationJS";
 
 				document.body.appendChild(js);
+				this.validationmethodloaded.emit();
 			}
 		);
+	}
+
+	public underlineTextRed(rawtext:string, validation: any[]) {
+			let result = rawtext;
+
+			interface pos{
+				start:number,
+				puffer:string
+			}
+
+			let insertions:pos[] = [];
+
+			if (validation.length > 0) {
+				//prepare insertions
+				for (let i = 0; i < validation.length; i++) {
+					let insertStart = insertions.find((val) =>{ return val.start === validation[i].start; });
+					let insertEnd = insertions.find((val) =>{ return val.start === validation[i].start; });
+
+					if(isNullOrUndefined(insertStart)){
+						insertions.push({
+							start: validation[i].start,
+							puffer: "<div class='error_underline' data-errorcode='" + validation[i].code + "'>"
+						});
+					} else{
+						insertStart.puffer += "<div class='error_underline' data-errorcode='" + validation[i].code + "'>"
+					}
+
+					if(isNullOrUndefined(insertEnd)){
+						insertions.push({
+							start: validation[i].start + validation[i].length,
+							puffer: "</div>"
+						});
+					} else{
+						insertEnd.puffer = "</div>" + insertEnd.puffer;
+					}
+				}
+
+				insertions = insertions.sort(function(a,b){
+					if(a.start == b.start)
+						return 0;
+					if(a.start < b.start)
+						return -1;
+					if(a.start > b.start)
+						return 1;
+				});
+
+				let puffer = "";
+				for(let key in insertions){
+					let offset = puffer.length;
+					let pos = insertions[key].start;
+
+					result = Functions.insertString(result, pos + offset, insertions[key].puffer);
+					puffer += insertions[key].puffer;
+				}
+			}
+			return result;
+
+	}
+
+	public getErrorDetails(code:string):any{
+		if(!isNullOrUndefined(this._guidelines.instructions)){
+			let instructions = this._guidelines.instructions;
+
+			for(let i = 0; i < instructions.length; i++){
+				let instruction = instructions[i];
+
+				for(let j = 0; j < instruction.entries.length; j++){
+					let entry = instruction.entries[j];
+
+					if(entry.code == code){
+						return entry;
+					}
+				}
+			}
+		}
+		return null;
 	}
 }

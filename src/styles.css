@@ -103,5 +103,27 @@ footer{
 }
 
 .error_underline{
-    border-bottom:2px solid red;
+    border-bottom: 2px solid #ff6a7d;
+    display:inline;
+    cursor:pointer;
+}
+
+.error-tooltip{
+    display:none;
+    background-color: #ff899d;
+    padding:10px;
+    max-width:70%;
+    position:absolute;
+    z-index:2000;
+    left:0;
+    top:0;
+}
+
+.error-tooltip .title{
+    font-weight: bold;
+    display:block;
+}
+
+.error-tooltip .description{
+    font-size:0.8em;
 }

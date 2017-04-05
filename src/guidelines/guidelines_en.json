@@ -17,7 +17,7 @@
           "code": "M01",
           "priority": 100,
           "title": "Nonverbale Störgeräusche",
-          "description": "nonverbale Sprechergeräusche werden mit '<usb>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Lachen, Husten, Schmatzen, lautes Atmen",
+          "description": "ENGLISH TEXT HERE nonverbale Sprechergeräusche werden mit '<usb>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Lachen, Husten, Schmatzen, lautes Atmen",
           "examples": [
             {
               "annotation": "Hanna *L <usb> Hanna Lühmann",

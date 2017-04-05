@@ -1,19 +1,13 @@
 import {
-	Component, OnInit, OnDestroy, EventEmitter, Output, ChangeDetectorRef, AfterViewInit,
-	Input, OnChanges
+	Component, OnInit, OnDestroy, EventEmitter, Output, ChangeDetectorRef, Input, OnChanges
 } from '@angular/core';
-import { UserInteractionsService } from "../../service/userInteractions.service";
 import { TranscrEditorConfig } from "./config/te.config";
-import { KeymappingService } from "../../service/keymapping.service";
-import { KeyMapping } from "../../shared/KeyMapping";
-import { BrowserInfo } from "../../shared/BrowserInfo";
-import { Functions } from "../../shared";
+import { TranslateService } from "@ngx-translate/core";
+
+import { KeyMapping, BrowserInfo, Functions, SubscriptionManager } from "../../shared";
 import { TranscrEditorConfigValidator } from "./validator/TranscrEditorConfigValidator";
 import { SettingsService } from "../../service/settings.service";
-import { SessionService } from "../../service/session.service";
-import { TranslateService } from "@ngx-translate/core";
-import { SubscriptionManager } from "../../shared/SubscriptionManager";
-import { isNullOrUndefined } from "util";
+import { TranscriptionService } from "../../service/transcription.service";
 
 @Component({
 	selector   : 'app-transcr-editor',
@@ -35,9 +29,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
 	private _settings: TranscrEditorConfig;
 	private subscrmanager: SubscriptionManager;
-	private init:number = 0;
+	private init: number = 0;
 
-	@Input() visible:boolean = true;
+	@Input() visible: boolean = true;
 
 	get rawText(): string {
 		return this.tidyUpRaw(this._rawText);
@@ -67,7 +61,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
 	constructor(private cd: ChangeDetectorRef,
 				private settingsService: SettingsService,
-				private langService: TranslateService) {
+				private langService: TranslateService,
+				private transcrService: TranscriptionService) {
 
 		this._settings = new TranscrEditorConfig().Settings;
 		this.subscrmanager = new SubscriptionManager();
@@ -117,7 +112,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 		this.initialize();
 	}
 
-	ngOnChanges(obj){
+	ngOnChanges(obj) {
 	}
 
 	/**
@@ -131,6 +126,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 		html = "<p>" + html + "</p>";
 		let dom = jQuery(html);
 
+		let test = dom.text();
 		let replace_func = (i, elem) => {
 			let attr = jQuery(elem).attr("data-marker-code");
 			if (elem.type == "select-one") {
@@ -147,14 +143,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 					}
 				}
 			}
-			else {
+			else if (jQuery(elem).attr("class") != "error_underline") {
 				jQuery(elem).remove();
 			}
 		};
 
 		jQuery.each(dom.children(), replace_func);
 		result = dom.text();
-		result = this.tidyUpRaw(result);
 
 		return result;
 	};
@@ -207,12 +202,17 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 					//prevent copy paste
 					e.preventDefault();
 				},
-				onChange: ()=>{
+				onChange : () => {
 					this.init++;
+					console.log("changed");
 
-					if(this.init == 1){
-						setTimeout(this.focus, 200);
+					if (this.init == 1) {
+						this.focus(true);
+					} else if(this.init > 1){
+						this.textfield.summernote("restoreRange");
 					}
+				},
+				onBlur: () =>{
 				}
 			}
 		});
@@ -296,6 +296,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 					let marker: any = this.markers[ i ];
 					if (marker.shortcut[ platform ] == comboKey) {
 						$event.preventDefault();
+						let test = this.textfield.summernote("createRange");
+						console.log("TEST");
+						console.log(test);
 						this.insertMarker(marker.code, marker.icon_url);
 						this.marker_insert.emit(marker.code);
 						return;
@@ -394,10 +397,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	private rawToHTML(rawtext: string): string {
 		let result: string = rawtext;
 
-		if(rawtext != "") {
-			//replace markers with wrap
-			result = this.replaceMarkersWithHTML(result, true);
-
+		if (rawtext != "") {
 			//replace markers with no wrap
 			for (let i = 0; i < this.markers.length; i++) {
 				let marker = this.markers[ i ];
@@ -416,7 +416,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 			}
 
 			result = result.replace(/\s+$/g, "&nbsp;");
-			result = (result !== "") ? "<p>" + result + "</p>" : "";
+			result = (result !== "") ? "" + result + "" : "";
 		}
 
 		return result;
@@ -425,12 +425,24 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	/**
 	 * set focus to the very last position of the editors text
 	 */
-	public focus = ()=>{
-		if (this.rawText != "") {
-			Functions.placeAtEnd(jQuery('.note-editable.panel-body')[ 0 ]);
-		}
+	public focus = (later: boolean = false) => {
+		let func = () => {
+			if (this.rawText != "") {
+				Functions.placeAtEnd(jQuery('.note-editable.panel-body')[ 0 ]);
+			}
+			this.textfield.summernote('focus');
+		};
 
-		this.textfield.summernote('focus');
+		if (later) {
+			setTimeout(
+				() => {
+					func();
+				}, 200
+			)
+		}
+		else {
+			func();
+		}
 	};
 
 	/**
@@ -465,27 +477,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	 */
 	private replaceMarkersWithHTML(input: string, use_wrap: boolean): string {
 		let result = input;
-		let regex_str;
-		if (use_wrap) {
-			regex_str = Functions.escapeRegex("([\\w~.^*-+]+)");
+
+		for (let i = 0; i < this.markers.length; i++) {
+			let marker = this.markers[ i ];
+			result = result.replace(marker, "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "'/>");
 		}
-		else {
-			regex_str = "([\\w~.^*-+]+)";
-		}
-		let regex = new RegExp(regex_str, "g");
-
-		let replace_func = (x, g1) => {
-			for (let i = 0; i < this.markers.length; i++) {
-				let marker = this.markers[ i ];
-				if (marker.code === g1) {
-					return "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "'/>";
-				}
-			}
-			return (use_wrap) ? "[MARKER NOT FOUND]" : g1;
-		};
-
-		result = result.replace(regex, replace_func);
-
 		return result;
 	}
 
@@ -495,5 +491,45 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 		if (!validation.success)
 			throw validation.error;
 
+	}
+
+	private validate() {
+		let val: any[] = this.transcrService.validate(this._rawText);
+		let ok = this.underlineTextRed(val);
+		ok = this.rawToHTML(ok);
+		this.textfield.summernote('code', ok);
+	}
+
+	private underlineTextRed(validation: any[]) {
+		let result = this._rawText;
+
+		let puffer = {};
+
+		if (validation.length > 0) {
+			for (let i = 0; i < validation.length; i++) {
+				if(!puffer.hasOwnProperty("p" + validation[i].start)){
+					puffer["p" + validation[i].start] = ""
+				}
+				if(!puffer.hasOwnProperty("p" + (validation[i].start + validation[i].length))){
+					puffer["p" + (validation[i].start + validation[i].length)] = ""
+				}
+
+				puffer["p" + validation[i].start] += "<div class='error_underline'>";
+				puffer["p" + (validation[i].start + validation[i].length)] = "</div>" + puffer["p" + (validation[i].start + validation[i].length)];
+
+				/*
+				let error: any = validation[ i ];
+				if (result.length >= error.start + error.length) {
+					result = result.substring(0, puffer + error.start) + "<div class='error_underline'>" + result.substring(puffer + error.start, puffer + error.start + error.length) + "</div>"
+						+ result.substring(puffer + error.start + error.length);
+					puffer += length;
+				}
+				*/
+			}
+
+			console.log("val");
+			console.log(puffer);
+		}
+		return result;
 	}
 }

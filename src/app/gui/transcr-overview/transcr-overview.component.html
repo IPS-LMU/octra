@@ -23,12 +23,10 @@
   <tr>
     <th>{{"general.timespan" | translate}}</th>
     <th>{{"general.transcription" | translate}}</th>
-    <th>{{"general.validation" | translate}}</th>
   </tr>
   </thead>
   <tr *ngFor="let segment of segments; let i = index" [ngClass]="{success: (segment.transcript != '' && segment.transcript != 'P'), info: (segment.transcript == 'P'), danger: (segment.transcript == '')}">
     <td># {{i+1 | leadingnull: segments.length}}</td>
-    <td [innerHTML]="sanitizeHTML(segment.transcript)"></td>
-    <td [innerHTML]="sanitizeHTML(segment.validation)" [ngClass]="{warning:(segment.validation)}"></td>
+    <td [innerHTML]="sanitizeHTML(segment.transcript)" (mouseover)="onMouseOver($event)" (mousedown)="onMouseOver($event)"></td>
   </tr>
 </table>

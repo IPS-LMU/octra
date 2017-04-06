@@ -133,7 +133,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	onButtonClick(event: { type: string, timestamp: number }) {
-		if (this.app_settings.octra.logging == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("mouse_click", {}, event.timestamp, event.type + "_button");
 
 		switch (event.type) {
@@ -233,7 +233,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	onShortCutTriggered($event, type) {
-		if (this.app_settings.octra.logging) {
+		if (this.app_settings.octra.logging_enabled) {
 
 			if (
 				$event.value == null || !(
@@ -303,13 +303,13 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	};
 
 	onMarkerInsert(marker_code: string) {
-		if (this.app_settings.octra.logging == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("marker_insert", { value: marker_code }, Date.now(), 'editor');
 	}
 
 	onMarkerClick(marker_code: string) {
 		this.onTranscriptionChanged(null);
-		if (this.app_settings.octra.logging == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("marker_click", { value: marker_code }, Date.now(), 'editor');
 	}
 
@@ -322,7 +322,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	afterSpeedChange(event: { new_value: number, timestamp: number }) {
-		if (this.app_settings.octra.logging == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "speed_change");
 	}
 
@@ -331,7 +331,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	afterVolumeChange(event: { new_value: number, timestamp: number }) {
-		if (this.app_settings.octra.logging == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "volume_change");
 	}
 }

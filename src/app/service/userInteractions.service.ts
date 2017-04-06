@@ -116,7 +116,7 @@ export class UserInteractionsService {
 		let result: any;
 
 		let j = 0;
-		for (var i = 0; i < this._elements.length; i++) {
+		for (let i = 0; i < this._elements.length; i++) {
 			let elem = this._elements[ i ];
 
 			if (elem instanceof type && j == i) {
@@ -139,7 +139,7 @@ export class UserInteractionsService {
 		else if (type_str == "mouse")
 			type = MouseStatisticElem;
 
-		for (var i = 0; i < this._elements.length; i++) {
+		for (let i = 0; i < this._elements.length; i++) {
 			let elem = this._elements[ i ];
 
 			if (elem instanceof type) {

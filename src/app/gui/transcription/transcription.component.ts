@@ -49,6 +49,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
 	private initialized: any = {};
 	private viewinitialized = false;
+	public showdetails:boolean = false;
 	private saving = "";
 
 	get help_url(): string {
@@ -131,7 +132,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		if (this.audio.audiobuffer == null) {
 			this.subscrmanager.add(this.audio.afterloaded.subscribe(this.afterAudioLoaded));
 
-			if (this.app_settings.octra.logging == true) {
+			if (this.app_settings.octra.logging_enabled == true) {
 				this.subscrmanager.add(
 					this.uiService.afteradd.subscribe((elem) => {
 						this.sessService.save("logs", this.uiService.elementsToAnyArray());
@@ -230,5 +231,10 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
 	getText() {
 		return this.tranService.getTranscriptString("text");
+	}
+
+	clearElements(){
+		this.uiService.clear();
+		this.sessService.save("logs", this.uiService.elementsToAnyArray());
 	}
 }

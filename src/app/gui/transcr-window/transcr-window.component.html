@@ -1,7 +1,7 @@
 <div id="window" [ngStyle]="{'margin-top': pos_y + 'px'}">
     <div class="window-nav-top"><span class="glyphicon glyphicon-remove close" (click)="close();"></span></div>
     <app-audio-navigation #audionav
-                          (button_click)="onButtonClick($event)"
+                          (buttonclick)="onButtonClick($event)"
                           (volumechange)="onVolumeChange($event)"
                           (aftervolumechange)="afterVolumeChange($event)"
                           (speedchange)="onSpeedChange($event)"

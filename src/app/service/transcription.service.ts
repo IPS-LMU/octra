@@ -69,6 +69,12 @@ export class TranscriptionService {
 		comment        : ""
 	};
 
+	private _break_marker:any = null;
+
+	get break_marker(): any {
+		return this._break_marker;
+	}
+
 	get statistic(): any {
 		return this._statistic;
 	}
@@ -98,7 +104,7 @@ export class TranscriptionService {
 				private http: Http) {
 		this.subscrmanager = new SubscriptionManager();
 
-		if (this.app_settings.octra.logging) {
+		if (this.app_settings.octra.logging_enabled) {
 			this.subscrmanager.add(this.audio.statechange.subscribe((state) => {
 				this.uiService.addElementFromEvent("audio_" + state, { value: state }, Date.now(), "audio");
 			}));
@@ -409,6 +415,15 @@ export class TranscriptionService {
 			(response: Response) => {
 				this._guidelines = response.json();
 				this.loadValidationMethod(this._guidelines.meta.validation_url);
+
+				for(let i = 0; i < this._guidelines.markers.length; i++){
+					let marker = this._guidelines.markers[i];
+					if(marker.type == "break"){
+						this._break_marker = marker;
+						break;
+					}
+				}
+
 				this.guidelinesloaded.emit(this._guidelines);
 			}
 		);

@@ -169,12 +169,12 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 	}
 
 	onMarkerInsert(marker_code: string) {
-		if (this.app_settings.octra.logging == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("marker_insert", { value: marker_code }, Date.now(), 'editor');
 	}
 
 	onMarkerClick(marker_code: string) {
-		if (this.app_settings.octra.logging == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("marker_click", { value: marker_code }, Date.now(), 'editor');
 	}
 
@@ -183,7 +183,7 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 	}
 
 	afterSpeedChange(event: { new_value: number, timestamp: number }) {
-		if (this.app_settings.octra.logging == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "speed_change");
 	}
 
@@ -192,12 +192,12 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 	}
 
 	afterVolumeChange(event: { new_value: number, timestamp: number }) {
-		if (this.app_settings.octra.logging == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "volume_change");
 	}
 
 	onButtonClick(event: { type: string, timestamp: number }) {
-		if (this.app_settings.octra.logging == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("mouse_click", {}, event.timestamp, event.type + "_button");
 
 		switch (event.type) {

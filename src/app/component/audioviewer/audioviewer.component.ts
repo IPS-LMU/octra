@@ -510,7 +510,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 							this.o_context.globalAlpha = 0.2;
 							this.o_context.fillStyle = "red";
 						}
-						else if (segment.transcript == "P") {
+						else if (segment.transcript == this.transcr.break_marker.code) {
 							this.o_context.globalAlpha = 0.2;
 							this.o_context.fillStyle = "blue";
 						}

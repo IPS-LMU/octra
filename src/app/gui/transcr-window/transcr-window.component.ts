@@ -9,9 +9,10 @@ import {
 	AfterContentInit
 } from '@angular/core';
 
-import { LoupeComponent, TranscrEditorComponent, AudioNavigationComponent} from "../../component";;
-import { KeymappingService, UserInteractionsService, TranscriptionService, AudioService} from "../../service";
-import { AudioTime, Functions, Segment, SubscriptionManager} from "../../shared";
+import { LoupeComponent, TranscrEditorComponent, AudioNavigationComponent } from "../../component";
+;
+import { KeymappingService, UserInteractionsService, TranscriptionService, AudioService } from "../../service";
+import { AudioTime, Functions, Segment, SubscriptionManager } from "../../shared";
 import { SettingsService } from "../../service/settings.service";
 
 @Component({
@@ -46,7 +47,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 		return this.settingsService.app_settings;
 	}
 
-	get responsive():boolean{
+	get responsive(): boolean {
 		return this.settingsService.app_settings.octra.responsive.enabled;
 	}
 
@@ -66,8 +67,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 				public transcrService: TranscriptionService,
 				public audio: AudioService,
 				public uiService: UserInteractionsService,
-				public settingsService:SettingsService
-	) {
+				public settingsService: SettingsService) {
 
 		this.subscrmanager = new SubscriptionManager();
 	}
@@ -133,7 +133,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 	}
 
 	onButtonClick(event: { type: string, timestamp: number }) {
-		if (this.app_settings.octra.logging == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("mouse_click", {}, event.timestamp, event.type + "_button");
 
 		if (event.type === "replay")
@@ -188,7 +188,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 	}
 
 	afterSpeedChange(event: { new_value: number, timestamp: number }) {
-		if (this.app_settings.octra.logging == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "speed_change");
 	}
 
@@ -197,7 +197,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 	}
 
 	afterVolumeChange(event: { new_value: number, timestamp: number }) {
-		if (this.app_settings.octra.logging == true)
+		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "volume_change");
 	}
 }

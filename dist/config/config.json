@@ -5,7 +5,7 @@
   },
   "octra": {
     "login_enabled": false,
-    "logging_enabled": false,
+    "logging_enabled": true,
     "responsive": {
       "enabled": true,
       "fixedwidth": 1200

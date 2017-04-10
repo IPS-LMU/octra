@@ -3,71 +3,52 @@
     "object_language": "deu",
     "language": "de",
     "project": "Speakers",
-    "authors": "Test Person2 (testperson@email.de)",
+    "authors": "Test Person (testperson@email.de)",
     "version": "1.0",
-    "date": "2017-03-02",
+    "date": "2017-04-10",
     "encoding": "UTF-8",
-    "validation_url": "assets/testfiles/validation.js"
+    "validation_url": "assets/testfiles/functions.js"
   },
   "instructions": [
     {
-      "group": "ENGLSIH Text",
+      "group": "Spelling",
       "entries": [
         {
-          "code": "M01",
+          "code": "R01",
           "priority": 100,
-          "title": "Nonverbale Störgeräusche",
-          "description": "ENGLISH TEXT HERE nonverbale Sprechergeräusche werden mit '<usb>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Lachen, Husten, Schmatzen, lautes Atmen",
+          "title": "Transcribe according to the german spelling",
+          "description": "Bei der Tranksription sollte die Deutsche Rechtschreibung nach Duden befolgt werden. Bei Unklarheiten bitte www.duden.de aufsuchen.",
           "examples": [
-            {
-              "annotation": "Hanna *L <usb> Hanna Lühmann",
-              "url": "assets/testfiles/test.mp4"
-            }
           ]
         },
         {
-          "code": "M02",
-          "priority": 90,
-          "title": "Ein anderer Titel",
-          "description": "nonverbale hello werden mit '<usb>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Lachen, Husten, Schmatzen, lautes Atmen",
+          "code": "R02",
+          "priority": 100,
+          "title": "Zahlen ausschreiben",
+          "description": "Zahlen müssen so wie sie gesprochen werden ausgeschrieben werden, ab 100 in einzelnen Worten",
           "examples": [
             {
-              "annotation": "Hanna *L <usb> Hanna Lühmann",
-              "url": "assets/testfiles/AAA4600C3_0_fragment.wav"
+              "annotation": "20: zwanzig",
+              "url":""
             },
             {
-              "annotation": "Hanna *L <usb> Hanna Lühmann",
-              "url": "assets/testfiles/test.mp4"
-            }
-          ]
-        }
-      ]
-    },{
-      "group": "",
-      "entries": [
-        {
-          "code": "M01",
-          "priority": 100,
-          "title": "Keine Gruppierung 1",
-          "description": "nonverbale Sprechergeräusche werden mit '<usb>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Lachen, Husten, Schmatzen, lautes Atmen",
-          "examples": [
-            {
-              "annotation": "Hanna *L <usb> Hanna Lühmann",
-              "url": ""
-            }, {
-              "annotation": "Hanna *L <usb> Hanna Lühmann",
-              "url": ""
+              "annotation": "1991: neunzehn hundert und einundzeunzig",
+              "url":""
             }
           ]
         },
         {
-          "code": "M02",
-          "priority": 90,
-          "title": "Keine Gruppierung 2",
-          "description": "nonverbale Sprechergeräusche werden mit '<usb>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Lachen, Husten, Schmatzen, lautes Atmen",
+          "code": "R03",
+          "priority": 100,
+          "title": "Buchstabierfolgen als Folge von Großbuchstaben",
+          "description": "Buchstabierfolgen als Folge von Großbuchstaben, Rest orthografisch.",
           "examples": [
             {
-              "annotation": "Hanna *L <usb> Hanna Lühmann",
+              "annotation": "A B B ß: A doppel B scharfes S",
+              "url":""
+            },
+            {
+              "annotation": "D: /D/",
               "url": ""
             }
           ]
@@ -75,16 +56,129 @@
       ]
     },
     {
-      "group": "group2",
+      "group": "Zeichensetzung",
       "entries": [
         {
-          "code": "M02",
+          "code": "Z01",
           "priority": 100,
-          "title": "Geräusche nicht vom Sprecher",
-          "description": "Geräusche, die nicht vom Sprecher stammen, werden mit '<nib>' und Leerzeichen vor dem betroffenen Wort markiert, z.B. Türgeräusche, Klopfen",
+          "title": "Keine Satzzeichen",
+          "description": "keine Satzzeichen => keine Sätze im herkömmlichen Sinn; keine Spezialsymbole wie %, \", #. Ausnahme: Satzeichen in Wörtern, nicht zwischen Wörtern",
           "examples": [
             {
-              "annotation": "Hanna *L <usb> Hanna Lühmann",
+              "annotation": "Kein (.,!?;-)",
+              "url": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "Groß und Kleinschreibung",
+      "entries": [
+        {
+          "code": "GK01",
+          "priority": 100,
+          "title": "Beachtung der Groß- und Kleinschreibung, auch bei Namen und Abkürzungen.",
+          "description": "Ausnahme: Personalpronomina, keine Großschreibung am Satzanfang.",
+          "examples": [
+            {
+              "annotation": "Josef, GmbH, AG",
+              "url": ""
+            },
+            {
+              "annotation": "Du, Sie, Ihr",
+              "url": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "Komposita und Abkürzungen",
+      "entries": [
+        {
+          "code": "KA01",
+          "priority": 100,
+          "title": "Komposita und Abkürzungen nicht künstlich trennen",
+          "description": "Diese sollten nicht künstlich getrennt oder in Buchstabierform geschrieben werden.",
+          "examples": [
+            {
+              "annotation": "'SPD-Fraktionsvorsitzender' wenn gelesen ist ok",
+              "url": ""
+            },
+            {
+              "annotation": "'S P D Fraktionsvorsitzender' wenn gelesen ist NICHT ok",
+              "url": ""
+            },
+            {
+              "annotation": "'UdSSR' ok, wenn so in der Vorlage (gelesen)",
+              "url": ""
+            },
+            {
+              "annotation": "'U D S S R' ok, wenn so in der Vorlage (zB. beim Buchstabieren)",
+              "url": ""
+            },
+            {
+              "annotation": "'Adam J Krusenstern' ok, wenn Eigenname",
+              "url": ""
+            },
+            {
+              "annotation": "'Adam-J. Krusenstern' NICHT ok, wenn Eigenname",
+              "url": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "Aussprache",
+      "entries": [
+        {
+          "code": "A01",
+          "priority": 100,
+          "title": "Bei falscher Aussprache, das erratene Wort mit * vorranstellen",
+          "description": "Bei falscher Aussprache, das erratene Wort mit * vorranstellen",
+          "examples": [
+            {
+              "annotation": "'achter vierter *fünfund nein sechsundneunzig' ist ok",
+              "url": ""
+            },
+            {
+              "annotation": "'[~abc]*chter vierter oder *sechsundneunz[abc~]' ist nicht ok",
+              "url": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "Unverständliche Sprache",
+      "entries": [
+        {
+          "code": "US01",
+          "priority": 100,
+          "title": "Unverständliche Sprache",
+          "description": "Passagen unverständlicher Sprache mit ** markieren",
+          "examples": [
+            {
+              "annotation": "du bist ein solches ** wie ich noch nie eines getroffen habe",
+              "url": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "Geräusche",
+      "entries": [
+        {
+          "code": "G01",
+          "priority": 100,
+          "title": "Geräuschmarker verwenden",
+          "description": "Bei Geräuschen müssen die Geräuschmarken verwendet werden. Ein Marker wird dabei an dem ersten Vorkommen eines Geräusches gesetzt, nicht aber zwischen Wörtern. Für weitere Informationen in der Toolbar des Editors mit der Maus über die Marker fahren. Mehrere gleiche Marker sollten nicht direkt aufeinander folgen.",
+          "examples": [
+            {
+              "annotation": "du bist ein solches ** wie ich noch nie eines getroffen habe",
               "url": ""
             }
           ]
@@ -97,6 +191,7 @@
       "id": 1,
       "name": "truncation marker start",
       "code": "[~abc]",
+      "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_start.png",
       "button_text": "~abc",
       "description": "Set this marker at the beginning of the annotation if a word was cutted off.",
@@ -109,6 +204,7 @@
       "id": 2,
       "name": "filled pause",
       "code": "[fil]",
+      "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/fil.png",
       "button_text": "filled pause",
       "description": "This marker is for the speakers hesitations like 'hm', 'ähm' and others.",
@@ -121,6 +217,7 @@
       "id": 3,
       "name": "intermittent noise",
       "code": "[int]",
+      "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/int.png",
       "button_text": "intermittent noise",
       "description": "This marker is for noise like door slam, touching the microphone or something like that.",
@@ -133,6 +230,7 @@
       "id": 4,
       "name": "speaker noise",
       "code": "[spk]",
+      "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/spk.png",
       "button_text": "speaker noise",
       "description": "This marker is for noise which was produced by the speaker, e.g. breathing loudly, laughing or something like that.",
@@ -145,6 +243,7 @@
       "id": 5,
       "name": "stationary noise",
       "code": "[sta]",
+      "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/sta.png",
       "button_text": "stationary noise",
       "description": "This marker is for continuous, loud noise like traffic jam, music or radio in the background",
@@ -157,6 +256,7 @@
       "id": 6,
       "name": "unclear word",
       "code": "**",
+      "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/stars.png",
       "button_text": "**",
       "description": "Set this marker before a word if it is not recognizable or if it is from another language.",
@@ -169,6 +269,7 @@
       "id": 7,
       "name": "truncation marker end",
       "code": "[abc~]",
+      "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_end.png",
       "button_text": "abc~",
       "description": "Set this marker only at the end of the annotation if the last word was cutted off",
@@ -181,6 +282,7 @@
       "id": 8,
       "name": "break",
       "code": "<P>",
+      "type": "break",
       "icon_url": "assets/img/components/transcr-editor/default_markers/break.png",
       "button_text": "Break",
       "description": "This marker represents a break that means a audio chunk without any speaking",

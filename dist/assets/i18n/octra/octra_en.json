@@ -36,7 +36,9 @@
     "validation": "Validation",
     "search": "Search",
     "project": "Project",
-    "authors": "Authors"
+    "authors": "Authors",
+    "no guidelines found": "No guidelines found",
+    "example": "Example"
   },
   "transcription":{
     "start": "Continue transcription",
@@ -144,5 +146,8 @@
     "form fill out": "Please fill out the form",
     "intelligibility of the speaker": "Intelligibility of the speaker",
     "comment description": "Short comment (Notes about workflows, waiting times, issues etc.)"
-  }
+  },
+  "segment invisible": "This segment has to be visible to play its audio sequence",
+  "boundary cannot delete": "Cannot delete boundary, because there are neighboring segments that are already transcribed.",
+  "boundary cannot set": "Cannot set boundary in a segments that is already transcribed."
 }

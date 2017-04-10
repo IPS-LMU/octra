@@ -37,7 +37,8 @@
     "search": "Suche",
     "project": "Projekt",
     "authors": "Authoren",
-    "no guidelines found": "Keine Transkriptionsrichtlinien gefunden"
+    "no guidelines found": "Keine Transkriptionsrichtlinien gefunden",
+    "example": "Beispiel"
   },
   "transcription":{
     "start": "Transkription fortsetzen",
@@ -92,21 +93,21 @@
     "login": {
       "header": "Anmeldung fehlgeschlagen",
       "text": "Bitte überprüfen Sie ihren Nutzernamen und ihr Passwort."
+    },
+    "shortcuts": {
+      "play pause": "Abspielen / Pausieren",
+      "stop playback": "Wiedergabe beenden",
+      "step backward": "Zur zuletzt pausierten Stelle springen",
+      "set segment": "Segmentgrenze setzen",
+      "play selection": "Selektion abspielen",
+      "transcribe segment": "Segment transkribieren",
+      "move cursor left": "Cursor nach links bewegen",
+      "move cursor right": "Cursor nach rechts bewegen",
+      "audioplayer": "Tastenkombinationen des Audioplayers",
+      "top signaldisplay": "Tastenkombinationen des oberen Signaldsiplays",
+      "down signaldisplay": "Tastenkombinationen des unteren Signaldsiplays",
+      "2D-Editor": "Tastenkombinationen des 2D-Editors"
     }
-  },
-  "shortcuts": {
-    "play pause": "Abspielen / Pausieren",
-    "stop playback": "Wiedergabe beenden",
-    "step backward": "Zur zuletzt pausierten Stelle springen",
-    "set segment": "Segmentgrenze setzen",
-    "play selection": "Selektion abspielen",
-    "transcribe segment": "Segment transkribieren",
-    "move cursor left": "Cursor nach links bewegen",
-    "move cursor right": "Cursor nach rechts bewegen",
-    "audioplayer": "Tastenkombinationen des Audioplayers",
-    "top signaldisplay": "Tastenkombinationen des oberen Signaldsiplays",
-    "down signaldisplay": "Tastenkombinationen des unteren Signaldsiplays",
-    "2D-Editor": "Tastenkombinationen des 2D-Editors"
   },
   "login": {
     "online mode": "Online Modus",
@@ -144,5 +145,8 @@
     "form fill out": "Bitte füllen Sie kurz das Formular aus",
     "intelligibility of the speaker": "Sprachverständlichkeit des Sprechers",
     "comment description": "Kurzer Kommentar (Anmerkungen zum Arbeitsablauf, Ladezeiten, Schwierigkeiten etc.)"
-  }
+  },
+  "segment invisible": "Das Segment muss sichtbar sein, um es abspielen zu können",
+  "boundary cannot delete": "Die Segmentgrenze kann nicht gelöscht werden, da daran angrenzende Segmente bereits transkribiert wurden",
+  "boundary cannot set": "Die Segmentgrenze kann nicht innerhalb eines trankribierten Segments gesetzt werden"
 }

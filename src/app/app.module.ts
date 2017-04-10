@@ -58,6 +58,7 @@ import { AppComponent } from "./app.component";
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { TranscrGuidelinesComponent } from './gui/transcr-guidelines/transcr-guidelines.component';
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { ReloadFileGuard } from "./guard/reload-file.activateguard";
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
@@ -123,20 +124,21 @@ export function HttpLoaderFactory(http: Http) {
 	],
 	providers   : [
 		ALoginGuard,
+		APIService,
 		AudioService,
 		AudioviewerConfig,
-		APIService,
 		DeALoginGuard,
-		ModalService,
 		KeymappingService,
 		LogoutGuard,
 		MembersAreaGuard,
-		SettingsGuard,
-		SessionService,
-		TranscrSubmittedGuard,
-		TranslateService,
+		ModalService,
 		NavbarService,
-		SettingsService
+		ReloadFileGuard,
+		SessionService,
+		SettingsGuard,
+		SettingsService,
+		TranscrSubmittedGuard,
+		TranslateService
 	]
 })
 

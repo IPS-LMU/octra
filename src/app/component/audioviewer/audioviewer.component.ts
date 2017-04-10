@@ -204,9 +204,14 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 	 * update and redraw audioviewer
 	 * @param computeDisplayData should display data be recomputed?
 	 */
-	public update = (computeDisplayData?: boolean) => {
+	public update = (computeDisplayData: boolean = false) => {
 		this.updateCanvasSizes();
+
 		if (this.av.channel) {
+
+			if(computeDisplayData == true){
+				this.av.refresh();
+			}
 
 			for (let i = 0; i < this.av.LinesArray.length; i++) {
 				this.drawSignal(i);
@@ -1101,9 +1106,10 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 				let ratio = this.innerWidth / this.oldInnerWidth;
 
 				this.changePlayCursorAbsX((this.av.PlayCursor.absX * ratio));
+				this.update(true);
+			} else if(this.Settings.multi_line){
+				this.update(false);
 			}
-
-			this.update(true);
 
 			if (this.av.PlayCursor.absX > 0) {
 				let line = this.av.getLineByAbsX(this.av.PlayCursor.absX, this.innerWidth);

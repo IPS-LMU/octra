@@ -292,7 +292,7 @@ export class AudioviewerService extends AudioComponentService {
 	 * @param innerWidth
 	 */
 	private afterChannelInititialized(innerWidth: number) {
-		this.computeDisplayData(this.AudioPxWidth / 2, this.Settings.height, this.channel);
+		this.refresh();
 		this.calculateZoom(this.Settings.height, this.AudioPxWidth, this._minmaxarray);
 
 		this.updateLines(innerWidth);
@@ -849,5 +849,9 @@ export class AudioviewerService extends AudioComponentService {
 		this._settings = new AudioviewerConfig();
 		this._settings = this._settings.Settings;
 		this.validateConfig();
+	}
+
+	public refresh(){
+		this.computeDisplayData(this.AudioPxWidth / 2, this.Settings.height, this.channel);
 	}
 }

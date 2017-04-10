@@ -24,6 +24,10 @@ footer{
     font-size:10px;
 }
 
+.container{
+    width:100%;
+}
+
 .icon-block {
     padding: 0 15px;
 }

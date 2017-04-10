@@ -43,7 +43,7 @@
     <p>
         {{"transcription-submit.overview" | translate}}
     </p>
-    <app-transcr-overview></app-transcr-overview>
+    <app-transcr-overview [visible]="true" [segments]="transcrService.segments.segments"></app-transcr-overview>
     <br><br>
     <div *ngIf="!sessService.offline">
         <h3>Feedback</h3>

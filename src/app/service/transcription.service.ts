@@ -1,4 +1,4 @@
-import { Injectable, EventEmitter } from '@angular/core';
+import { Injectable, EventEmitter, Output } from '@angular/core';
 import 'rxjs';
 import { Segments } from "../shared/Segments";
 import { AudioService } from "./audio.service";
@@ -37,7 +37,7 @@ export class TranscriptionService {
 	}
 
 	public validate(text:string):any{
-		return validateAnnotation(text);
+		return validateAnnotation(text, this._guidelines);
 	}
 
 	set segments(value: Segments) {
@@ -173,8 +173,6 @@ export class TranscriptionService {
 		else
 			this.uiService.fromAnyArray(this.sessServ.logs);
 
-
-		this.analyse();
 		this.dataloaded.emit();
 	}
 
@@ -348,7 +346,7 @@ export class TranscriptionService {
 			let segment = this.segments.get(i);
 
 			if (segment.transcript != "") {
-				if (segment.transcript == "P") {
+				if (this.break_marker != null && segment.transcript.indexOf(this.break_marker.code) > -1) {
 					this._statistic.pause++;
 				}
 				else {
@@ -392,20 +390,6 @@ export class TranscriptionService {
 			let regex = new RegExp(Functions.escapeRegex(marker.code), "g");
 			result = result.replace(regex, "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "'/>");
 		}
-		return result;
-	}
-
-	public validateTranscription(transcript: string): string[] {
-		let result = [];
-		//check for special letters
-		let has_special_chars = (transcript.match(new RegExp("[#%,.?!`´/;^°]", "g")) != null);
-		let has_digits = (transcript.match(new RegExp("[0-9]", "g")) != null);
-
-		if (has_special_chars)
-			result.push("- Spezielle Zeichen wie #%,.?!`´/:;^°");
-		if (has_digits)
-			result.push("- Ziffern vorhanden");
-
 		return result;
 	}
 

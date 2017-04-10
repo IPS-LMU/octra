@@ -55,7 +55,6 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 		if (!this.transcrService.segments && this.sessService.SampleRate) {
 			this.transcrService.loadSegments(this.sessService.SampleRate);
 		}
-		this.transcrService.analyse();
 		this.feedback_data = this.sessService.feedback;
 
 		//set change detection interval

@@ -5,7 +5,7 @@
         <h4 class="modal-title">{{"general.overview" | translate}}</h4>
     </modal-header>
     <modal-body>
-        <app-transcr-overview></app-transcr-overview>
+        <app-transcr-overview *ngIf="transcrService.segments != null" [visible]="modal_overview.visible" [segments]="transcrService.segments.segments"></app-transcr-overview>
     </modal-body>
     <modal-footer>
         <button type="button" class="btn btn-default" data-dismiss="modal" (click)="modal_overview.dismiss()">
@@ -98,7 +98,7 @@
             (overviewbtnclicked)="modal_overview.open()"
     ></app-fastbar>
 
-    <app-transcr-guidelines #modal_guidelines [guidelines]="tranService.guidelines"></app-transcr-guidelines>
+    <app-transcr-guidelines #modal_guidelines [guidelines]="transcrService.guidelines"></app-transcr-guidelines>
     <div *ngIf="!(sessService.Interface == 'overlay')">
         <app-signal-gui #signalloupe *ngIf="sessService.Interface == 'signaldisplay'">
         </app-signal-gui>
@@ -135,7 +135,7 @@
             <tbody>
             <tr>
                 <td>Anzahl Segmente:</td>
-                <td>{{tranService.segments.length}}</td>
+                <td>{{transcrService.segments.length}}</td>
             </tr>
             <tr>
                 <td>Anzahl Logeinträge:</td>

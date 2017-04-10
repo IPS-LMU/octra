@@ -3,9 +3,11 @@
         <div style="color:red; font-weight:bold; width:100%; text-align:center;">
             The guidelines are still in development.
         </div>
-        <div class="row">
+        <div class="row hidden-xs hidden-sm">
             <div class="col-md-7">
-                <h3>{{"general.guidelines" | translate }}</h3>
+                <h3>{{"general.guidelines" | translate }}<span class="version">
+                     v {{ guidelines.meta.version }}
+                </span></h3>
                 <span class="project">
                      {{"general.project" | translate }}: {{guidelines.meta.project }}
                 </span>
@@ -44,16 +46,19 @@
                             <div class="col-xs-9">
                                 <span class="guidelines-title" (click)="toggle(j,k)">{{entry.title}}</span>
                                 <div class="row entry-row" [ngbCollapse]="collapsed[j][k]">
-                                    <div class="col-md-4">
+                                    <div [ngClass]="{
+                                    'col-md-4': (entry.examples.length > 0),
+                                    'col-md-12': (entry.examples.length == 0)
+                                    }">
                                         <span class="guidelines-descr">
                                         {{entry.description}}
                                             </span>
                                     </div>
-                                    <div class="col-md-8">
+                                    <div *ngIf="entry.examples.length > 0" class="col-md-8">
                                         <div *ngFor="let example of entry.examples; let i = index;"
                                              class="panel panel-primary panel-example">
                                             <div class="panel-heading">
-                                                <h3 class="panel-title">Example {{i + 1}}</h3>
+                                                <h3 class="panel-title">{{"general.example" | translate}} {{i + 1}}</h3>
                                             </div>
                                             <div class="panel-body">
                                                 <div *ngIf="example.url.indexOf('.wav') > -1" class="media">

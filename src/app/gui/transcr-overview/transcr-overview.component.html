@@ -1,32 +1,42 @@
 <h4>{{"general.statistics" | translate}}</h4>
 <table class="table">
-  <thead>
-  <tr>
-    <th>{{"segments.total" | translate}}</th>
-    <th>{{"segments.transcribed" | translate}}</th>
-    <th>{{"segments.with breaks" | translate}}</th>
-    <th>{{"segments.not transcribed" | translate}}</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr>
-    <td class="active">{{numberOfSegments}}</td>
-    <td class="success">{{transcrSegments}}</td>
-    <td class="info">{{pauseSegments}}</td>
-    <td class="danger"><b><u>{{emptySegments}}</u></b></td>
-  </tr>
-  </tbody>
+    <thead>
+    <tr>
+        <th>{{"segments.total" | translate}}</th>
+        <th>{{"segments.transcribed" | translate}}</th>
+        <th>{{"segments.with breaks" | translate}}</th>
+        <th>{{"segments.not transcribed" | translate}}</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="active">{{numberOfSegments}}</td>
+        <td class="success">{{transcrSegments}}</td>
+        <td class="info">{{pauseSegments}}</td>
+        <td class="danger"><b><u>{{emptySegments}}</u></b></td>
+    </tr>
+    </tbody>
 </table>
 <h4>{{"general.transcript" | translate}}</h4>
 <table class="table">
-  <thead>
-  <tr>
-    <th>{{"general.timespan" | translate}}</th>
-    <th>{{"general.transcription" | translate}}</th>
-  </tr>
-  </thead>
-  <tr *ngFor="let segment of segments; let i = index" [ngClass]="{success: (segment.transcript != '' && segment.transcript != 'P'), info: (segment.transcript == 'P'), danger: (segment.transcript == '')}">
-    <td># {{i+1 | leadingnull: segments.length}}</td>
-    <td [innerHTML]="sanitizeHTML(segment.transcript)" (mouseover)="onMouseOver($event)" (mousedown)="onMouseOver($event)"></td>
-  </tr>
+    <thead>
+    <tr>
+        <th></th>
+        <th>{{"general.timespan" | translate}}</th>
+        <th>{{"general.transcription" | translate}}</th>
+    </tr>
+    </thead>
+    <tr *ngFor="let segment of shown_segments; let i = index"
+        [ngClass]="{success: (segment.transcription.text != '' && segment.transcription.text != transcrService.break_marker.code), info: (segment.transcription.text == transcrService.break_marker.code), danger: (segment.transcription.text == '')}">
+        <td style="width:25px;">
+            <span class="glyphicon glyphicon-warning-sign segment-warning"
+                  [ngStyle]="{
+                  'display': ((segment.transcription.html.indexOf('<div class=\'error_underline\'') > -1) ? 'normal': 'none')}"
+            >
+            </span>
+        </td>
+        <td><span class="segment-number"># {{i+1 | leadingnull: shown_segments.length}}</span></td>
+        <td [innerHTML]="sanitizeHTML(segment.transcription.html)" (mouseover)="onMouseOver($event)"
+            (mousedown)="onMouseOver($event)"></td>
+    </tr>
 </table>

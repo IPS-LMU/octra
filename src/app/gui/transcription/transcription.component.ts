@@ -67,7 +67,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	}
 
 	get loaded(): boolean {
-		return (this.audio.loaded && !isNullOrUndefined(this.tranService.guidelines));
+		return (this.audio.loaded && !isNullOrUndefined(this.transcrService.guidelines));
 	}
 
 	get appc(): any {
@@ -85,7 +85,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	constructor(public router: Router,
 				public audio: AudioService,
 				public uiService: UserInteractionsService,
-				public tranService: TranscriptionService,
+				public transcrService: TranscriptionService,
 				public sessService: SessionService,
 				public keyMap: KeymappingService,
 				public changeDetecorRef: ChangeDetectorRef,
@@ -97,7 +97,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	}
 
 	get dat(): string {
-		return JSON.stringify(this.tranService.exportDataToJSON(), null, 3);
+		return JSON.stringify(this.transcrService.exportDataToJSON(), null, 3);
 	}
 
 	get UIElements(): StatisticElem[] {
@@ -138,19 +138,19 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 						this.sessService.save("logs", this.uiService.elementsToAnyArray());
 					}));
 			}
-			this.tranService.loadAudioFile();
+			this.transcrService.loadAudioFile();
 			this.initialized[ "audiolayer" ] = false;
 		}
 		else {
 			this.afterAudioLoaded();
 		}
 
-		if (!isNullOrUndefined(this.tranService.segments)) {
-			this.subscrmanager.add(this.tranService.segments.onsegmentchange.subscribe(this.tranService.saveSegments));
+		if (!isNullOrUndefined(this.transcrService.segments)) {
+			this.subscrmanager.add(this.transcrService.segments.onsegmentchange.subscribe(this.transcrService.saveSegments));
 		}
 		else {
-			this.subscrmanager.add(this.tranService.dataloaded.subscribe(() => {
-				this.subscrmanager.add(this.tranService.segments.onsegmentchange.subscribe(this.tranService.saveSegments));
+			this.subscrmanager.add(this.transcrService.dataloaded.subscribe(() => {
+				this.subscrmanager.add(this.transcrService.segments.onsegmentchange.subscribe(this.transcrService.saveSegments));
 			}));
 		}
 	}
@@ -162,14 +162,14 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
 		//load guidelines
 		this.subscrmanager.add(
-			this.tranService.loadGuidelines(this.sessService.language, "./guidelines/guidelines_" + this.langService.currentLang + ".json")
+			this.transcrService.loadGuidelines(this.sessService.language, "./guidelines/guidelines_" + this.langService.currentLang + ".json")
 		);
 
 		//load guidelines on language change
 		this.subscrmanager.add(this.langService.onLangChange.subscribe(
 			(event: LangChangeEvent) => {
 				this.subscrmanager.add(
-					this.tranService.loadGuidelines(event.lang, "./guidelines/guidelines_" + event.lang + ".json")
+					this.transcrService.loadGuidelines(event.lang, "./guidelines/guidelines_" + event.lang + ".json")
 				);
 			}
 		));
@@ -196,7 +196,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	}
 
 	ngOnDestroy() {
-		this.tranService.destroy();
+		this.transcrService.destroy();
 		this.subscrmanager.destroy();
 	}
 
@@ -221,7 +221,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		}
 		if ($event.altKey && $event.which == 48) {
 			if (!this.overview.visible) {
-				this.tranService.analyse();
 				this.overview.open();
 			}
 			else this.overview.dismiss();
@@ -230,7 +229,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	}
 
 	getText() {
-		return this.tranService.getTranscriptString("text");
+		return this.transcrService.getTranscriptString("text");
 	}
 
 	clearElements(){

@@ -1,0 +1,11 @@
+.red{
+    background-color:#ff899d;
+}
+
+.segment-number{
+    padding:3px;
+}
+
+.segment-warning{
+    color:red;
+}

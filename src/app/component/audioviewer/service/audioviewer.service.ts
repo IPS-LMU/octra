@@ -14,6 +14,7 @@ import {
 import { AudioService, AudioComponentService, TranscriptionService, KeymappingService } from "../../../service";
 import { AudioviewerConfigValidator } from "../validator/AudioviewerConfigValidator";
 import { AudioviewerConfig } from "../config/av.config";
+import { TranslateService } from "@ngx-translate/core";
 
 @Injectable()
 export class AudioviewerService extends AudioComponentService {
@@ -105,7 +106,9 @@ export class AudioviewerService extends AudioComponentService {
 
 	constructor(protected audio: AudioService,
 				protected transcrService: TranscriptionService,
-				private keyMap: KeymappingService) {
+				private keyMap: KeymappingService,
+				private langService:TranslateService
+	) {
 		super(audio);
 
 		this.subscrmanager = new SubscriptionManager();
@@ -475,7 +478,7 @@ export class AudioviewerService extends AudioComponentService {
 								seg_num: i,
 								msg    : {
 									type: "error",
-									text: "Die Segmentgrenze kann nicht gelöscht werden, da daran angrenzende Segmente bereits transkribiert wurden"
+									text: this.langService.instant("boundary cannot delete")
 								}
 							};
 						}
@@ -508,7 +511,7 @@ export class AudioviewerService extends AudioComponentService {
 						seg_num: i,
 						msg    : {
 							type: "error",
-							text: "Die Segmentgrenze kann nicht innerhalb eines trankribierten Segments gesetzt werden"
+							text: this.langService.instant("boundary cannot set")
 						}
 					};
 				}
@@ -533,7 +536,7 @@ export class AudioviewerService extends AudioComponentService {
 						seg_num: i,
 						msg    : {
 							type: "error",
-							text: "Die Segmentgrenze kann nicht innerhalb eines trankribierten Segments gesetzt werden"
+							text: this.langService.instant("boundary cannot set")
 						}
 					};
 				}

@@ -26,6 +26,7 @@ import {
 } from "../../shared";
 import { AudioService, TranscriptionService, KeymappingService } from "../../service";
 import { AudioviewerService } from "./service/audioviewer.service";
+import { TranslateService } from "@ngx-translate/core";
 
 declare var window: any;
 @Component({
@@ -48,7 +49,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 	constructor(private audio: AudioService,
 				public av: AudioviewerService,
 				private transcr: TranscriptionService,
-				private keyMap: KeymappingService) {
+				private keyMap: KeymappingService,
+				private langService: TranslateService
+	) {
 
 		this.av.initializeSettings();
 
@@ -711,7 +714,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 										else {
 											this.alerttriggered.emit({
 												type   : "error",
-												message: "Das Segment muss sichtbar sein, um es abspielen zu können"
+												message: this.langService.instant("segment invisible")
 											});
 										}
 									}
@@ -757,7 +760,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 										else {
 											this.alerttriggered.emit({
 												type   : "error",
-												message: "Das Segment muss sichtbar sein, um es transkribieren zu können"
+												message: this.langService.instant("segment invisible")
 											});
 										}
 									}

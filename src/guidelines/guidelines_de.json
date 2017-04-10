@@ -5,7 +5,7 @@
     "project": "Sprecherinnen",
     "authors": "Test Person (testperson@email.de)",
     "version": "1.0",
-    "date": "2017-03-02",
+    "date": "2017-04-10",
     "encoding": "UTF-8",
     "validation_url": "assets/testfiles/functions.js"
   },
@@ -280,11 +280,11 @@
     },
     {
       "id": 8,
-      "name": "Pause",
+      "name": "break",
       "code": "<P>",
       "type": "break",
       "icon_url": "assets/img/components/transcr-editor/default_markers/break.png",
-      "button_text": "Break",
+      "button_text": "Pause",
       "description": "Dieser Marker stellt eine Pause dar, d.h. eine Sequenz in der nicht gesprochen wird",
       "shortcut": {
         "mac": "ALT + P",

@@ -3,20 +3,20 @@
     "object_language": "deu",
     "language": "de",
     "project": "Speakers",
-    "authors": "Test Person2 (testperson@email.de)",
+    "authors": "Test Person (testperson@email.de)",
     "version": "1.0",
-    "date": "2017-03-02",
+    "date": "2017-04-10",
     "encoding": "UTF-8",
     "validation_url": "assets/testfiles/functions.js"
   },
   "instructions": [
     {
-      "group": "Rechtschreibung",
+      "group": "Spelling",
       "entries": [
         {
           "code": "R01",
           "priority": 100,
-          "title": "Deutschen Rechtschreibung beachten",
+          "title": "Transcribe according to the german spelling",
           "description": "Bei der Tranksription sollte die Deutsche Rechtschreibung nach Duden befolgt werden. Bei Unklarheiten bitte www.duden.de aufsuchen.",
           "examples": [
           ]

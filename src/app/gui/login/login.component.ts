@@ -3,7 +3,7 @@ import {
 	OnInit,
 	ViewChild,
 	OnDestroy,
-	ChangeDetectorRef, HostListener
+	ChangeDetectorRef, HostListener, ElementRef
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
@@ -17,27 +17,31 @@ import { BrowserCheck } from "../../shared/BrowserCheck";
 import { SessionFile } from "../../shared/SessionFile";
 import { OCTRANIMATIONS } from "../../shared/OCTRAnimations";
 import { DropZoneComponent } from "../../component/drop-zone/drop-zone.component";
-import { isNullOrUndefined } from "util";
+import { isArray, isNullOrUndefined } from "util";
 import { SubscriptionManager } from "../../shared";
 import { Http } from "@angular/http";
 import { SettingsService } from "../../service/settings.service";
 import { ModalService } from "../../service/modal.service";
+import { ModalComponent } from "ng2-bs3-modal/ng2-bs3-modal";
 
 @Component({
 	selector   : 'app-login',
 	templateUrl: './login.component.html',
 	styleUrls  : [ './login.component.css' ],
-	providers  : [ LoginService ],
+	providers  : [ LoginService],
 	animations : OCTRANIMATIONS
 })
 export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate {
 	@ViewChild('f') loginform: NgForm;
 	@ViewChild('dropzone') dropzone: DropZoneComponent;
+	@ViewChild('agreement') agreement: ModalComponent;
 
 	public valid_platform: boolean = false;
 	public valid_size: boolean = false;
 	public browser_check: BrowserCheck;
 	public agreement_checked: boolean;
+
+	public projects:string[] = [];
 
 	private subscrmanager: SubscriptionManager;
 
@@ -53,7 +57,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
 	member = {
 		id       : "",
-		agreement: ""
+		agreement: "",
+		project: "",
+		jobno : 0
 	};
 
 	err: string = "";
@@ -83,13 +89,13 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 		else
 			this.valid_size = true;
 
-		jQuery.material.init();
-
 		this.cd.markForCheck();
 		this.cd.detectChanges();
 	}
 
 	ngAfterViewInit() {
+		this.loadPojectsList();
+		setTimeout(()=>{ jQuery.material.init(); }, 0);
 	}
 
 	ngOnDestroy() {
@@ -97,16 +103,16 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	}
 
 	onSubmit(form: NgForm) {
-		this.subscrmanager.add(this.api.beginSession("transcription", "", Number(this.member.id), "").catch((error) => {
+		this.subscrmanager.add(this.api.beginSession(this.member.project, this.member.id, Number(this.member.jobno)).catch((error) => {
 			alert("Fehler beim Aufbau der Verbindung.");
 			return Observable.throw(error);
 		}).subscribe(
 			(result) => {
 				let json = result.json();
-				if (form.valid && this.agreement_checked && this.loginService.checkLoginData(Number(this.member.id))
+				if (form.valid && this.agreement_checked && this.loginService.checkLoginData(this.member.id)
 					&& json.message !== "0"
 				) {
-					let res = this.sessionService.setSessionData(this.member.id, json.data.id, json.data.url);
+					let res = this.sessionService.setSessionData(this.member, json.data.id, json.data.url);
 					if (res.error === "")
 						this.navigate();
 					else
@@ -148,7 +154,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	};
 
 	canDeactivate(): Observable<boolean> | boolean {
-		return (this.valid && this.loginService.checkLoginData(Number(this.member.id)));
+		return (this.valid && this.loginService.checkLoginData(this.member.id));
 	}
 
 	private navigate() {
@@ -168,7 +174,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	}
 
 	openAgreement() {
-		//this.agreement.open();
+		this.agreement.open();
 	}
 
 	getDropzoneFileString(file: File| SessionFile) {
@@ -180,7 +186,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 		if (this.dropzone.file != null) {
 			this.sessionService.clearSession();
 			this.sessionService.clearLocalStorage();
-			this.sessionService.setSessionData("", 0, "");
+			this.sessionService.setSessionData(null, 0, "");
 			this.sessionService.sessionfile = this.getSessionFile(this.dropzone.file);
 			this.sessionService.file = this.dropzone.file;
 			this.sessionService.offline = true;
@@ -222,7 +228,29 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 		return result;
 	}
 
-	test() {
-		alert("OK");
+	loadPojectsList() {
+		this.subscrmanager.add(this.api.getProjects().subscribe(
+			((result)=>
+			{
+				let json = result.json();
+				if(isArray(json.data))
+				{
+					this.projects = json.data;
+				}
+			})
+		));
+	}
+
+	selectProject(event:HTMLSelectElement){
+		this.member.project = event.value;
+	}
+
+	test(){
+		console.log(this.member);
+		this.subscrmanager.add(this.api.beginSession(this.member.project, this.member.id , this.member.jobno).subscribe(
+			(result)=>{
+				console.log(result.json());
+			}
+		));
 	}
 }

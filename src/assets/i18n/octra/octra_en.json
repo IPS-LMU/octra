@@ -38,7 +38,10 @@
     "project": "Project",
     "authors": "Authors",
     "no guidelines found": "No guidelines found",
-    "example": "Example"
+    "example": "Example",
+    "select database": "Select Database",
+    "agreement": "agreement",
+    "agreement read": "I have read the agreement and accept its content"
   },
   "transcription":{
     "start": "Continue transcription",
@@ -149,5 +152,14 @@
   },
   "segment invisible": "This segment has to be visible to play its audio sequence",
   "boundary cannot delete": "Cannot delete boundary, because there are neighboring segments that are already transcribed.",
-  "boundary cannot set": "Cannot set boundary in a segments that is already transcribed."
+  "boundary cannot set": "Cannot set boundary in a segments that is already transcribed.",
+  "send error": "An error occured. Please reload this page and try it again",
+  "transcription submitted":{
+    "no jobs left": "No available jobs left",
+    "transcription sent": "transcription was transmitted",
+    "transcription sent successfully": "Your transcription was transmitted successfully.",
+    "want to do": "What do you like to do?",
+    "quit": "Quit and sign out",
+    "next transcription": "Get next transcription now"
+  }
 }

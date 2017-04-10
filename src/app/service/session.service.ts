@@ -1,6 +1,7 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { SessionStorage, LocalStorage, SessionStorageService, LocalStorageService } from 'ng2-webstorage';
 import { SessionFile } from "../shared/SessionFile";
+import { isNullOrUndefined } from "util";
 
 @Injectable()
 export class SessionService {
@@ -8,9 +9,11 @@ export class SessionService {
 		this._language = value;
 		this.sessStr.store("language", this._language);
 	}
+
 	get language(): string {
 		return this._language;
 	}
+
 	get sessionfile(): SessionFile {
 		return SessionFile.fromAny(this._sessionfile);
 	}
@@ -75,6 +78,8 @@ export class SessionService {
 	//SESSION STORAGE
 	@SessionStorage('session_key') session_key: string;
 	@SessionStorage() member_id: string;
+	@SessionStorage() member_project: string;
+	@SessionStorage() member_jobno: string;
 	@SessionStorage() logged_in: boolean;
 	@SessionStorage() logInTime: number; //timestamp
 	@SessionStorage() finishedTranscriptions: number;
@@ -101,8 +106,8 @@ export class SessionService {
 	//is user on the login page?
 	private login: boolean;
 
-	public file:File;
-	public saving:EventEmitter<boolean> = new EventEmitter<boolean>();
+	public file: File;
+	public saving: EventEmitter<boolean> = new EventEmitter<boolean>();
 
 	get SessionKey(): string {
 		return this.session_key;
@@ -110,6 +115,14 @@ export class SessionService {
 
 	get MemberID(): string {
 		return this.member_id;
+	}
+
+	get MemberProject(): string {
+		return this.member_project;
+	}
+
+	get MemberJobno(): string {
+		return this.member_jobno;
 	}
 
 	get LoggedIn(): boolean {
@@ -169,30 +182,33 @@ export class SessionService {
 		this.sessStr.store("session_key", this.session_key);
 	}
 
-	public setSessionData(member_id: string, data_id: number, audio_url: string): {error: string} {
-		if (!this.login) {
-				let interface_id: number = Number(member_id) % 3;
-
-				if (interface_id == 0) this._interface = "audioplayer";
-				else if (interface_id == 1) this._interface = "signaldisplay";
-				else if (interface_id == 2) this._interface = "overlay";
-
-				this.setNewSessionKey();
-				this.setMemberID(member_id);
-
-				this.sessStr.store("logInTime", Date.now());
-				this.sessStr.store("logged_in", this.logged_in);
-				this.sessStr.store("finishedTranscriptions", 0);
-				this.sessStr.store("nextTranscription", 0);
-				this.sessStr.store("transcriptionTime", { start: 0, end: 0 });
-				this.localStr.store("data_id", data_id);
-				this.localStr.store("audio_url", audio_url);
-				this.sessStr.store("interface", this._interface);
-				this.login = true;
-				this.logged_in = true;
+	public setSessionData(member: any, data_id: number, audio_url: string): { error: string } {
+		if (isNullOrUndefined(member.id) || isNullOrUndefined(member.project)) {
+			return { error: "member object error" };
 		}
 
-		return { error: "" };
+		if (!this.login) {
+			this._interface = "audioplayer";
+			this.setNewSessionKey();
+			this.setMemberID(member.id);
+
+			this.sessStr.store("logInTime", Date.now());
+			this.sessStr.store("logged_in", this.logged_in);
+			this.sessStr.store("finishedTranscriptions", 0);
+			this.sessStr.store("nextTranscription", 0);
+			this.sessStr.store("transcriptionTime", { start: 0, end: 0 });
+			this.localStr.store("data_id", data_id);
+			this.localStr.store("audio_url", audio_url);
+			this.sessStr.store("interface", this._interface);
+			this.sessStr.store("member_project", member.project);
+			this.sessStr.store("member_jobno", member.jobno);
+			this.login = true;
+			this.logged_in = true;
+
+			return { error: "" };
+		}
+
+		return { error: "member not logged in" };
 	}
 
 	/**
@@ -211,7 +227,7 @@ export class SessionService {
 		this.login = false;
 
 		this.sessStr.clear();
-		if(this.sessStr.retrieve('session_key') == null
+		if (this.sessStr.retrieve('session_key') == null
 			&& this.sessStr.retrieve('member_id') == null)
 			return true;
 

@@ -17,6 +17,7 @@ import { APIService } from "../../service/api.service";
 import { Functions } from "../../shared/Functions";
 import { NavbarService } from "../../service/navbar.service";
 import { SubscriptionManager } from "../../shared";
+import { TranslateService } from "@ngx-translate/core";
 
 
 @Component({
@@ -36,7 +37,9 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 				public api: APIService,
 				public cd: ChangeDetectorRef,
 				public sanitizer: DomSanitizer,
-				public navbarServ: NavbarService) {
+				public navbarServ: NavbarService,
+				private langService: TranslateService
+	) {
 
 		this.subscrmanager = new SubscriptionManager();
 	}
@@ -90,9 +93,8 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 		this.send_ok = true;
 
 		let json: any = this.transcrService.exportDataToJSON();
-		let member_id: number = Number(this.sessService.member_id);
 
-		this.subscrmanager.add(this.api.saveSession(json.transcript, json.project, json.annotator, member_id, json.id, json.status, json.comment, json.quality, json.log)
+		this.subscrmanager.add(this.api.saveSession(json.transcript, json.project, json.annotator, json.jobno, json.id, json.status, json.comment, json.quality, json.log)
 			.catch(this.onSendError)
 			.subscribe((result) => {
 					if (result != null && result.hasOwnProperty("statusText") && result.statusText === "OK") {
@@ -103,7 +105,7 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 						}, 1000);
 					}
 					else {
-						this.send_error = "Es ist ein Fehler aufgetreten. Lade diese Seite mit deinem Browser noch einmal und versuche es erneut";
+						this.send_error = this.langService.instant("send error");
 					}
 				}
 			));

@@ -21,9 +21,9 @@ export class LoginService {
 		));
 	}
 
-	public checkLoginData(user_id: number) {
+	public checkLoginData(user_name: string) {
 		for (let i = 0; i < this.db_data.length; i++) {
-			if (user_id === this.db_data[ i ].id)
+			if (user_name === this.db_data[ i ].name)
 				return true;
 		}
 		return false;

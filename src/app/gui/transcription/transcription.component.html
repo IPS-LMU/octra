@@ -82,6 +82,9 @@
     <app-loading #loading></app-loading>
 </div>
 <div *ngIf="loaded">
+    {{sessService.member_id}}<br/>
+    {{sessService.member_project}}<br/>
+    {{sessService.member_jobno}}<br/>
     <span id='saving' *ngIf="saving != ''"><i class="fa fa-spinner fa-spin" style="font-size:20px"></i></span>
     <app-fastbar
             [responsive]="responsive"
@@ -119,7 +122,7 @@
                         class="glyphicon glyphicon glyphicon-menu-right" aria-hidden="true"></span></a>
         </div>
     </div>
-    <span class="link" (click)="showdetails = !showdetails">Details anzeigen</span>
+    <span [hidden]="!appc.octra.showdetails" class="link" (click)="showdetails = !showdetails">Details anzeigen</span>
     <div [hidden]="!showdetails">
         <h3>Transkriptionstext:</h3>
         <p>

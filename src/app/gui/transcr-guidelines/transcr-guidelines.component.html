@@ -45,7 +45,7 @@
                             </div>
                             <div class="col-xs-9">
                                 <span class="guidelines-title" (click)="toggle(j,k)">{{entry.title}}</span>
-                                <div class="row entry-row" [ngbCollapse]="collapsed[j][k]">
+                                <div class="row entry-row" [collapse]="collapsed[j][k]">
                                     <div [ngClass]="{
                                     'col-md-4': (entry.examples.length > 0),
                                     'col-md-12': (entry.examples.length == 0)

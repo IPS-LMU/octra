@@ -47,7 +47,7 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
 	}
 
 	next() {
-		this.subscrmanager.add(this.api.beginSession("transcription", "", Number(this.sessService.member_id), "")
+		this.subscrmanager.add(this.api.beginSession(this.sessService.member_project, this.sessService.member_id, Number(this.sessService.member_jobno), "")
 			.subscribe((result) => {
 				if (result != null) {
 					let json = result.json();

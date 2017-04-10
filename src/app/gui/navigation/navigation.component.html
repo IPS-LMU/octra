@@ -44,7 +44,7 @@
             </button>
             <a class="navbar-brand" [routerLink]="['/']">OCTRA v{{version}}</a>
         </div>
-        <div id="navbar" class="collapse navbar-collapse" [ngbCollapse]="collapsed">
+        <div id="navbar" class="collapse navbar-collapse" [collapse]="collapsed">
             <ul class="nav navbar-nav">
                 <li *ngIf="sessService.LoggedIn && navbarServ.show_hidden">
                     <a (mouseup)="setInterface('audioplayer')">{{"interfaces.simple editor" | translate}}</a>

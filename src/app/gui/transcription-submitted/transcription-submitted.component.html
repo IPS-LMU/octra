@@ -1,31 +1,23 @@
 <modal #success id="transcription_success">
-    <modal-header>
-        <h4 class="modal-title">Herzlichen Glückwunsch!</h4>
-    </modal-header>
     <modal-body>
-        <p>Die Transkription der verfügbaren Audiodateien ist abgeschlossen.<br/>
-            Um die Studie abzuschließen füllen Sie bitte folgende Umfrage aus (6 kurze Fragen): <a href="https://goo.gl/forms/jVZkQyFXjPeGaGQx2" target="_blank">Zur kurzen Umfrage</a>
-            <br/><br/>
-            Vielen Dank für Ihre Teilnahme.
-        </p>
+        <p>{{"modal.no jobs left"}}</p>
     </modal-body>
     <modal-footer>
-        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="success.dismiss()">Schließen
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="success.dismiss()">{{"general.close" | translate}}
         </button>
     </modal-footer>
 </modal>
 <div id="transcr-submitted">
     <div class="container" style="width:900px;">
         <div class="well well-large">
-            <h4>Transkript erfolgreich übertragen</h4>
-            <p>Ihr Transkript wurde erfolgreich übertragen.<br><br>
+            <h4>{{"transcription submitted.transcription sent" | translate}}</h4>
+            <p>{{"transcription submitted.transcription sent successfully" | translate}}<br><br>
 
-                Was möchten Sie nun tun?
+                {{"transcription submitted.want to do" | translate}}
             </p>
 
-            <a class="btn btn-raised btn-default" style="width:49%;" (click)="leave()">Beenden und später fortfahren</a>
-            <a class="btn btn-raised btn-primary" style="width:49%;margin-left:1%;" (click)="next()">Jetzt nächste
-                Transkription durchführen</a>
+            <a class="btn btn-raised btn-default" style="width:49%;" (click)="leave()">{{"transcription submitted.quit" | translate}}</a>
+            <a class="btn btn-raised btn-primary" style="width:49%;margin-left:1%;" (click)="next()">{{"transcription submitted.next transcription" | translate}}</a>
         </div>
     </div>
 </div>

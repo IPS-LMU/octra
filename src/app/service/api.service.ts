@@ -15,11 +15,11 @@ export class APIService implements API {
 
 	public beginSession(project: string, annotator: string, jobno: number, password?: string): Observable<Response> {
 		//validation
-		if (project != "" && (annotator != "" || jobno > -1)) {
+		if (project != "" && (annotator != "")) {
 
 			let cmd_json = {
 				querytype: "startannotation",
-				project  : "transcription",
+				project  : project,
 				jobno    : jobno
 			};
 
@@ -28,17 +28,15 @@ export class APIService implements API {
 		throw "beginSession - validation false";
 	}
 
-	public continueSession(project: string, annotator: string): Observable<Response> {
-		//Bei welchen Konstellationen wird die Sitzung fortgesetzt?
-
+	public continueSession(project: string, annotator: string, jobno:number): Observable<Response> {
 		if (project != null && project != "" &&
 			annotator != null && annotator != ""
 		) {
 			let cmd_json = {
 				querytype: "continueannotation",
 				project  : project,
-				annotator: project, //TODO ändern
-				id       : "", //notwendig?
+				annotator: annotator,
+				jobno: jobno
 			};
 			return this.post(cmd_json);
 		}
@@ -106,6 +104,14 @@ export class APIService implements API {
 		else {
 			throw "getAudioBuffer - validation false";
 		}
+	}
+
+	public getProjects(){
+		let cmd_json = {
+			querytype: "listprojects"
+		};
+
+		return this.post(cmd_json);
 	}
 
 	public post(json: any): Observable<Response>{

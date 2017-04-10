@@ -26,9 +26,6 @@ import {
 } from "../../service";
 
 import { BrowserInfo, StatisticElem, SubscriptionManager } from "../../shared";
-import { Logger } from "../../shared/Logger";
-import { Observable } from "rxjs";
-import { isNull } from "util";
 import { isNullOrUndefined } from "util";
 import { TranslateService, LangChangeEvent } from "@ngx-translate/core";
 import { TranscrGuidelinesComponent } from "../transcr-guidelines/transcr-guidelines.component";
@@ -221,6 +218,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		}
 		if ($event.altKey && $event.which == 48) {
 			if (!this.overview.visible) {
+				this.transcrService.analyse();
 				this.overview.open();
 			}
 			else this.overview.dismiss();

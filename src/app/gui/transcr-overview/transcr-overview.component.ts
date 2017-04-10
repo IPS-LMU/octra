@@ -138,6 +138,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
 	ngOnChanges(event) {
 		if (!isNullOrUndefined(event.visible) && event.visible.currentValue == true) {
+			console.log("ok loaded");
 			this.updateSegments();
 			this.transcrService.analyse();
 		}

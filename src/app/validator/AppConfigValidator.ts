@@ -118,6 +118,14 @@ export class AppConfigValidator extends ConfigValidator {
 									};
 								}
 								break;
+							case("showdetails"):
+								if (typeof value === "boolean") {
+									return {
+										success: false,
+										error  : prefix + "value of key '" + key + "' must be of type boolean"
+									};
+								}
+								break;
 							default:
 								return {
 									success: false,

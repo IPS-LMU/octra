@@ -182,10 +182,11 @@ export class TranscriptionService {
 			let log_data: any[] = this.extractUI(this.uiService.elements);
 
 			data = {
-				project   : "transcription",
-				annotator : "",
+				project   : this.sessServ.member_project,
+				annotator : this.sessServ.member_id,
 				transcript: null,
 				comment   : this.feedback.comment,
+				jobno:	this.sessServ.member_jobno,
 				status    : this.state,
 				quality   : {
 					quality_audio  : this.feedback.quality_audio,

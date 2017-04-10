@@ -11,7 +11,11 @@ export class LoadingComponent implements OnInit {
 	public text:string = "";
 
 	constructor(private langService:TranslateService) {
-		this.text = langService.instant("general.please wait")+ "...";
+		langService.get("general.please wait").subscribe(
+			(translation) =>{
+				this.text = translation + "...";
+			}
+		);
 	}
 
 	ngOnInit() {

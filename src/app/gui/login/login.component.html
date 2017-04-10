@@ -10,7 +10,11 @@
             <li>Ich wurde für mich ausreichend mündlich und/oder schriftlich über die wissenschaftliche Untersuchung
                 informiert.
             </li>
-            <li>Ich erkläre mich bereit, dass ihm Rahmen der Studie Daten über mein Anwenderverhalten gesammelt und diese anonymisiert aufgezeichnet werden. Es wird gewährleistet, dass meine personenbezogenen Daten nicht an Dritte außerhalb der LMU weitergegeben werden. In anonymisierter Form dürfen die Daten für wissenschaftliche Untersuchungen, Publikationen und in der Lehre verwendet werden. Meine persönlichen Daten unterliegen dem Datenschutzgesetz.
+            <li>Ich erkläre mich bereit, dass ihm Rahmen der Studie Daten über mein Anwenderverhalten gesammelt und
+                diese anonymisiert aufgezeichnet werden. Es wird gewährleistet, dass meine personenbezogenen Daten nicht
+                an Dritte außerhalb der LMU weitergegeben werden. In anonymisierter Form dürfen die Daten für
+                wissenschaftliche Untersuchungen, Publikationen und in der Lehre verwendet werden. Meine persönlichen
+                Daten unterliegen dem Datenschutzgesetz.
             </li>
             <li>Ich weiß, dass ich jederzeit meine Einverständniserklärung, ohne Angabe von Gründen, widerrufen kann,
                 ohne dass dies für mich nachteilige Folgen hat.
@@ -47,54 +51,67 @@
                 <div *ngIf="!apc.octra.login_enabled" id="login-disabled">
                     {{'login.online mode disabled' | translate}}
                 </div>
-                <form *ngIf="apc.octra.login_enabled" class="form-horizontal" (ngSubmit)="onSubmit(f)" #f="ngForm">
-                    <fieldset>
-                        <div>
-                            <div class="form-group">
-                                <input class="form-control" type="text" id="login-id"
-                                       name="login-id"
-                                       placeholder="Anmeldename" [(ngModel)]="member.id"
-                                       required
-                                />
-                            </div>
-                            <div class="form-group">
-                                    <select id="select111" class="form-control" #selection (change)="selectProject(selection)" required>
+                <div *ngIf="apc.octra.login_enabled">
+                    <p class="bg-danger" *ngIf="sessionService.offline == true">
+                        Beim letzten Mal wurde der Offline Modus genutzt. Das Nutzen des Online Modus überschreibt die Daten des Offline Modus.
+                    </p>
+                    <p class="bg-warning" *ngIf="sessionService.member_id != null && sessionService.audio_url != null">
+                        Es wurden alte Daten gefunden. Zum Forsetzen folgende Daten angeben: {{sessionService.member_id}} , {{sessionService.member_project}}, {{sessionService.member_jobno}}
+                    </p>
+                    <form class="form-horizontal" (ngSubmit)="onSubmit(f)" #f="ngForm">
+                        <fieldset>
+                            <div>
+                                <div class="form-group">
+                                    <input class="form-control" type="text" id="login-id"
+                                           name="login-id"
+                                           placeholder="Anmeldename" [(ngModel)]="member.id"
+                                           required
+                                    />
+                                </div>
+                                <div class="form-group">
+                                    <select id="select111" class="form-control" #selection
+                                            (change)="selectProject(selection)" required>
                                         <option value="">{{"general.select database" | translate}}</option>
-                                        <option *ngFor="let project of projects;" value="{{project}}">{{project}}</option>
+                                        <option *ngFor="let project of projects;" value="{{project}}">{{project}}
+                                        </option>
                                     </select>
-                            </div>
-                            <div class="form-group">
-                                <input class="form-control" type="number" id="jobno"
-                                       name="jobno"
-                                       placeholder="Aufgaben-Nummer" [(ngModel)]="member.jobno"
-                                       required
-                                />
-                            </div>
-                            <div class="form-group">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" id="agreement" name="agreement"
-                                               [(ngModel)]="agreement_checked" required>
-                                    </label> <span style="font-size:1.0em;">
+                                </div>
+                                <div class="form-group">
+                                    <input class="form-control" type="number" id="jobno"
+                                           name="jobno"
+                                           placeholder="Aufgaben-Nummer" [(ngModel)]="member.jobno"
+                                           required
+                                    />
+                                </div>
+                                <div class="form-group">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" id="agreement" name="agreement"
+                                                   [(ngModel)]="agreement_checked" required>
+                                        </label> <span style="font-size:1.0em;">
                                     {{"general.agreement read" |translate:{"agreement": ("general.agreement" | translate )} }}</span>
-                                    <a (click)="openAgreement()">({{"general.agreement" | translate}})</a>
+                                        <a (click)="openAgreement()">({{"general.agreement" | translate}})</a>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <input class="form-control" type="submit" id="login-submit"
+                                           class="btn btn-raised btn-primary"
+                                           [disabled]="!f.valid"
+                                           name="login-submit" value="{{'general.login' | translate}}"/>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <input class="form-control" type="submit" id="login-submit"
-                                       class="btn btn-raised btn-primary"
-                                       [disabled]="!f.valid"
-                                       name="login-submit" value="{{'general.login' | translate}}"/>
-                            </div>
-                        </div>
-                    </fieldset>
-                </form>
+                        </fieldset>
+                    </form>
+                </div>
                 <br/>
             </section>
             <hr/>
             <section>
                 <h4>{{'login.local mode' | translate}}</h4>
                 <div>
+                    <p class="bg-danger" *ngIf="sessionService.member_id != null">
+                        Beim letzten Mal wurde der Online Modus genutzt. Das Nutzen des Offline Modus überschreibt die Daten des Online Modus.
+                    </p>
                     <p class="bg-warning" *ngIf="sessionService.sessionfile != null"
                        [innerHTML]="'login.old file found' | translate:{file_label: getDropzoneFileString(sessionfile)}">
                     </p>
@@ -119,5 +136,4 @@
         </div>
         <div class="col-sm-2 col-md-3"></div>
     </div>
-    <button (click)="test()">Test</button>
 </div>

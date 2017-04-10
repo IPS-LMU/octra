@@ -19,7 +19,7 @@ export class SessionService {
 	}
 
 	set sessionfile(value: SessionFile) {
-		this._sessionfile = value.toAny();
+		this._sessionfile = (value != null) ? value.toAny() : null;
 		this.localStr.store("sessionfile", this._sessionfile);
 	}
 
@@ -77,9 +77,6 @@ export class SessionService {
 
 	//SESSION STORAGE
 	@SessionStorage('session_key') session_key: string;
-	@SessionStorage() member_id: string;
-	@SessionStorage() member_project: string;
-	@SessionStorage() member_jobno: string;
 	@SessionStorage() logged_in: boolean;
 	@SessionStorage() logInTime: number; //timestamp
 	@SessionStorage() finishedTranscriptions: number;
@@ -102,6 +99,9 @@ export class SessionService {
 	@LocalStorage('offline') private _offline: boolean;
 	@LocalStorage('sessionfile') _sessionfile: any;
 	@LocalStorage('language') private _language: string;
+	@LocalStorage() member_id: string;
+	@LocalStorage() member_project: string;
+	@LocalStorage() member_jobno: string;
 
 	//is user on the login page?
 	private login: boolean;
@@ -182,9 +182,9 @@ export class SessionService {
 		this.sessStr.store("session_key", this.session_key);
 	}
 
-	public setSessionData(member: any, data_id: number, audio_url: string): { error: string } {
-		if (isNullOrUndefined(member.id) || isNullOrUndefined(member.project)) {
-			return { error: "member object error" };
+	public setSessionData(member: any, data_id: number, audio_url: string, offline:boolean = false): { error: string } {
+		if (!offline  && (isNullOrUndefined(member.id) || isNullOrUndefined(member.project))) {
+			return { error: "" };
 		}
 
 		if (!this.login) {
@@ -200,15 +200,16 @@ export class SessionService {
 			this.localStr.store("data_id", data_id);
 			this.localStr.store("audio_url", audio_url);
 			this.sessStr.store("interface", this._interface);
-			this.sessStr.store("member_project", member.project);
-			this.sessStr.store("member_jobno", member.jobno);
+			this.localStr.store("member_project", member.project);
+			this.localStr.store("member_jobno", member.jobno);
+			this.localStr.store("offline", false);
 			this.login = true;
 			this.logged_in = true;
 
 			return { error: "" };
 		}
 
-		return { error: "member not logged in" };
+		return { error: "" };
 	}
 
 	/**
@@ -218,7 +219,7 @@ export class SessionService {
 	 */
 	private setMemberID(member_id: string): boolean {
 		this.member_id = member_id;
-		this.sessStr.store("member_id", this.member_id);
+		this.localStr.store("member_id", this.member_id);
 		return true;
 	}
 

@@ -39,7 +39,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	public valid_platform: boolean = false;
 	public valid_size: boolean = false;
 	public browser_check: BrowserCheck;
-	public agreement_checked: boolean;
+	public agreement_checked: boolean = false;
 
 	public projects:string[] = [];
 
@@ -78,7 +78,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	ngOnInit() {
 		this.browser_check = new BrowserCheck();
 		this.valid_platform = true;
-		this.agreement_checked = true;
 		if (this.apc.octra.allowed_browsers.length > 0)
 			this.valid_platform = this.browser_check.isValidBrowser(this.apc.octra.allowed_browsers);
 		else
@@ -112,6 +111,13 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 				if (form.valid && this.agreement_checked && this.loginService.checkLoginData(this.member.id)
 					&& json.message !== "0"
 				) {
+					if(this.sessionService.sessionfile != null){
+						//last was online mode
+						this.sessionService.logs = null;
+						this.sessionService.transcription = null;
+						this.sessionService.data_id = null;
+						this.sessionService.sessionfile = null;
+					}
 					let res = this.sessionService.setSessionData(this.member, json.data.id, json.data.url);
 					if (res.error === "")
 						this.navigate();
@@ -131,7 +137,13 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
 		if (this.dropzone.file != null && type == "audio/x-wav" || type == "audio/wav") {
 
-			let res = this.sessionService.setSessionData("0", 0, "");
+			if(this.sessionService.member_id != null || this.sessionService.member_id == ""){
+				//last was online mode
+				this.sessionService.logs = null;
+				this.sessionService.transcription = null;
+				this.sessionService.data_id = null;
+			}
+			let res = this.sessionService.setSessionData("", 0, "", true);
 			if (res.error === "") {
 				this.sessionService.offline = true;
 				this.sessionService.sessionfile = new SessionFile(
@@ -243,14 +255,5 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
 	selectProject(event:HTMLSelectElement){
 		this.member.project = event.value;
-	}
-
-	test(){
-		console.log(this.member);
-		this.subscrmanager.add(this.api.beginSession(this.member.project, this.member.id , this.member.jobno).subscribe(
-			(result)=>{
-				console.log(result.json());
-			}
-		));
 	}
 }

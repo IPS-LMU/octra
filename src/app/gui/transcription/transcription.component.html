@@ -82,9 +82,6 @@
     <app-loading #loading></app-loading>
 </div>
 <div *ngIf="loaded">
-    {{sessService.member_id}}<br/>
-    {{sessService.member_project}}<br/>
-    {{sessService.member_jobno}}<br/>
     <span id='saving' *ngIf="saving != ''"><i class="fa fa-spinner fa-spin" style="font-size:20px"></i></span>
     <app-fastbar
             [responsive]="responsive"

@@ -38,7 +38,10 @@
     "project": "Projekt",
     "authors": "Authoren",
     "no guidelines found": "Keine Transkriptionsrichtlinien gefunden",
-    "example": "Beispiel"
+    "example": "Beispiel",
+    "select database": "Datenbank wählen",
+    "agreement": "Einverständniserklärung",
+    "agreement read": "Ich habe die {{agreement}} gelesen und akzeptiert"
   },
   "transcription":{
     "start": "Transkription fortsetzen",
@@ -113,7 +116,10 @@
     "online mode": "Online Modus",
     "online mode disabled": "Der Online Modus ist derzeit deaktiviert. Sie können OCTRA stattdessen lokal nutzen.",
     "local mode": "Lokaler Modus",
-    "old file found": "Es wurden Daten zu einer vorherigen Transkription gefunden. Um diese fortzusetzen, ziehen Sie die folgende Datei per Drag & Drop in das graue Feld:<br/><br/>{{file_label}}"
+    "old file found": "Es wurden Daten zu einer vorherigen Transkription gefunden. Um diese fortzusetzen, ziehen Sie die folgende Datei per Drag & Drop in das graue Feld:<br/><br/>{{file_label}}",
+    "online mode data warning": "Es sind lokale Daten vorhanden, die im Offline Modus erstellt worden sind. Das Nutzen des Online Modus überschreibt diese lokalen Daten.",
+    "offline mode data warning": "Es sind lokale Daten vorhanden, die im Online Modus erstellt worden sind. Das Nutzen des Offline Modus überschreibt diese lokalen Daten.",
+    "online mode continue": "Es wurden alte Daten gefunden. Zum Forsetzen folgende Daten angeben: {{member_id}} , {{member_project}}, {{member_jobno}}"
   },
   "dropzone": {
     "drag&drop here": "Audiodatei (*.wav) hier hineinziehen oder hier klicken",
@@ -148,5 +154,14 @@
   },
   "segment invisible": "Das Segment muss sichtbar sein, um es abspielen zu können",
   "boundary cannot delete": "Die Segmentgrenze kann nicht gelöscht werden, da daran angrenzende Segmente bereits transkribiert wurden",
-  "boundary cannot set": "Die Segmentgrenze kann nicht innerhalb eines trankribierten Segments gesetzt werden"
+  "boundary cannot set": "Die Segmentgrenze kann nicht innerhalb eines trankribierten Segments gesetzt werden",
+  "send error": "Es ist ein Fehler aufgetreten. Lade diese Seite mit ihrem Browser noch einmal und versuche es erneut",
+  "transcription submitted":{
+    "no jobs left": "Keine freien Aufgaben verfügbar",
+    "transcription sent": "Transkription wurde übertragen.",
+    "transcription sent successfully": "Ihre Transkription wurde erfolgreich übertragen.",
+    "want to do": "Was wollen Sie tun?",
+    "quit": "Beenden und abmelden",
+    "next transcription": "Jetzt nächste Transkription durchführen"
+  }
 }

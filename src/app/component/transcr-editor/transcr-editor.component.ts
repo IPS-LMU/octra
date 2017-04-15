@@ -31,7 +31,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	private _settings: TranscrEditorConfig;
 	private subscrmanager: SubscriptionManager;
 	private init: number = 0;
-	private focused:boolean = false;
+	public focused:boolean = false;
 
 	@Input() visible: boolean = true;
 	@Input() markers: any = true;

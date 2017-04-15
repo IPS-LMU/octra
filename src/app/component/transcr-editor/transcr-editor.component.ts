@@ -269,6 +269,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 		element.setAttribute("class", "btn-icon-text");
 		element.setAttribute("style", "height:16px");
 		element.setAttribute("data-marker-code", marker_code);
+		element.setAttribute("alt", marker_code);
 
 		this.textfield.summernote('editor.insertNode', element);
 		this.updateTextField();
@@ -400,7 +401,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 					let s1 = (g1) ? g1 : "";
 					let s2 = (g2) ? g2 : "";
 					let s3 = (g3) ? g3 : "";
-					return s1 + "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "'/>" + s3;
+					return s1 + "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "' alt='"+ marker.code + "'/>" + s3;
 				};
 
 				result = result.replace(regex, replace_func);
@@ -473,7 +474,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
 		for (let i = 0; i < this.markers.length; i++) {
 			let marker = this.markers[ i ];
-			result = result.replace(marker, "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "'/>");
+			result = result.replace(marker, "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "' alt='" + marker.code + "'/>");
 		}
 		return result;
 	}

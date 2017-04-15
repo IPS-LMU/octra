@@ -32,17 +32,15 @@ import { SettingsService } from "../../service/settings.service";
 })
 export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	@ViewChild('viewer') viewer: AudioviewerComponent;
+	@ViewChild('miniloupe') miniloupe: LoupeComponent;
 	@ViewChild('loupe') loupe: LoupeComponent;
-	@ViewChild('loupee') loupee: LoupeComponent;
-	@ViewChild('loupe2') loupe2: LoupeComponent;
 	@ViewChild('nav') nav: AudioNavigationComponent;
 	@ViewChild('transcr') editor: TranscrEditorComponent;
 
 	private subscrmanager: SubscriptionManager;
 
 	private initialized = false;
-	public loupe_hidden = true;
-	public loupe2_hidden = true;
+	public miniloupe_hidden = true;
 	public segmentselected: boolean = false;
 	public activeviewer: string = "";
 
@@ -89,31 +87,29 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.editor.Settings.markers = this.transcrService.guidelines.markers;
 		this.editor.Settings.responsive = this.app_settings.octra.responsive.enabled;
 
-		this.loupee.Settings.shortcuts = this.keyMap.register("Loupe", this.loupee.Settings.shortcuts);
-		this.loupee.Settings.shortcuts.play_pause.keys.mac = "SHIFT + TAB";
-		this.loupee.Settings.shortcuts.play_pause.keys.pc = "SHIFT + TAB";
-		this.loupee.Settings.shortcuts.step_backward.keys.mac = "SHIFT + ENTER";
-		this.loupee.Settings.shortcuts.step_backward.keys.pc = "SHIFT + ENTER";
+		this.loupe.Settings.shortcuts = this.keyMap.register("Loupe", this.loupe.Settings.shortcuts);
+		this.loupe.Settings.shortcuts.play_pause.keys.mac = "SHIFT + TAB";
+		this.loupe.Settings.shortcuts.play_pause.keys.pc = "SHIFT + TAB";
+		this.loupe.Settings.shortcuts.step_backward.keys.mac = "SHIFT + ENTER";
+		this.loupe.Settings.shortcuts.step_backward.keys.pc = "SHIFT + ENTER";
 
-		this.loupe.Settings.shortcuts_enabled = false;
-		this.loupe.Settings.boundaries.enabled = false;
-		this.loupe2.Settings.shortcuts_enabled = false;
-		this.loupe2.Settings.boundaries.enabled = false;
+		this.miniloupe.Settings.shortcuts_enabled = false;
+		this.miniloupe.Settings.boundaries.enabled = false;
 
 		//update signaldisplay on changes
 		this.subscrmanager.add(Observable.timer(0, 2000).subscribe(
 			() => {
 				this.viewer.drawSegments();
-				this.loupee.viewer.drawSegments();
+				this.loupe.viewer.drawSegments();
 			}
 		));
 
-		this.subscrmanager.add(this.loupee.viewer.segmentchange.subscribe(
+		this.subscrmanager.add(this.loupe.viewer.segmentchange.subscribe(
 			($event) => {
 				this.onSegmentChange($event);
 			}));
 
-		this.subscrmanager.add(this.loupee.viewer.alerttriggered.subscribe(
+		this.subscrmanager.add(this.loupe.viewer.alerttriggered.subscribe(
 			(result) => {
 				this.msg.showMessage(result.type, result.message);
 			}
@@ -158,8 +154,6 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	ngAfterViewInit() {
-		this.mini_loupecoord2.y = this.loupee.getLocation().y - this.loupee.Settings.height
-			- (this.loupe2.Settings.height/2);
 		this.initialized = true;
 		this.cd.detectChanges();
 	}
@@ -168,22 +162,27 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 		if (selection) {
 			if (selection.end.samples - selection.start.samples > 0) {
 				this.segmentselected = false;
-				this.loupee.changeArea(selection.start, selection.end);
+				this.loupe.changeArea(selection.start, selection.end);
 			}
 		}
 	}
 
 	onSegmentChange($event) {
-		this.loupee.update();
+		this.loupe.update();
 		this.viewer.drawSegments();
 	}
 
 	onMouseOver(cursor: AVMousePos) {
-		this.changeArea(this.loupe, this.viewer, this.mini_loupecoord, this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x);
+		let a = this.viewer.getLocation();
+		this.mini_loupecoord.y = a.y - this.viewer.Settings.height
+			- (this.miniloupe.Settings.height) - 17;
+		this.changeArea(this.miniloupe, this.viewer, this.mini_loupecoord, this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x);
 	}
 
 	onMouseOver2(cursor: AVMousePos) {
-		this.changeArea(this.loupe2, this.loupee.viewer, this.mini_loupecoord2, this.loupee.viewer.MouseCursor.timePos.samples, this.loupee.viewer.MouseCursor.relPos.x);
+		this.mini_loupecoord.y = this.loupe.getLocation().y - this.loupe.Settings.height
+			- (this.miniloupe.Settings.height/2) + 15;
+		this.changeArea(this.miniloupe, this.loupe.viewer, this.mini_loupecoord, this.loupe.viewer.MouseCursor.timePos.samples, this.loupe.viewer.MouseCursor.relPos.x);
 	}
 
 	private changeArea(loup: LoupeComponent, viewer: AudioviewerComponent, coord: any, cursor: number, relX: number) {
@@ -210,7 +209,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.editor.rawText = segment.transcript;
 		this.segmentselected = true;
 		this.transcrService.selectedSegment = $event;
-		this.loupee.changeArea(this.transcrService.segments.getStartTime($event.index), segment.time);
+		this.loupe.changeArea(this.transcrService.segments.getStartTime($event.index), segment.time);
 	}
 
 	//TODO CHANGE!!
@@ -227,7 +226,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 			if (index > -1 && this.transcrService.segments && index < this.transcrService.segments.length) {
 				let segment = this.transcrService.segments.get(index);
 				this.viewer.focused = false;
-				this.loupee.viewer.focused = false;
+				this.loupe.viewer.focused = false;
 				segment.transcript = this.editor.rawText;
 				this.transcrService.segments.change(index, segment);
 			}
@@ -257,7 +256,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	 */
 	onEditorTyping = (status: string) => {
 		this.viewer.focused = false;
-		this.loupee.viewer.focused = false;
+		this.loupe.viewer.focused = false;
 		if (status === "started") {
 			/*
 			//if started save old config of special keys

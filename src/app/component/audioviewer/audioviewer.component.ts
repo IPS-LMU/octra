@@ -416,6 +416,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 
 		let curr_line = this.av.getLineByMousePosition(x, y);
 
+		this.mousecursorchange.emit(this.av.Mousecursor);
+
 		if (curr_line) {
 			this.focused = true;
 			if (this.Settings.selection.enabled) {
@@ -426,7 +428,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 		} else{
 			this.focused = false;
 		}
-		this.mousecursorchange.emit(this.av.Mousecursor);
 	}
 
 	/**
@@ -1132,6 +1133,14 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 					this.drawPlayCursorOnly(line);
 				}
 			}
+		}
+	}
+
+	public getLocation(): any {
+		let rect = this.aview.elementRef.nativeElement.getBoundingClientRect();
+		return {
+			x: rect.left,
+			y: rect.top
 		}
 	}
 }

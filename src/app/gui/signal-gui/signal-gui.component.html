@@ -1,22 +1,12 @@
 <div style="width:100px;" id="">
-    <app-circleloupe #loupe [ngStyle]="{
+    <app-circleloupe #miniloupe [ngStyle]="{
 'position':'absolute',
 'margin-left':mini_loupecoord.x + 'px',
-'margin-top':'-20px',
+'margin-top':mini_loupecoord.y + 'px',
 'width' : '80px',
 'height': '80px',
 'z-index':'900',
 'visibility': (loupe_hidden) ? 'hidden' : 'inherit'}"></app-circleloupe>
-</div>
-<div style="width:100px;">
-    <app-circleloupe #loupe2 [ngStyle]="{
-'position':'absolute',
-'margin-left':mini_loupecoord2.x + 'px',
-'margin-top':mini_loupecoord2.y + 'px',
-'width' : '80px',
-'height': '80px',
-'z-index':'900',
-'visibility': (loupe2_hidden) ? 'hidden' : 'inherit'}"></app-circleloupe>
 </div>
 <app-audio-navigation #nav
                       (buttonclick)="onButtonClick($event)"
@@ -56,17 +46,17 @@
                      (segmentchange)="onSegmentChange($event)"
                      (segmententer)="onSegmentEnter($event)"
                      (mousecursorchange)="onMouseOver($event)"
-                     (mouseenter)="loupe_hidden = false;"
-                     (mouseleave)="loupe_hidden = true;"
+                     (mouseenter)="miniloupe_hidden = false;"
+                     (mouseleave)="miniloupe_hidden = true;"
                      (mousedown)="onViewerMouseDown($event)"
                      (shortcuttriggered)="onShortCutTriggered($event, 'signal')"
     >
     </app-audioviewer>
 </div>
-<app-loupe #loupee
+<app-loupe #loupe
            (mousecursorchange)="onMouseOver2($event)"
-           (mouseenter)="loupe2_hidden = false;"
-           (mouseleave)="loupe2_hidden = true;"
+           (mouseenter)="miniloupe_hidden = false;"
+           (mouseleave)="miniloupe_hidden = true;"
            (segmententer)="onLoupeSegmentEnter($event)"
            (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
 >

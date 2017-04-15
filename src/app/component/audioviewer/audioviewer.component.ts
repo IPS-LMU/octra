@@ -50,8 +50,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 				public av: AudioviewerService,
 				private transcr: TranscriptionService,
 				private keyMap: KeymappingService,
-				private langService: TranslateService
-	) {
+				private langService: TranslateService) {
 
 		this.av.initializeSettings();
 
@@ -72,7 +71,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 	@Output('mousecursorchange') mousecursorchange = new EventEmitter<AVMousePos>();
 	@Output('playcursorchange') playcursorchange = new EventEmitter<PlayCursor>();
 	@Output('shortcuttriggered') shortcuttriggered = new EventEmitter<any>();
-	@Output('altertriggered') alerttriggered = new EventEmitter<{type: string, message: string}>();
+	@Output('altertriggered') alerttriggered = new EventEmitter<{ type: string, message: string }>();
 
 	@Output('pos_time') get pos_time(): number {
 		return this.av.PlayCursor.time_pos.samples;
@@ -172,7 +171,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.m_context = this.mousecanvas.getContext("2d");
 
 		this.subscrmanager.add(this.audio.statechange.subscribe(
-			(state)=> {
+			(state) => {
 				if (state === "ended") {
 					if (this.av.Selection == null || (this.av.Selection.end.samples - this.av.Selection.start.samples) == 0) {
 						this.changePlayCursorSamples(this.av.Chunk.time.start.samples);
@@ -209,7 +208,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 
 		if (this.av.channel) {
 
-			if(computeDisplayData == true){
+			if (computeDisplayData == true) {
 				this.av.refresh();
 			}
 
@@ -418,11 +417,14 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 		let curr_line = this.av.getLineByMousePosition(x, y);
 
 		if (curr_line) {
+			this.focused = true;
 			if (this.Settings.selection.enabled) {
 				this.av.setMouseMovePosition($event.type, x, y, curr_line, this.innerWidth);
 				this.drawSegments();
 				this.drawCursor(curr_line);
 			}
+		} else{
+			this.focused = false;
 		}
 		this.mousecursorchange.emit(this.av.Mousecursor);
 	}
@@ -651,7 +653,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 								key_active = true;
 								break;
 							case("set_boundary"):
-								if (this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly) {
+								if (this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly && this.av.focused) {
 									let result = this.av.addSegment();
 									if (!result != null && result.msg != null) {
 										if (result.msg.text && result.msg.text != "") {
@@ -673,61 +675,63 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 								}
 								break;
 							case("play_selection"):
-								this.shortcuttriggered.emit({ shortcut: comboKey, value: shortc });
+								if(this.av.focused) {
+									this.shortcuttriggered.emit({ shortcut: comboKey, value: shortc });
 
-								let xSamples = this.av.audioTCalculator.absXChunktoSamples(this.av.Mousecursor.absX, this.av.Chunk);
+									let xSamples = this.av.audioTCalculator.absXChunktoSamples(this.av.Mousecursor.absX, this.av.Chunk);
 
-								let boundary_select = this.av.getSegmentSelection();
-								if (boundary_select) {
-									let segment_i = this.transcr.segments.getSegmentBySamplePosition(xSamples);
-									if (segment_i > -1) {
-										let segment = this.transcr.segments.get(segment_i);
-										let start_time = this.transcr.segments.getStartTime(segment_i);
-										//make shure, that segments boundaries are visible
-										if (start_time.samples >= this.av.Chunk.time.start.samples && segment.time.samples <= this.av.Chunk.time.end.samples) {
-											let absX = this.av.audioTCalculator.samplestoAbsX(this.transcr.segments.get(segment_i).time.samples);
-											this.av.Selection = boundary_select;
-											this.selchange.emit(this.av.Selection);
-											this.drawSegments();
+									let boundary_select = this.av.getSegmentSelection();
+									if (boundary_select) {
+										let segment_i = this.transcr.segments.getSegmentBySamplePosition(xSamples);
+										if (segment_i > -1) {
+											let segment = this.transcr.segments.get(segment_i);
+											let start_time = this.transcr.segments.getStartTime(segment_i);
+											//make shure, that segments boundaries are visible
+											if (start_time.samples >= this.av.Chunk.time.start.samples && segment.time.samples <= this.av.Chunk.time.end.samples) {
+												let absX = this.av.audioTCalculator.samplestoAbsX(this.transcr.segments.get(segment_i).time.samples);
+												this.av.Selection = boundary_select;
+												this.selchange.emit(this.av.Selection);
+												this.drawSegments();
 
-											let begin = new Segment(new AudioTime(0, this.audio.samplerate));
-											if (segment_i > 0)
-												begin = this.transcr.segments.get(segment_i - 1);
-											let beginX = this.av.audioTCalculator.samplestoAbsX(begin.time.samples);
+												let begin = new Segment(new AudioTime(0, this.audio.samplerate));
+												if (segment_i > 0)
+													begin = this.transcr.segments.get(segment_i - 1);
+												let beginX = this.av.audioTCalculator.samplestoAbsX(begin.time.samples);
 
-											let posY1 = (this.innerWidth < this.AudioPxWidth)
-												? Math.floor((beginX / this.innerWidth) + 1) * (this.Settings.height + this.Settings.margin.bottom) - this.Settings.margin.bottom
-												: 0;
+												let posY1 = (this.innerWidth < this.AudioPxWidth)
+													? Math.floor((beginX / this.innerWidth) + 1) * (this.Settings.height + this.Settings.margin.bottom) - this.Settings.margin.bottom
+													: 0;
 
-											let posY2 = (this.innerWidth < this.AudioPxWidth)
-												? Math.floor((absX / this.innerWidth) + 1) * (this.Settings.height + this.Settings.margin.bottom) - this.Settings.margin.bottom
-												: 0;
+												let posY2 = (this.innerWidth < this.AudioPxWidth)
+													? Math.floor((absX / this.innerWidth) + 1) * (this.Settings.height + this.Settings.margin.bottom) - this.Settings.margin.bottom
+													: 0;
 
-											if (xSamples >= this.av.Selection.start.samples && xSamples <= this.av.Selection.end.samples) {
-												this.av.current.samples = this.av.Selection.start.samples;
-												this.changePlayCursorSamples(this.av.Selection.start.samples);
-												this.drawPlayCursorOnly(this.av.LastLine);
-												this.audio.stopPlayback(this.playSelection);
+												if (xSamples >= this.av.Selection.start.samples && xSamples <= this.av.Selection.end.samples) {
+													this.av.current.samples = this.av.Selection.start.samples;
+													this.changePlayCursorSamples(this.av.Selection.start.samples);
+													this.drawPlayCursorOnly(this.av.LastLine);
+													this.audio.stopPlayback(this.playSelection);
+												}
+
+												if (!this.Settings.multi_line)
+													this.segmententer.emit({
+														index: segment_i,
+														pos  : { Y1: posY1, Y2: posY2 }
+													});
 											}
-
-											if (!this.Settings.multi_line)
-												this.segmententer.emit({
-													index: segment_i,
-													pos  : { Y1: posY1, Y2: posY2 }
+											else {
+												this.alerttriggered.emit({
+													type   : "error",
+													message: this.langService.instant("segment invisible")
 												});
-										}
-										else {
-											this.alerttriggered.emit({
-												type   : "error",
-												message: this.langService.instant("segment invisible")
-											});
+											}
 										}
 									}
+									key_active = true;
 								}
-								key_active = true;
 								break;
 							case("segment_enter"):
-								if (this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly) {
+								if (this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly && this.focused) {
 									this.shortcuttriggered.emit({ shortcut: comboKey, value: shortc });
 
 									let seg_index = this.transcr.segments.getSegmentBySamplePosition(this.av.Mousecursor.timePos.samples);
@@ -760,6 +764,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 												this.drawPlayCursorOnly(this.av.LastLine);
 												this.audio.stopPlayback();
 											}
+											this.focused = false;
 											this.segmententer.emit({ index: seg_index, pos: { Y1: posY1, Y2: posY2 } });
 										}
 										else {
@@ -773,22 +778,26 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 								}
 								break;
 							case("cursor_left"):
-								//move cursor to left
-								this.shortcuttriggered.emit({ shortcut: comboKey, value: shortc });
+								if (this.av.focused) {
+									//move cursor to left
+									this.shortcuttriggered.emit({ shortcut: comboKey, value: shortc });
 
-								this.av.moveCursor("left", this.Settings.step_width_ratio * this.audio.samplerate);
-								this.drawCursor(this.av.LastLine);
-								this.mousecursorchange.emit(this.av.Mousecursor);
-								key_active = true;
+									this.av.moveCursor("left", this.Settings.step_width_ratio * this.audio.samplerate);
+									this.drawCursor(this.av.LastLine);
+									this.mousecursorchange.emit(this.av.Mousecursor);
+									key_active = true;
+								}
 								break;
 							case("cursor_right"):
-								//move cursor to right
-								this.shortcuttriggered.emit({ shortcut: comboKey, value: shortc });
+								if (this.av.focused) {
+									//move cursor to right
+									this.shortcuttriggered.emit({ shortcut: comboKey, value: shortc });
 
-								this.av.moveCursor("right", this.Settings.step_width_ratio * this.audio.samplerate);
-								this.drawCursor(this.av.LastLine);
-								this.mousecursorchange.emit(this.av.Mousecursor);
-								key_active = true;
+									this.av.moveCursor("right", this.Settings.step_width_ratio * this.audio.samplerate);
+									this.drawCursor(this.av.LastLine);
+									this.mousecursorchange.emit(this.av.Mousecursor);
+									key_active = true;
+								}
 								break;
 						}
 
@@ -865,7 +874,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 	 * step to last position
 	 */
 	stepBackward() {
-		this.audio.stepBackward(()=> {
+		this.audio.stepBackward(() => {
 			//audio not playing
 			if (this.av.lastplayedpos != null) {
 				this.av.current = this.av.lastplayedpos.clone();
@@ -1089,6 +1098,10 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.audio.paused = false;
 	};
 
+	public onFocusLost($event) {
+		alert("leave");
+	}
+
 	/**
 	 * adjust the view when window resized
 	 * @param $event
@@ -1107,7 +1120,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 
 				this.changePlayCursorAbsX((this.av.PlayCursor.absX * ratio));
 				this.update(true);
-			} else if(this.Settings.multi_line){
+			}
+			else if (this.Settings.multi_line) {
 				this.update(false);
 			}
 

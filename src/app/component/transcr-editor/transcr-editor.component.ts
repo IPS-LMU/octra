@@ -31,6 +31,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	private _settings: TranscrEditorConfig;
 	private subscrmanager: SubscriptionManager;
 	private init: number = 0;
+	private focused:boolean = false;
 
 	@Input() visible: boolean = true;
 	@Input() markers: any = true;
@@ -312,13 +313,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
 		setTimeout(() => {
 			if (Date.now() - this.lastkeypress < 500) {
-				if (!this._is_typing) {
+				if (!this._is_typing && this.focused) {
 					this.typing.emit("started");
 				}
 				this._is_typing = true;
 			}
 			else {
-				if (this._is_typing) {
+				if (this._is_typing && this.focused) {
 					this.typing.emit("stopped");
 				}
 				this._is_typing = false;
@@ -417,6 +418,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	 * set focus to the very last position of the editors text
 	 */
 	public focus = (later: boolean = false) => {
+		this.focused = true;
 		let func = () => {
 			if (this.rawText != "") {
 				Functions.placeAtEnd(jQuery('.note-editable.panel-body')[ 0 ]);

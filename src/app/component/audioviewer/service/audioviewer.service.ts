@@ -312,9 +312,6 @@ export class AudioviewerService extends AudioComponentService {
 	public setMouseMovePosition(type: string, x: number, y: number, curr_line: Line, innerWidth) {
 		super.setMouseMovePosition(type, x, y, curr_line, innerWidth);
 
-		//mouse over audioviewer set focus
-		this.focused = true;
-
 		let absX = this.getAbsXByLine(curr_line, x - curr_line.Pos.x, innerWidth);
 		let absXTime = this.audioTCalculator.absXChunktoSamples(absX, this.Chunk);
 

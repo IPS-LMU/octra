@@ -226,6 +226,8 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 			let index = this.transcrService.selectedSegment.index;
 			if (index > -1 && this.transcrService.segments && index < this.transcrService.segments.length) {
 				let segment = this.transcrService.segments.get(index);
+				this.viewer.focused = false;
+				this.loupee.viewer.focused = false;
 				segment.transcript = this.editor.rawText;
 				this.transcrService.segments.change(index, segment);
 			}
@@ -254,7 +256,10 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	 * @param status
 	 */
 	onEditorTyping = (status: string) => {
+		this.viewer.focused = false;
+		this.loupee.viewer.focused = false;
 		if (status === "started") {
+			/*
 			//if started save old config of special keys
 			this.temp = {
 				viewer: {
@@ -288,8 +293,10 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 			this.loupee.Settings.shortcuts.play_selection.keys.pc = "";
 			this.loupee.Settings.shortcuts.set_boundary.keys.mac = "";
 			this.loupee.Settings.shortcuts.set_boundary.keys.pc = "";
+			*/
 		}
 		else if (status === "stopped") {
+			/*
 			//reaload old key settings to activate them
 			this.viewer.Settings.shortcuts.play_selection.keys.mac = this.temp.viewer.play_selection.mac;
 			this.viewer.Settings.shortcuts.play_selection.keys.pc = this.temp.viewer.play_selection.pc;
@@ -298,7 +305,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 			this.loupee.Settings.shortcuts.play_selection.keys.mac = this.temp.loupe.play_selection.mac;
 			this.loupee.Settings.shortcuts.play_selection.keys.pc = this.temp.loupe.play_selection.pc;
 			this.loupee.Settings.shortcuts.set_boundary.keys.mac = this.temp.loupe.set_boundary.mac;
-			this.loupee.Settings.shortcuts.set_boundary.keys.pc = this.temp.loupe.set_boundary.pc;
+			this.loupee.Settings.shortcuts.set_boundary.keys.pc = this.temp.loupe.set_boundary.pc;*/
 		}
 	};
 

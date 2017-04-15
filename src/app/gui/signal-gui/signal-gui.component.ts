@@ -4,7 +4,7 @@ import {
 	AfterViewInit,
 	OnDestroy,
 	ViewChild,
-	ChangeDetectorRef
+	ChangeDetectorRef, HostListener
 } from '@angular/core';
 import { Observable } from "rxjs";
 
@@ -24,6 +24,7 @@ import {
 } from "../../service";
 import { AVMousePos, AVSelection, SubscriptionManager, AudioTime, Functions, BrowserInfo } from "../../shared";
 import { SettingsService } from "../../service/settings.service";
+import { isNullOrUndefined } from "util";
 
 @Component({
 	selector   : 'app-signal-gui',
@@ -45,13 +46,9 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	public activeviewer: string = "";
 
 	public mini_loupecoord: any = {
+		component: "viewer",
 		x: 0,
 		y: 0
-	};
-
-	public mini_loupecoord2: any = {
-		x: 0,
-		y: 70
 	};
 
 	private temp: any = null;
@@ -173,6 +170,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	onMouseOver(cursor: AVMousePos) {
+		this.mini_loupecoord.component = this.viewer;
 		let a = this.viewer.getLocation();
 		this.mini_loupecoord.y = a.y - this.viewer.Settings.height
 			- (this.miniloupe.Settings.height) - 17;
@@ -180,6 +178,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	onMouseOver2(cursor: AVMousePos) {
+		this.mini_loupecoord.component = this.loupe;
 		this.mini_loupecoord.y = this.loupe.getLocation().y - this.loupe.Settings.height
 			- (this.miniloupe.Settings.height/2) + 15;
 		this.changeArea(this.miniloupe, this.loupe.viewer, this.mini_loupecoord, this.loupe.viewer.MouseCursor.timePos.samples, this.loupe.viewer.MouseCursor.relPos.x);
@@ -339,5 +338,21 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	afterVolumeChange(event: { new_value: number, timestamp: number }) {
 		if (this.app_settings.octra.logging_enabled == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "volume_change");
+	}
+
+	@HostListener('window:resize', [ '$event' ])
+	onResize($event) {
+		if(!isNullOrUndefined(this.mini_loupecoord.component)) {
+
+			if(this.mini_loupecoord.component === "viewer"){
+				let compute = this.viewer.getLocation();
+			this.mini_loupecoord.y = compute.y - this.viewer.Settings.height
+				- (this.miniloupe.Settings.height) - 17;
+			} else if(this.mini_loupecoord.component === "loupe"){
+				let compute = this.loupe.getLocation();
+				this.mini_loupecoord.y = compute.y - this.loupe.Settings.height
+					- (this.miniloupe.Settings.height/2) + 15;
+			}
+		}
 	}
 }

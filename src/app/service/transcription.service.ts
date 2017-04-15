@@ -182,11 +182,11 @@ export class TranscriptionService {
 			let log_data: any[] = this.extractUI(this.uiService.elements);
 
 			data = {
-				project   : this.sessServ.member_project,
-				annotator : this.sessServ.member_id,
+				project   : (isNullOrUndefined(this.sessServ.member_project)) ? "NOT AVAILABLE" : this.sessServ.member_project ,
+				annotator : (isNullOrUndefined(this.sessServ.member_id)) ? "NOT AVAILABLE" : this.sessServ.member_id,
 				transcript: null,
 				comment   : this.feedback.comment,
-				jobno:	this.sessServ.member_jobno,
+				jobno:	(isNullOrUndefined(this.sessServ.member_jobno)) ? "NOT AVAILABLE" : this.sessServ.member_jobno,
 				status    : this.state,
 				quality   : {
 					quality_audio  : this.feedback.quality_audio,

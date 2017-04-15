@@ -55,7 +55,7 @@
                     <p class="bg-danger" *ngIf="sessionService.offline == true">
                         {{"login.online mode data warning" | translate}}
                     </p>
-                    <p class="bg-warning" *ngIf="sessionService.member_id != null && sessionService.audio_url != null">
+                    <p class="bg-warning" *ngIf="sessionService.member_id != null && sessionService.audio_url != null && sessionService.offline == false">
                         {{"login.online mode continue" | translate:{member_id:sessionService.member_id,member_project:sessionService.member_project,member_jobno:sessionService.member_jobno} }}
                     </p>
                     <form class="form-horizontal" (ngSubmit)="onSubmit(f)" #f="ngForm">
@@ -109,7 +109,7 @@
             <section>
                 <h4>{{'login.local mode' | translate}}</h4>
                 <div>
-                    <p class="bg-danger" *ngIf="sessionService.member_id != null">
+                    <p class="bg-danger" *ngIf="sessionService.member_id != null && sessionService.member_id != '-1'">
                         {{"login.offline mode data warning" | translate}}
                     </p>
                     <p class="bg-warning" *ngIf="sessionService.sessionfile != null"

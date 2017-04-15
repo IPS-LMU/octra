@@ -183,7 +183,17 @@ export class SessionService {
 	}
 
 	public setSessionData(member: any, data_id: number, audio_url: string, offline:boolean = false): { error: string } {
-		if (!offline  && (isNullOrUndefined(member.id) || isNullOrUndefined(member.project))) {
+		if (offline  && (isNullOrUndefined(member))) {
+			this._interface = "audioplayer";
+			this.setNewSessionKey();
+			this.localStr.store("offline", true);
+			this.localStr.store("member_project", "");
+			this.localStr.store("member_jobno", "-1");
+			this.sessStr.store("transcriptionTime", { start: 0, end: 0 });
+			this.setMemberID("-1");
+			this.login = true;
+			this.logged_in = true;
+
 			return { error: "" };
 		}
 

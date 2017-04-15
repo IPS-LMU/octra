@@ -143,7 +143,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 				this.sessionService.transcription = null;
 				this.sessionService.data_id = null;
 			}
-			let res = this.sessionService.setSessionData("", 0, "", true);
+			let res = this.sessionService.setSessionData(null, 0, null, true);
 			if (res.error === "") {
 				this.sessionService.offline = true;
 				this.sessionService.sessionfile = new SessionFile(

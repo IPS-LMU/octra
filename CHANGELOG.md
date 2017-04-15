@@ -1,5 +1,28 @@
 # Change Log
 
+## [v1.0.7](https://github.com/IPS-LMU/octra/tree/v1.0.7) (2017-04-15)
+[Full Changelog](https://github.com/IPS-LMU/octra/compare/v1.0.6...v1.0.7)
+
+**Implemented enhancements:**
+
+- online mode: login with user name, project name and jobnumber [\#33](https://github.com/IPS-LMU/octra/issues/33)
+- marker symbols: automatically set alt attribute of images [\#32](https://github.com/IPS-LMU/octra/issues/32)
+- transcr-overview: underline errors according to the guidelines [\#31](https://github.com/IPS-LMU/octra/issues/31)
+- signal-gui: use one cricle loupe instance only [\#29](https://github.com/IPS-LMU/octra/issues/29)
+- transcr-overview: underline errors in transcriptions and show description on hover  [\#28](https://github.com/IPS-LMU/octra/issues/28)
+- transcr-guidelines: enable browsing through guidelines [\#24](https://github.com/IPS-LMU/octra/issues/24)
+- move cursor to text's end faster after initialisation of a texteditor [\#22](https://github.com/IPS-LMU/octra/issues/22)
+- upgrade @angular/cli to 1.0.0-rc.4 [\#21](https://github.com/IPS-LMU/octra/issues/21)
+- 2D-Editor: extend signaldisplay if it's shorter than its parent's width [\#14](https://github.com/IPS-LMU/octra/issues/14)
+- implement the possibility of creating distinc transcription guidelines und markers [\#6](https://github.com/IPS-LMU/octra/issues/6)
+- apply the translation module to the whole default GUI [\#5](https://github.com/IPS-LMU/octra/issues/5)
+
+**Fixed bugs:**
+
+- Linear Editor: Signal isn't drawn correctly while resizing [\#27](https://github.com/IPS-LMU/octra/issues/27)
+- Linear Editor: some keys are blocked while typing and the cursor is over the signaldisplay  [\#18](https://github.com/IPS-LMU/octra/issues/18)
+- warning before user switches between local and online mode [\#16](https://github.com/IPS-LMU/octra/issues/16)
+
 ## [v1.0.6](https://github.com/IPS-LMU/octra/tree/v1.0.6) (2017-03-20)
 [Full Changelog](https://github.com/IPS-LMU/octra/compare/v1.0.5...v1.0.6)
 

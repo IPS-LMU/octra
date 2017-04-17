@@ -7,6 +7,7 @@ import { APIService } from "../../service/api.service";
 import { ModalComponent } from "ng2-bs3-modal/components/modal";
 import { AudioService } from "../../service/audio.service";
 import { SubscriptionManager } from "../../shared";
+import { isNullOrUndefined } from "util";
 
 
 @Component({
@@ -42,7 +43,8 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
 		this.sessService.submitted = false;
 		this.audio.audiobuffer = null;
 		this.sessService.clearLocalStorage();
-		this.tranService.segments.clear();
+		if(!isNullOrUndefined(this.tranService))
+			this.tranService.segments.clear();
 		this.router.navigate([ '/logout' ]);
 	}
 

@@ -395,6 +395,26 @@ export class TranscriptionService {
 		return result;
 	}
 
+	public loadProjectConfig(): Subscription {
+
+		return this.http.get("./config/projectconfig.jso").subscribe(
+			(response: Response) => {
+				this._guidelines = response.json();
+				this.loadValidationMethod(this._guidelines.meta.validation_url);
+
+				for(let i = 0; i < this._guidelines.markers.length; i++){
+					let marker = this._guidelines.markers[i];
+					if(marker.type == "break"){
+						this._break_marker = marker;
+						break;
+					}
+				}
+
+				this.guidelinesloaded.emit(this._guidelines);
+			}
+		);
+	}
+
 	public loadGuidelines(language: string, url: string): Subscription {
 
 		return this.http.get(url).subscribe(

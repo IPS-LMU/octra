@@ -26,7 +26,7 @@ import {
 import { AVMousePos, AVSelection, AudioTime, Functions } from "../../shared";
 import { SubscriptionManager } from "../../shared/SubscriptionManager";
 import { SettingsService } from "../../service/settings.service";
-import { Segment } from "../../shared/Segment";
+import { SessionService } from "../../service/session.service";
 
 @Component({
 	selector: 'app-overlay-gui',
@@ -48,7 +48,8 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 				public uiService: UserInteractionsService,
 				public cd: ChangeDetectorRef,
 				public msg: MessageService,
-				public settingsService:SettingsService
+				public settingsService:SettingsService,
+				public sessService:SessionService
 	) {
 
 		this.subscrmanager = new SubscriptionManager();

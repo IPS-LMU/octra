@@ -23,27 +23,10 @@
 
 <div id="transcr-submit" class="panel panel-default">
     <h3>{{"transcription.check" | translate}}</h3>
-    <br>
-    <p>
-        {{"transcription-submit.finish transcription" | translate}}
-    </p>
-    <ul>
-        <li>
-            {{"transcription-submit.boundaries" | translate}}
-            </li>
-        <li>
-            {{"transcription-submit.breaks" | translate}}
-        </li>
-        <li>
-            {{"transcription-submit.markers" | translate}}
-        </li>
-    </ul>
-
-    <br>
     <p>
         {{"transcription-submit.overview" | translate}}
     </p>
-    <app-transcr-overview [visible]="true" [segments]="transcrService.segments.segments"></app-transcr-overview>
+    <app-transcr-overview [visible]="true" [show_transcriptiontable]="false" [segments]="transcrService.segments.segments"></app-transcr-overview>
     <br><br>
     <div *ngIf="!sessService.offline">
         <h3>Feedback</h3>

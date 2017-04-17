@@ -54,6 +54,7 @@
                 </li>
                 <li *ngIf="sessService.LoggedIn && navbarServ.show_hidden"><a (mouseup)="setInterface('overlay')">{{"interfaces.2D editor" | translate}}</a></li>
                 <li *ngIf="sessService.LoggedIn && navbarServ.show_hidden"><a (mouseup)="modalexport.open()">{{"general.export" | translate}} </a></li>
+                <li *ngIf="sessService.LoggedIn && navbarServ.show_hidden"><a (mouseup)="sessService.easymode = !sessService.easymode">{{"general.easy mode" | translate}}: <span *ngIf="sessService.easymode">{{"general.yes" | translate}}</span><span *ngIf="!sessService.easymode">{{"general.no" | translate}}</span></a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">

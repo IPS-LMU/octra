@@ -25,6 +25,7 @@ import {
 import { AVMousePos, AVSelection, SubscriptionManager, AudioTime, Functions, BrowserInfo } from "../../shared";
 import { SettingsService } from "../../service/settings.service";
 import { isNullOrUndefined } from "util";
+import { SessionService } from "../../service/session.service";
 
 @Component({
 	selector   : 'app-signal-gui',
@@ -69,7 +70,9 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 				public transcrService: TranscriptionService,
 				public cd: ChangeDetectorRef,
 				public uiService: UserInteractionsService,
-				public settingsService: SettingsService) {
+				public settingsService: SettingsService,
+				public sessService:SessionService
+	) {
 		this.subscrmanager = new SubscriptionManager();
 	}
 
@@ -366,10 +369,11 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	public openSegment(segnumber:number) {
 		let segment = this.transcrService.segments.get(segnumber);
 		this.editor.rawText = segment.transcript;
-		this.transcrService.selectedSegment = segment;
-		let selected:boolean = this.viewer.selectSegment(segnumber);
+
+		this.segmentselected = true;
+		this.transcrService.selectedSegment = { index: segnumber, pos: segment.time };
+		this.viewer.selectSegment(segnumber);
 
 		this.loupe.changeArea(this.transcrService.segments.getStartTime(segnumber), segment.time);
-		this.segmentselected = true;
 	}
 }

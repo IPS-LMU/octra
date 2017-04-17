@@ -17,13 +17,17 @@
     </tr>
     </tbody>
 </table>
-<h4>{{"general.transcript" | translate}}</h4>
-<div *ngIf="shown_segments.length == 0">
+<p [hidden]="shown_segments.length == 0">
+    <span *ngIf="foundErrors == 0" class="text-success">{{"general.no errors found" | translate}}</span>
+    <span *ngIf="foundErrors > 0" class="text-danger">{{"general.errors found" | translate : {errors: foundErrors} }}</span>
+</p>
+<h4 [hidden]="!show_transcriptiontable">{{"general.transcript" | translate}}</h4>
+<div *ngIf="shown_segments.length == 0" [hidden]="!show_transcriptiontable">
     <div style="display:block; text-align:center; padding-top:20px;">
         <i class="fa fa-spinner fa-spin" style="font-size:32px"></i>
     </div>
 </div>
-<table *ngIf="shown_segments.length > 0" class="table">
+<table *ngIf="shown_segments.length > 0" class="table" [hidden]="!show_transcriptiontable">
     <thead>
     <tr>
         <th></th>

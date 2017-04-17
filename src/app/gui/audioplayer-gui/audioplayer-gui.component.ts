@@ -6,6 +6,7 @@ import { SubscriptionManager } from "../../shared";
 import { SettingsService } from "../../service/settings.service";
 import { TranslateService } from "@ngx-translate/core";
 import { BrowserInfo } from "../../shared/BrowserInfo";
+import { SessionService } from "../../service/session.service";
 
 @Component({
 	selector   : 'app-audioplayer-gui',
@@ -42,7 +43,8 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 				public keyMap: KeymappingService,
 				public transcrService: TranscriptionService,
 				private uiService: UserInteractionsService,
-				private settingsService:SettingsService
+				private settingsService:SettingsService,
+				private sessService:SessionService
 	) {
 		this.subscrmanager = new SubscriptionManager();
 	}

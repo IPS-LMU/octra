@@ -41,7 +41,12 @@
     "example": "Example",
     "select database": "Select Database",
     "agreement": "agreement",
-    "agreement read": "I have read the agreement and accept its content"
+    "agreement read": "I have read the agreement and accept its content",
+    "easy mode": "Easy Mode",
+    "yes": "Yes",
+    "no": "No",
+    "errors found": "({{errors}}) errors found",
+    "no errors found": "No errors found"
   },
   "transcription":{
     "start": "Continue transcription",

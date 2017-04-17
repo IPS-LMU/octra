@@ -35,6 +35,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
 	@Input() visible: boolean = true;
 	@Input() markers: any = true;
+	@Input() easymode: boolean = true;
 
 	get rawText(): string {
 		return this.tidyUpRaw(this._rawText);
@@ -81,7 +82,15 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	}
 
 	ngOnChanges(obj) {
+		let renew:boolean = false;
 		if (!isNullOrUndefined(obj.markers) && obj.markers.previousValue != obj.markers.newValue){
+			renew = true;
+		}
+		if (!isNullOrUndefined(obj.easymode) && obj.easymode.previousValue != obj.easymode.newValue){
+			renew = true;
+		}
+
+		if(renew){
 			let navigation = this.initNavigation();
 
 			this.textfield.summernote('destroy');
@@ -241,9 +250,14 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	 */
 	createButton(marker): any {
 		let platform = BrowserInfo.platform;
-		let icon = "<img src='" + marker.icon_url + "' class='btn-icon' style='height:16px;'/> <span class='btn-description'>" + marker.button_text + "</span><span class='btn-shortcut'> [" + marker.shortcut[ platform ] + "]</span>";
-		if (this.Settings.responsive) {
-			icon = "<img src='" + marker.icon_url + "' class='btn-icon' style='height:16px;'/> <span class='btn-description hidden-xs hidden-sm'>" + marker.button_text + "</span><span class='btn-shortcut hidden-xs hidden-sm hidden-md'> [" + marker.shortcut[ platform ] + "]</span>";
+		let icon = "";
+		if(!this.easymode) {
+			icon = "<img src='" + marker.icon_url + "' class='btn-icon' style='height:16px;'/> <span class='btn-description'>" + marker.button_text + "</span><span class='btn-shortcut'> [" + marker.shortcut[ platform ] + "]</span>";
+			if (this.Settings.responsive) {
+				icon = "<img src='" + marker.icon_url + "' class='btn-icon' style='height:16px;'/> <span class='btn-description hidden-xs hidden-sm'>" + marker.button_text + "</span><span class='btn-shortcut hidden-xs hidden-sm hidden-md'> [" + marker.shortcut[ platform ] + "]</span>";
+			}
+		} else {
+			icon = "<img src='" + marker.icon_url + "' class='btn-icon' style='height:16px;'/>";
 		}
 		// create button
 		let button = this.summernote_ui.button({

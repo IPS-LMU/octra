@@ -28,6 +28,7 @@
                             shortcut: keyMap.getShortcut('AP', 'step_backward')
                         }
                       }"
+                      [easymode]="sessService.easymode"
 ></app-audio-navigation>
 <app-audioplayer #audioplayer (shortcuttriggered)="onShortcutTriggered($event)"></app-audioplayer>
 <app-transcr-editor #transcr
@@ -35,5 +36,6 @@
                     (marker_insert)="onMarkerInsert($event)"
                     (marker_click)="onMarkerClick($event)"
                     [markers]="transcrService.guidelines.markers"
+                    [easymode]="sessService.easymode"
 >
 </app-transcr-editor>

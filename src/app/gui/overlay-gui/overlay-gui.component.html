@@ -1,5 +1,5 @@
 <div id="overlay-transcr" style="position:relative">
-    <app-transcr-window #window (act)="onWindowAction($event)" *ngIf="showWindow"></app-transcr-window>
+    <app-transcr-window #window (act)="onWindowAction($event)" *ngIf="showWindow" [easymode]="sessService.easymode" ></app-transcr-window>
     <div style="position:fixed;bottom:0;z-index:20;" [ngStyle]="{width:viewer.innerWidth + 'px'}">
         <app-audio-navigation #audionav
                               (buttonclick)="onButtonClick($event)"
@@ -31,6 +31,7 @@
                                     shortcut: keyMap.getShortcut('overlay', 'step_backward')
                                 }
                               }"
+                              [easymode]="sessService.easymode"
         ></app-audio-navigation>
     </div>
     <div style="width:100px;">

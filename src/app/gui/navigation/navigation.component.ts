@@ -25,7 +25,8 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 	constructor(public sessService: SessionService,
 				public navbarServ: NavbarService,
 				public sanitizer: DomSanitizer,
-				public langService:TranslateService) {
+				public langService:TranslateService
+	) {
 	}
 
 	ngOnDestroy() {

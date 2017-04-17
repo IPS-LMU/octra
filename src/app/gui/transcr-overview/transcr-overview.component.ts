@@ -41,11 +41,28 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 		return (this.segments) ? this.transcrService.statistic.empty : 0;
 	}
 
+	public get foundErrors(): number {
+		let found = 0;
+
+		if(this.shown_segments.length > 0){
+			let result_str = "";
+			for(let i = 0; i < this.shown_segments.length; i++){
+				result_str += this.shown_segments[i].transcription.html;
+			}
+
+			found = (result_str.match(/<div class='error_underline'/g) || []).length;
+		}
+
+		return found;
+	}
+
 	public shown_segments: any[] = [];
 	@Input() segments: Segment[];
 
 	private subscrmanager: SubscriptionManager;
 	private updating: boolean = false;
+	@Input() private show_transcriptiontable:boolean = true;
+
 	@Input("visible") visible:boolean = true;
 
 	@Output("segmentclicked") segmentclicked:EventEmitter<number> = new EventEmitter<number>();
@@ -139,6 +156,10 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 		jQuery("body").append(this.errortooltip);
 
 		this.errortooltip = jQuery(".error-tooltip");
+
+		if(this.visible){
+			this.updateSegments();
+		}
 	}
 
 	ngOnChanges(event) {

@@ -30,6 +30,7 @@
                             shortcut: keyMap.getShortcut('overlay', 'step_backward')
                         }
                       }"
+                          [easymode]="easymode"
 
     ></app-audio-navigation>
     <app-loupe #loupe id="loupe"
@@ -39,22 +40,42 @@
                         (marker_insert)="onMarkerInsert($event)"
                         (marker_click)="onMarkerClick($event)"
                         [markers]="transcrService.guidelines.markers"
+                        [easymode]="easymode"
     ></app-transcr-editor>
     <div class="window-nav-bottom">
         <div class="row">
             <div class="col-xs-12">
                 <div class="btn-toolbar" role="toolbar">
                     <div class="btn-group btn-group-justified" role="group" aria-label="...">
-                        <a class="btn btn-default btn-raised" (click)="save();goToSegment('left');"><span *ngIf="responsive" [ngClass]="{'visible-xs visible-sm visible-md': responsive}"><span class="glyphicon glyphicon-floppy-save"></span>&<span class="glyphicon glyphicon-menu-left" ></span></span><span [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">
+                        <a class="btn btn-default btn-raised" (click)="save();goToSegment('left');">
+                            <span *ngIf="responsive || easymode"
+                                  [ngClass]="{'visible-xs visible-sm visible-md': responsive && !easymode}">
+                                <span class="glyphicon glyphicon-floppy-save"></span>&
+                                <span class="glyphicon glyphicon-menu-left"></span>
+                            </span>
+                            <span *ngIf="!easymode" [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">
                             {{"general.save" | translate}} &
-                            {{"segment previous" | translate}}</span>
+                            {{"segments.previous" | translate}}
+                            </span>
                         </a>
-                        <a class="btn btn-default btn-raised" (click)="save();close();"><span *ngIf="responsive" [ngClass]="{'visible-xs visible-sm visible-md': responsive}"><span class="glyphicon glyphicon-floppy-save"></span></span><span [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">
-                            {{"general.save" | translate}} & {{"general.close" | translate}}</span>
+                        <a class="btn btn-default btn-raised" (click)="save();close();">
+                            <span *ngIf="responsive || easymode"
+                                  [ngClass]="{'visible-xs visible-sm visible-md': responsive && !easymode}">
+                                <span class="glyphicon glyphicon-floppy-save"></span>
+                            </span>
+                            <span *ngIf="!easymode" [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">
+                            {{"general.save" | translate}} & {{"general.close" | translate}}
+                            </span>
                         </a>
-                        <a class="btn btn-default btn-raised" (click)="save();goToSegment('right');"><span *ngIf="responsive" [ngClass]="{'visible-xs visible-sm visible-md': responsive}"><span class="glyphicon glyphicon-floppy-save"></span>&<span class="glyphicon glyphicon-menu-right" ></span></span><span [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">
+                        <a class="btn btn-default btn-raised" (click)="save();goToSegment('right');">
+                            <span *ngIf="responsive || easymode"
+                                  [ngClass]="{'visible-xs visible-sm visible-md': responsive && !easymode}">
+                                <span class="glyphicon glyphicon-floppy-save"></span>&
+                                <span class="glyphicon glyphicon-menu-right"></span></span>
+                            <span *ngIf="!easymode" [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">
                             {{"general.save" | translate}} &
-                            {{"segment.next" | translate}}</span>
+                            {{"segments.next" | translate}}
+                            </span>
                         </a>
                     </div>
                 </div>

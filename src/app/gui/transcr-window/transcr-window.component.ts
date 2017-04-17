@@ -6,7 +6,7 @@ import {
 	ViewChild,
 	Output,
 	EventEmitter,
-	AfterContentInit
+	AfterContentInit, Input
 } from '@angular/core';
 
 import { LoupeComponent, TranscrEditorComponent, AudioNavigationComponent } from "../../component";
@@ -26,6 +26,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 	@ViewChild('audionav') audionav: AudioNavigationComponent;
 
 	@Output('act') act: EventEmitter<string> = new EventEmitter<string>();
+	@Input('easymode') easymode: boolean = false;
 
 	@Output('shortcuttriggered') get shortcuttriggered(): EventEmitter<string> {
 		return this.loupe.shortcuttriggered;

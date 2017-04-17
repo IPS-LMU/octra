@@ -38,10 +38,10 @@
                             shortcut: keyMap.getShortcut('AV', 'step_backward')
                         }
                       }"
+                      [easymode]="sessService.easymode"
 >
 
 </app-audio-navigation>
-<button (click)="openSegment(2)">Open Segment 2</button>
 <div id="viewer">
     <app-audioviewer #viewer (selchange)="test($event)"
                      (segmentchange)="onSegmentChange($event)"
@@ -72,5 +72,6 @@
                     (typing)="onEditorTyping($event)"
                     [visible]="segmentselected"
                     [markers]="transcrService.guidelines.markers"
+                    [easymode]="sessService.easymode"
 >
 </app-transcr-editor>

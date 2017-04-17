@@ -5,6 +5,13 @@ import { isNullOrUndefined } from "util";
 
 @Injectable()
 export class SessionService {
+	get easymode(): boolean {
+		return this._easymode;
+	}
+
+	set easymode(value: boolean) {
+		this._easymode = value;
+	}
 	set language(value: string) {
 		this._language = value;
 		this.sessStr.store("language", this._language);
@@ -102,6 +109,7 @@ export class SessionService {
 	@LocalStorage() member_id: string;
 	@LocalStorage() member_project: string;
 	@LocalStorage() member_jobno: string;
+	@LocalStorage('easymode') private _easymode: boolean;
 
 	//is user on the login page?
 	private login: boolean;
@@ -183,6 +191,9 @@ export class SessionService {
 	}
 
 	public setSessionData(member: any, data_id: number, audio_url: string, offline:boolean = false): { error: string } {
+		if(isNullOrUndefined(this._easymode)){
+			this._easymode = false;
+		}
 		if (offline  && (isNullOrUndefined(member))) {
 			this._interface = "audioplayer";
 			this.setNewSessionKey();

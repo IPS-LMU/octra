@@ -47,6 +47,7 @@ export class AudioNavigationComponent {
 
 	@Input() audioplaying:boolean = false;
 	@Input() responsive:boolean = false;
+	@Input() easymode:boolean = false;
 
 	@Output() buttonclick = new EventEmitter<{ type: string, timestamp: number }>();
 	@Output() volumechange = new EventEmitter<{ old_value: number, new_value: number, timestamp: number }>();

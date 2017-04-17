@@ -41,7 +41,12 @@
     "example": "Beispiel",
     "select database": "Datenbank wählen",
     "agreement": "Einverständniserklärung",
-    "agreement read": "Ich habe die {{agreement}} gelesen und akzeptiert"
+    "agreement read": "Ich habe die {{agreement}} gelesen und akzeptiert",
+    "easy mode": "Einfacher Modus",
+    "yes": "Ja",
+    "no": "Nein",
+    "errors found": "({{errors}}) Fehler gefunden",
+    "no errors found": "Keine Fehler gefunden"
   },
   "transcription":{
     "start": "Transkription fortsetzen",

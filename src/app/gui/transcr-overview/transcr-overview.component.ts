@@ -61,7 +61,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
 	private subscrmanager: SubscriptionManager;
 	private updating: boolean = false;
-	@Input() private show_transcriptiontable:boolean = true;
+	@Input() public show_transcriptiontable:boolean = true;
 
 	@Input("visible") visible:boolean = true;
 

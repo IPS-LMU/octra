@@ -22,7 +22,7 @@ export class FastbarComponent implements OnInit {
   @Output() overviewbtnclicked:EventEmitter<void> = new EventEmitter<void>();
 
   constructor(
-      private sessService:SessionService
+      public sessService:SessionService
   ) { }
 
   ngOnInit() {

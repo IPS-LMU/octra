@@ -39,7 +39,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	public valid_platform: boolean = false;
 	public valid_size: boolean = false;
 	public browser_check: BrowserCheck;
-	public agreement_checked: boolean = false;
+	public agreement_checked: boolean = true;
 
 	public projects:string[] = [];
 

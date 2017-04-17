@@ -4,6 +4,10 @@ import { AudioService } from "../../service/audio.service";
 import { UserInteractionsService } from "../../service/userInteractions.service";
 import { TranscriptionService } from "../../service/transcription.service";
 import { FileService } from "../../service/file.service";
+import { Router } from "@angular/router";
+import { SettingsService } from "../../service/settings.service";
+import { SubscriptionManager } from "../../shared/SubscriptionManager";
+import { isNullOrUndefined } from "util";
 
 @Component({
 	selector   : 'app-members-area',
@@ -13,6 +17,21 @@ import { FileService } from "../../service/file.service";
 })
 export class MembersAreaComponent{
 
-	constructor() {
+	subscrmanager:SubscriptionManager = new SubscriptionManager();
+	constructor(private router:Router,
+		private settService:SettingsService
+	) {
+		this.subscrmanager.add(
+			this.settService.projectsettingsloaded.subscribe(()=>{
+				console.log("loaded");
+				this.router.navigate(["transcr"]);
+			})
+		);
+
+		if(isNullOrUndefined(this.settService.projectsettings)){
+			this.settService.getProjectSettings();
+		} else{
+			this.router.navigate(["transcr"]);
+		}
 	}
 }

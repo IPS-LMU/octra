@@ -5,9 +5,20 @@ import { Http } from "@angular/http";
 import { SubscriptionManager } from "../shared";
 import { AppConfigValidator } from "../validator/AppConfigValidator";
 import { ConfigValidator } from "../shared/ConfigValidator";
+import { ProjectConfiguration } from "../types/Settings/project-configuration";
 
 @Injectable()
 export class SettingsService {
+	get projectsettings(): ProjectConfiguration {
+		return this._projectsettings;
+	}
+	get loaded(): boolean {
+		return this._loaded;
+	}
+
+	set loaded(value: boolean) {
+		this._loaded = value;
+	}
 	get validated(): boolean {
 		return this.validation.app;
 	}
@@ -18,8 +29,13 @@ export class SettingsService {
 
 	public settingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
 	private app_settingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
+	public projectsettingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
 	private subscrmanager: SubscriptionManager;
+	private _projectsettings:ProjectConfiguration;
+
 	private _app_settings: any;
+	private _loaded:boolean = false;
+
 	private validation: any = {
 		app    : false
 	};
@@ -53,9 +69,27 @@ export class SettingsService {
 		return result;
 	}
 
+	public getProjectSettings(): any {
+		let result: any = null;
+
+		this.subscrmanager.add(this.http.request("./config/projectconfig.json").subscribe(
+			(result) => {
+				this._projectsettings = result.json();
+				this.projectsettingsloaded.emit(true);
+			},
+			() => {
+				console.error("config.json not found. Please create this file in a folder named 'config'");
+			}
+		));
+
+		return result;
+	}
+
 	private triggerSettingsLoaded = () => {
-		if (this.validated)
+		if (this.validated) {
+			this.loaded = true;
 			this.settingsloaded.emit(true);
+		}
 	};
 
 	private validate(validator: ConfigValidator, settings:any): boolean {

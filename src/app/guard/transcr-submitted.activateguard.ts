@@ -13,7 +13,7 @@ export class TranscrSubmittedGuard implements CanActivate {
 	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean
 	{
 		if(!this.sessService.submitted) {
-			this.router.navigate(['/user/transcr']);
+			this.router.navigate(['/user/load']);
 			return false;
 		}
 		return true;

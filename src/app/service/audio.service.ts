@@ -317,7 +317,8 @@ export class AudioService {
 	public decodeAudio = (result: ArrayBuffer, callback: any = () => {
 	}) => {
 		let samplerate = this.getSampleRate(result);
-
+		console.log("Samplerate: " + samplerate);
+		console.log("Bits: " + this.getBits(result));
 		decodeAudioFile(result, samplerate).then((buffer) => {
 			this._audiobuffer = buffer;
 			this.duration = new AudioTime(buffer.length, buffer.sampleRate);
@@ -395,7 +396,14 @@ export class AudioService {
 
 	private getSampleRate(buf: ArrayBuffer): number {
 		let bufferPart = buf.slice(24, 28);
-		let bufferView = new Uint32Array(bufferPart);
+		let bufferView = new Uint16Array(bufferPart);
+
+		return bufferView[ 0 ];
+	}
+
+	public getBits(buf: ArrayBuffer): number {
+		let bufferPart = buf.slice(34, 36);
+		let bufferView = new Uint16Array(bufferPart);
 
 		return bufferView[ 0 ];
 	}

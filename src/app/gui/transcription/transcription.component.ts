@@ -109,6 +109,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	}
 
 	ngOnInit() {
+		console.log(this.settingsService.projectsettings);
 		setInterval(() => {
 			this.changeDetecorRef.markForCheck();
 		}, 2000);
@@ -156,6 +157,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		this.sessService.SampleRate = this.audio.samplerate;
 		this.change();
 		this.navbarServ.show_hidden = true;
+
 
 		//load guidelines
 		this.subscrmanager.add(

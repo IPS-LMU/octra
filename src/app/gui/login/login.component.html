@@ -79,19 +79,9 @@
                                 <div class="form-group">
                                     <input class="form-control" type="number" id="jobno"
                                            name="jobno"
-                                           placeholder="Aufgaben-Nummer" [(ngModel)]="member.jobno"
+                                           placeholder="Aufgaben-Nummer" #t (keyup)="member.jobno = t.value"
                                            required
                                     />
-                                </div>
-                                <div class="form-group">
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" id="agreement" name="agreement"
-                                                   [(ngModel)]="agreement_checked" required>
-                                        </label> <span style="font-size:1.0em;">
-                                    {{"general.agreement read" |translate:{"agreement": ("general.agreement" | translate )} }}</span>
-                                        <a (click)="openAgreement()">({{"general.agreement" | translate}})</a>
-                                    </div>
                                 </div>
                                 <div class="form-group">
                                     <input class="form-control" type="submit" id="login-submit"

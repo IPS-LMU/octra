@@ -18,7 +18,12 @@
     </tbody>
 </table>
 <h4>{{"general.transcript" | translate}}</h4>
-<table class="table">
+<div *ngIf="shown_segments.length == 0">
+    <div style="display:block; text-align:center; padding-top:20px;">
+        <i class="fa fa-spinner fa-spin" style="font-size:32px"></i>
+    </div>
+</div>
+<table *ngIf="shown_segments.length > 0" class="table">
     <thead>
     <tr>
         <th></th>
@@ -35,7 +40,7 @@
             >
             </span>
         </td>
-        <td><span class="segment-number"># {{i+1 | leadingnull: shown_segments.length}}</span></td>
+        <td><span class="link segment-number" (click)="onSegmentClicked(i)"># {{i+1 | leadingnull: shown_segments.length}}</span></td>
         <td [innerHTML]="sanitizeHTML(segment.transcription.html)" (mouseover)="onMouseOver($event)"
             (mousedown)="onMouseOver($event)"></td>
     </tr>

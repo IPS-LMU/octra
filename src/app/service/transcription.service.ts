@@ -54,6 +54,7 @@ export class TranscriptionService {
 	public dataloaded = new EventEmitter<any>();
 	public guidelinesloaded = new EventEmitter<any>();
 	public validationmethodloaded = new EventEmitter<void>();
+	public segmentrequested = new EventEmitter<number>();
 
 	private _segments: Segments;
 	private _last_sample: number;
@@ -503,5 +504,12 @@ export class TranscriptionService {
 			}
 		}
 		return null;
+	}
+
+	public requestSegment(segnumber:number){
+		if(segnumber < this.segments.length) {
+			this.segmentrequested.emit(segnumber);
+		} else{
+		}
 	}
 }

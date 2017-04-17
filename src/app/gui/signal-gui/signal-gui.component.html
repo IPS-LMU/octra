@@ -41,6 +41,7 @@
 >
 
 </app-audio-navigation>
+<button (click)="openSegment(2)">Open Segment 2</button>
 <div id="viewer">
     <app-audioviewer #viewer (selchange)="test($event)"
                      (segmentchange)="onSegmentChange($event)"

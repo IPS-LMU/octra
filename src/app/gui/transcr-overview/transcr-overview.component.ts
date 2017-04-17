@@ -1,6 +1,6 @@
 import {
 	Component, SecurityContext, ChangeDetectionStrategy, OnInit, ChangeDetectorRef,
-	OnDestroy, ViewChild, AfterViewInit, ElementRef, Input, OnChanges
+	OnDestroy, ViewChild, AfterViewInit, ElementRef, Input, OnChanges, Output, EventEmitter
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 
@@ -47,6 +47,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 	private subscrmanager: SubscriptionManager;
 	private updating: boolean = false;
 	@Input("visible") visible:boolean = true;
+
+	@Output("segmentclicked") segmentclicked:EventEmitter<number> = new EventEmitter<number>();
 
 	private updateSegments() {
 		if (!this.segments || !this.transcrService.guidelines) return [];
@@ -123,11 +125,14 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 	ngAfterViewInit() {
 		this.errortooltip = jQuery("<div></div>");
 		this.errortooltip.addClass("error-tooltip");
-		this.errortooltip.append(jQuery("<div></div>").addClass("title").text("Titel"));
+		this.errortooltip.append(jQuery("<div></div>").addClass("title").text("Title"));
 		this.errortooltip.append(jQuery("<div></div>")
-			.addClass("description").text("Beschuish difosdhfs oidhf sdihfi sdhf oisdfiosdhfo sidhf "));
+			.addClass("description").text(""));
 
 		this.errortooltip.on("mouseleave", function () {
+			jQuery(this).css("display", "none");
+		});
+		this.errortooltip.on("mouseout", function () {
 			jQuery(this).css("display", "none");
 		});
 
@@ -138,9 +143,12 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
 	ngOnChanges(event) {
 		if (!isNullOrUndefined(event.visible) && event.visible.currentValue == true) {
-			console.log("ok loaded");
 			this.updateSegments();
 			this.transcrService.analyse();
 		}
+	}
+
+	public onSegmentClicked(segnumber:number){
+		this.segmentclicked.emit(segnumber);
 	}
 }

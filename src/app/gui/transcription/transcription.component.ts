@@ -42,7 +42,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
 	@ViewChild('modal_shortcuts') modal_shortcuts: ModalComponent;
 	@ViewChild('modal_guidelines') modal_guidelines: TranscrGuidelinesComponent;
-	@ViewChild('modal_overview') overview: ModalComponent;
+	@ViewChild('modal_overview') modal_overview: ModalComponent;
 
 	private initialized: any = {};
 	private viewinitialized = false;
@@ -217,11 +217,11 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 			$event.preventDefault();
 		}
 		if ($event.altKey && $event.which == 48) {
-			if (!this.overview.visible) {
+			if (!this.modal_overview.visible) {
 				this.transcrService.analyse();
-				this.overview.open();
+				this.modal_overview.open();
 			}
-			else this.overview.dismiss();
+			else this.modal_overview.dismiss();
 			$event.preventDefault();
 		}
 	}
@@ -233,5 +233,10 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	clearElements(){
 		this.uiService.clear();
 		this.sessService.save("logs", this.uiService.elementsToAnyArray());
+	}
+
+	onSegmentInOverviewClicked(segnumber:number){
+		this.transcrService.requestSegment(segnumber);
+		this.modal_overview.close();
 	}
 }

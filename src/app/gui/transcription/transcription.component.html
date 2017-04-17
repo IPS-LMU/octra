@@ -1,11 +1,14 @@
 <app-alert #alert></app-alert>
 
 <modal #modal_overview id="overview">
-    <modal-header>
-        <h4 class="modal-title">{{"general.overview" | translate}}</h4>
-    </modal-header>
     <modal-body>
-        <app-transcr-overview *ngIf="transcrService.segments != null" [visible]="modal_overview.visible" [segments]="transcrService.segments.segments"></app-transcr-overview>
+        <app-transcr-overview *ngIf="transcrService.segments != null"
+                              [visible]="modal_overview.visible"
+                              [segments]="transcrService.segments.segments"
+                              (segmentclicked)="onSegmentInOverviewClicked($event)"
+        >
+
+        </app-transcr-overview>
     </modal-body>
     <modal-footer>
         <button type="button" class="btn btn-default" data-dismiss="modal" (click)="modal_overview.dismiss()">
@@ -143,7 +146,8 @@
             </tr>
             </tbody>
         </table>
-        <h3 style="display:inline;">Ereignisse</h3> <button (click)="clearElements()">Ereignisse löschen</button>
+        <h3 style="display:inline;">Ereignisse</h3>
+        <button (click)="clearElements()">Ereignisse löschen</button>
         <div style="max-height:400px;overflow: scroll;">
             <table class="table" style="">
                 <thead>

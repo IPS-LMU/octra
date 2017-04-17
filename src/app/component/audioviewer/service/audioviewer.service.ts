@@ -546,26 +546,26 @@ export class AudioviewerService extends AudioComponentService {
 	 * get selection of segment
 	 * @returns AVSelection
 	 */
-	public getSegmentSelection(): AVSelection {
+	public getSegmentSelection(position_samples:number): AVSelection {
 		// complex decision needed because there are no segments at position 0 and the end of the file
 		let result = null;
 		let segments = this.transcrService.segments;
 		let length = this.transcrService.segments.length;
 
 		if (length > 0) {
-			if (this.mousecursor.timePos.samples < segments.get(0).time.samples) {
+			if (position_samples < segments.get(0).time.samples) {
 				//select in first Boundary
 				result = new AVSelection(new AudioTime(0, this.audio.samplerate), segments.get(0).time);
 			}
-			else if (this.mousecursor.timePos.samples > segments.get(segments.length - 1).time.samples) {
+			else if (position_samples > segments.get(segments.length - 1).time.samples) {
 				//select in first Boundary
 				let seg = segments.get(segments.length - 1).time.clone();
 				result = new AVSelection(seg, this.audio.duration);
 			}
 			else {
 				for (let i = 1; i < length; i++) {
-					if (this.mousecursor.timePos.samples > segments.get(i - 1).time.samples
-						&& this.mousecursor.timePos.samples < segments.get(i).time.samples) {
+					if (position_samples > segments.get(i - 1).time.samples
+						&& position_samples < segments.get(i).time.samples) {
 						let seg1 = segments.get(i - 1).time;
 						let seg2 = segments.get(i).time;
 						result = new AVSelection(seg1, seg2);

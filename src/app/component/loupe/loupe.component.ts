@@ -127,4 +127,8 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy {
 				break;
 		}
 	}
+
+	public selectSegment(segnumber:number){
+		this.viewer.selectSegment(segnumber);
+	}
 }

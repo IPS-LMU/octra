@@ -26,6 +26,7 @@ import {
 import { AVMousePos, AVSelection, AudioTime, Functions } from "../../shared";
 import { SubscriptionManager } from "../../shared/SubscriptionManager";
 import { SettingsService } from "../../service/settings.service";
+import { Segment } from "../../shared/Segment";
 
 @Component({
 	selector: 'app-overlay-gui',
@@ -87,6 +88,14 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 	ngAfterViewInit() {
 		if (this.audio.channel)
 			this.viewer.initialize();
+
+		this.subscrmanager.add(
+			this.transcrService.segmentrequested.subscribe(
+				(segnumber:number)=>{
+					this.openSegment(segnumber);
+				}
+			)
+		);
 	}
 
 	ngAfterContentChecked() {
@@ -218,6 +227,37 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 				break;
 			case("default"):
 				break;
+		}
+	}
+
+	public openSegment(segnumber:number) {
+		let segment = this.transcrService.segments.get(segnumber);
+		this.selectSegment({
+			index: segnumber,
+			pos: segment.time.samples
+		});
+	}
+
+	public selectSegment(selected:any){
+		let segment = this.transcrService.segments.get(selected.index);
+		if (this.transcrService.segments && selected.index > -1 && selected.index < this.transcrService.segments.length) {
+			if (segment) {
+				this.transcrService.selectedSegment = { index: selected.index, pos: selected.pos };
+			}
+		}
+
+		if (this.transcrService.selectedSegment) {
+			this.viewer.deactivate_shortcuts = true;
+			this.viewer.focused = false;
+			if(!this.showWindow) {
+				this.showWindow = true;
+			}
+			else{
+				let start = (selected.index > 0) ? this.transcrService.segments.get(selected.index - 1).time : new AudioTime(0, 44100);
+				this.window.changeArea(start, segment.time);
+				this.window.editor.rawText = segment.transcript;
+			}
+		} else{
 		}
 	}
 }

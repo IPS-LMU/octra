@@ -153,6 +153,13 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	ngAfterViewInit() {
 		this.initialized = true;
 		this.cd.detectChanges();
+		this.subscrmanager.add(
+			this.transcrService.segmentrequested.subscribe(
+				(segnumber:number)=>{
+					this.openSegment(segnumber);
+				}
+			)
+		);
 	}
 
 	test(selection: AVSelection) {
@@ -354,5 +361,15 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 					- (this.miniloupe.Settings.height/2) + 15;
 			}
 		}
+	}
+
+	public openSegment(segnumber:number) {
+		let segment = this.transcrService.segments.get(segnumber);
+		this.editor.rawText = segment.transcript;
+		this.transcrService.selectedSegment = segment;
+		let selected:boolean = this.viewer.selectSegment(segnumber);
+
+		this.loupe.changeArea(this.transcrService.segments.getStartTime(segnumber), segment.time);
+		this.segmentselected = true;
 	}
 }

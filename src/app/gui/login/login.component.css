@@ -35,15 +35,6 @@ h4{
     border-bottom:2px solid red;
 }
 
-#logo{
-    text-align:center;
-    width:100%;
-    display:block;
-    font-size:5em;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-weight: 300;
-}
-
 #login-disabled{
     border:1px solid gray;
     padding:10px;

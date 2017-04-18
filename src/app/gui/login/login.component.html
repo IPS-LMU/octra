@@ -33,8 +33,7 @@
 </div>
 <div class="section">
     <div class="row">
-        <div class="col-sm-2 col-md-3"></div>
-        <div class="col-sm-8 col-md-6 panel panel-default" style="padding:40px;">
+        <div class="col-md-6 panel panel-default" style="padding:40px; height:500px;">
             <br/>
             <p *ngIf="!valid_platform" class="warning" [innerHTML]="'browser.invalid' | translate">
             </p>
@@ -95,7 +94,8 @@
                 </div>
                 <br/>
             </section>
-            <hr/>
+        </div>
+        <div class="col-md-6 panel panel-default" style="padding:40px; height:500px;">
             <section>
                 <h4>{{'login.local mode' | translate}}</h4>
                 <div>
@@ -105,7 +105,7 @@
                     <p class="bg-warning" *ngIf="sessionService.sessionfile != null"
                        [innerHTML]="'login.old file found' | translate:{file_label: getDropzoneFileString(sessionfile)}">
                     </p>
-                    <app-drop-zone #dropzone>
+                    <app-drop-zone #dropzone [height]="'275px'">
                         <span *ngIf="dropzone.file == null">{{ "dropzone.drag&drop here" | translate }}</span>
                         <span *ngIf="dropzone.file != null && (getFileStatus() == 'start')"><span
                                 class="text-success">{{ "dropzone.file selected" | translate:{file_label: getDropzoneFileString(dropzone.file)} }}</span></span>
@@ -124,6 +124,5 @@
                 </div>
             </section>
         </div>
-        <div class="col-sm-2 col-md-3"></div>
     </div>
 </div>

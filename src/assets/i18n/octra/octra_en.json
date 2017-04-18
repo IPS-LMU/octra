@@ -46,7 +46,8 @@
     "yes": "Yes",
     "no": "No",
     "errors found": "({{errors}}) errors found",
-    "no errors found": "No errors found"
+    "no errors found": "No errors found",
+    "segment": "Segment"
   },
   "transcription":{
     "start": "Continue transcription",

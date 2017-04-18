@@ -3,5 +3,5 @@ export abstract class Converter{
 
 	}
 
-	abstract convert(data:any):any;
+	abstract convert(data:any, filename:string):any;
 }

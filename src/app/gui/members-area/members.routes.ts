@@ -10,7 +10,7 @@ import { ReloadFileGuard } from "../../guard/reload-file.activateguard";
 import { LoadingComponent } from "../load-data/loading.component";
 
 export const MEMBER_ROUTES: Routes = [
-	{ path: '', redirectTo: 'load', pathMatch: 'full'},
+	{ path: '', redirectTo: 'transcr', pathMatch: 'full'},
 	{ path: 'transcr', component: TranscriptionComponent, canActivate:[SettingsGuard, MembersAreaGuard]},
 	{ path: 'load', component: LoadingComponent, canActivate:[SettingsGuard, MembersAreaGuard]},
 	{ path: 'transcr/submit', component: TranscriptionSubmitComponent, canActivate:[SettingsGuard, MembersAreaGuard]},

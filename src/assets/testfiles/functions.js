@@ -1,7 +1,7 @@
 /**
  * this is a test validation method to show how validation could work.
  * @param annotation
- * @returns {{position: number, length: number, code: string}}
+ * @returns {{start: number, length: number, code: string}}
  */
 function validateAnnotation(annotation, guidelines) {
     let result = [];
@@ -40,10 +40,27 @@ function validateAnnotation(annotation, guidelines) {
         });
     }
 
+    //the next line has to be before returning the result
     result = sortValidationResult(result);
     return result;
 }
 
+/**
+ * method that is called before annotation was saved
+ * @param annotation
+ * @param guidelines
+ * @returns string
+ */
+function tidyUpAnnotation(annotation, guidelines) {
+    let result = annotation;
+
+    return result;
+}
+
+
+/*
+###### Default methods.
+ */
 function escapeRegex(regex_str) {
     //escape special chars in regex
     return regex_str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
@@ -58,9 +75,4 @@ function sortValidationResult(result){
         if(a.start > b.start)
             return 1;
     });
-}
-
-function tidyUpAnnotation(annotation, guidelines) {
-    let result = annotation;
-    return result;
 }

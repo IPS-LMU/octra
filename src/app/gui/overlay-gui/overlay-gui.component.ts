@@ -5,7 +5,7 @@ import {
 	AfterViewInit,
 	AfterContentChecked,
 	ViewChild,
-	ChangeDetectorRef
+	ChangeDetectorRef, OnDestroy
 } from '@angular/core';
 
 import {
@@ -33,7 +33,7 @@ import { SessionService } from "../../service/session.service";
 	templateUrl: './overlay-gui.component.html',
 	styleUrls: [ './overlay-gui.component.css' ]
 })
-export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentChecked, OnChanges {
+export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentChecked, OnChanges, OnDestroy {
 	@ViewChild('viewer') viewer: AudioviewerComponent;
 	@ViewChild('window') window: TranscrWindowComponent;
 	@ViewChild('loupe') loupe: LoupeComponent;
@@ -84,6 +84,10 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 	}
 
 	ngOnChanges(test) {
+	}
+
+	ngOnDestroy(){
+		this.subscrmanager.destroy();
 	}
 
 	ngAfterViewInit() {

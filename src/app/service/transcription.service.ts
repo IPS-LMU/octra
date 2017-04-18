@@ -133,12 +133,12 @@ export class TranscriptionService {
 		if (format == "text") {
 			//format to text file
 			let tc: TextConverter = new TextConverter();
-			result = tc.convert(data);
+			result = tc.convert(data, this.filename);
 		}
 		else if (format == "annotJSON") {
 			//format to text file
 			let ac: AnnotJSONConverter = new AnnotJSONConverter();
-			result = ac.convert(data);
+			result = ac.convert(data, this.filename);
 			result = JSON.stringify(result, null, 4);
 		}
 

@@ -3,7 +3,7 @@ import { forEach } from "@angular/router/src/utils/collection";
 
 export class TextConverter extends Converter{
 
-	public convert(data:any):any{
+	public convert(data:any, filename:string):any{
 		let result = "";
 
 		for(let i = 0; i < data.transcript.length; i++){

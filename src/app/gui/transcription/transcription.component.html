@@ -115,9 +115,12 @@
             <a class="btn btn-default btn-raised"
                (click)="modService.show('transcription_stop', '', {ok: abortTranscription})"><span
                     class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span><span
+                    *ngIf="!sessService.easymode"
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.quit" | translate}}</span></a>
             <a class="btn btn-default btn-raised"
-               (click)="submitTranscription()"><span [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"transcription.finish" | translate}}</span>
+               (click)="submitTranscription()"><span
+                    *ngIf="!sessService.easymode"
+                    [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"transcription.finish" | translate}}</span>
                 <span
                         class="glyphicon glyphicon glyphicon-menu-right" aria-hidden="true"></span></a>
         </div>

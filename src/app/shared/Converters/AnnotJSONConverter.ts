@@ -3,12 +3,12 @@ import { forEach } from "@angular/router/src/utils/collection";
 
 export class AnnotJSONConverter extends Converter{
 
-	public convert(data:any):any{
+	public convert(data:any, filename:string):any{
 		let result = this.getDefaultAnnotJSON();
 
 		//set default settings
-		result.name = "test";
-		result.annotates = "test.wav";
+		result.name = filename;
+		result.annotates = filename + ".wav";
 		result.sampleRate = 1000;
 
 		for(let i = 0; i < data.transcript.length; i++){

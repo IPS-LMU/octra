@@ -1,22 +1,49 @@
 import { Subscription } from "rxjs";
+import { isNullOrUndefined } from "util";
 
 export class SubscriptionManager {
-	private subscriptions: Subscription[];
+	private subscriptions: {
+		id: number,
+		subscription: Subscription
+	}[];
+
+	private counter:number;
 
 	constructor() {
 		this.subscriptions = [];
+		this.counter = 0;
 	}
 
-	public add(subscription:Subscription){
-		this.subscriptions.push(subscription);
+	public add(subscription:Subscription):number{
+		this.subscriptions.push(
+			{
+				id: ++this.counter,
+				subscription: subscription
+			}
+		);
+		return this.counter;
 	}
 
 	public destroy() {
-		if (this.subscriptions) {
+		if (!isNullOrUndefined(this.subscriptions)) {
 			for (let i = 0; i < this.subscriptions.length; i++) {
-				this.subscriptions[ i ].unsubscribe();
+				this.subscriptions[ i ].subscription.unsubscribe();
 			}
 			this.subscriptions = [];
 		}
+	}
+
+
+	public remove(id:number):boolean{
+		for(let i = 0; i < this.subscriptions.length; i++){
+			let element = this.subscriptions[i];
+
+			if(element.id === id){
+				element.subscription.unsubscribe();
+				this.subscriptions.splice(i, 1);
+				return true;
+			}
+		}
+		return false;
 	}
 }

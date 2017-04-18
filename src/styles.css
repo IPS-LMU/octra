@@ -132,3 +132,12 @@ footer{
 .error-tooltip .description {
     font-size: 0.8em;
 }
+
+#logo{
+    text-align:center;
+    width:100%;
+    display:block;
+    font-size:5em;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 300;
+}

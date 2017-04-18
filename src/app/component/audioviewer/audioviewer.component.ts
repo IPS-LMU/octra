@@ -298,7 +298,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 			let x_max = line_obj.Size.width;
 
 			let zoomX = this.av.zoomX;
-			let zoomY = this.av.zoomY;
+			let zoomY = this.av.zoomY
+			console.log("draw with " + zoomY);
 
 			this.clearDisplay(line_num);
 

@@ -1,6 +1,9 @@
 <div id="loading">
-    <div style="display:block;">
-      <i class="fa fa-spinner fa-spin" style="font-size:64px"></i>
+    <span id="logo">OCTRA</span>
+    <div class="progress">
+        <div class="progress-bar" [ngStyle]="{
+            width: (progress + '%')
+        }"></div>
     </div>
     <div class="description">
       {{text}}

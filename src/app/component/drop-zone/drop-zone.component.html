@@ -1,4 +1,6 @@
-<div class="dropzone" #dropzone (dragover)="onDragOver($event)" (drop)="onFileDrop($event)" (click)="onClick($event)">
+<div class="dropzone" #dropzone [ngStyle]="{
+  height: height
+}" (dragover)="onDragOver($event)" (drop)="onFileDrop($event)" (click)="onClick($event)">
   <ng-content></ng-content><br/>
   <span class="glyphicon glyphicon-folder-open dragndrop"></span>
 </div>

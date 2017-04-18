@@ -6,9 +6,26 @@ import { SubscriptionManager } from "../shared";
 import { AppConfigValidator } from "../validator/AppConfigValidator";
 import { ConfigValidator } from "../shared/ConfigValidator";
 import { ProjectConfiguration } from "../types/Settings/project-configuration";
+import { Subscription } from "rxjs/Subscription";
+import { TranscriptionService } from "./transcription.service";
+import { SessionService } from "./session.service";
+import { AudioService } from "./audio.service";
+import { isNullOrUndefined } from "util";
 
 @Injectable()
 export class SettingsService {
+	get filename(): string {
+		return this._filename;
+	}
+	get guidelines(): any {
+		return this._guidelines;
+	}
+	get tidyUpMethod(): (string, any) => string {
+		return this._tidyUpMethod;
+	}
+	get validationmethod(): (string, any) => any[] {
+		return this._validationmethod;
+	}
 	get projectsettings(): ProjectConfiguration {
 		return this._projectsettings;
 	}
@@ -29,18 +46,37 @@ export class SettingsService {
 
 	public settingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
 	private app_settingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
-	public projectsettingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
-	private subscrmanager: SubscriptionManager;
-	private _projectsettings:ProjectConfiguration;
+	public projectsettingsloaded: EventEmitter<any> = new EventEmitter<any>();
+	public validationmethodloaded = new EventEmitter<void>();
+	public audioloaded:EventEmitter<any> = new EventEmitter<any>();
+	public guidelinesloaded = new EventEmitter<any>();
 
+	private subscrmanager: SubscriptionManager;
+
+	private _projectsettings:ProjectConfiguration;
 	private _app_settings: any;
+	private _guidelines: any;
 	private _loaded:boolean = false;
+
+	private _filename:string;
+
+	private _validationmethod: (string, any) => any[] = null;
+	private _tidyUpMethod: (string, any) => string = null;
 
 	private validation: any = {
 		app    : false
 	};
 
-	constructor(private http: Http) {
+	public get allloaded():boolean{
+		return (
+			!isNullOrUndefined(this.projectsettings)
+		)
+	}
+
+	constructor(
+		private http: Http,
+		private sessService:SessionService
+	) {
 		this.subscrmanager = new SubscriptionManager();
 		this.subscrmanager.add(
 			this.app_settingsloaded.subscribe(this.triggerSettingsLoaded)
@@ -69,20 +105,101 @@ export class SettingsService {
 		return result;
 	}
 
-	public getProjectSettings(): any {
-		let result: any = null;
-
-		this.subscrmanager.add(this.http.request("./config/projectconfig.json").subscribe(
+	public loadProjectSettings(): Subscription {
+		return this.http.request("./config/projectconfig.json").subscribe(
 			(result) => {
 				this._projectsettings = result.json();
-				this.projectsettingsloaded.emit(true);
+				this.projectsettingsloaded.emit(this._projectsettings);
 			},
 			() => {
 				console.error("config.json not found. Please create this file in a folder named 'config'");
 			}
-		));
+		);
+	}
 
-		return result;
+	public loadGuidelines(language: string, url: string): Subscription {
+		return this.http.get(url).subscribe(
+			(response) => {
+				let guidelines = response.json();
+				this._guidelines = guidelines;
+				this.loadValidationMethod(guidelines.meta.validation_url);
+				this.guidelinesloaded.emit(guidelines);
+			}
+		);
+	}
+
+	public loadValidationMethod(url: string): Subscription {
+		return this.http.get(url).subscribe(
+			(response) => {
+				let js = document.createElement("script");
+
+				js.type = "text/javascript";
+				js.src = url;
+				js.id = "validationJS";
+
+				document.body.appendChild(js);
+
+				setTimeout(()=>{
+					this._validationmethod = validateAnnotation;
+					this._tidyUpMethod = tidyUpAnnotation;
+				}, 2000);
+
+				this.validationmethodloaded.emit();
+			}
+		);
+	}
+
+	public loadAudioFile(audioService:AudioService) {
+		if (audioService.audiocontext) {
+			this.subscrmanager.add(
+				audioService.afterloaded.subscribe((result)=>{
+					console.log("audio loaded settings");
+					console.log(audioService.audiobuffer.length);
+					this.audioloaded.emit(result);
+				})
+			);
+
+			if (this.sessService.offline != true) {
+				let src = this.app_settings.audio_server.url + this.sessService.audio_url;
+				//extract filename
+				this._filename = this.sessService.audio_url.substr(this.sessService.audio_url.lastIndexOf("/") + 1);
+				this._filename = this._filename.substr(0, this._filename.lastIndexOf("."));
+
+				audioService.loadAudio(src);
+			}
+			else {
+				//offline mode
+				this._filename = this.sessService.file.name;
+				this._filename = this._filename.substr(0, this._filename.lastIndexOf("."));
+
+				//read file
+				let reader = new FileReader();
+
+				reader.onload = ((theFile) => {
+					return function (e) {
+						// Render thumbnail.
+					};
+				})(this.sessService.sessionfile);
+
+				reader.onloadend = (ev) => {
+					let t: any = ev.target;
+
+					this.sessService.offline = true;
+
+					audioService.decodeAudio(t.result);
+				};
+
+				if (this.sessService.file != null) {
+					//file not loaded. Load again!
+					reader.readAsArrayBuffer(this.sessService.file);
+				}
+			}
+		} else{
+			console.log("context bereits da");
+			this.audioloaded.emit({
+				result:"success"
+			});
+		}
 	}
 
 	private triggerSettingsLoaded = () => {

@@ -20,6 +20,8 @@ export class DropZoneComponent implements OnInit {
 	@Input()
 	innerhtml: string = "";
 
+	@Input() height:string = "auto";
+
 	private _file: File;
 	private _sessionfile: SessionFile;
 	private fileAPIsupported = false;

@@ -21,17 +21,6 @@ export class MembersAreaComponent{
 	constructor(private router:Router,
 		private settService:SettingsService
 	) {
-		this.subscrmanager.add(
-			this.settService.projectsettingsloaded.subscribe(()=>{
-				console.log("loaded");
-				this.router.navigate(["transcr"]);
-			})
-		);
-
-		if(isNullOrUndefined(this.settService.projectsettings)){
-			this.settService.getProjectSettings();
-		} else{
-			this.router.navigate(["transcr"]);
-		}
+		this.router.navigate(["/user/load"]);
 	}
 }

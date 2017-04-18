@@ -34,7 +34,8 @@ export class ReloadFileComponent implements OnInit {
 	}
 
 	private navigate() {
-		this.router.navigate([ 'user' ]);
+		console.log("go to user load");
+		this.router.navigate([ '/user/load' ]);
 	}
 
 	getDropzoneFileString(file: File | SessionFile) {

@@ -81,9 +81,6 @@
         </button>
     </modal-footer>
 </modal>
-<div *ngIf="!loaded">
-    <app-loading #loading></app-loading>
-</div>
 <div *ngIf="loaded">
     <span id='saving' *ngIf="saving != ''"><i class="fa fa-spinner fa-spin" style="font-size:20px"></i></span>
     <app-fastbar

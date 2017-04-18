@@ -16,7 +16,10 @@ export class LogoutGuard implements CanActivate {
 		if (this.sessService.logged_in) {
 			return true;
 		}
-		else this.router.navigate(['/user/transcr']);
+		else {
+			console.log("go to tanscr from logout");
+			this.router.navigate(['/user/transcr']);
+		}
 		return false;
 	}
 }

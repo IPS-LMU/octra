@@ -28,7 +28,7 @@ export class APIService implements API {
 		throw "beginSession - validation false";
 	}
 
-	public continueSession(project: string, annotator: string, jobno:number): Observable<Response> {
+	public continueSession(project: string, annotator: string, jobno: number): Observable<Response> {
 		if (project != null && project != "" &&
 			annotator != null && annotator != ""
 		) {
@@ -36,13 +36,24 @@ export class APIService implements API {
 				querytype: "continueannotation",
 				project  : project,
 				annotator: annotator,
-				jobno: jobno
+				jobno    : jobno
 			};
 			return this.post(cmd_json);
 		}
 		else {
 			throw "continueSession - validation false";
 		}
+	}
+
+	public fetchAnnotation(id: number): Observable<Response> {
+		let cmd_json = {
+			querytype: "fetchannotation",
+			project  : "",
+			annotator: "",
+			jobno    : 0,
+			id       : id
+		};
+		return this.post(cmd_json);
 	}
 
 	public saveSession(transcript: any[], project: string, annotator: string, jobno: number, data_id: number, status: string, comment: string, quality: any, log: any[]): Observable<Response> {
@@ -106,7 +117,7 @@ export class APIService implements API {
 		}
 	}
 
-	public getProjects(){
+	public getProjects() {
 		let cmd_json = {
 			querytype: "listprojects"
 		};
@@ -114,7 +125,7 @@ export class APIService implements API {
 		return this.post(cmd_json);
 	}
 
-	public post(json: any): Observable<Response>{
+	public post(json: any): Observable<Response> {
 		const body = JSON.stringify(json);
 		const headers = new Headers();
 		headers.append('Content-Type', 'application/json');

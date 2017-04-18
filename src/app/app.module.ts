@@ -60,6 +60,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { ReloadFileGuard } from "./guard/reload-file.activateguard";
 import { BsDropdownModule } from "ngx-bootstrap/dropdown";
 import { CollapseModule } from "ngx-bootstrap/collapse";
+import { TranscActivateGuard } from "./guard/transcr.activateguard";
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
@@ -140,6 +141,7 @@ export function HttpLoaderFactory(http: Http) {
 		NavbarService,
 		ReloadFileGuard,
 		SessionService,
+		TranscActivateGuard,
 		SettingsGuard,
 		SettingsService,
 		TranscrSubmittedGuard,

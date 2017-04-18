@@ -35,6 +35,7 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 				private cd: ChangeDetectorRef,
 				private lang:TranslateService
 	) {
+		/*
 		this.subscrmanager.add(
 			transcrService.guidelinesloaded.subscribe(
 				(guidelines) => {
@@ -42,7 +43,7 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 				}
 			)
 		);
-
+*/
 		if(!isNullOrUndefined(this.transcrService.guidelines)){
 			this.init();
 		}

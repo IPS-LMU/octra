@@ -458,23 +458,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	 * @param raw
 	 * @returns {string}
 	 */
-	private tidyUpRaw(raw: string) {
-		let result: string = raw;
-
-		result = result.replace(/\[[~^a-z0-9]+\]/g, function (x) {
-			return " " + x + " ";
-		});
-		//set whitespaces before *
-		result = result.replace(/(\w|ä|ü|ö|ß|Ü|Ö|Ä)\*(\w|ä|ü|ö|ß|Ü|Ö|Ä)/g, "$1 *$2");
-		//set whitespaces before and after **
-		result = result.replace(/(\*\*)|(\s\*\*)|(\*\*\s)/g, " ** ");
-
-		//replace all numbers of whitespaces to one
-		result = result.replace(/\s+/g, " ");
-		//replace whitespaces at start an end
-		result = result.replace(/^\s+/g, "");
-		result = result.replace(/\s$/g, "");
-		return result;
+	private tidyUpRaw(raw: string):string {
+		return tidyUpAnnotation(raw, this.transcrService.guidelines);
 	}
 
 	/**
@@ -524,15 +509,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
 				puffer["p" + validation[i].start] += "<div class='error_underline'>";
 				puffer["p" + (validation[i].start + validation[i].length)] = "</div>" + puffer["p" + (validation[i].start + validation[i].length)];
-
-				/*
-				let error: any = validation[ i ];
-				if (result.length >= error.start + error.length) {
-					result = result.substring(0, puffer + error.start) + "<div class='error_underline'>" + result.substring(puffer + error.start, puffer + error.start + error.length) + "</div>"
-						+ result.substring(puffer + error.start + error.length);
-					puffer += length;
-				}
-				*/
 			}
 		}
 		return result;

@@ -58,7 +58,10 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
 						this.sessService.submitted = false;
 						this.audio.audiobuffer = null;
 						this.sessService.transcription = [];
-						this.tranService.segments.clear();
+
+						if(!isNullOrUndefined(this.tranService))
+							this.tranService.segments.clear();
+
 						this.sessService.feedback = null;
 						this.sessService.logs = [];
 						this.uiService.elements = [];
@@ -66,7 +69,7 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
 						this.sessService.audio_url = json.data.url;
 						this.sessService.data_id = json.data.id;
 
-						this.router.navigate([ '/user/transcr' ]);
+						this.router.navigate([ '/user/load' ]);
 					}
 					else {
 						this.openSuccessModal();

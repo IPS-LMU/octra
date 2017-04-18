@@ -29,6 +29,7 @@ import { BrowserInfo, StatisticElem, SubscriptionManager } from "../../shared";
 import { isNullOrUndefined } from "util";
 import { TranslateService, LangChangeEvent } from "@ngx-translate/core";
 import { TranscrGuidelinesComponent } from "../transcr-guidelines/transcr-guidelines.component";
+import { APIService } from "../../service/api.service";
 
 @Component({
 	selector       : 'app-transcription',
@@ -44,9 +45,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	@ViewChild('modal_guidelines') modal_guidelines: TranscrGuidelinesComponent;
 	@ViewChild('modal_overview') modal_overview: ModalComponent;
 
-	private initialized: any = {};
-	private viewinitialized = false;
-	public showdetails:boolean = false;
+	public showdetails: boolean = false;
 	private saving = "";
 
 	get help_url(): string {
@@ -89,7 +88,9 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 				public navbarServ: NavbarService,
 				public settingsService: SettingsService,
 				public modService: ModalService,
-				public langService: TranslateService) {
+				public langService: TranslateService,
+				private api:APIService
+	) {
 		this.subscrmanager = new SubscriptionManager();
 	}
 
@@ -109,7 +110,8 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	}
 
 	ngOnInit() {
-		console.log(this.settingsService.projectsettings);
+		this.afterAudioLoaded();
+
 		setInterval(() => {
 			this.changeDetecorRef.markForCheck();
 		}, 2000);
@@ -127,20 +129,11 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 			}
 		));
 
-		if (this.audio.audiobuffer == null) {
-			this.subscrmanager.add(this.audio.afterloaded.subscribe(this.afterAudioLoaded));
-
-			if (this.app_settings.octra.logging_enabled == true) {
-				this.subscrmanager.add(
-					this.uiService.afteradd.subscribe((elem) => {
-						this.sessService.save("logs", this.uiService.elementsToAnyArray());
-					}));
-			}
-			this.transcrService.loadAudioFile();
-			this.initialized[ "audiolayer" ] = false;
-		}
-		else {
-			this.afterAudioLoaded();
+		if (this.app_settings.octra.logging_enabled == true) {
+			this.subscrmanager.add(
+				this.uiService.afteradd.subscribe((elem) => {
+					this.sessService.save("logs", this.uiService.elementsToAnyArray());
+				}));
 		}
 
 		if (!isNullOrUndefined(this.transcrService.segments)) {
@@ -154,29 +147,32 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	}
 
 	afterAudioLoaded = () => {
+		this.transcrService.load();
+		this.transcrService.guidelines = this.settingsService.guidelines;
+
+		for (let i = 0; i < this.transcrService.guidelines.markers.length; i++) {
+			let marker = this.transcrService.guidelines.markers[ i ];
+			if (marker.type == "break") {
+				this.transcrService.break_marker = marker;
+				break;
+			}
+		}
+
 		this.sessService.SampleRate = this.audio.samplerate;
 		this.change();
 		this.navbarServ.show_hidden = true;
-
-
-		//load guidelines
-		this.subscrmanager.add(
-			this.transcrService.loadGuidelines(this.sessService.language, "./guidelines/guidelines_" + this.langService.currentLang + ".json")
-		);
 
 		//load guidelines on language change
 		this.subscrmanager.add(this.langService.onLangChange.subscribe(
 			(event: LangChangeEvent) => {
 				this.subscrmanager.add(
-					this.transcrService.loadGuidelines(event.lang, "./guidelines/guidelines_" + event.lang + ".json")
+					this.settingsService.loadGuidelines(event.lang, "./guidelines/guidelines_" + event.lang + ".json")
 				);
 			}
 		));
-
 	};
 
 	ngAfterViewInit() {
-		this.viewinitialized = true;
 		this.sessService.TranscriptionTime.start = Date.now();
 		this.change();
 		jQuery.material.init();
@@ -232,13 +228,23 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		return this.transcrService.getTranscriptString("text");
 	}
 
-	clearElements(){
+	clearElements() {
 		this.uiService.clear();
 		this.sessService.save("logs", this.uiService.elementsToAnyArray());
 	}
 
-	onSegmentInOverviewClicked(segnumber:number){
+	onSegmentInOverviewClicked(segnumber: number) {
 		this.transcrService.requestSegment(segnumber);
 		this.modal_overview.close();
+	}
+
+	test(){
+		this.subscrmanager.add(
+			this.api.fetchAnnotation(101127708).subscribe(
+				(result)=>{
+					console.log(result.json());
+				}
+			)
+		);
 	}
 }

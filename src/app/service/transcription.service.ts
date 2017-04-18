@@ -19,6 +19,12 @@ import { Observable, Subscription } from "rxjs";
 
 @Injectable()
 export class TranscriptionService {
+	set break_marker(value: any) {
+		this._break_marker = value;
+	}
+	set guidelines(value: any) {
+		this._guidelines = value;
+	}
 	get guidelines(): any {
 		return this._guidelines;
 	}
@@ -50,10 +56,7 @@ export class TranscriptionService {
 
 	private subscrmanager: SubscriptionManager;
 
-	public onaudioloaded = new EventEmitter<any>();
 	public dataloaded = new EventEmitter<any>();
-	public guidelinesloaded = new EventEmitter<any>();
-	public validationmethodloaded = new EventEmitter<void>();
 	public segmentrequested = new EventEmitter<number>();
 
 	private _segments: Segments;
@@ -124,6 +127,14 @@ export class TranscriptionService {
 			}
 			this.navbarServ.exportformats.filename = this.filename;
 		}));
+	}
+
+	/**
+	 * metod after audio was loaded
+	 */
+	public load(){
+		this.last_sample = this.audio.duration.samples;
+		this.loadSegments(this.audio.samplerate);
 	}
 
 	public getTranscriptString(format: string): string {
@@ -219,65 +230,6 @@ export class TranscriptionService {
 			data.transcript = transcript;
 		}
 		return data;
-	}
-
-	public loadAudioFile() {
-		if (this.audio.audiocontext) {
-			if (this.sessServ.offline != true) {
-				let src = this.app_settings.audio_server.url + this.sessServ.audio_url;
-				//extract filename
-				this.filename = this.sessServ.audio_url.substr(this.sessServ.audio_url.lastIndexOf("/") + 1);
-				this.filename = this.filename.substr(0, this.filename.lastIndexOf("."));
-
-				this.subscrmanager.add(this.audio.afterloaded.subscribe((result) => {
-					this.last_sample = this.audio.duration.samples;
-					this.loadSegments(this.audio.samplerate);
-
-					this.onaudioloaded.emit(result);
-				}));
-
-				this.audio.loadAudio(src);
-			}
-			else {
-				//offline mode
-				this.filename = this.sessServ.file.name;
-				this.filename = this.filename.substr(0, this.filename.lastIndexOf("."));
-
-				this.subscrmanager.add(this.audio.afterloaded.subscribe((result) => {
-					this.last_sample = this.audio.duration.samples;
-					this.loadSegments(this.audio.samplerate);
-
-					this.onaudioloaded.emit(result);
-				}));
-
-				//read file
-				let reader = new FileReader();
-
-				reader.onload = ((theFile) => {
-					return function (e) {
-						// Render thumbnail.
-					};
-				})(this.sessServ.sessionfile);
-
-				reader.onloadend = (ev) => {
-					let t: any = ev.target;
-
-					this.sessServ.offline = true;
-
-					this.audio.decodeAudio(t.result);
-				};
-
-				if (this.sessServ.file != null) {
-					//file not loaded. Load again!
-					reader.readAsArrayBuffer(this.sessServ.file);
-				}
-			}
-
-			//fixes the issue after switching from transcription-submit to transcription
-			if (!isNullOrUndefined(this.segments)) {
-				this.subscrmanager.add(this.segments.onsegmentchange.subscribe(this.saveSegments));
-			}
-		}
 	}
 
 	public saveSegments = () => {
@@ -393,61 +345,6 @@ export class TranscriptionService {
 			result = result.replace(regex, "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "'/>");
 		}
 		return result;
-	}
-
-	public loadProjectConfig(): Subscription {
-
-		return this.http.get("./config/projectconfig.jso").subscribe(
-			(response: Response) => {
-				this._guidelines = response.json();
-				this.loadValidationMethod(this._guidelines.meta.validation_url);
-
-				for(let i = 0; i < this._guidelines.markers.length; i++){
-					let marker = this._guidelines.markers[i];
-					if(marker.type == "break"){
-						this._break_marker = marker;
-						break;
-					}
-				}
-
-				this.guidelinesloaded.emit(this._guidelines);
-			}
-		);
-	}
-
-	public loadGuidelines(language: string, url: string): Subscription {
-
-		return this.http.get(url).subscribe(
-			(response: Response) => {
-				this._guidelines = response.json();
-				this.loadValidationMethod(this._guidelines.meta.validation_url);
-
-				for(let i = 0; i < this._guidelines.markers.length; i++){
-					let marker = this._guidelines.markers[i];
-					if(marker.type == "break"){
-						this._break_marker = marker;
-						break;
-					}
-				}
-
-				this.guidelinesloaded.emit(this._guidelines);
-			}
-		);
-	}
-
-	public loadValidationMethod(url: string): Subscription {
-		return this.http.get(url).subscribe(
-			(response: Response) => {
-				let js = document.createElement("script");
-
-				js.type = "text/javascript";
-				js.src = url;
-				js.id = "validationJS";
-
-				document.body.appendChild(js);
-				this.validationmethodloaded.emit();
-			}
-		);
 	}
 
 	public underlineTextRed(rawtext:string, validation: any[]) {

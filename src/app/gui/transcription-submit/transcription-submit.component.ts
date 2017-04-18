@@ -94,6 +94,7 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 
 		let json: any = this.transcrService.exportDataToJSON();
 
+		console.log("data id:" + json.id);
 		this.subscrmanager.add(this.api.saveSession(json.transcript, json.project, json.annotator, json.jobno, json.id, json.status, json.comment, json.quality, json.log)
 			.catch(this.onSendError)
 			.subscribe((result) => {

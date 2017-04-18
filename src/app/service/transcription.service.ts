@@ -169,11 +169,7 @@ export class TranscriptionService {
 		this.segments = new Segments(sample_rate, this.sessServ.transcription, this._last_sample);
 
 		if (!this.sessServ.feedback) {
-			this.sessServ.feedback = {
-				quality_speaker: "",
-				quality_audio  : "",
-				comment        : ""
-			};
+			this.sessServ.feedback = {};
 		}
 
 		this.feedback = this.sessServ.feedback;

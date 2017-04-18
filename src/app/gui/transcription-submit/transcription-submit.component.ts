@@ -1,6 +1,6 @@
 import {
 	Component, OnInit, Output, AfterViewInit, ViewChild, OnDestroy, ChangeDetectionStrategy,
-	ChangeDetectorRef
+	ChangeDetectorRef, OnChanges
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -18,15 +18,16 @@ import { Functions } from "../../shared/Functions";
 import { NavbarService } from "../../service/navbar.service";
 import { SubscriptionManager } from "../../shared";
 import { TranslateService } from "@ngx-translate/core";
+import { SettingsService } from "../../service/settings.service";
+import { isNullOrUndefined } from "util";
 
 
 @Component({
 	selector       : 'app-transcription-submit',
 	templateUrl    : './transcription-submit.component.html',
-	styleUrls      : [ './transcription-submit.component.css' ],
-	changeDetection: ChangeDetectionStrategy.OnPush
+	styleUrls      : [ './transcription-submit.component.css' ]
 })
-export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactivate, OnDestroy, AfterViewInit {
+export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactivate, OnDestroy, AfterViewInit, OnChanges {
 
 	@ViewChild('modal') modal: ModalComponent;
 	@ViewChild('modal2') modal2: ModalComponent;
@@ -38,32 +39,38 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 				public cd: ChangeDetectorRef,
 				public sanitizer: DomSanitizer,
 				public navbarServ: NavbarService,
-				private langService: TranslateService
+				private langService: TranslateService,
+				private settingsService: SettingsService
 	) {
 
 		this.subscrmanager = new SubscriptionManager();
 	}
 
-	private feedback_data = {
-		quality_speaker: "",
-		quality_audio  : "",
-		comment        : ""
-	};
+	private feedback_data = {};
 
 	private send_ok = false;
 	public send_error: string = "";
 	private subscrmanager: SubscriptionManager;
 
 	ngOnInit() {
+		console.log(this.feedback_data);
 		if (!this.transcrService.segments && this.sessService.SampleRate) {
 			this.transcrService.loadSegments(this.sessService.SampleRate);
 		}
-		this.feedback_data = this.sessService.feedback;
+		if(isNullOrUndefined(this.sessService.feedback)) {
+			// init feedback_data
+			for(let i = 0; i < this.settingsService.projectsettings.feedback_form.length; i++){
+				let group = this.settingsService.projectsettings.feedback_form[i];
 
-		//set change detection interval
-		setInterval(() => {
-			this.cd.markForCheck();
-		}, 800);
+				for(let j = 0; j < group.controls.length; j++){
+					let control = group.controls[j];
+					this.feedback_data["" + control.name + ""] = "";
+				}
+			}
+		} else{
+			this.feedback_data = this.sessService.feedback;
+		}
+
 		this.navbarServ.show_hidden = false;
 	}
 
@@ -76,13 +83,13 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 	}
 
 	private back() {
-		this.feedback_data.comment = this.feedback_data.comment.replace(/(<)|(\/>)|(>)/g, "\s");
+		//this.feedback_data.comment = this.feedback_data.comment.replace(/(<)|(\/>)|(>)/g, "\s");
 		this.sessService.save("feedback", this.feedback_data);
 		this.router.navigate([ '/user/transcr' ]);
 	}
 
 	onSubmit(form: NgForm) {
-		this.feedback_data.comment = this.feedback_data.comment.replace(/(<)|(\/>)|(>)/g, "\s");
+		//this.feedback_data.comment = this.feedback_data.comment.replace(/(<)|(\/>)|(>)/g, "\s");
 		this.sessService.save("feedback", this.feedback_data);
 		this.modal.open();
 	}
@@ -113,7 +120,9 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 	}
 
 	ngAfterViewInit() {
-		jQuery.material.init();
+		setTimeout(()=>{
+			jQuery.material.init();
+		}, 100);
 	}
 
 	onSendError = (error) => {
@@ -125,6 +134,13 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 		this.subscrmanager.destroy();
 	}
 
+	ngOnChanges(obj){
+		if(!isNullOrUndefined(obj.feedback_data)){
+			console.log("change of feedback:");
+			console.log(obj.feedback_data.newValue);
+		}
+		jQuery.material.init();
+	}
 
 	getURI(format: string): string {
 		let result: string = "";
@@ -145,5 +161,9 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 
 	sanitize(url: string) {
 		return this.sanitizer.bypassSecurityTrustUrl(url);
+	}
+
+	test(){
+		console.log(this.feedback_data);
 	}
 }

@@ -7,7 +7,8 @@
     </modal-body>
     <modal-footer>
         <button type="button" class="btn btn-primary" (click)="modal.dismiss()">{{"general.abort" | translate}}</button>
-        <button type="button" class="btn btn-default" (click)="onSendNowClick()">{{"general.send now" | translate}}</button>
+        <button type="button" class="btn btn-default" (click)="onSendNowClick()">{{"general.send now" | translate}}
+        </button>
     </modal-footer>
 </modal>
 
@@ -26,7 +27,8 @@
     <p>
         {{"transcription-submit.overview" | translate}}
     </p>
-    <app-transcr-overview [visible]="true" [show_transcriptiontable]="false" [segments]="transcrService.segments.segments"></app-transcr-overview>
+    <app-transcr-overview [visible]="true" [show_transcriptiontable]="false"
+                          [segments]="transcrService.segments.segments"></app-transcr-overview>
     <br><br>
     <div *ngIf="!sessService.offline">
         <h3>Feedback</h3>
@@ -36,79 +38,30 @@
         <section>
             <form (ngSubmit)="onSubmit(fo)" #fo="ngForm">
                 <fieldset>
-                    <div class="form-group">
-                        <label class="control-label">{{"transcription-submit.intelligibility of the speaker" | translate}}:</label>
-                        <div class="row">
-                            <div class="col-xs-3">
-                                <div class="radio">
-                                    <label>{{"feedback.unintelligible" | translate}}
-                                        <input type="radio" [(ngModel)]="feedback_data.quality_speaker"
-                                               name="quality_speaker" value="unverstaendlich" required/></label>
-                                </div>
+                    <div class="form-group" *ngFor="let group of settingsService.projectsettings.feedback_form">
+                        <label class="control-label">{{group.group}}</label><br/>
+                        <div class="ctrl" *ngFor="let control of group.controls">
+                            <div class="radio" *ngIf="control.type === 'radiobutton'">
+                                <label>{{control.label}}
+                                    <input *ngIf="control.required" type="radio"
+                                           name="{{control.name}}" value="{{control.value}}"
+                                           [(ngModel)]="feedback_data[control.name]" (click)="test()" required/>
+                                    <input *ngIf="!control.required" type="radio"
+                                           name="{{control.name}}" value="{{control.value}}"
+                                           [(ngModel)]="feedback_data[control.name]" (click)="test()"/></label>
                             </div>
-                            <div class="col-xs-3">
-                                <div class="radio">
-                                    <label>{{"feedback.less intelligible" | translate}}
-                                        <input type="radio" [(ngModel)]="feedback_data.quality_speaker"
-                                               name="quality_speaker" value="weniger verstaendlich" required/></label>
-                                </div>
-                            </div>
-                            <div class="col-xs-3">
-                                <div class="radio">
-                                    <label>{{"feedback.intelligible" | translate}}
-                                        <input type="radio" [(ngModel)]="feedback_data.quality_speaker"
-                                               name="quality_speaker" value="verstaendlich" required/></label>
-                                </div>
-                            </div>
-                            <div class="col-xs-3">
-                                <div class="radio">
-                                    <label>{{"feedback.very good intelligible" | translate}}
-                                        <input type="radio" [(ngModel)]="feedback_data.quality_speaker"
-                                               name="quality_speaker" value="klar" required/></label>
-                                </div>
+                            <div *ngIf="control.type === 'textarea'">
+                                <label>{{control.label}}</label><br/>
+                                    <textarea class="form-control" *ngIf="control.required"
+                                              name="{{control.name}}" value="{{control.value}}"
+                                              [(ngModel)]="feedback_data[control.name]" (click)="test()"
+                                              required></textarea>
+                                    <textarea class="form-control" *ngIf="!control.required"
+                                              name="{{control.name}}" value="{{control.value}}"
+                                              [(ngModel)]="feedback_data[control.name]"
+                                              (click)="test()"></textarea>
                             </div>
                         </div>
-                    </div>
-                    <div class="form-group"><label class="control-label">{{"feedback.quality of signal" | translate}}:</label>
-                        <div class="row">
-                            <div class="col-xs-3">
-                                <div class="radio">
-                                    <label>{{"feedback.a lot of noises" | translate}}
-                                        <input type="radio" [(ngModel)]="feedback_data.quality_audio"
-                                               name="quality_audio"
-                                               value="viele" required/></label>
-                                </div>
-                            </div>
-                            <div class="col-xs-3">
-                                <div class="radio">
-                                    <label>{{"feedback.few noises" | translate}}
-                                        <input type="radio" [(ngModel)]="feedback_data.quality_audio"
-                                               name="quality_audio"
-                                               value="wenig" required/></label>
-                                </div>
-                            </div>
-                            <div class="col-xs-3">
-                                <div class="radio">
-                                    <label>{{"feedback.very few noises" | translate}}
-                                        <input type="radio" [(ngModel)]="feedback_data.quality_audio"
-                                               name="quality_audio"
-                                               value="sehr wenig" required/></label>
-                                </div>
-                            </div>
-                            <div class="col-xs-3">
-                                <div class="radio">
-                                    <label>{{"feedback.no noises" | translate}}
-                                        <input type="radio" [(ngModel)]="feedback_data.quality_audio"
-                                               name="quality_audio"
-                                               value="keine" required/></label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group"><label class="control-label">{{"transcription-submit.comment description" | translate}}:</label>
-                        <textarea class="form-control" id="short-feedback" name="shortfeedback"
-                                  [(ngModel)]="feedback_data.comment" required
-                                  minlength="3" maxlength="500"></textarea>
                     </div>
                     <div id="form-group">
                         <div class="btn-group btn-group-justified" role="group" aria-label="...">
@@ -133,7 +86,8 @@
             <div class="col-xs-6 export-button">
                 <a download="{{transcrService.filename}}.txt" [href]="sanitize(getURI('text'))">
                     <div><span
-                            class="glyphicon glyphicon-floppy-save export-glyphicon"></span><br/>{{"general.text file"| translate}}
+                            class="glyphicon glyphicon-floppy-save export-glyphicon"></span><br/>{{"general.text file"|
+                        translate}}
                     </div>
                 </a><br/>
                 <a class="export-a"
@@ -154,7 +108,8 @@
         <button type="button" class="form-control" class="btn btn-raised"
                 style="position:relative;width:100%;margin-top:40px;"
                 (click)="back()"><span
-                class="glyphicon glyphicon-menu-left" aria-hidden="true"></span><span> {{"general.back" | translate}}</span>
+                class="glyphicon glyphicon-menu-left"
+                aria-hidden="true"></span><span> {{"general.back" | translate}}</span>
         </button>
     </div>
 </div>

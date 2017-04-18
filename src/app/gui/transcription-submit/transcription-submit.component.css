@@ -14,3 +14,16 @@
 #transcr-submit{
     padding:20px;
 }
+
+.ctrl{
+    display:inline;
+    margin-right:10px;
+}
+
+.radio{
+    display:inline;
+}
+
+textarea{
+    width:100%;
+}

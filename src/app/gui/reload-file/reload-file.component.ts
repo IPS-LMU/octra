@@ -34,7 +34,6 @@ export class ReloadFileComponent implements OnInit {
 	}
 
 	private navigate() {
-		console.log("go to user load");
 		this.router.navigate([ '/user/load' ]);
 	}
 

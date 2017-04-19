@@ -43,13 +43,11 @@ export class LoadingComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
-		console.log("in load-data");
 		this.subscrmanager.add(
 			this.settService.projectsettingsloaded.subscribe(
 				(projectsettings) => {
 					this.loadedtable.projectconfig = true;
 					this.progress += 25;
-					console.log(projectsettings);
 					this.loadedchanged.emit(false);
 				}
 			)
@@ -60,7 +58,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
 				(guidelines) => {
 					this.loadedtable.guidelines = true;
 					this.progress += 25;
-					console.log(guidelines);
 					this.loadedchanged.emit(false);
 				}
 			)

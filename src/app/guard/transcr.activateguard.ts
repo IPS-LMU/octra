@@ -17,7 +17,6 @@ export class TranscActivateGuard implements CanActivate {
 	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean
 	{
 		if(!this.settService.allloaded) {
-			console.log("back to user load");
 			this.router.navigate(['/user/load']);
 			return false;
 		}

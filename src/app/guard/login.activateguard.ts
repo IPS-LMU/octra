@@ -14,7 +14,6 @@ export class ALoginGuard implements CanActivate{
 
 	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable < boolean > | boolean {
 		if (this.sessService.LoggedIn == true) {
-			console.log("go to transcr from login");
 			this.router.navigate([ '/user/transcr' ]);
 			return false;
 		}

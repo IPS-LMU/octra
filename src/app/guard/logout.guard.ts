@@ -17,7 +17,6 @@ export class LogoutGuard implements CanActivate {
 			return true;
 		}
 		else {
-			console.log("go to tanscr from logout");
 			this.router.navigate(['/user/transcr']);
 		}
 		return false;

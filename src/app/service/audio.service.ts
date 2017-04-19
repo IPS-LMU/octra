@@ -176,7 +176,6 @@ export class AudioService {
 			this._audiocontext = new AudioContext();
 		}
 
-		console.log("init audio service");
 		this.afterloaded = new EventEmitter<any>();
 		this.statechange = new EventEmitter<string>();
 	}
@@ -297,7 +296,6 @@ export class AudioService {
 	 */
 	public loadAudio = (url: string, callback: any = () => {
 	}) => {
-		console.log("load audio method");
 		this.loaded = false;
 
 		let options = new RequestOptions({
@@ -320,17 +318,13 @@ export class AudioService {
 	}) => {
 		let samplerate = this.getSampleRate(result);
 		decodeAudioFile(result, samplerate).then((buffer) => {
-			console.log("Samplerate: " + samplerate);
-			console.log("Bits: " + this.getDataRate(result));
 
-			console.log("buffer " + buffer.length);
 			this._audiobuffer = buffer;
 			this.duration = new AudioTime(buffer.length, buffer.sampleRate);
 			this.gainNode = this.audiocontext.createGain();
 			this.source = this.getSource();
 
 			this.loaded = true;
-			console.log("loaded JAA");
 			this.afterloaded.emit({ status: "success", error: "" });
 			callback();
 		}, () => {

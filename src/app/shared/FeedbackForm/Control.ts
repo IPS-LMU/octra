@@ -54,7 +54,6 @@ export class Control {
 	}
 
 	public static fromAny(control:any):Control{
-		console.log(control);
 		return new Control(
 			control.name,
 			control.value,

@@ -58,7 +58,6 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 		if (!this.transcrService.segments && this.sessService.SampleRate) {
 			this.transcrService.loadSegments(this.sessService.SampleRate);
 		}
-		console.log(`groups: ${this.transcrService.feedback.groups.length}`);
 
 		if(isNullOrUndefined(this.sessService.feedback)) {
 			console.error("feedback is null!");
@@ -93,7 +92,6 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 
 		let json: any = this.transcrService.exportDataToJSON();
 
-		console.log("data id:" + json.id);
 		this.subscrmanager.add(this.api.saveSession(json.transcript, json.project, json.annotator, json.jobno, json.id, json.status, json.comment, json.quality, json.log)
 			.catch(this.onSendError)
 			.subscribe((result) => {
@@ -128,7 +126,6 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 
 	ngOnChanges(obj){
 		if(!isNullOrUndefined(obj.form)){
-			console.log(obj.form.newValue);
 		}
 
 		jQuery.material.init();
@@ -156,20 +153,15 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 	}
 
 	test(){
-		console.log(this.transcrService.feedback);
 	}
 
 	onControlValueChange(control:Control, value:any){
-		console.log(this.form);
 		let custom = {};
 		if(control.type.type === "checkbox"){
 			value = (value) ? control.value : "";
 			custom["checked"] = !control.custom["checked"];
 		}
-		console.log("set value of " + control.name);
-		console.log(value);
 		let result = this.transcrService.feedback.setValueForControl(control.name, value.toString(), custom);
-		console.log("ergebnis: " + result);
 	}
 
 	getLabelTranslation(languages:any, lang:string):string{

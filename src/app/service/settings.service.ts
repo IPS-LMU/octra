@@ -153,8 +153,6 @@ export class SettingsService {
 		if (audioService.audiocontext) {
 			this.subscrmanager.add(
 				audioService.afterloaded.subscribe((result)=>{
-					console.log("audio loaded settings");
-					console.log(audioService.audiobuffer.length);
 					this.audioloaded.emit(result);
 				})
 			);
@@ -195,7 +193,6 @@ export class SettingsService {
 				}
 			}
 		} else{
-			console.log("context bereits da");
 			this.audioloaded.emit({
 				result:"success"
 			});

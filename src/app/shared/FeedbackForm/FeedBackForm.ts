@@ -56,8 +56,6 @@ export class FeedBackForm {
 				}
 			}
 		}
-		console.log("hier:");
-		console.log(result);
 		return result;
 	}
 
@@ -102,9 +100,7 @@ export class FeedBackForm {
 				let control: Control = this.groups[ i ].controls[ j ];
 				if (control.name === name) {
 					if (control.type.type === "textarea") {
-						console.log("set text of textarea: " + value);
 						control.value = value;
-						console.log(control);
 						return true;
 					}
 					else {

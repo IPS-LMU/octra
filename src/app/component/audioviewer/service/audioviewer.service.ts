@@ -229,10 +229,8 @@ export class AudioviewerService extends AudioComponentService {
 				max_zoom_y_min = Math.min(max_zoom_y_min, minmaxarray[ i ]);
 			}
 			let rest = (height - timeline_height - (max_zoom_y + Math.abs(max_zoom_y_min)));
-			console.log("rest: " + rest);
 			if (max_zoom_y > 0) {
 				this._zoomY = (rest/(max_zoom_y + Math.abs(max_zoom_y_min))) + 1;
-				console.log("calc zoom: " + this._zoomY);
 
 				this._zoomX = width / max_zoom_x;
 			}

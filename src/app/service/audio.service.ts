@@ -5,6 +5,7 @@ import { AudioTime } from "../shared/AudioTime";
 import { decodeAudioFile } from "browser-signal-processing/ts/browser-signal-processing/browser-api/format-conversion";
 
 import { isNullOrUndefined } from "util";
+import { ObservableInput } from "rxjs/Observable";
 
 @Injectable()
 export class AudioService {
@@ -294,28 +295,25 @@ export class AudioService {
 	 *
 	 * audio data; for longer data, a MediaElementAudioSourceNode should be used.
 	 */
-	public loadAudio = (url: string, callback: any = () => {
-	}) => {
+	public loadAudio = (url: string, callback: any = () => {}, errorcallback?: (err:any) => void) =>{
 		this.loaded = false;
 
 		let options = new RequestOptions({
 			responseType: ResponseContentType.ArrayBuffer
 		});
 
-		let request = this.http.get(url, options)
-			.map(this.extractData)
-			.catch(this.handleError);
-
-		request.subscribe(
-			result => {
-				this.decodeAudio(result, callback)
+		let request = this.http.get(url, options).subscribe(
+			(result)=>{
+				this.decodeAudio(this.extractData(result), callback, errorcallback);
 			},
-			error => this.error = <any> error
+			error =>{
+				errorcallback(error);
+			}
 		);
 	};
 
 	public decodeAudio = (result: ArrayBuffer, callback: any = () => {
-	}) => {
+	}, errorcallback?: (any)=>void) => {
 		let samplerate = this.getSampleRate(result);
 		decodeAudioFile(result, samplerate).then((buffer) => {
 
@@ -329,6 +327,7 @@ export class AudioService {
 			callback();
 		}, () => {
 			this.loaded = false;
+			errorcallback({});
 			this.afterloaded.emit({ status: "error", error: "Error decoding audio file" });
 		})
 	};
@@ -389,6 +388,7 @@ export class AudioService {
 
 	private handleError(err: any) {
 		let errMsg = err;
+		console.log("err:");
 		console.error(errMsg); // log to console instead
 		return Observable.throw(errMsg);
 	}

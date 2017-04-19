@@ -82,7 +82,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 						console.log(this.audio.audiobuffer.length)
 						this.loadedchanged.emit(false);
 					} else{
-						alert("ERROR");
+						alert("ERROR: " + result.error);
 					}
 				}
 			)

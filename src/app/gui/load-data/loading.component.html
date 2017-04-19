@@ -1,11 +1,19 @@
 <div id="loading">
     <span id="logo">OCTRA</span>
     <div class="progress">
-        <div class="progress-bar" [ngStyle]="{
+        <div *ngIf="settService.log == ''" class="progress-bar" [ngStyle]="{
             width: (progress + '%')
-        }"></div>
+        }">
+        </div>
+        <div *ngIf="settService.log != ''" class="progress-bar" [ngStyle]="{
+            width: '100%',
+            'background-color': 'red'
+        }">
+        </div>
     </div>
-    <div class="description">
+    <div *ngIf="settService.log == ''" class="description">
       {{text}}
+    </div>
+    <div class="log" [innerHTML]="settService.log">
     </div>
 </div>

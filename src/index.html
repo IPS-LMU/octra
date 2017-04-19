@@ -1,37 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <base href="/">
-  <link rel="shortcut icon" type="image/x-icon" href="assets/img/default/favicon.ico">
-  <title>OCTRA</title>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script>
-      (function(){
-          var redirect = sessionStorage.redirect;
-          delete sessionStorage.redirect;
-          if (redirect && redirect != location.href) {
-              history.replaceState(null, null, redirect);
-          }
-      })();
-  </script>
+    <base href="/">
+    <link rel="shortcut icon" type="image/x-icon" href="assets/img/default/favicon.ico">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/bootstrap-material/css/bootstrap-material-design.min.css">
+    <link rel="stylesheet" href="assets/bootstrap-material/css/ripples.min.css">
+    <link rel="shortcut icon" type="image/x-icon" href="assets/img/default/favicon.ico">
+    <title>OCTRA</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    "../node_modules/jquery/dist/jquery.min.js",
+    <script src="assets/jquery/jquery.min.js" type="text/javascript"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="assets/bootstrap-material/js/material.min.js" type="text/javascript"></script>
+    <script src="assets/bootstrap-material/js/ripples.min.js" type="text/javascript"></script>
+    <script>
+        (function () {
+            var redirect = sessionStorage.redirect;
+            delete sessionStorage.redirect;
+            if (redirect && redirect != location.href) {
+                history.replaceState(null, null, redirect);
+            }
+        })();
+    </script>
+    <style>
+        #logo{
+            text-align:center;
+            width:100%;
+            display:block;
+            font-size:5em;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-weight: 300;
+        }
+    </style>
 </head>
 <!-- 3. Display the application -->
 <body>
 
 <octra>
-  <div id="loading" style="margin-top:50px; text-align:center">
-    <div style="display:block;">
-      <i class="fa fa-spinner fa-spin" style="font-size:64px"></i>
+    <div id="loading" style="margin-top:10%;">
+        <span id="logo">OCTRA</span>
+        <div class="progress">
+            <div class="progress-bar progress-animated" style="width:100%">
+            </div>
+        </div>
+        <div class="description" style="margin-top:20px;text-align:center;">
+            Please wait... OCTRA is loading...
+        </div>
+        <noscript>
+            <p style="text-align:center;color:red"> You need Javascript to use this Web-application</p>
+        </noscript>
     </div>
-    <div class="description">
-      Please wait... OCTRA is loading...
-    </div>
-    <noscript>
-      <p style="color:red"> You need Javascript to use this Web-application</p>
-    </noscript>
-  </div>
 </octra>
 </body>
 </html>

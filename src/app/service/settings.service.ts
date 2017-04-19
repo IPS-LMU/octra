@@ -11,9 +11,13 @@ import { TranscriptionService } from "./transcription.service";
 import { SessionService } from "./session.service";
 import { AudioService } from "./audio.service";
 import { isNullOrUndefined } from "util";
+import { Observable } from "rxjs/Observable";
 
 @Injectable()
 export class SettingsService {
+	get log(): string {
+		return this._log;
+	}
 	get filename(): string {
 		return this._filename;
 	}
@@ -57,6 +61,7 @@ export class SettingsService {
 	private _app_settings: any;
 	private _guidelines: any;
 	private _loaded:boolean = false;
+	private _log:string = "";
 
 	private _filename:string;
 
@@ -97,8 +102,9 @@ export class SettingsService {
 					console.error("config.json validation error.");
 				}
 			},
-			() => {
-				console.error("config.json not found. Please create this file in a folder named 'config'");
+			(error)=>{
+				console.log(error);
+				this._log += "Loading application config failed<br/>";
 			}
 		));
 
@@ -111,8 +117,9 @@ export class SettingsService {
 				this._projectsettings = result.json();
 				this.projectsettingsloaded.emit(this._projectsettings);
 			},
-			() => {
-				console.error("config.json not found. Please create this file in a folder named 'config'");
+			(error)=>{
+				console.log(error);
+				this._log += "Loading project config failed<br/>";
 			}
 		);
 	}
@@ -121,9 +128,14 @@ export class SettingsService {
 		return this.http.get(url).subscribe(
 			(response) => {
 				let guidelines = response.json();
+				console.log("guidelines loaded");
 				this._guidelines = guidelines;
 				this.loadValidationMethod(guidelines.meta.validation_url);
 				this.guidelinesloaded.emit(guidelines);
+			},
+			(error)=>{
+				console.log(error);
+				this._log += "Loading guidelines failed<br/>";
 			}
 		);
 	}
@@ -146,6 +158,11 @@ export class SettingsService {
 
 				this.validationmethodloaded.emit();
 			}
+			,
+			(error)=>{
+				console.log(error);
+				this._log += "Loading functions failed<br/>";
+			}
 		);
 	}
 
@@ -163,7 +180,10 @@ export class SettingsService {
 				this._filename = this.sessService.audio_url.substr(this.sessService.audio_url.lastIndexOf("/") + 1);
 				this._filename = this._filename.substr(0, this._filename.lastIndexOf("."));
 
-				audioService.loadAudio(src);
+				audioService.loadAudio(src,()=>{}, (err)=>{
+					let errMsg = err;
+					this._log += "Loading audio file failed<br/>";
+				});
 			}
 			else {
 				//offline mode

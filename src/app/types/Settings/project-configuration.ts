@@ -1,8 +1,13 @@
-import { Group } from "../FeedbackForm/Group";
+import { Group } from "../../shared/FeedbackForm/Group";
 
 export interface ProjectConfiguration {
 	version: string,
-	force_logging: boolean,
+	logging: {
+		enabled: boolean
+	},
+	navigation: {
+		"export": true
+	},
 	responsive: {
 		enabled: boolean,
 		fixedwidth: number

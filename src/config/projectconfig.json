@@ -5,109 +5,112 @@
     "enabled": true,
     "fixedwidth": 1200
   },
-  "agreement":{
+  "agreement": {
     "enabled": true,
     "text": {
       "de": "Das ist ein Test"
     }
   },
-  "languages":[
-    "de", "en"
+  "languages": [
+    "de",
+    "en"
   ],
-  "interfaces":[
+  "interfaces": [
     "editor without signaldisplay",
     "linear editor",
     "2D-Editor"
   ],
   "feedback_form": [
     {
-      "group": "Sprachverständlichkeit des Sprechers",
+      "title": {
+        "de": "Sprachverständlichkeit des Sprechers"
+      },
       "controls": [
         {
           "type": "radiobutton",
           "name": "quality-speaker",
-          "label": "unverständlich",
-          "value": "0",
-          "custom": {},
-          "required": true
-        },
-        {
-          "type": "radiobutton",
-          "label": "weniger verständlich",
-          "name": "quality-speaker",
-          "value": "1",
-          "custom": {},
-          "required": true
-        },
-        {
-          "type": "radiobutton",
-          "label": "verständlich",
-          "name": "quality-speaker",
-          "value": "2",
-          "custom": {},
-          "required": true
-        },
-        {
-          "type": "radiobutton",
-          "label": "sehr gut verständlich",
-          "name": "quality-speaker",
-          "value": "3",
-          "custom": {},
-          "required": true
-        }
-      ]
-    },
-    {
-      "group": "Qualität des Audiosignals",
-      "controls": [
-        {
-          "type": "radiobutton",
-          "name": "quality-audio",
-          "label": "viele Störgeräusche",
-          "value": "0",
-          "custom": {},
-          "required": true
-        },
-        {
-          "type": "radiobutton",
-          "label": "wenige Störgeräusche",
-          "name": "quality-audio",
-          "value": "1",
-          "custom": {},
-          "required": true
-        },
-        {
-          "type": "radiobutton",
-          "label": "sehr wenige Störgeräusche",
-          "name": "quality-audio",
-          "value": "2",
-          "custom": {},
-          "required": true
-        },
-        {
-          "type": "radiobutton",
-          "label": "keine Störgeräusche",
-          "name": "quality-audio",
-          "value": "3",
-          "custom": {},
-          "required": true
-        }
-      ]
-    },
-    {
-      "group": "",
-      "controls": [
-        {
-          "type": "textarea",
-          "name": "comment",
-          "label": "Kurzer Kommentar  (Anmerkungen zum Arbeitsablauf, Ladezeiten, Schwierigkeiten etc.)",
-          "value": "",
-          "validation": "",
-          "custom": {
-            "minlength": 0,
-            "maxlength": 100,
-            "validation": ""
+          "label": {
+            "de": "unverständlich"
           },
+          "value": "0",
+          "custom": {},
+          "required": true
+        },
+        {
+          "type": "radiobutton",
+          "label": {
+            "de": "weniger verständlich"
+          },
+          "name": "quality-speaker",
+          "value": "1",
+          "custom": {},
+          "required": true
+        },
+        {
+          "type": "radiobutton",
+          "label": {
+            "de": "verständlich"
+          },
+          "name": "quality-speaker",
+          "value": "2",
+          "custom": {},
+          "required": true
+        },
+        {
+          "type": "radiobutton",
+          "label": {
+            "de": "sehr gut verständlich"
+          },
+          "name": "quality-speaker",
+          "value": "3",
+          "custom": {},
+          "required": true
+        }
+      ]
+    },
+    {
+      "title": {
+        "de": "Qualität des Audiosignals"
+      },
+      "controls": [
+        {
+          "type": "radiobutton",
+          "name": "quality-audio",
+          "label": {
+            "de": "viele Störgeräusche"
+          },
+          "value": "0",
+          "custom": {},
+          "required": true
+        },
+        {
+          "type": "radiobutton",
+          "label": {
+            "de": "wenige Störgeräusche"
+          },
+          "name": "quality-audio",
+          "value": "1",
+          "custom": {},
+          "required": true
+        },
+        {
+          "type": "radiobutton",
+          "label": {
+            "de": "sehr wenige Störgeräusche"
+          },
+          "name": "quality-audio",
+          "value": "2",
+          "custom": {},
+          "required": true
+        },
+        {
+          "type": "radiobutton",
+          "label": {
+            "de": "keine Störgeräusche"
+          },
+          "name": "quality-audio",
+          "value": "3",
+          "custom": {},
           "required": true
         }
       ]

@@ -20,10 +20,15 @@
     margin-right:10px;
 }
 
-.radio{
+.radio,
+.checkbox{
     display:inline;
 }
 
 textarea{
     width:100%;
+}
+
+.required_marker{
+    color:red;
 }

@@ -20,6 +20,7 @@ import { SubscriptionManager } from "../../shared";
 import { TranslateService } from "@ngx-translate/core";
 import { SettingsService } from "../../service/settings.service";
 import { isNullOrUndefined } from "util";
+import { Control } from "../../shared/FeedbackForm/Control";
 
 
 @Component({
@@ -31,6 +32,7 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 
 	@ViewChild('modal') modal: ModalComponent;
 	@ViewChild('modal2') modal2: ModalComponent;
+	@ViewChild('fo') form: NgForm;
 
 	constructor(public sessService: SessionService,
 				public router: Router,
@@ -46,29 +48,20 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 		this.subscrmanager = new SubscriptionManager();
 	}
 
-	private feedback_data = {};
-
 	private send_ok = false;
 	public send_error: string = "";
 	private subscrmanager: SubscriptionManager;
 
+	public t:string = "";
+
 	ngOnInit() {
-		console.log(this.feedback_data);
 		if (!this.transcrService.segments && this.sessService.SampleRate) {
 			this.transcrService.loadSegments(this.sessService.SampleRate);
 		}
-		if(isNullOrUndefined(this.sessService.feedback)) {
-			// init feedback_data
-			for(let i = 0; i < this.settingsService.projectsettings.feedback_form.length; i++){
-				let group = this.settingsService.projectsettings.feedback_form[i];
+		console.log(`groups: ${this.transcrService.feedback.groups.length}`);
 
-				for(let j = 0; j < group.controls.length; j++){
-					let control = group.controls[j];
-					this.feedback_data["" + control.name + ""] = "";
-				}
-			}
-		} else{
-			this.feedback_data = this.sessService.feedback;
+		if(isNullOrUndefined(this.sessService.feedback)) {
+			console.error("feedback is null!");
 		}
 
 		this.navbarServ.show_hidden = false;
@@ -78,19 +71,18 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 		return this.send_ok;
 	}
 
-	abort() {
-		this.router.navigate([ '/logout' ]);
-	}
+	public back() {
+		this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, "\s");
+		this.sessService.comment = this.transcrService.feedback.comment;
 
-	private back() {
-		//this.feedback_data.comment = this.feedback_data.comment.replace(/(<)|(\/>)|(>)/g, "\s");
-		this.sessService.save("feedback", this.feedback_data);
+		this.sessService.save("feedback", this.transcrService.feedback.exportData());
 		this.router.navigate([ '/user/transcr' ]);
 	}
 
 	onSubmit(form: NgForm) {
-		//this.feedback_data.comment = this.feedback_data.comment.replace(/(<)|(\/>)|(>)/g, "\s");
-		this.sessService.save("feedback", this.feedback_data);
+		this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, "\s");
+		this.sessService.comment = this.transcrService.feedback.comment;
+		this.sessService.save("feedback", this.transcrService.feedback.exportData());
 		this.modal.open();
 	}
 
@@ -135,10 +127,10 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 	}
 
 	ngOnChanges(obj){
-		if(!isNullOrUndefined(obj.feedback_data)){
-			console.log("change of feedback:");
-			console.log(obj.feedback_data.newValue);
+		if(!isNullOrUndefined(obj.form)){
+			console.log(obj.form.newValue);
 		}
+
 		jQuery.material.init();
 	}
 
@@ -164,6 +156,29 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 	}
 
 	test(){
-		console.log(this.feedback_data);
+		console.log(this.transcrService.feedback);
+	}
+
+	onControlValueChange(control:Control, value:any){
+		console.log(this.form);
+		let custom = {};
+		if(control.type.type === "checkbox"){
+			value = (value) ? control.value : "";
+			custom["checked"] = !control.custom["checked"];
+		}
+		console.log("set value of " + control.name);
+		console.log(value);
+		let result = this.transcrService.feedback.setValueForControl(control.name, value.toString(), custom);
+		console.log("ergebnis: " + result);
+	}
+
+	getLabelTranslation(languages:any, lang:string):string{
+		if(isNullOrUndefined(languages[lang])){
+			for(let attr in languages){
+				//take first
+				return languages[attr];
+			}
+		}
+		return languages[lang];
 	}
 }

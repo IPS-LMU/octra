@@ -5,6 +5,12 @@ import { isNullOrUndefined } from "util";
 
 @Injectable()
 export class SessionService {
+	set comment(value: string) {
+		this._comment = value;
+	}
+	get comment(): string {
+		return this._comment;
+	}
 	get easymode(): boolean {
 		return this._easymode;
 	}
@@ -110,6 +116,7 @@ export class SessionService {
 	@LocalStorage() member_project: string;
 	@LocalStorage() member_jobno: string;
 	@LocalStorage('easymode') private _easymode: boolean;
+	@LocalStorage('comment') private _comment: string;
 
 	//is user on the login page?
 	private login: boolean;

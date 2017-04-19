@@ -16,9 +16,13 @@ import { SettingsService } from "./settings.service";
 import { isNullOrUndefined } from "util";
 import { Http, Response } from "@angular/http";
 import { Observable, Subscription } from "rxjs";
+import { FeedBackForm } from "../shared/FeedbackForm/FeedBackForm";
 
 @Injectable()
 export class TranscriptionService {
+	get feedback(): FeedBackForm {
+		return this._feedback;
+	}
 	set break_marker(value: any) {
 		this._break_marker = value;
 	}
@@ -67,11 +71,7 @@ export class TranscriptionService {
 
 	public filename: string = "";
 
-	private feedback: any = {
-		quality_speaker: "",
-		quality_audio  : "",
-		comment        : ""
-	};
+	private _feedback: FeedBackForm;
 
 	private _break_marker:any = null;
 
@@ -168,11 +168,19 @@ export class TranscriptionService {
 
 		this.segments = new Segments(sample_rate, this.sessServ.transcription, this._last_sample);
 
-		if (!this.sessServ.feedback) {
+		//load feedback form data
+		if (isNullOrUndefined(this.sessServ.feedback)) {
 			this.sessServ.feedback = {};
 		}
 
-		this.feedback = this.sessServ.feedback;
+		this._feedback = FeedBackForm.fromAny(this.settingsService.projectsettings.feedback_form, this.sessServ.comment);
+		this._feedback.importData(this.sessServ.feedback);
+
+		if (isNullOrUndefined(this.sessServ.comment)) {
+			this.sessServ.comment = "";
+		} else{
+			this._feedback.comment = this.sessServ.comment;
+		}
 
 		if (this.sessServ.logs == null) {
 			this.sessServ.logs = [];
@@ -193,13 +201,10 @@ export class TranscriptionService {
 				project   : (isNullOrUndefined(this.sessServ.member_project)) ? "NOT AVAILABLE" : this.sessServ.member_project ,
 				annotator : (isNullOrUndefined(this.sessServ.member_id)) ? "NOT AVAILABLE" : this.sessServ.member_id,
 				transcript: null,
-				comment   : this.feedback.comment,
+				comment   : this._feedback.comment,
 				jobno:	(isNullOrUndefined(this.sessServ.member_jobno)) ? "NOT AVAILABLE" : this.sessServ.member_jobno,
 				status    : this.state,
-				quality   : {
-					quality_audio  : this.feedback.quality_audio,
-					quality_speaker: this.feedback.quality_speaker
-				},
+				quality   : this._feedback.exportData(),
 				id        : this.sessServ.data_id,
 				log       : log_data
 			};

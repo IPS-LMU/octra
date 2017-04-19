@@ -118,8 +118,9 @@ export class LoadingComponent implements OnInit, OnDestroy {
 		}
 
 		if(isNullOrUndefined(this.settService.guidelines)){
+			let language = this.langService.currentLang;
 			this.subscrmanager.add(
-				this.settService.loadGuidelines(this.sessionService.language, "./guidelines/guidelines_" + this.sessionService.language +".json")
+				this.settService.loadGuidelines(this.sessionService.language, "./guidelines/guidelines_" + language +".json")
 			);
 		} else{
 			this.loadedtable.guidelines = true;

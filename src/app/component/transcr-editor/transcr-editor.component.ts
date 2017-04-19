@@ -31,7 +31,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	private _settings: TranscrEditorConfig;
 	private subscrmanager: SubscriptionManager;
 	private init: number = 0;
-	public focused:boolean = false;
+	public focused: boolean = false;
 
 	@Input() visible: boolean = true;
 	@Input() markers: any = true;
@@ -82,15 +82,15 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	}
 
 	ngOnChanges(obj) {
-		let renew:boolean = false;
-		if (!isNullOrUndefined(obj.markers) && obj.markers.previousValue != obj.markers.newValue){
+		let renew: boolean = false;
+		if (!isNullOrUndefined(obj.markers) && obj.markers.previousValue != obj.markers.newValue) {
 			renew = true;
 		}
-		if (!isNullOrUndefined(obj.easymode) && obj.easymode.previousValue != obj.easymode.newValue){
+		if (!isNullOrUndefined(obj.easymode) && obj.easymode.previousValue != obj.easymode.newValue) {
 			renew = true;
 		}
 
-		if(renew){
+		if (renew) {
 			let navigation = this.initNavigation();
 
 			this.textfield.summernote('destroy');
@@ -211,11 +211,12 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
 					if (this.init == 1) {
 						this.focus(true);
-					} else if(this.init > 1){
+					}
+					else if (this.init > 1) {
 						this.textfield.summernote("restoreRange");
 					}
 				},
-				onBlur: () =>{
+				onBlur   : () => {
 				}
 			}
 		});
@@ -251,12 +252,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	createButton(marker): any {
 		let platform = BrowserInfo.platform;
 		let icon = "";
-		if(!this.easymode) {
+		if (!this.easymode) {
 			icon = "<img src='" + marker.icon_url + "' class='btn-icon' style='height:16px;'/> <span class='btn-description'>" + marker.button_text + "</span><span class='btn-shortcut'> [" + marker.shortcut[ platform ] + "]</span>";
 			if (this.Settings.responsive) {
 				icon = "<img src='" + marker.icon_url + "' class='btn-icon' style='height:16px;'/> <span class='btn-description hidden-xs hidden-sm'>" + marker.button_text + "</span><span class='btn-shortcut hidden-xs hidden-sm hidden-md'> [" + marker.shortcut[ platform ] + "]</span>";
 			}
-		} else {
+		}
+		else {
 			icon = "<img src='" + marker.icon_url + "' class='btn-icon' style='height:16px;'/>";
 		}
 		// create button
@@ -415,7 +417,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 					let s1 = (g1) ? g1 : "";
 					let s2 = (g2) ? g2 : "";
 					let s3 = (g3) ? g3 : "";
-					return s1 + "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "' alt='"+ marker.code + "'/>" + s3;
+					return s1 + "<img src='" + marker.icon_url + "' class='btn-icon-text' style='height:16px;' data-marker-code='" + marker.code + "' alt='" + marker.code + "'/>" + s3;
 				};
 
 				result = result.replace(regex, replace_func);
@@ -434,11 +436,17 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	 */
 	public focus = (later: boolean = false) => {
 		this.focused = true;
+
 		let func = () => {
-			if (this.rawText != "") {
-				Functions.placeAtEnd(jQuery('.note-editable.panel-body')[ 0 ]);
+			try {
+				if (this.rawText != "") {
+					Functions.placeAtEnd(jQuery('.note-editable.panel-body')[ 0 ]);
+				}
+				this.textfield.summernote('focus');
 			}
-			this.textfield.summernote('focus');
+			catch (exception) {
+				//ignore errors
+			}
 		};
 
 		if (later) {
@@ -458,7 +466,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 	 * @param raw
 	 * @returns {string}
 	 */
-	private tidyUpRaw(raw: string):string {
+	private tidyUpRaw(raw: string): string {
 		return tidyUpAnnotation(raw, this.transcrService.guidelines);
 	}
 
@@ -500,15 +508,15 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
 		if (validation.length > 0) {
 			for (let i = 0; i < validation.length; i++) {
-				if(!puffer.hasOwnProperty("p" + validation[i].start)){
-					puffer["p" + validation[i].start] = ""
+				if (!puffer.hasOwnProperty("p" + validation[ i ].start)) {
+					puffer[ "p" + validation[ i ].start ] = ""
 				}
-				if(!puffer.hasOwnProperty("p" + (validation[i].start + validation[i].length))){
-					puffer["p" + (validation[i].start + validation[i].length)] = ""
+				if (!puffer.hasOwnProperty("p" + (validation[ i ].start + validation[ i ].length))) {
+					puffer[ "p" + (validation[ i ].start + validation[ i ].length) ] = ""
 				}
 
-				puffer["p" + validation[i].start] += "<div class='error_underline'>";
-				puffer["p" + (validation[i].start + validation[i].length)] = "</div>" + puffer["p" + (validation[i].start + validation[i].length)];
+				puffer[ "p" + validation[ i ].start ] += "<div class='error_underline'>";
+				puffer[ "p" + (validation[ i ].start + validation[ i ].length) ] = "</div>" + puffer[ "p" + (validation[ i ].start + validation[ i ].length) ];
 			}
 		}
 		return result;

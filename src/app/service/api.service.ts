@@ -48,12 +48,35 @@ export class APIService implements API {
 	public fetchAnnotation(id: number): Observable<Response> {
 		let cmd_json = {
 			querytype: "fetchannotation",
-			project  : "",
-			annotator: "",
-			jobno    : 0,
 			id       : id
 		};
 		return this.post(cmd_json);
+	}
+
+	public lockSession(transcript: any[], project: string, annotator: string, jobno: number, data_id: number, comment: string, quality: any, log: any[]): Observable<Response> {
+		if (
+			project != "" &&
+			transcript.length > 0 &&
+			quality != null
+		) {
+			let cmd_json = {
+				querytype : "continueannotation",
+				transcript: JSON.stringify(transcript),
+				project   : "transcription",
+				annotator : annotator,
+				comment   : comment,
+				jobno     : jobno,
+				status    : "BUSY",
+				quality   : JSON.stringify(quality),
+				id        : data_id,
+				log       : log
+			};
+
+			return this.post(cmd_json);
+		}
+		else {
+			throw "saveSession - validation false";
+		}
 	}
 
 	public saveSession(transcript: any[], project: string, annotator: string, jobno: number, data_id: number, status: string, comment: string, quality: any, log: any[]): Observable<Response> {

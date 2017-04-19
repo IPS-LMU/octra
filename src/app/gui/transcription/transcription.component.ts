@@ -179,7 +179,19 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	}
 
 	abortTranscription = () => {
-		this.router.navigate([ '/logout' ]);
+		let json: any = this.transcrService.exportDataToJSON();
+
+		if(!this.sessService.offline) {
+			this.api.lockSession(json.transcript, json.project, json.annotator, json.jobno, json.id, json.comment, json.quality, json.log)
+				.subscribe((result) => {
+						setTimeout(() => {
+							this.router.navigate([ '/logout' ]);
+						}, 500);
+					}
+				);
+		} else{
+			this.router.navigate([ '/logout' ]);
+		}
 	};
 
 	ngAfterContentInit() {
@@ -240,7 +252,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
 	test(){
 		this.subscrmanager.add(
-			this.api.fetchAnnotation(101127708).subscribe(
+			this.api.fetchAnnotation(this.sessService.data_id).subscribe(
 				(result)=>{
 					console.log(result.json());
 				}

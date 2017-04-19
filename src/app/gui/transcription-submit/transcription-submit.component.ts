@@ -96,6 +96,7 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 			.catch(this.onSendError)
 			.subscribe((result) => {
 					if (result != null && result.hasOwnProperty("statusText") && result.statusText === "OK") {
+						console.log("gesendet mit id" + json.id);
 						this.sessService.submitted = true;
 						this.modal2.close();
 						setTimeout(() => {

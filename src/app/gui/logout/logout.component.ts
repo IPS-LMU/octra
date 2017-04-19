@@ -2,6 +2,9 @@ import { Component, OnInit} from '@angular/core';
 
 import { LogoutService } from "../../service/logout.service";
 import { Router } from "@angular/router";
+import { APIData } from "../../shared/APIData";
+import { APIService } from "../../service/api.service";
+import { TranscriptionService } from "../../service/transcription.service";
 
 @Component({
 

@@ -17,7 +17,7 @@ import { BrowserCheck } from "../../shared/BrowserCheck";
 import { SessionFile } from "../../shared/SessionFile";
 import { OCTRANIMATIONS } from "../../shared/OCTRAnimations";
 import { DropZoneComponent } from "../../component/drop-zone/drop-zone.component";
-import { isArray, isNullOrUndefined } from "util";
+import { isArray, isNullOrUndefined, isNumber } from "util";
 import { SubscriptionManager } from "../../shared";
 import { Http } from "@angular/http";
 import { SettingsService } from "../../service/settings.service";
@@ -102,33 +102,98 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	}
 
 	onSubmit(form: NgForm) {
-		this.subscrmanager.add(this.api.beginSession(this.member.project, this.member.id, Number(this.member.jobno)).catch((error) => {
-			alert("Fehler beim Aufbau der Verbindung.");
-			return Observable.throw(error);
-		}).subscribe(
-			(result) => {
-				let json = result.json();
-				if (form.valid && this.agreement_checked && this.loginService.checkLoginData(this.member.id)
-					&& json.message !== "0"
-				) {
-					if(this.sessionService.sessionfile != null){
-						//last was online mode
-						this.sessionService.logs = null;
-						this.sessionService.transcription = null;
-						this.sessionService.data_id = null;
-						this.sessionService.sessionfile = null;
+		let new_session = false;
+		let continue_session = false;
+
+		if(this.sessionService.sessionfile != null){
+			//last was offline mode, begin new Session
+			new_session = true;
+		} else{
+			if(!isNullOrUndefined(this.sessionService.data_id) && isNumber(this.sessionService.data_id)){
+				//last session was online session
+				//check if credentials are available
+				if(
+					!isNullOrUndefined(this.sessionService.member_project) &&
+					!isNullOrUndefined(this.sessionService.member_jobno) &&
+					!isNullOrUndefined(this.sessionService.member_id)
+				){
+					//check if credentials aret the same like before
+					if(
+						this.sessionService.member_id === this.member.id &&
+						this.sessionService.member_jobno === this.member.jobno.toString() &&
+						this.sessionService.member_project === this.member.project
+					){
+						continue_session = true;
+					} else{
+						new_session = true;
 					}
-					let res = this.sessionService.setSessionData(this.member, json.data.id, json.data.url);
-					if (res.error === "")
-						this.navigate();
-					else
-						alert(res.error);
 				}
-				else {
-					this.modService.show("login_invalid");
-				}
+			} else {
+				new_session = true;
 			}
-		));
+		}
+
+		if(new_session) {
+			console.log("new session");
+			this.subscrmanager.add(this.api.beginSession(this.member.project, this.member.id, Number(this.member.jobno)).catch((error) => {
+				alert("Server cannot be requested. Please check if you are online.");
+				return Observable.throw(error);
+			}).subscribe(
+				(result) => {
+					let json = result.json();
+					console.log(json);
+					if (form.valid && this.agreement_checked && this.loginService.checkLoginData(this.member.id)
+						&& json.message !== "0"
+					) {
+						if (this.sessionService.sessionfile != null) {
+							//last was offline mode
+							this.sessionService.logs = null;
+							this.sessionService.transcription = null;
+							this.sessionService.data_id = null;
+							this.sessionService.sessionfile = null;
+						}
+						let res = this.sessionService.setSessionData(this.member, json.data.id, json.data.url);
+						if (res.error === "")
+							this.navigate();
+						else
+							alert(res.error);
+					}
+					else {
+						this.modService.show("login_invalid");
+					}
+				}
+			));
+		} else if(continue_session) {
+			console.log("continue session");
+			this.subscrmanager.add(this.api.fetchAnnotation(this.sessionService.data_id).catch((error) => {
+				alert("Server cannot be requested. Please check if you are online.");
+				return Observable.throw(error);
+			}).subscribe(
+				(result) => {
+					let json = result.json();
+					console.log(json);
+					if (form.valid && this.agreement_checked && this.loginService.checkLoginData(this.member.id)
+						&& json.message !== "0"
+					) {
+						if (this.sessionService.sessionfile != null) {
+							//last was offline mode
+							this.sessionService.logs = null;
+							this.sessionService.transcription = null;
+							this.sessionService.data_id = null;
+							this.sessionService.sessionfile = null;
+						}
+						let res = this.sessionService.setSessionData(this.member, json.data.id, json.data.url);
+						if (res.error === "")
+							this.navigate();
+						else
+							alert(res.error);
+					}
+					else {
+						this.modService.show("login_invalid");
+					}
+				}
+			));
+		}
 	}
 
 	onOfflineSubmit = (form: NgForm) => {

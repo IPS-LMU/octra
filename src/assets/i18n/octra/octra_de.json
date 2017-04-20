@@ -149,10 +149,6 @@
     "selection text": "Bitte wählen Sie ein Segment aus, indem Sie mit der Maus über den Signalausschnitt fahren und die {{value}} Taste betätigen."
   },
   "transcription-submit":{
-    "finish transcription": "Sie möchten die Transkription dieser Audiodatei abschließen? Stellen Sie bitte folgende Punkte sicher:",
-    "boundaries": "Falls verfügbar: Wurden Segmentgrenzen möglichst genau gesetzt?",
-    "breaks": "Wurden alle definierten Segmente auf Inhalt/Pausen überprüft?",
-    "markers": "Wurden Marker gesetzt?",
     "overview": "Folgende Tabelle zeigt Ihnen einen Überblick über Ihre definierten Segmente:",
     "form fill out": "Bitte füllen Sie kurz das Formular aus",
     "intelligibility of the speaker": "Sprachverständlichkeit des Sprechers",
@@ -167,7 +163,7 @@
     "transcription sent": "Transkription wurde übertragen.",
     "transcription sent successfully": "Ihre Transkription wurde erfolgreich übertragen.",
     "want to do": "Was wollen Sie tun?",
-    "quit": "Beenden und abmelden",
+    "quit": "Beenden und Abmelden",
     "next transcription": "Jetzt nächste Transkription durchführen"
   }
 }

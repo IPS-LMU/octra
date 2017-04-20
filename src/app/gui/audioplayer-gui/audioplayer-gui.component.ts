@@ -47,7 +47,7 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 				public keyMap: KeymappingService,
 				public transcrService: TranscriptionService,
 				private uiService: UserInteractionsService,
-				private settingsService:SettingsService,
+				public settingsService:SettingsService,
 				public sessService:SessionService
 	) {
 		this.subscrmanager = new SubscriptionManager();

@@ -147,10 +147,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 					) {
 						if (this.sessionService.sessionfile != null) {
 							//last was offline mode
-							this.sessionService.logs = null;
-							this.sessionService.transcription = null;
-							this.sessionService.data_id = null;
-							this.sessionService.sessionfile = null;
+							this.sessionService.clearLocalStorage();
 						}
 						let res = this.sessionService.setSessionData(this.member, json.data.id, json.data.url);
 						if (res.error === "")
@@ -177,10 +174,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 					) {
 						if (this.sessionService.sessionfile != null) {
 							//last was offline mode
-							this.sessionService.logs = null;
-							this.sessionService.transcription = null;
-							this.sessionService.data_id = null;
-							this.sessionService.sessionfile = null;
+							this.sessionService.clearLocalStorage();
 						}
 						let res = this.sessionService.setSessionData(this.member, json.data.id, json.data.url);
 						if (res.error === "")

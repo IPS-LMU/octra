@@ -30,7 +30,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 	public progress: number = 0;
 
 	constructor(private langService: TranslateService,
-				private settService: SettingsService,
+				public settService: SettingsService,
 				private sessionService: SessionService,
 				public audio: AudioService,
 				private router: Router) {

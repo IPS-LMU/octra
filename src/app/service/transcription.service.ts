@@ -112,7 +112,7 @@ export class TranscriptionService {
 				private http: Http) {
 		this.subscrmanager = new SubscriptionManager();
 
-		if (this.projectsettings.logging.forced) {
+		if (!isNullOrUndefined(this.projectsettings) && this.projectsettings.logging.forced) {
 			this.subscrmanager.add(this.audio.statechange.subscribe((state) => {
 				this.uiService.addElementFromEvent("audio_" + state, { value: state }, Date.now(), "audio");
 			}));

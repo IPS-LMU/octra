@@ -219,6 +219,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 			this.api.lockSession(json.transcript, json.project, json.annotator, json.jobno, json.id, json.comment, json.quality, json.log)
 				.subscribe((result) => {
 						setTimeout(() => {
+							this.settingsService.clearSettings();
 							this.router.navigate([ '/logout' ]);
 						}, 500);
 					}

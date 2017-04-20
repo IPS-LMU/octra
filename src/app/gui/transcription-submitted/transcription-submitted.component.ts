@@ -8,6 +8,7 @@ import { ModalComponent } from "ng2-bs3-modal/components/modal";
 import { AudioService } from "../../service/audio.service";
 import { SubscriptionManager } from "../../shared";
 import { isNullOrUndefined } from "util";
+import { SettingsService } from "../../service/settings.service";
 
 
 @Component({
@@ -25,7 +26,9 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
 				private tranService: TranscriptionService,
 				private uiService: UserInteractionsService,
 				private api: APIService,
-				private audio: AudioService) {
+				private audio: AudioService,
+				private settService: SettingsService
+	) {
 		this.subscrmanager = new SubscriptionManager();
 	}
 
@@ -40,11 +43,8 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
 	}
 
 	leave() {
-		this.sessService.submitted = false;
-		this.audio.audiobuffer = null;
+		this.clearData();
 		this.sessService.clearLocalStorage();
-		if(!isNullOrUndefined(this.tranService))
-			this.tranService.segments.clear();
 		this.router.navigate([ '/logout' ]);
 	}
 
@@ -55,19 +55,13 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
 					let json = result.json();
 
 					if (json.data && json.data.hasOwnProperty("url") && json.data.hasOwnProperty("id")) {
-						this.sessService.submitted = false;
-						this.audio.audiobuffer = null;
-						this.sessService.transcription = [];
-
-						if(!isNullOrUndefined(this.tranService))
-							this.tranService.segments.clear();
-
-						this.sessService.feedback = null;
-						this.sessService.logs = [];
-						this.uiService.elements = [];
-
+						this.clearData();
 						this.sessService.audio_url = json.data.url;
 						this.sessService.data_id = json.data.id;
+
+						console.log("data id zugewiesen: " + this.sessService.data_id);
+						console.log("return: ");
+						console.log(json);
 
 						this.router.navigate([ '/user/load' ]);
 					}
@@ -80,5 +74,20 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
 
 	openSuccessModal() {
 		this.success_modal.open();
+	}
+
+	clearData(){
+		this.sessService.submitted = false;
+		this.audio.audiobuffer = null;
+		this.sessService.transcription = [];
+
+		if(!isNullOrUndefined(this.tranService) && !isNullOrUndefined(this.tranService.segments))
+			this.tranService.segments.clear();
+
+		this.sessService.feedback = null;
+		this.sessService.comment = "";
+		this.sessService.logs = [];
+		this.uiService.elements = [];
+		this.settService.clearSettings();
 	}
 }

@@ -262,4 +262,11 @@ export class SettingsService {
 	public destroy() {
 		this.subscrmanager.destroy();
 	}
+
+	public clearSettings(){
+		this._guidelines = null;
+		this._projectsettings = null;
+		this._validationmethod = null;
+		this._tidyUpMethod = null;
+	}
 }

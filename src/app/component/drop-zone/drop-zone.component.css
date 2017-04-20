@@ -4,6 +4,7 @@
     padding: 20px;
     min-height:100px;
     text-align:center;
+    width:100%;
 }
 
 .dropzone:hover{

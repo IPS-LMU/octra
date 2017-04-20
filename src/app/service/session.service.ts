@@ -5,6 +5,13 @@ import { isNullOrUndefined } from "util";
 
 @Injectable()
 export class SessionService {
+	get agreement(): any{
+		return this._agreement;
+	}
+
+	set agreement(value: any) {
+		this._agreement = value;
+	}
 	set comment(value: string) {
 		this._comment = value;
 	}
@@ -117,6 +124,7 @@ export class SessionService {
 	@LocalStorage() member_jobno: string;
 	@LocalStorage('easymode') private _easymode: boolean;
 	@LocalStorage('comment') private _comment: string;
+	@LocalStorage('agreement') private _agreement: any;
 
 	//is user on the login page?
 	private login: boolean;
@@ -184,7 +192,7 @@ export class SessionService {
 	}
 
 	constructor(private sessStr: SessionStorageService,
-				private localStr: LocalStorageService) {
+				public localStr: LocalStorageService) {
 	}
 
 	/**

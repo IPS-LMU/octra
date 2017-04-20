@@ -116,7 +116,16 @@ export class LoadingComponent implements OnInit, OnDestroy {
 						this.subscrmanager.remove(id);
 						console.log("LEAVE");
 						setTimeout(() => {
-							this.router.navigate([ "/user/transcr" ])
+							if((isNullOrUndefined(this.sessionService.agreement)
+									|| isNullOrUndefined(this.sessionService.agreement[this.sessionService.member_project]) ||
+									!this.sessionService.agreement[this.sessionService.member_project]
+								)
+							&& this.settService.projectsettings.agreement.enabled && !this.sessionService.offline)
+							{
+								this.router.navigate([ "/user/agreement" ]);
+							} else{
+								this.router.navigate([ "/user/transcr" ]);
+							}
 						}, 500);
 					}
 				}

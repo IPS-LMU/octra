@@ -134,14 +134,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 		}
 
 		if(new_session) {
-			console.log("new session");
 			this.subscrmanager.add(this.api.beginSession(this.member.project, this.member.id, Number(this.member.jobno)).catch((error) => {
 				alert("Server cannot be requested. Please check if you are online.");
 				return Observable.throw(error);
 			}).subscribe(
 				(result) => {
 					let json = result.json();
-					console.log(json);
 					if (form.valid && this.agreement_checked && this.loginService.checkLoginData(this.member.id)
 						&& json.message !== "0"
 					) {
@@ -161,14 +159,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 				}
 			));
 		} else if(continue_session) {
-			console.log("continue session");
 			this.subscrmanager.add(this.api.fetchAnnotation(this.sessionService.data_id).catch((error) => {
 				alert("Server cannot be requested. Please check if you are online.");
 				return Observable.throw(error);
 			}).subscribe(
 				(result) => {
 					let json = result.json();
-					console.log(json);
 					if (form.valid && this.agreement_checked && this.loginService.checkLoginData(this.member.id)
 						&& json.message !== "0"
 					) {

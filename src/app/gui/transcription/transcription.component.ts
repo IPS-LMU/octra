@@ -158,14 +158,11 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		this.transcrService.load();
 		this.transcrService.guidelines = this.settingsService.guidelines;
 
-		console.log("check init " + this.langService.currentLang + " == " + this.transcrService.guidelines.meta.language);
 		if(this.langService.currentLang !== this.transcrService.guidelines.meta.language){
 			//reload guidelines
-			console.log("reload guidelines");
 			this.subscrmanager.add(
 				this.settingsService.guidelinesloaded.subscribe(
 					(guidelines)=>{
-						console.log("guidelines reloaded");
 						this.transcrService.guidelines = guidelines
 					}
 				)
@@ -203,7 +200,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		if(isNullOrUndefined(this.projectsettings.interfaces.find((x)=>{
 				return this.sessService.Interface === x;
 			}))){
-			console.log("change interface " + this.sessService.Interface + " == ");
 			this.sessService.Interface = this.projectsettings.interfaces[0];
 		}
 

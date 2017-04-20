@@ -82,7 +82,6 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 
 		this.saveForm();
 		this.sessService.save("feedback", this.transcrService.feedback.exportData());
-		console.log(this.transcrService.feedback.exportData());
 		this.router.navigate([ '/user/transcr' ]);
 	}
 

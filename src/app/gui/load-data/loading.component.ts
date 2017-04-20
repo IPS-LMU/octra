@@ -112,9 +112,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 						&& this.loadedtable.methods
 						&& this.loadedtable.audio
 					) {
-						console.log("All loaded!");
 						this.subscrmanager.remove(id);
-						console.log("LEAVE");
 						setTimeout(() => {
 							if((isNullOrUndefined(this.sessionService.agreement)
 									|| isNullOrUndefined(this.sessionService.agreement[this.sessionService.member_project]) ||

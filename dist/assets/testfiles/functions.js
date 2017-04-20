@@ -1,7 +1,7 @@
 /**
  * this is a test validation method to show how validation could work.
  * @param annotation
- * @returns {{position: number, length: number, code: string}}
+ * @returns {{start: number, length: number, code: string}}
  */
 function validateAnnotation(annotation, guidelines) {
     let result = [];
@@ -40,10 +40,40 @@ function validateAnnotation(annotation, guidelines) {
         });
     }
 
+    //the next line has to be before returning the result
     result = sortValidationResult(result);
     return result;
 }
 
+/**
+ * method that is called before annotation was saved
+ * @param annotation
+ * @param guidelines
+ * @returns string
+ */
+function tidyUpAnnotation(annotation, guidelines) {
+    let result = annotation;
+
+    result = result.replace(/\[[~^a-z0-9]+\]/g, function (x) {
+        return " " + x + " ";
+    });
+    //set whitespaces before *
+    result = result.replace(/(\w|ä|ü|ö|ß|Ü|Ö|Ä)\*(\w|ä|ü|ö|ß|Ü|Ö|Ä)/g, "$1 *$2");
+    //set whitespaces before and after **
+    result = result.replace(/(\*\*)|(\s\*\*)|(\*\*\s)/g, " ** ");
+
+    //replace all numbers of whitespaces to one
+    result = result.replace(/\s+/g, " ");
+    //replace whitespaces at start an end
+    result = result.replace(/^\s+/g, "");
+    result = result.replace(/\s$/g, "");
+    return result;
+}
+
+
+/*
+###### Default methods.
+ */
 function escapeRegex(regex_str) {
     //escape special chars in regex
     return regex_str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
@@ -51,16 +81,11 @@ function escapeRegex(regex_str) {
 
 function sortValidationResult(result){
     return result.sort(function(a,b){
-        if(a.start == b.start)
+        if(a.start === b.start)
             return 0;
         if(a.start < b.start)
             return -1;
         if(a.start > b.start)
             return 1;
     });
-}
-
-function tidyUpAnnotation(annotation, guidelines) {
-    let result = annotation;
-    return result;
 }

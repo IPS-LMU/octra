@@ -8,7 +8,7 @@ import {
 	HostListener,
 	OnChanges,
 	ChangeDetectorRef,
-	ChangeDetectionStrategy
+	ChangeDetectionStrategy, AfterViewChecked
 } from '@angular/core';
 import { Router } from "@angular/router";
 import { ModalComponent } from 'ng2-bs3-modal/ng2-bs3-modal';
@@ -38,7 +38,7 @@ import { APIService } from "../../service/api.service";
 	providers      : [ MessageService ],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit, AfterContentInit, OnChanges {
+export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit, AfterContentInit, OnChanges, AfterViewChecked {
 	private subscrmanager: SubscriptionManager;
 
 	@ViewChild('modal_shortcuts') modal_shortcuts: ModalComponent;
@@ -70,8 +70,12 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		return this.settingsService.app_settings;
 	}
 
+	get projectsettings(): any {
+		return this.settingsService.projectsettings;
+	}
+
 	get responsive(): boolean {
-		return this.appc.octra.responsive.enabled;
+		return this.settingsService.responsive.enabled;
 	}
 
 	user: number;
@@ -110,6 +114,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	}
 
 	ngOnInit() {
+		this.navbarServ.interfaces = this.projectsettings.interfaces;
 		this.afterAudioLoaded();
 
 		setInterval(() => {
@@ -129,7 +134,9 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 			}
 		));
 
-		if (this.app_settings.octra.logging_enabled == true) {
+		this.navbarServ.show_export = this.settingsService.projectsettings.navigation.export;
+
+		if (this.projectsettings.logging.forced == true) {
 			this.subscrmanager.add(
 				this.uiService.afteradd.subscribe((elem) => {
 					this.sessService.save("logs", this.uiService.elementsToAnyArray());
@@ -147,8 +154,27 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	}
 
 	afterAudioLoaded = () => {
+
 		this.transcrService.load();
 		this.transcrService.guidelines = this.settingsService.guidelines;
+
+		console.log("check init " + this.langService.currentLang + " == " + this.transcrService.guidelines.meta.language);
+		if(this.langService.currentLang !== this.transcrService.guidelines.meta.language){
+			//reload guidelines
+			console.log("reload guidelines");
+			this.subscrmanager.add(
+				this.settingsService.guidelinesloaded.subscribe(
+					(guidelines)=>{
+						console.log("guidelines reloaded");
+						this.transcrService.guidelines = guidelines
+					}
+				)
+			);
+
+			this.subscrmanager.add(
+				this.settingsService.loadGuidelines(this.langService.currentLang, "./guidelines/guidelines_" + this.langService.currentLang + ".json")
+			);
+		}
 
 		for (let i = 0; i < this.transcrService.guidelines.markers.length; i++) {
 			let marker = this.transcrService.guidelines.markers[ i ];
@@ -160,7 +186,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
 		this.sessService.SampleRate = this.audio.samplerate;
 		this.change();
-		this.navbarServ.show_hidden = true;
+		this.navbarServ.show_interfaces = this.settingsService.projectsettings.navigation.interfaces;
 
 		//load guidelines on language change
 		this.subscrmanager.add(this.langService.onLangChange.subscribe(
@@ -174,7 +200,15 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
 	ngAfterViewInit() {
 		this.sessService.TranscriptionTime.start = Date.now();
+		if(isNullOrUndefined(this.projectsettings.interfaces.find((x)=>{
+				return this.sessService.Interface === x;
+			}))){
+			console.log("change interface " + this.sessService.Interface + " == ");
+			this.sessService.Interface = this.projectsettings.interfaces[0];
+		}
+
 		this.change();
+
 		jQuery.material.init();
 	}
 
@@ -195,6 +229,10 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	};
 
 	ngAfterContentInit() {
+	}
+
+	ngAfterViewChecked(){
+
 	}
 
 	submitTranscription() {

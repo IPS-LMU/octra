@@ -60,6 +60,10 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 		return this.settingsService.app_settings;
 	}
 
+	public get projectsettings(): any {
+		return this.settingsService.projectsettings;
+	}
+
 	get segmententer_shortc(): string {
 		return (this.viewer.Settings) ? this.viewer.Settings.shortcuts.segment_enter.keys[ this.platform ] : "";
 	}
@@ -85,7 +89,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.viewer.Settings.boundaries.readonly = false;
 
 		this.editor.Settings.markers = this.transcrService.guidelines.markers;
-		this.editor.Settings.responsive = this.app_settings.octra.responsive.enabled;
+		this.editor.Settings.responsive = this.settingsService.responsive.enabled;
 
 		this.loupe.Settings.shortcuts = this.keyMap.register("Loupe", this.loupe.Settings.shortcuts);
 		this.loupe.Settings.shortcuts.play_pause.keys.mac = "SHIFT + TAB";
@@ -129,7 +133,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	onButtonClick(event: { type: string, timestamp: number }) {
-		if (this.app_settings.octra.logging_enabled == true)
+		if (this.projectsettings.logging.forced == true)
 			this.uiService.addElementFromEvent("mouse_click", {}, event.timestamp, event.type + "_button");
 
 		switch (event.type) {
@@ -243,7 +247,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	onShortCutTriggered($event, type) {
-		if (this.app_settings.octra.logging_enabled) {
+		if (this.projectsettings.logging.forced) {
 
 			if (
 				$event.value == null || !(
@@ -318,13 +322,13 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	};
 
 	onMarkerInsert(marker_code: string) {
-		if (this.app_settings.octra.logging_enabled == true)
+		if (this.projectsettings.logging.forced == true)
 			this.uiService.addElementFromEvent("marker_insert", { value: marker_code }, Date.now(), 'editor');
 	}
 
 	onMarkerClick(marker_code: string) {
 		this.onTranscriptionChanged(null);
-		if (this.app_settings.octra.logging_enabled == true)
+		if (this.projectsettings.logging.forced == true)
 			this.uiService.addElementFromEvent("marker_click", { value: marker_code }, Date.now(), 'editor');
 	}
 
@@ -337,7 +341,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	afterSpeedChange(event: { new_value: number, timestamp: number }) {
-		if (this.app_settings.octra.logging_enabled == true)
+		if (this.projectsettings.logging.forced == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "speed_change");
 	}
 
@@ -346,7 +350,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	afterVolumeChange(event: { new_value: number, timestamp: number }) {
-		if (this.app_settings.octra.logging_enabled == true)
+		if (this.projectsettings.logging.forced == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "volume_change");
 	}
 

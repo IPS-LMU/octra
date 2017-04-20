@@ -4,7 +4,7 @@ import { isArray } from "util";
 
 export class AppConfigValidator extends ConfigValidator {
 
-	private version: string = "1.0.3";
+	private version: string = "1.1.0";
 
 	public validate(key: string, value: any): ValidationResult {
 		let prefix: string = "AppConfig Validation - ";
@@ -33,20 +33,21 @@ export class AppConfigValidator extends ConfigValidator {
 				if (typeof value === "object") {
 					for (let key in value) {
 						switch (key) {
-							case("login_enabled"):
-								if (typeof value[ key ] !== "boolean") {
+							case("login"):
+								if (typeof value[ key ] !== "object") {
 									return {
 										success: false,
 										error  : prefix + "key '" + key + "." + value[ key ] + "' must be of type boolean"
 									};
-								}
-								break;
-							case("logging_enabled"):
-								if (typeof value[ key ] !== "boolean") {
-									return {
-										success: false,
-										error  : prefix + "key '" + key + "." + value[ key ] + "' must be of type boolean"
-									};
+								} else{
+									if(!value[ key ].hasOwnProperty("enabled")
+										|| ! (typeof value[ key ]["enabled"] === "boolean")
+									){
+										return {
+											success: false,
+											error  : prefix + "key '" + key + "." + value[ key ] + "' must be of type {enabled:boolean}"
+										};
+									}
 								}
 								break;
 							case("responsive"):

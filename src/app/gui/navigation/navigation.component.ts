@@ -7,6 +7,7 @@ import { TextConverter } from "../../shared/Converters/TextConverter";
 import { NavbarService } from "../../service/navbar.service";
 import { DomSanitizer } from '@angular/platform-browser';
 import { TranslateService } from "@ngx-translate/core";
+import { isNull, isNullOrUndefined } from "util";
 
 @Component({
 	selector   : 'app-navigation',
@@ -86,6 +87,17 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 	changeLanguage(lang:string){
 		this.langService.use(lang);
 		this.sessService.language = lang;
+	}
+
+	public interfaceActive(name:string){
+		if(isNullOrUndefined(
+			this.navbarServ.interfaces.find((x)=>{
+				return name === x;
+			})
+			)){
+			return false;
+		}
+		return true;
 	}
 
 }

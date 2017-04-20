@@ -7,7 +7,7 @@
                           (speedchange)="onSpeedChange($event)"
                           (afterspeedchange)="afterSpeedChange($event)"
                           [(audioplaying)]="audio.audioplaying"
-                          [(responsive)]="app_settings.octra.responsive.enabled"
+                          [(responsive)]="settingsService.responsive.enabled"
                           [buttons]="{
                         play: {
                             label: ('general.play' | translate),

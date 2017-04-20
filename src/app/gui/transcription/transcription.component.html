@@ -17,7 +17,7 @@
 </modal>
 <modal #modal_shortcuts>
     <modal-body>
-        <div *ngIf="sessService.Interface == 'audioplayer'">
+        <div *ngIf="sessService.Interface == 'Editor without signaldisplay'">
             <h3>{{"modal.shortcuts.audioplayer" | translate}}</h3>
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -32,7 +32,7 @@
             </div>
         </div>
 
-        <div *ngIf="(sessService.Interface == 'signaldisplay')">
+        <div *ngIf="(sessService.Interface == 'Linear Editor')">
             <h3>{{"modal.shortcuts.top signaldisplay" | translate}}</h3>
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -58,12 +58,12 @@
                 </table>
             </div>
         </div>
-        <div *ngIf="(sessService.Interface == 'overlay')">
+        <div *ngIf="(sessService.Interface == '2D-Editor')">
             <h3>{{"modal.shortcuts.2D-Editor" | translate}}</h3>
             <div class="table-responsive">
                 <table class="table table-hover">
                     <tbody>
-                    <tr *ngFor="let entry of keyMap.getEntryList('overlay')">
+                    <tr *ngFor="let entry of keyMap.getEntryList('2D-Editor')">
                         <td>{{"modal.shortcuts."+ entry.value.title | translate}}</td>
                         <td>{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly" class="focus-info">({{"general.on focus only" | translate}})</span>
                         </td>
@@ -97,12 +97,12 @@
     ></app-fastbar>
 
     <app-transcr-guidelines #modal_guidelines [guidelines]="transcrService.guidelines"></app-transcr-guidelines>
-    <div *ngIf="!(sessService.Interface == 'overlay')">
-        <app-signal-gui #signalloupe *ngIf="sessService.Interface == 'signaldisplay'">
+    <div *ngIf="!(sessService.Interface == '2D-Editor')">
+        <app-signal-gui #signalloupe *ngIf="sessService.Interface == 'Linear Editor'">
         </app-signal-gui>
-        <app-audioplayer-gui #audioplayer *ngIf="sessService.Interface == 'audioplayer'"></app-audioplayer-gui>
+        <app-audioplayer-gui #audioplayer *ngIf="sessService.Interface == 'Editor without signaldisplay'"></app-audioplayer-gui>
     </div>
-    <div *ngIf="sessService.Interface == 'overlay'">
+    <div *ngIf="sessService.Interface == '2D-Editor'">
         <app-overlay-gui></app-overlay-gui>
     </div>
     <div id="bottom-nav">

@@ -18,12 +18,12 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
 	subscrmanager: SubscriptionManager = new SubscriptionManager();
 
-	private loadedchanged:EventEmitter<boolean> = new EventEmitter<boolean>();
+	private loadedchanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
 	private loadedtable: any = {
 		projectconfig: false,
 		guidelines   : false,
-		methods: false,
+		methods      : false,
 		audio        : false
 	};
 
@@ -32,9 +32,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
 	constructor(private langService: TranslateService,
 				private settService: SettingsService,
 				private sessionService: SessionService,
-				public audio:AudioService,
-				private router:Router
-	) {
+				public audio: AudioService,
+				private router: Router) {
 		langService.get("general.please wait").subscribe(
 			(translation) => {
 				this.text = translation + "...";
@@ -48,6 +47,21 @@ export class LoadingComponent implements OnInit, OnDestroy {
 				(projectsettings) => {
 					this.loadedtable.projectconfig = true;
 					this.progress += 25;
+					if (isNullOrUndefined(this.settService.guidelines)) {
+						let language = this.langService.currentLang;
+						if (isNullOrUndefined(projectsettings.languages.find((x) => {
+								return x === language
+							}))) {
+							//fall back to first defined language
+							language = projectsettings.languages[ 0 ];
+						}
+						this.subscrmanager.add(
+							this.settService.loadGuidelines(this.sessionService.language, "./guidelines/guidelines_" + language + ".json")
+						);
+					}
+					else {
+						this.loadedtable.guidelines = true;
+					}
 					this.loadedchanged.emit(false);
 				}
 			)
@@ -76,12 +90,13 @@ export class LoadingComponent implements OnInit, OnDestroy {
 		this.subscrmanager.add(
 			this.settService.audioloaded.subscribe(
 				(result) => {
-					if(result.status === "success") {
+					if (result.status === "success") {
 						this.loadedtable.audio = true;
 						this.progress += 25;
 						console.log(this.audio.audiobuffer.length)
 						this.loadedchanged.emit(false);
-					} else{
+					}
+					else {
 						alert("ERROR: " + result.error);
 					}
 				}
@@ -90,51 +105,46 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
 		let id = this.subscrmanager.add(
 			this.loadedchanged.subscribe(
-				()=>{
-					if(
+				() => {
+					if (
 						this.loadedtable.guidelines
 						&& this.loadedtable.projectconfig
 						&& this.loadedtable.methods
 						&& this.loadedtable.audio
-					){
+					) {
 						console.log("All loaded!");
 						this.subscrmanager.remove(id);
 						console.log("LEAVE");
-						setTimeout(()=>{this.router.navigate(["/user/transcr"])}, 500);
+						setTimeout(() => {
+							this.router.navigate([ "/user/transcr" ])
+						}, 500);
 					}
 				}
 			)
 		);
 
-		if(isNullOrUndefined(this.settService.projectsettings)){
+		if (isNullOrUndefined(this.settService.projectsettings)) {
 			this.subscrmanager.add(
 				this.settService.loadProjectSettings()
 			);
-		} else{
+		}
+		else {
 			this.loadedtable.projectconfig = true;
 		}
 
-		if(isNullOrUndefined(this.settService.guidelines)){
-			let language = this.langService.currentLang;
-			this.subscrmanager.add(
-				this.settService.loadGuidelines(this.sessionService.language, "./guidelines/guidelines_" + language +".json")
-			);
-		} else{
-			this.loadedtable.guidelines = true;
-		}
-
-		if(!isNullOrUndefined(this.settService.guidelines) && ((this.settService.tidyUpMethod) || isNullOrUndefined(this.settService.validationmethod))){
+		if (!isNullOrUndefined(this.settService.guidelines) && ((this.settService.tidyUpMethod) || isNullOrUndefined(this.settService.validationmethod))) {
 			this.subscrmanager.add(
 				this.settService.loadValidationMethod(this.settService.guidelines.meta.validation_url)
 			);
-		} else{
+		}
+		else {
 			this.loadedtable.methods = true;
 		}
 
 		this.settService.loadAudioFile(this.audio);
 	}
 
-	ngOnDestroy(){
+	ngOnDestroy() {
 		this.subscrmanager.destroy();
 	}
 

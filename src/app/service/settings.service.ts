@@ -48,6 +48,19 @@ export class SettingsService {
 		return this._app_settings;
 	}
 
+	get responsive(): {
+		enabled:boolean,
+		fixedwidth: number
+	} {
+		if(!isNullOrUndefined(this.projectsettings) && !isNullOrUndefined(this.projectsettings.responsive)){
+			return this.projectsettings.responsive;
+
+		}
+		else{
+			return this.app_settings.octra.responsive;
+		}
+	}
+
 	public settingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
 	private app_settingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
 	public projectsettingsloaded: EventEmitter<any> = new EventEmitter<any>();
@@ -96,6 +109,7 @@ export class SettingsService {
 			(result) => {
 				this._app_settings = result.json();
 				this.validation.app = this.validate(new AppConfigValidator(), this._app_settings);
+				console.log("application settings loaded");
 				if (this.validation.app) {
 					this.app_settingsloaded.emit(true);
 				} else{
@@ -115,7 +129,13 @@ export class SettingsService {
 		return this.http.request("./config/projectconfig.json").subscribe(
 			(result) => {
 				this._projectsettings = result.json();
-				this.projectsettingsloaded.emit(this._projectsettings);
+				let validation = this.validate(new AppConfigValidator(), this._app_settings);
+				console.log("project settings loaded");
+				if (validation) {
+					this.projectsettingsloaded.emit(this._projectsettings);
+				} else{
+					console.error("config.json validation error.");
+				}
 			},
 			(error)=>{
 				console.log(error);
@@ -128,13 +148,12 @@ export class SettingsService {
 		return this.http.get(url).subscribe(
 			(response) => {
 				let guidelines = response.json();
-				console.log("guidelines loaded");
 				this._guidelines = guidelines;
+				console.log("guidelines settings loaded");
 				this.loadValidationMethod(guidelines.meta.validation_url);
 				this.guidelinesloaded.emit(guidelines);
 			},
 			(error)=>{
-				console.log(error);
 				this._log += "Loading guidelines failed<br/>";
 			}
 		);
@@ -150,7 +169,7 @@ export class SettingsService {
 				js.id = "validationJS";
 
 				document.body.appendChild(js);
-
+				console.log("methods settings loaded");
 				setTimeout(()=>{
 					this._validationmethod = validateAnnotation;
 					this._tidyUpMethod = tidyUpAnnotation;
@@ -170,6 +189,7 @@ export class SettingsService {
 		if (audioService.audiocontext) {
 			this.subscrmanager.add(
 				audioService.afterloaded.subscribe((result)=>{
+					console.log("audio settings loaded");
 					this.audioloaded.emit(result);
 				})
 			);

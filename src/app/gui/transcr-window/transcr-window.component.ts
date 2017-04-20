@@ -48,8 +48,12 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 		return this.settingsService.app_settings;
 	}
 
+	get projectsettings(): any {
+		return this.settingsService.projectsettings;
+	}
+
 	get responsive(): boolean {
-		return this.settingsService.app_settings.octra.responsive.enabled;
+		return this.settingsService.responsive.enabled;
 	}
 
 	get SelectedSegment(): Segment {
@@ -75,7 +79,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
 	ngOnInit() {
 		this.editor.Settings.markers = this.transcrService.guidelines.markers;
-		this.editor.Settings.responsive = this.app_settings.octra.responsive.enabled;
+		this.editor.Settings.responsive = this.settingsService.responsive.enabled;
 
 		this.subscrmanager.add(this.editor.loaded.subscribe(
 			() => {
@@ -134,7 +138,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 	}
 
 	onButtonClick(event: { type: string, timestamp: number }) {
-		if (this.app_settings.octra.logging_enabled == true)
+		if (this.projectsettings.logging.forced == true)
 			this.uiService.addElementFromEvent("mouse_click", {}, event.timestamp, event.type + "_button");
 
 		if (event.type === "replay")
@@ -189,7 +193,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 	}
 
 	afterSpeedChange(event: { new_value: number, timestamp: number }) {
-		if (this.app_settings.octra.logging_enabled == true)
+		if (this.projectsettings.logging.forced == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "speed_change");
 	}
 
@@ -198,7 +202,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 	}
 
 	afterVolumeChange(event: { new_value: number, timestamp: number }) {
-		if (this.app_settings.octra.logging_enabled == true)
+		if (this.projectsettings.logging.forced == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "volume_change");
 	}
 }

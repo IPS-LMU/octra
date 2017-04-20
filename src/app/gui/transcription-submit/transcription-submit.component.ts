@@ -63,7 +63,8 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 			console.error("feedback is null!");
 		}
 
-		this.navbarServ.show_hidden = false;
+		this.navbarServ.show_interfaces = false;
+		this.navbarServ.show_export = false;
 	}
 
 	canDeactivate(): Observable<boolean> | boolean {
@@ -74,6 +75,7 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 		this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, "\s");
 		this.sessService.comment = this.transcrService.feedback.comment;
 
+		console.log(this.transcrService.feedback);
 		this.sessService.save("feedback", this.transcrService.feedback.exportData());
 		this.router.navigate([ '/user/transcr' ]);
 	}
@@ -122,6 +124,8 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 	};
 
 	ngOnDestroy() {
+		this.navbarServ.show_interfaces = this.settingsService.projectsettings.navigation.interfaces;
+		this.navbarServ.show_export = this.settingsService.projectsettings.navigation.export;
 		this.subscrmanager.destroy();
 	}
 

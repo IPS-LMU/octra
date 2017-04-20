@@ -58,6 +58,10 @@ export class TranscriptionService {
 		return this.settingsService.app_settings;
 	}
 
+	private get projectsettings(): any {
+		return this.settingsService.projectsettings;
+	}
+
 	private subscrmanager: SubscriptionManager;
 
 	public dataloaded = new EventEmitter<any>();
@@ -108,7 +112,7 @@ export class TranscriptionService {
 				private http: Http) {
 		this.subscrmanager = new SubscriptionManager();
 
-		if (this.app_settings.octra.logging_enabled) {
+		if (this.projectsettings.logging.forced) {
 			this.subscrmanager.add(this.audio.statechange.subscribe((state) => {
 				this.uiService.addElementFromEvent("audio_" + state, { value: state }, Date.now(), "audio");
 			}));

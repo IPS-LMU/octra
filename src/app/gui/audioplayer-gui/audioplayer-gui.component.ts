@@ -39,6 +39,10 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 		return this.settingsService.app_settings;
 	}
 
+	public get projectsettings():any{
+		return this.settingsService.projectsettings;
+	}
+
 	constructor(public audio: AudioService,
 				public keyMap: KeymappingService,
 				public transcrService: TranscriptionService,
@@ -53,7 +57,7 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 		this.settings.shortcuts = this.keyMap.register("AP", this.settings.shortcuts);
 		this.shortcuts = this.settings.shortcuts;
 		this.editor.Settings.markers = this.transcrService.guidelines.markers.items;
-		this.editor.Settings.responsive = this.settingsService.app_settings.octra.responsive.enabled;
+		this.editor.Settings.responsive = this.settingsService.responsive.enabled;
 	}
 
 	ngAfterViewInit() {
@@ -69,7 +73,7 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 	}
 
 	onButtonClick(event: { type: string, timestamp: number }) {
-		if (this.app_settings.octra.logging_enabled == true)
+		if (this.projectsettings.logging.forced == true)
 			this.uiService.addElementFromEvent("mouse_click", {}, event.timestamp, event.type + "_button");
 
 		switch (event.type) {
@@ -98,7 +102,7 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 	}
 
 	afterSpeedChange(event: { new_value: number, timestamp: number }) {
-		if (this.app_settings.octra.logging_enabled == true)
+		if (this.projectsettings.logging.forced == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "speed_change");
 	}
 
@@ -107,7 +111,7 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 	}
 
 	afterVolumeChange(event: { new_value: number, timestamp: number }) {
-		if (this.app_settings.octra.logging_enabled == true)
+		if (this.projectsettings.logging.forced == true)
 			this.uiService.addElementFromEvent("slider", event, event.timestamp, "volume_change");
 	}
 
@@ -118,18 +122,18 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
 	}
 
 	onShortcutTriggered(event) {
-		if (this.app_settings.octra.logging_enabled == true)
+		if (this.projectsettings.logging.forced == true)
 			this.uiService.addElementFromEvent("shortcut", event, Date.now(), 'audioplayer');
 	}
 
 	onMarkerInsert(marker_code: string) {
-		if (this.app_settings.octra.logging_enabled == true)
+		if (this.projectsettings.logging.forced == true)
 			this.uiService.addElementFromEvent("marker_insert", { value: marker_code }, Date.now(), 'editor');
 	}
 
 	onMarkerClick(marker_code: string) {
 		this.updateSegment(null);
-		if (this.app_settings.octra.logging_enabled == true)
+		if (this.projectsettings.logging.forced == true)
 			this.uiService.addElementFromEvent("marker_click", { value: marker_code }, Date.now(), 'editor');
 	}
 }

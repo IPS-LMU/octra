@@ -47,10 +47,10 @@
             </p>
             <section>
                 <h4>{{ 'login.online mode' | translate}}</h4>
-                <div *ngIf="!apc.octra.login_enabled" id="login-disabled">
+                <div *ngIf="!apc.octra.login.enabled" id="login-disabled">
                     {{'login.online mode disabled' | translate}}
                 </div>
-                <div *ngIf="apc.octra.login_enabled">
+                <div *ngIf="apc.octra.login.enabled">
                     <p class="bg-danger" *ngIf="sessionService.offline == true">
                         {{"login.online mode data warning" | translate}}
                     </p>

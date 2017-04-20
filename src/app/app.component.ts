@@ -29,6 +29,14 @@ export class AppComponent implements OnDestroy {
 			this.onSettingsLoaded
 		));
 
+		//after projectsessings loaded
+		this.subscrmanager.add(this.settingsService.projectsettingsloaded.subscribe(
+			()=>{
+				console.log("projectsettings loaded");
+				this.setFixedWidth();
+			}
+		));
+
 		if (this.settingsService.validated) {
 			this.onSettingsLoaded();
 		}
@@ -44,13 +52,8 @@ export class AppComponent implements OnDestroy {
 				this.api.init(this.settingsService.app_settings.audio_server.url + "WebTranscribe");
 			}
 
-			if (!this.settingsService.app_settings.octra.responsive.enabled) {
-				//set fixed width
-				let head = document.head || document.getElementsByTagName('head')[ 0 ];
-				let style = document.createElement('style');
-				style.type = 'text/css';
-				style.innerText = ".container {width:" + this.settingsService.app_settings.octra.responsive.fixedwidth + "px}";
-				head.appendChild(style);
+			if (!this.settingsService.responsive.enabled) {
+				this.setFixedWidth();
 			}
 		}
 
@@ -80,5 +83,14 @@ export class AppComponent implements OnDestroy {
 
 	ngOnDestroy() {
 		this.subscrmanager.destroy();
+	}
+
+	private setFixedWidth(){
+		//set fixed width
+		let head = document.head || document.getElementsByTagName('head')[ 0 ];
+		let style = document.createElement('style');
+		style.type = 'text/css';
+		style.innerText = ".container {width:" + this.settingsService.responsive.fixedwidth + "px}";
+		head.appendChild(style);
 	}
 }

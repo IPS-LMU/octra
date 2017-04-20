@@ -6,7 +6,8 @@ export interface ProjectConfiguration {
 		enabled: boolean
 	},
 	navigation: {
-		"export": true
+		"export": boolean,
+		"interfaces": boolean
 	},
 	responsive: {
 		enabled: boolean,

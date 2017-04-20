@@ -83,8 +83,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 		else
 			this.valid_platform = true;
 
-		if (this.apc.octra.responsive.enabled == false)
-			this.valid_size = window.innerWidth >= this.apc.octra.responsive.fixedwidth;
+		if (this.settingsService.responsive.enabled == false)
+			this.valid_size = window.innerWidth >= this.settingsService.responsive.fixedwidth;
 		else
 			this.valid_size = true;
 
@@ -244,8 +244,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
 	@HostListener('window:resize', [ '$event' ])
 	onResize($event) {
-		if (this.apc.octra.responsive.enabled == false)
-			this.valid_size = window.innerWidth >= this.apc.octra.responsive.fixedwidth;
+		if (this.settingsService.responsive.enabled == false)
+			this.valid_size = window.innerWidth >= this.settingsService.responsive.fixedwidth;
 		else
 			this.valid_size = true;
 	}

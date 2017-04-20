@@ -202,7 +202,7 @@ export class SessionService {
 			this._easymode = false;
 		}
 		if (offline  && (isNullOrUndefined(member))) {
-			this._interface = "audioplayer";
+			this._interface = "editor without signaldisplay";
 			this.setNewSessionKey();
 			this.localStr.store("offline", true);
 			this.localStr.store("member_project", "");
@@ -216,7 +216,7 @@ export class SessionService {
 		}
 
 		if (!this.login) {
-			this._interface = "audioplayer";
+			this._interface = "editor without signaldisplay";
 			this.setNewSessionKey();
 			this.setMemberID(member.id);
 

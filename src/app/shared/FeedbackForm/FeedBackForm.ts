@@ -4,7 +4,7 @@ import { isNullOrUndefined } from "util";
 import { isArray } from "rxjs/util/isArray";
 
 export class FeedBackForm {
-	public get groups() {
+	public get groups():Group[] {
 		return this._groups;
 	}
 

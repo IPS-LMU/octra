@@ -59,9 +59,6 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
 						this.sessService.audio_url = json.data.url;
 						this.sessService.data_id = json.data.id;
 
-						console.log("data id zugewiesen: " + this.sessService.data_id);
-						console.log("return: ");
-						console.log(json);
 
 						this.router.navigate([ '/user/load' ]);
 					}

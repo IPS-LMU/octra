@@ -33,7 +33,10 @@ export class AppComponent implements OnDestroy {
 		this.subscrmanager.add(this.settingsService.projectsettingsloaded.subscribe(
 			()=>{
 				console.log("projectsettings loaded");
-				this.setFixedWidth();
+				if (!this.settingsService.responsive.enabled) {
+					console.log("fixed set");
+					this.setFixedWidth();
+				}
 			}
 		));
 
@@ -53,6 +56,7 @@ export class AppComponent implements OnDestroy {
 			}
 
 			if (!this.settingsService.responsive.enabled) {
+				console.log("fixed set");
 				this.setFixedWidth();
 			}
 		}

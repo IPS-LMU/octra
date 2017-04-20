@@ -21,6 +21,7 @@ import { TranslateService } from "@ngx-translate/core";
 import { SettingsService } from "../../service/settings.service";
 import { isNullOrUndefined } from "util";
 import { Control } from "../../shared/FeedbackForm/Control";
+import { Group } from "../../shared/FeedbackForm/Group";
 
 
 @Component({
@@ -44,20 +45,13 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 				private langService: TranslateService,
 				private settingsService: SettingsService
 	) {
-
 		this.subscrmanager = new SubscriptionManager();
-	}
 
-	private send_ok = false;
-	public send_error: string = "";
-	private subscrmanager: SubscriptionManager;
-
-	public t:string = "";
-
-	ngOnInit() {
 		if (!this.transcrService.segments && this.sessService.SampleRate) {
 			this.transcrService.loadSegments(this.sessService.SampleRate);
 		}
+
+		this.loadForm();
 
 		if(isNullOrUndefined(this.sessService.feedback)) {
 			console.error("feedback is null!");
@@ -65,6 +59,17 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 
 		this.navbarServ.show_interfaces = false;
 		this.navbarServ.show_export = false;
+	}
+
+	private send_ok = false;
+	public send_error: string = "";
+	private subscrmanager: SubscriptionManager;
+
+	public feedback_data = {};
+
+	public t:string = "";
+
+	ngOnInit() {
 	}
 
 	canDeactivate(): Observable<boolean> | boolean {
@@ -75,8 +80,9 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 		this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, "\s");
 		this.sessService.comment = this.transcrService.feedback.comment;
 
-		console.log(this.transcrService.feedback);
+		this.saveForm();
 		this.sessService.save("feedback", this.transcrService.feedback.exportData());
+		console.log(this.transcrService.feedback.exportData());
 		this.router.navigate([ '/user/transcr' ]);
 	}
 
@@ -98,7 +104,6 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 			.catch(this.onSendError)
 			.subscribe((result) => {
 					if (result != null && result.hasOwnProperty("statusText") && result.statusText === "OK") {
-						console.log("gesendet mit id" + json.id);
 						this.sessService.submitted = true;
 						this.modal2.close();
 						setTimeout(() => {
@@ -116,6 +121,7 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 		setTimeout(()=>{
 			jQuery.material.init();
 		}, 100);
+
 	}
 
 	onSendError = (error) => {
@@ -157,19 +163,15 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 		return this.sanitizer.bypassSecurityTrustUrl(url);
 	}
 
-	test(){
+	public test = {
+		ok: ""
+	};
+
+	changeValue(control:string, value:any){
+		let result = this.transcrService.feedback.setValueForControl(control, value.toString());
 	}
 
-	onControlValueChange(control:Control, value:any){
-		let custom = {};
-		if(control.type.type === "checkbox"){
-			value = (value) ? control.value : "";
-			custom["checked"] = !control.custom["checked"];
-		}
-		let result = this.transcrService.feedback.setValueForControl(control.name, value.toString(), custom);
-	}
-
-	getLabelTranslation(languages:any, lang:string):string{
+	translate(languages:any, lang:string):string{
 		if(isNullOrUndefined(languages[lang])){
 			for(let attr in languages){
 				//take first
@@ -177,5 +179,33 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 			}
 		}
 		return languages[lang];
+	}
+
+	private saveForm(){
+		for(let control in this.feedback_data){
+			this.changeValue(control, this.feedback_data[control]);
+		}
+	}
+
+	private loadForm(){
+		//create emty attribute
+		if(!isNullOrUndefined(this.settingsService.projectsettings)){
+			let feedback = this.transcrService.feedback;
+			for(let g in feedback.groups){
+				for(let c in feedback.groups[g].controls){
+					let control = feedback.groups[g].controls[c];
+					if(control.type.type === "textarea") {
+						this.feedback_data[ control.name ] = control.value;
+					}else {
+						//radio or checkbox
+						if(!isNullOrUndefined(control.custom)
+						&& !isNullOrUndefined(control.custom.checked)
+						&& control.custom.checked){
+							this.feedback_data[control.name] = control.value;
+						}
+					}
+				}
+			}
+		}
 	}
 }

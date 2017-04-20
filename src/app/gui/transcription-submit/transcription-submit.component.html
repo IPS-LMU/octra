@@ -29,7 +29,6 @@
     </p>
     <app-transcr-overview [visible]="true" [show_transcriptiontable]="false"
                           [segments]="transcrService.segments.segments"></app-transcr-overview>
-    <br><br>
     <div *ngIf="!sessService.offline">
         <h3>Feedback</h3>
         <p>
@@ -39,42 +38,38 @@
             <form (ngSubmit)="onSubmit(fo)" #fo="ngForm">
                 <fieldset>
                     <div class="form-group" *ngFor="let group of transcrService.feedback.groups">
-                        <label class="control-label">{{group.title['de']}}</label><br/>
+                        <label class="control-label">{{translate(group.title, langService.currentLang)}}</label>
+                        <span class="required_marker" *ngIf="group.controls[0].required">*</span>
+                        <br/>
+                        <br/>
                         <div class="ctrl" *ngFor="let control of group.controls">
                             <div class="radio" *ngIf="control.type.type === 'radiobutton'">
-                                <label>{{control.label.languages['de']}}
-                                    <input *ngIf="control.required" type="radio"
+                                <label>{{translate(control.label.languages, langService.currentLang)}}
+                                    <input type="radio"
                                            name="{{control.name}}" value="{{control.value}}"
                                            [checked]="control.custom.checked"
-                                           (click)="onControlValueChange(control, control.value)" required/>
-                                    <input *ngIf="!control.required" type="radio"
-                                           name="{{control.name}}" value="{{control.value}}"
-                                           [checked]="control.custom.checked"
-                                           (click)="onControlValueChange(control, control.value)"/></label>
+                                           [required]="control.required"
+                                           [(ngModel)]="feedback_data[control.name]"
+                                    />
+                                </label>
                             </div>
                             <div class="checkbox" *ngIf="control.type.type === 'checkbox'">
                                 <label>
-                                    <input type="checkbox" *ngIf="control.required"
+                                    <input type="checkbox"
                                            name="{{control.name}}" value="{{control.value}}"
                                            [checked]="control.custom.checked" #checkb
-                                           (click)="onControlValueChange(control, control.value)" required>
+                                           [required]="control.required"
+                                           [(ngModel)]="feedback_data[control.name]">
                                     <span class="required_marker" *ngIf="control.required">*</span>
-                                    <input type="checkbox" *ngIf="!control.required"
-                                           name="{{control.name}}" value="{{control.value}}"
-                                           [checked]="control.custom.checked" #checkb
-                                           (click)="onControlValueChange(control, control.value)">
-                                    {{getLabelTranslation(control.label.languages, langService.currentLang)}}
+                                    {{translate(control.label.languages, langService.currentLang)}}
                                 </label>
                             </div>
                             <div *ngIf="control.type.type === 'textarea'">
-                                <label>{{control.label.languages['de']}}</label><br/>
-                                <textarea class="form-control" *ngIf="control.required"
-                                          name="{{control.name}}" value="{{control.value}}" #ta
-                                          (keyup)="onControlValueChange(control, ta.value)"
-                                          required></textarea>
-                                <textarea class="form-control" *ngIf="!control.required"
-                                          name="{{control.name}}" value="{{control.value}}" #ta
-                                          (keyup)="onControlValueChange(control, ta.value)"></textarea>
+                                <label>{{translate(control.label.languages, langService.currentLang)}}</label><br/>
+                                <textarea class="form-control"
+                                          name="{{control.name}}" value="{{control.value}}"
+                                          [required]="control.required"></textarea>
+                                          [(ngModel)]="feedback_data[control.name]"
                             </div>
                         </div>
                     </div>

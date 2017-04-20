@@ -35,7 +35,8 @@
           "type": "radiobutton",
           "name": "quality-speaker",
           "label": {
-            "de": "unverständlich"
+            "de": "unverständlich",
+            "en": "unknowable"
           },
           "value": "0",
           "custom": {},
@@ -44,7 +45,8 @@
         {
           "type": "radiobutton",
           "label": {
-            "de": "weniger verständlich"
+            "de": "weniger verständlich",
+            "en": "less clear"
           },
           "name": "quality-speaker",
           "value": "1",
@@ -54,7 +56,8 @@
         {
           "type": "radiobutton",
           "label": {
-            "de": "verständlich"
+            "de": "verständlich",
+            "en": "clear"
           },
           "name": "quality-speaker",
           "value": "2",
@@ -64,7 +67,8 @@
         {
           "type": "radiobutton",
           "label": {
-            "de": "sehr gut verständlich"
+            "de": "sehr gut verständlich",
+            "en": "very clear"
           },
           "name": "quality-speaker",
           "value": "3",
@@ -82,7 +86,8 @@
           "type": "radiobutton",
           "name": "quality-audio",
           "label": {
-            "de": "viele Störgeräusche"
+            "de": "viele Störgeräusche",
+            "en": "lot of noises"
           },
           "value": "0",
           "custom": {},
@@ -91,7 +96,8 @@
         {
           "type": "radiobutton",
           "label": {
-            "de": "wenige Störgeräusche"
+            "de": "wenige Störgeräusche",
+            "en": "less noises"
           },
           "name": "quality-audio",
           "value": "1",
@@ -101,7 +107,8 @@
         {
           "type": "radiobutton",
           "label": {
-            "de": "sehr wenige Störgeräusche"
+            "de": "viele Störgeräusche",
+            "en": "very clear"
           },
           "name": "quality-audio",
           "value": "2",
@@ -111,7 +118,8 @@
         {
           "type": "radiobutton",
           "label": {
-            "de": "keine Störgeräusche"
+            "de": "keine Störgeräusche",
+            "en": "no noises"
           },
           "name": "quality-audio",
           "value": "3",

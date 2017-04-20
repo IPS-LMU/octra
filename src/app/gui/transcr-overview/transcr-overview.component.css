@@ -9,3 +9,9 @@
 .segment-warning{
     color:red;
 }
+
+.found-errors{
+    padding:5px;
+    display:block;
+    text-align:center;
+}

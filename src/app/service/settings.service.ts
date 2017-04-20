@@ -109,7 +109,6 @@ export class SettingsService {
 			(result) => {
 				this._app_settings = result.json();
 				this.validation.app = this.validate(new AppConfigValidator(), this._app_settings);
-				console.log("application settings loaded");
 				if (this.validation.app) {
 					this.app_settingsloaded.emit(true);
 				} else{
@@ -117,7 +116,6 @@ export class SettingsService {
 				}
 			},
 			(error)=>{
-				console.log(error);
 				this._log += "Loading application config failed<br/>";
 			}
 		));
@@ -130,7 +128,6 @@ export class SettingsService {
 			(result) => {
 				this._projectsettings = result.json();
 				let validation = this.validate(new AppConfigValidator(), this._app_settings);
-				console.log("project settings loaded");
 				if (validation) {
 					this.projectsettingsloaded.emit(this._projectsettings);
 				} else{
@@ -138,7 +135,6 @@ export class SettingsService {
 				}
 			},
 			(error)=>{
-				console.log(error);
 				this._log += "Loading project config failed<br/>";
 			}
 		);
@@ -149,7 +145,6 @@ export class SettingsService {
 			(response) => {
 				let guidelines = response.json();
 				this._guidelines = guidelines;
-				console.log("guidelines settings loaded");
 				this.loadValidationMethod(guidelines.meta.validation_url);
 				this.guidelinesloaded.emit(guidelines);
 			},
@@ -169,7 +164,6 @@ export class SettingsService {
 				js.id = "validationJS";
 
 				document.body.appendChild(js);
-				console.log("methods settings loaded");
 				setTimeout(()=>{
 					this._validationmethod = validateAnnotation;
 					this._tidyUpMethod = tidyUpAnnotation;
@@ -179,7 +173,6 @@ export class SettingsService {
 			}
 			,
 			(error)=>{
-				console.log(error);
 				this._log += "Loading functions failed<br/>";
 			}
 		);
@@ -189,7 +182,6 @@ export class SettingsService {
 		if (audioService.audiocontext) {
 			this.subscrmanager.add(
 				audioService.afterloaded.subscribe((result)=>{
-					console.log("audio settings loaded");
 					this.audioloaded.emit(result);
 				})
 			);

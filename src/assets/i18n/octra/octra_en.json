@@ -86,7 +86,7 @@
     "transcription": {
       "delete": {
         "header": "Create a new transcription?",
-        "text": "Do you really want to delete the previous transcription and create a new one?<br><br>Your progress on the previous transcription will be deleted. This action can not be reverted.",
+        "text": "Do you really want to delete the previous Transcription and create a new one?<br><br>Your progress on the previous transcription will be deleted. This action can not be reverted.",
         "delete old": "Delete previous transcription"
       },
       "stop": {

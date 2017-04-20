@@ -18,8 +18,8 @@
     </tbody>
 </table>
 <p [hidden]="shown_segments.length == 0">
-    <span *ngIf="foundErrors == 0" class="text-success">{{"general.no errors found" | translate}}</span>
-    <span *ngIf="foundErrors > 0" class="text-danger">{{"general.errors found" | translate : {errors: foundErrors} }}</span>
+    <span *ngIf="foundErrors == 0" class="text-success found-errors">{{"general.no errors found" | translate}}</span>
+    <span *ngIf="foundErrors > 0" class="text-danger found-errors">{{"general.errors found" | translate : {errors: foundErrors} }}</span>
 </p>
 <h4 [hidden]="!show_transcriptiontable">{{"general.transcript" | translate}}</h4>
 <div *ngIf="shown_segments.length == 0" [hidden]="!show_transcriptiontable">

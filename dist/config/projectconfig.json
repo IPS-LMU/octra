@@ -1,0 +1,124 @@
+{
+  "version": "1.1.0",
+  "logging":{
+    "forced": true
+  },
+  "navigation":{
+    "export": true,
+    "interfaces": true
+  },
+  "responsive": {
+    "enabled": true,
+    "fixedwidth": 1200
+  },
+  "agreement": {
+    "enabled": true,
+    "text": {
+      "de": "Das ist ein Test"
+    }
+  },
+  "languages": [
+    "de"
+  ],
+  "interfaces": [
+    "Editor without signaldisplay",
+    "Linear Editor",
+    "2D-Editor"
+  ],
+  "feedback_form": [
+    {
+      "title": {
+        "de": "Sprachverständlichkeit des Sprechers"
+      },
+      "controls": [
+        {
+          "type": "radiobutton",
+          "name": "quality-speaker",
+          "label": {
+            "de": "unverständlich"
+          },
+          "value": "0",
+          "custom": {},
+          "required": true
+        },
+        {
+          "type": "radiobutton",
+          "label": {
+            "de": "weniger verständlich"
+          },
+          "name": "quality-speaker",
+          "value": "1",
+          "custom": {},
+          "required": true
+        },
+        {
+          "type": "radiobutton",
+          "label": {
+            "de": "verständlich"
+          },
+          "name": "quality-speaker",
+          "value": "2",
+          "custom": {},
+          "required": true
+        },
+        {
+          "type": "radiobutton",
+          "label": {
+            "de": "sehr gut verständlich"
+          },
+          "name": "quality-speaker",
+          "value": "3",
+          "custom": {},
+          "required": true
+        }
+      ]
+    },
+    {
+      "title": {
+        "de": "Qualität des Audiosignals"
+      },
+      "controls": [
+        {
+          "type": "radiobutton",
+          "name": "quality-audio",
+          "label": {
+            "de": "viele Störgeräusche"
+          },
+          "value": "0",
+          "custom": {},
+          "required": true
+        },
+        {
+          "type": "radiobutton",
+          "label": {
+            "de": "wenige Störgeräusche"
+          },
+          "name": "quality-audio",
+          "value": "1",
+          "custom": {},
+          "required": true
+        },
+        {
+          "type": "radiobutton",
+          "label": {
+            "de": "sehr wenige Störgeräusche"
+          },
+          "name": "quality-audio",
+          "value": "2",
+          "custom": {},
+          "required": true
+        },
+        {
+          "type": "radiobutton",
+          "label": {
+            "de": "keine Störgeräusche"
+          },
+          "name": "quality-audio",
+          "value": "3",
+          "custom": {},
+          "required": true
+        }
+      ]
+    }
+  ]
+}

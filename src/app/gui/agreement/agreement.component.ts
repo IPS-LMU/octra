@@ -52,7 +52,7 @@ export class AgreementComponent implements OnInit {
 			this.sessService.agreement = {};
 		}
 		this.sessService.agreement[this.sessService.member_project] = true;
-		this.sessService.localStr.store("agreement", this.sessService.agreement);
+		this.sessService.sessStr.store("agreement", this.sessService.agreement);
 		this.router.navigate(["/user/transcr"]);
 	}
 }

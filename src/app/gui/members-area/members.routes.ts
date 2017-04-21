@@ -13,7 +13,7 @@ import { AgreementComponent } from "../agreement/agreement.component";
 
 export const MEMBER_ROUTES: Routes = [
 	{ path: '', redirectTo: '/user/load', pathMatch: 'full'},
-	{ path: 'load', component: LoadingComponent, canActivate:[SettingsGuard, MembersAreaGuard]},
+	{ path: 'load', component: LoadingComponent, canActivate:[SettingsGuard]},
 	{ path: 'agreement', component: AgreementComponent, canActivate:[SettingsGuard, MembersAreaGuard]},
 	{ path: 'transcr', component: TranscriptionComponent, canActivate:[SettingsGuard, TranscActivateGuard, MembersAreaGuard]},
 	{ path: 'transcr/submit', component: TranscriptionSubmitComponent, canActivate:[SettingsGuard, TranscActivateGuard]},

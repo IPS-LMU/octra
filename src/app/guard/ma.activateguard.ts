@@ -3,11 +3,13 @@ import { Injectable } from '@angular/core';
 import { CanActivate, RouterStateSnapshot, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable } from 'rxjs/Rx';
 import { SessionService } from "../service/session.service";
+import { SettingsService } from "../service/settings.service";
 
 @Injectable()
 export class MembersAreaGuard implements CanActivate {
 
-	constructor(private sessService: SessionService, private router: Router) {
+	constructor(private sessService: SessionService, private router: Router,
+	private settService:SettingsService) {
 
 	}
 
@@ -24,9 +26,12 @@ export class MembersAreaGuard implements CanActivate {
 			}
 		}
 		else if (this.sessService.submitted) {
-			this.router.navigate([ '/user/transcr/submitted' ]);
-			return false;
-		}
+				this.router.navigate([ '/user/transcr/submitted' ]);
+				return false;
+			} else if(!this.settService.allloaded){
+			    console.log("settings are null");
+				this.router.navigate([ '/user/load' ]);
+			}
 		return true;
 	}
 }

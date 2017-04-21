@@ -18,7 +18,8 @@
     }
   },
   "languages": [
-    "de"
+    "de",
+    "en"
   ],
   "interfaces": [
     "Editor without signal display",

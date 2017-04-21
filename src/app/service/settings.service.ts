@@ -209,7 +209,7 @@ export class SettingsService {
 			}
 			else {
 				//offline mode
-				this._filename = this.sessService.file.name;
+				this._filename = this.sessService.sessionfile.name;
 				this._filename = this._filename.substr(0, this._filename.lastIndexOf("."));
 
 				//read file

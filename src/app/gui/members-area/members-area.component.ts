@@ -21,6 +21,5 @@ export class MembersAreaComponent{
 	constructor(private router:Router,
 		private settService:SettingsService
 	) {
-		this.router.navigate(["/user/load"]);
 	}
 }

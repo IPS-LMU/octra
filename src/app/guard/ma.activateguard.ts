@@ -32,6 +32,7 @@ export class MembersAreaGuard implements CanActivate {
 			    console.log("settings are null");
 				this.router.navigate([ '/user/load' ]);
 			}
+
 		return true;
 	}
 }

@@ -210,7 +210,7 @@ export class SessionService {
 			this._easymode = false;
 		}
 		if (offline  && (isNullOrUndefined(member))) {
-			this._interface = "editor without signaldisplay";
+			this._interface = "editor without signal display";
 			this.setNewSessionKey();
 			this.localStr.store("offline", true);
 			this.localStr.store("member_project", "");
@@ -224,7 +224,7 @@ export class SessionService {
 		}
 
 		if (!this.login) {
-			this._interface = "editor without signaldisplay";
+			this._interface = "editor without signal display";
 			this.setNewSessionKey();
 			this.setMemberID(member.id);
 

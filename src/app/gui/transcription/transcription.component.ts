@@ -49,13 +49,13 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	private saving = "";
 
 	get help_url(): string {
-		if (this.sessService.Interface === "audioplayer") {
+		if (this.sessService.Interface === "Editor without signal display") {
 			return "http://www.phonetik.uni-muenchen.de/apps/octra/videos/63sd324g43qt7-interface1/"
 		}
-		else if (this.sessService.Interface === "signaldisplay") {
+		else if (this.sessService.Interface === "Linear Editor") {
 			return "http://www.phonetik.uni-muenchen.de/apps/octra/videos/6at766dsf8ui34-interface2/";
 		}
-		else if (this.sessService.Interface === "overlay") {
+		else if (this.sessService.Interface === "2D-Editor") {
 			return "http://www.phonetik.uni-muenchen.de/apps/octra/videos/6at766dsf8ui34-interface3/";
 		}
 
@@ -96,6 +96,12 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 				private api:APIService
 	) {
 		this.subscrmanager = new SubscriptionManager();
+
+		if (!isNullOrUndefined(this.projectsettings) && !isNullOrUndefined(this.projectsettings.logging) &&  this.projectsettings.logging.forced) {
+			this.subscrmanager.add(this.audio.statechange.subscribe((state) => {
+				this.uiService.addElementFromEvent("audio_" + state, { value: state }, Date.now(), "audio");
+			}));
+		}
 	}
 
 	get dat(): string {
@@ -166,10 +172,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 						this.transcrService.guidelines = guidelines
 					}
 				)
-			);
-
-			this.subscrmanager.add(
-				this.settingsService.loadGuidelines(this.langService.currentLang, "./guidelines/guidelines_" + this.langService.currentLang + ".json")
 			);
 		}
 

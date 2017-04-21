@@ -11,6 +11,10 @@ export class Logger{
 		console.log(Logger.getDateStr() + ": " + message);
 	}
 
+	public static info(message:string){
+		console.info(Logger.getDateStr() + ": " + message);
+	}
+
 	public static getDateStr() {
 		let date = new Date();
 		return date.toLocaleDateString()+ " " + date.toLocaleTimeString();

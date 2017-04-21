@@ -21,7 +21,7 @@
     "de"
   ],
   "interfaces": [
-    "Editor without signaldisplay",
+    "Editor without signal display",
     "Linear Editor",
     "2D-Editor"
   ],

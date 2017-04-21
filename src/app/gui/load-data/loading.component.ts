@@ -42,26 +42,22 @@ export class LoadingComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
+		console.info("load gui init");
 		this.subscrmanager.add(
 			this.settService.projectsettingsloaded.subscribe(
 				(projectsettings) => {
 					this.loadedtable.projectconfig = true;
 					this.progress += 25;
-					if (isNullOrUndefined(this.settService.guidelines)) {
-						let language = this.langService.currentLang;
-						if (isNullOrUndefined(projectsettings.languages.find((x) => {
-								return x === language
-							}))) {
-							//fall back to first defined language
-							language = projectsettings.languages[ 0 ];
-						}
-						this.subscrmanager.add(
-							this.settService.loadGuidelines(this.sessionService.language, "./guidelines/guidelines_" + language + ".json")
-						);
+					let language = this.langService.currentLang;
+					if (isNullOrUndefined(projectsettings.languages.find((x) => {
+							return x === language
+						}))) {
+						//fall back to first defined language
+						language = projectsettings.languages[ 0 ];
 					}
-					else {
-						this.loadedtable.guidelines = true;
-					}
+					this.subscrmanager.add(
+						this.settService.loadGuidelines(this.sessionService.language, "./guidelines/guidelines_" + language + ".json")
+					);
 					this.loadedchanged.emit(false);
 				}
 			)
@@ -93,7 +89,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
 					if (result.status === "success") {
 						this.loadedtable.audio = true;
 						this.progress += 25;
-						console.log(this.audio.audiobuffer.length)
 						this.loadedchanged.emit(false);
 					}
 					else {
@@ -114,14 +109,14 @@ export class LoadingComponent implements OnInit, OnDestroy {
 					) {
 						this.subscrmanager.remove(id);
 						setTimeout(() => {
-							if((isNullOrUndefined(this.sessionService.agreement)
-									|| isNullOrUndefined(this.sessionService.agreement[this.sessionService.member_project]) ||
-									!this.sessionService.agreement[this.sessionService.member_project]
+							if ((isNullOrUndefined(this.sessionService.agreement)
+									|| isNullOrUndefined(this.sessionService.agreement[ this.sessionService.member_project ]) ||
+									!this.sessionService.agreement[ this.sessionService.member_project ]
 								)
-							&& this.settService.projectsettings.agreement.enabled && !this.sessionService.offline)
-							{
+								&& this.settService.projectsettings.agreement.enabled && !this.sessionService.offline) {
 								this.router.navigate([ "/user/agreement" ]);
-							} else{
+							}
+							else {
 								this.router.navigate([ "/user/transcr" ]);
 							}
 						}, 500);
@@ -130,14 +125,9 @@ export class LoadingComponent implements OnInit, OnDestroy {
 			)
 		);
 
-		if (isNullOrUndefined(this.settService.projectsettings)) {
-			this.subscrmanager.add(
-				this.settService.loadProjectSettings()
-			);
-		}
-		else {
-			this.loadedtable.projectconfig = true;
-		}
+		this.subscrmanager.add(
+			this.settService.loadProjectSettings()
+		);
 
 		if (!isNullOrUndefined(this.settService.guidelines) && ((this.settService.tidyUpMethod) || isNullOrUndefined(this.settService.validationmethod))) {
 			this.subscrmanager.add(
@@ -146,6 +136,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 		}
 		else {
 			this.loadedtable.methods = true;
+			this.loadedchanged.emit(false);
 		}
 
 		this.settService.loadAudioFile(this.audio);

@@ -12,6 +12,8 @@ import { SessionService } from "./session.service";
 import { AudioService } from "./audio.service";
 import { isNullOrUndefined } from "util";
 import { Observable } from "rxjs/Observable";
+import { Logger } from "../shared/Logger";
+import { ProjectConfigValidator } from "../validator/ProjectConfigValidator";
 
 @Injectable()
 export class SettingsService {
@@ -104,15 +106,16 @@ export class SettingsService {
 
 	getApplicationSettings(): any {
 		let result: any = null;
-
-		this.subscrmanager.add(this.http.request("./config/config.json").subscribe(
+		Logger.log("Load Application Settings...");
+		this.subscrmanager.add(this.http.request("./config/appconfig.json").subscribe(
 			(result) => {
 				this._app_settings = result.json();
+				Logger.log("AppSettings loaded.");
 				this.validation.app = this.validate(new AppConfigValidator(), this._app_settings);
 				if (this.validation.app) {
 					this.app_settingsloaded.emit(true);
 				} else{
-					console.error("config.json validation error.");
+					Logger.err("appconfig.json validation error.");
 				}
 			},
 			(error)=>{
@@ -123,27 +126,31 @@ export class SettingsService {
 		return result;
 	}
 
-	public loadProjectSettings(): Subscription {
+	public loadProjectSettings:()=>Subscription = () => {
+		Logger.log("Load Project Settings...");
 		return this.http.request("./config/projectconfig.json").subscribe(
 			(result) => {
 				this._projectsettings = result.json();
-				let validation = this.validate(new AppConfigValidator(), this._app_settings);
+				Logger.log("Projectconfig loaded.");
+				let validation = this.validate(new ProjectConfigValidator(), this._app_settings);
 				if (validation) {
 					this.projectsettingsloaded.emit(this._projectsettings);
 				} else{
-					console.error("config.json validation error.");
+					Logger.err("projectconfig.json validation error.");
 				}
 			},
 			(error)=>{
 				this._log += "Loading project config failed<br/>";
 			}
 		);
-	}
+	};
 
-	public loadGuidelines(language: string, url: string): Subscription {
+	public loadGuidelines:((language: string, url: string)=>Subscription) = (language: string, url: string) => {
+		Logger.log("Load Guidelines...");
 		return this.http.get(url).subscribe(
 			(response) => {
 				let guidelines = response.json();
+				Logger.log("Guidelines loaded.");
 				this._guidelines = guidelines;
 				this.loadValidationMethod(guidelines.meta.validation_url);
 				this.guidelinesloaded.emit(guidelines);
@@ -152,9 +159,10 @@ export class SettingsService {
 				this._log += "Loading guidelines failed<br/>";
 			}
 		);
-	}
+	};
 
-	public loadValidationMethod(url: string): Subscription {
+	public loadValidationMethod:((url: string)=>Subscription) = (url: string) => {
+		Logger.log("Load Methods...");
 		return this.http.get(url).subscribe(
 			(response) => {
 				let js = document.createElement("script");
@@ -164,24 +172,26 @@ export class SettingsService {
 				js.id = "validationJS";
 
 				document.body.appendChild(js);
+				Logger.log("Methods loaded.");
 				setTimeout(()=>{
 					this._validationmethod = validateAnnotation;
 					this._tidyUpMethod = tidyUpAnnotation;
+					this.validationmethodloaded.emit();
 				}, 2000);
-
-				this.validationmethodloaded.emit();
 			}
 			,
 			(error)=>{
 				this._log += "Loading functions failed<br/>";
 			}
 		);
-	}
+	};
 
-	public loadAudioFile(audioService:AudioService) {
-		if (audioService.audiocontext) {
+	public loadAudioFile:((audioService: AudioService) => void) = (audioService:AudioService)=> {
+		Logger.log("Load audio...");
+		if (isNullOrUndefined(audioService.audiobuffer)) {
 			this.subscrmanager.add(
 				audioService.afterloaded.subscribe((result)=>{
+					Logger.log("Audio loaded.");
 					this.audioloaded.emit(result);
 				})
 			);
@@ -229,7 +239,7 @@ export class SettingsService {
 				result:"success"
 			});
 		}
-	}
+	};
 
 	private triggerSettingsLoaded = () => {
 		if (this.validated) {

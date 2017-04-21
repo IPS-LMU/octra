@@ -17,7 +17,7 @@
 </modal>
 <modal #modal_shortcuts>
     <modal-body>
-        <div *ngIf="sessService.Interface == 'Editor without signaldisplay'">
+        <div *ngIf="sessService.Interface == 'Editor without signal display'">
             <h3>{{"modal.shortcuts.audioplayer" | translate}}</h3>
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -100,7 +100,7 @@
     <div *ngIf="!(sessService.Interface == '2D-Editor')">
         <app-signal-gui #signalloupe *ngIf="sessService.Interface == 'Linear Editor'">
         </app-signal-gui>
-        <app-audioplayer-gui #audioplayer *ngIf="sessService.Interface == 'Editor without signaldisplay'"></app-audioplayer-gui>
+        <app-audioplayer-gui #audioplayer *ngIf="sessService.Interface == 'Editor without signal display'"></app-audioplayer-gui>
     </div>
     <div *ngIf="sessService.Interface == '2D-Editor'">
         <app-overlay-gui></app-overlay-gui>

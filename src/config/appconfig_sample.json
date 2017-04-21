@@ -1,0 +1,19 @@
+{
+  "version": "1.1.0",
+  "audio_server": {
+    "url": "https://webapp.phonetik.uni-muenchen.de/JSWebTranscribe/"
+  },
+  "octra": {
+    "login": {
+      "enabled": true
+    },
+    "showdetails": true,
+    "responsive": {
+      "enabled": true,
+      "fixedwidth": 1200
+    },
+    "allowed_browsers": [
+    ],
+    "languages":["de", "en"]
+  }
+}

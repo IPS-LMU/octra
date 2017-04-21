@@ -46,8 +46,8 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li *ngIf="sessService.LoggedIn && navbarServ.show_interfaces && interfaceActive('Editor without signaldisplay')">
-                    <a (mouseup)="setInterface('Editor without signaldisplay')">{{"interfaces.simple editor" | translate}}</a>
+                <li *ngIf="sessService.LoggedIn && navbarServ.show_interfaces && interfaceActive('Editor without signal display')">
+                    <a (mouseup)="setInterface('Editor without signal display')">{{"interfaces.simple editor" | translate}}</a>
                 </li>
                 <li *ngIf="sessService.LoggedIn && navbarServ.show_interfaces && interfaceActive('Linear Editor')">
                     <a (mouseup)="setInterface('Linear Editor')">{{"interfaces.linear editor" | translate}}</a>

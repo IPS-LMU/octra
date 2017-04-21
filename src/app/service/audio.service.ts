@@ -6,6 +6,7 @@ import { decodeAudioFile } from "browser-signal-processing/ts/browser-signal-pro
 
 import { isNullOrUndefined } from "util";
 import { ObservableInput } from "rxjs/Observable";
+import { Logger } from "../shared/Logger";
 
 @Injectable()
 export class AudioService {
@@ -302,9 +303,12 @@ export class AudioService {
 			responseType: ResponseContentType.ArrayBuffer
 		});
 
+		Logger.info("Load audio form URL: " +  url + "...");
 		let request = this.http.get(url, options).subscribe(
 			(result)=>{
-				this.decodeAudio(this.extractData(result), callback, errorcallback);
+				let buffer = this.extractData(result);
+				Logger.info("Audio (Length: "+ buffer.byteLength +") loaded. Decode now...");
+				this.decodeAudio(buffer, callback, errorcallback);
 			},
 			error =>{
 				errorcallback(error);
@@ -314,9 +318,10 @@ export class AudioService {
 
 	public decodeAudio = (result: ArrayBuffer, callback: any = () => {
 	}, errorcallback?: (any)=>void) => {
+		Logger.log("Decode audio...");
 		let samplerate = this.getSampleRate(result);
 		decodeAudioFile(result, samplerate).then((buffer) => {
-
+			Logger.log("Audio decoded.");
 			this._audiobuffer = buffer;
 			this.duration = new AudioTime(buffer.length, buffer.sampleRate);
 			this.gainNode = this.audiocontext.createGain();

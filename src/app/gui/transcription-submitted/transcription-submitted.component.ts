@@ -9,6 +9,7 @@ import { AudioService } from "../../service/audio.service";
 import { SubscriptionManager } from "../../shared";
 import { isNullOrUndefined } from "util";
 import { SettingsService } from "../../service/settings.service";
+import { NavbarService } from "../../service/navbar.service";
 
 
 @Component({
@@ -21,15 +22,20 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
 
 	private subscrmanager: SubscriptionManager;
 
+	private navigation:any;
+
 	constructor(private router: Router,
 				private sessService: SessionService,
 				private tranService: TranscriptionService,
 				private uiService: UserInteractionsService,
 				private api: APIService,
 				private audio: AudioService,
-				private settService: SettingsService
+				private settService: SettingsService,
+				private navService:NavbarService
 	) {
 		this.subscrmanager = new SubscriptionManager();
+		this.navService.show_interfaces = false;
+		this.navService.show_export = false;
 	}
 
 	ngOnInit() {
@@ -58,7 +64,6 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
 						this.clearData();
 						this.sessService.audio_url = json.data.url;
 						this.sessService.data_id = json.data.id;
-
 
 						this.router.navigate([ '/user/load' ]);
 					}

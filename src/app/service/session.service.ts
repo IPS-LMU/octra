@@ -107,6 +107,7 @@ export class SessionService {
 	};
 	@SessionStorage('interface') _interface: string;
 	@SessionStorage('samplerate') _samplerate: number;
+	@SessionStorage('agreement') private _agreement: any;
 
 
 	//LOCAL STORAGE
@@ -124,7 +125,6 @@ export class SessionService {
 	@LocalStorage() member_jobno: string;
 	@LocalStorage('easymode') private _easymode: boolean;
 	@LocalStorage('comment') private _comment: string;
-	@LocalStorage('agreement') private _agreement: any;
 
 	//is user on the login page?
 	private login: boolean;
@@ -191,7 +191,7 @@ export class SessionService {
 		this._submitted = value;
 	}
 
-	constructor(private sessStr: SessionStorageService,
+	constructor(public sessStr: SessionStorageService,
 				public localStr: LocalStorageService) {
 	}
 

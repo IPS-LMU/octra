@@ -146,7 +146,7 @@ export class SettingsService {
 	};
 
 	public loadGuidelines:((language: string, url: string)=>Subscription) = (language: string, url: string) => {
-		Logger.log("Load Guidelines...");
+		Logger.log("Load Guidelines ("+ language +")...");
 		return this.http.get(url).subscribe(
 			(response) => {
 				let guidelines = response.json();

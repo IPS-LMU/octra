@@ -59,7 +59,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 		id       : "",
 		agreement: "",
 		project: "",
-		jobno : 0
+		jobno : null
 	};
 
 	err: string = "";
@@ -140,7 +140,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 			}).subscribe(
 				(result) => {
 					let json = result.json();
-					if (form.valid && this.agreement_checked && this.loginService.checkLoginData(this.member.id)
+					if (form.valid && this.agreement_checked
 						&& json.message !== "0"
 					) {
 						if (this.sessionService.sessionfile != null) {
@@ -165,7 +165,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 			}).subscribe(
 				(result) => {
 					let json = result.json();
-					if (form.valid && this.agreement_checked && this.loginService.checkLoginData(this.member.id)
+					if (form.valid && this.agreement_checked
 						&& json.message !== "0"
 					) {
 						if (this.sessionService.sessionfile != null) {
@@ -221,7 +221,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 	};
 
 	canDeactivate(): Observable<boolean> | boolean {
-		return (this.valid && this.loginService.checkLoginData(this.member.id));
+		return (this.valid);
 	}
 
 	private navigate() {

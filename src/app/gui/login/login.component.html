@@ -33,7 +33,7 @@
 </div>
 <div class="section">
     <div class="row">
-        <div class="col-md-6 panel panel-default" style="padding:40px; height:500px;">
+        <div class="col-md-6 panel panel-default" style="padding:40px; height:520px;">
             <br/>
             <p *ngIf="!valid_platform" class="warning" [innerHTML]="'browser.invalid' | translate">
             </p>
@@ -64,12 +64,13 @@
                                     <input class="form-control" type="text" id="login-id"
                                            name="login-id"
                                            placeholder="Anmeldename" [(ngModel)]="member.id"
+                                           pattern="\w+"
                                            required
                                     />
                                 </div>
                                 <div class="form-group">
                                     <select id="select111" class="form-control" #selection
-                                            (change)="selectProject(selection)" required>
+                                            [(ngModel)]="member.project" name="project" required>
                                         <option value="">{{"general.select database" | translate}}</option>
                                         <option *ngFor="let project of projects;" value="{{project}}">{{project}}
                                         </option>
@@ -78,7 +79,8 @@
                                 <div class="form-group">
                                     <input class="form-control" type="number" id="jobno"
                                            name="jobno"
-                                           placeholder="Aufgaben-Nummer" #t (keyup)="member.jobno = t.value"
+                                           placeholder="Aufgaben-Nummer" #t [(ngModel)]="member.jobno"
+                                           pattern="[0-9]+"
                                            required
                                     />
                                 </div>
@@ -95,7 +97,7 @@
                 <br/>
             </section>
         </div>
-        <div class="col-md-6 panel panel-default" style="padding:40px; height:500px;">
+        <div class="col-md-6 panel panel-default" style="padding:40px; height:520px;">
             <section>
                 <h4 style="padding-top:20px;">{{'login.local mode' | translate}}</h4>
                 <div>

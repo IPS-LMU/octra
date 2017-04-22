@@ -6,6 +6,7 @@ import { SessionService } from "../../service/session.service";
 import { isNullOrUndefined } from "util";
 import { AudioService } from "../../service/audio.service";
 import { Router } from "@angular/router";
+import { Observable } from "rxjs/Observable";
 
 @Component({
 	selector   : 'app-loading',
@@ -28,6 +29,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
 	};
 
 	public progress: number = 0;
+	public state:string = "";
+	public warning:string = "";
 
 	constructor(private langService: TranslateService,
 				public settService: SettingsService,
@@ -48,6 +51,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 				(projectsettings) => {
 					this.loadedtable.projectconfig = true;
 					this.progress += 25;
+					this.state = "Project configuration loaded";
 					let language = this.langService.currentLang;
 					if (isNullOrUndefined(projectsettings.languages.find((x) => {
 							return x === language
@@ -68,6 +72,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 				(guidelines) => {
 					this.loadedtable.guidelines = true;
 					this.progress += 25;
+					this.state = "Guidelines loaded";
 					this.loadedchanged.emit(false);
 				}
 			)
@@ -78,6 +83,10 @@ export class LoadingComponent implements OnInit, OnDestroy {
 				() => {
 					this.loadedtable.methods = true;
 					this.progress += 25;
+					this.state = "Methods loaded";
+					if(!this.loadedtable.audio){
+						this.state = "Load Audio...";
+					}
 					this.loadedchanged.emit(false);
 				}
 			)
@@ -89,6 +98,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 					if (result.status === "success") {
 						this.loadedtable.audio = true;
 						this.progress += 25;
+						this.state = "Audio loaded";
 						this.loadedchanged.emit(false);
 					}
 					else {
@@ -120,6 +130,10 @@ export class LoadingComponent implements OnInit, OnDestroy {
 								this.router.navigate([ "/user/transcr" ]);
 							}
 						}, 500);
+					} else if(this.loadedtable.guidelines
+						&& this.loadedtable.projectconfig
+						&& this.loadedtable.methods && !this.loadedtable.audio){
+
 					}
 				}
 			)
@@ -137,8 +151,13 @@ export class LoadingComponent implements OnInit, OnDestroy {
 		else {
 			this.loadedtable.methods = true;
 			this.loadedchanged.emit(false);
-		}
+		};
 
+		setTimeout(()=>{
+			if(!this.loadedtable.audio){
+				this.warning = "Audio file seems to be a large one. This could take a while...";
+			}
+		}, 10000);
 		this.settService.loadAudioFile(this.audio);
 	}
 

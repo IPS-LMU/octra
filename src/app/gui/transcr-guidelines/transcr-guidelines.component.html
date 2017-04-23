@@ -79,7 +79,7 @@
                                                     </video>
                                                 </div>
                                                 <div class="text">
-                                                    <code>{{example.annotation}}</code>
+                                                    <code [innerHTML]="transcrService.rawToHTML(example.annotation)"></code>
                                                 </div>
                                             </div>
                                         </div>

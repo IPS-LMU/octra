@@ -1,14 +1,25 @@
 import { AudioTime } from "./AudioTime";
 
 export class Segment{
+	get changed(): boolean {
+		return this._changed;
+	}
+
+	set changed(value: boolean) {
+		this._changed = value;
+	}
 
 	private _transcript = "";
+	private _changed:boolean = false;
 
 	get transcript():string {
 		return this._transcript;
 	}
 
 	set transcript(value:string) {
+		if(value !== this._transcript){
+			this.changed = true;
+		}
 		this._transcript = value;
 	}
 

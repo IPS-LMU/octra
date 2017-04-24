@@ -80,7 +80,7 @@ class GuidelinesPDF extends FPDF
                 $tab = 15;
                 $y = $this->GetY();
                 //code
-                $this->MultiCell($tab, 5, $this->ud("a_" . $entry->code), 1);
+                $this->MultiCell($tab, 5, $this->ud($entry->code), 1);
                 if ($this->GetY() < $y) {
                     //new page
                     $y = self::MARGIN_TOP;
@@ -91,7 +91,7 @@ class GuidelinesPDF extends FPDF
                 //set title
                 $this->SetFont(self::DEFAULTFONT, "U", 10);
                 $this->SetX($tab + self::MARGIN_LEFT);
-                $this->MultiCell($this->innerwidth - $tab, 5, $y . " " . $this->ud($entry->title), 1);
+                $this->MultiCell($this->innerwidth - $tab, 5, $this->ud($entry->title), 1);
                 $this->SetFont(self::DEFAULTFONT, "", 10);
                 $this->SetX($tab + self::MARGIN_LEFT);
                 //set description

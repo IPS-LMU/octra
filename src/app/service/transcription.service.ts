@@ -123,7 +123,7 @@ export class TranscriptionService {
 				//format to annotJSON file
 				this.navbarServ.exportformats.annotJSON = this.getTranscriptString(button.format);
 			}
-			this.navbarServ.exportformats.filename = this.filename;
+			this.navbarServ.exportformats.filename = this.settingsService.filename;
 		}));
 	}
 

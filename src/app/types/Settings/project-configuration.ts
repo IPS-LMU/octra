@@ -19,5 +19,6 @@ export interface ProjectConfiguration {
 	},
 	languages: string[],
 	interfaces: string[],
+	plugins: any,
 	feedback_form: Group[]
 }

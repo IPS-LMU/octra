@@ -164,16 +164,15 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		this.transcrService.load();
 		this.transcrService.guidelines = this.settingsService.guidelines;
 
-		if(this.langService.currentLang !== this.transcrService.guidelines.meta.language){
-			//reload guidelines
-			this.subscrmanager.add(
-				this.settingsService.guidelinesloaded.subscribe(
-					(guidelines)=>{
-						this.transcrService.guidelines = guidelines
-					}
-				)
-			);
-		}
+		//reload guidelines
+		this.subscrmanager.add(
+			this.settingsService.guidelinesloaded.subscribe(
+				(guidelines)=>{
+					this.transcrService.guidelines = guidelines;
+					console.log("!!loaded: " + guidelines.meta.language);
+				}
+			)
+		);
 
 		for (let i = 0; i < this.transcrService.guidelines.markers.length; i++) {
 			let marker = this.transcrService.guidelines.markers[ i ];
@@ -190,8 +189,18 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		//load guidelines on language change
 		this.subscrmanager.add(this.langService.onLangChange.subscribe(
 			(event: LangChangeEvent) => {
+				let lang = event.lang;
+				if(isNullOrUndefined(this.settingsService.projectsettings.languages.find(
+					x=>{
+						return x === lang
+					}
+					))){
+					//lang not in project config, fall back to first defined
+					lang = this.settingsService.projectsettings.languages[0];
+				}
+
 				this.subscrmanager.add(
-					this.settingsService.loadGuidelines(event.lang, "./guidelines/guidelines_" + event.lang + ".json")
+					this.settingsService.loadGuidelines(event.lang, "./guidelines/guidelines_" + lang + ".json")
 				);
 			}
 		));

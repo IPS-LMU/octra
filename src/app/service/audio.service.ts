@@ -303,9 +303,9 @@ export class AudioService {
 			responseType: ResponseContentType.ArrayBuffer
 		});
 
-		Logger.info("Load audio form URL: " +  url + "...");
 		let request = this.http.get(url, options).subscribe(
 			(result)=>{
+
 				let buffer = this.extractData(result);
 				Logger.info("Audio (Length: "+ buffer.byteLength +") loaded. Decode now...");
 				this.decodeAudio(buffer, callback, errorcallback);

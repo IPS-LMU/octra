@@ -22,8 +22,8 @@
     <span *ngIf="foundErrors > 0" class="text-danger found-errors">{{"general.errors found" | translate : {errors: foundErrors} }}</span>
 </p>
 <h4 [hidden]="!show_transcriptiontable">{{"general.transcript" | translate}}</h4>
-<div *ngIf="shown_segments.length == 0" [hidden]="!show_transcriptiontable">
-    <div style="display:block; text-align:center; padding-top:20px;">
+<div [hidden]="!show_loading">
+    <div style="display:block; text-align:center; margin-top:-10px;position:absolute;width:100%;">
         <i class="fa fa-spinner fa-spin" style="font-size:32px"></i>
     </div>
 </div>
@@ -45,7 +45,7 @@
             </span>
         </td>
         <td><span class="link segment-number" (click)="onSegmentClicked(i)"># {{i+1 | leadingnull: shown_segments.length}}</span></td>
-        <td [innerHTML]="sanitizeHTML(segment.transcription.html)" (mouseover)="onMouseOver($event)"
+        <td [innerHTML]="sanitizeHTML(segment.transcription.html)" (mousemove)="onMouseOver($event)"
             (mousedown)="onMouseOver($event)"></td>
     </tr>
 </table>

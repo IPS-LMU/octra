@@ -44,10 +44,10 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 	public get foundErrors(): number {
 		let found = 0;
 
-		if(this.shown_segments.length > 0){
+		if (this.shown_segments.length > 0) {
 			let result_str = "";
-			for(let i = 0; i < this.shown_segments.length; i++){
-				result_str += this.shown_segments[i].transcription.html;
+			for (let i = 0; i < this.shown_segments.length; i++) {
+				result_str += this.shown_segments[ i ].transcription.html;
 			}
 
 			found = (result_str.match(/<div class='error_underline'/g) || []).length;
@@ -61,17 +61,20 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
 	private subscrmanager: SubscriptionManager;
 	private updating: boolean = false;
-	@Input() public show_transcriptiontable:boolean = true;
+	@Input() public show_transcriptiontable: boolean = true;
+	public show_loading: boolean = true;
 
-	@Input("visible") visible:boolean = true;
+	@Input("visible") visible: boolean = true;
 
-	@Output("segmentclicked") segmentclicked:EventEmitter<number> = new EventEmitter<number>();
+	@Output("segmentclicked") segmentclicked: EventEmitter<number> = new EventEmitter<number>();
 
 	private updateSegments() {
 		if (!this.segments || !this.transcrService.guidelines) return [];
 
+		this.show_loading = true;
 		let start_time = 0;
 		let result = [];
+
 		for (let i = 0; i < this.segments.length; i++) {
 			let segment = this.segments[ i ];
 
@@ -96,6 +99,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 		}
 
 		this.shown_segments = result;
+		this.show_loading = false;
 	}
 
 	constructor(public transcrService: TranscriptionService,
@@ -119,17 +123,22 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
 	onMouseOver($event) {
 		let target = jQuery($event.target);
-		if (target.is(".error_underline")) {
+		if (target.is(".error_underline") || target.parent().is(".error_underline")) {
+
+			if (!target.is(".error_underline"))
+				target = target.parent();
+
 			let errorcode = target.attr("data-errorcode");
+
 			this.selectedError = this.transcrService.getErrorDetails(errorcode);
 
-			if(this.selectedError != null) {
+			if (this.selectedError != null) {
+				this.errortooltip.children(".title").text(this.selectedError.title);
+				this.errortooltip.children(".description").text(this.selectedError.description);
 				let y = target.offset().top - jQuery(this.errortooltip).height() - 20;
 				let x = target.offset().left;
 				this.errortooltip.css("margin-top", y + "px");
 				this.errortooltip.css("margin-left", x + "px");
-				this.errortooltip.children(".title").text(this.selectedError.title);
-				this.errortooltip.children(".description").text(this.selectedError.description);
 				this.errortooltip.fadeIn("fast");
 			}
 		}
@@ -157,19 +166,22 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
 		this.errortooltip = jQuery(".error-tooltip");
 
-		if(this.visible){
+		if (this.visible) {
 			this.updateSegments();
 		}
 	}
 
 	ngOnChanges(event) {
+		this.show_loading = true;
 		if (!isNullOrUndefined(event.visible) && event.visible.currentValue == true) {
 			this.updateSegments();
 			this.transcrService.analyse();
+		} else if(!isNullOrUndefined(event.visible) && event.visible.currentValue == false){
+			jQuery(".error-tooltip").css("display", "none");
 		}
 	}
 
-	public onSegmentClicked(segnumber:number){
+	public onSegmentClicked(segnumber: number) {
 		this.segmentclicked.emit(segnumber);
 	}
 }

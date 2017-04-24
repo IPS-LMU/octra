@@ -7,7 +7,7 @@
     "login": {
       "enabled": true
     },
-    "showdetails": false,
+    "showdetails": true,
     "responsive": {
       "enabled": true,
       "fixedwidth": 1200

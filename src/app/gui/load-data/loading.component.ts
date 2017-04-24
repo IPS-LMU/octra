@@ -37,6 +37,10 @@ export class LoadingComponent implements OnInit, OnDestroy {
 				private sessionService: SessionService,
 				public audio: AudioService,
 				private router: Router) {
+		if(this.sessionService.offline && isNullOrUndefined(this.sessionService.file)){
+			this.router.navigate(["/user/transcr/reload-file"]);
+		}
+
 		langService.get("general.please wait").subscribe(
 			(translation) => {
 				this.text = translation + "...";
@@ -45,7 +49,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
-		console.info("load gui init");
 		this.subscrmanager.add(
 			this.settService.projectsettingsloaded.subscribe(
 				(projectsettings) => {

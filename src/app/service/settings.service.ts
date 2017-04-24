@@ -131,9 +131,9 @@ export class SettingsService {
 		return this.http.request("./config/projectconfig.json").subscribe(
 			(result) => {
 				this._projectsettings = result.json();
-				Logger.log("Projectconfig loaded.");
-				let validation = this.validate(new ProjectConfigValidator(), this._app_settings);
+				let validation = this.validate(new ProjectConfigValidator(), this._projectsettings);
 				if (validation) {
+					Logger.log("Projectconfig loaded.");
 					this.projectsettingsloaded.emit(this._projectsettings);
 				} else{
 					Logger.err("projectconfig.json validation error.");
@@ -197,10 +197,14 @@ export class SettingsService {
 			);
 
 			if (this.sessService.offline != true) {
+				//online
 				let src = this.app_settings.audio_server.url + this.sessService.audio_url;
 				//extract filename
 				this._filename = this.sessService.audio_url.substr(this.sessService.audio_url.lastIndexOf("/") + 1);
 				this._filename = this._filename.substr(0, this._filename.lastIndexOf("."));
+				if(this._filename.indexOf("src=") > -1){
+					this._filename = this._filename.substr(this._filename.indexOf("src=") + 4);
+				}
 
 				audioService.loadAudio(src,()=>{}, (err)=>{
 					let errMsg = err;
@@ -208,7 +212,7 @@ export class SettingsService {
 				});
 			}
 			else {
-				//offline mode
+				//local mode
 				this._filename = this.sessService.sessionfile.name;
 				this._filename = this._filename.substr(0, this._filename.lastIndexOf("."));
 
@@ -249,7 +253,7 @@ export class SettingsService {
 	};
 
 	private validate(validator: ConfigValidator, settings:any): boolean {
-		//validate app config
+		//validate config
 
 		for (let setting in settings) {
 			let result = validator.validate(setting, settings[ "" + setting + "" ]);

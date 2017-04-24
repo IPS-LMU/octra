@@ -31,7 +31,7 @@ class GuidelinesConverter implements Converter
 
     public function output(){
         $project = $this->json->meta->project;
-        $this->pdf->Output("", "Guidelines-$project", true);
+        $this->pdf->Output("", "guidelines_$project.pdf", true);
     }
 
     private function y(){

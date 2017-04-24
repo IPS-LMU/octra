@@ -9,6 +9,7 @@ import { SubscriptionManager } from "../../shared/SubscriptionManager";
 import { Observable } from "rxjs";
 import { forEach } from "@angular/router/src/utils/collection";
 import { TranslateService } from "@ngx-translate/core";
+import { SettingsService } from "../../service/settings.service";
 
 declare var videojs: any;
 
@@ -22,7 +23,7 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 	@ViewChild('modal_guidelines') modal_guidelines: ModalComponent;
 
 	@Input() guidelines = null;
-	private shown_guidelines:any = {};
+	private shown_guidelines: any = {};
 
 	private subscrmanager: SubscriptionManager = new SubscriptionManager();
 	private collapsed: any[][] = [];
@@ -33,18 +34,18 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 
 	constructor(private transcrService: TranscriptionService,
 				private cd: ChangeDetectorRef,
-				private lang:TranslateService
-	) {
+				private lang: TranslateService,
+				private settService: SettingsService) {
 		/*
-		this.subscrmanager.add(
-			transcrService.guidelinesloaded.subscribe(
-				(guidelines) => {
-					this.init();
-				}
-			)
-		);
-*/
-		if(!isNullOrUndefined(this.transcrService.guidelines)){
+		 this.subscrmanager.add(
+		 transcrService.guidelinesloaded.subscribe(
+		 (guidelines) => {
+		 this.init();
+		 }
+		 )
+		 );
+		 */
+		if (!isNullOrUndefined(this.transcrService.guidelines)) {
 			this.init();
 		}
 	}
@@ -60,7 +61,7 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 
 	}
 
-	init(){
+	init() {
 		this.entries = 0;
 		this.guidelines = this.transcrService.guidelines;
 
@@ -84,7 +85,7 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 		}
 	}
 
-	initVideoPlayers(){
+	initVideoPlayers() {
 		for (let g = 0; g < this.guidelines.instructions.length; g++) {
 			for (let i = 0; i < this.guidelines.instructions[ g ].entries.length; i++) {
 				for (let e = 0; e < this.guidelines.instructions[ g ].entries[ i ].examples.length; e++) {
@@ -149,24 +150,25 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 		if (text != "") {
 			this.shown_guidelines.instructions = [];
 
-			for(let i in this.guidelines.instructions){
-				let instruction = this.guidelines.instructions[i];
-				if(instruction.group.indexOf(text) > -1){
+			for (let i in this.guidelines.instructions) {
+				let instruction = this.guidelines.instructions[ i ];
+				if (instruction.group.indexOf(text) > -1) {
 					this.shown_guidelines.instructions.push(instruction);
-				} else{
+				}
+				else {
 					let instr = JSON.parse(JSON.stringify(instruction));
 					instr.entries = [];
 
-					for(let e in instruction.entries){
-						let entry = instruction.entries[e];
-						if(entry.title.indexOf(text) > -1
+					for (let e in instruction.entries) {
+						let entry = instruction.entries[ e ];
+						if (entry.title.indexOf(text) > -1
 							|| entry.description.indexOf(text) > -1
-						){
+						) {
 							instr.entries.push(entry);
 						}
 					}
 
-					if(instr.entries.length > 0){
+					if (instr.entries.length > 0) {
 						this.shown_guidelines.instructions.push(instr);
 					}
 				}
@@ -174,6 +176,32 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 		}
 		else {
 			this.shown_guidelines = JSON.parse(JSON.stringify(this.guidelines));
+		}
+	}
+
+	public exportPDF() {
+		if (!isNullOrUndefined(this.settService.projectsettings)
+			&& !isNullOrUndefined(this.settService.projectsettings.plugins)
+			&& !isNullOrUndefined(this.settService.projectsettings.plugins.pdfexport)
+			&& !isNullOrUndefined(this.settService.projectsettings.plugins.pdfexport.url)) {
+			let form = jQuery("<form></form>")
+				.attr("method", "post")
+				.attr("target", "blank")
+				.attr("action", this.settService.projectsettings.plugins.pdfexport.url)
+				.appendTo("body");
+
+			let json_obj = {
+				translation: this.lang.instant("general"),
+				guidelines : this.guidelines
+			};
+			console.log(json_obj);
+
+			let json = jQuery("<input/>")
+				.attr("name", "json")
+				.attr("type", "text")
+				.attr("value", JSON.stringify(json_obj));
+			form.append(json);
+			form.submit().remove();
 		}
 	}
 }

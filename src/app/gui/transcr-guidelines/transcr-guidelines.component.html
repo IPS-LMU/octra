@@ -2,9 +2,9 @@
     <modal-header>
         <div class="row hidden-xs hidden-sm">
             <div class="col-md-7">
-                <h3>{{"general.guidelines" | translate }}<span class="version">
+                <h3 style="display:inline;">{{"general.guidelines" | translate }}<span class="version">
                      v {{ guidelines.meta.version }}
-                </span></h3>
+                </span></h3><button class="btn btn-sm btn-danger" style="border:1px solid red;" (click)="exportPDF()"><span class="glyphicon glyphicon-print"></span> PDF</button>
                 <span class="project">
                      {{"general.project" | translate }}: {{guidelines.meta.project }}
                 </span>

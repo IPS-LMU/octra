@@ -1,5 +1,23 @@
 # Change Log
 
+## [v1.1.0](https://github.com/IPS-LMU/octra/tree/v1.1.0) (2017-04-24)
+[Full Changelog](https://github.com/IPS-LMU/octra/compare/v1.0.7...v1.1.0)
+
+**Implemented enhancements:**
+
+- show loading status and a hint that loading could take a while [\#41](https://github.com/IPS-LMU/octra/issues/41)
+- Export guidelines.json to PDF [\#40](https://github.com/IPS-LMU/octra/issues/40)
+- change structure of configuration files [\#37](https://github.com/IPS-LMU/octra/issues/37)
+- enable configuration of the feedback form in project's configuration [\#36](https://github.com/IPS-LMU/octra/issues/36)
+- improve usabilty [\#35](https://github.com/IPS-LMU/octra/issues/35)
+- transcr-overview: click on a segment's number enables switching to the selected segment [\#25](https://github.com/IPS-LMU/octra/issues/25)
+
+**Fixed bugs:**
+
+- routing does not work properly [\#39](https://github.com/IPS-LMU/octra/issues/39)
+- delete browser cache and login leads to failure loading guidelines [\#38](https://github.com/IPS-LMU/octra/issues/38)
+- audioviewer: signal not drawn after reading short audio file \(\<2sec\) [\#20](https://github.com/IPS-LMU/octra/issues/20)
+
 ## [v1.0.7](https://github.com/IPS-LMU/octra/tree/v1.0.7) (2017-04-15)
 [Full Changelog](https://github.com/IPS-LMU/octra/compare/v1.0.6...v1.0.7)
 

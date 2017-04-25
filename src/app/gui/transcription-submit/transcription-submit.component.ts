@@ -77,11 +77,17 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 	}
 
 	public back() {
-		this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, "\s");
-		this.sessService.comment = this.transcrService.feedback.comment;
+		if(!this.sessService.offline) {
+			if(!isNullOrUndefined(this.transcrService.feedback.comment)
+			&& this.transcrService.feedback.comment !== "")
+			{
+				this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, "\s");
+			}
+			this.sessService.comment = this.transcrService.feedback.comment;
+			this.saveForm();
+			this.sessService.save("feedback", this.transcrService.feedback.exportData());
+		}
 
-		this.saveForm();
-		this.sessService.save("feedback", this.transcrService.feedback.exportData());
 		this.router.navigate([ '/user/transcr' ]);
 	}
 

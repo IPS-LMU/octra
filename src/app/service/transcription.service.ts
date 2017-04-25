@@ -123,7 +123,6 @@ export class TranscriptionService {
 				//format to annotJSON file
 				this.navbarServ.exportformats.annotJSON = this.getTranscriptString(button.format);
 			}
-			this.navbarServ.exportformats.filename = this.settingsService.filename;
 		}));
 	}
 
@@ -133,6 +132,22 @@ export class TranscriptionService {
 	public load(){
 		this.last_sample = this.audio.duration.samples;
 		this.loadSegments(this.audio.samplerate);
+
+		if(this.sessServ.offline){
+			this.filename = this.sessServ.file.name;
+			if(this.filename.indexOf(".wav") > -1) {
+				this.filename = this.filename.substr(0, this.filename.indexOf(".wav"));;
+			}
+		} else{
+			let start = this.sessServ.audio_url.search(/(%|-|\.|[A-ZÄÖÜß]|[a-zäöü]|_|[0-9])*.wav/g);
+			if(start > -1)
+			{
+				this.filename = this.sessServ.audio_url.substr(start, this.sessServ.audio_url.indexOf(".wav") - start);
+			} else{
+				this.filename = this.sessServ.audio_url;
+			}
+		}
+		this.navbarServ.exportformats.filename = this.filename;
 	}
 
 	public getTranscriptString(format: string): string {

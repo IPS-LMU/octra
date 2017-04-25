@@ -1,7 +1,7 @@
 {
   "version": "1.1.0",
   "logging":{
-    "forced": false
+    "forced": true
   },
   "navigation":{
     "export": true,
@@ -19,7 +19,7 @@
   },
   "plugins":{
     "pdfexport":{
-      "url": "http://localhost:6321/pdfconverter/"
+      "url": "https://www.phonetik.uni-muenchen.de/apps/octra/octra/pdfconverter/"
     }
   },
   "languages": [

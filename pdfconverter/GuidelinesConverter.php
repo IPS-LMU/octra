@@ -1,9 +1,9 @@
 <?php
 
-require_once("./fpdf181/fpdf.php");
-include_once("./Converter.php");
-include_once("./fpdf181/font/helvetica.php");
-include_once("./pdf/GuidelinesPDF.php");
+require_once("fpdf181/fpdf.php");
+include_once("Converter.php");
+include_once("fpdf181/font/helvetica.php");
+include_once("pdf/GuidelinesPDF.php");
 
 class GuidelinesConverter implements Converter
 {

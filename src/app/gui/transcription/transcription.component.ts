@@ -160,7 +160,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 	}
 
 	afterAudioLoaded = () => {
-
 		this.transcrService.load();
 		this.transcrService.guidelines = this.settingsService.guidelines;
 
@@ -296,9 +295,11 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 		this.modal_overview.close();
 	}
 
-	test(){
+	test(id:string){
+		console.log("test: " + id);
+
 		this.subscrmanager.add(
-			this.api.fetchAnnotation(this.sessService.data_id).subscribe(
+			this.api.fetchAnnotation(Number(id)).subscribe(
 				(result)=>{
 					console.log(result.json());
 				}

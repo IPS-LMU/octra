@@ -1,6 +1,6 @@
 <?php
 
-include_once('./fpdf181/fpdf.php');
+include_once('fpdf181/fpdf.php');
 
 class GuidelinesPDF extends FPDF
 {
@@ -24,9 +24,9 @@ class GuidelinesPDF extends FPDF
     private $innerwidth = 0;
 
     //colors
-    const GRAY = array(100, 100, 100);
-    const LIGHTGRAY = array(220, 220, 220);
-    const BLACK = array(0, 0, 0);
+    private $GRAY = array(100, 100, 100);
+    private $LIGHTGRAY = array(220, 220, 220);
+    private $BLACK = array(0, 0, 0);
 
     public function __construct($json, $language, $orientation = 'P', $unit = 'mm', $size = 'A4')
     {
@@ -46,29 +46,29 @@ class GuidelinesPDF extends FPDF
         $this->addPage();
         $this->SetFont(self::DEFAULTFONT, 'U', self::TITLE_FONT_SIZE);
 
-        $this->SetTitle($this->ud($this->language->guidelines." $project"));
+        $this->SetTitle($this->ud($this->language->guidelines . " $project"));
         $this->SetDrawColor(0, 0, 0);
 
         //Set title
         $this->SetY(self::MARGIN_TOP + 10);
-        $this->MultiCell($this->innerwidth, 10, $this->ud($this->language->guidelines." - $project"));
+        $this->MultiCell($this->innerwidth, 10, $this->ud($this->language->guidelines . " - $project"));
         //Set info
         $this->SetX(self::MARGIN_LEFT);
         $this->SetFont(self::DEFAULTFONT, '', self::INFO_FONT_SIZE);
-        $this->changeTextColor(self::GRAY);
-        $this->MultiCell($this->innerwidth, 5, $this->ud($this->language->authors.": " . $this->json->meta->authors));
+        $this->changeTextColor($this->GRAY);
+        $this->MultiCell($this->innerwidth, 5, $this->ud($this->language->authors . ": " . $this->json->meta->authors));
         $this->MultiCell($this->innerwidth, 5, $this->ud("Version: " . $this->json->meta->version));
 
         $this->SetAutoPageBreak(true, self::MARGIN_BOTTOM);
         //Begin output
         $this->SetY($this->GetY() + 5);
-        $this->changeTextColor(self::BLACK);
+        $this->changeTextColor($this->BLACK);
 
         foreach ($this->json->instructions as $group) {
             //new group
             $this->SetFont(self::DEFAULTFONT, "U", 10);
             if (!empty($group->group)) {
-                $this->changeFillColor(self::LIGHTGRAY);
+                $this->changeFillColor($this->LIGHTGRAY);
                 $this->SetFont(self::DEFAULTFONT, "B", 11);
                 $this->MultiCell($this->innerwidth, 5, $this->ud($group->group), 1, 'L', true);
                 $this->SetFont(self::DEFAULTFONT, "", 10);
@@ -186,7 +186,7 @@ class GuidelinesPDF extends FPDF
                             $e++;
                             $this->SetY($this->GetY() + $cell_heights[$k]);
                             $maxheight += $cell_heights[$k];
-                        } else if($k == sizeof($entry->examples) - 1){
+                        } else if ($k == sizeof($entry->examples) - 1) {
                             //last example
                             $maxheight += $cell_heights[$k];
                         }
@@ -211,7 +211,7 @@ class GuidelinesPDF extends FPDF
     function Header()
     {
         $this->SetFont(self::DEFAULTFONT, "", self::HEADER_FONT_SIZE);
-        $this->changeTextColor(self::GRAY);
+        $this->changeTextColor($this->GRAY);
         $this->SetY(self::MARGIN_TOP);
         $this->Cell(100, 5, $this->ud(""), 0, 0, 'L');
         $this->Cell($this->innerwidth - 100, 5, $this->ud("[" . $this->json->meta->date . " ] " . $this->json->meta->project), 0, 0, 'R');
@@ -224,7 +224,7 @@ class GuidelinesPDF extends FPDF
         // Position 1,5 cm von unten
         $this->SetY(-self::MARGIN_BOTTOM);
         $this->SetFont(self::DEFAULTFONT, "", self::FOOTER_FONT_SIZE);
-        $this->changeTextColor(self::GRAY);
+        $this->changeTextColor($this->GRAY);
         $page = $this->PageNo();
         $this->AliasNbPages();
         $this->Cell(0, 10, "$page/{nb}", 0, 0, 'C');

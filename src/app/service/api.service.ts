@@ -85,6 +85,7 @@ export class APIService implements API {
 			transcript.length > 0 &&
 			quality != null
 		) {
+			console.log(data_id);
 			let cmd_json = {
 				querytype : "continueannotation",
 				transcript: JSON.stringify(transcript),

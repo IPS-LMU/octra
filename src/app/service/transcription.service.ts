@@ -202,6 +202,7 @@ export class TranscriptionService {
 		else
 			this.uiService.fromAnyArray(this.sessServ.logs);
 
+		this.navbarServ.dataloaded = true;
 		this.dataloaded.emit();
 	}
 

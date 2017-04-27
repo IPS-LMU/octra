@@ -28,15 +28,16 @@
         </div>
     </modal-body>
     <modal-footer>
-        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="modalexport.dismiss()">{{"general.close" | translate}}
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="modalexport.dismiss()">
+            {{"general.close" | translate}}
         </button>
     </modal-footer>
 </modal>
 <nav class="navbar navbar-inverse">
     <div class="container">
         <div class="navbar-header">
-            <button type="button" (click)="collapsed = !collapsed;" class="navbar-toggle" data-toggle="collapse"
-                    data-target="#navbar" [attr.aria-expanded]="collapsed" aria-controls="navbar">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" (click)="collapsed = ! collapsed"
+                    data-target="#navbar" aria-controls="navbar">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
@@ -46,19 +47,63 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li *ngIf="sessService.LoggedIn && navbarServ.show_interfaces && interfaceActive('Editor without signal display')">
-                    <a (mouseup)="setInterface('Editor without signal display')">{{"interfaces.simple editor" | translate}}</a>
+                <li *ngIf="sessService.LoggedIn && navbarServ.show_interfaces && interfaceActive('Editor without signal display')"
+                    [ngClass]="{
+                        'active': sessService.Interface === 'Editor without signal display'
+                    }"
+                >
+                    <a (mouseup)="setInterface('Editor without signal display')">
+                        <i class="glyphicon glyphicon-minus navbar-icon"></i> <span class="hidden-sm">{{"interfaces.simple editor" | translate}}</span>
+                    </a>
                 </li>
-                <li *ngIf="sessService.LoggedIn && navbarServ.show_interfaces && interfaceActive('Linear Editor')">
-                    <a (mouseup)="setInterface('Linear Editor')">{{"interfaces.linear editor" | translate}}</a>
+                <li *ngIf="sessService.LoggedIn && navbarServ.show_interfaces && interfaceActive('Linear Editor')"
+                    [ngClass]="{
+                        'active': sessService.Interface === 'Linear Editor'
+                    }">
+                    <a (mouseup)="setInterface('Linear Editor')">
+                        <span class="glyphicon glyphicon-modal-window navbar-icon"></span> <span class="hidden-sm">{{"interfaces.linear editor" | translate}}</span>
+                    </a>
                 </li>
-                <li *ngIf="sessService.LoggedIn && navbarServ.show_interfaces && interfaceActive('2D-Editor')"><a (mouseup)="setInterface('2D-Editor')">{{"interfaces.2D editor" | translate}}</a></li>
-                <li *ngIf="sessService.LoggedIn && navbarServ.show_export"><a (mouseup)="modalexport.open()">{{"general.export" | translate}} </a></li>
-                <li *ngIf="sessService.LoggedIn && navbarServ.show_interfaces"><a (mouseup)="sessService.easymode = !sessService.easymode">{{"general.easy mode" | translate}}: <span *ngIf="sessService.easymode">{{"general.yes" | translate}}</span><span *ngIf="!sessService.easymode">{{"general.no" | translate}}</span></a></li>
+                <li *ngIf="sessService.LoggedIn && navbarServ.show_interfaces && interfaceActive('2D-Editor')"
+                    [ngClass]="{
+                        'active': sessService.Interface === '2D-Editor'
+                    }"
+                >
+                    <a (mouseup)="setInterface('2D-Editor')">
+                        <span class="glyphicon glyphicon-align-justify navbar-icon"></span> <span class="hidden-sm">{{"interfaces.2D editor" | translate}}</span></a>
+                </li>
             </ul>
+
             <ul class="nav navbar-nav navbar-right">
+                <li *ngIf="sessService.LoggedIn && navbarServ.show_export">
+                    <a (mouseup)="modalexport.open()">
+                        <span class="glyphicon glyphicon-download navbar-icon"></span>
+                        <span class="hidden-sm hidden-md">{{"general.export" | translate}}</span>
+                    </a>
+                </li>
+                <li class="dropdown" [hidden]="!(sessService.LoggedIn && navbarServ.dataloaded)">
+                    <a href="#" class="dropdown" data-toggle="dropdown" role="button"
+                       aria-expanded="false"><span class="glyphicon glyphicon-cog navbar-icon"></span></a>
+                    <div class="dropdown-menu options-menu" [ngClass]="{
+                        'collaps': collapsed
+                    }">
+                        <table class="table">
+                            <tr>
+                                <td><label for="easymode">{{"general.easy mode" | translate}}:</label></td>
+                                <td>
+                                    <div class="togglebutton">
+                                        <label>
+                                            <input (click)="toggleEasyMode()" [checked]="sessService.easymode" id="easymode" type="checkbox">
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </li>
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{langService.currentLang | uppercase}} <span class="caret"></span></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">{{langService.currentLang | uppercase}} <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li *ngFor="let item of langService.getLangs();">
                             <a (click)="changeLanguage(item)">{{item | uppercase}}</a>
@@ -66,6 +111,6 @@
                     </ul>
                 </li>
             </ul>
-        </div><!--/.nav-collapse -->
+        </div><!-- .nav-collapse -->
     </div>
 </nav>

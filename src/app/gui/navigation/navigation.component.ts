@@ -1,103 +1,117 @@
-import { Component, OnInit, Input, AfterViewInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { Subscription } from "rxjs/Rx";
-import { SessionService } from "../../service/session.service";
-import { ModalComponent } from "ng2-bs3-modal/components/modal";
-import { TranscriptionService } from "../../service/transcription.service";
-import { TextConverter } from "../../shared/Converters/TextConverter";
-import { NavbarService } from "../../service/navbar.service";
-import { DomSanitizer } from '@angular/platform-browser';
-import { TranslateService } from "@ngx-translate/core";
-import { isNull, isNullOrUndefined } from "util";
+import {AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {SessionService} from "../../service/session.service";
+import {ModalComponent} from "ng2-bs3-modal/components/modal";
+import {NavbarService} from "../../service/navbar.service";
+import {DomSanitizer} from "@angular/platform-browser";
+import {TranslateService} from "@ngx-translate/core";
+import {isNullOrUndefined} from "util";
 
 @Component({
-	selector   : 'app-navigation',
-	templateUrl: './navigation.component.html',
-	styleUrls  : [ './navigation.component.css' ]
+    selector: 'app-navigation',
+    templateUrl: './navigation.component.html',
+    styleUrls: ['./navigation.component.css']
 })
 
 export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
-	@ViewChild("modalexport") modalexport: ModalComponent;
-	@Input('version') version: string;
+    @ViewChild("modalexport") modalexport: ModalComponent;
+    @Input('version') version: string;
 
-	public test: string = "ok";
-	collapsed: boolean = true;
+    public test: string = "ok";
+    collapsed: boolean = true;
 
-	constructor(public sessService: SessionService,
-				public navbarServ: NavbarService,
-				public sanitizer: DomSanitizer,
-				public langService:TranslateService
-	) {
-	}
+    constructor(public sessService: SessionService,
+                public navbarServ: NavbarService,
+                public sanitizer: DomSanitizer,
+                public langService: TranslateService) {
+    }
 
-	ngOnDestroy() {
-	}
+    ngOnDestroy() {
+    }
 
-	ngOnInit() {
-	}
+    ngOnInit() {
+    }
 
-	ngAfterViewInit() {
-		(($) => {
-			$(() => {
-			}); // end of document ready
-		})(jQuery); // end of jQuery name space
-	}
+    ngAfterViewInit() {
+        (($) => {
+            $(() => {
+                $(document).on('click', '.options-menu', function (e) {
+                    e.stopPropagation();
+                });
+            });
+        })(jQuery);
 
-	setInterface(new_interface: string) {
-		this.sessService.Interface = new_interface;
+        jQuery(document).on('mouseleave', '.navbar-collapse.collapse.in', function (e){
+           jQuery(".navbar-header button").click();
+        });
+        setTimeout(() => {
+            jQuery.material.init();
+        }, 200);
+    }
 
-	}
+    setInterface(new_interface: string) {
+        this.sessService.Interface = new_interface;
 
-	onNavBarLeave($event) {
-		$event.target.click();
-	}
+    }
 
-	getTextFile() {
-		let txt = "";
-		/*
-		 let data = this.tranServ.exportDataToJSON();
+    onNavBarLeave($event) {
+        $event.target.click();
+    }
 
-		 let tc:TextConverter = new TextConverter();
-		 txt = tc.convert(data);
+    getTextFile() {
+        let txt = "";
+        /*
+         let data = this.tranServ.exportDataToJSON();
 
-		 alert(txt);*/
-	}
+         let tc:TextConverter = new TextConverter();
+         txt = tc.convert(data);
 
-	getURI(format: string): string {
-		let result: string = "";
+         alert(txt);*/
+    }
 
-		switch (format) {
-			case("text"):
-				result += "data:text/plain;charset=UTF-8,";
-				result += encodeURIComponent(this.navbarServ.exportformats.text);
-				break;
-			case("annotJSON"):
-				result += "data:application/json;charset=UTF-8,";
-				result += encodeURIComponent(this.navbarServ.exportformats.annotJSON);
-				break;
-		}
+    getURI(format: string): string {
+        let result: string = "";
 
-		return result;
-	}
+        switch (format) {
+            case("text"):
+                result += "data:text/plain;charset=UTF-8,";
+                result += encodeURIComponent(this.navbarServ.exportformats.text);
+                break;
+            case("annotJSON"):
+                result += "data:application/json;charset=UTF-8,";
+                result += encodeURIComponent(this.navbarServ.exportformats.annotJSON);
+                break;
+        }
 
-	sanitize(url:string){
-		return this.sanitizer.bypassSecurityTrustUrl(url);
-	}
+        return result;
+    }
 
-	changeLanguage(lang:string){
-		this.langService.use(lang);
-		this.sessService.language = lang;
-	}
+    sanitize(url: string) {
+        return this.sanitizer.bypassSecurityTrustUrl(url);
+    }
 
-	public interfaceActive(name:string){
-		if(isNullOrUndefined(
-			this.navbarServ.interfaces.find((x)=>{
-				return name === x;
-			})
-			)){
-			return false;
-		}
-		return true;
-	}
+    changeLanguage(lang: string) {
+        this.langService.use(lang);
+        this.sessService.language = lang;
+    }
 
+    public interfaceActive(name: string) {
+        if (isNullOrUndefined(
+                this.navbarServ.interfaces.find((x) => {
+                    return name === x;
+                })
+            )) {
+            return false;
+        }
+        return true;
+    }
+
+    toggleEasyMode() {
+        this.sessService.easymode = !this.sessService.easymode;
+    }
+
+    onOptionsOpened() {
+        console.log("OKOK");
+        this.collapsed = true;
+    }
 }

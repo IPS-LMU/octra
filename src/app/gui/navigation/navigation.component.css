@@ -20,3 +20,30 @@
     font-size:50px;
     color:#0b0080;
 }
+
+.navbar-icon{
+    color:white;
+    font-size:100%;
+}
+
+.options-menu{
+    padding:20px;
+    font-size:0.7em;
+    min-width:300px;
+}
+
+.dropdown-menu.options-menu.collaps label{
+    color:black;
+    font-size:1.5em;
+}
+
+.options-menu label{
+    color:white;
+}
+
+.options-menu *{
+    border: none;
+}
+.options-menu .table{
+    margin-bottom: 0;
+}

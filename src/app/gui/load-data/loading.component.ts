@@ -36,6 +36,9 @@ export class LoadingComponent implements OnInit, OnDestroy {
               private sessionService: SessionService,
               public audio: AudioService,
               private router: Router) {
+    if (!this.sessionService.LoggedIn) {
+      this.router.navigate(['/login']);
+    }
     if (this.sessionService.offline && isNullOrUndefined(this.sessionService.file)) {
       this.router.navigate(['/user/transcr/reload-file']);
     }
@@ -164,4 +167,12 @@ export class LoadingComponent implements OnInit, OnDestroy {
     this.subscrmanager.destroy();
   }
 
+  retry() {
+    location.reload();
+  }
+
+  goBack() {
+    this.sessionService.clearSession();
+    this.router.navigate(['/login']);
+  }
 }

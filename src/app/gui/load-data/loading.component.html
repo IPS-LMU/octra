@@ -17,4 +17,7 @@
     </div>
     <div class="log" [innerHTML]="settService.log">
     </div>
+    <div *ngIf="settService.log != ''">
+        <span class="link" (click)="retry()">Retry</span> or <span class="link" (click)="goBack()">Back</span>
+    </div>
 </div>

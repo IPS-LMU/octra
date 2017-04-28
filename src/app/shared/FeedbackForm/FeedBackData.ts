@@ -1,5 +1,5 @@
-import { Group } from "./Group";
+import {Group} from './Group';
 
 export interface FeedBackData {
-	groups: Group[]
+  groups: Group[];
 }

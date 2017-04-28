@@ -1,5 +1,5 @@
 .slider{
-    padding:0px;
+    padding:0;
 }
 
 .slider-descr {
@@ -18,7 +18,7 @@
 }
 
 .audio-nav .btn-toolbar{
-    margin-left:0px;
+    margin-left:0;
 }
 
 .audio-nav .btn-group{

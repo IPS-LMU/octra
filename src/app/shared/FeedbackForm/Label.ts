@@ -1,9 +1,9 @@
 export class Label {
-	public get languages():any{
-		return this._languages;
-	}
+  public get languages(): any {
+    return this._languages;
+  }
 
-	constructor(private _languages:any){
+  constructor(private _languages: any) {
 
-	}
+  }
 }

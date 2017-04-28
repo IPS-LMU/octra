@@ -1,42 +1,42 @@
-import { Control } from "./Control";
+import {Control} from './Control';
 
 export class Group {
-	public get title():string{
-		return this._title;
-	}
+  public get title(): string {
+    return this._title;
+  }
 
-	public get controls():Control[]{
-		return this._controls;
-	}
+  public get controls(): Control[] {
+    return this._controls;
+  }
 
-	constructor(private _title: string, private _controls:Control[]){
-	}
+  public static fromAny(group: any): Group {
+    const controls: Control[] = [];
 
-	public toAny():any{
-		let result = {
-			title: this._title
-		};
+    for (let i = 0; i < group.controls.length; i++) {
+      const control = group.controls[i];
+      controls.push(Control.fromAny(control));
+    }
 
-		result["controls"] = [];
-		for(let i = 0; i < this._controls.length; i++){
-			let control = this._controls[i];
-			result["controls"].push(control.toAny());
-		}
+    return new Group(
+      group.title,
+      controls
+    );
+  }
 
-		return result;
-	}
+  constructor(private _title: string, private _controls: Control[]) {
+  }
 
-	public static fromAny(group:any):Group{
-		let controls:Control[] = [];
+  public toAny(): any {
+    const result = {
+      title: this._title
+    };
 
-		for(let i = 0; i < group.controls.length; i++){
-			let control = group.controls[i];
-			controls.push(Control.fromAny(control));
-		}
+    result['controls'] = [];
+    for (let i = 0; i < this._controls.length; i++) {
+      const control = this._controls[i];
+      result['controls'].push(control.toAny());
+    }
 
-		return new Group(
-			group.title,
-			controls
-		);
-	}
+    return result;
+  }
 }

@@ -1,5 +1,5 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { SessionService } from "../../service/session.service";
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {SessionService} from '../../service/session.service';
 
 @Component({
   selector: 'app-fastbar',
@@ -8,22 +8,21 @@ import { SessionService } from "../../service/session.service";
 })
 export class FastbarComponent implements OnInit {
 
-  @Input() responsive:boolean = false;
-  @Input() help_url:string = "";
-  @Input() button_labels:any = {
-    shortcuts: "Shortcuts",
-    guidelines: "Guidlines",
-    overview: "Overview",
-    help: "Help"
+  @Input() responsive = false;
+  @Input() help_url = '';
+  @Input() button_labels: any = {
+    shortcuts: 'Shortcuts',
+    guidelines: 'Guidlines',
+    overview: 'Overview',
+    help: 'Help'
   };
 
-  @Output() shortcutbtnclicked:EventEmitter<void> = new EventEmitter<void>();
-  @Output() guidelinesbtnclicked:EventEmitter<void> = new EventEmitter<void>();
-  @Output() overviewbtnclicked:EventEmitter<void> = new EventEmitter<void>();
+  @Output() shortcutbtnclicked: EventEmitter<void> = new EventEmitter<void>();
+  @Output() guidelinesbtnclicked: EventEmitter<void> = new EventEmitter<void>();
+  @Output() overviewbtnclicked: EventEmitter<void> = new EventEmitter<void>();
 
-  constructor(
-      public sessService:SessionService
-  ) { }
+  constructor(public sessService: SessionService) {
+  }
 
   ngOnInit() {
   }

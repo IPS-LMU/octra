@@ -24,6 +24,9 @@ export interface API {
               comment: string,
               quality: any,
               log: any[]): Observable<Response>;
+  unlockSession(project: string,
+                data_id: number): Observable<Response>;
+
   closeSession(annotator: string, id: number, comment: string): Observable<Response>;
   getAudioURL(dir: string, src: string): string;
 

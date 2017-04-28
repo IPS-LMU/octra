@@ -1,5 +1,6 @@
 {
   "general": {
+    "name": "Name",
     "abort": "Abort",
     "continue": "Continue",
     "close": "Close",
@@ -49,7 +50,7 @@
     "no errors found": "No errors found",
     "segment": "Segment"
   },
-  "transcription":{
+  "transcription": {
     "start": "Continue transcription",
     "new": "Start new transcription",
     "finish": "Finish transcription",
@@ -57,7 +58,7 @@
     "check": "Check transcription",
     "send": "Send transcription"
   },
-  "segments":{
+  "segments": {
     "total": "Total segments",
     "transcribed": "Transcribed segments",
     "with breaks": "Segments with breaks",
@@ -66,7 +67,7 @@
     "next": "next segment",
     "no guidelines found": "No guidelines found"
   },
-  "feedback":{
+  "feedback": {
     "unintelligible": "unintelligible",
     "less intelligible": "less intelligible",
     "intelligible": "intelligible",
@@ -92,10 +93,12 @@
       "stop": {
         "header": "Stop Transcription",
         "text": "Do you really want to stop the transcription?<br><br>Your proceedings have been saved in your Browser. If you want to continue later do not delete the browser cache and revisit the application in the same browser (a browser's cache is not shared with other browsers)."
-      },"send": {
+      },
+      "send": {
         "header": "Send transcription",
         "text": "Clicking on 'Send now' will send your data to the Server to save it. After this, you can not change your data."
-      },"sending": {
+      },
+      "sending": {
         "header": "Send transcription now...",
         "text": "Your results are being transmitted to the server... Please wait for the transmission to finish successfully."
       }
@@ -142,14 +145,14 @@
     "file not supported": "Type of file is '{{type}}' and not supported.",
     "another file selected": "Another file selected. Please select the same file as before or start a new transcription.\n\nWanted: '{{file}}'"
   },
-  "logout":{
+  "logout": {
     "successful text": "You are successfully logged out.",
     "login again": "Login again"
   },
-  "signal-gui":{
+  "signal-gui": {
     "selection text": "Please select a segment by hovering over it and pressing the {{value}} key."
   },
-  "transcription-submit":{
+  "transcription-submit": {
     "overview": "The next table shows an overview about your defined segments:",
     "form fill out": "Please fill out the form",
     "intelligibility of the speaker": "Intelligibility of the speaker",
@@ -159,7 +162,7 @@
   "boundary cannot delete": "Cannot delete boundary because there are neighboring segments that are already transcribed.",
   "boundary cannot set": "Cannot set boundary in a segments that is already transcribed.",
   "send error": "An error occurred. Please reload this page and try again!",
-  "transcription submitted":{
+  "transcription submitted": {
     "no jobs left": "No available jobs left",
     "transcription sent": "transcription was transmitted",
     "transcription sent successfully": "Your transcription was transmitted successfully.",

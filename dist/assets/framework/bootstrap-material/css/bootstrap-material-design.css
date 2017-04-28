@@ -556,7 +556,7 @@ body .container-fluid .jumbotron-danger {
 .input-group-btn .btn.btn-fab.btn-fab-mini.material-icons,
 .btn-group-sm .btn.btn-fab.material-icons,
 .btn-group-sm .input-group-btn .btn.btn-fab.material-icons {
-  top: 0px;
+  top: 0;
   left: 0px;
 }
 .btn.btn-fab i.material-icons,

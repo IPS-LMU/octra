@@ -7,62 +7,62 @@
  */
 export class Line {
 
-	private size = {
-		width: 0,
-		height: 0
-	};
+  private size = {
+    width: 0,
+    height: 0
+  };
 
-	private pos = {
-		x: 0,
-		y: 0
-	};
+  private pos = {
+    x: 0,
+    y: 0
+  };
 
-	public number:number = -1;
-	private isMouseIn = false;
+  public number: number = -1;
+  private isMouseIn = false;
 
 
-	/*
-	GETTER / SETTER
-	 */
+  /*
+   GETTER / SETTER
+   */
 
-	get Size():any{
-		return {
-			width : this.size.width,
-			height: this.size.height
-		};
-	}
+  get Size(): any {
+    return {
+      width: this.size.width,
+      height: this.size.height
+    };
+  }
 
-	set Size(any){
-		this.size.width = any.width;
-		this.size.height = any.height;
-	}
+  set Size(any) {
+    this.size.width = any.width;
+    this.size.height = any.height;
+  }
 
-	get Pos():any{
-		return this.pos;
-	}
+  get Pos(): any {
+    return this.pos;
+  }
 
-	set Pos(any){
-		this.pos.x = any.x;
-		this.pos.y = any.y;
-	}
+  set Pos(any) {
+    this.pos.x = any.x;
+    this.pos.y = any.y;
+  }
 
-	constructor(number:number, size:any, pos:any){
-		this.number = number;
-		this.size = {
-			width: size.width,
-			height: size.height
-		};
-		this.pos = {
-			x:pos.x,
-			y: pos.y
-		};
-	}
+  constructor(number: number, size: any, pos: any) {
+    this.number = number;
+    this.size = {
+      width: size.width,
+      height: size.height
+    };
+    this.pos = {
+      x: pos.x,
+      y: pos.y
+    };
+  }
 
-	mouseIn = function(x,y){
-		var result =
-			(x > this.pos.x && x < (this.pos.x + this.size.width)) &&
-			(y > this.pos.y && y < (this.pos.y +  this.size.height));
+  mouseIn = function (x, y) {
+    const result =
+      (x > this.pos.x && x < (this.pos.x + this.size.width)) &&
+      (y > this.pos.y && y < (this.pos.y + this.size.height));
 
-		return result;
-	};
+    return result;
+  };
 }

@@ -1,16 +1,16 @@
-import { Injectable, EventEmitter } from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 
 @Injectable()
 export class MessageService {
-	constructor() {
-	}
+  public showmessage: EventEmitter<any> = new EventEmitter<any>();
 
-	public showmessage: EventEmitter<any> = new EventEmitter<any>();
+  public showMessage(type: string, message: string) {
+    this.showmessage.emit({
+      type: type,
+      message: message
+    });
+  }
 
-	public showMessage(type: string, message: string) {
-			this.showmessage.emit({
-				type   : type,
-				message: message
-			});
-	}
+  constructor() {
+  }
 }

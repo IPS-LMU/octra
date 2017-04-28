@@ -1,7 +1,7 @@
-export abstract class Converter{
-	constructor(){
+export abstract class Converter {
+  constructor() {
 
-	}
+  }
 
-	abstract convert(data:any, filename:string):any;
+  abstract convert(data: any, filename: string): any;
 }

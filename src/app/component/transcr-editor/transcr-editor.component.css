@@ -34,7 +34,7 @@
 
 .transcr-editor .btn-shortcut{
     font-size:0.7em;
-    margin:auto 0px;
+    margin:auto 0;
 }
 
 .transcr-editor .btn-description {
@@ -56,5 +56,5 @@
 }
 
 .transcr-editor .note-editor{
-    margin-bottom:0px;
+    margin-bottom:0;
 }

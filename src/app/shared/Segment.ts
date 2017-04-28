@@ -1,57 +1,56 @@
-import { AudioTime } from "./AudioTime";
+import {AudioTime} from './AudioTime';
 
-export class Segment{
-	get changed(): boolean {
-		return this._changed;
-	}
+export class Segment {
+  get changed(): boolean {
+    return this._changed;
+  }
 
-	set changed(value: boolean) {
-		this._changed = value;
-	}
+  set changed(value: boolean) {
+    this._changed = value;
+  }
 
-	private _transcript = "";
-	private _changed:boolean = false;
+  private _transcript = '';
+  private _changed = false;
 
-	get transcript():string {
-		return this._transcript;
-	}
+  get transcript(): string {
+    return this._transcript;
+  }
 
-	set transcript(value:string) {
-		if(value !== this._transcript){
-			this.changed = true;
-		}
-		this._transcript = value;
-	}
+  set transcript(value: string) {
+    if (value !== this._transcript) {
+      this.changed = true;
+    }
+    this._transcript = value;
+  }
 
-	constructor(
-		public time:AudioTime
-	){
+  public static fromAny(obj: any): Segment {
+    if (obj) {
+      const seg = new Segment(AudioTime.fromAny(obj.time));
 
-	}
+      if (obj.transcript) {
+        seg._transcript = obj.transcript;
+      }
 
-	public clone():Segment{
-		let seg = new Segment(this.time.clone());
-		seg.transcript = this.transcript;
-		return seg;
-	}
+      return seg;
+    }
 
-	public toAny():any{
-		return {
-			transcript: this._transcript,
-			time: this.time.toAny()
-		}
-	}
+    return null;
+  }
 
-	public static fromAny(obj:any):Segment{
-		if(obj){
-			let seg = new Segment(AudioTime.fromAny(obj.time));
+  constructor(public time: AudioTime) {
 
-			if(obj.transcript)
-				seg._transcript = obj.transcript;
+  }
 
-			return seg;
-		}
+  public clone(): Segment {
+    const seg = new Segment(this.time.clone());
+    seg.transcript = this.transcript;
+    return seg;
+  }
 
-		return null;
-	}
+  public toAny(): any {
+    return {
+      transcript: this._transcript,
+      time: this.time.toAny()
+    };
+  }
 }

@@ -1,57 +1,55 @@
-import { AudioTime } from "./AudioTime";
-import { Chunk } from "./Chunk";
-import { Functions } from "./Functions";
-import { Logger } from "./Logger";
+import {AudioTime} from './AudioTime';
+import {Chunk} from './Chunk';
 export class AudioTimeCalculator {
-	constructor(public samplerate: number,
-				public _duration: AudioTime,
-				public audio_px_width: number
-	) {
-		if(this.audio_px_width == null ||this.audio_px_width < 1)
-			console.error("audio px null");
-	}
+  public static roundSamples(samples: number) {
+    return Math.round(samples);
+  }
 
-	set duration(value: AudioTime) {
-		this._duration = value;
-	}
+  constructor(public samplerate: number,
+              public _duration: AudioTime,
+              public audio_px_width: number) {
+    if (this.audio_px_width == null || this.audio_px_width < 1) {
+      console.error('audio px null');
+    }
+  }
 
-	public samplestoAbsX(time_samples: number, duration?: AudioTime): number {
-		let dur = (duration) ? duration : this._duration;
-		return (time_samples / dur.samples) * this.audio_px_width;
-	}
+  set duration(value: AudioTime) {
+    this._duration = value;
+  }
 
-	public absXChunktoSamples(absX: number, chunk:Chunk): number {
-		let start = (chunk.time.start) ? chunk.time.start.samples : 1;
-		let duration = chunk.time.end.samples - start;
-		if (absX >= 0 && absX <= this.audio_px_width) {
-			let ratio = absX / this.audio_px_width;
-			return AudioTimeCalculator.roundSamples((duration * ratio) + chunk.time.start.samples);
-		}
+  public samplestoAbsX(time_samples: number, duration?: AudioTime): number {
+    const dur = (duration) ? duration : this._duration;
+    return (time_samples / dur.samples) * this.audio_px_width;
+  }
 
-		return -1;
-	}
+  public absXChunktoSamples(absX: number, chunk: Chunk): number {
+    const start = (chunk.time.start) ? chunk.time.start.samples : 1;
+    const duration = chunk.time.end.samples - start;
+    if (absX >= 0 && absX <= this.audio_px_width) {
+      const ratio = absX / this.audio_px_width;
+      return AudioTimeCalculator.roundSamples((duration * ratio) + chunk.time.start.samples);
+    }
 
-	public absXtoSamples2(absX: number, chunk:Chunk): number {
-		let start = (chunk.time.start) ? chunk.time.start.samples : 1;
-		let duration = chunk.time.end.samples - start;
-		if (absX >= 0 && absX <= this.audio_px_width) {
-			let ratio = absX / this.audio_px_width;
+    return -1;
+  }
 
-			return AudioTimeCalculator.roundSamples(duration * ratio);
-		}
+  public absXtoSamples2(absX: number, chunk: Chunk): number {
+    const start = (chunk.time.start) ? chunk.time.start.samples : 1;
+    const duration = chunk.time.end.samples - start;
+    if (absX >= 0 && absX <= this.audio_px_width) {
+      const ratio = absX / this.audio_px_width;
 
-		return -1;
-	}
+      return AudioTimeCalculator.roundSamples(duration * ratio);
+    }
 
-	public samplesToSeconds(samples: number):number {
-		return (this.samplerate > 0 && samples > -1) ? (samples / this.samplerate) : 0;
-	}
+    return -1;
+  }
 
-	public secondsToSamples(seconds:number):number {
-		return (this.samplerate > 0 && seconds > -1) ? AudioTimeCalculator.roundSamples(seconds * this.samplerate) : 0;
-	}
+  public samplesToSeconds(samples: number): number {
+    return (this.samplerate > 0 && samples > -1) ? (samples / this.samplerate) : 0;
+  }
 
-	public static roundSamples(samples:number){
-		return Math.round(samples);
-	}
+  public secondsToSamples(seconds: number): number {
+    return (this.samplerate > 0 && seconds > -1) ? AudioTimeCalculator.roundSamples(seconds * this.samplerate) : 0;
+  }
 }

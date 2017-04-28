@@ -1,138 +1,137 @@
-import { Group } from "./Group";
-import { Control } from "./Control";
-import { isNullOrUndefined } from "util";
-import { isArray } from "rxjs/util/isArray";
+import {Group} from './Group';
+import {Control} from './Control';
+import {isNullOrUndefined} from 'util';
+import {isArray} from 'rxjs/util/isArray';
 
 export class FeedBackForm {
-	public get groups():Group[] {
-		return this._groups;
-	}
+  public get groups(): Group[] {
+    return this._groups;
+  }
 
-	public get comment() {
-		return this._comment;
-	}
+  public get comment() {
+    return this._comment;
+  }
 
-	public set comment(value: string) {
-		this._comment = value;
-	}
+  public set comment(value: string) {
+    this._comment = value;
+  }
 
-	constructor(private _groups: Group[], private _comment: string) {
+  public static fromAny(feedback_data: any[], comment: string): FeedBackForm {
+    const groups: Group[] = [];
 
-	}
+    // init feedback_data
+    for (let i = 0; i < feedback_data.length; i++) {
+      const group = feedback_data[i];
+      groups.push(Group.fromAny(group));
+    }
 
-	public exportData(): any {
-		let result: any = {};
+    return new FeedBackForm(
+      groups,
+      comment
+    );
+  }
 
-		for (let i = 0; i < this.groups.length; i++) {
-			for (let j = 0; j < this.groups[ i ].controls.length; j++) {
-				let control: Control = this.groups[ i ].controls[ j ];
-				if (control.type.type !== "textarea") {
-					if (control.type.type === "radiobutton") {
-						if (!isNullOrUndefined(control.custom.checked)) {
-							if (control.custom.checked) {
-								result[ "" + control.name + "" ] = control.value;
-								break;
-							}
-							result[ "" + control.name + "" ] = "";
-						}
-						else {
-							result[ "" + control.name + "" ] = "";
-						}
-					}
-					else if (control.type.type === "checkbox") {
-						if(isNullOrUndefined(result[ "" + control.name + "" ])){
-							result[ "" + control.name + "" ] = [];
-						}
+  constructor(private _groups: Group[], private _comment: string) {
 
-						if (!isNullOrUndefined(control.custom.checked)) {
-							if (control.custom.checked) {
-								result[ "" + control.name + "" ].push(control.value)
-							}
-						}
-					}
-				}
-				else {
-					result[ "" + control.name + "" ] = control.value;
-				}
-			}
-		}
-		return result;
-	}
+  }
 
-	public importData(feedback_data: any): any {
-		let result: {};
+  public exportData(): any {
+    const result: any = {};
 
-		for (let attr in feedback_data) {
-			let value = feedback_data[ `${attr}` ];
+    for (let i = 0; i < this.groups.length; i++) {
+      for (let j = 0; j < this.groups[i].controls.length; j++) {
+        const control: Control = this.groups[i].controls[j];
+        if (control.type.type !== 'textarea') {
+          if (control.type.type === 'radiobutton') {
+            if (!isNullOrUndefined(control.custom.checked)) {
+              if (control.custom.checked) {
+                result['' + control.name + ''] = control.value;
+                break;
+              }
+              result['' + control.name + ''] = '';
+            } else {
+              result['' + control.name + ''] = '';
+            }
+          } else if (control.type.type === 'checkbox') {
+            if (isNullOrUndefined(result['' + control.name + ''])) {
+              result['' + control.name + ''] = [];
+            }
 
-			if(isArray(value)) {
-				for(let i = 0; i < value.length; i++){
-					this.setValueForControl(attr, value[i]);
-				}
-			}else {
-				this.setValueForControl(attr, value);
-			}
-		}
+            if (!isNullOrUndefined(control.custom.checked)) {
+              if (control.custom.checked) {
+                result['' + control.name + ''].push(control.value);
+              }
+            }
+          }
+        } else {
+          result['' + control.name + ''] = control.value;
+        }
+      }
+    }
+    return result;
+  }
 
-		return result;
-	}
+  public importData(feedback_data: any): any {
+    const result = {};
 
-	public static fromAny(feedback_data: any[], comment: string): FeedBackForm {
-		let groups: Group[] = [];
+    for (const attr in feedback_data) {
+      if (feedback_data.hasOwnProperty(attr)) {
+        const value = feedback_data[`${attr}`];
 
-		// init feedback_data
-		for (let i = 0; i < feedback_data.length; i++) {
-			let group = feedback_data[ i ];
-			groups.push(Group.fromAny(group));
-		}
+        if (isArray(value)) {
+          for (let i = 0; i < value.length; i++) {
+            this.setValueForControl(attr, value[i]);
+          }
+        } else {
+          this.setValueForControl(attr, value);
+        }
+      }
+    }
 
-		return new FeedBackForm(
-			groups,
-			comment
-		);
-	}
+    return result;
+  }
 
-	public setValueForControl(name: string, value: string, custom?:any): boolean {
-		let found = false;
+  public setValueForControl(name: string, value: string, custom?: any): boolean {
+    let found = false;
 
-		for (let i = 0; i < this.groups.length; i++) {
-			for (let j = 0; j < this.groups[ i ].controls.length; j++) {
-				let control: Control = this.groups[ i ].controls[ j ];
-				if (control.name === name) {
-					if (control.type.type === "textarea") {
-						control.value = value;
-						return true;
-					}
-					else {
-						// type of control is not textarea
-						if (control.type.type === "radiobutton" || control.type.type === "checkbox") {
-							found = true;
-							if (control.value === value) {
-								if(control.type.type === "radiobutton") {
-									control.custom[ "checked" ] = true;
-								} else{
-									if(control.type.type === "checkbox"){
-										if(!isNullOrUndefined(custom) && !isNullOrUndefined(custom.checked)){
-											control.custom[ "checked" ] = custom.checked;
-										} else{
-											//call from importData
-											control.custom[ "checked" ] = true;
-										}
-									}
-								}
-							}
-							else {
-								if (control.type.type === "radiobutton") {
-									control.custom[ "checked" ] = false;
-								}
-							}
-						}
-					}
-				}
-			}
-			if (found) return true;
-		}
+    for (let i = 0; i < this.groups.length; i++) {
+      for (let j = 0; j < this.groups[i].controls.length; j++) {
+        const control: Control = this.groups[i].controls[j];
+        if (control.name === name) {
+          if (control.type.type === 'textarea') {
+            control.value = value;
+            return true;
+          } else {
+            // type of control is not textarea
+            if (control.type.type === 'radiobutton' || control.type.type === 'checkbox') {
+              found = true;
+              if (control.value === value) {
+                if (control.type.type === 'radiobutton') {
+                  control.custom['checked'] = true;
+                } else {
+                  if (control.type.type === 'checkbox') {
+                    if (!isNullOrUndefined(custom) && !isNullOrUndefined(custom.checked)) {
+                      control.custom['checked'] = custom.checked;
+                    } else {
+                      // call from importData
+                      control.custom['checked'] = true;
+                    }
+                  }
+                }
+              } else {
+                if (control.type.type === 'radiobutton') {
+                  control.custom['checked'] = false;
+                }
+              }
+            }
+          }
+        }
+      }
+      if (found) {
+        return true;
+      }
+    }
 
-		return false;
-	}
+    return false;
+  }
 }

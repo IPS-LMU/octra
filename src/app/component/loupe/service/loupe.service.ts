@@ -1,10 +1,10 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
-import { AudioService, AudioComponentService } from "../../../service";
+import {AudioComponentService, AudioService} from '../../../service';
 
 @Injectable()
-export class LoupeService extends AudioComponentService{
-	constructor(protected audio:AudioService) {
-		super(audio);
-	}
+export class LoupeService extends AudioComponentService {
+  constructor(protected audio: AudioService) {
+    super(audio);
+  }
 }

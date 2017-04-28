@@ -112,6 +112,7 @@ export class SessionService {
   @SessionStorage('interface') _interface: string;
   @SessionStorage('samplerate') _samplerate: number;
   @SessionStorage('agreement') private _agreement: any;
+  @SessionStorage('jobs_left') jobs_left: number;
 
 
   // LOCAL STORAGE
@@ -279,7 +280,7 @@ export class SessionService {
     this.localStr.clear();
 
     return (this.sessStr.retrieve('data_id') == null
-      && this.sessStr.retrieve('audio_url') == null);
+    && this.sessStr.retrieve('audio_url') == null);
   }
 
   public incrementFinishedTranscriptions() {

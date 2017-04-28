@@ -75,13 +75,49 @@
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown" *ngIf="(sessService.LoggedIn && navbarServ.dataloaded)">
+                    <a href="#" class="dropdown" data-toggle="dropdown" role="button"
+                       aria-expanded="false"><span class="glyphicon glyphicon-info-sign navbar-icon"></span></a>
+                    <div class="dropdown-menu info-menu" [ngClass]="{
+                        'collaps': collapsed
+                    }">
+                        <table class="table">
+                            <tr *ngIf="!sessService.offline">
+                                <td><span>{{'general.project' |translate}}:</span></td>
+                                <td>
+                                    <span>{{sessService.member_project}}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span>{{'general.name' | translate}}</span></td>
+                                <td>
+                                    <span>{{navbarServ.exportformats.filename}}</span>
+                                </td>
+                            </tr>
+                            <tr *ngIf="!sessService.offline">
+                                <td><span>ID:</span></td>
+                                <td>
+                                    <span>{{sessService.data_id}}</span>
+                                </td>
+                            </tr>
+                            <tr *ngIf="!sessService.offline">
+                                <td><span>Jobs left:</span></td>
+                                <td>
+                                    <span>{{sessService.jobs_left}}</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </li>
                 <li *ngIf="sessService.LoggedIn && navbarServ.show_export">
                     <a (mouseup)="modalexport.open()">
                         <span class="glyphicon glyphicon-download navbar-icon"></span>
                         <span class="hidden-sm hidden-md">{{"general.export" | translate}}</span>
                     </a>
                 </li>
-                <li class="dropdown" [hidden]="!(sessService.LoggedIn && navbarServ.dataloaded)">
+                <li class="dropdown" [ngStyle]="{
+                'display': (!(navbarServ.dataloaded && sessService.LoggedIn)) ? 'none': 'inherit'
+                }">
                     <a href="#" class="dropdown" data-toggle="dropdown" role="button"
                        aria-expanded="false"><span class="glyphicon glyphicon-cog navbar-icon"></span></a>
                     <div class="dropdown-menu options-menu" [ngClass]="{
@@ -93,7 +129,8 @@
                                 <td>
                                     <div class="togglebutton">
                                         <label>
-                                            <input (click)="toggleEasyMode()" [checked]="sessService.easymode" id="easymode" type="checkbox">
+                                            <input (click)="toggleEasyMode()" [checked]="sessService.easymode"
+                                                   id="easymode" type="checkbox">
                                         </label>
                                     </div>
                                 </td>
@@ -114,3 +151,8 @@
         </div><!-- .nav-collapse -->
     </div>
 </nav>
+<div id="subnav" *ngIf="sessService.LoggedIn && !sessService.offline && navbarServ.dataloaded">
+    {{"general.project" | translate}}: {{sessService.member_project}} | {{"general.name" |translate}}:
+    {{navbarServ.exportformats.filename}} | Free Jobs:
+    {{sessService.jobs_left}}
+</div>

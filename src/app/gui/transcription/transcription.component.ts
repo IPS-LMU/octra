@@ -157,6 +157,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
   }
 
   afterAudioLoaded = () => {
+    console.log('audio laoded');
     this.transcrService.load();
     this.transcrService.guidelines = this.settingsService.guidelines;
 
@@ -219,15 +220,20 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
     const json: any = this.transcrService.exportDataToJSON();
 
     if (!this.sessService.offline) {
+      console.log('lock session');
+      /*
       this.api.lockSession(json.transcript, json.project, json.annotator, json.jobno, json.id, json.comment, json.quality, json.log)
-        .subscribe((result) => {
+        .subscribe(() => {
             setTimeout(() => {
               this.settingsService.clearSettings();
               this.router.navigate(['/logout']);
             }, 500);
           }
         );
+        */
+      this.router.navigate(['/logout']);
     } else {
+      this.settingsService.clearSettings();
       this.router.navigate(['/logout']);
     }
   }
@@ -293,17 +299,5 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
   onSegmentInOverviewClicked(segnumber: number) {
     this.transcrService.requestSegment(segnumber);
     this.modal_overview.close();
-  }
-
-  test(id: string) {
-    console.log('test: ' + id);
-
-    this.subscrmanager.add(
-      this.api.fetchAnnotation(Number(id)).subscribe(
-        (result) => {
-          console.log(result.json());
-        }
-      )
-    );
   }
 }

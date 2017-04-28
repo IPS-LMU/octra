@@ -52,7 +52,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     id: '',
     agreement: '',
     project: '',
-    jobno: null
+    jobno: ''
   };
 
   err = '';
@@ -98,10 +98,16 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   onSubmit(form: NgForm) {
     let new_session = false;
+    let new_session_after_old = false;
     let continue_session = false;
+
+    if (isNullOrUndefined(this.member.jobno) || this.member.jobno === '') {
+      this.member.jobno = '0';
+    }
 
     if (this.sessionService.sessionfile != null) {
       // last was offline mode, begin new Session
+      console.log('last offline');
       new_session = true;
     } else {
       if (!isNullOrUndefined(this.sessionService.data_id) && isNumber(this.sessionService.data_id)) {
@@ -112,60 +118,74 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           !isNullOrUndefined(this.sessionService.member_jobno) &&
           !isNullOrUndefined(this.sessionService.member_id)
         ) {
-          // check if credentials aret the same like before
+          // check if credentials are the same like before
           if (
             this.sessionService.member_id === this.member.id &&
-            this.sessionService.member_jobno === this.member.jobno.toString() &&
+            Number(this.sessionService.member_jobno) === Number(this.member.jobno) &&
             this.sessionService.member_project === this.member.project
           ) {
+            console.log('same');
             continue_session = true;
           } else {
-            new_session = true;
+            new_session_after_old = true;
           }
         }
       } else {
+        console.log('before false');
         new_session = true;
       }
     }
 
-    if (new_session) {
-      this.subscrmanager.add(this.api.beginSession(this.member.project, this.member.id, Number(this.member.jobno)).catch((error) => {
-        alert('Server cannot be requested. Please check if you are online.');
-        return Observable.throw(error);
-      }).subscribe(
+    if (new_session_after_old) {
+      console.log('new session after old');
+      // check if old annotation is already annotated
+      this.subscrmanager.add(this.api.fetchAnnotation(this.sessionService.data_id).subscribe(
         (result) => {
           const json = result.json();
-          if (form.valid && this.agreement_checked
-            && json.message !== '0'
-          ) {
-            console.log('Result');
-            console.log(json);
-            if (this.sessionService.sessionfile != null) {
-              // last was offline mode
-              this.sessionService.clearLocalStorage();
-            }
-            const res = this.sessionService.setSessionData(this.member, json.data.id, json.data.url);
-            if (res.error === '') {
-              this.navigate();
-            } else {
-              alert(res.error);
-            }
+          console.log('anno fetched');
+          console.log(json);
+
+          if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
+            console.log('is busy');
+            this.subscrmanager.add(this.api.closeSession(this.sessionService.member_id, this.sessionService.data_id, '').subscribe(
+              (result2) => {
+                console.log('BUSY to FREE');
+                console.log(result2.json());
+                this.createNewSession(form);
+              }
+            ));
           } else {
-            this.modService.show('login_invalid');
+            console.log('not busy');
+            this.createNewSession(form);
           }
         }
       ));
+    }
+
+    if (new_session) {
+      this.createNewSession(form);
     } else if (continue_session) {
+      console.log('OLD SESSION');
       this.subscrmanager.add(this.api.fetchAnnotation(this.sessionService.data_id).catch((error) => {
         alert('Server cannot be requested. Please check if you are online.');
         return Observable.throw(error);
       }).subscribe(
         (result) => {
           const json = result.json();
+          console.log('Result');
+          console.log(json);
+
+          if (json.hasOwnProperty('message')) {
+            let counter = (json.message === '') ? '0' : json.message;
+            console.log('set jobs left to : ' + counter);
+            this.sessionService.sessStr.store('jobs_left', Number(counter));
+            console.log(this.sessionService.jobs_left);
+          }
+
           if (form.valid && this.agreement_checked
             && json.message !== '0'
           ) {
-            if (this.sessionService.sessionfile != null) {
+            if (this.sessionService.sessionfile !== null) {
               // last was offline mode
               this.sessionService.clearLocalStorage();
             }
@@ -298,6 +318,15 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         const json = result.json();
         if (isArray(json.data)) {
           this.projects = json.data;
+          if (!isNullOrUndefined(this.sessionService.member_project) && this.sessionService.member_project !== '') {
+            if (isNullOrUndefined(this.projects.find(
+                (x) => {
+                  return x === this.sessionService.member_project;
+                }))) {
+              // make sure that old project is in list
+              this.projects.push(this.sessionService.member_project);
+            }
+          }
         }
       })
     ));
@@ -305,5 +334,43 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   public selectProject(event: HTMLSelectElement) {
     this.member.project = event.value;
+  }
+
+  private createNewSession(form: NgForm) {
+    console.log('NEW SESSION');
+    this.subscrmanager.add(this.api.beginSession(this.member.project, this.member.id, Number(this.member.jobno)).catch((error) => {
+      alert('Server cannot be requested. Please check if you are online.');
+      return Observable.throw(error);
+    }).subscribe(
+      (result) => {
+        const json = result.json();
+        if (form.valid && this.agreement_checked
+          && json.message !== '0'
+        ) {
+          console.log('Result');
+          console.log(json);
+          if (this.sessionService.sessionfile != null) {
+            // last was offline mode
+            this.sessionService.clearLocalStorage();
+          }
+          const res = this.sessionService.setSessionData(this.member, json.data.id, json.data.url);
+
+          if (json.hasOwnProperty('message')) {
+            let counter = (json.message === '') ? '0' : json.message;
+            console.log('set jobs left to : ' + counter);
+            this.sessionService.sessStr.store('jobs_left', Number(counter));
+            console.log(this.sessionService.jobs_left);
+          }
+
+          if (res.error === '') {
+            this.navigate();
+          } else {
+            alert(res.error);
+          }
+        } else {
+          this.modService.show('login_invalid');
+        }
+      }
+    ));
   }
 }

@@ -1,5 +1,6 @@
 {
   "general": {
+    "name": "Name",
     "abort": "Abbrechen",
     "continue": "Weiter",
     "close": "Schließen",
@@ -14,7 +15,7 @@
     "logout": "Abmelden",
     "play": "Abspielen",
     "pause": "Pausieren",
-    "stop": "Stop",
+    "stop": "Stopp",
     "backward": "Zurück",
     "replay": "Wiederholung",
     "shortcuts": "Tastenkombinationen",

@@ -7,7 +7,7 @@ import {APIService} from '../../service/api.service';
 import {ModalComponent} from 'ng2-bs3-modal/components/modal';
 import {AudioService} from '../../service/audio.service';
 import {SubscriptionManager} from '../../shared';
-import {isNullOrUndefined} from 'util';
+import {isNullOrUndefined, isNumber} from 'util';
 import {SettingsService} from '../../service/settings.service';
 import {NavbarService} from '../../service/navbar.service';
 
@@ -57,13 +57,17 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
     this.subscrmanager.add(this.api.beginSession(this.sessService.member_project, this.sessService.member_id,
       Number(this.sessService.member_jobno), '')
       .subscribe((result) => {
-        if (result != null) {
+        if (result !== null) {
           const json = result.json();
 
           if (json.data && json.data.hasOwnProperty('url') && json.data.hasOwnProperty('id')) {
             this.clearData();
             this.sessService.audio_url = json.data.url;
             this.sessService.data_id = json.data.id;
+
+            if (json.hasOwnProperty('message') && isNumber(json.message)) {
+              this.sessService.jobs_left = Number(json.message);
+            }
 
             this.router.navigate(['/user/load']);
           } else {

@@ -14,7 +14,7 @@ import {SubscriptionManager} from '../../shared/SubscriptionManager';
 export class AlertComponent implements OnInit, OnDestroy {
     private state = 'inactive';
     private text = '';
-    private type = 'error';
+    public type = 'error';
     private show = false;
 
     private subscrmanager: SubscriptionManager;

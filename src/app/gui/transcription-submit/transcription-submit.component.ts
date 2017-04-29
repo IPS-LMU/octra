@@ -86,9 +86,15 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
   }
 
   onSubmit(form: NgForm) {
-    this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, '\s');
-    this.sessService.comment = this.transcrService.feedback.comment;
-    this.sessService.save('feedback', this.transcrService.feedback.exportData());
+    if (!this.sessService.offline) {
+      if (!isNullOrUndefined(this.transcrService.feedback.comment)
+        && this.transcrService.feedback.comment !== '') {
+        this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, '\s');
+      }
+      this.sessService.comment = this.transcrService.feedback.comment;
+      this.saveForm();
+      this.sessService.save('feedback', this.transcrService.feedback.exportData());
+    }
     this.modal.open();
   }
 

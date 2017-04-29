@@ -16,6 +16,7 @@ import {SubscriptionManager} from '../../shared';
 import {SettingsService} from '../../service/settings.service';
 import {ModalService} from '../../service/modal.service';
 import {ModalComponent} from 'ng2-bs3-modal/ng2-bs3-modal';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-login',
@@ -62,13 +63,15 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               private api: APIService,
               private cd: ChangeDetectorRef,
               private settingsService: SettingsService,
-              private modService: ModalService) {
+              private modService: ModalService,
+              private langService: TranslateService) {
     this.subscrmanager = new SubscriptionManager();
   }
 
   ngOnInit() {
     this.browser_check = new BrowserCheck();
     this.valid_platform = true;
+
     if (this.apc.octra.allowed_browsers.length > 0) {
       this.valid_platform = this.browser_check.isValidBrowser(this.apc.octra.allowed_browsers);
     } else {
@@ -137,29 +140,11 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     }
 
     if (new_session_after_old) {
-      console.log('new session after old');
-      // check if old annotation is already annotated
-      this.subscrmanager.add(this.api.fetchAnnotation(this.sessionService.data_id).subscribe(
-        (result) => {
-          const json = result.json();
-          console.log('anno fetched');
-          console.log(json);
-
-          if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
-            console.log('is busy');
-            this.subscrmanager.add(this.api.closeSession(this.sessionService.member_id, this.sessionService.data_id, '').subscribe(
-              (result2) => {
-                console.log('BUSY to FREE');
-                console.log(result2.json());
-                this.createNewSession(form);
-              }
-            ));
-          } else {
-            console.log('not busy');
-            this.createNewSession(form);
-          }
+      this.setOnlineSessionToFree(
+        () => {
+          this.createNewSession(form);
         }
-      ));
+      );
     }
 
     if (new_session) {
@@ -176,7 +161,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           console.log(json);
 
           if (json.hasOwnProperty('message')) {
-            let counter = (json.message === '') ? '0' : json.message;
+            const counter = (json.message === '') ? '0' : json.message;
             console.log('set jobs left to : ' + counter);
             this.sessionService.sessStr.store('jobs_left', Number(counter));
             console.log(this.sessionService.jobs_left);
@@ -204,42 +189,27 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   onOfflineSubmit = (form: NgForm) => {
-
-    const type: string = (this.dropzone.file.type) ? this.dropzone.file.type : 'unknown';
-
-    if (this.dropzone.file != null && type === 'audio/x-wav' || type === 'audio/wav') {
-
-      if (this.sessionService.member_id != null || this.sessionService.member_id === '') {
-        // last was online mode
-        this.sessionService.logs = null;
-        this.sessionService.transcription = null;
-        this.sessionService.data_id = null;
-      }
-      const res = this.sessionService.setSessionData(null, 0, null, true);
-      if (res.error === '') {
-        this.sessionService.offline = true;
-        this.sessionService.sessionfile = new SessionFile(
-          this.dropzone.file.name,
-          this.dropzone.file.size,
-          this.dropzone.file.lastModifiedDate,
-          this.dropzone.file.type
-        );
-
-        this.sessionService.file = this.dropzone.file;
-        this.navigate();
-      } else {
-        alert(res.error);
-      }
+    if (!isNullOrUndefined(this.sessionService.data_id) && isNumber(this.sessionService.data_id)) {
+      // last was online mode
+      this.setOnlineSessionToFree(() => {
+        this.sessionService.beginLocalSession(this.dropzone, false, this.navigate, (error) => {
+          alert(error);
+        });
+      });
     } else {
-      alert('Die Datei ist vom Typ ' + type + ' und wird nicht unterstützt.');
+      this.sessionService.beginLocalSession(this.dropzone, true, this.navigate, (error) => {
+        alert(error);
+      });
     }
   }
 
   canDeactivate(): Observable<boolean> | boolean {
+    console.log('test');
+    console.log(this.valid);
     return (this.valid);
   }
 
-  private navigate() {
+  private navigate = (): void => {
     this.router.navigate(['user'], {
       queryParams: {
         login: true
@@ -256,33 +226,18 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     }
   }
 
-  openAgreement() {
-    this.agreement.open();
-  }
-
   getDropzoneFileString(file: File | SessionFile) {
     const fsize: FileSize = Functions.getFileSize(file.size);
     return Functions.buildStr('{0} ({1} {2})', [file.name, (Math.round(fsize.size * 100) / 100), fsize.label]);
   }
 
   newTranscription = () => {
-    if (this.dropzone.file != null) {
-      this.sessionService.clearSession();
-      this.sessionService.clearLocalStorage();
-      this.sessionService.setSessionData(null, 0, '');
-      this.sessionService.sessionfile = this.getSessionFile(this.dropzone.file);
-      this.sessionService.file = this.dropzone.file;
-      this.sessionService.offline = true;
-      this.navigate();
-    }
-  }
-
-  getSessionFile(file: File) {
-    return new SessionFile(
-      file.name,
-      file.size,
-      file.lastModifiedDate,
-      file.type
+    this.sessionService.beginLocalSession(this.dropzone, false, this.navigate,
+      (error) => {
+        if (error === 'file not supported') {
+          this.modService.show('error', this.langService.instant('reload-file.file not supported', {type: ''}));
+        }
+      }
     );
   }
 
@@ -349,14 +304,15 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         ) {
           console.log('Result');
           console.log(json);
-          if (this.sessionService.sessionfile != null) {
-            // last was offline mode
-            this.sessionService.clearLocalStorage();
-          }
+
+          // delete old data for fresh new session
+          this.sessionService.clearSession();
+          this.sessionService.clearLocalStorage();
+
           const res = this.sessionService.setSessionData(this.member, json.data.id, json.data.url);
 
           if (json.hasOwnProperty('message')) {
-            let counter = (json.message === '') ? '0' : json.message;
+            const counter = (json.message === '') ? '0' : json.message;
             console.log('set jobs left to : ' + counter);
             this.sessionService.sessStr.store('jobs_left', Number(counter));
             console.log(this.sessionService.jobs_left);
@@ -370,6 +326,35 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         } else {
           this.modService.show('login_invalid');
         }
+      }
+    ));
+  }
+
+  private setOnlineSessionToFree = (callback: () => void) => {
+    // check if old annotation is already annotated
+    this.subscrmanager.add(this.api.fetchAnnotation(this.sessionService.data_id).subscribe(
+      (result) => {
+        const json = result.json();
+        console.log('anno fetched');
+        console.log(json);
+
+        if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
+          console.log('is busy');
+          this.subscrmanager.add(this.api.closeSession(this.sessionService.member_id, this.sessionService.data_id, '').subscribe(
+            (result2) => {
+              console.log('BUSY to FREE');
+              console.log(result2.json());
+              callback();
+            }
+          ));
+        } else {
+          console.log('not busy');
+          callback();
+        }
+      },
+      () => {
+        // ignore error because this isn't important
+        callback();
       }
     ));
   }

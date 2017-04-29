@@ -240,7 +240,7 @@ export class SettingsService {
       }
     } else {
       this.audioloaded.emit({
-        result: 'success'
+        status: 'success'
       });
     }
   }

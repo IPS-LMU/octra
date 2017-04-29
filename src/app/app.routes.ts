@@ -12,8 +12,7 @@ const APP_ROUTES: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full'},
   {path: 'login', component: LoginComponent, canActivate: [SettingsGuard, ALoginGuard]},
   {path: 'logout', component: LogoutComponent, canActivate: [SettingsGuard, LogoutGuard]},
-  {path: 'user', component: MembersAreaComponent, children: MEMBER_ROUTES},
-  {path: 'user', component: MembersAreaComponent},
+  {path: 'user', component: MembersAreaComponent, canActivate: [SettingsGuard], children: MEMBER_ROUTES},
   {path: '**', redirectTo: '/login', pathMatch: 'full'}
 ];
 

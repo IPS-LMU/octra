@@ -265,6 +265,28 @@ export class TranscriptionService {
 
   public destroy() {
     this.subscrmanager.destroy();
+
+    // set data to null
+    this._segments = null;
+    this._last_sample = null;
+    this._guidelines = null;
+    this.saving = false;
+    this.filename = '';
+
+    this._feedback = null;
+
+    this._break_marker = null;
+
+    this._selectedSegment = null;
+    this.state = 'ANNOTATED';
+
+    this._statistic = {
+      transcribed: 0,
+      empty: 0,
+      pause: 0
+    };
+
+    this.uiService.elements = [];
   }
 
   private extractUI(ui_elements: StatisticElem[]): any[] {
@@ -446,5 +468,13 @@ export class TranscriptionService {
       this.segmentrequested.emit(segnumber);
     } else {
     }
+  }
+
+  /**
+   * resets the parent object values. Call this function after transcription was saved
+   */
+  public endTranscription = (destroyaudio: boolean = true) => {
+    this.audio.destroy(destroyaudio);
+    this.destroy();
   }
 }

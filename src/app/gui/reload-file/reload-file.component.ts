@@ -34,7 +34,7 @@ export class ReloadFileComponent implements OnInit {
   ngOnInit() {
   }
 
-  private navigate() {
+  private navigate = () => {
     this.router.navigate(['/user/load']);
   }
 
@@ -44,57 +44,33 @@ export class ReloadFileComponent implements OnInit {
   }
 
   abortTranscription = () => {
+    this.transcrServ.endTranscription();
     this.router.navigate(['/logout']);
   }
 
   newTranscription = () => {
-    this.sessServ.sessionfile = this.getSessionFile(this.dropzone.file);
-    this.sessServ.file = this.dropzone.file;
-
-    this.sessServ.transcription = [];
-    this.transcrServ.segments = null;
-
-    this.sessServ.offline = true;
-    this.navigate();
+    this.sessServ.beginLocalSession(this.dropzone, false, this.navigate,
+      (error) => {
+        if (error === 'file not supported') {
+          this.showErrorMessage(this.langService.instant('reload-file.file not supported', {type: ''}));
+        }
+      }
+    );
   }
 
   onOfflineSubmit = () => {
-    const type: string = (this.sessServ.sessionfile.type) ? this.sessServ.sessionfile.type : this.langService.instant('general.unknown');
-
-    if (this.dropzone.file != null && this.sessServ.sessionfile != null && this.validate(this.dropzone.file)) {
-      if (
-        this.dropzone.file.name !== this.sessServ.sessionfile.name
-        || this.dropzone.file.type !== this.sessServ.sessionfile.type
-        || this.dropzone.file.size !== this.sessServ.sessionfile.size
-      ) {
-        this.showErrorMessage(this.langService.instant('reload-file.another file selected',
-          {file: this.getDropzoneFileString(this.sessServ.sessionfile)}
-        ));
-      } else {
-        // navigate
-        this.sessServ.sessionfile = this.getSessionFile(this.dropzone.file);
-        this.sessServ.file = this.dropzone.file;
-
-        this.sessServ.offline = true;
-        this.navigate();
+    this.sessServ.beginLocalSession(this.dropzone, true, this.navigate,
+      (error) => {
+        if (error === 'file not supported') {
+          this.showErrorMessage(this.langService.instant('reload-file.file not supported', {type: ''}));
+        }
       }
-    } else {
-      this.showErrorMessage(this.langService.instant('reload-file.file not supported', {type: type}));
-    }
+    );
   }
 
   private showErrorMessage(err: string) {
     this.error = err;
     this.modService.show('error', err, null);
-  }
-
-  getSessionFile(file: File) {
-    return new SessionFile(
-      file.name,
-      file.size,
-      file.lastModifiedDate,
-      file.type
-    );
   }
 
   validate(file: any): boolean {

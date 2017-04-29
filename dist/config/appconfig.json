@@ -5,7 +5,7 @@
   },
   "octra": {
     "login": {
-      "enabled": false
+      "enabled": true
     },
     "showdetails": true,
     "responsive": {

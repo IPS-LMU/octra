@@ -13,7 +13,7 @@ import {isNullOrUndefined, isUndefined} from 'util';
 })
 
 export class AppComponent implements OnDestroy {
-  version = '1.1.0';
+  version = '1.1.1';
 
   private subscrmanager: SubscriptionManager;
 

@@ -1,14 +1,14 @@
 import {Component, OnInit} from '@angular/core';
 
-import {LogoutService} from '../../service/logout.service';
 import {Router} from '@angular/router';
+import {SessionService} from '../../service/session.service';
+import {SettingsService} from '../../service/settings.service';
 
 @Component({
 
   selector: 'app-login',
   templateUrl: './logout.component.html',
-  styleUrls: ['./logout.component.css'],
-  providers: [LogoutService]
+  styleUrls: ['./logout.component.css']
 })
 export class LogoutComponent implements OnInit {
 
@@ -19,12 +19,15 @@ export class LogoutComponent implements OnInit {
     pw: ''
   };
 
-  constructor(private logoutService: LogoutService,
-              private router: Router) {
+  constructor(private router: Router,
+              private sessionService: SessionService,
+              private settingsService: SettingsService) {
   }
 
   ngOnInit() {
-    this.logoutService.logout();
-    this.router.navigate(['login']);
+    this.settingsService.clearSettings();
+    this.sessionService.endSession(this.sessionService.offline, () => {
+      this.router.navigate(['login']);
+    });
   }
 }

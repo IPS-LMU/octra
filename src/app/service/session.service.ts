@@ -2,6 +2,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {LocalStorage, LocalStorageService, SessionStorage, SessionStorageService} from 'ng2-webstorage';
 import {SessionFile} from '../shared/SessionFile';
 import {isNullOrUndefined} from 'util';
+import {DropZoneComponent} from '../component/drop-zone/drop-zone.component';
 
 @Injectable()
 export class SessionService {
@@ -304,5 +305,55 @@ export class SessionService {
     }
     this.saving.emit(false);
     return true;
+  }
+
+  public beginLocalSession = (dropzone: DropZoneComponent, keep_data: boolean, navigate: () => void, err: (error: string) => void) => {
+    if (!isNullOrUndefined(dropzone.file)) {
+      const type: string = (dropzone.file.type) ? dropzone.file.type : 'unknown';
+
+      if (type === 'audio/x-wav' || type === 'audio/wav') {
+
+        if (!keep_data) {
+          // delete old data from previous session
+          console.error('clear session');
+          this.clearSession();
+          this.clearLocalStorage();
+        }
+
+        if (this.member_id != null && this.member_id !== '-1' && this.member_id !== '') {
+          // last was online mode
+          console.error('clear session m');
+          this.clearSession();
+          this.clearLocalStorage();
+        }
+
+        const res = this.setSessionData(null, null, null, true);
+        if (res.error === '') {
+          this.offline = true;
+          this.sessionfile = this.getSessionFile(dropzone.file);
+
+          this.file = dropzone.file;
+          navigate();
+        } else {
+          err(res.error);
+        }
+      } else {
+        err('type not supported');
+      }
+    }
+  }
+
+  public endSession(offline: boolean, navigate: () => void) {
+    this.clearSession();
+    navigate();
+  }
+
+  public getSessionFile = (file: File) => {
+    return new SessionFile(
+      file.name,
+      file.size,
+      file.lastModifiedDate,
+      file.type
+    );
   }
 }

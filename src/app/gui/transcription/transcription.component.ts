@@ -217,25 +217,8 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
   }
 
   abortTranscription = () => {
-    const json: any = this.transcrService.exportDataToJSON();
-
-    if (!this.sessService.offline) {
-      console.log('lock session');
-      /*
-      this.api.lockSession(json.transcript, json.project, json.annotator, json.jobno, json.id, json.comment, json.quality, json.log)
-        .subscribe(() => {
-            setTimeout(() => {
-              this.settingsService.clearSettings();
-              this.router.navigate(['/logout']);
-            }, 500);
-          }
-        );
-        */
-      this.router.navigate(['/logout']);
-    } else {
-      this.settingsService.clearSettings();
-      this.router.navigate(['/logout']);
-    }
+    this.transcrService.endTranscription();
+    this.router.navigate(['/logout']);
   }
 
   ngAfterContentInit() {
@@ -251,7 +234,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
   }
 
   ngOnDestroy() {
-    this.transcrService.destroy();
     this.subscrmanager.destroy();
   }
 

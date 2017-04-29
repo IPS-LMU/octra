@@ -170,17 +170,28 @@ export class AudioService {
    * Constructor
    */
   constructor(private http: Http) {
+    this.init();
+
+    this.afterloaded = new EventEmitter<any>();
+    this.statechange = new EventEmitter<string>();
+  }
+
+  public init() {
     // Fix up for prefixing
     const AudioContext = (<any>window).AudioContext // Default
       || (<any>window).webkitAudioContext // Safari and old versions of Chrome
       || (<any>window).mozAudioContext
       || false;
     if (AudioContext) {
-      this._audiocontext = new AudioContext();
+      if (isNullOrUndefined(this._audiocontext)) {
+        // reuse old audiocontext
+        this._audiocontext = new AudioContext();
+      } else {
+        console.info('old audiocontext available');
+      }
+    } else {
+      console.error('AudioContext not supported by this browser');
     }
-
-    this.afterloaded = new EventEmitter<any>();
-    this.statechange = new EventEmitter<string>();
   }
 
   public stopPlayback(callback: any = null): boolean {
@@ -408,5 +419,29 @@ export class AudioService {
     const bufferView = new Uint16Array(bufferPart);
 
     return bufferView[0];
+  }
+
+  public destroy(disconnect: boolean = true) {
+    if (!isNullOrUndefined(this._audiocontext)) {
+      if (disconnect) {
+        this._audiocontext.close()
+          .then(() => {
+            console.info('audioservice successfully destroyed');
+          })
+          .catch(
+            (re) => {
+              console.error('close audiocontext error:');
+              console.log(re);
+            }
+          );
+      }
+
+      this._audiobuffer = null;
+      this._source.disconnect();
+      this._source = null;
+      this._gainNode = null;
+      this._channel = null;
+      this._duration = null;
+    }
   }
 }

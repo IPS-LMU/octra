@@ -436,8 +436,11 @@ export class AudioService {
           );
       }
 
+      if (!isNullOrUndefined(this._source)) {
+        this._source.disconnect();
+      }
+
       this._audiobuffer = null;
-      this._source.disconnect();
       this._source = null;
       this._gainNode = null;
       this._channel = null;

@@ -35,6 +35,7 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
     this.subscrmanager = new SubscriptionManager();
     this.navService.show_interfaces = false;
     this.navService.show_export = false;
+    this.navService.dataloaded = false;
   }
 
   ngOnInit() {

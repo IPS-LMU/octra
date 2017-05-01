@@ -92,7 +92,6 @@ export class AppComponent implements OnDestroy {
   }
 
   test(id: string) {
-    console.log('test: ' + id);
 
     this.subscrmanager.add(
       this.api.fetchAnnotation(Number(id)).subscribe(
@@ -104,7 +103,6 @@ export class AppComponent implements OnDestroy {
   }
 
   reset(id: string) {
-    console.log('reset: ' + id);
 
     this.subscrmanager.add(
       this.api.closeSession('julian_test', Number(id), '').subscribe(
@@ -122,7 +120,6 @@ export class AppComponent implements OnDestroy {
       counter++;
       --id_num;
       if (counter < 10) {
-        console.log('fetch ID ' + id_num);
         this.subscrmanager.add(
           this.api.fetchAnnotation(id_num).subscribe(
             (result) => {

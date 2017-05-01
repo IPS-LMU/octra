@@ -27,9 +27,9 @@
     "en"
   ],
   "interfaces": [
+    "2D-Editor",
     "Editor without signal display",
-    "Linear Editor",
-    "2D-Editor"
+    "Linear Editor"
   ],
   "feedback_form": [
     {

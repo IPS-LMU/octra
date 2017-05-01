@@ -108,7 +108,6 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onOptionsOpened() {
-    console.log('OKOK');
     this.collapsed = true;
   }
 }

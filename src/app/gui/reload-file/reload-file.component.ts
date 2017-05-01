@@ -24,7 +24,6 @@ export class ReloadFileComponent implements OnInit {
               public transcrServ: TranscriptionService,
               public modService: ModalService,
               public langService: TranslateService) {
-    console.log('init reload');
   }
 
   get sessionfile(): SessionFile {

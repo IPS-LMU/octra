@@ -184,7 +184,6 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
         translation: this.lang.instant('general'),
         guidelines: this.guidelines
       };
-      console.log(json_obj);
 
       const json = jQuery('<input/>')
         .attr('name', 'json')

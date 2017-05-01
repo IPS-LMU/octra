@@ -109,7 +109,6 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 
     this.intervalID = setInterval(() => {
       if (!this.mousestartmoving && !this.loupe_updated) {
-        console.log('draw');
         this.loupe_updated = true;
         this.changeArea(this.loupe, this.mini_loupecoord);
       }

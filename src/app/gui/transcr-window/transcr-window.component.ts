@@ -1,7 +1,7 @@
 import {
   AfterContentInit,
   AfterViewInit,
-  Component,
+  Component, ElementRef,
   EventEmitter,
   Input,
   OnDestroy,
@@ -24,6 +24,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   @ViewChild('loupe') loupe: LoupeComponent;
   @ViewChild('editor') editor: TranscrEditorComponent;
   @ViewChild('audionav') audionav: AudioNavigationComponent;
+  @ViewChild('window') window: ElementRef;
 
   @Output('act') act: EventEmitter<string> = new EventEmitter<string>();
   @Input('easymode') easymode = false;
@@ -97,7 +98,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
   ngAfterViewInit() {
     this.pos_y = this.transcrService.selectedSegment.pos.Y2;
-    const pos_y2 = this.transcrService.selectedSegment.pos.Y1;
     const segment: Segment = this.transcrService.segments.get(this.transcrService.selectedSegment.index);
 
     let begin = new AudioTime(0, this.audio.samplerate);
@@ -106,7 +106,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       begin = this.transcrService.segments.get(this.transcrService.selectedSegment.index - 1).time.clone();
     }
 
-    Functions.scrollTo(pos_y2, '#window');
+    Functions.scrollTo(this.pos_y, '#window');
     this.loupe.Settings.boundaries.readonly = true;
     this.changeArea(begin, segment.time);
   }

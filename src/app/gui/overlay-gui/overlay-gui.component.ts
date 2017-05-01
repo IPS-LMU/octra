@@ -263,11 +263,13 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
       if (!this.showWindow) {
         this.showWindow = true;
       } else {
-        const start = (selected.index > 0) ? this.transcrService.segments.get(selected.index - 1).time : new AudioTime(0, 44100);
+        const start = (selected.index > 0) ? this.transcrService.segments.get(selected.index - 1).time
+          : new AudioTime(0, this.audio.samplerate);
         this.window.changeArea(start, segment.time);
         this.window.editor.rawText = segment.transcript;
       }
     } else {
+      console.error('selected segment not found');
     }
   }
 }

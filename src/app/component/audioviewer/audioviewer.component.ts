@@ -747,7 +747,10 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.selectSegment(seg_index,
                       (posY1, posY2) => {
                         this.focused = false;
-                        this.segmententer.emit({index: seg_index, pos: {Y1: posY1, Y2: posY2}});
+                        this.segmententer.emit({
+                          index: seg_index,
+                          pos: {Y1: posY1, Y2: posY2}
+                        });
                       },
                       () => {
                         this.alerttriggered.emit({
@@ -1146,9 +1149,12 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
           ? Math.floor((beginX / this.innerWidth) + 1) * (this.Settings.height + this.Settings.margin.bottom) - this.Settings.margin.bottom
           : 0;
 
-        const posY2 = (this.innerWidth < this.AudioPxWidth)
-          ? Math.floor((absX / this.innerWidth) + 1) * (this.Settings.height + this.Settings.margin.bottom) - this.Settings.margin.bottom
-          : 0;
+        let posY2 = 0;
+
+        if (this.innerWidth < this.AudioPxWidth) {
+          posY2 = Math.floor((absX / this.innerWidth) + 1) * (this.Settings.height +
+            this.Settings.margin.bottom) - this.Settings.margin.bottom;
+        }
 
         const boundary_select = this.av.getSegmentSelection(segment.time.samples - 1);
         if (boundary_select) {

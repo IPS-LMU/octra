@@ -65,7 +65,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
             language = projectsettings.languages[0];
           }
           this.subscrmanager.add(
-            this.settService.loadGuidelines(this.sessionService.language, './guidelines/guidelines_' + language + '.json')
+            this.settService.loadGuidelines(this.sessionService.language, './project/guidelines/guidelines_' + language + '.json')
           );
           this.loadedchanged.emit(false);
         }

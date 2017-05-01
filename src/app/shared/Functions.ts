@@ -5,8 +5,10 @@ export interface FileSize {
 ;
 
 export class Functions {
-  public static scrollTo(y: number, identifier_element: string) {
-    jQuery('html, body').scrollTop(y);
+  public static scrollTo(y: number) {
+    setTimeout(() => {
+      jQuery('html, body').scrollTop(y);
+    }, 200);
   }
 
   public static buildStr(str: string, replace_arr: any[]) {

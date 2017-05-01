@@ -128,7 +128,7 @@ export class SettingsService {
 
   public loadProjectSettings: () => Subscription = () => {
     Logger.log('Load Project Settings...');
-    return this.http.request('./config/projectconfig.json').subscribe(
+    return this.http.request('./project/projectconfig.json').subscribe(
       (result) => {
         this._projectsettings = result.json();
         const validation = this.validate(new ProjectConfigValidator(), this._projectsettings);
@@ -196,46 +196,46 @@ export class SettingsService {
         })
       );
 
-      if (this.sessService.offline !== true) {
+      if (this.sessService.offline === false) {
         // online
-        const src = this.app_settings.audio_server.url + this.sessService.audio_url;
-        // extract filename
-        this._filename = this.sessService.audio_url.substr(this.sessService.audio_url.lastIndexOf('/') + 1);
-        this._filename = this._filename.substr(0, this._filename.lastIndexOf('.'));
-        if (this._filename.indexOf('src=') > -1) {
-          this._filename = this._filename.substr(this._filename.indexOf('src=') + 4);
-        }
+        if (!isNullOrUndefined(this.sessService.audio_url)) {
+          const src = this.app_settings.audio_server.url + this.sessService.audio_url;
+          // extract filename
+          this._filename = this.sessService.audio_url.substr(this.sessService.audio_url.lastIndexOf('/') + 1);
+          this._filename = this._filename.substr(0, this._filename.lastIndexOf('.'));
+          if (this._filename.indexOf('src=') > -1) {
+            this._filename = this._filename.substr(this._filename.indexOf('src=') + 4);
+          }
 
-        audioService.loadAudio(src, () => {
-        }, (err) => {
-          const errMsg = err;
-          this._log += 'Loading audio file failed<br/>';
-        });
+          audioService.loadAudio(src, () => {
+          }, (err) => {
+            const errMsg = err;
+            this._log += 'Loading audio file failed<br/>';
+          });
+        } else {
+          console.error('audio src is null');
+        }
       } else {
         // local mode
-        this._filename = this.sessService.sessionfile.name;
-        this._filename = this._filename.substr(0, this._filename.lastIndexOf('.'));
+        if (!isNullOrUndefined(this.sessService.sessionfile)
+          && !isNullOrUndefined(this.sessService.sessionfile.name)) {
+          this._filename = this.sessService.sessionfile.name;
+          this._filename = this._filename.substr(0, this._filename.lastIndexOf('.'));
 
-        // read file
-        const reader = new FileReader();
+          // read file
+          const reader = new FileReader();
 
-        reader.onload = ((theFile) => {
-          return function (e) {
-            // Render thumbnail.
+          reader.onloadend = (ev) => {
+            const t: any = ev.target;
+            audioService.decodeAudio(t.result);
           };
-        })(this.sessService.sessionfile);
 
-        reader.onloadend = (ev) => {
-          const t: any = ev.target;
-
-          this.sessService.offline = true;
-
-          audioService.decodeAudio(t.result);
-        };
-
-        if (this.sessService.file != null) {
-          // file not loaded. Load again!
-          reader.readAsArrayBuffer(this.sessService.file);
+          if (!isNullOrUndefined(this.sessService.file)) {
+            // read audio file to array buffer
+            reader.readAsArrayBuffer(this.sessService.file);
+          }
+        } else {
+          console.error('session file is null.');
         }
       }
     } else {

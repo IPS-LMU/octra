@@ -40,6 +40,9 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
   private subscrmanager: SubscriptionManager;
 
   public loupe_hidden = true;
+  private mousestartmoving = false;
+  private loupe_updated = true;
+  private intervalID = null;
 
   public mini_loupecoord: any = {
     x: 0,
@@ -87,6 +90,7 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   ngOnDestroy() {
+    clearInterval(this.intervalID);
     this.subscrmanager.destroy();
   }
 
@@ -102,6 +106,14 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
         }
       )
     );
+
+    this.intervalID = setInterval(() => {
+      if (!this.mousestartmoving && !this.loupe_updated) {
+        console.log('draw');
+        this.loupe_updated = true;
+        this.changeArea(this.loupe, this.mini_loupecoord);
+      }
+    }, 200);
   }
 
   ngAfterContentChecked() {
@@ -142,7 +154,12 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   onMouseOver(cursor: AVMousePos) {
-    this.changeArea(this.loupe, this.mini_loupecoord);
+    this.mousestartmoving = true;
+    this.loupe_updated = false;
+    setTimeout(() => {
+      this.mousestartmoving = false;
+    }, 200);
+    this.changePosition(this.mini_loupecoord);
   }
 
   onSegmentChange($event) {
@@ -166,6 +183,16 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
       if (start && end) {
         loup.changeArea(start, end);
       }
+    }
+  }
+
+  private changePosition(coord: any) {
+    const cursor = this.viewer.MouseCursor;
+
+    if (cursor && cursor.timePos && cursor.relPos) {
+      coord.x = ((cursor.relPos.x) ? cursor.relPos.x - 40 : 0);
+      coord.y = ((cursor.line) ? (cursor.line.number + 1) *
+        cursor.line.Size.height + (cursor.line.number) * this.viewer.Settings.margin.bottom : 0);
     }
   }
 

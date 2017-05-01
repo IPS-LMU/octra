@@ -882,7 +882,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
     const date = new Date();
     // get actual time and calculate progress in percentage
     const timestamp = new Date().getTime();
-    const calculator = new AudioTimeCalculator(this.audio.samplerate, this.audio.duration, this.AudioPxWidth);
 
     const duration = (this.av.Selection.length > 0) ? new AudioTime(this.av.Selection.length, this.audio.samplerate) : this.av.playduration;
     const currentAbsX = this.av.audioTCalculator.samplestoAbsX((this.av.current.samples - this.av.Chunk.time.start.samples));
@@ -893,8 +892,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
       progress = Math.min((((duration.unix) - (this.audio.endplaying - timestamp)) / (duration.unix)) * this.audio.speed, 1);
       absX = Math.max(0, currentAbsX + (this.av.Distance * progress));
       this.changePlayCursorAbsX(absX);
-    } else if (progress > 0.99) {
-      this.changePlayCursorAbsX(currentAbsX + this.av.Distance);
+    } else if ((currentAbsX + (this.av.Distance * progress)) < (currentAbsX + this.av.Distance)) {
+      this.changePlayCursorAbsX(currentAbsX + this.av.Distance - 1);
     }
 
     // get line of PlayCursor
@@ -903,6 +902,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
     if (line) {
       this.drawPlayCursorOnly(line);
       this.av.LastLine = line;
+    } else {
     }
   }
 
@@ -1073,7 +1073,12 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
           this.changePlayCursorSamples(this.av.Chunk.time.start.samples);
           this.av.current.samples = this.av.Chunk.time.start.samples;
         }
-        this.drawPlayCursorOnly(this.av.LastLine);
+        const currentAbsX = this.av.audioTCalculator.samplestoAbsX((this.av.current.samples - this.av.Chunk.time.start.samples));
+        if (this.av.PlayCursor.absX < this.av.Distance + currentAbsX - 1) {
+          setTimeout(() => {
+            this.drawPlayCursor();
+          }, 100);
+        }
       }
     }
     this.audio.stepbackward = false;

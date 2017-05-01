@@ -48,7 +48,8 @@
     "no": "No",
     "errors found": "({{errors}}) errors found",
     "no errors found": "No errors found",
-    "segment": "Segment"
+    "segment": "Segment",
+    "job number": "Job number"
   },
   "transcription": {
     "start": "Continue transcription",
@@ -127,8 +128,8 @@
     "online mode disabled": "Online mode is currently inactive. Please use OCTRA locally.",
     "local mode": "Local Mode",
     "old file found": "There is data from a previous transcription available. If you would like to continue your work, just drag & drop the following file to the gray box:<br/><br/>{{file_label}}",
-    "online mode data warning": "There is local data available that was created in offline mode. If you want to continue in online mode this data will be overwritten.",
-    "offline mode data warning": "There is local data available that was created in online mode. If you want to continue in offline mode this data will be overwritten.",
+    "online mode data warning": "There is local data available that was created in local mode. If you want to continue in online mode this data will be overwritten.",
+    "offline mode data warning": "There is local data available that was created in online mode. If you want to continue in local mode this data will be overwritten.",
     "online mode continue": "Old data found! To continue make sure to set the login data to: {{member_id}} , {{member_project}}, {{member_jobno}}"
   },
   "dropzone": {

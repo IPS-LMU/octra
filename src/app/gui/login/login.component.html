@@ -21,8 +21,11 @@
                     <p class="bg-danger" *ngIf="sessionService.offline == true">
                         {{"login.online mode data warning" | translate}}
                     </p>
-                    <p class="bg-warning" *ngIf="sessionService.member_id != null && sessionService.audio_url != null && sessionService.offline == false">
-                        {{"login.online mode continue" | translate:{member_id:sessionService.member_id,member_project:sessionService.member_project,member_jobno:sessionService.member_jobno} }}
+                    <p class="bg-warning"
+                       *ngIf="sessionService.member_id != null && sessionService.audio_url != null && sessionService.offline == false">
+                        {{"login.online mode continue" |
+                        translate:{member_id:sessionService.member_id,member_project:sessionService.member_project,member_jobno:sessionService.member_jobno}
+                        }}
                     </p>
                     <form class="form-horizontal" (ngSubmit)="onSubmit(f)" #f="ngForm">
                         <fieldset>
@@ -30,7 +33,7 @@
                                 <div class="form-group">
                                     <input class="form-control" type="text" id="login-id"
                                            name="login-id"
-                                           placeholder="Anmeldename" [(ngModel)]="member.id"
+                                           placeholder="{{ 'general.name' | translate }}" [(ngModel)]="member.id"
                                            pattern="\w+"
                                            required
                                     />
@@ -46,7 +49,7 @@
                                 <div class="form-group">
                                     <input class="form-control" type="number" id="jobno"
                                            name="jobno"
-                                           placeholder="Aufgaben-Nummer" #t [(ngModel)]="member.jobno"
+                                           placeholder="{{'general.job number' | translate}}" #t [(ngModel)]="member.jobno"
                                            pattern="[0-9]+"
                                     />
                                 </div>

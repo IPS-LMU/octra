@@ -110,7 +110,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
     if (this.sessionService.sessionfile != null) {
       // last was offline mode, begin new Session
-      console.log('last offline');
       new_session = true;
     } else {
       if (!isNullOrUndefined(this.sessionService.data_id) && isNumber(this.sessionService.data_id)) {
@@ -127,14 +126,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
             Number(this.sessionService.member_jobno) === Number(this.member.jobno) &&
             this.sessionService.member_project === this.member.project
           ) {
-            console.log('same');
             continue_session = true;
           } else {
             new_session_after_old = true;
           }
         }
       } else {
-        console.log('before false');
         new_session = true;
       }
     }
@@ -150,21 +147,16 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     if (new_session) {
       this.createNewSession(form);
     } else if (continue_session) {
-      console.log('OLD SESSION');
       this.subscrmanager.add(this.api.fetchAnnotation(this.sessionService.data_id).catch((error) => {
         alert('Server cannot be requested. Please check if you are online.');
         return Observable.throw(error);
       }).subscribe(
         (result) => {
           const json = result.json();
-          console.log('Result');
-          console.log(json);
 
           if (json.hasOwnProperty('message')) {
             const counter = (json.message === '') ? '0' : json.message;
-            console.log('set jobs left to : ' + counter);
             this.sessionService.sessStr.store('jobs_left', Number(counter));
-            console.log(this.sessionService.jobs_left);
           }
 
           if (form.valid && this.agreement_checked
@@ -204,8 +196,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   canDeactivate(): Observable<boolean> | boolean {
-    console.log('test');
-    console.log(this.valid);
     return (this.valid);
   }
 
@@ -292,7 +282,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   private createNewSession(form: NgForm) {
-    console.log('NEW SESSION');
     this.subscrmanager.add(this.api.beginSession(this.member.project, this.member.id, Number(this.member.jobno)).catch((error) => {
       alert('Server cannot be requested. Please check if you are online.');
       return Observable.throw(error);
@@ -302,8 +291,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         if (form.valid && this.agreement_checked
           && json.message !== '0'
         ) {
-          console.log('Result');
-          console.log(json);
 
           // delete old data for fresh new session
           this.sessionService.clearSession();
@@ -313,9 +300,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
           if (json.hasOwnProperty('message')) {
             const counter = (json.message === '') ? '0' : json.message;
-            console.log('set jobs left to : ' + counter);
             this.sessionService.sessStr.store('jobs_left', Number(counter));
-            console.log(this.sessionService.jobs_left);
           }
 
           if (res.error === '') {
@@ -335,20 +320,14 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     this.subscrmanager.add(this.api.fetchAnnotation(this.sessionService.data_id).subscribe(
       (result) => {
         const json = result.json();
-        console.log('anno fetched');
-        console.log(json);
 
         if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
-          console.log('is busy');
           this.subscrmanager.add(this.api.closeSession(this.sessionService.member_id, this.sessionService.data_id, '').subscribe(
             (result2) => {
-              console.log('BUSY to FREE');
-              console.log(result2.json());
               callback();
             }
           ));
         } else {
-          console.log('not busy');
           callback();
         }
       },

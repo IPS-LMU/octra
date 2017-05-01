@@ -402,7 +402,6 @@ export class AudioService {
 
   private handleError(err: any) {
     const errMsg = err;
-    console.log('err:');
     console.error(errMsg); // log to console instead
     return Observable.throw(errMsg);
   }

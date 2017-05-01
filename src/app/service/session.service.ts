@@ -212,11 +212,14 @@ export class SessionService {
   }
 
   public setSessionData(member: any, data_id: number, audio_url: string, offline: boolean = false): { error: string } {
+    console.log('setSession');
     if (isNullOrUndefined(this._easymode)) {
       this._easymode = false;
     }
     if (offline && (isNullOrUndefined(member))) {
-      this._interface = 'editor without signal display';
+      if (isNullOrUndefined(this._interface)) {
+        this._interface = '2D-Editor';
+      }
       this.setNewSessionKey();
       this.localStr.store('offline', true);
       this.localStr.store('member_project', '');
@@ -230,7 +233,9 @@ export class SessionService {
     }
 
     if (!this.login && !offline && (!isNullOrUndefined(member))) {
-      this._interface = 'editor without signal display';
+      if (isNullOrUndefined(this._interface)) {
+        this._interface = '2D-Editor';
+      }
       this.setNewSessionKey();
       this.setMemberID(member.id);
 

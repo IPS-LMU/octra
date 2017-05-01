@@ -157,7 +157,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
   }
 
   afterAudioLoaded = () => {
-    console.log('audio laoded');
     this.transcrService.load();
     this.transcrService.guidelines = this.settingsService.guidelines;
 
@@ -166,7 +165,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
       this.settingsService.guidelinesloaded.subscribe(
         (guidelines) => {
           this.transcrService.guidelines = guidelines;
-          console.log('!!loaded: ' + guidelines.meta.language);
         }
       )
     );
@@ -193,6 +191,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
             }
           ))) {
           // lang not in project config, fall back to first defined
+          console.log("lang not found");
           lang = this.settingsService.projectsettings.languages[0];
         }
 
@@ -208,6 +207,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
     if (isNullOrUndefined(this.projectsettings.interfaces.find((x) => {
         return this.sessService.Interface === x;
       }))) {
+      console.log(this.sessService.Interface + ' not found');
       this.sessService.Interface = this.projectsettings.interfaces[0];
     }
 

@@ -28,6 +28,7 @@
   ],
   "interfaces": [
     "Editor without signal display",
+    "Linear Editor",
     "2D-Editor"
   ],
   "feedback_form": [

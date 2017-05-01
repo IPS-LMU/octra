@@ -1,22 +1,22 @@
 {
   "meta": {
     "object_language": "deu",
-    "language": "de",
-    "project": "Sprecherinnen",
+    "language": "en",
+    "project": "Speakers",
     "authors": "Test Person (testperson@email.de)",
     "version": "1.0",
     "date": "2017-04-10",
     "encoding": "UTF-8",
-    "validation_url": "assets/testfiles/functions.js"
+    "validation_url": "projects/functions.js"
   },
   "instructions": [
     {
-      "group": "Rechtschreibung",
+      "group": "Spelling",
       "entries": [
         {
           "code": "R01",
           "priority": 100,
-          "title": "Deutschen Rechtschreibung beachten",
+          "title": "Transcribe according to the german spelling",
           "description": "Bei der Tranksription sollte die Deutsche Rechtschreibung nach Duden befolgt werden. Bei Unklarheiten bitte www.duden.de aufsuchen.",
           "examples": [
           ]
@@ -128,7 +128,7 @@
             }
           ]
         }
-        ]
+      ]
     },
     {
       "group": "Aussprache",
@@ -194,7 +194,7 @@
       "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_start.png",
       "button_text": "~abc",
-      "description": "Diesen Marker nur am Anfang setzen, sollte die Audiosequenz mit einem abgeschnittenem Wort beginnen",
+      "description": "Set this marker at the beginning of the annotation if a word was cutted off.",
       "shortcut": {
         "mac": "ALT + 1",
         "pc": "ALT + 1"
@@ -206,8 +206,8 @@
       "code": "[fil]",
       "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/fil.png",
-      "button_text": "Gefüllte Pause",
-      "description": "Für Zögern des Sprechers wie hm, ähm, äh und andere.",
+      "button_text": "filled pause",
+      "description": "This marker is for the speakers hesitations like 'hm', 'ähm' and others.",
       "shortcut": {
         "mac": "ALT + 2",
         "pc": "ALT + 2"
@@ -219,8 +219,8 @@
       "code": "[int]",
       "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/int.png",
-      "button_text": "unterbrechendes Geräusch",
-      "description": "Für kurzes, eindeutiges Geräusch wie z.B. Türknallen, das Berühren des Mirkrofons, oder ähnliches.",
+      "button_text": "intermittent noise",
+      "description": "This marker is for noise like door slam, touching the microphone or something like that.",
       "shortcut": {
         "mac": "ALT + 3",
         "pc": "ALT + 3"
@@ -232,8 +232,8 @@
       "code": "[spk]",
       "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/spk.png",
-      "button_text": "Sprechergeräusch",
-      "description": "Für Geräusche und Unterbrechungen, die der Sprecher produziert wie z.B. lautes Atmen, Lachen oder ähnliches.",
+      "button_text": "speaker noise",
+      "description": "This marker is for noise which was produced by the speaker, e.g. breathing loudly, laughing or something like that.",
       "shortcut": {
         "mac": "ALT + 4",
         "pc": "ALT + 4"
@@ -245,8 +245,8 @@
       "code": "[sta]",
       "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/sta.png",
-      "button_text": "Andauerndes Geräusch",
-      "description": "Für lang andauerndes, lautes Geräusch wie Verkehrslärm, Musik oder Radio im Hintergrund.",
+      "button_text": "stationary noise",
+      "description": "This marker is for continuous, loud noise like traffic jam, music or radio in the background",
       "shortcut": {
         "mac": "ALT + 5",
         "pc": "ALT + 5"
@@ -259,7 +259,7 @@
       "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/stars.png",
       "button_text": "**",
-      "description": "Diesen Marker vor einem Wort setzen, welches einer unverständlichen Sprache entstammt.",
+      "description": "Set this marker before a word if it is not recognizable or if it is from another language.",
       "shortcut": {
         "mac": "ALT + 6",
         "pc": "ALT + 6"
@@ -272,7 +272,7 @@
       "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_end.png",
       "button_text": "abc~",
-      "description": "Diesen Marker nur am Ende setzen, sollte die Audiosequenz mit einem abgeschnittenem Wort enden.",
+      "description": "Set this marker only at the end of the annotation if the last word was cutted off",
       "shortcut": {
         "mac": "ALT + 7",
         "pc": "ALT + 7"
@@ -284,8 +284,8 @@
       "code": "<P>",
       "type": "break",
       "icon_url": "assets/img/components/transcr-editor/default_markers/break.png",
-      "button_text": "Pause",
-      "description": "Dieser Marker stellt eine Pause dar, d.h. eine Sequenz in der nicht gesprochen wird",
+      "button_text": "Break",
+      "description": "This marker represents a break that means a audio chunk without any speaking",
       "shortcut": {
         "mac": "ALT + P",
         "pc": "ALT + P"

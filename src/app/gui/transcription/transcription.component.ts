@@ -196,7 +196,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
         }
 
         this.subscrmanager.add(
-          this.settingsService.loadGuidelines(event.lang, './project/guidelines_' + lang + '.json')
+          this.settingsService.loadGuidelines(event.lang, './project/guidelines/guidelines_' + lang + '.json')
         );
       }
     ));

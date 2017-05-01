@@ -106,7 +106,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       begin = this.transcrService.segments.get(this.transcrService.selectedSegment.index - 1).time.clone();
     }
 
-    Functions.scrollTo(this.pos_y, '#window');
+    Functions.scrollTo(this.pos_y);
     this.loupe.Settings.boundaries.readonly = true;
     this.changeArea(begin, segment.time);
   }

@@ -191,8 +191,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
             }
           ))) {
           // lang not in project config, fall back to first defined
-          console.log("lang not found");
-          lang = this.settingsService.projectsettings.languages[0];
+                    lang = this.settingsService.projectsettings.languages[0];
         }
 
         this.subscrmanager.add(
@@ -207,8 +206,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
     if (isNullOrUndefined(this.projectsettings.interfaces.find((x) => {
         return this.sessService.Interface === x;
       }))) {
-      console.log(this.sessService.Interface + ' not found');
-      this.sessService.Interface = this.projectsettings.interfaces[0];
+            this.sessService.Interface = this.projectsettings.interfaces[0];
     }
 
     this.change();

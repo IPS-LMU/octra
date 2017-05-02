@@ -15,6 +15,7 @@ import {AudioComponentService, AudioService, KeymappingService, TranscriptionSer
 import {AudioviewerConfigValidator} from '../validator/AudioviewerConfigValidator';
 import {AudioviewerConfig} from '../config/av.config';
 import {TranslateService} from '@ngx-translate/core';
+import {isNullOrUndefined} from 'util';
 
 @Injectable()
 export class AudioviewerService extends AudioComponentService {
@@ -433,7 +434,8 @@ export class AudioviewerService extends AudioComponentService {
     const line = this.last_line;
     this.audioTCalculator.audio_px_width = this.audio_px_w;
 
-    if (line && this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly) {
+    if (!isNullOrUndefined(line) && this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly) {
+      console.log('line found');
       const absXTime = (!this.audio.audioplaying) ? this.mousecursor.timePos.samples : this.PlayCursor.time_pos.samples;
       let b_width_time = this.audioTCalculator.absXtoSamples2(this.Settings.boundaries.width * 2, this.Chunk);
       b_width_time = Math.round(b_width_time);
@@ -444,9 +446,12 @@ export class AudioviewerService extends AudioComponentService {
             && this.transcrService.segments.get(i).time.samples <= absXTime + b_width_time)
             && this.transcrService.segments.get(i).time.samples !== this.audio.duration.samples
           ) {
+            console.log('segment for delete found');
             const seg_after = (i < this.transcrService.segments.length - 1) ? this.transcrService.segments.get(i + 1) : null;
-            if ((this.transcrService.segments.get(i).transcript === '' || this.transcrService.segments.get(i).transcript === 'P')
-              && (seg_after == null || seg_after.transcript === '' || seg_after.transcript === 'P')) {
+            if ((this.transcrService.segments.get(i).transcript === ''
+              || this.transcrService.segments.get(i).transcript === this.transcrService.break_marker.code)
+              && (seg_after === null || seg_after.transcript === ''
+              || seg_after.transcript === this.transcrService.break_marker.code)) {
               this.transcrService.segments.removeByIndex(i);
 
               return {
@@ -471,14 +476,16 @@ export class AudioviewerService extends AudioComponentService {
         }
       }
 
+      // segment shall not be removed
       const selection: number = Math.abs(this.selection.end.samples - this.selection.start.samples);
 
-      if (selection > 0) {
+      if (selection > 0 && absXTime >= this.selection.start.samples && absXTime <= this.selection.end.samples) {
+        console.log('some selection');
         // some part selected
         const segm1 = this.transcrService.segments.BetweenWhichSegment(this.selection.start.samples);
         const segm2 = this.transcrService.segments.BetweenWhichSegment(this.selection.end.samples);
 
-        if (segm1 == null && segm2 == null || (segm1 === segm2 || (segm1.transcript === '' && segm2.transcript === ''))) {
+        if (segm1 === null && segm2 === null || (segm1 === segm2 || (segm1.transcript === '' && segm2.transcript === ''))) {
           if (this.selection.start.samples > 0) {
             // prevent setting boundary if first sample selected
             this.transcrService.segments.add(this.selection.start.samples);
@@ -487,7 +494,10 @@ export class AudioviewerService extends AudioComponentService {
           return {
             type: 'add',
             seg_num: i,
-            msg: null
+            msg: {
+              type: 'success',
+              text: ''
+            }
           };
         } else {
           return {
@@ -499,10 +509,12 @@ export class AudioviewerService extends AudioComponentService {
             }
           };
         }
-      } else if (selection === 0) {
+      } else {
+        // no selection
+        console.log('no selection');
         const segment = this.transcrService.segments.BetweenWhichSegment(Math.round(absXTime));
-        if (segment == null || (segment.transcript === ''
-          || segment.transcript === 'P')) {
+        if (segment === null ||
+          (segment.transcript === '' || segment.transcript === this.transcrService.break_marker.code)) {
           this.transcrService.segments.add(Math.round(absXTime));
           return {
             type: 'add',
@@ -524,6 +536,8 @@ export class AudioviewerService extends AudioComponentService {
         }
       }
     }
+    console.log('line not found');
+    console.log(line);
     return null;
   }
 
@@ -740,13 +754,13 @@ export class AudioviewerService extends AudioComponentService {
       let next_unblocked = true;
       if (i < this.transcrService.segments.length - 1) {
         const next_segment = this.transcrService.segments.get(i + 1);
-        if (next_segment.transcript !== '' && next_segment.transcript !== 'P') {
+        if (next_segment.transcript !== '' && next_segment.transcript !== this.transcrService.break_marker.code) {
           next_unblocked = false;
         }
       }
       if (segAbsX >= absX - this.Settings.boundaries.width / 2
         && segAbsX <= absX + this.Settings.boundaries.width / 2
-        && (segment.transcript === '' || segment.transcript === 'P')
+        && (segment.transcript === '' || segment.transcript === this.transcrService.break_marker.code)
         && next_unblocked
       ) {
         return i;

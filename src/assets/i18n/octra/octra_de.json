@@ -127,7 +127,7 @@
     "old file found": "Es wurden Daten zu einer vorherigen Transkription gefunden. Um diese fortzusetzen, ziehen Sie die folgende Datei per Drag & Drop in das graue Feld:<br/><br/>{{file_label}}",
     "online mode data warning": "Es sind lokale Daten vorhanden, die im lokalen Modus erstellt worden sind. Das Nutzen des Online Modus überschreibt diese lokalen Daten.",
     "offline mode data warning": "Es sind lokale Daten vorhanden, die im online Modus erstellt worden sind. Das Nutzen des lokalen Modus überschreibt diese lokalen Daten.",
-    "online mode continue": "Es wurden alte Daten gefunden. Zum Forsetzen folgende Daten angeben: {{member_id}} , {{member_project}}, {{member_jobno}}"
+    "online mode continue": "Es wurden alte Daten gefunden. Zum Fortsetzen folgende Daten angeben: {{member_id}} , {{member_project}}, {{member_jobno}}"
   },
   "dropzone": {
     "drag&drop here": "Audiodatei (*.wav) hier hineinziehen oder hier klicken",

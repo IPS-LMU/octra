@@ -421,8 +421,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
     if (curr_line) {
       this.focused = true;
       if (this.Settings.selection.enabled) {
-        console.log('curr line ok');
-        this.av.setMouseMovePosition($event.type, x, y, curr_line, this.innerWidth);
+                this.av.setMouseMovePosition($event.type, x, y, curr_line, this.innerWidth);
         this.drawSegments();
         this.drawCursor(curr_line);
       }

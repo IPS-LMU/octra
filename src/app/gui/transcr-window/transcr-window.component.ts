@@ -91,6 +91,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         }
       }
     ));
+
+    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown));
   }
 
   ngOnDestroy() {
@@ -212,6 +214,39 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
     if (this.projectsettings.logging.forced === true) {
       this.uiService.addElementFromEvent('slider', event, event.timestamp, 'volume_change');
+    }
+  }
+
+  onKeyDown = ($event) => {
+    // TODO search better solution!
+    const doit = (direction: string) => {
+      if (this.audio.audioplaying) {
+        this.loupe.viewer.stopPlayback();
+      }
+      this.save();
+      if (direction !== 'down') {
+        this.goToSegment(direction);
+      } else {
+        this.save();
+        this.close();
+      }
+      setTimeout(() => {
+        this.loupe.viewer.startPlayback();
+      }, 500);
+    };
+
+    switch ($event.comboKey) {
+      case ('SHIFT + ARROWRIGHT'):
+        doit('right');
+        break;
+      case ('SHIFT + ARROWLEFT'):
+        doit('left');
+        break;
+      case ('SHIFT + ARROWDOWN'):
+        doit('down');
+        break;
+      default:
+        console.log('not found ' + $event.comboKey);
     }
   }
 }

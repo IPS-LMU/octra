@@ -344,8 +344,7 @@ export class AudioService {
     }, (err) => {
       this.loaded = false;
       errorcallback({});
-      console.log(err);
-      this.afterloaded.emit({status: 'error', error: 'Error decoding audio file'});
+            this.afterloaded.emit({status: 'error', error: 'Error decoding audio file'});
     });
   }
 

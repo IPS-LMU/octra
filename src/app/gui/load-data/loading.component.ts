@@ -121,8 +121,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
             && this.loadedtable.methods
             && this.loadedtable.audio
           ) {
-            console.log('all loaded');
-            this.subscrmanager.remove(id);
+                        this.subscrmanager.remove(id);
             setTimeout(() => {
               if ((isNullOrUndefined(this.sessionService.agreement)
                   || isNullOrUndefined(this.sessionService.agreement[this.sessionService.member_project]) ||
@@ -147,13 +146,11 @@ export class LoadingComponent implements OnInit, OnDestroy {
       (typeof this.settService.tidyUpMethod === 'undefined') ||
       typeof this.settService.validationmethod === 'undefined') {
       // load methods
-      console.log('load again');
-      this.subscrmanager.add(
+            this.subscrmanager.add(
         this.settService.loadValidationMethod(this.settService.guidelines.meta.validation_url)
       );
     } else if (!isNullOrUndefined(this.settService.guidelines)) {
-      console.log('set to true');
-      this.loadedtable.methods = true;
+            this.loadedtable.methods = true;
       this.loadedchanged.emit(false);
     }
     setTimeout(() => {

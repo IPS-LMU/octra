@@ -212,8 +212,7 @@ export class SessionService {
   }
 
   public setSessionData(member: any, data_id: number, audio_url: string, offline: boolean = false): { error: string } {
-    console.log('setSession');
-    if (isNullOrUndefined(this._easymode)) {
+        if (isNullOrUndefined(this._easymode)) {
       this._easymode = false;
     }
     if (offline && (isNullOrUndefined(member))) {

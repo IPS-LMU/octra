@@ -435,8 +435,7 @@ export class AudioviewerService extends AudioComponentService {
     this.audioTCalculator.audio_px_width = this.audio_px_w;
 
     if (!isNullOrUndefined(line) && this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly) {
-      console.log('line found');
-      const absXTime = (!this.audio.audioplaying) ? this.mousecursor.timePos.samples : this.PlayCursor.time_pos.samples;
+            const absXTime = (!this.audio.audioplaying) ? this.mousecursor.timePos.samples : this.PlayCursor.time_pos.samples;
       let b_width_time = this.audioTCalculator.absXtoSamples2(this.Settings.boundaries.width * 2, this.Chunk);
       b_width_time = Math.round(b_width_time);
 
@@ -446,8 +445,7 @@ export class AudioviewerService extends AudioComponentService {
             && this.transcrService.segments.get(i).time.samples <= absXTime + b_width_time)
             && this.transcrService.segments.get(i).time.samples !== this.audio.duration.samples
           ) {
-            console.log('segment for delete found');
-            const seg_after = (i < this.transcrService.segments.length - 1) ? this.transcrService.segments.get(i + 1) : null;
+                        const seg_after = (i < this.transcrService.segments.length - 1) ? this.transcrService.segments.get(i + 1) : null;
             if ((this.transcrService.segments.get(i).transcript === ''
               || this.transcrService.segments.get(i).transcript === this.transcrService.break_marker.code)
               && (seg_after === null || seg_after.transcript === ''
@@ -480,8 +478,7 @@ export class AudioviewerService extends AudioComponentService {
       const selection: number = Math.abs(this.selection.end.samples - this.selection.start.samples);
 
       if (selection > 0 && absXTime >= this.selection.start.samples && absXTime <= this.selection.end.samples) {
-        console.log('some selection');
-        // some part selected
+                // some part selected
         const segm1 = this.transcrService.segments.BetweenWhichSegment(this.selection.start.samples);
         const segm2 = this.transcrService.segments.BetweenWhichSegment(this.selection.end.samples);
 
@@ -511,8 +508,7 @@ export class AudioviewerService extends AudioComponentService {
         }
       } else {
         // no selection
-        console.log('no selection');
-        const segment = this.transcrService.segments.BetweenWhichSegment(Math.round(absXTime));
+                const segment = this.transcrService.segments.BetweenWhichSegment(Math.round(absXTime));
         if (segment === null ||
           (segment.transcript === '' || segment.transcript === this.transcrService.break_marker.code)) {
           this.transcrService.segments.add(Math.round(absXTime));
@@ -536,9 +532,7 @@ export class AudioviewerService extends AudioComponentService {
         }
       }
     }
-    console.log('line not found');
-    console.log(line);
-    return null;
+            return null;
   }
 
   /**

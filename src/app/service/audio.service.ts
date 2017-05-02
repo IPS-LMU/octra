@@ -305,7 +305,8 @@ export class AudioService {
    * audio data; for longer data, a MediaElementAudioSourceNode should be used.
    */
   public loadAudio = (url: string, callback: any = () => {
-  }, errorcallback?: (err: any) => void) => {
+  }, errorcallback: (err: any) => void = () => {
+  }) => {
     this.loaded = false;
 
     const options = new RequestOptions({
@@ -326,7 +327,8 @@ export class AudioService {
   }
 
   public decodeAudio = (result: ArrayBuffer, callback: any = () => {
-  }, errorcallback?: (any) => void) => {
+  }, errorcallback: (any) => void = () => {
+  }) => {
     Logger.log('Decode audio...');
     const samplerate = this.getSampleRate(result);
     decodeAudioFile(result, samplerate).then((buffer) => {
@@ -339,9 +341,10 @@ export class AudioService {
       this.loaded = true;
       this.afterloaded.emit({status: 'success', error: ''});
       callback();
-    }, () => {
+    }, (err) => {
       this.loaded = false;
       errorcallback({});
+      console.log(err);
       this.afterloaded.emit({status: 'error', error: 'Error decoding audio file'});
     });
   }

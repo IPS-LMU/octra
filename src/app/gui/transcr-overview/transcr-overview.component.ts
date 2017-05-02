@@ -83,7 +83,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
         validation: ''
       };
 
-      if (typeof validateAnnotation === 'function') {
+      if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function') {
         obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
           validateAnnotation(obj.transcription.text, this.transcrService.guidelines));
       }

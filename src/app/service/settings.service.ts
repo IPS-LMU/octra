@@ -9,7 +9,7 @@ import {ProjectConfiguration} from '../types/Settings/project-configuration';
 import {Subscription} from 'rxjs/Subscription';
 import {SessionService} from './session.service';
 import {AudioService} from './audio.service';
-import {isNullOrUndefined} from 'util';
+import {isFunction, isNullOrUndefined} from 'util';
 import {Logger} from '../shared/Logger';
 import {ProjectConfigValidator} from '../validator/ProjectConfigValidator';
 import {AppSettings} from '../types/Settings/app-settings';
@@ -170,18 +170,25 @@ export class SettingsService {
         js.type = 'text/javascript';
         js.src = url;
         js.id = 'validationJS';
-
+        js.onload = () => {
+          if (
+            (typeof validateAnnotation !== 'undefined') && isFunction(validateAnnotation) &&
+            (typeof tidyUpAnnotation !== 'undefined') && isFunction(tidyUpAnnotation)
+          ) {
+            this._validationmethod = validateAnnotation;
+            this._tidyUpMethod = tidyUpAnnotation;
+            Logger.log('Methods loaded.');
+            this.validationmethodloaded.emit();
+          } else {
+            console.log('loading methods error');
+            this._log += 'Loading functions failed [Error: S02]';
+          }
+        };
         document.body.appendChild(js);
-        Logger.log('Methods loaded.');
-        setTimeout(() => {
-          this._validationmethod = validateAnnotation;
-          this._tidyUpMethod = tidyUpAnnotation;
-          this.validationmethodloaded.emit();
-        }, 2000);
       }
       ,
       (error) => {
-        this._log += 'Loading functions failed<br/>';
+        this._log += 'Loading functions failed [Error: S01]<br/>';
       }
     );
   }

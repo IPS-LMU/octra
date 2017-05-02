@@ -121,6 +121,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
             && this.loadedtable.methods
             && this.loadedtable.audio
           ) {
+            console.log('all loaded');
             this.subscrmanager.remove(id);
             setTimeout(() => {
               if ((isNullOrUndefined(this.sessionService.agreement)
@@ -133,10 +134,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
                 this.router.navigate(['/user/transcr']);
               }
             }, 500);
-          } else if (this.loadedtable.guidelines
-            && this.loadedtable.projectconfig
-            && this.loadedtable.methods && !this.loadedtable.audio) {
-
           }
         }
       )
@@ -146,12 +143,16 @@ export class LoadingComponent implements OnInit, OnDestroy {
       this.settService.loadProjectSettings()
     );
 
-    if (!isNullOrUndefined(this.settService.guidelines) && ((this.settService.tidyUpMethod)
-      || isNullOrUndefined(this.settService.validationmethod))) {
+    if (!isNullOrUndefined(this.settService.guidelines) &&
+      (typeof this.settService.tidyUpMethod === 'undefined') ||
+      typeof this.settService.validationmethod === 'undefined') {
+      // load methods
+      console.log('load again');
       this.subscrmanager.add(
         this.settService.loadValidationMethod(this.settService.guidelines.meta.validation_url)
       );
-    } else {
+    } else if (!isNullOrUndefined(this.settService.guidelines)) {
+      console.log('set to true');
       this.loadedtable.methods = true;
       this.loadedchanged.emit(false);
     }

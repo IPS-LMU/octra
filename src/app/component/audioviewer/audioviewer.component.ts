@@ -12,7 +12,6 @@ import {
 
 import {
   AudioTime,
-  AudioTimeCalculator,
   AVMousePos,
   AVSelection,
   BrowserInfo,
@@ -422,6 +421,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
     if (curr_line) {
       this.focused = true;
       if (this.Settings.selection.enabled) {
+        console.log('curr line ok');
         this.av.setMouseMovePosition($event.type, x, y, curr_line, this.innerWidth);
         this.drawSegments();
         this.drawCursor(curr_line);
@@ -662,7 +662,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
                 case('set_boundary'):
                   if (this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly && this.av.focused) {
                     const result = this.av.addSegment();
-                    if (!result != null && result.msg != null) {
+                    if (result !== null && result.msg !== null) {
                       if (result.msg.text && result.msg.text !== '') {
                         this.alerttriggered.emit({
                           type: result.msg.type,
@@ -1137,8 +1137,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public selectSegment(seg_index: number, successcallback: (posY1: number, posY2: number) => void = () => {
-  }, errorcallback: () => void = () => {
-  }): boolean {
+                       },
+                       errorcallback: () => void = () => {
+                       }): boolean {
     if (seg_index > -1) {
       const segment = this.transcr.segments.get(seg_index);
       const start_time = this.transcr.segments.getStartTime(seg_index);

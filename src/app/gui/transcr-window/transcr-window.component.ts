@@ -226,13 +226,13 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       this.save();
       if (direction !== 'down') {
         this.goToSegment(direction);
+        setTimeout(() => {
+          this.loupe.viewer.startPlayback();
+        }, 500);
       } else {
         this.save();
         this.close();
       }
-      setTimeout(() => {
-        this.loupe.viewer.startPlayback();
-      }, 500);
     };
 
     switch ($event.comboKey) {

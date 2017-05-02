@@ -245,6 +245,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       case ('SHIFT + ARROWDOWN'):
         doit('down');
         break;
+      case ('ESC'):
+        doit('down');
+        break;
       default:
         console.log('not found ' + $event.comboKey);
     }

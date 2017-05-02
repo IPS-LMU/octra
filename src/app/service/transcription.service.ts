@@ -158,6 +158,7 @@ export class TranscriptionService {
       // format to text file
       const tc: TextConverter = new TextConverter();
       result = tc.convert(data, this.filename);
+      result = tidyUpAnnotation(result, this.guidelines);
     } else if (format === 'annotJSON') {
       // format to text file
       const ac: AnnotJSONConverter = new AnnotJSONConverter();

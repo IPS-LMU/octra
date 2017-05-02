@@ -1,7 +1,8 @@
 import {
   AfterContentInit,
   AfterViewInit,
-  Component, ElementRef,
+  Component,
+  ElementRef,
   EventEmitter,
   Input,
   OnDestroy,
@@ -109,6 +110,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     Functions.scrollTo(this.pos_y);
     this.loupe.Settings.boundaries.readonly = true;
     this.changeArea(begin, segment.time);
+    setTimeout(() => {
+      this.loupe.viewer.startPlayback();
+    }, 500);
   }
 
   ngAfterContentInit() {

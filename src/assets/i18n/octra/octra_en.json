@@ -49,7 +49,18 @@
     "errors found": "({{errors}}) errors found",
     "no errors found": "No errors found",
     "segment": "Segment",
-    "job number": "Job number"
+    "job number": "Job number",
+    "free jobs": "free Jobs",
+    "email": "Email",
+    "description": "Description",
+    "bug report": "Bug Report"
+  },
+  "bug report": {
+    "report an error": "report an error",
+    "where does the error occur": "Where did the error occur?",
+    "have you found bugs": "Do you found other bugs?",
+    "Does something go wrong": "Does something go wrong?",
+    "Please send us your bug report": "Please send us your bug report."
   },
   "transcription": {
     "start": "Continue transcription",

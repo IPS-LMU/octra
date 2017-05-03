@@ -49,7 +49,18 @@
     "errors found": "({{errors}}) Fehler gefunden",
     "no errors found": "Keine Fehler gefunden",
     "segment": "Segment",
-    "job number": "Aufgabennummer"
+    "job number": "Aufgabennummer",
+    "free jobs": "Freie Aufgaben",
+    "email": "Email",
+    "description": "Beschreibung",
+    "bug report": "Fehlerbericht"
+  },
+  "bug report": {
+    "report an error": "Fehler melden",
+    "where does the error occur": "Wo trat der Fehler auf?",
+    "have you found bugs": "Haben Sie andere Fehler gefunden?",
+    "Does something go wrong": "Does something go wrong?",
+    "Please send us your bug report": "Please send us your bug report."
   },
   "transcription":{
     "start": "Transkription fortsetzen",

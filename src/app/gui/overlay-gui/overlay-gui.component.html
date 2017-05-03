@@ -1,15 +1,15 @@
 <div id="overlay-transcr" style="position:relative">
-    <app-transcr-window #window (act)="onWindowAction($event)" *ngIf="showWindow" [easymode]="sessService.easymode" ></app-transcr-window>
-    <div style="position:fixed;bottom:0;z-index:20;" [ngStyle]="{width:viewer.innerWidth + 'px'}">
-        <app-audio-navigation #audionav
-                              (buttonclick)="onButtonClick($event)"
-                              (volumechange)="onVolumeChange($event)"
-                              (aftervolumechange)="afterVolumeChange($event)"
-                              (speedchange)="onSpeedChange($event)"
-                              (afterspeedchange)="afterSpeedChange($event)"
-                              [(audioplaying)]="audio.audioplaying"
-                              [(responsive)]="settingsService.responsive.enabled"
-                              [buttons]="{
+    <app-transcr-window #window (act)="onWindowAction($event)" *ngIf="showWindow"
+                        [easymode]="sessService.easymode"></app-transcr-window>
+    <app-audio-navigation #audionav
+                          (buttonclick)="onButtonClick($event)"
+                          (volumechange)="onVolumeChange($event)"
+                          (aftervolumechange)="afterVolumeChange($event)"
+                          (speedchange)="onSpeedChange($event)"
+                          (afterspeedchange)="afterSpeedChange($event)"
+                          [(audioplaying)]="audio.audioplaying"
+                          [(responsive)]="settingsService.responsive.enabled"
+                          [buttons]="{
                                 play: {
                                     label: ('general.play' | translate),
                                     shortcut: keyMap.getShortcut('overlay', 'play_pause')
@@ -31,27 +31,31 @@
                                     shortcut: keyMap.getShortcut('overlay', 'step_backward')
                                 }
                               }"
-                              [easymode]="sessService.easymode"
-        ></app-audio-navigation>
-    </div>
-    <div style="width:100px;">
-        <app-circleloupe #loupe [ngStyle]="{
+                          [easymode]="sessService.easymode"
+    ></app-audio-navigation>
+    <div id="special" [ngStyle]="
+{
+height: getHeight + 'px'
+}" style="overflow-y: scroll; overflow-x: hidden; position:relative;">
+        <div style="width:100px;">
+            <app-circleloupe #loupe [ngStyle]="{
 'position':'absolute',
 'margin-left':mini_loupecoord.x + 'px',
 'margin-top':mini_loupecoord.y + 'px',
 'width' : '80px',
 'height': '80px',
-'z-index':'900',
-'visibility': (loupe_hidden) ? 'hidden' : 'inherit'}" (statechange)="onStateChange($event)"></app-circleloupe>
+'z-index':'90',
+'visibility': (loupe_hidden) ? 'hidden' : 'inherit'}"></app-circleloupe>
+        </div>
+        <app-audioviewer #viewer
+                         (selchange)="onSegmentSelected($event);"
+                         (segmententer)="onSegmentEntered($event);"
+                         (segmentchange)="onSegmentChange($event);"
+                         (mousecursorchange)="onMouseOver($event);"
+                         (mouseenter)="loupe_hidden = false;"
+                         (mouseleave)="loupe_hidden = true;"
+                         (shortcuttriggered)="onShortCutTriggered($event, 'overlay')"
+        >
+        </app-audioviewer>
     </div>
-    <app-audioviewer #viewer
-                     (selchange)="onSegmentSelected($event);"
-                     (segmententer)="onSegmentEntered($event);"
-                     (segmentchange)="onSegmentChange($event);"
-                     (mousecursorchange)="onMouseOver($event);"
-                     (mouseenter)="loupe_hidden = false;"
-                     (mouseleave)="loupe_hidden = true;"
-                     (shortcuttriggered)="onShortCutTriggered($event, 'overlay')"
-    >
-    </app-audioviewer>
 </div>

@@ -129,8 +129,19 @@
                                 <td>
                                     <div class="togglebutton">
                                         <label>
-                                            <input (click)="toggleEasyMode()" [checked]="sessService.easymode"
+                                            <input (click)="toggleSettings('easymode')" [checked]="sessService.easymode"
                                                    id="easymode" type="checkbox">
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label for="playonhover">PlayOnHover:</label></td>
+                                <td>
+                                    <div class="togglebutton">
+                                        <label>
+                                            <input (click)="toggleSettings('playonhover')" [checked]="sessService.playonhover"
+                                                   id="playonhover" type="checkbox">
                                         </label>
                                     </div>
                                 </td>
@@ -153,6 +164,6 @@
 </nav>
 <div id="subnav" *ngIf="sessService.LoggedIn && !sessService.offline && navbarServ.dataloaded">
     {{"general.project" | translate}}: {{sessService.member_project}} | {{"general.name" |translate}}:
-    {{navbarServ.exportformats.filename}} | Free Jobs:
+    {{navbarServ.exportformats.filename}} | {{'general.free jobs' | translate}}:
     {{sessService.jobs_left}}
 </div>

@@ -14,7 +14,6 @@ declare var window: any;
 
 export class CircleLoupeComponent implements AfterViewInit {
   @ViewChild('loupe') loupe: LoupeComponent;
-  @Output('statechange') statechange: EventEmitter<string> = new EventEmitter<string>();
 
   public pos: any = {
     x: 0,

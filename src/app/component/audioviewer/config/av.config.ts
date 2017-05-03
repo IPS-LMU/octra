@@ -107,6 +107,13 @@ export class AudioviewerConfig {
         },
         focusonly: true,
         title: 'move cursor right'
+      }, playonhover: {
+        keys: {
+          mac: 'H',
+          pc: 'H'
+        },
+        focusonly: true,
+        title: 'play audio on hover'
       }
     },
     disabled_keys: ['SHIFT + SPACE'],

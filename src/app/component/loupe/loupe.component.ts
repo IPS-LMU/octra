@@ -14,13 +14,20 @@ declare var window: any;
 export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('viewer') viewer: AudioviewerComponent;
   @ViewChild('loupe') loupe: ElementRef;
-  @Output('statechange') statechange: EventEmitter<string> = new EventEmitter<string>();
 
   @Output('mousecursorchange') mousecursorchange: EventEmitter<AVMousePos> = new EventEmitter<AVMousePos>();
   @Output('shortcuttriggered') shortcuttriggered: EventEmitter<string> = new EventEmitter<string>();
   @Output('segmententer') segmententer: EventEmitter<any> = new EventEmitter<any>();
 
   private subscrmanager;
+
+  public get zoomY(): number {
+    return this.viewer.av.zoomY;
+  }
+
+  public set zoomY(value: number) {
+    this.viewer.av.zoomY = value;
+  }
 
   public get MouseCursor(): AVMousePos {
     return this.viewer.MouseCursor;

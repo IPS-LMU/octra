@@ -97,14 +97,14 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public interfaceActive(name: string) {
     return !(isNullOrUndefined(
-        this.navbarServ.interfaces.find((x) => {
-          return name === x;
-        })
-      ));
+      this.navbarServ.interfaces.find((x) => {
+        return name === x;
+      })
+    ));
   }
 
-  toggleEasyMode() {
-    this.sessService.easymode = !this.sessService.easymode;
+  toggleSettings(option: string) {
+    this.sessService[option] = !this.sessService[option];
   }
 
   onOptionsOpened() {

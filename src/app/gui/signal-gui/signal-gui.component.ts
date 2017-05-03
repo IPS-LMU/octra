@@ -173,6 +173,16 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onMouseOver(cursor: AVMousePos) {
     this.mini_loupecoord.component = this.viewer;
+
+    if (!this.audio.audioplaying && this.sessService.playonhover) {
+      // play audio
+      this.audio.startPlayback(this.viewer.av.Mousecursor.timePos, new AudioTime(this.audio.samplerate / 10,
+        this.audio.samplerate), () => {
+      }, () => {
+        this.audio.audioplaying = false;
+      }, true);
+    }
+
     const a = this.viewer.getLocation();
     this.mini_loupecoord.y = a.y - this.viewer.Settings.height
       - (this.miniloupe.Settings.height) - 17;
@@ -182,6 +192,16 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onMouseOver2(cursor: AVMousePos) {
     this.mini_loupecoord.component = this.loupe;
+
+    if (!this.audio.audioplaying && this.sessService.playonhover) {
+      // play audio
+      this.audio.startPlayback(this.loupe.viewer.av.Mousecursor.timePos, new AudioTime(this.audio.samplerate / 10,
+        this.audio.samplerate), () => {
+      }, () => {
+        this.audio.audioplaying = false;
+      }, true);
+    }
+
     this.mini_loupecoord.y = this.loupe.getLocation().y - this.loupe.Settings.height
       - (this.miniloupe.Settings.height / 2) + 15;
     this.changeArea(this.miniloupe, this.loupe.viewer, this.mini_loupecoord,
@@ -240,15 +260,18 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.projectsettings.logging.forced) {
 
       if (
-        $event.value == null || !(
+        $event.value === null || !(
           // cursor move by keyboard events are note saved because this would be too much
           Functions.contains($event.value, 'cursor') ||
           // disable logging for user test phase, because it would be too much
           Functions.contains($event.value, 'play_selection') ||
-          Functions.contains($event.value, 'segment_enter')
+          Functions.contains($event.value, 'segment_enter') ||
+          Functions.contains($event.value, 'playonhover')
         )
       ) {
         this.uiService.addElementFromEvent('shortcut', $event, Date.now(), type);
+      } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
+        this.sessService.playonhover = !this.sessService.playonhover;
       }
     }
   }

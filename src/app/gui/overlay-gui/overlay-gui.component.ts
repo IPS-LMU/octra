@@ -3,6 +3,7 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   OnChanges,
   OnDestroy,
   OnInit,
@@ -35,6 +36,7 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
   @ViewChild('window') window: TranscrWindowComponent;
   @ViewChild('loupe') loupe: LoupeComponent;
   @ViewChild('audionav') audionav: AudioNavigationComponent;
+  @ViewChild('audionav') nav: ElementRef;
 
   public showWindow = false;
   private subscrmanager: SubscriptionManager;
@@ -48,6 +50,10 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
     x: 0,
     y: 0
   };
+
+  public get getHeight(): number {
+    return window.innerHeight - 250;
+  }
 
   private shortcuts: any = {};
 
@@ -113,6 +119,8 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
         this.changeArea(this.loupe, this.mini_loupecoord);
       }
     }, 200);
+
+    this.loupe.zoomY = 10;
   }
 
   ngAfterContentChecked() {
@@ -149,12 +157,17 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
     return this.viewer.Selection;
   }
 
-  onStateChange(state: string) {
-  }
-
   onMouseOver(cursor: AVMousePos) {
     this.mousestartmoving = true;
     this.loupe_updated = false;
+    if (!this.audio.audioplaying && this.sessService.playonhover) {
+      // play audio
+      this.audio.startPlayback(this.viewer.av.Mousecursor.timePos, new AudioTime(this.audio.samplerate / 10,
+        this.audio.samplerate), () => {
+      }, () => {
+        this.audio.audioplaying = false;
+      }, true);
+    }
     setTimeout(() => {
       this.mousestartmoving = false;
     }, 200);
@@ -171,7 +184,20 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
       coord.x = ((cursor.relPos.x) ? cursor.relPos.x - 40 : 0);
       coord.y = ((cursor.line) ? (cursor.line.number + 1) *
         cursor.line.Size.height + (cursor.line.number) * this.viewer.Settings.margin.bottom : 0);
-      const half_rate = Math.round(this.audio.samplerate / 20);
+
+      /*
+       let start = (cursor.absX > ) ? cursor.absX - 1 : 0;
+       let end = (cursor.absX < this.viewer.AudioPxWidth - 1) ? cursor.absX + 1 : this.viewer.AudioPxWidth;
+
+       start = this.viewer.av.audioTCalculator.absXChunktoSamples(start, this.viewer.av.Chunk);
+       end = this.viewer.av.audioTCalculator.absXChunktoSamples(end, this.viewer.av.Chunk);
+
+       const startA = new AudioTime(start, this.audio.samplerate);
+       const endA = new AudioTime(end, this.audio.samplerate);
+
+       */
+
+      const half_rate = Math.round(this.audio.samplerate / 4);
       const start = (cursor.timePos.samples > half_rate)
         ? new AudioTime(cursor.timePos.samples - half_rate, this.audio.samplerate)
         : new AudioTime(0, this.audio.samplerate);
@@ -197,15 +223,18 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 
   onShortCutTriggered($event, type) {
     if (
-      $event.value == null || !(
+      $event.value === null || !(
         // cursor move by keyboard events are note saved because this would be too much
         Functions.contains($event.value, 'cursor') ||
         // disable logging for user test phase, because it would be too much
         Functions.contains($event.value, 'play_selection') ||
-        Functions.contains($event.value, 'segment_enter')
+        Functions.contains($event.value, 'segment_enter') ||
+        Functions.contains($event.value, 'playonhover')
       )
     ) {
       this.uiService.addElementFromEvent('shortcut', $event, Date.now(), type);
+    } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
+      this.sessService.playonhover = !this.sessService.playonhover;
     }
   }
 

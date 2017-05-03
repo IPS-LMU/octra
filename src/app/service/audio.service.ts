@@ -161,7 +161,7 @@ export class AudioService {
   private _stepbackward = false;
 
   public afterloaded: EventEmitter<any>;
-  public statechange: EventEmitter<string>;
+  public statechange: EventEmitter<{ state: string, playonhover: boolean }>;
   public loaded = false;
 
   private error: any;
@@ -173,7 +173,7 @@ export class AudioService {
     this.init();
 
     this.afterloaded = new EventEmitter<any>();
-    this.statechange = new EventEmitter<string>();
+    this.statechange = new EventEmitter<{ state: string, playonhover: boolean }>();
   }
 
   public init() {
@@ -228,7 +228,7 @@ export class AudioService {
   }
 
   public startPlayback(begintime: AudioTime, duration: AudioTime = new AudioTime(0, this.samplerate),
-                       drawFunc: () => void, endPlayback: () => void): boolean {
+                       drawFunc: () => void, endPlayback: () => void, playonhover: boolean = false): boolean {
     if (!this.audioplaying) {
       this._state = 'started';
       this._stepbackward = false;
@@ -251,11 +251,16 @@ export class AudioService {
       this.source.onended = () => {
         endPlayback();
         if (this._state === 'started' && !this.stepbackward) {
-          this.statechange.emit('ended');
+          this.statechange.emit({
+            state: 'ended',
+            playonhover: playonhover
+          });
         } else {
-          this.statechange.emit(this._state);
+          this.statechange.emit({
+            state: this._state,
+            playonhover: playonhover
+          });
         }
-
       };
 
       this.startplaying = new Date().getTime();
@@ -268,7 +273,10 @@ export class AudioService {
         // important: source.start needs seconds, not samples!
         this.source.start(0, begintime.seconds, duration.seconds);
       }
-      this.statechange.emit('started');
+      this.statechange.emit({
+        state: 'started',
+        playonhover: playonhover
+      });
 
       return true;
     }
@@ -344,7 +352,7 @@ export class AudioService {
     }, (err) => {
       this.loaded = false;
       errorcallback({});
-            this.afterloaded.emit({status: 'error', error: 'Error decoding audio file'});
+      this.afterloaded.emit({status: 'error', error: 'Error decoding audio file'});
     });
   }
 

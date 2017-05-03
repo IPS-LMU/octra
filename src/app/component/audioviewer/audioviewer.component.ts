@@ -169,8 +169,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.m_context = this.mousecanvas.getContext('2d');
 
     this.subscrmanager.add(this.audio.statechange.subscribe(
-      (state) => {
-        if (state === 'ended') {
+      (obj) => {
+        if (obj.state === 'ended') {
           if (this.av.Selection == null || (this.av.Selection.end.samples - this.av.Selection.start.samples) === 0) {
             this.changePlayCursorSamples(this.av.Chunk.time.start.samples);
           } else {
@@ -780,6 +780,13 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.av.moveCursor('right', this.Settings.step_width_ratio * this.audio.samplerate);
                     this.drawCursor(this.av.LastLine);
                     this.mousecursorchange.emit(this.av.Mousecursor);
+                    key_active = true;
+                  }
+                  break;
+                case('playonhover'):
+                  if (this.av.focused && !this.Settings.boundaries.readonly) {
+                    // move cursor to right
+                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
                     key_active = true;
                   }
                   break;

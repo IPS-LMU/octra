@@ -6,6 +6,14 @@ import {DropZoneComponent} from '../component/drop-zone/drop-zone.component';
 
 @Injectable()
 export class SessionService {
+  get playonhover(): boolean {
+    return this._playonhover;
+  }
+
+  set playonhover(value: boolean) {
+    this._playonhover = value;
+  }
+
   get agreement(): any {
     return this._agreement;
   }
@@ -114,6 +122,7 @@ export class SessionService {
   @SessionStorage('samplerate') _samplerate: number;
   @SessionStorage('agreement') private _agreement: any;
   @SessionStorage('jobs_left') jobs_left: number;
+  @SessionStorage('playonhover') private _playonhover: boolean;
 
 
   // LOCAL STORAGE
@@ -212,7 +221,7 @@ export class SessionService {
   }
 
   public setSessionData(member: any, data_id: number, audio_url: string, offline: boolean = false): { error: string } {
-        if (isNullOrUndefined(this._easymode)) {
+    if (isNullOrUndefined(this._easymode)) {
       this._easymode = false;
     }
     if (offline && (isNullOrUndefined(member))) {

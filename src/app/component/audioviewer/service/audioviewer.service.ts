@@ -19,6 +19,9 @@ import {isNullOrUndefined} from 'util';
 
 @Injectable()
 export class AudioviewerService extends AudioComponentService {
+  set zoomY(value: number) {
+    this._zoomY = value;
+  }
   get minmaxarray(): number[] {
     return this._minmaxarray;
   }

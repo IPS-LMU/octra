@@ -1,3 +1,4 @@
+import {isNullOrUndefined} from 'util';
 export interface FileSize {
   size: number;
   label: string;
@@ -5,9 +6,13 @@ export interface FileSize {
 ;
 
 export class Functions {
-  public static scrollTo(y: number) {
+  public static scrollTo(y: number, target?: string) {
     setTimeout(() => {
-      jQuery('html, body').scrollTop(y);
+      if (isNullOrUndefined(target)) {
+        jQuery('html, body').scrollTop(y);
+      } else {
+        jQuery(target).scrollTop(y);
+      }
     }, 200);
   }
 

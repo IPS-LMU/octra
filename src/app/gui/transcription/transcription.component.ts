@@ -97,8 +97,11 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
     if (!isNullOrUndefined(this.projectsettings) && !isNullOrUndefined(this.projectsettings.logging)
       && this.projectsettings.logging.forced) {
-      this.subscrmanager.add(this.audio.statechange.subscribe((state) => {
-        this.uiService.addElementFromEvent('audio_' + state, {value: state}, Date.now(), 'audio');
+      this.subscrmanager.add(this.audio.statechange.subscribe((obj) => {
+        if (!obj.playonhover) {
+          // make sure that events from playonhover are not logged
+          this.uiService.addElementFromEvent('audio_' + obj.state, {value: obj.state}, Date.now(), 'audio');
+        }
       }));
     }
   }
@@ -191,7 +194,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
             }
           ))) {
           // lang not in project config, fall back to first defined
-                    lang = this.settingsService.projectsettings.languages[0];
+          lang = this.settingsService.projectsettings.languages[0];
         }
 
         this.subscrmanager.add(
@@ -206,7 +209,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
     if (isNullOrUndefined(this.projectsettings.interfaces.find((x) => {
         return this.sessService.Interface === x;
       }))) {
-            this.sessService.Interface = this.projectsettings.interfaces[0];
+      this.sessService.Interface = this.projectsettings.interfaces[0];
     }
 
     this.change();

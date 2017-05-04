@@ -53,14 +53,17 @@
     "free jobs": "Freie Aufgaben",
     "email": "Email",
     "description": "Beschreibung",
-    "bug report": "Fehlerbericht"
+    "bug report": "Fehlerbericht",
+    "protocol": "Protokoll"
   },
   "bug report": {
     "report an error": "Fehler melden",
     "where does the error occur": "Wo trat der Fehler auf?",
     "have you found bugs": "Haben Sie andere Fehler gefunden?",
-    "Does something go wrong": "Does something go wrong?",
-    "Please send us your bug report": "Please send us your bug report."
+    "Does something go wrong": "Funktioniert etwas nicht richtig?",
+    "Please send us your bug report": "Senden Sie uns bitte ihren Fehlerbericht.",
+    "sent": "Der Fehlerbericht wurde erfolgreich gesendet.",
+    "send protocol": "Protokoll beifügen (empfohlen)"
   },
   "transcription":{
     "start": "Transkription fortsetzen",

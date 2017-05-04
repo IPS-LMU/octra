@@ -6,6 +6,20 @@ import {DropZoneComponent} from '../component/drop-zone/drop-zone.component';
 
 @Injectable()
 export class SessionService {
+  get email(): string {
+    return this._email;
+  }
+
+  set email(value: string) {
+    this._email = value;
+  }
+  get reloaded(): boolean {
+    return this._reloaded;
+  }
+
+  set reloaded(value: boolean) {
+    this._reloaded = value;
+  }
   get playonhover(): boolean {
     return this._playonhover;
   }
@@ -123,6 +137,8 @@ export class SessionService {
   @SessionStorage('agreement') private _agreement: any;
   @SessionStorage('jobs_left') jobs_left: number;
   @SessionStorage('playonhover') private _playonhover: boolean;
+  @SessionStorage('reloaded') private _reloaded: boolean;
+  @SessionStorage('email') private _email: string;
 
 
   // LOCAL STORAGE

@@ -141,3 +141,12 @@ footer{
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 300;
 }
+
+#bugreport .modal-dialog{
+    width: 90%;
+    max-height:90%;
+}
+
+#bugreport .modal-content{
+    height: 100%;
+}

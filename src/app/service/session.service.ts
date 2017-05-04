@@ -13,6 +13,7 @@ export class SessionService {
   set email(value: string) {
     this._email = value;
   }
+
   get reloaded(): boolean {
     return this._reloaded;
   }
@@ -20,6 +21,7 @@ export class SessionService {
   set reloaded(value: boolean) {
     this._reloaded = value;
   }
+
   get playonhover(): boolean {
     return this._playonhover;
   }
@@ -318,7 +320,10 @@ export class SessionService {
   }
 
   public save(key: string, value: any): boolean {
-    this.saving.emit(true);
+    if (key === 'transcription' || key === 'feedback') {
+      this.saving.emit(true);
+    }
+
     switch (key) {
       case 'transcription':
         this.localStr.store(key, value);
@@ -332,7 +337,10 @@ export class SessionService {
       default:
         return false; // if key not found return false
     }
-    this.saving.emit(false);
+
+    if (key === 'transcription' || key === 'feedback') {
+      this.saving.emit(false);
+    }
     return true;
   }
 

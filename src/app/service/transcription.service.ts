@@ -195,7 +195,7 @@ export class TranscriptionService {
       this._feedback.comment = this.sessServ.comment;
     }
 
-    if (this.sessServ.logs == null) {
+    if (this.sessServ.logs === null) {
       this.sessServ.logs = [];
       this.uiService.elements = [];
     } else {

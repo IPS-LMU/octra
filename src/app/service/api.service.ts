@@ -186,4 +186,16 @@ export class APIService implements API {
     const sanitized_url = this.sanitizer.sanitize(SecurityContext.URL, server_url);
     this.server_url = sanitized_url;
   }
+
+  public sendBugReport(email: string = '', description: string = '', log: any): Observable<Response> {
+    const json = JSON.stringify(log);
+
+    const cmd_json = {
+      querytype: 'reportbug',
+      email: email,
+      logtext: json
+    };
+
+    return this.post(cmd_json);
+  }
 }

@@ -53,14 +53,18 @@
     "free jobs": "free Jobs",
     "email": "Email",
     "description": "Description",
-    "bug report": "Bug Report"
+    "bug report": "Bug Report",
+    "protocol": "Protocol"
   },
   "bug report": {
-    "report an error": "report an error",
+    "report an error": "Report an error",
     "where does the error occur": "Where did the error occur?",
     "have you found bugs": "Do you found other bugs?",
     "Does something go wrong": "Does something go wrong?",
-    "Please send us your bug report": "Please send us your bug report."
+    "Please send us your bug report": "Please send us your bug report.",
+    "sent": "Your bug was successfully reported.",
+    "send protocol": "Add Protocol (recommended)",
+    "protocol": "Protocol"
   },
   "transcription": {
     "start": "Continue transcription",

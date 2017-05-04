@@ -5,6 +5,7 @@ import {NavbarService} from '../../service/navbar.service';
 import {DomSanitizer} from '@angular/platform-browser';
 import {TranslateService} from '@ngx-translate/core';
 import {isNullOrUndefined} from 'util';
+import {ModalService} from '../../service/modal.service';
 
 @Component({
   selector: 'app-navigation',
@@ -23,7 +24,8 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(public sessService: SessionService,
               public navbarServ: NavbarService,
               public sanitizer: DomSanitizer,
-              public langService: TranslateService) {
+              public langService: TranslateService,
+              public modService: ModalService) {
   }
 
   ngOnDestroy() {
@@ -109,5 +111,9 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onOptionsOpened() {
     this.collapsed = true;
+  }
+
+  openBugReport() {
+    this.modService.show('bugreport');
   }
 }

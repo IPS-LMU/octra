@@ -5,6 +5,8 @@ import {SessionService} from './service/session.service';
 import {SettingsService} from './service/settings.service';
 import {SubscriptionManager} from './shared/SubscriptionManager';
 import {isNullOrUndefined, isUndefined} from 'util';
+import {BugReportService, ConsoleType} from './service/bug-report.service';
+import {AppInfo} from './app.info';
 
 @Component({
   selector: 'app-octra',
@@ -13,14 +15,55 @@ import {isNullOrUndefined, isUndefined} from 'util';
 })
 
 export class AppComponent implements OnDestroy {
-  version = '1.1.1';
+  public get version(): string {
+    return AppInfo.version;
+  }
 
   private subscrmanager: SubscriptionManager;
 
   constructor(private api: APIService,
               private langService: TranslateService,
               private sessService: SessionService,
-              private settingsService: SettingsService) {
+              private settingsService: SettingsService,
+              private bugService: BugReportService) {
+
+    // overwrite console.log
+    const oldLog = console.log;
+    const serv = this.bugService;
+    (() => {
+      console.log = function (message) {
+        serv.addEntry(ConsoleType.LOG, message);
+        oldLog.apply(console, arguments);
+      };
+    })();
+
+    // overwrite console.err
+    const oldError = console.error;
+    (() => {
+      console.error = function (message) {
+        serv.addEntry(ConsoleType.ERROR, message);
+        oldError.apply(console, arguments);
+      };
+    })();
+
+    // overwrite console.info
+    const oldInfo = console.info;
+    (() => {
+      console.info = function (message) {
+        serv.addEntry(ConsoleType.INFO, message);
+        oldInfo.apply(console, arguments);
+      };
+    })();
+
+    // overwrite console.warn
+    const oldWarn = console.warn;
+    (() => {
+      console.warn = function (message) {
+        serv.addEntry(ConsoleType.WARN, message);
+        oldWarn.apply(console, arguments);
+      };
+    })();
+
     this.subscrmanager = new SubscriptionManager();
 
     // load settings

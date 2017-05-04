@@ -9,4 +9,5 @@ export class BrowserInfo {
 
   public static browser: string = platform.name;
   public static version: string = platform.version;
+  public static os: any = platform.os;
 }

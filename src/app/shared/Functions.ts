@@ -104,25 +104,25 @@ export class Functions {
   public static getFileSize(bytes: number): FileSize {
     const result: FileSize = {
       size: 0,
-      label: 'hallo'
+      label: ''
     };
 
-    if ((bytes / 1024) < 1) {
+    if ((bytes / 1000) < 1) {
       // take bytes
       result.size = bytes;
       result.label = 'B';
-    } else if (bytes / (1024 * 1024) < 1) {
+    } else if (bytes / (1000 * 1000) < 1) {
       // take kilobytes
-      result.size = bytes / 1024;
+      result.size = bytes / 1000;
       result.label = 'KB';
-    } else if (bytes / (1024 * 1024 * 1024) < 1) {
+    } else if (bytes / (1000 * 1000 * 1000) < 1) {
       // take megabyte
-      result.size = bytes / 1024 / 1024;
+      result.size = bytes / 1000 / 1000;
       result.label = 'MB';
-    } else if (bytes / (1024 * 1024 * 1024 * 1024) < 1) {
+    } else if (bytes / (1000 * 1000 * 1000 * 1000) < 1) {
       // take gigabytes
 
-      result.size = bytes / 1024 / 1024 / 1024;
+      result.size = bytes / 1000 / 1000 / 1000;
       result.label = 'GB';
     }
 

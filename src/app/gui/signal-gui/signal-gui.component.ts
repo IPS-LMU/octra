@@ -228,16 +228,16 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onSegmentEnter($event) {
-    const segment = this.transcrService.segments.get($event.index);
+    const segment = this.transcrService.annotation.tiers[0].segments.get($event.index);
     this.editor.rawText = segment.transcript;
     this.segmentselected = true;
     this.transcrService.selectedSegment = $event;
-    this.loupe.changeArea(this.transcrService.segments.getStartTime($event.index), segment.time);
+    this.loupe.changeArea(this.transcrService.annotation.tiers[0].segments.getStartTime($event.index), segment.time);
   }
 
   // TODO CHANGE!!
   onLoupeSegmentEnter($event) {
-    const segment = this.transcrService.segments.get($event.index);
+    const segment = this.transcrService.annotation.tiers[0].segments.get($event.index);
     this.editor.rawText = segment.transcript;
     this.segmentselected = true;
     this.transcrService.selectedSegment = $event;
@@ -246,12 +246,13 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
   onTranscriptionChanged($event) {
     if (this.segmentselected) {
       const index = this.transcrService.selectedSegment.index;
-      if (index > -1 && this.transcrService.segments && index < this.transcrService.segments.length) {
-        const segment = this.transcrService.segments.get(index);
+      if (index > -1 && this.transcrService.annotation.tiers[0].segments &&
+        index < this.transcrService.annotation.tiers[0].segments.length) {
+        const segment = this.transcrService.annotation.tiers[0].segments.get(index);
         this.viewer.focused = false;
         this.loupe.viewer.focused = false;
         segment.transcript = this.editor.rawText;
-        this.transcrService.segments.change(index, segment);
+        this.transcrService.annotation.tiers[0].segments.change(index, segment);
       }
     }
   }
@@ -387,13 +388,13 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public openSegment(segnumber: number) {
-    const segment = this.transcrService.segments.get(segnumber);
+    const segment = this.transcrService.annotation.tiers[0].segments.get(segnumber);
     this.editor.rawText = segment.transcript;
 
     this.segmentselected = true;
     this.transcrService.selectedSegment = {index: segnumber, pos: segment.time};
     this.viewer.selectSegment(segnumber);
 
-    this.loupe.changeArea(this.transcrService.segments.getStartTime(segnumber), segment.time);
+    this.loupe.changeArea(this.transcrService.annotation.tiers[0].segments.getStartTime(segnumber), segment.time);
   }
 }

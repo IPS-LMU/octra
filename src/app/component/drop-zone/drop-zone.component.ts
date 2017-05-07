@@ -57,6 +57,7 @@ export class DropZoneComponent implements OnInit {
       if (files.length === 1) {
         // select the first file
         this._file = files[0];
+        console.log(this._file);
         this.afterdrop.emit(this._file);
       }
     }
@@ -72,6 +73,7 @@ export class DropZoneComponent implements OnInit {
     if (files.length === 1) {
       // select the first file
       this._file = files[0];
+      console.log(this._file);
       this.afterdrop.emit(this._file);
     }
   }

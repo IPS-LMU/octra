@@ -1,4 +1,8 @@
 import {EventEmitter, Injectable} from '@angular/core';
+import {File} from '../shared/Converters/Converter';
+import {TextConverter} from '../shared/Converters/TextConverter';
+import {SessionService} from './session.service';
+import {AnnotJSONConverter} from '../shared/Converters/AnnotJSONConverter';
 
 @Injectable()
 export class NavbarService {
@@ -26,6 +30,18 @@ export class NavbarService {
     this._show_export = value;
   }
 
+  public get textfile(): File {
+    const result = this.getExportFile('text');
+
+    return result;
+  }
+
+  public get annotjsonfile(): File {
+    const result = this.getExportFile('annotJSON');
+
+    return result;
+  }
+
   public onexportbuttonclick = new EventEmitter<any>();
 
   private _show_export = false;
@@ -36,11 +52,36 @@ export class NavbarService {
 
   public exportformats: any = {
     filename: '',
+    bitrate: 0,
+    samplerate: 0,
+    duration: 0,
+    filesize: {
+      size: 0,
+      label: ''
+    },
     text: '',
     annotJSON: ''
   };
 
-  constructor() {
+  constructor(private sessService: SessionService) {
+
+  }
+
+  public getExportFile(format: string): File {
+    if (format === 'text') {
+      const converter: TextConverter = new TextConverter();
+      return converter.export(this.sessService.annotation);
+    } else if (format === 'annotJSON') {
+      const converter: AnnotJSONConverter = new AnnotJSONConverter();
+      return converter.export(this.sessService.annotation);
+    }
+
+    return {
+      name: '',
+      content: 'nothing',
+      encoding: '',
+      type: ''
+    };
   }
 
   onExportButtonClick(format: string) {

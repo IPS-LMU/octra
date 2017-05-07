@@ -7,6 +7,8 @@ import {SubscriptionManager} from './shared/SubscriptionManager';
 import {isNullOrUndefined, isUndefined} from 'util';
 import {BugReportService, ConsoleType} from './service/bug-report.service';
 import {AppInfo} from './app.info';
+import {OAnnotation, OAudiofile, OSegment, OTier} from './types/annotation';
+import {Segments} from './shared/Segments';
 
 @Component({
   selector: 'app-octra',
@@ -26,6 +28,47 @@ export class AppComponent implements OnDestroy {
               private sessService: SessionService,
               private settingsService: SettingsService,
               private bugService: BugReportService) {
+
+/*
+    if (!isNullOrUndefined(this.sessService.transcription)) {
+      console.log('Convert to new OctraAnnotation...');
+
+      const audiofile: OAudiofile = new OAudiofile();
+      audiofile.name = this.sessService.sessionfile.name;
+      audiofile.size = this.sessService.sessionfile.size;
+      audiofile.duration = 0;
+      audiofile.samplerate = this.sessService.SampleRate;
+
+      const segments: OSegment[] = [];
+
+      let start = 0;
+      for (let i = 0; i < this.sessService.transcription.length; i++) {
+        const transcript = this.sessService.transcription[i].transcript;
+        const time = this.sessService.transcription[i].time.samples;
+
+        segments.push({
+          start: start,
+          length: time - start,
+          transcript: transcript
+        });
+
+        start = time;
+      }
+
+      const seg: Segments = new Segments(0, segments, 0);
+
+      const tier: OTier = new OTier();
+      tier.name = 'orthographic';
+      tier.segments = segments;
+      const tiers: OTier[] = [];
+      tiers.push(tier);
+
+      const annotation: OAnnotation = new OAnnotation(this.sessService.member_id, tiers, audiofile);
+      console.log('IMPORTED:');
+      this.sessService.localStr.store('annotation', annotation);
+      console.log(this.sessService.annotation);
+    }
+*/
 
     // overwrite console.log
     const oldLog = console.log;

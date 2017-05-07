@@ -14,6 +14,9 @@ import {SubscriptionManager} from '../../shared';
 import {TranslateService} from '@ngx-translate/core';
 import {SettingsService} from '../../service/settings.service';
 import {isNullOrUndefined} from 'util';
+import {TextConverter} from '../../shared/Converters/TextConverter';
+import {File} from '../../shared/Converters/Converter';
+import {AnnotJSONConverter} from '../../shared/Converters/AnnotJSONConverter';
 
 
 @Component({
@@ -50,8 +53,8 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
               private settingsService: SettingsService) {
     this.subscrmanager = new SubscriptionManager();
 
-    if (!this.transcrService.segments && this.sessService.SampleRate) {
-      this.transcrService.loadSegments(this.sessService.SampleRate);
+    if (!this.transcrService.annotation.tiers[0].segments && this.sessService.annotation.audiofile.samplerate) {
+      this.transcrService.loadSegments(this.sessService.annotation.audiofile.samplerate);
     }
 
     this.loadForm();
@@ -153,11 +156,11 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
     switch (format) {
       case('text'):
         result += 'data:text/plain;charset=UTF-8,';
-        result += encodeURIComponent(this.transcrService.getTranscriptString('text'));
+        result += encodeURIComponent(this.transcrService.getTranscriptString(new TextConverter()));
         break;
       case('annotJSON'):
         result += 'data:application/json;charset=UTF-8,';
-        result += encodeURIComponent(this.transcrService.getTranscriptString('annotJSON'));
+        result += encodeURIComponent(this.transcrService.getTranscriptString(new AnnotJSONConverter()));
         break;
     }
 

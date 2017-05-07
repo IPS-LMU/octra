@@ -1,3 +1,5 @@
+import {isNullOrUndefined} from 'util';
+import {sample} from 'rxjs/operator/sample';
 /**
  * class initialized with samples which can output other units like seconds, miliseconds
  */
@@ -56,11 +58,10 @@ export class AudioTime {
     }
   }
 
-  public static fromAny(obj: any): AudioTime {
-    if (obj && Number.isInteger(obj.samples) && obj.samples > -1 && obj.sample_rate) {
-      return new AudioTime(obj.samples, obj.sample_rate);
+  public static fromSamples(samples: number, samplerate: number): AudioTime {
+    if (!isNullOrUndefined(samples) && !isNullOrUndefined(samplerate) && Number.isInteger(samples) && samples > -1) {
+      return new AudioTime(samples, samplerate);
     }
-
     return null;
   }
 

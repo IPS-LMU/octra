@@ -82,7 +82,7 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 
     this.viewer.Settings.multi_line = true;
     this.viewer.Settings.height = 70;
-    this.viewer.Settings.justifySignalHeight = true;
+    this.viewer.Settings.justifySignalHeight = false;
     this.viewer.Settings.step_width_ratio = (this.viewer.Settings.pixel_per_sec / this.audio.samplerate);
 
     this.viewer.alerttriggered.subscribe(
@@ -127,8 +127,9 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   onSegmentEntered(selected: any) {
-    if (this.transcrService.segments && selected.index > -1 && selected.index < this.transcrService.segments.length) {
-      const segment = this.transcrService.segments.get(selected.index);
+    if (this.transcrService.annotation.tiers[0].segments && selected.index > -1 &&
+      selected.index < this.transcrService.annotation.tiers[0].segments.length) {
+      const segment = this.transcrService.annotation.tiers[0].segments.get(selected.index);
       if (segment) {
         this.transcrService.selectedSegment = {index: selected.index, pos: selected.pos};
       }
@@ -297,7 +298,7 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   public openSegment(segnumber: number) {
-    const segment = this.transcrService.segments.get(segnumber);
+    const segment = this.transcrService.annotation.tiers[0].segments.get(segnumber);
     this.selectSegment({
       index: segnumber,
       pos: segment.time.samples
@@ -305,8 +306,9 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   public selectSegment(selected: any) {
-    const segment = this.transcrService.segments.get(selected.index);
-    if (this.transcrService.segments && selected.index > -1 && selected.index < this.transcrService.segments.length) {
+    const segment = this.transcrService.annotation.tiers[0].segments.get(selected.index);
+    if (this.transcrService.annotation.tiers[0].segments && selected.index > -1 &&
+      selected.index < this.transcrService.annotation.tiers[0].segments.length) {
       if (segment) {
         this.transcrService.selectedSegment = {index: selected.index, pos: selected.pos};
       }
@@ -318,7 +320,7 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
       if (!this.showWindow) {
         this.showWindow = true;
       } else {
-        const start = (selected.index > 0) ? this.transcrService.segments.get(selected.index - 1).time
+        const start = (selected.index > 0) ? this.transcrService.annotation.tiers[0].segments.get(selected.index - 1).time
           : new AudioTime(0, this.audio.samplerate);
         this.window.changeArea(start, segment.time);
         this.window.editor.rawText = segment.transcript;

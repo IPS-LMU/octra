@@ -5,7 +5,7 @@
     <modal-body>
         <div class="row">
             <div class="col-xs-6 export-button">
-                <a download="{{navbarServ.exportformats.filename}}.txt" [href]="sanitize(getURI('text'))">
+                <a download="{{navbarServ.textfile.name}}" [href]="sanitize(getURI('text', navbarServ.textfile))">
                     <div (mouseenter)="navbarServ.onExportButtonClick('text')"><span
                             class="glyphicon glyphicon-floppy-save"></span><br/>
                         {{"general.text file" | translate}}
@@ -16,7 +16,7 @@
                    target="_blank">{{"general.open" | translate:{value:"WebMAUS"} }}</a>
             </div>
             <div class="col-xs-6 export-button">
-                <a download="{{navbarServ.exportformats.filename}}_annot.json" [href]="sanitize(getURI('annotJSON'))">
+                <a download="{{navbarServ.annotjsonfile.name}}" [href]="sanitize(getURI('annotJSON', navbarServ.annotjsonfile))">
                     <div (mouseenter)="navbarServ.onExportButtonClick('annotJSON')"><span
                             class="glyphicon glyphicon-floppy-save"></span><br/>annotJSON
                     </div>
@@ -89,9 +89,33 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td><span>{{'general.name' | translate}}</span></td>
+                                <td><span>{{'general.name' | translate}}:</span></td>
                                 <td>
                                     <span>{{navbarServ.exportformats.filename}}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span>Dauer:</span></td>
+                                <td>
+                                    <span>{{navbarServ.exportformats.duration | timespan}} (M:s:m)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span>Abtastrate:</span></td>
+                                <td>
+                                    <span>{{navbarServ.exportformats.samplerate}}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span>Bits pro Sample:</span></td>
+                                <td>
+                                    <span>{{navbarServ.exportformats.bitrate}} Bit/s</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span>Dateigröße:</span></td>
+                                <td>
+                                    <span>{{navbarServ.exportformats.filesize.size}} {{navbarServ.exportformats.filesize.label}}</span>
                                 </td>
                             </tr>
                             <tr *ngIf="!sessService.offline">

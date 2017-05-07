@@ -3,9 +3,18 @@ import {LocalStorage, LocalStorageService, SessionStorage, SessionStorageService
 import {SessionFile} from '../shared/SessionFile';
 import {isNullOrUndefined} from 'util';
 import {DropZoneComponent} from '../component/drop-zone/drop-zone.component';
+import {OAnnotation} from '../types/annotation';
 
 @Injectable()
 export class SessionService {
+  get annotation(): OAnnotation {
+    return this._annotation;
+  }
+
+  set annotation(value: OAnnotation) {
+    this._annotation = value;
+  }
+
   get email(): string {
     return this._email;
   }
@@ -115,14 +124,14 @@ export class SessionService {
     this._feedback = value;
   }
 
-  get transcription(): any {
+  /* get transcription(): any {
     return this._transcription;
   }
 
   set transcription(value: any) {
     this._transcription = value;
     this.localStr.store('transcription', value);
-  }
+  } */
 
   // SESSION STORAGE
   @SessionStorage('session_key') session_key: string;
@@ -135,7 +144,10 @@ export class SessionService {
     end: 0
   };
   @SessionStorage('interface') _interface: string;
-  @SessionStorage('samplerate') _samplerate: number;
+
+  // TODO DELETE
+  // @SessionStorage('samplerate') _samplerate: number;
+
   @SessionStorage('agreement') private _agreement: any;
   @SessionStorage('jobs_left') jobs_left: number;
   @SessionStorage('playonhover') private _playonhover: boolean;
@@ -144,7 +156,9 @@ export class SessionService {
 
 
   // LOCAL STORAGE
-  @LocalStorage('transcription') private _transcription: any;
+  // TODO DELETE
+  // @LocalStorage('transcription') private _transcription: any;
+
   @LocalStorage('submitted') private _submitted: boolean;
   @LocalStorage('feedback') private _feedback: any;
   @LocalStorage('logs') private _logs: any[];
@@ -153,11 +167,17 @@ export class SessionService {
   @LocalStorage('offline') private _offline: boolean;
   @LocalStorage('sessionfile') _sessionfile: any;
   @LocalStorage('language') private _language: string;
+
+  // TODO DELETE
   @LocalStorage() member_id: string;
+
   @LocalStorage() member_project: string;
   @LocalStorage() member_jobno: string;
+
   @LocalStorage('easymode') private _easymode: boolean;
   @LocalStorage('comment') private _comment: string;
+
+  @LocalStorage('annotation') private _annotation: OAnnotation;
 
   // is user on the login page?
   private login: boolean;
@@ -207,14 +227,14 @@ export class SessionService {
     this.sessStr.store('transcriptionTime', this.transcriptionTime);
   }
 
-  set SampleRate(samplerate: number) {
+  /* set SampleRate(samplerate: number) {
     this._samplerate = samplerate;
     this.sessStr.store('samplerate', this._samplerate);
   }
 
   get SampleRate(): number {
     return this._samplerate;
-  }
+  } */
 
   get submitted(): boolean {
     return this._submitted;
@@ -265,17 +285,20 @@ export class SessionService {
       this.setNewSessionKey();
       this.setMemberID(member.id);
 
-      this.sessStr.store('logInTime', Date.now());
-      this.sessStr.store('logged_in', this.logged_in);
-      this.sessStr.store('finishedTranscriptions', 0);
-      this.sessStr.store('nextTranscription', 0);
-      this.sessStr.store('transcriptionTime', {start: 0, end: 0});
       this.localStr.store('data_id', data_id);
-      this.localStr.store('audio_url', audio_url);
+      this.sessStr.store('logged_in', this.logged_in);
       this.sessStr.store('interface', this._interface);
+      this.localStr.store('audio_url', audio_url);
       this.localStr.store('member_project', member.project);
       this.localStr.store('member_jobno', member.jobno);
       this.localStr.store('offline', false);
+
+      // TODO DELETE
+      this.sessStr.store('logInTime', Date.now());
+      this.sessStr.store('finishedTranscriptions', 0);
+      this.sessStr.store('nextTranscription', 0);
+      this.sessStr.store('transcriptionTime', {start: 0, end: 0});
+
       this.login = true;
       this.logged_in = true;
 
@@ -320,12 +343,12 @@ export class SessionService {
   }
 
   public save(key: string, value: any): boolean {
-    if (key === 'transcription' || key === 'feedback') {
+    if (key === 'annotation' || key === 'feedback') {
       this.saving.emit(true);
     }
 
     switch (key) {
-      case 'transcription':
+      case 'annotation':
         this.localStr.store(key, value);
         break;
       case 'feedback':
@@ -338,7 +361,7 @@ export class SessionService {
         return false; // if key not found return false
     }
 
-    if (key === 'transcription' || key === 'feedback') {
+    if (key === 'annotation' || key === 'feedback') {
       this.saving.emit(false);
     }
     return true;

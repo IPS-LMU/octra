@@ -31,6 +31,7 @@ import {isNullOrUndefined} from 'util';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {TranscrGuidelinesComponent} from '../transcr-guidelines/transcr-guidelines.component';
 import {APIService} from '../../service/api.service';
+import {TextConverter} from '../../shared/Converters/TextConverter';
 
 @Component({
   selector: 'app-transcription',
@@ -126,6 +127,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
     this.afterAudioLoaded();
 
     setInterval(() => {
+      // TODO change!!
       this.changeDetecorRef.markForCheck();
     }, 2000);
 
@@ -150,11 +152,13 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
         }));
     }
 
-    if (!isNullOrUndefined(this.transcrService.segments)) {
-      this.subscrmanager.add(this.transcrService.segments.onsegmentchange.subscribe(this.transcrService.saveSegments));
+    if (!isNullOrUndefined(this.transcrService.annotation.tiers[0].segments)) {
+      this.subscrmanager.add(this.transcrService.annotation.tiers[0].segments.onsegmentchange.subscribe(this.transcrService.saveSegments));
     } else {
       this.subscrmanager.add(this.transcrService.dataloaded.subscribe(() => {
-        this.subscrmanager.add(this.transcrService.segments.onsegmentchange.subscribe(this.transcrService.saveSegments));
+        this.subscrmanager.add(
+          this.transcrService.annotation.tiers[0].segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
+        );
       }));
     }
   }
@@ -180,7 +184,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
       }
     }
 
-    this.sessService.SampleRate = this.audio.samplerate;
+    this.sessService.annotation.audiofile.samplerate = this.audio.samplerate;
     this.change();
     this.navbarServ.show_interfaces = this.settingsService.projectsettings.navigation.interfaces;
 
@@ -271,7 +275,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
   }
 
   getText() {
-    return this.transcrService.getTranscriptString('text');
+    return this.transcrService.getTranscriptString(new TextConverter());
   }
 
   clearElements() {

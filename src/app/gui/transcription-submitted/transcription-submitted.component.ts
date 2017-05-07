@@ -86,7 +86,7 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
 
   clearData() {
     this.sessService.submitted = false;
-    this.sessService.transcription = [];
+    this.sessService.annotation = null;
 
     this.sessService.feedback = null;
     this.sessService.comment = '';

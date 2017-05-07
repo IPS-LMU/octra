@@ -58,8 +58,8 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   ngAfterViewInit() {
-    if (this.transcrService.segments.length > 0) {
-      this.editor.rawText = this.transcrService.segments.get(0).transcript;
+    if (this.transcrService.annotation.tiers[0].segments.length > 0) {
+      this.editor.rawText = this.transcrService.annotation.tiers[0].segments.get(0).transcript;
     }
     this.editor.Settings.height = 300;
     this.editor.update();
@@ -116,9 +116,9 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   updateSegment($event) {
-    const segment = this.transcrService.segments.get(0);
+    const segment = this.transcrService.annotation.tiers[0].segments.get(0);
     segment.transcript = this.editor.rawText;
-    this.transcrService.segments.change(0, segment);
+    this.transcrService.annotation.tiers[0].segments.change(0, segment);
   }
 
   onShortcutTriggered(event) {

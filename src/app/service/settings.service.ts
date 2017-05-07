@@ -180,7 +180,7 @@ export class SettingsService {
             Logger.log('Methods loaded.');
             this.validationmethodloaded.emit();
           } else {
-                        this._log += 'Loading functions failed [Error: S02]';
+            this._log += 'Loading functions failed [Error: S02]';
           }
         };
         document.body.appendChild(js);

@@ -9,6 +9,14 @@ import {Logger} from '../shared/Logger';
 
 @Injectable()
 export class AudioService {
+  get size(): number {
+    return this._size;
+  }
+
+  get bitrate(): number {
+    return this._bitrate;
+  }
+
   // REMARKS
   // ALL time relevant variables have to be in samples which
   // is the smallest unit and needed for precision
@@ -146,6 +154,8 @@ export class AudioService {
   private _gainNode: any = null;
   private _channel: Float32Array = null;
   private _duration: AudioTime = null;
+  private _bitrate = 0;
+  private _size = 0;
   private _volume = 1;
   private _speed = 1;
 
@@ -325,6 +335,7 @@ export class AudioService {
       (result) => {
 
         const buffer = this.extractData(result);
+        this._size = buffer.byteLength;
         Logger.info('Audio (Length: ' + buffer.byteLength + ') loaded. Decode now...');
         this.decodeAudio(buffer, callback, errorcallback);
       },
@@ -339,6 +350,8 @@ export class AudioService {
   }) => {
     Logger.log('Decode audio...');
     const samplerate = this.getSampleRate(result);
+    this._bitrate = this.getBitRate(result);
+
     decodeAudioFile(result, samplerate).then((buffer) => {
       Logger.log('Audio decoded.');
       this._audiobuffer = buffer;
@@ -423,7 +436,7 @@ export class AudioService {
     return bufferView[0];
   }
 
-  public getDataRate(buf: ArrayBuffer): number {
+  public getBitRate(buf: ArrayBuffer): number {
     const bufferPart = buf.slice(34, 36);
     const bufferView = new Uint16Array(bufferPart);
 

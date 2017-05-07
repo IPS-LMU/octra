@@ -1,9 +1,9 @@
 import {Segment} from './Segment';
 import {AudioTime} from './AudioTime';
 import {EventEmitter} from '@angular/core';
+import {OSegment} from '../types/annotation';
 
 export class Segments {
-
 
   public onsegmentchange: EventEmitter<any> = new EventEmitter<any>();
 
@@ -17,7 +17,7 @@ export class Segments {
 
   private _segments: Segment[];
 
-  constructor(private sample_rate, segments: any[], last_sample: number) {
+  constructor(private sample_rate: number, segments: OSegment[], last_sample: number) {
     this._segments = [];
 
     if (segments.length === 0) {
@@ -25,7 +25,7 @@ export class Segments {
     }
 
     for (let i = 0; i < segments.length; i++) {
-      const new_segment = Segment.fromAny(segments[i]);
+      const new_segment = Segment.fromObj(segments[i], sample_rate);
       this._segments.push(new_segment);
     }
   }
@@ -62,6 +62,7 @@ export class Segments {
       if (index < this.segments.length - 1) {
         const next_segment = this.segments[index + 1];
         const transcription: string = this.segments[index].transcript;
+        // TODO change 'P' !
         if (next_segment.transcript !== 'P') {
           // concat transcripts
           if (next_segment.transcript !== '' && transcription !== '') {
@@ -223,5 +224,23 @@ export class Segments {
 
   public clear() {
     this._segments = [];
+  }
+
+  public getObj(): OSegment[] {
+    const result: OSegment[] = [];
+
+    let start = 0;
+    for (let i = 0; i < this._segments.length; i++) {
+      const segment = this._segments[i];
+      result.push({
+        transcript: segment.transcript,
+        start: start,
+        length: (segment.time.samples - start)
+      });
+
+      start = segment.time.samples;
+    }
+
+    return result;
   }
 }

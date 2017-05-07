@@ -9,16 +9,28 @@ import {StatisticElem} from '../shared/StatisticElement';
 import {MouseStatisticElem} from '../shared/MouseStatisticElem';
 import {KeyStatisticElem} from '../shared/KeyStatisticElem';
 import {NavbarService} from './navbar.service';
-import {TextConverter} from '../shared/Converters/TextConverter';
-import {AnnotJSONConverter} from '../shared/Converters/AnnotJSONConverter';
 import {SubscriptionManager} from '../shared';
 import {SettingsService} from './settings.service';
 import {isNullOrUndefined} from 'util';
 import {Http} from '@angular/http';
 import {FeedBackForm} from '../shared/FeedbackForm/FeedBackForm';
+import {IAudioFile, OAnnotation, OSegment, OTier} from '../types/annotation';
+import {Annotation} from '../shared/Annotation/Annotation';
+import {Tier} from '../shared/Annotation/Tier';
+import {Converter, File} from '../shared/Converters/Converter';
+import {TextConverter} from '../shared/Converters/TextConverter';
+import {AnnotJSONConverter} from '../shared/Converters/AnnotJSONConverter';
 
 @Injectable()
 export class TranscriptionService {
+  get annotation(): Annotation {
+    return this._annotation;
+  }
+
+  set annotation(value: Annotation) {
+    this._annotation = value;
+  }
+
   private subscrmanager: SubscriptionManager;
 
   public dataloaded = new EventEmitter<any>();
@@ -45,6 +57,8 @@ export class TranscriptionService {
     pause: 0
   };
 
+  private _annotation: Annotation;
+
   get feedback(): FeedBackForm {
     return this._feedback;
   }
@@ -69,18 +83,22 @@ export class TranscriptionService {
     this._last_sample = value;
   }
 
-  get segments(): Segments {
+  /*
+   get segments(): Segments {
 
-    return this._segments;
-  }
+   return this._segments;
+   }
+   */
 
   public validate(text: string): any {
     return validateAnnotation(text, this._guidelines);
   }
 
-  set segments(value: Segments) {
-    this._segments = value;
-  }
+  /*
+   set segments(value: Segments) {
+   this._segments = value;
+   }
+   */
 
   private get app_settings(): any {
     return this.settingsService.app_settings;
@@ -119,10 +137,10 @@ export class TranscriptionService {
 
       if (button.format === 'text') {
         // format to text file
-        this.navbarServ.exportformats.text = this.getTranscriptString(button.format);
+        this.navbarServ.exportformats.text = this.getTranscriptString(new TextConverter());
       } else if (button.format === 'annotJSON') {
         // format to annotJSON file
-        this.navbarServ.exportformats.annotJSON = this.getTranscriptString(button.format);
+        this.navbarServ.exportformats.annotJSON = this.getTranscriptString(new AnnotJSONConverter());
       }
     }));
   }
@@ -131,8 +149,6 @@ export class TranscriptionService {
    * metod after audio was loaded
    */
   public load() {
-    this.last_sample = this.audio.duration.samples;
-    this.loadSegments(this.audio.samplerate);
 
     if (this.sessServ.offline) {
       this.filename = this.sessServ.file.name;
@@ -147,39 +163,44 @@ export class TranscriptionService {
         this.filename = this.sessServ.audio_url;
       }
     }
+    this.last_sample = this.audio.duration.samples;
+    this.loadSegments(this.audio.samplerate);
+
     this.navbarServ.exportformats.filename = this.filename;
+    this.navbarServ.exportformats.bitrate = this.audio.bitrate;
+    this.navbarServ.exportformats.samplerate = this.audio.samplerate;
+    this.navbarServ.exportformats.filesize = Functions.getFileSize(this.audio.size);
+    this.navbarServ.exportformats.duration = this.audio.duration.unix;
   }
 
-  public getTranscriptString(format: string): string {
-    let result = '';
+  public getTranscriptString(converter: Converter): string {
+    let result: File;
 
-    const data = this.exportDataToJSON();
-    if (format === 'text') {
-      // format to text file
-      const tc: TextConverter = new TextConverter();
-      result = tc.convert(data, this.filename);
-      result = tidyUpAnnotation(result, this.guidelines);
-    } else if (format === 'annotJSON') {
-      // format to text file
-      const ac: AnnotJSONConverter = new AnnotJSONConverter();
-      result = ac.convert(data, this.filename);
-      result = JSON.stringify(result, null, 4);
+    if (!isNullOrUndefined(this.annotation)) {
+      const data = this.annotation;
+
+      result = converter.export(this.annotation.getObj());
+
+      return result.content;
     }
 
-    return result;
-  }
-
-  public resetSegments(sample_rate: number) {
-    this.sessServ.transcription = [];
-    this.segments = new Segments(sample_rate, this.sessServ.transcription, this._last_sample);
+    return '';
   }
 
   public loadSegments(sample_rate: number) {
-    if (!this.sessServ.transcription) {
-      this.sessServ.transcription = [];
+    if (isNullOrUndefined(this.sessServ.annotation)) {
+      this.sessServ.annotation = this.createNewAnnotation();
     }
 
-    this.segments = new Segments(sample_rate, this.sessServ.transcription, this._last_sample);
+    this.sessServ.annotation.audiofile.samplerate = this.audio.samplerate;
+    this._annotation = new Annotation(this.sessServ.annotation.annotator, this.sessServ.annotation.audiofile);
+
+    console.log(this.sessServ.annotation);
+    for (let i = 0; i < this.sessServ.annotation.tiers.length; i++) {
+      const tier: Tier = Tier.fromObj(this.sessServ.annotation.tiers[i],
+        this.audio.samplerate, this.audio.duration.samples);
+      this._annotation.tiers.push(tier);
+    }
 
     // load feedback form data
     if (isNullOrUndefined(this.sessServ.feedback)) {
@@ -208,7 +229,8 @@ export class TranscriptionService {
 
   public exportDataToJSON(): any {
     let data: any = {};
-    if (this.segments) {
+
+    if (!isNullOrUndefined(this.annotation)) {
       const log_data: any[] = this.extractUI(this.uiService.elements);
 
       data = {
@@ -225,12 +247,12 @@ export class TranscriptionService {
 
       const transcript: any[] = [];
 
-      for (let i = 0; i < this.segments.length; i++) {
-        const segment = this.segments.get(i);
+      for (let i = 0; i < this.annotation.tiers[0].segments.length; i++) {
+        const segment = this.annotation.tiers[0].segments.get(i);
 
         let last_bound = 0;
         if (i > 0) {
-          last_bound = this.segments.get(i - 1).time.samples;
+          last_bound = this.annotation.tiers[0].segments.get(i - 1).time.samples;
         }
 
         const segment_json: any = {
@@ -244,21 +266,16 @@ export class TranscriptionService {
 
       data.transcript = transcript;
     }
+
     return data;
   }
 
   public saveSegments = () => {
-    const temp: any[] = [];
-
     // make sure, that no saving overhead exist. After saving request wait 1 second
     if (!this.saving) {
       this.saving = true;
       setTimeout(() => {
-        for (let i = 0; i < this._segments.length; i++) {
-          const seg = this._segments.get(i);
-          temp.push(seg.toAny());
-        }
-        this.sessServ.save('transcription', temp);
+        this.sessServ.save('annotation', this._annotation.getObj());
         this.saving = false;
       }, 2000);
     }
@@ -331,8 +348,8 @@ export class TranscriptionService {
       pause: 0
     };
 
-    for (let i = 0; i < this.segments.length; i++) {
-      const segment = this.segments.get(i);
+    for (let i = 0; i < this._annotation.tiers[0].segments.length; i++) {
+      const segment = this._annotation.tiers[0].segments.get(i);
 
       if (segment.transcript !== '') {
         if (this.break_marker != null && segment.transcript.indexOf(this.break_marker.code) > -1) {
@@ -465,7 +482,7 @@ export class TranscriptionService {
   }
 
   public requestSegment(segnumber: number) {
-    if (segnumber < this.segments.length) {
+    if (segnumber < this._annotation.tiers[0].segments.length) {
       this.segmentrequested.emit(segnumber);
     } else {
     }
@@ -477,5 +494,31 @@ export class TranscriptionService {
   public endTranscription = (destroyaudio: boolean = true) => {
     this.audio.destroy(destroyaudio);
     this.destroy();
+  }
+
+
+  public createNewAnnotation(): OAnnotation {
+    let filesize = 0;
+
+    if (!isNullOrUndefined(this.sessServ.sessionfile)) {
+      filesize = this.sessServ.sessionfile.size;
+    } else {
+      filesize = this.audio.size;
+    }
+    const audiofile: IAudioFile = {
+      name: this.filename,
+      size: filesize,
+      duration: this.audio.duration.seconds,
+      samplerate: this.audio.samplerate
+    };
+
+    const tier: OTier = new OTier();
+    tier.name = 'orthographic';
+    tier.segments = [];
+    tier.segments.push(new OSegment(0, this.audio.duration.samples, ''));
+    const tiers: OTier[] = [];
+    tiers.push(tier);
+
+    return new OAnnotation(this.sessServ.member_id, tiers, audiofile);
   }
 }

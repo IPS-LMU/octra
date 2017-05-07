@@ -6,6 +6,7 @@ import {DomSanitizer} from '@angular/platform-browser';
 import {TranslateService} from '@ngx-translate/core';
 import {isNullOrUndefined} from 'util';
 import {ModalService} from '../../service/modal.service';
+import {File} from '../../shared/Converters/Converter';
 
 @Component({
   selector: 'app-navigation',
@@ -71,17 +72,17 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
      alert(txt);*/
   }
 
-  getURI(format: string): string {
+  getURI(format: string, file: File): string {
     let result = '';
 
     switch (format) {
       case('text'):
-        result += 'data:text/plain;charset=UTF-8,';
-        result += encodeURIComponent(this.navbarServ.exportformats.text);
+        result += 'data:' + file.type + ';charset:' + file.encoding + ',';
+        result += encodeURIComponent(file.content);
         break;
       case('annotJSON'):
-        result += 'data:application/json;charset=UTF-8,';
-        result += encodeURIComponent(this.navbarServ.exportformats.annotJSON);
+        result += 'data:' + file.type + ';charset:' + file.encoding + ',';
+        result += encodeURIComponent(file.content);
         break;
     }
 

@@ -7,7 +7,7 @@ export class PraatTableConverter extends Converter {
   public constructor() {
     super();
     this._application = 'Praat';
-    this._name = 'Text (*.Table)';
+    this._name = 'Text';
     this._showauthors = false;
     this._website.title = '';
     this._website.url = '';
@@ -36,7 +36,6 @@ export class PraatTableConverter extends Converter {
       for (let i = 0; i < annotation.tiers.length; i++) {
         const tier = annotation.tiers[i];
         for (let j = 0; j < tier.segments.length; j++) {
-          console.log('segment found');
           const segment = tier.segments[j];
           result = addEntry(result, tier, segment);
         }

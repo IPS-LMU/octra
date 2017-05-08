@@ -1,4 +1,13 @@
-import {AfterViewInit, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import {Router} from '@angular/router';
 import {NgForm} from '@angular/forms';
 import {LoginService} from '../../service/login.service';
@@ -29,6 +38,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   @ViewChild('f') loginform: NgForm;
   @ViewChild('dropzone') dropzone: DropZoneComponent;
   @ViewChild('agreement') agreement: ModalComponent;
+  @ViewChild('localmode') localmode: ElementRef;
+  @ViewChild('onlinemode') onlinemode: ElementRef;
 
   public valid_platform = false;
   public valid_size = false;
@@ -45,6 +56,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   get apc(): any {
     return this.settingsService.app_settings;
+  }
+
+  public get Math(): Math {
+    return Math;
   }
 
   valid = false;
@@ -92,6 +107,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     this.loadPojectsList();
     setTimeout(() => {
       jQuery.material.init();
+
+      const max_height: number = Math.max(Number(this.onlinemode.nativeElement.clientHeight),
+        Number(this.localmode.nativeElement.clientHeight));
+      console.log(`${this.onlinemode.nativeElement.clientHeight} ${this.localmode.nativeElement.clientHeight}`)
+      this.localmode.nativeElement.style.height = max_height + 'px';
+      this.onlinemode.nativeElement.style.height = max_height + 'px';
     }, 0);
   }
 
@@ -108,7 +129,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.member.jobno = '0';
     }
 
-    if (this.sessionService.sessionfile != null) {
+    if (this.sessionService.sessionfile !== null) {
       // last was offline mode, begin new Session
       new_session = true;
     } else {
@@ -232,11 +253,11 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   getFileStatus(): string {
-    if (!isNullOrUndefined(this.dropzone.file) &&
-      (this.dropzone.file.type === 'audio/wav' || this.dropzone.file.type === 'audio/x-wav')
+    if (!isNullOrUndefined(this.dropzone.files) &&
+      (this.dropzone.files.item(0).type === 'audio/wav' || this.dropzone.files.item(0).type === 'audio/x-wav')
     ) {
       // check conditions
-      if (this.sessionService.sessionfile == null || this.dropzone.file.name === this.sessionService.sessionfile.name) {
+      if (isNullOrUndefined(this.sessionService.sessionfile) || this.dropzone.files.item(0).name === this.sessionService.sessionfile.name) {
         return 'start';
       } else {
         return 'new';

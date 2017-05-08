@@ -1,42 +1,47 @@
-h4{
-    margin-top:0;
+h4 {
+    margin-top: 0;
     text-align: center;
 }
 
-#login{
-    padding:20px;
-    width:100%;
-    padding:0;
+#login {
+    padding: 20px;
+    width: 100%;
+    padding: 0;
 }
 
-#login .row{
-    padding-top:20px;
+#login .row {
+    padding-top: 20px;
 }
 
 .login-id-label,
-.login-pw-label{
-    font-size:1em;
+.login-pw-label {
+    font-size: 1em;
 }
 
 #login-pw,
-#login-id{
-    font-size:1.3em;
-    width:100%;
-    padding:5px;
+#login-id {
+    font-size: 1.3em;
+    width: 100%;
+    padding: 5px;
 }
 
 #login-submit,
 #offline-submit,
-#offline-delete-btn{
-    width:100%;
+#offline-delete-btn {
+    width: 100%;
 }
 
-.ng-touched .ng-invalid{
-    border-bottom:2px solid red;
+.ng-touched .ng-invalid {
+    border-bottom: 2px solid red;
 }
 
-#login-disabled{
-    border:1px solid gray;
-    padding:10px;
-    text-align:center;
+#login-disabled {
+    border: 1px solid gray;
+    padding: 10px;
+    text-align: center;
+}
+
+.form-group {
+    margin: 0;
+    margin-bottom: 0;
 }

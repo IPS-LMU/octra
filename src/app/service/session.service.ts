@@ -368,8 +368,8 @@ export class SessionService {
   }
 
   public beginLocalSession = (dropzone: DropZoneComponent, keep_data: boolean, navigate: () => void, err: (error: string) => void) => {
-    if (!isNullOrUndefined(dropzone.file)) {
-      const type: string = (dropzone.file.type) ? dropzone.file.type : 'unknown';
+    if (!isNullOrUndefined(dropzone.files)) {
+      const type: string = (dropzone.files[0].type) ? dropzone.files[0].type : 'unknown';
 
       if (type === 'audio/x-wav' || type === 'audio/wav') {
 
@@ -390,9 +390,9 @@ export class SessionService {
         const res = this.setSessionData(null, null, null, true);
         if (res.error === '') {
           this.offline = true;
-          this.sessionfile = this.getSessionFile(dropzone.file);
+          this.sessionfile = this.getSessionFile(dropzone.files[0]);
 
-          this.file = dropzone.file;
+          this.file = dropzone.files[0];
           navigate();
         } else {
           err(res.error);

@@ -12,13 +12,21 @@
             </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let converter of AppInfo.converters">
-                <td  *ngIf="converter.conversion.export">
-                    <a #a download="{{parentformat.download}}" [href]="parentformat.uri" (mouseover)="updateParentFormat(converter);">
-                        <span class="glyphicon glyphicon-floppy-save"></span> {{converter.name}}</a>
+            <tr *ngFor="let format of AppInfo.converters">
+                <td *ngIf="format.converter.conversion.export">
+                    <a #a download="{{parentformat.download}}" [href]="parentformat.uri"
+                       (mouseover)="updateParentFormat(format.converter);">
+                        <span class="glyphicon glyphicon-floppy-save"></span> {{format.converter.name}} (*{{format.appendix}})
+                    </a>
                 </td>
-                <td  *ngIf="converter.conversion.export">{{converter.application}}</td>
-                <td  *ngIf="converter.conversion.export"><a href="{{converter.website.url}}" target="_blank">{{converter.website.title}}</a></td>
+                <td *ngIf="format.converter.conversion.export">
+                    {{format.converter.application}}
+                </td>
+                <td *ngIf="format.converter.conversion.export">
+                    <a href="{{format.converter.website.url}}" target="_blank">
+                        {{format.converter.website.title}}
+                    </a>
+                </td>
             </tr>
             </tbody>
         </table>

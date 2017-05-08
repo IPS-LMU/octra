@@ -9,8 +9,8 @@ declare var window: any;
   styleUrls: ['./drop-zone.component.css']
 })
 export class DropZoneComponent implements OnInit {
-  get file(): File {
-    return this._file;
+  get files(): FileList {
+    return this._files;
   }
 
   get sessionfile(): SessionFile {
@@ -22,12 +22,12 @@ export class DropZoneComponent implements OnInit {
 
   @Input() height = 'auto';
 
-  private _file: File;
+  private _files: FileList;
   private _sessionfile: SessionFile;
   private fileAPIsupported = false;
 
   @Output()
-  public afterdrop: EventEmitter<File> = new EventEmitter<File>();
+  public afterdrop: EventEmitter<FileList> = new EventEmitter<FileList>();
 
   @ViewChild('fileinput') fileinput: ElementRef;
 
@@ -52,13 +52,14 @@ export class DropZoneComponent implements OnInit {
     $event.preventDefault();
 
     if (this.fileAPIsupported) {
-      const files = $event.dataTransfer.files; // FileList object.
+      const files: FileList = $event.dataTransfer.files; // FileList object.
 
-      if (files.length === 1) {
+      if (files.length < 2) {
+        console.log(files);
         // select the first file
-        this._file = files[0];
-        console.log(this._file);
-        this.afterdrop.emit(this._file);
+        this._files = files;
+        console.log(this._files);
+        this.afterdrop.emit(this._files);
       }
     }
   }
@@ -68,13 +69,9 @@ export class DropZoneComponent implements OnInit {
   }
 
   onFileChange($event) {
-    const files = $event.target.files;
+    const files: FileList = $event.target.files;
 
-    if (files.length === 1) {
-      // select the first file
-      this._file = files[0];
-      console.log(this._file);
-      this.afterdrop.emit(this._file);
-    }
+    this._files = files;
+    this.afterdrop.emit(this._files);
   }
 }

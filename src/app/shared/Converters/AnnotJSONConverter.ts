@@ -4,38 +4,12 @@ import {isNullOrUndefined} from 'util';
 
 export class AnnotJSONConverter extends Converter {
 
-  public convert(data: any, filename: string): any {
-    /*
-     const result = this.getDefaultAnnotJSON();
-
-     // set default settings
-     result.name = filename;
-     result.annotates = filename + '.wav';
-     result.sampleRate = 1000;
-
-     for (let i = 0; i < data.transcript.length; i++) {
-     const segment = data.transcript[i];
-     result.levels[0].items.push(
-     {
-     id: (i + 1),
-     sampleStart: segment.start,
-     sampleDur: segment.length,
-     labels: [
-     {
-     name: 'Orthographic',
-     value: segment.text
-     }
-     ]
-     }
-     );
-     }*/
-
-    return '';
-  }
-
   public constructor() {
     super();
-    this._authors = 'Julian Pömp';
+    this._application = 'Emu-WebApp';
+    this._name = 'AnnotJSON';
+    this._website.title = 'Emu-WebApp';
+    this._website.url = 'http://ips-lmu.github.io/EMU-webApp/';
     this._showauthors = true;
     this._conversion.export = true;
     this._conversion.import = true;

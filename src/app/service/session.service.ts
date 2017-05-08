@@ -77,7 +77,7 @@ export class SessionService {
   }
 
   set sessionfile(value: SessionFile) {
-    this._sessionfile = (value != null) ? value.toAny() : null;
+    this._sessionfile = (!isNullOrUndefined(value)) ? value.toAny() : null;
     this.localStr.store('sessionfile', this._sessionfile);
   }
 
@@ -124,14 +124,14 @@ export class SessionService {
     this._feedback = value;
   }
 
-  /* get transcription(): any {
+  get transcription(): any {
     return this._transcription;
   }
 
   set transcription(value: any) {
     this._transcription = value;
     this.localStr.store('transcription', value);
-  } */
+  }
 
   // SESSION STORAGE
   @SessionStorage('session_key') session_key: string;
@@ -146,7 +146,7 @@ export class SessionService {
   @SessionStorage('interface') _interface: string;
 
   // TODO DELETE
-  // @SessionStorage('samplerate') _samplerate: number;
+  @SessionStorage('samplerate') _samplerate: number;
 
   @SessionStorage('agreement') private _agreement: any;
   @SessionStorage('jobs_left') jobs_left: number;
@@ -157,7 +157,7 @@ export class SessionService {
 
   // LOCAL STORAGE
   // TODO DELETE
-  // @LocalStorage('transcription') private _transcription: any;
+  @LocalStorage('transcription') private _transcription: any;
 
   @LocalStorage('submitted') private _submitted: boolean;
   @LocalStorage('feedback') private _feedback: any;
@@ -227,14 +227,14 @@ export class SessionService {
     this.sessStr.store('transcriptionTime', this.transcriptionTime);
   }
 
-  /* set SampleRate(samplerate: number) {
+  set SampleRate(samplerate: number) {
     this._samplerate = samplerate;
     this.sessStr.store('samplerate', this._samplerate);
   }
 
   get SampleRate(): number {
     return this._samplerate;
-  } */
+  }
 
   get submitted(): boolean {
     return this._submitted;
@@ -325,8 +325,8 @@ export class SessionService {
 
     this.sessStr.clear();
 
-    return (this.sessStr.retrieve('session_key') == null
-    && this.sessStr.retrieve('member_id') == null);
+    return (isNullOrUndefined(this.sessStr.retrieve('session_key'))
+    && isNullOrUndefined(this.sessStr.retrieve('member_id')));
   }
 
   public clearLocalStorage(): boolean {
@@ -334,8 +334,8 @@ export class SessionService {
     this.login = false;
     this.localStr.clear();
 
-    return (this.sessStr.retrieve('data_id') == null
-    && this.sessStr.retrieve('audio_url') == null);
+    return (isNullOrUndefined(this.sessStr.retrieve('data_id'))
+    && isNullOrUndefined(this.sessStr.retrieve('audio_url')));
   }
 
   public incrementFinishedTranscriptions() {
@@ -380,7 +380,7 @@ export class SessionService {
           this.clearLocalStorage();
         }
 
-        if (this.member_id != null && this.member_id !== '-1' && this.member_id !== '') {
+        if (!isNullOrUndefined(this.member_id) && this.member_id !== '-1' && this.member_id !== '') {
           // last was online mode
           console.error('clear session m');
           this.clearSession();

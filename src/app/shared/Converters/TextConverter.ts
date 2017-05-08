@@ -6,23 +6,13 @@ export class TextConverter extends Converter {
 
   public constructor() {
     super();
-    this._authors = 'Julian Pömp';
+    this._application = 'Text Editor';
+    this._name = 'Text';
     this._showauthors = true;
+    this._website.title = 'WebMaus';
+    this._website.url = 'https://clarin.phonetik.uni-muenchen.de/BASWebServices/#/services/WebMAUSBasic';
     this._conversion.export = true;
     this._conversion.import = false;
-  }
-
-  public convert(data: any, filename: string): any {
-    let result = '';
-
-    for (let i = 0; i < data.transcript.length; i++) {
-      result += data.transcript[i].text;
-      if (i < data.transcript.length - 1) {
-        result += ' ';
-      }
-    }
-
-    return result;
   }
 
   public export(annotation: OAnnotation): File {

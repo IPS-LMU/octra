@@ -8,6 +8,17 @@ export interface File {
 }
 
 export abstract class Converter {
+  get website(): {
+    title: string,
+    url: string
+  } {
+    return this._website;
+  }
+
+  get name(): string {
+    return this._name;
+  }
+
   get conversion(): { import: boolean; export: boolean } {
     return this._conversion;
   }
@@ -16,22 +27,30 @@ export abstract class Converter {
     return this._showauthors;
   }
 
-  get authors(): string {
-    return this._authors;
+  get application(): string {
+    return this._application;
   }
 
   protected _conversion = {
     import: false,
     export: false
   };
-  protected _authors = '';
+
+  protected _application = '';
+  protected _name = '';
+  protected _website: {
+    title: string,
+    url: string
+  } = {
+    title: '',
+    url: ''
+  };
+
   protected _showauthors = false;
 
   constructor() {
 
   }
-
-  public abstract convert(data: any, filename: string): any;
 
   public abstract export(annotation: OAnnotation): File;
 

@@ -2,11 +2,12 @@ import {AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild} from '@an
 import {SessionService} from '../../service/session.service';
 import {ModalComponent} from 'ng2-bs3-modal/components/modal';
 import {NavbarService} from '../../service/navbar.service';
-import {DomSanitizer} from '@angular/platform-browser';
+import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {TranslateService} from '@ngx-translate/core';
 import {isNullOrUndefined} from 'util';
 import {ModalService} from '../../service/modal.service';
-import {File} from '../../shared/Converters/Converter';
+import {Converter, File} from '../../shared/Converters/Converter';
+import {AppInfo} from '../../app.info';
 
 @Component({
   selector: 'app-navigation',
@@ -20,7 +21,18 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input('version') version: string;
 
   public test = 'ok';
+  public parentformat: {
+    download: string,
+    uri: SafeUrl
+  } = {
+    download: '',
+    uri: ''
+  };
   collapsed = true;
+
+  public get AppInfo(): AppInfo {
+    return AppInfo;
+  }
 
   constructor(public sessService: SessionService,
               public navbarServ: NavbarService,
@@ -72,24 +84,11 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
      alert(txt);*/
   }
 
-  getURI(format: string, file: File): string {
-    let result = '';
-
-    switch (format) {
-      case('text'):
-        result += 'data:' + file.type + ';charset:' + file.encoding + ',';
-        result += encodeURIComponent(file.content);
-        break;
-      case('annotJSON'):
-        result += 'data:' + file.type + ';charset:' + file.encoding + ',';
-        result += encodeURIComponent(file.content);
-        break;
-    }
-
-    return result;
+  getURI(file: File): string {
+    return 'data:' + file.type + ';charset:' + file.encoding + ',' + encodeURIComponent(file.content);
   }
 
-  sanitize(url: string) {
+  sanitize(url: string): SafeUrl {
     return this.sanitizer.bypassSecurityTrustUrl(url);
   }
 
@@ -116,5 +115,11 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   openBugReport() {
     this.modService.show('bugreport');
+  }
+
+  updateParentFormat(converter: Converter) {
+    const result: File = converter.export(this.sessService.annotation);
+    this.parentformat.download = result.name;
+    this.parentformat.uri = this.sanitize(this.getURI(result));
   }
 }

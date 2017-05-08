@@ -3,29 +3,25 @@
         <h4 class="modal-title">{{"general.export data" | translate}}</h4>
     </modal-header>
     <modal-body>
-        <div class="row">
-            <div class="col-xs-6 export-button">
-                <a download="{{navbarServ.textfile.name}}" [href]="sanitize(getURI('text', navbarServ.textfile))">
-                    <div (mouseenter)="navbarServ.onExportButtonClick('text')"><span
-                            class="glyphicon glyphicon-floppy-save"></span><br/>
-                        {{"general.text file" | translate}}
-                    </div>
-                </a><br/>
-                <a class="export-a"
-                   href="https://clarin.phonetik.uni-muenchen.de/BASWebServices/#/services/WebMAUSBasic"
-                   target="_blank">{{"general.open" | translate:{value:"WebMAUS"} }}</a>
-            </div>
-            <div class="col-xs-6 export-button">
-                <a download="{{navbarServ.annotjsonfile.name}}" [href]="sanitize(getURI('annotJSON', navbarServ.annotjsonfile))">
-                    <div (mouseenter)="navbarServ.onExportButtonClick('annotJSON')"><span
-                            class="glyphicon glyphicon-floppy-save"></span><br/>annotJSON
-                    </div>
-                </a><br/>
-                <a class="export-a"
-                   href="http://ips-lmu.github.io/EMU-webApp/"
-                   target="_blank">{{"general.open" | translate:{value:"EMU-WebApp"} }}</a>
-            </div>
-        </div>
+        <table class="table table-striped table-responsive">
+            <thead>
+            <tr>
+                <th>Download</th>
+                <th>Application</th>
+                <th>Website</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let converter of AppInfo.converters">
+                <td  *ngIf="converter.conversion.export">
+                    <a #a download="{{parentformat.download}}" [href]="parentformat.uri" (mouseover)="updateParentFormat(converter);">
+                        <span class="glyphicon glyphicon-floppy-save"></span> {{converter.name}}</a>
+                </td>
+                <td  *ngIf="converter.conversion.export">{{converter.application}}</td>
+                <td  *ngIf="converter.conversion.export"><a href="{{converter.website.url}}" target="_blank">{{converter.website.title}}</a></td>
+            </tr>
+            </tbody>
+        </table>
     </modal-body>
     <modal-footer>
         <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="modalexport.dismiss()">
@@ -164,7 +160,8 @@
                                 <td>
                                     <div class="togglebutton">
                                         <label>
-                                            <input (click)="toggleSettings('playonhover')" [checked]="sessService.playonhover"
+                                            <input (click)="toggleSettings('playonhover')"
+                                                   [checked]="sessService.playonhover"
                                                    id="playonhover" type="checkbox">
                                         </label>
                                     </div>

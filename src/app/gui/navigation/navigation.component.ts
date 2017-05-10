@@ -30,8 +30,8 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   };
   collapsed = true;
 
-  public get AppInfo(): AppInfo {
-    return AppInfo;
+  public get converters(): any[] {
+    return AppInfo.converters;
   }
 
   constructor(public sessService: SessionService,

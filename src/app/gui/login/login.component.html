@@ -87,12 +87,20 @@
                     <p class="bg-warning" *ngIf="sessionService.sessionfile != null"
                        [innerHTML]="'login.old file found' | translate:{file_label: getDropzoneFileString(sessionfile)}">
                     </p>
-                    <app-drop-zone #dropzone [height]="'275px'">
-                        <span *ngIf="dropzone.files == null">{{ "dropzone.drag&drop here" | translate }}</span>
-                        <span *ngIf="dropzone.files != null && (getFileStatus() == 'start')"><span
-                                class="text-success">{{ "dropzone.file selected" | translate:{file_label: getDropzoneFileString(dropzone.files[0])} }}</span></span>
-                        <span *ngIf="dropzone.files != null && (getFileStatus() != 'start')"><span
-                                class="text-danger">{{ "dropzone.file selected" | translate:{file_label: getDropzoneFileString(dropzone.files[0])} }}</span></span>
+                    <app-drop-zone #dropzone [height]="'275px'" (afterdrop)="afterDrop()">
+                        <table [hidden]="!files.length > 0" class="dropzone-table">
+                            <tr *ngFor="let file of files">
+                                <td>{{getDropzoneFileString(file.file)}}
+                                </td>
+                                <td><span *ngIf="file.status === 'invalid'" class="glyphicon glyphicon-remove"></span>
+                                    <span *ngIf="file.status === 'valid'" class="glyphicon glyphicon-ok"></span>
+                                    <i *ngIf="file.status === 'progress'" class="fa fa-spinner fa-spin"
+                                       style="font-size:16px">
+                                    </i>
+                                </td>
+                            </tr>
+                        </table>
+                        <span *ngIf="files.length === 0">{{ "dropzone.drag&drop here" | translate }}</span>
                     </app-drop-zone>
                     <input *ngIf="getFileStatus() != 'new'" [disabled]="!(getFileStatus() == 'start')" type="submit"
                            id="offline-submit"

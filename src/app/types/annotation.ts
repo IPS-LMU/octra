@@ -66,6 +66,7 @@ export class OTier implements ITier {
   segments: OSegment[];
 
   constructor() {
+    this.segments = [];
   }
 }
 

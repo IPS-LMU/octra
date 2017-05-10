@@ -750,16 +750,18 @@ export class AudioviewerService extends AudioComponentService {
     for (let i = 0; i < this.transcrService.annotation.tiers[0].segments.length - 1; i++) {
       const segment = this.transcrService.annotation.tiers[0].segments.get(i);
       const segAbsX = this.audioTCalculator.samplestoAbsX(segment.time.samples - this.Chunk.time.start.samples);
-      let next_unblocked = true;
-      if (i < this.transcrService.annotation.tiers[0].segments.length - 1) {
-        const next_segment = this.transcrService.annotation.tiers[0].segments.get(i + 1);
-        if (next_segment.transcript !== '' && next_segment.transcript !== this.transcrService.break_marker.code) {
-          next_unblocked = false;
-        }
-      }
+      const next_unblocked = true;
+
+      /*
+       if (i < this.transcrService.annotation.tiers[0].segments.length - 1) {
+       const next_segment = this.transcrService.annotation.tiers[0].segments.get(i + 1);
+       if (next_segment.transcript !== '' && next_segment.transcript !== this.transcrService.break_marker.code) {
+       next_unblocked = false;
+       }
+       }*/
       if (segAbsX >= absX - this.Settings.boundaries.width / 2
         && segAbsX <= absX + this.Settings.boundaries.width / 2
-        && (segment.transcript === '' || segment.transcript === this.transcrService.break_marker.code)
+        // && (segment.transcript === '' || segment.transcript === this.transcrService.break_marker.code)
         && next_unblocked
       ) {
         return i;

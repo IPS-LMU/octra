@@ -12,7 +12,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let format of AppInfo.converters">
+            <tr *ngFor="let format of converters">
                 <td *ngIf="format.converter.conversion.export">
                     <a #a download="{{parentformat.download}}" [href]="parentformat.uri"
                        (mouseover)="updateParentFormat(format.converter);">

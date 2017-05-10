@@ -1,5 +1,5 @@
 import {Converter, File} from './Converter';
-import {OAnnotation, OTier} from '../../types/annotation';
+import {OAnnotation, OAudiofile, OTier} from '../../types/annotation';
 import {isNullOrUndefined} from 'util';
 
 export class TextConverter extends Converter {
@@ -32,7 +32,7 @@ export class TextConverter extends Converter {
         }
       }
 
-      filename = annotation.audiofile.name;
+      filename = annotation.audiofile.name + '.txt';
 
     }
 
@@ -44,9 +44,9 @@ export class TextConverter extends Converter {
     };
   };
 
-  public import(file: File) {
+  public import(file: File, audiofile: OAudiofile) {
     const result = new OAnnotation();
 
-    return result;
+    return null;
   };
 }

@@ -1,5 +1,5 @@
 import {Converter, File} from './Converter';
-import {OAnnotation, OTier} from '../../types/annotation';
+import {OAnnotation, OAudiofile, OTier} from '../../types/annotation';
 import {isNullOrUndefined} from 'util';
 
 export class AnnotJSONConverter extends Converter {
@@ -12,7 +12,7 @@ export class AnnotJSONConverter extends Converter {
     this._website.url = 'http://ips-lmu.github.io/EMU-webApp/';
     this._showauthors = true;
     this._conversion.export = true;
-    this._conversion.import = true;
+    this._conversion.import = false;
   }
 
   public export(annotation: OAnnotation): File {
@@ -71,9 +71,9 @@ export class AnnotJSONConverter extends Converter {
     };
   };
 
-  public import(file: File) {
+  public import(file: File, audiofile: OAudiofile) {
     const result = new OAnnotation();
 
-    return result;
+    return null;
   };
 }

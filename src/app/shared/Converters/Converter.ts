@@ -1,4 +1,4 @@
-import {OAnnotation} from '../../types/annotation';
+import {OAnnotation, OAudiofile} from '../../types/annotation';
 
 export interface File {
   name: string;
@@ -54,5 +54,5 @@ export abstract class Converter {
 
   public abstract export(annotation: OAnnotation): File;
 
-  public abstract import(file: File): OAnnotation;
+  public abstract import(file: File, audiofile: OAudiofile): OAnnotation;
 }

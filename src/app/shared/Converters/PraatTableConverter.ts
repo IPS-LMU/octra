@@ -1,5 +1,5 @@
 import {Converter, File} from './Converter';
-import {ISegment, ITier, OAnnotation} from '../../types/annotation';
+import {ISegment, ITier, OAnnotation, OAudiofile} from '../../types/annotation';
 import {isNullOrUndefined} from 'util';
 
 export class PraatTableConverter extends Converter {
@@ -52,7 +52,7 @@ export class PraatTableConverter extends Converter {
     };
   };
 
-  public import(file: File) {
+  public import(file: File, audiofile: OAudiofile) {
     const result = new OAnnotation();
 
     return result;

@@ -45,3 +45,24 @@ h4 {
     margin: 0;
     margin-bottom: 0;
 }
+
+.glyphicon-ok{
+    color:green;
+}
+
+.glyphicon-remove{
+    color:red;
+}
+
+.dropzone-table{
+    margin:0 auto;
+}
+
+.dropzone-table tr td {
+    border:none;
+    text-align:left;
+}
+
+.dropzone-table tr td:first-child {
+    padding-right:10px;
+}

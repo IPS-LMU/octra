@@ -2,9 +2,10 @@ import {Converter} from './shared/Converters/Converter';
 import {TextConverter} from './shared/Converters/TextConverter';
 import {AnnotJSONConverter} from './shared/Converters/AnnotJSONConverter';
 import {PraatTableConverter} from './shared/Converters/PraatTableConverter';
+import {CTMConverter} from './shared/Converters/CTMConverter';
 
 export class AppInfo {
-  static get converters(): {
+  public static get converters(): {
     appendix: string,
     converter: Converter
   }[] {
@@ -32,6 +33,10 @@ export class AppInfo {
     {
       appendix: '_annot.json',
       converter: new AnnotJSONConverter()
+    },
+    {
+      appendix: '.ctm',
+      converter: new CTMConverter()
     }
   ];
 }

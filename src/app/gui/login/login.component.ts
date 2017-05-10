@@ -26,6 +26,10 @@ import {SettingsService} from '../../service/settings.service';
 import {ModalService} from '../../service/modal.service';
 import {ModalComponent} from 'ng2-bs3-modal/ng2-bs3-modal';
 import {TranslateService} from '@ngx-translate/core';
+import {AppInfo} from '../../app.info';
+import {Converter} from '../../shared/Converters/Converter';
+import {OAnnotation, OAudiofile} from '../../types/annotation';
+import {AudioInfo} from '../../shared/AudioInfo';
 
 @Component({
   selector: 'app-login',
@@ -45,6 +49,15 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   public valid_size = false;
   public browser_check: BrowserCheck;
   public agreement_checked = true;
+
+  public files: {
+    status: string,
+    file: File,
+    checked_converters: number
+  }[] = [];
+
+  private oaudiofile: OAudiofile;
+  private oannotation: OAnnotation;
 
   public projects: string[] = [];
 
@@ -110,7 +123,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
       const max_height: number = Math.max(Number(this.onlinemode.nativeElement.clientHeight),
         Number(this.localmode.nativeElement.clientHeight));
-      console.log(`${this.onlinemode.nativeElement.clientHeight} ${this.localmode.nativeElement.clientHeight}`)
+      console.log(`${this.onlinemode.nativeElement.clientHeight} ${this.localmode.nativeElement.clientHeight}`);
       this.localmode.nativeElement.style.height = max_height + 'px';
       this.onlinemode.nativeElement.style.height = max_height + 'px';
     }, 0);
@@ -210,6 +223,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         });
       });
     } else {
+      if (!isNullOrUndefined(this.oannotation)) {
+        this.sessionService.annotation = this.oannotation;
+      }
       this.sessionService.beginLocalSession(this.dropzone, true, this.navigate, (error) => {
         alert(error);
       });
@@ -253,14 +269,14 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   getFileStatus(): string {
-    if (!isNullOrUndefined(this.dropzone.files) &&
-      (this.dropzone.files.item(0).type === 'audio/wav' || this.dropzone.files.item(0).type === 'audio/x-wav')
+    if (!isNullOrUndefined(this.files) && this.files.length > 0 &&
+      (this.files[0].file.type === 'audio/wav' || this.files[0].file.type === 'audio/x-wav')
     ) {
       // check conditions
-      if (isNullOrUndefined(this.sessionService.sessionfile) || this.dropzone.files.item(0).name === this.sessionService.sessionfile.name) {
+      if (isNullOrUndefined(this.sessionService.sessionfile) || this.files[0].file.name === this.sessionService.sessionfile.name) {
         return 'start';
       } else {
-        return 'new';
+        return 'start';
       }
     }
 
@@ -357,5 +373,119 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         callback();
       }
     ));
+  }
+
+  public isValidImportData(file: { status: string, file: File, checked_converters: number }) {
+    if (!isNullOrUndefined(this.oaudiofile)) {
+      for (let i = 0; i < AppInfo.converters.length; i++) {
+        const converter: Converter = AppInfo.converters[i].converter;
+        if (Functions.contains(file.file.name, AppInfo.converters[i].appendix)) {
+          if (converter.conversion.import) {
+
+            const reader: FileReader = new FileReader();
+            console.log('..read');
+
+            reader.onloadend = () => {
+              if (file.status === 'progress') {
+                console.log('read ok');
+                console.log(reader);
+                const ofile = {
+                  name: file.file.name,
+                  content: reader.result,
+                  type: file.file.type,
+                  encoding: 'utf-8'
+                };
+                console.log(ofile);
+
+                const test: OAnnotation = converter.import(ofile, this.oaudiofile);
+                file.checked_converters++;
+                if (!isNullOrUndefined(test)) {
+                  file.status = 'valid';
+                  this.oannotation = test;
+                } else if (file.checked_converters === AppInfo.converters.length) {
+                  // last converter to check
+                  file.status = 'invalid';
+                  this.oannotation = null;
+                }
+
+              }
+            };
+
+            reader.readAsText(file.file, 'utf-8');
+          } else {
+            file.checked_converters++;
+          }
+        } else {
+          file.checked_converters++;
+        }
+      }
+      if (file.checked_converters === AppInfo.converters.length
+        && file.status === 'progress'
+      ) {
+        file.status = 'invalid';
+      }
+    } else {
+      file.status = 'valid';
+    }
+  }
+
+  public testFile(converter: Converter, file: File) {
+    const reader: FileReader = new FileReader();
+    reader.onload = function (e) {
+      // e.target.result should contain the text
+    };
+    reader.readAsText(file);
+    reader.readAsText(file, 'utf-8');
+  }
+
+  public afterDrop() {
+    this.files = [];
+    for (let i = 0; i < this.dropzone.files.length; i++) {
+      const file = {
+        status: 'progress',
+        file: this.dropzone.files[i],
+        checked_converters: 0
+      };
+
+      if (Functions.contains(file.file.name, '.wav')) {
+        file.status = 'valid';
+        const reader = new FileReader();
+
+        console.log('read audio temp');
+        reader.onloadend = () => {
+          console.log(reader.result);
+
+          // check audio
+          const info: AudioInfo = new AudioInfo(reader.result);
+          info.decodeAudio(reader.result).then(() => {
+            this.oaudiofile = new OAudiofile();
+            this.oaudiofile.name = file.file.name;
+            this.oaudiofile.size = file.file.size;
+            this.oaudiofile.duration = info.duration;
+            this.oaudiofile.samplerate = info.samplerate;
+
+            // load import data
+            console.log('check now other import');
+            for (let j = 0; j < this.dropzone.files.length; j++) {
+              const importfile = this.dropzone.files[j];
+              if (!Functions.contains(importfile.name, '.wav')) {
+                console.log('ok no audio');
+                const newfile = {
+                  status: 'progress',
+                  file: this.dropzone.files[j],
+                  checked_converters: 0
+                };
+                this.files.push(newfile);
+                this.isValidImportData(newfile);
+              }
+            }
+          });
+        };
+
+        reader.readAsArrayBuffer(file.file);
+        this.files.push(file);
+        break;
+      }
+    }
   }
 }

@@ -369,9 +369,17 @@ export class SessionService {
 
   public beginLocalSession = (dropzone: DropZoneComponent, keep_data: boolean, navigate: () => void, err: (error: string) => void) => {
     if (!isNullOrUndefined(dropzone.files)) {
-      const type: string = (dropzone.files[0].type) ? dropzone.files[0].type : 'unknown';
+      // get audio file
+      let audiofile;
+      for (let i = 0; i < dropzone.files.length; i++) {
+        const type: string = (dropzone.files[i].type) ? dropzone.files[i].type : 'unknown';
 
-      if (type === 'audio/x-wav' || type === 'audio/wav') {
+        if (type === 'audio/x-wav' || type === 'audio/wav') {
+          audiofile = dropzone.files[i];
+        }
+      }
+
+      if (!isNullOrUndefined(audiofile)) {
 
         if (!keep_data) {
           // delete old data from previous session
@@ -390,9 +398,9 @@ export class SessionService {
         const res = this.setSessionData(null, null, null, true);
         if (res.error === '') {
           this.offline = true;
-          this.sessionfile = this.getSessionFile(dropzone.files[0]);
+          this.sessionfile = this.getSessionFile(audiofile);
 
-          this.file = dropzone.files[0];
+          this.file = audiofile;
           navigate();
         } else {
           err(res.error);

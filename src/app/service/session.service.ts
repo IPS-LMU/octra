@@ -2,7 +2,6 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {LocalStorage, LocalStorageService, SessionStorage, SessionStorageService} from 'ng2-webstorage';
 import {SessionFile} from '../shared/SessionFile';
 import {isNullOrUndefined} from 'util';
-import {DropZoneComponent} from '../component/drop-zone/drop-zone.component';
 import {OAnnotation} from '../types/annotation';
 
 @Injectable()
@@ -367,15 +366,19 @@ export class SessionService {
     return true;
   }
 
-  public beginLocalSession = (dropzone: DropZoneComponent, keep_data: boolean, navigate: () => void, err: (error: string) => void) => {
-    if (!isNullOrUndefined(dropzone.files)) {
+  public beginLocalSession = (files: {
+    status: string,
+    file: File,
+    checked_converters: number
+  }[], keep_data: boolean, navigate: () => void, err: (error: string) => void) => {
+    if (!isNullOrUndefined(files)) {
       // get audio file
       let audiofile;
-      for (let i = 0; i < dropzone.files.length; i++) {
-        const type: string = (dropzone.files[i].type) ? dropzone.files[i].type : 'unknown';
+      for (let i = 0; i < files.length; i++) {
+        const type: string = (files[i].file.type) ? files[i].file.type : 'unknown';
 
         if (type === 'audio/x-wav' || type === 'audio/wav') {
-          audiofile = dropzone.files[i];
+          audiofile = files[i].file;
         }
       }
 

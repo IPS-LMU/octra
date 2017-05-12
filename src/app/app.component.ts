@@ -8,6 +8,7 @@ import {isNullOrUndefined, isUndefined} from 'util';
 import {BugReportService, ConsoleType} from './service/bug-report.service';
 import {AppInfo} from './app.info';
 import {OAnnotation, OAudiofile, OSegment, OTier} from './types/annotation';
+import {environment} from '../environments/environment';
 
 @Component({
   selector: 'app-octra',
@@ -16,8 +17,14 @@ import {OAnnotation, OAudiofile, OSegment, OTier} from './types/annotation';
 })
 
 export class AppComponent implements OnDestroy {
+  // public jsontext = '';
+
   public get version(): string {
     return AppInfo.version;
+  }
+
+  public get environment(): any {
+    return environment;
   }
 
   private subscrmanager: SubscriptionManager;
@@ -27,8 +34,7 @@ export class AppComponent implements OnDestroy {
               private sessService: SessionService,
               private settingsService: SettingsService,
               private bugService: BugReportService) {
-
-
+    console.log(this.environment);
     if (!isNullOrUndefined(this.sessService.transcription)) {
       console.log('Convert to new OctraAnnotation...');
 
@@ -181,6 +187,7 @@ export class AppComponent implements OnDestroy {
       this.api.fetchAnnotation(Number(id)).subscribe(
         (result) => {
           console.log(result.json());
+          // this.jsontext = JSON.stringify(result.json(), null, 2);
         }
       )
     );

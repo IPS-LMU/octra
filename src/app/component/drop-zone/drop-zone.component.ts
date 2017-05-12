@@ -53,7 +53,7 @@ export class DropZoneComponent implements OnInit {
 
     if (this.fileAPIsupported) {
       const files: FileList = $event.dataTransfer.files; // FileList object.
-
+      console.log(files.length);
       if (files.length <= 2) {
         console.log(files);
         // select the first file

@@ -66,6 +66,7 @@ import {CollapseModule} from 'ngx-bootstrap/collapse';
 import {TranscActivateGuard} from './guard/transcr.activateguard';
 import {AgreementComponent} from './gui/agreement/agreement.component';
 import {BugReportService} from './service/bug-report.service';
+import { OctraDropzoneComponent } from './gui/octra-dropzone/octra-dropzone.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
@@ -106,7 +107,8 @@ export function HttpLoaderFactory(http: Http) {
     FastbarComponent,
     OctraModalComponent,
     TranscrGuidelinesComponent,
-    AgreementComponent
+    AgreementComponent,
+    OctraDropzoneComponent
   ],
   imports: [
     BrowserModule,

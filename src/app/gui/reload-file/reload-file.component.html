@@ -9,13 +9,7 @@
             <p>
                 <b>{{"general.wanted" |translate}}: {{getDropzoneFileString(sessionfile)}}</b><br/><br/>
             </p>
-            <app-drop-zone #dropzone>
-                <span *ngIf="dropzone.file == null">{{"dropzone.drag&drop here" | translate}}</span>
-                <span *ngIf="dropzone.file != null && (sessionfile == null || sessionfile.name == dropzone.file.name)"><span
-                        class="text-success">{{ "dropzone.file selected" | translate:{file_label: getDropzoneFileString(dropzone.file)} }}</span></span>
-                <span *ngIf="dropzone.file != null && (sessionfile != null && sessionfile.name != dropzone.file.name)"><span
-                        class="text-danger">{{ "dropzone.file selected" | translate:{file_label: getDropzoneFileString(dropzone.file)} }}</span></span>
-            </app-drop-zone>
+            <app-octra-dropzone #dropzone></app-octra-dropzone>
             <div class="btn-group btn-group-justified" role="group" aria-label="...">
                 <div class="btn-group" role="group">
                     <button class="btn btn-default btn-raised"
@@ -25,14 +19,14 @@
                     </button>
                 </div>
                 <div class="btn-group" role="group">
-                    <button class="btn btn-default btn-raised btn-danger" [disabled]="!validate(dropzone.file)"
+                    <button class="btn btn-default btn-raised btn-danger" [disabled]="!(dropzone.status === 'valid')"
                             (click)="modService.show('transcription_delete', '', {ok: newTranscription})">
                         <span class="glyphicon glyphicon-file"></span> <span class="hidden-xs hidden-sm hidden-md">{{"transcription.new" | translate}}</span>
                     </button>
                 </div>
                 <div class="btn-group" role="group">
                     <button type="button" class="btn btn-primary btn-raised"
-                            [disabled]="!(validate(dropzone.file) && dropzone.file.name == sessionfile.name)"
+                            [disabled]="!(!isN(dropzone.oaudiofile) && sessionfile !== null && dropzone.oaudiofile.name === sessionfile.name && isN(dropzone.oannotation))"
                             (click)="onOfflineSubmit()">
                         <span class="glyphicon glyphicon glyphicon-edit"></span> <span
                             class="hidden-xs hidden-sm hidden-md">{{"transcription.start" | translate}}</span>

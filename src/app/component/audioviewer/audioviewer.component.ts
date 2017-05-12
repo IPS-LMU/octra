@@ -455,6 +455,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   drawCursor(line: Line) {
     if (line) {
+      // TODO clear only last Cursor Position
       this.m_context.clearRect(0, 0, this.width, this.height);
 
       // --- now draw the cursor line ---
@@ -472,6 +473,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   drawSegments() {
     this.o_context.fillStyle = 'white';
+    // TODO clear only
     this.o_context.clearRect(0, 0, this.width, this.height - 2);
 
     // draw segments

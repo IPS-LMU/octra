@@ -53,6 +53,7 @@ export class OAnnotation implements IAnnotation {
 
 export class OAudiofile implements IAudioFile {
   name: string;
+  // need type attribute
   size: number;
   duration: number;
   samplerate: number;

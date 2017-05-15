@@ -72,14 +72,16 @@
                     <label for="inputEmail" class="col-md-2 control-label">{{'general.email' | translate}}</label>
 
                     <div class="col-md-10">
-                        <input [(ngModel)]="bgemail" name="email" class="form-control" id="inputEmail" placeholder="{{'general.email' | translate}}" type="email" email>
+                        <input [(ngModel)]="bgemail" name="email" class="form-control" id="inputEmail"
+                               placeholder="{{'general.email' | translate}}" type="email" email>
                     </div>
                 </div>
                 <div class="form-group" style="margin-bottom:20px;">
                     <label for="bgDescr" class="col-md-2 control-label">{{'general.description' | translate}}</label>
 
                     <div class="col-md-10">
-                        <textarea [(ngModel)]="bgdescr" name="bgdescr" class="form-control" rows="3" id="bgDescr" maxlength="300"></textarea>
+                        <textarea [(ngModel)]="bgdescr" name="bgdescr" class="form-control" rows="3" id="bgDescr"
+                                  maxlength="300"></textarea>
                         <span class="help-block">(German or English)</span>
                     </div>
                 </div>
@@ -87,7 +89,8 @@
                     <div class="col-md-offset-2 col-md-10">
                         <div class="checkbox" style="margin-top:20px;">
                             <label>
-                                <input [(ngModel)]="sendpro_obj" name="sendpro" #sendpro type="checkbox" checked> {{"bug report.send protocol" | translate}}
+                                <input [(ngModel)]="sendpro_obj" name="sendpro" #sendpro type="checkbox" checked>
+                                {{"bug report.send protocol" | translate}}
                             </label>
                         </div>
                     </div>
@@ -95,11 +98,43 @@
                 <div class="form-group" [hidden]="!sendpro.checked">
                     <label for="bgProtocol" class="col-md-2 control-label">{{'general.protocol' | translate}}:</label>
                     <div class="col-md-10">
-                        <textarea class="form-control" #bgProtocol [innerHTML]="bugService.getText()" id="bgProtocol" disabled></textarea>
+                        <textarea class="form-control" #bgProtocol [innerHTML]="bugService.getText()" id="bgProtocol"
+                                  disabled></textarea>
                     </div>
                 </div>
             </fieldset>
         </form>
+    </modal-body>
+    <modal-footer>
+        <modal-footer>
+            <button type="button" class="btn btn-default" data-dismiss="modal" (click)="bugreport.dismiss()">
+                {{"general.abort" | translate}}
+            </button>
+            <button type="button" class="btn btn-primary" (click)="sendBugReport()" [disabled]="!isvalid">
+                {{"bug report.report an error" | translate}}
+            </button>
+        </modal-footer>
+    </modal-footer>
+</modal>
+<modal #supportedfiles id="supportedfiles">
+    <modal-header>
+        <h3>Supported files for local mode</h3>
+    </modal-header>
+    <modal-body>
+        <h4>Audio files:</h4>
+        <table class="table table-responsive table-striped">
+<tr><td>*.wav</td></tr>
+        </table>
+        <h4>files for import:</h4>
+        <table class="table table-responsive table-striped">
+            <tr *ngFor="let elem of AppInfo.converters">
+                <td *ngIf="elem.converter.conversion.import">
+                    {{elem.converter.name}}
+                </td>
+                <td *ngIf="elem.converter.conversion.import">{{elem.converter.application}}</td>
+                <td *ngIf="elem.converter.conversion.import">*{{elem.appendix}}</td>
+            </tr>
+        </table>
     </modal-body>
     <modal-footer>
         <modal-footer>

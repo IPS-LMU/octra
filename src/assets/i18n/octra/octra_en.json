@@ -148,7 +148,7 @@
     "online mode continue": "Old data found! To continue make sure to set the login data to: {{member_id}} , {{member_project}}, {{member_jobno}}"
   },
   "dropzone": {
-    "drag&drop here": "Drag & Drop audio file (*.wav) here or click here.",
+    "drag&drop here": "Drag & Drop audio file (*.wav) (+ optional file for import) here or click here.",
     "file selected": "{{file_label}} selected"
   },
   "browser": {

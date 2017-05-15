@@ -7,6 +7,7 @@ import {isNullOrUndefined} from 'util';
 import {Converter} from '../../shared/Converters/Converter';
 import {DropZoneComponent} from '../../component/drop-zone/drop-zone.component';
 import {SessionFile} from '../../shared/SessionFile';
+import {ModalService} from '../../service/modal.service';
 
 @Component({
   selector: 'app-octra-dropzone',
@@ -24,6 +25,10 @@ export class OctraDropzoneComponent implements OnInit {
 
   get oaudiofile(): OAudiofile {
     return this._oaudiofile;
+  }
+
+  get AppInfo(): AppInfo {
+    return AppInfo;
   }
 
   @ViewChild('dropzone') dropzone: DropZoneComponent;
@@ -46,7 +51,8 @@ export class OctraDropzoneComponent implements OnInit {
     return this._files;
   }
 
-  constructor() {
+  constructor(private modService: ModalService) {
+
   }
 
   ngOnInit() {
@@ -198,5 +204,9 @@ export class OctraDropzoneComponent implements OnInit {
   getDropzoneFileString(file: File | SessionFile) {
     const fsize: FileSize = Functions.getFileSize(file.size);
     return Functions.buildStr('{0} ({1} {2})', [file.name, (Math.round(fsize.size * 100) / 100), fsize.label]);
+  }
+
+  showSupported() {
+    this.modService.show('supportedfiles');
   }
 }

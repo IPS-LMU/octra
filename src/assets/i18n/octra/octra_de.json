@@ -144,7 +144,7 @@
     "online mode continue": "Es wurden alte Daten gefunden. Zum Fortsetzen folgende Daten angeben: {{member_id}} , {{member_project}}, {{member_jobno}}"
   },
   "dropzone": {
-    "drag&drop here": "Audiodatei (*.wav) hier hineinziehen oder hier klicken",
+    "drag&drop here": "Audiodatei (*.wav) (+ optional Datei zum Importieren) hier hineinziehen oder hier klicken",
     "file selected": "{{file_label}} ausgewählt"
   },
   "browser": {

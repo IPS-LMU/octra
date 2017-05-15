@@ -195,8 +195,7 @@ export class TranscriptionService {
     this.sessServ.annotation.audiofile.samplerate = this.audio.samplerate;
     this._annotation = new Annotation(this.sessServ.annotation.annotator, this.sessServ.annotation.audiofile);
 
-    console.log(this.sessServ.annotation);
-    for (let i = 0; i < this.sessServ.annotation.tiers.length; i++) {
+        for (let i = 0; i < this.sessServ.annotation.tiers.length; i++) {
       const tier: Tier = Tier.fromObj(this.sessServ.annotation.tiers[i],
         this.audio.samplerate, this.audio.duration.samples);
       this._annotation.tiers.push(tier);

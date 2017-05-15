@@ -34,8 +34,7 @@ export class AppComponent implements OnDestroy {
               private sessService: SessionService,
               private settingsService: SettingsService,
               private bugService: BugReportService) {
-    console.log(this.environment);
-    if (!isNullOrUndefined(this.sessService.transcription)) {
+        if (!isNullOrUndefined(this.sessService.transcription)) {
       console.log('Convert to new OctraAnnotation...');
 
       const audiofile: OAudiofile = new OAudiofile();

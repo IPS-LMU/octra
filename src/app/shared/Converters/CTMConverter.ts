@@ -48,15 +48,12 @@ export class CTMConverter extends Converter {
   };
 
   public import(file: File, audiofile: OAudiofile) {
-    console.log('KOKOKOKO');
-    console.log(audiofile);
-    const result = new OAnnotation();
+            const result = new OAnnotation();
     result.audiofile = audiofile;
 
     const content = file.content;
     const lines: string[] = content.split('\n');
 
-    console.log('lines: ' + lines.length);
 
     // check if filename is equal with audio file
     const filename = lines[0].substr(0, lines[0].indexOf(' '));
@@ -104,9 +101,7 @@ export class CTMConverter extends Converter {
           otier.segments.push(osegment);
 
           if (i === lines.length - 2) {
-            console.log('ok in');
-            console.log(`compare ${start + length} with ${audiofile.duration}`);
-            if ((start + length) < audiofile.duration) {
+                                    if ((start + length) < audiofile.duration) {
 
               const osegment_end = new OSegment(
                 Math.round((start + length) * samplerate),
@@ -124,7 +119,6 @@ export class CTMConverter extends Converter {
       result.tiers.push(otier);
     }
 
-    console.log(result);
-    return result;
+        return result;
   };
 }

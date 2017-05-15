@@ -29,7 +29,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
 
   public bugsent = false;
 
-  public get AppInfo(): AppInfo {
+  public get AppInfo(): any {
     return AppInfo;
   }
 
@@ -71,11 +71,9 @@ export class OctraModalComponent implements OnInit, OnDestroy {
   }
 
   sendBugReport() {
-    console.log('send bug report');
-    this.sessService.email = this.bgemail;
+        this.sessService.email = this.bgemail;
     const bugs: ConsoleEntry[] = (this.sendpro_obj) ? this.bugService.console : [];
 
-    console.log(JSON.stringify(this.bugService.getPackage()));
 
     this._subscrmanager.add(
       this.api.sendBugReport(this.bgemail, this.bgdescr, bugs).subscribe(

@@ -6,29 +6,41 @@
                     <a *ngIf="!audioplaying" class="btn btn-default btn-raised" name="play"
                        (click)="onButtonClick('play'); ">
                         <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
-                        <span *ngIf="!easymode" class="btn-description" [ngClass]="{'hidden-xs hidden-sm': responsive}">{{buttons.play.label}}</span>
-                        <span *ngIf="!easymode" class="shortcut-descr" [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}"> {{buttons.play.shortcut}}</span>
+                        <!-- <span *ngIf="!easymode" class="btn-description" [ngClass]="{'hidden-xs hidden-sm': responsive}">{{buttons.play.label}}</span> -->
+                        <span *ngIf="!easymode" class="shortcut-descr"
+                              [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}"> {{buttons.play.shortcut}}</span>
                     </a>
                     <a *ngIf="audioplaying" class="btn btn-default btn-raised" name="pause"
                        (click)="onButtonClick('pause')">
                         <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
-                        <span *ngIf="!easymode" class="btn-description" [ngClass]="{'hidden-xs hidden-sm': responsive}">{{buttons.pause.label}}</span>
-                        <span *ngIf="!easymode" class="shortcut-descr" [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}"> {{buttons.pause.shortcut}}</span></a>
+                        <!-- <span *ngIf="!easymode" class="btn-description" [ngClass]="{'hidden-xs hidden-sm': responsive}">{{buttons.pause.label}}</span> -->
+                        <span *ngIf="!easymode" class="shortcut-descr"
+                              [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}"> {{buttons.pause.shortcut}}</span></a>
                     <a class="btn btn-default btn-raised" name="stop" (click)="onButtonClick('stop')">
                         <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
-                        <span *ngIf="!easymode" class="btn-description" [ngClass]="{'hidden-xs hidden-sm': responsive}">{{buttons.stop.label}}</span>
-                        <span *ngIf="!easymode" class="shortcut-descr" [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}"> {{buttons.stop.shortcut}}</span></a>
+                        <!-- <span *ngIf="!easymode" class="btn-description" [ngClass]="{'hidden-xs hidden-sm': responsive}">{{buttons.stop.label}}</span> -->
+                        <span *ngIf="!easymode" class="shortcut-descr"
+                              [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}"> {{buttons.stop.shortcut}}</span></a>
                     <a class="btn btn-default btn-raised" [ngClass]="{active: replay}"
                        name="replay" (click)="onButtonClick('replay')">
                         <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
-                        <span *ngIf="!easymode" class="btn-description" [ngClass]="{'hidden-xs hidden-sm': responsive}">{{buttons.replay.label}}</span>
+                        <!-- <span *ngIf="!easymode" class="btn-description" [ngClass]="{'hidden-xs hidden-sm': responsive}">{{buttons.replay.label}}</span>-->
                     </a>
                     <a class="btn btn-default btn-raised" name="step_back"
                        (click)="onButtonClick('backward')">
                         <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
-                        <span *ngIf="!easymode" class="btn-description"
-                              [ngClass]="{'hidden-xs hidden-sm': responsive}">{{buttons.backward.label}} </span>
-                        <span *ngIf="!easymode" class="shortcut-descr" [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}"> {{buttons.backward.shortcut}}</span></a>
+                        <!-- <span *ngIf="!easymode" class="btn-description"
+                              [ngClass]="{'hidden-xs hidden-sm': responsive}">{{buttons.backward.label}} </span>-->
+                        <span *ngIf="!easymode" class="shortcut-descr"
+                              [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}"> {{buttons.backward.shortcut}}</span></a>
+                    <a class="btn btn-default btn-raised" name="step_back"
+                       (click)="onButtonClick('backward time')">
+                        <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
+                        <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+                        <!-- <span *ngIf="!easymode" class="btn-description"
+                              [ngClass]="{'hidden-xs hidden-sm': responsive}">{{buttons.backward.label}} </span>-->
+                        <!-- <span *ngIf="!easymode" class="shortcut-descr" [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}"> {{buttons.backward.shortcut}}</span>-->
+                    </a>
                 </div>
             </div>
         </div>

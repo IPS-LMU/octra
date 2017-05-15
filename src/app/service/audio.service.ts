@@ -316,6 +316,23 @@ export class AudioService {
     }
   }
 
+  public stepBackwardTime(callback: () => void) {
+    this.stepbackward = true;
+    if (this.audioplaying) {
+      this._state = 'backward';
+      const obj: EventListenerOrEventListenerObject = () => {
+        this.source.removeEventListener('ended', obj);
+        callback();
+        this.stepbackward = false;
+      };
+
+      this.source.addEventListener('ended', obj);
+      this.source.stop(0);
+    } else {
+      callback();
+    }
+  }
+
   /**
    * loadAudio(url) loads the audio data referred to via the URL in an AJAX call.
    * The audiodata is written to the local audiobuffer field.

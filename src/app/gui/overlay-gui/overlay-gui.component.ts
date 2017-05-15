@@ -10,7 +10,7 @@ import {
   ViewChild
 } from '@angular/core';
 
-import {AudioNavigationComponent, AudioviewerComponent, LoupeComponent} from '../../component';
+import {AudioNavigationComponent, AudioviewerComponent} from '../../component';
 import {TranscrWindowComponent} from '../transcr-window/transcr-window.component';
 
 import {
@@ -25,6 +25,7 @@ import {AudioTime, AVMousePos, AVSelection, Functions} from '../../shared';
 import {SubscriptionManager} from '../../shared/SubscriptionManager';
 import {SettingsService} from '../../service/settings.service';
 import {SessionService} from '../../service/session.service';
+import {CircleLoupeComponent} from '../../component/circleloupe/circleloupe.component';
 
 @Component({
   selector: 'app-overlay-gui',
@@ -34,7 +35,7 @@ import {SessionService} from '../../service/session.service';
 export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentChecked, OnChanges, OnDestroy {
   @ViewChild('viewer') viewer: AudioviewerComponent;
   @ViewChild('window') window: TranscrWindowComponent;
-  @ViewChild('loupe') loupe: LoupeComponent;
+  @ViewChild('loupe') loupe: CircleLoupeComponent;
   @ViewChild('audionav') audionav: AudioNavigationComponent;
   @ViewChild('audionav') nav: ElementRef;
 
@@ -46,6 +47,7 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
   private loupe_updated = true;
   private intervalID = null;
 
+  private factor = 4;
   public mini_loupecoord: any = {
     x: 0,
     y: 0
@@ -90,6 +92,26 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
         this.msg.showMessage(result.type, result.message);
       }
     );
+
+    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(
+      (obj) => {
+        const event = obj.event;
+        if (this.viewer.focused) {
+          if (event.key === '+') {
+            this.factor = Math.max(4, this.factor + 1);
+            this.loupe.zoomY = Math.max(1, this.loupe.zoomY + 1);
+
+            this.changeArea(this.loupe, this.mini_loupecoord, this.factor);
+          } else if (event.key === '-') {
+            if (this.factor > 3) {
+              this.factor = Math.max(3, this.factor - 1);
+              this.loupe.zoomY = Math.max(1, this.loupe.zoomY - 1);
+              this.changeArea(this.loupe, this.mini_loupecoord, this.factor);
+            }
+          }
+        }
+      }
+    ));
   }
 
   ngOnChanges(test) {
@@ -113,14 +135,13 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
       )
     );
 
+    this.loupe.zoomY = 8;
     this.intervalID = setInterval(() => {
       if (!this.mousestartmoving && !this.loupe_updated) {
         this.loupe_updated = true;
-        this.changeArea(this.loupe, this.mini_loupecoord);
+        this.changeArea(this.loupe, this.mini_loupecoord, this.factor);
       }
     }, 200);
-
-    this.loupe.zoomY = 10;
   }
 
   ngAfterContentChecked() {
@@ -178,7 +199,7 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
   onSegmentChange($event) {
   }
 
-  private changeArea(loup: LoupeComponent, coord: any) {
+  private changeArea(loup: CircleLoupeComponent, coord: any, factor: number = 4) {
     const cursor = this.viewer.MouseCursor;
 
     if (cursor && cursor.timePos && cursor.relPos) {
@@ -198,7 +219,7 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 
        */
 
-      const half_rate = Math.round(this.audio.samplerate / 4);
+      const half_rate = Math.round(this.audio.samplerate / factor);
       const start = (cursor.timePos.samples > half_rate)
         ? new AudioTime(cursor.timePos.samples - half_rate, this.audio.samplerate)
         : new AudioTime(0, this.audio.samplerate);
@@ -291,6 +312,9 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
         break;
       case('backward'):
         this.viewer.stepBackward();
+        break;
+      case('backward time'):
+        this.viewer.stepBackwardTime();
         break;
       case('default'):
         break;

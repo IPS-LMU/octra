@@ -116,6 +116,9 @@ export class AudioNavigationComponent {
       case('backward'):
         this.buttonclick.emit({type: 'backward', timestamp: Date.now()});
         break;
+      case('backward time'):
+        this.buttonclick.emit({type: 'backward time', timestamp: Date.now()});
+        break;
       case('default'):
         break;
     }

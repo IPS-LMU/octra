@@ -6,6 +6,7 @@ import {isNullOrUndefined} from 'util';
 import {BugReportService, ConsoleEntry} from '../../service/bug-report.service';
 import {APIService} from '../../service/api.service';
 import {SessionService} from '../../service/session.service';
+import {AppInfo} from '../../app.info';
 
 @Component({
   selector: 'app-octra-modal',
@@ -20,12 +21,17 @@ export class OctraModalComponent implements OnInit, OnDestroy {
   @ViewChild('transcription_stop') transcription_stop: ModalComponent;
   @ViewChild('error') error: ModalComponent;
   @ViewChild('bugreport') bugreport: ModalComponent;
+  @ViewChild('supportedfiles') supportedfiles: ModalComponent;
 
   public bgdescr = '';
   public bgemail = '';
   public sendpro_obj = true;
 
   public bugsent = false;
+
+  public get AppInfo(): AppInfo {
+    return AppInfo;
+  }
 
   public data: any;
 

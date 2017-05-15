@@ -1,13 +1,14 @@
+
 /**
  * this is a test validation method to show how validation could work.
  * @param annotation
  * @returns {{start: number, length: number, code: string}}
  */
 function validateAnnotation(annotation, guidelines) {
-    let result = [];
+    var result = [];
 
     //Z01 Satzzeichen
-    let re = /[\(\.,\!\?;\-\)]/g;
+    var re = /[\(\.,\!\?;\-\)]/g;
     while ((match = re.exec(annotation)) != null) {
         result.push({
             start: match.index,
@@ -17,8 +18,8 @@ function validateAnnotation(annotation, guidelines) {
     }
 
     //G01
-    for(let i = 0; i < guidelines.markers.length; i++){
-        let marker = guidelines.markers[i].code;
+    for(var i = 0; i < guidelines.markers.length; i++){
+        var marker = guidelines.markers[i].code;
 
         re = new RegExp("("+ escapeRegex(marker) +")( *("+ escapeRegex(marker) +"))+", "g");
         while ((match = re.exec(annotation)) != null) {
@@ -52,7 +53,7 @@ function validateAnnotation(annotation, guidelines) {
  * @returns string
  */
 function tidyUpAnnotation(annotation, guidelines) {
-    let result = annotation;
+    var result = annotation;
 
     result = result.replace(/\[[~^a-z0-9]+\]/g, function (x) {
         return " " + x + " ";

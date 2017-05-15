@@ -29,6 +29,10 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.viewer.av.zoomY = value;
   }
 
+  public get focused(): boolean {
+    return this.viewer.focused;
+  }
+
   public get MouseCursor(): AVMousePos {
     return this.viewer.MouseCursor;
   }

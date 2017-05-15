@@ -202,7 +202,7 @@ export class AudioviewerService extends AudioComponentService {
       throw new Error('Channel Data Length is 0');
     } else {
       this.DurTime = new AudioTime(this.Chunk.time.length, this.audio.samplerate);
-      this.afterChannelInititialized(innerWidth, false);
+      this.afterChannelInititialized(innerWidth, true);
       this.current = this.Chunk.time.start.clone();
     }
   }

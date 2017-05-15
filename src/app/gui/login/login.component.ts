@@ -111,8 +111,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
       const max_height: number = Math.max(Number(this.onlinemode.nativeElement.clientHeight),
         Number(this.localmode.nativeElement.clientHeight));
-      console.log(`${this.onlinemode.nativeElement.clientHeight} ${this.localmode.nativeElement.clientHeight}`);
-      this.localmode.nativeElement.style.height = max_height + 'px';
+            this.localmode.nativeElement.style.height = max_height + 'px';
       this.onlinemode.nativeElement.style.height = max_height + 'px';
     }, 0);
   }

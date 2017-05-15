@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, EventEmitter, Output, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ViewChild} from '@angular/core';
 
 import {AudioTime} from '../../shared/AudioTime';
 import {LoupeComponent} from '../loupe/loupe.component';
@@ -14,6 +14,14 @@ declare var window: any;
 
 export class CircleLoupeComponent implements AfterViewInit {
   @ViewChild('loupe') loupe: LoupeComponent;
+
+  public get zoomY(): number {
+    return this.loupe.zoomY;
+  }
+
+  public set zoomY(value: number) {
+    this.loupe.zoomY = value;
+  }
 
   public pos: any = {
     x: 0,

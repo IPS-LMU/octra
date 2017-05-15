@@ -202,7 +202,7 @@ export class AudioviewerService extends AudioComponentService {
       throw new Error('Channel Data Length is 0');
     } else {
       this.DurTime = new AudioTime(this.Chunk.time.length, this.audio.samplerate);
-      this.afterChannelInititialized(innerWidth);
+      this.afterChannelInititialized(innerWidth, false);
       this.current = this.Chunk.time.start.clone();
     }
   }
@@ -290,9 +290,11 @@ export class AudioviewerService extends AudioComponentService {
    * after Channel was initialzed
    * @param innerWidth
    */
-  private afterChannelInititialized(innerWidth: number) {
+  private afterChannelInititialized(innerWidth: number, calculateZoom: boolean = true) {
     this.refresh();
-    this.calculateZoom(this.Settings.height, this.AudioPxWidth, this._minmaxarray);
+    if (calculateZoom) {
+      this.calculateZoom(this.Settings.height, this.AudioPxWidth, this._minmaxarray);
+    }
 
     this.updateLines(innerWidth);
 

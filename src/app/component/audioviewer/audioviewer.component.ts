@@ -204,7 +204,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.updateCanvasSizes();
 
     if (this.av.channel) {
-
       if (computeDisplayData === true) {
         this.av.refresh();
       }
@@ -421,7 +420,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
     if (curr_line) {
       this.focused = true;
       if (this.Settings.selection.enabled) {
-                this.av.setMouseMovePosition($event.type, x, y, curr_line, this.innerWidth);
+        this.av.setMouseMovePosition($event.type, x, y, curr_line, this.innerWidth);
         this.drawSegments();
         this.drawCursor(curr_line);
       }
@@ -871,6 +870,20 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   stepBackward() {
     this.audio.stepBackward(() => {
+      // audio not playing
+      if (this.av.lastplayedpos != null) {
+        this.av.current = this.av.lastplayedpos.clone();
+
+        this.av.PlayCursor.changeSamples(this.av.lastplayedpos.samples, this.av.audioTCalculator, this.av.Chunk);
+        this.drawPlayCursorOnly(this.av.LastLine);
+        this._begintime = this.av.current.clone();
+        this.startPlayback();
+      }
+    });
+  }
+
+  stepBackwardTime() {
+    this.audio.stepBackwardTime(() => {
       // audio not playing
       if (this.av.lastplayedpos != null) {
         this.av.current = this.av.lastplayedpos.clone();

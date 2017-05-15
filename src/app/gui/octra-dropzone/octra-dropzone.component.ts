@@ -66,19 +66,15 @@ export class OctraDropzoneComponent implements OnInit {
           if (converter.conversion.import) {
 
             const reader: FileReader = new FileReader();
-            console.log('..read');
 
             reader.onloadend = () => {
               if (file.status === 'progress') {
-                console.log('read ok');
-                console.log(reader);
-                const ofile = {
+                                                const ofile = {
                   name: file.file.name,
                   content: reader.result,
                   type: file.file.type,
                   encoding: 'utf-8'
                 };
-                console.log(ofile);
 
                 const test: OAnnotation = converter.import(ofile, this._oaudiofile);
                 file.checked_converters++;
@@ -117,29 +113,22 @@ export class OctraDropzoneComponent implements OnInit {
   public afterDrop() {
     this._files = [];
     this._oannotation = null;
-    console.log('hier');
-    console.log(this.dropzone.files);
-    for (let i = 0; i < this.dropzone.files.length; i++) {
+            for (let i = 0; i < this.dropzone.files.length; i++) {
       const file = {
         status: 'progress',
         file: this.dropzone.files[i],
         checked_converters: 0
       };
 
-      console.log('check ' + i);
-      console.log(this.dropzone.files[i]);
-      if (Functions.contains(file.file.name, '.wav')) {
+                  if (Functions.contains(file.file.name, '.wav')) {
         file.status = 'valid';
         const reader = new FileReader();
 
-        console.log('read audio temp');
-        reader.onloadend = () => {
-          console.log(reader.result);
+                reader.onloadend = () => {
 
           // check audio
           const info: AudioInfo = new AudioInfo(reader.result);
-          console.log('decode audio ' + file.file.name);
-          info.decodeAudio(reader.result).then(() => {
+                    info.decodeAudio(reader.result).then(() => {
             this._oaudiofile = new OAudiofile();
             this._oaudiofile.name = file.file.name;
             this._oaudiofile.size = file.file.size;
@@ -152,8 +141,7 @@ export class OctraDropzoneComponent implements OnInit {
             for (let j = 0; j < this.dropzone.files.length; j++) {
               const importfile = this.dropzone.files[j];
               if (!Functions.contains(importfile.name, '.wav')) {
-                console.log('ok no audio');
-                const newfile = {
+                                const newfile = {
                   status: 'progress',
                   file: this.dropzone.files[j],
                   checked_converters: 0
@@ -171,8 +159,7 @@ export class OctraDropzoneComponent implements OnInit {
 
         reader.readAsArrayBuffer(file.file);
         this._files.push(file);
-        console.log(this.files);
-        break;
+                break;
       }
     }
   }

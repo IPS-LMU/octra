@@ -55,9 +55,9 @@
     </app-audioviewer>
 </div>
 <app-loupe #loupe
-           (mousecursorchange)="onMouseOver2($event)"
-           (mouseenter)="miniloupe_hidden = false;"
-           (mouseleave)="miniloupe_hidden = true;"
+           [margin]="{
+            top:10
+           }"
            (segmententer)="onLoupeSegmentEnter($event)"
            (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
 >
@@ -75,4 +75,3 @@
                     [easymode]="sessService.easymode"
 >
 </app-transcr-editor>
-{{loupe.focused}}

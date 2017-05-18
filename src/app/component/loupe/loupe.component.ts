@@ -1,4 +1,7 @@
-import {AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {
+  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output,
+  ViewChild
+} from '@angular/core';
 import {AudioviewerComponent, AudioviewerService} from '../audioviewer';
 import {AudioTime, AVMousePos} from '../../shared';
 import {SubscriptionManager} from '../../shared/SubscriptionManager';
@@ -35,6 +38,14 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public get MouseCursor(): AVMousePos {
     return this.viewer.MouseCursor;
+  }
+
+  public get margin(): any {
+    return this.viewer.margin;
+  }
+
+  @Input() public set margin(value: any) {
+    this.viewer.margin = value;
   }
 
   public pos: any = {

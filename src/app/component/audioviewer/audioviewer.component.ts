@@ -4,6 +4,7 @@ import {
   ElementRef,
   EventEmitter,
   HostListener,
+  Input,
   OnDestroy,
   OnInit,
   Output,
@@ -62,6 +63,18 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
   @Output('pos_time') get pos_time(): number {
     return this.av.PlayCursor.time_pos.samples;
   }
+
+  @Input() margin: {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+  } = {
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0
+  };
 
   private _begintime: AudioTime = null;
 
@@ -262,7 +275,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.av.updateLines(this.innerWidth);
 
-    this.height = this.Settings.margin.top + (this.Settings.height + this.Settings.margin.bottom) * this.av.LinesArray.length;
+    if (this.Settings.multi_line) {
+      this.height = this.Settings.margin.top + (this.Settings.height + this.Settings.margin.bottom) * this.av.LinesArray.length;
+    } else {
+      this.height = this.Settings.height;
+    }
     // set width
     this.graphicscanvas.width = this.width;
     this.mousecanvas.width = this.width;
@@ -473,7 +490,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
   drawSegments() {
     this.o_context.fillStyle = 'white';
     // TODO clear only
-    this.o_context.clearRect(0, 0, this.width, this.height - 2);
+    this.o_context.clearRect(0, 0, this.width, this.height);
 
     // draw segments
     if (this.Settings.boundaries.enabled && this.transcr.annotation.tiers[0].segments) {

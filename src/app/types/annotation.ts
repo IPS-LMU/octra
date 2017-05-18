@@ -1,4 +1,5 @@
 import {isNullOrUndefined} from 'util';
+
 export interface IAnnotation {
   version: string;
   annotator: string;
@@ -23,6 +24,8 @@ export interface IAudioFile {
   size: number;
   duration: number;
   samplerate: number;
+  // channels: number;
+  // bit rate: number;
 }
 
 /*

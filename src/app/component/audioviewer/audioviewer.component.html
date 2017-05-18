@@ -1,4 +1,11 @@
-<div class="audioviewer" #audioview=audioview appAudioviewer>
+<div class="audioviewer"
+     [ngStyle]="{
+        'margin-top': margin.top+'px',
+        'margin-left': margin.left+'px',
+        'margin-right': margin.right+'px',
+        'margin-bottom': margin.bottom+'px'
+     }"
+     #audioview=audioview appAudioviewer>
     <canvas class="graphicscanvas" #graphicscan></canvas>
     <canvas class="overlaycanvas" #overlaycan></canvas>
     <canvas class="playcanvas" [ngClass]="{dragable: (av.overboundary)}" #playcan
@@ -10,5 +17,5 @@
             (mouseout)="av.focused = false"
     ></canvas>
     <canvas class="mousecanvas" #mousecan
-            ></canvas>
+    ></canvas>
 </div>

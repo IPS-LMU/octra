@@ -42,7 +42,7 @@ export class CircleLoupeComponent implements AfterViewInit {
   ngAfterViewInit() {
     this.loupe.Settings.multi_line = false;
     this.loupe.Settings.height = 80;
-    this.loupe.Settings.justify_signal_height = true;
+    this.loupe.Settings.justify_signal_height = false;
     this.loupe.Settings.boundaries.enabled = true;
     this.loupe.Settings.disabled_keys = [];
     this.loupe.Settings.type = 'line';

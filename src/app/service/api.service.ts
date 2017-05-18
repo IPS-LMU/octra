@@ -193,7 +193,7 @@ export class APIService implements API {
     const cmd_json = {
       querytype: 'reportbug',
       email: email,
-      logtext: json
+      buglogtext: json
     };
 
     return this.post(cmd_json);

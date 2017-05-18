@@ -135,7 +135,7 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
       )
     );
 
-    this.loupe.zoomY = 8;
+    this.loupe.zoomY = this.factor;
     this.intervalID = setInterval(() => {
       if (!this.mousestartmoving && !this.loupe_updated) {
         this.loupe_updated = true;

@@ -202,13 +202,14 @@ export class AudioviewerService extends AudioComponentService {
       throw new Error('Channel Data Length is 0');
     } else {
       this.DurTime = new AudioTime(this.Chunk.time.length, this.audio.samplerate);
-      this.afterChannelInititialized(innerWidth, true);
+      this.afterChannelInititialized(innerWidth, false);
       this.current = this.Chunk.time.start.clone();
     }
   }
 
 
   private calculateZoom(height: number, width: number, minmaxarray: number[]) {
+    console.log('calculate zoom');
     if (this.Settings.justify_signal_height) {
       // justify height to maximum top border
       let max_zoom_x = 0;
@@ -227,10 +228,13 @@ export class AudioviewerService extends AudioComponentService {
         max_zoom_y = Math.max(max_zoom_y, minmaxarray[i]);
         max_zoom_y_min = Math.min(max_zoom_y_min, minmaxarray[i]);
       }
-      const rest = (height - timeline_height - (max_zoom_y + Math.abs(max_zoom_y_min)));
+
+      let rest = (height - timeline_height - (max_zoom_y + Math.abs(max_zoom_y_min)));
+      rest = Math.floor(rest);
+
       if (rest > 0) {
         this._zoomY = (rest / (max_zoom_y + Math.abs(max_zoom_y_min))) + 1;
-
+        this._zoomY = Math.floor(this._zoomY * 100) / 100;
         this._zoomX = width / max_zoom_x;
       }
     } else {

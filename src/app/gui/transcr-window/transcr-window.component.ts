@@ -60,14 +60,14 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
   get SelectedSegment(): Segment {
     if (this.transcrService.selectedSegment.index > -1) {
-      return this.transcrService.annotation.tiers[0].segments.get(this.transcrService.selectedSegment.index);
+      return this.transcrService.annotation.levels[0].segments.get(this.transcrService.selectedSegment.index);
     }
 
     return null;
   }
 
   set SelectedSegment(segment: Segment) {
-    this.transcrService.annotation.tiers[0].segments.get(this.transcrService.selectedSegment.index).transcript;
+    this.transcrService.annotation.levels[0].segments.get(this.transcrService.selectedSegment.index).transcript;
   }
 
   constructor(public keyMap: KeymappingService,
@@ -86,9 +86,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.subscrmanager.add(this.editor.loaded.subscribe(
       () => {
         const index = this.transcrService.selectedSegment.index;
-        if (index > -1 && this.transcrService.annotation.tiers[0].segments &&
-          index < this.transcrService.annotation.tiers[0].segments.length) {
-          this.editor_rawText(this.transcrService.annotation.tiers[0].segments.get(this.transcrService.selectedSegment.index).transcript);
+        if (index > -1 && this.transcrService.annotation.levels[0].segments &&
+          index < this.transcrService.annotation.levels[0].segments.length) {
+          this.editor_rawText(this.transcrService.annotation.levels[0].segments.get(this.transcrService.selectedSegment.index).transcript);
         }
       }
     ));
@@ -102,12 +102,12 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
   ngAfterViewInit() {
     this.pos_y = this.transcrService.selectedSegment.pos.Y2;
-    const segment: Segment = this.transcrService.annotation.tiers[0].segments.get(this.transcrService.selectedSegment.index);
+    const segment: Segment = this.transcrService.annotation.levels[0].segments.get(this.transcrService.selectedSegment.index);
 
     let begin = new AudioTime(0, this.audio.samplerate);
 
     if (this.transcrService.selectedSegment.index > 0) {
-      begin = this.transcrService.annotation.tiers[0].segments.get(this.transcrService.selectedSegment.index - 1).time.clone();
+      begin = this.transcrService.annotation.levels[0].segments.get(this.transcrService.selectedSegment.index - 1).time.clone();
     }
 
     this.loupe.Settings.boundaries.readonly = true;
@@ -132,10 +132,11 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
   save() {
     const index = this.transcrService.selectedSegment.index;
-    if (index > -1 && this.transcrService.annotation.tiers[0].segments && index < this.transcrService.annotation.tiers[0].segments.length) {
-      const segment = this.transcrService.annotation.tiers[0].segments.get(index);
+    if (index > -1 && this.transcrService.annotation.levels[0].segments &&
+      index < this.transcrService.annotation.levels[0].segments.length) {
+      const segment = this.transcrService.annotation.levels[0].segments.get(index);
       segment.transcript = this.editor.rawText;
-      this.transcrService.annotation.tiers[0].segments.change(index, segment);
+      this.transcrService.annotation.levels[0].segments.change(index, segment);
     }
   }
 
@@ -161,23 +162,24 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
    */
   goToSegment(direction: string) {
     const index = this.transcrService.selectedSegment.index;
-    if (index > -1 && this.transcrService.annotation.tiers[0].segments && index < this.transcrService.annotation.tiers[0].segments.length) {
-      let segment: Segment = this.transcrService.annotation.tiers[0].segments.get(index);
+    if (index > -1 && this.transcrService.annotation.levels[0].segments &&
+      index < this.transcrService.annotation.levels[0].segments.length) {
+      let segment: Segment = this.transcrService.annotation.levels[0].segments.get(index);
 
       if (direction === 'right' &&
-        this.transcrService.selectedSegment.index < this.transcrService.annotation.tiers[0].segments.length - 1) {
-        segment = this.transcrService.annotation.tiers[0].segments.get(++this.transcrService.selectedSegment.index);
+        this.transcrService.selectedSegment.index < this.transcrService.annotation.levels[0].segments.length - 1) {
+        segment = this.transcrService.annotation.levels[0].segments.get(++this.transcrService.selectedSegment.index);
       } else if (direction === 'left' && this.transcrService.selectedSegment.index > 0) {
-        segment = this.transcrService.annotation.tiers[0].segments.get(--this.transcrService.selectedSegment.index);
+        segment = this.transcrService.annotation.levels[0].segments.get(--this.transcrService.selectedSegment.index);
       }
 
       let begin = new AudioTime(0, this.audio.samplerate);
 
       if (this.transcrService.selectedSegment.index > 0) {
-        begin = this.transcrService.annotation.tiers[0].segments.get(this.transcrService.selectedSegment.index - 1).time.clone();
+        begin = this.transcrService.annotation.levels[0].segments.get(this.transcrService.selectedSegment.index - 1).time.clone();
       }
 
-      this.editor.rawText = this.transcrService.annotation.tiers[0].segments.get(this.transcrService.selectedSegment.index).transcript;
+      this.editor.rawText = this.transcrService.annotation.levels[0].segments.get(this.transcrService.selectedSegment.index).transcript;
       this.changeArea(begin, segment.time);
     }
   }

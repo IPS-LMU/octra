@@ -1,5 +1,5 @@
 import {Converter, File} from './Converter';
-import {OAnnotation, OAudiofile, OTier} from '../../types/annotation';
+import {OAnnotJSON, OAudiofile, OLevel} from '../../types/annotjson';
 import {isNullOrUndefined} from 'util';
 
 export class TextConverter extends Converter {
@@ -15,16 +15,16 @@ export class TextConverter extends Converter {
     this._conversion.import = false;
   }
 
-  public export(annotation: OAnnotation): File {
+  public export(annotation: OAnnotJSON): File {
     let result = '';
     let filename = '';
 
     if (!isNullOrUndefined(annotation)) {
-      for (let i = 0; i < annotation.tiers.length; i++) {
-        const tier: OTier = annotation.tiers[i];
+      for (let i = 0; i < annotation.levels.length; i++) {
+        const level: OLevel = annotation.levels[i];
 
-        for (let j = 0; j < tier.segments.length; j++) {
-          const transcript = tier.segments[j].transcript;
+        for (let j = 0; j < level.items.length; j++) {
+          const transcript = level.items[j].labels[0].value;
           result += transcript;
           if (i < transcript.length - 1) {
             result += ' ';
@@ -32,7 +32,7 @@ export class TextConverter extends Converter {
         }
       }
 
-      filename = annotation.audiofile.name + '.txt';
+      filename = annotation.name + '.txt';
 
     }
 
@@ -45,7 +45,7 @@ export class TextConverter extends Converter {
   };
 
   public import(file: File, audiofile: OAudiofile) {
-    const result = new OAnnotation();
+    const result = null;
 
     return null;
   };

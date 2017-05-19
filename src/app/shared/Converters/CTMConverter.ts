@@ -1,5 +1,5 @@
 import {Converter, File} from './Converter';
-import {OAnnotation, OAudiofile, OSegment, OTier} from '../../types/annotation';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../../types/annotjson';
 import {isNullOrUndefined} from 'util';
 import {Functions} from '../Functions';
 
@@ -18,16 +18,16 @@ export class CTMConverter extends Converter {
     this._conversion.import = true;
   }
 
-  public export(annotation: OAnnotation): File {
+  public export(annotation: OAnnotJSON): File {
     let result = '';
     let filename = '';
 
     if (!isNullOrUndefined(annotation)) {
-      for (let i = 0; i < annotation.tiers.length; i++) {
-        const tier: OTier = annotation.tiers[i];
+      for (let i = 0; i < annotation.levels.length; i++) {
+        const level: OLevel = annotation.levels[i];
 
-        for (let j = 0; j < tier.segments.length; j++) {
-          const transcript = tier.segments[j].transcript;
+        for (let j = 0; j < level.items.length; j++) {
+          const transcript = level.items[j].labels[0].value;
           result += transcript;
           if (i < transcript.length - 1) {
             result += ' ';
@@ -35,7 +35,7 @@ export class CTMConverter extends Converter {
         }
       }
 
-      filename = annotation.audiofile.name;
+      filename = annotation.name;
 
     }
 
@@ -47,9 +47,8 @@ export class CTMConverter extends Converter {
     };
   };
 
-  public import(file: File, audiofile: OAudiofile) {
-            const result = new OAnnotation();
-    result.audiofile = audiofile;
+  public import(file: File, audiofile: OAudiofile): OAnnotJSON {
+    const result = new OAnnotJSON(audiofile.name, audiofile.samplerate);
 
     const content = file.content;
     const lines: string[] = content.split('\n');
@@ -59,8 +58,7 @@ export class CTMConverter extends Converter {
     const filename = lines[0].substr(0, lines[0].indexOf(' '));
 
     if (Functions.contains(file.name, filename)) {
-      const otier = new OTier();
-      otier.name = 'word';
+      const olevel = new OLevel('Orthographic', 'SEGMENT');
 
       let start = 0;
       for (let i = 0; i < lines.length; i++) {
@@ -84,41 +82,50 @@ export class CTMConverter extends Converter {
 
           if (i === 0 && start > 0) {
             // first segment not set
-            const osegment = new OSegment(
+            const osegment = new OSegment((i + 1),
               0,
               start * samplerate,
-              ''
+              [(new OLabel('Orthographic', ''))]
             );
-            otier.segments.push(osegment);
+
+            olevel.items.push(osegment);
           }
 
+          const olabels: OLabel[] = [];
+          olabels.push((new OLabel('Orthographic', columns[4])));
           const osegment = new OSegment(
+            (i + 1),
             Math.round(start * samplerate),
             Math.round(length * samplerate),
-            columns[4]
+            olabels
           );
 
-          otier.segments.push(osegment);
+          olevel.items.push(osegment);
 
           if (i === lines.length - 2) {
-                                    if ((start + length) < audiofile.duration) {
+            console.log(osegment);
+            console.log(olevel.items);
+            if ((start + length) < audiofile.duration) {
 
               const osegment_end = new OSegment(
+                (i + 2),
                 Math.round((start + length) * samplerate),
                 Math.round((audiofile.duration - (start + length)) * samplerate),
-                ''
+                [(new OLabel('Orthographic', ''))]
               );
 
-              otier.segments.push(osegment_end);
+              olevel.items.push(osegment_end);
             }
           }
 
           start += length;
         }
       }
-      result.tiers.push(otier);
+      result.levels.push(olevel);
     }
 
-        return result;
+    console.log('return');
+    console.log(result);
+    return result;
   };
 }

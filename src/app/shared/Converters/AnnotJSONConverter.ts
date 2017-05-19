@@ -1,5 +1,5 @@
 import {Converter, File} from './Converter';
-import {OAnnotation, OAudiofile, OTier} from '../../types/annotation';
+import {OAnnotJSON, OAudiofile, OLevel} from '../../types/annotjson';
 import {isNullOrUndefined} from 'util';
 
 export class AnnotJSONConverter extends Converter {
@@ -15,64 +15,21 @@ export class AnnotJSONConverter extends Converter {
     this._conversion.import = false;
   }
 
-  public export(annotation: OAnnotation): File {
-    const result = {
-      name: '',
-      annotates: '',
-      sampleRate: 0,
-      levels: [],
-      links: []
-    };
-    let filename = '';
-
+  public export(annotation: OAnnotJSON): File {
     if (!isNullOrUndefined(annotation)) {
-      // set default settings
-      result.name = annotation.audiofile.name;
-      result.annotates = annotation.audiofile.name + '.wav';
-      result.sampleRate = annotation.audiofile.samplerate;
-
-      for (let j = 0; j < annotation.tiers.length; j++) {
-        const tier: OTier = annotation.tiers[j];
-
-        result.levels.push({
-          name: tier.name,
-          type: 'SEGMENT',
-          items: []
-        });
-
-        for (let i = 0; i < tier.segments.length; i++) {
-          const segment = tier.segments[i];
-
-          result.levels[j].items.push(
-            {
-              id: (i + 1),
-              sampleStart: segment.start,
-              sampleDur: segment.length,
-              labels: [
-                {
-                  name: tier.name,
-                  value: segment.transcript
-                }
-              ]
-            }
-          );
-        }
-      }
-
-      filename = annotation.audiofile.name;
-
+      return {
+        name: annotation.name + '_annot.json',
+        content: JSON.stringify(annotation, null, 2),
+        encoding: 'UTF-8',
+        type: 'application/json'
+      };
     }
 
-    return {
-      name: filename + '_annot.json',
-      content: JSON.stringify(result, null, 2),
-      encoding: 'UTF-8',
-      type: 'application/json'
-    };
+    return null;
   };
 
   public import(file: File, audiofile: OAudiofile) {
-    const result = new OAnnotation();
+    const result = null;
 
     return null;
   };

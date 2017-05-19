@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {OAnnotation, OAudiofile} from '../../types/annotation';
+import {OAnnotJSON, OAudiofile} from '../../types/annotjson';
 import {AudioInfo} from '../../shared/AudioInfo';
 import {FileSize, Functions} from '../../shared/Functions';
 import {AppInfo} from '../../app.info';
@@ -19,7 +19,7 @@ export class OctraDropzoneComponent implements OnInit {
     return this._status;
   }
 
-  get oannotation(): OAnnotation {
+  get oannotation(): OAnnotJSON {
     return this._oannotation;
   }
 
@@ -40,7 +40,7 @@ export class OctraDropzoneComponent implements OnInit {
   }[] = [];
 
   private _oaudiofile: OAudiofile;
-  private _oannotation: OAnnotation;
+  private _oannotation: OAnnotJSON;
   private _status: string;
 
   public get files(): {
@@ -69,18 +69,20 @@ export class OctraDropzoneComponent implements OnInit {
 
             reader.onloadend = () => {
               if (file.status === 'progress') {
-                                                const ofile = {
+                const ofile = {
                   name: file.file.name,
                   content: reader.result,
                   type: file.file.type,
                   encoding: 'utf-8'
                 };
 
-                const test: OAnnotation = converter.import(ofile, this._oaudiofile);
+                const test: OAnnotJSON = converter.import(ofile, this._oaudiofile);
                 file.checked_converters++;
                 if (!isNullOrUndefined(test)) {
                   file.status = 'valid';
                   this._oannotation = test;
+                  console.log('test ok');
+                  console.log(test);
                   this.checkState();
                 } else if (file.checked_converters === AppInfo.converters.length) {
                   // last converter to check
@@ -113,22 +115,22 @@ export class OctraDropzoneComponent implements OnInit {
   public afterDrop() {
     this._files = [];
     this._oannotation = null;
-            for (let i = 0; i < this.dropzone.files.length; i++) {
+    for (let i = 0; i < this.dropzone.files.length; i++) {
       const file = {
         status: 'progress',
         file: this.dropzone.files[i],
         checked_converters: 0
       };
 
-                  if (Functions.contains(file.file.name, '.wav')) {
+      if (Functions.contains(file.file.name, '.wav')) {
         file.status = 'valid';
         const reader = new FileReader();
 
-                reader.onloadend = () => {
+        reader.onloadend = () => {
 
           // check audio
           const info: AudioInfo = new AudioInfo(reader.result);
-                    info.decodeAudio(reader.result).then(() => {
+          info.decodeAudio(reader.result).then(() => {
             this._oaudiofile = new OAudiofile();
             this._oaudiofile.name = file.file.name;
             this._oaudiofile.size = file.file.size;
@@ -141,7 +143,7 @@ export class OctraDropzoneComponent implements OnInit {
             for (let j = 0; j < this.dropzone.files.length; j++) {
               const importfile = this.dropzone.files[j];
               if (!Functions.contains(importfile.name, '.wav')) {
-                                const newfile = {
+                const newfile = {
                   status: 'progress',
                   file: this.dropzone.files[j],
                   checked_converters: 0
@@ -159,7 +161,7 @@ export class OctraDropzoneComponent implements OnInit {
 
         reader.readAsArrayBuffer(file.file);
         this._files.push(file);
-                break;
+        break;
       }
     }
   }

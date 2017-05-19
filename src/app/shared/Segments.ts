@@ -1,7 +1,7 @@
 import {Segment} from './Segment';
 import {AudioTime} from './AudioTime';
 import {EventEmitter} from '@angular/core';
-import {OSegment} from '../types/annotation';
+import {ISegment, OLabel, OSegment} from '../types/annotjson';
 
 export class Segments {
 
@@ -16,8 +16,9 @@ export class Segments {
   }
 
   private _segments: Segment[];
+  private type = 'SEGMENT';
 
-  constructor(private sample_rate: number, segments: OSegment[], last_sample: number) {
+  constructor(private sample_rate: number, segments: ISegment[], last_sample: number) {
     this._segments = [];
 
     if (segments.length === 0) {
@@ -226,17 +227,17 @@ export class Segments {
     this._segments = [];
   }
 
-  public getObj(): OSegment[] {
+  public getObj(labelname:string): OSegment[] {
     const result: OSegment[] = [];
 
     let start = 0;
     for (let i = 0; i < this._segments.length; i++) {
       const segment = this._segments[i];
-      result.push({
-        transcript: segment.transcript,
-        start: start,
-        length: (segment.time.samples - start)
-      });
+      const labels: OLabel[] = [];
+      labels.push(new OLabel(labelname, segment.transcript));
+
+      const annotSegment = new OSegment((i + 1), start, (segment.time.samples - start), labels);
+      result.push(annotSegment);
 
       start = segment.time.samples;
     }

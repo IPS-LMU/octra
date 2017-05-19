@@ -152,12 +152,12 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
         }));
     }
 
-    if (!isNullOrUndefined(this.transcrService.annotation.tiers[0].segments)) {
-      this.subscrmanager.add(this.transcrService.annotation.tiers[0].segments.onsegmentchange.subscribe(this.transcrService.saveSegments));
+    if (!isNullOrUndefined(this.transcrService.annotation.levels[0].segments)) {
+      this.subscrmanager.add(this.transcrService.annotation.levels[0].segments.onsegmentchange.subscribe(this.transcrService.saveSegments));
     } else {
       this.subscrmanager.add(this.transcrService.dataloaded.subscribe(() => {
         this.subscrmanager.add(
-          this.transcrService.annotation.tiers[0].segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
+          this.transcrService.annotation.levels[0].segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
         );
       }));
     }
@@ -184,7 +184,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
       }
     }
 
-    this.sessService.annotation.audiofile.samplerate = this.audio.samplerate;
+    this.sessService.annotation.sampleRate = this.audio.samplerate;
     this.change();
     this.navbarServ.show_interfaces = this.settingsService.projectsettings.navigation.interfaces;
 

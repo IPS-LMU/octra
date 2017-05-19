@@ -14,12 +14,12 @@ import {SettingsService} from './settings.service';
 import {isNullOrUndefined} from 'util';
 import {Http} from '@angular/http';
 import {FeedBackForm} from '../shared/FeedbackForm/FeedBackForm';
-import {IAudioFile, OAnnotation, OSegment, OTier} from '../types/annotation';
+import {IAudioFile, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../types/annotjson';
 import {Annotation} from '../shared/Annotation/Annotation';
-import {Tier} from '../shared/Annotation/Tier';
 import {Converter, File} from '../shared/Converters/Converter';
 import {TextConverter} from '../shared/Converters/TextConverter';
 import {AnnotJSONConverter} from '../shared/Converters/AnnotJSONConverter';
+import {Level} from '../shared/Annotation/Level';
 
 @Injectable()
 export class TranscriptionService {
@@ -154,6 +154,8 @@ export class TranscriptionService {
       this.filename = this.sessServ.file.name;
       if (this.filename.indexOf('.wav') > -1) {
         this.filename = this.filename.substr(0, this.filename.indexOf('.wav'));
+        console.log('filename cropped');
+        console.log(this.filename);
       }
     } else {
       const start = this.sessServ.audio_url.search(/(%|-|\.|[A-ZÄÖÜß]|[a-zäöü]|_|[0-9])*.wav/g);
@@ -167,6 +169,8 @@ export class TranscriptionService {
     this.loadSegments(this.audio.samplerate);
 
     this.navbarServ.exportformats.filename = this.filename;
+    console.log('th:');
+    console.log(this.filename);
     this.navbarServ.exportformats.bitrate = this.audio.bitrate;
     this.navbarServ.exportformats.samplerate = this.audio.samplerate;
     this.navbarServ.exportformats.filesize = Functions.getFileSize(this.audio.size);
@@ -192,13 +196,18 @@ export class TranscriptionService {
       this.sessServ.annotation = this.createNewAnnotation();
     }
 
-    this.sessServ.annotation.audiofile.samplerate = this.audio.samplerate;
-    this._annotation = new Annotation(this.sessServ.annotation.annotator, this.sessServ.annotation.audiofile);
+    console.log('AnnotJSON loaded');
+    console.log(this.sessServ.annotation);
+    this.sessServ.annotation.sampleRate = this.audio.samplerate;
+    const audiofile: OAudiofile = new OAudiofile();
+    audiofile.samplerate = this.audio.samplerate;
+    audiofile.name = this.sessServ.annotation.annotates;
+    this._annotation = new Annotation(this.sessServ.annotation.annotates, audiofile);
 
-        for (let i = 0; i < this.sessServ.annotation.tiers.length; i++) {
-      const tier: Tier = Tier.fromObj(this.sessServ.annotation.tiers[i],
+    for (let i = 0; i < this.sessServ.annotation.levels.length; i++) {
+      const level: Level = Level.fromObj(this.sessServ.annotation.levels[i],
         this.audio.samplerate, this.audio.duration.samples);
-      this._annotation.tiers.push(tier);
+      this._annotation.levels.push(level);
     }
 
     // load feedback form data
@@ -246,12 +255,12 @@ export class TranscriptionService {
 
       const transcript: any[] = [];
 
-      for (let i = 0; i < this.annotation.tiers[0].segments.length; i++) {
-        const segment = this.annotation.tiers[0].segments.get(i);
+      for (let i = 0; i < this.annotation.levels[0].segments.length; i++) {
+        const segment = this.annotation.levels[0].segments.get(i);
 
         let last_bound = 0;
         if (i > 0) {
-          last_bound = this.annotation.tiers[0].segments.get(i - 1).time.samples;
+          last_bound = this.annotation.levels[0].segments.get(i - 1).time.samples;
         }
 
         const segment_json: any = {
@@ -347,8 +356,8 @@ export class TranscriptionService {
       pause: 0
     };
 
-    for (let i = 0; i < this._annotation.tiers[0].segments.length; i++) {
-      const segment = this._annotation.tiers[0].segments.get(i);
+    for (let i = 0; i < this._annotation.levels[0].segments.length; i++) {
+      const segment = this._annotation.levels[0].segments.get(i);
 
       if (segment.transcript !== '') {
         if (this.break_marker != null && segment.transcript.indexOf(this.break_marker.code) > -1) {
@@ -481,7 +490,7 @@ export class TranscriptionService {
   }
 
   public requestSegment(segnumber: number) {
-    if (segnumber < this._annotation.tiers[0].segments.length) {
+    if (segnumber < this._annotation.levels[0].segments.length) {
       this.segmentrequested.emit(segnumber);
     } else {
     }
@@ -496,7 +505,7 @@ export class TranscriptionService {
   }
 
 
-  public createNewAnnotation(): OAnnotation {
+  public createNewAnnotation(): OAnnotJSON {
     let filesize = 0;
 
     if (!isNullOrUndefined(this.sessServ.sessionfile)) {
@@ -511,13 +520,11 @@ export class TranscriptionService {
       samplerate: this.audio.samplerate
     };
 
-    const tier: OTier = new OTier();
-    tier.name = 'orthographic';
-    tier.segments = [];
-    tier.segments.push(new OSegment(0, this.audio.duration.samples, ''));
-    const tiers: OTier[] = [];
-    tiers.push(tier);
+    const level: OLevel = new OLevel('orthographic', 'SEGMENT', []);
+    level.items.push(new OSegment(1, 0, this.audio.duration.samples, [(new OLabel('Orthographic', ''))]));
+    const levels: OLevel[] = [];
+    levels.push(level);
 
-    return new OAnnotation(this.sessServ.member_id, tiers, audiofile);
+    return new OAnnotJSON(this.filename, this.audio.samplerate, levels);
   }
 }

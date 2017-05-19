@@ -7,7 +7,7 @@ import {SubscriptionManager} from './shared/SubscriptionManager';
 import {isNullOrUndefined, isUndefined} from 'util';
 import {BugReportService, ConsoleType} from './service/bug-report.service';
 import {AppInfo} from './app.info';
-import {OAnnotation, OAudiofile, OSegment, OTier} from './types/annotation';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from './types/annotjson';
 import {environment} from '../environments/environment';
 
 @Component({
@@ -34,7 +34,7 @@ export class AppComponent implements OnDestroy {
               private sessService: SessionService,
               private settingsService: SettingsService,
               private bugService: BugReportService) {
-        if (!isNullOrUndefined(this.sessService.transcription)) {
+    if (!isNullOrUndefined(this.sessService.transcription)) {
       console.log('Convert to new OctraAnnotation...');
 
       const audiofile: OAudiofile = new OAudiofile();
@@ -50,22 +50,18 @@ export class AppComponent implements OnDestroy {
         const transcript = this.sessService.transcription[i].transcript;
         const time = this.sessService.transcription[i].time.samples;
 
-        segments.push({
-          start: start,
-          length: time - start,
-          transcript: transcript
-        });
+        const segment = new OSegment((i + 1), start, (time - start));
+        segment.labels.push(new OLabel('orthographic', transcript));
 
         start = time;
       }
 
-      const tier: OTier = new OTier();
-      tier.name = 'orthographic';
-      tier.segments = segments;
-      const tiers: OTier[] = [];
-      tiers.push(tier);
+      const level: OLevel = new OLevel('orthographic', 'SEGMENT');
+      level.items = segments;
+      const levels: OLevel[] = [];
+      levels.push(level);
 
-      const annotation: OAnnotation = new OAnnotation(this.sessService.member_id, tiers, audiofile);
+      const annotation: OAnnotJSON = new OAnnotJSON(audiofile.name, audiofile.samplerate, levels);
       console.log('IMPORTED:');
       this.sessService.localStr.store('annotation', annotation);
       console.log(this.sessService.annotation);

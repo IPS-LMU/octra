@@ -2,15 +2,15 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {LocalStorage, LocalStorageService, SessionStorage, SessionStorageService} from 'ng2-webstorage';
 import {SessionFile} from '../shared/SessionFile';
 import {isNullOrUndefined} from 'util';
-import {OAnnotation} from '../types/annotation';
+import {OAnnotJSON} from '../types/annotjson';
 
 @Injectable()
 export class SessionService {
-  get annotation(): OAnnotation {
+  get annotation(): OAnnotJSON {
     return this._annotation;
   }
 
-  set annotation(value: OAnnotation) {
+  set annotation(value: OAnnotJSON) {
     this._annotation = value;
   }
 
@@ -176,7 +176,7 @@ export class SessionService {
   @LocalStorage('easymode') private _easymode: boolean;
   @LocalStorage('comment') private _comment: string;
 
-  @LocalStorage('annotation') private _annotation: OAnnotation;
+  @LocalStorage('annotation') private _annotation: OAnnotJSON;
 
   // is user on the login page?
   private login: boolean;

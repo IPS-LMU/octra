@@ -53,8 +53,8 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
               private settingsService: SettingsService) {
     this.subscrmanager = new SubscriptionManager();
 
-    if (!this.transcrService.annotation.tiers[0].segments && this.sessService.annotation.audiofile.samplerate) {
-      this.transcrService.loadSegments(this.sessService.annotation.audiofile.samplerate);
+    if (!this.transcrService.annotation.levels[0].segments && this.sessService.annotation.sampleRate) {
+      this.transcrService.loadSegments(this.sessService.annotation.sampleRate);
     }
 
     this.loadForm();

@@ -3,7 +3,7 @@
     <modal-body>
         <app-transcr-overview *ngIf="transcrService.annotation !== null"
                               [visible]="modal_overview.visible"
-                              [segments]="transcrService.annotation.tiers[0].segments.segments"
+                              [segments]="transcrService.annotation.levels[0].segments.segments"
                               (segmentclicked)="onSegmentInOverviewClicked($event)"
         >
 
@@ -136,7 +136,7 @@
             <tbody>
             <tr>
                 <td>Anzahl Segmente:</td>
-                <td>{{transcrService.annotation.tiers[0].segments.length}}</td>
+                <td>{{transcrService.annotation.levels[0].segments.length}}</td>
             </tr>
             <tr>
                 <td>Anzahl Logeinträge:</td>

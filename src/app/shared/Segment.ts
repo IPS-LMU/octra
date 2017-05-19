@@ -1,5 +1,5 @@
 import {AudioTime} from './AudioTime';
-import {OSegment} from '../types/annotation';
+import {OSegment} from '../types/annotjson';
 
 export class Segment {
   get changed(): boolean {
@@ -26,10 +26,10 @@ export class Segment {
 
   public static fromObj(obj: OSegment, samplerate: number): Segment {
     if (obj) {
-      const seg = new Segment(AudioTime.fromSamples((obj.start + obj.length), samplerate));
+      const seg = new Segment(AudioTime.fromSamples((obj.sampleStart + obj.sampleDur), samplerate));
 
-      if (obj.transcript) {
-        seg._transcript = obj.transcript;
+      if (obj.labels[0].value) {
+        seg._transcript = obj.labels[0].value;
       }
 
       return seg;

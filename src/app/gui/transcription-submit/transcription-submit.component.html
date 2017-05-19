@@ -28,7 +28,7 @@
         {{"transcription-submit.overview" | translate}}
     </p>
     <app-transcr-overview [visible]="true" [show_transcriptiontable]="false"
-                          [segments]="transcrService.annotation.tiers[0].segments.segments"></app-transcr-overview>
+                          [segments]="transcrService.annotation.levels[0].segments.segments"></app-transcr-overview>
     <div *ngIf="!sessService.offline">
         <h3>Feedback</h3>
         <p>

@@ -1,4 +1,4 @@
-import {OAnnotation, OAudiofile} from '../../types/annotation';
+import {OAnnotJSON, OAudiofile} from '../../types/annotjson';
 
 export interface File {
   name: string;
@@ -52,7 +52,7 @@ export abstract class Converter {
 
   }
 
-  public abstract export(annotation: OAnnotation): File;
+  public abstract export(annotation: OAnnotJSON): File;
 
-  public abstract import(file: File, audiofile: OAudiofile): OAnnotation;
+  public abstract import(file: File, audiofile: OAudiofile): OAnnotJSON;
 }

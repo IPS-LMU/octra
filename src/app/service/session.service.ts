@@ -6,6 +6,14 @@ import {OAnnotJSON} from '../types/annotjson';
 
 @Injectable()
 export class SessionService {
+  get version(): string {
+    return this._version;
+  }
+
+  set version(value: string) {
+    this._version = value;
+  }
+
   get annotation(): OAnnotJSON {
     return this._annotation;
   }
@@ -136,8 +144,6 @@ export class SessionService {
   @SessionStorage('session_key') session_key: string;
   @SessionStorage() logged_in: boolean;
   @SessionStorage() logInTime: number; // timestamp
-  @SessionStorage() finishedTranscriptions: number;
-  @SessionStorage() nextTranscription = 0;
   @SessionStorage() transcriptionTime: any = {
     start: 0,
     end: 0
@@ -166,6 +172,7 @@ export class SessionService {
   @LocalStorage('offline') private _offline: boolean;
   @LocalStorage('sessionfile') _sessionfile: any;
   @LocalStorage('language') private _language: string;
+  @LocalStorage('version') private _version: string;
 
   // TODO DELETE
   @LocalStorage() member_id: string;
@@ -206,10 +213,6 @@ export class SessionService {
 
   get Interface(): string {
     return this._interface;
-  }
-
-  get FinishedTranscriptions(): number {
-    return this.finishedTranscriptions;
   }
 
   get TranscriptionTime(): any {
@@ -335,10 +338,6 @@ export class SessionService {
 
     return (isNullOrUndefined(this.sessStr.retrieve('data_id'))
     && isNullOrUndefined(this.sessStr.retrieve('audio_url')));
-  }
-
-  public incrementFinishedTranscriptions() {
-    this.finishedTranscriptions++;
   }
 
   public save(key: string, value: any): boolean {

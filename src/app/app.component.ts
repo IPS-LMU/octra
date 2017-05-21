@@ -7,8 +7,8 @@ import {SubscriptionManager} from './shared/SubscriptionManager';
 import {isNullOrUndefined, isUndefined} from 'util';
 import {BugReportService, ConsoleType} from './service/bug-report.service';
 import {AppInfo} from './app.info';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from './types/annotjson';
 import {environment} from '../environments/environment';
+import {UpdateManager} from './shared/UpdateManager';
 
 @Component({
   selector: 'app-octra',
@@ -34,40 +34,9 @@ export class AppComponent implements OnDestroy {
               private sessService: SessionService,
               private settingsService: SettingsService,
               private bugService: BugReportService) {
-    if (!isNullOrUndefined(this.sessService.transcription)) {
-      console.log('Convert to new OctraAnnotation...');
-
-      const audiofile: OAudiofile = new OAudiofile();
-      audiofile.name = '';
-      audiofile.size = 0;
-      audiofile.duration = 0;
-      audiofile.samplerate = 0;
-
-      const segments: OSegment[] = [];
-
-      let start = 0;
-      for (let i = 0; i < this.sessService.transcription.length; i++) {
-        const transcript = this.sessService.transcription[i].transcript;
-        const time = this.sessService.transcription[i].time.samples;
-
-        const segment = new OSegment((i + 1), start, (time - start));
-        segment.labels.push(new OLabel('orthographic', transcript));
-
-        start = time;
-      }
-
-      const level: OLevel = new OLevel('orthographic', 'SEGMENT');
-      level.items = segments;
-      const levels: OLevel[] = [];
-      levels.push(level);
-
-      const annotation: OAnnotJSON = new OAnnotJSON(audiofile.name, audiofile.samplerate, levels);
-      console.log('IMPORTED:');
-      this.sessService.localStr.store('annotation', annotation);
-      console.log(this.sessService.annotation);
-      console.log('delete old transcription');
-      this.sessService.localStr.store('transcription', null);
-    }
+    // check for Updates
+    const umanager = new UpdateManager(this.sessService);
+    umanager.checkForUpdates();
 
     // overwrite console.log
     const oldLog = console.log;

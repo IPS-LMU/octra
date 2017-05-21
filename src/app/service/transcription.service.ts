@@ -164,6 +164,7 @@ export class TranscriptionService {
       } else {
         this.filename = this.sessServ.audio_url;
       }
+      this.sessServ.annotation.annotates = this.filename + '.wav';
     }
     this.last_sample = this.audio.duration.samples;
     this.loadSegments(this.audio.samplerate);

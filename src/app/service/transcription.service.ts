@@ -156,7 +156,6 @@ export class TranscriptionService {
         this.filename = this.filename.substr(0, this.filename.indexOf('.wav'));
         console.log('filename cropped');
         console.log(this.filename);
-        this.sessServ.annotation.annotates = this.filename + '.wav';
       }
     } else {
       const start = this.sessServ.audio_url.search(/(%|-|\.|[A-ZÄÖÜß]|[a-zäöü]|_|[0-9])*.wav/g);
@@ -165,7 +164,6 @@ export class TranscriptionService {
       } else {
         this.filename = this.sessServ.audio_url;
       }
-      this.sessServ.annotation.annotates = this.filename + '.wav';
     }
     this.last_sample = this.audio.duration.samples;
     this.loadSegments(this.audio.samplerate);
@@ -197,6 +195,8 @@ export class TranscriptionService {
     if (isNullOrUndefined(this.sessServ.annotation)) {
       this.sessServ.annotation = this.createNewAnnotation();
     }
+
+    this.sessServ.annotation.annotates = this.filename + '.wav';
 
     console.log('AnnotJSON loaded');
     console.log(this.sessServ.annotation);

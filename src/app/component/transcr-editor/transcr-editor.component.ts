@@ -7,6 +7,7 @@ import {TranscrEditorConfigValidator} from './validator/TranscrEditorConfigValid
 import {SettingsService} from '../../service/settings.service';
 import {TranscriptionService} from '../../service/transcription.service';
 import {isNullOrUndefined} from 'util';
+declare var window: any;
 
 @Component({
   selector: 'app-transcr-editor',
@@ -89,31 +90,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     if (renew) {
-      const navigation = this.initNavigation();
-
       this.textfield.summernote('destroy');
-      this.textfield.summernote({
-        height: this.Settings.height,
-        focus: true,
-        disableDragAndDrop: true,
-        disableResizeEditor: true,
-        disableResizeImage: true,
-        popover: [],
-        airPopover: [],
-        toolbar: [
-          ['mybutton', navigation.str_array]
-        ],
-        shortcuts: false,
-        buttons: navigation.buttons,
-        callbacks: {
-          onKeydown: this.onKeyDownSummernote,
-          onKeyup: this.onKeyUpSummernote,
-          onPaste: function (e) {
-            // prevent copy paste
-            e.preventDefault();
-          }
-        }
-      });
+      this.initialize();
     }
   }
 
@@ -128,24 +106,27 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     html = '<p>' + html + '</p>';
     const dom = jQuery(html);
 
-    const test = dom.text();
     const replace_func = (i, elem) => {
-      let attr = jQuery(elem).attr('data-marker-code');
-      if (elem.type === 'select-one') {
-        const value = jQuery(elem).attr('data-value');
-        attr += '=' + value;
-      }
-      if (attr) {
-        for (let j = 0; j < this.markers.length; j++) {
-          const marker = this.markers[j];
-          if (attr === marker.code) {
-
-            jQuery(elem).replaceWith(Functions.escapeHtml(attr));
-            break;
-          }
+      if (jQuery(elem).children() !== null && jQuery(elem).children().length > 0) {
+        jQuery.each(jQuery(elem).children(), replace_func);
+      } else {
+        let attr = jQuery(elem).attr('data-marker-code');
+        if (elem.type === 'select-one') {
+          const value = jQuery(elem).attr('data-value');
+          attr += '=' + value;
         }
-      } else if (jQuery(elem).attr('class') !== 'error_underline') {
-        jQuery(elem).remove();
+        if (attr) {
+          for (let j = 0; j < this.markers.length; j++) {
+            const marker = this.markers[j];
+            if (attr === marker.code) {
+
+              jQuery(elem).replaceWith(Functions.escapeHtml(attr));
+              break;
+            }
+          }
+        } else if (jQuery(elem).attr('class') !== 'error_underline') {
+          jQuery(elem).remove();
+        }
       }
     };
 
@@ -199,9 +180,19 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       callbacks: {
         onKeydown: this.onKeyDownSummernote,
         onKeyup: this.onKeyUpSummernote,
-        onPaste: function (e) {
+        onPaste: (e) => {
           // prevent copy paste
+          console.log('PASTE');
+
+          const bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
+          console.log(bufferText);
+          const html = this.rawToHTML(bufferText);
+          const element = document.createElement('span');
+          element.innerHTML = html;
           e.preventDefault();
+          this.textfield.summernote('editor.insertNode', element);
+          this.updateTextField();
+          console.log('raw: ' + this._rawText);
         },
         onChange: () => {
           this.init++;

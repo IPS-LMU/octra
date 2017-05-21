@@ -98,7 +98,7 @@
                 <div class="form-group" [hidden]="!sendpro.checked">
                     <label for="bgProtocol" class="col-md-2 control-label">{{'general.protocol' | translate}}:</label>
                     <div class="col-md-10">
-                        <textarea class="form-control" #bgProtocol [innerHTML]="bugService.getText()" id="bgProtocol"
+                        <textarea *ngIf="bugreport.visible" class="form-control" #bgProtocol [innerHTML]="bugService.getText()" id="bgProtocol"
                                   disabled></textarea>
                     </div>
                 </div>

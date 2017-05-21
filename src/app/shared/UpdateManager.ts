@@ -43,6 +43,7 @@ export class UpdateManager {
           const segment = new OSegment((i + 1), start, (time - start));
           segment.labels.push(new OLabel('Orthographic', transcript));
 
+          segments.push(segment);
           start = time;
         }
 
@@ -57,6 +58,7 @@ export class UpdateManager {
         console.log(this.sessService.annotation);
         console.log('delete old transcription');
         this.sessService.localStr.store('transcription', null);
+        this.sessService.version = appversion;
       } else {
         // OCTRAJSON found
         console.log('clear OCTRAJSON');

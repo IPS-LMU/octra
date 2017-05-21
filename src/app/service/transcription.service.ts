@@ -156,6 +156,7 @@ export class TranscriptionService {
         this.filename = this.filename.substr(0, this.filename.indexOf('.wav'));
         console.log('filename cropped');
         console.log(this.filename);
+        this.sessServ.annotation.annotates = this.filename + '.wav';
       }
     } else {
       const start = this.sessServ.audio_url.search(/(%|-|\.|[A-ZÄÖÜß]|[a-zäöü]|_|[0-9])*.wav/g);

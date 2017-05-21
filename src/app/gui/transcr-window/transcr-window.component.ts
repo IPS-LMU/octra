@@ -111,6 +111,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
 
     this.loupe.Settings.boundaries.readonly = true;
+    this.loupe.zoomY = 4;
     this.changeArea(begin, segment.time);
     setTimeout(() => {
       this.loupe.viewer.startPlayback();

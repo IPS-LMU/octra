@@ -8,6 +8,11 @@ import {isNullOrUndefined} from 'util';
 import {ModalService} from '../../service/modal.service';
 import {Converter, File} from '../../shared/Converters/Converter';
 import {AppInfo} from '../../app.info';
+import {TextConverter} from '../../shared/Converters/TextConverter';
+import {TranscriptionService} from '../../service/transcription.service';
+import {UserInteractionsService} from '../../service/userInteractions.service';
+import {StatisticElem} from '../../shared/StatisticElement';
+import {SettingsService} from '../../service/settings.service';
 
 @Component({
   selector: 'app-navigation',
@@ -34,11 +39,29 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     return AppInfo.converters;
   }
 
+  public get transcrServ(): TranscriptionService {
+    return this.navbarServ.transcrService;
+  }
+
+  public get uiService(): UserInteractionsService {
+    return this.navbarServ.uiService;
+  }
+
+  get dat(): string {
+    return JSON.stringify(this.transcrServ.exportDataToJSON(), null, 3);
+  }
+
+  get UIElements(): StatisticElem[] {
+    return (!isNullOrUndefined(this.uiService)) ? this.uiService.elements : null;
+  }
+
   constructor(public sessService: SessionService,
               public navbarServ: NavbarService,
               public sanitizer: DomSanitizer,
               public langService: TranslateService,
-              public modService: ModalService) {
+              public modService: ModalService,
+              public settService: SettingsService
+  ) {
   }
 
   ngOnDestroy() {
@@ -122,4 +145,18 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     this.parentformat.download = result.name;
     this.parentformat.uri = this.sanitize(this.getURI(result));
   }
+
+  getText() {
+    if (!isNullOrUndefined(this.transcrServ)) {
+      return this.navbarServ.transcrService.getTranscriptString(new TextConverter());
+    }
+
+    return '';
+  }
+
+  clearElements() {
+    this.uiService.clear();
+    this.sessService.save('logs', this.uiService.elementsToAnyArray());
+  }
+
 }

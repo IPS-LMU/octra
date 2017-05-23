@@ -14,7 +14,8 @@
 }
 
 #special{
-    width: 97%;
-    margin: 0 auto;
+    width: 100%;
+    background-color:white;
+    padding:2%;
     border: 1px solid dimgray;
 }

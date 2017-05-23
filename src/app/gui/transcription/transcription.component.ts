@@ -96,6 +96,8 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
               private api: APIService) {
     this.subscrmanager = new SubscriptionManager();
 
+    this.navbarServ.transcrService = this.transcrService;
+    this.navbarServ.uiService = this.uiService;
     if (!isNullOrUndefined(this.projectsettings) && !isNullOrUndefined(this.projectsettings.logging)
       && this.projectsettings.logging.forced) {
       this.subscrmanager.add(this.audio.statechange.subscribe((obj) => {
@@ -105,14 +107,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
         }
       }));
     }
-  }
-
-  get dat(): string {
-    return JSON.stringify(this.transcrService.exportDataToJSON(), null, 3);
-  }
-
-  get UIElements(): StatisticElem[] {
-    return this.uiService.elements;
   }
 
   private get app_settings() {
@@ -272,15 +266,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
       }
       $event.preventDefault();
     }
-  }
-
-  getText() {
-    return this.transcrService.getTranscriptString(new TextConverter());
-  }
-
-  clearElements() {
-    this.uiService.clear();
-    this.sessService.save('logs', this.uiService.elementsToAnyArray());
   }
 
   onSegmentInOverviewClicked(segnumber: number) {

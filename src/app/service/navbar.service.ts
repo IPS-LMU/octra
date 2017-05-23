@@ -3,6 +3,8 @@ import {File} from '../shared/Converters/Converter';
 import {TextConverter} from '../shared/Converters/TextConverter';
 import {SessionService} from './session.service';
 import {AnnotJSONConverter} from '../shared/Converters/AnnotJSONConverter';
+import {TranscriptionService} from './transcription.service';
+import {UserInteractionsService} from './userInteractions.service';
 
 @Injectable()
 export class NavbarService {
@@ -47,6 +49,9 @@ export class NavbarService {
   private _show_export = false;
   private _show_interfaces = false;
   private _interfaces: string[] = [];
+
+  public transcrService: TranscriptionService;
+  public uiService: UserInteractionsService;
 
   public dataloaded = false;
 

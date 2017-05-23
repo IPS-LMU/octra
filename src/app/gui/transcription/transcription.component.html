@@ -39,7 +39,7 @@
                     <tbody>
                     <tr *ngFor="let entry of keyMap.getEntryList('AV')">
                         <td>{{"modal.shortcuts."+ entry.value.title | translate}}</td>
-                        <td>{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly" class="focus-info">({{"general.on focus only" | translate}})</span>
+                        <td>{{entry.value.keys[platform]}} <span *ngIf="(entry.value !== null && entry.value.focusonly)" class="focus-info">({{"general.on focus only" | translate}})</span>
                         </td>
                     </tr>
                     </tbody>
@@ -51,7 +51,7 @@
                     <tbody>
                     <tr *ngFor="let entry of keyMap.getEntryList('Loupe')">
                         <td>{{"modal.shortcuts."+ entry.value.title |translate}}</td>
-                        <td>{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly" class="focus-info">({{"general.on focus only" | translate}})</span>
+                        <td>{{entry.value.keys[platform]}} <span *ngIf="(entry.value !== null && entry.value.focusonly)" class="focus-info">({{"general.on focus only" | translate}})</span>
                         </td>
                     </tr>
                     </tbody>

@@ -81,9 +81,7 @@ export class OctraDropzoneComponent implements OnInit {
                 if (!isNullOrUndefined(test)) {
                   file.status = 'valid';
                   this._oannotation = test;
-                  console.log('test ok');
-                  console.log(test);
-                  this.checkState();
+                                                      this.checkState();
                 } else if (file.checked_converters === AppInfo.converters.length) {
                   // last converter to check
                   file.status = 'invalid';
@@ -139,8 +137,7 @@ export class OctraDropzoneComponent implements OnInit {
             this.checkState();
 
             // load import data
-            console.log('check now other import');
-            for (let j = 0; j < this.dropzone.files.length; j++) {
+                        for (let j = 0; j < this.dropzone.files.length; j++) {
               const importfile = this.dropzone.files[j];
               if (!Functions.contains(importfile.name, '.wav')) {
                 const newfile = {

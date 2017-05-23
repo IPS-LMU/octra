@@ -90,6 +90,9 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
       case('backward'):
         this.audioplayer.stepBackward();
         break;
+      case('backward time'):
+        this.audioplayer.stepBackwardTime(3, 0.5);
+        break;
       case('default'):
         break;
     }

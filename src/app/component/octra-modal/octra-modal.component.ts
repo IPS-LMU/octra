@@ -79,8 +79,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
       this.api.sendBugReport(this.bgemail, this.bgdescr, bugs).subscribe(
         (result) => {
           this.bugsent = true;
-          console.log(result);
-          setTimeout(() => {
+                    setTimeout(() => {
             this.bgdescr = '';
             this.bugreport.close();
             this.bugsent = false;

@@ -182,18 +182,15 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         onKeyup: this.onKeyUpSummernote,
         onPaste: (e) => {
           // prevent copy paste
-          console.log('PASTE');
 
           const bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
-          console.log(bufferText);
-          const html = this.rawToHTML(bufferText);
+                    const html = this.rawToHTML(bufferText);
           const element = document.createElement('span');
           element.innerHTML = html;
           e.preventDefault();
           this.textfield.summernote('editor.insertNode', element);
           this.updateTextField();
-          console.log('raw: ' + this._rawText);
-        },
+                  },
         onChange: () => {
           this.init++;
 

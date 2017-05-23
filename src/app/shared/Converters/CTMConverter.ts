@@ -103,9 +103,7 @@ export class CTMConverter extends Converter {
           olevel.items.push(osegment);
 
           if (i === lines.length - 2) {
-            console.log(osegment);
-            console.log(olevel.items);
-            if ((start + length) < audiofile.duration) {
+                                    if ((start + length) < audiofile.duration) {
 
               const osegment_end = new OSegment(
                 (i + 2),
@@ -124,8 +122,6 @@ export class CTMConverter extends Converter {
       result.levels.push(olevel);
     }
 
-    console.log('return');
-    console.log(result);
-    return result;
+            return result;
   };
 }

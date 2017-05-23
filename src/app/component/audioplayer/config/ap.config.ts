@@ -49,6 +49,14 @@ export class AudioplayerConfig {
                 },
                 title: 'step backward',
                 focusonly: false
+            },
+            step_backwardtime: {
+                keys: {
+                    mac: 'SHIFT + TAB',
+                    pc: 'SHIFT + TAB'
+                },
+                title: 'step backward time',
+                focusonly: false
             }
         }
     };

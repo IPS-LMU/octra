@@ -1,6 +1,7 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {KeyMapping} from '../shared/KeyMapping';
 import {BrowserInfo} from '../shared/BrowserInfo';
+import {isNullOrUndefined} from 'util';
 
 @Injectable()
 export class KeymappingService {
@@ -51,7 +52,7 @@ export class KeymappingService {
         const result: Entry[] = [];
 
         for (const entry in list) {
-          if (list.hasOwnProperty(entry)) {
+          if (!isNullOrUndefined(list[entry]) && list.hasOwnProperty(entry)) {
             const val = list[entry];
             result.push(new Entry(entry, val));
           }

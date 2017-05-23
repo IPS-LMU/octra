@@ -82,8 +82,10 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
 
     this.loupe.Settings.shortcuts = this.keyMap.register('Loupe', this.loupe.Settings.shortcuts);
-    this.loupe.Settings.shortcuts.play_pause.keys.mac = 'SHIFT + TAB';
-    this.loupe.Settings.shortcuts.play_pause.keys.pc = 'SHIFT + TAB';
+    this.loupe.Settings.shortcuts.play_pause.keys.mac = 'SPACE';
+    this.loupe.Settings.shortcuts.play_pause.keys.pc = 'SPACE';
+    this.loupe.Settings.shortcuts.play_pause.focusonly = true;
+    this.loupe.Settings.shortcuts.step_backwardtime = null;
     this.loupe.Settings.shortcuts.step_backward.keys.mac = 'SHIFT + ENTER';
     this.loupe.Settings.shortcuts.step_backward.keys.pc = 'SHIFT + ENTER';
     this.loupe.Settings.justify_signal_height = true;
@@ -126,12 +128,10 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
             this.miniloupe.zoomY = Math.max(1, this.miniloupe.zoomY + 1);
 
             if (this.viewer.focused) {
-              console.log('viewer focused');
-              this.changeArea(this.miniloupe, this.viewer, this.mini_loupecoord,
+                            this.changeArea(this.miniloupe, this.viewer, this.mini_loupecoord,
                 this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
             } else if (this.loupe.focused) {
-              console.log('loupe focused');
-              this.changeArea(this.miniloupe, this.loupe.viewer, this.mini_loupecoord,
+                            this.changeArea(this.miniloupe, this.loupe.viewer, this.mini_loupecoord,
                 this.viewer.MouseCursor.timePos.samples, this.loupe.MouseCursor.relPos.x, this.factor);
             }
           } else if (event.key === '-') {
@@ -139,12 +139,10 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
               this.factor = Math.max(3, this.factor - 1);
               this.miniloupe.zoomY = Math.max(1, this.miniloupe.zoomY - 1);
               if (this.viewer.focused) {
-                console.log('viewer focused');
-                this.changeArea(this.miniloupe, this.viewer, this.mini_loupecoord,
+                                this.changeArea(this.miniloupe, this.viewer, this.mini_loupecoord,
                   this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
               } else if (this.loupe.focused) {
-                console.log('loupe focused');
-                this.changeArea(this.miniloupe, this.loupe.viewer, this.mini_loupecoord,
+                                this.changeArea(this.miniloupe, this.loupe.viewer, this.mini_loupecoord,
                   this.viewer.MouseCursor.timePos.samples, this.loupe.MouseCursor.relPos.x, this.factor);
               }
             }
@@ -181,6 +179,9 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
       case('backward'):
         this.viewer.stepBackward();
         break;
+      case('backward time'):
+        this.viewer.stepBackwardTime(3, 0.5);
+        break;
       case('default'):
         break;
     }
@@ -214,9 +215,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onMouseOver(cursor: AVMousePos) {
-    console.log('zoom loupe: ' + this.viewer.av.zoomY);
-    console.log('zoom miniloupe: ' + this.miniloupe.zoomY);
-    this.mini_loupecoord.component = this.viewer;
+            this.mini_loupecoord.component = this.viewer;
 
     if (!this.audio.audioplaying && this.sessService.playonhover) {
       // play audio

@@ -209,8 +209,7 @@ export class AudioviewerService extends AudioComponentService {
 
 
   private calculateZoom(height: number, width: number, minmaxarray: number[]) {
-    console.log('calculate zoom');
-    if (this.Settings.justify_signal_height) {
+        if (this.Settings.justify_signal_height) {
       // justify height to maximum top border
       let max_zoom_x = 0;
       let max_zoom_y = 0;
@@ -359,11 +358,11 @@ export class AudioviewerService extends AudioComponentService {
     const absXInTime = this.audioTCalculator.absXChunktoSamples(absX, this.Chunk);
 
     if (this.selection && !this.audio.audioplaying) {
-      if (this.last_line == null || this.last_line === curr_line) {
+      if (this.last_line === null || this.last_line === curr_line) {
         // same line
         // fix margin settings
         if ($event.type === 'mousedown' && !this.shift_pressed) {
-          if (this.last_line == null || this.last_line.number === this.last_line.number) {
+          if (this.last_line === null || this.last_line.number === this.last_line.number) {
             // no line defined or same line
             this.mouse_click_pos.absX = absX;
             this.mouse_click_pos.timePos = new AudioTime(absXInTime, this.audio.samplerate);

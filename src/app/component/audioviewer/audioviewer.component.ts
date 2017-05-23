@@ -27,6 +27,7 @@ import {
 import {AudioService, KeymappingService, TranscriptionService} from '../../service';
 import {AudioviewerService} from './service/audioviewer.service';
 import {TranslateService} from '@ngx-translate/core';
+import {isNullOrUndefined} from 'util';
 
 @Component({
   selector: 'app-audioviewer',
@@ -626,6 +627,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
       this.av.setMouseClickPosition(x, y, curr_line, $event, this.innerWidth, () => {
         this.drawPlayCursorOnly(curr_line);
       });
+      this._begintime = this.av.current;
       this.drawSegments();
       this.drawCursor(this.av.LastLine);
       this.selchange.emit(this.av.Selection);
@@ -652,8 +654,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
         let key_active = false;
         for (const shortc in this.Settings.shortcuts) {
           if (this.Settings.shortcuts.hasOwnProperty(shortc)) {
-            const focuscheck = this.Settings.shortcuts['' + shortc + ''].focusonly === false
-              || (this.Settings.shortcuts['' + shortc + ''].focusonly === this.focused === true);
+            const shortcut = this.Settings.shortcuts['' + shortc + ''];
+            const focuscheck = (!isNullOrUndefined(shortcut)) && (shortcut.focusonly === false
+              || (shortcut.focusonly === this.focused === true));
 
             if (focuscheck && this.Settings.shortcuts['' + shortc + '']['keys']['' + platform + ''] === comboKey) {
               switch (shortc) {
@@ -676,6 +679,12 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
                   this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
 
                   this.stepBackward();
+                  key_active = true;
+                  break;
+                case('step_backwardtime'):
+                  this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
+
+                  this.stepBackwardTime(3, 0.5);
                   key_active = true;
                   break;
                 case('set_boundary'):
@@ -833,12 +842,14 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
   /**
    * playSelection() plays the selected signal fragment or the selection in this chunk
    */
-  playSelection = () => {
+  playSelection = (calculatetimes: boolean = true) => {
     this.audio.audioplaying = false;
-    this.av.Selection.checkSelection();
-    this._begintime = this.av.calculateBeginTime();
-    this.av.updatePlayDuration();
-    this.av.updateDistance();
+    if (calculatetimes) {
+      this.av.Selection.checkSelection();
+      this._begintime = this.av.calculateBeginTime();
+      this.av.updatePlayDuration();
+      this.av.updateDistance();
+    }
 
     const drawFunc = () => {
       this.anim.requestFrame(this.drawPlayCursor);
@@ -874,9 +885,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
   /**
    * start audio playback
    */
-  startPlayback() {
+  startPlayback(calculatetimes: boolean = true) {
     if (!this.audio.audioplaying && this.av.MouseClickPos.absX < this.av.AudioPxWidth - 5) {
-      this.playSelection();
+      this.playSelection(calculatetimes);
     }
   }
 
@@ -894,28 +905,26 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
   stepBackward() {
     this.audio.stepBackward(() => {
       // audio not playing
-      if (this.av.lastplayedpos != null) {
+      if (this.av.lastplayedpos !== null) {
         this.av.current = this.av.lastplayedpos.clone();
 
         this.av.PlayCursor.changeSamples(this.av.lastplayedpos.samples, this.av.audioTCalculator, this.av.Chunk);
         this.drawPlayCursorOnly(this.av.LastLine);
-        this._begintime = this.av.current.clone();
         this.startPlayback();
       }
     });
   }
 
-  stepBackwardTime() {
+  stepBackwardTime(duration_sec: number, back_sec: number) {
     this.audio.stepBackwardTime(() => {
-      // audio not playing
-      if (this.av.lastplayedpos != null) {
-        this.av.current = this.av.lastplayedpos.clone();
-
-        this.av.PlayCursor.changeSamples(this.av.lastplayedpos.samples, this.av.audioTCalculator, this.av.Chunk);
-        this.drawPlayCursorOnly(this.av.LastLine);
-        this._begintime = this.av.current.clone();
-        this.startPlayback();
-      }
+      this._begintime = this.PlayCursor.time_pos.clone();
+      this.av.PlayCursor.changeSamples(this._begintime.samples - (this.audio.samplerate), this.av.audioTCalculator, this.av.Chunk);
+      this.drawPlayCursorOnly(this.av.LastLine);
+      this._begintime.samples = Math.max(0, (this._begintime.samples - (Math.floor(back_sec * this.audio.samplerate))));
+      this.av.current.samples = this._begintime.samples;
+      this.av.playduration.samples = duration_sec * (this.audio.samplerate);
+      this.av.Distance = this.av.audioTCalculator.samplestoAbsX(this.av.playduration.samples);
+      this.startPlayback(false);
     });
   }
 
@@ -1109,16 +1118,20 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
       this.av.current.samples = this.av.PlayCursor.time_pos.samples;
     } else {
       if (!this.audio.stepbackward) {
-        if (this.av.Selection.start.samples >= 0 && this.av.Selection.end.samples > this.av.Selection.start.samples) {
-          // return to start position
-          this.changePlayCursorSamples(this.av.Selection.start.samples);
-          this.av.current = this.av.Selection.start.clone();
-        } else {
-          this.changePlayCursorSamples(this.av.Chunk.time.start.samples);
-          this.av.current.samples = this.av.Chunk.time.start.samples;
-        }
+                /*
+         if (this.av.Selection.start.samples >= 0 && this.av.Selection.end.samples > this.av.Selection.start.samples) {
+         // return to start position
+         this.changePlayCursorSamples(this.av.Selection.start.samples);
+         this.av.current = this.av.Selection.start.clone();
+         } else {
+         this.changePlayCursorSamples(this.av.Chunk.time.start.samples);
+         this.av.current.samples = this.av.Chunk.time.start.samples;
+         }
+         */
+        this.changePlayCursorSamples(this.av.current.samples);
         const currentAbsX = this.av.audioTCalculator.samplestoAbsX((this.av.current.samples - this.av.Chunk.time.start.samples));
         if (this.av.PlayCursor.absX < this.av.Distance + currentAbsX - 1) {
+          // TODO Check this mehtod
           setTimeout(() => {
             this.drawPlayCursor();
           }, 100);

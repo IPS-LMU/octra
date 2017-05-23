@@ -312,6 +312,11 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
                   this.stepBackward();
                   key_active = true;
                   break;
+                case('step_backwardtime'):
+                  this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
+                  this.stepBackwardTime(3, 0.5);
+                  key_active = true;
+                  break;
               }
             }
 
@@ -332,27 +337,20 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
    * playSelection() plays the selected signal fragment. Playback start and duration
    * depend on the current selection.
    */
-  private playSelection() {
+  private playSelection(computetimes: boolean = true) {
     // calculate time from which audio is played
-    this.ap.begintime = this.ap.calculateBeginTime();
-    this.ap.updatePlayDuration();
-    this.ap.updateDistance();
+    if (computetimes) {
+            this.ap.begintime = this.ap.calculateBeginTime();
+      this.ap.updatePlayDuration();
+      this.ap.updateDistance();
+    }
 
     // define callback for end event
     const endPlaybackEvent = () => {
       this.audio.audioplaying = false;
       this.audio.javascriptNode.disconnect();
 
-      if (this.audio.paused) {
-        this.ap.current.samples = this.ap.PlayCursor.time_pos.samples;
-      } else {
-        if (this.audio.stepbackward) {
-        } else {
-          this.changePlayCursorAbsX(0);
-          this.ap.current.samples = 0;
-        }
-      }
-
+      this.ap.current.samples = this.ap.PlayCursor.time_pos.samples;
       if (this.audio.replay === true) {
         this.playSelection();
       }
@@ -366,7 +364,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
     this.ap.lastplayedpos = this.ap.begintime.clone();
-    this.audio.startPlayback(this.ap.begintime, this.ap.DurTime, drawFunc, endPlaybackEvent);
+    this.audio.startPlayback(this.ap.begintime, this.ap.playduration, drawFunc, endPlaybackEvent);
   }
 
   /**
@@ -391,9 +389,9 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
   /**
    * start playback
    */
-  public startPlayback() {
+  public startPlayback(computetimes: boolean = true) {
     if (!this.audio.audioplaying) {
-      this.playSelection();
+      this.playSelection(computetimes);
     }
   }
 
@@ -425,13 +423,25 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
     this.audio.stepBackward(() => {
       // audio not playing
 
-      if (this.ap.lastplayedpos != null) {
+      if (this.ap.lastplayedpos !== null) {
         this.ap.current = this.ap.lastplayedpos.clone();
         this.ap.PlayCursor.changeSamples(this.ap.lastplayedpos.samples, this.ap.audioTCalculator);
         this.drawPlayCursorOnly(this.ap.LastLine);
         this.ap.begintime = this.ap.lastplayedpos.clone();
         this.startPlayback();
       }
+    });
+  }
+
+  stepBackwardTime(duration_sec: number, back_sec: number) {
+    this.audio.stepBackwardTime(() => {
+            this.ap.PlayCursor.changeSamples(this.ap.current.samples - (back_sec * this.audio.samplerate), this.ap.audioTCalculator, this.ap.Chunk);
+      this.drawPlayCursorOnly(this.ap.LastLine);
+      this.ap.current.samples = Math.max(0, (this.ap.current.samples - (Math.floor(back_sec * this.audio.samplerate))));
+      this.ap.begintime.samples = this.ap.current.samples;
+      this.ap.playduration.samples = duration_sec * (this.audio.samplerate);
+      this.ap.Distance = this.ap.audioTCalculator.samplestoAbsX(this.ap.playduration.samples);
+            this.startPlayback(false);
     });
   }
 

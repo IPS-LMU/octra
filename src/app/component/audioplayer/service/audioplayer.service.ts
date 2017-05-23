@@ -143,11 +143,11 @@ export class AudioplayerService extends AudioComponentService {
     super.setMouseClickPosition(x, y, curr_line, $event, innerWidth);
 
     if (!this.audio.audioplaying) {
-      if (this.last_line == null || this.last_line === curr_line) {
+      if (this.last_line === null || this.last_line === curr_line) {
         // same line
         // fix margin _settings
         if ($event.type === 'mousedown') {
-          if (this.last_line == null || this.last_line.number === this.last_line.number) {
+          if (this.last_line === null || this.last_line.number === this.last_line.number) {
             if (x < this.PlayCursor.absX - 5 && x > this.PlayCursor.absX + 5) {
               // selection disabled
             } else {

@@ -84,6 +84,14 @@ export class AudioviewerConfig {
         focusonly: false,
         title: 'step backward'
       },
+      step_backwardtime: {
+        keys: {
+          mac: 'SHIFT + TAB',
+          pc: 'SHIFT + TAB'
+        },
+        title: 'step backward time',
+        focusonly: false
+      },
       segment_enter: {
         keys: {
           mac: 'ENTER',

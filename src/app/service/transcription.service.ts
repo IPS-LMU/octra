@@ -154,9 +154,7 @@ export class TranscriptionService {
       this.filename = this.sessServ.file.name;
       if (this.filename.indexOf('.wav') > -1) {
         this.filename = this.filename.substr(0, this.filename.indexOf('.wav'));
-        console.log('filename cropped');
-        console.log(this.filename);
-      }
+                      }
     } else {
       const start = this.sessServ.audio_url.search(/(%|-|\.|[A-ZÄÖÜß]|[a-zäöü]|_|[0-9])*.wav/g);
       if (start > -1) {
@@ -169,9 +167,7 @@ export class TranscriptionService {
     this.loadSegments(this.audio.samplerate);
 
     this.navbarServ.exportformats.filename = this.filename;
-    console.log('th:');
-    console.log(this.filename);
-    this.navbarServ.exportformats.bitrate = this.audio.bitrate;
+            this.navbarServ.exportformats.bitrate = this.audio.bitrate;
     this.navbarServ.exportformats.samplerate = this.audio.samplerate;
     this.navbarServ.exportformats.filesize = Functions.getFileSize(this.audio.size);
     this.navbarServ.exportformats.duration = this.audio.duration.unix;
@@ -198,9 +194,7 @@ export class TranscriptionService {
 
     this.sessServ.annotation.annotates = this.filename + '.wav';
 
-    console.log('AnnotJSON loaded');
-    console.log(this.sessServ.annotation);
-    this.sessServ.annotation.sampleRate = this.audio.samplerate;
+            this.sessServ.annotation.sampleRate = this.audio.samplerate;
     const audiofile: OAudiofile = new OAudiofile();
     audiofile.samplerate = this.audio.samplerate;
     audiofile.name = this.sessServ.annotation.annotates;

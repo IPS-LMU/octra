@@ -314,7 +314,7 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
         this.viewer.stepBackward();
         break;
       case('backward time'):
-        this.viewer.stepBackwardTime();
+        this.viewer.stepBackwardTime(3, 0.5);
         break;
       case('default'):
         break;

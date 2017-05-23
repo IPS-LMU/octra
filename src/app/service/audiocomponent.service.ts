@@ -58,6 +58,10 @@ export class AudioComponentService {
     return null;
   }
 
+  set Distance(value: number) {
+    this.distance = value;
+  }
+
   get MouseClickPos(): AVMousePos {
     return this.mouse_click_pos;
   }

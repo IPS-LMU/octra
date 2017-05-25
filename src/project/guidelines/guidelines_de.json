@@ -16,53 +16,70 @@
         {
           "code": "R01",
           "priority": 100,
-          "title": "Deutschen Rechtschreibung beachten",
-          "description": "Bei der Tranksription sollte die Deutsche Rechtschreibung nach Duden befolgt werden. Bei Unklarheiten bitte www.duden.de aufsuchen.",
-          "examples": [
-          ]
+          "title": "Rechtschreibung",
+          "description": "Die Transkription erfolgt nach den Regeln der deutschen Rechtschreibung nach Duden.",
+          "examples": []
         },
         {
           "code": "R02",
           "priority": 100,
-          "title": "Zahlen ausschreiben",
-          "description": "Zahlen müssen so wie sie gesprochen werden ausgeschrieben werden, ab 100 in einzelnen Worten",
+          "title": "verschliffene Formen",
+          "description": "verschliffene oder verkürzte Formen in der langen Form schreiben.",
           "examples": [
             {
-              "annotation": "20: zwanzig",
-              "url":""
-            },
-            {
-              "annotation": "1991: neunzehn hundert und einundzeunzig",
-              "url":""
+              "annotation": "\"gibt es\" für \"gibt's\" \"haben wir\" für \"hammwa\" usw.",
+              "url": ""
             }
           ]
         },
         {
           "code": "R03",
           "priority": 100,
-          "title": "Buchstabierfolgen als Folge von Großbuchstaben",
-          "description": "Buchstabierfolgen als Folge von Großbuchstaben, Rest orthografisch.",
+          "title": "Leerzeichen",
+          "description": "Wörter durch einfache Leerzeichen trennen",
+          "examples": []
+        },
+        {
+          "code": "R04",
+          "priority": 100,
+          "title": "Buchstabierungen in Großbuchstaben",
+          "description": "Buchstaben als Großbuchstaben schreiben, Formatieranweisungen ausschreiben, phonetische Buchstabierung in Schrägstrichte.",
           "examples": [
             {
               "annotation": "A B B ß: A doppel B scharfes S",
-              "url":""
+              "url": ""
             },
             {
-              "annotation": "D: /D/",
+              "annotation": "B wie in Buch: /b/ wie in Buch",
               "url": ""
             }
           ]
-        }
-      ]
-    },
-    {
-      "group": "Zeichensetzung",
-      "entries": [
+        },
         {
-          "code": "Z01",
+          "code": "R05",
+          "priority": 100,
+          "title": "Groß- und Kleinschreibung",
+          "description": "Wörter unabhängig von der Position im Satz nach Wortart groß oder klein schreiben. Du, Höflichkeits-Sie und -Ihr groß schreiben. Namen und Abkürzungen wie üblich schreiben.",
+          "examples": [
+            {
+              "annotation": "heute ist schönes Frühlingswetter am blauen Himme ziehen die Wolken",
+              "url": ""
+            },
+            {
+              "annotation": "Josef, GmbH, AG",
+              "url": ""
+            },
+            {
+              "annotation": "Du, Sie, Ihr",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "code": "R06",
           "priority": 100,
           "title": "Keine Satzzeichen",
-          "description": "keine Satzzeichen => keine Sätze im herkömmlichen Sinn; keine Spezialsymbole wie %, \", #. Ausnahme: Satzeichen in Wörtern, nicht zwischen Wörtern",
+          "description": "Keine Satzzeichen verwenden.",
           "examples": [
             {
               "annotation": "Kein (.,!?;-)",
@@ -73,112 +90,84 @@
       ]
     },
     {
-      "group": "Groß und Kleinschreibung",
+      "group": "Marker",
       "entries": [
         {
-          "code": "GK01",
+          "code": "M01",
           "priority": 100,
-          "title": "Beachtung der Groß- und Kleinschreibung, auch bei Namen und Abkürzungen.",
-          "description": "Ausnahme: Personalpronomina, keine Großschreibung am Satzanfang.",
+          "title": "Marker sparsam verwenden!",
+          "description": "Marker nur setzen, wenn sie den Sprachfluss stark beeinträchtigen.",
+          "examples": []
+        },
+        {
+          "code": "M02",
+          "priority": 100,
+          "title": "Nonverbale Sprechergeräusche",
+          "description": "Nonverbale Sprechergeräusche wie Husten, Lachen, Schmatzen usw. werden mit <usb> und Leerzeichen vor jedem betroffenen Wort markiert. ",
+          "examples": []
+        },
+        {
+          "code": "M02",
+          "priority": 100,
+          "title": "Andere Geräusche",
+          "description": "Geräusche, die nicht vom Sprecher stammen, z.B. Türschlagen, Klopfen, Motoren, werden mit <nib> und Leerzeichen vor dem betroffenen Wort markiert. ",
+          "examples": []
+        },
+        {
+          "code": "M03",
+          "priority": 100,
+          "title": "Weitere Sprecher",
+          "description": "Sprache eines dritten Sprechers wird mit ** (mit Leerzeichen von den benachbarten Wörtern getrennt) markiert, ebenso unverständliche Passagen.",
+          "examples": []
+        },
+        {
+          "code": "M04",
+          "priority": 100,
+          "title": "Versprecher",
+          "description": "Versprecher werden soweit möglich transkribiert und mit * am Wortanfang markiert. ",
           "examples": [
             {
-              "annotation": "Josef, GmbH, AG",
-              "url": ""
-            },
-            {
-              "annotation": "Du, Sie, Ihr",
+              "annotation": "am *drit nein vierten April",
               "url": ""
             }
           ]
+        },
+        {
+          "code": "M05",
+          "priority": 100,
+          "title": "Phrasengrenzen",
+          "description": "Markieren Sie Phrasengrenzen (möglichst in Sprechpausen) mit einem senkrechten Strich.",
+          "examples": []
         }
       ]
     },
     {
-      "group": "Komposita und Abkürzungen",
+      "group": "Häsitationen",
       "entries": [
         {
-          "code": "KA01",
+          "code": "H01",
           "priority": 100,
-          "title": "Komposita und Abkürzungen nicht künstlich trennen",
-          "description": "Diese sollten nicht künstlich getrennt oder in Buchstabierform geschrieben werden.",
+          "title": "Häsitationsmarker",
+          "description": "Häsitationsphänomene wie 'äh', 'öh', 'ähm' oder 'mhm' werden unabhängig vom produzierten Vokal mit standardisierten Wörtern transkribiert:",
           "examples": [
             {
-              "annotation": "'SPD-Fraktionsvorsitzender' wenn gelesen ist ok",
+              "annotation": "äh - wenn kein Nasal zu hören ist",
               "url": ""
             },
             {
-              "annotation": "'S P D Fraktionsvorsitzender' wenn gelesen ist NICHT ok",
+              "annotation": "ähm - wenn ein Vokal und ein Nasal zu hören sind",
               "url": ""
             },
             {
-              "annotation": "'UdSSR' ok, wenn so in der Vorlage (gelesen)",
+              "annotation": "mhm - wenn zwei Nasale zu hören sind",
               "url": ""
             },
             {
-              "annotation": "'U D S S R' ok, wenn so in der Vorlage (zB. beim Buchstabieren)",
+              "annotation": "ach - wenn ein Frikativ zu hören ist",
               "url": ""
             },
             {
-              "annotation": "'Adam J Krusenstern' ok, wenn Eigenname",
-              "url": ""
-            },
-            {
-              "annotation": "'Adam-J. Krusenstern' NICHT ok, wenn Eigenname",
-              "url": ""
-            }
-          ]
-        }
-        ]
-    },
-    {
-      "group": "Aussprache",
-      "entries": [
-        {
-          "code": "A01",
-          "priority": 100,
-          "title": "Bei falscher Aussprache, das erratene Wort mit * vorranstellen",
-          "description": "Bei falscher Aussprache, das erratene Wort mit * vorranstellen",
-          "examples": [
-            {
-              "annotation": "'achter vierter *fünfund nein sechsundneunzig' ist ok",
-              "url": ""
-            },
-            {
-              "annotation": "'[~abc]*chter vierter oder *sechsundneunz[abc~]' ist nicht ok",
-              "url": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "group": "Unverständliche Sprache",
-      "entries": [
-        {
-          "code": "US01",
-          "priority": 100,
-          "title": "Unverständliche Sprache",
-          "description": "Passagen unverständlicher Sprache mit ** markieren",
-          "examples": [
-            {
-              "annotation": "du bist ein solches ** wie ich noch nie eines getroffen habe",
-              "url": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "group": "Geräusche",
-      "entries": [
-        {
-          "code": "G01",
-          "priority": 100,
-          "title": "Geräuschmarker verwenden",
-          "description": "Bei Geräuschen müssen die Geräuschmarken verwendet werden. Ein Marker wird dabei an dem ersten Vorkommen eines Geräusches gesetzt, nicht aber zwischen Wörtern. Für weitere Informationen in der Toolbar des Editors mit der Maus über die Marker fahren. Mehrere gleiche Marker sollten nicht direkt aufeinander folgen.",
-          "examples": [
-            {
-              "annotation": "du bist ein solches ** wie ich noch nie eines getroffen habe",
+              "annotation": "ne, nee - bei initialem Nasal",
               "url": ""
             }
           ]
@@ -203,7 +192,7 @@
     {
       "id": 2,
       "name": "filled pause",
-      "code": "[fil]",
+      "code": "<nib>",
       "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/fil.png",
       "button_text": "Gefüllte Pause",
@@ -229,7 +218,7 @@
     {
       "id": 4,
       "name": "speaker noise",
-      "code": "[spk]",
+      "code": "<usb>",
       "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/spk.png",
       "button_text": "Sprechergeräusch",

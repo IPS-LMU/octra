@@ -115,7 +115,7 @@ class GuidelinesPDF extends FPDF
                     foreach ($entry->examples as $example) {
                         $y = $this->GetY();
                         $this->SetX($tab + self::MARGIN_LEFT + $x);
-                        $this->MultiCell($col_width, 5, $example->annotation, 0, "L");
+                        $this->MultiCell($col_width, 5, utf8_decode($example->annotation), 0, "L");
                         $x += $col_width;
                         $maxy = max($maxy, $this->GetY());
 

@@ -61,7 +61,8 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
     if (this.transcrService.annotation.levels[0].segments.length > 0) {
       this.editor.rawText = this.transcrService.annotation.levels[0].segments.get(0).transcript;
     }
-    this.editor.Settings.height = 300;
+    // height of texteditor = 0 => auto
+    this.editor.Settings.height = 0;
     this.editor.update();
   }
 

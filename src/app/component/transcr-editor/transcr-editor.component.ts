@@ -35,6 +35,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Input() visible = true;
   @Input() markers: any = true;
   @Input() easymode = true;
+  @Input() height = 0;
 
   get rawText(): string {
     return this.tidyUpRaw(this._rawText);
@@ -76,7 +77,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit() {
-    this.Settings.height = 100;
+    this.Settings.height = this.height;
     this.initialize();
   }
 
@@ -184,13 +185,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           // prevent copy paste
 
           const bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
-                    const html = this.rawToHTML(bufferText);
+          const html = this.rawToHTML(bufferText);
           const element = document.createElement('span');
           element.innerHTML = html;
           e.preventDefault();
           this.textfield.summernote('editor.insertNode', element);
           this.updateTextField();
-                  },
+        },
         onChange: () => {
           this.init++;
 
@@ -206,7 +207,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     });
 
     this.textfield.summernote('removeModule', 'statusbar');
-
+    console.log(jQuery(this.textfield).next().css({'flex': 'auto'}));
     this.loaded.emit(true);
   }
 

@@ -39,7 +39,8 @@
                     <tbody>
                     <tr *ngFor="let entry of keyMap.getEntryList('AV')">
                         <td>{{"modal.shortcuts."+ entry.value.title | translate}}</td>
-                        <td>{{entry.value.keys[platform]}} <span *ngIf="(entry.value !== null && entry.value.focusonly)" class="focus-info">({{"general.on focus only" | translate}})</span>
+                        <td>{{entry.value.keys[platform]}} <span *ngIf="(entry.value !== null && entry.value.focusonly)"
+                                                                 class="focus-info">({{"general.on focus only" | translate}})</span>
                         </td>
                     </tr>
                     </tbody>
@@ -51,7 +52,8 @@
                     <tbody>
                     <tr *ngFor="let entry of keyMap.getEntryList('Loupe')">
                         <td>{{"modal.shortcuts."+ entry.value.title |translate}}</td>
-                        <td>{{entry.value.keys[platform]}} <span *ngIf="(entry.value !== null && entry.value.focusonly)" class="focus-info">({{"general.on focus only" | translate}})</span>
+                        <td>{{entry.value.keys[platform]}} <span *ngIf="(entry.value !== null && entry.value.focusonly)"
+                                                                 class="focus-info">({{"general.on focus only" | translate}})</span>
                         </td>
                     </tr>
                     </tbody>
@@ -79,8 +81,9 @@
         </button>
     </modal-footer>
 </modal>
-<div *ngIf="loaded">
-    <span id='saving' *ngIf="saving != ''"><span style="color:#333333" class="glyphicon glyphicon-floppy-disk"></span></span>
+<div class="flex" *ngIf="loaded">
+    <span id='saving' *ngIf="saving != ''"><span style="color:#333333"
+                                                 class="glyphicon glyphicon-floppy-disk"></span></span>
     <app-fastbar
             [responsive]="responsive"
             [help_url]="help_url"
@@ -96,15 +99,19 @@
             (overviewbtnclicked)="modal_overview.open()"
     ></app-fastbar>
 
-    <app-transcr-guidelines #modal_guidelines [guidelines]="transcrService.guidelines"></app-transcr-guidelines>
-    <div *ngIf="!(sessService.Interface == '2D-Editor')">
-        <app-signal-gui #signalloupe *ngIf="sessService.Interface == 'Linear Editor'">
-        </app-signal-gui>
-        <app-audioplayer-gui #audioplayer *ngIf="sessService.Interface == 'Editor without signal display'"></app-audioplayer-gui>
-    </div>
-    <div *ngIf="sessService.Interface == '2D-Editor'">
-        <app-overlay-gui></app-overlay-gui>
-    </div>
+    <app-transcr-guidelines #modal_guidelines [guidelines]="transcrService.guidelines">
+    </app-transcr-guidelines>
+
+    <app-signal-gui class="flex" #signalloupe *ngIf="sessService.Interface == 'Linear Editor'">
+    </app-signal-gui>
+
+    <app-audioplayer-gui class="flex" #audioplayer
+                         *ngIf="sessService.Interface == 'Editor without signal display'">
+    </app-audioplayer-gui>
+
+    <app-overlay-gui class="flex" *ngIf="sessService.Interface == '2D-Editor'">
+    </app-overlay-gui>
+
     <div id="bottom-nav">
         <div class="btn-group btn-group-justified" role="group" aria-label="...">
             <a class="btn btn-default btn-raised"

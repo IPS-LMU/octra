@@ -335,6 +335,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           this.sessionService.clearLocalStorage();
 
           const res = this.sessionService.setSessionData(this.member, json.data.id, json.data.url);
+          this.sessionService.member_jobno = json.data.jobno;
 
           if (json.hasOwnProperty('message')) {
             const counter = (json.message === '') ? '0' : json.message;

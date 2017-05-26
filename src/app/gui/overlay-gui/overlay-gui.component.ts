@@ -84,6 +84,7 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
 
     this.viewer.Settings.multi_line = true;
     this.viewer.Settings.height = 70;
+    this.viewer.Settings.margin.bottom = 5;
     this.viewer.Settings.justifySignalHeight = false;
     this.viewer.Settings.step_width_ratio = (this.viewer.Settings.pixel_per_sec / this.audio.samplerate);
 

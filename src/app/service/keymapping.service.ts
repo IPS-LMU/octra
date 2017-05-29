@@ -61,7 +61,7 @@ export class KeymappingService {
         return result;
       }
     }
-    return null;
+    return [];
   }
 
   private cloneShortcuts(shortcuts: any): any {

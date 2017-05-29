@@ -1,4 +1,7 @@
-import {AfterViewInit, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {
+  AfterViewInit, ChangeDetectorRef, Component, EventEmitter, HostListener, OnDestroy, OnInit, Output,
+  ViewChild
+} from '@angular/core';
 
 import {AudioNavigationComponent, AudioviewerComponent, LoupeComponent, TranscrEditorComponent} from '../../component';
 
@@ -22,6 +25,8 @@ import {CircleLoupeComponent} from '../../component/circleloupe/circleloupe.comp
   styleUrls: ['./signal-gui.component.css']
 })
 export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
+  public static initialized: EventEmitter<void> = new EventEmitter<void>();
+
   @ViewChild('viewer') viewer: AudioviewerComponent;
   @ViewChild('miniloupe') miniloupe: CircleLoupeComponent;
   @ViewChild('loupe') loupe: LoupeComponent;
@@ -30,7 +35,6 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscrmanager: SubscriptionManager;
 
-  private initialized = false;
   public miniloupe_hidden = true;
   public segmentselected = false;
   public activeviewer = '';
@@ -150,6 +154,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     ));
+    SignalGUIComponent.initialized.emit();
   }
 
   ngOnDestroy() {
@@ -188,7 +193,6 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    this.initialized = true;
     this.cd.detectChanges();
     this.loupe.zoomY = this.factor;
     this.subscrmanager.add(

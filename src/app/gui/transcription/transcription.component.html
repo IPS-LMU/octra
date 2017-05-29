@@ -1,4 +1,5 @@
 <app-alert #alert></app-alert>
+
 <modal #modal_overview id="overview">
     <modal-body>
         <app-transcr-overview *ngIf="transcrService.annotation !== null"
@@ -15,11 +16,12 @@
         </button>
     </modal-footer>
 </modal>
+
 <modal #modal_shortcuts>
-    <modal-body>
-        <div *ngIf="sessService.Interface == 'Editor without signal display'">
+    <modal-body *ngIf="editorloaded">
+        <div *ngIf="interface == 'Editor without signal display'">
             <h3>{{"modal.shortcuts.audioplayer" | translate}}</h3>
-            <div class="table-responsive">
+            <div class="table-responsive" *ngIf="keyMap.getEntryList('AP') !== null">
                 <table class="table table-hover">
                     <tbody>
                     <tr *ngFor="let entry of keyMap.getEntryList('AP')">
@@ -32,9 +34,9 @@
             </div>
         </div>
 
-        <div *ngIf="(sessService.Interface == 'Linear Editor')">
+        <div *ngIf="(interface == 'Linear Editor')">
             <h3>{{"modal.shortcuts.top signaldisplay" | translate}}</h3>
-            <div class="table-responsive">
+            <div class="table-responsive" *ngIf="keyMap.getEntryList('AV') !== null">
                 <table class="table table-hover">
                     <tbody>
                     <tr *ngFor="let entry of keyMap.getEntryList('AV')">
@@ -47,7 +49,7 @@
                 </table>
             </div>
             <h3>{{"modal.shortcuts.down signaldisplay" | translate}}</h3>
-            <div class="table-responsive">
+            <div class="table-responsive" *ngIf="keyMap.getEntryList('Loupe') !== null">
                 <table class="table table-hover">
                     <tbody>
                     <tr *ngFor="let entry of keyMap.getEntryList('Loupe')">
@@ -60,7 +62,7 @@
                 </table>
             </div>
         </div>
-        <div *ngIf="(sessService.Interface == '2D-Editor')">
+        <div *ngIf="(interface == '2D-Editor')">
             <h3>{{"modal.shortcuts.2D-Editor" | translate}}</h3>
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -81,6 +83,7 @@
         </button>
     </modal-footer>
 </modal>
+
 <div class="flex" *ngIf="loaded">
     <span id='saving' *ngIf="saving != ''"><span style="color:#333333"
                                                  class="glyphicon glyphicon-floppy-disk"></span></span>
@@ -102,15 +105,9 @@
     <app-transcr-guidelines #modal_guidelines [guidelines]="transcrService.guidelines">
     </app-transcr-guidelines>
 
-    <app-signal-gui class="flex" #signalloupe *ngIf="sessService.Interface == 'Linear Editor'">
-    </app-signal-gui>
-
-    <app-audioplayer-gui class="flex" #audioplayer
-                         *ngIf="sessService.Interface == 'Editor without signal display'">
-    </app-audioplayer-gui>
-
-    <app-overlay-gui class="flex" *ngIf="sessService.Interface == '2D-Editor'">
-    </app-overlay-gui>
+    <div class="flex">
+        <ng-template appLoadeditor></ng-template>
+    </div>
 
     <div id="bottom-nav">
         <div class="btn-group btn-group-justified" role="group" aria-label="...">

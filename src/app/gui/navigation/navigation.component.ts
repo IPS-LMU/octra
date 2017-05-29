@@ -89,7 +89,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   setInterface(new_interface: string) {
     this.sessService.Interface = new_interface;
-
+    this.navbarServ.interfacechange.emit(new_interface);
   }
 
   onNavBarLeave($event) {

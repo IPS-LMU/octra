@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 
 import {AudioNavigationComponent, AudioplayerComponent, TranscrEditorComponent} from '../../component';
 import {AudioService, KeymappingService, TranscriptionService, UserInteractionsService} from '../../service';
@@ -12,6 +12,7 @@ import {SessionService} from '../../service/session.service';
   styleUrls: ['./audioplayer-gui.component.css']
 })
 export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit {
+  public static initialized: EventEmitter<void> = new EventEmitter<void>();
 
   @ViewChild('nav') nav: AudioNavigationComponent;
   @ViewChild('audioplayer') audioplayer: AudioplayerComponent;
@@ -55,6 +56,8 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
     this.shortcuts = this.settings.shortcuts;
     this.editor.Settings.markers = this.transcrService.guidelines.markers.items;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
+
+    AudioplayerGUIComponent.initialized.emit();
   }
 
   ngAfterViewInit() {

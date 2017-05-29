@@ -56,3 +56,34 @@
     right:0;
     margin-right:5px;
 }
+
+#bottom-feedback{
+    border:2px solid blue;
+    background-color:white;
+    padding: 5px;
+    height: 25px;
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 50px;
+    width: 100%;
+    z-index: 100;
+    overflow: scroll;
+}
+
+#bottom-feedback .inner{
+    display:none;
+}
+
+.ctrl{
+    display:inline;
+    margin-right:10px;
+}
+
+.radio,
+.checkbox{
+    display:inline;
+}
+
+.form-group{
+    margin-top:0px;
+}

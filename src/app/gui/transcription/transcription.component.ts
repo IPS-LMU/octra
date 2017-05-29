@@ -58,6 +58,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
   public interface = '';
   public shortcutslist: Entry[] = [];
   public editorloaded = false;
+  public feedback_data = {};
 
   get help_url(): string {
     if (this.sessService.Interface === 'Editor without signal display') {
@@ -303,11 +304,12 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
     if (!isNullOrUndefined(comp)) {
       this.editorloaded = false;
-      this.subscrmanager.add(comp.initialized.subscribe(
+      const id = this.subscrmanager.add(comp.initialized.subscribe(
         () => {
           setTimeout(() => {
             console.log('component initialized');
             this.editorloaded = true;
+            this.subscrmanager.remove(id);
           }, 100);
         }
       ));
@@ -315,7 +317,43 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
       const viewContainerRef = this.appLoadeditor.viewContainerRef;
       viewContainerRef.clear();
 
-      let componentRef = viewContainerRef.createComponent(componentFactory);
+      const componentRef = viewContainerRef.createComponent(componentFactory);
     }
+  }
+
+  expandFeedback() {
+    if (jQuery('#bottom-feedback').css('height') === '25px') {
+      jQuery('#bottom-feedback').css({
+        'height': '50%',
+        'margin-bottom': 50,
+        'position': 'absolute'
+      });
+      jQuery('#bottom-feedback .inner').css({
+        'display': 'inherit'
+      });
+
+    } else {
+      jQuery('#bottom-feedback').css({
+        'height': 25,
+        'margin-bottom': 0,
+        'position': 'relative'
+      });
+
+      jQuery('#bottom-feedback .inner').css({
+        'display': 'none'
+      });
+    }
+  }
+
+  translate(languages: any, lang: string): string {
+    if (isNullOrUndefined(languages[lang])) {
+      for (const attr in languages) {
+        // take first
+        if (languages.hasOwnProperty(attr)) {
+          return languages[attr];
+        }
+      }
+    }
+    return languages[lang];
   }
 }

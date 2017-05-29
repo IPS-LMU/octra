@@ -1,5 +1,11 @@
 import {
-  AfterViewInit, ChangeDetectorRef, Component, EventEmitter, HostListener, OnDestroy, OnInit, Output,
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  HostListener,
+  OnDestroy,
+  OnInit,
   ViewChild
 } from '@angular/core';
 
@@ -132,10 +138,10 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
             this.miniloupe.zoomY = Math.max(1, this.miniloupe.zoomY + 1);
 
             if (this.viewer.focused) {
-                            this.changeArea(this.miniloupe, this.viewer, this.mini_loupecoord,
+              this.changeArea(this.miniloupe, this.viewer, this.mini_loupecoord,
                 this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
             } else if (this.loupe.focused) {
-                            this.changeArea(this.miniloupe, this.loupe.viewer, this.mini_loupecoord,
+              this.changeArea(this.miniloupe, this.loupe.viewer, this.mini_loupecoord,
                 this.viewer.MouseCursor.timePos.samples, this.loupe.MouseCursor.relPos.x, this.factor);
             }
           } else if (event.key === '-') {
@@ -143,10 +149,10 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
               this.factor = Math.max(3, this.factor - 1);
               this.miniloupe.zoomY = Math.max(1, this.miniloupe.zoomY - 1);
               if (this.viewer.focused) {
-                                this.changeArea(this.miniloupe, this.viewer, this.mini_loupecoord,
+                this.changeArea(this.miniloupe, this.viewer, this.mini_loupecoord,
                   this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
               } else if (this.loupe.focused) {
-                                this.changeArea(this.miniloupe, this.loupe.viewer, this.mini_loupecoord,
+                this.changeArea(this.miniloupe, this.loupe.viewer, this.mini_loupecoord,
                   this.viewer.MouseCursor.timePos.samples, this.loupe.MouseCursor.relPos.x, this.factor);
               }
             }
@@ -219,7 +225,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onMouseOver(cursor: AVMousePos) {
-            this.mini_loupecoord.component = this.viewer;
+    this.mini_loupecoord.component = this.viewer;
 
     if (!this.audio.audioplaying && this.sessService.playonhover) {
       // play audio
@@ -231,30 +237,29 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const a = this.viewer.getLocation();
-    this.mini_loupecoord.y = a.y - this.viewer.Settings.height
-      - (this.miniloupe.Settings.height);
+    this.mini_loupecoord.y = -this.miniloupe.Settings.height / 2;
     this.changeArea(this.miniloupe, this.viewer, this.mini_loupecoord,
       this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
   }
 
   /*
-  onMouseOver2(cursor: AVMousePos) {
-    this.mini_loupecoord.component = this.loupe;
+   onMouseOver2(cursor: AVMousePos) {
+   this.mini_loupecoord.component = this.loupe;
 
-    if (!this.audio.audioplaying && this.sessService.playonhover) {
-      // play audio
-      this.audio.startPlayback(this.loupe.viewer.av.Mousecursor.timePos, new AudioTime(this.audio.samplerate / 10,
-        this.audio.samplerate), () => {
-      }, () => {
-        this.audio.audioplaying = false;
-      }, true);
-    }
+   if (!this.audio.audioplaying && this.sessService.playonhover) {
+   // play audio
+   this.audio.startPlayback(this.loupe.viewer.av.Mousecursor.timePos, new AudioTime(this.audio.samplerate / 10,
+   this.audio.samplerate), () => {
+   }, () => {
+   this.audio.audioplaying = false;
+   }, true);
+   }
 
-    this.mini_loupecoord.y = this.viewer.getLocation().y - this.miniloupe.Settings.height + 15;
-    this.changeArea(this.miniloupe, this.loupe.viewer, this.mini_loupecoord,
-      this.loupe.viewer.MouseCursor.timePos.samples, this.loupe.viewer.MouseCursor.relPos.x, this.factor);
-  }
-*/
+   this.mini_loupecoord.y = this.viewer.getLocation().y - this.miniloupe.Settings.height + 15;
+   this.changeArea(this.miniloupe, this.loupe.viewer, this.mini_loupecoord,
+   this.loupe.viewer.MouseCursor.timePos.samples, this.loupe.viewer.MouseCursor.relPos.x, this.factor);
+   }
+   */
 
   private changeArea(loup: LoupeComponent | CircleLoupeComponent, viewer: AudioviewerComponent, coord: any,
                      cursor: number, relX: number, factor: number = 4) {
@@ -425,13 +430,13 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!isNullOrUndefined(this.mini_loupecoord.component)) {
 
       if (this.mini_loupecoord.component === 'viewer') {
-        const compute = this.viewer.getLocation();
-        this.mini_loupecoord.y = compute.y - this.viewer.Settings.height
-          - (this.miniloupe.Settings.height) - 17;
+        const a = this.viewer.getLocation();
+        this.mini_loupecoord.y = 0;
       } else if (this.mini_loupecoord.component === 'loupe') {
-        const compute = this.loupe.getLocation();
-        this.mini_loupecoord.y = compute.y - this.loupe.Settings.height
-          - (this.miniloupe.Settings.height / 2) + 15;
+        // TODO change
+        /* const compute = this.loupe.getLocation();
+         this.mini_loupecoord.y = compute.y - this.loupe.Settings.height
+         - (this.miniloupe.Settings.height / 2) + 15;*/
       }
     }
   }

@@ -15,7 +15,6 @@ import {TranslateService} from '@ngx-translate/core';
 import {SettingsService} from '../../service/settings.service';
 import {isNullOrUndefined} from 'util';
 import {TextConverter} from '../../shared/Converters/TextConverter';
-import {File} from '../../shared/Converters/Converter';
 import {AnnotJSONConverter} from '../../shared/Converters/AnnotJSONConverter';
 
 

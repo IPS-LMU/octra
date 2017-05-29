@@ -1,14 +1,16 @@
 import {
+  AfterContentChecked,
   AfterContentInit,
   AfterViewChecked,
   AfterViewInit,
-  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ComponentFactoryResolver,
   HostListener,
   OnChanges,
   OnDestroy,
   OnInit,
+  SimpleChanges,
   ViewChild
 } from '@angular/core';
 import {Router} from '@angular/router';
@@ -26,29 +28,36 @@ import {
   UserInteractionsService
 } from '../../service';
 
-import {BrowserInfo, StatisticElem, SubscriptionManager} from '../../shared';
+import {BrowserInfo, SubscriptionManager} from '../../shared';
 import {isNullOrUndefined} from 'util';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {TranscrGuidelinesComponent} from '../transcr-guidelines/transcr-guidelines.component';
 import {APIService} from '../../service/api.service';
-import {TextConverter} from '../../shared/Converters/TextConverter';
+import {LoadeditorDirective} from '../../directive/loadeditor.directive';
+import {AudioplayerGUIComponent} from '../audioplayer-gui/audioplayer-gui.component';
+import {OverlayGUIComponent} from '../overlay-gui/overlay-gui.component';
+import {SignalGUIComponent} from '../signal-gui/signal-gui.component';
+import {Entry} from '../../service/keymapping.service';
 
 @Component({
   selector: 'app-transcription',
   templateUrl: './transcription.component.html',
   styleUrls: ['./transcription.component.css'],
-  providers: [MessageService],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  providers: [MessageService]
 })
-export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit, AfterContentInit, OnChanges, AfterViewChecked {
+export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit, AfterContentInit, OnChanges, AfterViewChecked, AfterContentChecked {
   private subscrmanager: SubscriptionManager;
 
   @ViewChild('modal_shortcuts') modal_shortcuts: ModalComponent;
   @ViewChild('modal_guidelines') modal_guidelines: TranscrGuidelinesComponent;
   @ViewChild('modal_overview') modal_overview: ModalComponent;
+  @ViewChild(LoadeditorDirective) appLoadeditor: LoadeditorDirective;
 
   public showdetails = false;
   private saving = '';
+  public interface = '';
+  public shortcutslist: Entry[] = [];
+  public editorloaded = false;
 
   get help_url(): string {
     if (this.sessService.Interface === 'Editor without signal display') {
@@ -83,6 +92,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
   private platform = BrowserInfo.platform;
 
   constructor(public router: Router,
+              private _componentFactoryResolver: ComponentFactoryResolver,
               public audio: AudioService,
               public uiService: UserInteractionsService,
               public transcrService: TranscriptionService,
@@ -107,23 +117,22 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
         }
       }));
     }
+    this.interface = this.sessService.Interface;
   }
 
   private get app_settings() {
     return this.settingsService.app_settings;
   }
 
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges) {
+  }
+
+  ngAfterContentChecked() {
   }
 
   ngOnInit() {
     this.navbarServ.interfaces = this.projectsettings.interfaces;
     this.afterAudioLoaded();
-
-    setInterval(() => {
-      // TODO change!!
-      this.changeDetecorRef.markForCheck();
-    }, 2000);
 
     this.subscrmanager.add(this.sessService.saving.subscribe(
       (saving) => {
@@ -179,7 +188,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
     }
 
     this.sessService.annotation.sampleRate = this.audio.samplerate;
-    this.change();
     this.navbarServ.show_interfaces = this.settingsService.projectsettings.navigation.interfaces;
 
     // load guidelines on language change
@@ -200,17 +208,24 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
         );
       }
     ));
+
+
+    this.subscrmanager.add(this.navbarServ.interfacechange.subscribe(
+      (editor) => {
+        this.changeEditor(editor);
+      }
+    ));
   }
 
   ngAfterViewInit() {
+    this.changeEditor(this.interface);
+
     this.sessService.TranscriptionTime.start = Date.now();
     if (isNullOrUndefined(this.projectsettings.interfaces.find((x) => {
         return this.sessService.Interface === x;
       }))) {
       this.sessService.Interface = this.projectsettings.interfaces[0];
     }
-
-    this.change();
 
     jQuery.material.init();
   }
@@ -224,7 +239,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
   }
 
   ngAfterViewChecked() {
-
   }
 
   submitTranscription() {
@@ -234,10 +248,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
   ngOnDestroy() {
     this.subscrmanager.destroy();
-  }
-
-  change() {
-    this.changeDetecorRef.markForCheck();
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -271,5 +281,41 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
   onSegmentInOverviewClicked(segnumber: number) {
     this.transcrService.requestSegment(segnumber);
     this.modal_overview.close();
+  }
+
+  changeEditor(name: string) {
+    console.log('change ' + name);
+    let comp: any = null;
+    switch (name) {
+      case('2D-Editor'):
+        comp = OverlayGUIComponent;
+        this.interface = name;
+        break;
+      case('Editor without signal display'):
+        comp = AudioplayerGUIComponent;
+        this.interface = name;
+        break;
+      case('Linear Editor'):
+        comp = SignalGUIComponent;
+        this.interface = name;
+        break;
+    }
+
+    if (!isNullOrUndefined(comp)) {
+      this.editorloaded = false;
+      this.subscrmanager.add(comp.initialized.subscribe(
+        () => {
+          setTimeout(() => {
+            console.log('component initialized');
+            this.editorloaded = true;
+          }, 100);
+        }
+      ));
+      const componentFactory = this._componentFactoryResolver.resolveComponentFactory(comp);
+      const viewContainerRef = this.appLoadeditor.viewContainerRef;
+      viewContainerRef.clear();
+
+      let componentRef = viewContainerRef.createComponent(componentFactory);
+    }
   }
 }

@@ -67,6 +67,7 @@ import {TranscActivateGuard} from './guard/transcr.activateguard';
 import {AgreementComponent} from './gui/agreement/agreement.component';
 import {BugReportService} from './service/bug-report.service';
 import { OctraDropzoneComponent } from './gui/octra-dropzone/octra-dropzone.component';
+import { LoadeditorDirective } from './directive/loadeditor.directive';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
@@ -108,7 +109,13 @@ export function HttpLoaderFactory(http: Http) {
     OctraModalComponent,
     TranscrGuidelinesComponent,
     AgreementComponent,
-    OctraDropzoneComponent
+    OctraDropzoneComponent,
+    LoadeditorDirective
+  ],
+  entryComponents: [
+    AudioplayerGUIComponent,
+    SignalGUIComponent,
+    OverlayGUIComponent
   ],
   imports: [
     BrowserModule,

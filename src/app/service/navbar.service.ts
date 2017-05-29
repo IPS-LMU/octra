@@ -45,6 +45,7 @@ export class NavbarService {
   }
 
   public onexportbuttonclick = new EventEmitter<any>();
+  public interfacechange = new EventEmitter<string>();
 
   private _show_export = false;
   private _show_interfaces = false;

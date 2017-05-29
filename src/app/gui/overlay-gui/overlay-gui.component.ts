@@ -4,9 +4,11 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  EventEmitter,
   OnChanges,
   OnDestroy,
   OnInit,
+  Output,
   ViewChild
 } from '@angular/core';
 
@@ -33,6 +35,8 @@ import {CircleLoupeComponent} from '../../component/circleloupe/circleloupe.comp
   styleUrls: ['./overlay-gui.component.css']
 })
 export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentChecked, OnChanges, OnDestroy {
+  public static initialized: EventEmitter<void> = new EventEmitter<void>();
+
   @ViewChild('viewer') viewer: AudioviewerComponent;
   @ViewChild('window') window: TranscrWindowComponent;
   @ViewChild('loupe') loupe: CircleLoupeComponent;
@@ -113,6 +117,8 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
         }
       }
     ));
+
+    OverlayGUIComponent.initialized.emit();
   }
 
   ngOnChanges(test) {

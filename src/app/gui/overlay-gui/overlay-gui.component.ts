@@ -58,7 +58,7 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
   };
 
   public get getHeight(): number {
-    return window.innerHeight - 250;
+    return window.innerHeight - 350;
   }
 
   private shortcuts: any = {};

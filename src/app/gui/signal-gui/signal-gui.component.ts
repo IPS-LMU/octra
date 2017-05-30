@@ -105,12 +105,12 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
     this.miniloupe.Settings.justify_signal_height = false;
 
     // update signaldisplay on changes
-    this.subscrmanager.add(Observable.timer(0, 2000).subscribe(
+    /* this.subscrmanager.add(Observable.timer(0, 2000).subscribe(
       () => {
         this.viewer.drawSegments();
         this.loupe.viewer.drawSegments();
       }
-    ));
+    ));*/
 
     this.subscrmanager.add(this.loupe.viewer.segmentchange.subscribe(
       ($event) => {

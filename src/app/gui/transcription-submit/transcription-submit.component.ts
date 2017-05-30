@@ -75,10 +75,6 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 
   public back() {
     if (!this.sessService.offline) {
-      if (!isNullOrUndefined(this.transcrService.feedback.comment)
-        && this.transcrService.feedback.comment !== '') {
-        this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, '\s');
-      }
       this.sessService.comment = this.transcrService.feedback.comment;
       this.saveForm();
       this.sessService.save('feedback', this.transcrService.feedback.exportData());
@@ -89,10 +85,6 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
 
   onSubmit(form: NgForm) {
     if (!this.sessService.offline) {
-      if (!isNullOrUndefined(this.transcrService.feedback.comment)
-        && this.transcrService.feedback.comment !== '') {
-        this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, '\s');
-      }
       this.sessService.comment = this.transcrService.feedback.comment;
       this.saveForm();
       this.sessService.save('feedback', this.transcrService.feedback.exportData());
@@ -198,6 +190,8 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
     // create emty attribute
     if (!isNullOrUndefined(this.settingsService.projectsettings)) {
       const feedback = this.transcrService.feedback;
+      console.log("feedback");
+      console.log(feedback);
       for (const g in feedback.groups) {
         if (!isNullOrUndefined(g)) {
           for (const c in feedback.groups[g].controls) {

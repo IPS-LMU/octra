@@ -13,6 +13,7 @@ import {TranscriptionService} from '../../service/transcription.service';
 import {UserInteractionsService} from '../../service/userInteractions.service';
 import {StatisticElem} from '../../shared/StatisticElement';
 import {SettingsService} from '../../service/settings.service';
+import {SubscriptionManager} from '../../shared/SubscriptionManager';
 
 @Component({
   selector: 'app-navigation',
@@ -34,6 +35,8 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     uri: ''
   };
   collapsed = true;
+
+  private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
   public get converters(): any[] {
     return AppInfo.converters;
@@ -60,14 +63,23 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
               public sanitizer: DomSanitizer,
               public langService: TranslateService,
               public modService: ModalService,
-              public settService: SettingsService
-  ) {
+              public settService: SettingsService) {
   }
 
   ngOnDestroy() {
+    this.subscrmanager.destroy();
   }
 
   ngOnInit() {
+    this.subscrmanager.add(
+      this.navbarServ.onclick.subscribe((name) => {
+        switch (name) {
+          case('export'):
+            this.modalexport.open();
+            break;
+        }
+      })
+    );
   }
 
   ngAfterViewInit() {

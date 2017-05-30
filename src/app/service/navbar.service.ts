@@ -46,6 +46,7 @@ export class NavbarService {
 
   public onexportbuttonclick = new EventEmitter<any>();
   public interfacechange = new EventEmitter<string>();
+  public onclick = new EventEmitter<string>();
 
   private _show_export = false;
   private _show_interfaces = false;
@@ -94,5 +95,9 @@ export class NavbarService {
     this.onexportbuttonclick.emit({
       format: format
     });
+  }
+
+  public doclick(name: string) {
+    this.onclick.emit(name);
   }
 }

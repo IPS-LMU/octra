@@ -489,6 +489,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
    * drawSegments() draws a vertical line for every boundary in the current audio viewer
    */
   drawSegments() {
+    // TODO CHANGE ONLY CURRENT LINE!!
     this.o_context.fillStyle = 'white';
     // TODO clear only
     this.o_context.clearRect(0, 0, this.width, this.height);

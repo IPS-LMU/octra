@@ -38,6 +38,7 @@ import {AudioplayerGUIComponent} from '../audioplayer-gui/audioplayer-gui.compon
 import {OverlayGUIComponent} from '../overlay-gui/overlay-gui.component';
 import {SignalGUIComponent} from '../signal-gui/signal-gui.component';
 import {Entry} from '../../service/keymapping.service';
+import {Observable} from 'rxjs/Observable';
 
 @Component({
   selector: 'app-transcription',
@@ -53,9 +54,14 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
   @ViewChild('modal_overview') modal_overview: ModalComponent;
   @ViewChild(LoadeditorDirective) appLoadeditor: LoadeditorDirective;
 
+  @ViewChild('modal') modal: ModalComponent;
+  @ViewChild('modal2') modal2: ModalComponent;
+  public send_error = '';
+
   public showdetails = false;
   private saving = '';
   public interface = '';
+  private send_ok = false;
   public shortcutslist: Entry[] = [];
   public editorloaded = false;
   public feedback_data = {};
@@ -119,6 +125,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
       }));
     }
     this.interface = this.sessService.Interface;
+
   }
 
   private get app_settings() {
@@ -169,6 +176,16 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
   afterAudioLoaded = () => {
     this.transcrService.load();
+
+    this.loadForm();
+
+    if (isNullOrUndefined(this.sessService.feedback)) {
+      console.error('feedback is null!');
+    } else {
+      console.log('get feedback');
+      console.log(this.sessService.feedback);
+    }
+
     this.transcrService.guidelines = this.settingsService.guidelines;
 
     // reload guidelines
@@ -322,7 +339,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
   }
 
   expandFeedback() {
-    if (jQuery('#bottom-feedback').css('height') === '25px') {
+    if (jQuery('#bottom-feedback').css('height') === '30px') {
       jQuery('#bottom-feedback').css({
         'height': '50%',
         'margin-bottom': 50,
@@ -334,7 +351,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
     } else {
       jQuery('#bottom-feedback').css({
-        'height': 25,
+        'height': 30,
         'margin-bottom': 0,
         'position': 'relative'
       });
@@ -342,7 +359,29 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
       jQuery('#bottom-feedback .inner').css({
         'display': 'none'
       });
+      this.saveForm();
     }
+  }
+
+  private saveForm() {
+    if (!isNullOrUndefined(this.transcrService.feedback.comment)
+      && this.transcrService.feedback.comment !== '') {
+      this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, '\s');
+    }
+    this.sessService.comment = this.transcrService.feedback.comment;
+
+    for (const control in this.feedback_data) {
+      if (this.feedback_data.hasOwnProperty(control)) {
+        this.changeValue(control, this.feedback_data[control]);
+      }
+    }
+    console.log('saveForm');
+    this.sessService.save('feedback', this.transcrService.feedback.exportData());
+    console.log(this.sessService.feedback);
+  }
+
+  changeValue(control: string, value: any) {
+    const result = this.transcrService.feedback.setValueForControl(control, value.toString());
   }
 
   translate(languages: any, lang: string): string {
@@ -355,5 +394,62 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
       }
     }
     return languages[lang];
+  }
+
+  private loadForm() {
+    // create emty attribute
+    const feedback = this.transcrService.feedback;
+    if (!isNullOrUndefined(this.settingsService.projectsettings)
+      && !isNullOrUndefined(feedback)
+    ) {
+      for (const g in feedback.groups) {
+        if (!isNullOrUndefined(g)) {
+          for (const c in feedback.groups[g].controls) {
+            if (!isNullOrUndefined(c)) {
+              const control = feedback.groups[g].controls[c];
+              if (control.type.type === 'textarea') {
+                this.feedback_data[control.name] = control.value;
+              } else {
+                // radio or checkbox
+                if (!isNullOrUndefined(control.custom)
+                  && !isNullOrUndefined(control.custom.checked)
+                  && control.custom.checked) {
+                  this.feedback_data[control.name] = control.value;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  public onSendNowClick() {
+    this.modal.dismiss();
+    this.modal2.open();
+    this.send_ok = true;
+
+    const json: any = this.transcrService.exportDataToJSON();
+
+    this.subscrmanager.add(this.api.saveSession(json.transcript, json.project, json.annotator,
+      json.jobno, json.id, json.status, json.comment, json.quality, json.log)
+      .catch(this.onSendError)
+      .subscribe((result) => {
+          if (result !== null && result.hasOwnProperty('statusText') && result.statusText === 'OK') {
+            this.sessService.submitted = true;
+            this.modal2.close();
+            setTimeout(() => {
+              this.router.navigate(['/user/transcr/submitted']);
+            }, 1000);
+          } else {
+            this.send_error = this.langService.instant('send error');
+          }
+        }
+      ));
+  }
+
+  onSendError = (error) => {
+    this.send_error = error.message;
+    return Observable.throw(error);
   }
 }

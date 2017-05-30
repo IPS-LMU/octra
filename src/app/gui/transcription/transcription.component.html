@@ -1,5 +1,27 @@
 <app-alert #alert></app-alert>
+<modal #modal>
+    <modal-header>
+        <h4 class="modal-title">{{"modal.transcription.send.header" | translate}}</h4>
+    </modal-header>
+    <modal-body>
+        {{"modal.transcription.send.text" | translate}}
+    </modal-body>
+    <modal-footer>
+        <button type="button" class="btn btn-primary" (click)="modal.dismiss()">{{"general.abort" | translate}}</button>
+        <button type="button" class="btn btn-default" (click)="onSendNowClick()">{{"general.send now" | translate}}
+        </button>
+    </modal-footer>
+</modal>
 
+<modal #modal2>
+    <modal-header>
+        <h4 class="modal-title">{{"modal.transcription.sending.header" | translate}}</h4>
+    </modal-header>
+    <modal-body>
+        {{"modal.transcription.sending.text" | translate}}<br/><br/>
+        <div style="color:red">{{send_error}}</div>
+    </modal-body>
+</modal>
 <modal #modal_overview id="overview">
     <modal-body>
         <app-transcr-overview *ngIf="transcrService.annotation !== null"
@@ -109,7 +131,7 @@
         <ng-template appLoadeditor></ng-template>
     </div>
 
-    <div id="bottom-feedback" #feedback>
+    <div id="bottom-feedback" #feedback *ngIf="!sessService.offline">
         <span class="link" (click)="expandFeedback()" style="width:100%;display: block;">FEEDBACK</span>
         <div class="inner">
             <form (ngSubmit)="onSubmit(fo)" #fo="ngForm">
@@ -169,7 +191,12 @@
                     *ngIf="!sessService.easymode"
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.quit" | translate}}</span></a>
             <a class="btn btn-primary btn-raised"
-               (click)="submitTranscription()" *ngIf="!sessService.offline"><span
+               (click)="navbarServ.doclick('export');" *ngIf="sessService.offline"><span
+                    *ngIf="!sessService.easymode"
+                    [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.export data" | translate}}</span>
+                <span class="glyphicon glyphicon-download"></span></a>
+            <a class="btn btn-primary btn-raised"
+               (click)="modal.open();" *ngIf="!sessService.offline"><span
                     *ngIf="!sessService.easymode"
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"transcription.send" | translate}}</span>
                 <span class="glyphicon glyphicon-send"></span></a>

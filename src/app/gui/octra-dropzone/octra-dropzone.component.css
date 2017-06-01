@@ -18,3 +18,7 @@
 .dropzone-table tr td:first-child {
     padding-right:10px;
 }
+
+.delete-icon{
+    z-index:1000;
+}

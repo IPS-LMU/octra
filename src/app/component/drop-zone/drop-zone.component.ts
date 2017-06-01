@@ -25,6 +25,7 @@ export class DropZoneComponent implements OnInit {
   private _files: FileList = null;
   private _sessionfile: SessionFile;
   private fileAPIsupported = false;
+  public clicklocked = false;
 
   @Output()
   public afterdrop: EventEmitter<FileList> = new EventEmitter<FileList>();
@@ -53,16 +54,16 @@ export class DropZoneComponent implements OnInit {
 
     if (this.fileAPIsupported) {
       const files: FileList = $event.dataTransfer.files; // FileList object.
-            if (files.length <= 2) {
-                // select the first file
-        this._files = files;
-                this.afterdrop.emit(this._files);
-      }
+      this._files = files;
+      console.log(files);
+      this.afterdrop.emit(this._files);
     }
   }
 
   onClick($event) {
-    this.fileinput.nativeElement.click();
+    if (!this.clicklocked) {
+      this.fileinput.nativeElement.click();
+    }
   }
 
   onFileChange($event) {

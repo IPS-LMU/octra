@@ -3,7 +3,7 @@ import {Group} from '../../shared/FeedbackForm/Group';
 export interface ProjectConfiguration {
   version: string;
   logging: {
-    enabled: boolean
+    forced: boolean
   };
   navigation: {
     'export': boolean,

@@ -39,6 +39,7 @@ import {OverlayGUIComponent} from '../overlay-gui/overlay-gui.component';
 import {SignalGUIComponent} from '../signal-gui/signal-gui.component';
 import {Entry} from '../../service/keymapping.service';
 import {Observable} from 'rxjs/Observable';
+import {ProjectConfiguration} from '../../types/Settings/project-configuration';
 
 @Component({
   selector: 'app-transcription',
@@ -46,7 +47,8 @@ import {Observable} from 'rxjs/Observable';
   styleUrls: ['./transcription.component.css'],
   providers: [MessageService]
 })
-export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit, AfterContentInit, OnChanges, AfterViewChecked, AfterContentChecked {
+export class TranscriptionComponent implements OnInit,
+  OnDestroy, AfterViewInit, AfterContentInit, OnChanges, AfterViewChecked, AfterContentChecked {
   private subscrmanager: SubscriptionManager;
 
   @ViewChild('modal_shortcuts') modal_shortcuts: ModalComponent;
@@ -86,7 +88,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
     return this.settingsService.app_settings;
   }
 
-  get projectsettings(): any {
+  get projectsettings(): ProjectConfiguration {
     return this.settingsService.projectsettings;
   }
 
@@ -230,6 +232,9 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
 
     this.subscrmanager.add(this.navbarServ.interfacechange.subscribe(
       (editor) => {
+        if (this.projectsettings.logging.forced) {
+          this.uiService.addElementFromEvent('editor_changed', {value: editor}, Date.now(), '');
+        }
         this.changeEditor(editor);
       }
     ));
@@ -302,7 +307,6 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
   }
 
   changeEditor(name: string) {
-    console.log('change ' + name);
     let comp: any = null;
     switch (name) {
       case('2D-Editor'):
@@ -320,6 +324,7 @@ export class TranscriptionComponent implements OnInit, OnDestroy, AfterViewInit,
     }
 
     if (!isNullOrUndefined(comp)) {
+
       this.editorloaded = false;
       const id = this.subscrmanager.add(comp.initialized.subscribe(
         () => {

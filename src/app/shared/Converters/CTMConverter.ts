@@ -57,7 +57,8 @@ export class CTMConverter extends Converter {
     // check if filename is equal with audio file
     const filename = lines[0].substr(0, lines[0].indexOf(' '));
 
-    if (Functions.contains(file.name, filename)) {
+    if (Functions.contains(file.name, filename) && Functions.contains(audiofile.name, filename)) {
+      console.log('check ' + audiofile.name + '==' + filename);
       const olevel = new OLevel('Orthographic', 'SEGMENT');
 
       let start = 0;
@@ -103,7 +104,7 @@ export class CTMConverter extends Converter {
           olevel.items.push(osegment);
 
           if (i === lines.length - 2) {
-                                    if ((start + length) < audiofile.duration) {
+            if ((start + length) < audiofile.duration) {
 
               const osegment_end = new OSegment(
                 (i + 2),
@@ -120,8 +121,9 @@ export class CTMConverter extends Converter {
         }
       }
       result.levels.push(olevel);
+      return result;
     }
 
-            return result;
+    return null;
   };
 }

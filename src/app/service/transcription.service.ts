@@ -154,7 +154,7 @@ export class TranscriptionService {
       this.filename = this.sessServ.file.name;
       if (this.filename.indexOf('.wav') > -1) {
         this.filename = this.filename.substr(0, this.filename.indexOf('.wav'));
-                      }
+      }
     } else {
       const start = this.sessServ.audio_url.search(/(%|-|\.|[A-ZÄÖÜß]|[a-zäöü]|_|[0-9])*.wav/g);
       if (start > -1) {
@@ -167,7 +167,7 @@ export class TranscriptionService {
     this.loadSegments(this.audio.samplerate);
 
     this.navbarServ.exportformats.filename = this.filename;
-            this.navbarServ.exportformats.bitrate = this.audio.bitrate;
+    this.navbarServ.exportformats.bitrate = this.audio.bitrate;
     this.navbarServ.exportformats.samplerate = this.audio.samplerate;
     this.navbarServ.exportformats.filesize = Functions.getFileSize(this.audio.size);
     this.navbarServ.exportformats.duration = this.audio.duration.unix;
@@ -190,11 +190,27 @@ export class TranscriptionService {
   public loadSegments(sample_rate: number) {
     if (isNullOrUndefined(this.sessServ.annotation)) {
       this.sessServ.annotation = this.createNewAnnotation();
+
+      if (!this.sessServ.offline) {
+        if (!isNullOrUndefined(this.sessServ.servertranscipt)) {
+          // import server transcript
+          this.sessServ.annotation.levels[0].items = [];
+          console.log('import ' + this.sessServ.servertranscipt.length);
+          for (let i = 0; i < this.sessServ.servertranscipt.length; i++) {
+            const seg_t = this.sessServ.servertranscipt[i];
+
+            const oseg = new OSegment(i, seg_t.start, seg_t.length, [new OLabel('Orthographic', seg_t.text)]);
+            this.sessServ.annotation.levels[0].items.push(oseg);
+          }
+          // clear servertranscript
+          this.sessServ.servertranscipt = null;
+        }
+      }
     }
 
     this.sessServ.annotation.annotates = this.filename + '.wav';
 
-            this.sessServ.annotation.sampleRate = this.audio.samplerate;
+    this.sessServ.annotation.sampleRate = this.audio.samplerate;
     const audiofile: OAudiofile = new OAudiofile();
     audiofile.samplerate = this.audio.samplerate;
     audiofile.name = this.sessServ.annotation.annotates;

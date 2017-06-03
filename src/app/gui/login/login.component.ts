@@ -111,7 +111,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
       const max_height: number = Math.max(Number(this.onlinemode.nativeElement.clientHeight),
         Number(this.localmode.nativeElement.clientHeight));
-            this.localmode.nativeElement.style.height = max_height + 'px';
+      this.localmode.nativeElement.style.height = max_height + 'px';
       this.onlinemode.nativeElement.style.height = max_height + 'px';
     }, 0);
   }
@@ -326,6 +326,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     }).subscribe(
       (result) => {
         const json = result.json();
+        console.log(json);
         if (form.valid && this.agreement_checked
           && json.message !== '0'
         ) {
@@ -335,7 +336,15 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           this.sessionService.clearLocalStorage();
 
           const res = this.sessionService.setSessionData(this.member, json.data.id, json.data.url);
-          this.sessionService.member_jobno = json.data.jobno;
+
+          // get transcript data that already exists
+          if (json.data.hasOwnProperty('transcript')) {
+            const transcript = JSON.parse(json.data.transcript);
+
+            if (isArray(transcript) && transcript.length > 0) {
+              this.sessionService.servertranscipt = transcript;
+            }
+          }
 
           if (json.hasOwnProperty('message')) {
             const counter = (json.message === '') ? '0' : json.message;

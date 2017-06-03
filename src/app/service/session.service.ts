@@ -6,6 +6,13 @@ import {OAnnotJSON} from '../types/annotjson';
 
 @Injectable()
 export class SessionService {
+  get servertranscipt(): any[] {
+    return this._servertranscipt;
+  }
+
+  set servertranscipt(value: any[]) {
+    this._servertranscipt = value;
+  }
   get version(): string {
     return this._version;
   }
@@ -158,6 +165,7 @@ export class SessionService {
   @SessionStorage('playonhover') private _playonhover: boolean;
   @SessionStorage('reloaded') private _reloaded: boolean;
   @SessionStorage('email') private _email: string;
+  @SessionStorage('servertranscript') private _servertranscipt: any[];
 
 
   // LOCAL STORAGE

@@ -13,6 +13,7 @@ import {isFunction, isNullOrUndefined} from 'util';
 import {Logger} from '../shared/Logger';
 import {ProjectConfigValidator} from '../validator/ProjectConfigValidator';
 import {AppSettings} from '../types/Settings/app-settings';
+import {Functions} from '../shared/Functions';
 
 @Injectable()
 export class SettingsService {
@@ -109,7 +110,7 @@ export class SettingsService {
 
   getApplicationSettings() {
     Logger.log('Load Application Settings...');
-    this.subscrmanager.add(this.http.request('./config/appconfig.json').subscribe(
+    this.subscrmanager.add(Functions.uniqueHTTPRequest(this.http, false, null, './config/appconfig.json', null).subscribe(
       (result) => {
         this._app_settings = result.json();
         Logger.log('AppSettings loaded.');
@@ -128,7 +129,7 @@ export class SettingsService {
 
   public loadProjectSettings: () => Subscription = () => {
     Logger.log('Load Project Settings...');
-    return this.http.request('./project/projectconfig.json').subscribe(
+    return Functions.uniqueHTTPRequest(this.http, false, null, './project/projectconfig.json', null).subscribe(
       (result) => {
         this._projectsettings = result.json();
         const validation = this.validate(new ProjectConfigValidator(), this._projectsettings);
@@ -147,7 +148,7 @@ export class SettingsService {
 
   public loadGuidelines: ((language: string, url: string) => Subscription) = (language: string, url: string) => {
     Logger.log('Load Guidelines (' + language + ')...');
-    return this.http.get(url).subscribe(
+    return Functions.uniqueHTTPRequest(this.http, false, null, url, null).subscribe(
       (response) => {
         const guidelines = response.json();
         Logger.log('Guidelines loaded.');
@@ -163,7 +164,7 @@ export class SettingsService {
 
   public loadValidationMethod: ((url: string) => Subscription) = (url: string) => {
     Logger.log('Load Methods...');
-    return this.http.get(url).subscribe(
+    return Functions.uniqueHTTPRequest(this.http, false, null, url, null).subscribe(
       (response) => {
         const js = document.createElement('script');
 

@@ -1,4 +1,7 @@
 import {isNullOrUndefined} from 'util';
+import {Http, RequestOptions, Response, URLSearchParams} from '@angular/http';
+import {Observable} from 'rxjs/Observable';
+
 export interface FileSize {
   size: number;
   label: string;
@@ -157,5 +160,20 @@ export class Functions {
     }
 
     return result;
+  }
+
+  public static uniqueHTTPRequest(http: Http, post: boolean = false, headers: Headers, url: string, body: any): Observable<Response> {
+    if (!post) {
+      const params: URLSearchParams = new URLSearchParams();
+      let d = Date.now();
+      params.set('v', d.toString());
+
+      const requestOptions = new RequestOptions();
+      requestOptions.params = params;
+
+      return http.get(url, requestOptions);
+    } else {
+      return http.post(url, body, headers);
+    }
   }
 }

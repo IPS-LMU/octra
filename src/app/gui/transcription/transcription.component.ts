@@ -177,6 +177,7 @@ export class TranscriptionComponent implements OnInit,
   }
 
   afterAudioLoaded = () => {
+    console.log(this.sessService.servertranscipt);
     this.transcrService.load();
 
     this.loadForm();

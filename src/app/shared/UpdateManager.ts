@@ -16,6 +16,8 @@ export class UpdateManager {
 
     if (isNullOrUndefined(this.version) || appversion !== this.version) {
       console.log('update...');
+      console.log(appversion);
+      console.log(this.version);
       this.update();
     }
   }
@@ -62,6 +64,7 @@ export class UpdateManager {
       } else {
         // OCTRAJSON found
         console.log('clear OCTRAJSON');
+        console.log(this.sessService.annotation);
         this.sessService.localStr.store('annotation', null);
         this.sessService.version = appversion;
       }

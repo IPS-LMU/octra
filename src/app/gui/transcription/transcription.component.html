@@ -196,7 +196,7 @@
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.export data" | translate}}</span>
                 <span class="glyphicon glyphicon-download"></span></a>
             <a class="btn btn-primary btn-raised"
-               (click)="modal.open();" *ngIf="!sessService.offline"><span
+               (click)="onSendButtonClick()" *ngIf="!sessService.offline"><span
                     *ngIf="!sessService.easymode"
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"transcription.send" | translate}}</span>
                 <span class="glyphicon glyphicon-send"></span></a>

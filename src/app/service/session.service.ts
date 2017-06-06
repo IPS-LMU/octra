@@ -13,12 +13,14 @@ export class SessionService {
   set servertranscipt(value: any[]) {
     this._servertranscipt = value;
   }
+
   get version(): string {
     return this._version;
   }
 
   set version(value: string) {
     this._version = value;
+    this.localStr.store('version', value);
   }
 
   get annotation(): OAnnotJSON {
@@ -342,7 +344,10 @@ export class SessionService {
   public clearLocalStorage(): boolean {
     this.logged_in = false;
     this.login = false;
+
+    const version = this._version;
     this.localStr.clear();
+    this.localStr.store('version', version);
 
     return (isNullOrUndefined(this.sessStr.retrieve('data_id'))
     && isNullOrUndefined(this.sessStr.retrieve('audio_url')));

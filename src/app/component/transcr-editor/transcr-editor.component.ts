@@ -227,8 +227,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     for (let i = 0; i < this.markers.length; i++) {
       const marker = this.markers[i];
-      result.buttons[marker.code] = this.test();
-      result.str_array.push(marker.code);
+      result.buttons['' + i + ''] = this.createButton(marker);
+      result.str_array.push('' + i + '');
     }
 
     return result;
@@ -240,44 +240,46 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * @returns {any}
    */
   createButton(marker): any {
-    const platform = BrowserInfo.platform;
-    let icon = '';
-    if (!this.easymode) {
-      icon = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
-        '<span class=\'btn-description\'>' + marker.button_text + '</span><span class=\'btn-shortcut\'> ' +
-        '[' + marker.shortcut[platform] + ']</span>';
-      if (this.Settings.responsive) {
+    return (context) => {
+      const platform = BrowserInfo.platform;
+      let icon = '';
+      if (!this.easymode) {
         icon = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
-          '<span class=\'btn-description hidden-xs hidden-sm\'>' + marker.button_text +
-          '</span><span class=\'btn-shortcut hidden-xs hidden-sm hidden-md\'> [' + marker.shortcut[platform] + ']</span>';
+          '<span class=\'btn-description\'>' + marker.button_text + '</span><span class=\'btn-shortcut\'> ' +
+          '[' + marker.shortcut[platform] + ']</span>';
+        if (this.Settings.responsive) {
+          icon = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
+            '<span class=\'btn-description hidden-xs hidden-sm\'>' + marker.button_text +
+            '</span><span class=\'btn-shortcut hidden-xs hidden-sm hidden-md\'> [' + marker.shortcut[platform] + ']</span>';
+        }
+      } else {
+        icon = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon\' style=\'height:16px;\'/>';
       }
-    } else {
-      icon = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon\' style=\'height:16px;\'/>';
+      // create button
+      const btn_js = {
+        contents: icon,
+        click: () => {
+          // invoke insertText method with 'hello' on editor module.
+          this.insertMarker(marker.code, marker.icon_url);
+          this.marker_click.emit(marker.code);
+        }
+      };
+      const button = jQuery.summernote.ui.button(btn_js);
+
+      return button.render();   // return button as jquery object
     }
-    // create button
-    const btn_js = {
-      contents: icon,
-      click: () => {
-        // invoke insertText method with 'hello' on editor module.
-        this.insertMarker(marker.code, marker.icon_url);
-        this.marker_click.emit(marker.code);
-      }
-    };
-    console.log(btn_js);
-    const button = this.summernote_ui.button(btn_js);
-    return button.render();   // return button as jquery object
   }
 
   test() {
-      const ui = jQuery.summernote.ui;
+    const ui = jQuery.summernote.ui;
 
-      // create button
-      const button = ui.button({
-        contents: '<i class="fa fa-child"/> Hello',
-        tooltip: 'hello'
-      });
+    // create button
+    const button = ui.button({
+      contents: '<i class="fa fa-child"/> Hello',
+      tooltip: 'hello'
+    });
 
-      return button.render();   // return button as jquery object
+    return button.render();   // return button as jquery object
   }
 
   /**

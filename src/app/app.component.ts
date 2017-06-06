@@ -17,7 +17,6 @@ import {UpdateManager} from './shared/UpdateManager';
 })
 
 export class AppComponent implements OnDestroy {
-  // public jsontext = '';
 
   public get version(): string {
     return AppInfo.version;
@@ -169,26 +168,13 @@ export class AppComponent implements OnDestroy {
   }
 
   fetching(id: string) {
-    let id_num = Number(id);
-    let counter = 0;
-    setInterval(() => {
-      counter++;
-      --id_num;
-      if (counter < 10) {
-        this.subscrmanager.add(
-          this.api.fetchAnnotation(id_num).subscribe(
-            (result) => {
-              const json = result.json();
-
-              if (json.hasOwnProperty('data') && json.data.hasOwnProperty('annotator')
-                && json.data.annotator === 'julian_test') {
-                console.log('annotated found');
-                console.log(result.json());
-              }
-            }
-          )
-        );
+    /*
+    this.subscrmanager.add(this.api.webASRTest('octra@phonetik.uni-muenchen.de', 'JdZ-2F9-Z4f-8bV').subscribe(
+      (result) => {
+        console.log('TEST RESULT:');
+        console.log(result);
       }
-    }, 3000);
+    ));
+    */
   }
 }

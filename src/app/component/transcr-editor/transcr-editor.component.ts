@@ -151,9 +151,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * destroys the summernote editor
    */
   private destroy() {
+    console.log('destroy');
     this.textfield.summernote('destroy');
     // delete tooltip overlays
-    jQuery('.tooltip').remove();
+    //jQuery('.tooltip').remove();
     this.subscrmanager.destroy();
   }
 
@@ -171,7 +172,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       disableDragAndDrop: true,
       disableResizeEditor: true,
       disableResizeImage: true,
-      popover: [],
+      popover: {
+        image: [],
+        link: [],
+        air: []
+      },
       airPopover: [],
       toolbar: [
         ['mybutton', Navigation.str_array]
@@ -222,7 +227,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     for (let i = 0; i < this.markers.length; i++) {
       const marker = this.markers[i];
-      result.buttons[marker.code] = this.createButton(marker);
+      result.buttons[marker.code] = this.test();
       result.str_array.push(marker.code);
     }
 
@@ -250,16 +255,29 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       icon = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon\' style=\'height:16px;\'/>';
     }
     // create button
-    const button = this.summernote_ui.button({
+    const btn_js = {
       contents: icon,
-      tooltip: marker.description + ' Shortcut: [' + marker.shortcut[platform] + ']',
       click: () => {
         // invoke insertText method with 'hello' on editor module.
         this.insertMarker(marker.code, marker.icon_url);
         this.marker_click.emit(marker.code);
       }
-    });
+    };
+    console.log(btn_js);
+    const button = this.summernote_ui.button(btn_js);
     return button.render();   // return button as jquery object
+  }
+
+  test() {
+      const ui = jQuery.summernote.ui;
+
+      // create button
+      const button = ui.button({
+        contents: '<i class="fa fa-child"/> Hello',
+        tooltip: 'hello'
+      });
+
+      return button.render();   // return button as jquery object
   }
 
   /**

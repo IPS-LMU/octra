@@ -458,4 +458,9 @@ export class TranscriptionComponent implements OnInit,
     this.send_error = error.message;
     return Observable.throw(error);
   }
+
+  onSendButtonClick(){
+    this.saveForm();
+    this.modal.open();
+  }
 }

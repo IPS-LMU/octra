@@ -190,9 +190,7 @@ export class TranscriptionSubmitComponent implements OnInit, ComponentCanDeactiv
     // create emty attribute
     if (!isNullOrUndefined(this.settingsService.projectsettings)) {
       const feedback = this.transcrService.feedback;
-      console.log("feedback");
-      console.log(feedback);
-      for (const g in feedback.groups) {
+                  for (const g in feedback.groups) {
         if (!isNullOrUndefined(g)) {
           for (const c in feedback.groups[g].controls) {
             if (!isNullOrUndefined(c)) {

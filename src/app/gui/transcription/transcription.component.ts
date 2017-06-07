@@ -177,17 +177,14 @@ export class TranscriptionComponent implements OnInit,
   }
 
   afterAudioLoaded = () => {
-    console.log(this.sessService.servertranscipt);
-    this.transcrService.load();
+        this.transcrService.load();
 
     this.loadForm();
 
     if (isNullOrUndefined(this.sessService.feedback)) {
       console.error('feedback is null!');
     } else {
-      console.log('get feedback');
-      console.log(this.sessService.feedback);
-    }
+                }
 
     this.transcrService.guidelines = this.settingsService.guidelines;
 
@@ -330,8 +327,7 @@ export class TranscriptionComponent implements OnInit,
       const id = this.subscrmanager.add(comp.initialized.subscribe(
         () => {
           setTimeout(() => {
-            console.log('component initialized');
-            this.editorloaded = true;
+                        this.editorloaded = true;
             this.subscrmanager.remove(id);
           }, 100);
         }
@@ -381,10 +377,8 @@ export class TranscriptionComponent implements OnInit,
         this.changeValue(control, this.feedback_data[control]);
       }
     }
-    console.log('saveForm');
-    this.sessService.save('feedback', this.transcrService.feedback.exportData());
-    console.log(this.sessService.feedback);
-  }
+        this.sessService.save('feedback', this.transcrService.feedback.exportData());
+      }
 
   changeValue(control: string, value: any) {
     const result = this.transcrService.feedback.setValueForControl(control, value.toString());

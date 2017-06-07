@@ -326,8 +326,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     }).subscribe(
       (result) => {
         const json = result.json();
-        console.log(json);
-        if (form.valid && this.agreement_checked
+                if (form.valid && this.agreement_checked
           && json.message !== '0'
         ) {
 

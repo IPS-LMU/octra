@@ -55,8 +55,7 @@ export class DropZoneComponent implements OnInit {
     if (this.fileAPIsupported) {
       const files: FileList = $event.dataTransfer.files; // FileList object.
       this._files = files;
-      console.log(files);
-      this.afterdrop.emit(this._files);
+            this.afterdrop.emit(this._files);
     }
   }
 

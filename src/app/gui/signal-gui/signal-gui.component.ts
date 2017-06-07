@@ -22,7 +22,6 @@ import {AudioTime, AVMousePos, AVSelection, BrowserInfo, Functions, Subscription
 import {SettingsService} from '../../service/settings.service';
 import {isNullOrUndefined} from 'util';
 import {SessionService} from '../../service/session.service';
-import {Observable} from 'rxjs/Observable';
 import {CircleLoupeComponent} from '../../component/circleloupe/circleloupe.component';
 
 @Component({
@@ -40,6 +39,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('transcr') editor: TranscrEditorComponent;
 
   private subscrmanager: SubscriptionManager;
+  private saving = false;
 
   public miniloupe_hidden = true;
   public segmentselected = false;
@@ -106,22 +106,45 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // update signaldisplay on changes
     /* this.subscrmanager.add(Observable.timer(0, 2000).subscribe(
-      () => {
-        this.viewer.drawSegments();
-        this.loupe.viewer.drawSegments();
-      }
-    ));*/
+     () => {
+     this.viewer.drawSegments();
+     this.loupe.viewer.drawSegments();
+     }
+     ));*/
 
-    this.subscrmanager.add(this.loupe.viewer.segmentchange.subscribe(
+    this.subscrmanager.add(this.transcrService.annotation.levels[0].segments.onsegmentchange.subscribe(
       ($event) => {
-        this.onSegmentChange($event);
-      }));
-
-    this.subscrmanager.add(this.loupe.viewer.alerttriggered.subscribe(
-      (result) => {
-        this.msg.showMessage(result.type, result.message);
+        if (this.saving) {
+        } else {
+          setTimeout(() => {
+            this.saving = true;
+            this.onSegmentChange($event);
+          }, 1000);
+        }
       }
     ));
+
+    this
+      .subscrmanager
+      .add(this
+
+        .loupe
+        .viewer
+        .alerttriggered
+        .subscribe(
+          (result) => {
+            this
+              .msg
+              .showMessage(result
+
+                  .type
+                ,
+                result
+                  .message
+              );
+          }
+        ))
+    ;
 
     this.subscrmanager.add(this.viewer.alerttriggered.subscribe(
       (result) => {
@@ -169,7 +192,9 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
     this.keyMap.unregister('Loupe');
   }
 
-  onButtonClick(event: { type: string, timestamp: number }) {
+  onButtonClick(event: {
+    type: string, timestamp: number
+  }) {
     if (this.projectsettings.logging.forced === true) {
       this.uiService.addElementFromEvent('mouse_click', {}, event.timestamp, event.type + '_button');
     }
@@ -220,8 +245,9 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onSegmentChange($event) {
-    this.loupe.update();
-    this.viewer.drawSegments();
+        this.loupe.update();
+    this.viewer.update();
+    this.saving = false;
   }
 
   onMouseOver(cursor: AVMousePos) {
@@ -261,8 +287,9 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
    }
    */
 
-  private changeArea(loup: LoupeComponent | CircleLoupeComponent, viewer: AudioviewerComponent, coord: any,
-                     cursor: number, relX: number, factor: number = 4) {
+  private
+  changeArea(loup: LoupeComponent | CircleLoupeComponent, viewer: AudioviewerComponent, coord: any,
+             cursor: number, relX: number, factor: number = 4) {
     const range = ((viewer.Chunk.time.duration.samples / this.audio.duration.samples) * this.audio.samplerate) / factor;
 
     if (cursor && relX > -1) {
@@ -289,7 +316,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loupe.changeArea(this.transcrService.annotation.levels[0].segments.getStartTime($event.index), segment.time);
   }
 
-  // TODO CHANGE!!
+// TODO CHANGE!!
   onLoupeSegmentEnter($event) {
     const segment = this.transcrService.annotation.levels[0].segments.get($event.index);
     this.editor.rawText = segment.transcript;
@@ -405,21 +432,29 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
     this.segmentselected = false;
   }
 
-  onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
+  onSpeedChange(event: {
+    old_value: number, new_value: number, timestamp: number
+  }) {
     this.audio.speed = event.new_value;
   }
 
-  afterSpeedChange(event: { new_value: number, timestamp: number }) {
+  afterSpeedChange(event: {
+    new_value: number, timestamp: number
+  }) {
     if (this.projectsettings.logging.forced === true) {
       this.uiService.addElementFromEvent('slider', event, event.timestamp, 'speed_change');
     }
   }
 
-  onVolumeChange(event: { old_value: number, new_value: number, timestamp: number }) {
+  onVolumeChange(event: {
+    old_value: number, new_value: number, timestamp: number
+  }) {
     this.audio.volume = event.new_value;
   }
 
-  afterVolumeChange(event: { new_value: number, timestamp: number }) {
+  afterVolumeChange(event: {
+    new_value: number, timestamp: number
+  }) {
     if (this.projectsettings.logging.forced === true) {
       this.uiService.addElementFromEvent('slider', event, event.timestamp, 'volume_change');
     }
@@ -441,7 +476,8 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  public openSegment(segnumber: number) {
+  public
+  openSegment(segnumber: number) {
     const segment = this.transcrService.annotation.levels[0].segments.get(segnumber);
     this.editor.rawText = segment.transcript;
 

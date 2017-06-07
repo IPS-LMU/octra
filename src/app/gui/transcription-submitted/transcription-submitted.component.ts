@@ -39,6 +39,7 @@ export class TranscriptionSubmittedComponent implements OnInit, OnDestroy, After
   }
 
   ngOnInit() {
+    this.sessService.submitted = true;
   }
 
   ngAfterViewInit() {

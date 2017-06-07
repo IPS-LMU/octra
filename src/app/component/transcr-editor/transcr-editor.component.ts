@@ -151,8 +151,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * destroys the summernote editor
    */
   private destroy() {
-    console.log('destroy');
-    this.textfield.summernote('destroy');
+        this.textfield.summernote('destroy');
     // delete tooltip overlays
     //jQuery('.tooltip').remove();
     this.subscrmanager.destroy();
@@ -212,8 +211,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     });
 
     this.textfield.summernote('removeModule', 'statusbar');
-    console.log(jQuery(this.textfield).next().css({'flex': 'auto'}));
-    this.loaded.emit(true);
+        this.loaded.emit(true);
   }
 
   /**

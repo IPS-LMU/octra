@@ -66,6 +66,13 @@
     flex-direction: column;
     flex: 1 0 auto;
 }
+.transcr-editor .note-editor.note-frame.panel.panel-default{
+    flex:auto;
+}
+
+.note-editor.note-frame.panel.panel-default {
+    flex: auto;
+}
 
 :host {
     -webkit-box-flex: 1;

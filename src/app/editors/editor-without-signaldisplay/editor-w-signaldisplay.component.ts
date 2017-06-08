@@ -8,10 +8,12 @@ import {SessionService} from '../../service/session.service';
 
 @Component({
   selector: 'app-audioplayer-gui',
-  templateUrl: './audioplayer-gui.component.html',
-  styleUrls: ['./audioplayer-gui.component.css']
+  templateUrl: './editor-w-signaldisplay.component.html',
+  styleUrls: ['./editor-w-signaldisplay.component.css']
 })
-export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit {
+export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterViewInit {
+  public static editorname = 'Editor without signal display';
+
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
 
   @ViewChild('nav') nav: AudioNavigationComponent;
@@ -57,12 +59,12 @@ export class AudioplayerGUIComponent implements OnInit, OnDestroy, AfterViewInit
     this.editor.Settings.markers = this.transcrService.guidelines.markers.items;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
 
-    AudioplayerGUIComponent.initialized.emit();
+    EditorWSignaldisplayComponent.initialized.emit();
   }
 
   ngAfterViewInit() {
     if (this.transcrService.annotation.levels[0].segments.length > 0) {
-      this.editor.rawText = this.transcrService.annotation.levels[0].segments.get(0).transcript;
+      this.editor.segments = this.transcrService.annotation.levels[0].segments;
     }
     // height of texteditor = 0 => auto
     this.editor.Settings.height = 0;

@@ -42,6 +42,10 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     return AppInfo.converters;
   }
 
+  public get AppInfo(): AppInfo {
+    return AppInfo;
+  }
+
   public get transcrServ(): TranscriptionService {
     return this.navbarServ.transcrService;
   }

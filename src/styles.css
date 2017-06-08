@@ -166,3 +166,7 @@ footer{
     display: flex;
     flex-direction: column;
 }
+
+.note-editor.note-frame.panel.panel-default {
+    flex: auto;
+}

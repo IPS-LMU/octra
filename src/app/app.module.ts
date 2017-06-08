@@ -24,16 +24,13 @@ import {
   TranscrEditorComponent
 } from './component';
 import {
-  AudioplayerGUIComponent,
   FastbarComponent,
   LoadingComponent,
   LoginComponent,
   LogoutComponent,
   MembersAreaComponent,
   NavigationComponent,
-  OverlayGUIComponent,
   ReloadFileComponent,
-  SignalGUIComponent,
   TranscriptionComponent,
   TranscriptionSubmitComponent,
   TranscriptionSubmittedComponent,
@@ -66,21 +63,31 @@ import {CollapseModule} from 'ngx-bootstrap/collapse';
 import {TranscActivateGuard} from './guard/transcr.activateguard';
 import {AgreementComponent} from './gui/agreement/agreement.component';
 import {BugReportService} from './service/bug-report.service';
-import { OctraDropzoneComponent } from './gui/octra-dropzone/octra-dropzone.component';
-import { LoadeditorDirective } from './directive/loadeditor.directive';
+import {OctraDropzoneComponent} from './gui/octra-dropzone/octra-dropzone.component';
+import {LoadeditorDirective} from './directive/loadeditor.directive';
+import {AppInfo} from './app.info';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
   return new LanguageLoader(http, './assets/i18n/octra/octra_', '.json');
 }
 
-@NgModule({
+function getEditorArray(): any[] {
+  const result: any[] = [];
+
+  for (let i = 0; i < AppInfo.editors.length; i++) {
+    result.push(AppInfo.editors[i].editor);
+  }
+
+  return result;
+}
+
+const ngmodule = {
   declarations: [
     AppComponent,
     AudioNavigationComponent,
     AudioplayerComponent,
     AudioplayerDirective,
-    AudioplayerGUIComponent,
     AudioviewerComponent,
     AudioviewerDirective,
     CircleLoupeComponent,
@@ -90,11 +97,9 @@ export function HttpLoaderFactory(http: Http) {
     LoupeComponent,
     MembersAreaComponent,
     NavigationComponent,
-    OverlayGUIComponent,
     ProcentPipe,
     SecondsPipe,
     LeadingNullPipe,
-    SignalGUIComponent,
     TimespanPipe,
     TranscrEditorComponent,
     TranscriptionComponent,
@@ -113,9 +118,7 @@ export function HttpLoaderFactory(http: Http) {
     LoadeditorDirective
   ],
   entryComponents: [
-    AudioplayerGUIComponent,
-    SignalGUIComponent,
-    OverlayGUIComponent
+    getEditorArray()
   ],
   imports: [
     BrowserModule,
@@ -163,7 +166,15 @@ export function HttpLoaderFactory(http: Http) {
     TranslateService,
     BugReportService
   ]
-})
+};
+
+// add editors to declaration
+for (let i = 0; i < AppInfo.editors.length; i++) {
+  const comp = getEditorArray()[i];
+  ngmodule.declarations.push(comp);
+}
+
+@NgModule(ngmodule)
 
 export class AppModule {
 }

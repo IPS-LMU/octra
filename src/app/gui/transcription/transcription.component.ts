@@ -34,12 +34,13 @@ import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {TranscrGuidelinesComponent} from '../transcr-guidelines/transcr-guidelines.component';
 import {APIService} from '../../service/api.service';
 import {LoadeditorDirective} from '../../directive/loadeditor.directive';
-import {AudioplayerGUIComponent} from '../audioplayer-gui/audioplayer-gui.component';
-import {OverlayGUIComponent} from '../overlay-gui/overlay-gui.component';
-import {SignalGUIComponent} from '../signal-gui/signal-gui.component';
+import {EditorWSignaldisplayComponent} from '../../editors/editor-without-signaldisplay/editor-w-signaldisplay.component';
+import {TwoDEditorComponent} from '../../editors/2D-editor/2D-editor.component';
 import {Entry} from '../../service/keymapping.service';
 import {Observable} from 'rxjs/Observable';
 import {ProjectConfiguration} from '../../types/Settings/project-configuration';
+import {LinearEditorComponent} from '../../editors/linear-editor/linear-editor.component';
+import {AppInfo} from '../../app.info';
 
 @Component({
   selector: 'app-transcription',
@@ -177,14 +178,14 @@ export class TranscriptionComponent implements OnInit,
   }
 
   afterAudioLoaded = () => {
-        this.transcrService.load();
+    this.transcrService.load();
 
     this.loadForm();
 
     if (isNullOrUndefined(this.sessService.feedback)) {
       console.error('feedback is null!');
     } else {
-                }
+    }
 
     this.transcrService.guidelines = this.settingsService.guidelines;
 
@@ -230,9 +231,6 @@ export class TranscriptionComponent implements OnInit,
 
     this.subscrmanager.add(this.navbarServ.interfacechange.subscribe(
       (editor) => {
-        if (this.projectsettings.logging.forced) {
-          this.uiService.addElementFromEvent('editor_changed', {value: editor}, Date.now(), '');
-        }
         this.changeEditor(editor);
       }
     ));
@@ -305,20 +303,17 @@ export class TranscriptionComponent implements OnInit,
   }
 
   changeEditor(name: string) {
+    if (this.projectsettings.logging.forced) {
+      this.uiService.addElementFromEvent('editor_changed', {value: name}, Date.now(), '');
+    }
+
     let comp: any = null;
-    switch (name) {
-      case('2D-Editor'):
-        comp = OverlayGUIComponent;
-        this.interface = name;
+
+    for (let i = 0; i < AppInfo.editors.length; i++) {
+      if (name === AppInfo.editors[i].name) {
+        comp = AppInfo.editors[i].editor;
         break;
-      case('Editor without signal display'):
-        comp = AudioplayerGUIComponent;
-        this.interface = name;
-        break;
-      case('Linear Editor'):
-        comp = SignalGUIComponent;
-        this.interface = name;
-        break;
+      }
     }
 
     if (!isNullOrUndefined(comp)) {
@@ -327,7 +322,7 @@ export class TranscriptionComponent implements OnInit,
       const id = this.subscrmanager.add(comp.initialized.subscribe(
         () => {
           setTimeout(() => {
-                        this.editorloaded = true;
+            this.editorloaded = true;
             this.subscrmanager.remove(id);
           }, 100);
         }
@@ -377,8 +372,8 @@ export class TranscriptionComponent implements OnInit,
         this.changeValue(control, this.feedback_data[control]);
       }
     }
-        this.sessService.save('feedback', this.transcrService.feedback.exportData());
-      }
+    this.sessService.save('feedback', this.transcrService.feedback.exportData());
+  }
 
   changeValue(control: string, value: any) {
     const result = this.transcrService.feedback.setValueForControl(control, value.toString());
@@ -453,7 +448,7 @@ export class TranscriptionComponent implements OnInit,
     return Observable.throw(error);
   }
 
-  onSendButtonClick(){
+  onSendButtonClick() {
     this.saveForm();
     this.modal.open();
   }

@@ -26,10 +26,12 @@ import {CircleLoupeComponent} from '../../component/circleloupe/circleloupe.comp
 
 @Component({
   selector: 'app-signal-gui',
-  templateUrl: './signal-gui.component.html',
-  styleUrls: ['./signal-gui.component.css']
+  templateUrl: './linear-editor.component.html',
+  styleUrls: ['./linear-editor.component.css']
 })
-export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
+export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
+  public static editorname = 'Linear Editor';
+
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
 
   @ViewChild('viewer') viewer: AudioviewerComponent;
@@ -183,7 +185,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     ));
-    SignalGUIComponent.initialized.emit();
+    LinearEditorComponent.initialized.emit();
   }
 
   ngOnDestroy() {
@@ -245,7 +247,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onSegmentChange($event) {
-        this.loupe.update();
+    this.loupe.update();
     this.viewer.update();
     this.saving = false;
   }
@@ -287,9 +289,8 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
    }
    */
 
-  private
-  changeArea(loup: LoupeComponent | CircleLoupeComponent, viewer: AudioviewerComponent, coord: any,
-             cursor: number, relX: number, factor: number = 4) {
+  private changeArea(loup: LoupeComponent | CircleLoupeComponent, viewer: AudioviewerComponent, coord: any,
+                     cursor: number, relX: number, factor: number = 4) {
     const range = ((viewer.Chunk.time.duration.samples / this.audio.duration.samples) * this.audio.samplerate) / factor;
 
     if (cursor && relX > -1) {
@@ -476,8 +477,7 @@ export class SignalGUIComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  public
-  openSegment(segnumber: number) {
+  public openSegment(segnumber: number) {
     const segment = this.transcrService.annotation.levels[0].segments.get(segnumber);
     this.editor.rawText = segment.transcript;
 

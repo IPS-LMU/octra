@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 
 import {AudioNavigationComponent, AudioviewerComponent} from '../../component';
-import {TranscrWindowComponent} from '../transcr-window/transcr-window.component';
+import {TranscrWindowComponent} from '../../gui/transcr-window/transcr-window.component';
 
 import {
   AudioService,
@@ -31,10 +31,12 @@ import {CircleLoupeComponent} from '../../component/circleloupe/circleloupe.comp
 
 @Component({
   selector: 'app-overlay-gui',
-  templateUrl: './overlay-gui.component.html',
-  styleUrls: ['./overlay-gui.component.css']
+  templateUrl: './2D-editor.component.html',
+  styleUrls: ['./2D-editor.component.css']
 })
-export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentChecked, OnChanges, OnDestroy {
+export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentChecked, OnChanges, OnDestroy {
+  public static editorname = '2D-Editor';
+
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
 
   @ViewChild('viewer') viewer: AudioviewerComponent;
@@ -118,7 +120,7 @@ export class OverlayGUIComponent implements OnInit, AfterViewInit, AfterContentC
       }
     ));
 
-    OverlayGUIComponent.initialized.emit();
+    TwoDEditorComponent.initialized.emit();
   }
 
   ngOnChanges(test) {

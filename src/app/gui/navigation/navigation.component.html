@@ -128,33 +128,6 @@
                     </li>
 
                 </ng-template>
-                <!--
-                <li *ngIf="sessService.LoggedIn && navbarServ.show_interfaces && interfaceActive('Editor without signal display')"
-                    [ngClass]="{
-                        'active': sessService.Interface === 'Editor without signal display'
-                    }"
-                >
-                    <a (mouseup)="setInterface('Editor without signal display')">
-                        <i class="glyphicon glyphicon-minus navbar-icon"></i> <span class="hidden-sm">{{"interfaces.simple editor" | translate}}</span>
-                    </a>
-                </li>
-                <li *ngIf="sessService.LoggedIn && navbarServ.show_interfaces && interfaceActive('Linear Editor')"
-                    [ngClass]="{
-                        'active': sessService.Interface === 'Linear Editor'
-                    }">
-                    <a (mouseup)="setInterface('Linear Editor')">
-                        <span class="glyphicon glyphicon-modal-window navbar-icon"></span> <span class="hidden-sm">{{"interfaces.linear editor" | translate}}</span>
-                    </a>
-                </li>
-                <li *ngIf="sessService.LoggedIn && navbarServ.show_interfaces && interfaceActive('2D-Editor')"
-                    [ngClass]="{
-                        'active': sessService.Interface === '2D-Editor'
-                    }"
-                >
-                    <a (mouseup)="setInterface('2D-Editor')">
-                        <span class="glyphicon glyphicon-align-justify navbar-icon"></span> <span class="hidden-sm">{{"interfaces.2D editor" | translate}}</span></a>
-                </li>
-                -->
                 <li *ngIf="sessService.LoggedIn && navbarServ.show_interfaces && settService.app_settings.octra.showdetails">
                     <a (mouseup)="modalstatistics.open()">
                         <span class="glyphicon glyphicon-th-list navbar-icon"></span> <span

@@ -26,28 +26,8 @@ export class AppInfo {
 
   private static _version = '1.2.0';
 
-  private static _converters: {
-    appendix: string,
-    converter: Converter
-  }[] = [
-    {
-      appendix: '.txt',
-      converter: new TextConverter()
-    },
-    {
-      appendix: '.Table',
-      converter: new PraatTableConverter()
-    },
-    {
-      appendix: '_annot.json',
-      converter: new AnnotJSONConverter()
-    },
-    {
-      appendix: '.ctm',
-      converter: new CTMConverter()
-    }
-  ];
 
+  // defined editors
   private static _editors: {
     name: string,
     editor: Component,
@@ -71,6 +51,29 @@ export class AppInfo {
       editor: TwoDEditorComponent,
       translate: 'interfaces.2D editor',
       icon: '<span class="glyphicon glyphicon-align-justify navbar-icon"></span>'
+    }
+  ];
+
+  // defined converters
+  private static _converters: {
+    appendix: string,
+    converter: Converter
+  }[] = [
+    {
+      appendix: '.txt',
+      converter: new TextConverter()
+    },
+    {
+      appendix: '.Table',
+      converter: new PraatTableConverter()
+    },
+    {
+      appendix: '_annot.json',
+      converter: new AnnotJSONConverter()
+    },
+    {
+      appendix: '.ctm',
+      converter: new CTMConverter()
     }
   ];
 }

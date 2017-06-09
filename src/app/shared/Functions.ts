@@ -5,8 +5,7 @@ import {Observable} from 'rxjs/Observable';
 export interface FileSize {
   size: number;
   label: string;
-}
-;
+};
 
 export class Functions {
   public static scrollTo(y: number, target?: string) {

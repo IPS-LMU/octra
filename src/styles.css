@@ -170,3 +170,12 @@ footer{
 .note-editor.note-frame.panel.panel-default {
     flex: auto;
 }
+
+.seg-popover{
+    border: 1px solid orange;
+    background-color:white;
+    z-index:100;
+    position:absolute;
+    padding:5px;
+    display:none;
+}

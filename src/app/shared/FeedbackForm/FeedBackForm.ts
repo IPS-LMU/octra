@@ -4,6 +4,14 @@ import {isNullOrUndefined} from 'util';
 import {isArray} from 'rxjs/util/isArray';
 
 export class FeedBackForm {
+  set required(value: boolean) {
+    this._required = value;
+  }
+
+  get required(): boolean {
+    return this._required;
+  }
+
   public get groups(): Group[] {
     return this._groups;
   }
@@ -16,19 +24,33 @@ export class FeedBackForm {
     this._comment = value;
   }
 
+  private _required = false;
+
   public static fromAny(feedback_data: any[], comment: string): FeedBackForm {
     const groups: Group[] = [];
 
     // init feedback_data
+
+    let result: FeedBackForm = null;
+    let required = false;
     for (let i = 0; i < feedback_data.length; i++) {
       const group = feedback_data[i];
-      groups.push(Group.fromAny(group));
+      const group_obj = Group.fromAny(group);
+
+      groups.push(group_obj);
+      if (group_obj.required) {
+        required = true;
+      }
     }
 
-    return new FeedBackForm(
+    result = new FeedBackForm(
       groups,
       comment
     );
+
+    result.required = required;
+
+    return result;
   }
 
   constructor(private _groups: Group[], private _comment: string) {

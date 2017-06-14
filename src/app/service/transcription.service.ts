@@ -195,7 +195,7 @@ export class TranscriptionService {
         if (!isNullOrUndefined(this.sessServ.servertranscipt)) {
           // import server transcript
           this.sessServ.annotation.levels[0].items = [];
-                    for (let i = 0; i < this.sessServ.servertranscipt.length; i++) {
+          for (let i = 0; i < this.sessServ.servertranscipt.length; i++) {
             const seg_t = this.sessServ.servertranscipt[i];
 
             const oseg = new OSegment(i, seg_t.start, seg_t.length, [new OLabel('Orthographic', seg_t.text)]);

@@ -1,4 +1,3 @@
-
 /**
  * this is a test validation method to show how validation could work.
  * @param annotation
@@ -7,17 +6,17 @@
 function validateAnnotation(annotation, guidelines) {
     var result = [];
 
-    //Z01 Satzzeichen
-    var re = /[\(\.,\!\?;\-\)]/g;
+    //R06 Satzzeichen
+    var re = /[\(\.,\!\?;\)]/g;
     while ((match = re.exec(annotation)) != null) {
         result.push({
             start: match.index,
             length : match[0].length,
-            code: "Z01"
+            code: "R06"
         });
     }
 
-    //G01
+    //M01
     for(var i = 0; i < guidelines.markers.length; i++){
         var marker = guidelines.markers[i].code;
 
@@ -26,19 +25,9 @@ function validateAnnotation(annotation, guidelines) {
             result.push({
                 start: match.index,
                 length : match[0].length,
-                code: "G01"
+                code: "M01"
             });
         }
-    }
-
-    //R02 Ziffern
-    re = /[0-9]+/g;
-    while ((match = re.exec(annotation)) != null) {
-        result.push({
-            start: match.index,
-            length : match[0].length,
-            code: "R02"
-        });
     }
 
     //the next line has to be before returning the result
@@ -55,7 +44,7 @@ function validateAnnotation(annotation, guidelines) {
 function tidyUpAnnotation(annotation, guidelines) {
     var result = annotation;
 
-    result = result.replace(/\[[~^a-z0-9]+\]/g, function (x) {
+    result = result.replace(/<[~^a-z0-9]+>/g, function (x) {
         return " " + x + " ";
     });
     //set whitespaces before *
@@ -90,3 +79,5 @@ function sortValidationResult(result){
             return 1;
     });
 }
+
+console.log("ok es klappt test4");

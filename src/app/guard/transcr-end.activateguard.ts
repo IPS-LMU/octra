@@ -5,7 +5,7 @@ import {Observable} from 'rxjs/Rx';
 import {SessionService} from '../service/session.service';
 
 @Injectable()
-export class TranscrSubmittedGuard implements CanActivate {
+export class TranscrEndGuard implements CanActivate {
 
   constructor(private sessService: SessionService, private router: Router) {
 

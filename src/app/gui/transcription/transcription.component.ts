@@ -29,18 +29,16 @@ import {
 } from '../../service';
 
 import {BrowserInfo, SubscriptionManager} from '../../shared';
-import {isNullOrUndefined} from 'util';
+import {isArray, isNullOrUndefined, isNumber} from 'util';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {TranscrGuidelinesComponent} from '../transcr-guidelines/transcr-guidelines.component';
 import {APIService} from '../../service/api.service';
 import {LoadeditorDirective} from '../../directive/loadeditor.directive';
-import {EditorWSignaldisplayComponent} from '../../editors/editor-without-signaldisplay/editor-w-signaldisplay.component';
-import {TwoDEditorComponent} from '../../editors/2D-editor/2D-editor.component';
 import {Entry} from '../../service/keymapping.service';
 import {Observable} from 'rxjs/Observable';
 import {ProjectConfiguration} from '../../types/Settings/project-configuration';
-import {LinearEditorComponent} from '../../editors/linear-editor/linear-editor.component';
 import {AppInfo} from '../../app.info';
+import {NgForm} from '@angular/forms';
 
 @Component({
   selector: 'app-transcription',
@@ -59,6 +57,7 @@ export class TranscriptionComponent implements OnInit,
 
   @ViewChild('modal') modal: ModalComponent;
   @ViewChild('modal2') modal2: ModalComponent;
+  @ViewChild('fo') feedback_form: NgForm;
   public send_error = '';
 
   public showdetails = false;
@@ -68,6 +67,8 @@ export class TranscriptionComponent implements OnInit,
   public shortcutslist: Entry[] = [];
   public editorloaded = false;
   public feedback_data = {};
+
+  public feedback_expanded = false;
 
   get help_url(): string {
     if (this.sessService.Interface === 'Editor without signal display') {
@@ -234,6 +235,8 @@ export class TranscriptionComponent implements OnInit,
         this.changeEditor(editor);
       }
     ));
+
+    console.log(this.transcrService.feedback);
   }
 
   ngAfterViewInit() {
@@ -250,6 +253,9 @@ export class TranscriptionComponent implements OnInit,
   }
 
   abortTranscription = () => {
+    if(!this.sessService.offline){
+      this.saveFeedbackform();
+    }
     this.transcrService.endTranscription();
     this.router.navigate(['/logout']);
   }
@@ -343,7 +349,8 @@ export class TranscriptionComponent implements OnInit,
         'position': 'absolute'
       });
       jQuery('#bottom-feedback .inner').css({
-        'display': 'inherit'
+        'display': 'inherit',
+        'overflow-y': 'scroll'
       });
 
     } else {
@@ -354,13 +361,16 @@ export class TranscriptionComponent implements OnInit,
       });
 
       jQuery('#bottom-feedback .inner').css({
-        'display': 'none'
+        'display': 'none',
+        'overflow-y': 'hidden'
       });
-      this.saveForm();
+      this.saveFeedbackform();
     }
+
+    this.feedback_expanded = !this.feedback_expanded;
   }
 
-  private saveForm() {
+  private saveFeedbackform() {
     if (!isNullOrUndefined(this.transcrService.feedback.comment)
       && this.transcrService.feedback.comment !== '') {
       this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, '\s');
@@ -434,7 +444,10 @@ export class TranscriptionComponent implements OnInit,
             this.sessService.submitted = true;
             this.modal2.close();
             setTimeout(() => {
-              this.router.navigate(['/user/transcr/submitted']);
+              // this.router.navigate(['/user/transcr/submitted']);
+
+              this.nextTranscription();
+
             }, 1000);
           } else {
             this.send_error = this.langService.instant('send error');
@@ -449,7 +462,59 @@ export class TranscriptionComponent implements OnInit,
   }
 
   onSendButtonClick() {
-    this.saveForm();
-    this.modal.open();
+    console.log(this.feedback_form);
+
+    if (this.feedback_form.valid) {
+      this.saveFeedbackform();
+      this.modal.open();
+    } else if (!this.feedback_expanded) {
+      this.expandFeedback();
+    }
+  }
+
+  nextTranscription() {
+    this.transcrService.endTranscription(false);
+    this.clearData();
+    this.subscrmanager.add(this.api.beginSession(this.sessService.member_project, this.sessService.member_id,
+      Number(this.sessService.member_jobno), '')
+      .subscribe((result) => {
+        if (result !== null) {
+          const json = result.json();
+
+          if (json.data && json.data.hasOwnProperty('url') && json.data.hasOwnProperty('id')) {
+            this.sessService.audio_url = json.data.url;
+            this.sessService.data_id = json.data.id;
+
+            // get transcript data that already exists
+            if (json.data.hasOwnProperty('transcript')) {
+              const transcript = JSON.parse(json.data.transcript);
+
+              if (isArray(transcript) && transcript.length > 0) {
+                this.sessService.servertranscipt = transcript;
+              }
+            }
+
+            if (json.hasOwnProperty('message') && isNumber(json.message)) {
+              this.sessService.jobs_left = Number(json.message);
+            }
+
+            this.router.navigate(['/user/load']);
+          } else {
+            this.sessService.submitted = true;
+            this.router.navigate(['/user/transcr/end']);
+          }
+        }
+      }));
+  }
+
+  clearData() {
+    this.sessService.submitted = false;
+    this.sessService.annotation = null;
+
+    this.sessService.feedback = null;
+    this.sessService.comment = '';
+    this.sessService.logs = [];
+    this.uiService.elements = [];
+    this.settingsService.clearSettings();
   }
 }

@@ -45,3 +45,13 @@ h4 {
     margin: 0;
     margin-bottom: 0;
 }
+
+#loginrow {
+    display: -webkit-box;
+}
+
+@media(max-width:990px){
+    #loginrow {
+        display: inherit;
+    }
+}

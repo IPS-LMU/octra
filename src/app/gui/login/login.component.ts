@@ -106,7 +106,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   ngAfterViewInit() {
     this.loadPojectsList();
-    setTimeout(() => {
+    /* setTimeout(() => {
       jQuery.material.init();
 
       const max_height: number = Math.max(Number(this.onlinemode.nativeElement.clientHeight),
@@ -114,6 +114,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.localmode.nativeElement.style.height = max_height + 'px';
       this.onlinemode.nativeElement.style.height = max_height + 'px';
     }, 0);
+    */
   }
 
   ngOnDestroy() {

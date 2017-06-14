@@ -171,6 +171,20 @@ footer{
     flex: auto;
 }
 
+.transcr-editor .note-editable.panel-body{
+    flex: auto;
+}
+
+.note-editor.note-frame.panel.panel-default,
+.note-editing-area{
+    flex: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.note-editable.panel-body {
+}
+
 .seg-popover{
     border: 1px solid orange;
     background-color:white;

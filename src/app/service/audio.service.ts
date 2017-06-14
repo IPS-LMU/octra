@@ -239,7 +239,7 @@ export class AudioService {
 
   public startPlayback(begintime: AudioTime, duration: AudioTime = new AudioTime(0, this.samplerate),
                        drawFunc: () => void, endPlayback: () => void, playonhover: boolean = false): boolean {
-        if (!this.audioplaying) {
+    if (!this.audioplaying) {
       this._state = 'started';
       this._stepbackward = false;
       this.source = this.getSource();
@@ -317,10 +317,10 @@ export class AudioService {
   }
 
   public stepBackwardTime(callback: () => void) {
-        this.stepbackward = true;
+    this.stepbackward = true;
 
     if (this.audioplaying) {
-            this._state = 'backward time';
+      this._state = 'backward time';
       const obj: EventListenerOrEventListenerObject = () => {
         this.source.removeEventListener('ended', obj);
         callback();
@@ -329,7 +329,7 @@ export class AudioService {
       this.source.addEventListener('ended', obj);
       this.source.stop(0);
     } else {
-            callback();
+      callback();
     }
   }
 
@@ -369,9 +369,10 @@ export class AudioService {
     const samplerate = this.getSampleRate(result);
     this._bitrate = this.getBitRate(result);
 
-    decodeAudioFile(result, samplerate).then((buffer) => {
+    decodeAudioFile(result, samplerate).then((buffer: AudioBuffer) => {
       Logger.log('Audio decoded.');
       this._audiobuffer = buffer;
+      this._size = result.byteLength;
       this.duration = new AudioTime(buffer.length, buffer.sampleRate);
       this.gainNode = this.audiocontext.createGain();
       this.source = this.getSource();
@@ -470,7 +471,7 @@ export class AudioService {
           .catch(
             (re) => {
               console.error('close audiocontext error:');
-                          }
+            }
           );
       }
 

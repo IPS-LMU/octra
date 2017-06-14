@@ -129,7 +129,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
       this.selectedError = this.transcrService.getErrorDetails(errorcode);
 
-      if (this.selectedError != null) {
+      if (this.selectedError !== null) {
+        console.log('show');
         this.errortooltip.children('.title').text(this.selectedError.title);
         this.errortooltip.children('.description').text(this.selectedError.description);
         const y = target.offset().top - jQuery(this.errortooltip).height() - 20;

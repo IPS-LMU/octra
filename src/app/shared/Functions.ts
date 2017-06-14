@@ -5,7 +5,8 @@ import {Observable} from 'rxjs/Observable';
 export interface FileSize {
   size: number;
   label: string;
-};
+}
+;
 
 export class Functions {
   public static scrollTo(y: number, target?: string) {
@@ -127,6 +128,8 @@ export class Functions {
       result.size = bytes / 1000 / 1000 / 1000;
       result.label = 'GB';
     }
+
+    result.size = Math.round(result.size * 1000) / 1000;
 
     return result;
   }

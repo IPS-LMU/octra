@@ -66,8 +66,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     if (this.transcrService.annotation.levels[0].segments.length > 0) {
       this.editor.segments = this.transcrService.annotation.levels[0].segments;
     }
-    // height of texteditor = 0 => auto
-    this.editor.Settings.height = 0;
+    this.editor.Settings.height = 100;
     this.editor.update();
   }
 

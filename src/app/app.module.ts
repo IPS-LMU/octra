@@ -32,8 +32,7 @@ import {
   NavigationComponent,
   ReloadFileComponent,
   TranscriptionComponent,
-  TranscriptionSubmitComponent,
-  TranscriptionSubmittedComponent,
+  TranscriptionEndComponent,
   TranscrOverviewComponent,
   TranscrWindowComponent
 } from './gui';
@@ -51,7 +50,7 @@ import {
   SettingsService
 } from './service';
 
-import {ALoginGuard, DeALoginGuard, LogoutGuard, MembersAreaGuard, SettingsGuard, TranscrSubmittedGuard} from './guard';
+import {ALoginGuard, DeALoginGuard, LogoutGuard, MembersAreaGuard, SettingsGuard, TranscrEndGuard} from './guard';
 
 import {AppComponent} from './app.component';
 
@@ -72,17 +71,12 @@ export function HttpLoaderFactory(http: Http) {
   return new LanguageLoader(http, './assets/i18n/octra/octra_', '.json');
 }
 
-function getEditorArray(): any[] {
-  const result: any[] = [];
-
-  for (let i = 0; i < AppInfo.editors.length; i++) {
-    result.push(AppInfo.editors[i].editor);
-  }
-
-  return result;
+export const editorArray: any[] = [];
+for (let i = 0; i < AppInfo.editors.length; i++) {
+  editorArray.push(AppInfo.editors[i].editor);
 }
 
-const ngmodule = {
+export const ngmodule = {
   declarations: [
     AppComponent,
     AudioNavigationComponent,
@@ -103,8 +97,7 @@ const ngmodule = {
     TimespanPipe,
     TranscrEditorComponent,
     TranscriptionComponent,
-    TranscriptionSubmitComponent,
-    TranscriptionSubmittedComponent,
+    TranscriptionEndComponent,
     TranscrOverviewComponent,
     TranscrWindowComponent,
     AlertComponent,
@@ -118,7 +111,7 @@ const ngmodule = {
     LoadeditorDirective
   ],
   entryComponents: [
-    getEditorArray()
+    editorArray
   ],
   imports: [
     BrowserModule,
@@ -162,7 +155,7 @@ const ngmodule = {
     TranscActivateGuard,
     SettingsGuard,
     SettingsService,
-    TranscrSubmittedGuard,
+    TranscrEndGuard,
     TranslateService,
     BugReportService
   ]
@@ -170,7 +163,7 @@ const ngmodule = {
 
 // add editors to declaration
 for (let i = 0; i < AppInfo.editors.length; i++) {
-  const comp = getEditorArray()[i];
+  const comp = editorArray[i];
   ngmodule.declarations.push(comp);
 }
 

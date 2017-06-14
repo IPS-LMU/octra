@@ -106,6 +106,17 @@
     </modal-footer>
 </modal>
 
+<modal #success id="transcription_success">
+    <modal-body>
+        <p>{{"transcription submitted.no jobs left" | translate}}</p>
+    </modal-body>
+    <modal-footer>
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="success.dismiss()">{{"general.close"
+            | translate}}
+        </button>
+    </modal-footer>
+</modal>
+
 <div class="flex" *ngIf="loaded">
     <span id='saving' *ngIf="saving != ''"><span style="color:#333333"
                                                  class="glyphicon glyphicon-floppy-disk"></span></span>
@@ -131,8 +142,27 @@
         <ng-template appLoadeditor></ng-template>
     </div>
 
-    <div id="bottom-feedback" #feedback *ngIf="!sessService.offline">
-        <span class="link" (click)="expandFeedback()" style="width:100%;display: block;">FEEDBACK</span>
+    <div id="bottom-feedback" class="panel" #feedback *ngIf="!sessService.offline">
+        <table style="width:100%;">
+            <tbody>
+            <tr>
+                <td><span class="link" (click)="expandFeedback()" style="width:100%;display: block;">FEEDBACK <span class="required_marker" *ngIf="transcrService.feedback.required">*</span></span>
+                </td>
+                <td style="text-align: right">
+                    <span *ngIf="!feedback_expanded" class="glyphicon glyphicon-chevron-up"
+                          (click)="expandFeedback()"
+                          style="color:grey; display: block; padding:0;cursor:pointer;margin-bottom:10px;"
+                    >
+                    </span>
+                    <span *ngIf="feedback_expanded" class="glyphicon glyphicon-chevron-down"
+                          (click)="expandFeedback()"
+                          style="color:grey; display: block; padding:0;cursor:pointer;margin-bottom:10px;"
+                    >
+                    </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
         <div class="inner">
             <form (ngSubmit)="onSubmit(fo)" #fo="ngForm">
                 <fieldset>
@@ -190,11 +220,13 @@
                     class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span><span
                     *ngIf="!sessService.easymode"
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.quit" | translate}}</span></a>
+
             <a class="btn btn-primary btn-raised"
                (click)="navbarServ.doclick('export');" *ngIf="sessService.offline"><span
                     *ngIf="!sessService.easymode"
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.export data" | translate}}</span>
                 <span class="glyphicon glyphicon-download"></span></a>
+
             <a class="btn btn-primary btn-raised"
                (click)="onSendButtonClick()" *ngIf="!sessService.offline"><span
                     *ngIf="!sessService.easymode"

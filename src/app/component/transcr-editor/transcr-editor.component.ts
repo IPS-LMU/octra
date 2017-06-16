@@ -48,7 +48,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   set rawText(value: string) {
     this._rawText = this.tidyUpRaw(value);
     this.init = 0;
-    this.textfield.summernote('code', this.rawToHTML(this._rawText));
+    const html = this.rawToHTML(this._rawText);
+    this.textfield.summernote('code', html);
 
     this.initPopover();
   }
@@ -216,7 +217,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
      */
     this.textfield = jQuery('.textfield');
     this.textfield.summernote({
-      height: 0,
+      height: this.Settings.height,
       focus: true,
       disableDragAndDrop: true,
       disableResizeEditor: true,
@@ -275,6 +276,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       .html('00:00:000');
 
     this.segpopover.insertBefore('.note-editing-area');
+
+    jQuery('.note-editable').on('click', (click) => {
+      const selection = jQuery('.note-editable').caret('pos');
+      // alert(selection);
+    });
 
     this.loaded.emit(true);
   }
@@ -348,9 +354,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       })
         .on('mouseover', (event) => {
           const jqueryobj = jQuery(event.target);
+          console.log(jqueryobj);
 
           const width = jQuery('.seg-popover').width();
           const height = jQuery('.seg-popover').height();
+          const editor_pos = jQuery('.note-toolbar.panel-heading').offset();
           let seg_id = jqueryobj.attr('data-boundary');
 
           if (!isNullOrUndefined(seg_id) && Functions.isNumber(seg_id)) {
@@ -359,9 +367,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
             this.segpopover.css({
               'margin-left': (event.target.offsetLeft - (width / 2)) + 'px',
-              'margin-top': (event.target.offsetTop - height - event.target.height) + 'px',
+              'margin-top': (jqueryobj.offset().top - editor_pos.top - height - 10) + 'px',
               'display': 'inherit'
             });
+            console.log(editor_pos.top);
             const timespan = new TimespanPipe();
             const text = timespan.transform(seg.time.unix.toString());
             this.segpopover.text(text);
@@ -388,7 +397,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           '[SHORTCUT]</span>';
         if (this.Settings.responsive) {
           icon = '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
-            '<span class=\'btn-description hidden-xs hidden-sm\'>BOUNDARY DESCR</span><span class=\'btn-shortcut hidden-xs hidden-sm hidden-md\'> ' +
+            '<span class=\'btn-description hidden-xs hidden-sm\'>BOUNDARY DESCR</span>' +
+            '<span class=\'btn-shortcut hidden-xs hidden-sm hidden-md\'> ' +
             '[SHORTCUT]</span>';
         }
       } else {
@@ -595,9 +605,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       }
 
       result = result.replace(/\s+$/g, '&nbsp;');
-      result = (result !== '') ? '' + result + '' : '';
     }
 
+    // wrap result with <p>. Missing this would cause the editor fail on marker insertion
+    result = (result !== '') ? '<p>' + result + '</p>' : '<p><br/></p>';
     return result;
   }
 

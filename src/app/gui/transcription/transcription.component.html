@@ -164,14 +164,14 @@
             </tbody>
         </table>
         <div class="inner">
-            <form (ngSubmit)="onSubmit(fo)" #fo="ngForm">
+            <form #fo="ngForm">
                 <fieldset>
                     <div class="form-group" *ngFor="let group of transcrService.feedback.groups">
                         <label class="control-label">{{translate(group.title, langService.currentLang)}}</label>
                         <span class="required_marker" *ngIf="group.controls[0].required">*</span>
                         <br/>
                         <br/>
-                        <div class="ctrl" *ngFor="let control of group.controls">
+                        <div class="ctrl" *ngFor="let control of group.controls;">
                             <div class="radio" *ngIf="control.type.type === 'radiobutton'">
                                 <label>{{translate(control.label.languages, langService.currentLang)}}
                                     <input type="radio"

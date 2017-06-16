@@ -47,7 +47,7 @@ import {NgForm} from '@angular/forms';
   providers: [MessageService]
 })
 export class TranscriptionComponent implements OnInit,
-  OnDestroy, AfterViewInit, AfterContentInit, OnChanges, AfterViewChecked, AfterContentChecked {
+  OnDestroy, AfterViewInit, AfterContentInit, OnChanges, AfterViewChecked, AfterContentChecked, AfterContentInit {
   private subscrmanager: SubscriptionManager;
 
   @ViewChild('modal_shortcuts') modal_shortcuts: ModalComponent;
@@ -61,7 +61,7 @@ export class TranscriptionComponent implements OnInit,
   public send_error = '';
 
   public showdetails = false;
-  private saving = '';
+  public saving = '';
   public interface = '';
   private send_ok = false;
   public shortcutslist: Entry[] = [];
@@ -72,7 +72,7 @@ export class TranscriptionComponent implements OnInit,
 
   get help_url(): string {
     if (this.sessService.Interface === 'Editor without signal display') {
-      return 'http:// www.phonetik.uni-muenchen.de/apps/octra/videos/63sd324g43qt7-interface1/';
+      return 'http://www.phonetik.uni-muenchen.de/apps/octra/videos/63sd324g43qt7-interface1/';
     } else if (this.sessService.Interface === 'Linear Editor') {
       return 'http://www.phonetik.uni-muenchen.de/apps/octra/videos/6at766dsf8ui34-interface2/';
     } else if (this.sessService.Interface === '2D-Editor') {
@@ -100,7 +100,7 @@ export class TranscriptionComponent implements OnInit,
 
   user: number;
 
-  private platform = BrowserInfo.platform;
+  public platform = BrowserInfo.platform;
 
   constructor(public router: Router,
               private _componentFactoryResolver: ComponentFactoryResolver,
@@ -240,8 +240,6 @@ export class TranscriptionComponent implements OnInit,
   }
 
   ngAfterViewInit() {
-    this.changeEditor(this.interface);
-
     this.sessService.TranscriptionTime.start = Date.now();
     if (isNullOrUndefined(this.projectsettings.interfaces.find((x) => {
         return this.sessService.Interface === x;
@@ -250,10 +248,13 @@ export class TranscriptionComponent implements OnInit,
     }
 
     jQuery.material.init();
+
+    this.changeEditor(this.interface);
+    this.changeDetecorRef.detectChanges();
   }
 
   abortTranscription = () => {
-    if(!this.sessService.offline){
+    if (!this.sessService.offline) {
       this.saveFeedbackform();
     }
     this.transcrService.endTranscription();
@@ -333,11 +334,19 @@ export class TranscriptionComponent implements OnInit,
           }, 100);
         }
       ));
-      const componentFactory = this._componentFactoryResolver.resolveComponentFactory(comp);
-      const viewContainerRef = this.appLoadeditor.viewContainerRef;
-      viewContainerRef.clear();
 
-      const componentRef = viewContainerRef.createComponent(componentFactory);
+      if (!isNullOrUndefined(this.appLoadeditor)) {
+        const componentFactory = this._componentFactoryResolver.resolveComponentFactory(comp);
+
+        const viewContainerRef = this.appLoadeditor.viewContainerRef;
+        viewContainerRef.clear();
+
+        const componentRef = viewContainerRef.createComponent(componentFactory);
+      } else {
+        console.log('ERROR appLoadeditor is null');
+      }
+    } else {
+      console.log('ERROR comp is null');
     }
   }
 

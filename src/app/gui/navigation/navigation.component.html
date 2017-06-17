@@ -115,6 +115,18 @@
             <a class="navbar-brand" [routerLink]="['/']">OCTRA v{{version}}</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav" *ngIf="!sessService.LoggedIn">
+                <li routerLinkActive="active">
+                    <a [routerLink]="['/login']">Login</a>
+                </li>
+                <li routerLinkActive="active">
+                    <a [routerLink]="['/news']">News</a>
+                </li>
+                <li routerLinkActive="active">
+                    <a [routerLink]="['/faq']">FAQ</a>
+                </li>
+            </ul>
+
             <ul class="nav navbar-nav">
                 <ng-template ngFor let-editor [ngForOf]="AppInfo.editors">
                     <li *ngIf="sessService.LoggedIn && navbarServ.show_interfaces && interfaceActive(editor.name)"

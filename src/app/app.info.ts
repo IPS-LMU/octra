@@ -8,8 +8,14 @@ import {TwoDEditorComponent} from './editors/2D-editor/2D-editor.component';
 import {EditorWSignaldisplayComponent} from './editors/editor-without-signaldisplay/editor-w-signaldisplay.component';
 import {LinearEditorComponent} from './editors/linear-editor/linear-editor.component';
 
+export const EDITORS: any[] = [
+  EditorWSignaldisplayComponent,
+  TwoDEditorComponent,
+  LinearEditorComponent
+];
+
 export class AppInfo {
-  static get editors(): { name: string; editor: Component }[] {
+  public static get editors(): { name: string; editor: Component }[] {
     return this._editors;
   }
 

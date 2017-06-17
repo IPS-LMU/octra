@@ -64,16 +64,13 @@ import {AgreementComponent} from './gui/agreement/agreement.component';
 import {BugReportService} from './service/bug-report.service';
 import {OctraDropzoneComponent} from './gui/octra-dropzone/octra-dropzone.component';
 import {LoadeditorDirective} from './directive/loadeditor.directive';
-import {AppInfo} from './app.info';
+import {EDITORS} from './app.info';
+import {NewsComponent} from './gui/news/news.component';
+import {FaqComponent} from './gui/faq/faq.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
   return new LanguageLoader(http, './assets/i18n/octra/octra_', '.json');
-}
-
-export const editorArray: any[] = [];
-for (let i = 0; i < AppInfo.editors.length; i++) {
-  editorArray.push(AppInfo.editors[i].editor);
 }
 
 export const ngmodule = {
@@ -108,11 +105,12 @@ export const ngmodule = {
     TranscrGuidelinesComponent,
     AgreementComponent,
     OctraDropzoneComponent,
-    LoadeditorDirective
+    LoadeditorDirective,
+    NewsComponent,
+    FaqComponent,
+    EDITORS
   ],
-  entryComponents: [
-    editorArray
-  ],
+  entryComponents: EDITORS,
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -160,12 +158,6 @@ export const ngmodule = {
     BugReportService
   ]
 };
-
-// add editors to declaration
-for (let i = 0; i < AppInfo.editors.length; i++) {
-  const comp = editorArray[i];
-  ngmodule.declarations.push(comp);
-}
 
 @NgModule(ngmodule)
 

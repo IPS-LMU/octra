@@ -1,0 +1,10 @@
+.date{
+    font-size:0.8em;
+}
+
+.pagination {
+    padding-left: 0;
+    margin: 10px 0;
+    margin-right:0;
+    position: relative;
+}

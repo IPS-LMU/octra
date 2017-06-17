@@ -42,7 +42,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     return AppInfo.converters;
   }
 
-  public get AppInfo(): AppInfo {
+  public get AppInfo(): any {
     return AppInfo;
   }
 

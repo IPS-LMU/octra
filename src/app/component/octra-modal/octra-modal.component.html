@@ -128,11 +128,11 @@
         <h4>files for import:</h4>
         <table class="table table-responsive table-striped">
             <tr *ngFor="let elem of AppInfo.converters">
-                <td *ngIf="elem.converter.conversion.import">
-                    {{elem.converter.name}}
+                <td *ngIf="elem.conversion.import">
+                    {{elem.name}}
                 </td>
-                <td *ngIf="elem.converter.conversion.import">{{elem.converter.application}}</td>
-                <td *ngIf="elem.converter.conversion.import">*{{elem.appendix}}</td>
+                <td *ngIf="elem.conversion.import">{{elem.application}}</td>
+                <td *ngIf="elem.conversion.import">*{{elem.extension}}</td>
             </tr>
         </table>
     </modal-body>

@@ -8,14 +8,14 @@ export class TextConverter extends Converter {
     super();
     this._application = 'Text Editor';
     this._name = 'Text';
-    this._showauthors = true;
+    this._extension = '.txt';
     this._website.title = 'WebMaus';
     this._website.url = 'https://clarin.phonetik.uni-muenchen.de/BASWebServices/#/services/WebMAUSBasic';
     this._conversion.export = true;
     this._conversion.import = false;
   }
 
-  public export(annotation: OAnnotJSON): File {
+  public export(annotation: OAnnotJSON, audiofile: OAudiofile): File {
     let result = '';
     let filename = '';
 
@@ -32,7 +32,7 @@ export class TextConverter extends Converter {
         }
       }
 
-      filename = annotation.name + '.txt';
+      filename = annotation.name + this._extension;
 
     }
 

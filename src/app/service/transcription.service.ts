@@ -23,6 +23,9 @@ import {Level} from '../shared/Annotation/Level';
 
 @Injectable()
 export class TranscriptionService {
+  get audiofile(): OAudiofile {
+    return this._audiofile;
+  }
   get annotation(): Annotation {
     return this._annotation;
   }
@@ -39,6 +42,8 @@ export class TranscriptionService {
   private _segments: Segments;
   private _last_sample: number;
   private _guidelines: any;
+
+  private _audiofile: OAudiofile;
 
   private saving = false;
 
@@ -163,6 +168,12 @@ export class TranscriptionService {
         this.filename = this.sessServ.audio_url;
       }
     }
+
+    this._audiofile = new OAudiofile();
+    this._audiofile.name = this.filename + '.wav';
+    this._audiofile.samplerate = this.audio.samplerate;
+    this._audiofile.duration = this.audio.duration.samples;
+
     this.last_sample = this.audio.duration.samples;
     this.loadSegments(this.audio.samplerate);
 
@@ -179,7 +190,7 @@ export class TranscriptionService {
     if (!isNullOrUndefined(this.annotation)) {
       const data = this.annotation;
 
-      result = converter.export(this.annotation.getObj());
+      result = converter.export(this.annotation.getObj(), this.audiofile);
 
       return result.content;
     }
@@ -210,10 +221,8 @@ export class TranscriptionService {
     this.sessServ.annotation.annotates = this.filename + '.wav';
 
     this.sessServ.annotation.sampleRate = this.audio.samplerate;
-    const audiofile: OAudiofile = new OAudiofile();
-    audiofile.samplerate = this.audio.samplerate;
-    audiofile.name = this.sessServ.annotation.annotates;
-    this._annotation = new Annotation(this.sessServ.annotation.annotates, audiofile);
+
+    this._annotation = new Annotation(this.sessServ.annotation.annotates, this._audiofile);
 
     for (let i = 0; i < this.sessServ.annotation.levels.length; i++) {
       const level: Level = Level.fromObj(this.sessServ.annotation.levels[i],

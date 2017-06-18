@@ -11,14 +11,14 @@ export class CTMConverter extends Converter {
     super();
     this._application = 'CTM';
     this._name = 'CTM';
-    this._showauthors = true;
+    this._extension = '.txt';
     this._website.title = '';
     this._website.url = '';
     this._conversion.export = false;
     this._conversion.import = true;
   }
 
-  public export(annotation: OAnnotJSON): File {
+  public export(annotation: OAnnotJSON, audiofile: OAudiofile): File {
     let result = '';
     let filename = '';
 
@@ -35,7 +35,7 @@ export class CTMConverter extends Converter {
         }
       }
 
-      filename = annotation.name;
+      filename = annotation.name + this._extension;
 
     }
 

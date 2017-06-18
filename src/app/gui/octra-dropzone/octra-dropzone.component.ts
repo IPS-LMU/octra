@@ -61,8 +61,8 @@ export class OctraDropzoneComponent implements OnInit {
   public isValidImportData(file: { status: string, file: File, checked_converters: number }) {
     if (!isNullOrUndefined(this._oaudiofile)) {
       for (let i = 0; i < AppInfo.converters.length; i++) {
-        const converter: Converter = AppInfo.converters[i].converter;
-        if (Functions.contains(file.file.name, AppInfo.converters[i].appendix)) {
+        const converter: Converter = AppInfo.converters[i];
+        if (Functions.contains(file.file.name, AppInfo.converters[i].extension)) {
           if (converter.conversion.import) {
 
             const reader: FileReader = new FileReader();

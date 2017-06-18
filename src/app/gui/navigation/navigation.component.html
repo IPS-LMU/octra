@@ -13,19 +13,19 @@
             </thead>
             <tbody>
             <tr *ngFor="let format of converters">
-                <td *ngIf="format.converter.conversion.export">
+                <td *ngIf="format.conversion.export">
                     <a #a download="{{parentformat.download}}" [href]="parentformat.uri"
-                       (mouseover)="updateParentFormat(format.converter);">
-                        <span class="glyphicon glyphicon-floppy-save"></span> {{format.converter.name}}
-                        (*{{format.appendix}})
+                       (mouseover)="updateParentFormat(format);">
+                        <span class="glyphicon glyphicon-floppy-save"></span> {{format.name}}
+                        (*{{format.extension}})
                     </a>
                 </td>
-                <td *ngIf="format.converter.conversion.export">
-                    {{format.converter.application}}
+                <td *ngIf="format.conversion.export">
+                    {{format.application}}
                 </td>
-                <td *ngIf="format.converter.conversion.export">
-                    <a href="{{format.converter.website.url}}" target="_blank">
-                        {{format.converter.website.title}}
+                <td *ngIf="format.conversion.export">
+                    <a href="{{format.website.url}}" target="_blank">
+                        {{format.website.title}}
                     </a>
                 </td>
             </tr>

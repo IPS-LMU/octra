@@ -8,6 +8,10 @@ export interface File {
 }
 
 export abstract class Converter {
+  get extension(): string {
+    return this._extension;
+  }
+
   get website(): {
     title: string,
     url: string
@@ -38,6 +42,7 @@ export abstract class Converter {
 
   protected _application = '';
   protected _name = '';
+  protected _extension = '';
   protected _website: {
     title: string,
     url: string
@@ -52,7 +57,7 @@ export abstract class Converter {
 
   }
 
-  public abstract export(annotation: OAnnotJSON): File;
+  public abstract export(annotation: OAnnotJSON, audiofile: OAudiofile): File;
 
   public abstract import(file: File, audiofile: OAudiofile): OAnnotJSON;
 }

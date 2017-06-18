@@ -7,6 +7,7 @@ import {Component} from '@angular/core';
 import {TwoDEditorComponent} from './editors/2D-editor/2D-editor.component';
 import {EditorWSignaldisplayComponent} from './editors/editor-without-signaldisplay/editor-w-signaldisplay.component';
 import {LinearEditorComponent} from './editors/linear-editor/linear-editor.component';
+import {PraatTextgridConverter} from './shared/Converters/PraatTextgridConverter';
 
 export const EDITORS: any[] = [
   EditorWSignaldisplayComponent,
@@ -19,10 +20,7 @@ export class AppInfo {
     return this._editors;
   }
 
-  public static get converters(): {
-    appendix: string,
-    converter: Converter
-  }[] {
+  public static get converters(): Converter[] {
     return this._converters;
   }
 
@@ -61,25 +59,11 @@ export class AppInfo {
   ];
 
   // defined converters
-  private static _converters: {
-    appendix: string,
-    converter: Converter
-  }[] = [
-    {
-      appendix: '.txt',
-      converter: new TextConverter()
-    },
-    {
-      appendix: '.Table',
-      converter: new PraatTableConverter()
-    },
-    {
-      appendix: '_annot.json',
-      converter: new AnnotJSONConverter()
-    },
-    {
-      appendix: '.ctm',
-      converter: new CTMConverter()
-    }
+  private static _converters: Converter[] = [
+    new TextConverter(),
+    new PraatTableConverter(),
+    new PraatTextgridConverter(),
+    new AnnotJSONConverter(),
+    new CTMConverter()
   ];
 }

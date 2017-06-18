@@ -1,5 +1,5 @@
 import {Converter, File} from './Converter';
-import {OAnnotJSON, OAudiofile, OLevel} from '../../types/annotjson';
+import {OAnnotJSON, OAudiofile} from '../../types/annotjson';
 import {isNullOrUndefined} from 'util';
 
 export class AnnotJSONConverter extends Converter {
@@ -10,15 +10,15 @@ export class AnnotJSONConverter extends Converter {
     this._name = 'AnnotJSON';
     this._website.title = 'Emu-WebApp';
     this._website.url = 'http://ips-lmu.github.io/EMU-webApp/';
-    this._showauthors = true;
+    this._extension = '_annot.json';
     this._conversion.export = true;
-    this._conversion.import = false;
+    this._conversion.import = true;
   }
 
-  public export(annotation: OAnnotJSON): File {
+  public export(annotation: OAnnotJSON, audiofile: OAudiofile): File {
     if (!isNullOrUndefined(annotation)) {
       return {
-        name: annotation.name + '_annot.json',
+        name: annotation.name + this._extension,
         content: JSON.stringify(annotation, null, 2),
         encoding: 'UTF-8',
         type: 'application/json'
@@ -29,7 +29,14 @@ export class AnnotJSONConverter extends Converter {
   };
 
   public import(file: File, audiofile: OAudiofile) {
-    const result = null;
+    let result = new OAnnotJSON(audiofile.name, audiofile.samplerate);
+    const content = file.content;
+
+    if (content !== '') {
+      result = JSON.parse(content);
+
+      return result;
+    }
 
     return null;
   };

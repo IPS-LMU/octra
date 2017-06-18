@@ -14,6 +14,7 @@ import {UserInteractionsService} from '../../service/userInteractions.service';
 import {StatisticElem} from '../../shared/StatisticElement';
 import {SettingsService} from '../../service/settings.service';
 import {SubscriptionManager} from '../../shared/SubscriptionManager';
+import {OAudiofile} from '../../types/annotjson';
 
 @Component({
   selector: 'app-navigation',
@@ -157,7 +158,8 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   updateParentFormat(converter: Converter) {
-    const result: File = converter.export(this.sessService.annotation);
+    console.log(this.navbarServ.transcrService.audiofile);
+    const result: File = converter.export(this.sessService.annotation, this.navbarServ.transcrService.audiofile);
     this.parentformat.download = result.name;
     this.parentformat.uri = this.sanitize(this.getURI(result));
   }

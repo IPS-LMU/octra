@@ -5,6 +5,7 @@ import {SessionService} from './session.service';
 import {AnnotJSONConverter} from '../shared/Converters/AnnotJSONConverter';
 import {TranscriptionService} from './transcription.service';
 import {UserInteractionsService} from './userInteractions.service';
+import {OAudiofile} from '../types/annotjson';
 
 @Injectable()
 export class NavbarService {
@@ -32,18 +33,6 @@ export class NavbarService {
     this._show_export = value;
   }
 
-  public get textfile(): File {
-    const result = this.getExportFile('text');
-
-    return result;
-  }
-
-  public get annotjsonfile(): File {
-    const result = this.getExportFile('annotJSON');
-
-    return result;
-  }
-
   public onexportbuttonclick = new EventEmitter<any>();
   public interfacechange = new EventEmitter<string>();
   public onclick = new EventEmitter<string>();
@@ -65,36 +54,11 @@ export class NavbarService {
     filesize: {
       size: 0,
       label: ''
-    },
-    text: '',
-    annotJSON: ''
+    }
   };
 
   constructor(private sessService: SessionService) {
 
-  }
-
-  public getExportFile(format: string): File {
-    if (format === 'text') {
-      const converter: TextConverter = new TextConverter();
-      return converter.export(this.sessService.annotation);
-    } else if (format === 'annotJSON') {
-      const converter: AnnotJSONConverter = new AnnotJSONConverter();
-      return converter.export(this.sessService.annotation);
-    }
-
-    return {
-      name: '',
-      content: 'nothing',
-      encoding: '',
-      type: ''
-    };
-  }
-
-  onExportButtonClick(format: string) {
-    this.onexportbuttonclick.emit({
-      format: format
-    });
   }
 
   public doclick(name: string) {

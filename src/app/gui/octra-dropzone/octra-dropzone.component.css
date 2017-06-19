@@ -5,6 +5,11 @@
 .glyphicon-remove{
     color:red;
 }
+.fa.fa-spinner.fa-spin,
+.glyphicon-ok,
+.glyphicon-remove{
+    margin-left:5px;
+}
 
 .dropzone-table{
     margin:0 auto;

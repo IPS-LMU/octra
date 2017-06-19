@@ -125,6 +125,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   getURI(file: File): string {
+    console.log(file);
     return 'data:' + file.type + ';charset:' + file.encoding + ',' + encodeURIComponent(file.content);
   }
 
@@ -158,7 +159,6 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   updateParentFormat(converter: Converter) {
-    console.log(this.navbarServ.transcrService.audiofile);
     const result: File = converter.export(this.sessService.annotation, this.navbarServ.transcrService.audiofile);
     this.parentformat.download = result.name;
     this.parentformat.uri = this.sanitize(this.getURI(result));

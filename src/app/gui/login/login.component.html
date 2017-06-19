@@ -1,13 +1,13 @@
 <div class="section">
+    <div *ngIf="!valid_platform" class="bg-danger">
+        <p *ngIf="!valid_platform" class="warning" [innerHTML]="'browser.invalid' | translate">
+        </p>
+        <p *ngIf="!valid_platform" class="warning">
+            {{getValidBrowsers()}}
+        </p>
+    </div>
     <div id="loginrow" class="row">
         <div #onlinemode id='onlinemode' class="col-md-6 panel panel-default" style="padding:40px;">
-            <br/>
-            <p *ngIf="!valid_platform" class="warning" [innerHTML]="'browser.invalid' | translate">
-            </p>
-            <p *ngIf="!valid_platform" class="warning">
-                {{getValidBrowsers()}}
-            </p>
-
             <p *ngIf="!apc.octra.responsive.enabled && !valid_size" class="warning"
                [innerHTML]="'browser.small window width' | translate">
 

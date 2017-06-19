@@ -76,7 +76,7 @@ export class OctraDropzoneComponent implements OnInit {
                   encoding: 'utf-8'
                 };
 
-                                                                const test: OAnnotJSON = converter.import(ofile, this._oaudiofile);
+                const test: OAnnotJSON = converter.import(ofile, this._oaudiofile);
                 file.checked_converters++;
                 if (!isNullOrUndefined(test)) {
                   file.status = 'valid';
@@ -112,7 +112,7 @@ export class OctraDropzoneComponent implements OnInit {
 
   public afterDrop() {
     this._oannotation = null;
-        for (let i = 0; i < this.dropzone.files.length; i++) {
+    for (let i = 0; i < this.dropzone.files.length; i++) {
       const file = {
         status: 'progress',
         file: this.dropzone.files[i],
@@ -132,7 +132,7 @@ export class OctraDropzoneComponent implements OnInit {
       }
 
       if (Functions.contains(file.file.name, '.wav')) {
-                file.status = 'valid';
+        file.status = 'progress';
         const reader = new FileReader();
 
         reader.onloadend = () => {
@@ -140,6 +140,7 @@ export class OctraDropzoneComponent implements OnInit {
           // check audio
           const info: AudioInfo = new AudioInfo(reader.result);
           info.decodeAudio(reader.result).then(() => {
+            file.status = 'valid';
             this._oaudiofile = new OAudiofile();
             this._oaudiofile.name = file.file.name;
             this._oaudiofile.size = file.file.size;
@@ -168,7 +169,7 @@ export class OctraDropzoneComponent implements OnInit {
             for (let j = 0; j < this.files.length; j++) {
               const importfile = this.files[j].file;
               if (!Functions.contains(importfile.name, '.wav')) {
-                                this.files[j].status = 'progress';
+                this.files[j].status = 'progress';
                 this.files[j].checked_converters = 0;
                 this.isValidImportData(this.files[j]);
                 break;
@@ -176,7 +177,7 @@ export class OctraDropzoneComponent implements OnInit {
             }
           }).catch(
             (err) => {
-              console.error(err);
+              alert(err);
             }
           );
         };
@@ -186,7 +187,7 @@ export class OctraDropzoneComponent implements OnInit {
         this._files.push(file);
         break;
       } else if (!isNullOrUndefined(audio_file)) {
-                // load import data
+        // load import data
         for (let j = 0; j < this.dropzone.files.length; j++) {
           const importfile = this.dropzone.files[j];
           if (!Functions.contains(importfile.name, '.wav')) {

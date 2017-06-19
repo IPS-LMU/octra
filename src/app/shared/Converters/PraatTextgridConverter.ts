@@ -62,7 +62,7 @@ export class PraatTextgridConverter extends Converter {
           result += `        intervals [${j + 1}]:\n` +
             `            xmin = ${seconds_start}\n` +
             `            xmax = ${seconds_end}\n` +
-            `            text = "${segment.labels[0].value}\n"`;
+            `            text = "${segment.labels[0].value}"\n`;
         }
       }
 
@@ -72,7 +72,7 @@ export class PraatTextgridConverter extends Converter {
     return {
       name: filename,
       content: result,
-      encoding: 'UTF-8',
+      encoding: 'UTF-16',
       type: 'text/plain'
     };
   };

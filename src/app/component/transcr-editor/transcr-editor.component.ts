@@ -218,7 +218,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.textfield = jQuery('.textfield');
     this.textfield.summernote({
       height: this.Settings.height,
-      focus: true,
+      focus: false,
       disableDragAndDrop: true,
       disableResizeEditor: true,
       disableResizeImage: true,
@@ -279,7 +279,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.segpopover.insertBefore('.note-editing-area');
 
     jQuery('.note-editable').on('click', (click) => {
-      const selection = jQuery('.note-editable').caret('pos');
+      // const selection = jQuery('.note-editable').caret('pos');
       // alert(selection);
     });
 
@@ -595,15 +595,15 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         };
 
         /*
-        const replace_func2 = (x, g1) => {
-          const s1 = (g1) ? g1 : '';
-          return '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon-text\' style=\'height:16px;\' ' +
-            'data-boundary=\'' + g1 + '\' />';
-        };
+         const replace_func2 = (x, g1) => {
+         const s1 = (g1) ? g1 : '';
+         return '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon-text\' style=\'height:16px;\' ' +
+         'data-boundary=\'' + g1 + '\' />';
+         };
 
          result = result.replace(regex2, replace_func2);
 
-        */
+         */
 
         result = result.replace(regex, replace_func);
 
@@ -625,7 +625,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     const func = () => {
       try {
-        if (this.rawText !== '') {
+        console.log('later : ' + this.html);
+        if (this.rawText !== '' && this.html !== '<p><br/></p>') {
           Functions.placeAtEnd(jQuery('.note-editable.panel-body')[0]);
         }
         this.textfield.summernote('focus');
@@ -638,7 +639,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       setTimeout(
         () => {
           func();
-        }, 200
+        }, 300
       );
     } else {
       func();

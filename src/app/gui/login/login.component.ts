@@ -86,7 +86,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   ngOnInit() {
     this.browser_check = new BrowserCheck();
-    this.valid_platform = true;
+    this.valid_platform = false;
 
     if (this.apc.octra.allowed_browsers.length > 0) {
       this.valid_platform = this.browser_check.isValidBrowser(this.apc.octra.allowed_browsers);
@@ -107,14 +107,14 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   ngAfterViewInit() {
     this.loadPojectsList();
     /* setTimeout(() => {
-      jQuery.material.init();
+     jQuery.material.init();
 
-      const max_height: number = Math.max(Number(this.onlinemode.nativeElement.clientHeight),
-        Number(this.localmode.nativeElement.clientHeight));
-      this.localmode.nativeElement.style.height = max_height + 'px';
-      this.onlinemode.nativeElement.style.height = max_height + 'px';
-    }, 0);
-    */
+     const max_height: number = Math.max(Number(this.onlinemode.nativeElement.clientHeight),
+     Number(this.localmode.nativeElement.clientHeight));
+     this.localmode.nativeElement.style.height = max_height + 'px';
+     this.onlinemode.nativeElement.style.height = max_height + 'px';
+     }, 0);
+     */
   }
 
   ngOnDestroy() {
@@ -290,7 +290,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
     for (let i = 0; i < this.apc.octra.allowed_browsers.length; i++) {
       const browser = this.apc.octra.allowed_browsers[i];
-      result += browser.name + '(' + browser.version + ')';
+      result += browser.name;
+      if (i < this.apc.octra.allowed_browsers.length - 1) {
+        result += ', ';
+      }
     }
 
     return result;
@@ -327,7 +330,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     }).subscribe(
       (result) => {
         const json = result.json();
-                if (form.valid && this.agreement_checked
+        if (form.valid && this.agreement_checked
           && json.message !== '0'
         ) {
 

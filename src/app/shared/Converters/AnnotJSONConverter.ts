@@ -35,7 +35,9 @@ export class AnnotJSONConverter extends Converter {
     if (content !== '') {
       result = JSON.parse(content);
 
-      return result;
+      if (result.annotates === audiofile.name) {
+        return result;
+      }
     }
 
     return null;

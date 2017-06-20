@@ -209,7 +209,7 @@ export class AudioviewerService extends AudioComponentService {
 
 
   private calculateZoom(height: number, width: number, minmaxarray: number[]) {
-        if (this.Settings.justify_signal_height) {
+    if (this.Settings.justify_signal_height) {
       // justify height to maximum top border
       let max_zoom_x = 0;
       let max_zoom_y = 0;
@@ -456,30 +456,19 @@ export class AudioviewerService extends AudioComponentService {
           ) {
             const seg_after = (i < this.transcrService.annotation.levels[0].segments.length - 1)
               ? this.transcrService.annotation.levels[0].segments.get(i + 1) : null;
-            if ((this.transcrService.annotation.levels[0].segments.get(i).transcript === ''
-              || this.transcrService.annotation.levels[0].segments.get(i).transcript === this.transcrService.break_marker.code)
-              && (seg_after === null || seg_after.transcript === ''
-              || seg_after.transcript === this.transcrService.break_marker.code)) {
-              this.transcrService.annotation.levels[0].segments.removeByIndex(i);
 
-              return {
-                type: 'remove',
-                seg_num: i,
-                msg: {
-                  type: 'success',
-                  text: ''
-                }
-              };
-            } else {
-              return {
-                type: 'remove',
-                seg_num: i,
-                msg: {
-                  type: 'error',
-                  text: this.langService.instant('boundary cannot delete')
-                }
-              };
-            }
+            const seg_selected = this.transcrService.annotation.levels[0].segments.get(i);
+
+            this.transcrService.annotation.levels[0].segments.removeByIndex(i, this.transcrService.break_marker.code);
+
+            return {
+              type: 'remove',
+              seg_num: i,
+              msg: {
+                type: 'success',
+                text: ''
+              }
+            };
           }
         }
       }
@@ -518,28 +507,16 @@ export class AudioviewerService extends AudioComponentService {
         }
       } else {
         // no selection
-        const segment = this.transcrService.annotation.levels[0].segments.BetweenWhichSegment(Math.round(absXTime));
-        if (segment === null ||
-          (segment.transcript === '' || segment.transcript === this.transcrService.break_marker.code)) {
-          this.transcrService.annotation.levels[0].segments.add(Math.round(absXTime));
-          return {
-            type: 'add',
-            seg_num: -1,
-            msg: {
-              type: 'success',
-              text: ''
-            }
-          };
-        } else {
-          return {
-            type: 'add',
-            seg_num: i,
-            msg: {
-              type: 'error',
-              text: this.langService.instant('boundary cannot set')
-            }
-          };
-        }
+
+        this.transcrService.annotation.levels[0].segments.add(Math.round(absXTime));
+        return {
+          type: 'add',
+          seg_num: -1,
+          msg: {
+            type: 'success',
+            text: ''
+          }
+        };
       }
     }
     return null;

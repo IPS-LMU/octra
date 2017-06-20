@@ -217,12 +217,15 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
   public update = (computeDisplayData: boolean = false) => {
     this.updateCanvasSizes();
 
-    if (this.av.channel) {
+    if (!isNullOrUndefined(this.av.channel)) {
       if (computeDisplayData === true) {
         this.av.refresh();
       }
 
       for (let i = 0; i < this.av.LinesArray.length; i++) {
+        if (i < 3) {
+          console.log('drawsignal ' + i);
+        }
         this.drawSignal(i);
 
         if (this.Settings.cropping !== 'none') {
@@ -235,6 +238,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
       if (this.Settings.timeline.enabled) {
         this.drawTimeLine();
       }
+    } else {
+      console.error('aduio channel is null');
     }
     this.oldInnerWidth = this.innerWidth;
   }
@@ -307,7 +312,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
     const line_obj = this.av.LinesArray[line_num];
     const timeline_height = (this.Settings.timeline.enabled) ? this.Settings.timeline.height : 0;
 
-    if (line_obj) {
+    if (!isNullOrUndefined(line_obj)) {
       // line_obj found
       const midline = Math.floor((this.Settings.height - timeline_height) / 2);
       const x_pos = line_num * this.innerWidth;
@@ -330,6 +335,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
       this.g_context.stroke();
 
     } else {
+      console.error('line obj not found');
       throw new Error('Line Object not found');
     }
   };
@@ -359,6 +365,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
     const hZoom = Math.round(this.innerWidth / vLines);
     const vZoom = Math.round((this.Settings.height - timeline_height) / hLines);
 
+
     // --- get the appropriate context
     this.g_context.beginPath();
     this.g_context.strokeStyle = this.Settings.grid.color;
@@ -386,7 +393,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
     const mouse_c = this.mousecanvas;
     const line_obj = this.av.LinesArray[line_num];
 
-    if (line_obj) {
+    if (!isNullOrUndefined(line_obj)) {
       if (this.Settings.cropping !== 'none') {
         this.crop(this.Settings.cropping, this.g_context);
         this.crop(this.Settings.cropping, this.o_context);
@@ -420,6 +427,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
       this.g_context.strokeRect(line_obj.Pos.x, line_obj.Pos.y, line_obj.Size.width, this.Settings.height);
       this.g_context.lineWidth = 1;
     } else {
+      console.error('line obj not found');
       throw new Error('Line Object not found');
     }
   }
@@ -501,7 +509,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
           ? this.av.LinesArray[line_obj.number + 1] : line_obj;
 
         const line_absx: number = startline.number * this.innerWidth;
-                const line_samples: number = this.av.audioTCalculator.absXChunktoSamples(line_absx, this.av.Chunk);
+        const line_samples: number = this.av.audioTCalculator.absXChunktoSamples(line_absx, this.av.Chunk);
         const line_start: AudioTime = new AudioTime(line_samples, this.audio.samplerate);
 
         const endline_absx: number = endline.number * this.innerWidth;
@@ -1316,9 +1324,10 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.width = this.aview.elementRef.nativeElement.clientWidth;
     this.innerWidth = this.width - this.Settings.margin.left - this.Settings.margin.right;
 
-    // onlie resize if size has changed and resizing not in processing state
+    // only resize if size has changed and resizing not in processing state
     if (this.innerWidth !== this.oldInnerWidth) {
       if (!this.Settings.multi_line || this.av.AudioPxWidth < this.innerWidth) {
+        console.log('HÄÄ');
         this.av.AudioPxWidth = this.innerWidth;
         this.av.audioTCalculator.audio_px_width = this.innerWidth;
         const ratio = this.innerWidth / this.oldInnerWidth;
@@ -1326,6 +1335,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
         this.changePlayCursorAbsX((this.av.PlayCursor.absX * ratio));
         this.update(true);
       } else if (this.Settings.multi_line) {
+        console.log('multiline update');
         this.update(false);
       }
 
@@ -1336,6 +1346,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
           this.drawPlayCursorOnly(line);
         }
       }
+    } else {
+      console.log('same');
     }
   }
 

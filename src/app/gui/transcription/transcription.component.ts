@@ -318,13 +318,14 @@ export class TranscriptionComponent implements OnInit,
 
     for (let i = 0; i < AppInfo.editors.length; i++) {
       if (name === AppInfo.editors[i].name) {
+        this.sessService.Interface = name;
+        this.interface = name;
         comp = AppInfo.editors[i].editor;
         break;
       }
     }
 
     if (!isNullOrUndefined(comp)) {
-
       this.editorloaded = false;
       const id = this.subscrmanager.add(comp.initialized.subscribe(
         () => {

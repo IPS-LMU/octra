@@ -58,18 +58,19 @@ export class Segments {
     }
   }
 
-  public removeByIndex(index: number) {
+  public removeByIndex(index: number, breakmarker: string) {
     if (index > -1 && index < this.segments.length) {
       if (index < this.segments.length - 1) {
         const next_segment = this.segments[index + 1];
         const transcription: string = this.segments[index].transcript;
         // TODO change 'P' !
-        if (next_segment.transcript !== 'P') {
+        console.log(breakmarker);
+        if (next_segment.transcript !== breakmarker && transcription !== breakmarker) {
           // concat transcripts
           if (next_segment.transcript !== '' && transcription !== '') {
             next_segment.transcript = transcription + ' ' + next_segment.transcript;
           }
-        } else {
+        } else if (next_segment.transcript === breakmarker) {
           // delete pause
           next_segment.transcript = transcription;
         }
@@ -227,7 +228,7 @@ export class Segments {
     this._segments = [];
   }
 
-  public getObj(labelname:string): OSegment[] {
+  public getObj(labelname: string): OSegment[] {
     const result: OSegment[] = [];
 
     let start = 0;

@@ -59,8 +59,8 @@ export class Functions {
     return result;
   }
 
-  public static contains(str1: string, str2: string): boolean {
-    return str1.indexOf(str2) !== -1;
+  public static contains(haystack: string, needle: string): boolean {
+    return haystack.indexOf(needle) !== -1;
   }
 
   public static placeAtEnd(element: HTMLElement) {

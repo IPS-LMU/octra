@@ -73,7 +73,7 @@ export class OctraDropzoneComponent implements OnInit {
                   name: file.file.name,
                   content: reader.result,
                   type: file.file.type,
-                  encoding: 'utf-8'
+                  encoding: converter.encoding
                 };
 
                 const test: OAnnotJSON = converter.import(ofile, this._oaudiofile);
@@ -88,11 +88,10 @@ export class OctraDropzoneComponent implements OnInit {
                   this._oannotation = null;
                   this.checkState();
                 }
-
               }
             };
 
-            reader.readAsText(file.file, 'utf-8');
+            reader.readAsText(file.file, converter.encoding.toLowerCase());
           } else {
             file.checked_converters++;
           }

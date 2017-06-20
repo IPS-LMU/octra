@@ -16,6 +16,7 @@ export class CTMConverter extends Converter {
     this._website.url = '';
     this._conversion.export = false;
     this._conversion.import = true;
+    this._encoding = 'UTF-8';
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile): File {

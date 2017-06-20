@@ -8,6 +8,9 @@ export interface File {
 }
 
 export abstract class Converter {
+  get encoding(): string {
+    return this._encoding;
+  }
   get extension(): string {
     return this._extension;
   }
@@ -43,6 +46,7 @@ export abstract class Converter {
   protected _application = '';
   protected _name = '';
   protected _extension = '';
+  protected _encoding = '';
   protected _website: {
     title: string,
     url: string

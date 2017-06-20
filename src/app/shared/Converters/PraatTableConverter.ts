@@ -14,6 +14,7 @@ export class PraatTableConverter extends Converter {
     this._website.url = '';
     this._conversion.export = true;
     this._conversion.import = false;
+    this._encoding = 'UTF-8';
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile): File {

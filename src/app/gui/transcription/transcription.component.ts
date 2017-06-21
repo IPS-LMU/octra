@@ -452,13 +452,14 @@ export class TranscriptionComponent implements OnInit,
       .subscribe((result) => {
           if (result !== null && result.hasOwnProperty('statusText') && result.statusText === 'OK') {
             this.sessService.submitted = true;
-            this.modal2.close();
+
             setTimeout(() => {
-              // this.router.navigate(['/user/transcr/submitted']);
+              this.modal2.close();
 
-              this.nextTranscription();
-
-            }, 1000);
+              setTimeout(() => {
+                this.nextTranscription();
+              }, 1000);
+            }, 2000);
           } else {
             this.send_error = this.langService.instant('send error');
           }

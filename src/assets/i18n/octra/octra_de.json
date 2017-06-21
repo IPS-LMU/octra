@@ -54,7 +54,8 @@
     "email": "Email",
     "description": "Beschreibung",
     "bug report": "Fehlerbericht",
-    "protocol": "Protokoll"
+    "protocol": "Protokoll",
+    "submission success": "Übertragung erfolgreich"
   },
   "bug report": {
     "report an error": "Fehler melden",

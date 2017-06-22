@@ -344,10 +344,10 @@ export class TranscriptionComponent implements OnInit,
 
         const componentRef = viewContainerRef.createComponent(componentFactory);
       } else {
-        console.log('ERROR appLoadeditor is null');
+        console.error('ERROR appLoadeditor is null');
       }
     } else {
-      console.log('ERROR comp is null');
+      console.error('ERROR comp is null');
     }
   }
 

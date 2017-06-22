@@ -1,12 +1,51 @@
 <div class="container">
     <h3>FAQ</h3>
     <p>
-        The FAQ is only available in English.
+        This section helps you to find answers to questions that were asked before. If you can't find an answer you can use the bug report to ask us.
     </p>
-    <ol>
-        <li><div class="well">
-            <h4><a href="#notloading">The Editor is not working</a></h4>
-            <p>If the editor is not working, try this:</p>
-        </div></li>
-    </ol>
+    <div class="well faq-elem">
+        <table>
+            <tr>
+                <td><span class="glyphicon" appExpand></span></td>
+                <td><h4><a [routerLink]="['./']" fragment="requirements" appExpand>What are the system requirements to use OCTRA?</a></h4>
+                    <div class="description">
+                        To make sure, that OCTRA works well it is recommended to use Chrome, because OCTRA was tested with this Browser. It could be possible that OCTRA works with the latest versions of Firefox and Opera, but it hasn't been tested before. <b>Safari is not supported.</b><br/>
+
+                        Recommended system configuration:
+                        <ol>
+                            <li>browser: Google Chrome</li>
+                            <li>min. 2GB RAM</li>
+                            <li>min 128MB GPU</li>
+                            <li>connection to the internet</li>
+                        </ol>
+                        If you want to use OCTRA on a PC or notebook which is less than 5 years old, this should be enough for OCTRA to work.
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><span class="glyphicon" appExpand></span></td>
+                <td><h4><a [routerLink]="['./']" fragment="notloading" appExpand>The progress bar stopped and OCTRA does not continue</a></h4>
+                    <div class="description">Please make sure that you don't use Safari, because it is not supported. If error messages have been appeared these could help to find the source of this error. You can try to click on 'Retry'. If this still does not work, you should do a full refresh (in Chrome):
+                    <ol class="description-list">
+                        <li class="description-li">
+                            Do a right-click on any place on the page and click on 'Inspect':<br/>
+                            <img src="./assets/img/faq/faq01.png" alt="right click context menu" style="max-height:250px;max-width:100%;"/>
+                        </li>
+                        <li class="description-li">
+                            Now a new developement window appears<br/>
+                            <img src="./assets/img/faq/faq02.png" alt="right click context menu" style="max-width: 80%"/>
+                        </li>
+                        <li class="description-li">
+                            Now you can click (right-click) on the reload icon before the address bar. On the context menu click on 'Clear cache and make full refresh'<br/>
+                            <img src="./assets/img/faq/faq03.png" alt="right click context menu" style="max-height:100px; max-width: 100%"/>
+
+                        </li>
+                    </ol>
+                        <br/>
+                        If this still does not work, please send us a <a>bug report</a>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
 </div>

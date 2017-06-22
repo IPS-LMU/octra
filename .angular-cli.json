@@ -9,6 +9,7 @@
       "outDir": "dist",
       "assets": [
         "assets",
+        "i18n",
         "config",
         "project",
         "favicon.ico",

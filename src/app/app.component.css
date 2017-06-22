@@ -6,14 +6,14 @@
     box-shadow: 0 1px 6px #a0a0a0; /* CSS3 */
 }
 
-#beta_mark{
-    color:red;
-    position:absolute;
-    margin-left:20px;
-    z-index:10;
+#beta_mark {
+    color: red;
+    position: absolute;
+    margin-left: 20px;
+    z-index: 10;
 }
 
-:host{
+:host {
     height: 100%;
     display: flex;
     flex-direction: column;

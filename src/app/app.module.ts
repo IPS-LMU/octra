@@ -67,10 +67,11 @@ import {LoadeditorDirective} from './directive/loadeditor.directive';
 import {EDITORS} from './app.info';
 import {NewsComponent} from './gui/news/news.component';
 import {FaqComponent} from './gui/faq/faq.component';
+import {ExpandDirective} from './gui/faq/expand.directive';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
-  return new LanguageLoader(http, './assets/i18n/octra/octra_', '.json');
+  return new LanguageLoader(http, './i18n/octra/octra_', '.json');
 }
 
 export const ngmodule = {
@@ -108,6 +109,7 @@ export const ngmodule = {
     LoadeditorDirective,
     NewsComponent,
     FaqComponent,
+    ExpandDirective,
     EDITORS
   ],
   entryComponents: EDITORS,

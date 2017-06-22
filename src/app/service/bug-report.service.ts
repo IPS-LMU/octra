@@ -4,6 +4,8 @@ import {TranslateService} from '@ngx-translate/core';
 import {AppInfo} from '../app.info';
 import {SessionService} from './session.service';
 import {isArray} from 'util';
+import {Headers, Http, Request, RequestMethod, RequestOptions, Response, URLSearchParams} from '@angular/http';
+import {Observable} from 'rxjs/Observable';
 
 export enum ConsoleType {
   LOG,
@@ -26,7 +28,8 @@ export class BugReportService {
   private _console: ConsoleEntry[] = [];
 
   constructor(private langService: TranslateService,
-              private sessService: SessionService) {
+              private sessService: SessionService,
+              private http: Http) {
   }
 
   public addEntry(type: ConsoleType, message: string) {
@@ -85,6 +88,26 @@ export class BugReportService {
     }
 
     return result;
+  }
+
+  /**
+   * function to test the API
+   * @returns {Observable<Response>}
+   */
+  sendReport(): Observable<Response> {
+    const api_token = 'D6GbEI41cq1PXgorQu_IpfBf6dvg6GAw';
+
+    const url = 'https://poemp.net/mantisbt/api/rest/issues';
+
+    const headers = new Headers();
+    headers.append('content-type', 'application/json');
+    headers.append('authorization', api_token);
+
+    const params = new URLSearchParams();
+    params.set('id', '1');
+    const options = new RequestOptions({ headers: headers, search: params });
+
+    return this.http.get(url, options);
   }
 
 }

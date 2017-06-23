@@ -13,6 +13,22 @@
       "fixedwidth": 1200
     },
     "allowed_browsers": [
+      {
+        "name": "Chrome",
+        "version": ""
+      },
+      {
+        "name": "Chrome Mobile",
+        "version": ""
+      },
+      {
+        "name": "Firefox",
+        "version": ""
+      },
+      {
+        "name": "Opera",
+        "version": ""
+      }
     ],
     "languages":["de", "en"]
   }

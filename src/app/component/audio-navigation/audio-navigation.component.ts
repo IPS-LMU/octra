@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, EventEmitter, Input, Output} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, Output} from '@angular/core';
 
 export interface Buttons {
   play: {
@@ -21,6 +21,10 @@ export interface Buttons {
     label: string,
     shortcut: string
   };
+  backwardtime: {
+    label: string,
+    shortcut: string
+  };
 }
 
 @Component({
@@ -28,7 +32,7 @@ export interface Buttons {
   templateUrl: './audio-navigation.component.html',
   styleUrls: ['./audio-navigation.component.css']
 })
-export class AudioNavigationComponent {
+export class AudioNavigationComponent implements AfterViewInit {
   get volume(): number {
     return this._volume;
   }
@@ -89,10 +93,20 @@ export class AudioNavigationComponent {
     backward: {
       label: 'Backward',
       shortcut: 'SHIFT + DEL'
+    },
+    backwardtime: {
+      label: 'Backward in time',
+      shortcut: 'SHIFT + DEL'
     }
   };
 
   constructor(private cd: ChangeDetectorRef) {
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      jQuery.material.init()
+    }, 3000);
   }
 
   /**

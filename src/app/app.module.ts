@@ -8,7 +8,7 @@ import {TranslateLoader, TranslateModule, TranslateService} from '@ngx-translate
 import {Ng2Bs3ModalModule} from 'ng2-bs3-modal/ng2-bs3-modal';
 import {Ng2Webstorage} from 'ng2-webstorage';
 // other
-import {LanguageLoader} from './shared';
+import {LanguageLoader} from './core/shared';
 import {
   AlertComponent,
   AudioNavigationComponent,
@@ -22,7 +22,7 @@ import {
   LoupeComponent,
   OctraModalComponent,
   TranscrEditorComponent
-} from './component';
+} from './core/component';
 import {
   FastbarComponent,
   LoadingComponent,
@@ -35,10 +35,10 @@ import {
   TranscriptionEndComponent,
   TranscrOverviewComponent,
   TranscrWindowComponent
-} from './gui';
+} from './core/gui';
 
 import {routing} from './app.routes';
-import {LeadingNullPipe, ProcentPipe, SecondsPipe, TimespanPipe} from './pipe';
+import {LeadingNullPipe, ProcentPipe, SecondsPipe, TimespanPipe} from './core/shared/pipe';
 
 import {
   APIService,
@@ -48,26 +48,26 @@ import {
   NavbarService,
   SessionService,
   SettingsService
-} from './service';
+} from './core/shared/service';
 
-import {ALoginGuard, DeALoginGuard, LogoutGuard, MembersAreaGuard, SettingsGuard, TranscrEndGuard} from './guard';
+import {ALoginGuard, DeALoginGuard, LogoutGuard, MembersAreaGuard, SettingsGuard, TranscrEndGuard} from './core/shared/guard';
 
 import {AppComponent} from './app.component';
 
-import {TranscrGuidelinesComponent} from './gui/transcr-guidelines/transcr-guidelines.component';
+import {TranscrGuidelinesComponent} from './core/gui/transcr-guidelines/transcr-guidelines.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {ReloadFileGuard} from './guard/reload-file.activateguard';
+import {ReloadFileGuard} from './core/gui/reload-file/reload-file.activateguard';
 import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
 import {CollapseModule} from 'ngx-bootstrap/collapse';
-import {TranscActivateGuard} from './guard/transcr.activateguard';
-import {AgreementComponent} from './gui/agreement/agreement.component';
-import {BugReportService} from './service/bug-report.service';
-import {OctraDropzoneComponent} from './gui/octra-dropzone/octra-dropzone.component';
-import {LoadeditorDirective} from './directive/loadeditor.directive';
+import {TranscActivateGuard} from './core/shared/guard/transcr.activateguard';
+import {AgreementComponent} from './core/gui/agreement/agreement.component';
+import {BugReportService} from './core/shared/service/bug-report.service';
+import {OctraDropzoneComponent} from './core/gui/octra-dropzone/octra-dropzone.component';
+import {LoadeditorDirective} from './core/shared/directive/loadeditor.directive';
 import {EDITORS} from './app.info';
-import {NewsComponent} from './gui/news/news.component';
-import {FaqComponent} from './gui/faq/faq.component';
-import {ExpandDirective} from './gui/faq/expand.directive';
+import {NewsComponent} from './core/gui/news/news.component';
+import {FaqComponent} from './core/gui/faq/faq.component';
+import {ExpandDirective} from './core/gui/faq/expand.directive';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {

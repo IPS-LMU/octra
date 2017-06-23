@@ -1,13 +1,13 @@
-import {Converter} from './shared/Converters/Converter';
-import {TextConverter} from './shared/Converters/TextConverter';
-import {AnnotJSONConverter} from './shared/Converters/AnnotJSONConverter';
-import {PraatTableConverter} from './shared/Converters/PraatTableConverter';
-import {CTMConverter} from './shared/Converters/CTMConverter';
+import {Converter} from './core/obj/Converters/Converter';
+import {TextConverter} from './core/obj/Converters/TextConverter';
+import {AnnotJSONConverter} from './core/obj/Converters/AnnotJSONConverter';
+import {PraatTableConverter} from './core/obj/Converters/PraatTableConverter';
+import {CTMConverter} from './core/obj/Converters/CTMConverter';
 import {Component} from '@angular/core';
 import {TwoDEditorComponent} from './editors/2D-editor/2D-editor.component';
 import {EditorWSignaldisplayComponent} from './editors/editor-without-signaldisplay/editor-w-signaldisplay.component';
 import {LinearEditorComponent} from './editors/linear-editor/linear-editor.component';
-import {PraatTextgridConverter} from './shared/Converters/PraatTextgridConverter';
+import {PraatTextgridConverter} from './core/obj/Converters/PraatTextgridConverter';
 
 export const EDITORS: any[] = [
   EditorWSignaldisplayComponent,

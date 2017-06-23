@@ -12,8 +12,8 @@ import {
   ViewChild
 } from '@angular/core';
 
-import {AudioNavigationComponent, AudioviewerComponent} from '../../component';
-import {TranscrWindowComponent} from '../../gui/transcr-window/transcr-window.component';
+import {AudioNavigationComponent, AudioviewerComponent} from '../../core/component';
+import {TranscrWindowComponent} from '../../core/gui/transcr-window/transcr-window.component';
 
 import {
   AudioService,
@@ -21,13 +21,13 @@ import {
   MessageService,
   TranscriptionService,
   UserInteractionsService
-} from '../../service';
+} from '../../core/shared/service';
 
-import {AudioTime, AVMousePos, AVSelection, Functions} from '../../shared';
-import {SubscriptionManager} from '../../shared/SubscriptionManager';
-import {SettingsService} from '../../service/settings.service';
-import {SessionService} from '../../service/session.service';
-import {CircleLoupeComponent} from '../../component/circleloupe/circleloupe.component';
+import {AudioTime, AVMousePos, AVSelection, Functions} from '../../core/shared';
+import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
+import {SettingsService} from '../../core/shared/service/settings.service';
+import {SessionService} from '../../core/shared/service/session.service';
+import {CircleLoupeComponent} from '../../core/component/circleloupe/circleloupe.component';
 
 @Component({
   selector: 'app-overlay-gui',

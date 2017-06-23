@@ -1,14 +1,14 @@
 import {RouterModule, Routes} from '@angular/router';
 
-import {LoginComponent} from './gui/login/login.component';
-import {MEMBER_ROUTES} from './gui/members-area/members.routes';
-import {MembersAreaComponent} from './gui/members-area/members-area.component';
-import {ALoginGuard} from './guard/login.activateguard';
-import {LogoutComponent} from './gui/logout/logout.component';
-import {LogoutGuard} from './guard/logout.guard';
-import {SettingsGuard} from './guard/settings.activateguard';
-import {NewsComponent} from './gui/news/news.component';
-import {FaqComponent} from './gui/faq/faq.component';
+import {LoginComponent} from './core/gui/login/login.component';
+import {MEMBER_ROUTES} from './core/gui/members-area/members-area.routes';
+import {MembersAreaComponent} from './core/gui/members-area/members-area.component';
+import {ALoginGuard} from './core/gui/login/login.activateguard';
+import {LogoutComponent} from './core/gui/logout/logout.component';
+import {LogoutGuard} from './core/gui/logout/logout.guard';
+import {SettingsGuard} from './core/shared/guard/settings.activateguard';
+import {NewsComponent} from './core/gui/news/news.component';
+import {FaqComponent} from './core/gui/faq/faq.component';
 
 const APP_ROUTES: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full'},

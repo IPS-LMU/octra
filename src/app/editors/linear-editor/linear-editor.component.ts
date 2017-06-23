@@ -9,7 +9,12 @@ import {
   ViewChild
 } from '@angular/core';
 
-import {AudioNavigationComponent, AudioviewerComponent, LoupeComponent, TranscrEditorComponent} from '../../component';
+import {
+  AudioNavigationComponent,
+  AudioviewerComponent,
+  LoupeComponent,
+  TranscrEditorComponent
+} from '../../core/component';
 
 import {
   AudioService,
@@ -17,12 +22,12 @@ import {
   MessageService,
   TranscriptionService,
   UserInteractionsService
-} from '../../service';
-import {AudioTime, AVMousePos, AVSelection, BrowserInfo, Functions, SubscriptionManager} from '../../shared';
-import {SettingsService} from '../../service/settings.service';
+} from '../../core/shared/service';
+import {AudioTime, AVMousePos, AVSelection, BrowserInfo, Functions, SubscriptionManager} from '../../core/shared';
+import {SettingsService} from '../../core/shared/service/settings.service';
 import {isNullOrUndefined} from 'util';
-import {SessionService} from '../../service/session.service';
-import {CircleLoupeComponent} from '../../component/circleloupe/circleloupe.component';
+import {SessionService} from '../../core/shared/service/session.service';
+import {CircleLoupeComponent} from '../../core/component/circleloupe/circleloupe.component';
 
 @Component({
   selector: 'app-signal-gui',

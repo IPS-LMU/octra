@@ -1,14 +1,14 @@
 import {Component, OnDestroy} from '@angular/core';
-import {APIService} from './service/api.service';
+import {APIService} from './core/shared/service/api.service';
 import {TranslateService} from '@ngx-translate/core';
-import {SessionService} from './service/session.service';
-import {SettingsService} from './service/settings.service';
-import {SubscriptionManager} from './shared/SubscriptionManager';
+import {SessionService} from './core/shared/service/session.service';
+import {SettingsService} from './core/shared/service/settings.service';
+import {SubscriptionManager} from './core/obj/SubscriptionManager';
 import {isNullOrUndefined, isUndefined} from 'util';
-import {BugReportService, ConsoleType} from './service/bug-report.service';
+import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
 import {AppInfo} from './app.info';
 import {environment} from '../environments/environment';
-import {UpdateManager} from './shared/UpdateManager';
+import {UpdateManager} from './core/shared/UpdateManager';
 
 @Component({
   selector: 'app-octra',

@@ -1,10 +1,10 @@
 import {AfterViewInit, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 
-import {AudioNavigationComponent, AudioplayerComponent, TranscrEditorComponent} from '../../component';
-import {AudioService, KeymappingService, TranscriptionService, UserInteractionsService} from '../../service';
-import {SubscriptionManager} from '../../shared';
-import {SettingsService} from '../../service/settings.service';
-import {SessionService} from '../../service/session.service';
+import {AudioNavigationComponent, AudioplayerComponent, TranscrEditorComponent} from '../../core/component';
+import {AudioService, KeymappingService, TranscriptionService, UserInteractionsService} from '../../core/shared/service';
+import {SubscriptionManager} from '../../core/shared';
+import {SettingsService} from '../../core/shared/service/settings.service';
+import {SessionService} from '../../core/shared/service/session.service';
 
 @Component({
   selector: 'app-audioplayer-gui',

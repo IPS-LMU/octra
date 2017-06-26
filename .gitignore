@@ -393,8 +393,6 @@ xcuserdata/
 /src/app/*.js
 /src/app/*.js.map
 /tmp/
-/src/app/app.config.ts
-/src/config/config.json
-/src/config/markers.json
+/src/config/appconfig.json
 /doc/
 /deployment/

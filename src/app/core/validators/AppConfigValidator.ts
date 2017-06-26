@@ -88,6 +88,59 @@ export class AppConfigValidator extends ConfigValidator {
                     }
                   }
                   break;
+                case('bugreport'):
+                  if (typeof value[key] !== 'object') {
+                    return {
+                      success: false,
+                      error: prefix + 'key \'' + key + '.' + value[key] + '\' must be of type object ' +
+                      '{login_enabled:boolean, fixedwidth:number}'
+                    };
+                  } else {
+                    for (const ke in value[key]) {
+                      if (!isNullOrUndefined(ke)) {
+                        switch (ke) {
+                          case('enabled'):
+                            if (typeof value[key][ke] !== 'boolean') {
+                              return {
+                                success: false,
+                                error: prefix + 'key \'octra.' + key + '.' + ke + '\' must be of type boolean'
+                              };
+                            }
+                            break;
+                          case('name'):
+                            if (typeof value[key][ke] !== 'string') {
+                              return {
+                                success: false,
+                                error: prefix + 'key \'octra.' + key + '.' + ke + '\' must be of type number'
+                              };
+                            }
+                            break;
+                          case('auth_token'):
+                            if (typeof value[key][ke] !== 'string') {
+                              return {
+                                success: false,
+                                error: prefix + 'key \'octra.' + key + '.' + ke + '\' must be of type number'
+                              };
+                            }
+                            break;
+                          case('url'):
+                            if (typeof value[key][ke] !== 'string') {
+                              return {
+                                success: false,
+                                error: prefix + 'key \'octra.' + key + '.' + ke + '\' must be of type number'
+                              };
+                            }
+                            break;
+                          default:
+                            return {
+                              success: false,
+                              error: prefix + 'key \'octra' + '.' + key + '.' + ke + '\' not valid.'
+                            };
+                        }
+                      }
+                    }
+                  }
+                  break;
                 case('allowed_browsers'):
                   if (!isArray(value[key])) {
                     return {

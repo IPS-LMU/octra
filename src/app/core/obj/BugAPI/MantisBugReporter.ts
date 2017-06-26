@@ -1,0 +1,76 @@
+import {BugReporter} from './BugReporter';
+import {Observable} from 'rxjs/Observable';
+import {Http, RequestOptions, Response, URLSearchParams} from '@angular/http';
+import {isArray} from 'rxjs/util/isArray';
+
+export class MantisBugReporter extends BugReporter {
+  constructor() {
+    super();
+    this._name = 'MantisBT';
+  }
+
+  public sendBugReport(http: Http, pkg: any, form: any, url: string, auth_token: string, sendbugreport: boolean): Observable<Response> {
+
+    const report = (sendbugreport) ? this.getText(pkg) : '';
+
+    const params = new URLSearchParams();
+    params.set('auth', auth_token);
+
+    let summary = form.description;
+    if (summary.length > 100) {
+      summary = summary.substr(0, 100) + '...';
+    }
+
+    const requestOptions = new RequestOptions();
+    requestOptions.params = params;
+
+    const json = pkg;
+
+    const body = {
+      project: {
+        id: 1
+      },
+      category: 'General',
+      summary: summary,
+      description: form.description,
+      additional_information: 'Email: ' + form.email,
+      os: json.system.os.name,
+      os_build: json.system.os.version,
+      platform: json.system.browser,
+      version: json.octra.version
+    };
+
+    if (sendbugreport) {
+      body['additional_information'] += '\n\n' + report;
+    }
+
+    return http.post(url, JSON.stringify(body), requestOptions);
+  }
+
+  public getText(pkg: any): string {
+    let result = '';
+
+    for (const attr in pkg) {
+      if (!isArray(pkg[attr]) && typeof pkg[attr] === 'object') {
+        result += attr + '\n';
+        result += '---------\n';
+
+        for (const attr2 in pkg[attr]) {
+          if (typeof pkg[attr][attr2] !== 'object' || pkg[attr][attr2] === null) {
+            result += '  ' + attr2 + ':  ' + pkg[attr][attr2] + '\n';
+          }
+        }
+      } else if (isArray(pkg[attr])) {
+        result += attr + '\n';
+        result += '---------\n';
+
+        for (let i = 0; i < pkg[attr].length; i++) {
+          result += '  ' + pkg[attr][i].type + '  ' + pkg[attr][i].message + '\n';
+        }
+      }
+      result += '\n';
+    }
+
+    return result;
+  }
+}

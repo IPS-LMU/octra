@@ -7,6 +7,7 @@ import {BugReportService, ConsoleEntry} from '../../shared/service/bug-report.se
 import {APIService} from '../../shared/service/api.service';
 import {SessionService} from '../../shared/service/session.service';
 import {AppInfo} from '../../../app.info';
+import {SettingsService} from '../../shared/service/settings.service';
 
 @Component({
   selector: 'app-octra-modal',
@@ -46,7 +47,8 @@ export class OctraModalComponent implements OnInit, OnDestroy {
   constructor(private modService: ModalService,
               public bugService: BugReportService,
               private api: APIService,
-              private sessService: SessionService) {
+              private sessService: SessionService,
+              private settService: SettingsService) {
   }
 
   ngOnInit() {
@@ -71,15 +73,16 @@ export class OctraModalComponent implements OnInit, OnDestroy {
   }
 
   sendBugReport() {
-        this.sessService.email = this.bgemail;
-    const bugs: ConsoleEntry[] = (this.sendpro_obj) ? this.bugService.console : [];
-
+    this.sessService.email = this.bgemail;
 
     this._subscrmanager.add(
-      this.api.sendBugReport(this.bgemail, this.bgdescr, bugs).subscribe(
+      this.bugService.sendReport(this.bgemail, this.bgdescr, this.sendpro_obj, {
+        auth_token: this.settService.app_settings.octra.bugreport.auth_token,
+        url: this.settService.app_settings.octra.bugreport.url
+      }).subscribe(
         (result) => {
           this.bugsent = true;
-                    setTimeout(() => {
+          setTimeout(() => {
             this.bgdescr = '';
             this.bugreport.close();
             this.bugsent = false;

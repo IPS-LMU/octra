@@ -8,6 +8,8 @@ import {TwoDEditorComponent} from './editors/2D-editor/2D-editor.component';
 import {EditorWSignaldisplayComponent} from './editors/editor-without-signaldisplay/editor-w-signaldisplay.component';
 import {LinearEditorComponent} from './editors/linear-editor/linear-editor.component';
 import {PraatTextgridConverter} from './core/obj/Converters/PraatTextgridConverter';
+import {BugReporter} from './core/obj/BugAPI/BugReporter';
+import {MantisBugReporter} from './core/obj/BugAPI/MantisBugReporter';
 
 export const EDITORS: any[] = [
   EditorWSignaldisplayComponent,
@@ -16,6 +18,9 @@ export const EDITORS: any[] = [
 ];
 
 export class AppInfo {
+  static get bugreporters(): BugReporter[] {
+    return this._bugreporters;
+  }
   public static get editors(): { name: string; editor: Component }[] {
     return this._editors;
   }
@@ -65,5 +70,10 @@ export class AppInfo {
     new PraatTextgridConverter(),
     new AnnotJSONConverter(),
     new CTMConverter()
+  ];
+
+  // supported Bug Reporters.
+  private static _bugreporters: BugReporter[] = [
+    new MantisBugReporter()
   ];
 }

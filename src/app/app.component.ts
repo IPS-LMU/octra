@@ -165,24 +165,4 @@ export class AppComponent implements OnDestroy {
       )
     );
   }
-
-  fetching(id: string) {
-    /*
-     this.subscrmanager.add(this.api.webASRTest('octra@phonetik.uni-muenchen.de', 'JdZ-2F9-Z4f-8bV').subscribe(
-     (result) => {
-     console.log('TEST RESULT:');
-     console.log(result);
-     }
-     ));
-     */
-  }
-
-  testBugAPI() {
-    this.subscrmanager.add(this.bugService.sendReport().subscribe(
-      (result) => {
-        console.log('BUG RESULT');
-        console.log(result);
-      }
-    ));
-  }
 }

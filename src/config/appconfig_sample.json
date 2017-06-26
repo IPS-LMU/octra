@@ -1,19 +1,24 @@
 {
   "version": "1.1.0",
   "audio_server": {
-    "url": "https://webapp.phonetik.uni-muenchen.de/JSWebTranscribe/"
+    "url": ""
   },
   "octra": {
     "login": {
-      "enabled": true
+      "enabled": false
     },
-    "showdetails": true,
+    "showdetails": false,
     "responsive": {
       "enabled": true,
       "fixedwidth": 1200
     },
-    "allowed_browsers": [
-    ],
+    "bugreport": {
+      "enabled": true,
+      "name": "MantisBT",
+      "auth_token": "",
+      "url": ""
+    },
+    "allowed_browsers": [],
     "languages":["de", "en"]
   }
 }

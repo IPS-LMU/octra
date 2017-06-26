@@ -3,9 +3,11 @@ import {BrowserInfo} from '../BrowserInfo';
 import {TranslateService} from '@ngx-translate/core';
 import {AppInfo} from '../../../app.info';
 import {SessionService} from './session.service';
-import {isArray} from 'util';
-import {Headers, Http, Request, RequestMethod, RequestOptions, Response, URLSearchParams} from '@angular/http';
+import {Http, Response} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
+import {MantisBugReporter} from '../../obj/BugAPI/MantisBugReporter';
+import {SettingsService} from './settings.service';
+import {isNullOrUndefined} from 'util';
 
 export enum ConsoleType {
   LOG,
@@ -29,6 +31,7 @@ export class BugReportService {
 
   constructor(private langService: TranslateService,
               private sessService: SessionService,
+              private settService: SettingsService,
               private http: Http) {
   }
 
@@ -55,59 +58,46 @@ export class BugReportService {
         localmode: this.sessService.offline
       },
       system: {
-        os: BrowserInfo.os.family,
-        browser: BrowserInfo.browser + ' ' + BrowserInfo.version
+        os: {
+          name: BrowserInfo.os.family,
+          version: BrowserInfo.os.version
+        },
+        browser: BrowserInfo.browser + ' ' + BrowserInfo.version,
+        version: BrowserInfo.os.version
       },
       entries: this._console
     };
   }
 
   public getText(): string {
-    let result = '';
-    const pkg = this.getPackage();
-
-    for (const attr in pkg) {
-      if (!isArray(pkg[attr]) && typeof pkg[attr] === 'object') {
-        result += attr + '\n';
-        result += '---------\n';
-
-        for (const attr2 in pkg[attr]) {
-          if (typeof pkg[attr][attr2] !== 'object' || pkg[attr][attr2] === null) {
-            result += '  ' + attr2 + ':  ' + pkg[attr][attr2] + '\n';
-          }
-        }
-      } else if (isArray(pkg[attr])) {
-        result += attr + '\n';
-        result += '---------\n';
-
-        for (let i = 0; i < pkg[attr].length; i++) {
-          result += '  ' + pkg[attr][i].type + '  ' + pkg[attr][i].message + '\n';
-        }
-      }
-      result += '\n';
-    }
-
-    return result;
+    const reporter = new MantisBugReporter();
+    return reporter.getText(this.getPackage());
   }
 
-  /**
-   * function to test the API
-   * @returns {Observable<Response>}
-   */
-  sendReport(): Observable<Response> {
-    const api_token = 'D6GbEI41cq1PXgorQu_IpfBf6dvg6GAw';
+  sendReport(email: string, description: string, sendbugreport: boolean, credentials: {
+    auth_token: string,
+    url: string
+  }): Observable<Response> {
+    const bugreport_settings = this.settService.app_settings.octra.bugreport;
 
-    const url = 'https://poemp.net/mantisbt/api/rest/issues';
+    if (!isNullOrUndefined(bugreport_settings) && bugreport_settings.enabled) {
+      for (let i = 0; i < AppInfo.bugreporters.length; i++) {
+        const bugreporter = AppInfo.bugreporters[i];
+        if (bugreporter.name === bugreport_settings.name) {
+          const auth_token = credentials.auth_token;
+          const url = credentials.url;
+          const form = {
+            email: email,
+            description: description
+          };
 
-    const headers = new Headers();
-    headers.append('content-type', 'application/json');
-    headers.append('authorization', api_token);
+          const reporter = new MantisBugReporter();
+          return reporter.sendBugReport(this.http, this.getPackage(), form, url, auth_token, sendbugreport);
+        }
+      }
+    }
 
-    const params = new URLSearchParams();
-    params.set('id', '1');
-    const options = new RequestOptions({ headers: headers, search: params });
-
-    return this.http.get(url, options);
+    return null;
   }
 
 }

@@ -79,7 +79,7 @@
         </div>
         <div #localmode id='localmode' class="col-md-6 panel panel-default" style="padding:40px;">
             <section>
-                <h4 style="padding-top:20px;">{{'login.local mode' | translate}}</h4>
+                <h4>{{'login.local mode' | translate}}</h4>
                 <div>
                     <p class="bg-danger" *ngIf="sessionService.member_id !== null && sessionService.member_id !== '-1'">
                         {{"login.offline mode data warning" | translate}}

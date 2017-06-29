@@ -17,6 +17,7 @@
     "pause": "Pausieren",
     "stop": "Stopp",
     "backward": "Zurück",
+    "backwardtime": "Zurück (zeitversetzt)",
     "replay": "Wiederholung",
     "shortcuts": "Tastenkombinationen",
     "guidelines": "Regeln",
@@ -49,7 +50,22 @@
     "errors found": "({{errors}}) Fehler gefunden",
     "no errors found": "Keine Fehler gefunden",
     "segment": "Segment",
-    "job number": "Aufgabennummer"
+    "job number": "Aufgabennummer",
+    "free jobs": "Freie Aufgaben",
+    "email": "Email",
+    "description": "Beschreibung",
+    "bug report": "Fehlerbericht",
+    "protocol": "Protokoll",
+    "submission success": "Übertragung erfolgreich"
+  },
+  "bug report": {
+    "report an error": "Fehler melden",
+    "where does the error occur": "Wo trat der Fehler auf?",
+    "have you found bugs": "Haben Sie andere Fehler gefunden?",
+    "Does something go wrong": "Funktioniert etwas nicht richtig?",
+    "Please send us your bug report": "Senden Sie uns bitte ihren Fehlerbericht.",
+    "sent": "Der Fehlerbericht wurde erfolgreich gesendet.",
+    "send protocol": "Protokoll beifügen (empfohlen)"
   },
   "transcription":{
     "start": "Transkription fortsetzen",
@@ -127,10 +143,10 @@
     "old file found": "Es wurden Daten zu einer vorherigen Transkription gefunden. Um diese fortzusetzen, ziehen Sie die folgende Datei per Drag & Drop in das graue Feld:<br/><br/>{{file_label}}",
     "online mode data warning": "Es sind lokale Daten vorhanden, die im lokalen Modus erstellt worden sind. Das Nutzen des Online Modus überschreibt diese lokalen Daten.",
     "offline mode data warning": "Es sind lokale Daten vorhanden, die im online Modus erstellt worden sind. Das Nutzen des lokalen Modus überschreibt diese lokalen Daten.",
-    "online mode continue": "Es wurden alte Daten gefunden. Zum Forsetzen folgende Daten angeben: {{member_id}} , {{member_project}}, {{member_jobno}}"
+    "online mode continue": "Es wurden alte Daten gefunden. Zum Fortsetzen folgende Daten angeben: {{member_id}} , {{member_project}}, {{member_jobno}}"
   },
   "dropzone": {
-    "drag&drop here": "Audiodatei (*.wav) hier hineinziehen oder hier klicken",
+    "drag&drop here": "Audiodatei (*.wav) (+ optional Datei zum Importieren) hier hineinziehen oder hier klicken",
     "file selected": "{{file_label}} ausgewählt"
   },
   "browser": {

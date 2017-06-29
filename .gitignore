@@ -396,3 +396,4 @@ xcuserdata/
 /src/config/appconfig.json
 /doc/
 /deployment/
+/dist/config/appconfig.json

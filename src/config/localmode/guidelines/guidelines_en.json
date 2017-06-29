@@ -7,7 +7,7 @@
     "version": "1.0",
     "date": "2017-04-10",
     "encoding": "UTF-8",
-    "validation_url": "project/functions.js"
+    "validation_url": "config/localmode/functions.js"
   },
   "instructions": [
     {

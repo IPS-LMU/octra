@@ -11,3 +11,4 @@ declare var window: Window;
 declare var videojs: any;
 declare var navigator: Navigator;
 declare var document: Document;
+declare var Ajv: any;

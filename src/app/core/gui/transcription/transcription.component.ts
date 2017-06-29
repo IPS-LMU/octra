@@ -223,9 +223,7 @@ export class TranscriptionComponent implements OnInit,
           lang = this.settingsService.projectsettings.languages[0];
         }
 
-        this.subscrmanager.add(
-          this.settingsService.loadGuidelines(event.lang, './project/guidelines/guidelines_' + lang + '.json')
-        );
+        this.settingsService.loadGuidelines(event.lang, './config/localmode/guidelines/guidelines_' + lang + '.json');
       }
     ));
 

@@ -13,7 +13,8 @@
         "config",
         "project",
         "favicon.ico",
-        "404.html"
+        "404.html",
+        "schemata"
       ],
       "index": "index.html",
       "main": "main.ts",
@@ -38,7 +39,8 @@
         "../node_modules/bootstrap-material-design/dist/js/ripples.min.js",
         "../node_modules/summernote/dist/summernote.min.js",
         "../node_modules/video.js/dist/video.js",
-        "../node_modules/platform/platform.js"
+        "../node_modules/platform/platform.js",
+        "../node_modules/ajv/dist/ajv.min.js"
         ],
       "environmentSource": "environments/environment.ts",
       "environments": {

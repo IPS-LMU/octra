@@ -3,7 +3,6 @@ import 'rxjs/Rx';
 import {Http} from '@angular/http';
 
 import {SubscriptionManager} from '../';
-import {AppConfigValidator} from '../../validators/AppConfigValidator';
 import {ConfigValidator} from '../../obj/ConfigValidator';
 import {ProjectConfiguration} from '../../obj/Settings/project-configuration';
 import {Subscription} from 'rxjs/Subscription';
@@ -11,7 +10,6 @@ import {SessionService} from './session.service';
 import {AudioService} from './audio.service';
 import {isFunction, isNullOrUndefined} from 'util';
 import {Logger} from '../Logger';
-import {ProjectConfigValidator} from '../../validators/ProjectConfigValidator';
 import {AppSettings} from '../../obj/Settings/app-settings';
 import {Functions} from '../Functions';
 
@@ -109,61 +107,78 @@ export class SettingsService {
   }
 
   getApplicationSettings() {
-    Logger.log('Load Application Settings...');
-    this.subscrmanager.add(Functions.uniqueHTTPRequest(this.http, false, null, './config/appconfig.json', null).subscribe(
+    this.loadSettings(
+      {
+        loading: 'Load application settings...'
+      },
+      {
+        json: './config/appconfig.json',
+        schema: './schemata/appconfig.schema.json'
+      },
+      {
+        json: 'appconfig.json',
+        schema: 'appconfig.schema.json'
+      },
       (result) => {
         this._app_settings = result.json();
+      },
+      () => {
         Logger.log('AppSettings loaded.');
-        this.validation.app = this.validate(new AppConfigValidator(), this._app_settings);
-        if (this.validation.app) {
-          this.app_settingsloaded.emit(true);
-        } else {
-          Logger.err('appconfig.json validation error.');
-        }
-      },
-      (error) => {
-        this._log += 'Loading application config failed<br/>';
-      }
-    ));
-  }
-
-  public loadProjectSettings: () => Subscription = () => {
-    Logger.log('Load Project Settings...');
-    return Functions.uniqueHTTPRequest(this.http, false, null, './project/projectconfig.json', null).subscribe(
-      (result) => {
-        this._projectsettings = result.json();
-        const validation = this.validate(new ProjectConfigValidator(), this._projectsettings);
-        if (validation) {
-          Logger.log('Projectconfig loaded.');
-          this.projectsettingsloaded.emit(this._projectsettings);
-        } else {
-          Logger.err('projectconfig.json validation error.');
-        }
-      },
-      (error) => {
-        this._log += 'Loading project config failed<br/>';
+        this.validation.app = true;
+        this.app_settingsloaded.emit(true);
       }
     );
   }
 
-  public loadGuidelines: ((language: string, url: string) => Subscription) = (language: string, url: string) => {
-    Logger.log('Load Guidelines (' + language + ')...');
-    return Functions.uniqueHTTPRequest(this.http, false, null, url, null).subscribe(
-      (response) => {
-        const guidelines = response.json();
-        Logger.log('Guidelines loaded.');
-        this._guidelines = guidelines;
-        this.loadValidationMethod(guidelines.meta.validation_url);
-        this.guidelinesloaded.emit(guidelines);
+  public loadProjectSettings = () => {
+    this.loadSettings(
+      {
+        loading: 'Load project Settings...'
       },
-      (error) => {
-        this._log += 'Loading guidelines failed<br/>';
+      {
+        json: './config/localmode/projectconfig.json',
+        schema: './schemata/projectconfig.schema.json'
+      },
+      {
+        json: 'projectconfig.json',
+        schema: 'projectconfig.schema.json'
+      },
+      (result) => {
+        this._projectsettings = result.json();
+      },
+      () => {
+        Logger.log('Projectconfig loaded.');
+        this.projectsettingsloaded.emit(this._projectsettings);
+      }
+    );
+  }
+
+  public loadGuidelines = (language: string, url: string) => {
+    this.loadSettings(
+      {
+        loading: 'Load guidelines (' + language + ')...'
+      },
+      {
+        json: url,
+        schema: './schemata/guidelines.schema.json'
+      },
+      {
+        json: 'guidelines_' + language + '.json',
+        schema: 'guidelines.schema.json'
+      },
+      (result) => {
+        this._guidelines = result.json();
+      },
+      () => {
+        Logger.log('Guidelines loaded.');
+        this.loadValidationMethod(this._guidelines.meta.validation_url);
+        this.guidelinesloaded.emit(this._guidelines);
       }
     );
   }
 
   public loadValidationMethod: ((url: string) => Subscription) = (url: string) => {
-    Logger.log('Load Methods...');
+    Logger.log('Load methods...');
     return Functions.uniqueHTTPRequest(this.http, false, null, url, null).subscribe(
       (response) => {
         const js = document.createElement('script');
@@ -194,7 +209,7 @@ export class SettingsService {
   }
 
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
-    Logger.log('Load audio...');
+    Logger.log('Load audio file...');
     if (isNullOrUndefined(audioService.audiobuffer)) {
       this.subscrmanager.add(
         audioService.afterloaded.subscribe((result) => {
@@ -283,5 +298,63 @@ export class SettingsService {
     this._projectsettings = null;
     this._validationmethod = null;
     this._tidyUpMethod = null;
+  }
+
+  private validateJSON(filename: string, json: any, schema: any): boolean {
+    if (!isNullOrUndefined(json) && !isNullOrUndefined(schema)) {
+      const ajv = new Ajv(); // options can be passed, e.g. {allErrors: true}
+      const validate = ajv.compile(schema);
+      const valid = validate(json);
+      if (!valid) {
+        for (const err in validate.errors) {
+          if (validate.errors.hasOwnProperty(err)) {
+            const err_obj = (validate.errors['' + err + '']);
+            Logger.err(`JSON Validation Error (${filename}): ${err_obj.dataPath} ${err_obj.message}`);
+          }
+        }
+      } else {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private loadSettings(messages: any, urls: any, filenames: any, onhttpreturn: (any) => void, onvalidated: () => void) {
+    if (
+      messages.hasOwnProperty('loading') &&
+      urls.hasOwnProperty('json') && urls.hasOwnProperty('schema') &&
+      filenames.hasOwnProperty('json') && filenames.hasOwnProperty('schema')
+    ) {
+      Logger.log(messages.loading);
+      this.subscrmanager.add(Functions.uniqueHTTPRequest(this.http, false, null, urls.json, null).subscribe(
+        (result) => {
+          onhttpreturn(result);
+
+          this.subscrmanager.add(Functions.uniqueHTTPRequest(this.http, false, null, urls.schema, null).subscribe(
+            (result2) => {
+
+              Logger.log(filenames.json + ' schema file loaded');
+
+              const schema = result2.json();
+              const json = result.json();
+
+              const validation_ok = this.validateJSON(filenames.json, json, schema);
+
+              if (validation_ok) {
+                onvalidated();
+              }
+            },
+            () => {
+              console.error(filenames.schema + ' could not be loaded!');
+            }
+          ));
+        },
+        (error) => {
+          this._log += 'Loading ' + filenames.json + ' failed<br/>';
+        }
+      ));
+    } else {
+      throw new Error('parameters of loadSettings() are not correct.');
+    }
   }
 }

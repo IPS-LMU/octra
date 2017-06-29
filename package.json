@@ -29,6 +29,7 @@
     "@ngx-translate/http-loader": "0.0.3",
     "@types/es6-promise": "0.0.32",
     "@types/text-encoding": "0.0.30",
+    "ajv": "^5.2.0",
     "bootstrap": "^3.3.7",
     "bootstrap-material-design": "^0.5.10",
     "browser-signal-processing": "^0.1.7",

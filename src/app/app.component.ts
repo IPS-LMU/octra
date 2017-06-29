@@ -9,6 +9,7 @@ import {BugReportService, ConsoleType} from './core/shared/service/bug-report.se
 import {AppInfo} from './app.info';
 import {environment} from '../environments/environment';
 import {UpdateManager} from './core/shared/UpdateManager';
+import {Http} from '@angular/http';
 
 @Component({
   selector: 'app-octra',
@@ -32,7 +33,8 @@ export class AppComponent implements OnDestroy {
               private langService: TranslateService,
               private sessService: SessionService,
               private settingsService: SettingsService,
-              private bugService: BugReportService) {
+              private bugService: BugReportService,
+              private http: Http) {
     // check for Updates
     const umanager = new UpdateManager(this.sessService);
     umanager.checkForUpdates();

@@ -64,9 +64,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
             // fall back to first defined language
             language = projectsettings.languages[0];
           }
-          this.subscrmanager.add(
-            this.settService.loadGuidelines(this.sessionService.language, './project/guidelines/guidelines_' + language + '.json')
-          );
+          this.settService.loadGuidelines(this.sessionService.language, './config/localmode/guidelines/guidelines_' + language + '.json');
+
           this.loadedchanged.emit(false);
         }
       )
@@ -121,7 +120,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
             && this.loadedtable.methods
             && this.loadedtable.audio
           ) {
-                        this.subscrmanager.remove(id);
+            this.subscrmanager.remove(id);
             setTimeout(() => {
               if ((isNullOrUndefined(this.sessionService.agreement)
                   || isNullOrUndefined(this.sessionService.agreement[this.sessionService.member_project]) ||
@@ -138,19 +137,17 @@ export class LoadingComponent implements OnInit, OnDestroy {
       )
     );
 
-    this.subscrmanager.add(
-      this.settService.loadProjectSettings()
-    );
+    this.settService.loadProjectSettings();
 
     if (!isNullOrUndefined(this.settService.guidelines) &&
       (typeof this.settService.tidyUpMethod === 'undefined') ||
       typeof this.settService.validationmethod === 'undefined') {
       // load methods
-            this.subscrmanager.add(
+      this.subscrmanager.add(
         this.settService.loadValidationMethod(this.settService.guidelines.meta.validation_url)
       );
     } else if (!isNullOrUndefined(this.settService.guidelines)) {
-            this.loadedtable.methods = true;
+      this.loadedtable.methods = true;
       this.loadedchanged.emit(false);
     }
     setTimeout(() => {

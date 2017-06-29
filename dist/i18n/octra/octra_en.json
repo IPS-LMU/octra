@@ -17,6 +17,7 @@
     "pause": "Pause",
     "stop": "Stop",
     "backward": "Back",
+    "backwardtime": "Back (in time)",
     "replay": "Replay",
     "shortcuts": "Shortcuts",
     "guidelines": "Guidelines",
@@ -49,7 +50,23 @@
     "errors found": "({{errors}}) errors found",
     "no errors found": "No errors found",
     "segment": "Segment",
-    "job number": "Job number"
+    "job number": "Job number",
+    "free jobs": "free Jobs",
+    "email": "Email",
+    "description": "Description",
+    "bug report": "Bug Report",
+    "protocol": "Protocol",
+    "submission success": "successfully transmitted"
+  },
+  "bug report": {
+    "report an error": "Report an error",
+    "where does the error occur": "Where did the error occur?",
+    "have you found bugs": "Do you found other bugs?",
+    "Does something go wrong": "Does something go wrong?",
+    "Please send us your bug report": "Please send us your bug report.",
+    "sent": "Your bug was successfully reported.",
+    "send protocol": "Add Protocol (recommended)",
+    "protocol": "Protocol"
   },
   "transcription": {
     "start": "Continue transcription",
@@ -133,7 +150,7 @@
     "online mode continue": "Old data found! To continue make sure to set the login data to: {{member_id}} , {{member_project}}, {{member_jobno}}"
   },
   "dropzone": {
-    "drag&drop here": "Drag & Drop audio file (*.wav) here or click here.",
+    "drag&drop here": "Drag & Drop audio file (*.wav) (+ optional file for import) here or click here.",
     "file selected": "{{file_label}} selected"
   },
   "browser": {

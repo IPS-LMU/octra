@@ -1,7 +1,12 @@
-import {AfterViewInit, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
 
 import {AudioNavigationComponent, AudioplayerComponent, TranscrEditorComponent} from '../../core/component';
-import {AudioService, KeymappingService, TranscriptionService, UserInteractionsService} from '../../core/shared/service';
+import {
+  AudioService,
+  KeymappingService,
+  TranscriptionService,
+  UserInteractionsService
+} from '../../core/shared/service';
 import {SubscriptionManager} from '../../core/shared';
 import {SettingsService} from '../../core/shared/service/settings.service';
 import {SessionService} from '../../core/shared/service/session.service';
@@ -123,10 +128,12 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     }
   }
 
-  updateSegment($event) {
-    const segment = this.transcrService.annotation.levels[0].segments.get(0);
-    segment.transcript = this.editor.rawText;
-    this.transcrService.annotation.levels[0].segments.change(0, segment);
+  afterTyping(status) {
+    if (status === 'stopped') {
+      const segment = this.transcrService.annotation.levels[0].segments.get(0);
+      segment.transcript = this.editor.rawText;
+      this.transcrService.annotation.levels[0].segments.change(0, segment);
+    }
   }
 
   onShortcutTriggered(event) {
@@ -142,7 +149,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   }
 
   onMarkerClick(marker_code: string) {
-    this.updateSegment(null);
+    this.afterTyping('stopped');
     if (this.projectsettings.logging.forced === true) {
       this.uiService.addElementFromEvent('marker_click', {value: marker_code}, Date.now(), 'editor');
     }

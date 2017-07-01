@@ -35,7 +35,6 @@
                       [easymode]="sessService.easymode"
 ></app-audio-navigation>
 <app-audioplayer #audioplayer (shortcuttriggered)="onShortcutTriggered($event)"></app-audioplayer>
-{{transcr.is_typing}}
 <app-transcr-editor #transcr
                     (typing)="afterTyping($event);"
                     (marker_insert)="onMarkerInsert($event)"

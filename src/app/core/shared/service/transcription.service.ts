@@ -26,6 +26,7 @@ export class TranscriptionService {
   get audiofile(): OAudiofile {
     return this._audiofile;
   }
+
   get annotation(): Annotation {
     return this._annotation;
   }
@@ -415,7 +416,7 @@ export class TranscriptionService {
    * @param use_wrap
    * @returns {string}
    */
-  private replaceMarkersWithHTML(input: string): string {
+  public replaceMarkersWithHTML(input: string): string {
     let result = input;
     for (let i = 0; i < this._guidelines.markers.length; i++) {
       const marker = this._guidelines.markers[i];
@@ -546,5 +547,35 @@ export class TranscriptionService {
     levels.push(level);
 
     return new OAnnotJSON(this.filename, this.audio.samplerate, levels);
+  }
+
+  public htmlToRaw(html: string): string {
+    html = '<p>' + html + '</p>';
+    const dom = jQuery(html);
+
+    const replace_func = (i, elem) => {
+      if (jQuery(elem).children() !== null && jQuery(elem).children().length > 0) {
+        jQuery.each(jQuery(elem).children(), replace_func);
+      } else {
+        let attr = jQuery(elem).attr('data-marker-code');
+        if (elem.type === 'select-one') {
+          const value = jQuery(elem).attr('data-value');
+          attr += '=' + value;
+        }
+        if (attr) {
+          for (let j = 0; j < this.guidelines.markers.length; j++) {
+            const marker = this.guidelines.markers[j];
+            if (attr === marker.code) {
+              return jQuery(elem).replaceWith(Functions.escapeHtml(attr));
+            }
+          }
+        } else if (jQuery(elem).attr('class') !== 'error_underline') {
+          jQuery(elem).remove();
+        }
+      }
+    };
+
+    jQuery.each(dom.children(), replace_func);
+    return dom.text();
   }
 }

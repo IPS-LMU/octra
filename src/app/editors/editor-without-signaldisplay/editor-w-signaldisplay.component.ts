@@ -10,6 +10,7 @@ import {
 import {SubscriptionManager} from '../../core/shared';
 import {SettingsService} from '../../core/shared/service/settings.service';
 import {SessionService} from '../../core/shared/service/session.service';
+import {Segment} from '../../core/obj/Segment';
 
 @Component({
   selector: 'app-audioplayer-gui',
@@ -130,9 +131,12 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
   afterTyping(status) {
     if (status === 'stopped') {
-      const segment = this.transcrService.annotation.levels[0].segments.get(0);
-      segment.transcript = this.editor.rawText;
-      this.transcrService.annotation.levels[0].segments.change(0, segment);
+      this.saveTranscript();
+      /*
+       const segment = this.transcrService.annotation.levels[0].segments.get(0);
+       segment.transcript = this.editor.rawText;
+       this.transcrService.annotation.levels[0].segments.change(0, segment);
+       */
     }
   }
 
@@ -152,6 +156,27 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     this.afterTyping('stopped');
     if (this.projectsettings.logging.forced === true) {
       this.uiService.addElementFromEvent('marker_click', {value: marker_code}, Date.now(), 'editor');
+    }
+  }
+
+  private saveTranscript() {
+    const html = this.editor.html.replace(/&nbsp;/g, ' ');
+    // split text at the position of every boundary marker
+    let seg_texts: string[] = html.split(
+      /\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-boundary="[0-9]+">\s?/g
+    );
+
+    seg_texts = seg_texts.map((a: string) => {
+      return a.replace(/(<p>)|(<\/p>)/g, '');
+    });
+
+    for (let i = 0; i < this.transcrService.annotation.levels[0].segments.length && i < seg_texts.length; i++) {
+      const segment: Segment = this.transcrService.annotation.levels[0].segments.get(i);
+      const new_raw = this.transcrService.htmlToRaw(seg_texts[i]);
+      if (segment.transcript !== new_raw) {
+        segment.transcript = new_raw;
+        this.transcrService.annotation.levels[0].segments.change(i, segment);
+      }
     }
   }
 }

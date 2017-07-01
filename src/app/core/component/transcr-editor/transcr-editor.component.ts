@@ -185,7 +185,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   public initialize = () => {
     this.summernote_ui = jQuery.summernote.ui;
     const Navigation = this.initNavigation();
-    // Navigation.buttons['boundary'] = this.createCustomButtonsArray()[0];
+    Navigation.buttons['boundary'] = this.createCustomButtonsArray()[0];
+    Navigation.str_array.push('boundary');
 
     /*
 
@@ -230,8 +231,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       airPopover: [],
       toolbar: [
         ['default', Navigation.str_array]
-
-        /* ['static', ['boundary']] */
       ],
       shortcuts: false,
       buttons: Navigation.buttons,
@@ -259,6 +258,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           }
         },
         onBlur: () => {
+          this.focused = false;
+        },
+        onFocus: () => {
+          this.focused = true;
         }
       }
     });
@@ -355,7 +358,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       })
         .on('mouseover', (event) => {
           const jqueryobj = jQuery(event.target);
-          console.log(jqueryobj);
 
           const width = jQuery('.seg-popover').width();
           const height = jQuery('.seg-popover').height();
@@ -371,7 +373,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
               'margin-top': (jqueryobj.offset().top - editor_pos.top - height - 10) + 'px',
               'display': 'inherit'
             });
-            console.log(editor_pos.top);
             const timespan = new TimespanPipe();
             const text = timespan.transform(seg.time.unix.toString());
             this.segpopover.text(text);
@@ -618,11 +619,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * set focus to the very last position of the editors text
    */
   public focus = (later: boolean = false) => {
-    this.focused = true;
-
     const func = () => {
       try {
-        console.log('later : ' + this.html);
         if (this.rawText !== '' && this.html !== '<p><br/></p>') {
           Functions.placeAtEnd(jQuery('.note-editable.panel-body')[0]);
         }

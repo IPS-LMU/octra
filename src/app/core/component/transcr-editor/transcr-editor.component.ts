@@ -488,8 +488,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
     }
-
-    this.lastkeypress = Date.now();
   }
 
   /**
@@ -502,18 +500,19 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.onkeyup.emit($event);
 
     setTimeout(() => {
-      if (Date.now() - this.lastkeypress < 500) {
-        if (!this._is_typing && this.focused) {
-          this.typing.emit('started');
-        }
-        this._is_typing = true;
-      } else {
+      if (Date.now() - this.lastkeypress >= 700) {
         if (this._is_typing && this.focused) {
           this.typing.emit('stopped');
         }
         this._is_typing = false;
       }
-    }, 500);
+    }, 700);
+
+    if (!this._is_typing && this.focused) {
+      this.typing.emit('started');
+    }
+    this._is_typing = true;
+    this.lastkeypress = Date.now();
   }
 
   /**
@@ -584,7 +583,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         const marker = this.markers[i];
 
         const regex = new RegExp('(\\s)*(' + Functions.escapeRegex(marker.code) + ')(\\s)*', 'g');
-        // const regex2 = /\[\|([0-9]+)\]/g;
+        const regex2 = /\[\|([0-9]+)\]/g;
 
         const replace_func = (x, g1, g2, g3) => {
           const s1 = (g1) ? g1 : '';
@@ -594,16 +593,14 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             'data-marker-code=\'' + marker.code + '\' alt=\'' + marker.code + '\'/>' + s3;
         };
 
-        /*
-         const replace_func2 = (x, g1) => {
-         const s1 = (g1) ? g1 : '';
-         return '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon-text\' style=\'height:16px;\' ' +
-         'data-boundary=\'' + g1 + '\' />';
-         };
 
-         result = result.replace(regex2, replace_func2);
+        const replace_func2 = (x, g1) => {
+          const s1 = (g1) ? g1 : '';
+          return '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon-text\' style=\'height:16px;\' ' +
+            'data-boundary=\'' + g1 + '\' />';
+        };
 
-         */
+        result = result.replace(regex2, replace_func2);
 
         result = result.replace(regex, replace_func);
 

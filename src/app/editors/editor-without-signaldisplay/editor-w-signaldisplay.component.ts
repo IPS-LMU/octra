@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, OnChanges, OnDestroy, OnInit, ViewChild} from '@angular/core';
 
 import {AudioNavigationComponent, AudioplayerComponent, TranscrEditorComponent} from '../../core/component';
 import {
@@ -11,13 +11,15 @@ import {SubscriptionManager} from '../../core/shared';
 import {SettingsService} from '../../core/shared/service/settings.service';
 import {SessionService} from '../../core/shared/service/session.service';
 import {Segment} from '../../core/obj/Segment';
+import {AudioTime} from '../../core/obj/AudioTime';
 
 @Component({
   selector: 'app-audioplayer-gui',
   templateUrl: './editor-w-signaldisplay.component.html',
   styleUrls: ['./editor-w-signaldisplay.component.css']
 })
-export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterViewInit {
+export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
+
   public static editorname = 'Editor without signal display';
 
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
@@ -78,6 +80,10 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
   ngOnDestroy() {
     this.subscrmanager.destroy();
+  }
+
+  ngOnChanges(obj: any) {
+    console.log(obj);
   }
 
   onButtonClick(event: { type: string, timestamp: number }) {

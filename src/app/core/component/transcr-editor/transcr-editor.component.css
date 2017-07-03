@@ -67,7 +67,6 @@
     flex: 1 0 auto;
 }
 
-
 :host {
     -webkit-box-flex: 1;
     -ms-flex: 1 0 auto;

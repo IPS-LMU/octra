@@ -9,6 +9,7 @@ import {TranscriptionService} from '../../shared/service/transcription.service';
 import {isNullOrUndefined} from 'util';
 import {Segments} from '../../obj/Segments';
 import {TimespanPipe} from '../../shared/pipe/timespan.pipe';
+import {AudioTime} from '../../obj/AudioTime';
 declare var window: any;
 
 @Component({
@@ -40,6 +41,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Input() markers: any = true;
   @Input() easymode = true;
   @Input() height = 0;
+  @Input() playposition: AudioTime;
 
   get rawText(): string {
     return this.tidyUpRaw(this._rawText);
@@ -368,18 +370,18 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             seg_id = Number(seg_id);
             const seg = this.transcrService.annotation.levels[0].segments.get(seg_id);
 
-            this.segpopover.css({
+            jQuery('.seg-popover').css({
               'margin-left': (event.target.offsetLeft - (width / 2)) + 'px',
               'margin-top': (jqueryobj.offset().top - editor_pos.top - height - 10) + 'px',
               'display': 'inherit'
             });
             const timespan = new TimespanPipe();
             const text = timespan.transform(seg.time.unix.toString());
-            this.segpopover.text(text);
+            jQuery('.seg-popover').text(text);
           }
         })
         .on('mouseleave', (event) => {
-          this.segpopover.css({
+          jQuery('.seg-popover').css({
             'display': 'none'
           });
         });
@@ -457,7 +459,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   insertBoundary(img_url: string, number: number) {
     const element = document.createElement('img');
     element.setAttribute('src', img_url);
-    element.setAttribute('class', 'btn-icon-text');
+    element.setAttribute('class', 'btn-icon-text boundary');
     element.setAttribute('style', 'height:16px');
     element.setAttribute('data-boundary', number.toString());
 
@@ -590,14 +592,14 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           const s1 = (g1) ? g1 : '';
           const s2 = (g2) ? g2 : '';
           const s3 = (g3) ? g3 : '';
-          return s1 + '<img src=\'' + marker.icon_url + '\' class=\'btn-icon-text\' style=\'height:16px;\' ' +
+          return s1 + '<img src=\'' + marker.icon_url + '\' class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
             'data-marker-code=\'' + marker.code + '\' alt=\'' + marker.code + '\'/>' + s3;
         };
 
 
         const replace_func2 = (x, g1) => {
           const s1 = (g1) ? g1 : '';
-          return '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon-text\' style=\'height:16px;\' ' +
+          return '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
             'data-boundary=\'' + g1 + '\' />';
         };
 

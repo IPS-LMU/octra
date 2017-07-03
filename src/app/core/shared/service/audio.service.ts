@@ -9,6 +9,13 @@ import {Logger} from '../Logger';
 
 @Injectable()
 export class AudioService {
+  get playpostion(): AudioTime {
+    return this._playpostion;
+  }
+
+  set playpostion(value: AudioTime) {
+    this._playpostion = value;
+  }
   get size(): number {
     return this._size;
   }
@@ -21,7 +28,6 @@ export class AudioService {
   // ALL time relevant variables have to be in samples which
   // is the smallest unit and needed for precision
   // It would be the best if you use the AudioTime class
-
   set audiobuffer(value: AudioBuffer) {
     this._audiobuffer = value;
   }
@@ -158,21 +164,22 @@ export class AudioService {
   private _size = 0;
   private _volume = 1;
   private _speed = 1;
+  private _playpostion: AudioTime;
 
   private _audioplaying = false;
   private _startplaying = 0;
   private _endplaying = 0;
   private _replay = false;
   private _state = 'stopped';
+  private _paused = false;
+  private _stepbackward = false;
+  public loaded = false;
 
   private _javascriptNode = null;
 
-  private _paused = false;
-  private _stepbackward = false;
-
   public afterloaded: EventEmitter<any>;
   public statechange: EventEmitter<{ state: string, playonhover: boolean }>;
-  public loaded = false;
+
 
   private error: any;
 

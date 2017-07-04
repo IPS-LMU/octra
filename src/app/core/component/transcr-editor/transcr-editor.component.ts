@@ -10,6 +10,7 @@ import {isNullOrUndefined} from 'util';
 import {Segments} from '../../obj/Segments';
 import {TimespanPipe} from '../../shared/pipe/timespan.pipe';
 import {AudioTime} from '../../obj/AudioTime';
+import {AudioService} from '../../shared/service/audio.service';
 declare var window: any;
 
 @Component({
@@ -92,7 +93,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   constructor(private cd: ChangeDetectorRef,
               private settingsService: SettingsService,
               private langService: TranslateService,
-              private transcrService: TranscriptionService) {
+              private transcrService: TranscriptionService,
+              private audio: AudioService) {
 
     this._settings = new TranscrEditorConfig().Settings;
     this.subscrmanager = new SubscriptionManager();
@@ -349,11 +351,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   initPopover() {
     // set popover
-    jQuery('.btn-icon-text[data-boundary]').off('click');
+    jQuery('.btn-icon-text[data-samples]').off('click');
     setTimeout(() => {
-      jQuery('.btn-icon-text[data-boundary]').on('click', function (event) {
+      jQuery('.btn-icon-text[data-samples]').on('click', function (event) {
         const jqueryobj = jQuery(this);
-        // alert('segment ' + jqueryobj.attr('data-boundary') + ' clicked!');
         jqueryobj.css({
           'background-color': '#5add80'
         });
@@ -364,11 +365,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           const width = jQuery('.seg-popover').width();
           const height = jQuery('.seg-popover').height();
           const editor_pos = jQuery('.note-toolbar.panel-heading').offset();
-          let seg_id = jqueryobj.attr('data-boundary');
+          const seg_samples = jqueryobj.attr('data-samples');
 
-          if (!isNullOrUndefined(seg_id) && Functions.isNumber(seg_id)) {
-            seg_id = Number(seg_id);
-            const seg = this.transcrService.annotation.levels[0].segments.get(seg_id);
+          if (!isNullOrUndefined(seg_samples) && Functions.isNumber(seg_samples)) {
+            const samples = Number(seg_samples);
+            const time = new AudioTime(samples, this.audio.samplerate);
 
             jQuery('.seg-popover').css({
               'margin-left': (event.target.offsetLeft - (width / 2)) + 'px',
@@ -376,7 +377,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
               'display': 'inherit'
             });
             const timespan = new TimespanPipe();
-            const text = timespan.transform(seg.time.unix.toString());
+            const text = timespan.transform(time.unix.toString());
             jQuery('.seg-popover').text(text);
           }
         })
@@ -413,8 +414,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         contents: icon,
         tooltip: 'test',
         click: () => {
-          this.insertBoundary('assets/img/components/transcr-editor/boundary.png', 0);
-          this.initPopover();
+          this.marker_click.emit('boundary');
+          this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
         }
       };
       const button = jQuery.summernote.ui.button(btn_js);
@@ -456,15 +457,16 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.updateTextField();
   };
 
-  insertBoundary(img_url: string, number: number) {
+  insertBoundary(img_url: string) {
     const element = document.createElement('img');
     element.setAttribute('src', img_url);
     element.setAttribute('class', 'btn-icon-text boundary');
     element.setAttribute('style', 'height:16px');
-    element.setAttribute('data-boundary', number.toString());
+    element.setAttribute('data-samples', this.audio.playpostion.samples.toString());
 
     this.textfield.summernote('editor.insertNode', element);
     this.updateTextField();
+    this.initPopover();
   }
 
   /**
@@ -479,14 +481,20 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       if (this.isDisabledKey(comboKey)) {
         $event.preventDefault();
       } else {
-        for (let i = 0; i < this.markers.length; i++) {
-          const marker: any = this.markers[i];
-          if (marker.shortcut[platform] === comboKey) {
-            $event.preventDefault();
-            const test = this.textfield.summernote('createRange');
-            this.insertMarker(marker.code, marker.icon_url);
-            this.marker_insert.emit(marker.code);
-            return;
+        if (comboKey === 'ALT + S') {
+          // add boundary
+          this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
+          $event.preventDefault();
+        } else {
+          for (let i = 0; i < this.markers.length; i++) {
+            const marker: any = this.markers[i];
+            if (marker.shortcut[platform] === comboKey) {
+              $event.preventDefault();
+              const test = this.textfield.summernote('createRange');
+              this.insertMarker(marker.code, marker.icon_url);
+              this.marker_insert.emit(marker.code);
+              return;
+            }
           }
         }
       }
@@ -599,8 +607,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
         const replace_func2 = (x, g1) => {
           const s1 = (g1) ? g1 : '';
+
+          const seg = this.transcrService.annotation.levels[0].segments.get(g1);
           return '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
-            'data-boundary=\'' + g1 + '\' />';
+            'data-samples=\'' + seg.time.samples + '\' />';
         };
 
         result = result.replace(regex2, replace_func2);

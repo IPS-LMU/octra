@@ -122,13 +122,15 @@ export class AudioplayerService extends AudioComponentService {
       if (this.drag_playcursor) {
         // drag playcursor
         this.PlayCursor.changeAbsX(x - this._settings.margin.left, this.audioTCalculator, this.audio_px_w, this.Chunk);
-        this.current.samples = this.PlayCursor.time_pos.samples;
+        this.current = this.PlayCursor.time_pos.clone();
       }
     }
 
     if (type === 'mouseleave') {
       this.drag_playcursor = false;
     }
+
+    this.audio.playpostion = this.PlayCursor.time_pos.clone();
   }
 
   /**

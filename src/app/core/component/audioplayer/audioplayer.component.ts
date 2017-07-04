@@ -464,6 +464,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
         ) * this.audio.speed, 1);
       absX = Math.max(0, currentAbsX + (this.ap.Distance * progress));
       this.changePlayCursorAbsX(absX);
+      console.log(this.ap.current);
     }
 
     const line = this.ap.Line;

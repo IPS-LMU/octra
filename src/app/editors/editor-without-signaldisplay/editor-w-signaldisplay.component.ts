@@ -11,7 +11,7 @@ import {SubscriptionManager} from '../../core/shared';
 import {SettingsService} from '../../core/shared/service/settings.service';
 import {SessionService} from '../../core/shared/service/session.service';
 import {Segment} from '../../core/obj/Segment';
-import {AudioTime} from '../../core/obj/AudioTime';
+import {isNullOrUndefined} from 'util';
 
 @Component({
   selector: 'app-audioplayer-gui',
@@ -84,6 +84,10 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
   ngOnChanges(obj: any) {
     console.log(obj);
+  }
+
+  test() {
+    return (isNullOrUndefined(this.audio.playpostion)) ? 0 : this.audio.playpostion.unix;
   }
 
   onButtonClick(event: { type: string, timestamp: number }) {
@@ -166,23 +170,50 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   }
 
   private saveTranscript() {
-    const html = this.editor.html.replace(/&nbsp;/g, ' ');
+    const html: string = this.editor.html.replace(/&nbsp;/g, ' ');
     // split text at the position of every boundary marker
     let seg_texts: string[] = html.split(
-      /\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-boundary="[0-9]+">\s?/g
+      /\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="[0-9]+">\s?/g
     );
+
+    const samples_array: number[] = [];
+    html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)">\s?/g, function (match, g1, g2) {
+      samples_array.push(Number(g1));
+      return '';
+    });
 
     seg_texts = seg_texts.map((a: string) => {
       return a.replace(/(<p>)|(<\/p>)/g, '');
     });
 
-    for (let i = 0; i < this.transcrService.annotation.levels[0].segments.length && i < seg_texts.length; i++) {
-      const segment: Segment = this.transcrService.annotation.levels[0].segments.get(i);
+    const anno_seg_length = this.transcrService.annotation.levels[0].segments.length;
+
+    for (let i = 0; i < seg_texts.length; i++) {
       const new_raw = this.transcrService.htmlToRaw(seg_texts[i]);
-      if (segment.transcript !== new_raw) {
+
+      if (i < anno_seg_length) {
+        // probably overwrite old files
+        const segment: Segment = this.transcrService.annotation.levels[0].segments.get(i);
         segment.transcript = new_raw;
+        if (i < seg_texts.length - 1) {
+          segment.time.samples = samples_array[i];
+        } else {
+          segment.time.samples = this.audio.duration.samples;
+        }
         this.transcrService.annotation.levels[0].segments.change(i, segment);
+      } else {
+        // add new segments
+        console.log('new segment');
+        this.transcrService.annotation.levels[0].segments.add(samples_array[i], new_raw);
       }
+    }
+
+    if (anno_seg_length > seg_texts.length) {
+      // remove left segments
+      console.log('remove segments');
+      this.transcrService.annotation.levels[0].segments.segments.splice(seg_texts.length, (anno_seg_length - seg_texts.length));
+      // because last segment was removed
+      this.transcrService.annotation.levels[0].segments.get(seg_texts.length - 1).time.samples = this.audio.duration.samples;
     }
   }
 }

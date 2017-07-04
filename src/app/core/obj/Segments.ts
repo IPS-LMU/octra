@@ -2,6 +2,7 @@ import {Segment} from './Segment';
 import {AudioTime} from './AudioTime';
 import {EventEmitter} from '@angular/core';
 import {ISegment, OLabel, OSegment} from './annotjson';
+import {isNullOrUndefined} from 'util';
 
 export class Segments {
 
@@ -36,8 +37,13 @@ export class Segments {
    * @param time_samples
    * @returns {boolean}
    */
-  public add(time_samples: number): boolean {
+  public add(time_samples: number, transcript: string = null): boolean {
     const newSegment: Segment = new Segment(new AudioTime(time_samples, this.sample_rate));
+
+    if (!isNullOrUndefined(transcript)) {
+      newSegment.transcript = transcript;
+    }
+
     this.segments.push(newSegment);
     this.sort();
     this.cleanup();

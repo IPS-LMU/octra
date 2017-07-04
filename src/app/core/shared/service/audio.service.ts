@@ -9,6 +9,10 @@ import {Logger} from '../Logger';
 
 @Injectable()
 export class AudioService {
+  get startposition(): AudioTime {
+    return this._startposition;
+  }
+
   get playduration(): AudioTime {
     return this._playduration;
   }
@@ -175,6 +179,7 @@ export class AudioService {
   private _speed = 1;
   private _playpostion: AudioTime;
   private _playduration: AudioTime;
+  private _startposition: AudioTime;
 
   private _audioplaying = false;
   private _startplaying = 0;
@@ -214,11 +219,12 @@ export class AudioService {
         // reuse old audiocontext
         this._audiocontext = new AudioContext();
       } else {
-        console.info('old audiocontext available');
+        console.log('old audiocontext available');
       }
     } else {
       console.error('AudioContext not supported by this browser');
     }
+
   }
 
   public stopPlayback(callback: any = null): boolean {
@@ -256,6 +262,13 @@ export class AudioService {
 
   public startPlayback(begintime: AudioTime, duration: AudioTime = new AudioTime(0, this.samplerate),
                        drawFunc: () => void, endPlayback: () => void, playonhover: boolean = false): boolean {
+
+    if (isNullOrUndefined(this.playpostion)) {
+      this.playpostion = new AudioTime(0, this.samplerate)
+    }
+
+    this._startposition = begintime.clone();
+
     if (!this.audioplaying) {
       this._state = 'started';
       this._stepbackward = false;
@@ -391,6 +404,8 @@ export class AudioService {
       this._audiobuffer = buffer;
       this._size = result.byteLength;
       this.duration = new AudioTime(buffer.length, buffer.sampleRate);
+      // TODO change playduration with other definition
+      this.playduration = this.duration.clone();
       this.gainNode = this.audiocontext.createGain();
       this.source = this.getSource();
 
@@ -483,7 +498,7 @@ export class AudioService {
       if (disconnect) {
         this._audiocontext.close()
           .then(() => {
-            console.info('audioservice successfully destroyed');
+            console.log('audioservice successfully destroyed');
           })
           .catch(
             (re) => {
@@ -509,13 +524,18 @@ export class AudioService {
    * TODO when does this method must be called? Animation of playcursor or at another time else?
    * @returns {number}
    */
-  private calculatePlayPosition = (): number => {
+  public updatePlayPosition = () => {
     const timestamp = new Date().getTime();
 
-    if (this.endplaying > timestamp && this.audioplaying) {
-      return (this.playduration.unix) - (this.endplaying - timestamp);
+    if (isNullOrUndefined(this._playpostion)) {
+      console.log('is null');
+      this._playpostion = new AudioTime(0, this.samplerate);
     }
 
-    return 0;
+    if (this.endplaying > timestamp && this.audioplaying) {
+      const result = this._startposition.unix + (this._playduration.unix) - (this._endplaying - timestamp);
+      this.playpostion.unix = result;
+      console.log('set position to ' + this.playpostion.samples);
+    }
   }
 }

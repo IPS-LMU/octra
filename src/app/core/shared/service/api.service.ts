@@ -1,6 +1,6 @@
 import {Injectable, SecurityContext} from '@angular/core';
 import {API} from '../../obj/API/api.interface';
-import {Headers, Http, Response} from '@angular/http';
+import {Http, RequestOptionsArgs, Response} from '@angular/http';
 import 'rxjs/Rx';
 import {DomSanitizer} from '@angular/platform-browser';
 import {Observable} from 'rxjs/Observable';
@@ -176,10 +176,11 @@ export class APIService implements API {
 
   public post(json: any): Observable<Response> {
     const body = JSON.stringify(json);
-    const headers = new Headers();
-    headers.append('Content-Type', 'application/json');
 
-    return this.http.post(this.server_url, body, headers);
+    const requoptions: RequestOptionsArgs = {};
+    requoptions.headers.set('Content-Type', 'application/json');
+
+    return this.http.post(this.server_url, body, requoptions);
   }
 
   public init(server_url: string) {

@@ -39,7 +39,7 @@ export class AppInfo {
   // defined editors
   private static _editors: {
     name: string,
-    editor: Component,
+    editor: any,
     translate: string,
     icon: string
   }[] = [

@@ -16,7 +16,9 @@ export class SettingsGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
     if (isNullOrUndefined(this.settingsService.app_settings)) {
-      return this.settingsService.settingsloaded;
+      // TODO CHECK!!!
+      // return new Observable<boolean>(this.settingsService.settingsloaded.subscribe());
+      return true;
     } else {
       return this.settingsService.validated;
     }

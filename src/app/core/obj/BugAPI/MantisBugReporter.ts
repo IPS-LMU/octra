@@ -1,6 +1,6 @@
 import {BugReporter} from './BugReporter';
 import {Observable} from 'rxjs/Observable';
-import {Http, RequestOptions, Response, URLSearchParams} from '@angular/http';
+import {Headers, Http, RequestOptions, Response, URLSearchParams} from '@angular/http';
 import {isArray} from 'rxjs/util/isArray';
 
 export class MantisBugReporter extends BugReporter {
@@ -14,7 +14,6 @@ export class MantisBugReporter extends BugReporter {
     const report = (sendbugreport) ? this.getText(pkg) : '';
 
     const params = new URLSearchParams();
-    params.set('auth', auth_token);
 
     let summary = form.description;
     if (summary.length > 100) {
@@ -23,6 +22,8 @@ export class MantisBugReporter extends BugReporter {
 
     const requestOptions = new RequestOptions();
     requestOptions.params = params;
+    requestOptions.headers = new Headers();
+    requestOptions.headers.set('Authorization', auth_token);
 
     const json = pkg;
 
@@ -51,24 +52,26 @@ export class MantisBugReporter extends BugReporter {
     let result = '';
 
     for (const attr in pkg) {
-      if (!isArray(pkg[attr]) && typeof pkg[attr] === 'object') {
-        result += attr + '\n';
-        result += '---------\n';
+      if (pkg.hasOwnProperty(attr)) {
+        if (!isArray(pkg[attr]) && typeof pkg[attr] === 'object') {
+          result += attr + '\n';
+          result += '---------\n';
 
-        for (const attr2 in pkg[attr]) {
-          if (typeof pkg[attr][attr2] !== 'object' || pkg[attr][attr2] === null) {
-            result += '  ' + attr2 + ':  ' + pkg[attr][attr2] + '\n';
+          for (const attr2 in pkg[attr]) {
+            if (typeof pkg[attr][attr2] !== 'object' || pkg[attr][attr2] === null) {
+              result += '  ' + attr2 + ':  ' + pkg[attr][attr2] + '\n';
+            }
+          }
+        } else if (isArray(pkg[attr])) {
+          result += attr + '\n';
+          result += '---------\n';
+
+          for (let i = 0; i < pkg[attr].length; i++) {
+            result += '  ' + pkg[attr][i].type + '  ' + pkg[attr][i].message + '\n';
           }
         }
-      } else if (isArray(pkg[attr])) {
-        result += attr + '\n';
-        result += '---------\n';
-
-        for (let i = 0; i < pkg[attr].length; i++) {
-          result += '  ' + pkg[attr][i].type + '  ' + pkg[attr][i].message + '\n';
-        }
+        result += '\n';
       }
-      result += '\n';
     }
 
     return result;

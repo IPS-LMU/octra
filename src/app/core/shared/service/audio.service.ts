@@ -9,6 +9,14 @@ import {Logger} from '../Logger';
 
 @Injectable()
 export class AudioService {
+  get playduration(): AudioTime {
+    return this._playduration;
+  }
+
+  set playduration(value: AudioTime) {
+    this._playduration = value;
+  }
+
   get playpostion(): AudioTime {
     return this._playpostion;
   }
@@ -16,6 +24,7 @@ export class AudioService {
   set playpostion(value: AudioTime) {
     this._playpostion = value;
   }
+
   get size(): number {
     return this._size;
   }
@@ -165,6 +174,7 @@ export class AudioService {
   private _volume = 1;
   private _speed = 1;
   private _playpostion: AudioTime;
+  private _playduration: AudioTime;
 
   private _audioplaying = false;
   private _startplaying = 0;
@@ -492,5 +502,20 @@ export class AudioService {
       this._channel = null;
       this._duration = null;
     }
+  }
+
+  /**
+   * calculate current position of the current audio playback.
+   * TODO when does this method must be called? Animation of playcursor or at another time else?
+   * @returns {number}
+   */
+  private calculatePlayPosition = (): number => {
+    const timestamp = new Date().getTime();
+
+    if (this.endplaying > timestamp && this.audioplaying) {
+      return (this.playduration.unix) - (this.endplaying - timestamp);
+    }
+
+    return 0;
   }
 }

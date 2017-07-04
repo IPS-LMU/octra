@@ -1,5 +1,4 @@
 import {isNullOrUndefined} from 'util';
-import {sample} from 'rxjs/operator/sample';
 /**
  * class initialized with samples which can output other units like seconds, miliseconds
  */
@@ -79,6 +78,10 @@ export class AudioTime {
 
   get unix(): number {
     return Math.floor((this.samples * 1000) / this._sample_rate);
+  }
+
+  set unix(value: number) {
+    this._samples = Math.round((value / 1000) * this._sample_rate);
   }
 
   get seconds(): number {

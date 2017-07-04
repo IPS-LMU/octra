@@ -20,7 +20,9 @@ export class ReloadFileGuard implements CanActivate {
       return false;
     } else {
       if (isNullOrUndefined(this.settingsService.app_settings)) {
-        return this.settingsService.settingsloaded;
+        // TODO change!
+        return true;
+        // return this.settingsService.settingsloaded;
       } else {
         return this.settingsService.validated;
       }

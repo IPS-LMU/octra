@@ -1,10 +1,19 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output,
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
   ViewChild
 } from '@angular/core';
 import {AudioviewerComponent, AudioviewerService} from '../audioviewer';
 import {AudioTime, AVMousePos} from '../../shared';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {AudioManager} from '../../obj/media/audio/AudioManager';
+import {AudioChunk} from '../../obj/media/audio/AudioChunk';
 declare var window: any;
 
 @Component({
@@ -21,6 +30,8 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output('mousecursorchange') mousecursorchange: EventEmitter<AVMousePos> = new EventEmitter<AVMousePos>();
   @Output('shortcuttriggered') shortcuttriggered: EventEmitter<string> = new EventEmitter<string>();
   @Output('segmententer') segmententer: EventEmitter<any> = new EventEmitter<any>();
+
+  @Input('audiochunk') audiochunk: AudioChunk;
 
   private subscrmanager;
 
@@ -44,7 +55,8 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.viewer.margin;
   }
 
-  @Input() public set margin(value: any) {
+  @Input()
+  public set margin(value: any) {
     this.viewer.margin = value;
   }
 
@@ -104,17 +116,20 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscrmanager.destroy();
   }
 
+  /*
   public changeArea(start: AudioTime, end: AudioTime) {
     this.viewer.changeBuffer(start, end);
   }
+  */
 
   public updateSegments() {
     this.viewer.drawSegments();
   }
 
+  /*
   public changeBuffer(start: AudioTime, end: AudioTime) {
     this.viewer.changeBuffer(start, end);
-  }
+  }*/
 
   public update() {
     this.viewer.update();

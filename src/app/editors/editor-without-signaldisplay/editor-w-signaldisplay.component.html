@@ -4,7 +4,7 @@
                       (speedchange)="onSpeedChange($event)"
                       (afterspeedchange)="afterSpeedChange($event)"
                       (buttonclick)="onButtonClick($event)"
-                      [(audioplaying)]="audio.audioplaying"
+                      [(audioplaying)]="audiomanager.audioplaying"
                       [(responsive)]="settingsService.responsive.enabled"
                       [buttons]="{
                         play: {
@@ -34,12 +34,13 @@
                       }"
                       [easymode]="sessService.easymode"
 ></app-audio-navigation>
-<app-audioplayer #audioplayer (shortcuttriggered)="onShortcutTriggered($event)"></app-audioplayer>
+<app-audioplayer #audioplayer (shortcuttriggered)="onShortcutTriggered($event)" [audiochunk]="audiochunk"></app-audioplayer>
 <app-transcr-editor #transcr
                     (typing)="afterTyping($event);"
                     (marker_insert)="onMarkerInsert($event)"
                     (marker_click)="onMarkerClick($event)"
                     [markers]="transcrService.guidelines.markers"
                     [easymode]="sessService.easymode"
+                    [audiochunk]="audiochunk"
 >
 </app-transcr-editor>

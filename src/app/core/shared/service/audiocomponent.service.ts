@@ -1,10 +1,11 @@
-import {AudioService} from './audio.service';
 import {Line} from '../../obj/Line';
-import {AudioTime} from '../../obj/AudioTime';
+import {AudioTime} from '../../obj/media/audio/AudioTime';
 import {AVMousePos} from '../../obj/AVMousePos';
 import {PlayCursor} from '../../obj/PlayCursor';
-import {AudioTimeCalculator} from '../../obj/AudioTimeCalculator';
-import {Chunk} from '../../obj/Chunk';
+import {AudioTimeCalculator} from '../../obj/media/audio/AudioTimeCalculator';
+import {AudioChunk} from '../../obj/media/audio/AudioChunk';
+import {isNullOrUndefined} from 'util';
+import {AudioManager} from '../../obj/media/audio/AudioManager';
 
 export class AudioComponentService {
   // LINES
@@ -21,26 +22,16 @@ export class AudioComponentService {
 
   protected mousecursor: AVMousePos = null;
   protected playcursor: PlayCursor = null;
-  public lastplayedpos: AudioTime = null;
 
   // AUDIO
   protected audio_px_w = 0;
   protected distance = 0;
   protected hZoom = 0;
-  public current: AudioTime = null;
-  private _playduration: AudioTime = null;
+  protected audiochunk: AudioChunk;
   public audioTCalculator: AudioTimeCalculator;
 
-  private chunk: Chunk = null;
-  protected audio: AudioService;
-
-
-  get Chunk(): Chunk {
-    return this.chunk;
-  }
-
-  set Chunk(new_chunk: Chunk) {
-    this.chunk = new_chunk;
+  protected get audiomanager(): AudioManager {
+    return this.audiochunk.audiomanager;
   }
 
   get AudioPxWidth(): number {
@@ -87,37 +78,40 @@ export class AudioComponentService {
     this.playcursor = playcursor;
   }
 
-  get playduration(): AudioTime {
-    return this._playduration;
-  }
-
-  set playduration(value: AudioTime) {
-    this._playduration = value;
-  }
-
-  constructor(audio: AudioService) {
-    this.audio = audio;
+  constructor() {
   }
 
   public calculateBeginTime(): AudioTime {
-    if (this.current.samples >= 0) {
-      return this.current.clone();
-    } else if (this.Chunk.time.start != null) {
-      return this.Chunk.time.start.clone();
+    if (!isNullOrUndefined(this.audiochunk.playposition)) {
+      if (this.audiochunk.playposition.samples >= 0) {
+        return this.audiochunk.playposition.clone();
+      } else if (this.audiochunk.time.start !== null) {
+        return this.audiochunk.time.start.clone();
+      } else {
+        return (new AudioTime(0, this.audiomanager.ressource.info.samplerate));
+      }
     } else {
-      return (new AudioTime(0, this.audio.samplerate));
+      return new AudioTime(0, this.audiomanager.ressource.info.samplerate);
     }
   }
 
   public updateDistance(): void {
-    this.distance = (this.audio_px_w - this.audioTCalculator.samplestoAbsX(this.current.samples));
+    if (isNullOrUndefined(this.audiochunk.selection)) {
+      this.distance = (this.audio_px_w - this.audioTCalculator.samplestoAbsX(this.audiochunk.playposition.samples));
+    } else {
+      this.distance = this.audioTCalculator.samplestoAbsX(this.audiochunk.selection.duration.samples);
+      this.distance -= this.audioTCalculator.samplestoAbsX(
+        this.audiochunk.playposition.samples - this.audiochunk.selection.start.samples
+      );
+    }
   }
 
   public resetAudioMeta() {
     this.mouse_click_pos = new AVMousePos(0, 0, 0, new AudioTime(0, 0));
   }
 
-  public initialize(innerWidth: number) {
+  public initialize(innerWidth: number, audiochunk: AudioChunk) {
+    this.audiochunk = audiochunk;
   }
 
   /***
@@ -127,7 +121,7 @@ export class AudioComponentService {
   public setMouseMovePosition(type: string, x: number, y: number, curr_line: Line, innerWidth) {
     this.mousecursor.relPos.x = x;
     this.mousecursor.absX = this.getAbsXByLine(curr_line, x, innerWidth);
-    this.mousecursor.timePos.samples = this.audioTCalculator.absXChunktoSamples(this.mousecursor.absX, this.Chunk);
+    this.mousecursor.timePos.samples = this.audioTCalculator.absXChunktoSamples(this.mousecursor.absX, this.audiochunk);
     this.mousecursor.relPos.y = y;
     this.mousecursor.line = curr_line;
     this.last_line = curr_line;

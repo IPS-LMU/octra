@@ -1,4 +1,4 @@
-import {AudioTime} from './AudioTime';
+import {AudioTime} from './media/audio/AudioTime';
 import {OSegment} from './annotjson';
 
 export class Segment {

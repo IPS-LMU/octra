@@ -12,6 +12,8 @@ import {SettingsService} from '../../core/shared/service/settings.service';
 import {SessionService} from '../../core/shared/service/session.service';
 import {Segment} from '../../core/obj/Segment';
 import {isNullOrUndefined} from 'util';
+import {AudioManager} from '../../core/obj/media/audio/AudioManager';
+import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
 
 @Component({
   selector: 'app-audioplayer-gui',
@@ -52,6 +54,9 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     return this.settingsService.projectsettings;
   }
 
+  public audiochunk: AudioChunk;
+  public audiomanager: AudioManager;
+
   constructor(public audio: AudioService,
               public keyMap: KeymappingService,
               public transcrService: TranscriptionService,
@@ -62,6 +67,11 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   }
 
   ngOnInit() {
+    this.audiomanager = this.audio.audiomanagers[0];
+    this.audiochunk = this.audiomanager.mainchunk;
+    this.audiochunk.speed = 1;
+    this.audiochunk.volume = 1;
+    console.log(this.audiochunk);
     this.settings.shortcuts = this.keyMap.register('AP', this.settings.shortcuts);
     this.shortcuts = this.settings.shortcuts;
     this.editor.Settings.markers = this.transcrService.guidelines.markers.items;
@@ -87,7 +97,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   }
 
   test() {
-    return (isNullOrUndefined(this.audio.playpostion)) ? 0 : this.audio.playpostion.unix;
+    return (isNullOrUndefined(this.audiochunk.playposition)) ? 0 : this.audiochunk.playposition.unix;
   }
 
   onButtonClick(event: { type: string, timestamp: number }) {
@@ -120,7 +130,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   }
 
   onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
-    this.audio.speed = event.new_value;
+    this.audiochunk.speed = event.new_value;
   }
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
@@ -130,7 +140,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   }
 
   onVolumeChange(event: { old_value: number, new_value: number, timestamp: number }) {
-    this.audio.volume = event.new_value;
+    this.audiochunk.volume = event.new_value;
   }
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
@@ -177,10 +187,11 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     );
 
     const samples_array: number[] = [];
-    html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)">\s?/g, function (match, g1, g2) {
-      samples_array.push(Number(g1));
-      return '';
-    });
+    html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)">\s?/g,
+      function (match, g1, g2) {
+        samples_array.push(Number(g1));
+        return '';
+      });
 
     seg_texts = seg_texts.map((a: string) => {
       return a.replace(/(<p>)|(<\/p>)/g, '');
@@ -198,13 +209,21 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
         if (i < seg_texts.length - 1) {
           segment.time.samples = samples_array[i];
         } else {
-          segment.time.samples = this.audio.duration.samples;
+          segment.time.samples = this.audiomanager.ressource.info.duration.samples;
         }
+
         this.transcrService.annotation.levels[0].segments.change(i, segment);
       } else {
         // add new segments
         console.log('new segment');
         this.transcrService.annotation.levels[0].segments.add(samples_array[i], new_raw);
+
+        const seg: number = this.transcrService.annotation.levels[0].segments.getSegmentBySamplePosition(samples_array[i]);
+        if (seg > -1) {
+          if (seg === anno_seg_length - 1) {
+            this.transcrService.annotation.levels[0].segments.get(seg).time.samples = this.audiomanager.ressource.info.duration.samples;
+          }
+        }
       }
     }
 
@@ -213,7 +232,8 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
       console.log('remove segments');
       this.transcrService.annotation.levels[0].segments.segments.splice(seg_texts.length, (anno_seg_length - seg_texts.length));
       // because last segment was removed
-      this.transcrService.annotation.levels[0].segments.get(seg_texts.length - 1).time.samples = this.audio.duration.samples;
+      const seg = this.transcrService.annotation.levels[0].segments.get(seg_texts.length - 1);
+      seg.time.samples = this.audiomanager.ressource.info.duration.samples;
     }
   }
 }

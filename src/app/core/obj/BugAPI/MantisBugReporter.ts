@@ -48,6 +48,23 @@ export class MantisBugReporter extends BugReporter {
     return http.post(url, JSON.stringify(body), requestOptions);
   }
 
+  public getTest(http: Http, url: string, auth_token: string) {
+    const params = new URLSearchParams();
+    const requestOptions = new RequestOptions();
+    params.set('id', '10');
+    requestOptions.params = params;
+    requestOptions.headers = new Headers();
+    requestOptions.headers.set('Authorization', auth_token);
+
+    const body = {
+      project: {
+        id: 1
+      }
+    };
+
+    return http.get(url, requestOptions);
+  }
+
   public getText(pkg: any): string {
     let result = '';
 

@@ -7,6 +7,7 @@ import {
   ElementRef,
   EventEmitter,
   HostListener,
+  Input,
   OnDestroy,
   OnInit,
   Output,
@@ -17,6 +18,10 @@ import {Observable} from 'rxjs/Rx';
 import {AudioTimeCalculator, BrowserInfo, CanvasAnimation, Line, Logger, SubscriptionManager} from '../../shared';
 import {AudioService, KeymappingService} from '../../shared/service';
 import {AudioplayerService} from './service/audioplayer.service';
+import {AudioManager} from '../../obj/media/audio/AudioManager';
+import {AudioChunk} from '../../obj/media/audio/AudioChunk';
+import {AudioRessource} from '../../obj/media/audio/AudioRessource';
+import {AudioTime} from '../../obj/media/audio/AudioTime';
 
 @Component({
   selector: 'app-audioplayer',
@@ -36,20 +41,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
    * @type {EventEmitter<any>}
    */
   @Output() shortcuttriggered = new EventEmitter<any>();
-
-  /**
-   * gets data object that contains informations about the current state of audio playback
-   * @returns {{distance: (number|string), duration: number, playduration: number, current: number}}
-   * @constructor
-   */
-  @Output('Data') get Data(): any {
-    return {
-      distance: (this.ap && this.ap.Distance) ? this.ap.Distance : '',
-      duration: (this.audio.duration) ? this.audio.duration.unix : 0,
-      playduration: (this.ap.playduration) ? this.ap.playduration.unix : 0,
-      current: (this.ap.PlayCursor && this.ap.PlayCursor.time_pos) ? this.ap.PlayCursor.time_pos.unix : 0
-    };
-  }
+  @Input() audiochunk: AudioChunk;
 
   /**
    * gets or sets the settings of this audioplayer component
@@ -77,7 +69,15 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
    * @returns {number}
    */
   public get current_time(): number {
-    return this.ap.current_time;
+    return this.audiochunk.playposition.unix;
+  }
+
+  private get audiomanager(): AudioManager {
+    return this.audiochunk.audiomanager;
+  }
+
+  private get audioressource(): AudioRessource {
+    return this.audiomanager.ressource;
   }
 
   private subscrmanager: SubscriptionManager;
@@ -128,8 +128,8 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
     this.innerWidth = this.width - this.settings.margin.left - this.settings.margin.right;
     this.oldInnerWidth = this.innerWidth;
 
-    this.ap.init(this.innerWidth);
-    this.audio.updateChannel();
+    this.ap.init(this.innerWidth, this.audiochunk);
+    // this.audiochunk.updateChannel();
     this.update();
     this.startTimer();
   }
@@ -144,7 +144,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   private update = () => {
     this.updateCanvasSizes();
-    if (this.audio.channel) {
+    if (this.audiochunk.channel) {
       this.draw();
     }
 
@@ -295,7 +295,8 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
               switch (shortc) {
                 case('play_pause'):
                   this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
-                  if (this.audio.audioplaying) {
+                  console.log('shortcut play pause triggered');
+                  if (this.audiochunk.isPlaying) {
                     this.pausePlayback();
                   } else {
                     this.startPlayback();
@@ -339,42 +340,39 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   private playSelection(computetimes: boolean = true) {
     // calculate time from which audio is played
-    if (computetimes) {
-            this.ap.begintime = this.ap.calculateBeginTime();
-      this.ap.updatePlayDuration();
-      this.ap.updateDistance();
-    }
+    this.ap.updateDistance();
 
     // define callback for end event
     const endPlaybackEvent = () => {
-      this.audio.audioplaying = false;
-      this.audio.javascriptNode.disconnect();
+      this.audiomanager.audioplaying = false;
+      this.audiomanager.javascriptNode.disconnect();
 
-      this.ap.current.samples = this.ap.PlayCursor.time_pos.samples;
-      if (this.audio.replay === true) {
+      if (this.audiomanager.replay === true) {
+        this.audiochunk.playposition = this.audiochunk.time.start.clone();
         this.playSelection();
       }
 
-      this.audio.stepbackward = false;
-      this.audio.paused = false;
+      this.audiomanager.stepbackward = false;
+      this.audiomanager.paused = false;
     };
 
     const drawFunc = () => {
-      this.audio.updatePlayPosition();
+      this.audiochunk.updatePlayPosition();
       this.anim.requestFrame(this.drawPlayCursor);
     };
 
-    this.ap.lastplayedpos = this.ap.begintime.clone();
-    this.audio.startPlayback(this.ap.begintime, this.ap.playduration, drawFunc, endPlaybackEvent);
+    this.audiochunk.startpos = this.audiochunk.playposition.clone();
+
+    this.audiochunk.startPlayback(drawFunc, endPlaybackEvent);
   }
 
   /**
    * stops the playback and sets the current playcursor position to 0.
    */
   public stopPlayback() {
-    if (this.audio.stopPlayback()) {
+    if (this.audiochunk.stopPlayback()) {
       // state was not audioplaying
-      this.ap.current.samples = 0;
+      this.audiochunk.playposition.samples = 0;
       this.changePlayCursorAbsX(0);
       this.drawPlayCursorOnly(this.ap.Line);
     }
@@ -384,14 +382,15 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
    * pause playback
    */
   public pausePlayback() {
-    this.audio.pausePlayback();
+    console.log('try pause');
+    this.audiochunk.pausePlayback();
   }
 
   /**
    * start playback
    */
   public startPlayback(computetimes: boolean = true) {
-    if (!this.audio.audioplaying) {
+    if (!this.audiochunk.isPlaying) {
       this.playSelection(computetimes);
     }
   }
@@ -402,9 +401,8 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
   private startTimer() {
     this.subscrmanager.add(this.timer.subscribe(
       () => {
-        if (this.audio.audiobuffer && this.ap.PlayCursor) {
-          this.ap.current_time = Math.round(this.ap.PlayCursor.time_pos.unix);
-          this.ap.total_time = this.ap.Chunk.time.end.unix - this.ap.Chunk.time.start.unix;
+        if (this.audioressource.content && this.ap.PlayCursor) {
+          this.ap.total_time = this.audiochunk.time.end.unix - this.audiochunk.time.start.unix;
           this.changeDetectorRef.markForCheck();
         }
       }
@@ -413,7 +411,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // sets the loop of playback
   public rePlayback(): boolean {
-    return this.audio.rePlayback();
+    return this.audiochunk.rePlayback();
   }
 
   /**
@@ -421,28 +419,32 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
    steps back to last position
    */
   public stepBackward() {
-    this.audio.stepBackward(() => {
+    this.audiochunk.stepBackward(() => {
       // audio not playing
 
-      if (this.ap.lastplayedpos !== null) {
-        this.ap.current = this.ap.lastplayedpos.clone();
-        this.ap.PlayCursor.changeSamples(this.ap.lastplayedpos.samples, this.ap.audioTCalculator);
+      if (this.audiochunk.lastplayedpos !== null) {
+        this.audiochunk.playposition = this.audiochunk.lastplayedpos.clone();
+        this.audiochunk.startpos = this.audiochunk.lastplayedpos.clone();
+        this.ap.PlayCursor.changeSamples(this.audiochunk.lastplayedpos.samples, this.ap.audioTCalculator);
         this.drawPlayCursorOnly(this.ap.LastLine);
-        this.ap.begintime = this.ap.lastplayedpos.clone();
         this.startPlayback();
       }
     });
   }
 
   stepBackwardTime(duration_sec: number, back_sec: number) {
-    this.audio.stepBackwardTime(() => {
-            this.ap.PlayCursor.changeSamples(this.ap.current.samples - (back_sec * this.audio.samplerate), this.ap.audioTCalculator, this.ap.Chunk);
+    this.audiochunk.stepBackwardTime(() => {
+      this.audiochunk.playposition.samples = Math.max(0, (this.audiochunk.playposition.samples
+      - (Math.floor(back_sec * this.audioressource.info.samplerate))));
+      this.ap.Distance = this.ap.audioTCalculator.samplestoAbsX(
+        this.audiochunk.time.duration.samples - this.audiochunk.playposition.samples
+      );
+
+      this.ap.PlayCursor.changeSamples(this.audiochunk.playposition.samples,
+        this.ap.audioTCalculator, this.audiochunk);
       this.drawPlayCursorOnly(this.ap.LastLine);
-      this.ap.current.samples = Math.max(0, (this.ap.current.samples - (Math.floor(back_sec * this.audio.samplerate))));
-      this.ap.begintime.samples = this.ap.current.samples;
-      this.ap.playduration.samples = duration_sec * (this.audio.samplerate);
-      this.ap.Distance = this.ap.audioTCalculator.samplestoAbsX(this.ap.playduration.samples);
-            this.startPlayback(false);
+
+      this.startPlayback(true);
     });
   }
 
@@ -450,29 +452,29 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
    * draws the playcursor during animation
    */
   private drawPlayCursor = () => {
-    // get actual time and calculate progress in percentage
-    const timestamp = new Date().getTime();
-    const currentAbsX = this.ap.audioTCalculator.samplestoAbsX(this.ap.current.samples);
-    let progress = 0;
-    let absX = 0;
+    // set new position of playcursor
 
-    if (this.audio.endplaying > timestamp && this.audio.audioplaying) {
-      // set new position of playcursor
-      progress = Math.min(
-        (
-          ((this.ap.playduration.unix) - (this.audio.endplaying - timestamp))
-          / (this.ap.playduration.unix)
-        ) * this.audio.speed, 1);
-      absX = Math.max(0, currentAbsX + (this.ap.Distance * progress));
-      this.changePlayCursorAbsX(absX);
-    }
+    /*
+    const playduration = this.audiochunk.playposition.unix - this.audiochunk.selection.start.unix;
 
+    const progress = Math.min(
+      (playduration / (this.audiochunk.selection.duration.unix)) * this.audiochunk.speed, 1);
+    // console.log(`progress ${progress} playpos ${this.audiochunk.playposition.unix}, duration ${this.audiochunk.selection.duration.unix}, speed ${this.audiochunk.speed}`);
+    const absX = Math.max(0, this.ap.Distance * progress);
+    console.log('absX ' + (playduration/1000));
+    // console.log(`absX ${absX}, distance ${this.ap.Distance}, length ${this.audiochunk.selection.duration.seconds}`);
+    this.changePlayCursorAbsX(absX);
+
+    */
+
+    const absX = this.ap.audioTCalculator.samplestoAbsX(this.audiochunk.playposition.samples);
+    this.changePlayCursorAbsX(absX);
     const line = this.ap.Line;
 
     if (line) {
       this.drawPlayCursorOnly(line);
     }
-  }
+  };
 
   /**
    * draws playcursor at its current position
@@ -500,7 +502,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
    * @param new_value
    */
   private changePlayCursorAbsX(new_value: number) {
-    this.ap.PlayCursor.changeAbsX(new_value, this.ap.audioTCalculator, this.ap.AudioPxWidth, this.ap.Chunk);
+    this.ap.PlayCursor.changeAbsX(new_value, this.ap.audioTCalculator, this.ap.AudioPxWidth, this.audiochunk);
   }
 
 
@@ -515,11 +517,11 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const ratio = this.innerWidth / this.oldInnerWidth;
     if (this.ap.PlayCursor) {
-      const ac = new AudioTimeCalculator(this.audio.samplerate, this.ap.playduration, this.innerWidth);
-      Logger.log('' + this.ap.current.samples);
+      const ac = new AudioTimeCalculator(this.audioressource.info.samplerate, this.audiochunk.time.duration, this.innerWidth);
+      Logger.log('' + this.audiochunk.playposition.samples);
 
       this.ap.audioTCalculator = ac;
-      this.ap.PlayCursor.changeSamples(this.ap.current.samples, ac);
+      this.ap.PlayCursor.changeSamples(this.audiochunk.playposition.samples, ac);
 
       this.update();
     }

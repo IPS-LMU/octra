@@ -12,6 +12,9 @@ import {isFunction, isNullOrUndefined} from 'util';
 import {Logger} from '../Logger';
 import {AppSettings} from '../../obj/Settings/app-settings';
 import {Functions} from '../Functions';
+import {Observable} from 'rxjs/Observable';
+import {ReplaySubject} from 'rxjs/ReplaySubject';
+import {AudioManager} from '../../obj/media/audio/AudioManager';
 
 @Injectable()
 export class SettingsService {
@@ -67,7 +70,9 @@ export class SettingsService {
     }
   }
 
-  public settingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
+  private test: ReplaySubject<boolean> = new ReplaySubject<boolean>(1);
+  public settingsloaded: Observable<boolean> = this.test.asObservable();
+
   private app_settingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
   public projectsettingsloaded: EventEmitter<any> = new EventEmitter<any>();
   public validationmethodloaded = new EventEmitter<void>();
@@ -100,13 +105,14 @@ export class SettingsService {
   constructor(private http: Http,
               private sessService: SessionService) {
     this.subscrmanager = new SubscriptionManager();
+  }
+
+  public getApplicationSettings() {
+
     this.subscrmanager.add(
       this.app_settingsloaded.subscribe(this.triggerSettingsLoaded)
     );
-    this.getApplicationSettings();
-  }
 
-  getApplicationSettings() {
     this.loadSettings(
       {
         loading: 'Load application settings...'
@@ -209,14 +215,8 @@ export class SettingsService {
   }
 
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
-    Logger.log('Load audio file...');
-    if (isNullOrUndefined(audioService.audiobuffer)) {
-      this.subscrmanager.add(
-        audioService.afterloaded.subscribe((result) => {
-          Logger.log('Audio loaded.');
-          this.audioloaded.emit(result);
-        })
-      );
+    Logger.log('Load audio file 2...');
+    if (audioService.audiomanagers.length === 0) {
 
       if (this.sessService.offline === false) {
         // online
@@ -224,12 +224,15 @@ export class SettingsService {
           const src = this.app_settings.audio_server.url + this.sessService.audio_url;
           // extract filename
           this._filename = this.sessService.audio_url.substr(this.sessService.audio_url.lastIndexOf('/') + 1);
+          const fullname = this._filename;
           this._filename = this._filename.substr(0, this._filename.lastIndexOf('.'));
           if (this._filename.indexOf('src=') > -1) {
             this._filename = this._filename.substr(this._filename.indexOf('src=') + 4);
           }
 
           audioService.loadAudio(src, () => {
+            Logger.log('Audio loaded.');
+            this.audioloaded.emit({status: 'success'});
           }, (err) => {
             const errMsg = err;
             this._log += 'Loading audio file failed<br/>';
@@ -249,7 +252,14 @@ export class SettingsService {
 
           reader.onloadend = (ev) => {
             const t: any = ev.target;
-            audioService.decodeAudio(t.result);
+            AudioManager.decodeAudio(this.sessService.sessionfile.name, t.result).then(
+              (audiomanager: AudioManager) => {
+                console.log('audiomanager registered');
+                audioService.registerAudioManager(audiomanager);
+                Logger.log('Audio loaded.');
+                this.audioloaded.emit({status: 'success'});
+              }
+            );
           };
 
           if (!isNullOrUndefined(this.sessService.file)) {
@@ -270,7 +280,7 @@ export class SettingsService {
   private triggerSettingsLoaded = () => {
     if (this.validated) {
       this.loaded = true;
-      this.settingsloaded.emit(true);
+      this.test.next(true);
     }
   }
 

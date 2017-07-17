@@ -20,6 +20,7 @@ import {Converter, File} from '../../obj/Converters/Converter';
 import {TextConverter} from '../../obj/Converters/TextConverter';
 import {AnnotJSONConverter} from '../../obj/Converters/AnnotJSONConverter';
 import {Level} from '../../obj/Annotation/Level';
+import {AudioManager} from '../../obj/media/audio/AudioManager';
 
 @Injectable()
 export class TranscriptionService {
@@ -64,6 +65,8 @@ export class TranscriptionService {
   };
 
   private _annotation: Annotation;
+
+  private audiomanager: AudioManager;
 
   get feedback(): FeedBackForm {
     return this._feedback;
@@ -155,6 +158,7 @@ export class TranscriptionService {
    * metod after audio was loaded
    */
   public load() {
+    this.audiomanager = this.audio.audiomanagers[0];
 
     if (this.sessServ.offline) {
       this.filename = this.sessServ.file.name;
@@ -172,17 +176,18 @@ export class TranscriptionService {
 
     this._audiofile = new OAudiofile();
     this._audiofile.name = this.filename + '.wav';
-    this._audiofile.samplerate = this.audio.samplerate;
-    this._audiofile.duration = this.audio.duration.samples;
+    this._audiofile.samplerate = this.audiomanager.ressource.info.samplerate;
+    this._audiofile.duration = this.audiomanager.ressource.info.duration.samples;
 
-    this.last_sample = this.audio.duration.samples;
-    this.loadSegments(this.audio.samplerate);
+    this.last_sample = this.audiomanager.ressource.info.duration.samples;
+    this.loadSegments(this.audiomanager.ressource.info.samplerate);
 
     this.navbarServ.exportformats.filename = this.filename;
-    this.navbarServ.exportformats.bitrate = this.audio.bitrate;
-    this.navbarServ.exportformats.samplerate = this.audio.samplerate;
-    this.navbarServ.exportformats.filesize = Functions.getFileSize(this.audio.size);
-    this.navbarServ.exportformats.duration = this.audio.duration.unix;
+    this.navbarServ.exportformats.bitrate = this.audiomanager.ressource.info.bitrate;
+    this.navbarServ.exportformats.samplerate = this.audiomanager.ressource.info.samplerate;
+    this.navbarServ.exportformats.filesize = Functions.getFileSize(this.audiomanager.ressource.size);
+    this.navbarServ.exportformats.duration = this.audiomanager.ressource.info.duration.unix;
+    console.log('dur2 ' + this.audiomanager.ressource.info.duration.unix);
   }
 
   public getTranscriptString(converter: Converter): string {
@@ -221,13 +226,13 @@ export class TranscriptionService {
 
     this.sessServ.annotation.annotates = this.filename + '.wav';
 
-    this.sessServ.annotation.sampleRate = this.audio.samplerate;
+    this.sessServ.annotation.sampleRate = this.audiomanager.ressource.info.samplerate;
 
     this._annotation = new Annotation(this.sessServ.annotation.annotates, this._audiofile);
 
     for (let i = 0; i < this.sessServ.annotation.levels.length; i++) {
       const level: Level = Level.fromObj(this.sessServ.annotation.levels[i],
-        this.audio.samplerate, this.audio.duration.samples);
+        this.audiomanager.ressource.info.samplerate, this.audiomanager.ressource.info.duration.samples);
       this._annotation.levels.push(level);
     }
 
@@ -532,21 +537,21 @@ export class TranscriptionService {
     if (!isNullOrUndefined(this.sessServ.sessionfile)) {
       filesize = this.sessServ.sessionfile.size;
     } else {
-      filesize = this.audio.size;
+      filesize = this.audiomanager.ressource.size;
     }
     const audiofile: IAudioFile = {
       name: this.filename,
       size: filesize,
-      duration: this.audio.duration.seconds,
-      samplerate: this.audio.samplerate
+      duration: this.audiomanager.ressource.info.duration.seconds,
+      samplerate: this.audiomanager.ressource.info.samplerate
     };
 
     const level: OLevel = new OLevel('orthographic', 'SEGMENT', []);
-    level.items.push(new OSegment(1, 0, this.audio.duration.samples, [(new OLabel('Orthographic', ''))]));
+    level.items.push(new OSegment(1, 0, this.audiomanager.ressource.info.duration.samples, [(new OLabel('Orthographic', ''))]));
     const levels: OLevel[] = [];
     levels.push(level);
 
-    return new OAnnotJSON(this.filename, this.audio.samplerate, levels);
+    return new OAnnotJSON(this.filename, this.audiomanager.ressource.info.samplerate, levels);
   }
 
   public htmlToRaw(html: string): string {

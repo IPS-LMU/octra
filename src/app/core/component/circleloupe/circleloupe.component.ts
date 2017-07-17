@@ -1,8 +1,7 @@
-import {AfterViewInit, Component, ViewChild} from '@angular/core';
-
-import {AudioTime} from '../../obj/AudioTime';
+import {AfterViewInit, Component, Input, ViewChild} from '@angular/core';
 import {LoupeComponent} from '../loupe/loupe.component';
 import {CircleLoupeService} from './service/circleloupe.service';
+import {AudioChunk} from '../../obj/media/audio/AudioChunk';
 declare var window: any;
 
 @Component({
@@ -14,6 +13,8 @@ declare var window: any;
 
 export class CircleLoupeComponent implements AfterViewInit {
   @ViewChild('loupe') loupe: LoupeComponent;
+
+  @Input() audiochunk: AudioChunk;
 
   public get zoomY(): number {
     return this.loupe.zoomY;
@@ -61,9 +62,10 @@ export class CircleLoupeComponent implements AfterViewInit {
     this.loupe.update();
   }
 
-  public changeArea(start: AudioTime, end: AudioTime) {
-    this.loupe.changeBuffer(start, end);
-  }
+  /*
+   public changeArea(start: AudioTime, end: AudioTime) {
+   this.loupe.changeBuffer(start, end);
+   } */
 
   public updateSegments() {
     this.loupe.update();

@@ -9,8 +9,10 @@ import {TranscriptionService} from '../../shared/service/transcription.service';
 import {isNullOrUndefined} from 'util';
 import {Segments} from '../../obj/Segments';
 import {TimespanPipe} from '../../shared/pipe/timespan.pipe';
-import {AudioTime} from '../../obj/AudioTime';
+import {AudioTime} from '../../obj/media/audio/AudioTime';
 import {AudioService} from '../../shared/service/audio.service';
+import {AudioManager} from '../../obj/media/audio/AudioManager';
+import {AudioChunk} from '../../obj/media/audio/AudioChunk';
 declare var window: any;
 
 @Component({
@@ -44,6 +46,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Input() height = 0;
   @Input() playposition: AudioTime;
 
+  @Input() audiochunk: AudioChunk;
+
   get rawText(): string {
     return this.tidyUpRaw(this._rawText);
   }
@@ -55,6 +59,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.textfield.summernote('code', html);
 
     this.initPopover();
+  }
+
+  get audiomanager(): AudioManager {
+    return this.audiochunk.audiomanager;
   }
 
   set segments(segments: Segments) {
@@ -160,7 +168,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     result = dom.text();
 
     return result;
-  }
+  };
 
   ngOnDestroy() {
     this.destroy();
@@ -291,7 +299,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     });
 
     this.loaded.emit(true);
-  }
+  };
 
   /**
    * initializes the navbar bar of the editor
@@ -369,7 +377,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
           if (!isNullOrUndefined(seg_samples) && Functions.isNumber(seg_samples)) {
             const samples = Number(seg_samples);
-            const time = new AudioTime(samples, this.audio.samplerate);
+            const time = new AudioTime(samples, this.audiomanager.ressource.info.samplerate);
 
             jQuery('.seg-popover').css({
               'margin-left': (event.target.offsetLeft - (width / 2)) + 'px',
@@ -462,7 +470,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     element.setAttribute('src', img_url);
     element.setAttribute('class', 'btn-icon-text boundary');
     element.setAttribute('style', 'height:16px');
-    element.setAttribute('data-samples', this.audio.playpostion.samples.toString());
+    element.setAttribute('data-samples', this.audiochunk.playposition.samples.toString());
 
     this.textfield.summernote('editor.insertNode', element);
     this.updateTextField();
@@ -524,7 +532,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
     this._is_typing = true;
     this.lastkeypress = Date.now();
-  }
+  };
 
   /**
    * updates the raw text of the editor
@@ -651,7 +659,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     } else {
       func();
     }
-  }
+  };
 
   /**
    * tidy up the raw text, remove white spaces etc.

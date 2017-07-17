@@ -1,5 +1,5 @@
 import {AudioTime} from './AudioTime';
-export class AVSelection {
+export class AudioSelection {
     get start(): AudioTime {
         return this._start;
     }
@@ -17,6 +17,7 @@ export class AVSelection {
     }
 
     get length(): number {
+        // TODO is this implementation correct?
         if (this._start && this._end && this._start.samples > this._end.samples) {
             return Math.abs(this._start.samples - this._end.samples);
         } else {
@@ -34,7 +35,7 @@ export class AVSelection {
     private _end: AudioTime;
 
     public clone() {
-        return new AVSelection(
+        return new AudioSelection(
             this._start, this._end
         );
     }

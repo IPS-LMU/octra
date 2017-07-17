@@ -9,7 +9,6 @@ import {BugReportService, ConsoleType} from './core/shared/service/bug-report.se
 import {AppInfo} from './app.info';
 import {environment} from '../environments/environment';
 import {UpdateManager} from './core/shared/UpdateManager';
-import {Http} from '@angular/http';
 
 @Component({
   selector: 'app-octra',
@@ -33,8 +32,8 @@ export class AppComponent implements OnDestroy {
               private langService: TranslateService,
               private sessService: SessionService,
               private settingsService: SettingsService,
-              private bugService: BugReportService,
-              private http: Http) {
+              private bugService: BugReportService) {
+
     // check for Updates
     const umanager = new UpdateManager(this.sessService);
     umanager.checkForUpdates();
@@ -92,45 +91,54 @@ export class AppComponent implements OnDestroy {
       }
     ));
 
+    this.settingsService.getApplicationSettings();
+
     if (this.settingsService.validated) {
-      this.onSettingsLoaded();
+      console.log('loaded');
+      this.onSettingsLoaded(true);
     }
   }
 
-  onSettingsLoaded = () => {
-    // settings have been loaded
-    if (isNullOrUndefined(this.settingsService.app_settings)) {
-      throw new Error('config.json not set correctly');
-    } else {
-      if (this.settingsService.validated) {
-        this.api.init(this.settingsService.app_settings.audio_server.url + 'WebTranscribe');
-      }
+  onSettingsLoaded = (loaded) => {
+    console.log(loaded);
+    console.log('interface ' + this.sessService.Interface);
+    this.sessService.Interface = 'Editor without signal display';
 
-      if (!this.settingsService.responsive.enabled) {
-        this.setFixedWidth();
-      }
-    }
-
-    // define languages
-    const languages = this.settingsService.app_settings.octra.languages;
-    const browser_lang = this.langService.getBrowserLang();
-
-    this.langService.addLangs(languages);
-
-    // check if browser language is available in translations
-    if (isNullOrUndefined(this.sessService.language) || this.sessService.language === '') {
-      if (!isUndefined(this.langService.getLangs().find((value) => {
-          return value === browser_lang;
-        }))) {
-        this.langService.use(browser_lang);
+    if (loaded) {
+      // settings have been loaded
+      if (isNullOrUndefined(this.settingsService.app_settings)) {
+        throw new Error('config.json does not exist');
       } else {
-        // use first language defined as default language
-        this.langService.use(languages[0]);
-      }
-    } else {
-      this.langService.use(this.sessService.language);
-    }
+        if (this.settingsService.validated) {
+          console.log('settings valid');
+          this.api.init(this.settingsService.app_settings.audio_server.url + 'WebTranscribe');
+        }
 
+        if (!this.settingsService.responsive.enabled) {
+          this.setFixedWidth();
+        }
+      }
+
+      // define languages
+      const languages = this.settingsService.app_settings.octra.languages;
+      const browser_lang = this.langService.getBrowserLang();
+
+      this.langService.addLangs(languages);
+
+      // check if browser language is available in translations
+      if (isNullOrUndefined(this.sessService.language) || this.sessService.language === '') {
+        if (!isUndefined(this.langService.getLangs().find((value) => {
+            return value === browser_lang;
+          }))) {
+          this.langService.use(browser_lang);
+        } else {
+          // use first language defined as default language
+          this.langService.use(languages[0]);
+        }
+      } else {
+        this.langService.use(this.sessService.language);
+      }
+    }
   }
 
   ngOnDestroy() {

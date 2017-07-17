@@ -88,6 +88,10 @@ export class AudioTime {
     return this.samples / this._sample_rate;
   }
 
+  set seconds(value: number) {
+    this.samples = value * this._sample_rate;
+  }
+
   public clone(): AudioTime {
     return new AudioTime(this.samples, this._sample_rate);
   }

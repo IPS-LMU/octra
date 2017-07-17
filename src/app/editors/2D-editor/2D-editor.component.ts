@@ -8,7 +8,6 @@ import {
   OnChanges,
   OnDestroy,
   OnInit,
-  Output,
   ViewChild
 } from '@angular/core';
 
@@ -23,11 +22,13 @@ import {
   UserInteractionsService
 } from '../../core/shared/service';
 
-import {AudioTime, AVMousePos, AVSelection, Functions} from '../../core/shared';
+import {AudioTime, AVMousePos, AudioSelection, Functions} from '../../core/shared';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
 import {SettingsService} from '../../core/shared/service/settings.service';
 import {SessionService} from '../../core/shared/service/session.service';
 import {CircleLoupeComponent} from '../../core/component/circleloupe/circleloupe.component';
+import {AudioManager} from '../../core/obj/media/audio/AudioManager';
+import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
 
 @Component({
   selector: 'app-overlay-gui',
@@ -73,6 +74,11 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     return this.settingsService.projectsettings;
   }
 
+  public audiomanager: AudioManager;
+  public audiochunk_lines: AudioChunk;
+  public audiochunk_window: AudioChunk;
+  public audiochunk_loupe: AudioChunk;
+
   constructor(public transcrService: TranscriptionService,
               public keyMap: KeymappingService,
               public audio: AudioService,
@@ -86,13 +92,15 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   ngOnInit() {
+    this.audiomanager = this.audio.audiomanagers[0];
+    this.audiochunk_lines = this.audiomanager.mainchunk;
     this.shortcuts = this.keyMap.register('2D-Editor', this.viewer.Settings.shortcuts);
 
     this.viewer.Settings.multi_line = true;
     this.viewer.Settings.height = 70;
     this.viewer.Settings.margin.bottom = 5;
     this.viewer.Settings.justifySignalHeight = false;
-    this.viewer.Settings.step_width_ratio = (this.viewer.Settings.pixel_per_sec / this.audio.samplerate);
+    this.viewer.Settings.step_width_ratio = (this.viewer.Settings.pixel_per_sec / this.audiomanager.ressource.info.samplerate);
 
     this.viewer.alerttriggered.subscribe(
       (result) => {
@@ -132,7 +140,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   ngAfterViewInit() {
-    if (this.audio.channel) {
+    if (this.audiochunk_lines.channel) {
       this.viewer.initialize();
     }
 
@@ -184,19 +192,21 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   onSegmentSelected(num: number) {
   }
 
-  public get Selection(): AVSelection {
+  public get Selection(): AudioSelection {
     return this.viewer.Selection;
   }
 
   onMouseOver(cursor: AVMousePos) {
     this.mousestartmoving = true;
     this.loupe_updated = false;
-    if (!this.audio.audioplaying && this.sessService.playonhover) {
+    if (!this.audiomanager.audioplaying && this.sessService.playonhover) {
       // play audio
-      this.audio.startPlayback(this.viewer.av.Mousecursor.timePos, new AudioTime(this.audio.samplerate / 10,
-        this.audio.samplerate), () => {
+      this.audiochunk_lines.selection.start.samples = this.viewer.av.Mousecursor.timePos.samples;
+      this.audiochunk_lines.selection.end.samples = this.viewer.av.Mousecursor.timePos.samples +
+        this.audiomanager.ressource.info.samplerate / 10;
+      this.audiochunk_lines.startPlayback(() => {
       }, () => {
-        this.audio.audioplaying = false;
+        this.audiomanager.audioplaying = false;
       }, true);
     }
     setTimeout(() => {
@@ -220,24 +230,24 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
        let start = (cursor.absX > ) ? cursor.absX - 1 : 0;
        let end = (cursor.absX < this.viewer.AudioPxWidth - 1) ? cursor.absX + 1 : this.viewer.AudioPxWidth;
 
-       start = this.viewer.av.audioTCalculator.absXChunktoSamples(start, this.viewer.av.Chunk);
-       end = this.viewer.av.audioTCalculator.absXChunktoSamples(end, this.viewer.av.Chunk);
+       start = this.viewer.av.audioTCalculator.absXChunktoSamples(start, this.viewer.av.AudioChunk);
+       end = this.viewer.av.audioTCalculator.absXChunktoSamples(end, this.viewer.av.AudioChunk);
 
        const startA = new AudioTime(start, this.audio.samplerate);
        const endA = new AudioTime(end, this.audio.samplerate);
 
        */
 
-      const half_rate = Math.round(this.audio.samplerate / factor);
+      const half_rate = Math.round(this.audiomanager.ressource.info.samplerate / factor);
       const start = (cursor.timePos.samples > half_rate)
-        ? new AudioTime(cursor.timePos.samples - half_rate, this.audio.samplerate)
-        : new AudioTime(0, this.audio.samplerate);
-      const end = (cursor.timePos.samples < this.audio.duration.samples - half_rate)
-        ? new AudioTime(cursor.timePos.samples + half_rate, this.audio.samplerate)
-        : this.audio.duration.clone();
+        ? new AudioTime(cursor.timePos.samples - half_rate, this.audiomanager.ressource.info.samplerate)
+        : new AudioTime(0, this.audiomanager.ressource.info.samplerate);
+      const end = (cursor.timePos.samples < this.audiomanager.ressource.info.duration.samples - half_rate)
+        ? new AudioTime(cursor.timePos.samples + half_rate, this.audiomanager.ressource.info.samplerate)
+        : this.audiomanager.ressource.info.duration.clone();
 
       if (start && end) {
-        loup.changeArea(start, end);
+        this.audiochunk_loupe = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
       }
     }
   }
@@ -282,7 +292,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
-    this.audio.speed = event.new_value;
+    this.audiochunk_lines.speed = event.new_value;
   }
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
@@ -292,7 +302,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   onVolumeChange(event: { old_value: number, new_value: number, timestamp: number }) {
-    this.audio.volume = event.new_value;
+    this.audiochunk_lines.volume = event.new_value;
   }
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
@@ -354,8 +364,10 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         this.showWindow = true;
       } else {
         const start = (selected.index > 0) ? this.transcrService.annotation.levels[0].segments.get(selected.index - 1).time
-          : new AudioTime(0, this.audio.samplerate);
-        this.window.changeArea(start, segment.time);
+          : new AudioTime(0, this.audiomanager.ressource.info.samplerate);
+        const end = start.clone();
+        end.samples = start.samples + segment.time.samples;
+        this.audiochunk_window = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
         this.window.editor.rawText = segment.transcript;
       }
     } else {

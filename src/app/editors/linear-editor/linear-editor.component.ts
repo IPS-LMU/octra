@@ -23,11 +23,13 @@ import {
   TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
-import {AudioTime, AVMousePos, AVSelection, BrowserInfo, Functions, SubscriptionManager} from '../../core/shared';
+import {AudioSelection, AudioTime, AVMousePos, BrowserInfo, Functions, SubscriptionManager} from '../../core/shared';
 import {SettingsService} from '../../core/shared/service/settings.service';
 import {isNullOrUndefined} from 'util';
 import {SessionService} from '../../core/shared/service/session.service';
 import {CircleLoupeComponent} from '../../core/component/circleloupe/circleloupe.component';
+import {AudioManager} from '../../core/obj/media/audio/AudioManager';
+import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
 
 @Component({
   selector: 'app-signal-gui',
@@ -63,6 +65,11 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private platform = BrowserInfo.platform;
 
+  public audiomanager: AudioManager;
+  public audiochunk_top: AudioChunk;
+  public audiochunk_down: AudioChunk;
+  public audiochunk_loupe: AudioChunk;
+
   public get app_settings(): any {
     return this.settingsService.app_settings;
   }
@@ -87,6 +94,8 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.audiomanager = this.audio.audiomanagers[0];
+
     this.viewer.Settings.shortcuts = this.keyMap.register('AV', this.viewer.Settings.shortcuts);
 
     this.viewer.Settings.multi_line = false;
@@ -168,10 +177,10 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
             this.miniloupe.zoomY = Math.max(1, this.miniloupe.zoomY + 1);
 
             if (this.viewer.focused) {
-              this.changeArea(this.miniloupe, this.viewer, this.mini_loupecoord,
+              this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
                 this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
             } else if (this.loupe.focused) {
-              this.changeArea(this.miniloupe, this.loupe.viewer, this.mini_loupecoord,
+              this.changeArea(this.audiochunk_loupe, this.loupe.viewer, this.mini_loupecoord,
                 this.viewer.MouseCursor.timePos.samples, this.loupe.MouseCursor.relPos.x, this.factor);
             }
           } else if (event.key === '-') {
@@ -179,10 +188,10 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
               this.factor = Math.max(3, this.factor - 1);
               this.miniloupe.zoomY = Math.max(1, this.miniloupe.zoomY - 1);
               if (this.viewer.focused) {
-                this.changeArea(this.miniloupe, this.viewer, this.mini_loupecoord,
+                this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
                   this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
               } else if (this.loupe.focused) {
-                this.changeArea(this.miniloupe, this.loupe.viewer, this.mini_loupecoord,
+                this.changeArea(this.audiochunk_loupe, this.loupe.viewer, this.mini_loupecoord,
                   this.viewer.MouseCursor.timePos.samples, this.loupe.MouseCursor.relPos.x, this.factor);
               }
             }
@@ -242,11 +251,11 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  test(selection: AVSelection) {
+  test(selection: AudioSelection) {
     if (selection) {
       if (selection.end.samples - selection.start.samples > 0) {
         this.segmentselected = false;
-        this.loupe.changeArea(selection.start, selection.end);
+        this.audiochunk_down = new AudioChunk(selection.clone(), this.audiomanager);
       }
     }
   }
@@ -260,18 +269,20 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   onMouseOver(cursor: AVMousePos) {
     this.mini_loupecoord.component = this.viewer;
 
-    if (!this.audio.audioplaying && this.sessService.playonhover) {
+    if (!this.audiomanager.audioplaying && this.sessService.playonhover) {
       // play audio
-      this.audio.startPlayback(this.viewer.av.Mousecursor.timePos, new AudioTime(this.audio.samplerate / 10,
-        this.audio.samplerate), () => {
+      this.audiochunk_top.selection.start = this.viewer.av.Mousecursor.timePos.clone();
+      this.audiochunk_top.selection.end.samples = this.viewer.av.Mousecursor.timePos.samples +
+        this.audiomanager.ressource.info.samplerate / 10;
+      this.audiochunk_top.startPlayback(() => {
       }, () => {
-        this.audio.audioplaying = false;
+        this.audiomanager.audioplaying = false;
       }, true);
     }
 
     const a = this.viewer.getLocation();
     this.mini_loupecoord.y = -this.miniloupe.Settings.height / 2;
-    this.changeArea(this.miniloupe, this.viewer, this.mini_loupecoord,
+    this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
       this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
   }
 
@@ -294,22 +305,23 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
    }
    */
 
-  private changeArea(loup: LoupeComponent | CircleLoupeComponent, viewer: AudioviewerComponent, coord: any,
+  private changeArea(audiochunk: AudioChunk, viewer: AudioviewerComponent, coord: any,
                      cursor: number, relX: number, factor: number = 4) {
-    const range = ((viewer.Chunk.time.duration.samples / this.audio.duration.samples) * this.audio.samplerate) / factor;
+    const range = ((viewer.Chunk.time.duration.samples / this.audiomanager.ressource.info.duration.samples)
+      * this.audiomanager.ressource.info.samplerate) / factor;
 
     if (cursor && relX > -1) {
       coord.x = ((relX) ? relX - 40 : 0);
       const half_rate = Math.round(range);
       const start = (cursor > half_rate)
-        ? new AudioTime(cursor - half_rate, this.audio.samplerate)
-        : new AudioTime(0, this.audio.samplerate);
-      const end = (cursor < this.audio.duration.samples - half_rate)
-        ? new AudioTime(cursor + half_rate, this.audio.samplerate)
-        : this.audio.duration.clone();
+        ? new AudioTime(cursor - half_rate, this.audiomanager.ressource.info.samplerate)
+        : new AudioTime(0, this.audiomanager.ressource.info.samplerate);
+      const end = (cursor < this.audiomanager.ressource.info.duration.samples - half_rate)
+        ? new AudioTime(cursor + half_rate, this.audiomanager.ressource.info.samplerate)
+        : this.audiomanager.ressource.info.duration.clone();
 
       if (start && end) {
-        loup.changeArea(start, end);
+        audiochunk = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
       }
     }
   }
@@ -319,7 +331,8 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.editor.rawText = segment.transcript;
     this.segmentselected = true;
     this.transcrService.selectedSegment = $event;
-    this.loupe.changeArea(this.transcrService.annotation.levels[0].segments.getStartTime($event.index), segment.time);
+    const start = this.transcrService.annotation.levels[0].segments.getStartTime($event.index);
+    this.audiochunk_down = new AudioChunk(new AudioSelection(start, AudioTime.add(start, segment.time)), this.audiomanager);
   }
 
 // TODO CHANGE!!
@@ -400,7 +413,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   onSpeedChange(event: {
     old_value: number, new_value: number, timestamp: number
   }) {
-    this.audio.speed = event.new_value;
+    this.audiochunk_top.speed = event.new_value;
   }
 
   afterSpeedChange(event: {
@@ -414,7 +427,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   onVolumeChange(event: {
     old_value: number, new_value: number, timestamp: number
   }) {
-    this.audio.volume = event.new_value;
+    this.audiochunk_top.volume = event.new_value;
   }
 
   afterVolumeChange(event: {
@@ -449,6 +462,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.transcrService.selectedSegment = {index: segnumber, pos: segment.time};
     this.viewer.selectSegment(segnumber);
 
-    this.loupe.changeArea(this.transcrService.annotation.levels[0].segments.getStartTime(segnumber), segment.time);
+    const start = this.transcrService.annotation.levels[0].segments.getStartTime(segnumber);
+    this.audiochunk_down = new AudioChunk(new AudioSelection(start, AudioTime.add(start, segment.time)), this.audiomanager);
   }
 }

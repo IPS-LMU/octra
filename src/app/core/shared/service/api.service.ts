@@ -1,6 +1,6 @@
 import {Injectable, SecurityContext} from '@angular/core';
 import {API} from '../../obj/API/api.interface';
-import {Http, RequestOptionsArgs, Response} from '@angular/http';
+import {Headers, Http, RequestOptions, Response} from '@angular/http';
 import 'rxjs/Rx';
 import {DomSanitizer} from '@angular/platform-browser';
 import {Observable} from 'rxjs/Observable';
@@ -29,8 +29,8 @@ export class APIService implements API {
   }
 
   public continueSession(project: string, annotator: string, jobno: number): Observable<Response> {
-    if (project != null && project !== '' &&
-      annotator != null && annotator !== ''
+    if (project !== null && project !== '' &&
+      annotator !== null && annotator !== ''
     ) {
       const cmd_json = {
         querytype: 'continueannotation',
@@ -171,16 +171,14 @@ export class APIService implements API {
       querytype: 'listprojects'
     };
 
+    console.log(cmd_json);
     return this.post(cmd_json);
   }
 
   public post(json: any): Observable<Response> {
     const body = JSON.stringify(json);
 
-    const requoptions: RequestOptionsArgs = {};
-    requoptions.headers.set('Content-Type', 'application/json');
-
-    return this.http.post(this.server_url, body, requoptions);
+    return this.http.post(this.server_url, body);
   }
 
   public init(server_url: string) {

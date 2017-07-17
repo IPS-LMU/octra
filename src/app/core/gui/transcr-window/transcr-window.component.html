@@ -6,7 +6,7 @@
                           (aftervolumechange)="afterVolumeChange($event)"
                           (speedchange)="onSpeedChange($event)"
                           (afterspeedchange)="afterSpeedChange($event)"
-                          [(audioplaying)]="audio.audioplaying"
+                          [(audioplaying)]="audiomanager.audioplaying"
                           [(responsive)]="settingsService.responsive.enabled"
                           [buttons]="{
                         play: {
@@ -45,6 +45,7 @@
                         (marker_click)="onMarkerClick($event)"
                         [markers]="transcrService.guidelines.markers"
                         [easymode]="easymode"
+                        [audiochunk]="audiochunk"
     ></app-transcr-editor>
     <div class="window-nav-bottom">
         <div class="row">

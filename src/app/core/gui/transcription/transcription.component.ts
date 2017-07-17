@@ -39,6 +39,7 @@ import {Observable} from 'rxjs/Observable';
 import {ProjectConfiguration} from '../../obj/Settings/project-configuration';
 import {AppInfo} from '../../../app.info';
 import {NgForm} from '@angular/forms';
+import {AudioManager} from '../../obj/media/audio/AudioManager';
 
 @Component({
   selector: 'app-transcription',
@@ -102,6 +103,8 @@ export class TranscriptionComponent implements OnInit,
 
   public platform = BrowserInfo.platform;
 
+  private audiomanager: AudioManager;
+
   constructor(public router: Router,
               private _componentFactoryResolver: ComponentFactoryResolver,
               public audio: AudioService,
@@ -116,12 +119,13 @@ export class TranscriptionComponent implements OnInit,
               public langService: TranslateService,
               private api: APIService) {
     this.subscrmanager = new SubscriptionManager();
+    this.audiomanager = this.audio.audiomanagers[0];
 
     this.navbarServ.transcrService = this.transcrService;
     this.navbarServ.uiService = this.uiService;
     if (!isNullOrUndefined(this.projectsettings) && !isNullOrUndefined(this.projectsettings.logging)
       && this.projectsettings.logging.forced) {
-      this.subscrmanager.add(this.audio.statechange.subscribe((obj) => {
+      this.subscrmanager.add(this.audiomanager.statechange.subscribe((obj) => {
         if (!obj.playonhover) {
           // make sure that events from playonhover are not logged
           this.uiService.addElementFromEvent('audio_' + obj.state, {value: obj.state}, Date.now(), 'audio');
@@ -207,7 +211,7 @@ export class TranscriptionComponent implements OnInit,
       }
     }
 
-    this.sessService.annotation.sampleRate = this.audio.samplerate;
+    this.sessService.annotation.sampleRate = this.audiomanager.ressource.info.samplerate;
     this.navbarServ.show_interfaces = this.settingsService.projectsettings.navigation.interfaces;
 
     // load guidelines on language change
@@ -235,7 +239,7 @@ export class TranscriptionComponent implements OnInit,
     ));
 
     console.log(this.transcrService.feedback);
-  }
+  };
 
   ngAfterViewInit() {
     this.sessService.TranscriptionTime.start = Date.now();
@@ -257,7 +261,7 @@ export class TranscriptionComponent implements OnInit,
     }
     this.transcrService.endTranscription();
     this.router.navigate(['/logout']);
-  }
+  };
 
   ngAfterContentInit() {
   }
@@ -308,6 +312,7 @@ export class TranscriptionComponent implements OnInit,
   }
 
   changeEditor(name: string) {
+    console.log(this.audiomanager.ressource.info.duration.unix);
     if (this.projectsettings.logging.forced) {
       this.uiService.addElementFromEvent('editor_changed', {value: name}, Date.now(), '');
     }
@@ -340,7 +345,7 @@ export class TranscriptionComponent implements OnInit,
         const viewContainerRef = this.appLoadeditor.viewContainerRef;
         viewContainerRef.clear();
 
-        const componentRef = viewContainerRef.createComponent(componentFactory);
+        viewContainerRef.createComponent(componentFactory);
       } else {
         console.error('ERROR appLoadeditor is null');
       }

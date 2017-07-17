@@ -1,6 +1,5 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {OAnnotJSON, OAudiofile} from '../../obj/annotjson';
-import {AudioInfo} from '../../obj/AudioInfo';
 import {FileSize, Functions} from '../../shared/Functions';
 import {AppInfo} from '../../../app.info';
 import {isNullOrUndefined} from 'util';
@@ -8,13 +7,15 @@ import {Converter} from '../../obj/Converters/Converter';
 import {DropZoneComponent} from '../../component/drop-zone/drop-zone.component';
 import {SessionFile} from '../../obj/SessionFile';
 import {ModalService} from '../../shared/service/modal.service';
+import {AudioManager} from '../../obj/media/audio/AudioManager';
+import {SubscriptionManager} from '../../obj/SubscriptionManager';
 
 @Component({
   selector: 'app-octra-dropzone',
   templateUrl: './octra-dropzone.component.html',
   styleUrls: ['./octra-dropzone.component.css']
 })
-export class OctraDropzoneComponent implements OnInit {
+export class OctraDropzoneComponent implements OnInit, OnDestroy {
   get status(): string {
     return this._status;
   }
@@ -42,6 +43,7 @@ export class OctraDropzoneComponent implements OnInit {
   private _oaudiofile: OAudiofile;
   private _oannotation: OAnnotJSON;
   private _status: string;
+  private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
   public get files(): {
     status: string,
@@ -56,6 +58,10 @@ export class OctraDropzoneComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  ngOnDestroy() {
+    this.subscrmanager.destroy();
   }
 
   public isValidImportData(file: { status: string, file: File, checked_converters: number }) {
@@ -109,7 +115,7 @@ export class OctraDropzoneComponent implements OnInit {
     }
   }
 
-  public afterDrop() {
+  public afterDrop = () => {
     this._oannotation = null;
     for (let i = 0; i < this.dropzone.files.length; i++) {
       const file = {
@@ -134,53 +140,58 @@ export class OctraDropzoneComponent implements OnInit {
         file.status = 'progress';
         const reader = new FileReader();
 
-        reader.onloadend = () => {
+        reader.onloadend = (test) => {
 
           // check audio
-          const info: AudioInfo = new AudioInfo(reader.result);
-          info.decodeAudio(reader.result).then(() => {
-            file.status = 'valid';
-            this._oaudiofile = new OAudiofile();
-            this._oaudiofile.name = file.file.name;
-            this._oaudiofile.size = file.file.size;
-            this._oaudiofile.duration = info.duration;
-            this._oaudiofile.samplerate = info.samplerate;
-            this.checkState();
+          console.log('NEW');
+          console.log(reader.result);
+          console.log(test);
 
-            // load import data
-            for (let j = 0; j < this.dropzone.files.length; j++) {
-              const importfile = this.dropzone.files[j];
-              if (!Functions.contains(importfile.name, '.wav')) {
-                this.dropFile(importfile.name);
+          AudioManager.decodeAudio(file.file.name, reader.result).then(
+            (audiomanager: AudioManager) => {
+              file.status = 'valid';
+              this._oaudiofile = new OAudiofile();
+              this._oaudiofile.name = file.file.name;
+              this._oaudiofile.size = file.file.size;
+              this._oaudiofile.duration = audiomanager.ressource.info.duration.samples;
+              this._oaudiofile.samplerate = audiomanager.ressource.info.samplerate;
+              this.checkState();
 
-                const newfile = {
-                  status: 'progress',
-                  file: this.dropzone.files[j],
-                  checked_converters: 0
-                };
-                this.dropFile('.wav', true, true);
-                this._files.push(newfile);
-                this.isValidImportData(newfile);
+              // load import data
+              for (let j = 0; j < this.dropzone.files.length; j++) {
+                const importfile = this.dropzone.files[j];
+                if (!Functions.contains(importfile.name, '.wav')) {
+                  this.dropFile(importfile.name);
+
+                  const newfile = {
+                    status: 'progress',
+                    file: this.dropzone.files[j],
+                    checked_converters: 0
+                  };
+                  this.dropFile('.wav', true, true);
+                  this._files.push(newfile);
+                  this.isValidImportData(newfile);
+                }
+              }
+
+              // check for data already exist
+              for (let j = 0; j < this.files.length; j++) {
+                const importfile = this.files[j].file;
+                if (!Functions.contains(importfile.name, '.wav')) {
+                  this.files[j].status = 'progress';
+                  this.files[j].checked_converters = 0;
+                  this.isValidImportData(this.files[j]);
+                  break;
+                }
               }
             }
-
-            // check for data already exist
-            for (let j = 0; j < this.files.length; j++) {
-              const importfile = this.files[j].file;
-              if (!Functions.contains(importfile.name, '.wav')) {
-                this.files[j].status = 'progress';
-                this.files[j].checked_converters = 0;
-                this.isValidImportData(this.files[j]);
-                break;
-              }
-            }
-          }).catch(
-            (err) => {
-              alert(err);
-            }
-          );
+          ).catch((error) => {
+            console.error('error occured while decoding audio file');
+            console.error(error);
+          });
         };
 
+        console.log('read...');
         reader.readAsArrayBuffer(file.file);
         this.dropFile('.wav', true);
         this._files.push(file);
@@ -203,7 +214,7 @@ export class OctraDropzoneComponent implements OnInit {
         }
       }
     }
-  }
+  };
 
   private checkState() {
     if (isNullOrUndefined(this._files)) {

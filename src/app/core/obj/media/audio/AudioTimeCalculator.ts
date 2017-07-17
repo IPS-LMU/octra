@@ -1,5 +1,5 @@
 import {AudioTime} from './AudioTime';
-import {Chunk} from './Chunk';
+import {AudioChunk} from './AudioChunk';
 export class AudioTimeCalculator {
   public static roundSamples(samples: number) {
     return Math.round(samples);
@@ -8,7 +8,7 @@ export class AudioTimeCalculator {
   constructor(public samplerate: number,
               public _duration: AudioTime,
               public audio_px_width: number) {
-    if (this.audio_px_width == null || this.audio_px_width < 1) {
+    if (this.audio_px_width === null || this.audio_px_width < 1) {
       console.error('audio px null');
     }
   }
@@ -19,10 +19,15 @@ export class AudioTimeCalculator {
 
   public samplestoAbsX(time_samples: number, duration?: AudioTime): number {
     const dur = (duration) ? duration : this._duration;
+
+    if (dur.samples === 0) {
+      throw new Error('time duration must have samples greater 0');
+    }
+
     return (time_samples / dur.samples) * this.audio_px_width;
   }
 
-  public absXChunktoSamples(absX: number, chunk: Chunk): number {
+  public absXChunktoSamples(absX: number, chunk: AudioChunk): number {
     const start = (chunk.time.start) ? chunk.time.start.samples : 1;
     const duration = chunk.time.end.samples - start;
     if (absX >= 0 && absX <= this.audio_px_width) {
@@ -33,7 +38,7 @@ export class AudioTimeCalculator {
     return -1;
   }
 
-  public absXtoSamples2(absX: number, chunk: Chunk): number {
+  public absXtoSamples2(absX: number, chunk: AudioChunk): number {
     const start = (chunk.time.start) ? chunk.time.start.samples : 1;
     const duration = chunk.time.end.samples - start;
     if (absX >= 0 && absX <= this.audio_px_width) {

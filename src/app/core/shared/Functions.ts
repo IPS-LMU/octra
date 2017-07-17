@@ -178,4 +178,25 @@ export class Functions {
       return http.post(url, body, requestoptions);
     }
   }
+
+  public static setCursor(node, pos) {
+
+    node = (typeof node === 'string' || node instanceof String) ? document.getElementById('' + node + '') : node;
+
+    if (!node) {
+      return false;
+    } else if (node.createTextRange) {
+      const textRange = node.createTextRange();
+      textRange.collapse(true);
+      textRange.moveEnd(pos);
+      textRange.moveStart(pos);
+      textRange.select();
+      return true;
+    } else if (node.setSelectionRange) {
+      node.setSelectionRange(pos, pos);
+      return true;
+    }
+
+    return false;
+  }
 }

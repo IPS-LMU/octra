@@ -14,16 +14,16 @@ export class ReloadFileGuard implements CanActivate {
               private settingsService: SettingsService) {
   }
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     if (this.sessService.LoggedIn !== true) {
       this.router.navigate(['/login']);
       return false;
     } else {
       if (isNullOrUndefined(this.settingsService.app_settings)) {
-        // TODO change!
-        return true;
-        // return this.settingsService.settingsloaded;
+        console.log('1');
+        return this.settingsService.settingsloaded.first();
       } else {
+        console.log('2');
         return this.settingsService.validated;
       }
     }

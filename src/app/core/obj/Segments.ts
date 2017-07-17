@@ -1,5 +1,5 @@
 import {Segment} from './Segment';
-import {AudioTime} from './AudioTime';
+import {AudioTime} from './media/audio/AudioTime';
 import {EventEmitter} from '@angular/core';
 import {ISegment, OLabel, OSegment} from './annotjson';
 import {isNullOrUndefined} from 'util';

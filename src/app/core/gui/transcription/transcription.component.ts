@@ -121,6 +121,7 @@ export class TranscriptionComponent implements OnInit,
     this.subscrmanager = new SubscriptionManager();
     this.audiomanager = this.audio.audiomanagers[0];
 
+    this.sessService.Interface = '2D-Editor';
     this.navbarServ.transcrService = this.transcrService;
     this.navbarServ.uiService = this.uiService;
     if (!isNullOrUndefined(this.projectsettings) && !isNullOrUndefined(this.projectsettings.logging)

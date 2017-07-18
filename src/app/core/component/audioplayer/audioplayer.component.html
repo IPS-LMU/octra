@@ -8,6 +8,6 @@
             (mouseup)="onClick($event)"
             (click)="onClick($event)"
             (mousemove)="onMouseMove($event)"></canvas>
-    <div class="ap-time-start-display">{{(current_time) | timespan}}</div>
-    <div class="ap-time-end-display">{{(total_time - current_time) | timespan}}</div>
+    <div class="ap-time-start-display">{{(audiochunk.playposition.unix) | timespan}}</div>
+    <div class="ap-time-end-display">{{(audiochunk.time.end.unix - audiochunk.playposition.unix) | timespan}}</div>
 </div>

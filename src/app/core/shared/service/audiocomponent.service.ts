@@ -25,7 +25,6 @@ export class AudioComponentService {
 
   // AUDIO
   protected audio_px_w = 0;
-  protected distance = 0;
   protected hZoom = 0;
   protected audiochunk: AudioChunk;
   public audioTCalculator: AudioTimeCalculator;
@@ -40,17 +39,6 @@ export class AudioComponentService {
 
   set AudioPxWidth(audio_px: number) {
     this.audio_px_w = audio_px;
-  }
-
-  get Distance(): number {
-    if (this && this.distance) {
-      return this.distance;
-    }
-    return null;
-  }
-
-  set Distance(value: number) {
-    this.distance = value;
   }
 
   get MouseClickPos(): AVMousePos {
@@ -92,17 +80,6 @@ export class AudioComponentService {
       }
     } else {
       return new AudioTime(0, this.audiomanager.ressource.info.samplerate);
-    }
-  }
-
-  public updateDistance(): void {
-    if (isNullOrUndefined(this.audiochunk.selection)) {
-      this.distance = (this.audio_px_w - this.audioTCalculator.samplestoAbsX(this.audiochunk.playposition.samples));
-    } else {
-      this.distance = this.audioTCalculator.samplestoAbsX(this.audiochunk.selection.duration.samples);
-      this.distance -= this.audioTCalculator.samplestoAbsX(
-        this.audiochunk.playposition.samples - this.audiochunk.selection.start.samples
-      );
     }
   }
 

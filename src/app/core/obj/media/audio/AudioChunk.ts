@@ -9,6 +9,7 @@ export class AudioChunk {
   get lastplayedpos(): AudioTime {
     return this._lastplayedpos;
   }
+
   get state(): PlayBackState {
     return this._state;
   }
@@ -41,11 +42,17 @@ export class AudioChunk {
     this._playposition = value;
   }
 
+  /**
+   * sets the playposition and the audio chunk's selection. Be aware that this methods changes the
+   * end position to the last sample every time it's called
+   * @param value
+   */
   public set startpos(value: AudioTime) {
     if (isNullOrUndefined(this.selection)) {
       this.selection = new AudioSelection(value.clone(), this.time.end.clone());
     } else {
       this.selection.start = value.clone();
+      this.selection.end = this.time.end.clone();
     }
     this._playposition = this.selection.start.clone();
   }
@@ -138,7 +145,8 @@ export class AudioChunk {
 
   public startPlayback(drawFunc: () => void, endPlayback: () => void, playonhover: boolean = false): boolean {
 
-    if (isNullOrUndefined(this._selection) || this._selection.length > 0) {
+    console.log(`play from ${this.selection.start.seconds} to ${this.selection.end.seconds}`);
+    if (isNullOrUndefined(this._selection) || this._selection.length === 0) {
       this.selection = new AudioSelection(this.playposition.clone(), this.time.end.clone());
     }
 
@@ -170,6 +178,7 @@ export class AudioChunk {
 
   public stopPlayback(callback: any = null): boolean {
     if (this._audiomanger.stopPlayback(callback)) {
+      this.startpos = this.time.start.clone();
       this.setState(PlayBackState.STOPPED);
       return true;
     }
@@ -217,14 +226,14 @@ export class AudioChunk {
     const timestamp = new Date().getTime();
 
     if (isNullOrUndefined(this._playposition)) {
-      console.log('is null');
       this._playposition = new AudioTime(0, this._audiomanger.ressource.info.samplerate);
     }
 
-    if (this._audiomanger.endplaying > timestamp && this._audiomanger.audioplaying) {
+    if (this._audiomanger.audioplaying) {
       const playduration = (this._audiomanger.endplaying - timestamp) * this.speed;
-      const result = this.selection.start.unix + (this.selection.duration.unix) - playduration;
-      this._playposition.unix = result;
+      this._playposition.unix = this.selection.start.unix + (this.selection.duration.unix) - playduration;
+    } else {
+      console.log('cant update playcursor');
     }
   };
 

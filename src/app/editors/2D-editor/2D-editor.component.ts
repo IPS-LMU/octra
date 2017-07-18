@@ -28,6 +28,7 @@ import {SessionService} from '../../core/shared/service/session.service';
 import {CircleLoupeComponent} from '../../core/component/circleloupe/circleloupe.component';
 import {AudioManager} from '../../core/obj/media/audio/AudioManager';
 import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
+import {TranscrWindowComponent} from '../../core/gui/transcr-window/transcr-window.component';
 
 @Component({
   selector: 'app-overlay-gui',
@@ -40,8 +41,8 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
 
   @ViewChild('viewer') viewer: AudioviewerComponent;
-  // here @ViewChild('window') window: TranscrWindowComponent;
-  // here @ViewChild('loupe') loupe: CircleLoupeComponent;
+  @ViewChild('window') window: TranscrWindowComponent;
+  @ViewChild('loupe') loupe: CircleLoupeComponent;
   @ViewChild('audionav') audionav: AudioNavigationComponent;
   @ViewChild('audionav') nav: ElementRef;
 
@@ -52,6 +53,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   private mousestartmoving = false;
   private loupe_updated = true;
   private intervalID = null;
+  public selected_index: number;
 
   private factor = 4;
   public mini_loupecoord: any = {
@@ -93,9 +95,8 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   ngOnInit() {
     this.audiomanager = this.audio.audiomanagers[0];
     this.audiochunk_lines = this.audiomanager.mainchunk;
-    // here this.audiochunk_loupe = this.audiomanager.mainchunk;
-    // here this.audiochunk_window = this.audiomanager.mainchunk;
-    console.log('sec chunks ' + this.audiochunk_lines.audiomanager.ressource.info.duration.seconds);
+    this.audiochunk_loupe = this.audiomanager.mainchunk;
+    this.audiochunk_window = this.audiomanager.mainchunk;
     this.shortcuts = this.keyMap.register('2D-Editor', this.viewer.Settings.shortcuts);
 
     this.viewer.Settings.multi_line = true;
@@ -116,14 +117,14 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         if (this.viewer.focused) {
           if (event.key === '+') {
             this.factor = Math.max(4, this.factor + 1);
-            // here this.loupe.zoomY = Math.max(1, this.loupe.zoomY + 1);
+            this.loupe.zoomY = Math.max(1, this.loupe.zoomY + 1);
 
-            // here this.changeArea(this.loupe, this.mini_loupecoord, this.factor);
+            this.changeArea(this.loupe, this.mini_loupecoord, this.factor);
           } else if (event.key === '-') {
             if (this.factor > 3) {
               this.factor = Math.max(3, this.factor - 1);
-              // here this.loupe.zoomY = Math.max(1, this.loupe.zoomY - 1);
-              // here this.changeArea(this.loupe, this.mini_loupecoord, this.factor);
+              this.loupe.zoomY = Math.max(1, this.loupe.zoomY - 1);
+              this.changeArea(this.loupe, this.mini_loupecoord, this.factor);
             }
           }
         }
@@ -154,11 +155,11 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       )
     );
 
-    // here this.loupe.zoomY = this.factor;
+    this.loupe.zoomY = this.factor;
     this.intervalID = setInterval(() => {
       if (!this.mousestartmoving && !this.loupe_updated) {
         this.loupe_updated = true;
-        // here this.changeArea(this.loupe, this.mini_loupecoord, this.factor);
+        this.changeArea(this.loupe, this.mini_loupecoord, this.factor);
       }
     }, 200);
   }
@@ -167,19 +168,21 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   onSegmentEntered(selected: any) {
+    console.log('segmetn entered');
     if (this.transcrService.annotation.levels[0].segments && selected.index > -1 &&
       selected.index < this.transcrService.annotation.levels[0].segments.length) {
       const segment = this.transcrService.annotation.levels[0].segments.get(selected.index);
+      const start: AudioTime = (selected.index > 0) ? this.transcrService.annotation.levels[0].segments.get(selected.index - 1).time.clone()
+        : new AudioTime(0, this.audiomanager.ressource.info.samplerate);
       if (segment) {
-        this.transcrService.selectedSegment = {index: selected.index, pos: selected.pos};
+        this.selected_index = selected.index;
+        this.audiochunk_window = new AudioChunk(new AudioSelection(start, segment.time.clone()), this.audiomanager);
       }
     }
 
-    if (this.transcrService.selectedSegment) {
-      this.viewer.deactivate_shortcuts = true;
-      this.viewer.focused = false;
-      this.showWindow = true;
-    }
+    this.viewer.deactivate_shortcuts = true;
+    this.viewer.focused = false;
+    this.showWindow = true;
   }
 
   onWindowAction(state) {
@@ -224,18 +227,6 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       coord.y = ((cursor.line) ? (cursor.line.number + 1) *
         cursor.line.Size.height + (cursor.line.number) * this.viewer.Settings.margin.bottom : 0);
 
-      /*
-       let start = (cursor.absX > ) ? cursor.absX - 1 : 0;
-       let end = (cursor.absX < this.viewer.AudioPxWidth - 1) ? cursor.absX + 1 : this.viewer.AudioPxWidth;
-
-       start = this.viewer.av.audioTCalculator.absXChunktoSamples(start, this.viewer.av.AudioChunk);
-       end = this.viewer.av.audioTCalculator.absXChunktoSamples(end, this.viewer.av.AudioChunk);
-
-       const startA = new AudioTime(start, this.audio.samplerate);
-       const endA = new AudioTime(end, this.audio.samplerate);
-
-       */
-
       const half_rate = Math.round(this.audiomanager.ressource.info.samplerate / factor);
       const start = (cursor.timePos.samples > half_rate)
         ? new AudioTime(cursor.timePos.samples - half_rate, this.audiomanager.ressource.info.samplerate)
@@ -245,6 +236,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         : this.audiomanager.ressource.info.duration.clone();
 
       if (start && end) {
+        console.log('set to ' + start.seconds + ' ' + end.seconds);
         this.audiochunk_loupe = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
       }
     }
@@ -351,25 +343,17 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     if (this.transcrService.annotation.levels[0].segments && selected.index > -1 &&
       selected.index < this.transcrService.annotation.levels[0].segments.length) {
       if (segment) {
-        this.transcrService.selectedSegment = {index: selected.index, pos: selected.pos};
-      }
-    }
-
-    if (this.transcrService.selectedSegment) {
-      this.viewer.deactivate_shortcuts = true;
-      this.viewer.focused = false;
-      if (!this.showWindow) {
-        this.showWindow = true;
-      } else {
         const start = (selected.index > 0) ? this.transcrService.annotation.levels[0].segments.get(selected.index - 1).time
           : new AudioTime(0, this.audiomanager.ressource.info.samplerate);
         const end = start.clone();
         end.samples = start.samples + segment.time.samples;
         this.audiochunk_window = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
-        // here this.window.editor.rawText = segment.transcript;
+        console.log('chnage to ' + this.audiochunk_window.time.duration.seconds);
+        this.window.editor.rawText = segment.transcript;
       }
-    } else {
-      console.error('selected segment not found');
     }
+    this.viewer.deactivate_shortcuts = true;
+    this.viewer.focused = false;
+    this.showWindow = true;
   }
 }

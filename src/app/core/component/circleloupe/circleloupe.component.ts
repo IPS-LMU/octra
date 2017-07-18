@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Input, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, Input, OnChanges, ViewChild} from '@angular/core';
 import {LoupeComponent} from '../loupe/loupe.component';
 import {CircleLoupeService} from './service/circleloupe.service';
 import {AudioChunk} from '../../obj/media/audio/AudioChunk';
@@ -11,7 +11,7 @@ declare var window: any;
   providers: [CircleLoupeService]
 })
 
-export class CircleLoupeComponent implements AfterViewInit {
+export class CircleLoupeComponent implements AfterViewInit, OnChanges {
   @ViewChild('loupe') loupe: LoupeComponent;
 
   @Input() audiochunk: AudioChunk;
@@ -40,6 +40,12 @@ export class CircleLoupeComponent implements AfterViewInit {
   constructor() {
   }
 
+  ngOnChanges(obj) {
+    if (obj.hasOwnProperty('audiochunk')) {
+      console.log('audio chunk changed in circle');
+    }
+  }
+
   ngAfterViewInit() {
     this.loupe.Settings.multi_line = false;
     this.loupe.Settings.height = 80;
@@ -61,11 +67,6 @@ export class CircleLoupeComponent implements AfterViewInit {
     this.loupe.Settings.timeline.enabled = false;
     this.loupe.update();
   }
-
-  /*
-   public changeArea(start: AudioTime, end: AudioTime) {
-   this.loupe.changeBuffer(start, end);
-   } */
 
   public updateSegments() {
     this.loupe.update();

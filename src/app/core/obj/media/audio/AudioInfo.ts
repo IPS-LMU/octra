@@ -21,7 +21,7 @@ export class AudioInfo {
 
   constructor(samplerate: number, duration: number, bitrate: number = -1) {
     this._samplerate = samplerate;
-    this._duration = new AudioTime(Math.round(duration * samplerate), samplerate);
+    this._duration = new AudioTime(duration, samplerate);
     this._bitrate = bitrate;
   }
 }

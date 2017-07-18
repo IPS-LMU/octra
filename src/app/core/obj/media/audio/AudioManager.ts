@@ -147,6 +147,7 @@ export class AudioManager {
 
       const selection = new AudioSelection(new AudioTime(0, samplerate), new AudioTime(audiobuffer.length, samplerate));
       result._mainchunk = new AudioChunk(selection, result);
+      console.log('mainchunk ' + result._mainchunk.time.duration.seconds);
 
       result.newstate = 'ready';
       result.afterdecoded.emit(result.ressource);

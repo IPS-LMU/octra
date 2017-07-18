@@ -21,7 +21,6 @@ import {AudioplayerService} from './service/audioplayer.service';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {AudioChunk} from '../../obj/media/audio/AudioChunk';
 import {AudioRessource} from '../../obj/media/audio/AudioRessource';
-import {AudioTime} from '../../obj/media/audio/AudioTime';
 
 @Component({
   selector: 'app-audioplayer',
@@ -54,14 +53,6 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public set settings(value: any) {
     this.ap.Settings = value;
-  }
-
-  /**
-   * gets the total time (from start to end)
-   * @returns {number}
-   */
-  public get total_time(): number {
-    return this.ap.total_time;
   }
 
   /**
@@ -339,8 +330,6 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
    * depend on the current selection.
    */
   private playSelection(computetimes: boolean = true) {
-    // calculate time from which audio is played
-    this.ap.updateDistance();
 
     // define callback for end event
     const endPlaybackEvent = () => {
@@ -402,7 +391,6 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscrmanager.add(this.timer.subscribe(
       () => {
         if (this.audioressource.content && this.ap.PlayCursor) {
-          this.ap.total_time = this.audiochunk.time.end.unix - this.audiochunk.time.start.unix;
           this.changeDetectorRef.markForCheck();
         }
       }
@@ -425,7 +413,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.audiochunk.lastplayedpos !== null) {
         this.audiochunk.playposition = this.audiochunk.lastplayedpos.clone();
         this.audiochunk.startpos = this.audiochunk.lastplayedpos.clone();
-        this.ap.PlayCursor.changeSamples(this.audiochunk.lastplayedpos.samples, this.ap.audioTCalculator);
+        this.ap.PlayCursor.changeSamples(this.audiochunk.playposition.samples, this.ap.audioTCalculator);
         this.drawPlayCursorOnly(this.ap.LastLine);
         this.startPlayback();
       }
@@ -436,10 +424,6 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
     this.audiochunk.stepBackwardTime(() => {
       this.audiochunk.playposition.samples = Math.max(0, (this.audiochunk.playposition.samples
       - (Math.floor(back_sec * this.audioressource.info.samplerate))));
-      this.ap.Distance = this.ap.audioTCalculator.samplestoAbsX(
-        this.audiochunk.time.duration.samples - this.audiochunk.playposition.samples
-      );
-
       this.ap.PlayCursor.changeSamples(this.audiochunk.playposition.samples,
         this.ap.audioTCalculator, this.audiochunk);
       this.drawPlayCursorOnly(this.ap.LastLine);
@@ -455,17 +439,17 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
     // set new position of playcursor
 
     /*
-    const playduration = this.audiochunk.playposition.unix - this.audiochunk.selection.start.unix;
+     const playduration = this.audiochunk.playposition.unix - this.audiochunk.selection.start.unix;
 
-    const progress = Math.min(
-      (playduration / (this.audiochunk.selection.duration.unix)) * this.audiochunk.speed, 1);
-    // console.log(`progress ${progress} playpos ${this.audiochunk.playposition.unix}, duration ${this.audiochunk.selection.duration.unix}, speed ${this.audiochunk.speed}`);
-    const absX = Math.max(0, this.ap.Distance * progress);
-    console.log('absX ' + (playduration/1000));
-    // console.log(`absX ${absX}, distance ${this.ap.Distance}, length ${this.audiochunk.selection.duration.seconds}`);
-    this.changePlayCursorAbsX(absX);
+     const progress = Math.min(
+     (playduration / (this.audiochunk.selection.duration.unix)) * this.audiochunk.speed, 1);
+     // console.log(`progress ${progress} playpos ${this.audiochunk.playposition.unix}, duration ${this.audiochunk.selection.duration.unix}, speed ${this.audiochunk.speed}`);
+     const absX = Math.max(0, this.ap.Distance * progress);
+     console.log('absX ' + (playduration/1000));
+     // console.log(`absX ${absX}, distance ${this.ap.Distance}, length ${this.audiochunk.selection.duration.seconds}`);
+     this.changePlayCursorAbsX(absX);
 
-    */
+     */
 
     const absX = this.ap.audioTCalculator.samplestoAbsX(this.audiochunk.playposition.samples);
     this.changePlayCursorAbsX(absX);

@@ -11,15 +11,6 @@ import {AudioplayerConfigValidator} from '../validator/AudioplayerConfigValidato
 export class AudioplayerService extends AudioComponentService {
   private drag_playcursor = false;
   private _settings: any;
-  private _total_time = 0;
-
-  get total_time(): number {
-    return this._total_time;
-  }
-
-  set total_time(value: number) {
-    this._total_time = value;
-  }
 
   get Settings(): any {
     return this._settings;
@@ -43,19 +34,6 @@ export class AudioplayerService extends AudioComponentService {
     this.validateConfig();
   }
 
-  /***
-   * sets the time of duration in seconds
-   */
-  /*
-   public updatePlayDuration() {
-   if (this.Chunk && this.Chunk.time.start.samples >= 0 && this.Chunk.time.end.samples > this.Chunk.time.start.samples) {
-   this.audiomanager.playduration.samples = (this.Chunk.time.end.samples - this.Chunk.time.start.samples);
-   } else {
-   this.audiomanager.playduration = new AudioTime(0, this.audiomanager.ressource.info.samplerate);
-   }
-   }
-   */
-
   /**
    * initializes the audioplayer
    * @param innerWidth
@@ -64,14 +42,6 @@ export class AudioplayerService extends AudioComponentService {
     this.audio_px_w = innerWidth;
     this.playcursor = new PlayCursor(0, new AudioTime(0, this.audiomanager.ressource.info.samplerate), innerWidth);
     this.initializeLine(this.audio_px_w, this._settings.height);
-  }
-
-  /**
-   * updates the distance to destination
-   */
-  public updateDistance(): void {
-    this.distance = this.audio_px_w - this.audioTCalculator.samplestoAbsX(this.audiochunk.playposition.samples);
-    const t = 0;
   }
 
   /**
@@ -197,7 +167,7 @@ export class AudioplayerService extends AudioComponentService {
   /**
    * initializes all attributes needed for initialization of the audioplayer
    * @param innerWidth
-   * @param audiomanager
+   * @param audiochunk
    */
   public init(innerWidth: number, audiochunk: AudioChunk) {
     this.AudioPxWidth = innerWidth;
@@ -207,7 +177,6 @@ export class AudioplayerService extends AudioComponentService {
       this.audiochunk.time.duration, this.AudioPxWidth);
     this.Mousecursor = new AVMousePos(0, 0, 0, new AudioTime(0, this.audiomanager.ressource.info.samplerate));
     this.MouseClickPos = new AVMousePos(0, 0, 0, new AudioTime(0, this.audiomanager.ressource.info.samplerate));
-    this.total_time = Math.round(this.audiochunk.time.end.unix - this.audiochunk.time.start.unix);
   }
 
   private validateConfig() {

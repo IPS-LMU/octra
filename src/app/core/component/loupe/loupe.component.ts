@@ -4,15 +4,15 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
   Output,
   ViewChild
 } from '@angular/core';
 import {AudioviewerComponent, AudioviewerService} from '../audioviewer';
-import {AudioTime, AVMousePos} from '../../shared';
+import {AVMousePos} from '../../shared';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {AudioChunk} from '../../obj/media/audio/AudioChunk';
 declare var window: any;
 
@@ -23,7 +23,7 @@ declare var window: any;
   providers: [AudioviewerService]
 })
 
-export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy {
+export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
   @ViewChild('viewer') viewer: AudioviewerComponent;
   @ViewChild('loupe') loupe: ElementRef;
 
@@ -85,6 +85,9 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscrmanager = new SubscriptionManager();
   }
 
+  ngOnChanges(obj) {
+  }
+
   ngOnInit() {
     this.viewer.Settings.multi_line = false;
     this.viewer.Settings.height = 150;
@@ -116,23 +119,13 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscrmanager.destroy();
   }
 
-  /*
-  public changeArea(start: AudioTime, end: AudioTime) {
-    this.viewer.changeBuffer(start, end);
-  }
-  */
-
   public updateSegments() {
     this.viewer.drawSegments();
   }
 
-  /*
-  public changeBuffer(start: AudioTime, end: AudioTime) {
-    this.viewer.changeBuffer(start, end);
-  }*/
-
   public update() {
-    this.viewer.update();
+    this.viewer.initialize();
+    this.viewer.update(true);
   }
 
   onButtonClick(event: { type: string, timestamp: number }) {

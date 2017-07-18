@@ -5,9 +5,11 @@ import {
   EventEmitter,
   HostListener,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
   Output,
+  SimpleChanges,
   ViewChild
 } from '@angular/core';
 
@@ -30,7 +32,6 @@ import {TranslateService} from '@ngx-translate/core';
 import {isNullOrUndefined} from 'util';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {AudioRessource} from '../../obj/media/audio/AudioRessource';
-import {Subscription} from 'rxjs/Subscription';
 
 @Component({
   selector: 'app-audioviewer',
@@ -39,7 +40,7 @@ import {Subscription} from 'rxjs/Subscription';
   providers: [AudioviewerService]
 })
 
-export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
+export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
 
   /**
    *    TODO
@@ -108,6 +109,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
   private height = 0;
   private innerWidth = 0;
   private oldInnerWidth = 0;
+  private audiotimer: any;
   private resizing = false;
 
   private _deactivate_shortcuts = false;
@@ -205,6 +207,24 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.update(true);
   }
 
+  ngOnChanges(obj: SimpleChanges) {
+    if (obj.hasOwnProperty('audiochunk')) {
+      const previous: AudioChunk = obj.audiochunk.previousValue;
+      const current: AudioChunk = obj.audiochunk.currentValue;
+
+      if (!obj.audiochunk.firstChange) {
+        if ((isNullOrUndefined(previous) && !isNullOrUndefined(current)) ||
+          (current.time.start.samples !== previous.time.start.samples &&
+          current.time.end.samples !== previous.time.end.samples)) {
+          // audiochunk changed
+          console.log('ok changed');
+          this.initialize();
+          this.update(true);
+        }
+      }
+    }
+  }
+
   ngOnDestroy() {
     this.stopPlayback();
     this.av.destroy();
@@ -224,7 +244,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.updateCanvasSizes();
 
     if (!isNullOrUndefined(this.av.channel)) {
-      if (computeDisplayData === true) {
+      if (computeDisplayData) {
         this.av.refresh();
       }
 
@@ -241,7 +261,10 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
       if (this.Settings.timeline.enabled) {
         this.drawTimeLine();
       }
-      this.drawPlayCursor();
+
+      if (this.Settings.cropping === 'none') {
+        this.drawPlayCursor();
+      }
     } else {
       console.error('audio channel is null');
     }
@@ -343,24 +366,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
       throw new Error('Line Object not found');
     }
   };
-
-  /**
-   * change audiosequence shown in this audioviewer
-   * @param start
-   * @param end
-   */
-  /*
-   public changeBuffer(start: AudioTime, end: AudioTime) {
-   if (!this.drawing) {
-   // fix for too many drawing request
-   setTimeout(() => {
-   this.drawing = true;
-   this.av.changeBuffer(start, end, this.innerWidth);
-   this.update(true);
-   this.drawing = false;
-   }, 25);
-   }
-   } */
 
   /**
    * drawGrid(h, v) draws a grid with h horizontal and v vertical lines over the canvas
@@ -986,7 +991,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
     };
 
     this.audiochunk.startPlayback(drawFunc, this.onEndPlayBack);
-
   };
 
   /**
@@ -1057,7 +1061,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   drawPlayCursor = () => {
 
-    const currentAbsX = this.av.audioTCalculator.samplestoAbsX((this.audiochunk.playposition.samples - this.audiochunk.time.start.samples));
+    let currentAbsX = this.av.audioTCalculator.samplestoAbsX((this.audiochunk.playposition.samples - this.audiochunk.time.start.samples));
+    const endAbsX = this.av.audioTCalculator.samplestoAbsX((this.audiochunk.time.end.samples - this.audiochunk.time.start.samples));
+    currentAbsX = Math.min(currentAbsX, endAbsX - 1);
     this.changePlayCursorAbsX(currentAbsX);
 
     // get line of PlayCursor
@@ -1066,6 +1072,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
     if (line) {
       this.drawPlayCursorOnly(line);
       this.av.LastLine = line;
+    } else {
+      console.log('LINE NULL');
     }
   };
 
@@ -1345,7 +1353,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
         const boundary_select = this.av.getSegmentSelection(segment.time.samples - 1);
         if (boundary_select) {
           this.audiochunk.selection = boundary_select;
-          this.Settings.selection.color = 'purple';
+          this.av.drawnselection = boundary_select.clone();
           this.drawSegments();
           this.Settings.selection.color = 'gray';
           this.audiochunk.playposition.samples = this.audiochunk.selection.start.samples;
@@ -1360,6 +1368,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit {
         errorcallback();
       }
       return false;
+    } else {
+      errorcallback();
     }
+    return false;
   }
 }

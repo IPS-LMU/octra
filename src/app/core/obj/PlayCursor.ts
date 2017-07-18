@@ -1,6 +1,7 @@
 import {AudioTime} from './media/audio/AudioTime';
 import {AudioTimeCalculator} from './media/audio/AudioTimeCalculator';
 import {AudioChunk} from './media/audio/AudioChunk';
+import {isNullOrUndefined} from 'util';
 export class PlayCursor {
 
   private _absX: number;
@@ -27,7 +28,7 @@ export class PlayCursor {
 
   public changeSamples(samples: number, audioTCalculator: AudioTimeCalculator, chunk?: AudioChunk) {
     this._time_pos.samples = samples;
-    const duration = (chunk !== null && chunk.time.start.samples < chunk.time.end.samples)
+    const duration = (!isNullOrUndefined(chunk) && chunk.time.start.samples < chunk.time.end.samples)
       ? new AudioTime(chunk.time.end.samples - chunk.time.start.samples, audioTCalculator.samplerate) : null;
 
     const chunk_s = ((chunk) ? (chunk.time.start.samples) : 0);

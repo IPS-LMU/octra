@@ -1,8 +1,9 @@
 <div id="overlay-transcr" style="position:relative">
-    <!-- here <app-transcr-window #window (act)="onWindowAction($event)" *ngIf="showWindow"
+    <app-transcr-window #window (act)="onWindowAction($event)" *ngIf="showWindow"
                         [easymode]="sessService.easymode"
                         [audiochunk]="audiochunk_window"
-    ></app-transcr-window -->
+                        [segment_index]="selected_index"
+    ></app-transcr-window>
     <app-audio-navigation #audionav
                           (buttonclick)="onButtonClick($event)"
                           (volumechange)="onVolumeChange($event)"
@@ -39,7 +40,7 @@
                               }"
                           [easymode]="sessService.easymode"
     ></app-audio-navigation>
-    <!-- here <div id="special" class="flex" [ngStyle]="
+    <div id="special" class="flex" [ngStyle]="
 {
 height: getHeight + 'px'
 }" style="overflow-y: scroll; overflow-x: hidden; position:relative;">
@@ -53,16 +54,16 @@ height: getHeight + 'px'
 'z-index':'90',
 'visibility': (loupe_hidden) ? 'hidden' : 'inherit'}"
                              [audiochunk]="audiochunk_loupe"></app-circleloupe>
-        </div>-->
-    <app-audioviewer #viewer
-                     (selchange)="onSegmentSelected($event);"
-                     (segmententer)="onSegmentEntered($event);"
-                     (segmentchange)="onSegmentChange($event);"
-                     (mousecursorchange)="onMouseOver($event);"
-                     (mouseenter)="loupe_hidden = false;"
-                     (mouseleave)="loupe_hidden = true;"
-                     (shortcuttriggered)="onShortCutTriggered($event, 'overlay')"
-                     [audiochunk]="audiochunk_lines"
-    >
-    </app-audioviewer>
-</div>
+        </div>
+        <app-audioviewer #viewer
+                         (selchange)="onSegmentSelected($event);"
+                         (segmententer)="onSegmentEntered($event);"
+                         (segmentchange)="onSegmentChange($event);"
+                         (mousecursorchange)="onMouseOver($event);"
+                         (mouseenter)="loupe_hidden = false;"
+                         (mouseleave)="loupe_hidden = true;"
+                         (shortcuttriggered)="onShortCutTriggered($event, 'overlay')"
+                         [audiochunk]="audiochunk_lines"
+        >
+        </app-audioviewer>
+    </div>

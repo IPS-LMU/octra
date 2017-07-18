@@ -70,6 +70,8 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   public audiochunk_down: AudioChunk;
   public audiochunk_loupe: AudioChunk;
 
+  private selected_index: number;
+
   public get app_settings(): any {
     return this.settingsService.app_settings;
   }
@@ -95,7 +97,9 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     this.audiomanager = this.audio.audiomanagers[0];
-
+    this.audiochunk_top = this.audiomanager.mainchunk;
+    this.audiochunk_down = new AudioChunk(new AudioSelection(new AudioTime(0, this.audiomanager.ressource.info.samplerate), this.audiochunk_top.time.end.clone()), this.audiomanager);
+    this.audiochunk_loupe = new AudioChunk(new AudioSelection(new AudioTime(0, this.audiomanager.ressource.info.samplerate), this.audiochunk_top.time.end.clone()), this.audiomanager);
     this.viewer.Settings.shortcuts = this.keyMap.register('AV', this.viewer.Settings.shortcuts);
 
     this.viewer.Settings.multi_line = false;
@@ -119,14 +123,6 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.miniloupe.Settings.shortcuts_enabled = false;
     this.miniloupe.Settings.boundaries.enabled = false;
     this.miniloupe.Settings.justify_signal_height = false;
-
-    // update signaldisplay on changes
-    /* this.subscrmanager.add(Observable.timer(0, 2000).subscribe(
-     () => {
-     this.viewer.drawSegments();
-     this.loupe.viewer.drawSegments();
-     }
-     ));*/
 
     this.subscrmanager.add(this.transcrService.annotation.levels[0].segments.onsegmentchange.subscribe(
       ($event) => {
@@ -253,9 +249,12 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   test(selection: AudioSelection) {
     if (selection) {
-      if (selection.end.samples - selection.start.samples > 0) {
+      if (selection.length > 0) {
+        selection.checkSelection();
         this.segmentselected = false;
-        this.audiochunk_down = new AudioChunk(selection.clone(), this.audiomanager);
+        console.log(`${selection.start.seconds} , ${selection.end.seconds}}`);
+        this.audiochunk_down = new AudioChunk(this.audiochunk_top.selection.clone(), this.audiomanager);
+        this.loupe.update();
       }
     }
   }
@@ -320,9 +319,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         ? new AudioTime(cursor + half_rate, this.audiomanager.ressource.info.samplerate)
         : this.audiomanager.ressource.info.duration.clone();
 
-      if (start && end) {
-        audiochunk = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
-      }
+      audiochunk = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
     }
   }
 
@@ -330,9 +327,15 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     const segment = this.transcrService.annotation.levels[0].segments.get($event.index);
     this.editor.rawText = segment.transcript;
     this.segmentselected = true;
-    this.transcrService.selectedSegment = $event;
-    const start = this.transcrService.annotation.levels[0].segments.getStartTime($event.index);
-    this.audiochunk_down = new AudioChunk(new AudioSelection(start, AudioTime.add(start, segment.time)), this.audiomanager);
+    this.selected_index = $event.index;
+    let start = new AudioTime(0, this.audiomanager.ressource.info.samplerate);
+    if ($event.index > 0) {
+      start = this.transcrService.annotation.levels[0].segments.get($event.index - 1).time;
+    }
+
+    this.audiochunk_down = new AudioChunk(new AudioSelection(start, segment.time), this.audiomanager);
+    console.log('enter segment ' + $event.index);
+    this.loupe.update();
   }
 
 // TODO CHANGE!!
@@ -340,7 +343,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     const segment = this.transcrService.annotation.levels[0].segments.get($event.index);
     this.editor.rawText = segment.transcript;
     this.segmentselected = true;
-    this.transcrService.selectedSegment = $event;
+    this.selected_index = $event.index;
   }
 
   onTranscriptionChanged($event) {
@@ -349,14 +352,13 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private save() {
     if (this.segmentselected) {
-      const index = this.transcrService.selectedSegment.index;
-      if (index > -1 && this.transcrService.annotation.levels[0].segments &&
-        index < this.transcrService.annotation.levels[0].segments.length) {
-        const segment = this.transcrService.annotation.levels[0].segments.get(index);
+      if (this.selected_index > -1 && this.transcrService.annotation.levels[0].segments &&
+        this.selected_index < this.transcrService.annotation.levels[0].segments.length) {
+        const segment = this.transcrService.annotation.levels[0].segments.get(this.selected_index);
         this.viewer.focused = false;
         this.loupe.viewer.focused = false;
         segment.transcript = this.editor.rawText;
-        this.transcrService.annotation.levels[0].segments.change(index, segment);
+        this.transcrService.annotation.levels[0].segments.change(this.selected_index, segment);
       }
     }
   }
@@ -459,10 +461,11 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.editor.rawText = segment.transcript;
 
     this.segmentselected = true;
-    this.transcrService.selectedSegment = {index: segnumber, pos: segment.time};
+    this.selected_index = segnumber;
     this.viewer.selectSegment(segnumber);
 
     const start = this.transcrService.annotation.levels[0].segments.getStartTime(segnumber);
     this.audiochunk_down = new AudioChunk(new AudioSelection(start, AudioTime.add(start, segment.time)), this.audiomanager);
+    this.loupe.update();
   }
 }

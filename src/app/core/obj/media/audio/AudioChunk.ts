@@ -145,12 +145,12 @@ export class AudioChunk {
 
   public startPlayback(drawFunc: () => void, endPlayback: () => void, playonhover: boolean = false): boolean {
 
-    console.log(`play from ${this.selection.start.seconds} to ${this.selection.end.seconds}`);
     if (isNullOrUndefined(this._selection) || this._selection.length === 0) {
       this.selection = new AudioSelection(this.playposition.clone(), this.time.end.clone());
     }
 
     if (!this._audiomanger.audioplaying) {
+      console.log(`play from ${this.selection.start.seconds} to ${this.selection.end.seconds}`);
       this._state = PlayBackState.STARTED;
 
       this._lastplayedpos = this.playposition.clone();
@@ -223,17 +223,19 @@ export class AudioChunk {
    * @returns {number}
    */
   public updatePlayPosition = () => {
-    const timestamp = new Date().getTime();
+    if (!isNullOrUndefined(this.selection)) {
+      const timestamp = new Date().getTime();
 
-    if (isNullOrUndefined(this._playposition)) {
-      this._playposition = new AudioTime(0, this._audiomanger.ressource.info.samplerate);
-    }
+      if (isNullOrUndefined(this._playposition)) {
+        this._playposition = new AudioTime(0, this._audiomanger.ressource.info.samplerate);
+      }
 
-    if (this._audiomanger.audioplaying) {
-      const playduration = (this._audiomanger.endplaying - timestamp) * this.speed;
-      this._playposition.unix = this.selection.start.unix + (this.selection.duration.unix) - playduration;
-    } else {
-      console.log('cant update playcursor');
+      if (this._audiomanger.audioplaying) {
+        const playduration = (this._audiomanger.endplaying - timestamp) * this.speed;
+        this._playposition.unix = this.selection.start.unix + (this.selection.duration.unix) - playduration;
+      } else {
+        this._playposition = this.selection.end.clone();
+      }
     }
   };
 

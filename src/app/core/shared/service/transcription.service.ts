@@ -55,7 +55,6 @@ export class TranscriptionService {
 
   private _break_marker: any = null;
 
-  private _selectedSegment: any = null;
   private state = 'ANNOTATED';
 
   private _statistic: any = {
@@ -123,14 +122,6 @@ export class TranscriptionService {
 
   get statistic(): any {
     return this._statistic;
-  }
-
-  get selectedSegment(): any {
-    return this._selectedSegment;
-  }
-
-  set selectedSegment(value: any) {
-    this._selectedSegment = value;
   }
 
   constructor(private audio: AudioService,
@@ -329,7 +320,6 @@ export class TranscriptionService {
 
     this._break_marker = null;
 
-    this._selectedSegment = null;
     this.state = 'ANNOTATED';
 
     this._statistic = {

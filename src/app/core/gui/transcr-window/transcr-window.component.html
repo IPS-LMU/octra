@@ -39,6 +39,7 @@
     ></app-audio-navigation>
     <app-loupe #loupe id="loupe"
                (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
+               [audiochunk]="audiochunk"
     ></app-loupe>
     <app-transcr-editor #editor id="trancr"
                         (marker_insert)="onMarkerInsert($event)"
@@ -52,7 +53,7 @@
             <div class="col-xs-12">
                 <div class="btn-toolbar" role="toolbar">
                     <div class="btn-group btn-group-justified" role="group" aria-label="...">
-                        <a class="btn btn-default btn-raised" (click)="save();goToSegment('left');">
+                        <a class="btn btn-default btn-raised" (click)="save();doit('left');">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'visible-xs visible-sm visible-md': responsive && !easymode}">
                                 <span class="glyphicon glyphicon-floppy-save"></span>&
@@ -72,7 +73,7 @@
                             {{"general.save" | translate}} & {{"general.close" | translate}}
                             </span>
                         </a>
-                        <a class="btn btn-default btn-raised" (click)="save();goToSegment('right');">
+                        <a class="btn btn-default btn-raised" (click)="save();doit('right');">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'visible-xs visible-sm visible-md': responsive && !easymode}">
                                 <span class="glyphicon glyphicon-floppy-save"></span>&

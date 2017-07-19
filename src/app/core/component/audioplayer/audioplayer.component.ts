@@ -286,8 +286,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
               switch (shortc) {
                 case('play_pause'):
                   this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
-                  console.log('shortcut play pause triggered');
-                  if (this.audiochunk.isPlaying) {
+                                    if (this.audiochunk.isPlaying) {
                     this.pausePlayback();
                   } else {
                     this.startPlayback();
@@ -323,27 +322,13 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     }
-  }
+  };
 
   /**
    * playSelection() plays the selected signal fragment. Playback start and duration
    * depend on the current selection.
    */
-  private playSelection(computetimes: boolean = true) {
-
-    // define callback for end event
-    const endPlaybackEvent = () => {
-      this.audiomanager.audioplaying = false;
-      this.audiomanager.javascriptNode.disconnect();
-
-      if (this.audiomanager.replay === true) {
-        this.audiochunk.playposition = this.audiochunk.time.start.clone();
-        this.playSelection();
-      }
-
-      this.audiomanager.stepbackward = false;
-      this.audiomanager.paused = false;
-    };
+  private playSelection() {
 
     const drawFunc = () => {
       this.audiochunk.updatePlayPosition();
@@ -351,9 +336,18 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
     this.audiochunk.startpos = this.audiochunk.playposition.clone();
-
-    this.audiochunk.startPlayback(drawFunc, endPlaybackEvent);
+    this.audiochunk.startPlayback(drawFunc, this.onEndPlayback);
   }
+
+  private onEndPlayback = () => {
+    if (this.audiomanager.replay) {
+      this.audiochunk.playposition = this.audiochunk.time.start.clone();
+      this.playSelection();
+    }
+
+    this.audiomanager.stepbackward = false;
+    this.audiomanager.paused = false;
+  };
 
   /**
    * stops the playback and sets the current playcursor position to 0.
@@ -371,8 +365,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
    * pause playback
    */
   public pausePlayback() {
-    console.log('try pause');
-    this.audiochunk.pausePlayback();
+        this.audiochunk.pausePlayback();
   }
 
   /**
@@ -380,7 +373,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   public startPlayback(computetimes: boolean = true) {
     if (!this.audiochunk.isPlaying) {
-      this.playSelection(computetimes);
+      this.playSelection();
     }
   }
 
@@ -437,20 +430,6 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   private drawPlayCursor = () => {
     // set new position of playcursor
-
-    /*
-     const playduration = this.audiochunk.playposition.unix - this.audiochunk.selection.start.unix;
-
-     const progress = Math.min(
-     (playduration / (this.audiochunk.selection.duration.unix)) * this.audiochunk.speed, 1);
-     // console.log(`progress ${progress} playpos ${this.audiochunk.playposition.unix}, duration ${this.audiochunk.selection.duration.unix}, speed ${this.audiochunk.speed}`);
-     const absX = Math.max(0, this.ap.Distance * progress);
-     console.log('absX ' + (playduration/1000));
-     // console.log(`absX ${absX}, distance ${this.ap.Distance}, length ${this.audiochunk.selection.duration.seconds}`);
-     this.changePlayCursorAbsX(absX);
-
-     */
-
     const absX = this.ap.audioTCalculator.samplestoAbsX(this.audiochunk.playposition.samples);
     this.changePlayCursorAbsX(absX);
     const line = this.ap.Line;

@@ -147,7 +147,6 @@ export class AudioManager {
 
       const selection = new AudioSelection(new AudioTime(0, samplerate), new AudioTime(audiobuffer.length, samplerate));
       result._mainchunk = new AudioChunk(selection, result);
-      console.log('mainchunk ' + result._mainchunk.time.duration.seconds);
 
       result.newstate = 'ready';
       result.afterdecoded.emit(result.ressource);
@@ -211,8 +210,7 @@ export class AudioManager {
       return true;
     }
 
-    console.log('not playing');
-    return false;
+        return false;
   }
 
   public startPlayback(begintime: AudioTime, duration: AudioTime = new AudioTime(0, this._ressource.info.samplerate),
@@ -237,6 +235,8 @@ export class AudioManager {
       this._paused = false;
 
       this._source.onended = () => {
+        this.audioplaying = false;
+        this.javascriptNode.disconnect();
         endPlayback();
         if (this._playbackstate === 'started' && !this._stepbackward) {
           this.statechange.emit({
@@ -255,14 +255,13 @@ export class AudioManager {
       this._endplaying = this._startplaying + (duration.unix / speed);
       this._javascriptNode.onaudioprocess = drawFunc;
 
-      console.log('start AT ' + begintime.seconds);
 
       if (duration.samples <= 0) {
         // important: source.start needs seconds, not samples!
-        this._source.start(0, begintime.seconds);
+        this._source.start(0, Math.max(0, begintime.seconds));
       } else {
         // important: source.start needs seconds, not samples!
-        this._source.start(0, begintime.seconds, duration.seconds);
+        this._source.start(0, Math.max(0, begintime.seconds), duration.seconds);
       }
       this.statechange.emit({
         state: 'started',

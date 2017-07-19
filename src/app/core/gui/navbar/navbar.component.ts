@@ -124,8 +124,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   getURI(file: File): string {
-    console.log(file);
-    return 'data:' + file.type + ';charset:' + file.encoding + ',' + encodeURIComponent(file.content);
+        return 'data:' + file.type + ';charset:' + file.encoding + ',' + encodeURIComponent(file.content);
   }
 
   sanitize(url: string): SafeUrl {

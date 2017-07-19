@@ -252,7 +252,6 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       if (selection.length > 0) {
         selection.checkSelection();
         this.segmentselected = false;
-        console.log(`${selection.start.seconds} , ${selection.end.seconds}}`);
         this.audiochunk_down = new AudioChunk(this.audiochunk_top.selection.clone(), this.audiomanager);
         this.loupe.update();
       }
@@ -279,7 +278,6 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       }, true);
     }
 
-    const a = this.viewer.getLocation();
     this.mini_loupecoord.y = -this.miniloupe.Settings.height / 2;
     this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
       this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
@@ -319,7 +317,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         ? new AudioTime(cursor + half_rate, this.audiomanager.ressource.info.samplerate)
         : this.audiomanager.ressource.info.duration.clone();
 
-      audiochunk = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
+      this.audiochunk_loupe = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
     }
   }
 
@@ -334,7 +332,6 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.audiochunk_down = new AudioChunk(new AudioSelection(start, segment.time), this.audiomanager);
-    console.log('enter segment ' + $event.index);
     this.loupe.update();
   }
 

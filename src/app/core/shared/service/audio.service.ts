@@ -62,10 +62,8 @@ export class AudioService {
             this.registerAudioManager(manager);
 
             Logger.info('Audio (Length: ' + manager.ressource.size + ') loaded. Decode now...');
-            console.log('audiomanager finished decoding');
-            this.afterloaded.emit({status: 'success'});
-            console.log(manager);
-            callback({});
+                        this.afterloaded.emit({status: 'success'});
+                        callback({});
           }
         );
       },

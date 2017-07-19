@@ -178,8 +178,7 @@ export class TranscriptionService {
     this.navbarServ.exportformats.samplerate = this.audiomanager.ressource.info.samplerate;
     this.navbarServ.exportformats.filesize = Functions.getFileSize(this.audiomanager.ressource.size);
     this.navbarServ.exportformats.duration = this.audiomanager.ressource.info.duration.unix;
-    console.log('dur2 ' + this.audiomanager.ressource.info.duration.unix);
-  }
+      }
 
   public getTranscriptString(converter: Converter): string {
     let result: File;

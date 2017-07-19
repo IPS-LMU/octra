@@ -70,8 +70,7 @@ export class Segments {
         const next_segment = this.segments[index + 1];
         const transcription: string = this.segments[index].transcript;
         // TODO change 'P' !
-        console.log(breakmarker);
-        if (next_segment.transcript !== breakmarker && transcription !== breakmarker) {
+                if (next_segment.transcript !== breakmarker && transcription !== breakmarker) {
           // concat transcripts
           if (next_segment.transcript !== '' && transcription !== '') {
             next_segment.transcript = transcription + ' ' + next_segment.transcript;
@@ -205,6 +204,7 @@ export class Segments {
       if (i > 0) {
         const last = this.segments[i - 1];
         if (last.time.samples === this.segments[i].time.samples) {
+          console.log("removed segment");
           remove.push(i);
         }
       }

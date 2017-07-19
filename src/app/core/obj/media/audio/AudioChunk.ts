@@ -150,7 +150,6 @@ export class AudioChunk {
     }
 
     if (!this._audiomanger.audioplaying) {
-      console.log(`play from ${this.selection.start.seconds} to ${this.selection.end.seconds}`);
       this._state = PlayBackState.STARTED;
 
       this._lastplayedpos = this.playposition.clone();

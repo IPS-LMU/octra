@@ -11,7 +11,6 @@ import {SubscriptionManager} from '../../core/shared';
 import {SettingsService} from '../../core/shared/service/settings.service';
 import {SessionService} from '../../core/shared/service/session.service';
 import {Segment} from '../../core/obj/Segment';
-import {isNullOrUndefined} from 'util';
 import {AudioManager} from '../../core/obj/media/audio/AudioManager';
 import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
 
@@ -71,7 +70,6 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     this.audiochunk = this.audiomanager.mainchunk;
     this.audiochunk.speed = 1;
     this.audiochunk.volume = 1;
-    console.log(this.audiochunk);
     this.settings.shortcuts = this.keyMap.register('AP', this.settings.shortcuts);
     this.shortcuts = this.settings.shortcuts;
     this.editor.Settings.markers = this.transcrService.guidelines.markers.items;
@@ -93,11 +91,22 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   }
 
   ngOnChanges(obj: any) {
-    console.log(obj);
   }
 
   test() {
-    return (isNullOrUndefined(this.audiochunk.playposition)) ? 0 : this.audiochunk.playposition.unix;
+    const selection: Selection = document.getSelection();
+    const cursorPos = selection.anchorOffset;
+    const oldContent = selection.anchorNode.nodeValue;
+    const t = jQuery(selection.anchorNode.parentElement);
+    console.log(t);
+    t.css(
+      {
+        border: '1px solid red'
+      }
+    );
+    const toInsert = 'InsertMe!';
+    const newContent = oldContent.substring(0, cursorPos) + toInsert + oldContent.substring(cursorPos);
+    selection.anchorNode.nodeValue = newContent;
   }
 
   onButtonClick(event: { type: string, timestamp: number }) {
@@ -185,7 +194,9 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     let seg_texts: string[] = html.split(
       /\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="[0-9]+">\s?/g
     );
+    console.log(seg_texts);
 
+    console.log(this.transcrService.annotation.levels[0].segments);
     const samples_array: number[] = [];
     html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)">\s?/g,
       function (match, g1, g2) {
@@ -197,9 +208,9 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
       return a.replace(/(<p>)|(<\/p>)/g, '');
     });
 
-    const anno_seg_length = this.transcrService.annotation.levels[0].segments.length;
 
     for (let i = 0; i < seg_texts.length; i++) {
+      const anno_seg_length = this.transcrService.annotation.levels[0].segments.length;
       const new_raw = this.transcrService.htmlToRaw(seg_texts[i]);
 
       if (i < anno_seg_length) {
@@ -208,32 +219,31 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
         segment.transcript = new_raw;
         if (i < seg_texts.length - 1) {
           segment.time.samples = samples_array[i];
-        } else {
-          segment.time.samples = this.audiomanager.ressource.info.duration.samples;
         }
 
         this.transcrService.annotation.levels[0].segments.change(i, segment);
       } else {
         // add new segments
-        console.log('new segment');
-        this.transcrService.annotation.levels[0].segments.add(samples_array[i], new_raw);
+        console.log(samples_array);
+        console.log(i - 1);
 
-        const seg: number = this.transcrService.annotation.levels[0].segments.getSegmentBySamplePosition(samples_array[i]);
-        if (seg > -1) {
-          if (seg === anno_seg_length - 1) {
-            this.transcrService.annotation.levels[0].segments.get(seg).time.samples = this.audiomanager.ressource.info.duration.samples;
-          }
+        if (i === seg_texts.length - 1) {
+          this.transcrService.annotation.levels[0].segments.add(this.audiochunk.time.end.samples, new_raw);
+        } else {
+          this.transcrService.annotation.levels[0].segments.add(samples_array[i - 1], new_raw);
         }
+
+        console.log(this.transcrService.annotation.levels[0].segments);
       }
     }
 
+    const anno_seg_length = this.transcrService.annotation.levels[0].segments.length;
     if (anno_seg_length > seg_texts.length) {
       // remove left segments
-      console.log('remove segments');
       this.transcrService.annotation.levels[0].segments.segments.splice(seg_texts.length, (anno_seg_length - seg_texts.length));
       // because last segment was removed
       const seg = this.transcrService.annotation.levels[0].segments.get(seg_texts.length - 1);
-      seg.time.samples = this.audiomanager.ressource.info.duration.samples;
+      seg.time.samples = this.audiochunk.time.end.samples;
     }
   }
 }

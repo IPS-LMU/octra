@@ -13,6 +13,8 @@ import {AudioTime} from '../../obj/media/audio/AudioTime';
 import {AudioService} from '../../shared/service/audio.service';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {AudioChunk} from '../../obj/media/audio/AudioChunk';
+import {isNumeric} from 'rxjs/util/isNumeric';
+
 declare var window: any;
 
 @Component({
@@ -32,6 +34,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Output('marker_insert') marker_insert: EventEmitter<string> = new EventEmitter<string>();
   @Output('marker_click') marker_click: EventEmitter<string> = new EventEmitter<string>();
   @Output('typing') typing: EventEmitter<string> = new EventEmitter<string>();
+  @Output('boundaryclicked') boundaryclicked: EventEmitter<number> = new EventEmitter<number>();
 
   private _settings: TranscrEditorConfig;
   private subscrmanager: SubscriptionManager;
@@ -361,11 +364,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     // set popover
     jQuery('.btn-icon-text[data-samples]').off('click');
     setTimeout(() => {
-      jQuery('.btn-icon-text[data-samples]').on('click', function (event) {
-        const jqueryobj = jQuery(this);
-        jqueryobj.css({
-          'background-color': '#5add80'
-        });
+      jQuery('.btn-icon-text[data-samples]').on('click', (event) => {
+        const jqueryobj = jQuery(event.target);
+        const samples = jqueryobj.attr('data-samples');
+
+        if (isNumeric(samples)) {
+          this.boundaryclicked.emit(Number(samples));
+        }
       })
         .on('mouseover', (event) => {
           const jqueryobj = jQuery(event.target);
@@ -383,6 +388,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
               'margin-left': (event.target.offsetLeft - (width / 2)) + 'px',
               'margin-top': (jqueryobj.offset().top - editor_pos.top - height - 10) + 'px',
               'display': 'inherit'
+            });
+
+            jqueryobj.css({
+              'cursor': 'pointer'
             });
             const timespan = new TimespanPipe();
             const text = timespan.transform(time.unix.toString());

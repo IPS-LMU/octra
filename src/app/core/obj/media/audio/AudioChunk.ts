@@ -186,8 +186,11 @@ export class AudioChunk {
   }
 
   public pausePlayback(): boolean {
+    console.log('plapos before ' + this.playposition.seconds);
     if (this._audiomanger.pausePlayback()) {
+      console.log('plapos middle ' + this.playposition.seconds);
       this.setState(PlayBackState.PAUSED);
+      console.log('plapos after ' + this.playposition.seconds);
       return true;
     }
 
@@ -232,7 +235,7 @@ export class AudioChunk {
       if (this._audiomanger.audioplaying) {
         const playduration = (this._audiomanger.endplaying - timestamp) * this.speed;
         this._playposition.unix = this.selection.start.unix + (this.selection.duration.unix) - playduration;
-      } else {
+      } else if (this.state === PlayBackState.ENDED) {
         this._playposition = this.selection.end.clone();
       }
     }
@@ -255,5 +258,9 @@ export class AudioChunk {
 
   public get isPlaying(): boolean {
     return this._state === PlayBackState.PLAYING;
+  }
+
+  public clone() {
+    return new AudioChunk(this.time.clone(), this.audiomanager, this.selection);
   }
 }

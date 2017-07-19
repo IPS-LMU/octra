@@ -97,9 +97,9 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     this.audiomanager = this.audio.audiomanagers[0];
-    this.audiochunk_top = this.audiomanager.mainchunk;
-    this.audiochunk_down = new AudioChunk(new AudioSelection(new AudioTime(0, this.audiomanager.ressource.info.samplerate), this.audiochunk_top.time.end.clone()), this.audiomanager);
-    this.audiochunk_loupe = new AudioChunk(new AudioSelection(new AudioTime(0, this.audiomanager.ressource.info.samplerate), this.audiochunk_top.time.end.clone()), this.audiomanager);
+    this.audiochunk_top = this.audiomanager.mainchunk.clone();
+    this.audiochunk_down = this.audiomanager.mainchunk.clone();
+    this.audiochunk_loupe = this.audiomanager.mainchunk.clone();
     this.viewer.Settings.shortcuts = this.keyMap.register('AV', this.viewer.Settings.shortcuts);
 
     this.viewer.Settings.multi_line = false;
@@ -273,9 +273,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       this.audiochunk_top.selection.end.samples = this.viewer.av.Mousecursor.timePos.samples +
         this.audiomanager.ressource.info.samplerate / 10;
       this.audiochunk_top.startPlayback(() => {
-      }, () => {
-        this.audiomanager.audioplaying = false;
-      }, true);
+      }, () => {}, true);
     }
 
     this.mini_loupecoord.y = -this.miniloupe.Settings.height / 2;

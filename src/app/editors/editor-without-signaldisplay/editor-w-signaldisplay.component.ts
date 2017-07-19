@@ -13,6 +13,7 @@ import {SessionService} from '../../core/shared/service/session.service';
 import {Segment} from '../../core/obj/Segment';
 import {AudioManager} from '../../core/obj/media/audio/AudioManager';
 import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
+import {AudioTime} from '../../core/obj/media/audio/AudioTime';
 
 @Component({
   selector: 'app-audioplayer-gui',
@@ -67,7 +68,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
   ngOnInit() {
     this.audiomanager = this.audio.audiomanagers[0];
-    this.audiochunk = this.audiomanager.mainchunk;
+    this.audiochunk = this.audiomanager.mainchunk.clone();
     this.audiochunk.speed = 1;
     this.audiochunk.volume = 1;
     this.settings.shortcuts = this.keyMap.register('AP', this.settings.shortcuts);
@@ -175,6 +176,18 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     }
   }
 
+  onBoundaryClicked(samples: number) {
+    const i: number = this.transcrService.annotation.levels[0].segments.getSegmentBySamplePosition(samples);
+
+    if (i > -1) {
+      const start = (i > 0) ? this.transcrService.annotation.levels[0].segments.get(i - 1).time.samples : 0;
+      this.audiochunk.startpos = new AudioTime(start, this.audiomanager.ressource.info.samplerate);
+      this.audiochunk.selection.end = this.transcrService.annotation.levels[0].segments.get(i).time.clone();
+      this.audioplayer.update();
+      this.audioplayer.startPlayback();
+    }
+  }
+
   onMarkerInsert(marker_code: string) {
     if (this.projectsettings.logging.forced === true) {
       this.uiService.addElementFromEvent('marker_insert', {value: marker_code}, Date.now(), 'editor');
@@ -188,7 +201,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     }
   }
 
-  private saveTranscript() {
+  saveTranscript() {
     const html: string = this.editor.html.replace(/&nbsp;/g, ' ');
     // split text at the position of every boundary marker
     let seg_texts: string[] = html.split(

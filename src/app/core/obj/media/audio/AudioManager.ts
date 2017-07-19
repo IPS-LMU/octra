@@ -68,11 +68,6 @@ export class AudioManager {
     return this._javascriptNode;
   }
 
-
-  set audioplaying(value: boolean) {
-    this._audioplaying = value;
-  }
-
   get audioplaying(): boolean {
     return this._audioplaying;
   }
@@ -208,9 +203,11 @@ export class AudioManager {
       this._source.stop(0);
 
       return true;
+    } else {
+      console.log('cant pause because not playing');
     }
 
-        return false;
+    return false;
   }
 
   public startPlayback(begintime: AudioTime, duration: AudioTime = new AudioTime(0, this._ressource.info.samplerate),
@@ -235,7 +232,7 @@ export class AudioManager {
       this._paused = false;
 
       this._source.onended = () => {
-        this.audioplaying = false;
+        this._audioplaying = false;
         this.javascriptNode.disconnect();
         endPlayback();
         if (this._playbackstate === 'started' && !this._stepbackward) {

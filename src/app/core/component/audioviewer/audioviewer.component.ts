@@ -97,10 +97,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   // for animation of playcursor
   private anim: CanvasAnimation;
 
-  private drawing = false;
-
   public audioplaying = false;
-  private last_frame: boolean;
 
   private step_backward = false;
 
@@ -109,8 +106,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   private height = 0;
   private innerWidth = 0;
   private oldInnerWidth = 0;
-  private audiotimer: any;
-  private resizing = false;
 
   private _deactivate_shortcuts = false;
 
@@ -166,6 +161,30 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     return this.audiochunk.audiomanager.ressource;
   }
 
+  /**
+   * get the max size possible of an number in px
+   * @param num
+   * @param d
+   * @returns {string}
+   */
+  private static getmaxString(num: number, d: number): string {
+    let result = '';
+
+    for (let i = num; i > 1; i = i / 10) {
+      result += '9';
+    }
+
+    if (d > 0) {
+      result += '.';
+    }
+
+    for (let i = 0; i < d; i++) {
+      result += '9';
+    }
+
+    return result;
+  }
+
   constructor(private audio: AudioService,
               public av: AudioviewerService,
               private transcr: TranscriptionService,
@@ -217,7 +236,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           (current.time.start.samples !== previous.time.start.samples &&
           current.time.end.samples !== previous.time.end.samples)) {
           // audiochunk changed
-          console.log('ok changed');
           this.initialize();
           this.update(true);
         }
@@ -269,7 +287,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       console.error('audio channel is null');
     }
     this.oldInnerWidth = this.innerWidth;
-  }
+  };
 
   /**
    * crop audioviewer
@@ -398,9 +416,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    */
   clearDisplay(line_num) {
     // get canvas
-    const play_c = this.playcanvas;
-    const overlay_c = this.overlaycanvas;
-    const mouse_c = this.mousecanvas;
     const line_obj = this.av.LinesArray[line_num];
 
     if (!isNullOrUndefined(line_obj)) {
@@ -565,7 +580,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             (begin.time.samples < line_start.samples && segment.time.samples > line_end.samples)
           ) {
             // sample in the lines space
-            const beginX = this.av.audioTCalculator.samplestoAbsX(begin.time.samples);
             const line_num1 = startline.number;
             const line_num2 = endline.number;
 
@@ -866,7 +880,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                           const absX = this.av.audioTCalculator.samplestoAbsX(
                             this.transcr.annotation.levels[0].segments.get(segment_i).time.samples
                           );
-                          this.audiochunk.selection = boundary_select;
+                          this.audiochunk.selection = boundary_select.clone();
                           this.av.drawnselection = boundary_select.clone();
                           this.selchange.emit(this.audiochunk.selection);
                           this.drawSegments();
@@ -891,7 +905,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                             this.audiochunk.playposition.samples = this.audiochunk.selection.start.samples;
                             this.changePlayCursorSamples(this.audiochunk.selection.start.samples);
                             this.drawPlayCursorOnly(this.av.LastLine);
-                            this.audiochunk.stopPlayback(this.playSelection);
+                            this.audiochunk.stopPlayback(() => {
+                                this.audiochunk.selection = boundary_select.clone();
+                                this.playSelection();
+                              }
+                            );
                           }
 
                           if (!this.Settings.multi_line) {
@@ -984,13 +1002,25 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    * playSelection() plays the selected signal fragment or the selection in this chunk
    */
   playSelection = () => {
-
     const drawFunc = () => {
       this.audiochunk.updatePlayPosition();
       this.anim.requestFrame(this.drawPlayCursor);
     };
 
     this.audiochunk.startPlayback(drawFunc, this.onEndPlayBack);
+  };
+
+  /**
+   * method called when audioplayback ended
+   */
+  private onEndPlayBack = () => {
+    if (this.audiomanager.replay) {
+      this.audiochunk.playposition = this.audiochunk.time.start.clone();
+      this.playSelection();
+    }
+
+    this.audiomanager.stepbackward = false;
+    this.audiomanager.paused = false;
   };
 
   /**
@@ -1008,7 +1038,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    * pause audio playback
    */
   pausePlayback() {
-    this.audiomanager.pausePlayback();
+    this.audiochunk.pausePlayback();
   }
 
   /**
@@ -1016,6 +1046,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    */
   startPlayback() {
     if (!this.audiochunk.isPlaying && this.av.MouseClickPos.absX < this.av.AudioPxWidth - 5) {
+      this.audiochunk.startpos = this.audiochunk.playposition.clone();
       this.playSelection();
     }
   }
@@ -1121,6 +1152,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   /**
    * change samples of playcursor
    * @param new_value
+   * @param chunk
    */
   private changePlayCursorSamples = (new_value: number, chunk?: AudioChunk) => {
     this.av.PlayCursor.changeSamples(new_value, this.av.audioTCalculator, chunk);
@@ -1140,30 +1172,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     }
 
     return false;
-  }
-
-  /**
-   * get the max size possible of an number in px
-   * @param num
-   * @param d
-   * @returns {string}
-   */
-  private getmaxString(num: number, d: number): string {
-    let result = '';
-
-    for (let i = num; i > 1; i = i / 10) {
-      result += '9';
-    }
-
-    if (d > 0) {
-      result += '.';
-    }
-
-    for (let i = 0; i < d; i++) {
-      result += '9';
-    }
-
-    return result;
   }
 
   /**
@@ -1261,26 +1269,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       this.o_context.globalAlpha = 1.0;
     }
   };
-
-  /**
-   * method called when audioplayback ended
-   */
-  private onEndPlayBack = () => {
-    this.audiomanager.audioplaying = false;
-    this.audiomanager.javascriptNode.disconnect();
-
-    if (this.audiomanager.replay === true) {
-      this.audiochunk.playposition = this.audiochunk.time.start.clone();
-      this.playSelection();
-    }
-
-    this.audiomanager.stepbackward = false;
-    this.audiomanager.paused = false;
-  };
-
-  public onFocusLost($event) {
-    alert('leave');
-  }
 
   /**
    * adjust the view when window resized

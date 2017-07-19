@@ -116,8 +116,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           (current.time.start.samples !== previous.time.start.samples &&
           current.time.end.samples !== previous.time.end.samples)) {
           // audiochunk changed
-          console.log('ok changed in window');
-          this.loupe.update();
+                    this.loupe.update();
         }
       }
     }

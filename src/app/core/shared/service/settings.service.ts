@@ -254,8 +254,7 @@ export class SettingsService {
             const t: any = ev.target;
             AudioManager.decodeAudio(this.sessService.sessionfile.name, t.result).then(
               (audiomanager: AudioManager) => {
-                console.log('audiomanager registered');
-                audioService.registerAudioManager(audiomanager);
+                                audioService.registerAudioManager(audiomanager);
                 Logger.log('Audio loaded.');
                 this.audioloaded.emit({status: 'success'});
               }

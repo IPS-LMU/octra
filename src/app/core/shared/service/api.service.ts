@@ -171,8 +171,7 @@ export class APIService implements API {
       querytype: 'listprojects'
     };
 
-    console.log(cmd_json);
-    return this.post(cmd_json);
+        return this.post(cmd_json);
   }
 
   public post(json: any): Observable<Response> {

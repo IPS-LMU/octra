@@ -42,8 +42,7 @@ export class CircleLoupeComponent implements AfterViewInit, OnChanges {
 
   ngOnChanges(obj) {
     if (obj.hasOwnProperty('audiochunk')) {
-      console.log('audio chunk changed in circle');
-    }
+          }
   }
 
   ngAfterViewInit() {

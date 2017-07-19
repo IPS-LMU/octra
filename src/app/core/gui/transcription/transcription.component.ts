@@ -239,8 +239,7 @@ export class TranscriptionComponent implements OnInit,
       }
     ));
 
-    console.log(this.transcrService.feedback);
-  };
+      };
 
   ngAfterViewInit() {
     this.sessService.TranscriptionTime.start = Date.now();
@@ -313,8 +312,7 @@ export class TranscriptionComponent implements OnInit,
   }
 
   changeEditor(name: string) {
-    console.log(this.audiomanager.ressource.info.duration.unix);
-    if (this.projectsettings.logging.forced) {
+        if (this.projectsettings.logging.forced) {
       this.uiService.addElementFromEvent('editor_changed', {value: name}, Date.now(), '');
     }
 
@@ -477,7 +475,6 @@ export class TranscriptionComponent implements OnInit,
   }
 
   onSendButtonClick() {
-    console.log(this.feedback_form);
 
     if (this.feedback_form.valid) {
       this.saveFeedbackform();

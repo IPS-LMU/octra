@@ -143,9 +143,6 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
         reader.onloadend = (test) => {
 
           // check audio
-          console.log('NEW');
-          console.log(reader.result);
-          console.log(test);
 
           AudioManager.decodeAudio(file.file.name, reader.result).then(
             (audiomanager: AudioManager) => {
@@ -191,8 +188,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
           });
         };
 
-        console.log('read...');
-        reader.readAsArrayBuffer(file.file);
+                reader.readAsArrayBuffer(file.file);
         this.dropFile('.wav', true);
         this._files.push(file);
         break;

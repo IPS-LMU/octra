@@ -8,6 +8,7 @@ import {
   EventEmitter,
   HostListener,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
   Output,
@@ -21,6 +22,7 @@ import {AudioplayerService} from './service/audioplayer.service';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {AudioChunk} from '../../obj/media/audio/AudioChunk';
 import {AudioRessource} from '../../obj/media/audio/AudioRessource';
+import {isNullOrUndefined} from 'util';
 
 @Component({
   selector: 'app-audioplayer',
@@ -29,7 +31,7 @@ import {AudioRessource} from '../../obj/media/audio/AudioRessource';
   providers: [AudioplayerService],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
+export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
   @ViewChild('audioplay') apview;
   @ViewChild('ap_graphicscan') graphicscanRef: ElementRef;
   @ViewChild('ap_overlaycan') overlaynacRef: ElementRef;
@@ -125,6 +127,23 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
     this.startTimer();
   }
 
+  ngOnChanges(obj) {
+    if (obj.hasOwnProperty('audiochunk')) {
+      const previous: AudioChunk = obj.audiochunk.previousValue;
+      const current: AudioChunk = obj.audiochunk.currentValue;
+
+      if (!obj.audiochunk.firstChange) {
+        if ((isNullOrUndefined(previous) && !isNullOrUndefined(current)) ||
+          (current.time.start.samples !== previous.time.start.samples &&
+            current.time.end.samples !== previous.time.end.samples)) {
+          // audiochunk changed
+          this.ap.init(this.innerWidth, this.audiochunk);
+          this.update();
+        }
+      }
+    }
+  }
+
   ngOnDestroy() {
     this.stopPlayback();
     this.subscrmanager.destroy();
@@ -133,15 +152,16 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
   /**
    * updates the GUI
    */
-  private update = () => {
+  public update = () => {
     this.updateCanvasSizes();
     if (this.audiochunk.channel) {
       this.draw();
+      this.drawPlayCursor();
     }
 
     // update oldinnerWidth
     this.oldInnerWidth = this.innerWidth;
-  }
+  };
 
   /**
    * updateCanvasSizes is needed to update the size of the canvas respective to window resizing
@@ -286,7 +306,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
               switch (shortc) {
                 case('play_pause'):
                   this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
-                                    if (this.audiochunk.isPlaying) {
+                  if (this.audiochunk.isPlaying) {
                     this.pausePlayback();
                   } else {
                     this.startPlayback();
@@ -335,7 +355,6 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
       this.anim.requestFrame(this.drawPlayCursor);
     };
 
-    this.audiochunk.startpos = this.audiochunk.playposition.clone();
     this.audiochunk.startPlayback(drawFunc, this.onEndPlayback);
   }
 
@@ -365,7 +384,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
    * pause playback
    */
   public pausePlayback() {
-        this.audiochunk.pausePlayback();
+    this.audiochunk.pausePlayback();
   }
 
   /**
@@ -416,7 +435,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy {
   stepBackwardTime(duration_sec: number, back_sec: number) {
     this.audiochunk.stepBackwardTime(() => {
       this.audiochunk.playposition.samples = Math.max(0, (this.audiochunk.playposition.samples
-      - (Math.floor(back_sec * this.audioressource.info.samplerate))));
+        - (Math.floor(back_sec * this.audioressource.info.samplerate))));
       this.ap.PlayCursor.changeSamples(this.audiochunk.playposition.samples,
         this.ap.audioTCalculator, this.audiochunk);
       this.drawPlayCursorOnly(this.ap.LastLine);

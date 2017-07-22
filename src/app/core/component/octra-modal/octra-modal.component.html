@@ -98,7 +98,8 @@
                 <div class="form-group" [hidden]="!sendpro.checked">
                     <label for="bgProtocol" class="col-md-2 control-label">{{'general.protocol' | translate}}:</label>
                     <div class="col-md-10">
-                        <textarea *ngIf="bugreport.visible" class="form-control" #bgProtocol [innerHTML]="bugService.getText()" id="bgProtocol"
+                        <textarea *ngIf="bugreport.visible" class="form-control" #bgProtocol
+                                  [innerHTML]="bugService.getText()" id="bgProtocol"
                                   disabled></textarea>
                     </div>
                 </div>
@@ -123,7 +124,9 @@
     <modal-body>
         <h4>Audio files:</h4>
         <table class="table table-responsive table-striped">
-<tr><td>*.wav</td></tr>
+            <tr>
+                <td><span *ngFor="let elem of AppInfo.audioformats; let i = index">*{{elem.extension}}{{(i < AppInfo.audioformats.length - 1) ? ',' : ''}} </span></td>
+            </tr>
         </table>
         <h4>files for import:</h4>
         <table class="table table-responsive table-striped">

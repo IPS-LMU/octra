@@ -33,7 +33,7 @@ export class MediaRessource {
     } else {
       const extensionstart = fullname.lastIndexOf('.');
       this._name = fullname.substr(0, extensionstart);
-      this._extension = fullname.substr(extensionstart + 1);
+      this._extension = fullname.substr(extensionstart);
       this._size = size;
       this.source = source;
       this._content = content;

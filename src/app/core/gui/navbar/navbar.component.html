@@ -128,7 +128,7 @@
             </ul>
 
             <ul class="nav navbar-nav">
-                <ng-template ngFor let-editor [ngForOf]="AppInfo.editors">
+                <ng-template ngFor let-editor [ngForOf]="editors">
                     <li *ngIf="sessService.LoggedIn && navbarServ.show_interfaces && interfaceActive(editor.name)"
                         [ngClass]="{
                         'active': sessService.Interface === editor.name

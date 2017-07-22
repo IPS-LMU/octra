@@ -27,7 +27,7 @@ export class Functions {
 
     if (count === replace_arr.length) {
       for (let i = 0; i < replace_arr.length; i++) {
-        const replace_str = (replace_arr[i] != null) ? replace_arr[i].toString() : 'null';
+        const replace_str = (replace_arr[i] !== null) ? replace_arr[i].toString() : 'null';
 
         result = result.replace('{' + i + '}', replace_str);
       }

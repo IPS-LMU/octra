@@ -57,7 +57,7 @@ export class APIService implements API {
     if (
       project !== '' &&
       transcript.length > 0 &&
-      quality != null
+      quality !== null
     ) {
       const cmd_json = {
         querytype: 'continueannotation',
@@ -112,7 +112,7 @@ export class APIService implements API {
     if (
       project !== '' &&
       transcript.length > 0 &&
-      quality != null
+      quality !== null
     ) {
       const cmd_json = {
         querytype: 'continueannotation',
@@ -137,8 +137,8 @@ export class APIService implements API {
     comment = (comment) ? comment : '';
 
     if (
-      annotator != null && annotator !== '' &&
-      id != null && id > -1) {
+      annotator !== null && annotator !== '' &&
+      id !== null && id > -1) {
       const cmd_json = {
         querytype: 'endannotation',
         annotator: annotator,
@@ -154,8 +154,8 @@ export class APIService implements API {
 
   public getAudioURL(dir: string, src: string): string {
     if (
-      dir != null && dir !== '' &&
-      src != null && src !== ''
+      dir !== null && dir !== '' &&
+      src !== null && src !== ''
     ) {
       dir = this.sanitizer.sanitize(SecurityContext.URL, dir);
       src = this.sanitizer.sanitize(SecurityContext.URL, src);

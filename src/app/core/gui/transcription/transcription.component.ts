@@ -37,9 +37,9 @@ import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 import {Entry} from '../../shared/service/keymapping.service';
 import {Observable} from 'rxjs/Observable';
 import {ProjectConfiguration} from '../../obj/Settings/project-configuration';
-import {AppInfo} from '../../../app.info';
 import {NgForm} from '@angular/forms';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
+import {EditorComponents} from '../../../editors/components';
 
 @Component({
   selector: 'app-transcription',
@@ -214,6 +214,7 @@ export class TranscriptionComponent implements OnInit,
 
     this.sessService.annotation.sampleRate = this.audiomanager.ressource.info.samplerate;
     this.navbarServ.show_interfaces = this.settingsService.projectsettings.navigation.interfaces;
+    console.log('show interfaces ' + this.navbarServ.show_interfaces);
 
     // load guidelines on language change
     this.subscrmanager.add(this.langService.onLangChange.subscribe(
@@ -239,7 +240,7 @@ export class TranscriptionComponent implements OnInit,
       }
     ));
 
-      };
+  };
 
   ngAfterViewInit() {
     this.sessService.TranscriptionTime.start = Date.now();
@@ -312,17 +313,17 @@ export class TranscriptionComponent implements OnInit,
   }
 
   changeEditor(name: string) {
-        if (this.projectsettings.logging.forced) {
+    if (this.projectsettings.logging.forced) {
       this.uiService.addElementFromEvent('editor_changed', {value: name}, Date.now(), '');
     }
 
     let comp: any = null;
 
-    for (let i = 0; i < AppInfo.editors.length; i++) {
-      if (name === AppInfo.editors[i].name) {
+    for (let i = 0; i < EditorComponents.length; i++) {
+      if (name === EditorComponents[i].name) {
         this.sessService.Interface = name;
         this.interface = name;
-        comp = AppInfo.editors[i].editor;
+        comp = EditorComponents[i].editor;
         break;
       }
     }

@@ -1,13 +1,13 @@
 import {Logger} from '../../../shared/Logger';
 import {AudioRessource} from './AudioRessource';
 import {isNullOrUndefined} from 'util';
-import {AudioInfo} from './AudioInfo';
 import {EventEmitter} from '@angular/core';
 import {decodeAudioFile} from 'browser-signal-processing/ts/browser-signal-processing/browser-api/format-conversion';
 import {AudioTime} from './AudioTime';
 import {SourceType} from '../index';
 import {AudioChunk} from './AudioChunk';
 import {AudioSelection} from './AudioSelection';
+import {AudioFormat} from './AudioFormats/AudioFormat';
 
 export class AudioManager {
   get gainNode(): any {
@@ -110,38 +110,41 @@ export class AudioManager {
   private error: any;
   private newstate = 'uninitialized';
 
-  public static getSampleRateWav(buf: ArrayBuffer): number {
-    const bufferPart = buf.slice(24, 28);
-    const bufferView = new Uint16Array(bufferPart);
-
-    return bufferView[0];
+  public static getFileFormat(extension: string, audioformats: AudioFormat[]): AudioFormat {
+    for (let i = 0; i < audioformats.length; i++) {
+      if (audioformats[i].extension === extension) {
+        return audioformats[i];
+      }
+    }
+    return null;
   }
 
-  public static getBitRateWav(buf: ArrayBuffer): number {
-    const bufferPart = buf.slice(34, 36);
-    const bufferView = new Uint16Array(bufferPart);
-
-    return bufferView[0];
+  public static isValidFileName(filename: string, audioformats: AudioFormat[]): boolean {
+    return AudioManager.getFileFormat(filename, audioformats) === null;
   }
 
-  public static decodeAudio = (filename: string, buffer: ArrayBuffer): Promise<AudioManager> => {
+  public static decodeAudio = (filename: string, buffer: ArrayBuffer, audioformats: AudioFormat[]): Promise<AudioManager> => {
     Logger.log('Decode audio...');
 
-    const samplerate = AudioManager.getSampleRateWav(buffer);
-    const bitrate = AudioManager.getBitRateWav(buffer);
+    const audioformat: AudioFormat = AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats);
 
     const result = new AudioManager(filename);
+    const audioinfo = audioformat.getAudioInfo(buffer);
 
-    return decodeAudioFile(buffer, samplerate).then((audiobuffer: AudioBuffer) => {
+    return decodeAudioFile(buffer, audioinfo.samplerate).then((audiobuffer: AudioBuffer) => {
       Logger.log('Audio decoded.');
 
       result.ressource = new AudioRessource(filename, SourceType.ArrayBuffer,
-        new AudioInfo(samplerate, audiobuffer.length, bitrate),
-        buffer, buffer.byteLength);
+        audioinfo, buffer, buffer.byteLength);
+
+      // set duration is very important
+      result.ressource.info.duration.samples = audiobuffer.length;
       result.ressource.content = audiobuffer;
 
-      const selection = new AudioSelection(new AudioTime(0, samplerate), new AudioTime(audiobuffer.length, samplerate));
+      const selection = new AudioSelection(new AudioTime(0, audioinfo.samplerate), new AudioTime(audiobuffer.length, audioinfo.samplerate));
       result._mainchunk = new AudioChunk(selection, result);
+      console.log('dur audiomanager ' + result.ressource.info.duration.samples);
+      console.log('dur audiobuffer ' + audiobuffer.length);
 
       result.newstate = 'ready';
       result.afterdecoded.emit(result.ressource);

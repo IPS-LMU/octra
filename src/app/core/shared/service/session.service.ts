@@ -387,11 +387,7 @@ export class SessionService {
       // get audio file
       let audiofile;
       for (let i = 0; i < files.length; i++) {
-        const type: string = (files[i].file.type) ? files[i].file.type : 'unknown';
-
-        if (type === 'audio/x-wav' || type === 'audio/wav') {
-          audiofile = files[i].file;
-        }
+        audiofile = files[i].file;
       }
 
       if (!isNullOrUndefined(audiofile)) {

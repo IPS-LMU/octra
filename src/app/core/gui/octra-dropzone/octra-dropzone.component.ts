@@ -129,22 +129,22 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
       for (let j = 0; j < this.files.length; j++) {
         const file_any = this.files[j];
 
-        if (Functions.contains(file_any.file.name, '.wav')) {
+        if (AudioManager.isValidFileName(file_any.file.name, AppInfo.audioformats)) {
           audio_file = file_any;
         } else if (file_any.file.name === file.file.name) {
           data_file = file_any;
         }
       }
 
-      if (Functions.contains(file.file.name, '.wav')) {
+      if (AudioManager.isValidFileName(file.file.name, AppInfo.audioformats)) {
         file.status = 'progress';
         const reader = new FileReader();
+        const extension = file.file.name.substr(file.file.name.lastIndexOf('.'));
 
         reader.onloadend = (test) => {
 
           // check audio
-
-          AudioManager.decodeAudio(file.file.name, reader.result).then(
+          AudioManager.decodeAudio(file.file.name, reader.result, AppInfo.audioformats).then(
             (audiomanager: AudioManager) => {
               file.status = 'valid';
               this._oaudiofile = new OAudiofile();
@@ -152,12 +152,13 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
               this._oaudiofile.size = file.file.size;
               this._oaudiofile.duration = audiomanager.ressource.info.duration.samples;
               this._oaudiofile.samplerate = audiomanager.ressource.info.samplerate;
+
               this.checkState();
 
               // load import data
               for (let j = 0; j < this.dropzone.files.length; j++) {
                 const importfile = this.dropzone.files[j];
-                if (!Functions.contains(importfile.name, '.wav')) {
+                if (!AudioManager.isValidFileName(importfile.name, AppInfo.audioformats)) {
                   this.dropFile(importfile.name);
 
                   const newfile = {
@@ -165,7 +166,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
                     file: this.dropzone.files[j],
                     checked_converters: 0
                   };
-                  this.dropFile('.wav', true, true);
+                  this.dropFile(extension, true, true);
                   this._files.push(newfile);
                   this.isValidImportData(newfile);
                 }
@@ -174,7 +175,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
               // check for data already exist
               for (let j = 0; j < this.files.length; j++) {
                 const importfile = this.files[j].file;
-                if (!Functions.contains(importfile.name, '.wav')) {
+                if (!AudioManager.isValidFileName(importfile.name, AppInfo.audioformats)) {
                   this.files[j].status = 'progress';
                   this.files[j].checked_converters = 0;
                   this.isValidImportData(this.files[j]);
@@ -188,16 +189,22 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
           });
         };
 
-                reader.readAsArrayBuffer(file.file);
-        this.dropFile('.wav', true);
+        reader.readAsArrayBuffer(file.file);
+
+        // drop previous audio files
+        for (const h = 0; i < AppInfo.audioformats.length; i++) {
+          this.dropFile(AppInfo.audioformats[h].extension, true);
+        }
+
         this._files.push(file);
         break;
       } else if (!isNullOrUndefined(audio_file)) {
+        const extension = audio_file.name.substr(audio_file.name.lastIndexOf('.'));
         // load import data
         for (let j = 0; j < this.dropzone.files.length; j++) {
           const importfile = this.dropzone.files[j];
-          if (!Functions.contains(importfile.name, '.wav')) {
-            this.dropFile('.wav', true, true);
+          if (!Functions.contains(importfile.name, extension)) {
+            this.dropFile(extension, true, true);
 
             const newfile = {
               status: 'progress',

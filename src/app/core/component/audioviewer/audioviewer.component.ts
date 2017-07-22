@@ -65,7 +65,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   @Output('shortcuttriggered') shortcuttriggered = new EventEmitter<any>();
   @Output() alerttriggered = new EventEmitter<{ type: string, message: string }>();
 
-  @Output('pos_time') get pos_time(): number {
+  @Output('pos_time')
+  get pos_time(): number {
     return this.av.PlayCursor.time_pos.samples;
   }
 
@@ -234,7 +235,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       if (!obj.audiochunk.firstChange) {
         if ((isNullOrUndefined(previous) && !isNullOrUndefined(current)) ||
           (current.time.start.samples !== previous.time.start.samples &&
-          current.time.end.samples !== previous.time.end.samples)) {
+            current.time.end.samples !== previous.time.end.samples)) {
           // audiochunk changed
           this.initialize();
           this.update(true);

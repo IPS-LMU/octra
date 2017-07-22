@@ -59,8 +59,8 @@ export class OAnnotJSON implements IAnnotJSON {
     this.name = audio_file;
     this.sampleRate = samplerate;
 
-    if (audio_file.indexOf('.wav') > -1) {
-      this.name = audio_file.substr(0, audio_file.indexOf('.wav'));
+    if (audio_file.lastIndexOf('.') > -1) {
+      this.name = audio_file.substr(0, audio_file.lastIndexOf('.'));
     }
 
     if (!isNullOrUndefined(levels)) {

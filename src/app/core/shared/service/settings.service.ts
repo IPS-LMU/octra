@@ -15,6 +15,8 @@ import {Functions} from '../Functions';
 import {Observable} from 'rxjs/Observable';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
+import {WavFormat} from '../../obj/media/audio/AudioFormats/WavFormat';
+import {AppInfo} from '../../../app.info';
 
 @Injectable()
 export class SettingsService {
@@ -252,9 +254,9 @@ export class SettingsService {
 
           reader.onloadend = (ev) => {
             const t: any = ev.target;
-            AudioManager.decodeAudio(this.sessService.sessionfile.name, t.result).then(
+            AudioManager.decodeAudio(this.sessService.sessionfile.name, t.result, AppInfo.audioformats).then(
               (audiomanager: AudioManager) => {
-                                audioService.registerAudioManager(audiomanager);
+                audioService.registerAudioManager(audiomanager);
                 Logger.log('Audio loaded.');
                 this.audioloaded.emit({status: 'success'});
               }

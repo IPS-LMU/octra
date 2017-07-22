@@ -36,15 +36,18 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   @Output('act') act: EventEmitter<string> = new EventEmitter<string>();
   @Input('easymode') easymode = false;
 
-  @Output('shortcuttriggered') get shortcuttriggered(): EventEmitter<string> {
+  @Output('shortcuttriggered')
+  get shortcuttriggered(): EventEmitter<string> {
     return this.loupe.shortcuttriggered;
   }
 
-  @Output('marker_insert') get marker_insert(): EventEmitter<string> {
+  @Output('marker_insert')
+  get marker_insert(): EventEmitter<string> {
     return this.editor.marker_insert;
   }
 
-  @Output('marker_click') get marker_click(): EventEmitter<string> {
+  @Output('marker_click')
+  get marker_click(): EventEmitter<string> {
     return this.editor.marker_click;
   }
 
@@ -114,9 +117,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       if (!obj.audiochunk.firstChange) {
         if ((isNullOrUndefined(previous) && !isNullOrUndefined(current)) ||
           (current.time.start.samples !== previous.time.start.samples &&
-          current.time.end.samples !== previous.time.end.samples)) {
+            current.time.end.samples !== previous.time.end.samples)) {
           // audiochunk changed
-                    this.loupe.update();
+          this.loupe.update();
         }
       }
     }

@@ -19,7 +19,7 @@ export class MembersAreaGuard implements CanActivate {
       this.router.navigate(['/login']);
       return false;
     } else if (this.sessService.offline === true) {
-      if (this.sessService.file == null) {
+      if (this.sessService.file === null) {
         // navigate to reload-file
         this.router.navigate(['/user/transcr/reload-file']);
         return false;

@@ -24,7 +24,7 @@ export class SessionFile {
   }
 
   public static fromAny(element: any) {
-    if (element == null) {
+    if (element === null) {
       return null;
     }
 

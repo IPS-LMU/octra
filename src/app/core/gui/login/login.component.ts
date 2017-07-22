@@ -79,7 +79,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               private api: APIService,
               private cd: ChangeDetectorRef,
               private settingsService: SettingsService,
-              private modService: ModalService,
+              public modService: ModalService,
               private langService: TranslateService) {
     this.subscrmanager = new SubscriptionManager();
   }

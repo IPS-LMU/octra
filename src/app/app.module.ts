@@ -64,15 +64,23 @@ import {AgreementComponent} from './core/gui/agreement/agreement.component';
 import {BugReportService} from './core/shared/service/bug-report.service';
 import {OctraDropzoneComponent} from './core/gui/octra-dropzone/octra-dropzone.component';
 import {LoadeditorDirective} from './core/shared/directive/loadeditor.directive';
-import {EDITORS} from './app.info';
 import {NewsComponent} from './core/gui/news/news.component';
 import {FaqComponent} from './core/gui/faq/faq.component';
 import {ExpandDirective} from './core/gui/faq/expand.directive';
+import {LinearEditorComponent} from './editors/linear-editor/linear-editor.component';
+import {EditorWSignaldisplayComponent} from './editors/editor-without-signaldisplay/editor-w-signaldisplay.component';
+import {TwoDEditorComponent} from './editors/2D-editor/2D-editor.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
   return new LanguageLoader(http, './i18n/octra/octra_', '.json');
 }
+
+export const EDITORS: any[] = [
+  EditorWSignaldisplayComponent,
+  TwoDEditorComponent,
+  LinearEditorComponent
+];
 
 export const ngmodule = {
   declarations: [

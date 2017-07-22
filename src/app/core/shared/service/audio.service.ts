@@ -6,7 +6,7 @@ import {isNullOrUndefined} from 'util';
 import {Logger} from '../Logger';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {AudioRessource} from '../../obj/media/audio/AudioRessource';
+import {AppInfo} from '../../../app.info';
 
 @Injectable()
 export class AudioService {
@@ -57,13 +57,24 @@ export class AudioService {
     const request = this.http.get(url, options).subscribe(
       (result) => {
         const buffer = this.extractData(result);
-        AudioManager.decodeAudio('test.wav', buffer).then(
+        const regex: RegExp = new RegExp(/((%|-|\.|[A-ZÄÖÜß]|[a-zäöü]|_|[0-9])+)\.\w+/, 'g');
+        const matches: RegExpExecArray = regex.exec(url);
+
+        let filename = '';
+        if (matches !== null && matches[1].length > 0) {
+          console.log(matches + ' found');
+          filename = matches[1] + matches[3];
+        } else {
+          filename = url;
+        }
+
+        AudioManager.decodeAudio(filename, buffer, AppInfo.audioformats).then(
           (manager: AudioManager) => {
             this.registerAudioManager(manager);
 
             Logger.info('Audio (Length: ' + manager.ressource.size + ') loaded. Decode now...');
-                        this.afterloaded.emit({status: 'success'});
-                        callback({});
+            this.afterloaded.emit({status: 'success'});
+            callback({});
           }
         );
       },

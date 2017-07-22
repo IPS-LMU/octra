@@ -17,6 +17,7 @@ import {AudioviewerConfig} from '../config/av.config';
 import {TranslateService} from '@ngx-translate/core';
 import {isNullOrUndefined} from 'util';
 
+
 @Injectable()
 export class AudioviewerService extends AudioComponentService {
   set drawnselection(value: AudioSelection) {
@@ -118,28 +119,6 @@ export class AudioviewerService extends AudioComponentService {
   }
 
   /**
-   * sets the time of duration in seconds
-   */
-  /*
-   public updatePlayDuration() {
-   if (this.selection && this.selection.start.samples < this.selection.end.samples) {
-   this.audiomanager.playduration.samples = this.selection.end.samples - this.selection.start.samples;
-   } else if (this.Chunk && this.Chunk.time.start.samples >= 0 && this.Chunk.time.end.samples > this.Chunk.time.start.samples) {
-   const start_pos = this.audiomanager.playposition.samples;
-   this.audiomanager.playduration.samples = (this.Chunk.time.end.samples - start_pos);
-   } else {
-   this.audiomanager.playduration = new AudioTime(0, this.audiomanager.ressource.info.samplerate);
-   }
-   }*/
-
-  // TODO DELETE
-  /* public resetAudioMeta() {
-   super.resetAudioMeta();
-
-   this.selection = null;
-   }*/
-
-  /**
    * initializes audioviewer using inner width
    * @param innerWidth
    */
@@ -165,28 +144,6 @@ export class AudioviewerService extends AudioComponentService {
     this.PlayCursor = new PlayCursor(0, new AudioTime(0, this.audiomanager.ressource.info.samplerate), innerWidth);
     this.afterChannelInititialized(innerWidth);
   }
-
-  /**
-   * change the chunk date of the audioviewer
-   * @param start
-   * @param end
-   * @param innerWidth
-   */
-  /*
-   changeBuffer(start: AudioTime, end: AudioTime, innerWidth: number) {
-   this.Chunk.time = new AudioSelection(start.clone(), end.clone());
-   this.Chunk.selection = new AudioSelection(new AudioTime(0, this.audiomanager.ressource.info.samplerate),
-   new AudioTime(1, this.audiomanager.ressource.info.samplerate));
-   this._channel = this.audiomanager.getChannelBuffer(this.Chunk, innerWidth);
-   if (this._channel.length === 0) {
-   throw new Error('Channel Data Length is 0');
-   } else {
-   this.DurTime = new AudioTime(this.Chunk.time.length, this.audiomanager.ressource.info.samplerate);
-   this.afterChannelInititialized(innerWidth, false);
-   this.audiomanager.playposition = this.Chunk.time.start.clone();
-   }
-   }*/
-
 
   private calculateZoom(height: number, width: number, minmaxarray: number[]) {
     if (this.Settings.justify_signal_height) {
@@ -367,7 +324,6 @@ export class AudioviewerService extends AudioComponentService {
             } else {
               // set selection
               this.audiochunk.selection.end = new AudioTime(absXInTime, this.audiomanager.ressource.info.samplerate);
-              // console.log(`set selection start: ${this.audiochunk.selection.start.seconds} end: ${this.audiochunk.selection.end.seconds}`);
               this.audiochunk.selection.checkSelection();
               this._drawnselection = this.audiochunk.selection.clone();
               this.PlayCursor.changeSamples(this.audiochunk.playposition.samples, this.audioTCalculator, this.audiochunk);
@@ -434,7 +390,7 @@ export class AudioviewerService extends AudioComponentService {
       if (this.transcrService.annotation.levels[0].segments.length > 0) {
         for (i = 0; i < this.transcrService.annotation.levels[0].segments.length; i++) {
           if ((this.transcrService.annotation.levels[0].segments.get(i).time.samples >= absXTime - b_width_time
-            && this.transcrService.annotation.levels[0].segments.get(i).time.samples <= absXTime + b_width_time)
+              && this.transcrService.annotation.levels[0].segments.get(i).time.samples <= absXTime + b_width_time)
             && this.transcrService.annotation.levels[0].segments.get(i).time.samples !== this.audiomanager.ressource.info.duration.samples
           ) {
             const seg_after = (i < this.transcrService.annotation.levels[0].segments.length - 1)

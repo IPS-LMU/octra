@@ -16,16 +16,16 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
   @ViewChild('modal_guidelines') modal_guidelines: ModalComponent;
 
   @Input() guidelines = null;
-  private shown_guidelines: any = {};
+  public shown_guidelines: any = {};
 
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
-  private collapsed: any[][] = [];
+  public collapsed: any[][] = [];
   private entries = 0;
 
   private counter = 0;
   private video_players: any[] = [];
 
-  constructor(private transcrService: TranscriptionService,
+  constructor(public transcrService: TranscriptionService,
               private cd: ChangeDetectorRef,
               private lang: TranslateService,
               private settService: SettingsService) {

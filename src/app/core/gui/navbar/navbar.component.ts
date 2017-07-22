@@ -14,6 +14,8 @@ import {UserInteractionsService} from '../../shared/service/userInteractions.ser
 import {StatisticElem} from '../../obj/StatisticElement';
 import {SettingsService} from '../../shared/service/settings.service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {EDITORS} from '../../../app.module';
+import {EditorComponents} from '../../../editors/components';
 
 @Component({
   selector: 'app-navigation',
@@ -52,6 +54,10 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public get uiService(): UserInteractionsService {
     return this.navbarServ.uiService;
+  }
+
+  public get editors() {
+    return EditorComponents;
   }
 
   get dat(): string {
@@ -124,7 +130,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   getURI(file: File): string {
-        return 'data:' + file.type + ';charset:' + file.encoding + ',' + encodeURIComponent(file.content);
+    return 'data:' + file.type + ';charset:' + file.encoding + ',' + encodeURIComponent(file.content);
   }
 
   sanitize(url: string): SafeUrl {

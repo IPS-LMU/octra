@@ -10,10 +10,11 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import {AudioviewerComponent, AudioviewerService} from '../audioviewer';
+import {AudioviewerComponent} from '../audioviewer';
 import {AVMousePos} from '../../shared';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AudioChunk} from '../../obj/media/audio/AudioChunk';
+import {AudioviewerService} from '../audioviewer/service';
 declare var window: any;
 
 @Component({

@@ -112,6 +112,7 @@ export class AudioManager {
 
   public static getFileFormat(extension: string, audioformats: AudioFormat[]): AudioFormat {
     for (let i = 0; i < audioformats.length; i++) {
+      console.log(audioformats[i].extension + ' === ' + extension);
       if (audioformats[i].extension === extension) {
         return audioformats[i];
       }
@@ -120,11 +121,12 @@ export class AudioManager {
   }
 
   public static isValidFileName(filename: string, audioformats: AudioFormat[]): boolean {
-    return AudioManager.getFileFormat(filename, audioformats) === null;
+    console.log('check if ' + filename + 'is audiofile');
+    return AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats) !== null;
   }
 
   public static decodeAudio = (filename: string, buffer: ArrayBuffer, audioformats: AudioFormat[]): Promise<AudioManager> => {
-    Logger.log('Decode audio...');
+    Logger.log('Decode audio... ' + filename);
 
     const audioformat: AudioFormat = AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats);
 

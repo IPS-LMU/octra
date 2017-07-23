@@ -66,7 +66,7 @@ export class ReloadFileComponent implements OnInit {
         }
       }
     );
-  }
+  };
 
   onOfflineSubmit = () => {
     this.sessServ.beginLocalSession(this.dropzone.files, true, this.navigate,
@@ -76,7 +76,7 @@ export class ReloadFileComponent implements OnInit {
         }
       }
     );
-  }
+  };
 
   private showErrorMessage(err: string) {
     this.error = err;

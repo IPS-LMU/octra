@@ -117,6 +117,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
 
   public afterDrop = () => {
     this._oannotation = null;
+    console.log('drop');
     for (let i = 0; i < this.dropzone.files.length; i++) {
       const file = {
         status: 'progress',
@@ -136,6 +137,8 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
         }
       }
 
+      console.log('data');
+      console.log(data_file);
       if (AudioManager.isValidFileName(file.file.name, AppInfo.audioformats)) {
         file.status = 'progress';
         const reader = new FileReader();
@@ -192,14 +195,15 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
         reader.readAsArrayBuffer(file.file);
 
         // drop previous audio files
-        for (const h = 0; i < AppInfo.audioformats.length; i++) {
+        for (let h = 0; h < AppInfo.audioformats.length; h++) {
+          console.log('drop ' + AppInfo.audioformats[h].extension);
           this.dropFile(AppInfo.audioformats[h].extension, true);
         }
-
         this._files.push(file);
         break;
       } else if (!isNullOrUndefined(audio_file)) {
-        const extension = audio_file.name.substr(audio_file.name.lastIndexOf('.'));
+        const extension = audio_file.file.name.substr(audio_file.file.name.lastIndexOf('.'));
+        console.log('audio ext is ' + extension);
         // load import data
         for (let j = 0; j < this.dropzone.files.length; j++) {
           const importfile = this.dropzone.files[j];
@@ -215,6 +219,8 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
             this.isValidImportData(newfile);
           }
         }
+      } else {
+        console.log('audiofile is null');
       }
     }
   };

@@ -11,7 +11,7 @@ export class CTMConverter extends Converter {
     super();
     this._application = 'CTM';
     this._name = 'CTM';
-    this._extension = '.txt';
+    this._extension = '.ctm';
     this._website.title = '';
     this._website.url = '';
     this._conversion.export = false;

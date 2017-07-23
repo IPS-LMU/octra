@@ -3,6 +3,8 @@ import {LocalStorage, LocalStorageService, SessionStorage, SessionStorageService
 import {SessionFile} from '../../obj/SessionFile';
 import {isNullOrUndefined} from 'util';
 import {OAnnotJSON} from '../../obj/annotjson';
+import {AudioManager} from '../../obj/media/audio/AudioManager';
+import {AppInfo} from '../../../app.info';
 
 @Injectable()
 export class SessionService {
@@ -338,7 +340,7 @@ export class SessionService {
     this.sessStr.clear();
 
     return (isNullOrUndefined(this.sessStr.retrieve('session_key'))
-    && isNullOrUndefined(this.sessStr.retrieve('member_id')));
+      && isNullOrUndefined(this.sessStr.retrieve('member_id')));
   }
 
   public clearLocalStorage(): boolean {
@@ -350,7 +352,7 @@ export class SessionService {
     this.localStr.store('version', version);
 
     return (isNullOrUndefined(this.sessStr.retrieve('data_id'))
-    && isNullOrUndefined(this.sessStr.retrieve('audio_url')));
+      && isNullOrUndefined(this.sessStr.retrieve('audio_url')));
   }
 
   public save(key: string, value: any): boolean {
@@ -387,7 +389,10 @@ export class SessionService {
       // get audio file
       let audiofile;
       for (let i = 0; i < files.length; i++) {
-        audiofile = files[i].file;
+        if (AudioManager.isValidFileName(files[i].file.name, AppInfo.audioformats)) {
+          audiofile = files[i].file;
+          break;
+        }
       }
 
       if (!isNullOrUndefined(audiofile)) {

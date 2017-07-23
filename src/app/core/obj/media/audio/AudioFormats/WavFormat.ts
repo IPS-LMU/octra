@@ -7,16 +7,6 @@ export class WavFormat extends AudioFormat {
     this._extension = '.wav';
   }
 
-
-  public getAudioInfo(buffer: ArrayBuffer): AudioInfo {
-
-    const samplerate = this.getSampleRate(buffer);
-    const channels = this.getChannels(buffer);
-    const bitrate = this.getBitRate(buffer);
-    const duration = buffer.byteLength / (bitrate / 8);
-    return new AudioInfo(samplerate, duration, channels, bitrate);
-  }
-
   protected getChannels(buffer: ArrayBuffer): number {
     const bufferPart = buffer.slice(22, 24);
     const bufferView = new Uint16Array(bufferPart);
@@ -38,5 +28,16 @@ export class WavFormat extends AudioFormat {
 
     console.log('byteRate: ' + bufferView[0]);
     return bufferView[0];
+  }
+
+  protected isValid(buffer: ArrayBuffer): boolean {
+    let bufferPart = buffer.slice(0, 4);
+    let test1 = String.fromCharCode.apply(null, new Uint8Array(bufferPart));
+
+    bufferPart = buffer.slice(8, 12);
+    let test2 = String.fromCharCode.apply(null, new Uint8Array(bufferPart));
+    test1 = test1.slice(0, 4);
+    test2 = test2.slice(0, 4);
+    return ('' + test1 + '' === 'RIFF' && test2 === 'WAVE');
   }
 }

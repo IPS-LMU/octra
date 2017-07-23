@@ -129,7 +129,12 @@ export class AudioManager {
     const audioformat: AudioFormat = AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats);
 
     const result = new AudioManager(filename);
-    const audioinfo = audioformat.getAudioInfo(buffer);
+    let audioinfo = null;
+    try {
+      audioinfo = audioformat.getAudioInfo(buffer);
+    } catch (err) {
+      console.error(err.message);
+    }
 
     return decodeAudioFile(buffer, audioinfo.samplerate).then((audiobuffer: AudioBuffer) => {
       Logger.log('Audio decoded.');

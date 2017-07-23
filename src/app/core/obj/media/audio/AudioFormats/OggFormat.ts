@@ -14,8 +14,8 @@ export class OggFormat extends AudioFormat {
   }
 
   protected getSampleRate(buffer: ArrayBuffer): number {
-    const bufferPart = buffer.slice(40, 48);
-    const bufferView = new Uint32Array(bufferPart);
+    const bufferPart = buffer.slice(40, 42);
+    const bufferView = new Uint16Array(bufferPart);
     console.log(bufferView);
     console.log('Rate: ' + bufferView[0]);
     return bufferView[0];
@@ -27,5 +27,12 @@ export class OggFormat extends AudioFormat {
     console.log(bufferView);
 
     return bufferView[0];
+  }
+
+  protected isValid(buffer: ArrayBuffer): boolean {
+    const bufferPart = buffer.slice(29, 37);
+    let test = String.fromCharCode.apply(null, new Uint8Array(bufferPart));
+    test = test.slice(0, 6);
+    return ('' + test + '' === 'vorbis');
   }
 }

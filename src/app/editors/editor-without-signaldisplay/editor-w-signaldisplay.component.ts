@@ -184,7 +184,11 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
       this.audiochunk.startpos = new AudioTime(start, this.audiomanager.ressource.info.samplerate);
       this.audiochunk.selection.end = this.transcrService.annotation.levels[0].segments.get(i).time.clone();
       this.audioplayer.update();
-      this.audioplayer.startPlayback();
+      this.audioplayer.startPlayback().then(() => {
+        // set start pos and playback length to end of audio file
+        this.audiochunk.startpos = this.audiochunk.playposition.clone();
+      }).catch(() => {
+      });
     }
   }
 

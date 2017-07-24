@@ -348,14 +348,22 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
    * playSelection() plays the selected signal fragment. Playback start and duration
    * depend on the current selection.
    */
-  private playSelection() {
+  private playSelection(): Promise<void> {
 
-    const drawFunc = () => {
-      this.audiochunk.updatePlayPosition();
-      this.anim.requestFrame(this.drawPlayCursor);
-    };
+    return new Promise<void>((resolve, reject) => {
+      const drawFunc = () => {
+        this.audiochunk.updatePlayPosition();
+        this.anim.requestFrame(this.drawPlayCursor);
+      };
 
-    this.audiochunk.startPlayback(drawFunc, this.onEndPlayback);
+      this.audiochunk.startPlayback(drawFunc).then((played: boolean) => {
+          if (played) {
+            this.onEndPlayback();
+            resolve();
+          }
+        }
+      );
+    });
   }
 
   private onEndPlayback = () => {
@@ -390,10 +398,14 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   /**
    * start playback
    */
-  public startPlayback(computetimes: boolean = true) {
-    if (!this.audiochunk.isPlaying) {
-      this.playSelection();
-    }
+  public startPlayback(computetimes: boolean = true): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (!this.audiochunk.isPlaying) {
+        this.playSelection().then(resolve);
+      } else {
+        reject();
+      }
+    });
   }
 
   /**

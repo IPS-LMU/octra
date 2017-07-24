@@ -83,7 +83,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   };
 
   @Input('audiochunk') audiochunk: AudioChunk;
-  private _begintime: AudioTime = null;
 
   private graphicscanvas: HTMLCanvasElement = null;
   private overlaycanvas: HTMLCanvasElement = null;
@@ -251,7 +250,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   }
 
   public initialize() {
-    this._begintime = new AudioTime(0, this.audioressource.info.samplerate);
     this.av.initialize(this.innerWidth, this.audiochunk);
   }
 
@@ -777,7 +775,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       this.av.setMouseClickPosition(x, y, curr_line, $event, this.innerWidth).then((curr: Line) => {
         this.drawPlayCursorOnly(curr);
       });
-      this._begintime = this.audiochunk.playposition;
       this.drawSegments();
       this.drawCursor(this.av.LastLine);
       this.selchange.emit(this.audiochunk.selection);
@@ -1008,7 +1005,16 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       this.anim.requestFrame(this.drawPlayCursor);
     };
 
-    this.audiochunk.startPlayback(drawFunc, this.onEndPlayBack);
+    this.audiochunk.startPlayback(drawFunc).then((played: boolean) => {
+      console.log('ok3');
+      if (played) {
+        this.onEndPlayBack();
+        console.log('ok4');
+      }
+    }).catch((err) => {
+      console.log('HÄÄ');
+      console.log(err);
+    });
   };
 
   /**
@@ -1047,7 +1053,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    */
   startPlayback() {
     if (!this.audiochunk.isPlaying && this.av.MouseClickPos.absX < this.av.AudioPxWidth - 5) {
-      this.audiochunk.startpos = this.audiochunk.playposition.clone();
       this.playSelection();
     }
   }

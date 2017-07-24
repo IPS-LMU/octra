@@ -193,7 +193,9 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     }
   }
 
-  onSegmentSelected(num: number) {
+  onSegmentSelected(selection: AudioSelection) {
+    console.log('selected: ');
+    console.log(selection);
   }
 
   onMouseOver(cursor: AVMousePos) {
@@ -205,7 +207,6 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       this.audiochunk_lines.selection.end.samples = this.viewer.av.Mousecursor.timePos.samples +
         this.audiomanager.ressource.info.samplerate / 10;
       this.audiochunk_lines.startPlayback(() => {
-      }, () => {
       }, true);
     }
     setTimeout(() => {

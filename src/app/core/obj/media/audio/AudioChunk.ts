@@ -143,19 +143,23 @@ export class AudioChunk {
     return null;
   }
 
-  public startPlayback(drawFunc: () => void, endPlayback: () => void, playonhover: boolean = false): boolean {
+  public startPlayback(drawFunc: () => void, playonhover: boolean = false): Promise<boolean> {
 
-    if (isNullOrUndefined(this._selection) || this._selection.length === 0) {
-      this.selection = new AudioSelection(this.playposition.clone(), this.time.end.clone());
-    }
+    return new Promise<boolean>((resolve, reject) => {
+      if (isNullOrUndefined(this._selection) || this._selection.length === 0) {
+        this.selection = new AudioSelection(this.playposition.clone(), this.time.end.clone());
+      }
 
-    if (!this._audiomanger.audioplaying) {
-      this._state = PlayBackState.STARTED;
+      if (!this._audiomanger.audioplaying) {
+        this._state = PlayBackState.STARTED;
 
-      this._lastplayedpos = this.playposition.clone();
+        this._lastplayedpos = this.playposition.clone();
 
-      this._audiomanger.startPlayback(
-        this.selection.start, this.selection.duration, this._volume, this._speed, drawFunc, () => {
+        this.setState(PlayBackState.PLAYING);
+
+        return this._audiomanger.startPlayback(
+          this.selection.start, this.selection.duration, this._volume, this._speed, drawFunc, playonhover).then((result: boolean) => {
+          console.log('resolved');
           if (this.state !== PlayBackState.PAUSED && this.state !== PlayBackState.STOPPED) {
             this.setState(PlayBackState.ENDED);
           }
@@ -163,16 +167,16 @@ export class AudioChunk {
           if (this.state === PlayBackState.PAUSED) {
             this.startpos = this.playposition.clone();
           }
-          endPlayback();
-        }, playonhover
-      );
-
-      this.setState(PlayBackState.PLAYING);
-
-      return true;
-    }
-
-    return false;
+          resolve(result);
+        }).catch((err) => {
+          console.log('hm');
+          console.log(err);
+        });
+      } else {
+        console.log('ok2');
+        resolve(false);
+      }
+    });
   }
 
   public stopPlayback(callback: any = null): boolean {

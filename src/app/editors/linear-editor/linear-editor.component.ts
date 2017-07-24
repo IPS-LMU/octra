@@ -273,32 +273,13 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       this.audiochunk_top.selection.end.samples = this.viewer.av.Mousecursor.timePos.samples +
         this.audiomanager.ressource.info.samplerate / 10;
       this.audiochunk_top.startPlayback(() => {
-      }, () => {}, true);
+      }, true);
     }
 
     this.mini_loupecoord.y = -this.miniloupe.Settings.height / 2;
     this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
       this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
   }
-
-  /*
-   onMouseOver2(cursor: AVMousePos) {
-   this.mini_loupecoord.component = this.loupe;
-
-   if (!this.audio.audioplaying && this.sessService.playonhover) {
-   // play audio
-   this.audio.startPlayback(this.loupe.viewer.av.Mousecursor.timePos, new AudioTime(this.audio.samplerate / 10,
-   this.audio.samplerate), () => {
-   }, () => {
-   this.audio.audioplaying = false;
-   }, true);
-   }
-
-   this.mini_loupecoord.y = this.viewer.getLocation().y - this.miniloupe.Settings.height + 15;
-   this.changeArea(this.miniloupe, this.loupe.viewer, this.mini_loupecoord,
-   this.loupe.viewer.MouseCursor.timePos.samples, this.loupe.viewer.MouseCursor.relPos.x, this.factor);
-   }
-   */
 
   private changeArea(audiochunk: AudioChunk, viewer: AudioviewerComponent, coord: any,
                      cursor: number, relX: number, factor: number = 4) {

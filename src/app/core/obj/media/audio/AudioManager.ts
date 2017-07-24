@@ -221,64 +221,66 @@ export class AudioManager {
   }
 
   public startPlayback(begintime: AudioTime, duration: AudioTime = new AudioTime(0, this._ressource.info.samplerate),
-                       volume: number, speed: number, drawFunc: () => void, endPlayback: () => void,
-                       playonhover: boolean = false): boolean {
+                       volume: number, speed: number, drawFunc: () => void, playonhover: boolean = false): Promise<boolean> {
 
-    if (!this._audioplaying) {
-      this._playbackstate = 'started';
-      this._stepbackward = false;
-      this._source = this.getSource();
-      this._source.buffer = this._ressource.content;
-      this._javascriptNode = this._audiocontext.createScriptProcessor(2048, 1, 1);
+    return new Promise<boolean>((resolve, reject) => {
+      if (!this._audioplaying) {
+        console.log('play2');
+        this._playbackstate = 'started';
+        this._stepbackward = false;
+        this._source = this.getSource();
+        this._source.buffer = this._ressource.content;
+        this._javascriptNode = this._audiocontext.createScriptProcessor(2048, 1, 1);
 
-      // connect modules of Web Audio API
-      this._gainNode.gain.value = volume;
-      this._source.playbackRate.value = speed;
-      this._source.connect(this._gainNode);
-      this._javascriptNode.connect(this._audiocontext.destination);
-      this._gainNode.connect(this._audiocontext.destination);
+        // connect modules of Web Audio API
+        this._gainNode.gain.value = volume;
+        this._source.playbackRate.value = speed;
+        this._source.connect(this._gainNode);
+        this._javascriptNode.connect(this._audiocontext.destination);
+        this._gainNode.connect(this._audiocontext.destination);
 
-      this._audioplaying = true;
-      this._paused = false;
+        this._audioplaying = true;
+        this._paused = false;
 
-      this._source.onended = () => {
-        this._audioplaying = false;
-        this.javascriptNode.disconnect();
-        endPlayback();
-        if (this._playbackstate === 'started' && !this._stepbackward) {
-          this.statechange.emit({
-            state: 'ended',
-            playonhover: playonhover
-          });
+        this._source.onended = () => {
+          this._audioplaying = false;
+          this.javascriptNode.disconnect();
+          console.log('play ended');
+
+          if (this._playbackstate === 'started' && !this._stepbackward) {
+            this.statechange.emit({
+              state: 'ended',
+              playonhover: playonhover
+            });
+          } else {
+            this.statechange.emit({
+              state: this._playbackstate,
+              playonhover: playonhover
+            });
+          }
+          resolve(true);
+        };
+
+        this._startplaying = new Date().getTime();
+        this._endplaying = this._startplaying + (duration.unix / speed);
+        this._javascriptNode.onaudioprocess = drawFunc;
+
+
+        if (duration.samples <= 0) {
+          // important: source.start needs seconds, not samples!
+          this._source.start(0, Math.max(0, begintime.seconds));
         } else {
-          this.statechange.emit({
-            state: this._playbackstate,
-            playonhover: playonhover
-          });
+          // important: source.start needs seconds, not samples!
+          this._source.start(0, Math.max(0, begintime.seconds), duration.seconds);
         }
-      };
-
-      this._startplaying = new Date().getTime();
-      this._endplaying = this._startplaying + (duration.unix / speed);
-      this._javascriptNode.onaudioprocess = drawFunc;
-
-
-      if (duration.samples <= 0) {
-        // important: source.start needs seconds, not samples!
-        this._source.start(0, Math.max(0, begintime.seconds));
+        this.statechange.emit({
+          state: 'started',
+          playonhover: playonhover
+        });
       } else {
-        // important: source.start needs seconds, not samples!
-        this._source.start(0, Math.max(0, begintime.seconds), duration.seconds);
+        resolve(false)
       }
-      this.statechange.emit({
-        state: 'started',
-        playonhover: playonhover
-      });
-
-      return true;
-    }
-
-    return false;
+    });
   }
 
   public rePlayback(): boolean {

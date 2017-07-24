@@ -29,18 +29,6 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
               private cd: ChangeDetectorRef,
               private lang: TranslateService,
               private settService: SettingsService) {
-    /*
-     this.subscrmanager.add(
-     transcrService.guidelinesloaded.subscribe(
-     (guidelines) => {
-     this.init();
-     }
-     )
-     );
-     */
-    if (!isNullOrUndefined(this.transcrService.guidelines)) {
-      this.init();
-    }
   }
 
   get visible(): boolean {
@@ -54,22 +42,10 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
 
   }
 
-  init() {
-    this.entries = 0;
-    this.guidelines = this.transcrService.guidelines;
-
-    for (let i = 0; i < this.transcrService.guidelines.instructions.length; i++) {
-      this.entries += this.transcrService.guidelines.instructions[i].entries.length;
-    }
-
-    this.initVideoPlayers();
-
-    this.unCollapseAll();
-  }
-
   ngOnChanges($event) {
     if (!isNullOrUndefined($event.guidelines.currentValue)) {
       this.shown_guidelines = JSON.parse(JSON.stringify($event.guidelines.currentValue));
+      this.unCollapseAll();
     }
     if (isNullOrUndefined($event.guidelines.previousValue) && !isNullOrUndefined($event.guidelines.currentValue)) {
       setTimeout(() => {

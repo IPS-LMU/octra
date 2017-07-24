@@ -383,11 +383,12 @@ export class AudioviewerService extends AudioComponentService {
     this.audioTCalculator.audio_px_width = this.audio_px_w;
 
     if (!isNullOrUndefined(line) && this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly) {
-      const absXTime = (!this.audiomanager.audioplaying) ? this.mousecursor.timePos.samples : this.PlayCursor.time_pos.samples;
+      const absXTime = (!this.audiochunk.isPlaying) ? this.mousecursor.timePos.samples : this.audiochunk.playposition.samples;
+      console.log('was playing ' + this.audiochunk.isPlaying);
       let b_width_time = this.audioTCalculator.absXtoSamples2(this.Settings.boundaries.width * 2, this.audiochunk);
       b_width_time = Math.round(b_width_time);
 
-      if (this.transcrService.annotation.levels[0].segments.length > 0) {
+      if (this.transcrService.annotation.levels[0].segments.length > 0 && !this.audiochunk.isPlaying) {
         for (i = 0; i < this.transcrService.annotation.levels[0].segments.length; i++) {
           if ((this.transcrService.annotation.levels[0].segments.get(i).time.samples >= absXTime - b_width_time
               && this.transcrService.annotation.levels[0].segments.get(i).time.samples <= absXTime + b_width_time)
@@ -412,19 +413,19 @@ export class AudioviewerService extends AudioComponentService {
         }
       }
 
-      const selection: number = !isNullOrUndefined(this.audiochunk.selection) ? this.audiochunk.selection.length : 0;
+      const selection: number = !isNullOrUndefined(this.drawnselection) ? this.drawnselection.length : 0;
 
-      if (selection > 0 && absXTime >= this.audiochunk.selection.start.samples && absXTime <= this.audiochunk.selection.end.samples) {
+      if (selection > 0 && absXTime >= this.drawnselection.start.samples && absXTime <= this.drawnselection.end.samples) {
         // some part selected
-        const segm1 = this.transcrService.annotation.levels[0].segments.BetweenWhichSegment(this.audiochunk.selection.start.samples);
-        const segm2 = this.transcrService.annotation.levels[0].segments.BetweenWhichSegment(this.audiochunk.selection.end.samples);
+        const segm1 = this.transcrService.annotation.levels[0].segments.BetweenWhichSegment(this.drawnselection.start.samples);
+        const segm2 = this.transcrService.annotation.levels[0].segments.BetweenWhichSegment(this.drawnselection.end.samples);
 
         if (segm1 === null && segm2 === null || (segm1 === segm2 || (segm1.transcript === '' && segm2.transcript === ''))) {
-          if (this.audiochunk.selection.start.samples > 0) {
+          if (this.drawnselection.start.samples > 0) {
             // prevent setting boundary if first sample selected
-            this.transcrService.annotation.levels[0].segments.add(this.audiochunk.selection.start.samples);
+            this.transcrService.annotation.levels[0].segments.add(this.drawnselection.start.samples);
           }
-          this.transcrService.annotation.levels[0].segments.add(this.audiochunk.selection.end.samples);
+          this.transcrService.annotation.levels[0].segments.add(this.drawnselection.end.samples);
           return {
             type: 'add',
             seg_num: i,

@@ -41,6 +41,9 @@ import {AudioRessource} from '../../obj/media/audio/AudioRessource';
 })
 
 export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
+  get innerWidth(): number {
+    return this._innerWidth;
+  }
 
   /**
    *    TODO
@@ -104,7 +107,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   // size settings
   private width = 0;
   private height = 0;
-  private innerWidth = 0;
+  private _innerWidth = 0;
   private oldInnerWidth = 0;
 
   private _deactivate_shortcuts = false;
@@ -201,8 +204,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     this.anim = new CanvasAnimation(25);
 
     this.width = this.aview.elementRef.nativeElement.clientWidth;
-    this.innerWidth = this.width - this.Settings.margin.left - this.Settings.margin.right;
-    this.oldInnerWidth = this.innerWidth;
+    this._innerWidth = this.width - this.Settings.margin.left - this.Settings.margin.right;
+    this.oldInnerWidth = this._innerWidth;
 
     // initialize canvas
     this.graphicscanvas = this.graphicscanRef.nativeElement;
@@ -250,7 +253,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   }
 
   public initialize() {
-    this.av.initialize(this.innerWidth, this.audiochunk);
+    this.av.initialize(this._innerWidth, this.audiochunk);
   }
 
   /**
@@ -269,7 +272,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         this.drawSignal(i);
 
         if (this.Settings.cropping !== 'none') {
-          this.av.Mousecursor.relPos.x = this.innerWidth / 2;
+          this.av.Mousecursor.relPos.x = this._innerWidth / 2;
           this.drawCursor(this.av.LinesArray[i]);
           this.drawCropBorder();
         }
@@ -285,7 +288,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     } else {
       console.error('audio channel is null');
     }
-    this.oldInnerWidth = this.innerWidth;
+    this.oldInnerWidth = this._innerWidth;
   };
 
   /**
@@ -295,21 +298,21 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    */
   private crop(type: string, context: CanvasRenderingContext2D) {
     if (type === 'none' || type === 'circle') {
-      const radius = this.innerWidth / 2;
+      const radius = this._innerWidth / 2;
 
       if (radius > 0) {
         // crop Line
         context.globalAlpha = 1.0;
         context.save();
         context.beginPath();
-        context.arc(this.innerWidth / 2, this.height / 2, this.innerWidth / 2, 0, 2 * Math.PI, false);
+        context.arc(this._innerWidth / 2, this.height / 2, this._innerWidth / 2, 0, 2 * Math.PI, false);
         context.closePath();
         context.clip();
 
         this.m_context.globalAlpha = 1.0;
         this.m_context.save();
         this.m_context.beginPath();
-        this.m_context.arc(this.innerWidth / 2, this.height / 2, this.innerWidth / 2, 0, 2 * Math.PI, false);
+        this.m_context.arc(this._innerWidth / 2, this.height / 2, this._innerWidth / 2, 0, 2 * Math.PI, false);
         this.m_context.closePath();
         this.m_context.clip();
       }
@@ -321,9 +324,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    */
   updateCanvasSizes() {
     this.width = Number(this.aview.elementRef.nativeElement.clientWidth);
-    this.innerWidth = Number(this.width - this.Settings.margin.left - this.Settings.margin.right);
+    this._innerWidth = Number(this.width - this.Settings.margin.left - this.Settings.margin.right);
 
-    this.av.updateLines(this.innerWidth);
+    this.av.updateLines(this._innerWidth);
 
     if (this.Settings.multi_line) {
       this.height = this.Settings.margin.top + (this.Settings.height + this.Settings.margin.bottom) * this.av.LinesArray.length;
@@ -389,7 +392,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    */
   drawGrid(hLines: number, vLines: number, line: Line) {
     const timeline_height = (this.Settings.timeline.enabled) ? this.Settings.timeline.height : 0;
-    const hZoom = Math.round(this.innerWidth / vLines);
+    const hZoom = Math.round(this._innerWidth / vLines);
     const vZoom = Math.round((this.Settings.height - timeline_height) / hLines);
 
 
@@ -425,18 +428,18 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
       const timeline_height = (this.Settings.timeline.enabled) ? this.Settings.timeline.height : 0;
 
-      this.p_context.clearRect(line_obj.Pos.x, line_obj.Pos.y - 1, this.innerWidth, line_obj.Size.height + 1 - timeline_height);
+      this.p_context.clearRect(line_obj.Pos.x, line_obj.Pos.y - 1, this._innerWidth, line_obj.Size.height + 1 - timeline_height);
 
       this.m_context.globalAlpha = 1.0;
-      this.m_context.clearRect(line_obj.Pos.x - 1, line_obj.Pos.y - 1, this.innerWidth, line_obj.Size.height + 1 - timeline_height);
+      this.m_context.clearRect(line_obj.Pos.x - 1, line_obj.Pos.y - 1, this._innerWidth, line_obj.Size.height + 1 - timeline_height);
       this.m_context.strokeStyle = this.Settings.selection.color;
 
       this.o_context.globalAlpha = 1.0;
-      this.o_context.clearRect(line_obj.Pos.x, line_obj.Pos.y - 1, this.innerWidth, line_obj.Size.height + 1 - timeline_height);
+      this.o_context.clearRect(line_obj.Pos.x, line_obj.Pos.y - 1, this._innerWidth, line_obj.Size.height + 1 - timeline_height);
       this.o_context.strokeStyle = this.Settings.cursor.color;
 
       this.p_context.globalAlpha = 1.0;
-      this.p_context.clearRect(line_obj.Pos.x, line_obj.Pos.y - 1, this.innerWidth, line_obj.Size.height + 1 - timeline_height);
+      this.p_context.clearRect(line_obj.Pos.x, line_obj.Pos.y - 1, this._innerWidth, line_obj.Size.height + 1 - timeline_height);
       this.p_context.strokeStyle = this.Settings.playcursor.color;
 
       this.g_context.globalAlpha = 1.0;
@@ -470,7 +473,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     if (curr_line) {
       this.focused = true;
       if (this.Settings.selection.enabled) {
-        this.av.setMouseMovePosition($event.type, x, y, curr_line, this.innerWidth);
+        this.av.setMouseMovePosition($event.type, x, y, curr_line, this._innerWidth);
         this.drawCursor(curr_line);
         this.drawSegments(curr_line);
       }
@@ -483,7 +486,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    * draws an black Border alongside the cropped audioviewer
    */
   drawCropBorder() {
-    const radius = this.innerWidth / 2;
+    const radius = this._innerWidth / 2;
     if (radius > 0) {
       this.g_context.moveTo(0, 0);
       this.g_context.beginPath();
@@ -500,7 +503,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   drawCursor(line: Line) {
     if (line) {
       // TODO clear only last Cursor Position
-      this.m_context.clearRect(0, 0, this.innerWidth, this.height);
+      this.m_context.clearRect(0, 0, this._innerWidth, this.height);
 
       // --- now draw the cursor line ---
       this.m_context.globalAlpha = 1.0;
@@ -532,11 +535,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         const endline: Line = (line_obj.number < this.av.LinesArray.length - 1)
           ? this.av.LinesArray[line_obj.number + 1] : line_obj;
 
-        const line_absx: number = startline.number * this.innerWidth;
+        const line_absx: number = startline.number * this._innerWidth;
         const line_samples: number = this.av.audioTCalculator.absXChunktoSamples(line_absx, this.audiochunk);
         const line_start: AudioTime = new AudioTime(line_samples, this.audioressource.info.samplerate);
 
-        const endline_absx: number = endline.number * this.innerWidth;
+        const endline_absx: number = endline.number * this._innerWidth;
         const line_samples_end: number = this.av.audioTCalculator.absXChunktoSamples(endline_absx + endline.Size.width, this.audiochunk);
         const line_end: AudioTime = new AudioTime(line_samples_end, this.audioressource.info.samplerate);
 
@@ -590,9 +593,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
               const h = line.Size.height;
               let relX = 0;
 
-              relX = absX % this.innerWidth + this.Settings.margin.left;
+              relX = absX % this._innerWidth + this.Settings.margin.left;
 
-              const select = this.av.getRelativeSelectionByLine(line, begin.time.samples, segments[i].time.samples, this.innerWidth);
+              const select = this.av.getRelativeSelectionByLine(line, begin.time.samples, segments[i].time.samples, this._innerWidth);
               let w = 0;
               let x = select.start;
 
@@ -625,7 +628,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             }
 
             // draw boundaries
-            const seg_linenum = (this.innerWidth < this.AudioPxWidth) ? Math.floor(absX / this.innerWidth) : 0;
+            const seg_linenum = (this._innerWidth < this.AudioPxWidth) ? Math.floor(absX / this._innerWidth) : 0;
 
             const line = this.av.LinesArray[seg_linenum];
             if (!isNullOrUndefined(line) && segment.time.samples !== this.audioressource.info.duration.samples
@@ -633,7 +636,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
               const h = line.Size.height;
               let relX = 0;
               if (this.Settings.multi_line) {
-                relX = absX % this.innerWidth + this.Settings.margin.left;
+                relX = absX % this._innerWidth + this.Settings.margin.left;
               } else {
                 relX = absX + this.Settings.margin.left;
               }
@@ -679,8 +682,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             begin = segments[i - 1];
           }
           const beginX = this.av.audioTCalculator.samplestoAbsX(begin.time.samples);
-          const line_num1 = (this.innerWidth < this.AudioPxWidth) ? Math.floor(beginX / this.innerWidth) : 0;
-          const line_num2 = (this.innerWidth < this.AudioPxWidth) ? Math.floor(absX / this.innerWidth) : 0;
+          const line_num1 = (this._innerWidth < this.AudioPxWidth) ? Math.floor(beginX / this._innerWidth) : 0;
+          const line_num2 = (this._innerWidth < this.AudioPxWidth) ? Math.floor(absX / this._innerWidth) : 0;
 
           for (let j = 0; j <= line_num2; j++) {
             const line = this.av.LinesArray[line_num1 + j];
@@ -689,9 +692,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
               const h = line.Size.height;
               let relX = 0;
 
-              relX = absX % this.innerWidth + this.Settings.margin.left;
+              relX = absX % this._innerWidth + this.Settings.margin.left;
 
-              const select = this.av.getRelativeSelectionByLine(line, begin.time.samples, segments[i].time.samples, this.innerWidth);
+              const select = this.av.getRelativeSelectionByLine(line, begin.time.samples, segments[i].time.samples, this._innerWidth);
               let w = 0;
               let x = select.start;
 
@@ -730,7 +733,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             const h = line.Size.height;
             let relX = 0;
             if (this.Settings.multi_line) {
-              relX = absX % this.innerWidth + this.Settings.margin.left;
+              relX = absX % this._innerWidth + this.Settings.margin.left;
             } else {
               relX = absX + this.Settings.margin.left;
             }
@@ -751,8 +754,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       if (!isNullOrUndefined(this.av.drawnselection)) {
         const sel_start = this.av.audioTCalculator.samplestoAbsX(this.av.drawnselection.start.samples);
         const sel_end = this.av.audioTCalculator.samplestoAbsX(this.av.drawnselection.end.samples);
-        const line_num1 = (this.innerWidth < this.AudioPxWidth) ? Math.floor(sel_start / this.innerWidth) : 0;
-        const line_num2 = (this.innerWidth < this.AudioPxWidth) ? Math.floor(sel_end / this.innerWidth) : 0;
+        const line_num1 = (this._innerWidth < this.AudioPxWidth) ? Math.floor(sel_start / this._innerWidth) : 0;
+        const line_num2 = (this._innerWidth < this.AudioPxWidth) ? Math.floor(sel_end / this._innerWidth) : 0;
 
         for (let j = line_num1; j <= line_num2; j++) {
           const line = this.av.LinesArray[j];
@@ -772,7 +775,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     const curr_line = this.av.getLineByMousePosition(x, y);
 
     if (curr_line && this.Settings.selection.enabled) {
-      this.av.setMouseClickPosition(x, y, curr_line, $event, this.innerWidth).then((curr: Line) => {
+      this.av.setMouseClickPosition(x, y, curr_line, $event, this._innerWidth).then((curr: Line) => {
         this.drawPlayCursorOnly(curr);
       });
       this.drawSegments();
@@ -889,13 +892,13 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                           }
                           const beginX = this.av.audioTCalculator.samplestoAbsX(begin.time.samples);
 
-                          const posY1 = (this.innerWidth < this.AudioPxWidth)
-                            ? Math.floor((beginX / this.innerWidth) + 1) *
+                          const posY1 = (this._innerWidth < this.AudioPxWidth)
+                            ? Math.floor((beginX / this._innerWidth) + 1) *
                             (this.Settings.height + this.Settings.margin.bottom) - this.Settings.margin.bottom
                             : 0;
 
-                          const posY2 = (this.innerWidth < this.AudioPxWidth)
-                            ? Math.floor((absX / this.innerWidth) + 1) *
+                          const posY2 = (this._innerWidth < this.AudioPxWidth)
+                            ? Math.floor((absX / this._innerWidth) + 1) *
                             (this.Settings.height + this.Settings.margin.bottom) - this.Settings.margin.bottom
                             : 0;
 
@@ -1104,7 +1107,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     this.changePlayCursorAbsX(currentAbsX);
 
     // get line of PlayCursor
-    const line = this.av.getLineByAbsX(this.av.PlayCursor.absX, this.innerWidth);
+    const line = this.av.getLineByAbsX(this.av.PlayCursor.absX, this._innerWidth);
 
     if (line) {
       this.drawPlayCursorOnly(line);
@@ -1122,7 +1125,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     if (curr_line) {
       const player_width = this.Settings.playcursor.width;
 
-      const relX = this.av.PlayCursor.absX - (curr_line.number * this.innerWidth);
+      const relX = this.av.PlayCursor.absX - (curr_line.number * this._innerWidth);
       const relY = curr_line.Pos.y;
 
       if (relX <= curr_line.Size.width + this.Settings.margin.left) {
@@ -1242,7 +1245,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   private drawSelection = (line: Line) => {
     // draw gray selection
     const select = this.av.getRelativeSelectionByLine(
-      line, this.av.drawnselection.start.samples, this.av.drawnselection.end.samples, this.innerWidth
+      line, this.av.drawnselection.start.samples, this.av.drawnselection.end.samples, this._innerWidth
     );
     if (line && select) {
       const left = select.start;
@@ -1283,14 +1286,14 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   @HostListener('window:resize', ['$event'])
   onResize($event) {
     this.width = this.aview.elementRef.nativeElement.clientWidth;
-    this.innerWidth = this.width - this.Settings.margin.left - this.Settings.margin.right;
+    this._innerWidth = this.width - this.Settings.margin.left - this.Settings.margin.right;
 
     // only resize if size has changed and resizing not in processing state
-    if (this.innerWidth !== this.oldInnerWidth) {
-      if (!this.Settings.multi_line || this.av.AudioPxWidth < this.innerWidth) {
-        this.av.AudioPxWidth = this.innerWidth;
-        this.av.audioTCalculator.audio_px_width = this.innerWidth;
-        const ratio = this.innerWidth / this.oldInnerWidth;
+    if (this._innerWidth !== this.oldInnerWidth) {
+      if (!this.Settings.multi_line || this.av.AudioPxWidth < this._innerWidth) {
+        this.av.AudioPxWidth = this._innerWidth;
+        this.av.audioTCalculator.audio_px_width = this._innerWidth;
+        const ratio = this._innerWidth / this.oldInnerWidth;
 
         this.changePlayCursorAbsX((this.av.PlayCursor.absX * ratio));
         this.update(true);
@@ -1299,7 +1302,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       }
 
       if (this.av.PlayCursor.absX > 0) {
-        const line = this.av.getLineByAbsX(this.av.PlayCursor.absX, this.innerWidth);
+        const line = this.av.getLineByAbsX(this.av.PlayCursor.absX, this._innerWidth);
 
         if (line) {
           this.drawPlayCursorOnly(line);
@@ -1333,14 +1336,14 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           begin = this.transcr.annotation.levels[0].segments.get(seg_index - 1);
         }
         const beginX = this.av.audioTCalculator.samplestoAbsX(begin.time.samples);
-        const posY1 = (this.innerWidth < this.AudioPxWidth)
-          ? Math.floor((beginX / this.innerWidth) + 1) * (this.Settings.height + this.Settings.margin.bottom) - this.Settings.margin.bottom
+        const posY1 = (this._innerWidth < this.AudioPxWidth)
+          ? Math.floor((beginX / this._innerWidth) + 1) * (this.Settings.height + this.Settings.margin.bottom) - this.Settings.margin.bottom
           : 0;
 
         let posY2 = 0;
 
-        if (this.innerWidth < this.AudioPxWidth) {
-          posY2 = Math.floor((absX / this.innerWidth) + 1) * (this.Settings.height +
+        if (this._innerWidth < this.AudioPxWidth) {
+          posY2 = Math.floor((absX / this._innerWidth) + 1) * (this.Settings.height +
             this.Settings.margin.bottom) - this.Settings.margin.bottom;
         }
 

@@ -234,6 +234,7 @@ export class SettingsService {
 
           audioService.loadAudio(src, () => {
             Logger.log('Audio loaded.');
+
             this.audioloaded.emit({status: 'success'});
           }, (err) => {
             const errMsg = err;

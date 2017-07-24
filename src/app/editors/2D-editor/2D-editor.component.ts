@@ -29,6 +29,9 @@ import {CircleLoupeComponent} from '../../core/component/circleloupe/circleloupe
 import {AudioManager} from '../../core/obj/media/audio/AudioManager';
 import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
 import {TranscrWindowComponent} from '../../core/gui/transcr-window/transcr-window.component';
+import {PlayBackState} from '../../core/obj/media/index';
+import {Observable} from 'rxjs/Observable';
+import {Subscription} from 'rxjs/Subscription';
 
 @Component({
   selector: 'app-overlay-gui',
@@ -60,6 +63,8 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     x: 0,
     y: 0
   };
+
+  private scrolltimer: Subscription = null;
 
   public get getHeight(): number {
     return window.innerHeight - 350;
@@ -131,6 +136,28 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       }
     ));
 
+    this.subscrmanager.add(this.audiochunk_lines.statechange.subscribe(
+      (state: PlayBackState) => {
+        if (state === PlayBackState.PLAYING) {
+          this.scrolltimer = Observable.interval(1000).subscribe(() => {
+            const absx = this.viewer.av.audioTCalculator.samplestoAbsX(this.audiochunk_lines.playposition.samples);
+            const specialheight = jQuery('#special').height();
+            let y = Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.height;
+            y += 10 + (Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.margin.bottom);
+
+            if (y > specialheight) {
+              Functions.scrollTo(y, '#special');
+            }
+          });
+        } else {
+          if (this.scrolltimer !== null) {
+            this.scrolltimer.unsubscribe();
+          }
+        }
+      }
+    ));
+
+
     TwoDEditorComponent.initialized.emit();
   }
 
@@ -140,6 +167,9 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   ngOnDestroy() {
     clearInterval(this.intervalID);
     this.subscrmanager.destroy();
+    if (this.scrolltimer !== null) {
+      this.scrolltimer.unsubscribe();
+    }
   }
 
   ngAfterViewInit() {

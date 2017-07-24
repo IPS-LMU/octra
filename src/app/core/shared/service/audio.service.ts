@@ -57,17 +57,18 @@ export class AudioService {
     const request = this.http.get(url, options).subscribe(
       (result) => {
         const buffer = this.extractData(result);
-        const regex: RegExp = new RegExp(/((%|-|\.|[A-ZÄÖÜß]|[a-zäöü]|_|[0-9])+)\.\w+/, 'g');
+        const regex: RegExp = new RegExp(/((%|-|\.|[A-ZÄÖÜß]|[a-zäöü]|_|[0-9])+)\.(wav|ogg)/, 'g');
         const matches: RegExpExecArray = regex.exec(url);
 
         let filename = '';
         if (matches !== null && matches[1].length > 0) {
           console.log(matches + ' found');
-          filename = matches[1] + matches[3];
+          filename = matches[1] + '.' + matches[3];
         } else {
           filename = url;
         }
 
+        console.log('filename = ' + filename);
         AudioManager.decodeAudio(filename, buffer, AppInfo.audioformats).then(
           (manager: AudioManager) => {
             this.registerAudioManager(manager);

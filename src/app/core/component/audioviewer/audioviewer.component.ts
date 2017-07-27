@@ -853,11 +853,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                         });
                         this.segmentchange.emit(result.seg_num);
 
-                        if (this.av.drawnselection.length === 0) {
-                          this.drawSegments(this.av.LastLine);
-                        } else {
-                          this.drawSegments();
-                        }
+                        this.drawSegments();
                       }
                     }
                     key_active = true;
@@ -1002,21 +998,25 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   /**
    * playSelection() plays the selected signal fragment or the selection in this chunk
    */
-  playSelection = () => {
-    const drawFunc = () => {
-      this.audiochunk.updatePlayPosition();
-      this.anim.requestFrame(this.drawPlayCursor);
-    };
+  playSelection = (): Promise<boolean> => {
 
-    this.audiochunk.startPlayback(drawFunc).then((played: boolean) => {
-      console.log('ok3');
-      if (played) {
-        this.onEndPlayBack();
-        console.log('ok4');
-      }
-    }).catch((err) => {
-      console.log('HÄÄ');
-      console.log(err);
+    return new Promise<boolean>((resolve, reject) => {
+      const drawFunc = () => {
+        this.audiochunk.updatePlayPosition();
+        this.anim.requestFrame(this.drawPlayCursor);
+      };
+
+      this.audiochunk.startPlayback(drawFunc).then((played: boolean) => {
+        console.log('ok3');
+        if (played) {
+          this.onEndPlayBack();
+          console.log('ok4');
+        }
+        resolve(played);
+      }).catch((err) => {
+        console.log('HÄÄ');
+        console.log(err);
+      });
     });
   };
 
@@ -1054,10 +1054,16 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   /**
    * start audio playback
    */
-  startPlayback() {
+  startPlayback(): Promise<boolean> {
     if (!this.audiochunk.isPlaying && this.av.MouseClickPos.absX < this.av.AudioPxWidth - 5) {
-      this.playSelection();
+      return this.playSelection();
     }
+
+    return new Promise<boolean>(
+      (resolve, reject) => {
+        resolve(false);
+      }
+    );
   }
 
   /**

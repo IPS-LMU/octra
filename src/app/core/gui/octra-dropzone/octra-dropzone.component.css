@@ -1,29 +1,30 @@
-.glyphicon-ok{
-    color:green;
+.glyphicon-ok {
+    color: green;
 }
 
-.glyphicon-remove{
-    color:red;
+.glyphicon-remove {
+    color: red;
 }
+
 .fa.fa-spinner.fa-spin,
 .glyphicon-ok,
-.glyphicon-remove{
-    margin-left:5px;
+.glyphicon-remove {
+    margin-left: 5px;
 }
 
-.dropzone-table{
-    margin:0 auto;
+.dropzone-table {
+    margin: 0 auto;
 }
 
 .dropzone-table tr td {
-    border:none;
-    text-align:left;
+    border: none;
+    text-align: left;
 }
 
 .dropzone-table tr td:first-child {
-    padding-right:10px;
+    padding-right: 10px;
 }
 
-.delete-icon{
-    z-index:1000;
+.delete-icon {
+    z-index: 1000;
 }

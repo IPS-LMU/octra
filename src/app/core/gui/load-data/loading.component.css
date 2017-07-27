@@ -1,14 +1,14 @@
-#loading{
+#loading {
     text-align: center;
-    padding:20px;
-    margin-top:10%;
+    padding: 20px;
+    margin-top: 10%;
 }
 
-#loading .description{
-    margin-top:20px;
+#loading .description {
+    margin-top: 20px;
 }
 
-.log{
-    color:red;
+.log {
+    color: red;
     line-height: 1.5;
 }

@@ -11,6 +11,7 @@ export abstract class Converter {
   get encoding(): string {
     return this._encoding;
   }
+
   get extension(): string {
     return this._extension;
   }

@@ -2,20 +2,20 @@ export class Logger {
   private entries: any[];
   private group_name: string;
 
-  public static err(message: string) {
+  public static err(message: any) {
     console.error(Logger.getDateStr() + ': ' + message);
   }
 
-  public static warn(message: string) {
+  public static warn(message: any) {
     console.warn(Logger.getDateStr() + ': ' + message);
   }
 
-  public static log(message: string) {
-    console.log(Logger.getDateStr() + ': ' + message);
-  }
-
-  public static info(message: string) {
-    console.info(Logger.getDateStr() + ': ' + message);
+  public static log(message: any) {
+    if (typeof message !== 'object') {
+      console.log(Logger.getDateStr() + ': ' + message);
+    } else {
+      console.log(message);
+    }
   }
 
   public static getDateStr() {
@@ -28,7 +28,7 @@ export class Logger {
     this.group_name = groupe_name;
   }
 
-  public addEntry(type: string, message: string) {
+  public addEntry(type: string, message: any) {
     this.entries.push(
       {
         type: type,

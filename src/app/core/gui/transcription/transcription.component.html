@@ -20,7 +20,9 @@
     <modal-body>
         {{"modal.transcription.sending.text" | translate}}<br/><br/>
         <div style="color:red">{{send_error}}</div>
-        <div class="text-success" style="text-align: center;display:block;">{{"general.submission success" | translate}}</div>
+        <div class="text-success" style="text-align: center;display:block;">{{"general.submission success" |
+            translate}}
+        </div>
     </modal-body>
 </modal>
 <modal #modal_overview id="overview">
@@ -147,7 +149,8 @@
         <table style="width:100%;">
             <tbody>
             <tr>
-                <td><span class="link" (click)="expandFeedback()" style="width:100%;display: block;">FEEDBACK <span class="required_marker" *ngIf="transcrService.feedback.required">*</span></span>
+                <td><span class="link" (click)="expandFeedback()" style="width:100%;display: block;">FEEDBACK <span
+                        class="required_marker" *ngIf="transcrService.feedback.required">*</span></span>
                 </td>
                 <td style="text-align: right">
                     <span *ngIf="!feedback_expanded" class="glyphicon glyphicon-chevron-up"

@@ -59,7 +59,7 @@ export class CTMConverter extends Converter {
     const filename = lines[0].substr(0, lines[0].indexOf(' '));
 
     if (Functions.contains(file.name, filename) && Functions.contains(audiofile.name, filename)) {
-            const olevel = new OLevel('Orthographic', 'SEGMENT');
+      const olevel = new OLevel('Orthographic', 'SEGMENT');
 
       let start = 0;
       for (let i = 0; i < lines.length; i++) {

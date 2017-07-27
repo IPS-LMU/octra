@@ -1,18 +1,18 @@
-.dropzone{
+.dropzone {
     border: 2px dashed grey;
-    background-color: rgb(240,240,240);
+    background-color: rgb(240, 240, 240);
     padding: 20px;
-    min-height:100px;
-    text-align:center;
-    width:100%;
+    min-height: 100px;
+    text-align: center;
+    width: 100%;
 }
 
-.dropzone:hover{
+.dropzone:hover {
     cursor: pointer;
 }
 
-.dropzone .dragndrop{
-    padding:10px;
-    color:#a0a0a0;
-    font-size:30px;
+.dropzone .dragndrop {
+    padding: 10px;
+    color: #a0a0a0;
+    font-size: 30px;
 }

@@ -2,6 +2,7 @@ import {AfterViewInit, Component, Input, OnChanges, ViewChild} from '@angular/co
 import {LoupeComponent} from '../loupe/loupe.component';
 import {CircleLoupeService} from './service/circleloupe.service';
 import {AudioChunk} from '../../obj/media/audio/AudioChunk';
+
 declare var window: any;
 
 @Component({
@@ -42,7 +43,7 @@ export class CircleLoupeComponent implements AfterViewInit, OnChanges {
 
   ngOnChanges(obj) {
     if (obj.hasOwnProperty('audiochunk')) {
-          }
+    }
   }
 
   ngAfterViewInit() {

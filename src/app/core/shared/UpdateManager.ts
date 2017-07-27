@@ -2,6 +2,7 @@ import {AppInfo} from '../../app.info';
 import {SessionService} from './service/session.service';
 import {isNullOrUndefined} from 'util';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../obj/annotjson';
+
 export class UpdateManager {
   private version = '';
   private sessService: SessionService;

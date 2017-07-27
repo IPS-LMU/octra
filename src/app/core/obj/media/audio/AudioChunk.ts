@@ -159,7 +159,6 @@ export class AudioChunk {
 
         return this._audiomanger.startPlayback(
           this.selection.start, this.selection.duration, this._volume, this._speed, drawFunc, playonhover).then((result: boolean) => {
-          console.log('resolved');
           if (this.state !== PlayBackState.PAUSED && this.state !== PlayBackState.STOPPED) {
             this.setState(PlayBackState.ENDED);
           }
@@ -169,11 +168,9 @@ export class AudioChunk {
           }
           resolve(result);
         }).catch((err) => {
-          console.log('hm');
           console.log(err);
         });
       } else {
-        console.log('ok2');
         resolve(false);
       }
     });
@@ -190,11 +187,8 @@ export class AudioChunk {
   }
 
   public pausePlayback(): boolean {
-    console.log('plapos before ' + this.playposition.seconds);
     if (this._audiomanger.pausePlayback()) {
-      console.log('plapos middle ' + this.playposition.seconds);
       this.setState(PlayBackState.PAUSED);
-      console.log('plapos after ' + this.playposition.seconds);
       return true;
     }
 

@@ -78,7 +78,7 @@ export class PraatTableConverter extends Converter {
           const text = columns[2];
           const tmax = Number(columns[3]);
 
-                    length = 0;
+          length = 0;
           if (isNaN(tmin)) {
             console.error('column 1 is NaN');
             return null;

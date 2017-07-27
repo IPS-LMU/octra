@@ -5,12 +5,15 @@ export class MediaRessource {
   get size(): number {
     return this._size;
   }
+
   get extension(): string {
     return this._extension;
   }
+
   get name(): string {
     return this._name;
   }
+
   get content(): any {
     return this._content;
   }

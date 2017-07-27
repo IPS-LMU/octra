@@ -9,7 +9,7 @@
     display: block;
 }
 
-.version{
+.version {
     color: gray;
     font-size: 0.8em;
 }
@@ -55,10 +55,10 @@ audio {
     margin-bottom: 5px;
 }
 
-.modal-dialog{
+.modal-dialog {
     width: 90%;
 }
 
-.media{
-    margin-bottom:10px;
+.media {
+    margin-bottom: 10px;
 }

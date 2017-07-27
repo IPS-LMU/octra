@@ -4,7 +4,10 @@
             <div class="col-md-7">
                 <h3 style="display:inline;">{{"general.guidelines" | translate }}<span class="version">
                      v {{ guidelines.meta.version }}
-                </span></h3><button class="btn btn-sm btn-danger" style="border:1px solid red;" (click)="exportPDF()"><span class="glyphicon glyphicon-print"></span> PDF</button>
+                </span></h3>
+                <button class="btn btn-sm btn-danger" style="border:1px solid red;" (click)="exportPDF()"><span
+                        class="glyphicon glyphicon-print"></span> PDF
+                </button>
                 <span class="project">
                      {{"general.project" | translate }}: {{guidelines.meta.project }}
                 </span>
@@ -70,9 +73,11 @@
                                                             data-setup='{}'>
                                                         <source src="{{example.url}}" type="video/mp4">
                                                         <p class="vjs-no-js">
-                                                            To view this video please enable JavaScript, and consider upgrading to a
+                                                            To view this video please enable JavaScript, and consider
+                                                            upgrading to a
                                                             web browser that
-                                                            <a href="http://videojs.com/html5-video-support/" target="_blank">
+                                                            <a href="http://videojs.com/html5-video-support/"
+                                                               target="_blank">
                                                                 supports HTML5 video
                                                             </a>
                                                         </p>

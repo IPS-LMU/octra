@@ -1,4 +1,5 @@
 import {isNullOrUndefined} from 'util';
+
 /**
  * class initialized with samples which can output other units like seconds, miliseconds
  */

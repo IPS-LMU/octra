@@ -1,4 +1,5 @@
 import {Functions} from '../shared/Functions';
+
 /***
  * Statistic Element Class
  */

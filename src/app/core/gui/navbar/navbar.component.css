@@ -1,79 +1,81 @@
-.navbar ul li a:hover{
+.navbar ul li a:hover {
     cursor: pointer;
 }
 
 .navbar-nav > li > a, .navbar-brand {
-    padding-top:4px !important;
-    padding-bottom:0 !important;
+    padding-top: 4px !important;
+    padding-bottom: 0 !important;
     vertical-align: middle;
     line-height: inherit;
     height: 30px;
 }
+
 .navbar {
-    min-height:30px !important;
+    min-height: 30px !important;
     margin-bottom: 0px;
 }
 
-.navbar .navbar-brand{
+.navbar .navbar-brand {
     vertical-align: middle;
-    font-size:1.3em;
+    font-size: 1.3em;
 }
 
-.glyphicon{
-    font-size:100%;
-    color:#0b0080;
+.glyphicon {
+    font-size: 100%;
+    color: #0b0080;
 }
 
-.navbar-icon{
-    color:white;
-    font-size:100%;
+.navbar-icon {
+    color: white;
+    font-size: 100%;
 }
 
 .options-menu,
 .info-menu {
-    padding:20px;
-    font-size:0.7em;
-    min-width:300px;
+    padding: 20px;
+    font-size: 0.7em;
+    min-width: 300px;
 }
 
 .info-menu {
 }
 
 .dropdown-menu.options-menu.collaps label,
-.dropdown-menu.info-menu.collaps span
-{
-    color:black;
+.dropdown-menu.info-menu.collaps span {
+    color: black;
 }
 
 .dropdown-menu.options-menu label,
 .dropdown-menu.info-menu label,
 .dropdown-menu.info-menu table tr td,
-.dropdown-menu.options-menu table tr td{
-    color:white;
+.dropdown-menu.options-menu table tr td {
+    color: white;
 }
 
-.options-menu *{
+.options-menu * {
     border: none;
-    font-size:1.1em;
+    font-size: 1.1em;
 }
-.options-menu .table{
+
+.options-menu .table {
     margin-bottom: 0;
 }
 
-.info-menu *{
+.info-menu * {
     border: none;
-    font-size:11px;
+    font-size: 11px;
 }
-.info-menu .table{
+
+.info-menu .table {
     margin-bottom: 0;
 }
 
-#subnav{
-    padding:3px;
-    text-align:center;
+#subnav {
+    padding: 3px;
+    text-align: center;
     background-color: #bae6f3;
 }
 
-#modalstatis .modal-dialog{
-    width:100%;
+#modalstatis .modal-dialog {
+    width: 100%;
 }

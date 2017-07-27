@@ -214,7 +214,6 @@ export class TranscriptionComponent implements OnInit,
 
     this.sessService.annotation.sampleRate = this.audiomanager.ressource.info.samplerate;
     this.navbarServ.show_interfaces = this.settingsService.projectsettings.navigation.interfaces;
-    console.log('show interfaces ' + this.navbarServ.show_interfaces);
 
     // load guidelines on language change
     this.subscrmanager.add(this.langService.onLangChange.subscribe(

@@ -1,5 +1,5 @@
-.slider{
-    padding:0;
+.slider {
+    padding: 0;
 }
 
 .slider-descr {
@@ -14,21 +14,21 @@
 }
 
 .audio-nav {
-    margin-bottom:3px;
+    margin-bottom: 3px;
 }
 
-.audio-nav .btn-toolbar{
-    margin-left:0;
+.audio-nav .btn-toolbar {
+    margin-left: 0;
 }
 
-.audio-nav .btn-group{
-    margin:0;
+.audio-nav .btn-group {
+    margin: 0;
 }
 
-.audio-nav .col-xs-1{
-    padding:0;
+.audio-nav .col-xs-1 {
+    padding: 0;
 }
 
-.btn-description{
-    font-size:0.9em;
+.btn-description {
+    font-size: 0.9em;
 }

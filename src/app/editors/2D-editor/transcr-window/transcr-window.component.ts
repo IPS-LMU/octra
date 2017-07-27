@@ -12,15 +12,22 @@ import {
   ViewChild
 } from '@angular/core';
 
-import {AudioNavigationComponent, LoupeComponent, TranscrEditorComponent} from '../../component';
-import {AudioService, KeymappingService, TranscriptionService, UserInteractionsService} from '../../shared/service';
-import {AudioTime, Segment, SubscriptionManager} from '../../shared';
-import {SettingsService} from '../../shared/service/settings.service';
-import {AudioChunk} from '../../obj/media/audio/AudioChunk';
-import {AudioManager} from '../../obj/media/audio/AudioManager';
-import {AudioRessource} from '../../obj/media/audio/AudioRessource';
+import {AudioNavigationComponent, LoupeComponent, TranscrEditorComponent} from '../../../core/component';
+import {
+  AudioService,
+  KeymappingService,
+  TranscriptionService,
+  UserInteractionsService
+} from '../../../core/shared/service';
+import {AudioTime, Segment, SubscriptionManager} from '../../../core/shared';
+import {SettingsService} from '../../../core/shared/service/settings.service';
+import {AudioChunk} from '../../../core/obj/media/audio/AudioChunk';
+import {AudioManager} from '../../../core/obj/media/audio/AudioManager';
+import {AudioRessource} from '../../../core/obj/media/audio/AudioRessource';
 import {isNullOrUndefined} from 'util';
-import {AudioSelection} from '../../obj/media/audio/AudioSelection';
+import {AudioSelection} from '../../../core/obj/media/audio/AudioSelection';
+import {Segments} from '../../../core/obj/Segments';
+import {Logger} from '../../../core/shared/Logger';
 
 @Component({
   selector: 'app-transcr-window',
@@ -54,6 +61,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   private showWindow = false;
   public pos_y = 0;
   private subscrmanager: SubscriptionManager;
+  private temp_segments: Segments;
 
   get app_settings(): any {
     return this.settingsService.app_settings;
@@ -75,12 +83,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     return this.audiochunk.audiomanager.ressource;
   }
 
-  /*
-   set SelectedSegment(segment: Segment) {
-   this.transcrService.annotation.levels[0].segments.get(this.transcrService.selectedSegment.index).transcript;
-   }
-   */
-
   @Input() audiochunk: AudioChunk;
   @Input() segment_index: number;
 
@@ -96,7 +98,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   ngOnInit() {
     this.editor.Settings.markers = this.transcrService.guidelines.markers;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
-
+    this.editor.Settings.special_markers.boundary = true;
+    const segments = this.transcrService.annotation.levels[0].segments;
+    this.temp_segments = segments.clone();
     this.subscrmanager.add(this.editor.loaded.subscribe(
       () => {
         if (this.segment_index > -1 && this.transcrService.annotation.levels[0].segments &&
@@ -130,16 +134,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   ngAfterViewInit() {
-    const segment: Segment = this.transcrService.annotation.levels[0].segments.get(this.segment_index);
-
-    let begin = new AudioTime(0, this.audiomanager.ressource.info.samplerate);
-
-    if (this.segment_index > 0) {
-      begin = this.transcrService.annotation.levels[0].segments.get(this.segment_index - 1).time.clone();
-    }
-
     this.loupe.Settings.boundaries.readonly = true;
     this.loupe.zoomY = 4;
+
     setTimeout(() => {
       this.audiochunk.startpos = this.audiochunk.time.start.clone();
       this.loupe.viewer.startPlayback();
@@ -162,9 +159,16 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   save() {
     if (this.segment_index > -1 && this.transcrService.annotation.levels[0].segments &&
       this.segment_index < this.transcrService.annotation.levels[0].segments.length) {
-      const segment = this.transcrService.annotation.levels[0].segments.get(this.segment_index);
-      segment.transcript = this.editor.rawText;
-      this.transcrService.annotation.levels[0].segments.change(this.segment_index, segment);
+
+      if (this.editor.html.indexOf('<img src="assets/img/components/transcr-editor/boundary.png"') > -1) {
+        // boundaries were inserted
+        this.transcrService.annotation.levels[0].segments = this.temp_segments.clone();
+      } else {
+        // no boundaries inserted
+        const segment = this.transcrService.annotation.levels[0].segments.get(this.segment_index);
+        segment.transcript = this.editor.rawText;
+        this.transcrService.annotation.levels[0].segments.change(this.segment_index, segment);
+      }
     }
   }
 
@@ -275,5 +279,71 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         this.doit('down');
         break;
     }
+  };
+
+  onBoundaryClicked(samples: number) {
+    const i: number = this.temp_segments.getSegmentBySamplePosition(samples);
+
+    if (i > -1) {
+      const start = (i > 0) ? this.transcrService.annotation.levels[0].segments.get(i - 1).time.samples : 0;
+      this.audiochunk.startpos = new AudioTime(start, this.audiomanager.ressource.info.samplerate);
+      this.audiochunk.selection.end = this.transcrService.annotation.levels[0].segments.get(i).time.clone();
+      this.loupe.update();
+      this.loupe.viewer.startPlayback().then(() => {
+        // set start pos and playback length to end of audio file
+        this.audiochunk.startpos = this.audiochunk.playposition.clone();
+      }).catch(() => {
+      });
+    }
+  }
+
+  afterTyping(status) {
+    if (status === 'stopped') {
+      this.saveTranscript();
+    }
+  }
+
+  saveTranscript() {
+    const logger: Logger = new Logger('saveTranscript');
+    const seg_start = this.transcrService.annotation.levels[0].segments.getSegmentBySamplePosition(this.audiochunk.time.start.samples + 20);
+    logger.addEntry('log', 'start at segment ' + seg_start);
+
+    this.temp_segments = this.transcrService.annotation.levels[0].segments.clone();
+    // TODO ! left and rigt boundary must not be changed !
+    const html: string = this.editor.html.replace(/&nbsp;/g, ' ');
+    // split text at the position of every boundary marker
+    let seg_texts: string[] = html.split(
+      /\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="[0-9]+">\s?/g
+    );
+
+    const samples_array: number[] = [];
+    html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)">\s?/g,
+      function (match, g1, g2) {
+        samples_array.push(Number(g1));
+        return '';
+      });
+
+    seg_texts = seg_texts.map((a: string) => {
+      return a.replace(/(<p>)|(<\/p>)/g, '');
+    });
+
+    logger.addEntry('log', 'texts');
+    logger.addEntry('log', seg_texts);
+    logger.addEntry('log', this.temp_segments);
+
+    for (let i = 0; i < seg_texts.length - 1; i++) {
+      const new_raw = this.transcrService.htmlToRaw(seg_texts[i]);
+
+      this.temp_segments.add(samples_array[i], new_raw);
+      logger.addEntry('log', 'add segment ' + i + ' with samples ' + samples_array[i]);
+    }
+
+    // shift rest of text to next segment
+    if (!isNullOrUndefined(this.temp_segments.get(seg_start + seg_texts.length - 1))) {
+      this.temp_segments.get(seg_start + seg_texts.length - 1).transcript = seg_texts[seg_texts.length - 1];
+    }
+
+    logger.addEntry('log', this.temp_segments);
+    logger.output();
   }
 }

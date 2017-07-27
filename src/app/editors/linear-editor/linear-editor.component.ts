@@ -52,7 +52,6 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public miniloupe_hidden = true;
   public segmentselected = false;
-  public activeviewer = '';
   private factor = 4;
 
   public mini_loupecoord: any = {
@@ -60,8 +59,6 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     x: 0,
     y: 0
   };
-
-  private temp: any = null;
 
   private platform = BrowserInfo.platform;
 
@@ -155,8 +152,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
                   .message
               );
           }
-        ))
-    ;
+        ));
 
     this.subscrmanager.add(this.viewer.alerttriggered.subscribe(
       (result) => {
@@ -369,7 +365,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     if (status === 'stopped') {
       this.save();
     }
-  }
+  };
 
   onMarkerInsert(marker_code: string) {
     if (this.projectsettings.logging.forced === true) {

@@ -128,7 +128,6 @@ export class AudioviewerService extends AudioComponentService {
     this.Lines = [];
     this._channel = this.audiochunk.channel;
 
-    console.log('seconds: ' + this.audiochunk.audiomanager.ressource.info.duration);
     if (this.Settings.multi_line) {
       this.AudioPxWidth = this.audiomanager.ressource.info.duration.seconds * this.Settings.pixel_per_sec;
       this.AudioPxWidth = (this.AudioPxWidth < innerWidth) ? innerWidth : this.AudioPxWidth;
@@ -384,7 +383,6 @@ export class AudioviewerService extends AudioComponentService {
 
     if (!isNullOrUndefined(line) && this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly) {
       const absXTime = (!this.audiochunk.isPlaying) ? this.mousecursor.timePos.samples : this.audiochunk.playposition.samples;
-      console.log('was playing ' + this.audiochunk.isPlaying);
       let b_width_time = this.audioTCalculator.absXtoSamples2(this.Settings.boundaries.width * 2, this.audiochunk);
       b_width_time = Math.round(b_width_time);
 

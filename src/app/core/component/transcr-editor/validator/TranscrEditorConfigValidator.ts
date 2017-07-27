@@ -41,6 +41,14 @@ export class TranscrEditorConfigValidator extends ConfigValidator {
           success: false,
           error: prefix + 'value of key \'' + key + '\' must be of type boolean'
         };
+      case('special_markers'):
+        if (typeof value === 'object') {
+          break;
+        }
+        return {
+          success: false,
+          error: prefix + 'value of key \'' + key + '\' must be of type boolean'
+        };
       case('markers'):
         let val_ok2 = true;
         if (isArray(value)) {

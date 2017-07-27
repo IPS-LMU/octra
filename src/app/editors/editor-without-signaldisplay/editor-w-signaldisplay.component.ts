@@ -75,6 +75,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     this.shortcuts = this.settings.shortcuts;
     this.editor.Settings.markers = this.transcrService.guidelines.markers.items;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
+    this.editor.Settings.special_markers.boundary = true;
 
     EditorWSignaldisplayComponent.initialized.emit();
   }
@@ -99,7 +100,6 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     const cursorPos = selection.anchorOffset;
     const oldContent = selection.anchorNode.nodeValue;
     const t = jQuery(selection.anchorNode.parentElement);
-    console.log(t);
     t.css(
       {
         border: '1px solid red'
@@ -162,11 +162,6 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   afterTyping(status) {
     if (status === 'stopped') {
       this.saveTranscript();
-      /*
-       const segment = this.transcrService.annotation.levels[0].segments.get(0);
-       segment.transcript = this.editor.rawText;
-       this.transcrService.annotation.levels[0].segments.change(0, segment);
-       */
     }
   }
 
@@ -211,9 +206,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     let seg_texts: string[] = html.split(
       /\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="[0-9]+">\s?/g
     );
-    console.log(seg_texts);
 
-    console.log(this.transcrService.annotation.levels[0].segments);
     const samples_array: number[] = [];
     html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)">\s?/g,
       function (match, g1, g2) {
@@ -241,16 +234,12 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
         this.transcrService.annotation.levels[0].segments.change(i, segment);
       } else {
         // add new segments
-        console.log(samples_array);
-        console.log(i - 1);
 
         if (i === seg_texts.length - 1) {
           this.transcrService.annotation.levels[0].segments.add(this.audiochunk.time.end.samples, new_raw);
         } else {
           this.transcrService.annotation.levels[0].segments.add(samples_array[i - 1], new_raw);
         }
-
-        console.log(this.transcrService.annotation.levels[0].segments);
       }
     }
 

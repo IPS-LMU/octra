@@ -28,7 +28,7 @@ import {SessionService} from '../../core/shared/service/session.service';
 import {CircleLoupeComponent} from '../../core/component/circleloupe/circleloupe.component';
 import {AudioManager} from '../../core/obj/media/audio/AudioManager';
 import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
-import {TranscrWindowComponent} from '../../core/gui/transcr-window/transcr-window.component';
+import {TranscrWindowComponent} from './transcr-window/transcr-window.component';
 import {PlayBackState} from '../../core/obj/media/index';
 import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
@@ -224,8 +224,6 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   onSegmentSelected(selection: AudioSelection) {
-    console.log('selected: ');
-    console.log(selection);
   }
 
   onMouseOver(cursor: AVMousePos) {

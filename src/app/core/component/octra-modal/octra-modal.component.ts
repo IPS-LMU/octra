@@ -3,7 +3,7 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {ModalComponent} from 'ng2-bs3-modal/components/modal';
 import {ModalService} from '../../shared/service/modal.service';
 import {isNullOrUndefined} from 'util';
-import {BugReportService, ConsoleEntry} from '../../shared/service/bug-report.service';
+import {BugReportService} from '../../shared/service/bug-report.service';
 import {APIService} from '../../shared/service/api.service';
 import {SessionService} from '../../shared/service/session.service';
 import {AppInfo} from '../../../app.info';

@@ -100,7 +100,7 @@ export class AppComponent implements OnDestroy {
   }
 
   onSettingsLoaded = (loaded) => {
-            this.sessService.Interface = 'Editor without signal display';
+    this.sessService.Interface = 'Editor without signal display';
 
     if (loaded) {
       // settings have been loaded

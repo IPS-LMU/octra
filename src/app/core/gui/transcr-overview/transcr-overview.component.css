@@ -1,17 +1,17 @@
-.red{
-    background-color:#ff899d;
+.red {
+    background-color: #ff899d;
 }
 
-.segment-number{
-    padding:3px;
+.segment-number {
+    padding: 3px;
 }
 
-.segment-warning{
-    color:red;
+.segment-warning {
+    color: red;
 }
 
-.found-errors{
-    padding:5px;
-    display:block;
-    text-align:center;
+.found-errors {
+    padding: 5px;
+    display: block;
+    text-align: center;
 }

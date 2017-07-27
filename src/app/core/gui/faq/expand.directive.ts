@@ -7,7 +7,8 @@ export class ExpandDirective implements OnInit {
 
   private toggled = true;
 
-  @HostListener('mousedown') mouseover() {
+  @HostListener('mousedown')
+  mouseover() {
     if (this.elRef.nativeElement.tagName !== 'A') {
       let element: Node = this.renderer.parentNode(this.elRef.nativeElement);
       element = this.renderer.parentNode(element);

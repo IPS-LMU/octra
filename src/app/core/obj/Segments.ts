@@ -5,7 +5,6 @@ import {ISegment, OLabel, OSegment} from './annotjson';
 import {isNullOrUndefined} from 'util';
 
 export class Segments {
-
   public onsegmentchange: EventEmitter<any> = new EventEmitter<any>();
 
   get segments(): Segment[] {
@@ -22,13 +21,15 @@ export class Segments {
   constructor(private sample_rate: number, segments: ISegment[], last_sample: number) {
     this._segments = [];
 
-    if (segments.length === 0) {
-      this._segments.push(new Segment(new AudioTime(last_sample, sample_rate)));
-    }
+    if (segments !== null) {
+      if (segments.length === 0) {
+        this._segments.push(new Segment(new AudioTime(last_sample, sample_rate)));
+      }
 
-    for (let i = 0; i < segments.length; i++) {
-      const new_segment = Segment.fromObj(segments[i], sample_rate);
-      this._segments.push(new_segment);
+      for (let i = 0; i < segments.length; i++) {
+        const new_segment = Segment.fromObj(segments[i], sample_rate);
+        this._segments.push(new_segment);
+      }
     }
   }
 
@@ -70,7 +71,7 @@ export class Segments {
         const next_segment = this.segments[index + 1];
         const transcription: string = this.segments[index].transcript;
         // TODO change 'P' !
-                if (next_segment.transcript !== breakmarker && transcription !== breakmarker) {
+        if (next_segment.transcript !== breakmarker && transcription !== breakmarker) {
           // concat transcripts
           if (next_segment.transcript !== '' && transcription !== '') {
             next_segment.transcript = transcription + ' ' + next_segment.transcript;
@@ -204,7 +205,6 @@ export class Segments {
       if (i > 0) {
         const last = this.segments[i - 1];
         if (last.time.samples === this.segments[i].time.samples) {
-          console.log("removed segment");
           remove.push(i);
         }
       }
@@ -249,6 +249,14 @@ export class Segments {
       start = segment.time.samples;
     }
 
+    return result;
+  }
+
+  public clone(): Segments {
+    const result = new Segments(this.sample_rate, null, this.segments[this.length - 1].time.samples);
+    for (let i = 0; i < this.segments.length; i++) {
+      result.add(this.segments[i].time.samples, this.segments[i].transcript);
+    }
     return result;
   }
 }

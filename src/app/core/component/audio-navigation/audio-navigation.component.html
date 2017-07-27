@@ -11,14 +11,15 @@
                               [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}"> {{buttons.play.shortcut}}</span> -->
                     </a>
                     <a *ngIf="audioplaying" class="btn btn-default btn-raised" name="pause"
-                       (click)="onButtonClick('pause')"  title="{{buttons.pause.label}}">
+                       (click)="onButtonClick('pause')" title="{{buttons.pause.label}}">
                         <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
                         <!-- <span *ngIf="!easymode" class="btn-description" [ngClass]="{'hidden-xs hidden-sm': responsive}">{{buttons.pause.label}}</span>
                         <span *ngIf="!easymode" class="shortcut-descr"
                               [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}"> {{buttons.pause.shortcut}}</span>
                                -->
                     </a>
-                    <a class="btn btn-default btn-raised" name="stop" (click)="onButtonClick('stop')"  title="{{buttons.stop.label}}">
+                    <a class="btn btn-default btn-raised" name="stop" (click)="onButtonClick('stop')"
+                       title="{{buttons.stop.label}}">
                         <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
                         <!-- <span *ngIf="!easymode" class="btn-description" [ngClass]="{'hidden-xs hidden-sm': responsive}">{{buttons.stop.label}}</span>
                         <span *ngIf="!easymode" class="shortcut-descr"
@@ -26,11 +27,11 @@
                                -->
                     </a>
                     <a class="btn btn-default btn-raised" [ngClass]="{active: replay}"
-                       name="replay" (click)="onButtonClick('replay')"  title="{{buttons.replay.label}}">
+                       name="replay" (click)="onButtonClick('replay')" title="{{buttons.replay.label}}">
                         <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
                         <!-- <span *ngIf="!easymode" class="btn-description" [ngClass]="{'hidden-xs hidden-sm': responsive}">{{buttons.replay.label}}</span>-->
                     </a>
-                    <a class="btn btn-default btn-raised" name="step_back"  title="{{buttons.backward.label}}"
+                    <a class="btn btn-default btn-raised" name="step_back" title="{{buttons.backward.label}}"
                        (click)="onButtonClick('backward')">
                         <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
                         <!-- <span *ngIf="!easymode" class="btn-description"
@@ -39,7 +40,7 @@
                               [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}"> {{buttons.backward.shortcut}}</span>
                               -->
                     </a>
-                    <a class="btn btn-default btn-raised" name="step_back"  title="{{buttons.backwardtime.label}}"
+                    <a class="btn btn-default btn-raised" name="step_back" title="{{buttons.backwardtime.label}}"
                        (click)="onButtonClick('backward time')">
                         <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
                         <span class="glyphicon glyphicon-time" aria-hidden="true"></span>

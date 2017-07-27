@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {Http} from '@angular/http';
-import {ModalService} from '../../shared/service/modal.service';
 
 @Injectable()
 export class LoginService {

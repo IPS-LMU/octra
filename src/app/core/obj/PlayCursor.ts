@@ -2,6 +2,7 @@ import {AudioTime} from './media/audio/AudioTime';
 import {AudioTimeCalculator} from './media/audio/AudioTimeCalculator';
 import {AudioChunk} from './media/audio/AudioChunk';
 import {isNullOrUndefined} from 'util';
+
 export class PlayCursor {
 
   private _absX: number;

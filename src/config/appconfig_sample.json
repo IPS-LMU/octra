@@ -19,6 +19,9 @@
       "url": ""
     },
     "allowed_browsers": [],
-    "languages":["de", "en"]
+    "languages": [
+      "de",
+      "en"
+    ]
   }
 }

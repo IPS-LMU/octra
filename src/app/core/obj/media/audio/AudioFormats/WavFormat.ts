@@ -1,5 +1,4 @@
 import {AudioFormat} from './AudioFormat';
-import {AudioInfo} from '../AudioInfo';
 
 export class WavFormat extends AudioFormat {
   constructor() {
@@ -18,7 +17,6 @@ export class WavFormat extends AudioFormat {
     const bufferPart = buffer.slice(24, 28);
     const bufferView = new Uint16Array(bufferPart);
 
-    console.log('sampleRate: ' + bufferView[0]);
     return bufferView[0];
   }
 
@@ -26,7 +24,6 @@ export class WavFormat extends AudioFormat {
     const bufferPart = buffer.slice(28, 32);
     const bufferView = new Uint16Array(bufferPart);
 
-    console.log('byteRate: ' + bufferView[0]);
     return bufferView[0];
   }
 

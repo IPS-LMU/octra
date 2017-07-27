@@ -14,7 +14,6 @@ import {UserInteractionsService} from '../../shared/service/userInteractions.ser
 import {StatisticElem} from '../../obj/StatisticElement';
 import {SettingsService} from '../../shared/service/settings.service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {EDITORS} from '../../../app.module';
 import {EditorComponents} from '../../../editors/components';
 
 @Component({

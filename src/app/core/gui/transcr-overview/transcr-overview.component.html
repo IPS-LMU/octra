@@ -44,7 +44,8 @@
             >
             </span>
         </td>
-        <td><span class="link segment-number" (click)="onSegmentClicked(i)"># {{i+1 | leadingnull: shown_segments.length}}</span></td>
+        <td><span class="link segment-number" (click)="onSegmentClicked(i)"># {{i+1 | leadingnull: shown_segments.length}}</span>
+        </td>
         <td [innerHTML]="sanitizeHTML(segment.transcription.html)" (mousemove)="onMouseOver($event)"
             (mousedown)="onMouseOver($event)"></td>
     </tr>

@@ -50,7 +50,14 @@ import {
   SettingsService
 } from './core/shared/service';
 
-import {ALoginGuard, DeALoginGuard, LogoutGuard, MembersAreaGuard, SettingsGuard, TranscrEndGuard} from './core/shared/guard';
+import {
+  ALoginGuard,
+  DeALoginGuard,
+  LogoutGuard,
+  MembersAreaGuard,
+  SettingsGuard,
+  TranscrEndGuard
+} from './core/shared/guard';
 
 import {AppComponent} from './app.component';
 

@@ -1,7 +1,8 @@
 <app-drop-zone #dropzone [height]="'275px'" (afterdrop)="afterDrop()">
     <table [hidden]="(files.length === 0)" class="dropzone-table">
         <tr *ngFor="let file of files">
-            <td><span class="glyphicon glyphicon-remove-circle delete-icon" (click)="onDeleteEntry(file.file.name)"></span></td>
+            <td><span class="glyphicon glyphicon-remove-circle delete-icon"
+                      (click)="onDeleteEntry(file.file.name)"></span></td>
             <td>{{getDropzoneFileString(file.file)}}
             </td>
             <td><span *ngIf="file.status === 'invalid'" class="glyphicon glyphicon-remove"></span>

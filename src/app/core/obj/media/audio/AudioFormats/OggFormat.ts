@@ -16,15 +16,12 @@ export class OggFormat extends AudioFormat {
   protected getSampleRate(buffer: ArrayBuffer): number {
     const bufferPart = buffer.slice(40, 42);
     const bufferView = new Uint16Array(bufferPart);
-    console.log(bufferView);
-    console.log('Rate: ' + bufferView[0]);
     return bufferView[0];
   }
 
   protected getBitRate(buffer: ArrayBuffer): number {
     const bufferPart = buffer.slice(48, 52);
     const bufferView = new Uint32Array(bufferPart);
-    console.log(bufferView);
 
     return bufferView[0];
   }

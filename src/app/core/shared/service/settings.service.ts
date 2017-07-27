@@ -15,7 +15,6 @@ import {Functions} from '../Functions';
 import {Observable} from 'rxjs/Observable';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
-import {WavFormat} from '../../obj/media/audio/AudioFormats/WavFormat';
 import {AppInfo} from '../../../app.info';
 
 @Injectable()

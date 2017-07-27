@@ -1,12 +1,12 @@
-import {IAnnotJSON, OAnnotJSON, OAudiofile} from '../annotjson';
+import {OAnnotJSON, OAudiofile} from '../annotjson';
 import {isNullOrUndefined} from 'util';
 import {Level} from './Level';
-import {AppInfo} from '../../../app.info';
 
 export class Annotation {
   get annotates(): string {
     return this._annotates;
   }
+
   get date(): number {
     return this._date;
   }
@@ -14,6 +14,7 @@ export class Annotation {
   set date(value: number) {
     this._date = value;
   }
+
   get audiofile(): OAudiofile {
     return this._audiofile;
   }

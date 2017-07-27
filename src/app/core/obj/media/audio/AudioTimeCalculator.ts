@@ -1,5 +1,6 @@
 import {AudioTime} from './AudioTime';
 import {AudioChunk} from './AudioChunk';
+
 export class AudioTimeCalculator {
   public static roundSamples(samples: number) {
     return Math.round(samples);

@@ -1,6 +1,6 @@
 import {Injectable, SecurityContext} from '@angular/core';
 import {API} from '../../obj/API/api.interface';
-import {Headers, Http, RequestOptions, Response} from '@angular/http';
+import {Http, Response} from '@angular/http';
 import 'rxjs/Rx';
 import {DomSanitizer} from '@angular/platform-browser';
 import {Observable} from 'rxjs/Observable';
@@ -171,7 +171,7 @@ export class APIService implements API {
       querytype: 'listprojects'
     };
 
-        return this.post(cmd_json);
+    return this.post(cmd_json);
   }
 
   public post(json: any): Observable<Response> {

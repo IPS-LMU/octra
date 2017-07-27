@@ -1,4 +1,5 @@
 import {BrowserInfo} from './BrowserInfo';
+
 export class BrowserCheck {
   private platform: BrowserInfo = new BrowserInfo();
 

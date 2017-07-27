@@ -28,7 +28,7 @@ export class MembersAreaGuard implements CanActivate {
       this.router.navigate(['/user/transcr/submitted']);
       return false;
     } else if (!this.settService.allloaded) {
-            this.router.navigate(['/user/load']);
+      this.router.navigate(['/user/load']);
     }
 
     return true;

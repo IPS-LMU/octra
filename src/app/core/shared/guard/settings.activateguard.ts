@@ -1,4 +1,4 @@
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs/Rx';
@@ -16,9 +16,9 @@ export class SettingsGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     if (isNullOrUndefined(this.settingsService.app_settings)) {
-            return this.settingsService.settingsloaded.first();
+      return this.settingsService.settingsloaded.first();
     } else {
-            return this.settingsService.validated;
+      return this.settingsService.validated;
     }
   }
 }

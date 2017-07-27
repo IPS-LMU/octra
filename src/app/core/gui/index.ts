@@ -6,6 +6,6 @@ export * from './navbar';
 export * from './transcription';
 export * from './transcription-end';
 export * from './transcr-overview';
-export * from './transcr-window';
+export * from '../../editors/2D-editor/transcr-window';
 export * from './reload-file';
 export * from './taskbar';

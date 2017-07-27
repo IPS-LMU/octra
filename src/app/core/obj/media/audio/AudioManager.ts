@@ -112,7 +112,6 @@ export class AudioManager {
 
   public static getFileFormat(extension: string, audioformats: AudioFormat[]): AudioFormat {
     for (let i = 0; i < audioformats.length; i++) {
-      console.log(audioformats[i].extension + ' === ' + extension);
       if (audioformats[i].extension === extension) {
         return audioformats[i];
       }
@@ -121,7 +120,6 @@ export class AudioManager {
   }
 
   public static isValidFileName(filename: string, audioformats: AudioFormat[]): boolean {
-    console.log('check if ' + filename + 'is audiofile');
     return AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats) !== null;
   }
 
@@ -150,8 +148,6 @@ export class AudioManager {
 
       const selection = new AudioSelection(new AudioTime(0, audioinfo.samplerate), new AudioTime(audiobuffer.length, audioinfo.samplerate));
       result._mainchunk = new AudioChunk(selection, result);
-      console.log('dur audiomanager ' + result.ressource.info.duration.samples);
-      console.log('dur audiobuffer ' + audiobuffer.length);
 
       result.newstate = 'ready';
       result.afterdecoded.emit(result.ressource);
@@ -225,7 +221,6 @@ export class AudioManager {
 
     return new Promise<boolean>((resolve, reject) => {
       if (!this._audioplaying) {
-        console.log('play2');
         this._playbackstate = 'started';
         this._stepbackward = false;
         this._source = this.getSource();
@@ -245,7 +240,6 @@ export class AudioManager {
         this._source.onended = () => {
           this._audioplaying = false;
           this.javascriptNode.disconnect();
-          console.log('play ended');
 
           if (this._playbackstate === 'started' && !this._stepbackward) {
             this.statechange.emit({

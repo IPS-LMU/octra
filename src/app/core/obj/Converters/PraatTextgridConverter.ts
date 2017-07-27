@@ -103,7 +103,7 @@ export class PraatTextgridConverter extends Converter {
         let lvl_num = 1;
 
         if (lines[7] === 'item []: ') {
-                    // start reading segments
+          // start reading segments
           for (let i = 8; i < lines.length; i++) {
             if (lines[i] !== '') {
 

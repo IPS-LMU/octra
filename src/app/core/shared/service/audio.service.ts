@@ -62,18 +62,16 @@ export class AudioService {
 
         let filename = '';
         if (matches !== null && matches[1].length > 0) {
-          console.log(matches + ' found');
           filename = matches[1] + '.' + matches[3];
         } else {
           filename = url;
         }
 
-        console.log('filename = ' + filename);
         AudioManager.decodeAudio(filename, buffer, AppInfo.audioformats).then(
           (manager: AudioManager) => {
             this.registerAudioManager(manager);
 
-            Logger.info('Audio (Length: ' + manager.ressource.size + ') loaded. Decode now...');
+            Logger.log('Audio (Length: ' + manager.ressource.size + ') loaded. Decode now...');
             this.afterloaded.emit({status: 'success'});
             callback({});
           }

@@ -50,7 +50,7 @@ h4 {
     display: -webkit-box;
 }
 
-@media(max-width:990px){
+@media (max-width: 990px) {
     #loginrow {
         display: inherit;
     }

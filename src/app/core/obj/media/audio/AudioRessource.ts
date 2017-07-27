@@ -2,10 +2,12 @@ import {MediaRessource} from '../MediaRessource';
 import {SourceType} from '../index';
 import {AudioInfo} from './AudioInfo';
 import {isNullOrUndefined} from 'util';
+
 export class AudioRessource extends MediaRessource {
   set info(value: AudioInfo) {
     this._info = value;
   }
+
   get info(): AudioInfo {
     return this._info;
   }

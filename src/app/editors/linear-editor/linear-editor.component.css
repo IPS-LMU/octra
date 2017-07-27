@@ -1,20 +1,20 @@
-#viewer{
-    max-height:200px;
+#viewer {
+    max-height: 200px;
 }
 
-#editor-placeholder{
-    background-color:white;
+#editor-placeholder {
+    background-color: white;
     border: 1px dashed gray;
-    padding:10px;
-    width:100%;
-    text-align:center;
+    padding: 10px;
+    width: 100%;
+    text-align: center;
 }
 
-.loupe{
-    margin-top:10px;
+.loupe {
+    margin-top: 10px;
 }
 
-:host{
+:host {
     -webkit-box-flex: 1;
     -ms-flex: 1 0 auto;
     display: flex;

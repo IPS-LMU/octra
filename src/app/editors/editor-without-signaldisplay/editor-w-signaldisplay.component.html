@@ -34,7 +34,8 @@
                       }"
                       [easymode]="sessService.easymode"
 ></app-audio-navigation>
-<app-audioplayer #audioplayer (shortcuttriggered)="onShortcutTriggered($event)" [audiochunk]="audiochunk"></app-audioplayer>
+<app-audioplayer #audioplayer (shortcuttriggered)="onShortcutTriggered($event)"
+                 [audiochunk]="audiochunk"></app-audioplayer>
 <app-transcr-editor #transcr
                     (typing)="afterTyping($event);"
                     (marker_insert)="onMarkerInsert($event)"

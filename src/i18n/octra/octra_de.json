@@ -67,7 +67,7 @@
     "sent": "Der Fehlerbericht wurde erfolgreich gesendet.",
     "send protocol": "Protokoll beifügen (empfohlen)"
   },
-  "transcription":{
+  "transcription": {
     "start": "Transkription fortsetzen",
     "new": "Neue Transkription beginnen",
     "finish": "Transkription fertigstellen",
@@ -75,7 +75,7 @@
     "check": "Transkription überprüfen",
     "send": "Transkription senden"
   },
-  "segments":{
+  "segments": {
     "total": "Segmente insgesamt",
     "transcribed": "Segmente transkribiert",
     "with breaks": "Segmente mit Pausen",
@@ -83,7 +83,7 @@
     "previous": "vorheriges Segment",
     "next": "nächstes Segment"
   },
-  "feedback":{
+  "feedback": {
     "unintelligible": "unverständlich",
     "less intelligible": "weniger verständlich",
     "intelligible": "verständlich",
@@ -109,10 +109,12 @@
       "stop": {
         "header": "Transkription beenden",
         "text": "Möchten Sie die Transkription wirklich beenden?<br><br>Ihr Fortschritt wird lokal in diesem Browser gespeichert. Um später fortzufahren, sollten Sie nicht den Browserverlauf löschen und ausschließlich diesen Browser nutzen."
-      },"send": {
+      },
+      "send": {
         "header": "Transkription senden",
         "text": "Durch Klicken auf 'Jetzt senden' werden Ihre Ergebnisse zentral gespeichert und können nicht mehr geändert werden."
-      },"sending": {
+      },
+      "sending": {
         "header": "Transkription wird übertragen...",
         "text": "Ihre Ergebnisse werden übertragen... Bitte bis zum Abschluss der Übertragung warten..."
       }
@@ -159,14 +161,14 @@
     "file not supported": "Die Datei ist vom Typ '{{type}}' und wird nicht unterstützt.",
     "another file selected": "Es wurde eine andere Datei ausgewählt. Bitte wähle die gleiche Datei aus wie zuvor oder beginne eine neue Transkription.\n\nGesucht wird die Datei '{{file}}'"
   },
-  "logout":{
+  "logout": {
     "successful text": "Sie haben sich erfolgreich abgemeldet.",
     "login again": "Erneut anmelden"
   },
-  "signal-gui":{
+  "signal-gui": {
     "selection text": "Bitte wählen Sie ein Segment aus, indem Sie mit der Maus über den Signalausschnitt fahren und die {{value}} Taste betätigen."
   },
-  "transcription-submit":{
+  "transcription-submit": {
     "overview": "Folgende Tabelle zeigt Ihnen einen Überblick über Ihre definierten Segmente:",
     "form fill out": "Bitte füllen Sie kurz das Formular aus",
     "intelligibility of the speaker": "Sprachverständlichkeit des Sprechers",
@@ -176,12 +178,18 @@
   "boundary cannot delete": "Die Segmentgrenze kann nicht gelöscht werden, da daran angrenzende Segmente bereits transkribiert wurden",
   "boundary cannot set": "Die Segmentgrenze kann nicht innerhalb eines trankribierten Segments gesetzt werden",
   "send error": "Es ist ein Fehler aufgetreten. Lade diese Seite mit ihrem Browser noch einmal und versuche es erneut",
-  "transcription submitted":{
+  "transcription submitted": {
     "no jobs left": "Keine freien Aufgaben verfügbar",
     "transcription sent": "Transkription wurde übertragen.",
     "transcription sent successfully": "Ihre Transkription wurde erfolgreich übertragen.",
     "want to do": "Was wollen Sie tun?",
     "quit": "Beenden und Abmelden",
     "next transcription": "Jetzt nächste Transkription durchführen"
+  },
+  "special_markers": {
+    "boundary": {
+      "insert": "Schnittmarke",
+      "description": "Nachdem die aktuelle Audioposition im Audioplayer oder im Signaldisplay gesetzt wurde, kann hiermit an einer bestimmten Textstelle eine Schnittmarke eingefügt werden."
+    }
   }
 }

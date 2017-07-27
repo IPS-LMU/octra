@@ -200,8 +200,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   public initialize = () => {
     this.summernote_ui = jQuery.summernote.ui;
     const Navigation = this.initNavigation();
-    Navigation.buttons['boundary'] = this.createCustomButtonsArray()[0];
-    Navigation.str_array.push('boundary');
+
+    if (this.Settings.special_markers.boundary) {
+      Navigation.buttons['boundary'] = this.createCustomButtonsArray()[0];
+      Navigation.str_array.push('boundary');
+    }
 
     /*
 
@@ -411,17 +414,18 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     // create boundary button
     const boundary_btn = (context) => {
-      const platform = BrowserInfo.platform;
+      const boundary_label = this.langService.instant('special_markers.boundary.insert', {type: ''});
+      const boundary_descr = this.langService.instant('special_markers.boundary.description', {type: ''});
       let icon = '';
       if (!this.easymode) {
         icon = '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
-          '<span class=\'btn-description\'>BOUNDARY DESCR</span><span class=\'btn-shortcut\'> ' +
-          '[SHORTCUT]</span>';
+          '<span class=\'btn-description\'>' + boundary_label + '</span><span class=\'btn-shortcut\'> ' +
+          '[ALT + S]</span>';
         if (this.Settings.responsive) {
           icon = '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
-            '<span class=\'btn-description hidden-xs hidden-sm\'>BOUNDARY DESCR</span>' +
+            '<span class=\'btn-description hidden-xs hidden-sm\'>' + boundary_label + '</span>' +
             '<span class=\'btn-shortcut hidden-xs hidden-sm hidden-md\'> ' +
-            '[SHORTCUT]</span>';
+            '[ALT + S]</span>';
         }
       } else {
         icon = '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon\' style=\'height:16px;\'/>';
@@ -429,7 +433,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       // create button
       const btn_js = {
         contents: icon,
-        tooltip: 'test',
+        tooltip: boundary_descr,
         click: () => {
           this.marker_click.emit('boundary');
           this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
@@ -498,7 +502,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       if (this.isDisabledKey(comboKey)) {
         $event.preventDefault();
       } else {
-        if (comboKey === 'ALT + S') {
+        if (comboKey === 'ALT + S' && this.Settings.special_markers.boundary) {
           // add boundary
           this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
           $event.preventDefault();
@@ -516,7 +520,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
     }
-  }
+  };
 
   /**
    * called after key up in editor
@@ -594,7 +598,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
     this.Settings.disabled_keys.splice(j, 1);
 
-    return (j > -1) ? true : false;
+    return (j > -1);
   }
 
   /**

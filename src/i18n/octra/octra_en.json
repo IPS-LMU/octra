@@ -187,5 +187,11 @@
     "want to do": "What would you like to do?",
     "quit": "Quit and sign out",
     "next transcription": "Get next transcription"
+  },
+  "special_markers": {
+    "boundary": {
+      "insert": "Crop mark",
+      "description": "After the playback postion was set in the audio player or signal display with this you can insert a crop mark at the text position."
+    }
   }
 }

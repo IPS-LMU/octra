@@ -125,7 +125,8 @@
         <h4>Audio files:</h4>
         <table class="table table-responsive table-striped">
             <tr>
-                <td><span *ngFor="let elem of AppInfo.audioformats; let i = index">*{{elem.extension}}{{(i < AppInfo.audioformats.length - 1) ? ',' : ''}} </span></td>
+                <td><span *ngFor="let elem of AppInfo.audioformats; let i = index">*{{elem.extension}}{{(i < AppInfo.audioformats.length - 1) ? ',' : ''}} </span>
+                </td>
             </tr>
         </table>
         <h4>files for import:</h4>

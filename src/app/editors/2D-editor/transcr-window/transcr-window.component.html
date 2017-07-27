@@ -1,4 +1,4 @@
-<div id="window"  #window>
+<div id="window" #window>
     <div class="window-nav-top"><span class="glyphicon glyphicon-remove close" (click)="close();"></span></div>
     <app-audio-navigation #audionav
                           (buttonclick)="onButtonClick($event)"
@@ -41,12 +41,15 @@
                (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
                [audiochunk]="audiochunk"
     ></app-loupe>
+    {{(audiochunk.selection !== null) ? audiochunk.selection.start.seconds : 0}}
     <app-transcr-editor #editor id="trancr"
                         (marker_insert)="onMarkerInsert($event)"
                         (marker_click)="onMarkerClick($event)"
                         [markers]="transcrService.guidelines.markers"
                         [easymode]="easymode"
                         [audiochunk]="audiochunk"
+                        (boundaryclicked)="onBoundaryClicked($event)"
+                        (typing)="afterTyping($event)"
     ></app-transcr-editor>
     <div class="window-nav-bottom">
         <div class="row">

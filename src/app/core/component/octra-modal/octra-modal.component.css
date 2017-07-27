@@ -1,12 +1,12 @@
-#bgProtocol{
-    font-size:12px;
-    height:200px;
+#bgProtocol {
+    font-size: 12px;
+    height: 200px;
     font-family: "Courier New", "Arial";
     border: 1px solid lightgray;
     padding: 5px;
 }
 
-.bugsent{
+.bugsent {
     position: absolute;
     right: 0;
     margin-right: 30px;

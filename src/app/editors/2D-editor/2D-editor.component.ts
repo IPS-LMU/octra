@@ -107,6 +107,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     this.viewer.Settings.multi_line = true;
     this.viewer.Settings.height = 70;
     this.viewer.Settings.margin.bottom = 5;
+    this.viewer.Settings.margin.right = 0;
     this.viewer.Settings.justifySignalHeight = false;
     this.viewer.Settings.step_width_ratio = (this.viewer.Settings.pixel_per_sec / this.audiomanager.ressource.info.samplerate);
 
@@ -251,9 +252,9 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
     if (cursor && cursor.timePos && cursor.relPos) {
       coord.x = ((cursor.relPos.x) ? cursor.relPos.x - 40 : 0);
-      coord.y = ((cursor.line) ? (cursor.line.number + 1) *
+      coord.y = ((cursor.line) ? (cursor.line.number) *
         cursor.line.Size.height + (cursor.line.number) * this.viewer.Settings.margin.bottom : 0);
-      coord.y -= 25;
+      coord.y -= cursor.line.Size.height - 25;
 
       const half_rate = Math.round(this.audiomanager.ressource.info.samplerate / factor);
       const start = (cursor.timePos.samples > half_rate)
@@ -274,9 +275,9 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
     if (cursor && cursor.timePos && cursor.relPos) {
       coord.x = ((cursor.relPos.x) ? cursor.relPos.x - 40 : 0);
-      coord.y = ((cursor.line) ? (cursor.line.number + 1) *
+      coord.y = ((cursor.line) ? (cursor.line.number) *
         cursor.line.Size.height + (cursor.line.number) * this.viewer.Settings.margin.bottom : 0);
-      coord.y -= 25;
+      coord.y -= cursor.line.Size.height - 25;
     }
   }
 

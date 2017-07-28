@@ -41,7 +41,6 @@
                (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
                [audiochunk]="audiochunk"
     ></app-loupe>
-    {{(audiochunk.selection !== null) ? audiochunk.selection.start.seconds : 0}}
     <app-transcr-editor #editor id="trancr"
                         (marker_insert)="onMarkerInsert($event)"
                         (marker_click)="onMarkerClick($event)"

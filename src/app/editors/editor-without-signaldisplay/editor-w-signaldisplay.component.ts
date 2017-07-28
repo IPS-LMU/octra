@@ -162,6 +162,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   afterTyping(status) {
     if (status === 'stopped') {
       this.saveTranscript();
+      this.highlight();
     }
   }
 
@@ -218,6 +219,25 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
       return a.replace(/(<p>)|(<\/p>)/g, '');
     });
 
+    // remove invalid boundaries
+    if (seg_texts.length > 1) {
+      let start = 0;
+      for (let i = 0; i < samples_array.length; i++) {
+        if (!(samples_array[i] > start)) {
+          // remove boundary
+          samples_array.splice(i, 1);
+
+          // concat
+          seg_texts[i + 1] = seg_texts[i] + seg_texts[i + 1];
+          seg_texts.splice(i, 1);
+
+
+          --i;
+        } else {
+          start = samples_array[i];
+        }
+      }
+    }
 
     for (let i = 0; i < seg_texts.length; i++) {
       const anno_seg_length = this.transcrService.annotation.levels[0].segments.length;
@@ -250,6 +270,32 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
       // because last segment was removed
       const seg = this.transcrService.annotation.levels[0].segments.get(seg_texts.length - 1);
       seg.time.samples = this.audiochunk.time.end.samples;
+    }
+  }
+
+  public highlight() {
+    const html: string = this.editor.html.replace(/&nbsp;/g, ' ');
+
+    const samples_array: number[] = [];
+    html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)">\s?/g,
+      function (match, g1, g2) {
+        samples_array.push(Number(g1));
+        return '';
+      });
+
+    let start = 0;
+    for (let i = 0; i < samples_array.length; i++) {
+      if (!(samples_array[i] > start)) {
+        // mark boundary red
+        jQuery('.note-editable.panel-body img[data-samples]:eq(' + i + ')').css({
+          'background-color': 'red'
+        });
+      } else {
+        jQuery('.note-editable.panel-body img[data-samples]:eq(' + i + ')').css({
+          'background-color': 'white'
+        });
+        start = samples_array[i];
+      }
     }
   }
 }

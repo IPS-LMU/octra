@@ -129,6 +129,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     if (renew) {
       this.textfield.summernote('destroy');
       this.initialize();
+      this.initPopover();
     }
   }
 

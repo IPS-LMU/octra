@@ -21,7 +21,7 @@
 #special {
     width: 100%;
     background-color: white;
-    padding: 1%;
+    padding:0;
     padding-top: 10px;
     border: 1px solid dimgray;
 }

@@ -291,7 +291,7 @@ export class TranscriptionService {
         this.saving = false;
       }, 2000);
     }
-  }
+  };
 
   public destroy() {
     this.subscrmanager.destroy();

@@ -123,8 +123,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.subscrmanager.add(this.transcrService.annotation.levels[0].segments.onsegmentchange.subscribe(
       ($event) => {
-        if (this.saving) {
-        } else {
+        if (!this.saving) {
           setTimeout(() => {
             this.saving = true;
             this.onSegmentChange($event);
@@ -133,26 +132,10 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     ));
 
-    this
-      .subscrmanager
-      .add(this
-
-        .loupe
-        .viewer
-        .alerttriggered
-        .subscribe(
-          (result) => {
-            this
-              .msg
-              .showMessage(result
-
-                  .type
-                ,
-                result
-                  .message
-              );
-          }
-        ));
+    this.subscrmanager.add(this.loupe.viewer.alerttriggered.subscribe((result) => {
+        this.msg.showMessage(result.type, result.message);
+      }
+    ));
 
     this.subscrmanager.add(this.viewer.alerttriggered.subscribe(
       (result) => {

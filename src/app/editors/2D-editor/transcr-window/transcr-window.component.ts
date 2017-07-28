@@ -27,7 +27,6 @@ import {AudioRessource} from '../../../core/obj/media/audio/AudioRessource';
 import {isNullOrUndefined} from 'util';
 import {AudioSelection} from '../../../core/obj/media/audio/AudioSelection';
 import {Segments} from '../../../core/obj/Segments';
-import {Logger} from '../../../core/shared/Logger';
 
 @Component({
   selector: 'app-transcr-window',
@@ -162,7 +161,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
       if (this.editor.html.indexOf('<img src="assets/img/components/transcr-editor/boundary.png"') > -1) {
         // boundaries were inserted
-        this.transcrService.annotation.levels[0].segments = this.temp_segments.clone();
+        this.transcrService.annotation.levels[0].segments.segments = this.temp_segments.segments;
+        this.transcrService.annotation.levels[0].segments.onsegmentchange.emit(null);
       } else {
         // no boundaries inserted
         const segment = this.transcrService.annotation.levels[0].segments.get(this.segment_index);
@@ -300,13 +300,12 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   afterTyping(status) {
     if (status === 'stopped') {
       this.saveTranscript();
+      this.highlight();
     }
   }
 
   saveTranscript() {
-    const logger: Logger = new Logger('saveTranscript');
     const seg_start = this.transcrService.annotation.levels[0].segments.getSegmentBySamplePosition(this.audiochunk.time.start.samples + 20);
-    logger.addEntry('log', 'start at segment ' + seg_start);
 
     this.temp_segments = this.transcrService.annotation.levels[0].segments.clone();
     // TODO ! left and rigt boundary must not be changed !
@@ -327,23 +326,61 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       return a.replace(/(<p>)|(<\/p>)/g, '');
     });
 
-    logger.addEntry('log', 'texts');
-    logger.addEntry('log', seg_texts);
-    logger.addEntry('log', this.temp_segments);
+    // remove invalid boundaries
+    if (seg_texts.length > 1) {
+      let start = 0;
+      for (let i = 0; i < samples_array.length; i++) {
+        if (!(samples_array[i] > start)) {
+          // remove boundary
+          samples_array.splice(i, 1);
+
+          // concat
+          seg_texts[i + 1] = seg_texts[i] + seg_texts[i + 1];
+          seg_texts.splice(i, 1);
+
+
+          --i;
+        } else {
+          start = samples_array[i];
+        }
+      }
+    }
 
     for (let i = 0; i < seg_texts.length - 1; i++) {
       const new_raw = this.transcrService.htmlToRaw(seg_texts[i]);
 
       this.temp_segments.add(samples_array[i], new_raw);
-      logger.addEntry('log', 'add segment ' + i + ' with samples ' + samples_array[i]);
     }
 
     // shift rest of text to next segment
     if (!isNullOrUndefined(this.temp_segments.get(seg_start + seg_texts.length - 1))) {
       this.temp_segments.get(seg_start + seg_texts.length - 1).transcript = seg_texts[seg_texts.length - 1];
     }
+  }
 
-    logger.addEntry('log', this.temp_segments);
-    logger.output();
+  public highlight() {
+    const html: string = this.editor.html.replace(/&nbsp;/g, ' ');
+
+    const samples_array: number[] = [];
+    html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)">\s?/g,
+      function (match, g1, g2) {
+        samples_array.push(Number(g1));
+        return '';
+      });
+
+    let start = 0;
+    for (let i = 0; i < samples_array.length; i++) {
+      if (!(samples_array[i] > start)) {
+        // mark boundary red
+        jQuery('.note-editable.panel-body img[data-samples]:eq(' + i + ')').css({
+          'background-color': 'red'
+        });
+      } else {
+        jQuery('.note-editable.panel-body img[data-samples]:eq(' + i + ')').css({
+          'background-color': 'white'
+        });
+        start = samples_array[i];
+      }
+    }
   }
 }

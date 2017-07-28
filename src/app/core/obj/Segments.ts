@@ -5,6 +5,9 @@ import {ISegment, OLabel, OSegment} from './annotjson';
 import {isNullOrUndefined} from 'util';
 
 export class Segments {
+  set segments(value: Segment[]) {
+    this._segments = value;
+  }
   public onsegmentchange: EventEmitter<any> = new EventEmitter<any>();
 
   get segments(): Segment[] {

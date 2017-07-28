@@ -19,11 +19,11 @@ export class AppInfo {
   ];
 
   public static readonly converters: Converter[] = [
-    new TextConverter(),
     new PraatTableConverter(),
     new PraatTextgridConverter(),
     new AnnotJSONConverter(),
-    new CTMConverter()
+    new CTMConverter(),
+    new TextConverter(),
   ];
 
   static readonly version = '1.2.0';

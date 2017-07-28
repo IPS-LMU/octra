@@ -1,5 +1,5 @@
 import {Converter, File} from './Converter';
-import {OAnnotJSON, OAudiofile, OLevel} from '../annotjson';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
 import {isNullOrUndefined} from 'util';
 
 export class TextConverter extends Converter {
@@ -12,7 +12,7 @@ export class TextConverter extends Converter {
     this._website.title = 'WebMaus';
     this._website.url = 'https://clarin.phonetik.uni-muenchen.de/BASWebServices/#/services/WebMAUSBasic';
     this._conversion.export = true;
-    this._conversion.import = false;
+    this._conversion.import = true;
     this._encoding = 'UTF-8';
   }
 
@@ -46,8 +46,21 @@ export class TextConverter extends Converter {
   };
 
   public import(file: File, audiofile: OAudiofile) {
-    const result = null;
+    const result = new OAnnotJSON(audiofile.name, audiofile.samplerate);
 
-    return null;
+    const content = file.content;
+    const olevel = new OLevel('Orthographic', 'SEGMENT');
+    const samplerate = audiofile.samplerate;
+
+    const olabels: OLabel[] = [];
+    olabels.push((new OLabel('Orthographic', file.content)));
+    const osegment = new OSegment(
+      1, 0, Math.round(audiofile.duration * samplerate), olabels
+    );
+
+    olevel.items.push(osegment);
+    result.levels.push(olevel);
+
+    return result;
   };
 }

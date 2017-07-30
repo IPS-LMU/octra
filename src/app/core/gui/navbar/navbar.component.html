@@ -6,9 +6,9 @@
         <table class="table table-striped table-responsive">
             <thead>
             <tr>
-                <th>Download</th>
-                <th>Application</th>
-                <th>Website</th>
+                <th>{{'general.download' | translate}}</th>
+                <th>{{'general.application' | translate}}</th>
+                <th>{{'general.website' | translate}}</th>
             </tr>
             </thead>
             <tbody>
@@ -117,13 +117,13 @@
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav" *ngIf="!sessService.LoggedIn">
                 <li routerLinkActive="active">
-                    <a [routerLink]="['/login']">Login</a>
+                    <a [routerLink]="['/login']">{{'general.login' | translate}}</a>
                 </li>
                 <li routerLinkActive="active">
-                    <a [routerLink]="['/news']">News</a>
+                    <a [routerLink]="['/news']">{{'general.news' | translate}}</a>
                 </li>
                 <li routerLinkActive="active">
-                    <a [routerLink]="['/faq']">FAQ</a>
+                    <a [routerLink]="['/faq']">{{'general.faq' | translate}}</a>
                 </li>
             </ul>
 
@@ -168,37 +168,37 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td><span>Dauer:</span></td>
+                                <td><span>{{'general.duration' | translate}}:</span></td>
                                 <td>
                                     <span>{{navbarServ.exportformats.duration | timespan}} (M:s:m)</span>
                                 </td>
                             </tr>
                             <tr>
-                                <td><span>Abtastrate:</span></td>
+                                <td><span>{{'general.samplerate' | translate}}:</span></td>
                                 <td>
                                     <span>{{navbarServ.exportformats.samplerate}}</span>
                                 </td>
                             </tr>
                             <tr>
-                                <td><span>Bits pro Sample:</span></td>
+                                <td><span>{{'general.bitspersecond' | translate}}:</span></td>
                                 <td>
                                     <span>{{navbarServ.exportformats.bitrate}} Bit/s</span>
                                 </td>
                             </tr>
                             <tr>
-                                <td><span>Dateigröße:</span></td>
+                                <td><span>{{'general.filesize' | translate}}:</span></td>
                                 <td>
                                     <span>{{navbarServ.exportformats.filesize.size}} {{navbarServ.exportformats.filesize.label}}</span>
                                 </td>
                             </tr>
                             <tr *ngIf="!sessService.offline">
-                                <td><span>ID:</span></td>
+                                <td><span>{{'general.id' | translate}}:</span></td>
                                 <td>
                                     <span>{{sessService.data_id}}</span>
                                 </td>
                             </tr>
                             <tr *ngIf="!sessService.offline">
-                                <td><span>Jobs left:</span></td>
+                                <td><span>{{'general.free jobs' | translate}}:</span></td>
                                 <td>
                                     <span>{{sessService.jobs_left}}</span>
                                 </td>
@@ -222,7 +222,7 @@
                     }">
                         <table class="table">
                             <tr>
-                                <td><label for="easymode">{{"general.easy mode" | translate}}:</label></td>
+                                <td><label for="easymode">{{"settings.easy mode" | translate}}:</label></td>
                                 <td>
                                     <div class="togglebutton">
                                         <label>
@@ -233,7 +233,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td><label for="playonhover">PlayOnHover:</label></td>
+                                <td><label for="playonhover">{{"settings.play on hover" | translate}}:</label></td>
                                 <td>
                                     <div class="togglebutton">
                                         <label>

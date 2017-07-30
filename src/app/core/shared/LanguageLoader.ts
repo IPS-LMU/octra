@@ -1,6 +1,7 @@
 import {Http, Response} from '@angular/http';
 import {TranslateLoader} from '@ngx-translate/core';
 import 'rxjs/add/operator/map';
+import {Functions} from './Functions';
 
 export class LanguageLoader implements TranslateLoader {
   constructor(private http: Http, private prefix: string = '/assets/i18n/', private suffix: string = '.json') {
@@ -12,7 +13,7 @@ export class LanguageLoader implements TranslateLoader {
    * @returns {any}
    */
   public getTranslation(lang: string): any {
-    return this.http.get(`${this.prefix}${lang}${this.suffix}`)
+    return Functions.uniqueHTTPRequest(this.http, false, null, `${this.prefix}${lang}${this.suffix}`, null)
       .map((res: Response) => res.json());
   }
 }

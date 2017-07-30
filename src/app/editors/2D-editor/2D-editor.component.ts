@@ -254,7 +254,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       coord.x = ((cursor.relPos.x) ? cursor.relPos.x - 40 : 0);
       coord.y = ((cursor.line) ? (cursor.line.number) *
         cursor.line.Size.height + (cursor.line.number) * this.viewer.Settings.margin.bottom : 0);
-      coord.y += cursor.line.Size.height - 15;
+      coord.y += this.viewer.Settings.height - 15;
 
       const half_rate = Math.round(this.audiomanager.ressource.info.samplerate / factor);
       const start = (cursor.timePos.samples > half_rate)
@@ -277,7 +277,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       coord.x = ((cursor.relPos.x) ? cursor.relPos.x - 40 : 0);
       coord.y = ((cursor.line) ? (cursor.line.number) *
         cursor.line.Size.height + (cursor.line.number) * this.viewer.Settings.margin.bottom : 0);
-      coord.y += cursor.line.Size.height -15;
+      coord.y += this.viewer.Settings.height - 15;
     }
   }
 
@@ -377,7 +377,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         const end = start.clone();
         end.samples = start.samples + segment.time.samples;
         this.audiochunk_window = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
-        this.window.editor.rawText = segment.transcript;
+        this.selected_index = selected.index;
       }
     }
     this.viewer.deactivate_shortcuts = true;

@@ -13,8 +13,8 @@ import {FaqComponent} from './core/gui/faq/faq.component';
 const APP_ROUTES: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full'},
   {path: 'login', component: LoginComponent, canActivate: [SettingsGuard, ALoginGuard]},
-  {path: 'news', component: NewsComponent, canActivate: [SettingsGuard, ALoginGuard]},
-  {path: 'faq', component: FaqComponent, canActivate: [SettingsGuard, ALoginGuard]},
+  {path: 'news', component: NewsComponent, canActivate: [SettingsGuard]},
+  {path: 'faq', component: FaqComponent, canActivate: [SettingsGuard]},
   {path: 'logout', component: LogoutComponent, canActivate: [SettingsGuard, LogoutGuard]},
   {path: 'user', component: MembersAreaComponent, canActivate: [SettingsGuard], children: MEMBER_ROUTES},
   {path: '**', redirectTo: '/login', pathMatch: 'full'}

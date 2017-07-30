@@ -77,6 +77,7 @@ import {ExpandDirective} from './core/gui/faq/expand.directive';
 import {LinearEditorComponent} from './editors/linear-editor/linear-editor.component';
 import {EditorWSignaldisplayComponent} from './editors/editor-without-signaldisplay/editor-w-signaldisplay.component';
 import {TwoDEditorComponent} from './editors/2D-editor/2D-editor.component';
+import {HelpComponent} from './core/gui/help/help.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
@@ -113,6 +114,7 @@ export const ngmodule = {
     TranscriptionEndComponent,
     TranscrOverviewComponent,
     TranscrWindowComponent,
+    HelpComponent,
     AlertComponent,
     ReloadFileComponent,
     DropZoneComponent,

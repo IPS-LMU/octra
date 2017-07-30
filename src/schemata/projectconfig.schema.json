@@ -10,6 +10,9 @@
         },
         "interfaces": {
           "type": "boolean"
+        },
+        "help_url": {
+          "type": "string"
         }
       },
       "type": "object"

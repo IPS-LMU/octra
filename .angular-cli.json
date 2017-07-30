@@ -41,7 +41,7 @@
         "../node_modules/video.js/dist/video.js",
         "../node_modules/platform/platform.js",
         "../node_modules/ajv/dist/ajv.min.js"
-        ],
+      ],
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",

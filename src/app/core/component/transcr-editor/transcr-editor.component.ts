@@ -157,12 +157,14 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           for (let j = 0; j < this.markers.length; j++) {
             const marker = this.markers[j];
             if (attr === marker.code) {
-
               jQuery(elem).replaceWith(Functions.escapeHtml(attr));
               break;
             }
           }
-        } else if (jQuery(elem).attr('class') !== 'error_underline') {
+        } else if (
+          jQuery(elem).attr('class') !== 'error_underline'
+          && jQuery(elem).prop('tagName').toLowerCase() !== 'textspan'
+        ) {
           jQuery(elem).remove();
         }
       }
@@ -170,6 +172,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     jQuery.each(dom.children(), replace_func);
     result = dom.text();
+    console.log(result);
 
     return result;
   };
@@ -486,9 +489,79 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     element.setAttribute('style', 'height:16px');
     element.setAttribute('data-samples', this.audiochunk.playposition.samples.toString());
 
+    this.textfield.summernote('editor.insertText', ' ');
     this.textfield.summernote('editor.insertNode', element);
+    this.textfield.summernote('editor.insertText', ' ');
+    /*
+    // this.textfield.summernote('saveRange');
+    const selection: Selection = document.getSelection();
+    const cursorPos = selection.anchorOffset;
+    const oldContent = selection.anchorNode.nodeValue;
+    const t = jQuery(selection.anchorNode.parentElement);
+
+    console.log(this.textfield.summernote('createRange'));
+    // const range: any = this.textfield.summernote('createRange');
+
+    if (selection.anchorNode.parentNode.nodeName.toLowerCase() === 'textspan') {
+      console.log('hasNextSibling ' + (selection.anchorNode.parentNode.nextSibling !== null));
+      const hasSibling = selection.anchorNode.parentNode.nextSibling !== null;
+      let element = document.createElement('img');
+      element.setAttribute('src', img_url);
+      element.setAttribute('class', 'btn-icon-text boundary');
+      element.setAttribute('style', 'height:16px');
+      element.setAttribute('data-samples', this.audiochunk.playposition.samples.toString());
+
+      this.textfield.summernote('editor.insertNode', element);
+      if (!hasSibling) {
+        const test = document.createElement('textspan');
+        test.innerHTML = '&nbsp;';
+        const txt = document.createTextNode('dasd');
+        this.textfield.summernote('editor.insertNode', test);
+
+        const range = document.createRange();
+        range.setStart(test, 0);
+        range.setEnd(test, 0);
+        range.collapse(true);
+
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+      // console.log('pos: ' + cursorPos);
+      // selection.anchorNode.nodeValue = oldContent.substr(0, cursorPos);
+
+
+            const range = document.createRange();
+            const sel = window.getSelection();
+            range.setEnd(selection.anchorNode, 0);
+            range.collapse(false);
+            sel.removeAllRanges();
+            sel.addRange(range);
+
+
+
+      // selection.setPosition(selection.anchorNode, selection.anchorNode.nodeValue.length);
+      // jQuery(selection.anchorNode.parentNode).after(element);
+
+            const nextspan = document.createElement('textspan');
+            nextspan.nodeValue = oldContent.substr(cursorPos);
+            nextspan.innerText = oldContent.substr(cursorPos);
+
+      // console.log(jQuery('.note-editable panel-body:eq(0)').html());
+      // jQuery(element).after(jQuery(nextspan));
+      // this.textfield.summernote('code', jQuery(nextspan).parent().html());
+      // const range = document.createRange().selectNode(nextspan);
+      // this.textfield.summernote('saveRange');
+      // range.selectNode(nextspan).setSelectionRange(0);
+      // this.textfield.summernote('code', jQuery('.note-editable panel-body:eq(0)').innerHTML);
+      // this.textfield.summernote('editor.insertNode', element);
+
+    */
     this.updateTextField();
     this.initPopover();
+    // } else {
+    //   console.log('nodeName = ' + selection.anchorNode.parentNode.nodeName);
+    // }
   }
 
   /**
@@ -631,8 +704,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           const s1 = (g1) ? g1 : '';
 
           const seg = this.transcrService.annotation.levels[0].segments.get(g1);
-          return '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
-            'data-samples=\'' + seg.time.samples + '\' />';
+          return ' <img src=\'assets/img/components/transcr-editor/boundary.png\' ' +
+            'class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
+            'data-samples=\'' + seg.time.samples + '\' /> ';
         };
 
         result = result.replace(regex2, replace_func2);

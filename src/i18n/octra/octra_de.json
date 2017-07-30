@@ -44,7 +44,6 @@
     "select database": "Datenbank wählen",
     "agreement": "Einverständniserklärung",
     "agreement read": "Ich habe die {{agreement}} gelesen und akzeptiert",
-    "easy mode": "Einfacher Modus",
     "yes": "Ja",
     "no": "Nein",
     "errors found": "({{errors}}) Fehler gefunden",
@@ -56,7 +55,17 @@
     "description": "Beschreibung",
     "bug report": "Fehlerbericht",
     "protocol": "Protokoll",
-    "submission success": "Übertragung erfolgreich"
+    "submission success": "Übertragung erfolgreich",
+    "duration": "Dauer",
+    "samplerate": "Abtastrate",
+    "bitspersecond": "Bits pro Sekunde",
+    "filesize": "Dateigröße",
+    "id": "ID",
+    "download": "Download",
+    "application": "Anwendung",
+    "website" : "Webseite",
+    "news": "Neuigkeiten",
+    "faq": "FAQ"
   },
   "bug report": {
     "report an error": "Fehler melden",
@@ -123,10 +132,16 @@
       "header": "Anmeldung fehlgeschlagen",
       "text": "Bitte überprüfen Sie ihren Nutzernamen und ihr Passwort."
     },
+    "supported": {
+      "header": "Unterstützte Dateien für den lokalen Modus",
+      "audio files": "Audio Dateien",
+      "file formats for import": "Dateiformate für den Import"
+    },
     "shortcuts": {
       "play pause": "Abspielen / Pausieren",
       "stop playback": "Wiedergabe beenden",
       "step backward": "Zur zuletzt pausierten Stelle springen",
+      "step backward time": "Zeitversetzt zurückspringen",
       "set segment": "Segmentgrenze setzen",
       "play selection": "Selektion abspielen",
       "transcribe segment": "Segment transkribieren",
@@ -135,7 +150,8 @@
       "audioplayer": "Tastenkombinationen des Audioplayers",
       "top signaldisplay": "Tastenkombinationen des oberen Signaldsiplays",
       "down signaldisplay": "Tastenkombinationen des unteren Signaldsiplays",
-      "2D-Editor": "Tastenkombinationen des 2D-Editors"
+      "2D-Editor": "Tastenkombinationen des 2D-Editors",
+      "play audio on hover": "Audio mit Mausbewegung abspielen"
     }
   },
   "login": {
@@ -191,5 +207,9 @@
       "insert": "Schnittmarke",
       "description": "Nachdem die aktuelle Audioposition im Audioplayer oder im Signaldisplay gesetzt wurde, kann hiermit an einer bestimmten Textstelle eine Schnittmarke eingefügt werden."
     }
+  },
+  "settings": {
+    "easy mode": "Einfacher Modus",
+    "play on hover": "PlayOnHover"
   }
 }

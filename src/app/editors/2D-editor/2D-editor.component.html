@@ -40,8 +40,13 @@
                               }"
                           [easymode]="sessService.easymode"
     ></app-audio-navigation>
-    <div style="width:100px;">
-        <app-circleloupe #loupe [ngStyle]="{
+
+    <div id="special" class="flex" [ngStyle]="
+{
+height: getHeight + 'px'
+}" style="overflow-y: scroll; overflow-x: hidden; position:relative;">
+        <div style="width:100px;">
+            <app-circleloupe #loupe [ngStyle]="{
 'position':'absolute',
 'margin-left':mini_loupecoord.x + 'px',
 'margin-top':mini_loupecoord.y + 'px',
@@ -49,12 +54,8 @@
 'height': '80px',
 'z-index':'90',
 'visibility': (loupe_hidden) ? 'hidden' : 'inherit'}"
-                         [audiochunk]="audiochunk_loupe"></app-circleloupe>
-    </div>
-    <div id="special" class="flex" [ngStyle]="
-{
-height: getHeight + 'px'
-}" style="overflow-y: scroll; overflow-x: hidden; position:relative;">
+                             [audiochunk]="audiochunk_loupe"></app-circleloupe>
+        </div>
         <app-audioviewer #viewer
                          (selchange)="onSegmentSelected($event);"
                          (segmententer)="onSegmentEntered($event);"

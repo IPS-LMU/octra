@@ -3,6 +3,10 @@
     min-height: 100px;
 }
 
+.textspan {
+    display: inline;
+}
+
 .transcr-editor .editor-nav {
     width: 100%;
     height: 2em;

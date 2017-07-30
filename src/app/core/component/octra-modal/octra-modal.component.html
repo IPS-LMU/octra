@@ -119,17 +119,17 @@
 </modal>
 <modal #supportedfiles id="supportedfiles">
     <modal-header>
-        <h3>Supported files for local mode</h3>
+        <h3>{{'modal.supported.header' | translate}}</h3>
     </modal-header>
     <modal-body>
-        <h4>Audio files:</h4>
+        <h4>{{'modal.supported.audio files' | translate}}:</h4>
         <table class="table table-responsive table-striped">
             <tr>
                 <td><span *ngFor="let elem of AppInfo.audioformats; let i = index">*{{elem.extension}}{{(i < AppInfo.audioformats.length - 1) ? ',' : ''}} </span>
                 </td>
             </tr>
         </table>
-        <h4>files for import:</h4>
+        <h4>{{'modal.supported.file formats for import' | translate}}:</h4>
         <table class="table table-responsive table-striped">
             <tr *ngFor="let elem of AppInfo.converters">
                 <td *ngIf="elem.conversion.import">

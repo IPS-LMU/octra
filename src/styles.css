@@ -195,3 +195,7 @@ footer {
     padding: 5px;
     display: none;
 }
+
+.textspan {
+    display: inline;
+}

@@ -56,6 +56,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
   public audiochunk: AudioChunk;
   public audiomanager: AudioManager;
+  private boundaryselected = false;
 
   constructor(public audio: AudioService,
               public keyMap: KeymappingService,
@@ -78,6 +79,20 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     this.editor.Settings.special_markers.boundary = true;
 
     EditorWSignaldisplayComponent.initialized.emit();
+
+
+    /* does not work
+    setInterval(() => {
+      if (this.audiochunk.isPlaying) {
+        const samples = this.audiochunk.playposition.samples;
+        let i: number = this.transcrService.annotation.levels[0].segments.getSegmentBySamplePosition(samples);
+        if (i < 0) {
+          i = this.transcrService.annotation.levels[0].segments.length - 1;
+        }
+        this.highlightSegment(i);
+      }
+    }, 500);
+    */
   }
 
   ngAfterViewInit() {
@@ -95,19 +110,13 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   ngOnChanges(obj: any) {
   }
 
-  test() {
-    const selection: Selection = document.getSelection();
-    const cursorPos = selection.anchorOffset;
-    const oldContent = selection.anchorNode.nodeValue;
-    const t = jQuery(selection.anchorNode.parentElement);
-    t.css(
-      {
-        border: '1px solid red'
-      }
-    );
-    const toInsert = 'InsertMe!';
-    const newContent = oldContent.substring(0, cursorPos) + toInsert + oldContent.substring(cursorPos);
-    selection.anchorNode.nodeValue = newContent;
+  highlightSegment(seg_number: number) {
+    jQuery('.note-editable.panel-body textspan').css({
+      'background-color': ''
+    });
+    jQuery('.note-editable.panel-body textspan:eq(' + seg_number + ')').css({
+      'background-color': 'yellow'
+    });
   }
 
   onButtonClick(event: { type: string, timestamp: number }) {
@@ -175,16 +184,29 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   onBoundaryClicked(samples: number) {
     const i: number = this.transcrService.annotation.levels[0].segments.getSegmentBySamplePosition(samples);
 
+    this.boundaryselected = true;
+
     if (i > -1) {
       const start = (i > 0) ? this.transcrService.annotation.levels[0].segments.get(i - 1).time.samples : 0;
+      this.highlightSegment(i);
       this.audiochunk.startpos = new AudioTime(start, this.audiomanager.ressource.info.samplerate);
       this.audiochunk.selection.end = this.transcrService.annotation.levels[0].segments.get(i).time.clone();
       this.audioplayer.update();
-      this.audioplayer.startPlayback().then(() => {
-        // set start pos and playback length to end of audio file
-        this.audiochunk.startpos = this.audiochunk.playposition.clone();
-      }).catch(() => {
+
+      // make sure that audio is stopped
+      this.audiochunk.stopPlayback(() => {
+        this.audioplayer.startPlayback().then(() => {
+          this.boundaryselected = false;
+          if (this.audiochunk.isPlaybackEnded) {
+            // set start pos and playback length to end of audio file
+            this.audiochunk.startpos = this.audiochunk.playposition.clone();
+            this.audioplayer.update();
+          }
+        }).catch(() => {
+        });
       });
+    } else {
+      this.boundaryselected = false;
     }
   }
 
@@ -202,11 +224,15 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   }
 
   saveTranscript() {
-    const html: string = this.editor.html.replace(/&nbsp;/g, ' ');
+    let html: string = this.editor.html.replace(/&nbsp;/g, ' ');
     // split text at the position of every boundary marker
+    html = html.replace(/(<textspan([ \w:"\-%;]|[0-9])*>)|(<\/textspan>)/g, '');
     let seg_texts: string[] = html.split(
       /\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="[0-9]+">\s?/g
     );
+    console.log(html);
+    console.log('summernote code: ' + this.editor.textfield.summernote('code'));
+    console.log(seg_texts);
 
     const samples_array: number[] = [];
     html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)">\s?/g,
@@ -271,6 +297,8 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
       const seg = this.transcrService.annotation.levels[0].segments.get(seg_texts.length - 1);
       seg.time.samples = this.audiochunk.time.end.samples;
     }
+
+    console.log(this.transcrService.annotation.levels[0].segments.segments);
   }
 
   public highlight() {

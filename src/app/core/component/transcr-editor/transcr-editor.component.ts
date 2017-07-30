@@ -172,7 +172,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     jQuery.each(dom.children(), replace_func);
     result = dom.text();
-    console.log(result);
 
     return result;
   };

@@ -105,7 +105,6 @@ export class CTMConverter extends Converter {
 
           if (i === lines.length - 2) {
             if ((start + length) < audiofile.duration) {
-
               const osegment_end = new OSegment(
                 (i + 2),
                 Math.round((start + length) * samplerate),
@@ -113,6 +112,7 @@ export class CTMConverter extends Converter {
                 [(new OLabel('Orthographic', ''))]
               );
 
+              console.log('END AT ' + (audiofile.duration));
               olevel.items.push(osegment_end);
             }
           }

@@ -224,15 +224,13 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   }
 
   saveTranscript() {
+    console.log('saveTranscript');
     let html: string = this.editor.html.replace(/&nbsp;/g, ' ');
     // split text at the position of every boundary marker
     html = html.replace(/(<textspan([ \w:"\-%;]|[0-9])*>)|(<\/textspan>)/g, '');
     let seg_texts: string[] = html.split(
       /\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="[0-9]+">\s?/g
     );
-    console.log(html);
-    console.log('summernote code: ' + this.editor.textfield.summernote('code'));
-    console.log(seg_texts);
 
     const samples_array: number[] = [];
     html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)">\s?/g,
@@ -297,8 +295,6 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
       const seg = this.transcrService.annotation.levels[0].segments.get(seg_texts.length - 1);
       seg.time.samples = this.audiochunk.time.end.samples;
     }
-
-    console.log(this.transcrService.annotation.levels[0].segments.segments);
   }
 
   public highlight() {

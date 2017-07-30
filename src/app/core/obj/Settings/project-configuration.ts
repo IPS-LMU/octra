@@ -7,7 +7,8 @@ export interface ProjectConfiguration {
   };
   navigation: {
     'export': boolean,
-    'interfaces': boolean
+    'interfaces': boolean,
+    'help_url': string
   };
   responsive: {
     enabled: boolean,

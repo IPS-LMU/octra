@@ -71,18 +71,6 @@ export class TranscriptionComponent implements OnInit,
 
   public feedback_expanded = false;
 
-  get help_url(): string {
-    if (this.sessService.Interface === 'Editor without signal display') {
-      return 'http://www.phonetik.uni-muenchen.de/apps/octra/videos/63sd324g43qt7-interface1/';
-    } else if (this.sessService.Interface === 'Linear Editor') {
-      return 'http://www.phonetik.uni-muenchen.de/apps/octra/videos/6at766dsf8ui34-interface2/';
-    } else if (this.sessService.Interface === '2D-Editor') {
-      return 'http://www.phonetik.uni-muenchen.de/apps/octra/videos/6at766dsf8ui34-interface3/';
-    }
-
-    return '';
-  }
-
   get loaded(): boolean {
     return (this.audio.loaded && !isNullOrUndefined(this.transcrService.guidelines));
   }
@@ -121,7 +109,6 @@ export class TranscriptionComponent implements OnInit,
     this.subscrmanager = new SubscriptionManager();
     this.audiomanager = this.audio.audiomanagers[0];
 
-    this.sessService.Interface = '2D-Editor';
     this.navbarServ.transcrService = this.transcrService;
     this.navbarServ.uiService = this.uiService;
     if (!isNullOrUndefined(this.projectsettings) && !isNullOrUndefined(this.projectsettings.logging)

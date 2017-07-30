@@ -5,7 +5,8 @@
   },
   "navigation": {
     "export": true,
-    "interfaces": true
+    "interfaces": true,
+    "help_url": "https://www.phonetik.uni-muenchen.de/apps/octra/help/"
   },
   "responsive": {
     "enabled": true,

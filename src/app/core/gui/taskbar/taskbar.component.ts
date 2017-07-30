@@ -9,7 +9,6 @@ import {SessionService} from '../../shared/service/session.service';
 export class FastbarComponent implements OnInit {
 
   @Input() responsive = false;
-  @Input() help_url = '';
   @Input() button_labels: any = {
     shortcuts: 'Shortcuts',
     guidelines: 'Guidlines',

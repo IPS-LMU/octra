@@ -2,7 +2,6 @@ import {Logger} from '../../../shared/Logger';
 import {AudioRessource} from './AudioRessource';
 import {isNullOrUndefined} from 'util';
 import {EventEmitter} from '@angular/core';
-import {decodeAudioFile} from 'browser-signal-processing/ts/browser-signal-processing/browser-api/format-conversion';
 import {AudioTime} from './AudioTime';
 import {SourceType} from '../index';
 import {AudioChunk} from './AudioChunk';
@@ -136,7 +135,7 @@ export class AudioManager {
       console.error(err.message);
     }
 
-    return decodeAudioFile(buffer, audioinfo.samplerate).then((audiobuffer: AudioBuffer) => {
+    return AudioManager.decodeAudioFile(buffer, audioinfo.samplerate).then((audiobuffer: AudioBuffer) => {
       Logger.log('Audio decoded.');
 
       result.ressource = new AudioRessource(filename, SourceType.ArrayBuffer,
@@ -156,6 +155,42 @@ export class AudioManager {
     });
   };
 
+  /**
+   * Decode an audio file to an AudioBuffer object.
+   *
+   * Supported input formats are determined by the browser. The WebAudio API
+   * re-samples the signal to the given sample rate. If resampling is
+   * undesired, the source sample rate must be known beforehand.
+   *
+   * @param file An object containing the encoded input file.
+   * @param sampleRate The sample rate of the target AudioBuffer object.
+   * @returns A promise resolving to the requested AudioBuffer.
+   */
+  public static decodeAudioFile(file: ArrayBuffer, sampleRate: number): Promise<AudioBuffer> {
+    /* adapted function from
+       "browser-signal-processing" package (MIT)
+       author: Markus Jochim (markusjochim@phonetik.uni-muenchen.de)
+    */
+
+    const OfflineAudioContext = (<any>window).OfflineAudioContext // Default
+      || (<any>window).webkitOfflineAudioContext // Safari and old versions of Chrome
+      || (<any>window).mozOfflineAudioContext
+      || false;
+
+    return new Promise<AudioBuffer>((resolve, reject) => {
+      const context = new OfflineAudioContext(1, 4096, sampleRate);
+
+      context.decodeAudioData(file, (result) => {
+        resolve(result);
+      }, (reason) => {
+        reject({
+          message: 'Could not decode audio file',
+          action: 'decodeAudioFile',
+          previousError: reason
+        });
+      });
+    });
+  }
 
   constructor(filename: string) {
     this._id = ++AudioManager.counter;
@@ -332,15 +367,6 @@ export class AudioManager {
     this.loaded = true;
     this.afterloaded.emit({status: 'success', error: ''})
   }
-
-  /*
-   public getChannel(audiobuffer: AudioBuffer): Float32Array {
-   if (!isNullOrUndefined(audiobuffer)) {
-   return audiobuffer.getChannelData(0);
-   }
-   return null;
-   }
-   */
 
   public destroy(disconnect: boolean = true) {
     if (!isNullOrUndefined(this._audiocontext)) {

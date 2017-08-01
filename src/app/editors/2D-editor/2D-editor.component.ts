@@ -122,14 +122,11 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         const event = obj.event;
         if (this.viewer.focused) {
           if (event.key === '+') {
-            this.factor = Math.max(4, this.factor + 1);
-            this.loupe.zoomY = Math.max(1, this.loupe.zoomY + 1);
-
+            this.factor = Math.min(8, this.factor + 1);
             this.changeArea(this.loupe, this.mini_loupecoord, this.factor);
           } else if (event.key === '-') {
             if (this.factor > 3) {
-              this.factor = Math.max(3, this.factor - 1);
-              this.loupe.zoomY = Math.max(1, this.loupe.zoomY - 1);
+              this.factor = Math.max(1, this.factor - 1);
               this.changeArea(this.loupe, this.mini_loupecoord, this.factor);
             }
           }
@@ -247,7 +244,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   onSegmentChange($event) {
   }
 
-  private changeArea(loup: CircleLoupeComponent, coord: any, factor: number = 4) {
+  private changeArea(loup: CircleLoupeComponent, coord: any, factor: number) {
     const cursor = this.viewer.MouseCursor;
 
     if (cursor && cursor.timePos && cursor.relPos) {
@@ -264,6 +261,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         ? new AudioTime(cursor.timePos.samples + half_rate, this.audiomanager.ressource.info.samplerate)
         : this.audiomanager.ressource.info.duration.clone();
 
+      this.loupe.zoomY = factor;
       if (start && end) {
         this.audiochunk_loupe = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
       }

@@ -30,9 +30,7 @@
         <app-transcr-overview *ngIf="transcrService.annotation !== null"
                               [visible]="modal_overview.visible"
                               [segments]="transcrService.annotation.levels[0].segments.segments"
-                              (segmentclicked)="onSegmentInOverviewClicked($event)"
-        >
-
+                              (segmentclicked)="onSegmentInOverviewClicked($event)">
         </app-transcr-overview>
     </modal-body>
     <modal-footer>
@@ -178,20 +176,20 @@
                             <div class="radio" *ngIf="control.type.type === 'radiobutton'">
                                 <label>{{translate(control.label.languages, langService.currentLang)}}
                                     <input type="radio"
-                                           name="{{control.name}}" value="{{control.value}}"
+                                           name="{{group.name}}" value="{{control.value}}"
                                            [checked]="control.custom.checked"
                                            [required]="control.required"
-                                           [(ngModel)]="feedback_data[control.name]"
+                                           [(ngModel)]="feedback_data[group.name]"
                                     />
                                 </label>
                             </div>
                             <div class="checkbox" *ngIf="control.type.type === 'checkbox'">
                                 <label>
                                     <input type="checkbox"
-                                           name="{{control.name}}" value="{{control.value}}"
+                                           name="{{control.value}}" value="true"
                                            [checked]="control.custom.checked" #checkb
                                            [required]="control.required"
-                                           [(ngModel)]="feedback_data[control.name]">
+                                           (change)="checkBoxChanged(group.name, control.value)" >
                                     <span class="required_marker" *ngIf="control.required">*</span>
                                     {{translate(control.label.languages, langService.currentLang)}}
                                 </label>
@@ -199,9 +197,9 @@
                             <div *ngIf="control.type.type === 'textarea'">
                                 <label>{{translate(control.label.languages, langService.currentLang)}}</label><br/>
                                 <textarea class="form-control"
-                                          name="{{control.name}}" value="{{control.value}}"
+                                          name="{{group.name}}" value="{{control.value}}"
                                           [required]="control.required"></textarea>
-                                [(ngModel)]="feedback_data[control.name]"
+                                [(ngModel)]="feedback_data[group.name]"
                             </div>
                         </div>
                     </div>

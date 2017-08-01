@@ -386,6 +386,7 @@ export class TranscriptionComponent implements OnInit,
 
   changeValue(control: string, value: any) {
     const result = this.transcrService.feedback.setValueForControl(control, value.toString());
+    console.warn(result);
   }
 
   translate(languages: any, lang: string): string {
@@ -408,17 +409,18 @@ export class TranscriptionComponent implements OnInit,
     ) {
       for (const g in feedback.groups) {
         if (!isNullOrUndefined(g)) {
-          for (const c in feedback.groups[g].controls) {
+          const group = feedback.groups[g];
+          for (const c in group.controls) {
             if (!isNullOrUndefined(c)) {
-              const control = feedback.groups[g].controls[c];
+              const control = group.controls[c];
               if (control.type.type === 'textarea') {
-                this.feedback_data[control.name] = control.value;
+                this.feedback_data[group.name] = control.value;
               } else {
-                // radio or checkbox
-                if (!isNullOrUndefined(control.custom)
+                // radio skip checkboxes
+                if (control.type.type !== 'checkbox' && !isNullOrUndefined(control.custom)
                   && !isNullOrUndefined(control.custom.checked)
                   && control.custom.checked) {
-                  this.feedback_data[control.name] = control.value;
+                  this.feedback_data[group.name] = control.value;
                 }
               }
             }
@@ -509,11 +511,26 @@ export class TranscriptionComponent implements OnInit,
   clearData() {
     this.sessService.submitted = false;
     this.sessService.annotation = null;
-
     this.sessService.feedback = null;
     this.sessService.comment = '';
     this.sessService.logs = [];
     this.uiService.elements = [];
     this.settingsService.clearSettings();
+  }
+
+  public checkBoxChanged(group: string, checkb: string) {
+    for (let i = 0; i < this.transcrService.feedback.groups.length; i++) {
+      const group_ = this.transcrService.feedback.groups[i];
+      if (group_.name === group) {
+        for (let j = 0; j < group_.controls.length; j++) {
+          const control = group_.controls[j];
+          if (control.value === checkb) {
+            control.custom['checked'] = (isNullOrUndefined(control.custom['checked'])) ? true : !control.custom['checked'];
+            break;
+          }
+        }
+        break;
+      }
+    }
   }
 }

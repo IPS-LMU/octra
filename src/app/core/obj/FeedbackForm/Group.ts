@@ -1,4 +1,5 @@
 import {Control} from './Control';
+import {isNullOrUndefined} from 'util';
 
 export class Group {
   set required(value: boolean) {
@@ -13,16 +14,19 @@ export class Group {
     return this._title;
   }
 
-  private _required = false;
-
   public get controls(): Control[] {
     return this._controls;
   }
 
+  public get name(): string {
+    return this._name;
+  }
+
+  private _required = false;
+
   public static fromAny(group: any): Group {
     const controls: Control[] = [];
 
-    let result: Group = null;
     let required = false;
     for (let i = 0; i < group.controls.length; i++) {
       const control = group.controls[i];
@@ -32,8 +36,9 @@ export class Group {
       }
     }
 
-    result = new Group(
+    const result = new Group(
       group.title,
+      (!isNullOrUndefined(group.name)) ? group.name : group.controls[0].name,
       controls
     );
 
@@ -42,7 +47,7 @@ export class Group {
     return result;
   }
 
-  constructor(private _title: string, private _controls: Control[]) {
+  constructor(private _title: string, private _name: string, private _controls: Control[]) {
 
     // check if group is required
     for (let i = 0; i < _controls.length; i++) {

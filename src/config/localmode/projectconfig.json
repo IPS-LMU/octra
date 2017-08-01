@@ -37,10 +37,10 @@
       "title": {
         "de": "Sprachverständlichkeit des Sprechers"
       },
+      "name": "quality-speaker",
       "controls": [
         {
           "type": "radiobutton",
-          "name": "quality-speaker",
           "label": {
             "de": "unverständlich",
             "en": "unknowable"
@@ -55,7 +55,6 @@
             "de": "weniger verständlich",
             "en": "less clear"
           },
-          "name": "quality-speaker",
           "value": "1",
           "custom": {},
           "required": true
@@ -66,7 +65,6 @@
             "de": "verständlich",
             "en": "clear"
           },
-          "name": "quality-speaker",
           "value": "2",
           "custom": {},
           "required": true
@@ -77,7 +75,6 @@
             "de": "sehr gut verständlich",
             "en": "very clear"
           },
-          "name": "quality-speaker",
           "value": "3",
           "custom": {},
           "required": true
@@ -88,10 +85,10 @@
       "title": {
         "de": "Qualität des Audiosignals"
       },
+      "name": "quality-audio",
       "controls": [
         {
           "type": "radiobutton",
-          "name": "quality-audio",
           "label": {
             "de": "viele Störgeräusche",
             "en": "lot of noises"
@@ -106,7 +103,6 @@
             "de": "wenige Störgeräusche",
             "en": "less noises"
           },
-          "name": "quality-audio",
           "value": "1",
           "custom": {},
           "required": true
@@ -117,7 +113,6 @@
             "de": "sehr wenig Störgeräusche",
             "en": "very clear"
           },
-          "name": "quality-audio",
           "value": "2",
           "custom": {},
           "required": true
@@ -128,7 +123,6 @@
             "de": "keine Störgeräusche",
             "en": "no noises"
           },
-          "name": "quality-audio",
           "value": "3",
           "custom": {},
           "required": true

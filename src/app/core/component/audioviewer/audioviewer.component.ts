@@ -238,8 +238,10 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         if ((isNullOrUndefined(previous) && !isNullOrUndefined(current)) ||
           (current.time.start.samples !== previous.time.start.samples &&
             current.time.end.samples !== previous.time.end.samples)) {
+          const zoomY = this.av.zoomY;
           // audiochunk changed
           this.initialize();
+          this.av.zoomY = zoomY;
           this.update(true);
         }
       }

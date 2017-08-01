@@ -121,6 +121,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.miniloupe.Settings.boundaries.enabled = false;
     this.miniloupe.Settings.justify_signal_height = false;
 
+
     this.subscrmanager.add(this.transcrService.annotation.levels[0].segments.onsegmentchange.subscribe(
       ($event) => {
         if (!this.saving) {
@@ -148,8 +149,8 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         const event = obj.event;
         if (this.viewer.focused || this.loupe.focused) {
           if (event.key === '+') {
-            this.factor = Math.max(4, this.factor + 1);
-            this.miniloupe.zoomY = Math.max(1, this.miniloupe.zoomY + 1);
+            this.factor = Math.min(8, this.factor + 1);
+            this.miniloupe.zoomY = Math.max(1, this.factor);
 
             if (this.viewer.focused) {
               this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
@@ -160,8 +161,8 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
             }
           } else if (event.key === '-') {
             if (this.factor > 3) {
-              this.factor = Math.max(3, this.factor - 1);
-              this.miniloupe.zoomY = Math.max(1, this.miniloupe.zoomY - 1);
+              this.factor = Math.max(1, this.factor - 1);
+              this.miniloupe.zoomY = Math.max(4, this.factor);
               if (this.viewer.focused) {
                 this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
                   this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
@@ -216,7 +217,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     this.cd.detectChanges();
-    this.loupe.zoomY = this.factor;
+    this.miniloupe.zoomY = this.factor;
     this.subscrmanager.add(
       this.transcrService.segmentrequested.subscribe(
         (segnumber: number) => {

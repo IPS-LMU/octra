@@ -12,12 +12,17 @@
 
 .navbar {
     min-height: 30px !important;
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 .navbar .navbar-brand {
+    padding-top: 3px !important;
     vertical-align: middle;
     font-size: 1.3em;
+}
+
+.navbar .navbar-toggle{
+    padding:0;
 }
 
 .glyphicon {

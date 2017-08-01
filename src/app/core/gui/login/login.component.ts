@@ -100,6 +100,18 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.valid_size = true;
     }
 
+    if (!isNullOrUndefined(this.sessionService.member_id)) {
+      this.member.id = this.sessionService.member_id;
+    }
+
+    if (!isNullOrUndefined(this.sessionService.member_project)) {
+      this.member.project = this.sessionService.member_project;
+    }
+
+    if (!isNullOrUndefined(this.sessionService.member_jobno)) {
+      this.member.jobno = this.sessionService.member_jobno;
+    }
+
     this.cd.markForCheck();
     this.cd.detectChanges();
   }

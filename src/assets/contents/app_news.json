@@ -1,5 +1,10 @@
 [
   {
+    "date": "2017-08-01 12:00",
+    "title": "OCTRA v1.2.0 Enhancements",
+    "content": "<ul><li>2D-Editor: audio playback starts automatically after entering a segment</li><li>Now ogg Vorbis audio format is supported</li><li>Texteditors now support Copy & Paste</li><li>Now you can set Boundaries in an existing full text</li><li>More import data formats (Textgrid, CTM and raw text file)</li><li>Usability and Design improvements</li><li>2D-Editor: While audio playing the view follows the cursor</li></ul>"
+  },
+  {
     "date": "2017-04-24 12:00",
     "title": "OCTRA v1.1.0 Enhancements",
     "content": "<ul><li>Progressbar that shows the current loading progress</li><li>Now the guidelines can be converted to PDF automatically</li><li>In \"Overview\" you can now select a segment number to go to this segment directly.</li><li>Improved usability</li></ul>"

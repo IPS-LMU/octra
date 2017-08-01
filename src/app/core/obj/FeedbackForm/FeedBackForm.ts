@@ -30,8 +30,6 @@ export class FeedBackForm {
     const groups: Group[] = [];
 
     // init feedback_data
-
-    let result: FeedBackForm = null;
     let required = false;
     for (let i = 0; i < feedback_data.length; i++) {
       const group = feedback_data[i];
@@ -43,7 +41,7 @@ export class FeedBackForm {
       }
     }
 
-    result = new FeedBackForm(
+    const result = new FeedBackForm(
       groups,
       comment
     );
@@ -61,32 +59,33 @@ export class FeedBackForm {
     const result: any = {};
 
     for (let i = 0; i < this.groups.length; i++) {
-      for (let j = 0; j < this.groups[i].controls.length; j++) {
-        const control: Control = this.groups[i].controls[j];
+      const group = this.groups[i];
+      for (let j = 0; j < group.controls.length; j++) {
+        const control: Control = group.controls[j];
         if (control.type.type !== 'textarea') {
           if (control.type.type === 'radiobutton') {
             if (!isNullOrUndefined(control.custom.checked)) {
               if (control.custom.checked) {
-                result['' + control.name + ''] = control.value;
+                result['' + group.name + ''] = control.value;
                 break;
               }
-              result['' + control.name + ''] = '';
+              result['' + group.name + ''] = '';
             } else {
-              result['' + control.name + ''] = '';
+              result['' + group.name + ''] = '';
             }
           } else if (control.type.type === 'checkbox') {
-            if (isNullOrUndefined(result['' + control.name + ''])) {
-              result['' + control.name + ''] = [];
+            if (isNullOrUndefined(result['' + group.name + ''])) {
+              result['' + group.name + ''] = [];
             }
 
             if (!isNullOrUndefined(control.custom.checked)) {
               if (control.custom.checked) {
-                result['' + control.name + ''].push(control.value);
+                result['' + group.name + ''].push(control.value);
               }
             }
           }
         } else {
-          result['' + control.name + ''] = control.value;
+          result['' + group.name + ''] = control.value;
         }
       }
     }
@@ -95,7 +94,6 @@ export class FeedBackForm {
 
   public importData(feedback_data: any): any {
     const result = {};
-
     for (const attr in feedback_data) {
       if (feedback_data.hasOwnProperty(attr)) {
         const value = feedback_data[`${attr}`];
@@ -117,9 +115,10 @@ export class FeedBackForm {
     let found = false;
 
     for (let i = 0; i < this.groups.length; i++) {
+      const group = this.groups[i];
       for (let j = 0; j < this.groups[i].controls.length; j++) {
         const control: Control = this.groups[i].controls[j];
-        if (control.name === name) {
+        if (group.name === name) {
           if (control.type.type === 'textarea') {
             control.value = value;
             return true;
@@ -127,22 +126,16 @@ export class FeedBackForm {
             // type of control is not textarea
             if (control.type.type === 'radiobutton' || control.type.type === 'checkbox') {
               found = true;
-              if (control.value === value) {
-                if (control.type.type === 'radiobutton') {
-                  control.custom['checked'] = true;
-                } else {
-                  if (control.type.type === 'checkbox') {
-                    if (!isNullOrUndefined(custom) && !isNullOrUndefined(custom.checked)) {
-                      control.custom['checked'] = custom.checked;
-                    } else {
-                      // call from importData
-                      control.custom['checked'] = true;
-                    }
+              if (control.type.type === 'radiobutton') {
+                control.custom['checked'] = (control.value === value);
+              } else if (control.type.type === 'checkbox') {
+                if (control.value === value) {
+                  if (!isNullOrUndefined(custom) && !isNullOrUndefined(custom.checked)) {
+                    control.custom['checked'] = custom.checked;
+                  } else {
+                    // call from importData
+                    control.custom['checked'] = true;
                   }
-                }
-              } else {
-                if (control.type.type === 'radiobutton') {
-                  control.custom['checked'] = false;
                 }
               }
             }

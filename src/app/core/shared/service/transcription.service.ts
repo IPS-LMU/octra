@@ -474,7 +474,6 @@ export class TranscriptionService {
       }
     }
     return result;
-
   }
 
   public getErrorDetails(code: string): any {

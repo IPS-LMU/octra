@@ -1,4 +1,15 @@
-import {AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output
+} from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
 import {AudioService, TranscriptionService} from '../../shared/service';
@@ -9,7 +20,8 @@ import {Segment} from '../../obj/Segment';
 @Component({
   selector: 'app-transcr-overview',
   templateUrl: './transcr-overview.component.html',
-  styleUrls: ['./transcr-overview.component.css']
+  styleUrls: ['./transcr-overview.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
 
@@ -100,7 +112,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
   constructor(public transcrService: TranscriptionService,
               public audio: AudioService,
-              public sanitizer: DomSanitizer) {
+              public sanitizer: DomSanitizer,
+              private cd: ChangeDetectorRef) {
 
     this.subscrmanager = new SubscriptionManager();
   }
@@ -120,7 +133,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   onMouseOver($event) {
     let target = jQuery($event.target);
     if (target.is('.error_underline') || target.parent().is('.error_underline')) {
-
       if (!target.is('.error_underline')) {
         target = target.parent();
       }
@@ -164,6 +176,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
     if (this.visible) {
       this.updateSegments();
+      this.cd.markForCheck();
+      this.cd.detectChanges();
     }
   }
 

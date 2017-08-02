@@ -422,27 +422,31 @@ export class TranscriptionService {
     if (validation.length > 0) {
       // prepare insertions
       for (let i = 0; i < validation.length; i++) {
-        const insertStart = insertions.find((val) => {
-          return val.start === validation[i].start;
-        });
-        const insertEnd = insertions.find((val) => {
+        let insertStart = insertions.find((val) => {
           return val.start === validation[i].start;
         });
 
         if (isNullOrUndefined(insertStart)) {
-          insertions.push({
+          insertStart = {
             start: validation[i].start,
             puffer: '<div class=\'error_underline\' data-errorcode=\'' + validation[i].code + '\'>'
-          });
+          };
+          insertions.push(insertStart);
         } else {
           insertStart.puffer += '<div class=\'error_underline\' data-errorcode=\'' + validation[i].code + '\'>';
         }
 
+        let insertEnd = insertions.find((val) => {
+          return val.start === validation[i].start + validation[i].length;
+        });
+
         if (isNullOrUndefined(insertEnd)) {
-          insertions.push({
-            start: validation[i].start + validation[i].length,
-            puffer: '</div>'
-          });
+          insertEnd = {
+            start: insertStart.start + validation[i].length,
+            puffer: ''
+          };
+          insertEnd.puffer = '</div>';
+          insertions.push(insertEnd);
         } else {
           insertEnd.puffer = '</div>' + insertEnd.puffer;
         }

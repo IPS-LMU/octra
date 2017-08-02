@@ -100,7 +100,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.valid_size = true;
     }
 
-    if (!isNullOrUndefined(this.sessionService.member_id)) {
+    if (!isNullOrUndefined(this.sessionService.member_id) && this.sessionService.member_id !== '-1') {
       this.member.id = this.sessionService.member_id;
     }
 
@@ -108,7 +108,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.member.project = this.sessionService.member_project;
     }
 
-    if (!isNullOrUndefined(this.sessionService.member_jobno)) {
+    if (!isNullOrUndefined(this.sessionService.member_jobno) && this.sessionService.member_jobno !== '-1') {
       this.member.jobno = this.sessionService.member_jobno;
     }
 
@@ -118,15 +118,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   ngAfterViewInit() {
     this.loadPojectsList();
-    /* setTimeout(() => {
-     jQuery.material.init();
-
-     const max_height: number = Math.max(Number(this.onlinemode.nativeElement.clientHeight),
-     Number(this.localmode.nativeElement.clientHeight));
-     this.localmode.nativeElement.style.height = max_height + 'px';
-     this.onlinemode.nativeElement.style.height = max_height + 'px';
-     }, 0);
-     */
   }
 
   ngOnDestroy() {

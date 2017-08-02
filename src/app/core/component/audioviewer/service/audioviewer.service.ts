@@ -252,7 +252,7 @@ export class AudioviewerService extends AudioComponentService {
     super.setMouseMovePosition(type, x, y, curr_line, innerWidth);
 
     const absX = this.getAbsXByLine(curr_line, x - curr_line.Pos.x, innerWidth);
-    const absXTime = this.audioTCalculator.absXChunktoSamples(absX, this.audiochunk);
+    let absXTime = this.audioTCalculator.absXChunktoSamples(absX, this.audiochunk);
 
     let dragableBoundaryTemp = this.getBoundaryNumber(absX);
 
@@ -263,6 +263,26 @@ export class AudioviewerService extends AudioComponentService {
     } else if (this.mouse_down && this.dragableBoundaryNumber > -1) {
       // mouse down something dragged
       const segment = this.transcrService.annotation.levels[0].segments.get(this.dragableBoundaryNumber);
+      const absXSeconds = (absXTime / this.audiomanager.ressource.info.samplerate);
+
+      // prevent overwriting another boundary
+      const segment_before = (this.dragableBoundaryNumber > 0)
+        ? this.transcrService.annotation.levels[0].segments.get(this.dragableBoundaryNumber - 1) : null;
+      const segment_after = (this.dragableBoundaryNumber < this.transcrService.annotation.levels[0].segments.length - 1)
+        ? this.transcrService.annotation.levels[0].segments.get(this.dragableBoundaryNumber + 1) : null;
+      if (!isNullOrUndefined(segment_before)) {
+        // check segment boundary before this segment
+        if (absXSeconds < segment_before.time.seconds + 0.02) {
+          absXTime = segment_before.time.samples + Math.round((0.02) * this.audiomanager.ressource.info.samplerate);
+        }
+      }
+      if (!isNullOrUndefined(segment_after)) {
+        // check segment boundary after this segment
+        if (absXSeconds > segment_after.time.seconds - 0.02) {
+          absXTime = segment_after.time.samples - Math.round((0.02) * this.audiomanager.ressource.info.samplerate);
+        }
+      }
+
       segment.time.samples = absXTime;
       this.transcrService.annotation.levels[0].segments.change(this.dragableBoundaryNumber, segment);
       this.transcrService.annotation.levels[0].segments.sort();

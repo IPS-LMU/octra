@@ -275,6 +275,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           if (this.init === 1) {
             this.focus(true);
           } else if (this.init > 1) {
+            console.log("restore range");
             this.textfield.summernote('restoreRange');
           }
         },
@@ -301,11 +302,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       .html('00:00:000');
 
     this.segpopover.insertBefore('.note-editing-area');
-
-    jQuery('.note-editable').on('click', (click) => {
-      // const selection = jQuery('.note-editable').caret('pos');
-      // alert(selection);
-    });
 
     this.loaded.emit(true);
   };
@@ -357,7 +353,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           // invoke insertText method with 'hello' on editor module.
           this.insertMarker(marker.code, marker.icon_url);
           this.marker_click.emit(marker.code);
-          this.initPopover();
+          // this.initPopover();
         }
       };
       const button = jQuery.summernote.ui.button(btn_js);
@@ -584,7 +580,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             const marker: any = this.markers[i];
             if (marker.shortcut[platform] === comboKey) {
               $event.preventDefault();
-              const test = this.textfield.summernote('createRange');
               this.insertMarker(marker.code, marker.icon_url);
               this.marker_insert.emit(marker.code);
               return;

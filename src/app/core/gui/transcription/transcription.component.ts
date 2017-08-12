@@ -155,7 +155,8 @@ export class TranscriptionComponent implements OnInit,
     if (this.projectsettings.logging.forced === true) {
       this.subscrmanager.add(
         this.uiService.afteradd.subscribe((elem) => {
-          this.sessService.save('logs', this.uiService.elementsToAnyArray());
+          // this.sessService.save('logs', this.uiService.elementsToAnyArray());
+          this.sessService.saveLogItem(elem.getDataClone());
         }));
     }
 
@@ -178,6 +179,8 @@ export class TranscriptionComponent implements OnInit,
     if (isNullOrUndefined(this.sessService.feedback)) {
       console.error('feedback is null!');
     } else {
+      console.log('FEEDBACK is not NULL');
+      console.log(this.sessService.feedback);
     }
 
     this.transcrService.guidelines = this.settingsService.guidelines;
@@ -199,7 +202,7 @@ export class TranscriptionComponent implements OnInit,
       }
     }
 
-    this.sessService.annotation.sampleRate = this.audiomanager.ressource.info.samplerate;
+    this.transcrService.annotation.audiofile.samplerate = this.audiomanager.ressource.info.samplerate;
     this.navbarServ.show_interfaces = this.settingsService.projectsettings.navigation.interfaces;
 
     // load guidelines on language change
@@ -229,7 +232,6 @@ export class TranscriptionComponent implements OnInit,
   };
 
   ngAfterViewInit() {
-    this.sessService.TranscriptionTime.start = Date.now();
     if (isNullOrUndefined(this.projectsettings.interfaces.find((x) => {
         return this.sessService.Interface === x;
       }))) {
@@ -243,7 +245,7 @@ export class TranscriptionComponent implements OnInit,
   }
 
   abortTranscription = () => {
-    if (!this.sessService.offline) {
+    if (!this.sessService.uselocalmode) {
       this.saveFeedbackform();
     }
     this.transcrService.endTranscription();
@@ -257,7 +259,6 @@ export class TranscriptionComponent implements OnInit,
   }
 
   submitTranscription() {
-    this.sessService.TranscriptionTime.end = Date.now();
     this.router.navigate(['/user/transcr/submit']);
   }
 
@@ -476,8 +477,8 @@ export class TranscriptionComponent implements OnInit,
   nextTranscription() {
     this.transcrService.endTranscription(false);
     this.clearData();
-    this.subscrmanager.add(this.api.beginSession(this.sessService.member_project, this.sessService.member_id,
-      Number(this.sessService.member_jobno), '')
+    this.subscrmanager.add(this.api.beginSession(this.sessService.user.project, this.sessService.user.id,
+      Number(this.sessService.user.jobno), '')
       .subscribe((result) => {
         if (result !== null) {
           const json = result.json();
@@ -510,10 +511,12 @@ export class TranscriptionComponent implements OnInit,
 
   clearData() {
     this.sessService.submitted = false;
-    this.sessService.annotation = null;
-    this.sessService.feedback = null;
+    this.sessService.clearIDBTable('annotation');
+    this.sessService.idb.save('options', 'feedback', {value: null});
     this.sessService.comment = '';
-    this.sessService.logs = [];
+    this.sessService.clearIDBTable('logs').catch((err) => {
+      console.error(err)
+    });
     this.uiService.elements = [];
     this.settingsService.clearSettings();
   }

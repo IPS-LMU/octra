@@ -52,7 +52,7 @@ export class AgreementComponent implements OnInit {
     if (isNullOrUndefined(this.sessService.agreement)) {
       this.sessService.agreement = {};
     }
-    this.sessService.agreement[this.sessService.member_project] = true;
+    this.sessService.agreement[this.sessService.user.project] = true;
     this.sessService.sessStr.store('agreement', this.sessService.agreement);
     this.router.navigate(['/user/transcr']);
   }

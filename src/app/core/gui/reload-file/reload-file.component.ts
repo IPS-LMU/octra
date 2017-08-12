@@ -49,23 +49,30 @@ export class ReloadFileComponent implements OnInit {
   abortTranscription = () => {
     this.transcrServ.endTranscription();
     this.router.navigate(['/logout']);
-  }
+  };
 
   newTranscription = () => {
     let keep_data = false;
 
-    if (!isNullOrUndefined(this.dropzone.oannotation)) {
-      this.sessServ.annotation = this.dropzone.oannotation;
-      keep_data = true;
-    }
-
-    this.sessServ.beginLocalSession(this.dropzone.files, keep_data, this.navigate,
-      (error) => {
-        if (error === 'file not supported') {
-          this.showErrorMessage(this.langService.instant('reload-file.file not supported', {type: ''}));
+    const process = () => {
+      this.sessServ.beginLocalSession(this.dropzone.files, keep_data, this.navigate,
+        (error) => {
+          if (error === 'file not supported') {
+            this.showErrorMessage(this.langService.instant('reload-file.file not supported', {type: ''}));
+          }
         }
-      }
-    );
+      );
+    };
+    if (!isNullOrUndefined(this.dropzone.oannotation)) {
+      this.sessServ.overwriteAnnotation(this.dropzone.oannotation.levels).then(() => {
+        keep_data = true;
+        process();
+      }).catch((err) => {
+        console.error(err)
+      });
+    } else {
+      process();
+    }
   };
 
   onOfflineSubmit = () => {

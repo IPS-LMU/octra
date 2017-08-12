@@ -219,7 +219,7 @@ export class SettingsService {
     Logger.log('Load audio file 2...');
     if (audioService.audiomanagers.length === 0) {
 
-      if (this.sessService.offline === false) {
+      if (!this.sessService.uselocalmode) {
         // online
         if (!isNullOrUndefined(this.sessService.audio_url)) {
           const src = this.app_settings.audio_server.url + this.sessService.audio_url;

@@ -55,7 +55,7 @@ export class BugReportService {
         language: this.langService.currentLang,
         signed_in: this.sessService.logged_in,
         dataid: this.sessService.data_id,
-        localmode: this.sessService.offline
+        localmode: this.sessService.uselocalmode
       },
       system: {
         os: {

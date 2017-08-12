@@ -33,11 +33,6 @@ export class AppComponent implements OnDestroy {
               private sessService: SessionService,
               private settingsService: SettingsService,
               private bugService: BugReportService) {
-
-    // check for Updates
-    const umanager = new UpdateManager(this.sessService);
-    umanager.checkForUpdates();
-
     // overwrite console.log
     const oldLog = console.log;
     const serv = this.bugService;
@@ -91,12 +86,21 @@ export class AppComponent implements OnDestroy {
       }
     ));
 
-    this.settingsService.getApplicationSettings();
+    // check for Updates
+    const umanager = new UpdateManager(this.sessService);
+    umanager.checkForUpdates().then((idb) => {
+      this.sessService.load(idb).then(
+        () => {
+          console.log('LOADEDLOADEDLOADED');
+          this.settingsService.getApplicationSettings();
 
-    if (this.settingsService.validated) {
-      console.log('loaded');
-      this.onSettingsLoaded(true);
-    }
+          if (this.settingsService.validated) {
+            console.log('loaded');
+            this.onSettingsLoaded(true);
+          }
+        }
+      );
+    });
   }
 
   onSettingsLoaded = (loaded) => {
@@ -135,7 +139,7 @@ export class AppComponent implements OnDestroy {
         this.langService.use(this.sessService.language);
       }
     }
-  }
+  };
 
   ngOnDestroy() {
     this.subscrmanager.destroy();

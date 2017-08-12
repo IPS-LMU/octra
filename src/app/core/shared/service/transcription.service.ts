@@ -183,60 +183,68 @@ export class TranscriptionService {
   }
 
   public loadSegments(sample_rate: number) {
-    if (isNullOrUndefined(this.sessServ.annotation)) {
-      this.sessServ.annotation = this.createNewAnnotation();
+    const process = () => {
+      const annotates = this.audiomanager.ressource.name + this.audiomanager.ressource.extension;
 
-      if (!this.sessServ.offline) {
-        if (!isNullOrUndefined(this.sessServ.servertranscipt)) {
-          // import server transcript
-          this.sessServ.annotation.levels[0].items = [];
-          for (let i = 0; i < this.sessServ.servertranscipt.length; i++) {
-            const seg_t = this.sessServ.servertranscipt[i];
+      this._annotation = new Annotation(annotates, this._audiofile);
 
-            const oseg = new OSegment(i, seg_t.start, seg_t.length, [new OLabel('Orthographic', seg_t.text)]);
-            this.sessServ.annotation.levels[0].items.push(oseg);
-          }
-          // clear servertranscript
-          this.sessServ.servertranscipt = null;
-        }
+      for (let i = 0; i < this.sessServ.annotation.length; i++) {
+        const level: Level = Level.fromObj(this.sessServ.annotation[i],
+          this.audiomanager.ressource.info.samplerate, this.audiomanager.ressource.info.duration.samples);
+        this._annotation.levels.push(level);
       }
-    }
 
-    this.sessServ.annotation.annotates = this.audiomanager.ressource.name + this.audiomanager.ressource.extension;
+      // load feedback form data
+      if (isNullOrUndefined(this.sessServ.feedback)) {
+        this.sessServ.idb.save('options', 'feedback', {value: {}});
+      }
 
-    this.sessServ.annotation.sampleRate = this.audiomanager.ressource.info.samplerate;
+      this._feedback = FeedBackForm.fromAny(this.settingsService.projectsettings.feedback_form, this.sessServ.comment);
+      this._feedback.importData(this.sessServ.feedback);
 
-    this._annotation = new Annotation(this.sessServ.annotation.annotates, this._audiofile);
+      if (isNullOrUndefined(this.sessServ.comment)) {
+        this.sessServ.comment = '';
+      } else {
+        this._feedback.comment = this.sessServ.comment;
+      }
 
-    for (let i = 0; i < this.sessServ.annotation.levels.length; i++) {
-      const level: Level = Level.fromObj(this.sessServ.annotation.levels[i],
-        this.audiomanager.ressource.info.samplerate, this.audiomanager.ressource.info.duration.samples);
-      this._annotation.levels.push(level);
-    }
+      if (this.sessServ.logs === null) {
+        this.sessServ.clearIDBTable('logs');
+        this.uiService.elements = [];
+      } else {
+        console.log('LOGS:');
+        console.log(this.sessServ.logs);
+        this.uiService.fromAnyArray(this.sessServ.logs);
+      }
 
-    // load feedback form data
-    if (isNullOrUndefined(this.sessServ.feedback)) {
-      this.sessServ.feedback = {};
-    }
+      this.navbarServ.dataloaded = true;
+      this.dataloaded.emit();
+    };
 
-    this._feedback = FeedBackForm.fromAny(this.settingsService.projectsettings.feedback_form, this.sessServ.comment);
-    this._feedback.importData(this.sessServ.feedback);
+    if (isNullOrUndefined(this.sessServ.annotation)) {
+      this.sessServ.overwriteAnnotation(this.createNewAnnotation().levels).then(() => {
+        if (!this.sessServ.uselocalmode) {
+          if (!isNullOrUndefined(this.sessServ.servertranscipt)) {
+            // import server transcript
+            this.sessServ.annotation[0].items = [];
+            for (let i = 0; i < this.sessServ.servertranscipt.length; i++) {
+              const seg_t = this.sessServ.servertranscipt[i];
 
-    if (isNullOrUndefined(this.sessServ.comment)) {
-      this.sessServ.comment = '';
+              const oseg = new OSegment(i, seg_t.start, seg_t.length, [new OLabel('Orthographic', seg_t.text)]);
+              this.sessServ.annotation[0].items.push(oseg);
+            }
+            // clear servertranscript
+            this.sessServ.servertranscipt = null;
+          }
+        }
+
+        process();
+      }).catch((err) => {
+        console.error(err);
+      });
     } else {
-      this._feedback.comment = this.sessServ.comment;
+      process();
     }
-
-    if (this.sessServ.logs === null) {
-      this.sessServ.logs = [];
-      this.uiService.elements = [];
-    } else {
-      this.uiService.fromAnyArray(this.sessServ.logs);
-    }
-
-    this.navbarServ.dataloaded = true;
-    this.dataloaded.emit();
   }
 
   public exportDataToJSON(): any {
@@ -246,11 +254,11 @@ export class TranscriptionService {
       const log_data: any[] = this.extractUI(this.uiService.elements);
 
       data = {
-        project: (isNullOrUndefined(this.sessServ.member_project)) ? 'NOT AVAILABLE' : this.sessServ.member_project,
-        annotator: (isNullOrUndefined(this.sessServ.member_id)) ? 'NOT AVAILABLE' : this.sessServ.member_id,
+        project: (isNullOrUndefined(this.sessServ.user.project)) ? 'NOT AVAILABLE' : this.sessServ.user.project,
+        annotator: (isNullOrUndefined(this.sessServ.user.id)) ? 'NOT AVAILABLE' : this.sessServ.user.id,
         transcript: null,
         comment: this._feedback.comment,
-        jobno: (isNullOrUndefined(this.sessServ.member_jobno)) ? 'NOT AVAILABLE' : this.sessServ.member_jobno,
+        jobno: (isNullOrUndefined(this.sessServ.user.jobno)) ? 'NOT AVAILABLE' : this.sessServ.user.jobno,
         status: this.state,
         quality: this._feedback.exportData(),
         id: this.sessServ.data_id,

@@ -1,4 +1,4 @@
-export * from './load-data';
+export * from './loading';
 export * from './login';
 export * from './logout';
 export * from './members-area';

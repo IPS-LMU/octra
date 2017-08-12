@@ -18,7 +18,7 @@ export class MembersAreaGuard implements CanActivate {
     if (this.sessService.LoggedIn !== true) {
       this.router.navigate(['/login']);
       return false;
-    } else if (this.sessService.offline === true) {
+    } else if (this.sessService.uselocalmode === true) {
       if (this.sessService.file === null) {
         // navigate to reload-file
         this.router.navigate(['/user/transcr/reload-file']);

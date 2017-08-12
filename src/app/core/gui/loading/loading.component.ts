@@ -39,7 +39,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
     if (!this.sessionService.LoggedIn) {
       this.router.navigate(['/login']);
     }
-    if (this.sessionService.offline && isNullOrUndefined(this.sessionService.file)) {
+    if (this.sessionService.uselocalmode && isNullOrUndefined(this.sessionService.file)) {
       this.router.navigate(['/user/transcr/reload-file']);
     }
 
@@ -123,10 +123,10 @@ export class LoadingComponent implements OnInit, OnDestroy {
             this.subscrmanager.remove(id);
             setTimeout(() => {
               if ((isNullOrUndefined(this.sessionService.agreement)
-                  || isNullOrUndefined(this.sessionService.agreement[this.sessionService.member_project]) ||
-                  !this.sessionService.agreement[this.sessionService.member_project]
+                  || isNullOrUndefined(this.sessionService.agreement[this.sessionService.user.project]) ||
+                  !this.sessionService.agreement[this.sessionService.user.project]
                 )
-                && this.settService.projectsettings.agreement.enabled && !this.sessionService.offline) {
+                && this.settService.projectsettings.agreement.enabled && !this.sessionService.uselocalmode) {
                 this.router.navigate(['/user/agreement']);
               } else {
                 this.router.navigate(['/user/transcr']);

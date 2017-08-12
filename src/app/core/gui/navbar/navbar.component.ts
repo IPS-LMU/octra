@@ -162,7 +162,8 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   updateParentFormat(converter: Converter) {
-    const result: File = converter.export(this.sessService.annotation, this.navbarServ.transcrService.audiofile);
+    const oannotjson = this.navbarServ.transcrService.annotation.getObj();
+    const result: File = converter.export(oannotjson, this.navbarServ.transcrService.audiofile);
     this.parentformat.download = result.name;
     this.parentformat.uri = this.sanitize(this.getURI(result));
   }
@@ -177,7 +178,9 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   clearElements() {
     this.uiService.clear();
-    this.sessService.save('logs', this.uiService.elementsToAnyArray());
+    this.sessService.clearIDBTable('logs').catch((err)=>{
+      console.error(err);
+    });
   }
 
 }

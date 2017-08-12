@@ -5,7 +5,7 @@ import {TranscriptionEndComponent} from '../transcription-end/transcription-end.
 import {TranscrEndGuard} from '../../shared/guard/transcr-end.activateguard';
 import {ReloadFileComponent} from '../reload-file/reload-file.component';
 import {ReloadFileGuard} from '../reload-file/reload-file.activateguard';
-import {LoadingComponent} from '../load-data/loading.component';
+import {LoadingComponent} from '../loading/loading.component';
 import {TranscActivateGuard} from '../../shared/guard/transcr.activateguard';
 import {AgreementComponent} from '../agreement/agreement.component';
 import {HelpComponent} from '../help/help.component';

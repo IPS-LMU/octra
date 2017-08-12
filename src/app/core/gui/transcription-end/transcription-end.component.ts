@@ -51,11 +51,17 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
 
   clearData() {
     this.sessService.submitted = false;
-    this.sessService.annotation = null;
+    this.sessService.clearIDBTable('annotation').catch((err) => {
+      console.error(err)
+    });
 
-    this.sessService.feedback = null;
+    this.sessService.idb.save('options', 'feedback', {value: null}).catch((err) => {
+      console.error(err);
+    });
     this.sessService.comment = '';
-    this.sessService.logs = [];
+    this.sessService.clearIDBTable('logs').catch((err) => {
+      console.error(err)
+    });
     this.uiService.elements = [];
     this.settService.clearSettings();
   }

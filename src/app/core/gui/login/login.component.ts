@@ -100,16 +100,16 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.valid_size = true;
     }
 
-    if (!isNullOrUndefined(this.sessionService.member_id) && this.sessionService.member_id !== '-1') {
-      this.member.id = this.sessionService.member_id;
+    if (!isNullOrUndefined(this.sessionService.user.id) && this.sessionService.user.id !== '-1') {
+      this.member.id = this.sessionService.user.id;
     }
 
-    if (!isNullOrUndefined(this.sessionService.member_project)) {
-      this.member.project = this.sessionService.member_project;
+    if (!isNullOrUndefined(this.sessionService.user.project)) {
+      this.member.project = this.sessionService.user.project;
     }
 
-    if (!isNullOrUndefined(this.sessionService.member_jobno) && this.sessionService.member_jobno !== '-1') {
-      this.member.jobno = this.sessionService.member_jobno;
+    if (!isNullOrUndefined(this.sessionService.user.jobno) && this.sessionService.user.jobno > -1) {
+      this.member.jobno = this.sessionService.user.jobno.toString();
     }
 
     this.cd.markForCheck();
@@ -141,15 +141,15 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         // last session was online session
         // check if credentials are available
         if (
-          !isNullOrUndefined(this.sessionService.member_project) &&
-          !isNullOrUndefined(this.sessionService.member_jobno) &&
-          !isNullOrUndefined(this.sessionService.member_id)
+          !isNullOrUndefined(this.sessionService.user.project) &&
+          !isNullOrUndefined(this.sessionService.user.jobno) &&
+          !isNullOrUndefined(this.sessionService.user.id)
         ) {
           // check if credentials are the same like before
           if (
-            this.sessionService.member_id === this.member.id &&
-            Number(this.sessionService.member_jobno) === Number(this.member.jobno) &&
-            this.sessionService.member_project === this.member.project
+            this.sessionService.user.id === this.member.id &&
+            Number(this.sessionService.user.jobno) === Number(this.member.jobno) &&
+            this.sessionService.user.project === this.member.project
           ) {
             continue_session = true;
           } else {
@@ -211,26 +211,34 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.setOnlineSessionToFree(() => {
         this.sessionService.beginLocalSession(this.dropzone.files, false, () => {
           if (!isNullOrUndefined(this.dropzone.oannotation)) {
-            this.sessionService.annotation = this.dropzone.oannotation;
+            this.sessionService.overwriteAnnotation(this.dropzone.oannotation.levels).then(() => {
+              this.navigate();
+            }).catch((err) => {
+              console.error(err);
+            });
+          } else {
+            this.navigate();
           }
-          this.navigate();
         }, (error) => {
           alert(error);
         });
       });
     } else {
-
-
       this.sessionService.beginLocalSession(this.dropzone.files, true, () => {
         if (!isNullOrUndefined(this.dropzone.oannotation)) {
-          this.sessionService.annotation = this.dropzone.oannotation;
+          this.sessionService.overwriteAnnotation(this.dropzone.oannotation.levels).then(() => {
+            this.navigate();
+          }).catch((err) => {
+            console.error(err);
+          });
+        } else {
+          this.navigate();
         }
-        this.navigate();
       }, (error) => {
         alert(error);
       });
     }
-  }
+  };
 
   canDeactivate(): Observable<boolean> | boolean {
     return (this.valid);
@@ -261,9 +269,14 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   newTranscription = () => {
     this.sessionService.beginLocalSession(this.dropzone.files, false, () => {
         if (!isNullOrUndefined(this.dropzone.oannotation)) {
-          this.sessionService.annotation = this.dropzone.oannotation;
+          this.sessionService.overwriteAnnotation(this.dropzone.oannotation.levels).then(() => {
+            this.navigate();
+          }).catch((err) => {
+            console.error(err);
+          });
+        } else {
+          this.navigate();
         }
-        this.navigate();
       },
       (error) => {
         if (error === 'file not supported') {
@@ -271,7 +284,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         }
       }
     );
-  }
+  };
 
   getFileStatus(): string {
     if (!isNullOrUndefined(this.dropzone.files) && this.dropzone.files.length > 0 &&
@@ -308,13 +321,13 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         const json = result.json();
         if (isArray(json.data)) {
           this.projects = json.data;
-          if (!isNullOrUndefined(this.sessionService.member_project) && this.sessionService.member_project !== '') {
+          if (!isNullOrUndefined(this.sessionService.user.project) && this.sessionService.user.project !== '') {
             if (isNullOrUndefined(this.projects.find(
                 (x) => {
-                  return x === this.sessionService.member_project;
+                  return x === this.sessionService.user.project;
                 }))) {
               // make sure that old project is in list
-              this.projects.push(this.sessionService.member_project);
+              this.projects.push(this.sessionService.user.project);
             }
           }
         }
@@ -376,7 +389,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         const json = result.json();
 
         if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
-          this.subscrmanager.add(this.api.closeSession(this.sessionService.member_id, this.sessionService.data_id, '').subscribe(
+          this.subscrmanager.add(this.api.closeSession(this.sessionService.user.id, this.sessionService.data_id, '').subscribe(
             (result2) => {
               callback();
             }

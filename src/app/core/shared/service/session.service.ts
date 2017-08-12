@@ -1,36 +1,25 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {LocalStorage, LocalStorageService, SessionStorage, SessionStorageService} from 'ng2-webstorage';
+import {LocalStorageService, SessionStorage, SessionStorageService} from 'ng2-webstorage';
 import {SessionFile} from '../../obj/SessionFile';
 import {isNullOrUndefined} from 'util';
-import {OAnnotJSON} from '../../obj/annotjson';
+import {OLevel} from '../../obj/annotjson';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {AppInfo} from '../../../app.info';
+import {IndexedDBManager} from '../../obj/IndexedDBManager';
 
 @Injectable()
 export class SessionService {
+  get idb(): IndexedDBManager {
+    return this._idb;
+  }
+
+  /* Getter/Setter SessionStorage */
   get servertranscipt(): any[] {
     return this._servertranscipt;
   }
 
   set servertranscipt(value: any[]) {
     this._servertranscipt = value;
-  }
-
-  get version(): string {
-    return this._version;
-  }
-
-  set version(value: string) {
-    this._version = value;
-    this.localStr.store('version', value);
-  }
-
-  get annotation(): OAnnotJSON {
-    return this._annotation;
-  }
-
-  set annotation(value: OAnnotJSON) {
-    this._annotation = value;
   }
 
   get email(): string {
@@ -65,8 +54,28 @@ export class SessionService {
     this._agreement = value;
   }
 
+
+  /* Getter/Setter IDB Storage */
+  get version(): string {
+    return this._version;
+  }
+
+  set version(value: string) {
+    this._version = value;
+    this._idb.save('options', 'version', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  get annotation(): OLevel[] {
+    return this._annotation;
+  }
+
   set comment(value: string) {
     this._comment = value;
+    this._idb.save('options', 'comment', {value: value}).catch((err) => {
+      console.error(err);
+    });
   }
 
   get comment(): string {
@@ -99,12 +108,12 @@ export class SessionService {
     this.localStr.store('sessionfile', this._sessionfile);
   }
 
-  get offline(): boolean {
-    return this._offline;
+  get uselocalmode(): boolean {
+    return this._uselocalmode;
   }
 
-  set offline(value: boolean) {
-    this._offline = value;
+  set uselocalmode(value: boolean) {
+    this._uselocalmode = value;
     this.sessStr.store('offline', value);
   }
 
@@ -130,39 +139,43 @@ export class SessionService {
     return this._logs;
   }
 
-  set logs(value: any[]) {
-    this._logs = value;
-  }
-
   get feedback(): any {
     return this._feedback;
   }
 
-  set feedback(value: any) {
-    this._feedback = value;
+  get submitted(): boolean {
+    return this._submitted;
   }
 
-  get transcription(): any {
-    return this._transcription;
+  set submitted(value: boolean) {
+    this._submitted = value;
   }
 
-  set transcription(value: any) {
-    this._transcription = value;
-    this.localStr.store('transcription', value);
+  get user(): {
+    id: string,
+    project: string,
+    jobno: number
+  } {
+    return this._user;
+  }
+
+  set user(value: {
+    id: string,
+    project: string,
+    jobno: number
+  }) {
+    this._user = value;
+    this._idb.save('options', 'user', this._user).then((result) => {
+      console.log('USER saved');
+      console.log(result);
+    });
   }
 
   // SESSION STORAGE
   @SessionStorage('session_key') session_key: string;
   @SessionStorage() logged_in: boolean;
   @SessionStorage() logInTime: number; // timestamp
-  @SessionStorage() transcriptionTime: any = {
-    start: 0,
-    end: 0
-  };
   @SessionStorage('interface') _interface: string;
-
-  // TODO DELETE
-  @SessionStorage('samplerate') _samplerate: number;
 
   @SessionStorage('agreement') private _agreement: any;
   @SessionStorage('jobs_left') jobs_left: number;
@@ -171,53 +184,32 @@ export class SessionService {
   @SessionStorage('email') private _email: string;
   @SessionStorage('servertranscript') private _servertranscipt: any[];
 
+  // IDB STORAGE
+  private _idb: IndexedDBManager;
+  private _submitted: boolean = null;
+  private _feedback: any = null;
+  private _logs: any[] = [];
+  private _data_id: number = null;
+  private _audio_url: string = null;
+  private _uselocalmode: boolean = null;
+  private _sessionfile: any = null;
+  private _language = 'en';
+  private _version: string = null;
 
-  // LOCAL STORAGE
-  // TODO DELETE
-  @LocalStorage('transcription') private _transcription: any;
-
-  @LocalStorage('submitted') private _submitted: boolean;
-  @LocalStorage('feedback') private _feedback: any;
-  @LocalStorage('logs') private _logs: any[];
-  @LocalStorage('data_id') private _data_id: number;
-  @LocalStorage('audio_url') private _audio_url: string;
-  @LocalStorage('offline') private _offline: boolean;
-  @LocalStorage('sessionfile') _sessionfile: any;
-  @LocalStorage('language') private _language: string;
-  @LocalStorage('version') private _version: string;
-
-  // TODO DELETE
-  @LocalStorage() member_id: string;
-
-  @LocalStorage() member_project: string;
-  @LocalStorage() member_jobno: string;
-
-  @LocalStorage('easymode') private _easymode: boolean;
-  @LocalStorage('comment') private _comment: string;
-
-  @LocalStorage('annotation') private _annotation: OAnnotJSON;
+  private _user: {
+    id: string,
+    project: string,
+    jobno: number
+  } = null;
+  private _easymode = false;
+  private _comment = '';
+  private _annotation: OLevel[] = null;
 
   // is user on the login page?
   private login: boolean;
 
   public file: File;
   public saving: EventEmitter<boolean> = new EventEmitter<boolean>();
-
-  get SessionKey(): string {
-    return this.session_key;
-  }
-
-  get MemberID(): string {
-    return this.member_id;
-  }
-
-  get MemberProject(): string {
-    return this.member_project;
-  }
-
-  get MemberJobno(): string {
-    return this.member_jobno;
-  }
 
   get LoggedIn(): boolean {
     return this.logged_in;
@@ -227,35 +219,9 @@ export class SessionService {
     return this._interface;
   }
 
-  get TranscriptionTime(): any {
-    return this.transcriptionTime;
-  }
-
   set Interface(new_interface: string) {
     this._interface = new_interface;
     this.sessStr.store('interface', new_interface);
-  }
-
-  set TranscriptionTime(n: any) {
-    this.transcriptionTime = n;
-    this.sessStr.store('transcriptionTime', this.transcriptionTime);
-  }
-
-  set SampleRate(samplerate: number) {
-    this._samplerate = samplerate;
-    this.sessStr.store('samplerate', this._samplerate);
-  }
-
-  get SampleRate(): number {
-    return this._samplerate;
-  }
-
-  get submitted(): boolean {
-    return this._submitted;
-  }
-
-  set submitted(value: boolean) {
-    this._submitted = value;
   }
 
   constructor(public sessStr: SessionStorageService,
@@ -284,7 +250,6 @@ export class SessionService {
       this.localStr.store('offline', true);
       this.localStr.store('member_project', '');
       this.localStr.store('member_jobno', '-1');
-      this.sessStr.store('transcriptionTime', {start: 0, end: 0});
       this.setMemberID('-1');
       this.login = true;
       this.logged_in = true;
@@ -328,8 +293,7 @@ export class SessionService {
    * @returns {boolean}
    */
   private setMemberID(member_id: string): boolean {
-    this.member_id = member_id;
-    this.localStr.store('member_id', this.member_id);
+    this.user.id = member_id;
     return true;
   }
 
@@ -362,13 +326,14 @@ export class SessionService {
 
     switch (key) {
       case 'annotation':
-        this.localStr.store(key, value);
+        this.overwriteAnnotation(value.levels).catch((err) => {
+          console.error(err);
+        });
         break;
       case 'feedback':
-        this.localStr.store(key, value);
-        break;
-      case 'logs':
-        this.localStr.store(key, value);
+        this._idb.save('options', 'feedback', {value: value}).catch((err) => {
+          console.error(err);
+        });
         break;
       default:
         return false; // if key not found return false
@@ -378,6 +343,16 @@ export class SessionService {
       this.saving.emit(false);
     }
     return true;
+  }
+
+  public saveLogItem(log: any) {
+    if (!isNullOrUndefined(log)) {
+      this._idb.save('logs', log.timestamp, log).then(() => {
+        console.log('LOG SAVED');
+      }).catch((err) => {
+        console.error(err);
+      })
+    }
   }
 
   public beginLocalSession = (files: {
@@ -404,7 +379,7 @@ export class SessionService {
           this.clearLocalStorage();
         }
 
-        if (!isNullOrUndefined(this.member_id) && this.member_id !== '-1' && this.member_id !== '') {
+        if (!isNullOrUndefined(this._user.id) && this._user.id !== '-1' && this._user.id !== '') {
           // last was online mode
           console.error('clear session m');
           this.clearSession();
@@ -413,7 +388,7 @@ export class SessionService {
 
         const res = this.setSessionData(null, null, null, true);
         if (res.error === '') {
-          this.offline = true;
+          this._uselocalmode = true;
           this.sessionfile = this.getSessionFile(audiofile);
 
           this.file = audiofile;
@@ -425,7 +400,7 @@ export class SessionService {
         err('type not supported');
       }
     }
-  }
+  };
 
   public endSession(offline: boolean, navigate: () => void) {
     this.clearSession();
@@ -439,5 +414,145 @@ export class SessionService {
       file.lastModifiedDate,
       file.type
     );
+  };
+
+  /**
+   * loads the option by its key and sets its variable.
+   * Notice: the variable is defined by '_' before the key string
+   * @param {string} key
+   */
+  private loadOptionFromIDB(key: string): Promise<any> {
+    return new Promise<any>(
+      (resolve, reject) => {
+        if (!isNullOrUndefined(this._idb)) {
+          if (typeof key === 'string') {
+            this._idb.get('options', key).then(
+              (result) => {
+                resolve(result.value);
+              }
+            ).catch((err) => {
+              reject(err);
+            });
+          } else {
+            reject(Error('loadOptionFromIDB: method needs key of type string'));
+          }
+        } else {
+          reject(Error('loadOptionFromIDB: idb is null'));
+        }
+      }
+    );
+  }
+
+  public load(idb: IndexedDBManager): Promise<void> {
+    this._idb = idb;
+    console.log('in load function');
+
+    return this.loadOptions(
+      [
+        {
+          attribute: '_submitted',
+          key: 'submitted'
+        },
+        {
+          attribute: '_version',
+          key: 'version'
+        },
+        {
+          attribute: '_easymode',
+          key: 'easymode'
+        },
+        {
+          attribute: '_audio_url',
+          key: 'audio_url'
+        },
+        {
+          attribute: '_comment',
+          key: 'comment'
+        },
+        {
+          attribute: '_data_id',
+          key: 'data_id'
+        },
+        {
+          attribute: '_feedback',
+          key: 'feedback'
+        },
+        {
+          attribute: '_language',
+          key: 'language'
+        },
+        {
+          attribute: '_sessionfile',
+          key: 'sessionfile'
+        },
+        {
+          attribute: '_uselocalmode',
+          key: 'uselocalmode'
+        },
+        {
+          attribute: '_user',
+          key: 'user'
+        }
+      ]
+    ).then(() => {
+      idb.getAll('logs', 'timestamp').then((logs) => {
+        this._logs = logs;
+      });
+    }).then(() => {
+      idb.getAll('annotation', 'name').then((levels: OLevel[]) => {
+        this._annotation = levels;
+        console.log('feedback is');
+        console.log(this._feedback);
+      });
+    });
+  }
+
+  private loadOptions = (variables: { attribute: string, key: string }[]): Promise<void> => {
+    return new Promise<void>(
+      (resolve, reject) => {
+        const wrapper = (acc: number): Promise<any> => {
+          if (acc < variables.length) {
+            console.log(this);
+            if (this['' + variables[acc].attribute + ''] !== undefined) {
+              if (variables[acc].hasOwnProperty('attribute') && variables[acc].hasOwnProperty('key')) {
+                return this.loadOptionFromIDB(variables[acc].key).then(
+                  (result) => {
+                    if (variables[acc].key === 'feedback') {
+                      console.log('FFFFFFF ' + result);
+                    }
+                    this['' + variables[acc].attribute + ''] = result;
+                    console.log(`RESULT OF ${variables[acc].attribute} is ${this['' + variables[acc].attribute + '']}`);
+                    wrapper(++acc);
+                  }
+                )
+              } else {
+                reject(Error('loadOptions: variables parameter must be of type {attribute:string, key:string}[]'));
+              }
+            } else {
+              reject(Error(`session service needs an attribute called \'${variables[acc].attribute}\'`))
+            }
+          } else {
+            resolve();
+          }
+        };
+
+        wrapper(0);
+      }
+    );
+  };
+
+  public clearIDBTable(name: string): Promise<void> {
+    return this._idb.clear(name);
+  }
+
+  public overwriteAnnotation = (value: OLevel[]): Promise<void> => {
+    return this.clearIDBTable('annotation')
+      .then(() => {
+        this._annotation = value;
+      }).catch((err) => {
+        console.error(err);
+      }).then(() => {
+        return this._idb.saveArraySync(value, 'annotation', 'name')
+      });
   }
 }

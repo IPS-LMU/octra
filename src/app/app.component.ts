@@ -5,7 +5,7 @@ import {SessionService} from './core/shared/service/session.service';
 import {SettingsService} from './core/shared/service/settings.service';
 import {SubscriptionManager} from './core/obj/SubscriptionManager';
 import {isNullOrUndefined, isUndefined} from 'util';
-import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
+import {BugReportService} from './core/shared/service/bug-report.service';
 import {AppInfo} from './app.info';
 import {environment} from '../environments/environment';
 import {UpdateManager} from './core/shared/UpdateManager';
@@ -33,6 +33,7 @@ export class AppComponent implements OnDestroy {
               private sessService: SessionService,
               private settingsService: SettingsService,
               private bugService: BugReportService) {
+    /*
     // overwrite console.log
     const oldLog = console.log;
     const serv = this.bugService;
@@ -70,6 +71,7 @@ export class AppComponent implements OnDestroy {
       };
     })();
 
+*/
     this.subscrmanager = new SubscriptionManager();
 
     // load settings
@@ -91,13 +93,13 @@ export class AppComponent implements OnDestroy {
     umanager.checkForUpdates().then((idb) => {
       this.sessService.load(idb).then(
         () => {
-          console.log('LOADEDLOADEDLOADED');
           this.settingsService.getApplicationSettings();
 
           if (this.settingsService.validated) {
             console.log('loaded');
             this.onSettingsLoaded(true);
           }
+          umanager.destroy();
         }
       );
     });

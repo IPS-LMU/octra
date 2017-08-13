@@ -15,7 +15,7 @@ import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {AudioService, TranscriptionService} from '../../shared/service';
 import {SubscriptionManager} from '../../shared';
 import {isNullOrUndefined} from 'util';
-import {Segment} from '../../obj/Segment';
+import {Segment} from '../../obj/Annotation/Segment';
 
 @Component({
   selector: 'app-transcr-overview',

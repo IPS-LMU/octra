@@ -241,6 +241,7 @@ export class SettingsService {
           });
         } else {
           console.error('audio src is null');
+          this.audioloaded.emit({status: 'error'});
         }
       } else {
         // local mode

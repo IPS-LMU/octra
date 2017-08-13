@@ -79,5 +79,3 @@ function sortValidationResult(result) {
             return 1;
     });
 }
-
-console.log("ok es klappt test4");

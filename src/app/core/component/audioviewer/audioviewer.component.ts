@@ -1009,14 +1009,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       };
 
       this.audiochunk.startPlayback(drawFunc).then((played: boolean) => {
-        console.log('ok3');
         if (played) {
           this.onEndPlayBack();
-          console.log('ok4');
         }
         resolve(played);
       }).catch((err) => {
-        console.log('HÄÄ');
         console.log(err);
       });
     });
@@ -1082,7 +1079,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   stepBackward() {
     this.audiochunk.stepBackward(() => {
       // audio not playing
-      console.log('ok back');
       if (this.audiochunk.lastplayedpos !== null) {
         this.audiochunk.playposition = this.audiochunk.lastplayedpos.clone();
         this.audiochunk.startpos = this.audiochunk.lastplayedpos.clone();
@@ -1316,8 +1312,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           this.drawPlayCursorOnly(line);
         }
       }
-    } else {
-      console.log('same');
     }
   }
 

@@ -1,5 +1,5 @@
 import {Converter, File} from './Converter';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../Annotation/AnnotJSON';
 import {isNullOrUndefined} from 'util';
 
 export class TextConverter extends Converter {

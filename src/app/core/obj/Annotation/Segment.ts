@@ -1,5 +1,5 @@
-import {AudioTime} from './media/audio/AudioTime';
-import {OSegment} from './annotjson';
+import {AudioTime} from '../media/audio/AudioTime';
+import {OSegment} from './AnnotJSON';
 
 export class Segment {
   get changed(): boolean {

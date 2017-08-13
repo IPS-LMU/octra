@@ -10,14 +10,6 @@ export class LoginService {
 
   constructor(private http: Http) {
     this.subscrmanager = new SubscriptionManager();
-    this.subscrmanager.add(this.http.request('./config/allowed_users.json').subscribe(
-      (result) => {
-        this.db_data = result.json();
-      },
-      () => {
-        console.error('allowed_users.json not found. Please create this file in a folder named \'config\'');
-      }
-    ));
   }
 
   public checkLoginData(user_name: string) {

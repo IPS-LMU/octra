@@ -55,7 +55,7 @@
         <p style="text-align:center;color:red;">{{(data) ? data.text : ""}}</p>
     </modal-body>
     <modal-footer>
-        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="error.dismiss()">
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="error.close()">
             {{"general.OK" |translate}}
         </button>
     </modal-footer>

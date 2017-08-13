@@ -1,5 +1,5 @@
 import {Converter, File} from './Converter';
-import {ILevel, ISegment, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
+import {ILevel, ISegment, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../Annotation/AnnotJSON';
 import {isNullOrUndefined} from 'util';
 import {Functions} from '../../shared/Functions';
 
@@ -91,7 +91,6 @@ export class PraatTableConverter extends Converter {
             return null;
           } else {
             length = Number(tmax - tmin);
-            console.log('Length: ' + length)
           }
           const samplerate = audiofile.samplerate;
 

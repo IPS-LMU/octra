@@ -7,7 +7,7 @@ import {TranscrEditorConfigValidator} from './validator/TranscrEditorConfigValid
 import {SettingsService} from '../../shared/service/settings.service';
 import {TranscriptionService} from '../../shared/service/transcription.service';
 import {isNullOrUndefined} from 'util';
-import {Segments} from '../../obj/Segments';
+import {Segments} from '../../obj/Annotation/Segments';
 import {TimespanPipe} from '../../shared/pipe/timespan.pipe';
 import {AudioTime} from '../../obj/media/audio/AudioTime';
 import {AudioService} from '../../shared/service/audio.service';
@@ -275,7 +275,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           if (this.init === 1) {
             this.focus(true);
           } else if (this.init > 1) {
-            console.log("restore range");
             this.textfield.summernote('restoreRange');
           }
         },

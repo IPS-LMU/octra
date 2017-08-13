@@ -178,7 +178,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   clearElements() {
     this.uiService.clear();
-    this.sessService.clearIDBTable('logs').catch((err)=>{
+    this.sessService.clearLoggingData().catch((err) => {
       console.error(err);
     });
   }

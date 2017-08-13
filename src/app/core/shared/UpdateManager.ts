@@ -1,13 +1,15 @@
 import {AppInfo} from '../../app.info';
 import {SessionService} from './service/session.service';
 import {isNullOrUndefined} from 'util';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../obj/annotjson';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../obj/Annotation/AnnotJSON';
 import {IndexedDBManager} from '../obj/IndexedDBManager';
 import {Logger} from './Logger';
+import {SubscriptionManager} from '../obj/SubscriptionManager';
 
 export class UpdateManager {
   private version = '';
   private sessService: SessionService;
+  private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
   constructor(sessService: SessionService) {
     this.version = sessService.version;
@@ -23,8 +25,9 @@ export class UpdateManager {
           this.version = this.sessService.localStr.retrieve('version');
         }
 
+
         const continue_check = () => {
-          if (isNullOrUndefined(this.version) || appversion !== this.version) {
+          if (isNullOrUndefined(this.version)) {
             console.log('update...');
             console.log(appversion);
             console.log(this.version);
@@ -34,12 +37,13 @@ export class UpdateManager {
           // incremental IDB upgrade: It is very important to make sure, that the database can
           // be upgrade from any version to the latest version
           const idbm = new IndexedDBManager('octra');
-          idbm.open(2).subscribe(
+          this.subscrmanager.add(idbm.open(2).subscribe(
             (result) => {
               console.log(result.type);
               if (result.type === 'success') {
                 // database opened
                 Logger.log('IDB opened');
+                idbm.save('options', 'version', {value: AppInfo.version});
                 resolve(idbm);
               } else if (result.type === 'upgradeneeded') {
                 // database opened and needs upgrade/installation
@@ -54,7 +58,7 @@ export class UpdateManager {
                   const annoStore = idbm.db.createObjectStore('annotation', {keyPath: 'name'});
 
                   // options for version 1
-                  idbm.saveSync(optionsStore, [
+                  idbm.saveSequential(optionsStore, [
                     {
                       key: 'easymode',
                       value: {value: this.sessService.localStr.retrieve('easymode')}
@@ -78,6 +82,10 @@ export class UpdateManager {
                     {
                       key: 'uselocalmode',
                       value: {value: this.sessService.localStr.retrieve('offline')}
+                    },
+                    {
+                      key: 'useinterface',
+                      value: {value: this.sessService.sessStr.retrieve('interface')}
                     },
                     {
                       key: 'sessionfile',
@@ -106,23 +114,26 @@ export class UpdateManager {
                       }
                     }
                   ]).then(() => {
-                    console.log('ALL SAVED');
 
                     const convertAnnotation = () => {
                       if (!isNullOrUndefined(this.sessService.localStr.retrieve('annotation'))) {
                         Logger.log(`Convert annotation to IDB...`);
 
-                        idbm.saveArraySync(this.sessService.localStr.retrieve('annotation').levels, annoStore, 'name').then(() => {
+                        idbm.saveArraySequential(this.sessService.localStr.retrieve('annotation').levels, annoStore, 'name').then(() => {
                           console.log(`converted annotation levels to IDB`);
 
                           version++;
                           Logger.log(`IDB upgraded to v${version}`);
+                          this.sessService.localStr.clear();
+                          // do not insert a resolve call here!
+                          // after an successful upgrade the success is automatically triggered
                         }).catch((err) => {
                           console.error(err);
                           reject(err);
                         });
                       } else {
                         version++;
+                        this.sessService.localStr.clear();
                         Logger.log(`IDB upgraded to v${version}`);
                       }
                     };
@@ -130,7 +141,7 @@ export class UpdateManager {
                     if (!isNullOrUndefined(this.sessService.localStr.retrieve('logs'))) {
                       Logger.log('Convert logging data...');
                       Logger.log(`${this.sessService.localStr.retrieve('logs').length} logs to convert:`);
-                      idbm.saveArraySync(this.sessService.localStr.retrieve('logs'), logsStore, 'timestamp').then(() => {
+                      idbm.saveArraySequential(this.sessService.localStr.retrieve('logs'), logsStore, 'timestamp').then(() => {
                         console.log(`converted ${this.sessService.localStr.retrieve('logs').length} logging items to IDB`);
                         convertAnnotation();
                       }).catch((err) => {
@@ -151,12 +162,13 @@ export class UpdateManager {
             (error) => {
               console.error(error);
               reject(error);
-            });
+            }));
         };
+
 
         // check if version entry in IDB exists
         const idb = new IndexedDBManager('octra');
-        idb.open().subscribe(
+        this.subscrmanager.add(idb.open().subscribe(
           (result) => {
             // database opened
             Logger.log('get version');
@@ -173,10 +185,10 @@ export class UpdateManager {
             });
           },
           (err) => {
-            console.log('cannot open IDB');
-            console.error(err);
+            // IDB does not exist
+            continue_check();
           }
-        );
+        ));
       }
     );
   }
@@ -220,18 +232,14 @@ export class UpdateManager {
         console.log('delete old transcription');
         this.sessService.localStr.store('transcription', null);
         this.sessService.version = appversion;
-      } else {
-        // OCTRAJSON found
-        console.log('clear OCTRAJSON');
-        console.log(this.sessService.annotation);
-        this.sessService.localStr.store('annotation', null);
-        this.sessService.version = appversion;
       }
     } else {
       console.log('version available');
-      // update
-
       this.sessService.version = appversion;
     }
+  }
+
+  public destroy() {
+    this.subscrmanager.destroy();
   }
 }

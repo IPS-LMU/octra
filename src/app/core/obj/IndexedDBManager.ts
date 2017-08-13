@@ -169,13 +169,12 @@ export class IndexedDBManager {
     );
   };
 
-  public saveSync = (store_name: string | IDBObjectStore, data: { key: string, value: any }[]): Promise<void> => {
+  public saveSequential = (store_name: string | IDBObjectStore, data: { key: string, value: any }[]): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
 
         const wrapper = (acc: number) => {
           if (acc < data.length) {
             if (data[acc].hasOwnProperty('key') && data[acc].hasOwnProperty('value')) {
-              console.log('SAVE ' + data[acc].key + '... ');
               return this.save(store_name, data[acc].key, data[acc].value).then(wrapper(++acc));
             } else {
               reject(new Error('saveSync data parameter has invalid elements'));
@@ -224,7 +223,7 @@ export class IndexedDBManager {
     this.db.close();
   };
 
-  public saveArraySync = (array: any[], store_name: string | IDBObjectStore, key: any): Promise<void> => {
+  public saveArraySequential = (array: any[], store_name: string | IDBObjectStore, key: any): Promise<void> => {
     return new Promise<void>(
       (resolve, reject) => {
         const store = (typeof store_name !== 'string') ? store_name : this.getObjectStore(store_name, IDBMode.READWRITE);
@@ -237,7 +236,6 @@ export class IndexedDBManager {
                 wrapper(++acc);
               }
             ).catch((err) => {
-              console.log(`saveArraySync failed saving ${acc}th Element in store ${store}`);
               reject(err);
             });
           } else {

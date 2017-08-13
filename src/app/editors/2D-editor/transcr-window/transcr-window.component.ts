@@ -26,7 +26,7 @@ import {AudioManager} from '../../../core/obj/media/audio/AudioManager';
 import {AudioRessource} from '../../../core/obj/media/audio/AudioRessource';
 import {isNullOrUndefined} from 'util';
 import {AudioSelection} from '../../../core/obj/media/audio/AudioSelection';
-import {Segments} from '../../../core/obj/Segments';
+import {Segments} from '../../../core/obj/Annotation/Segments';
 
 @Component({
   selector: 'app-transcr-window',

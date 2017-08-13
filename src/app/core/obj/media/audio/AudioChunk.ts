@@ -168,7 +168,7 @@ export class AudioChunk {
           }
           resolve(result);
         }).catch((err) => {
-          console.log(err);
+          reject(err);
         });
       } else {
         resolve(false);

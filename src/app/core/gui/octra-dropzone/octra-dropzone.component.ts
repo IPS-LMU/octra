@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {OAnnotJSON, OAudiofile} from '../../obj/annotjson';
+import {OAnnotJSON, OAudiofile} from '../../obj/Annotation/AnnotJSON';
 import {FileSize, Functions} from '../../shared/Functions';
 import {AppInfo} from '../../../app.info';
 import {isNullOrUndefined} from 'util';
@@ -215,7 +215,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
           }
         }
       } else {
-        console.log('audiofile is null');
+        console.error('audiofile is null');
       }
     }
   };

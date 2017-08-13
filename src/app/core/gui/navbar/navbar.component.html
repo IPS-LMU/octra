@@ -155,10 +155,10 @@
                         'collaps': collapsed
                         }">
                         <table class="table">
-                            <tr *ngIf="!sessService.offline">
+                            <tr *ngIf="!sessService.uselocalmode">
                                 <td><span>{{'general.project' |translate}}:</span></td>
                                 <td>
-                                    <span>{{sessService.member_project}}</span>
+                                    <span>{{sessService.user.project}}</span>
                                 </td>
                             </tr>
                             <tr>
@@ -191,13 +191,13 @@
                                     <span>{{navbarServ.exportformats.filesize.size}} {{navbarServ.exportformats.filesize.label}}</span>
                                 </td>
                             </tr>
-                            <tr *ngIf="!sessService.offline">
+                            <tr *ngIf="!sessService.uselocalmode">
                                 <td><span>{{'general.id' | translate}}:</span></td>
                                 <td>
                                     <span>{{sessService.data_id}}</span>
                                 </td>
                             </tr>
-                            <tr *ngIf="!sessService.offline">
+                            <tr *ngIf="!sessService.uselocalmode">
                                 <td><span>{{'general.free jobs' | translate}}:</span></td>
                                 <td>
                                     <span>{{sessService.jobs_left}}</span>
@@ -265,8 +265,8 @@
         </div><!-- .nav-collapse -->
     </div>
 </nav>
-<div id="subnav" *ngIf="sessService.LoggedIn && !sessService.offline && navbarServ.dataloaded">
-    {{"general.project" | translate}}: {{sessService.member_project}} | {{"general.name" |translate}}:
+<div id="subnav" *ngIf="sessService.LoggedIn && !sessService.uselocalmode && navbarServ.dataloaded">
+    {{"general.project" | translate}}: {{sessService.user.project}} | {{"general.name" |translate}}:
     {{navbarServ.exportformats.filename}} | {{'general.free jobs' | translate}}:
     {{sessService.jobs_left}}
 </div>

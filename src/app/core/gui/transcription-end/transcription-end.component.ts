@@ -51,7 +51,7 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
 
   clearData() {
     this.sessService.submitted = false;
-    this.sessService.clearIDBTable('annotation').catch((err) => {
+    this.sessService.clearAnnotationData().catch((err) => {
       console.error(err)
     });
 
@@ -59,7 +59,7 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
       console.error(err);
     });
     this.sessService.comment = '';
-    this.sessService.clearIDBTable('logs').catch((err) => {
+    this.sessService.clearLoggingData().catch((err) => {
       console.error(err)
     });
     this.uiService.elements = [];

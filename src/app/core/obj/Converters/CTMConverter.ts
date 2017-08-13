@@ -1,5 +1,5 @@
 import {Converter, File} from './Converter';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../Annotation/AnnotJSON';
 import {isNullOrUndefined} from 'util';
 import {Functions} from '../../shared/Functions';
 
@@ -112,7 +112,6 @@ export class CTMConverter extends Converter {
                 [(new OLabel('Orthographic', ''))]
               );
 
-              console.log('END AT ' + (audiofile.duration));
               olevel.items.push(osegment_end);
             }
           }

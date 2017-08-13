@@ -6,6 +6,7 @@ import {SessionService} from '../../shared/service/session.service';
 import {isNullOrUndefined} from 'util';
 import {AudioService} from '../../shared/service/audio.service';
 import {Router} from '@angular/router';
+import {TranscriptionService} from '../../shared/service/transcription.service';
 
 @Component({
   selector: 'app-loading',
@@ -35,7 +36,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
               public settService: SettingsService,
               private sessionService: SessionService,
               public audio: AudioService,
-              private router: Router) {
+              private router: Router,
+              private transcrService: TranscriptionService) {
     if (!this.sessionService.LoggedIn) {
       this.router.navigate(['/login']);
     }
@@ -105,7 +107,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
             this.state = 'Audio loaded';
             this.loadedchanged.emit(false);
           } else {
-            alert('ERROR: ' + result.error);
+            this.router.navigate(['/logout']);
           }
         }
       )
@@ -127,9 +129,17 @@ export class LoadingComponent implements OnInit, OnDestroy {
                   !this.sessionService.agreement[this.sessionService.user.project]
                 )
                 && this.settService.projectsettings.agreement.enabled && !this.sessionService.uselocalmode) {
-                this.router.navigate(['/user/agreement']);
+                this.transcrService.load().then(() => {
+                  this.router.navigate(['/user/agreement']);
+                }).catch((err) => {
+                  console.error(err);
+                });
               } else {
-                this.router.navigate(['/user/transcr']);
+                this.transcrService.load().then(() => {
+                  this.router.navigate(['/user/transcr']);
+                }).catch((err) => {
+                  console.error(err);
+                });
               }
             }, 500);
           }

@@ -10,7 +10,7 @@ import {
 import {SubscriptionManager} from '../../core/shared';
 import {SettingsService} from '../../core/shared/service/settings.service';
 import {SessionService} from '../../core/shared/service/session.service';
-import {Segment} from '../../core/obj/Segment';
+import {Segment} from '../../core/obj/Annotation/Segment';
 import {AudioManager} from '../../core/obj/media/audio/AudioManager';
 import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
 import {AudioTime} from '../../core/obj/media/audio/AudioTime';
@@ -224,7 +224,6 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   }
 
   saveTranscript() {
-    console.log('saveTranscript');
     let html: string = this.editor.html.replace(/&nbsp;/g, ' ');
     // split text at the position of every boundary marker
     html = html.replace(/(<textspan([ \w:"\-%;]|[0-9])*>)|(<\/textspan>)/g, '');

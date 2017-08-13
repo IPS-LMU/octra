@@ -1,6 +1,6 @@
-import {AnnotJSONType, OLevel} from '../annotjson';
+import {AnnotJSONType, OLevel} from './AnnotJSON';
 import {isNullOrUndefined} from 'util';
-import {Segments} from '../Segments';
+import {Segments} from './Segments';
 
 export class Level {
   private name: string;

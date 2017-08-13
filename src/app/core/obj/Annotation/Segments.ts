@@ -1,7 +1,7 @@
 import {Segment} from './Segment';
-import {AudioTime} from './media/audio/AudioTime';
+import {AudioTime} from '../media/audio/AudioTime';
 import {EventEmitter} from '@angular/core';
-import {ISegment, OLabel, OSegment} from './annotjson';
+import {ISegment, OLabel, OSegment} from './AnnotJSON';
 import {isNullOrUndefined} from 'util';
 
 export class Segments {

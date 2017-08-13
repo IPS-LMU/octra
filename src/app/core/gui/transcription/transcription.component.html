@@ -29,7 +29,8 @@
     <modal-body>
         <app-transcr-overview *ngIf="transcrService.annotation !== null"
                               [visible]="modal_overview.visible"
-                              [segments]="transcrService.annotation.levels[0].segments.segments"
+                              [segments]="(transcrService.annotation !== null && transcrService.annotation !== undefined)
+                              ? transcrService.annotation.levels[0].segments.segments: null"
                               (segmentclicked)="onSegmentInOverviewClicked($event)">
         </app-transcr-overview>
     </modal-body>
@@ -142,7 +143,8 @@
         <ng-template appLoadeditor></ng-template>
     </div>
 
-    <div id="bottom-feedback" class="panel" #feedback *ngIf="!sessService.offline">
+    <div id="bottom-feedback" class="panel" #feedback
+         *ngIf="!sessService.uselocalmode && transcrService.feedback !== null && transcrService.feedback !== undefined">
         <table style="width:100%;">
             <tbody>
             <tr>
@@ -189,7 +191,7 @@
                                            name="{{control.value}}" value="true"
                                            [checked]="control.custom.checked" #checkb
                                            [required]="control.required"
-                                           (change)="checkBoxChanged(group.name, control.value)" >
+                                           (change)="checkBoxChanged(group.name, control.value)">
                                     <span class="required_marker" *ngIf="control.required">*</span>
                                     {{translate(control.label.languages, langService.currentLang)}}
                                 </label>
@@ -223,13 +225,13 @@
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.quit" | translate}}</span></a>
 
             <a class="btn btn-primary btn-raised"
-               (click)="navbarServ.doclick('export');" *ngIf="sessService.offline"><span
+               (click)="navbarServ.doclick('export');" *ngIf="sessService.uselocalmode"><span
                     *ngIf="!sessService.easymode"
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.export data" | translate}}</span>
                 <span class="glyphicon glyphicon-download"></span></a>
 
             <a class="btn btn-primary btn-raised"
-               (click)="onSendButtonClick()" *ngIf="!sessService.offline"><span
+               (click)="onSendButtonClick()" *ngIf="!sessService.uselocalmode"><span
                     *ngIf="!sessService.easymode"
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"transcription.send" | translate}}</span>
                 <span class="glyphicon glyphicon-send"></span></a>

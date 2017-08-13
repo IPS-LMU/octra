@@ -1,6 +1,6 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import 'rxjs/Observable';
-import {Segments} from '../../obj/Segments';
+import {Segments} from '../../obj/Annotation/Segments';
 import {AudioService} from './audio.service';
 import {SessionService} from './session.service';
 import {Functions} from '../Functions';
@@ -14,7 +14,7 @@ import {SettingsService} from './settings.service';
 import {isNullOrUndefined} from 'util';
 import {Http} from '@angular/http';
 import {FeedBackForm} from '../../obj/FeedbackForm/FeedBackForm';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../../obj/annotjson';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../../obj/Annotation/AnnotJSON';
 import {Annotation} from '../../obj/Annotation/Annotation';
 import {Converter, File} from '../../obj/Converters/Converter';
 import {TextConverter} from '../../obj/Converters/TextConverter';
@@ -148,32 +148,38 @@ export class TranscriptionService {
   /**
    * metod after audio was loaded
    */
-  public load() {
-    this.audiomanager = this.audio.audiomanagers[0];
+  public load(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.audiomanager = this.audio.audiomanagers[0];
 
-    this.filename = this.audiomanager.ressource.name;
+      this.filename = this.audiomanager.ressource.name;
 
-    this._audiofile = new OAudiofile();
-    this._audiofile.name = this.audiomanager.ressource.name + this.audiomanager.ressource.extension;
-    this._audiofile.samplerate = this.audiomanager.ressource.info.samplerate;
-    this._audiofile.duration = this.audiomanager.ressource.info.duration.samples;
+      this._audiofile = new OAudiofile();
+      this._audiofile.name = this.audiomanager.ressource.name + this.audiomanager.ressource.extension;
+      this._audiofile.samplerate = this.audiomanager.ressource.info.samplerate;
+      this._audiofile.duration = this.audiomanager.ressource.info.duration.samples;
 
-    this.last_sample = this.audiomanager.ressource.info.duration.samples;
-    this.loadSegments(this.audiomanager.ressource.info.samplerate);
+      this.last_sample = this.audiomanager.ressource.info.duration.samples;
+      this.loadSegments(this.audiomanager.ressource.info.samplerate).then(
+        () => {
+          this.navbarServ.exportformats.filename = this.filename + this.audiomanager.ressource.extension;
+          this.navbarServ.exportformats.bitrate = this.audiomanager.ressource.info.bitrate;
+          this.navbarServ.exportformats.samplerate = this.audiomanager.ressource.info.samplerate;
+          this.navbarServ.exportformats.filesize = Functions.getFileSize(this.audiomanager.ressource.size);
+          this.navbarServ.exportformats.duration = this.audiomanager.ressource.info.duration.unix;
 
-    this.navbarServ.exportformats.filename = this.filename + this.audiomanager.ressource.extension;
-    this.navbarServ.exportformats.bitrate = this.audiomanager.ressource.info.bitrate;
-    this.navbarServ.exportformats.samplerate = this.audiomanager.ressource.info.samplerate;
-    this.navbarServ.exportformats.filesize = Functions.getFileSize(this.audiomanager.ressource.size);
-    this.navbarServ.exportformats.duration = this.audiomanager.ressource.info.duration.unix;
+          resolve();
+        }
+      ).catch((err) => {
+        reject(err);
+      });
+    });
   }
 
   public getTranscriptString(converter: Converter): string {
     let result: File;
 
     if (!isNullOrUndefined(this.annotation)) {
-      const data = this.annotation;
-
       result = converter.export(this.annotation.getObj(), this.audiofile);
 
       return result.content;
@@ -182,69 +188,77 @@ export class TranscriptionService {
     return '';
   }
 
-  public loadSegments(sample_rate: number) {
-    const process = () => {
-      const annotates = this.audiomanager.ressource.name + this.audiomanager.ressource.extension;
+  public loadSegments(sample_rate: number): Promise<void> {
+    return new Promise<void>(
+      (resolve, reject) => {
+        const process = () => {
+          const annotates = this.audiomanager.ressource.name + this.audiomanager.ressource.extension;
 
-      this._annotation = new Annotation(annotates, this._audiofile);
+          this._annotation = new Annotation(annotates, this._audiofile);
 
-      for (let i = 0; i < this.sessServ.annotation.length; i++) {
-        const level: Level = Level.fromObj(this.sessServ.annotation[i],
-          this.audiomanager.ressource.info.samplerate, this.audiomanager.ressource.info.duration.samples);
-        this._annotation.levels.push(level);
-      }
-
-      // load feedback form data
-      if (isNullOrUndefined(this.sessServ.feedback)) {
-        this.sessServ.idb.save('options', 'feedback', {value: {}});
-      }
-
-      this._feedback = FeedBackForm.fromAny(this.settingsService.projectsettings.feedback_form, this.sessServ.comment);
-      this._feedback.importData(this.sessServ.feedback);
-
-      if (isNullOrUndefined(this.sessServ.comment)) {
-        this.sessServ.comment = '';
-      } else {
-        this._feedback.comment = this.sessServ.comment;
-      }
-
-      if (this.sessServ.logs === null) {
-        this.sessServ.clearIDBTable('logs');
-        this.uiService.elements = [];
-      } else {
-        console.log('LOGS:');
-        console.log(this.sessServ.logs);
-        this.uiService.fromAnyArray(this.sessServ.logs);
-      }
-
-      this.navbarServ.dataloaded = true;
-      this.dataloaded.emit();
-    };
-
-    if (isNullOrUndefined(this.sessServ.annotation)) {
-      this.sessServ.overwriteAnnotation(this.createNewAnnotation().levels).then(() => {
-        if (!this.sessServ.uselocalmode) {
-          if (!isNullOrUndefined(this.sessServ.servertranscipt)) {
-            // import server transcript
-            this.sessServ.annotation[0].items = [];
-            for (let i = 0; i < this.sessServ.servertranscipt.length; i++) {
-              const seg_t = this.sessServ.servertranscipt[i];
-
-              const oseg = new OSegment(i, seg_t.start, seg_t.length, [new OLabel('Orthographic', seg_t.text)]);
-              this.sessServ.annotation[0].items.push(oseg);
+          if (!isNullOrUndefined(this.sessServ.annotation)) {
+            for (let i = 0; i < this.sessServ.annotation.length; i++) {
+              const level: Level = Level.fromObj(this.sessServ.annotation[i],
+                this.audiomanager.ressource.info.samplerate, this.audiomanager.ressource.info.duration.samples);
+              this._annotation.levels.push(level);
             }
-            // clear servertranscript
-            this.sessServ.servertranscipt = null;
-          }
-        }
 
-        process();
-      }).catch((err) => {
-        console.error(err);
-      });
-    } else {
-      process();
-    }
+            // load feedback form data
+            if (isNullOrUndefined(this.sessServ.feedback)) {
+              this.sessServ.idb.save('options', 'feedback', {value: {}});
+            }
+
+            this._feedback = FeedBackForm.fromAny(this.settingsService.projectsettings.feedback_form, this.sessServ.comment);
+            this._feedback.importData(this.sessServ.feedback);
+
+            if (isNullOrUndefined(this.sessServ.comment)) {
+              this.sessServ.comment = '';
+            } else {
+              this._feedback.comment = this.sessServ.comment;
+            }
+
+            if (this.sessServ.logs === null) {
+              this.sessServ.clearLoggingData();
+              this.uiService.elements = [];
+            } else {
+              this.uiService.fromAnyArray(this.sessServ.logs);
+            }
+
+            this.navbarServ.dataloaded = true;
+            this.dataloaded.emit();
+          } else {
+            reject(Error('annotation object in sessServ is null'));
+          }
+          resolve();
+        };
+
+        if (isNullOrUndefined(this.sessServ.annotation) || this.sessServ.annotation.length === 0) {
+          this.sessServ.overwriteAnnotation(this.createNewAnnotation().levels).then(() => {
+            if (!this.sessServ.uselocalmode) {
+              if (!isNullOrUndefined(this.sessServ.servertranscipt)) {
+                // import server transcript
+                this.sessServ.annotation[0].items = [];
+                for (let i = 0; i < this.sessServ.servertranscipt.length; i++) {
+                  const seg_t = this.sessServ.servertranscipt[i];
+
+                  const oseg = new OSegment(i, seg_t.start, seg_t.length, [new OLabel('Orthographic', seg_t.text)]);
+                  this.sessServ.annotation[0].items.push(oseg);
+                }
+                // clear servertranscript
+                this.sessServ.servertranscipt = null;
+              }
+            } else {
+            }
+
+            process();
+          }).catch((err) => {
+            console.error(err);
+          });
+        } else {
+          process();
+        }
+      }
+    );
   }
 
   public exportDataToJSON(): any {

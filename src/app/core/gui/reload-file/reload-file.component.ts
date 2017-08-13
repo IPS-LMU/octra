@@ -42,8 +42,11 @@ export class ReloadFileComponent implements OnInit {
   }
 
   getDropzoneFileString(file: File | SessionFile) {
-    const fsize: FileSize = Functions.getFileSize(file.size);
-    return Functions.buildStr('{0} ({1} {2})', [file.name, (Math.round(fsize.size * 100) / 100), fsize.label]);
+    if (!isNullOrUndefined(file)) {
+      const fsize: FileSize = Functions.getFileSize(file.size);
+      return `${file.name} (${(Math.round(fsize.size * 100) / 100)} ${fsize.label})`;
+    }
+    return '[FILE UNDEFINED]';
   }
 
   abortTranscription = () => {

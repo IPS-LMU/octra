@@ -179,7 +179,9 @@ export class AudioManager {
 
     return new Promise<AudioBuffer>((resolve, reject) => {
       const context = new OfflineAudioContext(1, 4096, sampleRate);
-
+      context.onstatechange = (state) => {
+        console.log(state);
+      };
       context.decodeAudioData(file, (result) => {
         resolve(result);
       }, (reason) => {
@@ -373,7 +375,7 @@ export class AudioManager {
       if (disconnect) {
         this._audiocontext.close()
           .then(() => {
-            console.log('AdioManager X successfully destroyed its AudioContext');
+            console.log('AudioManager successfully destroyed its AudioContext');
           })
           .catch(
             (re) => {

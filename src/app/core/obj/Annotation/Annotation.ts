@@ -1,4 +1,4 @@
-import {OAnnotJSON, OAudiofile} from '../annotjson';
+import {OAnnotJSON, OAudiofile} from './AnnotJSON';
 import {isNullOrUndefined} from 'util';
 import {Level} from './Level';
 

@@ -45,7 +45,7 @@
     "typescript": "^2.2.2",
     "video.js": "^5.18.4",
     "web-animations-js": "^2.2.2",
-    "zone.js": "^0.8.4"
+    "zone.js": "^0.8.16"
   },
   "devDependencies": {
     "@angular/cli": "^1.2.0",

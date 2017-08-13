@@ -1,2 +1,2 @@
-export * from './annotjson';
+export * from './Annotation/AnnotJSON';
 export * from './Settings';

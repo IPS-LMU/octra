@@ -136,52 +136,11 @@ export class TranscriptionComponent implements OnInit,
 
   ngOnInit() {
     this.navbarServ.interfaces = this.projectsettings.interfaces;
-    this.afterAudioLoaded();
 
-    this.subscrmanager.add(this.sessService.saving.subscribe(
-      (saving) => {
-        if (saving) {
-          this.saving = 'Saving...';
-        } else {
-          setTimeout(() => {
-            this.saving = '';
-          }, 1000);
-        }
-      }
-    ));
 
-    this.navbarServ.show_export = this.settingsService.projectsettings.navigation.export;
-
-    if (this.projectsettings.logging.forced === true) {
-      this.subscrmanager.add(
-        this.uiService.afteradd.subscribe((elem) => {
-          // this.sessService.save('logs', this.uiService.elementsToAnyArray());
-          this.sessService.saveLogItem(elem.getDataClone());
-        }));
-    }
-
-    if (!isNullOrUndefined(this.transcrService.annotation.levels[0].segments)) {
-      this.subscrmanager.add(this.transcrService.annotation.levels[0].segments.onsegmentchange.subscribe(this.transcrService.saveSegments));
-    } else {
-      this.subscrmanager.add(this.transcrService.dataloaded.subscribe(() => {
-        this.subscrmanager.add(
-          this.transcrService.annotation.levels[0].segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
-        );
-      }));
-    }
-  }
-
-  afterAudioLoaded = () => {
-    this.transcrService.load();
-
+    // because of the loading data before through the loading component you can be sure the audio was loaded
+    // correctly
     this.loadForm();
-
-    if (isNullOrUndefined(this.sessService.feedback)) {
-      console.error('feedback is null!');
-    } else {
-      console.log('FEEDBACK is not NULL');
-      console.log(this.sessService.feedback);
-    }
 
     this.transcrService.guidelines = this.settingsService.guidelines;
 
@@ -202,7 +161,7 @@ export class TranscriptionComponent implements OnInit,
       }
     }
 
-    this.transcrService.annotation.audiofile.samplerate = this.audiomanager.ressource.info.samplerate;
+    // this.transcrService.annotation.audiofile.samplerate = this.audiomanager.ressource.info.samplerate;
     this.navbarServ.show_interfaces = this.settingsService.projectsettings.navigation.interfaces;
 
     // load guidelines on language change
@@ -229,7 +188,41 @@ export class TranscriptionComponent implements OnInit,
       }
     ));
 
-  };
+    this.changeEditor(this.interface);
+    this.changeDetecorRef.detectChanges();
+
+    this.subscrmanager.add(this.sessService.saving.subscribe(
+      (saving) => {
+        if (saving) {
+          this.saving = 'Saving...';
+        } else {
+          setTimeout(() => {
+            this.saving = '';
+          }, 1000);
+        }
+      }
+    ));
+
+    this.navbarServ.show_export = this.settingsService.projectsettings.navigation.export;
+
+    if (this.projectsettings.logging.forced === true) {
+      this.subscrmanager.add(
+        this.uiService.afteradd.subscribe((elem) => {
+          // this.sessService.save('logs', this.uiService.elementsToAnyArray());
+          this.sessService.saveLogItem(elem.getDataClone());
+        }));
+    }
+
+    if (!isNullOrUndefined(this.transcrService.annotation)) {
+      this.subscrmanager.add(this.transcrService.annotation.levels[0].segments.onsegmentchange.subscribe(this.transcrService.saveSegments));
+    } else {
+      this.subscrmanager.add(this.transcrService.dataloaded.subscribe(() => {
+        this.subscrmanager.add(
+          this.transcrService.annotation.levels[0].segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
+        );
+      }));
+    }
+  }
 
   ngAfterViewInit() {
     if (isNullOrUndefined(this.projectsettings.interfaces.find((x) => {
@@ -239,9 +232,6 @@ export class TranscriptionComponent implements OnInit,
     }
 
     jQuery.material.init();
-
-    this.changeEditor(this.interface);
-    this.changeDetecorRef.detectChanges();
   }
 
   abortTranscription = () => {
@@ -306,6 +296,10 @@ export class TranscriptionComponent implements OnInit,
 
     let comp: any = null;
 
+    if (isNullOrUndefined(name) || name === '') {
+      // fallback to last editor
+      name = EditorComponents[EditorComponents.length - 1].name;
+    }
     for (let i = 0; i < EditorComponents.length; i++) {
       if (name === EditorComponents[i].name) {
         this.sessService.Interface = name;
@@ -337,7 +331,7 @@ export class TranscriptionComponent implements OnInit,
         console.error('ERROR appLoadeditor is null');
       }
     } else {
-      console.error('ERROR comp is null');
+      console.error('ERROR editor component is null');
     }
   }
 
@@ -511,10 +505,12 @@ export class TranscriptionComponent implements OnInit,
 
   clearData() {
     this.sessService.submitted = false;
-    this.sessService.clearIDBTable('annotation');
+    this.sessService.clearAnnotationData().catch((err) => {
+      console.error(err);
+    });
     this.sessService.idb.save('options', 'feedback', {value: null});
     this.sessService.comment = '';
-    this.sessService.clearIDBTable('logs').catch((err) => {
+    this.sessService.clearLoggingData().catch((err) => {
       console.error(err)
     });
     this.uiService.elements = [];

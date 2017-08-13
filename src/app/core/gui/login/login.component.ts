@@ -100,18 +100,18 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.valid_size = true;
     }
 
-    if (!isNullOrUndefined(this.sessionService.user.id) && this.sessionService.user.id !== '-1') {
+    if (!isNullOrUndefined(this.sessionService.user) && this.sessionService.user.id !== '-1') {
       this.member.id = this.sessionService.user.id;
     }
 
-    if (!isNullOrUndefined(this.sessionService.user.project)) {
+    if (!isNullOrUndefined(this.sessionService.user) && this.sessionService.user.hasOwnProperty('project')) {
       this.member.project = this.sessionService.user.project;
     }
 
-    if (!isNullOrUndefined(this.sessionService.user.jobno) && this.sessionService.user.jobno > -1) {
+    if (!isNullOrUndefined(this.sessionService.user) && this.sessionService.user.hasOwnProperty('jobno')
+      && this.sessionService.user.jobno !== null && this.sessionService.user.jobno > -1) {
       this.member.jobno = this.sessionService.user.jobno.toString();
     }
-
     this.cd.markForCheck();
     this.cd.detectChanges();
   }
@@ -172,10 +172,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     if (new_session) {
       this.createNewSession(form);
     } else if (continue_session) {
-      this.subscrmanager.add(this.api.fetchAnnotation(this.sessionService.data_id).catch((error) => {
-        alert('Server cannot be requested. Please check if you are online.');
-        return Observable.throw(error);
-      }).subscribe(
+      this.subscrmanager.add(this.api.fetchAnnotation(this.sessionService.data_id).subscribe(
         (result) => {
           const json = result.json();
 
@@ -200,6 +197,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           } else {
             this.modService.show('login_invalid');
           }
+        },
+        (error) => {
+          this.modService.show('error', 'Server cannot be requested. Please check if you are online.');
+          return Observable.throw(error);
         }
       ));
     }
@@ -241,6 +242,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   };
 
   canDeactivate(): Observable<boolean> | boolean {
+    console.log('VALID? :' + this.valid);
     return (this.valid);
   }
 
@@ -250,7 +252,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         login: true
       }
     });
-  }
+  };
 
   @HostListener('window:resize', ['$event'])
   onResize($event) {
@@ -321,7 +323,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         const json = result.json();
         if (isArray(json.data)) {
           this.projects = json.data;
-          if (!isNullOrUndefined(this.sessionService.user.project) && this.sessionService.user.project !== '') {
+          if (!isNullOrUndefined(this.sessionService.user) && !isNullOrUndefined(this.sessionService.user.project) && this.sessionService.user.project !== '') {
             if (isNullOrUndefined(this.projects.find(
                 (x) => {
                   return x === this.sessionService.user.project;
@@ -352,29 +354,34 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
           // delete old data for fresh new session
           this.sessionService.clearSession();
-          this.sessionService.clearLocalStorage();
+          this.sessionService.clearLocalStorage().then(
+            () => {
+              const res = this.sessionService.setSessionData(this.member, json.data.id, json.data.url);
 
-          const res = this.sessionService.setSessionData(this.member, json.data.id, json.data.url);
+              // get transcript data that already exists
+              if (json.data.hasOwnProperty('transcript')) {
+                const transcript = JSON.parse(json.data.transcript);
 
-          // get transcript data that already exists
-          if (json.data.hasOwnProperty('transcript')) {
-            const transcript = JSON.parse(json.data.transcript);
+                if (isArray(transcript) && transcript.length > 0) {
+                  this.sessionService.servertranscipt = transcript;
+                }
+              }
 
-            if (isArray(transcript) && transcript.length > 0) {
-              this.sessionService.servertranscipt = transcript;
+              if (json.hasOwnProperty('message')) {
+                const counter = (json.message === '') ? '0' : json.message;
+                this.sessionService.sessStr.store('jobs_left', Number(counter));
+              }
+
+              if (res.error === '') {
+                console.log('NAVIGATE');
+                this.navigate();
+              } else {
+                this.modService.show('error', res.error);
+              }
             }
-          }
-
-          if (json.hasOwnProperty('message')) {
-            const counter = (json.message === '') ? '0' : json.message;
-            this.sessionService.sessStr.store('jobs_left', Number(counter));
-          }
-
-          if (res.error === '') {
-            this.navigate();
-          } else {
-            alert(res.error);
-          }
+          ).catch((err) => {
+            console.error(err)
+          });
         } else {
           this.modService.show('login_invalid');
         }

@@ -85,9 +85,9 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     setInterval(() => {
       if (this.audiochunk.isPlaying) {
         const samples = this.audiochunk.playposition.samples;
-        let i: number = this.transcrService.annotation.levels[0].segments.getSegmentBySamplePosition(samples);
+        let i: number = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(samples);
         if (i < 0) {
-          i = this.transcrService.annotation.levels[0].segments.length - 1;
+          i = this.transcrService.currentlevel.segments.length - 1;
         }
         this.highlightSegment(i);
       }
@@ -96,8 +96,12 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   }
 
   ngAfterViewInit() {
-    if (this.transcrService.annotation.levels[0].segments.length > 0) {
-      this.editor.segments = this.transcrService.annotation.levels[0].segments;
+    this.loadEditor();
+  }
+
+  private loadEditor() {
+    if (this.transcrService.currentlevel.segments.length > 0) {
+      this.editor.segments = this.transcrService.currentlevel.segments;
     }
     this.editor.Settings.height = 100;
     this.editor.update();
@@ -182,15 +186,15 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   }
 
   onBoundaryClicked(samples: number) {
-    const i: number = this.transcrService.annotation.levels[0].segments.getSegmentBySamplePosition(samples);
+    const i: number = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(samples);
 
     this.boundaryselected = true;
 
     if (i > -1) {
-      const start = (i > 0) ? this.transcrService.annotation.levels[0].segments.get(i - 1).time.samples : 0;
+      const start = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.samples : 0;
       this.highlightSegment(i);
       this.audiochunk.startpos = new AudioTime(start, this.audiomanager.ressource.info.samplerate);
-      this.audiochunk.selection.end = this.transcrService.annotation.levels[0].segments.get(i).time.clone();
+      this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(i).time.clone();
       this.audioplayer.update();
 
       // make sure that audio is stopped
@@ -263,35 +267,35 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     }
 
     for (let i = 0; i < seg_texts.length; i++) {
-      const anno_seg_length = this.transcrService.annotation.levels[0].segments.length;
+      const anno_seg_length = this.transcrService.currentlevel.segments.length;
       const new_raw = this.transcrService.htmlToRaw(seg_texts[i]);
 
       if (i < anno_seg_length) {
         // probably overwrite old files
-        const segment: Segment = this.transcrService.annotation.levels[0].segments.get(i);
+        const segment: Segment = this.transcrService.currentlevel.segments.get(i);
         segment.transcript = new_raw;
         if (i < seg_texts.length - 1) {
           segment.time.samples = samples_array[i];
         }
 
-        this.transcrService.annotation.levels[0].segments.change(i, segment);
+        this.transcrService.currentlevel.segments.change(i, segment);
       } else {
         // add new segments
 
         if (i === seg_texts.length - 1) {
-          this.transcrService.annotation.levels[0].segments.add(this.audiochunk.time.end.samples, new_raw);
+          this.transcrService.currentlevel.segments.add(this.audiochunk.time.end.samples, new_raw);
         } else {
-          this.transcrService.annotation.levels[0].segments.add(samples_array[i - 1], new_raw);
+          this.transcrService.currentlevel.segments.add(samples_array[i - 1], new_raw);
         }
       }
     }
 
-    const anno_seg_length = this.transcrService.annotation.levels[0].segments.length;
+    const anno_seg_length = this.transcrService.currentlevel.segments.length;
     if (anno_seg_length > seg_texts.length) {
       // remove left segments
-      this.transcrService.annotation.levels[0].segments.segments.splice(seg_texts.length, (anno_seg_length - seg_texts.length));
+      this.transcrService.currentlevel.segments.segments.splice(seg_texts.length, (anno_seg_length - seg_texts.length));
       // because last segment was removed
-      const seg = this.transcrService.annotation.levels[0].segments.get(seg_texts.length - 1);
+      const seg = this.transcrService.currentlevel.segments.get(seg_texts.length - 1);
       seg.time.samples = this.audiochunk.time.end.samples;
     }
   }
@@ -320,5 +324,11 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
         start = samples_array[i];
       }
     }
+  }
+
+  public update() {
+    this.audiochunk.startpos = this.audiochunk.time.start;
+    this.audioplayer.update();
+    this.loadEditor();
   }
 }

@@ -528,8 +528,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       // TODO IMPLEMENT DRAWING ONLY CURRENT LINE
 
       // draw segments
-      if (this.Settings.boundaries.enabled && this.transcr.annotation.levels[0].segments) {
-        const segments = this.transcr.annotation.levels[0].segments.getSegmentsOfRange(
+      if (this.Settings.boundaries.enabled && this.transcr.currentlevel.segments) {
+        const segments = this.transcr.currentlevel.segments.getSegmentsOfRange(
           this.audiochunk.time.start.samples, this.audiochunk.time.end.samples
         );
 
@@ -667,8 +667,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       this.o_context.clearRect(0, 0, this.width, this.height);
 
       // draw segments
-      if (this.Settings.boundaries.enabled && this.transcr.annotation.levels[0].segments) {
-        const segments = this.transcr.annotation.levels[0].segments.getSegmentsOfRange(
+      if (this.Settings.boundaries.enabled && this.transcr.currentlevel.segments.length > 0) {
+        console.log('UPDATE ALL');
+        const segments = this.transcr.currentlevel.segments.getSegmentsOfRange(
           this.audiochunk.time.start.samples, this.audiochunk.time.end.samples
         );
 
@@ -869,15 +870,15 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
                     const boundary_select = this.av.getSegmentSelection(this.av.Mousecursor.timePos.samples);
                     if (boundary_select) {
-                      const segment_i = this.transcr.annotation.levels[0].segments.getSegmentBySamplePosition(xSamples);
+                      const segment_i = this.transcr.currentlevel.segments.getSegmentBySamplePosition(xSamples);
                       if (segment_i > -1) {
-                        const segment = this.transcr.annotation.levels[0].segments.get(segment_i);
-                        const start_time = this.transcr.annotation.levels[0].segments.getStartTime(segment_i);
+                        const segment = this.transcr.currentlevel.segments.get(segment_i);
+                        const start_time = this.transcr.currentlevel.segments.getStartTime(segment_i);
                         // make shure, that segments boundaries are visible
                         if (start_time.samples >= this.audiochunk.time.start.samples &&
                           segment.time.samples <= this.audiochunk.time.end.samples) {
                           const absX = this.av.audioTCalculator.samplestoAbsX(
-                            this.transcr.annotation.levels[0].segments.get(segment_i).time.samples
+                            this.transcr.currentlevel.segments.get(segment_i).time.samples
                           );
                           this.audiochunk.selection = boundary_select.clone();
                           this.av.drawnselection = boundary_select.clone();
@@ -886,7 +887,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
                           let begin = new Segment(new AudioTime(0, this.audioressource.info.samplerate));
                           if (segment_i > 0) {
-                            begin = this.transcr.annotation.levels[0].segments.get(segment_i - 1);
+                            begin = this.transcr.currentlevel.segments.get(segment_i - 1);
                           }
                           const beginX = this.av.audioTCalculator.samplestoAbsX(begin.time.samples);
 
@@ -931,7 +932,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 case('segment_enter'):
                   if (this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly && this.focused) {
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
-                    const seg_index = this.transcr.annotation.levels[0].segments.getSegmentBySamplePosition(
+                    const seg_index = this.transcr.currentlevel.segments.getSegmentBySamplePosition(
                       this.av.Mousecursor.timePos.samples
                     );
                     this.selectSegment(seg_index,
@@ -1328,14 +1329,14 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                        errorcallback: () => void = () => {
                        }): boolean {
     if (seg_index > -1) {
-      const segment = this.transcr.annotation.levels[0].segments.get(seg_index);
-      const start_time = this.transcr.annotation.levels[0].segments.getStartTime(seg_index);
+      const segment = this.transcr.currentlevel.segments.get(seg_index);
+      const start_time = this.transcr.currentlevel.segments.getStartTime(seg_index);
       // make shure, that segments boundaries are visible
       if (start_time.samples >= this.audiochunk.time.start.samples && segment.time.samples <= this.audiochunk.time.end.samples) {
-        const absX = this.av.audioTCalculator.samplestoAbsX(this.transcr.annotation.levels[0].segments.get(seg_index).time.samples);
+        const absX = this.av.audioTCalculator.samplestoAbsX(this.transcr.currentlevel.segments.get(seg_index).time.samples);
         let begin = new Segment(new AudioTime(0, this.audioressource.info.samplerate));
         if (seg_index > 0) {
-          begin = this.transcr.annotation.levels[0].segments.get(seg_index - 1);
+          begin = this.transcr.currentlevel.segments.get(seg_index - 1);
         }
         const beginX = this.av.audioTCalculator.samplestoAbsX(begin.time.samples);
         const posY1 = (this._innerWidth < this.AudioPxWidth)

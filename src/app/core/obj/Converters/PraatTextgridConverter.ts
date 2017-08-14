@@ -82,7 +82,6 @@ export class PraatTextgridConverter extends Converter {
   public import(file: File, audiofile: OAudiofile): OAnnotJSON {
     const result = new OAnnotJSON(audiofile.name, audiofile.samplerate);
 
-    // TODO Does this work?
     let content = file.content;
     // replace
     const ctrl_char = String.fromCharCode(13);
@@ -91,25 +90,25 @@ export class PraatTextgridConverter extends Converter {
 
 
     // check if header is first
-
+    let pointer = 7;
     if (lines.length > 14) {
       if (
         Functions.contains(lines[0], 'File type = "ooTextFile"')
         && Functions.contains(lines[1], 'Object class = "TextGrid"')) {
         // is TextGrid
 
-        const olevel = new OLevel('Orthographic', 'SEGMENT');
-
-        let lvl_num = 1;
+        let lvl_num = 0;
 
         if (lines[7] === 'item []: ') {
           // start reading segments
           for (let i = 8; i < lines.length; i++) {
+            lvl_num++;
             if (lines[i] !== '') {
 
               let level = '    ';
-
               if (lines[i] === level + `item [${lvl_num}]:`) {
+                console.log('START');
+                console.log(lines[i]);
                 i++;
 
                 // get class
@@ -130,6 +129,7 @@ export class PraatTextgridConverter extends Converter {
                   return null;
                 }
                 lvl_name = test[1];
+                const olevel = new OLevel(lvl_name, 'SEGMENT');
                 i++;
 
                 // ignore xmin and xmax, interval size
@@ -175,7 +175,7 @@ export class PraatTextgridConverter extends Converter {
                   const samplerate = audiofile.samplerate;
 
                   const olabels: OLabel[] = [];
-                  olabels.push((new OLabel('Orthographic', text)));
+                  olabels.push((new OLabel(lvl_name, text)));
                   const osegment = new OSegment(
                     (seg_num),
                     Math.round(xmin * samplerate),
@@ -187,13 +187,19 @@ export class PraatTextgridConverter extends Converter {
 
                   seg_num++;
                 }
-
+                i--;
                 result.levels.push(olevel);
-                return result;
               }
             }
           }
         }
+
+        if (result.levels.length === 0) {
+          return null;
+        }
+
+        console.log(result);
+        return result;
       }
     }
 

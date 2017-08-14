@@ -573,22 +573,28 @@ export class AppStorageService {
     if (!isNullOrUndefined(level)) {
       if (this._annotation.length > num) {
         const old_name = this._annotation[num].name;
+
         this._annotation[num] = level;
-        console.log('this.changeAnnotationLevel ' + old_name);
-        console.log(level.name);
         return this.idb.save('annotation', old_name, level).then(() => {
-          return this.idb.remove('annotation', old_name);
+          if (old_name !== level.name) {
+            // name was changed. replace
+            return this.idb.remove('annotation', old_name);
+          } else {
+            return new Promise((resolve) => {
+              resolve();
+            });
+          }
         });
       } else {
         return new Promise((resolve, reject) => {
-          reject(new Error('level is undefined or null'));
+          reject(new Error('number of level that should be changed is invalid'));
         });
       }
+    } else {
+      return new Promise((resolve, reject) => {
+        reject(new Error('level is undefined or null'));
+      });
     }
-
-    return new Promise((resolve, reject) => {
-      reject(new Error('level is undefined or null'));
-    });
   }
 
   public addAnnotationLevel(level: OLevel): Promise<void> {

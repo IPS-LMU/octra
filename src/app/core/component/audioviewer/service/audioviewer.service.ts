@@ -262,14 +262,14 @@ export class AudioviewerService extends AudioComponentService {
       this.drawnselection.end = this.audiochunk.selection.end.clone();
     } else if (this.mouse_down && this.dragableBoundaryNumber > -1) {
       // mouse down something dragged
-      const segment = this.transcrService.annotation.levels[0].segments.get(this.dragableBoundaryNumber);
+      const segment = this.transcrService.currentlevel.segments.get(this.dragableBoundaryNumber);
       const absXSeconds = (absXTime / this.audiomanager.ressource.info.samplerate);
 
       // prevent overwriting another boundary
       const segment_before = (this.dragableBoundaryNumber > 0)
-        ? this.transcrService.annotation.levels[0].segments.get(this.dragableBoundaryNumber - 1) : null;
-      const segment_after = (this.dragableBoundaryNumber < this.transcrService.annotation.levels[0].segments.length - 1)
-        ? this.transcrService.annotation.levels[0].segments.get(this.dragableBoundaryNumber + 1) : null;
+        ? this.transcrService.currentlevel.segments.get(this.dragableBoundaryNumber - 1) : null;
+      const segment_after = (this.dragableBoundaryNumber < this.transcrService.currentlevel.segments.length - 1)
+        ? this.transcrService.currentlevel.segments.get(this.dragableBoundaryNumber + 1) : null;
       if (!isNullOrUndefined(segment_before)) {
         // check segment boundary before this segment
         if (absXSeconds < segment_before.time.seconds + 0.02) {
@@ -284,8 +284,8 @@ export class AudioviewerService extends AudioComponentService {
       }
 
       segment.time.samples = absXTime;
-      this.transcrService.annotation.levels[0].segments.change(this.dragableBoundaryNumber, segment);
-      this.transcrService.annotation.levels[0].segments.sort();
+      this.transcrService.currentlevel.segments.change(this.dragableBoundaryNumber, segment);
+      this.transcrService.currentlevel.segments.sort();
       dragableBoundaryTemp = this.getBoundaryNumber(absX);
       this.dragableBoundaryNumber = dragableBoundaryTemp;
     } else {
@@ -334,12 +334,12 @@ export class AudioviewerService extends AudioComponentService {
             this.mouse_down = false;
 
             if (this.dragableBoundaryNumber > -1 &&
-              this.dragableBoundaryNumber < this.transcrService.annotation.levels[0].segments.length) {
+              this.dragableBoundaryNumber < this.transcrService.currentlevel.segments.length) {
               // some boundary dragged
-              const segment = this.transcrService.annotation.levels[0].segments.get(this.dragableBoundaryNumber);
+              const segment = this.transcrService.currentlevel.segments.get(this.dragableBoundaryNumber);
               segment.time.samples = this.audioTCalculator.absXChunktoSamples(absX, this.audiochunk);
-              this.transcrService.annotation.levels[0].segments.change(this.dragableBoundaryNumber, segment);
-              this.transcrService.annotation.levels[0].segments.sort();
+              this.transcrService.currentlevel.segments.change(this.dragableBoundaryNumber, segment);
+              this.transcrService.currentlevel.segments.sort();
             } else {
               // set selection
               this.audiochunk.selection.end = new AudioTime(absXInTime, this.audiomanager.ressource.info.samplerate);
@@ -354,11 +354,11 @@ export class AudioviewerService extends AudioComponentService {
         } else if ($event.type === 'mouseup') {
           this.mouse_down = false;
 
-          if (this.dragableBoundaryNumber > -1 && this.dragableBoundaryNumber < this.transcrService.annotation.levels[0].segments.length) {
+          if (this.dragableBoundaryNumber > -1 && this.dragableBoundaryNumber < this.transcrService.currentlevel.segments.length) {
             // some boundary dragged
-            const segment = this.transcrService.annotation.levels[0].segments.get(this.dragableBoundaryNumber);
+            const segment = this.transcrService.currentlevel.segments.get(this.dragableBoundaryNumber);
             segment.time.samples = this.audioTCalculator.absXChunktoSamples(absX, this.audiochunk);
-            this.transcrService.annotation.levels[0].segments.sort();
+            this.transcrService.currentlevel.segments.sort();
           } else {
             // set selection
             this.audiochunk.selection.end = new AudioTime(absXInTime, this.audiomanager.ressource.info.samplerate);
@@ -406,18 +406,18 @@ export class AudioviewerService extends AudioComponentService {
       let b_width_time = this.audioTCalculator.absXtoSamples2(this.Settings.boundaries.width * 2, this.audiochunk);
       b_width_time = Math.round(b_width_time);
 
-      if (this.transcrService.annotation.levels[0].segments.length > 0 && !this.audiochunk.isPlaying) {
-        for (i = 0; i < this.transcrService.annotation.levels[0].segments.length; i++) {
-          if ((this.transcrService.annotation.levels[0].segments.get(i).time.samples >= absXTime - b_width_time
-              && this.transcrService.annotation.levels[0].segments.get(i).time.samples <= absXTime + b_width_time)
-            && this.transcrService.annotation.levels[0].segments.get(i).time.samples !== this.audiomanager.ressource.info.duration.samples
+      if (this.transcrService.currentlevel.segments.length > 0 && !this.audiochunk.isPlaying) {
+        for (i = 0; i < this.transcrService.currentlevel.segments.length; i++) {
+          if ((this.transcrService.currentlevel.segments.get(i).time.samples >= absXTime - b_width_time
+              && this.transcrService.currentlevel.segments.get(i).time.samples <= absXTime + b_width_time)
+            && this.transcrService.currentlevel.segments.get(i).time.samples !== this.audiomanager.ressource.info.duration.samples
           ) {
-            const seg_after = (i < this.transcrService.annotation.levels[0].segments.length - 1)
-              ? this.transcrService.annotation.levels[0].segments.get(i + 1) : null;
+            const seg_after = (i < this.transcrService.currentlevel.segments.length - 1)
+              ? this.transcrService.currentlevel.segments.get(i + 1) : null;
 
-            const seg_selected = this.transcrService.annotation.levels[0].segments.get(i);
+            const seg_selected = this.transcrService.currentlevel.segments.get(i);
 
-            this.transcrService.annotation.levels[0].segments.removeByIndex(i, this.transcrService.break_marker.code);
+            this.transcrService.currentlevel.segments.removeByIndex(i, this.transcrService.break_marker.code);
 
             return {
               type: 'remove',
@@ -435,15 +435,15 @@ export class AudioviewerService extends AudioComponentService {
 
       if (selection > 0 && absXTime >= this.drawnselection.start.samples && absXTime <= this.drawnselection.end.samples) {
         // some part selected
-        const segm1 = this.transcrService.annotation.levels[0].segments.BetweenWhichSegment(this.drawnselection.start.samples);
-        const segm2 = this.transcrService.annotation.levels[0].segments.BetweenWhichSegment(this.drawnselection.end.samples);
+        const segm1 = this.transcrService.currentlevel.segments.BetweenWhichSegment(this.drawnselection.start.samples);
+        const segm2 = this.transcrService.currentlevel.segments.BetweenWhichSegment(this.drawnselection.end.samples);
 
         if (segm1 === null && segm2 === null || (segm1 === segm2 || (segm1.transcript === '' && segm2.transcript === ''))) {
           if (this.drawnselection.start.samples > 0) {
             // prevent setting boundary if first sample selected
-            this.transcrService.annotation.levels[0].segments.add(this.drawnselection.start.samples);
+            this.transcrService.currentlevel.segments.add(this.drawnselection.start.samples);
           }
-          this.transcrService.annotation.levels[0].segments.add(this.drawnselection.end.samples);
+          this.transcrService.currentlevel.segments.add(this.drawnselection.end.samples);
           return {
             type: 'add',
             seg_num: i,
@@ -465,7 +465,7 @@ export class AudioviewerService extends AudioComponentService {
       } else {
         // no selection
 
-        this.transcrService.annotation.levels[0].segments.add(Math.round(absXTime));
+        this.transcrService.currentlevel.segments.add(Math.round(absXTime));
         return {
           type: 'add',
           seg_num: -1,
@@ -486,8 +486,8 @@ export class AudioviewerService extends AudioComponentService {
   public getSegmentSelection(position_samples: number): AudioSelection {
     // complex decision needed because there are no segments at position 0 and the end of the file
     let result = null;
-    const segments = this.transcrService.annotation.levels[0].segments;
-    const length = this.transcrService.annotation.levels[0].segments.length;
+    const segments = this.transcrService.currentlevel.segments;
+    const length = this.transcrService.currentlevel.segments.length;
 
     if (length > 0) {
       if (position_samples < segments.get(0).time.samples) {
@@ -682,14 +682,14 @@ export class AudioviewerService extends AudioComponentService {
    */
   getBoundaryNumber(absX: number): number {
     // last boundary may not be returned!
-    for (let i = 0; i < this.transcrService.annotation.levels[0].segments.length - 1; i++) {
-      const segment = this.transcrService.annotation.levels[0].segments.get(i);
+    for (let i = 0; i < this.transcrService.currentlevel.segments.length - 1; i++) {
+      const segment = this.transcrService.currentlevel.segments.get(i);
       const segAbsX = this.audioTCalculator.samplestoAbsX(segment.time.samples - this.audiochunk.time.start.samples);
       const next_unblocked = true;
 
       /*
-       if (i < this.transcrService.annotation.levels[0].segments.length - 1) {
-       const next_segment = this.transcrService.annotation.levels[0].segments.get(i + 1);
+       if (i < this.transcrService.currentlevel.segments.length - 1) {
+       const next_segment = this.transcrService.currentlevel.segments.get(i + 1);
        if (next_segment.transcript !== '' && next_segment.transcript !== this.transcrService.break_marker.code) {
        next_unblocked = false;
        }

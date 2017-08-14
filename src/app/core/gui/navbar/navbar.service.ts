@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {SessionService} from '../../shared/service/session.service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 import {TranscriptionService} from '../../shared/service/transcription.service';
 import {UserInteractionsService} from '../../shared/service/userInteractions.service';
 
@@ -53,7 +53,7 @@ export class NavbarService {
     }
   };
 
-  constructor(private sessService: SessionService) {
+  constructor(private sessService: AppStorageService) {
 
   }
 

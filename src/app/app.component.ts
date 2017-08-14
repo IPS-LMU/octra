@@ -1,7 +1,7 @@
 import {Component, OnDestroy} from '@angular/core';
 import {APIService} from './core/shared/service/api.service';
 import {TranslateService} from '@ngx-translate/core';
-import {SessionService} from './core/shared/service/session.service';
+import {AppStorageService} from './core/shared/service/appstorage.service';
 import {SettingsService} from './core/shared/service/settings.service';
 import {SubscriptionManager} from './core/obj/SubscriptionManager';
 import {isNullOrUndefined, isUndefined} from 'util';
@@ -30,7 +30,7 @@ export class AppComponent implements OnDestroy {
 
   constructor(private api: APIService,
               private langService: TranslateService,
-              private sessService: SessionService,
+              private sessService: AppStorageService,
               private settingsService: SettingsService,
               private bugService: BugReportService) {
     /*

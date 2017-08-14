@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {SessionService} from '../../shared/service/session.service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 
 @Component({
   selector: 'app-fastbar',
@@ -20,7 +20,7 @@ export class FastbarComponent implements OnInit {
   @Output() guidelinesbtnclicked: EventEmitter<void> = new EventEmitter<void>();
   @Output() overviewbtnclicked: EventEmitter<void> = new EventEmitter<void>();
 
-  constructor(public sessService: SessionService) {
+  constructor(public sessService: AppStorageService) {
   }
 
   ngOnInit() {

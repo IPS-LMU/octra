@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {SessionService} from '../../shared/service/session.service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 import {ModalComponent} from 'ng2-bs3-modal/components/modal';
 import {NavbarService} from './navbar.service';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
@@ -15,6 +15,8 @@ import {StatisticElem} from '../../obj/StatisticElement';
 import {SettingsService} from '../../shared/service/settings.service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {EditorComponents} from '../../../editors/components';
+import {Level} from '../../obj/Annotation/Level';
+import {Segments} from '../../obj/Annotation/Segments';
 
 @Component({
   selector: 'app-navigation',
@@ -67,7 +69,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     return (!isNullOrUndefined(this.uiService)) ? this.uiService.elements : null;
   }
 
-  constructor(public sessService: SessionService,
+  constructor(public sessService: AppStorageService,
               public navbarServ: NavbarService,
               public sanitizer: DomSanitizer,
               public langService: TranslateService,
@@ -183,4 +185,60 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
+  onLevelNameClick(event) {
+    jQuery(event.target).addClass('selected');
+  }
+
+  onLevelNameLeave(event, tiernum: number) {
+    jQuery(event.target).removeClass('selected');
+    // save level name
+    const level = this.transcrServ.annotation.levels[tiernum].getObj();
+    level.name = event.target.value;
+    console.log(level.name);
+    this.sessService.changeAnnotationLevel(tiernum, level).catch((err) => {
+      console.error(err);
+    }).then(() => {
+      console.log('SAVED OK');
+      // update value for annoation object in transcr service
+      this.transcrServ.annotation.levels[tiernum].name = event.target.value;
+    });
+  }
+
+  onLevelAddClick() {
+    const level_nums = this.transcrServ.annotation.levels.length;
+    let levelname = `Tier ${level_nums + 1}`;
+    let index = level_nums;
+
+    const nameexists = (newname: string) => {
+      for (let i = 0; i < this.transcrServ.annotation.levels.length; i++) {
+        const level = this.transcrServ.annotation.levels[i];
+        if (level.name === newname) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    while (nameexists(levelname)) {
+      index++;
+      levelname = `Tier ${index + 1}`
+    }
+
+    const newlevel = new Level(levelname, new Segments(this.transcrServ.audiofile.samplerate, [], this.transcrServ.last_sample));
+    this.sessService.addAnnotationLevel(newlevel.getObj());
+    // update value for annoation object in transc servcie
+    this.transcrServ.annotation.levels.push(newlevel);
+  }
+
+  onLevelRemoveClick(tiernum) {
+    if (this.transcrServ.annotation.levels.length > 1) {
+      this.sessService.removeAnnotationLevel(tiernum, this.transcrServ.annotation.levels[tiernum].name).catch((err) => {
+        console.error(err);
+      }).then(() => {
+        console.log('REMOVED OK');
+        // update value for annoation object in transcr service
+        this.transcrServ.annotation.levels.splice(tiernum, 1);
+      });
+    }
+  }
 }

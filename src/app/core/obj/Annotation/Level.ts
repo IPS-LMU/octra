@@ -3,7 +3,13 @@ import {isNullOrUndefined} from 'util';
 import {Segments} from './Segments';
 
 export class Level {
-  private name: string;
+  set name(value: string) {
+    this._name = value;
+  }
+  get name(): string {
+    return this._name;
+  }
+  private _name: string;
   public segments: Segments;
   private type: AnnotJSONType = AnnotJSONType.SEGMENT;
 
@@ -15,7 +21,7 @@ export class Level {
   }
 
   constructor(name: string, segments?: Segments) {
-    this.name = name;
+    this._name = name;
 
     if (!isNullOrUndefined(segments)) {
       this.segments = segments;
@@ -23,7 +29,7 @@ export class Level {
   }
 
   public getObj(): OLevel {
-    const result: OLevel = new OLevel(this.name, 'SEGMENT', this.segments.getObj(this.name));
+    const result: OLevel = new OLevel(this._name, 'SEGMENT', this.segments.getObj(this._name));
     this.type.toString();
     return result;
   }

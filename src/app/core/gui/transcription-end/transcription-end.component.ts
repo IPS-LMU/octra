@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {SessionService} from '../../shared/service/session.service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 import {TranscriptionService} from '../../shared/service/transcription.service';
 import {UserInteractionsService} from '../../shared/service/userInteractions.service';
 import {SubscriptionManager} from '../../shared';
@@ -17,7 +17,7 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
   private subscrmanager: SubscriptionManager;
 
   constructor(private router: Router,
-              private sessService: SessionService,
+              private sessService: AppStorageService,
               private tranService: TranscriptionService,
               private uiService: UserInteractionsService,
               private settService: SettingsService,

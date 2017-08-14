@@ -2,14 +2,14 @@ import {Injectable} from '@angular/core';
 
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs/Rx';
-import {SessionService} from '../service/session.service';
+import {AppStorageService} from '../service/appstorage.service';
 import {SettingsService} from '../service/settings.service';
 import {isNullOrUndefined} from 'util';
 
 @Injectable()
 export class SettingsGuard implements CanActivate {
 
-  constructor(private sessService: SessionService,
+  constructor(private sessService: AppStorageService,
               private router: Router,
               private settingsService: SettingsService) {
   }

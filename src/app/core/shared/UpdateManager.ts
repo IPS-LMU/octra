@@ -1,5 +1,5 @@
 import {AppInfo} from '../../app.info';
-import {SessionService} from './service/session.service';
+import {AppStorageService} from './service/appstorage.service';
 import {isNullOrUndefined} from 'util';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../obj/Annotation/AnnotJSON';
 import {IndexedDBManager} from '../obj/IndexedDBManager';
@@ -8,10 +8,10 @@ import {SubscriptionManager} from '../obj/SubscriptionManager';
 
 export class UpdateManager {
   private version = '';
-  private sessService: SessionService;
+  private sessService: AppStorageService;
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
-  constructor(sessService: SessionService) {
+  constructor(sessService: AppStorageService) {
     this.version = sessService.version;
     this.sessService = sessService;
   }

@@ -2,11 +2,11 @@ import {Injectable} from '@angular/core';
 
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs/Rx';
-import {SessionService} from '../../shared/service/session.service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 
 @Injectable()
 export class LogoutGuard implements CanActivate {
-  constructor(private sessService: SessionService,
+  constructor(private sessService: AppStorageService,
               private router: Router) {
 
   }

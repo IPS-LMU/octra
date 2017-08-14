@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 
 import {Router} from '@angular/router';
-import {SessionService} from '../../shared/service/session.service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 import {SettingsService} from '../../shared/service/settings.service';
 
 @Component({
@@ -20,7 +20,7 @@ export class LogoutComponent implements OnInit {
   };
 
   constructor(private router: Router,
-              private sessionService: SessionService,
+              private sessionService: AppStorageService,
               private settingsService: SettingsService) {
   }
 

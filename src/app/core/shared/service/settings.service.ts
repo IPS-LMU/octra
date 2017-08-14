@@ -6,7 +6,7 @@ import {SubscriptionManager} from '../';
 import {ConfigValidator} from '../../obj/ConfigValidator';
 import {ProjectConfiguration} from '../../obj/Settings/project-configuration';
 import {Subscription} from 'rxjs/Subscription';
-import {SessionService} from './session.service';
+import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
 import {isFunction, isNullOrUndefined} from 'util';
 import {Logger} from '../Logger';
@@ -104,7 +104,7 @@ export class SettingsService {
   }
 
   constructor(private http: Http,
-              private sessService: SessionService) {
+              private sessService: AppStorageService) {
     this.subscrmanager = new SubscriptionManager();
   }
 

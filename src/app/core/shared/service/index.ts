@@ -4,7 +4,7 @@ export * from './audiocomponent.service';
 export * from './modal.service';
 export * from './keymapping.service';
 export * from '../../gui/login/login.service';
-export * from './session.service';
+export * from './appstorage.service';
 export * from './transcription.service';
 export * from './userInteractions.service';
 export * from './message.service';

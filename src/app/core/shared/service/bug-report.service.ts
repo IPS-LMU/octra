@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {BrowserInfo} from '../BrowserInfo';
 import {TranslateService} from '@ngx-translate/core';
 import {AppInfo} from '../../../app.info';
-import {SessionService} from './session.service';
+import {AppStorageService} from './appstorage.service';
 import {Http, Response} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {MantisBugReporter} from '../../obj/BugAPI/MantisBugReporter';
@@ -30,7 +30,7 @@ export class BugReportService {
   private _console: ConsoleEntry[] = [];
 
   constructor(private langService: TranslateService,
-              private sessService: SessionService,
+              private sessService: AppStorageService,
               private settService: SettingsService,
               private http: Http) {
   }

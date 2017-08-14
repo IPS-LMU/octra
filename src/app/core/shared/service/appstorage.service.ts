@@ -8,7 +8,7 @@ import {AppInfo} from '../../../app.info';
 import {IndexedDBManager} from '../../obj/IndexedDBManager';
 
 @Injectable()
-export class SessionService {
+export class AppStorageService {
   get idb(): IndexedDBManager {
     return this._idb;
   }
@@ -569,9 +569,52 @@ export class SessionService {
     return this.clearIDBTable('annotation');
   }
 
-  public clearLoggingData(): Promise<void> {
-    this._logs = null;
-    return this.clearIDBTable('logs');
+  public changeAnnotationLevel(num: number, level: OLevel): Promise<void> {
+    if (!isNullOrUndefined(level)) {
+      if (this._annotation.length > num) {
+        const old_name = this._annotation[num].name;
+        this._annotation[num] = level;
+        console.log('this.changeAnnotationLevel ' + old_name);
+        console.log(level.name);
+        return this.idb.save('annotation', old_name, level).then(() => {
+          return this.idb.remove('annotation', old_name);
+        });
+      } else {
+        return new Promise((resolve, reject) => {
+          reject(new Error('level is undefined or null'));
+        });
+      }
+    }
+
+    return new Promise((resolve, reject) => {
+      reject(new Error('level is undefined or null'));
+    });
+  }
+
+  public addAnnotationLevel(level: OLevel): Promise<void> {
+    if (!isNullOrUndefined(level)) {
+      this._annotation.push(level);
+      return this.idb.save('annotation', level.name, level);
+    } else {
+      return new Promise((resolve, reject) => {
+        reject(new Error('level is undefined or null'));
+      });
+    }
+  }
+
+  public removeAnnotationLevel(num: number, name: string): Promise<void> {
+    if (!isNullOrUndefined(name) && num < this._annotation.length) {
+      return this.idb.remove('annotation', name).then(
+        () => {
+          this._annotation.splice(num, 1);
+          console.log(this._annotation);
+        }
+      );
+    } else {
+      return new Promise((resolve, reject) => {
+        reject(new Error('level is undefined or null'));
+      });
+    }
   }
 
   public overwriteAnnotation = (value: OLevel[]): Promise<void> => {
@@ -583,5 +626,12 @@ export class SessionService {
       }).then(() => {
         return this._idb.saveArraySequential(value, 'annotation', 'name')
       });
+  };
+
+
+  public clearLoggingData(): Promise<void> {
+    this._logs = null;
+    return this.clearIDBTable('logs');
   }
+
 }

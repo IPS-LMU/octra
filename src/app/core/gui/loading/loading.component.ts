@@ -2,7 +2,7 @@ import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core'
 import {TranslateService} from '@ngx-translate/core';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {SettingsService} from '../../shared/service/settings.service';
-import {SessionService} from '../../shared/service/session.service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 import {isNullOrUndefined} from 'util';
 import {AudioService} from '../../shared/service/audio.service';
 import {Router} from '@angular/router';
@@ -34,7 +34,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
   constructor(private langService: TranslateService,
               public settService: SettingsService,
-              private sessionService: SessionService,
+              private sessionService: AppStorageService,
               public audio: AudioService,
               private router: Router,
               private transcrService: TranscriptionService) {

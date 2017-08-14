@@ -3,7 +3,7 @@ import {isNullOrUndefined} from 'util';
 import {SettingsService} from '../../shared/service/settings.service';
 import {Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
-import {SessionService} from '../../shared/service/session.service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 
 @Component({
@@ -18,7 +18,7 @@ export class AgreementComponent implements OnInit {
   constructor(public settService: SettingsService,
               private router: Router,
               private langService: TranslateService,
-              private sessService: SessionService) {
+              private sessService: AppStorageService) {
     if (isNullOrUndefined(this.settService.projectsettings)) {
       this.router.navigate(['/user/load']);
     }

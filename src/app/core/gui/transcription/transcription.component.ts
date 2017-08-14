@@ -17,12 +17,12 @@ import {Router} from '@angular/router';
 import {ModalComponent} from 'ng2-bs3-modal/ng2-bs3-modal';
 
 import {
+  AppStorageService,
   AudioService,
   KeymappingService,
   MessageService,
   ModalService,
   NavbarService,
-  SessionService,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
@@ -98,7 +98,7 @@ export class TranscriptionComponent implements OnInit,
               public audio: AudioService,
               public uiService: UserInteractionsService,
               public transcrService: TranscriptionService,
-              public sessService: SessionService,
+              public sessService: AppStorageService,
               public keyMap: KeymappingService,
               public changeDetecorRef: ChangeDetectorRef,
               public navbarServ: NavbarService,

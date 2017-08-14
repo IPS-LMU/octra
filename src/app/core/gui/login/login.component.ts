@@ -11,7 +11,7 @@ import {
 import {Router} from '@angular/router';
 import {NgForm} from '@angular/forms';
 import {LoginService} from './login.service';
-import {SessionService} from '../../shared/service/session.service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 import {ComponentCanDeactivate} from './login.deactivateguard';
 import {Observable} from 'rxjs/Rx';
 import {FileSize, Functions} from '../../shared/Functions';
@@ -75,7 +75,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   err = '';
 
   constructor(private router: Router,
-              public sessionService: SessionService,
+              public sessionService: AppStorageService,
               private api: APIService,
               private cd: ChangeDetectorRef,
               private settingsService: SettingsService,

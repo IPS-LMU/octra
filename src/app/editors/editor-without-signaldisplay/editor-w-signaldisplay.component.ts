@@ -9,7 +9,7 @@ import {
 } from '../../core/shared/service';
 import {SubscriptionManager} from '../../core/shared';
 import {SettingsService} from '../../core/shared/service/settings.service';
-import {SessionService} from '../../core/shared/service/session.service';
+import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {Segment} from '../../core/obj/Annotation/Segment';
 import {AudioManager} from '../../core/obj/media/audio/AudioManager';
 import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
@@ -63,7 +63,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
               public transcrService: TranscriptionService,
               private uiService: UserInteractionsService,
               public settingsService: SettingsService,
-              public sessService: SessionService) {
+              public sessService: AppStorageService) {
     this.subscrmanager = new SubscriptionManager();
   }
 

@@ -24,7 +24,7 @@ import {
 import {AudioSelection, AudioTime, AVMousePos, Functions} from '../../core/shared';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
 import {SettingsService} from '../../core/shared/service/settings.service';
-import {SessionService} from '../../core/shared/service/session.service';
+import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {CircleLoupeComponent} from '../../core/component/circleloupe/circleloupe.component';
 import {AudioManager} from '../../core/obj/media/audio/AudioManager';
 import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
@@ -92,7 +92,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
               public cd: ChangeDetectorRef,
               public msg: MessageService,
               public settingsService: SettingsService,
-              public sessService: SessionService) {
+              public sessService: AppStorageService) {
 
     this.subscrmanager = new SubscriptionManager();
   }

@@ -2,13 +2,13 @@ import {Injectable} from '@angular/core';
 
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs/Rx';
-import {SessionService} from '../service/session.service';
+import {AppStorageService} from '../service/appstorage.service';
 import {SettingsService} from '../service/settings.service';
 
 @Injectable()
 export class TranscActivateGuard implements CanActivate {
 
-  constructor(private sessService: SessionService,
+  constructor(private sessService: AppStorageService,
               private router: Router,
               private settService: SettingsService) {
 

@@ -5,7 +5,7 @@ import {ModalService} from '../../shared/service/modal.service';
 import {isNullOrUndefined} from 'util';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import {APIService} from '../../shared/service/api.service';
-import {SessionService} from '../../shared/service/session.service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 import {AppInfo} from '../../../app.info';
 import {SettingsService} from '../../shared/service/settings.service';
 
@@ -47,7 +47,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
   constructor(private modService: ModalService,
               public bugService: BugReportService,
               private api: APIService,
-              private sessService: SessionService,
+              private sessService: AppStorageService,
               private settService: SettingsService) {
   }
 

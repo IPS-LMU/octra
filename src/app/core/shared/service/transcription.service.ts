@@ -2,7 +2,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import 'rxjs/Observable';
 import {Segments} from '../../obj/Annotation/Segments';
 import {AudioService} from './audio.service';
-import {SessionService} from './session.service';
+import {AppStorageService} from './appstorage.service';
 import {Functions} from '../Functions';
 import {UserInteractionsService} from './userInteractions.service';
 import {StatisticElem} from '../../obj/StatisticElement';
@@ -125,7 +125,7 @@ export class TranscriptionService {
   }
 
   constructor(private audio: AudioService,
-              private sessServ: SessionService,
+              private sessServ: AppStorageService,
               private uiService: UserInteractionsService,
               private navbarServ: NavbarService,
               private settingsService: SettingsService,

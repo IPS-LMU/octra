@@ -42,11 +42,11 @@ import {LeadingNullPipe, ProcentPipe, SecondsPipe, TimespanPipe} from './core/sh
 
 import {
   APIService,
+  AppStorageService,
   AudioService,
   KeymappingService,
   ModalService,
   NavbarService,
-  SessionService,
   SettingsService
 } from './core/shared/service';
 
@@ -168,7 +168,7 @@ export const ngmodule = {
     ModalService,
     NavbarService,
     ReloadFileGuard,
-    SessionService,
+    AppStorageService,
     TranscActivateGuard,
     SettingsGuard,
     SettingsService,

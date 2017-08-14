@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {SessionService} from '../../shared/service/session.service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 import {SessionFile} from '../../obj/SessionFile';
 import {FileSize, Functions} from '../../shared/Functions';
 import {Router} from '@angular/router';
@@ -20,7 +20,7 @@ export class ReloadFileComponent implements OnInit {
   private error = '';
 
   constructor(public router: Router,
-              public sessServ: SessionService,
+              public sessServ: AppStorageService,
               public transcrServ: TranscriptionService,
               public modService: ModalService,
               public langService: TranslateService) {

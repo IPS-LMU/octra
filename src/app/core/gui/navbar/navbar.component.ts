@@ -192,16 +192,20 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   onLevelNameLeave(event, tiernum: number) {
     jQuery(event.target).removeClass('selected');
     // save level name
-    const level = this.transcrServ.annotation.levels[tiernum].getObj();
-    level.name = event.target.value;
-    console.log(level.name);
-    this.sessService.changeAnnotationLevel(tiernum, level).catch((err) => {
-      console.error(err);
-    }).then(() => {
-      console.log('SAVED OK');
-      // update value for annoation object in transcr service
-      this.transcrServ.annotation.levels[tiernum].name = event.target.value;
-    });
+    if (event.target.value !== null && event.target.value !== '') {
+      const level = this.transcrServ.annotation.levels[tiernum];
+      level.name = event.target.value;
+      console.log(level.name);
+      this.sessService.changeAnnotationLevel(tiernum, level.getObj()).catch((err) => {
+        console.error(err);
+      }).then(() => {
+        console.log('SAVED OK');
+        // update value for annoation object in transcr service
+        this.transcrServ.annotation.levels[tiernum].name = event.target.value;
+      });
+    } else {
+      event.target.value = this.transcrServ.annotation.levels[tiernum].name;
+    }
   }
 
   onLevelAddClick() {
@@ -230,15 +234,22 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     this.transcrServ.annotation.levels.push(newlevel);
   }
 
-  onLevelRemoveClick(tiernum) {
+  onLevelRemoveClick(tiernum: number, name: string) {
     if (this.transcrServ.annotation.levels.length > 1) {
-      this.sessService.removeAnnotationLevel(tiernum, this.transcrServ.annotation.levels[tiernum].name).catch((err) => {
+      this.sessService.removeAnnotationLevel(tiernum, name).catch((err) => {
         console.error(err);
       }).then(() => {
         console.log('REMOVED OK');
         // update value for annoation object in transcr service
         this.transcrServ.annotation.levels.splice(tiernum, 1);
+        if (tiernum === this.transcrServ.selectedlevel) {
+          this.transcrServ.selectedlevel = tiernum - 1;
+        }
       });
     }
+  }
+
+  public selectLevel(tiernum: number) {
+    this.transcrServ.selectedlevel = tiernum;
   }
 }

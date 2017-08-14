@@ -696,7 +696,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         const replace_func2 = (x, g1) => {
           const s1 = (g1) ? g1 : '';
 
-          const seg = this.transcrService.annotation.levels[0].segments.get(g1);
+          const seg = this.transcrService.currentlevel.segments.get(g1);
           return ' <img src=\'assets/img/components/transcr-editor/boundary.png\' ' +
             'class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
             'data-samples=\'' + seg.time.samples + '\' /> ';

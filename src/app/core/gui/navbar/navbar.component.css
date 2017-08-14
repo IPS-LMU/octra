@@ -90,13 +90,22 @@
     padding: 5px;
 }
 
+.row.level-row.selected,
+.row.level-row.selected * {
+    background-color: #65f0c3;
+}
+
 .row.level-row .col-xs-8 input[type="text"] {
     padding: 3px;
     width: 100%;
 }
 
-.row.level-row .col-xs-8 .selected{
+.row.level-row .col-xs-8 .selected {
     border: 1px solid lightgray;
+}
+
+.row.level-row .col-xs-2 .glyphicon.glyphicon-trash {
+    cursor: pointer;
 }
 
 .row.level-add-row {

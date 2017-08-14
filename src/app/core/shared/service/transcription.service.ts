@@ -24,6 +24,21 @@ import {AudioManager} from '../../obj/media/audio/AudioManager';
 
 @Injectable()
 export class TranscriptionService {
+  get selectedlevel(): number {
+    return this._selectedlevel;
+  }
+
+  set selectedlevel(value: number) {
+    const old_value = this._selectedlevel;
+    if (value > -1 && value < this.annotation.levels.length) {
+      this._selectedlevel = value;
+    } else {
+      this._selectedlevel = 0;
+    }
+
+    this.levelchanged.emit(this._selectedlevel);
+  }
+
   get audiofile(): OAudiofile {
     return this._audiofile;
   }
@@ -37,26 +52,18 @@ export class TranscriptionService {
   }
 
   private subscrmanager: SubscriptionManager;
-
   public dataloaded = new EventEmitter<any>();
   public segmentrequested = new EventEmitter<number>();
-
   private _segments: Segments;
   private _last_sample: number;
   private _guidelines: any;
-
   private _audiofile: OAudiofile;
-
   private saving = false;
-
   public filename = '';
-
   private _feedback: FeedBackForm;
-
   private _break_marker: any = null;
-
   private state = 'ANNOTATED';
-
+  private _selectedlevel = 0;
   private _statistic: any = {
     transcribed: 0,
     empty: 0,
@@ -66,6 +73,8 @@ export class TranscriptionService {
   private _annotation: Annotation;
 
   private audiomanager: AudioManager;
+
+  public levelchanged: EventEmitter<number> = new EventEmitter<number>();
 
   get feedback(): FeedBackForm {
     return this._feedback;
@@ -89,6 +98,10 @@ export class TranscriptionService {
 
   set last_sample(value: number) {
     this._last_sample = value;
+  }
+
+  public get currentlevel(): Level {
+    return this._annotation.levels[this._selectedlevel];
   }
 
   /*
@@ -281,12 +294,12 @@ export class TranscriptionService {
 
       const transcript: any[] = [];
 
-      for (let i = 0; i < this.annotation.levels[0].segments.length; i++) {
-        const segment = this.annotation.levels[0].segments.get(i);
+      for (let i = 0; i < this.currentlevel.segments.length; i++) {
+        const segment = this.currentlevel.segments.get(i);
 
         let last_bound = 0;
         if (i > 0) {
-          last_bound = this.annotation.levels[0].segments.get(i - 1).time.samples;
+          last_bound = this.currentlevel.segments.get(i - 1).time.samples;
         }
 
         const segment_json: any = {

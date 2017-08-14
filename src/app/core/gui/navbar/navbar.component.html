@@ -58,7 +58,7 @@
                 <tbody>
                 <tr>
                     <td>Anzahl Segmente:</td>
-                    <td>{{transcrServ.annotation.levels[0].segments.length}}</td>
+                    <td>{{transcrServ.currentlevel.segments.length}}</td>
                 </tr>
                 <tr>
                     <td>Anzahl Logeinträge:</td>
@@ -153,20 +153,26 @@
                 }">
                     <a href="#" class="dropdown" data-toggle="dropdown" role="button"
                        aria-expanded="false">
+                        {{(transcrServ.currentlevel.name.length > 30) ? transcrServ.currentlevel.name.substr(0, 30) +
+                        '...' : transcrServ.currentlevel.name}}
                         <span class="glyphicon glyphicon-book navbar-icon"></span>
-                        1/{{transcrServ.annotation.levels.length}}
                     </a>
                     <div class="dropdown-menu options-menu" [ngClass]="{
                         'collaps': collapsed
                     }">
 
-                        <div class="row level-row" *ngFor="let level of transcrServ.annotation.levels; let i = index;">
-                            <div class="col-xs-2">{{i+1}}:</div>
+                        <div class="row level-row" *ngFor="let level of transcrServ.annotation.levels; let i = index;"
+                             [ngClass]="{
+                        selected: (transcrServ.selectedlevel === i)
+                        }"
+                        >
+                            <div class="col-xs-2" style="cursor: pointer;" (click)="selectLevel(i)">{{i+1}}:</div>
                             <div class="col-xs-8"><input (click)="onLevelNameClick($event)"
                                                          (blur)="onLevelNameLeave($event, i)" type="text"
                                                          maxlength="100" value="{{level.name}}"/>
                             </div>
-                            <div class="col-xs-2"><span class="glyphicon glyphicon-trash" (click)="onLevelRemoveClick(i)"></span></div>
+                            <div class="col-xs-2"><span class="glyphicon glyphicon-trash"
+                                                        (click)="onLevelRemoveClick(i, level.name)"></span></div>
                         </div>
                         <div class="row level-add-row" (click)="onLevelAddClick()">
                             <div class="col-xs-12"><span class="glyphicon glyphicon-plus"></span></div>

@@ -6,6 +6,7 @@ import {
   ChangeDetectorRef,
   Component,
   ComponentFactoryResolver,
+  ComponentRef,
   HostListener,
   OnChanges,
   OnDestroy,
@@ -49,12 +50,16 @@ import {EditorComponents} from '../../../editors/components';
 })
 export class TranscriptionComponent implements OnInit,
   OnDestroy, AfterViewInit, AfterContentInit, OnChanges, AfterViewChecked, AfterContentChecked, AfterContentInit {
+  get currentEditor(): ComponentRef<Component> {
+    return this._currentEditor;
+  }
   private subscrmanager: SubscriptionManager;
 
   @ViewChild('modal_shortcuts') modal_shortcuts: ModalComponent;
   @ViewChild('modal_guidelines') modal_guidelines: TranscrGuidelinesComponent;
   @ViewChild('modal_overview') modal_overview: ModalComponent;
   @ViewChild(LoadeditorDirective) appLoadeditor: LoadeditorDirective;
+  private _currentEditor: ComponentRef<Component>;
 
   @ViewChild('modal') modal: ModalComponent;
   @ViewChild('modal2') modal2: ModalComponent;
@@ -214,14 +219,21 @@ export class TranscriptionComponent implements OnInit,
     }
 
     if (!isNullOrUndefined(this.transcrService.annotation)) {
-      this.subscrmanager.add(this.transcrService.annotation.levels[0].segments.onsegmentchange.subscribe(this.transcrService.saveSegments));
+      this.subscrmanager.add(this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments));
     } else {
       this.subscrmanager.add(this.transcrService.dataloaded.subscribe(() => {
         this.subscrmanager.add(
-          this.transcrService.annotation.levels[0].segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
+          this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
         );
       }));
     }
+
+    this.subscrmanager.add(this.transcrService.levelchanged.subscribe(
+      () => {
+        console.log('levelchanged');
+        (<any> this.currentEditor.instance).update();
+      }
+    ));
   }
 
   ngAfterViewInit() {
@@ -326,7 +338,7 @@ export class TranscriptionComponent implements OnInit,
         const viewContainerRef = this.appLoadeditor.viewContainerRef;
         viewContainerRef.clear();
 
-        viewContainerRef.createComponent(componentFactory);
+        this._currentEditor = viewContainerRef.createComponent(componentFactory);
       } else {
         console.error('ERROR appLoadeditor is null');
       }

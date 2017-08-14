@@ -196,10 +196,10 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   onSegmentEntered(selected: any) {
-    if (this.transcrService.annotation.levels[0].segments && selected.index > -1 &&
-      selected.index < this.transcrService.annotation.levels[0].segments.length) {
-      const segment = this.transcrService.annotation.levels[0].segments.get(selected.index);
-      const start: AudioTime = (selected.index > 0) ? this.transcrService.annotation.levels[0].segments.get(selected.index - 1).time.clone()
+    if (this.transcrService.currentlevel.segments && selected.index > -1 &&
+      selected.index < this.transcrService.currentlevel.segments.length) {
+      const segment = this.transcrService.currentlevel.segments.get(selected.index);
+      const start: AudioTime = (selected.index > 0) ? this.transcrService.currentlevel.segments.get(selected.index - 1).time.clone()
         : new AudioTime(0, this.audiomanager.ressource.info.samplerate);
       if (segment) {
         this.selected_index = selected.index;
@@ -358,19 +358,24 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   public openSegment(segnumber: number) {
-    const segment = this.transcrService.annotation.levels[0].segments.get(segnumber);
+    const segment = this.transcrService.currentlevel.segments.get(segnumber);
     this.selectSegment({
       index: segnumber,
       pos: segment.time.samples
     });
   }
 
+  public update() {
+    this.viewer.update();
+    this.audiochunk_lines.startpos = this.audiochunk_lines.time.start;
+  }
+
   public selectSegment(selected: any) {
-    const segment = this.transcrService.annotation.levels[0].segments.get(selected.index);
-    if (this.transcrService.annotation.levels[0].segments && selected.index > -1 &&
-      selected.index < this.transcrService.annotation.levels[0].segments.length) {
+    const segment = this.transcrService.currentlevel.segments.get(selected.index);
+    if (this.transcrService.currentlevel.segments && selected.index > -1 &&
+      selected.index < this.transcrService.currentlevel.segments.length) {
       if (segment) {
-        const start = (selected.index > 0) ? this.transcrService.annotation.levels[0].segments.get(selected.index - 1).time
+        const start = (selected.index > 0) ? this.transcrService.currentlevel.segments.get(selected.index - 1).time
           : new AudioTime(0, this.audiomanager.ressource.info.samplerate);
         const end = start.clone();
         end.samples = start.samples + segment.time.samples;

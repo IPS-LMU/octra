@@ -112,11 +112,13 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
                   }
                   this._oannotation = importresult.annotjson;
                   this.checkState();
-                } else if (file.checked_converters === AppInfo.converters.length) {
-                  // last converter to check
-                  file.status = 'invalid';
-                  this._oannotation = null;
-                  this.checkState();
+                } else {
+                  if (file.checked_converters === AppInfo.converters.length || converter.name === 'Bundle') {
+                    // last converter to check
+                    file.status = 'invalid';
+                    this._oannotation = null;
+                    this.checkState();
+                  }
                 }
               };
 

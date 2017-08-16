@@ -9,6 +9,14 @@ import {IndexedDBManager} from '../../obj/IndexedDBManager';
 
 @Injectable()
 export class AppStorageService {
+  get idbloaded(): boolean {
+    return this._idbloaded;
+  }
+
+  get loaded(): EventEmitter<any> {
+    return this._loaded;
+  }
+
   get idb(): IndexedDBManager {
     return this._idb;
   }
@@ -211,6 +219,8 @@ export class AppStorageService {
   @SessionStorage('servertranscript') private _servertranscipt: any[];
 
   // IDB STORAGE
+  private _idbloaded = false;
+  private _loaded = new EventEmitter();
   private _idb: IndexedDBManager;
   private _submitted: boolean = null;
   private _feedback: any = null;
@@ -284,6 +294,7 @@ export class AppStorageService {
       this.setNewSessionKey();
 
       this.data_id = data_id;
+      this.logged_in = true;
       this.sessStr.store('logged_in', this.logged_in);
       this.sessStr.store('interface', this._interface);
       this.audio_url = audio_url;
@@ -295,8 +306,6 @@ export class AppStorageService {
       this.uselocalmode = false;
 
       this.login = true;
-      this.logged_in = true;
-
       return {error: ''};
     }
 
@@ -304,6 +313,7 @@ export class AppStorageService {
   }
 
   public clearSession(): boolean {
+    console.log('clear Session');
     this.logged_in = false;
     this.login = false;
 
@@ -315,6 +325,7 @@ export class AppStorageService {
 
   public clearLocalStorage(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
+      console.log('clear Local Storage');
       this.logged_in = false;
       this.login = false;
 
@@ -383,12 +394,15 @@ export class AppStorageService {
     file: File,
     checked_converters: number
   }[], keep_data: boolean, navigate: () => void, err: (error: string) => void) => {
+    console.log('beginLocal');
     if (!isNullOrUndefined(files)) {
       // get audio file
       let audiofile;
       for (let i = 0; i < files.length; i++) {
         if (AudioManager.isValidFileName(files[i].file.name, AppInfo.audioformats)) {
           audiofile = files[i].file;
+          console.log(audiofile);
+          console.log('audiofile found');
           break;
         }
       }
@@ -409,6 +423,7 @@ export class AppStorageService {
         if (!keep_data || (!isNullOrUndefined(this._user) &&
             !isNullOrUndefined(this._user.id) && this._user.id !== '-1' && this._user.id !== '')) {
           // last was online mode
+          console.log('clear 1');
           this.clearSession();
           this.clearLocalStorage().then(() => {
             process();
@@ -423,6 +438,7 @@ export class AppStorageService {
   };
 
   public endSession(offline: boolean, navigate: () => void) {
+    console.log('clear 2');
     this.clearSession();
     navigate();
   }
@@ -526,7 +542,12 @@ export class AppStorageService {
       idb.getAll('annotation', 'name').then((levels: OLevel[]) => {
         this._annotation = levels;
       });
-    });
+    }).then(
+      () => {
+        console.log('ALL LOADED');
+        this._loaded.complete();
+      }
+    );
   }
 
   private loadOptions = (variables: { attribute: string, key: string }[]): Promise<void> => {

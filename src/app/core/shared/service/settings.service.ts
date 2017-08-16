@@ -74,7 +74,7 @@ export class SettingsService {
   private test: ReplaySubject<boolean> = new ReplaySubject<boolean>(1);
   public settingsloaded: Observable<boolean> = this.test.asObservable();
 
-  private app_settingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
+  public app_settingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
   public projectsettingsloaded: EventEmitter<any> = new EventEmitter<any>();
   public validationmethodloaded = new EventEmitter<void>();
   public audioloaded: EventEmitter<any> = new EventEmitter<any>();
@@ -213,7 +213,7 @@ export class SettingsService {
         this._log += 'Loading functions failed [Error: S01]<br/>';
       }
     );
-  }
+  };
 
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
     Logger.log('Load audio file 2...');
@@ -255,7 +255,7 @@ export class SettingsService {
 
           reader.onloadend = (ev) => {
             const t: any = ev.target;
-            AudioManager.decodeAudio(this.sessService.sessionfile.name, t.result, AppInfo.audioformats).then(
+            AudioManager.decodeAudio(this.sessService.sessionfile.name, t.result, AppInfo.audioformats, true).then(
               (audiomanager: AudioManager) => {
                 audioService.registerAudioManager(audiomanager);
                 Logger.log('Audio loaded.');
@@ -277,7 +277,7 @@ export class SettingsService {
         status: 'success'
       });
     }
-  }
+  };
 
   private triggerSettingsLoaded = () => {
     if (this.validated) {

@@ -1,10 +1,19 @@
 import {OAnnotJSON, OAudiofile} from '../Annotation/AnnotJSON';
 
-export interface File {
+export interface IFile {
   name: string;
   content: string;
   type: string;
   encoding: string;
+}
+
+export interface ImportResult {
+  annotjson: OAnnotJSON,
+  audiofile: OAudiofile
+}
+
+export interface ExportResult {
+  file: IFile
 }
 
 export abstract class Converter {
@@ -62,7 +71,7 @@ export abstract class Converter {
 
   }
 
-  public abstract export(annotation: OAnnotJSON, audiofile: OAudiofile): File;
+  public abstract export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult;
 
-  public abstract import(file: File, audiofile: OAudiofile): OAnnotJSON;
+  public abstract import(file: IFile, audiofile: OAudiofile): ImportResult;
 }

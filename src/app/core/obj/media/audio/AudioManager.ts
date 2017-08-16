@@ -122,7 +122,7 @@ export class AudioManager {
     return AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats) !== null;
   }
 
-  public static decodeAudio = (filename: string, buffer: ArrayBuffer, audioformats: AudioFormat[]): Promise<AudioManager> => {
+  public static decodeAudio = (filename: string, buffer: ArrayBuffer, audioformats: AudioFormat[], keepbuffer = false): Promise<AudioManager> => {
     Logger.log('Decode audio... ' + filename);
 
     const audioformat: AudioFormat = AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats);
@@ -135,15 +135,19 @@ export class AudioManager {
       console.error(err.message);
     }
 
+    let buffer_copy = null;
+
+    if (keepbuffer) {
+      buffer_copy = buffer.slice(0);
+    }
     return AudioManager.decodeAudioFile(buffer, audioinfo.samplerate).then((audiobuffer: AudioBuffer) => {
       Logger.log('Audio decoded.');
 
       result.ressource = new AudioRessource(filename, SourceType.ArrayBuffer,
-        audioinfo, buffer, buffer.byteLength);
+        audioinfo, (buffer_copy === null) ? buffer : buffer_copy, audiobuffer, buffer.byteLength);
 
       // set duration is very important
       result.ressource.info.duration.samples = audiobuffer.length;
-      result.ressource.content = audiobuffer;
 
       const selection = new AudioSelection(new AudioTime(0, audioinfo.samplerate), new AudioTime(audiobuffer.length, audioinfo.samplerate));
       result._mainchunk = new AudioChunk(selection, result);
@@ -261,7 +265,7 @@ export class AudioManager {
         this._playbackstate = 'started';
         this._stepbackward = false;
         this._source = this.getSource();
-        this._source.buffer = this._ressource.content;
+        this._source.buffer = this._ressource.audiobuffer;
         this._javascriptNode = this._audiocontext.createScriptProcessor(2048, 1, 1);
 
         // connect modules of Web Audio API

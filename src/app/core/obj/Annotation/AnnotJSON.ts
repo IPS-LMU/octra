@@ -5,6 +5,7 @@ export interface IAnnotJSON {
   annotates: string;
   sampleRate: number;
   levels: ILevel[];
+  links: ILink[];
 }
 
 export interface ILevel {
@@ -76,6 +77,7 @@ export class OAnnotJSON implements IAnnotJSON {
 export class OAudiofile implements IAudioFile {
   name: string;
   // need type attribute
+  arraybuffer: ArrayBuffer;
   size: number;
   duration: number;
   samplerate: number;

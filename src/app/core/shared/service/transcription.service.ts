@@ -229,10 +229,12 @@ export class TranscriptionService {
               this._annotation.levels.push(level);
             }
 
-            // load feedback form data
-            if (isNullOrUndefined(this.sessServ.feedback)) {
-              this.sessServ.idb.save('options', 'feedback', {value: {}});
+            for (let i = 0; i < this.sessServ.annotation_links.length; i++) {
+              this._annotation.links.push(this.sessServ.annotation_links[i].link);
             }
+            console.log('LINKS:');
+            console.log(this._annotation.links);
+
 
             this._feedback = FeedBackForm.fromAny(this.settingsService.projectsettings.feedback_form, this.sessServ.comment);
             this._feedback.importData(this.sessServ.feedback);
@@ -265,6 +267,7 @@ export class TranscriptionService {
           for (let i = 0; i < levels.length; i++) {
             new_levels.push(new OIDBLevel(i + 1, levels[i], i));
           }
+
           this.sessServ.overwriteAnnotation(new_levels).then(() => {
             if (!this.sessServ.uselocalmode) {
               if (!isNullOrUndefined(this.sessServ.servertranscipt)) {

@@ -92,7 +92,7 @@
 
 .row.level-row.selected,
 .row.level-row.selected * {
-    background-color: #65f0c3;
+    background-color: rgb(165, 250, 190);
 }
 
 .row.level-row.disabled {

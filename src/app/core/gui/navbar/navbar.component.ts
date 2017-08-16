@@ -276,9 +276,10 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
         console.log('REMOVED OK');
         // update value for annoation object in transcr service
         this.transcrServ.annotation.levels.splice(tiernum, 1);
-        if (tiernum === this.transcrServ.selectedlevel) {
+        if (tiernum <= this.transcrServ.selectedlevel) {
           this.transcrServ.selectedlevel = tiernum - 1;
         }
+        console.log(this.transcrServ.selectedlevel);
       });
     }
   }

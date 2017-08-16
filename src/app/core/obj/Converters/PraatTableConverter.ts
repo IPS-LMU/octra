@@ -38,9 +38,12 @@ export class PraatTableConverter extends Converter {
 
       for (let i = 0; i < annotation.levels.length; i++) {
         const level = annotation.levels[i];
-        for (let j = 0; j < level.items.length; j++) {
-          const segment = level.items[j];
-          result = addEntry(result, level, segment);
+        // export segments only
+        if (level.type === 'SEGMENT') {
+          for (let j = 0; j < level.items.length; j++) {
+            const segment: ISegment = <ISegment> level.items[j];
+            result = addEntry(result, level, segment);
+          }
         }
       }
 

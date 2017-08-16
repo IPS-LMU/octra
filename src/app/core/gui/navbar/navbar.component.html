@@ -176,7 +176,7 @@
                                                          maxlength="100" value="{{level.name}}"/>
                             </div>
                             <div class="col-xs-2"><span class="glyphicon glyphicon-trash"
-                                                        (click)="onLevelRemoveClick(i, level.name)"></span></div>
+                                                        (click)="onLevelRemoveClick(i, level.id)"></span></div>
                         </div>
                         <div class="row level-add-row" (click)="onLevelAddClick()">
                             <div class="col-xs-12"><span class="glyphicon glyphicon-plus"></span></div>
@@ -301,7 +301,7 @@
         </div><!-- .nav-collapse -->
     </div>
 </nav>
-<div id="subnav" *ngIf="sessService.LoggedIn && !sessService.uselocalmode && navbarServ.dataloaded">
+<div id="subnav" class="panel" *ngIf="sessService.LoggedIn && !sessService.uselocalmode && navbarServ.dataloaded">
     <div class="row">
         <div class="col-sm-2"></div>
         <div class="col-xs-4 col-sm-3">{{"general.project" | translate}}: {{sessService.user.project}}</div>

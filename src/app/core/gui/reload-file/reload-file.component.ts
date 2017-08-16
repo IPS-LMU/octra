@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {AppStorageService} from '../../shared/service/appstorage.service';
+import {AppStorageService, OIDBLevel} from '../../shared/service/appstorage.service';
 import {SessionFile} from '../../obj/SessionFile';
 import {FileSize, Functions} from '../../shared/Functions';
 import {Router} from '@angular/router';
@@ -67,7 +67,15 @@ export class ReloadFileComponent implements OnInit {
       );
     };
     if (!isNullOrUndefined(this.dropzone.oannotation)) {
-      this.sessServ.overwriteAnnotation(this.dropzone.oannotation.levels).then(() => {
+      console.log("oanno not null 4");
+      const new_levels: OIDBLevel[] = [];
+      for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
+        new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
+      }
+
+      console.log('HERE');
+      console.log(new_levels);
+      this.sessServ.overwriteAnnotation(new_levels).then(() => {
         keep_data = true;
         process();
       }).catch((err) => {

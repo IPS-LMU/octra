@@ -7,8 +7,30 @@ import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {AppInfo} from '../../../app.info';
 import {IndexedDBManager} from '../../obj/IndexedDBManager';
 
+export interface IIDBLevel {
+  id: number,
+  level: OLevel,
+  sortorder: number
+}
+
+export class OIDBLevel {
+  id: number;
+  level: OLevel;
+  sortorder: number;
+
+  constructor(id: number, level: OLevel, sortorder: number) {
+    this.id = id;
+    this.level = level;
+    this.sortorder = sortorder;
+  }
+}
+
 @Injectable()
 export class AppStorageService {
+  get levelcounter(): number {
+    return this._levelcounter;
+  }
+
   get idbloaded(): boolean {
     return this._idbloaded;
   }
@@ -75,7 +97,7 @@ export class AppStorageService {
     });
   }
 
-  get annotation(): OLevel[] {
+  get annotation(): OIDBLevel[] {
     return this._annotation;
   }
 
@@ -240,13 +262,14 @@ export class AppStorageService {
   } = null;
   private _easymode = false;
   private _comment = '';
-  private _annotation: OLevel[] = null;
+  private _annotation: OIDBLevel[] = null;
 
   // is user on the login page?
   private login: boolean;
 
   public file: File;
-  public saving: EventEmitter<boolean> = new EventEmitter<boolean>();
+  public saving: EventEmitter<string> = new EventEmitter<string>();
+  private _levelcounter = 0;
 
   get LoggedIn(): boolean {
     return this.logged_in;
@@ -357,17 +380,27 @@ export class AppStorageService {
 
   public save(key: string, value: any): boolean {
     if (key === 'annotation' || key === 'feedback') {
-      this.saving.emit(true);
+      this.saving.emit('saving');
     }
 
     switch (key) {
       case 'annotation':
-        this.overwriteAnnotation(value.levels).catch((err) => {
+        this.changeAnnotationLevel(value.num, value.level).then(
+          () => {
+            this.saving.emit('success');
+          }
+        ).catch((err) => {
+          this.saving.emit('error');
           console.error(err);
         });
         break;
       case 'feedback':
-        this._idb.save('options', 'feedback', {value: value}).catch((err) => {
+        this._idb.save('options', 'feedback', {value: value}).then(
+          () => {
+            this.saving.emit('success');
+          }
+        ).catch((err) => {
+          this.saving.emit('error');
           console.error(err);
         });
         break;
@@ -375,9 +408,6 @@ export class AppStorageService {
         return false; // if key not found return false
     }
 
-    if (key === 'annotation' || key === 'feedback') {
-      this.saving.emit(false);
-    }
     return true;
   }
 
@@ -539,8 +569,26 @@ export class AppStorageService {
         this._logs = logs;
       });
     }).then(() => {
-      idb.getAll('annotation', 'name').then((levels: OLevel[]) => {
-        this._annotation = levels;
+      idb.getAll('annotation', 'id').then((levels: any[]) => {
+        this._annotation = [];
+        let max = 0;
+        for (let i = 0; i < levels.length; i++) {
+          if (!levels[i].hasOwnProperty('id')) {
+            this._annotation.push(
+              {
+                id: i + 1,
+                level: levels[i],
+                sortorder: i
+              }
+            );
+            max = Math.max(i + 1, max);
+          } else {
+            this._annotation.push(levels[i]);
+            max = Math.max(levels[i].id, max);
+          }
+        }
+        this._levelcounter = max;
+        console.log('max = ' + max);
       });
     }).then(
       () => {
@@ -590,22 +638,13 @@ export class AppStorageService {
     return this.clearIDBTable('annotation');
   }
 
-  public changeAnnotationLevel(num: number, level: OLevel): Promise<void> {
+  public changeAnnotationLevel(tiernum: number, level: OLevel): Promise<void> {
     if (!isNullOrUndefined(level)) {
-      if (this._annotation.length > num) {
-        const old_name = this._annotation[num].name;
+      if (this._annotation.length > tiernum) {
+        const id = this._annotation[tiernum].id;
 
-        this._annotation[num] = level;
-        return this.idb.save('annotation', old_name, level).then(() => {
-          if (old_name !== level.name) {
-            // name was changed. replace
-            return this.idb.remove('annotation', old_name);
-          } else {
-            return new Promise((resolve) => {
-              resolve();
-            });
-          }
-        });
+        this._annotation[tiernum].level = level;
+        return this.idb.save('annotation', id, this._annotation[tiernum]);
       } else {
         return new Promise((resolve, reject) => {
           reject(new Error('number of level that should be changed is invalid'));
@@ -620,8 +659,15 @@ export class AppStorageService {
 
   public addAnnotationLevel(level: OLevel): Promise<void> {
     if (!isNullOrUndefined(level)) {
-      this._annotation.push(level);
-      return this.idb.save('annotation', level.name, level);
+      this._annotation.push({
+        id: ++this._levelcounter,
+        level: level,
+        sortorder: this._annotation.length
+      });
+      return this.idb.save('annotation', this._levelcounter, {
+        id: this._levelcounter,
+        level: level
+      });
     } else {
       return new Promise((resolve, reject) => {
         reject(new Error('level is undefined or null'));
@@ -629,9 +675,9 @@ export class AppStorageService {
     }
   }
 
-  public removeAnnotationLevel(num: number, name: string): Promise<void> {
+  public removeAnnotationLevel(num: number, id: number): Promise<void> {
     if (!isNullOrUndefined(name) && num < this._annotation.length) {
-      return this.idb.remove('annotation', name).then(
+      return this.idb.remove('annotation', id).then(
         () => {
           this._annotation.splice(num, 1);
           console.log(this._annotation);
@@ -644,14 +690,24 @@ export class AppStorageService {
     }
   }
 
-  public overwriteAnnotation = (value: OLevel[]): Promise<void> => {
+  public overwriteAnnotation = (value: OIDBLevel[]): Promise<void> => {
+    console.log('overwrite');
+    console.log(value);
     return this.clearAnnotationData()
       .then(() => {
         this._annotation = value;
       }).catch((err) => {
         console.error(err);
       }).then(() => {
-        return this._idb.saveArraySequential(value, 'annotation', 'name')
+        return this._idb.saveArraySequential(value, 'annotation', 'id').then(
+          () => {
+            let max = 0;
+
+            for (let i = 0; i < value.length; i++) {
+              max = Math.max(max, value[i].id);
+            }
+          }
+        );
       });
   };
 
@@ -659,6 +715,15 @@ export class AppStorageService {
   public clearLoggingData(): Promise<void> {
     this._logs = null;
     return this.clearIDBTable('logs');
+  }
+
+  public getLevelByID(id: number) {
+    for (let i = 0; i < this._annotation.length; i++) {
+      if (this._annotation[i].id === id) {
+        return this._annotation[i];
+      }
+    }
+    return null;
   }
 
 }

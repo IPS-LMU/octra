@@ -256,15 +256,21 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
       levelname = `Tier ${index + 1}`
     }
 
-    const newlevel = new Level(levelname, 'SEGMENT', new Segments(this.transcrServ.audiofile.samplerate, [], this.transcrServ.last_sample));
-    this.sessService.addAnnotationLevel(newlevel.getObj());
-    // update value for annoation object in transc servcie
-    this.transcrServ.annotation.levels.push(newlevel);
+    const newlevel = new Level(this.sessService.levelcounter + 1, levelname, 'SEGMENT',
+      new Segments(this.transcrServ.audiofile.samplerate, [], this.transcrServ.last_sample));
+    this.sessService.addAnnotationLevel(newlevel.getObj()).then(
+      () => {
+        // update value for annoation object in transc servcie
+        this.transcrServ.annotation.levels.push(newlevel);
+      }
+    ).catch((err) => {
+      console.error(err);
+    });
   }
 
-  onLevelRemoveClick(tiernum: number, name: string) {
+  onLevelRemoveClick(tiernum: number, id: number) {
     if (this.transcrServ.annotation.levels.length > 1) {
-      this.sessService.removeAnnotationLevel(tiernum, name).catch((err) => {
+      this.sessService.removeAnnotationLevel(tiernum, id).catch((err) => {
         console.error(err);
       }).then(() => {
         console.log('REMOVED OK');

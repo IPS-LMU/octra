@@ -190,7 +190,7 @@ export class IndexedDBManager {
     );
   };
 
-  public remove = (store_name: string | IDBObjectStore, key: string): Promise<any> => {
+  public remove = (store_name: string | IDBObjectStore, key: string | number): Promise<any> => {
     return new Promise<any>(
       (resolve, reject) => {
         const store = (typeof store_name !== 'string') ? store_name : this.getObjectStore(store_name, IDBMode.READWRITE);

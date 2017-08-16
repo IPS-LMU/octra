@@ -198,13 +198,15 @@ export class TranscriptionComponent implements OnInit,
     this.changeDetecorRef.detectChanges();
 
     this.subscrmanager.add(this.sessService.saving.subscribe(
-      (saving) => {
-        if (saving) {
-          this.saving = 'Saving...';
-        } else {
+      (saving: string) => {
+        if (saving === 'saving') {
+          this.saving = 'saving';
+        } else if (saving === 'error') {
+          this.saving = 'error';
+        } else if (saving === 'success') {
           setTimeout(() => {
-            this.saving = '';
-          }, 1000);
+            this.saving = 'success';
+          }, 200);
         }
       }
     ));

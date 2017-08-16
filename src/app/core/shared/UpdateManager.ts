@@ -1,5 +1,5 @@
 import {AppInfo} from '../../app.info';
-import {AppStorageService} from './service/appstorage.service';
+import {AppStorageService, OIDBLevel} from './service/appstorage.service';
 import {isNullOrUndefined} from 'util';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../obj/Annotation/AnnotJSON';
 import {IndexedDBManager} from '../obj/IndexedDBManager';
@@ -55,7 +55,7 @@ export class UpdateManager {
                 if (version === 1) {
                   const optionsStore = idbm.db.createObjectStore('options', {keyPath: 'name'});
                   const logsStore = idbm.db.createObjectStore('logs', {keyPath: 'timestamp'});
-                  const annoStore = idbm.db.createObjectStore('annotation', {keyPath: 'name'});
+                  const annoStore = idbm.db.createObjectStore('annotation', {keyPath: 'id'});
 
                   // options for version 1
                   idbm.saveSequential(optionsStore, [
@@ -119,7 +119,13 @@ export class UpdateManager {
                       if (!isNullOrUndefined(this.sessService.localStr.retrieve('annotation'))) {
                         Logger.log(`Convert annotation to IDB...`);
 
-                        idbm.saveArraySequential(this.sessService.localStr.retrieve('annotation').levels, annoStore, 'name').then(() => {
+                        const levels = this.sessService.localStr.retrieve('annotation').levels;
+                        const new_levels: OIDBLevel[] = [];
+                        for (let i = 0; i < levels.length; i++) {
+                          new_levels.push(new OIDBLevel(i + 1, levels[i], i));
+                        }
+
+                        idbm.saveArraySequential(new_levels, annoStore, 'id').then(() => {
                           console.log(`converted annotation levels to IDB`);
 
                           version++;

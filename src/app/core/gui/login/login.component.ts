@@ -11,7 +11,7 @@ import {
 import {Router} from '@angular/router';
 import {NgForm} from '@angular/forms';
 import {LoginService} from './login.service';
-import {AppStorageService} from '../../shared/service/appstorage.service';
+import {AppStorageService, OIDBLevel} from '../../shared/service/appstorage.service';
 import {ComponentCanDeactivate} from './login.deactivateguard';
 import {Observable} from 'rxjs/Rx';
 import {FileSize, Functions} from '../../shared/Functions';
@@ -226,7 +226,13 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.setOnlineSessionToFree(() => {
         this.sessionService.beginLocalSession(this.dropzone.files, false, () => {
           if (!isNullOrUndefined(this.dropzone.oannotation)) {
-            this.sessionService.overwriteAnnotation(this.dropzone.oannotation.levels).then(() => {
+            console.log('oanno not null');
+            const new_levels: OIDBLevel[] = [];
+            for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
+              new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
+            }
+
+            this.sessionService.overwriteAnnotation(new_levels).then(() => {
               this.navigate();
             }).catch((err) => {
               console.error(err);
@@ -241,7 +247,13 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     } else {
       this.sessionService.beginLocalSession(this.dropzone.files, true, () => {
         if (!isNullOrUndefined(this.dropzone.oannotation)) {
-          this.sessionService.overwriteAnnotation(this.dropzone.oannotation.levels).then(() => {
+          console.log("oanno not null 2");
+          const new_levels: OIDBLevel[] = [];
+          for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
+            new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
+          }
+
+          this.sessionService.overwriteAnnotation(new_levels).then(() => {
             this.navigate();
           }).catch((err) => {
             console.error(err);
@@ -285,7 +297,13 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   newTranscription = () => {
     this.sessionService.beginLocalSession(this.dropzone.files, false, () => {
         if (!isNullOrUndefined(this.dropzone.oannotation)) {
-          this.sessionService.overwriteAnnotation(this.dropzone.oannotation.levels).then(() => {
+          console.log("oanno not null 3");
+          const new_levels: OIDBLevel[] = [];
+          for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
+            new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
+          }
+
+          this.sessionService.overwriteAnnotation(new_levels).then(() => {
             this.navigate();
           }).catch((err) => {
             console.error(err);

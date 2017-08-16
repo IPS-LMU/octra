@@ -1,8 +1,13 @@
 import {AnnotJSONType, OLevel} from './AnnotJSON';
 import {isNullOrUndefined} from 'util';
 import {Segments} from './Segments';
+import {OIDBLevel} from '../../shared/service/appstorage.service';
 
 export class Level {
+  get id(): number {
+    return this._id;
+  }
+
   set name(value: string) {
     this._name = value;
   }
@@ -11,20 +16,23 @@ export class Level {
     return this._name;
   }
 
+  public static counter = 1;
+
   private _name: string;
   public segments: Segments;
   private type: AnnotJSONType;
+  private _id: number;
 
-  public static fromObj(level: OLevel, samplerate: number, last_sample: number): Level {
-    const segments: Segments = new Segments(samplerate, level.items, last_sample);
-    const result = new Level(level.name, level.type, segments);
+  public static fromObj(entry: OIDBLevel, samplerate: number, last_sample: number): Level {
+    const segments: Segments = new Segments(samplerate, entry.level.items, last_sample);
+    const result = new Level(entry.id, entry.level.name, entry.level.type, segments);
 
     return result;
   }
 
-  constructor(name: string, type: string, segments?: Segments) {
+  constructor(id: number, name: string, type: string, segments?: Segments) {
     this._name = name;
-
+    this._id = id;
     switch (type) {
       case('EVENT'):
         this.type = AnnotJSONType.EVENT;

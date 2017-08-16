@@ -2,7 +2,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import 'rxjs/Observable';
 import {Segments} from '../../obj/Annotation/Segments';
 import {AudioService} from './audio.service';
-import {AppStorageService} from './appstorage.service';
+import {AppStorageService, OIDBLevel} from './appstorage.service';
 import {Functions} from '../Functions';
 import {UserInteractionsService} from './userInteractions.service';
 import {StatisticElem} from '../../obj/StatisticElement';
@@ -222,6 +222,7 @@ export class TranscriptionService {
           this._annotation = new Annotation(annotates, this._audiofile);
 
           if (!isNullOrUndefined(this.sessServ.annotation)) {
+            console.log(this.sessServ.annotation);
             for (let i = 0; i < this.sessServ.annotation.length; i++) {
               const level: Level = Level.fromObj(this.sessServ.annotation[i],
                 this._audiomanager.ressource.info.samplerate, this._audiomanager.ressource.info.duration.samples);
@@ -258,19 +259,33 @@ export class TranscriptionService {
         };
 
         if (isNullOrUndefined(this.sessServ.annotation) || this.sessServ.annotation.length === 0) {
-          this.sessServ.overwriteAnnotation(this.createNewAnnotation().levels).then(() => {
+          console.log('oanno not null 5');
+          const new_levels = [];
+          const levels = this.createNewAnnotation().levels;
+          for (let i = 0; i < levels.length; i++) {
+            new_levels.push(new OIDBLevel(i + 1, levels[i], i));
+          }
+          this.sessServ.overwriteAnnotation(new_levels).then(() => {
             if (!this.sessServ.uselocalmode) {
               if (!isNullOrUndefined(this.sessServ.servertranscipt)) {
                 // import server transcript
-                this.sessServ.annotation[this._selectedlevel].items = [];
+                this.sessServ.annotation[this._selectedlevel].level.items = [];
                 for (let i = 0; i < this.sessServ.servertranscipt.length; i++) {
                   const seg_t = this.sessServ.servertranscipt[i];
 
                   const oseg = new OSegment(i, seg_t.start, seg_t.length, [new OLabel('Tier 1', seg_t.text)]);
-                  this.sessServ.annotation[this.selectedlevel].items.push(oseg);
+                  this.sessServ.annotation[this.selectedlevel].level.items.push(oseg);
                 }
                 // clear servertranscript
                 this.sessServ.servertranscipt = null;
+
+                this.sessServ.changeAnnotationLevel(this._selectedlevel,
+                  this.sessServ.annotation[this._selectedlevel].level)
+                  .catch(
+                    (err) => {
+                      console.error(err);
+                    }
+                  );
               }
             } else {
             }
@@ -334,7 +349,10 @@ export class TranscriptionService {
     if (!this.saving) {
       this.saving = true;
       setTimeout(() => {
-        this.sessServ.save('annotation', this._annotation.getObj());
+        this.sessServ.save('annotation', {
+          num: this._selectedlevel,
+          level: this._annotation.levels[this._selectedlevel].getObj()
+        });
         this.saving = false;
       }, 2000);
     }
@@ -406,8 +424,8 @@ export class TranscriptionService {
       pause: 0
     };
 
-    for (let i = 0; i < this._annotation.levels[0].segments.length; i++) {
-      const segment = this._annotation.levels[0].segments.get(i);
+    for (let i = 0; i < this._annotation.levels[this._selectedlevel].segments.length; i++) {
+      const segment = this._annotation.levels[this._selectedlevel].segments.get(i);
 
       if (segment.transcript !== '') {
         if (this.break_marker !== null && segment.transcript.indexOf(this.break_marker.code) > -1) {
@@ -543,7 +561,7 @@ export class TranscriptionService {
   }
 
   public requestSegment(segnumber: number) {
-    if (segnumber < this._annotation.levels[0].segments.length) {
+    if (segnumber < this._annotation.levels[this._selectedlevel].segments.length) {
       this.segmentrequested.emit(segnumber);
     } else {
     }

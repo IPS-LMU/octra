@@ -120,8 +120,10 @@
 </modal>
 
 <div class="flex">
-    <span id='saving' *ngIf="saving != ''"><span style="color:#333333"
-                                                 class="glyphicon glyphicon-floppy-disk"></span></span>
+    <span id='saving'>
+        <span *ngIf="saving === 'saving'" style="color:#333333" class="glyphicon glyphicon-floppy-disk"></span>
+        <span *ngIf="saving === 'error'" style="color:red" class="glyphicon glyphicon-floppy-disk"></span>
+    </span>
     <app-fastbar
             [responsive]="responsive"
             [button_labels]="{

@@ -5,7 +5,7 @@ import {AppStorageService} from './core/shared/service/appstorage.service';
 import {SettingsService} from './core/shared/service/settings.service';
 import {SubscriptionManager} from './core/obj/SubscriptionManager';
 import {isNullOrUndefined, isUndefined} from 'util';
-import {BugReportService} from './core/shared/service/bug-report.service';
+import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
 import {AppInfo} from './app.info';
 import {environment} from '../environments/environment';
 import {UpdateManager} from './core/shared/UpdateManager';
@@ -33,7 +33,6 @@ export class AppComponent implements OnDestroy {
               private sessService: AppStorageService,
               private settingsService: SettingsService,
               private bugService: BugReportService) {
-    /*
     // overwrite console.log
     const oldLog = console.log;
     const serv = this.bugService;
@@ -71,7 +70,6 @@ export class AppComponent implements OnDestroy {
       };
     })();
 
-*/
     this.subscrmanager = new SubscriptionManager();
 
     // load settings

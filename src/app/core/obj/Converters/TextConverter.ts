@@ -7,7 +7,7 @@ export class TextConverter extends Converter {
   public constructor() {
     super();
     this._application = 'Text Editor';
-    this._name = 'Text';
+    this._name = 'Plain Text';
     this._extension = '.txt';
     this._website.title = 'WebMaus';
     this._website.url = 'https://clarin.phonetik.uni-muenchen.de/BASWebServices/#/services/WebMAUSBasic';

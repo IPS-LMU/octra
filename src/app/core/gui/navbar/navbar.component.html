@@ -2,7 +2,7 @@
     <modal-header>
         <h4 class="modal-title">{{"general.export data" | translate}}</h4>
     </modal-header>
-    <modal-body>
+    <modal-body id="export-table">
         <table class="table table-striped table-responsive">
             <thead>
             <tr>
@@ -14,10 +14,14 @@
             <tbody>
             <tr *ngFor="let format of converters">
                 <td *ngIf="format.conversion.export">
-                    <a #a download="{{parentformat.download}}" [href]="parentformat.uri"
-                       (mouseover)="updateParentFormat(format);">
-                        <span class="glyphicon glyphicon-floppy-save"></span> {{format.name}}
-                        (*{{format.extension}})
+                    <a #a
+                       (click)="updateParentFormat(format);">
+                        {{format.name}} (*{{format.extension}})
+                    </a>
+                    <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === format.name && preparing.preparing"></i>
+                    <a style="margin-left:10px;" *ngIf="preparing.name === format.name && !preparing.preparing" download="{{parentformat.download}}" [href]="parentformat.uri"
+                          class="link">
+                        <span class="glyphicon glyphicon-floppy-save"></span> Download
                     </a>
                 </td>
                 <td *ngIf="format.conversion.export">
@@ -31,9 +35,13 @@
             </tr>
             </tbody>
         </table>
-        <a *ngIf="arraybufferExists" (mouseover)="getAudioURI();" [href]="parentformat.uri"
-           download="{{parentformat.download}}">
-            <span class="glyphicon glyphicon-headphones"></span> Download Audio file (experimental)</a>
+        <a *ngIf="arraybufferExists" (click)="getAudioURI();">
+            <span class="glyphicon glyphicon-headphones"></span> Audio file (experimental)</a>
+        <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === 'Audio' && preparing.preparing"></i>
+        <a style="margin-left:10px;" *ngIf="preparing.name === 'Audio' && !preparing.preparing" download="{{parentformat.download}}" [href]="parentformat.uri"
+           class="link">
+            <span class="glyphicon glyphicon-floppy-save"></span> Download
+        </a>
     </modal-body>
     <modal-footer>
         <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="modalexport.dismiss()">

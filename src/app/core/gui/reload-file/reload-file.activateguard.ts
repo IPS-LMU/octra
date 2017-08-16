@@ -16,9 +16,11 @@ export class ReloadFileGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     if (this.sessService.LoggedIn !== true) {
+      console.log('not logged in');
       this.router.navigate(['/login']);
       return false;
     } else {
+      console.log('logged in');
       if (isNullOrUndefined(this.settingsService.app_settings)) {
         return this.settingsService.settingsloaded.first();
       } else {

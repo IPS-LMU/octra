@@ -13,6 +13,17 @@
     },
     "octra": {
       "properties": {
+        "database": {
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "required": [
+            "name"
+          ]
+        },
         "login": {
           "properties": {
             "enabled": {
@@ -74,7 +85,10 @@
           "type": "array"
         }
       },
-      "type": "object"
+      "type": "object",
+      "required": [
+        "database"
+      ]
     }
   },
   "type": "object",

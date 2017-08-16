@@ -131,7 +131,7 @@ export class AudioChunk {
         let chunk_buffer: Float32Array;
 
         if (isNullOrUndefined(this._audiomanger.mainchunk) || this._audiomanger.mainchunk.channel.length === 0) {
-          chunk_buffer = new Float32Array(this._audiomanger.ressource.content.getChannelData(0));
+          chunk_buffer = new Float32Array(this._audiomanger.ressource.audiobuffer.getChannelData(0));
         } else {
           chunk_buffer = new Float32Array(this._audiomanger.mainchunk.channel);
         }

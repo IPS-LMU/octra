@@ -38,21 +38,45 @@ export class LoadingComponent implements OnInit, OnDestroy {
               public audio: AudioService,
               private router: Router,
               private transcrService: TranscriptionService) {
-    if (!this.sessionService.LoggedIn) {
-      this.router.navigate(['/login']);
-    }
-    if (this.sessionService.uselocalmode && isNullOrUndefined(this.sessionService.file)) {
-      this.router.navigate(['/user/transcr/reload-file']);
+  }
+
+  ngOnInit() {
+    const process = () => {
+      if (this.sessionService.uselocalmode && isNullOrUndefined(this.sessionService.file)) {
+        console.log('reload file');
+        this.router.navigate(['/user/transcr/reload-file']);
+      } else {
+        console.log('ERROR');
+        console.log(this.sessionService.uselocalmode);
+        console.log(this.sessionService.file);
+      }
+      console.log('PROCESS');
+      this.settService.loadAudioFile(this.audio);
+    };
+
+    if (!this.sessionService.idbloaded) {
+      this.subscrmanager.add(this.sessionService.loaded.subscribe(() => {
+        },
+        () => {
+        },
+        () => {
+          process();
+        }));
+    } else {
+      process();
     }
 
-    langService.get('general.please wait').subscribe(
+    if (!this.sessionService.LoggedIn) {
+      console.log('not logged in');
+      this.router.navigate(['/login']);
+    }
+
+    this.langService.get('general.please wait').subscribe(
       (translation) => {
         this.text = translation + '...';
       }
     );
-  }
 
-  ngOnInit() {
     this.subscrmanager.add(
       this.settService.projectsettingsloaded.subscribe(
         (projectsettings) => {
@@ -107,7 +131,11 @@ export class LoadingComponent implements OnInit, OnDestroy {
             this.state = 'Audio loaded';
             this.loadedchanged.emit(false);
           } else {
-            this.router.navigate(['/logout']);
+            console.error('audio not loaded');
+            console.log(result);
+            if (this.sessionService.uselocalmode) {
+              this.router.navigate(['/user/transcr/reload-file']);
+            }
           }
         }
       )
@@ -165,7 +193,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
         this.warning = 'Audio file seems to be a large one. This could take a while...';
       }
     }, 10000);
-    this.settService.loadAudioFile(this.audio);
   }
 
   ngOnDestroy() {
@@ -177,6 +204,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
+    console.log('go back');
     this.sessionService.clearSession();
     this.router.navigate(['/login']);
   }

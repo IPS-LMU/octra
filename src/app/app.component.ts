@@ -88,21 +88,33 @@ export class AppComponent implements OnDestroy {
       }
     ));
 
-    // check for Updates
-    const umanager = new UpdateManager(this.sessService);
-    umanager.checkForUpdates().then((idb) => {
-      this.sessService.load(idb).then(
-        () => {
-          this.settingsService.getApplicationSettings();
+    this.settingsService.getApplicationSettings();
 
-          if (this.settingsService.validated) {
-            console.log('loaded');
-            this.onSettingsLoaded(true);
+    const checkupdates = () => {
+      // check for Updates
+      const umanager = new UpdateManager(this.sessService);
+      umanager.checkForUpdates(this.settingsService.app_settings.octra.database.name).then((idb) => {
+        this.sessService.load(idb).then(
+          () => {
+            if (this.settingsService.validated) {
+              console.log('loaded');
+              this.onSettingsLoaded(true);
+            }
+            umanager.destroy();
           }
-          umanager.destroy();
+        );
+      });
+    };
+
+    if (isNullOrUndefined(this.settingsService.app_settings)) {
+      this.subscrmanager.add(this.settingsService.app_settingsloaded.subscribe(
+        () => {
+          checkupdates();
         }
-      );
-    });
+      ))
+    } else {
+      checkupdates();
+    }
   }
 
   onSettingsLoaded = (loaded) => {

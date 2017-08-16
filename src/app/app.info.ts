@@ -7,6 +7,7 @@ import {PraatTextgridConverter} from './core/obj/Converters/PraatTextgridConvert
 import {MantisBugReporter} from './core/obj/BugAPI/MantisBugReporter';
 import {WavFormat} from './core/obj/media/audio/AudioFormats/WavFormat';
 import {OggFormat} from './core/obj/media/audio/AudioFormats/OggFormat';
+import {BundleJSONConverter} from './core/obj/Converters/BundleJSONConverter';
 
 export class AppInfo {
   public static readonly audioformats = [
@@ -22,8 +23,9 @@ export class AppInfo {
     new PraatTableConverter(),
     new PraatTextgridConverter(),
     new AnnotJSONConverter(),
+    new BundleJSONConverter(),
     new CTMConverter(),
-    new TextConverter(),
+    new TextConverter()
   ];
 
   static readonly version = '1.2.0';

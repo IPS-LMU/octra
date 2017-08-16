@@ -14,22 +14,22 @@ export class MediaRessource {
     return this._name;
   }
 
-  get content(): any {
-    return this._content;
+  get arraybuffer(): ArrayBuffer {
+    return this._arraybuffer;
   }
 
-  set content(value: any) {
-    this._content = value;
+  set arraybuffer(value: ArrayBuffer) {
+    this._arraybuffer = value;
   }
 
   private _name: string;
   private _extension: string;
   private _size: number;
   private source: SourceType;
-  private _content: any;
+  private _arraybuffer: ArrayBuffer;
 
-  constructor(fullname: string, source: SourceType, content?: File | ArrayBuffer, size?: number) {
-    if (source !== SourceType.URL && isNullOrUndefined(content)) {
+  constructor(fullname: string, source: SourceType, buffer?: ArrayBuffer, size?: number) {
+    if (source !== SourceType.URL && isNullOrUndefined(buffer)) {
       throw new Error('MediaRessource of type File or ArrayBuffer must have content');
     } else if (fullname.lastIndexOf('.') === -1) {
       throw new Error('fullname parameter needs to consist of an file extension');
@@ -39,7 +39,7 @@ export class MediaRessource {
       this._extension = fullname.substr(extensionstart);
       this._size = size;
       this.source = source;
-      this._content = content;
+      this._arraybuffer = buffer;
     }
   }
 }

@@ -31,6 +31,9 @@
             </tr>
             </tbody>
         </table>
+        <a *ngIf="arraybufferExists" (mouseover)="getAudioURI();" [href]="parentformat.uri"
+           download="{{parentformat.download}}">
+            <span class="glyphicon glyphicon-headphones"></span> Download Audio file (experimental)</a>
     </modal-body>
     <modal-footer>
         <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="modalexport.dismiss()">
@@ -149,7 +152,7 @@
 
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown" *ngIf="transcrServ !== undefined" [ngStyle]="{
-                'display': (!(navbarServ.dataloaded && sessService.LoggedIn)) ? 'none': 'inherit'
+                'display': (!(navbarServ.dataloaded && sessService.LoggedIn && sessService.uselocalmode)) ? 'none': 'inherit'
                 }">
                     <a href="#" class="dropdown" data-toggle="dropdown" role="button"
                        aria-expanded="false">
@@ -163,7 +166,8 @@
 
                         <div class="row level-row" *ngFor="let level of transcrServ.annotation.levels; let i = index;"
                              [ngClass]="{
-                        selected: (transcrServ.selectedlevel === i)
+                        selected: (transcrServ.selectedlevel === i),
+                        disabled: (level.getTypeString() !== 'SEGMENT')
                         }"
                         >
                             <div class="col-xs-2" style="cursor: pointer;" (click)="selectLevel(i)">{{i+1}}:</div>
@@ -298,7 +302,15 @@
     </div>
 </nav>
 <div id="subnav" *ngIf="sessService.LoggedIn && !sessService.uselocalmode && navbarServ.dataloaded">
-    {{"general.project" | translate}}: {{sessService.user.project}} | {{"general.name" |translate}}:
-    {{navbarServ.exportformats.filename}} | {{'general.free jobs' | translate}}:
-    {{sessService.jobs_left}}
+    <div class="row">
+        <div class="col-sm-2"></div>
+        <div class="col-xs-4 col-sm-3">{{"general.project" | translate}}: {{sessService.user.project}}</div>
+        <div class="col-xs-4 col-sm-3">{{"general.name" |translate}}:
+            {{navbarServ.exportformats.filename}}
+        </div>
+        <div class="col-xs-4 col-sm-3">{{'general.free jobs' | translate}}:
+            {{sessService.jobs_left}}
+        </div>
+        <div class="col-sm-2"></div>
+    </div>
 </div>

@@ -4,6 +4,9 @@ export interface AppSettings {
     url: string
   };
   octra: {
+    database: {
+      name: string
+    },
     login: {
       enabled: boolean
     },

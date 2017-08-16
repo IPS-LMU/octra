@@ -6,7 +6,7 @@ import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {TranslateService} from '@ngx-translate/core';
 import {isNullOrUndefined} from 'util';
 import {ModalService} from '../../shared/service/modal.service';
-import {Converter, File} from '../../obj/Converters/Converter';
+import {Converter, IFile} from '../../obj/Converters/Converter';
 import {AppInfo} from '../../../app.info';
 import {TextConverter} from '../../obj/Converters/TextConverter';
 import {TranscriptionService} from '../../shared/service/transcription.service';
@@ -130,10 +130,6 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
      alert(txt);*/
   }
 
-  getURI(file: File): string {
-    return 'data:' + file.type + ';charset:' + file.encoding + ',' + encodeURIComponent(file.content);
-  }
-
   sanitize(url: string): SafeUrl {
     return this.sanitizer.bypassSecurityTrustUrl(url);
   }
@@ -165,9 +161,41 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   updateParentFormat(converter: Converter) {
     const oannotjson = this.navbarServ.transcrService.annotation.getObj();
-    const result: File = converter.export(oannotjson, this.navbarServ.transcrService.audiofile);
+    const result: IFile = converter.export(oannotjson, this.navbarServ.transcrService.audiofile).file;
     this.parentformat.download = result.name;
-    this.parentformat.uri = this.sanitize(this.getURI(result));
+
+    window.URL = (((<any> window).URL) ||
+      ((<any> window).webkitURL) || false);
+
+    if (this.parentformat.uri !== null) {
+      window.URL.revokeObjectURL(this.parentformat.uri.toString());
+    }
+    const test = new File([result.content], result.name);
+    const urlobj = window.URL.createObjectURL(test);
+    this.parentformat.uri = this.sanitize(urlobj);
+  }
+
+  getAudioURI() {
+    if (!isNullOrUndefined(this.transcrServ) && !isNullOrUndefined(this.transcrServ.audiomanager.ressource.arraybuffer)) {
+      this.parentformat.download = this.transcrServ.audiomanager.ressource.name + this.transcrServ.audiomanager.ressource.extension;
+
+      window.URL = (((<any> window).URL) ||
+        ((<any> window).webkitURL) || false);
+
+      if (this.parentformat.uri !== null) {
+        window.URL.revokeObjectURL(this.parentformat.uri.toString());
+      }
+      const test = new File([this.transcrServ.audiomanager.ressource.arraybuffer], this.parentformat.download);
+      const urlobj = window.URL.createObjectURL(test);
+      this.parentformat.uri = this.sanitize(urlobj);
+    } else {
+      console.error('can\'t get audio file');
+    }
+  }
+
+  public get arraybufferExists(): boolean {
+    return (!isNullOrUndefined(this.transcrServ) && !isNullOrUndefined(this.transcrServ.audiomanager.ressource.arraybuffer)
+      && this.transcrServ.audiomanager.ressource.arraybuffer.byteLength > 0);
   }
 
   getText() {
@@ -228,7 +256,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
       levelname = `Tier ${index + 1}`
     }
 
-    const newlevel = new Level(levelname, new Segments(this.transcrServ.audiofile.samplerate, [], this.transcrServ.last_sample));
+    const newlevel = new Level(levelname, 'SEGMENT', new Segments(this.transcrServ.audiofile.samplerate, [], this.transcrServ.last_sample));
     this.sessService.addAnnotationLevel(newlevel.getObj());
     // update value for annoation object in transc servcie
     this.transcrServ.annotation.levels.push(newlevel);

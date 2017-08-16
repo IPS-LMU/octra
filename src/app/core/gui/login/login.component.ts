@@ -100,20 +100,34 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.valid_size = true;
     }
 
-    if (!isNullOrUndefined(this.sessionService.user) && this.sessionService.user.id !== '-1') {
-      this.member.id = this.sessionService.user.id;
-    }
+    const loaduser = () => {
+      if (!isNullOrUndefined(this.sessionService.user) && this.sessionService.user.id !== '-1') {
+        this.member.id = this.sessionService.user.id;
+      }
 
-    if (!isNullOrUndefined(this.sessionService.user) && this.sessionService.user.hasOwnProperty('project')) {
-      this.member.project = this.sessionService.user.project;
-    }
+      if (!isNullOrUndefined(this.sessionService.user) && this.sessionService.user.hasOwnProperty('project')) {
+        this.member.project = this.sessionService.user.project;
+      }
 
-    if (!isNullOrUndefined(this.sessionService.user) && this.sessionService.user.hasOwnProperty('jobno')
-      && this.sessionService.user.jobno !== null && this.sessionService.user.jobno > -1) {
-      this.member.jobno = this.sessionService.user.jobno.toString();
+      if (!isNullOrUndefined(this.sessionService.user) && this.sessionService.user.hasOwnProperty('jobno')
+        && this.sessionService.user.jobno !== null && this.sessionService.user.jobno > -1) {
+        this.member.jobno = this.sessionService.user.jobno.toString();
+      }
+    };
+
+    if (!this.sessionService.idbloaded) {
+      this.subscrmanager.add(this.sessionService.loaded.subscribe(
+        () => {
+        },
+        () => {
+        },
+        () => {
+          loaduser();
+        })
+      );
+    } else {
+      loaduser();
     }
-    this.cd.markForCheck();
-    this.cd.detectChanges();
   }
 
   ngAfterViewInit() {
@@ -323,7 +337,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         const json = result.json();
         if (isArray(json.data)) {
           this.projects = json.data;
-          if (!isNullOrUndefined(this.sessionService.user) && !isNullOrUndefined(this.sessionService.user.project) && this.sessionService.user.project !== '') {
+          if (!isNullOrUndefined(this.sessionService.user) &&
+            !isNullOrUndefined(this.sessionService.user.project) && this.sessionService.user.project !== '') {
             if (isNullOrUndefined(this.projects.find(
                 (x) => {
                   return x === this.sessionService.user.project;
@@ -353,6 +368,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         ) {
 
           // delete old data for fresh new session
+          console.log('clear 3');
           this.sessionService.clearSession();
           this.sessionService.clearLocalStorage().then(
             () => {

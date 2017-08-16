@@ -11,9 +11,12 @@
         }">
         </div>
     </div>
-    <div *ngIf="settService.log == ''" class="description">
+    <div *ngIf="settService.log == ''" c2lass="description">
         {{text}}{{state}}<br/>
         <div class="text-info">{{warning}}</div>
+        <div *ngIf="warning !== null && warning !== ''">
+            <span class="link" (click)="retry()">Retry</span> or <span class="link" (click)="goBack()">Back</span>
+        </div>
     </div>
     <div class="log" [innerHTML]="settService.log">
     </div>

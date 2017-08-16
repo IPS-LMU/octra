@@ -414,7 +414,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   private startTimer() {
     this.subscrmanager.add(this.timer.subscribe(
       () => {
-        if (this.audioressource.content && this.ap.PlayCursor) {
+        if (this.audioressource.audiobuffer && this.ap.PlayCursor) {
           this.changeDetectorRef.markForCheck();
         }
       }

@@ -8,6 +8,7 @@ export class Segments {
   set segments(value: Segment[]) {
     this._segments = value;
   }
+
   public onsegmentchange: EventEmitter<any> = new EventEmitter<any>();
 
   get segments(): Segment[] {
@@ -19,7 +20,6 @@ export class Segments {
   }
 
   private _segments: Segment[];
-  private type = 'SEGMENT';
 
   constructor(private sample_rate: number, segments: ISegment[], last_sample: number) {
     this._segments = [];
@@ -132,7 +132,7 @@ export class Segments {
    * @param i
    * @returns {any}
    */
-  public get(i: number): Segment {
+  public get (i: number): Segment {
     if (i > -1 && i < this.segments.length) {
       return this.segments[i];
     }

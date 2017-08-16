@@ -16,7 +16,7 @@ export class UpdateManager {
     this.sessService = sessService;
   }
 
-  public checkForUpdates(): Promise<IndexedDBManager> {
+  public checkForUpdates(dbname: string): Promise<IndexedDBManager> {
     return new Promise<IndexedDBManager>(
       (resolve, reject) => {
         const appversion = AppInfo.version;
@@ -36,7 +36,7 @@ export class UpdateManager {
 
           // incremental IDB upgrade: It is very important to make sure, that the database can
           // be upgrade from any version to the latest version
-          const idbm = new IndexedDBManager('octra');
+          const idbm = new IndexedDBManager(dbname);
           this.subscrmanager.add(idbm.open(2).subscribe(
             (result) => {
               console.log(result.type);
@@ -167,7 +167,7 @@ export class UpdateManager {
 
 
         // check if version entry in IDB exists
-        const idb = new IndexedDBManager('octra');
+        const idb = new IndexedDBManager(dbname);
         this.subscrmanager.add(idb.open().subscribe(
           (result) => {
             // database opened

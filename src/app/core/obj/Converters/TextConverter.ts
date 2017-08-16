@@ -1,4 +1,4 @@
-import {Converter, File} from './Converter';
+import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../Annotation/AnnotJSON';
 import {isNullOrUndefined} from 'util';
 
@@ -16,7 +16,7 @@ export class TextConverter extends Converter {
     this._encoding = 'UTF-8';
   }
 
-  public export(annotation: OAnnotJSON, audiofile: OAudiofile): File {
+  public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult {
     let result = '';
     let filename = '';
 
@@ -38,29 +38,38 @@ export class TextConverter extends Converter {
     }
 
     return {
-      name: filename,
-      content: result,
-      encoding: 'UTF-8',
-      type: 'text/plain'
+      file: {
+        name: filename,
+        content: result,
+        encoding: 'UTF-8',
+        type: 'text/plain'
+      }
     };
   };
 
-  public import(file: File, audiofile: OAudiofile) {
-    const result = new OAnnotJSON(audiofile.name, audiofile.samplerate);
+  public import(file: IFile, audiofile: OAudiofile): ImportResult {
+    if (audiofile !== null && audiofile !== undefined) {
+      const result = new OAnnotJSON(audiofile.name, audiofile.samplerate);
 
-    const content = file.content;
-    const olevel = new OLevel('Orthographic', 'SEGMENT');
-    const samplerate = audiofile.samplerate;
+      const content = file.content;
+      const olevel = new OLevel('Tier 1', 'SEGMENT');
+      const samplerate = audiofile.samplerate;
 
-    const olabels: OLabel[] = [];
-    olabels.push((new OLabel('Orthographic', file.content)));
-    const osegment = new OSegment(
-      1, 0, Math.round(audiofile.duration * samplerate), olabels
-    );
+      const olabels: OLabel[] = [];
+      olabels.push((new OLabel('Tier 1', file.content)));
+      const osegment = new OSegment(
+        1, 0, Math.round(audiofile.duration * samplerate), olabels
+      );
 
-    olevel.items.push(osegment);
-    result.levels.push(olevel);
+      olevel.items.push(osegment);
+      result.levels.push(olevel);
 
-    return result;
+      return {
+        annotjson: result,
+        audiofile: null
+      };
+    }
+
+    return null;
   };
 }

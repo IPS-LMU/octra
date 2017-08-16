@@ -53,6 +53,7 @@ export class TranscriptionComponent implements OnInit,
   get currentEditor(): ComponentRef<Component> {
     return this._currentEditor;
   }
+
   private subscrmanager: SubscriptionManager;
 
   @ViewChild('modal_shortcuts') modal_shortcuts: ModalComponent;
@@ -229,8 +230,9 @@ export class TranscriptionComponent implements OnInit,
     }
 
     this.subscrmanager.add(this.transcrService.levelchanged.subscribe(
-      () => {
-        console.log('levelchanged');
+      (level) => {
+        console.log('levelchanged ' + level);
+
         (<any> this.currentEditor.instance).update();
       }
     ));

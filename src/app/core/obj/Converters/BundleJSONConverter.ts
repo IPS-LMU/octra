@@ -86,8 +86,6 @@ export class BundleJSONConverter extends Converter {
         };
       }
     }
-
-    console.log('FALSE');
     return null;
   };
 }

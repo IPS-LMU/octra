@@ -130,3 +130,7 @@
 .row.level-row div {
     color: black;
 }
+
+#export-table a {
+    cursor: pointer;
+}

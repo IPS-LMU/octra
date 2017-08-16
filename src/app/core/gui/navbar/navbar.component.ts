@@ -39,6 +39,11 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   };
   collapsed = true;
 
+  public preparing = {
+    name: '',
+    preparing: false
+  };
+
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
   public get converters(): any[] {
@@ -160,23 +165,44 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   updateParentFormat(converter: Converter) {
-    const oannotjson = this.navbarServ.transcrService.annotation.getObj();
-    const result: IFile = converter.export(oannotjson, this.navbarServ.transcrService.audiofile).file;
-    this.parentformat.download = result.name;
+    if (!this.preparing.preparing) {
+      const oannotjson = this.navbarServ.transcrService.annotation.getObj();
+      this.preparing = {
+        name: converter.name,
+        preparing: true
+      };
+      setTimeout(() => {
+        if (converter.name === 'Bundle') {
+          // only this converter needs an array buffer
+          this.navbarServ.transcrService.audiofile.arraybuffer = this.transcrServ.audiomanager.ressource.arraybuffer;
+        }
 
-    window.URL = (((<any> window).URL) ||
-      ((<any> window).webkitURL) || false);
+        const result: IFile = converter.export(oannotjson, this.navbarServ.transcrService.audiofile).file;
+        this.parentformat.download = result.name;
 
-    if (this.parentformat.uri !== null) {
-      window.URL.revokeObjectURL(this.parentformat.uri.toString());
+        window.URL = (((<any> window).URL) ||
+          ((<any> window).webkitURL) || false);
+
+        if (this.parentformat.uri !== null) {
+          window.URL.revokeObjectURL(this.parentformat.uri.toString());
+        }
+        const test = new File([result.content], result.name);
+        const urlobj = window.URL.createObjectURL(test);
+        this.parentformat.uri = this.sanitize(urlobj);
+        this.preparing = {
+          name: converter.name,
+          preparing: false
+        };
+      }, 300);
     }
-    const test = new File([result.content], result.name);
-    const urlobj = window.URL.createObjectURL(test);
-    this.parentformat.uri = this.sanitize(urlobj);
   }
 
   getAudioURI() {
     if (!isNullOrUndefined(this.transcrServ) && !isNullOrUndefined(this.transcrServ.audiomanager.ressource.arraybuffer)) {
+      this.preparing = {
+        name: 'Audio',
+        preparing: true
+      };
       this.parentformat.download = this.transcrServ.audiomanager.ressource.name + this.transcrServ.audiomanager.ressource.extension;
 
       window.URL = (((<any> window).URL) ||
@@ -188,6 +214,10 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
       const test = new File([this.transcrServ.audiomanager.ressource.arraybuffer], this.parentformat.download);
       const urlobj = window.URL.createObjectURL(test);
       this.parentformat.uri = this.sanitize(urlobj);
+      this.preparing = {
+        name: 'Audio',
+        preparing: false
+      };
     } else {
       console.error('can\'t get audio file');
     }

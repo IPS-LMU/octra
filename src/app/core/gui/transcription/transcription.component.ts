@@ -75,6 +75,7 @@ export class TranscriptionComponent implements OnInit,
   public editorloaded = false;
   public feedback_data = {};
 
+  private level_subscription_id: number = 0;
   public feedback_expanded = false;
 
   get loaded(): boolean {
@@ -222,10 +223,12 @@ export class TranscriptionComponent implements OnInit,
     }
 
     if (!isNullOrUndefined(this.transcrService.annotation)) {
-      this.subscrmanager.add(this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments));
+      this.level_subscription_id = this.subscrmanager.add(
+        this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
+      );
     } else {
       this.subscrmanager.add(this.transcrService.dataloaded.subscribe(() => {
-        this.subscrmanager.add(
+        this.level_subscription_id = this.subscrmanager.add(
           this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
         );
       }));
@@ -233,9 +236,13 @@ export class TranscriptionComponent implements OnInit,
 
     this.subscrmanager.add(this.transcrService.levelchanged.subscribe(
       (level) => {
-        console.log('levelchanged ' + level);
-
         (<any> this.currentEditor.instance).update();
+
+        // important: subscribe to level changes in order to save proceedings
+        this.subscrmanager.remove(this.level_subscription_id);
+        this.level_subscription_id = this.subscrmanager.add(
+          this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
+        );
       }
     ));
   }

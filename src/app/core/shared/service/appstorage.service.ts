@@ -2,7 +2,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {LocalStorageService, SessionStorage, SessionStorageService} from 'ng2-webstorage';
 import {SessionFile} from '../../obj/SessionFile';
 import {isNullOrUndefined} from 'util';
-import {OLevel} from '../../obj/Annotation/AnnotJSON';
+import {OLevel, OLink} from '../../obj/Annotation/AnnotJSON';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {AppInfo} from '../../../app.info';
 import {IndexedDBManager} from '../../obj/IndexedDBManager';
@@ -11,6 +11,11 @@ export interface IIDBLevel {
   id: number,
   level: OLevel,
   sortorder: number
+}
+
+export interface IIDBLink {
+  id: number,
+  link: OLink,
 }
 
 export class OIDBLevel {
@@ -25,8 +30,22 @@ export class OIDBLevel {
   }
 }
 
+export class OIDBLink {
+  id: number;
+  link: OLink;
+
+  constructor(id: number, link: OLink) {
+    this.id = id;
+    this.link = link;
+  }
+}
+
 @Injectable()
 export class AppStorageService {
+  get annotation_links(): OIDBLink[] {
+    return this._annotation_links;
+  }
+
   get levelcounter(): number {
     return this._levelcounter;
   }
@@ -263,6 +282,7 @@ export class AppStorageService {
   private _easymode = false;
   private _comment = '';
   private _annotation: OIDBLevel[] = null;
+  private _annotation_links: OIDBLink[] = null;
 
   // is user on the login page?
   private login: boolean;
@@ -569,7 +589,7 @@ export class AppStorageService {
         this._logs = logs;
       });
     }).then(() => {
-      idb.getAll('annotation', 'id').then((levels: any[]) => {
+      idb.getAll('annotation_levels', 'id').then((levels: any[]) => {
         this._annotation = [];
         let max = 0;
         for (let i = 0; i < levels.length; i++) {
@@ -589,6 +609,19 @@ export class AppStorageService {
         }
         this._levelcounter = max;
         console.log('max = ' + max);
+      });
+    }).then(() => {
+      idb.getAll('annotation_links', 'id').then((links: IIDBLink[]) => {
+        this._annotation_links = [];
+        for (let i = 0; i < links.length; i++) {
+          if (!links[i].hasOwnProperty('id')) {
+            this._annotation_links.push(
+              new OIDBLink(i + 1, links[i].link)
+            );
+          } else {
+            this._annotation_links.push(links[i]);
+          }
+        }
       });
     }).then(
       () => {
@@ -635,7 +668,10 @@ export class AppStorageService {
 
   public clearAnnotationData(): Promise<void> {
     this._annotation = null;
-    return this.clearIDBTable('annotation');
+    return this.clearIDBTable('annotation_levels').then(
+      () => {
+        return this.clearIDBTable('annotation_links');
+      });
   }
 
   public changeAnnotationLevel(tiernum: number, level: OLevel): Promise<void> {
@@ -644,7 +680,8 @@ export class AppStorageService {
         const id = this._annotation[tiernum].id;
 
         this._annotation[tiernum].level = level;
-        return this.idb.save('annotation', id, this._annotation[tiernum]);
+        console.log('save annotation level');
+        return this.idb.save('annotation_levels', id, this._annotation[tiernum]);
       } else {
         return new Promise((resolve, reject) => {
           reject(new Error('number of level that should be changed is invalid'));
@@ -664,7 +701,7 @@ export class AppStorageService {
         level: level,
         sortorder: this._annotation.length
       });
-      return this.idb.save('annotation', this._levelcounter, {
+      return this.idb.save('annotation_levels', this._levelcounter, {
         id: this._levelcounter,
         level: level
       });
@@ -677,7 +714,7 @@ export class AppStorageService {
 
   public removeAnnotationLevel(num: number, id: number): Promise<void> {
     if (!isNullOrUndefined(name) && num < this._annotation.length) {
-      return this.idb.remove('annotation', id).then(
+      return this.idb.remove('annotation_levels', id).then(
         () => {
           this._annotation.splice(num, 1);
           console.log(this._annotation);
@@ -699,18 +736,31 @@ export class AppStorageService {
       }).catch((err) => {
         console.error(err);
       }).then(() => {
-        return this._idb.saveArraySequential(value, 'annotation', 'id').then(
+        return this._idb.saveArraySequential(value, 'annotation_levels', 'id').then(
           () => {
             let max = 0;
 
             for (let i = 0; i < value.length; i++) {
               max = Math.max(max, value[i].id);
             }
+            this._levelcounter = max;
           }
         );
       });
   };
 
+  public overwriteLinks = (value: OIDBLink[]): Promise<void> => {
+    console.log('overwrite links');
+    console.log(value);
+    return this.clearIDBTable('annotation_links')
+      .then(() => {
+        this._annotation_links = value;
+      }).catch((err) => {
+        console.error(err);
+      }).then(() => {
+        return this._idb.saveArraySequential(value, 'annotation_links', 'id');
+      });
+  };
 
   public clearLoggingData(): Promise<void> {
     this._logs = null;

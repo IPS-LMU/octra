@@ -1,4 +1,4 @@
-import {AnnotJSONType, OLevel} from './AnnotJSON';
+import {AnnotJSONType, ISegment, OEvent, OItem, OLevel} from './AnnotJSON';
 import {isNullOrUndefined} from 'util';
 import {Segments} from './Segments';
 import {OIDBLevel} from '../../shared/service/appstorage.service';
@@ -20,12 +20,28 @@ export class Level {
 
   private _name: string;
   public segments: Segments;
+  public items: OItem[];
+  public events: OEvent[];
   private type: AnnotJSONType;
   private _id: number;
 
   public static fromObj(entry: OIDBLevel, samplerate: number, last_sample: number): Level {
-    const segments: Segments = new Segments(samplerate, entry.level.items, last_sample);
+    let segments: Segments = null;
+    let events = [];
+    let items = [];
+
+    if (entry.level.type === 'SEGMENT') {
+      const segment_entries: ISegment[] = <ISegment[]> entry.level.items;
+      segments = new Segments(samplerate, segment_entries, last_sample);
+    } else if (entry.level.type === 'ITEM') {
+      items = entry.level.items;
+    } else if (entry.level.type === 'EVENT') {
+      events = entry.level.items;
+    }
+
     const result = new Level(entry.id, entry.level.name, entry.level.type, segments);
+    result.items = items;
+    result.events = events;
 
     return result;
   }
@@ -51,7 +67,14 @@ export class Level {
   }
 
   public getObj(): OLevel {
-    const result: OLevel = new OLevel(this._name, this.getTypeString(), this.segments.getObj(this._name));
+    let result: OLevel = null;
+    if (this.type === AnnotJSONType.SEGMENT) {
+      result = new OLevel(this._name, this.getTypeString(), this.segments.getObj(this._name));
+    } else if (this.type === AnnotJSONType.ITEM) {
+      result = new OLevel(this._name, this.getTypeString(), this.items);
+    } else if (this.type === AnnotJSONType.EVENT) {
+      result = new OLevel(this._name, this.getTypeString(), this.events);
+    }
     this.type.toString();
     return result;
   }

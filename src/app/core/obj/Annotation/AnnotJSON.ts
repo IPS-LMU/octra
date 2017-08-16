@@ -11,17 +11,24 @@ export interface IAnnotJSON {
 export interface ILevel {
   name: string;
   type: string;
-  items: ISegment[];
+  items: IItem[];
 }
 
 export interface IItem {
   id: number;
+  sampleStart?: number;
+  sampleDur?: number;
+  samplePoint?: number;
   labels: ILabel[];
 }
 
 export interface ISegment extends IItem {
   sampleStart: number;
   sampleDur: number;
+}
+
+export interface IEvent extends IItem {
+  samplePoint: number;
 }
 
 export interface ILabel {
@@ -39,8 +46,6 @@ export interface IAudioFile {
   size: number;
   duration: number;
   samplerate: number;
-  /*channels: number;
-   bit_rate: number;*/
 }
 
 /*
@@ -89,9 +94,9 @@ export class OAudiofile implements IAudioFile {
 export class OLevel implements ILevel {
   name = '';
   type = '';
-  items: ISegment[];
+  items: IItem[];
 
-  constructor(name: string, type: string, items?: ISegment[]) {
+  constructor(name: string, type: string, items?: IItem[]) {
     this.name = name;
     this.type = type;
     this.items = [];
@@ -124,6 +129,15 @@ export class OSegment extends OItem {
     super(id, labels);
     this.sampleStart = sampleStart;
     this.sampleDur = sampleDur;
+  }
+}
+
+export class OEvent extends OItem {
+  samplePoint
+
+  constructor(id: number, samplePoint: number, labels?: ILabel[]) {
+    super(id, labels);
+    this.samplePoint = samplePoint;
   }
 }
 

@@ -55,7 +55,8 @@ export class UpdateManager {
                 if (version === 1) {
                   const optionsStore = idbm.db.createObjectStore('options', {keyPath: 'name'});
                   const logsStore = idbm.db.createObjectStore('logs', {keyPath: 'timestamp'});
-                  const annoStore = idbm.db.createObjectStore('annotation', {keyPath: 'id'});
+                  const annoLevelsStore = idbm.db.createObjectStore('annotation_levels', {keyPath: 'id'});
+                  const annoLinksStore = idbm.db.createObjectStore('annotation_links', {keyPath: 'id'});
 
                   // options for version 1
                   idbm.saveSequential(optionsStore, [
@@ -125,7 +126,7 @@ export class UpdateManager {
                           new_levels.push(new OIDBLevel(i + 1, levels[i], i));
                         }
 
-                        idbm.saveArraySequential(new_levels, annoStore, 'id').then(() => {
+                        idbm.saveArraySequential(new_levels, annoLevelsStore, 'id').then(() => {
                           console.log(`converted annotation levels to IDB`);
 
                           version++;

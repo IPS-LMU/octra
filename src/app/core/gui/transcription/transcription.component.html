@@ -30,7 +30,7 @@
         <app-transcr-overview *ngIf="transcrService.annotation !== null"
                               [visible]="modal_overview.visible"
                               [segments]="(transcrService.annotation !== null && transcrService.annotation !== undefined)
-                              ? transcrService.annotation.levels[0].segments.segments: null"
+                              ? transcrService.annotation.levels[transcrService.selectedlevel].segments.segments: null"
                               (segmentclicked)="onSegmentInOverviewClicked($event)">
         </app-transcr-overview>
     </modal-body>

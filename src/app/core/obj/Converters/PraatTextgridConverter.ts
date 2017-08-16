@@ -22,6 +22,13 @@ export class PraatTextgridConverter extends Converter {
     let filename = '';
     const dur_seconds = (audiofile.duration / audiofile.samplerate);
 
+    let seg_levels = 0;
+
+    for (let i = 0; i < annotation.levels.length; i++) {
+      if (annotation.levels[i].type === 'SEGMENT') {
+        seg_levels++;
+      }
+    }
     const addHeader = (res: string) => {
       return res + `File type = "ooTextFile"\n` +
         `Object class = "TextGrid"\n` +
@@ -29,7 +36,7 @@ export class PraatTextgridConverter extends Converter {
         `xmin = 0\n` +
         `xmax = ${dur_seconds}\n` +
         `tiers? <exists>\n` +
-        `size = ${annotation.levels.length}\n`;
+        `size = ${seg_levels}\n`;
     };
 
     const addEntry = (res: string, level: ILevel, segment: ISegment) => {
@@ -48,23 +55,25 @@ export class PraatTextgridConverter extends Converter {
       for (let i = 0; i < annotation.levels.length; i++) {
         const level = annotation.levels[i];
 
-        result += `    item [1]:\n` +
-          `        class = "IntervalTier" \n` +
-          `        name = "Orthographic" \n` +
-          `        xmin = 0 \n` +
-          `        xmax = ${dur_seconds} \n` +
-          `        intervals: size = ${level.items.length} \n`;
+        if (level.type === 'SEGMENT') {
+          result += `    item [${i + 1}]:\n` +
+            `        class = "IntervalTier" \n` +
+            `        name = "${level.name}" \n` +
+            `        xmin = 0 \n` +
+            `        xmax = ${dur_seconds} \n` +
+            `        intervals: size = ${level.items.length} \n`;
 
-        for (let j = 0; j < level.items.length; j++) {
-          const segment = level.items[j];
+          for (let j = 0; j < level.items.length; j++) {
+            const segment = level.items[j];
 
-          const seconds_start = segment.sampleStart / audiofile.samplerate;
-          const seconds_end = (segment.sampleStart + segment.sampleDur) / audiofile.samplerate;
+            const seconds_start = segment.sampleStart / audiofile.samplerate;
+            const seconds_end = (segment.sampleStart + segment.sampleDur) / audiofile.samplerate;
 
-          result += `        intervals [${j + 1}]:\n` +
-            `            xmin = ${seconds_start} \n` +
-            `            xmax = ${seconds_end} \n` +
-            `            text = "${segment.labels[0].value}" \n`;
+            result += `        intervals [${j + 1}]:\n` +
+              `            xmin = ${seconds_start} \n` +
+              `            xmax = ${seconds_end} \n` +
+              `            text = "${segment.labels[0].value}" \n`;
+          }
         }
       }
 

@@ -24,11 +24,14 @@ export class TextConverter extends Converter {
       for (let i = 0; i < annotation.levels.length; i++) {
         const level: OLevel = annotation.levels[i];
 
-        for (let j = 0; j < level.items.length; j++) {
-          const transcript = level.items[j].labels[0].value;
-          result += transcript;
-          if (i < transcript.length - 1) {
-            result += ' ';
+        if (level.type === 'SEGMENT') {
+          result += `LEVEL ${level.name}:\n-------\n\n`;
+          for (let j = 0; j < level.items.length; j++) {
+            const transcript = level.items[j].labels[0].value;
+            result += transcript;
+            if (i < transcript.length - 1) {
+              result += ' ';
+            }
           }
         }
       }

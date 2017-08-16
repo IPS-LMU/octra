@@ -72,18 +72,22 @@ export class BundleJSONConverter extends Converter {
       const buffer = Functions.base64ToArrayBuffer(data);
 
       const audio_result: OAudiofile = new OAudiofile();
-      audio_result.name = annotation.name + '.wav';
-      audio_result.size = buffer.byteLength;
-      audio_result.samplerate = annotation.sampleRate;
-      audio_result.arraybuffer = buffer;
+      audio_result.name = annotation.name + annotation.annotates.substr(annotation.annotates.lastIndexOf('.'));
+
+      if (Functions.contains(audio_result.name, '.wav') || Functions.contains(audio_result.name, '.ogg')) {
+        audio_result.size = buffer.byteLength;
+        audio_result.samplerate = annotation.sampleRate;
+        audio_result.arraybuffer = buffer;
 
 
-      return {
-        annotjson: new OAnnotJSON(annotation.name, annotation.sampleRate, annotation.levels, annotation.links),
-        audiofile: audio_result
-      };
+        return {
+          annotjson: new OAnnotJSON(annotation.name, annotation.sampleRate, annotation.levels, annotation.links),
+          audiofile: audio_result
+        };
+      }
     }
 
+    console.log('FALSE');
     return null;
   };
 }

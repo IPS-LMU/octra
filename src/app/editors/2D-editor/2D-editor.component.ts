@@ -32,6 +32,8 @@ import {TranscrWindowComponent} from './transcr-window/transcr-window.component'
 import {PlayBackState} from '../../core/obj/media/index';
 import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
+import {TranscrEditorComponent} from '../../core/component/transcr-editor/transcr-editor.component';
+import {isNullOrUndefined} from 'util';
 
 @Component({
   selector: 'app-overlay-gui',
@@ -48,6 +50,13 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   @ViewChild('loupe') loupe: CircleLoupeComponent;
   @ViewChild('audionav') audionav: AudioNavigationComponent;
   @ViewChild('audionav') nav: ElementRef;
+
+  public get editor(): TranscrEditorComponent {
+    if (isNullOrUndefined(this.window)) {
+      return null;
+    }
+    return this.window.editor;
+  }
 
   public showWindow = false;
   private subscrmanager: SubscriptionManager;
@@ -196,6 +205,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   onSegmentEntered(selected: any) {
+    console.log(selected);
     if (this.transcrService.currentlevel.segments && selected.index > -1 &&
       selected.index < this.transcrService.currentlevel.segments.length) {
       const segment = this.transcrService.currentlevel.segments.get(selected.index);
@@ -204,12 +214,12 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       if (segment) {
         this.selected_index = selected.index;
         this.audiochunk_window = new AudioChunk(new AudioSelection(start, segment.time.clone()), this.audiomanager);
+
+        this.viewer.deactivate_shortcuts = true;
+        this.viewer.focused = false;
+        this.showWindow = true;
       }
     }
-
-    this.viewer.deactivate_shortcuts = true;
-    this.viewer.focused = false;
-    this.showWindow = true;
   }
 
   onWindowAction(state) {
@@ -284,13 +294,14 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       $event.value === null || !(
         // cursor move by keyboard events are note saved because this would be too much
         Functions.contains($event.value, 'cursor') ||
-        // disable logging for user test phase, because it would be too much
-        Functions.contains($event.value, 'play_selection') ||
         Functions.contains($event.value, 'segment_enter') ||
         Functions.contains($event.value, 'playonhover')
       )
     ) {
-      this.uiService.addElementFromEvent('shortcut', $event, Date.now(), type);
+      $event.value = `${$event.type}:${$event.value}`;
+      const caretpos = (!isNullOrUndefined(this.editor)) ? this.editor.caretpos : -1;
+      this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
+        this.audiomanager.playposition, caretpos, 'multi-lines-viewer');
     } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
       this.sessService.playonhover = !this.sessService.playonhover;
     }
@@ -298,13 +309,31 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
   onMarkerInsert(marker_code: string) {
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('marker_insert', {value: marker_code}, Date.now(), 'editor');
+      const caretpos = (!isNullOrUndefined(this.editor)) ? this.editor.caretpos : -1;
+      const segment = {
+        start: -1,
+        length: -1,
+        textlength: -1
+      };
+
+      if (!isNullOrUndefined(this.editor) && this.editor.caretpos > -1) {
+        const end = (this.selected_index < this.transcrService.currentlevel.segments.length - 1) ?
+          this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.samples :
+          this.transcrService.currentlevel.segments.get(this.selected_index).time.samples;
+        segment.start = end - this.transcrService.currentlevel.segments.get(this.selected_index).time.samples;
+        segment.length = this.transcrService.currentlevel.items[this.selected_index].labels[0].value.length;
+        segment.textlength = this.editor.rawText.length;
+      }
+      this.uiService.addElementFromEvent('shortcut', {value: marker_code},
+        Date.now(), this.audiomanager.playposition, caretpos, 'texteditor:markers');
     }
   }
 
   onMarkerClick(marker_code: string) {
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('marker_click', {value: marker_code}, Date.now(), 'editor');
+      const caretpos = (!isNullOrUndefined(this.editor)) ? this.editor.caretpos : -1;
+      this.uiService.addElementFromEvent('mouseclick', {value: marker_code},
+        Date.now(), this.audiomanager.playposition, caretpos, 'texteditor:toolbar');
     }
   }
 
@@ -314,7 +343,9 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('slider', event, event.timestamp, 'speed_change');
+      const caretpos = (!isNullOrUndefined(this.editor)) ? this.editor.caretpos : -1;
+      this.uiService.addElementFromEvent('slider', event, event.timestamp,
+        this.audiomanager.playposition, caretpos, 'audio_speed');
     }
   }
 
@@ -324,13 +355,17 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('slider', event, event.timestamp, 'volume_change');
+      const caretpos = (!isNullOrUndefined(this.editor)) ? this.editor.caretpos : -1;
+      this.uiService.addElementFromEvent('slider', event, event.timestamp,
+        this.audiomanager.playposition, caretpos, 'audio_volume');
     }
   }
 
   onButtonClick(event: { type: string, timestamp: number }) {
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('mouse_click', {}, event.timestamp, event.type + '_button');
+      const caretpos = (!isNullOrUndefined(this.editor)) ? this.editor.caretpos : -1;
+      this.uiService.addElementFromEvent('mouseclick', {value: 'click:' + event.type},
+        event.timestamp, this.audiomanager.playposition, caretpos, 'audio_buttons');
     }
 
     switch (event.type) {
@@ -358,33 +393,11 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   public openSegment(segnumber: number) {
-    const segment = this.transcrService.currentlevel.segments.get(segnumber);
-    this.selectSegment({
-      index: segnumber,
-      pos: segment.time.samples
-    });
+    this.onSegmentEntered({index: segnumber});
   }
 
   public update() {
     this.viewer.update();
     this.audiochunk_lines.startpos = this.audiochunk_lines.time.start;
-  }
-
-  public selectSegment(selected: any) {
-    const segment = this.transcrService.currentlevel.segments.get(selected.index);
-    if (this.transcrService.currentlevel.segments && selected.index > -1 &&
-      selected.index < this.transcrService.currentlevel.segments.length) {
-      if (segment) {
-        const start = (selected.index > 0) ? this.transcrService.currentlevel.segments.get(selected.index - 1).time
-          : new AudioTime(0, this.audiomanager.ressource.info.samplerate);
-        const end = start.clone();
-        end.samples = start.samples + segment.time.samples;
-        this.audiochunk_window = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
-        this.selected_index = selected.index;
-      }
-    }
-    this.viewer.deactivate_shortcuts = true;
-    this.viewer.focused = false;
-    this.showWindow = true;
   }
 }

@@ -356,7 +356,6 @@ export class AppStorageService {
   }
 
   public clearSession(): boolean {
-    console.log('clear Session');
     this.logged_in = false;
     this.login = false;
 
@@ -368,7 +367,6 @@ export class AppStorageService {
 
   public clearLocalStorage(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      console.log('clear Local Storage');
       this.logged_in = false;
       this.login = false;
 
@@ -444,15 +442,12 @@ export class AppStorageService {
     file: File,
     checked_converters: number
   }[], keep_data: boolean, navigate: () => void, err: (error: string) => void) => {
-    console.log('beginLocal');
     if (!isNullOrUndefined(files)) {
       // get audio file
       let audiofile;
       for (let i = 0; i < files.length; i++) {
         if (AudioManager.isValidFileName(files[i].file.name, AppInfo.audioformats)) {
           audiofile = files[i].file;
-          console.log(audiofile);
-          console.log('audiofile found');
           break;
         }
       }
@@ -473,7 +468,6 @@ export class AppStorageService {
         if (!keep_data || (!isNullOrUndefined(this._user) &&
             !isNullOrUndefined(this._user.id) && this._user.id !== '-1' && this._user.id !== '')) {
           // last was online mode
-          console.log('clear 1');
           this.clearSession();
           this.clearLocalStorage().then(() => {
             process();
@@ -488,7 +482,6 @@ export class AppStorageService {
   };
 
   public endSession(offline: boolean, navigate: () => void) {
-    console.log('clear 2');
     this.clearSession();
     navigate();
   }
@@ -608,7 +601,6 @@ export class AppStorageService {
           }
         }
         this._levelcounter = max;
-        console.log('max = ' + max);
       });
     }).then(() => {
       idb.getAll('annotation_links', 'id').then((links: IIDBLink[]) => {
@@ -625,7 +617,6 @@ export class AppStorageService {
       });
     }).then(
       () => {
-        console.log('ALL LOADED');
         this._loaded.complete();
       }
     );
@@ -680,7 +671,6 @@ export class AppStorageService {
         const id = this._annotation[tiernum].id;
 
         this._annotation[tiernum].level = level;
-        console.log('save annotation level');
         return this.idb.save('annotation_levels', id, this._annotation[tiernum]);
       } else {
         return new Promise((resolve, reject) => {
@@ -717,7 +707,6 @@ export class AppStorageService {
       return this.idb.remove('annotation_levels', id).then(
         () => {
           this._annotation.splice(num, 1);
-          console.log(this._annotation);
         }
       );
     } else {
@@ -728,8 +717,6 @@ export class AppStorageService {
   }
 
   public overwriteAnnotation = (value: OIDBLevel[]): Promise<void> => {
-    console.log('overwrite');
-    console.log(value);
     return this.clearAnnotationData()
       .then(() => {
         this._annotation = value;
@@ -750,8 +737,6 @@ export class AppStorageService {
   };
 
   public overwriteLinks = (value: OIDBLink[]): Promise<void> => {
-    console.log('overwrite links');
-    console.log(value);
     return this.clearIDBTable('annotation_links')
       .then(() => {
         this._annotation_links = value;

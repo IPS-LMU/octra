@@ -91,8 +91,7 @@ export class BugReportService {
             description: description
           };
 
-          const reporter = new MantisBugReporter();
-          return reporter.sendBugReport(this.http, this.getPackage(), form, url, auth_token, sendbugreport);
+          return bugreporter.sendBugReport(this.http, this.getPackage(), form, url, auth_token, sendbugreport);
         }
       }
     }

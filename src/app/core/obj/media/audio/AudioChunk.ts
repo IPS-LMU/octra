@@ -154,6 +154,7 @@ export class AudioChunk {
         this._state = PlayBackState.STARTED;
 
         this._lastplayedpos = this.playposition.clone();
+        this.audiomanager.playposition = this._lastplayedpos.samples;
 
         this.setState(PlayBackState.PLAYING);
 
@@ -236,6 +237,8 @@ export class AudioChunk {
       } else if (this.state === PlayBackState.ENDED) {
         this._playposition = this.selection.end.clone();
       }
+
+      this.audiomanager.playposition = this._playposition.samples;
     }
   };
 

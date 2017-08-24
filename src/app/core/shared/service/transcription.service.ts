@@ -5,9 +5,9 @@ import {AudioService} from './audio.service';
 import {AppStorageService, OIDBLevel} from './appstorage.service';
 import {Functions} from '../Functions';
 import {UserInteractionsService} from './userInteractions.service';
-import {StatisticElem} from '../../obj/StatisticElement';
-import {MouseStatisticElem} from '../../obj/MouseStatisticElem';
-import {KeyStatisticElem} from '../../obj/KeyStatisticElem';
+import {StatisticElem} from '../../obj/statistics/StatisticElement';
+import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
+import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {NavbarService} from '../../gui/navbar/navbar.service';
 import {SubscriptionManager} from '../';
 import {SettingsService} from './settings.service';
@@ -21,6 +21,7 @@ import {TextConverter} from '../../obj/Converters/TextConverter';
 import {AnnotJSONConverter} from '../../obj/Converters/AnnotJSONConverter';
 import {Level} from '../../obj/Annotation/Level';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
+import {OLog, OLogging} from '../../obj/Settings/logging';
 
 @Injectable()
 export class TranscriptionService {
@@ -51,7 +52,7 @@ export class TranscriptionService {
 
   private _audiomanager: AudioManager;
 
-  public levelchanged: EventEmitter<number> = new EventEmitter<number>();
+  public levelchanged: EventEmitter<Level> = new EventEmitter<Level>();
 
   get selectedlevel(): number {
     return this._selectedlevel;
@@ -64,7 +65,7 @@ export class TranscriptionService {
       this._selectedlevel = this.getSegmentFirstLevel();
     }
 
-    this.levelchanged.emit(this._selectedlevel);
+    this.levelchanged.emit(this._annotation.levels[this._selectedlevel]);
   }
 
   public getSegmentFirstLevel(): number {
@@ -183,7 +184,6 @@ export class TranscriptionService {
       this._audiofile.duration = this._audiomanager.ressource.info.duration.samples;
 
       this.last_sample = this._audiomanager.ressource.info.duration.samples;
-      console.log(this._audiomanager.ressource.info.duration.seconds);
       this.loadSegments(this._audiomanager.ressource.info.samplerate).then(
         () => {
           this.selectedlevel = 0;
@@ -222,7 +222,6 @@ export class TranscriptionService {
           this._annotation = new Annotation(annotates, this._audiofile);
 
           if (!isNullOrUndefined(this.sessServ.annotation)) {
-            console.log(this.sessServ.annotation);
             for (let i = 0; i < this.sessServ.annotation.length; i++) {
               const level: Level = Level.fromObj(this.sessServ.annotation[i],
                 this._audiomanager.ressource.info.samplerate, this._audiomanager.ressource.info.duration.samples);
@@ -232,8 +231,6 @@ export class TranscriptionService {
             for (let i = 0; i < this.sessServ.annotation_links.length; i++) {
               this._annotation.links.push(this.sessServ.annotation_links[i].link);
             }
-            console.log('LINKS:');
-            console.log(this._annotation.links);
 
 
             this._feedback = FeedBackForm.fromAny(this.settingsService.projectsettings.feedback_form, this.sessServ.comment);
@@ -261,7 +258,6 @@ export class TranscriptionService {
         };
 
         if (isNullOrUndefined(this.sessServ.annotation) || this.sessServ.annotation.length === 0) {
-          console.log('oanno not null 5');
           const new_levels = [];
           const levels = this.createNewAnnotation().levels;
           for (let i = 0; i < levels.length; i++) {
@@ -308,7 +304,7 @@ export class TranscriptionService {
     let data: any = {};
 
     if (!isNullOrUndefined(this.annotation)) {
-      const log_data: any[] = this.extractUI(this.uiService.elements);
+      const log_data: OLogging = this.extractUI(this.uiService.elements);
 
       data = {
         project: (isNullOrUndefined(this.sessServ.user.project)) ? 'NOT AVAILABLE' : this.sessServ.user.project,
@@ -386,34 +382,41 @@ export class TranscriptionService {
     this.uiService.elements = [];
   }
 
-  private extractUI(ui_elements: StatisticElem[]): any[] {
-    const result: any[] = [];
+  public extractUI(ui_elements: StatisticElem[]): OLogging {
+    const now = new Date();
+    const result: OLogging = new OLogging(
+      '1.0',
+      'UTF-8',
+      (isNullOrUndefined(this.sessServ.user.project) || this.sessServ.user.project === '') ? 'local' : this.sessServ.user.project,
+      now.toUTCString(),
+      this._annotation.audiofile.name,
+      this._annotation.audiofile.samplerate,
+      this._annotation.audiofile.duration,
+      []
+    );
 
     if (ui_elements) {
       for (let i = 0; i < ui_elements.length; i++) {
         const elem = ui_elements[i];
 
-        const new_elem = {
-          timestamp: elem.timestamp,
-          message: '', // not implemented
-          type: elem.type,
-          targetname: elem.target_name,
-          value: ''
-        };
+        const new_elem = new OLog(
+          elem.timestamp,
+          elem.type,
+          elem.target,
+          '',
+          elem.playerpos,
+          elem.caretpos
+        );
 
         if (elem instanceof MouseStatisticElem) {
           new_elem.value = elem.value;
         } else if (elem instanceof KeyStatisticElem) {
-          new_elem.value = elem.char;
+          new_elem.value = (<KeyStatisticElem> elem).char;
         } else {
-          new_elem.value = elem.value;
+          new_elem.value = (<StatisticElem> elem).value;
         }
 
-        if (new_elem.value === null) {
-          new_elem.value = 'no obj';
-        }
-
-        result.push(new_elem);
+        result.logs.push(new_elem);
       }
     }
 

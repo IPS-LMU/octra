@@ -43,15 +43,10 @@ export class LoadingComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const process = () => {
       if (this.sessionService.uselocalmode && isNullOrUndefined(this.sessionService.file)) {
-        console.log('reload file');
-        this.router.navigate(['/user/transcr/reload-file']);
+                this.router.navigate(['/user/transcr/reload-file']);
       } else {
-        console.log('ERROR');
-        console.log(this.sessionService.uselocalmode);
-        console.log(this.sessionService.file);
-      }
-      console.log('PROCESS');
-      this.settService.loadAudioFile(this.audio);
+                              }
+            this.settService.loadAudioFile(this.audio);
     };
 
     if (!this.sessionService.idbloaded) {
@@ -67,8 +62,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
     }
 
     if (!this.sessionService.LoggedIn) {
-      console.log('not logged in');
-      this.router.navigate(['/login']);
+            this.router.navigate(['/login']);
     }
 
     this.langService.get('general.please wait').subscribe(
@@ -132,8 +126,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
             this.loadedchanged.emit(false);
           } else {
             console.error('audio not loaded');
-            console.log(result);
-            if (this.sessionService.uselocalmode) {
+                        if (this.sessionService.uselocalmode) {
               this.router.navigate(['/user/transcr/reload-file']);
             }
           }
@@ -204,8 +197,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    console.log('go back');
-    this.sessionService.clearSession();
+        this.sessionService.clearSession();
     this.router.navigate(['/login']);
   }
 }

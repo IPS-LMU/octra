@@ -118,9 +118,7 @@ export class PraatTextgridConverter extends Converter {
 
                 const level = '    ';
                 if (lines[i] === level + `item [${lvl_num}]:`) {
-                  console.log('START');
-                  console.log(lines[i]);
-                  i++;
+                                                      i++;
 
                   // get class
                   let class_str = null;
@@ -209,8 +207,7 @@ export class PraatTextgridConverter extends Converter {
             return null;
           }
 
-          console.log(result);
-          return {
+                    return {
             annotjson: result,
             audiofile: null
           };

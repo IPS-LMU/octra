@@ -35,11 +35,19 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Output('marker_click') marker_click: EventEmitter<string> = new EventEmitter<string>();
   @Output('typing') typing: EventEmitter<string> = new EventEmitter<string>();
   @Output('boundaryclicked') boundaryclicked: EventEmitter<number> = new EventEmitter<number>();
+  @Output('boundaryinserted') boundaryinserted: EventEmitter<number> = new EventEmitter<number>();
 
   private _settings: TranscrEditorConfig;
   private subscrmanager: SubscriptionManager;
   private init = 0;
   public focused = false;
+
+  public get caretpos(): number {
+    if (!this.focused) {
+      return -1;
+    }
+    return jQuery('.note-editable.panel-body:eq(0)').caret('pos');
+  }
 
   public segpopover: any = null;
 
@@ -351,7 +359,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         click: () => {
           // invoke insertText method with 'hello' on editor module.
           this.insertMarker(marker.code, marker.icon_url);
-          this.marker_click.emit(marker.code);
+          this.marker_click.emit(marker.name);
           // this.initPopover();
         }
       };
@@ -573,6 +581,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         if (comboKey === 'ALT + S' && this.Settings.special_markers.boundary) {
           // add boundary
           this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
+          this.boundaryinserted.emit(this.audiochunk.playposition.samples);
           $event.preventDefault();
         } else {
           for (let i = 0; i < this.markers.length; i++) {
@@ -580,7 +589,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             if (marker.shortcut[platform] === comboKey) {
               $event.preventDefault();
               this.insertMarker(marker.code, marker.icon_url);
-              this.marker_insert.emit(marker.code);
+              this.marker_insert.emit(marker.name);
               return;
             }
           }

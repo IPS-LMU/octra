@@ -1,9 +1,8 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import 'rxjs/Rx';
-import {StatisticElem} from '../../obj/StatisticElement';
-import {KeyStatisticElem} from '../../obj/KeyStatisticElem';
-import {MouseStatisticElem} from '../../obj/MouseStatisticElem';
-import {KeyMapping} from '../';
+import {StatisticElem} from '../../obj/statistics/StatisticElement';
+import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
+import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
 import {Functions} from '../Functions';
 
 @Injectable()
@@ -28,7 +27,12 @@ export class UserInteractionsService {
    * @param type
    * @param event
    */
-  public addElementFromEvent(type: string, event: any, timestamp: number, target_name?: string) {
+  public addElementFromEvent(type: string, event: any, timestamp: number, playerpos: number, caretpos: number,
+                             target_name?: string, segment?: {
+      start: number,
+      length: number,
+      textlength: number
+    }) {
     let name = '';
     let target: any = null;
 
@@ -47,36 +51,29 @@ export class UserInteractionsService {
     } else {
       name = target_name;
     }
-
+    console.log(target_name);
     let elem = null;
-    if (Functions.contains(type, 'key')) {
+    if (Functions.contains(type, 'key') || Functions.contains(type, 'shortcut')) {
       elem = new KeyStatisticElem(
-        event.type,
-        name,
-        '',
-        timestamp,
-        event.which,
-        event.shiftKey,
-        event.ctrlKey,
-        event.altKey
-      );
-      elem.shortcode = KeyMapping.getShortcutCombination(event);
-    } else if (Functions.contains(type, 'mouse')) {
-      elem = new MouseStatisticElem(
         type,
         name,
-        '',
-        timestamp
+        event.value,
+        timestamp,
+        playerpos,
+        caretpos,
+        segment
       );
+    } else if (Functions.contains(type, 'mouse')) {
+      elem = new MouseStatisticElem(type, name, event.value, timestamp, playerpos, caretpos);
     } else if (Functions.contains(type, 'slider')) {
-      elem = new MouseStatisticElem('mouse_slider', name, event.new_value, timestamp
-      );
+      elem = new MouseStatisticElem(type, name, event.new_value, timestamp, playerpos, caretpos);
     } else {
-      elem = new StatisticElem(type, name, event.value, timestamp
+      elem = new StatisticElem(type, name, event.value, timestamp, playerpos
       );
     }
 
     if (elem) {
+      console.log(JSON.stringify(elem, null, 2));
       this._elements.push(elem);
       this.afteradd.emit(elem);
     }
@@ -118,7 +115,6 @@ export class UserInteractionsService {
       const elem = array[i];
       let new_elem = null;
 
-      new_elem = KeyStatisticElem.fromAny(elem);
       if (new_elem) {
       } else {
         new_elem = MouseStatisticElem.fromAny(elem);

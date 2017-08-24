@@ -396,7 +396,7 @@ export class AudioviewerService extends AudioComponentService {
    * addSegment() adds a boundary to the list of segments or removes the segment
    * @returns {any}
    */
-  public addSegment(): { type: string, seg_num: number, msg: { type: string, text: string } } {
+  public addSegment(): { type: string, seg_samples: number, msg: { type: string, text: string } } {
     let i = 0;
     const line = this.last_line;
     this.audioTCalculator.audio_px_width = this.audio_px_w;
@@ -417,11 +417,12 @@ export class AudioviewerService extends AudioComponentService {
 
             const seg_selected = this.transcrService.currentlevel.segments.get(i);
 
+            const seg_samples = this.transcrService.currentlevel.segments.get(i).time.samples;
             this.transcrService.currentlevel.segments.removeByIndex(i, this.transcrService.break_marker.code);
 
             return {
               type: 'remove',
-              seg_num: i,
+              seg_samples: seg_samples,
               msg: {
                 type: 'success',
                 text: ''
@@ -446,7 +447,7 @@ export class AudioviewerService extends AudioComponentService {
           this.transcrService.currentlevel.segments.add(this.drawnselection.end.samples);
           return {
             type: 'add',
-            seg_num: i,
+            seg_samples: this.drawnselection.start.samples,
             msg: {
               type: 'success',
               text: ''
@@ -455,7 +456,7 @@ export class AudioviewerService extends AudioComponentService {
         } else {
           return {
             type: 'add',
-            seg_num: i,
+            seg_samples: this.drawnselection.start.samples,
             msg: {
               type: 'error',
               text: this.langService.instant('boundary cannot set')
@@ -468,7 +469,7 @@ export class AudioviewerService extends AudioComponentService {
         this.transcrService.currentlevel.segments.add(Math.round(absXTime));
         return {
           type: 'add',
-          seg_num: -1,
+          seg_samples: -1,
           msg: {
             type: 'success',
             text: ''

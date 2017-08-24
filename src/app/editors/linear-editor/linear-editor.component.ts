@@ -45,7 +45,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('miniloupe') miniloupe: CircleLoupeComponent;
   @ViewChild('loupe') loupe: LoupeComponent;
   @ViewChild('nav') nav: AudioNavigationComponent;
-  @ViewChild('transcr') editor: TranscrEditorComponent;
+  @ViewChild('transcr') public editor: TranscrEditorComponent;
 
   private subscrmanager: SubscriptionManager;
   private saving = false;
@@ -188,7 +188,9 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     type: string, timestamp: number
   }) {
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('mouse_click', {}, event.timestamp, event.type + '_button');
+      const caretpos = this.editor.caretpos;
+      this.uiService.addElementFromEvent('mouseclick', {value: event.type},
+        event.timestamp, this.audiomanager.playposition, caretpos, 'audio_buttons');
     }
 
     switch (event.type) {
@@ -319,7 +321,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  onShortCutTriggered($event, type) {
+  onShortCutTriggered($event, control) {
     if (this.projectsettings.logging.forced) {
 
       if (
@@ -327,12 +329,14 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
           // cursor move by keyboard events are note saved because this would be too much
           Functions.contains($event.value, 'cursor') ||
           // disable logging for user test phase, because it would be too much
-          Functions.contains($event.value, 'play_selection') ||
           Functions.contains($event.value, 'segment_enter') ||
           Functions.contains($event.value, 'playonhover')
         )
       ) {
-        this.uiService.addElementFromEvent('shortcut', $event, Date.now(), type);
+        const caretpos = this.editor.caretpos;
+        $event.value = $event.type + ':' + $event.value;
+        this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
+          this.audiomanager.playposition, caretpos, control);
       } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
         this.sessService.playonhover = !this.sessService.playonhover;
       }
@@ -353,14 +357,16 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onMarkerInsert(marker_code: string) {
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('marker_insert', {value: marker_code}, Date.now(), 'editor');
+      this.uiService.addElementFromEvent('shortcut', {value: marker_code}, Date.now(),
+        this.audiomanager.playposition, this.editor.caretpos, 'texteditor_markers');
     }
   }
 
   onMarkerClick(marker_code: string) {
     this.onTranscriptionChanged(null);
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('marker_click', {value: marker_code}, Date.now(), 'editor');
+      this.uiService.addElementFromEvent('mouseclick', {value: marker_code}, Date.now(),
+        this.audiomanager.playposition, this.editor.caretpos, 'texteditor_toolbar');
     }
   }
 
@@ -378,7 +384,8 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     new_value: number, timestamp: number
   }) {
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('slider', event, event.timestamp, 'speed_change');
+      this.uiService.addElementFromEvent('slider', event, event.timestamp,
+        this.audiomanager.playposition, this.editor.caretpos, 'audio_speed');
     }
   }
 
@@ -392,7 +399,8 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     new_value: number, timestamp: number
   }) {
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('slider', event, event.timestamp, 'volume_change');
+      this.uiService.addElementFromEvent('slider', event, event.timestamp,
+        this.audiomanager.playposition, this.editor.caretpos, 'audio_volume');
     }
   }
 

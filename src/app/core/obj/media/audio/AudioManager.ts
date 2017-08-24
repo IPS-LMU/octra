@@ -9,6 +9,21 @@ import {AudioSelection} from './AudioSelection';
 import {AudioFormat} from './AudioFormats/AudioFormat';
 
 export class AudioManager {
+
+  set playposition(value: number) {
+    if (isNullOrUndefined(this._playposition)) {
+      this._playposition = new AudioTime(0, this.ressource.info.samplerate);
+    }
+    this._playposition.samples = value;
+  }
+
+  get playposition(): number {
+    if (isNullOrUndefined(this._playposition)) {
+      return 0;
+    }
+    return this._playposition.samples;
+  }
+
   get gainNode(): any {
     return this._gainNode;
   }
@@ -100,6 +115,7 @@ export class AudioManager {
   public loaded = false;
   private chunks: AudioChunk[] = [];
   private _mainchunk: AudioChunk;
+  private _playposition: AudioTime;
 
   private _javascriptNode = null;
 
@@ -122,7 +138,8 @@ export class AudioManager {
     return AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats) !== null;
   }
 
-  public static decodeAudio = (filename: string, buffer: ArrayBuffer, audioformats: AudioFormat[], keepbuffer = false): Promise<AudioManager> => {
+  public static decodeAudio = (filename: string, buffer: ArrayBuffer,
+                               audioformats: AudioFormat[], keepbuffer = false): Promise<AudioManager> => {
     Logger.log('Decode audio... ' + filename);
 
     const audioformat: AudioFormat = AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats);

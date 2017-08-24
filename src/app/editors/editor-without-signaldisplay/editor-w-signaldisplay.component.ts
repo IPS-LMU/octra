@@ -28,7 +28,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
   @ViewChild('nav') nav: AudioNavigationComponent;
   @ViewChild('audioplayer') audioplayer: AudioplayerComponent;
-  @ViewChild('transcr') editor: TranscrEditorComponent;
+  @ViewChild('transcr') public editor: TranscrEditorComponent;
 
   private subscrmanager: SubscriptionManager;
 
@@ -125,7 +125,8 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
   onButtonClick(event: { type: string, timestamp: number }) {
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('mouse_click', {}, event.timestamp, event.type + '_button');
+      this.uiService.addElementFromEvent('mouseclick', {value: event.type},
+        event.timestamp, this.audiomanager.playposition, this.editor.caretpos, 'audio_buttons');
     }
 
     switch (event.type) {
@@ -158,7 +159,8 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('slider', event, event.timestamp, 'speed_change');
+      this.uiService.addElementFromEvent('slider', event, event.timestamp,
+        this.audiomanager.playposition, this.editor.caretpos, 'audio_speed');
     }
   }
 
@@ -168,7 +170,8 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('slider', event, event.timestamp, 'volume_change');
+      this.uiService.addElementFromEvent('slider', event, event.timestamp,
+        this.audiomanager.playposition, this.editor.caretpos, 'audio_volume');
     }
   }
 
@@ -181,7 +184,9 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
   onShortcutTriggered(event) {
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('shortcut', event, Date.now(), 'audioplayer');
+      event.value = `audio:${event.value}`;
+      this.uiService.addElementFromEvent('shortcut', event, Date.now(),
+        this.audiomanager.playposition, this.editor.caretpos, 'texteditor');
     }
   }
 
@@ -214,16 +219,23 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     }
   }
 
+  onBoundaryInserted(event) {
+    this.uiService.addElementFromEvent('segment', {value: 'boundaries:add'}, Date.now(),
+      this.audiomanager.playposition, this.editor.caretpos, 'texteditor');
+  }
+
   onMarkerInsert(marker_code: string) {
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('marker_insert', {value: marker_code}, Date.now(), 'editor');
+      this.uiService.addElementFromEvent('shortcut', {value: 'markers:' + marker_code}, Date.now(),
+        this.audiomanager.playposition, this.editor.caretpos, 'texteditor');
     }
   }
 
   onMarkerClick(marker_code: string) {
     this.afterTyping('stopped');
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('marker_click', {value: marker_code}, Date.now(), 'editor');
+      this.uiService.addElementFromEvent('mouseclick', {value: marker_code}, Date.now(),
+        this.audiomanager.playposition, this.editor.caretpos, 'texteditor_toolbar');
     }
   }
 

@@ -86,6 +86,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   };
 
   @Input('audiochunk') audiochunk: AudioChunk;
+  @Input('name') name: string;
 
   private graphicscanvas: HTMLCanvasElement = null;
   private overlaycanvas: HTMLCanvasElement = null;
@@ -668,7 +669,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
       // draw segments
       if (this.Settings.boundaries.enabled && this.transcr.currentlevel.segments.length > 0) {
-        console.log('UPDATE ALL');
         const segments = this.transcr.currentlevel.segments.getSegmentsOfRange(
           this.audiochunk.time.start.samples, this.audiochunk.time.end.samples
         );
@@ -814,7 +814,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             if (focuscheck && this.Settings.shortcuts['' + shortc + '']['keys']['' + platform + ''] === comboKey) {
               switch (shortc) {
                 case('play_pause'):
-                  this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
+                  this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'audio'});
                   if (this.audiochunk.isPlaying) {
                     this.pausePlayback();
                   } else {
@@ -823,19 +823,19 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                   key_active = true;
                   break;
                 case('stop'):
-                  this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
+                  this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'audio'});
 
                   this.stopPlayback();
                   key_active = true;
                   break;
                 case('step_backward'):
-                  this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
+                  this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'audio'});
 
                   this.stepBackward();
                   key_active = true;
                   break;
                 case('step_backwardtime'):
-                  this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
+                  this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'audio'});
 
                   this.stepBackwardTime(0.5);
                   key_active = true;
@@ -852,9 +852,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                       } else if (result.type !== null) {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
-                          value: result.type + '_boundary'
+                          value: result.type,
+                          type: 'boundary',
+                          samplepos: result.seg_samples
                         });
-                        this.segmentchange.emit(result.seg_num);
+                        this.segmentchange.emit(result.seg_samples);
 
                         this.drawSegments();
                       }
@@ -864,7 +866,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                   break;
                 case('play_selection'):
                   if (this.av.focused) {
-                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
+                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'audio'});
 
                     const xSamples = this.av.audioTCalculator.absXChunktoSamples(this.av.Mousecursor.absX, this.audiochunk);
 
@@ -931,7 +933,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                   break;
                 case('segment_enter'):
                   if (this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly && this.focused) {
-                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
+                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'segment'});
                     const seg_index = this.transcr.currentlevel.segments.getSegmentBySamplePosition(
                       this.av.Mousecursor.timePos.samples
                     );
@@ -956,7 +958,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 case('cursor_left'):
                   if (this.av.focused) {
                     // move cursor to left
-                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
+                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'mouse'});
 
                     this.av.moveCursor('left', this.Settings.step_width_ratio * this.audioressource.info.samplerate);
                     this.drawCursor(this.av.LastLine);
@@ -967,7 +969,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 case('cursor_right'):
                   if (this.av.focused) {
                     // move cursor to right
-                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
+                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'mouse'});
 
                     this.av.moveCursor('right', this.Settings.step_width_ratio * this.audioressource.info.samplerate);
                     this.drawCursor(this.av.LastLine);
@@ -978,7 +980,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 case('playonhover'):
                   if (this.av.focused && !this.Settings.boundaries.readonly) {
                     // move cursor to right
-                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
+                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'option'});
                     key_active = true;
                   }
                   break;

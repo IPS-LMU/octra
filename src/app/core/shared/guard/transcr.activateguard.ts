@@ -22,8 +22,7 @@ export class TranscActivateGuard implements CanActivate {
       }
     } else {
       if (!this.settService.allloaded) {
-        console.log('offline ok');
-        this.router.navigate(['/user/transcr/reload-file']);
+                this.router.navigate(['/user/transcr/reload-file']);
         return false;
       }
     }

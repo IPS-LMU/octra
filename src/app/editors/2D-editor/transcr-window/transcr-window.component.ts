@@ -174,7 +174,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
   onButtonClick(event: { type: string, timestamp: number }) {
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('mouse_click', {}, event.timestamp, event.type + '_button');
+      this.uiService.addElementFromEvent('mouse_clicked', {value: event.type},
+        event.timestamp, this.audiomanager.playposition, this.editor.caretpos, 'audio_buttons');
     }
 
     if (event.type === 'replay') {
@@ -216,15 +217,18 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   onShortCutTriggered($event, type) {
-    this.uiService.addElementFromEvent('shortcut', $event, Date.now(), type);
+    this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
+      this.audiomanager.playposition, this.editor.caretpos, type);
   }
 
   onMarkerInsert(marker_code: string) {
-    this.uiService.addElementFromEvent('marker_insert', {value: marker_code}, Date.now(), 'editor');
+    this.uiService.addElementFromEvent('shortcut', {value: marker_code}, Date.now(),
+      this.audiomanager.playposition, this.editor.caretpos, 'markers');
   }
 
   onMarkerClick(marker_code: string) {
-    this.uiService.addElementFromEvent('marker_click', {value: marker_code}, Date.now(), 'editor');
+    this.uiService.addElementFromEvent('mouse_clicked', {value: marker_code}, Date.now(),
+      this.audiomanager.playposition, this.editor.caretpos, 'texteditor_toolbar');
   }
 
   onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
@@ -233,7 +237,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('slider', event, event.timestamp, 'speed_change');
+      this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
+        this.audiomanager.playposition, this.editor.caretpos, 'audio_speed');
     }
   }
 
@@ -243,7 +248,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
     if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('slider', event, event.timestamp, 'volume_change');
+      this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
+        this.audiomanager.playposition, this.editor.caretpos, 'audio_volume');
     }
   }
 

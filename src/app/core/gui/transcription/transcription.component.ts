@@ -41,6 +41,7 @@ import {ProjectConfiguration} from '../../obj/Settings/project-configuration';
 import {NgForm} from '@angular/forms';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {EditorComponents} from '../../../editors/components';
+import {Level} from '../../obj/Annotation/Level';
 
 @Component({
   selector: 'app-transcription',
@@ -75,7 +76,7 @@ export class TranscriptionComponent implements OnInit,
   public editorloaded = false;
   public feedback_data = {};
 
-  private level_subscription_id: number = 0;
+  private level_subscription_id = 0;
   public feedback_expanded = false;
 
   get loaded(): boolean {
@@ -122,8 +123,14 @@ export class TranscriptionComponent implements OnInit,
       && this.projectsettings.logging.forced) {
       this.subscrmanager.add(this.audiomanager.statechange.subscribe((obj) => {
         if (!obj.playonhover) {
+          let caretpos = -1;
+
+          if (!isNullOrUndefined((<any> this.currentEditor.instance).editor)) {
+            caretpos = (<any> this.currentEditor.instance).editor.caretpos;
+          }
           // make sure that events from playonhover are not logged
-          this.uiService.addElementFromEvent('audio_' + obj.state, {value: obj.state}, Date.now(), 'audio');
+          this.uiService.addElementFromEvent('audio',
+            {value: obj.state}, Date.now(), this.audiomanager.playposition, caretpos, this.sessService.Interface);
         }
       }));
     }
@@ -217,7 +224,6 @@ export class TranscriptionComponent implements OnInit,
     if (this.projectsettings.logging.forced === true) {
       this.subscrmanager.add(
         this.uiService.afteradd.subscribe((elem) => {
-          // this.sessService.save('logs', this.uiService.elementsToAnyArray());
           this.sessService.saveLogItem(elem.getDataClone());
         }));
     }
@@ -235,7 +241,7 @@ export class TranscriptionComponent implements OnInit,
     }
 
     this.subscrmanager.add(this.transcrService.levelchanged.subscribe(
-      (level) => {
+      (level: Level) => {
         (<any> this.currentEditor.instance).update();
 
         // important: subscribe to level changes in order to save proceedings
@@ -243,6 +249,7 @@ export class TranscriptionComponent implements OnInit,
         this.level_subscription_id = this.subscrmanager.add(
           this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
         );
+        this.uiService.addElementFromEvent('level', {value: 'changed'}, Date.now(), 0, -1, level.name);
       }
     ));
   }
@@ -313,10 +320,6 @@ export class TranscriptionComponent implements OnInit,
   }
 
   changeEditor(name: string) {
-    if (this.projectsettings.logging.forced) {
-      this.uiService.addElementFromEvent('editor_changed', {value: name}, Date.now(), '');
-    }
-
     let comp: any = null;
 
     if (isNullOrUndefined(name) || name === '') {
@@ -350,6 +353,17 @@ export class TranscriptionComponent implements OnInit,
         viewContainerRef.clear();
 
         this._currentEditor = viewContainerRef.createComponent(componentFactory);
+
+        let caretpos = -1;
+
+        if (!isNullOrUndefined((<any> this.currentEditor.instance).editor)) {
+          caretpos = (<any> this.currentEditor.instance).editor.caretpos;
+        }
+        if (this.projectsettings.logging.forced) {
+          console.log('log');
+          this.uiService.addElementFromEvent('editor', {value: 'changed'}, Date.now(),
+            null, null, name);
+        }
       } else {
         console.error('ERROR appLoadeditor is null');
       }

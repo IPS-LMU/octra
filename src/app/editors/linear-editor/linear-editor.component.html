@@ -55,7 +55,7 @@
                      (mouseenter)="miniloupe_hidden = false;"
                      (mouseleave)="miniloupe_hidden = true;"
                      (mousedown)="onViewerMouseDown($event)"
-                     (shortcuttriggered)="onShortCutTriggered($event, 'signal')"
+                     (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_top')"
                      [audiochunk]="audiochunk_top"
     >
     </app-audioviewer>
@@ -65,7 +65,7 @@
             top:2
            }"
            (segmententer)="onLoupeSegmentEnter($event)"
-           (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
+           (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_down')"
            [audiochunk]="audiochunk_down"
 >
 </app-loupe>

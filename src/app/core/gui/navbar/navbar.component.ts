@@ -11,7 +11,7 @@ import {AppInfo} from '../../../app.info';
 import {TextConverter} from '../../obj/Converters/TextConverter';
 import {TranscriptionService} from '../../shared/service/transcription.service';
 import {UserInteractionsService} from '../../shared/service/userInteractions.service';
-import {StatisticElem} from '../../obj/StatisticElement';
+import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {SettingsService} from '../../shared/service/settings.service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {EditorComponents} from '../../../editors/components';
@@ -223,6 +223,32 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  getProtocol() {
+    if (!isNullOrUndefined(this.transcrServ)) {
+      this.preparing = {
+        name: 'Protocol',
+        preparing: true
+      };
+      this.parentformat.download = this.transcrServ.audiofile.name + '.json';
+
+      window.URL = (((<any> window).URL) ||
+        ((<any> window).webkitURL) || false);
+
+      if (this.parentformat.uri !== null) {
+        window.URL.revokeObjectURL(this.parentformat.uri.toString());
+      }
+      const json = new File([JSON.stringify(this.transcrServ.extractUI(this.uiService.elements), null, 2)], this.parentformat.download);
+      const urlobj = window.URL.createObjectURL(json);
+      this.parentformat.uri = this.sanitize(urlobj);
+      this.preparing = {
+        name: 'Protocol',
+        preparing: false
+      };
+    } else {
+      console.error('can\'t get protocol file');
+    }
+  }
+
   public get arraybufferExists(): boolean {
     return (!isNullOrUndefined(this.transcrServ) && !isNullOrUndefined(this.transcrServ.audiomanager.ressource.arraybuffer)
       && this.transcrServ.audiomanager.ressource.arraybuffer.byteLength > 0);
@@ -253,11 +279,9 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     if (event.target.value !== null && event.target.value !== '') {
       const level = this.transcrServ.annotation.levels[tiernum];
       level.name = event.target.value;
-      console.log(level.name);
       this.sessService.changeAnnotationLevel(tiernum, level.getObj()).catch((err) => {
         console.error(err);
       }).then(() => {
-        console.log('SAVED OK');
         // update value for annoation object in transcr service
         this.transcrServ.annotation.levels[tiernum].name = event.target.value;
       });
@@ -303,13 +327,11 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
       this.sessService.removeAnnotationLevel(tiernum, id).catch((err) => {
         console.error(err);
       }).then(() => {
-        console.log('REMOVED OK');
         // update value for annoation object in transcr service
         this.transcrServ.annotation.levels.splice(tiernum, 1);
         if (tiernum <= this.transcrServ.selectedlevel) {
           this.transcrServ.selectedlevel = tiernum - 1;
         }
-        console.log(this.transcrServ.selectedlevel);
       });
     }
   }

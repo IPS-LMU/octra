@@ -41,7 +41,13 @@
         <a style="margin-left:10px;" *ngIf="preparing.name === 'Audio' && !preparing.preparing" download="{{parentformat.download}}" [href]="parentformat.uri"
            class="link">
             <span class="glyphicon glyphicon-floppy-save"></span> Download
-        </a>
+        </a><br/>
+        <a (click)="getProtocol()"><span class="glyphicon glyphicon-list"></span> Protocol</a>
+        <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === 'Protocol' && preparing.preparing"></i>
+        <a style="margin-left:10px;" *ngIf="preparing.name === 'Protocol' && !preparing.preparing" download="{{parentformat.download}}" [href]="parentformat.uri"
+           class="link">
+            <span class="glyphicon glyphicon-floppy-save"></span> Download
+        </a><br/>
     </modal-body>
     <modal-footer>
         <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="modalexport.dismiss()">

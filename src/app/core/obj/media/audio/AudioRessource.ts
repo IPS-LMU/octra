@@ -27,6 +27,5 @@ export class AudioRessource extends MediaRessource {
       throw Error('AudioRessource needs a correct instance of AudioInfo as parameter');
     }
     this._audiobuffer = audiobuffer;
-    console.log('set buffer to ' + buffer.byteLength);
-  }
+      }
 }

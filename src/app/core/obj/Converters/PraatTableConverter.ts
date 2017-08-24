@@ -71,12 +71,10 @@ export class PraatTableConverter extends Converter {
       // check if filename is equal with audio file
       const filename = file.name.substr(0, file.name.indexOf('.Table'));
 
-      console.log(`${audiofile.name} === ${filename}`);
-      if (Functions.contains(audiofile.name, filename)) {
+            if (Functions.contains(audiofile.name, filename)) {
         const tiers: string[] = [];
         // get tiers
-        console.log('IMPORT');
-        for (let i = 1; i < lines.length; i++) {
+                for (let i = 1; i < lines.length; i++) {
           if (lines[i] !== '') {
             const columns: string[] = lines[i].split('\t');
             const tmin = Number(columns[0]);
@@ -84,8 +82,7 @@ export class PraatTableConverter extends Converter {
             const text = columns[2];
             const tmax = Number(columns[3]);
 
-            console.log(tier);
-            if (tiers.filter((a) => {
+                        if (tiers.filter((a) => {
                 if (a === tier) {
                   return true;
                 }
@@ -160,8 +157,7 @@ export class PraatTableConverter extends Converter {
           }
           result.levels.push(olevel);
         }
-        console.log(result);
-        return {
+                return {
           annotjson: result,
           audiofile: null
         };

@@ -67,8 +67,7 @@ export class ReloadFileComponent implements OnInit {
       );
     };
     if (!isNullOrUndefined(this.dropzone.oannotation)) {
-      console.log('oanno not null 4');
-      const new_levels: OIDBLevel[] = [];
+            const new_levels: OIDBLevel[] = [];
       for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
         new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
       }

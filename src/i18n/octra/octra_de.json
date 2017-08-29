@@ -182,7 +182,8 @@
     "login again": "Erneut anmelden"
   },
   "signal-gui": {
-    "selection text": "Bitte wählen Sie ein Segment aus, indem Sie mit der Maus über den Signalausschnitt fahren und die {{value}} Taste betätigen."
+    "selection text": "Bitte wählen Sie mit der Mause einen Signalausschnitt aus, um diesen zu bearbeiten: Klicken Sie mit der linken Maustaste an eine gewünschte Position, halten Sie diese gedrückt und ziehen Sie den Mauszeiger bis zur Endposition.",
+    "segment enter text": "Bitte wählen Sie ein Segment aus, indem Sie mit der Maus über den Signalausschnitt fahren und die {{value}} Taste betätigen."
   },
   "transcription-submit": {
     "overview": "Folgende Tabelle zeigt Ihnen einen Überblick über Ihre definierten Segmente:",

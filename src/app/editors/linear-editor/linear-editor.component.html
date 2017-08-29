@@ -70,7 +70,10 @@
 >
 </app-loupe>
 <div *ngIf="!segmentselected" id="editor-placeholder">
-    <div class="inner" [innerHTML]="'signal-gui.selection text' | translate:{value: segmententer_shortc}">
+    <div *ngIf="!segmentselected && top_selected" class="inner"
+         [innerHTML]="'signal-gui.segment enter text' | translate:{value: segmententer_shortc}">
+    </div>
+    <div *ngIf="!top_selected" class="inner" [innerHTML]="'signal-gui.selection text' | translate">
     </div>
 </div>
 <app-transcr-editor #transcr

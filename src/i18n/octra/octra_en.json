@@ -184,7 +184,8 @@
     "login again": "Login again"
   },
   "signal-gui": {
-    "selection text": "Please select a segment by hovering over it and pressing the {{value}} key."
+    "selection text": "Please select a part of signal using the mouse: Click and hold the left mouse button and hold it while moving the cursor to the end position.",
+    "segment enter text": "Please select a segment by hovering over it and pressing the {{value}} key."
   },
   "transcription-submit": {
     "overview": "The next table shows an overview about your defined segments:",

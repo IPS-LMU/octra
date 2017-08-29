@@ -360,7 +360,6 @@ export class TranscriptionComponent implements OnInit,
           caretpos = (<any> this.currentEditor.instance).editor.caretpos;
         }
         if (this.projectsettings.logging.forced) {
-          console.log('log');
           this.uiService.addElementFromEvent('editor', {value: 'changed'}, Date.now(),
             null, null, name);
         }

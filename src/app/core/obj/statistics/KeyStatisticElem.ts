@@ -31,7 +31,7 @@ export class KeyStatisticElem extends StatisticElem {
   public static fromAny(elem: any): KeyStatisticElem {
     const result = {
       value: null,
-      target: null,
+      context: null,
       timestamp: null,
       type: null,
       playerpos: -1,
@@ -55,7 +55,7 @@ export class KeyStatisticElem extends StatisticElem {
       }
     }
 
-    return new KeyStatisticElem(result.type, result.target, result.value, result.timestamp,
+    return new KeyStatisticElem(result.type, result.context, result.value, result.timestamp,
       result.playerpos, result.caretpos, result.segment);
   }
 
@@ -73,7 +73,7 @@ export class KeyStatisticElem extends StatisticElem {
     this.data = {
       timestamp: timestamp,
       type: type,
-      target: name,
+      context: name,
       value: value,
       playerpos: playerpos,
       caretpos: caretpos,

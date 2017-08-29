@@ -36,14 +36,14 @@ export class StatisticElem {
   protected data: any = {
     timestamp: null,
     type: null,
-    target: null,
+    context: null,
     value: null
   };
 
   public static fromAny(elem: any): StatisticElem {
     const result = {
       value: null,
-      target: null,
+      context: null,
       timestamp: null,
       type: null,
       playerpos: null
@@ -61,7 +61,7 @@ export class StatisticElem {
 
     return new StatisticElem(
       result.type,
-      result.target,
+      result.context,
       result.value,
       result.timestamp,
       result.playerpos
@@ -70,7 +70,7 @@ export class StatisticElem {
 
   constructor(type: string, target: string, value: any, timestamp: number, playerpos: number) {
     this.data.type = type;
-    this.data.target = target;
+    this.data.context = target;
     this.data.timestamp = timestamp;
     this.data.value = value;
     if (!isNullOrUndefined(playerpos)) {

@@ -235,7 +235,7 @@ export class AudioviewerService extends AudioComponentService {
       this.calculateZoom(this.Settings.height, this.AudioPxWidth, this._minmaxarray);
     }
 
-    this.audiochunk.playposition = new AudioTime(0, this.audiomanager.ressource.info.samplerate);
+    this.audiochunk.playposition = this.audiochunk.time.start.clone();
 
     this.updateLines(innerWidth);
   }
@@ -331,7 +331,6 @@ export class AudioviewerService extends AudioComponentService {
             }
             this.mouse_down = true;
           } else if ($event.type === 'mouseup') {
-            this.mouse_down = false;
 
             if (this.dragableBoundaryNumber > -1 &&
               this.dragableBoundaryNumber < this.transcrService.currentlevel.segments.length) {
@@ -342,7 +341,13 @@ export class AudioviewerService extends AudioComponentService {
               this.transcrService.currentlevel.segments.sort();
             } else {
               // set selection
-              this.audiochunk.selection.end = new AudioTime(absXInTime, this.audiomanager.ressource.info.samplerate);
+              if (!this.mouse_down) {
+                // click only
+                this.audiochunk.selection.end = this.audiochunk.selection.start.clone();
+              } else {
+                this.audiochunk.selection.end = new AudioTime(absXInTime, this.audiomanager.ressource.info.samplerate);
+              }
+
               this.audiochunk.selection.checkSelection();
               this._drawnselection = this.audiochunk.selection.clone();
               this.PlayCursor.changeSamples(this.audiochunk.playposition.samples, this.audioTCalculator, this.audiochunk);
@@ -350,9 +355,9 @@ export class AudioviewerService extends AudioComponentService {
 
             this.dragableBoundaryNumber = -1;
             this.overboundary = false;
+            this.mouse_down = false;
           }
         } else if ($event.type === 'mouseup') {
-          this.mouse_down = false;
 
           if (this.dragableBoundaryNumber > -1 && this.dragableBoundaryNumber < this.transcrService.currentlevel.segments.length) {
             // some boundary dragged
@@ -361,13 +366,19 @@ export class AudioviewerService extends AudioComponentService {
             this.transcrService.currentlevel.segments.sort();
           } else {
             // set selection
-            this.audiochunk.selection.end = new AudioTime(absXInTime, this.audiomanager.ressource.info.samplerate);
+            if (!this.mouse_down) {
+              // click only
+              this.audiochunk.selection.end = this.audiochunk.selection.start.clone();
+            } else {
+              this.audiochunk.selection.end = new AudioTime(absXInTime, this.audiomanager.ressource.info.samplerate);
+            }
             this.audiochunk.selection.checkSelection();
             this.PlayCursor.changeSamples(this.audiochunk.playposition.samples, this.audioTCalculator, this.audiochunk);
           }
 
           this.dragableBoundaryNumber = -1;
           this.overboundary = false;
+          this.mouse_down = false;
         }
       }
 
@@ -753,7 +764,7 @@ export class AudioviewerService extends AudioComponentService {
 
   onKeyUp = (event) => {
     this.shift_pressed = false;
-  }
+  };
 
   /**
    * validate audioviewer config

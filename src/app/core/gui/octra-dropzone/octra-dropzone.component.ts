@@ -362,7 +362,6 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
         this._oaudiofile = null;
       } else {
         this._oannotation = null;
-        console.log(this._files);
       }
       this.dropzone.clicklocked = true;
       // make sure, that event click does not trigger

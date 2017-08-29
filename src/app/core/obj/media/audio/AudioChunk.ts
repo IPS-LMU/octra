@@ -147,7 +147,7 @@ export class AudioChunk {
 
     return new Promise<boolean>((resolve, reject) => {
       if (isNullOrUndefined(this._selection) || this._selection.length === 0) {
-        this.selection = new AudioSelection(this.playposition.clone(), this.time.end.clone());
+        this.selection = new AudioSelection(this.time.start.clone(), this.time.end.clone());
       }
 
       if (!this._audiomanger.audioplaying) {
@@ -158,6 +158,7 @@ export class AudioChunk {
 
         this.setState(PlayBackState.PLAYING);
 
+        // console.log(`play from ${this.selection.start.seconds} to ${this.selection.start.seconds + this.selection.duration.seconds}`);
         return this._audiomanger.startPlayback(
           this.selection.start, this.selection.duration, this._volume, this._speed, drawFunc, playonhover).then((result: boolean) => {
           if (this.state !== PlayBackState.PAUSED && this.state !== PlayBackState.STOPPED) {
@@ -228,17 +229,20 @@ export class AudioChunk {
       const timestamp = new Date().getTime();
 
       if (isNullOrUndefined(this._playposition)) {
-        this._playposition = new AudioTime(0, this._audiomanger.ressource.info.samplerate);
+        this._playposition = this.time.start.clone();
       }
 
       if (this._audiomanger.audioplaying) {
         const playduration = (this._audiomanger.endplaying - timestamp) * this.speed;
-        this._playposition.unix = this.selection.start.unix + (this.selection.duration.unix) - playduration;
+        this._playposition.unix = this.selection.start.unix + this.selection.duration.unix - playduration;
       } else if (this.state === PlayBackState.ENDED) {
         this._playposition = this.selection.end.clone();
+      } else if (this.state === PlayBackState.PAUSED) {
+      } else {
       }
 
       this.audiomanager.playposition = this._playposition.samples;
+    } else {
     }
   };
 

@@ -51,7 +51,6 @@ export class UserInteractionsService {
     } else {
       name = target_name;
     }
-    console.log(target_name);
     let elem = null;
     if (Functions.contains(type, 'key') || Functions.contains(type, 'shortcut')) {
       elem = new KeyStatisticElem(
@@ -73,7 +72,6 @@ export class UserInteractionsService {
     }
 
     if (elem) {
-      console.log(JSON.stringify(elem, null, 2));
       this._elements.push(elem);
       this.afteradd.emit(elem);
     }

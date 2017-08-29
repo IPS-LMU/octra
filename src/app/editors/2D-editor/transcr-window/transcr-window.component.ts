@@ -98,6 +98,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.editor.Settings.markers = this.transcrService.guidelines.markers;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.special_markers.boundary = true;
+    this.loupe.viewer.Settings.justify_signal_height = true;
     const segments = this.transcrService.currentlevel.segments;
     this.temp_segments = segments.clone();
     this.subscrmanager.add(this.editor.loaded.subscribe(
@@ -134,7 +135,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
   ngAfterViewInit() {
     this.loupe.Settings.boundaries.readonly = true;
-    this.loupe.zoomY = 4;
+    this.loupe.zoomY = 6;
 
     setTimeout(() => {
       this.audiochunk.startpos = this.audiochunk.time.start.clone();
@@ -192,13 +193,26 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   goToSegment(direction: string) {
     if (this.segment_index > -1 && this.transcrService.currentlevel.segments &&
       this.segment_index < this.transcrService.currentlevel.segments.length) {
-      let segment: Segment = this.transcrService.currentlevel.segments.get(this.segment_index);
+      const segments_length = this.transcrService.currentlevel.segments.length;
 
-      if (direction === 'right' &&
-        this.segment_index < this.transcrService.currentlevel.segments.length - 1) {
-        segment = this.transcrService.currentlevel.segments.get(++this.segment_index);
+      let segment: Segment = null;
+
+      if (direction === 'right' && this.segment_index < segments_length - 1) {
+        for (let i = this.segment_index + 1; i < segments_length - 1; i++) {
+          if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.break_marker.code) {
+            segment = this.transcrService.currentlevel.segments.get(i);
+            this.segment_index = i;
+            break;
+          }
+        }
       } else if (direction === 'left' && this.segment_index > 0) {
-        segment = this.transcrService.currentlevel.segments.get(--this.segment_index);
+        for (let i = this.segment_index - 1; i > 0; i--) {
+          if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.break_marker.code) {
+            segment = this.transcrService.currentlevel.segments.get(i);
+            this.segment_index = i;
+            break;
+          }
+        }
       }
 
       let begin = new AudioTime(0, this.audiomanager.ressource.info.samplerate);
@@ -207,8 +221,12 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         begin = this.transcrService.currentlevel.segments.get(this.segment_index - 1).time.clone();
       }
 
-      this.editor.rawText = this.transcrService.currentlevel.segments.get(this.segment_index).transcript;
-      this.audiochunk = new AudioChunk(new AudioSelection(begin, segment.time.clone()), this.audiochunk.audiomanager);
+      if (!isNullOrUndefined(segment)) {
+        this.editor.rawText = this.transcrService.currentlevel.segments.get(this.segment_index).transcript;
+        this.audiochunk = new AudioChunk(new AudioSelection(begin, segment.time.clone()), this.audiochunk.audiomanager);
+        // this.loupe.viewer.initialize();
+        this.loupe.viewer.update(true);
+      }
     }
   }
 

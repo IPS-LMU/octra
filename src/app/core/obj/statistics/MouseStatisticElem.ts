@@ -39,7 +39,7 @@ export class MouseStatisticElem extends StatisticElem {
     this.data = {
       timestamp: timestamp,
       type: type,
-      target: name,
+      context: name,
       value: value,
       playerpos: playerpos,
       caretpos: caretpos

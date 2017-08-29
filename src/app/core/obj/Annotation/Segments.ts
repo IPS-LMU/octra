@@ -9,7 +9,7 @@ export class Segments {
     this._segments = value;
   }
 
-  public onsegmentchange: EventEmitter<any> = new EventEmitter<any>();
+  public onsegmentchange: EventEmitter<void> = new EventEmitter<void>();
 
   get segments(): Segment[] {
     return this._segments;
@@ -63,7 +63,7 @@ export class Segments {
       if (this.segments[i].time.samples === time_samples) {
         this.segments.splice(i, 1);
 
-        this.onsegmentchange.emit(null);
+        this.onsegmentchange.emit();
       }
     }
   }
@@ -86,7 +86,7 @@ export class Segments {
       }
 
       this.segments.splice(index, 1);
-      this.onsegmentchange.emit(null);
+      this.onsegmentchange.emit();
     }
   }
 
@@ -101,7 +101,7 @@ export class Segments {
       this._segments[i].time.samples = segment.time.samples;
       this._segments[i].transcript = segment.transcript;
 
-      this.onsegmentchange.emit(null);
+      this.onsegmentchange.emit();
 
       return true;
     }
@@ -124,7 +124,7 @@ export class Segments {
       }
     });
 
-    this.onsegmentchange.emit({});
+    this.onsegmentchange.emit();
   }
 
   /**

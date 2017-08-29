@@ -1,13 +1,4 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  HostListener,
-  OnDestroy,
-  OnInit,
-  ViewChild
-} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
 
 import {
   AudioNavigationComponent,
@@ -25,7 +16,6 @@ import {
 } from '../../core/shared/service';
 import {AudioSelection, AudioTime, AVMousePos, BrowserInfo, Functions, SubscriptionManager} from '../../core/shared';
 import {SettingsService} from '../../core/shared/service/settings.service';
-import {isNullOrUndefined} from 'util';
 import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {CircleLoupeComponent} from '../../core/component/circleloupe/circleloupe.component';
 import {AudioManager} from '../../core/obj/media/audio/AudioManager';
@@ -52,6 +42,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public miniloupe_hidden = true;
   public segmentselected = false;
+  public top_selected = false;
   private factor = 4;
 
   public mini_loupecoord: any = {
@@ -109,9 +100,10 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
 
     this.loupe.Settings.shortcuts = this.keyMap.register('Loupe', this.loupe.Settings.shortcuts);
-    this.loupe.Settings.shortcuts.play_pause.keys.mac = 'SPACE';
-    this.loupe.Settings.shortcuts.play_pause.keys.pc = 'SPACE';
-    this.loupe.Settings.shortcuts.play_pause.focusonly = true;
+    this.loupe.Settings.shortcuts.play_pause.keys.mac = 'SHIFT + SPACE';
+    this.loupe.Settings.shortcuts.play_pause.keys.pc = 'SHIFT + SPACE';
+    this.loupe.Settings.shortcuts.play_pause.focusonly = false;
+    this.editor.Settings.disabled_keys.push('SHIFT + SPACE');
     this.loupe.Settings.shortcuts.step_backwardtime = null;
     this.loupe.Settings.shortcuts.step_backward.keys.mac = 'SHIFT + ENTER';
     this.loupe.Settings.shortcuts.step_backward.keys.pc = 'SHIFT + ENTER';
@@ -235,8 +227,11 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         selection.checkSelection();
         this.segmentselected = false;
         this.audiochunk_down = new AudioChunk(this.audiochunk_top.selection.clone(), this.audiomanager);
-        this.loupe.update();
+        this.top_selected = true;
+      } else {
+        this.top_selected = false;
       }
+      this.loupe.update();
     }
   }
 
@@ -258,7 +253,8 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       }, true);
     }
 
-    this.mini_loupecoord.y = -this.miniloupe.Settings.height / 2;
+    const a = this.viewer.getLocation();
+    this.mini_loupecoord.y = a.y - (this.miniloupe.Settings.height / 2) - this.viewer.Settings.height;
     this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
       this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
   }
@@ -292,8 +288,11 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       start = this.transcrService.currentlevel.segments.get($event.index - 1).time;
     }
 
-    this.audiochunk_down = new AudioChunk(new AudioSelection(start, segment.time), this.audiomanager);
-    this.loupe.update();
+    this.top_selected = true;
+    setTimeout(() => {
+      this.audiochunk_down = new AudioChunk(new AudioSelection(start, segment.time), this.audiomanager);
+      this.loupe.update();
+    }, 100);
   }
 
 // TODO CHANGE!!
@@ -404,22 +403,6 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  @HostListener('window:resize', ['$event'])
-  onResize($event) {
-    if (!isNullOrUndefined(this.mini_loupecoord.component)) {
-
-      if (this.mini_loupecoord.component === 'viewer') {
-        const a = this.viewer.getLocation();
-        this.mini_loupecoord.y = 0;
-      } else if (this.mini_loupecoord.component === 'loupe') {
-        // TODO change
-        /* const compute = this.loupe.getLocation();
-         this.mini_loupecoord.y = compute.y - this.loupe.Settings.height
-         - (this.miniloupe.Settings.height / 2) + 15;*/
-      }
-    }
-  }
-
   public openSegment(segnumber: number) {
     const segment = this.transcrService.currentlevel.segments.get(segnumber);
     this.editor.rawText = segment.transcript;
@@ -430,6 +413,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const start = this.transcrService.currentlevel.segments.getStartTime(segnumber);
     this.audiochunk_down = new AudioChunk(new AudioSelection(start, AudioTime.add(start, segment.time)), this.audiomanager);
+    this.top_selected = true;
     this.loupe.update();
   }
 

@@ -60,7 +60,7 @@
     >
     </app-audioviewer>
 </div>
-<app-loupe #loupe
+<app-loupe #loupe [hidden]="!top_selected"
            [margin]="{
             top:2
            }"
@@ -69,15 +69,16 @@
            [audiochunk]="audiochunk_down"
 >
 </app-loupe>
-<div *ngIf="!segmentselected" id="editor-placeholder"
-     [innerHTML]="'signal-gui.selection text' | translate:{value: segmententer_shortc}">
+<div *ngIf="!segmentselected" id="editor-placeholder">
+    <div class="inner" [innerHTML]="'signal-gui.selection text' | translate:{value: segmententer_shortc}">
+    </div>
 </div>
 <app-transcr-editor #transcr
                     (onkeyup)="onTranscriptionChanged($event)"
                     (marker_insert)="onMarkerInsert($event)"
                     (marker_click)="onMarkerClick($event)"
                     (typing)="onEditorTyping($event)"
-                    [visible]="segmentselected"
+                    [ngStyle]="{display: (segmentselected) ? 'inherit': 'none'}"
                     [markers]="transcrService.guidelines.markers"
                     [easymode]="sessService.easymode"
                     [audiochunk]="audiochunk_down"

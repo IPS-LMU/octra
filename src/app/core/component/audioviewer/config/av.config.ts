@@ -68,6 +68,14 @@ export class AudioviewerConfig {
         focusonly: true,
         title: 'set segment'
       },
+      set_break: {
+        keys: {
+          mac: 'P',
+          pc: 'P'
+        },
+        focusonly: true,
+        title: 'set break'
+      },
       play_selection: {
         keys: {
           mac: 'C',

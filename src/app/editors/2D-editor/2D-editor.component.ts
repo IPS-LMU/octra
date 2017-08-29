@@ -67,7 +67,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   private intervalID = null;
   public selected_index: number;
 
-  private factor = 4;
+  private factor = 6;
   public mini_loupecoord: any = {
     x: 0,
     y: 0
@@ -131,7 +131,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         const event = obj.event;
         if (this.viewer.focused) {
           if (event.key === '+') {
-            this.factor = Math.min(8, this.factor + 1);
+            this.factor = Math.min(20, this.factor + 1);
             this.changeArea(this.loupe, this.mini_loupecoord, this.factor);
           } else if (event.key === '-') {
             if (this.factor > 3) {

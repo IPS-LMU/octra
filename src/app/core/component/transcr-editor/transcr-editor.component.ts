@@ -42,6 +42,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   private init = 0;
   public focused = false;
 
+  public get summernote() {
+    return this.textfield.summernote;
+  }
+
   public get caretpos(): number {
     if (!this.focused) {
       return -1;
@@ -271,10 +275,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
           const bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
           const html = this.rawToHTML(bufferText);
-          const element = document.createElement('span');
-          element.innerHTML = html;
           e.preventDefault();
-          this.textfield.summernote('editor.insertNode', element);
+          this.textfield.summernote('editor.insertNode', html);
           this.updateTextField();
         },
         onChange: () => {
@@ -494,6 +496,49 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.textfield.summernote('editor.insertText', ' ');
     this.textfield.summernote('editor.insertNode', element);
     this.textfield.summernote('editor.insertText', ' ');
+
+    // set popover
+    setTimeout(() => {
+      jQuery(element).on('click', (event) => {
+        const jqueryobj = jQuery(event.target);
+        const samples = jqueryobj.attr('data-samples');
+
+        if (isNumeric(samples)) {
+          this.boundaryclicked.emit(Number(samples));
+        }
+      })
+        .on('mouseover', (event) => {
+          const jqueryobj = jQuery(event.target);
+
+          const width = jQuery('.seg-popover').width();
+          const height = jQuery('.seg-popover').height();
+          const editor_pos = jQuery('.note-toolbar.panel-heading').offset();
+          const seg_samples = jqueryobj.attr('data-samples');
+
+          if (!isNullOrUndefined(seg_samples) && Functions.isNumber(seg_samples)) {
+            const samples = Number(seg_samples);
+            const time = new AudioTime(samples, this.audiomanager.ressource.info.samplerate);
+
+            jQuery('.seg-popover').css({
+              'margin-left': (event.target.offsetLeft - (width / 2)) + 'px',
+              'margin-top': (jqueryobj.offset().top - editor_pos.top - height - 10) + 'px',
+              'display': 'inherit'
+            });
+
+            jqueryobj.css({
+              'cursor': 'pointer'
+            });
+            const timespan = new TimespanPipe();
+            const text = timespan.transform(time.unix.toString());
+            jQuery('.seg-popover').text(text);
+          }
+        })
+        .on('mouseleave', (event) => {
+          jQuery('.seg-popover').css({
+            'display': 'none'
+          });
+        });
+    }, 200);
     /*
     // this.textfield.summernote('saveRange');
     const selection: Selection = document.getSelection();
@@ -560,7 +605,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     */
     this.updateTextField();
-    this.initPopover();
+    // this.initPopover();
     // } else {
     //   console.log('nodeName = ' + selection.anchorNode.parentNode.nodeName);
     // }
@@ -814,6 +859,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     return result;
   }
 
+  public saveRange() {
+    this.textfield.summernote('saveRange');
+  }
+
+  public restoreRange() {
+    this.textfield.summernote('restoreRange');
+  }
 
   /*
 

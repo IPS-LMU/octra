@@ -2,10 +2,12 @@
     <div class="dropzone" #dropzone [ngStyle]="{
   height: height
 }" (dragover)="onDragOver($event)" (drop)="onFileDrop($event)" (click)="onClick($event)">
-        <ng-content></ng-content>
-        <br/>
-        <span class="glyphicon glyphicon-folder-open dragndrop"></span>
-        <input type="file" multiple class="fileinput" value="Select audio file" style="display:none;" #fileinput
-               (change)="onFileChange($event)"/>
+        <div class="inner" style="margin: auto 0;">
+            <ng-content></ng-content>
+            <br/>
+            <span class="glyphicon glyphicon-folder-open dragndrop"></span>
+            <input type="file" multiple class="fileinput" value="Select audio file" style="display:none;" #fileinput
+                   (change)="onFileChange($event)"/>
+        </div>
     </div>
 </div>

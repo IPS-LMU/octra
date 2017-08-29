@@ -45,7 +45,7 @@
 {
 height: getHeight + 'px'
 }" style="overflow-y: scroll; overflow-x: hidden; position:relative;">
-        <div style="width:100px;">
+        <div style="width:100px;" (mouseenter)="loupe_hidden = false;">
             <app-circleloupe #loupe [ngStyle]="{
 'position':'absolute',
 'margin-left':mini_loupecoord.x + 'px',
@@ -68,3 +68,4 @@ height: getHeight + 'px'
         >
         </app-audioviewer>
     </div>
+</div>

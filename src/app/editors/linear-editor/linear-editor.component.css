@@ -3,11 +3,18 @@
 }
 
 #editor-placeholder {
+    flex: auto;
+    flex-direction: column;;
+    display: flex;
     background-color: white;
     border: 1px dashed gray;
     padding: 10px;
     width: 100%;
     text-align: center;
+}
+
+#editor-placeholder .inner {
+    margin: auto 0;
 }
 
 .loupe {

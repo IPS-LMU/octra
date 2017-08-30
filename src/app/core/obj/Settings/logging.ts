@@ -28,7 +28,7 @@ export class OLogging implements ILogging {
   samplerate: number;
   logs: ILog[];
 
-  constructor(version: string, encoding: string, projectname: string, lastupdate: string, audiofile:string, samplerate: number, duration: number, logs: OLog[]) {
+  constructor(version: string, encoding: string, projectname: string, lastupdate: string, audiofile: string, samplerate: number, duration: number, logs: OLog[]) {
     this.version = version;
     this.encoding = encoding;
     this.projectname = projectname;
@@ -37,6 +37,10 @@ export class OLogging implements ILogging {
     this.samplerate = samplerate;
     this.audiofile = audiofile;
     this.logs = logs;
+  }
+
+  getObj() {
+    return JSON.parse(JSON.stringify(this.logs));
   }
 }
 

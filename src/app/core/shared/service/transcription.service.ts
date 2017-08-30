@@ -315,7 +315,7 @@ export class TranscriptionService {
         status: this.state,
         quality: this._feedback.exportData(),
         id: this.sessServ.data_id,
-        log: log_data
+        log: log_data.getObj()
       };
 
       const transcript: any[] = [];

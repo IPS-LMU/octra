@@ -9,6 +9,7 @@ import {WavFormat} from './core/obj/media/audio/AudioFormats/WavFormat';
 import {OggFormat} from './core/obj/media/audio/AudioFormats/OggFormat';
 import {BundleJSONConverter} from './core/obj/Converters/BundleJSONConverter';
 import {EmailBugReporter} from './core/obj/BugAPI/EmailBugReporter';
+import {PartiturConverter} from './core/obj/Converters/PartiturConverter';
 
 export class AppInfo {
   public static readonly audioformats = [
@@ -22,11 +23,12 @@ export class AppInfo {
   ];
 
   public static readonly converters: Converter[] = [
+    new AnnotJSONConverter(),
     new PraatTableConverter(),
     new PraatTextgridConverter(),
-    new AnnotJSONConverter(),
-    new BundleJSONConverter(),
     new CTMConverter(),
+    new PartiturConverter(),
+    new BundleJSONConverter(),
     new TextConverter()
   ];
 

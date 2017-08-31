@@ -55,7 +55,7 @@ export class AudioviewerService extends AudioComponentService {
   public overboundary = false;
 
   // AUDIO
-  private durtime: AudioTime = null;
+  // private durtime: AudioTime = null;
   private _channel: Float32Array = null;
 
   private _zoomY = 1;
@@ -87,6 +87,7 @@ export class AudioviewerService extends AudioComponentService {
     this.last_line = line;
   }
 
+  /*
   get DurTime(): AudioTime {
     return this.durtime;
   }
@@ -95,6 +96,7 @@ export class AudioviewerService extends AudioComponentService {
     this.durtime = new_durtime;
     this.audioTCalculator.duration = this.durtime.clone();
   }
+  */
 
   get Settings(): any {
     return this._settings;
@@ -136,8 +138,8 @@ export class AudioviewerService extends AudioComponentService {
     }
 
     // initialize the default values
-    this.durtime = new AudioTime(this.audiochunk.time.length, this.audiomanager.ressource.info.samplerate);
-    this.audioTCalculator = new AudioTimeCalculator(this.audiomanager.ressource.info.samplerate, this.durtime, this.AudioPxWidth);
+    this.audioTCalculator = new AudioTimeCalculator(this.audiomanager.ressource.info.samplerate,
+      this.audiochunk.time.duration, this.AudioPxWidth);
     this.Mousecursor = new AVMousePos(0, 0, 0, new AudioTime(0, this.audiomanager.ressource.info.samplerate));
     this.MouseClickPos = new AVMousePos(0, 0, 0, new AudioTime(0, this.audiomanager.ressource.info.samplerate));
     this.PlayCursor = new PlayCursor(0, new AudioTime(0, this.audiomanager.ressource.info.samplerate), innerWidth);
@@ -331,7 +333,6 @@ export class AudioviewerService extends AudioComponentService {
             }
             this.mouse_down = true;
           } else if ($event.type === 'mouseup') {
-
             if (this.dragableBoundaryNumber > -1 &&
               this.dragableBoundaryNumber < this.transcrService.currentlevel.segments.length) {
               // some boundary dragged
@@ -341,12 +342,7 @@ export class AudioviewerService extends AudioComponentService {
               this.transcrService.currentlevel.segments.sort();
             } else {
               // set selection
-              if (!this.mouse_down) {
-                // click only
-                this.audiochunk.selection.end = this.audiochunk.selection.start.clone();
-              } else {
-                this.audiochunk.selection.end = new AudioTime(absXInTime, this.audiomanager.ressource.info.samplerate);
-              }
+              this.audiochunk.selection.end = new AudioTime(absXInTime, this.audiomanager.ressource.info.samplerate);
 
               this.audiochunk.selection.checkSelection();
               this._drawnselection = this.audiochunk.selection.clone();

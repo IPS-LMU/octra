@@ -146,8 +146,12 @@ export class AudioChunk {
   public startPlayback(drawFunc: () => void, playonhover: boolean = false): Promise<boolean> {
 
     return new Promise<boolean>((resolve, reject) => {
-      if (isNullOrUndefined(this._selection) || this._selection.length === 0) {
+      if (isNullOrUndefined(this._selection)) {
         this.selection = new AudioSelection(this.time.start.clone(), this.time.end.clone());
+      }
+
+      if (this._selection.start.samples === this._selection.end.samples) {
+        this.startpos = this._selection.start.clone();
       }
 
       if (!this._audiomanger.audioplaying) {

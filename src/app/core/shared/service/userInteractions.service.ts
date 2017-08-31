@@ -4,6 +4,7 @@ import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
 import {Functions} from '../Functions';
+import {isNullOrUndefined} from 'util';
 
 @Injectable()
 export class UserInteractionsService {
@@ -36,6 +37,14 @@ export class UserInteractionsService {
     let name = '';
     let target: any = null;
 
+    if (isNullOrUndefined(segment)) {
+      segment = {
+        start: -1,
+        length: -1,
+        textlength: -1
+      }
+    }
+
     if (!target_name) {
       if (event && event.target) {
         target = event.target;
@@ -63,14 +72,15 @@ export class UserInteractionsService {
         segment
       );
     } else if (Functions.contains(type, 'mouse')) {
-      elem = new MouseStatisticElem(type, name, event.value, timestamp, playerpos, caretpos);
+      elem = new MouseStatisticElem(type, name, event.value, timestamp, playerpos, caretpos, segment);
     } else if (Functions.contains(type, 'slider')) {
-      elem = new MouseStatisticElem(type, name, event.new_value, timestamp, playerpos, caretpos);
+      elem = new MouseStatisticElem(type, name, event.new_value, timestamp, playerpos, caretpos, segment);
     } else {
       elem = new StatisticElem(type, name, event.value, timestamp, playerpos
       );
     }
 
+    console.log(elem);
     if (elem) {
       this._elements.push(elem);
       this.afteradd.emit(elem);

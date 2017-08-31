@@ -125,6 +125,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
   onButtonClick(event: { type: string, timestamp: number }) {
     if (this.projectsettings.logging.forced === true) {
+
       this.uiService.addElementFromEvent('mouseclick', {value: event.type},
         event.timestamp, this.audiomanager.playposition, this.editor.caretpos, 'audio_buttons');
     }

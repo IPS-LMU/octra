@@ -11,13 +11,19 @@ export class MouseStatisticElem extends StatisticElem {
       timestamp: null,
       type: null,
       playerpos: -1,
-      caretpos: -1
+      caretpos: -1,
+      segment: {
+        start: -1,
+        length: -1,
+        textlength: -1
+      }
     };
 
     for (const attr in elem) {
       if (elem.hasOwnProperty(attr)) {
         if (elem.hasOwnProperty('value') || elem.hasOwnProperty('target') || elem.hasOwnProperty('timestamp')
           || elem.hasOwnProperty('type') || elem.hasOwnProperty('playerpos') || elem.hasOwnProperty('caretpos')
+          || elem.hasOwnProperty('segment')
         ) {
           result[`${attr}`] = elem[`${attr}`];
         }
@@ -25,7 +31,7 @@ export class MouseStatisticElem extends StatisticElem {
     }
 
     return new MouseStatisticElem(result.type, result.target,
-      result.value, result.timestamp, result.playerpos, result.caretpos);
+      result.value, result.timestamp, result.playerpos, result.caretpos, result.segment);
   }
 
   constructor(type: string,
@@ -33,7 +39,12 @@ export class MouseStatisticElem extends StatisticElem {
               value: string,
               timestamp: number,
               playerpos: number,
-              caretpos: number) {
+              caretpos: number,
+              segment: {
+                start: number,
+                length: number,
+                textlength: number
+              }) {
     super(type, name, value, timestamp, playerpos);
 
     this.data = {
@@ -42,7 +53,8 @@ export class MouseStatisticElem extends StatisticElem {
       context: name,
       value: value,
       playerpos: playerpos,
-      caretpos: caretpos
+      caretpos: caretpos,
+      segment: segment
     };
   }
 }

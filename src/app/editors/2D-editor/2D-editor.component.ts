@@ -298,41 +298,28 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       )
     ) {
       $event.value = `${$event.type}:${$event.value}`;
-      const caretpos = (!isNullOrUndefined(this.editor)) ? this.editor.caretpos : -1;
-      this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
-        this.audiomanager.playposition, caretpos, 'multi-lines-viewer');
-    } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
-      this.sessService.playonhover = !this.sessService.playonhover;
-    }
-  }
 
-  onMarkerInsert(marker_code: string) {
-    if (this.projectsettings.logging.forced === true) {
-      const caretpos = (!isNullOrUndefined(this.editor)) ? this.editor.caretpos : -1;
       const segment = {
         start: -1,
         length: -1,
         textlength: -1
       };
 
-      if (!isNullOrUndefined(this.editor) && this.editor.caretpos > -1) {
-        const end = (this.selected_index < this.transcrService.currentlevel.segments.length - 1) ?
-          this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.samples :
-          this.transcrService.currentlevel.segments.get(this.selected_index).time.samples;
-        segment.start = end - this.transcrService.currentlevel.segments.get(this.selected_index).time.samples;
-        segment.length = this.transcrService.currentlevel.items[this.selected_index].labels[0].value.length;
-        segment.textlength = this.editor.rawText.length;
-      }
-      this.uiService.addElementFromEvent('shortcut', {value: marker_code},
-        Date.now(), this.audiomanager.playposition, caretpos, 'texteditor:markers');
-    }
-  }
+      if (this.selected_index > -1) {
+        const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
+        segment.start = anno_segment.time.samples;
+        segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
+          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.samples - anno_segment.time.samples
+          : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
 
-  onMarkerClick(marker_code: string) {
-    if (this.projectsettings.logging.forced === true) {
+        segment.textlength = anno_segment.transcript.length;
+      }
+
       const caretpos = (!isNullOrUndefined(this.editor)) ? this.editor.caretpos : -1;
-      this.uiService.addElementFromEvent('mouseclick', {value: marker_code},
-        Date.now(), this.audiomanager.playposition, caretpos, 'texteditor:toolbar');
+      this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
+        this.audiomanager.playposition, caretpos, 'multi-lines-viewer', segment);
+    } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
+      this.sessService.playonhover = !this.sessService.playonhover;
     }
   }
 
@@ -342,9 +329,25 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
     if (this.projectsettings.logging.forced === true) {
+      const segment = {
+        start: -1,
+        length: -1,
+        textlength: -1
+      };
+
+      if (this.selected_index > -1) {
+        const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
+        segment.start = anno_segment.time.samples;
+        segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
+          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.samples - anno_segment.time.samples
+          : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
+
+        segment.textlength = anno_segment.transcript.length;
+      }
+
       const caretpos = (!isNullOrUndefined(this.editor)) ? this.editor.caretpos : -1;
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        this.audiomanager.playposition, caretpos, 'audio_speed');
+        this.audiomanager.playposition, caretpos, 'audio_speed', segment);
     }
   }
 
@@ -354,17 +357,49 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
     if (this.projectsettings.logging.forced === true) {
+      const segment = {
+        start: -1,
+        length: -1,
+        textlength: -1
+      };
+
+      if (this.selected_index > -1) {
+        const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
+        segment.start = anno_segment.time.samples;
+        segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
+          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.samples - anno_segment.time.samples
+          : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
+
+        segment.textlength = anno_segment.transcript.length;
+      }
+
       const caretpos = (!isNullOrUndefined(this.editor)) ? this.editor.caretpos : -1;
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        this.audiomanager.playposition, caretpos, 'audio_volume');
+        this.audiomanager.playposition, caretpos, 'audio_volume', segment);
     }
   }
 
   onButtonClick(event: { type: string, timestamp: number }) {
     if (this.projectsettings.logging.forced === true) {
       const caretpos = (!isNullOrUndefined(this.editor)) ? this.editor.caretpos : -1;
+
+      const segment = {
+        start: -1,
+        length: -1,
+        textlength: -1
+      };
+
+      if (this.selected_index > -1) {
+        const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
+        segment.start = anno_segment.time.samples;
+        segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
+          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.samples - anno_segment.time.samples
+          : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
+
+        segment.textlength = anno_segment.transcript.length;
+      }
       this.uiService.addElementFromEvent('mouseclick', {value: 'click:' + event.type},
-        event.timestamp, this.audiomanager.playposition, caretpos, 'audio_buttons');
+        event.timestamp, this.audiomanager.playposition, caretpos, 'audio_buttons', segment);
     }
 
     switch (event.type) {

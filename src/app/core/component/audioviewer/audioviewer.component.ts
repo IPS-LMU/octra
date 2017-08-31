@@ -1047,7 +1047,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         }
         resolve(played);
       }).catch((err) => {
-        console.log(err);
+        console.error(err);
       });
     });
   };
@@ -1059,7 +1059,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     if (this.audiomanager.replay) {
       this.audiochunk.playposition = this.audiochunk.time.start.clone();
       this.playSelection();
-      console.log('REPLAY??');
     }
 
     this.audiomanager.stepbackward = false;
@@ -1149,7 +1148,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       this.drawPlayCursorOnly(line);
       this.av.LastLine = line;
     } else {
-      console.log('LINE NULL');
     }
   };
 
@@ -1159,8 +1157,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    */
   drawPlayCursorOnly = (curr_line: Line) => {
     if (curr_line) {
-      console.log(`draw cursor only at ${this.audiochunk.playposition.samples} and ${this.av.PlayCursor.absX}`);
-      console.log(`start is ${this.audiochunk.time.start.samples}`);
       const player_width = this.Settings.playcursor.width;
 
       const relX = this.av.PlayCursor.absX - (curr_line.number * this._innerWidth);
@@ -1184,7 +1180,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         this.p_context.stroke();
       }
     } else {
-      console.log('curr line is null');
+      console.error('curr line is null');
     }
   };
 
@@ -1193,7 +1189,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    * @param new_value
    */
   private changePlayCursorAbsX = (new_value: number) => {
-    console.log('change ABSC to ' + new_value);
     this.av.PlayCursor.changeAbsX(new_value, this.av.audioTCalculator, this.av.AudioPxWidth, this.audiochunk);
     this.playcursorchange.emit(this.av.PlayCursor);
   };

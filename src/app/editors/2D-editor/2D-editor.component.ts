@@ -205,7 +205,6 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   onSegmentEntered(selected: any) {
-    console.log(selected);
     if (this.transcrService.currentlevel.segments && selected.index > -1 &&
       selected.index < this.transcrService.currentlevel.segments.length) {
       const segment = this.transcrService.currentlevel.segments.get(selected.index);

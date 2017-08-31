@@ -201,7 +201,6 @@ export class AudioManager {
     return new Promise<AudioBuffer>((resolve, reject) => {
       const context = new OfflineAudioContext(1, 4096, sampleRate);
       context.onstatechange = (state) => {
-        console.log(state);
       };
       context.decodeAudioData(file, (result) => {
         resolve(result);
@@ -268,7 +267,7 @@ export class AudioManager {
 
       return true;
     } else {
-      console.log('cant pause because not playing');
+      console.error('cant pause because not playing');
     }
 
     return false;

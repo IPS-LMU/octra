@@ -17,7 +17,7 @@ export class ControlType {
         this._type = 'textarea';
         break;
       default:
-        console.log('type \'${type}\' not valid control type for the feedback form');
+        console.error('type \'${type}\' not valid control type for the feedback form');
         break;
     }
   }

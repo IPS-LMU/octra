@@ -254,7 +254,10 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const a = this.viewer.getLocation();
-    this.mini_loupecoord.y = a.y - (this.miniloupe.Settings.height / 2) - this.viewer.Settings.height;
+    this.mini_loupecoord.y = a.y - this.viewer.Settings.height - this.miniloupe.Settings.height;
+    if (this.sessService.uselocalmode) {
+      this.mini_loupecoord.y += 24;
+    }
     this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
       this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
   }

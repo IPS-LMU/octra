@@ -226,7 +226,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.setOnlineSessionToFree(() => {
         this.sessionService.beginLocalSession(this.dropzone.files, false, () => {
           if (!isNullOrUndefined(this.dropzone.oannotation)) {
-            console.log('oanno not null');
             const new_levels: OIDBLevel[] = [];
             for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
               new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
@@ -256,7 +255,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     } else {
       this.sessionService.beginLocalSession(this.dropzone.files, true, () => {
         if (!isNullOrUndefined(this.dropzone.oannotation)) {
-          console.log('oanno not null 2');
           const new_levels: OIDBLevel[] = [];
           for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
             new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
@@ -284,7 +282,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   };
 
   canDeactivate(): Observable<boolean> | boolean {
-    console.log('VALID? :' + this.valid);
     return (this.valid);
   }
 
@@ -313,7 +310,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   newTranscription = () => {
     this.sessionService.beginLocalSession(this.dropzone.files, false, () => {
         if (!isNullOrUndefined(this.dropzone.oannotation)) {
-          console.log('oanno not null 3');
           const new_levels: OIDBLevel[] = [];
           for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
             new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
@@ -411,7 +407,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         ) {
 
           // delete old data for fresh new session
-          console.log('clear 3');
           this.sessionService.clearSession();
           this.sessionService.clearLocalStorage().then(
             () => {
@@ -432,7 +427,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               }
 
               if (res.error === '') {
-                console.log('NAVIGATE');
                 this.navigate();
               } else {
                 this.modService.show('error', res.error);

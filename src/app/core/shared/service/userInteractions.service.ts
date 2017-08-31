@@ -80,7 +80,6 @@ export class UserInteractionsService {
       );
     }
 
-    console.log(elem);
     if (elem) {
       this._elements.push(elem);
       this.afteradd.emit(elem);

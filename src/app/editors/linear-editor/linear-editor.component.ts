@@ -487,6 +487,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+
   public openSegment(segnumber: number) {
     const segment = this.transcrService.currentlevel.segments.get(segnumber);
     this.editor.rawText = segment.transcript;

@@ -1,10 +1,8 @@
 import {Line} from '../../obj/Line';
-import {AudioTime} from '../../obj/media/audio/AudioTime';
 import {AVMousePos} from '../../obj/AVMousePos';
 import {PlayCursor} from '../../obj/PlayCursor';
 import {AudioTimeCalculator} from '../../obj/media/audio/AudioTimeCalculator';
 import {AudioChunk} from '../../obj/media/audio/AudioChunk';
-import {isNullOrUndefined} from 'util';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 
 export class AudioComponentService {
@@ -67,24 +65,6 @@ export class AudioComponentService {
   }
 
   constructor() {
-  }
-
-  public calculateBeginTime(): AudioTime {
-    if (!isNullOrUndefined(this.audiochunk.playposition)) {
-      if (this.audiochunk.playposition.samples >= 0) {
-        return this.audiochunk.playposition.clone();
-      } else if (this.audiochunk.time.start !== null) {
-        return this.audiochunk.time.start.clone();
-      } else {
-        return (new AudioTime(0, this.audiomanager.ressource.info.samplerate));
-      }
-    } else {
-      return new AudioTime(0, this.audiomanager.ressource.info.samplerate);
-    }
-  }
-
-  public resetAudioMeta() {
-    this.mouse_click_pos = new AVMousePos(0, 0, 0, new AudioTime(0, 0));
   }
 
   public initialize(innerWidth: number, audiochunk: AudioChunk) {

@@ -171,7 +171,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    * @param d
    * @returns {string}
    */
-  private static getmaxString(num: number, d: number): string {
+  private getmaxString(num: number, d: number): string {
     let result = '';
 
     for (let i = num; i > 1; i = i / 10) {
@@ -770,6 +770,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         }
       }
     }
+
+    this.drawTimeLine();
   }
 
   /**
@@ -1048,6 +1050,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         resolve(played);
       }).catch((err) => {
         console.error(err);
+        reject(err);
       });
     });
   };
@@ -1223,23 +1226,23 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    */
   drawTimeLine = function () {
     if (this.Settings.timeline.enabled && this.av.LinesArray.length > 0
-      && this.av.DurTime.samples > 0 && this.av.AudioPxWidth > 0
+      && this.audiochunk.time.start.samples > 0 && this.av.AudioPxWidth > 0
     ) {
-      let max_width = this.g_context.measureText(this.getmaxString(Math.round(this.av.DurTime.seconds * 100) / 100, 2)).width + 12;
+      let max_width = this.g_context.measureText(this.getmaxString(Math.round(this.audiochunk.time.duration.seconds * 100) / 100, 2)).width + 12;
       const sec_px = (this.Settings.multi_line)
         ? this.Settings.pixel_per_sec
         : this.av.audioTCalculator.samplestoAbsX(this.av.audioTCalculator.secondsToSamples(1), this.av.DurTime);
 
       max_width = max_width / sec_px;
       let t = this.av.audioTCalculator.secondsToSamples(max_width);
-      max_width = this.av.audioTCalculator.samplestoAbsX(t, this.av.DurTime);
+      max_width = this.av.audioTCalculator.samplestoAbsX(t, this.audiochunk.time.duration);
       t = this.av.audioTCalculator.absXChunktoSamples(max_width, this.audiochunk);
       t = t - this.audiochunk.time.start.samples;
 
       let mwidth_seconds = this.av.audioTCalculator.samplesToSeconds(t);
       mwidth_seconds = Math.round(mwidth_seconds * 100) / 100;
       t = this.av.audioTCalculator.secondsToSamples(mwidth_seconds);
-      max_width = this.av.audioTCalculator.samplestoAbsX(t, this.av.DurTime);
+      max_width = this.av.audioTCalculator.samplestoAbsX(t, this.audiochunk.time.duration);
 
       const parts = this.av.AudioPxWidth / max_width;
       const start_time: AudioTime = this.audiochunk.time.start;
@@ -1256,7 +1259,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           const line_obj = this.av.LinesArray[line_num];
           let seconds = start_time.seconds + k * mwidth_seconds;
           const time2 = AudioTime.fromSeconds(seconds, this.audio.samplerate);
-          let relX = this.av.audioTCalculator.samplestoAbsX(time2.samples - start_time.samples, this.av.DurTime);
+          let relX = this.av.audioTCalculator.samplestoAbsX(time2.samples - start_time.samples, this.audiochunk.time.duration);
           relX = relX % this.innerWidth;
           seconds = Math.round(seconds * 100) / 100;
           this.g_context.beginPath();

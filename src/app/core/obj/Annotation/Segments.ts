@@ -73,11 +73,12 @@ export class Segments {
       if (index < this.segments.length - 1) {
         const next_segment = this.segments[index + 1];
         const transcription: string = this.segments[index].transcript;
-        // TODO change 'P' !
         if (next_segment.transcript !== breakmarker && transcription !== breakmarker) {
           // concat transcripts
           if (next_segment.transcript !== '' && transcription !== '') {
             next_segment.transcript = transcription + ' ' + next_segment.transcript;
+          } else if (next_segment.transcript === '' && transcription !== '') {
+            next_segment.transcript = transcription;
           }
         } else if (next_segment.transcript === breakmarker) {
           // delete pause

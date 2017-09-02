@@ -118,8 +118,10 @@ export class AudioChunk {
       throw new Error('AudioChunk needs an audiomanger reference');
     }
 
-    if (selection) {
-      this._selection = selection;
+    if (!isNullOrUndefined(selection)) {
+      this._selection = selection.clone();
+    } else {
+      this._selection = this._time.clone();
     }
 
     this._id = ++AudioChunk.counter;

@@ -241,24 +241,23 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   }
 
   saveTranscript() {
-    let html: string = this.editor.html.replace(/&nbsp;/g, ' ');
+    let html: string = this.editor.html.replace(/(&nbsp;)+/g, ' ');
     // split text at the position of every boundary marker
     html = html.replace(/(<textspan([ \w:"\-%;]|[0-9])*>)|(<\/textspan>)/g, '');
     let seg_texts: string[] = html.split(
-      /\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="[0-9]+">\s?/g
+      /\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="[0-9]+" alt="\[\|[0-9]+\|\]">\s?/g
     );
 
     const samples_array: number[] = [];
-    html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)">\s?/g,
+    html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s?/g,
       function (match, g1, g2) {
         samples_array.push(Number(g1));
         return '';
       });
 
     seg_texts = seg_texts.map((a: string) => {
-      return a.replace(/(<p>)|(<\/p>)/g, '');
+      return a.replace(/(<span>)|(<\/span>)|(<p>)|(<\/p>)/g, '');
     });
-
     // remove invalid boundaries
     if (seg_texts.length > 1) {
       let start = 0;
@@ -294,12 +293,13 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
         this.transcrService.currentlevel.segments.change(i, segment);
       } else {
         // add new segments
-
         if (i === seg_texts.length - 1) {
           this.transcrService.currentlevel.segments.add(this.audiochunk.time.end.samples, new_raw);
         } else {
           this.transcrService.currentlevel.segments.add(samples_array[i - 1], new_raw);
         }
+        console.log('add segment');
+        console.log(this.transcrService.currentlevel.segments.segments);
       }
     }
 
@@ -317,7 +317,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     const html: string = this.editor.html.replace(/&nbsp;/g, ' ');
 
     const samples_array: number[] = [];
-    html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)">\s?/g,
+    html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s?/g,
       function (match, g1, g2) {
         samples_array.push(Number(g1));
         return '';

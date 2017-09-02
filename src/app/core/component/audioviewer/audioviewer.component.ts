@@ -231,14 +231,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   }
 
   ngOnChanges(obj: SimpleChanges) {
-    if (obj.hasOwnProperty('audiochunk')) {
-      const previous: AudioChunk = obj.audiochunk.previousValue;
+    if (!isNullOrUndefined(obj.audiochunk)) {
       const current: AudioChunk = obj.audiochunk.currentValue;
 
       if (!obj.audiochunk.firstChange) {
-        if ((isNullOrUndefined(previous) && !isNullOrUndefined(current)) ||
-          (current.time.start.samples !== previous.time.start.samples &&
-            current.time.end.samples !== previous.time.end.samples)) {
+        if (!isNullOrUndefined(current)) {
           if (!this.av.Settings.justify_signal_height) {
             const zoomY = this.av.zoomY;
             // audiochunk changed
@@ -1228,7 +1225,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     if (this.Settings.timeline.enabled && this.av.LinesArray.length > 0
       && this.audiochunk.time.start.samples > 0 && this.av.AudioPxWidth > 0
     ) {
-      let max_width = this.g_context.measureText(this.getmaxString(Math.round(this.audiochunk.time.duration.seconds * 100) / 100, 2)).width + 12;
+      let max_width = this.g_context.measureText(this.getmaxString(
+        Math.round(this.audiochunk.time.duration.seconds * 100) / 100, 2)
+      ).width + 12;
       const sec_px = (this.Settings.multi_line)
         ? this.Settings.pixel_per_sec
         : this.av.audioTCalculator.samplestoAbsX(this.av.audioTCalculator.secondsToSamples(1), this.av.DurTime);
@@ -1405,5 +1404,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       errorcallback();
     }
     return false;
+  }
+
+  public focus() {
+    this.mousecanRef.nativeElement.focus();
   }
 }

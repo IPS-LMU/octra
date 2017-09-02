@@ -43,7 +43,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   public miniloupe_hidden = true;
   public segmentselected = false;
   public top_selected = false;
-  private factor = 4;
+  private factor = 6;
 
   public mini_loupecoord: any = {
     component: 'viewer',
@@ -141,7 +141,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         const event = obj.event;
         if (this.viewer.focused || this.loupe.focused) {
           if (event.key === '+') {
-            this.factor = Math.min(8, this.factor + 1);
+            this.factor = Math.min(12, this.factor + 1);
             this.miniloupe.zoomY = Math.max(1, this.factor);
 
             if (this.viewer.focused) {

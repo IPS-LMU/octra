@@ -88,7 +88,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       result += seg.transcript;
 
       if (i < segments.length - 1) {
-        result += `[|${i}]`;
+        result += `{${segments.get(i).time.samples}}`;
       }
     }
     this.rawText = result;
@@ -271,13 +271,19 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         onKeydown: this.onKeyDownSummernote,
         onKeyup: this.onKeyUpSummernote,
         onPaste: (e) => {
-          // prevent copy paste
-
-          const bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
-          const html = this.rawToHTML(bufferText);
           e.preventDefault();
-          this.textfield.summernote('editor.insertNode', html);
+          const bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
+          let html = bufferText.replace('<p>', '').replace('</p>', '')
+            .replace(new RegExp('\\\[\\\|', 'g'), '{').replace(new RegExp('\\\|\\\]', 'g'), '}');
+          html = '<span>' + this.rawToHTML(html) + '</span>';
+          const html_obj = jQuery(html);
+          if (!isNullOrUndefined(this.rawText) && this._rawText !== '') {
+            this.textfield.summernote('editor.insertNode', html_obj[0]);
+          } else {
+            this.textfield.summernote('code', html);
+          }
           this.updateTextField();
+          this.initPopover();
         },
         onChange: () => {
           this.init++;
@@ -492,6 +498,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     element.setAttribute('class', 'btn-icon-text boundary');
     element.setAttribute('style', 'height:16px');
     element.setAttribute('data-samples', this.audiochunk.playposition.samples.toString());
+    element.setAttribute('alt', '[|' + this.audiochunk.playposition.samples.toString() + '|]');
 
     this.textfield.summernote('editor.insertText', ' ');
     this.textfield.summernote('editor.insertNode', element);
@@ -731,12 +738,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     let result: string = rawtext;
 
     if (rawtext !== '') {
+      result = result.replace(/\r?\n/g, ' ');
       // replace markers with no wrap
       for (let i = 0; i < this.markers.length; i++) {
         const marker = this.markers[i];
 
         const regex = new RegExp('(\\s)*(' + Functions.escapeRegex(marker.code) + ')(\\s)*', 'g');
-        const regex2 = /\[\|([0-9]+)\]/g;
+        const regex2 = /{([0-9]+)}/g;
 
         const replace_func = (x, g1, g2, g3) => {
           const s1 = (g1) ? g1 : '';
@@ -750,16 +758,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         const replace_func2 = (x, g1) => {
           const s1 = (g1) ? g1 : '';
 
-          const seg = this.transcrService.currentlevel.segments.get(g1);
           return ' <img src=\'assets/img/components/transcr-editor/boundary.png\' ' +
             'class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
-            'data-samples=\'' + seg.time.samples + '\' /> ';
+            'data-samples=\'' + g1 + '\' alt=\'\[|' + g1 + '|\]\' /> ';
         };
 
         result = result.replace(regex2, replace_func2);
-
         result = result.replace(regex, replace_func);
-
       }
 
       result = result.replace(/\s+$/g, '&nbsp;');

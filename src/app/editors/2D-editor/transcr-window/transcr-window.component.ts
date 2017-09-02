@@ -162,6 +162,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
       if (this.editor.html.indexOf('<img src="assets/img/components/transcr-editor/boundary.png"') > -1) {
         // boundaries were inserted
+        console.log('save sements');
         this.transcrService.currentlevel.segments.segments = this.temp_segments.segments;
         this.transcrService.currentlevel.segments.onsegmentchange.emit(null);
       } else {
@@ -214,20 +215,32 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       let segment: Segment = null;
 
       if (direction === 'right' && this.segment_index < segments_length - 1) {
-        for (let i = this.segment_index + 1; i < segments_length - 1; i++) {
+        let i = this.segment_index + 1;
+        for (i = this.segment_index + 1; i < segments_length - 1; i++) {
           if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.break_marker.code) {
             segment = this.transcrService.currentlevel.segments.get(i);
             this.segment_index = i;
             break;
           }
         }
+
+        if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.break_marker.code) {
+          segment = this.transcrService.currentlevel.segments.get(i);
+          this.segment_index = i;
+        }
       } else if (direction === 'left' && this.segment_index > 0) {
-        for (let i = this.segment_index - 1; i > 0; i--) {
+        let i = this.segment_index - 1;
+        for (i = this.segment_index - 1; i > 0; i--) {
           if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.break_marker.code) {
             segment = this.transcrService.currentlevel.segments.get(i);
             this.segment_index = i;
             break;
           }
+        }
+
+        if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.break_marker.code) {
+          segment = this.transcrService.currentlevel.segments.get(i);
+          this.segment_index = i;
         }
       }
 
@@ -433,18 +446,18 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     const html: string = this.editor.html.replace(/&nbsp;/g, ' ');
     // split text at the position of every boundary marker
     let seg_texts: string[] = html.split(
-      /\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="[0-9]+">\s?/g
+      /\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="[0-9]+" alt="\[\|[0-9]+\|\]">\s?/g
     );
 
     const samples_array: number[] = [];
-    html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)">\s?/g,
+    html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s?/g,
       function (match, g1, g2) {
         samples_array.push(Number(g1));
         return '';
       });
 
     seg_texts = seg_texts.map((a: string) => {
-      return a.replace(/(<p>)|(<\/p>)/g, '');
+      return a.replace(/(<span>)|(<\/span>)|(<p>)|(<\/p>)/g, '');
     });
 
     // remove invalid boundaries
@@ -483,7 +496,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     const html: string = this.editor.html.replace(/&nbsp;/g, ' ');
 
     const samples_array: number[] = [];
-    html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)">\s?/g,
+    html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s?/g,
       function (match, g1, g2) {
         samples_array.push(Number(g1));
         return '';

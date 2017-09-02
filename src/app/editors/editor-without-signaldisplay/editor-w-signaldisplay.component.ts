@@ -80,7 +80,6 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
     EditorWSignaldisplayComponent.initialized.emit();
 
-
     /* does not work
     setInterval(() => {
       if (this.audiochunk.isPlaying) {
@@ -298,8 +297,6 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
         } else {
           this.transcrService.currentlevel.segments.add(samples_array[i - 1], new_raw);
         }
-        console.log('add segment');
-        console.log(this.transcrService.currentlevel.segments.segments);
       }
     }
 
@@ -343,5 +340,17 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     this.audiochunk.startpos = this.audiochunk.time.start;
     this.audioplayer.update();
     this.loadEditor();
+  }
+
+  public onSelectionChanged(caretpos) {
+    if (!this.audiochunk.isPlaying) {
+      const seg_num = this.editor.getSegmentByCaretPos(caretpos);
+      if (seg_num > -1) {
+        const samples = (seg_num > 0) ? this.transcrService.currentlevel.segments.get(seg_num - 1).time.samples : 0;
+        this.audiochunk.startpos = new AudioTime(samples, this.audiochunk.audiomanager.ressource.info.samplerate);
+        this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(seg_num).time.clone();
+        this.audioplayer.update();
+      }
+    }
   }
 }

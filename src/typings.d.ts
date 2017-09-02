@@ -8,6 +8,7 @@ declare var platform: any;
 declare var validateAnnotation: ((string, any) => any);
 declare var tidyUpAnnotation: ((string, any) => any);
 declare var videojs: any;
+declare var window: any;
 declare var navigator: Navigator;
 declare var document: Document;
 declare var Ajv: any;

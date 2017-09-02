@@ -79,7 +79,6 @@ export class KeyMapping {
 
     let name = this.getNameByCode(keycode);
     if (name === '' && !isNullOrUndefined($event.which)) {
-      console.log('hä');
       name = String.fromCharCode($event.which).toUpperCase();
     }
 

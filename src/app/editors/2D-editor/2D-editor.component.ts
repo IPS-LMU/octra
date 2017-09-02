@@ -67,10 +67,25 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   private intervalID = null;
   public selected_index: number;
 
-  private factor = 6;
-  public mini_loupecoord: any = {
-    x: 0,
-    y: 0
+  private factor = 8;
+  public miniloupe: {
+    size: {
+      width: number,
+      height: number
+    },
+    location: {
+      x: number,
+      y: number
+    }
+  } = {
+    size: {
+      width: 160,
+      height: 160
+    },
+    location: {
+      x: 0,
+      y: 0
+    }
   };
 
   private scrolltimer: Subscription = null;
@@ -132,11 +147,11 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         if (this.viewer.focused) {
           if (event.key === '+') {
             this.factor = Math.min(20, this.factor + 1);
-            this.changeArea(this.loupe, this.mini_loupecoord, this.factor);
+            this.changeArea(this.loupe, this.miniloupe, this.factor);
           } else if (event.key === '-') {
             if (this.factor > 3) {
               this.factor = Math.max(1, this.factor - 1);
-              this.changeArea(this.loupe, this.mini_loupecoord, this.factor);
+              this.changeArea(this.loupe, this.miniloupe, this.factor);
             }
           }
         }
@@ -163,7 +178,6 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         }
       }
     ));
-
 
     TwoDEditorComponent.initialized.emit();
   }
@@ -196,7 +210,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     this.intervalID = setInterval(() => {
       if (!this.mousestartmoving && !this.loupe_updated) {
         this.loupe_updated = true;
-        this.changeArea(this.loupe, this.mini_loupecoord, this.factor);
+        this.changeArea(this.loupe, this.miniloupe, this.factor);
       }
     }, 200);
   }
@@ -225,7 +239,18 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     if (state === 'close') {
       this.showWindow = false;
       this.viewer.deactivate_shortcuts = false;
+      this.selected_index = this.window.segment_index;
+      this.viewer.selectSegment(this.selected_index);
       this.viewer.drawSegments();
+
+      const segment = this.transcrService.currentlevel.segments.get(this.selected_index);
+      const absx = this.viewer.av.audioTCalculator.samplestoAbsX(segment.time.samples);
+      const specialheight = jQuery('#special').height();
+
+      let y = Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.height;
+      y += 10 + (Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.margin.bottom);
+      Functions.scrollTo(y, '#special');
+
     } else if (state === 'open') {
     }
   }
@@ -247,20 +272,29 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     setTimeout(() => {
       this.mousestartmoving = false;
     }, 200);
-    this.changePosition(this.mini_loupecoord);
+    this.changePosition(this.miniloupe);
   }
 
   onSegmentChange($event) {
   }
 
-  private changeArea(loup: CircleLoupeComponent, coord: any, factor: number) {
+  private changeArea(loup: CircleLoupeComponent, coord: {
+    size: {
+      width: number,
+      height: number
+    },
+    location: {
+      x: number,
+      y: number
+    }
+  }, factor: number) {
     const cursor = this.viewer.MouseCursor;
 
     if (cursor && cursor.timePos && cursor.relPos) {
-      coord.x = ((cursor.relPos.x) ? cursor.relPos.x - 40 : 0);
-      coord.y = ((cursor.line) ? (cursor.line.number) *
+      coord.location.x = ((cursor.relPos.x) ? cursor.relPos.x - coord.size.width / 2 : 0);
+      coord.location.y = ((cursor.line) ? (cursor.line.number) *
         cursor.line.Size.height + (cursor.line.number) * this.viewer.Settings.margin.bottom : 0);
-      coord.y += this.viewer.Settings.height - 15;
+      coord.location.y += this.viewer.Settings.height - 15;
 
       const half_rate = Math.round(this.audiomanager.ressource.info.samplerate / factor);
       const start = (cursor.timePos.samples > half_rate)
@@ -277,14 +311,23 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     }
   }
 
-  private changePosition(coord: any) {
+  private changePosition(coord: {
+    size: {
+      width: number,
+      height: number
+    },
+    location: {
+      x: number,
+      y: number
+    }
+  }) {
     const cursor = this.viewer.MouseCursor;
 
     if (cursor && cursor.timePos && cursor.relPos) {
-      coord.x = ((cursor.relPos.x) ? cursor.relPos.x - 40 : 0);
-      coord.y = ((cursor.line) ? (cursor.line.number) *
+      coord.location.x = ((cursor.relPos.x) ? cursor.relPos.x - coord.size.width / 2 : 0);
+      coord.location.y = ((cursor.line) ? (cursor.line.number) *
         cursor.line.Size.height + (cursor.line.number) * this.viewer.Settings.margin.bottom : 0);
-      coord.y += this.viewer.Settings.height - 15;
+      coord.location.y += this.viewer.Settings.height - 15;
     }
   }
 

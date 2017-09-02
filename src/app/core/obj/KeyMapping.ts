@@ -1,3 +1,5 @@
+import {isNullOrUndefined} from 'util';
+
 export class KeyMapping {
   /**
    * mapping for special keys
@@ -76,7 +78,8 @@ export class KeyMapping {
     const shift = $event.shiftKey;
 
     let name = this.getNameByCode(keycode);
-    if (name === '') {
+    if (name === '' && !isNullOrUndefined($event.which)) {
+      console.log('hä');
       name = String.fromCharCode($event.which).toUpperCase();
     }
 

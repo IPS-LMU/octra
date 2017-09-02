@@ -419,10 +419,6 @@ export class AudioviewerService extends AudioComponentService {
               && this.transcrService.currentlevel.segments.get(i).time.samples <= absXTime + b_width_time)
             && this.transcrService.currentlevel.segments.get(i).time.samples !== this.audiomanager.ressource.info.duration.samples
           ) {
-            const seg_after = (i < this.transcrService.currentlevel.segments.length - 1)
-              ? this.transcrService.currentlevel.segments.get(i + 1) : null;
-
-            const seg_selected = this.transcrService.currentlevel.segments.get(i);
 
             const seg_samples = this.transcrService.currentlevel.segments.get(i).time.samples;
             this.transcrService.currentlevel.segments.removeByIndex(i, this.transcrService.break_marker.code);
@@ -472,8 +468,12 @@ export class AudioviewerService extends AudioComponentService {
         }
       } else {
         // no selection
-
+        let segment = this.transcrService.currentlevel.segments.BetweenWhichSegment(absXTime);
+        const transcript = segment.transcript;
+        segment.transcript = '';
         this.transcrService.currentlevel.segments.add(Math.round(absXTime));
+        segment = this.transcrService.currentlevel.segments.BetweenWhichSegment(absXTime);
+        segment.transcript = transcript;
         return {
           type: 'add',
           seg_samples: -1,

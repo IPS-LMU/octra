@@ -8,6 +8,7 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  SimpleChanges,
   ViewChild
 } from '@angular/core';
 import {AudioviewerComponent} from '../audioviewer';
@@ -15,6 +16,7 @@ import {AVMousePos} from '../../shared';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AudioChunk} from '../../obj/media/audio/AudioChunk';
 import {AudioviewerService} from '../audioviewer/service';
+import {isNullOrUndefined} from 'util';
 
 declare var window: any;
 
@@ -36,6 +38,7 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
   @Input('audiochunk') audiochunk: AudioChunk;
 
   private subscrmanager;
+  public name: string;
 
   public get zoomY(): number {
     return this.viewer.av.zoomY;
@@ -87,7 +90,9 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
     this.subscrmanager = new SubscriptionManager();
   }
 
-  ngOnChanges(obj) {
+  ngOnChanges(obj: SimpleChanges) {
+    if (!isNullOrUndefined(obj.audiochunk)) {
+    }
   }
 
   ngOnInit() {
@@ -126,6 +131,7 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
   }
 
   public update() {
+    this.viewer.name = this.name;
     this.viewer.initialize();
     this.viewer.update(true);
   }

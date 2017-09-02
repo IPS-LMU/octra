@@ -45,13 +45,11 @@
 {
 height: getHeight + 'px'
 }" style="overflow-y: scroll; overflow-x: hidden; position:relative;">
-        <div style="width:100px;" (mouseenter)="loupe_hidden = false;">
-            <app-circleloupe #loupe [ngStyle]="{
+        <div (mouseenter)="loupe_hidden = false;" (mouseleave)="loupe_hidden = true;">
+            <app-circleloupe #loupe [width]="miniloupe.size.width" [height]="miniloupe.size.height" [ngStyle]="{
 'position':'absolute',
-'margin-left':mini_loupecoord.x + 'px',
-'margin-top':mini_loupecoord.y + 'px',
-'width' : '80px',
-'height': '80px',
+'margin-left':miniloupe.location.x + 'px',
+'margin-top':miniloupe.location.y + 'px',
 'z-index':'90',
 'visibility': (loupe_hidden) ? 'hidden' : 'inherit'}"
                              [audiochunk]="audiochunk_loupe"></app-circleloupe>

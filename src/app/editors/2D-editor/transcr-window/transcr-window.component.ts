@@ -240,8 +240,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       if (!isNullOrUndefined(segment)) {
         this.editor.rawText = this.transcrService.currentlevel.segments.get(this.segment_index).transcript;
         this.audiochunk = new AudioChunk(new AudioSelection(begin, segment.time.clone()), this.audiochunk.audiomanager);
-        // this.loupe.viewer.initialize();
-        this.loupe.viewer.update(true);
+      } else {
+        console.error('segment is null');
       }
     }
   }
@@ -375,24 +375,25 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     if (direction !== 'down') {
       this.goToSegment(direction);
       setTimeout(() => {
-        this.audiochunk.startpos = this.audiochunk.time.start.clone();
         this.loupe.viewer.startPlayback();
       }, 500);
     } else {
-      this.save();
       this.close();
     }
   };
 
   onKeyDown = ($event) => {
     switch ($event.comboKey) {
-      case ('SHIFT + ARROWRIGHT'):
+      case ('ALT + ARROWRIGHT'):
+        $event.event.preventDefault();
         this.doit('right');
         break;
-      case ('SHIFT + ARROWLEFT'):
+      case ('ALT + ARROWLEFT'):
+        $event.event.preventDefault();
         this.doit('left');
         break;
-      case ('SHIFT + ARROWDOWN'):
+      case ('ALT + ARROWDOWN'):
+        $event.event.preventDefault();
         this.doit('down');
         break;
       case ('ESC'):

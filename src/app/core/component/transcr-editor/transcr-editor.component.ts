@@ -871,7 +871,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     let start = 0;
 
     if (seg_texts.length > 1) {
-      if (caretpos >= rawtext.replace(/\s?{([0-9]+)}\s?/g, ' ').length) {
+      if (caretpos === 0) {
+        return 0;
+      } else if (caretpos >= rawtext.replace(/\s?{([0-9]+)}\s?/g, ' ').length) {
         return seg_texts.length - 1;
       }
 

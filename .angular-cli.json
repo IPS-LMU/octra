@@ -26,7 +26,6 @@
       "styles": [
         "../node_modules/bootstrap/dist/css/bootstrap.min.css",
         "../node_modules/bootstrap-material-design/dist/css/bootstrap-material-design.min.css",
-        "../node_modules/bootstrap-material-design/dist/css/ripples.min.css",
         "../node_modules/font-awesome/css/font-awesome.min.css",
         "../node_modules/video.js/dist/video-js.min.css",
         "../node_modules/summernote/dist/summernote.css",
@@ -36,7 +35,6 @@
         "../node_modules/jquery/dist/jquery.min.js",
         "../node_modules/bootstrap/dist/js/bootstrap.min.js",
         "../node_modules/bootstrap-material-design/dist/js/material.min.js",
-        "../node_modules/bootstrap-material-design/dist/js/ripples.min.js",
         "../node_modules/summernote/dist/summernote.min.js",
         "../node_modules/video.js/dist/video.js",
         "../node_modules/platform/platform.js",

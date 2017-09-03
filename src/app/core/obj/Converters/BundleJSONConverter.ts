@@ -8,12 +8,12 @@ export interface Bundle {
     fileExtension: string,
     encoding: string,
     data: string
-  }[],
+  }[];
   mediaFile: {
     encoding: string,
     data: string
-  },
-  annotation: IAnnotJSON
+  };
+  annotation: IAnnotJSON;
 }
 
 export class BundleJSONConverter extends Converter {
@@ -59,7 +59,7 @@ export class BundleJSONConverter extends Converter {
         type: 'application/json'
       }
     };
-  };
+  }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     const content = file.content;
@@ -87,5 +87,5 @@ export class BundleJSONConverter extends Converter {
       }
     }
     return null;
-  };
+  }
 }

@@ -145,6 +145,7 @@
       "step backward": "Jump to the last position",
       "step backward time": "Jump back in time",
       "set segment": "Set segment boundary",
+      "set break": "Mark segment as break",
       "play selection": "Play selection",
       "transcribe segment": "Transcribe segment",
       "move cursor left": "Move cursor to the left",

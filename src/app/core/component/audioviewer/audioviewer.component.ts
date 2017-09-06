@@ -288,12 +288,13 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
       if (this.Settings.cropping === 'none') {
         this.drawPlayCursor();
+        this.drawCursor(this.av.Mousecursor.line);
       }
     } else {
       console.error('audio channel is null');
     }
     this.oldInnerWidth = this._innerWidth;
-  };
+  }
 
   /**
    * crop audioviewer
@@ -517,7 +518,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       this.m_context.lineTo(this.av.Mousecursor.relPos.x, line.Pos.y + this.Settings.height - 1);
       this.m_context.stroke();
     }
-  };
+  }
 
   /**
    * drawSegments() draws a vertical line for every boundary in the current audio viewer
@@ -862,7 +863,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                           samplepos: result.seg_samples
                         });
                         this.segmentchange.emit(result.seg_samples);
-
                         this.drawSegments();
                       }
                     }
@@ -936,7 +936,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                             this.audiochunk.playposition.samples = this.audiochunk.selection.start.samples;
                             this.changePlayCursorSamples(this.audiochunk.selection.start.samples);
                             this.drawPlayCursorOnly(this.av.LastLine);
-                            this.audiochunk.stopPlayback(() => {
+                            this.audiochunk.stopPlayback().then(() => {
                                 this.audiochunk.selection = boundary_select.clone();
                                 this.playSelection();
                               }
@@ -1027,13 +1027,12 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         }
       }
     }
-  };
+  }
 
   /**
    * playSelection() plays the selected signal fragment or the selection in this chunk
    */
   playSelection = (): Promise<boolean> => {
-
     return new Promise<boolean>((resolve, reject) => {
       const drawFunc = () => {
         this.audiochunk.updatePlayPosition();
@@ -1043,6 +1042,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       this.audiochunk.startPlayback(drawFunc).then((played: boolean) => {
         if (played) {
           this.onEndPlayBack();
+        } else {
+          console.log('not played?');
         }
         resolve(played);
       }).catch((err) => {
@@ -1050,30 +1051,39 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         reject(err);
       });
     });
-  };
+  }
+
 
   /**
    * method called when audioplayback ended
    */
   private onEndPlayBack = () => {
-    if (this.audiomanager.replay) {
+    if (this.audiomanager.replay && this.audiochunk.isPlaybackEnded) {
       this.audiochunk.playposition = this.audiochunk.time.start.clone();
       this.playSelection();
+      console.log('Hä2');
+    } else if (this.audiochunk.isPlaybackEnded) {
+      console.log('HÄ1');
+      this.audiochunk.playposition = this.audiochunk.selection.start.clone();
     }
+    console.log(this.audiochunk.state);
+    console.log('state: ' + this.audiochunk.state);
+    console.log(this.audiochunk.playposition);
+
+    this.drawPlayCursor();
 
     this.audiomanager.stepbackward = false;
     this.audiomanager.paused = false;
-  };
+  }
 
   /**
    * stops audio playback
    */
   stopPlayback() {
-    if (!this.audiochunk.stopPlayback()) {
-      // state was not audioplaying
-      this.changePlayCursorAbsX(0);
-      this.drawPlayCursor();
-    }
+    return this.audiochunk.stopPlayback().then(() => {
+      this.av.drawnselection.start = this.av.drawnselection.end.clone();
+      this.drawSegments();
+    });
   }
 
   /**
@@ -1149,7 +1159,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       this.av.LastLine = line;
     } else {
     }
-  };
+  }
 
   /**
    * draw playcursor at its current position. You can call this method to update the playcursor view.
@@ -1182,7 +1192,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     } else {
       console.error('curr line is null');
     }
-  };
+  }
 
   /**
    * change the absolute positon of playcursor
@@ -1191,7 +1201,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   private changePlayCursorAbsX = (new_value: number) => {
     this.av.PlayCursor.changeAbsX(new_value, this.av.audioTCalculator, this.av.AudioPxWidth, this.audiochunk);
     this.playcursorchange.emit(this.av.PlayCursor);
-  };
+  }
 
   /**
    * change samples of playcursor
@@ -1201,7 +1211,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   private changePlayCursorSamples = (new_value: number, chunk?: AudioChunk) => {
     this.av.PlayCursor.changeSamples(new_value, this.av.audioTCalculator, chunk);
     this.playcursorchange.emit(this.av.PlayCursor);
-  };
+  }
 
   /**
    * checks if the comboKey is part of the list of disabled keys
@@ -1314,7 +1324,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
       this.o_context.globalAlpha = 1.0;
     }
-  };
+  }
 
   /**
    * adjust the view when window resized

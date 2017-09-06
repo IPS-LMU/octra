@@ -143,6 +143,7 @@
       "step backward": "Zur zuletzt pausierten Stelle springen",
       "step backward time": "Zeitversetzt zurückspringen",
       "set segment": "Segmentgrenze setzen",
+      "set break": "Segment als Pause markieren",
       "play selection": "Selektion abspielen",
       "transcribe segment": "Segment transkribieren",
       "move cursor left": "Cursor nach links bewegen",

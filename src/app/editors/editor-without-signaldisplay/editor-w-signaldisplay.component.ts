@@ -140,7 +140,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
         this.audioplayer.stopPlayback();
         break;
       case('replay'):
-        this.nav.replay = this.audioplayer.rePlayback();
+        this.audioplayer.rePlayback();
         break;
       case('backward'):
         this.audioplayer.stepBackward();
@@ -197,29 +197,34 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
     if (i > -1) {
       const start = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.samples : 0;
-      this.highlightSegment(i);
-      this.audiochunk.startpos = new AudioTime(start, this.audiomanager.ressource.info.samplerate);
-      this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(i).time.clone();
-      this.audioplayer.update();
 
+      // this.highlightSegment(i);
       // make sure that audio is stopped
-      this.audiochunk.stopPlayback(() => {
-        this.audioplayer.startPlayback().then(() => {
-          this.boundaryselected = false;
-          if (this.audiochunk.isPlaybackEnded) {
-            // set start pos and playback length to end of audio file
-            this.audiochunk.startpos = this.audiochunk.selection.end.clone();
-            this.audioplayer.update();
-          }
-        }).catch(() => {
-        });
+      this.audiochunk.stopPlayback().then(
+        () => {
+          this.audiochunk.startpos = new AudioTime(start, this.audiomanager.ressource.info.samplerate);
+          this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(i).time.clone();
+          this.audioplayer.update();
+          this.audioplayer.startPlayback().then(() => {
+            this.boundaryselected = false;
+            if (this.audiochunk.isPlaybackEnded) {
+              // set start pos and playback length to end of audio file
+              this.audiochunk.startpos = this.audiochunk.selection.end.clone();
+              this.audioplayer.update();
+            }
+          }).catch((error) => {
+            console.error(error);
+          });
+        }
+      ).catch((error) => {
+        console.error(error);
       });
     } else {
       this.boundaryselected = false;
     }
   }
 
-  onBoundaryInserted(event) {
+  onBoundaryInserted() {
     this.uiService.addElementFromEvent('segment', {value: 'boundaries:add'}, Date.now(),
       this.audiomanager.playposition, this.editor.caretpos, 'texteditor');
   }
@@ -244,11 +249,11 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     // split text at the position of every boundary marker
     html = html.replace(/(<textspan([ \w:"\-%;]|[0-9])*>)|(<\/textspan>)/g, '');
     let seg_texts: string[] = html.split(
-      /\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="[0-9]+" alt="\[\|[0-9]+\|\]">\s?/g
+      /\s*<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="[0-9]+" alt="\[\|[0-9]+\|\]">\s*/g
     );
 
     const samples_array: number[] = [];
-    html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s?/g,
+    html.replace(/\s*<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s*/g,
       function (match, g1, g2) {
         samples_array.push(Number(g1));
         return '';
@@ -277,13 +282,17 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
       }
     }
 
+    seg_texts = seg_texts.map((a: string) => {
+      return a.replace(/(^\s+)|(\s+$)/g, '');
+    });
+
     for (let i = 0; i < seg_texts.length; i++) {
       const anno_seg_length = this.transcrService.currentlevel.segments.length;
       const new_raw = this.transcrService.htmlToRaw(seg_texts[i]);
 
       if (i < anno_seg_length) {
         // probably overwrite old files
-        const segment: Segment = this.transcrService.currentlevel.segments.get(i);
+        const segment: Segment = this.transcrService.currentlevel.segments.get(i).clone();
         segment.transcript = new_raw;
         if (i < seg_texts.length - 1) {
           segment.time.samples = samples_array[i];
@@ -343,6 +352,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   }
 
   public onSelectionChanged(caretpos) {
+    /*
     if (!this.audiochunk.isPlaying) {
       const seg_num = this.editor.getSegmentByCaretPos(caretpos);
       if (seg_num > -1) {
@@ -351,6 +361,6 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
         this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(seg_num).time.clone();
         this.audioplayer.update();
       }
-    }
+    } */
   }
 }

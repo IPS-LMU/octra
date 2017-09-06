@@ -264,7 +264,7 @@ export class AudioviewerService extends AudioComponentService {
       this.drawnselection.end = this.audiochunk.selection.end.clone();
     } else if (this.mouse_down && this.dragableBoundaryNumber > -1) {
       // mouse down something dragged
-      const segment = this.transcrService.currentlevel.segments.get(this.dragableBoundaryNumber);
+      const segment = this.transcrService.currentlevel.segments.get(this.dragableBoundaryNumber).clone();
       const absXSeconds = (absXTime / this.audiomanager.ressource.info.samplerate);
 
       // prevent overwriting another boundary
@@ -376,6 +376,18 @@ export class AudioviewerService extends AudioComponentService {
           this.overboundary = false;
           this.mouse_down = false;
         }
+      } else if (this.audiochunk.isPlaying) {
+        const pos = this.audiochunk.playposition.clone();
+        console.log(`before ${pos.samples}`);
+        this.audiochunk.stopPlayback().then((result) => {
+          console.log(`Stop after Click is ${result}`);
+          this.audiochunk.startpos = pos;
+          this.audiochunk.selection.start = this.audiochunk.playposition.clone();
+          this.audiochunk.selection.end = this.audiochunk.playposition.clone();
+          console.log(`after ${this.audiochunk.playposition.samples}`);
+          this.drawnselection = this.audiochunk.selection.clone();
+          this.PlayCursor.changeSamples(this.audiochunk.playposition.samples, this.audioTCalculator, this.audiochunk);
+        });
       }
 
       resolve(this.mouse_click_pos.line);

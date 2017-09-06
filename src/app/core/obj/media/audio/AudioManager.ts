@@ -238,39 +238,38 @@ export class AudioManager {
     }
   }
 
-  public stopPlayback(callback: any = null): boolean {
-    if (this._audioplaying) {
-      if (callback) {
-        const call = () => {
-          this._audioplaying = false;
-          callback();
-        };
-        this._source.onended = call;
+  public stopPlayback(): Promise<any> {
+    return new Promise<any>(
+      (resolve) => {
+        if (this._audioplaying) {
+          this._source.onended = (ev) => {
+            this._source.onended(ev);
+            resolve(true);
+          };
+          this._source.stop(0);
+        } else {
+          resolve(false);
+        }
       }
-      this._playbackstate = 'stopped';
-      this._source.stop(0);
-    } else {
-      if (callback) {
-        callback();
-      }
-      return false;
-    }
-
-    return true;
+    );
   }
 
-  public pausePlayback(): boolean {
-    if (this._audioplaying) {
-      this._paused = true;
-      this._playbackstate = 'paused';
-      this._source.stop(0);
-
-      return true;
-    } else {
-      console.error('cant pause because not playing');
-    }
-
-    return false;
+  public pausePlayback(): Promise<void> {
+    return new Promise(
+      (resolve, reject) => {
+        if (this._audioplaying) {
+          this._paused = true;
+          this._playbackstate = 'paused';
+          this._source.onended = (ev) => {
+            this._source.onended(ev);
+            resolve();
+          };
+          this._source.stop(0);
+        } else {
+          reject(new Error('cant pause because not playing'));
+        }
+      }
+    );
   }
 
   public startPlayback(begintime: AudioTime, duration: AudioTime = new AudioTime(0, this._ressource.info.samplerate),
@@ -295,20 +294,7 @@ export class AudioManager {
         this._paused = false;
 
         this._source.onended = () => {
-          this._audioplaying = false;
-          this.javascriptNode.disconnect();
-
-          if (this._playbackstate === 'started' && !this._stepbackward) {
-            this.statechange.emit({
-              state: 'ended',
-              playonhover: playonhover
-            });
-          } else {
-            this.statechange.emit({
-              state: this._playbackstate,
-              playonhover: playonhover
-            });
-          }
+          this.afterAudioEnded(playonhover);
           resolve(true);
         };
 
@@ -329,9 +315,27 @@ export class AudioManager {
           playonhover: playonhover
         });
       } else {
-        resolve(false)
+        resolve(false);
       }
     });
+  }
+
+  private afterAudioEnded(playonhover) {
+    this._audioplaying = false;
+    this.javascriptNode.disconnect();
+
+    if (this._playbackstate === 'started' && !this._stepbackward) {
+      this._playbackstate = 'ended';
+      this.statechange.emit({
+        state: 'ended',
+        playonhover: playonhover
+      });
+    } else {
+      this.statechange.emit({
+        state: this._playbackstate,
+        playonhover: playonhover
+      });
+    }
   }
 
   public rePlayback(): boolean {
@@ -387,7 +391,7 @@ export class AudioManager {
     this._source = this.getSource();
 
     this.loaded = true;
-    this.afterloaded.emit({status: 'success', error: ''})
+    this.afterloaded.emit({status: 'success', error: ''});
   }
 
   public destroy(disconnect: boolean = true) {

@@ -167,7 +167,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         this.transcrService.currentlevel.segments.onsegmentchange.emit(null);
       } else {
         // no boundaries inserted
-        const segment = this.transcrService.currentlevel.segments.get(this.segment_index);
+        const segment = this.transcrService.currentlevel.segments.get(this.segment_index).clone();
         segment.transcript = this.editor.rawText;
         this.transcrService.currentlevel.segments.change(this.segment_index, segment);
       }

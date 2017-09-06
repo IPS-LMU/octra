@@ -119,7 +119,8 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         if (!this.saving) {
           setTimeout(() => {
             this.saving = true;
-            this.onSegmentChange($event);
+            console.log('call segment change by subscr');
+            this.onSegmentChange();
           }, 1000);
         }
       }
@@ -235,9 +236,10 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  onSegmentChange($event) {
+  onSegmentChange() {
     this.loupe.update();
     this.viewer.update();
+    console.log('h6');
     this.saving = false;
   }
 
@@ -282,28 +284,45 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onSegmentEnter($event) {
-    const segment = this.transcrService.currentlevel.segments.get($event.index);
-    this.editor.rawText = segment.transcript;
-    this.segmentselected = true;
-    this.selected_index = $event.index;
-    let start = new AudioTime(0, this.audiomanager.ressource.info.samplerate);
-    if ($event.index > 0) {
-      start = this.transcrService.currentlevel.segments.get($event.index - 1).time;
-    }
+    this.selectSegment($event.index).then((selection: AudioSelection) => {
+      this.top_selected = true;
 
-    this.top_selected = true;
-    setTimeout(() => {
-      this.audiochunk_down = new AudioChunk(new AudioSelection(start, segment.time), this.audiomanager);
-      this.loupe.update();
-    }, 100);
+      setTimeout(() => {
+        this.audiochunk_down = new AudioChunk(selection, this.audiomanager);
+        this.loupe.update();
+      }, 100);
+    });
   }
 
-// TODO CHANGE!!
   onLoupeSegmentEnter($event) {
-    const segment = this.transcrService.currentlevel.segments.get($event.index);
-    this.editor.rawText = segment.transcript;
-    this.segmentselected = true;
-    this.selected_index = $event.index;
+    this.selectSegment($event.index).then((selection: AudioSelection) => {
+      this.audiochunk_down.selection = selection.clone();
+      this.audiochunk_down.playposition = this.audiochunk_down.selection.start.clone();
+
+      setTimeout(() => {
+        console.log(1);
+        if (this.audiochunk_down.playposition.samples === this.audiochunk_down.time.start.samples) {
+          console.log('HÄÄÄ');
+        }
+        this.loupe.update();
+      }, 100);
+    });
+  }
+
+  private selectSegment(index: number): Promise<AudioSelection> {
+    return new Promise<AudioSelection>(
+      (resolve) => {
+        const segment = this.transcrService.currentlevel.segments.get(index);
+        this.editor.rawText = segment.transcript;
+        this.selected_index = index;
+        this.segmentselected = true;
+        let start = new AudioTime(0, this.audiomanager.ressource.info.samplerate);
+        if (index > 0) {
+          start = this.transcrService.currentlevel.segments.get(index - 1).time;
+        }
+        resolve(new AudioSelection(start, segment.time));
+      }
+    );
   }
 
   onTranscriptionChanged($event) {
@@ -314,11 +333,11 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.segmentselected) {
       if (this.selected_index > -1 && this.transcrService.currentlevel.segments &&
         this.selected_index < this.transcrService.currentlevel.segments.length) {
-        const segment = this.transcrService.currentlevel.segments.get(this.selected_index);
+        const segment = this.transcrService.currentlevel.segments.get(this.selected_index).clone();
         this.viewer.focused = false;
         this.loupe.viewer.focused = false;
         segment.transcript = this.editor.rawText;
-        this.transcrService.currentlevel.segments.change(this.selected_index, segment);
+        const saved = this.transcrService.currentlevel.segments.change(this.selected_index, segment);
       }
     }
   }
@@ -362,6 +381,20 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  onLoupeClick(event) {
+    if (this.selected_index > -1) {
+      const end_samples = this.transcrService.currentlevel.segments.get(this.selected_index).time.samples;
+      let start_samples = 0;
+      if (this.selected_index > 0) {
+        start_samples = this.transcrService.currentlevel.segments.get(this.selected_index - 1).time.samples;
+      }
+      if (this.loupe.viewer.MouseCursor.timePos.samples < start_samples
+        || this.loupe.viewer.MouseCursor.timePos.samples > end_samples) {
+        this.segmentselected = false;
+      }
+    }
+  }
+
   /**
    * hits when user is typing something in the editor
    * @param status
@@ -372,7 +405,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     if (status === 'stopped') {
       this.save();
     }
-  };
+  }
 
   onMarkerInsert(marker_code: string) {
     if (this.projectsettings.logging.forced === true) {
@@ -505,6 +538,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   public update() {
     this.loupe.update();
     this.viewer.update();
+    console.log('h7');
     this.segmentselected = false;
     this.audiochunk_top.startpos = this.audiochunk_top.time.start;
     this.audiochunk_down.startpos = this.audiochunk_down.time.start;

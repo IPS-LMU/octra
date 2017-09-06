@@ -58,7 +58,7 @@ export class AudioNavigationComponent implements AfterViewInit {
 
   private _volume = 1;
   private _speed = 1;
-  public replay = false;
+  @Input() public replay = false;
 
   get speed(): number {
     return this._speed;
@@ -105,7 +105,7 @@ export class AudioNavigationComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     setTimeout(() => {
-      jQuery.material.init()
+      jQuery.material.init();
     }, 3000);
   }
 

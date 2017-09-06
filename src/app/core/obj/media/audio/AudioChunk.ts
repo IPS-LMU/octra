@@ -167,13 +167,18 @@ export class AudioChunk {
         // console.log(`play from ${this.selection.start.seconds} to ${this.selection.start.seconds + this.selection.duration.seconds}`);
         return this._audiomanger.startPlayback(
           this.selection.start, this.selection.duration, this._volume, this._speed, drawFunc, playonhover).then((result: boolean) => {
+          console.log('after played');
           if (this.state !== PlayBackState.PAUSED && this.state !== PlayBackState.STOPPED) {
             this.setState(PlayBackState.ENDED);
           }
 
           if (this.state === PlayBackState.PAUSED) {
-            this.startpos = this.playposition.clone();
+            console.log('paused');
+            if (this.selection.end.samples === this.time.end.samples) {
+              this.startpos = this.playposition.clone();
+            }
           }
+          console.log('resolve');
           resolve(result);
         }).catch((err) => {
           reject(err);
@@ -184,23 +189,31 @@ export class AudioChunk {
     });
   }
 
-  public stopPlayback(callback: any = null): boolean {
-    if (this._audiomanger.stopPlayback(callback)) {
-      this.startpos = this.time.start.clone();
-      this.setState(PlayBackState.STOPPED);
-      return true;
-    }
-
-    return false;
+  public stopPlayback(): Promise<boolean> {
+    return new Promise<boolean>(
+      (resolve, reject) => {
+        this._audiomanger.stopPlayback().then(
+          (result) => {
+            this.startpos = this.selection.start.clone();
+            this.setState(PlayBackState.STOPPED);
+            this.audiomanager.replay = false;
+            resolve(result);
+          }
+        ).catch((error) => {
+          reject(error);
+        });
+      });
   }
 
-  public pausePlayback(): boolean {
-    if (this._audiomanger.pausePlayback()) {
-      this.setState(PlayBackState.PAUSED);
-      return true;
-    }
-
-    return false;
+  public pausePlayback(): Promise<void> {
+    const last = this._playposition.clone();
+    return this._audiomanger.pausePlayback().then(
+      () => {
+        this.setState(PlayBackState.PAUSED);
+        console.log('paused ok');
+        this._playposition = last;
+      }
+    );
   }
 
   public rePlayback(): boolean {
@@ -238,19 +251,18 @@ export class AudioChunk {
         this._playposition = this.time.start.clone();
       }
 
-      if (this._audiomanger.audioplaying) {
+      if (this.isPlaying) {
         const playduration = (this._audiomanger.endplaying - timestamp) * this.speed;
         this._playposition.unix = this.selection.start.unix + this.selection.duration.unix - playduration;
+
       } else if (this.state === PlayBackState.ENDED) {
-        this._playposition = this.selection.end.clone();
+        this._playposition = this.selection.start.clone();
       } else if (this.state === PlayBackState.PAUSED) {
-      } else {
       }
 
       this.audiomanager.playposition = this._playposition.samples;
-    } else {
     }
-  };
+  }
 
   private setState(state: PlayBackState) {
     if (this._state !== state) {
@@ -269,6 +281,10 @@ export class AudioChunk {
 
   public get isPlaying(): boolean {
     return this._state === PlayBackState.PLAYING;
+  }
+
+  public get isPlayBackStopped(): boolean {
+    return this._state === PlayBackState.STOPPED;
   }
 
   public clone() {

@@ -132,7 +132,7 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
 
   public update() {
     this.viewer.name = this.name;
-    this.viewer.initialize();
+    // this.viewer.initialize();
     this.viewer.update(true);
   }
 
@@ -152,6 +152,9 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
         break;
       case('backward'):
         this.viewer.stepBackward();
+        break;
+      case('backward time'):
+        this.viewer.stepBackwardTime(0.5);
         break;
       case('default'):
         break;

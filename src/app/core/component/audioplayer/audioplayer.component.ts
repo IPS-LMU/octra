@@ -138,6 +138,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
             current.time.end.samples !== previous.time.end.samples)) {
           // audiochunk changed
           this.ap.init(this.innerWidth, this.audiochunk);
+          console.log('audiochunk changed');
           this.update();
         }
       }
@@ -156,6 +157,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
     this.updateCanvasSizes();
     if (this.audiochunk.channel) {
       this.draw();
+      console.log('update');
       this.drawPlayCursor();
     }
 
@@ -350,7 +352,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
    */
   private playSelection(): Promise<void> {
 
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve) => {
       const drawFunc = () => {
         this.audiochunk.updatePlayPosition();
         this.anim.requestFrame(this.drawPlayCursor);
@@ -367,20 +369,29 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   private onEndPlayback = () => {
-    if (this.audiomanager.replay) {
-      this.audiochunk.playposition = this.audiochunk.time.start.clone();
-      this.playSelection();
+    if (this.audiochunk.isPlaybackEnded) {
+      if (this.audiochunk.selection.end.samples === this.audiochunk.time.end.samples) {
+        this.audiochunk.startpos = this.audiochunk.time.start.clone();
+      } else {
+        this.audiochunk.playposition = this.audiochunk.selection.start.clone();
+        console.log(this.audiochunk.selection.start.clone());
+      }
+      if (this.audiomanager.replay) {
+        this.playSelection();
+      }
     }
 
     this.audiomanager.stepbackward = false;
     this.audiomanager.paused = false;
-  };
+    this.drawPlayCursor();
+  }
 
   /**
    * stops the playback and sets the current playcursor position to 0.
    */
   public stopPlayback() {
     if (this.audiochunk.stopPlayback()) {
+      this.rePlayback();
       // state was not audioplaying
       this.audiochunk.playposition.samples = 0;
       this.changePlayCursorAbsX(0);
@@ -401,7 +412,9 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   public startPlayback(computetimes: boolean = true): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (!this.audiochunk.isPlaying) {
-        this.playSelection().then(resolve);
+        this.playSelection().then(() => {
+          resolve();
+        });
       } else {
         reject();
       }
@@ -463,6 +476,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
     // set new position of playcursor
     const absX = this.ap.audioTCalculator.samplestoAbsX(this.audiochunk.playposition.samples);
     this.changePlayCursorAbsX(absX);
+    console.log('absX =  ' + absX);
     const line = this.ap.Line;
 
     if (line) {

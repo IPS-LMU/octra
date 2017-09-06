@@ -11,6 +11,7 @@
                           (speedchange)="onSpeedChange($event)"
                           (afterspeedchange)="afterSpeedChange($event)"
                           [audioplaying]="audiomanager.audioplaying"
+                          [replay]="audiomanager.replay"
                           [(responsive)]="settingsService.responsive.enabled"
                           [buttons]="{
                                 play: {

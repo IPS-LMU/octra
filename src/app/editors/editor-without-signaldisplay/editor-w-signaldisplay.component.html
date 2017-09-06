@@ -6,6 +6,7 @@
                       (buttonclick)="onButtonClick($event)"
                       [audioplaying]="audiomanager.audioplaying"
                       [(responsive)]="settingsService.responsive.enabled"
+                      [replay]="audiomanager.replay"
                       [buttons]="{
                         play: {
                             label: ('general.play' | translate),

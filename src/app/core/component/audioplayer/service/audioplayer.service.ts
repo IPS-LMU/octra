@@ -79,38 +79,41 @@ export class AudioplayerService extends AudioComponentService {
   public setMouseClickPosition(x: number, y: number, curr_line: Line, $event: Event, innerWidth: number) {
     super.setMouseClickPosition(x, y, curr_line, $event, innerWidth);
 
-    if (!this.audiomanager.audioplaying) {
-      if (this.last_line === null || this.last_line === curr_line) {
-        // same line
-        // fix margin _settings
-        if ($event.type === 'mousedown') {
-          if (this.last_line === null || this.last_line.number === this.last_line.number) {
-            if (x < this.PlayCursor.absX - 5 && x > this.PlayCursor.absX + 5) {
-              // selection disabled
-            } else {
-              // drag only if audioplaying = false
-              this.drag_playcursor = true;
-            }
-            this.mouse_click_pos.line = curr_line;
-            this.mouse_click_pos.absX = this.getAbsXByLine(curr_line, x - curr_line.Pos.x, innerWidth);
-            this.audiochunk.playposition.samples = this.mouse_click_pos.timePos.samples;
+    if (this.audiomanager.audioplaying) {
+      this.audiochunk.stopPlayback();
+    }
+
+    if (this.last_line === null || this.last_line === curr_line) {
+      // same line
+      // fix margin _settings
+      if ($event.type === 'mousedown') {
+        if (this.last_line === null || this.last_line.number === this.last_line.number) {
+          if (x < this.PlayCursor.absX - 5 && x > this.PlayCursor.absX + 5) {
+            // selection disabled
+          } else {
+            // drag only if audioplaying = false
+            this.drag_playcursor = true;
           }
-          this.mouse_down = true;
-        } else if ($event.type === 'mouseup') {
-          this.mouse_down = false;
-          this.drag_playcursor = false;
-          // drag playcursor
-          this.PlayCursor.changeAbsX(x - this._settings.margin.left, this.audioTCalculator, this.audio_px_w, this.audiochunk);
-          this.audiochunk.startpos = this.PlayCursor.time_pos.clone();
+          this.mouse_click_pos.line = curr_line;
+          this.mouse_click_pos.absX = this.getAbsXByLine(curr_line, x - curr_line.Pos.x, innerWidth);
+          this.audiochunk.playposition.samples = this.mouse_click_pos.timePos.samples;
         }
+        this.mouse_down = true;
       } else if ($event.type === 'mouseup') {
         this.mouse_down = false;
         this.drag_playcursor = false;
         // drag playcursor
         this.PlayCursor.changeAbsX(x - this._settings.margin.left, this.audioTCalculator, this.audio_px_w, this.audiochunk);
-        this.audiochunk.startpos.samples = this.audioTCalculator.absXChunktoSamples(this.PlayCursor.absX, this.audiochunk);
+        this.audiochunk.startpos = this.PlayCursor.time_pos.clone();
       }
+    } else if ($event.type === 'mouseup') {
+      this.mouse_down = false;
+      this.drag_playcursor = false;
+      // drag playcursor
+      this.PlayCursor.changeAbsX(x - this._settings.margin.left, this.audioTCalculator, this.audio_px_w, this.audiochunk);
+      this.audiochunk.startpos.samples = this.audioTCalculator.absXChunktoSamples(this.PlayCursor.absX, this.audiochunk);
     }
+
   }
 
   /**

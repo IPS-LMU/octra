@@ -99,12 +99,18 @@ export class Segments {
    */
   public change(i: number, segment: Segment): boolean {
     if (i > -1 && this._segments[i]) {
+      const old = {
+        samples: this._segments[i].time.samples,
+        transcript: this._segments[i].transcript
+      };
+
       this._segments[i].time.samples = segment.time.samples;
       this._segments[i].transcript = segment.transcript;
 
-      this.onsegmentchange.emit();
-
-      return true;
+      if (old.samples !== segment.time.samples || old.transcript !== segment.transcript) {
+        this.onsegmentchange.emit();
+        return true;
+      }
     }
     return false;
   }

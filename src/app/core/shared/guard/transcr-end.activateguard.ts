@@ -7,12 +7,12 @@ import {AppStorageService} from '../service/appstorage.service';
 @Injectable()
 export class TranscrEndGuard implements CanActivate {
 
-  constructor(private sessService: AppStorageService, private router: Router) {
+  constructor(private appStorage: AppStorageService, private router: Router) {
 
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
-    if (!this.sessService.submitted) {
+    if (!this.appStorage.submitted) {
       this.router.navigate(['/user/load']);
       return false;
     }

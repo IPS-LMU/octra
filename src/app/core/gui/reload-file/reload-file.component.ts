@@ -20,14 +20,14 @@ export class ReloadFileComponent implements OnInit {
   private error = '';
 
   constructor(public router: Router,
-              public sessServ: AppStorageService,
+              public appStorage: AppStorageService,
               public transcrServ: TranscriptionService,
               public modService: ModalService,
               public langService: TranslateService) {
   }
 
   get sessionfile(): SessionFile {
-    return this.sessServ.sessionfile;
+    return this.appStorage.sessionfile;
   }
 
   public isN(obj: any): boolean {
@@ -39,7 +39,7 @@ export class ReloadFileComponent implements OnInit {
 
   private navigate = () => {
     this.router.navigate(['/user/load']);
-  };
+  }
 
   getDropzoneFileString(file: File | SessionFile) {
     if (!isNullOrUndefined(file)) {
@@ -52,13 +52,13 @@ export class ReloadFileComponent implements OnInit {
   abortTranscription = () => {
     this.transcrServ.endTranscription();
     this.router.navigate(['/logout']);
-  };
+  }
 
   newTranscription = () => {
     let keep_data = false;
 
     const process = () => {
-      this.sessServ.beginLocalSession(this.dropzone.files, keep_data, this.navigate,
+      this.appStorage.beginLocalSession(this.dropzone.files, keep_data, this.navigate,
         (error) => {
           if (error === 'file not supported') {
             this.showErrorMessage(this.langService.instant('reload-file.file not supported', {type: ''}));
@@ -76,31 +76,30 @@ export class ReloadFileComponent implements OnInit {
       for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
         new_links.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
       }
-      ;
-      this.sessServ.overwriteAnnotation(new_levels).then(
+      this.appStorage.overwriteAnnotation(new_levels).then(
         () => {
-          return this.sessServ.overwriteLinks(new_links)
+          return this.appStorage.overwriteLinks(new_links);
         }
       ).then(() => {
         keep_data = true;
         process();
       }).catch((err) => {
-        console.error(err)
+        console.error(err);
       });
     } else {
       process();
     }
-  };
+  }
 
   onOfflineSubmit = () => {
-    this.sessServ.beginLocalSession(this.dropzone.files, true, this.navigate,
+    this.appStorage.beginLocalSession(this.dropzone.files, true, this.navigate,
       (error) => {
         if (error === 'file not supported') {
           this.showErrorMessage(this.langService.instant('reload-file.file not supported', {type: ''}));
         }
       }
     );
-  };
+  }
 
   private showErrorMessage(err: string) {
     this.error = err;

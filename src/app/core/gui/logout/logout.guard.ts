@@ -6,14 +6,14 @@ import {AppStorageService} from '../../shared/service/appstorage.service';
 
 @Injectable()
 export class LogoutGuard implements CanActivate {
-  constructor(private sessService: AppStorageService,
+  constructor(private appStorage: AppStorageService,
               private router: Router) {
 
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
     // check if an active session is available
-    if (this.sessService.logged_in) {
+    if (this.appStorage.logged_in) {
       return true;
     } else {
       this.router.navigate(['/user/transcr']);

@@ -53,7 +53,7 @@ export class NavbarService {
     }
   };
 
-  constructor(private sessService: AppStorageService) {
+  constructor(private appStorage: AppStorageService) {
 
   }
 

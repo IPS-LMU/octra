@@ -1,3 +1,17 @@
+<modal #yesno>
+    <modal-body>
+        <p style="text-align:center;">{{(data !== undefined) ? data.text : ''}}</p>
+    </modal-body>
+    <modal-footer>
+        <button type="button" class="btn btn-primary" (click)="data.functions.no();yesno.close()">
+            {{"general.no" | translate}}
+        </button>
+        <button type="button" class="btn btn-danger" (click)="data.functions.yes();yesno.close()">
+            {{"general.yes" | translate}}
+        </button>
+    </modal-footer>
+</modal>
+
 <modal #login_invalid>
     <modal-header>
         <h4 class="modal-title">{{"modal.login.header" | translate}}</h4>

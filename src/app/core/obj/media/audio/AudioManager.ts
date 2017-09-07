@@ -3,12 +3,15 @@ import {AudioRessource} from './AudioRessource';
 import {isNullOrUndefined} from 'util';
 import {EventEmitter} from '@angular/core';
 import {AudioTime} from './AudioTime';
-import {SourceType} from '../index';
+import {PlayBackState, SourceType} from '../index';
 import {AudioChunk} from './AudioChunk';
 import {AudioSelection} from './AudioSelection';
 import {AudioFormat} from './AudioFormats/AudioFormat';
 
 export class AudioManager {
+  get playonhover(): boolean {
+    return this._playonhover;
+  }
 
   set playposition(value: number) {
     if (isNullOrUndefined(this._playposition)) {
@@ -66,10 +69,6 @@ export class AudioManager {
     return this._paused;
   }
 
-  get playbackstate(): string {
-    return this._playbackstate;
-  }
-
   get replay(): boolean {
     return this._replay;
   }
@@ -83,7 +82,7 @@ export class AudioManager {
   }
 
   get audioplaying(): boolean {
-    return this._audioplaying;
+    return (this.state === PlayBackState.PLAYING);
   }
 
   get ressource(): AudioRessource {
@@ -105,13 +104,12 @@ export class AudioManager {
   private _source: AudioBufferSourceNode = null;
   private _gainNode: any = null;
 
-  private _audioplaying = false;
   private _startplaying = 0;
   private _endplaying = 0;
   private _replay = false;
-  private _playbackstate = 'stopped';
   private _paused = false;
   private _stepbackward = false;
+  private _playonhover = false;
   public loaded = false;
   private chunks: AudioChunk[] = [];
   private _mainchunk: AudioChunk;
@@ -120,10 +118,9 @@ export class AudioManager {
   private _javascriptNode = null;
 
   public afterloaded: EventEmitter<any> = new EventEmitter<any>();
-  public statechange: EventEmitter<{ state: string, playonhover: boolean }> = new EventEmitter<{ state: string, playonhover: boolean }>();
+  public statechange: EventEmitter<PlayBackState> = new EventEmitter<PlayBackState>();
 
-  private error: any;
-  private newstate = 'uninitialized';
+  private state = PlayBackState.PREPARE;
 
   public static getFileFormat(extension: string, audioformats: AudioFormat[]): AudioFormat {
     for (let i = 0; i < audioformats.length; i++) {
@@ -169,12 +166,12 @@ export class AudioManager {
       const selection = new AudioSelection(new AudioTime(0, audioinfo.samplerate), new AudioTime(audiobuffer.length, audioinfo.samplerate));
       result._mainchunk = new AudioChunk(selection, result);
 
-      result.newstate = 'ready';
+      result.state = PlayBackState.INITIALIZED;
       result.afterdecoded.emit(result.ressource);
       result.prepareAudioPlayBack();
       return result;
     });
-  };
+  }
 
   /**
    * Decode an audio file to an AudioBuffer object.
@@ -200,8 +197,6 @@ export class AudioManager {
 
     return new Promise<AudioBuffer>((resolve, reject) => {
       const context = new OfflineAudioContext(1, 4096, sampleRate);
-      context.onstatechange = (state) => {
-      };
       context.decodeAudioData(file, (result) => {
         resolve(result);
       }, (reason) => {
@@ -231,111 +226,90 @@ export class AudioManager {
           console.log('old audiocontext available');
         }
 
-        this.newstate = 'pending';
+        this.state = PlayBackState.PREPARE;
       } else {
         console.error('AudioContext not supported by this browser');
       }
     }
   }
 
-  public stopPlayback(): Promise<any> {
-    return new Promise<any>(
-      (resolve) => {
-        if (this._audioplaying) {
-          this._source.onended = (ev) => {
-            this._source.onended(ev);
-            resolve(true);
-          };
-          this._source.stop(0);
-        } else {
-          resolve(false);
-        }
-      }
-    );
+  public stopPlayback(): boolean {
+    this._replay = false;
+    if (this.audioplaying) {
+      this.state = PlayBackState.STOPPED;
+      this._source.stop(0);
+      return true;
+    }
+    return false;
   }
 
-  public pausePlayback(): Promise<void> {
-    return new Promise(
-      (resolve, reject) => {
-        if (this._audioplaying) {
-          this._paused = true;
-          this._playbackstate = 'paused';
-          this._source.onended = (ev) => {
-            this._source.onended(ev);
-            resolve();
-          };
-          this._source.stop(0);
-        } else {
-          reject(new Error('cant pause because not playing'));
-        }
-      }
-    );
+  public pausePlayback(): boolean {
+    if (this.audioplaying) {
+      this._paused = true;
+      this.state = PlayBackState.PAUSED;
+      this._source.stop(0);
+      return true;
+    } else {
+      this.statechange.error(new Error('cant pause because not playing'));
+      return false;
+    }
   }
 
   public startPlayback(begintime: AudioTime, duration: AudioTime = new AudioTime(0, this._ressource.info.samplerate),
-                       volume: number, speed: number, drawFunc: () => void, playonhover: boolean = false): Promise<boolean> {
+                       volume: number, speed: number, drawFunc: () => void, playonhover: boolean = false): boolean {
 
-    return new Promise<boolean>((resolve, reject) => {
-      if (!this._audioplaying) {
-        this._playbackstate = 'started';
-        this._stepbackward = false;
-        this._source = this.getSource();
-        this._source.buffer = this._ressource.audiobuffer;
-        this._javascriptNode = this._audiocontext.createScriptProcessor(2048, 1, 1);
+    if (!this.audioplaying) {
+      this._playonhover = playonhover;
+      this.changeState(PlayBackState.STARTED);
+      this._stepbackward = false;
+      this._source = this.getSource();
+      this._source.buffer = this._ressource.audiobuffer;
+      this._javascriptNode = this._audiocontext.createScriptProcessor(2048, 1, 1);
 
-        // connect modules of Web Audio API
-        this._gainNode.gain.value = volume;
-        this._source.playbackRate.value = speed;
-        this._source.connect(this._gainNode);
-        this._javascriptNode.connect(this._audiocontext.destination);
-        this._gainNode.connect(this._audiocontext.destination);
+      // connect modules of Web Audio API
+      this._gainNode.gain.value = volume;
+      this._source.playbackRate.value = speed;
+      this._source.connect(this._gainNode);
+      this._javascriptNode.connect(this._audiocontext.destination);
+      this._gainNode.connect(this._audiocontext.destination);
+      this._source.onended = this.afterAudioEnded;
 
-        this._audioplaying = true;
-        this._paused = false;
+      this._startplaying = new Date().getTime();
+      this._endplaying = this._startplaying + (duration.unix / speed);
+      this._javascriptNode.onaudioprocess = drawFunc;
 
-        this._source.onended = () => {
-          this.afterAudioEnded(playonhover);
-          resolve(true);
-        };
+      this.changeState(PlayBackState.PLAYING);
 
-        this._startplaying = new Date().getTime();
-        this._endplaying = this._startplaying + (duration.unix / speed);
-        this._javascriptNode.onaudioprocess = drawFunc;
-
-
-        if (duration.samples <= 0) {
-          // important: source.start needs seconds, not samples!
-          this._source.start(0, Math.max(0, begintime.seconds));
-        } else {
-          // important: source.start needs seconds, not samples!
-          this._source.start(0, Math.max(0, begintime.seconds), duration.seconds);
-        }
-        this.statechange.emit({
-          state: 'started',
-          playonhover: playonhover
-        });
+      if (duration.samples <= 0) {
+        // important: source.start needs seconds, not samples!
+        this._source.start(0, Math.max(0, begintime.seconds));
       } else {
-        resolve(false);
+        // important: source.start needs seconds, not samples!
+        this._source.start(0, Math.max(0, begintime.seconds), duration.seconds);
       }
-    });
+
+      return true;
+    } else {
+      this.statechange.error(new Error('Can\'t play audio because it is already playing'));
+      return false;
+    }
   }
 
-  private afterAudioEnded(playonhover) {
-    this._audioplaying = false;
-    this.javascriptNode.disconnect();
-
-    if (this._playbackstate === 'started' && !this._stepbackward) {
-      this._playbackstate = 'ended';
-      this.statechange.emit({
-        state: 'ended',
-        playonhover: playonhover
-      });
-    } else {
-      this.statechange.emit({
-        state: this._playbackstate,
-        playonhover: playonhover
-      });
+  private afterAudioEnded = () => {
+    if (this.state === PlayBackState.PLAYING) {
+      // audio ended normally
+      this.state = PlayBackState.ENDED;
     }
+
+    if (this.state === PlayBackState.ENDED || this.state === PlayBackState.PAUSED || this.state === PlayBackState.STOPPED) {
+      this.javascriptNode.disconnect();
+    }
+    /*
+    if (this.state === PlayBackState.PLAYING && !this._stepbackward) {
+      this.state = PlayBackState.ENDED;
+    }
+    */
+    this.statechange.emit(this.state);
   }
 
   public rePlayback(): boolean {
@@ -343,10 +317,29 @@ export class AudioManager {
     return this._replay;
   }
 
-  public stepBackward(callback: () => void): boolean {
+  public stepBackward(): boolean {
     this._stepbackward = true;
-    if (this._audioplaying) {
-      this._playbackstate = 'backward';
+    if (this.audioplaying) {
+      /* const obj: EventListenerOrEventListenerObject = () => {
+        this._source.removeEventListener('ended', obj);
+        callback();
+        this._stepbackward = false;
+      };
+      this._source.addEventListener('ended', obj);
+      */
+
+      this.state = PlayBackState.STOPPED;
+      this._source.stop(0);
+      return true;
+    }
+    return false;
+  }
+
+  public stepBackwardTime(back_samples: number): boolean {
+    this._stepbackward = true;
+
+    if (this.audioplaying) {
+      /*
       const obj: EventListenerOrEventListenerObject = () => {
         this._source.removeEventListener('ended', obj);
         callback();
@@ -354,31 +347,13 @@ export class AudioManager {
       };
 
       this._source.addEventListener('ended', obj);
+      */
+
+      this.state = PlayBackState.STOPPED;
       this._source.stop(0);
       return true;
-    } else {
-      callback();
-      return false;
     }
-  }
-
-  public stepBackwardTime(callback: () => void): boolean {
-    this._stepbackward = true;
-
-    if (this._audioplaying) {
-      this._playbackstate = 'backward time';
-      const obj: EventListenerOrEventListenerObject = () => {
-        this._source.removeEventListener('ended', obj);
-        callback();
-      };
-
-      this._source.addEventListener('ended', obj);
-      this._source.stop(0);
-      return true;
-    } else {
-      callback();
-      return false;
-    }
+    return false;
   }
 
   private getSource(): AudioBufferSourceNode {
@@ -402,8 +377,8 @@ export class AudioManager {
             console.log('AudioManager successfully destroyed its AudioContext');
           })
           .catch(
-            (re) => {
-              console.error('close audiocontext error:');
+            (error) => {
+              console.error(error);
             }
           );
       }
@@ -412,6 +387,11 @@ export class AudioManager {
         this._source.disconnect();
       }
     }
+  }
+
+  private changeState(newstate: PlayBackState) {
+    this.state = newstate;
+    this.statechange.emit(newstate);
   }
 
   public addChunk(chunk: AudioChunk) {

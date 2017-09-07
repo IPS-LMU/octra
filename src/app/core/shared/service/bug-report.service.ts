@@ -30,7 +30,7 @@ export class BugReportService {
   private _console: ConsoleEntry[] = [];
 
   constructor(private langService: TranslateService,
-              private sessService: AppStorageService,
+              private appStorage: AppStorageService,
               private settService: SettingsService,
               private http: Http) {
   }
@@ -53,9 +53,9 @@ export class BugReportService {
       octra: {
         version: AppInfo.version,
         language: this.langService.currentLang,
-        signed_in: this.sessService.logged_in,
-        dataid: this.sessService.data_id,
-        localmode: this.sessService.uselocalmode
+        signed_in: this.appStorage.logged_in,
+        dataid: this.appStorage.data_id,
+        localmode: this.appStorage.uselocalmode
       },
       system: {
         os: {

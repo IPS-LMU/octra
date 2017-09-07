@@ -7,12 +7,12 @@ import {AppStorageService} from '../../shared/service/appstorage.service';
 @Injectable()
 export class ALoginGuard implements CanActivate {
 
-  constructor(private sessService: AppStorageService, private router: Router) {
+  constructor(private appStorage: AppStorageService, private router: Router) {
 
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
-    if (this.sessService.LoggedIn === true) {
+    if (this.appStorage.LoggedIn === true) {
       this.router.navigate(['/user/transcr']);
       return false;
     }

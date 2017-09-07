@@ -146,7 +146,7 @@
     </div>
 
     <div id="bottom-feedback" class="panel" #feedback
-         *ngIf="!sessService.uselocalmode && transcrService.feedback !== null && transcrService.feedback !== undefined">
+         *ngIf="!appStorage.uselocalmode && transcrService.feedback !== null && transcrService.feedback !== undefined">
         <table style="width:100%;">
             <tbody>
             <tr>
@@ -223,18 +223,18 @@
             <a class="btn btn-default btn-raised"
                (click)="modService.show('transcription_stop', '', {ok: abortTranscription})"><span
                     class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span><span
-                    *ngIf="!sessService.easymode"
+                    *ngIf="!appStorage.easymode"
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.quit" | translate}}</span></a>
 
             <a class="btn btn-primary btn-raised"
-               (click)="navbarServ.doclick('export');" *ngIf="sessService.uselocalmode"><span
-                    *ngIf="!sessService.easymode"
+               (click)="navbarServ.doclick('export');" *ngIf="appStorage.uselocalmode"><span
+                    *ngIf="!appStorage.easymode"
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.export data" | translate}}</span>
                 <span class="glyphicon glyphicon-download"></span></a>
 
             <a class="btn btn-primary btn-raised"
-               (click)="onSendButtonClick()" *ngIf="!sessService.uselocalmode"><span
-                    *ngIf="!sessService.easymode"
+               (click)="onSendButtonClick()" *ngIf="!appStorage.uselocalmode"><span
+                    *ngIf="!appStorage.easymode"
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"transcription.send" | translate}}</span>
                 <span class="glyphicon glyphicon-send"></span></a>
         </div>

@@ -203,7 +203,7 @@
     {
       "id": 2,
       "name": "filled pause",
-      "code": "[fil]",
+      "code": "<nib>",
       "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/fil.png",
       "button_text": "filled pause",

@@ -8,12 +8,12 @@ import {SubscriptionManager} from '../obj/SubscriptionManager';
 
 export class UpdateManager {
   private version = '';
-  private sessService: AppStorageService;
+  private appStorage: AppStorageService;
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
-  constructor(sessService: AppStorageService) {
-    this.version = sessService.version;
-    this.sessService = sessService;
+  constructor(appStorage: AppStorageService) {
+    this.version = appStorage.version;
+    this.appStorage = appStorage;
   }
 
   public checkForUpdates(dbname: string): Promise<IndexedDBManager> {
@@ -21,8 +21,8 @@ export class UpdateManager {
       (resolve, reject) => {
         const appversion = AppInfo.version;
 
-        if (!isNullOrUndefined(this.sessService.localStr.retrieve('version'))) {
-          this.version = this.sessService.localStr.retrieve('version');
+        if (!isNullOrUndefined(this.appStorage.localStr.retrieve('version'))) {
+          this.version = this.appStorage.localStr.retrieve('version');
         }
 
 
@@ -62,65 +62,65 @@ export class UpdateManager {
                   idbm.saveSequential(optionsStore, [
                     {
                       key: 'easymode',
-                      value: {value: this.sessService.localStr.retrieve('easymode')}
+                      value: {value: this.appStorage.localStr.retrieve('easymode')}
                     },
                     {
                       key: 'submitted',
-                      value: {value: this.sessService.localStr.retrieve('submitted')}
+                      value: {value: this.appStorage.localStr.retrieve('submitted')}
                     },
                     {
                       key: 'feedback',
-                      value: {value: this.sessService.localStr.retrieve('feedback')}
+                      value: {value: this.appStorage.localStr.retrieve('feedback')}
                     },
                     {
                       key: 'data_id',
-                      value: {value: this.sessService.localStr.retrieve('data_id')}
+                      value: {value: this.appStorage.localStr.retrieve('data_id')}
                     },
                     {
                       key: 'audio_url',
-                      value: {value: this.sessService.localStr.retrieve('audio_url')}
+                      value: {value: this.appStorage.localStr.retrieve('audio_url')}
                     },
                     {
                       key: 'uselocalmode',
-                      value: {value: this.sessService.localStr.retrieve('offline')}
+                      value: {value: this.appStorage.localStr.retrieve('offline')}
                     },
                     {
                       key: 'useinterface',
-                      value: {value: this.sessService.sessStr.retrieve('interface')}
+                      value: {value: this.appStorage.sessStr.retrieve('interface')}
                     },
                     {
                       key: 'sessionfile',
-                      value: {value: this.sessService.localStr.retrieve('sessionfile')}
+                      value: {value: this.appStorage.localStr.retrieve('sessionfile')}
                     },
                     {
                       key: 'language',
-                      value: {value: this.sessService.localStr.retrieve('language')}
+                      value: {value: this.appStorage.localStr.retrieve('language')}
                     },
                     {
                       key: 'version',
-                      value: {value: this.sessService.localStr.retrieve('version')}
+                      value: {value: this.appStorage.localStr.retrieve('version')}
                     },
                     {
                       key: 'comment',
-                      value: {value: this.sessService.localStr.retrieve('comment')}
+                      value: {value: this.appStorage.localStr.retrieve('comment')}
                     },
                     {
                       key: 'user',
                       value: {
                         value: {
-                          id: this.sessService.localStr.retrieve('member_id'),
-                          project: this.sessService.localStr.retrieve('member_project'),
-                          jobno: this.sessService.localStr.retrieve('member_jobno')
+                          id: this.appStorage.localStr.retrieve('member_id'),
+                          project: this.appStorage.localStr.retrieve('member_project'),
+                          jobno: this.appStorage.localStr.retrieve('member_jobno')
                         }
                       }
                     }
                   ]).then(() => {
 
                     const convertAnnotation = () => {
-                      if (!isNullOrUndefined(this.sessService.localStr.retrieve('annotation'))) {
+                      if (!isNullOrUndefined(this.appStorage.localStr.retrieve('annotation'))) {
                         Logger.log(`Convert annotation to IDB...`);
 
-                        const levels = this.sessService.localStr.retrieve('annotation').levels;
+                        const levels = this.appStorage.localStr.retrieve('annotation').levels;
                         const new_levels: OIDBLevel[] = [];
                         for (let i = 0; i < levels.length; i++) {
                           new_levels.push(new OIDBLevel(i + 1, levels[i], i));
@@ -131,7 +131,7 @@ export class UpdateManager {
 
                           version++;
                           Logger.log(`IDB upgraded to v${version}`);
-                          this.sessService.localStr.clear();
+                          this.appStorage.localStr.clear();
                           // do not insert a resolve call here!
                           // after an successful upgrade the success is automatically triggered
                         }).catch((err) => {
@@ -140,16 +140,16 @@ export class UpdateManager {
                         });
                       } else {
                         version++;
-                        this.sessService.localStr.clear();
+                        this.appStorage.localStr.clear();
                         Logger.log(`IDB upgraded to v${version}`);
                       }
                     };
 
-                    if (!isNullOrUndefined(this.sessService.localStr.retrieve('logs'))) {
+                    if (!isNullOrUndefined(this.appStorage.localStr.retrieve('logs'))) {
                       Logger.log('Convert logging data...');
-                      Logger.log(`${this.sessService.localStr.retrieve('logs').length} logs to convert:`);
-                      idbm.saveArraySequential(this.sessService.localStr.retrieve('logs'), logsStore, 'timestamp').then(() => {
-                        console.log(`converted ${this.sessService.localStr.retrieve('logs').length} logging items to IDB`);
+                      Logger.log(`${this.appStorage.localStr.retrieve('logs').length} logs to convert:`);
+                      idbm.saveArraySequential(this.appStorage.localStr.retrieve('logs'), logsStore, 'timestamp').then(() => {
+                        console.log(`converted ${this.appStorage.localStr.retrieve('logs').length} logging items to IDB`);
                         convertAnnotation();
                       }).catch((err) => {
                         console.error(err);
@@ -204,7 +204,7 @@ export class UpdateManager {
     const appversion = AppInfo.version;
 
     if (isNullOrUndefined(this.version)) {
-      const old_transcription = this.sessService.localStr.retrieve('transcription');
+      const old_transcription = this.appStorage.localStr.retrieve('transcription');
       if (!isNullOrUndefined(old_transcription)) {
         console.log('Convert to new AnnotJSON...');
 
@@ -235,14 +235,14 @@ export class UpdateManager {
 
         const annotation: OAnnotJSON = new OAnnotJSON(audiofile.name, audiofile.samplerate, levels);
         console.log('IMPORTED:');
-        this.sessService.localStr.store('annotation', annotation);
+        this.appStorage.localStr.store('annotation', annotation);
         console.log('delete old transcription');
-        this.sessService.localStr.store('transcription', null);
-        this.sessService.version = appversion;
+        this.appStorage.localStr.store('transcription', null);
+        this.appStorage.version = appversion;
       }
     } else {
       console.log('version available');
-      this.sessService.version = appversion;
+      this.appStorage.version = appversion;
     }
   }
 

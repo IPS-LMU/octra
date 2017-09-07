@@ -14,6 +14,7 @@ import {Segment} from '../../core/obj/Annotation/Segment';
 import {AudioManager} from '../../core/obj/media/audio/AudioManager';
 import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
 import {AudioTime} from '../../core/obj/media/audio/AudioTime';
+import {PlayBackState} from '../../core/obj/media/index';
 
 @Component({
   selector: 'app-audioplayer-gui',
@@ -63,7 +64,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
               public transcrService: TranscriptionService,
               private uiService: UserInteractionsService,
               public settingsService: SettingsService,
-              public sessService: AppStorageService) {
+              public appStorage: AppStorageService) {
     this.subscrmanager = new SubscriptionManager();
   }
 
@@ -146,7 +147,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
         this.audioplayer.stepBackward();
         break;
       case('backward time'):
-        this.audioplayer.stepBackwardTime(3, 0.5);
+        this.audioplayer.stepBackwardTime(0.5);
         break;
       case('default'):
         break;
@@ -200,25 +201,42 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
       // this.highlightSegment(i);
       // make sure that audio is stopped
-      this.audiochunk.stopPlayback().then(
-        () => {
-          this.audiochunk.startpos = new AudioTime(start, this.audiomanager.ressource.info.samplerate);
-          this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(i).time.clone();
-          this.audioplayer.update();
-          this.audioplayer.startPlayback().then(() => {
-            this.boundaryselected = false;
-            if (this.audiochunk.isPlaybackEnded) {
-              // set start pos and playback length to end of audio file
-              this.audiochunk.startpos = this.audiochunk.selection.end.clone();
-              this.audioplayer.update();
-            }
-          }).catch((error) => {
-            console.error(error);
-          });
+      const id = this.subscrmanager.add(this.audiochunk.statechange.subscribe(
+        (state: PlayBackState) => {
+          if (state === PlayBackState.STOPPED) {
+            this.audiochunk.startpos = new AudioTime(start, this.audiomanager.ressource.info.samplerate);
+            this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(i).time.clone();
+            this.audioplayer.update();
+            this.subscrmanager.remove(id);
+
+            const id2 = this.subscrmanager.add(this.audiochunk.statechange.subscribe(
+              (state2: PlayBackState) => {
+                console.log(state2);
+                this.boundaryselected = false;
+                if (this.audiochunk.isPlaybackEnded) {
+                  // set start pos and playback length to end of audio file
+                  this.audiochunk.startpos = this.audiochunk.selection.end.clone();
+                  this.audioplayer.update();
+                }
+
+                if (state2 === PlayBackState.STOPPED
+                  || state2 === PlayBackState.PAUSED
+                  || state2 === PlayBackState.ENDED) {
+                  this.subscrmanager.remove(id2);
+                }
+              },
+              (error) => {
+                console.error(error);
+              }
+            ));
+            this.audioplayer.startPlayback(true);
+          }
+        },
+        (error) => {
+          console.error(error);
         }
-      ).catch((error) => {
-        console.error(error);
-      });
+      ));
+      this.audiochunk.stopPlayback();
     } else {
       this.boundaryselected = false;
     }

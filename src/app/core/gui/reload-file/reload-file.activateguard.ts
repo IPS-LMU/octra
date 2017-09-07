@@ -9,13 +9,13 @@ import {isNullOrUndefined} from 'util';
 @Injectable()
 export class ReloadFileGuard implements CanActivate {
 
-  constructor(private sessService: AppStorageService,
+  constructor(private appStorage: AppStorageService,
               private router: Router,
               private settingsService: SettingsService) {
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-    if (this.sessService.LoggedIn !== true) {
+    if (this.appStorage.LoggedIn !== true) {
             this.router.navigate(['/login']);
       return false;
     } else {

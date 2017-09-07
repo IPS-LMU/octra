@@ -20,7 +20,7 @@ export class FastbarComponent implements OnInit {
   @Output() guidelinesbtnclicked: EventEmitter<void> = new EventEmitter<void>();
   @Output() overviewbtnclicked: EventEmitter<void> = new EventEmitter<void>();
 
-  constructor(public sessService: AppStorageService) {
+  constructor(public appStorage: AppStorageService) {
   }
 
   ngOnInit() {

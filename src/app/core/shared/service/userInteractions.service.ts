@@ -42,7 +42,7 @@ export class UserInteractionsService {
         start: -1,
         length: -1,
         textlength: -1
-      }
+      };
     }
 
     if (!target_name) {

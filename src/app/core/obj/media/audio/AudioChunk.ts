@@ -4,6 +4,7 @@ import {isNullOrUndefined} from 'util';
 import {AudioTime} from './AudioTime';
 import {PlayBackState} from '../index';
 import {EventEmitter} from '@angular/core';
+import {SubscriptionManager} from '../../SubscriptionManager';
 
 export class AudioChunk {
   get lastplayedpos(): AudioTime {
@@ -91,6 +92,7 @@ export class AudioChunk {
   private _speed = 1;
   private _playposition: AudioTime;
   private _lastplayedpos: AudioTime;
+  private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
   public statechange: EventEmitter<PlayBackState> = new EventEmitter<PlayBackState>();
 
@@ -145,97 +147,97 @@ export class AudioChunk {
     return null;
   }
 
-  public startPlayback(drawFunc: () => void, playonhover: boolean = false): Promise<boolean> {
+  public startPlayback(drawFunc: () => void, playonhover: boolean = false): boolean {
+    if (isNullOrUndefined(this._selection)) {
+      this.selection = new AudioSelection(this.time.start.clone(), this.time.end.clone());
+    }
 
-    return new Promise<boolean>((resolve, reject) => {
-      if (isNullOrUndefined(this._selection)) {
-        this.selection = new AudioSelection(this.time.start.clone(), this.time.end.clone());
-      }
+    if (this._selection.start.samples === this._selection.end.samples) {
+      this.startpos = this._selection.start.clone();
+    }
 
-      if (this._selection.start.samples === this._selection.end.samples) {
-        this.startpos = this._selection.start.clone();
-      }
+    if (!this._audiomanger.audioplaying) {
+      this._state = PlayBackState.STARTED;
 
-      if (!this._audiomanger.audioplaying) {
-        this._state = PlayBackState.STARTED;
+      this._lastplayedpos = this.playposition.clone();
+      this.audiomanager.playposition = this._lastplayedpos.samples;
 
-        this._lastplayedpos = this.playposition.clone();
-        this.audiomanager.playposition = this._lastplayedpos.samples;
+      this.setState(PlayBackState.PLAYING);
 
-        this.setState(PlayBackState.PLAYING);
+      // console.log(`play from ${this.selection.start.seconds} to ${this.selection.start.seconds + this.selection.duration.seconds}`);
+      const id = this.subscrmanager.add(this.audiomanager.statechange.subscribe(
+        (state: PlayBackState) => {
+          this.checkState(state);
+          this.setState(state);
 
-        // console.log(`play from ${this.selection.start.seconds} to ${this.selection.start.seconds + this.selection.duration.seconds}`);
-        return this._audiomanger.startPlayback(
-          this.selection.start, this.selection.duration, this._volume, this._speed, drawFunc, playonhover).then((result: boolean) => {
-          console.log('after played');
-          if (this.state !== PlayBackState.PAUSED && this.state !== PlayBackState.STOPPED) {
-            this.setState(PlayBackState.ENDED);
+          if (state === PlayBackState.STOPPED || state === PlayBackState.PAUSED || state === PlayBackState.ENDED) {
+            this.subscrmanager.remove(id);
           }
+        },
+        (error) => {
+          console.error(error);
+        }
+      ));
 
-          if (this.state === PlayBackState.PAUSED) {
-            console.log('paused');
-            if (this.selection.end.samples === this.time.end.samples) {
-              this.startpos = this.playposition.clone();
-            }
-          }
-          console.log('resolve');
-          resolve(result);
-        }).catch((err) => {
-          reject(err);
-        });
-      } else {
-        resolve(false);
-      }
-    });
+      return this._audiomanger.startPlayback(
+        this.selection.start, this.selection.duration, this._volume, this._speed, drawFunc, playonhover
+      );
+    }
+    return false;
   }
 
-  public stopPlayback(): Promise<boolean> {
-    return new Promise<boolean>(
-      (resolve, reject) => {
-        this._audiomanger.stopPlayback().then(
-          (result) => {
-            this.startpos = this.selection.start.clone();
-            this.setState(PlayBackState.STOPPED);
-            this.audiomanager.replay = false;
-            resolve(result);
-          }
-        ).catch((error) => {
-          reject(error);
-        });
-      });
+  public stopPlayback(): boolean {
+    const stopped = this._audiomanger.stopPlayback();
+    this.startpos = this.time.start.clone();
+
+    if (!stopped) {
+      // audio was not playing
+      this.setState(PlayBackState.STOPPED);
+    }
+
+    return true;
   }
 
-  public pausePlayback(): Promise<void> {
-    const last = this._playposition.clone();
-    return this._audiomanger.pausePlayback().then(
-      () => {
-        this.setState(PlayBackState.PAUSED);
-        console.log('paused ok');
-        this._playposition = last;
-      }
-    );
+  public pausePlayback(): boolean {
+    return this.audiomanager.pausePlayback();
   }
 
   public rePlayback(): boolean {
     return this._audiomanger.rePlayback();
   }
 
-  public stepBackward(callback: () => void) {
-    if (this._audiomanger.stepBackward(callback)) {
-      this.setState(PlayBackState.PAUSED);
-      return true;
+  public stepBackward() {
+    if (!isNullOrUndefined(this.lastplayedpos)) {
+      this.startpos = this.lastplayedpos.clone();
+      const result = this.audiomanager.stepBackward();
+
+      if (!result) {
+        // audio was not playing
+        this.audiomanager.stepbackward = true;
+        this.setState(PlayBackState.STOPPED);
+      }
+
+      return result;
+    } else {
+      console.error('lastplayedpos is null');
     }
 
     return false;
   }
 
-  public stepBackwardTime(callback: () => void) {
-    if (this._audiomanger.stepBackwardTime(callback)) {
-      this.setState(PlayBackState.PAUSED);
-      return true;
-    }
+  public stepBackwardTime(back_sec: number) {
+    const back_samples = Math.max(0, (this.playposition.samples
+      - (Math.round(back_sec * this.audiomanager.ressource.info.samplerate))));
+    this.startpos = new AudioTime(back_samples, this.audiomanager.ressource.info.samplerate);
 
-    return false;
+    const result = this.audiomanager.stepBackwardTime(back_samples);
+
+    if (!result) {
+      // audio was not playing
+      this.audiomanager.stepbackward = true;
+      this.setState(PlayBackState.STOPPED);
+    }
+    return result;
   }
 
   /**
@@ -265,9 +267,42 @@ export class AudioChunk {
   }
 
   private setState(state: PlayBackState) {
-    if (this._state !== state) {
+    if (this._state !== state || state === PlayBackState.STOPPED) {
       this._state = state;
       this.statechange.emit(state);
+    }
+  }
+
+  private afterPlaybackStopped() {
+    this.startpos = this.time.start.clone();
+    this.audiomanager.replay = false;
+  }
+
+  private afterPlaybackPaused() {
+    this.startpos = this.playposition.clone();
+  }
+
+  private afterPlaybackEnded() {
+    if (this.selection.end.samples === this.time.end.samples) {
+      this.startpos = this.time.start.clone();
+    }
+  }
+
+  private checkState(newstate: PlayBackState) {
+    switch (newstate) {
+      case(PlayBackState.STOPPED):
+        if (!this.audiomanager.stepbackward) {
+          this.afterPlaybackStopped();
+        }
+        break;
+      case (PlayBackState.PAUSED):
+        this.afterPlaybackPaused();
+        break;
+      case (PlayBackState.ENDED):
+        this.afterPlaybackEnded();
+        break;
+      default:
+        break;
     }
   }
 
@@ -289,5 +324,9 @@ export class AudioChunk {
 
   public clone() {
     return new AudioChunk(this.time.clone(), this.audiomanager, this.selection);
+  }
+
+  public destroy() {
+    this.subscrmanager.destroy();
   }
 }

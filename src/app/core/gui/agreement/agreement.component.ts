@@ -18,7 +18,7 @@ export class AgreementComponent implements OnInit {
   constructor(public settService: SettingsService,
               private router: Router,
               private langService: TranslateService,
-              private sessService: AppStorageService) {
+              private appStorage: AppStorageService) {
     if (isNullOrUndefined(this.settService.projectsettings)) {
       this.router.navigate(['/user/load']);
     }
@@ -49,11 +49,11 @@ export class AgreementComponent implements OnInit {
   }
 
   accept() {
-    if (isNullOrUndefined(this.sessService.agreement)) {
-      this.sessService.agreement = {};
+    if (isNullOrUndefined(this.appStorage.agreement)) {
+      this.appStorage.agreement = {};
     }
-    this.sessService.agreement[this.sessService.user.project] = true;
-    this.sessService.sessStr.store('agreement', this.sessService.agreement);
+    this.appStorage.agreement[this.appStorage.user.project] = true;
+    this.appStorage.sessStr.store('agreement', this.appStorage.agreement);
     this.router.navigate(['/user/transcr']);
   }
 }

@@ -8,14 +8,14 @@ import {SettingsService} from '../service/settings.service';
 @Injectable()
 export class TranscActivateGuard implements CanActivate {
 
-  constructor(private sessService: AppStorageService,
+  constructor(private appStorage: AppStorageService,
               private router: Router,
               private settService: SettingsService) {
 
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
-    if (!this.sessService.uselocalmode) {
+    if (!this.appStorage.uselocalmode) {
       if (!this.settService.allloaded) {
         this.router.navigate(['/user/load']);
         return false;

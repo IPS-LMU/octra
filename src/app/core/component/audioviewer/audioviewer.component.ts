@@ -32,6 +32,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {isNullOrUndefined} from 'util';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {AudioRessource} from '../../obj/media/audio/AudioRessource';
+import {PlayBackState} from '../../obj/media/index';
 
 @Component({
   selector: 'app-audioviewer',
@@ -223,6 +224,10 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       new AudioTime(0, this.audiochunk.audiomanager.ressource.info.samplerate),
       new AudioTime(0, this.audiochunk.audiomanager.ressource.info.samplerate)
     );
+
+    this.subscrmanager.add(this.audiochunk.statechange.subscribe((state: PlayBackState) => {
+      this.onAudioChunkStateChange();
+    }));
   }
 
   ngAfterViewInit() {
@@ -782,10 +787,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     const curr_line = this.av.getLineByMousePosition(x, y);
 
     if (curr_line && this.Settings.selection.enabled) {
-      this.av.setMouseClickPosition(x, y, curr_line, $event, this._innerWidth).then((curr: Line) => {
+      this.av.setMouseClickPosition(x, y, curr_line, $event, this._innerWidth, this).then((curr: Line) => {
         this.drawPlayCursorOnly(curr);
       });
-      this.drawSegments();
       this.drawCursor(this.av.LastLine);
       if ($event.type !== 'mousedown') {
         this.selchange.emit(this.audiochunk.selection);
@@ -936,11 +940,22 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                             this.audiochunk.playposition.samples = this.audiochunk.selection.start.samples;
                             this.changePlayCursorSamples(this.audiochunk.selection.start.samples);
                             this.drawPlayCursorOnly(this.av.LastLine);
-                            this.audiochunk.stopPlayback().then(() => {
-                                this.audiochunk.selection = boundary_select.clone();
-                                this.playSelection();
+
+                            const id = this.subscrmanager.add(this.audiochunk.statechange.subscribe(
+                              (state: PlayBackState) => {
+                                if (state === PlayBackState.STOPPED) {
+                                  this.audiochunk.selection = boundary_select.clone();
+                                  this.playSelection();
+
+                                  this.subscrmanager.remove(id);
+                                }
+                              },
+                              (error) => {
+                                console.error(error);
                               }
-                            );
+                            ));
+
+                            this.audiochunk.stopPlayback();
                           }
 
                           if (!this.Settings.multi_line) {
@@ -1032,43 +1047,41 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   /**
    * playSelection() plays the selected signal fragment or the selection in this chunk
    */
-  playSelection = (): Promise<boolean> => {
-    return new Promise<boolean>((resolve, reject) => {
-      const drawFunc = () => {
-        this.audiochunk.updatePlayPosition();
-        this.anim.requestFrame(this.drawPlayCursor);
-      };
+  playSelection = (): boolean => {
+    const drawFunc = () => {
+      this.audiochunk.updatePlayPosition();
+      this.anim.requestFrame(this.drawPlayCursor);
+    };
 
-      this.audiochunk.startPlayback(drawFunc).then((played: boolean) => {
-        if (played) {
-          this.onEndPlayBack();
-        } else {
-          console.log('not played?');
-        }
-        resolve(played);
-      }).catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-    });
+    return this.audiochunk.startPlayback(drawFunc);
   }
 
 
   /**
    * method called when audioplayback ended
    */
-  private onEndPlayBack = () => {
+  private onAudioChunkStateChange = () => {
     if (this.audiomanager.replay && this.audiochunk.isPlaybackEnded) {
       this.audiochunk.playposition = this.audiochunk.time.start.clone();
       this.playSelection();
-      console.log('Hä2');
     } else if (this.audiochunk.isPlaybackEnded) {
-      console.log('HÄ1');
-      this.audiochunk.playposition = this.audiochunk.selection.start.clone();
+      if (!this.audiomanager.stepbackward) {
+        this.audiochunk.playposition = this.audiochunk.selection.start.clone();
+        this.av.drawnselection = this.av.drawnselection.clone();
+        this.drawSegments();
+      } else {
+        this.av.PlayCursor.changeSamples(this.audiochunk.lastplayedpos.samples, this.av.audioTCalculator, this.audiochunk);
+        this.startPlayback();
+      }
     }
-    console.log(this.audiochunk.state);
-    console.log('state: ' + this.audiochunk.state);
-    console.log(this.audiochunk.playposition);
+
+    if (this.audiochunk.isPlayBackStopped && this.audiomanager.stepbackward) {
+
+      this.av.PlayCursor.changeSamples(this.audiochunk.playposition.samples,
+        this.av.audioTCalculator, this.audiochunk);
+
+      this.startPlayback();
+    }
 
     this.drawPlayCursor();
 
@@ -1079,11 +1092,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   /**
    * stops audio playback
    */
-  stopPlayback() {
-    return this.audiochunk.stopPlayback().then(() => {
-      this.av.drawnselection.start = this.av.drawnselection.end.clone();
-      this.drawSegments();
-    });
+  stopPlayback(): boolean {
+    return this.audiochunk.stopPlayback();
   }
 
   /**
@@ -1096,16 +1106,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   /**
    * start audio playback
    */
-  startPlayback(): Promise<boolean> {
+  startPlayback(): boolean {
     if (!this.audiochunk.isPlaying && this.av.MouseClickPos.absX < this.av.AudioPxWidth - 5) {
       return this.playSelection();
     }
-
-    return new Promise<boolean>(
-      (resolve, reject) => {
-        resolve(false);
-      }
-    );
+    return false;
   }
 
   /**
@@ -1120,26 +1125,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    * step to last position
    */
   stepBackward() {
-    this.audiochunk.stepBackward(() => {
-      // audio not playing
-      if (this.audiochunk.lastplayedpos !== null) {
-        this.audiochunk.startpos = this.audiochunk.lastplayedpos.clone();
-        this.av.PlayCursor.changeSamples(this.audiochunk.lastplayedpos.samples, this.av.audioTCalculator, this.audiochunk);
-        this.drawPlayCursorOnly(this.av.LastLine);
-        this.startPlayback();
-      }
-    });
+    this.audiochunk.stepBackward();
   }
 
   stepBackwardTime(back_sec: number) {
-    this.audiochunk.stepBackwardTime(() => {
-      this.audiochunk.playposition.samples -= (Math.floor(back_sec * this.audioressource.info.samplerate));
-      this.audiochunk.startpos = this.audiochunk.playposition.clone();
-      this.av.PlayCursor.changeSamples(this.audiochunk.playposition.samples,
-        this.av.audioTCalculator, this.audiochunk);
-      this.drawPlayCursor();
-      this.startPlayback();
-    });
+    this.audiochunk.stepBackwardTime(back_sec);
   }
 
   /**
@@ -1290,39 +1280,41 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   };
 
   private drawSelection = (line: Line) => {
-    // draw gray selection
-    const select = this.av.getRelativeSelectionByLine(
-      line, this.av.drawnselection.start.samples, this.av.drawnselection.end.samples, this._innerWidth
-    );
-    if (line && select) {
-      const left = select.start;
-      const right = select.end;
-      let x = (left > right) ? right : left;
+    if (!isNullOrUndefined(this.av.drawnselection)) {
+      // draw gray selection
+      const select = this.av.getRelativeSelectionByLine(
+        line, this.av.drawnselection.start.samples, this.av.drawnselection.end.samples, this._innerWidth
+      );
+      if (line && select) {
+        const left = select.start;
+        const right = select.end;
+        let x = (left > right) ? right : left;
 
-      let w = 0;
+        let w = 0;
 
-      if (left > -1 && right > -1) {
-        w = Math.abs(right - left);
-      }
+        if (left > -1 && right > -1) {
+          w = Math.abs(right - left);
+        }
 
-      // draw selection rectangle
-      this.o_context.globalAlpha = 0.2;
-      if (left < 1 || left > line.Size.width) {
-        x = 1;
-      }
-      if (right < 1) {
-        w = 0;
-      }
-      if (right < 1 || right > line.Size.width) {
-        w = right;
-      }
+        // draw selection rectangle
+        this.o_context.globalAlpha = 0.2;
+        if (left < 1 || left > line.Size.width) {
+          x = 1;
+        }
+        if (right < 1) {
+          w = 0;
+        }
+        if (right < 1 || right > line.Size.width) {
+          w = right;
+        }
 
-      if (w > 0) {
-        this.o_context.fillStyle = this.Settings.selection.color;
-        this.o_context.fillRect(line.Pos.x + x, line.Pos.y, w, this.Settings.height);
-      }
+        if (w > 0) {
+          this.o_context.fillStyle = this.Settings.selection.color;
+          this.o_context.fillRect(line.Pos.x + x, line.Pos.y, w, this.Settings.height);
+        }
 
-      this.o_context.globalAlpha = 1.0;
+        this.o_context.globalAlpha = 1.0;
+      }
     }
   }
 
@@ -1331,7 +1323,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    * @param $event
    */
   @HostListener('window:resize', ['$event'])
-  onResize($event) {
+  onResize() {
     this.width = this.aview.elementRef.nativeElement.clientWidth;
     this._innerWidth = this.width - this.Settings.margin.left - this.Settings.margin.right;
 

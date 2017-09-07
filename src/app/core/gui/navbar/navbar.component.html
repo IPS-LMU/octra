@@ -99,7 +99,7 @@
                     <tr *ngFor="let elem of UIElements">
                         <td>{{elem.timestamp | date:"dd.MM.yy HH:mm:ss"}}</td>
                         <td>{{elem.type}}</td>
-                        <td>{{elem.target_name}}</td>
+                        <td>{{elem.target}}</td>
                         <td>
                             {{elem.value}}
                         </td>
@@ -132,7 +132,7 @@
             <a class="navbar-brand" [routerLink]="['/']">OCTRA v{{version}}</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
-            <ul class="nav navbar-nav" *ngIf="!sessService.LoggedIn">
+            <ul class="nav navbar-nav" *ngIf="!appStorage.LoggedIn">
                 <li routerLinkActive="active">
                     <a [routerLink]="['/login']">{{'general.login' | translate}}</a>
                 </li>
@@ -146,9 +146,9 @@
 
             <ul class="nav navbar-nav">
                 <ng-template ngFor let-editor [ngForOf]="editors">
-                    <li *ngIf="sessService.LoggedIn && navbarServ.show_interfaces && interfaceActive(editor.name)"
+                    <li *ngIf="appStorage.LoggedIn && navbarServ.show_interfaces && interfaceActive(editor.name)"
                         [ngClass]="{
-                        'active': sessService.Interface === editor.name
+                        'active': appStorage.Interface === editor.name
                     }"
                     >
                         <a (mouseup)="setInterface(editor.name)">
@@ -157,7 +157,7 @@
                     </li>
 
                 </ng-template>
-                <li *ngIf="sessService.LoggedIn && navbarServ.show_interfaces && settService.app_settings.octra.showdetails">
+                <li *ngIf="appStorage.LoggedIn && navbarServ.show_interfaces && settService.app_settings.octra.showdetails">
                     <a (mouseup)="modalstatistics.open()">
                         <span class="glyphicon glyphicon-th-list navbar-icon"></span> <span
                             class="hidden-sm">Statistics</span></a>
@@ -166,7 +166,7 @@
 
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown" *ngIf="transcrServ !== undefined" [ngStyle]="{
-                'display': (!(navbarServ.dataloaded && sessService.LoggedIn && sessService.uselocalmode)) ? 'none': 'inherit'
+                'display': (!(navbarServ.dataloaded && appStorage.LoggedIn && appStorage.uselocalmode)) ? 'none': 'inherit'
                 }">
                     <a href="#" class="dropdown" data-toggle="dropdown" role="button"
                        aria-expanded="false">
@@ -185,12 +185,16 @@
                         }"
                         >
                             <div class="col-xs-2" style="cursor: pointer;" (click)="selectLevel(i)">{{i+1}}:</div>
-                            <div class="col-xs-8"><input (click)="onLevelNameClick($event)"
+                            <div class="col-xs-7"><input (click)="onLevelNameClick($event)"
                                                          (blur)="onLevelNameLeave($event, i)" type="text"
                                                          maxlength="100" value="{{level.name}}"/>
                             </div>
-                            <div class="col-xs-2"><span class="glyphicon glyphicon-trash"
-                                                        (click)="onLevelRemoveClick(i, level.id)"></span></div>
+                            <div class="col-xs-3">
+                                <span style="cursor:pointer;" class="glyphicon glyphicon-trash"
+                                      (click)="onLevelRemoveClick(i, level.id)"></span>
+                                <span style="margin-left:3px;cursor:pointer;" class="glyphicon glyphicon-duplicate"
+                                      (click)="onLevelDuplicateClick(i, level.id)"></span>
+                            </div>
                         </div>
                         <div class="row level-add-row" (click)="onLevelAddClick()">
                             <div class="col-xs-12"><span class="glyphicon glyphicon-plus"></span></div>
@@ -198,17 +202,17 @@
                     </div>
                 </li>
 
-                <li class="dropdown" *ngIf="(sessService.LoggedIn && navbarServ.dataloaded)">
+                <li class="dropdown" *ngIf="(appStorage.LoggedIn && navbarServ.dataloaded)">
                     <a href="#" class="dropdown" data-toggle="dropdown" role="button"
                        aria-expanded="false"><span class="glyphicon glyphicon-info-sign navbar-icon"></span></a>
                     <div class="dropdown-menu info-menu" [ngClass]="{
                         'collaps': collapsed
                         }">
                         <table class="table">
-                            <tr *ngIf="!sessService.uselocalmode">
+                            <tr *ngIf="!appStorage.uselocalmode">
                                 <td><span>{{'general.project' |translate}}:</span></td>
                                 <td>
-                                    <span>{{sessService.user.project}}</span>
+                                    <span>{{appStorage.user.project}}</span>
                                 </td>
                             </tr>
                             <tr>
@@ -241,29 +245,29 @@
                                     <span>{{navbarServ.exportformats.filesize.size}} {{navbarServ.exportformats.filesize.label}}</span>
                                 </td>
                             </tr>
-                            <tr *ngIf="!sessService.uselocalmode">
+                            <tr *ngIf="!appStorage.uselocalmode">
                                 <td><span>{{'general.id' | translate}}:</span></td>
                                 <td>
-                                    <span>{{sessService.data_id}}</span>
+                                    <span>{{appStorage.data_id}}</span>
                                 </td>
                             </tr>
-                            <tr *ngIf="!sessService.uselocalmode">
+                            <tr *ngIf="!appStorage.uselocalmode">
                                 <td><span>{{'general.free jobs' | translate}}:</span></td>
                                 <td>
-                                    <span>{{sessService.jobs_left}}</span>
+                                    <span>{{appStorage.jobs_left}}</span>
                                 </td>
                             </tr>
                         </table>
                     </div>
                 </li>
-                <li *ngIf="sessService.LoggedIn && navbarServ.show_export">
+                <li *ngIf="appStorage.LoggedIn && navbarServ.show_export">
                     <a (mouseup)="modalexport.open()">
                         <span class="glyphicon glyphicon-download navbar-icon"></span>
                         <span class="hidden-sm hidden-md">{{"general.export" | translate}}</span>
                     </a>
                 </li>
                 <li class="dropdown" [ngStyle]="{
-                'display': (!(navbarServ.dataloaded && sessService.LoggedIn)) ? 'none': 'inherit'
+                'display': (!(navbarServ.dataloaded && appStorage.LoggedIn)) ? 'none': 'inherit'
                 }">
                     <a href="#" class="dropdown" data-toggle="dropdown" role="button"
                        aria-expanded="false"><span class="glyphicon glyphicon-cog navbar-icon"></span></a>
@@ -276,7 +280,7 @@
                                 <td>
                                     <div class="togglebutton">
                                         <label>
-                                            <input (click)="toggleSettings('easymode')" [checked]="sessService.easymode"
+                                            <input (click)="toggleSettings('easymode')" [checked]="appStorage.easymode"
                                                    id="easymode" type="checkbox">
                                         </label>
                                     </div>
@@ -288,8 +292,20 @@
                                     <div class="togglebutton">
                                         <label>
                                             <input (click)="toggleSettings('playonhover')"
-                                                   [checked]="sessService.playonhover"
+                                                   [checked]="appStorage.playonhover"
                                                    id="playonhover" type="checkbox">
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label for="playonhover">{{"settings.follow playcursor" | translate}}:</label></td>
+                                <td>
+                                    <div class="togglebutton">
+                                        <label>
+                                            <input (click)="toggleSettings('followplaycursor')"
+                                                   [checked]="appStorage.followplaycursor"
+                                                   id="followplaycursor" type="checkbox">
                                         </label>
                                     </div>
                                 </td>
@@ -315,15 +331,15 @@
         </div><!-- .nav-collapse -->
     </div>
 </nav>
-<div id="subnav" class="panel" *ngIf="sessService.LoggedIn && !sessService.uselocalmode && navbarServ.dataloaded">
+<div id="subnav" class="panel" *ngIf="appStorage.LoggedIn && !appStorage.uselocalmode && navbarServ.dataloaded">
     <div class="row">
         <div class="col-sm-2"></div>
-        <div class="col-xs-4 col-sm-3">{{"general.project" | translate}}: {{sessService.user.project}}</div>
+        <div class="col-xs-4 col-sm-3">{{"general.project" | translate}}: {{appStorage.user.project}}</div>
         <div class="col-xs-4 col-sm-3">{{"general.name" |translate}}:
             {{navbarServ.exportformats.filename}}
         </div>
         <div class="col-xs-4 col-sm-3">{{'general.free jobs' | translate}}:
-            {{sessService.jobs_left}}
+            {{appStorage.jobs_left}}
         </div>
         <div class="col-sm-2"></div>
     </div>

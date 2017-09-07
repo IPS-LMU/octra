@@ -4,6 +4,7 @@ import {PlayCursor} from '../../obj/PlayCursor';
 import {AudioTimeCalculator} from '../../obj/media/audio/AudioTimeCalculator';
 import {AudioChunk} from '../../obj/media/audio/AudioChunk';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
+import {AudioviewerComponent} from '../../component/audioviewer/audioviewer.component';
 
 export class AudioComponentService {
   // LINES
@@ -84,7 +85,7 @@ export class AudioComponentService {
     this.last_line = curr_line;
   }
 
-  public setMouseClickPosition(x: number, y: number, curr_line: Line, $event: Event, innerWidth: number) {
+  public setMouseClickPosition(x: number, y: number, curr_line: Line, $event: Event, innerWidth: number, viewer?: AudioviewerComponent) {
     this.mousecursor.relPos.x = x;
     this.mousecursor.relPos.y = y;
   }

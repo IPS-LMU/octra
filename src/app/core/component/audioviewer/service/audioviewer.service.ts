@@ -16,6 +16,8 @@ import {AudioviewerConfigValidator} from '../validator/AudioviewerConfigValidato
 import {AudioviewerConfig} from '../config/av.config';
 import {TranslateService} from '@ngx-translate/core';
 import {isNullOrUndefined} from 'util';
+import {PlayBackState} from '../../../obj/media/index';
+import {AudioviewerComponent} from '../audioviewer.component';
 
 
 @Injectable()
@@ -225,7 +227,7 @@ export class AudioviewerService extends AudioComponentService {
       min_maxarray.push(max * yZoom);
     }
     this._minmaxarray = min_maxarray;
-  };
+  }
 
   /**
    * after Channel was initialzed
@@ -307,7 +309,8 @@ export class AudioviewerService extends AudioComponentService {
    * @param innerWidth
    * @param callback
    */
-  public setMouseClickPosition(x: number, y: number, curr_line: Line, $event: Event, innerWidth: number): Promise<Line> {
+  public setMouseClickPosition(x: number, y: number, curr_line: Line, $event: Event,
+                               innerWidth: number, viewer: AudioviewerComponent): Promise<Line> {
     const promise = new Promise<Line>((resolve, reject) => {
       super.setMouseClickPosition(x, y, curr_line, $event, innerWidth);
 
@@ -376,18 +379,21 @@ export class AudioviewerService extends AudioComponentService {
           this.overboundary = false;
           this.mouse_down = false;
         }
-      } else if (this.audiochunk.isPlaying) {
+      } else if (this.audiochunk.isPlaying && ($event.type === 'mouseup')) {
         const pos = this.audiochunk.playposition.clone();
-        console.log(`before ${pos.samples}`);
-        this.audiochunk.stopPlayback().then((result) => {
-          console.log(`Stop after Click is ${result}`);
-          this.audiochunk.startpos = pos;
-          this.audiochunk.selection.start = this.audiochunk.playposition.clone();
-          this.audiochunk.selection.end = this.audiochunk.playposition.clone();
-          console.log(`after ${this.audiochunk.playposition.samples}`);
-          this.drawnselection = this.audiochunk.selection.clone();
-          this.PlayCursor.changeSamples(this.audiochunk.playposition.samples, this.audioTCalculator, this.audiochunk);
-        });
+        const id = this.subscrmanager.add(this.audiochunk.statechange.subscribe(
+          (state) => {
+            if (state === PlayBackState.STOPPED) {
+              this.audiochunk.startpos = new AudioTime(absXInTime, this.audiomanager.ressource.info.samplerate);
+              this.audiochunk.selection.end = this.audiochunk.playposition.clone();
+              this.drawnselection = null;
+              this.PlayCursor.changeSamples(this.audiochunk.playposition.samples, this.audioTCalculator, this.audiochunk);
+              viewer.drawSegments();
+              this.subscrmanager.remove(id);
+            }
+          }
+        ));
+        this.audiochunk.stopPlayback();
       }
 
       resolve(this.mouse_click_pos.line);
@@ -667,7 +673,7 @@ export class AudioviewerService extends AudioComponentService {
     }
 
     return null;
-  };
+  }
 
   /**
    * add line zu the list of lines
@@ -772,7 +778,7 @@ export class AudioviewerService extends AudioComponentService {
 
   onKeyUp = (event) => {
     this.shift_pressed = false;
-  };
+  }
 
   /**
    * validate audioviewer config

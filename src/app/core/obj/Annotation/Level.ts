@@ -89,4 +89,8 @@ export class Level {
         return 'SEGMENT';
     }
   }
+
+  public clone(): Level {
+    return new Level(++Level.counter, this.name + '_2', this.getTypeString(), this.segments.clone());
+  }
 }

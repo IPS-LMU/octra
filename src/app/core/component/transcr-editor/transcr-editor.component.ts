@@ -179,7 +179,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     jQuery.each(dom.children(), replace_func);
     return dom.text();
-  };
+  }
 
   ngOnDestroy() {
     this.destroy();
@@ -315,7 +315,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.segpopover.insertBefore('.note-editing-area');
 
     this.loaded.emit(true);
-  };
+  }
 
   /**
    * initializes the navbar bar of the editor
@@ -370,7 +370,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       const button = jQuery.summernote.ui.button(btn_js);
 
       return button.render();   // return button as jquery object
-    }
+    };
   }
 
   initPopover() {
@@ -634,7 +634,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
     }
-  };
+  }
 
   /**
    * called after key up in editor
@@ -659,7 +659,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
     this._is_typing = true;
     this.lastkeypress = Date.now();
-  };
+  }
 
   /**
    * updates the raw text of the editor
@@ -782,7 +782,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     } else {
       func();
     }
-  };
+  }
 
   /**
    * tidy up the raw text, remove white spaces etc.

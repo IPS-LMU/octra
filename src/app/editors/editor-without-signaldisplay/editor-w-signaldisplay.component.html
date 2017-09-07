@@ -33,7 +33,7 @@
                             shortcut: keyMap.getShortcut('overlay', 'step_backward')
                         }
                       }"
-                      [easymode]="sessService.easymode"
+                      [easymode]="appStorage.easymode"
 ></app-audio-navigation>
 <app-audioplayer #audioplayer (shortcuttriggered)="onShortcutTriggered($event)"
                  [audiochunk]="audiochunk"></app-audioplayer>
@@ -42,7 +42,7 @@
                     (marker_insert)="onMarkerInsert($event)"
                     (marker_click)="onMarkerClick($event)"
                     [markers]="transcrService.guidelines.markers"
-                    [easymode]="sessService.easymode"
+                    [easymode]="appStorage.easymode"
                     [audiochunk]="audiochunk"
                     (boundaryclicked)="onBoundaryClicked($event)"
                     (boundaryinserted)="onBoundaryInserted($event)"

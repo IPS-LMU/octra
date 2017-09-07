@@ -1,8 +1,8 @@
 {
   "meta": {
     "object_language": "deu",
-    "language": "de",
-    "project": "Sprecherinnen",
+    "language": "en",
+    "project": "Speakers",
     "authors": "Test Person (testperson@email.de)",
     "version": "1.0",
     "date": "2017-04-10",
@@ -11,23 +11,28 @@
   },
   "instructions": [
     {
-      "group": "Rechtschreibung",
+      "group": "Spelling",
       "entries": [
         {
           "code": "R01",
           "priority": 100,
-          "title": "Rechtschreibung",
-          "description": "Die Transkription erfolgt nach den Regeln der deutschen Rechtschreibung nach Duden.",
-          "examples": []
+          "title": "Transcribe according to the german spelling",
+          "description": "Bei der Tranksription sollte die Deutsche Rechtschreibung nach Duden befolgt werden. Bei Unklarheiten bitte www.duden.de aufsuchen.",
+          "examples": [
+          ]
         },
         {
           "code": "R02",
           "priority": 100,
-          "title": "verschliffene Formen",
-          "description": "verschliffene oder verkürzte Formen in der langen Form schreiben.",
+          "title": "Zahlen ausschreiben",
+          "description": "Zahlen müssen so wie sie gesprochen werden ausgeschrieben werden, ab 100 in einzelnen Worten",
           "examples": [
             {
-              "annotation": "\"gibt es\" für \"gibt's\" \"haben wir\" für \"hammwa\" usw.",
+              "annotation": "20: zwanzig",
+              "url": ""
+            },
+            {
+              "annotation": "1991: neunzehn hundert und einundzeunzig",
               "url": ""
             }
           ]
@@ -35,51 +40,29 @@
         {
           "code": "R03",
           "priority": 100,
-          "title": "Leerzeichen",
-          "description": "Wörter durch einfache Leerzeichen trennen",
-          "examples": []
-        },
-        {
-          "code": "R04",
-          "priority": 100,
-          "title": "Buchstabierungen in Großbuchstaben",
-          "description": "Buchstaben als Großbuchstaben schreiben, Formatieranweisungen ausschreiben, phonetische Buchstabierung in Schrägstrichte.",
+          "title": "Buchstabierfolgen als Folge von Großbuchstaben",
+          "description": "Buchstabierfolgen als Folge von Großbuchstaben, Rest orthografisch.",
           "examples": [
             {
               "annotation": "A B B ß: A doppel B scharfes S",
               "url": ""
             },
             {
-              "annotation": "B wie in Buch: /b/ wie in Buch",
+              "annotation": "D: /D/",
               "url": ""
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "group": "Zeichensetzung",
+      "entries": [
         {
-          "code": "R05",
-          "priority": 100,
-          "title": "Groß- und Kleinschreibung",
-          "description": "Wörter unabhängig von der Position im Satz nach Wortart groß oder klein schreiben. Du, Höflichkeits-Sie und -Ihr groß schreiben. Namen und Abkürzungen wie üblich schreiben.",
-          "examples": [
-            {
-              "annotation": "heute ist schönes Frühlingswetter am blauen Himme ziehen die Wolken",
-              "url": ""
-            },
-            {
-              "annotation": "Josef, GmbH, AG",
-              "url": ""
-            },
-            {
-              "annotation": "Du, Sie, Ihr",
-              "url": ""
-            }
-          ]
-        },
-        {
-          "code": "R06",
+          "code": "Z01",
           "priority": 100,
           "title": "Keine Satzzeichen",
-          "description": "Keine Satzzeichen verwenden.",
+          "description": "keine Satzzeichen => keine Sätze im herkömmlichen Sinn; keine Spezialsymbole wie %, \", #. Ausnahme: Satzeichen in Wörtern, nicht zwischen Wörtern",
           "examples": [
             {
               "annotation": "Kein (.,!?;-)",
@@ -90,84 +73,112 @@
       ]
     },
     {
-      "group": "Marker",
+      "group": "Groß und Kleinschreibung",
       "entries": [
         {
-          "code": "M01",
+          "code": "GK01",
           "priority": 100,
-          "title": "Marker sparsam verwenden!",
-          "description": "Marker nur setzen, wenn sie den Sprachfluss stark beeinträchtigen.",
-          "examples": []
-        },
-        {
-          "code": "M02",
-          "priority": 100,
-          "title": "Nonverbale Sprechergeräusche",
-          "description": "Nonverbale Sprechergeräusche wie Husten, Lachen, Schmatzen usw. werden mit <usb> und Leerzeichen vor jedem betroffenen Wort markiert. ",
-          "examples": []
-        },
-        {
-          "code": "M02",
-          "priority": 100,
-          "title": "Andere Geräusche",
-          "description": "Geräusche, die nicht vom Sprecher stammen, z.B. Türschlagen, Klopfen, Motoren, werden mit <nib> und Leerzeichen vor dem betroffenen Wort markiert. ",
-          "examples": []
-        },
-        {
-          "code": "M03",
-          "priority": 100,
-          "title": "Weitere Sprecher",
-          "description": "Sprache eines dritten Sprechers wird mit ** (mit Leerzeichen von den benachbarten Wörtern getrennt) markiert, ebenso unverständliche Passagen.",
-          "examples": []
-        },
-        {
-          "code": "M04",
-          "priority": 100,
-          "title": "Versprecher",
-          "description": "Versprecher werden soweit möglich transkribiert und mit * am Wortanfang markiert. ",
+          "title": "Beachtung der Groß- und Kleinschreibung, auch bei Namen und Abkürzungen.",
+          "description": "Ausnahme: Personalpronomina, keine Großschreibung am Satzanfang.",
           "examples": [
             {
-              "annotation": "am *drit nein vierten April",
+              "annotation": "Josef, GmbH, AG",
+              "url": ""
+            },
+            {
+              "annotation": "Du, Sie, Ihr",
               "url": ""
             }
           ]
-        },
-        {
-          "code": "M05",
-          "priority": 100,
-          "title": "Phrasengrenzen",
-          "description": "Markieren Sie Phrasengrenzen (möglichst in Sprechpausen) mit einem senkrechten Strich.",
-          "examples": []
         }
       ]
     },
     {
-      "group": "Häsitationen",
+      "group": "Komposita und Abkürzungen",
       "entries": [
         {
-          "code": "H01",
+          "code": "KA01",
           "priority": 100,
-          "title": "Häsitationsmarker",
-          "description": "Häsitationsphänomene wie 'äh', 'öh', 'ähm' oder 'mhm' werden unabhängig vom produzierten Vokal mit standardisierten Wörtern transkribiert:",
+          "title": "Komposita und Abkürzungen nicht künstlich trennen",
+          "description": "Diese sollten nicht künstlich getrennt oder in Buchstabierform geschrieben werden.",
           "examples": [
             {
-              "annotation": "äh - wenn kein Nasal zu hören ist",
+              "annotation": "'SPD-Fraktionsvorsitzender' wenn gelesen ist ok",
               "url": ""
             },
             {
-              "annotation": "ähm - wenn ein Vokal und ein Nasal zu hören sind",
+              "annotation": "'S P D Fraktionsvorsitzender' wenn gelesen ist NICHT ok",
               "url": ""
             },
             {
-              "annotation": "mhm - wenn zwei Nasale zu hören sind",
+              "annotation": "'UdSSR' ok, wenn so in der Vorlage (gelesen)",
               "url": ""
             },
             {
-              "annotation": "ach - wenn ein Frikativ zu hören ist",
+              "annotation": "'U D S S R' ok, wenn so in der Vorlage (zB. beim Buchstabieren)",
               "url": ""
             },
             {
-              "annotation": "ne, nee - bei initialem Nasal",
+              "annotation": "'Adam J Krusenstern' ok, wenn Eigenname",
+              "url": ""
+            },
+            {
+              "annotation": "'Adam-J. Krusenstern' NICHT ok, wenn Eigenname",
+              "url": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "Aussprache",
+      "entries": [
+        {
+          "code": "A01",
+          "priority": 100,
+          "title": "Bei falscher Aussprache, das erratene Wort mit * vorranstellen",
+          "description": "Bei falscher Aussprache, das erratene Wort mit * vorranstellen",
+          "examples": [
+            {
+              "annotation": "'achter vierter *fünfund nein sechsundneunzig' ist ok",
+              "url": ""
+            },
+            {
+              "annotation": "'[~abc]*chter vierter oder *sechsundneunz[abc~]' ist nicht ok",
+              "url": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "Unverständliche Sprache",
+      "entries": [
+        {
+          "code": "US01",
+          "priority": 100,
+          "title": "Unverständliche Sprache",
+          "description": "Passagen unverständlicher Sprache mit ** markieren",
+          "examples": [
+            {
+              "annotation": "du bist ein solches ** wie ich noch nie eines getroffen habe",
+              "url": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": "Geräusche",
+      "entries": [
+        {
+          "code": "G01",
+          "priority": 100,
+          "title": "Geräuschmarker verwenden",
+          "description": "Bei Geräuschen müssen die Geräuschmarken verwendet werden. Ein Marker wird dabei an dem ersten Vorkommen eines Geräusches gesetzt, nicht aber zwischen Wörtern. Für weitere Informationen in der Toolbar des Editors mit der Maus über die Marker fahren. Mehrere gleiche Marker sollten nicht direkt aufeinander folgen.",
+          "examples": [
+            {
+              "annotation": "du bist ein solches ** wie ich noch nie eines getroffen habe",
               "url": ""
             }
           ]
@@ -183,7 +194,7 @@
       "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_start.png",
       "button_text": "~abc",
-      "description": "Diesen Marker nur am Anfang setzen, sollte die Audiosequenz mit einem abgeschnittenem Wort beginnen",
+      "description": "Set this marker at the beginning of the annotation if a word was cutted off.",
       "shortcut": {
         "mac": "ALT + 1",
         "pc": "ALT + 1"
@@ -195,8 +206,8 @@
       "code": "<nib>",
       "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/fil.png",
-      "button_text": "Gefüllte Pause",
-      "description": "Für Zögern des Sprechers wie hm, ähm, äh und andere.",
+      "button_text": "filled pause",
+      "description": "This marker is for the speakers hesitations like 'hm', 'ähm' and others.",
       "shortcut": {
         "mac": "ALT + 2",
         "pc": "ALT + 2"
@@ -208,8 +219,8 @@
       "code": "[int]",
       "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/int.png",
-      "button_text": "unterbrechendes Geräusch",
-      "description": "Für kurzes, eindeutiges Geräusch wie z.B. Türknallen, das Berühren des Mirkrofons, oder ähnliches.",
+      "button_text": "intermittent noise",
+      "description": "This marker is for noise like door slam, touching the microphone or something like that.",
       "shortcut": {
         "mac": "ALT + 3",
         "pc": "ALT + 3"
@@ -218,11 +229,11 @@
     {
       "id": 4,
       "name": "speaker noise",
-      "code": "<usb>",
+      "code": "[spk]",
       "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/spk.png",
-      "button_text": "Sprechergeräusch",
-      "description": "Für Geräusche und Unterbrechungen, die der Sprecher produziert wie z.B. lautes Atmen, Lachen oder ähnliches.",
+      "button_text": "speaker noise",
+      "description": "This marker is for noise which was produced by the speaker, e.g. breathing loudly, laughing or something like that.",
       "shortcut": {
         "mac": "ALT + 4",
         "pc": "ALT + 4"
@@ -234,8 +245,8 @@
       "code": "[sta]",
       "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/sta.png",
-      "button_text": "Andauerndes Geräusch",
-      "description": "Für lang andauerndes, lautes Geräusch wie Verkehrslärm, Musik oder Radio im Hintergrund.",
+      "button_text": "stationary noise",
+      "description": "This marker is for continuous, loud noise like traffic jam, music or radio in the background",
       "shortcut": {
         "mac": "ALT + 5",
         "pc": "ALT + 5"
@@ -248,7 +259,7 @@
       "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/stars.png",
       "button_text": "**",
-      "description": "Diesen Marker vor einem Wort setzen, welches einer unverständlichen Sprache entstammt.",
+      "description": "Set this marker before a word if it is not recognizable or if it is from another language.",
       "shortcut": {
         "mac": "ALT + 6",
         "pc": "ALT + 6"
@@ -261,7 +272,7 @@
       "type": "normal",
       "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_end.png",
       "button_text": "abc~",
-      "description": "Diesen Marker nur am Ende setzen, sollte die Audiosequenz mit einem abgeschnittenem Wort enden.",
+      "description": "Set this marker only at the end of the annotation if the last word was cutted off",
       "shortcut": {
         "mac": "ALT + 7",
         "pc": "ALT + 7"
@@ -273,8 +284,8 @@
       "code": "<P>",
       "type": "break",
       "icon_url": "assets/img/components/transcr-editor/default_markers/break.png",
-      "button_text": "Pause",
-      "description": "Dieser Marker stellt eine Pause dar, d.h. eine Sequenz in der nicht gesprochen wird",
+      "button_text": "Break",
+      "description": "This marker represents a break that means a audio chunk without any speaking",
       "shortcut": {
         "mac": "ALT + P",
         "pc": "ALT + P"

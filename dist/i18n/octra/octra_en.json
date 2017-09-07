@@ -44,7 +44,6 @@
     "select database": "Select Database",
     "agreement": "agreement",
     "agreement read": "I have read the agreement and accept its content",
-    "easy mode": "Easy Mode",
     "yes": "Yes",
     "no": "No",
     "errors found": "({{errors}}) errors found",
@@ -56,7 +55,17 @@
     "description": "Description",
     "bug report": "Bug Report",
     "protocol": "Protocol",
-    "submission success": "successfully transmitted"
+    "submission success": "successfully transmitted",
+    "duration": "Duration",
+    "samplerate": "Sample Rate",
+    "bitspersecond": "Bits per Second",
+    "filesize": "File Size",
+    "id": "ID",
+    "download": "Download",
+    "application": "Application",
+    "website": "Website",
+    "news": "News",
+    "faq": "FAQ"
   },
   "bug report": {
     "report an error": "Report an error",
@@ -125,11 +134,18 @@
       "header": "Login failed",
       "text": "Please check your username and your password."
     },
+    "supported": {
+      "header": "Supported file formats for the local mode",
+      "audio files": "Audio files",
+      "file formats for import": "File formats for import"
+    },
     "shortcuts": {
       "play pause": "Play / Pause",
       "stop playback": "Stop Playback",
       "step backward": "Jump to the last position",
+      "step backward time": "Jump back in time",
       "set segment": "Set segment boundary",
+      "set break": "Mark segment as break",
       "play selection": "Play selection",
       "transcribe segment": "Transcribe segment",
       "move cursor left": "Move cursor to the left",
@@ -137,7 +153,8 @@
       "audioplayer": "Audioplayer shortcuts",
       "top signaldisplay": "Shortcuts of the signal display on the top",
       "down signaldisplay": "Shortcuts of the signal display on the bottom",
-      "2D-Editor": "Shortcuts of the 2D-Editor"
+      "2D-Editor": "Shortcuts of the 2D-Editor",
+      "play audio on hover": "Play audio on hover"
     }
   },
   "login": {
@@ -168,7 +185,8 @@
     "login again": "Login again"
   },
   "signal-gui": {
-    "selection text": "Please select a segment by hovering over it and pressing the {{value}} key."
+    "selection text": "Please select a part of signal using the mouse: Click and hold the left mouse button and hold it while moving the cursor to the end position.",
+    "segment enter text": "Please select a segment by hovering over it and pressing the {{value}} key."
   },
   "transcription-submit": {
     "overview": "The next table shows an overview about your defined segments:",
@@ -187,5 +205,16 @@
     "want to do": "What would you like to do?",
     "quit": "Quit and sign out",
     "next transcription": "Get next transcription"
+  },
+  "special_markers": {
+    "boundary": {
+      "insert": "Crop mark",
+      "description": "After the playback postion was set in the audio player or signal display with this you can insert a crop mark at the text position."
+    }
+  },
+  "settings": {
+    "easy mode": "Easy Mode",
+    "play on hover": "Play on hover",
+    "follow playcursor": "Follow Playcursor"
   }
 }

@@ -1,6 +1,49 @@
 # Change Log
 
-## [v1.1.0](https://github.com/IPS-LMU/octra/tree/v1.1.0) (2017-04-24)
+## [1.2.0](https://github.com/IPS-LMU/octra/tree/1.2.0) (2017-09-07)
+[Full Changelog](https://github.com/IPS-LMU/octra/compare/v1.1.0...1.2.0)
+
+**Implemented enhancements:**
+
+- use new protocol specification for logging user actions [\#77](https://github.com/IPS-LMU/octra/issues/77)
+- allow sending bug reports via email [\#76](https://github.com/IPS-LMU/octra/issues/76)
+- allow more levels [\#75](https://github.com/IPS-LMU/octra/issues/75)
+- use IndexedDB instead of LocalStorage [\#74](https://github.com/IPS-LMU/octra/issues/74)
+- 2D-Editor: follow playcursor [\#70](https://github.com/IPS-LMU/octra/issues/70)
+- allow importing raw text file [\#69](https://github.com/IPS-LMU/octra/issues/69)
+- allow more audio formats than Wave format [\#67](https://github.com/IPS-LMU/octra/issues/67)
+- better audio managing structure [\#66](https://github.com/IPS-LMU/octra/issues/66)
+- 2D-Editor: change position of miniloupe [\#64](https://github.com/IPS-LMU/octra/issues/64)
+- reorganize editor components [\#61](https://github.com/IPS-LMU/octra/issues/61)
+- add popover to each button of audio-navigation component [\#60](https://github.com/IPS-LMU/octra/issues/60)
+- allow setting boundaries in "editor without a signal display" [\#59](https://github.com/IPS-LMU/octra/issues/59)
+- audio playback: step back n seconds and play audio d seconds [\#57](https://github.com/IPS-LMU/octra/issues/57)
+- read annotation data that already exists in database [\#56](https://github.com/IPS-LMU/octra/issues/56)
+- enable Copy & Paste in text editor [\#55](https://github.com/IPS-LMU/octra/issues/55)
+- use annotJSON as OCTRAs representation of its annotation [\#54](https://github.com/IPS-LMU/octra/issues/54)
+- enable bug report [\#53](https://github.com/IPS-LMU/octra/issues/53)
+- play audio on hover [\#52](https://github.com/IPS-LMU/octra/issues/52)
+- Overlay GUI: play audio after entering semgment [\#51](https://github.com/IPS-LMU/octra/issues/51)
+- update dependencies [\#47](https://github.com/IPS-LMU/octra/issues/47)
+- show additional informations [\#46](https://github.com/IPS-LMU/octra/issues/46)
+- improve usability [\#44](https://github.com/IPS-LMU/octra/issues/44)
+- enable login without job number [\#42](https://github.com/IPS-LMU/octra/issues/42)
+
+**Fixed bugs:**
+
+- Safari: can't decode audio file [\#73](https://github.com/IPS-LMU/octra/issues/73)
+- boundaries in text: no popover after loading other language [\#72](https://github.com/IPS-LMU/octra/issues/72)
+- mini-loupe: false zooming factor [\#71](https://github.com/IPS-LMU/octra/issues/71)
+- prevent moving boundary over others [\#65](https://github.com/IPS-LMU/octra/issues/65)
+- transcr-overview: whole text is underlined red when two errors come after each other [\#62](https://github.com/IPS-LMU/octra/issues/62)
+- play cursor vanished after stopping at some positions [\#58](https://github.com/IPS-LMU/octra/issues/58)
+- audioviewer: can't set boundary if playcursor is in another segment [\#50](https://github.com/IPS-LMU/octra/issues/50)
+- transcr-window: scroll to parent positon doesn't work [\#49](https://github.com/IPS-LMU/octra/issues/49)
+- if audio cannot be loaded user can't go back [\#48](https://github.com/IPS-LMU/octra/issues/48)
+- false state: broken view [\#45](https://github.com/IPS-LMU/octra/issues/45)
+- editor dissapears after switching to another one [\#43](https://github.com/IPS-LMU/octra/issues/43)
+
+## [v1.1.0](https://github.com/IPS-LMU/octra/tree/v1.1.0) (2017-04-25)
 [Full Changelog](https://github.com/IPS-LMU/octra/compare/v1.0.7...v1.1.0)
 
 **Implemented enhancements:**

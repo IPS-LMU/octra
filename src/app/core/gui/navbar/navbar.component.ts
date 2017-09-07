@@ -74,7 +74,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     return (!isNullOrUndefined(this.uiService)) ? this.uiService.elements : null;
   }
 
-  constructor(public sessService: AppStorageService,
+  constructor(public appStorage: AppStorageService,
               public navbarServ: NavbarService,
               public sanitizer: DomSanitizer,
               public langService: TranslateService,
@@ -116,7 +116,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   setInterface(new_interface: string) {
-    this.sessService.Interface = new_interface;
+    this.appStorage.Interface = new_interface;
     this.navbarServ.interfacechange.emit(new_interface);
   }
 
@@ -141,7 +141,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   changeLanguage(lang: string) {
     this.langService.use(lang);
-    this.sessService.language = lang;
+    this.appStorage.language = lang;
   }
 
   public interfaceActive(name: string) {
@@ -153,7 +153,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   toggleSettings(option: string) {
-    this.sessService[option] = !this.sessService[option];
+    this.appStorage[option] = !this.appStorage[option];
   }
 
   onOptionsOpened() {
@@ -264,7 +264,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   clearElements() {
     this.uiService.clear();
-    this.sessService.clearLoggingData().catch((err) => {
+    this.appStorage.clearLoggingData().catch((err) => {
       console.error(err);
     });
   }
@@ -279,7 +279,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     if (event.target.value !== null && event.target.value !== '') {
       const level = this.transcrServ.annotation.levels[tiernum];
       level.name = event.target.value;
-      this.sessService.changeAnnotationLevel(tiernum, level.getObj()).catch((err) => {
+      this.appStorage.changeAnnotationLevel(tiernum, level.getObj()).catch((err) => {
         console.error(err);
       }).then(() => {
         // update value for annoation object in transcr service
@@ -307,12 +307,12 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
     while (nameexists(levelname)) {
       index++;
-      levelname = `Tier ${index + 1}`
+      levelname = `Tier ${index + 1}`;
     }
 
-    const newlevel = new Level(this.sessService.levelcounter + 1, levelname, 'SEGMENT',
+    const newlevel = new Level(this.appStorage.levelcounter + 1, levelname, 'SEGMENT',
       new Segments(this.transcrServ.audiofile.samplerate, [], this.transcrServ.last_sample));
-    this.sessService.addAnnotationLevel(newlevel.getObj()).then(
+    this.appStorage.addAnnotationLevel(newlevel.getObj()).then(
       () => {
         // update value for annoation object in transc servcie
         this.transcrServ.annotation.levels.push(newlevel);
@@ -323,17 +323,37 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onLevelRemoveClick(tiernum: number, id: number) {
-    if (this.transcrServ.annotation.levels.length > 1) {
-      this.sessService.removeAnnotationLevel(tiernum, id).catch((err) => {
-        console.error(err);
-      }).then(() => {
-        // update value for annoation object in transcr service
-        this.transcrServ.annotation.levels.splice(tiernum, 1);
-        if (tiernum <= this.transcrServ.selectedlevel) {
-          this.transcrServ.selectedlevel = tiernum - 1;
+    this.modService.show('yesno', 'The Tier will be deleted permanently. Are you sure?', {
+      yes: () => {
+        if (this.transcrServ.annotation.levels.length > 1) {
+          this.appStorage.removeAnnotationLevel(tiernum, id).catch((err) => {
+            console.error(err);
+          }).then(() => {
+            // update value for annoation object in transcr service
+            this.transcrServ.annotation.levels.splice(tiernum, 1);
+            if (tiernum <= this.transcrServ.selectedlevel) {
+              this.transcrServ.selectedlevel = tiernum - 1;
+            }
+          });
         }
-      });
-    }
+        this.collapsed = false;
+      },
+      no: () => {
+        this.collapsed = false;
+      }
+    });
+  }
+
+  onLevelDuplicateClick(tiernum: number, id: number) {
+    const newlevel = this.transcrServ.annotation.levels[tiernum].clone();
+    this.appStorage.addAnnotationLevel(newlevel.getObj()).then(
+      () => {
+        // update value for annoation object in transc servcie
+        this.transcrServ.annotation.levels.push(newlevel);
+      }
+    ).catch((err) => {
+      console.error(err);
+    });
   }
 
   public selectLevel(tiernum: number) {

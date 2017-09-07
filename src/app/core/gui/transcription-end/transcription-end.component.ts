@@ -17,7 +17,7 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
   private subscrmanager: SubscriptionManager;
 
   constructor(private router: Router,
-              private sessService: AppStorageService,
+              private appStorage: AppStorageService,
               private tranService: TranscriptionService,
               private uiService: UserInteractionsService,
               private settService: SettingsService,
@@ -30,7 +30,7 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   ngOnInit() {
-    this.sessService.submitted = true;
+    this.appStorage.submitted = true;
   }
 
   ngAfterViewInit() {
@@ -44,22 +44,22 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
     this.tranService.endTranscription();
 
     this.clearData();
-    this.sessService.clearLocalStorage();
+    this.appStorage.clearLocalStorage();
 
     this.router.navigate(['/logout']);
   }
 
   clearData() {
-    this.sessService.submitted = false;
-    this.sessService.clearAnnotationData().catch((err) => {
+    this.appStorage.submitted = false;
+    this.appStorage.clearAnnotationData().catch((err) => {
       console.error(err)
     });
 
-    this.sessService.idb.save('options', 'feedback', {value: null}).catch((err) => {
+    this.appStorage.idb.save('options', 'feedback', {value: null}).catch((err) => {
       console.error(err);
     });
-    this.sessService.comment = '';
-    this.sessService.clearLoggingData().catch((err) => {
+    this.appStorage.comment = '';
+    this.appStorage.clearLoggingData().catch((err) => {
       console.error(err)
     });
     this.uiService.elements = [];

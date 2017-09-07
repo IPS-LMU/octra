@@ -9,7 +9,7 @@ import {isNullOrUndefined} from 'util';
 @Injectable()
 export class SettingsGuard implements CanActivate {
 
-  constructor(private sessService: AppStorageService,
+  constructor(private appStorage: AppStorageService,
               private router: Router,
               private settingsService: SettingsService) {
   }

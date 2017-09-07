@@ -23,6 +23,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
   @ViewChild('error') error: ModalComponent;
   @ViewChild('bugreport') bugreport: ModalComponent;
   @ViewChild('supportedfiles') supportedfiles: ModalComponent;
+  @ViewChild('yesno') yesno: ModalComponent;
 
   public bgdescr = '';
   public bgemail = '';
@@ -47,12 +48,12 @@ export class OctraModalComponent implements OnInit, OnDestroy {
   constructor(private modService: ModalService,
               public bugService: BugReportService,
               private api: APIService,
-              private sessService: AppStorageService,
+              private appStorage: AppStorageService,
               private settService: SettingsService) {
   }
 
   ngOnInit() {
-    this.bgemail = (!isNullOrUndefined(this.sessService.email)) ? this.sessService.email : '';
+    this.bgemail = (!isNullOrUndefined(this.appStorage.email)) ? this.appStorage.email : '';
     this._subscrmanager = new SubscriptionManager();
 
 
@@ -73,7 +74,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
   }
 
   sendBugReport() {
-    this.sessService.email = this.bgemail;
+    this.appStorage.email = this.bgemail;
 
     this._subscrmanager.add(
       this.bugService.sendReport(this.bgemail, this.bgdescr, this.sendpro_obj, {

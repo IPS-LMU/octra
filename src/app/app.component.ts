@@ -30,7 +30,7 @@ export class AppComponent implements OnDestroy {
 
   constructor(private api: APIService,
               private langService: TranslateService,
-              private sessService: AppStorageService,
+              private appStorage: AppStorageService,
               private settingsService: SettingsService,
               private bugService: BugReportService) {
     // overwrite console.log
@@ -90,9 +90,9 @@ export class AppComponent implements OnDestroy {
 
     const checkupdates = () => {
       // check for Updates
-      const umanager = new UpdateManager(this.sessService);
+      const umanager = new UpdateManager(this.appStorage);
       umanager.checkForUpdates(this.settingsService.app_settings.octra.database.name).then((idb) => {
-        this.sessService.load(idb).then(
+        this.appStorage.load(idb).then(
           () => {
             if (this.settingsService.validated) {
               console.log('loaded');
@@ -109,7 +109,7 @@ export class AppComponent implements OnDestroy {
         () => {
           checkupdates();
         }
-      ))
+      ));
     } else {
       checkupdates();
     }
@@ -138,7 +138,7 @@ export class AppComponent implements OnDestroy {
       this.langService.addLangs(languages);
 
       // check if browser language is available in translations
-      if (isNullOrUndefined(this.sessService.language) || this.sessService.language === '') {
+      if (isNullOrUndefined(this.appStorage.language) || this.appStorage.language === '') {
         if (!isUndefined(this.langService.getLangs().find((value) => {
             return value === browser_lang;
           }))) {
@@ -148,10 +148,10 @@ export class AppComponent implements OnDestroy {
           this.langService.use(languages[0]);
         }
       } else {
-        this.langService.use(this.sessService.language);
+        this.langService.use(this.appStorage.language);
       }
     }
-  };
+  }
 
   ngOnDestroy() {
     this.subscrmanager.destroy();

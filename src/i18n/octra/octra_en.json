@@ -214,6 +214,7 @@
   },
   "settings": {
     "easy mode": "Easy Mode",
-    "play on hover": "PlayOnHover"
+    "play on hover": "Play on hover",
+    "follow playcursor": "Follow Playcursor"
   }
 }

@@ -8,23 +8,23 @@ import {SettingsService} from '../../shared/service/settings.service';
 @Injectable()
 export class MembersAreaGuard implements CanActivate {
 
-  constructor(private sessService: AppStorageService, private router: Router,
+  constructor(private appStorage: AppStorageService, private router: Router,
               private settService: SettingsService) {
 
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
 
-    if (this.sessService.LoggedIn !== true) {
+    if (this.appStorage.LoggedIn !== true) {
       this.router.navigate(['/login']);
       return false;
-    } else if (this.sessService.uselocalmode === true) {
-      if (this.sessService.file === null) {
+    } else if (this.appStorage.uselocalmode === true) {
+      if (this.appStorage.file === null) {
         // navigate to reload-file
         this.router.navigate(['/user/transcr/reload-file']);
         return false;
       }
-    } else if (this.sessService.submitted) {
+    } else if (this.appStorage.submitted) {
       this.router.navigate(['/user/transcr/submitted']);
       return false;
     } else if (!this.settService.allloaded) {

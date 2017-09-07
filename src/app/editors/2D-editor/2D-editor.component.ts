@@ -116,7 +116,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
               public cd: ChangeDetectorRef,
               public msg: MessageService,
               public settingsService: SettingsService,
-              public sessService: AppStorageService) {
+              public appStorage: AppStorageService) {
 
     this.subscrmanager = new SubscriptionManager();
   }
@@ -161,16 +161,18 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     this.subscrmanager.add(this.audiochunk_lines.statechange.subscribe(
       (state: PlayBackState) => {
         if (state === PlayBackState.PLAYING) {
-          this.scrolltimer = Observable.interval(1000).subscribe(() => {
-            const absx = this.viewer.av.audioTCalculator.samplestoAbsX(this.audiochunk_lines.playposition.samples);
-            const specialheight = jQuery('#special').height();
-            let y = Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.height;
-            y += 10 + (Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.margin.bottom);
+          if (!isNullOrUndefined(this.appStorage.followplaycursor) && this.appStorage.followplaycursor === true) {
+            this.scrolltimer = Observable.interval(1000).subscribe(() => {
+              const absx = this.viewer.av.audioTCalculator.samplestoAbsX(this.audiochunk_lines.playposition.samples);
+              const specialheight = jQuery('#special').height();
+              let y = Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.height;
+              y += 10 + (Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.margin.bottom);
 
-            if (y > specialheight) {
-              Functions.scrollTo(y, '#special');
-            }
-          });
+              if (y > specialheight) {
+                Functions.scrollTo(y, '#special');
+              }
+            });
+          }
         } else {
           if (this.scrolltimer !== null) {
             this.scrolltimer.unsubscribe();
@@ -261,7 +263,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   onMouseOver(cursor: AVMousePos) {
     this.mousestartmoving = true;
     this.loupe_updated = false;
-    if (!this.audiomanager.audioplaying && this.sessService.playonhover) {
+    if (!this.audiomanager.audioplaying && this.appStorage.playonhover) {
       // play audio
       this.audiochunk_lines.selection.start.samples = this.viewer.av.Mousecursor.timePos.samples;
       this.audiochunk_lines.selection.end.samples = this.viewer.av.Mousecursor.timePos.samples +
@@ -362,7 +364,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
         this.audiomanager.playposition, caretpos, 'multi-lines-viewer', segment);
     } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
-      this.sessService.playonhover = !this.sessService.playonhover;
+      this.appStorage.playonhover = !this.appStorage.playonhover;
     }
   }
 

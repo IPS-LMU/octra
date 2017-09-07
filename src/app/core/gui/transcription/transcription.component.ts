@@ -42,6 +42,7 @@ import {NgForm} from '@angular/forms';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {EditorComponents} from '../../../editors/components';
 import {Level} from '../../obj/Annotation/Level';
+import {getPlayBackString, PlayBackState} from '../../obj/media/index';
 
 @Component({
   selector: 'app-transcription',
@@ -106,7 +107,7 @@ export class TranscriptionComponent implements OnInit,
               public audio: AudioService,
               public uiService: UserInteractionsService,
               public transcrService: TranscriptionService,
-              public sessService: AppStorageService,
+              public appStorage: AppStorageService,
               public keyMap: KeymappingService,
               public changeDetecorRef: ChangeDetectorRef,
               public navbarServ: NavbarService,
@@ -121,20 +122,23 @@ export class TranscriptionComponent implements OnInit,
     this.navbarServ.uiService = this.uiService;
     if (!isNullOrUndefined(this.projectsettings) && !isNullOrUndefined(this.projectsettings.logging)
       && this.projectsettings.logging.forced) {
-      this.subscrmanager.add(this.audiomanager.statechange.subscribe((obj) => {
-        if (!obj.playonhover) {
+      this.subscrmanager.add(this.audiomanager.statechange.subscribe((state) => {
+        if (!this.audiomanager.playonhover) {
           let caretpos = -1;
 
           if (!isNullOrUndefined((<any> this.currentEditor.instance).editor)) {
             caretpos = (<any> this.currentEditor.instance).editor.caretpos;
           }
+
           // make sure that events from playonhover are not logged
-          this.uiService.addElementFromEvent('audio',
-            {value: obj.state}, Date.now(), this.audiomanager.playposition, caretpos, this.sessService.Interface);
+          if (state !== PlayBackState.PLAYING && state !== PlayBackState.INITIALIZED && state !== PlayBackState.PREPARE) {
+            this.uiService.addElementFromEvent('audio',
+              {value: getPlayBackString(state).toLowerCase()}, Date.now(), this.audiomanager.playposition, caretpos, this.appStorage.Interface);
+          }
         }
       }));
     }
-    this.interface = this.sessService.Interface;
+    this.interface = this.appStorage.Interface;
 
   }
 
@@ -205,7 +209,7 @@ export class TranscriptionComponent implements OnInit,
     this.changeEditor(this.interface);
     this.changeDetecorRef.detectChanges();
 
-    this.subscrmanager.add(this.sessService.saving.subscribe(
+    this.subscrmanager.add(this.appStorage.saving.subscribe(
       (saving: string) => {
         if (saving === 'saving') {
           this.saving = 'saving';
@@ -224,7 +228,7 @@ export class TranscriptionComponent implements OnInit,
     if (this.projectsettings.logging.forced === true) {
       this.subscrmanager.add(
         this.uiService.afteradd.subscribe((elem) => {
-          this.sessService.saveLogItem(elem.getDataClone());
+          this.appStorage.saveLogItem(elem.getDataClone());
         }));
     }
 
@@ -256,16 +260,16 @@ export class TranscriptionComponent implements OnInit,
 
   ngAfterViewInit() {
     if (isNullOrUndefined(this.projectsettings.interfaces.find((x) => {
-        return this.sessService.Interface === x;
+        return this.appStorage.Interface === x;
       }))) {
-      this.sessService.Interface = this.projectsettings.interfaces[0];
+      this.appStorage.Interface = this.projectsettings.interfaces[0];
     }
 
     jQuery.material.init();
   }
 
   abortTranscription = () => {
-    if (!this.sessService.uselocalmode) {
+    if (!this.appStorage.uselocalmode) {
       this.saveFeedbackform();
     }
     this.transcrService.endTranscription();
@@ -328,7 +332,7 @@ export class TranscriptionComponent implements OnInit,
     }
     for (let i = 0; i < EditorComponents.length; i++) {
       if (name === EditorComponents[i].name) {
-        this.sessService.Interface = name;
+        this.appStorage.Interface = name;
         this.interface = name;
         comp = EditorComponents[i].editor;
         break;
@@ -405,14 +409,14 @@ export class TranscriptionComponent implements OnInit,
       && this.transcrService.feedback.comment !== '') {
       this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, '\s');
     }
-    this.sessService.comment = this.transcrService.feedback.comment;
+    this.appStorage.comment = this.transcrService.feedback.comment;
 
     for (const control in this.feedback_data) {
       if (this.feedback_data.hasOwnProperty(control)) {
         this.changeValue(control, this.feedback_data[control]);
       }
     }
-    this.sessService.save('feedback', this.transcrService.feedback.exportData());
+    this.appStorage.save('feedback', this.transcrService.feedback.exportData());
   }
 
   changeValue(control: string, value: any) {
@@ -473,7 +477,7 @@ export class TranscriptionComponent implements OnInit,
       .catch(this.onSendError)
       .subscribe((result) => {
           if (result !== null && result.hasOwnProperty('statusText') && result.statusText === 'OK') {
-            this.sessService.submitted = true;
+            this.appStorage.submitted = true;
 
             setTimeout(() => {
               this.modal2.close();
@@ -507,32 +511,32 @@ export class TranscriptionComponent implements OnInit,
   nextTranscription() {
     this.transcrService.endTranscription(false);
     this.clearData();
-    this.subscrmanager.add(this.api.beginSession(this.sessService.user.project, this.sessService.user.id,
-      Number(this.sessService.user.jobno), '')
+    this.subscrmanager.add(this.api.beginSession(this.appStorage.user.project, this.appStorage.user.id,
+      Number(this.appStorage.user.jobno), '')
       .subscribe((result) => {
         if (result !== null) {
           const json = result.json();
 
           if (json.data && json.data.hasOwnProperty('url') && json.data.hasOwnProperty('id')) {
-            this.sessService.audio_url = json.data.url;
-            this.sessService.data_id = json.data.id;
+            this.appStorage.audio_url = json.data.url;
+            this.appStorage.data_id = json.data.id;
 
             // get transcript data that already exists
             if (json.data.hasOwnProperty('transcript')) {
               const transcript = JSON.parse(json.data.transcript);
 
               if (isArray(transcript) && transcript.length > 0) {
-                this.sessService.servertranscipt = transcript;
+                this.appStorage.servertranscipt = transcript;
               }
             }
 
             if (json.hasOwnProperty('message') && isNumber(json.message)) {
-              this.sessService.jobs_left = Number(json.message);
+              this.appStorage.jobs_left = Number(json.message);
             }
 
             this.router.navigate(['/user/load']);
           } else {
-            this.sessService.submitted = true;
+            this.appStorage.submitted = true;
             this.router.navigate(['/user/transcr/end']);
           }
         }
@@ -540,13 +544,13 @@ export class TranscriptionComponent implements OnInit,
   }
 
   clearData() {
-    this.sessService.submitted = false;
-    this.sessService.clearAnnotationData().catch((err) => {
+    this.appStorage.submitted = false;
+    this.appStorage.clearAnnotationData().catch((err) => {
       console.error(err);
     });
-    this.sessService.idb.save('options', 'feedback', {value: null});
-    this.sessService.comment = '';
-    this.sessService.clearLoggingData().catch((err) => {
+    this.appStorage.idb.save('options', 'feedback', {value: null});
+    this.appStorage.comment = '';
+    this.appStorage.clearLoggingData().catch((err) => {
       console.error(err)
     });
     this.uiService.elements = [];

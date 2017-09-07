@@ -79,10 +79,6 @@ export class AudioplayerService extends AudioComponentService {
   public setMouseClickPosition(x: number, y: number, curr_line: Line, $event: Event, innerWidth: number) {
     super.setMouseClickPosition(x, y, curr_line, $event, innerWidth);
 
-    if (this.audiomanager.audioplaying) {
-      this.audiochunk.stopPlayback();
-    }
-
     if (this.last_line === null || this.last_line === curr_line) {
       // same line
       // fix margin _settings
@@ -113,7 +109,6 @@ export class AudioplayerService extends AudioComponentService {
       this.PlayCursor.changeAbsX(x - this._settings.margin.left, this.audioTCalculator, this.audio_px_w, this.audiochunk);
       this.audiochunk.startpos.samples = this.audioTCalculator.absXChunktoSamples(this.PlayCursor.absX, this.audiochunk);
     }
-
   }
 
   /**
@@ -165,7 +160,7 @@ export class AudioplayerService extends AudioComponentService {
    */
   public getAbsXByLine(line: Line, rel_x, innerWidth): number {
     return (line.number * innerWidth + rel_x);
-  };
+  }
 
   /**
    * initializes all attributes needed for initialization of the audioplayer

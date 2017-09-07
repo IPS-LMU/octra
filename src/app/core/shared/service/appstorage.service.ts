@@ -8,14 +8,14 @@ import {AppInfo} from '../../../app.info';
 import {IndexedDBManager} from '../../obj/IndexedDBManager';
 
 export interface IIDBLevel {
-  id: number,
-  level: OLevel,
-  sortorder: number
+  id: number;
+  level: OLevel;
+  sortorder: number;
 }
 
 export interface IIDBLink {
-  id: number,
-  link: OLink,
+  id: number;
+  link: OLink;
 }
 
 export class OIDBLevel {
@@ -42,6 +42,13 @@ export class OIDBLink {
 
 @Injectable()
 export class AppStorageService {
+  get followplaycursor(): boolean {
+    return this._followplaycursor;
+  }
+
+  set followplaycursor(value: boolean) {
+    this._followplaycursor = value;
+  }
   get annotation_links(): OIDBLink[] {
     return this._annotation_links;
   }
@@ -255,6 +262,7 @@ export class AppStorageService {
   @SessionStorage('agreement') private _agreement: any;
   @SessionStorage('jobs_left') jobs_left: number;
   @SessionStorage('playonhover') private _playonhover: boolean;
+  @SessionStorage('followplaycursor') private _followplaycursor: boolean;
   @SessionStorage('reloaded') private _reloaded: boolean;
   @SessionStorage('email') private _email: string;
   @SessionStorage('servertranscript') private _servertranscipt: any[];
@@ -391,7 +399,7 @@ export class AppStorageService {
             resolve();
           }
         ).catch((err) => {
-          reject(err)
+          reject(err);
         });
     });
   }
@@ -433,7 +441,7 @@ export class AppStorageService {
     if (!isNullOrUndefined(log)) {
       this._idb.save('logs', log.timestamp, log).catch((err) => {
         console.error(err);
-      })
+      });
     }
   }
 
@@ -479,7 +487,7 @@ export class AppStorageService {
         err('type not supported');
       }
     }
-  };
+  }
 
   public endSession(offline: boolean, navigate: () => void) {
     this.clearSession();
@@ -493,7 +501,7 @@ export class AppStorageService {
       file.lastModifiedDate,
       file.type
     );
-  };
+  }
 
   /**
    * loads the option by its key and sets its variable.
@@ -636,12 +644,12 @@ export class AppStorageService {
                     this['' + variables[acc].attribute + ''] = result;
                     wrapper(++acc);
                   }
-                )
+                );
               } else {
                 reject(Error('loadOptions: variables parameter must be of type {attribute:string, key:string}[]'));
               }
             } else {
-              reject(Error(`session service needs an attribute called \'${variables[acc].attribute}\'`))
+              reject(Error(`session service needs an attribute called \'${variables[acc].attribute}\'`));
             }
           } else {
             resolve();
@@ -651,7 +659,7 @@ export class AppStorageService {
         wrapper(0);
       }
     );
-  };
+  }
 
   private clearIDBTable(name: string): Promise<void> {
     return this._idb.clear(name);
@@ -734,7 +742,7 @@ export class AppStorageService {
           }
         );
       });
-  };
+  }
 
   public overwriteLinks = (value: OIDBLink[]): Promise<void> => {
     return this.clearIDBTable('annotation_links')
@@ -745,7 +753,7 @@ export class AppStorageService {
       }).then(() => {
         return this._idb.saveArraySequential(value, 'annotation_links', 'id');
       });
-  };
+  }
 
   public clearLoggingData(): Promise<void> {
     this._logs = null;

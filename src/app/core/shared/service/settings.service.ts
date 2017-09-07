@@ -104,7 +104,7 @@ export class SettingsService {
   }
 
   constructor(private http: Http,
-              private sessService: AppStorageService) {
+              private appStorage: AppStorageService) {
     this.subscrmanager = new SubscriptionManager();
   }
 
@@ -219,12 +219,12 @@ export class SettingsService {
     Logger.log('Load audio file 2...');
     if (audioService.audiomanagers.length === 0) {
 
-      if (!this.sessService.uselocalmode) {
+      if (!this.appStorage.uselocalmode) {
         // online
-        if (!isNullOrUndefined(this.sessService.audio_url)) {
-          const src = this.app_settings.audio_server.url + this.sessService.audio_url;
+        if (!isNullOrUndefined(this.appStorage.audio_url)) {
+          const src = this.app_settings.audio_server.url + this.appStorage.audio_url;
           // extract filename
-          this._filename = this.sessService.audio_url.substr(this.sessService.audio_url.lastIndexOf('/') + 1);
+          this._filename = this.appStorage.audio_url.substr(this.appStorage.audio_url.lastIndexOf('/') + 1);
           const fullname = this._filename;
           this._filename = this._filename.substr(0, this._filename.lastIndexOf('.'));
           if (this._filename.indexOf('src=') > -1) {
@@ -245,9 +245,9 @@ export class SettingsService {
         }
       } else {
         // local mode
-        if (!isNullOrUndefined(this.sessService.sessionfile)
-          && !isNullOrUndefined(this.sessService.sessionfile.name)) {
-          this._filename = this.sessService.sessionfile.name;
+        if (!isNullOrUndefined(this.appStorage.sessionfile)
+          && !isNullOrUndefined(this.appStorage.sessionfile.name)) {
+          this._filename = this.appStorage.sessionfile.name;
           this._filename = this._filename.substr(0, this._filename.lastIndexOf('.'));
 
           // read file
@@ -255,7 +255,7 @@ export class SettingsService {
 
           reader.onloadend = (ev) => {
             const t: any = ev.target;
-            AudioManager.decodeAudio(this.sessService.sessionfile.name, t.result, AppInfo.audioformats, true).then(
+            AudioManager.decodeAudio(this.appStorage.sessionfile.name, t.result, AppInfo.audioformats, true).then(
               (audiomanager: AudioManager) => {
                 audioService.registerAudioManager(audiomanager);
                 Logger.log('Audio loaded.');
@@ -264,9 +264,9 @@ export class SettingsService {
             );
           };
 
-          if (!isNullOrUndefined(this.sessService.file)) {
+          if (!isNullOrUndefined(this.appStorage.file)) {
             // read audio file to array buffer
-            reader.readAsArrayBuffer(this.sessService.file);
+            reader.readAsArrayBuffer(this.appStorage.file);
           }
         } else {
           console.error('session file is null.');

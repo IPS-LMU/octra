@@ -151,7 +151,7 @@ export class TranscriptionService {
   }
 
   constructor(private audio: AudioService,
-              private sessServ: AppStorageService,
+              private appStorage: AppStorageService,
               private uiService: UserInteractionsService,
               private navbarServ: NavbarService,
               private settingsService: SettingsService,
@@ -221,65 +221,65 @@ export class TranscriptionService {
 
           this._annotation = new Annotation(annotates, this._audiofile);
 
-          if (!isNullOrUndefined(this.sessServ.annotation)) {
-            for (let i = 0; i < this.sessServ.annotation.length; i++) {
-              const level: Level = Level.fromObj(this.sessServ.annotation[i],
+          if (!isNullOrUndefined(this.appStorage.annotation)) {
+            for (let i = 0; i < this.appStorage.annotation.length; i++) {
+              const level: Level = Level.fromObj(this.appStorage.annotation[i],
                 this._audiomanager.ressource.info.samplerate, this._audiomanager.ressource.info.duration.samples);
               this._annotation.levels.push(level);
             }
 
-            for (let i = 0; i < this.sessServ.annotation_links.length; i++) {
-              this._annotation.links.push(this.sessServ.annotation_links[i].link);
+            for (let i = 0; i < this.appStorage.annotation_links.length; i++) {
+              this._annotation.links.push(this.appStorage.annotation_links[i].link);
             }
 
 
-            this._feedback = FeedBackForm.fromAny(this.settingsService.projectsettings.feedback_form, this.sessServ.comment);
-            this._feedback.importData(this.sessServ.feedback);
+            this._feedback = FeedBackForm.fromAny(this.settingsService.projectsettings.feedback_form, this.appStorage.comment);
+            this._feedback.importData(this.appStorage.feedback);
 
-            if (isNullOrUndefined(this.sessServ.comment)) {
-              this.sessServ.comment = '';
+            if (isNullOrUndefined(this.appStorage.comment)) {
+              this.appStorage.comment = '';
             } else {
-              this._feedback.comment = this.sessServ.comment;
+              this._feedback.comment = this.appStorage.comment;
             }
 
-            if (this.sessServ.logs === null) {
-              this.sessServ.clearLoggingData();
+            if (this.appStorage.logs === null) {
+              this.appStorage.clearLoggingData();
               this.uiService.elements = [];
             } else {
-              this.uiService.fromAnyArray(this.sessServ.logs);
+              this.uiService.fromAnyArray(this.appStorage.logs);
             }
 
             this.navbarServ.dataloaded = true;
             this.dataloaded.emit();
           } else {
-            reject(Error('annotation object in sessServ is null'));
+            reject(Error('annotation object in appStorage is null'));
           }
           resolve();
         };
 
-        if (isNullOrUndefined(this.sessServ.annotation) || this.sessServ.annotation.length === 0) {
+        if (isNullOrUndefined(this.appStorage.annotation) || this.appStorage.annotation.length === 0) {
           const new_levels = [];
           const levels = this.createNewAnnotation().levels;
           for (let i = 0; i < levels.length; i++) {
             new_levels.push(new OIDBLevel(i + 1, levels[i], i));
           }
 
-          this.sessServ.overwriteAnnotation(new_levels).then(() => {
-            if (!this.sessServ.uselocalmode) {
-              if (!isNullOrUndefined(this.sessServ.servertranscipt)) {
+          this.appStorage.overwriteAnnotation(new_levels).then(() => {
+            if (!this.appStorage.uselocalmode) {
+              if (!isNullOrUndefined(this.appStorage.servertranscipt)) {
                 // import server transcript
-                this.sessServ.annotation[this._selectedlevel].level.items = [];
-                for (let i = 0; i < this.sessServ.servertranscipt.length; i++) {
-                  const seg_t = this.sessServ.servertranscipt[i];
+                this.appStorage.annotation[this._selectedlevel].level.items = [];
+                for (let i = 0; i < this.appStorage.servertranscipt.length; i++) {
+                  const seg_t = this.appStorage.servertranscipt[i];
 
                   const oseg = new OSegment(i, seg_t.start, seg_t.length, [new OLabel('Tier 1', seg_t.text)]);
-                  this.sessServ.annotation[this.selectedlevel].level.items.push(oseg);
+                  this.appStorage.annotation[this.selectedlevel].level.items.push(oseg);
                 }
                 // clear servertranscript
-                this.sessServ.servertranscipt = null;
+                this.appStorage.servertranscipt = null;
 
-                this.sessServ.changeAnnotationLevel(this._selectedlevel,
-                  this.sessServ.annotation[this._selectedlevel].level)
+                this.appStorage.changeAnnotationLevel(this._selectedlevel,
+                  this.appStorage.annotation[this._selectedlevel].level)
                   .catch(
                     (err) => {
                       console.error(err);
@@ -307,14 +307,14 @@ export class TranscriptionService {
       const log_data: OLogging = this.extractUI(this.uiService.elements);
 
       data = {
-        project: (isNullOrUndefined(this.sessServ.user.project)) ? 'NOT AVAILABLE' : this.sessServ.user.project,
-        annotator: (isNullOrUndefined(this.sessServ.user.id)) ? 'NOT AVAILABLE' : this.sessServ.user.id,
+        project: (isNullOrUndefined(this.appStorage.user.project)) ? 'NOT AVAILABLE' : this.appStorage.user.project,
+        annotator: (isNullOrUndefined(this.appStorage.user.id)) ? 'NOT AVAILABLE' : this.appStorage.user.id,
         transcript: null,
         comment: this._feedback.comment,
-        jobno: (isNullOrUndefined(this.sessServ.user.jobno)) ? 'NOT AVAILABLE' : this.sessServ.user.jobno,
+        jobno: (isNullOrUndefined(this.appStorage.user.jobno)) ? 'NOT AVAILABLE' : this.appStorage.user.jobno,
         status: this.state,
         quality: this._feedback.exportData(),
-        id: this.sessServ.data_id,
+        id: this.appStorage.data_id,
         log: log_data.getObj()
       };
 
@@ -348,14 +348,14 @@ export class TranscriptionService {
     if (!this.saving) {
       this.saving = true;
       setTimeout(() => {
-        this.sessServ.save('annotation', {
+        this.appStorage.save('annotation', {
           num: this._selectedlevel,
           level: this._annotation.levels[this._selectedlevel].getObj()
         });
         this.saving = false;
       }, 2000);
     }
-  };
+  }
 
   public destroy() {
     this.subscrmanager.destroy();
@@ -387,7 +387,7 @@ export class TranscriptionService {
     const result: OLogging = new OLogging(
       '1.0',
       'UTF-8',
-      (isNullOrUndefined(this.sessServ.user.project) || this.sessServ.user.project === '') ? 'local' : this.sessServ.user.project,
+      (isNullOrUndefined(this.appStorage.user.project) || this.appStorage.user.project === '') ? 'local' : this.appStorage.user.project,
       now.toUTCString(),
       this._annotation.audiofile.name,
       this._annotation.audiofile.samplerate,

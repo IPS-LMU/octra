@@ -393,7 +393,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     } else {
       this.close();
     }
-  };
+  }
 
   onKeyDown = ($event) => {
     switch ($event.comboKey) {
@@ -413,21 +413,18 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         this.doit('down');
         break;
     }
-  };
+  }
 
   onBoundaryClicked(samples: number) {
     const i: number = this.temp_segments.getSegmentBySamplePosition(samples);
 
     if (i > -1) {
-      const start = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.samples : 0;
+      const start = (i > 0) ? this.temp_segments.get(i - 1).time.samples : 0;
       this.audiochunk.startpos = new AudioTime(start, this.audiomanager.ressource.info.samplerate);
-      this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(i).time.clone();
-      this.loupe.update();
-      this.loupe.viewer.startPlayback().then(() => {
-        // set start pos and playback length to end of audio file
-        this.audiochunk.startpos = this.audiochunk.playposition.clone();
-      }).catch(() => {
-      });
+      this.audiochunk.selection.end = this.temp_segments.get(i).time.clone();
+      this.loupe.viewer.av.drawnselection = this.audiochunk.selection;
+      this.loupe.viewer.drawSegments();
+      this.loupe.viewer.startPlayback();
     }
   }
 
@@ -491,6 +488,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       this.temp_segments.get(seg_start + seg_texts.length - 1).transcript = seg_texts[seg_texts.length - 1];
     }
   }
+
 
   public highlight() {
     const html: string = this.editor.html.replace(/&nbsp;/g, ' ');

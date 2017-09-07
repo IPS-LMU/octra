@@ -521,18 +521,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   public openSegment(segnumber: number) {
-    const segment = this.transcrService.currentlevel.segments.get(segnumber);
-    this.editor.rawText = segment.transcript;
-
-    this.segmentselected = true;
-    this.selected_index = segnumber;
-    this.viewer.selectSegment(segnumber);
-
-    const start = this.transcrService.currentlevel.segments.getStartTime(segnumber);
-    this.audiochunk_down.destroy();
-    this.audiochunk_down = new AudioChunk(new AudioSelection(start, AudioTime.add(start, segment.time)), this.audiomanager);
-    this.top_selected = true;
-    this.loupe.update();
+    this.onSegmentEnter({index: segnumber});
   }
 
   public update() {

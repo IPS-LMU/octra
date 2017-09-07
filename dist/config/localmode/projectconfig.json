@@ -1,11 +1,12 @@
 {
   "version": "1.1.0",
-  "logging":{
+  "logging": {
     "forced": true
   },
-  "navigation":{
+  "navigation": {
     "export": true,
-    "interfaces": true
+    "interfaces": true,
+    "help_url": "https://www.phonetik.uni-muenchen.de/apps/octra/help/"
   },
   "responsive": {
     "enabled": true,
@@ -17,8 +18,8 @@
       "de": "<p>Ich erkläre, dass ich die Probandeninformation zur Studie <b>'Optimale Webbasierte Transkription langer Audiodateien'</b> und diese Einverständniserklärung zur Studienteilnahme erhalten habe.</p><ul><li>Ich wurde für mich ausreichend mündlich und/oder schriftlich über die wissenschaftliche Untersuchunginformiert.</li><li>Ich erkläre mich bereit, dass ihm Rahmen der Studie Daten über mein Anwenderverhalten gesammelt unddiese anonymisiert aufgezeichnet werden. Es wird gewährleistet, dass meine personenbezogenen Daten nichtan Dritte außerhalb der LMU weitergegeben werden. In anonymisierter Form dürfen die Daten fürwissenschaftliche Untersuchungen, Publikationen und in der Lehre verwendet werden. Meine persönlichenDaten unterliegen dem Datenschutzgesetz.</li><li>Ich weiß, dass ich jederzeit meine Einverständniserklärung, ohne Angabe von Gründen, widerrufen kann,ohne dass dies für mich nachteilige Folgen hat.</li><li>Mit der vorstehend geschilderten Vorgehensweise bin ich einverstanden und bestätige dies mit dem Klick auf Akzeptieren'</li></ul>"
     }
   },
-  "plugins":{
-    "pdfexport":{
+  "plugins": {
+    "pdfexport": {
       "url": "https://www.phonetik.uni-muenchen.de/apps/octra/pdfconverter/"
     }
   },
@@ -36,10 +37,10 @@
       "title": {
         "de": "Sprachverständlichkeit des Sprechers"
       },
+      "name": "quality-speaker",
       "controls": [
         {
           "type": "radiobutton",
-          "name": "quality-speaker",
           "label": {
             "de": "unverständlich",
             "en": "unknowable"
@@ -54,7 +55,6 @@
             "de": "weniger verständlich",
             "en": "less clear"
           },
-          "name": "quality-speaker",
           "value": "1",
           "custom": {},
           "required": true
@@ -65,7 +65,6 @@
             "de": "verständlich",
             "en": "clear"
           },
-          "name": "quality-speaker",
           "value": "2",
           "custom": {},
           "required": true
@@ -76,7 +75,6 @@
             "de": "sehr gut verständlich",
             "en": "very clear"
           },
-          "name": "quality-speaker",
           "value": "3",
           "custom": {},
           "required": true
@@ -87,10 +85,10 @@
       "title": {
         "de": "Qualität des Audiosignals"
       },
+      "name": "quality-audio",
       "controls": [
         {
           "type": "radiobutton",
-          "name": "quality-audio",
           "label": {
             "de": "viele Störgeräusche",
             "en": "lot of noises"
@@ -105,7 +103,6 @@
             "de": "wenige Störgeräusche",
             "en": "less noises"
           },
-          "name": "quality-audio",
           "value": "1",
           "custom": {},
           "required": true
@@ -116,7 +113,6 @@
             "de": "sehr wenig Störgeräusche",
             "en": "very clear"
           },
-          "name": "quality-audio",
           "value": "2",
           "custom": {},
           "required": true
@@ -127,7 +123,6 @@
             "de": "keine Störgeräusche",
             "en": "no noises"
           },
-          "name": "quality-audio",
           "value": "3",
           "custom": {},
           "required": true

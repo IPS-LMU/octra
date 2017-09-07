@@ -11,20 +11,20 @@ function validateAnnotation(annotation, guidelines) {
     while ((match = re.exec(annotation)) != null) {
         result.push({
             start: match.index,
-            length : match[0].length,
+            length: match[0].length,
             code: "R06"
         });
     }
 
     //M01
-    for(var i = 0; i < guidelines.markers.length; i++){
+    for (var i = 0; i < guidelines.markers.length; i++) {
         var marker = guidelines.markers[i].code;
 
-        re = new RegExp("("+ escapeRegex(marker) +")( *("+ escapeRegex(marker) +"))+", "g");
+        re = new RegExp("(" + escapeRegex(marker) + ")( *(" + escapeRegex(marker) + "))+", "g");
         while ((match = re.exec(annotation)) != null) {
             result.push({
                 start: match.index,
-                length : match[0].length,
+                length: match[0].length,
                 code: "M01"
             });
         }
@@ -69,15 +69,13 @@ function escapeRegex(regex_str) {
     return regex_str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
-function sortValidationResult(result){
-    return result.sort(function(a,b){
-        if(a.start === b.start)
+function sortValidationResult(result) {
+    return result.sort(function (a, b) {
+        if (a.start === b.start)
             return 0;
-        if(a.start < b.start)
+        if (a.start < b.start)
             return -1;
-        if(a.start > b.start)
+        if (a.start > b.start)
             return 1;
     });
 }
-
-console.log("ok es klappt test4");

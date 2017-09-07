@@ -11,9 +11,20 @@
       },
       "type": "object"
     },
-    "octra":{
+    "octra": {
       "properties": {
-        "login":{
+        "database": {
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "required": [
+            "name"
+          ]
+        },
+        "login": {
           "properties": {
             "enabled": {
               "type": "boolean"
@@ -24,7 +35,7 @@
         "showdetails": {
           "type": "boolean"
         },
-        "responsive":{
+        "responsive": {
           "id": "/properties/octra/responsive",
           "properties": {
             "enabled": {
@@ -51,10 +62,10 @@
               "type": "string"
             }
           },
-         "type": "object"
+          "type": "object"
         },
         "allowed_browsers": {
-          "items" :{
+          "items": {
             "properties": {
               "name": {
                 "type": "string"
@@ -74,10 +85,17 @@
           "type": "array"
         }
       },
-      "type": "object"
+      "type": "object",
+      "required": [
+        "database"
+      ]
     }
   },
   "type": "object",
-  "required": ["version", "audio_server", "octra"],
+  "required": [
+    "version",
+    "audio_server",
+    "octra"
+  ],
   "additionalProperties": true
 }

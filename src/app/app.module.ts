@@ -73,7 +73,6 @@ import {OctraDropzoneComponent} from './core/gui/octra-dropzone/octra-dropzone.c
 import {LoadeditorDirective} from './core/shared/directive/loadeditor.directive';
 import {NewsComponent} from './core/gui/news/news.component';
 import {FaqComponent} from './core/gui/faq/faq.component';
-import {ExpandDirective} from './core/gui/faq/expand.directive';
 import {LinearEditorComponent} from './editors/linear-editor/linear-editor.component';
 import {EditorWSignaldisplayComponent} from './editors/editor-without-signaldisplay/editor-w-signaldisplay.component';
 import {TwoDEditorComponent} from './editors/2D-editor/2D-editor.component';
@@ -126,7 +125,6 @@ export const ngmodule = {
     LoadeditorDirective,
     NewsComponent,
     FaqComponent,
-    ExpandDirective,
     EDITORS
   ],
   entryComponents: EDITORS,

@@ -1,30 +1,12 @@
-.faq-elem table tr td:first-child {
-    color: gray;
-    padding-right: 20px;
-    padding-top: 10px;
-    cursor: pointer;
-    vertical-align: top;
+iframe {
+    width: 100%;
+    height: 100%;
+    flex: auto;
+    border: none;
 }
 
-.description {
-    display: none;
-    padding-bottom: 20px;
-    max-width: 900px;
-    text-align: justify;
-}
-
-ul, ol {
-    padding-top: 20px;
-}
-
-.description-list {
-    padding-top: 10px;
-}
-
-.description-li {
-    padding-top: 30px;
-}
-
-img {
-    border: 1px solid #00aa9a;
+:host {
+    display: flex;
+    flex-direction: column;
+    flex: auto;
 }

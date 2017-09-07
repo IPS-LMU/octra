@@ -272,7 +272,7 @@ export class TranscriptionService {
                 for (let i = 0; i < this.appStorage.servertranscipt.length; i++) {
                   const seg_t = this.appStorage.servertranscipt[i];
 
-                  const oseg = new OSegment(i, seg_t.start, seg_t.length, [new OLabel('Tier 1', seg_t.text)]);
+                  const oseg = new OSegment(i, seg_t.start, seg_t.length, [new OLabel('Tier_1', seg_t.text)]);
                   this.appStorage.annotation[this.selectedlevel].level.items.push(oseg);
                 }
                 // clear servertranscript
@@ -583,8 +583,8 @@ export class TranscriptionService {
 
 
   public createNewAnnotation(): OAnnotJSON {
-    const level: OLevel = new OLevel('Tier 1', 'SEGMENT', []);
-    level.items.push(new OSegment(1, 0, this._audiomanager.ressource.info.duration.samples, [(new OLabel('Tier 1', ''))]));
+    const level: OLevel = new OLevel('Tier_1', 'SEGMENT', []);
+    level.items.push(new OSegment(1, 0, this._audiomanager.ressource.info.duration.samples, [(new OLabel('Tier_1', ''))]));
     const levels: OLevel[] = [];
     levels.push(level);
 

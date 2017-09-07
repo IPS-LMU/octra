@@ -55,11 +55,11 @@ export class TextConverter extends Converter {
       const result = new OAnnotJSON(audiofile.name, audiofile.samplerate);
 
       const content = file.content;
-      const olevel = new OLevel('Tier 1', 'SEGMENT');
+      const olevel = new OLevel('Tier_1', 'SEGMENT');
       const samplerate = audiofile.samplerate;
 
       const olabels: OLabel[] = [];
-      olabels.push((new OLabel('Tier 1', file.content)));
+      olabels.push((new OLabel('Tier_1', file.content)));
       const osegment = new OSegment(
         1, 0, Math.round(audiofile.duration * samplerate), olabels
       );

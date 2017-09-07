@@ -278,12 +278,12 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     // save level name
     if (event.target.value !== null && event.target.value !== '') {
       const level = this.transcrServ.annotation.levels[tiernum];
-      level.name = event.target.value;
+      level.name = event.target.value.replace(' ', '_');
       this.appStorage.changeAnnotationLevel(tiernum, level.getObj()).catch((err) => {
         console.error(err);
       }).then(() => {
         // update value for annoation object in transcr service
-        this.transcrServ.annotation.levels[tiernum].name = event.target.value;
+        this.transcrServ.annotation.levels[tiernum].name = event.target.value.replace(' ', '_');
       });
     } else {
       event.target.value = this.transcrServ.annotation.levels[tiernum].name;
@@ -292,7 +292,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onLevelAddClick() {
     const level_nums = this.transcrServ.annotation.levels.length;
-    let levelname = `Tier ${level_nums + 1}`;
+    let levelname = `Tier_${level_nums + 1}`;
     let index = level_nums;
 
     const nameexists = (newname: string) => {
@@ -307,7 +307,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
     while (nameexists(levelname)) {
       index++;
-      levelname = `Tier ${index + 1}`;
+      levelname = `Tier_${index + 1}`;
     }
 
     const newlevel = new Level(this.appStorage.levelcounter + 1, levelname, 'SEGMENT',

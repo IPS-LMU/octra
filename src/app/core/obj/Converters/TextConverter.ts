@@ -25,7 +25,7 @@ export class TextConverter extends Converter {
         const level: OLevel = annotation.levels[i];
 
         if (level.type === 'SEGMENT') {
-          result += `LEVEL ${level.name}:\n-------\n\n`;
+          result += `${level.name}\n`;
           for (let j = 0; j < level.items.length; j++) {
             const transcript = level.items[j].labels[0].value;
             result += transcript;
@@ -33,6 +33,7 @@ export class TextConverter extends Converter {
               result += ' ';
             }
           }
+          result += '\n\n';
         }
       }
 

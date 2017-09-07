@@ -62,7 +62,7 @@ export class CTMConverter extends Converter {
       const filename = lines[0].substr(0, lines[0].indexOf(' '));
 
       if (Functions.contains(file.name, filename) && Functions.contains(audiofile.name, filename)) {
-        const olevel = new OLevel('Tier 1', 'SEGMENT');
+        const olevel = new OLevel('Tier_1', 'SEGMENT');
 
         let start = 0;
         for (let i = 0; i < lines.length; i++) {
@@ -89,14 +89,14 @@ export class CTMConverter extends Converter {
               const osegment = new OSegment((i + 1),
                 0,
                 start * samplerate,
-                [(new OLabel('Tier 1', ''))]
+                [(new OLabel('Tier_1', ''))]
               );
 
               olevel.items.push(osegment);
             }
 
             const olabels: OLabel[] = [];
-            olabels.push((new OLabel('Tier 1', columns[4])));
+            olabels.push((new OLabel('Tier_1', columns[4])));
             const osegment = new OSegment(
               (i + 1),
               Math.round(start * samplerate),
@@ -112,7 +112,7 @@ export class CTMConverter extends Converter {
                   (i + 2),
                   Math.round((start + length) * samplerate),
                   Math.round((audiofile.duration - (start + length)) * samplerate),
-                  [(new OLabel('Tier 1', ''))]
+                  [(new OLabel('Tier_1', ''))]
                 );
 
                 olevel.items.push(osegment_end);

@@ -9,14 +9,16 @@ audiofiles. For now, it uses three editors for the orthographic transcription:
 
 One special feature of OCTRA is that it saves your proceedings automatically in your browser. If the browser is closed (abruptly) you can continue your transcription without data-loss.
 
+
 ## Remarks
 At the moment, OCTRA's online mode supports only one specific server database. That means, if you install OCTRA on your server, you can only use the local mode. We are working on supporting other servers.
+
 
 ## Production Use
 
 ### OCTRA website
 
-If you don't want to install OCTRA, you can use the latest release[here](https://www.phonetik.uni-muenchen.de/apps/octra/octra/)
+If you don't want to install OCTRA, you can use the latest release [here](https://www.phonetik.uni-muenchen.de/apps/octra/octra/).
 
 ### Installation
 In a production environment you don't need to compile OCTRA again.
@@ -49,6 +51,7 @@ In a production environment you don't need to compile OCTRA again.
 
 7. Test if OCTRA works and check the webconsole if all works fine. If there are no errors you can use OCTRA.
 
+
 ## Development Use
 On the Development level OCTRA requires Node 6.9.0 or higher, together with NPM 3 or higher.
 
@@ -60,6 +63,12 @@ Then you can install OCTRA:
 4. Duplicate the file ``src/config/appconfig_sample.json`` and rename it to ``scr/config/appconfig.json``. In appconfig.json you can change the settings of your instance of OCTRA.
 5. After the installation you can call `` npm start `` to start the node server.
 6. After that please read the notice about the config files in the production use section
+
+
+## Documentation
+
+You can find a detailed documentation on OCTRA's configuration files [here](https://github.com/IPS-LMU/octra/wiki).
+
 
 ## Translation
 To translate OCTRA to a new language you need to create these new files:

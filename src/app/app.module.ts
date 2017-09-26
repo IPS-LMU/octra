@@ -77,6 +77,7 @@ import {LinearEditorComponent} from './editors/linear-editor/linear-editor.compo
 import {EditorWSignaldisplayComponent} from './editors/editor-without-signaldisplay/editor-w-signaldisplay.component';
 import {TwoDEditorComponent} from './editors/2D-editor/2D-editor.component';
 import {HelpComponent} from './core/gui/help/help.component';
+import {NewEditorComponent} from './editors/new-editor/new-editor.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
@@ -125,7 +126,8 @@ export const ngmodule = {
     LoadeditorDirective,
     NewsComponent,
     FaqComponent,
-    EDITORS
+    EDITORS,
+    NewEditorComponent
   ],
   entryComponents: EDITORS,
   imports: [

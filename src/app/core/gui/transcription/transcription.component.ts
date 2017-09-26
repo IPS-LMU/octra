@@ -206,6 +206,13 @@ export class TranscriptionComponent implements OnInit,
       }
     ));
 
+    if (this.projectsettings.logging.forced === true) {
+      this.subscrmanager.add(
+        this.uiService.afteradd.subscribe((elem) => {
+          this.appStorage.saveLogItem(elem.getDataClone());
+        }));
+    }
+
     this.changeEditor(this.interface);
     this.changeDetecorRef.detectChanges();
 
@@ -224,13 +231,6 @@ export class TranscriptionComponent implements OnInit,
     ));
 
     this.navbarServ.show_export = this.settingsService.projectsettings.navigation.export;
-
-    if (this.projectsettings.logging.forced === true) {
-      this.subscrmanager.add(
-        this.uiService.afteradd.subscribe((elem) => {
-          this.appStorage.saveLogItem(elem.getDataClone());
-        }));
-    }
 
     if (!isNullOrUndefined(this.transcrService.annotation)) {
       this.level_subscription_id = this.subscrmanager.add(
@@ -274,7 +274,7 @@ export class TranscriptionComponent implements OnInit,
     }
     this.transcrService.endTranscription();
     this.router.navigate(['/logout']);
-  };
+  }
 
   ngAfterContentInit() {
   }
@@ -551,7 +551,7 @@ export class TranscriptionComponent implements OnInit,
     this.appStorage.idb.save('options', 'feedback', {value: null});
     this.appStorage.comment = '';
     this.appStorage.clearLoggingData().catch((err) => {
-      console.error(err)
+      console.error(err);
     });
     this.uiService.elements = [];
     this.settingsService.clearSettings();

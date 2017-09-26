@@ -83,7 +83,7 @@ own licenses; we recommend you read them, as their terms may differ from
 the terms above.
 
 
-summernote@0.8.7 MIT
+summernote@0.8.8 MIT
 The MIT License (MIT)
 
 Copyright (c) 2015~ Summernote Team (https://github.com/orgs/summernote/people)

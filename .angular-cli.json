@@ -14,7 +14,8 @@
         "project",
         "favicon.ico",
         "404.html",
-        "schemata"
+        "schemata",
+        "LICENSE.txt"
       ],
       "index": "index.html",
       "main": "main.ts",

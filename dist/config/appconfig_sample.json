@@ -5,7 +5,7 @@
   },
   "octra": {
     "database": {
-      "name": ""
+      "name": "octra"
     },
     "login": {
       "enabled": false

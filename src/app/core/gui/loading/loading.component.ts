@@ -43,10 +43,10 @@ export class LoadingComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const process = () => {
       if (this.sessionService.uselocalmode && isNullOrUndefined(this.sessionService.file)) {
-                this.router.navigate(['/user/transcr/reload-file']);
+        this.router.navigate(['/user/transcr/reload-file']);
       } else {
-                              }
-            this.settService.loadAudioFile(this.audio);
+      }
+      this.settService.loadAudioFile(this.audio);
     };
 
     if (!this.sessionService.idbloaded) {
@@ -62,7 +62,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
     }
 
     if (!this.sessionService.LoggedIn) {
-            this.router.navigate(['/login']);
+      this.router.navigate(['/login']);
     }
 
     this.langService.get('general.please wait').subscribe(
@@ -126,7 +126,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
             this.loadedchanged.emit(false);
           } else {
             console.error('audio not loaded');
-                        if (this.sessionService.uselocalmode) {
+            if (this.sessionService.uselocalmode) {
               this.router.navigate(['/user/transcr/reload-file']);
             }
           }
@@ -197,7 +197,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-        this.sessionService.clearSession();
+    this.sessionService.clearSession();
     this.router.navigate(['/login']);
   }
 }

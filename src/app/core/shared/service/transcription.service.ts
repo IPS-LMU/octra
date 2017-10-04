@@ -12,7 +12,6 @@ import {NavbarService} from '../../gui/navbar/navbar.service';
 import {SubscriptionManager} from '../';
 import {SettingsService} from './settings.service';
 import {isNullOrUndefined} from 'util';
-import {Http} from '@angular/http';
 import {FeedBackForm} from '../../obj/FeedbackForm/FeedBackForm';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../../obj/Annotation/AnnotJSON';
 import {Annotation} from '../../obj/Annotation/Annotation';
@@ -22,6 +21,8 @@ import {AnnotJSONConverter} from '../../obj/Converters/AnnotJSONConverter';
 import {Level} from '../../obj/Annotation/Level';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {OLog, OLogging} from '../../obj/Settings/logging';
+import {AppSettings} from '../../obj/Settings/app-settings';
+import {ProjectConfiguration} from '../../obj/Settings/project-configuration';
 
 @Injectable()
 export class TranscriptionService {
@@ -134,11 +135,11 @@ export class TranscriptionService {
    }
    */
 
-  private get app_settings(): any {
+  private get app_settings(): AppSettings {
     return this.settingsService.app_settings;
   }
 
-  private get projectsettings(): any {
+  private get projectsettings(): ProjectConfiguration {
     return this.settingsService.projectsettings;
   }
 
@@ -154,8 +155,7 @@ export class TranscriptionService {
               private appStorage: AppStorageService,
               private uiService: UserInteractionsService,
               private navbarServ: NavbarService,
-              private settingsService: SettingsService,
-              private http: Http) {
+              private settingsService: SettingsService) {
     this.subscrmanager = new SubscriptionManager();
 
     this.subscrmanager.add(this.navbarServ.onexportbuttonclick.subscribe((button) => {
@@ -182,6 +182,7 @@ export class TranscriptionService {
       this._audiofile.name = this._audiomanager.ressource.name + this._audiomanager.ressource.extension;
       this._audiofile.samplerate = this._audiomanager.ressource.info.samplerate;
       this._audiofile.duration = this._audiomanager.ressource.info.duration.samples;
+      this._audiofile.size = this._audiomanager.ressource.size;
 
       this.last_sample = this._audiomanager.ressource.info.duration.samples;
       this.loadSegments(this._audiomanager.ressource.info.samplerate).then(

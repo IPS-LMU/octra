@@ -154,11 +154,14 @@ export class AudioManager {
     if (keepbuffer) {
       buffer_copy = buffer.slice(0);
     }
+
+    const buffer_length = buffer.byteLength;
+
     return AudioManager.decodeAudioFile(buffer, audioinfo.samplerate).then((audiobuffer: AudioBuffer) => {
       Logger.log('Audio decoded.');
 
       result.ressource = new AudioRessource(filename, SourceType.ArrayBuffer,
-        audioinfo, (buffer_copy === null) ? buffer : buffer_copy, audiobuffer, buffer.byteLength);
+        audioinfo, (buffer_copy === null) ? buffer : buffer_copy, audiobuffer, buffer_length);
 
       // set duration is very important
       result.ressource.info.duration.samples = audiobuffer.length;

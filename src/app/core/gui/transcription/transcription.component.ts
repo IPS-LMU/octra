@@ -43,6 +43,7 @@ import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {EditorComponents} from '../../../editors/components';
 import {Level} from '../../obj/Annotation/Level';
 import {getPlayBackString, PlayBackState} from '../../obj/media/index';
+import {BugReportService} from '../../shared/service/bug-report.service';
 
 @Component({
   selector: 'app-transcription',
@@ -114,7 +115,8 @@ export class TranscriptionComponent implements OnInit,
               public settingsService: SettingsService,
               public modService: ModalService,
               public langService: TranslateService,
-              private api: APIService) {
+              private api: APIService,
+              private bugService: BugReportService) {
     this.subscrmanager = new SubscriptionManager();
     this.audiomanager = this.audio.audiomanagers[0];
 
@@ -133,7 +135,8 @@ export class TranscriptionComponent implements OnInit,
           // make sure that events from playonhover are not logged
           if (state !== PlayBackState.PLAYING && state !== PlayBackState.INITIALIZED && state !== PlayBackState.PREPARE) {
             this.uiService.addElementFromEvent('audio',
-              {value: getPlayBackString(state).toLowerCase()}, Date.now(), this.audiomanager.playposition, caretpos, this.appStorage.Interface);
+              {value: getPlayBackString(state).toLowerCase()}, Date.now(),
+              this.audiomanager.playposition, caretpos, this.appStorage.Interface);
           }
         }
       }));
@@ -256,6 +259,8 @@ export class TranscriptionComponent implements OnInit,
         this.uiService.addElementFromEvent('level', {value: 'changed'}, Date.now(), 0, -1, level.name);
       }
     ));
+
+    this.bugService.init(this.transcrService);
   }
 
   ngAfterViewInit() {

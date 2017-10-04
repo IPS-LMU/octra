@@ -5,9 +5,11 @@ import {AppInfo} from '../../../app.info';
 import {AppStorageService} from './appstorage.service';
 import {Http, Response} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
-import {MantisBugReporter} from '../../obj/BugAPI/MantisBugReporter';
 import {SettingsService} from './settings.service';
 import {isNullOrUndefined} from 'util';
+import {BugReporter} from '../../obj/BugAPI/BugReporter';
+import {TranscriptionService} from './transcription.service';
+import {Functions} from '../Functions';
 
 export enum ConsoleType {
   LOG,
@@ -28,6 +30,8 @@ export class BugReportService {
   }
 
   private _console: ConsoleEntry[] = [];
+  private reporter: BugReporter;
+  private transcrService: TranscriptionService;
 
   constructor(private langService: TranslateService,
               private appStorage: AppStorageService,
@@ -35,7 +39,11 @@ export class BugReportService {
               private http: Http) {
   }
 
-  public addEntry(type: ConsoleType, message: string) {
+  public init(transcrService: TranscriptionService) {
+    this.transcrService = transcrService;
+  }
+
+  public addEntry(type: ConsoleType, message: any) {
     const console: ConsoleEntry = {
       type: type,
       message: message
@@ -49,7 +57,7 @@ export class BugReportService {
   }
 
   public getPackage(): any {
-    return {
+    const result = {
       octra: {
         version: AppInfo.version,
         language: this.langService.currentLang,
@@ -67,11 +75,37 @@ export class BugReportService {
       },
       entries: this._console
     };
+
+    if (!isNullOrUndefined(this.transcrService)) {
+      const file = Functions.getFileSize(this.transcrService.audiofile.size);
+      result.octra['audiofile_size'] = file.size + ' ' + file.label;
+      result.octra['audiofile_duration'] = this.transcrService.audiomanager.ressource.info.duration.seconds;
+      result.octra['audiofile_samplerate'] = this.transcrService.audiofile.samplerate;
+      result.octra['audiofile_bitrate'] = this.transcrService.audiomanager.ressource.info.bitrate;
+      result.octra['audiofile_channels'] = this.transcrService.audiomanager.ressource.info.channels;
+      result.octra['audiofile_type'] = this.transcrService.audiomanager.ressource.extension;
+      result.octra['levels'] = this.transcrService.annotation.levels.length;
+      result.octra['currentlevel'] = this.transcrService.selectedlevel;
+      result.octra['segments'] = this.transcrService.currentlevel.segments.length;
+    }
+
+    return result;
   }
 
   public getText(): string {
-    const reporter = new MantisBugReporter();
-    return reporter.getText(this.getPackage());
+    const bugreport_settings = this.settService.app_settings.octra.bugreport;
+
+    for (let i = 0; i < AppInfo.bugreporters.length; i++) {
+      const bugreporter = AppInfo.bugreporters[i];
+      if (bugreporter.name === bugreport_settings.name) {
+        this.reporter = bugreporter;
+      }
+    }
+
+    if (!isNullOrUndefined(this.reporter)) {
+      return this.reporter.getText(this.getPackage());
+    }
+    return '';
   }
 
   sendReport(email: string, description: string, sendbugreport: boolean, credentials: {
@@ -81,19 +115,14 @@ export class BugReportService {
     const bugreport_settings = this.settService.app_settings.octra.bugreport;
 
     if (!isNullOrUndefined(bugreport_settings) && bugreport_settings.enabled) {
-      for (let i = 0; i < AppInfo.bugreporters.length; i++) {
-        const bugreporter = AppInfo.bugreporters[i];
-        if (bugreporter.name === bugreport_settings.name) {
-          const auth_token = credentials.auth_token;
-          const url = credentials.url;
-          const form = {
-            email: email,
-            description: description
-          };
+      const auth_token = credentials.auth_token;
+      const url = credentials.url;
+      const form = {
+        email: email,
+        description: description
+      };
 
-          return bugreporter.sendBugReport(this.http, this.getPackage(), form, url, auth_token, sendbugreport);
-        }
-      }
+      return this.reporter.sendBugReport(this.http, this.getPackage(), form, url, auth_token, sendbugreport);
     }
 
     return null;

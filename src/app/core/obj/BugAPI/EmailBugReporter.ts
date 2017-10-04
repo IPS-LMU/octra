@@ -47,7 +47,7 @@ export class EmailBugReporter extends BugReporter {
           result += '---------\n';
 
           for (const attr2 in pkg[attr]) {
-            if (typeof pkg[attr][attr2] !== 'object' || pkg[attr][attr2] === null) {
+            if (pkg[attr].hasOwnProperty(attr2) && typeof pkg[attr][attr2] !== 'object' || pkg[attr][attr2] === null) {
               result += '  ' + attr2 + ':  ' + pkg[attr][attr2] + '\n';
             }
           }
@@ -56,7 +56,11 @@ export class EmailBugReporter extends BugReporter {
           result += '---------\n';
 
           for (let i = 0; i < pkg[attr].length; i++) {
-            result += '  ' + pkg[attr][i].type + '  ' + pkg[attr][i].message + '\n';
+            if (typeof pkg[attr][i].message === 'string') {
+              result += '  ' + pkg[attr][i].type + '  ' + pkg[attr][i].message + '\n';
+            } else if (typeof pkg[attr][i].message === 'object') {
+              result += '  ' + pkg[attr][i].type + '\n' + JSON.stringify(pkg[attr][i].message, null, 2) + '\n';
+            }
           }
         }
         result += '\n';

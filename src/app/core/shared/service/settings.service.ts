@@ -55,7 +55,7 @@ export class SettingsService {
     return this.validation.app;
   }
 
-  get app_settings(): any {
+  get app_settings(): AppSettings {
     return this._app_settings;
   }
 

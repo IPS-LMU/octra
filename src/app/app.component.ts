@@ -123,6 +123,8 @@ export class AppComponent implements OnDestroy {
       } else {
         if (this.settingsService.validated) {
           console.log('settings valid');
+          if (!this.appStorage.uselocalmode) {
+          }
           this.api.init(this.settingsService.app_settings.audio_server.url + 'WebTranscribe');
         }
 

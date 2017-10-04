@@ -122,25 +122,30 @@ export class TranscriptionComponent implements OnInit,
 
     this.navbarServ.transcrService = this.transcrService;
     this.navbarServ.uiService = this.uiService;
-    if (!isNullOrUndefined(this.projectsettings) && !isNullOrUndefined(this.projectsettings.logging)
-      && this.projectsettings.logging.forced) {
-      this.subscrmanager.add(this.audiomanager.statechange.subscribe((state) => {
-        if (!this.audiomanager.playonhover) {
-          let caretpos = -1;
 
-          if (!isNullOrUndefined((<any> this.currentEditor.instance).editor)) {
-            caretpos = (<any> this.currentEditor.instance).editor.caretpos;
-          }
-
-          // make sure that events from playonhover are not logged
-          if (state !== PlayBackState.PLAYING && state !== PlayBackState.INITIALIZED && state !== PlayBackState.PREPARE) {
-            this.uiService.addElementFromEvent('audio',
-              {value: getPlayBackString(state).toLowerCase()}, Date.now(),
-              this.audiomanager.playposition, caretpos, this.appStorage.Interface);
-          }
-        }
-      }));
+    // overwrite logging option using projectconfig
+    if (!this.appStorage.uselocalmode) {
+      this.appStorage.logging = this.settingsService.projectsettings.logging.forced;
     }
+    this.uiService.enabled = this.appStorage.logging;
+
+    this.subscrmanager.add(this.audiomanager.statechange.subscribe((state) => {
+      if (!this.audiomanager.playonhover) {
+        let caretpos = -1;
+
+        if (!isNullOrUndefined((<any> this.currentEditor.instance).editor)) {
+          caretpos = (<any> this.currentEditor.instance).editor.caretpos;
+        }
+
+        // make sure that events from playonhover are not logged
+        if (state !== PlayBackState.PLAYING && state !== PlayBackState.INITIALIZED && state !== PlayBackState.PREPARE) {
+          this.uiService.addElementFromEvent('audio',
+            {value: getPlayBackString(state).toLowerCase()}, Date.now(),
+            this.audiomanager.playposition, caretpos, this.appStorage.Interface);
+        }
+      }
+    }));
+
     this.interface = this.appStorage.Interface;
 
   }
@@ -209,7 +214,7 @@ export class TranscriptionComponent implements OnInit,
       }
     ));
 
-    if (this.projectsettings.logging.forced === true) {
+    if (this.appStorage.logging) {
       this.subscrmanager.add(
         this.uiService.afteradd.subscribe((elem) => {
           this.appStorage.saveLogItem(elem.getDataClone());
@@ -368,10 +373,10 @@ export class TranscriptionComponent implements OnInit,
         if (!isNullOrUndefined((<any> this.currentEditor.instance).editor)) {
           caretpos = (<any> this.currentEditor.instance).editor.caretpos;
         }
-        if (this.projectsettings.logging.forced) {
-          this.uiService.addElementFromEvent('editor', {value: 'changed'}, Date.now(),
-            null, null, name);
-        }
+
+        this.uiService.addElementFromEvent('editor', {value: 'changed'}, Date.now(),
+          null, null, name);
+
       } else {
         console.error('ERROR appLoadeditor is null');
       }

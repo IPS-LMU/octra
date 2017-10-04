@@ -27,6 +27,7 @@ import {AudioRessource} from '../../../core/obj/media/audio/AudioRessource';
 import {isNullOrUndefined} from 'util';
 import {AudioSelection} from '../../../core/obj/media/audio/AudioSelection';
 import {Segments} from '../../../core/obj/Annotation/Segments';
+import {AppStorageService} from '../../../core/shared/service/appstorage.service';
 
 @Component({
   selector: 'app-transcr-window',
@@ -89,7 +90,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
               public transcrService: TranscriptionService,
               public audio: AudioService,
               public uiService: UserInteractionsService,
-              public settingsService: SettingsService) {
+              public settingsService: SettingsService,
+              private appStorage: AppStorageService) {
 
     this.subscrmanager = new SubscriptionManager();
   }
@@ -175,7 +177,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   onButtonClick(event: { type: string, timestamp: number }) {
-    if (this.projectsettings.logging.forced === true) {
+    if (this.appStorage.logging) {
       const segment = {
         start: -1,
         length: -1,
@@ -347,10 +349,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       segment.textlength = this.editor.rawText.length;
     }
 
-    if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
-        this.audiomanager.playposition, this.editor.caretpos, 'audio_speed', segment);
-    }
+    this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
+      this.audiomanager.playposition, this.editor.caretpos, 'audio_speed', segment);
+
   }
 
   onVolumeChange(event: { old_value: number, new_value: number, timestamp: number }) {
@@ -374,10 +375,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       segment.textlength = this.editor.rawText.length;
     }
 
-    if (this.projectsettings.logging.forced === true) {
-      this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
-        this.audiomanager.playposition, this.editor.caretpos, 'audio_volume', segment);
-    }
+    this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
+      this.audiomanager.playposition, this.editor.caretpos, 'audio_volume', segment);
   }
 
   public doit = (direction: string) => {

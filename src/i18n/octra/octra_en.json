@@ -215,6 +215,7 @@
   "settings": {
     "easy mode": "Easy Mode",
     "play on hover": "Play on hover",
-    "follow playcursor": "Follow Playcursor"
+    "follow playcursor": "Follow playcursor",
+    "logging": "Log user actions"
   }
 }

@@ -361,8 +361,10 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       }
 
       const caretpos = (!isNullOrUndefined(this.editor)) ? this.editor.caretpos : -1;
+
       this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
         this.audiomanager.playposition, caretpos, 'multi-lines-viewer', segment);
+
     } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
       this.appStorage.playonhover = !this.appStorage.playonhover;
     }
@@ -373,7 +375,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
-    if (this.projectsettings.logging.forced === true) {
+    if (this.appStorage.logging) {
       const segment = {
         start: -1,
         length: -1,
@@ -401,7 +403,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
-    if (this.projectsettings.logging.forced === true) {
+    if (this.appStorage.logging) {
       const segment = {
         start: -1,
         length: -1,
@@ -425,7 +427,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   onButtonClick(event: { type: string, timestamp: number }) {
-    if (this.projectsettings.logging.forced === true) {
+    if (this.appStorage.logging) {
       const caretpos = (!isNullOrUndefined(this.editor)) ? this.editor.caretpos : -1;
 
       const segment = {

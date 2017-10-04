@@ -15,6 +15,12 @@ export interface AppSettings {
       enabled: boolean,
       fixedwidth: number
     },
+    bugreport: {
+      enabled: boolean,
+      name: string,
+      auth_token: string,
+      url: string
+    },
     allowed_browsers: any[],
     languages: string[]
   };

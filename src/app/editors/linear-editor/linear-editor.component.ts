@@ -179,11 +179,9 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   onButtonClick(event: {
     type: string, timestamp: number
   }) {
-    if (this.projectsettings.logging.forced === true) {
-      const caretpos = this.editor.caretpos;
-      this.uiService.addElementFromEvent('mouseclick', {value: event.type},
-        event.timestamp, this.audiomanager.playposition, caretpos, 'audio_buttons');
-    }
+    const caretpos = this.editor.caretpos;
+    this.uiService.addElementFromEvent('mouseclick', {value: event.type},
+      event.timestamp, this.audiomanager.playposition, caretpos, 'audio_buttons');
 
     switch (event.type) {
       case('play'):
@@ -342,7 +340,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onShortCutTriggered($event, control) {
-    if (this.projectsettings.logging.forced) {
+    if (this.appStorage.logging) {
 
       if (
         $event.value === null || !(
@@ -407,7 +405,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onMarkerInsert(marker_code: string) {
-    if (this.projectsettings.logging.forced === true) {
+    if (this.appStorage.logging) {
       const segment = {
         start: -1,
         length: -1,
@@ -431,7 +429,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onMarkerClick(marker_code: string) {
     this.onTranscriptionChanged(null);
-    if (this.projectsettings.logging.forced === true) {
+    if (this.appStorage.logging) {
       const segment = {
         start: -1,
         length: -1,
@@ -466,7 +464,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   afterSpeedChange(event: {
     new_value: number, timestamp: number
   }) {
-    if (this.projectsettings.logging.forced === true) {
+    if (this.appStorage.logging) {
       const segment = {
         start: -1,
         length: -1,
@@ -497,7 +495,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   afterVolumeChange(event: {
     new_value: number, timestamp: number
   }) {
-    if (this.projectsettings.logging.forced === true) {
+    if (this.appStorage.logging) {
       const segment = {
         start: -1,
         length: -1,

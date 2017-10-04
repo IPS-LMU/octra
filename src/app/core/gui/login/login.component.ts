@@ -52,7 +52,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   private subscrmanager: SubscriptionManager;
 
   get sessionfile(): SessionFile {
-    return this.sessionService.sessionfile;
+    return this.appStorage.sessionfile;
   }
 
   get apc(): any {
@@ -75,7 +75,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   err = '';
 
   constructor(private router: Router,
-              public sessionService: AppStorageService,
+              public appStorage: AppStorageService,
               private api: APIService,
               private cd: ChangeDetectorRef,
               private settingsService: SettingsService,
@@ -101,22 +101,22 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     }
 
     const loaduser = () => {
-      if (!isNullOrUndefined(this.sessionService.user) && this.sessionService.user.id !== '-1') {
-        this.member.id = this.sessionService.user.id;
+      if (!isNullOrUndefined(this.appStorage.user) && this.appStorage.user.id !== '-1') {
+        this.member.id = this.appStorage.user.id;
       }
 
-      if (!isNullOrUndefined(this.sessionService.user) && this.sessionService.user.hasOwnProperty('project')) {
-        this.member.project = this.sessionService.user.project;
+      if (!isNullOrUndefined(this.appStorage.user) && this.appStorage.user.hasOwnProperty('project')) {
+        this.member.project = this.appStorage.user.project;
       }
 
-      if (!isNullOrUndefined(this.sessionService.user) && this.sessionService.user.hasOwnProperty('jobno')
-        && this.sessionService.user.jobno !== null && this.sessionService.user.jobno > -1) {
-        this.member.jobno = this.sessionService.user.jobno.toString();
+      if (!isNullOrUndefined(this.appStorage.user) && this.appStorage.user.hasOwnProperty('jobno')
+        && this.appStorage.user.jobno !== null && this.appStorage.user.jobno > -1) {
+        this.member.jobno = this.appStorage.user.jobno.toString();
       }
     };
 
-    if (!this.sessionService.idbloaded) {
-      this.subscrmanager.add(this.sessionService.loaded.subscribe(
+    if (!this.appStorage.idbloaded) {
+      this.subscrmanager.add(this.appStorage.loaded.subscribe(
         () => {
         },
         () => {
@@ -147,23 +147,24 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.member.jobno = '0';
     }
 
-    if (this.sessionService.sessionfile !== null) {
+    if (this.appStorage.sessionfile !== null) {
       // last was offline mode, begin new Session
       new_session = true;
+
     } else {
-      if (!isNullOrUndefined(this.sessionService.data_id) && isNumber(this.sessionService.data_id)) {
+      if (!isNullOrUndefined(this.appStorage.data_id) && isNumber(this.appStorage.data_id)) {
         // last session was online session
         // check if credentials are available
         if (
-          !isNullOrUndefined(this.sessionService.user.project) &&
-          !isNullOrUndefined(this.sessionService.user.jobno) &&
-          !isNullOrUndefined(this.sessionService.user.id)
+          !isNullOrUndefined(this.appStorage.user.project) &&
+          !isNullOrUndefined(this.appStorage.user.jobno) &&
+          !isNullOrUndefined(this.appStorage.user.id)
         ) {
           // check if credentials are the same like before
           if (
-            this.sessionService.user.id === this.member.id &&
-            Number(this.sessionService.user.jobno) === Number(this.member.jobno) &&
-            this.sessionService.user.project === this.member.project
+            this.appStorage.user.id === this.member.id &&
+            Number(this.appStorage.user.jobno) === Number(this.member.jobno) &&
+            this.appStorage.user.project === this.member.project
           ) {
             continue_session = true;
           } else {
@@ -186,23 +187,23 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     if (new_session) {
       this.createNewSession(form);
     } else if (continue_session) {
-      this.subscrmanager.add(this.api.fetchAnnotation(this.sessionService.data_id).subscribe(
+      this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
         (result) => {
           const json = result.json();
 
           if (json.hasOwnProperty('message')) {
             const counter = (json.message === '') ? '0' : json.message;
-            this.sessionService.sessStr.store('jobs_left', Number(counter));
+            this.appStorage.sessStr.store('jobs_left', Number(counter));
           }
 
           if (form.valid && this.agreement_checked
             && json.message !== '0'
           ) {
-            if (this.sessionService.sessionfile !== null) {
+            if (this.appStorage.sessionfile !== null) {
               // last was offline mode
-              this.sessionService.clearLocalStorage();
+              this.appStorage.clearLocalStorage();
             }
-            const res = this.sessionService.setSessionData(this.member, json.data.id, json.data.url);
+            const res = this.appStorage.setSessionData(this.member, json.data.id, json.data.url);
             if (res.error === '') {
               this.navigate();
             } else {
@@ -221,10 +222,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   onOfflineSubmit = (form: NgForm) => {
-    if (!isNullOrUndefined(this.sessionService.data_id) && isNumber(this.sessionService.data_id)) {
+    if (!isNullOrUndefined(this.appStorage.data_id) && isNumber(this.appStorage.data_id)) {
       // last was online mode
       this.setOnlineSessionToFree(() => {
-        this.sessionService.beginLocalSession(this.dropzone.files, false, () => {
+        this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
           if (!isNullOrUndefined(this.dropzone.oannotation)) {
             const new_levels: OIDBLevel[] = [];
             for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
@@ -236,9 +237,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               new_links.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
             }
 
-            this.sessionService.overwriteAnnotation(new_levels).then(
+            this.appStorage.overwriteAnnotation(new_levels).then(
               () => {
-                return this.sessionService.overwriteLinks(new_links);
+                return this.appStorage.overwriteLinks(new_links);
               }
             ).then(() => {
               this.navigate();
@@ -253,7 +254,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         });
       });
     } else {
-      this.sessionService.beginLocalSession(this.dropzone.files, true, () => {
+      this.appStorage.beginLocalSession(this.dropzone.files, true, () => {
         if (!isNullOrUndefined(this.dropzone.oannotation)) {
           const new_levels: OIDBLevel[] = [];
           for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
@@ -265,8 +266,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
             new_links.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
           }
 
-          this.sessionService.overwriteAnnotation(new_levels).then(() => {
-            return this.sessionService.overwriteLinks(new_links);
+          this.appStorage.overwriteAnnotation(new_levels).then(() => {
+            return this.appStorage.overwriteLinks(new_links);
           }).then(() => {
             this.navigate();
           }).catch((err) => {
@@ -279,7 +280,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         alert(error);
       });
     }
-  };
+  }
 
   canDeactivate(): Observable<boolean> | boolean {
     return (this.valid);
@@ -291,7 +292,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         login: true
       }
     });
-  };
+  }
 
   @HostListener('window:resize', ['$event'])
   onResize($event) {
@@ -308,7 +309,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   newTranscription = () => {
-    this.sessionService.beginLocalSession(this.dropzone.files, false, () => {
+    this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
         if (!isNullOrUndefined(this.dropzone.oannotation)) {
           const new_levels: OIDBLevel[] = [];
           for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
@@ -320,9 +321,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
             new_links.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
           }
 
-          this.sessionService.overwriteAnnotation(new_levels).then(
+          this.appStorage.overwriteAnnotation(new_levels).then(
             () => {
-              return this.sessionService.overwriteLinks(new_links);
+              return this.appStorage.overwriteLinks(new_links);
             }
           ).then(() => {
             this.navigate();
@@ -339,13 +340,13 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         }
       }
     );
-  };
+  }
 
   getFileStatus(): string {
     if (!isNullOrUndefined(this.dropzone.files) && this.dropzone.files.length > 0 &&
       (!isNullOrUndefined(this.dropzone.oaudiofile))) {
       // check conditions
-      if (isNullOrUndefined(this.sessionService.sessionfile) || (this.dropzone.oaudiofile.name === this.sessionService.sessionfile.name)
+      if (isNullOrUndefined(this.appStorage.sessionfile) || (this.dropzone.oaudiofile.name === this.appStorage.sessionfile.name)
         && isNullOrUndefined(this.dropzone.oannotation)) {
         return 'start';
       } else {
@@ -376,14 +377,14 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         const json = result.json();
         if (isArray(json.data)) {
           this.projects = json.data;
-          if (!isNullOrUndefined(this.sessionService.user) &&
-            !isNullOrUndefined(this.sessionService.user.project) && this.sessionService.user.project !== '') {
+          if (!isNullOrUndefined(this.appStorage.user) &&
+            !isNullOrUndefined(this.appStorage.user.project) && this.appStorage.user.project !== '') {
             if (isNullOrUndefined(this.projects.find(
                 (x) => {
-                  return x === this.sessionService.user.project;
+                  return x === this.appStorage.user.project;
                 }))) {
               // make sure that old project is in list
-              this.projects.push(this.sessionService.user.project);
+              this.projects.push(this.appStorage.user.project);
             }
           }
         }
@@ -407,23 +408,23 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         ) {
 
           // delete old data for fresh new session
-          this.sessionService.clearSession();
-          this.sessionService.clearLocalStorage().then(
+          this.appStorage.clearSession();
+          this.appStorage.clearLocalStorage().then(
             () => {
-              const res = this.sessionService.setSessionData(this.member, json.data.id, json.data.url);
+              const res = this.appStorage.setSessionData(this.member, json.data.id, json.data.url);
 
               // get transcript data that already exists
               if (json.data.hasOwnProperty('transcript')) {
                 const transcript = JSON.parse(json.data.transcript);
 
                 if (isArray(transcript) && transcript.length > 0) {
-                  this.sessionService.servertranscipt = transcript;
+                  this.appStorage.servertranscipt = transcript;
                 }
               }
 
               if (json.hasOwnProperty('message')) {
                 const counter = (json.message === '') ? '0' : json.message;
-                this.sessionService.sessStr.store('jobs_left', Number(counter));
+                this.appStorage.sessStr.store('jobs_left', Number(counter));
               }
 
               if (res.error === '') {
@@ -433,7 +434,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               }
             }
           ).catch((err) => {
-            console.error(err)
+            console.error(err);
           });
         } else {
           this.modService.show('login_invalid');
@@ -444,12 +445,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   private setOnlineSessionToFree = (callback: () => void) => {
     // check if old annotation is already annotated
-    this.subscrmanager.add(this.api.fetchAnnotation(this.sessionService.data_id).subscribe(
+    this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
       (result) => {
         const json = result.json();
 
         if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
-          this.subscrmanager.add(this.api.closeSession(this.sessionService.user.id, this.sessionService.data_id, '').subscribe(
+          this.subscrmanager.add(this.api.closeSession(this.appStorage.user.id, this.appStorage.data_id, '').subscribe(
             (result2) => {
               callback();
             }

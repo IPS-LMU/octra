@@ -42,6 +42,17 @@ export class OIDBLink {
 
 @Injectable()
 export class AppStorageService {
+  get logging(): boolean {
+    return this._logging;
+  }
+
+  set logging(value: boolean) {
+    this._logging = value;
+    this._idb.save('options', 'logging', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
   get followplaycursor(): boolean {
     return this._followplaycursor;
   }
@@ -49,6 +60,7 @@ export class AppStorageService {
   set followplaycursor(value: boolean) {
     this._followplaycursor = value;
   }
+
   get annotation_links(): OIDBLink[] {
     return this._annotation_links;
   }
@@ -281,6 +293,7 @@ export class AppStorageService {
   private _language = 'en';
   private _version: string = null;
   private _interface: string = null;
+  private _logging = false;
 
   private _user: {
     id: string,
@@ -583,6 +596,10 @@ export class AppStorageService {
         {
           attribute: '_interface',
           key: 'interface'
+        },
+        {
+          attribute: '_logging',
+          key: 'logging'
         }
       ]
     ).then(() => {
@@ -639,9 +656,9 @@ export class AppStorageService {
               if (variables[acc].hasOwnProperty('attribute') && variables[acc].hasOwnProperty('key')) {
                 return this.loadOptionFromIDB(variables[acc].key).then(
                   (result) => {
-                    if (variables[acc].key === 'feedback') {
+                    if (!isNullOrUndefined(result)) {
+                      this['' + variables[acc].attribute + ''] = result;
                     }
-                    this['' + variables[acc].attribute + ''] = result;
                     wrapper(++acc);
                   }
                 );

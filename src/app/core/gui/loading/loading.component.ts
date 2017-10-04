@@ -34,7 +34,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
   constructor(private langService: TranslateService,
               public settService: SettingsService,
-              private sessionService: AppStorageService,
+              private appStorage: AppStorageService,
               public audio: AudioService,
               private router: Router,
               private transcrService: TranscriptionService) {
@@ -42,15 +42,15 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     const process = () => {
-      if (this.sessionService.uselocalmode && isNullOrUndefined(this.sessionService.file)) {
+      if (this.appStorage.uselocalmode && isNullOrUndefined(this.appStorage.file)) {
         this.router.navigate(['/user/transcr/reload-file']);
       } else {
       }
       this.settService.loadAudioFile(this.audio);
     };
 
-    if (!this.sessionService.idbloaded) {
-      this.subscrmanager.add(this.sessionService.loaded.subscribe(() => {
+    if (!this.appStorage.idbloaded) {
+      this.subscrmanager.add(this.appStorage.loaded.subscribe(() => {
         },
         () => {
         },
@@ -61,7 +61,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
       process();
     }
 
-    if (!this.sessionService.LoggedIn) {
+    if (!this.appStorage.LoggedIn) {
       this.router.navigate(['/login']);
     }
 
@@ -84,7 +84,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
             // fall back to first defined language
             language = projectsettings.languages[0];
           }
-          this.settService.loadGuidelines(this.sessionService.language, './config/localmode/guidelines/guidelines_' + language + '.json');
+          this.settService.loadGuidelines(this.appStorage.language, './config/localmode/guidelines/guidelines_' + language + '.json');
 
           this.loadedchanged.emit(false);
         }
@@ -126,7 +126,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
             this.loadedchanged.emit(false);
           } else {
             console.error('audio not loaded');
-            if (this.sessionService.uselocalmode) {
+            if (this.appStorage.uselocalmode) {
               this.router.navigate(['/user/transcr/reload-file']);
             }
           }
@@ -145,11 +145,11 @@ export class LoadingComponent implements OnInit, OnDestroy {
           ) {
             this.subscrmanager.remove(id);
             setTimeout(() => {
-              if ((isNullOrUndefined(this.sessionService.agreement)
-                  || isNullOrUndefined(this.sessionService.agreement[this.sessionService.user.project]) ||
-                  !this.sessionService.agreement[this.sessionService.user.project]
+              if ((isNullOrUndefined(this.appStorage.agreement)
+                  || isNullOrUndefined(this.appStorage.agreement[this.appStorage.user.project]) ||
+                  !this.appStorage.agreement[this.appStorage.user.project]
                 )
-                && this.settService.projectsettings.agreement.enabled && !this.sessionService.uselocalmode) {
+                && this.settService.projectsettings.agreement.enabled && !this.appStorage.uselocalmode) {
                 this.transcrService.load().then(() => {
                   this.router.navigate(['/user/agreement']);
                 }).catch((err) => {
@@ -197,7 +197,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    this.sessionService.clearSession();
+    this.appStorage.clearSession();
     this.router.navigate(['/login']);
   }
 }

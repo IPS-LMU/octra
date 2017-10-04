@@ -19,8 +19,9 @@
                         {{format.name}} (*{{format.extension}})
                     </a>
                     <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === format.name && preparing.preparing"></i>
-                    <a style="margin-left:10px;" *ngIf="preparing.name === format.name && !preparing.preparing" download="{{parentformat.download}}" [href]="parentformat.uri"
-                          class="link">
+                    <a style="margin-left:10px;" *ngIf="preparing.name === format.name && !preparing.preparing"
+                       download="{{parentformat.download}}" [href]="parentformat.uri"
+                       class="link">
                         <span class="glyphicon glyphicon-floppy-save"></span> Download
                     </a>
                 </td>
@@ -38,13 +39,15 @@
         <a *ngIf="arraybufferExists" (click)="getAudioURI();">
             <span class="glyphicon glyphicon-headphones"></span> Audio file (experimental)</a>
         <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === 'Audio' && preparing.preparing"></i>
-        <a style="margin-left:10px;" *ngIf="preparing.name === 'Audio' && !preparing.preparing" download="{{parentformat.download}}" [href]="parentformat.uri"
+        <a style="margin-left:10px;" *ngIf="preparing.name === 'Audio' && !preparing.preparing"
+           download="{{parentformat.download}}" [href]="parentformat.uri"
            class="link">
             <span class="glyphicon glyphicon-floppy-save"></span> Download
         </a><br/>
         <a (click)="getProtocol()"><span class="glyphicon glyphicon-list"></span> Protocol</a>
         <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === 'Protocol' && preparing.preparing"></i>
-        <a style="margin-left:10px;" *ngIf="preparing.name === 'Protocol' && !preparing.preparing" download="{{parentformat.download}}" [href]="parentformat.uri"
+        <a style="margin-left:10px;" *ngIf="preparing.name === 'Protocol' && !preparing.preparing"
+           download="{{parentformat.download}}" [href]="parentformat.uri"
            class="link">
             <span class="glyphicon glyphicon-floppy-save"></span> Download
         </a><br/>
@@ -306,6 +309,19 @@
                                             <input (click)="toggleSettings('followplaycursor')"
                                                    [checked]="appStorage.followplaycursor"
                                                    id="followplaycursor" type="checkbox">
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label for="playonhover">{{"settings.logging" | translate}}:</label></td>
+                                <td>
+                                    <div class="togglebutton">
+                                        <label>
+                                            <input (click)="toggleSettings('logging')"
+                                                   [checked]="appStorage.logging"
+                                                   [disabled]="!appStorage.uselocalmode"
+                                                   id="logging" type="checkbox">
                                         </label>
                                     </div>
                                 </td>

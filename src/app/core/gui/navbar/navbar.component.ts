@@ -154,6 +154,9 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   toggleSettings(option: string) {
     this.appStorage[option] = !this.appStorage[option];
+    if (option === 'logging') {
+      this.uiService.enabled = this.appStorage[option];
+    }
   }
 
   onOptionsOpened() {

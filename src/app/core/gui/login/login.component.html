@@ -18,17 +18,17 @@
                     {{'login.online mode disabled' | translate}}
                 </div>
                 <div *ngIf="apc.octra.login.enabled">
-                    <p class="bg-danger" *ngIf="sessionService.uselocalmode == true">
+                    <p class="bg-danger" *ngIf="appStorage.uselocalmode == true">
                         {{"login.online mode data warning" | translate}}
                     </p>
                     <p class="bg-warning"
-                       *ngIf="  sessionService.user !== undefined && sessionService.user !== null &&
-                                sessionService.user.id != null && sessionService.audio_url != null &&
-                                sessionService.uselocalmode == false"
+                       *ngIf="  appStorage.user !== undefined && appStorage.user !== null &&
+                                appStorage.user.id != null && appStorage.audio_url != null &&
+                                appStorage.uselocalmode == false"
                     >
                         {{"login.online mode continue" |
-                        translate:{member_id:sessionService.user.id,
-                        member_project:sessionService.user.project,member_jobno:sessionService.user.jobno}
+                        translate:{member_id:appStorage.user.id,
+                        member_project:appStorage.user.project,member_jobno:appStorage.user.jobno}
                         }}
                     </p>
                     <form class="form-horizontal" (ngSubmit)="onSubmit(f)" #f="ngForm">
@@ -87,11 +87,11 @@
                 </h4>
                 <div>
                     <p class="bg-danger"
-                       *ngIf="!(sessionService.user === undefined || sessionService.user === null)
-                       && sessionService.user.id !== '-1' && sessionService.user.id !== null">
+                       *ngIf="!(appStorage.user === undefined || appStorage.user === null)
+                       && appStorage.user.id !== '-1' && appStorage.user.id !== null">
                         {{"login.offline mode data warning" | translate}}
                     </p>
-                    <p class="bg-warning" *ngIf="sessionService.sessionfile !== null"
+                    <p class="bg-warning" *ngIf="appStorage.sessionfile !== null"
                        [innerHTML]="'login.old file found' | translate:{file_label: getDropzoneFileString(sessionfile)}">
                     </p>
                     <app-octra-dropzone #dropzone></app-octra-dropzone>

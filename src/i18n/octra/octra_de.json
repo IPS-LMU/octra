@@ -213,6 +213,7 @@
   "settings": {
     "easy mode": "Einfacher Modus",
     "play on hover": "Audiowiedergabe bei Mausbewegung",
-    "follow playcursor": "Abspielposition folgen"
+    "follow playcursor": "Abspielposition folgen",
+    "logging": "Aktionen protkollieren"
   }
 }

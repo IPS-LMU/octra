@@ -270,7 +270,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    * @param computeDisplayData should display data be recomputed?
    */
   public update = (computeDisplayData: boolean = false) => {
-    console.log('UPDATE');
     this.updateCanvasSizes();
 
     if (!isNullOrUndefined(this.av.channel)) {
@@ -533,6 +532,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     this.o_context.fillStyle = 'white';
     this.o_context.globalAlpha = 1.0;
 
+    let drawn_segments = 0;
+    let drawn_boundaries = 0;
+    let cleared = 0;
+    let drawn_selection = 0;
+
     if (!isNullOrUndefined(line_obj)) {
       // TODO IMPLEMENT DRAWING ONLY CURRENT LINE
 
@@ -555,10 +559,12 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         const line_end: AudioTime = new AudioTime(line_samples_end, this.audioressource.info.samplerate);
 
         const clearheight = endline.Pos.y - startline.Pos.y + line_obj.Size.height;
+        cleared++;
         this.o_context.clearRect(startline.Pos.x - 5, startline.Pos.y,
           Math.max(startline.Size.width, endline.Size.width) + 5, clearheight + 1);
 
-        //         //
+        // console.log('DRAW SEGMENTS ' + this.Settings.height);
+
         for (let i = 0; i < segments.length; i++) {
           const segment = segments[i];
           const start = AudioTime.sub(segments[i].time, this.audiochunk.time.start);
@@ -588,8 +594,10 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
            */
           if (
             (begin.time.samples >= line_start.samples && segment.time.samples <= line_end.samples) ||
-            (begin.time.samples < line_start.samples && segment.time.samples <= line_end.samples) ||
-            (begin.time.samples >= line_start.samples && segment.time.samples > line_end.samples) ||
+            (begin.time.samples < line_start.samples && segment.time.samples <= line_end.samples
+              && segment.time.samples >= line_start.samples) ||
+            (begin.time.samples >= line_start.samples && begin.time.samples <= line_end.samples
+              && segment.time.samples > line_end.samples) ||
             (begin.time.samples < line_start.samples && segment.time.samples > line_end.samples)
           ) {
             // sample in the lines space
@@ -635,6 +643,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 this.o_context.fillStyle = 'green';
               }
 
+              // drawn_segments++;
               this.o_context.fillRect(x + this.Settings.margin.left - 1, line.Pos.y, w, h);
             }
 
@@ -659,7 +668,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
               this.o_context.moveTo(relX, line.Pos.y);
               this.o_context.lineTo(relX, line.Pos.y + h);
               this.o_context.stroke();
-
+              // drawn_boundaries++;
             }
           }
         }
@@ -670,9 +679,12 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         for (let j = line_num1; j <= line_num2; j++) {
           const line = this.av.LinesArray[j];
           this.drawSelection(line);
+          // drawn_selection++;
         }
       }
     } else {
+      // console.log('CLEAR ALL ' + this.Settings.height);
+      cleared++;
       this.o_context.clearRect(0, 0, this.width, this.height);
 
       // draw segments
@@ -734,6 +746,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 this.o_context.fillStyle = 'green';
               }
 
+              // drawn_segments++;
               this.o_context.fillRect(x + this.Settings.margin.left - 1, line.Pos.y, w, h);
             }
           }
@@ -756,7 +769,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             this.o_context.moveTo(relX, line.Pos.y);
             this.o_context.lineTo(relX, line.Pos.y + h);
             this.o_context.stroke();
-
+            // drawn_boundaries++;
           }
         }
       }
@@ -768,14 +781,25 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         const line_num1 = (this._innerWidth < this.AudioPxWidth) ? Math.floor(sel_start / this._innerWidth) : 0;
         const line_num2 = (this._innerWidth < this.AudioPxWidth) ? Math.floor(sel_end / this._innerWidth) : 0;
 
+        // console.log('DRAW Selection ' + this.Settings.height);
         for (let j = line_num1; j <= line_num2; j++) {
           const line = this.av.LinesArray[j];
           this.drawSelection(line);
+          // drawn_selection++;
         }
       }
     }
 
     this.drawTimeLine();
+
+    /*
+    const log = new Logger('draw segments');
+    log.addEntry('log', `cleared: ${cleared}`);
+    log.addEntry('log', `drawn_segments: ${drawn_segments}`);
+    log.addEntry('log', `drawn_boundaries: ${drawn_boundaries}`);
+    log.addEntry('log', `drawn_selection: ${drawn_selection}`);
+    log.output();
+    */
   }
 
   /**
@@ -1226,6 +1250,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     if (this.Settings.timeline.enabled && this.av.LinesArray.length > 0
       && this.audiochunk.time.start.samples > 0 && this.av.AudioPxWidth > 0
     ) {
+      console.log('DRAW TIMELINE');
       let max_width = this.g_context.measureText(this.getmaxString(
         Math.round(this.audiochunk.time.duration.seconds * 100) / 100, 2)
       ).width + 12;

@@ -270,6 +270,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    * @param computeDisplayData should display data be recomputed?
    */
   public update = (computeDisplayData: boolean = false) => {
+    console.log('UPDATE');
     this.updateCanvasSizes();
 
     if (!isNullOrUndefined(this.av.channel)) {

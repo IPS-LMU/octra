@@ -18,7 +18,7 @@
                     {{'login.online mode disabled' | translate}}
                 </div>
                 <div *ngIf="apc.octra.login.enabled">
-                    <p class="bg-danger" *ngIf="appStorage.uselocalmode == true">
+                    <p class="bg-danger" *ngIf="appStorage.uselocalmode == true && appStorage.sessionfile !== null">
                         {{"login.online mode data warning" | translate}}
                     </p>
                     <p class="bg-warning"

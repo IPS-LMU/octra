@@ -9,6 +9,7 @@ import {LogoutGuard} from './core/gui/logout/logout.guard';
 import {SettingsGuard} from './core/shared/guard/settings.activateguard';
 import {NewsComponent} from './core/gui/news/news.component';
 import {FaqComponent} from './core/gui/faq/faq.component';
+import {HelpToolsComponent} from './core/gui/help-tools/help-tools.component';
 
 const APP_ROUTES: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full'},
@@ -17,6 +18,7 @@ const APP_ROUTES: Routes = [
   {path: 'faq', component: FaqComponent, canActivate: [SettingsGuard]},
   {path: 'logout', component: LogoutComponent, canActivate: [SettingsGuard, LogoutGuard]},
   {path: 'user', component: MembersAreaComponent, canActivate: [SettingsGuard], children: MEMBER_ROUTES},
+  {path: 'help-tools', component: HelpToolsComponent},
   {path: '**', redirectTo: '/login', pathMatch: 'full'}
 ];
 

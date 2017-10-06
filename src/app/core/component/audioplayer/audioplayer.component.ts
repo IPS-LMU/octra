@@ -319,7 +319,9 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
       const platform = BrowserInfo.platform;
       if (this.settings.shortcuts) {
         let key_active = false;
+        let a = 0;
         for (const shortc in this.settings.shortcuts) {
+          a++;
           if (this.settings.shortcuts.hasOwnProperty(shortc)) {
             const focuscheck = this.settings.shortcuts['' + shortc + ''].focusonly === false
               || (this.settings.shortcuts['' + shortc + ''].focusonly === this.focused === true);
@@ -358,6 +360,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
             }
           }
         }
+        console.log('audioplayer a ' + a);
 
         if (key_active) {
           $event.event.preventDefault();

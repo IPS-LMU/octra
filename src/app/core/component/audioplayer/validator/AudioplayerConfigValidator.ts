@@ -110,7 +110,9 @@ export class AudioplayerConfigValidator extends ConfigValidator {
         };
       case('shortcuts'):
         if (typeof value === 'object') {
+          let a = 0;
           for (const shortc in value) {
+            a++;
             if (!value['' + shortc + ''].hasOwnProperty('keys') || !value['' + shortc + ''].hasOwnProperty('title')
               || !value['' + shortc + ''].hasOwnProperty('focusonly')
             ) {

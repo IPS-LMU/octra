@@ -770,7 +770,7 @@ export class AppStorageService {
       }).then(() => {
         return this._idb.saveArraySequential(value, 'annotation_links', 'id');
       });
-  }
+  };
 
   public clearLoggingData(): Promise<void> {
     this._logs = null;

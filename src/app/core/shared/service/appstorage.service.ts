@@ -386,8 +386,8 @@ export class AppStorageService {
       && isNullOrUndefined(this.sessStr.retrieve('member_id')));
   }
 
-  public clearLocalStorage(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
+  public clearLocalStorage(): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
       this.logged_in = false;
       this.login = false;
 
@@ -544,7 +544,7 @@ export class AppStorageService {
     );
   }
 
-  public load(idb: IndexedDBManager): Promise<void> {
+  public load(idb: IndexedDBManager): Promise<any> {
     this._idb = idb;
 
     return this.loadOptions(
@@ -647,8 +647,8 @@ export class AppStorageService {
     );
   }
 
-  private loadOptions = (variables: { attribute: string, key: string }[]): Promise<void> => {
-    return new Promise<void>(
+  private loadOptions = (variables: { attribute: string, key: string }[]): Promise<any> => {
+    return new Promise<any>(
       (resolve, reject) => {
         const wrapper = (acc: number): Promise<any> => {
           if (acc < variables.length) {
@@ -678,11 +678,11 @@ export class AppStorageService {
     );
   }
 
-  private clearIDBTable(name: string): Promise<void> {
+  private clearIDBTable(name: string): Promise<any> {
     return this._idb.clear(name);
   }
 
-  public clearAnnotationData(): Promise<void> {
+  public clearAnnotationData(): Promise<any> {
     this._annotation = null;
     return this.clearIDBTable('annotation_levels').then(
       () => {
@@ -690,7 +690,7 @@ export class AppStorageService {
       });
   }
 
-  public changeAnnotationLevel(tiernum: number, level: OLevel): Promise<void> {
+  public changeAnnotationLevel(tiernum: number, level: OLevel): Promise<any> {
     if (!isNullOrUndefined(level)) {
       if (this._annotation.length > tiernum) {
         const id = this._annotation[tiernum].id;
@@ -709,7 +709,7 @@ export class AppStorageService {
     }
   }
 
-  public addAnnotationLevel(level: OLevel): Promise<void> {
+  public addAnnotationLevel(level: OLevel): Promise<any> {
     if (!isNullOrUndefined(level)) {
       this._annotation.push({
         id: ++this._levelcounter,
@@ -727,7 +727,7 @@ export class AppStorageService {
     }
   }
 
-  public removeAnnotationLevel(num: number, id: number): Promise<void> {
+  public removeAnnotationLevel(num: number, id: number): Promise<any> {
     if (!isNullOrUndefined(name) && num < this._annotation.length) {
       return this.idb.remove('annotation_levels', id).then(
         () => {
@@ -741,7 +741,7 @@ export class AppStorageService {
     }
   }
 
-  public overwriteAnnotation = (value: OIDBLevel[]): Promise<void> => {
+  public overwriteAnnotation = (value: OIDBLevel[]): Promise<any> => {
     return this.clearAnnotationData()
       .then(() => {
         this._annotation = value;
@@ -761,7 +761,7 @@ export class AppStorageService {
       });
   }
 
-  public overwriteLinks = (value: OIDBLink[]): Promise<void> => {
+  public overwriteLinks = (value: OIDBLink[]): Promise<any> => {
     return this.clearIDBTable('annotation_links')
       .then(() => {
         this._annotation_links = value;
@@ -772,7 +772,7 @@ export class AppStorageService {
       });
   };
 
-  public clearLoggingData(): Promise<void> {
+  public clearLoggingData(): Promise<any> {
     this._logs = null;
     return this.clearIDBTable('logs');
   }

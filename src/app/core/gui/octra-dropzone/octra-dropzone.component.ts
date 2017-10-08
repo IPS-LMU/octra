@@ -16,6 +16,10 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
   styleUrls: ['./octra-dropzone.component.css']
 })
 export class OctraDropzoneComponent implements OnInit, OnDestroy {
+  get audiomanager(): AudioManager {
+    return this._audiomanager;
+  }
+
   get status(): string {
     return this._status;
   }
@@ -44,6 +48,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
   private _oannotation: OAnnotJSON;
   private _status: string;
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
+  private _audiomanager: AudioManager;
 
   public get files(): {
     status: string,
@@ -105,7 +110,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
                         if (last.sampleStart + last.sampleDur !== this._oaudiofile.duration * this._oaudiofile.samplerate) {
                           level.items.push(new OSegment(last.id + 1, last.sampleStart + last.sampleDur,
                             (this._oaudiofile.duration * this._oaudiofile.samplerate) - (last.sampleStart + last.sampleDur),
-                            [new OLabel(level.name, '')]))
+                            [new OLabel(level.name, '')]));
                         }
                       }
                     }
@@ -238,7 +243,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
         }
       }
     }
-  };
+  }
 
   private checkState() {
     if (isNullOrUndefined(this._files)) {
@@ -271,12 +276,18 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
     // check audio
     return AudioManager.decodeAudio(file_process.file.name, buffer, AppInfo.audioformats).then(
       (audiomanager: AudioManager) => {
+        if (!isNullOrUndefined(this._audiomanager)) {
+          this._audiomanager.destroy();
+          this._audiomanager = null;
+        }
+
+        this._audiomanager = audiomanager;
         file_process.status = 'valid';
         this._oaudiofile = new OAudiofile();
         this._oaudiofile.name = file_process.file.name;
         this._oaudiofile.size = file_process.file.size;
-        this._oaudiofile.duration = audiomanager.ressource.info.duration.samples;
-        this._oaudiofile.samplerate = audiomanager.ressource.info.samplerate;
+        this._oaudiofile.duration = this._audiomanager.ressource.info.duration.samples;
+        this._oaudiofile.samplerate = this._audiomanager.ressource.info.samplerate;
         this._oaudiofile.arraybuffer = buffer;
 
         this.checkState();
@@ -310,9 +321,6 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
             }
           }
         }
-
-        // very important: destroy manager because we don't need it
-        audiomanager.destroy();
       }
     ).catch((error) => {
       console.error('error occured while decoding audio file');

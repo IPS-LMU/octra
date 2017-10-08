@@ -643,7 +643,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 this.o_context.fillStyle = 'green';
               }
 
-              // drawn_segments++;
+              drawn_segments++;
               this.o_context.fillRect(x + this.Settings.margin.left - 1, line.Pos.y, w, h);
             }
 
@@ -668,7 +668,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
               this.o_context.moveTo(relX, line.Pos.y);
               this.o_context.lineTo(relX, line.Pos.y + h);
               this.o_context.stroke();
-              // drawn_boundaries++;
+              drawn_boundaries++;
             }
           }
         }
@@ -679,11 +679,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         for (let j = line_num1; j <= line_num2; j++) {
           const line = this.av.LinesArray[j];
           this.drawSelection(line);
-          // drawn_selection++;
+          drawn_selection++;
         }
       }
     } else {
-      // console.log('CLEAR ALL ' + this.Settings.height);
+      console.log('CLEAR ALL ' + this.Settings.height);
       cleared++;
       this.o_context.clearRect(0, 0, this.width, this.height);
 
@@ -708,68 +708,73 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           const line_num1 = (this._innerWidth < this.AudioPxWidth) ? Math.floor(beginX / this._innerWidth) : 0;
           const line_num2 = (this._innerWidth < this.AudioPxWidth) ? Math.floor(absX / this._innerWidth) : 0;
 
-          for (let j = 0; j <= line_num2; j++) {
-            const line = this.av.LinesArray[line_num1 + j];
+          if ((segment.time.samples >= this.audiochunk.time.start.samples && segment.time.samples <= this.audiochunk.time.end.samples)
+            || (begin.time.samples >= this.audiochunk.time.start.samples && begin.time.samples <= this.audiochunk.time.end.samples)
+            || (begin.time.samples < this.audiochunk.time.start.samples && segment.time.samples > this.audiochunk.time.end.samples)
+          ) {
+            for (let j = 0; j <= line_num2; j++) {
+              const line = this.av.LinesArray[line_num1 + j];
 
-            if (line) {
+              if (line) {
+                const h = line.Size.height;
+                let relX = 0;
+
+                relX = absX % this._innerWidth + this.Settings.margin.left;
+
+                const select = this.av.getRelativeSelectionByLine(line, begin.time.samples, segments[i].time.samples, this._innerWidth);
+                let w = 0;
+                let x = select.start;
+
+                if (select.start > -1 && select.end > -1) {
+                  w = Math.abs(select.end - select.start);
+                }
+
+                if (select.start < 1 || select.start > line.Size.width) {
+                  x = 1;
+                }
+                if (select.end < 1) {
+                  w = 0;
+                }
+                if (select.end < 1 || select.end > line.Size.width) {
+                  w = select.end;
+                }
+
+                if (segment.transcript === '') {
+                  this.o_context.globalAlpha = 0.2;
+                  this.o_context.fillStyle = 'red';
+                } else if (segment.transcript === this.transcr.break_marker.code) {
+                  this.o_context.globalAlpha = 0.2;
+                  this.o_context.fillStyle = 'blue';
+                } else if (segment.transcript !== '') {
+                  this.o_context.globalAlpha = 0.2;
+                  this.o_context.fillStyle = 'green';
+                }
+
+                drawn_segments++;
+                this.o_context.fillRect(x + this.Settings.margin.left - 1, line.Pos.y, w, h);
+              }
+            }
+
+            // draw boundaries
+            const line = this.av.LinesArray[line_num2];
+            if (line && segment.time.samples !== this.audioressource.info.duration.samples) {
               const h = line.Size.height;
               let relX = 0;
-
-              relX = absX % this._innerWidth + this.Settings.margin.left;
-
-              const select = this.av.getRelativeSelectionByLine(line, begin.time.samples, segments[i].time.samples, this._innerWidth);
-              let w = 0;
-              let x = select.start;
-
-              if (select.start > -1 && select.end > -1) {
-                w = Math.abs(select.end - select.start);
+              if (this.Settings.multi_line) {
+                relX = absX % this._innerWidth + this.Settings.margin.left;
+              } else {
+                relX = absX + this.Settings.margin.left;
               }
 
-              if (select.start < 1 || select.start > line.Size.width) {
-                x = 1;
-              }
-              if (select.end < 1) {
-                w = 0;
-              }
-              if (select.end < 1 || select.end > line.Size.width) {
-                w = select.end;
-              }
-
-              if (segment.transcript === '') {
-                this.o_context.globalAlpha = 0.2;
-                this.o_context.fillStyle = 'red';
-              } else if (segment.transcript === this.transcr.break_marker.code) {
-                this.o_context.globalAlpha = 0.2;
-                this.o_context.fillStyle = 'blue';
-              } else if (segment.transcript !== '') {
-                this.o_context.globalAlpha = 0.2;
-                this.o_context.fillStyle = 'green';
-              }
-
-              // drawn_segments++;
-              this.o_context.fillRect(x + this.Settings.margin.left - 1, line.Pos.y, w, h);
+              this.o_context.globalAlpha = 0.5;
+              this.o_context.beginPath();
+              this.o_context.strokeStyle = this.Settings.boundaries.color;
+              this.o_context.lineWidth = this.Settings.boundaries.width;
+              this.o_context.moveTo(relX, line.Pos.y);
+              this.o_context.lineTo(relX, line.Pos.y + h);
+              this.o_context.stroke();
+              drawn_boundaries++;
             }
-          }
-
-          // draw boundaries
-          const line = this.av.LinesArray[line_num2];
-          if (line && segment.time.samples !== this.audioressource.info.duration.samples) {
-            const h = line.Size.height;
-            let relX = 0;
-            if (this.Settings.multi_line) {
-              relX = absX % this._innerWidth + this.Settings.margin.left;
-            } else {
-              relX = absX + this.Settings.margin.left;
-            }
-
-            this.o_context.globalAlpha = 0.5;
-            this.o_context.beginPath();
-            this.o_context.strokeStyle = this.Settings.boundaries.color;
-            this.o_context.lineWidth = this.Settings.boundaries.width;
-            this.o_context.moveTo(relX, line.Pos.y);
-            this.o_context.lineTo(relX, line.Pos.y + h);
-            this.o_context.stroke();
-            // drawn_boundaries++;
           }
         }
       }
@@ -785,7 +790,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         for (let j = line_num1; j <= line_num2; j++) {
           const line = this.av.LinesArray[j];
           this.drawSelection(line);
-          // drawn_selection++;
+          drawn_selection++;
         }
       }
     }
@@ -793,13 +798,14 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     this.drawTimeLine();
 
     /*
-    const log = new Logger('draw segments');
-    log.addEntry('log', `cleared: ${cleared}`);
-    log.addEntry('log', `drawn_segments: ${drawn_segments}`);
-    log.addEntry('log', `drawn_boundaries: ${drawn_boundaries}`);
-    log.addEntry('log', `drawn_selection: ${drawn_selection}`);
-    log.output();
-    */
+      const log = new Logger('draw segments');
+      log.addEntry('log', `cleared: ${cleared}`);
+      log.addEntry('log', `drawn_segments: ${drawn_segments}`);
+      log.addEntry('log', `drawn_boundaries: ${drawn_boundaries}`);
+      log.addEntry('log', `drawn_selection: ${drawn_selection}`);
+      log.output();
+      */
+
   }
 
   /**

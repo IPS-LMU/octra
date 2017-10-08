@@ -8,6 +8,7 @@ import {ModalService} from '../../shared/service/modal.service';
 import {TranslateService} from '@ngx-translate/core';
 import {isNullOrUndefined} from 'util';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
+import {AudioService} from '../../shared/service/audio.service';
 
 @Component({
   selector: 'app-reload-file',
@@ -23,7 +24,8 @@ export class ReloadFileComponent implements OnInit {
               public appStorage: AppStorageService,
               public transcrServ: TranscriptionService,
               public modService: ModalService,
-              public langService: TranslateService) {
+              public langService: TranslateService,
+              private audioService: AudioService) {
   }
 
   get sessionfile(): SessionFile {
@@ -58,6 +60,7 @@ export class ReloadFileComponent implements OnInit {
     let keep_data = false;
 
     const process = () => {
+      this.audioService.registerAudioManager(this.dropzone.audiomanager);
       this.appStorage.beginLocalSession(this.dropzone.files, keep_data, this.navigate,
         (error) => {
           if (error === 'file not supported') {
@@ -67,7 +70,7 @@ export class ReloadFileComponent implements OnInit {
       );
     };
     if (!isNullOrUndefined(this.dropzone.oannotation)) {
-            const new_levels: OIDBLevel[] = [];
+      const new_levels: OIDBLevel[] = [];
       for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
         new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
       }
@@ -92,6 +95,7 @@ export class ReloadFileComponent implements OnInit {
   }
 
   onOfflineSubmit = () => {
+    this.audioService.registerAudioManager(this.dropzone.audiomanager);
     this.appStorage.beginLocalSession(this.dropzone.files, true, this.navigate,
       (error) => {
         if (error === 'file not supported') {

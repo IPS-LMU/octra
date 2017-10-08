@@ -95,7 +95,6 @@ export class AudioService {
   }
 
   public destroy(disconnect: boolean = true) {
-
     for (let i = 0; i < this._audiomanagers.length; i++) {
       this._audiomanagers[i].destroy(disconnect);
     }

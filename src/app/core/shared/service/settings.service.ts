@@ -217,45 +217,44 @@ export class SettingsService {
 
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
     Logger.log('Load audio file 2...');
-    if (audioService.audiomanagers.length === 0) {
-
-      if (!this.appStorage.uselocalmode) {
-        // online
-
-        if (!isNullOrUndefined(this.appStorage.audio_url)) {
-          const src = this.app_settings.audio_server.url + this.appStorage.audio_url;
-          // extract filename
-          this._filename = this.appStorage.audio_url.substr(this.appStorage.audio_url.lastIndexOf('/') + 1);
-          const fullname = this._filename;
-          this._filename = this._filename.substr(0, this._filename.lastIndexOf('.'));
-          if (this._filename.indexOf('src=') > -1) {
-            this._filename = this._filename.substr(this._filename.indexOf('src=') + 4);
-          }
-
-          audioService.loadAudio(src, () => {
-            Logger.log('Audio loaded.');
-
-            this.audioloaded.emit({status: 'success'});
-          }, (err) => {
-            const errMsg = err;
-            this._log += 'Loading audio file failed<br/>';
-          });
-        } else {
-          console.error('audio src is null');
-          this.audioloaded.emit({status: 'error'});
+    if (!this.appStorage.uselocalmode) {
+      // online
+      if (!isNullOrUndefined(this.appStorage.audio_url)) {
+        const src = this.app_settings.audio_server.url + this.appStorage.audio_url;
+        // extract filename
+        this._filename = this.appStorage.audio_url.substr(this.appStorage.audio_url.lastIndexOf('/') + 1);
+        const fullname = this._filename;
+        this._filename = this._filename.substr(0, this._filename.lastIndexOf('.'));
+        if (this._filename.indexOf('src=') > -1) {
+          this._filename = this._filename.substr(this._filename.indexOf('src=') + 4);
         }
+
+        audioService.loadAudio(src, () => {
+          Logger.log('Audio loaded.');
+
+          this.audioloaded.emit({status: 'success'});
+        }, (err) => {
+          const errMsg = err;
+          this._log += 'Loading audio file failed<br/>';
+        });
       } else {
-        // local mode
-        if (!isNullOrUndefined(this.appStorage.sessionfile)
-          && !isNullOrUndefined(this.appStorage.sessionfile.name)) {
-          this._filename = this.appStorage.sessionfile.name;
-          this._filename = this._filename.substr(0, this._filename.lastIndexOf('.'));
+        console.error('audio src is null');
+        this.audioloaded.emit({status: 'error'});
+      }
+    } else {
+      // local mode
+      if (!isNullOrUndefined(this.appStorage.sessionfile)
+        && !isNullOrUndefined(this.appStorage.sessionfile.name)) {
+        this._filename = this.appStorage.sessionfile.name;
+        this._filename = this._filename.substr(0, this._filename.lastIndexOf('.'));
 
-          // read file
-          const reader = new FileReader();
+        // read file
+        const reader = new FileReader();
 
-          reader.onloadend = (ev) => {
-            const t: any = ev.target;
+        reader.onloadend = (ev) => {
+          const t: any = ev.target;
+          if (audioService.audiomanagers.length === 0) {
+            console.log('AUDIOMANAGER is 0');
             AudioManager.decodeAudio(this.appStorage.sessionfile.name, t.result, AppInfo.audioformats, true).then(
               (audiomanager: AudioManager) => {
                 audioService.registerAudioManager(audiomanager);
@@ -263,22 +262,22 @@ export class SettingsService {
                 this.audioloaded.emit({status: 'success'});
               }
             );
-          };
-
-          if (!isNullOrUndefined(this.appStorage.file)) {
-            // read audio file to array buffer
-            reader.readAsArrayBuffer(this.appStorage.file);
+          } else {
+            console.log('AUDIOMANAGER ALREADY EXISTS');
+            Logger.log('Audio loaded.');
+            this.audioloaded.emit({status: 'success'});
           }
-        } else {
-          console.error('session file is null.');
+        };
+
+        if (!isNullOrUndefined(this.appStorage.file)) {
+          // read audio file to array buffer
+          reader.readAsArrayBuffer(this.appStorage.file);
         }
+      } else {
+        console.error('session file is null.');
       }
-    } else {
-      this.audioloaded.emit({
-        status: 'success'
-      });
     }
-  };
+  }
 
   private triggerSettingsLoaded = () => {
     if (this.validated) {

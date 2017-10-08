@@ -1,6 +1,4 @@
 import {Component} from '@angular/core';
-
-import {AudioService} from '../../shared/service/audio.service';
 import {UserInteractionsService} from '../../shared/service/userInteractions.service';
 import {TranscriptionService} from '../../shared/service/transcription.service';
 import {Router} from '@angular/router';
@@ -11,7 +9,7 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
   selector: 'app-members-area',
   templateUrl: './members-area.component.html',
   styleUrls: ['./members-area.component.css'],
-  providers: [AudioService, UserInteractionsService, TranscriptionService]
+  providers: [UserInteractionsService, TranscriptionService]
 })
 export class MembersAreaComponent {
 

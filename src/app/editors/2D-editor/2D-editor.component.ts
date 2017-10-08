@@ -215,6 +215,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         this.changeArea(this.loupe, this.miniloupe, this.factor);
       }
     }, 200);
+    this.viewer.update(true);
   }
 
   ngAfterContentChecked() {

@@ -27,6 +27,7 @@ import {ModalComponent} from 'ng2-bs3-modal/ng2-bs3-modal';
 import {TranslateService} from '@ngx-translate/core';
 import {Converter} from '../../obj/Converters/Converter';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
+import {AudioService} from '../../shared/service/audio.service';
 
 @Component({
   selector: 'app-login',
@@ -80,7 +81,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               private cd: ChangeDetectorRef,
               private settingsService: SettingsService,
               public modService: ModalService,
-              private langService: TranslateService) {
+              private langService: TranslateService,
+              private audioService: AudioService) {
     this.subscrmanager = new SubscriptionManager();
   }
 
@@ -136,6 +138,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   ngOnDestroy() {
     this.subscrmanager.destroy();
+    console.log('LEAVE AUDIOMANAGERS = ' + this.audioService.audiomanagers.length);
   }
 
   onSubmit(form: NgForm) {
@@ -225,6 +228,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     if (!isNullOrUndefined(this.appStorage.data_id) && isNumber(this.appStorage.data_id)) {
       // last was online mode
       this.setOnlineSessionToFree(() => {
+        this.audioService.registerAudioManager(this.dropzone.audiomanager);
+        console.log('AUDIOMANAGER: ' + this.audioService.audiomanagers[0].ressource.info.samplerate);
         this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
           if (!isNullOrUndefined(this.dropzone.oannotation)) {
             const new_levels: OIDBLevel[] = [];
@@ -254,6 +259,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         });
       });
     } else {
+      this.audioService.registerAudioManager(this.dropzone.audiomanager);
+      console.log('AUDIOMANAGER: ' + this.dropzone.audiomanager.ressource.info.samplerate);
       this.appStorage.beginLocalSession(this.dropzone.files, true, () => {
         if (!isNullOrUndefined(this.dropzone.oannotation)) {
           const new_levels: OIDBLevel[] = [];
@@ -309,6 +316,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   newTranscription = () => {
+    this.audioService.registerAudioManager(this.dropzone.audiomanager);
+    console.log('AUDIOMANAGER: ' + this.dropzone.audiomanager.ressource.info.samplerate);
+
     this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
         if (!isNullOrUndefined(this.dropzone.oannotation)) {
           const new_levels: OIDBLevel[] = [];

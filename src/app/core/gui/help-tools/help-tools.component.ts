@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {APIService} from '../../shared/service/api.service';
@@ -9,6 +9,8 @@ import {APIService} from '../../shared/service/api.service';
   styleUrls: ['./help-tools.component.css']
 })
 export class HelpToolsComponent implements OnInit, OnDestroy {
+  @ViewChild('canvas') canvas: ElementRef;
+
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
   constructor(private appStorage: AppStorageService,

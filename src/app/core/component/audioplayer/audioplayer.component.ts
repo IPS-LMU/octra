@@ -360,7 +360,6 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
             }
           }
         }
-        console.log('audioplayer a ' + a);
 
         if (key_active) {
           $event.event.preventDefault();

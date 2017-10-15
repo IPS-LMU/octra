@@ -3,19 +3,28 @@
         'margin-top': margin.top+'px',
         'margin-left': margin.left+'px',
         'margin-right': margin.right+'px',
-        'margin-bottom': margin.bottom+'px'
+        'margin-bottom': margin.bottom+'px',
+        'height': '100px'
      }"
      #audioview=audioview appAudioviewer>
-    <canvas class="graphicscanvas" #graphicscan></canvas>
-    <canvas class="overlaycanvas" #overlaycan></canvas>
-    <canvas class="playcanvas" [ngClass]="{dragable: (av.overboundary)}" #playcan
+    <canvas class="graphicscanvas" #graphicscan=audioview appAudioviewer></canvas>
+    <canvas class="overlaycanvas" #overlaycan=audioview appAudioviewer></canvas>
+    <canvas class="playcanvas" [ngClass]="{dragable: (av.overboundary)}" #playcan=audioview appAudioviewer
             (mousedown)="onClick($event)"
             (mouseup)="onClick($event)"
             (click)="onClick($event)"
             (mousemove)="onMouseMove($event)"
             (mouseleave)="av.focused = false;"
             (mouseout)="av.focused = false"
+            (wheel)="onWheel($event)"
     ></canvas>
-    <canvas class="mousecanvas" #mousecan
-    ></canvas>
+    <canvas class="mousecanvas" #mousecan=audioview appAudioviewer></canvas>
+    <div *ngIf="Settings.scrollable" class="scrollbar" #scrollbar>
+        <div class="slider" (mousedown)="onSliderChanged($event)" (mousemove)="onSliderChanged($event)"
+             (mouseup)="onSliderChanged($event)" (mouseleave)="onSliderChanged($event)"
+             (mouseout)="onSliderChanged($event)" [ngStyle]="{
+            'margin-top': ((viewRect.y/height) * viewRect.h) + 'px',
+            'height': ((viewRect.h/height) * viewRect.h) + 'px'
+        }"></div>
+    </div>
 </div>

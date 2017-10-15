@@ -1,8 +1,11 @@
 .audioviewer {
     width: 100%;
+    height: 100%;
     position: relative;
     resize: vertical;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    flex: auto;
 }
 
 .audioviewer .audio-line {
@@ -40,4 +43,30 @@
 
 .playcanvas.dragable {
     cursor: move;
+}
+
+:host {
+    display: flex;
+    flex-direction: column;
+    flex: auto;
+}
+
+.scrollbar {
+    position: absolute;
+    background-color: white;
+    width: 20px;
+    height: 100%;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    flex: auto;
+    right: 0;
+    border: 1px solid gray;
+}
+
+.scrollbar .slider {
+    height: 20px;
+    width: 100%;
+    background-color: #00aa9a;
+    cursor: pointer;
 }

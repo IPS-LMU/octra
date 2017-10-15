@@ -202,7 +202,6 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
             const id2 = this.subscrmanager.add(this.audiochunk.statechange.subscribe(
               (state2: PlayBackState) => {
-                console.log(state2);
                 this.boundaryselected = false;
                 if (this.audiochunk.isPlaybackEnded) {
                   // set start pos and playback length to end of audio file

@@ -254,7 +254,6 @@ export class SettingsService {
         reader.onloadend = (ev) => {
           const t: any = ev.target;
           if (audioService.audiomanagers.length === 0) {
-            console.log('AUDIOMANAGER is 0');
             AudioManager.decodeAudio(this.appStorage.sessionfile.name, t.result, AppInfo.audioformats, true).then(
               (audiomanager: AudioManager) => {
                 audioService.registerAudioManager(audiomanager);
@@ -263,7 +262,6 @@ export class SettingsService {
               }
             );
           } else {
-            console.log('AUDIOMANAGER ALREADY EXISTS');
             Logger.log('Audio loaded.');
             this.audioloaded.emit({status: 'success'});
           }

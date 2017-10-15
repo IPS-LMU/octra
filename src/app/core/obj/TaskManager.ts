@@ -12,6 +12,7 @@ export class TaskManager {
     this.functions = functions;
 
     // prepare BLOB
+    const start = Date.now();
     const blobURL = URL.createObjectURL(new Blob([
         this.getFunctionsString()
       ],
@@ -20,6 +21,7 @@ export class TaskManager {
       }
     ));
     this.worker = new Worker(blobURL);
+    const end = Date.now();
   }
 
   /**
@@ -29,11 +31,11 @@ export class TaskManager {
    * @returns {Promise<any>}
    */
   public run(function_name: string, args: any[]): Promise<any> {
+    const start = Date.now();
     return new Promise<any>(
       (resolve, reject) => {
         if (this.hasFunction(function_name) !== null) {
           this.worker.onmessage = (ev) => {
-            console.log(ev);
             resolve(ev);
           };
 

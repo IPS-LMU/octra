@@ -65,7 +65,8 @@
     "application": "Anwendung",
     "website" : "Webseite",
     "news": "Neuigkeiten",
-    "faq": "FAQ"
+    "faq": "FAQ",
+    "features": "Features"
   },
   "bug report": {
     "report an error": "Fehler melden",

@@ -91,7 +91,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.viewer.Settings.shortcuts = this.keyMap.register('AV', this.viewer.Settings.shortcuts);
 
     this.viewer.Settings.multi_line = false;
-    this.viewer.Settings.height = 80;
+    this.viewer.Settings.lineheight = 80;
     this.viewer.Settings.shortcuts_enabled = true;
     this.viewer.Settings.boundaries.readonly = false;
     this.viewer.Settings.justify_signal_height = true;
@@ -253,7 +253,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const a = this.viewer.getLocation();
-    this.mini_loupecoord.y = a.y - this.viewer.Settings.height - this.miniloupe.Settings.height;
+    this.mini_loupecoord.y = a.y - this.viewer.Settings.lineheight - this.miniloupe.Settings.height;
     if (this.appStorage.uselocalmode) {
       this.mini_loupecoord.y += 24;
     }

@@ -138,7 +138,6 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
                 this._files.push(audio_process);
                 this.decodeArrayBuffer(importresult.audiofile.arraybuffer, audio_process, false).then(
                   () => {
-                    console.log('Audio from Bundle decoded!');
                     set_annotation();
                   }
                 ).catch((err) => {

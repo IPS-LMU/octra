@@ -164,7 +164,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
       if (this.editor.html.indexOf('<img src="assets/img/components/transcr-editor/boundary.png"') > -1) {
         // boundaries were inserted
-        console.log('save sements');
         this.transcrService.currentlevel.segments.segments = this.temp_segments.segments;
         this.transcrService.currentlevel.segments.onsegmentchange.emit(null);
       } else {

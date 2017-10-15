@@ -79,6 +79,7 @@ import {TwoDEditorComponent} from './editors/2D-editor/2D-editor.component';
 import {HelpComponent} from './core/gui/help/help.component';
 import {NewEditorComponent} from './editors/new-editor/new-editor.component';
 import {HelpToolsComponent} from './core/gui/help-tools/help-tools.component';
+import {FeaturesComponent} from './core/gui/features/features.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
@@ -129,7 +130,8 @@ export const ngmodule = {
     NewsComponent,
     FaqComponent,
     EDITORS,
-    NewEditorComponent
+    NewEditorComponent,
+    FeaturesComponent
   ],
   entryComponents: EDITORS,
   imports: [

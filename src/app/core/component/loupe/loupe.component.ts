@@ -16,7 +16,6 @@ import {AVMousePos} from '../../shared';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AudioChunk} from '../../obj/media/audio/AudioChunk';
 import {AudioviewerService} from '../audioviewer/service';
-import {isNullOrUndefined} from 'util';
 
 declare var window: any;
 
@@ -91,13 +90,11 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
   }
 
   ngOnChanges(obj: SimpleChanges) {
-    if (!isNullOrUndefined(obj.audiochunk)) {
-    }
   }
 
   ngOnInit() {
     this.viewer.Settings.multi_line = false;
-    this.viewer.Settings.height = 150;
+    this.viewer.Settings.lineheight = 150;
     this.viewer.Settings.justify_signal_height = true;
     this.viewer.Settings.boundaries.enabled = true;
     this.viewer.Settings.disabled_keys = [];

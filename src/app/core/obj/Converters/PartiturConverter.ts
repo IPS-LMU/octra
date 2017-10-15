@@ -77,7 +77,6 @@ export class PartiturConverter extends Converter {
       }
       result.levels.push(level);
 
-      console.log(result);
       return {
         annotjson: result,
         audiofile: null

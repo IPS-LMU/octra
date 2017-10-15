@@ -138,7 +138,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   ngOnDestroy() {
     this.subscrmanager.destroy();
-    console.log('LEAVE AUDIOMANAGERS = ' + this.audioService.audiomanagers.length);
   }
 
   onSubmit(form: NgForm) {
@@ -229,7 +228,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       // last was online mode
       this.setOnlineSessionToFree(() => {
         this.audioService.registerAudioManager(this.dropzone.audiomanager);
-        console.log('AUDIOMANAGER: ' + this.audioService.audiomanagers[0].ressource.info.samplerate);
         this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
           if (!isNullOrUndefined(this.dropzone.oannotation)) {
             const new_levels: OIDBLevel[] = [];
@@ -260,7 +258,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       });
     } else {
       this.audioService.registerAudioManager(this.dropzone.audiomanager);
-      console.log('AUDIOMANAGER: ' + this.dropzone.audiomanager.ressource.info.samplerate);
       this.appStorage.beginLocalSession(this.dropzone.files, true, () => {
         if (!isNullOrUndefined(this.dropzone.oannotation)) {
           const new_levels: OIDBLevel[] = [];
@@ -317,7 +314,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   newTranscription = () => {
     this.audioService.registerAudioManager(this.dropzone.audiomanager);
-    console.log('AUDIOMANAGER: ' + this.dropzone.audiomanager.ressource.info.samplerate);
 
     this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
         if (!isNullOrUndefined(this.dropzone.oannotation)) {

@@ -45,7 +45,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
       if (this.appStorage.uselocalmode && isNullOrUndefined(this.appStorage.file)) {
         this.router.navigate(['/user/transcr/reload-file']);
       } else {
-        console.log('LOADING ' + this.audio.audiomanagers.length);
         this.settService.loadAudioFile(this.audio);
       }
     };

@@ -80,6 +80,7 @@ import {HelpComponent} from './core/gui/help/help.component';
 import {NewEditorComponent} from './editors/new-editor/new-editor.component';
 import {HelpToolsComponent} from './core/gui/help-tools/help-tools.component';
 import {FeaturesComponent} from './core/gui/features/features.component';
+import {Timespan2Pipe} from './core/shared/pipe/timespan2.pipe';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
@@ -112,6 +113,7 @@ export const ngmodule = {
     SecondsPipe,
     LeadingNullPipe,
     TimespanPipe,
+    Timespan2Pipe,
     TranscrEditorComponent,
     TranscriptionComponent,
     TranscriptionEndComponent,

@@ -55,17 +55,12 @@
         'flex-direction': 'column'}" [height]="miniloupe.size.height"
                          [audiochunk]="audiochunk_loupe"></app-circleloupe>
     </div>
-    <app-audioviewer id="special" #viewer
-                     (selchange)="onSegmentSelected($event);"
+    <app-audioviewer id="special" (selchange)="onSegmentSelected($event);"
                      (segmententer)="onSegmentEntered($event);"
                      (segmentchange)="onSegmentChange($event);"
-                     (mousecursorchange)="onMouseOver($event);"
-                     (mousemove)="loupe_hidden = viewer.scrollbar.mouseover;"
+                     (mousecursorchange)="onMouseOver($event); loupe_hidden = false;"
                      (mouseleave)="loupe_hidden = true;"
                      (shortcuttriggered)="onShortCutTriggered($event, 'mult-lines-viewer')"
-                     [audiochunk]="audiochunk_lines"
-                     (scrolling)="onScrolling($event)"
-                     (scrollbarchange)="onScrollbarMouse($event)"
-    >
-    </app-audioviewer>
+                     [audiochunk]="audiochunk_lines" (scrolling)="onScrolling($event)"
+                     (scrollbarchange)="onScrollbarMouse($event)" #viewer></app-audioviewer>
 </div>

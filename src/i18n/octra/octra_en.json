@@ -66,7 +66,8 @@
     "website": "Website",
     "news": "News",
     "faq": "FAQ",
-    "features": "Features"
+    "features": "Features",
+    "transcription window": "Transcription window"
   },
   "bug report": {
     "report an error": "Report an error",
@@ -145,7 +146,7 @@
       "stop playback": "Stop Playback",
       "step backward": "Jump to the last position",
       "step backward time": "Jump back in time",
-      "set segment": "Set segment boundary",
+      "set segment": "Open transcription window",
       "set break": "Mark segment as break",
       "play selection": "Play selection",
       "transcribe segment": "Transcribe segment",
@@ -155,7 +156,10 @@
       "top signaldisplay": "Shortcuts of the signal display on the top",
       "down signaldisplay": "Shortcuts of the signal display on the bottom",
       "2D-Editor": "Shortcuts of the 2D-Editor",
-      "play audio on hover": "Play audio on hover"
+      "play audio on hover": "Play audio on hover",
+      "jump_last_segment": "Save & jump to previous segment",
+      "jump_next_segment": "Save & jump to next segment",
+      "close_save": "Save & close window"
     }
   },
   "login": {

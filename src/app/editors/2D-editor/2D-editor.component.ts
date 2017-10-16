@@ -126,6 +126,33 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     this.audiochunk_loupe = this.audiomanager.mainchunk.clone();
     this.audiochunk_window = this.audiomanager.mainchunk.clone();
     this.shortcuts = this.keyMap.register('2D-Editor', this.viewer.Settings.shortcuts);
+    const window_shortcuts = {
+      jump_left: {
+        keys: {
+          mac: 'ALT + ARROWLEFT',
+          pc: 'ALT + ARROWLEFT'
+        },
+        focusonly: false,
+        title: 'jump_last_segment'
+      },
+      jump_right: {
+        keys: {
+          mac: 'ALT + ARROWRIGHT',
+          pc: 'ALT + ARROWRIGHT'
+        },
+        focusonly: false,
+        title: 'jump_next_segment'
+      },
+      close_save: {
+        keys: {
+          mac: 'ALT + ARROWDOWN',
+          pc: 'ALT + ARROWDOWN'
+        },
+        focusonly: false,
+        title: 'close_save'
+      }
+    };
+    this.keyMap.register('Transcription Window', window_shortcuts);
 
     this.viewer.Settings.multi_line = true;
     this.viewer.Settings.lineheight = 70;

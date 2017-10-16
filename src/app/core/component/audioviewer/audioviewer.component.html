@@ -29,8 +29,8 @@
          #scrollbar>
         <div class="slider" (mousedown)="onSliderChanged($event)" (mousemove)="onSliderChanged($event)"
              (mouseup)="onSliderChanged($event)" [ngStyle]="{
-            'margin-top': ((viewRect.y/height) * viewRect.h) + 'px',
-            'height': ((viewRect.h/height) * viewRect.h) + 'px'
+            'margin-top': ((height < viewRect.h)? 0 : (viewRect.y/height) * viewRect.h) + 'px',
+            'height': ((height < viewRect.h) ? viewRect.h : ((viewRect.h/height) * viewRect.h)) + 'px'
         }"></div>
     </div>
 </div>

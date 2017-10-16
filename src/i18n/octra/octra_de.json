@@ -66,7 +66,8 @@
     "website" : "Webseite",
     "news": "Neuigkeiten",
     "faq": "FAQ",
-    "features": "Features"
+    "features": "Features",
+    "transcription window": "Transkriptionsfenster"
   },
   "bug report": {
     "report an error": "Fehler melden",
@@ -146,14 +147,17 @@
       "set segment": "Segmentgrenze setzen",
       "set break": "Segment als Pause markieren",
       "play selection": "Selektion abspielen",
-      "transcribe segment": "Segment transkribieren",
+      "transcribe segment": "Transkriptionsfenter öffnen",
       "move cursor left": "Cursor nach links bewegen",
       "move cursor right": "Cursor nach rechts bewegen",
       "audioplayer": "Tastenkombinationen des Audioplayers",
       "top signaldisplay": "Tastenkombinationen des oberen Signaldsiplays",
       "down signaldisplay": "Tastenkombinationen des unteren Signaldsiplays",
       "2D-Editor": "Tastenkombinationen des 2D-Editors",
-      "play audio on hover": "Audio mit Mausbewegung abspielen"
+      "play audio on hover": "Audio mit Mausbewegung abspielen",
+      "jump_last_segment": "Speichern & zum vorherigen Segment springen",
+      "jump_next_segment": "Speichern & zum nächsten Segment springen",
+      "close_save": "Speichern & Fenster schließen"
     }
   },
   "login": {

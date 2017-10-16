@@ -99,6 +99,18 @@
                     </tbody>
                 </table>
             </div>
+            <h3>{{"general.transcription window" | translate}}</h3>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <tbody>
+                    <tr *ngFor="let entry of keyMap.getEntryList('Transcription Window')">
+                        <td>{{"modal.shortcuts."+ entry.value.title | translate}}</td>
+                        <td>{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly" class="focus-info">({{"general.on focus only" | translate}})</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </modal-body>
     <modal-footer>

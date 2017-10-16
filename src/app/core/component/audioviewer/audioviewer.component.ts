@@ -322,9 +322,13 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         const draw = () => {
           this.av.updateLines(this._innerWidth);
           if (this.av.LinesArray.length > 0) {
-            for (let i = 0; i < this.av.LinesArray.length; i++) {
-              this.clearDisplay(i);
-              this.drawGrid(3, 3, this.av.LinesArray[i]);
+            for (let i = this._viewRect.lines.start; i <= this._viewRect.lines.end; i++) {
+              if (!isNullOrUndefined(this.av.LinesArray[i])) {
+                this.clearDisplay(i);
+                this.drawGrid(3, 3, this.av.LinesArray[i]);
+              } else {
+                break;
+              }
             }
             this.drawSegments();
             if (this.Settings.cropping !== 'none') {
@@ -541,6 +545,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       this.g_context.globalAlpha = 1.0;
       this.g_context.strokeStyle = this.Settings.frame.color;
       this.g_context.fillStyle = this.Settings.backgroundcolor;
+      this.g_context.clearRect(line_obj.Pos.x, line_obj.Pos.y - this._viewRect.y, this._innerWidth,
+        this.Settings.lineheight + this.margin.bottom);
       this.g_context.fillRect(line_obj.Pos.x, line_obj.Pos.y - this._viewRect.y, line_obj.Size.width,
         this.Settings.lineheight - timeline_height);
       this.g_context.lineWidth = 0.5;
@@ -558,9 +564,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
       this.g_context.strokeRect(line_obj.Pos.x, line_obj.Pos.y - this._viewRect.y, line_obj.Size.width, this.Settings.lineheight);
       this.g_context.lineWidth = 1;
-    } else {
-      console.error('line obj not found');
-      throw new Error('Line Object not found');
     }
   }
 
@@ -1554,46 +1557,52 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
   onWheel(event: WheelEvent) {
     event.preventDefault();
-    if (BrowserInfo.os === 'mac') {
-      this._viewRect.y = Math.max(0, this._viewRect.y - event.deltaY);
-    } else {
-      this._viewRect.y = Math.max(0, this._viewRect.y + event.deltaY);
+    if ((this.height >= this.viewRect.h)) {
+      if (BrowserInfo.os === 'mac') {
+        this._viewRect.y = Math.max(0, this._viewRect.y - event.deltaY);
+      } else {
+        this._viewRect.y = Math.max(0, this._viewRect.y + event.deltaY);
+      }
+      this.scrollTo(this._viewRect.y);
     }
-    this.scrollTo(this._viewRect.y);
   }
 
   public scrollTo(y_coord: number, scrollbar: boolean = false) {
-    this.scrolling.emit({state: 'scrolling'});
-    this._viewRect.y = Math.max(0, y_coord);
-    this._viewRect.y = Math.min(this._viewRect.y, this.height - this._viewRect.h);
-    this.updateVisibleLines();
+    if ((this.height >= this.viewRect.h)) {
+      this.scrolling.emit({state: 'scrolling'});
+      this._viewRect.y = Math.max(0, y_coord);
+      this._viewRect.y = Math.min(this._viewRect.y, this.height - this._viewRect.h);
+      this.updateVisibleLines();
 
-    if (!isNullOrUndefined(this.wheeling)) {
-      window.clearTimeout(this.wheeling);
-    }
-    this.wheeling = setTimeout(() => {
-      if (!scrollbar) {
-        this.scrolling.emit({state: 'stopped'});
+      if (!isNullOrUndefined(this.wheeling)) {
+        window.clearTimeout(this.wheeling);
       }
-      this.update(false);
-    }, 20);
+      this.wheeling = setTimeout(() => {
+        if (!scrollbar) {
+          this.scrolling.emit({state: 'stopped'});
+        }
+        this.update(false);
+      }, 20);
+    }
   }
 
   onSliderChanged($event: MouseEvent) {
-    if ($event.type === 'mousemove') {
-      if (this.scrollbar.dragging) {
-        this.scrollTo(($event.layerY / this._viewRect.h) * this.height, true);
+    if (this.height >= this.viewRect.h) {
+      if ($event.type === 'mousemove') {
+        if (this.scrollbar.dragging) {
+          this.scrollTo(($event.layerY / this._viewRect.h) * this.height, true);
+        }
+      } else if ($event.type === 'mousedown') {
+        this.scrollbar.dragging = true;
+      } else if ($event.type === 'mouseup' || $event.type === 'mouseleave' || $event.type === 'mouseout') {
+        this.scrolling.emit({state: 'stopped'});
+        this.scrollbar.dragging = false;
+      } else if ($event.type === 'click') {
+        if (!this.scrollbar.dragging) {
+          this.scrollTo(($event.layerY / this._viewRect.h) * this.height, false);
+        }
+        this.scrollbar.dragging = false;
       }
-    } else if ($event.type === 'mousedown') {
-      this.scrollbar.dragging = true;
-    } else if ($event.type === 'mouseup' || $event.type === 'mouseleave' || $event.type === 'mouseout') {
-      this.scrolling.emit({state: 'stopped'});
-      this.scrollbar.dragging = false;
-    } else if ($event.type === 'click') {
-      if (!this.scrollbar.dragging) {
-        this.scrollTo(($event.layerY / this._viewRect.h) * this.height, false);
-      }
-      this.scrollbar.dragging = false;
     }
   }
 }

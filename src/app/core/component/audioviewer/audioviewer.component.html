@@ -7,7 +7,8 @@
         'height': '100px'
      }"
      #audioview=audioview appAudioviewer>
-    <canvas class="graphicscanvas" #graphicscan=audioview appAudioviewer></canvas>
+    <canvas class="graphicscanvas" #graphicscan=audioview
+            appAudioviewer></canvas>
     <canvas class="overlaycanvas" #overlaycan=audioview appAudioviewer></canvas>
     <canvas class="playcanvas" [ngClass]="{dragable: (av.overboundary)}" #playcan=audioview appAudioviewer
             (mousedown)="onClick($event)"
@@ -19,10 +20,15 @@
             (wheel)="onWheel($event)"
     ></canvas>
     <canvas class="mousecanvas" #mousecan=audioview appAudioviewer></canvas>
-    <div *ngIf="Settings.scrollable" class="scrollbar" #scrollbar>
+    <div *ngIf="Settings.scrollable" class="scrollbar"
+         (mousemove)="scrollbar.mouseover = true; scrollbarchange.emit({state:'mousemove'});onSliderChanged($event)"
+         (mouseleave)="scrollbar.mouseover = false; scrollbarchange.emit({state:'mouseleave'});onSliderChanged($event);"
+         (mouseout)="scrollbar.mouseover = false;"
+         (mouseup)="scrollbarchange.emit({state:'mouseup'});onSliderChanged($event)"
+         (click)="onSliderChanged($event)"
+         #scrollbar>
         <div class="slider" (mousedown)="onSliderChanged($event)" (mousemove)="onSliderChanged($event)"
-             (mouseup)="onSliderChanged($event)" (mouseleave)="onSliderChanged($event)"
-             (mouseout)="onSliderChanged($event)" [ngStyle]="{
+             (mouseup)="onSliderChanged($event)" [ngStyle]="{
             'margin-top': ((viewRect.y/height) * viewRect.h) + 'px',
             'height': ((viewRect.h/height) * viewRect.h) + 'px'
         }"></div>

@@ -16,6 +16,8 @@ import {AVMousePos} from '../../shared';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AudioChunk} from '../../obj/media/audio/AudioChunk';
 import {AudioviewerService} from '../audioviewer/service';
+import {AudioviewerConfig} from '../audioviewer/config/av.config';
+import {isNullOrUndefined} from 'util';
 
 declare var window: any;
 
@@ -33,8 +35,10 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
   @Output('mousecursorchange') mousecursorchange: EventEmitter<AVMousePos> = new EventEmitter<AVMousePos>();
   @Output('shortcuttriggered') shortcuttriggered: EventEmitter<string> = new EventEmitter<string>();
   @Output('segmententer') segmententer: EventEmitter<any> = new EventEmitter<any>();
+  @Output('alerttriggered') alerttriggered: EventEmitter<{ type: string, message: string }> = new EventEmitter<{ type: string, message: string }>();
 
   @Input('audiochunk') audiochunk: AudioChunk;
+  @Input('height') height: number;
 
   private subscrmanager;
   public name: string;
@@ -77,11 +81,12 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
     };
   }
 
-  get Settings(): any {
+  get Settings(): AudioviewerConfig {
     return this.viewer.Settings;
   }
 
-  set Settings(new_settings: any) {
+  @Input()
+  set Settings(new_settings: AudioviewerConfig) {
     this.viewer.Settings = new_settings;
   }
 
@@ -93,12 +98,16 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
   }
 
   ngOnInit() {
-    this.viewer.Settings.multi_line = false;
-    this.viewer.Settings.lineheight = 150;
-    this.viewer.Settings.justify_signal_height = true;
-    this.viewer.Settings.boundaries.enabled = true;
-    this.viewer.Settings.disabled_keys = [];
-    this.viewer.Settings.type = 'line';
+    if (!isNullOrUndefined(this.height)) {
+      this.viewer.Settings.multi_line = false;
+      this.viewer.Settings.lineheight = this.height;
+      this.viewer.Settings.justify_signal_height = true;
+      this.viewer.Settings.boundaries.enabled = true;
+      this.viewer.Settings.disabled_keys = [];
+      this.viewer.Settings.type = 'line';
+    } else {
+      throw new Error('you have to set [height] to the loupe component');
+    }
   }
 
   ngAfterViewInit() {

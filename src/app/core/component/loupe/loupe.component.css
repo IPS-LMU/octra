@@ -1,11 +1,6 @@
 .loupe {
+    height: 100%;
     display: flex;
     flex: auto;
     flex-direction: column;
-}
-
-:host {
-    display: flex;
-    flex-direction: column;
-    flex: auto;
 }

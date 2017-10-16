@@ -32,6 +32,7 @@ import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor/transcr-editor.component';
 import {isNullOrUndefined} from 'util';
+import {CircleLoupeComponent} from '../../core/component/circleloupe/circleloupe.component';
 
 @Component({
   selector: 'app-overlay-gui',
@@ -45,7 +46,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
   @ViewChild('viewer') viewer: AudioviewerComponent;
   @ViewChild('window') window: TranscrWindowComponent;
-  // @ViewChild('loupe') loupe: CircleLoupeComponent;
+  @ViewChild('loupe') loupe: CircleLoupeComponent;
   @ViewChild('audionav') audionav: AudioNavigationComponent;
 
   public get editor(): TranscrEditorComponent {
@@ -62,6 +63,8 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   private mousestate = 'initiliazied';
   private intervalID = null;
   public selected_index: number;
+
+  private mouseTimer;
 
   private factor = 8;
   public miniloupe: {
@@ -139,7 +142,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       }
     );
 
-    /* this.subscrmanager.add(this.keyMap.onkeydown.subscribe(
+    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(
       (obj) => {
         const event = obj.event;
         if (this.viewer.focused) {
@@ -154,20 +157,20 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
           }
         }
       }
-    )); */
+    ));
 
     this.subscrmanager.add(this.audiochunk_lines.statechange.subscribe(
       (state: PlayBackState) => {
         if (state === PlayBackState.PLAYING) {
           if (!isNullOrUndefined(this.appStorage.followplaycursor) && this.appStorage.followplaycursor === true) {
+
             this.scrolltimer = Observable.interval(1000).subscribe(() => {
               const absx = this.viewer.av.audioTCalculator.samplestoAbsX(this.audiochunk_lines.playposition.samples);
-              const specialheight = jQuery('#special').height();
               let y = Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.lineheight;
               y += 10 + (Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.margin.bottom);
 
-              if (y > specialheight) {
-                Functions.scrollTo(y, '#special');
+              if (y > this.viewer.viewRect.h) {
+                this.viewer.scrollTo(y);
               }
             });
           }
@@ -206,14 +209,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       )
     );
 
-    /* this.loupe.zoomY = this.factor;
-    this.subscrmanager.add(Observable.interval(200).subscribe(() => {
-      if (this.mousestate === 'ended') {
-        this.changeArea(this.loupe, this.miniloupe, this.factor);
-        this.mousestate = 'initialized';
-      }
-    }));*/
-
+    this.loupe.zoomY = this.factor;
     this.viewer.update(true);
   }
 
@@ -261,6 +257,9 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   onMouseOver() {
+    if (!isNullOrUndefined(this.mouseTimer)) {
+      window.clearTimeout(this.mouseTimer);
+    }
     this.mousestate = 'moving';
 
     if (!this.audiomanager.audioplaying && this.appStorage.playonhover) {
@@ -273,15 +272,16 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     }
 
     this.changePosition(this.miniloupe);
-    setTimeout(() => {
+    this.mouseTimer = window.setTimeout(() => {
+      this.changeArea(this.loupe, this.miniloupe, this.factor);
       this.mousestate = 'ended';
-    }, 180);
+    }, 20);
   }
 
   onSegmentChange($event) {
   }
 
-  /* private changeArea(loup: CircleLoupeComponent, coord: {
+  private changeArea(loup: CircleLoupeComponent, coord: {
     size: {
       width: number,
       height: number
@@ -297,7 +297,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       coord.location.x = ((cursor.relPos.x) ? cursor.relPos.x - coord.size.width / 2 : 0);
       coord.location.y = ((cursor.line) ? (cursor.line.number) *
         cursor.line.Size.height + (cursor.line.number) * this.viewer.Settings.margin.bottom : 0);
-      coord.location.y += this.viewer.Settings.lineheight - 15;
+      coord.location.y += this.viewer.Settings.lineheight - 15 - this.viewer.viewRect.y;
 
       const half_rate = Math.round(this.audiomanager.ressource.info.samplerate / factor);
       const start = (cursor.timePos.samples > half_rate)
@@ -312,7 +312,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         this.audiochunk_loupe = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
       }
     }
-  } */
+  }
 
   private changePosition(coord: {
     size: {
@@ -330,7 +330,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       coord.location.x = ((cursor.relPos.x) ? cursor.relPos.x - coord.size.width / 2 : 0);
       coord.location.y = ((cursor.line) ? (cursor.line.number) *
         cursor.line.Size.height + (cursor.line.number) * this.viewer.Settings.margin.bottom : 0);
-      coord.location.y += this.viewer.Settings.lineheight - 15;
+      coord.location.y += this.viewer.Settings.lineheight - 15 - this.viewer.viewRect.y;
     }
   }
 
@@ -481,5 +481,17 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   public update() {
     this.viewer.update();
     this.audiochunk_lines.startpos = this.audiochunk_lines.time.start;
+  }
+
+  onScrollbarMouse(event) {
+    if (event.state === 'mousemove') {
+      this.loupe_hidden = true;
+    }
+  }
+
+  onScrolling(event) {
+    if (event.state === 'scrolling') {
+      this.loupe_hidden = true;
+    }
   }
 }

@@ -58,11 +58,13 @@
                      (mousedown)="onViewerMouseDown($event)"
                      (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_top')"
                      [audiochunk]="audiochunk_top"
+                     style="height:80px;"
     >
     </app-audioviewer>
 </div>
 
-<app-loupe #loupe [hidden]="!top_selected"
+<app-loupe #loupe
+           *ngIf="top_selected"
            [margin]="{
             top:2
            }"
@@ -70,6 +72,9 @@
            (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_down')"
            (click)="onLoupeClick($event)"
            [audiochunk]="audiochunk_down"
+           [height]="150"
+           [Settings]="loupe_settings"
+           (alerttriggered)="onAlertTriggered($event)"
 >
 </app-loupe>
 <div *ngIf="!segmentselected" id="editor-placeholder">

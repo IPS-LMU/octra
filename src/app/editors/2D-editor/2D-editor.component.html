@@ -41,25 +41,31 @@
                               }"
                           [easymode]="appStorage.easymode"
     ></app-audio-navigation>
-    <!--
     <div (mouseenter)="loupe_hidden = false;" (mouseleave)="loupe_hidden = true;">
-        <app-circleloupe #loupe [width]="miniloupe.size.width" [height]="miniloupe.size.height" [ngStyle]="{
-'position':'absolute',
-'margin-left':miniloupe.location.x + 'px',
-'margin-top':miniloupe.location.y + 'px',
-'z-index':'90',
-'display': 'none'}"
+        <app-circleloupe #loupe [ngStyle]="{
+        'width': miniloupe.size.width + 'px',
+        'height': miniloupe.size.height + 'px',
+        'position':'absolute',
+        'margin-left':miniloupe.location.x + 'px',
+        'margin-top':miniloupe.location.y + 'px',
+        'z-index':'90',
+        'display': 'flex',
+        'visibility': (loupe_hidden) ? 'hidden' : 'inherit',
+        'flex': 'auto',
+        'flex-direction': 'column'}" [height]="miniloupe.size.height"
                          [audiochunk]="audiochunk_loupe"></app-circleloupe>
-    </div> -->
+    </div>
     <app-audioviewer id="special" #viewer
                      (selchange)="onSegmentSelected($event);"
                      (segmententer)="onSegmentEntered($event);"
                      (segmentchange)="onSegmentChange($event);"
                      (mousecursorchange)="onMouseOver($event);"
-                     (mouseenter)="loupe_hidden = false;"
+                     (mousemove)="loupe_hidden = viewer.scrollbar.mouseover;"
                      (mouseleave)="loupe_hidden = true;"
                      (shortcuttriggered)="onShortCutTriggered($event, 'mult-lines-viewer')"
                      [audiochunk]="audiochunk_lines"
+                     (scrolling)="onScrolling($event)"
+                     (scrollbarchange)="onScrollbarMouse($event)"
     >
     </app-audioviewer>
 </div>

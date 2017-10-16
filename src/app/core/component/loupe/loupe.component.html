@@ -1,3 +1,3 @@
-<div class="loupe" #loupe>
-    <app-audioviewer #viewer [audiochunk]="audiochunk"></app-audioviewer>
+<div class="loupe" [ngStyle]="{height: this.height + 'px'}" #loupe>
+    <app-audioviewer #viewer [audiochunk]="audiochunk" (alerttriggered)="alerttriggered.emit($event)"></app-audioviewer>
 </div>

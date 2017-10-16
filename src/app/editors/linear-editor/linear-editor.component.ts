@@ -1,4 +1,14 @@
-import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 
 import {
   AudioNavigationComponent,
@@ -17,16 +27,18 @@ import {
 import {AudioSelection, AudioTime, AVMousePos, BrowserInfo, Functions, SubscriptionManager} from '../../core/shared';
 import {SettingsService} from '../../core/shared/service/settings.service';
 import {AppStorageService} from '../../core/shared/service/appstorage.service';
-import {CircleLoupeComponent} from '../../core/component/circleloupe/circleloupe.component';
 import {AudioManager} from '../../core/obj/media/audio/AudioManager';
 import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
+import {isNullOrUndefined} from 'util';
+import {AudioviewerConfig} from '../../core/component/audioviewer/config/av.config';
+import {CircleLoupeComponent} from '../../core/component/circleloupe/circleloupe.component';
 
 @Component({
   selector: 'app-signal-gui',
   templateUrl: './linear-editor.component.html',
   styleUrls: ['./linear-editor.component.css']
 })
-export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
+export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
   public static editorname = 'Linear Editor';
 
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
@@ -45,6 +57,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   public top_selected = false;
   private factor = 6;
 
+  public loupe_settings: AudioviewerConfig;
   public mini_loupecoord: any = {
     component: 'viewer',
     x: 0,
@@ -95,24 +108,30 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.viewer.Settings.shortcuts_enabled = true;
     this.viewer.Settings.boundaries.readonly = false;
     this.viewer.Settings.justify_signal_height = true;
+    this.viewer.round_values = true;
+
+    this.loupe_settings = new AudioviewerConfig();
+    this.loupe_settings.shortcuts = this.keyMap.register('Loupe', this.loupe_settings.shortcuts);
+    this.loupe_settings.shortcuts.play_pause.keys.mac = 'SHIFT + SPACE';
+    this.loupe_settings.shortcuts.play_pause.keys.pc = 'SHIFT + SPACE';
+    this.loupe_settings.shortcuts.play_pause.focusonly = false;
+    this.loupe_settings.shortcuts.step_backwardtime = null;
+    this.loupe_settings.shortcuts.step_backward.keys.mac = 'SHIFT + ENTER';
+    this.loupe_settings.shortcuts.step_backward.keys.pc = 'SHIFT + ENTER';
+    this.loupe_settings.justify_signal_height = true;
+    this.loupe_settings.round_values = false;
 
     this.editor.Settings.markers = this.transcrService.guidelines.markers;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
-
-    this.loupe.Settings.shortcuts = this.keyMap.register('Loupe', this.loupe.Settings.shortcuts);
-    this.loupe.Settings.shortcuts.play_pause.keys.mac = 'SHIFT + SPACE';
-    this.loupe.Settings.shortcuts.play_pause.keys.pc = 'SHIFT + SPACE';
-    this.loupe.Settings.shortcuts.play_pause.focusonly = false;
     this.editor.Settings.disabled_keys.push('SHIFT + SPACE');
-    this.loupe.Settings.shortcuts.step_backwardtime = null;
-    this.loupe.Settings.shortcuts.step_backward.keys.mac = 'SHIFT + ENTER';
-    this.loupe.Settings.shortcuts.step_backward.keys.pc = 'SHIFT + ENTER';
-    this.loupe.Settings.justify_signal_height = true;
 
+
+    /*
     this.miniloupe.Settings.shortcuts_enabled = false;
     this.miniloupe.Settings.boundaries.enabled = false;
     this.miniloupe.Settings.justify_signal_height = false;
-
+    this.miniloupe.loupe.viewer.round_values = false;
+*/
 
     this.subscrmanager.add(this.transcrService.currentlevel.segments.onsegmentchange.subscribe(
       ($event) => {
@@ -125,11 +144,6 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     ));
 
-    this.subscrmanager.add(this.loupe.viewer.alerttriggered.subscribe((result) => {
-        this.msg.showMessage(result.type, result.message);
-      }
-    ));
-
     this.subscrmanager.add(this.viewer.alerttriggered.subscribe(
       (result) => {
         this.msg.showMessage(result.type, result.message);
@@ -139,7 +153,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscrmanager.add(this.keyMap.onkeydown.subscribe(
       (obj) => {
         const event = obj.event;
-        if (this.viewer.focused || this.loupe.focused) {
+        if (this.viewer.focused || (!isNullOrUndefined(this.loupe) && this.loupe.focused)) {
           if (event.key === '+') {
             this.factor = Math.min(12, this.factor + 1);
             this.miniloupe.zoomY = Math.max(1, this.factor);
@@ -147,7 +161,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
             if (this.viewer.focused) {
               this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
                 this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
-            } else if (this.loupe.focused) {
+            } else if (!isNullOrUndefined(this.loupe) && this.loupe.focused) {
               this.changeArea(this.audiochunk_loupe, this.loupe.viewer, this.mini_loupecoord,
                 this.viewer.MouseCursor.timePos.samples, this.loupe.MouseCursor.relPos.x, this.factor);
             }
@@ -158,7 +172,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
               if (this.viewer.focused) {
                 this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
                   this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
-              } else if (this.loupe.focused) {
+              } else if (!isNullOrUndefined(this.loupe) && this.loupe.focused) {
                 this.changeArea(this.audiochunk_loupe, this.loupe.viewer, this.mini_loupecoord,
                   this.viewer.MouseCursor.timePos.samples, this.loupe.MouseCursor.relPos.x, this.factor);
               }
@@ -168,6 +182,9 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     ));
     LinearEditorComponent.initialized.emit();
+  }
+
+  ngOnChanges(obj: SimpleChanges) {
   }
 
   ngOnDestroy() {
@@ -230,12 +247,17 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       } else {
         this.top_selected = false;
       }
-      this.loupe.update();
     }
   }
 
+  onAlertTriggered(result) {
+    this.msg.showMessage(result.type, result.message);
+  }
+
   onSegmentChange() {
-    this.loupe.update();
+    if (!isNullOrUndefined(this.loupe)) {
+      this.loupe.update();
+    }
     this.viewer.update();
     this.saving = false;
   }
@@ -288,7 +310,6 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       setTimeout(() => {
         this.audiochunk_down.destroy();
         this.audiochunk_down = new AudioChunk(selection, this.audiomanager);
-        this.loupe.update();
       }, 100);
     });
   }

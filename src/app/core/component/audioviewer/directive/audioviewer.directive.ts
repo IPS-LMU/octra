@@ -16,5 +16,4 @@ export class AudioviewerDirective {
   changeAttr(attr: string, val: string) {
     this.renderer.setElementAttribute(this.elementRef.nativeElement, attr, val);
   }
-
 }

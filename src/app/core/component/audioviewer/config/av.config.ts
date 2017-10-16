@@ -4,7 +4,7 @@ export class AudioviewerConfig {
   public justify_signal_height = true;
   public cropping = 'none';
   public lineheight = 150;
-  public backgroundcolor = 'rgb(248, 248, 248)';
+  public backgroundcolor = 'rgb(255, 248, 248)';
   public margin: {
     top: number,
     right: number,
@@ -56,7 +56,7 @@ export class AudioviewerConfig {
   };
 
   public selection: {
-    enabled: true,
+    enabled: boolean,
     color: string
   } = {
     enabled: true,
@@ -183,4 +183,5 @@ export class AudioviewerConfig {
   public step_width_ratio = 0.0226;
   public scrollable = false;
   public type: string;
+  public round_values = true;
 }

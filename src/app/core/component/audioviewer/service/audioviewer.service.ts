@@ -49,7 +49,6 @@ export class AudioviewerService extends AudioComponentService {
   private _settings: AudioviewerConfig;
 
   private subscrmanager: SubscriptionManager;
-  public round_values = true;
 
   // LINES
   private Lines: Line[] = [];
@@ -141,12 +140,19 @@ export class AudioviewerService extends AudioComponentService {
       this.AudioPxWidth = innerWidth;
     }
 
-    // initialize the default values
-    this.audioTCalculator = new AudioTimeCalculator(this.audiomanager.ressource.info.samplerate,
-      this.audiochunk.time.duration, this.AudioPxWidth);
-    this.Mousecursor = new AVMousePos(0, 0, 0, new AudioTime(0, this.audiomanager.ressource.info.samplerate));
-    this.MouseClickPos = new AVMousePos(0, 0, 0, new AudioTime(0, this.audiomanager.ressource.info.samplerate));
-    this.PlayCursor = new PlayCursor(0, new AudioTime(0, this.audiomanager.ressource.info.samplerate), innerWidth);
+    if (this.AudioPxWidth > 0) {
+      // initialize the default values
+      this.audioTCalculator = new AudioTimeCalculator(this.audiomanager.ressource.info.samplerate,
+        this.audiochunk.time.duration, this.AudioPxWidth);
+      this.Mousecursor = new AVMousePos(0, 0, 0, new AudioTime(0, this.audiomanager.ressource.info.samplerate));
+      this.MouseClickPos = new AVMousePos(0, 0, 0, new AudioTime(0, this.audiomanager.ressource.info.samplerate));
+      this.PlayCursor = new PlayCursor(0, new AudioTime(0, this.audiomanager.ressource.info.samplerate), innerWidth);
+    } else {
+      return new Promise<void>((resolve, reject) => {
+        console.error('audio px is 0.');
+        resolve();
+      });
+    }
 
     return this.afterChannelInititialized(innerWidth);
   }
@@ -248,7 +254,7 @@ export class AudioviewerService extends AudioComponentService {
       }
     ]);
 
-    return this.taskmanager.run('compute', [w, h, channel, this.round_values]);
+    return this.taskmanager.run('compute', [w, h, channel, this.Settings.round_values]);
   }
 
   /**
@@ -677,7 +683,6 @@ export class AudioviewerService extends AudioComponentService {
           width: w,
           height: this.Settings.lineheight
         };
-
       } else {
         this.addLine(0, w, this.Settings.lineheight);
       }
@@ -717,11 +722,7 @@ export class AudioviewerService extends AudioComponentService {
       y: this.Settings.margin.top
     };
 
-    // get new y coordinate
-    for (let i = 0; i < this.Lines.length; i++) {
-      position.y += this.Lines[i].Size.height + this.Settings.margin.bottom;
-    }
-
+    position.y += (this.Lines.length > line_num - 1 && !isNullOrUndefined(this.Lines[line_num - 1])) ? this.Lines[line_num - 1].Pos.y : 0;
     const line_obj = new Line(line_num, size, position);
     this.Lines.push(line_obj);
   }

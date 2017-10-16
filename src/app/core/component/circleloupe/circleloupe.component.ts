@@ -51,34 +51,23 @@ export class CircleLoupeComponent implements AfterViewInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes.hasOwnProperty('height')) {
       if (!isNullOrUndefined(this.loupe)) {
-        this.loupe.Settings.height = changes.height.currentValue;
-        if (isNullOrUndefined(this.loupe.Settings.height) || this.loupe.Settings.height < 1) {
-          this.loupe.Settings.height = 80;
+        this.loupe.Settings.lineheight = changes.height.currentValue;
+        if (isNullOrUndefined(this.loupe.Settings.lineheight) || this.loupe.Settings.lineheight < 1) {
+          this.loupe.Settings.lineheight = 80;
         }
         if (this.initialized) {
           this.loupe.update();
         }
       }
     }
-    if (changes.hasOwnProperty('width')) {
-      this.loupe.Settings.width = changes.width.currentValue;
-      if (isNullOrUndefined(this.loupe.Settings.width) || this.loupe.Settings.width < 1) {
-        this.loupe.Settings.width = 80;
-      }
-      if (this.initialized) {
-        this.loupe.update();
-      }
-    }
   }
 
   ngAfterViewInit() {
     this.loupe.Settings.multi_line = false;
-    this.loupe.Settings.height = this.height;
     this.loupe.Settings.justify_signal_height = false;
     this.loupe.Settings.boundaries.enabled = true;
     this.loupe.Settings.disabled_keys = [];
     this.loupe.Settings.type = 'line';
-    this.loupe.Settings.width = this.width;
     this.loupe.Settings.backgroundcolor = 'white';
     this.loupe.Settings.frame.color = 'transparent';
     this.loupe.Settings.cropping = 'circle';
@@ -86,10 +75,12 @@ export class CircleLoupeComponent implements AfterViewInit, OnChanges {
     this.loupe.Settings.margin.top = 0;
     this.loupe.Settings.margin.right = 0;
     this.loupe.Settings.margin.bottom = 0;
+    this.loupe.Settings.lineheight = this.height;
     this.loupe.Settings.selection.enabled = false;
     this.loupe.Settings.shortcuts_enabled = false;
     this.loupe.Settings.boundaries.enabled = true;
     this.loupe.Settings.timeline.enabled = false;
+    this.loupe.viewer.round_values = false;
     this.loupe.name = 'circleloupe';
     this.loupe.update();
 

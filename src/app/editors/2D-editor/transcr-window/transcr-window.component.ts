@@ -101,6 +101,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.special_markers.boundary = true;
     this.loupe.viewer.Settings.justify_signal_height = true;
+    this.loupe.viewer.round_values = false;
     const segments = this.transcrService.currentlevel.segments;
     this.temp_segments = segments.clone();
     this.subscrmanager.add(this.editor.loaded.subscribe(
@@ -138,9 +139,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   ngAfterViewInit() {
     this.loupe.Settings.boundaries.readonly = true;
     this.loupe.zoomY = 6;
+    this.audiochunk.startpos = this.audiochunk.time.start.clone();
 
     setTimeout(() => {
-      this.audiochunk.startpos = this.audiochunk.time.start.clone();
       this.loupe.viewer.startPlayback();
     }, 500);
   }

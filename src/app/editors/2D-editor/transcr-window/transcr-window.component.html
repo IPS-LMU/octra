@@ -39,9 +39,9 @@
 
     ></app-audio-navigation>
     <app-loupe #loupe id="loupe"
-               style="height:150px;"
                (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
                [audiochunk]="audiochunk"
+               [height]="150"
     ></app-loupe>
     <app-transcr-editor #editor id="trancr"
                         (marker_insert)="onMarkerInsert($event)"

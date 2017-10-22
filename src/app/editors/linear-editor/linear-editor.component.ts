@@ -56,6 +56,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
   public segmentselected = false;
   public top_selected = false;
   private factor = 6;
+  private mouseTimer = null;
 
   public loupe_settings: AudioviewerConfig;
   public mini_loupecoord: any = {
@@ -125,13 +126,10 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.disabled_keys.push('SHIFT + SPACE');
 
-
-    /*
     this.miniloupe.Settings.shortcuts_enabled = false;
     this.miniloupe.Settings.boundaries.enabled = false;
-    this.miniloupe.Settings.justify_signal_height = false;
+    this.miniloupe.Settings.height = 160;
     this.miniloupe.loupe.viewer.round_values = false;
-*/
 
     this.subscrmanager.add(this.transcrService.currentlevel.segments.onsegmentchange.subscribe(
       ($event) => {
@@ -263,6 +261,10 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
   }
 
   onMouseOver(cursor: AVMousePos) {
+    if (!isNullOrUndefined(this.mouseTimer)) {
+      window.clearTimeout(this.mouseTimer);
+    }
+
     this.mini_loupecoord.component = this.viewer;
 
     if (!this.audiomanager.audioplaying && this.appStorage.playonhover) {
@@ -275,12 +277,15 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
     }
 
     const a = this.viewer.getLocation();
-    this.mini_loupecoord.y = a.y - this.viewer.Settings.lineheight - this.miniloupe.Settings.height;
+    this.mini_loupecoord.y = this.viewer.Settings.lineheight;
     if (this.appStorage.uselocalmode) {
       this.mini_loupecoord.y += 24;
     }
-    this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
-      this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
+
+    this.mouseTimer = window.setTimeout(() => {
+      this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
+        this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
+    }, 20);
   }
 
   private changeArea(audiochunk: AudioChunk, viewer: AudioviewerComponent, coord: any,
@@ -289,7 +294,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
       * this.audiomanager.ressource.info.samplerate) / factor;
 
     if (cursor && relX > -1) {
-      coord.x = ((relX) ? relX - 40 : 0);
+      coord.x = ((relX) ? relX - 80 : 0);
       const half_rate = Math.round(range);
       const start = (cursor > half_rate)
         ? new AudioTime(cursor - half_rate, this.audiomanager.ressource.info.samplerate)

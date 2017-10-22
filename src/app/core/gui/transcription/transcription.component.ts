@@ -214,13 +214,12 @@ export class TranscriptionComponent implements OnInit,
       }
     ));
 
-    if (this.appStorage.logging) {
-      this.subscrmanager.add(
-        this.uiService.afteradd.subscribe((elem) => {
+    this.subscrmanager.add(
+      this.uiService.afteradd.subscribe((elem) => {
+        if (this.appStorage.logging) {
           this.appStorage.saveLogItem(elem.getDataClone());
-        }));
-    }
-
+        }
+      }));
     this.changeEditor(this.interface);
     this.changeDetecorRef.detectChanges();
 

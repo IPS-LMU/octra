@@ -455,6 +455,8 @@ export class AppStorageService {
       this._idb.save('logs', log.timestamp, log).catch((err) => {
         console.error(err);
       });
+    } else {
+      console.error('Can\'t save log because it is null.');
     }
   }
 

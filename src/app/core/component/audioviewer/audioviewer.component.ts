@@ -42,6 +42,10 @@ import {AudioviewerConfig} from './index';
 })
 
 export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
+  get initialized(): boolean {
+    return this._initialized;
+  }
+
   get viewRect(): { x: number; y: number; w: number; h: number; lines: { start: number; end: number } } {
     return this._viewRect;
   }
@@ -136,6 +140,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   private height = 0;
   private _innerWidth = 0;
   private oldInnerWidth = 0;
+  private _initialized = false;
 
   private _viewRect: {
     x: number, y: number, w: number, h: number, lines: {
@@ -354,7 +359,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
               this.drawPlayCursor();
               this.drawCursor(this.av.Mousecursor.line);
             }
-
+            this._initialized = true;
           } else {
             console.error('0 lines?');
           }

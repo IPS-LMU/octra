@@ -1,14 +1,16 @@
-<div style="width:100px;" id="">
-    <app-circleloupe #miniloupe [ngStyle]="{
+<app-circleloupe #miniloupe [ngStyle]="{
 'position':'absolute',
 'margin-left':mini_loupecoord.x + 'px',
 'margin-top':mini_loupecoord.y + 'px',
-'width' : '80px',
-'height': '80px',
+'width' : '160px',
+'height': '160px',
+'display': 'flex',
 'z-index':'900',
-'visibility': (miniloupe_hidden) ? 'hidden' : 'inherit'}"
-                     [audiochunk]="audiochunk_loupe"></app-circleloupe>
-</div>
+'visibility': (miniloupe_hidden) ? 'hidden' : 'inherit',
+'flex': 'auto',
+'flex-direction': 'column'}"
+                 [audiochunk]="audiochunk_loupe" [height]="160">
+</app-circleloupe>
 <app-audio-navigation #nav
                       (buttonclick)="onButtonClick($event)"
                       (volumechange)="onVolumeChange($event)"

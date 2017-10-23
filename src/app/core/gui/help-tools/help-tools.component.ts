@@ -27,9 +27,9 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
   clearAllData() {
     if (this.appStorage.uselocalmode) {
       this.appStorage.clearAnnotationData().then(() => {
-        this.appStorage.clearLoggingData();
+        this.appStorage.clearOptions();
       }).then(() => {
-        this.appStorage.clearLocalStorage();
+        this.appStorage.clearLoggingData();
       }).then(
         () => {
           alert('All cleared. The app will be reloaded.');
@@ -41,7 +41,7 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
         this.appStorage.clearAnnotationData().then(() => {
           this.appStorage.clearLoggingData();
         }).then(() => {
-          this.appStorage.clearLocalStorage();
+          this.appStorage.clearOptions();
         }).then(
           () => {
             alert('All cleared. The app will be reloaded.');

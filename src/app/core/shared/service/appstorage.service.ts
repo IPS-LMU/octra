@@ -692,6 +692,10 @@ export class AppStorageService {
       });
   }
 
+  public clearOptions(): Promise<any> {
+    return this.clearIDBTable('options');
+  }
+
   public changeAnnotationLevel(tiernum: number, level: OLevel): Promise<any> {
     if (!isNullOrUndefined(level)) {
       if (this._annotation.length > tiernum) {

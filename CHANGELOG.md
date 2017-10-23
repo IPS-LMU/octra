@@ -1,6 +1,21 @@
 # Change Log
 
-## [1.2.0](https://github.com/IPS-LMU/octra/tree/1.2.0) (2017-09-07)
+## [v1.2.1](https://github.com/IPS-LMU/octra/tree/v1.2.1) (2017-10-23)
+[Full Changelog](https://github.com/IPS-LMU/octra/compare/1.2.0...v1.2.1)
+
+**Implemented enhancements:**
+
+- audioviewer: use web worker to compute display data, improved algorithms
+- 2D-Editor: improved performance and stability
+- Linear Editor: improved performance and stability
+- Login GUI: improved the way to switch between the local and online mode
+- Help Tools: OCTRA-URL/help-tools allows to easily remove data or (hard) reload OCTRA
+
+**Fixed bugs:**
+
+- audioviewer does not draw any signal in some cases [\#63](https://github.com/IPS-LMU/octra/issues/63)
+
+## [1.2.0](https://github.com/IPS-LMU/octra/tree/1.2.0) (2017-09-26)
 [Full Changelog](https://github.com/IPS-LMU/octra/compare/v1.1.0...1.2.0)
 
 **Implemented enhancements:**

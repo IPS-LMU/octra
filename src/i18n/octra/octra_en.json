@@ -169,7 +169,10 @@
     "old file found": "There is data from a previous transcription available. If you would like to continue your work, just drag & drop the following file to the gray box:<br/><br/>{{file_label}}",
     "online mode data warning": "There is local data available that was created in local mode. If you want to continue in online mode this data will be overwritten.",
     "offline mode data warning": "There is local data available that was created in online mode. If you want to continue in local mode this data will be overwritten.",
-    "online mode continue": "Old data found! To continue make sure to set the login data to: {{member_id}} , {{member_project}}, {{member_jobno}}"
+    "online mode continue": "Old data found! To continue make sure to set the login data to: {{member_id}} , {{member_project}}, {{member_jobno}}",
+    "last used": "recently used",
+    "login and remove": "Remove local mode data & login",
+    "local and remove": "Remove online mode data & continue"
   },
   "dropzone": {
     "drag&drop here": "Drag & Drop audio file (*.wav) (+ optional file for import) here or click here.",

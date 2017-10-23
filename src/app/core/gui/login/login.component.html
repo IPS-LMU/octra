@@ -10,27 +10,15 @@
         <div #onlinemode id='onlinemode' class="col-md-6 panel panel-default" style="padding:40px;">
             <p *ngIf="!apc.octra.responsive.enabled && !valid_size" class="warning"
                [innerHTML]="'browser.small window width' | translate">
-
             </p>
             <section>
-                <h4>{{ 'login.online mode' | translate}}</h4>
+                <h4 [ngClass]="{
+                'bg-success': appStorage.uselocalmode == false
+                }">{{ 'login.online mode' | translate}}</h4>
                 <div *ngIf="!apc.octra.login.enabled" id="login-disabled">
                     {{'login.online mode disabled' | translate}}
                 </div>
                 <div *ngIf="apc.octra.login.enabled">
-                    <p class="bg-danger" *ngIf="appStorage.uselocalmode == true && appStorage.sessionfile !== null">
-                        {{"login.online mode data warning" | translate}}
-                    </p>
-                    <p class="bg-warning"
-                       *ngIf="  appStorage.user !== undefined && appStorage.user !== null &&
-                                appStorage.user.id != null && appStorage.audio_url != null &&
-                                appStorage.uselocalmode == false"
-                    >
-                        {{"login.online mode continue" |
-                        translate:{member_id:appStorage.user.id,
-                        member_project:appStorage.user.project,member_jobno:appStorage.user.jobno}
-                        }}
-                    </p>
                     <form class="form-horizontal" (ngSubmit)="onSubmit(f)" #f="ngForm">
                         <fieldset>
                             <div>
@@ -69,10 +57,18 @@
                                     />
                                 </div>
                                 <div class="form-group">
-                                    <input class="form-control" type="submit" id="login-submit"
-                                           class="btn btn-raised btn-primary"
+                                    <input *ngIf="!appStorage.uselocalmode" class="form-control" type="submit"
+                                           id="login-submit"
+                                           class="btn btn-raised btn-primary" [ngClass]="{
+                                           'btn-danger': (appStorage.uselocalmode && appStorage.sessionfile !== null)
+                                           }"
                                            [disabled]="!f.valid"
                                            name="login-submit" value="{{'general.login' | translate}}"/>
+                                    <input *ngIf="appStorage.uselocalmode && appStorage.sessionfile !== null"
+                                           class="form-control" type="submit" id="login-submit"
+                                           class="btn btn-raised btn-danger"
+                                           [disabled]="!f.valid"
+                                           name="login-submit" value="{{'login.login and remove' | translate}}"/>
                                 </div>
                             </div>
                         </fieldset>
@@ -83,27 +79,33 @@
         </div>
         <div #localmode id='localmode' class="col-md-6 panel panel-default" style="padding:40px;">
             <section>
-                <h4>{{'login.local mode' | translate}}
+                <h4 [ngClass]="{
+                'bg-success': appStorage.uselocalmode
+                }">{{'login.local mode' | translate}}
                 </h4>
                 <div>
-                    <p class="bg-danger"
-                       *ngIf="!(appStorage.user === undefined || appStorage.user === null)
-                       && appStorage.user.id !== '-1' && appStorage.user.id !== null">
-                        {{"login.offline mode data warning" | translate}}
-                    </p>
-                    <p class="bg-warning" *ngIf="appStorage.sessionfile !== null"
+                    <p class="bg-warning" *ngIf="appStorage.uselocalmode && appStorage.sessionfile !== null"
                        [innerHTML]="'login.old file found' | translate:{file_label: getDropzoneFileString(sessionfile)}">
                     </p>
                     <app-octra-dropzone #dropzone></app-octra-dropzone>
-                    <input *ngIf="getFileStatus() != 'new'" [disabled]="!(getFileStatus() == 'start')" type="submit"
+                    <input *ngIf="(appStorage.uselocalmode === null || appStorage.uselocalmode) && getFileStatus() != 'new'"
+                           [disabled]="!(getFileStatus() == 'start')" type="submit"
                            id="offline-submit"
                            class="btn btn-raised btn-primary" value="{{'transcription.start' | translate}}"
                            (click)="onOfflineSubmit()"/>
 
-                    <input *ngIf="getFileStatus() == 'new'" id="offline-delete-btn"
+                    <input *ngIf="appStorage.uselocalmode && getFileStatus() == 'new'"
+                           id="offline-delete-btn"
                            class="btn btn-raised btn-danger"
                            (click)="modService.show('transcription_delete', '', {ok: newTranscription})"
                            value="{{'transcription.new' |translate}}"/>
+                    <input *ngIf="(appStorage.uselocalmode !== null && appStorage.uselocalmode !== undefined) &&
+                    !appStorage.uselocalmode && (getFileStatus() != 'new' || getFileStatus() != 'start')"
+                           id="offline-delete-btn"
+                           [disabled]="(getFileStatus() !== 'new' && getFileStatus() !== 'start')"
+                           class="btn btn-raised btn-danger"
+                           (click)="onOfflineSubmit()"
+                           value="{{'login.local and remove' |translate}}"/>
                 </div>
             </section>
         </div>

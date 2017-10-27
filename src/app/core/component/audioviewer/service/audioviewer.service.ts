@@ -740,14 +740,16 @@ export class AudioviewerService extends AudioComponentService {
   public refresh(): Promise<any> {
     return new Promise<void>(
       (resolve, reject) => {
-        const start = Date.now();
-        this._minmaxarray = this.computeDisplayData(this.AudioPxWidth / 2, this.Settings.lineheight, this.audiochunk.audiomanager.channel,
-          {
-            start: this.audiochunk.selection.start.samples,
-            end: this.audiochunk.selection.end.samples
-          });
-        console.log('time + ' + (Date.now() - start));
-        resolve();
+        try {
+          this._minmaxarray = this.computeDisplayData(this.AudioPxWidth / 2, this.Settings.lineheight, this.audiochunk.audiomanager.channel,
+            {
+              start: this.audiochunk.selection.start.samples,
+              end: this.audiochunk.selection.end.samples
+            });
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
       }
     );
   }
@@ -763,8 +765,7 @@ export class AudioviewerService extends AudioComponentService {
     width = Math.floor(width);
 
     if (_interval.start !== null && _interval.end !== null && _interval.end >= _interval.start) {
-      let min_maxarray = [],
-        len = _interval.end - _interval.start;
+      const min_maxarray = [], len = _interval.end - _interval.start;
 
       let min = 0,
         max = 0,
@@ -772,9 +773,9 @@ export class AudioviewerService extends AudioComponentService {
         offset = 0,
         maxindex = 0;
 
-      let xZoom = len / width;
+      const xZoom = len / width;
 
-      let yZoom = height / 2;
+      const yZoom = height / 2;
 
       for (let i = 0; i < width; i++) {
         offset = Math.round(i * xZoom) + _interval.start;

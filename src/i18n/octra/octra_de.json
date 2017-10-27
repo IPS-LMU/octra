@@ -222,6 +222,7 @@
     "easy mode": "Einfacher Modus",
     "play on hover": "Audiowiedergabe bei Mausbewegung",
     "follow playcursor": "Abspielposition folgen",
-    "logging": "Aktionen protkollieren"
+    "logging": "Aktionen protkollieren",
+    "show loupe": "Lupe anzeigen"
   }
 }

@@ -371,7 +371,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
         if (!isNullOrUndefined(this.audiomanager.channel)) {
           if (computeDisplayData) {
-            console.log('refresh ' + this.name);
             this.av.refresh().then(() => {
               draw();
             }).catch((err) => {

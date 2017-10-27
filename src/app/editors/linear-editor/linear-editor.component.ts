@@ -126,11 +126,6 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.disabled_keys.push('SHIFT + SPACE');
 
-    this.miniloupe.Settings.shortcuts_enabled = false;
-    this.miniloupe.Settings.boundaries.enabled = false;
-    this.miniloupe.Settings.height = 160;
-    this.miniloupe.loupe.viewer.round_values = false;
-
     this.subscrmanager.add(this.transcrService.currentlevel.segments.onsegmentchange.subscribe(
       ($event) => {
         if (!this.saving) {
@@ -150,29 +145,31 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
 
     this.subscrmanager.add(this.keyMap.onkeydown.subscribe(
       (obj) => {
-        const event = obj.event;
-        if (this.viewer.focused || (!isNullOrUndefined(this.loupe) && this.loupe.focused)) {
-          if (event.key === '+') {
-            this.factor = Math.min(12, this.factor + 1);
-            this.miniloupe.zoomY = Math.max(1, this.factor);
+        if (this.appStorage.show_loupe) {
+          const event = obj.event;
+          if (this.viewer.focused || (!isNullOrUndefined(this.loupe) && this.loupe.focused)) {
+            if (event.key === '+') {
+              this.factor = Math.min(12, this.factor + 1);
+              this.miniloupe.zoomY = Math.max(1, this.factor);
 
-            if (this.viewer.focused) {
-              this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
-                this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
-            } else if (!isNullOrUndefined(this.loupe) && this.loupe.focused) {
-              this.changeArea(this.audiochunk_loupe, this.loupe.viewer, this.mini_loupecoord,
-                this.viewer.MouseCursor.timePos.samples, this.loupe.MouseCursor.relPos.x, this.factor);
-            }
-          } else if (event.key === '-') {
-            if (this.factor > 3) {
-              this.factor = Math.max(1, this.factor - 1);
-              this.miniloupe.zoomY = Math.max(4, this.factor);
               if (this.viewer.focused) {
                 this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
                   this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
               } else if (!isNullOrUndefined(this.loupe) && this.loupe.focused) {
                 this.changeArea(this.audiochunk_loupe, this.loupe.viewer, this.mini_loupecoord,
                   this.viewer.MouseCursor.timePos.samples, this.loupe.MouseCursor.relPos.x, this.factor);
+              }
+            } else if (event.key === '-') {
+              if (this.factor > 3) {
+                this.factor = Math.max(1, this.factor - 1);
+                this.miniloupe.zoomY = Math.max(4, this.factor);
+                if (this.viewer.focused) {
+                  this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
+                    this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
+                } else if (!isNullOrUndefined(this.loupe) && this.loupe.focused) {
+                  this.changeArea(this.audiochunk_loupe, this.loupe.viewer, this.mini_loupecoord,
+                    this.viewer.MouseCursor.timePos.samples, this.loupe.MouseCursor.relPos.x, this.factor);
+                }
               }
             }
           }
@@ -183,6 +180,15 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
   }
 
   ngOnChanges(obj: SimpleChanges) {
+    console.log(obj);
+    if (!isNullOrUndefined(obj.mini_loupe)) {
+      if (obj.mini_loupe.isFirstChange() && this.appStorage.show_loupe) {
+        this.miniloupe.Settings.shortcuts_enabled = false;
+        this.miniloupe.Settings.boundaries.enabled = false;
+        this.miniloupe.Settings.height = 160;
+        this.miniloupe.loupe.viewer.round_values = false;
+      }
+    }
   }
 
   ngOnDestroy() {
@@ -224,7 +230,10 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
 
   ngAfterViewInit() {
     this.cd.detectChanges();
-    this.miniloupe.zoomY = this.factor;
+    if (this.appStorage.show_loupe) {
+      this.miniloupe.zoomY = this.factor;
+    }
+
     this.subscrmanager.add(
       this.transcrService.segmentrequested.subscribe(
         (segnumber: number) => {

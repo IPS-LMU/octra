@@ -329,6 +329,18 @@
                                     </div>
                                 </td>
                             </tr>
+                            <tr>
+                                <td><label for="playonhover">{{"settings.show loupe" | translate}}:</label></td>
+                                <td>
+                                    <div class="togglebutton">
+                                        <label>
+                                            <input (click)="toggleSettings('show_loupe')"
+                                                   [checked]="appStorage.show_loupe"
+                                                   id="show_loupe" type="checkbox">
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
                         </table>
                     </div>
                 </li>

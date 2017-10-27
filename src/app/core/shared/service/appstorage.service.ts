@@ -613,6 +613,10 @@ export class AppStorageService {
         {
           attribute: '_logging',
           key: 'logging'
+        },
+        {
+          attribute: '_show_loupe',
+          key: 'show_loupe'
         }
       ]
     ).then(() => {

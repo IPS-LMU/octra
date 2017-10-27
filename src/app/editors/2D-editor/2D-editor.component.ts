@@ -225,7 +225,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   ngAfterViewInit() {
-    if (this.audiochunk_lines.channel) {
+    if (this.audiomanager.channel) {
       this.viewer.initialize();
     }
 
@@ -303,7 +303,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     this.mouseTimer = window.setTimeout(() => {
       this.changeArea(this.loupe, this.miniloupe, this.factor);
       this.mousestate = 'ended';
-    }, 20);
+    }, 50);
   }
 
   onSegmentChange($event) {

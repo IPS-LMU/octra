@@ -274,6 +274,10 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
       if (!obj.audiochunk.firstChange) {
         if (!isNullOrUndefined(current)) {
+          if (!isNullOrUndefined(obj.audiochunk.previousValue)) {
+            // audiochunk already exists
+            (<AudioChunk> obj.audiochunk.previousValue).destroy();
+          }
           if (!this.av.Settings.justify_signal_height) {
             const zoomY = this.av.zoomY;
             // audiochunk changed
@@ -365,8 +369,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           }
         };
 
-        if (!isNullOrUndefined(this.av.channel)) {
+        if (!isNullOrUndefined(this.audiomanager.channel)) {
           if (computeDisplayData) {
+            console.log('refresh ' + this.name);
             this.av.refresh().then(() => {
               draw();
             }).catch((err) => {

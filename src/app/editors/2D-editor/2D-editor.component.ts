@@ -172,15 +172,17 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
     this.subscrmanager.add(this.keyMap.onkeydown.subscribe(
       (obj) => {
-        const event = obj.event;
-        if (this.viewer.focused) {
-          if (event.key === '+') {
-            this.factor = Math.min(20, this.factor + 1);
-            this.changeArea(this.loupe, this.miniloupe, this.factor);
-          } else if (event.key === '-') {
-            if (this.factor > 3) {
-              this.factor = Math.max(1, this.factor - 1);
+        if (this.appStorage.show_loupe) {
+          const event = obj.event;
+          if (this.viewer.focused) {
+            if (event.key === '+') {
+              this.factor = Math.min(20, this.factor + 1);
               this.changeArea(this.loupe, this.miniloupe, this.factor);
+            } else if (event.key === '-') {
+              if (this.factor > 3) {
+                this.factor = Math.max(1, this.factor - 1);
+                this.changeArea(this.loupe, this.miniloupe, this.factor);
+              }
             }
           }
         }
@@ -237,7 +239,9 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       )
     );
 
-    this.loupe.zoomY = this.factor;
+    if (this.appStorage.show_loupe) {
+      this.loupe.zoomY = this.factor;
+    }
     this.viewer.update(true);
   }
 
@@ -299,11 +303,13 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       }, true);
     }
 
-    this.changePosition(this.miniloupe);
-    this.mouseTimer = window.setTimeout(() => {
-      this.changeArea(this.loupe, this.miniloupe, this.factor);
-      this.mousestate = 'ended';
-    }, 50);
+    if (this.appStorage.show_loupe) {
+      this.changePosition(this.miniloupe);
+      this.mouseTimer = window.setTimeout(() => {
+        this.changeArea(this.loupe, this.miniloupe, this.factor);
+        this.mousestate = 'ended';
+      }, 50);
+    }
   }
 
   onSegmentChange($event) {
@@ -335,7 +341,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         ? new AudioTime(cursor.timePos.samples + half_rate, this.audiomanager.ressource.info.samplerate)
         : this.audiomanager.ressource.info.duration.clone();
 
-      this.loupe.zoomY = factor;
+      loup.zoomY = factor;
       if (start && end) {
         this.audiochunk_loupe = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
       }

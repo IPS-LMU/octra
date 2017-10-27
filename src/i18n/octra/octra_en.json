@@ -224,6 +224,7 @@
     "easy mode": "Easy Mode",
     "play on hover": "Play on hover",
     "follow playcursor": "Follow playcursor",
-    "logging": "Log user actions"
+    "logging": "Log user actions",
+    "show loupe": "Show loupe"
   }
 }

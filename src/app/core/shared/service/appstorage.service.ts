@@ -42,6 +42,16 @@ export class OIDBLink {
 
 @Injectable()
 export class AppStorageService {
+  get show_loupe(): boolean {
+    return this._show_loupe;
+  }
+
+  set show_loupe(value: boolean) {
+    this._show_loupe = value;
+    this._idb.save('options', 'show_loupe', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
   get logging(): boolean {
     return this._logging;
   }
@@ -294,6 +304,7 @@ export class AppStorageService {
   private _version: string = null;
   private _interface: string = null;
   private _logging = false;
+  private _show_loupe = true;
 
   private _user: {
     id: string,

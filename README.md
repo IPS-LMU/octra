@@ -39,9 +39,9 @@ In a production environment you don't need to compile OCTRA again.
 
 ### Upgrade
 
-1. Duplicate and rename your octra directory (e.g. to 'octra_backup').
+1. Duplicate and rename your octra directory (e.g. to 'octra_backup') on your server.
 
-2. Download the new OCTRA release and upload the 'dist' folder to  your server and rename it to the same name like before (e.g. 'octra').
+2. Download the new OCTRA release and upload the 'dist' folder to your server next to the backup and rename it to the same name like before (e.g. 'octra').
 
 3. Copy your old appconfig.json and localmode folder to the new config directory.
 

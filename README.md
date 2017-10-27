@@ -35,11 +35,13 @@ In a production environment you don't need to compile OCTRA again.
 
 6. Change the baseref attribute in the index.html according to the url where your OCTRA installation is hosted.
 
+7. Test if OCTRA works and check the webconsole if all works fine. If there are no errors you can use OCTRA.
+
 ### Upgrade
 
-1. Duplicate and rename or octra directory (e.g. to 'octra_backup').
+1. Duplicate and rename your octra directory (e.g. to 'octra_backup').
 
-2. Download the new OCTRA release and copy the content of the 'dist' folder to a new directory on your server called the same as before.
+2. Download the new OCTRA release and upload the 'dist' folder to  your server and rename it to the same name like before (e.g. 'octra').
 
 3. Copy your old appconfig.json and localmode folder to the new config directory.
 
@@ -57,12 +59,13 @@ On the Development level OCTRA requires Node 6.9.0 or higher, together with NPM 
 
 Then you can install OCTRA:
 
-1. Go to your octra directory via Terminal (or GitBash on Windows)
-2. Call `` npm install ``
-3. Wait.
-4. Duplicate the file ``src/config/appconfig_sample.json`` and rename it to ``scr/config/appconfig.json``. In appconfig.json you can change the settings of your instance of OCTRA.
-5. After the installation you can call `` npm start `` to start the node server.
-6. After that please read the notice about the config files in the production use section
+1. Clone the octra repository.
+2. Go to the octra directory via Terminal (or GitBash on Windows).
+3. Call `` npm install ``.
+4. Wait.
+5. Duplicate the file ``src/config/appconfig_sample.json`` and rename it to ``scr/config/appconfig.json``. In appconfig.json you can change the settings of your instance of OCTRA.
+6. After the installation you can call `` npm start `` to start the node server.
+7. After that please read the notice about the config files in the production use section
 
 
 ## Documentation

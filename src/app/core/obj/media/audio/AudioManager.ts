@@ -9,6 +9,10 @@ import {AudioSelection} from './AudioSelection';
 import {AudioFormat} from './AudioFormats/AudioFormat';
 
 export class AudioManager {
+  get channel(): Float32Array {
+    return this._channel;
+  }
+
   get playonhover(): boolean {
     return this._playonhover;
   }
@@ -114,6 +118,8 @@ export class AudioManager {
   private chunks: AudioChunk[] = [];
   private _mainchunk: AudioChunk;
   private _playposition: AudioTime;
+  // only the Audiomanager may have the channel array
+  private _channel: Float32Array;
 
   private _javascriptNode = null;
 
@@ -367,6 +373,14 @@ export class AudioManager {
   public prepareAudioPlayBack() {
     this._gainNode = this._audiocontext.createGain();
     this._source = this.getSource();
+
+    // get channel data
+    if (isNullOrUndefined(this._channel) || this._channel.length === 0) {
+      this._channel = new Float32Array(this._ressource.audiobuffer.getChannelData(0));
+      // clear audiobuffer otherwise this would need to much memory space
+    } else {
+      console.log('audio manager already has channel data');
+    }
 
     this.loaded = true;
     this.afterloaded.emit({status: 'success', error: ''});

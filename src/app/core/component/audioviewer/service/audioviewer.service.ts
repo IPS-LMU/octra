@@ -57,8 +57,6 @@ export class AudioviewerService extends AudioComponentService {
   public overboundary = false;
 
   // AUDIO
-  // private durtime: AudioTime = null;
-  private _channel: Float32Array = null;
 
   private _zoomY = 1;
   private _zoomX = 1;
@@ -109,10 +107,6 @@ export class AudioviewerService extends AudioComponentService {
     this._settings = value;
   }
 
-  get channel(): Float32Array {
-    return this._channel;
-  }
-
   constructor(protected audio: AudioService,
               protected transcrService: TranscriptionService,
               private keyMap: KeymappingService,
@@ -131,7 +125,6 @@ export class AudioviewerService extends AudioComponentService {
     super.initialize(innerWidth, audiochunk);
 
     this.Lines = [];
-    this._channel = this.audiochunk.channel;
 
     if (this.Settings.multi_line) {
       this.AudioPxWidth = this.audiomanager.ressource.info.duration.seconds * this.Settings.pixel_per_sec;
@@ -197,64 +190,67 @@ export class AudioviewerService extends AudioComponentService {
    * @param h
    * @param channel
    */
-  computeDisplayData(w, h, channel): Promise<any> {
+  computeDisplayData(w, h, channel, interval: { start: number; end: number; }): Promise<any> {
     this.taskmanager = new TaskManager([
       {
         name: 'compute',
         do: (args) => {
-          var width = args[0], height = args[1], cha = args[2], round = args[3];
-
+          var width = args[0], height = args[1], cha = args[2], round = args[3], _interval = args[4];
           width = Math.floor(width);
 
-          var min_maxarray = [],
-            len = cha.length;
+          if (_interval.start !== null && _interval.end !== null && _interval.end >= _interval.start) {
+            var min_maxarray = [],
+              len = _interval.end - _interval.start;
 
-          var min = 0,
-            max = 0,
-            val = 0,
-            offset = 0,
-            maxindex = 0;
+            var min = 0,
+              max = 0,
+              val = 0,
+              offset = 0,
+              maxindex = 0;
 
-          var xZoom = len / width;
+            var xZoom = len / width;
 
-          var yZoom = height / 2;
+            var yZoom = height / 2;
 
-          for (var i = 0; i < width; i++) {
-            offset = Math.round(i * xZoom);
-            min = cha[offset];
-            max = cha[offset];
+            for (var i = 0; i < width; i++) {
+              offset = Math.round(i * xZoom) + _interval.start;
+              min = cha[offset];
+              max = cha[offset];
 
-            if (isNaN(cha[offset])) {
-              break;
+              if (isNaN(cha[offset])) {
+                break;
+              }
+
+              if ((offset + xZoom) > len) {
+                maxindex = len;
+              } else {
+                maxindex = Math.round(offset + xZoom);
+              }
+
+              for (var j = offset; j < maxindex; j++) {
+                val = cha[j];
+                max = Math.max(max, val);
+                min = Math.min(min, val);
+              }
+
+              if (round) {
+                min_maxarray.push(Math.round(min * yZoom));
+                min_maxarray.push(Math.round(max * yZoom));
+              } else {
+                min_maxarray.push(min * yZoom);
+                min_maxarray.push(max * yZoom);
+              }
             }
 
-            if ((offset + xZoom) > len) {
-              maxindex = len;
-            } else {
-              maxindex = Math.round(offset + xZoom);
-            }
-
-            for (var j = offset; j < maxindex; j++) {
-              val = cha[j];
-              max = Math.max(max, val);
-              min = Math.min(min, val);
-            }
-
-            if (round) {
-              min_maxarray.push(Math.round(min * yZoom));
-              min_maxarray.push(Math.round(max * yZoom));
-            } else {
-              min_maxarray.push(min * yZoom);
-              min_maxarray.push(max * yZoom);
-            }
+            return min_maxarray;
+          } else {
+            throw new Error('interval.end is less than interval.start');
           }
-
-          return min_maxarray;
         }
       }
     ]);
 
-    return this.taskmanager.run('compute', [w, h, channel, this.Settings.round_values]);
+    return this.taskmanager.run('compute', [w, h, channel, this.Settings.round_values, interval]);
   }
 
   /**
@@ -817,7 +813,11 @@ export class AudioviewerService extends AudioComponentService {
   public refresh(): Promise<any> {
     return new Promise<void>(
       (resolve, reject) => {
-        this.computeDisplayData(this.AudioPxWidth / 2, this.Settings.lineheight, this.channel).then(
+        this.computeDisplayData(this.AudioPxWidth / 2, this.Settings.lineheight, this.audiochunk.audiomanager.channel,
+          {
+            start: this.audiochunk.selection.start.samples,
+            end: this.audiochunk.selection.end.samples
+          }).then(
           (result) => {
             this._minmaxarray = result.data;
             resolve();

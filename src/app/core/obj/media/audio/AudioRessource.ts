@@ -4,6 +4,9 @@ import {AudioInfo} from './AudioInfo';
 import {isNullOrUndefined} from 'util';
 
 export class AudioRessource extends MediaRessource {
+  set audiobuffer(value: AudioBuffer) {
+    this._audiobuffer = value;
+  }
   get audiobuffer(): AudioBuffer {
     return this._audiobuffer;
   }
@@ -17,7 +20,7 @@ export class AudioRessource extends MediaRessource {
   }
 
   private _info: AudioInfo;
-  private _audiobuffer: AudioBuffer
+  private _audiobuffer: AudioBuffer;
 
   constructor(fullname: string, source: SourceType, info: AudioInfo, buffer?: ArrayBuffer, audiobuffer?: AudioBuffer, size?: number) {
     super(fullname, source, buffer, size);

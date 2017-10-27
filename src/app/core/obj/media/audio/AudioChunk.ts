@@ -6,7 +6,16 @@ import {PlayBackState} from '../index';
 import {EventEmitter} from '@angular/core';
 import {SubscriptionManager} from '../../SubscriptionManager';
 
+interface Interval {
+  start: number;
+  end: number;
+}
+
 export class AudioChunk {
+  static get counter(): number {
+    return this._counter;
+  }
+
   get lastplayedpos(): AudioTime {
     return this._lastplayedpos;
   }
@@ -17,10 +26,6 @@ export class AudioChunk {
 
   get audiomanager(): AudioManager {
     return this._audiomanger;
-  }
-
-  get channel(): Float32Array {
-    return this._channel;
   }
 
   get id() {
@@ -79,12 +84,11 @@ export class AudioChunk {
     return this._volume;
   }
 
-  private static counter = 0;
+  private static _counter = 0;
 
   private _selection: AudioSelection = null;
   private _time: AudioSelection = null;
   private _id;
-  private _channel: Float32Array;
   private _audiomanger: AudioManager;
   private _state: PlayBackState = PlayBackState.PREPARE;
 
@@ -113,7 +117,6 @@ export class AudioChunk {
 
     if (!isNullOrUndefined(audio_manager)) {
       this._audiomanger = audio_manager;
-      this._channel = this.getChannelBuffer(time);
       this._playposition = new AudioTime(time.start.samples, this._audiomanger.ressource.info.samplerate);
       this._state = PlayBackState.INITIALIZED;
     } else {
@@ -126,22 +129,12 @@ export class AudioChunk {
       this._selection = this._time.clone();
     }
 
-    this._id = ++AudioChunk.counter;
+    this._id = ++AudioChunk._counter;
   }
 
   public getChannelBuffer(selection: AudioSelection): Float32Array {
     if (!isNullOrUndefined(selection)) {
-      if (isNullOrUndefined(this._channel) || this._channel.length === 0) {
-        let chunk_buffer: Float32Array;
-
-        if (isNullOrUndefined(this._audiomanger.mainchunk) || this._audiomanger.mainchunk.channel.length === 0) {
-          chunk_buffer = new Float32Array(this._audiomanger.ressource.audiobuffer.getChannelData(0));
-        } else {
-          chunk_buffer = new Float32Array(this._audiomanger.mainchunk.channel);
-        }
-        chunk_buffer = chunk_buffer.subarray(selection.start.samples, selection.end.samples);
-        return chunk_buffer;
-      }
+      return this.audiomanager.channel.subarray(selection.start.samples, selection.end.samples);
     }
 
     return null;

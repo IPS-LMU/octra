@@ -17,7 +17,6 @@ import {TranslateService} from '@ngx-translate/core';
 import {isNullOrUndefined} from 'util';
 import {PlayBackState} from '../../../obj/media/index';
 import {AudioviewerComponent} from '../audioviewer.component';
-import {TaskManager} from '../../../obj/TaskManager';
 
 
 @Injectable()
@@ -66,7 +65,6 @@ export class AudioviewerService extends AudioComponentService {
 
   public shift_pressed = false;
   private _drawnselection: AudioSelection;
-  private taskmanager: TaskManager;
 
   get LinesArray(): Line[] {
     return this.Lines;
@@ -181,76 +179,6 @@ export class AudioviewerService extends AudioComponentService {
     } else {
       this._zoomY = 1;
     }
-  }
-
-  /**
-   * computeDisplayData() generates an array of min-max pairs representing the
-   * audio signal. The values of the array are float in the range -1 .. 1.
-   * @param w
-   * @param h
-   * @param channel
-   */
-  computeDisplayData(w, h, channel, interval: { start: number; end: number; }): Promise<any> {
-    this.taskmanager = new TaskManager([
-      {
-        name: 'compute',
-        do: (args) => {
-          var width = args[0], height = args[1], cha = args[2], round = args[3], _interval = args[4];
-          width = Math.floor(width);
-
-          if (_interval.start !== null && _interval.end !== null && _interval.end >= _interval.start) {
-            var min_maxarray = [],
-              len = _interval.end - _interval.start;
-
-            var min = 0,
-              max = 0,
-              val = 0,
-              offset = 0,
-              maxindex = 0;
-
-            var xZoom = len / width;
-
-            var yZoom = height / 2;
-
-            for (var i = 0; i < width; i++) {
-              offset = Math.round(i * xZoom) + _interval.start;
-              min = cha[offset];
-              max = cha[offset];
-
-              if (isNaN(cha[offset])) {
-                break;
-              }
-
-              if ((offset + xZoom) > len) {
-                maxindex = len;
-              } else {
-                maxindex = Math.round(offset + xZoom);
-              }
-
-              for (var j = offset; j < maxindex; j++) {
-                val = cha[j];
-                max = Math.max(max, val);
-                min = Math.min(min, val);
-              }
-
-              if (round) {
-                min_maxarray.push(Math.round(min * yZoom));
-                min_maxarray.push(Math.round(max * yZoom));
-              } else {
-                min_maxarray.push(min * yZoom);
-                min_maxarray.push(max * yZoom);
-              }
-            }
-
-            return min_maxarray;
-          } else {
-            throw new Error('interval.end is less than interval.start');
-          }
-        }
-      }
-    ]);
-
-    return this.taskmanager.run('compute', [w, h, channel, this.Settings.round_values, interval]);
   }
 
   /**
@@ -796,7 +724,6 @@ export class AudioviewerService extends AudioComponentService {
    */
   public destroy() {
     this.subscrmanager.destroy();
-    this.taskmanager.destroy();
   }
 
   onKeyUp = (event) => {
@@ -813,19 +740,75 @@ export class AudioviewerService extends AudioComponentService {
   public refresh(): Promise<any> {
     return new Promise<void>(
       (resolve, reject) => {
-        this.computeDisplayData(this.AudioPxWidth / 2, this.Settings.lineheight, this.audiochunk.audiomanager.channel,
+        const start = Date.now();
+        this._minmaxarray = this.computeDisplayData(this.AudioPxWidth / 2, this.Settings.lineheight, this.audiochunk.audiomanager.channel,
           {
             start: this.audiochunk.selection.start.samples,
             end: this.audiochunk.selection.end.samples
-          }).then(
-          (result) => {
-            this._minmaxarray = result.data;
-            resolve();
-          }
-        ).catch((err) => {
-          reject(err);
-        });
+          });
+        console.log('time + ' + (Date.now() - start));
+        resolve();
       }
     );
+  }
+
+  /**
+   * computeDisplayData() generates an array of min-max pairs representing the
+   * audio signal. The values of the array are float in the range -1 .. 1.
+   * @param w
+   * @param h
+   * @param channel
+   */
+  computeDisplayData(width, height, cha, _interval) {
+    width = Math.floor(width);
+
+    if (_interval.start !== null && _interval.end !== null && _interval.end >= _interval.start) {
+      let min_maxarray = [],
+        len = _interval.end - _interval.start;
+
+      let min = 0,
+        max = 0,
+        val = 0,
+        offset = 0,
+        maxindex = 0;
+
+      let xZoom = len / width;
+
+      let yZoom = height / 2;
+
+      for (let i = 0; i < width; i++) {
+        offset = Math.round(i * xZoom) + _interval.start;
+        min = cha[offset];
+        max = cha[offset];
+
+        if (isNaN(cha[offset])) {
+          break;
+        }
+
+        if ((offset + xZoom) > len) {
+          maxindex = len;
+        } else {
+          maxindex = Math.round(offset + xZoom);
+        }
+
+        for (let j = offset; j < maxindex; j++) {
+          val = cha[j];
+          max = Math.max(max, val);
+          min = Math.min(min, val);
+        }
+
+        if (this.Settings.round_values) {
+          min_maxarray.push(Math.round(min * yZoom));
+          min_maxarray.push(Math.round(max * yZoom));
+        } else {
+          min_maxarray.push(min * yZoom);
+          min_maxarray.push(max * yZoom);
+        }
+      }
+
+      return min_maxarray;
+    } else {
+      throw new Error('interval.end is less than interval.start');
+    }
   }
 }

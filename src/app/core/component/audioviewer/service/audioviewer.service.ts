@@ -21,6 +21,9 @@ import {AudioviewerComponent} from '../audioviewer.component';
 
 @Injectable()
 export class AudioviewerService extends AudioComponentService {
+  get dragableBoundaryNumber(): number {
+    return this._dragableBoundaryNumber;
+  }
   set drawnselection(value: AudioSelection) {
     this._drawnselection = value;
   }
@@ -52,7 +55,7 @@ export class AudioviewerService extends AudioComponentService {
   // LINES
   private Lines: Line[] = [];
 
-  private dragableBoundaryNumber = -1;
+  private _dragableBoundaryNumber = -1;
   public overboundary = false;
 
   // AUDIO
@@ -216,20 +219,20 @@ export class AudioviewerService extends AudioComponentService {
 
     let dragableBoundaryTemp = this.getBoundaryNumber(absX);
 
-    if (this.mouse_down && this.dragableBoundaryNumber < 0) {
+    if (this.mouse_down && this._dragableBoundaryNumber < 0) {
       // mouse down, nothing dragged
       this.audiochunk.selection.end = new AudioTime(absXTime, this.audiomanager.ressource.info.samplerate);
       this.drawnselection.end = this.audiochunk.selection.end.clone();
-    } else if (this.mouse_down && this.dragableBoundaryNumber > -1) {
+    } else if (this.mouse_down && this._dragableBoundaryNumber > -1) {
       // mouse down something dragged
-      const segment = this.transcrService.currentlevel.segments.get(this.dragableBoundaryNumber).clone();
+      const segment = this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber).clone();
       const absXSeconds = (absXTime / this.audiomanager.ressource.info.samplerate);
 
       // prevent overwriting another boundary
-      const segment_before = (this.dragableBoundaryNumber > 0)
-        ? this.transcrService.currentlevel.segments.get(this.dragableBoundaryNumber - 1) : null;
-      const segment_after = (this.dragableBoundaryNumber < this.transcrService.currentlevel.segments.length - 1)
-        ? this.transcrService.currentlevel.segments.get(this.dragableBoundaryNumber + 1) : null;
+      const segment_before = (this._dragableBoundaryNumber > 0)
+        ? this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber - 1) : null;
+      const segment_after = (this._dragableBoundaryNumber < this.transcrService.currentlevel.segments.length - 1)
+        ? this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber + 1) : null;
       if (!isNullOrUndefined(segment_before)) {
         // check segment boundary before this segment
         if (absXSeconds < segment_before.time.seconds + 0.02) {
@@ -244,10 +247,10 @@ export class AudioviewerService extends AudioComponentService {
       }
 
       segment.time.samples = absXTime;
-      this.transcrService.currentlevel.segments.change(this.dragableBoundaryNumber, segment);
+      this.transcrService.currentlevel.segments.change(this._dragableBoundaryNumber, segment);
       this.transcrService.currentlevel.segments.sort();
       dragableBoundaryTemp = this.getBoundaryNumber(absX);
-      this.dragableBoundaryNumber = dragableBoundaryTemp;
+      this._dragableBoundaryNumber = dragableBoundaryTemp;
     } else {
       this.mouse_down = false;
     }
@@ -288,16 +291,16 @@ export class AudioviewerService extends AudioComponentService {
               this._drawnselection = this.audiochunk.selection.clone();
               this._drawnselection.end = this.audiochunk.selection.start.clone();
 
-              this.dragableBoundaryNumber = this.getBoundaryNumber(this.mouse_click_pos.absX);
+              this._dragableBoundaryNumber = this.getBoundaryNumber(this.mouse_click_pos.absX);
             }
             this.mouse_down = true;
           } else if ($event.type === 'mouseup') {
-            if (this.dragableBoundaryNumber > -1 &&
-              this.dragableBoundaryNumber < this.transcrService.currentlevel.segments.length) {
+            if (this._dragableBoundaryNumber > -1 &&
+              this._dragableBoundaryNumber < this.transcrService.currentlevel.segments.length) {
               // some boundary dragged
-              const segment = this.transcrService.currentlevel.segments.get(this.dragableBoundaryNumber);
+              const segment = this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber);
               segment.time.samples = this.audioTCalculator.absXChunktoSamples(absX, this.audiochunk);
-              this.transcrService.currentlevel.segments.change(this.dragableBoundaryNumber, segment);
+              this.transcrService.currentlevel.segments.change(this._dragableBoundaryNumber, segment);
               this.transcrService.currentlevel.segments.sort();
             } else {
               // set selection
@@ -308,15 +311,15 @@ export class AudioviewerService extends AudioComponentService {
               this.PlayCursor.changeSamples(this.audiochunk.playposition.samples, this.audioTCalculator, this.audiochunk);
             }
 
-            this.dragableBoundaryNumber = -1;
+            this._dragableBoundaryNumber = -1;
             this.overboundary = false;
             this.mouse_down = false;
           }
         } else if ($event.type === 'mouseup') {
 
-          if (this.dragableBoundaryNumber > -1 && this.dragableBoundaryNumber < this.transcrService.currentlevel.segments.length) {
+          if (this._dragableBoundaryNumber > -1 && this._dragableBoundaryNumber < this.transcrService.currentlevel.segments.length) {
             // some boundary dragged
-            const segment = this.transcrService.currentlevel.segments.get(this.dragableBoundaryNumber);
+            const segment = this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber);
             segment.time.samples = this.audioTCalculator.absXChunktoSamples(absX, this.audiochunk);
             this.transcrService.currentlevel.segments.sort();
           } else {
@@ -331,7 +334,7 @@ export class AudioviewerService extends AudioComponentService {
             this.PlayCursor.changeSamples(this.audiochunk.playposition.samples, this.audioTCalculator, this.audiochunk);
           }
 
-          this.dragableBoundaryNumber = -1;
+          this._dragableBoundaryNumber = -1;
           this.overboundary = false;
           this.mouse_down = false;
         }

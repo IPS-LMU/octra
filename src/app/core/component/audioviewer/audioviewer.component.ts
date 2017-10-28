@@ -341,7 +341,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             }
             this.drawSegments();
             if (this.Settings.cropping !== 'none') {
-              this.av.Mousecursor.relPos.x = this._innerWidth / 2;
+              this.av.Mousecursor.relPos.x = Math.round(this._innerWidth / 2);
               this.drawCropBorder();
             }
 
@@ -356,7 +356,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
               }
             }
             if (this.Settings.cropping !== 'none') {
-              this.av.Mousecursor.relPos.x = this._innerWidth / 2;
+              this.av.Mousecursor.relPos.x = Math.round(this._innerWidth / 2);
+              this.drawCursor(this.av.LinesArray[0]);
               this.drawCropBorder();
             }
             if (this.Settings.selection.enabled) {
@@ -398,21 +399,22 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    */
   private crop(type: string, context: CanvasRenderingContext2D) {
     if (type === 'none' || type === 'circle') {
-      const radius = this._innerWidth / 2;
+      const radius = Math.round(this._innerWidth / 2);
 
       if (radius > 0 && !isNullOrUndefined(context)) {
+        const half_height = Math.round(this.height / 2);
         // crop Line
         context.globalAlpha = 1.0;
         context.save();
         context.beginPath();
-        context.arc(this._innerWidth / 2, this.height / 2, this._innerWidth / 2, 0, 2 * Math.PI, false);
+        context.arc(radius, half_height, radius, 0, 2 * Math.PI, false);
         context.closePath();
         context.clip();
 
         this.m_context.globalAlpha = 1.0;
         this.m_context.save();
         this.m_context.beginPath();
-        this.m_context.arc(this._innerWidth / 2, this.height / 2, this._innerWidth / 2, 0, 2 * Math.PI, false);
+        this.m_context.arc(radius, half_height, radius, 0, 2 * Math.PI, false);
         this.m_context.closePath();
         this.m_context.clip();
       }
@@ -467,7 +469,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
     if (!isNullOrUndefined(line_obj)) {
       // line_obj found
-      const midline = Math.floor((this.Settings.lineheight - timeline_height) / 2);
+      const midline = Math.round((this.Settings.lineheight - timeline_height) / 2);
       const x_pos = line_num * this.innerWidth;
 
       const zoomX = this.av.zoomX;
@@ -593,7 +595,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       if (this.Settings.selection.enabled) {
         this.av.setMouseMovePosition($event.type, x, y, curr_line, this._innerWidth);
         this.drawCursor(curr_line);
-        this.drawSegments(curr_line);
+        if (!isNullOrUndefined(this.av.drawnselection) &&
+          (this.av.drawnselection.length > 0 || this.av.dragableBoundaryNumber > -1)) {
+          // only if there is something selected or boundary dragged you need to redraw the segments around this line
+          this.drawSegments(curr_line);
+        }
       }
     } else {
       this.focused = false;
@@ -604,7 +610,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    * draws an black Border alongside the cropped audioviewer
    */
   drawCropBorder() {
-    const radius = this._innerWidth / 2;
+    const radius = Math.round(this._innerWidth / 2);
     if (radius > 0) {
       this.g_context.moveTo(0, 0);
       this.g_context.beginPath();
@@ -935,6 +941,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       if ($event.type !== 'mousedown') {
         this.selchange.emit(this.audiochunk.selection);
       }
+
+      this.drawSegments(curr_line);
     }
   }
 

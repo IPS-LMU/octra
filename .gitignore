@@ -397,3 +397,5 @@ xcuserdata/
 /doc/
 /deployment/
 /dist/config/appconfig.json
+/bd.sh
+/bp.sh

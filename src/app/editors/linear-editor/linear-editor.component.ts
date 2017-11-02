@@ -30,8 +30,8 @@ import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {AudioManager} from '../../core/obj/media/audio/AudioManager';
 import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
 import {isNullOrUndefined} from 'util';
-import {AudioviewerConfig} from '../../core/component/audioviewer/config/av.config';
-import {CircleLoupeComponent} from '../../core/component/circleloupe/circleloupe.component';
+import {CircleLoupeComponent} from '../../core/component/audiocomponents/circleloupe/circleloupe.component';
+import {AudioviewerConfig} from '../../core/component/audiocomponents/audioviewer/audioviewer.config';
 
 @Component({
   selector: 'app-signal-gui',

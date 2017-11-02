@@ -1,10 +1,9 @@
 // angular
 import {Injectable} from '@angular/core';
 // other
-import {AudioplayerConfig} from '../config';
 import {AudioComponentService, AudioService} from '../../../shared/service';
 import {AudioChunk, AudioTime, AudioTimeCalculator, AVMousePos, Line, PlayCursor} from '../../../shared';
-import {AudioplayerConfigValidator} from '../validator/AudioplayerConfigValidator';
+import {AudioplayerConfig} from './audioplayer.config';
 
 
 @Injectable()
@@ -31,7 +30,6 @@ export class AudioplayerService extends AudioComponentService {
   constructor(protected audio: AudioService) {
     super();
     this._settings = new AudioplayerConfig().Settings;
-    this.validateConfig();
   }
 
   /**
@@ -175,14 +173,5 @@ export class AudioplayerService extends AudioComponentService {
       this.audiochunk.time.duration, this.AudioPxWidth);
     this.Mousecursor = new AVMousePos(0, 0, 0, new AudioTime(0, this.audiomanager.ressource.info.samplerate));
     this.MouseClickPos = new AVMousePos(0, 0, 0, new AudioTime(0, this.audiomanager.ressource.info.samplerate));
-  }
-
-  private validateConfig() {
-    const validator: AudioplayerConfigValidator = new AudioplayerConfigValidator();
-    const validation = validator.validateObject(this._settings);
-    if (!validation.success) {
-      throw validation.error;
-    }
-
   }
 }

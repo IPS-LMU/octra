@@ -24,15 +24,16 @@ import {
   PlayCursor,
   Segment,
   SubscriptionManager
-} from '../../shared';
-import {KeymappingService, TranscriptionService} from '../../shared/service';
-import {AudioviewerService} from './service/audioviewer.service';
+} from '../../../shared';
+import {KeymappingService, TranscriptionService} from '../../../shared/service';
+import {AudioviewerService} from './audioviewer.service';
 import {TranslateService} from '@ngx-translate/core';
 import {isNullOrUndefined} from 'util';
-import {AudioManager} from '../../obj/media/audio/AudioManager';
-import {AudioRessource} from '../../obj/media/audio/AudioRessource';
-import {PlayBackState} from '../../obj/media/index';
-import {AudioviewerConfig} from './index';
+import {AudioManager} from '../../../obj/media/audio/AudioManager';
+import {AudioRessource} from '../../../obj/media/audio/AudioRessource';
+import {PlayBackState} from '../../../obj/media/index';
+import {Interval, Position, Rectangle, Size} from '../objects';
+import {AudioviewerConfig} from './audioviewer.config';
 
 @Component({
   selector: 'app-audioviewer',
@@ -40,13 +41,16 @@ import {AudioviewerConfig} from './index';
   styleUrls: ['./audioviewer.component.css'],
   providers: [AudioviewerService]
 })
-
 export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
+  get visibleLines(): Interval {
+    return this._visibleLines;
+  }
+
   get initialized(): boolean {
     return this._initialized;
   }
 
-  get viewRect(): { x: number; y: number; w: number; h: number; lines: { start: number; end: number } } {
+  get viewRect(): Rectangle {
     return this._viewRect;
   }
 
@@ -133,8 +137,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
   public audioplaying = false;
 
-  private step_backward = false;
-
   // size settings
   private width = 0;
   private height = 0;
@@ -142,15 +144,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   private oldInnerWidth = 0;
   private _initialized = false;
 
-  private _viewRect: {
-    x: number, y: number, w: number, h: number, lines: {
-      start: number,
-      end: number
-    }
-  } = {
-    x: 0, y: 0, w: 0, h: 0,
-    lines: {start: 0, end: 0}
-  };
+  private _realRect: Rectangle = new Rectangle(new Position(0, 0), new Size(0, 0));
+  private _viewRect: Rectangle = new Rectangle(new Position(0, 0), new Size(0, 0));
+  private _visibleLines: Interval = new Interval(0, 0);
 
   private _deactivate_shortcuts = false;
 
@@ -331,7 +327,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         const draw = () => {
           this.av.updateLines(this._innerWidth);
           if (this.av.LinesArray.length > 0) {
-            for (let i = this._viewRect.lines.start; i <= this._viewRect.lines.end; i++) {
+            for (let i = this._visibleLines.start; i <= this._visibleLines.end; i++) {
               if (!isNullOrUndefined(this.av.LinesArray[i])) {
                 this.clearDisplay(i);
                 this.drawGrid(3, 3, this.av.LinesArray[i]);
@@ -350,7 +346,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             }
 
             // draw signal. Separate for loop because of performance issues
-            for (let i = this._viewRect.lines.start; i <= this._viewRect.lines.end; i++) {
+            for (let i = this._visibleLines.start; i <= this._visibleLines.end; i++) {
               if (!this.drawSignal(i)) {
                 break;
               }
@@ -445,8 +441,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     }
 
 
-    this._viewRect.w = this.width;
-    this._viewRect.h = clientheight;
+    this._viewRect.size.width = this.width;
+    this._viewRect.size.height = clientheight;
 
     // set height
     this.playcanRef.changeAttr('height', clientheight.toString());
@@ -477,7 +473,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
       this.g_context.strokeStyle = this.Settings.data.color;
       this.g_context.beginPath();
-      this.g_context.moveTo(line_obj.Pos.x, line_obj.Pos.y + midline - this.av.minmaxarray[x_pos] - this._viewRect.y);
+      this.g_context.moveTo(line_obj.Pos.x, line_obj.Pos.y + midline - this.av.minmaxarray[x_pos] - this._viewRect.position.y);
 
       if (!isNullOrUndefined(midline) && !isNullOrUndefined(line_obj.Pos) && !isNullOrUndefined(this.av.minmaxarray)
         && !isNullOrUndefined(zoomY)) {
@@ -485,8 +481,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
           const x_draw = (!this.Settings.round_values) ? line_obj.Pos.x + (x * zoomX) : Math.round(line_obj.Pos.x + (x * zoomX));
           const y_draw = (!this.Settings.round_values)
-            ? (line_obj.Pos.y - this._viewRect.y + midline - (this.av.minmaxarray[x + x_pos] * zoomY))
-            : Math.round(line_obj.Pos.y - this._viewRect.y + midline - (this.av.minmaxarray[x + x_pos] * zoomY));
+            ? (line_obj.Pos.y - this._viewRect.position.y + midline - (this.av.minmaxarray[x + x_pos] * zoomY))
+            : Math.round(line_obj.Pos.y - this._viewRect.position.y + midline - (this.av.minmaxarray[x + x_pos] * zoomY));
 
           if (!isNaN(y_draw) && !isNaN(x_draw)) {
             this.g_context.lineTo(x_draw, y_draw);
@@ -526,14 +522,14 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     this.g_context.strokeStyle = this.Settings.grid.color;
     // set |
     for (let x = Math.round(hZoom / 2); x < line.Size.width; x = x + hZoom) {
-      this.g_context.moveTo(line.Pos.x + x, line.Pos.y - this._viewRect.y);
-      this.g_context.lineTo(line.Pos.x + x, line.Pos.y - this._viewRect.y + this.Settings.lineheight - timeline_height);
+      this.g_context.moveTo(line.Pos.x + x, line.Pos.y - this._viewRect.position.y);
+      this.g_context.lineTo(line.Pos.x + x, line.Pos.y - this._viewRect.position.y + this.Settings.lineheight - timeline_height);
     }
 
     // set vertical lines
     for (let y = Math.round(vZoom / 2); y < this.Settings.lineheight - timeline_height; y = y + vZoom) {
-      this.g_context.moveTo(line.Pos.x, y + line.Pos.y - this._viewRect.y);
-      this.g_context.lineTo(line.Pos.x + line.Size.width, y + line.Pos.y - this._viewRect.y);
+      this.g_context.moveTo(line.Pos.x, y + line.Pos.y - this._viewRect.position.y);
+      this.g_context.lineTo(line.Pos.x + line.Size.width, y + line.Pos.y - this._viewRect.position.y);
     }
     this.g_context.stroke();
   }
@@ -556,24 +552,24 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       this.g_context.globalAlpha = 1.0;
       this.g_context.strokeStyle = this.Settings.frame.color;
       this.g_context.fillStyle = this.Settings.backgroundcolor;
-      this.g_context.clearRect(line_obj.Pos.x, line_obj.Pos.y - this._viewRect.y, this._innerWidth,
+      this.g_context.clearRect(line_obj.Pos.x, line_obj.Pos.y - this._viewRect.position.y, this._innerWidth,
         this.Settings.lineheight + this.margin.bottom);
-      this.g_context.fillRect(line_obj.Pos.x, line_obj.Pos.y - this._viewRect.y, line_obj.Size.width,
+      this.g_context.fillRect(line_obj.Pos.x, line_obj.Pos.y - this._viewRect.position.y, line_obj.Size.width,
         this.Settings.lineheight - timeline_height);
       this.g_context.lineWidth = 0.5;
 
       // draw margin bottom
       this.g_context.fillStyle = 'white';
-      this.g_context.fillRect(line_obj.Pos.x, line_obj.Pos.y - this._viewRect.y + this.Settings.lineheight, line_obj.Size.width,
+      this.g_context.fillRect(line_obj.Pos.x, line_obj.Pos.y - this._viewRect.position.y + this.Settings.lineheight, line_obj.Size.width,
         this.Settings.margin.bottom);
 
       // draw timeline container
       if (this.Settings.timeline.enabled) {
-        this.g_context.fillRect(line_obj.Pos.x, line_obj.Pos.y - this._viewRect.y + (this.Settings.lineheight - timeline_height),
+        this.g_context.fillRect(line_obj.Pos.x, line_obj.Pos.y - this._viewRect.position.y + (this.Settings.lineheight - timeline_height),
           line_obj.Size.width, timeline_height);
       }
 
-      this.g_context.strokeRect(line_obj.Pos.x, line_obj.Pos.y - this._viewRect.y, line_obj.Size.width, this.Settings.lineheight);
+      this.g_context.strokeRect(line_obj.Pos.x, line_obj.Pos.y - this._viewRect.position.y, line_obj.Size.width, this.Settings.lineheight);
       this.g_context.lineWidth = 1;
     }
   }
@@ -584,7 +580,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   onMouseMove($event) {
 
     const x = ($event.offsetX || $event.pageX - jQuery($event.target).offset().left);
-    const y = ($event.offsetY || $event.pageY - jQuery($event.target).offset().left) + this._viewRect.y;
+    const y = ($event.offsetY || $event.pageY - jQuery($event.target).offset().left) + this._viewRect.position.y;
 
     const curr_line = this.av.getLineByMousePosition(x, y);
 
@@ -627,14 +623,14 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   drawCursor(line: Line) {
     if (line) {
       // TODO clear only last Cursor Position
-      this.m_context.clearRect(0, 0, this._viewRect.w, this._viewRect.h);
+      this.m_context.clearRect(0, 0, this._viewRect.size.width, this._viewRect.size.height);
 
       // --- now draw the cursor line ---
       this.m_context.globalAlpha = 1.0;
       this.m_context.strokeStyle = this.Settings.cursor.color;
       this.m_context.beginPath();
-      this.m_context.moveTo(this.av.Mousecursor.relPos.x, line.Pos.y - this._viewRect.y);
-      this.m_context.lineTo(this.av.Mousecursor.relPos.x, line.Pos.y - this._viewRect.y + this.Settings.lineheight - 1);
+      this.m_context.moveTo(this.av.Mousecursor.relPos.x, line.Pos.y - this._viewRect.position.y);
+      this.m_context.lineTo(this.av.Mousecursor.relPos.x, line.Pos.y - this._viewRect.position.y + this.Settings.lineheight - 1);
       this.m_context.stroke();
     }
   }
@@ -672,7 +668,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
         const clearheight = endline.Pos.y - startline.Pos.y + line_obj.Size.height;
         cleared++;
-        this.o_context.clearRect(startline.Pos.x - 5, startline.Pos.y - this._viewRect.y,
+        this.o_context.clearRect(startline.Pos.x - 5, startline.Pos.y - this._viewRect.position.y,
           Math.max(startline.Size.width, endline.Size.width) + 5, clearheight + 1);
 
         // console.log('DRAW SEGMENTS ' + this.Settings.height);
@@ -756,7 +752,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
               }
 
               drawn_segments++;
-              this.o_context.fillRect(x + this.Settings.margin.left - 1, line.Pos.y - this._viewRect.y, w, h);
+              this.o_context.fillRect(x + this.Settings.margin.left - 1, line.Pos.y - this._viewRect.position.y, w, h);
             }
 
             // draw boundaries
@@ -777,8 +773,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
               this.o_context.beginPath();
               this.o_context.strokeStyle = this.Settings.boundaries.color;
               this.o_context.lineWidth = this.Settings.boundaries.width;
-              this.o_context.moveTo(relX, line.Pos.y - this._viewRect.y);
-              this.o_context.lineTo(relX, line.Pos.y - this._viewRect.y + h);
+              this.o_context.moveTo(relX, line.Pos.y - this._viewRect.position.y);
+              this.o_context.lineTo(relX, line.Pos.y - this._viewRect.position.y + h);
               this.o_context.stroke();
               drawn_boundaries++;
             }
@@ -796,7 +792,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       }
     } else {
       cleared++;
-      this.o_context.clearRect(0, 0, this._viewRect.w, this._viewRect.h);
+      this.o_context.clearRect(0, 0, this._viewRect.size.width, this._viewRect.size.height);
 
       // draw segments for all visible lines
       if (this.Settings.boundaries.enabled && this.transcr.currentlevel.segments.length > 0) {
@@ -820,16 +816,16 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           const line_num2 = (this._innerWidth < this.AudioPxWidth) ? Math.floor(absX / this._innerWidth) : 0;
 
           if (
-            ((line_num1 <= this._viewRect.lines.start && line_num2 <= this._viewRect.lines.end) ||
-              (line_num1 >= this._viewRect.lines.start && line_num2 <= this._viewRect.lines.end) ||
-              (line_num1 >= this._viewRect.lines.start && line_num2 >= this._viewRect.lines.end) ||
-              (line_num1 <= this._viewRect.lines.start && line_num2 >= this._viewRect.lines.end))
+            ((line_num1 <= this._visibleLines.start && line_num2 <= this._visibleLines.end) ||
+              (line_num1 >= this._visibleLines.start && line_num2 <= this._visibleLines.end) ||
+              (line_num1 >= this._visibleLines.start && line_num2 >= this._visibleLines.end) ||
+              (line_num1 <= this._visibleLines.start && line_num2 >= this._visibleLines.end))
             &&
             ((segment.time.samples >= this.audiochunk.time.start.samples && segment.time.samples <= this.audiochunk.time.end.samples)
               || (begin.time.samples >= this.audiochunk.time.start.samples && begin.time.samples <= this.audiochunk.time.end.samples)
               || (begin.time.samples < this.audiochunk.time.start.samples && segment.time.samples > this.audiochunk.time.end.samples))
           ) {
-            for (let j = Math.max(line_num1, this._viewRect.lines.start); j <= Math.min(line_num2, this._viewRect.lines.end); j++) {
+            for (let j = Math.max(line_num1, this._visibleLines.start); j <= Math.min(line_num2, this._visibleLines.end); j++) {
               const line = this.av.LinesArray[j];
 
               if (line) {
@@ -868,15 +864,15 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 }
 
                 drawn_segments++;
-                this.o_context.fillRect(x + this.Settings.margin.left - 1, line.Pos.y - this._viewRect.y, w, h);
+                this.o_context.fillRect(x + this.Settings.margin.left - 1, line.Pos.y - this._viewRect.position.y, w, h);
               }
             }
-          } else if (line_num2 > this._viewRect.lines.end + 2) {
+          } else if (line_num2 > this._visibleLines.end + 2) {
             break;
           }
           // draw boundary
           const line = this.av.LinesArray[line_num2];
-          if (line_num2 >= this._viewRect.lines.start && line_num2 <= this._viewRect.lines.end &&
+          if (line_num2 >= this._visibleLines.start && line_num2 <= this._visibleLines.end &&
             !isNullOrUndefined(line) && segment.time.samples !== this.audioressource.info.duration.samples) {
             const h = line.Size.height;
             let relX = 0;
@@ -890,8 +886,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             this.o_context.beginPath();
             this.o_context.strokeStyle = this.Settings.boundaries.color;
             this.o_context.lineWidth = this.Settings.boundaries.width;
-            this.o_context.moveTo(relX, line.Pos.y - this._viewRect.y);
-            this.o_context.lineTo(relX, line.Pos.y - this._viewRect.y + h);
+            this.o_context.moveTo(relX, line.Pos.y - this._viewRect.position.y);
+            this.o_context.lineTo(relX, line.Pos.y - this._viewRect.position.y + h);
             this.o_context.stroke();
             drawn_boundaries++;
           }
@@ -929,7 +925,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    */
   onClick($event) {
     const x = ($event.offsetX || $event.pageX - jQuery($event.target).offset().left);
-    const y = ($event.offsetY || $event.pageY - jQuery($event.target).offset().left) + this._viewRect.y;
+    const y = ($event.offsetY || $event.pageY - jQuery($event.target).offset().left) + this._viewRect.position.y;
 
     const curr_line = this.av.getLineByMousePosition(x, y);
 
@@ -1308,9 +1304,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       const player_width = this.Settings.playcursor.width;
 
       const relX = this.av.PlayCursor.absX - (curr_line.number * this._innerWidth);
-      const relY = curr_line.Pos.y - this._viewRect.y;
-      this.p_context.clearRect(0, 0, this._viewRect.w, this._viewRect.h);
-      if (curr_line.number >= this._viewRect.lines.start && curr_line.number <= this._viewRect.lines.end &&
+      const relY = curr_line.Pos.y - this._viewRect.position.y;
+      this.p_context.clearRect(0, 0, this._viewRect.size.width, this._viewRect.size.height);
+      if (curr_line.number >= this._visibleLines.start && curr_line.number <= this._visibleLines.end &&
         relX <= curr_line.Size.width + this.Settings.margin.left) {
         this.p_context.strokeStyle = this.Settings.playcursor.color;
         this.p_context.beginPath();
@@ -1457,7 +1453,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
         if (w > 0) {
           this.o_context.fillStyle = this.Settings.selection.color;
-          this.o_context.fillRect(line.Pos.x + x, line.Pos.y - this._viewRect.y, w, this.Settings.lineheight);
+          this.o_context.fillRect(line.Pos.x + x, line.Pos.y - this._viewRect.position.y, w, this.Settings.lineheight);
         }
 
         this.o_context.globalAlpha = 1.0;
@@ -1567,27 +1563,29 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   }
 
   private updateVisibleLines() {
-    this._viewRect.lines.start = Math.floor(this._viewRect.y / (this.Settings.lineheight + this.Settings.margin.bottom));
-    this._viewRect.lines.end = Math.floor((this._viewRect.y + this._viewRect.h) / (this.Settings.lineheight + this.Settings.margin.bottom));
+    this._visibleLines.start = Math.floor(this._viewRect.position.y / (this.Settings.lineheight + this.Settings.margin.bottom));
+    this._visibleLines.end = Math.floor(
+      (this._viewRect.position.y + this._viewRect.size.height) / (this.Settings.lineheight + this.Settings.margin.bottom)
+    );
   }
 
   onWheel(event: WheelEvent) {
     event.preventDefault();
-    if ((this.height >= this.viewRect.h)) {
+    if ((this.height >= this._viewRect.size.height)) {
       if (BrowserInfo.os === 'mac') {
-        this._viewRect.y = Math.max(0, this._viewRect.y - event.deltaY);
+        this._viewRect.position.y = Math.max(0, this._viewRect.position.y - event.deltaY);
       } else {
-        this._viewRect.y = Math.max(0, this._viewRect.y + event.deltaY);
+        this._viewRect.position.y = Math.max(0, this._viewRect.position.y + event.deltaY);
       }
-      this.scrollTo(this._viewRect.y);
+      this.scrollTo(this._viewRect.position.y);
     }
   }
 
   public scrollTo(y_coord: number, scrollbar: boolean = false) {
-    if ((this.height >= this.viewRect.h)) {
+    if ((this.height >= this._viewRect.size.height)) {
       this.scrolling.emit({state: 'scrolling'});
-      this._viewRect.y = Math.max(0, y_coord);
-      this._viewRect.y = Math.min(this._viewRect.y, this.height - this._viewRect.h);
+      this._viewRect.position.y = Math.max(0, y_coord);
+      this._viewRect.position.y = Math.min(this._viewRect.position.y, this.height - this._viewRect.size.height);
       this.updateVisibleLines();
 
       if (!isNullOrUndefined(this.wheeling)) {
@@ -1603,10 +1601,10 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   }
 
   onSliderChanged($event: MouseEvent) {
-    if (this.height >= this.viewRect.h) {
+    if (this.height >= this._viewRect.size.height) {
       if ($event.type === 'mousemove') {
         if (this.scrollbar.dragging) {
-          this.scrollTo(($event.layerY / this._viewRect.h) * this.height, true);
+          this.scrollTo(($event.layerY / this._viewRect.size.height) * this.height, true);
         }
       } else if ($event.type === 'mousedown') {
         this.scrollbar.dragging = true;
@@ -1615,7 +1613,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         this.scrollbar.dragging = false;
       } else if ($event.type === 'click') {
         if (!this.scrollbar.dragging) {
-          this.scrollTo(($event.layerY / this._viewRect.h) * this.height, false);
+          this.scrollTo(($event.layerY / this._viewRect.size.height) * this.height, false);
         }
         this.scrollbar.dragging = false;
       }

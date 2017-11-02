@@ -12,11 +12,11 @@ import {
 } from '../../../shared';
 
 import {AudioComponentService, AudioService, KeymappingService, TranscriptionService} from '../../../shared/service';
-import {AudioviewerConfig} from '../config/av.config';
 import {TranslateService} from '@ngx-translate/core';
 import {isNullOrUndefined} from 'util';
 import {PlayBackState} from '../../../obj/media/index';
-import {AudioviewerComponent} from '../audioviewer.component';
+import {AudioviewerComponent} from './audioviewer.component';
+import {AudioviewerConfig} from './audioviewer.config';
 
 
 @Injectable()

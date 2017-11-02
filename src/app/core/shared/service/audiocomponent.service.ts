@@ -4,7 +4,7 @@ import {PlayCursor} from '../../obj/PlayCursor';
 import {AudioTimeCalculator} from '../../obj/media/audio/AudioTimeCalculator';
 import {AudioChunk} from '../../obj/media/audio/AudioChunk';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
-import {AudioviewerComponent} from '../../component/audioviewer/audioviewer.component';
+import {AudioviewerComponent} from '../../component/audiocomponents/audioviewer/audioviewer.component';
 
 export class AudioComponentService {
   // LINES

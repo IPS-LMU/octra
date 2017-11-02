@@ -16,14 +16,14 @@ import {
 } from '@angular/core';
 import {Observable} from 'rxjs/Rx';
 // other
-import {AudioTimeCalculator, BrowserInfo, CanvasAnimation, Line, Logger, SubscriptionManager} from '../../shared';
-import {AudioService, KeymappingService} from '../../shared/service';
-import {AudioplayerService} from './service/audioplayer.service';
-import {AudioManager} from '../../obj/media/audio/AudioManager';
-import {AudioChunk} from '../../obj/media/audio/AudioChunk';
-import {AudioRessource} from '../../obj/media/audio/AudioRessource';
+import {AudioTimeCalculator, BrowserInfo, CanvasAnimation, Line, Logger, SubscriptionManager} from '../../../shared';
+import {AudioService, KeymappingService} from '../../../shared/service';
+import {AudioplayerService} from './audioplayer.service';
+import {AudioManager} from '../../../obj/media/audio/AudioManager';
+import {AudioChunk} from '../../../obj/media/audio/AudioChunk';
+import {AudioRessource} from '../../../obj/media/audio/AudioRessource';
 import {isNullOrUndefined} from 'util';
-import {PlayBackState} from '../../obj/media/index';
+import {PlayBackState} from '../../../obj/media/index';
 
 @Component({
   selector: 'app-audioplayer',

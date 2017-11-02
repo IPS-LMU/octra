@@ -32,7 +32,7 @@ import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor/transcr-editor.component';
 import {isNullOrUndefined} from 'util';
-import {CircleLoupeComponent} from '../../core/component/circleloupe/circleloupe.component';
+import {CircleLoupeComponent} from '../../core/component/audiocomponents/circleloupe/circleloupe.component';
 
 @Component({
   selector: 'app-overlay-gui',
@@ -199,7 +199,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
               let y = Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.lineheight;
               y += 10 + (Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.margin.bottom);
 
-              if (y > this.viewer.viewRect.h) {
+              if (y > this.viewer.viewRect.size.height) {
                 this.viewer.scrollTo(y);
               }
             });
@@ -275,7 +275,6 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
       const segment = this.transcrService.currentlevel.segments.get(this.selected_index);
       const absx = this.viewer.av.audioTCalculator.samplestoAbsX(segment.time.samples);
-      const specialheight = jQuery('#special').height();
 
       let y = Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.lineheight;
       y += 10 + (Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.margin.bottom);
@@ -285,7 +284,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     }
   }
 
-  onSegmentSelected(selection: AudioSelection) {
+  onSegmentSelected() {
   }
 
   onMouseOver() {
@@ -331,7 +330,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       coord.location.x = ((cursor.relPos.x) ? cursor.relPos.x - coord.size.width / 2 : 0);
       coord.location.y = ((cursor.line) ? (cursor.line.number) *
         cursor.line.Size.height + (cursor.line.number) * this.viewer.Settings.margin.bottom : 0);
-      coord.location.y += this.viewer.Settings.lineheight - 15 - this.viewer.viewRect.y;
+      coord.location.y += this.viewer.Settings.lineheight - 15 - this.viewer.viewRect.position.y;
 
       const half_rate = Math.round(this.audiomanager.ressource.info.samplerate / factor);
       const start = (cursor.timePos.samples > half_rate)
@@ -364,7 +363,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       coord.location.x = ((cursor.relPos.x) ? cursor.relPos.x - coord.size.width / 2 : 0);
       coord.location.y = ((cursor.line) ? (cursor.line.number) *
         cursor.line.Size.height + (cursor.line.number) * this.viewer.Settings.margin.bottom : 0);
-      coord.location.y += this.viewer.Settings.lineheight - 15 - this.viewer.viewRect.y;
+      coord.location.y += this.viewer.Settings.lineheight - 15 - this.viewer.viewRect.position.y;
     }
   }
 

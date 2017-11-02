@@ -1015,8 +1015,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                           type: 'boundary',
                           samplepos: result.seg_samples
                         });
-                        this.segmentchange.emit(result.seg_samples);
-                        this.drawSegments();
+                        this.drawSegments(this.av.LastLine);
                       }
                     }
                     key_active = true;

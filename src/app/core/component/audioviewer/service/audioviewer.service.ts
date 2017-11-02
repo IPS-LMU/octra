@@ -24,6 +24,7 @@ export class AudioviewerService extends AudioComponentService {
   get dragableBoundaryNumber(): number {
     return this._dragableBoundaryNumber;
   }
+
   set drawnselection(value: AudioSelection) {
     this._drawnselection = value;
   }
@@ -764,7 +765,7 @@ export class AudioviewerService extends AudioComponentService {
    * @param h
    * @param channel
    */
-  computeDisplayData(width, height, cha, _interval) {
+  computeDisplayData(width: number, height: number, cha: Float32Array, _interval: { start: number; end: number; }) {
     width = Math.floor(width);
 
     if (_interval.start !== null && _interval.end !== null && _interval.end >= _interval.start) {
@@ -789,7 +790,7 @@ export class AudioviewerService extends AudioComponentService {
           break;
         }
 
-        if ((offset + xZoom) > len) {
+        if ((offset + xZoom) > _interval.start + len) {
           maxindex = len;
         } else {
           maxindex = Math.round(offset + xZoom);

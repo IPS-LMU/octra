@@ -35,7 +35,8 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
   @Output('mousecursorchange') mousecursorchange: EventEmitter<AVMousePos> = new EventEmitter<AVMousePos>();
   @Output('shortcuttriggered') shortcuttriggered: EventEmitter<string> = new EventEmitter<string>();
   @Output('segmententer') segmententer: EventEmitter<any> = new EventEmitter<any>();
-  @Output('alerttriggered') alerttriggered: EventEmitter<{ type: string, message: string }> = new EventEmitter<{ type: string, message: string }>();
+  @Output('alerttriggered') alerttriggered: EventEmitter<{ type: string, message: string }>
+    = new EventEmitter<{ type: string, message: string }>();
 
   @Input('audiochunk') audiochunk: AudioChunk;
   @Input('height') height: number;
@@ -136,10 +137,10 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
     this.viewer.drawSegments();
   }
 
-  public update() {
+  public update(compute = true) {
     this.viewer.name = this.name;
     // this.viewer.initialize();
-    this.viewer.update(true);
+    this.viewer.update(compute);
   }
 
   onButtonClick(event: { type: string, timestamp: number }) {

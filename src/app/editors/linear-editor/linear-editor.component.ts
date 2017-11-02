@@ -262,9 +262,6 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
   }
 
   onSegmentChange() {
-    if (!isNullOrUndefined(this.loupe)) {
-      this.loupe.update();
-    }
     this.viewer.update();
     this.saving = false;
   }
@@ -320,24 +317,15 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
   onSegmentEnter($event) {
     this.selectSegment($event.index).then((selection: AudioSelection) => {
       this.top_selected = true;
-
-      setTimeout(() => {
-        this.audiochunk_down.destroy();
-        this.audiochunk_down = new AudioChunk(selection, this.audiomanager);
-      }, 100);
+      this.audiochunk_down = new AudioChunk(selection, this.audiomanager);
     });
   }
 
   onLoupeSegmentEnter($event) {
     this.selectSegment($event.index).then((selection: AudioSelection) => {
       this.audiochunk_down.selection = selection.clone();
-      this.audiochunk_down.playposition = this.audiochunk_down.selection.start.clone();
-
-      setTimeout(() => {
-        if (this.audiochunk_down.playposition.samples === this.audiochunk_down.time.start.samples) {
-        }
-        this.loupe.update();
-      }, 100);
+      this.audiochunk_down.playposition = selection.start.clone();
+      this.loupe.viewer.drawPlayCursor();
     });
   }
 
@@ -436,6 +424,9 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
     this.loupe.viewer.focused = false;
     if (status === 'stopped') {
       this.save();
+      setTimeout(() => {
+        this.loupe.update(false);
+      }, 200);
     }
   }
 

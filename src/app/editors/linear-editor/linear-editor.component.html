@@ -77,6 +77,7 @@
            [height]="150"
            [Settings]="loupe_settings"
            (alerttriggered)="onAlertTriggered($event)"
+           (alerttriggered)="onAlertTriggered($event)"
 >
 </app-loupe>
 <div *ngIf="!segmentselected" id="editor-placeholder">
@@ -91,7 +92,7 @@
                     (marker_click)="onMarkerClick($event)"
                     (typing)="onEditorTyping($event)"
                     [ngStyle]="{display: (segmentselected) ? 'inherit': 'none'}"
-                    [markers]="transcrService.guidelines.markers"
+                    [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
                     [easymode]="appStorage.easymode"
                     [audiochunk]="audiochunk_down"
 >

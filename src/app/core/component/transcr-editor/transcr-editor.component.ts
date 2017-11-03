@@ -326,12 +326,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       str_array: []
     };
 
-    for (let i = 0; i < this.markers.length; i++) {
-      const marker = this.markers[i];
-      result.buttons['' + i + ''] = this.createButton(marker);
-      result.str_array.push('' + i + '');
+    if (!isNullOrUndefined(this.markers)) {
+      for (let i = 0; i < this.markers.length; i++) {
+        const marker = this.markers[i];
+        result.buttons['' + i + ''] = this.createButton(marker);
+        result.str_array.push('' + i + '');
+      }
     }
-
     return result;
   }
 

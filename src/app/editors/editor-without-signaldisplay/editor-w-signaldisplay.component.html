@@ -41,7 +41,7 @@
                     (typing)="afterTyping($event);"
                     (marker_insert)="onMarkerInsert($event)"
                     (marker_click)="onMarkerClick($event)"
-                    [markers]="transcrService.guidelines.markers"
+                    [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
                     [easymode]="appStorage.easymode"
                     [audiochunk]="audiochunk"
                     (boundaryclicked)="onBoundaryClicked($event)"

@@ -6,7 +6,7 @@ import {Http, HttpModule, JsonpModule} from '@angular/http';
 import {TranslateLoader, TranslateModule, TranslateService} from '@ngx-translate/core';
 // third-party
 import {Ng2Bs3ModalModule} from 'ng2-bs3-modal/ng2-bs3-modal';
-import {Ng2Webstorage} from 'ng2-webstorage';
+import {Ng2Webstorage} from 'ngx-webstorage';
 // other
 import {LanguageLoader} from './core/shared';
 import {

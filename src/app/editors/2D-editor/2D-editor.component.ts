@@ -311,7 +311,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     }
   }
 
-  onSegmentChange($event) {
+  onSegmentChange() {
   }
 
   private changeArea(loup: CircleLoupeComponent, coord: {

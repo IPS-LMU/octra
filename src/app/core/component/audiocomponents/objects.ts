@@ -35,6 +35,13 @@ export interface ICircle {
   radius: number;
 }
 
+export interface IMargin {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+
 export class Rectangle implements IRectangle {
   constructor(public position: Position, public size: Size) {
   }
@@ -47,5 +54,10 @@ export class Position implements Position {
 
 export class Size implements ISize {
   constructor(public width: number, public height: number) {
+  }
+}
+
+export class Margin implements IMargin {
+  constructor(public top: number, public right: number, public bottom: number, public left: number) {
   }
 }

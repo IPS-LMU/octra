@@ -1,4 +1,4 @@
-import {Directive, ElementRef, Renderer} from '@angular/core';
+import {Directive, ElementRef, Renderer2} from '@angular/core';
 
 @Directive({
   selector: '[appAudioPlayer]',
@@ -6,11 +6,11 @@ import {Directive, ElementRef, Renderer} from '@angular/core';
 })
 export class AudioplayerDirective {
 
-  constructor(private elementRef: ElementRef, private renderer: Renderer) {
+  constructor(private elementRef: ElementRef, private renderer: Renderer2) {
   }
 
   changeStyle(attr: string, val: string) {
-    this.renderer.setElementStyle(this.elementRef.nativeElement, attr, val);
+    this.renderer.setStyle(this.elementRef.nativeElement, attr, val);
   }
 
 }

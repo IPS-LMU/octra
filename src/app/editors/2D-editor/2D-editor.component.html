@@ -56,9 +56,9 @@
                          [audiochunk]="audiochunk_loupe"></app-circleloupe>
     </div>
     <app-audioviewer #viewer id="special"
-                     (selchange)="onSegmentSelected($event);"
-                     (segmententer)="onSegmentEntered($event);"
-                     (segmentchange)="onSegmentChange($event);"
+                     (selchange)="onSegmentSelected()"
+                     (segmententer)="onSegmentEntered($event)"
+                     (segmentchange)="onSegmentChange();"
                      (mousecursorchange)="onMouseOver(); loupe_hidden = false;"
                      (mouseleave)="loupe_hidden = true;"
                      (shortcuttriggered)="onShortCutTriggered($event, 'mult-lines-viewer')"

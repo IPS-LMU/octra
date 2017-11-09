@@ -1,4 +1,4 @@
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs/Rx';
 import {Http, Response} from '@angular/http';
 
 export abstract class BugReporter {

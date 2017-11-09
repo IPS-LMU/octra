@@ -1,5 +1,5 @@
 import {BugReporter} from './BugReporter';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs/Rx';
 import {Headers, Http, RequestOptions, Response, URLSearchParams} from '@angular/http';
 import {isArray} from 'rxjs/util/isArray';
 

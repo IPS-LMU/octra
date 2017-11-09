@@ -4,7 +4,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {AppInfo} from '../../../app.info';
 import {AppStorageService} from './appstorage.service';
 import {Http, Response} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs/Rx';
 import {SettingsService} from './settings.service';
 import {isNullOrUndefined} from 'util';
 import {BugReporter} from '../../obj/BugAPI/BugReporter';

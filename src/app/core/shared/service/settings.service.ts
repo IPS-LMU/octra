@@ -1,5 +1,4 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import 'rxjs/Rx';
 import {Http} from '@angular/http';
 
 import {SubscriptionManager} from '../';
@@ -12,7 +11,7 @@ import {isFunction, isNullOrUndefined} from 'util';
 import {Logger} from '../Logger';
 import {AppSettings} from '../../obj/Settings/app-settings';
 import {Functions} from '../Functions';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs/Rx';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {AppInfo} from '../../../app.info';
@@ -213,7 +212,7 @@ export class SettingsService {
         this._log += 'Loading functions failed [Error: S01]<br/>';
       }
     );
-  };
+  }
 
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
     Logger.log('Load audio file 2...');

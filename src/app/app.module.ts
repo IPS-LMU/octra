@@ -5,7 +5,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Http, HttpModule, JsonpModule} from '@angular/http';
 import {TranslateLoader, TranslateModule, TranslateService} from '@ngx-translate/core';
 // third-party
-import {Ng2Bs3ModalModule} from 'ng2-bs3-modal/ng2-bs3-modal';
+import {BsModalModule} from 'ng2-bs3-modal';
 import {Ng2Webstorage} from 'ngx-webstorage';
 // other
 import {LanguageLoader} from './core/shared';
@@ -62,7 +62,6 @@ import {
 import {AppComponent} from './app.component';
 
 import {TranscrGuidelinesComponent} from './core/gui/transcr-guidelines/transcr-guidelines.component';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ReloadFileGuard} from './core/gui/reload-file/reload-file.activateguard';
 import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
 import {CollapseModule} from 'ngx-bootstrap/collapse';
@@ -138,7 +137,6 @@ export const ngmodule = {
   entryComponents: EDITORS,
   imports: [
     BrowserModule,
-    BrowserAnimationsModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
@@ -155,7 +153,7 @@ export const ngmodule = {
       separator: '.',
       prefix: 'custom'
     }),
-    Ng2Bs3ModalModule,
+    BsModalModule,
     ReactiveFormsModule,
     routing
   ],

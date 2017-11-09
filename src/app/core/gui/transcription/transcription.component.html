@@ -1,48 +1,48 @@
 <app-alert #alert></app-alert>
-<modal #modal>
-    <modal-header>
+<bs-modal #modal>
+    <bs-modal-header>
         <h4 class="modal-title">{{"modal.transcription.send.header" | translate}}</h4>
-    </modal-header>
-    <modal-body>
+    </bs-modal-header>
+    <bs-modal-body>
         {{"modal.transcription.send.text" | translate}}
-    </modal-body>
-    <modal-footer>
+    </bs-modal-body>
+    <bs-modal-footer>
         <button type="button" class="btn btn-primary" (click)="modal.dismiss()">{{"general.abort" | translate}}</button>
         <button type="button" class="btn btn-default" (click)="onSendNowClick()">{{"general.send now" | translate}}
         </button>
-    </modal-footer>
-</modal>
+    </bs-modal-footer>
+</bs-modal>
 
-<modal #modal2>
-    <modal-header>
+<bs-modal #modal2>
+    <bs-modal-header>
         <h4 class="modal-title">{{"modal.transcription.sending.header" | translate}}</h4>
-    </modal-header>
-    <modal-body>
+    </bs-modal-header>
+    <bs-modal-body>
         {{"modal.transcription.sending.text" | translate}}<br/><br/>
         <div style="color:red">{{send_error}}</div>
         <div class="text-success" style="text-align: center;display:block;">{{"general.submission success" |
             translate}}
         </div>
-    </modal-body>
-</modal>
-<modal #modal_overview id="overview">
-    <modal-body>
+    </bs-modal-body>
+</bs-modal>
+<bs-modal #modal_overview id="overview">
+    <bs-modal-body>
         <app-transcr-overview *ngIf="transcrService.annotation !== null"
                               [visible]="modal_overview.visible"
                               [segments]="(transcrService.annotation !== null && transcrService.annotation !== undefined)
                               ? transcrService.annotation.levels[transcrService.selectedlevel].segments.segments: null"
                               (segmentclicked)="onSegmentInOverviewClicked($event)">
         </app-transcr-overview>
-    </modal-body>
-    <modal-footer>
+    </bs-modal-body>
+    <bs-modal-footer>
         <button type="button" class="btn btn-default" data-dismiss="modal" (click)="modal_overview.dismiss()">
             {{"general.close" | translate}}
         </button>
-    </modal-footer>
-</modal>
+    </bs-modal-footer>
+</bs-modal>
 
-<modal #modal_shortcuts>
-    <modal-body *ngIf="editorloaded">
+<bs-modal #modal_shortcuts>
+    <bs-modal-body *ngIf="editorloaded">
         <div *ngIf="interface == 'Editor without signal display'">
             <h3>{{"modal.shortcuts.audioplayer" | translate}}</h3>
             <div class="table-responsive" *ngIf="keyMap.getEntryList('AP') !== null">
@@ -112,24 +112,24 @@
                 </table>
             </div>
         </div>
-    </modal-body>
-    <modal-footer>
+    </bs-modal-body>
+    <bs-modal-footer>
         <button type="button" class="btn btn-primary" (click)="modal_shortcuts.dismiss();">
             {{"general.close" |translate}}
         </button>
-    </modal-footer>
-</modal>
+    </bs-modal-footer>
+</bs-modal>
 
-<modal #success id="transcription_success">
-    <modal-body>
+<bs-modal #success id="transcription_success">
+    <bs-modal-body>
         <p>{{"transcription submitted.no jobs left" | translate}}</p>
-    </modal-body>
-    <modal-footer>
+    </bs-modal-body>
+    <bs-modal-footer>
         <button type="button" class="btn btn-default" data-dismiss="modal" (click)="success.dismiss()">{{"general.close"
             | translate}}
         </button>
-    </modal-footer>
-</modal>
+    </bs-modal-footer>
+</bs-modal>
 
 <div class="flex">
     <span id='saving'>

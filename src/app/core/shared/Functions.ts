@@ -1,6 +1,6 @@
 import {isNullOrUndefined} from 'util';
 import {Http, RequestOptions, RequestOptionsArgs, Response, URLSearchParams} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs/Rx';
 
 export interface FileSize {
   size: number;

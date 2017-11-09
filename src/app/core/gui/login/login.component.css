@@ -5,13 +5,9 @@ h4 {
 }
 
 #login {
-    padding: 20px;
-    width: 100%;
-    padding: 0;
-}
-
-#login .row {
-    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    flex: auto;
 }
 
 .login-id-label,
@@ -48,11 +44,22 @@ h4 {
 }
 
 #loginrow {
-    display: -webkit-box;
 }
 
-@media (max-width: 990px) {
+@media (min-width: 990px) {
     #loginrow {
-        display: inherit;
+        flex: auto;
+        display: flex;
     }
+}
+
+footer .logo {
+    height: 60px;
+    margin-bottom: 10px;
+}
+
+:host {
+    display: flex;
+    flex-direction: column;
+    flex: auto;
 }

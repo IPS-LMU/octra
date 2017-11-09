@@ -1,4 +1,4 @@
-<div class="section">
+<div class="section" id="login">
     <div *ngIf="!valid_platform" class="bg-danger">
         <p *ngIf="!valid_platform" class="warning" [innerHTML]="'browser.invalid' | translate">
         </p>
@@ -110,4 +110,30 @@
             </section>
         </div>
     </div>
+</div>
+<div class="section">
+    <footer class="footer">
+        <div class="container">
+            <div class="col-md-3">
+                <a href="http://www.en.phonetik.uni-muenchen.de/" target="_blank">
+                    <img class="logo" src="assets/img/ipsx60.png" alt="IPS LMU Munich"/>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="https://www.phonetik.uni-muenchen.de/Bas/BasHomeeng.html" target="_blank">
+                    <img class="logo" src="assets/img/bas.png" alt="BAS"/>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="https://www.clarin-d.de/en/" target="_blank">
+                    <img class="logo" src="assets/img/clarin-d.png" alt="Clarin-D"/>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="https://github.com/IPS-LMU/octra" target="_blank"><img class="logo"
+                                                                                src="assets/img/GitHub_Logo.png"
+                                                                                alt="Github Logo"/></a>
+            </div>
+        </div>
+    </footer>
 </div>

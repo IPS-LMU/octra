@@ -17,10 +17,22 @@ import {isNullOrUndefined} from 'util';
 import {PlayBackState} from '../../../obj/media/index';
 import {AudioviewerComponent} from './audioviewer.component';
 import {AudioviewerConfig} from './audioviewer.config';
+import {Interval, Position, Rectangle, Size} from '../objects';
 
 
 @Injectable()
 export class AudioviewerService extends AudioComponentService {
+  get visibleLines(): Interval {
+    return this._visibleLines;
+  }
+
+  get viewRect(): Rectangle {
+    return this._viewRect;
+  }
+
+  get realRect(): Rectangle {
+    return this._realRect;
+  }
   get dragableBoundaryNumber(): number {
     return this._dragableBoundaryNumber;
   }
@@ -49,26 +61,6 @@ export class AudioviewerService extends AudioComponentService {
     return this._zoomY;
   }
 
-  private _settings: AudioviewerConfig;
-
-  private subscrmanager: SubscriptionManager;
-
-  // LINES
-  private Lines: Line[] = [];
-
-  private _dragableBoundaryNumber = -1;
-  public overboundary = false;
-
-  // AUDIO
-
-  private _zoomY = 1;
-  private _zoomX = 1;
-  private _minmaxarray: number[] = [];
-
-  public focused = false;
-
-  public shift_pressed = false;
-  private _drawnselection: AudioSelection;
 
   get LinesArray(): Line[] {
     return this.Lines;
@@ -90,17 +82,6 @@ export class AudioviewerService extends AudioComponentService {
     this.last_line = line;
   }
 
-  /*
-  get DurTime(): AudioTime {
-    return this.durtime;
-  }
-
-  set DurTime(new_durtime: AudioTime) {
-    this.durtime = new_durtime;
-    this.audioTCalculator.duration = this.durtime.clone();
-  }
-  */
-
   get Settings(): AudioviewerConfig {
     return this._settings;
   }
@@ -108,6 +89,31 @@ export class AudioviewerService extends AudioComponentService {
   set Settings(value: AudioviewerConfig) {
     this._settings = value;
   }
+
+  private _settings: AudioviewerConfig;
+
+  private subscrmanager: SubscriptionManager;
+
+  // LINES
+  private Lines: Line[] = [];
+
+  private _dragableBoundaryNumber = -1;
+  public overboundary = false;
+
+  // AUDIO
+
+  private _zoomY = 1;
+  private _zoomX = 1;
+  private _minmaxarray: number[] = [];
+
+  public focused = false;
+
+  public shift_pressed = false;
+  private _drawnselection: AudioSelection;
+
+  private _realRect: Rectangle = new Rectangle(new Position(0, 0), new Size(0, 0));
+  private _viewRect: Rectangle = new Rectangle(new Position(0, 0), new Size(0, 0));
+  private _visibleLines: Interval = new Interval(0, 0);
 
   constructor(protected audio: AudioService,
               protected transcrService: TranscriptionService,

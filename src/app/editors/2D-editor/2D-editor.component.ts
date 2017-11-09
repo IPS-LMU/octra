@@ -28,7 +28,7 @@ import {AudioManager} from '../../core/obj/media/audio/AudioManager';
 import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
 import {TranscrWindowComponent} from './transcr-window/transcr-window.component';
 import {PlayBackState} from '../../core/obj/media/index';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs/Rx';
 import {Subscription} from 'rxjs/Subscription';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor/transcr-editor.component';
 import {isNullOrUndefined} from 'util';

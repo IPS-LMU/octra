@@ -1,9 +1,8 @@
 import {Injectable, SecurityContext} from '@angular/core';
 import {API} from '../../obj/API/api.interface';
 import {Http, Response} from '@angular/http';
-import 'rxjs/Rx';
 import {DomSanitizer} from '@angular/platform-browser';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs/Rx';
 
 @Injectable()
 export class APIService implements API {

@@ -15,7 +15,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {Router} from '@angular/router';
-import {ModalComponent} from 'ng2-bs3-modal/ng2-bs3-modal';
+import {BsModalComponent} from 'ng2-bs3-modal/ng2-bs3-modal';
 
 import {
   AppStorageService,
@@ -36,7 +36,7 @@ import {TranscrGuidelinesComponent} from '../transcr-guidelines/transcr-guidelin
 import {APIService} from '../../shared/service/api.service';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 import {Entry} from '../../shared/service/keymapping.service';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs/Rx';
 import {ProjectConfiguration} from '../../obj/Settings/project-configuration';
 import {NgForm} from '@angular/forms';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
@@ -59,14 +59,14 @@ export class TranscriptionComponent implements OnInit,
 
   private subscrmanager: SubscriptionManager;
 
-  @ViewChild('modal_shortcuts') modal_shortcuts: ModalComponent;
+  @ViewChild('modal_shortcuts') modal_shortcuts: BsModalComponent;
   @ViewChild('modal_guidelines') modal_guidelines: TranscrGuidelinesComponent;
-  @ViewChild('modal_overview') modal_overview: ModalComponent;
+  @ViewChild('modal_overview') modal_overview: BsModalComponent;
   @ViewChild(LoadeditorDirective) appLoadeditor: LoadeditorDirective;
   private _currentEditor: ComponentRef<Component>;
 
-  @ViewChild('modal') modal: ModalComponent;
-  @ViewChild('modal2') modal2: ModalComponent;
+  @ViewChild('modal') modal: BsModalComponent;
+  @ViewChild('modal2') modal2: BsModalComponent;
   @ViewChild('fo') feedback_form: NgForm;
   public send_error = '';
 

@@ -23,7 +23,7 @@ import {isArray, isNullOrUndefined, isNumber} from 'util';
 import {SubscriptionManager} from '../../shared';
 import {SettingsService} from '../../shared/service/settings.service';
 import {ModalService} from '../../shared/service/modal.service';
-import {ModalComponent} from 'ng2-bs3-modal/ng2-bs3-modal';
+import {BsModalComponent} from 'ng2-bs3-modal';
 import {TranslateService} from '@ngx-translate/core';
 import {Converter} from '../../obj/Converters/Converter';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
@@ -39,7 +39,7 @@ import {AudioService} from '../../shared/service/audio.service';
 export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate, AfterViewInit {
   @ViewChild('f') loginform: NgForm;
   @ViewChild('dropzone') dropzone: OctraDropzoneComponent;
-  @ViewChild('agreement') agreement: ModalComponent;
+  @ViewChild('agreement') agreement: BsModalComponent;
   @ViewChild('localmode') localmode: ElementRef;
   @ViewChild('onlinemode') onlinemode: ElementRef;
 

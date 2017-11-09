@@ -1,6 +1,5 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {ModalComponent} from 'ng2-bs3-modal/components/modal';
 import {ModalService} from '../../shared/service/modal.service';
 import {isNullOrUndefined} from 'util';
 import {BugReportService} from '../../shared/service/bug-report.service';
@@ -8,6 +7,7 @@ import {APIService} from '../../shared/service/api.service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {AppInfo} from '../../../app.info';
 import {SettingsService} from '../../shared/service/settings.service';
+import {BsModalComponent} from 'ng2-bs3-modal';
 
 @Component({
   selector: 'app-octra-modal',
@@ -17,13 +17,13 @@ import {SettingsService} from '../../shared/service/settings.service';
 export class OctraModalComponent implements OnInit, OnDestroy {
 
   private _subscrmanager: SubscriptionManager;
-  @ViewChild('login_invalid') login_invalid: ModalComponent;
-  @ViewChild('transcription_delete') transcription_delete: ModalComponent;
-  @ViewChild('transcription_stop') transcription_stop: ModalComponent;
-  @ViewChild('error') error: ModalComponent;
-  @ViewChild('bugreport') bugreport: ModalComponent;
-  @ViewChild('supportedfiles') supportedfiles: ModalComponent;
-  @ViewChild('yesno') yesno: ModalComponent;
+  @ViewChild('login_invalid') login_invalid: BsModalComponent;
+  @ViewChild('transcription_delete') transcription_delete: BsModalComponent;
+  @ViewChild('transcription_stop') transcription_stop: BsModalComponent;
+  @ViewChild('error') error: BsModalComponent;
+  @ViewChild('bugreport') bugreport: BsModalComponent;
+  @ViewChild('supportedfiles') supportedfiles: BsModalComponent;
+  @ViewChild('yesno') yesno: BsModalComponent;
 
   public bgdescr = '';
   public bgemail = '';

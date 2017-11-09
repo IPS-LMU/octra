@@ -1,8 +1,8 @@
-<modal #modalexport>
-    <modal-header>
+<bs-modal #modalexport>
+    <bs-modal-header>
         <h4 class="modal-title">{{"general.export data" | translate}}</h4>
-    </modal-header>
-    <modal-body id="export-table">
+    </bs-modal-header>
+    <bs-modal-body id="export-table">
         <table class="table table-striped table-responsive">
             <thead>
             <tr>
@@ -51,18 +51,18 @@
            class="link">
             <span class="glyphicon glyphicon-floppy-save"></span> Download
         </a><br/>
-    </modal-body>
-    <modal-footer>
+    </bs-modal-body>
+    <bs-modal-footer>
         <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="modalexport.dismiss()">
             {{"general.close" | translate}}
         </button>
-    </modal-footer>
-</modal>
-<modal #modalstatistics id="modalstatis">
-    <modal-header>
+    </bs-modal-footer>
+</bs-modal>
+<bs-modal #modalstatistics id="modalstatis">
+    <bs-modal-header>
         <h4 class="modal-title">Statistics</h4>
-    </modal-header>
-    <modal-body>
+    </bs-modal-header>
+    <bs-modal-body>
         <div *ngIf="modalstatistics.visible">
             <h3>Transkriptionstext:</h3>
             <p>
@@ -115,13 +115,13 @@
             </h3>
             <textarea style="width:100%; height:300px;">{{dat}}</textarea>
         </div>
-    </modal-body>
-    <modal-footer>
+    </bs-modal-body>
+    <bs-modal-footer>
         <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="modalstatistics.dismiss()">
             {{"general.close" | translate}}
         </button>
-    </modal-footer>
-</modal>
+    </bs-modal-footer>
+</bs-modal>
 <nav class="navbar navbar-inverse">
     <div class="container">
         <div class="navbar-header">

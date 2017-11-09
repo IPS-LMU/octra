@@ -1,5 +1,5 @@
 import {isNullOrUndefined} from 'util';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs/Rx';
 
 export enum IDBMode {
   READONLY,

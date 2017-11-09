@@ -15,6 +15,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {Observable} from 'rxjs/Rx';
+import 'rxjs/add/observable/timer';
 // other
 import {AudioTimeCalculator, BrowserInfo, CanvasAnimation, Line, Logger, SubscriptionManager} from '../../../shared';
 import {AudioService, KeymappingService} from '../../../shared/service';

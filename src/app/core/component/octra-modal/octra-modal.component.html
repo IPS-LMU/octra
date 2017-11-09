@@ -1,40 +1,40 @@
-<modal #yesno>
-    <modal-body>
+<bs-modal #yesno>
+    <bs-modal-body>
         <p style="text-align:center;">{{(data !== undefined) ? data.text : ''}}</p>
-    </modal-body>
-    <modal-footer>
+    </bs-modal-body>
+    <bs-modal-footer>
         <button type="button" class="btn btn-primary" (click)="data.functions.no();yesno.close()">
             {{"general.no" | translate}}
         </button>
         <button type="button" class="btn btn-danger" (click)="data.functions.yes();yesno.close()">
             {{"general.yes" | translate}}
         </button>
-    </modal-footer>
-</modal>
+    </bs-modal-footer>
+</bs-modal>
 
-<modal #login_invalid>
-    <modal-header>
+<bs-modal #login_invalid>
+    <bs-modal-header>
         <h4 class="modal-title">{{"modal.login.header" | translate}}</h4>
-    </modal-header>
-    <modal-body>
+    </bs-modal-header>
+    <bs-modal-body>
         {{"modal.login.text" | translate}}
-    </modal-body>
-    <modal-footer>
+    </bs-modal-body>
+    <bs-modal-footer>
         <button type="button" class="btn btn-primary" (click)="login_invalid.dismiss()">
             {{"general.OK" | translate}}
         </button>
-    </modal-footer>
-</modal>
+    </bs-modal-footer>
+</bs-modal>
 
-<modal #transcription_delete>
-    <modal-header>
+<bs-modal #transcription_delete>
+    <bs-modal-header>
         <h4 class="modal-title">{{"modal.transcription.delete.header" | translate}}</h4>
-    </modal-header>
+    </bs-modal-header>
 
-    <modal-body>
+    <bs-modal-body>
         <div [innerHTML]="'modal.transcription.delete.text' | translate"></div>
-    </modal-body>
-    <modal-footer>
+    </bs-modal-body>
+    <bs-modal-footer>
         <button type="button" class="btn btn-default" data-dismiss="modal" (click)="transcription_delete.dismiss()">
             {{"general.abort" | translate}}
         </button>
@@ -42,18 +42,18 @@
                 (click)="transcription_delete.close();data.functions.ok()">
             {{"modal.transcription.delete.delete old" | translate}}
         </button>
-    </modal-footer>
-</modal>
+    </bs-modal-footer>
+</bs-modal>
 
-<modal #transcription_stop>
-    <modal-header>
+<bs-modal #transcription_stop>
+    <bs-modal-header>
         <h4 class="modal-title">{{"modal.transcription.stop.header" | translate}}?</h4>
-    </modal-header>
-    <modal-body>
+    </bs-modal-header>
+    <bs-modal-body>
         <div [innerHTML]="'modal.transcription.stop.text' | translate">
         </div>
-    </modal-body>
-    <modal-footer>
+    </bs-modal-body>
+    <bs-modal-footer>
         <button type="button" class="btn btn-default" data-dismiss="modal" (click)="transcription_stop.dismiss()">
             {{"general.continue" | translate}}
         </button>
@@ -61,24 +61,24 @@
                 (click)="transcription_stop.close();data.functions.ok();">
             {{"general.quit" | translate}}
         </button>
-    </modal-footer>
-</modal>
+    </bs-modal-footer>
+</bs-modal>
 
-<modal #error>
-    <modal-body>
+<bs-modal #error>
+    <bs-modal-body>
         <p style="text-align:center;color:red;">{{(data) ? data.text : ""}}</p>
-    </modal-body>
-    <modal-footer>
+    </bs-modal-body>
+    <bs-modal-footer>
         <button type="button" class="btn btn-default" data-dismiss="modal" (click)="error.close()">
             {{"general.OK" |translate}}
         </button>
-    </modal-footer>
-</modal>
-<modal #bugreport id="bugreport">
-    <modal-header>
+    </bs-modal-footer>
+</bs-modal>
+<bs-modal #bugreport id="bugreport">
+    <bs-modal-header>
         <h3>{{'bug report.report an error' | translate}}</h3>
-    </modal-header>
-    <modal-body>
+    </bs-modal-header>
+    <bs-modal-body>
         <div *ngIf="bugsent" class="text-success bugsent">{{'bug report.sent' | translate}}</div>
         <form class="form-vertical">
             <fieldset>
@@ -119,23 +119,23 @@
                 </div>
             </fieldset>
         </form>
-    </modal-body>
-    <modal-footer>
-        <modal-footer>
+    </bs-modal-body>
+    <bs-modal-footer>
+        <bs-modal-footer>
             <button type="button" class="btn btn-default" data-dismiss="modal" (click)="bugreport.dismiss()">
                 {{"general.abort" | translate}}
             </button>
             <button type="button" class="btn btn-primary" (click)="sendBugReport()" [disabled]="!isvalid">
                 {{"bug report.report an error" | translate}}
             </button>
-        </modal-footer>
-    </modal-footer>
-</modal>
-<modal #supportedfiles id="supportedfiles">
-    <modal-header>
+        </bs-modal-footer>
+    </bs-modal-footer>
+</bs-modal>
+<bs-modal #supportedfiles id="supportedfiles">
+    <bs-modal-header>
         <h3>{{'modal.supported.header' | translate}}</h3>
-    </modal-header>
-    <modal-body>
+    </bs-modal-header>
+    <bs-modal-body>
         <h4>{{'modal.supported.audio files' | translate}}:</h4>
         <table class="table table-responsive table-striped">
             <tr>
@@ -153,12 +153,12 @@
                 <td *ngIf="elem.conversion.import">*{{elem.extension}}</td>
             </tr>
         </table>
-    </modal-body>
-    <modal-footer>
-        <modal-footer>
+    </bs-modal-body>
+    <bs-modal-footer>
+        <bs-modal-footer>
             <button type="button" class="btn btn-primary" (click)="supportedfiles.close();">
                 {{"general.close" | translate}}
             </button>
-        </modal-footer>
-    </modal-footer>
-</modal>
+        </bs-modal-footer>
+    </bs-modal-footer>
+</bs-modal>

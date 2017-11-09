@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {LocalStorageService, SessionStorage, SessionStorageService} from 'ng2-webstorage';
+import {LocalStorageService, SessionStorage, SessionStorageService} from 'ngx-webstorage';
 import {SessionFile} from '../../obj/SessionFile';
 import {isNullOrUndefined} from 'util';
 import {OLevel, OLink} from '../../obj/Annotation/AnnotJSON';
@@ -791,7 +791,7 @@ export class AppStorageService {
       }).then(() => {
         return this._idb.saveArraySequential(value, 'annotation_links', 'id');
       });
-  };
+  }
 
   public clearLoggingData(): Promise<any> {
     this._logs = null;

@@ -1,5 +1,4 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import 'rxjs/Rx';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';

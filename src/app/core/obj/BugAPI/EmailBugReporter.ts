@@ -1,5 +1,5 @@
 import {BugReporter} from './BugReporter';
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
 import {isArray} from 'rxjs/util/isArray';
 import {HttpClient, HttpResponse} from '@angular/common/http';
 

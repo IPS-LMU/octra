@@ -10,7 +10,7 @@ import {isFunction, isNullOrUndefined} from 'util';
 import {Logger} from '../Logger';
 import {AppSettings} from '../../obj/Settings/app-settings';
 import {Functions} from '../Functions';
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {AppInfo} from '../../../app.info';

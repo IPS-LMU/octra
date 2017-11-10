@@ -1,5 +1,5 @@
 import {isNullOrUndefined} from 'util';
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
 import {HttpClient} from '@angular/common/http';
 
 export interface FileSize {

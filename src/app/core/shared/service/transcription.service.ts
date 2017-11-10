@@ -1,5 +1,4 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import 'rxjs/Rx';
 import {Segments} from '../../obj/Annotation/Segments';
 import {AudioService} from './audio.service';
 import {AppStorageService, OIDBLevel} from './appstorage.service';

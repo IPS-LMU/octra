@@ -36,7 +36,7 @@ import {TranscrGuidelinesComponent} from '../transcr-guidelines/transcr-guidelin
 import {APIService} from '../../shared/service/api.service';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 import {Entry} from '../../shared/service/keymapping.service';
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
 import {ProjectSettings} from '../../obj/Settings/project-configuration';
 import {NgForm} from '@angular/forms';
 import {AudioManager} from '../../obj/media/audio/AudioManager';

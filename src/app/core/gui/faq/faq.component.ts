@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges,
 import {DomSanitizer} from '@angular/platform-browser';
 import {isNullOrUndefined} from 'util';
 import {SettingsService} from '../../shared/service/settings.service';
-import {ProjectConfiguration} from '../../obj/Settings/project-configuration';
+import {ProjectSettings} from '../../obj/Settings/project-configuration';
 import {NavbarService} from '../navbar/navbar.service';
 
 @Component({
@@ -15,7 +15,7 @@ export class FaqComponent implements OnInit, OnChanges {
 
   @Input() url;
 
-  public get projectsettings(): ProjectConfiguration {
+  public get projectsettings(): ProjectSettings {
     return this.settService.projectsettings;
   }
 

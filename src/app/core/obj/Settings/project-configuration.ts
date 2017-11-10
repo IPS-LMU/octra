@@ -1,6 +1,6 @@
 import {Group} from '../FeedbackForm/Group';
 
-export interface ProjectConfiguration {
+export interface ProjectSettings {
   version: string;
   logging: {
     forced: boolean

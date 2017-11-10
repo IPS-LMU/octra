@@ -7,7 +7,7 @@ export class MouseStatisticElem extends StatisticElem {
   public static fromAny(elem: any): MouseStatisticElem {
     const result = {
       value: null,
-      target: null,
+      context: null,
       timestamp: null,
       type: null,
       playerpos: -1,
@@ -21,7 +21,7 @@ export class MouseStatisticElem extends StatisticElem {
 
     for (const attr in elem) {
       if (elem.hasOwnProperty(attr)) {
-        if (elem.hasOwnProperty('value') || elem.hasOwnProperty('target') || elem.hasOwnProperty('timestamp')
+        if (elem.hasOwnProperty('value') || elem.hasOwnProperty('context') || elem.hasOwnProperty('timestamp')
           || elem.hasOwnProperty('type') || elem.hasOwnProperty('playerpos') || elem.hasOwnProperty('caretpos')
           || elem.hasOwnProperty('segment')
         ) {
@@ -30,7 +30,7 @@ export class MouseStatisticElem extends StatisticElem {
       }
     }
 
-    return new MouseStatisticElem(result.type, result.target,
+    return new MouseStatisticElem(result.type, result.context,
       result.value, result.timestamp, result.playerpos, result.caretpos, result.segment);
   }
 

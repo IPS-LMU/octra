@@ -37,7 +37,7 @@ import {APIService} from '../../shared/service/api.service';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 import {Entry} from '../../shared/service/keymapping.service';
 import {Observable} from 'rxjs/Rx';
-import {ProjectConfiguration} from '../../obj/Settings/project-configuration';
+import {ProjectSettings} from '../../obj/Settings/project-configuration';
 import {NgForm} from '@angular/forms';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {EditorComponents} from '../../../editors/components';
@@ -89,7 +89,7 @@ export class TranscriptionComponent implements OnInit,
     return this.settingsService.app_settings;
   }
 
-  get projectsettings(): ProjectConfiguration {
+  get projectsettings(): ProjectSettings {
     return this.settingsService.projectsettings;
   }
 
@@ -485,7 +485,7 @@ export class TranscriptionComponent implements OnInit,
       json.jobno, json.id, json.status, json.comment, json.quality, json.log)
       .catch(this.onSendError)
       .subscribe((result) => {
-          if (result !== null && result.hasOwnProperty('statusText') && result.statusText === 'OK') {
+          if (result !== null) {
             this.appStorage.submitted = true;
 
             setTimeout(() => {
@@ -498,6 +498,9 @@ export class TranscriptionComponent implements OnInit,
           } else {
             this.send_error = this.langService.instant('send error');
           }
+        },
+        (error) => {
+          console.error(error);
         }
       ));
   }
@@ -522,10 +525,8 @@ export class TranscriptionComponent implements OnInit,
     this.clearData();
     this.subscrmanager.add(this.api.beginSession(this.appStorage.user.project, this.appStorage.user.id,
       Number(this.appStorage.user.jobno), '')
-      .subscribe((result) => {
-        if (result !== null) {
-          const json = result.json();
-
+      .subscribe((json) => {
+        if (json !== null) {
           if (json.data && json.data.hasOwnProperty('url') && json.data.hasOwnProperty('id')) {
             this.appStorage.audio_url = json.data.url;
             this.appStorage.data_id = json.data.id;

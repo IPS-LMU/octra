@@ -1,9 +1,8 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {Http} from '@angular/http';
 
 import {SubscriptionManager} from '../';
 import {ConfigValidator} from '../../obj/ConfigValidator';
-import {ProjectConfiguration} from '../../obj/Settings/project-configuration';
+import {ProjectSettings} from '../../obj/Settings/project-configuration';
 import {Subscription} from 'rxjs/Subscription';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
@@ -15,6 +14,7 @@ import {Observable} from 'rxjs/Rx';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {AppInfo} from '../../../app.info';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable()
 export class SettingsService {
@@ -38,7 +38,7 @@ export class SettingsService {
     return this._validationmethod;
   }
 
-  get projectsettings(): ProjectConfiguration {
+  get projectsettings(): ProjectSettings {
     return this._projectsettings;
   }
 
@@ -81,7 +81,7 @@ export class SettingsService {
 
   private subscrmanager: SubscriptionManager;
 
-  private _projectsettings: ProjectConfiguration;
+  private _projectsettings: ProjectSettings;
   private _app_settings: AppSettings;
   private _guidelines: any;
   private _loaded = false;
@@ -102,7 +102,7 @@ export class SettingsService {
     );
   }
 
-  constructor(private http: Http,
+  constructor(private http: HttpClient,
               private appStorage: AppStorageService) {
     this.subscrmanager = new SubscriptionManager();
   }
@@ -125,8 +125,8 @@ export class SettingsService {
         json: 'appconfig.json',
         schema: 'appconfig.schema.json'
       },
-      (result) => {
-        this._app_settings = result.json();
+      (result: AppSettings) => {
+        this._app_settings = result;
       },
       () => {
         Logger.log('AppSettings loaded.');
@@ -149,8 +149,8 @@ export class SettingsService {
         json: 'projectconfig.json',
         schema: 'projectconfig.schema.json'
       },
-      (result) => {
-        this._projectsettings = result.json();
+      (result: ProjectSettings) => {
+        this._projectsettings = result;
       },
       () => {
         Logger.log('Projectconfig loaded.');
@@ -173,7 +173,7 @@ export class SettingsService {
         schema: 'guidelines.schema.json'
       },
       (result) => {
-        this._guidelines = result.json();
+        this._guidelines = result;
       },
       () => {
         Logger.log('Guidelines loaded.');
@@ -185,7 +185,9 @@ export class SettingsService {
 
   public loadValidationMethod: ((url: string) => Subscription) = (url: string) => {
     Logger.log('Load methods...');
-    return Functions.uniqueHTTPRequest(this.http, false, null, url, null).subscribe(
+    return Functions.uniqueHTTPRequest(this.http, false, {
+      responseType: 'text'
+    }, url, null).subscribe(
       (response) => {
         const js = document.createElement('script');
 
@@ -206,10 +208,10 @@ export class SettingsService {
           }
         };
         document.body.appendChild(js);
-      }
-      ,
+      },
       (error) => {
         this._log += 'Loading functions failed [Error: S01]<br/>';
+        console.error(error);
       }
     );
   }
@@ -336,18 +338,14 @@ export class SettingsService {
     ) {
       Logger.log(messages.loading);
       this.subscrmanager.add(Functions.uniqueHTTPRequest(this.http, false, null, urls.json, null).subscribe(
-        (result) => {
-          onhttpreturn(result);
+        (appsettings: AppSettings) => {
+          onhttpreturn(appsettings);
 
           this.subscrmanager.add(Functions.uniqueHTTPRequest(this.http, false, null, urls.schema, null).subscribe(
-            (result2) => {
-
+            (schema) => {
               Logger.log(filenames.json + ' schema file loaded');
 
-              const schema = result2.json();
-              const json = result.json();
-
-              const validation_ok = this.validateJSON(filenames.json, json, schema);
+              const validation_ok = this.validateJSON(filenames.json, appsettings, schema);
 
               if (validation_ok) {
                 onvalidated();

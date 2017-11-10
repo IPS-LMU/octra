@@ -12,7 +12,7 @@ export interface ILogging {
 export interface ILog {
   timestamp: number; // Unix Timestamp
   type: string;
-  target: string; // Ziel der Aktion/betroffenes Control
+  context: string; // Ziel der Aktion/betroffenes Control
   value: string | number | any;
   playerpos: number; // Samples
   caretpos: number; // Position des Cursors im// Text (wird Caret genannt)
@@ -47,15 +47,15 @@ export class OLogging implements ILogging {
 export class OLog implements ILog {
   timestamp: number; // Unix Timestamp
   type: string;
-  target: string; // Ziel der Aktion/betroffenes Control
+  context: string; // Ziel der Aktion/betroffenes Control
   value: string | number | any;
   playerpos: number; // Samples
   caretpos: number; // Position des Cursors im Text (wird Caret genannt)
 
-  constructor(timestamp: number, type: string, target: string, value: any, playerpos: number, caretpos: number) {
+  constructor(timestamp: number, type: string, context: string, value: any, playerpos: number, caretpos: number) {
     this.timestamp = timestamp;
     this.type = type;
-    this.target = target;
+    this.context = context;
     this.value = value;
     this.playerpos = playerpos;
     this.caretpos = caretpos;

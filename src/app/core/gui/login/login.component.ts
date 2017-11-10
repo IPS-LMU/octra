@@ -190,9 +190,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.createNewSession(form);
     } else if (continue_session) {
       this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
-        (result) => {
-          const json = result.json();
-
+        (json) => {
           if (json.hasOwnProperty('message')) {
             const counter = (json.message === '') ? '0' : json.message;
             this.appStorage.sessStr.store('jobs_left', Number(counter));
@@ -379,8 +377,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   loadPojectsList() {
     this.subscrmanager.add(this.api.getProjects().subscribe(
-      ((result) => {
-        const json = result.json();
+      ((json) => {
         if (isArray(json.data)) {
           this.projects = json.data;
           if (!isNullOrUndefined(this.appStorage.user) &&
@@ -407,8 +404,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       alert('Server cannot be requested. Please check if you are online.');
       return Observable.throw(error);
     }).subscribe(
-      (result) => {
-        const json = result.json();
+      (json) => {
         if (form.valid && this.agreement_checked
           && json.message !== '0'
         ) {
@@ -452,9 +448,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   private setOnlineSessionToFree = (callback: () => void) => {
     // check if old annotation is already annotated
     this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
-      (result) => {
-        const json = result.json();
-
+      (json) => {
         if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
           this.subscrmanager.add(this.api.closeSession(this.appStorage.user.id, this.appStorage.data_id, '').subscribe(
             (result2) => {

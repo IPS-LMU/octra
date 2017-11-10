@@ -1,5 +1,5 @@
 import {Observable} from 'rxjs/Rx';
-import {Http, Response} from '@angular/http';
+import {HttpClient} from '@angular/common/http';
 
 export abstract class BugReporter {
   get name(): string {
@@ -8,7 +8,7 @@ export abstract class BugReporter {
 
   protected _name = '';
 
-  public abstract sendBugReport(http: Http, form: any, pkg: any, url: string, auth_token: string, sendbugreport: boolean): Observable<Response>;
+  public abstract sendBugReport(http: HttpClient, form: any, pkg: any, url: string, auth_token: string, sendbugreport: boolean): Observable<any>;
 
   public abstract getText(pkg: any): string;
 }

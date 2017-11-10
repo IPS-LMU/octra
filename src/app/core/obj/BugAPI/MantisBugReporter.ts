@@ -1,7 +1,7 @@
 import {BugReporter} from './BugReporter';
 import {Observable} from 'rxjs/Rx';
-import {Headers, Http, RequestOptions, Response, URLSearchParams} from '@angular/http';
 import {isArray} from 'rxjs/util/isArray';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 
 export class MantisBugReporter extends BugReporter {
   constructor() {
@@ -9,21 +9,14 @@ export class MantisBugReporter extends BugReporter {
     this._name = 'MantisBT';
   }
 
-  public sendBugReport(http: Http, pkg: any, form: any, url: string, auth_token: string, sendbugreport: boolean): Observable<Response> {
+  public sendBugReport(http: HttpClient, pkg: any, form: any, url: string, auth_token: string, sendbugreport: boolean): Observable<any> {
 
     const report = (sendbugreport) ? this.getText(pkg) : '';
-
-    const params = new URLSearchParams();
 
     let summary = form.description;
     if (summary.length > 100) {
       summary = summary.substr(0, 100) + '...';
     }
-
-    const requestOptions = new RequestOptions();
-    requestOptions.params = params;
-    requestOptions.headers = new Headers();
-    requestOptions.headers.set('Authorization', auth_token);
 
     const json = pkg;
 
@@ -45,15 +38,21 @@ export class MantisBugReporter extends BugReporter {
       body['additional_information'] += '\n\n' + report;
     }
 
-    return http.post(url, JSON.stringify(body), requestOptions);
+    return http.post(url, JSON.stringify(body), {
+      headers: {
+        Authorization: auth_token
+      },
+      responseType: 'json'
+    });
   }
 
-  public getTest(http: Http, url: string, auth_token: string) {
-    const params = new URLSearchParams();
-    const requestOptions = new RequestOptions();
-    params.set('id', '10');
-    requestOptions.params = params;
-    requestOptions.headers = new Headers();
+  public getTest(http: HttpClient, url: string, auth_token: string) {
+    const params = new HttpParams();
+    const requestOptions = {
+      params: params,
+      headers: new HttpHeaders()
+    };
+    requestOptions.params.set('id', '10');
     requestOptions.headers.set('Authorization', auth_token);
 
     const body = {

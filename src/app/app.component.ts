@@ -173,7 +173,7 @@ export class AppComponent implements OnDestroy {
     this.subscrmanager.add(
       this.api.fetchAnnotation(Number(id)).subscribe(
         (result) => {
-          console.log(result.json());
+          console.log(result);
         }
       )
     );
@@ -184,7 +184,7 @@ export class AppComponent implements OnDestroy {
     this.subscrmanager.add(
       this.api.closeSession('julian_test', Number(id), '').subscribe(
         (result) => {
-          console.log(result.json());
+          console.log(result);
         }
       )
     );

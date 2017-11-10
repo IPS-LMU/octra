@@ -59,9 +59,7 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
   private setOnlineSessionToFree = (callback: () => void) => {
     // check if old annotation is already annotated
     this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
-      (result) => {
-        const json = result.json();
-
+      (json) => {
         if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
           this.subscrmanager.add(this.api.closeSession(this.appStorage.user.id, this.appStorage.data_id, '').subscribe(
             (result2) => {

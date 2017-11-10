@@ -3,13 +3,13 @@ import {BrowserInfo} from '../BrowserInfo';
 import {TranslateService} from '@ngx-translate/core';
 import {AppInfo} from '../../../app.info';
 import {AppStorageService} from './appstorage.service';
-import {Http, Response} from '@angular/http';
 import {Observable} from 'rxjs/Rx';
 import {SettingsService} from './settings.service';
 import {isNullOrUndefined} from 'util';
 import {BugReporter} from '../../obj/BugAPI/BugReporter';
 import {TranscriptionService} from './transcription.service';
 import {Functions} from '../Functions';
+import {HttpClient} from '@angular/common/http';
 
 export enum ConsoleType {
   LOG,
@@ -36,7 +36,7 @@ export class BugReportService {
   constructor(private langService: TranslateService,
               private appStorage: AppStorageService,
               private settService: SettingsService,
-              private http: Http) {
+              private http: HttpClient) {
   }
 
   public init(transcrService: TranscriptionService) {
@@ -111,7 +111,7 @@ export class BugReportService {
   sendReport(email: string, description: string, sendbugreport: boolean, credentials: {
     auth_token: string,
     url: string
-  }): Observable<Response> {
+  }): Observable<any> {
     const bugreport_settings = this.settService.app_settings.octra.bugreport;
 
     if (!isNullOrUndefined(bugreport_settings) && bugreport_settings.enabled) {

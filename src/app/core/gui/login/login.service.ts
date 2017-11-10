@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {Http} from '@angular/http';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable()
 export class LoginService {
@@ -8,7 +8,7 @@ export class LoginService {
 
   private subscrmanager: SubscriptionManager;
 
-  constructor(private http: Http) {
+  constructor(private http: HttpClient) {
     this.subscrmanager = new SubscriptionManager();
   }
 

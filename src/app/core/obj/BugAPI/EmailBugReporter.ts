@@ -1,7 +1,7 @@
 import {BugReporter} from './BugReporter';
 import {Observable} from 'rxjs/Rx';
 import {isArray} from 'rxjs/util/isArray';
-import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
+import {HttpClient, HttpResponse} from '@angular/common/http';
 
 export class EmailBugReporter extends BugReporter {
   constructor() {
@@ -33,7 +33,6 @@ export class EmailBugReporter extends BugReporter {
         Authorization: auth_token
       },
       observe: 'response',
-      params: new HttpParams(),
       responseType: 'json'
     });
   }

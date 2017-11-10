@@ -180,7 +180,6 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
   }
 
   ngOnChanges(obj: SimpleChanges) {
-    console.log(obj);
     if (!isNullOrUndefined(obj.mini_loupe)) {
       if (obj.mini_loupe.isFirstChange() && this.appStorage.show_loupe) {
         this.miniloupe.Settings.shortcuts_enabled = false;

@@ -1,18 +1,18 @@
 import {Injectable, SecurityContext} from '@angular/core';
 import {API} from '../../obj/API/api.interface';
-import {Http, Response} from '@angular/http';
 import {DomSanitizer} from '@angular/platform-browser';
 import {Observable} from 'rxjs/Rx';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable()
 export class APIService implements API {
   private server_url = '';
 
-  constructor(private http: Http,
+  constructor(private http: HttpClient,
               private sanitizer: DomSanitizer) {
   }
 
-  public beginSession(project: string, annotator: string, jobno: number, password?: string): Observable<Response> {
+  public beginSession(project: string, annotator: string, jobno: number, password?: string): Observable<any> {
     // validation
     if (project !== '' && (annotator !== '')) {
 
@@ -27,7 +27,7 @@ export class APIService implements API {
     throw new Error('beginSession - validation false');
   }
 
-  public continueSession(project: string, annotator: string, jobno: number): Observable<Response> {
+  public continueSession(project: string, annotator: string, jobno: number): Observable<any> {
     if (project !== null && project !== '' &&
       annotator !== null && annotator !== ''
     ) {
@@ -43,7 +43,7 @@ export class APIService implements API {
     }
   }
 
-  public fetchAnnotation(id: number): Observable<Response> {
+  public fetchAnnotation(id: number): Observable<any> {
     const cmd_json = {
       querytype: 'fetchannotation',
       id: id
@@ -52,7 +52,7 @@ export class APIService implements API {
   }
 
   public lockSession(transcript: any[], project: string, annotator: string, jobno: number,
-                     data_id: number, comment: string, quality: any, log: any[]): Observable<Response> {
+                     data_id: number, comment: string, quality: any, log: any[]): Observable<any> {
     if (
       project !== '' &&
       transcript.length > 0 &&
@@ -81,10 +81,10 @@ export class APIService implements API {
    * this method doesn't work! Do not use it.
    * @param project
    * @param data_id
-   * @returns {Observable<Response>}
+   * @returns {Observable<any>}
    */
   public unlockSession(project: string,
-                       data_id: number): Observable<Response> {
+                       data_id: number): Observable<any> {
     if (
       project !== ''
     ) {
@@ -107,7 +107,7 @@ export class APIService implements API {
   }
 
   public saveSession(transcript: any[], project: string, annotator: string, jobno: number, data_id: number,
-                     status: string, comment: string, quality: any, log: any[]): Observable<Response> {
+                     status: string, comment: string, quality: any, log: any[]): Observable<any> {
     if (
       project !== '' &&
       transcript.length > 0 &&
@@ -132,7 +132,7 @@ export class APIService implements API {
     }
   }
 
-  public closeSession(annotator: string, id: number, comment: string): Observable<Response> {
+  public closeSession(annotator: string, id: number, comment: string): Observable<any> {
     comment = (comment) ? comment : '';
 
     if (
@@ -173,10 +173,12 @@ export class APIService implements API {
     return this.post(cmd_json);
   }
 
-  public post(json: any): Observable<Response> {
+  public post(json: any): Observable<any> {
     const body = JSON.stringify(json);
 
-    return this.http.post(this.server_url, body);
+    return this.http.post(this.server_url, body, {
+      responseType: 'json'
+    });
   }
 
   public init(server_url: string) {
@@ -184,7 +186,7 @@ export class APIService implements API {
     this.server_url = sanitized_url;
   }
 
-  public sendBugReport(email: string = '', description: string = '', log: any): Observable<Response> {
+  public sendBugReport(email: string = '', description: string = '', log: any): Observable<any> {
     const json = JSON.stringify(log);
 
     const cmd_json = {

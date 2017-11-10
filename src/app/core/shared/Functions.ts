@@ -1,6 +1,6 @@
 import {isNullOrUndefined} from 'util';
-import {Http, RequestOptions, RequestOptionsArgs, Response, URLSearchParams} from '@angular/http';
 import {Observable} from 'rxjs/Rx';
+import {HttpClient, HttpParams} from '@angular/common/http';
 
 export interface FileSize {
   size: number;
@@ -163,16 +163,19 @@ export class Functions {
     return result;
   }
 
-  public static uniqueHTTPRequest(http: Http, post: boolean = false, requestoptions: RequestOptionsArgs, url: string, body: any): Observable<Response> {
+  public static uniqueHTTPRequest(http: HttpClient, post: boolean = false, requestoptions: any,
+                                  url: string, body: any): Observable<any> {
     if (!post) {
-      const params: URLSearchParams = new URLSearchParams();
+      const options = (!isNullOrUndefined(requestoptions)) ? requestoptions : {};
+
+      if (!options.hasOwnProperty('params')) {
+        options['params'] = new HttpParams();
+      }
+
       const d = Date.now();
-      params.set('v', d.toString());
+      options.params.set('v', d.toString());
 
-      const requestOptions = new RequestOptions();
-      requestOptions.params = params;
-
-      return http.get(url, requestOptions);
+      return http.get(url, options);
     } else {
       return http.post(url, body, requestoptions);
     }
@@ -200,10 +203,10 @@ export class Functions {
   }
 
   public static base64ToArrayBuffer(base64): ArrayBuffer {
-    const binary_string =  window.atob(base64);
+    const binary_string = window.atob(base64);
     const len = binary_string.length;
-    const bytes = new Uint8Array( len );
-    for (let i = 0; i < len; i++)        {
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
       bytes[i] = binary_string.charCodeAt(i);
     }
     return (<ArrayBuffer> bytes.buffer);

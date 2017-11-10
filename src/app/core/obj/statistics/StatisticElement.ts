@@ -17,8 +17,8 @@ export class StatisticElem {
     return this.data.timestamp;
   }
 
-  get target(): string {
-    return this.data.target;
+  get context(): string {
+    return this.data.context;
   }
 
   get type(): string {
@@ -51,7 +51,7 @@ export class StatisticElem {
 
     for (const attr in elem) {
       if (elem.hasOwnProperty(attr)) {
-        if (elem.hasOwnProperty('value') || elem.hasOwnProperty('target') || elem.hasOwnProperty('timestamp') ||
+        if (elem.hasOwnProperty('value') || elem.hasOwnProperty('context') || elem.hasOwnProperty('timestamp') ||
           elem.hasOwnProperty('type') || elem.hasOwnProperty('playerpos') || elem.hasOwnProperty('cursorpos')
         ) {
           result[`${attr}`] = elem[`${attr}`];
@@ -68,9 +68,9 @@ export class StatisticElem {
     );
   }
 
-  constructor(type: string, target: string, value: any, timestamp: number, playerpos: number) {
+  constructor(type: string, context: string, value: any, timestamp: number, playerpos: number) {
     this.data.type = type;
-    this.data.context = target;
+    this.data.context = context;
     this.data.timestamp = timestamp;
     this.data.value = value;
     if (!isNullOrUndefined(playerpos)) {

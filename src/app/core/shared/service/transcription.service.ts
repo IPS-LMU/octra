@@ -22,7 +22,7 @@ import {Level} from '../../obj/Annotation/Level';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {OLog, OLogging} from '../../obj/Settings/logging';
 import {AppSettings} from '../../obj/Settings/app-settings';
-import {ProjectConfiguration} from '../../obj/Settings/project-configuration';
+import {ProjectSettings} from '../../obj/Settings/project-configuration';
 
 @Injectable()
 export class TranscriptionService {
@@ -139,7 +139,7 @@ export class TranscriptionService {
     return this.settingsService.app_settings;
   }
 
-  private get projectsettings(): ProjectConfiguration {
+  private get projectsettings(): ProjectSettings {
     return this.settingsService.projectsettings;
   }
 
@@ -403,7 +403,7 @@ export class TranscriptionService {
         const new_elem = new OLog(
           elem.timestamp,
           elem.type,
-          elem.target,
+          elem.context,
           '',
           elem.playerpos,
           elem.caretpos
@@ -412,7 +412,7 @@ export class TranscriptionService {
         if (elem instanceof MouseStatisticElem) {
           new_elem.value = elem.value;
         } else if (elem instanceof KeyStatisticElem) {
-          new_elem.value = (<KeyStatisticElem> elem).char;
+          new_elem.value = (<KeyStatisticElem> elem).value;
         } else {
           new_elem.value = (<StatisticElem> elem).value;
         }

@@ -2,7 +2,6 @@
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {Http, HttpModule, JsonpModule} from '@angular/http';
 import {TranslateLoader, TranslateModule, TranslateService} from '@ngx-translate/core';
 // third-party
 import {BsModalModule} from 'ng2-bs3-modal';
@@ -37,6 +36,7 @@ import {
   TranscrWindowComponent
 } from './core/gui';
 
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {routing} from './app.routes';
 import {LeadingNullPipe, ProcentPipe, SecondsPipe, TimespanPipe} from './core/shared/pipe';
 
@@ -80,9 +80,10 @@ import {NewEditorComponent} from './editors/new-editor/new-editor.component';
 import {HelpToolsComponent} from './core/gui/help-tools/help-tools.component';
 import {FeaturesComponent} from './core/gui/features/features.component';
 import {Timespan2Pipe} from './core/shared/pipe/timespan2.pipe';
+import {HttpClient, HttpClientModule} from '@angular/common/http';
 
 // AoT requires an exported function for factories
-export function HttpLoaderFactory(http: Http) {
+export function HttpLoaderFactory(http: HttpClient) {
   return new LanguageLoader(http, './i18n/octra/octra_', '.json');
 }
 
@@ -141,19 +142,19 @@ export const ngmodule = {
       loader: {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,
-        deps: [Http]
+        deps: [HttpClient]
       }
     }),
     BsDropdownModule.forRoot(),
     CollapseModule.forRoot(),
     FormsModule,
-    HttpModule,
-    JsonpModule,
+    HttpClientModule,
     Ng2Webstorage.forRoot({
       separator: '.',
       prefix: 'custom'
     }),
     BsModalModule,
+    BrowserAnimationsModule,
     ReactiveFormsModule,
     routing
   ],

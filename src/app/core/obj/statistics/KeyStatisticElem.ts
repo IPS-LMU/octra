@@ -45,7 +45,7 @@ export class KeyStatisticElem extends StatisticElem {
 
     for (const attr in elem) {
       if (elem.hasOwnProperty(attr)) {
-        if (elem.hasOwnProperty('value') || elem.hasOwnProperty('target') || elem.hasOwnProperty('timestamp')
+        if (elem.hasOwnProperty('value') || elem.hasOwnProperty('context') || elem.hasOwnProperty('timestamp')
           || elem.hasOwnProperty('type') || elem.hasOwnProperty('keyCode') || elem.hasOwnProperty('shiftPressed')
           || elem.hasOwnProperty('ctrlPressed') || elem.hasOwnProperty('altPressed') || elem.hasOwnProperty('char')
           || elem.hasOwnProperty('playerpos') || elem.hasOwnProperty('caretpos') || elem.hasOwnProperty('control')

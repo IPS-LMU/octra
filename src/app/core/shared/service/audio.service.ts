@@ -1,5 +1,4 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {Http, RequestOptions, Response, ResponseContentType} from '@angular/http';
 import {Observable} from 'rxjs/Rx';
 
 import {isNullOrUndefined} from 'util';
@@ -7,6 +6,7 @@ import {Logger} from '../Logger';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 
 @Injectable()
 export class AudioService {
@@ -28,7 +28,7 @@ export class AudioService {
   /***
    * Constructor
    */
-  constructor(private http: Http) {
+  constructor(private http: HttpClient) {
   }
 
   public registerAudioManager(manager: AudioManager) {
@@ -50,13 +50,14 @@ export class AudioService {
   }) => {
     this._loaded = false;
 
-    const options = new RequestOptions({
-      responseType: ResponseContentType.ArrayBuffer
-    });
+    const options = {
+      headers: new HttpHeaders(),
+      params: HttpParams,
+      responseType: 'arraybuffer'
+    };
 
-    const request = this.http.get(url, options).subscribe(
-      (result) => {
-        const buffer = this.extractData(result);
+    const request = this.http.get(url, {responseType: 'arraybuffer'}).subscribe(
+      (buffer: ArrayBuffer) => {
         const regex: RegExp = new RegExp(/((%|-|\.|[A-ZÄÖÜß]|[a-zäöü]|_|[0-9])+)\.(wav|ogg)/, 'g');
         const matches: RegExpExecArray = regex.exec(url);
 
@@ -82,11 +83,6 @@ export class AudioService {
       }
     );
   };
-
-  private extractData(result: Response) {
-    const data = result.arrayBuffer();
-    return data;
-  }
 
   private handleError(err: any) {
     const errMsg = err;

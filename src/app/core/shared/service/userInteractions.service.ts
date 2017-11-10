@@ -46,7 +46,7 @@ export class UserInteractionsService {
 
     if (this._enabled) {
       let name = '';
-      let target: any = null;
+      let context: any = null;
 
       if (isNullOrUndefined(segment)) {
         segment = {
@@ -58,11 +58,11 @@ export class UserInteractionsService {
 
       if (!target_name) {
         if (event && event.target) {
-          target = event.target;
-          name = target.getAttribute('name');
+          context = event.target;
+          name = context.getAttribute('name');
 
           if (!name) {
-            name = target.parentNode.getAttribute('name');
+            name = context.parentNode.getAttribute('name');
           }
           if (!name) {
             name = '';
@@ -87,8 +87,7 @@ export class UserInteractionsService {
       } else if (Functions.contains(type, 'slider')) {
         elem = new MouseStatisticElem(type, name, event.new_value, timestamp, playerpos, caretpos, segment);
       } else {
-        elem = new StatisticElem(type, name, event.value, timestamp, playerpos
-        );
+        elem = new StatisticElem(type, name, event.value, timestamp, playerpos);
       }
 
       if (elem) {

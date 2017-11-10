@@ -1,6 +1,6 @@
 import {isNullOrUndefined} from 'util';
 import {Observable} from 'rxjs/Rx';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 
 export interface FileSize {
   size: number;
@@ -169,12 +169,14 @@ export class Functions {
       const options = (!isNullOrUndefined(requestoptions)) ? requestoptions : {};
 
       if (!options.hasOwnProperty('params')) {
-        options['params'] = new HttpParams();
+        options['params'] = {};
       }
 
       const d = Date.now();
-      options.params.set('v', d.toString());
+      options['params']['v'] = d.toString();
 
+      console.log('url: ' + url);
+      console.log(options);
       return http.get(url, options);
     } else {
       return http.post(url, body, requestoptions);

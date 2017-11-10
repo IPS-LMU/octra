@@ -1,7 +1,7 @@
 import {BugReporter} from './BugReporter';
 import {Observable} from 'rxjs/Rx';
 import {isArray} from 'rxjs/util/isArray';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 
 export class MantisBugReporter extends BugReporter {
   constructor() {
@@ -47,12 +47,11 @@ export class MantisBugReporter extends BugReporter {
   }
 
   public getTest(http: HttpClient, url: string, auth_token: string) {
-    const params = new HttpParams();
     const requestOptions = {
-      params: params,
+      params: {},
       headers: new HttpHeaders()
     };
-    requestOptions.params.set('id', '10');
+    requestOptions.params['id'] = '10';
     requestOptions.headers.set('Authorization', auth_token);
 
     const body = {

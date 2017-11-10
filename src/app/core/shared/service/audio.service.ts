@@ -6,7 +6,7 @@ import {Logger} from '../Logger';
 import {AudioManager} from '../../obj/media/audio/AudioManager';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable()
 export class AudioService {
@@ -49,12 +49,6 @@ export class AudioService {
   }, errorcallback: (err: any) => void = () => {
   }) => {
     this._loaded = false;
-
-    const options = {
-      headers: new HttpHeaders(),
-      params: HttpParams,
-      responseType: 'arraybuffer'
-    };
 
     const request = this.http.get(url, {responseType: 'arraybuffer'}).subscribe(
       (buffer: ArrayBuffer) => {

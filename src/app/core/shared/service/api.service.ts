@@ -1,7 +1,7 @@
 import {Injectable, SecurityContext} from '@angular/core';
 import {API} from '../../obj/API/api.interface';
 import {DomSanitizer} from '@angular/platform-browser';
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
 import {HttpClient} from '@angular/common/http';
 
 @Injectable()

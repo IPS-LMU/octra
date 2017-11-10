@@ -13,7 +13,7 @@ import {NgForm} from '@angular/forms';
 import {LoginService} from './login.service';
 import {AppStorageService, OIDBLevel, OIDBLink} from '../../shared/service/appstorage.service';
 import {ComponentCanDeactivate} from './login.deactivateguard';
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
 import {FileSize, Functions} from '../../shared/Functions';
 import {APIService} from '../../shared/service/api.service';
 import {BrowserCheck} from '../../shared/BrowserCheck';
@@ -28,6 +28,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {Converter} from '../../obj/Converters/Converter';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
 import {AudioService} from '../../shared/service/audio.service';
+import 'rxjs/add/operator/catch';
 
 @Component({
   selector: 'app-login',

@@ -1,4 +1,4 @@
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
 import {Response} from '@angular/http';
 
 /***

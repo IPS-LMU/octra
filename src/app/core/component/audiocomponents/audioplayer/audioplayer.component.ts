@@ -14,7 +14,7 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/observable/timer';
 // other
 import {AudioTimeCalculator, BrowserInfo, CanvasAnimation, Line, Logger, SubscriptionManager} from '../../../shared';

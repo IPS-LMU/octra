@@ -38,16 +38,34 @@ if (!empty($data) && !is_null($headers["Authorization"]) && $headers["Authorizat
         $from_email = $data["additional_information"]["email"];
         $timestamp = date("Y-m-d-H-i-s");
         $topic = "OCTRA BUG [$timestamp]";
-        $text = "An user sent a new bug report.<br/><br/>
-        <table>
-        <tr><td> Email Address:</td><td>$from_email</td></tr>
-        <tr><td>Description:</td><td>".$data["description"]."</td></tr>
-        <tr><td>OS:</td><td>" . $data["os"] . " " . $data["os_build"] . "</td></tr>
-        <tr><td>Platform:</td><td>" . $data["platform"] . " " . $data["version"] . "</td></tr>
+        $text = "<html>
+<head>
+<style>
+table tr td{
+border:1px solid gray;
+vertical-align:top;
+text-align:left;
+}
+
+table tr .left{
+ max-width: 50px;
+}
+</style>
+</head>
+<body>
+<h3>OCTRA BUG [$timestamp]</h3>
+A user sent a new bug report.<br/><br/>
+        <table style='width:100%;'>
+        <tr><td class='left'>Email Address:</td><td>$from_email</td></tr>
+        <tr><td class='left'>Description:</td><td>" . str_replace("\n", "<br/>", $data["description"]) . "</td></tr>
+        <tr><td class='left'>OS:</td><td>" . $data["os"] . " " . $data["os_build"] . "</td></tr>
+        <tr><td class='left'>Platform:</td><td>" . $data["platform"] . " " . $data["version"] . "</td></tr>
 </table>
 <br/><br/>
         Please have a look on the attachment<br><br>
-        --- This message was auto generated ---";
+        --- This message was auto generated ---
+        </body>
+        </html>";
 
         $file = null;
         $bugreport = $data["report"];

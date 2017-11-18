@@ -102,14 +102,14 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
     this.audiochunk_top = this.audiomanager.mainchunk.clone();
     this.audiochunk_down = this.audiomanager.mainchunk.clone();
     this.audiochunk_loupe = this.audiomanager.mainchunk.clone();
-    this.viewer.Settings.shortcuts = this.keyMap.register('AV', this.viewer.Settings.shortcuts);
 
+    this.viewer.Settings.shortcuts = this.keyMap.register('AV', this.viewer.Settings.shortcuts);
     this.viewer.Settings.multi_line = false;
     this.viewer.Settings.lineheight = 80;
     this.viewer.Settings.shortcuts_enabled = true;
     this.viewer.Settings.boundaries.readonly = false;
     this.viewer.Settings.justify_signal_height = true;
-    this.viewer.round_values = true;
+    this.viewer.Settings.round_values = false;
 
     this.loupe_settings = new AudioviewerConfig();
     this.loupe_settings.shortcuts = this.keyMap.register('Loupe', this.loupe_settings.shortcuts);

@@ -151,6 +151,8 @@
                 </td>
                 <td *ngIf="elem.conversion.import">{{elem.application}}</td>
                 <td *ngIf="elem.conversion.import">*{{elem.extension}}</td>
+                <td><span *ngIf="elem.notice !== ''" class="glyphicon glyphicon-info-sign"
+                          data-toggle="tooltip" data-placement="right" [attr.title]="elem.notice"></span></td>
             </tr>
         </table>
     </bs-modal-body>

@@ -63,6 +63,9 @@ export class OctraModalComponent implements OnInit, OnDestroy {
 
         if (!isNullOrUndefined(result.type)) {
           this[result.type].open();
+          jQuery(function () {
+            jQuery('[data-toggle="tooltip"]').tooltip();
+          });
         } else {
           throw new Error('modal function not supported');
         }

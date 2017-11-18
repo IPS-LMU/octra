@@ -8,15 +8,18 @@ export interface IFile {
 }
 
 export interface ImportResult {
-  annotjson: OAnnotJSON,
-  audiofile: OAudiofile
+  annotjson: OAnnotJSON;
+  audiofile: OAudiofile;
 }
 
 export interface ExportResult {
-  file: IFile
+  file: IFile;
 }
 
 export abstract class Converter {
+  get notice(): string {
+    return this._notice;
+  }
   get encoding(): string {
     return this._encoding;
   }
@@ -64,6 +67,7 @@ export abstract class Converter {
     title: '',
     url: ''
   };
+  protected _notice = '';
 
   protected _showauthors = false;
 

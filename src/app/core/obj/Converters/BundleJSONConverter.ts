@@ -25,9 +25,10 @@ export class BundleJSONConverter extends Converter {
     this._extension = '_bndl.json';
     this._website.title = '';
     this._website.url = '';
-    this._conversion.export = true;
+    this._conversion.export = false;
     this._conversion.import = true;
     this._encoding = 'UTF-8';
+    this._notice = 'Export to Bundle is currenty not possible';
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult {

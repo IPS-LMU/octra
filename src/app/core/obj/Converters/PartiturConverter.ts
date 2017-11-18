@@ -10,15 +10,59 @@ export class PartiturConverter extends Converter {
     this._name = 'BAS Partitur Format';
     this._extension = '.par';
     this._website.title = 'BAS Partitur Format';
-    this._website.url = 'www.bas.uni-muenchen.de/Bas/BasFormatsdeu.html';
-    this._conversion.export = false;
-    this._conversion.import = false;
+    this._website.url = 'http://www.bas.uni-muenchen.de/Bas/BasFormatsdeu.html';
+    this._conversion.export = true;
+    this._conversion.import = true;
     this._encoding = 'UTF-8';
+    this._notice = 'While importing a .par file OCTRA combines TRN and ORT lines to one tier. ' +
+      'This tier only consists of time aligned segments. For export OCTRA creates ORT and TRN lines from the transcription.';
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult {
-    return null;
-  };
+    const result: ExportResult = {
+      file: {
+        name: annotation.name + '.par',
+        content: 'SAM ' + audiofile.samplerate,
+        encoding: 'UTF-8',
+        type: 'text'
+      }
+    };
+    let content = `SAM: ${audiofile.samplerate}\n` +
+      `LBD:\n`;
+
+    let ort = [];
+    const trn = [];
+
+    let ort_counter = 0;
+
+    for (let i = 0; i < annotation.levels[0].items.length; i++) {
+      const item = annotation.levels[0].items[i];
+      const words = item.labels[0].value.split(' ');
+      ort = ort.concat(words);
+      let trn_line = `TRN: ${item.sampleStart} ${item.sampleDur} `;
+
+      for (let j = 0; j < words.length; j++) {
+        trn_line += `${ort_counter + j}`;
+        if (j < words.length - 1) {
+          trn_line += ',';
+        }
+      }
+      ort_counter += words.length;
+      trn_line += ` ${item.labels[0].value}\n`;
+      trn.push(trn_line);
+    }
+
+    for (let i = 0; i < ort.length; i++) {
+      content += `ORT: ${i} ${ort[i]}\n`;
+    }
+    for (let i = 0; i < trn.length; i++) {
+      content += trn[i];
+    }
+
+    result.file.content = content;
+
+    return result;
+  }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile !== null && audiofile !== undefined) {
@@ -50,7 +94,7 @@ export class PartiturConverter extends Converter {
           new RegExp(
             '(KAN)|(ORT)|(DAS)|(TR2)|(SUP)|(PRS)|(NOI)|(LBP)|(LBG)|(PRO)|(POS)|(LMA)|(SYN)|(FUN)|(LEX)|' +
             '(IPA)|(TRN)|(TRS)|(GES)|(USH)|(USM)|(OCC)|(USP)|(GES)|(TLN)|(PRM)|(TRW)|(MAS)'));
-        if (!isNullOrUndefined(search)) {
+        if (!isNullOrUndefined(search) && search[0] === 'TRN') {
           if (previous_tier !== search[0]) {
             if (level !== null) {
               result.levels.push(level);

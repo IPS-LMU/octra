@@ -199,3 +199,7 @@ footer {
 .textspan {
     display: inline;
 }
+
+.tooltip.right {
+    width: 200px;
+}

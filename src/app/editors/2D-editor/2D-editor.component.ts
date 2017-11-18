@@ -289,7 +289,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   onSegmentSelected() {
   }
 
-  onMouseOver() {
+  onMouseOver(event) {
     if (!isNullOrUndefined(this.mouseTimer)) {
       window.clearTimeout(this.mouseTimer);
     }
@@ -305,7 +305,6 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     }
 
     if (this.appStorage.show_loupe) {
-      this.changePosition(this.miniloupe);
       this.mouseTimer = window.setTimeout(() => {
         this.changeArea(this.loupe, this.miniloupe, this.factor);
         this.mousestate = 'ended';
@@ -329,11 +328,6 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     const cursor = this.viewer.MouseCursor;
 
     if (cursor && cursor.timePos && cursor.relPos) {
-      coord.location.x = ((cursor.relPos.x) ? cursor.relPos.x - coord.size.width / 2 : 0);
-      coord.location.y = ((cursor.line) ? (cursor.line.number) *
-        cursor.line.Size.height + (cursor.line.number) * this.viewer.Settings.margin.bottom : 0);
-      coord.location.y += this.viewer.Settings.lineheight - 15 - this.viewer.viewRect.position.y;
-
       const half_rate = Math.round(this.audiomanager.ressource.info.samplerate / factor);
       const start = (cursor.timePos.samples > half_rate)
         ? new AudioTime(cursor.timePos.samples - half_rate, this.audiomanager.ressource.info.samplerate)
@@ -349,23 +343,17 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     }
   }
 
-  private changePosition(coord: {
-    size: {
-      width: number,
-      height: number
-    },
-    location: {
-      x: number,
-      y: number
-    }
-  }) {
-    const cursor = this.viewer.MouseCursor;
+  private changePosition(x: number, y: number) {
+    const full_y = y + this.miniloupe.size.height;
 
-    if (cursor && cursor.timePos && cursor.relPos) {
-      coord.location.x = ((cursor.relPos.x) ? cursor.relPos.x - coord.size.width / 2 : 0);
-      coord.location.y = ((cursor.line) ? (cursor.line.number) *
-        cursor.line.Size.height + (cursor.line.number) * this.viewer.Settings.margin.bottom : 0);
-      coord.location.y += this.viewer.Settings.lineheight - 15 - this.viewer.viewRect.position.y;
+    if (full_y < this.viewer.viewRect.size.height) {
+      // loupe is fully visible
+      this.miniloupe.location.y = y + 20;
+      this.miniloupe.location.x = x - (this.miniloupe.size.width / 2);
+    } else {
+      // loupe out of the bottom border of view rectangle
+      this.miniloupe.location.y = y - 20 - this.miniloupe.size.height;
+      this.miniloupe.location.x = x - (this.miniloupe.size.width / 2);
     }
   }
 

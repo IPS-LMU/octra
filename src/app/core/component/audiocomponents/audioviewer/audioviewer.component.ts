@@ -563,7 +563,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    * onMouseMove sets the selection to the current x values of the mouse move
    */
   onMouseMove($event) {
-
     const x = ($event.offsetX || $event.pageX - jQuery($event.target).offset().left);
     const y = ($event.offsetY || $event.pageY - jQuery($event.target).offset().left) + this.av.viewRect.position.y;
 
@@ -1544,7 +1543,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   }
 
   public focus() {
-    this.mousecanRef.nativeElement.focus();
+    this.playcanvas.focus();
   }
 
   private updateVisibleLines() {

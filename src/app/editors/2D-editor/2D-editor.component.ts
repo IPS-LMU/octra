@@ -343,7 +343,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     }
   }
 
-  private changePosition(x: number, y: number) {
+  public changePosition(x: number, y: number) {
     const full_y = y + this.miniloupe.size.height;
 
     if (full_y < this.viewer.viewRect.size.height) {
@@ -516,5 +516,10 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     if (event.state === 'scrolling') {
       this.loupe_hidden = true;
     }
+  }
+
+  onCircleLoupeMouseOver($event) {
+    this.viewer.focus();
+    this.miniloupe.location.y += $event.layerY + 20;
   }
 }

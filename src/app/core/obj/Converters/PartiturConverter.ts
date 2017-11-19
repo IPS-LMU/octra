@@ -16,52 +16,60 @@ export class PartiturConverter extends Converter {
     this._encoding = 'UTF-8';
     this._notice = 'While importing a .par file OCTRA combines TRN and ORT lines to one tier. ' +
       'This tier only consists of time aligned segments. For export OCTRA creates ORT and TRN lines from the transcription.';
+    this._multitiers = false;
   }
 
-  public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult {
-    const result: ExportResult = {
-      file: {
-        name: annotation.name + '.par',
-        content: 'SAM ' + audiofile.samplerate,
-        encoding: 'UTF-8',
-        type: 'text'
-      }
-    };
-    let content = `SAM: ${audiofile.samplerate}\n` +
-      `LBD:\n`;
+  public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
 
-    let ort = [];
-    const trn = [];
-
-    let ort_counter = 0;
-
-    for (let i = 0; i < annotation.levels[0].items.length; i++) {
-      const item = annotation.levels[0].items[i];
-      const words = item.labels[0].value.split(' ');
-      ort = ort.concat(words);
-      let trn_line = `TRN: ${item.sampleStart} ${item.sampleDur} `;
-
-      for (let j = 0; j < words.length; j++) {
-        trn_line += `${ort_counter + j}`;
-        if (j < words.length - 1) {
-          trn_line += ',';
+    if (!isNullOrUndefined(levelnum)) {
+      const result: ExportResult = {
+        file: {
+          name: `${annotation.name}-${annotation.levels[levelnum].name}${this._extension}`,
+          content: 'SAM ' + audiofile.samplerate,
+          encoding: 'UTF-8',
+          type: 'text'
         }
+      };
+      let content = `SAM: ${audiofile.samplerate}\n` +
+        `LBD:\n`;
+
+      let ort = [];
+      const trn = [];
+
+      let ort_counter = 0;
+
+      for (let i = 0; i < annotation.levels[levelnum].items.length; i++) {
+        const item = annotation.levels[levelnum].items[i];
+        const words = item.labels[0].value.split(' ');
+        ort = ort.concat(words);
+        let trn_line = `TRN: ${item.sampleStart} ${item.sampleDur} `;
+
+        for (let j = 0; j < words.length; j++) {
+          trn_line += `${ort_counter + j}`;
+          if (j < words.length - 1) {
+            trn_line += ',';
+          }
+        }
+        ort_counter += words.length;
+        trn_line += ` ${item.labels[0].value}\n`;
+        trn.push(trn_line);
       }
-      ort_counter += words.length;
-      trn_line += ` ${item.labels[0].value}\n`;
-      trn.push(trn_line);
-    }
 
-    for (let i = 0; i < ort.length; i++) {
-      content += `ORT: ${i} ${ort[i]}\n`;
-    }
-    for (let i = 0; i < trn.length; i++) {
-      content += trn[i];
-    }
+      for (let i = 0; i < ort.length; i++) {
+        content += `ORT: ${i} ${ort[i]}\n`;
+      }
+      for (let i = 0; i < trn.length; i++) {
+        content += trn[i];
+      }
 
-    result.file.content = content;
+      result.file.content = content;
 
-    return result;
+      return result;
+    } else {
+      // levelnum is null;
+      console.error('BASPartitur Converter needs a level number for export');
+      return null;
+    }
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {

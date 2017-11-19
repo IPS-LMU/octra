@@ -67,7 +67,9 @@
     "news": "Neuigkeiten",
     "faq": "FAQ",
     "features": "Features",
-    "transcription window": "Transkriptionsfenster"
+    "transcription window": "Transkriptionsfenster",
+    "supported files": "Unterstützte Dateien",
+    "select one tier": "Einen Tier auswählen"
   },
   "bug report": {
     "report an error": "Fehler melden",

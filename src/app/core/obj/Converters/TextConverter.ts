@@ -14,31 +14,32 @@ export class TextConverter extends Converter {
     this._conversion.export = true;
     this._conversion.import = true;
     this._encoding = 'UTF-8';
+    this._multitiers = false;
   }
 
-  public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult {
+  public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
     let result = '';
     let filename = '';
 
-    if (!isNullOrUndefined(annotation)) {
-      for (let i = 0; i < annotation.levels.length; i++) {
-        const level: OLevel = annotation.levels[i];
+    if (!isNullOrUndefined(levelnum) && levelnum < annotation.levels.length) {
+      const level: OLevel = annotation.levels[levelnum];
 
-        if (level.type === 'SEGMENT') {
-          result += `${level.name}\n`;
-          for (let j = 0; j < level.items.length; j++) {
-            const transcript = level.items[j].labels[0].value;
-            result += transcript;
-            if (i < transcript.length - 1) {
-              result += ' ';
-            }
+      if (level.type === 'SEGMENT') {
+        for (let j = 0; j < level.items.length; j++) {
+          const transcript = level.items[j].labels[0].value;
+          result += transcript;
+          if (j < level.items.length - 1) {
+            result += ' ';
           }
-          result += '\n\n';
         }
+        result += '\n';
       }
 
-      filename = annotation.name + this._extension;
+      filename = `${annotation.name}-${level.name}${this._extension}`;
 
+    } else {
+      console.error('TextConverter needs a level number');
+      return null;
     }
 
     return {

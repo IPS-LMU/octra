@@ -7,10 +7,15 @@ import {Component, OnInit} from '@angular/core';
 })
 export class FeaturesComponent implements OnInit {
 
+  public loaded = false;
+
   constructor() {
   }
 
   ngOnInit() {
   }
 
+  onLoad() {
+    this.loaded = true;
+  }
 }

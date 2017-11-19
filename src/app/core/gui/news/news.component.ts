@@ -15,6 +15,8 @@ export class NewsComponent implements OnInit, OnChanges {
 
   @Input() url;
 
+  public loaded = false;
+
   public get projectsettings(): ProjectSettings {
     return this.settService.projectsettings;
   }
@@ -39,5 +41,9 @@ export class NewsComponent implements OnInit, OnChanges {
 
   get sanitized_url() {
     return this.sanitizer.bypassSecurityTrustResourceUrl(this.projectsettings.navigation.help_url);
+  }
+
+  onLoad() {
+    this.loaded = true;
   }
 }

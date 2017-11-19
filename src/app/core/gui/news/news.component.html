@@ -1,2 +1,7 @@
 <h2>{{"general.news" | translate}}</h2>
-<iframe src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/news.html"></iframe>
+<div *ngIf="!loaded"
+     style="text-align: center; margin-top:40px; position:absolute;width:100%; font-size:60px; font-width:100;">
+    <i class="fa fa-spinner fa-spin"></i>
+</div>
+<iframe [ngStyle]="{visibility: (loaded) ? 'visible' : 'hidden'}"
+        src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/news.html" (load)="onLoad()"></iframe>

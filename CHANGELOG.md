@@ -1,5 +1,31 @@
 # Change Log
 
+## [v1.2.2](https://github.com/IPS-LMU/octra/tree/v1.2.2) (2017-11-19)
+[Full Changelog](https://github.com/IPS-LMU/octra/compare/v1.2.1...v1.2.2)
+
+**Implemented enhancements:**
+
+- 2D-Editor: circle loupe should follow the mouse cursor more fluently [\#82](https://github.com/IPS-LMU/octra/issues/82)
+- new option: Enable/Disable rounded loupe [\#80](https://github.com/IPS-LMU/octra/issues/80)
+- Import and export of BASPartitur files
+- changed shortcut for "set break" action from 'P' to 'A'
+- tier selection for specific files before export
+- perfomance and stability improvements 
+
+**Fixed bugs:**
+
+- OCTRA crashes using the local mode and very large audio files [\#79](https://github.com/IPS-LMU/octra/issues/79)
+- 2D-editor: fixed scrollbar bug
+- fixed clone bug in multi-tiers selection
+
+**Merged pull requests:**
+
+- Create CODE\_OF\_CONDUCT.md [\#81](https://github.com/IPS-LMU/octra/pull/81) ([julianpoemp](https://github.com/julianpoemp))
+
+**Thanks to:**
+- Riccarda Funk (feedback, bug report)
+- P.Pavlitschek (feedback, bug report)
+
 ## [v1.2.1](https://github.com/IPS-LMU/octra/tree/v1.2.1) (2017-10-23)
 [Full Changelog](https://github.com/IPS-LMU/octra/compare/1.2.0...v1.2.1)
 

@@ -67,7 +67,9 @@
     "news": "News",
     "faq": "FAQ",
     "features": "Features",
-    "transcription window": "Transcription window"
+    "transcription window": "Transcription window",
+    "supported files": "Supported files",
+    "select one tier": "Select one tier"
   },
   "bug report": {
     "report an error": "Report an error",
@@ -224,6 +226,7 @@
     "easy mode": "Easy Mode",
     "play on hover": "Play on hover",
     "follow playcursor": "Follow playcursor",
-    "logging": "Log user actions"
+    "logging": "Log user actions",
+    "show loupe": "Show loupe"
   }
 }

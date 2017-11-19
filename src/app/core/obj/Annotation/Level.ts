@@ -4,6 +4,9 @@ import {Segments} from './Segments';
 import {OIDBLevel} from '../../shared/service/appstorage.service';
 
 export class Level {
+  get type(): AnnotJSONType {
+    return this._type;
+  }
   get id(): number {
     return this._id;
   }
@@ -22,7 +25,7 @@ export class Level {
   public segments: Segments;
   public items: OItem[];
   public events: OEvent[];
-  private type: AnnotJSONType;
+  private _type: AnnotJSONType;
   private _id: number;
 
   public static fromObj(entry: OIDBLevel, samplerate: number, last_sample: number): Level {
@@ -51,13 +54,13 @@ export class Level {
     this._id = id;
     switch (type) {
       case('EVENT'):
-        this.type = AnnotJSONType.EVENT;
+        this._type = AnnotJSONType.EVENT;
         break;
       case('ITEM'):
-        this.type = AnnotJSONType.ITEM;
+        this._type = AnnotJSONType.ITEM;
         break;
       case('SEGMENT'):
-        this.type = AnnotJSONType.SEGMENT;
+        this._type = AnnotJSONType.SEGMENT;
         break;
     }
 
@@ -68,19 +71,19 @@ export class Level {
 
   public getObj(): OLevel {
     let result: OLevel = null;
-    if (this.type === AnnotJSONType.SEGMENT) {
+    if (this._type === AnnotJSONType.SEGMENT) {
       result = new OLevel(this._name, this.getTypeString(), this.segments.getObj(this._name));
-    } else if (this.type === AnnotJSONType.ITEM) {
+    } else if (this._type === AnnotJSONType.ITEM) {
       result = new OLevel(this._name, this.getTypeString(), this.items);
-    } else if (this.type === AnnotJSONType.EVENT) {
+    } else if (this._type === AnnotJSONType.EVENT) {
       result = new OLevel(this._name, this.getTypeString(), this.events);
     }
-    this.type.toString();
+    this._type.toString();
     return result;
   }
 
   public getTypeString() {
-    switch (this.type) {
+    switch (this._type) {
       case(AnnotJSONType.EVENT):
         return 'EVENT';
       case(AnnotJSONType.ITEM):

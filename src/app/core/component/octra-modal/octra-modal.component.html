@@ -145,15 +145,17 @@
         </table>
         <h4>{{'modal.supported.file formats for import' | translate}}:</h4>
         <table class="table table-responsive table-striped">
-            <tr *ngFor="let elem of AppInfo.converters">
-                <td *ngIf="elem.conversion.import">
-                    {{elem.name}}
-                </td>
-                <td *ngIf="elem.conversion.import">{{elem.application}}</td>
-                <td *ngIf="elem.conversion.import">*{{elem.extension}}</td>
-                <td><span *ngIf="elem.notice !== ''" class="glyphicon glyphicon-info-sign"
-                          data-toggle="tooltip" data-placement="right" [attr.title]="elem.notice"></span></td>
-            </tr>
+            <ng-container *ngFor="let elem of AppInfo.converters">
+                <tr *ngIf="elem.conversion.import">
+                    <td>{{elem.name}}</td>
+                    <td>{{elem.application}}</td>
+                    <td>*{{elem.extension}}</td>
+                    <td>
+                        <span *ngIf="elem.notice !== ''" class="glyphicon glyphicon-info-sign"
+                              [attr.title]="elem.notice"></span>
+                    </td>
+                </tr>
+            </ng-container>
         </table>
     </bs-modal-body>
     <bs-modal-footer>

@@ -17,11 +17,14 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {EditorComponents} from '../../../editors/components';
 import {Level} from '../../obj/Annotation/Level';
 import {Segments} from '../../obj/Annotation/Segments';
+import {OCTRANIMATIONS} from '../../shared/OCTRAnimations';
+import {AnnotJSONType} from '../../obj/Annotation/AnnotJSON';
 
 @Component({
   selector: 'app-navigation',
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css']
+  styleUrls: ['./navbar.component.css'],
+  animations: OCTRANIMATIONS
 })
 
 export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
@@ -44,6 +47,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     preparing: false
   };
 
+  public export_states = [];
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
   public get converters(): any[] {
@@ -74,6 +78,10 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     return (!isNullOrUndefined(this.uiService)) ? this.uiService.elements : null;
   }
 
+  get AnnotJSONType() {
+    return AnnotJSONType;
+  }
+
   constructor(public appStorage: AppStorageService,
               public navbarServ: NavbarService,
               public sanitizer: DomSanitizer,
@@ -96,16 +104,15 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       })
     );
+    for (let i = 0; i < AppInfo.converters.length; i++) {
+      this.export_states.push('inactive');
+    }
   }
 
   ngAfterViewInit() {
-    (($) => {
-      $(() => {
-        $(document).on('click', '.options-menu', function (e) {
-          e.stopPropagation();
-        });
-      });
-    })(jQuery);
+    jQuery(document).on('click', '.options-menu', function (e) {
+      e.stopPropagation();
+    });
 
     jQuery(document).on('mouseleave', '.navbar-collapse.collapse.in', function (e) {
       jQuery('.navbar-header button').click();
@@ -133,6 +140,13 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
      txt = tc.convert(data);
 
      alert(txt);*/
+  }
+
+  onLineClick(converter: Converter, index: number) {
+    if (converter.multitiers) {
+      this.updateParentFormat(converter);
+    }
+    this.toggleLine(index);
   }
 
   sanitize(url: string): SafeUrl {
@@ -167,7 +181,13 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     this.modService.show('bugreport');
   }
 
-  updateParentFormat(converter: Converter) {
+  onSelectionChange(converter: Converter, value: any) {
+    if (value !== '') {
+      this.updateParentFormat(converter, value);
+    }
+  }
+
+  updateParentFormat(converter: Converter, levelnum?: number) {
     if (!this.preparing.preparing) {
       const oannotjson = this.navbarServ.transcrService.annotation.getObj();
       this.preparing = {
@@ -180,7 +200,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
           this.navbarServ.transcrService.audiofile.arraybuffer = this.transcrServ.audiomanager.ressource.arraybuffer;
         }
 
-        const result: IFile = converter.export(oannotjson, this.navbarServ.transcrService.audiofile).file;
+        const result: IFile = converter.export(oannotjson, this.navbarServ.transcrService.audiofile, levelnum).file;
         this.parentformat.download = result.name;
 
         window.URL = (((<any> window).URL) ||
@@ -197,6 +217,22 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
           preparing: false
         };
       }, 300);
+    }
+  }
+
+  toggleLine(index: number) {
+    for (let i = 0; i < this.export_states.length; i++) {
+      if (this.export_states[i] === 'active') {
+        this.export_states[i] = 'close';
+      }
+    }
+
+    if (index < this.export_states.length) {
+      if (this.export_states[index] === 'active') {
+        this.export_states[index] = 'inactive';
+      } else {
+        this.export_states[index] = 'active';
+      }
     }
   }
 
@@ -348,6 +384,8 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onLevelDuplicateClick(tiernum: number, id: number) {
+    console.log('tier');
+    console.log(tiernum);
     const newlevel = this.transcrServ.annotation.levels[tiernum].clone();
     this.appStorage.addAnnotationLevel(newlevel.getObj()).then(
       () => {

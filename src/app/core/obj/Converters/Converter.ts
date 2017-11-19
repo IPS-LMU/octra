@@ -17,9 +17,14 @@ export interface ExportResult {
 }
 
 export abstract class Converter {
+  get multitiers(): boolean {
+    return this._multitiers;
+  }
+
   get notice(): string {
     return this._notice;
   }
+
   get encoding(): string {
     return this._encoding;
   }
@@ -43,10 +48,6 @@ export abstract class Converter {
     return this._conversion;
   }
 
-  get showauthors(): boolean {
-    return this._showauthors;
-  }
-
   get application(): string {
     return this._application;
   }
@@ -68,14 +69,13 @@ export abstract class Converter {
     url: ''
   };
   protected _notice = '';
-
-  protected _showauthors = false;
+  protected _multitiers = true;
 
   constructor() {
 
   }
 
-  public abstract export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult;
+  public abstract export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum?: number): ExportResult;
 
   public abstract import(file: IFile, audiofile: OAudiofile): ImportResult;
 }

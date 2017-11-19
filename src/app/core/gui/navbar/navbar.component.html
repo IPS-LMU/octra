@@ -12,28 +12,46 @@
             </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let format of converters">
-                <td *ngIf="format.conversion.export">
-                    <a #a
-                       (click)="updateParentFormat(format);">
-                        {{format.name}} (*{{format.extension}})
-                    </a>
-                    <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === format.name && preparing.preparing"></i>
-                    <a style="margin-left:10px;" *ngIf="preparing.name === format.name && !preparing.preparing"
-                       download="{{parentformat.download}}" [href]="parentformat.uri"
-                       class="link">
-                        <span class="glyphicon glyphicon-floppy-save"></span> Download
-                    </a>
-                </td>
-                <td *ngIf="format.conversion.export">
-                    {{format.application}}
-                </td>
-                <td *ngIf="format.conversion.export">
-                    <a href="{{format.website.url}}" target="_blank">
-                        {{format.website.title}}
-                    </a>
-                </td>
-            </tr>
+            <ng-container *ngFor="let converter of converters; let i = index;">
+                <tr *ngIf="converter.conversion.export">
+                    <td>
+                        <a #a (click)="onLineClick(converter, i)">
+                            {{converter.name}} (*{{converter.extension}})
+                        </a>
+                        <i class="fa fa-spinner fa-spin"
+                           *ngIf="preparing.name === converter.name && preparing.preparing"></i>
+                    </td>
+                    <td>
+                        {{converter.application}}
+                    </td>
+                    <td>
+                        <a href="{{converter.website.url}}" target="_blank">
+                            {{converter.website.title}}
+                        </a>
+                    </td>
+                    <td>
+                        <span *ngIf="converter.notice !== ''" class="glyphicon glyphicon-info-sign"
+                              [attr.title]="converter.notice"></span>
+                    </td>
+                </tr>
+                <tr [@fadeToggle]="export_states[i]" *ngIf="converter.conversion.export">
+                    <td colspan="5" style="padding-left:20px;">
+                        <select #val *ngIf="navbarServ.transcrService !== undefined && !converter.multitiers"
+                                (change)="onSelectionChange(converter, val.value)">
+                            <option value="">{{"general.select one tier" | translate}}</option>
+                            <option *ngFor="let level of navbarServ.transcrService.annotation.levels; let l = index;"
+                                    value="{{l}}">{{level.name}}
+                            </option>
+                        </select>
+
+                        <a style="margin-left:10px;" *ngIf="preparing.name === converter.name && !preparing.preparing"
+                           download="{{parentformat.download}}" [href]="parentformat.uri"
+                           class="link">
+                            <span class="glyphicon glyphicon-floppy-save"></span> Download
+                        </a>
+                    </td>
+                </tr>
+            </ng-container>
             </tbody>
         </table>
         <a *ngIf="arraybufferExists" (click)="getAudioURI();">
@@ -102,7 +120,7 @@
                     <tr *ngFor="let elem of UIElements">
                         <td>{{elem.timestamp | date:"dd.MM.yy HH:mm:ss"}}</td>
                         <td>{{elem.type}}</td>
-                        <td>{{elem.target}}</td>
+                        <td>{{elem.context}}</td>
                         <td>
                             {{elem.value}}
                         </td>
@@ -186,19 +204,23 @@
 
                         <div class="row level-row" *ngFor="let level of transcrServ.annotation.levels; let i = index;"
                              [ngClass]="{
-                        selected: (transcrServ.selectedlevel === i),
-                        disabled: (level.getTypeString() !== 'SEGMENT')
+                        selected: (transcrServ.selectedlevel === i)
                         }"
                         >
-                            <div class="col-xs-2" style="cursor: pointer;" (click)="selectLevel(i)">{{i+1}}:</div>
-                            <div class="col-xs-7"><input (click)="onLevelNameClick($event)"
-                                                         (blur)="onLevelNameLeave($event, i)" type="text"
-                                                         maxlength="100" value="{{level.name}}"/>
+                            <div class="col-xs-2" style="cursor: pointer;"
+                                 [ngClass]="{ disabled: (level.getTypeString() !== 'SEGMENT') }"
+                                 (click)="selectLevel(i)">{{i+1}}:
+                            </div>
+                            <div class="col-xs-7" [ngClass]="{ disabled: (level.getTypeString() !== 'SEGMENT') }"><input
+                                    (click)="onLevelNameClick($event)"
+                                    (blur)="onLevelNameLeave($event, i)" type="text"
+                                    maxlength="100" value="{{level.name}}"/>
                             </div>
                             <div class="col-xs-3">
                                 <span style="cursor:pointer;" class="glyphicon glyphicon-trash"
                                       (click)="onLevelRemoveClick(i, level.id)"></span>
-                                <span style="margin-left:3px;cursor:pointer;" class="glyphicon glyphicon-duplicate"
+                                <span *ngIf="level.type === AnnotJSONType.SEGMENT"
+                                      style="margin-left:3px;cursor:pointer;" class="glyphicon glyphicon-duplicate"
                                       (click)="onLevelDuplicateClick(i, level.id)"></span>
                             </div>
                         </div>

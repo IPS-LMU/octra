@@ -99,8 +99,8 @@ export class AudioviewerConfig {
     },
     set_break: {
       keys: {
-        mac: 'P',
-        pc: 'P'
+        mac: 'A',
+        pc: 'A'
       },
       focusonly: true,
       title: 'set break'

@@ -384,8 +384,6 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onLevelDuplicateClick(tiernum: number, id: number) {
-    console.log('tier');
-    console.log(tiernum);
     const newlevel = this.transcrServ.annotation.levels[tiernum].clone();
     this.appStorage.addAnnotationLevel(newlevel.getObj()).then(
       () => {

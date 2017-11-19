@@ -42,7 +42,7 @@
                           [easymode]="appStorage.easymode"
     ></app-audio-navigation>
     <div *ngIf="appStorage.show_loupe" (mouseenter)="loupe_hidden = false;" (mouseleave)="loupe_hidden = true;">
-        <app-circleloupe #loupe [ngStyle]="{
+        <app-circleloupe #loupe (mousemove)="onCircleLoupeMouseOver($event)" [ngStyle]="{
         'width': miniloupe.size.width + 'px',
         'height': miniloupe.size.height + 'px',
         'position':'absolute',

@@ -174,9 +174,6 @@ export class Functions {
 
       const d = Date.now();
       options['params']['v'] = d.toString();
-
-      console.log('url: ' + url);
-      console.log(options);
       return http.get(url, options);
     } else {
       return http.post(url, body, requestoptions);

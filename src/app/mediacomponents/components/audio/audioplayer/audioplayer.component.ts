@@ -17,14 +17,16 @@ import {
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/observable/timer';
 // other
-import {AudioTimeCalculator, BrowserInfo, CanvasAnimation, Line, Logger, SubscriptionManager} from '../../../shared';
-import {AudioService, KeymappingService} from '../../../shared/service';
-import {AudioplayerService} from './audioplayer.service';
-import {AudioManager} from '../../../obj/media/audio/AudioManager';
-import {AudioChunk} from '../../../obj/media/audio/AudioChunk';
-import {AudioRessource} from '../../../obj/media/audio/AudioRessource';
+// import {AudioplayerService} from './audioplayer.service';
+import {AudioChunk, AudioManager, AudioRessource, AudioTimeCalculator} from '../../../obj/media/audio';
 import {isNullOrUndefined} from 'util';
-import {PlayBackState} from '../../../obj/media/index';
+import {PlayBackState} from '../../../obj/media';
+import {AudioplayerService} from './audioplayer.service';
+import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
+import {CanvasAnimation} from '../../../obj/CanvasAnimation';
+import {AudioService, KeymappingService} from '../../../../core/shared/service';
+import {BrowserInfo, Logger} from '../../../../core/shared';
+import {Line} from '../../../obj';
 
 @Component({
   selector: 'app-audioplayer',

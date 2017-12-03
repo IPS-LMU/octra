@@ -11,27 +11,27 @@ import {
 } from '@angular/core';
 
 import {
-  AudioNavigationComponent,
-  AudioviewerComponent,
-  LoupeComponent,
-  TranscrEditorComponent
-} from '../../core/component';
-
-import {
   AudioService,
   KeymappingService,
   MessageService,
   TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
-import {AudioSelection, AudioTime, AVMousePos, BrowserInfo, Functions, SubscriptionManager} from '../../core/shared';
+
 import {SettingsService} from '../../core/shared/service/settings.service';
 import {AppStorageService} from '../../core/shared/service/appstorage.service';
-import {AudioManager} from '../../core/obj/media/audio/AudioManager';
-import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
+import {AudioManager} from '../../mediacomponents/obj/media/audio/AudioManager';
+import {AudioChunk} from '../../mediacomponents/obj/media/audio/AudioChunk';
 import {isNullOrUndefined} from 'util';
-import {CircleLoupeComponent} from '../../core/component/audiocomponents/circleloupe/circleloupe.component';
-import {AudioviewerConfig} from '../../core/component/audiocomponents/audioviewer/audioviewer.config';
+import {AudioviewerComponent, AudioviewerConfig} from '../../mediacomponents/components/audio/audioviewer';
+import {CircleLoupeComponent} from '../../mediacomponents/components/audio/circleloupe';
+import {LoupeComponent} from '../../mediacomponents/components/audio/loupe';
+import {AudioNavigationComponent} from '../../mediacomponents/components/audio/audio-navigation';
+import {TranscrEditorComponent} from '../../core/component/transcr-editor';
+import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
+import {BrowserInfo, Functions} from '../../core/shared';
+import {AudioSelection, AudioTime} from '../../mediacomponents/obj/media/audio';
+import {AVMousePos} from '../../mediacomponents/obj/AVMousePos';
 
 @Component({
   selector: 'app-signal-gui',

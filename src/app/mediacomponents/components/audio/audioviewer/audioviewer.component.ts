@@ -12,28 +12,23 @@ import {
   ViewChild
 } from '@angular/core';
 
-import {
-  AudioChunk,
-  AudioSelection,
-  AudioTime,
-  AVMousePos,
-  BrowserInfo,
-  CanvasAnimation,
-  Line,
-  Logger,
-  PlayCursor,
-  Segment,
-  SubscriptionManager
-} from '../../../shared';
-import {KeymappingService, TranscriptionService} from '../../../shared/service';
 import {AudioviewerService} from './audioviewer.service';
 import {TranslateService} from '@ngx-translate/core';
 import {isNullOrUndefined} from 'util';
 import {AudioManager} from '../../../obj/media/audio/AudioManager';
 import {AudioRessource} from '../../../obj/media/audio/AudioRessource';
 import {PlayBackState} from '../../../obj/media/index';
-import {Interval, Margin, Rectangle} from '../objects';
+import {Interval, Margin, Rectangle} from '../../../objects';
 import {AudioviewerConfig} from './audioviewer.config';
+import {AudioChunk, AudioSelection, AudioTime} from '../../../obj/media/audio';
+import {AVMousePos} from '../../../obj/AVMousePos';
+import {PlayCursor} from '../../../obj/PlayCursor';
+import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
+import {CanvasAnimation} from '../../../obj/CanvasAnimation';
+import {KeymappingService, TranscriptionService} from '../../../../core/shared/service';
+import {Line} from '../../../obj/Line';
+import {BrowserInfo, Logger} from '../../../../core/shared';
+import {Segment} from '../../../../core/obj/Annotation/Segment';
 
 @Component({
   selector: 'app-audioviewer',

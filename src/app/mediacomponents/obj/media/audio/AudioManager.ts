@@ -1,4 +1,4 @@
-import {Logger} from '../../../shared/Logger';
+import {Logger} from '../../../../core/shared/Logger';
 import {AudioRessource} from './AudioRessource';
 import {isNullOrUndefined} from 'util';
 import {EventEmitter} from '@angular/core';

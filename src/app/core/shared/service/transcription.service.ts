@@ -18,7 +18,7 @@ import {Converter, IFile} from '../../obj/Converters/Converter';
 import {TextConverter} from '../../obj/Converters/TextConverter';
 import {AnnotJSONConverter} from '../../obj/Converters/AnnotJSONConverter';
 import {Level} from '../../obj/Annotation/Level';
-import {AudioManager} from '../../obj/media/audio/AudioManager';
+import {AudioManager} from '../../../mediacomponents/obj/media/audio/AudioManager';
 import {OLog, OLogging} from '../../obj/Settings/logging';
 import {AppSettings} from '../../obj/Settings/app-settings';
 import {ProjectSettings} from '../../obj/Settings/project-configuration';

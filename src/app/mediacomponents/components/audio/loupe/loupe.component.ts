@@ -11,13 +11,11 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import {AudioviewerComponent} from '../audioviewer';
-import {AVMousePos} from '../../../shared';
-import {SubscriptionManager} from '../../../obj/SubscriptionManager';
-import {AudioChunk} from '../../../obj/media/audio/AudioChunk';
+import {AudioviewerComponent, AudioviewerConfig, AudioviewerService} from '../audioviewer';
+import {AudioChunk} from '../../../obj/media/audio';
 import {isNullOrUndefined} from 'util';
-import {AudioviewerService} from '../audioviewer/audioviewer.service';
-import {AudioviewerConfig} from '../audioviewer/audioviewer.config';
+import {AVMousePos} from '../../../obj/AVMousePos';
+import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
 
 declare var window: any;
 
@@ -27,7 +25,6 @@ declare var window: any;
   styleUrls: ['./loupe.component.css'],
   providers: [AudioviewerService]
 })
-
 export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
   @ViewChild('viewer') viewer: AudioviewerComponent;
   @ViewChild('loupe') loupe: ElementRef;

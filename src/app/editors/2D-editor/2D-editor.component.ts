@@ -10,31 +10,30 @@ import {
   ViewChild
 } from '@angular/core';
 
-import {AudioNavigationComponent, AudioviewerComponent} from '../../core/component';
-
 import {
+  AppStorageService,
   AudioService,
   KeymappingService,
   MessageService,
+  SettingsService,
   TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
 
 import {AudioSelection, AudioTime, Functions} from '../../core/shared';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
-import {SettingsService} from '../../core/shared/service/settings.service';
-import {AppStorageService} from '../../core/shared/service/appstorage.service';
-import {AudioManager} from '../../core/obj/media/audio/AudioManager';
-import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
-import {TranscrWindowComponent} from './transcr-window/transcr-window.component';
-import {PlayBackState} from '../../core/obj/media/index';
+import {AudioChunk, AudioManager} from '../../mediacomponents/obj/media/audio';
+import {TranscrWindowComponent} from './transcr-window';
+import {PlayBackState} from '../../mediacomponents/obj/media';
 import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
-import {TranscrEditorComponent} from '../../core/component/transcr-editor/transcr-editor.component';
+import {TranscrEditorComponent} from '../../core/component';
 import {isNullOrUndefined} from 'util';
-import {CircleLoupeComponent} from '../../core/component/audiocomponents/circleloupe/circleloupe.component';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/interval';
+import {AudioviewerComponent} from '../../mediacomponents/components/audio/audioviewer';
+import {CircleLoupeComponent} from '../../mediacomponents/components/audio/circleloupe';
+import {AudioNavigationComponent} from '../../mediacomponents/components/audio/audio-navigation';
 
 @Component({
   selector: 'app-overlay-gui',

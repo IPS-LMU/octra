@@ -1,9 +1,13 @@
 // angular
 import {Injectable} from '@angular/core';
 // other
-import {AudioComponentService, AudioService} from '../../../shared/service';
-import {AudioChunk, AudioTime, AudioTimeCalculator, AVMousePos, Line, PlayCursor} from '../../../shared';
 import {AudioplayerConfig} from './audioplayer.config';
+import {AudioComponentService} from '../../../service';
+import {Line} from '../../../obj/Line';
+import {AudioService} from '../../../../core/shared/service';
+import {AudioChunk, AudioTime, AudioTimeCalculator} from '../../../obj/media/audio';
+import {PlayCursor} from '../../../obj/PlayCursor';
+import {AVMousePos} from '../../../obj/AVMousePos';
 
 
 @Injectable()

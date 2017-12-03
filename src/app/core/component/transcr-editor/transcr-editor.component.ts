@@ -3,14 +3,13 @@ import {TranscrEditorConfig} from './config/te.config';
 import {TranslateService} from '@ngx-translate/core';
 
 import {BrowserInfo, Functions, KeyMapping, SubscriptionManager} from '../../shared';
-import {TranscrEditorConfigValidator} from './validator/TranscrEditorConfigValidator';
 import {TranscriptionService} from '../../shared/service/transcription.service';
 import {isNullOrUndefined} from 'util';
 import {Segments} from '../../obj/Annotation/Segments';
 import {TimespanPipe} from '../../shared/pipe/timespan.pipe';
-import {AudioTime} from '../../obj/media/audio/AudioTime';
-import {AudioManager} from '../../obj/media/audio/AudioManager';
-import {AudioChunk} from '../../obj/media/audio/AudioChunk';
+import {AudioTime} from '../../../mediacomponents/obj/media/audio/AudioTime';
+import {AudioManager} from '../../../mediacomponents/obj/media/audio/AudioManager';
+import {AudioChunk} from '../../../mediacomponents/obj/media/audio/AudioChunk';
 import {isNumeric} from 'rxjs/util/isNumeric';
 
 @Component({
@@ -111,7 +110,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     this._settings = new TranscrEditorConfig().Settings;
     this.subscrmanager = new SubscriptionManager();
-    this.validateConfig();
   }
 
   ngOnInit() {
@@ -792,15 +790,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    */
   private tidyUpRaw(raw: string): string {
     return tidyUpAnnotation(raw, this.transcrService.guidelines);
-  }
-
-  private validateConfig() {
-    const validator: TranscrEditorConfigValidator = new TranscrEditorConfigValidator();
-    const validation = validator.validateObject(this._settings);
-    if (!validation.success) {
-      throw new Error(validation.error);
-    }
-
   }
 
   /*

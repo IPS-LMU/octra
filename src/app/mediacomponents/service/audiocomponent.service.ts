@@ -1,10 +1,8 @@
-import {Line} from '../../obj/Line';
-import {AVMousePos} from '../../obj/AVMousePos';
-import {PlayCursor} from '../../obj/PlayCursor';
-import {AudioTimeCalculator} from '../../obj/media/audio/AudioTimeCalculator';
-import {AudioChunk} from '../../obj/media/audio/AudioChunk';
-import {AudioManager} from '../../obj/media/audio/AudioManager';
-import {AudioviewerComponent} from '../../component/audiocomponents/audioviewer/audioviewer.component';
+import {Line} from '../obj/Line';
+import {AVMousePos} from '../obj/AVMousePos';
+import {PlayCursor} from '../obj/PlayCursor';
+import {AudioChunk, AudioManager, AudioTimeCalculator} from '../obj/media/audio';
+import {AudioviewerComponent} from '../components/audio/audioviewer';
 
 export class AudioComponentService {
   // LINES

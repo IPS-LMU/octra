@@ -32,3 +32,6 @@ export function getPlayBackString(state: PlayBackState) {
       return 'ENDED';
   }
 }
+
+export * from './audio';
+export * from './MediaRessource';

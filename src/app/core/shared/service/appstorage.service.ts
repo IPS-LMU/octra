@@ -3,7 +3,7 @@ import {LocalStorageService, SessionStorage, SessionStorageService} from 'ngx-we
 import {SessionFile} from '../../obj/SessionFile';
 import {isNullOrUndefined} from 'util';
 import {OLevel, OLink} from '../../obj/Annotation/AnnotJSON';
-import {AudioManager} from '../../obj/media/audio/AudioManager';
+import {AudioManager} from '../../../mediacomponents/obj/media/audio/AudioManager';
 import {AppInfo} from '../../../app.info';
 import {IndexedDBManager} from '../../obj/IndexedDBManager';
 

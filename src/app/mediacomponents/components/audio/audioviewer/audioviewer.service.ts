@@ -1,23 +1,18 @@
 import {Injectable} from '@angular/core';
 
-import {
-  AudioChunk,
-  AudioSelection,
-  AudioTime,
-  AudioTimeCalculator,
-  AVMousePos,
-  Line,
-  PlayCursor,
-  SubscriptionManager
-} from '../../../shared';
-
-import {AudioComponentService, AudioService, KeymappingService, TranscriptionService} from '../../../shared/service';
 import {TranslateService} from '@ngx-translate/core';
 import {isNullOrUndefined} from 'util';
-import {PlayBackState} from '../../../obj/media/index';
+import {PlayBackState} from '../../../obj/media';
 import {AudioviewerComponent} from './audioviewer.component';
 import {AudioviewerConfig} from './audioviewer.config';
-import {Interval, Position, Rectangle, Size} from '../objects';
+import {Interval, Position, Rectangle, Size} from '../../../objects';
+import {AudioComponentService} from '../../../service';
+import {AudioChunk, AudioSelection, AudioTime, AudioTimeCalculator} from '../../../obj/media/audio';
+import {Line} from '../../../obj/Line';
+import {AVMousePos} from '../../../obj/AVMousePos';
+import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
+import {AudioService, KeymappingService, TranscriptionService} from '../../../../core/shared/service';
+import {PlayCursor} from '../../../obj/PlayCursor';
 
 
 @Injectable()
@@ -33,6 +28,7 @@ export class AudioviewerService extends AudioComponentService {
   get realRect(): Rectangle {
     return this._realRect;
   }
+
   get dragableBoundaryNumber(): number {
     return this._dragableBoundaryNumber;
   }

@@ -17,7 +17,7 @@ export class Line {
     y: 0
   };
 
-  public number: number = -1;
+  public number = -1;
   private isMouseIn = false;
 
 

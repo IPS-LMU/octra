@@ -1,7 +1,6 @@
 import {EventEmitter, Injectable} from '@angular/core';
 
 import {SubscriptionManager} from '../';
-import {ConfigValidator} from '../../obj/ConfigValidator';
 import {ProjectSettings} from '../../obj/Settings/project-configuration';
 import {Subscription} from 'rxjs/Subscription';
 import {AppStorageService} from './appstorage.service';
@@ -12,7 +11,7 @@ import {AppSettings} from '../../obj/Settings/app-settings';
 import {Functions} from '../Functions';
 import {Observable} from 'rxjs/Observable';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
-import {AudioManager} from '../../obj/media/audio/AudioManager';
+import {AudioManager} from '../../../mediacomponents/obj/media/audio/AudioManager';
 import {AppInfo} from '../../../app.info';
 import {HttpClient} from '@angular/common/http';
 
@@ -283,21 +282,6 @@ export class SettingsService {
       this.loaded = true;
       this.test.next(true);
     }
-  }
-
-  private validate(validator: ConfigValidator, settings: any): boolean {
-    // validate config
-
-    for (const setting in settings) {
-      if (settings.hasOwnProperty(setting)) {
-        const result = validator.validate(setting, settings['' + setting + '']);
-        if (!result.success) {
-          console.error(result.error);
-          return false;
-        }
-      }
-    }
-    return true;
   }
 
   public destroy() {

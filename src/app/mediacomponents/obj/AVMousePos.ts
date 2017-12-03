@@ -1,5 +1,5 @@
-import {AudioTime} from './media/audio/AudioTime';
 import {Line} from './Line';
+import {AudioTime} from './media/audio';
 
 /**
  * class needed to determine mouse position in audioviewer compnents

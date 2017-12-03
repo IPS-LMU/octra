@@ -1,6 +1,5 @@
 import {AfterViewInit, Component, EventEmitter, OnChanges, OnDestroy, OnInit, ViewChild} from '@angular/core';
 
-import {AudioNavigationComponent, AudioplayerComponent, TranscrEditorComponent} from '../../core/component';
 import {
   AudioService,
   KeymappingService,
@@ -11,10 +10,13 @@ import {SubscriptionManager} from '../../core/shared';
 import {SettingsService} from '../../core/shared/service/settings.service';
 import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {Segment} from '../../core/obj/Annotation/Segment';
-import {AudioManager} from '../../core/obj/media/audio/AudioManager';
-import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
-import {AudioTime} from '../../core/obj/media/audio/AudioTime';
-import {PlayBackState} from '../../core/obj/media/index';
+import {AudioManager} from '../../mediacomponents/obj/media/audio/AudioManager';
+import {AudioChunk} from '../../mediacomponents/obj/media/audio/AudioChunk';
+import {AudioTime} from '../../mediacomponents/obj/media/audio/AudioTime';
+import {PlayBackState} from '../../mediacomponents/obj/media/index';
+import {AudioNavigationComponent} from '../../mediacomponents/components/audio/audio-navigation';
+import {AudioplayerComponent} from '../../mediacomponents/components/audio/audioplayer';
+import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 
 @Component({
   selector: 'app-audioplayer-gui',

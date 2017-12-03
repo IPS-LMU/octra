@@ -8,20 +8,7 @@ import {BsModalModule} from 'ng2-bs3-modal';
 import {Ng2Webstorage} from 'ngx-webstorage';
 // other
 import {LanguageLoader} from './core/shared';
-import {
-  AlertComponent,
-  AudioNavigationComponent,
-  AudioplayerComponent,
-  AudioplayerDirective,
-  AudioviewerComponent,
-  AudioviewerConfig,
-  AudioviewerDirective,
-  CircleLoupeComponent,
-  DropZoneComponent,
-  LoupeComponent,
-  OctraModalComponent,
-  TranscrEditorComponent
-} from './core/component';
+import {AlertComponent, DropZoneComponent, OctraModalComponent, TranscrEditorComponent} from './core/component';
 import {
   FastbarComponent,
   LoadingComponent,
@@ -72,15 +59,22 @@ import {OctraDropzoneComponent} from './core/gui/octra-dropzone/octra-dropzone.c
 import {LoadeditorDirective} from './core/shared/directive/loadeditor.directive';
 import {NewsComponent} from './core/gui/news/news.component';
 import {FaqComponent} from './core/gui/faq/faq.component';
-import {LinearEditorComponent} from './editors/linear-editor/linear-editor.component';
-import {EditorWSignaldisplayComponent} from './editors/editor-without-signaldisplay/editor-w-signaldisplay.component';
-import {TwoDEditorComponent} from './editors/2D-editor/2D-editor.component';
+import {EditorWSignaldisplayComponent, LinearEditorComponent, TwoDEditorComponent} from './editors';
 import {HelpComponent} from './core/gui/help/help.component';
 import {NewEditorComponent} from './editors/new-editor/new-editor.component';
 import {HelpToolsComponent} from './core/gui/help-tools/help-tools.component';
 import {FeaturesComponent} from './core/gui/features/features.component';
 import {Timespan2Pipe} from './core/shared/pipe/timespan2.pipe';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
+import {AudioNavigationComponent} from './mediacomponents/components/audio/audio-navigation';
+import {AudioplayerComponent, AudioplayerDirective} from './mediacomponents/components/audio/audioplayer';
+import {
+  AudioviewerComponent,
+  AudioviewerConfig,
+  AudioviewerDirective
+} from './mediacomponents/components/audio/audioviewer';
+import {CircleLoupeComponent} from './mediacomponents/components/audio/circleloupe';
+import {LoupeComponent} from './mediacomponents/components/audio/loupe';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {

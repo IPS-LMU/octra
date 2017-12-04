@@ -205,7 +205,7 @@ export class TranscriptionService {
     let result: IFile;
 
     if (!isNullOrUndefined(this.annotation)) {
-      result = converter.export(this.annotation.getObj(), this.audiofile).file;
+      result = converter.export(this.annotation.getObj(), this.audiofile, 0).file;
 
       return result.content;
     }
@@ -355,7 +355,7 @@ export class TranscriptionService {
         this.saving = false;
       }, 2000);
     }
-  }
+  };
 
   public destroy() {
     this.subscrmanager.destroy();
@@ -579,7 +579,7 @@ export class TranscriptionService {
   public endTranscription = (destroyaudio: boolean = true) => {
     this.audio.destroy(destroyaudio);
     this.destroy();
-  }
+  };
 
 
   public createNewAnnotation(): OAnnotJSON {

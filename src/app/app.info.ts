@@ -1,15 +1,16 @@
 import {Converter} from './core/obj/Converters/Converter';
-import {TextConverter} from './core/obj/Converters/TextConverter';
-import {AnnotJSONConverter} from './core/obj/Converters/AnnotJSONConverter';
-import {PraatTableConverter} from './core/obj/Converters/PraatTableConverter';
-import {CTMConverter} from './core/obj/Converters/CTMConverter';
-import {PraatTextgridConverter} from './core/obj/Converters/PraatTextgridConverter';
+import {
+  AnnotJSONConverter,
+  CTMConverter,
+  PartiturConverter,
+  PraatTableConverter,
+  PraatTextgridConverter,
+  TextConverter
+} from './core/obj/Converters';
 import {MantisBugReporter} from './core/obj/BugAPI/MantisBugReporter';
-import {WavFormat} from './mediacomponents/obj/media/audio/AudioFormats/WavFormat';
-import {OggFormat} from './mediacomponents/obj/media/audio/AudioFormats/OggFormat';
+import {OggFormat, WavFormat} from './media-components/obj/media/audio/AudioFormats';
 import {BundleJSONConverter} from './core/obj/Converters/BundleJSONConverter';
 import {EmailBugReporter} from './core/obj/BugAPI/EmailBugReporter';
-import {PartiturConverter} from './core/obj/Converters/PartiturConverter';
 
 export class AppInfo {
   public static readonly audioformats = [

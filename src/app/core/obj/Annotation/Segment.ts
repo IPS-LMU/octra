@@ -1,4 +1,4 @@
-import {AudioTime} from '../../../mediacomponents/obj/media/audio/AudioTime';
+import {AudioTime} from '../../../media-components/obj/media/audio/AudioTime';
 import {OSegment} from './AnnotJSON';
 
 export class Segment {

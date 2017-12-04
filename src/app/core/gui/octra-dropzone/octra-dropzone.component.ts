@@ -7,7 +7,7 @@ import {Converter, ImportResult} from '../../obj/Converters/Converter';
 import {DropZoneComponent} from '../../component/drop-zone/drop-zone.component';
 import {SessionFile} from '../../obj/SessionFile';
 import {ModalService} from '../../shared/service/modal.service';
-import {AudioManager} from '../../../mediacomponents/obj/media/audio/AudioManager';
+import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 
 @Component({

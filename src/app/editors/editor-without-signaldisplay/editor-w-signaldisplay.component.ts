@@ -10,12 +10,12 @@ import {SubscriptionManager} from '../../core/shared';
 import {SettingsService} from '../../core/shared/service/settings.service';
 import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {Segment} from '../../core/obj/Annotation/Segment';
-import {AudioManager} from '../../mediacomponents/obj/media/audio/AudioManager';
-import {AudioChunk} from '../../mediacomponents/obj/media/audio/AudioChunk';
-import {AudioTime} from '../../mediacomponents/obj/media/audio/AudioTime';
-import {PlayBackState} from '../../mediacomponents/obj/media/index';
-import {AudioNavigationComponent} from '../../mediacomponents/components/audio/audio-navigation';
-import {AudioplayerComponent} from '../../mediacomponents/components/audio/audioplayer';
+import {AudioManager} from '../../media-components/obj/media/audio/AudioManager';
+import {AudioChunk} from '../../media-components/obj/media/audio/AudioChunk';
+import {AudioTime} from '../../media-components/obj/media/audio/AudioTime';
+import {PlayBackState} from '../../media-components/obj/media/index';
+import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
+import {AudioplayerComponent} from '../../media-components/components/audio/audioplayer';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 
 @Component({

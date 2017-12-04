@@ -39,10 +39,10 @@ import {Entry} from '../../shared/service/keymapping.service';
 import {Observable} from 'rxjs/Observable';
 import {ProjectSettings} from '../../obj/Settings/project-configuration';
 import {NgForm} from '@angular/forms';
-import {AudioManager} from '../../../mediacomponents/obj/media/audio/AudioManager';
+import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {EditorComponents} from '../../../editors/components';
 import {Level} from '../../obj/Annotation/Level';
-import {getPlayBackString, PlayBackState} from '../../../mediacomponents/obj/media/index';
+import {getPlayBackString, PlayBackState} from '../../../media-components/obj/media/index';
 import {BugReportService} from '../../shared/service/bug-report.service';
 
 @Component({

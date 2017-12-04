@@ -3,7 +3,7 @@ import {Observable} from 'rxjs/Observable';
 
 import {isNullOrUndefined} from 'util';
 import {Logger} from '../Logger';
-import {AudioManager} from '../../../mediacomponents/obj/media/audio/AudioManager';
+import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
 import {HttpClient} from '@angular/common/http';

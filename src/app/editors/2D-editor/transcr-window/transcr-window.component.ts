@@ -21,12 +21,12 @@ import {
   UserInteractionsService
 } from '../../../core/shared/service';
 import {AudioTime, Segment, SubscriptionManager} from '../../../core/shared';
-import {AudioChunk, AudioManager, AudioRessource, AudioSelection} from '../../../mediacomponents/obj/media/audio';
+import {AudioChunk, AudioManager, AudioRessource, AudioSelection} from '../../../media-components/obj/media/audio';
 import {isNullOrUndefined} from 'util';
 import {Segments} from '../../../core/obj/Annotation/Segments';
 import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
-import {LoupeComponent} from '../../../mediacomponents/components/audio/loupe';
-import {AudioNavigationComponent} from '../../../mediacomponents/components/audio/audio-navigation';
+import {LoupeComponent} from '../../../media-components/components/audio/loupe';
+import {AudioNavigationComponent} from '../../../media-components/components/audio/audio-navigation';
 
 @Component({
   selector: 'app-transcr-window',

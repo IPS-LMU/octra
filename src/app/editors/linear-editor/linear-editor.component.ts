@@ -20,18 +20,18 @@ import {
 
 import {SettingsService} from '../../core/shared/service/settings.service';
 import {AppStorageService} from '../../core/shared/service/appstorage.service';
-import {AudioManager} from '../../mediacomponents/obj/media/audio/AudioManager';
-import {AudioChunk} from '../../mediacomponents/obj/media/audio/AudioChunk';
+import {AudioManager} from '../../media-components/obj/media/audio/AudioManager';
+import {AudioChunk} from '../../media-components/obj/media/audio/AudioChunk';
 import {isNullOrUndefined} from 'util';
-import {AudioviewerComponent, AudioviewerConfig} from '../../mediacomponents/components/audio/audioviewer';
-import {CircleLoupeComponent} from '../../mediacomponents/components/audio/circleloupe';
-import {LoupeComponent} from '../../mediacomponents/components/audio/loupe';
-import {AudioNavigationComponent} from '../../mediacomponents/components/audio/audio-navigation';
+import {AudioviewerComponent, AudioviewerConfig} from '../../media-components/components/audio/audioviewer';
+import {CircleLoupeComponent} from '../../media-components/components/audio/circleloupe';
+import {LoupeComponent} from '../../media-components/components/audio/loupe';
+import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
 import {BrowserInfo, Functions} from '../../core/shared';
-import {AudioSelection, AudioTime} from '../../mediacomponents/obj/media/audio';
-import {AVMousePos} from '../../mediacomponents/obj/AVMousePos';
+import {AudioSelection, AudioTime} from '../../media-components/obj/media/audio';
+import {AVMousePos} from '../../media-components/obj/AVMousePos';
 
 @Component({
   selector: 'app-signal-gui',

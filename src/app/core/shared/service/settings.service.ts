@@ -11,7 +11,7 @@ import {AppSettings} from '../../obj/Settings/app-settings';
 import {Functions} from '../Functions';
 import {Observable} from 'rxjs/Observable';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
-import {AudioManager} from '../../../mediacomponents/obj/media/audio/AudioManager';
+import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {AppInfo} from '../../../app.info';
 import {HttpClient} from '@angular/common/http';
 

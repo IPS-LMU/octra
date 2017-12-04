@@ -1,15 +1,13 @@
 import {ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
-import {TranscrEditorConfig} from './config/te.config';
+import {TranscrEditorConfig} from './config';
 import {TranslateService} from '@ngx-translate/core';
 
 import {BrowserInfo, Functions, KeyMapping, SubscriptionManager} from '../../shared';
-import {TranscriptionService} from '../../shared/service/transcription.service';
+import {TranscriptionService} from '../../shared/service';
 import {isNullOrUndefined} from 'util';
 import {Segments} from '../../obj/Annotation/Segments';
-import {TimespanPipe} from '../../shared/pipe/timespan.pipe';
-import {AudioTime} from '../../../mediacomponents/obj/media/audio/AudioTime';
-import {AudioManager} from '../../../mediacomponents/obj/media/audio/AudioManager';
-import {AudioChunk} from '../../../mediacomponents/obj/media/audio/AudioChunk';
+import {TimespanPipe} from '../../shared/pipe';
+import {AudioChunk, AudioManager, AudioTime} from '../../../media-components/obj/media/audio';
 import {isNumeric} from 'rxjs/util/isNumeric';
 
 @Component({
@@ -18,7 +16,6 @@ import {isNumeric} from 'rxjs/util/isNumeric';
   styleUrls: ['./transcr-editor.component.css'],
   providers: [TranscrEditorConfig]
 })
-
 export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Output('loaded') loaded: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output('onkeyup') onkeyup: EventEmitter<any> = new EventEmitter<any>();

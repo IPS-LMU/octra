@@ -22,18 +22,18 @@ import {
 
 import {AudioSelection, AudioTime, Functions} from '../../core/shared';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
-import {AudioChunk, AudioManager} from '../../mediacomponents/obj/media/audio';
+import {AudioChunk, AudioManager} from '../../media-components/obj/media/audio';
 import {TranscrWindowComponent} from './transcr-window';
-import {PlayBackState} from '../../mediacomponents/obj/media';
+import {PlayBackState} from '../../media-components/obj/media';
 import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
 import {TranscrEditorComponent} from '../../core/component';
 import {isNullOrUndefined} from 'util';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/interval';
-import {AudioviewerComponent} from '../../mediacomponents/components/audio/audioviewer';
-import {CircleLoupeComponent} from '../../mediacomponents/components/audio/circleloupe';
-import {AudioNavigationComponent} from '../../mediacomponents/components/audio/audio-navigation';
+import {AudioviewerComponent} from '../../media-components/components/audio/audioviewer';
+import {CircleLoupeComponent} from '../../media-components/components/audio/circleloupe';
+import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
 
 @Component({
   selector: 'app-overlay-gui',

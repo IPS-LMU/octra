@@ -8,7 +8,7 @@ import {BsModalModule} from 'ng2-bs3-modal';
 import {Ng2Webstorage} from 'ngx-webstorage';
 // other
 import {LanguageLoader} from './core/shared';
-import {AlertComponent, DropZoneComponent, OctraModalComponent, TranscrEditorComponent} from './core/component';
+import {AlertComponent, DropZoneComponent, OctraModalComponent} from './core/component';
 import {
   FastbarComponent,
   LoadingComponent,
@@ -25,7 +25,7 @@ import {
 
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {routing} from './app.routes';
-import {LeadingNullPipe, ProcentPipe, SecondsPipe, TimespanPipe} from './core/shared/pipe';
+import {LeadingNullPipe, SecondsPipe} from './core/shared/pipe';
 
 import {
   APIService,
@@ -66,15 +66,9 @@ import {HelpToolsComponent} from './core/gui/help-tools/help-tools.component';
 import {FeaturesComponent} from './core/gui/features/features.component';
 import {Timespan2Pipe} from './core/shared/pipe/timespan2.pipe';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
-import {AudioNavigationComponent} from './mediacomponents/components/audio/audio-navigation';
-import {AudioplayerComponent, AudioplayerDirective} from './mediacomponents/components/audio/audioplayer';
-import {
-  AudioviewerComponent,
-  AudioviewerConfig,
-  AudioviewerDirective
-} from './mediacomponents/components/audio/audioviewer';
-import {CircleLoupeComponent} from './mediacomponents/components/audio/circleloupe';
-import {LoupeComponent} from './mediacomponents/components/audio/loupe';
+import {AudioviewerConfig} from './media-components/components/audio/audioviewer';
+import {MediaComponentsModule} from './media-components/media-components.module';
+import {TranscrEditorComponent} from './core/component/transcr-editor';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -89,45 +83,36 @@ export const EDITORS: any[] = [
 
 export const ngmodule = {
   declarations: [
+    AgreementComponent,
+    AlertComponent,
     AppComponent,
-    AudioNavigationComponent,
-    AudioplayerComponent,
-    AudioplayerDirective,
-    AudioviewerComponent,
-    AudioviewerDirective,
-    CircleLoupeComponent,
+    DropZoneComponent,
+    EDITORS,
+    FaqComponent,
+    FastbarComponent,
+    FeaturesComponent,
+    HelpComponent,
+    HelpToolsComponent,
+    LeadingNullPipe,
+    LoadeditorDirective,
     LoadingComponent,
     LoginComponent,
     LogoutComponent,
-    LoupeComponent,
-    HelpToolsComponent,
     MembersAreaComponent,
     NavigationComponent,
-    ProcentPipe,
+    NewEditorComponent,
+    NewsComponent,
+    OctraDropzoneComponent,
+    OctraModalComponent,
+    ReloadFileComponent,
     SecondsPipe,
-    LeadingNullPipe,
-    TimespanPipe,
     Timespan2Pipe,
     TranscrEditorComponent,
+    TranscrGuidelinesComponent,
     TranscriptionComponent,
     TranscriptionEndComponent,
     TranscrOverviewComponent,
-    TranscrWindowComponent,
-    HelpComponent,
-    AlertComponent,
-    ReloadFileComponent,
-    DropZoneComponent,
-    FastbarComponent,
-    OctraModalComponent,
-    TranscrGuidelinesComponent,
-    AgreementComponent,
-    OctraDropzoneComponent,
-    LoadeditorDirective,
-    NewsComponent,
-    FaqComponent,
-    EDITORS,
-    NewEditorComponent,
-    FeaturesComponent
+    TranscrWindowComponent
   ],
   entryComponents: EDITORS,
   imports: [
@@ -143,6 +128,7 @@ export const ngmodule = {
     CollapseModule.forRoot(),
     FormsModule,
     HttpClientModule,
+    MediaComponentsModule,
     Ng2Webstorage.forRoot({
       separator: '.',
       prefix: 'custom'
@@ -150,6 +136,7 @@ export const ngmodule = {
     BsModalModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
+    MediaComponentsModule,
     routing
   ],
   bootstrap: [

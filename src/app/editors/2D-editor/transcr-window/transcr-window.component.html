@@ -1,5 +1,6 @@
 <div id="window" #window>
     <div class="window-nav-top"><span class="glyphicon glyphicon-remove close" (click)="close();"></span></div>
+
     <app-audio-navigation #audionav
                           (buttonclick)="onButtonClick($event)"
                           (volumechange)="onVolumeChange($event)"

@@ -17,9 +17,13 @@
     </tr>
     </tbody>
 </table>
-<p [hidden]="shown_segments.length == 0">
-    <span *ngIf="foundErrors == 0" class="text-success found-errors">{{"general.no errors found" | translate}}</span>
-    <span *ngIf="foundErrors > 0" class="text-danger found-errors">{{"general.errors found" | translate : {errors: foundErrors} }}</span>
+<p [hidden]="shown_segments.length == 0" style="text-align: center">
+    <ng-container *ngIf="validationFound">
+        <span *ngIf="foundErrors == 0"
+              class="text-success found-errors">{{"general.no errors found" | translate}}</span>
+        <span *ngIf="foundErrors > 0" class="text-danger found-errors">{{"general.errors found" | translate : {errors: foundErrors} }}</span>
+    </ng-container>
+    <span *ngIf="!validationFound">No validation methods found</span>
 </p>
 <h4 [hidden]="!show_transcriptiontable">{{"general.transcript" | translate}}</h4>
 <div [hidden]="!show_loading">

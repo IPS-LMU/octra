@@ -156,7 +156,7 @@ export class SettingsService {
         this.projectsettingsloaded.emit(this._projectsettings);
       }
     );
-  }
+  };
 
   public loadGuidelines = (language: string, url: string) => {
     this.loadSettings(
@@ -180,7 +180,7 @@ export class SettingsService {
         this.guidelinesloaded.emit(this._guidelines);
       }
     );
-  }
+  };
 
   public loadValidationMethod: ((url: string) => Subscription) = (url: string) => {
     Logger.log('Load methods...');
@@ -209,11 +209,11 @@ export class SettingsService {
         document.body.appendChild(js);
       },
       (error) => {
-        this._log += 'Loading functions failed [Error: S01]<br/>';
-        console.error(error);
+        console.log('Loading functions failed [Error: S01]');
+        this.validationmethodloaded.emit();
       }
     );
-  }
+  };
 
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
     Logger.log('Load audio file 2...');
@@ -275,14 +275,14 @@ export class SettingsService {
         console.error('session file is null.');
       }
     }
-  }
+  };
 
   private triggerSettingsLoaded = () => {
     if (this.validated) {
       this.loaded = true;
       this.test.next(true);
     }
-  }
+  };
 
   public destroy() {
     this.subscrmanager.destroy();

@@ -12,6 +12,7 @@ import {HelpComponent} from '../help/help.component';
 
 export const MEMBER_ROUTES: Routes = [
   {path: 'load', component: LoadingComponent},
+  {path: 'load', component: LoadingComponent},
   {path: 'agreement', component: AgreementComponent, canActivate: [MembersAreaGuard]},
   {
     path: 'transcr',

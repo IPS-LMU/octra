@@ -101,6 +101,8 @@ export class AppComponent implements OnDestroy {
             umanager.destroy();
           }
         );
+      }).catch((error) => {
+        console.error(error.target.error);
       });
     };
 
@@ -153,7 +155,7 @@ export class AppComponent implements OnDestroy {
         this.langService.use(this.appStorage.language);
       }
     }
-  }
+  };
 
   ngOnDestroy() {
     this.subscrmanager.destroy();

@@ -1,11 +1,11 @@
 import {Routes} from '@angular/router';
-import {TranscriptionComponent} from '../transcription/transcription.component';
+import {TranscriptionComponent} from '../transcription';
 import {MembersAreaGuard} from './members-area.activateguard';
-import {TranscriptionEndComponent} from '../transcription-end/transcription-end.component';
-import {TranscrEndGuard} from '../../shared/guard/transcr-end.activateguard';
-import {ReloadFileComponent} from '../reload-file/reload-file.component';
+import {TranscriptionEndComponent} from '../transcription-end';
+import {TranscrEndGuard} from '../../shared/guard';
+import {ReloadFileComponent} from '../reload-file';
 import {ReloadFileGuard} from '../reload-file/reload-file.activateguard';
-import {LoadingComponent} from '../loading/loading.component';
+import {LoadingComponent} from '../loading';
 import {TranscActivateGuard} from '../../shared/guard/transcr.activateguard';
 import {AgreementComponent} from '../agreement/agreement.component';
 import {HelpComponent} from '../help/help.component';
@@ -25,5 +25,5 @@ export const MEMBER_ROUTES: Routes = [
     canActivate: [TranscrEndGuard]
   },
   {path: 'transcr/reload-file', component: ReloadFileComponent, canActivate: [ReloadFileGuard]},
-  {path: '', redirectTo: '/user/load', pathMatch: 'full'},
+  {path: '', redirectTo: '/user/load', pathMatch: 'full'}
 ];

@@ -50,9 +50,11 @@ export class LoadingComponent implements OnInit, OnDestroy {
     };
 
     if (!this.appStorage.idbloaded) {
+      console.log('db not loaded');
       this.subscrmanager.add(this.appStorage.loaded.subscribe(() => {
         },
-        () => {
+        (error) => {
+          console.error(error);
         },
         () => {
           process();

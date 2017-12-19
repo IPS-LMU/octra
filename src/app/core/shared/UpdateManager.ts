@@ -167,7 +167,6 @@ export class UpdateManager {
               }
             },
             (error) => {
-              console.error(error);
               reject(error);
             }));
         };

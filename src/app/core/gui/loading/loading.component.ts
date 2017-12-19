@@ -5,7 +5,7 @@ import {SettingsService} from '../../shared/service/settings.service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {isNullOrUndefined} from 'util';
 import {AudioService} from '../../shared/service/audio.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {TranscriptionService} from '../../shared/service/transcription.service';
 
 @Component({
@@ -37,10 +37,12 @@ export class LoadingComponent implements OnInit, OnDestroy {
               private appStorage: AppStorageService,
               public audio: AudioService,
               private router: Router,
-              private transcrService: TranscriptionService) {
+              private transcrService: TranscriptionService,
+              private route: ActivatedRoute) {
   }
 
   ngOnInit() {
+
     const process = () => {
       if (this.appStorage.uselocalmode && isNullOrUndefined(this.appStorage.file)) {
         this.router.navigate(['/user/transcr/reload-file']);
@@ -49,29 +51,12 @@ export class LoadingComponent implements OnInit, OnDestroy {
       }
     };
 
-    if (!this.appStorage.idbloaded) {
-      console.log('db not loaded');
-      this.subscrmanager.add(this.appStorage.loaded.subscribe(() => {
-        },
-        (error) => {
-          console.error(error);
-        },
-        () => {
-          process();
-        }));
-    } else {
-      process();
-    }
-
-    if (!this.appStorage.LoggedIn) {
-      this.router.navigate(['/login']);
-    }
-
     this.langService.get('general.please wait').subscribe(
       (translation) => {
         this.text = translation + '...';
       }
     );
+
 
     this.subscrmanager.add(
       this.settService.projectsettingsloaded.subscribe(
@@ -172,22 +157,43 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
     this.settService.loadProjectSettings();
 
-    if (!isNullOrUndefined(this.settService.guidelines) &&
-      (typeof this.settService.tidyUpMethod === 'undefined') ||
-      typeof this.settService.validationmethod === 'undefined') {
-      // load methods
-      this.subscrmanager.add(
-        this.settService.loadValidationMethod(this.settService.guidelines.meta.validation_url)
-      );
-    } else if (!isNullOrUndefined(this.settService.guidelines)) {
-      this.loadedtable.methods = true;
-      this.loadedchanged.emit(false);
-    }
-    setTimeout(() => {
-      if (!this.loadedtable.audio) {
-        this.warning = 'Audio file seems to be a large one. This could take a while...';
+    if (this.queryParamsSet()) {
+      const audio_url = this.route.snapshot.queryParams['audio'];
+      const transcript_url = this.route.snapshot.queryParams['transcript'];
+      const embedded = this.route.snapshot.queryParams['embedded'];
+
+      if (!this.appStorage.idbloaded) {
+        this.settService.app_settings.octra.database.name = 'url';
+        console.log('load db ' + this.settService.app_settings.octra.database.name);
+        this.subscrmanager.add(this.appStorage.loaded.subscribe(() => {
+          },
+          (error) => {
+            console.error(error);
+          },
+          () => {
+            process();
+          }));
       }
-    }, 10000);
+    } else {
+
+      if (!this.appStorage.idbloaded) {
+        console.log('db not loaded');
+        this.subscrmanager.add(this.appStorage.loaded.subscribe(() => {
+          },
+          (error) => {
+            console.error(error);
+          },
+          () => {
+            process();
+          }));
+      } else {
+        process();
+      }
+
+      if (!this.appStorage.LoggedIn) {
+        this.router.navigate(['/login']);
+      }
+    }
   }
 
   ngOnDestroy() {
@@ -201,5 +207,14 @@ export class LoadingComponent implements OnInit, OnDestroy {
   goBack() {
     this.appStorage.clearSession();
     this.router.navigate(['/login']);
+  }
+
+  queryParamsSet(): boolean {
+    const params = this.route.snapshot.queryParams;
+    return (
+      params.hasOwnProperty('audio') &&
+      params.hasOwnProperty('transcript') &&
+      params.hasOwnProperty('embedded')
+    );
   }
 }

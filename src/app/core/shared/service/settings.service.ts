@@ -106,7 +106,7 @@ export class SettingsService {
     this.subscrmanager = new SubscriptionManager();
   }
 
-  public getApplicationSettings() {
+  public loadApplicationSettings() {
 
     this.subscrmanager.add(
       this.app_settingsloaded.subscribe(this.triggerSettingsLoaded)

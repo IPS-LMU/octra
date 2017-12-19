@@ -52,7 +52,7 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
   clearData() {
     this.appStorage.submitted = false;
     this.appStorage.clearAnnotationData().catch((err) => {
-      console.error(err)
+      console.error(err);
     });
 
     this.appStorage.idb.save('options', 'feedback', {value: null}).catch((err) => {
@@ -60,7 +60,7 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
     });
     this.appStorage.comment = '';
     this.appStorage.clearLoggingData().catch((err) => {
-      console.error(err)
+      console.error(err);
     });
     this.uiService.elements = [];
     this.settService.clearSettings();

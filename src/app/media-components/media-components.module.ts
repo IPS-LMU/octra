@@ -8,7 +8,8 @@ import {AudioplayerComponent, AudioplayerDirective} from './components/audio/aud
 import {HttpClientModule} from '@angular/common/http';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {ProcentPipe, TimespanPipe} from './pipe';
+import {LeadingNullPipe, ProcentPipe, SecondsPipe, TimespanPipe} from './pipe';
+import {Timespan2Pipe} from './pipe/timespan2.pipe';
 
 @NgModule({
   imports: [
@@ -27,7 +28,10 @@ import {ProcentPipe, TimespanPipe} from './pipe';
     CircleLoupeComponent,
     LoupeComponent,
     ProcentPipe,
-    TimespanPipe
+    TimespanPipe,
+    SecondsPipe,
+    LeadingNullPipe,
+    Timespan2Pipe
   ],
   exports: [
     CommonModule,
@@ -37,7 +41,11 @@ import {ProcentPipe, TimespanPipe} from './pipe';
     AudioviewerComponent,
     AudioviewerDirective,
     CircleLoupeComponent,
-    LoupeComponent
+    LoupeComponent,
+    SecondsPipe,
+    LeadingNullPipe,
+    TimespanPipe,
+    Timespan2Pipe
   ]
 })
 export class MediaComponentsModule {

@@ -1,11 +1,5 @@
 import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  HostListener,
-  OnDestroy,
-  OnInit,
+  AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit,
   ViewChild
 } from '@angular/core';
 import {Router} from '@angular/router';
@@ -202,7 +196,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           ) {
             if (this.appStorage.sessionfile !== null) {
               // last was offline mode
-              this.appStorage.clearLocalStorage();
+              this.appStorage.clearLocalStorage().catch((err) => {
+                console.error(err);
+              });
             }
             const res = this.appStorage.setSessionData(this.member, json.data.id, json.data.url);
             if (res.error === '') {
@@ -283,7 +279,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         alert(error);
       });
     }
-  }
+  };
 
   canDeactivate(): Observable<boolean> | boolean {
     return (this.valid);
@@ -295,7 +291,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         login: true
       }
     });
-  }
+  };
 
   @HostListener('window:resize', ['$event'])
   onResize($event) {
@@ -345,7 +341,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         }
       }
     );
-  }
+  };
 
   getFileStatus(): string {
     if (!isNullOrUndefined(this.dropzone.files) && this.dropzone.files.length > 0 &&
@@ -465,7 +461,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         callback();
       }
     ));
-  }
+  };
 
   public testFile(converter: Converter, file: File) {
     const reader: FileReader = new FileReader();

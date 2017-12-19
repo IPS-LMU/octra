@@ -86,7 +86,7 @@ export class AppComponent implements OnDestroy {
       }
     ));
 
-    this.settingsService.getApplicationSettings();
+    this.settingsService.loadApplicationSettings();
 
     const checkupdates = () => {
       // check for Updates

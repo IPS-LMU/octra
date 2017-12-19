@@ -10,39 +10,21 @@ import {Ng2Webstorage} from 'ngx-webstorage';
 import {LanguageLoader} from './core/shared';
 import {AlertComponent, DropZoneComponent, OctraModalComponent} from './core/component';
 import {
-  FastbarComponent,
-  LoadingComponent,
-  LoginComponent,
-  LogoutComponent,
-  MembersAreaComponent,
-  NavigationComponent,
-  ReloadFileComponent,
-  TranscriptionComponent,
-  TranscriptionEndComponent,
-  TranscrOverviewComponent,
+  FastbarComponent, LoadingComponent, LoginComponent, LogoutComponent, MembersAreaComponent, NavigationComponent,
+  ReloadFileComponent, TranscriptionComponent, TranscriptionEndComponent, TranscrOverviewComponent,
   TranscrWindowComponent
 } from './core/gui';
 
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {routing} from './app.routes';
-import {LeadingNullPipe, SecondsPipe} from './core/shared/pipe';
 
 import {
-  APIService,
-  AppStorageService,
-  AudioService,
-  KeymappingService,
-  ModalService,
-  NavbarService,
+  APIService, AppStorageService, AudioService, KeymappingService, ModalService, NavbarService,
   SettingsService
 } from './core/shared/service';
 
 import {
-  ALoginGuard,
-  DeALoginGuard,
-  LogoutGuard,
-  MembersAreaGuard,
-  SettingsGuard,
+  ALoginGuard, DeALoginGuard, LogoutGuard, MembersAreaGuard, SettingsGuard,
   TranscrEndGuard
 } from './core/shared/guard';
 
@@ -64,7 +46,6 @@ import {HelpComponent} from './core/gui/help/help.component';
 import {NewEditorComponent} from './editors/new-editor/new-editor.component';
 import {HelpToolsComponent} from './core/gui/help-tools/help-tools.component';
 import {FeaturesComponent} from './core/gui/features/features.component';
-import {Timespan2Pipe} from './core/shared/pipe/timespan2.pipe';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
 import {AudioviewerConfig} from './media-components/components/audio/audioviewer';
 import {MediaComponentsModule} from './media-components/media-components.module';
@@ -93,7 +74,6 @@ export const ngmodule = {
     FeaturesComponent,
     HelpComponent,
     HelpToolsComponent,
-    LeadingNullPipe,
     LoadeditorDirective,
     LoadingComponent,
     LoginComponent,
@@ -105,8 +85,6 @@ export const ngmodule = {
     OctraDropzoneComponent,
     OctraModalComponent,
     ReloadFileComponent,
-    SecondsPipe,
-    Timespan2Pipe,
     TranscrEditorComponent,
     TranscrGuidelinesComponent,
     TranscriptionComponent,

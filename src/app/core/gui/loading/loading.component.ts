@@ -162,6 +162,10 @@ export class LoadingComponent implements OnInit, OnDestroy {
       const transcript_url = this.route.snapshot.queryParams['transcript'];
       const embedded = this.route.snapshot.queryParams['embedded'];
 
+      window.postMessage({
+        result: transcript_url
+      }, 'octra');
+      /*
       if (!this.appStorage.idbloaded) {
         this.settService.app_settings.octra.database.name = 'url';
         console.log('load db ' + this.settService.app_settings.octra.database.name);
@@ -174,6 +178,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
             process();
           }));
       }
+      */
     } else {
 
       if (!this.appStorage.idbloaded) {

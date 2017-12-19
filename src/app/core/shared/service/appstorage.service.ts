@@ -2,8 +2,8 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {LocalStorageService, SessionStorage, SessionStorageService} from 'ngx-webstorage';
 import {SessionFile} from '../../obj/SessionFile';
 import {isNullOrUndefined} from 'util';
-import {OLevel, OLink} from '../../obj/Annotation/AnnotJSON';
-import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
+import {OLevel, OLink} from '../../obj';
+import {AudioManager} from '../../../media-components/obj/media/audio';
 import {AppInfo} from '../../../app.info';
 import {IndexedDBManager} from '../../obj/IndexedDBManager';
 
@@ -18,7 +18,7 @@ export interface IIDBLink {
   link: OLink;
 }
 
-export class OIDBLevel {
+export class OIDBLevel implements IIDBLevel {
   id: number;
   level: OLevel;
   sortorder: number;
@@ -30,7 +30,7 @@ export class OIDBLevel {
   }
 }
 
-export class OIDBLink {
+export class OIDBLink implements IIDBLink {
   id: number;
   link: OLink;
 
@@ -398,34 +398,29 @@ export class AppStorageService {
       && isNullOrUndefined(this.sessStr.retrieve('member_id')));
   }
 
-  public clearLocalStorage(): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
+  public clearLocalStorage(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
       this.logged_in = false;
       this.login = false;
 
-      return this.clearAnnotationData()
-        .then(() => {
-            return this.idb.save('options', 'user', {value: null});
-          }
-        ).then(() => {
-          this.idb.save('options', 'feedback', {value: null});
-        }).then(() => {
-          this.idb.save('options', 'comment', {value: ''});
-        }).then(() => {
-          this.idb.save('options', 'audio_url', {value: null});
-        }).then(() => {
-          this.idb.save('options', 'data_id', {value: null});
-        }).then(() => {
-          this.idb.save('options', 'sessionfile', {value: null});
-        }).then(() => {
-          return this.clearLoggingData();
-        }).then(
-          () => {
+      const promises: Promise<any>[] = [];
+      promises.push(this.idb.save('options', 'user', {value: null}));
+      promises.push(this.idb.save('options', 'feedback', {value: null}));
+      promises.push(this.idb.save('options', 'comment', {value: ''}));
+      promises.push(this.idb.save('options', 'audio_url', {value: null}));
+      promises.push(this.idb.save('options', 'data_id', {value: null}));
+      promises.push(this.idb.save('options', 'sessionfile', {value: null}));
+      promises.push(this.clearLoggingData());
+
+      this.clearAnnotationData().then(
+        () => {
+          Promise.all(promises).then(() => {
             resolve();
-          }
-        ).catch((err) => {
-          reject(err);
-        });
+          }).catch((error) => {
+            reject(error);
+          });
+        }
+      );
     });
   }
 
@@ -558,7 +553,7 @@ export class AppStorageService {
     );
   }
 
-  public load(idb: IndexedDBManager): Promise<any> {
+  public load(idb: IndexedDBManager): Promise<void> {
     this._idb = idb;
 
     return this.loadOptions(
@@ -665,33 +660,39 @@ export class AppStorageService {
     );
   }
 
-  private loadOptions = (variables: { attribute: string, key: string }[]): Promise<any> => {
-    return new Promise<any>(
+  private loadOptions = (variables: { attribute: string, key: string }[]): Promise<void> => {
+    return new Promise<void>(
       (resolve, reject) => {
-        const wrapper = (acc: number): Promise<any> => {
-          if (acc < variables.length) {
-            if (this['' + variables[acc].attribute + ''] !== undefined) {
-              if (variables[acc].hasOwnProperty('attribute') && variables[acc].hasOwnProperty('key')) {
-                return this.loadOptionFromIDB(variables[acc].key).then(
-                  (result) => {
-                    if (!isNullOrUndefined(result)) {
-                      this['' + variables[acc].attribute + ''] = result;
-                    }
-                    wrapper(++acc);
+        const promises: Promise<any>[] = [];
+        for (let i = 0; i < variables.length; i++) {
+          const variable = variables[i];
+
+          if (this['' + variable.attribute + ''] !== undefined) {
+            if (variable.hasOwnProperty('attribute') && variable.hasOwnProperty('key')) {
+              promises.push(this.loadOptionFromIDB(variable.key).then(
+                (result) => {
+                  if (!isNullOrUndefined(result)) {
+                    this['' + variable.attribute + ''] = result;
                   }
-                );
-              } else {
-                reject(Error('loadOptions: variables parameter must be of type {attribute:string, key:string}[]'));
-              }
+                }
+              ));
             } else {
-              reject(Error(`session service needs an attribute called \'${variables[acc].attribute}\'`));
+              reject(Error('loadOptions: variables parameter must be of type {attribute:string, key:string}[]'));
             }
           } else {
-            resolve();
+            reject(Error(`session service needs an attribute called \'${variable.attribute}\'`));
           }
-        };
+        }
 
-        wrapper(0);
+        // return when all operations have been finished
+        Promise.all(promises).then(
+          () => {
+            resolve();
+          },
+          (error) => {
+            reject(error);
+          }
+        );
       }
     );
   };
@@ -807,5 +808,4 @@ export class AppStorageService {
     }
     return null;
   }
-
 }

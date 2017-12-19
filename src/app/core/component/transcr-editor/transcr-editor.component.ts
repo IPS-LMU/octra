@@ -6,9 +6,9 @@ import {BrowserInfo, Functions, KeyMapping, SubscriptionManager} from '../../sha
 import {TranscriptionService} from '../../shared/service';
 import {isNullOrUndefined} from 'util';
 import {Segments} from '../../obj/Annotation/Segments';
-import {TimespanPipe} from '../../shared/pipe';
 import {AudioChunk, AudioManager, AudioTime} from '../../../media-components/obj/media/audio';
 import {isNumeric} from 'rxjs/util/isNumeric';
+import {TimespanPipe} from '../../../media-components/pipe';
 
 @Component({
   selector: 'app-transcr-editor',
@@ -174,7 +174,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     jQuery.each(dom.children(), replace_func);
     return dom.text();
-  }
+  };
 
   ngOnDestroy() {
     this.destroy();
@@ -310,7 +310,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.segpopover.insertBefore('.note-editing-area');
 
     this.loaded.emit(true);
-  }
+  };
 
   /**
    * initializes the navbar bar of the editor
@@ -630,7 +630,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
     }
-  }
+  };
 
   /**
    * called after key up in editor
@@ -655,7 +655,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
     this._is_typing = true;
     this.lastkeypress = Date.now();
-  }
+  };
 
   /**
    * updates the raw text of the editor
@@ -778,7 +778,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     } else {
       func();
     }
-  }
+  };
 
   /**
    * tidy up the raw text, remove white spaces etc.

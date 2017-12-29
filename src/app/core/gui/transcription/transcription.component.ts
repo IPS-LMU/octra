@@ -1,32 +1,13 @@
 import {
-  AfterContentChecked,
-  AfterContentInit,
-  AfterViewChecked,
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  ComponentFactoryResolver,
-  ComponentRef,
-  HostListener,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  SimpleChanges,
-  ViewChild
+  AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component,
+  ComponentFactoryResolver, ComponentRef, HostListener, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild
 } from '@angular/core';
 import {Router} from '@angular/router';
 import {BsModalComponent} from 'ng2-bs3-modal/ng2-bs3-modal';
 
 import {
-  AppStorageService,
-  AudioService,
-  KeymappingService,
-  MessageService,
-  ModalService,
-  NavbarService,
-  SettingsService,
-  TranscriptionService,
-  UserInteractionsService
+  AppStorageService, AudioService, KeymappingService, MessageService, ModalService, NavbarService,
+  SettingsService, TranscriptionService, UserInteractionsService
 } from '../../shared/service';
 
 import {BrowserInfo, SubscriptionManager} from '../../shared';
@@ -282,8 +263,10 @@ export class TranscriptionComponent implements OnInit,
       this.saveFeedbackform();
     }
     this.transcrService.endTranscription();
-    this.router.navigate(['/logout']);
-  }
+    this.router.navigate(['/logout'], {
+      queryParamsHandling: 'preserve'
+    });
+  };
 
   ngAfterContentInit() {
   }
@@ -292,7 +275,9 @@ export class TranscriptionComponent implements OnInit,
   }
 
   submitTranscription() {
-    this.router.navigate(['/user/transcr/submit']);
+    this.router.navigate(['/user/transcr/submit'], {
+      queryParamsHandling: 'preserve'
+    });
   }
 
   ngOnDestroy() {
@@ -508,7 +493,7 @@ export class TranscriptionComponent implements OnInit,
   onSendError = (error) => {
     this.send_error = error.message;
     return Observable.throw(error);
-  }
+  };
 
   onSendButtonClick() {
 
@@ -544,10 +529,14 @@ export class TranscriptionComponent implements OnInit,
               this.appStorage.jobs_left = Number(json.message);
             }
 
-            this.router.navigate(['/user/load']);
+            this.router.navigate(['/user/load'], {
+              queryParamsHandling: 'preserve'
+            });
           } else {
             this.appStorage.submitted = true;
-            this.router.navigate(['/user/transcr/end']);
+            this.router.navigate(['/user/transcr/end'], {
+              queryParamsHandling: 'preserve'
+            });
           }
         }
       }));

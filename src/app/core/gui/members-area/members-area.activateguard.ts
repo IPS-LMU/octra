@@ -16,19 +16,31 @@ export class MembersAreaGuard implements CanActivate {
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
 
     if (this.appStorage.LoggedIn !== true) {
-      this.router.navigate(['/login']);
+      console.log('NAV MEM to login');
+      this.router.navigate(['/login'], {
+        queryParamsHandling: 'preserve'
+      });
       return false;
     } else if (this.appStorage.uselocalmode === true) {
       if (this.appStorage.file === null) {
         // navigate to reload-file
-        this.router.navigate(['/user/transcr/reload-file']);
+        console.log('NAV MEM to reload');
+        this.router.navigate(['/user/transcr/reload-file'], {
+          queryParamsHandling: 'preserve'
+        });
         return false;
       }
     } else if (this.appStorage.submitted) {
-      this.router.navigate(['/user/transcr/submitted']);
+      console.log('NAV MEM to submitted');
+      this.router.navigate(['/user/transcr/submitted'], {
+        queryParamsHandling: 'preserve'
+      });
       return false;
     } else if (!this.settService.allloaded) {
-      this.router.navigate(['/user/load']);
+      console.log('NAV MEM to load');
+      this.router.navigate(['/user/load'], {
+        queryParamsHandling: 'preserve'
+      });
     }
 
     return true;

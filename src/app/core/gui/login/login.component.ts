@@ -286,10 +286,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   private navigate = (): void => {
+    console.log('NAvigate CALLED!');
     this.router.navigate(['user'], {
-      queryParams: {
-        login: true
-      }
+      queryParamsHandling: 'preserve'
     });
   };
 

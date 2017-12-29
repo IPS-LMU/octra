@@ -16,7 +16,9 @@ export class LogoutGuard implements CanActivate {
     if (this.appStorage.logged_in) {
       return true;
     } else {
-      this.router.navigate(['/user/transcr']);
+      this.router.navigate(['/user/transcr'], {
+        queryParamsHandling: 'preserve'
+      });
     }
     return false;
   }

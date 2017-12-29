@@ -150,21 +150,22 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" [routerLink]="['/']">OCTRA v{{version}}</a>
+            <a class="navbar-brand" [routerLink]="['/']" [queryParamsHandling]="'merge'">OCTRA v{{version}}</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav" *ngIf="!appStorage.LoggedIn">
                 <li routerLinkActive="active">
-                    <a [routerLink]="['/login']">{{'general.login' | translate}}</a>
+                    <a [routerLink]="['/login']" [queryParamsHandling]="'merge'">{{'general.login' | translate}}</a>
                 </li>
                 <li routerLinkActive="active">
-                    <a [routerLink]="['/features']">{{'general.features' | translate}}</a>
+                    <a [routerLink]="['/features']" [queryParamsHandling]="'merge'">{{'general.features' |
+                        translate}}</a>
                 </li>
                 <li routerLinkActive="active">
-                    <a [routerLink]="['/news']">{{'general.news' | translate}}</a>
+                    <a [routerLink]="['/news']" [queryParamsHandling]="'merge'">{{'general.news' | translate}}</a>
                 </li>
                 <li routerLinkActive="active">
-                    <a [routerLink]="['/faq']">{{'general.faq' | translate}}</a>
+                    <a [routerLink]="['/faq']" [queryParamsHandling]="'merge'">{{'general.faq' | translate}}</a>
                 </li>
             </ul>
 

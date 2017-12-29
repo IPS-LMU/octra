@@ -45,7 +45,9 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
     const process = () => {
       if (this.appStorage.uselocalmode && isNullOrUndefined(this.appStorage.file)) {
-        this.router.navigate(['/user/transcr/reload-file']);
+        this.router.navigate(['/user/transcr/reload-file'], {
+          queryParamsHandling: 'preserve'
+        });
       } else {
         this.settService.loadAudioFile(this.audio);
       }
@@ -114,7 +116,9 @@ export class LoadingComponent implements OnInit, OnDestroy {
           } else {
             console.error('audio not loaded');
             if (this.appStorage.uselocalmode) {
-              this.router.navigate(['/user/transcr/reload-file']);
+              this.router.navigate(['/user/transcr/reload-file'], {
+                queryParamsHandling: 'preserve'
+              });
             }
           }
         }
@@ -138,13 +142,17 @@ export class LoadingComponent implements OnInit, OnDestroy {
                 )
                 && this.settService.projectsettings.agreement.enabled && !this.appStorage.uselocalmode) {
                 this.transcrService.load().then(() => {
-                  this.router.navigate(['/user/agreement']);
+                  this.router.navigate(['/user/agreement'], {
+                    queryParamsHandling: 'preserve'
+                  });
                 }).catch((err) => {
                   console.error(err);
                 });
               } else {
                 this.transcrService.load().then(() => {
-                  this.router.navigate(['/user/transcr']);
+                  this.router.navigate(['/user/transcr'], {
+                    queryParamsHandling: 'preserve'
+                  });
                 }).catch((err) => {
                   console.error(err);
                 });
@@ -162,9 +170,13 @@ export class LoadingComponent implements OnInit, OnDestroy {
       const transcript_url = this.route.snapshot.queryParams['transcript'];
       const embedded = this.route.snapshot.queryParams['embedded'];
 
-      window.postMessage({
-        result: transcript_url
-      }, 'octra');
+      setTimeout(() => {
+        window.parent.postMessage({
+          result: transcript_url
+        }, '*');
+        console.log('send message');
+      }, 3000);
+
       /*
       if (!this.appStorage.idbloaded) {
         this.settService.app_settings.octra.database.name = 'url';
@@ -196,7 +208,9 @@ export class LoadingComponent implements OnInit, OnDestroy {
       }
 
       if (!this.appStorage.LoggedIn) {
-        this.router.navigate(['/login']);
+        this.router.navigate(['/login'], {
+          queryParamsHandling: 'preserve'
+        });
       }
     }
   }
@@ -211,7 +225,9 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
   goBack() {
     this.appStorage.clearSession();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/login'], {
+      queryParamsHandling: 'preserve'
+    });
   }
 
   queryParamsSet(): boolean {

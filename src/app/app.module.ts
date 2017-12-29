@@ -50,6 +50,7 @@ import {HttpClient, HttpClientModule} from '@angular/common/http';
 import {AudioviewerConfig} from './media-components/components/audio/audioviewer';
 import {MediaComponentsModule} from './media-components/media-components.module';
 import {TranscrEditorComponent} from './core/component/transcr-editor';
+import {Error404Component} from './core/gui/error404/error404.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -90,7 +91,8 @@ export const ngmodule = {
     TranscriptionComponent,
     TranscriptionEndComponent,
     TranscrOverviewComponent,
-    TranscrWindowComponent
+    TranscrWindowComponent,
+    Error404Component
   ],
   entryComponents: EDITORS,
   imports: [

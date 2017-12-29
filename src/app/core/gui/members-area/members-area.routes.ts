@@ -12,7 +12,6 @@ import {HelpComponent} from '../help/help.component';
 
 export const MEMBER_ROUTES: Routes = [
   {path: 'load', component: LoadingComponent},
-  {path: 'load', component: LoadingComponent},
   {path: 'agreement', component: AgreementComponent, canActivate: [MembersAreaGuard]},
   {
     path: 'transcr',
@@ -26,5 +25,6 @@ export const MEMBER_ROUTES: Routes = [
     canActivate: [TranscrEndGuard]
   },
   {path: 'transcr/reload-file', component: ReloadFileComponent, canActivate: [ReloadFileGuard]},
-  {path: '', redirectTo: '/user/load', pathMatch: 'full'}
+  {path: '', redirectTo: 'load', pathMatch: 'full'},
+  {path: '**', redirectTo: '/404', pathMatch: 'full'}
 ];

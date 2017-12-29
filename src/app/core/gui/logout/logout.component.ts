@@ -27,7 +27,9 @@ export class LogoutComponent implements OnInit {
   ngOnInit() {
     this.settingsService.clearSettings();
     this.sessionService.endSession(this.sessionService.uselocalmode, () => {
-      this.router.navigate(['login']);
+      this.router.navigate(['login'], {
+        queryParamsHandling: 'preserve'
+      });
     });
   }
 }

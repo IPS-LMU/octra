@@ -1,17 +1,15 @@
 import {RouterModule, Routes} from '@angular/router';
 
-import {LoginComponent} from './core/gui/login/login.component';
+import {
+  Error404Component, FeaturesComponent, HelpToolsComponent, LoginComponent, LogoutComponent,
+  MembersAreaComponent
+} from './core/gui';
 import {MEMBER_ROUTES} from './core/gui/members-area/members-area.routes';
-import {MembersAreaComponent} from './core/gui/members-area/members-area.component';
 import {ALoginGuard} from './core/gui/login/login.activateguard';
-import {LogoutComponent} from './core/gui/logout/logout.component';
 import {LogoutGuard} from './core/gui/logout/logout.guard';
-import {SettingsGuard} from './core/shared/guard/settings.activateguard';
+import {SettingsGuard} from './core/shared/guard';
 import {NewsComponent} from './core/gui/news/news.component';
 import {FaqComponent} from './core/gui/faq/faq.component';
-import {HelpToolsComponent} from './core/gui/help-tools/help-tools.component';
-import {FeaturesComponent} from './core/gui/features/features.component';
-import {Error404Component} from './core/gui/error404/error404.component';
 
 const APP_ROUTES: Routes = [
   {path: 'login', component: LoginComponent, canActivate: [SettingsGuard, ALoginGuard]},

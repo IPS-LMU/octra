@@ -1,4 +1,6 @@
 export * from './AnnotJSONConverter';
+export * from './BundleJSONConverter';
+export * from './Converter';
 export * from './TextConverter';
 export * from './CTMConverter';
 export * from './PartiturConverter';

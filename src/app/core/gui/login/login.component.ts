@@ -82,6 +82,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   ngOnInit() {
+    console.log('login component called');
     this.browser_check = new BrowserCheck();
     this.valid_platform = false;
 

@@ -31,6 +31,7 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
 
   ngOnInit() {
     this.appStorage.submitted = true;
+    console.log('transcription component called');
   }
 
   ngAfterViewInit() {

@@ -13,7 +13,7 @@
             </p>
             <section>
                 <h4 [ngClass]="{
-                'bg-success': appStorage.uselocalmode == false
+                'bg-success': appStorage.usemode === 'online'
                 }">{{ 'login.online mode' | translate}}</h4>
                 <div *ngIf="!apc.octra.login.enabled" id="login-disabled">
                     {{'login.online mode disabled' | translate}}
@@ -57,14 +57,14 @@
                                     />
                                 </div>
                                 <div class="form-group">
-                                    <input *ngIf="!appStorage.uselocalmode" class="form-control" type="submit"
+                                    <input *ngIf="appStorage.usemode === 'online'" class="form-control" type="submit"
                                            id="login-submit"
                                            class="btn btn-raised btn-primary" [ngClass]="{
-                                           'btn-danger': (appStorage.uselocalmode && appStorage.sessionfile !== null)
+                                           'btn-danger': (appStorage.usemode === 'local' && appStorage.sessionfile !== null)
                                            }"
                                            [disabled]="!f.valid"
                                            name="login-submit" value="{{'general.login' | translate}}"/>
-                                    <input *ngIf="appStorage.uselocalmode && appStorage.sessionfile !== null"
+                                    <input *ngIf="appStorage.usemode === 'local' && appStorage.sessionfile !== null"
                                            class="form-control btn btn-raised btn-dange" type="submit" id="login-submit"
                                            [disabled]="!f.valid"
                                            name="login-submit" value="{{'login.login and remove' | translate}}"/>
@@ -79,27 +79,27 @@
         <div #localmode id='localmode' class="col-md-6 panel panel-default" style="padding:40px;">
             <section>
                 <h4 [ngClass]="{
-                'bg-success': appStorage.uselocalmode
+                'bg-success': appStorage.usemode === 'local'
                 }">{{'login.local mode' | translate}}
                 </h4>
                 <div>
-                    <p class="bg-warning" *ngIf="appStorage.uselocalmode && appStorage.sessionfile !== null"
+                    <p class="bg-warning" *ngIf="appStorage.usemode === 'local' && appStorage.sessionfile !== null"
                        [innerHTML]="'login.old file found' | translate:{file_label: getDropzoneFileString(sessionfile)}">
                     </p>
                     <app-octra-dropzone #dropzone></app-octra-dropzone>
-                    <input *ngIf="(appStorage.uselocalmode === null || appStorage.uselocalmode) && getFileStatus() != 'new'"
+                    <input *ngIf="(appStorage.usemode === null || appStorage.usemode === 'local') && getFileStatus() != 'new'"
                            [disabled]="!(getFileStatus() == 'start')" type="submit"
                            id="offline-submit"
                            class="btn btn-raised btn-primary" value="{{'transcription.start' | translate}}"
                            (click)="onOfflineSubmit()"/>
 
-                    <input *ngIf="appStorage.uselocalmode && getFileStatus() == 'new'"
+                    <input *ngIf="appStorage.usemode === 'local' && getFileStatus() == 'new'"
                            id="offline-delete-btn"
                            class="btn btn-raised btn-danger"
                            (click)="modService.show('transcription_delete', '', {ok: newTranscription})"
                            value="{{'transcription.new' |translate}}"/>
-                    <input *ngIf="(appStorage.uselocalmode !== null && appStorage.uselocalmode !== undefined) &&
-                    !appStorage.uselocalmode && (getFileStatus() != 'new' || getFileStatus() != 'start')"
+                    <input *ngIf="(appStorage.usemode !== null && appStorage.usemode !== undefined) &&
+                    appStorage.usemode === 'online' && (getFileStatus() != 'new' || getFileStatus() != 'start')"
                            id="offline-delete-btn"
                            [disabled]="(getFileStatus() !== 'new' && getFileStatus() !== 'start')"
                            class="btn btn-raised btn-danger"

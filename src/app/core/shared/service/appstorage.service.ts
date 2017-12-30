@@ -42,6 +42,17 @@ export class OIDBLink implements IIDBLink {
 
 @Injectable()
 export class AppStorageService {
+  set LoggedIn(value: boolean) {
+    this._logged_in = value;
+  }
+
+  get url_params(): any[] {
+    return this._url_params;
+  }
+
+  set url_params(value: any[]) {
+    this._url_params = value;
+  }
   get show_loupe(): boolean {
     return this._show_loupe;
   }
@@ -195,13 +206,13 @@ export class AppStorageService {
       });
   }
 
-  get uselocalmode(): boolean {
-    return this._uselocalmode;
+  get usemode(): 'online' | 'local' | 'url' {
+    return this._usemode;
   }
 
-  set uselocalmode(value: boolean) {
-    this._uselocalmode = value;
-    this.idb.save('options', 'uselocalmode', {value: value}).catch((err) => {
+  set usemode(value: 'online' | 'local' | 'url') {
+    this._usemode = value;
+    this.idb.save('options', 'usemode', {value: value}).catch((err) => {
       console.error(err);
     });
   }
@@ -279,7 +290,7 @@ export class AppStorageService {
 
   // SESSION STORAGE
   @SessionStorage('session_key') session_key: string;
-  @SessionStorage() logged_in: boolean;
+  @SessionStorage() _logged_in: boolean;
   @SessionStorage() logInTime: number; // timestamp
 
   @SessionStorage('agreement') private _agreement: any;
@@ -299,13 +310,16 @@ export class AppStorageService {
   private _logs: any[] = [];
   private _data_id: number = null;
   private _audio_url: string = null;
-  private _uselocalmode: boolean = null;
+  private _usemode: 'local' | 'online' | 'url' = null;
+
   private _sessionfile: any = null;
   private _language = 'en';
   private _version: string = null;
   private _interface: string = null;
   private _logging = false;
   private _show_loupe = true;
+
+  private _url_params: any = {};
 
   private _user: {
     id: string,
@@ -325,7 +339,7 @@ export class AppStorageService {
   private _levelcounter = 0;
 
   get LoggedIn(): boolean {
-    return this.logged_in;
+    return this._logged_in;
   }
 
   constructor(public sessStr: SessionStorageService,
@@ -351,14 +365,14 @@ export class AppStorageService {
         this._interface = '2D-Editor';
       }
       this.setNewSessionKey();
-      this.uselocalmode = true;
+      this._usemode = 'local';
       this.user = {
         id: '-1',
         project: '',
         jobno: -1
       };
       this.login = true;
-      this.logged_in = true;
+      this._logged_in = true;
 
       return {error: ''};
     }
@@ -370,8 +384,8 @@ export class AppStorageService {
       this.setNewSessionKey();
 
       this.data_id = data_id;
-      this.logged_in = true;
-      this.sessStr.store('logged_in', this.logged_in);
+      this._logged_in = true;
+      this.sessStr.store('_logged_in', this._logged_in);
       this.sessStr.store('interface', this._interface);
       this.audio_url = audio_url;
       this.user = {
@@ -379,7 +393,7 @@ export class AppStorageService {
         project: member.project,
         jobno: member.jobno
       };
-      this.uselocalmode = false;
+      this._usemode = 'online';
 
       this.login = true;
       return {error: ''};
@@ -389,7 +403,7 @@ export class AppStorageService {
   }
 
   public clearSession(): boolean {
-    this.logged_in = false;
+    this._logged_in = false;
     this.login = false;
 
     this.sessStr.clear();
@@ -400,7 +414,7 @@ export class AppStorageService {
 
   public clearLocalStorage(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this.logged_in = false;
+      this._logged_in = false;
       this.login = false;
 
       const promises: Promise<any>[] = [];
@@ -485,7 +499,7 @@ export class AppStorageService {
       const process = () => {
         const res = this.setSessionData(null, null, null, true);
         if (res.error === '') {
-          this._uselocalmode = true;
+          this._usemode = 'local';
           this.sessionfile = this.getSessionFile(audiofile);
           this.file = audiofile;
           navigate();
@@ -511,7 +525,8 @@ export class AppStorageService {
     }
   };
 
-  public endSession(offline: boolean, navigate: () => void) {
+  // TODO make this method return a Promise
+  public endSession(navigate: () => void) {
     this.clearSession();
     navigate();
   }
@@ -554,6 +569,7 @@ export class AppStorageService {
   }
 
   public load(idb: IndexedDBManager): Promise<void> {
+    console.log('load from indexedDB');
     this._idb = idb;
 
     return this.loadOptions(
@@ -595,8 +611,8 @@ export class AppStorageService {
           key: 'sessionfile'
         },
         {
-          attribute: '_uselocalmode',
-          key: 'uselocalmode'
+          attribute: '_usemode',
+          key: 'usemode'
         },
         {
           attribute: '_user',

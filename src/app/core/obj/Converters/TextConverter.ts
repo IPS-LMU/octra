@@ -50,7 +50,7 @@ export class TextConverter extends Converter {
         type: 'text/plain'
       }
     };
-  };
+  }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile !== null && audiofile !== undefined) {
@@ -76,5 +76,5 @@ export class TextConverter extends Converter {
     }
 
     return null;
-  };
+  }
 }

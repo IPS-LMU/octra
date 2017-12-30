@@ -1,12 +1,12 @@
 import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {SettingsService} from '../../shared/service/settings.service';
-import {AppStorageService} from '../../shared/service/appstorage.service';
+import {AppStorageService, AudioService, SettingsService, TranscriptionService} from '../../shared/service';
 import {isNullOrUndefined} from 'util';
-import {AudioService} from '../../shared/service/audio.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import {TranscriptionService} from '../../shared/service/transcription.service';
+import {Router} from '@angular/router';
+import {HttpClient} from '@angular/common/http';
+import {IFile, ImportResult, PartiturConverter} from '../../obj/Converters';
+import {OAudiofile} from '../../obj/Annotation';
 
 @Component({
   selector: 'app-loading',
@@ -38,20 +38,11 @@ export class LoadingComponent implements OnInit, OnDestroy {
               public audio: AudioService,
               private router: Router,
               private transcrService: TranscriptionService,
-              private route: ActivatedRoute) {
+              private http: HttpClient) {
   }
 
   ngOnInit() {
-
-    const process = () => {
-      if (this.appStorage.uselocalmode && isNullOrUndefined(this.appStorage.file)) {
-        this.router.navigate(['/user/transcr/reload-file'], {
-          queryParamsHandling: 'preserve'
-        });
-      } else {
-        this.settService.loadAudioFile(this.audio);
-      }
-    };
+    console.log('loading component called');
 
     this.langService.get('general.please wait').subscribe(
       (translation) => {
@@ -109,13 +100,65 @@ export class LoadingComponent implements OnInit, OnDestroy {
       this.settService.audioloaded.subscribe(
         (result) => {
           if (result.status === 'success') {
-            this.loadedtable.audio = true;
-            this.progress += 25;
-            this.state = 'Audio loaded';
-            this.loadedchanged.emit(false);
+            new Promise<void>((resolve, reject) => {
+              if (this.appStorage.usemode === 'url') {
+                // load transcript file via URL
+                this.http.get(this.appStorage.url_params['transcript'], {
+                  responseType: 'text'
+                }).subscribe(
+                  (res) => {
+                    console.log(`transcript fetched`);
+                    console.log(res);
+
+                    this.state = 'Import BAF File...';
+                    let filename = this.appStorage.url_params['transcript'];
+                    filename = filename.substr(filename.lastIndexOf('/') + 1);
+
+                    const file: IFile = {
+                      name: filename,
+                      content: res,
+                      type: 'text',
+                      encoding: 'utf-8'
+                    };
+
+                    // convert par to annotJSON
+                    const audioRessource = this.audio.audiomanagers[0].ressource;
+                    const oAudioFile = new OAudiofile();
+                    oAudioFile.arraybuffer = audioRessource.arraybuffer;
+                    oAudioFile.duration = audioRessource.info.duration.samples;
+                    oAudioFile.name = audioRessource.name;
+                    oAudioFile.samplerate = audioRessource.info.samplerate;
+                    oAudioFile.size = audioRessource.size;
+
+                    const importResult: ImportResult = new PartiturConverter().import(file, oAudioFile);
+                    if (!isNullOrUndefined(importResult) && !isNullOrUndefined(importResult.annotjson)) {
+                      // conversion successfully finished
+                      // this.appStorage.annotation = importResult.
+
+                      resolve();
+                    } else {
+                      reject('importResult is empty');
+                    }
+                  },
+                  (err) => {
+                    reject(err);
+                  }
+                );
+              } else {
+                resolve();
+              }
+            }).then(() => {
+              this.loadedtable.audio = true;
+              this.progress += 25;
+              this.state = 'Audio loaded';
+
+              this.loadedchanged.emit(false);
+            }).catch((error) => {
+              console.log(error);
+            });
           } else {
             console.error('audio not loaded');
-            if (this.appStorage.uselocalmode) {
+            if (this.appStorage.usemode === 'local') {
               this.router.navigate(['/user/transcr/reload-file'], {
                 queryParamsHandling: 'preserve'
               });
@@ -140,7 +183,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                   || isNullOrUndefined(this.appStorage.agreement[this.appStorage.user.project]) ||
                   !this.appStorage.agreement[this.appStorage.user.project]
                 )
-                && this.settService.projectsettings.agreement.enabled && !this.appStorage.uselocalmode) {
+                && this.settService.projectsettings.agreement.enabled && this.appStorage.usemode === 'online') {
                 this.transcrService.load().then(() => {
                   this.router.navigate(['/user/agreement'], {
                     queryParamsHandling: 'preserve'
@@ -163,56 +206,50 @@ export class LoadingComponent implements OnInit, OnDestroy {
       )
     );
 
-    this.settService.loadProjectSettings();
-
-    if (this.queryParamsSet()) {
-      const audio_url = this.route.snapshot.queryParams['audio'];
-      const transcript_url = this.route.snapshot.queryParams['transcript'];
-      const embedded = this.route.snapshot.queryParams['embedded'];
-
-      setTimeout(() => {
-        window.parent.postMessage({
-          result: transcript_url
-        }, '*');
-        console.log('send message');
-      }, 3000);
-
-      /*
-      if (!this.appStorage.idbloaded) {
-        this.settService.app_settings.octra.database.name = 'url';
-        console.log('load db ' + this.settService.app_settings.octra.database.name);
-        this.subscrmanager.add(this.appStorage.loaded.subscribe(() => {
-          },
-          (error) => {
-            console.error(error);
-          },
-          () => {
-            process();
-          }));
-      }
-      */
-    } else {
-
+    new Promise<void>((resolve, reject) => {
+      console.log(`IN PROMISE`);
       if (!this.appStorage.idbloaded) {
         console.log('db not loaded');
         this.subscrmanager.add(this.appStorage.loaded.subscribe(() => {
           },
           (error) => {
-            console.error(error);
+            reject(error);
           },
           () => {
-            process();
+            resolve();
           }));
       } else {
-        process();
+        resolve();
       }
+    }).then(() => {
+      console.log(`PROMISE FINISHED`);
 
-      if (!this.appStorage.LoggedIn) {
+      if (this.appStorage.usemode !== 'url' && !this.appStorage.LoggedIn) {
+        // not logged in, go back
+        console.log(`NO URL ${this.appStorage.usemode}`);
         this.router.navigate(['/login'], {
           queryParamsHandling: 'preserve'
         });
       }
-    }
+
+      this.settService.loadProjectSettings();
+
+      if (this.appStorage.usemode === 'local' && isNullOrUndefined(this.appStorage.file)) {
+        this.router.navigate(['/user/transcr/reload-file'], {
+          queryParamsHandling: 'preserve'
+        });
+      } else {
+        if (this.appStorage.usemode === 'url') {
+          this.state = 'Get transcript from URL...';
+          // set audio url from url params
+          this.appStorage.audio_url = decodeURI(this.appStorage.url_params['audio']);
+          console.log(`load audio from ${this.appStorage.audio_url}`);
+          this.settService.loadAudioFile(this.audio);
+        }
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   ngOnDestroy() {
@@ -228,14 +265,5 @@ export class LoadingComponent implements OnInit, OnDestroy {
     this.router.navigate(['/login'], {
       queryParamsHandling: 'preserve'
     });
-  }
-
-  queryParamsSet(): boolean {
-    const params = this.route.snapshot.queryParams;
-    return (
-      params.hasOwnProperty('audio') &&
-      params.hasOwnProperty('transcript') &&
-      params.hasOwnProperty('embedded')
-    );
   }
 }

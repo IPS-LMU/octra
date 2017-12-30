@@ -28,6 +28,7 @@ export class FaqComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.navService.show_interfaces = false;
     this.navService.show_export = false;
+    console.log('FAQ component called');
   }
 
   ngOnChanges(obj) {

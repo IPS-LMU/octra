@@ -63,7 +63,7 @@ export class BugReportService {
         language: this.langService.currentLang,
         signed_in: this.appStorage.logged_in,
         dataid: this.appStorage.data_id,
-        localmode: this.appStorage.uselocalmode
+        usemode: this.appStorage.usemode
       },
       system: {
         os: {

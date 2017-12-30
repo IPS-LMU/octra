@@ -133,7 +133,7 @@ export class OSegment extends OItem {
 }
 
 export class OEvent extends OItem {
-  samplePoint
+  samplePoint;
 
   constructor(id: number, samplePoint: number, labels?: ILabel[]) {
     super(id, labels);

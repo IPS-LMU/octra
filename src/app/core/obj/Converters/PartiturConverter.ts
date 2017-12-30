@@ -96,7 +96,7 @@ export class PartiturConverter extends Converter {
       let previous_tier = '';
       let level = null;
       let counter = 1;
-      let start = 0;
+      const start = 0;
       while (pointer < lines.length) {
         const search = lines[pointer].match(
           new RegExp(
@@ -136,5 +136,5 @@ export class PartiturConverter extends Converter {
     }
 
     return null;
-  };
+  }
 }

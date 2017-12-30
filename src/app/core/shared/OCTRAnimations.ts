@@ -24,4 +24,4 @@ export const toggleFade = (element: HTMLElement) => {
   } else {
     element.setAttribute('state', 'inactive');
   }
-}
+};

@@ -191,7 +191,7 @@
 
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown" *ngIf="transcrServ !== undefined" [ngStyle]="{
-                'display': (!(navbarServ.dataloaded && appStorage.LoggedIn && appStorage.uselocalmode)) ? 'none': 'inherit'
+                'display': (!(navbarServ.dataloaded && appStorage.LoggedIn && appStorage.usemode === 'local')) ? 'none': 'inherit'
                 }">
                     <a href="#" class="dropdown" data-toggle="dropdown" role="button"
                        aria-expanded="false">
@@ -238,7 +238,7 @@
                         'collaps': collapsed
                         }">
                         <table class="table">
-                            <tr *ngIf="!appStorage.uselocalmode">
+                            <tr *ngIf="appStorage.usemode === 'online'">
                                 <td><span>{{'general.project' |translate}}:</span></td>
                                 <td>
                                     <span>{{appStorage.user.project}}</span>
@@ -274,13 +274,13 @@
                                     <span>{{navbarServ.exportformats.filesize.size}} {{navbarServ.exportformats.filesize.label}}</span>
                                 </td>
                             </tr>
-                            <tr *ngIf="!appStorage.uselocalmode">
+                            <tr *ngIf="appStorage.usemode === 'online'">
                                 <td><span>{{'general.id' | translate}}:</span></td>
                                 <td>
                                     <span>{{appStorage.data_id}}</span>
                                 </td>
                             </tr>
-                            <tr *ngIf="!appStorage.uselocalmode">
+                            <tr *ngIf="appStorage.usemode === 'online'">
                                 <td><span>{{'general.free jobs' | translate}}:</span></td>
                                 <td>
                                     <span>{{appStorage.jobs_left}}</span>
@@ -346,7 +346,7 @@
                                         <label>
                                             <input (click)="toggleSettings('logging')"
                                                    [checked]="appStorage.logging"
-                                                   [disabled]="!appStorage.uselocalmode"
+                                                   [disabled]="appStorage.usemode === 'online'"
                                                    id="logging" type="checkbox">
                                         </label>
                                     </div>
@@ -385,7 +385,7 @@
         </div><!-- .nav-collapse -->
     </div>
 </nav>
-<div id="subnav" class="panel" *ngIf="appStorage.LoggedIn && !appStorage.uselocalmode && navbarServ.dataloaded">
+<div id="subnav" class="panel" *ngIf="appStorage.LoggedIn && appStorage.usemode === 'online' && navbarServ.dataloaded">
     <div class="row">
         <div class="col-sm-2"></div>
         <div class="col-xs-4 col-sm-3">{{"general.project" | translate}}: {{appStorage.user.project}}</div>

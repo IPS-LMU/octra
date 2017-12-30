@@ -15,7 +15,7 @@ export class TranscActivateGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
     console.log('transcription component opened');
-    if (!this.appStorage.uselocalmode) {
+    if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
       if (!this.settService.allloaded) {
         console.log('go back to load');
         this.router.navigate(['/user/load'], {
@@ -23,7 +23,7 @@ export class TranscActivateGuard implements CanActivate {
         });
         return false;
       }
-    } else {
+    } else if (this.appStorage.usemode === 'local') {
       if (!this.settService.allloaded) {
         console.log('go back to reload');
         this.router.navigate(['/user/transcr/reload-file'], {

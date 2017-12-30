@@ -98,6 +98,7 @@ export class TranscriptionComponent implements OnInit,
               public langService: TranslateService,
               private api: APIService,
               private bugService: BugReportService) {
+    console.log('transcription component called');
     this.subscrmanager = new SubscriptionManager();
     this.audiomanager = this.audio.audiomanagers[0];
 
@@ -105,7 +106,7 @@ export class TranscriptionComponent implements OnInit,
     this.navbarServ.uiService = this.uiService;
 
     // overwrite logging option using projectconfig
-    if (!this.appStorage.uselocalmode) {
+    if (this.appStorage.usemode === 'online') {
       this.appStorage.logging = this.settingsService.projectsettings.logging.forced;
     }
     this.uiService.enabled = this.appStorage.logging;
@@ -259,7 +260,7 @@ export class TranscriptionComponent implements OnInit,
   }
 
   abortTranscription = () => {
-    if (!this.appStorage.uselocalmode) {
+    if (this.appStorage.usemode === 'online') {
       this.saveFeedbackform();
     }
     this.transcrService.endTranscription();

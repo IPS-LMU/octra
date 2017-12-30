@@ -37,7 +37,7 @@ export class UpdateManager {
           // incremental IDB upgrade: It is very important to make sure, that the database can
           // be upgrade from any version to the latest version
           const idbm = new IndexedDBManager(dbname);
-          this.subscrmanager.add(idbm.open(2).subscribe(
+          this.subscrmanager.add(idbm.open(3).subscribe(
             (result) => {
               console.log(result.type);
               if (result.type === 'success') {
@@ -81,7 +81,7 @@ export class UpdateManager {
                       value: {value: this.appStorage.localStr.retrieve('audio_url')}
                     },
                     {
-                      key: 'uselocalmode',
+                      key: 'usemode',
                       value: {value: this.appStorage.localStr.retrieve('offline')}
                     },
                     {
@@ -162,6 +162,28 @@ export class UpdateManager {
 
                   }).catch((err) => {
                     console.error(err);
+                  });
+                  version = 2;
+                }
+
+                if (version === 2) {
+                  const transaction = result.target.transaction;
+                  const options = transaction.objectStore('options');
+
+                  idbm.get(options, 'uselocalmode').then((entry) => {
+                    if (!isNullOrUndefined(entry)) {
+                      if (entry.value === false) {
+                        idbm.save(options, 'usemode', {
+                          name: 'usemode',
+                          value: 'online'
+                        });
+                      } else if (entry.value === true) {
+                        idbm.save(options, 'usemode', {
+                          name: 'usemode',
+                          value: 'local'
+                        });
+                      }
+                    }
                   });
                 }
               }

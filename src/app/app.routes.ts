@@ -12,6 +12,7 @@ import {NewsComponent} from './core/gui/news/news.component';
 import {FaqComponent} from './core/gui/faq/faq.component';
 
 const APP_ROUTES: Routes = [
+  {path: '', redirectTo: '/login', pathMatch: 'full'},
   {path: 'login', component: LoginComponent, canActivate: [SettingsGuard, ALoginGuard]},
   {path: '404', component: Error404Component},
   {path: 'news', component: NewsComponent, canActivate: [SettingsGuard]},

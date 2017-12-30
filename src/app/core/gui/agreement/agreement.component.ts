@@ -27,6 +27,7 @@ export class AgreementComponent implements OnInit {
   }
 
   ngOnInit() {
+    console.log('agreement component called');
   }
 
   public toHTML(text: any): string {

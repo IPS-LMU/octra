@@ -5,7 +5,7 @@ import {HttpClient} from '@angular/common/http';
 export interface FileSize {
   size: number;
   label: string;
-};
+}
 
 export class Functions {
   public static scrollTo(y: number, target?: string) {

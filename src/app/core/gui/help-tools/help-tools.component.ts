@@ -18,6 +18,7 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    console.log('help-tools component called');
   }
 
   ngOnDestroy() {
@@ -25,7 +26,7 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
   }
 
   clearAllData() {
-    if (this.appStorage.uselocalmode) {
+    if (this.appStorage.usemode === 'local') {
       this.appStorage.clearAnnotationData().then(() => {
         this.appStorage.clearOptions();
       }).then(() => {

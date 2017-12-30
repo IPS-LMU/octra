@@ -21,7 +21,7 @@ export class MembersAreaGuard implements CanActivate {
         queryParamsHandling: 'preserve'
       });
       return false;
-    } else if (this.appStorage.uselocalmode === true) {
+    } else if (this.appStorage.usemode === 'local') {
       if (this.appStorage.file === null) {
         // navigate to reload-file
         console.log('NAV MEM to reload');

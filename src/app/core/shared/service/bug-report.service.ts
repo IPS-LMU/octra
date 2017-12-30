@@ -61,7 +61,7 @@ export class BugReportService {
       octra: {
         version: AppInfo.version,
         language: this.langService.currentLang,
-        signed_in: this.appStorage.logged_in,
+        signed_in: this.appStorage.LoggedIn,
         dataid: this.appStorage.data_id,
         usemode: this.appStorage.usemode
       },

@@ -13,7 +13,7 @@ export class LogoutGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
     // check if an active session is available
-    if (this.appStorage.logged_in) {
+    if (this.appStorage.LoggedIn) {
       return true;
     } else {
       this.router.navigate(['/user/transcr'], {

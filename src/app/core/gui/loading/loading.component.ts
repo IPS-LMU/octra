@@ -7,6 +7,7 @@ import {Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
 import {IFile, ImportResult, PartiturConverter} from '../../obj/Converters';
 import {OAudiofile} from '../../obj/Annotation';
+import {OIDBLevel} from '../../shared/service/appstorage.service';
 
 @Component({
   selector: 'app-loading',
@@ -133,9 +134,18 @@ export class LoadingComponent implements OnInit, OnDestroy {
                     const importResult: ImportResult = new PartiturConverter().import(file, oAudioFile);
                     if (!isNullOrUndefined(importResult) && !isNullOrUndefined(importResult.annotjson)) {
                       // conversion successfully finished
-                      // this.appStorage.annotation = importResult.
-
-                      resolve();
+                      console.log(`Conversion from URL successfully finished`);
+                      const new_levels: OIDBLevel[] = [];
+                      for (let i = 0; i < importResult.annotjson.levels.length; i++) {
+                        new_levels.push(new OIDBLevel(i + 1, importResult.annotjson.levels[i], i));
+                      }
+                      this.appStorage.overwriteAnnotation(new_levels).then(
+                        () => {
+                          resolve();
+                        }
+                      ).catch((error) => {
+                        reject(error);
+                      });
                     } else {
                       reject('importResult is empty');
                     }

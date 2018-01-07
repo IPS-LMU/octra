@@ -93,7 +93,7 @@ export class Functions {
         }
       }
     } catch (ex) {
-      console.error('error in Functions.placeAt');
+      console.error(ex);
       // ignore
     }
   }

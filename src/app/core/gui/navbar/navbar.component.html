@@ -191,7 +191,7 @@
 
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown" *ngIf="transcrServ !== undefined" [ngStyle]="{
-                'display': (!(navbarServ.dataloaded && appStorage.LoggedIn && appStorage.usemode === 'local')) ? 'none': 'inherit'
+                'display': (!(navbarServ.dataloaded && appStorage.LoggedIn && (appStorage.usemode === 'local' || appStorage.usemode === 'url'))) ? 'none': 'inherit'
                 }">
                     <a href="#" class="dropdown" data-toggle="dropdown" role="button"
                        aria-expanded="false">

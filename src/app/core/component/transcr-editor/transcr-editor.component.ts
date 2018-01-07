@@ -39,7 +39,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     if (!this.focused) {
       return -1;
     }
-    return jQuery('.note-editable.panel-body:eq(0)').caret('pos');
+    return jQuery('.note-editable:eq(0)').caret('pos');
   }
 
   public segpopover: any = null;
@@ -761,7 +761,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     const func = () => {
       try {
         if (this.rawText !== '' && this.html !== '<p><br/></p>') {
-          Functions.placeAtEnd(jQuery('.note-editable.panel-body')[0]);
+          Functions.placeAtEnd(jQuery('.note-editable')[0]);
         }
         this.textfield.summernote('focus');
       } catch (exception) {

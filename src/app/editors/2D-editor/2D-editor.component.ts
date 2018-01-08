@@ -1,22 +1,10 @@
 import {
-  AfterContentChecked,
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  OnChanges,
-  OnDestroy,
-  OnInit,
+  AfterContentChecked, AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnChanges, OnDestroy, OnInit,
   ViewChild
 } from '@angular/core';
 
 import {
-  AppStorageService,
-  AudioService,
-  KeymappingService,
-  MessageService,
-  SettingsService,
-  TranscriptionService,
+  AppStorageService, AudioService, KeymappingService, MessageService, SettingsService, TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
 
@@ -34,6 +22,7 @@ import 'rxjs/add/observable/interval';
 import {AudioviewerComponent} from '../../media-components/components/audio/audioviewer';
 import {CircleLoupeComponent} from '../../media-components/components/audio/circleloupe';
 import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
+import {Line} from '../../media-components/obj';
 
 @Component({
   selector: 'app-overlay-gui',
@@ -304,10 +293,18 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     }
 
     if (this.appStorage.show_loupe) {
-      this.mouseTimer = window.setTimeout(() => {
-        this.changeArea(this.loupe, this.miniloupe, this.factor);
-        this.mousestate = 'ended';
-      }, 50);
+      const lastlinevisible: Line = this.viewer.av.LinesArray[this.viewer.av.LinesArray.length - 1];
+      if (this.miniloupe.location.y <= (lastlinevisible.Pos.y - this.viewer.viewRect.position.y +
+          lastlinevisible.Size.height + this.viewer.margin.top + this.viewer.margin.bottom)) {
+        this.loupe_hidden = false;
+        this.mouseTimer = window.setTimeout(() => {
+          this.changeArea(this.loupe, this.miniloupe, this.factor);
+          this.mousestate = 'ended';
+
+        }, 50);
+      } else {
+        this.loupe_hidden = true;
+      }
     }
   }
 

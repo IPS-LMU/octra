@@ -8,7 +8,7 @@ import {ReloadFileGuard} from '../reload-file/reload-file.activateguard';
 import {LoadingComponent} from '../loading';
 import {TranscActivateGuard} from '../../shared/guard/transcr.activateguard';
 import {AgreementComponent} from '../agreement/agreement.component';
-import {HelpComponent} from '../help/help.component';
+import {HelpComponent} from '../help';
 
 export const MEMBER_ROUTES: Routes = [
   {path: 'load', component: LoadingComponent},

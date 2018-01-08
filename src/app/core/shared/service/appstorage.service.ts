@@ -53,6 +53,7 @@ export class AppStorageService {
   set url_params(value: any[]) {
     this._url_params = value;
   }
+
   get show_loupe(): boolean {
     return this._show_loupe;
   }
@@ -212,6 +213,7 @@ export class AppStorageService {
 
   set usemode(value: 'online' | 'local' | 'url') {
     this._usemode = value;
+    console.log('save usemode to ' + value);
     this.idb.save('options', 'usemode', {value: value}).catch((err) => {
       console.error(err);
     });
@@ -365,7 +367,7 @@ export class AppStorageService {
         this._interface = '2D-Editor';
       }
       this.setNewSessionKey();
-      this._usemode = 'local';
+      this.usemode = 'local';
       this.user = {
         id: '-1',
         project: '',
@@ -393,7 +395,7 @@ export class AppStorageService {
         project: member.project,
         jobno: member.jobno
       };
-      this._usemode = 'online';
+      this.usemode = 'online';
 
       this.login = true;
       return {error: ''};
@@ -499,7 +501,7 @@ export class AppStorageService {
       const process = () => {
         const res = this.setSessionData(null, null, null, true);
         if (res.error === '') {
-          this._usemode = 'local';
+          this.usemode = 'local';
           this.sessionfile = this.getSessionFile(audiofile);
           this.file = audiofile;
           navigate();

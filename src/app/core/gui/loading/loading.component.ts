@@ -245,17 +245,20 @@ export class LoadingComponent implements OnInit, OnDestroy {
       this.settService.loadProjectSettings();
 
       if (this.appStorage.usemode === 'local' && isNullOrUndefined(this.appStorage.file)) {
+        console.log('use mode is local, redirect to reload-file');
         this.router.navigate(['/user/transcr/reload-file'], {
           queryParamsHandling: 'preserve'
         });
       } else {
-        if (this.appStorage.usemode === 'url') {
-          this.state = 'Get transcript from URL...';
-          // set audio url from url params
-          this.appStorage.audio_url = decodeURI(this.appStorage.url_params['audio']);
-          console.log(`load audio from ${this.appStorage.audio_url}`);
-          this.settService.loadAudioFile(this.audio);
+        if (this.appStorage.usemode === 'url' || this.appStorage.usemode === 'online') {
+          if (this.appStorage.usemode === 'url') {
+            this.state = 'Get transcript from URL...';
+            // set audio url from url params
+            this.appStorage.audio_url = decodeURI(this.appStorage.url_params['audio']);
+            console.log(`load audio from ${this.appStorage.audio_url}`);
+          }
         }
+        this.settService.loadAudioFile(this.audio);
       }
     }).catch((error) => {
       console.error(error);

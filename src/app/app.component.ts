@@ -112,11 +112,16 @@ export class AppComponent implements OnDestroy {
         this.appStorage.load(idb).then(
           () => {
 
+
+            console.log('USEMODE FROM IDB is ' + this.appStorage.usemode);
+
             // if url mode, set it in options
             if (this.queryParamsSet()) {
               this.appStorage.usemode = 'url';
               this.appStorage.LoggedIn = true;
             }
+
+            console.log('AFTER USEMODE FROM IDB is ' + this.appStorage.usemode);
 
             if (this.settingsService.validated) {
               console.log('loaded');
@@ -185,7 +190,6 @@ export class AppComponent implements OnDestroy {
   }
 
   test(id: string) {
-
     this.subscrmanager.add(
       this.api.fetchAnnotation(Number(id)).subscribe(
         (result) => {

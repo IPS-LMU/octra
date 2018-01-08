@@ -1,3 +1,4 @@
+
 <div class="section" id="login">
     <div *ngIf="!valid_platform" class="bg-danger">
         <p *ngIf="!valid_platform" class="warning" [innerHTML]="'browser.invalid' | translate">
@@ -8,6 +9,7 @@
     </div>
     <div id="loginrow" class="row">
         <div #onlinemode id='onlinemode' class="col-md-6 panel panel-default" style="padding:40px;">
+            {{appStorage.usemode}}
             <p *ngIf="!apc.octra.responsive.enabled && !valid_size" class="warning"
                [innerHTML]="'browser.small window width' | translate">
             </p>
@@ -57,15 +59,15 @@
                                     />
                                 </div>
                                 <div class="form-group">
-                                    <input *ngIf="appStorage.usemode === 'online'" class="form-control" type="submit"
-                                           id="login-submit"
-                                           class="btn btn-raised btn-primary" [ngClass]="{
+                                    <input *ngIf="appStorage.usemode === 'online'"
+                                           class="form-control btn btn-raised btn-primary login-submit" type="submit"
+                                           [ngClass]="{
                                            'btn-danger': (appStorage.usemode === 'local' && appStorage.sessionfile !== null)
                                            }"
                                            [disabled]="!f.valid"
                                            name="login-submit" value="{{'general.login' | translate}}"/>
-                                    <input *ngIf="appStorage.usemode === 'local' && appStorage.sessionfile !== null"
-                                           class="form-control btn btn-raised btn-dange" type="submit" id="login-submit"
+                                    <input *ngIf="appStorage.usemode === 'local'"
+                                           class="form-control btn btn-raised btn-danger" type="submit"
                                            [disabled]="!f.valid"
                                            name="login-submit" value="{{'login.login and remove' | translate}}"/>
                                 </div>
@@ -94,15 +96,13 @@
                            (click)="onOfflineSubmit()"/>
 
                     <input *ngIf="appStorage.usemode === 'local' && getFileStatus() == 'new'"
-                           id="offline-delete-btn"
-                           class="btn btn-raised btn-danger"
+                           class="btn btn-raised btn-danger offline-delete-btn"
                            (click)="modService.show('transcription_delete', '', {ok: newTranscription})"
                            value="{{'transcription.new' |translate}}"/>
                     <input *ngIf="(appStorage.usemode !== null && appStorage.usemode !== undefined) &&
                     appStorage.usemode === 'online' && (getFileStatus() != 'new' || getFileStatus() != 'start')"
-                           id="offline-delete-btn"
                            [disabled]="(getFileStatus() !== 'new' && getFileStatus() !== 'start')"
-                           class="btn btn-raised btn-danger"
+                           class="btn btn-raised btn-danger offline-delete-btn"
                            (click)="onOfflineSubmit()"
                            value="{{'login.local and remove' |translate}}"/>
                 </div>

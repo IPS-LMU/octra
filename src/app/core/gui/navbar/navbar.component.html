@@ -369,7 +369,11 @@
                 </li>
                 <li *ngIf="settService.app_settings !== undefined && settService.app_settings.octra.bugreport !== undefined && settService.app_settings.octra.bugreport.enabled">
                     <a (mouseup)="openBugReport()">
-                        <span class="glyphicon glyphicon-exclamation-sign navbar-icon" style="color:#fcffba"></span>
+                        <span class="glyphicon glyphicon-exclamation-sign navbar-icon" style="color:#fcffba"
+                              [ngStyle]="{
+                            color: (errorsFound) ? 'red' : '#fcffba'
+                        }"
+                        ></span>
                     </a>
                 </li>
                 <li class="dropdown">

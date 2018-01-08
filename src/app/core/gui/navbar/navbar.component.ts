@@ -19,6 +19,7 @@ import {Level} from '../../obj/Annotation/Level';
 import {Segments} from '../../obj/Annotation/Segments';
 import {OCTRANIMATIONS} from '../../shared/OCTRAnimations';
 import {AnnotJSONType} from '../../obj/Annotation/AnnotJSON';
+import {BugReportService, ConsoleType} from '../../shared/service/bug-report.service';
 
 @Component({
   selector: 'app-navigation',
@@ -87,7 +88,8 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
               public sanitizer: DomSanitizer,
               public langService: TranslateService,
               public modService: ModalService,
-              public settService: SettingsService) {
+              public settService: SettingsService,
+              public bugService: BugReportService) {
   }
 
   ngOnDestroy() {
@@ -397,5 +399,13 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public selectLevel(tiernum: number) {
     this.transcrServ.selectedlevel = tiernum;
+  }
+
+  public get errorsFound(): boolean {
+    return (this.bugService.console.filter((a) => {
+      if (a.type === ConsoleType.ERROR) {
+        return true;
+      }
+    }).length > 0);
   }
 }

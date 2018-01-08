@@ -146,7 +146,7 @@ export class TranscriptionComponent implements OnInit,
 
   ngOnInit() {
     this.navbarServ.interfaces = this.projectsettings.interfaces;
-
+    console.log('usemode is in transcr: ' + this.appStorage.usemode);
 
     // because of the loading data before through the loading component you can be sure the audio was loaded
     // correctly
@@ -634,7 +634,9 @@ export class TranscriptionComponent implements OnInit,
 
         // send upload url to iframe owner
         window.parent.postMessage({
-          result: resulturl,
+          data: {
+            transcript_url: resulturl
+          },
           status: 'success'
         }, '*');
       } else {

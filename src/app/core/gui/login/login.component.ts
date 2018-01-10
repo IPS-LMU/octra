@@ -1,27 +1,24 @@
 import {
-  AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit,
-  ViewChild
+  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy,
+  OnInit, ViewChild
 } from '@angular/core';
 import {Router} from '@angular/router';
 import {NgForm} from '@angular/forms';
 import {LoginService} from './login.service';
-import {AppStorageService, OIDBLevel, OIDBLink} from '../../shared/service/appstorage.service';
+import {
+  APIService, AppStorageService, AudioService, ModalService, OIDBLevel, OIDBLink,
+  SettingsService
+} from '../../shared/service';
 import {ComponentCanDeactivate} from './login.deactivateguard';
 import {Observable} from 'rxjs/Observable';
-import {FileSize, Functions} from '../../shared/Functions';
-import {APIService} from '../../shared/service/api.service';
+import {FileSize, Functions, OCTRANIMATIONS, SubscriptionManager} from '../../shared';
 import {BrowserCheck} from '../../shared/BrowserCheck';
 import {SessionFile} from '../../obj/SessionFile';
-import {OCTRANIMATIONS} from '../../shared/OCTRAnimations';
 import {isArray, isNullOrUndefined, isNumber} from 'util';
-import {SubscriptionManager} from '../../shared';
-import {SettingsService} from '../../shared/service/settings.service';
-import {ModalService} from '../../shared/service/modal.service';
 import {BsModalComponent} from 'ng2-bs3-modal';
 import {TranslateService} from '@ngx-translate/core';
-import {Converter} from '../../obj/Converters/Converter';
+import {Converter} from '../../obj/Converters';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
-import {AudioService} from '../../shared/service/audio.service';
 import 'rxjs/add/operator/catch';
 
 @Component({
@@ -29,7 +26,8 @@ import 'rxjs/add/operator/catch';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
   providers: [LoginService],
-  animations: OCTRANIMATIONS
+  animations: OCTRANIMATIONS,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate, AfterViewInit {
   @ViewChild('f') loginform: NgForm;
@@ -83,6 +81,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   ngOnInit() {
     console.log('login component called');
+
+    setInterval(() => {
+      this.cd.markForCheck();
+      this.cd.detectChanges();
+    }, 1000);
+
     this.browser_check = new BrowserCheck();
     this.valid_platform = false;
 

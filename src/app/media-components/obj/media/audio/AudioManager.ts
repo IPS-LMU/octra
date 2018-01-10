@@ -180,7 +180,7 @@ export class AudioManager {
       result.prepareAudioPlayBack();
       return result;
     });
-  }
+  };
 
   /**
    * Decode an audio file to an AudioBuffer object.
@@ -204,9 +204,15 @@ export class AudioManager {
       || (<any>window).mozOfflineAudioContext
       || false;
 
+    console.log('decode Methode');
+    if (OfflineAudioContext === false) {
+      console.error(`OfflineAudioContext is not supported!`);
+    }
+
     return new Promise<AudioBuffer>((resolve, reject) => {
       const context = new OfflineAudioContext(1, 4096, sampleRate);
-      context.decodeAudioData(file, (result) => {
+      console.log('get decoded audio');
+      context.decodeAudioData(file, function (result) {
         resolve(result);
       }, (reason) => {
         reject({
@@ -319,7 +325,7 @@ export class AudioManager {
     }
     */
     this.statechange.emit(this.state);
-  }
+  };
 
   public rePlayback(): boolean {
     this._replay = !this._replay;

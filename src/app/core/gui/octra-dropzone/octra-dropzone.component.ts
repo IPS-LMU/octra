@@ -242,7 +242,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
         }
       }
     }
-  }
+  };
 
   private checkState() {
     if (isNullOrUndefined(this._files)) {
@@ -275,6 +275,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
     // check audio
     return AudioManager.decodeAudio(file_process.file.name, buffer, AppInfo.audioformats).then(
       (audiomanager: AudioManager) => {
+        console.log('DECODED!');
         if (!isNullOrUndefined(this._audiomanager)) {
           this._audiomanager.destroy();
           this._audiomanager = null;

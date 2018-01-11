@@ -1,6 +1,6 @@
 import {
-  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy,
-  OnInit, ViewChild
+  AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit,
+  ViewChild
 } from '@angular/core';
 import {Router} from '@angular/router';
 import {NgForm} from '@angular/forms';
@@ -26,8 +26,7 @@ import 'rxjs/add/operator/catch';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
   providers: [LoginService],
-  animations: OCTRANIMATIONS,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  animations: OCTRANIMATIONS
 })
 export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate, AfterViewInit {
   @ViewChild('f') loginform: NgForm;
@@ -81,11 +80,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   ngOnInit() {
     console.log('login component called');
-
-    setInterval(() => {
-      this.cd.markForCheck();
-      this.cd.detectChanges();
-    }, 1000);
 
     this.browser_check = new BrowserCheck();
     this.valid_platform = false;

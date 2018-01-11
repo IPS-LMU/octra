@@ -1,13 +1,13 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {OAnnotJSON, OAudiofile, OLabel, OSegment} from '../../obj/Annotation/AnnotJSON';
-import {FileSize, Functions} from '../../shared/Functions';
+import {OAnnotJSON, OAudiofile, OLabel, OSegment} from '../../obj/Annotation';
+import {FileSize, Functions} from '../../shared';
 import {AppInfo} from '../../../app.info';
 import {isNullOrUndefined} from 'util';
-import {Converter, ImportResult} from '../../obj/Converters/Converter';
-import {DropZoneComponent} from '../../component/drop-zone/drop-zone.component';
+import {Converter, ImportResult} from '../../obj/Converters';
+import {DropZoneComponent} from '../../component/drop-zone';
 import {SessionFile} from '../../obj/SessionFile';
-import {ModalService} from '../../shared/service/modal.service';
-import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
+import {ModalService} from '../../shared/service';
+import {AudioManager} from '../../../media-components/obj/media/';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 
 @Component({
@@ -59,7 +59,6 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
   }
 
   constructor(private modService: ModalService) {
-
   }
 
   ngOnInit() {

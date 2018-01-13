@@ -1,11 +1,5 @@
 import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  HostListener,
-  OnDestroy,
-  OnInit,
+  AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit,
   ViewChild
 } from '@angular/core';
 import {Router} from '@angular/router';
@@ -192,6 +186,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     } else if (continue_session) {
       this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
         (json) => {
+          console.log(json);
           if (json.hasOwnProperty('message')) {
             const counter = (json.message === '') ? '0' : json.message;
             this.appStorage.sessStr.store('jobs_left', Number(counter));
@@ -204,6 +199,26 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               // last was offline mode
               this.appStorage.clearLocalStorage();
             }
+
+            if (json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
+              // get transcript data that already exists
+              if (json.data.hasOwnProperty('prompt')) {
+                const prompt = json.data.prompt;
+
+                if (prompt) {
+                  this.appStorage.prompttext = prompt;
+                }
+              } else if (json.data.hasOwnProperty('prompttext')) {
+                const prompt = json.data.prompttext;
+
+                if (prompt) {
+                  this.appStorage.prompttext = prompt;
+                }
+              }
+            } else {
+              this.appStorage.prompttext = '';
+            }
+
             const res = this.appStorage.setSessionData(this.member, json.data.id, json.data.url);
             if (res.error === '') {
               this.navigate();
@@ -283,7 +298,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         alert(error);
       });
     }
-  }
+  };
 
   canDeactivate(): Observable<boolean> | boolean {
     return (this.valid);
@@ -295,7 +310,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         login: true
       }
     });
-  }
+  };
 
   @HostListener('window:resize', ['$event'])
   onResize($event) {
@@ -345,7 +360,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         }
       }
     );
-  }
+  };
 
   getFileStatus(): string {
     if (!isNullOrUndefined(this.dropzone.files) && this.dropzone.files.length > 0 &&
@@ -406,6 +421,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       return Observable.throw(error);
     }).subscribe(
       (json) => {
+        console.log('LOGIN!');
+        console.log(json);
         if (form.valid && this.agreement_checked
           && json.message !== '0'
         ) {
@@ -423,6 +440,25 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
                 if (isArray(transcript) && transcript.length > 0) {
                   this.appStorage.servertranscipt = transcript;
                 }
+              }
+
+              if (json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
+                // get transcript data that already exists
+                if (json.data.hasOwnProperty('prompt')) {
+                  const prompt = json.data.prompt;
+
+                  if (prompt) {
+                    this.appStorage.prompttext = prompt;
+                  }
+                } else if (json.data.hasOwnProperty('prompttext')) {
+                  const prompt = json.data.prompttext;
+
+                  if (prompt) {
+                    this.appStorage.prompttext = prompt;
+                  }
+                }
+              } else {
+                this.appStorage.prompttext = '';
               }
 
               if (json.hasOwnProperty('message')) {
@@ -465,7 +501,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         callback();
       }
     ));
-  }
+  };
 
   public testFile(converter: Converter, file: File) {
     const reader: FileReader = new FileReader();

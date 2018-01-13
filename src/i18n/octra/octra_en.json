@@ -50,7 +50,7 @@
     "no errors found": "No errors found",
     "segment": "Segment",
     "job number": "Job number",
-    "free jobs": "free Jobs",
+    "free jobs": "Free Jobs",
     "email": "Email",
     "description": "Description",
     "bug report": "Bug Report",
@@ -69,7 +69,8 @@
     "features": "Features",
     "transcription window": "Transcription window",
     "supported files": "Supported files",
-    "select one tier": "Select one tier"
+    "select one tier": "Select one tier",
+    "prompt": "Prompt"
   },
   "bug report": {
     "report an error": "Report an error",

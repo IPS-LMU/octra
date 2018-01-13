@@ -42,6 +42,16 @@ export class OIDBLink {
 
 @Injectable()
 export class AppStorageService {
+  get prompttext(): string {
+    return this._prompttext;
+  }
+
+  set prompttext(value: string) {
+    this._prompttext = value;
+    this._idb.save('options', 'prompttext', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
   get show_loupe(): boolean {
     return this._show_loupe;
   }
@@ -305,6 +315,7 @@ export class AppStorageService {
   private _interface: string = null;
   private _logging = false;
   private _show_loupe = true;
+  private _prompttext = '';
 
   private _user: {
     id: string,
@@ -513,7 +524,7 @@ export class AppStorageService {
         err('type not supported');
       }
     }
-  }
+  };
 
   public endSession(offline: boolean, navigate: () => void) {
     this.clearSession();
@@ -527,7 +538,7 @@ export class AppStorageService {
       file.lastModifiedDate,
       file.type
     );
-  }
+  };
 
   /**
    * loads the option by its key and sets its variable.
@@ -617,6 +628,10 @@ export class AppStorageService {
         {
           attribute: '_show_loupe',
           key: 'show_loupe'
+        },
+        {
+          attribute: '_prompttext',
+          key: 'prompttext'
         }
       ]
     ).then(() => {
@@ -693,7 +708,7 @@ export class AppStorageService {
         wrapper(0);
       }
     );
-  }
+  };
 
   private clearIDBTable(name: string): Promise<any> {
     return this._idb.clear(name);
@@ -780,7 +795,7 @@ export class AppStorageService {
           }
         );
       });
-  }
+  };
 
   public overwriteLinks = (value: OIDBLink[]): Promise<any> => {
     return this.clearIDBTable('annotation_links')
@@ -791,7 +806,7 @@ export class AppStorageService {
       }).then(() => {
         return this._idb.saveArraySequential(value, 'annotation_links', 'id');
       });
-  }
+  };
 
   public clearLoggingData(): Promise<any> {
     this._logs = null;

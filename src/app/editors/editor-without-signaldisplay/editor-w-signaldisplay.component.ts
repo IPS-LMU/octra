@@ -2,19 +2,15 @@ import {AfterViewInit, Component, EventEmitter, OnChanges, OnDestroy, OnInit, Vi
 
 import {AudioNavigationComponent, AudioplayerComponent, TranscrEditorComponent} from '../../core/component';
 import {
-  AudioService,
-  KeymappingService,
-  TranscriptionService,
+  AppStorageService, AudioService, KeymappingService, SettingsService, TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
 import {SubscriptionManager} from '../../core/shared';
-import {SettingsService} from '../../core/shared/service/settings.service';
-import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {Segment} from '../../core/obj/Annotation/Segment';
 import {AudioManager} from '../../core/obj/media/audio/AudioManager';
 import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
 import {AudioTime} from '../../core/obj/media/audio/AudioTime';
-import {PlayBackState} from '../../core/obj/media/index';
+import {PlayBackState} from '../../core/obj/media';
 
 @Component({
   selector: 'app-audioplayer-gui',
@@ -102,6 +98,10 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   private loadEditor() {
     if (this.transcrService.currentlevel.segments.length > 0) {
       this.editor.segments = this.transcrService.currentlevel.segments;
+    }
+    if (this.appStorage.prompttext !== '' && (this.transcrService.currentlevel.segments.length <= 1 &&
+        this.transcrService.currentlevel.segments.get(0).transcript === '')) {
+      this.editor.rawText = this.appStorage.prompttext;
     }
     this.editor.Settings.height = 100;
     this.editor.update();

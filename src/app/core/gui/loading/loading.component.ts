@@ -189,6 +189,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
           ) {
             this.subscrmanager.remove(id);
             setTimeout(() => {
+              console.log('all loaded!!!');
               if ((isNullOrUndefined(this.appStorage.agreement)
                   || isNullOrUndefined(this.appStorage.agreement[this.appStorage.user.project]) ||
                   !this.appStorage.agreement[this.appStorage.user.project]

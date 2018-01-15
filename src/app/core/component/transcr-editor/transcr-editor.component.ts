@@ -720,8 +720,22 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     let result: string = rawtext;
 
     if (rawtext !== '') {
-      result = result.replace(/\r?\n/g, ' ');
+      result = result.replace(/\r?\n/g, ' '); // .replace(/</g, "&lt;").replace(/>/g, "&gt;");
       // replace markers with no wrap
+
+      const markers = this.markers;
+      // replace all tags that are not markers
+      result = result.replace(new RegExp('(<[\\w\\+\\*:=~ ";]+>)', 'g'), function (x) {
+        for (let i = 0; i < markers.length; i++) {
+          const marker = markers[i];
+          if (arguments[0] === marker.code) {
+            return marker.code;
+          }
+        }
+
+        return arguments[0].replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      });
+
       for (let i = 0; i < this.markers.length; i++) {
         const marker = this.markers[i];
 

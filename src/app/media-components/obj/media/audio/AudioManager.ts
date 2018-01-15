@@ -6,7 +6,9 @@ import {AudioTime} from './AudioTime';
 import {PlayBackState, SourceType} from '../index';
 import {AudioChunk} from './AudioChunk';
 import {AudioSelection} from './AudioSelection';
-import {AudioFormat} from './AudioFormats/AudioFormat';
+import {AudioFormat} from './AudioFormats';
+
+declare var window: any;
 
 export class AudioManager {
   get channel(): Float32Array {
@@ -231,7 +233,7 @@ export class AudioManager {
           reject(error);
         });
       });
-    };
+    });
   }
 
   constructor(filename: string) {

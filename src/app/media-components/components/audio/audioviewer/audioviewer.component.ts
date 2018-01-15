@@ -1,15 +1,6 @@
 import {
-  AfterViewInit,
-  Component,
-  EventEmitter,
-  HostListener,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  SimpleChanges,
-  ViewChild
+  AfterViewInit, Component, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output,
+  SimpleChanges, ViewChild
 } from '@angular/core';
 
 import {AudioviewerService} from './audioviewer.service';
@@ -364,7 +355,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     } else {
       console.error('audiopx 0');
     }
-  }
+  };
 
   /**
    * crop audioviewer
@@ -1165,7 +1156,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         }
       }
     }
-  }
+  };
 
   /**
    * playSelection() plays the selected signal fragment or the selection in this chunk
@@ -1177,7 +1168,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     };
 
     return this.audiochunk.startPlayback(drawFunc);
-  }
+  };
 
 
   /**
@@ -1210,7 +1201,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
     this.audiomanager.stepbackward = false;
     this.audiomanager.paused = false;
-  }
+  };
 
   /**
    * stops audio playback
@@ -1272,7 +1263,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       this.av.LastLine = line;
     } else {
     }
-  }
+  };
 
   /**
    * draw playcursor at its current position. You can call this method to update the playcursor view.
@@ -1304,7 +1295,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         this.p_context.stroke();
       }
     }
-  }
+  };
 
   /**
    * change the absolute positon of playcursor
@@ -1313,7 +1304,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   private changePlayCursorAbsX = (new_value: number) => {
     this.av.PlayCursor.changeAbsX(new_value, this.av.audioTCalculator, this.av.AudioPxWidth, this.audiochunk);
     this.playcursorchange.emit(this.av.PlayCursor);
-  }
+  };
 
   /**
    * change samples of playcursor
@@ -1323,7 +1314,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   private changePlayCursorSamples = (new_value: number, chunk?: AudioChunk) => {
     this.av.PlayCursor.changeSamples(new_value, this.av.audioTCalculator, chunk);
     this.playcursorchange.emit(this.av.PlayCursor);
-  }
+  };
 
   /**
    * checks if the comboKey is part of the list of disabled keys
@@ -1438,7 +1429,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         this.o_context.globalAlpha = 1.0;
       }
     }
-  }
+  };
 
   /**
    * adjust the view when window resized
@@ -1550,7 +1541,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
   onWheel(event: WheelEvent) {
     event.preventDefault();
-    if ((this.av.viewRect.size.height >= this.av.viewRect.size.height)) {
+    if ((this.av.realRect.size.height > this.av.viewRect.size.height)) {
       if (BrowserInfo.os === 'mac') {
         this.av.viewRect.position.y = Math.max(0, this.av.viewRect.position.y - event.deltaY);
       } else {
@@ -1561,7 +1552,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   }
 
   public scrollTo(y_coord: number, scrollbar: boolean = false) {
-    if ((this.av.viewRect.size.height >= this.av.viewRect.size.height)) {
+    if ((this.av.realRect.size.height > this.av.viewRect.size.height)) {
       this.scrolling.emit({state: 'scrolling'});
       this.av.viewRect.position.y = Math.max(0, y_coord);
       this.av.viewRect.position.y = Math.min(this.av.viewRect.position.y, this.av.realRect.size.height - this.av.viewRect.size.height);
@@ -1576,6 +1567,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         }
         this.update(false);
       }, 20);
+    } else {
+      console.log(`realrect (${this.av.realRect.size.height},${this.av.realRect.size.width}) viewrect (${this.av.viewRect.size.height},${this.av.viewRect.size.width})`);
+      if (!scrollbar) {
+        this.scrolling.emit({state: 'stopped'});
+      }
     }
   }
 

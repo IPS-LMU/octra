@@ -237,6 +237,7 @@ export class TranscriptionComponent implements OnInit,
 
     this.subscrmanager.add(this.transcrService.levelchanged.subscribe(
       (level: Level) => {
+        console.log('level changed');
         (<any> this.currentEditor.instance).update();
 
         // important: subscribe to level changes in order to save proceedings

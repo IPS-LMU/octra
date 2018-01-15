@@ -1,9 +1,7 @@
 import {AfterViewInit, Component, EventEmitter, OnChanges, OnDestroy, OnInit, ViewChild} from '@angular/core';
 
 import {
-  AudioService,
-  KeymappingService,
-  TranscriptionService,
+  AudioService, KeymappingService, TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
 import {SubscriptionManager} from '../../core/shared';
@@ -252,9 +250,12 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   }
 
   saveTranscript() {
+    console.log('Save!');
     let html: string = this.editor.html.replace(/(&nbsp;)+/g, ' ');
     // split text at the position of every boundary marker
     html = html.replace(/(<textspan([ \w:"\-%;]|[0-9])*>)|(<\/textspan>)/g, '');
+    console.log(html);
+    console.log(this.editor.rawText);
     let seg_texts: string[] = html.split(
       /\s*<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="[0-9]+" alt="\[\|[0-9]+\|\]">\s*/g
     );
@@ -269,6 +270,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     seg_texts = seg_texts.map((a: string) => {
       return a.replace(/(<span>)|(<\/span>)|(<p>)|(<\/p>)/g, '');
     });
+    console.log(seg_texts);
     // remove invalid boundaries
     if (seg_texts.length > 1) {
       let start = 0;
@@ -305,12 +307,16 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
           segment.time.samples = samples_array[i];
         }
 
+        console.log(`a`);
+        console.log(segment);
         this.transcrService.currentlevel.segments.change(i, segment);
       } else {
         // add new segments
         if (i === seg_texts.length - 1) {
+          console.log(`b`);
           this.transcrService.currentlevel.segments.add(this.audiochunk.time.end.samples, new_raw);
         } else {
+          console.log(`c`);
           this.transcrService.currentlevel.segments.add(samples_array[i - 1], new_raw);
         }
       }
@@ -318,6 +324,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
     const anno_seg_length = this.transcrService.currentlevel.segments.length;
     if (anno_seg_length > seg_texts.length) {
+      console.log('d');
       // remove left segments
       this.transcrService.currentlevel.segments.segments.splice(seg_texts.length, (anno_seg_length - seg_texts.length));
       // because last segment was removed

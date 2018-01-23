@@ -69,7 +69,8 @@
     "features": "Features",
     "transcription window": "Transkriptionsfenster",
     "supported files": "Unterstützte Dateien",
-    "select one tier": "Einen Tier auswählen"
+    "select one tier": "Einen Tier auswählen",
+    "prompt": "Textvorlage"
   },
   "bug report": {
     "report an error": "Fehler melden",

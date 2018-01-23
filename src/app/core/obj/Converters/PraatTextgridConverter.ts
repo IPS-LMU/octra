@@ -88,7 +88,7 @@ export class PraatTextgridConverter extends Converter {
         type: 'text/plain'
       }
     };
-  };
+  }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile !== null && audiofile !== undefined) {
@@ -243,5 +243,5 @@ export class PraatTextgridConverter extends Converter {
     }
 
     return null;
-  };
+  }
 }

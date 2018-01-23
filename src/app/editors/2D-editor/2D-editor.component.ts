@@ -1,40 +1,28 @@
 import {
-  AfterContentChecked,
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  OnChanges,
-  OnDestroy,
-  OnInit,
+  AfterContentChecked, AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnChanges, OnDestroy, OnInit,
   ViewChild
 } from '@angular/core';
 
-import {AudioNavigationComponent, AudioviewerComponent} from '../../core/component';
-
 import {
-  AudioService,
-  KeymappingService,
-  MessageService,
-  TranscriptionService,
+  AppStorageService, AudioService, KeymappingService, MessageService, SettingsService, TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
 
 import {AudioSelection, AudioTime, Functions} from '../../core/shared';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
-import {SettingsService} from '../../core/shared/service/settings.service';
-import {AppStorageService} from '../../core/shared/service/appstorage.service';
-import {AudioManager} from '../../core/obj/media/audio/AudioManager';
-import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
-import {TranscrWindowComponent} from './transcr-window/transcr-window.component';
-import {PlayBackState} from '../../core/obj/media/index';
+import {AudioChunk, AudioManager} from '../../media-components/obj/media/audio';
+import {TranscrWindowComponent} from './transcr-window';
+import {PlayBackState} from '../../media-components/obj/media';
 import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
-import {TranscrEditorComponent} from '../../core/component/transcr-editor/transcr-editor.component';
+import {TranscrEditorComponent} from '../../core/component';
 import {isNullOrUndefined} from 'util';
-import {CircleLoupeComponent} from '../../core/component/audiocomponents/circleloupe/circleloupe.component';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/interval';
+import {AudioviewerComponent} from '../../media-components/components/audio/audioviewer';
+import {CircleLoupeComponent} from '../../media-components/components/audio/circleloupe';
+import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
+import {Line} from '../../media-components/obj';
 
 @Component({
   selector: 'app-overlay-gui',
@@ -305,10 +293,18 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     }
 
     if (this.appStorage.show_loupe) {
-      this.mouseTimer = window.setTimeout(() => {
-        this.changeArea(this.loupe, this.miniloupe, this.factor);
-        this.mousestate = 'ended';
-      }, 50);
+      const lastlinevisible: Line = this.viewer.av.LinesArray[this.viewer.av.LinesArray.length - 1];
+      if (this.miniloupe.location.y <= (lastlinevisible.Pos.y - this.viewer.viewRect.position.y +
+          lastlinevisible.Size.height + this.viewer.margin.top + this.viewer.margin.bottom)) {
+        this.loupe_hidden = false;
+        this.mouseTimer = window.setTimeout(() => {
+          this.changeArea(this.loupe, this.miniloupe, this.factor);
+          this.mousestate = 'ended';
+
+        }, 50);
+      } else {
+        this.loupe_hidden = true;
+      }
     }
   }
 

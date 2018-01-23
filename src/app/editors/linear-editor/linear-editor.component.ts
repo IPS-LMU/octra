@@ -1,37 +1,22 @@
 import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  SimpleChanges,
+  AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnChanges, OnDestroy, OnInit, SimpleChanges,
   ViewChild
 } from '@angular/core';
 
 import {
-  AudioNavigationComponent,
-  AudioviewerComponent,
-  LoupeComponent,
-  TranscrEditorComponent
-} from '../../core/component';
-
-import {
-  AudioService,
-  KeymappingService,
-  MessageService,
-  TranscriptionService,
+  AppStorageService, AudioService, KeymappingService, MessageService, SettingsService, TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
-import {AudioSelection, AudioTime, AVMousePos, BrowserInfo, Functions, SubscriptionManager} from '../../core/shared';
-import {SettingsService} from '../../core/shared/service/settings.service';
-import {AppStorageService} from '../../core/shared/service/appstorage.service';
-import {AudioManager} from '../../core/obj/media/audio/AudioManager';
-import {AudioChunk} from '../../core/obj/media/audio/AudioChunk';
+import {AudioChunk, AudioManager, AudioSelection, AudioTime} from '../../media-components/obj/media/audio';
 import {isNullOrUndefined} from 'util';
-import {CircleLoupeComponent} from '../../core/component/audiocomponents/circleloupe/circleloupe.component';
-import {AudioviewerConfig} from '../../core/component/audiocomponents/audioviewer/audioviewer.config';
+import {AudioviewerComponent, AudioviewerConfig} from '../../media-components/components/audio/audioviewer';
+import {CircleLoupeComponent} from '../../media-components/components/audio/circleloupe';
+import {LoupeComponent} from '../../media-components/components/audio/loupe';
+import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
+import {TranscrEditorComponent} from '../../core/component/transcr-editor';
+import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
+import {BrowserInfo, Functions} from '../../core/shared';
+import {AVMousePos} from '../../media-components/obj';
 
 @Component({
   selector: 'app-signal-gui',
@@ -283,7 +268,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
 
     const a = this.viewer.getLocation();
     this.mini_loupecoord.y = this.viewer.Settings.lineheight;
-    if (this.appStorage.uselocalmode) {
+    if (this.appStorage.usemode === 'local' || this.appStorage.usemode === 'url') {
       this.mini_loupecoord.y += 24;
     }
 
@@ -427,7 +412,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
         this.loupe.update(false);
       }, 200);
     }
-  }
+  };
 
   onMarkerInsert(marker_code: string) {
     if (this.appStorage.logging) {

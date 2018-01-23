@@ -1,7 +1,6 @@
 import {EventEmitter, Injectable} from '@angular/core';
 
 import {SubscriptionManager} from '../';
-import {ConfigValidator} from '../../obj/ConfigValidator';
 import {ProjectSettings} from '../../obj/Settings/project-configuration';
 import {Subscription} from 'rxjs/Subscription';
 import {AppStorageService} from './appstorage.service';
@@ -12,7 +11,7 @@ import {AppSettings} from '../../obj/Settings/app-settings';
 import {Functions} from '../Functions';
 import {Observable} from 'rxjs/Observable';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
-import {AudioManager} from '../../obj/media/audio/AudioManager';
+import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {AppInfo} from '../../../app.info';
 import {HttpClient} from '@angular/common/http';
 
@@ -107,33 +106,39 @@ export class SettingsService {
     this.subscrmanager = new SubscriptionManager();
   }
 
-  public getApplicationSettings() {
+  public loadApplicationSettings(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.subscrmanager.add(
+        this.app_settingsloaded.subscribe(this.triggerSettingsLoaded)
+      );
 
-    this.subscrmanager.add(
-      this.app_settingsloaded.subscribe(this.triggerSettingsLoaded)
-    );
-
-    this.loadSettings(
-      {
-        loading: 'Load application settings...'
-      },
-      {
-        json: './config/appconfig.json',
-        schema: './schemata/appconfig.schema.json'
-      },
-      {
-        json: 'appconfig.json',
-        schema: 'appconfig.schema.json'
-      },
-      (result: AppSettings) => {
-        this._app_settings = result;
-      },
-      () => {
-        Logger.log('AppSettings loaded.');
-        this.validation.app = true;
-        this.app_settingsloaded.emit(true);
-      }
-    );
+      this.loadSettings(
+        {
+          loading: 'Load application settings...'
+        },
+        {
+          json: './config/appconfig.json',
+          schema: './schemata/appconfig.schema.json'
+        },
+        {
+          json: 'appconfig.json',
+          schema: 'appconfig.schema.json'
+        },
+        (result: AppSettings) => {
+          this._app_settings = result;
+        },
+        () => {
+          Logger.log('AppSettings loaded.');
+          this.validation.app = true;
+          resolve();
+          this.app_settingsloaded.emit(true);
+        },
+        (error) => {
+          Logger.err(error);
+          reject();
+        }
+      );
+    });
   }
 
   public loadProjectSettings = () => {
@@ -155,9 +160,12 @@ export class SettingsService {
       () => {
         Logger.log('Projectconfig loaded.');
         this.projectsettingsloaded.emit(this._projectsettings);
+      },
+      (error) => {
+        Logger.err(error);
       }
     );
-  }
+  };
 
   public loadGuidelines = (language: string, url: string) => {
     this.loadSettings(
@@ -179,9 +187,12 @@ export class SettingsService {
         Logger.log('Guidelines loaded.');
         this.loadValidationMethod(this._guidelines.meta.validation_url);
         this.guidelinesloaded.emit(this._guidelines);
+      },
+      (error) => {
+        Logger.err(error);
       }
     );
-  }
+  };
 
   public loadValidationMethod: ((url: string) => Subscription) = (url: string) => {
     Logger.log('Load methods...');
@@ -210,18 +221,23 @@ export class SettingsService {
         document.body.appendChild(js);
       },
       (error) => {
-        this._log += 'Loading functions failed [Error: S01]<br/>';
-        console.error(error);
+        console.log('Loading functions failed [Error: S01]');
+        this.validationmethodloaded.emit();
       }
     );
-  }
+  };
 
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
     Logger.log('Load audio file 2...');
-    if (!this.appStorage.uselocalmode) {
+    if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
       // online
       if (!isNullOrUndefined(this.appStorage.audio_url)) {
-        const src = this.app_settings.audio_server.url + this.appStorage.audio_url;
+        let src = '';
+        if (this.appStorage.usemode === 'online') {
+          src = this.app_settings.audio_server.url + this.appStorage.audio_url;
+        } else {
+          src = this.appStorage.audio_url;
+        }
         // extract filename
         this._filename = this.appStorage.audio_url.substr(this.appStorage.audio_url.lastIndexOf('/') + 1);
         const fullname = this._filename;
@@ -242,7 +258,7 @@ export class SettingsService {
         console.error('audio src is null');
         this.audioloaded.emit({status: 'error'});
       }
-    } else {
+    } else if (this.appStorage.usemode === 'local') {
       // local mode
       if (!isNullOrUndefined(this.appStorage.sessionfile)
         && !isNullOrUndefined(this.appStorage.sessionfile.name)) {
@@ -276,29 +292,14 @@ export class SettingsService {
         console.error('session file is null.');
       }
     }
-  }
+  };
 
   private triggerSettingsLoaded = () => {
     if (this.validated) {
       this.loaded = true;
       this.test.next(true);
     }
-  }
-
-  private validate(validator: ConfigValidator, settings: any): boolean {
-    // validate config
-
-    for (const setting in settings) {
-      if (settings.hasOwnProperty(setting)) {
-        const result = validator.validate(setting, settings['' + setting + '']);
-        if (!result.success) {
-          console.error(result.error);
-          return false;
-        }
-      }
-    }
-    return true;
-  }
+  };
 
   public destroy() {
     this.subscrmanager.destroy();
@@ -330,7 +331,8 @@ export class SettingsService {
     return false;
   }
 
-  private loadSettings(messages: any, urls: any, filenames: any, onhttpreturn: (any) => void, onvalidated: () => void) {
+  private loadSettings(messages: any, urls: any, filenames: any, onhttpreturn: (any) => void, onvalidated: () => void,
+                       onerror: (error: string) => void) {
     if (
       messages.hasOwnProperty('loading') &&
       urls.hasOwnProperty('json') && urls.hasOwnProperty('schema') &&
@@ -357,6 +359,7 @@ export class SettingsService {
           ));
         },
         (error) => {
+          onerror(error);
           this._log += 'Loading ' + filenames.json + ' failed<br/>';
         }
       ));

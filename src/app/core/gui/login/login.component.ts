@@ -5,23 +5,20 @@ import {
 import {Router} from '@angular/router';
 import {NgForm} from '@angular/forms';
 import {LoginService} from './login.service';
-import {AppStorageService, OIDBLevel, OIDBLink} from '../../shared/service/appstorage.service';
+import {
+  APIService, AppStorageService, AudioService, ModalService, OIDBLevel, OIDBLink,
+  SettingsService
+} from '../../shared/service';
 import {ComponentCanDeactivate} from './login.deactivateguard';
 import {Observable} from 'rxjs/Observable';
-import {FileSize, Functions} from '../../shared/Functions';
-import {APIService} from '../../shared/service/api.service';
+import {FileSize, Functions, OCTRANIMATIONS, SubscriptionManager} from '../../shared';
 import {BrowserCheck} from '../../shared/BrowserCheck';
 import {SessionFile} from '../../obj/SessionFile';
-import {OCTRANIMATIONS} from '../../shared/OCTRAnimations';
 import {isArray, isNullOrUndefined, isNumber} from 'util';
-import {SubscriptionManager} from '../../shared';
-import {SettingsService} from '../../shared/service/settings.service';
-import {ModalService} from '../../shared/service/modal.service';
 import {BsModalComponent} from 'ng2-bs3-modal';
 import {TranslateService} from '@ngx-translate/core';
-import {Converter} from '../../obj/Converters/Converter';
+import {Converter} from '../../obj/Converters';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
-import {AudioService} from '../../shared/service/audio.service';
 import 'rxjs/add/operator/catch';
 
 @Component({
@@ -82,6 +79,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   ngOnInit() {
+    console.log('login component called');
+
     this.browser_check = new BrowserCheck();
     this.valid_platform = false;
 
@@ -197,10 +196,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           ) {
             if (this.appStorage.sessionfile !== null) {
               // last was offline mode
-              this.appStorage.clearLocalStorage();
+              this.appStorage.clearLocalStorage().catch((err) => {
+                console.error(err);
+              });
             }
 
-            if (json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
+            if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
               // get transcript data that already exists
               if (json.data.hasOwnProperty('prompt')) {
                 const prompt = json.data.prompt;
@@ -305,10 +306,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   private navigate = (): void => {
+    console.log('NAvigate CALLED!');
     this.router.navigate(['user'], {
-      queryParams: {
-        login: true
-      }
+      queryParamsHandling: 'preserve'
     });
   };
 
@@ -442,7 +442,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
                 }
               }
 
-              if (json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
+              if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
                 // get transcript data that already exists
                 if (json.data.hasOwnProperty('prompt')) {
                   const prompt = json.data.prompt;

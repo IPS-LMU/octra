@@ -399,3 +399,4 @@ xcuserdata/
 /dist/config/appconfig.json
 /bd.sh
 /bp.sh
+/bdeploy.sh

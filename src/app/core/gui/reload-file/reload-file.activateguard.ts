@@ -18,7 +18,9 @@ export class ReloadFileGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     if (this.appStorage.LoggedIn !== true) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login'], {
+        queryParamsHandling: 'preserve'
+      });
       return false;
     } else {
       if (isNullOrUndefined(this.settingsService.app_settings)) {

@@ -14,7 +14,7 @@ import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
 import {AudioService, TranscriptionService} from '../../shared/service';
 import {SubscriptionManager} from '../../shared';
-import {isNullOrUndefined} from 'util';
+import {isFunction, isNullOrUndefined} from 'util';
 import {Segment} from '../../obj/Annotation/Segment';
 
 @Component({
@@ -59,6 +59,11 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     }
 
     return found;
+  }
+
+  public get validationFound() {
+    return ((typeof validateAnnotation !== 'undefined') && isFunction(validateAnnotation) &&
+      (typeof tidyUpAnnotation !== 'undefined') && isFunction(tidyUpAnnotation));
   }
 
   public shown_segments: any[] = [];

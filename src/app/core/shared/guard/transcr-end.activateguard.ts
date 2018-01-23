@@ -13,7 +13,9 @@ export class TranscrEndGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
     if (!this.appStorage.submitted) {
-      this.router.navigate(['/user/load']);
+      this.router.navigate(['/user/load'], {
+        queryParamsHandling: 'preserve'
+      });
       return false;
     }
     return true;

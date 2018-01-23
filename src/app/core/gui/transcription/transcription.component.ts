@@ -6,25 +6,26 @@ import {Router} from '@angular/router';
 import {BsModalComponent} from 'ng2-bs3-modal/ng2-bs3-modal';
 
 import {
-  AppStorageService, AudioService, KeymappingService, MessageService, ModalService, NavbarService,
-  SettingsService, TranscriptionService, UserInteractionsService
+  APIService, AppStorageService, AudioService, Entry, KeymappingService, MessageService, ModalService,
+  NavbarService, SettingsService, TranscriptionService, UserInteractionsService
 } from '../../shared/service';
 
 import {BrowserInfo, SubscriptionManager} from '../../shared';
 import {isArray, isNullOrUndefined, isNumber} from 'util';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {TranscrGuidelinesComponent} from '../transcr-guidelines/transcr-guidelines.component';
-import {APIService} from '../../shared/service/api.service';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
-import {Entry} from '../../shared/service/keymapping.service';
 import {Observable} from 'rxjs/Observable';
-import {ProjectSettings} from '../../obj/Settings/project-configuration';
+import {ProjectSettings} from '../../obj/Settings';
 import {NgForm} from '@angular/forms';
-import {AudioManager} from '../../obj/media/audio/AudioManager';
+import {AudioManager} from '../../../media-components/obj/media/audio';
 import {EditorComponents} from '../../../editors/components';
-import {Level} from '../../obj/Annotation/Level';
-import {getPlayBackString, PlayBackState} from '../../obj/media/index';
+import {Level} from '../../obj/Annotation';
+import {getPlayBackString, PlayBackState} from '../../../media-components/obj/media';
+import {HttpClient} from '@angular/common/http';
+import {IFile, PartiturConverter} from '../../obj/Converters';
 import {BugReportService} from '../../shared/service/bug-report.service';
+import * as X2JS from 'x2js';
 
 @Component({
   selector: 'app-transcription',
@@ -97,7 +98,9 @@ export class TranscriptionComponent implements OnInit,
               public modService: ModalService,
               public langService: TranslateService,
               private api: APIService,
-              private bugService: BugReportService) {
+              private bugService: BugReportService,
+              private http: HttpClient) {
+    console.log('transcription component called');
     this.subscrmanager = new SubscriptionManager();
     this.audiomanager = this.audio.audiomanagers[0];
 
@@ -105,7 +108,7 @@ export class TranscriptionComponent implements OnInit,
     this.navbarServ.uiService = this.uiService;
 
     // overwrite logging option using projectconfig
-    if (!this.appStorage.uselocalmode) {
+    if (this.appStorage.usemode === 'online') {
       this.appStorage.logging = this.settingsService.projectsettings.logging.forced;
     }
     this.uiService.enabled = this.appStorage.logging;
@@ -143,7 +146,7 @@ export class TranscriptionComponent implements OnInit,
 
   ngOnInit() {
     this.navbarServ.interfaces = this.projectsettings.interfaces;
-
+    console.log('usemode is in transcr: ' + this.appStorage.usemode);
 
     // because of the loading data before through the loading component you can be sure the audio was loaded
     // correctly
@@ -234,6 +237,7 @@ export class TranscriptionComponent implements OnInit,
 
     this.subscrmanager.add(this.transcrService.levelchanged.subscribe(
       (level: Level) => {
+        console.log('level changed');
         (<any> this.currentEditor.instance).update();
 
         // important: subscribe to level changes in order to save proceedings
@@ -259,11 +263,13 @@ export class TranscriptionComponent implements OnInit,
   }
 
   abortTranscription = () => {
-    if (!this.appStorage.uselocalmode) {
+    if (this.appStorage.usemode === 'online') {
       this.saveFeedbackform();
     }
     this.transcrService.endTranscription();
-    this.router.navigate(['/logout']);
+    this.router.navigate(['/logout'], {
+      queryParamsHandling: 'preserve'
+    });
   };
 
   ngAfterContentInit() {
@@ -273,7 +279,9 @@ export class TranscriptionComponent implements OnInit,
   }
 
   submitTranscription() {
-    this.router.navigate(['/user/transcr/submit']);
+    this.router.navigate(['/user/transcr/submit'], {
+      queryParamsHandling: 'preserve'
+    });
   }
 
   ngOnDestroy() {
@@ -521,7 +529,7 @@ export class TranscriptionComponent implements OnInit,
               }
             }
 
-            if (json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
+            if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
               // get transcript data that already exists
               if (json.data.hasOwnProperty('prompt')) {
                 const prompt = json.data.prompt;
@@ -544,10 +552,14 @@ export class TranscriptionComponent implements OnInit,
               this.appStorage.jobs_left = Number(json.message);
             }
 
-            this.router.navigate(['/user/load']);
+            this.router.navigate(['/user/load'], {
+              queryParamsHandling: 'preserve'
+            });
           } else {
             this.appStorage.submitted = true;
-            this.router.navigate(['/user/transcr/end']);
+            this.router.navigate(['/user/transcr/end'], {
+              queryParamsHandling: 'preserve'
+            });
           }
         }
       }));
@@ -581,5 +593,79 @@ export class TranscriptionComponent implements OnInit,
         break;
       }
     }
+  }
+
+  public onSaveTranscriptionButtonClicked() {
+    const converter = new PartiturConverter();
+    const oannotjson = this.transcrService.annotation.getObj();
+    console.log(oannotjson);
+    console.log(this.transcrService.audiofile);
+    const result: IFile = converter.export(oannotjson, this.transcrService.audiofile, 0).file;
+    result.name = result.name.replace('-' + oannotjson.levels[0].name, '');
+
+    // upload transcript
+    const form: FormData = new FormData();
+    const url = 'https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/uploadFileMulti';
+
+    form.append('file0', new File([result.content], result.name, {type: 'text/plain'}));
+
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', url);
+
+    xhr.upload.addEventListener('progress', (e: ProgressEvent) => {
+      if (e.lengthComputable) {
+        console.log(e.loaded / e.total);
+      }
+    }, false);
+
+    xhr.onloadstart = (e) => {
+      console.log('start');
+    };
+
+    xhr.onerror = (e) => {
+      console.error(e);
+      // add messages to protocol
+      console.error(`${e.message}`);
+    };
+
+    xhr.onloadend = (e) => {
+      console.log('loadend');
+      const result = e.currentTarget['responseText'];
+
+      console.log(result);
+      const x2js = new X2JS();
+      let json: any = x2js.xml2js(result);
+      json = json.UploadFileMultiResponse;
+      console.log(json);
+
+      if (json.success === 'true') {
+        // TODO set urls to results only
+        let resulturl = '';
+        if (isArray(json.fileList.entry)) {
+          for (let i = 0; i < json.fileList.length; i++) {
+            resulturl = json.fileList.entry[i].value;
+            break;
+          }
+        } else {
+          // json attribute entry is an object
+          resulturl = json.fileList.entry['value'];
+        }
+
+        // send upload url to iframe owner
+        window.parent.postMessage({
+          data: {
+            transcript_url: resulturl
+          },
+          status: 'success'
+        }, '*');
+      } else {
+        window.parent.postMessage({
+          status: 'error',
+          error: json['message']
+        }, '*');
+      }
+    };
+    xhr.send(form);
   }
 }

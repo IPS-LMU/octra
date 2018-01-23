@@ -9,3 +9,7 @@ export * from './transcr-overview';
 export * from '../../editors/2D-editor/transcr-window';
 export * from './reload-file';
 export * from './taskbar';
+export * from './error404';
+export * from './help-tools';
+export * from './help';
+export * from './features';

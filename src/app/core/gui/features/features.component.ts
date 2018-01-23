@@ -13,6 +13,7 @@ export class FeaturesComponent implements OnInit {
   }
 
   ngOnInit() {
+    console.log('Features component called');
   }
 
   onLoad() {

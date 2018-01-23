@@ -20,11 +20,14 @@ export class AgreementComponent implements OnInit {
               private langService: TranslateService,
               private appStorage: AppStorageService) {
     if (isNullOrUndefined(this.settService.projectsettings)) {
-      this.router.navigate(['/user/load']);
+      this.router.navigate(['/user/load'], {
+        queryParamsHandling: 'preserve'
+      });
     }
   }
 
   ngOnInit() {
+    console.log('agreement component called');
   }
 
   public toHTML(text: any): string {
@@ -45,7 +48,9 @@ export class AgreementComponent implements OnInit {
 
   logout() {
     this.settService.clearSettings();
-    this.router.navigate(['/logout']);
+    this.router.navigate(['/logout'], {
+      queryParamsHandling: 'preserve'
+    });
   }
 
   accept() {
@@ -54,6 +59,8 @@ export class AgreementComponent implements OnInit {
     }
     this.appStorage.agreement[this.appStorage.user.project] = true;
     this.appStorage.sessStr.store('agreement', this.appStorage.agreement);
-    this.router.navigate(['/user/transcr']);
+    this.router.navigate(['/user/transcr'], {
+      queryParamsHandling: 'preserve'
+    });
   }
 }

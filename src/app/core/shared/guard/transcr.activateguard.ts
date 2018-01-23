@@ -2,8 +2,7 @@ import {Injectable} from '@angular/core';
 
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
-import {AppStorageService} from '../service/appstorage.service';
-import {SettingsService} from '../service/settings.service';
+import {AppStorageService, SettingsService} from '../service';
 
 @Injectable()
 export class TranscActivateGuard implements CanActivate {
@@ -15,14 +14,21 @@ export class TranscActivateGuard implements CanActivate {
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
-    if (!this.appStorage.uselocalmode) {
+    console.log('transcription component opened');
+    if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
       if (!this.settService.allloaded) {
-        this.router.navigate(['/user/load']);
+        console.log('go back to load');
+        this.router.navigate(['/user/load'], {
+          queryParamsHandling: 'preserve'
+        });
         return false;
       }
-    } else {
+    } else if (this.appStorage.usemode === 'local') {
       if (!this.settService.allloaded) {
-                this.router.navigate(['/user/transcr/reload-file']);
+        console.log('go back to reload');
+        this.router.navigate(['/user/transcr/reload-file'], {
+          queryParamsHandling: 'preserve'
+        });
         return false;
       }
     }

@@ -22,9 +22,9 @@ h4 {
     padding: 5px;
 }
 
-#login-submit,
+.login-submit,
 #offline-submit,
-#offline-delete-btn {
+.offline-delete-btn {
     width: 100%;
 }
 

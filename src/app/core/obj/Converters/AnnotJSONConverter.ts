@@ -28,7 +28,7 @@ export class AnnotJSONConverter extends Converter {
     }
 
     return null;
-  };
+  }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile !== null && audiofile !== undefined) {
@@ -48,5 +48,5 @@ export class AnnotJSONConverter extends Converter {
     }
 
     return null;
-  };
+  }
 }

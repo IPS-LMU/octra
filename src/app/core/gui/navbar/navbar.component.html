@@ -163,21 +163,22 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" [routerLink]="['/']">OCTRA v{{version}}</a>
+            <a class="navbar-brand" [routerLink]="['/']" [queryParamsHandling]="'merge'">OCTRA v{{version}}</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav" *ngIf="!appStorage.LoggedIn">
                 <li routerLinkActive="active">
-                    <a [routerLink]="['/login']">{{'general.login' | translate}}</a>
+                    <a [routerLink]="['/login']" [queryParamsHandling]="'merge'">{{'general.login' | translate}}</a>
                 </li>
                 <li routerLinkActive="active">
-                    <a [routerLink]="['/features']">{{'general.features' | translate}}</a>
+                    <a [routerLink]="['/features']" [queryParamsHandling]="'merge'">{{'general.features' |
+                        translate}}</a>
                 </li>
                 <li routerLinkActive="active">
-                    <a [routerLink]="['/news']">{{'general.news' | translate}}</a>
+                    <a [routerLink]="['/news']" [queryParamsHandling]="'merge'">{{'general.news' | translate}}</a>
                 </li>
                 <li routerLinkActive="active">
-                    <a [routerLink]="['/faq']">{{'general.faq' | translate}}</a>
+                    <a [routerLink]="['/faq']" [queryParamsHandling]="'merge'">{{'general.faq' | translate}}</a>
                 </li>
             </ul>
 
@@ -203,7 +204,7 @@
 
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown" *ngIf="transcrServ !== undefined" [ngStyle]="{
-                'display': (!(navbarServ.dataloaded && appStorage.LoggedIn && appStorage.uselocalmode)) ? 'none': 'inherit'
+                'display': (!(navbarServ.dataloaded && appStorage.LoggedIn && (appStorage.usemode === 'local' || appStorage.usemode === 'url'))) ? 'none': 'inherit'
                 }">
                     <a href="#" class="dropdown" data-toggle="dropdown" role="button"
                        aria-expanded="false">
@@ -250,7 +251,7 @@
                         'collaps': collapsed
                         }">
                         <table class="table">
-                            <tr *ngIf="!appStorage.uselocalmode">
+                            <tr *ngIf="appStorage.usemode === 'online'">
                                 <td><span>{{'general.project' |translate}}:</span></td>
                                 <td>
                                     <span>{{appStorage.user.project}}</span>
@@ -286,13 +287,13 @@
                                     <span>{{navbarServ.exportformats.filesize.size}} {{navbarServ.exportformats.filesize.label}}</span>
                                 </td>
                             </tr>
-                            <tr *ngIf="!appStorage.uselocalmode">
+                            <tr *ngIf="appStorage.usemode === 'online'">
                                 <td><span>{{'general.id' | translate}}:</span></td>
                                 <td>
                                     <span>{{appStorage.data_id}}</span>
                                 </td>
                             </tr>
-                            <tr *ngIf="!appStorage.uselocalmode">
+                            <tr *ngIf="appStorage.usemode === 'online'">
                                 <td><span>{{'general.free jobs' | translate}}:</span></td>
                                 <td>
                                     <span>{{appStorage.jobs_left}}</span>
@@ -358,7 +359,7 @@
                                         <label>
                                             <input (click)="toggleSettings('logging')"
                                                    [checked]="appStorage.logging"
-                                                   [disabled]="!appStorage.uselocalmode"
+                                                   [disabled]="appStorage.usemode === 'online'"
                                                    id="logging" type="checkbox">
                                         </label>
                                     </div>
@@ -381,7 +382,11 @@
                 </li>
                 <li *ngIf="settService.app_settings !== undefined && settService.app_settings.octra.bugreport !== undefined && settService.app_settings.octra.bugreport.enabled">
                     <a (mouseup)="openBugReport()">
-                        <span class="glyphicon glyphicon-exclamation-sign navbar-icon" style="color:#fcffba"></span>
+                        <span class="glyphicon glyphicon-exclamation-sign navbar-icon" style="color:#fcffba"
+                              [ngStyle]="{
+                            color: (errorsFound) ? 'red' : '#fcffba'
+                        }"
+                        ></span>
                     </a>
                 </li>
                 <li class="dropdown">
@@ -397,7 +402,7 @@
         </div><!-- .nav-collapse -->
     </div>
 </nav>
-<div id="subnav" class="panel" *ngIf="appStorage.LoggedIn && !appStorage.uselocalmode && navbarServ.dataloaded">
+<div id="subnav" class="panel" *ngIf="appStorage.LoggedIn && appStorage.usemode === 'online' && navbarServ.dataloaded">
     <div class="row">
         <div class="col-xs-3 col-sm-3">{{"general.project" | translate}}: {{appStorage.user.project}}</div>
         <div class="col-xs-3 col-sm-3">{{"general.name" |translate}}:

@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {Segments} from '../../obj/Annotation/Segments';
+import {Annotation, Level, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment, Segments} from '../../obj/Annotation';
 import {AudioService} from './audio.service';
 import {AppStorageService, OIDBLevel} from './appstorage.service';
 import {Functions} from '../Functions';
@@ -12,16 +12,11 @@ import {SubscriptionManager} from '../';
 import {SettingsService} from './settings.service';
 import {isNullOrUndefined} from 'util';
 import {FeedBackForm} from '../../obj/FeedbackForm/FeedBackForm';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../../obj/Annotation/AnnotJSON';
-import {Annotation} from '../../obj/Annotation/Annotation';
-import {Converter, IFile} from '../../obj/Converters/Converter';
-import {TextConverter} from '../../obj/Converters/TextConverter';
-import {AnnotJSONConverter} from '../../obj/Converters/AnnotJSONConverter';
-import {Level} from '../../obj/Annotation/Level';
-import {AudioManager} from '../../obj/media/audio/AudioManager';
+import {AnnotJSONConverter, Converter, IFile, TextConverter} from '../../obj/Converters';
+import {AudioManager} from '../../../media-components/obj/media/audio';
 import {OLog, OLogging} from '../../obj/Settings/logging';
-import {AppSettings} from '../../obj/Settings/app-settings';
-import {ProjectSettings} from '../../obj/Settings/project-configuration';
+import {AppSettings, ProjectSettings} from '../../obj/Settings';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable()
 export class TranscriptionService {
@@ -154,7 +149,8 @@ export class TranscriptionService {
               private appStorage: AppStorageService,
               private uiService: UserInteractionsService,
               private navbarServ: NavbarService,
-              private settingsService: SettingsService) {
+              private settingsService: SettingsService,
+              private http: HttpClient) {
     this.subscrmanager = new SubscriptionManager();
 
     this.subscrmanager.add(this.navbarServ.onexportbuttonclick.subscribe((button) => {
@@ -205,7 +201,7 @@ export class TranscriptionService {
     let result: IFile;
 
     if (!isNullOrUndefined(this.annotation)) {
-      result = converter.export(this.annotation.getObj(), this.audiofile).file;
+      result = converter.export(this.annotation.getObj(), this.audiofile, 0).file;
 
       return result.content;
     }
@@ -265,7 +261,16 @@ export class TranscriptionService {
           }
 
           this.appStorage.overwriteAnnotation(new_levels).then(() => {
-            if (!this.appStorage.uselocalmode) {
+            if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
+              if (this.appStorage.usemode === 'url') {
+                // load transcript from url
+
+                // TODO continue implementing
+                Functions.uniqueHTTPRequest(this.http, false, {
+                  responseType: 'text'
+                }, 'test.com', {});
+              }
+
               if (!isNullOrUndefined(this.appStorage.servertranscipt)) {
                 // import server transcript
                 this.appStorage.annotation[this._selectedlevel].level.items = [];
@@ -286,7 +291,6 @@ export class TranscriptionService {
                     }
                   );
               }
-            } else {
             }
 
             process();
@@ -344,6 +348,7 @@ export class TranscriptionService {
   }
 
   public saveSegments = () => {
+    console.log(`SAVE SEGMENTS`);
     // make sure, that no saving overhead exist. After saving request wait 1 second
     if (!this.saving) {
       this.saving = true;
@@ -355,7 +360,7 @@ export class TranscriptionService {
         this.saving = false;
       }, 2000);
     }
-  }
+  };
 
   public destroy() {
     this.subscrmanager.destroy();
@@ -579,7 +584,7 @@ export class TranscriptionService {
   public endTranscription = (destroyaudio: boolean = true) => {
     this.audio.destroy(destroyaudio);
     this.destroy();
-  }
+  };
 
 
   public createNewAnnotation(): OAnnotJSON {

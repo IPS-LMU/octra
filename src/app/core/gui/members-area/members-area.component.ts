@@ -1,4 +1,4 @@
-import {Component, OnDestroy} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {UserInteractionsService} from '../../shared/service/userInteractions.service';
 import {TranscriptionService} from '../../shared/service/transcription.service';
 import {Router} from '@angular/router';
@@ -11,13 +11,17 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
   styleUrls: ['./members-area.component.css'],
   providers: [UserInteractionsService, TranscriptionService]
 })
-export class MembersAreaComponent implements OnDestroy {
+export class MembersAreaComponent implements OnInit, OnDestroy {
 
   subscrmanager: SubscriptionManager = new SubscriptionManager();
 
   constructor(private router: Router,
               private settService: SettingsService) {
     document.body.setAttribute('style', 'overflow:hidden');
+  }
+
+  ngOnInit() {
+    console.log('members area component called');
   }
 
   ngOnDestroy() {

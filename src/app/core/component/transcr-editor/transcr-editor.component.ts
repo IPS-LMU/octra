@@ -1,17 +1,14 @@
 import {ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
-import {TranscrEditorConfig} from './config/te.config';
+import {TranscrEditorConfig} from './config';
 import {TranslateService} from '@ngx-translate/core';
 
 import {BrowserInfo, Functions, KeyMapping, SubscriptionManager} from '../../shared';
-import {TranscrEditorConfigValidator} from './validator/TranscrEditorConfigValidator';
-import {TranscriptionService} from '../../shared/service/transcription.service';
+import {TranscriptionService} from '../../shared/service';
 import {isNullOrUndefined} from 'util';
 import {Segments} from '../../obj/Annotation/Segments';
-import {TimespanPipe} from '../../shared/pipe/timespan.pipe';
-import {AudioTime} from '../../obj/media/audio/AudioTime';
-import {AudioManager} from '../../obj/media/audio/AudioManager';
-import {AudioChunk} from '../../obj/media/audio/AudioChunk';
+import {AudioChunk, AudioManager, AudioTime} from '../../../media-components/obj/media/audio';
 import {isNumeric} from 'rxjs/util/isNumeric';
+import {TimespanPipe} from '../../../media-components/pipe';
 
 @Component({
   selector: 'app-transcr-editor',
@@ -19,7 +16,6 @@ import {isNumeric} from 'rxjs/util/isNumeric';
   styleUrls: ['./transcr-editor.component.css'],
   providers: [TranscrEditorConfig]
 })
-
 export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Output('loaded') loaded: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output('onkeyup') onkeyup: EventEmitter<any> = new EventEmitter<any>();
@@ -43,7 +39,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     if (!this.focused) {
       return -1;
     }
-    return jQuery('.note-editable.panel-body:eq(0)').caret('pos');
+    return jQuery('.note-editable:eq(0)').caret('pos');
   }
 
   public segpopover: any = null;
@@ -111,7 +107,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     this._settings = new TranscrEditorConfig().Settings;
     this.subscrmanager = new SubscriptionManager();
-    this.validateConfig();
   }
 
   ngOnInit() {
@@ -179,7 +174,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     jQuery.each(dom.children(), replace_func);
     return dom.text();
-  }
+  };
 
   ngOnDestroy() {
     this.destroy();
@@ -315,7 +310,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.segpopover.insertBefore('.note-editing-area');
 
     this.loaded.emit(true);
-  }
+  };
 
   /**
    * initializes the navbar bar of the editor
@@ -635,7 +630,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
     }
-  }
+  };
 
   /**
    * called after key up in editor
@@ -660,7 +655,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
     this._is_typing = true;
     this.lastkeypress = Date.now();
-  }
+  };
 
   /**
    * updates the raw text of the editor
@@ -725,8 +720,22 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     let result: string = rawtext;
 
     if (rawtext !== '') {
-      result = result.replace(/\r?\n/g, ' ');
+      result = result.replace(/\r?\n/g, ' '); // .replace(/</g, "&lt;").replace(/>/g, "&gt;");
       // replace markers with no wrap
+
+      const markers = this.markers;
+      // replace all tags that are not markers
+      result = result.replace(new RegExp('(<[\\w\\+\\*:=~ ";]+>)', 'g'), function (x) {
+        for (let i = 0; i < markers.length; i++) {
+          const marker = markers[i];
+          if (arguments[0] === marker.code) {
+            return marker.code;
+          }
+        }
+
+        return arguments[0].replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      });
+
       for (let i = 0; i < this.markers.length; i++) {
         const marker = this.markers[i];
 
@@ -766,7 +775,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     const func = () => {
       try {
         if (this.rawText !== '' && this.html !== '<p><br/></p>') {
-          Functions.placeAtEnd(jQuery('.note-editable.panel-body')[0]);
+          Functions.placeAtEnd(jQuery('.note-editable')[0]);
         }
         this.textfield.summernote('focus');
       } catch (exception) {
@@ -783,7 +792,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     } else {
       func();
     }
-  }
+  };
 
   /**
    * tidy up the raw text, remove white spaces etc.
@@ -792,15 +801,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    */
   private tidyUpRaw(raw: string): string {
     return tidyUpAnnotation(raw, this.transcrService.guidelines);
-  }
-
-  private validateConfig() {
-    const validator: TranscrEditorConfigValidator = new TranscrEditorConfigValidator();
-    const validation = validator.validateObject(this._settings);
-    if (!validation.success) {
-      throw new Error(validation.error);
-    }
-
   }
 
   /*

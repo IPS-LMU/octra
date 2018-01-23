@@ -14,26 +14,25 @@ export class CTMConverter extends Converter {
     this._extension = '.ctm';
     this._website.title = '';
     this._website.url = '';
-    this._conversion.export = false;
+    this._conversion.export = true;
     this._conversion.import = true;
     this._encoding = 'UTF-8';
+    this._multitiers = false;
+    this._notice = 'OCTRA does not take the confidency level into account. On export to CTM the confidency value will be set to 1 to all values.';
   }
 
-  public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult {
+  public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
     let result = '';
     let filename = '';
 
     if (!isNullOrUndefined(annotation)) {
-      for (let i = 0; i < annotation.levels.length; i++) {
-        const level: OLevel = annotation.levels[i];
+      const level = annotation.levels[levelnum];
 
-        for (let j = 0; j < level.items.length; j++) {
-          const transcript = level.items[j].labels[0].value;
-          result += transcript;
-          if (i < transcript.length - 1) {
-            result += ' ';
-          }
-        }
+      for (let j = 0; j < level.items.length; j++) {
+        const transcript = level.items[j].labels[0].value;
+        const start = Math.round((level.items[j].sampleStart / audiofile.samplerate) * 100) / 100;
+        const duration = Math.round((level.items[j].sampleDur / audiofile.samplerate) * 100) / 100;
+        result += `${annotation.name} 1 ${start} ${duration} ${transcript} 1.00\n`;
       }
 
       filename = annotation.name + this._extension;
@@ -48,7 +47,7 @@ export class CTMConverter extends Converter {
         type: 'text/plain'
       }
     };
-  };
+  }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile !== null && audiofile !== undefined) {
@@ -132,5 +131,5 @@ export class CTMConverter extends Converter {
     }
 
     return null;
-  };
+  }
 }

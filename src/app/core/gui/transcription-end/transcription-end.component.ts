@@ -31,6 +31,7 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
 
   ngOnInit() {
     this.appStorage.submitted = true;
+    console.log('transcription component called');
   }
 
   ngAfterViewInit() {
@@ -46,13 +47,15 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
     this.clearData();
     this.appStorage.clearLocalStorage();
 
-    this.router.navigate(['/logout']);
+    this.router.navigate(['/logout'], {
+      queryParamsHandling: 'preserve'
+    });
   }
 
   clearData() {
     this.appStorage.submitted = false;
     this.appStorage.clearAnnotationData().catch((err) => {
-      console.error(err)
+      console.error(err);
     });
 
     this.appStorage.idb.save('options', 'feedback', {value: null}).catch((err) => {
@@ -60,7 +63,7 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
     });
     this.appStorage.comment = '';
     this.appStorage.clearLoggingData().catch((err) => {
-      console.error(err)
+      console.error(err);
     });
     this.uiService.elements = [];
     this.settService.clearSettings();

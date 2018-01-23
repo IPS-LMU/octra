@@ -2,7 +2,7 @@
     <div id="logout">
         <h3>{{"general.logout successful" | translate}}</h3>
         <p>{{"logout.successful text" | translate}}
-            <a [routerLink]="['/login']">{{"logout.login again" |translate}}</a>
+            <a [routerLink]="['/login']" [queryParamsHandling]="'merge'">{{"logout.login again" |translate}}</a>
         </p>
     </div>
 </div>

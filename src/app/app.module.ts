@@ -8,54 +8,23 @@ import {BsModalModule} from 'ng2-bs3-modal';
 import {Ng2Webstorage} from 'ngx-webstorage';
 // other
 import {LanguageLoader} from './core/shared';
+import {AlertComponent, DropZoneComponent, OctraModalComponent} from './core/component';
 import {
-  AlertComponent,
-  AudioNavigationComponent,
-  AudioplayerComponent,
-  AudioplayerDirective,
-  AudioviewerComponent,
-  AudioviewerConfig,
-  AudioviewerDirective,
-  CircleLoupeComponent,
-  DropZoneComponent,
-  LoupeComponent,
-  OctraModalComponent,
-  TranscrEditorComponent
-} from './core/component';
-import {
-  FastbarComponent,
-  LoadingComponent,
-  LoginComponent,
-  LogoutComponent,
-  MembersAreaComponent,
-  NavigationComponent,
-  ReloadFileComponent,
-  TranscriptionComponent,
-  TranscriptionEndComponent,
-  TranscrOverviewComponent,
+  FastbarComponent, LoadingComponent, LoginComponent, LogoutComponent, MembersAreaComponent, NavigationComponent,
+  ReloadFileComponent, TranscriptionComponent, TranscriptionEndComponent, TranscrOverviewComponent,
   TranscrWindowComponent
 } from './core/gui';
 
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {routing} from './app.routes';
-import {LeadingNullPipe, ProcentPipe, SecondsPipe, TimespanPipe} from './core/shared/pipe';
 
 import {
-  APIService,
-  AppStorageService,
-  AudioService,
-  KeymappingService,
-  ModalService,
-  NavbarService,
+  APIService, AppStorageService, AudioService, KeymappingService, ModalService, NavbarService,
   SettingsService
 } from './core/shared/service';
 
 import {
-  ALoginGuard,
-  DeALoginGuard,
-  LogoutGuard,
-  MembersAreaGuard,
-  SettingsGuard,
+  ALoginGuard, DeALoginGuard, LogoutGuard, MembersAreaGuard, SettingsGuard,
   TranscrEndGuard
 } from './core/shared/guard';
 
@@ -72,15 +41,16 @@ import {OctraDropzoneComponent} from './core/gui/octra-dropzone/octra-dropzone.c
 import {LoadeditorDirective} from './core/shared/directive/loadeditor.directive';
 import {NewsComponent} from './core/gui/news/news.component';
 import {FaqComponent} from './core/gui/faq/faq.component';
-import {LinearEditorComponent} from './editors/linear-editor/linear-editor.component';
-import {EditorWSignaldisplayComponent} from './editors/editor-without-signaldisplay/editor-w-signaldisplay.component';
-import {TwoDEditorComponent} from './editors/2D-editor/2D-editor.component';
+import {EditorWSignaldisplayComponent, LinearEditorComponent, TwoDEditorComponent} from './editors';
 import {HelpComponent} from './core/gui/help/help.component';
 import {NewEditorComponent} from './editors/new-editor/new-editor.component';
 import {HelpToolsComponent} from './core/gui/help-tools/help-tools.component';
 import {FeaturesComponent} from './core/gui/features/features.component';
-import {Timespan2Pipe} from './core/shared/pipe/timespan2.pipe';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
+import {AudioviewerConfig} from './media-components/components/audio/audioviewer';
+import {MediaComponentsModule} from './media-components/media-components.module';
+import {TranscrEditorComponent} from './core/component/transcr-editor';
+import {Error404Component} from './core/gui/error404/error404.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -95,45 +65,34 @@ export const EDITORS: any[] = [
 
 export const ngmodule = {
   declarations: [
+    AgreementComponent,
+    AlertComponent,
     AppComponent,
-    AudioNavigationComponent,
-    AudioplayerComponent,
-    AudioplayerDirective,
-    AudioviewerComponent,
-    AudioviewerDirective,
-    CircleLoupeComponent,
+    DropZoneComponent,
+    EDITORS,
+    FaqComponent,
+    FastbarComponent,
+    FeaturesComponent,
+    HelpComponent,
+    HelpToolsComponent,
+    LoadeditorDirective,
     LoadingComponent,
     LoginComponent,
     LogoutComponent,
-    LoupeComponent,
-    HelpToolsComponent,
     MembersAreaComponent,
     NavigationComponent,
-    ProcentPipe,
-    SecondsPipe,
-    LeadingNullPipe,
-    TimespanPipe,
-    Timespan2Pipe,
+    NewEditorComponent,
+    NewsComponent,
+    OctraDropzoneComponent,
+    OctraModalComponent,
+    ReloadFileComponent,
     TranscrEditorComponent,
+    TranscrGuidelinesComponent,
     TranscriptionComponent,
     TranscriptionEndComponent,
     TranscrOverviewComponent,
     TranscrWindowComponent,
-    HelpComponent,
-    AlertComponent,
-    ReloadFileComponent,
-    DropZoneComponent,
-    FastbarComponent,
-    OctraModalComponent,
-    TranscrGuidelinesComponent,
-    AgreementComponent,
-    OctraDropzoneComponent,
-    LoadeditorDirective,
-    NewsComponent,
-    FaqComponent,
-    EDITORS,
-    NewEditorComponent,
-    FeaturesComponent
+    Error404Component
   ],
   entryComponents: EDITORS,
   imports: [
@@ -149,6 +108,7 @@ export const ngmodule = {
     CollapseModule.forRoot(),
     FormsModule,
     HttpClientModule,
+    MediaComponentsModule,
     Ng2Webstorage.forRoot({
       separator: '.',
       prefix: 'custom'
@@ -156,6 +116,7 @@ export const ngmodule = {
     BsModalModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
+    MediaComponentsModule,
     routing
   ],
   bootstrap: [

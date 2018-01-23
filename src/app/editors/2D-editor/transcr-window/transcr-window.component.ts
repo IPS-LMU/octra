@@ -3,20 +3,21 @@ import {
   Output, ViewChild
 } from '@angular/core';
 
-import {AudioNavigationComponent, LoupeComponent, TranscrEditorComponent} from '../../../core/component';
 import {
-  AudioService, KeymappingService, TranscriptionService,
+  AppStorageService,
+  AudioService,
+  KeymappingService,
+  SettingsService,
+  TranscriptionService,
   UserInteractionsService
 } from '../../../core/shared/service';
 import {AudioTime, Segment, SubscriptionManager} from '../../../core/shared';
-import {SettingsService} from '../../../core/shared/service/settings.service';
-import {AudioChunk} from '../../../core/obj/media/audio/AudioChunk';
-import {AudioManager} from '../../../core/obj/media/audio/AudioManager';
-import {AudioRessource} from '../../../core/obj/media/audio/AudioRessource';
+import {AudioChunk, AudioManager, AudioRessource, AudioSelection} from '../../../media-components/obj/media/audio';
 import {isNullOrUndefined} from 'util';
-import {AudioSelection} from '../../../core/obj/media/audio/AudioSelection';
 import {Segments} from '../../../core/obj/Annotation/Segments';
-import {AppStorageService} from '../../../core/shared/service/appstorage.service';
+import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
+import {LoupeComponent} from '../../../media-components/components/audio/loupe';
+import {AudioNavigationComponent} from '../../../media-components/components/audio/audio-navigation';
 
 @Component({
   selector: 'app-transcr-window',

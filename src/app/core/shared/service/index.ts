@@ -1,6 +1,5 @@
 export * from './api.service';
 export * from './audio.service';
-export * from './audiocomponent.service';
 export * from './modal.service';
 export * from './keymapping.service';
 export * from '../../gui/login/login.service';

@@ -45,21 +45,22 @@ export class IndexedDBManager {
 
   constructor(dbname: string) {
     this.dbname = dbname;
-    this.indexedDB = (<any> window).indexedDB
-      || (<any> window).mozIndexedDB
-      || (<any> window).webkitIndexedDB
-      || (<any> window).msIndexedDB;
-
-    this._idbtransaction = (<any> window).IDBTransaction
-      || (<any> window).webkitIDBTransaction
-      || (<any> window).msIDBTransaction;
-
-    this.idbkeyrange = (<any> window).IDBKeyRange
-      || (<any> window).webkitIDBKeyRange
-      || (<any> window).msIDBKeyRange;
 
     if (!IndexedDBManager.isCompatible()) {
       console.error('Browser doesn\'t support a stable version of IndexedDB.');
+    } else {
+      this.indexedDB = (<any> window).indexedDB
+        || (<any> window).mozIndexedDB
+        || (<any> window).webkitIndexedDB
+        || (<any> window).msIndexedDB;
+
+      this._idbtransaction = (<any> window).IDBTransaction
+        || (<any> window).webkitIDBTransaction
+        || (<any> window).msIDBTransaction;
+
+      this.idbkeyrange = (<any> window).IDBKeyRange
+        || (<any> window).webkitIDBKeyRange
+        || (<any> window).msIDBKeyRange;
     }
   }
 
@@ -246,5 +247,5 @@ export class IndexedDBManager {
         wrapper(0);
       }
     );
-  };
+  }
 }

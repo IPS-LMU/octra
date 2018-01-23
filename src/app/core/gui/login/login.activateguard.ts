@@ -13,7 +13,9 @@ export class ALoginGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
     if (this.appStorage.LoggedIn === true) {
-      this.router.navigate(['/user/transcr']);
+      this.router.navigate(['/user/transcr'], {
+        queryParamsHandling: 'preserve'
+      });
       return false;
     }
     return true;

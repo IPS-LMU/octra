@@ -1,14 +1,14 @@
 import {Component, OnDestroy} from '@angular/core';
-import {APIService} from './core/shared/service/api.service';
+import {APIService, AppStorageService, SettingsService} from './core/shared/service';
 import {TranslateService} from '@ngx-translate/core';
-import {AppStorageService} from './core/shared/service/appstorage.service';
-import {SettingsService} from './core/shared/service/settings.service';
 import {SubscriptionManager} from './core/obj/SubscriptionManager';
 import {isNullOrUndefined, isUndefined} from 'util';
 import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
 import {AppInfo} from './app.info';
 import {environment} from '../environments/environment';
 import {UpdateManager} from './core/shared/UpdateManager';
+import {ActivatedRoute, Router} from '@angular/router';
+import {Logger} from './core/shared';
 
 @Component({
   selector: 'app-octra',
@@ -26,13 +26,15 @@ export class AppComponent implements OnDestroy {
     return environment;
   }
 
-  private subscrmanager: SubscriptionManager;
+  private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
   constructor(private api: APIService,
               private langService: TranslateService,
-              private appStorage: AppStorageService,
+              public appStorage: AppStorageService,
               private settingsService: SettingsService,
-              private bugService: BugReportService) {
+              private bugService: BugReportService,
+              private router: Router,
+              private route: ActivatedRoute) {
     // overwrite console.log
     const oldLog = console.log;
     const serv = this.bugService;
@@ -70,8 +72,6 @@ export class AppComponent implements OnDestroy {
       };
     })();
 
-    this.subscrmanager = new SubscriptionManager();
-
     // load settings
     this.subscrmanager.add(this.settingsService.settingsloaded.subscribe(
       this.onSettingsLoaded
@@ -86,33 +86,56 @@ export class AppComponent implements OnDestroy {
       }
     ));
 
-    this.settingsService.getApplicationSettings();
+    this.settingsService.loadApplicationSettings().then(() => {
+      // App Settings loaded
 
-    const checkupdates = () => {
       // check for Updates
+      if (this.queryParamsSet()) {
+        // URL MODE, overwrite db name with 'url'
+        console.log('params!');
+        this.settingsService.app_settings.octra.database.name = 'url';
+        console.log('load db ' + this.settingsService.app_settings.octra.database.name);
+      }
+
       const umanager = new UpdateManager(this.appStorage);
       umanager.checkForUpdates(this.settingsService.app_settings.octra.database.name).then((idb) => {
+
+        const audio_url = this.route.snapshot.queryParams['audio'];
+        const transcript_url = this.route.snapshot.queryParams['transcript'];
+        const embedded = this.route.snapshot.queryParams['embedded'];
+
+        this.appStorage.url_params['audio'] = audio_url;
+        this.appStorage.url_params['transcript'] = transcript_url;
+        this.appStorage.url_params['embedded'] = (embedded === '1');
+
+        // load from indexedDB
         this.appStorage.load(idb).then(
           () => {
+
+
+            console.log('USEMODE FROM IDB is ' + this.appStorage.usemode);
+
+            // if url mode, set it in options
+            if (this.queryParamsSet()) {
+              this.appStorage.usemode = 'url';
+              this.appStorage.LoggedIn = true;
+            }
+
+            console.log('AFTER USEMODE FROM IDB is ' + this.appStorage.usemode);
+
             if (this.settingsService.validated) {
               console.log('loaded');
               this.onSettingsLoaded(true);
             }
             umanager.destroy();
           }
-        );
+        ).catch((error) => {
+          Logger.err(error);
+        });
+      }).catch((error) => {
+        console.error(error.target.error);
       });
-    };
-
-    if (isNullOrUndefined(this.settingsService.app_settings)) {
-      this.subscrmanager.add(this.settingsService.app_settingsloaded.subscribe(
-        () => {
-          checkupdates();
-        }
-      ));
-    } else {
-      checkupdates();
-    }
+    });
   }
 
   onSettingsLoaded = (loaded) => {
@@ -123,8 +146,6 @@ export class AppComponent implements OnDestroy {
       } else {
         if (this.settingsService.validated) {
           console.log('settings valid');
-          if (!this.appStorage.uselocalmode) {
-          }
           this.api.init(this.settingsService.app_settings.audio_server.url + 'WebTranscribe');
         }
 
@@ -153,7 +174,7 @@ export class AppComponent implements OnDestroy {
         this.langService.use(this.appStorage.language);
       }
     }
-  }
+  };
 
   ngOnDestroy() {
     this.subscrmanager.destroy();
@@ -169,7 +190,6 @@ export class AppComponent implements OnDestroy {
   }
 
   test(id: string) {
-
     this.subscrmanager.add(
       this.api.fetchAnnotation(Number(id)).subscribe(
         (result) => {
@@ -187,6 +207,15 @@ export class AppComponent implements OnDestroy {
           console.log(result);
         }
       )
+    );
+  }
+
+  queryParamsSet(): boolean {
+    const params = this.route.snapshot.queryParams;
+    return (
+      params.hasOwnProperty('audio') &&
+      params.hasOwnProperty('transcript') &&
+      params.hasOwnProperty('embedded')
     );
   }
 }

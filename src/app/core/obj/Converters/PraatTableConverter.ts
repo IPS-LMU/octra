@@ -58,7 +58,7 @@ export class PraatTableConverter extends Converter {
         type: 'text/plain'
       }
     };
-  };
+  }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile !== null && audiofile !== undefined) {
@@ -167,5 +167,5 @@ export class PraatTableConverter extends Converter {
     }
 
     return null;
-  };
+  }
 }

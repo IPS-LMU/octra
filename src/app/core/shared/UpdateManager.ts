@@ -37,7 +37,7 @@ export class UpdateManager {
           // incremental IDB upgrade: It is very important to make sure, that the database can
           // be upgrade from any version to the latest version
           const idbm = new IndexedDBManager(dbname);
-          this.subscrmanager.add(idbm.open(2).subscribe(
+          this.subscrmanager.add(idbm.open(3).subscribe(
             (result) => {
               console.log('open db');
               console.log(result.type);
@@ -53,122 +53,152 @@ export class UpdateManager {
 
                 // foreach step to the latest version you need to define the uprade
                 // procedure
-                if (version === 1) {
-                  const optionsStore = idbm.db.createObjectStore('options', {keyPath: 'name'});
-                  const logsStore = idbm.db.createObjectStore('logs', {keyPath: 'timestamp'});
-                  const annoLevelsStore = idbm.db.createObjectStore('annotation_levels', {keyPath: 'id'});
-                  const annoLinksStore = idbm.db.createObjectStore('annotation_links', {keyPath: 'id'});
+                new Promise<void>((resolve, reject) => {
+                  if (version === 1) {
+                    const optionsStore = idbm.db.createObjectStore('options', {keyPath: 'name'});
+                    const logsStore = idbm.db.createObjectStore('logs', {keyPath: 'timestamp'});
+                    const annoLevelsStore = idbm.db.createObjectStore('annotation_levels', {keyPath: 'id'});
+                    const annoLinksStore = idbm.db.createObjectStore('annotation_links', {keyPath: 'id'});
 
-                  // options for version 1
-                  idbm.saveSequential(optionsStore, [
-                    {
-                      key: 'easymode',
-                      value: {value: this.appStorage.localStr.retrieve('easymode')}
-                    },
-                    {
-                      key: 'submitted',
-                      value: {value: this.appStorage.localStr.retrieve('submitted')}
-                    },
-                    {
-                      key: 'feedback',
-                      value: {value: this.appStorage.localStr.retrieve('feedback')}
-                    },
-                    {
-                      key: 'data_id',
-                      value: {value: this.appStorage.localStr.retrieve('data_id')}
-                    },
-                    {
-                      key: 'audio_url',
-                      value: {value: this.appStorage.localStr.retrieve('audio_url')}
-                    },
-                    {
-                      key: 'uselocalmode',
-                      value: {value: this.appStorage.localStr.retrieve('offline')}
-                    },
-                    {
-                      key: 'useinterface',
-                      value: {value: this.appStorage.sessStr.retrieve('interface')}
-                    },
-                    {
-                      key: 'sessionfile',
-                      value: {value: this.appStorage.localStr.retrieve('sessionfile')}
-                    },
-                    {
-                      key: 'language',
-                      value: {value: this.appStorage.localStr.retrieve('language')}
-                    },
-                    {
-                      key: 'version',
-                      value: {value: this.appStorage.localStr.retrieve('version')}
-                    },
-                    {
-                      key: 'comment',
-                      value: {value: this.appStorage.localStr.retrieve('comment')}
-                    },
-                    {
-                      key: 'user',
-                      value: {
+                    // options for version 1
+                    idbm.saveSequential(optionsStore, [
+                      {
+                        key: 'easymode',
+                        value: {value: this.appStorage.localStr.retrieve('easymode')}
+                      },
+                      {
+                        key: 'submitted',
+                        value: {value: this.appStorage.localStr.retrieve('submitted')}
+                      },
+                      {
+                        key: 'feedback',
+                        value: {value: this.appStorage.localStr.retrieve('feedback')}
+                      },
+                      {
+                        key: 'data_id',
+                        value: {value: this.appStorage.localStr.retrieve('data_id')}
+                      },
+                      {
+                        key: 'audio_url',
+                        value: {value: this.appStorage.localStr.retrieve('audio_url')}
+                      },
+                      {
+                        key: 'usemode',
+                        value: {value: this.appStorage.localStr.retrieve('offline')}
+                      },
+                      {
+                        key: 'useinterface',
+                        value: {value: this.appStorage.sessStr.retrieve('interface')}
+                      },
+                      {
+                        key: 'sessionfile',
+                        value: {value: this.appStorage.localStr.retrieve('sessionfile')}
+                      },
+                      {
+                        key: 'language',
+                        value: {value: this.appStorage.localStr.retrieve('language')}
+                      },
+                      {
+                        key: 'version',
+                        value: {value: this.appStorage.localStr.retrieve('version')}
+                      },
+                      {
+                        key: 'comment',
+                        value: {value: this.appStorage.localStr.retrieve('comment')}
+                      },
+                      {
+                        key: 'user',
                         value: {
-                          id: this.appStorage.localStr.retrieve('member_id'),
-                          project: this.appStorage.localStr.retrieve('member_project'),
-                          jobno: this.appStorage.localStr.retrieve('member_jobno')
+                          value: {
+                            id: this.appStorage.localStr.retrieve('member_id'),
+                            project: this.appStorage.localStr.retrieve('member_project'),
+                            jobno: this.appStorage.localStr.retrieve('member_jobno')
+                          }
                         }
                       }
-                    }
-                  ]).then(() => {
+                    ]).then(() => {
 
-                    const convertAnnotation = () => {
-                      if (!isNullOrUndefined(this.appStorage.localStr.retrieve('annotation'))) {
-                        Logger.log(`Convert annotation to IDB...`);
+                      const convertAnnotation = () => {
+                        if (!isNullOrUndefined(this.appStorage.localStr.retrieve('annotation'))) {
+                          Logger.log(`Convert annotation to IDB...`);
 
-                        const levels = this.appStorage.localStr.retrieve('annotation').levels;
-                        const new_levels: OIDBLevel[] = [];
-                        for (let i = 0; i < levels.length; i++) {
-                          new_levels.push(new OIDBLevel(i + 1, levels[i], i));
-                        }
+                          const levels = this.appStorage.localStr.retrieve('annotation').levels;
+                          const new_levels: OIDBLevel[] = [];
+                          for (let i = 0; i < levels.length; i++) {
+                            new_levels.push(new OIDBLevel(i + 1, levels[i], i));
+                          }
 
-                        idbm.saveArraySequential(new_levels, annoLevelsStore, 'id').then(() => {
-                          console.log(`converted annotation levels to IDB`);
+                          idbm.saveArraySequential(new_levels, annoLevelsStore, 'id').then(() => {
+                            console.log(`converted annotation levels to IDB`);
 
+                            version++;
+                            Logger.log(`IDB upgraded to v${version}`);
+                            this.appStorage.localStr.clear();
+                            // do not insert a resolve call here!
+                            // after an successful upgrade the success is automatically triggered
+                          }).catch((err) => {
+                            console.error(err);
+                            reject(err);
+                          });
+                        } else {
                           version++;
-                          Logger.log(`IDB upgraded to v${version}`);
                           this.appStorage.localStr.clear();
-                          // do not insert a resolve call here!
-                          // after an successful upgrade the success is automatically triggered
+                          Logger.log(`IDB upgraded to v${version}`);
+                        }
+                      };
+
+                      if (!isNullOrUndefined(this.appStorage.localStr.retrieve('logs'))) {
+                        Logger.log('Convert logging data...');
+                        Logger.log(`${this.appStorage.localStr.retrieve('logs').length} logs to convert:`);
+                        idbm.saveArraySequential(this.appStorage.localStr.retrieve('logs'), logsStore, 'timestamp').then(() => {
+                          console.log(`converted ${this.appStorage.localStr.retrieve('logs').length} logging items to IDB`);
+                          convertAnnotation();
                         }).catch((err) => {
                           console.error(err);
                           reject(err);
                         });
                       } else {
-                        version++;
-                        this.appStorage.localStr.clear();
-                        Logger.log(`IDB upgraded to v${version}`);
-                      }
-                    };
-
-                    if (!isNullOrUndefined(this.appStorage.localStr.retrieve('logs'))) {
-                      Logger.log('Convert logging data...');
-                      Logger.log(`${this.appStorage.localStr.retrieve('logs').length} logs to convert:`);
-                      idbm.saveArraySequential(this.appStorage.localStr.retrieve('logs'), logsStore, 'timestamp').then(() => {
-                        console.log(`converted ${this.appStorage.localStr.retrieve('logs').length} logging items to IDB`);
                         convertAnnotation();
-                      }).catch((err) => {
-                        console.error(err);
-                        reject(err);
-                      });
-                    } else {
-                      convertAnnotation();
-                    }
+                      }
 
+                      version = 2;
+                      console.log(`updated to v2`);
+                      resolve();
+                    }).catch((err) => {
+                      reject(err);
+                    });
+                  } else {
+                    resolve();
+                  }
+                }).then(() => {
+                  if (version === 2) {
+                    const transaction = result.target.transaction;
+                    const options = transaction.objectStore('options');
 
-                  }).catch((err) => {
-                    console.error(err);
-                  });
-                }
+                    idbm.get(options, 'uselocalmode').then((entry) => {
+                      if (!isNullOrUndefined(entry)) {
+                        if (entry.value === false) {
+                          idbm.save(options, 'usemode', {
+                            name: 'usemode',
+                            value: 'online'
+                          });
+                        } else if (entry.value === true) {
+                          console.log('SET USEMODE to local');
+                          idbm.save(options, 'usemode', {
+                            name: 'usemode',
+                            value: 'local'
+                          });
+                        }
+                      }
+                    });
+                    console.log(`updated to v3`);
+                  }
+                }).catch((error) => {
+                  console.error(error);
+                });
               }
             },
             (error) => {
-              console.error(error);
               reject(error);
             }));
         };

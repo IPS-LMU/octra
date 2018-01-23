@@ -158,7 +158,7 @@
     </div>
 
     <div id="bottom-feedback" class="panel" #feedback
-         *ngIf="!appStorage.uselocalmode && transcrService.feedback !== null && transcrService.feedback !== undefined">
+         *ngIf="appStorage.usemode === 'online' && transcrService.feedback !== null && transcrService.feedback !== undefined">
         <table style="width:100%;">
             <tbody>
             <tr>
@@ -233,21 +233,28 @@
     <div id="bottom-nav">
         <div class="btn-group btn-group-justified" role="group" aria-label="...">
             <a class="btn btn-default btn-raised"
-               (click)="modService.show('transcription_stop', '', {ok: abortTranscription})"><span
-                    class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span><span
-                    *ngIf="!appStorage.easymode"
-                    [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.quit" | translate}}</span></a>
-
+               (click)="modService.show('transcription_stop', '', {ok: abortTranscription})"
+               *ngIf="appStorage.usemode !== 'url'"
+            >
+                <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+                <span *ngIf="!appStorage.easymode" [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}">
+                    {{"general.quit" | translate}}
+                </span>
+            </a>
             <a class="btn btn-primary btn-raised"
-               (click)="navbarServ.doclick('export');" *ngIf="appStorage.uselocalmode"><span
+               (click)="navbarServ.doclick('export');" *ngIf="appStorage.usemode === 'local'"><span
                     *ngIf="!appStorage.easymode"
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.export data" | translate}}</span>
                 <span class="glyphicon glyphicon-download"></span></a>
 
             <a class="btn btn-primary btn-raised"
-               (click)="onSendButtonClick()" *ngIf="!appStorage.uselocalmode"><span
+               (click)="onSendButtonClick()" *ngIf="appStorage.usemode === 'online'"><span
                     *ngIf="!appStorage.easymode"
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"transcription.send" | translate}}</span>
+                <span class="glyphicon glyphicon-send"></span></a>
+            <a class="btn btn-primary btn-raised"
+               (click)="onSaveTranscriptionButtonClicked()" *ngIf="appStorage.usemode === 'url'">
+                <span>SAVE TRANSCRIPTION</span>
                 <span class="glyphicon glyphicon-send"></span></a>
         </div>
     </div>

@@ -37,11 +37,14 @@ export class ReloadFileComponent implements OnInit {
   }
 
   ngOnInit() {
+    console.log('reload component called');
   }
 
   private navigate = () => {
-    this.router.navigate(['/user/load']);
-  }
+    this.router.navigate(['/user/load'], {
+      queryParamsHandling: 'preserve'
+    });
+  };
 
   getDropzoneFileString(file: File | SessionFile) {
     if (!isNullOrUndefined(file)) {
@@ -53,8 +56,10 @@ export class ReloadFileComponent implements OnInit {
 
   abortTranscription = () => {
     this.transcrServ.endTranscription();
-    this.router.navigate(['/logout']);
-  }
+    this.router.navigate(['/logout'], {
+      queryParamsHandling: 'preserve'
+    });
+  };
 
   newTranscription = () => {
     let keep_data = false;
@@ -92,7 +97,7 @@ export class ReloadFileComponent implements OnInit {
     } else {
       process();
     }
-  }
+  };
 
   onOfflineSubmit = () => {
     this.audioService.registerAudioManager(this.dropzone.audiomanager);
@@ -103,7 +108,7 @@ export class ReloadFileComponent implements OnInit {
         }
       }
     );
-  }
+  };
 
   private showErrorMessage(err: string) {
     this.error = err;

@@ -201,7 +201,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               });
             }
 
-            if (json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
+            if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
               // get transcript data that already exists
               if (json.data.hasOwnProperty('prompt')) {
                 const prompt = json.data.prompt;
@@ -442,7 +442,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
                 }
               }
 
-              if (json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
+              if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
                 // get transcript data that already exists
                 if (json.data.hasOwnProperty('prompt')) {
                   const prompt = json.data.prompt;

@@ -9,7 +9,6 @@
     </div>
     <div id="loginrow" class="row">
         <div #onlinemode id='onlinemode' class="col-md-6 panel panel-default" style="padding:40px;">
-            {{appStorage.usemode}}
             <p *ngIf="!apc.octra.responsive.enabled && !valid_size" class="warning"
                [innerHTML]="'browser.small window width' | translate">
             </p>
@@ -59,7 +58,7 @@
                                     />
                                 </div>
                                 <div class="form-group">
-                                    <input *ngIf="appStorage.usemode === 'online'"
+                                    <input *ngIf="appStorage.usemode !== 'local'"
                                            class="form-control btn btn-raised btn-primary login-submit" type="submit"
                                            [ngClass]="{
                                            'btn-danger': (appStorage.usemode === 'local' && appStorage.sessionfile !== null)

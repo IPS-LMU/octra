@@ -29,11 +29,11 @@
           "examples": [
             {
               "annotation": "20: zwanzig",
-              "url": ""
+              "url":""
             },
             {
               "annotation": "1991: neunzehn hundert und einundzeunzig",
-              "url": ""
+              "url":""
             }
           ]
         },
@@ -45,7 +45,7 @@
           "examples": [
             {
               "annotation": "A B B ß: A doppel B scharfes S",
-              "url": ""
+              "url":""
             },
             {
               "annotation": "D: /D/",

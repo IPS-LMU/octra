@@ -1,15 +1,6 @@
 import {
-  AfterContentInit,
-  AfterViewInit,
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  ViewChild
+  AfterContentInit, AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit,
+  Output, ViewChild
 } from '@angular/core';
 
 import {
@@ -107,7 +98,13 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       () => {
         if (this.segment_index > -1 && this.transcrService.currentlevel.segments &&
           this.segment_index < this.transcrService.currentlevel.segments.length) {
-          this.editor_rawText(this.transcrService.currentlevel.segments.get(this.segment_index).transcript);
+
+          if (this.appStorage.prompttext !== '' && (this.transcrService.currentlevel.segments.length <= 1 &&
+              this.transcrService.currentlevel.segments.get(0).transcript === '')) {
+            this.editor_rawText(this.appStorage.prompttext);
+          } else {
+            this.editor_rawText(this.transcrService.currentlevel.segments.get(this.segment_index).transcript);
+          }
         }
       }
     ));
@@ -391,7 +388,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     } else {
       this.close();
     }
-  }
+  };
 
   onKeyDown = ($event) => {
     switch ($event.comboKey) {
@@ -411,7 +408,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         this.doit('down');
         break;
     }
-  }
+  };
 
   onBoundaryClicked(samples: number) {
     const i: number = this.temp_segments.getSegmentBySamplePosition(samples);

@@ -1,6 +1,6 @@
 # Change Log
 
-## [v1.2.3](https://github.com/IPS-LMU/octra/tree/v1.2.3) (2017-11-19)
+## [v1.2.3](https://github.com/IPS-LMU/octra/tree/v1.2.3) (2018-01-23)
 
 [Full Changelog](https://github.com/IPS-LMU/octra/compare/v1.2.2...v1.2.3)
 

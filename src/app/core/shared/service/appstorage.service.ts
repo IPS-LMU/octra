@@ -52,6 +52,7 @@ export class AppStorageService {
       console.error(err);
     });
   }
+
   get show_loupe(): boolean {
     return this._show_loupe;
   }
@@ -62,6 +63,7 @@ export class AppStorageService {
       console.error(err);
     });
   }
+
   get logging(): boolean {
     return this._logging;
   }
@@ -711,6 +713,11 @@ export class AppStorageService {
   };
 
   private clearIDBTable(name: string): Promise<any> {
+    if (this._idb === undefined) {
+      return new Promise<any>((resolve) => {
+        resolve();
+      });
+    }
     return this._idb.clear(name);
   }
 

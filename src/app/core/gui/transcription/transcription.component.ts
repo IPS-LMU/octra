@@ -1,32 +1,13 @@
 import {
-  AfterContentChecked,
-  AfterContentInit,
-  AfterViewChecked,
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  ComponentFactoryResolver,
-  ComponentRef,
-  HostListener,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  SimpleChanges,
-  ViewChild
+  AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component,
+  ComponentFactoryResolver, ComponentRef, HostListener, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild
 } from '@angular/core';
 import {Router} from '@angular/router';
 import {BsModalComponent} from 'ng2-bs3-modal/ng2-bs3-modal';
 
 import {
-  AppStorageService,
-  AudioService,
-  KeymappingService,
-  MessageService,
-  ModalService,
-  NavbarService,
-  SettingsService,
-  TranscriptionService,
-  UserInteractionsService
+  AppStorageService, AudioService, KeymappingService, MessageService, ModalService, NavbarService,
+  SettingsService, TranscriptionService, UserInteractionsService
 } from '../../shared/service';
 
 import {BrowserInfo, SubscriptionManager} from '../../shared';
@@ -283,7 +264,7 @@ export class TranscriptionComponent implements OnInit,
     }
     this.transcrService.endTranscription();
     this.router.navigate(['/logout']);
-  }
+  };
 
   ngAfterContentInit() {
   }
@@ -508,7 +489,7 @@ export class TranscriptionComponent implements OnInit,
   onSendError = (error) => {
     this.send_error = error.message;
     return Observable.throw(error);
-  }
+  };
 
   onSendButtonClick() {
 
@@ -538,6 +519,25 @@ export class TranscriptionComponent implements OnInit,
               if (isArray(transcript) && transcript.length > 0) {
                 this.appStorage.servertranscipt = transcript;
               }
+            }
+
+            if (json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
+              // get transcript data that already exists
+              if (json.data.hasOwnProperty('prompt')) {
+                const prompt = json.data.prompt;
+
+                if (prompt) {
+                  this.appStorage.prompttext = prompt;
+                }
+              } else if (json.data.hasOwnProperty('prompttext')) {
+                const prompt = json.data.prompttext;
+
+                if (prompt) {
+                  this.appStorage.prompttext = prompt;
+                }
+              }
+            } else {
+              this.appStorage.prompttext = '';
             }
 
             if (json.hasOwnProperty('message') && isNumber(json.message)) {

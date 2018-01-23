@@ -39,6 +39,7 @@ export class UpdateManager {
           const idbm = new IndexedDBManager(dbname);
           this.subscrmanager.add(idbm.open(3).subscribe(
             (result) => {
+              console.log('open db');
               console.log(result.type);
               if (result.type === 'success') {
                 // database opened

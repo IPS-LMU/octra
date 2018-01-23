@@ -529,6 +529,25 @@ export class TranscriptionComponent implements OnInit,
               }
             }
 
+            if (json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
+              // get transcript data that already exists
+              if (json.data.hasOwnProperty('prompt')) {
+                const prompt = json.data.prompt;
+
+                if (prompt) {
+                  this.appStorage.prompttext = prompt;
+                }
+              } else if (json.data.hasOwnProperty('prompttext')) {
+                const prompt = json.data.prompttext;
+
+                if (prompt) {
+                  this.appStorage.prompttext = prompt;
+                }
+              }
+            } else {
+              this.appStorage.prompttext = '';
+            }
+
             if (json.hasOwnProperty('message') && isNumber(json.message)) {
               this.appStorage.jobs_left = Number(json.message);
             }

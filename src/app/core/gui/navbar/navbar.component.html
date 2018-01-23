@@ -140,6 +140,19 @@
         </button>
     </bs-modal-footer>
 </bs-modal>
+<bs-modal #promptmodal id="prompt-modal">
+    <bs-modal-header>
+        <h4 class="modal-title">{{"general.prompt" | translate}}</h4>
+    </bs-modal-header>
+    <bs-modal-body>
+        {{appStorage.prompttext}}
+    </bs-modal-body>
+    <bs-modal-footer>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="promptmodal.dismiss()">
+            {{"general.close" | translate}}
+        </button>
+    </bs-modal-footer>
+</bs-modal>
 <nav class="navbar navbar-inverse">
     <div class="container">
         <div class="navbar-header">
@@ -391,14 +404,14 @@
 </nav>
 <div id="subnav" class="panel" *ngIf="appStorage.LoggedIn && appStorage.usemode === 'online' && navbarServ.dataloaded">
     <div class="row">
-        <div class="col-sm-2"></div>
-        <div class="col-xs-4 col-sm-3">{{"general.project" | translate}}: {{appStorage.user.project}}</div>
-        <div class="col-xs-4 col-sm-3">{{"general.name" |translate}}:
+        <div class="col-xs-3 col-sm-3">{{"general.project" | translate}}: {{appStorage.user.project}}</div>
+        <div class="col-xs-3 col-sm-3">{{"general.name" |translate}}:
             {{navbarServ.exportformats.filename}}
         </div>
-        <div class="col-xs-4 col-sm-3">{{'general.free jobs' | translate}}:
+        <div class="col-xs-3 col-sm-3">{{'general.free jobs' | translate}}:
             {{appStorage.jobs_left}}
         </div>
-        <div class="col-sm-2"></div>
+        <div class="col-xs-3 col-sm-3"><a (click)="promptmodal.open()" style="cursor: pointer;">{{'general.prompt' |
+            translate}}</a></div>
     </div>
 </div>

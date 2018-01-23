@@ -42,6 +42,17 @@ export class OIDBLink implements IIDBLink {
 
 @Injectable()
 export class AppStorageService {
+  get prompttext(): string {
+    return this._prompttext;
+  }
+
+  set prompttext(value: string) {
+    this._prompttext = value;
+    this._idb.save('options', 'prompttext', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
   set LoggedIn(value: boolean) {
     this._logged_in = value;
   }
@@ -320,6 +331,7 @@ export class AppStorageService {
   private _interface: string = null;
   private _logging = false;
   private _show_loupe = true;
+  private _prompttext = '';
 
   private _url_params: any = {};
 
@@ -631,6 +643,10 @@ export class AppStorageService {
         {
           attribute: '_show_loupe',
           key: 'show_loupe'
+        },
+        {
+          attribute: '_prompttext',
+          key: 'prompttext'
         }
       ]
     ).then(() => {
@@ -716,6 +732,11 @@ export class AppStorageService {
   };
 
   private clearIDBTable(name: string): Promise<any> {
+    if (this._idb === undefined) {
+      return new Promise<any>((resolve) => {
+        resolve();
+      });
+    }
     return this._idb.clear(name);
   }
 

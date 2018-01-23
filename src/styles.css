@@ -203,3 +203,7 @@ footer {
 .tooltip.right {
     width: 200px;
 }
+
+#prompt-modal .modal-dialog {
+    width: 90%;
+}

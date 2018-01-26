@@ -6,7 +6,7 @@ import {isNullOrUndefined} from 'util';
 import {Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
 import {IFile, ImportResult, PartiturConverter} from '../../obj/Converters';
-import {OAudiofile} from '../../obj/Annotation';
+import {OAudiofile, OLevel} from '../../obj/Annotation';
 import {OIDBLevel} from '../../shared/service/appstorage.service';
 
 @Component({
@@ -102,7 +102,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
         (result) => {
           if (result.status === 'success') {
             new Promise<void>((resolve, reject) => {
-              if (this.appStorage.usemode === 'url') {
+              if (this.appStorage.usemode === 'url' && this.appStorage.url_params['transcript'] !== null) {
                 // load transcript file via URL
                 this.http.get(this.appStorage.url_params['transcript'], {
                   responseType: 'text'
@@ -155,6 +155,19 @@ export class LoadingComponent implements OnInit, OnDestroy {
                   }
                 );
               } else {
+                if (this.appStorage.usemode === 'url') {
+                  // overwrite
+                  const new_levels: OIDBLevel[] = [];
+                  new_levels.push(new OIDBLevel(1, new OLevel('Tier_1', 'SEGMENT'), 1));
+
+                  this.appStorage.overwriteAnnotation(new_levels).then(
+                    () => {
+                      resolve();
+                    }
+                  ).catch((error) => {
+                    reject(error);
+                  });
+                }
                 resolve();
               }
             }).then(() => {

@@ -101,7 +101,7 @@ export class AppComponent implements OnDestroy {
       umanager.checkForUpdates(this.settingsService.app_settings.octra.database.name).then((idb) => {
 
         const audio_url = this.route.snapshot.queryParams['audio'];
-        const transcript_url = this.route.snapshot.queryParams['transcript'];
+        const transcript_url = (this.route.snapshot.queryParams['transcript'] !== undefined) ? this.route.snapshot.queryParams['transcript'] : null;
         const embedded = this.route.snapshot.queryParams['embedded'];
 
         this.appStorage.url_params['audio'] = audio_url;
@@ -214,7 +214,6 @@ export class AppComponent implements OnDestroy {
     const params = this.route.snapshot.queryParams;
     return (
       params.hasOwnProperty('audio') &&
-      params.hasOwnProperty('transcript') &&
       params.hasOwnProperty('embedded')
     );
   }

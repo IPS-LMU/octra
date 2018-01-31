@@ -1,6 +1,10 @@
 import {Converter} from './core/obj/Converters/Converter';
 import {
-  AnnotJSONConverter, CTMConverter, PartiturConverter, PraatTableConverter, PraatTextgridConverter,
+  AnnotJSONConverter,
+  CTMConverter,
+  PartiturConverter,
+  PraatTableConverter,
+  PraatTextgridConverter,
   TextConverter
 } from './core/obj/Converters';
 import {MantisBugReporter} from './core/obj/BugAPI/MantisBugReporter';
@@ -29,5 +33,5 @@ export class AppInfo {
     new TextConverter()
   ];
 
-  static readonly version = '1.2.3';
+  static readonly version = '1.2.4';
 }

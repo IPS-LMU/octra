@@ -107,6 +107,7 @@ export class AppComponent implements OnDestroy {
         this.appStorage.url_params['audio'] = audio_url;
         this.appStorage.url_params['transcript'] = transcript_url;
         this.appStorage.url_params['embedded'] = (embedded === '1');
+        this.appStorage.url_params['host'] = this.route.snapshot.queryParams['host'];
 
         // load from indexedDB
         this.appStorage.load(idb).then(

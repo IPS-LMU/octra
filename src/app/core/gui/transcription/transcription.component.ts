@@ -1,13 +1,34 @@
 import {
-  AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component,
-  ComponentFactoryResolver, ComponentRef, HostListener, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild
+  AfterContentChecked,
+  AfterContentInit,
+  AfterViewChecked,
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ComponentFactoryResolver,
+  ComponentRef,
+  HostListener,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
+  ViewChild
 } from '@angular/core';
 import {Router} from '@angular/router';
 import {BsModalComponent} from 'ng2-bs3-modal/ng2-bs3-modal';
 
 import {
-  APIService, AppStorageService, AudioService, Entry, KeymappingService, MessageService, ModalService,
-  NavbarService, SettingsService, TranscriptionService, UserInteractionsService
+  APIService,
+  AppStorageService,
+  AudioService,
+  Entry,
+  KeymappingService,
+  MessageService,
+  ModalService,
+  NavbarService,
+  SettingsService,
+  TranscriptionService,
+  UserInteractionsService
 } from '../../shared/service';
 
 import {BrowserInfo, SubscriptionManager} from '../../shared';
@@ -605,7 +626,13 @@ export class TranscriptionComponent implements OnInit,
 
     // upload transcript
     const form: FormData = new FormData();
-    const url = 'https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/uploadFileMulti';
+    let host = 'https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/';
+
+    if (!isNullOrUndefined(this.appStorage.url_params['host'])) {
+      host = this.appStorage.url_params['host'];
+    }
+
+    const url = `${host}uploadFileMulti`;
 
     form.append('file0', new File([result.content], result.name, {type: 'text/plain'}));
 

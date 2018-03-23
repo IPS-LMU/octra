@@ -4,6 +4,7 @@ import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
 import {Functions} from '../Functions';
 import {isNullOrUndefined} from 'util';
+import {OLog} from '../../obj/Settings/logging';
 
 @Injectable()
 export class UserInteractionsService {
@@ -92,6 +93,25 @@ export class UserInteractionsService {
       if (elem) {
         this._elements.push(elem);
         this.afteradd.emit(elem);
+        const new_elem = new OLog(
+          elem.timestamp,
+          elem.type,
+          elem.context,
+          '',
+          elem.playerpos,
+          elem.caretpos
+        );
+
+        if (elem instanceof MouseStatisticElem) {
+          new_elem.value = elem.value;
+        } else if (elem instanceof KeyStatisticElem) {
+          new_elem.value = (<KeyStatisticElem> elem).value;
+        } else {
+          new_elem.value = (<StatisticElem> elem).value;
+        }
+
+        console.log(`Element ADDED:`);
+        console.log(new_elem);
       }
     }
   }

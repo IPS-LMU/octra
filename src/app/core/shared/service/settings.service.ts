@@ -17,6 +17,9 @@ import {HttpClient} from '@angular/common/http';
 
 @Injectable()
 export class SettingsService {
+    set log(value: string) {
+        this._log = value;
+    }
   get log(): string {
     return this._log;
   }
@@ -165,7 +168,7 @@ export class SettingsService {
         Logger.err(error);
       }
     );
-  };
+  }
 
   public loadGuidelines = (language: string, url: string) => {
     this.loadSettings(
@@ -192,7 +195,7 @@ export class SettingsService {
         Logger.err(error);
       }
     );
-  };
+  }
 
   public loadValidationMethod: ((url: string) => Subscription) = (url: string) => {
     Logger.log('Load methods...');
@@ -225,7 +228,7 @@ export class SettingsService {
         this.validationmethodloaded.emit();
       }
     );
-  };
+  }
 
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
     Logger.log('Load audio file 2...');
@@ -295,14 +298,14 @@ export class SettingsService {
         console.error('session file is null.');
       }
     }
-  };
+  }
 
   private triggerSettingsLoaded = () => {
     if (this.validated) {
       this.loaded = true;
       this.test.next(true);
     }
-  };
+  }
 
   public destroy() {
     this.subscrmanager.destroy();

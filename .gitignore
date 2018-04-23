@@ -266,7 +266,6 @@ TSWLatexianTemp*
 
 ## Editors:
 # WinEdt
-*.bak
 *.sav
 
 # Texpad
@@ -400,3 +399,4 @@ xcuserdata/
 /bd.sh
 /bp.sh
 /bdeploy.sh
+/backups/

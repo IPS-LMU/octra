@@ -229,6 +229,9 @@ export class SettingsService {
 
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
     Logger.log('Load audio file 2...');
+    if (isNullOrUndefined(this.appStorage.usemode)) {
+      console.log(`usemode is null`);
+    }
     if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
       // online
       if (!isNullOrUndefined(this.appStorage.audio_url)) {

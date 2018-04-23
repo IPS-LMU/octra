@@ -60,8 +60,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
           this.state = 'Project configuration loaded';
           let language = this.langService.currentLang;
           if (isNullOrUndefined(projectsettings.languages.find((x) => {
-              return x === language;
-            }))) {
+            return x === language;
+          }))) {
             // fall back to first defined language
             language = projectsettings.languages[0];
           }
@@ -247,6 +247,10 @@ export class LoadingComponent implements OnInit, OnDestroy {
       }
     }).then(() => {
       console.log(`PROMISE FINISHED`);
+
+      if (isNullOrUndefined(this.appStorage.usemode) && this.appStorage.url_params.hasOwnProperty('audio') && this.appStorage.url_params['audio'] !== '') {
+        this.appStorage.usemode = 'url';
+      }
 
       if (this.appStorage.usemode !== 'url' && !this.appStorage.LoggedIn) {
         // not logged in, go back

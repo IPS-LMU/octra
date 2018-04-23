@@ -1,12 +1,23 @@
 import {
-  AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit,
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  OnInit,
   ViewChild
 } from '@angular/core';
 import {Router} from '@angular/router';
 import {NgForm} from '@angular/forms';
 import {LoginService} from './login.service';
 import {
-  APIService, AppStorageService, AudioService, ModalService, OIDBLevel, OIDBLink,
+  APIService,
+  AppStorageService,
+  AudioService,
+  ModalService,
+  OIDBLevel,
+  OIDBLink,
   SettingsService
 } from '../../shared/service';
 import {ComponentCanDeactivate} from './login.deactivateguard';
@@ -484,9 +495,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   private setOnlineSessionToFree = (callback: () => void) => {
     // check if old annotation is already annotated
+    console.log(`call set online session to free`);
     this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
       (json) => {
-        if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
+        if (!isNullOrUndefined(json.data) && json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
           this.subscrmanager.add(this.api.closeSession(this.appStorage.user.id, this.appStorage.data_id, '').subscribe(
             (result2) => {
               callback();
@@ -496,8 +508,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           callback();
         }
       },
-      () => {
+      (err) => {
         // ignore error because this isn't important
+        console.error(err);
         callback();
       }
     ));

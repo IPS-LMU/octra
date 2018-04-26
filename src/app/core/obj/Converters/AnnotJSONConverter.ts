@@ -36,13 +36,17 @@ export class AnnotJSONConverter extends Converter {
       const content = file.content;
 
       if (content !== '') {
-        result = JSON.parse(content);
+        try {
+          result = JSON.parse(content);
 
-        if (result.annotates === audiofile.name) {
-          return {
-            annotjson: result,
-            audiofile: null
-          };
+          if (result.annotates === audiofile.name) {
+            return {
+              annotjson: result,
+              audiofile: null
+            };
+          }
+        } catch (e) {
+          console.log(`No valid AnnotJSON file`);
         }
       }
     }

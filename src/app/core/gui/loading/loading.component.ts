@@ -5,9 +5,10 @@ import {AppStorageService, AudioService, SettingsService, TranscriptionService} 
 import {isNullOrUndefined} from 'util';
 import {Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
-import {IFile, ImportResult, PartiturConverter} from '../../obj/Converters';
+import {IFile, ImportResult} from '../../obj/Converters';
 import {OAudiofile, OLevel} from '../../obj/Annotation';
 import {OIDBLevel} from '../../shared/service/appstorage.service';
+import {AppInfo} from '../../../app.info';
 
 @Component({
   selector: 'app-loading',
@@ -108,12 +109,11 @@ export class LoadingComponent implements OnInit, OnDestroy {
                   responseType: 'text'
                 }).subscribe(
                   (res) => {
-                    console.log(`transcript fetched`);
-                    console.log(res);
 
-                    this.state = 'Import BAF File...';
+                    this.state = 'Import transcript...';
                     let filename = this.appStorage.url_params['transcript'];
                     filename = filename.substr(filename.lastIndexOf('/') + 1);
+                    console.log(`transcript fetched ${filename}`);
 
                     const file: IFile = {
                       name: filename,
@@ -131,7 +131,21 @@ export class LoadingComponent implements OnInit, OnDestroy {
                     oAudioFile.samplerate = audioRessource.info.samplerate;
                     oAudioFile.size = audioRessource.size;
 
-                    const importResult: ImportResult = new PartiturConverter().import(file, oAudioFile);
+                    let importResult: ImportResult;
+                    // find valid converter...
+                    for (let i = 0; i < AppInfo.converters.length; i++) {
+                      const converter = AppInfo.converters[i];
+                      if (filename.indexOf(converter.extension)) {
+                        // test converter
+                        importResult = converter.import(file, oAudioFile);
+
+                        if (!isNullOrUndefined(importResult)) {
+                          console.log(`OK is: ${converter.extension}`);
+                          break;
+                        }
+                      }
+                    }
+
                     if (!isNullOrUndefined(importResult) && !isNullOrUndefined(importResult.annotjson)) {
                       // conversion successfully finished
                       console.log(`Conversion from URL successfully finished`);
@@ -147,6 +161,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                         reject(error);
                       });
                     } else {
+                      this.settService.log = 'Invalid transcript file';
                       reject('importResult is empty');
                     }
                   },

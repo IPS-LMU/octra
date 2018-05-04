@@ -190,15 +190,15 @@
                     }"
                     >
                         <a (mouseup)="setInterface(editor.name)">
-                            <span [innerHTML]="editor.icon"></span> <span class="hidden-sm">{{editor.translate | translate}}</span>
+                            <span [innerHTML]="editor.icon"></span><span class="hidden-sm"> {{editor.translate | translate}}</span>
                         </a>
                     </li>
 
                 </ng-template>
                 <li *ngIf="appStorage.LoggedIn && navbarServ.show_interfaces && settService.app_settings.octra.showdetails">
                     <a (mouseup)="modalstatistics.open()">
-                        <span class="glyphicon glyphicon-th-list navbar-icon"></span> <span
-                            class="hidden-sm">Statistics</span></a>
+                        <span class="glyphicon glyphicon-th-list navbar-icon"></span><span
+                            class="hidden-sm"> Statistics</span></a>
                 </li>
             </ul>
 
@@ -305,7 +305,7 @@
                 <li *ngIf="appStorage.LoggedIn && navbarServ.show_export">
                     <a (mouseup)="modalexport.open()">
                         <span class="glyphicon glyphicon-download navbar-icon"></span>
-                        <span class="hidden-sm hidden-md">{{"general.export" | translate}}</span>
+                        <span class="hidden-sm hidden-md"> {{"general.export" | translate}}</span>
                     </a>
                 </li>
                 <li class="dropdown" [ngStyle]="{

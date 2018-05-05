@@ -1,3 +1,31 @@
+nav {
+    height: 28px;
+    padding: 0;
+    font-size: 0.8em;
+    background-color: #3f51b5;
+}
+
+nav .navbar-toggler-icon {
+    height: 18px;
+    border-color: white;
+}
+
+nav .navbar-toggler {
+    padding: 2px;
+}
+
+nav .navbar-collapse {
+    background-color: #3f51b5;
+}
+
+nav .navbar-brand {
+    margin-left: 7px;
+}
+
+nav .nav-link {
+    text-transform: none;
+}
+
 .navbar ul li a:hover {
     cursor: pointer;
 }
@@ -135,3 +163,4 @@
 #export-table a {
     cursor: pointer;
 }
+

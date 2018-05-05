@@ -121,14 +121,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
       e.stopPropagation();
     });
 
-    jQuery(document).on('mouseleave', '.navbar-collapse.collapse.in', function (e) {
-      //jQuery('.navbar-header button').click();
-    });
-    setTimeout(() => {
-      jQuery(document).ready(function () {
-        jQuery('body').bootstrapMaterialDesign();
-      });
-    }, 200);
+    jQuery('body').bootstrapMaterialDesign();
   }
 
   setInterface(new_interface: string) {

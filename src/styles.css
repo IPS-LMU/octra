@@ -207,3 +207,9 @@ footer {
 #prompt-modal .modal-dialog {
     width: 90%;
 }
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}

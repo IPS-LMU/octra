@@ -20,6 +20,7 @@ import {Segments} from '../../obj/Annotation/Segments';
 import {OCTRANIMATIONS} from '../../shared/OCTRAnimations';
 import {AnnotJSONType} from '../../obj/Annotation/AnnotJSON';
 import {BugReportService, ConsoleType} from '../../shared/service/bug-report.service';
+import {environment} from '../../../../environments/environment';
 
 @Component({
   selector: 'app-navigation',
@@ -47,6 +48,10 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     name: '',
     preparing: false
   };
+
+  public get environment(): any {
+    return environment;
+  }
 
   public export_states = [];
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
@@ -117,10 +122,12 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     });
 
     jQuery(document).on('mouseleave', '.navbar-collapse.collapse.in', function (e) {
-      jQuery('.navbar-header button').click();
+      //jQuery('.navbar-header button').click();
     });
     setTimeout(() => {
-      jQuery.material.init();
+      jQuery(document).ready(function () {
+        jQuery('body').bootstrapMaterialDesign();
+      });
     }, 200);
   }
 

@@ -1,14 +1,14 @@
-.glyphicon-ok {
+.icon-success {
     color: green;
 }
 
-.glyphicon-remove {
+.icon-invalid {
     color: red;
 }
 
-.fa.fa-spinner.fa-spin,
-.glyphicon-ok,
-.glyphicon-remove {
+.icon-success,
+.icon-invalid,
+.icon-wait {
     margin-left: 5px;
 }
 

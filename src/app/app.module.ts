@@ -10,8 +10,16 @@ import {Ng2Webstorage} from 'ngx-webstorage';
 import {LanguageLoader} from './core/shared';
 import {AlertComponent, DropZoneComponent, OctraModalComponent} from './core/component';
 import {
-  FastbarComponent, LoadingComponent, LoginComponent, LogoutComponent, MembersAreaComponent, NavigationComponent,
-  ReloadFileComponent, TranscriptionComponent, TranscriptionEndComponent, TranscrOverviewComponent,
+  FastbarComponent,
+  LoadingComponent,
+  LoginComponent,
+  LogoutComponent,
+  MembersAreaComponent,
+  NavigationComponent,
+  ReloadFileComponent,
+  TranscriptionComponent,
+  TranscriptionEndComponent,
+  TranscrOverviewComponent,
   TranscrWindowComponent
 } from './core/gui';
 
@@ -19,12 +27,21 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {routing} from './app.routes';
 
 import {
-  APIService, AppStorageService, AudioService, KeymappingService, ModalService, NavbarService,
+  APIService,
+  AppStorageService,
+  AudioService,
+  KeymappingService,
+  ModalService,
+  NavbarService,
   SettingsService
 } from './core/shared/service';
 
 import {
-  ALoginGuard, DeALoginGuard, LogoutGuard, MembersAreaGuard, SettingsGuard,
+  ALoginGuard,
+  DeALoginGuard,
+  LogoutGuard,
+  MembersAreaGuard,
+  SettingsGuard,
   TranscrEndGuard
 } from './core/shared/guard';
 
@@ -51,6 +68,13 @@ import {AudioviewerConfig} from './media-components/components/audio/audioviewer
 import {MediaComponentsModule} from './media-components/media-components.module';
 import {TranscrEditorComponent} from './core/component/transcr-editor';
 import {Error404Component} from './core/gui/error404/error404.component';
+//icons
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCheck, faSpinner, faTrash} from '@fortawesome/free-solid-svg-icons';
+import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
+
+library.add(faSpinner, faCheck, faTimes, faTrash);
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -97,6 +121,7 @@ export const ngmodule = {
   entryComponents: EDITORS,
   imports: [
     BrowserModule,
+    FontAwesomeModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

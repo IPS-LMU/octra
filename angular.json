@@ -27,7 +27,6 @@
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "node_modules/bootstrap-material-design/dist/css/bootstrap-material-design.min.css",
-              "node_modules/font-awesome/css/font-awesome.min.css",
               "node_modules/video.js/dist/video-js.min.css",
               "node_modules/summernote/dist/summernote.css",
               "src/styles.css"

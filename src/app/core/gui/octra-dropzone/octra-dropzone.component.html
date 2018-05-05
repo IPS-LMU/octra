@@ -1,15 +1,20 @@
 <app-drop-zone #dropzone [height]="'250px'" (afterdrop)="afterDrop()">
     <table [hidden]="(files.length === 0)" class="dropzone-table">
         <tr *ngFor="let file of files">
-            <td><span class="glyphicon glyphicon-remove-circle delete-icon"
-                      (click)="onDeleteEntry(file.file.name)"></span></td>
+            <td>
+                <fa-icon class="icon-delete" icon="trash" *ngIf="file.status === 'invalid'"
+                         style="font-size:14px; color:dimgray"
+                         (click)="onDeleteEntry(file.file.name)"></fa-icon>
+            </td>
             <td>{{getDropzoneFileString(file.file)}}
             </td>
-            <td><span *ngIf="file.status === 'invalid'" class="glyphicon glyphicon-remove"></span>
-                <span *ngIf="file.status === 'valid'" class="glyphicon glyphicon-ok"></span>
-                <i *ngIf="file.status === 'progress'" class="fa fa-spinner fa-spin"
-                   style="font-size:16px">
-                </i>
+            <td><span class="glyphicon glyphicon-remove"></span>
+                <fa-icon class="icon-invalid" icon="times" *ngIf="file.status === 'invalid'"
+                         style="font-size:16px"></fa-icon>
+                <fa-icon class="icon-success" icon="check" *ngIf="file.status === 'valid'"
+                         style="font-size:16px"></fa-icon>
+                <fa-icon class="icon-wait" icon="spinner" *ngIf="file.status === 'progress'" style="font-size:16px"
+                         [spin]="true"></fa-icon>
             </td>
         </tr>
     </table>

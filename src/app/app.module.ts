@@ -69,7 +69,7 @@ import {Error404Component} from './core/gui/error404/error404.component';
 //icons
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {library} from '@fortawesome/fontawesome-svg-core';
-import {faCheck, faSpinner, faTrash} from '@fortawesome/free-solid-svg-icons';
+import {faCheck, faDownload, faInfoCircle, faSpinner, faTrash} from '@fortawesome/free-solid-svg-icons';
 import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import {ModalModule} from 'ngx-bootstrap';
 import {YesNoModalComponent} from './core/modals/yes-no-modal/yes-no-modal.component';
@@ -80,7 +80,7 @@ import {SupportedFilesModalComponent} from './core/modals/supportedfiles-modal/s
 import {TranscriptionDeleteModalComponent} from './core/modals/transcription-delete-modal/transcription-delete-modal.component';
 import {TranscriptionStopModalComponent} from './core/modals/transcription-stop-modal/transcription-stop-modal.component';
 
-library.add(faSpinner, faCheck, faTimes, faTrash, faExclamationCircle);
+library.add(faSpinner, faCheck, faTimes, faTrash, faExclamationCircle, faInfoCircle, faDownload);
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {

@@ -9,6 +9,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {isNullOrUndefined} from 'util';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
 import {AudioService} from '../../shared/service/audio.service';
+import {TranscriptiptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 
 @Component({
   selector: 'app-reload-file',
@@ -114,5 +115,15 @@ export class ReloadFileComponent implements OnInit {
     this.error = err;
     // TODO CHANGE!
     // this.modService.show('error', err, null);
+  }
+
+  askForAbort() {
+    this.modService.show('transcription_stop').then((answer: TranscriptiptionStopModalAnswer) => {
+      if (answer === TranscriptiptionStopModalAnswer.QUIT) {
+        this.abortTranscription();
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 }

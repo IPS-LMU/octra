@@ -96,7 +96,7 @@
 
                     <input *ngIf="appStorage.usemode === 'local' && getFileStatus() == 'new'"
                            class="btn btn-raised btn-danger offline-delete-btn"
-                           (click)="modService.show('transcription_delete', '', {ok: newTranscription})"
+                           (click)="onTranscriptionDelete()"
                            value="{{'transcription.new' |translate}}"/>
                     <input *ngIf="(appStorage.usemode !== null && appStorage.usemode !== undefined) &&
                     appStorage.usemode === 'online' && (getFileStatus() != 'new' || getFileStatus() != 'start')"

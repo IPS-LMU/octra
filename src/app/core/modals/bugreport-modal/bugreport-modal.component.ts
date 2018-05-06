@@ -70,7 +70,7 @@ export class BugreportModalComponent implements OnInit {
   }
 
   public close(action: ModalAnswer) {
-    this.modalRef.hide();
+    this.modal.hide();
     this.visible = false;
     this.actionperformed.next(action);
   }
@@ -87,7 +87,7 @@ export class BugreportModalComponent implements OnInit {
           this.bugsent = true;
           setTimeout(() => {
             this.bgdescr = '';
-            this.modalRef.hide();
+            this.modal.hide();
             this.visible = false;
             this.bugsent = false;
           }, 2000);

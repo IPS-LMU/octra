@@ -253,12 +253,11 @@
             infoDropdown
             -->
             <li class="nav-item dropdown" *ngIf="(appStorage.LoggedIn && navbarServ.dataloaded)">
-                <a class="nav-link dropdown-toggle" href="#" id="infoDropdown" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false"><span
-                        class="glyphicon glyphicon-info-sign navbar-icon"></span></a>
-                <div class="dropdown-menu info-menu" aria-labelledby="infoDropdown" [ngClass]="{
-                        'collaps': collapsed
-                        }">
+                <a class="nav-link" href="#" id="infoDropdown" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    <fa-icon icon="info-circle" class="navbar-icon"></fa-icon>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right info-menu" aria-labelledby="infoDropdown">
                     <table class="table">
                         <tr *ngIf="appStorage.usemode === 'online'">
                             <td><span>{{'general.project' |translate}}:</span></td>
@@ -313,7 +312,8 @@
             </li>
             <li class="nav-item" *ngIf="appStorage.LoggedIn && navbarServ.show_export">
                 <a class="nav-link" (mouseup)="modalexport.open()">
-                    <span class="glyphicon glyphicon-download navbar-icon"></span>
+                    <fa-icon icon="download" class="navbar-icon"></fa-icon>
+                    <!-- TODO CHNAGE this! -->
                     <span class="hidden-sm hidden-md"> {{"general.export" | translate}}</span>
                 </a>
             </li>
@@ -324,7 +324,7 @@
             <li class="nav-item dropdown" [ngStyle]="{
                 'display': (!(navbarServ.dataloaded && appStorage.LoggedIn)) ? 'none': 'inherit'
                 }">
-                <a href="#" class="nav-link dropdown-toggle" id="optionsDropdown" data-toggle="dropdown" role="button"
+                <a href="#" class="nav-link" id="optionsDropdown" data-toggle="dropdown" role="button"
                    aria-haspopup="true"
                    aria-expanded="false">
                     <span class="glyphicon glyphicon-cog navbar-icon"></span>

@@ -73,8 +73,8 @@ nav .nav-link {
 .info-menu {
 }
 
-.dropdown-menu.options-menu.collaps label,
-.dropdown-menu.info-menu.collaps span {
+.dropdown-menu.options-menu.show label,
+.dropdown-menu.info-menu.show span {
     color: black;
 }
 

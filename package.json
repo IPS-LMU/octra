@@ -49,7 +49,7 @@
     "popper.js": "^1.14.3",
     "rxjs": "^6.1.0",
     "rxjs-compat": "^6.1.0",
-    "summernote": "^0.8.10",
+    "summernote": "^0.8.8",
     "typescript": "2.7.2",
     "video.js": "^5.18.4",
     "web-animations-js": "^2.2.2",

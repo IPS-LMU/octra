@@ -6,9 +6,9 @@ import {isNullOrUndefined} from 'util';
 import {Converter, ImportResult} from '../../obj/Converters';
 import {DropZoneComponent} from '../../component/drop-zone';
 import {SessionFile} from '../../obj/SessionFile';
-import {ModalService} from '../../shared/service';
 import {AudioManager} from '../../../media-components/obj/media/';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {ModalService} from '../../modals/modal.service';
 
 @Component({
   selector: 'app-octra-dropzone',

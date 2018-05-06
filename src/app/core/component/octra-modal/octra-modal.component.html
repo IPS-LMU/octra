@@ -1,17 +1,7 @@
-<bs-modal #yesno>
-    <bs-modal-body>
-        <p style="text-align:center;">{{(data !== undefined) ? data.text : ''}}</p>
-    </bs-modal-body>
-    <bs-modal-footer>
-        <button type="button" class="btn btn-primary" (click)="data.functions.no();yesno.close()">
-            {{"general.no" | translate}}
-        </button>
-        <button type="button" class="btn btn-danger" (click)="data.functions.yes();yesno.close()">
-            {{"general.yes" | translate}}
-        </button>
-    </bs-modal-footer>
-</bs-modal>
+<app-yes-no-modal #yesno></app-yes-no-modal>
+<app-bugreport-modal #bugreport></app-bugreport-modal>
 
+<!--
 <bs-modal #login_invalid>
     <bs-modal-header>
         <h4 class="modal-title">{{"modal.login.header" | translate}}</h4>
@@ -74,63 +64,6 @@
         </button>
     </bs-modal-footer>
 </bs-modal>
-<bs-modal #bugreport id="bugreport">
-    <bs-modal-header>
-        <h3>{{'bug report.report an error' | translate}}</h3>
-    </bs-modal-header>
-    <bs-modal-body>
-        <div *ngIf="bugsent" class="text-success bugsent">{{'bug report.sent' | translate}}</div>
-        <form class="form-vertical">
-            <fieldset>
-                <div class="form-group">
-                    <label for="inputEmail" class="col-md-2 control-label">{{'general.email' | translate}}</label>
-
-                    <div class="col-md-10">
-                        <input [(ngModel)]="bgemail" name="email" class="form-control" id="inputEmail"
-                               placeholder="{{'general.email' | translate}}" type="email" email>
-                    </div>
-                </div>
-                <div class="form-group" style="margin-bottom:20px;">
-                    <label for="bgDescr" class="col-md-2 control-label">{{'general.description' | translate}}</label>
-
-                    <div class="col-md-10">
-                        <textarea [(ngModel)]="bgdescr" name="bgdescr" class="form-control" rows="3" id="bgDescr"
-                                  maxlength="300"></textarea>
-                        <span class="help-block">(German or English)</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <div class="checkbox" style="margin-top:20px;">
-                            <label>
-                                <input [(ngModel)]="sendpro_obj" name="sendpro" #sendpro type="checkbox" checked>
-                                {{"bug report.send protocol" | translate}}
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group" [hidden]="!sendpro.checked">
-                    <label for="bgProtocol" class="col-md-2 control-label">{{'general.protocol' | translate}}:</label>
-                    <div class="col-md-10">
-                        <textarea *ngIf="bugreport.visible" class="form-control" #bgProtocol
-                                  [innerHTML]="bugService.getText()" id="bgProtocol"
-                                  disabled></textarea>
-                    </div>
-                </div>
-            </fieldset>
-        </form>
-    </bs-modal-body>
-    <bs-modal-footer>
-        <bs-modal-footer>
-            <button type="button" class="btn btn-default" data-dismiss="modal" (click)="bugreport.dismiss()">
-                {{"general.abort" | translate}}
-            </button>
-            <button type="button" class="btn btn-primary" (click)="sendBugReport()" [disabled]="!isvalid">
-                {{"bug report.report an error" | translate}}
-            </button>
-        </bs-modal-footer>
-    </bs-modal-footer>
-</bs-modal>
 <bs-modal #supportedfiles id="supportedfiles">
     <bs-modal-header>
         <h3>{{'modal.supported.header' | translate}}</h3>
@@ -166,3 +99,4 @@
         </bs-modal-footer>
     </bs-modal-footer>
 </bs-modal>
+-->

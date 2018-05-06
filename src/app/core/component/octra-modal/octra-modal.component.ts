@@ -1,6 +1,6 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {ModalService} from '../../shared/service/modal.service';
+import {ModalService} from '../../modals/modal.service';
 import {isNullOrUndefined} from 'util';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import {APIService} from '../../shared/service/api.service';
@@ -37,14 +37,6 @@ export class OctraModalComponent implements OnInit, OnDestroy {
 
   public data: any;
 
-  public get isvalid(): boolean {
-    if (this.sendpro_obj || this.bgdescr !== '') {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   constructor(private modService: ModalService,
               public bugService: BugReportService,
               private api: APIService,
@@ -61,38 +53,30 @@ export class OctraModalComponent implements OnInit, OnDestroy {
       (result: any) => {
         this.data = result;
 
-        if (!isNullOrUndefined(result.type)) {
-          this[result.type].open();
+        console.log('here!');
+        if (!isNullOrUndefined(result.type) && this[result.type] !== undefined) {
+          console.log(result.data);
+          this[result.type].open(result.data).then(
+            (answer) => {
+              result.emitter.emit(answer);
+            }
+          ).catch(
+            (err) => {
+              console.error(err);
+            }
+          );
+          /*
           jQuery(function () {
             jQuery('[data-toggle="tooltip"]').tooltip();
-          });
+          });*/
         } else {
-          throw new Error('modal function not supported');
+          const emitter: EventEmitter<any> = result.emitter;
+          emitter.error('modal function not supported');
         }
       }));
   }
 
   ngOnDestroy() {
     this._subscrmanager.destroy();
-  }
-
-  sendBugReport() {
-    this.appStorage.email = this.bgemail;
-
-    this._subscrmanager.add(
-      this.bugService.sendReport(this.bgemail, this.bgdescr, this.sendpro_obj, {
-        auth_token: this.settService.app_settings.octra.bugreport.auth_token,
-        url: this.settService.app_settings.octra.bugreport.url
-      }).subscribe(
-        (result) => {
-          this.bugsent = true;
-          setTimeout(() => {
-            this.bgdescr = '';
-            this.bugreport.close();
-            this.bugsent = false;
-          }, 2000);
-        }
-      )
-    );
   }
 }

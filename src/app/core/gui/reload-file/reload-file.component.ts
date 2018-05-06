@@ -4,7 +4,7 @@ import {SessionFile} from '../../obj/SessionFile';
 import {FileSize, Functions} from '../../shared/Functions';
 import {Router} from '@angular/router';
 import {TranscriptionService} from '../../shared/service/transcription.service';
-import {ModalService} from '../../shared/service/modal.service';
+import {ModalService} from '../../modals/modal.service';
 import {TranslateService} from '@ngx-translate/core';
 import {isNullOrUndefined} from 'util';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
@@ -112,6 +112,7 @@ export class ReloadFileComponent implements OnInit {
 
   private showErrorMessage(err: string) {
     this.error = err;
-    this.modService.show('error', err, null);
+    // TODO CHANGE!
+    // this.modService.show('error', err, null);
   }
 }

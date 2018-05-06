@@ -11,15 +11,7 @@ import {
 import {Router} from '@angular/router';
 import {NgForm} from '@angular/forms';
 import {LoginService} from './login.service';
-import {
-  APIService,
-  AppStorageService,
-  AudioService,
-  ModalService,
-  OIDBLevel,
-  OIDBLink,
-  SettingsService
-} from '../../shared/service';
+import {APIService, AppStorageService, AudioService, OIDBLevel, OIDBLink, SettingsService} from '../../shared/service';
 import {ComponentCanDeactivate} from './login.deactivateguard';
 import {Observable} from 'rxjs/Observable';
 import {FileSize, Functions, OCTRANIMATIONS, SubscriptionManager} from '../../shared';
@@ -31,6 +23,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {Converter} from '../../obj/Converters';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
 import 'rxjs/add/operator/catch';
+import {ModalService} from '../../modals/modal.service';
 
 @Component({
   selector: 'app-login',
@@ -410,9 +403,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           if (!isNullOrUndefined(this.appStorage.user) &&
             !isNullOrUndefined(this.appStorage.user.project) && this.appStorage.user.project !== '') {
             if (isNullOrUndefined(this.projects.find(
-                (x) => {
-                  return x === this.appStorage.user.project;
-                }))) {
+              (x) => {
+                return x === this.appStorage.user.project;
+              }))) {
               // make sure that old project is in list
               this.projects.push(this.appStorage.user.project);
             }

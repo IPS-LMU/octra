@@ -76,6 +76,7 @@ import {YesNoModalComponent} from './core/modals/yes-no-modal/yes-no-modal.compo
 import {ModalService} from './core/modals/modal.service';
 import {BugreportModalComponent} from './core/modals/bugreport-modal/bugreport-modal.component';
 import {faExclamationCircle} from '@fortawesome/free-solid-svg-icons/faExclamationCircle';
+import {SupportedFilesModalComponent} from './core/modals/supportedfiles-modal/supportedfiles-modal.component';
 
 library.add(faSpinner, faCheck, faTimes, faTrash, faExclamationCircle);
 
@@ -121,7 +122,8 @@ export const ngmodule = {
     TranscrWindowComponent,
     Error404Component,
     YesNoModalComponent,
-    BugreportModalComponent
+    BugreportModalComponent,
+    SupportedFilesModalComponent
   ],
   entryComponents: EDITORS,
   imports: [

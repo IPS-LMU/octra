@@ -24,7 +24,6 @@ import {
   Entry,
   KeymappingService,
   MessageService,
-  ModalService,
   NavbarService,
   SettingsService,
   TranscriptionService,
@@ -47,6 +46,7 @@ import {HttpClient} from '@angular/common/http';
 import {IFile, PartiturConverter} from '../../obj/Converters';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import * as X2JS from 'x2js';
+import {ModalService} from '../../modals/modal.service';
 
 @Component({
   selector: 'app-transcription',

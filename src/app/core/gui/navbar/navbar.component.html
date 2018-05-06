@@ -1,4 +1,4 @@
-<bs-modal #modalexport>
+<!-- <bs-modal #modalexport>
     <bs-modal-header>
         <h4 class="modal-title">{{"general.export data" | translate}}</h4>
     </bs-modal-header>
@@ -76,6 +76,7 @@
         </button>
     </bs-modal-footer>
 </bs-modal>
+
 <bs-modal #modalstatistics id="modalstatis">
     <bs-modal-header>
         <h4 class="modal-title">Statistics</h4>
@@ -140,6 +141,7 @@
         </button>
     </bs-modal-footer>
 </bs-modal>
+
 <bs-modal #promptmodal id="prompt-modal">
     <bs-modal-header>
         <h4 class="modal-title">{{"general.prompt" | translate}}</h4>
@@ -153,6 +155,7 @@
         </button>
     </bs-modal-footer>
 </bs-modal>
+-->
 
 <nav class="navbar navbar-expand-md navbar-dark">
     <a class="navbar-brand" href="#">OCTRA v{{version}}</a>
@@ -393,32 +396,33 @@
                     </table>
                 </div>
             </li>
+
+            <!--
+            BugReport
+            -->
             <li class="nav-item"
                 *ngIf="settService.app_settings !== undefined && settService.app_settings.octra.bugreport !== undefined && settService.app_settings.octra.bugreport.enabled">
                 <a class="nav-link" (mouseup)="openBugReport()">
-                        <span class="glyphicon glyphicon-exclamation-sign navbar-icon" style="color:#fcffba"
-                              [ngStyle]="{
+                    <fa-icon icon="exclamation-circle" class="navbar-icon" style="color:#fcffba"
+                             [ngStyle]="{
                             color: (errorsFound) ? 'red' : '#fcffba'
                         }"
-                        ></span>
+                    ></fa-icon>
                 </a>
             </li>
 
             <!--
             languageDropdown
             -->
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" data-toggle="dropdown"
+            <li class="nav-item dropdown active">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
-                    {{langService.currentLang | uppercase}} <b class="caret"></b>
+                    {{langService.currentLang | uppercase}} <span class="caret"></span>
                 </a>
-                <div class="dropdown-menu options-menu" aria-labelledby="optionsDropdown" [ngClass]="{
-                        'collaps': collapsed
-                    }">
-                    <a class="dropdown-item" *ngFor="let item of langService.getLangs();" href="#"
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" *ngFor="let item of langService.getLangs();"
                        (click)="changeLanguage(item)">
-                        {{item | uppercase}}
-                    </a>
+                        {{item | uppercase}}</a>
                 </div>
             </li>
         </ul>

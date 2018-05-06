@@ -1,0 +1,13 @@
+<ng-template #modal>
+    <div class="modal-body">
+        {{data?.text}}
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="close('no')">
+            {{"general.no" | translate}}
+        </button>
+        <button type="button" class="btn btn-danger" (click)="close('yes')">
+            {{"general.yes" | translate}}
+        </button>
+    </div>
+</ng-template>

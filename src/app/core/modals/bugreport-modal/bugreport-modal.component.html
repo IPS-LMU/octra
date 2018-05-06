@@ -1,0 +1,59 @@
+<div bsModal #modal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1"
+     id="bugreport">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="dialog-sizes-name1" class="modal-title pull-left">{{'bug report.report an error' |
+                    translate}}</h3>
+            </div>
+            <div class="modal-body">
+                <div *ngIf="bugsent" class="text-success bugsent">{{'bug report.sent' | translate}}</div>
+
+                <form>
+                    <fieldset>
+                        <div class="form-group">
+                            <label for="inputEmail">{{'general.email' |
+                                translate}}</label>
+
+                            <input [(ngModel)]="bgemail" name="email" class="form-control" id="inputEmail"
+                                   placeholder="{{'general.email' | translate}}" type="email" email>
+                        </div>
+                        <div class="form-group" style="margin-bottom:20px;">
+                            <label for="bgDescr">{{'general.description' |
+                                translate}}</label>
+
+                            <textarea [(ngModel)]="bgdescr" name="bgdescr" class="form-control" rows="3"
+                                      id="bgDescr"
+                                      maxlength="300" aria-describedby="descrHelp"></textarea>
+                            <small id="descrHelp" class="form-text text-muted">(German or English)</small>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox" style="margin-top:20px;">
+                                <label>
+                                    <input [(ngModel)]="sendpro_obj" name="sendpro" #sendpro type="checkbox"
+                                           checked>
+                                    {{"bug report.send protocol" | translate}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group" [hidden]="!sendpro.checked">
+                            <label for="bgProtocol">{{'general.protocol' |
+                                translate}}:</label>
+                            <textarea class="form-control" #bgProtocol *ngIf="visible"
+                                      id="bgProtocol"
+                                      disabled [innerHTML]="bugService.getText()"></textarea>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="close('CANCEL')">
+                    {{"general.abort" | translate}}
+                </button>
+                <button type="button" class="btn btn-primary" (click)="close('SEND')" [disabled]="!isvalid">
+                    {{"bug report.report an error" | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

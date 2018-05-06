@@ -5,7 +5,6 @@ import {NavbarService} from './navbar.service';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {TranslateService} from '@ngx-translate/core';
 import {isNullOrUndefined} from 'util';
-import {ModalService} from '../../shared/service/modal.service';
 import {Converter, IFile} from '../../obj/Converters/Converter';
 import {AppInfo} from '../../../app.info';
 import {TextConverter} from '../../obj/Converters/TextConverter';
@@ -21,6 +20,7 @@ import {OCTRANIMATIONS} from '../../shared/OCTRAnimations';
 import {AnnotJSONType} from '../../obj/Annotation/AnnotJSON';
 import {BugReportService, ConsoleType} from '../../shared/service/bug-report.service';
 import {environment} from '../../../../environments/environment';
+import {ModalService} from '../../modals/modal.service';
 
 @Component({
   selector: 'app-navigation',
@@ -180,7 +180,11 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   openBugReport() {
-    this.modService.show('bugreport');
+    this.modService.show('bugreport').then((action) => {
+      console.log(action);
+    }).catch((err) => {
+      console.error(err);
+    });
   }
 
   onSelectionChange(converter: Converter, value: any) {
@@ -364,8 +368,8 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onLevelRemoveClick(tiernum: number, id: number) {
-    this.modService.show('yesno', 'The Tier will be deleted permanently. Are you sure?', {
-      yes: () => {
+    this.modService.show('yesno', 'The Tier will be deleted permanently. Are you sure?').then((answer) => {
+      if (answer === 'yes') {
         if (this.transcrServ.annotation.levels.length > 1) {
           this.appStorage.removeAnnotationLevel(tiernum, id).catch((err) => {
             console.error(err);
@@ -378,10 +382,11 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
           });
         }
         this.collapsed = false;
-      },
-      no: () => {
+      } else {
         this.collapsed = false;
       }
+    }).catch((error) => {
+      console.error(error);
     });
   }
 

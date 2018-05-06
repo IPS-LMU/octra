@@ -4,7 +4,6 @@ import {BrowserModule} from '@angular/platform-browser';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {TranslateLoader, TranslateModule, TranslateService} from '@ngx-translate/core';
 // third-party
-import {BsModalModule} from 'ng2-bs3-modal';
 import {Ng2Webstorage} from 'ngx-webstorage';
 // other
 import {LanguageLoader} from './core/shared';
@@ -31,7 +30,6 @@ import {
   AppStorageService,
   AudioService,
   KeymappingService,
-  ModalService,
   NavbarService,
   SettingsService
 } from './core/shared/service';
@@ -73,8 +71,13 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faCheck, faSpinner, faTrash} from '@fortawesome/free-solid-svg-icons';
 import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
+import {ModalModule} from 'ngx-bootstrap';
+import {YesNoModalComponent} from './core/modals/yes-no-modal/yes-no-modal.component';
+import {ModalService} from './core/modals/modal.service';
+import {BugreportModalComponent} from './core/modals/bugreport-modal/bugreport-modal.component';
+import {faExclamationCircle} from '@fortawesome/free-solid-svg-icons/faExclamationCircle';
 
-library.add(faSpinner, faCheck, faTimes, faTrash);
+library.add(faSpinner, faCheck, faTimes, faTrash, faExclamationCircle);
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -116,12 +119,16 @@ export const ngmodule = {
     TranscriptionEndComponent,
     TranscrOverviewComponent,
     TranscrWindowComponent,
-    Error404Component
+    Error404Component,
+    YesNoModalComponent,
+    BugreportModalComponent
   ],
   entryComponents: EDITORS,
   imports: [
     BrowserModule,
     FontAwesomeModule,
+    ModalModule.forRoot(),
+    BsDropdownModule.forRoot(),
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
@@ -129,7 +136,6 @@ export const ngmodule = {
         deps: [HttpClient]
       }
     }),
-    BsDropdownModule.forRoot(),
     CollapseModule.forRoot(),
     FormsModule,
     HttpClientModule,
@@ -138,7 +144,6 @@ export const ngmodule = {
       separator: '.',
       prefix: 'custom'
     }),
-    BsModalModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
     MediaComponentsModule,

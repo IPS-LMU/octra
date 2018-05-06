@@ -77,6 +77,8 @@ import {ModalService} from './core/modals/modal.service';
 import {BugreportModalComponent} from './core/modals/bugreport-modal/bugreport-modal.component';
 import {faExclamationCircle} from '@fortawesome/free-solid-svg-icons/faExclamationCircle';
 import {SupportedFilesModalComponent} from './core/modals/supportedfiles-modal/supportedfiles-modal.component';
+import {TranscriptionDeleteModalComponent} from './core/modals/transcription-delete-modal/transcription-delete-modal.component';
+import {TranscriptionStopModalComponent} from './core/modals/transcription-stop-modal/transcription-stop-modal.component';
 
 library.add(faSpinner, faCheck, faTimes, faTrash, faExclamationCircle);
 
@@ -123,7 +125,9 @@ export const ngmodule = {
     Error404Component,
     YesNoModalComponent,
     BugreportModalComponent,
-    SupportedFilesModalComponent
+    SupportedFilesModalComponent,
+    TranscriptionDeleteModalComponent,
+    TranscriptionStopModalComponent
   ],
   entryComponents: EDITORS,
   imports: [

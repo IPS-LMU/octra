@@ -24,6 +24,7 @@ import {Converter} from '../../obj/Converters';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
 import 'rxjs/add/operator/catch';
 import {ModalService} from '../../modals/modal.service';
+import {ModalAnswer} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
 
 @Component({
   selector: 'app-login',
@@ -331,6 +332,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   newTranscription = () => {
+    console.log(`in new Transcription!`);
     this.audioService.registerAudioManager(this.dropzone.audiomanager);
 
     this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
@@ -518,5 +520,15 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     reader.readAsText(file, 'utf-8');
   }
 
-
+  onTranscriptionDelete() {
+    this.modService.show('transcription_delete').then((answer: ModalAnswer) => {
+      console.log(`answer: ${answer}`);
+      if (answer === ModalAnswer.DELETE) {
+        console.log('new Transcription!');
+        this.newTranscription();
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
+  }
 }

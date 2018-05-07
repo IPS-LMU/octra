@@ -10,6 +10,23 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {LeadingNullPipe, ProcentPipe, SecondsPipe, TimespanPipe} from './pipe';
 import {Timespan2Pipe} from './pipe/timespan2.pipe';
+// icons
+import {library} from '@fortawesome/fontawesome';
+import {
+  faForward,
+  faPause,
+  faPlay,
+  faRetweet,
+  faStepBackward,
+  faStepForward,
+  faStop,
+  faVolumeDown,
+  faVolumeUp
+} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {faClock} from '@fortawesome/free-regular-svg-icons';
+
+library.add(faPlay, faPause, faStop, faForward, faStepForward, faStepBackward, faRetweet, faClock, faVolumeUp, faVolumeDown);
 
 @NgModule({
   imports: [
@@ -17,7 +34,8 @@ import {Timespan2Pipe} from './pipe/timespan2.pipe';
     FormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FontAwesomeModule
   ],
   declarations: [
     AudioNavigationComponent,

@@ -70,13 +70,29 @@ import {Error404Component} from './core/gui/error404/error404.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {
+  faBook,
   faCheck,
+  faChevronDown,
   faCog,
   faDownload,
+  faEdit,
   faExclamationCircle,
+  faExclamationTriangle,
+  faEye,
+  faFile,
+  faFolderOpen,
   faInfoCircle,
+  faKeyboard,
+  faMinus,
+  faPaperPlane,
+  faPlus,
+  faQuestionCircle,
+  faSave,
+  faSignOutAlt,
   faSpinner,
-  faTrash
+  faThList,
+  faTrash,
+  faWindowMaximize
 } from '@fortawesome/free-solid-svg-icons';
 import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import {ModalModule} from 'ngx-bootstrap';
@@ -86,9 +102,14 @@ import {BugreportModalComponent} from './core/modals/bugreport-modal/bugreport-m
 import {SupportedFilesModalComponent} from './core/modals/supportedfiles-modal/supportedfiles-modal.component';
 import {TranscriptionDeleteModalComponent} from './core/modals/transcription-delete-modal/transcription-delete-modal.component';
 import {TranscriptionStopModalComponent} from './core/modals/transcription-stop-modal/transcription-stop-modal.component';
-import {faTimesCircle} from '@fortawesome/free-regular-svg-icons';
+import {faCopy, faTimesCircle} from '@fortawesome/free-regular-svg-icons';
+import {faCheckCircle} from '@fortawesome/free-regular-svg-icons/faCheckCircle';
+import {faChevronUp} from '@fortawesome/fontawesome-free-solid';
 
-library.add(faSpinner, faCheck, faTimes, faTrash, faExclamationCircle, faInfoCircle, faDownload, faTimesCircle, faCog);
+library.add(
+  faSpinner, faCheck, faTimes, faTrash, faExclamationCircle, faInfoCircle, faDownload,
+  faTimesCircle, faCog, faFolderOpen, faCheckCircle, faThList, faBook, faCopy, faPlus, faSignOutAlt, faEdit, faFile,
+  faKeyboard, faEye, faExclamationTriangle, faSave, faQuestionCircle, faChevronUp, faChevronDown, faPaperPlane, faMinus, faWindowMaximize);
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {

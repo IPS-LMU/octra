@@ -62,9 +62,9 @@
     background-color: white;
     padding: 5px;
     height: 30px;
-    position: absolute;
+    position: relative;
     bottom: 0;
-    margin-bottom: 50px;
+    margin-bottom: 0px;
     width: 100%;
     z-index: 80;
     display: flex;

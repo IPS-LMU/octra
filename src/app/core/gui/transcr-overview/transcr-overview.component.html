@@ -42,11 +42,8 @@
     <tr *ngFor="let segment of shown_segments; let i = index"
         [ngClass]="{success: (segment.transcription.text != '' && segment.transcription.text != transcrService.break_marker.code), info: (segment.transcription.text == transcrService.break_marker.code), danger: (segment.transcription.text == '')}">
         <td style="width:25px;">
-            <span class="glyphicon glyphicon-warning-sign segment-warning"
-                  [ngStyle]="{
-                  'display': ((segment.transcription.html.indexOf('<div class=\'error_underline\'') > -1) ? 'normal': 'none')}"
-            >
-            </span>
+            <fa-icon icon="exclamation-triangle" class="segment-warning" [ngStyle]="{
+                  'display': ((segment.transcription.html.indexOf('<div class=\'error_underline\'') > -1) ? 'normal': 'none')}"></fa-icon>
         </td>
         <td><span class="link segment-number" (click)="onSegmentClicked(i)"># {{i+1 | leadingnull: shown_segments.length}}</span>
         </td>

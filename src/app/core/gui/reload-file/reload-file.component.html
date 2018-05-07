@@ -11,18 +11,21 @@
     <div class="row" role="group">
         <button class="btn btn-default btn-raised col-md-4"
                 (click)="askForAbort()">
-            <span class="glyphicon glyphicon glyphicon-log-out"></span> <span
-                class="hidden-xs hidden-sm hidden-md">{{"transcription.stop" | translate}}</span>
+            <fa-icon icon="sign-out-alt"></fa-icon>
+            <span
+                    class="hidden-xs hidden-sm hidden-md"> {{"transcription.stop" | translate}}</span>
         </button>
         <button class="btn btn-default btn-raised btn-danger col-md-4" [disabled]="!(dropzone.status === 'valid')"
                 (click)="modService.show('transcription_delete', '', {ok: newTranscription})">
-            <span class="glyphicon glyphicon-file"></span> <span class="hidden-xs hidden-sm hidden-md">{{"transcription.new" | translate}}</span>
+            <fa-icon icon="file"></fa-icon>
+            <span class="hidden-xs hidden-sm hidden-md"> {{"transcription.new" | translate}}</span>
         </button>
         <button type="button" class="btn btn-primary btn-raised col-md-4"
                 [disabled]="!(!isN(dropzone.oaudiofile) && sessionfile !== null && dropzone.oaudiofile.name === sessionfile.name && isN(dropzone.oannotation))"
                 (click)="onOfflineSubmit()">
-            <span class="glyphicon glyphicon glyphicon-edit"></span> <span
-                class="hidden-xs hidden-sm hidden-md">{{"transcription.start" | translate}}</span>
+            <fa-icon icon="edit"></fa-icon>
+            <span
+                    class="hidden-xs hidden-sm hidden-md"> {{"transcription.start" | translate}}</span>
         </button>
     </div>
 </div>

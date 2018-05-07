@@ -25,8 +25,8 @@
                             <td>{{elem.application}}</td>
                             <td>*{{elem.extension}}</td>
                             <td>
-                            <span *ngIf="elem.notice !== ''" class="glyphicon glyphicon-info-sign"
-                                  [attr.title]="elem.notice"></span>
+                                <fa-icon *ngIf="elem.notice !== ''" icon="info-circle"
+                                         [attr.title]="elem.notice"></fa-icon>
                             </td>
                         </tr>
                     </ng-container>

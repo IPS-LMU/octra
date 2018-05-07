@@ -192,7 +192,8 @@
                     }"
                 >
                     <a class="nav-link" (mouseup)="setInterface(editor.name)">
-                        <span [innerHTML]="editor.icon"></span><span
+                        <fa-icon [icon]="['fas', editor.icon]"></fa-icon>
+                        <span
                             class="hidden-sm"> {{editor.translate | translate}}</span>
                     </a>
                 </li>
@@ -200,8 +201,8 @@
             <li class="nav-item"
                 *ngIf="appStorage.LoggedIn && navbarServ.show_interfaces && settService.app_settings.octra.showdetails">
                 <a class="nav-link" (mouseup)="modalstatistics.open()">
-                    <span class="glyphicon glyphicon-th-list navbar-icon"></span><span
-                        class="hidden-sm"> Statistics</span></a>
+                    <fa-icon icon="th-list" class="navbar-icon"></fa-icon>
+                    <span class="hidden-sm"> Statistics</span></a>
             </li>
         </ul>
         <ul class="navbar-nav mt-2 mt-md-0">
@@ -216,7 +217,7 @@
                    aria-expanded="false">
                     {{(transcrServ.currentlevel.name.length > 30) ? transcrServ.currentlevel.name.substr(0, 30) +
                     '...' : transcrServ.currentlevel.name}}
-                    <span class="glyphicon glyphicon-book navbar-icon"></span>
+                    <fa-icon icon="book" class="navbar-icon"></fa-icon>
                 </a>
                 <div class="dropdown-menu options-menu" aria-labelledby="tiersDropdown" [ngClass]="{
                         'collaps': collapsed
@@ -236,15 +237,17 @@
                                 maxlength="100" value="{{level.name}}"/>
                         </div>
                         <div class="col-3">
-                                <span style="cursor:pointer;" class="glyphicon glyphicon-trash"
-                                      (click)="onLevelRemoveClick(i, level.id)"></span>
-                            <span *ngIf="level.type === AnnotJSONType.SEGMENT"
-                                  style="margin-left:3px;cursor:pointer;" class="glyphicon glyphicon-duplicate"
-                                  (click)="onLevelDuplicateClick(i, level.id)"></span>
+                            <fa-icon icon="trash" style="cursor: pointer;"
+                                     (click)="onLevelRemoveClick(i, level.id)"></fa-icon>
+                            <fa-icon [icon]="['far', 'copy']" *ngIf="level.type === AnnotJSONType.SEGMENT"
+                                     style="margin-left:3px;cursor:pointer;"
+                                     (click)="onLevelDuplicateClick(i, level.id)"></fa-icon>
                         </div>
                     </div>
                     <div class="row level-add-row" (click)="onLevelAddClick()">
-                        <div class="col-12"><span class="glyphicon glyphicon-plus"></span></div>
+                        <div class="col-12">
+                            <fa-icon icon="plus"></fa-icon>
+                        </div>
                     </div>
                 </div>
             </li>

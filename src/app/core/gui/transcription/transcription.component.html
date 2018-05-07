@@ -134,8 +134,8 @@
 
 <div class="flex">
     <span id='saving'>
-        <span *ngIf="saving === 'saving'" style="color:#333333" class="glyphicon glyphicon-floppy-disk"></span>
-        <span *ngIf="saving === 'error'" style="color:red" class="glyphicon glyphicon-floppy-disk"></span>
+        <fa-icon *ngIf="saving === 'saving'" style="color:#333333" icon="save"></fa-icon>
+        <fa-icon *ngIf="saving === 'error'" style="color:red" icon="save"></fa-icon>
     </span>
     <app-fastbar
             [responsive]="responsive"
@@ -167,16 +167,11 @@
                         class="required_marker" *ngIf="transcrService.feedback.required">*</span></span>
                 </td>
                 <td style="text-align: right">
-                    <span *ngIf="!feedback_expanded" class="glyphicon glyphicon-chevron-up"
-                          (click)="expandFeedback()"
-                          style="color:grey; display: block; padding:0;cursor:pointer;margin-bottom:10px;"
-                    >
-                    </span>
-                    <span *ngIf="feedback_expanded" class="glyphicon glyphicon-chevron-down"
-                          (click)="expandFeedback()"
-                          style="color:grey; display: block; padding:0;cursor:pointer;margin-bottom:10px;"
-                    >
-                    </span>
+                    <fa-icon *ngIf="!feedback_expanded" icon="chevron-up" (click)="expandFeedback()"
+                             style="color:grey; display: block; padding:0;cursor:pointer;margin-bottom:10px;"></fa-icon>
+
+                    <fa-icon *ngIf="feedback_expanded" icon="chevron-down" (click)="expandFeedback()"
+                             style="color:grey; display: block; padding:0;cursor:pointer;margin-bottom:10px;"></fa-icon>
                 </td>
             </tr>
             </tbody>
@@ -244,19 +239,19 @@
             <span
                     *ngIf="!appStorage.easymode"
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.export data" | translate}}</span>
-            <span class="glyphicon glyphicon-download"></span>
+            <fa-icon icon="download"></fa-icon>
         </button>
         <button type="button" class="btn btn-primary btn-raised col-md-6"
                 (click)="onSendButtonClick()" *ngIf="appStorage.usemode === 'online'">
             <span
                     *ngIf="!appStorage.easymode"
                     [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"transcription.send" | translate}}</span>
-            <span class="glyphicon glyphicon-send"></span>
+            <fa-icon icon="paper-plane"></fa-icon>
         </button>
         <button type="button" class="btn btn-primary btn-raised"
                 (click)="onSaveTranscriptionButtonClicked()" *ngIf="appStorage.usemode === 'url'">
             <span>SAVE TRANSCRIPTION</span>
-            <span class="glyphicon glyphicon-send"></span>
+            <fa-icon icon="paper-plane"></fa-icon>
         </button>
     </div>
 </div>

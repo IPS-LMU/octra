@@ -53,11 +53,6 @@ nav .nav-link {
     padding: 0;
 }
 
-.glyphicon {
-    font-size: 100%;
-    color: #0b0080;
-}
-
 .navbar-icon {
     color: white;
     font-size: 100%;
@@ -135,10 +130,6 @@ nav .nav-link {
 
 .row.level-row .col-8 .selected {
     border: 1px solid lightgray;
-}
-
-.row.level-row .col-2 .glyphicon.glyphicon-trash {
-    cursor: pointer;
 }
 
 .row.level-add-row {

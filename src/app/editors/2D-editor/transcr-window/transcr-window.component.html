@@ -1,5 +1,7 @@
 <div id="window" #window>
-    <div class="window-nav-top"><span class="glyphicon glyphicon-remove close" (click)="close();"></span></div>
+    <div class="window-nav-top">
+        <fa-icon icon="times" class="close" (click)="close();"></fa-icon>
+    </div>
 
     <app-audio-navigation #audionav
                           (buttonclick)="onButtonClick($event)"
@@ -61,30 +63,29 @@
                         <a class="btn btn-default btn-raised" (click)="save();doit('left');">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'visible-xs visible-sm visible-md': responsive && !easymode}">
-                                <span class="glyphicon glyphicon-floppy-save"></span>&
-                                <span class="glyphicon glyphicon-menu-left"></span>
+                                <fa-icon icon="save"></fa-icon> & <fa-icon icon="arrow-left"></fa-icon>
                             </span>
                             <span *ngIf="!easymode" [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">
-                            {{"general.save" | translate}} &
+                             {{"general.save" | translate}} &
                             {{"segments.previous" | translate}}
                             </span>
                         </a>
                         <a class="btn btn-default btn-raised" (click)="save();close();">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'visible-xs visible-sm visible-md': responsive && !easymode}">
-                                <span class="glyphicon glyphicon-floppy-save"></span>
+                                <fa-icon icon="save"></fa-icon>
                             </span>
                             <span *ngIf="!easymode" [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">
-                            {{"general.save" | translate}} & {{"general.close" | translate}}
+                             {{"general.save" | translate}} & {{"general.close" | translate}}
                             </span>
                         </a>
                         <a class="btn btn-default btn-raised" (click)="save();doit('right');">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'visible-xs visible-sm visible-md': responsive && !easymode}">
-                                <span class="glyphicon glyphicon-floppy-save"></span>&
-                                <span class="glyphicon glyphicon-menu-right"></span></span>
+                                <fa-icon icon="save"></fa-icon> & <fa-icon icon="arrow-right"></fa-icon>
+                            </span>
                             <span *ngIf="!easymode" [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">
-                            {{"general.save" | translate}} &
+                             {{"general.save" | translate}} &
                             {{"segments.next" | translate}}
                             </span>
                         </a>

@@ -31,19 +31,19 @@
             {{"general.no guidelines found" | translate}}
         </div>
         <div class="row" *ngFor="let instructions of shown_guidelines.instructions;let j = index;">
-            <div class="col-xs-12">
+            <div class="col-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">{{instructions.group}}</div>
                     <div class="panel-body" *ngIf="collapsed.length > 0">
                         <div class="row select-row" *ngFor="let entry of instructions.entries;let k = index;">
-                            <div class="col-xs-1 chevron" (click)="toggle(j,k)">
+                            <div class="col-1 chevron" (click)="toggle(j,k)">
                                 <span *ngIf="collapsed[j][k]" class="glyphicon glyphicon glyphicon-chevron-down"></span>
                                 <span *ngIf="!collapsed[j][k]" class="glyphicon glyphicon glyphicon-chevron-up"></span>
                             </div>
-                            <div class="col-xs-1 code" (click)="toggle(j,k)">
+                            <div class="col-1 code" (click)="toggle(j,k)">
                                 {{entry.code}}
                             </div>
-                            <div class="col-xs-9">
+                            <div class="col-9">
                                 <span class="guidelines-title" (click)="toggle(j,k)">{{entry.title}}</span>
                                 <div class="row entry-row" [collapse]="collapsed[j][k]">
                                     <div [ngClass]="{
@@ -91,7 +91,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-xs-1 hidden-xs col-priority" (click)="toggle(j,k)">
+                            <div class="col-1 hidden-xs col-priority" (click)="toggle(j,k)">
                                 <span class="label label-info">{{entry.priority}}</span>
                             </div>
                         </div>

@@ -1,12 +1,18 @@
+.w-20 {
+    width: 20%;
+}
+
 .slider {
     padding: 0;
+    width: 100%;
 }
 
 .slider-descr {
     font-size: 0.7em;
     vertical-align: middle;
     display: inline-flex;
-    margin-bottom: 3px;
+    margin-bottom: 6px;
+    margin-left: 3px;
 }
 
 .shortcut-descr {
@@ -25,10 +31,15 @@
     margin: 0;
 }
 
-.audio-nav .col-xs-1 {
+.audio-nav .col-1 {
     padding: 0;
 }
 
 .btn-description {
     font-size: 0.9em;
+}
+
+img {
+    position: absolute;
+    left: 0;
 }

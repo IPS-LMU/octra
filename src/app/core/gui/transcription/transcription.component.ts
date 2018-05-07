@@ -279,8 +279,6 @@ export class TranscriptionComponent implements OnInit,
       }))) {
       this.appStorage.Interface = this.projectsettings.interfaces[0];
     }
-
-    jQuery.material.init();
   }
 
   abortTranscription = () => {

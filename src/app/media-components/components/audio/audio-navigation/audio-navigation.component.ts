@@ -104,9 +104,6 @@ export class AudioNavigationComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    setTimeout(() => {
-      jQuery.material.init();
-    }, 3000);
   }
 
   /**

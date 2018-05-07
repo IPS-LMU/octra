@@ -7,18 +7,18 @@ export const EditorComponents = [
     name: EditorWSignaldisplayComponent.editorname,
     editor: EditorWSignaldisplayComponent,
     translate: 'interfaces.simple editor',
-    icon: '<span class="glyphicon glyphicon-minus navbar-icon"></span>'
+    icon: 'minus'
   },
   {
     name: LinearEditorComponent.editorname,
     editor: LinearEditorComponent,
     translate: 'interfaces.linear editor',
-    icon: '<span class="glyphicon glyphicon-modal-window navbar-icon">'
+    icon: 'window-maximize'
   },
   {
     name: TwoDEditorComponent.editorname,
     editor: TwoDEditorComponent,
     translate: 'interfaces.2D editor',
-    icon: '<span class="glyphicon glyphicon-align-justify navbar-icon"></span>'
+    icon: 'align-justify'
   }
 ];

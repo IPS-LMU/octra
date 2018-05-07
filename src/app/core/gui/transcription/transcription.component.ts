@@ -396,8 +396,8 @@ export class TranscriptionComponent implements OnInit,
     if (jQuery('#bottom-feedback').css('height') === '30px') {
       jQuery('#bottom-feedback').css({
         'height': '50%',
-        'margin-bottom': 50,
-        'position': 'absolute'
+        'margin-bottom': 0,
+        'position': 'relative'
       });
       jQuery('#bottom-feedback .inner').css({
         'display': 'inherit',

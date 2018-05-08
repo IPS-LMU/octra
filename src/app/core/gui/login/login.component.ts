@@ -236,8 +236,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           }
         },
         (error) => {
-          this.modService.show('error', 'Server cannot be requested. Please check if you are online.');
-          return Observable.throw(error);
+          this.modService.show('error', {
+            text: 'Server cannot be requested. Please check if you are online.'
+          });
+          console.error(error);
         }
       ));
     }
@@ -362,7 +364,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       },
       (error) => {
         if (error === 'file not supported') {
-          this.modService.show('error', this.langService.instant('reload-file.file not supported', {type: ''}));
+          this.modService.show('error', {
+            text: this.langService.instant('reload-file.file not supported', {type: ''})
+          });
         }
       }
     );

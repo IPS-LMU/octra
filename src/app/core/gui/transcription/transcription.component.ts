@@ -47,6 +47,7 @@ import {IFile, PartiturConverter} from '../../obj/Converters';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import * as X2JS from 'x2js';
 import {ModalService} from '../../modals/modal.service';
+import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 
 @Component({
   selector: 'app-transcription',
@@ -200,10 +201,10 @@ export class TranscriptionComponent implements OnInit,
       (event: LangChangeEvent) => {
         let lang = event.lang;
         if (isNullOrUndefined(this.settingsService.projectsettings.languages.find(
-            x => {
-              return x === lang;
-            }
-          ))) {
+          x => {
+            return x === lang;
+          }
+        ))) {
           // lang not in project config, fall back to first defined
           lang = this.settingsService.projectsettings.languages[0];
         }
@@ -275,19 +276,25 @@ export class TranscriptionComponent implements OnInit,
 
   ngAfterViewInit() {
     if (isNullOrUndefined(this.projectsettings.interfaces.find((x) => {
-        return this.appStorage.Interface === x;
-      }))) {
+      return this.appStorage.Interface === x;
+    }))) {
       this.appStorage.Interface = this.projectsettings.interfaces[0];
     }
   }
 
   abortTranscription = () => {
-    if (this.appStorage.usemode === 'online') {
-      this.saveFeedbackform();
-    }
-    this.transcrService.endTranscription();
-    this.router.navigate(['/logout'], {
-      queryParamsHandling: 'preserve'
+    this.modService.show('transcription_stop').then((answer: TranscriptionStopModalAnswer) => {
+      if (answer === TranscriptionStopModalAnswer.QUIT) {
+        if (this.appStorage.usemode === 'online') {
+          this.saveFeedbackform();
+        }
+        this.transcrService.endTranscription();
+        this.router.navigate(['/logout'], {
+          queryParamsHandling: 'preserve'
+        });
+      }
+    }).catch((error) => {
+      console.error(error);
     });
   };
 

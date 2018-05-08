@@ -16,7 +16,7 @@
                     class="hidden-xs hidden-sm hidden-md"> {{"transcription.stop" | translate}}</span>
         </button>
         <button class="btn btn-default btn-raised btn-danger col-md-4" [disabled]="!(dropzone.status === 'valid')"
-                (click)="modService.show('transcription_delete', '', {ok: newTranscription})">
+                (click)="newTranscription()">
             <fa-icon icon="file"></fa-icon>
             <span class="hidden-xs hidden-sm hidden-md"> {{"transcription.new" | translate}}</span>
         </button>

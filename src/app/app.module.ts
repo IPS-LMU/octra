@@ -70,9 +70,11 @@ import {Error404Component} from './core/gui/error404/error404.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {
+  faAlignJustify,
   faBook,
   faCheck,
   faChevronDown,
+  faChevronUp,
   faCog,
   faDownload,
   faEdit,
@@ -81,6 +83,7 @@ import {
   faEye,
   faFile,
   faFolderOpen,
+  faHeadphones,
   faInfoCircle,
   faKeyboard,
   faMinus,
@@ -104,12 +107,16 @@ import {TranscriptionDeleteModalComponent} from './core/modals/transcription-del
 import {TranscriptionStopModalComponent} from './core/modals/transcription-stop-modal/transcription-stop-modal.component';
 import {faCopy, faTimesCircle} from '@fortawesome/free-regular-svg-icons';
 import {faCheckCircle} from '@fortawesome/free-regular-svg-icons/faCheckCircle';
-import {faChevronUp} from '@fortawesome/fontawesome-free-solid';
+import {LoginInvalidModalComponent} from './core/modals/login-invalid-modal/login-invalid-modal.component';
+import {ErrorModalComponent} from './core/modals/error-modal/error-modal.component';
+import {ExportFilesModalComponent} from './core/modals/exported-files-modal/export-files-modal.component';
+import {StatisticsModalComponent} from './core/modals/statistics-modal/statistics-modal.component';
+import {PromptModalComponent} from './core/modals/prompt-modal/prompt-modal.component';
 
 library.add(
-  faSpinner, faCheck, faTimes, faTrash, faExclamationCircle, faInfoCircle, faDownload,
+  faSpinner, faCheck, faTimes, faTrash, faExclamationCircle, faInfoCircle, faDownload, faHeadphones,
   faTimesCircle, faCog, faFolderOpen, faCheckCircle, faThList, faBook, faCopy, faPlus, faSignOutAlt, faEdit, faFile,
-  faKeyboard, faEye, faExclamationTriangle, faSave, faQuestionCircle, faChevronUp, faChevronDown, faPaperPlane, faMinus, faWindowMaximize);
+  faKeyboard, faEye, faExclamationTriangle, faSave, faQuestionCircle, faChevronUp, faChevronDown, faPaperPlane, faMinus, faWindowMaximize, faAlignJustify);
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -156,7 +163,12 @@ export const ngmodule = {
     BugreportModalComponent,
     SupportedFilesModalComponent,
     TranscriptionDeleteModalComponent,
-    TranscriptionStopModalComponent
+    TranscriptionStopModalComponent,
+    LoginInvalidModalComponent,
+    ErrorModalComponent,
+    ExportFilesModalComponent,
+    StatisticsModalComponent,
+    PromptModalComponent
   ],
   entryComponents: EDITORS,
   imports: [

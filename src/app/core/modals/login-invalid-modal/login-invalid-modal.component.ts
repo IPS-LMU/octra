@@ -2,20 +2,16 @@ import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs/Subject';
 
-export enum TranscriptionStopModalAnswer {
-  CONTINUE = 'CONTINUE',
-  QUIT = 'QUIT'
-}
-
 @Component({
-  selector: 'app-transcription-stop-modal',
-  templateUrl: './transcription-stop-modal.component.html',
-  styleUrls: ['./transcription-stop-modal.component.css']
+  selector: 'app-login-invalid-modal',
+  templateUrl: './login-invalid-modal.component.html',
+  styleUrls: ['./login-invalid-modal.component.css']
 })
-
-export class TranscriptionStopModalComponent implements OnInit {
+export class LoginInvalidModalComponent implements OnInit {
   modalRef: BsModalRef;
-
+  protected data = {
+    text: ''
+  };
   config: ModalOptions = {
     keyboard: false,
     backdrop: false,
@@ -24,7 +20,7 @@ export class TranscriptionStopModalComponent implements OnInit {
 
   @ViewChild('modal') modal: TemplateRef<any>;
 
-  private actionperformed: Subject<TranscriptionStopModalAnswer> = new Subject<TranscriptionStopModalAnswer>();
+  private actionperformed: Subject<(void)> = new Subject<(void)>();
 
   constructor(private modalService: BsModalService) {
   }
@@ -32,8 +28,8 @@ export class TranscriptionStopModalComponent implements OnInit {
   ngOnInit() {
   }
 
-  public open(): Promise<TranscriptionStopModalAnswer> {
-    return new Promise<TranscriptionStopModalAnswer>((resolve, reject) => {
+  public open(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
       this.modalRef = this.modalService.show(this.modal, this.config);
       const subscr = this.actionperformed.subscribe(
         (action) => {
@@ -47,7 +43,7 @@ export class TranscriptionStopModalComponent implements OnInit {
     });
   }
 
-  public close(action: TranscriptionStopModalAnswer) {
+  public close(action: void) {
     this.modalRef.hide();
     this.actionperformed.next(action);
   }

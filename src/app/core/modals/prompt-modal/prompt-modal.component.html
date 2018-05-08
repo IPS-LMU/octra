@@ -1,0 +1,18 @@
+<div bsModal #modal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1"
+     id="bugreport">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">{{"general.prompt" | translate}}</h4>
+            </div>
+            <div class="modal-body">
+                {{appStorage.prompttext}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="close()">
+                    {{"general.close" | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

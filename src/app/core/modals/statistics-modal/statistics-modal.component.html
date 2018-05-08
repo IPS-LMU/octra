@@ -1,0 +1,69 @@
+<div bsModal #modal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1"
+     id="bugreport">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Statistics</h4>
+            </div>
+            <div class="modal-body">
+                <div *ngIf="visible">
+                    <h3>Transkriptionstext:</h3>
+                    <p>
+                        {{getText()}}
+                    </p>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Wert</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Anzahl Segmente:</td>
+                            <td>{{transcrServ.currentlevel.segments.length}}</td>
+                        </tr>
+                        <tr>
+                            <td>Anzahl Logeinträge:</td>
+                            <td>{{(UIElements != null) ? UIElements.length : 0}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <h3 style="display:inline;">Ereignisse</h3>
+                    <button (click)="clearElements()">Ereignisse löschen</button>
+                    <div style="max-height:400px;overflow: scroll;">
+                        <table class="table" style="">
+                            <thead>
+                            <tr>
+                                <th>Zeit</th>
+                                <th>Typ</th>
+                                <th>Ziel</th>
+                                <th>Inhalt</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr *ngFor="let elem of UIElements">
+                                <td>{{elem.timestamp | date:"dd.MM.yy HH:mm:ss"}}</td>
+                                <td>{{elem.type}}</td>
+                                <td>{{elem.context}}</td>
+                                <td>
+                                    {{elem.value}}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <h3>
+                        Das Transkriptionsobjekt:
+                    </h3>
+                    <textarea style="width:100%; height:300px;">{{transcrObjStr}}</textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="close()">
+                    {{"general.close" | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

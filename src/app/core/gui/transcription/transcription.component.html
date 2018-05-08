@@ -228,7 +228,7 @@
     </div>
     <div class="row" role="group">
         <button class="btn btn-default btn-raised col-md-6"
-                (click)="modService.show('transcription_stop', '', {ok: abortTranscription})">
+                (click)="abortTranscription()">
             <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
             <span *ngIf="!appStorage.easymode" [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}">
                     {{"general.quit" | translate}}
@@ -245,7 +245,7 @@
                 (click)="onSendButtonClick()" *ngIf="appStorage.usemode === 'online'">
             <span
                     *ngIf="!appStorage.easymode"
-                    [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"transcription.send" | translate}}</span>
+                    [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"transcription.send" | translate}} </span>
             <fa-icon icon="paper-plane"></fa-icon>
         </button>
         <button type="button" class="btn btn-primary btn-raised"

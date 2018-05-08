@@ -1,163 +1,9 @@
-<!-- <bs-modal #modalexport>
-    <bs-modal-header>
-        <h4 class="modal-title">{{"general.export data" | translate}}</h4>
-    </bs-modal-header>
-    <bs-modal-body id="export-table">
-        <table class="table table-striped table-responsive">
-            <thead>
-            <tr>
-                <th>{{'general.download' | translate}}</th>
-                <th>{{'general.application' | translate}}</th>
-                <th>{{'general.website' | translate}}</th>
-            </tr>
-            </thead>
-            <tbody>
-            <ng-container *ngFor="let converter of converters; let i = index;">
-                <tr *ngIf="converter.conversion.export">
-                    <td>
-                        <a #a (click)="onLineClick(converter, i)">
-                            {{converter.name}} (*{{converter.extension}})
-                        </a>
-                        <i class="fa fa-spinner fa-spin"
-                           *ngIf="preparing.name === converter.name && preparing.preparing"></i>
-                    </td>
-                    <td>
-                        {{converter.application}}
-                    </td>
-                    <td>
-                        <a href="{{converter.website.url}}" target="_blank">
-                            {{converter.website.title}}
-                        </a>
-                    </td>
-                    <td>
-                        <span *ngIf="converter.notice !== ''" class="glyphicon glyphicon-info-sign"
-                              [attr.title]="converter.notice"></span>
-                    </td>
-                </tr>
-                <tr [@fadeToggle]="export_states[i]" *ngIf="converter.conversion.export">
-                    <td colspan="5" style="padding-left:20px;">
-                        <select #val *ngIf="navbarServ.transcrService !== undefined && !converter.multitiers"
-                                (change)="onSelectionChange(converter, val.value)">
-                            <option value="">{{"general.select one tier" | translate}}</option>
-                            <option *ngFor="let level of navbarServ.transcrService.annotation.levels; let l = index;"
-                                    value="{{l}}">{{level.name}}
-                            </option>
-                        </select>
+<app-export-files-modal #modalexport [transcrService]="navbarServ.transcrService" [uiService]="navbarServ.uiService">
+</app-export-files-modal>
+<app-statistics-modal #modalstatistics></app-statistics-modal>
+<app-prompt-modal #promptmodal></app-prompt-modal>
 
-                        <a style="margin-left:10px;" *ngIf="preparing.name === converter.name && !preparing.preparing"
-                           download="{{parentformat.download}}" [href]="parentformat.uri"
-                           class="link">
-                            <span class="glyphicon glyphicon-floppy-save"></span> Download
-                        </a>
-                    </td>
-                </tr>
-            </ng-container>
-            </tbody>
-        </table>
-        <a *ngIf="arraybufferExists" (click)="getAudioURI();">
-            <span class="glyphicon glyphicon-headphones"></span> Audio file (experimental)</a>
-        <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === 'Audio' && preparing.preparing"></i>
-        <a style="margin-left:10px;" *ngIf="preparing.name === 'Audio' && !preparing.preparing"
-           download="{{parentformat.download}}" [href]="parentformat.uri"
-           class="link">
-            <span class="glyphicon glyphicon-floppy-save"></span> Download
-        </a><br/>
-        <a (click)="getProtocol()"><span class="glyphicon glyphicon-list"></span> Protocol</a>
-        <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === 'Protocol' && preparing.preparing"></i>
-        <a style="margin-left:10px;" *ngIf="preparing.name === 'Protocol' && !preparing.preparing"
-           download="{{parentformat.download}}" [href]="parentformat.uri"
-           class="link">
-            <span class="glyphicon glyphicon-floppy-save"></span> Download
-        </a><br/>
-    </bs-modal-body>
-    <bs-modal-footer>
-        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="modalexport.dismiss()">
-            {{"general.close" | translate}}
-        </button>
-    </bs-modal-footer>
-</bs-modal>
-
-<bs-modal #modalstatistics id="modalstatis">
-    <bs-modal-header>
-        <h4 class="modal-title">Statistics</h4>
-    </bs-modal-header>
-    <bs-modal-body>
-        <div *ngIf="modalstatistics.visible">
-            <h3>Transkriptionstext:</h3>
-            <p>
-                {{getText()}}
-            </p>
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Wert</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>Anzahl Segmente:</td>
-                    <td>{{transcrServ.currentlevel.segments.length}}</td>
-                </tr>
-                <tr>
-                    <td>Anzahl Logeinträge:</td>
-                    <td>{{(UIElements != null) ? UIElements.length : 0}}</td>
-                </tr>
-                </tbody>
-            </table>
-            <h3 style="display:inline;">Ereignisse</h3>
-            <button (click)="clearElements()">Ereignisse löschen</button>
-            <div style="max-height:400px;overflow: scroll;">
-                <table class="table" style="">
-                    <thead>
-                    <tr>
-                        <th>Zeit</th>
-                        <th>Typ</th>
-                        <th>Ziel</th>
-                        <th>Inhalt</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr *ngFor="let elem of UIElements">
-                        <td>{{elem.timestamp | date:"dd.MM.yy HH:mm:ss"}}</td>
-                        <td>{{elem.type}}</td>
-                        <td>{{elem.context}}</td>
-                        <td>
-                            {{elem.value}}
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-            <h3>
-                Das Transkriptionsobjekt:
-            </h3>
-            <textarea style="width:100%; height:300px;">{{dat}}</textarea>
-        </div>
-    </bs-modal-body>
-    <bs-modal-footer>
-        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="modalstatistics.dismiss()">
-            {{"general.close" | translate}}
-        </button>
-    </bs-modal-footer>
-</bs-modal>
-
-<bs-modal #promptmodal id="prompt-modal">
-    <bs-modal-header>
-        <h4 class="modal-title">{{"general.prompt" | translate}}</h4>
-    </bs-modal-header>
-    <bs-modal-body>
-        {{appStorage.prompttext}}
-    </bs-modal-body>
-    <bs-modal-footer>
-        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="promptmodal.dismiss()">
-            {{"general.close" | translate}}
-        </button>
-    </bs-modal-footer>
-</bs-modal>
--->
-
-<nav class="navbar navbar-expand-md navbar-dark">
+<nav class="navbar navbar-expand-md navbar-fixed-top navbar-dark" style="z-index:1000;">
     <a class="navbar-brand" href="#">OCTRA v{{version}}</a>
     <div class="d-block d-md-none" *ngIf="environment.dev_version" style="color:red;">in developement</div>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
@@ -212,14 +58,14 @@
             <li class="nav-item dropdown" *ngIf="transcrServ !== undefined" [ngStyle]="{
                 'display': (!(navbarServ.dataloaded && appStorage.LoggedIn && (appStorage.usemode === 'local' || appStorage.usemode === 'url'))) ? 'none': 'inherit'
                 }">
-                <a href="#" id="tiersDropdown" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+                <a href="#" id="tiersDropdown" class="nav-link" data-toggle="dropdown" role="button"
                    aria-haspopup="true"
                    aria-expanded="false">
                     {{(transcrServ.currentlevel.name.length > 30) ? transcrServ.currentlevel.name.substr(0, 30) +
                     '...' : transcrServ.currentlevel.name}}
                     <fa-icon icon="book" class="navbar-icon"></fa-icon>
                 </a>
-                <div class="dropdown-menu options-menu" aria-labelledby="tiersDropdown" [ngClass]="{
+                <div class="dropdown-menu dropdown-menu-right options-menu" aria-labelledby="tiersDropdown" [ngClass]="{
                         'collaps': collapsed
                     }">
                     <div class="row level-row" *ngFor="let level of transcrServ.annotation.levels; let i = index;"
@@ -336,7 +182,7 @@
                         <tr>
                             <td><label for="easymode">{{"settings.easy mode" | translate}}:</label></td>
                             <td>
-                                <div class="togglebutton">
+                                <div class="switch">
                                     <label>
                                         <input (click)="toggleSettings('easymode')" [checked]="appStorage.easymode"
                                                id="easymode" type="checkbox">
@@ -347,7 +193,7 @@
                         <tr>
                             <td><label for="playonhover">{{"settings.play on hover" | translate}}:</label></td>
                             <td>
-                                <div class="togglebutton">
+                                <div class="switch">
                                     <label>
                                         <input (click)="toggleSettings('playonhover')"
                                                [checked]="appStorage.playonhover"
@@ -359,7 +205,7 @@
                         <tr>
                             <td><label for="playonhover">{{"settings.follow playcursor" | translate}}:</label></td>
                             <td>
-                                <div class="togglebutton">
+                                <div class="switch">
                                     <label>
                                         <input (click)="toggleSettings('followplaycursor')"
                                                [checked]="appStorage.followplaycursor"
@@ -371,7 +217,7 @@
                         <tr>
                             <td><label for="playonhover">{{"settings.logging" | translate}}:</label></td>
                             <td>
-                                <div class="togglebutton">
+                                <div class="switch">
                                     <label>
                                         <input (click)="toggleSettings('logging')"
                                                [checked]="appStorage.logging"
@@ -384,7 +230,7 @@
                         <tr>
                             <td><label for="playonhover">{{"settings.show loupe" | translate}}:</label></td>
                             <td>
-                                <div class="togglebutton">
+                                <div class="switch">
                                     <label>
                                         <input (click)="toggleSettings('show_loupe')"
                                                [checked]="appStorage.show_loupe"

@@ -1,0 +1,92 @@
+<div bsModal #modal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1"
+     id="supportedfiles">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">{{"general.export data" | translate}}</h4>
+            </div>
+            <div class="modal-body" id="export-table">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>{{'general.download' | translate}}</th>
+                        <th>{{'general.application' | translate}}</th>
+                        <th>{{'general.website' | translate}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <ng-container *ngFor="let converter of converters; let i = index;">
+                        <tr *ngIf="converter.conversion.export">
+                            <td (click)="onLineClick(converter, i)">
+                                <fa-icon style="color:gray;"
+                                         [icon]="['fas', ((export_states[i] === 'active') ? 'chevron-up' : 'chevron-down')]"></fa-icon>
+                            </td>
+                            <td (click)="onLineClick(converter, i)">
+                                <a #a>
+                                    {{converter.name}} (*{{converter.extension}})
+                                </a>
+                                <fa-icon icon="spinner" [spin]="true"
+                                         *ngIf="preparing.name === converter.name && preparing.preparing"></fa-icon>
+                            </td>
+                            <td (click)="onLineClick(converter, i)">
+                                {{converter.application}}
+                            </td>
+                            <td (click)="onLineClick(converter, i)">
+                                <a href="{{converter.website.url}}" target="_blank">
+                                    {{converter.website.title}}
+                                </a>
+                            </td>
+                            <td (click)="onLineClick(converter, i)">
+                                <fa-icon *ngIf="converter.notice !== ''" icon="info-circle"
+                                         [attr.title]="converter.notice"></fa-icon>
+                            </td>
+                        </tr>
+                        <tr [@fadeToggle]="export_states[i]" *ngIf="converter.conversion.export">
+                            <td colspan="5" style="padding-left:20px;">
+                                <select #val *ngIf="navbarServ.transcrService !== undefined && !converter.multitiers"
+                                        (change)="onSelectionChange(converter, val.value)">
+                                    <option value="">{{"general.select one tier" | translate}}</option>
+                                    <option *ngFor="let level of navbarServ.transcrService.annotation.levels; let l = index;"
+                                            value="{{l}}">{{level.name}}
+                                    </option>
+                                </select>
+
+                                <a style="margin-left:10px;"
+                                   *ngIf="preparing.name === converter.name && !preparing.preparing"
+                                   download="{{parentformat.download}}" [href]="parentformat.uri"
+                                   class="link">
+                                    <fa-icon icon="save"></fa-icon>
+                                    Download
+                                </a>
+                            </td>
+                        </tr>
+                    </ng-container>
+                    </tbody>
+                </table>
+                <span class="link" *ngIf="arraybufferExists" (click)="getAudioURI();">
+                    <fa-icon icon="headphones"></fa-icon> Audio file (experimental)</span>
+                <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === 'Audio' && preparing.preparing"></i>
+                <a style="margin-left:10px;" *ngIf="preparing.name === 'Audio' && !preparing.preparing"
+                   download="{{parentformat.download}}" [href]="parentformat.uri"
+                   class="link">
+                    <fa-icon icon="save"></fa-icon>
+                    Download
+                </a><br/>
+                <span class="link" (click)="getProtocol()"><fa-icon icon="th-list"></fa-icon> Protocol</span>
+                <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === 'Protocol' && preparing.preparing"></i>
+                <a style="margin-left:10px;" *ngIf="preparing.name === 'Protocol' && !preparing.preparing"
+                   download="{{parentformat.download}}" [href]="parentformat.uri"
+                   class="link">
+                    <fa-icon icon="save"></fa-icon>
+                    Download
+                </a><br/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="close()">
+                    {{"general.close" | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

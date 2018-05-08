@@ -1,6 +1,6 @@
 import {Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {ModalService} from '../../modals/modal.service';
+import {ModalService} from '../modal.service';
 import {isNullOrUndefined} from 'util';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import {APIService} from '../../shared/service/api.service';

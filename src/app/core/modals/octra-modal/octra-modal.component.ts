@@ -7,7 +7,7 @@ import {APIService} from '../../shared/service/api.service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {AppInfo} from '../../../app.info';
 import {SettingsService} from '../../shared/service/settings.service';
-import {BsModalComponent} from 'ng2-bs3-modal';
+import {BsModalRef} from 'ngx-bootstrap';
 
 @Component({
   selector: 'app-octra-modal',
@@ -17,13 +17,13 @@ import {BsModalComponent} from 'ng2-bs3-modal';
 export class OctraModalComponent implements OnInit, OnDestroy {
 
   private _subscrmanager: SubscriptionManager;
-  @ViewChild('login_invalid') login_invalid: BsModalComponent;
-  @ViewChild('transcription_delete') transcription_delete: BsModalComponent;
-  @ViewChild('transcription_stop') transcription_stop: BsModalComponent;
-  @ViewChild('error') error: BsModalComponent;
-  @ViewChild('bugreport') bugreport: BsModalComponent;
-  @ViewChild('supportedfiles') supportedfiles: BsModalComponent;
-  @ViewChild('yesno') yesno: BsModalComponent;
+  @ViewChild('login_invalid') login_invalid: BsModalRef;
+  @ViewChild('transcription_delete') transcription_delete: BsModalRef;
+  @ViewChild('transcription_stop') transcription_stop: BsModalRef;
+  @ViewChild('error') error: BsModalRef;
+  @ViewChild('bugreport') bugreport: BsModalRef;
+  @ViewChild('supportedfiles') supportedfiles: BsModalRef;
+  @ViewChild('yesno') yesno: BsModalRef;
 
   public bgdescr = '';
   public bgemail = '';

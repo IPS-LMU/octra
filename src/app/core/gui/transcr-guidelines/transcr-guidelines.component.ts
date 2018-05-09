@@ -1,5 +1,4 @@
 import {AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
-import {BsModalComponent} from 'ng2-bs3-modal';
 import {isNullOrUndefined} from 'util';
 import {TranscriptionService} from '../../shared/service/transcription.service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
@@ -13,7 +12,7 @@ import {SettingsService} from '../../shared/service/settings.service';
 })
 
 export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChanges {
-  @ViewChild('modal_guidelines') modal_guidelines: BsModalComponent;
+  @ViewChild('modal_guidelines') modal_guidelines: any;
 
   @Input() guidelines = null;
   public shown_guidelines: any = {};
@@ -32,7 +31,8 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
   }
 
   get visible(): boolean {
-    return this.modal_guidelines.visible;
+    return false;
+    // return this.modal_guidelines.visible;
   }
 
   ngOnInit() {

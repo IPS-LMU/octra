@@ -18,7 +18,6 @@ import {FileSize, Functions, OCTRANIMATIONS, SubscriptionManager} from '../../sh
 import {BrowserCheck} from '../../shared/BrowserCheck';
 import {SessionFile} from '../../obj/SessionFile';
 import {isArray, isNullOrUndefined, isNumber} from 'util';
-import {BsModalComponent} from 'ng2-bs3-modal';
 import {TranslateService} from '@ngx-translate/core';
 import {Converter} from '../../obj/Converters';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
@@ -36,7 +35,7 @@ import {ModalAnswer} from '../../modals/transcription-delete-modal/transcription
 export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate, AfterViewInit {
   @ViewChild('f') loginform: NgForm;
   @ViewChild('dropzone') dropzone: OctraDropzoneComponent;
-  @ViewChild('agreement') agreement: BsModalComponent;
+  @ViewChild('agreement') agreement: ElementRef;
   @ViewChild('localmode') localmode: ElementRef;
   @ViewChild('onlinemode') onlinemode: ElementRef;
 

@@ -15,7 +15,6 @@ import {
   ViewChild
 } from '@angular/core';
 import {Router} from '@angular/router';
-import {BsModalComponent} from 'ng2-bs3-modal/ng2-bs3-modal';
 
 import {
   APIService,
@@ -63,14 +62,15 @@ export class TranscriptionComponent implements OnInit,
 
   private subscrmanager: SubscriptionManager;
 
-  @ViewChild('modal_shortcuts') modal_shortcuts: BsModalComponent;
+  // TODO change to ModalComponents!
+  @ViewChild('modal_shortcuts') modal_shortcuts: any;
   @ViewChild('modal_guidelines') modal_guidelines: TranscrGuidelinesComponent;
-  @ViewChild('modal_overview') modal_overview: BsModalComponent;
+  @ViewChild('modal_overview') modal_overview: any;
   @ViewChild(LoadeditorDirective) appLoadeditor: LoadeditorDirective;
   private _currentEditor: ComponentRef<Component>;
 
-  @ViewChild('modal') modal: BsModalComponent;
-  @ViewChild('modal2') modal2: BsModalComponent;
+  @ViewChild('modal') modal: any;
+  @ViewChild('modal2') modal2: any;
   @ViewChild('fo') feedback_form: NgForm;
   public send_error = '';
 
@@ -340,11 +340,6 @@ export class TranscriptionComponent implements OnInit,
       }
       $event.preventDefault();
     }
-  }
-
-  onSegmentInOverviewClicked(segnumber: number) {
-    this.transcrService.requestSegment(segnumber);
-    this.modal_overview.close();
   }
 
   changeEditor(name: string) {

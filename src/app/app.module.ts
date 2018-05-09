@@ -71,6 +71,8 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {
   faAlignJustify,
+  faArrowLeft,
+  faArrowRight,
   faBook,
   faCheck,
   faChevronDown,
@@ -112,10 +114,13 @@ import {ErrorModalComponent} from './core/modals/error-modal/error-modal.compone
 import {ExportFilesModalComponent} from './core/modals/exported-files-modal/export-files-modal.component';
 import {StatisticsModalComponent} from './core/modals/statistics-modal/statistics-modal.component';
 import {PromptModalComponent} from './core/modals/prompt-modal/prompt-modal.component';
+import {TranscriptionSendModalComponent} from './core/modals/transcription-send-modal/transcription-send-modal.component';
+import {TranscriptionSendingModalComponent} from './core/modals/transcription-sending-modal/transcription-sending-modal.component';
+import {OverviewModalComponent} from './core/modals/overview-modal/overview-modal.component';
 
 library.add(
   faSpinner, faCheck, faTimes, faTrash, faExclamationCircle, faInfoCircle, faDownload, faHeadphones,
-  faTimesCircle, faCog, faFolderOpen, faCheckCircle, faThList, faBook, faCopy, faPlus, faSignOutAlt, faEdit, faFile,
+  faTimesCircle, faCog, faFolderOpen, faCheckCircle, faThList, faBook, faCopy, faPlus, faSignOutAlt, faEdit, faFile, faArrowLeft, faArrowRight,
   faKeyboard, faEye, faExclamationTriangle, faSave, faQuestionCircle, faChevronUp, faChevronDown, faPaperPlane, faMinus, faWindowMaximize, faAlignJustify);
 
 // AoT requires an exported function for factories
@@ -168,7 +173,10 @@ export const ngmodule = {
     ErrorModalComponent,
     ExportFilesModalComponent,
     StatisticsModalComponent,
-    PromptModalComponent
+    PromptModalComponent,
+    TranscriptionSendModalComponent,
+    TranscriptionSendingModalComponent,
+    OverviewModalComponent
   ],
   entryComponents: EDITORS,
   imports: [

@@ -1,6 +1,5 @@
 import {AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {AppStorageService} from '../../shared/service/appstorage.service';
-import {BsModalComponent} from 'ng2-bs3-modal';
 import {NavbarService} from './navbar.service';
 import {DomSanitizer} from '@angular/platform-browser';
 import {TranslateService} from '@ngx-translate/core';
@@ -18,6 +17,7 @@ import {AnnotJSONType} from '../../obj/Annotation/AnnotJSON';
 import {BugReportService, ConsoleType} from '../../shared/service/bug-report.service';
 import {environment} from '../../../../environments/environment';
 import {ModalService} from '../../modals/modal.service';
+import {ExportFilesModalComponent} from '../../modals/exported-files-modal/export-files-modal.component';
 
 @Component({
   selector: 'app-navigation',
@@ -28,7 +28,7 @@ import {ModalService} from '../../modals/modal.service';
 
 export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
-  @ViewChild('modalexport') modalexport: BsModalComponent;
+  @ViewChild('modalexport') modalexport: ExportFilesModalComponent;
   @Input('version') version: string;
 
   public test = 'ok';

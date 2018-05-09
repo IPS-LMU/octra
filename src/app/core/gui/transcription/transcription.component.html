@@ -1,46 +1,9 @@
 <app-alert #alert></app-alert>
-<!-- <bs-modal #modal>
-    <bs-modal-header>
-        <h4 class="modal-title">{{"modal.transcription.send.header" | translate}}</h4>
-    </bs-modal-header>
-    <bs-modal-body>
-        {{"modal.transcription.send.text" | translate}}
-    </bs-modal-body>
-    <bs-modal-footer>
-        <button type="button" class="btn btn-primary" (click)="modal.dismiss()">{{"general.abort" | translate}}</button>
-        <button type="button" class="btn btn-default" (click)="onSendNowClick()">{{"general.send now" | translate}}
-        </button>
-    </bs-modal-footer>
-</bs-modal>
+<app-transcription-send-modal #modal></app-transcription-send-modal>
+<app-transcription-sending-modal #modal2></app-transcription-sending-modal>
+<app-overview-modal #modal_overview id="overview"></app-overview-modal>
 
-<bs-modal #modal2>
-    <bs-modal-header>
-        <h4 class="modal-title">{{"modal.transcription.sending.header" | translate}}</h4>
-    </bs-modal-header>
-    <bs-modal-body>
-        {{"modal.transcription.sending.text" | translate}}<br/><br/>
-        <div style="color:red">{{send_error}}</div>
-        <div class="text-success" style="text-align: center;display:block;">{{"general.submission success" |
-            translate}}
-        </div>
-    </bs-modal-body>
-</bs-modal>
-<bs-modal #modal_overview id="overview">
-    <bs-modal-body>
-        <app-transcr-overview *ngIf="transcrService.annotation !== null"
-                              [visible]="modal_overview.visible"
-                              [segments]="(transcrService.annotation !== null && transcrService.annotation !== undefined)
-                              ? transcrService.annotation.levels[transcrService.selectedlevel].segments.segments: null"
-                              (segmentclicked)="onSegmentInOverviewClicked($event)">
-        </app-transcr-overview>
-    </bs-modal-body>
-    <bs-modal-footer>
-        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="modal_overview.dismiss()">
-            {{"general.close" | translate}}
-        </button>
-    </bs-modal-footer>
-</bs-modal>
-
+<!--
 <bs-modal #modal_shortcuts>
     <bs-modal-body *ngIf="editorloaded">
         <div *ngIf="interface == 'Editor without signal display'">

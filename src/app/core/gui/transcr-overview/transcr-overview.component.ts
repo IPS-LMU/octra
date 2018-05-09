@@ -5,7 +5,6 @@ import {
   Component,
   EventEmitter,
   Input,
-  OnChanges,
   OnDestroy,
   OnInit,
   Output
@@ -14,7 +13,7 @@ import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
 import {AudioService, TranscriptionService} from '../../shared/service';
 import {SubscriptionManager} from '../../shared';
-import {isFunction, isNullOrUndefined} from 'util';
+import {isFunction} from 'util';
 import {Segment} from '../../obj/Annotation/Segment';
 
 @Component({
@@ -23,7 +22,7 @@ import {Segment} from '../../obj/Annotation/Segment';
   styleUrls: ['./transcr-overview.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
+export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private errortooltip: any;
 
@@ -179,13 +178,13 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
     this.errortooltip = jQuery('.error-tooltip');
 
-    if (this.visible) {
-      this.updateSegments();
-      this.cd.markForCheck();
-      this.cd.detectChanges();
-    }
+    this.updateSegments();
+    this.transcrService.analyse();
+    this.cd.markForCheck();
+    this.cd.detectChanges();
   }
 
+  /*
   ngOnChanges(event) {
     this.show_loading = true;
     if (!isNullOrUndefined(event.visible) && event.visible.currentValue === true) {
@@ -194,7 +193,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     } else if (!isNullOrUndefined(event.visible) && event.visible.currentValue === false) {
       jQuery('.error-tooltip').css('display', 'none');
     }
-  }
+  } */
 
   public onSegmentClicked(segnumber: number) {
     this.segmentclicked.emit(segnumber);

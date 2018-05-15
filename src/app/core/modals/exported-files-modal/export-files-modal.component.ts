@@ -36,6 +36,11 @@ export class ExportFilesModalComponent implements OnInit {
     uri: ''
   };
 
+  public get arraybufferExists(): boolean {
+    return (!isNullOrUndefined(this.navbarServ.transcrService) && !isNullOrUndefined(this.navbarServ.transcrService.audiomanager.ressource.arraybuffer)
+      && this.navbarServ.transcrService.audiomanager.ressource.arraybuffer.byteLength > 0);
+  }
+
 
   public converters = AppInfo.converters;
 

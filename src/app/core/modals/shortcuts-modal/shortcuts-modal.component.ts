@@ -1,24 +1,25 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs/Subject';
-import {AppStorageService, SettingsService} from '../../shared/service';
+import {AppStorageService, KeymappingService, SettingsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {BugReportService} from '../../shared/service/bug-report.service';
 
 @Component({
-  selector: 'app-prompt-modal',
-  templateUrl: './prompt-modal.component.html',
-  styleUrls: ['./prompt-modal.component.css']
+  selector: 'app-shortcuts-modal',
+  templateUrl: './shortcuts-modal.component.html',
+  styleUrls: ['./shortcuts-modal.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class PromptModalComponent implements OnInit {
+export class ShortcutsModalComponent implements OnInit {
   modalRef: BsModalRef;
   protected data = null;
 
   public visible = false;
-  public bgemail = '';
-  public bgdescr = '';
-  public sendpro_obj = true;
-  public bugsent = false;
+  @Input() editor: string = '';
+
+  public shortcuts = [];
 
   config: ModalOptions = {
     keyboard: false,
@@ -31,18 +32,11 @@ export class PromptModalComponent implements OnInit {
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();
 
-  constructor(private modalService: BsModalService, public appStorage: AppStorageService, private settService: SettingsService) {
+  constructor(private modalService: BsModalService, private appStorage: AppStorageService, private bugService: BugReportService, private settService: SettingsService,
+              private keyMap: KeymappingService, private cd: ChangeDetectorRef) {
   }
 
   ngOnInit() {
-  }
-
-  public get isvalid(): boolean {
-    if (this.sendpro_obj || this.bgdescr !== '') {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   public open(data: {
@@ -51,6 +45,7 @@ export class PromptModalComponent implements OnInit {
     return new Promise<void>((resolve, reject) => {
       this.modal.show(this.modal, this.config);
       this.visible = true;
+      this.cd.markForCheck();
       const subscr = this.actionperformed.subscribe(
         (action) => {
           resolve(action);

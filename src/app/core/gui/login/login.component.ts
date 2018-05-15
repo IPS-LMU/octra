@@ -23,7 +23,7 @@ import {Converter} from '../../obj/Converters';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
 import 'rxjs/add/operator/catch';
 import {ModalService} from '../../modals/modal.service';
-import {ModalAnswer} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
+import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
 
 @Component({
   selector: 'app-login',
@@ -524,9 +524,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   onTranscriptionDelete() {
-    this.modService.show('transcription_delete').then((answer: ModalAnswer) => {
+    this.modService.show('transcription_delete').then((answer: ModalDeleteAnswer) => {
       console.log(`answer: ${answer}`);
-      if (answer === ModalAnswer.DELETE) {
+      if (answer === ModalDeleteAnswer.DELETE) {
         console.log('new Transcription!');
         this.newTranscription();
       }

@@ -1,45 +1,48 @@
-import {AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
-import {isNullOrUndefined} from 'util';
-import {TranscriptionService} from '../../shared/service/transcription.service';
+import {Component, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
+import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
+import {Subject} from 'rxjs/Subject';
+import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {BugReportService} from '../../shared/service/bug-report.service';
+import {isNullOrUndefined} from 'util';
 import {TranslateService} from '@ngx-translate/core';
-import {SettingsService} from '../../shared/service/settings.service';
 
 @Component({
-  selector: 'app-transcr-guidelines',
-  templateUrl: './transcr-guidelines.component.html',
-  styleUrls: ['./transcr-guidelines.component.css']
+  selector: 'app-transcription-guidelines-modal',
+  templateUrl: './transcription-guidelines-modal.component.html',
+  styleUrls: ['./transcription-guidelines-modal.component.css']
 })
 
-export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChanges {
-  @ViewChild('modal_guidelines') modal_guidelines: any;
+export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges {
+  modalRef: BsModalRef;
+  protected data = null;
 
+  public visible = false;
   @Input() guidelines = null;
   public shown_guidelines: any = {};
 
-  private subscrmanager: SubscriptionManager = new SubscriptionManager();
   public collapsed: any[][] = [];
   private entries = 0;
 
   private counter = 0;
   private video_players: any[] = [];
 
-  constructor(public transcrService: TranscriptionService,
-              private cd: ChangeDetectorRef,
-              private lang: TranslateService,
-              private settService: SettingsService) {
-  }
+  config: ModalOptions = {
+    keyboard: false,
+    backdrop: false,
+    ignoreBackdropClick: false
+  };
 
-  get visible(): boolean {
-    return false;
-    // return this.modal_guidelines.visible;
+  @ViewChild('modal') modal: any;
+
+  private actionperformed: Subject<void> = new Subject<void>();
+  private subscrmanager = new SubscriptionManager();
+
+  constructor(private modalService: BsModalService, private lang: TranslateService, private transcrService: TranscriptionService,
+              private appStorage: AppStorageService, private bugService: BugReportService, private settService: SettingsService) {
   }
 
   ngOnInit() {
-  }
-
-  ngAfterViewInit() {
-
   }
 
   ngOnChanges($event) {
@@ -54,12 +57,20 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
     }
   }
 
-  public open() {
-    this.modal_guidelines.open();
-  }
-
-  public close() {
-    this.modal_guidelines.dismiss();
+  public open(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.modal.show(this.modal, this.config);
+      this.visible = true;
+      const subscr = this.actionperformed.subscribe(
+        (action) => {
+          resolve(action);
+          subscr.unsubscribe();
+        },
+        (err) => {
+          reject(err);
+        }
+      );
+    });
   }
 
   private unCollapseAll() {
@@ -168,5 +179,11 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
       form.append(json);
       form.submit().remove();
     }
+  }
+
+  public close() {
+    this.modal.hide();
+    this.visible = false;
+    this.actionperformed.next();
   }
 }

@@ -47,6 +47,7 @@ import {BugReportService} from '../../shared/service/bug-report.service';
 import * as X2JS from 'x2js';
 import {ModalService} from '../../modals/modal.service';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
+import {ModalSendAnswer} from '../../modals/transcription-send-modal/transcription-send-modal.component';
 
 @Component({
   selector: 'app-transcription',
@@ -76,11 +77,15 @@ export class TranscriptionComponent implements OnInit,
 
   public showdetails = false;
   public saving = '';
-  public interface = '';
+  public interface: string = '';
   private send_ok = false;
   public shortcutslist: Entry[] = [];
   public editorloaded = false;
   public feedback_data = {};
+
+  public get Interface(): string {
+    return this.interface;
+  }
 
   private level_subscription_id = 0;
   public feedback_expanded = false;
@@ -320,7 +325,7 @@ export class TranscriptionComponent implements OnInit,
       if (!this.modal_shortcuts.visible) {
         this.modal_shortcuts.open();
       } else {
-        this.modal_shortcuts.dismiss();
+        this.modal_shortcuts.close();
       }
       $event.preventDefault();
     } else if ($event.altKey && $event.which === 57) {
@@ -336,7 +341,7 @@ export class TranscriptionComponent implements OnInit,
         this.transcrService.analyse();
         this.modal_overview.open();
       } else {
-        this.modal_overview.dismiss();
+        this.modal_overview.close();
       }
       $event.preventDefault();
     }
@@ -485,7 +490,6 @@ export class TranscriptionComponent implements OnInit,
   }
 
   public onSendNowClick() {
-    this.modal.dismiss();
     this.modal2.open();
     this.send_ok = true;
 
@@ -524,7 +528,14 @@ export class TranscriptionComponent implements OnInit,
 
     if (this.feedback_form.valid) {
       this.saveFeedbackform();
-      this.modal.open();
+      this.modal.open().then((action) => {
+        if (action === ModalSendAnswer.SEND) {
+          this.onSendNowClick();
+        }
+        console.log('ANSWER: ' + action);
+      }).catch((error) => {
+        console.error(error);
+      });
     } else if (!this.feedback_expanded) {
       this.expandFeedback();
     }

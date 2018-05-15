@@ -149,11 +149,6 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  public get arraybufferExists(): boolean {
-    return (!isNullOrUndefined(this.transcrServ) && !isNullOrUndefined(this.transcrServ.audiomanager.ressource.arraybuffer)
-      && this.transcrServ.audiomanager.ressource.arraybuffer.byteLength > 0);
-  }
-
   onLevelNameClick(event) {
     jQuery(event.target).addClass('selected');
   }

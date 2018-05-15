@@ -5,9 +5,9 @@ import {AppStorageService, SettingsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {BugReportService} from '../../shared/service/bug-report.service';
 
-enum ModalAnswer {
-  'CANCEL',
-  'SEND'
+export enum ModalAnswer {
+  CANCEL = 'CANCEL',
+  SEND = 'SEND'
 }
 
 @Component({
@@ -69,10 +69,10 @@ export class BugreportModalComponent implements OnInit {
     });
   }
 
-  public close(action: ModalAnswer) {
+  public close(action: string) {
     this.modal.hide();
     this.visible = false;
-    this.actionperformed.next(action);
+    this.actionperformed.next(<ModalAnswer> action);
   }
 
   sendBugReport() {

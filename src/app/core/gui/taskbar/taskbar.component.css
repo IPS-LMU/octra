@@ -14,3 +14,7 @@
 .btn-group.btn-group-justified.btn-group-sm {
     margin: 0;
 }
+
+a:not([href]):not([tabindex]), a:not([href]):not([tabindex]):focus, a:not([href]):not([tabindex]):hover {
+    color: #009688;
+}

@@ -7,11 +7,6 @@ import {TextConverter} from '../../obj/Converters/TextConverter';
 import {isNullOrUndefined} from 'util';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
 
-enum ModalAnswer {
-  'CANCEL',
-  'SEND'
-}
-
 @Component({
   selector: 'app-statistics-modal',
   templateUrl: './statistics-modal.component.html',
@@ -44,7 +39,7 @@ export class StatisticsModalComponent implements OnInit {
     return this.navbarService.uiService;
   }
 
-  private actionperformed: Subject<ModalAnswer> = new Subject<ModalAnswer>();
+  private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();
 
   constructor(private modalService: BsModalService, private navbarService: NavbarService, private appStorage: AppStorageService) {
@@ -63,8 +58,8 @@ export class StatisticsModalComponent implements OnInit {
 
   public open(data: {
     text: string
-  }): Promise<ModalAnswer> {
-    return new Promise<ModalAnswer>((resolve, reject) => {
+  }): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
       this.modal.show(this.modal, this.config);
       this.visible = true;
       const subscr = this.actionperformed.subscribe(
@@ -79,10 +74,10 @@ export class StatisticsModalComponent implements OnInit {
     });
   }
 
-  public close(action: ModalAnswer) {
+  public close() {
     this.modal.hide();
     this.visible = false;
-    this.actionperformed.next(action);
+    this.actionperformed.next();
   }
 
   clearElements() {

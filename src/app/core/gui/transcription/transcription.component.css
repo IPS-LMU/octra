@@ -71,6 +71,10 @@
     flex-direction: column;
 }
 
+#bottom-feedback .card-header {
+    padding: 0px;
+}
+
 #bottom-feedback .inner {
     display: none;
     flex: auto;

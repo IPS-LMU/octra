@@ -2,18 +2,13 @@ import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs/Subject';
 
-export enum ModalSendAnswer {
-  CANCEL = 'CANCEL',
-  SEND = 'SEND'
-}
-
 @Component({
-  selector: 'app-transcription-send-modal',
-  templateUrl: './transcription-send-modal.component.html',
-  styleUrls: ['./transcription-send-modal.component.css']
+  selector: 'app-transcription-success-modal',
+  templateUrl: './transcription-success-modal.component.html',
+  styleUrls: ['./transcription-success-modal.component.css']
 })
 
-export class TranscriptionSendModalComponent implements OnInit {
+export class TranscriptionSuccessModalComponent implements OnInit {
   modalRef: BsModalRef;
 
   config: ModalOptions = {
@@ -24,7 +19,7 @@ export class TranscriptionSendModalComponent implements OnInit {
 
   @ViewChild('modal') modal: TemplateRef<any>;
 
-  private actionperformed: Subject<ModalSendAnswer> = new Subject<ModalSendAnswer>();
+  private actionperformed: Subject<void> = new Subject<void>();
 
   constructor(private modalService: BsModalService) {
   }
@@ -32,8 +27,8 @@ export class TranscriptionSendModalComponent implements OnInit {
   ngOnInit() {
   }
 
-  public open(): Promise<ModalSendAnswer> {
-    return new Promise<ModalSendAnswer>((resolve, reject) => {
+  public open(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
       this.modalRef = this.modalService.show(this.modal, this.config);
       const subscr = this.actionperformed.subscribe(
         (action) => {
@@ -47,7 +42,7 @@ export class TranscriptionSendModalComponent implements OnInit {
     });
   }
 
-  public close(action: ModalSendAnswer) {
+  public close(action: void) {
     this.modalRef.hide();
     this.actionperformed.next(action);
   }

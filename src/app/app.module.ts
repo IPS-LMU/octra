@@ -91,15 +91,18 @@ import {
   faMinus,
   faPaperPlane,
   faPlus,
+  faPrint,
   faQuestionCircle,
   faSave,
+  faSearch,
   faSignOutAlt,
   faSpinner,
   faThList,
+  faTimes,
   faTrash,
   faWindowMaximize
 } from '@fortawesome/free-solid-svg-icons';
-import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
+//modules
 import {ModalModule} from 'ngx-bootstrap';
 import {YesNoModalComponent} from './core/modals/yes-no-modal/yes-no-modal.component';
 import {ModalService} from './core/modals/modal.service';
@@ -117,9 +120,12 @@ import {PromptModalComponent} from './core/modals/prompt-modal/prompt-modal.comp
 import {TranscriptionSendModalComponent} from './core/modals/transcription-send-modal/transcription-send-modal.component';
 import {TranscriptionSendingModalComponent} from './core/modals/transcription-sending-modal/transcription-sending-modal.component';
 import {OverviewModalComponent} from './core/modals/overview-modal/overview-modal.component';
+import {ShortcutsModalComponent} from './core/modals/shortcuts-modal/shortcuts-modal.component';
+import {TranscriptionSuccessModalComponent} from './core/modals/transcription-success-modal/transcription-success-modal.component';
+import {TranscriptionGuidelinesModalComponent} from './core/modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
 
 library.add(
-  faSpinner, faCheck, faTimes, faTrash, faExclamationCircle, faInfoCircle, faDownload, faHeadphones,
+  faSpinner, faCheck, faTimes, faTrash, faExclamationCircle, faInfoCircle, faDownload, faHeadphones, faPrint, faSearch,
   faTimesCircle, faCog, faFolderOpen, faCheckCircle, faThList, faBook, faCopy, faPlus, faSignOutAlt, faEdit, faFile, faArrowLeft, faArrowRight,
   faKeyboard, faEye, faExclamationTriangle, faSave, faQuestionCircle, faChevronUp, faChevronDown, faPaperPlane, faMinus, faWindowMaximize, faAlignJustify);
 
@@ -176,7 +182,10 @@ export const ngmodule = {
     PromptModalComponent,
     TranscriptionSendModalComponent,
     TranscriptionSendingModalComponent,
-    OverviewModalComponent
+    OverviewModalComponent,
+    ShortcutsModalComponent,
+    TranscriptionSuccessModalComponent,
+    TranscriptionGuidelinesModalComponent
   ],
   entryComponents: EDITORS,
   imports: [

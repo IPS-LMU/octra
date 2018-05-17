@@ -56,42 +56,36 @@
                         (typing)="afterTyping($event)"
     ></app-transcr-editor>
     <div class="window-nav-bottom">
-        <div class="row">
-            <div class="col-12">
-                <div class="btn-toolbar" role="toolbar">
-                    <div class="btn-group btn-group-justified" role="group" aria-label="...">
-                        <a class="btn btn-default btn-raised" (click)="save();doit('left');">
+        <div class="row" role="group">
+            <button class="btn btn-default btn-raised col-md-4" (click)="save();doit('left');">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'visible-xs visible-sm visible-md': responsive && !easymode}">
                                 <fa-icon icon="save"></fa-icon> & <fa-icon icon="arrow-left"></fa-icon>
                             </span>
-                            <span *ngIf="!easymode" [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">
+                <span *ngIf="!easymode" [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">
                              {{"general.save" | translate}} &
                             {{"segments.previous" | translate}}
                             </span>
-                        </a>
-                        <a class="btn btn-default btn-raised" (click)="save();close();">
+            </button>
+            <button class="btn btn-default btn-raised col-md-4" (click)="save();close();">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'visible-xs visible-sm visible-md': responsive && !easymode}">
                                 <fa-icon icon="save"></fa-icon>
                             </span>
-                            <span *ngIf="!easymode" [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">
+                <span *ngIf="!easymode" [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">
                              {{"general.save" | translate}} & {{"general.close" | translate}}
                             </span>
-                        </a>
-                        <a class="btn btn-default btn-raised" (click)="save();doit('right');">
+            </button>
+            <button class="btn btn-default btn-raised col-md-4" (click)="save();doit('right');">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'visible-xs visible-sm visible-md': responsive && !easymode}">
                                 <fa-icon icon="save"></fa-icon> & <fa-icon icon="arrow-right"></fa-icon>
                             </span>
-                            <span *ngIf="!easymode" [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">
+                <span *ngIf="!easymode" [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}">
                              {{"general.save" | translate}} &
                             {{"segments.next" | translate}}
                             </span>
-                        </a>
-                    </div>
-                </div>
-            </div>
+            </button>
         </div>
     </div>
 </div>

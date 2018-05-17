@@ -22,12 +22,10 @@
     display: inline-block;
     padding: 3px 5px;
     margin-right: 2px;
-    background-color: #faebcc;
     vertical-align: middle;
 }
 
 .transcr-editor .marker-btn:hover {
-    background-color: #d6e9c6;
     cursor: pointer;
 }
 

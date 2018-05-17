@@ -10,6 +10,8 @@ import {AudioChunk, AudioManager, AudioTime} from '../../../media-components/obj
 import {isNumeric} from 'rxjs/util/isNumeric';
 import {TimespanPipe} from '../../../media-components/pipe';
 
+declare var lang: any;
+
 @Component({
   selector: 'app-transcr-editor',
   templateUrl: './transcr-editor.component.html',
@@ -356,6 +358,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       const btn_js = {
         contents: icon,
         tooltip: marker.description,
+        container: false,
         click: () => {
           // invoke insertText method with 'hello' on editor module.
           this.insertMarker(marker.code, marker.icon_url);
@@ -441,6 +444,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       const btn_js = {
         contents: icon,
         tooltip: boundary_descr,
+        container: false,
         click: () => {
           this.marker_click.emit('boundary');
           this.insertBoundary('assets/img/components/transcr-editor/boundary.png');

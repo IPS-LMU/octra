@@ -172,7 +172,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onLevelAddClick() {
     const level_nums = this.transcrServ.annotation.levels.length;
-    let levelname = `Tier_${level_nums + 1}`;
+    let levelname = `OCTRA_${level_nums + 1}`;
     let index = level_nums;
 
     const nameexists = (newname: string) => {
@@ -187,7 +187,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
     while (nameexists(levelname)) {
       index++;
-      levelname = `Tier_${index + 1}`;
+      levelname = `OCTRA_${index + 1}`;
     }
 
     const newlevel = new Level(this.appStorage.levelcounter + 1, levelname, 'SEGMENT',

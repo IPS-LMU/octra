@@ -173,7 +173,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                 if (this.appStorage.usemode === 'url') {
                   // overwrite
                   const new_levels: OIDBLevel[] = [];
-                  new_levels.push(new OIDBLevel(1, new OLevel('Tier_1', 'SEGMENT'), 1));
+                  new_levels.push(new OIDBLevel(1, new OLevel('OCTRA_1', 'SEGMENT'), 1));
 
                   this.appStorage.overwriteAnnotation(new_levels).then(
                     () => {

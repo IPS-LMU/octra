@@ -78,8 +78,14 @@ Then you can install OCTRA:
 
 You can find a detailed documentation on OCTRA's configuration files [here](https://github.com/IPS-LMU/octra/wiki).
 
+## Contribution
 
-## Translation
+### Commit template
+For this project <a href="https://github.com/commitizen/cz-cli">commitizen</a> is used. If you want to contribute to this project you should make use of this tool to create commit messages important for the changelog (other commit messages will be ignored otherwise). For WebStorm or PHPStorm there is a <a href="https://plugins.jetbrains.com/plugin/9861-git-commit-template">Commit Template Plugin</a> to create these templates.
+
+For creating changelog automatically, <a href="https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-changelog-cli">conventional-changelog-cli</a> is used. To create changelogs you need to install conventional-changelog-cli globally as described on its github page. After installation you just need to run `npm run changelog` to create the changelog automatically.
+
+### Translation
 To translate OCTRA to a new language you need to create these new files:
 
 * i18n/octra/octra_<language code>.json

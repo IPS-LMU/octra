@@ -316,7 +316,6 @@ export class TranscriptionService {
         transcript: null,
         comment: this._feedback.comment,
         jobno: (isNullOrUndefined(this.appStorage.user.jobno)) ? 'NOT AVAILABLE' : this.appStorage.user.jobno,
-        status: this.state,
         quality: this._feedback.exportData(),
         id: this.appStorage.data_id,
         log: log_data.getObj()

@@ -12,7 +12,9 @@ import {LeadingNullPipe, ProcentPipe, SecondsPipe, TimespanPipe} from './pipe';
 import {Timespan2Pipe} from './pipe/timespan2.pipe';
 // icons
 import {library} from '@fortawesome/fontawesome';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {
+  faClock,
   faForward,
   faPause,
   faPlay,
@@ -22,9 +24,7 @@ import {
   faStop,
   faVolumeDown,
   faVolumeUp
-} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
-import {faClock} from '@fortawesome/free-regular-svg-icons';
+} from '@fortawesome/fontawesome-free-solid';
 
 library.add(faPlay, faPause, faStop, faForward, faStepForward, faStepBackward, faRetweet, faClock, faVolumeUp, faVolumeDown);
 

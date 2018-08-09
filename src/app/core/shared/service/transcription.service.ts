@@ -504,11 +504,11 @@ export class TranscriptionService {
         if (isNullOrUndefined(insertStart)) {
           insertStart = {
             start: validation[i].start,
-            puffer: '<div class=\'error_underline\' data-errorcode=\'' + validation[i].code + '\'>'
+            puffer: '<span class=\'val-error\'>'
           };
           insertions.push(insertStart);
         } else {
-          insertStart.puffer += '<div class=\'error_underline\' data-errorcode=\'' + validation[i].code + '\'>';
+          insertStart.puffer += '<span class=\'val-error\'>';
         }
 
         let insertEnd = insertions.find((val) => {
@@ -520,10 +520,10 @@ export class TranscriptionService {
             start: insertStart.start + validation[i].length,
             puffer: ''
           };
-          insertEnd.puffer = '</div>';
+          insertEnd.puffer = '</span>';
           insertions.push(insertEnd);
         } else {
-          insertEnd.puffer = '</div>' + insertEnd.puffer;
+          insertEnd.puffer = '</span>' + insertEnd.puffer;
         }
       }
 
@@ -615,7 +615,7 @@ export class TranscriptionService {
               return jQuery(elem).replaceWith(Functions.escapeHtml(attr));
             }
           }
-        } else if (jQuery(elem).attr('class') !== 'error_underline') {
+        } else if (jQuery(elem).attr('class') !== 'val-error') {
           jQuery(elem).remove();
         }
       }

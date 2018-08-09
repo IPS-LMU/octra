@@ -231,7 +231,6 @@ footer {
 }
 
 .note-editor .note-editable {
-    display: flex;
     flex-direction: column;
     flex: auto;
 }
@@ -248,4 +247,8 @@ footer {
 
 .note-toolbar-wrapper.panel-default {
     background-color: whitesmoke;
+}
+
+.val-error {
+    border-bottom: 2px solid red;
 }

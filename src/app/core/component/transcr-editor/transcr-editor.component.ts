@@ -53,13 +53,16 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Input() audiochunk: AudioChunk;
 
   get rawText(): string {
-    return this.tidyUpRaw(this._rawText);
+    const result = this.tidyUpRaw(this._rawText);
+    console.log(`GET RAWTEXT: ${result}`);
+    return result;
   }
 
   set rawText(value: string) {
     this._rawText = this.tidyUpRaw(value);
     this.init = 0;
     const html = this.rawToHTML(this._rawText);
+    console.log(`SET RAWTEXT: ${html}`);
     this.textfield.summernote('code', html);
 
     this.initPopover();
@@ -81,6 +84,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       }
     }
     this.rawText = result;
+    console.log(`SET RAW TEXT due segments`);
+    console.log(result);
   }
 
   get Settings(): any {
@@ -137,8 +142,22 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   getRawText = () => {
     let html = this.textfield.summernote('code');
 
+    console.log(`code is:\n${html}`);
+    html = html.replace(/<((p)|(\/p))>/g, '');
+
+    // replace tags
+    html = html.replace(/(?:(<)(?!(?:img)|(?:span)|(?:div)))|(?:(?:(?:\/?((?:span)|(?:div)|(?:img \/))))(>))/g, (g0, g1, g2, g3) => {
+      if (g1 !== undefined && g1 === '<') {
+        return '&lt;';
+      } else if (g3 === '>' && g2 === '') {
+        return '&gt;';
+      }
+    });
+
     html = '<p>' + html + '</p>';
+
     const dom = jQuery(html);
+
 
     const replace_func = (i, elem) => {
       if (jQuery(elem).children() !== null && jQuery(elem).children().length > 0) {
@@ -173,7 +192,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     };
 
     jQuery.each(dom.children(), replace_func);
-    return dom.text();
+
+    let rawText = dom.text();
+    console.log(`code is Result: ${rawText}`);
+
+    return rawText;
   };
 
   ngOnDestroy() {
@@ -340,17 +363,23 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     return () => {
       const platform = BrowserInfo.platform;
       let icon = '';
-      if (!this.easymode) {
-        icon = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
-          '<span class=\'btn-description\'>' + marker.button_text + '</span><span class=\'btn-shortcut\'> ' +
-          '[' + marker.shortcut[platform] + ']</span>';
-        if (this.Settings.responsive) {
+      if ((marker.icon_url === null || marker.icon_url === undefined) || marker.icon_url == '') {
+        // text only
+        icon = '<span class=\'btn-description\'>' + marker.button_text;
+      }
+      else {
+        if (!this.easymode) {
           icon = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
-            '<span class=\'btn-description hidden-xs hidden-sm\'>' + marker.button_text +
-            '</span><span class=\'btn-shortcut hidden-xs hidden-sm hidden-md\'> [' + marker.shortcut[platform] + ']</span>';
+            '<span class=\'btn-description\'>' + marker.button_text + '</span><span class=\'btn-shortcut\'> ' +
+            '[' + marker.shortcut[platform] + ']</span>';
+          if (this.Settings.responsive) {
+            icon = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
+              '<span class=\'btn-description hidden-xs hidden-sm\'>' + marker.button_text +
+              '</span><span class=\'btn-shortcut hidden-xs hidden-sm hidden-md\'> [' + marker.shortcut[platform] + ']</span>';
+          }
+        } else {
+          icon = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon\' style=\'height:16px;\'/>';
         }
-      } else {
-        icon = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon\' style=\'height:16px;\'/>';
       }
       // create button
       const btn_js = {
@@ -461,15 +490,20 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * @param marker_code
    * @param icon_url
    */
-  insertMarker = function (marker_code, icon_url) {
-    const element = document.createElement('img');
-    element.setAttribute('src', icon_url);
-    element.setAttribute('class', 'btn-icon-text');
-    element.setAttribute('style', 'height:16px');
-    element.setAttribute('data-marker-code', marker_code);
-    element.setAttribute('alt', marker_code);
+  insertMarker = (marker_code, icon_url) => {
+    if ((icon_url === null || icon_url === undefined) || icon_url === '') {
+      // text only
+      this.textfield.summernote('editor.insertText', marker_code);
+    } else {
+      const element = document.createElement('img');
+      element.setAttribute('src', icon_url);
+      element.setAttribute('class', 'btn-icon-text');
+      element.setAttribute('style', 'height:16px');
+      element.setAttribute('data-marker-code', marker_code);
+      element.setAttribute('alt', marker_code);
 
-    this.textfield.summernote('editor.insertNode', element);
+      this.textfield.summernote('editor.insertNode', element);
+    }
     this.updateTextField();
   };
 
@@ -662,6 +696,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    */
   updateTextField() {
     this._rawText = this.getRawText();
+    console.log(`RAWTEXT:\n${this._rawText}`);
   }
 
   /**
@@ -729,11 +764,34 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         for (let i = 0; i < markers.length; i++) {
           const marker = markers[i];
           if (arguments[0] === marker.code) {
-            return marker.code;
+            return marker.code.replace(/(<)|(>)/g, (g0, g1, g2) => {
+              if (g2 === undefined && g1 !== undefined) {
+                return '[[[';
+              } else {
+                return ']]]';
+              }
+            });
           }
         }
 
-        return arguments[0].replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return arguments[0];
+      });
+
+      // replace
+      result = result.replace(/(?:(<)(?!(?:img)|(?:span)|(?:div)|(?:\/span)|(?:\/div)))|(?:(?:(?:\/?((?:span)|(?:div)|(?:\/))))?(>))/g, (g0, g1, g2, g3) => {
+        if (g1 !== undefined && g1 === '<') {
+          return '&lt;';
+        } else if (g3 === '>' && g2 === undefined) {
+          return '&gt;';
+        }
+      });
+
+      result = result.replace(/(\[\[\[)|(]]])/g, (g0, g1, g2) => {
+        if (g2 === undefined && g1 !== undefined) {
+          return '<';
+        } else {
+          return '>';
+        }
       });
 
       for (let i = 0; i < this.markers.length; i++) {
@@ -745,8 +803,17 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         const replace_func = (x, g1, g2, g3) => {
           const s1 = (g1) ? g1 : '';
           const s3 = (g3) ? g3 : '';
-          return s1 + '<img src=\'' + marker.icon_url + '\' class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
-            'data-marker-code=\'' + marker.code + '\' alt=\'' + marker.code + '\'/>' + s3;
+
+          let img = '';
+          if (!((marker.icon_url === null || marker.icon_url === undefined) || marker.icon_url === '')) {
+            img = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
+              'data-marker-code=\'' + marker.code + '\' alt=\'' + marker.code + '\'/>';
+          } else {
+            img = marker.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            console.log(`INSERTED ${img}`);
+          }
+
+          return s1 + img + s3;
         };
 
 

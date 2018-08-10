@@ -458,6 +458,14 @@ export class TranscriptionService {
   public rawToHTML(rawtext: string): string {
     let result: string = rawtext;
 
+    result = result.replace(/(?:(<)(?!(?:img)|(?:span)|(?:div)|(?:\/span)|(?:\/div)))|(?:(?:(?:\/?((?:span)|(?:div)|(?:\/))))?(>))/g, (g0, g1, g2, g3) => {
+      if (g1 !== undefined && g1 === '<') {
+        return '&lt;';
+      } else if (g3 === '>' && g2 === undefined) {
+        return '&gt;';
+      }
+    });
+
     result = this.replaceMarkersWithHTML(result);
 
     if (rawtext !== '') {
@@ -475,12 +483,28 @@ export class TranscriptionService {
    * @returns {string}
    */
   public replaceMarkersWithHTML(input: string): string {
+    // TODO optimization possible
+
     let result = input;
     for (let i = 0; i < this._guidelines.markers.length; i++) {
       const marker = this._guidelines.markers[i];
       const regex = new RegExp(Functions.escapeRegex(marker.code), 'g');
-      result = result.replace(regex, '<img src=\'' + marker.icon_url + '\' class=\'btn-icon-text\' ' +
-        'style=\'height:16px;\' data-marker-code=\'' + marker.code + '\'/>');
+
+      if (!((marker.icon_url === null || marker.icon_url === undefined) || marker.icon_url === '')) {
+        result = result.replace(regex, '<img src=\'' + marker.icon_url + '\' class=\'btn-icon-text\' ' +
+          'style=\'height:16px;\' data-marker-code=\'' + marker.code + '\'/>');
+      } else {
+        // marker is text only
+        const code = marker.code.replace(/([<|>])/g, (g0, g1) => {
+          switch (g1) {
+            case('<'):
+              return '&lt;';
+            case('>'):
+              return '&gt;';
+          }
+        });
+        result = result.replace(regex, code);
+      }
     }
     return result;
   }
@@ -505,11 +529,11 @@ export class TranscriptionService {
         if (isNullOrUndefined(insertStart)) {
           insertStart = {
             start: validation[i].start,
-            puffer: '<div class=\'error_underline\' data-errorcode=\'' + validation[i].code + '\'>'
+            puffer: '[[[div class=\'error_underline\' data-errorcode=\'' + validation[i].code + '\']]]'
           };
           insertions.push(insertStart);
         } else {
-          insertStart.puffer += '<div class=\'error_underline\' data-errorcode=\'' + validation[i].code + '\'>';
+          insertStart.puffer += '[[[div class=\'error_underline\' data-errorcode=\'' + validation[i].code + '\']]]';
         }
 
         let insertEnd = insertions.find((val) => {
@@ -521,10 +545,10 @@ export class TranscriptionService {
             start: insertStart.start + validation[i].length,
             puffer: ''
           };
-          insertEnd.puffer = '</div>';
+          insertEnd.puffer = '[[[/div]]]';
           insertions.push(insertEnd);
         } else {
-          insertEnd.puffer = '</div>' + insertEnd.puffer;
+          insertEnd.puffer = '[[[/div]]]' + insertEnd.puffer;
         }
       }
 

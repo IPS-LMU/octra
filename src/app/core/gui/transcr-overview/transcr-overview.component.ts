@@ -5,9 +5,11 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
-  Output
+  Output,
+  SimpleChanges
 } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
@@ -22,7 +24,7 @@ import {Segment} from '../../obj/Annotation/Segment';
   styleUrls: ['./transcr-overview.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewInit {
+export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
 
   private errortooltip: any;
 
@@ -140,6 +142,10 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   ngOnInit() {
+    this.updateView();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
   }
 
   sanitizeHTML(str: string): SafeHtml {
@@ -173,6 +179,10 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   ngAfterViewInit() {
+    this.updateView();
+  }
+
+  updateView() {
     this.errortooltip = jQuery('<div></div>');
     this.errortooltip.addClass('error-tooltip');
     this.errortooltip.append(jQuery('<div></div>').addClass('title').text('Title'));

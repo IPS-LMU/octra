@@ -49,21 +49,16 @@
                                         <fa-icon
                                                 [icon]="['fas', (collapsed[j][k])? 'chevron-down': 'chevron-up']"></fa-icon>
                                     </div>
-                                    <div class="col-1 code" (click)="toggle(j,k)">
+                                    <div class="col-2 code" (click)="toggle(j,k)">
                                         {{entry.code}}
                                     </div>
-                                    <div class="col-9">
+                                    <div class="col-8">
                                         <span class="guidelines-title" (click)="toggle(j,k)">{{entry.title}}</span>
+                                        <p class="guidelines-descr" [collapse]="collapsed[j][k]">
+                                            {{entry.description}}
+                                        </p>
                                         <div class="row entry-row" [collapse]="collapsed[j][k]">
-                                            <div [ngClass]="{
-                                    'col-md-4': (entry.examples.length > 0),
-                                    'col-md-12': (entry.examples.length == 0)
-                                    }">
-                                        <span class="guidelines-descr">
-                                        {{entry.description}}
-                                            </span>
-                                            </div>
-                                            <div *ngIf="entry.examples.length > 0" class="col-md-8">
+                                            <div *ngIf="entry.examples.length > 0" class="col-md-12">
                                                 <div *ngFor="let example of entry.examples; let i = index;"
                                                      class="card card-example">
                                                     <div class="card-header example">

@@ -4,6 +4,7 @@ import {Subject} from 'rxjs/Subject';
 import {AppStorageService, KeymappingService, SettingsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {BugReportService} from '../../shared/service/bug-report.service';
+import {BrowserInfo} from '../../shared';
 
 @Component({
   selector: 'app-shortcuts-modal',
@@ -28,6 +29,10 @@ export class ShortcutsModalComponent implements OnInit {
   };
 
   @ViewChild('modal') modal: any;
+
+  public get platform(): string {
+    return BrowserInfo.platform;
+  }
 
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();

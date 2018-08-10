@@ -226,7 +226,7 @@ footer {
     flex: auto;
 }
 
-.note-editor.note-frame.panel span.bmd-form-group {
+.note-editing-area span.bmd-form-group {
     display: none;
 }
 
@@ -243,6 +243,7 @@ footer {
 
 .note-btn-group.btn-group.note-default {
     margin: 0;
+    display: inherit;
 }
 
 .note-toolbar-wrapper.panel-default {
@@ -251,4 +252,14 @@ footer {
 
 .val-error {
     border-bottom: 2px solid red;
+}
+
+.note-editor.note-frame.card {
+    display: flex;
+    flex-direction: column;
+    flex: auto;
+}
+
+.note-toolbar {
+    z-index: 20;
 }

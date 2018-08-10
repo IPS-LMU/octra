@@ -1,0 +1,120 @@
+<div bsModal #modal="bs-modal" *ngIf="guidelines !== null" class="modal fade" tabindex="-1" role="dialog"
+     aria-labelledby="dialog-sizes-name1"
+     id="rules">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row" style="width:100%;">
+                    <div class="col-md-7">
+                        <h3 style="display:inline;">{{"general.guidelines" | translate }}<span class="version">
+                     v {{ guidelines.meta.version }}
+                </span></h3>
+                        <button class="btn btn-sm btn-danger" style="border:1px solid red;" (click)="exportPDF()">
+                            <fa-icon icon="print"></fa-icon>
+                            PDF
+                        </button>
+                        <span class="project">
+                     {{"general.project" | translate }}: {{guidelines.meta.project }}
+                </span>
+                        <span class="authors">
+                     {{"general.authors" | translate }}: {{ guidelines.meta.authors }}
+                </span>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <fa-icon icon="search"></fa-icon></span>
+                                <input type="text" id="addon1" placeholder="{{'general.search' |translate}}"
+                                       class="form-control" #input (keyup)="search(input.value)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div *ngIf="shown_guidelines.instructions.length == 0" class="bg-warning">
+                    {{"general.no guidelines found" | translate}}
+                </div>
+                <div class="row" style="margin-bottom:20px;"
+                     *ngFor="let instructions of shown_guidelines.instructions;let j = index;">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                {{instructions.group}}
+                            </div>
+                            <div class="card-body" *ngIf="collapsed.length > 0">
+                                <div class="row select-row" *ngFor="let entry of instructions.entries;let k = index;">
+                                    <div class="col-1 chevron" (click)="toggle(j,k)">
+                                        <fa-icon
+                                                [icon]="['fas', (collapsed[j][k])? 'chevron-down': 'chevron-up']"></fa-icon>
+                                    </div>
+                                    <div class="col-1 code" (click)="toggle(j,k)">
+                                        {{entry.code}}
+                                    </div>
+                                    <div class="col-9">
+                                        <span class="guidelines-title" (click)="toggle(j,k)">{{entry.title}}</span>
+                                        <div class="row entry-row" [collapse]="collapsed[j][k]">
+                                            <div [ngClass]="{
+                                    'col-md-4': (entry.examples.length > 0),
+                                    'col-md-12': (entry.examples.length == 0)
+                                    }">
+                                        <span class="guidelines-descr">
+                                        {{entry.description}}
+                                            </span>
+                                            </div>
+                                            <div *ngIf="entry.examples.length > 0" class="col-md-8">
+                                                <div *ngFor="let example of entry.examples; let i = index;"
+                                                     class="card card-example">
+                                                    <div class="card-header example">
+                                                        {{"general.example" | translate}} {{i + 1}}
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div *ngIf="example.url.indexOf('.wav') > -1" class="media">
+                                                            <audio src="{{example.url}}" controls></audio>
+                                                        </div>
+                                                        <div *ngIf="example.url.indexOf('.mp4') > -1" class="media">
+                                                            <video
+                                                                    id="my-player_g{{j}}i{{k}}e{{i}}"
+                                                                    class="video-js vjs-default-skin vjs-big-play-centered"
+                                                                    controls
+                                                                    preload="auto"
+                                                                    data-setup='{}'>
+                                                                <source src="{{example.url}}" type="video/mp4">
+                                                                <p class="vjs-no-js">
+                                                                    To view this video please enable JavaScript, and
+                                                                    consider
+                                                                    upgrading to a
+                                                                    web browser that
+                                                                    <a href="http://videojs.com/html5-video-support/"
+                                                                       target="_blank">
+                                                                        supports HTML5 video
+                                                                    </a>
+                                                                </p>
+                                                            </video>
+                                                        </div>
+                                                        <div class="text">
+                                                            <code [innerHTML]="transcrService.rawToHTML(example.annotation)"></code>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-1 hidden-xs col-priority" (click)="toggle(j,k)">
+                                        <span class="label label-info">{{entry.priority}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="close()">
+                    {{"general.close" | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -5,13 +5,14 @@
     <div id="bottom-nav">
         <div class="btn-group btn-group-justified" role="group" aria-label="...">
             <a class="btn btn-default btn-raised"
-               (click)="logout()"><span
-                    class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+               (click)="logout()">
+                <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
                 <span class="hidden-xs hidden-sm"> {{"general.quit" | translate}}</span></a>
             <a class="btn btn-default btn-raised"
                (click)="accept()">
                 <span class="hidden-xs hidden-sm"> {{"general.continue" | translate}}</span>
-                <span class="glyphicon glyphicon glyphicon-menu-right" aria-hidden="true"></span></a>
+                <fa-icon [icon]="['far', 'check-circle']"></fa-icon>
+            </a>
         </div>
     </div>
 </div>

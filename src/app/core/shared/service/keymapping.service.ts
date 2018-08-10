@@ -29,18 +29,19 @@ export class KeymappingService {
   private onKeyDown = ($event) => {
     const combo = KeyMapping.getShortcutCombination($event);
     this._onkeydown.emit({comboKey: combo, event: $event});
-  }
+  };
 
   private onKeyUp = ($event) => {
     const combo = KeyMapping.getShortcutCombination($event);
     this._onkeyup.emit({comboKey: combo, event: $event});
-  }
+  };
 
 
   public getEntryList(name: string): Entry[] {
     const list = this.getShortcuts(name);
 
     if (list) {
+      console.log('CHECK!');
       let i = 0;
       for (const entry in list) {
         if (list.hasOwnProperty(entry)) {

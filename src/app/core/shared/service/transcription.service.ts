@@ -277,7 +277,7 @@ export class TranscriptionService {
                 for (let i = 0; i < this.appStorage.servertranscipt.length; i++) {
                   const seg_t = this.appStorage.servertranscipt[i];
 
-                  const oseg = new OSegment(i, seg_t.start, seg_t.length, [new OLabel('Tier_1', seg_t.text)]);
+                  const oseg = new OSegment(i, seg_t.start, seg_t.length, [new OLabel('OCTRA_1', seg_t.text)]);
                   this.appStorage.annotation[this.selectedlevel].level.items.push(oseg);
                 }
                 // clear servertranscript
@@ -316,7 +316,6 @@ export class TranscriptionService {
         transcript: null,
         comment: this._feedback.comment,
         jobno: (isNullOrUndefined(this.appStorage.user.jobno)) ? 'NOT AVAILABLE' : this.appStorage.user.jobno,
-        status: this.state,
         quality: this._feedback.exportData(),
         id: this.appStorage.data_id,
         log: log_data.getObj()
@@ -529,11 +528,11 @@ export class TranscriptionService {
         if (isNullOrUndefined(insertStart)) {
           insertStart = {
             start: validation[i].start,
-            puffer: '[[[div class=\'error_underline\' data-errorcode=\'' + validation[i].code + '\']]]'
+            puffer: '[[[span class=\'val-error\']]]'
           };
           insertions.push(insertStart);
         } else {
-          insertStart.puffer += '[[[div class=\'error_underline\' data-errorcode=\'' + validation[i].code + '\']]]';
+          insertStart.puffer += '[[[span class=\'val-error\']]]';
         }
 
         let insertEnd = insertions.find((val) => {
@@ -545,10 +544,10 @@ export class TranscriptionService {
             start: insertStart.start + validation[i].length,
             puffer: ''
           };
-          insertEnd.puffer = '[[[/div]]]';
+          insertEnd.puffer = '[[[/span]]]';
           insertions.push(insertEnd);
         } else {
-          insertEnd.puffer = '[[[/div]]]' + insertEnd.puffer;
+          insertEnd.puffer = '[[[/span]]]' + insertEnd.puffer;
         }
       }
 
@@ -612,8 +611,8 @@ export class TranscriptionService {
 
 
   public createNewAnnotation(): OAnnotJSON {
-    const level: OLevel = new OLevel('Tier_1', 'SEGMENT', []);
-    level.items.push(new OSegment(1, 0, this._audiomanager.ressource.info.duration.samples, [(new OLabel('Tier_1', ''))]));
+    const level: OLevel = new OLevel('OCTRA_1', 'SEGMENT', []);
+    level.items.push(new OSegment(1, 0, this._audiomanager.ressource.info.duration.samples, [(new OLabel('OCTRA_1', ''))]));
     const levels: OLevel[] = [];
     levels.push(level);
 
@@ -640,7 +639,7 @@ export class TranscriptionService {
               return jQuery(elem).replaceWith(Functions.escapeHtml(attr));
             }
           }
-        } else if (jQuery(elem).attr('class') !== 'error_underline') {
+        } else if (jQuery(elem).attr('class') !== 'val-error') {
           jQuery(elem).remove();
         }
       }

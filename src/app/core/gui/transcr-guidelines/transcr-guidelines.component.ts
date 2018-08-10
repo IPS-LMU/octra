@@ -1,5 +1,4 @@
 import {AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
-import {BsModalComponent} from 'ng2-bs3-modal';
 import {isNullOrUndefined} from 'util';
 import {TranscriptionService} from '../../shared/service/transcription.service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
@@ -13,7 +12,7 @@ import {SettingsService} from '../../shared/service/settings.service';
 })
 
 export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChanges {
-  @ViewChild('modal_guidelines') modal_guidelines: BsModalComponent;
+  @ViewChild('modal_guidelines') modal_guidelines: any;
 
   @Input() guidelines = null;
   public shown_guidelines: any = {};
@@ -32,7 +31,8 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
   }
 
   get visible(): boolean {
-    return this.modal_guidelines.visible;
+    return false;
+    // return this.modal_guidelines.visible;
   }
 
   ngOnInit() {
@@ -51,33 +51,6 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
       setTimeout(() => {
         this.initVideoPlayers();
       }, 1000);
-    }
-  }
-
-  initVideoPlayers() {
-    for (let g = 0; g < this.guidelines.instructions.length; g++) {
-      for (let i = 0; i < this.guidelines.instructions[g].entries.length; i++) {
-        for (let e = 0; e < this.guidelines.instructions[g].entries[i].examples.length; e++) {
-          const id_v = 'my-player_g' + g + 'i' + i + 'e' + e;
-          if (document.getElementById(id_v)) {
-
-            const old_player = this.videoplayerExists(id_v);
-
-            if (old_player > -1) {
-              // videojs(document.getElementById(id_v)).dispose();
-            } else {
-              const player = videojs(id_v, {
-                'fluid': true,
-                'autoplay': false,
-                'preload': 'auto'
-              }, function onPlayerReady() {
-              });
-
-              this.video_players.push(player);
-            }
-          }
-        }
-      }
     }
   }
 
@@ -112,6 +85,33 @@ export class TranscrGuidelinesComponent implements OnInit, AfterViewInit, OnChan
       }
     }
     return -1;
+  }
+
+  initVideoPlayers() {
+    for (let g = 0; g < this.guidelines.instructions.length; g++) {
+      for (let i = 0; i < this.guidelines.instructions[g].entries.length; i++) {
+        for (let e = 0; e < this.guidelines.instructions[g].entries[i].examples.length; e++) {
+          const id_v = 'my-player_g' + g + 'i' + i + 'e' + e;
+          if (document.getElementById(id_v)) {
+
+            const old_player = this.videoplayerExists(id_v);
+
+            if (old_player > -1) {
+              // videojs(document.getElementById(id_v)).dispose();
+            } else {
+              const player = videojs(id_v, {
+                'fluid': true,
+                'autoplay': false,
+                'preload': 'auto'
+              }, function onPlayerReady() {
+              });
+
+              this.video_players.push(player);
+            }
+          }
+        }
+      }
+    }
   }
 
   private search(text: string) {

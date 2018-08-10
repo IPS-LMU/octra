@@ -1,0 +1,22 @@
+<div bsModal #modal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1"
+     id="bugreport">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+
+            </div>
+            <div class="modal-body">
+                <app-transcr-overview *ngIf="visible && transcrService.annotation !== null"
+                                      [segments]="(transcrService.annotation !== null && transcrService.annotation !== undefined)
+                              ? transcrService.annotation.levels[transcrService.selectedlevel].segments.segments: null"
+                                      (segmentclicked)="onSegmentInOverviewClicked($event)">
+                </app-transcr-overview>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="close()">
+                    {{"general.close" | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

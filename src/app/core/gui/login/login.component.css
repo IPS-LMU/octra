@@ -40,13 +40,9 @@ h4 {
 
 .form-group {
     margin: 0;
-    margin-bottom: 0;
 }
 
-#loginrow {
-}
-
-@media (min-width: 990px) {
+@media (min-width: 796px) {
     #loginrow {
         flex: auto;
         display: flex;
@@ -62,4 +58,10 @@ footer .logo {
     display: flex;
     flex-direction: column;
     flex: auto;
+}
+
+.alert-success,
+h4,
+.alert-danger {
+    padding: 3px;
 }

@@ -11,26 +11,19 @@ import {
 import {Router} from '@angular/router';
 import {NgForm} from '@angular/forms';
 import {LoginService} from './login.service';
-import {
-  APIService,
-  AppStorageService,
-  AudioService,
-  ModalService,
-  OIDBLevel,
-  OIDBLink,
-  SettingsService
-} from '../../shared/service';
+import {APIService, AppStorageService, AudioService, OIDBLevel, OIDBLink, SettingsService} from '../../shared/service';
 import {ComponentCanDeactivate} from './login.deactivateguard';
 import {Observable} from 'rxjs/Observable';
 import {FileSize, Functions, OCTRANIMATIONS, SubscriptionManager} from '../../shared';
 import {BrowserCheck} from '../../shared/BrowserCheck';
 import {SessionFile} from '../../obj/SessionFile';
 import {isArray, isNullOrUndefined, isNumber} from 'util';
-import {BsModalComponent} from 'ng2-bs3-modal';
 import {TranslateService} from '@ngx-translate/core';
 import {Converter} from '../../obj/Converters';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
 import 'rxjs/add/operator/catch';
+import {ModalService} from '../../modals/modal.service';
+import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
 
 @Component({
   selector: 'app-login',
@@ -42,7 +35,7 @@ import 'rxjs/add/operator/catch';
 export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate, AfterViewInit {
   @ViewChild('f') loginform: NgForm;
   @ViewChild('dropzone') dropzone: OctraDropzoneComponent;
-  @ViewChild('agreement') agreement: BsModalComponent;
+  @ViewChild('agreement') agreement: ElementRef;
   @ViewChild('localmode') localmode: ElementRef;
   @ViewChild('onlinemode') onlinemode: ElementRef;
 
@@ -242,8 +235,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           }
         },
         (error) => {
-          this.modService.show('error', 'Server cannot be requested. Please check if you are online.');
-          return Observable.throw(error);
+          this.modService.show('error', {
+            text: 'Server cannot be requested. Please check if you are online.'
+          });
+          console.error(error);
         }
       ));
     }
@@ -338,6 +333,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   newTranscription = () => {
+    console.log(`in new Transcription!`);
     this.audioService.registerAudioManager(this.dropzone.audiomanager);
 
     this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
@@ -367,7 +363,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       },
       (error) => {
         if (error === 'file not supported') {
-          this.modService.show('error', this.langService.instant('reload-file.file not supported', {type: ''}));
+          this.modService.show('error', {
+            text: this.langService.instant('reload-file.file not supported', {type: ''})
+          });
         }
       }
     );
@@ -410,9 +408,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           if (!isNullOrUndefined(this.appStorage.user) &&
             !isNullOrUndefined(this.appStorage.user.project) && this.appStorage.user.project !== '') {
             if (isNullOrUndefined(this.projects.find(
-                (x) => {
-                  return x === this.appStorage.user.project;
-                }))) {
+              (x) => {
+                return x === this.appStorage.user.project;
+              }))) {
               // make sure that old project is in list
               this.projects.push(this.appStorage.user.project);
             }
@@ -525,5 +523,15 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     reader.readAsText(file, 'utf-8');
   }
 
-
+  onTranscriptionDelete() {
+    this.modService.show('transcription_delete').then((answer: ModalDeleteAnswer) => {
+      console.log(`answer: ${answer}`);
+      if (answer === ModalDeleteAnswer.DELETE) {
+        console.log('new Transcription!');
+        this.newTranscription();
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
+  }
 }

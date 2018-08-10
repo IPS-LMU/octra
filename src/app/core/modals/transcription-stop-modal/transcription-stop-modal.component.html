@@ -1,0 +1,18 @@
+<ng-template #modal>
+    <div class="modal-header">
+        <h4 class="modal-title">{{"modal.transcription.stop.header" | translate}}?</h4>
+    </div>
+    <div class="modal-body">
+        <div [innerHTML]="'modal.transcription.stop.text' | translate">
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="close('CONTINUE')">
+            {{"general.continue" | translate}}
+        </button>
+        <button type="button" class="btn btn-primary"
+                (click)="close('QUIT');">
+            {{"general.quit" | translate}}
+        </button>
+    </div>
+</ng-template>

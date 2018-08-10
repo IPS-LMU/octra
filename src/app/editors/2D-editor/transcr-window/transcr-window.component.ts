@@ -260,8 +260,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       if (!isNullOrUndefined(segment)) {
         this.editor.rawText = this.transcrService.currentlevel.segments.get(this.segment_index).transcript;
         this.audiochunk = new AudioChunk(new AudioSelection(begin, segment.time.clone()), this.audiochunk.audiomanager);
-      } else {
-        console.error('segment is null');
       }
     }
   }

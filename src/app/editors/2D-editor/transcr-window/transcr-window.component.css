@@ -24,6 +24,7 @@
 .window-nav-top,
 .window-nav-bottom {
     display: block;
+    padding: 0px 15px;
     width: 100%;
     text-align: right;
 }

@@ -134,6 +134,8 @@ export class Functions {
   }
 
   public static escapeHtml(text: string): string {
+    // TODO improve code!
+
     return text
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -143,6 +145,8 @@ export class Functions {
   }
 
   public static unEscapeHtml(text: string): string {
+    // TODO improve code!
+
     return text
       .replace('&amp;', '&')
       .replace('&lt;', '<')

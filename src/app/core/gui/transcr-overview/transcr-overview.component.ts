@@ -104,7 +104,19 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
         obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
           validateAnnotation(obj.transcription.text, this.transcrService.guidelines));
       }
+
+      console.log(`--------`);
+      console.log(`Transcription text before: ${obj.transcription.html}`);
       obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
+      obj.transcription.html = obj.transcription.html.replace(/(\[\[\[)|(]]])/g, (g0, g1, g2) => {
+        if (g2 === undefined && g1 !== undefined) {
+          return '<';
+        } else {
+          return '>';
+        }
+      });
+      console.log(`After conversion: ${obj.transcription.html}`);
+      console.log(`--------`);
 
       result.push(obj);
 

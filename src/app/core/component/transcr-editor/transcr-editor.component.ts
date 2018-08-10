@@ -11,6 +11,7 @@ import {isNumeric} from 'rxjs/util/isNumeric';
 import {TimespanPipe} from '../../../media-components/pipe';
 
 declare let lang: any;
+declare let document: any;
 
 @Component({
   selector: 'app-transcr-editor',
@@ -367,7 +368,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       let icon = '';
       if ((marker.icon_url === null || marker.icon_url === undefined) || marker.icon_url == '') {
         // text only
-        icon = '<span class=\'btn-description\'>' + marker.button_text;
+        icon = marker.button_text;
       }
       else {
         if (!this.easymode) {
@@ -419,7 +420,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
           const width = seg_popover.width();
           const height = seg_popover.height();
-          const editor_pos = jQuery('.note-toolbar.panel-heading').offset();
+          const editor_pos = jQuery('.note-toolbar-wrapper').offset();
           const seg_samples = jqueryobj.attr('data-samples');
 
           if (!isNullOrUndefined(seg_samples) && Functions.isNumber(seg_samples)) {
@@ -429,6 +430,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             seg_popover.css({
               'margin-left': (event.target.offsetLeft - (width / 2)) + 'px',
               'margin-top': (jqueryobj.offset().top - editor_pos.top - height - 10) + 'px',
+              'z-index': 30,
+              'position': 'absolute',
+              'background-color': 'white',
               'display': 'inherit'
             });
 
@@ -497,7 +501,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   insertMarker = (marker_code, icon_url) => {
     if ((icon_url === null || icon_url === undefined) || icon_url === '') {
       // text only
-      this.textfield.summernote('editor.insertText', marker_code);
+      this.textfield.summernote('editor.insertText', marker_code + ' ');
     } else {
       const element = document.createElement('img');
       element.setAttribute('src', icon_url);
@@ -539,7 +543,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
           const width = seg_popover.width();
           const height = seg_popover.height();
-          const editor_pos = jQuery('.note-toolbar.panel-heading').offset();
+          const editor_pos = jQuery('.note-toolbar-wrapper').offset();
           const seg_samples = jqueryobj.attr('data-samples');
 
           if (!isNullOrUndefined(seg_samples) && Functions.isNumber(seg_samples)) {
@@ -710,6 +714,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this._is_typing = true;
     this.lastkeypress = Date.now();
 
+    /*
+    TODO implement auto-validation
+
     setTimeout(() => {
       if (Date.now() - this.lastkeypress >= 1000) {
         this.saveSelection();
@@ -725,7 +732,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         code = code.replace(/<span(?:[\s ]|(?:&nbsp;))class=['"]val-error['"]>(.*)(?:[\s ]|(?:&nbsp;))<\/span>/g, (g0, g1) => {
           return g1;
         });
-        */
 
         code = this.convertEntitiesToString(code);
         console.log(code);
@@ -737,7 +743,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         this.restoreSelection();
       }
     }, 1000);
-
+    */
   };
 
   /**

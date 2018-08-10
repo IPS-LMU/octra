@@ -59,7 +59,10 @@ export class KeymappingService {
           }
         }
 
+        console.log(result);
         return result;
+      } else {
+        console.error(`no shortcuts found!`);
       }
     }
     return [];

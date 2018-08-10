@@ -1,6 +1,6 @@
 <div bsModal #modal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1"
      id="bugreport">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content" *ngIf="visible">
             <div class="modal-body">
                 <div *ngIf="editor == 'Editor without signal display'">
@@ -40,9 +40,10 @@
                             <tbody>
                             <tr *ngFor="let entry of keyMap.getEntryList('Loupe')">
                                 <td>{{"modal.shortcuts."+ entry.value.title |translate}}</td>
-                                <td>{{entry.value.keys[platform]}} <span
-                                        *ngIf="(entry.value !== null && entry.value.focusonly)"
-                                        class="focus-info">({{"general.on focus only" | translate}})</span>
+                                <td>
+                                    {{entry.value.keys[platform]}}
+                                    <span *ngIf="(entry.value !== null && entry.value.focusonly)"
+                                          class="focus-info">({{"general.on focus only" | translate}})</span>
                                 </td>
                             </tr>
                             </tbody>

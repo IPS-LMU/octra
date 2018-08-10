@@ -11,7 +11,6 @@ import {isNumeric} from 'rxjs/util/isNumeric';
 import {TimespanPipe} from '../../../media-components/pipe';
 
 declare let lang: any;
-declare let document: Document;
 
 @Component({
   selector: 'app-transcr-editor',
@@ -597,7 +596,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         let el2 = document.createElement('sel-start');
         range2.insertNode(el2);
       }
-    } else if (document.selection && document.selection.createRange) {
+    } else if (document.hasOwnProperty('selection') && document.selection.hasOwnProperty('createRange')) {
       alert('?');
       /*
       range = document.selection.createRange();

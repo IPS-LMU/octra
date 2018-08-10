@@ -1,39 +1,31 @@
-<div class="container">
-    <div class="row">
-        <div class="col-md-1"></div>
-        <div class="col-md-10 panel" style="background-color:white;padding:20px;">
-            <h3>{{"reload-file.header" | translate}}</h3>
-            <p>
-                {{"reload-file.text" | translate}}
-            </p>
-            <p>
-                <b>{{"general.wanted" |translate}}: {{getDropzoneFileString(sessionfile)}}</b><br/><br/>
-            </p>
-            <app-octra-dropzone #dropzone></app-octra-dropzone>
-            <div class="btn-group btn-group-justified" role="group" aria-label="...">
-                <div class="btn-group" role="group">
-                    <button class="btn btn-default btn-raised"
-                            (click)="modService.show('transcription_stop', '', {ok: abortTranscription})">
-                        <span class="glyphicon glyphicon glyphicon-log-out"></span> <span
-                            class="hidden-xs hidden-sm hidden-md">{{"transcription.stop" | translate}}</span>
-                    </button>
-                </div>
-                <div class="btn-group" role="group">
-                    <button class="btn btn-default btn-raised btn-danger" [disabled]="!(dropzone.status === 'valid')"
-                            (click)="modService.show('transcription_delete', '', {ok: newTranscription})">
-                        <span class="glyphicon glyphicon-file"></span> <span class="hidden-xs hidden-sm hidden-md">{{"transcription.new" | translate}}</span>
-                    </button>
-                </div>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-primary btn-raised"
-                            [disabled]="!(!isN(dropzone.oaudiofile) && sessionfile !== null && dropzone.oaudiofile.name === sessionfile.name && isN(dropzone.oannotation))"
-                            (click)="onOfflineSubmit()">
-                        <span class="glyphicon glyphicon glyphicon-edit"></span> <span
-                            class="hidden-xs hidden-sm hidden-md">{{"transcription.start" | translate}}</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-1"></div>
+<div class="container panel" style="background-color:white;padding:20px;">
+    <h3>{{"reload-file.header" | translate}}</h3>
+    <p>
+        {{"reload-file.text" | translate}}
+    </p>
+    <p>
+        <b>{{"general.wanted" |translate}}: {{getDropzoneFileString(sessionfile)}}</b><br/><br/>
+    </p>
+    <app-octra-dropzone #dropzone></app-octra-dropzone>
+
+    <div class="row" role="group">
+        <button class="btn btn-default btn-raised col-md-4"
+                (click)="askForAbort()">
+            <fa-icon icon="sign-out-alt"></fa-icon>
+            <span
+                    class="hidden-xs hidden-sm hidden-md"> {{"transcription.stop" | translate}}</span>
+        </button>
+        <button class="btn btn-default btn-raised btn-danger col-md-4" [disabled]="!(dropzone.status === 'valid')"
+                (click)="newTranscription()">
+            <fa-icon icon="file"></fa-icon>
+            <span class="hidden-xs hidden-sm hidden-md"> {{"transcription.new" | translate}}</span>
+        </button>
+        <button type="button" class="btn btn-primary btn-raised col-md-4"
+                [disabled]="!(!isN(dropzone.oaudiofile) && sessionfile !== null && dropzone.oaudiofile.name === sessionfile.name && isN(dropzone.oannotation))"
+                (click)="onOfflineSubmit()">
+            <fa-icon icon="edit"></fa-icon>
+            <span
+                    class="hidden-xs hidden-sm hidden-md"> {{"transcription.start" | translate}}</span>
+        </button>
     </div>
 </div>

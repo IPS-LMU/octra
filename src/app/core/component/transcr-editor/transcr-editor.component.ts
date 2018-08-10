@@ -10,6 +10,9 @@ import {AudioChunk, AudioManager, AudioTime} from '../../../media-components/obj
 import {isNumeric} from 'rxjs/util/isNumeric';
 import {TimespanPipe} from '../../../media-components/pipe';
 
+declare let lang: any;
+declare let document: Document;
+
 @Component({
   selector: 'app-transcr-editor',
   templateUrl: './transcr-editor.component.html',
@@ -183,7 +186,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             jQuery(elem).remove();
           }
         } else if (
-          jQuery(elem).attr('class') !== 'error_underline'
+          jQuery(elem).attr('class') !== 'val-error'
           && jQuery(elem).prop('tagName').toLowerCase() !== 'textspan'
         ) {
           jQuery(elem).remove();
@@ -385,6 +388,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       const btn_js = {
         contents: icon,
         tooltip: marker.description,
+        container: false,
         click: () => {
           // invoke insertText method with 'hello' on editor module.
           this.insertMarker(marker.code, marker.icon_url);
@@ -470,6 +474,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       const btn_js = {
         contents: icon,
         tooltip: boundary_descr,
+        container: false,
         click: () => {
           this.marker_click.emit('boundary');
           this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
@@ -562,76 +567,91 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           });
         });
     }, 200);
-    /*
-    // this.textfield.summernote('saveRange');
-    const selection: Selection = document.getSelection();
-    const cursorPos = selection.anchorOffset;
-    const oldContent = selection.anchorNode.nodeValue;
-    const t = jQuery(selection.anchorNode.parentElement);
 
-    console.log(this.textfield.summernote('createRange'));
-    // const range: any = this.textfield.summernote('createRange');
+    this.updateTextField();
+  }
 
-    if (selection.anchorNode.parentNode.nodeName.toLowerCase() === 'textspan') {
-      console.log('hasNextSibling ' + (selection.anchorNode.parentNode.nextSibling !== null));
-      const hasSibling = selection.anchorNode.parentNode.nextSibling !== null;
-      let element = document.createElement('img');
-      element.setAttribute('src', img_url);
-      element.setAttribute('class', 'btn-icon-text boundary');
-      element.setAttribute('style', 'height:16px');
-      element.setAttribute('data-samples', this.audiochunk.playposition.samples.toString());
+  saveSelection() {
+    let sel, range, expandedSelRange, node;
 
-      this.textfield.summernote('editor.insertNode', element);
-      if (!hasSibling) {
-        const test = document.createElement('textspan');
-        test.innerHTML = '&nbsp;';
-        const txt = document.createTextNode('dasd');
-        this.textfield.summernote('editor.insertNode', test);
+    jQuery('sel-start').remove();
+    jQuery('sel-end').remove();
 
-        const range = document.createRange();
-        range.setStart(test, 0);
-        range.setEnd(test, 0);
-        range.collapse(true);
+    if (window.getSelection) {
+      sel = window.getSelection();
+      if (sel.getRangeAt && sel.rangeCount) {
+        range = window.getSelection().getRangeAt(0);
+        let range2 = range.cloneRange();
 
-        const sel = window.getSelection();
+        // Range.createContextualFragment() would be useful here but is
+        // non-standard and not supported in all browsers (IE9, for one)
+        let el = document.createElement('sel-end');
+        let frag = document.createDocumentFragment(), node, lastNode;
+        while ((node = el.firstChild)) {
+          lastNode = frag.appendChild(node);
+        }
+        range.collapse(false);
+        range.insertNode(el);
+
+        range2.collapse(true);
+        let el2 = document.createElement('sel-start');
+        range2.insertNode(el2);
+      }
+    } else if (document.selection && document.selection.createRange) {
+      alert('?');
+      /*
+      range = document.selection.createRange();
+      expandedSelRange = range.duplicate();
+      range.collapse(false);
+      range.pasteHTML(html);
+      expandedSelRange.setEndPoint('EndToEnd', range);
+      expandedSelRange.select();
+      */
+    }
+  }
+
+  restoreSelection() {
+    let elem = document.getElementsByClassName('note-editable')[0];
+
+    if (elem != null && elem.getElementsByTagName('sel-start')[0] !== undefined) {
+      let el = elem;
+      let range = document.createRange();
+      console.log(range);
+      let sel = window.getSelection();
+      console.log(sel);
+      let selStart = elem.getElementsByTagName('sel-start')[0].previousSibling;
+      let selEnd = elem.getElementsByTagName('sel-end')[0].nextSibling;
+
+      let endOffset = 0;
+
+      let childLength = el.childNodes.length;
+
+      if (selStart !== null) {
+        // set start position
+        let lastNodeChildren = selStart.childNodes.length;
+        if (selStart.nodeName === '#text') {
+          console.log('is text');
+          lastNodeChildren = selStart.textContent.length;
+        }
+        range.setStart(selStart, lastNodeChildren);
+
+        if (selEnd !== null) {
+          range.setEnd(selEnd, endOffset);
+          console.log('same name! ' + selEnd.nodeName);
+          range.collapse(false);
+        }
+
         sel.removeAllRanges();
         sel.addRange(range);
+        // TODO change to specific textfield!
+        jQuery('sel-start').remove();
+        jQuery('sel-end').remove();
+      } else {
+        console.error('cursor is null!');
       }
-      // console.log('pos: ' + cursorPos);
-      // selection.anchorNode.nodeValue = oldContent.substr(0, cursorPos);
-
-
-            const range = document.createRange();
-            const sel = window.getSelection();
-            range.setEnd(selection.anchorNode, 0);
-            range.collapse(false);
-            sel.removeAllRanges();
-            sel.addRange(range);
-
-
-
-      // selection.setPosition(selection.anchorNode, selection.anchorNode.nodeValue.length);
-      // jQuery(selection.anchorNode.parentNode).after(element);
-
-            const nextspan = document.createElement('textspan');
-            nextspan.nodeValue = oldContent.substr(cursorPos);
-            nextspan.innerText = oldContent.substr(cursorPos);
-
-      // console.log(jQuery('.note-editable panel-body:eq(0)').html());
-      // jQuery(element).after(jQuery(nextspan));
-      // this.textfield.summernote('code', jQuery(nextspan).parent().html());
-      // const range = document.createRange().selectNode(nextspan);
-      // this.textfield.summernote('saveRange');
-      // range.selectNode(nextspan).setSelectionRange(0);
-      // this.textfield.summernote('code', jQuery('.note-editable panel-body:eq(0)').innerHTML);
-      // this.textfield.summernote('editor.insertNode', element);
-
-    */
-    this.updateTextField();
-    // this.initPopover();
-    // } else {
-    //   console.log('nodeName = ' + selection.anchorNode.parentNode.nodeName);
-    // }
+    } else {
+      console.error('elem is null');
+    }
   }
 
   /**
@@ -675,6 +695,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.updateTextField();
     this.onkeyup.emit($event);
 
+
     setTimeout(() => {
       if (Date.now() - this.lastkeypress >= 700) {
         if (this._is_typing && this.focused) {
@@ -689,6 +710,35 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
     this._is_typing = true;
     this.lastkeypress = Date.now();
+
+    setTimeout(() => {
+      if (Date.now() - this.lastkeypress >= 1000) {
+        this.saveSelection();
+        let code = this.textfield.summernote('code');
+        code = code.replace('<span class="val-error"><sel-start></sel-start><sel-end></sel-end></span>', '<sel-start></sel-start><sel-end></sel-end>');
+        console.log(`BEFORE`);
+        console.log(code);
+        console.log(`AFTER!`);
+
+        code = code.replace(/(<span(?:[\s ]|(?:&nbsp;))class=['"]val-error['"]>)|(<\/span>)/g, '');
+
+        /*
+        code = code.replace(/<span(?:[\s ]|(?:&nbsp;))class=['"]val-error['"]>(.*)(?:[\s ]|(?:&nbsp;))<\/span>/g, (g0, g1) => {
+          return g1;
+        });
+        */
+
+        code = this.convertEntitiesToString(code);
+        console.log(code);
+        code = this.transcrService.underlineTextRed(code, validateAnnotation(code, this.transcrService.guidelines));
+        code = code.replace('<br>', '');
+        this.textfield.summernote('code', code);
+        console.log(`END:`);
+        console.log(code);
+        this.restoreSelection();
+      }
+    }, 1000);
+
   };
 
   /**
@@ -746,6 +796,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     return (j > -1);
   }
 
+  public convertEntitiesToString(str: string) {
+    return jQuery('<textarea />').html(str).text();
+  }
+
   /**
    * converts raw text of markers to html
    * @param rawtext
@@ -760,7 +814,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
       const markers = this.markers;
       // replace all tags that are not markers
-      result = result.replace(new RegExp('(<[\\w\\+\\*:=~ ";]+>)', 'g'), function (x) {
+      result = result.replace(new RegExp('(<[\\w\+\*:=~ ";]+>)', 'g'), function (x) {
         for (let i = 0; i < markers.length; i++) {
           const marker = markers[i];
           if (arguments[0] === marker.code) {

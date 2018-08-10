@@ -1,417 +1,290 @@
-<bs-modal #modalexport>
-    <bs-modal-header>
-        <h4 class="modal-title">{{"general.export data" | translate}}</h4>
-    </bs-modal-header>
-    <bs-modal-body id="export-table">
-        <table class="table table-striped table-responsive">
-            <thead>
-            <tr>
-                <th>{{'general.download' | translate}}</th>
-                <th>{{'general.application' | translate}}</th>
-                <th>{{'general.website' | translate}}</th>
-            </tr>
-            </thead>
-            <tbody>
-            <ng-container *ngFor="let converter of converters; let i = index;">
-                <tr *ngIf="converter.conversion.export">
-                    <td>
-                        <a #a (click)="onLineClick(converter, i)">
-                            {{converter.name}} (*{{converter.extension}})
-                        </a>
-                        <i class="fa fa-spinner fa-spin"
-                           *ngIf="preparing.name === converter.name && preparing.preparing"></i>
-                    </td>
-                    <td>
-                        {{converter.application}}
-                    </td>
-                    <td>
-                        <a href="{{converter.website.url}}" target="_blank">
-                            {{converter.website.title}}
-                        </a>
-                    </td>
-                    <td>
-                        <span *ngIf="converter.notice !== ''" class="glyphicon glyphicon-info-sign"
-                              [attr.title]="converter.notice"></span>
-                    </td>
-                </tr>
-                <tr [@fadeToggle]="export_states[i]" *ngIf="converter.conversion.export">
-                    <td colspan="5" style="padding-left:20px;">
-                        <select #val *ngIf="navbarServ.transcrService !== undefined && !converter.multitiers"
-                                (change)="onSelectionChange(converter, val.value)">
-                            <option value="">{{"general.select one tier" | translate}}</option>
-                            <option *ngFor="let level of navbarServ.transcrService.annotation.levels; let l = index;"
-                                    value="{{l}}">{{level.name}}
-                            </option>
-                        </select>
+<app-export-files-modal #modalexport [transcrService]="navbarServ.transcrService" [uiService]="navbarServ.uiService">
+</app-export-files-modal>
+<app-statistics-modal #modalstatistics></app-statistics-modal>
+<app-prompt-modal #promptmodal></app-prompt-modal>
 
-                        <a style="margin-left:10px;" *ngIf="preparing.name === converter.name && !preparing.preparing"
-                           download="{{parentformat.download}}" [href]="parentformat.uri"
-                           class="link">
-                            <span class="glyphicon glyphicon-floppy-save"></span> Download
-                        </a>
-                    </td>
-                </tr>
-            </ng-container>
-            </tbody>
-        </table>
-        <a *ngIf="arraybufferExists" (click)="getAudioURI();">
-            <span class="glyphicon glyphicon-headphones"></span> Audio file (experimental)</a>
-        <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === 'Audio' && preparing.preparing"></i>
-        <a style="margin-left:10px;" *ngIf="preparing.name === 'Audio' && !preparing.preparing"
-           download="{{parentformat.download}}" [href]="parentformat.uri"
-           class="link">
-            <span class="glyphicon glyphicon-floppy-save"></span> Download
-        </a><br/>
-        <a (click)="getProtocol()"><span class="glyphicon glyphicon-list"></span> Protocol</a>
-        <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === 'Protocol' && preparing.preparing"></i>
-        <a style="margin-left:10px;" *ngIf="preparing.name === 'Protocol' && !preparing.preparing"
-           download="{{parentformat.download}}" [href]="parentformat.uri"
-           class="link">
-            <span class="glyphicon glyphicon-floppy-save"></span> Download
-        </a><br/>
-    </bs-modal-body>
-    <bs-modal-footer>
-        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="modalexport.dismiss()">
-            {{"general.close" | translate}}
-        </button>
-    </bs-modal-footer>
-</bs-modal>
-<bs-modal #modalstatistics id="modalstatis">
-    <bs-modal-header>
-        <h4 class="modal-title">Statistics</h4>
-    </bs-modal-header>
-    <bs-modal-body>
-        <div *ngIf="modalstatistics.visible">
-            <h3>Transkriptionstext:</h3>
-            <p>
-                {{getText()}}
-            </p>
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Wert</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>Anzahl Segmente:</td>
-                    <td>{{transcrServ.currentlevel.segments.length}}</td>
-                </tr>
-                <tr>
-                    <td>Anzahl Logeinträge:</td>
-                    <td>{{(UIElements != null) ? UIElements.length : 0}}</td>
-                </tr>
-                </tbody>
-            </table>
-            <h3 style="display:inline;">Ereignisse</h3>
-            <button (click)="clearElements()">Ereignisse löschen</button>
-            <div style="max-height:400px;overflow: scroll;">
-                <table class="table" style="">
-                    <thead>
-                    <tr>
-                        <th>Zeit</th>
-                        <th>Typ</th>
-                        <th>Ziel</th>
-                        <th>Inhalt</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr *ngFor="let elem of UIElements">
-                        <td>{{elem.timestamp | date:"dd.MM.yy HH:mm:ss"}}</td>
-                        <td>{{elem.type}}</td>
-                        <td>{{elem.context}}</td>
-                        <td>
-                            {{elem.value}}
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-            <h3>
-                Das Transkriptionsobjekt:
-            </h3>
-            <textarea style="width:100%; height:300px;">{{dat}}</textarea>
-        </div>
-    </bs-modal-body>
-    <bs-modal-footer>
-        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="modalstatistics.dismiss()">
-            {{"general.close" | translate}}
-        </button>
-    </bs-modal-footer>
-</bs-modal>
-<bs-modal #promptmodal id="prompt-modal">
-    <bs-modal-header>
-        <h4 class="modal-title">{{"general.prompt" | translate}}</h4>
-    </bs-modal-header>
-    <bs-modal-body>
-        {{appStorage.prompttext}}
-    </bs-modal-body>
-    <bs-modal-footer>
-        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="promptmodal.dismiss()">
-            {{"general.close" | translate}}
-        </button>
-    </bs-modal-footer>
-</bs-modal>
-<nav class="navbar navbar-inverse">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" (click)="collapsed = ! collapsed"
-                    data-target="#navbar" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" [routerLink]="['/']" [queryParamsHandling]="'merge'">OCTRA v{{version}}</a>
-        </div>
-        <div id="navbar" class="collapse navbar-collapse">
-            <ul class="nav navbar-nav" *ngIf="!appStorage.LoggedIn">
-                <li routerLinkActive="active">
-                    <a [routerLink]="['/login']" [queryParamsHandling]="'merge'">{{'general.login' | translate}}</a>
-                </li>
-                <li routerLinkActive="active">
-                    <a [routerLink]="['/features']" [queryParamsHandling]="'merge'">{{'general.features' |
-                        translate}}</a>
-                </li>
-                <li routerLinkActive="active">
-                    <a [routerLink]="['/news']" [queryParamsHandling]="'merge'">{{'general.news' | translate}}</a>
-                </li>
-                <li routerLinkActive="active">
-                    <a [routerLink]="['/faq']" [queryParamsHandling]="'merge'">{{'general.faq' | translate}}</a>
-                </li>
-            </ul>
-
-            <ul class="nav navbar-nav">
-                <ng-template ngFor let-editor [ngForOf]="editors">
-                    <li *ngIf="appStorage.LoggedIn && navbarServ.show_interfaces && interfaceActive(editor.name)"
-                        [ngClass]="{
+<nav class="navbar navbar-expand-md navbar-fixed-top navbar-dark" style="z-index:1000;">
+    <a class="navbar-brand" href="#">OCTRA v{{version}}</a>
+    <div class="d-block d-md-none" *ngIf="environment.dev_version" style="color:red;">in developement</div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto" *ngIf="!appStorage.LoggedIn">
+            <li class="nav-item" [routerLinkActive]="['active']">
+                <a class="nav-link" [routerLink]="['/login']" [queryParamsHandling]="'merge'">{{'general.login' |
+                    translate}}</a>
+            </li>
+            <li class="nav-item" [routerLinkActive]="['active']">
+                <a class="nav-link" [routerLink]="['/features']" [queryParamsHandling]="'merge'">{{'general.features' |
+                    translate}}</a>
+            </li>
+            <li class="nav-item" [routerLinkActive]="['active']">
+                <a class="nav-link" [routerLink]="['/news']" [queryParamsHandling]="'merge'">{{'general.news' |
+                    translate}}</a>
+            </li>
+            <li class="nav-item" [routerLinkActive]="['active']">
+                <a class="nav-link" [routerLink]="['/faq']" [queryParamsHandling]="'merge'">{{'general.faq' |
+                    translate}}</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav mr-auto" *ngIf="appStorage.LoggedIn">
+            <ng-template ngFor let-editor [ngForOf]="editors">
+                <li class="nav-item"
+                    *ngIf="appStorage.LoggedIn && navbarServ.show_interfaces && interfaceActive(editor.name)"
+                    [ngClass]="{
                         'active': appStorage.Interface === editor.name
                     }"
-                    >
-                        <a (mouseup)="setInterface(editor.name)">
-                            <span [innerHTML]="editor.icon"></span> <span class="hidden-sm">{{editor.translate | translate}}</span>
-                        </a>
-                    </li>
-
-                </ng-template>
-                <li *ngIf="appStorage.LoggedIn && navbarServ.show_interfaces && settService.app_settings.octra.showdetails">
-                    <a (mouseup)="modalstatistics.open()">
-                        <span class="glyphicon glyphicon-th-list navbar-icon"></span> <span
-                            class="hidden-sm">Statistics</span></a>
+                >
+                    <a class="nav-link" (mouseup)="setInterface(editor.name)">
+                        <fa-icon [icon]="['fas', editor.icon]"></fa-icon>
+                        <span
+                            class="hidden-sm"> {{editor.translate | translate}}</span>
+                    </a>
                 </li>
-            </ul>
-
-            <ul class="nav navbar-nav navbar-right">
-                <li class="dropdown" *ngIf="transcrServ !== undefined" [ngStyle]="{
+            </ng-template>
+            <li class="nav-item"
+                *ngIf="appStorage.LoggedIn && navbarServ.show_interfaces && settService.app_settings.octra.showdetails">
+                <a class="nav-link" (mouseup)="modalstatistics.open()">
+                    <fa-icon icon="th-list" class="navbar-icon"></fa-icon>
+                    <span class="hidden-sm"> Statistics</span></a>
+            </li>
+        </ul>
+        <ul class="navbar-nav mt-2 mt-md-0">
+            <!--
+            tiersDropdown
+            -->
+            <li class="nav-item dropdown" *ngIf="transcrServ !== undefined" [ngStyle]="{
                 'display': (!(navbarServ.dataloaded && appStorage.LoggedIn && (appStorage.usemode === 'local' || appStorage.usemode === 'url'))) ? 'none': 'inherit'
                 }">
-                    <a href="#" class="dropdown" data-toggle="dropdown" role="button"
-                       aria-expanded="false">
-                        {{(transcrServ.currentlevel.name.length > 30) ? transcrServ.currentlevel.name.substr(0, 30) +
-                        '...' : transcrServ.currentlevel.name}}
-                        <span class="glyphicon glyphicon-book navbar-icon"></span>
-                    </a>
-                    <div class="dropdown-menu options-menu" [ngClass]="{
+                <a href="#" id="tiersDropdown" class="nav-link" data-toggle="dropdown" role="button"
+                   aria-haspopup="true"
+                   aria-expanded="false">
+                    {{(transcrServ.currentlevel.name.length > 30) ? transcrServ.currentlevel.name.substr(0, 30) +
+                    '...' : transcrServ.currentlevel.name}}
+                    <fa-icon icon="book" class="navbar-icon"></fa-icon>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right options-menu" aria-labelledby="tiersDropdown" [ngClass]="{
                         'collaps': collapsed
                     }">
-
-                        <div class="row level-row" *ngFor="let level of transcrServ.annotation.levels; let i = index;"
-                             [ngClass]="{
+                    <div class="row level-row" *ngFor="let level of transcrServ.annotation.levels; let i = index;"
+                         [ngClass]="{
                         selected: (transcrServ.selectedlevel === i)
                         }"
-                        >
-                            <div class="col-xs-2" style="cursor: pointer;"
-                                 [ngClass]="{ disabled: (level.getTypeString() !== 'SEGMENT') }"
-                                 (click)="selectLevel(i)">{{i+1}}:
-                            </div>
-                            <div class="col-xs-7" [ngClass]="{ disabled: (level.getTypeString() !== 'SEGMENT') }"><input
-                                    (click)="onLevelNameClick($event)"
-                                    (blur)="onLevelNameLeave($event, i)" type="text"
-                                    maxlength="100" value="{{level.name}}"/>
-                            </div>
-                            <div class="col-xs-3">
-                                <span style="cursor:pointer;" class="glyphicon glyphicon-trash"
-                                      (click)="onLevelRemoveClick(i, level.id)"></span>
-                                <span *ngIf="level.type === AnnotJSONType.SEGMENT"
-                                      style="margin-left:3px;cursor:pointer;" class="glyphicon glyphicon-duplicate"
-                                      (click)="onLevelDuplicateClick(i, level.id)"></span>
-                            </div>
+                    >
+                        <div class="col-2" style="cursor: pointer;"
+                             [ngClass]="{ disabled: (level.getTypeString() !== 'SEGMENT') }"
+                             (click)="selectLevel(i)">{{i+1}}:
                         </div>
-                        <div class="row level-add-row" (click)="onLevelAddClick()">
-                            <div class="col-xs-12"><span class="glyphicon glyphicon-plus"></span></div>
+                        <div class="col-7" [ngClass]="{ disabled: (level.getTypeString() !== 'SEGMENT') }"><input
+                                (click)="onLevelNameClick($event)"
+                                (blur)="onLevelNameLeave($event, i)" type="text"
+                                maxlength="100" value="{{level.name}}"/>
+                        </div>
+                        <div class="col-3">
+                            <fa-icon icon="trash" style="cursor: pointer;"
+                                     (click)="onLevelRemoveClick(i, level.id)"></fa-icon>
+                            <fa-icon [icon]="['far', 'copy']" *ngIf="level.type === AnnotJSONType.SEGMENT"
+                                     style="margin-left:3px;cursor:pointer;"
+                                     (click)="onLevelDuplicateClick(i, level.id)"></fa-icon>
                         </div>
                     </div>
-                </li>
+                    <div class="row level-add-row" (click)="onLevelAddClick()">
+                        <div class="col-12">
+                            <fa-icon icon="plus"></fa-icon>
+                        </div>
+                    </div>
+                </div>
+            </li>
 
-                <li class="dropdown" *ngIf="(appStorage.LoggedIn && navbarServ.dataloaded)">
-                    <a href="#" class="dropdown" data-toggle="dropdown" role="button"
-                       aria-expanded="false"><span class="glyphicon glyphicon-info-sign navbar-icon"></span></a>
-                    <div class="dropdown-menu info-menu" [ngClass]="{
-                        'collaps': collapsed
-                        }">
-                        <table class="table">
-                            <tr *ngIf="appStorage.usemode === 'online'">
-                                <td><span>{{'general.project' |translate}}:</span></td>
-                                <td>
-                                    <span>{{appStorage.user.project}}</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span>{{'general.name' | translate}}:</span></td>
-                                <td>
-                                    <span>{{navbarServ.exportformats.filename}}</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span>{{'general.duration' | translate}}:</span></td>
-                                <td>
-                                    <span>{{navbarServ.exportformats.duration | timespan2}} (H:m:s)</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span>{{'general.samplerate' | translate}}:</span></td>
-                                <td>
-                                    <span>{{navbarServ.exportformats.samplerate}}</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span>{{'general.bitspersecond' | translate}}:</span></td>
-                                <td>
-                                    <span>{{navbarServ.exportformats.bitrate}} Bit/s</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span>{{'general.filesize' | translate}}:</span></td>
-                                <td>
-                                    <span>{{navbarServ.exportformats.filesize.size}} {{navbarServ.exportformats.filesize.label}}</span>
-                                </td>
-                            </tr>
-                            <tr *ngIf="appStorage.usemode === 'online'">
-                                <td><span>{{'general.id' | translate}}:</span></td>
-                                <td>
-                                    <span>{{appStorage.data_id}}</span>
-                                </td>
-                            </tr>
-                            <tr *ngIf="appStorage.usemode === 'online'">
-                                <td><span>{{'general.free jobs' | translate}}:</span></td>
-                                <td>
-                                    <span>{{appStorage.jobs_left}}</span>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </li>
-                <li *ngIf="appStorage.LoggedIn && navbarServ.show_export">
-                    <a (mouseup)="modalexport.open()">
-                        <span class="glyphicon glyphicon-download navbar-icon"></span>
-                        <span class="hidden-sm hidden-md">{{"general.export" | translate}}</span>
-                    </a>
-                </li>
-                <li class="dropdown" [ngStyle]="{
+            <!--
+            infoDropdown
+            -->
+            <li class="nav-item dropdown" *ngIf="(appStorage.LoggedIn && navbarServ.dataloaded)">
+                <a class="nav-link" href="#" id="infoDropdown" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    <fa-icon icon="info-circle" class="navbar-icon"></fa-icon>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right info-menu" aria-labelledby="infoDropdown">
+                    <table class="table">
+                        <tr *ngIf="appStorage.usemode === 'online'">
+                            <td><span>{{'general.project' |translate}}:</span></td>
+                            <td>
+                                <span>{{appStorage.user.project}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span>{{'general.name' | translate}}:</span></td>
+                            <td>
+                                <span>{{navbarServ.exportformats.filename}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span>{{'general.duration' | translate}}:</span></td>
+                            <td>
+                                <span>{{navbarServ.exportformats.duration | timespan2}} (H:m:s)</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span>{{'general.samplerate' | translate}}:</span></td>
+                            <td>
+                                <span>{{navbarServ.exportformats.samplerate}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span>{{'general.bitspersecond' | translate}}:</span></td>
+                            <td>
+                                <span>{{navbarServ.exportformats.bitrate}} Bit/s</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span>{{'general.filesize' | translate}}:</span></td>
+                            <td>
+                                <span>{{navbarServ.exportformats.filesize.size}} {{navbarServ.exportformats.filesize.label}}</span>
+                            </td>
+                        </tr>
+                        <tr *ngIf="appStorage.usemode === 'online'">
+                            <td><span>{{'general.id' | translate}}:</span></td>
+                            <td>
+                                <span>{{appStorage.data_id}}</span>
+                            </td>
+                        </tr>
+                        <tr *ngIf="appStorage.usemode === 'online'">
+                            <td><span>{{'general.free jobs' | translate}}:</span></td>
+                            <td>
+                                <span>{{appStorage.jobs_left}}</span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </li>
+            <li class="nav-item" *ngIf="appStorage.LoggedIn && navbarServ.show_export">
+                <a class="nav-link" (mouseup)="modalexport.open()">
+                    <fa-icon icon="download" class="navbar-icon"></fa-icon>
+                    <!-- TODO CHNAGE this! -->
+                    <span class="hidden-sm hidden-md"> {{"general.export" | translate}}</span>
+                </a>
+            </li>
+
+            <!--
+            optionsDropdown
+            -->
+            <li class="nav-item dropdown" [ngStyle]="{
                 'display': (!(navbarServ.dataloaded && appStorage.LoggedIn)) ? 'none': 'inherit'
                 }">
-                    <a href="#" class="dropdown" data-toggle="dropdown" role="button"
-                       aria-expanded="false"><span class="glyphicon glyphicon-cog navbar-icon"></span></a>
-                    <div class="dropdown-menu options-menu" [ngClass]="{
-                        'collaps': collapsed
-                    }">
-                        <table class="table">
-                            <tr>
-                                <td><label for="easymode">{{"settings.easy mode" | translate}}:</label></td>
-                                <td>
-                                    <div class="togglebutton">
-                                        <label>
-                                            <input (click)="toggleSettings('easymode')" [checked]="appStorage.easymode"
-                                                   id="easymode" type="checkbox">
-                                        </label>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><label for="playonhover">{{"settings.play on hover" | translate}}:</label></td>
-                                <td>
-                                    <div class="togglebutton">
-                                        <label>
-                                            <input (click)="toggleSettings('playonhover')"
-                                                   [checked]="appStorage.playonhover"
-                                                   id="playonhover" type="checkbox">
-                                        </label>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><label for="playonhover">{{"settings.follow playcursor" | translate}}:</label></td>
-                                <td>
-                                    <div class="togglebutton">
-                                        <label>
-                                            <input (click)="toggleSettings('followplaycursor')"
-                                                   [checked]="appStorage.followplaycursor"
-                                                   id="followplaycursor" type="checkbox">
-                                        </label>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><label for="playonhover">{{"settings.logging" | translate}}:</label></td>
-                                <td>
-                                    <div class="togglebutton">
-                                        <label>
-                                            <input (click)="toggleSettings('logging')"
-                                                   [checked]="appStorage.logging"
-                                                   [disabled]="appStorage.usemode === 'online'"
-                                                   id="logging" type="checkbox">
-                                        </label>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><label for="playonhover">{{"settings.show loupe" | translate}}:</label></td>
-                                <td>
-                                    <div class="togglebutton">
-                                        <label>
-                                            <input (click)="toggleSettings('show_loupe')"
-                                                   [checked]="appStorage.show_loupe"
-                                                   id="show_loupe" type="checkbox">
-                                        </label>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </li>
-                <li *ngIf="settService.app_settings !== undefined && settService.app_settings.octra.bugreport !== undefined && settService.app_settings.octra.bugreport.enabled">
-                    <a (mouseup)="openBugReport()">
-                        <span class="glyphicon glyphicon-exclamation-sign navbar-icon" style="color:#fcffba"
-                              [ngStyle]="{
+                <a class="nav-link" href="#" id="optionsDropdown" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    <fa-icon icon="cog"></fa-icon>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right options-menu" aria-labelledby="optionsDropdown">
+                    <table class="table">
+                        <tr>
+                            <td><label for="easymode">{{"settings.easy mode" | translate}}:</label></td>
+                            <td>
+                                <div class="switch">
+                                    <label>
+                                        <input (click)="toggleSettings('easymode')" [checked]="appStorage.easymode"
+                                               id="easymode" type="checkbox">
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label for="playonhover">{{"settings.play on hover" | translate}}:</label></td>
+                            <td>
+                                <div class="switch">
+                                    <label>
+                                        <input (click)="toggleSettings('playonhover')"
+                                               [checked]="appStorage.playonhover"
+                                               id="playonhover" type="checkbox">
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label for="playonhover">{{"settings.follow playcursor" | translate}}:</label></td>
+                            <td>
+                                <div class="switch">
+                                    <label>
+                                        <input (click)="toggleSettings('followplaycursor')"
+                                               [checked]="appStorage.followplaycursor"
+                                               id="followplaycursor" type="checkbox">
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label for="playonhover">{{"settings.logging" | translate}}:</label></td>
+                            <td>
+                                <div class="switch">
+                                    <label>
+                                        <input (click)="toggleSettings('logging')"
+                                               [checked]="appStorage.logging"
+                                               [disabled]="appStorage.usemode === 'online'"
+                                               id="logging" type="checkbox">
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label for="playonhover">{{"settings.show loupe" | translate}}:</label></td>
+                            <td>
+                                <div class="switch">
+                                    <label>
+                                        <input (click)="toggleSettings('show_loupe')"
+                                               [checked]="appStorage.show_loupe"
+                                               id="show_loupe" type="checkbox">
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </li>
+
+            <!--
+            BugReport
+            -->
+            <li class="nav-item"
+                *ngIf="settService.app_settings !== undefined && settService.app_settings.octra.bugreport !== undefined && settService.app_settings.octra.bugreport.enabled">
+                <a class="nav-link" (mouseup)="openBugReport()">
+                    <fa-icon icon="exclamation-circle" class="navbar-icon" style="color:#fcffba"
+                             [ngStyle]="{
                             color: (errorsFound) ? 'red' : '#fcffba'
                         }"
-                        ></span>
-                    </a>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                       aria-expanded="false">{{langService.currentLang | uppercase}} <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li *ngFor="let item of langService.getLangs();">
-                            <a (click)="changeLanguage(item)">{{item | uppercase}}</a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div><!-- .nav-collapse -->
+                    ></fa-icon>
+                </a>
+            </li>
+
+            <!--
+            languageDropdown
+            -->
+            <li class="nav-item dropdown active">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    {{langService.currentLang | uppercase}} <span class="caret"></span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" *ngFor="let item of langService.getLangs();"
+                       (click)="changeLanguage(item)">
+                        {{item | uppercase}}</a>
+                </div>
+            </li>
+        </ul>
     </div>
 </nav>
 <div id="subnav" class="panel" *ngIf="appStorage.LoggedIn && appStorage.usemode === 'online' && navbarServ.dataloaded">
     <div class="row">
-        <div class="col-xs-3 col-sm-3">{{"general.project" | translate}}: {{appStorage.user.project}}</div>
-        <div class="col-xs-3 col-sm-3">{{"general.name" |translate}}:
+        <div class="col-3 col-sm-3">{{"general.project" | translate}}: {{appStorage.user.project}}</div>
+        <div class="col-3 col-sm-3">{{"general.name" |translate}}:
             {{navbarServ.exportformats.filename}}
         </div>
-        <div class="col-xs-3 col-sm-3">{{'general.free jobs' | translate}}:
+        <div class="col-3 col-sm-3">{{'general.free jobs' | translate}}:
             {{appStorage.jobs_left}}
         </div>
-        <div class="col-xs-3 col-sm-3"><a (click)="promptmodal.open()" style="cursor: pointer;">{{'general.prompt' |
+        <div class="col-3 col-sm-3"><a (click)="promptmodal.open()" style="cursor: pointer; color:#009688;">{{'general.prompt'
+            |
             translate}}</a></div>
     </div>
 </div>

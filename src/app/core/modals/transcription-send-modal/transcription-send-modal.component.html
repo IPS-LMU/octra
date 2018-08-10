@@ -1,0 +1,13 @@
+<ng-template #modal>
+    <div class="modal-header">
+        <h4 class="modal-title">{{"modal.transcription.send.header" | translate}}</h4>
+    </div>
+    <div class="modal-body">
+        {{"modal.transcription.send.text" | translate}}
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="close('ABORT')">{{"general.abort" | translate}}</button>
+        <button type="button" class="btn btn-default" (click)="close('SEND')">{{"general.send now" | translate}}
+        </button>
+    </div>
+</ng-template>

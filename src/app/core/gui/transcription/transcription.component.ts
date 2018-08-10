@@ -15,7 +15,6 @@ import {
   ViewChild
 } from '@angular/core';
 import {Router} from '@angular/router';
-import {BsModalComponent} from 'ng2-bs3-modal/ng2-bs3-modal';
 
 import {
   APIService,
@@ -24,7 +23,6 @@ import {
   Entry,
   KeymappingService,
   MessageService,
-  ModalService,
   NavbarService,
   SettingsService,
   TranscriptionService,
@@ -47,6 +45,9 @@ import {HttpClient} from '@angular/common/http';
 import {IFile, PartiturConverter} from '../../obj/Converters';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import * as X2JS from 'x2js';
+import {ModalService} from '../../modals/modal.service';
+import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
+import {ModalSendAnswer} from '../../modals/transcription-send-modal/transcription-send-modal.component';
 
 @Component({
   selector: 'app-transcription',
@@ -62,24 +63,29 @@ export class TranscriptionComponent implements OnInit,
 
   private subscrmanager: SubscriptionManager;
 
-  @ViewChild('modal_shortcuts') modal_shortcuts: BsModalComponent;
+  // TODO change to ModalComponents!
+  @ViewChild('modal_shortcuts') modal_shortcuts: any;
   @ViewChild('modal_guidelines') modal_guidelines: TranscrGuidelinesComponent;
-  @ViewChild('modal_overview') modal_overview: BsModalComponent;
+  @ViewChild('modal_overview') modal_overview: any;
   @ViewChild(LoadeditorDirective) appLoadeditor: LoadeditorDirective;
   private _currentEditor: ComponentRef<Component>;
 
-  @ViewChild('modal') modal: BsModalComponent;
-  @ViewChild('modal2') modal2: BsModalComponent;
+  @ViewChild('modal') modal: any;
+  @ViewChild('modal2') modal2: any;
   @ViewChild('fo') feedback_form: NgForm;
   public send_error = '';
 
   public showdetails = false;
   public saving = '';
-  public interface = '';
+  public interface: string = '';
   private send_ok = false;
   public shortcutslist: Entry[] = [];
   public editorloaded = false;
   public feedback_data = {};
+
+  public get Interface(): string {
+    return this.interface;
+  }
 
   private level_subscription_id = 0;
   public feedback_expanded = false;
@@ -200,10 +206,10 @@ export class TranscriptionComponent implements OnInit,
       (event: LangChangeEvent) => {
         let lang = event.lang;
         if (isNullOrUndefined(this.settingsService.projectsettings.languages.find(
-            x => {
-              return x === lang;
-            }
-          ))) {
+          x => {
+            return x === lang;
+          }
+        ))) {
           // lang not in project config, fall back to first defined
           lang = this.settingsService.projectsettings.languages[0];
         }
@@ -275,21 +281,25 @@ export class TranscriptionComponent implements OnInit,
 
   ngAfterViewInit() {
     if (isNullOrUndefined(this.projectsettings.interfaces.find((x) => {
-        return this.appStorage.Interface === x;
-      }))) {
+      return this.appStorage.Interface === x;
+    }))) {
       this.appStorage.Interface = this.projectsettings.interfaces[0];
     }
-
-    jQuery.material.init();
   }
 
   abortTranscription = () => {
-    if (this.appStorage.usemode === 'online') {
-      this.saveFeedbackform();
-    }
-    this.transcrService.endTranscription();
-    this.router.navigate(['/logout'], {
-      queryParamsHandling: 'preserve'
+    this.modService.show('transcription_stop').then((answer: TranscriptionStopModalAnswer) => {
+      if (answer === TranscriptionStopModalAnswer.QUIT) {
+        if (this.appStorage.usemode === 'online') {
+          this.saveFeedbackform();
+        }
+        this.transcrService.endTranscription();
+        this.router.navigate(['/logout'], {
+          queryParamsHandling: 'preserve'
+        });
+      }
+    }).catch((error) => {
+      console.error(error);
     });
   };
 
@@ -315,7 +325,7 @@ export class TranscriptionComponent implements OnInit,
       if (!this.modal_shortcuts.visible) {
         this.modal_shortcuts.open();
       } else {
-        this.modal_shortcuts.dismiss();
+        this.modal_shortcuts.close();
       }
       $event.preventDefault();
     } else if ($event.altKey && $event.which === 57) {
@@ -331,15 +341,10 @@ export class TranscriptionComponent implements OnInit,
         this.transcrService.analyse();
         this.modal_overview.open();
       } else {
-        this.modal_overview.dismiss();
+        this.modal_overview.close();
       }
       $event.preventDefault();
     }
-  }
-
-  onSegmentInOverviewClicked(segnumber: number) {
-    this.transcrService.requestSegment(segnumber);
-    this.modal_overview.close();
   }
 
   changeEditor(name: string) {
@@ -398,8 +403,8 @@ export class TranscriptionComponent implements OnInit,
     if (jQuery('#bottom-feedback').css('height') === '30px') {
       jQuery('#bottom-feedback').css({
         'height': '50%',
-        'margin-bottom': 50,
-        'position': 'absolute'
+        'margin-bottom': 0,
+        'position': 'relative'
       });
       jQuery('#bottom-feedback .inner').css({
         'display': 'inherit',
@@ -485,7 +490,6 @@ export class TranscriptionComponent implements OnInit,
   }
 
   public onSendNowClick() {
-    this.modal.dismiss();
     this.modal2.open();
     this.send_ok = true;
 
@@ -524,7 +528,14 @@ export class TranscriptionComponent implements OnInit,
 
     if (this.feedback_form.valid) {
       this.saveFeedbackform();
-      this.modal.open();
+      this.modal.open().then((action) => {
+        if (action === ModalSendAnswer.SEND) {
+          this.onSendNowClick();
+        }
+        console.log('ANSWER: ' + action);
+      }).catch((error) => {
+        console.error(error);
+      });
     } else if (!this.feedback_expanded) {
       this.expandFeedback();
     }

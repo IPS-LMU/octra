@@ -1,4 +1,3 @@
-
 <div class="section" id="login">
     <div *ngIf="!valid_platform" class="bg-danger">
         <p *ngIf="!valid_platform" class="warning" [innerHTML]="'browser.invalid' | translate">
@@ -8,68 +7,68 @@
         </p>
     </div>
     <div id="loginrow" class="row">
-        <div #onlinemode id='onlinemode' class="col-md-6 panel panel-default" style="padding:40px;">
+        <div #onlinemode id='onlinemode' class="col-md-6 card" style="padding:40px;margin-bottom:20px;">
             <p *ngIf="!apc.octra.responsive.enabled && !valid_size" class="warning"
                [innerHTML]="'browser.small window width' | translate">
             </p>
             <section>
                 <h4 [ngClass]="{
-                'bg-success': appStorage.usemode === 'online'
+                'alert-success': appStorage.usemode === 'online'
                 }">{{ 'login.online mode' | translate}}</h4>
                 <div *ngIf="!apc.octra.login.enabled" id="login-disabled">
                     {{'login.online mode disabled' | translate}}
                 </div>
-                <div *ngIf="apc.octra.login.enabled">
-                    <form class="form-horizontal" (ngSubmit)="onSubmit(f)" #f="ngForm">
+                <div class="form-horizontal" *ngIf="apc.octra.login.enabled">
+                    <form (ngSubmit)="onSubmit(f)" #f="ngForm">
                         <fieldset>
-                            <div>
-                                <div class="form-group">
-                                    <label for="login-id" class="control-label">
-                                        {{ 'general.name' | translate}}
-                                    </label>
-                                    <input class="form-control" id="login-id"
-                                           name="login-id"
-                                           placeholder="{{ 'general.name' | translate }}" [(ngModel)]="member.id"
-                                           pattern="\w+"
-                                           required
-                                    />
-                                </div>
-                                <div class="form-group">
-                                    <label for="select111" class="control-label">
-                                        {{"general.select database" | translate}}
-                                    </label>
-                                    <select id="select111" class="form-control" #selection
-                                            [(ngModel)]="member.project" name="project" required>
-                                        <option value="">{{"general.select database" | translate}}</option>
-                                        <option *ngFor="let project of projects;" value="{{project}}">{{project}}
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-
-                                    <label for="jobno" class="control-label">
-                                        {{"general.job number" | translate}}
-                                    </label>
-                                    <input class="form-control" type="number" id="jobno"
-                                           name="jobno"
-                                           placeholder="{{'general.job number' | translate}}" #t
-                                           [(ngModel)]="member.jobno"
-                                           pattern="[0-9]+"
-                                    />
-                                </div>
-                                <div class="form-group">
-                                    <input *ngIf="appStorage.usemode !== 'local'"
-                                           class="form-control btn btn-raised btn-primary login-submit" type="submit"
-                                           [ngClass]="{
+                            <div class="form-group">
+                                <label for="login-id" class="control-label">
+                                    {{ 'general.name' | translate}}
+                                </label>
+                                <input class="form-control" id="login-id" aria-describedby="loginName"
+                                       name="login-id"
+                                       placeholder="{{ 'general.name' | translate }}" [(ngModel)]="member.id"
+                                       pattern="\w+"
+                                       required
+                                />
+                            </div>
+                            <div class="form-group">
+                                <label for="select111" class="control-label">
+                                    {{"general.select database" | translate}}
+                                </label>
+                                <select id="select111" class="form-control" #selection aria-describedby="databaseName"
+                                        [(ngModel)]="member.project" name="project" required>
+                                    <option value="">{{"general.select database" | translate}}</option>
+                                    <option *ngFor="let project of projects;" value="{{project}}">{{project}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="jobno" class="control-label">
+                                    {{"general.job number" | translate}}
+                                </label>
+                                <input class="form-control" type="number" id="jobno" aria-describedby="jobNumber"
+                                       name="jobno"
+                                       placeholder="{{'general.job number' | translate}}" #t
+                                       [(ngModel)]="member.jobno"
+                                       pattern="[0-9]+"
+                                />
+                            </div>
+                            <div class="form-group">
+                                <button *ngIf="appStorage.usemode !== 'local'" aria-describedby="submitButton"
+                                        class="btn btn-primary btn-raised login-submit"
+                                        [ngClass]="{
                                            'btn-danger': (appStorage.usemode === 'local' && appStorage.sessionfile !== null)
                                            }"
-                                           [disabled]="!f.valid"
-                                           name="login-submit" value="{{'general.login' | translate}}"/>
-                                    <input *ngIf="appStorage.usemode === 'local'"
-                                           class="form-control btn btn-raised btn-danger" type="submit"
-                                           [disabled]="!f.valid"
-                                           name="login-submit" value="{{'login.login and remove' | translate}}"/>
-                                </div>
+                                        [disabled]="!f.valid"
+                                        name="login-submit">{{'general.login' | translate}}
+                                </button>
+                                <button *ngIf="appStorage.usemode === 'local'"
+                                        class="btn btn-raised btn-primary btn-danger login-submit"
+                                        aria-describedby="submitButton"
+                                        [disabled]="!f.valid"
+                                        name="login-submit">{{'login.login and remove' | translate}}
+                                </button>
                             </div>
                         </fieldset>
                     </form>
@@ -77,16 +76,17 @@
                 <br/>
             </section>
         </div>
-        <div #localmode id='localmode' class="col-md-6 panel panel-default" style="padding:40px;">
+        <div #localmode id='localmode' class="col-md-6 card" style="padding:40px;margin-bottom:20px;">
             <section>
                 <h4 [ngClass]="{
-                'bg-success': appStorage.usemode === 'local'
+                'alert-success': appStorage.usemode === 'local'
                 }">{{'login.local mode' | translate}}
                 </h4>
                 <div>
-                    <p class="bg-warning" *ngIf="appStorage.usemode === 'local' && appStorage.sessionfile !== null"
-                       [innerHTML]="'login.old file found' | translate:{file_label: getDropzoneFileString(sessionfile)}">
-                    </p>
+                    <div class="alert alert-warning"
+                         *ngIf="appStorage.usemode === 'local' && appStorage.sessionfile !== null"
+                         [innerHTML]="'login.old file found' | translate:{file_label: getDropzoneFileString(sessionfile)}">
+                    </div>
                     <app-octra-dropzone #dropzone></app-octra-dropzone>
                     <input *ngIf="(appStorage.usemode === null || appStorage.usemode === 'local') && getFileStatus() != 'new'"
                            [disabled]="!(getFileStatus() == 'start')" type="submit"
@@ -96,7 +96,7 @@
 
                     <input *ngIf="appStorage.usemode === 'local' && getFileStatus() == 'new'"
                            class="btn btn-raised btn-danger offline-delete-btn"
-                           (click)="modService.show('transcription_delete', '', {ok: newTranscription})"
+                           (click)="onTranscriptionDelete()"
                            value="{{'transcription.new' |translate}}"/>
                     <input *ngIf="(appStorage.usemode !== null && appStorage.usemode !== undefined) &&
                     appStorage.usemode === 'online' && (getFileStatus() != 'new' || getFileStatus() != 'start')"
@@ -111,7 +111,7 @@
 </div>
 <div class="section">
     <footer class="footer">
-        <div class="container">
+        <div class="row">
             <div class="col-md-3">
                 <a href="http://www.en.phonetik.uni-muenchen.de/" target="_blank">
                     <img class="logo" src="assets/img/ipsx60.png" alt="IPS LMU Munich"/>

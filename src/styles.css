@@ -95,11 +95,6 @@ footer {
     height: 16px;
 }
 
-.export-glyphicon {
-    font-size: 50px;
-    color: #0b0080;
-}
-
 .export-button {
     background-color: whitesmoke;
     border: 1px solid grey;
@@ -206,4 +201,54 @@ footer {
 
 #prompt-modal .modal-dialog {
     width: 90%;
+}
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+
+.note-toolbar button.note-btn.btn.btn-light.btn-sm {
+    background-color: whitesmoke;
+    margin-right: 5px;
+    color: black;
+}
+
+.note-toolbar button.note-btn.btn.btn-light.btn-sm:hover {
+    background-color: lightgrey;
+    color: black;
+}
+
+.note-editor.note-frame.panel {
+    display: flex;
+    flex-direction: column;
+    flex: auto;
+}
+
+.note-editor.note-frame.panel span.bmd-form-group {
+    display: none;
+}
+
+.note-editor .note-editable {
+    flex-direction: column;
+    flex: auto;
+}
+
+.note-toolbar.panel-heading {
+    margin: 0;
+    margin-top: 5px;
+    margin-left: 5px;
+}
+
+.note-btn-group.btn-group.note-default {
+    margin: 0;
+}
+
+.note-toolbar-wrapper.panel-default {
+    background-color: whitesmoke;
+}
+
+.val-error {
+    border-bottom: 2px solid red;
 }

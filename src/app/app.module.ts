@@ -4,14 +4,21 @@ import {BrowserModule} from '@angular/platform-browser';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {TranslateLoader, TranslateModule, TranslateService} from '@ngx-translate/core';
 // third-party
-import {BsModalModule} from 'ng2-bs3-modal';
 import {Ng2Webstorage} from 'ngx-webstorage';
 // other
 import {LanguageLoader} from './core/shared';
 import {AlertComponent, DropZoneComponent, OctraModalComponent} from './core/component';
 import {
-  FastbarComponent, LoadingComponent, LoginComponent, LogoutComponent, MembersAreaComponent, NavigationComponent,
-  ReloadFileComponent, TranscriptionComponent, TranscriptionEndComponent, TranscrOverviewComponent,
+  FastbarComponent,
+  LoadingComponent,
+  LoginComponent,
+  LogoutComponent,
+  MembersAreaComponent,
+  NavigationComponent,
+  ReloadFileComponent,
+  TranscriptionComponent,
+  TranscriptionEndComponent,
+  TranscrOverviewComponent,
   TranscrWindowComponent
 } from './core/gui';
 
@@ -19,12 +26,20 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {routing} from './app.routes';
 
 import {
-  APIService, AppStorageService, AudioService, KeymappingService, ModalService, NavbarService,
+  APIService,
+  AppStorageService,
+  AudioService,
+  KeymappingService,
+  NavbarService,
   SettingsService
 } from './core/shared/service';
 
 import {
-  ALoginGuard, DeALoginGuard, LogoutGuard, MembersAreaGuard, SettingsGuard,
+  ALoginGuard,
+  DeALoginGuard,
+  LogoutGuard,
+  MembersAreaGuard,
+  SettingsGuard,
   TranscrEndGuard
 } from './core/shared/guard';
 
@@ -51,6 +66,68 @@ import {AudioviewerConfig} from './media-components/components/audio/audioviewer
 import {MediaComponentsModule} from './media-components/media-components.module';
 import {TranscrEditorComponent} from './core/component/transcr-editor';
 import {Error404Component} from './core/gui/error404/error404.component';
+//icons
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {
+  faAlignJustify,
+  faArrowLeft,
+  faArrowRight,
+  faBook,
+  faCheck,
+  faChevronDown,
+  faChevronUp,
+  faCog,
+  faDownload,
+  faEdit,
+  faExclamationCircle,
+  faExclamationTriangle,
+  faEye,
+  faFile,
+  faFolderOpen,
+  faHeadphones,
+  faInfoCircle,
+  faKeyboard,
+  faMinus,
+  faPaperPlane,
+  faPlus,
+  faPrint,
+  faQuestionCircle,
+  faSave,
+  faSearch,
+  faSignOutAlt,
+  faSpinner,
+  faThList,
+  faTimes,
+  faTrash,
+  faWindowMaximize
+} from '@fortawesome/free-solid-svg-icons';
+//modules
+import {ModalModule} from 'ngx-bootstrap';
+import {YesNoModalComponent} from './core/modals/yes-no-modal/yes-no-modal.component';
+import {ModalService} from './core/modals/modal.service';
+import {BugreportModalComponent} from './core/modals/bugreport-modal/bugreport-modal.component';
+import {SupportedFilesModalComponent} from './core/modals/supportedfiles-modal/supportedfiles-modal.component';
+import {TranscriptionDeleteModalComponent} from './core/modals/transcription-delete-modal/transcription-delete-modal.component';
+import {TranscriptionStopModalComponent} from './core/modals/transcription-stop-modal/transcription-stop-modal.component';
+import {faCopy, faTimesCircle} from '@fortawesome/free-regular-svg-icons';
+import {faCheckCircle} from '@fortawesome/free-regular-svg-icons/faCheckCircle';
+import {LoginInvalidModalComponent} from './core/modals/login-invalid-modal/login-invalid-modal.component';
+import {ErrorModalComponent} from './core/modals/error-modal/error-modal.component';
+import {ExportFilesModalComponent} from './core/modals/exported-files-modal/export-files-modal.component';
+import {StatisticsModalComponent} from './core/modals/statistics-modal/statistics-modal.component';
+import {PromptModalComponent} from './core/modals/prompt-modal/prompt-modal.component';
+import {TranscriptionSendModalComponent} from './core/modals/transcription-send-modal/transcription-send-modal.component';
+import {TranscriptionSendingModalComponent} from './core/modals/transcription-sending-modal/transcription-sending-modal.component';
+import {OverviewModalComponent} from './core/modals/overview-modal/overview-modal.component';
+import {ShortcutsModalComponent} from './core/modals/shortcuts-modal/shortcuts-modal.component';
+import {TranscriptionSuccessModalComponent} from './core/modals/transcription-success-modal/transcription-success-modal.component';
+import {TranscriptionGuidelinesModalComponent} from './core/modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
+
+library.add(
+  faSpinner, faCheck, faTimes, faTrash, faExclamationCircle, faInfoCircle, faDownload, faHeadphones, faPrint, faSearch,
+  faTimesCircle, faCog, faFolderOpen, faCheckCircle, faThList, faBook, faCopy, faPlus, faSignOutAlt, faEdit, faFile, faArrowLeft, faArrowRight,
+  faKeyboard, faEye, faExclamationTriangle, faSave, faQuestionCircle, faChevronUp, faChevronDown, faPaperPlane, faMinus, faWindowMaximize, faAlignJustify);
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -92,11 +169,30 @@ export const ngmodule = {
     TranscriptionEndComponent,
     TranscrOverviewComponent,
     TranscrWindowComponent,
-    Error404Component
+    Error404Component,
+    YesNoModalComponent,
+    BugreportModalComponent,
+    SupportedFilesModalComponent,
+    TranscriptionDeleteModalComponent,
+    TranscriptionStopModalComponent,
+    LoginInvalidModalComponent,
+    ErrorModalComponent,
+    ExportFilesModalComponent,
+    StatisticsModalComponent,
+    PromptModalComponent,
+    TranscriptionSendModalComponent,
+    TranscriptionSendingModalComponent,
+    OverviewModalComponent,
+    ShortcutsModalComponent,
+    TranscriptionSuccessModalComponent,
+    TranscriptionGuidelinesModalComponent
   ],
   entryComponents: EDITORS,
   imports: [
     BrowserModule,
+    FontAwesomeModule,
+    ModalModule.forRoot(),
+    BsDropdownModule.forRoot(),
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
@@ -104,7 +200,6 @@ export const ngmodule = {
         deps: [HttpClient]
       }
     }),
-    BsDropdownModule.forRoot(),
     CollapseModule.forRoot(),
     FormsModule,
     HttpClientModule,
@@ -113,7 +208,6 @@ export const ngmodule = {
       separator: '.',
       prefix: 'custom'
     }),
-    BsModalModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
     MediaComponentsModule,

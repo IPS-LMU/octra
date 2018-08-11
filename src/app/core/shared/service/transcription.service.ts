@@ -317,6 +317,7 @@ export class TranscriptionService {
         comment: this._feedback.comment,
         jobno: (isNullOrUndefined(this.appStorage.user.jobno)) ? 'NOT AVAILABLE' : this.appStorage.user.jobno,
         quality: this._feedback.exportData(),
+        status: 'ANNOTATED',
         id: this.appStorage.data_id,
         log: log_data.getObj()
       };

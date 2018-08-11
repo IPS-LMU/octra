@@ -1,37 +1,37 @@
 <div class="audio-nav">
     <div class="row">
         <div class="col-md-7">
-            <div class="row" role="group">
-                <a *ngIf="!audioplaying" class="btn btn-default btn-raised w-20" name="play"
+            <div class="row" role="group" style="height:100%;">
+                <button *ngIf="!audioplaying" class="btn btn-info btn-raised w-20" name="play"
                    (mousedown)="onButtonClick('play'); " title="{{buttons.play.label}}">
                     <fa-icon icon="play"></fa-icon>
-                </a>
-                <a *ngIf="audioplaying" class="btn btn-default btn-raised w-20" name="pause"
+                </button>
+                <button *ngIf="audioplaying" class="btn btn-info btn-raised w-20" name="pause"
                    (mousedown)="onButtonClick('pause')" title="{{buttons.pause.label}}">
                     <fa-icon icon="pause"></fa-icon>
-                </a>
-                <a class="btn btn-default btn-raised w-20" name="stop" (mousedown)="onButtonClick('stop')"
+                </button>
+                <button class="btn btn-info btn-raised w-20" name="stop" (mousedown)="onButtonClick('stop')"
                    title="{{buttons.stop.label}}">
                     <fa-icon icon="stop"></fa-icon>
-                </a>
-                <a class="btn btn-default btn-raised w-20" [ngClass]="{active: replay}"
+                </button>
+                <button class="btn btn-info btn-raised w-20" [ngClass]="{active: replay}"
                    name="replay" (mousedown)="onButtonClick('replay')" title="{{buttons.replay.label}}">
                     <fa-icon icon="retweet"></fa-icon>
-                </a>
-                <a class="btn btn-default btn-raised w-20" name="step_back" title="{{buttons.backward.label}}"
+                </button>
+                <button class="btn btn-info btn-raised w-20" name="step_back" title="{{buttons.backward.label}}"
                    (mousedown)="onButtonClick('backward')">
                     <fa-icon icon="step-backward"></fa-icon>
-                </a>
-                <a class="btn btn-default btn-raised w-20" name="step_back" title="{{buttons.backwardtime.label}}"
+                </button>
+                <button class="btn btn-info btn-raised w-20" name="step_back" title="{{buttons.backwardtime.label}}"
                    (mousedown)="onButtonClick('backward time')">
                     <fa-icon icon="step-backward"></fa-icon>
                     <fa-icon [icon]="['fa', 'clock']"></fa-icon>
-                </a>
+                </button>
             </div>
         </div>
         <div class="col-md-5">
-            <div class="row" role="group">
-                <div class="btn btn-raised col-md-6">
+            <div class="row" role="group" style="height:100%;">
+                <div class="btn btn-info btn-raised col-md-6">
                     <div class="row">
                         <div class="col-1 col-sm-4 col-md-3">
                             <fa-icon icon="volume-down"></fa-icon>
@@ -48,10 +48,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="btn btn-raised col-md-6">
+                <div class="btn btn-info btn-raised col-md-6">
                     <div class="row">
-                        <div class="col-1 col-sm-4 col-md-3"><img
-                                src="assets/img/components/audio-navigation/slow.png" alt="fast">
+                        <div class="col-1 col-sm-4 col-md-3" style="text-align: center;">
+                            <img src="assets/img/components/audio-navigation/slow_white.png"
+                                 style="height:16px;position: inherit;"
+                                 alt="fast">
                         </div>
                         <div class="col-10 col-sm-4 col-md-6">
                             <input class="slider" type="range" name="speed" min="0.2" max="1.8" step="0.2" value="1"
@@ -60,7 +62,8 @@
                                    [disabled]="audioplaying"/>
                         </div>
                         <div class="col-1 col-sm-4 col-md-3"><img
-                                src="assets/img/components/audio-navigation/fast.png" alt="fast">
+                                src="assets/img/components/audio-navigation/fast_white.png" style="height:16px;"
+                                alt="fast">
                             <div class="slider-descr" [ngClass]="{'hidden-xs': responsive}">{{speed}}x</div>
                         </div>
                     </div>

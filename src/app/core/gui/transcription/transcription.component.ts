@@ -34,7 +34,6 @@ import {isArray, isNullOrUndefined, isNumber} from 'util';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {TranscrGuidelinesComponent} from '../transcr-guidelines/transcr-guidelines.component';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
-import {Observable} from 'rxjs/Observable';
 import {ProjectSettings} from '../../obj/Settings';
 import {NgForm} from '@angular/forms';
 import {AudioManager} from '../../../media-components/obj/media/audio';
@@ -48,6 +47,7 @@ import * as X2JS from 'x2js';
 import {ModalService} from '../../modals/modal.service';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 import {ModalSendAnswer} from '../../modals/transcription-send-modal/transcription-send-modal.component';
+import {throwError} from 'rxjs';
 
 @Component({
   selector: 'app-transcription',
@@ -519,7 +519,7 @@ export class TranscriptionComponent implements OnInit,
 
   onSendError = (error) => {
     this.send_error = error.message;
-    return Observable.throw(error);
+    return throwError(error);
   };
 
   onSendButtonClick() {

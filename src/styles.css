@@ -263,3 +263,8 @@ footer {
 .note-toolbar {
     z-index: 20;
 }
+
+.note-btn-group.btn-group.note-default button {
+    margin: 3px 0px 0px 0px;
+    /* padding: 1px; */
+}

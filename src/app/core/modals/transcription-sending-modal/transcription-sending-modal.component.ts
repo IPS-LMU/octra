@@ -1,4 +1,4 @@
-import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs/Subject';
 
@@ -18,6 +18,7 @@ export class TranscriptionSendingModalComponent implements OnInit {
   };
 
   @ViewChild('modal') modal: TemplateRef<any>;
+  @Input('sendError') send_error: string = '';
 
   private actionperformed: Subject<void> = new Subject<void>();
 

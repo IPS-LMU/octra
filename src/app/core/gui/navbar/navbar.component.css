@@ -151,4 +151,9 @@ nav .nav-link {
     color: black;
 }
 
+@media (max-width: 765px) {
+    #subnav {
+        font-size: 0.8em;
+    }
+}
 

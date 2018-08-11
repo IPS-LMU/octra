@@ -1,26 +1,26 @@
 <div id="fastbar">
-    <div class="btn-group d-flex" role="group" aria-label="Justified button group">
+    <div class="btn-group d-flex" role="group" aria-label="Justified button group" style="margin:0;">
         <a class="btn w-100" (click)="shortcutbtnclicked.emit()">
             <fa-icon icon="keyboard"></fa-icon>
-            <span *ngIf="!appStorage.easymode" [ngClass]="{'hidden-xs hidden-sm ': responsive}"> {{button_labels.shortcuts}}</span>
-            <span *ngIf="!appStorage.easymode" [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}"> [ALT +
+            <span *ngIf="!appStorage.easymode" [ngClass]="{'d-none d-md-inline': responsive}"> {{button_labels.shortcuts}}</span>
+            <span *ngIf="!appStorage.easymode" [ngClass]="{'d-none d-lg-inline': responsive}"> [ALT +
                             8]</span></a>
         <a class='btn w-100' (click)="guidelinesbtnclicked.emit()">
             <fa-icon icon="th-list"></fa-icon>
-            <span *ngIf="!appStorage.easymode" [ngClass]="{'hidden-xs hidden-sm ': responsive}"> {{button_labels.guidelines}}</span>
+            <span *ngIf="!appStorage.easymode" [ngClass]="{'d-none d-md-inline': responsive}"> {{button_labels.guidelines}}</span>
             <span *ngIf="!appStorage.easymode"
-                  [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}"> [ALT + 9]</span>
+                  [ngClass]="{'d-none d-lg-inline': responsive}"> [ALT + 9]</span>
         </a>
         <a class='btn w-100' (click)="overviewbtnclicked.emit()">
             <fa-icon icon="eye"></fa-icon>
-            <span *ngIf="!appStorage.easymode" [ngClass]="{'hidden-xs hidden-sm ': responsive}"> {{button_labels.overview}}</span>
+            <span *ngIf="!appStorage.easymode" [ngClass]="{'d-none d-md-inline': responsive}"> {{button_labels.overview}}</span>
             <span *ngIf="!appStorage.easymode"
-                  [ngClass]="{'hidden-xs hidden-sm hidden-md': responsive}"> [ALT + 0]</span>
+                  [ngClass]="{'d-none d-lg-inline': responsive}"> [ALT + 0]</span>
         </a>
         <a [routerLink]="['/user/transcr/help']" [queryParamsHandling]="'merge'" class="btn w-100">
             <fa-icon icon="question-circle"></fa-icon>
             <span *ngIf="!appStorage.easymode"
-                  [ngClass]="{'hidden-xs hidden-sm ': responsive}"> {{button_labels.help}}</span>
+                  [ngClass]="{'d-none d-md-inline': responsive}"> {{button_labels.help}}</span>
         </a>
     </div>
 </div>

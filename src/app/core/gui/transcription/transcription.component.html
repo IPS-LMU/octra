@@ -1,6 +1,6 @@
 <app-alert #alert></app-alert>
 <app-transcription-send-modal #modal></app-transcription-send-modal>
-<app-transcription-sending-modal #modal2></app-transcription-sending-modal>
+<app-transcription-sending-modal [sendError]="send_error" #modal2></app-transcription-sending-modal>
 <app-overview-modal #modal_overview id="overview"></app-overview-modal>
 <app-shortcuts-modal #modal_shortcuts [editor]="Interface"></app-shortcuts-modal>
 <app-transcription-success-modal #success></app-transcription-success-modal>
@@ -103,8 +103,8 @@
             </div>
         </div>
     </div>
-    <div class="row" role="group">
-        <button class="btn btn-default btn-raised col-md-6"
+    <div class="row" id="bottom-navigation" role="group">
+        <button class="btn btn-secondary btn-raised col-md-6"
                 (click)="abortTranscription()">
             <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
             <span *ngIf="!appStorage.easymode" [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}">

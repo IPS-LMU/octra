@@ -44,3 +44,7 @@ img {
     position: absolute;
     left: 0;
 }
+
+.btn-info {
+    background-color: white;
+}

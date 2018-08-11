@@ -5,7 +5,8 @@
     <div class="modal-body">
         {{"modal.transcription.sending.text" | translate}}<br/><br/>
         <div style="color:red">{{send_error}}</div>
-        <div class="text-success" style="text-align: center;display:block;">{{"general.submission success" |
+        <div *ngIf="send_error === ''" class="text-success" style="text-align: center;display:block;">
+            {{"general.submission success" |
             translate}}
         </div>
     </div>

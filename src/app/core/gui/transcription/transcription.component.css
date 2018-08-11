@@ -97,3 +97,7 @@
 .required_marker {
     color: red;
 }
+
+#bottom-navigation button {
+    margin-bottom: 0;
+}

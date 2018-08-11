@@ -40,7 +40,7 @@
                     <a class="nav-link" (mouseup)="setInterface(editor.name)">
                         <fa-icon [icon]="['fas', editor.icon]"></fa-icon>
                         <span
-                            class="hidden-sm"> {{editor.translate | translate}}</span>
+                                class="d-md-none d-lg-inline"> {{editor.translate | translate}}</span>
                     </a>
                 </li>
             </ng-template>
@@ -48,7 +48,7 @@
                 *ngIf="appStorage.LoggedIn && navbarServ.show_interfaces && settService.app_settings.octra.showdetails">
                 <a class="nav-link" (mouseup)="modalstatistics.open()">
                     <fa-icon icon="th-list" class="navbar-icon"></fa-icon>
-                    <span class="hidden-sm"> Statistics</span></a>
+                    <span class="d-md-none d-lg-inline"> Statistics</span></a>
             </li>
         </ul>
         <ul class="navbar-nav mt-2 mt-md-0">
@@ -163,7 +163,7 @@
                 <a class="nav-link" (mouseup)="modalexport.open()">
                     <fa-icon icon="download" class="navbar-icon"></fa-icon>
                     <!-- TODO CHNAGE this! -->
-                    <span class="hidden-sm hidden-md"> {{"general.export" | translate}}</span>
+                    <span class="d-md-none d-lg-inline"> {{"general.export" | translate}}</span>
                 </a>
             </li>
 
@@ -276,14 +276,14 @@
 </nav>
 <div id="subnav" class="panel" *ngIf="appStorage.LoggedIn && appStorage.usemode === 'online' && navbarServ.dataloaded">
     <div class="row">
-        <div class="col-3 col-sm-3">{{"general.project" | translate}}: {{appStorage.user.project}}</div>
-        <div class="col-3 col-sm-3">{{"general.name" |translate}}:
+        <div class="col-6 col-sm-3">{{"general.project" | translate}}: {{appStorage.user.project}}</div>
+        <div class="col-6 col-sm-3">{{"general.name" |translate}}:
             {{navbarServ.exportformats.filename}}
         </div>
-        <div class="col-3 col-sm-3">{{'general.free jobs' | translate}}:
+        <div class="col-6 col-sm-3">{{'general.free jobs' | translate}}:
             {{appStorage.jobs_left}}
         </div>
-        <div class="col-3 col-sm-3"><a (click)="promptmodal.open()" style="cursor: pointer; color:#009688;">{{'general.prompt'
+        <div class="col-6 col-sm-3"><a (click)="promptmodal.open()" style="cursor: pointer; color:#009688;">{{'general.prompt'
             |
             translate}}</a></div>
     </div>

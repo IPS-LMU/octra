@@ -56,7 +56,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
         result_str += this.shown_segments[i].transcription.html;
       }
 
-      found = (result_str.match(/<div class='error_underline'/g) || []).length;
+      found = (result_str.match(/<div class='val-error'/g) || []).length;
     }
 
     return found;
@@ -106,18 +106,13 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
           validateAnnotation(obj.transcription.text, this.transcrService.guidelines));
       }
 
-      console.log(`--------`);
-      console.log(`Transcription text before: ${obj.transcription.html}`);
       obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
-      obj.transcription.html = obj.transcription.html.replace(/(\[\[\[)|(]]])/g, (g0, g1, g2) => {
-        if (g2 === undefined && g1 !== undefined) {
+      obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
+        if (g1 == '[[[') {
           return '<';
-        } else {
-          return '>';
         }
+        return '>';
       });
-      console.log(`After conversion: ${obj.transcription.html}`);
-      console.log(`--------`);
 
       result.push(obj);
 
@@ -154,8 +149,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
   onMouseOver($event) {
     let target = jQuery($event.target);
-    if (target.is('.error_underline') || target.parent().is('.error_underline')) {
-      if (!target.is('.error_underline')) {
+    if (target.is('.val-error') || target.parent().is('.val-error')) {
+      if (!target.is('.val-error')) {
         target = target.parent();
       }
 

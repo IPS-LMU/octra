@@ -386,6 +386,29 @@ export class TranscriptionService {
     this.uiService.elements = [];
   }
 
+  public replaceSingleTags(html: string) {
+    html = html.replace(/(<)([^<>]+)(>)/g, (g0, g1, g2) => {
+      return `[[[${g2}]]]`;
+    });
+
+    html = html.replace(/([<>])/g, (g0, g1) => {
+      if (g1 === '<') {
+        return '&lt;';
+      }
+      return '&gt;';
+    });
+
+    html = html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
+      if (g1 == '[[[') {
+        return '<';
+      }
+
+      return '>';
+    });
+
+    return html;
+  }
+
   public extractUI(ui_elements: StatisticElem[]): OLogging {
     const now = new Date();
     const result: OLogging = new OLogging(
@@ -457,15 +480,9 @@ export class TranscriptionService {
   public rawToHTML(rawtext: string): string {
     let result: string = rawtext;
 
-    result = result.replace(/(?:(<)(?!(?:img)|(?:span)|(?:div)|(?:\/span)|(?:\/div)))|(?:(?:(?:\/?((?:span)|(?:div)|(?:\/))))?(>))/g, (g0, g1, g2, g3) => {
-      if (g1 !== undefined && g1 === '<') {
-        return '&lt;';
-      } else if (g3 === '>' && g2 === undefined) {
-        return '&gt;';
-      }
-    });
-
     result = this.replaceMarkersWithHTML(result);
+
+    const result2 = this.replaceSingleTags(result);
 
     if (rawtext !== '') {
       result = result.replace(/\s+$/g, '&nbsp;');
@@ -488,20 +505,20 @@ export class TranscriptionService {
     for (let i = 0; i < this._guidelines.markers.length; i++) {
       const marker = this._guidelines.markers[i];
       const regex = new RegExp(Functions.escapeRegex(marker.code), 'g');
+      const code = marker.code.replace(/([[<>])/g, (g0, g1) => {
+        switch (g1) {
+          case('<'):
+            return '&lt;';
+          case('>'):
+            return '&gt;';
+        }
+      });
 
       if (!((marker.icon_url === null || marker.icon_url === undefined) || marker.icon_url === '')) {
         result = result.replace(regex, '<img src=\'' + marker.icon_url + '\' class=\'btn-icon-text\' ' +
-          'style=\'height:16px;\' data-marker-code=\'' + marker.code + '\'/>');
+          'style=\'height:16px;\' data-marker-code=\'' + code + '\'/>');
       } else {
         // marker is text only
-        const code = marker.code.replace(/([<|>])/g, (g0, g1) => {
-          switch (g1) {
-            case('<'):
-              return '&lt;';
-            case('>'):
-              return '&gt;';
-          }
-        });
         result = result.replace(regex, code);
       }
     }
@@ -528,11 +545,11 @@ export class TranscriptionService {
         if (isNullOrUndefined(insertStart)) {
           insertStart = {
             start: validation[i].start,
-            puffer: '[[[span class=\'val-error\']]]'
+            puffer: '[[[span class=\'val-error\' data-errorcode=\'' + validation[i].code + '\']]]'
           };
           insertions.push(insertStart);
         } else {
-          insertStart.puffer += '[[[span class=\'val-error\']]]';
+          insertStart.puffer += '[[[span class=\'val-error\' data-errorcode=\'' + validation[i].code + '\']]]';
         }
 
         let insertEnd = insertions.find((val) => {

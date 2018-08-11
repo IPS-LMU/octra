@@ -127,7 +127,6 @@ export class TranscriptionComponent implements OnInit,
               private api: APIService,
               private bugService: BugReportService,
               private http: HttpClient) {
-    console.log('transcription component called');
     this.subscrmanager = new SubscriptionManager();
     this.audiomanager = this.audio.audiomanagers[0];
 
@@ -173,7 +172,6 @@ export class TranscriptionComponent implements OnInit,
 
   ngOnInit() {
     this.navbarServ.interfaces = this.projectsettings.interfaces;
-    console.log('usemode is in transcr: ' + this.appStorage.usemode);
 
     // because of the loading data before through the loading component you can be sure the audio was loaded
     // correctly
@@ -532,7 +530,6 @@ export class TranscriptionComponent implements OnInit,
         if (action === ModalSendAnswer.SEND) {
           this.onSendNowClick();
         }
-        console.log('ANSWER: ' + action);
       }).catch((error) => {
         console.error(error);
       });
@@ -630,8 +627,6 @@ export class TranscriptionComponent implements OnInit,
   public onSaveTranscriptionButtonClicked() {
     const converter = new PartiturConverter();
     const oannotjson = this.transcrService.annotation.getObj();
-    console.log(oannotjson);
-    console.log(this.transcrService.audiofile);
     const result: IFile = converter.export(oannotjson, this.transcrService.audiofile, 0).file;
     result.name = result.name.replace('-' + oannotjson.levels[0].name, '');
 
@@ -651,12 +646,6 @@ export class TranscriptionComponent implements OnInit,
     const xhr = new XMLHttpRequest();
     xhr.open('POST', url);
 
-    xhr.upload.addEventListener('progress', (e: ProgressEvent) => {
-      if (e.lengthComputable) {
-        console.log(e.loaded / e.total);
-      }
-    }, false);
-
     xhr.onloadstart = (e) => {
       console.log('start');
     };
@@ -668,14 +657,11 @@ export class TranscriptionComponent implements OnInit,
     };
 
     xhr.onloadend = (e) => {
-      console.log('loadend');
       const result = e.currentTarget['responseText'];
 
-      console.log(result);
       const x2js = new X2JS();
       let json: any = x2js.xml2js(result);
       json = json.UploadFileMultiResponse;
-      console.log(json);
 
       if (json.success === 'true') {
         // TODO set urls to results only

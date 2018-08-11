@@ -11,7 +11,6 @@ export class Error404Component implements OnInit {
   }
 
   ngOnInit() {
-    console.log('error404 component called');
   }
 
 }

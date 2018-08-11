@@ -83,7 +83,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   ngOnInit() {
-    console.log('login component called');
 
     this.browser_check = new BrowserCheck();
     this.valid_platform = false;
@@ -312,7 +311,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   private navigate = (): void => {
-    console.log('NAvigate CALLED!');
     this.router.navigate(['user'], {
       queryParamsHandling: 'preserve'
     });
@@ -333,7 +331,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   newTranscription = () => {
-    console.log(`in new Transcription!`);
     this.audioService.registerAudioManager(this.dropzone.audiomanager);
 
     this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
@@ -430,8 +427,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       return Observable.throw(error);
     }).subscribe(
       (json) => {
-        console.log('LOGIN!');
-        console.log(json);
         if (form.valid && this.agreement_checked
           && json.message !== '0'
         ) {
@@ -493,7 +488,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   private setOnlineSessionToFree = (callback: () => void) => {
     // check if old annotation is already annotated
-    console.log(`call set online session to free`);
     this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
       (json) => {
         if (!isNullOrUndefined(json.data) && json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
@@ -525,9 +519,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   onTranscriptionDelete() {
     this.modService.show('transcription_delete').then((answer: ModalDeleteAnswer) => {
-      console.log(`answer: ${answer}`);
       if (answer === ModalDeleteAnswer.DELETE) {
-        console.log('new Transcription!');
         this.newTranscription();
       }
     }).catch((error) => {

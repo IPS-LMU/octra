@@ -110,7 +110,6 @@ LBD:\n`;
           const columns = lines[pointer].split(' ');
 
           if (search[0] === 'SAM') {
-            console.log(`SAM found with: ${columns[1]}`);
             if (audiofile.samplerate !== Number(columns[1])) {
               console.error(`Sample Rate of audio file is not equal to the value from Partitur file!`);
             }

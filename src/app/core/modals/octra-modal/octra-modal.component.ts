@@ -53,9 +53,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
       (result: any) => {
         this.data = result;
 
-        console.log('here!');
         if (!isNullOrUndefined(result.type) && this[result.type] !== undefined) {
-          console.log(result.data);
           this[result.type].open(result.data).then(
             (answer) => {
               result.emitter.emit(answer);

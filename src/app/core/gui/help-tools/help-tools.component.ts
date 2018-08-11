@@ -18,7 +18,6 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    console.log('help-tools component called');
   }
 
   ngOnDestroy() {

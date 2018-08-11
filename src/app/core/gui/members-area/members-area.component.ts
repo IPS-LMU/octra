@@ -21,7 +21,6 @@ export class MembersAreaComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    console.log('members area component called');
   }
 
   ngOnDestroy() {

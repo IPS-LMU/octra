@@ -14,7 +14,6 @@ export class TranscActivateGuard implements CanActivate {
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
-    console.log('transcription component opened');
     if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
       if (!this.settService.allloaded) {
         console.log('go back to load');

@@ -38,7 +38,6 @@ export class ReloadFileComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log('reload component called');
   }
 
   private navigate = () => {

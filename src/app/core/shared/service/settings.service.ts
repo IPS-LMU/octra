@@ -224,7 +224,7 @@ export class SettingsService {
         document.body.appendChild(js);
       },
       (error) => {
-        console.log('Loading functions failed [Error: S01]');
+        console.error('Loading functions failed [Error: S01]');
         this.validationmethodloaded.emit();
       }
     );
@@ -233,7 +233,7 @@ export class SettingsService {
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
     Logger.log('Load audio file 2...');
     if (isNullOrUndefined(this.appStorage.usemode)) {
-      console.log(`usemode is null`);
+      console.error(`usemode is null`);
     }
     if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
       // online

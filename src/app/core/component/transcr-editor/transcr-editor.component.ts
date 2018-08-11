@@ -57,7 +57,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   get rawText(): string {
     const result = this.tidyUpRaw(this._rawText);
-    console.log(`GET RAWTEXT: ${result}`);
     return result;
   }
 
@@ -65,7 +64,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this._rawText = this.tidyUpRaw(value);
     this.init = 0;
     const html = this.rawToHTML(this._rawText);
-    console.log(`SET RAWTEXT: ${html}`);
     this.textfield.summernote('code', html);
 
     this.initPopover();
@@ -87,8 +85,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       }
     }
     this.rawText = result;
-    console.log(`SET RAW TEXT due segments`);
-    console.log(result);
   }
 
   get Settings(): any {
@@ -148,16 +144,12 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     html = html.replace(/<((p)|(\s?\/p))>/g, '');
     html = html.replace(/&nbsp;/g, ' ');
-    // replace tags
-    console.log(`code is:\n${html}`);
 
-    // html = this.replaceSingleTags(html);
+    html = this.transcrService.replaceSingleTags(html);
 
-    // console.log(html);
-    html = '<p>' + html + '</p>';
+    html = `<p>${html}</p>`;
 
     const dom = jQuery(html);
-
 
     const replace_func = (i, elem) => {
       if (jQuery(elem).children() !== null && jQuery(elem).children().length > 0) {
@@ -202,7 +194,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     jQuery.each(dom.children(), replace_func);
 
     let rawText = dom.text();
-    console.log(`code is Result: ${rawText}`);
 
     return rawText;
   };
@@ -296,7 +287,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             .replace(new RegExp('\\\[\\\|', 'g'), '{').replace(new RegExp('\\\|\\\]', 'g'), '}');
           html = '<span>' + this.rawToHTML(html) + '</span>';
           html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
-          console.log(`html paste is: ${html}`);
           const html_obj = jQuery(html);
           if (!isNullOrUndefined(this.rawText) && this._rawText !== '') {
             this.textfield.summernote('editor.insertNode', html_obj[0]);
@@ -626,9 +616,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     if (elem != null && elem.getElementsByTagName('sel-start')[0] !== undefined) {
       let el = elem;
       let range = document.createRange();
-      console.log(range);
       let sel = window.getSelection();
-      console.log(sel);
       let selStart = elem.getElementsByTagName('sel-start')[0].previousSibling;
       let selEnd = elem.getElementsByTagName('sel-end')[0].nextSibling;
 
@@ -640,14 +628,12 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         // set start position
         let lastNodeChildren = selStart.childNodes.length;
         if (selStart.nodeName === '#text') {
-          console.log('is text');
           lastNodeChildren = selStart.textContent.length;
         }
         range.setStart(selStart, lastNodeChildren);
 
         if (selEnd !== null) {
           range.setEnd(selEnd, endOffset);
-          console.log('same name! ' + selEnd.nodeName);
           range.collapse(false);
         }
 
@@ -758,7 +744,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    */
   updateTextField() {
     this._rawText = this.getRawText();
-    console.log(`RAWTEXT:\n${this._rawText}`);
   }
 
   /**
@@ -876,7 +861,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
               'data-marker-code=\'' + marker.code + '\' alt=\'' + marker.code + '\'/>';
           } else {
             img = marker.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            console.log(`INSERTED ${img}`);
           }
 
           return s1 + img + s3;

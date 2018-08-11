@@ -41,7 +41,6 @@ export class KeymappingService {
     const list = this.getShortcuts(name);
 
     if (list) {
-      console.log('CHECK!');
       let i = 0;
       for (const entry in list) {
         if (list.hasOwnProperty(entry)) {
@@ -59,7 +58,6 @@ export class KeymappingService {
           }
         }
 
-        console.log(result);
         return result;
       } else {
         console.error(`no shortcuts found!`);

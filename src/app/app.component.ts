@@ -92,7 +92,6 @@ export class AppComponent implements OnDestroy {
       // check for Updates
       if (this.queryParamsSet()) {
         // URL MODE, overwrite db name with 'url'
-        console.log('params!');
         this.settingsService.app_settings.octra.database.name = 'url';
         console.log('load db ' + this.settingsService.app_settings.octra.database.name);
       }
@@ -122,7 +121,6 @@ export class AppComponent implements OnDestroy {
               this.appStorage.LoggedIn = true;
             }
 
-            console.log('AFTER USEMODE FROM IDB is ' + this.appStorage.usemode);
 
             if (this.settingsService.validated) {
               console.log('loaded');

@@ -25,7 +25,6 @@ export class LogoutComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log('logout component called');
     this.settingsService.clearSettings();
     this.sessionService.endSession(() => {
       this.router.navigate(['login'], {

@@ -143,7 +143,6 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   openBugReport() {
     this.modService.show('bugreport').then((action) => {
-      console.log(action);
     }).catch((err) => {
       console.error(err);
     });

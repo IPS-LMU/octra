@@ -145,18 +145,15 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   getRawText = () => {
     let html = this.textfield.summernote('code');
 
-    console.log(`code is:\n${html}`);
-    html = html.replace(/<((p)|(\/p))>/g, '');
 
+    html = html.replace(/<((p)|(\s?\/p))>/g, '');
+    html = html.replace(/&nbsp;/g, ' ');
     // replace tags
-    html = html.replace(/(?:(<)(?!(?:img)|(?:span)|(?:div)))|(?:(?:(?:\/?((?:span)|(?:div)|(?:img \/))))(>))/g, (g0, g1, g2, g3) => {
-      if (g1 !== undefined && g1 === '<') {
-        return '&lt;';
-      } else if (g3 === '>' && g2 === '') {
-        return '&gt;';
-      }
-    });
+    console.log(`code is:\n${html}`);
 
+    // html = this.replaceSingleTags(html);
+
+    // console.log(html);
     html = '<p>' + html + '</p>';
 
     const dom = jQuery(html);
@@ -166,6 +163,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       if (jQuery(elem).children() !== null && jQuery(elem).children().length > 0) {
         jQuery.each(jQuery(elem).children(), replace_func);
       } else {
+        const tagName = jQuery(elem).prop('tagName');
+
         let attr = jQuery(elem).attr('data-marker-code');
         if (elem.type === 'select-one') {
           const value = jQuery(elem).attr('data-value');
@@ -179,16 +178,22 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
               break;
             }
           }
-        } else if (jQuery(elem).prop('tagName').toLowerCase() === 'img') {
+        } else if (tagName.toLowerCase() === 'img') {
           if (!isNullOrUndefined(jQuery(elem).attr('data-samples'))) {
             const textnode = document.createTextNode(`{${jQuery(elem).attr('data-samples')}}`);
             jQuery(elem).before(textnode);
             jQuery(elem).remove();
           }
         } else if (
-          jQuery(elem).attr('class') !== 'val-error'
-          && jQuery(elem).prop('tagName').toLowerCase() !== 'textspan'
+          jQuery(elem).attr('class') === 'val-error'
+          && tagName.toLowerCase() !== 'textspan'
         ) {
+          jQuery(elem).remove();
+        } else if (
+          tagName.toLowerCase() === 'span'
+        ) {
+          const textnode = document.createTextNode(jQuery(elem).text());
+          jQuery(elem).before(textnode);
           jQuery(elem).remove();
         }
       }
@@ -287,9 +292,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         onPaste: (e) => {
           e.preventDefault();
           const bufferText = ((e.originalEvent || e).clipboardData || (<any> window).clipboardData).getData('Text');
-          let html = bufferText.replace('<p>', '').replace('</p>', '')
+          let html = bufferText.replace(/(<p>)|(<\/p>)/g, '')
             .replace(new RegExp('\\\[\\\|', 'g'), '{').replace(new RegExp('\\\|\\\]', 'g'), '}');
           html = '<span>' + this.rawToHTML(html) + '</span>';
+          html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
+          console.log(`html paste is: ${html}`);
           const html_obj = jQuery(html);
           if (!isNullOrUndefined(this.rawText) && this._rawText !== '') {
             this.textfield.summernote('editor.insertNode', html_obj[0]);

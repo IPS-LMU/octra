@@ -216,15 +216,11 @@ export class AudioManager {
         || (<any>window).mozOfflineAudioContext
         || false;
 
-      console.log('decode Methode');
       if (OfflineAudioContext === false) {
         console.error(`OfflineAudioContext is not supported!`);
       }
 
       audioCtx.decodeAudioData(file, function (buffer) {
-        console.log('received');
-        console.log(buffer.length / buffer.sampleRate);
-        console.log(buffer);
         const context = new OfflineAudioContext(1, Math.ceil(buffer.duration * sampleRate), sampleRate);
         const source = context.createBufferSource();
         source.buffer = buffer;

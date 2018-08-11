@@ -1,6 +1,15 @@
 import {
-  AfterViewInit, Component, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output,
-  SimpleChanges, ViewChild
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  HostListener,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild
 } from '@angular/core';
 
 import {AudioviewerService} from './audioviewer.service';
@@ -1568,7 +1577,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         this.update(false);
       }, 20);
     } else {
-      console.log(`realrect (${this.av.realRect.size.height},${this.av.realRect.size.width}) viewrect (${this.av.viewRect.size.height},${this.av.viewRect.size.width})`);
       if (!scrollbar) {
         this.scrolling.emit({state: 'stopped'});
       }

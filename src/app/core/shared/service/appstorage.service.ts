@@ -224,7 +224,6 @@ export class AppStorageService {
 
   set usemode(value: 'online' | 'local' | 'url') {
     this._usemode = value;
-    console.log('save usemode to ' + value);
     this.idb.save('options', 'usemode', {value: value}).catch((err) => {
       console.error(err);
     });

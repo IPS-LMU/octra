@@ -30,7 +30,6 @@ export class NewsComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.navService.show_interfaces = false;
     this.navService.show_export = false;
-    console.log('navbar component called');
   }
 
   ngOnChanges(obj) {

@@ -46,7 +46,7 @@ export class AnnotJSONConverter extends Converter {
             };
           }
         } catch (e) {
-          console.log(`No valid AnnotJSON file`);
+          console.error(`No valid AnnotJSON file`);
         }
       }
     }

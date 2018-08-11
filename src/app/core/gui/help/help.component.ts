@@ -29,7 +29,6 @@ export class HelpComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.navService.show_interfaces = false;
     this.navService.show_export = false;
-    console.log('help component called');
   }
 
   ngOnChanges(obj) {

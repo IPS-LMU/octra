@@ -44,7 +44,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    console.log('loading component called');
 
     this.langService.get('general.please wait').subscribe(
       (translation) => {
@@ -140,7 +139,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
                         importResult = converter.import(file, oAudioFile);
 
                         if (!isNullOrUndefined(importResult)) {
-                          console.log(`OK is: ${converter.extension}`);
                           break;
                         }
                       }
@@ -246,7 +244,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
     );
 
     new Promise<void>((resolve, reject) => {
-      console.log(`IN PROMISE`);
       if (!this.appStorage.idbloaded) {
         console.log('db not loaded');
         this.subscrmanager.add(this.appStorage.loaded.subscribe(() => {
@@ -261,7 +258,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
         resolve();
       }
     }).then(() => {
-      console.log(`PROMISE FINISHED`);
 
       if (isNullOrUndefined(this.appStorage.usemode) && this.appStorage.url_params.hasOwnProperty('audio') && this.appStorage.url_params['audio'] !== '') {
         this.appStorage.usemode = 'url';

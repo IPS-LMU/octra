@@ -110,8 +110,6 @@ export class UserInteractionsService {
           new_elem.value = (<StatisticElem> elem).value;
         }
 
-        console.log(`Element ADDED:`);
-        console.log(new_elem);
       }
     }
   }

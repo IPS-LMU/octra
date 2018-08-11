@@ -265,11 +265,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   public editor_rawText(text: string) {
-    console.log(`SET via window!`);
     this.editor.rawText = text;
-    console.log('window: :' + text);
-    console.log(`AFTE RWINDOW`);
-    console.log(this.editor.rawText);
   }
 
   onShortCutTriggered($event, type) {

@@ -1,10 +1,22 @@
 import {
-  AfterContentChecked, AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnChanges, OnDestroy, OnInit,
+  AfterContentChecked,
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  OnChanges,
+  OnDestroy,
+  OnInit,
   ViewChild
 } from '@angular/core';
 
 import {
-  AppStorageService, AudioService, KeymappingService, MessageService, SettingsService, TranscriptionService,
+  AppStorageService,
+  AudioService,
+  KeymappingService,
+  MessageService,
+  SettingsService,
+  TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
 
@@ -370,7 +382,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         textlength: -1
       };
 
-      if (this.selected_index > -1) {
+      if (this.selected_index > -1 && this.selected_index < this.transcrService.currentlevel.segments.length) {
         const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
         segment.start = anno_segment.time.samples;
         segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
@@ -402,7 +414,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         textlength: -1
       };
 
-      if (this.selected_index > -1) {
+      if (this.selected_index > -1 && this.selected_index < this.transcrService.currentlevel.segments.length) {
         const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
         segment.start = anno_segment.time.samples;
         segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
@@ -430,7 +442,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         textlength: -1
       };
 
-      if (this.selected_index > -1) {
+      if (this.selected_index > -1 && this.selected_index < this.transcrService.currentlevel.segments.length) {
         const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
         segment.start = anno_segment.time.samples;
         segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
@@ -456,7 +468,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         textlength: -1
       };
 
-      if (this.selected_index > -1) {
+      if (this.selected_index > -1 && this.selected_index < this.transcrService.currentlevel.segments.length) {
         const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
         segment.start = anno_segment.time.samples;
         segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)

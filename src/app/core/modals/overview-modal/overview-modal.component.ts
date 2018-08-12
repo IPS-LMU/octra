@@ -1,7 +1,8 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {BsModalRef, ModalOptions} from 'ngx-bootstrap';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs/Subject';
 import {TranscriptionService} from '../../shared/service';
+import {SubscriptionManager} from '../../obj/SubscriptionManager';
 
 @Component({
   selector: 'app-overview-modal',
@@ -9,7 +10,7 @@ import {TranscriptionService} from '../../shared/service';
   styleUrls: ['./overview-modal.component.css']
 })
 
-export class OverviewModalComponent implements OnInit {
+export class OverviewModalComponent implements OnInit, OnDestroy {
   modalRef: BsModalRef;
   protected data = null;
 
@@ -22,13 +23,30 @@ export class OverviewModalComponent implements OnInit {
   };
 
   @ViewChild('modal') modal: any;
+  private subscrmanager = new SubscriptionManager();
 
   private actionperformed: Subject<void> = new Subject<void>();
 
-  constructor(public transcrService: TranscriptionService) {
+  constructor(public transcrService: TranscriptionService, public ms: BsModalService) {
   }
 
   ngOnInit() {
+    this.subscrmanager.add(this.modal.onHide.subscribe(
+      () => {
+        this.visible = false;
+        this.actionperformed.next();
+      }
+    ));
+    this.subscrmanager.add(this.modal.onHidden.subscribe(
+      () => {
+        this.visible = false;
+        this.actionperformed.next();
+      }
+    ));
+  }
+
+  ngOnDestroy() {
+    this.subscrmanager.destroy();
   }
 
   public open(): Promise<void> {
@@ -50,6 +68,10 @@ export class OverviewModalComponent implements OnInit {
   public close() {
     this.modal.hide();
     this.visible = false;
+    this.actionperformed.next();
+  }
+
+  public beforeDismiss() {
     this.actionperformed.next();
   }
 

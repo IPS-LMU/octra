@@ -27,9 +27,12 @@ export class TextConverter extends Converter {
       if (level.type === 'SEGMENT') {
         for (let j = 0; j < level.items.length; j++) {
           const transcript = level.items[j].labels[0].value;
-          result += transcript;
-          if (j < level.items.length - 1) {
-            result += ' ';
+
+          if (transcript !== '') {
+            result += transcript;
+            if (j < level.items.length - 1) {
+              result += ' ';
+            }
           }
         }
         result += '\n';

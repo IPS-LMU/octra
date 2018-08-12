@@ -6,8 +6,7 @@
 
             </div>
             <div class="modal-body">
-                <app-transcr-overview *ngIf="visible && transcrService.annotation !== null"
-                                      [visible]="visible"
+                <app-transcr-overview [visible]="visible"
                                       [segments]="(transcrService.annotation !== null && transcrService.annotation !== undefined)
                               ? transcrService.annotation.levels[transcrService.selectedlevel].segments.segments: null"
                                       (segmentclicked)="onSegmentInOverviewClicked($event)">

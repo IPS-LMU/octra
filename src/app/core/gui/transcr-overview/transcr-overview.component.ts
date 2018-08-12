@@ -26,10 +26,33 @@ import {Segment} from '../../obj/Annotation/Segment';
 })
 export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
 
-  private errortooltip: any;
-
   public selectedError: any = '';
+  public shown_segments: any[] = [];
+  @Input() segments: Segment[];
+  @Input() public show_transcriptiontable = true;
+  public show_loading = true;
+  @Output('segmentclicked') segmentclicked: EventEmitter<number> = new EventEmitter<number>();
+  private errortooltip: any;
+  private subscrmanager: SubscriptionManager;
+  private updating = false;
   private errorY = 0;
+
+  constructor(public transcrService: TranscriptionService,
+              public audio: AudioService,
+              public sanitizer: DomSanitizer,
+              private cd: ChangeDetectorRef) {
+
+    this.subscrmanager = new SubscriptionManager();
+  }
+
+  private _visible = false;
+
+  @Input('visible') set visible(value: boolean) {
+    this._visible = value;
+    if (value) {
+      this.updateView();
+    }
+  }
 
   public get numberOfSegments(): number {
     return (this.segments) ? this.segments.length : 0;
@@ -65,70 +88,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   public get validationFound() {
     return ((typeof validateAnnotation !== 'undefined') && isFunction(validateAnnotation) &&
       (typeof tidyUpAnnotation !== 'undefined') && isFunction(tidyUpAnnotation));
-  }
-
-  public shown_segments: any[] = [];
-  @Input() segments: Segment[];
-
-  private subscrmanager: SubscriptionManager;
-  private updating = false;
-  @Input() public show_transcriptiontable = true;
-  public show_loading = true;
-
-  @Input('visible') visible = true;
-
-  @Output('segmentclicked') segmentclicked: EventEmitter<number> = new EventEmitter<number>();
-
-  private updateSegments() {
-    if (!this.segments || !this.transcrService.guidelines) {
-      return [];
-    }
-
-    this.show_loading = true;
-    let start_time = 0;
-    const result = [];
-
-    for (let i = 0; i < this.segments.length; i++) {
-      const segment = this.segments[i];
-
-      const obj = {
-        start: start_time,
-        end: segment.time.seconds,
-        transcription: {
-          text: segment.transcript,
-          html: segment.transcript
-        },
-        validation: ''
-      };
-
-      if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function') {
-        obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
-          validateAnnotation(obj.transcription.text, this.transcrService.guidelines));
-      }
-
-      obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
-      obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
-        if (g1 == '[[[') {
-          return '<';
-        }
-        return '>';
-      });
-
-      result.push(obj);
-
-      start_time = segment.time.seconds;
-    }
-
-    this.shown_segments = result;
-    this.show_loading = false;
-  }
-
-  constructor(public transcrService: TranscriptionService,
-              public audio: AudioService,
-              public sanitizer: DomSanitizer,
-              private cd: ChangeDetectorRef) {
-
-    this.subscrmanager = new SubscriptionManager();
   }
 
   ngOnDestroy() {
@@ -197,8 +156,13 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
     this.updateSegments();
     this.transcrService.analyse();
+
     this.cd.markForCheck();
     this.cd.detectChanges();
+  }
+
+  public onSegmentClicked(segnumber: number) {
+    this.segmentclicked.emit(segnumber);
   }
 
   /*
@@ -212,7 +176,47 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     }
   } */
 
-  public onSegmentClicked(segnumber: number) {
-    this.segmentclicked.emit(segnumber);
+  private updateSegments() {
+    if (!this.segments || !this.transcrService.guidelines) {
+      this.shown_segments = [];
+    }
+
+    this.show_loading = true;
+    let start_time = 0;
+    const result = [];
+
+    for (let i = 0; i < this.segments.length; i++) {
+      const segment = this.segments[i];
+
+      const obj = {
+        start: start_time,
+        end: segment.time.seconds,
+        transcription: {
+          text: segment.transcript,
+          html: segment.transcript
+        },
+        validation: ''
+      };
+
+      if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function') {
+        obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
+          validateAnnotation(obj.transcription.text, this.transcrService.guidelines));
+      }
+
+      obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
+      obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
+        if (g1 == '[[[') {
+          return '<';
+        }
+        return '>';
+      });
+
+      result.push(obj);
+
+      start_time = segment.time.seconds;
+    }
+
+    this.shown_segments = result;
+    this.show_loading = false;
   }
 }

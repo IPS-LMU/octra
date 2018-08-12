@@ -28,11 +28,6 @@ export class MembersAreaGuard implements CanActivate {
         });
         return false;
       }
-    } else if (this.appStorage.submitted) {
-      this.router.navigate(['/user/transcr/submitted'], {
-        queryParamsHandling: 'preserve'
-      });
-      return false;
     } else if (!this.settService.allloaded) {
       this.router.navigate(['/user/load'], {
         queryParamsHandling: 'preserve'

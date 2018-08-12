@@ -2,7 +2,7 @@ import {Component, OnDestroy} from '@angular/core';
 import {APIService, AppStorageService, SettingsService} from './core/shared/service';
 import {TranslateService} from '@ngx-translate/core';
 import {SubscriptionManager} from './core/obj/SubscriptionManager';
-import {isNullOrUndefined, isUndefined} from 'util';
+import {isNullOrUndefined} from 'util';
 import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
 import {AppInfo} from './app.info';
 import {environment} from '../environments/environment';
@@ -72,10 +72,6 @@ export class AppComponent implements OnDestroy {
       };
     })();
 
-    // load settings
-    this.subscrmanager.add(this.settingsService.settingsloaded.subscribe(
-      this.onSettingsLoaded
-    ));
 
     // after project settings loaded
     this.subscrmanager.add(this.settingsService.projectsettingsloaded.subscribe(
@@ -143,35 +139,12 @@ export class AppComponent implements OnDestroy {
       if (isNullOrUndefined(this.settingsService.app_settings)) {
         throw new Error('config.json does not exist');
       } else {
-        if (this.settingsService.validated) {
-          console.log('settings valid');
-          this.api.init(this.settingsService.app_settings.audio_server.url + 'WebTranscribe');
-        }
-
         if (!this.settingsService.responsive.enabled) {
           this.setFixedWidth();
         }
       }
-
-      // define languages
-      const languages = this.settingsService.app_settings.octra.languages;
-      const browser_lang = this.langService.getBrowserLang();
-
-      this.langService.addLangs(languages);
-
-      // check if browser language is available in translations
-      if (isNullOrUndefined(this.appStorage.language) || this.appStorage.language === '') {
-        if (!isUndefined(this.langService.getLangs().find((value) => {
-            return value === browser_lang;
-          }))) {
-          this.langService.use(browser_lang);
-        } else {
-          // use first language defined as default language
-          this.langService.use(languages[0]);
-        }
-      } else {
-        this.langService.use(this.appStorage.language);
-      }
+    } else {
+      console.log(`settings not loaded`);
     }
   };
 

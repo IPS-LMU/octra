@@ -127,10 +127,22 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     } else {
       loaduser();
     }
+
+    new Promise<void>((resolve, reject) => {
+      if (!((this.settingsService.app_settings === null || this.settingsService.app_settings === undefined))) {
+        resolve();
+      } else {
+        this.subscrmanager.add(this.settingsService.app_settingsloaded.subscribe(() => {
+          resolve();
+        }));
+      }
+    }).then(() => {
+      this.loadPojectsList();
+    });
+
   }
 
   ngAfterViewInit() {
-    this.loadPojectsList();
   }
 
   ngOnDestroy() {
@@ -398,8 +410,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   loadPojectsList() {
-    this.subscrmanager.add(this.api.getProjects().subscribe(
-      ((json) => {
+    this.subscrmanager.add(this.api.getProjects().subscribe((json) => {
         if (isArray(json.data)) {
           this.projects = json.data;
           if (!isNullOrUndefined(this.appStorage.user) &&
@@ -413,8 +424,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
             }
           }
         }
-      })
-    ));
+      },
+      (error) => {
+        console.error(`ERROR: could not load list of projects:\n${error}`);
+      }));
   }
 
   public selectProject(event: HTMLSelectElement) {

@@ -5,7 +5,7 @@ import {ProjectSettings} from '../../obj/Settings/project-configuration';
 import {Subscription} from 'rxjs/Subscription';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
-import {isFunction, isNullOrUndefined} from 'util';
+import {isFunction, isNullOrUndefined, isUndefined} from 'util';
 import {Logger} from '../Logger';
 import {AppSettings} from '../../obj/Settings/app-settings';
 import {Functions} from '../Functions';
@@ -14,12 +14,15 @@ import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {AppInfo} from '../../../app.info';
 import {HttpClient} from '@angular/common/http';
+import {APIService} from './api.service';
+import {TranslateService} from '@ngx-translate/core';
 
 @Injectable()
 export class SettingsService {
   set log(value: string) {
     this._log = value;
   }
+
   get log(): string {
     return this._log;
   }
@@ -105,7 +108,7 @@ export class SettingsService {
   }
 
   constructor(private http: HttpClient,
-              private appStorage: AppStorageService) {
+              private appStorage: AppStorageService, private api: APIService, private langService: TranslateService) {
     this.subscrmanager = new SubscriptionManager();
   }
 
@@ -133,6 +136,42 @@ export class SettingsService {
         () => {
           Logger.log('AppSettings loaded.');
           this.validation.app = true;
+
+          // settings have been loaded
+          if (isNullOrUndefined(this.app_settings)) {
+            throw new Error('config.json does not exist');
+          } else {
+            if (this.validated) {
+              console.log('settings valid');
+              this.api.init(this.app_settings.audio_server.url + 'WebTranscribe');
+            }
+          }
+
+          // define languages
+          const languages = this.app_settings.octra.languages;
+          const browser_lang = this.langService.getBrowserLang();
+
+          this.langService.addLangs(languages);
+
+          // check if browser language is available in translations
+          if (isNullOrUndefined(this.appStorage.language) || this.appStorage.language === '') {
+            if (!isUndefined(this.langService.getLangs().find((value) => {
+              return value === browser_lang;
+            }))) {
+              this.langService.use(browser_lang);
+            } else {
+              // use first language defined as default language
+              this.langService.use(languages[0]);
+            }
+          } else {
+            if (!isUndefined(this.langService.getLangs().find((value) => {
+              return value === this.appStorage.language;
+            }))) {
+              this.langService.use(this.appStorage.language);
+            } else {
+              this.langService.use(languages[0]);
+            }
+          }
           resolve();
           this.app_settingsloaded.emit(true);
         },

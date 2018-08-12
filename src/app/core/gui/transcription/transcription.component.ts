@@ -307,12 +307,6 @@ export class TranscriptionComponent implements OnInit,
   ngAfterViewChecked() {
   }
 
-  submitTranscription() {
-    this.router.navigate(['/user/transcr/submit'], {
-      queryParamsHandling: 'preserve'
-    });
-  }
-
   ngOnDestroy() {
     this.subscrmanager.destroy();
   }
@@ -541,6 +535,8 @@ export class TranscriptionComponent implements OnInit,
   nextTranscription() {
     this.transcrService.endTranscription(false);
     this.clearData();
+
+
     this.subscrmanager.add(this.api.beginSession(this.appStorage.user.project, this.appStorage.user.id,
       Number(this.appStorage.user.jobno), '')
       .subscribe((json) => {

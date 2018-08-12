@@ -413,6 +413,15 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     this.subscrmanager.add(this.api.getProjects().subscribe((json) => {
         if (isArray(json.data)) {
           this.projects = json.data;
+
+          if (!isNullOrUndefined(this.settingsService.app_settings.octra.allowed_projects) && this.settingsService.app_settings.octra.allowed_projects.length > 0) {
+            // filter disabled projects
+            this.projects = this.projects.filter((a) => {
+              return (this.settingsService.app_settings.octra.allowed_projects.findIndex((b) => {
+                return a === b.name;
+              }) > -1);
+            });
+          }
           if (!isNullOrUndefined(this.appStorage.user) &&
             !isNullOrUndefined(this.appStorage.user.project) && this.appStorage.user.project !== '') {
             if (isNullOrUndefined(this.projects.find(

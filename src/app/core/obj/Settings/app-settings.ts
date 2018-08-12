@@ -22,6 +22,9 @@ export interface AppSettings {
       url: string
     },
     allowed_browsers: any[],
+    allowed_projects: {
+      name: string
+    }[],
     languages: string[]
   };
 }

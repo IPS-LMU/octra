@@ -1,33 +1,33 @@
 <div class="container">
-    <h3>Help tools</h3>
+    <h2>Help tools</h2>
     <div class="row">
         <div class="col-sm-4 is-table-row">
-            <div class="panel panel-primary">
-                <div class="panel-body">
-
-                    <h5>
-                        <button type="button" class="btn btn-primary btn-fab btn-fab-mini"> 1</button>
-                        Refresh App
-                    </h5>
-                    <p>
-                        This tool forces the App to reload and refresh the browser cache.<br/>
-                    </p>
-                    <button class="btn btn-raised btn-primary col-12" (click)="refreshApp()"> Refresh App</button>
+            <div class="card">
+                <div class="card-header">
+                    <button type="button" class="btn btn-success bmd-btn-fab bmd-btn-fab-sm">
+                        1
+                    </button>
+                    Refresh App
+                </div>
+                <div class="card-body">
+                    <p class="card-text">This tool forces the App to reload and refresh the browser cache.</p>
+                    <button class="btn btn-raised btn-primary col-12" (click)="refreshApp()"> Refresh app</button>
                 </div>
             </div>
         </div>
         <div class="col-sm-4 is-table-row">
-            <div class="panel panel-primary">
-                <div class="panel-body">
-
-                    <h5>
-                        <button type="button" class="btn btn-primary btn-fab btn-fab-mini"> 2</button>
-                        Clear all Storage Data
-                    </h5>
-                    <p>
-                        This tool removes all local data including (transcript, logs and settings).
-                    </p>
-                    <button class="btn btn-raised btn-danger col-12" (click)="clearAllData()"> Clear Data</button>
+            <div class="card">
+                <div class="card-header">
+                    <button type="button" class="btn btn-success bmd-btn-fab bmd-btn-fab-sm">
+                        2
+                    </button>
+                    Clear all Storage Data
+                </div>
+                <div class="card-body">
+                    <p class="card-text">This tool removes all local data including (transcript, logs and settings).</p>
+                    <button class="btn btn-raised btn-danger col-12" (click)="clearAllData()"> Clear all data
+                        permanently
+                    </button>
                 </div>
             </div>
         </div>

@@ -109,7 +109,6 @@ export class PraatTableConverter extends Converter {
               length = 0;
 
               if (isNaN(tmax)) {
-                console.error('column 4 is NaN');
                 return null;
               } else {
                 length = Number(tmax - tmin);
@@ -118,7 +117,6 @@ export class PraatTableConverter extends Converter {
 
               if (tier === tiers[t]) {
                 if (isNaN(tmin)) {
-                  console.error('column 1 is NaN');
                   return null;
                 } else {
                   const last = (olevel.items.length > 0 && !isNullOrUndefined(olevel.items[olevel.items.length - 1]))

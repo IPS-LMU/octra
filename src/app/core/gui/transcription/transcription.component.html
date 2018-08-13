@@ -104,7 +104,8 @@
         </div>
     </div>
     <div class="row" id="bottom-navigation" role="group">
-        <button class="btn btn-secondary btn-raised col-md-6" *ngIf="appStorage.usemode !== 'url'"
+        <button class="btn btn-secondary btn-raised col-md-6"
+                *ngIf="appStorage.usemode === 'local' || appStorage.usemode === 'online'"
                 (click)="abortTranscription()">
             <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
             <span *ngIf="!appStorage.easymode" [ngClass]="{' d-none d-md-inline': appc.octra.responsive.enabled}">

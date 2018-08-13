@@ -69,14 +69,12 @@ export class CTMConverter extends Converter {
             const columns: string[] = lines[i].split(' ');
             length = 0;
             if (isNaN(Number(columns[2]))) {
-              console.error(columns[2] + ' is NaN');
               return null;
             } else {
               start = Number(columns[2]);
             }
 
             if (isNaN(Number(columns[3]))) {
-              console.error(columns[3] + ' is NaN');
               return null;
             } else {
               length = Number(columns[3]);

@@ -16,6 +16,8 @@ import {AppInfo} from '../../../app.info';
 import {HttpClient} from '@angular/common/http';
 import {APIService} from './api.service';
 import {TranslateService} from '@ngx-translate/core';
+import {UpdateManager} from '../UpdateManager';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Injectable()
 export class SettingsService {
@@ -108,7 +110,9 @@ export class SettingsService {
   }
 
   constructor(private http: HttpClient,
-              private appStorage: AppStorageService, private api: APIService, private langService: TranslateService) {
+              private appStorage: AppStorageService, private api: APIService, private langService: TranslateService,
+              private router: Router,
+              private route: ActivatedRoute) {
     this.subscrmanager = new SubscriptionManager();
   }
 
@@ -137,43 +141,89 @@ export class SettingsService {
           Logger.log('AppSettings loaded.');
           this.validation.app = true;
 
-          // settings have been loaded
-          if (isNullOrUndefined(this.app_settings)) {
-            throw new Error('config.json does not exist');
-          } else {
-            if (this.validated) {
-              console.log('settings valid');
-              this.api.init(this.app_settings.audio_server.url + 'WebTranscribe');
-            }
+          // App Settings loaded
+
+          // check for Updates
+          if (this.queryParamsSet()) {
+            // URL MODE, overwrite db name with 'url'
+            this.app_settings.octra.database.name = 'url';
+            console.log('load db ' + this.app_settings.octra.database.name);
           }
 
-          // define languages
-          const languages = this.app_settings.octra.languages;
-          const browser_lang = this.langService.getBrowserLang();
+          const umanager = new UpdateManager(this.appStorage);
+          umanager.checkForUpdates(this.app_settings.octra.database.name).then((idb) => {
 
-          this.langService.addLangs(languages);
+            const audio_url = this.route.snapshot.queryParams['audio'];
+            const transcript_url = (this.route.snapshot.queryParams['transcript'] !== undefined) ? this.route.snapshot.queryParams['transcript'] : null;
+            const embedded = this.route.snapshot.queryParams['embedded'];
 
-          // check if browser language is available in translations
-          if (isNullOrUndefined(this.appStorage.language) || this.appStorage.language === '') {
-            if (!isUndefined(this.langService.getLangs().find((value) => {
-              return value === browser_lang;
-            }))) {
-              this.langService.use(browser_lang);
-            } else {
-              // use first language defined as default language
-              this.langService.use(languages[0]);
-            }
-          } else {
-            if (!isUndefined(this.langService.getLangs().find((value) => {
-              return value === this.appStorage.language;
-            }))) {
-              this.langService.use(this.appStorage.language);
-            } else {
-              this.langService.use(languages[0]);
-            }
-          }
-          resolve();
-          this.app_settingsloaded.emit(true);
+            this.appStorage.url_params['audio'] = audio_url;
+            this.appStorage.url_params['transcript'] = transcript_url;
+            this.appStorage.url_params['embedded'] = (embedded === '1');
+            this.appStorage.url_params['host'] = this.route.snapshot.queryParams['host'];
+
+            // load from indexedDB
+            this.appStorage.load(idb).then(
+              () => {
+
+                // if url mode, set it in options
+                if (this.queryParamsSet()) {
+                  this.appStorage.usemode = 'url';
+                  this.appStorage.LoggedIn = true;
+                }
+
+
+                if (this.validated) {
+                  console.log('loaded');
+
+                  // settings have been loaded
+                  if (isNullOrUndefined(this.app_settings)) {
+                    throw new Error('config.json does not exist');
+                  } else {
+                    if (this.validated) {
+                      console.log('settings valid');
+                      this.api.init(this.app_settings.audio_server.url + 'WebTranscribe');
+                    }
+                  }
+
+                  // define languages
+                  const languages = this.app_settings.octra.languages;
+                  const browser_lang = this.langService.getBrowserLang();
+
+                  this.langService.addLangs(languages);
+
+                  // check if browser language is available in translations
+                  if (isNullOrUndefined(this.appStorage.language) || this.appStorage.language === '') {
+                    if (!isUndefined(this.langService.getLangs().find((value) => {
+                      return value === browser_lang;
+                    }))) {
+                      this.langService.use(browser_lang);
+                    } else {
+                      // use first language defined as default language
+                      this.langService.use(languages[0]);
+                    }
+                  } else {
+                    if (!isUndefined(this.langService.getLangs().find((value) => {
+                      return value === this.appStorage.language;
+                    }))) {
+                      this.langService.use(this.appStorage.language);
+                    } else {
+                      this.langService.use(languages[0]);
+                    }
+                  }
+                }
+                umanager.destroy();
+
+                // settings finally loaded
+                resolve();
+                this.app_settingsloaded.emit(true);
+              }
+            ).catch((error) => {
+              Logger.err(error);
+            });
+          }).catch((error) => {
+            console.error(error.target.error);
+          });
         },
         (error) => {
           Logger.err(error);
@@ -411,5 +461,13 @@ export class SettingsService {
     } else {
       throw new Error('parameters of loadSettings() are not correct.');
     }
+  }
+
+  queryParamsSet(): boolean {
+    const params = this.route.snapshot.queryParams;
+    return (
+      params.hasOwnProperty('audio') &&
+      params.hasOwnProperty('embedded')
+    );
   }
 }

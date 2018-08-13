@@ -9,23 +9,23 @@
     <app-octra-dropzone #dropzone></app-octra-dropzone>
 
     <div class="row" role="group">
-        <button class="btn btn-default btn-raised col-md-4"
+        <button class="btn btn-secondary btn-raised col-md-4"
                 (click)="askForAbort()">
             <fa-icon icon="sign-out-alt"></fa-icon>
             <span
-                    class="hidden-xs hidden-sm hidden-md"> {{"transcription.stop" | translate}}</span>
+                    class=" d-none d-lg-inline"> {{"transcription.stop" | translate}}</span>
         </button>
         <button class="btn btn-default btn-raised btn-danger col-md-4" [disabled]="!(dropzone.status === 'valid')"
                 (click)="newTranscription()">
             <fa-icon icon="file"></fa-icon>
-            <span class="hidden-xs hidden-sm hidden-md"> {{"transcription.new" | translate}}</span>
+            <span class="d-none d-lg-inline"> {{"transcription.new" | translate}}</span>
         </button>
         <button type="button" class="btn btn-primary btn-raised col-md-4"
                 [disabled]="!(!isN(dropzone.oaudiofile) && sessionfile !== null && dropzone.oaudiofile.name === sessionfile.name && isN(dropzone.oannotation))"
                 (click)="onOfflineSubmit()">
             <fa-icon icon="edit"></fa-icon>
             <span
-                    class="hidden-xs hidden-sm hidden-md"> {{"transcription.start" | translate}}</span>
+                    class="d-none d-lg-inline"> {{"transcription.start" | translate}}</span>
         </button>
     </div>
 </div>

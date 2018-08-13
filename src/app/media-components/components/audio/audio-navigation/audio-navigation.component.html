@@ -42,7 +42,7 @@
                         </div>
                         <div class="col-1 col-sm-4 col-md-3">
                             <fa-icon icon="volume-up"></fa-icon>
-                            <div class="slider-descr" [ngClass]="{'hidden-xs': responsive}">{{volume |
+                            <div class="slider-descr" [ngClass]="{'d-none d-sm-inline': responsive}">{{volume |
                                 procent}}%
                             </div>
                         </div>
@@ -64,7 +64,7 @@
                         <div class="col-1 col-sm-4 col-md-3"><img
                                 src="assets/img/components/audio-navigation/fast_white.png" style="height:16px;"
                                 alt="fast">
-                            <div class="slider-descr" [ngClass]="{'hidden-xs': responsive}">{{speed}}x</div>
+                            <div class="slider-descr" [ngClass]="{'d-none d-sm-inline': responsive}">{{speed}}x</div>
                         </div>
                     </div>
                 </div>

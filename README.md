@@ -1,10 +1,10 @@
 <h1 align="center">OCTRA v1.2</h1>
 
 <p align="center">
-  <img width="200" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.2/img/features/editor3_1.png" alt="2D-Editor">
-  <img width="200" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.2/img/features/editor3_2.png" alt="2D-Editor">
-  <img width="200" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.2/img/features/editor1.png" alt="Dictaphone Editor">
-  <img width="200" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.2/img/features/editor2.png" alt="Linear Editor">
+  <img width="220" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.2/img/features/editor3_1.png" alt="2D-Editor">
+  <img width="220" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.2/img/features/editor3_2.png" alt="2D-Editor">
+  <img width="220" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.2/img/features/editor2.png" alt="Linear Editor">
+  <img width="220" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.2/img/features/editor1.png" alt="Dictaphone Editor">
 </p>
 
 This is a web-application for the orthographic transcription of longer

@@ -17,10 +17,11 @@ import {HttpClient} from '@angular/common/http';
 import {APIService} from './api.service';
 import {TranslateService} from '@ngx-translate/core';
 import {UpdateManager} from '../UpdateManager';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 
 @Injectable()
 export class SettingsService {
+  public dbloaded = new EventEmitter<any>();
   set log(value: string) {
     this._log = value;
   }
@@ -85,6 +86,93 @@ export class SettingsService {
   public validationmethodloaded = new EventEmitter<void>();
   public audioloaded: EventEmitter<any> = new EventEmitter<any>();
   public guidelinesloaded = new EventEmitter<any>();
+  public loadDB = (appRoute: ActivatedRoute) => {
+
+    // check for Updates
+    if (this.queryParamsSet(appRoute)) {
+      // URL MODE, overwrite db name with 'url'
+      this.app_settings.octra.database.name = 'url';
+      console.log('load db ' + this.app_settings.octra.database.name);
+    } else {
+      console.log(`no params`);
+    }
+
+    const umanager = new UpdateManager(this.appStorage);
+    umanager.checkForUpdates(this.app_settings.octra.database.name).then((idb) => {
+
+      const audio_url = appRoute.snapshot.queryParams['audio'];
+      const transcript_url = (appRoute.snapshot.queryParams['transcript'] !== undefined) ? appRoute.snapshot.queryParams['transcript'] : null;
+      const embedded = appRoute.snapshot.queryParams['embedded'];
+
+      this.appStorage.url_params['audio'] = audio_url;
+      this.appStorage.url_params['transcript'] = transcript_url;
+      this.appStorage.url_params['embedded'] = (embedded === '1');
+      this.appStorage.url_params['host'] = appRoute.snapshot.queryParams['host'];
+
+      // load from indexedDB
+      this.appStorage.load(idb).then(
+        () => {
+
+          // if url mode, set it in options
+          if (this.queryParamsSet(appRoute)) {
+            console.log(`PARAMS SET!`);
+            this.appStorage.usemode = 'url';
+            this.appStorage.LoggedIn = true;
+          }
+
+
+          if (this.validated) {
+            console.log('loaded');
+
+            // settings have been loaded
+            if (isNullOrUndefined(this.app_settings)) {
+              throw new Error('config.json does not exist');
+            } else {
+              if (this.validated) {
+                console.log('settings valid');
+                this.api.init(this.app_settings.audio_server.url + 'WebTranscribe');
+              }
+            }
+
+            // define languages
+            const languages = this.app_settings.octra.languages;
+            const browser_lang = this.langService.getBrowserLang();
+
+            this.langService.addLangs(languages);
+
+            // check if browser language is available in translations
+            if (isNullOrUndefined(this.appStorage.language) || this.appStorage.language === '') {
+              if (!isUndefined(this.langService.getLangs().find((value) => {
+                return value === browser_lang;
+              }))) {
+                this.langService.use(browser_lang);
+              } else {
+                // use first language defined as default language
+                this.langService.use(languages[0]);
+              }
+            } else {
+              if (!isUndefined(this.langService.getLangs().find((value) => {
+                return value === this.appStorage.language;
+              }))) {
+                this.langService.use(this.appStorage.language);
+              } else {
+                this.langService.use(languages[0]);
+              }
+            }
+          }
+          umanager.destroy();
+          this._isDBLoadded = true;
+          this.dbloaded.emit();
+        }
+      ).catch((error) => {
+        this.dbloaded.error(error);
+        Logger.err(error);
+      });
+    }).catch((error) => {
+      this.dbloaded.error(error);
+      console.error(error.target.error);
+    });
+  };
 
   private subscrmanager: SubscriptionManager;
 
@@ -92,6 +180,12 @@ export class SettingsService {
   private _app_settings: AppSettings;
   private _guidelines: any;
   private _loaded = false;
+
+  constructor(private http: HttpClient,
+              private appStorage: AppStorageService, private api: APIService, private langService: TranslateService) {
+    this.subscrmanager = new SubscriptionManager();
+  }
+
   private _log = '';
 
   private _filename: string;
@@ -109,14 +203,13 @@ export class SettingsService {
     );
   }
 
-  constructor(private http: HttpClient,
-              private appStorage: AppStorageService, private api: APIService, private langService: TranslateService,
-              private router: Router,
-              private route: ActivatedRoute) {
-    this.subscrmanager = new SubscriptionManager();
+  private _isDBLoadded = false;
+
+  get isDBLoadded(): boolean {
+    return this._isDBLoadded;
   }
 
-  public loadApplicationSettings(): Promise<void> {
+  public loadApplicationSettings(appRoute: ActivatedRoute): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.subscrmanager.add(
         this.app_settingsloaded.subscribe(this.triggerSettingsLoaded)
@@ -141,89 +234,13 @@ export class SettingsService {
           Logger.log('AppSettings loaded.');
           this.validation.app = true;
 
+          this.app_settingsloaded.emit(true);
           // App Settings loaded
 
-          // check for Updates
-          if (this.queryParamsSet()) {
-            // URL MODE, overwrite db name with 'url'
-            this.app_settings.octra.database.name = 'url';
-            console.log('load db ' + this.app_settings.octra.database.name);
-          }
+          // settings finally loaded
+          resolve();
 
-          const umanager = new UpdateManager(this.appStorage);
-          umanager.checkForUpdates(this.app_settings.octra.database.name).then((idb) => {
-
-            const audio_url = this.route.snapshot.queryParams['audio'];
-            const transcript_url = (this.route.snapshot.queryParams['transcript'] !== undefined) ? this.route.snapshot.queryParams['transcript'] : null;
-            const embedded = this.route.snapshot.queryParams['embedded'];
-
-            this.appStorage.url_params['audio'] = audio_url;
-            this.appStorage.url_params['transcript'] = transcript_url;
-            this.appStorage.url_params['embedded'] = (embedded === '1');
-            this.appStorage.url_params['host'] = this.route.snapshot.queryParams['host'];
-
-            // load from indexedDB
-            this.appStorage.load(idb).then(
-              () => {
-
-                // if url mode, set it in options
-                if (this.queryParamsSet()) {
-                  this.appStorage.usemode = 'url';
-                  this.appStorage.LoggedIn = true;
-                }
-
-
-                if (this.validated) {
-                  console.log('loaded');
-
-                  // settings have been loaded
-                  if (isNullOrUndefined(this.app_settings)) {
-                    throw new Error('config.json does not exist');
-                  } else {
-                    if (this.validated) {
-                      console.log('settings valid');
-                      this.api.init(this.app_settings.audio_server.url + 'WebTranscribe');
-                    }
-                  }
-
-                  // define languages
-                  const languages = this.app_settings.octra.languages;
-                  const browser_lang = this.langService.getBrowserLang();
-
-                  this.langService.addLangs(languages);
-
-                  // check if browser language is available in translations
-                  if (isNullOrUndefined(this.appStorage.language) || this.appStorage.language === '') {
-                    if (!isUndefined(this.langService.getLangs().find((value) => {
-                      return value === browser_lang;
-                    }))) {
-                      this.langService.use(browser_lang);
-                    } else {
-                      // use first language defined as default language
-                      this.langService.use(languages[0]);
-                    }
-                  } else {
-                    if (!isUndefined(this.langService.getLangs().find((value) => {
-                      return value === this.appStorage.language;
-                    }))) {
-                      this.langService.use(this.appStorage.language);
-                    } else {
-                      this.langService.use(languages[0]);
-                    }
-                  }
-                }
-                umanager.destroy();
-
-                // settings finally loaded
-                resolve();
-                this.app_settingsloaded.emit(true);
-              }
-            ).catch((error) => {
-              Logger.err(error);
-            });
-          }).catch((error) => {
-            console.error(error.target.error);
-          });
+          this.loadDB(appRoute);
         },
         (error) => {
           Logger.err(error);
@@ -463,8 +480,8 @@ export class SettingsService {
     }
   }
 
-  queryParamsSet(): boolean {
-    const params = this.route.snapshot.queryParams;
+  queryParamsSet(route: ActivatedRoute): boolean {
+    const params = route.snapshot.queryParams;
     return (
       params.hasOwnProperty('audio') &&
       params.hasOwnProperty('embedded')

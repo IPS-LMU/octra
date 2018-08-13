@@ -24,38 +24,6 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
 
   }
 
-  clearAllData() {
-    if (this.appStorage.usemode === 'local') {
-      this.appStorage.clearAnnotationData().then(() => {
-        this.appStorage.clearOptions();
-      }).then(() => {
-        this.appStorage.clearLoggingData();
-      }).then(
-        () => {
-          alert('All cleared. The app will be reloaded.');
-          document.location.reload(true);
-        }
-      );
-    } else {
-      this.setOnlineSessionToFree(() => {
-        this.appStorage.clearAnnotationData().then(() => {
-          this.appStorage.clearLoggingData();
-        }).then(() => {
-          this.appStorage.clearOptions();
-        }).then(
-          () => {
-            alert('All cleared. The app will be reloaded.');
-            document.location.reload(true);
-          }
-        );
-      });
-    }
-  }
-
-  refreshApp() {
-    document.location.reload(true);
-  }
-
   private setOnlineSessionToFree = (callback: () => void) => {
     // check if old annotation is already annotated
     this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
@@ -75,5 +43,50 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
         callback();
       }
     ));
+  };
+
+  refreshApp() {
+    document.location.reload(true);
+  }
+
+  clearAllData() {
+    this.appStorage._logged_in = false;
+
+    if (this.appStorage.usemode === 'local') {
+      this.appStorage.clearAnnotationData().then(() => {
+        this.appStorage.clearOptions();
+      }).then(() => {
+        this.appStorage.clearLoggingData();
+      }).then(
+        () => {
+          alert('All cleared. The app will be reloaded.');
+          document.location.reload(true);
+        }
+      );
+    } else if (this.appStorage.usemode === 'online') {
+      this.setOnlineSessionToFree(() => {
+        this.appStorage.clearAnnotationData().then(() => {
+          this.appStorage.clearLoggingData();
+        }).then(() => {
+          this.appStorage.clearOptions();
+        }).then(
+          () => {
+            alert('All cleared. The app will be reloaded.');
+            document.location.reload(true);
+          }
+        );
+      });
+    } else if (this.appStorage.usemode === 'url') {
+      this.appStorage.clearAnnotationData().then(() => {
+        this.appStorage.clearLoggingData();
+      }).then(() => {
+        this.appStorage.clearOptions();
+      }).then(
+        () => {
+          alert('All cleared. The app will be reloaded.');
+          document.location.reload(true);
+        }
+      );
+    }
   }
 }

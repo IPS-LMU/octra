@@ -4,7 +4,12 @@
 <app-prompt-modal #promptmodal></app-prompt-modal>
 
 <nav class="navbar navbar-expand-md navbar-fixed-top navbar-dark" style="z-index:1000;">
-    <a class="navbar-brand" href="#">OCTRA v{{version}} ({{appStorage.usemode}})</a>
+    <a class="navbar-brand" href="#">OCTRA v{{version}}
+        <ng-container
+                *ngIf="appStorage.usemode === 'url' || appStorage.usemode === 'local' || appStorage.usemode === 'online'">
+            ({{appStorage.usemode}})
+        </ng-container>
+    </a>
     <div class="d-block d-md-none" *ngIf="environment.dev_version" style="color:red;">in developement</div>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
             aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">

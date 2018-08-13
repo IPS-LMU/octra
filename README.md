@@ -3,8 +3,8 @@
 <p align="center">
   <img width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.2/img/features/editor3_1.png" alt="2D-Editor">
   <img width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.2/img/features/editor3_2.png" alt="2D-Editor">
-  <img width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.2/img/features/editor2.png" alt="Linear Editor">
-  <img width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.2/img/features/editor1.png" alt="Dictaphone Editor">
+  <img width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.2/img/features/editor2_new.png" alt="Linear Editor">
+  <img width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.2/img/features/editor1_new.png" alt="Dictaphone Editor">
 </p>
 
 This is a web-application for the orthographic transcription of longer
@@ -121,8 +121,4 @@ German:
 * summernote: https://github.com/summernote/summernote
 * bootstrap: http://getbootstrap.com/
 * bootstrap-material-design: http://fezvrasta.github.io/bootstrap-material-design/
-* glyphicons (in bootstrap package): http://glyphicons.com/
-* ng2-webstorage: https://github.com/PillowPillow/ng2-webstorage
-* browser-signal-processing: https://www.npmjs.com/package/browser-signal-processing
-* ng2-bs3-modal: https://github.com/dougludlow/ng2-bs3-modal
 * platform: https://github.com/bestiejs/platform.js/

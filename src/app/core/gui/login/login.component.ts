@@ -129,7 +129,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     }
 
     new Promise<void>((resolve, reject) => {
-      if (!((this.settingsService.app_settings === null || this.settingsService.app_settings === undefined))) {
+      if (this.settingsService.loaded) {
         resolve();
       } else {
         this.subscrmanager.add(this.settingsService.app_settingsloaded.subscribe(() => {

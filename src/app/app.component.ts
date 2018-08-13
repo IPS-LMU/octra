@@ -2,13 +2,10 @@ import {Component, OnDestroy} from '@angular/core';
 import {APIService, AppStorageService, SettingsService} from './core/shared/service';
 import {TranslateService} from '@ngx-translate/core';
 import {SubscriptionManager} from './core/obj/SubscriptionManager';
-import {isNullOrUndefined} from 'util';
 import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
 import {AppInfo} from './app.info';
 import {environment} from '../environments/environment';
-import {UpdateManager} from './core/shared/UpdateManager';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Logger} from './core/shared';
 
 @Component({
   selector: 'app-octra',
@@ -81,72 +78,7 @@ export class AppComponent implements OnDestroy {
         }
       }
     ));
-
-    this.settingsService.loadApplicationSettings().then(() => {
-      // App Settings loaded
-
-      // check for Updates
-      if (this.queryParamsSet()) {
-        // URL MODE, overwrite db name with 'url'
-        this.settingsService.app_settings.octra.database.name = 'url';
-        console.log('load db ' + this.settingsService.app_settings.octra.database.name);
-      }
-
-      const umanager = new UpdateManager(this.appStorage);
-      umanager.checkForUpdates(this.settingsService.app_settings.octra.database.name).then((idb) => {
-
-        const audio_url = this.route.snapshot.queryParams['audio'];
-        const transcript_url = (this.route.snapshot.queryParams['transcript'] !== undefined) ? this.route.snapshot.queryParams['transcript'] : null;
-        const embedded = this.route.snapshot.queryParams['embedded'];
-
-        this.appStorage.url_params['audio'] = audio_url;
-        this.appStorage.url_params['transcript'] = transcript_url;
-        this.appStorage.url_params['embedded'] = (embedded === '1');
-        this.appStorage.url_params['host'] = this.route.snapshot.queryParams['host'];
-
-        // load from indexedDB
-        this.appStorage.load(idb).then(
-          () => {
-
-
-            console.log('USEMODE FROM IDB is ' + this.appStorage.usemode);
-
-            // if url mode, set it in options
-            if (this.queryParamsSet()) {
-              this.appStorage.usemode = 'url';
-              this.appStorage.LoggedIn = true;
-            }
-
-
-            if (this.settingsService.validated) {
-              console.log('loaded');
-              this.onSettingsLoaded(true);
-            }
-            umanager.destroy();
-          }
-        ).catch((error) => {
-          Logger.err(error);
-        });
-      }).catch((error) => {
-        console.error(error.target.error);
-      });
-    });
   }
-
-  onSettingsLoaded = (loaded) => {
-    if (loaded) {
-      // settings have been loaded
-      if (isNullOrUndefined(this.settingsService.app_settings)) {
-        throw new Error('config.json does not exist');
-      } else {
-        if (!this.settingsService.responsive.enabled) {
-          this.setFixedWidth();
-        }
-      }
-    } else {
-      console.log(`settings not loaded`);
-    }
-  };
 
   ngOnDestroy() {
     this.subscrmanager.destroy();
@@ -179,14 +111,6 @@ export class AppComponent implements OnDestroy {
           console.log(result);
         }
       )
-    );
-  }
-
-  queryParamsSet(): boolean {
-    const params = this.route.snapshot.queryParams;
-    return (
-      params.hasOwnProperty('audio') &&
-      params.hasOwnProperty('embedded')
     );
   }
 }

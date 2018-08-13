@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <base href="">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <base href="">    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <link rel="shortcut icon" type="image/x-icon" href="assets/img/default/favicon.ico">
     <title>OCTRA - Orthographic Transcription</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Place this data between the <head> tags of your website -->
     <meta name="description" content="OCTRA is a modern online tool for the orthographic transcription of audio files.
     It can be used online or local and is free to use. What makes it special is its user-friendly appearance and its features:
     multiple editors and tiers, auto-saving, transcription guidelines support of various file formats and a lot more."/>
+
     <!-- Twitter Card data -->
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="OCTRA - modern web-application for the orthographic transcription">
@@ -22,6 +22,7 @@
     multiple editors and tiers, auto-saving, transcription guidelines support of various file formats and a lot more.">
     <meta name="twitter:image"
           content="https://www.phonetik.uni-muenchen.de/apps/octra/octra/assets/img/socialmedia/octra_logo_twitter.jpg">
+
     <!-- Open Graph data -->
     <meta property="og:title" content="OCTRA - modern web-application for the orthographic transcription"/>
     <meta property="og:type" content="article"/>
@@ -31,72 +32,78 @@
     <meta property="og:description" content="OCTRA is a modern online tool for the orthographic transcription of audio files.
     It can be used online or local and is free to use. What makes it special is its user-friendly appearance and its features:
     multiple editors and tiers, auto-saving, transcription guidelines support of various file formats and a lot more."/>
-    <style>#logo {
-        text-align: center;
-        width: 100%;
-        display: block;
-        font-size: 4em;
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        font-weight: 300;
-    }
 
-    /* copy from bootstrap-material */
-    .progress {
-        height: 4px;
-        border-radius: 0;
-        -webkit-box-shadow: none;
-        box-shadow: none;
-        background: #c8c8c8;
-    }
+    <style>
+        #logo {
+            text-align: center;
+            width: 100%;
+            display: block;
+            font-size: 4em;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-weight: 300;
+        }
 
-    .progress .progress-bar {
-        -webkit-box-shadow: none;
-        box-shadow: none;
-    }
+        /* copy from bootstrap-material */
+        .progress {
+            height: 4px;
+            border-radius: 0;
+            -webkit-box-shadow: none;
+            box-shadow: none;
+            background: #c8c8c8;
+        }
 
-    .progress .progress-bar,
-    .progress .progress-bar.progress-bar-default {
-        background-color: #009688;
-    }
+        .progress .progress-bar {
+            -webkit-box-shadow: none;
+            box-shadow: none;
+        }
 
-    .progress .progress-bar.progress-bar-inverse {
-        background-color: #3f51b5;
-    }
+        .progress .progress-bar,
+        .progress .progress-bar.progress-bar-default {
+            background-color: #009688;
+        }
 
-    .progress .progress-bar.progress-bar-primary {
-        background-color: #009688;
-    }
+        .progress .progress-bar.progress-bar-inverse {
+            background-color: #3f51b5;
+        }
 
-    .progress .progress-bar.progress-bar-success {
-        background-color: #4caf50;
-    }
+        .progress .progress-bar.progress-bar-primary {
+            background-color: #009688;
+        }
 
-    .progress .progress-bar.progress-bar-info {
-        background-color: #03a9f4;
-    }
+        .progress .progress-bar.progress-bar-success {
+            background-color: #4caf50;
+        }
 
-    .progress .progress-bar.progress-bar-warning {
-        background-color: #ff5722;
-    }
+        .progress .progress-bar.progress-bar-info {
+            background-color: #03a9f4;
+        }
 
-    .progress .progress-bar.progress-bar-danger {
-        background-color: #f44336;
-    }</style>
-    <link href="styles.c771c34ead87e054153e.bundle.css" rel="stylesheet"/>
-</head><!-- 3. Display the application -->
+        .progress .progress-bar.progress-bar-warning {
+            background-color: #ff5722;
+        }
+
+        .progress .progress-bar.progress-bar-danger {
+            background-color: #f44336;
+        }
+    </style>
+<link rel="stylesheet" href="styles.69731cfb8582444a6b7f.css"></head>
+<!-- 3. Display the application -->
 <body>
+
 <app-octra>
-    <div id="loading" style="margin-top:10%;padding:20px;"><span id="logo">OCTRA</span>
+    <div id="loading" style="margin-top:10%;padding:20px;">
+        <span id="logo">OCTRA</span>
         <div class="progress">
-            <div class="progress-bar progress-animated" style="width:100%"></div>
+            <div class="progress-bar progress-animated" style="width:100%">
+            </div>
         </div>
-        <div class="description" style="margin-top:20px;text-align:center;">Please wait... OCTRA is loading...</div>
-        <noscript><p style="text-align:center;color:red">You need Javascript to use this Web-application</p></noscript>
+        <div class="description" style="margin-top:20px;text-align:center;">
+            Please wait... OCTRA is loading...
+        </div>
+        <noscript>
+            <p style="text-align:center;color:red"> You need Javascript to use this Web-application</p>
+        </noscript>
     </div>
 </app-octra>
-<script type="text/javascript" src="inline.318b50c57b4eba3d437b.bundle.js"></script>
-<script type="text/javascript" src="polyfills.80f031055a7e9bb8c439.bundle.js"></script>
-<script type="text/javascript" src="scripts.da8be7e200af41bfebd1.bundle.js"></script>
-<script type="text/javascript" src="main.1d31c8048606f288bf74.bundle.js"></script>
-</body>
+<script type="text/javascript" src="runtime.a66f828dca56eeb90e02.js"></script><script type="text/javascript" src="polyfills.72a7876d2fb54bbc8405.js"></script><script type="text/javascript" src="scripts.461b3e28b696b47f921b.js"></script><script type="text/javascript" src="main.e04e09169c3ee444f5e9.js"></script></body>
 </html>

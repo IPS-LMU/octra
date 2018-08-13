@@ -78,6 +78,17 @@
           },
           "type": "array"
         },
+        "allowed_projects": {
+          "items": {
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
         "languages": {
           "items": {
             "type": "string"

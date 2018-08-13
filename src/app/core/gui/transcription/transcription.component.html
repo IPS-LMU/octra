@@ -104,10 +104,10 @@
         </div>
     </div>
     <div class="row" id="bottom-navigation" role="group">
-        <button class="btn btn-secondary btn-raised col-md-6"
+        <button class="btn btn-secondary btn-raised col-md-6" *ngIf="appStorage.usemode !== 'url'"
                 (click)="abortTranscription()">
             <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
-            <span *ngIf="!appStorage.easymode" [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}">
+            <span *ngIf="!appStorage.easymode" [ngClass]="{' d-none d-md-inline': appc.octra.responsive.enabled}">
                     {{"general.quit" | translate}}
             </span>
         </button>
@@ -116,16 +116,16 @@
             <fa-icon icon="download"></fa-icon>
             <span
                     *ngIf="!appStorage.easymode"
-                    [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"general.export data" | translate}}</span>
+                    [ngClass]="{'d-none d-md-inline': appc.octra.responsive.enabled}"> {{"general.export data" | translate}}</span>
         </button>
         <button type="button" class="btn btn-primary btn-raised col-md-6"
                 (click)="onSendButtonClick()" *ngIf="appStorage.usemode === 'online'">
             <span
                     *ngIf="!appStorage.easymode"
-                    [ngClass]="{'hidden-xs hidden-sm': appc.octra.responsive.enabled}"> {{"transcription.send" | translate}} </span>
+                    [ngClass]="{'d-none d-md-inline': appc.octra.responsive.enabled}"> {{"transcription.send" | translate}} </span>
             <fa-icon icon="paper-plane"></fa-icon>
         </button>
-        <button type="button" class="btn btn-primary btn-raised"
+        <button type="button" class="btn btn-primary btn-raised w-100"
                 (click)="onSaveTranscriptionButtonClicked()" *ngIf="appStorage.usemode === 'url'">
             <span>SAVE TRANSCRIPTION</span>
             <fa-icon icon="paper-plane"></fa-icon>

@@ -366,6 +366,17 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       if ((marker.icon_url === null || marker.icon_url === undefined) || marker.icon_url == '') {
         // text only
         icon = marker.button_text;
+
+        if (!this.easymode) {
+          icon = marker.button_text + '<span class=\'btn-shortcut\'>  ' +
+            '[' + marker.shortcut[platform] + ']</span>';
+          if (this.Settings.responsive) {
+            icon = marker.button_text + '<span class=\'btn-shortcut d-none d-lg-inline\'>  ' +
+              '[' + marker.shortcut[platform] + ']</span>';
+          }
+        } else {
+          icon = marker.button_text;
+        }
       }
       else {
         if (!this.easymode) {
@@ -374,8 +385,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             '[' + marker.shortcut[platform] + ']</span>';
           if (this.Settings.responsive) {
             icon = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
-              '<span class=\'btn-description hidden-xs hidden-sm\'>' + marker.button_text +
-              '</span><span class=\'btn-shortcut hidden-xs hidden-sm hidden-md\'> [' + marker.shortcut[platform] + ']</span>';
+              '<span class=\'btn-description d-none d-lg-inline\'>' + marker.button_text +
+              '</span><span class=\'btn-shortcut d-none d-lg-inline\'> [' + marker.shortcut[platform] + ']</span>';
           }
         } else {
           icon = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon\' style=\'height:16px;\'/>';
@@ -463,8 +474,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           '[ALT + S]</span>';
         if (this.Settings.responsive) {
           icon = '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
-            '<span class=\'btn-description hidden-xs hidden-sm\'>' + boundary_label + '</span>' +
-            '<span class=\'btn-shortcut hidden-xs hidden-sm hidden-md\'> ' +
+            '<span class=\'btn-description d-none d-md-inline\'>' + boundary_label + '</span>' +
+            '<span class=\'btn-shortcut d-none d-lg-inline\'> ' +
             '[ALT + S]</span>';
         }
       } else {

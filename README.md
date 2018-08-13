@@ -87,30 +87,9 @@ For this project <a href="https://github.com/commitizen/cz-cli">commitizen</a> i
 For creating changelog automatically, <a href="https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-changelog-cli">conventional-changelog-cli</a> is used. To create changelogs you need to install conventional-changelog-cli globally as described on its github page. After installation you just need to run `npm run changelog` to create the changelog automatically.
 
 ### Translation
-To translate OCTRA to a new language you need to create these new files:
+To translate OCTRA to a new language please visit https://www.phonetik.uni-muenchen.de/apps/octra/translation/start.php
 
-* i18n/octra/octra_<language code>.json
-* config/localmode/guidelines/guidelines_<language code>.json
-
-The easiest way to translate to a new language is to duplicate e.g. english files and overwrite their contents with the new translations. __Please translate the right side only__:
-
-For example (Translation English -> German):
-
-English:
-
-```
-[...]
-"continue": "continue"
-[...]
-```
-
-German:
-
-```
-[...]
-"continue": "weiter"
-[...]
-```
+If the language you would like translate to does not exist please send us an email to octra@phonetik.uni-muenchen.de
 
 
 ### Affiliations

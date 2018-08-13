@@ -1,4 +1,4 @@
-import {Component, OnDestroy} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
 import {APIService, AppStorageService, SettingsService} from './core/shared/service';
 import {TranslateService} from '@ngx-translate/core';
 import {SubscriptionManager} from './core/obj/SubscriptionManager';
@@ -13,7 +13,7 @@ import {ActivatedRoute, Router} from '@angular/router';
   styleUrls: ['app.component.css']
 })
 
-export class AppComponent implements OnDestroy {
+export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
 
   public get version(): string {
     return AppInfo.version;
@@ -69,6 +69,9 @@ export class AppComponent implements OnDestroy {
       };
     })();
 
+  }
+
+  ngOnInit() {
 
     // after project settings loaded
     this.subscrmanager.add(this.settingsService.projectsettingsloaded.subscribe(
@@ -78,6 +81,16 @@ export class AppComponent implements OnDestroy {
         }
       }
     ));
+
+
+    this.settingsService.loadApplicationSettings(this.route).then(() => {
+      console.log(`Application settings loaded`);
+    }).catch((error) => {
+      console.error(error);
+    });
+  }
+
+  ngAfterViewInit() {
   }
 
   ngOnDestroy() {
@@ -111,6 +124,14 @@ export class AppComponent implements OnDestroy {
           console.log(result);
         }
       )
+    );
+  }
+
+  queryParamsSet(route: ActivatedRoute): boolean {
+    const params = this.route.snapshot.queryParams;
+    return (
+      params.hasOwnProperty('audio') &&
+      params.hasOwnProperty('embedded')
     );
   }
 }

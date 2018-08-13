@@ -129,10 +129,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     }
 
     new Promise<void>((resolve, reject) => {
-      if (this.settingsService.loaded) {
+      if (this.settingsService.isDBLoadded) {
         resolve();
       } else {
-        this.subscrmanager.add(this.settingsService.app_settingsloaded.subscribe(() => {
+        this.subscrmanager.add(this.settingsService.dbloaded.subscribe(() => {
           resolve();
         }));
       }

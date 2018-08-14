@@ -148,11 +148,11 @@ export class Functions {
     // TODO improve code!
 
     return text
-      .replace('&amp;', '&')
-      .replace('&lt;', '<')
-      .replace('&gt;', '>')
-      .replace('&quot;', '"')
-      .replace('&#039;', '\'');
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#039;/g, '\'');
   }
 
   public static insertString(input: string, pos: number, insertion: string): string {

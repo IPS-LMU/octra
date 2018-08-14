@@ -1,4 +1,12 @@
-import {Component, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs/Subject';
 import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
@@ -10,7 +18,8 @@ import {TranslateService} from '@ngx-translate/core';
 @Component({
   selector: 'app-transcription-guidelines-modal',
   templateUrl: './transcription-guidelines-modal.component.html',
-  styleUrls: ['./transcription-guidelines-modal.component.css']
+  styleUrls: ['./transcription-guidelines-modal.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges {
@@ -39,7 +48,8 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
   private subscrmanager = new SubscriptionManager();
 
   constructor(private modalService: BsModalService, private lang: TranslateService, private transcrService: TranscriptionService,
-              private appStorage: AppStorageService, private bugService: BugReportService, private settService: SettingsService) {
+              private appStorage: AppStorageService, private bugService: BugReportService, private settService: SettingsService,
+              private cd: ChangeDetectorRef) {
   }
 
   ngOnInit() {
@@ -61,6 +71,9 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
     return new Promise<void>((resolve, reject) => {
       this.modal.show(this.modal, this.config);
       this.visible = true;
+      this.cd.markForCheck();
+      this.cd.detectChanges();
+
       const subscr = this.actionperformed.subscribe(
         (action) => {
           resolve(action);
@@ -184,6 +197,10 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
   public close() {
     this.modal.hide();
     this.visible = false;
+
+    this.cd.markForCheck();
+    this.cd.detectChanges();
+
     this.actionperformed.next();
   }
 }

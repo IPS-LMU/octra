@@ -124,7 +124,7 @@ import {TranscriptionSuccessModalComponent} from './core/modals/transcription-su
 import {TranscriptionGuidelinesModalComponent} from './core/modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
 
 library.add(
-  faSpinner, faCheck, faTimes, faTrash, faExclamationCircle, faInfoCircle, faDownload, faHeadphones, faPrint, faSearch,
+  faSpinner, faCheck, faTimes, faTrash, faExclamationCircle, faInfoCircle, faDownload, faHeadphones, faPrint, faSearch, faExclamationTriangle,
   faTimesCircle, faCog, faFolderOpen, faCheckCircle, faThList, faBook, faCopy, faPlus, faSignOutAlt, faEdit, faFile, faArrowLeft, faArrowRight,
   faKeyboard, faEye, faExclamationTriangle, faSave, faQuestionCircle, faChevronUp, faChevronDown, faPaperPlane, faMinus, faWindowMaximize, faAlignJustify);
 

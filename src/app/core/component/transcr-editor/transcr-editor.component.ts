@@ -144,7 +144,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     html = html.replace(/<((p)|(\s?\/p))>/g, '');
     html = html.replace(/&nbsp;/g, ' ');
-    console.log(`html to parse: ${html}`);
 
     html = this.transcrService.replaceSingleTags(html);
 
@@ -168,7 +167,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           for (let j = 0; j < this.markers.length; j++) {
             const marker = this.markers[j];
             if (marker_code === marker.code) {
-              console.log(`marker: ${marker_code}`);
               jQuery(elem).replaceWith(Functions.escapeHtml(marker_code));
               break;
             }
@@ -190,8 +188,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           const textnode = document.createTextNode(jQuery(elem).text());
           jQuery(elem).before(textnode);
           jQuery(elem).remove();
-        } else {
-          console.error(`invalid tagname ${tagName}`);
         }
       }
     };
@@ -199,7 +195,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     jQuery.each(dom.children(), replace_func);
 
     let rawText = dom.text();
-    console.log('rawtext is:\n' + rawText);
 
     return rawText;
   };
@@ -291,6 +286,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           const bufferText = ((e.originalEvent || e).clipboardData || (<any> window).clipboardData).getData('Text');
           let html = bufferText.replace(/(<p>)|(<\/p>)/g, '')
             .replace(new RegExp('\\\[\\\|', 'g'), '{').replace(new RegExp('\\\|\\\]', 'g'), '}');
+          html = Functions.unEscapeHtml(html);
           html = '<span>' + this.rawToHTML(html) + '</span>';
           html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
           const html_obj = jQuery(html);
@@ -298,6 +294,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             this.textfield.summernote('editor.insertNode', html_obj[0]);
           } else {
             this.textfield.summernote('code', html);
+            this.focus(true);
           }
           this.updateTextField();
           this.initPopover();
@@ -513,17 +510,18 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * @param icon_url
    */
   insertMarker = (marker_code, icon_url) => {
-    marker_code = marker_code.replace(/(<)|(>)/g, (g0, g1, g2) => {
-      if (g2 === undefined && g1 !== undefined) {
-        return '&lt;';
-      } else {
-        return '&gt;';
-      }
-    });
     if ((icon_url === null || icon_url === undefined) || icon_url === '') {
       // text only
       this.textfield.summernote('editor.insertText', marker_code + ' ');
     } else {
+      marker_code = marker_code.replace(/(<)|(>)/g, (g0, g1, g2) => {
+        if (g2 === undefined && g1 !== undefined) {
+          return '&lt;';
+        } else {
+          return '&gt;';
+        }
+      });
+
       const element = document.createElement('img');
       element.setAttribute('src', icon_url);
       element.setAttribute('class', 'btn-icon-text');
@@ -531,9 +529,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       element.setAttribute('data-marker-code', marker_code);
       element.setAttribute('alt', marker_code);
 
-      console.log(`MARKER insert is ${marker_code}`);
       this.textfield.summernote('editor.insertNode', element);
-      console.log("sumernote code is: " + this.textfield.summernote('code'));
     }
     this.updateTextField();
   };
@@ -831,7 +827,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   private rawToHTML(rawtext: string): string {
     let result: string = rawtext;
 
-    console.log(`RAWTEXT:\n${result}`);
     if (rawtext !== '') {
       result = result.replace(/\r?\n/g, ' '); // .replace(/</g, "&lt;").replace(/>/g, "&gt;");
       // replace markers with no wrap
@@ -872,7 +867,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         }
       });
 
-      console.log(`middle step: ${result}`);
       for (let i = 0; i < this.markers.length; i++) {
         const marker = this.markers[i];
 
@@ -884,12 +878,12 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           const s3 = (g3) ? g3 : '';
 
           let img = '';
-          const marker_code = marker.code.replace(/</g, '&amp;lt;').replace(/>/g, '&amp;gt;');
           if (!((marker.icon_url === null || marker.icon_url === undefined) || marker.icon_url === '')) {
+            const marker_code = marker.code.replace(/</g, '&amp;lt;').replace(/>/g, '&amp;gt;');
             img = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
               'data-marker-code=\'' + marker_code + '\' alt=\'' + marker_code + '\'/>';
           } else {
-            img = marker_code;
+            img = marker.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
           }
 
           return s1 + img + s3;
@@ -911,7 +905,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     // wrap result with <p>. Missing this would cause the editor fail on marker insertion
     result = (result !== '') ? '<p>' + result + '</p>' : '<p><br/></p>';
-    console.log(`RESULT:\n${result}`);
 
     return result;
   }

@@ -480,19 +480,90 @@ export class TranscriptionService {
   public rawToHTML(rawtext: string): string {
     let result: string = rawtext;
 
-    result = this.replaceMarkersWithHTML(result);
-
-    const result2 = this.replaceSingleTags(result);
-
     if (rawtext !== '') {
+      result = result.replace(/\r?\n/g, ' '); // .replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      // replace markers with no wrap
+
+      const markers = this._guidelines.markers;
+      // replace all tags that are not markers
+      result = result.replace(new RegExp('(<[\\w\+\*:=~ ";]+>)', 'g'), function (x) {
+        for (let i = 0; i < markers.length; i++) {
+          const marker = markers[i];
+          if (arguments[0] === marker.code) {
+            return marker.code.replace(/(<)|(>)/g, (g0, g1, g2) => {
+              if (g2 === undefined && g1 !== undefined) {
+                return '[[[';
+              } else {
+                return ']]]';
+              }
+            });
+          }
+        }
+
+        return arguments[0];
+      });
+
+      // replace
+      result = result.replace(/(?:(<)(?!(?:img)|(?:span)|(?:div)|(?:\/span)|(?:\/div)))|(?:(?:(?:\/?((?:span)|(?:div)|(?:\/))))?(>))/g, (g0, g1, g2, g3) => {
+        if (g1 !== undefined && g1 === '<') {
+          return '&lt;';
+        } else if (g3 === '>' && g2 === undefined) {
+          return '&gt;';
+        }
+      });
+
+      result = result.replace(/(\[\[\[)|(]]])/g, (g0, g1, g2) => {
+        if (g2 === undefined && g1 !== undefined) {
+          return '<';
+        } else {
+          return '>';
+        }
+      });
+
+      for (let i = 0; i < markers.length; i++) {
+        const marker = markers[i];
+
+        const regex = new RegExp('(\\s)*(' + Functions.escapeRegex(marker.code) + ')(\\s)*', 'g');
+        const regex2 = /{([0-9]+)}/g;
+
+        const replace_func = (x, g1, g2, g3) => {
+          const s1 = (g1) ? g1 : '';
+          const s3 = (g3) ? g3 : '';
+
+          let img = '';
+          if (!((marker.icon_url === null || marker.icon_url === undefined) || marker.icon_url === '')) {
+            const marker_code = marker.code.replace(/</g, '&amp;lt;').replace(/>/g, '&amp;gt;');
+            img = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
+              'data-marker-code=\'' + marker_code + '\' alt=\'' + marker_code + '\'/>';
+          } else {
+            img = marker.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          }
+
+          return s1 + img + s3;
+        };
+
+
+        const replace_func2 = (x, g1) => {
+          return ' <img src=\'assets/img/components/transcr-editor/boundary.png\' ' +
+            'class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
+            'data-samples=\'' + g1 + '\' alt=\'\[|' + g1 + '|\]\' /> ';
+        };
+
+        result = result.replace(regex2, replace_func2);
+        result = result.replace(regex, replace_func);
+      }
+
       result = result.replace(/\s+$/g, '&nbsp;');
-      result = (result !== '') ? '' + result + '' : '';
     }
+
+    // wrap result with <p>. Missing this would cause the editor fail on marker insertion
+    result = (result !== '') ? '<p>' + result + '</p>' : '<p><br/></p>';
 
     return result;
   }
 
-  /**
+
+    /**
    * replace markers of the input string with its html pojection
    * @param input
    * @param use_wrap
@@ -505,7 +576,7 @@ export class TranscriptionService {
     for (let i = 0; i < this._guidelines.markers.length; i++) {
       const marker = this._guidelines.markers[i];
       const regex = new RegExp(Functions.escapeRegex(marker.code), 'g');
-      const code = marker.code.replace(/([[<>])/g, (g0, g1) => {
+      const code = marker.code.replace(/([<>])/g, (g0, g1) => {
         switch (g1) {
           case('<'):
             return '&lt;';
@@ -650,6 +721,13 @@ export class TranscriptionService {
           attr += '=' + value;
         }
         if (attr) {
+          attr = attr.replace(/((?:&lt;)|(?:&gt;))/g, (g0, g1) => {
+            if (g1 === '&lt;') {
+              return '<';
+            }
+            return '>';
+          });
+
           for (let j = 0; j < this.guidelines.markers.length; j++) {
             const marker = this.guidelines.markers[j];
             if (attr === marker.code) {

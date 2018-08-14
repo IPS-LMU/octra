@@ -112,6 +112,30 @@ export class SettingsService {
       // load from indexedDB
       this.appStorage.load(idb).then(
         () => {
+          // define languages
+          const languages = this.app_settings.octra.languages;
+          const browser_lang = this.langService.getBrowserLang();
+          this.langService.addLangs(languages);
+
+          // check if browser language is available in translations
+          if (isNullOrUndefined(this.appStorage.language) || this.appStorage.language === '') {
+            if (!isUndefined(this.langService.getLangs().find((value) => {
+              return value === browser_lang;
+            }))) {
+              this.langService.use(browser_lang);
+            } else {
+              // use first language defined as default language
+              this.langService.use(languages[0]);
+            }
+          } else {
+            if (!isUndefined(this.langService.getLangs().find((value) => {
+              return value === this.appStorage.language;
+            }))) {
+              this.langService.use(this.appStorage.language);
+            } else {
+              this.langService.use(languages[0]);
+            }
+          }
 
           // if url mode, set it in options
           if (this.queryParamsSet(appRoute)) {
@@ -131,32 +155,6 @@ export class SettingsService {
               if (this.validated) {
                 console.log('settings valid');
                 this.api.init(this.app_settings.audio_server.url + 'WebTranscribe');
-              }
-            }
-
-            // define languages
-            const languages = this.app_settings.octra.languages;
-            const browser_lang = this.langService.getBrowserLang();
-
-            this.langService.addLangs(languages);
-
-            // check if browser language is available in translations
-            if (isNullOrUndefined(this.appStorage.language) || this.appStorage.language === '') {
-              if (!isUndefined(this.langService.getLangs().find((value) => {
-                return value === browser_lang;
-              }))) {
-                this.langService.use(browser_lang);
-              } else {
-                // use first language defined as default language
-                this.langService.use(languages[0]);
-              }
-            } else {
-              if (!isUndefined(this.langService.getLangs().find((value) => {
-                return value === this.appStorage.language;
-              }))) {
-                this.langService.use(this.appStorage.language);
-              } else {
-                this.langService.use(languages[0]);
               }
             }
           }

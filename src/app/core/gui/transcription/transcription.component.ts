@@ -32,7 +32,6 @@ import {
 import {BrowserInfo, SubscriptionManager} from '../../shared';
 import {isArray, isNullOrUndefined, isNumber} from 'util';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
-import {TranscrGuidelinesComponent} from '../transcr-guidelines/transcr-guidelines.component';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 import {ProjectSettings} from '../../obj/Settings';
 import {NgForm} from '@angular/forms';
@@ -48,6 +47,7 @@ import {ModalService} from '../../modals/modal.service';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 import {ModalSendAnswer} from '../../modals/transcription-send-modal/transcription-send-modal.component';
 import {throwError} from 'rxjs';
+import {TranscriptionGuidelinesModalComponent} from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
 
 @Component({
   selector: 'app-transcription',
@@ -65,13 +65,13 @@ export class TranscriptionComponent implements OnInit,
 
   // TODO change to ModalComponents!
   @ViewChild('modal_shortcuts') modal_shortcuts: any;
-  @ViewChild('modal_guidelines') modal_guidelines: TranscrGuidelinesComponent;
   @ViewChild('modal_overview') modal_overview: any;
   @ViewChild(LoadeditorDirective) appLoadeditor: LoadeditorDirective;
   private _currentEditor: ComponentRef<Component>;
 
   @ViewChild('modal') modal: any;
   @ViewChild('modal2') modal2: any;
+  @ViewChild('modal_guidelines') modal_guidelines: TranscriptionGuidelinesModalComponent;
   @ViewChild('fo') feedback_form: NgForm;
   public send_error = '';
 

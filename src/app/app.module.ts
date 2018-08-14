@@ -45,7 +45,6 @@ import {
 
 import {AppComponent} from './app.component';
 
-import {TranscrGuidelinesComponent} from './core/gui/transcr-guidelines/transcr-guidelines.component';
 import {ReloadFileGuard} from './core/gui/reload-file/reload-file.activateguard';
 import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
 import {CollapseModule} from 'ngx-bootstrap/collapse';
@@ -57,15 +56,15 @@ import {LoadeditorDirective} from './core/shared/directive/loadeditor.directive'
 import {NewsComponent} from './core/gui/news/news.component';
 import {FaqComponent} from './core/gui/faq/faq.component';
 import {EditorWSignaldisplayComponent, LinearEditorComponent, TwoDEditorComponent} from './editors';
-import {HelpComponent} from './core/gui/help/help.component';
+import {HelpComponent} from './core/gui/help/';
 import {NewEditorComponent} from './editors/new-editor/new-editor.component';
-import {HelpToolsComponent} from './core/gui/help-tools/help-tools.component';
-import {FeaturesComponent} from './core/gui/features/features.component';
+import {HelpToolsComponent} from './core/gui/help-tools/';
+import {FeaturesComponent} from './core/gui/features';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
 import {AudioviewerConfig} from './media-components/components/audio/audioviewer';
 import {MediaComponentsModule} from './media-components/media-components.module';
 import {TranscrEditorComponent} from './core/component/transcr-editor';
-import {Error404Component} from './core/gui/error404/error404.component';
+import {Error404Component} from './core/gui/error404';
 //icons
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {library} from '@fortawesome/fontawesome-svg-core';
@@ -164,7 +163,6 @@ export const ngmodule = {
     OctraModalComponent,
     ReloadFileComponent,
     TranscrEditorComponent,
-    TranscrGuidelinesComponent,
     TranscriptionComponent,
     TranscriptionEndComponent,
     TranscrOverviewComponent,

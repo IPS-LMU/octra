@@ -45,12 +45,24 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.langService.get('general.please wait').subscribe(
-      (translation) => {
-        this.text = translation + '...';
+    new Promise<void>((resolve, reject) => {
+      if (this.settService.isDBLoadded) {
+        resolve();
+      } else {
+        this.subscrmanager.add(this.settService.dbloaded.subscribe(
+          () => {
+            resolve();
+          }));
       }
-    );
-
+    }).then(() => {
+      this.langService.get('general.please wait').subscribe(
+        (translation) => {
+          this.text = translation + '... ';
+          console.log(this.text);
+        }
+      );
+    }).catch((error) => {
+    });
 
     this.subscrmanager.add(
       this.settService.projectsettingsloaded.subscribe(

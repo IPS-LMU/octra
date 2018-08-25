@@ -131,7 +131,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
   onButtonClick(event: { type: string, timestamp: number }) {
     this.uiService.addElementFromEvent('mouseclick', {value: event.type},
-      event.timestamp, this.audiomanager.playposition, this.editor.caretpos, 'audio_buttons');
+      event.timestamp, Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_buttons');
 
     switch (event.type) {
       case('play'):
@@ -163,7 +163,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
     this.uiService.addElementFromEvent('slider', event, event.timestamp,
-      this.audiomanager.playposition, this.editor.caretpos, 'audio_speed');
+      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_speed');
   }
 
   onVolumeChange(event: { old_value: number, new_value: number, timestamp: number }) {
@@ -172,7 +172,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
     this.uiService.addElementFromEvent('slider', event, event.timestamp,
-      this.audiomanager.playposition, this.editor.caretpos, 'audio_volume');
+      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_volume');
   }
 
   afterTyping(status) {
@@ -185,7 +185,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   onShortcutTriggered(event) {
     event.value = `audio:${event.value}`;
     this.uiService.addElementFromEvent('shortcut', event, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, 'texteditor');
+      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor');
   }
 
   onBoundaryClicked(samples: number) {
@@ -240,19 +240,19 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
   onBoundaryInserted() {
     this.uiService.addElementFromEvent('segment', {value: 'boundaries:add'}, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, 'texteditor');
+      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor');
   }
 
   onMarkerInsert(marker_code: string) {
     this.uiService.addElementFromEvent('shortcut', {value: 'markers:' + marker_code}, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, 'texteditor');
+      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor');
   }
 
   onMarkerClick(marker_code: string) {
     this.afterTyping('stopped');
 
     this.uiService.addElementFromEvent('mouseclick', {value: marker_code}, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, 'texteditor_toolbar');
+      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor_toolbar');
   }
 
   saveTranscript() {

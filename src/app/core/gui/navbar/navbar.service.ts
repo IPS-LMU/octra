@@ -2,6 +2,8 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {TranscriptionService} from '../../shared/service/transcription.service';
 import {UserInteractionsService} from '../../shared/service/userInteractions.service';
+import {AudioInfo} from '../../../media-components/obj/media/audio';
+import {FileSize} from '../../shared';
 
 @Injectable()
 export class NavbarService {
@@ -42,16 +44,9 @@ export class NavbarService {
 
   public dataloaded = false;
 
-  public exportformats: any = {
-    filename: '',
-    bitrate: 0,
-    samplerate: 0,
-    duration: 0,
-    filesize: {
-      size: 0,
-      label: ''
-    }
-  };
+  public originalInfo: AudioInfo;
+
+  public filesize: FileSize;
 
   constructor(private appStorage: AppStorageService) {
 

@@ -23,7 +23,6 @@ import {
   Entry,
   KeymappingService,
   MessageService,
-  NavbarService,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
@@ -35,7 +34,6 @@ import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 import {ProjectSettings} from '../../obj/Settings';
 import {NgForm} from '@angular/forms';
-import {AudioManager} from '../../../media-components/obj/media/audio';
 import {EditorComponents} from '../../../editors/components';
 import {Level} from '../../obj/Annotation';
 import {getPlayBackString, PlayBackState} from '../../../media-components/obj/media';
@@ -48,6 +46,8 @@ import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-moda
 import {ModalSendAnswer} from '../../modals/transcription-send-modal/transcription-send-modal.component';
 import {throwError} from 'rxjs';
 import {TranscriptionGuidelinesModalComponent} from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
+import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
+import {NavbarService} from '../navbar/navbar.service';
 
 @Component({
   selector: 'app-transcription',
@@ -151,7 +151,7 @@ export class TranscriptionComponent implements OnInit,
         if (state !== PlayBackState.PLAYING && state !== PlayBackState.INITIALIZED && state !== PlayBackState.PREPARE) {
           this.uiService.addElementFromEvent('audio',
             {value: getPlayBackString(state).toLowerCase()}, Date.now(),
-            this.audiomanager.playposition, caretpos, this.appStorage.Interface);
+            Math.round(this.audiomanager.playposition * this.transcrService.audiomanager.sampleRateFactor), caretpos, this.appStorage.Interface);
         }
       }
     }));
@@ -230,8 +230,6 @@ export class TranscriptionComponent implements OnInit,
         }
       }));
     this.changeEditor(this.interface);
-    this.changeDetecorRef.detectChanges();
-
     this.subscrmanager.add(this.appStorage.saving.subscribe(
       (saving: string) => {
         if (saving === 'saving') {
@@ -262,7 +260,6 @@ export class TranscriptionComponent implements OnInit,
 
     this.subscrmanager.add(this.transcrService.levelchanged.subscribe(
       (level: Level) => {
-        console.log('level changed');
         (<any> this.currentEditor.instance).update();
 
         // important: subscribe to level changes in order to save proceedings
@@ -622,7 +619,7 @@ export class TranscriptionComponent implements OnInit,
 
   public onSaveTranscriptionButtonClicked() {
     const converter = new PartiturConverter();
-    const oannotjson = this.transcrService.annotation.getObj();
+    const oannotjson = this.transcrService.annotation.getObj(this.transcrService.audiomanager.sampleRateFactor, this.transcrService.audiomanager.originalInfo.duration.samples);
     const result: IFile = converter.export(oannotjson, this.transcrService.audiofile, 0).file;
     result.name = result.name.replace('-' + oannotjson.levels[0].name, '');
 

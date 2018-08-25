@@ -3,9 +3,9 @@ import {LocalStorageService, SessionStorage, SessionStorageService} from 'ngx-we
 import {SessionFile} from '../../obj/SessionFile';
 import {isNullOrUndefined} from 'util';
 import {OLevel, OLink} from '../../obj';
-import {AudioManager} from '../../../media-components/obj/media/audio';
 import {AppInfo} from '../../../app.info';
 import {IndexedDBManager} from '../../obj/IndexedDBManager';
+import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 
 export interface IIDBLevel {
   id: number;

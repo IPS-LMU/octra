@@ -24,7 +24,6 @@ export class TranscActivateGuard implements CanActivate {
       }
     } else if (this.appStorage.usemode === 'local') {
       if (!this.settService.allloaded) {
-        console.log('go back to reload');
         this.router.navigate(['/user/transcr/reload-file'], {
           queryParamsHandling: 'preserve'
         });

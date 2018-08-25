@@ -58,8 +58,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
       this.langService.get('general.please wait').subscribe(
         (translation) => {
           this.text = translation + '... ';
-          console.log(this.text);
-        }
+                  }
       );
     }).catch((error) => {
     });
@@ -124,7 +123,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
                     this.state = 'Import transcript...';
                     let filename = this.appStorage.url_params['transcript'];
                     filename = filename.substr(filename.lastIndexOf('/') + 1);
-                    console.log(`transcript fetched ${filename}`);
 
                     const file: IFile = {
                       name: filename,
@@ -158,7 +156,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
                     if (!isNullOrUndefined(importResult) && !isNullOrUndefined(importResult.annotjson)) {
                       // conversion successfully finished
-                      console.log(`Conversion from URL successfully finished`);
                       const new_levels: OIDBLevel[] = [];
                       for (let i = 0; i < importResult.annotjson.levels.length; i++) {
                         new_levels.push(new OIDBLevel(i + 1, importResult.annotjson.levels[i], i));
@@ -227,7 +224,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
           ) {
             this.subscrmanager.remove(id);
             setTimeout(() => {
-              console.log('all loaded!!!');
               if ((isNullOrUndefined(this.appStorage.agreement)
                   || isNullOrUndefined(this.appStorage.agreement[this.appStorage.user.project]) ||
                   !this.appStorage.agreement[this.appStorage.user.project]
@@ -241,7 +237,9 @@ export class LoadingComponent implements OnInit, OnDestroy {
                   console.error(err);
                 });
               } else {
+                console.log(`load segments`);
                 this.transcrService.load().then(() => {
+                  console.log(`ALL LOADED!`);
                   this.router.navigate(['/user/transcr'], {
                     queryParamsHandling: 'preserve'
                   });
@@ -257,7 +255,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
     new Promise<void>((resolve, reject) => {
       if (!this.appStorage.idbloaded) {
-        console.log('db not loaded');
         this.subscrmanager.add(this.appStorage.loaded.subscribe(() => {
           },
           (error) => {
@@ -277,7 +274,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
       if (this.appStorage.usemode !== 'url' && !this.appStorage.LoggedIn) {
         // not logged in, go back
-        console.log(`NO URL ${this.appStorage.usemode}`);
         this.router.navigate(['/login'], {
           queryParamsHandling: 'preserve'
         });
@@ -311,6 +307,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
   }
 
   retry() {
+    alert("retry!");
     location.reload();
   }
 

@@ -22,6 +22,7 @@ import {ActivatedRoute} from '@angular/router';
 @Injectable()
 export class SettingsService {
   public dbloaded = new EventEmitter<any>();
+
   set log(value: string) {
     this._log = value;
   }
@@ -92,10 +93,8 @@ export class SettingsService {
     if (this.queryParamsSet(appRoute)) {
       // URL MODE, overwrite db name with 'url'
       this.app_settings.octra.database.name = 'url';
-      console.log('load db ' + this.app_settings.octra.database.name);
-    } else {
-      console.log(`no params`);
-    }
+          } else {
+          }
 
     const umanager = new UpdateManager(this.appStorage);
     umanager.checkForUpdates(this.app_settings.octra.database.name).then((idb) => {
@@ -139,22 +138,19 @@ export class SettingsService {
 
           // if url mode, set it in options
           if (this.queryParamsSet(appRoute)) {
-            console.log(`PARAMS SET!`);
-            this.appStorage.usemode = 'url';
+                        this.appStorage.usemode = 'url';
             this.appStorage.LoggedIn = true;
           }
 
 
           if (this.validated) {
-            console.log('loaded');
 
             // settings have been loaded
             if (isNullOrUndefined(this.app_settings)) {
               throw new Error('config.json does not exist');
             } else {
               if (this.validated) {
-                console.log('settings valid');
-                this.api.init(this.app_settings.audio_server.url + 'WebTranscribe');
+                                this.api.init(this.app_settings.audio_server.url + 'WebTranscribe');
               }
             }
           }
@@ -381,7 +377,7 @@ export class SettingsService {
         reader.onloadend = (ev) => {
           const t: any = ev.target;
           if (audioService.audiomanagers.length === 0) {
-            AudioManager.decodeAudio(this.appStorage.sessionfile.name, t.result, AppInfo.audioformats, true).then(
+            AudioManager.decodeAudio(this.appStorage.sessionfile.name, 'audio/wav', t.result, AppInfo.audioformats, true).then(
               (audiomanager: AudioManager) => {
                 audioService.registerAudioManager(audiomanager);
                 Logger.log('Audio loaded.');

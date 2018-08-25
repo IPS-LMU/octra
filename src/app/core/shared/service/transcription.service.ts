@@ -12,11 +12,11 @@ import {SubscriptionManager} from '../';
 import {SettingsService} from './settings.service';
 import {isNullOrUndefined} from 'util';
 import {FeedBackForm} from '../../obj/FeedbackForm/FeedBackForm';
-import {AnnotJSONConverter, Converter, IFile, TextConverter} from '../../obj/Converters';
-import {AudioManager} from '../../../media-components/obj/media/audio';
+import {Converter, IFile} from '../../obj/Converters';
 import {OLog, OLogging} from '../../obj/Settings/logging';
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
 import {HttpClient} from '@angular/common/http';
+import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 
 @Injectable()
 export class TranscriptionService {
@@ -152,16 +152,6 @@ export class TranscriptionService {
               private settingsService: SettingsService,
               private http: HttpClient) {
     this.subscrmanager = new SubscriptionManager();
-
-    this.subscrmanager.add(this.navbarServ.onexportbuttonclick.subscribe((button) => {
-      if (button.format === 'text') {
-        // format to text file
-        this.navbarServ.exportformats.text = this.getTranscriptString(new TextConverter());
-      } else if (button.format === 'annotJSON') {
-        // format to annotJSON file
-        this.navbarServ.exportformats.annotJSON = this.getTranscriptString(new AnnotJSONConverter());
-      }
-    }));
   }
 
   /**
@@ -174,20 +164,19 @@ export class TranscriptionService {
       this.filename = this._audiomanager.ressource.name;
 
       this._audiofile = new OAudiofile();
-      this._audiofile.name = this._audiomanager.ressource.name + this._audiomanager.ressource.extension;
-      this._audiofile.samplerate = this._audiomanager.ressource.info.samplerate;
-      this._audiofile.duration = this._audiomanager.ressource.info.duration.samples;
-      this._audiofile.size = this._audiomanager.ressource.size;
+      this._audiofile.name = this._audiomanager.originalInfo.fullname;
+      this._audiofile.samplerate = this._audiomanager.originalInfo.samplerate;
+      this._audiofile.duration = this._audiomanager.originalInfo.duration.samples;
+      this._audiofile.size = this._audiomanager.originalInfo.size;
 
       this.last_sample = this._audiomanager.ressource.info.duration.samples;
-      this.loadSegments(this._audiomanager.ressource.info.samplerate).then(
+
+      this.loadSegments().then(
         () => {
           this.selectedlevel = 0;
-          this.navbarServ.exportformats.filename = this.filename + this._audiomanager.ressource.extension;
-          this.navbarServ.exportformats.bitrate = this._audiomanager.ressource.info.bitrate;
-          this.navbarServ.exportformats.samplerate = this._audiomanager.ressource.info.samplerate;
-          this.navbarServ.exportformats.filesize = Functions.getFileSize(this._audiomanager.ressource.size);
-          this.navbarServ.exportformats.duration = this._audiomanager.ressource.info.duration.unix;
+          this.navbarServ.originalInfo = this._audiomanager.originalInfo;
+
+          this.navbarServ.filesize = Functions.getFileSize(this._audiomanager.ressource.size);
 
           resolve();
         }
@@ -201,7 +190,7 @@ export class TranscriptionService {
     let result: IFile;
 
     if (!isNullOrUndefined(this.annotation)) {
-      result = converter.export(this.annotation.getObj(), this.audiofile, 0).file;
+      result = converter.export(this.annotation.getObj(this.audiomanager.sampleRateFactor, this.audiomanager.originalInfo.duration.samples), this.audiofile, 0).file;
 
       return result.content;
     }
@@ -209,18 +198,21 @@ export class TranscriptionService {
     return '';
   }
 
-  public loadSegments(sample_rate: number): Promise<void> {
+  public loadSegments(): Promise<void> {
     return new Promise<void>(
       (resolve, reject) => {
+
+        // TODO use Promise instead of func variable
         const process = () => {
           const annotates = this._audiomanager.ressource.name + this._audiomanager.ressource.extension;
 
           this._annotation = new Annotation(annotates, this._audiofile);
 
           if (!isNullOrUndefined(this.appStorage.annotation)) {
+            // load levels
             for (let i = 0; i < this.appStorage.annotation.length; i++) {
               const level: Level = Level.fromObj(this.appStorage.annotation[i],
-                this._audiomanager.ressource.info.samplerate, this._audiomanager.ressource.info.duration.samples);
+                this._audiomanager.ressource.info.samplerate, this._audiomanager.ressource.info.duration.samples, this.audiomanager.sampleRateFactor);
               this._annotation.levels.push(level);
             }
 
@@ -329,14 +321,18 @@ export class TranscriptionService {
 
         let last_bound = 0;
         if (i > 0) {
-          last_bound = this.currentlevel.segments.get(i - 1).time.samples;
+          last_bound = Math.round(this.currentlevel.segments.get(i - 1).time.samples * this.audiomanager.sampleRateFactor);
         }
 
         const segment_json: any = {
           start: last_bound,
-          length: segment.time.samples - last_bound,
+          length: Math.round(segment.time.samples * this.audiomanager.sampleRateFactor) - last_bound,
           text: segment.transcript
         };
+
+        if (i == this.currentlevel.segments.length - 1) {
+          segment_json.length = this._audiomanager.originalInfo.duration.samples - last_bound;
+        }
 
         transcript.push(segment_json);
       }
@@ -354,7 +350,7 @@ export class TranscriptionService {
       setTimeout(() => {
         this.appStorage.save('annotation', {
           num: this._selectedlevel,
-          level: this._annotation.levels[this._selectedlevel].getObj()
+          level: this._annotation.levels[this._selectedlevel].getObj(this.audiomanager.sampleRateFactor, this.audiomanager.originalInfo.duration.samples)
         });
         this.saving = false;
       }, 2000);
@@ -563,7 +559,7 @@ export class TranscriptionService {
   }
 
 
-    /**
+  /**
    * replace markers of the input string with its html pojection
    * @param input
    * @param use_wrap

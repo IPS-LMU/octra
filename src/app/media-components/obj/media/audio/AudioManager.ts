@@ -3,14 +3,17 @@ import {AudioRessource} from './AudioRessource';
 import {isNullOrUndefined} from 'util';
 import {EventEmitter} from '@angular/core';
 import {AudioTime} from './AudioTime';
-import {PlayBackState, SourceType} from '../index';
 import {AudioChunk} from './AudioChunk';
 import {AudioSelection} from './AudioSelection';
 import {AudioFormat} from './AudioFormats';
+import {AudioInfo, PlayBackState, SourceType} from '../index';
 
 declare var window: any;
 
 export class AudioManager {
+  get originalInfo(): AudioInfo {
+    return this._originalInfo;
+  }
   get channel(): Float32Array {
     return this._channel;
   }
@@ -102,6 +105,7 @@ export class AudioManager {
   private static counter = 0;
   private _id: number;
   private _ressource: AudioRessource;
+  private _originalInfo: AudioInfo;
 
   public afterdecoded: EventEmitter<AudioRessource> = new EventEmitter<AudioRessource>();
   private _audiocontext: AudioContext = null;
@@ -123,6 +127,12 @@ export class AudioManager {
   // only the Audiomanager may have the channel array
   private _channel: Float32Array;
 
+  public get sampleRateFactor(): number {
+    return (!(this._originalInfo.samplerate === null || this._originalInfo.samplerate === undefined)
+      && !(this.ressource.info.samplerate === null || this.ressource.info.samplerate === undefined))
+      ? this._originalInfo.samplerate / this.ressource.info.samplerate : 1;
+  }
+
   private _javascriptNode = null;
 
   public afterloaded: EventEmitter<any> = new EventEmitter<any>();
@@ -143,17 +153,18 @@ export class AudioManager {
     return AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats) !== null;
   }
 
-  public static decodeAudio = (filename: string, buffer: ArrayBuffer,
+  public static decodeAudio = (filename: string, type:string, buffer: ArrayBuffer,
                                audioformats: AudioFormat[], keepbuffer = false): Promise<AudioManager> => {
     return new Promise<AudioManager>((resolve, reject) => {
       Logger.log('Decode audio... ' + filename);
 
       const audioformat: AudioFormat = AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats);
+      audioformat.init(buffer);
 
-      const result = new AudioManager(filename);
       let audioinfo = null;
       try {
-        audioinfo = audioformat.getAudioInfo(buffer);
+        audioinfo = audioformat.getAudioInfo(filename, type, buffer);
+
       } catch (err) {
         reject(err.message);
       }
@@ -168,13 +179,16 @@ export class AudioManager {
         const buffer_length = buffer.byteLength;
 
         AudioManager.decodeAudioFile(buffer, audioinfo.samplerate).then((audiobuffer: AudioBuffer) => {
-          Logger.log('Audio decoded.');
+          console.log(`audio decoded`);
+          const result = new AudioManager(audioinfo);
+          audioinfo = new AudioInfo(filename, type, buffer_length, audiobuffer.sampleRate, audiobuffer.length, audiobuffer.numberOfChannels, audioinfo.bitrate);
 
           result.ressource = new AudioRessource(filename, SourceType.ArrayBuffer,
             audioinfo, (buffer_copy === null) ? buffer : buffer_copy, audiobuffer, buffer_length);
 
           // set duration is very important
           result.ressource.info.duration.samples = audiobuffer.length;
+          console.log(`factor is ${result.sampleRateFactor}!`);
 
           const selection = new AudioSelection(new AudioTime(0, audioinfo.samplerate),
             new AudioTime(audiobuffer.length, audioinfo.samplerate));
@@ -183,6 +197,7 @@ export class AudioManager {
           result.state = PlayBackState.INITIALIZED;
           result.afterdecoded.emit(result.ressource);
           result.prepareAudioPlayBack();
+          console.log(`audiomanager created`);
           resolve(result);
         }).catch((error) => {
           reject(error);
@@ -191,54 +206,25 @@ export class AudioManager {
     });
   };
 
-  /**
-   * Decode an audio file to an AudioBuffer object.
-   *
-   * Supported input formats are determined by the browser. The WebAudio API
-   * re-samples the signal to the given sample rate. If resampling is
-   * undesired, the source sample rate must be known beforehand.
-   *
-   * @param file An object containing the encoded input file.
-   * @param sampleRate The sample rate of the target AudioBuffer object.
-   * @returns A promise resolving to the requested AudioBuffer.
-   */
   public static decodeAudioFile(file: ArrayBuffer, sampleRate: number): Promise<AudioBuffer> {
-    /* adapted function from
-       "browser-signal-processing" package (MIT)
-       author: Markus Jochim (markusjochim@phonetik.uni-muenchen.de)
-    */
-
     return new Promise<AudioBuffer>((resolve, reject) => {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-      const OfflineAudioContext = (<any>window).OfflineAudioContext // Default
-        || (<any>window).webkitOfflineAudioContext // Safari and old versions of Chrome
-        || (<any>window).mozOfflineAudioContext
-        || false;
-
-      if (OfflineAudioContext === false) {
-        console.error(`OfflineAudioContext is not supported!`);
-      }
-
-      audioCtx.decodeAudioData(file, function (buffer) {
-        const context = new OfflineAudioContext(1, Math.ceil(buffer.duration * sampleRate), sampleRate);
-        const source = context.createBufferSource();
-        source.buffer = buffer;
-        source.connect(context.destination);
-        source.start();
-        context.startRendering().then((rendered) => {
-          resolve(rendered);
-        }).catch((error) => {
-          reject(error);
+      if (audioCtx) {
+        audioCtx.decodeAudioData(file, function (buffer) {
+          resolve(buffer);
         });
-      });
+      } else {
+        reject('AudioContext not supported by the browser.');
+      }
     });
   }
 
-  constructor(filename: string) {
+  constructor(audioinfo) {
     this._id = ++AudioManager.counter;
+    this._originalInfo = audioinfo;
 
-    if (!isNullOrUndefined(filename)) {
+    if (!isNullOrUndefined(audioinfo)) {
       // Fix up for prefixing
       const AudioContext = (<any>window).AudioContext // Default
         || (<any>window).webkitAudioContext // Safari and old versions of Chrome

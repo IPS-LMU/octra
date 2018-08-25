@@ -200,8 +200,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     } else if (continue_session) {
       this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
         (json) => {
-          console.log(json);
-          if (json.hasOwnProperty('message')) {
+                    if (json.hasOwnProperty('message')) {
             const counter = (json.message === '') ? '0' : json.message;
             this.appStorage.sessStr.store('jobs_left', Number(counter));
           }

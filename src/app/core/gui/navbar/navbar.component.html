@@ -122,31 +122,31 @@
                         <tr>
                             <td><span>{{'general.name' | translate}}:</span></td>
                             <td>
-                                <span>{{navbarServ.exportformats.filename}}</span>
+                                <span>{{navbarServ.originalInfo?.fullname}}</span>
                             </td>
                         </tr>
                         <tr>
                             <td><span>{{'general.duration' | translate}}:</span></td>
                             <td>
-                                <span>{{navbarServ.exportformats.duration | timespan2}} (H:m:s)</span>
+                                <span>{{navbarServ.originalInfo?.duration.unix | timespan2}} (H:m:s)</span>
                             </td>
                         </tr>
                         <tr>
                             <td><span>{{'general.samplerate' | translate}}:</span></td>
                             <td>
-                                <span>{{navbarServ.exportformats.samplerate}}</span>
+                                <span>{{navbarServ.originalInfo?.samplerate}}</span>
                             </td>
                         </tr>
                         <tr>
                             <td><span>{{'general.bitspersecond' | translate}}:</span></td>
                             <td>
-                                <span>{{navbarServ.exportformats.bitrate}} Bit/s</span>
+                                <span>{{navbarServ.originalInfo?.bitrate}} Bit/s</span>
                             </td>
                         </tr>
                         <tr>
                             <td><span>{{'general.filesize' | translate}}:</span></td>
                             <td>
-                                <span>{{navbarServ.exportformats.filesize.size}} {{navbarServ.exportformats.filesize.label}}</span>
+                                <span>{{navbarServ.filesize.size}} {{navbarServ.filesize.label}}</span>
                             </td>
                         </tr>
                         <tr *ngIf="appStorage.usemode === 'online'">
@@ -283,7 +283,7 @@
     <div class="row">
         <div class="col-6 col-sm-3">{{"general.project" | translate}}: {{appStorage.user.project}}</div>
         <div class="col-6 col-sm-3">{{"general.name" |translate}}:
-            {{navbarServ.exportformats.filename}}
+            {{navbarServ.originalInfo?.fullname}}
         </div>
         <div class="col-6 col-sm-3">{{'general.free jobs' | translate}}:
             {{appStorage.jobs_left}}

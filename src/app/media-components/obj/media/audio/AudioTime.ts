@@ -4,6 +4,8 @@ import {isNullOrUndefined} from 'util';
  * class initialized with samples which can output other units like seconds, miliseconds
  */
 export class AudioTime {
+  public static sampleRateFactor: number = 1;
+
   /**
    * converts seconds given sample_rate to Audiotime
    * @param seconds

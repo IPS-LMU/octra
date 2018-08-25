@@ -158,9 +158,11 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     if (event.target.value !== null && event.target.value !== '') {
       const level = this.transcrServ.annotation.levels[tiernum];
       level.name = event.target.value.replace(' ', '_');
-      this.appStorage.changeAnnotationLevel(tiernum, level.getObj()).catch((err) => {
-        console.error(err);
-      }).then(() => {
+      this.appStorage.changeAnnotationLevel(tiernum,
+        level.getObj(this.transcrServ.audiomanager.sampleRateFactor, this.transcrServ.audiomanager.originalInfo.duration.samples))
+        .catch((err) => {
+          console.error(err);
+        }).then(() => {
         // update value for annoation object in transcr service
         this.transcrServ.annotation.levels[tiernum].name = event.target.value.replace(' ', '_');
       });
@@ -191,12 +193,14 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
     const newlevel = new Level(this.appStorage.levelcounter + 1, levelname, 'SEGMENT',
       new Segments(this.transcrServ.audiofile.samplerate, [], this.transcrServ.last_sample));
-    this.appStorage.addAnnotationLevel(newlevel.getObj()).then(
-      () => {
-        // update value for annoation object in transc servcie
-        this.transcrServ.annotation.levels.push(newlevel);
-      }
-    ).catch((err) => {
+    this.appStorage.addAnnotationLevel(
+      newlevel.getObj(this.transcrServ.audiomanager.sampleRateFactor, this.transcrServ.audiomanager.originalInfo.duration.samples))
+      .then(
+        () => {
+          // update value for annoation object in transc servcie
+          this.transcrServ.annotation.levels.push(newlevel);
+        }
+      ).catch((err) => {
       console.error(err);
     });
   }
@@ -228,12 +232,14 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onLevelDuplicateClick(tiernum: number, id: number) {
     const newlevel = this.transcrServ.annotation.levels[tiernum].clone();
-    this.appStorage.addAnnotationLevel(newlevel.getObj()).then(
-      () => {
-        // update value for annoation object in transc servcie
-        this.transcrServ.annotation.levels.push(newlevel);
-      }
-    ).catch((err) => {
+    this.appStorage.addAnnotationLevel(
+      newlevel.getObj(this.transcrServ.audiomanager.sampleRateFactor, this.transcrServ.audiomanager.originalInfo.duration.samples))
+      .then(
+        () => {
+          // update value for annoation object in transc servcie
+          this.transcrServ.annotation.levels.push(newlevel);
+        }
+      ).catch((err) => {
       console.error(err);
     });
   }

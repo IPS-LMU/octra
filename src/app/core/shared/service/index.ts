@@ -6,5 +6,4 @@ export * from './appstorage.service';
 export * from './transcription.service';
 export * from './userInteractions.service';
 export * from './message.service';
-export * from '../../gui/navbar/navbar.service';
 export * from './settings.service';

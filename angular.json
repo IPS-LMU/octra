@@ -32,6 +32,7 @@
               "src/styles.css"
             ],
             "scripts": [
+              "src/assets/js/modernizr.js",
               "node_modules/jquery/dist/jquery.min.js",
               "node_modules/arrive/minified/arrive.min.js",
               "node_modules/popper.js/dist/umd/popper.js",

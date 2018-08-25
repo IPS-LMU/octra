@@ -33,5 +33,5 @@ export class AppInfo {
     new TextConverter()
   ];
 
-  static readonly version = '1.2.5';
+  static readonly version = '1.2.6';
 }

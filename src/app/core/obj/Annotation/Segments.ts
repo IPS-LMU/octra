@@ -21,15 +21,21 @@ export class Segments {
 
   private _segments: Segment[];
 
-  constructor(private sample_rate: number, segments: ISegment[], last_sample: number) {
+  constructor(private sample_rate: number, segments: ISegment[], last_sample: number, sampleRateFactor?: number) {
     this._segments = [];
 
-    if (segments !== null) {
+    if (segments !== null ) {
+      if ((sampleRateFactor === null || sampleRateFactor === undefined)) {
+        throw new Error('sampleRateFactor is null!');
+      }
+
       if (segments.length === 0) {
         this._segments.push(new Segment(new AudioTime(last_sample, sample_rate)));
       }
 
       for (let i = 0; i < segments.length; i++) {
+        segments[i].sampleDur = Math.round(segments[i].sampleDur / sampleRateFactor);
+        segments[i].sampleStart = Math.round(segments[i].sampleStart / sampleRateFactor);
         const new_segment = Segment.fromObj(segments[i], sample_rate);
         this._segments.push(new_segment);
       }
@@ -139,7 +145,7 @@ export class Segments {
    * @param i
    * @returns {any}
    */
-  public get (i: number): Segment {
+  public get(i: number): Segment {
     if (i > -1 && i < this.segments.length) {
       return this.segments[i];
     }
@@ -244,22 +250,34 @@ export class Segments {
     this._segments = [];
   }
 
-  public getObj(labelname: string): OSegment[] {
-    const result: OSegment[] = [];
+  public getObj(labelname: string, sampleRateFactor: number, lastOriganlSample: number): OSegment[] {
 
-    let start = 0;
-    for (let i = 0; i < this._segments.length; i++) {
-      const segment = this._segments[i];
-      const labels: OLabel[] = [];
-      labels.push(new OLabel(labelname, segment.transcript));
+    if (!(sampleRateFactor === null || sampleRateFactor === undefined)
+      && !(lastOriganlSample === null || lastOriganlSample === undefined)
+      && lastOriganlSample > 0 && sampleRateFactor > 0) {
+      const result: OSegment[] = [];
 
-      const annotSegment = new OSegment((i + 1), start, (segment.time.samples - start), labels);
-      result.push(annotSegment);
+      let start = 0;
+      for (let i = 0; i < this._segments.length; i++) {
+        const segment = this._segments[i];
+        const labels: OLabel[] = [];
+        labels.push(new OLabel(labelname, segment.transcript));
 
-      start = segment.time.samples;
+        let annotSegment = null;
+        if (i < this._segments.length - 1) {
+          annotSegment = new OSegment((i + 1), start, (Math.round(segment.time.samples * sampleRateFactor) - start), labels);
+        } else {
+          annotSegment = new OSegment((i + 1), start, lastOriganlSample - start, labels);
+        }
+        result.push(annotSegment);
+
+        start = Math.round(segment.time.samples * sampleRateFactor);
+      }
+
+      return result;
+    } else {
+      throw new Error('invalid Params for segments.getObj()!');
     }
-
-    return result;
   }
 
   public clone(): Segments {

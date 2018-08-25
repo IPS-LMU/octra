@@ -62,7 +62,7 @@ export class AudioService {
           filename = url;
         }
 
-        AudioManager.decodeAudio(filename, buffer, AppInfo.audioformats).then(
+        AudioManager.decodeAudio(filename, 'audio/wav', buffer, AppInfo.audioformats).then(
           (manager: AudioManager) => {
             this.registerAudioManager(manager);
 

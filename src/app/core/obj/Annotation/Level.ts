@@ -7,6 +7,7 @@ export class Level {
   get type(): AnnotJSONType {
     return this._type;
   }
+
   get id(): number {
     return this._id;
   }
@@ -28,25 +29,29 @@ export class Level {
   private _type: AnnotJSONType;
   private _id: number;
 
-  public static fromObj(entry: OIDBLevel, samplerate: number, last_sample: number): Level {
-    let segments: Segments = null;
-    let events = [];
-    let items = [];
+  public static fromObj(entry: OIDBLevel, samplerate: number, last_sample: number, sampleRateFactor: number): Level {
+    if (!(sampleRateFactor === null || sampleRateFactor === undefined) && sampleRateFactor > 0) {
+      let segments: Segments = null;
+      let events = [];
+      let items = [];
 
-    if (entry.level.type === 'SEGMENT') {
-      const segment_entries: ISegment[] = <ISegment[]> entry.level.items;
-      segments = new Segments(samplerate, segment_entries, last_sample);
-    } else if (entry.level.type === 'ITEM') {
-      items = entry.level.items;
-    } else if (entry.level.type === 'EVENT') {
-      events = entry.level.items;
+      if (entry.level.type === 'SEGMENT') {
+        const segment_entries: ISegment[] = <ISegment[]> entry.level.items;
+        segments = new Segments(samplerate, segment_entries, last_sample, sampleRateFactor);
+      } else if (entry.level.type === 'ITEM') {
+        items = entry.level.items;
+      } else if (entry.level.type === 'EVENT') {
+        events = entry.level.items;
+      }
+
+      const result = new Level(entry.id, entry.level.name, entry.level.type, segments);
+      result.items = items;
+      result.events = events;
+
+      return result;
+    } else {
+      throw new Error('can not load Level because sampleRateFactor is null!');
     }
-
-    const result = new Level(entry.id, entry.level.name, entry.level.type, segments);
-    result.items = items;
-    result.events = events;
-
-    return result;
   }
 
   constructor(id: number, name: string, type: string, segments?: Segments) {
@@ -69,10 +74,10 @@ export class Level {
     }
   }
 
-  public getObj(): OLevel {
+  public getObj(sampleRateFactor: number, lastOriginalSample: number): OLevel {
     let result: OLevel = null;
     if (this._type === AnnotJSONType.SEGMENT) {
-      result = new OLevel(this._name, this.getTypeString(), this.segments.getObj(this._name));
+      result = new OLevel(this._name, this.getTypeString(), this.segments.getObj(this._name, sampleRateFactor, lastOriginalSample));
     } else if (this._type === AnnotJSONType.ITEM) {
       result = new OLevel(this._name, this.getTypeString(), this.items);
     } else if (this._type === AnnotJSONType.EVENT) {

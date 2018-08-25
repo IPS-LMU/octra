@@ -6,9 +6,9 @@ import {isNullOrUndefined} from 'util';
 import {Converter, ImportResult} from '../../obj/Converters';
 import {DropZoneComponent} from '../../component/drop-zone';
 import {SessionFile} from '../../obj/SessionFile';
-import {AudioManager} from '../../../media-components/obj/media/';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {ModalService} from '../../modals/modal.service';
+import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 
 @Component({
   selector: 'app-octra-dropzone',
@@ -272,7 +272,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
     const extension = file_process.file.name.substr(file_process.file.name.lastIndexOf('.'));
 
     // check audio
-    return AudioManager.decodeAudio(file_process.file.name, buffer, AppInfo.audioformats).then(
+    return AudioManager.decodeAudio(file_process.file.name, file_process.file.type, buffer, AppInfo.audioformats).then(
       (audiomanager: AudioManager) => {
         if (!isNullOrUndefined(this._audiomanager)) {
           this._audiomanager.destroy();

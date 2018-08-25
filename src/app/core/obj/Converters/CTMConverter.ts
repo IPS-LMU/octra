@@ -61,7 +61,7 @@ export class CTMConverter extends Converter {
       const filename = lines[0].substr(0, lines[0].indexOf(' '));
 
       if (Functions.contains(file.name, filename) && Functions.contains(audiofile.name, filename)) {
-        const olevel = new OLevel('OCTRA_1', 'SEGMENT');
+        const olevel = new OLevel('Tier_1', 'SEGMENT');
 
         let start = 0;
         for (let i = 0; i < lines.length; i++) {
@@ -69,12 +69,14 @@ export class CTMConverter extends Converter {
             const columns: string[] = lines[i].split(' ');
             length = 0;
             if (isNaN(Number(columns[2]))) {
+              console.error(columns[2] + ' is NaN');
               return null;
             } else {
               start = Number(columns[2]);
             }
 
             if (isNaN(Number(columns[3]))) {
+              console.error(columns[3] + ' is NaN');
               return null;
             } else {
               length = Number(columns[3]);
@@ -86,14 +88,14 @@ export class CTMConverter extends Converter {
               const osegment = new OSegment((i + 1),
                 0,
                 start * samplerate,
-                [(new OLabel('OCTRA_1', ''))]
+                [(new OLabel('Tier_1', ''))]
               );
 
               olevel.items.push(osegment);
             }
 
             const olabels: OLabel[] = [];
-            olabels.push((new OLabel('OCTRA_1', columns[4])));
+            olabels.push((new OLabel('Tier_1', columns[4])));
             const osegment = new OSegment(
               (i + 1),
               Math.round(start * samplerate),
@@ -109,7 +111,7 @@ export class CTMConverter extends Converter {
                   (i + 2),
                   Math.round((start + length) * samplerate),
                   Math.round((audiofile.duration - (start + length)) * samplerate),
-                  [(new OLabel('OCTRA_1', ''))]
+                  [(new OLabel('Tier_1', ''))]
                 );
 
                 olevel.items.push(osegment_end);

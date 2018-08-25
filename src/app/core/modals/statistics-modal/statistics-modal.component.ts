@@ -1,11 +1,12 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs/Subject';
-import {AppStorageService, NavbarService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {AppStorageService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {TextConverter} from '../../obj/Converters/TextConverter';
 import {isNullOrUndefined} from 'util';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
+import {NavbarService} from '../../gui/navbar/navbar.service';
 
 @Component({
   selector: 'app-statistics-modal',

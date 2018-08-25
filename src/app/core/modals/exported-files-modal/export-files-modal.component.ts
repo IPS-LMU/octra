@@ -1,13 +1,15 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs/Subject';
-import {NavbarService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
 import {Converter, IFile} from '../../obj/Converters';
 import {isNullOrUndefined} from 'util';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {OCTRANIMATIONS} from '../../shared';
+import {NavbarService} from '../../gui/navbar/navbar.service';
+import {OAudiofile} from '../../obj/Annotation';
 
 @Component({
   selector: 'app-export-files-modal',
@@ -152,7 +154,7 @@ export class ExportFilesModalComponent implements OnInit {
 
   updateParentFormat(converter: Converter, levelnum?: number) {
     if (!this.preparing.preparing) {
-      const oannotjson = this.navbarServ.transcrService.annotation.getObj();
+      const oannotjson = this.navbarServ.transcrService.annotation.getObj(this.transcrService.audiomanager.sampleRateFactor, this.transcrService.audiomanager.originalInfo.duration.samples);
       this.preparing = {
         name: converter.name,
         preparing: true
@@ -163,6 +165,7 @@ export class ExportFilesModalComponent implements OnInit {
           this.navbarServ.transcrService.audiofile.arraybuffer = this.transcrService.audiomanager.ressource.arraybuffer;
         }
 
+        const oAudiofile = new OAudiofile();
         const result: IFile = converter.export(oannotjson, this.navbarServ.transcrService.audiofile, levelnum).file;
         this.parentformat.download = result.name;
 

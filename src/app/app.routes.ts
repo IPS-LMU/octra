@@ -10,10 +10,12 @@ import {LogoutGuard} from './core/gui/logout/logout.guard';
 import {SettingsGuard} from './core/shared/guard';
 import {NewsComponent} from './core/gui/news/news.component';
 import {FaqComponent} from './core/gui/faq/faq.component';
+import {BrowserTestComponent} from './core/gui/browser-test/browser-test.component';
 
 const APP_ROUTES: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full'},
   {path: 'login', component: LoginComponent, canActivate: [SettingsGuard, ALoginGuard]},
+  {path: 'test', component: BrowserTestComponent},
   {path: '404', component: Error404Component},
   {path: 'news', component: NewsComponent, canActivate: [SettingsGuard]},
   {path: 'faq', component: FaqComponent, canActivate: [SettingsGuard]},

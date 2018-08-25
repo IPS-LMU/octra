@@ -21,12 +21,13 @@ import {
   UserInteractionsService
 } from '../../../core/shared/service';
 import {AudioTime, Segment, SubscriptionManager} from '../../../core/shared';
-import {AudioChunk, AudioManager, AudioRessource, AudioSelection} from '../../../media-components/obj/media/audio';
+import {AudioChunk, AudioRessource, AudioSelection} from '../../../media-components/obj/media/audio';
 import {isNullOrUndefined} from 'util';
 import {Segments} from '../../../core/obj/Annotation/Segments';
 import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
 import {LoupeComponent} from '../../../media-components/components/audio/loupe';
 import {AudioNavigationComponent} from '../../../media-components/components/audio/audio-navigation';
+import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 
 @Component({
   selector: 'app-transcr-window',
@@ -196,11 +197,13 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           ? this.transcrService.currentlevel.segments.get(this.segment_index + 1).time.samples - anno_segment.time.samples
           : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
 
+        segment.start = Math.round(segment.start * this.audiomanager.sampleRateFactor);
+        segment.length = Math.round(segment.length * this.audiomanager.sampleRateFactor);
         segment.textlength = this.editor.rawText.length;
       }
 
       this.uiService.addElementFromEvent('mouse_clicked', {value: event.type},
-        event.timestamp, this.audiomanager.playposition, this.editor.caretpos, 'audio_buttons', segment);
+        event.timestamp, Math.round(this.audiomanager.playposition  * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_buttons', segment);
     }
 
     if (event.type === 'replay') {
@@ -282,11 +285,13 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         ? this.transcrService.currentlevel.segments.get(this.segment_index + 1).time.samples - anno_segment.time.samples
         : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
 
+      segment.start = Math.round(segment.start * this.audiomanager.sampleRateFactor);
+      segment.length = Math.round(segment.length * this.audiomanager.sampleRateFactor);
       segment.textlength = this.editor.rawText.length;
     }
 
     this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, type, segment);
+      Math.round(this.audiomanager.playposition  * this.audiomanager.sampleRateFactor), this.editor.caretpos, type, segment);
   }
 
   onMarkerInsert(marker_code: string) {
@@ -303,11 +308,13 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         ? this.transcrService.currentlevel.segments.get(this.segment_index + 1).time.samples - anno_segment.time.samples
         : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
 
+      segment.start = Math.round(segment.start * this.audiomanager.sampleRateFactor);
+      segment.length = Math.round(segment.length * this.audiomanager.sampleRateFactor);
       segment.textlength = this.editor.rawText.length;
     }
 
     this.uiService.addElementFromEvent('shortcut', {value: marker_code}, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, 'markers', segment);
+      Math.round(this.audiomanager.playposition  * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'markers', segment);
   }
 
   onMarkerClick(marker_code: string) {
@@ -324,11 +331,13 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         ? this.transcrService.currentlevel.segments.get(this.segment_index + 1).time.samples - anno_segment.time.samples
         : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
 
+      segment.start = Math.round(segment.start * this.audiomanager.sampleRateFactor);
+      segment.length = Math.round(segment.length * this.audiomanager.sampleRateFactor);
       segment.textlength = this.editor.rawText.length;
     }
 
     this.uiService.addElementFromEvent('mouse_clicked', {value: marker_code}, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, 'texteditor_toolbar', segment);
+      Math.round(this.audiomanager.playposition  * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor_toolbar', segment);
   }
 
   onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
@@ -349,11 +358,13 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         ? this.transcrService.currentlevel.segments.get(this.segment_index + 1).time.samples - anno_segment.time.samples
         : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
 
+      segment.start = Math.round(segment.start * this.audiomanager.sampleRateFactor);
+      segment.length = Math.round(segment.length * this.audiomanager.sampleRateFactor);
       segment.textlength = this.editor.rawText.length;
     }
 
     this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
-      this.audiomanager.playposition, this.editor.caretpos, 'audio_speed', segment);
+      Math.round(this.audiomanager.playposition  * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_speed', segment);
 
   }
 
@@ -375,11 +386,13 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         ? this.transcrService.currentlevel.segments.get(this.segment_index + 1).time.samples - anno_segment.time.samples
         : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
 
+      segment.start = Math.round(segment.start * this.audiomanager.sampleRateFactor);
+      segment.length = Math.round(segment.length * this.audiomanager.sampleRateFactor);
       segment.textlength = this.editor.rawText.length;
     }
 
     this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
-      this.audiomanager.playposition, this.editor.caretpos, 'audio_volume', segment);
+      Math.round(this.audiomanager.playposition  * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_volume', segment);
   }
 
   public doit = (direction: string) => {

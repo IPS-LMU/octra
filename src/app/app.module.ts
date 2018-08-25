@@ -30,7 +30,6 @@ import {
   AppStorageService,
   AudioService,
   KeymappingService,
-  NavbarService,
   SettingsService
 } from './core/shared/service';
 
@@ -122,6 +121,8 @@ import {OverviewModalComponent} from './core/modals/overview-modal/overview-moda
 import {ShortcutsModalComponent} from './core/modals/shortcuts-modal/shortcuts-modal.component';
 import {TranscriptionSuccessModalComponent} from './core/modals/transcription-success-modal/transcription-success-modal.component';
 import {TranscriptionGuidelinesModalComponent} from './core/modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
+import {BrowserTestComponent} from './core/gui/browser-test/browser-test.component';
+import {NavbarService} from './core/gui/navbar/navbar.service';
 
 library.add(
   faSpinner, faCheck, faTimes, faTrash, faExclamationCircle, faInfoCircle, faDownload, faHeadphones, faPrint, faSearch, faExclamationTriangle,
@@ -183,7 +184,8 @@ export const ngmodule = {
     OverviewModalComponent,
     ShortcutsModalComponent,
     TranscriptionSuccessModalComponent,
-    TranscriptionGuidelinesModalComponent
+    TranscriptionGuidelinesModalComponent,
+    BrowserTestComponent
   ],
   entryComponents: EDITORS,
   imports: [

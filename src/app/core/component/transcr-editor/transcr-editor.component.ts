@@ -6,9 +6,10 @@ import {BrowserInfo, Functions, KeyMapping, SubscriptionManager} from '../../sha
 import {TranscriptionService} from '../../shared/service';
 import {isNullOrUndefined} from 'util';
 import {Segments} from '../../obj/Annotation/Segments';
-import {AudioChunk, AudioManager, AudioTime} from '../../../media-components/obj/media/audio';
+import {AudioChunk, AudioTime} from '../../../media-components/obj/media/audio';
 import {isNumeric} from 'rxjs/util/isNumeric';
 import {TimespanPipe} from '../../../media-components/pipe';
+import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 
 declare let lang: any;
 declare let document: any;

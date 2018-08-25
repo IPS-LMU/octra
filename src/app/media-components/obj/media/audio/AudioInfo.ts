@@ -1,6 +1,7 @@
 import {AudioTime} from './AudioTime';
+import {FileInfo} from '../../fileInfo';
 
-export class AudioInfo {
+export class AudioInfo extends FileInfo {
   get bitrate(): number {
     return this._bitrate;
   }
@@ -26,7 +27,8 @@ export class AudioInfo {
   private _channels = -1;
   private _duration: AudioTime;
 
-  constructor(samplerate: number, duration: number, channels: number, bitrate: number) {
+  constructor(filename: string, type: string, size: number, samplerate: number, duration: number, channels: number, bitrate: number) {
+    super(filename, type, size);
     this._samplerate = samplerate;
     this._duration = new AudioTime(duration, samplerate);
     this._channels = channels;

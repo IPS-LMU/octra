@@ -1,11 +1,4 @@
 <div class="section" id="login">
-    <div *ngIf="!valid_platform" class="bg-danger">
-        <p *ngIf="!valid_platform" class="warning" [innerHTML]="'browser.invalid' | translate">
-        </p>
-        <p *ngIf="!valid_platform" class="warning">
-            {{getValidBrowsers()}}
-        </p>
-    </div>
     <div id="loginrow" class="row">
         <div #onlinemode id='onlinemode' class="col-md-6 card" style="padding:40px;margin-bottom:20px;">
             <p *ngIf="!apc.octra.responsive.enabled && !valid_size" class="warning"

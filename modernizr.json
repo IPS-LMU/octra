@@ -8,6 +8,9 @@
     "test/canvastext",
     "test/cookies",
     "test/audio/webaudio",
-    "test/es6/promises"
+    "test/es6/promises",
+    "test/indexeddb",
+    "test/file/api",
+    "test/url/bloburls"
   ]
 }

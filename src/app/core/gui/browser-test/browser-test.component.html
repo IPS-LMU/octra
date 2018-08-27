@@ -1,0 +1,16 @@
+<div class="container">
+    <h2>Browser compatibility check</h2>
+
+    <table class="table table-striped">
+        <tr *ngFor="let rule of compatibility.rules">
+            <td style="width:40px;text-align:center;">
+                <fa-icon [ngStyle]="{color:getStateColor(rule)}" [icon]="['fas', getStateIcon(rule)]"
+                         [spin]="rule.state === 'processing'"></fa-icon>
+            </td>
+            <td>{{rule.description}}
+            <p [innerHTML]="rule.help" *ngIf="rule.state === 'failed' && rule.help !== ''" style="color:red;">
+            </p>
+            </td>
+        </tr>
+    </table>
+</div>

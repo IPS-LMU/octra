@@ -15,7 +15,6 @@ import {APIService, AppStorageService, AudioService, OIDBLevel, OIDBLink, Settin
 import {ComponentCanDeactivate} from './login.deactivateguard';
 import {Observable} from 'rxjs/Observable';
 import {FileSize, Functions, OCTRANIMATIONS, SubscriptionManager} from '../../shared';
-import {BrowserCheck} from '../../shared/BrowserCheck';
 import {SessionFile} from '../../obj/SessionFile';
 import {isArray, isNullOrUndefined, isNumber} from 'util';
 import {TranslateService} from '@ngx-translate/core';
@@ -39,9 +38,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   @ViewChild('localmode') localmode: ElementRef;
   @ViewChild('onlinemode') onlinemode: ElementRef;
 
-  public valid_platform = false;
   public valid_size = false;
-  public browser_check: BrowserCheck;
   public agreement_checked = true;
 
   public projects: string[] = [];
@@ -83,16 +80,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   ngOnInit() {
-
-    this.browser_check = new BrowserCheck();
-    this.valid_platform = false;
-
-    if (this.apc.octra.allowed_browsers.length > 0) {
-      this.valid_platform = this.browser_check.isValidBrowser(this.apc.octra.allowed_browsers);
-    } else {
-      this.valid_platform = true;
-    }
-
     if (this.settingsService.responsive.enabled === false) {
       this.valid_size = window.innerWidth >= this.settingsService.responsive.fixedwidth;
     } else {
@@ -200,7 +187,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     } else if (continue_session) {
       this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
         (json) => {
-                    if (json.hasOwnProperty('message')) {
+          if (json.hasOwnProperty('message')) {
             const counter = (json.message === '') ? '0' : json.message;
             this.appStorage.sessStr.store('jobs_left', Number(counter));
           }

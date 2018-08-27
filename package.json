@@ -6,7 +6,7 @@
   "angular-cli": {},
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --port 5321",
+    "start": "npm run modernizr && ng serve --port 5321",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",

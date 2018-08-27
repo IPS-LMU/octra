@@ -123,6 +123,7 @@ import {TranscriptionSuccessModalComponent} from './core/modals/transcription-su
 import {TranscriptionGuidelinesModalComponent} from './core/modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
 import {BrowserTestComponent} from './core/gui/browser-test/browser-test.component';
 import {NavbarService} from './core/gui/navbar/navbar.service';
+import {CompatibilityService} from './core/shared/service/compatibility.service';
 
 library.add(
   faSpinner, faCheck, faTimes, faTrash, faExclamationCircle, faInfoCircle, faDownload, faHeadphones, faPrint, faSearch, faExclamationTriangle,
@@ -234,7 +235,8 @@ export const ngmodule = {
     SettingsService,
     TranscrEndGuard,
     TranslateService,
-    BugReportService
+    BugReportService,
+    CompatibilityService
   ]
 };
 

@@ -1,14 +1,25 @@
 import {
-  AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnChanges, OnDestroy, OnInit, SimpleChanges,
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
   ViewChild
 } from '@angular/core';
 
 import {
-  AppStorageService, AudioService, KeymappingService, MessageService, SettingsService, TranscriptionService,
+  AppStorageService,
+  AudioService,
+  KeymappingService,
+  MessageService,
+  SettingsService,
+  TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
 import {AudioChunk, AudioSelection, AudioTime} from '../../media-components/obj/media/audio';
-import {isNullOrUndefined} from 'util';
 import {AudioviewerComponent, AudioviewerConfig} from '../../media-components/components/audio/audioviewer';
 import {CircleLoupeComponent} from '../../media-components/components/audio/circleloupe';
 import {LoupeComponent} from '../../media-components/components/audio/loupe';
@@ -34,30 +45,38 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
   @ViewChild('loupe') loupe: LoupeComponent;
   @ViewChild('nav') nav: AudioNavigationComponent;
   @ViewChild('transcr') public editor: TranscrEditorComponent;
-
-  private subscrmanager: SubscriptionManager;
-  private saving = false;
-
   public miniloupe_hidden = true;
   public segmentselected = false;
   public top_selected = false;
-  private factor = 6;
-  private mouseTimer = null;
-
   public loupe_settings: AudioviewerConfig;
   public mini_loupecoord: any = {
     component: 'viewer',
     x: 0,
     y: 0
   };
-
-  private platform = BrowserInfo.platform;
-
   public audiomanager: AudioManager;
   public audiochunk_top: AudioChunk;
   public audiochunk_down: AudioChunk;
   public audiochunk_loupe: AudioChunk;
-
+  /**
+   * hits when user is typing something in the editor
+   * @param status
+   */
+  onEditorTyping = (status: string) => {
+    this.viewer.focused = false;
+    this.loupe.viewer.focused = false;
+    if (status === 'stopped') {
+      this.save();
+      setTimeout(() => {
+        this.loupe.update(false);
+      }, 200);
+    }
+  };
+  private subscrmanager: SubscriptionManager;
+  private saving = false;
+  private factor = 6;
+  private mouseTimer = null;
+  private platform = BrowserInfo.platform;
   private selected_index: number;
 
   public get app_settings(): any {
@@ -133,7 +152,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
       (obj) => {
         if (this.appStorage.show_loupe) {
           const event = obj.event;
-          if (this.viewer.focused || (!isNullOrUndefined(this.loupe) && this.loupe.focused)) {
+          if (this.viewer.focused || (!(this.loupe === null || this.loupe === undefined) && this.loupe.focused)) {
             if (event.key === '+') {
               this.factor = Math.min(12, this.factor + 1);
               this.miniloupe.zoomY = Math.max(1, this.factor);
@@ -141,7 +160,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
               if (this.viewer.focused) {
                 this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
                   this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
-              } else if (!isNullOrUndefined(this.loupe) && this.loupe.focused) {
+              } else if (!(this.loupe === null || this.loupe === undefined) && this.loupe.focused) {
                 this.changeArea(this.audiochunk_loupe, this.loupe.viewer, this.mini_loupecoord,
                   this.viewer.MouseCursor.timePos.samples, this.loupe.MouseCursor.relPos.x, this.factor);
               }
@@ -152,7 +171,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
                 if (this.viewer.focused) {
                   this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
                     this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
-                } else if (!isNullOrUndefined(this.loupe) && this.loupe.focused) {
+                } else if (!(this.loupe === null || this.loupe === undefined) && this.loupe.focused) {
                   this.changeArea(this.audiochunk_loupe, this.loupe.viewer, this.mini_loupecoord,
                     this.viewer.MouseCursor.timePos.samples, this.loupe.MouseCursor.relPos.x, this.factor);
                 }
@@ -166,7 +185,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
   }
 
   ngOnChanges(obj: SimpleChanges) {
-    if (!isNullOrUndefined(obj.mini_loupe)) {
+    if (!(obj.mini_loupe === null || obj.mini_loupe === undefined)) {
       if (obj.mini_loupe.isFirstChange() && this.appStorage.show_loupe) {
         this.miniloupe.Settings.shortcuts_enabled = false;
         this.miniloupe.Settings.boundaries.enabled = false;
@@ -252,7 +271,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
   }
 
   onMouseOver(cursor: AVMousePos) {
-    if (!isNullOrUndefined(this.mouseTimer)) {
+    if (!(this.mouseTimer === null || this.mouseTimer === undefined)) {
       window.clearTimeout(this.mouseTimer);
     }
 
@@ -279,26 +298,6 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
     }, 20);
   }
 
-  private changeArea(audiochunk: AudioChunk, viewer: AudioviewerComponent, coord: any,
-                     cursor: number, relX: number, factor: number = 4) {
-    const range = ((viewer.Chunk.time.duration.samples / this.audiomanager.ressource.info.duration.samples)
-      * this.audiomanager.ressource.info.samplerate) / factor;
-
-    if (cursor && relX > -1) {
-      coord.x = ((relX) ? relX - 80 : 0);
-      const half_rate = Math.round(range);
-      const start = (cursor > half_rate)
-        ? new AudioTime(cursor - half_rate, this.audiomanager.ressource.info.samplerate)
-        : new AudioTime(0, this.audiomanager.ressource.info.samplerate);
-      const end = (cursor < this.audiomanager.ressource.info.duration.samples - half_rate)
-        ? new AudioTime(cursor + half_rate, this.audiomanager.ressource.info.samplerate)
-        : this.audiomanager.ressource.info.duration.clone();
-
-      this.audiochunk_loupe.destroy();
-      this.audiochunk_loupe = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
-    }
-  }
-
   onSegmentEnter($event) {
     this.selectSegment($event.index).then((selection: AudioSelection) => {
       this.top_selected = true;
@@ -314,37 +313,8 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
     });
   }
 
-  private selectSegment(index: number): Promise<AudioSelection> {
-    return new Promise<AudioSelection>(
-      (resolve) => {
-        const segment = this.transcrService.currentlevel.segments.get(index);
-        this.editor.rawText = segment.transcript;
-        this.selected_index = index;
-        this.segmentselected = true;
-        let start = new AudioTime(0, this.audiomanager.ressource.info.samplerate);
-        if (index > 0) {
-          start = this.transcrService.currentlevel.segments.get(index - 1).time;
-        }
-        resolve(new AudioSelection(start, segment.time));
-      }
-    );
-  }
-
   onTranscriptionChanged($event) {
     this.save();
-  }
-
-  private save() {
-    if (this.segmentselected) {
-      if (this.selected_index > -1 && this.transcrService.currentlevel.segments &&
-        this.selected_index < this.transcrService.currentlevel.segments.length) {
-        const segment = this.transcrService.currentlevel.segments.get(this.selected_index).clone();
-        this.viewer.focused = false;
-        this.loupe.viewer.focused = false;
-        segment.transcript = this.editor.rawText;
-        const saved = this.transcrService.currentlevel.segments.change(this.selected_index, segment);
-      }
-    }
   }
 
   onShortCutTriggered($event, control) {
@@ -401,21 +371,6 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
       }
     }
   }
-
-  /**
-   * hits when user is typing something in the editor
-   * @param status
-   */
-  onEditorTyping = (status: string) => {
-    this.viewer.focused = false;
-    this.loupe.viewer.focused = false;
-    if (status === 'stopped') {
-      this.save();
-      setTimeout(() => {
-        this.loupe.update(false);
-      }, 200);
-    }
-  };
 
   onMarkerInsert(marker_code: string) {
     if (this.appStorage.logging) {
@@ -538,7 +493,6 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
     }
   }
 
-
   public openSegment(segnumber: number) {
     this.onSegmentEnter({index: segnumber});
   }
@@ -549,5 +503,54 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
     this.segmentselected = false;
     this.audiochunk_top.startpos = this.audiochunk_top.time.start;
     this.audiochunk_down.startpos = this.audiochunk_down.time.start;
+  }
+
+  private changeArea(audiochunk: AudioChunk, viewer: AudioviewerComponent, coord: any,
+                     cursor: number, relX: number, factor: number = 4) {
+    const range = ((viewer.Chunk.time.duration.samples / this.audiomanager.ressource.info.duration.samples)
+      * this.audiomanager.ressource.info.samplerate) / factor;
+
+    if (cursor && relX > -1) {
+      coord.x = ((relX) ? relX - 80 : 0);
+      const half_rate = Math.round(range);
+      const start = (cursor > half_rate)
+        ? new AudioTime(cursor - half_rate, this.audiomanager.ressource.info.samplerate)
+        : new AudioTime(0, this.audiomanager.ressource.info.samplerate);
+      const end = (cursor < this.audiomanager.ressource.info.duration.samples - half_rate)
+        ? new AudioTime(cursor + half_rate, this.audiomanager.ressource.info.samplerate)
+        : this.audiomanager.ressource.info.duration.clone();
+
+      this.audiochunk_loupe.destroy();
+      this.audiochunk_loupe = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
+    }
+  }
+
+  private selectSegment(index: number): Promise<AudioSelection> {
+    return new Promise<AudioSelection>(
+      (resolve) => {
+        const segment = this.transcrService.currentlevel.segments.get(index);
+        this.editor.rawText = segment.transcript;
+        this.selected_index = index;
+        this.segmentselected = true;
+        let start = new AudioTime(0, this.audiomanager.ressource.info.samplerate);
+        if (index > 0) {
+          start = this.transcrService.currentlevel.segments.get(index - 1).time;
+        }
+        resolve(new AudioSelection(start, segment.time));
+      }
+    );
+  }
+
+  private save() {
+    if (this.segmentselected) {
+      if (this.selected_index > -1 && this.transcrService.currentlevel.segments &&
+        this.selected_index < this.transcrService.currentlevel.segments.length) {
+        const segment = this.transcrService.currentlevel.segments.get(this.selected_index).clone();
+        this.viewer.focused = false;
+        this.loupe.viewer.focused = false;
+        segment.transcript = this.editor.rawText;
+        const saved = this.transcrService.currentlevel.segments.change(this.selected_index, segment);
+      }
+    }
   }
 }

@@ -23,6 +23,12 @@ export class SessionFile {
     this._size = value;
   }
 
+  constructor(private _name: string,
+              private _size: number,
+              private _timestamp: Date,
+              private _type: string) {
+  }
+
   public static fromAny(element: any) {
     if (element === null || element === undefined) {
       return null;
@@ -37,12 +43,6 @@ export class SessionFile {
     } else {
       throw new Error('Can not convert to SessionFile. Properties are not valid.');
     }
-  }
-
-  constructor(private _name: string,
-              private _size: number,
-              private _timestamp: Date,
-              private _type: string) {
   }
 
   public toAny() {

@@ -1,6 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 import {IAnnotJSON, OAnnotJSON, OAudiofile} from '../Annotation/AnnotJSON';
-import {isNullOrUndefined} from 'util';
 import {Functions} from '../../shared/Functions';
 
 export interface Bundle {
@@ -35,7 +34,7 @@ export class BundleJSONConverter extends Converter {
     let result = '';
     let filename = '';
 
-    if (!isNullOrUndefined(annotation)) {
+    if (!(annotation === null || annotation === undefined)) {
       const bundle = {
         'ssffFiles': [],
         'mediaFile': {
@@ -66,7 +65,7 @@ export class BundleJSONConverter extends Converter {
     const content = file.content;
     const json: Bundle = JSON.parse(content);
 
-    if (!isNullOrUndefined(json) && json.hasOwnProperty('mediaFile') && json.mediaFile.hasOwnProperty('data')
+    if (!(json === null || json === undefined) && json.hasOwnProperty('mediaFile') && json.mediaFile.hasOwnProperty('data')
       && json.hasOwnProperty('annotation')) {
       const data = json.mediaFile.data;
       const annotation: IAnnotJSON = json.annotation;

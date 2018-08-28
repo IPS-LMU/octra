@@ -15,6 +15,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 
 export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
 
+  private subscrmanager: SubscriptionManager = new SubscriptionManager();
+
   public get version(): string {
     return AppInfo.version;
   }
@@ -22,8 +24,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
   public get environment(): any {
     return environment;
   }
-
-  private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
   constructor(private api: APIService,
               private langService: TranslateService,
@@ -119,15 +119,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
     this.subscrmanager.destroy();
   }
 
-  private setFixedWidth() {
-    // set fixed width
-    const head = document.head || document.getElementsByTagName('head')[0];
-    const style = document.createElement('style');
-    style.type = 'text/css';
-    style.innerText = '.container {width:' + this.settingsService.responsive.fixedwidth + 'px}';
-    head.appendChild(style);
-  }
-
   test(id: string) {
     this.subscrmanager.add(
       this.api.fetchAnnotation(Number(id)).subscribe(
@@ -155,5 +146,14 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       params.hasOwnProperty('audio') &&
       params.hasOwnProperty('embedded')
     );
+  }
+
+  private setFixedWidth() {
+    // set fixed width
+    const head = document.head || document.getElementsByTagName('head')[0];
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.innerText = '.container {width:' + this.settingsService.responsive.fixedwidth + 'px}';
+    head.appendChild(style);
   }
 }

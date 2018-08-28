@@ -28,7 +28,6 @@ import {PlayBackState} from '../../media-components/obj/media';
 import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
 import {TranscrEditorComponent} from '../../core/component';
-import {isNullOrUndefined} from 'util';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/interval';
 import {AudioviewerComponent} from '../../media-components/components/audio/audioviewer';
@@ -51,25 +50,9 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   @ViewChild('window') window: TranscrWindowComponent;
   @ViewChild('loupe') loupe: CircleLoupeComponent;
   @ViewChild('audionav') audionav: AudioNavigationComponent;
-
-  public get editor(): TranscrEditorComponent {
-    if (isNullOrUndefined(this.window)) {
-      return null;
-    }
-    return this.window.editor;
-  }
-
   public showWindow = false;
-  private subscrmanager: SubscriptionManager;
-
   public loupe_hidden = true;
-  private mousestate = 'initiliazied';
-  private intervalID = null;
   public selected_index: number;
-
-  private mouseTimer;
-
-  private factor = 8;
   public miniloupe: {
     size: {
       width: number,
@@ -89,14 +72,28 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       y: 0
     }
   };
-
+  public audiomanager: AudioManager;
+  public audiochunk_lines: AudioChunk;
+  public audiochunk_window: AudioChunk;
+  public audiochunk_loupe: AudioChunk;
+  private subscrmanager: SubscriptionManager;
+  private mousestate = 'initiliazied';
+  private intervalID = null;
+  private mouseTimer;
+  private factor = 8;
   private scrolltimer: Subscription = null;
+  private shortcuts: any = {};
+
+  public get editor(): TranscrEditorComponent {
+    if ((this.window === null || this.window === undefined)) {
+      return null;
+    }
+    return this.window.editor;
+  }
 
   public get getHeight(): number {
     return window.innerHeight - 350;
   }
-
-  private shortcuts: any = {};
 
   public get app_settings(): any {
     return this.settingsService.app_settings;
@@ -105,11 +102,6 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   public get projectsettings(): any {
     return this.settingsService.projectsettings;
   }
-
-  public audiomanager: AudioManager;
-  public audiochunk_lines: AudioChunk;
-  public audiochunk_window: AudioChunk;
-  public audiochunk_loupe: AudioChunk;
 
   constructor(public transcrService: TranscriptionService,
               public keyMap: KeymappingService,
@@ -195,7 +187,8 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     this.subscrmanager.add(this.audiochunk_lines.statechange.subscribe(
       (state: PlayBackState) => {
         if (state === PlayBackState.PLAYING) {
-          if (!isNullOrUndefined(this.appStorage.followplaycursor) && this.appStorage.followplaycursor === true) {
+          if (!(this.appStorage.followplaycursor === null || this.appStorage.followplaycursor === undefined)
+            && this.appStorage.followplaycursor === true) {
 
             this.scrolltimer = Observable.interval(1000).subscribe(() => {
               const absx = this.viewer.av.audioTCalculator.samplestoAbsX(this.audiochunk_lines.playposition.samples);
@@ -291,7 +284,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   onMouseOver(event) {
-    if (!isNullOrUndefined(this.mouseTimer)) {
+    if (!(this.mouseTimer === null || this.mouseTimer === undefined)) {
       window.clearTimeout(this.mouseTimer);
     }
     this.mousestate = 'moving';
@@ -308,7 +301,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     if (this.appStorage.show_loupe) {
       const lastlinevisible: Line = this.viewer.av.LinesArray[this.viewer.av.LinesArray.length - 1];
       if (this.miniloupe.location.y <= (lastlinevisible.Pos.y - this.viewer.viewRect.position.y +
-          lastlinevisible.Size.height + this.viewer.margin.top + this.viewer.margin.bottom)) {
+        lastlinevisible.Size.height + this.viewer.margin.top + this.viewer.margin.bottom)) {
         this.loupe_hidden = false;
         this.mouseTimer = window.setTimeout(() => {
           this.changeArea(this.loupe, this.miniloupe, this.factor);
@@ -322,34 +315,6 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   }
 
   onSegmentChange() {
-  }
-
-  private changeArea(loup: CircleLoupeComponent, coord: {
-    size: {
-      width: number,
-      height: number
-    },
-    location: {
-      x: number,
-      y: number
-    }
-  }, factor: number) {
-    const cursor = this.viewer.MouseCursor;
-
-    if (cursor && cursor.timePos && cursor.relPos) {
-      const half_rate = Math.round(this.audiomanager.ressource.info.samplerate / factor);
-      const start = (cursor.timePos.samples > half_rate)
-        ? new AudioTime(cursor.timePos.samples - half_rate, this.audiomanager.ressource.info.samplerate)
-        : new AudioTime(0, this.audiomanager.ressource.info.samplerate);
-      const end = (cursor.timePos.samples < this.audiomanager.ressource.info.duration.samples - half_rate)
-        ? new AudioTime(cursor.timePos.samples + half_rate, this.audiomanager.ressource.info.samplerate)
-        : this.audiomanager.ressource.info.duration.clone();
-
-      loup.zoomY = factor;
-      if (start && end) {
-        this.audiochunk_loupe = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
-      }
-    }
   }
 
   public changePosition(x: number, y: number) {
@@ -395,7 +360,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         segment.textlength = anno_segment.transcript.length;
       }
 
-      const caretpos = (!isNullOrUndefined(this.editor)) ? this.editor.caretpos : -1;
+      const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
 
       this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
         Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), caretpos, 'multi-lines-viewer', segment);
@@ -430,7 +395,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         segment.textlength = anno_segment.transcript.length;
       }
 
-      const caretpos = (!isNullOrUndefined(this.editor)) ? this.editor.caretpos : -1;
+      const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
         Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), caretpos, 'audio_speed', segment);
     }
@@ -460,7 +425,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         segment.textlength = anno_segment.transcript.length;
       }
 
-      const caretpos = (!isNullOrUndefined(this.editor)) ? this.editor.caretpos : -1;
+      const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
         Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), caretpos, 'audio_volume', segment);
     }
@@ -468,7 +433,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
   onButtonClick(event: { type: string, timestamp: number }) {
     if (this.appStorage.logging) {
-      const caretpos = (!isNullOrUndefined(this.editor)) ? this.editor.caretpos : -1;
+      const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
 
       const segment = {
         start: -1,
@@ -489,8 +454,11 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
         segment.textlength = anno_segment.transcript.length;
       }
+      const justifiedPlayPosition = Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor);
+
       this.uiService.addElementFromEvent('mouseclick', {value: 'click:' + event.type},
-        event.timestamp, Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), caretpos, 'audio_buttons', segment);
+        event.timestamp,
+        justifiedPlayPosition, caretpos, 'audio_buttons', segment);
     }
 
     switch (event.type) {
@@ -541,5 +509,33 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   onCircleLoupeMouseOver($event) {
     this.viewer.focus();
     this.miniloupe.location.y += $event.layerY + 20;
+  }
+
+  private changeArea(loup: CircleLoupeComponent, coord: {
+    size: {
+      width: number,
+      height: number
+    },
+    location: {
+      x: number,
+      y: number
+    }
+  }, factor: number) {
+    const cursor = this.viewer.MouseCursor;
+
+    if (cursor && cursor.timePos && cursor.relPos) {
+      const half_rate = Math.round(this.audiomanager.ressource.info.samplerate / factor);
+      const start = (cursor.timePos.samples > half_rate)
+        ? new AudioTime(cursor.timePos.samples - half_rate, this.audiomanager.ressource.info.samplerate)
+        : new AudioTime(0, this.audiomanager.ressource.info.samplerate);
+      const end = (cursor.timePos.samples < this.audiomanager.ressource.info.duration.samples - half_rate)
+        ? new AudioTime(cursor.timePos.samples + half_rate, this.audiomanager.ressource.info.samplerate)
+        : this.audiomanager.ressource.info.duration.clone();
+
+      loup.zoomY = factor;
+      if (start && end) {
+        this.audiochunk_loupe = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
+      }
+    }
   }
 }

@@ -1,17 +1,8 @@
 import {Group} from './Group';
 import {Control} from './Control';
-import {isNullOrUndefined} from 'util';
 import {isArray} from 'rxjs/util/isArray';
 
 export class FeedBackForm {
-  set required(value: boolean) {
-    this._required = value;
-  }
-
-  get required(): boolean {
-    return this._required;
-  }
-
   public get groups(): Group[] {
     return this._groups;
   }
@@ -25,6 +16,18 @@ export class FeedBackForm {
   }
 
   private _required = false;
+
+  get required(): boolean {
+    return this._required;
+  }
+
+  set required(value: boolean) {
+    this._required = value;
+  }
+
+  constructor(private _groups: Group[], private _comment: string) {
+
+  }
 
   public static fromAny(feedback_data: any[], comment: string): FeedBackForm {
     const groups: Group[] = [];
@@ -51,10 +54,6 @@ export class FeedBackForm {
     return result;
   }
 
-  constructor(private _groups: Group[], private _comment: string) {
-
-  }
-
   public exportData(): any {
     const result: any = {};
 
@@ -64,7 +63,7 @@ export class FeedBackForm {
         const control: Control = group.controls[j];
         if (control.type.type !== 'textarea') {
           if (control.type.type === 'radiobutton') {
-            if (!isNullOrUndefined(control.custom.checked)) {
+            if (!(control.custom.checked === null || control.custom.checked === undefined)) {
               if (control.custom.checked) {
                 result['' + group.name + ''] = control.value;
                 break;
@@ -74,11 +73,11 @@ export class FeedBackForm {
               result['' + group.name + ''] = '';
             }
           } else if (control.type.type === 'checkbox') {
-            if (isNullOrUndefined(result['' + group.name + ''])) {
+            if ((result['' + group.name + ''] === null || result['' + group.name + ''] === undefined)) {
               result['' + group.name + ''] = [];
             }
 
-            if (!isNullOrUndefined(control.custom.checked)) {
+            if (!(control.custom.checked === null || control.custom.checked === undefined)) {
               if (control.custom.checked) {
                 result['' + group.name + ''].push(control.value);
               }
@@ -130,7 +129,7 @@ export class FeedBackForm {
                 control.custom['checked'] = (control.value === value);
               } else if (control.type.type === 'checkbox') {
                 if (control.value === value) {
-                  if (!isNullOrUndefined(custom) && !isNullOrUndefined(custom.checked)) {
+                  if (!(custom === null || custom === undefined) && !(custom.checked === null || custom.checked === undefined)) {
                     control.custom['checked'] = custom.checked;
                   } else {
                     // call from importData

@@ -1,6 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../Annotation/AnnotJSON';
-import {isNullOrUndefined} from 'util';
 import {Functions} from '../../shared/Functions';
 
 export class CTMConverter extends Converter {
@@ -25,7 +24,7 @@ export class CTMConverter extends Converter {
     let result = '';
     let filename = '';
 
-    if (!isNullOrUndefined(annotation)) {
+    if (!(annotation === null || annotation === undefined)) {
       const level = annotation.levels[levelnum];
 
       for (let j = 0; j < level.items.length; j++) {

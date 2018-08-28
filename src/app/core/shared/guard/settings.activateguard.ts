@@ -4,7 +4,6 @@ import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '
 import {Observable} from 'rxjs/Observable';
 import {AppStorageService} from '../service/appstorage.service';
 import {SettingsService} from '../service/settings.service';
-import {isNullOrUndefined} from 'util';
 import 'rxjs/add/operator/first';
 
 @Injectable()
@@ -16,7 +15,7 @@ export class SettingsGuard implements CanActivate {
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-    if (isNullOrUndefined(this.settingsService.app_settings)) {
+    if ((this.settingsService.app_settings === null || this.settingsService.app_settings === undefined)) {
       return this.settingsService.settingsloaded.first();
     } else {
       return this.settingsService.validated;

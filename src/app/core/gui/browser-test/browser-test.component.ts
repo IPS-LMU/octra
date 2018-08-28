@@ -8,7 +8,7 @@ import {CompatibilityService} from '../../shared/service/compatibility.service';
   styleUrls: ['./browser-test.component.css']
 })
 export class BrowserTestComponent implements OnInit {
-  constructor(private router: Router, public compatibility:CompatibilityService) {
+  constructor(private router: Router, public compatibility: CompatibilityService) {
   }
 
   ngOnInit() {

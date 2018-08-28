@@ -5,6 +5,8 @@ import {AudioTime} from './media/audio';
  * class needed to determine mouse position in audioviewer compnents
  */
 export class AVMousePos {
+  private _timepos: AudioTime;
+
   get timePos(): AudioTime {
     return this._timepos;
   }
@@ -12,6 +14,12 @@ export class AVMousePos {
   set timePos(value: AudioTime) {
     this._timepos = value;
   }
+
+  // relative Position related to line number
+  private _relPos: any = {
+    x: 0,
+    y: 0
+  };
 
   get relPos(): any {
     return this._relPos;
@@ -21,6 +29,8 @@ export class AVMousePos {
     this._relPos = value;
   }
 
+  private _absX = 0;
+
   get absX(): number {
     return this._absX;
   }
@@ -29,6 +39,8 @@ export class AVMousePos {
     this._absX = value;
   }
 
+  private _line: Line = null;
+
   get line(): Line {
     return this._line;
   }
@@ -36,17 +48,6 @@ export class AVMousePos {
   set line(value: Line) {
     this._line = value;
   }
-
-  private _timepos: AudioTime;
-
-  // relative Position related to line number
-  private _relPos: any = {
-    x: 0,
-    y: 0
-  };
-
-  private _absX = 0;
-  private _line: Line = null;
 
   /**
    * initializes AVMousePos. time_pos will be cloned.

@@ -5,7 +5,6 @@ import {AppInfo} from '../../../app.info';
 import {AppStorageService} from './appstorage.service';
 import {Observable} from 'rxjs/Observable';
 import {SettingsService} from './settings.service';
-import {isNullOrUndefined} from 'util';
 import {BugReporter} from '../../obj/BugAPI/BugReporter';
 import {TranscriptionService} from './transcription.service';
 import {Functions} from '../Functions';
@@ -25,13 +24,14 @@ export interface ConsoleEntry {
 
 @Injectable()
 export class BugReportService {
+  private reporter: BugReporter;
+  private transcrService: TranscriptionService;
+
+  private _console: ConsoleEntry[] = [];
+
   get console(): ConsoleEntry[] {
     return this._console;
   }
-
-  private _console: ConsoleEntry[] = [];
-  private reporter: BugReporter;
-  private transcrService: TranscriptionService;
 
   constructor(private langService: TranslateService,
               private appStorage: AppStorageService,
@@ -76,7 +76,7 @@ export class BugReportService {
       entries: this._console
     };
 
-    if (!isNullOrUndefined(this.transcrService)) {
+    if (!(this.transcrService === null || this.transcrService === undefined)) {
       const file = Functions.getFileSize(this.transcrService.audiofile.size);
       result.octra['audiofile_size'] = file.size + ' ' + file.label;
       result.octra['audiofile_duration'] = this.transcrService.audiomanager.ressource.info.duration.seconds;
@@ -102,7 +102,7 @@ export class BugReportService {
       }
     }
 
-    if (!isNullOrUndefined(this.reporter)) {
+    if (!(this.reporter === null || this.reporter === undefined)) {
       return this.reporter.getText(this.getPackage());
     }
     return '';
@@ -114,7 +114,7 @@ export class BugReportService {
   }): Observable<any> {
     const bugreport_settings = this.settService.app_settings.octra.bugreport;
 
-    if (!isNullOrUndefined(bugreport_settings) && bugreport_settings.enabled) {
+    if (!(bugreport_settings === null || bugreport_settings === undefined) && bugreport_settings.enabled) {
       const auth_token = credentials.auth_token;
       const url = credentials.url;
       const form = {

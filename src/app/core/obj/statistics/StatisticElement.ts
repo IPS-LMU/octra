@@ -2,9 +2,15 @@
  * Statistic Element Class
  */
 import {ILog} from '../Settings/logging';
-import {isNullOrUndefined} from 'util';
 
 export class StatisticElem {
+  protected data: any = {
+    timestamp: null,
+    type: null,
+    context: null,
+    value: null
+  };
+
   get value(): any {
     return this.data.value;
   }
@@ -33,12 +39,15 @@ export class StatisticElem {
     return this.data.caretpos;
   }
 
-  protected data: any = {
-    timestamp: null,
-    type: null,
-    context: null,
-    value: null
-  };
+  constructor(type: string, context: string, value: any, timestamp: number, playerpos: number) {
+    this.data.type = type;
+    this.data.context = context;
+    this.data.timestamp = timestamp;
+    this.data.value = value;
+    if (!(playerpos === null || playerpos === undefined)) {
+      this.data.playerpos = playerpos;
+    }
+  }
 
   public static fromAny(elem: any): StatisticElem {
     const result = {
@@ -66,16 +75,6 @@ export class StatisticElem {
       result.timestamp,
       result.playerpos
     );
-  }
-
-  constructor(type: string, context: string, value: any, timestamp: number, playerpos: number) {
-    this.data.type = type;
-    this.data.context = context;
-    this.data.timestamp = timestamp;
-    this.data.value = value;
-    if (!isNullOrUndefined(playerpos)) {
-      this.data.playerpos = playerpos;
-    }
   }
 
   public getDataClone(): ILog {

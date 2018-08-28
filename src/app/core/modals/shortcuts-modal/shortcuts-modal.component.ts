@@ -15,27 +15,22 @@ import {BrowserInfo} from '../../shared';
 
 export class ShortcutsModalComponent implements OnInit {
   modalRef: BsModalRef;
-  protected data = null;
-
   public visible = false;
   @Input() editor: string = '';
-
   public shortcuts = [];
-
   config: ModalOptions = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
   };
-
   @ViewChild('modal') modal: any;
+  protected data = null;
+  private actionperformed: Subject<void> = new Subject<void>();
+  private subscrmanager = new SubscriptionManager();
 
   public get platform(): string {
     return BrowserInfo.platform;
   }
-
-  private actionperformed: Subject<void> = new Subject<void>();
-  private subscrmanager = new SubscriptionManager();
 
   constructor(private modalService: BsModalService, private appStorage: AppStorageService, private bugService: BugReportService, private settService: SettingsService,
               private keyMap: KeymappingService, private cd: ChangeDetectorRef) {

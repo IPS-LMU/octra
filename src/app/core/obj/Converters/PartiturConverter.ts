@@ -1,6 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 import {OAnnotJSON, OAudiofile, OItem, OLabel, OLevel, OSegment} from '../Annotation/AnnotJSON';
-import {isNullOrUndefined} from 'util';
 
 export class PartiturConverter extends Converter {
 
@@ -21,7 +20,7 @@ export class PartiturConverter extends Converter {
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
 
-    if (!isNullOrUndefined(levelnum)) {
+    if (!(levelnum === null || levelnum === undefined)) {
       const result: ExportResult = {
         file: {
           name: `${annotation.name}-${annotation.levels[levelnum].name}${this._extension}`,
@@ -80,7 +79,7 @@ LBD:\n`;
       let pointer = 0;
       // const sam_found = lines[pointer].match(/SAM: ([0-9]+)/);
       /*
-      if (isNullOrUndefined(sam_found)) {
+      if ((sam_found === null || sam_found === undefined)) {
         console.error(this._name + ' Converter Error: samplerate not found in .par file');
         return null;
       }
@@ -106,7 +105,7 @@ LBD:\n`;
         const search = lines[pointer].match(
           new RegExp(/^((LHD)|(SAM)|(KAN)|(ORT)|(DAS)|(TR2)|(SUP)|(PRS)|(NOI)|(LBP)|(LBG)|(PRO)|(POS)|(LMA)|(SYN)|(FUN)|(LEX)|(IPA)|(TRN)|(TRS)|(GES)|(USH)|(USM)|(OCC)|(USP)|(GES)|(TLN)|(PRM)|(TRW)|(MAS))/g));
 
-        if (!isNullOrUndefined(search)) {
+        if (!(search === null || search === undefined)) {
           const columns = lines[pointer].split(' ');
 
           if (search[0] === 'SAM') {

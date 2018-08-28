@@ -1,4 +1,3 @@
-import {isNullOrUndefined} from 'util';
 import {Observable} from 'rxjs/Observable';
 import {HttpClient} from '@angular/common/http';
 
@@ -10,7 +9,7 @@ export interface FileSize {
 export class Functions {
   public static scrollTo(y: number, target?: string) {
     setTimeout(() => {
-      if (isNullOrUndefined(target)) {
+      if ((target === null || target === undefined)) {
         jQuery('html, body').scrollTop(y);
       } else {
         jQuery(target).scrollTop(y);
@@ -170,7 +169,7 @@ export class Functions {
   public static uniqueHTTPRequest(http: HttpClient, post: boolean = false, requestoptions: any,
                                   url: string, body: any): Observable<any> {
     if (!post) {
-      const options = (!isNullOrUndefined(requestoptions)) ? requestoptions : {};
+      const options = (!(requestoptions === null || requestoptions === undefined)) ? requestoptions : {};
 
       if (!options.hasOwnProperty('params')) {
         options['params'] = {};

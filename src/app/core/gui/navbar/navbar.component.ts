@@ -3,7 +3,6 @@ import {AppStorageService} from '../../shared/service/appstorage.service';
 import {NavbarService} from './navbar.service';
 import {DomSanitizer} from '@angular/platform-browser';
 import {TranslateService} from '@ngx-translate/core';
-import {isNullOrUndefined} from 'util';
 import {AppInfo} from '../../../app.info';
 import {TranscriptionService} from '../../shared/service/transcription.service';
 import {UserInteractionsService} from '../../shared/service/userInteractions.service';
@@ -29,16 +28,15 @@ import {ExportFilesModalComponent} from '../../modals/exported-files-modal/expor
 export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChild('modalexport') modalexport: ExportFilesModalComponent;
-  @Input('version') version: string;
+  @Input() version: string;
 
   public test = 'ok';
   collapsed = true;
+  private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
   public get environment(): any {
     return environment;
   }
-
-  private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
   public get converters(): any[] {
     return AppInfo.converters;
@@ -62,6 +60,14 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   get AnnotJSONType() {
     return AnnotJSONType;
+  }
+
+  public get errorsFound(): boolean {
+    return (this.bugService.console.filter((a) => {
+      if (a.type === ConsoleType.ERROR) {
+        return true;
+      }
+    }).length > 0);
   }
 
   constructor(public appStorage: AppStorageService,
@@ -123,11 +129,10 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public interfaceActive(name: string) {
-    return !(isNullOrUndefined(
-      this.navbarServ.interfaces.find((x) => {
-        return name === x;
-      })
-    ));
+    const found = this.navbarServ.interfaces.find((x) => {
+      return name === x;
+    });
+    return !(found === null || found === undefined);
   }
 
   toggleSettings(option: string) {
@@ -246,13 +251,5 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public selectLevel(tiernum: number) {
     this.transcrServ.selectedlevel = tiernum;
-  }
-
-  public get errorsFound(): boolean {
-    return (this.bugService.console.filter((a) => {
-      if (a.type === ConsoleType.ERROR) {
-        return true;
-      }
-    }).length > 0);
   }
 }

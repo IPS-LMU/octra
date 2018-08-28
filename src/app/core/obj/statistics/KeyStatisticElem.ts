@@ -28,6 +28,28 @@ export class KeyStatisticElem extends StatisticElem {
     return this.data.altPressed;
   }
 
+  constructor(type: string,
+              name: string,
+              value: any,
+              timestamp: number,
+              playerpos: number,
+              caretpos: number, segment: {
+      start: number,
+      length: number,
+      textlength: number
+    }) {
+    super(type, name, value, timestamp, playerpos);
+    this.data = {
+      timestamp: timestamp,
+      type: type,
+      context: name,
+      value: value,
+      playerpos: playerpos,
+      caretpos: caretpos,
+      segment: segment
+    };
+  }
+
   public static fromAny(elem: any): KeyStatisticElem {
     const result = {
       value: null,
@@ -57,27 +79,5 @@ export class KeyStatisticElem extends StatisticElem {
 
     return new KeyStatisticElem(result.type, result.context, result.value, result.timestamp,
       result.playerpos, result.caretpos, result.segment);
-  }
-
-  constructor(type: string,
-              name: string,
-              value: any,
-              timestamp: number,
-              playerpos: number,
-              caretpos: number, segment: {
-      start: number,
-      length: number,
-      textlength: number
-    }) {
-    super(type, name, value, timestamp, playerpos);
-    this.data = {
-      timestamp: timestamp,
-      type: type,
-      context: name,
-      value: value,
-      playerpos: playerpos,
-      caretpos: caretpos,
-      segment: segment
-    };
   }
 }

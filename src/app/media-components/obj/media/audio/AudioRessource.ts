@@ -1,34 +1,35 @@
 import {MediaRessource} from '../MediaRessource';
 import {SourceType} from '../index';
 import {AudioInfo} from './AudioInfo';
-import {isNullOrUndefined} from 'util';
 
 export class AudioRessource extends MediaRessource {
-  set audiobuffer(value: AudioBuffer) {
-    this._audiobuffer = value;
-  }
-  get audiobuffer(): AudioBuffer {
-    return this._audiobuffer;
+  private _info: AudioInfo;
+
+  get info(): AudioInfo {
+    return this._info;
   }
 
   set info(value: AudioInfo) {
     this._info = value;
   }
 
-  get info(): AudioInfo {
-    return this._info;
+  private _audiobuffer: AudioBuffer;
+
+  get audiobuffer(): AudioBuffer {
+    return this._audiobuffer;
   }
 
-  private _info: AudioInfo;
-  private _audiobuffer: AudioBuffer;
+  set audiobuffer(value: AudioBuffer) {
+    this._audiobuffer = value;
+  }
 
   constructor(fullname: string, source: SourceType, info: AudioInfo, buffer?: ArrayBuffer, audiobuffer?: AudioBuffer, size?: number) {
     super(fullname, source, buffer, size);
-    if (!isNullOrUndefined(info.duration) && !isNullOrUndefined(info.duration) && info.duration.samples > 0 && info.samplerate > 0) {
+    if (!(info.duration === null || info.duration === undefined) && !(info.duration === null || info.duration === undefined) && info.duration.samples > 0 && info.samplerate > 0) {
       this._info = info;
     } else {
       throw Error('AudioRessource needs a correct instance of AudioInfo as parameter');
     }
     this._audiobuffer = audiobuffer;
-      }
+  }
 }

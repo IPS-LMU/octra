@@ -12,11 +12,28 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AlertComponent implements OnInit, OnDestroy {
+
+  public type = 'error';
+  /**
+   * show alert on the right top corner of the screen.
+   * @param type "log", "error" or "info"
+   * @param message Message which should be shown
+   */
+  public showMessage = (type: string, message: string) => {
+    this.show = true;
+    this.state = 'active';
+    this.type = type;
+    this.text = message;
+    this.cd.markForCheck();
+
+    setTimeout(() => {
+      this.state = 'inactive';
+      this.cd.markForCheck();
+    }, 3000);
+  };
   private state = 'inactive';
   private text = '';
-  public type = 'error';
   private show = false;
-
   private subscrmanager: SubscriptionManager;
 
   constructor(private cd: ChangeDetectorRef,
@@ -38,23 +55,5 @@ export class AlertComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscrmanager.destroy();
-  }
-
-  /**
-   * show alert on the right top corner of the screen.
-   * @param type "log", "error" or "info"
-   * @param message Message which should be shown
-   */
-  public showMessage = (type: string, message: string) => {
-    this.show = true;
-    this.state = 'active';
-    this.type = type;
-    this.text = message;
-    this.cd.markForCheck();
-
-    setTimeout(() => {
-      this.state = 'inactive';
-      this.cd.markForCheck();
-    }, 3000);
   }
 }

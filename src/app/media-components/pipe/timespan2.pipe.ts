@@ -7,6 +7,25 @@ import {Pipe, PipeTransform} from '@angular/core';
 export class Timespan2Pipe implements PipeTransform {
 
   private timespan = 0;
+  private FormatNumber = (num, length): string => {
+    let result = '' + num.toFixed(0);
+    while (result.length < length) {
+      result = '0' + result;
+    }
+    return result;
+  };
+
+  private get Seconds(): number {
+    return Math.floor(this.timespan / 1000) % 60;
+  }
+
+  private get Minutes(): number {
+    return Math.floor(this.timespan / 1000 / 60);
+  }
+
+  private get Hours(): number {
+    return Math.floor(this.timespan / 1000 / 60 / 60);
+  }
 
   transform(value: any, args?: any): any {
     this.timespan = Number(value);
@@ -21,26 +40,6 @@ export class Timespan2Pipe implements PipeTransform {
 
     result += hours + ':' + minutes + ':' + seconds;
 
-    return result;
-  }
-
-  private get Seconds(): number {
-    return Math.floor(this.timespan / 1000) % 60;
-  }
-
-  private get Minutes(): number {
-    return Math.floor(this.timespan / 1000 / 60);
-  }
-
-  private get Hours(): number {
-    return Math.floor(this.timespan / 1000 / 60 / 60);
-  }
-
-  private FormatNumber = (num, length): string => {
-    let result = '' + num.toFixed(0);
-    while (result.length < length) {
-      result = '0' + result;
-    }
     return result;
   }
 

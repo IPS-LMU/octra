@@ -7,23 +7,28 @@
  */
 export class Line {
 
+  public number = -1;
+  mouseIn = function (x, y) {
+    const result =
+      (x > this.pos.x && x < (this.pos.x + this.size.width)) &&
+      (y > this.pos.y && y < (this.pos.y + this.size.height));
+
+    return result;
+  };
   private size = {
     width: 0,
     height: 0
   };
-
   private pos = {
     x: 0,
     y: 0
   };
 
-  public number = -1;
-  private isMouseIn = false;
-
 
   /*
    GETTER / SETTER
    */
+  private isMouseIn = false;
 
   get Size(): any {
     return {
@@ -57,12 +62,4 @@ export class Line {
       y: pos.y
     };
   }
-
-  mouseIn = function (x, y) {
-    const result =
-      (x > this.pos.x && x < (this.pos.x + this.size.width)) &&
-      (y > this.pos.y && y < (this.pos.y + this.size.height));
-
-    return result;
-  };
 }

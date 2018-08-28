@@ -1,6 +1,5 @@
 import {AppInfo} from '../../app.info';
 import {AppStorageService, OIDBLevel} from './service/appstorage.service';
-import {isNullOrUndefined} from 'util';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../obj/Annotation/AnnotJSON';
 import {IndexedDBManager} from '../obj/IndexedDBManager';
 import {Logger} from './Logger';
@@ -21,13 +20,13 @@ export class UpdateManager {
       (resolve, reject) => {
         const appversion = AppInfo.version;
 
-        if (!isNullOrUndefined(this.appStorage.localStr.retrieve('version'))) {
+        if (!(this.appStorage.localStr.retrieve('version') === null || this.appStorage.localStr.retrieve('version') === undefined)) {
           this.version = this.appStorage.localStr.retrieve('version');
         }
 
 
         const continue_check = () => {
-          if (isNullOrUndefined(this.version)) {
+          if ((this.version === null || this.version === undefined)) {
             console.log('update...');
             console.log(appversion);
             console.log(this.version);
@@ -119,7 +118,7 @@ export class UpdateManager {
                     ]).then(() => {
 
                       const convertAnnotation = () => {
-                        if (!isNullOrUndefined(this.appStorage.localStr.retrieve('annotation'))) {
+                        if (!(this.appStorage.localStr.retrieve('annotation') === null || this.appStorage.localStr.retrieve('annotation') === undefined)) {
                           Logger.log(`Convert annotation to IDB...`);
 
                           const levels = this.appStorage.localStr.retrieve('annotation').levels;
@@ -147,7 +146,7 @@ export class UpdateManager {
                         }
                       };
 
-                      if (!isNullOrUndefined(this.appStorage.localStr.retrieve('logs'))) {
+                      if (!(this.appStorage.localStr.retrieve('logs') === null || this.appStorage.localStr.retrieve('logs') === undefined)) {
                         Logger.log('Convert logging data...');
                         Logger.log(`${this.appStorage.localStr.retrieve('logs').length} logs to convert:`);
                         idbm.saveArraySequential(this.appStorage.localStr.retrieve('logs'), logsStore, 'timestamp').then(() => {
@@ -176,7 +175,7 @@ export class UpdateManager {
                     const options = transaction.objectStore('options');
 
                     idbm.get(options, 'uselocalmode').then((entry) => {
-                      if (!isNullOrUndefined(entry)) {
+                      if (!(entry === null || entry === undefined)) {
                         if (entry.value === false) {
                           idbm.save(options, 'usemode', {
                             name: 'usemode',
@@ -231,12 +230,16 @@ export class UpdateManager {
     );
   }
 
+  public destroy() {
+    this.subscrmanager.destroy();
+  }
+
   private update() {
     const appversion = AppInfo.version;
 
-    if (isNullOrUndefined(this.version)) {
+    if ((this.version === null || this.version === undefined)) {
       const old_transcription = this.appStorage.localStr.retrieve('transcription');
-      if (!isNullOrUndefined(old_transcription)) {
+      if (!(old_transcription === null || old_transcription === undefined)) {
         console.log('Convert to new AnnotJSON...');
 
         const audiofile: OAudiofile = new OAudiofile();
@@ -275,9 +278,5 @@ export class UpdateManager {
       console.log('version available');
       this.appStorage.version = appversion;
     }
-  }
-
-  public destroy() {
-    this.subscrmanager.destroy();
   }
 }

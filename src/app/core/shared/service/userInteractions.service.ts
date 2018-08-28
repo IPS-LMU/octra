@@ -3,18 +3,13 @@ import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
 import {Functions} from '../Functions';
-import {isNullOrUndefined} from 'util';
 import {OLog} from '../../obj/Settings/logging';
 
 @Injectable()
 export class UserInteractionsService {
-  set enabled(value: boolean) {
-    this._enabled = value;
-  }
+  public afteradd: EventEmitter<StatisticElem> = new EventEmitter<StatisticElem>();
 
-  get enabled(): boolean {
-    return this._enabled;
-  }
+  private _elements: StatisticElem[];
 
   get elements(): StatisticElem[] {
     return this._elements;
@@ -24,9 +19,15 @@ export class UserInteractionsService {
     this._elements = value;
   }
 
-  private _elements: StatisticElem[];
-  public afteradd: EventEmitter<StatisticElem> = new EventEmitter<StatisticElem>();
   private _enabled = false;
+
+  get enabled(): boolean {
+    return this._enabled;
+  }
+
+  set enabled(value: boolean) {
+    this._enabled = value;
+  }
 
   constructor() {
     this._elements = [];
@@ -48,7 +49,7 @@ export class UserInteractionsService {
       let name = '';
       let context: any = null;
 
-      if (isNullOrUndefined(segment)) {
+      if ((segment === null || segment === undefined)) {
         segment = {
           start: -1,
           length: -1,
@@ -114,28 +115,6 @@ export class UserInteractionsService {
     }
   }
 
-  private getElements(type_str: string): StatisticElem[] {
-    const result: StatisticElem[] = [];
-
-    let type: any;
-
-    if (type_str === 'key') {
-      type = KeyStatisticElem;
-    } else if (type_str === 'mouse') {
-      type = MouseStatisticElem;
-    }
-
-    for (let i = 0; i < this._elements.length; i++) {
-      const elem = this._elements[i];
-
-      if (elem instanceof type) {
-        result.push(elem);
-      }
-    }
-
-    return result;
-  }
-
   public elementsToAnyArray(): any[] {
     const result = [];
     for (let i = 0; i < this._elements.length; i++) {
@@ -171,5 +150,27 @@ export class UserInteractionsService {
 
   public clear() {
     this._elements = [];
+  }
+
+  private getElements(type_str: string): StatisticElem[] {
+    const result: StatisticElem[] = [];
+
+    let type: any;
+
+    if (type_str === 'key') {
+      type = KeyStatisticElem;
+    } else if (type_str === 'mouse') {
+      type = MouseStatisticElem;
+    }
+
+    for (let i = 0; i < this._elements.length; i++) {
+      const elem = this._elements[i];
+
+      if (elem instanceof type) {
+        result.push(elem);
+      }
+    }
+
+    return result;
   }
 }

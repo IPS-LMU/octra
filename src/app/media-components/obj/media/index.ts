@@ -1,5 +1,3 @@
-import {AudioManager} from './audio/AudioManager';
-
 export const enum SourceType {
   URL,
   FILE,

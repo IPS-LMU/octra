@@ -18,30 +18,20 @@ export enum ModalAnswer {
 
 export class BugreportModalComponent implements OnInit {
   modalRef: BsModalRef;
-  protected data = null;
-
   public visible = false;
   public bgemail = '';
   public bgdescr = '';
   public sendpro_obj = true;
   public bugsent = false;
-
   config: ModalOptions = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
   };
-
   @ViewChild('modal') modal: any;
-
+  protected data = null;
   private actionperformed: Subject<ModalAnswer> = new Subject<ModalAnswer>();
   private subscrmanager = new SubscriptionManager();
-
-  constructor(private modalService: BsModalService, private appStorage: AppStorageService, private bugService: BugReportService, private settService: SettingsService) {
-  }
-
-  ngOnInit() {
-  }
 
   public get isvalid(): boolean {
     if (this.sendpro_obj || this.bgdescr !== '') {
@@ -49,6 +39,12 @@ export class BugreportModalComponent implements OnInit {
     } else {
       return false;
     }
+  }
+
+  constructor(private modalService: BsModalService, private appStorage: AppStorageService, private bugService: BugReportService, private settService: SettingsService) {
+  }
+
+  ngOnInit() {
   }
 
   public open(data: {

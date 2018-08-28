@@ -1,33 +1,54 @@
 import {AnnotJSONType, ISegment, OEvent, OItem, OLevel} from './AnnotJSON';
-import {isNullOrUndefined} from 'util';
 import {Segments} from './Segments';
 import {OIDBLevel} from '../../shared/service/appstorage.service';
 
 export class Level {
-  get type(): AnnotJSONType {
-    return this._type;
-  }
+  public static counter = 1;
+  public segments: Segments;
+  public items: OItem[];
+  public events: OEvent[];
 
-  get id(): number {
-    return this._id;
+  private _name: string;
+
+  get name(): string {
+    return this._name;
   }
 
   set name(value: string) {
     this._name = value;
   }
 
-  get name(): string {
-    return this._name;
+  private _type: AnnotJSONType;
+
+  get type(): AnnotJSONType {
+    return this._type;
   }
 
-  public static counter = 1;
-
-  private _name: string;
-  public segments: Segments;
-  public items: OItem[];
-  public events: OEvent[];
-  private _type: AnnotJSONType;
   private _id: number;
+
+  get id(): number {
+    return this._id;
+  }
+
+  constructor(id: number, name: string, type: string, segments?: Segments) {
+    this._name = name;
+    this._id = id;
+    switch (type) {
+      case('EVENT'):
+        this._type = AnnotJSONType.EVENT;
+        break;
+      case('ITEM'):
+        this._type = AnnotJSONType.ITEM;
+        break;
+      case('SEGMENT'):
+        this._type = AnnotJSONType.SEGMENT;
+        break;
+    }
+
+    if (!(segments === null || segments === undefined)) {
+      this.segments = segments;
+    }
+  }
 
   public static fromObj(entry: OIDBLevel, samplerate: number, last_sample: number, sampleRateFactor: number): Level {
     if (!(sampleRateFactor === null || sampleRateFactor === undefined) && sampleRateFactor > 0) {
@@ -51,26 +72,6 @@ export class Level {
       return result;
     } else {
       throw new Error('can not load Level because sampleRateFactor is null!');
-    }
-  }
-
-  constructor(id: number, name: string, type: string, segments?: Segments) {
-    this._name = name;
-    this._id = id;
-    switch (type) {
-      case('EVENT'):
-        this._type = AnnotJSONType.EVENT;
-        break;
-      case('ITEM'):
-        this._type = AnnotJSONType.ITEM;
-        break;
-      case('SEGMENT'):
-        this._type = AnnotJSONType.SEGMENT;
-        break;
-    }
-
-    if (!isNullOrUndefined(segments)) {
-      this.segments = segments;
     }
   }
 

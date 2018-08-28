@@ -1,9 +1,6 @@
 import {RouterModule, Routes} from '@angular/router';
 
-import {
-  Error404Component, FeaturesComponent, HelpToolsComponent, LoginComponent, LogoutComponent,
-  MembersAreaComponent
-} from './core/gui';
+import {Error404Component, FeaturesComponent, HelpToolsComponent, LoginComponent, LogoutComponent, MembersAreaComponent} from './core/gui';
 import {MEMBER_ROUTES} from './core/gui/members-area/members-area.routes';
 import {ALoginGuard} from './core/gui/login/login.activateguard';
 import {LogoutGuard} from './core/gui/logout/logout.guard';
@@ -22,7 +19,12 @@ const APP_ROUTES: Routes = [
   {path: 'faq', component: FaqComponent, canActivate: [SettingsGuard]},
   {path: 'features', component: FeaturesComponent, canActivate: [SettingsGuard]},
   {path: 'logout', component: LogoutComponent, canActivate: [SettingsGuard, LogoutGuard]},
-  {path: 'user', component: MembersAreaComponent, canActivate: [SettingsGuard, CompatibilityGuard], children: MEMBER_ROUTES},
+  {
+    path: 'user',
+    component: MembersAreaComponent,
+    canActivate: [SettingsGuard, CompatibilityGuard],
+    children: MEMBER_ROUTES
+  },
   {path: 'help-tools', component: HelpToolsComponent},
   {path: '**', redirectTo: '/404', pathMatch: 'full'}
 ];

@@ -1,18 +1,9 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  Input,
-  OnChanges,
-  OnInit,
-  ViewChild
-} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs/Subject';
 import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {BugReportService} from '../../shared/service/bug-report.service';
-import {isNullOrUndefined} from 'util';
 import {TranslateService} from '@ngx-translate/core';
 
 @Component({
@@ -24,26 +15,20 @@ import {TranslateService} from '@ngx-translate/core';
 
 export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges {
   modalRef: BsModalRef;
-  protected data = null;
-
   public visible = false;
   @Input() guidelines = null;
   public shown_guidelines: any = {};
-
   public collapsed: any[][] = [];
-  private entries = 0;
-
-  private counter = 0;
-  private video_players: any[] = [];
-
   config: ModalOptions = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
   };
-
   @ViewChild('modal') modal: any;
-
+  protected data = null;
+  private entries = 0;
+  private counter = 0;
+  private video_players: any[] = [];
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();
 
@@ -56,11 +41,11 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
   }
 
   ngOnChanges($event) {
-    if (!isNullOrUndefined($event.guidelines.currentValue)) {
+    if (!($event.guidelines.currentValue === null || $event.guidelines.currentValue === undefined)) {
       this.shown_guidelines = JSON.parse(JSON.stringify($event.guidelines.currentValue));
       this.unCollapseAll();
     }
-    if (isNullOrUndefined($event.guidelines.previousValue) && !isNullOrUndefined($event.guidelines.currentValue)) {
+    if (($event.guidelines.previousValue === null || $event.guidelines.previousValue === undefined) && !($event.guidelines.currentValue === null || $event.guidelines.currentValue === undefined)) {
       setTimeout(() => {
         this.initVideoPlayers();
       }, 1000);
@@ -84,22 +69,6 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
         }
       );
     });
-  }
-
-  private unCollapseAll() {
-    this.collapsed = [];
-
-    for (let i = 0; i < this.guidelines.instructions.length; i++) {
-      const elem = [];
-      for (let j = 0; j < this.guidelines.instructions[i].entries.length; j++) {
-        elem.push(true);
-      }
-      this.collapsed.push(elem);
-    }
-  }
-
-  private toggle(group: number, entry: number) {
-    this.collapsed[group][entry] = !this.collapsed[group][entry];
   }
 
   videoplayerExists(player: string): number {
@@ -138,6 +107,57 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
     }
   }
 
+  public exportPDF() {
+    if (!(this.settService.projectsettings === null || this.settService.projectsettings === undefined)
+      && !(this.settService.projectsettings.plugins === null || this.settService.projectsettings.plugins === undefined)
+      && !(this.settService.projectsettings.plugins.pdfexport === null || this.settService.projectsettings.plugins.pdfexport === undefined)
+      && !(this.settService.projectsettings.plugins.pdfexport.url === null || this.settService.projectsettings.plugins.pdfexport.url === undefined)) {
+      const form = jQuery('<form></form>')
+        .attr('method', 'post')
+        .attr('target', 'blank')
+        .attr('action', this.settService.projectsettings.plugins.pdfexport.url)
+        .appendTo('body');
+
+      const json_obj = {
+        translation: this.lang.instant('general'),
+        guidelines: this.guidelines
+      };
+
+      const json = jQuery('<input/>')
+        .attr('name', 'json')
+        .attr('type', 'text')
+        .attr('value', JSON.stringify(json_obj));
+      form.append(json);
+      form.submit().remove();
+    }
+  }
+
+  public close() {
+    this.modal.hide();
+    this.visible = false;
+
+    this.cd.markForCheck();
+    this.cd.detectChanges();
+
+    this.actionperformed.next();
+  }
+
+  private unCollapseAll() {
+    this.collapsed = [];
+
+    for (let i = 0; i < this.guidelines.instructions.length; i++) {
+      const elem = [];
+      for (let j = 0; j < this.guidelines.instructions[i].entries.length; j++) {
+        elem.push(true);
+      }
+      this.collapsed.push(elem);
+    }
+  }
+
+  private toggle(group: number, entry: number) {
+    this.collapsed[group][entry] = !this.collapsed[group][entry];
+  }
+
   private search(text: string) {
     if (text !== '') {
       this.shown_guidelines.instructions = [];
@@ -167,40 +187,5 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
     } else {
       this.shown_guidelines = JSON.parse(JSON.stringify(this.guidelines));
     }
-  }
-
-  public exportPDF() {
-    if (!isNullOrUndefined(this.settService.projectsettings)
-      && !isNullOrUndefined(this.settService.projectsettings.plugins)
-      && !isNullOrUndefined(this.settService.projectsettings.plugins.pdfexport)
-      && !isNullOrUndefined(this.settService.projectsettings.plugins.pdfexport.url)) {
-      const form = jQuery('<form></form>')
-        .attr('method', 'post')
-        .attr('target', 'blank')
-        .attr('action', this.settService.projectsettings.plugins.pdfexport.url)
-        .appendTo('body');
-
-      const json_obj = {
-        translation: this.lang.instant('general'),
-        guidelines: this.guidelines
-      };
-
-      const json = jQuery('<input/>')
-        .attr('name', 'json')
-        .attr('type', 'text')
-        .attr('value', JSON.stringify(json_obj));
-      form.append(json);
-      form.submit().remove();
-    }
-  }
-
-  public close() {
-    this.modal.hide();
-    this.visible = false;
-
-    this.cd.markForCheck();
-    this.cd.detectChanges();
-
-    this.actionperformed.next();
   }
 }

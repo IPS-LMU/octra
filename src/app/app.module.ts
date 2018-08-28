@@ -25,22 +25,9 @@ import {
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {routing} from './app.routes';
 
-import {
-  APIService,
-  AppStorageService,
-  AudioService,
-  KeymappingService,
-  SettingsService
-} from './core/shared/service';
+import {APIService, AppStorageService, AudioService, KeymappingService, SettingsService} from './core/shared/service';
 
-import {
-  ALoginGuard,
-  DeALoginGuard,
-  LogoutGuard,
-  MembersAreaGuard,
-  SettingsGuard,
-  TranscrEndGuard
-} from './core/shared/guard';
+import {ALoginGuard, DeALoginGuard, LogoutGuard, MembersAreaGuard, SettingsGuard, TranscrEndGuard} from './core/shared/guard';
 
 import {AppComponent} from './app.component';
 

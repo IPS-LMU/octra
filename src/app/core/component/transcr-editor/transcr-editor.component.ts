@@ -4,7 +4,6 @@ import {TranslateService} from '@ngx-translate/core';
 
 import {BrowserInfo, Functions, KeyMapping, SubscriptionManager} from '../../shared';
 import {TranscriptionService} from '../../shared/service';
-import {isNullOrUndefined} from 'util';
 import {Segments} from '../../obj/Annotation/Segments';
 import {AudioChunk, AudioTime} from '../../../media-components/obj/media/audio';
 import {isNumeric} from 'rxjs/util/isNumeric';
@@ -30,110 +29,16 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Output('boundaryinserted') boundaryinserted: EventEmitter<number> = new EventEmitter<number>();
   @Output('selectionchanged') selectionchanged: EventEmitter<number> = new EventEmitter<number>();
 
-  private _settings: TranscrEditorConfig;
-  private subscrmanager: SubscriptionManager;
-  private init = 0;
-  public focused = false;
-
-  public get summernote() {
-    return this.textfield.summernote;
-  }
-
-  public get caretpos(): number {
-    if (!this.focused) {
-      return -1;
-    }
-    return jQuery('.note-editable:eq(0)').caret('pos');
-  }
-
-  public segpopover: any = null;
-
   @Input() visible = true;
   @Input() markers: any = true;
   @Input() easymode = true;
   @Input() height = 0;
   @Input() playposition: AudioTime;
-
   @Input() audiochunk: AudioChunk;
 
-  get rawText(): string {
-    const result = this.tidyUpRaw(this._rawText);
-    return result;
-  }
-
-  set rawText(value: string) {
-    this._rawText = this.tidyUpRaw(value);
-    this.init = 0;
-    const html = this.rawToHTML(this._rawText);
-    this.textfield.summernote('code', html);
-
-    this.initPopover();
-  }
-
-  get audiomanager(): AudioManager {
-    return this.audiochunk.audiomanager;
-  }
-
-  set segments(segments: Segments) {
-    let result = '';
-
-    for (let i = 0; i < segments.length; i++) {
-      const seg = segments.get(i);
-      result += seg.transcript;
-
-      if (i < segments.length - 1) {
-        result += `{${segments.get(i).time.samples}}`;
-      }
-    }
-    this.rawText = result;
-  }
-
-  get Settings(): any {
-    return this._settings;
-  }
-
-  get html(): string {
-    return (this.textfield) ? this.textfield.summernote('code') : '';
-  }
-
-  set Settings(value: any) {
-    this._settings = value;
-  }
-
   public textfield: any = null;
-  private _rawText = '';
-  private summernote_ui: any = null;
-  private _is_typing = false;
-  private lastkeypress = 0;
-
-  constructor(private cd: ChangeDetectorRef,
-              private langService: TranslateService,
-              private transcrService: TranscriptionService) {
-
-    this._settings = new TranscrEditorConfig().Settings;
-    this.subscrmanager = new SubscriptionManager();
-  }
-
-  ngOnInit() {
-    this.Settings.height = this.height;
-    this.initialize();
-  }
-
-  ngOnChanges(obj) {
-    let renew = false;
-    if (!isNullOrUndefined(obj.markers) && obj.markers.previousValue !== obj.markers.newValue) {
-      renew = true;
-    }
-    if (!isNullOrUndefined(obj.easymode) && obj.easymode.previousValue !== obj.easymode.newValue) {
-      renew = true;
-    }
-
-    if (renew) {
-      this.textfield.summernote('destroy');
-      this.initialize();
-      this.initPopover();
-    }
-  }
+  public focused = false;
+  public segpopover: any = null;
 
   /**
    * converts the editor's html text to raw text
@@ -173,7 +78,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             }
           }
         } else if (tagName.toLowerCase() === 'img') {
-          if (!isNullOrUndefined(jQuery(elem).attr('data-samples'))) {
+          if (!(jQuery(elem).attr('data-samples') === null || jQuery(elem).attr('data-samples') === undefined)) {
             const textnode = document.createTextNode(`{${jQuery(elem).attr('data-samples')}}`);
             jQuery(elem).before(textnode);
             jQuery(elem).remove();
@@ -195,32 +100,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     jQuery.each(dom.children(), replace_func);
 
-    let rawText = dom.text();
+    const rawText = dom.text();
 
     return rawText;
   };
-
-  ngOnDestroy() {
-    this.destroy();
-    jQuery('.note-editable.panel-body img').off('click');
-  }
-
-  public update() {
-    this.destroy();
-    this.initialize();
-    this.cd.detectChanges();
-  }
-
-  /**
-   * destroys the summernote editor
-   */
-  private destroy() {
-    this.textfield.summernote('destroy');
-    // delete tooltip overlays
-    jQuery('.tooltip').remove();
-    this.subscrmanager.destroy();
-  }
-
   /**
    * initializes the editor and the containing summernote editor
    */
@@ -291,7 +174,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           html = '<span>' + this.rawToHTML(html) + '</span>';
           html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
           const html_obj = jQuery(html);
-          if (!isNullOrUndefined(this.rawText) && this._rawText !== '') {
+          if (!(this.rawText === null || this.rawText === undefined) && this._rawText !== '') {
             this.textfield.summernote('editor.insertNode', html_obj[0]);
           } else {
             this.textfield.summernote('code', html);
@@ -338,6 +221,250 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     this.loaded.emit(true);
   };
+  /**
+   * inserts a marker to the editors html
+   * @param marker_code
+   * @param icon_url
+   */
+  insertMarker = (marker_code, icon_url) => {
+    if ((icon_url === null || icon_url === undefined) || icon_url === '') {
+      // text only
+      this.textfield.summernote('editor.insertText', marker_code + ' ');
+    } else {
+      marker_code = marker_code.replace(/(<)|(>)/g, (g0, g1, g2) => {
+        if (g2 === undefined && g1 !== undefined) {
+          return '&lt;';
+        } else {
+          return '&gt;';
+        }
+      });
+
+      const element = document.createElement('img');
+      element.setAttribute('src', icon_url);
+      element.setAttribute('class', 'btn-icon-text');
+      element.setAttribute('style', 'height:16px');
+      element.setAttribute('data-marker-code', marker_code);
+      element.setAttribute('alt', marker_code);
+
+      this.textfield.summernote('editor.insertNode', element);
+    }
+    this.updateTextField();
+  };
+  /**
+   * called when key pressed in editor
+   * @param $event
+   */
+  onKeyDownSummernote = ($event) => {
+    const comboKey = KeyMapping.getShortcutCombination($event);
+    const platform = BrowserInfo.platform;
+
+    if (comboKey !== '') {
+      if (this.isDisabledKey(comboKey)) {
+        $event.preventDefault();
+      } else {
+        if (comboKey === 'ALT + S' && this.Settings.special_markers.boundary) {
+          // add boundary
+          this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
+          this.boundaryinserted.emit(this.audiochunk.playposition.samples);
+          $event.preventDefault();
+        } else {
+          for (let i = 0; i < this.markers.length; i++) {
+            const marker: any = this.markers[i];
+            if (marker.shortcut[platform] === comboKey) {
+              $event.preventDefault();
+              this.insertMarker(marker.code, marker.icon_url);
+              this.marker_insert.emit(marker.name);
+              return;
+            }
+          }
+        }
+      }
+    }
+  };
+  /**
+   * called after key up in editor
+   * @param $event
+   */
+  onKeyUpSummernote = ($event) => {
+    // update rawText
+    this.updateTextField();
+    this.onkeyup.emit($event);
+
+
+    setTimeout(() => {
+      if (Date.now() - this.lastkeypress >= 700) {
+        if (this._is_typing && this.focused) {
+          this.typing.emit('stopped');
+        }
+        this._is_typing = false;
+      }
+    }, 700);
+
+    if (!this._is_typing && this.focused) {
+      this.typing.emit('started');
+    }
+    this._is_typing = true;
+    this.lastkeypress = Date.now();
+
+    /*
+    TODO implement auto-validation
+
+    setTimeout(() => {
+      if (Date.now() - this.lastkeypress >= 1000) {
+        this.saveSelection();
+        let code = this.textfield.summernote('code');
+        code = code.replace('<span class="val-error"><sel-start></sel-start><sel-end></sel-end></span>', '<sel-start></sel-start><sel-end></sel-end>');
+        console.log(`BEFORE`);
+        console.log(code);
+        console.log(`AFTER!`);
+
+        code = code.replace(/(<span(?:[\s ]|(?:&nbsp;))class=['"]val-error['"]>)|(<\/span>)/g, '');
+
+        /*
+        code = code.replace(/<span(?:[\s ]|(?:&nbsp;))class=['"]val-error['"]>(.*)(?:[\s ]|(?:&nbsp;))<\/span>/g, (g0, g1) => {
+          return g1;
+        });
+
+        code = this.convertEntitiesToString(code);
+        console.log(code);
+        code = this.transcrService.underlineTextRed(code, validateAnnotation(code, this.transcrService.guidelines));
+        code = code.replace('<br>', '');
+        this.textfield.summernote('code', code);
+        console.log(`END:`);
+        console.log(code);
+        this.restoreSelection();
+      }
+    }, 1000);
+    */
+  };
+  /**
+   * set focus to the very last position of the editors text
+   */
+  public focus = (later: boolean = false) => {
+    const func = () => {
+      try {
+        if (this.rawText !== '' && this.html !== '<p><br/></p>') {
+          Functions.placeAtEnd(jQuery('.note-editable')[0]);
+        }
+        this.textfield.summernote('focus');
+      } catch (exception) {
+        // ignore errors
+      }
+    };
+
+    if (later) {
+      setTimeout(
+        () => {
+          func();
+        }, 300
+      );
+    } else {
+      func();
+    }
+  };
+  private _settings: TranscrEditorConfig;
+  private subscrmanager: SubscriptionManager;
+  private init = 0;
+  private summernote_ui: any = null;
+  private _is_typing = false;
+  private lastkeypress = 0;
+
+  public get summernote() {
+    return this.textfield.summernote;
+  }
+
+  public get caretpos(): number {
+    if (!this.focused) {
+      return -1;
+    }
+    return jQuery('.note-editable:eq(0)').caret('pos');
+  }
+
+  get audiomanager(): AudioManager {
+    return this.audiochunk.audiomanager;
+  }
+
+  set segments(segments: Segments) {
+    let result = '';
+
+    for (let i = 0; i < segments.length; i++) {
+      const seg = segments.get(i);
+      result += seg.transcript;
+
+      if (i < segments.length - 1) {
+        result += `{${segments.get(i).time.samples}}`;
+      }
+    }
+    this.rawText = result;
+  }
+
+  get Settings(): any {
+    return this._settings;
+  }
+
+  set Settings(value: any) {
+    this._settings = value;
+  }
+
+  get html(): string {
+    return (this.textfield) ? this.textfield.summernote('code') : '';
+  }
+
+  private _rawText = '';
+
+  get rawText(): string {
+    const result = this.tidyUpRaw(this._rawText);
+    return result;
+  }
+
+  set rawText(value: string) {
+    this._rawText = this.tidyUpRaw(value);
+    this.init = 0;
+    const html = this.rawToHTML(this._rawText);
+    this.textfield.summernote('code', html);
+
+    this.initPopover();
+  }
+
+  constructor(private cd: ChangeDetectorRef,
+              private langService: TranslateService,
+              private transcrService: TranscriptionService) {
+
+    this._settings = new TranscrEditorConfig().Settings;
+    this.subscrmanager = new SubscriptionManager();
+  }
+
+  ngOnInit() {
+    this.Settings.height = this.height;
+    this.initialize();
+  }
+
+  ngOnChanges(obj) {
+    let renew = false;
+    if (!(obj.markers === null || obj.markers === undefined) && obj.markers.previousValue !== obj.markers.newValue) {
+      renew = true;
+    }
+    if (!(obj.easymode === null || obj.easymode === undefined) && obj.easymode.previousValue !== obj.easymode.newValue) {
+      renew = true;
+    }
+
+    if (renew) {
+      this.textfield.summernote('destroy');
+      this.initialize();
+      this.initPopover();
+    }
+  }
+
+  ngOnDestroy() {
+    this.destroy();
+    jQuery('.note-editable.panel-body img').off('click');
+  }
+
+  public update() {
+    this.destroy();
+    this.initialize();
+    this.cd.detectChanges();
+  }
 
   /**
    * initializes the navbar bar of the editor
@@ -348,7 +475,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       str_array: []
     };
 
-    if (!isNullOrUndefined(this.markers)) {
+    if (!(this.markers === null || this.markers === undefined)) {
       for (let i = 0; i < this.markers.length; i++) {
         const marker = this.markers[i];
         result.buttons['' + i + ''] = this.createButton(marker);
@@ -367,7 +494,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     return () => {
       const platform = BrowserInfo.platform;
       let icon = '';
-      if ((marker.icon_url === null || marker.icon_url === undefined) || marker.icon_url == '') {
+      if ((marker.icon_url === null || marker.icon_url === undefined) || marker.icon_url === '') {
         // text only
         icon = marker.button_text;
 
@@ -435,7 +562,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           const editor_pos = jQuery('.note-toolbar-wrapper').offset();
           const seg_samples = jqueryobj.attr('data-samples');
 
-          if (!isNullOrUndefined(seg_samples) && Functions.isNumber(seg_samples)) {
+          if (!(seg_samples === null || seg_samples === undefined) && Functions.isNumber(seg_samples)) {
             const samples = Number(seg_samples);
             const time = new AudioTime(samples, this.audiomanager.ressource.info.samplerate);
 
@@ -505,36 +632,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     return result;
   }
 
-  /**
-   * inserts a marker to the editors html
-   * @param marker_code
-   * @param icon_url
-   */
-  insertMarker = (marker_code, icon_url) => {
-    if ((icon_url === null || icon_url === undefined) || icon_url === '') {
-      // text only
-      this.textfield.summernote('editor.insertText', marker_code + ' ');
-    } else {
-      marker_code = marker_code.replace(/(<)|(>)/g, (g0, g1, g2) => {
-        if (g2 === undefined && g1 !== undefined) {
-          return '&lt;';
-        } else {
-          return '&gt;';
-        }
-      });
-
-      const element = document.createElement('img');
-      element.setAttribute('src', icon_url);
-      element.setAttribute('class', 'btn-icon-text');
-      element.setAttribute('style', 'height:16px');
-      element.setAttribute('data-marker-code', marker_code);
-      element.setAttribute('alt', marker_code);
-
-      this.textfield.summernote('editor.insertNode', element);
-    }
-    this.updateTextField();
-  };
-
   insertBoundary(img_url: string) {
     const element = document.createElement('img');
     element.setAttribute('src', img_url);
@@ -566,7 +663,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           const editor_pos = jQuery('.note-toolbar-wrapper').offset();
           const seg_samples = jqueryobj.attr('data-samples');
 
-          if (!isNullOrUndefined(seg_samples) && Functions.isNumber(seg_samples)) {
+          if (!(seg_samples === null || seg_samples === undefined) && Functions.isNumber(seg_samples)) {
             const samples = Number(seg_samples);
             const time = new AudioTime(samples, this.audiomanager.ressource.info.samplerate);
 
@@ -636,7 +733,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   restoreSelection() {
     let elem = document.getElementsByClassName('note-editable')[0];
 
-    if (elem != null && elem.getElementsByTagName('sel-start')[0] !== undefined) {
+    if (!(elem === null || elem === undefined) && elem.getElementsByTagName('sel-start')[0] !== undefined) {
       let el = elem;
       let range = document.createRange();
       let sel = window.getSelection();
@@ -674,113 +771,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   /**
-   * called when key pressed in editor
-   * @param $event
-   */
-  onKeyDownSummernote = ($event) => {
-    const comboKey = KeyMapping.getShortcutCombination($event);
-    const platform = BrowserInfo.platform;
-
-    if (comboKey !== '') {
-      if (this.isDisabledKey(comboKey)) {
-        $event.preventDefault();
-      } else {
-        if (comboKey === 'ALT + S' && this.Settings.special_markers.boundary) {
-          // add boundary
-          this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
-          this.boundaryinserted.emit(this.audiochunk.playposition.samples);
-          $event.preventDefault();
-        } else {
-          for (let i = 0; i < this.markers.length; i++) {
-            const marker: any = this.markers[i];
-            if (marker.shortcut[platform] === comboKey) {
-              $event.preventDefault();
-              this.insertMarker(marker.code, marker.icon_url);
-              this.marker_insert.emit(marker.name);
-              return;
-            }
-          }
-        }
-      }
-    }
-  };
-
-  /**
-   * called after key up in editor
-   * @param $event
-   */
-  onKeyUpSummernote = ($event) => {
-    // update rawText
-    this.updateTextField();
-    this.onkeyup.emit($event);
-
-
-    setTimeout(() => {
-      if (Date.now() - this.lastkeypress >= 700) {
-        if (this._is_typing && this.focused) {
-          this.typing.emit('stopped');
-        }
-        this._is_typing = false;
-      }
-    }, 700);
-
-    if (!this._is_typing && this.focused) {
-      this.typing.emit('started');
-    }
-    this._is_typing = true;
-    this.lastkeypress = Date.now();
-
-    /*
-    TODO implement auto-validation
-
-    setTimeout(() => {
-      if (Date.now() - this.lastkeypress >= 1000) {
-        this.saveSelection();
-        let code = this.textfield.summernote('code');
-        code = code.replace('<span class="val-error"><sel-start></sel-start><sel-end></sel-end></span>', '<sel-start></sel-start><sel-end></sel-end>');
-        console.log(`BEFORE`);
-        console.log(code);
-        console.log(`AFTER!`);
-
-        code = code.replace(/(<span(?:[\s ]|(?:&nbsp;))class=['"]val-error['"]>)|(<\/span>)/g, '');
-
-        /*
-        code = code.replace(/<span(?:[\s ]|(?:&nbsp;))class=['"]val-error['"]>(.*)(?:[\s ]|(?:&nbsp;))<\/span>/g, (g0, g1) => {
-          return g1;
-        });
-
-        code = this.convertEntitiesToString(code);
-        console.log(code);
-        code = this.transcrService.underlineTextRed(code, validateAnnotation(code, this.transcrService.guidelines));
-        code = code.replace('<br>', '');
-        this.textfield.summernote('code', code);
-        console.log(`END:`);
-        console.log(code);
-        this.restoreSelection();
-      }
-    }, 1000);
-    */
-  };
-
-  /**
    * updates the raw text of the editor
    */
   updateTextField() {
     this._rawText = this.getRawText();
-  }
-
-  /**
-   * checks if the combokey is part of the configs disabledkeys
-   * @param comboKey
-   * @returns {boolean}
-   */
-  private isDisabledKey(comboKey: string): boolean {
-    for (let i = 0; i < this.Settings.disabled_keys.length; i++) {
-      if (this.Settings.disabled_keys[i] === comboKey) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**
@@ -818,6 +812,122 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   public convertEntitiesToString(str: string) {
     return jQuery('<textarea />').html(str).text();
+  }
+
+  public saveRange() {
+    this.textfield.summernote('saveRange');
+  }
+
+  public restoreRange() {
+    this.textfield.summernote('restoreRange');
+  }
+
+  public getSegmentByCaretPos(caretpos: number): number {
+    let rawtext = this.getRawText();
+
+    const regex2 = /{([0-9]+)}/g;
+
+    for (let i = 0; i < this.markers.length; i++) {
+      const marker = this.markers[i];
+
+      const replace_func = (x, g1, g2, g3) => {
+        const s1 = (g1) ? g1 : '';
+        const s3 = (g3) ? g3 : '';
+        return s1 + 'X' + s3;
+      };
+
+      const regex = new RegExp('(\\s)*(' + Functions.escapeRegex(marker.code) + ')(\\s)*', 'g');
+
+      rawtext = rawtext.replace(regex, replace_func);
+    }
+
+    const seg_texts = rawtext.split(regex2).filter((a) => {
+      if (!isNumeric(a)) {
+        return a;
+      }
+    });
+
+    let start = 0;
+
+    if (seg_texts.length > 1) {
+      if (caretpos === 0) {
+        return 0;
+      } else if (caretpos >= rawtext.replace(/\s?{([0-9]+)}\s?/g, ' ').length) {
+        return seg_texts.length - 1;
+      }
+
+      for (let i = 0; i < seg_texts.length; i++) {
+        const text = seg_texts[i];
+        if (start >= caretpos) {
+          return Math.max(0, i - 1);
+        }
+        start += text.length - 1;
+      }
+
+      if (start >= caretpos) {
+        return seg_texts.length - 1;
+      }
+
+    }
+
+    return -1;
+  }
+
+  /**
+   * destroys the summernote editor
+   */
+  private destroy() {
+    this.textfield.summernote('destroy');
+    // delete tooltip overlays
+    jQuery('.tooltip').remove();
+    this.subscrmanager.destroy();
+  }
+
+  /*
+
+  private validate() {
+    const val: any[] = this.transcrService.validate(this._rawText);
+    let ok = this.underlineTextRed(val);
+    ok = this.rawToHTML(ok);
+    this.textfield.summernote('code', ok);
+  }
+
+
+  private underlineTextRed(validation: any[]) {
+    const result = this._rawText;
+
+    const puffer = {};
+
+    if (validation.length > 0) {
+      for (let i = 0; i < validation.length; i++) {
+        if (!puffer.hasOwnProperty('p' + validation[i].start)) {
+          puffer['p' + validation[i].start] = '';
+        }
+        if (!puffer.hasOwnProperty('p' + (validation[i].start + validation[i].length))) {
+          puffer['p' + (validation[i].start + validation[i].length)] = '';
+        }
+
+        puffer['p' + validation[i].start] += '<div class=\'error_underline\'>';
+        puffer['p' + (validation[i].start + validation[i].length)] = '</div>' + puffer['p' + (validation[i].start + validation[i].length)];
+      }
+    }
+    return result;
+  }
+
+*/
+
+  /**
+   * checks if the combokey is part of the configs disabledkeys
+   * @param comboKey
+   * @returns {boolean}
+   */
+  private isDisabledKey(comboKey: string): boolean {
+    for (let i = 0; i < this.Settings.disabled_keys.length; i++) {
+      if (this.Settings.disabled_keys[i] === comboKey) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -911,130 +1021,12 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   /**
-   * set focus to the very last position of the editors text
-   */
-  public focus = (later: boolean = false) => {
-    const func = () => {
-      try {
-        if (this.rawText !== '' && this.html !== '<p><br/></p>') {
-          Functions.placeAtEnd(jQuery('.note-editable')[0]);
-        }
-        this.textfield.summernote('focus');
-      } catch (exception) {
-        // ignore errors
-      }
-    };
-
-    if (later) {
-      setTimeout(
-        () => {
-          func();
-        }, 300
-      );
-    } else {
-      func();
-    }
-  };
-
-  /**
    * tidy up the raw text, remove white spaces etc.
    * @param raw
    * @returns {string}
    */
   private tidyUpRaw(raw: string): string {
     return tidyUpAnnotation(raw, this.transcrService.guidelines);
-  }
-
-  /*
-
-  private validate() {
-    const val: any[] = this.transcrService.validate(this._rawText);
-    let ok = this.underlineTextRed(val);
-    ok = this.rawToHTML(ok);
-    this.textfield.summernote('code', ok);
-  }
-
-
-  private underlineTextRed(validation: any[]) {
-    const result = this._rawText;
-
-    const puffer = {};
-
-    if (validation.length > 0) {
-      for (let i = 0; i < validation.length; i++) {
-        if (!puffer.hasOwnProperty('p' + validation[i].start)) {
-          puffer['p' + validation[i].start] = '';
-        }
-        if (!puffer.hasOwnProperty('p' + (validation[i].start + validation[i].length))) {
-          puffer['p' + (validation[i].start + validation[i].length)] = '';
-        }
-
-        puffer['p' + validation[i].start] += '<div class=\'error_underline\'>';
-        puffer['p' + (validation[i].start + validation[i].length)] = '</div>' + puffer['p' + (validation[i].start + validation[i].length)];
-      }
-    }
-    return result;
-  }
-
-*/
-
-  public saveRange() {
-    this.textfield.summernote('saveRange');
-  }
-
-  public restoreRange() {
-    this.textfield.summernote('restoreRange');
-  }
-
-  public getSegmentByCaretPos(caretpos: number): number {
-    let rawtext = this.getRawText();
-
-    const regex2 = /{([0-9]+)}/g;
-
-    for (let i = 0; i < this.markers.length; i++) {
-      const marker = this.markers[i];
-
-      const replace_func = (x, g1, g2, g3) => {
-        const s1 = (g1) ? g1 : '';
-        const s3 = (g3) ? g3 : '';
-        return s1 + 'X' + s3;
-      };
-
-      const regex = new RegExp('(\\s)*(' + Functions.escapeRegex(marker.code) + ')(\\s)*', 'g');
-
-      rawtext = rawtext.replace(regex, replace_func);
-    }
-
-    const seg_texts = rawtext.split(regex2).filter((a) => {
-      if (!isNumeric(a)) {
-        return a;
-      }
-    });
-
-    let start = 0;
-
-    if (seg_texts.length > 1) {
-      if (caretpos === 0) {
-        return 0;
-      } else if (caretpos >= rawtext.replace(/\s?{([0-9]+)}\s?/g, ' ').length) {
-        return seg_texts.length - 1;
-      }
-
-      for (let i = 0; i < seg_texts.length; i++) {
-        const text = seg_texts[i];
-        if (start >= caretpos) {
-          return Math.max(0, i - 1);
-        }
-        start += text.length - 1;
-      }
-
-      if (start >= caretpos) {
-        return seg_texts.length - 1;
-      }
-
-    }
-
-    return -1;
   }
 
   /*

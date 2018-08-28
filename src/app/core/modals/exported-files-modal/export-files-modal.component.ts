@@ -5,7 +5,6 @@ import {TranscriptionService, UserInteractionsService} from '../../shared/servic
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
 import {Converter, IFile} from '../../obj/Converters';
-import {isNullOrUndefined} from 'util';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {OCTRANIMATIONS} from '../../shared';
 import {NavbarService} from '../../gui/navbar/navbar.service';
@@ -20,16 +19,13 @@ import {OAudiofile} from '../../obj/Annotation';
 
 export class ExportFilesModalComponent implements OnInit {
   modalRef: BsModalRef;
-  protected data = null;
   AppInfo = AppInfo;
   public visible = false;
-
   public export_states = [];
   public preparing = {
     name: '',
     preparing: false
   };
-
   public parentformat: {
     download: string,
     uri: SafeUrl
@@ -37,28 +33,23 @@ export class ExportFilesModalComponent implements OnInit {
     download: '',
     uri: ''
   };
-
-  public get arraybufferExists(): boolean {
-    return (!isNullOrUndefined(this.navbarServ.transcrService) && !isNullOrUndefined(this.navbarServ.transcrService.audiomanager.ressource.arraybuffer)
-      && this.navbarServ.transcrService.audiomanager.ressource.arraybuffer.byteLength > 0);
-  }
-
-
   public converters = AppInfo.converters;
-
   config: ModalOptions = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
   };
-
   @ViewChild('modal') modal: any;
-
   @Input() transcrService: TranscriptionService;
   @Input() uiService: UserInteractionsService;
-
+  protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();
+
+  public get arraybufferExists(): boolean {
+    return (!(this.navbarServ.transcrService === null || this.navbarServ.transcrService === undefined) && !(this.navbarServ.transcrService.audiomanager.ressource.arraybuffer === null || this.navbarServ.transcrService.audiomanager.ressource.arraybuffer === undefined)
+      && this.navbarServ.transcrService.audiomanager.ressource.arraybuffer.byteLength > 0);
+  }
 
   constructor(private sanitizer: DomSanitizer, private navbarServ: NavbarService) {
   }
@@ -120,7 +111,7 @@ export class ExportFilesModalComponent implements OnInit {
   }
 
   getAudioURI() {
-    if (!isNullOrUndefined(this.transcrService) && !isNullOrUndefined(this.transcrService.audiomanager.ressource.arraybuffer)) {
+    if (!(this.transcrService === null || this.transcrService === undefined) && !(this.transcrService.audiomanager.ressource.arraybuffer === null || this.transcrService.audiomanager.ressource.arraybuffer === undefined)) {
       this.preparing = {
         name: 'Audio',
         preparing: true
@@ -187,7 +178,7 @@ export class ExportFilesModalComponent implements OnInit {
   }
 
   getProtocol() {
-    if (!isNullOrUndefined(this.transcrService)) {
+    if (!(this.transcrService === null || this.transcrService === undefined)) {
       this.preparing = {
         name: 'Protocol',
         preparing: true

@@ -1,43 +1,49 @@
 import {AudioInfo} from '../AudioInfo';
 
 export abstract class AudioFormat {
-  get bitsPerSample(): number {
-    return this._bitsPerSample;
-  }
-
-  get byteRate(): number {
-    return this._byteRate;
-  }
-
-  get filename(): string {
-    return this._filename;
-  }
-
-  get channels(): number {
-    return this._channels;
-  }
-
-  get sampleRate(): number {
-    return this._sampleRate;
-  }
+  protected _extension: string;
 
   get extension(): string {
     return this._extension;
   }
 
+  protected _filename: string;
+
+  get filename(): string {
+    return this._filename;
+  }
+
+  protected _sampleRate: number;
+
+  get sampleRate(): number {
+    return this._sampleRate;
+  }
+
+  protected _channels: number;
+
+  get channels(): number {
+    return this._channels;
+  }
+
+  protected _byteRate: number;
+
+  get byteRate(): number {
+    return this._byteRate;
+  }
+
+  protected _bitsPerSample: number;
+
+  get bitsPerSample(): number {
+    return this._bitsPerSample;
+  }
+
+  protected _duration: number;
+
   get duration(): number {
     return this._duration;
   }
 
-  protected _extension: string;
-  protected _filename: string;
-  protected _sampleRate: number;
-  protected _channels: number;
-  protected _byteRate: number;
-  protected _bitsPerSample: number;
-  protected _duration: number;
-
-  constructor() {
+  protected constructor() {
   }
 
   public init(buffer: ArrayBuffer) {

@@ -22,8 +22,7 @@ import {
 } from '../../../core/shared/service';
 import {AudioTime, Segment, SubscriptionManager} from '../../../core/shared';
 import {AudioChunk, AudioRessource, AudioSelection} from '../../../media-components/obj/media/audio';
-import {isNullOrUndefined} from 'util';
-import {Segments} from '../../../core/obj/Annotation/Segments';
+import {Segments} from '../../../core/obj/Annotation';
 import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
 import {LoupeComponent} from '../../../media-components/components/audio/loupe';
 import {AudioNavigationComponent} from '../../../media-components/components/audio/audio-navigation';
@@ -35,13 +34,52 @@ import {AudioManager} from '../../../media-components/obj/media/audio/AudioManag
   styleUrls: ['./transcr-window.component.css']
 })
 export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterViewInit, OnDestroy, OnChanges {
+
   @ViewChild('loupe') loupe: LoupeComponent;
   @ViewChild('editor') editor: TranscrEditorComponent;
   @ViewChild('audionav') audionav: AudioNavigationComponent;
   @ViewChild('window') window: ElementRef;
-
   @Output('act') act: EventEmitter<string> = new EventEmitter<string>();
   @Input('easymode') easymode = false;
+  public pos_y = 0;
+  @Input() audiochunk: AudioChunk;
+  @Input() segment_index: number;
+  public doit = (direction: string) => {
+    if (this.audiomanager.audioplaying) {
+      this.loupe.viewer.stopPlayback();
+    }
+    this.save();
+    if (direction !== 'down') {
+      this.goToSegment(direction);
+      setTimeout(() => {
+        this.loupe.viewer.startPlayback();
+      }, 500);
+    } else {
+      this.close();
+    }
+  };
+  onKeyDown = ($event) => {
+    switch ($event.comboKey) {
+      case ('ALT + ARROWRIGHT'):
+        $event.event.preventDefault();
+        this.doit('right');
+        break;
+      case ('ALT + ARROWLEFT'):
+        $event.event.preventDefault();
+        this.doit('left');
+        break;
+      case ('ALT + ARROWDOWN'):
+        $event.event.preventDefault();
+        this.doit('down');
+        break;
+      case ('ESC'):
+        this.doit('down');
+        break;
+    }
+  };
+  private showWindow = false;
+  private subscrmanager: SubscriptionManager;
+  private temp_segments: Segments;
 
   @Output('shortcuttriggered')
   get shortcuttriggered(): EventEmitter<string> {
@@ -57,11 +95,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   get marker_click(): EventEmitter<string> {
     return this.editor.marker_click;
   }
-
-  private showWindow = false;
-  public pos_y = 0;
-  private subscrmanager: SubscriptionManager;
-  private temp_segments: Segments;
 
   get app_settings(): any {
     return this.settingsService.app_settings;
@@ -82,9 +115,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   get ressource(): AudioRessource {
     return this.audiochunk.audiomanager.ressource;
   }
-
-  @Input() audiochunk: AudioChunk;
-  @Input() segment_index: number;
 
   constructor(public keyMap: KeymappingService,
               public transcrService: TranscriptionService,
@@ -110,7 +140,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           this.segment_index < this.transcrService.currentlevel.segments.length) {
 
           if (this.appStorage.prompttext !== '' && (this.transcrService.currentlevel.segments.length <= 1 &&
-              this.transcrService.currentlevel.segments.get(0).transcript === '')) {
+            this.transcrService.currentlevel.segments.get(0).transcript === '')) {
             this.editor_rawText(this.appStorage.prompttext);
           } else {
             this.editor_rawText(this.transcrService.currentlevel.segments.get(this.segment_index).transcript);
@@ -128,7 +158,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       const current: AudioChunk = obj.audiochunk.currentValue;
 
       if (!obj.audiochunk.firstChange) {
-        if ((isNullOrUndefined(previous) && !isNullOrUndefined(current)) ||
+        if (((previous === null || previous === undefined) && !(current === null || current === undefined)) ||
           (current.time.start.samples !== previous.time.start.samples &&
             current.time.end.samples !== previous.time.end.samples)) {
           // audiochunk changed
@@ -203,7 +233,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       }
 
       this.uiService.addElementFromEvent('mouse_clicked', {value: event.type},
-        event.timestamp, Math.round(this.audiomanager.playposition  * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_buttons', segment);
+        event.timestamp, Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor),
+        this.editor.caretpos, 'audio_buttons', segment);
     }
 
     if (event.type === 'replay') {
@@ -260,7 +291,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         begin = this.transcrService.currentlevel.segments.get(this.segment_index - 1).time.clone();
       }
 
-      if (!isNullOrUndefined(segment)) {
+      if (!(segment === null || segment === undefined)) {
         this.editor.rawText = this.transcrService.currentlevel.segments.get(this.segment_index).transcript;
         this.audiochunk = new AudioChunk(new AudioSelection(begin, segment.time.clone()), this.audiochunk.audiomanager);
       }
@@ -291,7 +322,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
 
     this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
-      Math.round(this.audiomanager.playposition  * this.audiomanager.sampleRateFactor), this.editor.caretpos, type, segment);
+      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, type, segment);
   }
 
   onMarkerInsert(marker_code: string) {
@@ -314,7 +345,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
 
     this.uiService.addElementFromEvent('shortcut', {value: marker_code}, Date.now(),
-      Math.round(this.audiomanager.playposition  * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'markers', segment);
+      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'markers', segment);
   }
 
   onMarkerClick(marker_code: string) {
@@ -337,7 +368,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
 
     this.uiService.addElementFromEvent('mouse_clicked', {value: marker_code}, Date.now(),
-      Math.round(this.audiomanager.playposition  * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor_toolbar', segment);
+      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor_toolbar', segment);
   }
 
   onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
@@ -364,7 +395,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
 
     this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
-      Math.round(this.audiomanager.playposition  * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_speed', segment);
+      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_speed', segment);
 
   }
 
@@ -392,43 +423,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
 
     this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
-      Math.round(this.audiomanager.playposition  * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_volume', segment);
+      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_volume', segment);
   }
-
-  public doit = (direction: string) => {
-    if (this.audiomanager.audioplaying) {
-      this.loupe.viewer.stopPlayback();
-    }
-    this.save();
-    if (direction !== 'down') {
-      this.goToSegment(direction);
-      setTimeout(() => {
-        this.loupe.viewer.startPlayback();
-      }, 500);
-    } else {
-      this.close();
-    }
-  };
-
-  onKeyDown = ($event) => {
-    switch ($event.comboKey) {
-      case ('ALT + ARROWRIGHT'):
-        $event.event.preventDefault();
-        this.doit('right');
-        break;
-      case ('ALT + ARROWLEFT'):
-        $event.event.preventDefault();
-        this.doit('left');
-        break;
-      case ('ALT + ARROWDOWN'):
-        $event.event.preventDefault();
-        this.doit('down');
-        break;
-      case ('ESC'):
-        this.doit('down');
-        break;
-    }
-  };
 
   onBoundaryClicked(samples: number) {
     const i: number = this.temp_segments.getSegmentBySamplePosition(samples);
@@ -499,7 +495,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
 
     // shift rest of text to next segment
-    if (!isNullOrUndefined(this.temp_segments.get(seg_start + seg_texts.length - 1))) {
+    const found = this.temp_segments.get(seg_start + seg_texts.length - 1);
+
+    if (!(found === null || found === undefined)) {
       this.temp_segments.get(seg_start + seg_texts.length - 1).transcript = seg_texts[seg_texts.length - 1];
     }
   }

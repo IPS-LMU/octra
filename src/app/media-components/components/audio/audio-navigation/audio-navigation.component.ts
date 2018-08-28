@@ -33,46 +33,15 @@ export interface Buttons {
   styleUrls: ['./audio-navigation.component.css']
 })
 export class AudioNavigationComponent implements AfterViewInit {
-  get volume(): number {
-    return this._volume;
-  }
-
-  set volume(value: number) {
-    this.volumechange.emit({
-      old_value: Number(this._volume),
-      new_value: Number(value),
-      timestamp: Date.now()
-    });
-    this._volume = value;
-  }
-
   @Input() audioplaying = false;
   @Input() responsive = false;
   @Input() easymode = false;
-
   @Output() buttonclick = new EventEmitter<{ type: string, timestamp: number }>();
   @Output() volumechange = new EventEmitter<{ old_value: number, new_value: number, timestamp: number }>();
   @Output() aftervolumechange = new EventEmitter<{ new_value: number, timestamp: number }>();
   @Output() speedchange = new EventEmitter<{ old_value: number, new_value: number, timestamp: number }>();
   @Output() afterspeedchange = new EventEmitter<{ new_value: number, timestamp: number }>();
-
-  private _volume = 1;
-  private _speed = 1;
   @Input() public replay = false;
-
-  get speed(): number {
-    return this._speed;
-  }
-
-  set speed(value: number) {
-    this.speedchange.emit({
-      old_value: Number(this._speed),
-      new_value: Number(value),
-      timestamp: Date.now()
-    });
-    this._speed = value;
-  }
-
   @Input() buttons: Buttons = {
     play: {
       label: 'Play',
@@ -99,6 +68,36 @@ export class AudioNavigationComponent implements AfterViewInit {
       shortcut: 'SHIFT + DEL'
     }
   };
+
+  private _volume = 1;
+
+  get volume(): number {
+    return this._volume;
+  }
+
+  set volume(value: number) {
+    this.volumechange.emit({
+      old_value: Number(this._volume),
+      new_value: Number(value),
+      timestamp: Date.now()
+    });
+    this._volume = value;
+  }
+
+  private _speed = 1;
+
+  get speed(): number {
+    return this._speed;
+  }
+
+  set speed(value: number) {
+    this.speedchange.emit({
+      old_value: Number(this._speed),
+      new_value: Number(value),
+      timestamp: Date.now()
+    });
+    this._speed = value;
+  }
 
   constructor(private cd: ChangeDetectorRef) {
   }

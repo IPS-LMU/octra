@@ -1,7 +1,6 @@
 import {Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {ModalService} from '../modal.service';
-import {isNullOrUndefined} from 'util';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import {APIService} from '../../shared/service/api.service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
@@ -16,7 +15,6 @@ import {BsModalRef} from 'ngx-bootstrap';
 })
 export class OctraModalComponent implements OnInit, OnDestroy {
 
-  private _subscrmanager: SubscriptionManager;
   @ViewChild('login_invalid') login_invalid: BsModalRef;
   @ViewChild('transcription_delete') transcription_delete: BsModalRef;
   @ViewChild('transcription_stop') transcription_stop: BsModalRef;
@@ -24,18 +22,16 @@ export class OctraModalComponent implements OnInit, OnDestroy {
   @ViewChild('bugreport') bugreport: BsModalRef;
   @ViewChild('supportedfiles') supportedfiles: BsModalRef;
   @ViewChild('yesno') yesno: BsModalRef;
-
   public bgdescr = '';
   public bgemail = '';
   public sendpro_obj = true;
-
   public bugsent = false;
+  public data: any;
+  private _subscrmanager: SubscriptionManager;
 
   public get AppInfo(): any {
     return AppInfo;
   }
-
-  public data: any;
 
   constructor(private modService: ModalService,
               public bugService: BugReportService,
@@ -45,7 +41,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.bgemail = (!isNullOrUndefined(this.appStorage.email)) ? this.appStorage.email : '';
+    this.bgemail = (!(this.appStorage.email === null || this.appStorage.email === undefined)) ? this.appStorage.email : '';
     this._subscrmanager = new SubscriptionManager();
 
 
@@ -53,7 +49,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
       (result: any) => {
         this.data = result;
 
-        if (!isNullOrUndefined(result.type) && this[result.type] !== undefined) {
+        if (!(result.type === null || result.type === undefined) && this[result.type] !== undefined) {
           this[result.type].open(result.data).then(
             (answer) => {
               result.emitter.emit(answer);

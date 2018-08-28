@@ -3,27 +3,27 @@
         <div class="col-md-7">
             <div class="row" role="group" style="height:100%;">
                 <button *ngIf="!audioplaying" class="btn btn-info btn-raised w-20" name="play"
-                   (mousedown)="onButtonClick('play'); " title="{{buttons.play.label}}">
+                        (mousedown)="onButtonClick('play'); " title="{{buttons.play.label}}">
                     <fa-icon icon="play"></fa-icon>
                 </button>
                 <button *ngIf="audioplaying" class="btn btn-info btn-raised w-20" name="pause"
-                   (mousedown)="onButtonClick('pause')" title="{{buttons.pause.label}}">
+                        (mousedown)="onButtonClick('pause')" title="{{buttons.pause.label}}">
                     <fa-icon icon="pause"></fa-icon>
                 </button>
                 <button class="btn btn-info btn-raised w-20" name="stop" (mousedown)="onButtonClick('stop')"
-                   title="{{buttons.stop.label}}">
+                        title="{{buttons.stop.label}}">
                     <fa-icon icon="stop"></fa-icon>
                 </button>
                 <button class="btn btn-info btn-raised w-20" [ngClass]="{active: replay}"
-                   name="replay" (mousedown)="onButtonClick('replay')" title="{{buttons.replay.label}}">
+                        name="replay" (mousedown)="onButtonClick('replay')" title="{{buttons.replay.label}}">
                     <fa-icon icon="retweet"></fa-icon>
                 </button>
                 <button class="btn btn-info btn-raised w-20" name="step_back" title="{{buttons.backward.label}}"
-                   (mousedown)="onButtonClick('backward')">
+                        (mousedown)="onButtonClick('backward')">
                     <fa-icon icon="step-backward"></fa-icon>
                 </button>
                 <button class="btn btn-info btn-raised w-20" name="step_back" title="{{buttons.backwardtime.label}}"
-                   (mousedown)="onButtonClick('backward time')">
+                        (mousedown)="onButtonClick('backward time')">
                     <fa-icon icon="step-backward"></fa-icon>
                     <fa-icon [icon]="['fa', 'clock']"></fa-icon>
                 </button>

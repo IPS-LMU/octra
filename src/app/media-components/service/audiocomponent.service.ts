@@ -6,9 +6,9 @@ import {AudioviewerComponent} from '../components/audio/audioviewer';
 import {AudioManager} from '../obj/media/audio/AudioManager';
 
 export class AudioComponentService {
+  public audioTCalculator: AudioTimeCalculator;
   // LINES
   protected last_line: Line = null;
-
   // MOUSE
   protected mouse_down = false;
   protected mouse_click_pos: AVMousePos = new AVMousePos(
@@ -17,19 +17,12 @@ export class AudioComponentService {
     0,
     null
   );
-
   protected mousecursor: AVMousePos = null;
   protected playcursor: PlayCursor = null;
-
   // AUDIO
   protected audio_px_w = 0;
   protected hZoom = 0;
   protected audiochunk: AudioChunk;
-  public audioTCalculator: AudioTimeCalculator;
-
-  protected get audiomanager(): AudioManager {
-    return this.audiochunk.audiomanager;
-  }
 
   get AudioPxWidth(): number {
     return this.audio_px_w;
@@ -62,6 +55,10 @@ export class AudioComponentService {
 
   set PlayCursor(playcursor: PlayCursor) {
     this.playcursor = playcursor;
+  }
+
+  protected get audiomanager(): AudioManager {
+    return this.audiochunk.audiomanager;
   }
 
   constructor() {

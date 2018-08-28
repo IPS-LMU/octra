@@ -9,59 +9,9 @@ export class WavFormat extends AudioFormat {
     this._extension = '.wav';
   }
 
-  public init(buffer:ArrayBuffer){
+  public init(buffer: ArrayBuffer) {
     super.init(buffer);
     this.setBlockAlign(buffer);
-  }
-
-  protected setSampleRate(buffer: ArrayBuffer) {
-    const bufferPart = buffer.slice(24, 28);
-    const bufferView = new Uint32Array(bufferPart);
-
-    this._sampleRate = bufferView[0];
-  }
-
-  protected setChannels(buffer: ArrayBuffer) {
-    const bufferPart = buffer.slice(22, 24);
-    const bufferView = new Uint16Array(bufferPart);
-
-    this._channels = bufferView[0];
-  }
-
-  protected setBitsPerSample(buffer: ArrayBuffer) {
-    const bufferPart = buffer.slice(34, 36);
-    const bufferView = new Uint16Array(bufferPart);
-
-    this._bitsPerSample = bufferView[0];
-  }
-
-  protected setByteRate(buffer: ArrayBuffer) {
-    const bufferPart = buffer.slice(28, 32);
-    const bufferView = new Uint16Array(bufferPart);
-
-    this._byteRate = bufferView[0];
-  }
-
-  protected setBlockAlign(buffer: ArrayBuffer) {
-    const bufferPart = buffer.slice(32, 34);
-    const bufferView = new Uint16Array(bufferPart);
-
-    this.blockAlign = bufferView[0];
-  }
-
-  protected getDataChunkSize(buffer: ArrayBuffer): number {
-    const bufferPart = buffer.slice(40, 44);
-    const bufferView = new Uint32Array(bufferPart);
-
-    return bufferView[0];
-  }
-
-  protected getDataChunk(buffer: ArrayBuffer): ArrayBuffer {
-    return buffer.slice(44, buffer.byteLength);
-  }
-
-  protected setDuration(buffer: ArrayBuffer) {
-    this._duration = this.getDataChunkSize(buffer) / (this._channels * this._bitsPerSample) * 8;
   }
 
   public isValid(buffer: ArrayBuffer): boolean {
@@ -115,6 +65,56 @@ export class WavFormat extends AudioFormat {
     }
 
     return result;
+  }
+
+  protected setSampleRate(buffer: ArrayBuffer) {
+    const bufferPart = buffer.slice(24, 28);
+    const bufferView = new Uint32Array(bufferPart);
+
+    this._sampleRate = bufferView[0];
+  }
+
+  protected setChannels(buffer: ArrayBuffer) {
+    const bufferPart = buffer.slice(22, 24);
+    const bufferView = new Uint16Array(bufferPart);
+
+    this._channels = bufferView[0];
+  }
+
+  protected setBitsPerSample(buffer: ArrayBuffer) {
+    const bufferPart = buffer.slice(34, 36);
+    const bufferView = new Uint16Array(bufferPart);
+
+    this._bitsPerSample = bufferView[0];
+  }
+
+  protected setByteRate(buffer: ArrayBuffer) {
+    const bufferPart = buffer.slice(28, 32);
+    const bufferView = new Uint16Array(bufferPart);
+
+    this._byteRate = bufferView[0];
+  }
+
+  protected setBlockAlign(buffer: ArrayBuffer) {
+    const bufferPart = buffer.slice(32, 34);
+    const bufferView = new Uint16Array(bufferPart);
+
+    this.blockAlign = bufferView[0];
+  }
+
+  protected getDataChunkSize(buffer: ArrayBuffer): number {
+    const bufferPart = buffer.slice(40, 44);
+    const bufferView = new Uint32Array(bufferPart);
+
+    return bufferView[0];
+  }
+
+  protected getDataChunk(buffer: ArrayBuffer): ArrayBuffer {
+    return buffer.slice(44, buffer.byteLength);
+  }
+
+  protected setDuration(buffer: ArrayBuffer) {
+    this._duration = this.getDataChunkSize(buffer) / (this._channels * this._bitsPerSample) * 8;
   }
 
   private getFileFromBufferPart(originalBuffer: ArrayBuffer, data: number[], filename: string): File {

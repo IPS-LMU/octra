@@ -1,11 +1,6 @@
 import {AfterViewInit, Component, EventEmitter, OnChanges, OnDestroy, OnInit, ViewChild} from '@angular/core';
 
-import {
-  AudioService,
-  KeymappingService,
-  TranscriptionService,
-  UserInteractionsService
-} from '../../core/shared/service';
+import {AudioService, KeymappingService, TranscriptionService, UserInteractionsService} from '../../core/shared/service';
 import {SubscriptionManager} from '../../core/shared';
 import {SettingsService} from '../../core/shared/service/settings.service';
 import {AppStorageService} from '../../core/shared/service/appstorage.service';
@@ -32,10 +27,11 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   @ViewChild('nav') nav: AudioNavigationComponent;
   @ViewChild('audioplayer') audioplayer: AudioplayerComponent;
   @ViewChild('transcr') public editor: TranscrEditorComponent;
-
+  public audiochunk: AudioChunk;
+  public audiomanager: AudioManager;
   private subscrmanager: SubscriptionManager;
-
   private shortcuts: any;
+  private boundaryselected = false;
 
   public set NavShortCuts(value: any) {
     this.shortcuts = value;
@@ -56,10 +52,6 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
   public get projectsettings(): any {
     return this.settingsService.projectsettings;
   }
-
-  public audiochunk: AudioChunk;
-  public audiomanager: AudioManager;
-  private boundaryselected = false;
 
   constructor(public audio: AudioService,
               public keyMap: KeymappingService,
@@ -99,18 +91,6 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
   ngAfterViewInit() {
     this.loadEditor();
-  }
-
-  private loadEditor() {
-    if (this.transcrService.currentlevel.segments.length > 0) {
-      this.editor.segments = this.transcrService.currentlevel.segments;
-    }
-    if (this.appStorage.prompttext !== '' && (this.transcrService.currentlevel.segments.length <= 1 &&
-        this.transcrService.currentlevel.segments.get(0).transcript === '')) {
-      this.editor.rawText = this.appStorage.prompttext;
-    }
-    this.editor.Settings.height = 100;
-    this.editor.update();
   }
 
   ngOnDestroy() {
@@ -373,5 +353,17 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
         this.audioplayer.update();
       }
     } */
+  }
+
+  private loadEditor() {
+    if (this.transcrService.currentlevel.segments.length > 0) {
+      this.editor.segments = this.transcrService.currentlevel.segments;
+    }
+    if (this.appStorage.prompttext !== '' && (this.transcrService.currentlevel.segments.length <= 1 &&
+      this.transcrService.currentlevel.segments.get(0).transcript === '')) {
+      this.editor.rawText = this.appStorage.prompttext;
+    }
+    this.editor.Settings.height = 100;
+    this.editor.update();
   }
 }

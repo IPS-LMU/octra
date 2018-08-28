@@ -1,13 +1,4 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  HostListener,
-  OnDestroy,
-  OnInit,
-  ViewChild
-} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {NgForm} from '@angular/forms';
 import {LoginService} from './login.service';
@@ -16,7 +7,6 @@ import {ComponentCanDeactivate} from './login.deactivateguard';
 import {Observable} from 'rxjs/Observable';
 import {FileSize, Functions, OCTRANIMATIONS, SubscriptionManager} from '../../shared';
 import {SessionFile} from '../../obj/SessionFile';
-import {isArray, isNullOrUndefined, isNumber} from 'util';
 import {TranslateService} from '@ngx-translate/core';
 import {Converter} from '../../obj/Converters';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
@@ -32,18 +22,149 @@ import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcr
   animations: OCTRANIMATIONS
 })
 export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate, AfterViewInit {
+
   @ViewChild('f') loginform: NgForm;
   @ViewChild('dropzone') dropzone: OctraDropzoneComponent;
   @ViewChild('agreement') agreement: ElementRef;
   @ViewChild('localmode') localmode: ElementRef;
   @ViewChild('onlinemode') onlinemode: ElementRef;
-
   public valid_size = false;
   public agreement_checked = true;
-
   public projects: string[] = [];
+  valid = false;
+  member = {
+    id: '',
+    agreement: '',
+    project: '',
+    jobno: ''
+  };
+  err = '';
+  onOfflineSubmit = (form: NgForm) => {
+    if (!(this.appStorage.data_id === null || this.appStorage.data_id === undefined) && typeof this.appStorage.data_id === 'number') {
+      // last was online mode
+      this.setOnlineSessionToFree(() => {
+        this.audioService.registerAudioManager(this.dropzone.audiomanager);
+        this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
+          if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
+            const new_levels: OIDBLevel[] = [];
+            for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
+              new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
+            }
 
+            const new_links: OIDBLink[] = [];
+            for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
+              new_links.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
+            }
+
+            this.appStorage.overwriteAnnotation(new_levels).then(
+              () => {
+                return this.appStorage.overwriteLinks(new_links);
+              }
+            ).then(() => {
+              this.navigate();
+            }).catch((err) => {
+              console.error(err);
+            });
+          } else {
+            this.navigate();
+          }
+        }, (error) => {
+          alert(error);
+        });
+      });
+    } else {
+      this.audioService.registerAudioManager(this.dropzone.audiomanager);
+      this.appStorage.beginLocalSession(this.dropzone.files, true, () => {
+        if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
+          const new_levels: OIDBLevel[] = [];
+          for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
+            new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
+          }
+
+          const new_links: OIDBLink[] = [];
+          for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
+            new_links.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
+          }
+
+          this.appStorage.overwriteAnnotation(new_levels).then(() => {
+            return this.appStorage.overwriteLinks(new_links);
+          }).then(() => {
+            this.navigate();
+          }).catch((err) => {
+            console.error(err);
+          });
+        } else {
+          this.navigate();
+        }
+      }, (error) => {
+        alert(error);
+      });
+    }
+  };
+  newTranscription = () => {
+    this.audioService.registerAudioManager(this.dropzone.audiomanager);
+
+    this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
+        if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
+          const new_levels: OIDBLevel[] = [];
+          for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
+            new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
+          }
+
+          const new_links: OIDBLink[] = [];
+          for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
+            new_links.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
+          }
+
+          this.appStorage.overwriteAnnotation(new_levels).then(
+            () => {
+              return this.appStorage.overwriteLinks(new_links);
+            }
+          ).then(() => {
+            this.navigate();
+          }).catch((err) => {
+            console.error(err);
+          });
+        } else {
+          this.navigate();
+        }
+      },
+      (error) => {
+        if (error === 'file not supported') {
+          this.modService.show('error', {
+            text: this.langService.instant('reload-file.file not supported', {type: ''})
+          });
+        }
+      }
+    );
+  };
   private subscrmanager: SubscriptionManager;
+  private navigate = (): void => {
+    this.router.navigate(['user'], {
+      queryParamsHandling: 'preserve'
+    });
+  };
+  private setOnlineSessionToFree = (callback: () => void) => {
+    // check if old annotation is already annotated
+    this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
+      (json) => {
+        if (!(json.data === null || json.data === undefined) && json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
+          this.subscrmanager.add(this.api.closeSession(this.appStorage.user.id, this.appStorage.data_id, '').subscribe(
+            (result2) => {
+              callback();
+            }
+          ));
+        } else {
+          callback();
+        }
+      },
+      (err) => {
+        // ignore error because this isn't important
+        console.error(err);
+        callback();
+      }
+    ));
+  };
 
   get sessionfile(): SessionFile {
     return this.appStorage.sessionfile;
@@ -56,17 +177,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   public get Math(): Math {
     return Math;
   }
-
-  valid = false;
-
-  member = {
-    id: '',
-    agreement: '',
-    project: '',
-    jobno: ''
-  };
-
-  err = '';
 
   constructor(private router: Router,
               public appStorage: AppStorageService,
@@ -87,15 +197,15 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     }
 
     const loaduser = () => {
-      if (!isNullOrUndefined(this.appStorage.user) && this.appStorage.user.id !== '-1') {
+      if (!(this.appStorage.user === null || this.appStorage.user === undefined) && this.appStorage.user.id !== '-1') {
         this.member.id = this.appStorage.user.id;
       }
 
-      if (!isNullOrUndefined(this.appStorage.user) && this.appStorage.user.hasOwnProperty('project')) {
+      if (!(this.appStorage.user === null || this.appStorage.user === undefined) && this.appStorage.user.hasOwnProperty('project')) {
         this.member.project = this.appStorage.user.project;
       }
 
-      if (!isNullOrUndefined(this.appStorage.user) && this.appStorage.user.hasOwnProperty('jobno')
+      if (!(this.appStorage.user === null || this.appStorage.user === undefined) && this.appStorage.user.hasOwnProperty('jobno')
         && this.appStorage.user.jobno !== null && this.appStorage.user.jobno > -1) {
         this.member.jobno = this.appStorage.user.jobno.toString();
       }
@@ -141,7 +251,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     let new_session_after_old = false;
     let continue_session = false;
 
-    if (isNullOrUndefined(this.member.jobno) || this.member.jobno === '') {
+    if ((this.member.jobno === null || this.member.jobno === undefined) || this.member.jobno === '') {
       this.member.jobno = '0';
     }
 
@@ -150,13 +260,13 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       new_session = true;
 
     } else {
-      if (!isNullOrUndefined(this.appStorage.data_id) && isNumber(this.appStorage.data_id)) {
+      if (!(this.appStorage.data_id === null || this.appStorage.data_id === undefined) && typeof this.appStorage.data_id === 'number') {
         // last session was online session
         // check if credentials are available
         if (
-          !isNullOrUndefined(this.appStorage.user.project) &&
-          !isNullOrUndefined(this.appStorage.user.jobno) &&
-          !isNullOrUndefined(this.appStorage.user.id)
+          !(this.appStorage.user.project === null || this.appStorage.user.project === undefined) &&
+          !(this.appStorage.user.jobno === null || this.appStorage.user.jobno === undefined) &&
+          !(this.appStorage.user.id === null || this.appStorage.user.id === undefined)
         ) {
           // check if credentials are the same like before
           if (
@@ -241,78 +351,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     }
   }
 
-  onOfflineSubmit = (form: NgForm) => {
-    if (!isNullOrUndefined(this.appStorage.data_id) && isNumber(this.appStorage.data_id)) {
-      // last was online mode
-      this.setOnlineSessionToFree(() => {
-        this.audioService.registerAudioManager(this.dropzone.audiomanager);
-        this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
-          if (!isNullOrUndefined(this.dropzone.oannotation)) {
-            const new_levels: OIDBLevel[] = [];
-            for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
-              new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
-            }
-
-            const new_links: OIDBLink[] = [];
-            for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
-              new_links.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
-            }
-
-            this.appStorage.overwriteAnnotation(new_levels).then(
-              () => {
-                return this.appStorage.overwriteLinks(new_links);
-              }
-            ).then(() => {
-              this.navigate();
-            }).catch((err) => {
-              console.error(err);
-            });
-          } else {
-            this.navigate();
-          }
-        }, (error) => {
-          alert(error);
-        });
-      });
-    } else {
-      this.audioService.registerAudioManager(this.dropzone.audiomanager);
-      this.appStorage.beginLocalSession(this.dropzone.files, true, () => {
-        if (!isNullOrUndefined(this.dropzone.oannotation)) {
-          const new_levels: OIDBLevel[] = [];
-          for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
-            new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
-          }
-
-          const new_links: OIDBLink[] = [];
-          for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
-            new_links.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
-          }
-
-          this.appStorage.overwriteAnnotation(new_levels).then(() => {
-            return this.appStorage.overwriteLinks(new_links);
-          }).then(() => {
-            this.navigate();
-          }).catch((err) => {
-            console.error(err);
-          });
-        } else {
-          this.navigate();
-        }
-      }, (error) => {
-        alert(error);
-      });
-    }
-  };
-
   canDeactivate(): Observable<boolean> | boolean {
     return (this.valid);
   }
-
-  private navigate = (): void => {
-    this.router.navigate(['user'], {
-      queryParamsHandling: 'preserve'
-    });
-  };
 
   @HostListener('window:resize', ['$event'])
   onResize($event) {
@@ -328,50 +369,13 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     return Functions.buildStr('{0} ({1} {2})', [file.name, (Math.round(fsize.size * 100) / 100), fsize.label]);
   }
 
-  newTranscription = () => {
-    this.audioService.registerAudioManager(this.dropzone.audiomanager);
-
-    this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
-        if (!isNullOrUndefined(this.dropzone.oannotation)) {
-          const new_levels: OIDBLevel[] = [];
-          for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
-            new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
-          }
-
-          const new_links: OIDBLink[] = [];
-          for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
-            new_links.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
-          }
-
-          this.appStorage.overwriteAnnotation(new_levels).then(
-            () => {
-              return this.appStorage.overwriteLinks(new_links);
-            }
-          ).then(() => {
-            this.navigate();
-          }).catch((err) => {
-            console.error(err);
-          });
-        } else {
-          this.navigate();
-        }
-      },
-      (error) => {
-        if (error === 'file not supported') {
-          this.modService.show('error', {
-            text: this.langService.instant('reload-file.file not supported', {type: ''})
-          });
-        }
-      }
-    );
-  };
-
   getFileStatus(): string {
-    if (!isNullOrUndefined(this.dropzone.files) && this.dropzone.files.length > 0 &&
-      (!isNullOrUndefined(this.dropzone.oaudiofile))) {
+    if (!(this.dropzone.files === null || this.dropzone.files === undefined) && this.dropzone.files.length > 0 &&
+      (!(this.dropzone.oaudiofile === null || this.dropzone.oaudiofile === undefined))) {
       // check conditions
-      if (isNullOrUndefined(this.appStorage.sessionfile) || (this.dropzone.oaudiofile.name === this.appStorage.sessionfile.name)
-        && isNullOrUndefined(this.dropzone.oannotation)) {
+      if ((this.appStorage.sessionfile === null || this.appStorage.sessionfile === undefined)
+        || (this.dropzone.oaudiofile.name === this.appStorage.sessionfile.name)
+        && (this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
         return 'start';
       } else {
         return 'new';
@@ -397,10 +401,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   loadPojectsList() {
     this.subscrmanager.add(this.api.getProjects().subscribe((json) => {
-        if (isArray(json.data)) {
+        if (Array.isArray(json.data)) {
           this.projects = json.data;
 
-          if (!isNullOrUndefined(this.settingsService.app_settings.octra.allowed_projects) && this.settingsService.app_settings.octra.allowed_projects.length > 0) {
+          if (!(this.settingsService.app_settings.octra.allowed_projects === null ||
+            this.settingsService.app_settings.octra.allowed_projects === undefined)
+            && this.settingsService.app_settings.octra.allowed_projects.length > 0) {
             // filter disabled projects
             this.projects = this.projects.filter((a) => {
               return (this.settingsService.app_settings.octra.allowed_projects.findIndex((b) => {
@@ -408,12 +414,14 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               }) > -1);
             });
           }
-          if (!isNullOrUndefined(this.appStorage.user) &&
-            !isNullOrUndefined(this.appStorage.user.project) && this.appStorage.user.project !== '') {
-            if (isNullOrUndefined(this.projects.find(
+          if (!(this.appStorage.user === null || this.appStorage.user === undefined) &&
+            !(this.appStorage.user.project === null || this.appStorage.user.project === undefined) && this.appStorage.user.project !== '') {
+
+            const found = this.projects.find(
               (x) => {
                 return x === this.appStorage.user.project;
-              }))) {
+              });
+            if ((found === null || found === undefined)) {
               // make sure that old project is in list
               this.projects.push(this.appStorage.user.project);
             }
@@ -427,6 +435,25 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   public selectProject(event: HTMLSelectElement) {
     this.member.project = event.value;
+  }
+
+  public testFile(converter: Converter, file: File) {
+    const reader: FileReader = new FileReader();
+    reader.onload = function (e) {
+      // e.target.result should contain the text
+    };
+    reader.readAsText(file);
+    reader.readAsText(file, 'utf-8');
+  }
+
+  onTranscriptionDelete() {
+    this.modService.show('transcription_delete').then((answer: ModalDeleteAnswer) => {
+      if (answer === ModalDeleteAnswer.DELETE) {
+        this.newTranscription();
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   private createNewSession(form: NgForm) {
@@ -449,7 +476,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               if (json.data.hasOwnProperty('transcript')) {
                 const transcript = JSON.parse(json.data.transcript);
 
-                if (isArray(transcript) && transcript.length > 0) {
+                if (Array.isArray(transcript) && transcript.length > 0) {
                   this.appStorage.servertranscipt = transcript;
                 }
               }
@@ -492,46 +519,5 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         }
       }
     ));
-  }
-
-  private setOnlineSessionToFree = (callback: () => void) => {
-    // check if old annotation is already annotated
-    this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
-      (json) => {
-        if (!isNullOrUndefined(json.data) && json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
-          this.subscrmanager.add(this.api.closeSession(this.appStorage.user.id, this.appStorage.data_id, '').subscribe(
-            (result2) => {
-              callback();
-            }
-          ));
-        } else {
-          callback();
-        }
-      },
-      (err) => {
-        // ignore error because this isn't important
-        console.error(err);
-        callback();
-      }
-    ));
-  };
-
-  public testFile(converter: Converter, file: File) {
-    const reader: FileReader = new FileReader();
-    reader.onload = function (e) {
-      // e.target.result should contain the text
-    };
-    reader.readAsText(file);
-    reader.readAsText(file, 'utf-8');
-  }
-
-  onTranscriptionDelete() {
-    this.modService.show('transcription_delete').then((answer: ModalDeleteAnswer) => {
-      if (answer === ModalDeleteAnswer.DELETE) {
-        this.newTranscription();
-      }
-    }).catch((error) => {
-      console.error(error);
-    });
   }
 }

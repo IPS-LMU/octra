@@ -13,7 +13,6 @@ import {
 } from '@angular/core';
 import {AudioviewerComponent, AudioviewerConfig, AudioviewerService} from '../audioviewer';
 import {AudioChunk} from '../../../obj/media/audio';
-import {isNullOrUndefined} from 'util';
 import {AVMousePos} from '../../../obj/AVMousePos';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
 
@@ -37,9 +36,12 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
 
   @Input('audiochunk') audiochunk: AudioChunk;
   @Input('height') height: number;
-
-  private subscrmanager;
   public name: string;
+  public pos: any = {
+    x: 0,
+    y: 0
+  };
+  private subscrmanager;
 
   public get zoomY(): number {
     return this.viewer.av.zoomY;
@@ -66,19 +68,6 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
     this.viewer.margin = value;
   }
 
-  public pos: any = {
-    x: 0,
-    y: 0
-  };
-
-  public getLocation(): any {
-    const rect = this.loupe.nativeElement.getBoundingClientRect();
-    return {
-      x: rect.left,
-      y: rect.top
-    };
-  }
-
   get Settings(): AudioviewerConfig {
     return this.viewer.Settings;
   }
@@ -92,11 +81,19 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
     this.subscrmanager = new SubscriptionManager();
   }
 
+  public getLocation(): any {
+    const rect = this.loupe.nativeElement.getBoundingClientRect();
+    return {
+      x: rect.left,
+      y: rect.top
+    };
+  }
+
   ngOnChanges(obj: SimpleChanges) {
   }
 
   ngOnInit() {
-    if (!isNullOrUndefined(this.height)) {
+    if (!(this.height === null || this.height === undefined)) {
       this.viewer.Settings.multi_line = false;
       this.viewer.Settings.lineheight = this.height;
       this.viewer.Settings.justify_signal_height = true;

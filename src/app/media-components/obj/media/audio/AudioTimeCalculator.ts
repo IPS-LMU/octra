@@ -2,8 +2,8 @@ import {AudioTime} from './AudioTime';
 import {AudioChunk} from './AudioChunk';
 
 export class AudioTimeCalculator {
-  public static roundSamples(samples: number) {
-    return Math.round(samples);
+  set duration(value: AudioTime) {
+    this._duration = value;
   }
 
   constructor(public samplerate: number,
@@ -14,8 +14,8 @@ export class AudioTimeCalculator {
     }
   }
 
-  set duration(value: AudioTime) {
-    this._duration = value;
+  public static roundSamples(samples: number) {
+    return Math.round(samples);
   }
 
   public samplestoAbsX(time_samples: number, duration?: AudioTime): number {

@@ -1,6 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../Annotation/AnnotJSON';
-import {isNullOrUndefined} from 'util';
 
 export class TextConverter extends Converter {
 
@@ -21,7 +20,7 @@ export class TextConverter extends Converter {
     let result = '';
     let filename = '';
 
-    if (!isNullOrUndefined(levelnum) && levelnum < annotation.levels.length) {
+    if (!(levelnum === null || levelnum === undefined) && levelnum < annotation.levels.length) {
       const level: OLevel = annotation.levels[levelnum];
 
       if (level.type === 'SEGMENT') {

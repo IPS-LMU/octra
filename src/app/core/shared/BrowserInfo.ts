@@ -7,15 +7,15 @@ export class BrowserInfo {
     }
   }
 
-  public static get browser(): string{
+  public static get browser(): string {
     return (!(platform === null || platform === undefined)) ? platform.name : '';
   }
 
-  public static get version(): string{
+  public static get version(): string {
     return (!(platform === null || platform === undefined)) ? platform.version : '';
   }
 
-  public static get os(): any{
+  public static get os(): any {
     return (!(platform === null || platform === undefined)) ? platform.os : null;
   }
 }

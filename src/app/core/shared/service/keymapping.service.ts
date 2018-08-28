@@ -1,22 +1,30 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {KeyMapping} from '../../obj/KeyMapping';
 import {BrowserInfo} from '../BrowserInfo';
-import {isNullOrUndefined} from 'util';
 
 @Injectable()
 export class KeymappingService {
+  private shortcuts: any[] = [];
+  private onKeyDown = ($event) => {
+    const combo = KeyMapping.getShortcutCombination($event);
+    this._onkeydown.emit({comboKey: combo, event: $event});
+  };
+  private onKeyUp = ($event) => {
+    const combo = KeyMapping.getShortcutCombination($event);
+    this._onkeyup.emit({comboKey: combo, event: $event});
+  };
+
+  private _onkeydown: EventEmitter<any>;
+
   get onkeydown(): EventEmitter<any> {
     return this._onkeydown;
   }
 
+  private _onkeyup: EventEmitter<any>;
+
   get onkeyup(): EventEmitter<any> {
     return this._onkeyup;
   }
-
-  private shortcuts: any[] = [];
-
-  private _onkeydown: EventEmitter<any>;
-  private _onkeyup: EventEmitter<any>;
 
   constructor() {
     this._onkeydown = new EventEmitter<any>();
@@ -25,17 +33,6 @@ export class KeymappingService {
     this._onkeyup = new EventEmitter<any>();
     window.onkeyup = this.onKeyUp;
   }
-
-  private onKeyDown = ($event) => {
-    const combo = KeyMapping.getShortcutCombination($event);
-    this._onkeydown.emit({comboKey: combo, event: $event});
-  };
-
-  private onKeyUp = ($event) => {
-    const combo = KeyMapping.getShortcutCombination($event);
-    this._onkeyup.emit({comboKey: combo, event: $event});
-  };
-
 
   public getEntryList(name: string): Entry[] {
     const list = this.getShortcuts(name);
@@ -52,7 +49,7 @@ export class KeymappingService {
         const result: Entry[] = [];
 
         for (const entry in list) {
-          if (!isNullOrUndefined(list[entry]) && list.hasOwnProperty(entry)) {
+          if (!(list[entry] === null || list[entry] === undefined) && list.hasOwnProperty(entry)) {
             const val = list[entry];
             result.push(new Entry(entry, val));
           }
@@ -64,24 +61,6 @@ export class KeymappingService {
       }
     }
     return [];
-  }
-
-  private cloneShortcuts(shortcuts: any): any {
-    const result: any = {};
-    for (const elem in shortcuts) {
-      if (shortcuts.hasOwnProperty(elem)) {
-        result['' + elem + ''] = {
-          keys: {
-            mac: shortcuts[elem].keys.mac,
-            pc: shortcuts[elem].keys.pc
-          },
-          title: shortcuts[elem].title,
-          focusonly: shortcuts[elem].focusonly
-        };
-      }
-    }
-
-    return result;
   }
 
   public register(identifier: string, shortcuts: any): any {
@@ -139,6 +118,24 @@ export class KeymappingService {
     }
 
     return '';
+  }
+
+  private cloneShortcuts(shortcuts: any): any {
+    const result: any = {};
+    for (const elem in shortcuts) {
+      if (shortcuts.hasOwnProperty(elem)) {
+        result['' + elem + ''] = {
+          keys: {
+            mac: shortcuts[elem].keys.mac,
+            pc: shortcuts[elem].keys.pc
+          },
+          title: shortcuts[elem].title,
+          focusonly: shortcuts[elem].focusonly
+        };
+      }
+    }
+
+    return result;
   }
 
   /*private getRegist(combo:string):string{

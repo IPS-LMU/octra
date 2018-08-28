@@ -2,18 +2,9 @@ import {Segment} from './Segment';
 import {AudioTime} from '../../../media-components/obj/media/audio/AudioTime';
 import {EventEmitter} from '@angular/core';
 import {ISegment, OLabel, OSegment} from './AnnotJSON';
-import {isNullOrUndefined} from 'util';
 
 export class Segments {
-  set segments(value: Segment[]) {
-    this._segments = value;
-  }
-
   public onsegmentchange: EventEmitter<void> = new EventEmitter<void>();
-
-  get segments(): Segment[] {
-    return this._segments;
-  }
 
   get length(): number {
     return this._segments.length;
@@ -21,10 +12,18 @@ export class Segments {
 
   private _segments: Segment[];
 
+  get segments(): Segment[] {
+    return this._segments;
+  }
+
+  set segments(value: Segment[]) {
+    this._segments = value;
+  }
+
   constructor(private sample_rate: number, segments: ISegment[], last_sample: number, sampleRateFactor?: number) {
     this._segments = [];
 
-    if (segments !== null ) {
+    if (segments !== null) {
       if ((sampleRateFactor === null || sampleRateFactor === undefined)) {
         throw new Error('sampleRateFactor is null!');
       }
@@ -50,7 +49,7 @@ export class Segments {
   public add(time_samples: number, transcript: string = null): boolean {
     const newSegment: Segment = new Segment(new AudioTime(time_samples, this.sample_rate));
 
-    if (!isNullOrUndefined(transcript)) {
+    if (!(transcript === null || transcript === undefined)) {
       newSegment.transcript = transcript;
     }
 
@@ -214,25 +213,6 @@ export class Segments {
     return null;
   }
 
-  private cleanup() {
-    const remove: number[] = [];
-
-    for (let i = 0; i < this.segments.length; i++) {
-      if (i > 0) {
-        const last = this.segments[i - 1];
-        if (last.time.samples === this.segments[i].time.samples) {
-          remove.push(i);
-        }
-      }
-    }
-
-    for (let i = 0; i < remove.length; i++) {
-      this.segments.splice(remove[i], 1);
-      remove.splice(i, 1);
-      --i;
-    }
-  }
-
   public BetweenWhichSegment(samples: number): Segment {
     let start = 0;
 
@@ -286,5 +266,24 @@ export class Segments {
       result.add(this.segments[i].time.samples, this.segments[i].transcript);
     }
     return result;
+  }
+
+  private cleanup() {
+    const remove: number[] = [];
+
+    for (let i = 0; i < this.segments.length; i++) {
+      if (i > 0) {
+        const last = this.segments[i - 1];
+        if (last.time.samples === this.segments[i].time.samples) {
+          remove.push(i);
+        }
+      }
+    }
+
+    for (let i = 0; i < remove.length; i++) {
+      this.segments.splice(remove[i], 1);
+      remove.splice(i, 1);
+      --i;
+    }
   }
 }

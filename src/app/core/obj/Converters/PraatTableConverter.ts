@@ -1,6 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 import {ILevel, ISegment, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../Annotation/AnnotJSON';
-import {isNullOrUndefined} from 'util';
 import {Functions} from '../../shared/Functions';
 
 export class PraatTableConverter extends Converter {
@@ -33,7 +32,7 @@ export class PraatTableConverter extends Converter {
       return `${res}${tmin}\t${level.name}\t${transcript}\t${tmax}\n`;
     };
 
-    if (!isNullOrUndefined(annotation)) {
+    if (!(annotation === null || annotation === undefined)) {
       result = addHeader(result);
 
       for (let i = 0; i < annotation.levels.length; i++) {
@@ -71,10 +70,10 @@ export class PraatTableConverter extends Converter {
       // check if filename is equal with audio file
       const filename = file.name.substr(0, file.name.indexOf('.Table'));
 
-            if (Functions.contains(audiofile.name, filename)) {
+      if (Functions.contains(audiofile.name, filename)) {
         const tiers: string[] = [];
         // get tiers
-                for (let i = 1; i < lines.length; i++) {
+        for (let i = 1; i < lines.length; i++) {
           if (lines[i] !== '') {
             const columns: string[] = lines[i].split('\t');
             const tmin = Number(columns[0]);
@@ -82,11 +81,11 @@ export class PraatTableConverter extends Converter {
             const text = columns[2];
             const tmax = Number(columns[3]);
 
-                        if (tiers.filter((a) => {
-                if (a === tier) {
-                  return true;
-                }
-              }).length === 0) {
+            if (tiers.filter((a) => {
+              if (a === tier) {
+                return true;
+              }
+            }).length === 0) {
               tiers.push(tier);
             }
           }
@@ -119,7 +118,7 @@ export class PraatTableConverter extends Converter {
                 if (isNaN(tmin)) {
                   return null;
                 } else {
-                  const last = (olevel.items.length > 0 && !isNullOrUndefined(olevel.items[olevel.items.length - 1]))
+                  const last = (olevel.items.length > 0 && !(olevel.items[olevel.items.length - 1] === null || olevel.items[olevel.items.length - 1] === undefined))
                     ? olevel.items[olevel.items.length - 1] : null;
                   if (last !== null && last.sampleStart + last.sampleDur === Math.round(Number(tmin))) {
                     start = tmin;
@@ -155,7 +154,7 @@ export class PraatTableConverter extends Converter {
           }
           result.levels.push(olevel);
         }
-                return {
+        return {
           annotjson: result,
           audiofile: null
         };

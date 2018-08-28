@@ -1,15 +1,6 @@
 import {Control} from './Control';
-import {isNullOrUndefined} from 'util';
 
 export class Group {
-  set required(value: boolean) {
-    this._required = value;
-  }
-
-  get required(): boolean {
-    return this._required;
-  }
-
   public get title(): string {
     return this._title;
   }
@@ -23,6 +14,25 @@ export class Group {
   }
 
   private _required = false;
+
+  get required(): boolean {
+    return this._required;
+  }
+
+  set required(value: boolean) {
+    this._required = value;
+  }
+
+  constructor(private _title: string, private _name: string, private _controls: Control[]) {
+
+    // check if group is required
+    for (let i = 0; i < _controls.length; i++) {
+      if (_controls[i].required) {
+        this.required = true;
+        break;
+      }
+    }
+  }
 
   public static fromAny(group: any): Group {
     const controls: Control[] = [];
@@ -38,24 +48,13 @@ export class Group {
 
     const result = new Group(
       group.title,
-      (!isNullOrUndefined(group.name)) ? group.name : group.controls[0].name,
+      (!(group.name === null || group.name === undefined)) ? group.name : group.controls[0].name,
       controls
     );
 
     result.required = required;
 
     return result;
-  }
-
-  constructor(private _title: string, private _name: string, private _controls: Control[]) {
-
-    // check if group is required
-    for (let i = 0; i < _controls.length; i++) {
-      if (_controls[i].required) {
-        this.required = true;
-        break;
-      }
-    }
   }
 
   public toAny(): any {

@@ -1,6 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 import {OAnnotJSON, OAudiofile} from '../Annotation/AnnotJSON';
-import {isNullOrUndefined} from 'util';
 
 export class AnnotJSONConverter extends Converter {
 
@@ -16,7 +15,7 @@ export class AnnotJSONConverter extends Converter {
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult {
-    if (!isNullOrUndefined(annotation)) {
+    if (!(annotation === null || annotation === undefined)) {
       return {
         file: {
           name: annotation.name + this._extension,

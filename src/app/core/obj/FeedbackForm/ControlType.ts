@@ -1,9 +1,9 @@
 export class ControlType {
+  private _type: string;
+
   get type(): string {
     return this._type;
   }
-
-  private _type: string;
 
   constructor(type: string) {
     switch (type) {

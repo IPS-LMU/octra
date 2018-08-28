@@ -1,5 +1,3 @@
-import {isNullOrUndefined} from 'util';
-
 export interface IAnnotJSON {
   name: string;
   annotates: string;
@@ -69,11 +67,11 @@ export class OAnnotJSON implements IAnnotJSON {
       this.name = audio_file.substr(0, audio_file.lastIndexOf('.'));
     }
 
-    if (!isNullOrUndefined(levels)) {
+    if (!(levels === null || levels === undefined)) {
       this.levels = levels;
     }
 
-    if (!isNullOrUndefined(links)) {
+    if (!(links === null || links === undefined)) {
       this.links = links;
     }
   }
@@ -101,7 +99,7 @@ export class OLevel implements ILevel {
     this.type = type;
     this.items = [];
 
-    if (!isNullOrUndefined(items)) {
+    if (!(items === null || items === undefined)) {
       this.items = items;
     }
   }
@@ -115,7 +113,7 @@ export class OItem implements IItem {
     this.id = id;
 
     this.labels = [];
-    if (!isNullOrUndefined(labels)) {
+    if (!(labels === null || labels === undefined)) {
       this.labels = labels;
     }
   }

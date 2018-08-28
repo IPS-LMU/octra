@@ -12,30 +12,20 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
 
 export class PromptModalComponent implements OnInit {
   modalRef: BsModalRef;
-  protected data = null;
-
   public visible = false;
   public bgemail = '';
   public bgdescr = '';
   public sendpro_obj = true;
   public bugsent = false;
-
   config: ModalOptions = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
   };
-
   @ViewChild('modal') modal: any;
-
+  protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();
-
-  constructor(private modalService: BsModalService, public appStorage: AppStorageService, private settService: SettingsService) {
-  }
-
-  ngOnInit() {
-  }
 
   public get isvalid(): boolean {
     if (this.sendpro_obj || this.bgdescr !== '') {
@@ -43,6 +33,12 @@ export class PromptModalComponent implements OnInit {
     } else {
       return false;
     }
+  }
+
+  constructor(private modalService: BsModalService, public appStorage: AppStorageService, private settService: SettingsService) {
+  }
+
+  ngOnInit() {
   }
 
   public open(data: {

@@ -19,18 +19,15 @@ export enum ModalDeleteAnswer {
 
 export class TranscriptionDeleteModalComponent implements OnInit {
   modalRef: BsModalRef;
-  protected data = null;
   AppInfo = AppInfo;
   public visible = false;
-
   config: ModalOptions = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
   };
-
   @ViewChild('modal') modal: any;
-
+  protected data = null;
   private actionperformed: Subject<ModalDeleteAnswer> = new Subject<ModalDeleteAnswer>();
   private subscrmanager = new SubscriptionManager();
 

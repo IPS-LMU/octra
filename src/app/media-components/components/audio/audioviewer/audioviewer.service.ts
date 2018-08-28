@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 
 import {TranslateService} from '@ngx-translate/core';
-import {isNullOrUndefined} from 'util';
 import {PlayBackState} from '../../../obj/media';
 import {AudioviewerComponent} from './audioviewer.component';
 import {AudioviewerConfig} from './audioviewer.config';
@@ -17,46 +16,16 @@ import {PlayCursor} from '../../../obj/PlayCursor';
 
 @Injectable()
 export class AudioviewerService extends AudioComponentService {
-  get visibleLines(): Interval {
-    return this._visibleLines;
-  }
-
-  get viewRect(): Rectangle {
-    return this._viewRect;
-  }
-
-  get realRect(): Rectangle {
-    return this._realRect;
-  }
-
-  get dragableBoundaryNumber(): number {
-    return this._dragableBoundaryNumber;
-  }
-
-  set drawnselection(value: AudioSelection) {
-    this._drawnselection = value;
-  }
-
-  get drawnselection(): AudioSelection {
-    return this._drawnselection;
-  }
-
-  set zoomY(value: number) {
-    this._zoomY = value;
-  }
-
-  get minmaxarray(): number[] {
-    return this._minmaxarray;
-  }
-
-  get zoomX(): number {
-    return this._zoomX;
-  }
-
-  get zoomY(): number {
-    return this._zoomY;
-  }
-
+  public overboundary = false;
+  public focused = false;
+  public shift_pressed = false;
+  onKeyUp = (event) => {
+    this.shift_pressed = false;
+  };
+  private _settings: AudioviewerConfig;
+  private subscrmanager: SubscriptionManager;
+  // LINES
+  private Lines: Line[] = [];
 
   get LinesArray(): Line[] {
     return this.Lines;
@@ -86,30 +55,63 @@ export class AudioviewerService extends AudioComponentService {
     this._settings = value;
   }
 
-  private _settings: AudioviewerConfig;
-
-  private subscrmanager: SubscriptionManager;
-
-  // LINES
-  private Lines: Line[] = [];
-
   private _dragableBoundaryNumber = -1;
-  public overboundary = false;
+
+  get dragableBoundaryNumber(): number {
+    return this._dragableBoundaryNumber;
+  }
+
+  private _zoomY = 1;
+
+  get zoomY(): number {
+    return this._zoomY;
+  }
+
+  set zoomY(value: number) {
+    this._zoomY = value;
+  }
+
+  private _zoomX = 1;
+
+  get zoomX(): number {
+    return this._zoomX;
+  }
+
+  private _minmaxarray: number[] = [];
 
   // AUDIO
 
-  private _zoomY = 1;
-  private _zoomX = 1;
-  private _minmaxarray: number[] = [];
+  get minmaxarray(): number[] {
+    return this._minmaxarray;
+  }
 
-  public focused = false;
-
-  public shift_pressed = false;
   private _drawnselection: AudioSelection;
 
+  get drawnselection(): AudioSelection {
+    return this._drawnselection;
+  }
+
+  set drawnselection(value: AudioSelection) {
+    this._drawnselection = value;
+  }
+
   private _realRect: Rectangle = new Rectangle(new Position(0, 0), new Size(0, 0));
+
+  get realRect(): Rectangle {
+    return this._realRect;
+  }
+
   private _viewRect: Rectangle = new Rectangle(new Position(0, 0), new Size(0, 0));
+
+  get viewRect(): Rectangle {
+    return this._viewRect;
+  }
+
   private _visibleLines: Interval = new Interval(0, 0);
+
+  get visibleLines(): Interval {
+    return this._visibleLines;
+  }
 
   constructor(protected audio: AudioService,
               protected transcrService: TranscriptionService,
@@ -154,58 +156,6 @@ export class AudioviewerService extends AudioComponentService {
     return this.afterChannelInititialized(innerWidth);
   }
 
-  private calculateZoom(height: number, width: number, minmaxarray: number[]) {
-    if (this.Settings.justify_signal_height) {
-      // justify height to maximum top border
-      let max_zoom_x = 0;
-      let max_zoom_y = 0;
-      const timeline_height = (this.Settings.timeline.enabled) ? this.Settings.timeline.height : 0;
-      let max_zoom_y_min = height / 2;
-      const x_max = this.AudioPxWidth;
-
-      // get_max_signal_length
-      for (let i = 0; i <= x_max; i++) {
-        max_zoom_x = i;
-
-        if (isNaN(minmaxarray[i])) {
-          break;
-        }
-        max_zoom_y = Math.max(max_zoom_y, minmaxarray[i]);
-        max_zoom_y_min = Math.min(max_zoom_y_min, minmaxarray[i]);
-      }
-
-      let rest = (height - timeline_height - (max_zoom_y + Math.abs(max_zoom_y_min)));
-      rest = Math.floor(rest - 2);
-
-      if (rest > 0) {
-        this._zoomY = (rest / (max_zoom_y + Math.abs(max_zoom_y_min))) + 1;
-        this._zoomY = Math.floor(this._zoomY * 10) / 10;
-        this._zoomX = width / max_zoom_x;
-      }
-    } else {
-      this._zoomY = 1;
-    }
-  }
-
-  /**
-   * after Channel was initialzed
-   * @param innerWidth
-   */
-  private afterChannelInititialized(innerWidth: number, calculateZoom: boolean = true): Promise<void> {
-    return this.refresh()
-      .then(() => {
-        if (calculateZoom) {
-          this.calculateZoom(this.Settings.lineheight, this.AudioPxWidth, this._minmaxarray);
-        }
-
-        this.audiochunk.playposition = this.audiochunk.time.start.clone();
-        this.updateLines(innerWidth);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }
-
   /**
    * save mouse position for further processing
    * @param type
@@ -236,13 +186,13 @@ export class AudioviewerService extends AudioComponentService {
         ? this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber - 1) : null;
       const segment_after = (this._dragableBoundaryNumber < this.transcrService.currentlevel.segments.length - 1)
         ? this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber + 1) : null;
-      if (!isNullOrUndefined(segment_before)) {
+      if (!(segment_before === null || segment_before === undefined)) {
         // check segment boundary before this segment
         if (absXSeconds < segment_before.time.seconds + 0.02) {
           absXTime = segment_before.time.samples + Math.round((0.02) * this.audiomanager.ressource.info.samplerate);
         }
       }
-      if (!isNullOrUndefined(segment_after)) {
+      if (!(segment_after === null || segment_after === undefined)) {
         // check segment boundary after this segment
         if (absXSeconds > segment_after.time.seconds - 0.02) {
           absXTime = segment_after.time.samples - Math.round((0.02) * this.audiomanager.ressource.info.samplerate);
@@ -388,7 +338,7 @@ export class AudioviewerService extends AudioComponentService {
     const line = this.last_line;
     this.audioTCalculator.audio_px_width = this.audio_px_w;
 
-    if (!isNullOrUndefined(line) && this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly) {
+    if (!(line === null || line === undefined) && this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly) {
       const absXTime = (!this.audiochunk.isPlaying) ? this.mousecursor.timePos.samples : this.audiochunk.playposition.samples;
       let b_width_time = this.audioTCalculator.absXtoSamples2(this.Settings.boundaries.width * 2, this.audiochunk);
       b_width_time = Math.round(b_width_time);
@@ -396,7 +346,7 @@ export class AudioviewerService extends AudioComponentService {
       if (this.transcrService.currentlevel.segments.length > 0 && !this.audiochunk.isPlaying) {
         for (i = 0; i < this.transcrService.currentlevel.segments.length; i++) {
           if ((this.transcrService.currentlevel.segments.get(i).time.samples >= absXTime - b_width_time
-              && this.transcrService.currentlevel.segments.get(i).time.samples <= absXTime + b_width_time)
+            && this.transcrService.currentlevel.segments.get(i).time.samples <= absXTime + b_width_time)
             && this.transcrService.currentlevel.segments.get(i).time.samples !== this.audiomanager.ressource.info.duration.samples
           ) {
 
@@ -415,7 +365,7 @@ export class AudioviewerService extends AudioComponentService {
         }
       }
 
-      const selection: number = !isNullOrUndefined(this.drawnselection) ? this.drawnselection.length : 0;
+      const selection: number = !(this.drawnselection === null || this.drawnselection === undefined) ? this.drawnselection.length : 0;
 
       if (selection > 0 && absXTime >= this.drawnselection.start.samples && absXTime <= this.drawnselection.end.samples) {
         // some part selected
@@ -511,7 +461,7 @@ export class AudioviewerService extends AudioComponentService {
   public getRelativeSelectionByLine(line: Line, start_samples: number,
                                     end_samples: number, innerWidth: number): { start: number, end: number } {
 
-    if (!isNullOrUndefined(line)) {
+    if (!(line === null || line === undefined)) {
       const absX = line.number * innerWidth;
       const absEnd = absX + line.Size.width;
       const SelAbsStart = this.audioTCalculator.samplestoAbsX(start_samples - this.audiochunk.time.start.samples);
@@ -607,7 +557,7 @@ export class AudioviewerService extends AudioComponentService {
       const w = innerWidth;
 
       const line = this.Lines[0];
-      if (!isNullOrUndefined(line)) {
+      if (!(line === null || line === undefined)) {
         line.number = 0;
         line.Size = {
           width: w,
@@ -618,7 +568,6 @@ export class AudioviewerService extends AudioComponentService {
       }
     }
   }
-
 
   /**
    * get Line by absolute width of the audio sample
@@ -652,7 +601,7 @@ export class AudioviewerService extends AudioComponentService {
       y: this.Settings.margin.top
     };
 
-    position.y += (this.Lines.length > line_num - 1 && !isNullOrUndefined(this.Lines[line_num - 1])) ? this.Lines[line_num - 1].Pos.y : 0;
+    position.y += (this.Lines.length > line_num - 1 && !(this.Lines[line_num - 1] === null || this.Lines[line_num - 1] === undefined)) ? this.Lines[line_num - 1].Pos.y : 0;
     const line_obj = new Line(line_num, size, position);
     this.Lines.push(line_obj);
   }
@@ -730,10 +679,6 @@ export class AudioviewerService extends AudioComponentService {
    */
   public destroy() {
     this.subscrmanager.destroy();
-  }
-
-  onKeyUp = (event) => {
-    this.shift_pressed = false;
   }
 
   /**
@@ -817,5 +762,57 @@ export class AudioviewerService extends AudioComponentService {
     } else {
       throw new Error('interval.end is less than interval.start');
     }
+  }
+
+  private calculateZoom(height: number, width: number, minmaxarray: number[]) {
+    if (this.Settings.justify_signal_height) {
+      // justify height to maximum top border
+      let max_zoom_x = 0;
+      let max_zoom_y = 0;
+      const timeline_height = (this.Settings.timeline.enabled) ? this.Settings.timeline.height : 0;
+      let max_zoom_y_min = height / 2;
+      const x_max = this.AudioPxWidth;
+
+      // get_max_signal_length
+      for (let i = 0; i <= x_max; i++) {
+        max_zoom_x = i;
+
+        if (isNaN(minmaxarray[i])) {
+          break;
+        }
+        max_zoom_y = Math.max(max_zoom_y, minmaxarray[i]);
+        max_zoom_y_min = Math.min(max_zoom_y_min, minmaxarray[i]);
+      }
+
+      let rest = (height - timeline_height - (max_zoom_y + Math.abs(max_zoom_y_min)));
+      rest = Math.floor(rest - 2);
+
+      if (rest > 0) {
+        this._zoomY = (rest / (max_zoom_y + Math.abs(max_zoom_y_min))) + 1;
+        this._zoomY = Math.floor(this._zoomY * 10) / 10;
+        this._zoomX = width / max_zoom_x;
+      }
+    } else {
+      this._zoomY = 1;
+    }
+  }
+
+  /**
+   * after Channel was initialzed
+   * @param innerWidth
+   */
+  private afterChannelInititialized(innerWidth: number, calculateZoom: boolean = true): Promise<void> {
+    return this.refresh()
+      .then(() => {
+        if (calculateZoom) {
+          this.calculateZoom(this.Settings.lineheight, this.AudioPxWidth, this._minmaxarray);
+        }
+
+        this.audiochunk.playposition = this.audiochunk.time.start.clone();
+        this.updateLines(innerWidth);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 }

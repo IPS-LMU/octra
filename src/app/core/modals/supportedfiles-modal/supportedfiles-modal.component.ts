@@ -14,18 +14,15 @@ import {AppInfo} from '../../../app.info';
 
 export class SupportedFilesModalComponent implements OnInit {
   modalRef: BsModalRef;
-  protected data = null;
   AppInfo = AppInfo;
   public visible = false;
-
   config: ModalOptions = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
   };
-
   @ViewChild('modal') modal: any;
-
+  protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();
 

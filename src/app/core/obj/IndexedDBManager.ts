@@ -1,4 +1,3 @@
-import {isNullOrUndefined} from 'util';
 import {Observable} from 'rxjs/Observable';
 
 export enum IDBMode {
@@ -7,97 +6,6 @@ export enum IDBMode {
 }
 
 export class IndexedDBManager {
-  get db(): IDBDatabase {
-    return this._db;
-  }
-
-  get idbtransaction(): IDBTransaction {
-    return this._idbtransaction;
-  }
-
-  private indexedDB: IDBFactory;
-  private _idbtransaction: IDBTransaction;
-  private idbkeyrange: IDBKeyRange;
-  private _db: IDBDatabase;
-  private dbname: string;
-
-
-  /***
-   * checks if browser supports indexedDB
-   * @returns {boolean}
-   */
-  public static isCompatible(): boolean {
-    const indexedDB = (<any> window).indexedDB
-      || (<any> window).mozIndexedDB
-      || (<any> window).webkitIndexedDB
-      || (<any> window).msIndexedDB;
-
-    const idbtransaction = (<any> window).IDBTransaction
-      || (<any> window).webkitIDBTransaction
-      || (<any> window).msIDBTransaction;
-
-    const idbkeyrange = (<any> window).IDBKeyRange
-      || (<any> window).webkitIDBKeyRange
-      || (<any> window).msIDBKeyRange;
-
-    return (!(isNullOrUndefined(indexedDB) || isNullOrUndefined(idbtransaction) || isNullOrUndefined(idbkeyrange)));
-  }
-
-  constructor(dbname: string) {
-    this.dbname = dbname;
-
-    if (!IndexedDBManager.isCompatible()) {
-      console.error('Browser doesn\'t support a stable version of IndexedDB.');
-    } else {
-      this.indexedDB = (<any> window).indexedDB
-        || (<any> window).mozIndexedDB
-        || (<any> window).webkitIndexedDB
-        || (<any> window).msIndexedDB;
-
-      this._idbtransaction = (<any> window).IDBTransaction
-        || (<any> window).webkitIDBTransaction
-        || (<any> window).msIDBTransaction;
-
-      this.idbkeyrange = (<any> window).IDBKeyRange
-        || (<any> window).webkitIDBKeyRange
-        || (<any> window).msIDBKeyRange;
-    }
-  }
-
-  public open(version?: number): Observable<any> {
-    const request = this.indexedDB.open(this.dbname, version);
-    return Observable.create(observer => {
-      request.onerror = (event: any) => {
-        observer.error(event);
-      };
-
-      request.onsuccess = (event: any) => {
-        this._db = event.target.result;
-        observer.next(event);
-        observer.complete();
-      };
-
-      request.onupgradeneeded = (event: any) => {
-        this._db = event.target.result;
-        observer.next(event);
-      };
-
-      request.onblocked = (event: any) => {
-        observer.next(event);
-      };
-    });
-  }
-
-  private getObjectStore = (store_name: string, mode: IDBMode): IDBObjectStore => {
-    let mode_str: IDBTransactionMode = 'readonly';
-
-    if (mode === IDBMode.READWRITE) {
-      mode_str = 'readwrite';
-    }
-    const txn = this.db.transaction([store_name], mode_str);
-    return txn.objectStore(store_name);
-  };
-
   public get = (store_name: string | IDBObjectStore, key: string | number): Promise<any> => {
     return new Promise<any>(
       (resolve, reject) => {
@@ -117,7 +25,6 @@ export class IndexedDBManager {
       }
     );
   };
-
   public getAll = (store_name: string | IDBObjectStore, key: string | number): Promise<any[]> => {
     return new Promise<any>(
       (resolve, reject) => {
@@ -147,7 +54,6 @@ export class IndexedDBManager {
       }
     );
   };
-
   public save = (store_name: string | IDBObjectStore, key, data): Promise<any> => {
     return new Promise<any>(
       (resolve, reject) => {
@@ -170,7 +76,6 @@ export class IndexedDBManager {
       }
     );
   };
-
   public saveSequential = (store_name: string | IDBObjectStore, data: { key: string, value: any }[]): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
 
@@ -190,7 +95,6 @@ export class IndexedDBManager {
       }
     );
   };
-
   public remove = (store_name: string | IDBObjectStore, key: string | number): Promise<any> => {
     return new Promise<any>(
       (resolve, reject) => {
@@ -205,7 +109,6 @@ export class IndexedDBManager {
         };
       });
   };
-
   public clear = (store_name: string | IDBObjectStore): Promise<any> => {
     return new Promise<any>(
       (resolve, reject) => {
@@ -220,11 +123,9 @@ export class IndexedDBManager {
         };
       });
   };
-
   public close = () => {
     this.db.close();
   };
-
   public saveArraySequential = (array: any[], store_name: string | IDBObjectStore, key: any): Promise<void> => {
     return new Promise<void>(
       (resolve, reject) => {
@@ -247,5 +148,95 @@ export class IndexedDBManager {
         wrapper(0);
       }
     );
+  };
+  private indexedDB: IDBFactory;
+  private idbkeyrange: IDBKeyRange;
+  private dbname: string;
+  private getObjectStore = (store_name: string, mode: IDBMode): IDBObjectStore => {
+    let mode_str: IDBTransactionMode = 'readonly';
+
+    if (mode === IDBMode.READWRITE) {
+      mode_str = 'readwrite';
+    }
+    const txn = this.db.transaction([store_name], mode_str);
+    return txn.objectStore(store_name);
+  };
+
+  private _idbtransaction: IDBTransaction;
+
+  get idbtransaction(): IDBTransaction {
+    return this._idbtransaction;
+  }
+
+  private _db: IDBDatabase;
+
+  get db(): IDBDatabase {
+    return this._db;
+  }
+
+  constructor(dbname: string) {
+    this.dbname = dbname;
+
+    if (!IndexedDBManager.isCompatible()) {
+      console.error('Browser doesn\'t support a stable version of IndexedDB.');
+    } else {
+      this.indexedDB = (<any> window).indexedDB
+        || (<any> window).mozIndexedDB
+        || (<any> window).webkitIndexedDB
+        || (<any> window).msIndexedDB;
+
+      this._idbtransaction = (<any> window).IDBTransaction
+        || (<any> window).webkitIDBTransaction
+        || (<any> window).msIDBTransaction;
+
+      this.idbkeyrange = (<any> window).IDBKeyRange
+        || (<any> window).webkitIDBKeyRange
+        || (<any> window).msIDBKeyRange;
+    }
+  }
+
+  /***
+   * checks if browser supports indexedDB
+   * @returns {boolean}
+   */
+  public static isCompatible(): boolean {
+    const indexedDB = (<any> window).indexedDB
+      || (<any> window).mozIndexedDB
+      || (<any> window).webkitIndexedDB
+      || (<any> window).msIndexedDB;
+
+    const idbtransaction = (<any> window).IDBTransaction
+      || (<any> window).webkitIDBTransaction
+      || (<any> window).msIDBTransaction;
+
+    const idbkeyrange = (<any> window).IDBKeyRange
+      || (<any> window).webkitIDBKeyRange
+      || (<any> window).msIDBKeyRange;
+
+    return (!((indexedDB === null || indexedDB === undefined) || (idbtransaction === null || idbtransaction === undefined) || (idbkeyrange === null || idbkeyrange === undefined)));
+  }
+
+  public open(version?: number): Observable<any> {
+    const request = this.indexedDB.open(this.dbname, version);
+    return Observable.create(observer => {
+      request.onerror = (event: any) => {
+        observer.error(event);
+      };
+
+      request.onsuccess = (event: any) => {
+        this._db = event.target.result;
+        observer.next(event);
+        observer.complete();
+      };
+
+      request.onupgradeneeded = (event: any) => {
+        this._db = event.target.result;
+        observer.next(event);
+      };
+
+      request.onblocked = (event: any) => {
+        observer.next(event);
+      };
+    });
   }
 }

@@ -29,7 +29,6 @@ import {
 } from '../../shared/service';
 
 import {BrowserInfo, SubscriptionManager} from '../../shared';
-import {isArray, isNullOrUndefined, isNumber} from 'util';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 import {ProjectSettings} from '../../obj/Settings';
@@ -57,41 +56,55 @@ import {NavbarService} from '../navbar/navbar.service';
 })
 export class TranscriptionComponent implements OnInit,
   OnDestroy, AfterViewInit, AfterContentInit, OnChanges, AfterViewChecked, AfterContentChecked, AfterContentInit {
-  get currentEditor(): ComponentRef<Component> {
-    return this._currentEditor;
-  }
-
-  private subscrmanager: SubscriptionManager;
 
   // TODO change to ModalComponents!
   @ViewChild('modal_shortcuts') modal_shortcuts: any;
   @ViewChild('modal_overview') modal_overview: any;
   @ViewChild(LoadeditorDirective) appLoadeditor: LoadeditorDirective;
-  private _currentEditor: ComponentRef<Component>;
-
   @ViewChild('modal') modal: any;
   @ViewChild('modal2') modal2: any;
   @ViewChild('modal_guidelines') modal_guidelines: TranscriptionGuidelinesModalComponent;
   @ViewChild('fo') feedback_form: NgForm;
   public send_error = '';
-
   public showdetails = false;
   public saving = '';
-  public interface: string = '';
-  private send_ok = false;
+  public interface = '';
   public shortcutslist: Entry[] = [];
   public editorloaded = false;
   public feedback_data = {};
+  public feedback_expanded = false;
+  user: number;
+  public platform = BrowserInfo.platform;
+  abortTranscription = () => {
+    this.modService.show('transcription_stop').then((answer: TranscriptionStopModalAnswer) => {
+      if (answer === TranscriptionStopModalAnswer.QUIT) {
+        if (this.appStorage.usemode === 'online') {
+          this.saveFeedbackform();
+        }
+        this.transcrService.endTranscription();
+        this.router.navigate(['/logout'], {
+          queryParamsHandling: 'preserve'
+        });
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
+  };
+  onSendError = (error) => {
+    this.send_error = error.message;
+    return throwError(error);
+  };
+  private subscrmanager: SubscriptionManager;
+  private send_ok = false;
+  private level_subscription_id = 0;
+  private audiomanager: AudioManager;
 
   public get Interface(): string {
     return this.interface;
   }
 
-  private level_subscription_id = 0;
-  public feedback_expanded = false;
-
   get loaded(): boolean {
-    return (this.audio.loaded && !isNullOrUndefined(this.transcrService.guidelines));
+    return (this.audio.loaded && !(this.transcrService.guidelines === null || this.transcrService.guidelines === undefined));
   }
 
   get appc(): any {
@@ -106,11 +119,15 @@ export class TranscriptionComponent implements OnInit,
     return this.settingsService.responsive.enabled;
   }
 
-  user: number;
+  private _currentEditor: ComponentRef<Component>;
 
-  public platform = BrowserInfo.platform;
+  get currentEditor(): ComponentRef<Component> {
+    return this._currentEditor;
+  }
 
-  private audiomanager: AudioManager;
+  private get app_settings() {
+    return this.settingsService.app_settings;
+  }
 
   constructor(public router: Router,
               private _componentFactoryResolver: ComponentFactoryResolver,
@@ -143,7 +160,7 @@ export class TranscriptionComponent implements OnInit,
       if (!this.audiomanager.playonhover) {
         let caretpos = -1;
 
-        if (!isNullOrUndefined((<any> this.currentEditor.instance).editor)) {
+        if (!(((<any> this.currentEditor.instance).editor) === null || ((<any> this.currentEditor.instance).editor) === undefined)) {
           caretpos = (<any> this.currentEditor.instance).editor.caretpos;
         }
 
@@ -151,17 +168,14 @@ export class TranscriptionComponent implements OnInit,
         if (state !== PlayBackState.PLAYING && state !== PlayBackState.INITIALIZED && state !== PlayBackState.PREPARE) {
           this.uiService.addElementFromEvent('audio',
             {value: getPlayBackString(state).toLowerCase()}, Date.now(),
-            Math.round(this.audiomanager.playposition * this.transcrService.audiomanager.sampleRateFactor), caretpos, this.appStorage.Interface);
+            Math.round(this.audiomanager.playposition * this.transcrService.audiomanager.sampleRateFactor),
+            caretpos, this.appStorage.Interface);
         }
       }
     }));
 
     this.interface = this.appStorage.Interface;
 
-  }
-
-  private get app_settings() {
-    return this.settingsService.app_settings;
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -203,11 +217,12 @@ export class TranscriptionComponent implements OnInit,
     this.subscrmanager.add(this.langService.onLangChange.subscribe(
       (event: LangChangeEvent) => {
         let lang = event.lang;
-        if (isNullOrUndefined(this.settingsService.projectsettings.languages.find(
+        const found = this.settingsService.projectsettings.languages.find(
           x => {
             return x === lang;
           }
-        ))) {
+        );
+        if ((found === null || found === undefined)) {
           // lang not in project config, fall back to first defined
           lang = this.settingsService.projectsettings.languages[0];
         }
@@ -246,7 +261,7 @@ export class TranscriptionComponent implements OnInit,
 
     this.navbarServ.show_export = this.settingsService.projectsettings.navigation.export;
 
-    if (!isNullOrUndefined(this.transcrService.annotation)) {
+    if (!(this.transcrService.annotation === null || this.transcrService.annotation === undefined)) {
       this.level_subscription_id = this.subscrmanager.add(
         this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
       );
@@ -275,28 +290,14 @@ export class TranscriptionComponent implements OnInit,
   }
 
   ngAfterViewInit() {
-    if (isNullOrUndefined(this.projectsettings.interfaces.find((x) => {
+    const found = this.projectsettings.interfaces.find((x) => {
       return this.appStorage.Interface === x;
-    }))) {
+    });
+
+    if ((found === null || found === undefined)) {
       this.appStorage.Interface = this.projectsettings.interfaces[0];
     }
   }
-
-  abortTranscription = () => {
-    this.modService.show('transcription_stop').then((answer: TranscriptionStopModalAnswer) => {
-      if (answer === TranscriptionStopModalAnswer.QUIT) {
-        if (this.appStorage.usemode === 'online') {
-          this.saveFeedbackform();
-        }
-        this.transcrService.endTranscription();
-        this.router.navigate(['/logout'], {
-          queryParamsHandling: 'preserve'
-        });
-      }
-    }).catch((error) => {
-      console.error(error);
-    });
-  };
 
   ngAfterContentInit() {
   }
@@ -339,7 +340,7 @@ export class TranscriptionComponent implements OnInit,
   changeEditor(name: string) {
     let comp: any = null;
 
-    if (isNullOrUndefined(name) || name === '') {
+    if ((name === null || name === undefined) || name === '') {
       // fallback to last editor
       name = EditorComponents[EditorComponents.length - 1].name;
     }
@@ -352,7 +353,7 @@ export class TranscriptionComponent implements OnInit,
       }
     }
 
-    if (!isNullOrUndefined(comp)) {
+    if (!(comp === null || comp === undefined)) {
       this.editorloaded = false;
       const id = this.subscrmanager.add(comp.initialized.subscribe(
         () => {
@@ -363,7 +364,7 @@ export class TranscriptionComponent implements OnInit,
         }
       ));
 
-      if (!isNullOrUndefined(this.appLoadeditor)) {
+      if (!(this.appLoadeditor === null || this.appLoadeditor === undefined)) {
         const componentFactory = this._componentFactoryResolver.resolveComponentFactory(comp);
 
         const viewContainerRef = this.appLoadeditor.viewContainerRef;
@@ -373,7 +374,7 @@ export class TranscriptionComponent implements OnInit,
 
         let caretpos = -1;
 
-        if (!isNullOrUndefined((<any> this.currentEditor.instance).editor)) {
+        if (!((<any> this.currentEditor.instance).editor === null || (<any> this.currentEditor.instance).editor === undefined)) {
           caretpos = (<any> this.currentEditor.instance).editor.caretpos;
         }
 
@@ -417,28 +418,13 @@ export class TranscriptionComponent implements OnInit,
     this.feedback_expanded = !this.feedback_expanded;
   }
 
-  private saveFeedbackform() {
-    if (!isNullOrUndefined(this.transcrService.feedback.comment)
-      && this.transcrService.feedback.comment !== '') {
-      this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, '\s');
-    }
-    this.appStorage.comment = this.transcrService.feedback.comment;
-
-    for (const control in this.feedback_data) {
-      if (this.feedback_data.hasOwnProperty(control)) {
-        this.changeValue(control, this.feedback_data[control]);
-      }
-    }
-    this.appStorage.save('feedback', this.transcrService.feedback.exportData());
-  }
-
   changeValue(control: string, value: any) {
     const result = this.transcrService.feedback.setValueForControl(control, value.toString());
     console.warn(result);
   }
 
   translate(languages: any, lang: string): string {
-    if (isNullOrUndefined(languages[lang])) {
+    if ((languages[lang] === null || languages[lang] === undefined)) {
       for (const attr in languages) {
         // take first
         if (languages.hasOwnProperty(attr)) {
@@ -447,35 +433,6 @@ export class TranscriptionComponent implements OnInit,
       }
     }
     return languages[lang];
-  }
-
-  private loadForm() {
-    // create emty attribute
-    const feedback = this.transcrService.feedback;
-    if (!isNullOrUndefined(this.settingsService.projectsettings)
-      && !isNullOrUndefined(feedback)
-    ) {
-      for (const g in feedback.groups) {
-        if (!isNullOrUndefined(g)) {
-          const group = feedback.groups[g];
-          for (const c in group.controls) {
-            if (!isNullOrUndefined(c)) {
-              const control = group.controls[c];
-              if (control.type.type === 'textarea') {
-                this.feedback_data[group.name] = control.value;
-              } else {
-                // radio skip checkboxes
-                if (control.type.type !== 'checkbox' && !isNullOrUndefined(control.custom)
-                  && !isNullOrUndefined(control.custom.checked)
-                  && control.custom.checked) {
-                  this.feedback_data[group.name] = control.value;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
   }
 
   public onSendNowClick() {
@@ -507,11 +464,6 @@ export class TranscriptionComponent implements OnInit,
         }
       ));
   }
-
-  onSendError = (error) => {
-    this.send_error = error.message;
-    return throwError(error);
-  };
 
   onSendButtonClick() {
 
@@ -546,7 +498,7 @@ export class TranscriptionComponent implements OnInit,
             if (json.data.hasOwnProperty('transcript')) {
               const transcript = JSON.parse(json.data.transcript);
 
-              if (isArray(transcript) && transcript.length > 0) {
+              if (Array.isArray(transcript) && transcript.length > 0) {
                 this.appStorage.servertranscipt = transcript;
               }
             }
@@ -570,7 +522,7 @@ export class TranscriptionComponent implements OnInit,
               this.appStorage.prompttext = '';
             }
 
-            if (json.hasOwnProperty('message') && isNumber(json.message)) {
+            if (json.hasOwnProperty('message') && typeof (json.message) === 'number') {
               this.appStorage.jobs_left = Number(json.message);
             }
 
@@ -608,7 +560,8 @@ export class TranscriptionComponent implements OnInit,
         for (let j = 0; j < group_.controls.length; j++) {
           const control = group_.controls[j];
           if (control.value === checkb) {
-            control.custom['checked'] = (isNullOrUndefined(control.custom['checked'])) ? true : !control.custom['checked'];
+            control.custom['checked'] = ((control.custom['checked'] === null || control.custom['checked'] === undefined))
+              ? true : !control.custom['checked'];
             break;
           }
         }
@@ -619,7 +572,8 @@ export class TranscriptionComponent implements OnInit,
 
   public onSaveTranscriptionButtonClicked() {
     const converter = new PartiturConverter();
-    const oannotjson = this.transcrService.annotation.getObj(this.transcrService.audiomanager.sampleRateFactor, this.transcrService.audiomanager.originalInfo.duration.samples);
+    const oannotjson = this.transcrService.annotation.getObj(this.transcrService.audiomanager.sampleRateFactor,
+      this.transcrService.audiomanager.originalInfo.duration.samples);
     const result: IFile = converter.export(oannotjson, this.transcrService.audiofile, 0).file;
     result.name = result.name.replace('-' + oannotjson.levels[0].name, '');
 
@@ -627,7 +581,7 @@ export class TranscriptionComponent implements OnInit,
     const form: FormData = new FormData();
     let host = 'https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/';
 
-    if (!isNullOrUndefined(this.appStorage.url_params['host'])) {
+    if (!(this.appStorage.url_params['host'] === null || this.appStorage.url_params['host'] === undefined)) {
       host = this.appStorage.url_params['host'];
     }
 
@@ -650,16 +604,16 @@ export class TranscriptionComponent implements OnInit,
     };
 
     xhr.onloadend = (e) => {
-      const result = e.currentTarget['responseText'];
+      const result2 = e.currentTarget['responseText'];
 
       const x2js = new X2JS();
-      let json: any = x2js.xml2js(result);
+      let json: any = x2js.xml2js(result2);
       json = json.UploadFileMultiResponse;
 
       if (json.success === 'true') {
         // TODO set urls to results only
         let resulturl = '';
-        if (isArray(json.fileList.entry)) {
+        if (Array.isArray(json.fileList.entry)) {
           for (let i = 0; i < json.fileList.length; i++) {
             resulturl = json.fileList.entry[i].value;
             break;
@@ -684,5 +638,49 @@ export class TranscriptionComponent implements OnInit,
       }
     };
     xhr.send(form);
+  }
+
+  private saveFeedbackform() {
+    if (!(this.transcrService.feedback.comment === null || this.transcrService.feedback.comment === undefined)
+      && this.transcrService.feedback.comment !== '') {
+      this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, '\s');
+    }
+    this.appStorage.comment = this.transcrService.feedback.comment;
+
+    for (const control in this.feedback_data) {
+      if (this.feedback_data.hasOwnProperty(control)) {
+        this.changeValue(control, this.feedback_data[control]);
+      }
+    }
+    this.appStorage.save('feedback', this.transcrService.feedback.exportData());
+  }
+
+  private loadForm() {
+    // create emty attribute
+    const feedback = this.transcrService.feedback;
+    if (!(this.settingsService.projectsettings === null || this.settingsService.projectsettings === undefined)
+      && !(feedback === null || feedback === undefined)
+    ) {
+      for (const g in feedback.groups) {
+        if (!(g === null || g === undefined)) {
+          const group = feedback.groups[g];
+          for (const c in group.controls) {
+            if (!(c === null || c === undefined)) {
+              const control = group.controls[c];
+              if (control.type.type === 'textarea') {
+                this.feedback_data[group.name] = control.value;
+              } else {
+                // radio skip checkboxes
+                if (control.type.type !== 'checkbox' && !(control.custom === null || control.custom === undefined)
+                  && !(control.custom.checked === null || control.custom.checked === undefined)
+                  && control.custom.checked) {
+                  this.feedback_data[group.name] = control.value;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

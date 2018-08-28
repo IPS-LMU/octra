@@ -1,24 +1,15 @@
 import {OAnnotJSON, OAudiofile} from './AnnotJSON';
-import {isNullOrUndefined} from 'util';
 import {Level} from './Level';
 import {Link} from './Link';
 
 export class Annotation {
-  set links(value: Link[]) {
-    this._links = value;
-  }
-
-  get levels(): Level[] {
-    return this._levels;
-  }
-
-  get links(): Link[] {
-    return this._links;
-  }
+  private _annotates: string;
 
   get annotates(): string {
     return this._annotates;
   }
+
+  private _audiofile: OAudiofile;
 
   get audiofile(): OAudiofile {
     return this._audiofile;
@@ -28,10 +19,21 @@ export class Annotation {
     this._audiofile = value;
   }
 
-  private _annotates: string;
-  private _audiofile: OAudiofile;
   private _levels: Level[];
+
+  get levels(): Level[] {
+    return this._levels;
+  }
+
   private _links: Link[];
+
+  get links(): Link[] {
+    return this._links;
+  }
+
+  set links(value: Link[]) {
+    this._links = value;
+  }
 
   constructor(annotates: string, audiofile: OAudiofile, levels?: Level[], links?: Link[]) {
     this._annotates = annotates;
@@ -39,10 +41,10 @@ export class Annotation {
     this._levels = [];
     this._links = [];
 
-    if (!isNullOrUndefined(levels)) {
+    if (!(levels === null || levels === undefined)) {
       this._levels = levels;
     }
-    if (!isNullOrUndefined(links)) {
+    if (!(links === null || links === undefined)) {
       this._links = links;
     }
   }
@@ -59,7 +61,7 @@ export class Annotation {
         const level = this._levels[i].getObj(sampleRateFactor, lastOriginalSample);
         for (let j = 0; j < level.items.length; j++) {
           level.items[j].id = start_id++;
-          if (!isNullOrUndefined(level.items[j].labels) && level.items[j].labels.length > 0) {
+          if (!(level.items[j].labels === null || level.items[j].labels === undefined) && level.items[j].labels.length > 0) {
             if (level.items[j].labels[0].name === '') {
               level.items[j].labels[0].name = level.name;
             }

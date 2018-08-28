@@ -6,7 +6,6 @@ import {Router} from '@angular/router';
 import {TranscriptionService} from '../../shared/service/transcription.service';
 import {ModalService} from '../../modals/modal.service';
 import {TranslateService} from '@ngx-translate/core';
-import {isNullOrUndefined} from 'util';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
 import {AudioService} from '../../shared/service/audio.service';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
@@ -18,55 +17,18 @@ import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-moda
 })
 export class ReloadFileComponent implements OnInit {
   @ViewChild('dropzone') dropzone: OctraDropzoneComponent;
-
-  private error = '';
-
-  constructor(public router: Router,
-              public appStorage: AppStorageService,
-              public transcrServ: TranscriptionService,
-              public modService: ModalService,
-              public langService: TranslateService,
-              private audioService: AudioService) {
-  }
-
-  get sessionfile(): SessionFile {
-    return this.appStorage.sessionfile;
-  }
-
-  public isN(obj: any): boolean {
-    return isNullOrUndefined(obj);
-  }
-
-  ngOnInit() {
-  }
-
-  private navigate = () => {
-    this.router.navigate(['/user/load'], {
-      queryParamsHandling: 'preserve'
-    });
-  };
-
-  getDropzoneFileString(file: File | SessionFile) {
-    if (!isNullOrUndefined(file)) {
-      const fsize: FileSize = Functions.getFileSize(file.size);
-      return `${file.name} (${(Math.round(fsize.size * 100) / 100)} ${fsize.label})`;
-    }
-    return '[FILE UNDEFINED]';
-  }
-
   abortTranscription = () => {
     this.transcrServ.endTranscription();
     this.router.navigate(['/logout'], {
       queryParamsHandling: 'preserve'
     });
   };
-
   newTranscription = () => {
     this.modService.show('transcription_delete').then(() => {
       let keep_data = false;
 
       new Promise<void>((resolve) => {
-        if (!isNullOrUndefined(this.dropzone.oannotation)) {
+        if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
           const new_levels: OIDBLevel[] = [];
           for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
             new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
@@ -103,7 +65,6 @@ export class ReloadFileComponent implements OnInit {
       console.error(error);
     });
   };
-
   onOfflineSubmit = () => {
     this.audioService.registerAudioManager(this.dropzone.audiomanager);
     this.appStorage.beginLocalSession(this.dropzone.files, true, this.navigate,
@@ -114,12 +75,38 @@ export class ReloadFileComponent implements OnInit {
       }
     );
   };
-
-  private showErrorMessage(err: string) {
-    this.error = err;
-    this.modService.show('error', {
-      text: err
+  private error = '';
+  private navigate = () => {
+    this.router.navigate(['/user/load'], {
+      queryParamsHandling: 'preserve'
     });
+  };
+
+  get sessionfile(): SessionFile {
+    return this.appStorage.sessionfile;
+  }
+
+  constructor(public router: Router,
+              public appStorage: AppStorageService,
+              public transcrServ: TranscriptionService,
+              public modService: ModalService,
+              public langService: TranslateService,
+              private audioService: AudioService) {
+  }
+
+  public isN(obj: any): boolean {
+    return (obj === null || obj === undefined);
+  }
+
+  ngOnInit() {
+  }
+
+  getDropzoneFileString(file: File | SessionFile) {
+    if (!(file === null || file === undefined)) {
+      const fsize: FileSize = Functions.getFileSize(file.size);
+      return `${file.name} (${(Math.round(fsize.size * 100) / 100)} ${fsize.label})`;
+    }
+    return '[FILE UNDEFINED]';
   }
 
   askForAbort() {
@@ -129,6 +116,13 @@ export class ReloadFileComponent implements OnInit {
       }
     }).catch((error) => {
       console.error(error);
+    });
+  }
+
+  private showErrorMessage(err: string) {
+    this.error = err;
+    this.modService.show('error', {
+      text: err
     });
   }
 }

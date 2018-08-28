@@ -12,18 +12,6 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
   @ViewChild('canvas') canvas: ElementRef;
 
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
-
-  constructor(private appStorage: AppStorageService,
-              private api: APIService) {
-  }
-
-  ngOnInit() {
-  }
-
-  ngOnDestroy() {
-
-  }
-
   private setOnlineSessionToFree = (callback: () => void) => {
     // check if old annotation is already annotated
     this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
@@ -44,6 +32,17 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
       }
     ));
   };
+
+  constructor(private appStorage: AppStorageService,
+              private api: APIService) {
+  }
+
+  ngOnInit() {
+  }
+
+  ngOnDestroy() {
+
+  }
 
   refreshApp() {
     document.location.reload(true);

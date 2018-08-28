@@ -31,6 +31,13 @@ export class Control {
     this._custom = value;
   }
 
+  constructor(private _value: string,
+              private _label: Label,
+              private _required: boolean,
+              private _type: ControlType,
+              private _custom: any) {
+  }
+
   public static fromAny(control: any): Control {
     return new Control(
       control.value,
@@ -39,13 +46,6 @@ export class Control {
       new ControlType(control.type),
       control.custom
     );
-  }
-
-  constructor(private _value: string,
-              private _label: Label,
-              private _required: boolean,
-              private _type: ControlType,
-              private _custom: any) {
   }
 
   public toAny(): any {

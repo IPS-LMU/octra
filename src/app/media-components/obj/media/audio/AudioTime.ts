@@ -1,10 +1,43 @@
-import {isNullOrUndefined} from 'util';
-
 /**
  * class initialized with samples which can output other units like seconds, miliseconds
  */
 export class AudioTime {
   public static sampleRateFactor: number = 1;
+
+  set sample_rate(value) {
+    this._sample_rate = value;
+  }
+
+  get samples(): number {
+    return this._samples;
+  }
+
+  set samples(value: number) {
+    this._samples = value;
+  }
+
+  get unix(): number {
+    return Math.floor((this.samples * 1000) / this._sample_rate);
+  }
+
+  set unix(value: number) {
+    this._samples = Math.round((value / 1000) * this._sample_rate);
+  }
+
+  get seconds(): number {
+    return this.samples / this._sample_rate;
+  }
+
+  set seconds(value: number) {
+    this.samples = value * this._sample_rate;
+  }
+
+  constructor(private _samples: number,
+              private _sample_rate: number) {
+    if (this._sample_rate <= 0) {
+      throw new Error('sample_rate must be bigger than 0');
+    }
+  }
 
   /**
    * converts seconds given sample_rate to Audiotime
@@ -61,49 +94,14 @@ export class AudioTime {
   }
 
   public static fromSamples(samples: number, samplerate: number): AudioTime {
-    if (!isNullOrUndefined(samples) && !isNullOrUndefined(samplerate) && Number.isInteger(samples) && samples > -1) {
+    if (!(samples === null || samples === undefined) && !(samplerate === null || samplerate === undefined) && Number.isInteger(samples) && samples > -1) {
       return new AudioTime(samples, samplerate);
     }
     return null;
   }
 
-  set sample_rate(value) {
-    this._sample_rate = value;
-  }
-
-  get samples(): number {
-    return this._samples;
-  }
-
-  set samples(value: number) {
-    this._samples = value;
-  }
-
-  get unix(): number {
-    return Math.floor((this.samples * 1000) / this._sample_rate);
-  }
-
-  set unix(value: number) {
-    this._samples = Math.round((value / 1000) * this._sample_rate);
-  }
-
-  get seconds(): number {
-    return this.samples / this._sample_rate;
-  }
-
-  set seconds(value: number) {
-    this.samples = value * this._sample_rate;
-  }
-
   public clone(): AudioTime {
     return new AudioTime(this.samples, this._sample_rate);
-  }
-
-  constructor(private _samples: number,
-              private _sample_rate: number) {
-    if (this._sample_rate <= 0) {
-      throw new Error('sample_rate must be bigger than 0');
-    }
   }
 
   public toString(): string {

@@ -9,17 +9,15 @@ import {Subject} from 'rxjs/Subject';
 })
 export class YesNoModalComponent implements OnInit {
   modalRef: BsModalRef;
-  protected data = {
-    text: ''
-  };
   config: ModalOptions = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
   };
-
   @ViewChild('modal') modal: TemplateRef<any>;
-
+  protected data = {
+    text: ''
+  };
   private actionperformed: Subject<('yes' | 'no')> = new Subject<('yes' | 'no')>();
 
   constructor(private modalService: BsModalService) {

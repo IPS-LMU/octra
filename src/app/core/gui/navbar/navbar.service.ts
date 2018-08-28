@@ -7,21 +7,16 @@ import {FileSize} from '../../shared';
 
 @Injectable()
 export class NavbarService {
-  get interfaces(): string[] {
-    return this._interfaces;
-  }
+  public onexportbuttonclick = new EventEmitter<any>();
+  public interfacechange = new EventEmitter<string>();
+  public onclick = new EventEmitter<string>();
+  public transcrService: TranscriptionService;
+  public uiService: UserInteractionsService;
+  public dataloaded = false;
+  public originalInfo: AudioInfo;
+  public filesize: FileSize;
 
-  set interfaces(value: string[]) {
-    this._interfaces = value;
-  }
-
-  get show_interfaces(): boolean {
-    return this._show_interfaces;
-  }
-
-  set show_interfaces(value: boolean) {
-    this._show_interfaces = value;
-  }
+  private _show_export = false;
 
   get show_export(): boolean {
     return this._show_export;
@@ -31,22 +26,25 @@ export class NavbarService {
     this._show_export = value;
   }
 
-  public onexportbuttonclick = new EventEmitter<any>();
-  public interfacechange = new EventEmitter<string>();
-  public onclick = new EventEmitter<string>();
-
-  private _show_export = false;
   private _show_interfaces = false;
+
+  get show_interfaces(): boolean {
+    return this._show_interfaces;
+  }
+
+  set show_interfaces(value: boolean) {
+    this._show_interfaces = value;
+  }
+
   private _interfaces: string[] = [];
 
-  public transcrService: TranscriptionService;
-  public uiService: UserInteractionsService;
+  get interfaces(): string[] {
+    return this._interfaces;
+  }
 
-  public dataloaded = false;
-
-  public originalInfo: AudioInfo;
-
-  public filesize: FileSize;
+  set interfaces(value: string[]) {
+    this._interfaces = value;
+  }
 
   constructor(private appStorage: AppStorageService) {
 

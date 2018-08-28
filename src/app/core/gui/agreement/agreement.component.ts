@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {isNullOrUndefined} from 'util';
 import {SettingsService} from '../../shared/service/settings.service';
 import {Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
@@ -19,24 +18,25 @@ export class AgreementComponent implements OnInit {
               private router: Router,
               private langService: TranslateService,
               private appStorage: AppStorageService) {
-    if (isNullOrUndefined(this.settService.projectsettings)) {
+    if ((this.settService.projectsettings === null || this.settService.projectsettings === undefined)) {
       this.router.navigate(['/user/load'], {
         queryParamsHandling: 'preserve'
       });
     }
   }
 
+
   ngOnInit() {
     console.log('agreement component called');
   }
 
   public toHTML(text: any): string {
-    if (!isNullOrUndefined(text)) {
-      if (!isNullOrUndefined(text[this.langService.currentLang])) {
+    if (!(text === null || text === undefined)) {
+      if (!(text[this.langService.currentLang] === null || text[this.langService.currentLang] === undefined)) {
         return text[this.langService.currentLang].replace('\n', '<br/>');
       } else {
         for (const l in text) {
-          if (!isNullOrUndefined(text[l])) {
+          if (!(text[l] === null || text[l] === undefined)) {
             return text[l].replace('\n', '<br/>');
           }
         }
@@ -54,7 +54,7 @@ export class AgreementComponent implements OnInit {
   }
 
   accept() {
-    if (isNullOrUndefined(this.appStorage.agreement)) {
+    if ((this.appStorage.agreement === null || this.appStorage.agreement === undefined)) {
       this.appStorage.agreement = {};
     }
     this.appStorage.agreement[this.appStorage.user.project] = true;

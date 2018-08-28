@@ -2,7 +2,6 @@ import {AfterViewInit, Component, Input, OnChanges, SimpleChanges, ViewChild} fr
 import {LoupeComponent} from '../loupe/loupe.component';
 import {CircleLoupeService} from './circleloupe.service';
 import {AudioChunk} from '../../../obj/media/audio/AudioChunk';
-import {isNullOrUndefined} from 'util';
 
 declare var window: any;
 
@@ -19,6 +18,11 @@ export class CircleLoupeComponent implements AfterViewInit, OnChanges {
   @Input() audiochunk: AudioChunk;
   @Input() height: number;
   @Input() width: number;
+  public pos: any = {
+    x: 0,
+    y: 0
+  };
+  private initialized = false;
 
   public get zoomY(): number {
     return this.loupe.zoomY;
@@ -28,11 +32,6 @@ export class CircleLoupeComponent implements AfterViewInit, OnChanges {
     this.loupe.zoomY = value;
   }
 
-  public pos: any = {
-    x: 0,
-    y: 0
-  };
-
   get Settings(): any {
     return this.loupe.Settings;
   }
@@ -41,8 +40,6 @@ export class CircleLoupeComponent implements AfterViewInit, OnChanges {
     this.loupe.Settings = new_settings;
   }
 
-  private initialized = false;
-
   constructor() {
     this.height = 80;
     this.width = 80;
@@ -50,9 +47,9 @@ export class CircleLoupeComponent implements AfterViewInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.hasOwnProperty('height')) {
-      if (!isNullOrUndefined(this.loupe)) {
+      if (!(this.loupe === null || this.loupe === undefined)) {
         this.loupe.Settings.lineheight = changes.height.currentValue;
-        if (isNullOrUndefined(this.loupe.Settings.lineheight) || this.loupe.Settings.lineheight < 1) {
+        if ((this.loupe.Settings.lineheight === null || this.loupe.Settings.lineheight === undefined) || this.loupe.Settings.lineheight < 1) {
           this.loupe.Settings.lineheight = 80;
         }
         if (this.initialized) {

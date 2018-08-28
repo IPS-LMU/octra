@@ -17,12 +17,9 @@ export class DropZoneComponent implements OnInit {
   public afterdrop: EventEmitter<FileList> = new EventEmitter<FileList>();
   @ViewChild('fileinput') fileinput: ElementRef;
   private fileAPIsupported = false;
-
-  constructor() {
-  }
+  private old_files: FileList = null;
 
   private _files: FileList = null;
-  private old_files: FileList = null;
 
   get files(): FileList {
     return this._files;
@@ -32,6 +29,9 @@ export class DropZoneComponent implements OnInit {
 
   get sessionfile(): SessionFile {
     return this._sessionfile;
+  }
+
+  constructor() {
   }
 
   ngOnInit() {

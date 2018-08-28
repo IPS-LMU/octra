@@ -8,8 +8,8 @@
                          [spin]="rule.state === 'processing'"></fa-icon>
             </td>
             <td>{{rule.description}}
-            <p [innerHTML]="rule.help" *ngIf="rule.state === 'failed' && rule.help !== ''" style="color:red;">
-            </p>
+                <p [innerHTML]="rule.help" *ngIf="rule.state === 'failed' && rule.help !== ''" style="color:red;">
+                </p>
             </td>
         </tr>
     </table>

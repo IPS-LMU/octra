@@ -37,14 +37,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   private updating = false;
   private errorY = 0;
 
-  constructor(public transcrService: TranscriptionService,
-              public audio: AudioService,
-              public sanitizer: DomSanitizer,
-              private cd: ChangeDetectorRef) {
-
-    this.subscrmanager = new SubscriptionManager();
-  }
-
   private _visible = false;
 
   @Input('visible') set visible(value: boolean) {
@@ -88,6 +80,14 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   public get validationFound() {
     return ((typeof validateAnnotation !== 'undefined') && isFunction(validateAnnotation) &&
       (typeof tidyUpAnnotation !== 'undefined') && isFunction(tidyUpAnnotation));
+  }
+
+  constructor(public transcrService: TranscriptionService,
+              public audio: AudioService,
+              public sanitizer: DomSanitizer,
+              private cd: ChangeDetectorRef) {
+
+    this.subscrmanager = new SubscriptionManager();
   }
 
   ngOnDestroy() {
@@ -168,10 +168,10 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   /*
   ngOnChanges(event) {
     this.show_loading = true;
-    if (!isNullOrUndefined(event.visible) && event.visible.currentValue === true) {
+    if (!(event.visible === null || event.visible === undefined) && event.visible.currentValue === true) {
       this.updateSegments();
       this.transcrService.analyse();
-    } else if (!isNullOrUndefined(event.visible) && event.visible.currentValue === false) {
+    } else if (!(event.visible === null || event.visible === undefined) && event.visible.currentValue === false) {
       jQuery('.error-tooltip').css('display', 'none');
     }
   } */

@@ -12,17 +12,14 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
 
 export class OverviewModalComponent implements OnInit, OnDestroy {
   modalRef: BsModalRef;
-  protected data = null;
-
   public visible = false;
-
   config: ModalOptions = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
   };
-
   @ViewChild('modal') modal: any;
+  protected data = null;
   private subscrmanager = new SubscriptionManager();
 
   private actionperformed: Subject<void> = new Subject<void>();

@@ -4,6 +4,30 @@ import {StatisticElem} from './StatisticElement';
  * Statistic Element Class
  */
 export class MouseStatisticElem extends StatisticElem {
+  constructor(type: string,
+              name: string,
+              value: string,
+              timestamp: number,
+              playerpos: number,
+              caretpos: number,
+              segment: {
+                start: number,
+                length: number,
+                textlength: number
+              }) {
+    super(type, name, value, timestamp, playerpos);
+
+    this.data = {
+      timestamp: timestamp,
+      type: type,
+      context: name,
+      value: value,
+      playerpos: playerpos,
+      caretpos: caretpos,
+      segment: segment
+    };
+  }
+
   public static fromAny(elem: any): MouseStatisticElem {
     const result = {
       value: null,
@@ -32,29 +56,5 @@ export class MouseStatisticElem extends StatisticElem {
 
     return new MouseStatisticElem(result.type, result.context,
       result.value, result.timestamp, result.playerpos, result.caretpos, result.segment);
-  }
-
-  constructor(type: string,
-              name: string,
-              value: string,
-              timestamp: number,
-              playerpos: number,
-              caretpos: number,
-              segment: {
-                start: number,
-                length: number,
-                textlength: number
-              }) {
-    super(type, name, value, timestamp, playerpos);
-
-    this.data = {
-      timestamp: timestamp,
-      type: type,
-      context: name,
-      value: value,
-      playerpos: playerpos,
-      caretpos: caretpos,
-      segment: segment
-    };
   }
 }

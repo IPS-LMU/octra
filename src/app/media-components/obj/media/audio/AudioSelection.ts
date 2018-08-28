@@ -1,22 +1,6 @@
 import {AudioTime} from './AudioTime';
 
 export class AudioSelection {
-  get start(): AudioTime {
-    return this._start;
-  }
-
-  set start(value: AudioTime) {
-    this._start = value;
-  }
-
-  get end(): AudioTime {
-    return this._end;
-  }
-
-  set end(value: AudioTime) {
-    this._end = value;
-  }
-
   get length(): number {
     // TODO is this implementation correct?
     if (this._start && this._end && this._start.samples > this._end.samples) {
@@ -33,18 +17,35 @@ export class AudioSelection {
   }
 
   private _start: AudioTime;
+
+  get start(): AudioTime {
+    return this._start;
+  }
+
+  set start(value: AudioTime) {
+    this._start = value;
+  }
+
   private _end: AudioTime;
 
-  public clone() {
-    return new AudioSelection(
-      this._start, this._end
-    );
+  get end(): AudioTime {
+    return this._end;
+  }
+
+  set end(value: AudioTime) {
+    this._end = value;
   }
 
   constructor(start: AudioTime,
               end: AudioTime) {
     this.start = start.clone();
     this.end = end.clone();
+  }
+
+  public clone() {
+    return new AudioSelection(
+      this._start, this._end
+    );
   }
 
   public checkSelection() {

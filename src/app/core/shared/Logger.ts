@@ -2,6 +2,11 @@ export class Logger {
   private entries: any[];
   private group_name: string;
 
+  constructor(groupe_name: string) {
+    this.entries = [];
+    this.group_name = groupe_name;
+  }
+
   public static err(message: any) {
     console.error(Logger.getDateStr() + ': ' + message);
   }
@@ -21,11 +26,6 @@ export class Logger {
   public static getDateStr() {
     const date = new Date();
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-  }
-
-  constructor(groupe_name: string) {
-    this.entries = [];
-    this.group_name = groupe_name;
   }
 
   public addEntry(type: string, message: any) {

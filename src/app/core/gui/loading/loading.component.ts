@@ -2,7 +2,6 @@ import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core'
 import {TranslateService} from '@ngx-translate/core';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppStorageService, AudioService, SettingsService, TranscriptionService} from '../../shared/service';
-import {isNullOrUndefined} from 'util';
 import {Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
 import {IFile, ImportResult} from '../../obj/Converters';
@@ -20,19 +19,16 @@ export class LoadingComponent implements OnInit, OnDestroy {
   public text = '';
 
   subscrmanager: SubscriptionManager = new SubscriptionManager();
-
+  public progress = 0;
+  public state = '';
+  public warning = '';
   private loadedchanged: EventEmitter<boolean> = new EventEmitter<boolean>();
-
   private loadedtable: any = {
     projectconfig: false,
     guidelines: false,
     methods: false,
     audio: false
   };
-
-  public progress = 0;
-  public state = '';
-  public warning = '';
 
   constructor(private langService: TranslateService,
               public settService: SettingsService,
@@ -58,7 +54,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
       this.langService.get('general.please wait').subscribe(
         (translation) => {
           this.text = translation + '... ';
-                  }
+        }
       );
     }).catch((error) => {
     });
@@ -70,9 +66,11 @@ export class LoadingComponent implements OnInit, OnDestroy {
           this.progress += 25;
           this.state = 'Project configuration loaded';
           let language = this.langService.currentLang;
-          if (isNullOrUndefined(projectsettings.languages.find((x) => {
+
+          const found = projectsettings.languages.find((x) => {
             return x === language;
-          }))) {
+          });
+          if ((found === null || found === undefined)) {
             // fall back to first defined language
             language = projectsettings.languages[0];
           }
@@ -148,13 +146,13 @@ export class LoadingComponent implements OnInit, OnDestroy {
                         // test converter
                         importResult = converter.import(file, oAudioFile);
 
-                        if (!isNullOrUndefined(importResult)) {
+                        if (!(importResult === null || importResult === undefined)) {
                           break;
                         }
                       }
                     }
 
-                    if (!isNullOrUndefined(importResult) && !isNullOrUndefined(importResult.annotjson)) {
+                    if (!(importResult === null || importResult === undefined) && !(importResult.annotjson === null || importResult.annotjson === undefined)) {
                       // conversion successfully finished
                       const new_levels: OIDBLevel[] = [];
                       for (let i = 0; i < importResult.annotjson.levels.length; i++) {
@@ -224,8 +222,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
           ) {
             this.subscrmanager.remove(id);
             setTimeout(() => {
-              if ((isNullOrUndefined(this.appStorage.agreement)
-                  || isNullOrUndefined(this.appStorage.agreement[this.appStorage.user.project]) ||
+              if (((this.appStorage.agreement === null || this.appStorage.agreement === undefined)
+                  || (this.appStorage.agreement[this.appStorage.user.project] === null || this.appStorage.agreement[this.appStorage.user.project] === undefined) ||
                   !this.appStorage.agreement[this.appStorage.user.project]
                 )
                 && this.settService.projectsettings.agreement.enabled && this.appStorage.usemode === 'online') {
@@ -268,7 +266,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
       }
     }).then(() => {
 
-      if (isNullOrUndefined(this.appStorage.usemode) && this.appStorage.url_params.hasOwnProperty('audio') && this.appStorage.url_params['audio'] !== '') {
+      if ((this.appStorage.usemode === null || this.appStorage.usemode === undefined) && this.appStorage.url_params.hasOwnProperty('audio') && this.appStorage.url_params['audio'] !== '') {
         this.appStorage.usemode = 'url';
       }
 
@@ -281,7 +279,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
       this.settService.loadProjectSettings();
 
-      if (this.appStorage.usemode === 'local' && isNullOrUndefined(this.appStorage.file)) {
+      if (this.appStorage.usemode === 'local' && (this.appStorage.file === null || this.appStorage.file === undefined)) {
         console.log('use mode is local, redirect to reload-file');
         this.router.navigate(['/user/transcr/reload-file'], {
           queryParamsHandling: 'preserve'
@@ -307,7 +305,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
   }
 
   retry() {
-    alert("retry!");
+    alert('retry!');
     location.reload();
   }
 

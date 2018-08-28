@@ -46,7 +46,26 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
     const oldError = console.error;
     (() => {
       console.error = function (message) {
-        serv.addEntry(ConsoleType.ERROR, message);
+        let debug = '';
+
+        if (typeof debug === 'string') {
+          debug = message;
+        } else {
+          debug = (
+            arguments.length > 0
+            && !(arguments[1].message === null || arguments[1].message === undefined)
+          ) ? arguments[1].message : '';
+        }
+
+        const stack = (
+          arguments.length > 0
+          && !(arguments[1].stack === null || arguments[1].stack === undefined)
+        ) ? arguments[1].stack : '';
+
+        if (debug !== '') {
+          serv.addEntry(ConsoleType.ERROR, `${debug}: ${stack}`);
+        }
+
         oldError.apply(console, arguments);
       };
     })();
@@ -55,7 +74,11 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
     const oldInfo = console.info;
     (() => {
       console.info = function (message) {
-        serv.addEntry(ConsoleType.INFO, message);
+        if (typeof  message === 'string') {
+          // makes sure that only strings are logged
+          serv.addEntry(ConsoleType.INFO, message);
+        }
+
         oldInfo.apply(console, arguments);
       };
     })();
@@ -68,7 +91,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
         oldWarn.apply(console, arguments);
       };
     })();
-
   }
 
   ngOnInit() {

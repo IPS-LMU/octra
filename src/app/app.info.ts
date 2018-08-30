@@ -33,5 +33,10 @@ export class AppInfo {
     new TextConverter()
   ];
 
+  public static readonly themes: string[] = [
+    'default',
+    'shortAudioFiles'
+  ];
+
   static readonly version = '1.2.6';
 }

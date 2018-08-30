@@ -22,4 +22,7 @@ export interface ProjectSettings {
   interfaces: string[];
   plugins: any;
   feedback_form: Group[];
+  octra: {
+    theme: string
+  };
 }

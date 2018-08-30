@@ -31,7 +31,7 @@
     </div>
 
     <div id="bottom-feedback" class="card" #feedback
-         *ngIf="appStorage.usemode === 'online' && transcrService.feedback !== null && transcrService.feedback !== undefined">
+         *ngIf="settingsService.projectsettings.octra.theme === 'default' && (appStorage.usemode === 'online' && transcrService.feedback !== null && transcrService.feedback !== undefined)">
         <div class="card-header">
             <table style="width:100%;">
                 <tbody>

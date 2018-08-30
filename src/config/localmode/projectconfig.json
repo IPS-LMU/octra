@@ -129,5 +129,8 @@
         }
       ]
     }
-  ]
+  ],
+  "octra": {
+    "theme": "shortAudioFiles"
+  }
 }

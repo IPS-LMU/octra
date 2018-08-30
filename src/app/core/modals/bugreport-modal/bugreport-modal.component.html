@@ -50,7 +50,7 @@
                 <button type="button" class="btn btn-secondary" (click)="close('CANCEL')">
                     {{"general.abort" | translate}}
                 </button>
-                <button type="button" class="btn btn-primary" (click)="close('SEND')" [disabled]="!isvalid">
+                <button type="button" class="btn btn-primary" (click)="sendBugReport();" [disabled]="!isvalid">
                     {{"bug report.report an error" | translate}}
                 </button>
             </div>

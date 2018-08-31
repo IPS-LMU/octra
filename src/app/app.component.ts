@@ -52,13 +52,13 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
           debug = message;
         } else {
           debug = (
-            arguments.length > 0
+            arguments.length > 1
             && !(arguments[1].message === null || arguments[1].message === undefined)
           ) ? arguments[1].message : '';
         }
 
         const stack = (
-          arguments.length > 0
+          arguments.length > 1
           && !(arguments[1].stack === null || arguments[1].stack === undefined)
         ) ? arguments[1].stack : '';
 

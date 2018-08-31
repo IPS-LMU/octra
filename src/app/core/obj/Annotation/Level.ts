@@ -52,6 +52,7 @@ export class Level {
 
   public static fromObj(entry: OIDBLevel, samplerate: number, last_sample: number, sampleRateFactor: number): Level {
     if (!(sampleRateFactor === null || sampleRateFactor === undefined) && sampleRateFactor > 0) {
+      console.log(`last samples ${last_sample}`);
       let segments: Segments = null;
       let events = [];
       let items = [];

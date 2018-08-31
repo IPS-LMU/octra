@@ -6,6 +6,7 @@ import {AudioChunk} from './AudioChunk';
 import {AudioSelection} from './AudioSelection';
 import {AudioFormat} from './AudioFormats';
 import {AudioInfo, PlayBackState, SourceType} from '../index';
+import {BrowserInfo} from '../../../../core/shared';
 
 declare var window: any;
 
@@ -38,17 +39,23 @@ export class AudioManager {
         AudioManager.decodeAudioFile(buffer, audioinfo.samplerate).then((audiobuffer: AudioBuffer) => {
           console.log(`audio decoded`);
           const result = new AudioManager(audioinfo);
-          audioinfo = new AudioInfo(filename, type, buffer_length, audiobuffer.sampleRate, audiobuffer.length, audiobuffer.numberOfChannels, audioinfo.bitrate);
+
+          console.log(`original samplerate: ${audioinfo.samplerate}`);
+          audioinfo = new AudioInfo(filename, type, buffer_length, audiobuffer.sampleRate,
+            audiobuffer.length, audiobuffer.numberOfChannels, audioinfo.bitrate);
 
           result.ressource = new AudioRessource(filename, SourceType.ArrayBuffer,
             audioinfo, (buffer_copy === null) ? buffer : buffer_copy, audiobuffer, buffer_length);
 
           // set duration is very important
           result.ressource.info.duration.samples = audiobuffer.length;
+          console.log(`duration: ${result.ressource.info.duration.seconds}`);
+          console.log(`dur ${audiobuffer.length / audiobuffer.sampleRate}`);
           console.log(`factor is ${result.sampleRateFactor}!`);
+          console.log(`decoded samplerate: ${audiobuffer.sampleRate}`);
 
-          const selection = new AudioSelection(new AudioTime(0, audioinfo.samplerate),
-            new AudioTime(audiobuffer.length, audioinfo.samplerate));
+          const selection = new AudioSelection(new AudioTime(0, audiobuffer.sampleRate),
+            new AudioTime(audiobuffer.length, audiobuffer.sampleRate));
           result._mainchunk = new AudioChunk(selection, result);
 
           result.state = PlayBackState.INITIALIZED;
@@ -254,15 +261,74 @@ export class AudioManager {
   }
 
   public static decodeAudioFile(file: ArrayBuffer, sampleRate: number): Promise<AudioBuffer> {
+    /*
     return new Promise<AudioBuffer>((resolve, reject) => {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-      if (audioCtx) {
-        audioCtx.decodeAudioData(file, function (buffer) {
-          resolve(buffer);
+      const OfflineAudioContext = (<any>window).OfflineAudioContext // Default
+        || (<any>window).webkitOfflineAudioContext // Safari and old versions of Chrome
+        || (<any>window).mozOfflineAudioContext
+        || false;
+
+      console.log('decode Methode');
+      if (OfflineAudioContext === false) {
+        console.error(`OfflineAudioContext is not supported!`);
+      }
+
+      audioCtx.decodeAudioData(file, function (buffer) {
+        console.log('received');
+        console.log(buffer.length / buffer.sampleRate);
+        console.log(buffer);
+        const context = new OfflineAudioContext(1, Math.ceil(buffer.duration * sampleRate), sampleRate);
+        const source = context.createBufferSource();
+        source.buffer = buffer;
+        source.connect(context.destination);
+        source.start();
+        context.startRendering().then((rendered) => {
+          resolve(rendered);
+        }).catch((error) => {
+          reject(error);
         });
+      });
+    });
+     */
+    return new Promise<AudioBuffer>((resolve, reject) => {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+      if (BrowserInfo.browser.indexOf('Safari') > -1) {
+        console.log(`safari`);
+        if (audioCtx) {
+          audioCtx.decodeAudioData(file, function (buffer) {
+            resolve(buffer);
+          });
+        } else {
+          reject('AudioContext not supported by the browser.');
+        }
       } else {
-        reject('AudioContext not supported by the browser.');
+        // not Safari Browser
+        console.log(`not safari`);
+        const OfflineAudioContext = (<any>window).OfflineAudioContext // Default
+          || (<any>window).webkitOfflineAudioContext // Safari and old versions of Chrome
+          || (<any>window).mozOfflineAudioContext
+          || false;
+
+        if (OfflineAudioContext === false) {
+          console.error(`OfflineAudioContext is not supported!`);
+        }
+
+        audioCtx.decodeAudioData(file, function (buffer) {
+          // do downsampling in order to allow bigger files
+          const context = new OfflineAudioContext(1, Math.ceil(buffer.duration * sampleRate), sampleRate);
+          const source = context.createBufferSource();
+          source.buffer = buffer;
+          source.connect(context.destination);
+          source.start();
+          context.startRendering().then((rendered) => {
+            resolve(rendered);
+          }).catch((error) => {
+            reject(error);
+          });
+        });
       }
     });
   }

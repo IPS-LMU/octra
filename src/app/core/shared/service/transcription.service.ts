@@ -194,6 +194,7 @@ export class TranscriptionService {
       this._audiofile.size = this._audiomanager.originalInfo.size;
 
       this.last_sample = this._audiomanager.ressource.info.duration.samples;
+      console.log(`LAST Sample: ${this.last_sample}`);
 
       this.loadSegments().then(
         () => {

@@ -87,7 +87,8 @@
     "finish": "Transkription fertigstellen",
     "stop": "Transkription beenden",
     "check": "Transkription überprüfen",
-    "send": "Transkription senden"
+    "send": "Transkription senden",
+    "complete": "Transkription abschließen"
   },
   "segments": {
     "total": "Segmente insgesamt",

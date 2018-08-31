@@ -88,7 +88,8 @@
     "finish": "Finish transcription",
     "stop": "Stop transcription",
     "check": "Check transcription",
-    "send": "Send transcription"
+    "send": "Send transcription",
+    "complete": "Complete Transcription"
   },
   "segments": {
     "total": "Total segments",

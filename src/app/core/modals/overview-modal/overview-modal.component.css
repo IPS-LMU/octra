@@ -1,3 +1,7 @@
 #bgProtocol {
     min-height: 200px;
 }
+
+#transcr-send-btn {
+    width: 100%;
+}

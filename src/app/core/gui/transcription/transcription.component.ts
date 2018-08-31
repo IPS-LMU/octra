@@ -32,7 +32,6 @@ import {BrowserInfo, SubscriptionManager} from '../../shared';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 import {ProjectSettings} from '../../obj/Settings';
-import {NgForm} from '@angular/forms';
 import {EditorComponents} from '../../../editors/components';
 import {Level} from '../../obj/Annotation';
 import {getPlayBackString, PlayBackState} from '../../../media-components/obj/media';
@@ -42,11 +41,11 @@ import {BugReportService} from '../../shared/service/bug-report.service';
 import * as X2JS from 'x2js';
 import {ModalService} from '../../modals/modal.service';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
-import {ModalSendAnswer} from '../../modals/transcription-send-modal/transcription-send-modal.component';
 import {throwError} from 'rxjs';
 import {TranscriptionGuidelinesModalComponent} from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {NavbarService} from '../navbar/navbar.service';
+import {OverviewModalComponent} from '../../modals/overview-modal/overview-modal.component';
 
 @Component({
   selector: 'app-transcription',
@@ -56,48 +55,6 @@ import {NavbarService} from '../navbar/navbar.service';
 })
 export class TranscriptionComponent implements OnInit,
   OnDestroy, AfterViewInit, AfterContentInit, OnChanges, AfterViewChecked, AfterContentChecked, AfterContentInit {
-
-  // TODO change to ModalComponents!
-  @ViewChild('modal_shortcuts') modal_shortcuts: any;
-  @ViewChild('modal_overview') modal_overview: any;
-  @ViewChild(LoadeditorDirective) appLoadeditor: LoadeditorDirective;
-  @ViewChild('modal') modal: any;
-  @ViewChild('modal2') modal2: any;
-  @ViewChild('modal_guidelines') modal_guidelines: TranscriptionGuidelinesModalComponent;
-  @ViewChild('fo') feedback_form: NgForm;
-  public send_error = '';
-  public showdetails = false;
-  public saving = '';
-  public interface = '';
-  public shortcutslist: Entry[] = [];
-  public editorloaded = false;
-  public feedback_data = {};
-  public feedback_expanded = false;
-  user: number;
-  public platform = BrowserInfo.platform;
-  abortTranscription = () => {
-    this.modService.show('transcription_stop').then((answer: TranscriptionStopModalAnswer) => {
-      if (answer === TranscriptionStopModalAnswer.QUIT) {
-        if (this.appStorage.usemode === 'online') {
-          this.saveFeedbackform();
-        }
-        this.transcrService.endTranscription();
-        this.router.navigate(['/logout'], {
-          queryParamsHandling: 'preserve'
-        });
-      }
-    }).catch((error) => {
-      console.error(error);
-    });
-  };
-  onSendError = (error) => {
-    this.send_error = error.message;
-    return throwError(error);
-  };
-  private subscrmanager: SubscriptionManager;
-  private send_ok = false;
-  private level_subscription_id = 0;
-  private audiomanager: AudioManager;
 
   public get Interface(): string {
     return this.interface;
@@ -118,8 +75,6 @@ export class TranscriptionComponent implements OnInit,
   get responsive(): boolean {
     return this.settingsService.responsive.enabled;
   }
-
-  private _currentEditor: ComponentRef<Component>;
 
   get currentEditor(): ComponentRef<Component> {
     return this._currentEditor;
@@ -178,6 +133,45 @@ export class TranscriptionComponent implements OnInit,
 
   }
 
+  // TODO change to ModalComponents!
+  @ViewChild('modal_shortcuts') modal_shortcuts: any;
+  @ViewChild('modal_overview') modal_overview: OverviewModalComponent;
+  @ViewChild(LoadeditorDirective) appLoadeditor: LoadeditorDirective;
+  @ViewChild('modal') modal: any;
+  @ViewChild('modal2') modal2: any;
+  @ViewChild('modal_guidelines') modal_guidelines: TranscriptionGuidelinesModalComponent;
+
+  public send_error = '';
+  public showdetails = false;
+  public saving = '';
+  public interface = '';
+  public shortcutslist: Entry[] = [];
+  public editorloaded = false;
+  public feedback_expanded = false;
+  user: number;
+  public platform = BrowserInfo.platform;
+  abortTranscription = () => {
+    this.modService.show('transcription_stop').then((answer: TranscriptionStopModalAnswer) => {
+      if (answer === TranscriptionStopModalAnswer.QUIT) {
+        this.transcrService.endTranscription();
+        this.router.navigate(['/logout'], {
+          queryParamsHandling: 'preserve'
+        });
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
+  };
+  onSendError = (error) => {
+    this.send_error = error.message;
+    return throwError(error);
+  };
+  private subscrmanager: SubscriptionManager;
+  private send_ok = false;
+  private level_subscription_id = 0;
+  private audiomanager: AudioManager;
+  private _currentEditor: ComponentRef<Component>;
+
   ngOnChanges(changes: SimpleChanges) {
   }
 
@@ -189,7 +183,6 @@ export class TranscriptionComponent implements OnInit,
 
     // because of the loading data before through the loading component you can be sure the audio was loaded
     // correctly
-    this.loadForm();
 
     this.transcrService.guidelines = this.settingsService.guidelines;
 
@@ -389,40 +382,6 @@ export class TranscriptionComponent implements OnInit,
     }
   }
 
-  expandFeedback() {
-    if (jQuery('#bottom-feedback').css('height') === '30px') {
-      jQuery('#bottom-feedback').css({
-        'height': '50%',
-        'margin-bottom': 0,
-        'position': 'relative'
-      });
-      jQuery('#bottom-feedback .inner').css({
-        'display': 'inherit',
-        'overflow-y': 'scroll'
-      });
-
-    } else {
-      jQuery('#bottom-feedback').css({
-        'height': 30,
-        'margin-bottom': 0,
-        'position': 'relative'
-      });
-
-      jQuery('#bottom-feedback .inner').css({
-        'display': 'none',
-        'overflow-y': 'hidden'
-      });
-      this.saveFeedbackform();
-    }
-
-    this.feedback_expanded = !this.feedback_expanded;
-  }
-
-  changeValue(control: string, value: any) {
-    const result = this.transcrService.feedback.setValueForControl(control, value.toString());
-    console.warn(result);
-  }
-
   translate(languages: any, lang: string): string {
     if ((languages[lang] === null || languages[lang] === undefined)) {
       for (const attr in languages) {
@@ -466,18 +425,10 @@ export class TranscriptionComponent implements OnInit,
   }
 
   onSendButtonClick() {
-
-    if (this.feedback_form.valid) {
-      this.saveFeedbackform();
-      this.modal.open().then((action) => {
-        if (action === ModalSendAnswer.SEND) {
-          this.onSendNowClick();
-        }
-      }).catch((error) => {
-        console.error(error);
-      });
-    } else if (!this.feedback_expanded) {
-      this.expandFeedback();
+    if (!this.modal_overview.feedBackComponent.valid) {
+      this.modal_overview.open();
+    } else {
+      this.onSendNowClick();
     }
   }
 
@@ -544,30 +495,13 @@ export class TranscriptionComponent implements OnInit,
     this.appStorage.clearAnnotationData().catch((err) => {
       console.error(err);
     });
-    this.appStorage.idb.save('options', 'feedback', {value: null});
+    this.appStorage.feedback = {};
     this.appStorage.comment = '';
     this.appStorage.clearLoggingData().catch((err) => {
       console.error(err);
     });
     this.uiService.elements = [];
     this.settingsService.clearSettings();
-  }
-
-  public checkBoxChanged(group: string, checkb: string) {
-    for (let i = 0; i < this.transcrService.feedback.groups.length; i++) {
-      const group_ = this.transcrService.feedback.groups[i];
-      if (group_.name === group) {
-        for (let j = 0; j < group_.controls.length; j++) {
-          const control = group_.controls[j];
-          if (control.value === checkb) {
-            control.custom['checked'] = ((control.custom['checked'] === null || control.custom['checked'] === undefined))
-              ? true : !control.custom['checked'];
-            break;
-          }
-        }
-        break;
-      }
-    }
   }
 
   public onSaveTranscriptionButtonClicked() {
@@ -638,49 +572,5 @@ export class TranscriptionComponent implements OnInit,
       }
     };
     xhr.send(form);
-  }
-
-  private saveFeedbackform() {
-    if (!(this.transcrService.feedback.comment === null || this.transcrService.feedback.comment === undefined)
-      && this.transcrService.feedback.comment !== '') {
-      this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(<)|(\/>)|(>)/g, '\s');
-    }
-    this.appStorage.comment = this.transcrService.feedback.comment;
-
-    for (const control in this.feedback_data) {
-      if (this.feedback_data.hasOwnProperty(control)) {
-        this.changeValue(control, this.feedback_data[control]);
-      }
-    }
-    this.appStorage.save('feedback', this.transcrService.feedback.exportData());
-  }
-
-  private loadForm() {
-    // create emty attribute
-    const feedback = this.transcrService.feedback;
-    if (!(this.settingsService.projectsettings === null || this.settingsService.projectsettings === undefined)
-      && !(feedback === null || feedback === undefined)
-    ) {
-      for (const g in feedback.groups) {
-        if (!(g === null || g === undefined)) {
-          const group = feedback.groups[g];
-          for (const c in group.controls) {
-            if (!(c === null || c === undefined)) {
-              const control = group.controls[c];
-              if (control.type.type === 'textarea') {
-                this.feedback_data[group.name] = control.value;
-              } else {
-                // radio skip checkboxes
-                if (control.type.type !== 'checkbox' && !(control.custom === null || control.custom === undefined)
-                  && !(control.custom.checked === null || control.custom.checked === undefined)
-                  && control.custom.checked) {
-                  this.feedback_data[group.name] = control.value;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
   }
 }

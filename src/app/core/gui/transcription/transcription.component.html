@@ -1,7 +1,7 @@
 <app-alert #alert></app-alert>
 <app-transcription-send-modal #modal></app-transcription-send-modal>
 <app-transcription-sending-modal [sendError]="send_error" #modal2></app-transcription-sending-modal>
-<app-overview-modal #modal_overview id="overview"></app-overview-modal>
+<app-overview-modal #modal_overview id="overview" (transcriptionSend)="onSendNowClick()"></app-overview-modal>
 <app-shortcuts-modal #modal_shortcuts [editor]="Interface"></app-shortcuts-modal>
 <app-transcription-success-modal #success></app-transcription-success-modal>
 <app-transcription-guidelines-modal #modal_guidelines
@@ -30,6 +30,7 @@
         <ng-template appLoadeditor></ng-template>
     </div>
 
+    <!--
     <div id="bottom-feedback" class="card" #feedback
          *ngIf="settingsService.projectsettings.octra.theme === 'default' && (appStorage.usemode === 'online' && transcrService.feedback !== null && transcrService.feedback !== undefined)">
         <div class="card-header">
@@ -51,58 +52,8 @@
                 </tbody>
             </table>
         </div>
-        <div class="card-body" [hidden]="!feedback_expanded">
-            <div class="inner">
-                <form #fo="ngForm">
-                    <fieldset>
-                        <div class="form-group" *ngFor="let group of transcrService.feedback.groups">
-                            <label class="control-label">{{translate(group.title, langService.currentLang)}}</label>
-                            <span class="required_marker" *ngIf="group.controls[0].required">*</span>
-                            <br/>
-                            <br/>
-                            <div class="ctrl" *ngFor="let control of group.controls;">
-                                <div class="radio" *ngIf="control.type.type === 'radiobutton'">
-                                    <label>{{translate(control.label.languages, langService.currentLang)}}
-                                        <input type="radio"
-                                               name="{{group.name}}" value="{{control.value}}"
-                                               [checked]="control.custom.checked"
-                                               [required]="control.required"
-                                               [(ngModel)]="feedback_data[group.name]"
-                                        />
-                                    </label>
-                                </div>
-                                <div class="checkbox" *ngIf="control.type.type === 'checkbox'">
-                                    <label>
-                                        <input type="checkbox"
-                                               name="{{control.value}}" value="true"
-                                               [checked]="control.custom.checked" #checkb
-                                               [required]="control.required"
-                                               (change)="checkBoxChanged(group.name, control.value)">
-                                        <span class="required_marker" *ngIf="control.required">*</span>
-                                        {{translate(control.label.languages, langService.currentLang)}}
-                                    </label>
-                                </div>
-                                <div *ngIf="control.type.type === 'textarea'">
-                                    <label>{{translate(control.label.languages, langService.currentLang)}}</label><br/>
-                                    <textarea class="form-control"
-                                              name="{{group.name}}" value="{{control.value}}"
-                                              [required]="control.required"></textarea>
-                                    [(ngModel)]="feedback_data[group.name]"
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div>
-                                <label>{{"transcription-submit.comment description" | translate}}</label><br/>
-                                <textarea class="form-control" [(ngModel)]="transcrService.feedback.comment"
-                                          name="comment"></textarea>
-                            </div>
-                        </div>
-                    </fieldset>
-                </form>
-            </div>
-        </div>
     </div>
+    -->
     <div class="row" id="bottom-navigation" role="group">
         <button class="btn btn-secondary btn-raised col-md-6"
                 *ngIf="appStorage.usemode === 'local' || appStorage.usemode === 'online'"

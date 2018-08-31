@@ -7,6 +7,7 @@ import {
   OnChanges,
   OnDestroy,
   OnInit,
+  Output,
   ViewChild
 } from '@angular/core';
 
@@ -50,6 +51,8 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
   @ViewChild('window') window: TranscrWindowComponent;
   @ViewChild('loupe') loupe: CircleLoupeComponent;
   @ViewChild('audionav') audionav: AudioNavigationComponent;
+
+  @Output() public openModal = new EventEmitter();
   public showWindow = false;
   public loupe_hidden = true;
   public selected_index: number;
@@ -277,6 +280,8 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       Functions.scrollTo(y, '#special');
 
     } else if (state === 'open') {
+    } else if (state === 'overview') {
+      this.openModal.emit('overview');
     }
   }
 

@@ -76,7 +76,8 @@
                              {{"general.save" | translate}} & {{"general.close" | translate}}
                             </span>
             </button>
-            <button class="btn btn-info btn-raised col-md-4" (click)="save();doit('right');">
+            <button class="btn btn-info btn-raised col-md-4" (click)="save();doit('right');"
+                    *ngIf="segment_index < transcrService.currentlevel.segments.length - 1">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'d-lg-none': responsive && !easymode}">
                                 <fa-icon icon="save"></fa-icon> & <fa-icon icon="arrow-right"></fa-icon>
@@ -84,6 +85,17 @@
                 <span *ngIf="!easymode" [ngClass]="{'d-none d-lg-inline': responsive}">
                              {{"general.save" | translate}} &
                             {{"segments.next" | translate}}
+                            </span>
+            </button>
+            <button class="btn btn-info btn-raised col-md-4" (click)="save();close();openOverview();"
+                    *ngIf="segment_index === transcrService.currentlevel.segments.length - 1">
+                            <span *ngIf="responsive || easymode"
+                                  [ngClass]="{'d-lg-none': responsive && !easymode}">
+                                <fa-icon icon="save"></fa-icon> & <fa-icon icon="eye"></fa-icon>
+                            </span>
+                <span *ngIf="!easymode" [ngClass]="{'d-none d-lg-inline': responsive}">
+                             {{"general.save" | translate}} &
+                            {{"general.overview" | translate}}
                             </span>
             </button>
         </div>

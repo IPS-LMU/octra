@@ -58,11 +58,17 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       this.close();
     }
   };
+
   onKeyDown = ($event) => {
     switch ($event.comboKey) {
       case ('ALT + ARROWRIGHT'):
         $event.event.preventDefault();
-        this.doit('right');
+        if (this.segment_index < this.transcrService.currentlevel.segments.length - 1) {
+          this.doit('right');
+        } else {
+          this.close();
+          this.act.emit('overview');
+        }
         break;
       case ('ALT + ARROWLEFT'):
         $event.event.preventDefault();
@@ -193,6 +199,10 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
   public open() {
     this.showWindow = true;
+  }
+
+  openOverview() {
+    this.act.emit('overview');
   }
 
   save() {

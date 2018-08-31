@@ -371,6 +371,12 @@ export class TranscriptionComponent implements OnInit,
           caretpos = (<any> this.currentEditor.instance).editor.caretpos;
         }
 
+        if ((<any> this.currentEditor.instance).hasOwnProperty('openModal')) {
+          this.subscrmanager.add((<any> this.currentEditor.instance).openModal.subscribe(() => {
+            this.modal_overview.open();
+          }));
+        }
+
         this.uiService.addElementFromEvent('editor', {value: 'changed'}, Date.now(),
           null, null, name);
 

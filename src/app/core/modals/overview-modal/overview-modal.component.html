@@ -1,6 +1,9 @@
 <div bsModal #modal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1"
      id="bugreport" style="padding: 20px;">
-    <div class="modal-dialog modal-lg flex" style="height:93%;width:100%;display: contents;">
+    <div class="modal-dialog modal-lg flex" style="height:93%;display: contents;" [ngStyle]="{
+        'max-width': (appStorage.usemode === 'online') ? '100%' : '750px;',
+        'display': (appStorage.usemode === 'online') ? 'contents' : 'block'
+    }">
         <div class="modal-content flex" style="flex:auto;height:100%;">
             <div class="modal-header">
                 <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
@@ -9,20 +12,23 @@
             </div>
             <div class="modal-body flex" style="flex:auto;">
                 <div class="row" style="overflow: auto;">
-                    <div class="col-md-6" style="overflow: auto; max-height:1200px;border-right:1px solid lightgray;">
+                    <div [ngClass]="{
+                        'col-md-6': appStorage.usemode === 'online',
+                        'col-12': appStorage.usemode !== 'online'
+                    }" class="col-md-6" style="overflow: auto; max-height:1200px;border-right:1px solid lightgray;">
                         <app-transcr-overview [visible]="visible"
                                               [segments]="(transcrService.annotation !== null && transcrService.annotation !== undefined)
                               ? transcrService.annotation.levels[transcrService.selectedlevel].segments.segments: null"
                                               (segmentclicked)="onSegmentInOverviewClicked($event)">
                         </app-transcr-overview>
                     </div>
-                    <div class="col-md-6" style="overflow: auto;">
+                    <div class="col-md-6" style="overflow: auto;" *ngIf="appStorage.usemode === 'online'">
                         <h4>Feedback</h4>
                         <app-transcription-feedback #feedback></app-transcription-feedback>
                         <button class="btn btn-primary btn-outline btn-success" id="transcr-send-btn"
                                 (click)="sendTranscription()" [disabled]="!feedback.valid">
                             <fa-icon icon="paper-plane"></fa-icon>
-                            SENDEN
+                            {{"transcription.send" | translate}}
                         </button>
                     </div>
                 </div>

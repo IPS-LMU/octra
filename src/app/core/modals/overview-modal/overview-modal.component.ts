@@ -37,7 +37,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
   constructor(public transcrService: TranscriptionService,
               public ms: BsModalService,
               private settingsService: SettingsService,
-              private appStorage: AppStorageService) {
+              public appStorage: AppStorageService) {
   }
 
   ngOnInit() {
@@ -65,7 +65,9 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
       this.visible = true;
 
       // this.loadForm();
-      this.feedback.feedback_data = this.appStorage.feedback;
+      if (this.appStorage.usemode === 'online') {
+        this.feedback.feedback_data = this.appStorage.feedback;
+      }
 
       const subscr = this.actionperformed.subscribe(
         (action) => {
@@ -83,7 +85,10 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
     this.modal.hide();
     this.visible = false;
     this.actionperformed.next();
-    this.feedback.saveFeedbackform();
+
+    if (this.appStorage.usemode === 'online') {
+      this.feedback.saveFeedbackform();
+    }
   }
 
   public beforeDismiss() {

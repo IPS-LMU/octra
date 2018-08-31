@@ -1,0 +1,16 @@
+textarea {
+    width: 100% !important;
+}
+
+fieldset {
+    width: 100%;
+}
+
+.form-group {
+    margin-top: 5px !important;
+    margin-bottom: 20px !important;
+}
+
+.required_marker {
+    color: red;
+}

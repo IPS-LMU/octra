@@ -148,10 +148,6 @@ footer {
 
 #bugreport .modal-dialog {
     width: 90%;
-    max-height: 90%;
-}
-
-#bugreport .modal-content {
     height: 100%;
 }
 
@@ -267,4 +263,12 @@ footer {
 .note-btn-group.btn-group.note-default button {
     margin: 3px 0px 0px 0px;
     /* padding: 1px; */
+}
+
+.radio label .bmd-radio, label.radio-inline .bmd-radio {
+    margin-top: 0;
+}
+
+.radio {
+    margin-right: 5px;
 }

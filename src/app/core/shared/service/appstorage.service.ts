@@ -43,6 +43,272 @@ export class OIDBLink implements IIDBLink {
 export class AppStorageService {
   // SESSION STORAGE
   @SessionStorage('session_key') session_key: string;
+
+  get Interface(): string {
+    return this._interface;
+  }
+
+  set Interface(new_interface: string) {
+    this._interface = new_interface;
+    this.idb.save('options', 'interface', {value: new_interface}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  get followplaycursor(): boolean {
+    return this._followplaycursor;
+  }
+
+  set followplaycursor(value: boolean) {
+    this._followplaycursor = value;
+  }
+
+  get agreement(): any {
+    return this._agreement;
+  }
+
+  set agreement(value: any) {
+    this._agreement = value;
+  }
+
+  get playonhover(): boolean {
+    return this._playonhover;
+  }
+
+  set playonhover(value: boolean) {
+    this._playonhover = value;
+  }
+
+  get reloaded(): boolean {
+    return this._reloaded;
+  }
+
+  set reloaded(value: boolean) {
+    this._reloaded = value;
+  }
+
+  get email(): string {
+    return this._email;
+  }
+
+  get idbloaded(): boolean {
+    return this._idbloaded;
+  }
+
+  set email(value: string) {
+    this._email = value;
+  }
+
+  get loaded(): EventEmitter<any> {
+    return this._loaded;
+  }
+
+  get idb(): IndexedDBManager {
+    return this._idb;
+  }
+
+  /* Getter/Setter SessionStorage */
+  get servertranscipt(): any[] {
+    return this._servertranscipt;
+  }
+
+  set servertranscipt(value: any[]) {
+    this._servertranscipt = value;
+  }
+
+  get submitted(): boolean {
+    return this._submitted;
+  }
+
+  set submitted(value: boolean) {
+    this._submitted = value;
+    this.idb.save('options', 'submitted', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  get feedback(): any {
+    return this._feedback;
+  }
+
+  get logs(): any[] {
+    return this._logs;
+  }
+
+  get data_id(): number {
+    return this._data_id;
+  }
+
+  set data_id(value: number) {
+    this._data_id = value;
+    this.idb.save('options', 'data_id', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  get audio_url(): string {
+    return this._audio_url;
+  }
+
+  set audio_url(value: string) {
+    this._audio_url = value;
+    this.idb.save('options', 'audio_url', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  get usemode(): 'online' | 'local' | 'url' {
+    return this._usemode;
+  }
+
+  get sessionfile(): SessionFile {
+    return SessionFile.fromAny(this._sessionfile);
+  }
+
+  set usemode(value: 'online' | 'local' | 'url') {
+    this._usemode = value;
+    this.idb.save('options', 'usemode', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  set sessionfile(value: SessionFile) {
+    this._sessionfile = (!(value === null || value === undefined)) ? value.toAny() : null;
+    this.idb.save('options', 'sessionfile', {value: this._sessionfile})
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
+  get language(): string {
+    return this._language;
+  }
+
+  set language(value: string) {
+    this._language = value;
+    this.idb.save('options', 'language', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  /* Getter/Setter IDB Storage */
+  get version(): string {
+    return this._version;
+  }
+
+  set version(value: string) {
+    this._version = value;
+    this._idb.save('options', 'version', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  get logging(): boolean {
+    return this._logging;
+  }
+
+  set logging(value: boolean) {
+    this._logging = value;
+    this._idb.save('options', 'logging', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  get show_loupe(): boolean {
+    return this._show_loupe;
+  }
+
+  set show_loupe(value: boolean) {
+    this._show_loupe = value;
+    this._idb.save('options', 'show_loupe', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  get prompttext(): string {
+    return this._prompttext;
+  }
+
+  set prompttext(value: string) {
+    this._prompttext = value;
+    this._idb.save('options', 'prompttext', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  get url_params(): any[] {
+    return this._url_params;
+  }
+
+  set url_params(value: any[]) {
+    this._url_params = value;
+  }
+
+  get user(): {
+    id: string,
+    project: string,
+    jobno: number
+  } {
+    return this._user;
+  }
+
+  set user(value: {
+    id: string,
+    project: string,
+    jobno: number
+  }) {
+    this._user = value;
+    this._idb.save('options', 'user', {value: this._user}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  get easymode(): boolean {
+    return this._easymode;
+  }
+
+  set easymode(value: boolean) {
+    this._easymode = value;
+    this.idb.save('options', 'easymode', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  get comment(): string {
+    return this._comment;
+  }
+
+  set comment(value: string) {
+    this._comment = value;
+    this._idb.save('options', 'comment', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  get annotation(): OIDBLevel[] {
+    return this._annotation;
+  }
+
+  get annotation_links(): OIDBLink[] {
+    return this._annotation_links;
+  }
+
+  get levelcounter(): number {
+    return this._levelcounter;
+  }
+
+  get LoggedIn(): boolean {
+    return this._logged_in;
+  }
+
+  set LoggedIn(value: boolean) {
+    this._logged_in = value;
+  }
+
+  constructor(public sessStr: SessionStorageService,
+              public localStr: LocalStorageService) {
+  }
+
   @SessionStorage() _logged_in: boolean;
   @SessionStorage() logInTime: number; // timestamp
   @SessionStorage('jobs_left') jobs_left: number;
@@ -131,6 +397,39 @@ export class AppStorageService {
   private _interface: string = null;
   // is user on the login page?
   private login: boolean;
+  @SessionStorage('followplaycursor') private _followplaycursor: boolean;
+  // IDB STORAGE
+  private _idbloaded = false;
+  private _loaded = new EventEmitter();
+  private _idb: IndexedDBManager;
+  private _sessionfile: any = null;
+  private _user: {
+    id: string,
+    project: string,
+    jobno: number
+  } = null;
+  @SessionStorage('agreement') private _agreement: any;
+  @SessionStorage('playonhover') private _playonhover: boolean;
+  @SessionStorage('reloaded') private _reloaded: boolean;
+  @SessionStorage('email') private _email: string;
+  @SessionStorage('servertranscript') private _servertranscipt: any[];
+  private _submitted: boolean = null;
+  private _feedback: any = null;
+  private _logs: any[] = [];
+  private _data_id: number = null;
+  private _audio_url: string = null;
+  private _usemode: 'local' | 'online' | 'url' = null;
+  private _language = 'en';
+  private _version: string = null;
+  private _logging = false;
+  private _show_loupe = true;
+  private _prompttext = '';
+  private _url_params: any = {};
+  private _easymode = false;
+  private _comment = '';
+  private _annotation: OIDBLevel[] = null;
+  private _annotation_links: OIDBLink[] = null;
+  private _levelcounter = 0;
   private loadOptions = (variables: { attribute: string, key: string }[]): Promise<void> => {
     return new Promise<void>(
       (resolve, reject) => {
@@ -167,325 +466,12 @@ export class AppStorageService {
       }
     );
   };
-  @SessionStorage('followplaycursor') private _followplaycursor: boolean;
-  // IDB STORAGE
-  private _idbloaded = false;
-  private _loaded = new EventEmitter();
-  private _idb: IndexedDBManager;
-  private _sessionfile: any = null;
-  private _user: {
-    id: string,
-    project: string,
-    jobno: number
-  } = null;
 
-  get Interface(): string {
-    return this._interface;
-  }
-
-  set Interface(new_interface: string) {
-    this._interface = new_interface;
-    this.idb.save('options', 'interface', {value: new_interface}).catch((err) => {
+  set feedback(value: any) {
+    this._feedback = value;
+    this._idb.save('options', 'feedback', {value: value}).catch((err) => {
       console.error(err);
     });
-  }
-
-  @SessionStorage('agreement') private _agreement: any;
-
-  get followplaycursor(): boolean {
-    return this._followplaycursor;
-  }
-
-  set followplaycursor(value: boolean) {
-    this._followplaycursor = value;
-  }
-
-  get agreement(): any {
-    return this._agreement;
-  }
-
-  set agreement(value: any) {
-    this._agreement = value;
-  }
-
-  @SessionStorage('playonhover') private _playonhover: boolean;
-
-  get playonhover(): boolean {
-    return this._playonhover;
-  }
-
-  set playonhover(value: boolean) {
-    this._playonhover = value;
-  }
-
-  @SessionStorage('reloaded') private _reloaded: boolean;
-
-  get reloaded(): boolean {
-    return this._reloaded;
-  }
-
-  set reloaded(value: boolean) {
-    this._reloaded = value;
-  }
-
-  @SessionStorage('email') private _email: string;
-
-  get email(): string {
-    return this._email;
-  }
-
-  get idbloaded(): boolean {
-    return this._idbloaded;
-  }
-
-  set email(value: string) {
-    this._email = value;
-  }
-
-  get loaded(): EventEmitter<any> {
-    return this._loaded;
-  }
-
-  @SessionStorage('servertranscript') private _servertranscipt: any[];
-
-  get idb(): IndexedDBManager {
-    return this._idb;
-  }
-
-  /* Getter/Setter SessionStorage */
-  get servertranscipt(): any[] {
-    return this._servertranscipt;
-  }
-
-  set servertranscipt(value: any[]) {
-    this._servertranscipt = value;
-  }
-
-  private _submitted: boolean = null;
-
-  get submitted(): boolean {
-    return this._submitted;
-  }
-
-  set submitted(value: boolean) {
-    this._submitted = value;
-    this.idb.save('options', 'submitted', {value: value}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  private _feedback: any = null;
-
-  get feedback(): any {
-    return this._feedback;
-  }
-
-  private _logs: any[] = [];
-
-  get logs(): any[] {
-    return this._logs;
-  }
-
-  private _data_id: number = null;
-
-  get data_id(): number {
-    return this._data_id;
-  }
-
-  set data_id(value: number) {
-    this._data_id = value;
-    this.idb.save('options', 'data_id', {value: value}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  private _audio_url: string = null;
-
-  get audio_url(): string {
-    return this._audio_url;
-  }
-
-  set audio_url(value: string) {
-    this._audio_url = value;
-    this.idb.save('options', 'audio_url', {value: value}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  private _usemode: 'local' | 'online' | 'url' = null;
-
-  get usemode(): 'online' | 'local' | 'url' {
-    return this._usemode;
-  }
-
-  get sessionfile(): SessionFile {
-    return SessionFile.fromAny(this._sessionfile);
-  }
-
-  set usemode(value: 'online' | 'local' | 'url') {
-    this._usemode = value;
-    this.idb.save('options', 'usemode', {value: value}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  set sessionfile(value: SessionFile) {
-    this._sessionfile = (!(value === null || value === undefined)) ? value.toAny() : null;
-    this.idb.save('options', 'sessionfile', {value: this._sessionfile})
-      .catch((err) => {
-        console.error(err);
-      });
-  }
-
-  private _language = 'en';
-
-  get language(): string {
-    return this._language;
-  }
-
-  set language(value: string) {
-    this._language = value;
-    this.idb.save('options', 'language', {value: value}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  private _version: string = null;
-
-  /* Getter/Setter IDB Storage */
-  get version(): string {
-    return this._version;
-  }
-
-  set version(value: string) {
-    this._version = value;
-    this._idb.save('options', 'version', {value: value}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  private _logging = false;
-
-  get logging(): boolean {
-    return this._logging;
-  }
-
-  set logging(value: boolean) {
-    this._logging = value;
-    this._idb.save('options', 'logging', {value: value}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  private _show_loupe = true;
-
-  get show_loupe(): boolean {
-    return this._show_loupe;
-  }
-
-  set show_loupe(value: boolean) {
-    this._show_loupe = value;
-    this._idb.save('options', 'show_loupe', {value: value}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  private _prompttext = '';
-
-  get prompttext(): string {
-    return this._prompttext;
-  }
-
-  set prompttext(value: string) {
-    this._prompttext = value;
-    this._idb.save('options', 'prompttext', {value: value}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  private _url_params: any = {};
-
-  get url_params(): any[] {
-    return this._url_params;
-  }
-
-  set url_params(value: any[]) {
-    this._url_params = value;
-  }
-
-  get user(): {
-    id: string,
-    project: string,
-    jobno: number
-  } {
-    return this._user;
-  }
-
-  set user(value: {
-    id: string,
-    project: string,
-    jobno: number
-  }) {
-    this._user = value;
-    this._idb.save('options', 'user', {value: this._user}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  private _easymode = false;
-
-  get easymode(): boolean {
-    return this._easymode;
-  }
-
-  set easymode(value: boolean) {
-    this._easymode = value;
-    this.idb.save('options', 'easymode', {value: value}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  private _comment = '';
-
-  get comment(): string {
-    return this._comment;
-  }
-
-  set comment(value: string) {
-    this._comment = value;
-    this._idb.save('options', 'comment', {value: value}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  private _annotation: OIDBLevel[] = null;
-
-  get annotation(): OIDBLevel[] {
-    return this._annotation;
-  }
-
-  private _annotation_links: OIDBLink[] = null;
-
-  get annotation_links(): OIDBLink[] {
-    return this._annotation_links;
-  }
-
-  private _levelcounter = 0;
-
-  get levelcounter(): number {
-    return this._levelcounter;
-  }
-
-  get LoggedIn(): boolean {
-    return this._logged_in;
-  }
-
-  set LoggedIn(value: boolean) {
-    this._logged_in = value;
-  }
-
-  constructor(public sessStr: SessionStorageService,
-              public localStr: LocalStorageService) {
   }
 
   public setSessionData(member: any, data_id: number, audio_url: string, offline: boolean = false): { error: string } {

@@ -38,7 +38,7 @@
     "validation": "Validierung",
     "search": "Suche",
     "project": "Projekt",
-    "authors": "Authoren",
+    "authors": "Autoren",
     "no guidelines found": "Keine Transkriptionsrichtlinien gefunden",
     "example": "Beispiel",
     "select database": "Datenbank wählen",
@@ -218,8 +218,8 @@
   },
   "special_markers": {
     "boundary": {
-      "insert": "Schnittmarke",
-      "description": "Nachdem die aktuelle Audioposition im Audioplayer oder im Signaldisplay gesetzt wurde, kann hiermit an einer bestimmten Textstelle eine Schnittmarke eingefügt werden."
+      "insert": "Segmentgrenze",
+      "description": "Nachdem die aktuelle Audioposition im Audioplayer oder im Signaldisplay gesetzt wurde, kann hiermit an einer bestimmten Textstelle eine Segmentgrenze eingefügt werden."
     }
   },
   "settings": {

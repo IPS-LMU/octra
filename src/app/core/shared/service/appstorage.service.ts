@@ -258,6 +258,8 @@ export class AppStorageService {
     jobno: number
   }) {
     this._user = value;
+    console.log(`save user`);
+    console.log(value);
     this._idb.save('options', 'user', {value: this._user}).catch((err) => {
       console.error(err);
     });
@@ -535,6 +537,7 @@ export class AppStorageService {
     return new Promise<void>((resolve, reject) => {
       this._logged_in = false;
       this.login = false;
+      this.data_id = null;
 
       const promises: Promise<any>[] = [];
       promises.push(this.idb.save('options', 'user', {value: null}));
@@ -840,5 +843,11 @@ export class AppStorageService {
       });
     }
     return this._idb.clear(name);
+  }
+
+  public saveUser() {
+    this._idb.save('options', 'user', {value: this._user}).catch((err) => {
+      console.error(err);
+    });
   }
 }

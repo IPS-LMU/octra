@@ -66,7 +66,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
 
       // this.loadForm();
       if (this.appStorage.usemode === 'online') {
-        this.feedback.feedback_data = this.appStorage.feedback;
+        this.feedback.feedback_data = (this.appStorage.feedback === null) ? {} : this.appStorage.feedback;
       }
 
       const subscr = this.actionperformed.subscribe(

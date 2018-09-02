@@ -12,26 +12,6 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
   @ViewChild('canvas') canvas: ElementRef;
 
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
-  private setOnlineSessionToFree = (callback: () => void) => {
-    // check if old annotation is already annotated
-    this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
-      (json) => {
-        if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
-          this.subscrmanager.add(this.api.closeSession(this.appStorage.user.id, this.appStorage.data_id, '').subscribe(
-            (result2) => {
-              callback();
-            }
-          ));
-        } else {
-          callback();
-        }
-      },
-      () => {
-        // ignore error because this isn't important
-        callback();
-      }
-    ));
-  };
 
   constructor(private appStorage: AppStorageService,
               private api: APIService) {
@@ -63,7 +43,7 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
         }
       );
     } else if (this.appStorage.usemode === 'online') {
-      this.setOnlineSessionToFree(() => {
+      this.api.setOnlineSessionToFree(this.appStorage, () => {
         this.appStorage.clearAnnotationData().then(() => {
           this.appStorage.clearLoggingData();
         }).then(() => {

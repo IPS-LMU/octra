@@ -11,7 +11,7 @@
                 </button>
             </div>
             <div class="modal-body flex" style="flex:auto;">
-                <div class="row" style="overflow: auto;">
+                <div class="row" style="overflow: auto; flex:auto;">
                     <div [ngClass]="{
                         'col-md-6': appStorage.usemode === 'online',
                         'col-12': appStorage.usemode !== 'online'
@@ -22,9 +22,11 @@
                                               (segmentclicked)="onSegmentInOverviewClicked($event)">
                         </app-transcr-overview>
                     </div>
-                    <div class="col-md-6" style="overflow: auto;" *ngIf="appStorage.usemode === 'online'">
+                    <div class="col-md-6" style="overflow: auto;max-height:1200px;"
+                         *ngIf="appStorage.usemode === 'online'">
                         <h4>Feedback</h4>
-                        <app-transcription-feedback #feedback></app-transcription-feedback>
+                        <app-transcription-feedback #feedback
+                                                    [feedback_data]="appStorage.feedback"></app-transcription-feedback>
                         <button class="btn btn-primary btn-outline btn-success" id="transcr-send-btn"
                                 (click)="sendTranscription()" [disabled]="!feedback.valid">
                             <fa-icon icon="paper-plane"></fa-icon>
@@ -34,7 +36,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="close()">
+                <button type="button" class="btn btn-primary mr-auto" data-dismiss="modal" (click)="close()">
                     {{"general.close" | translate}}
                 </button>
             </div>

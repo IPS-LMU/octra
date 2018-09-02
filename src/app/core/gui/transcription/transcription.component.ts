@@ -40,13 +40,13 @@ import {IFile, PartiturConverter} from '../../obj/Converters';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import * as X2JS from 'x2js';
 import {ModalService} from '../../modals/modal.service';
-import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 import {throwError} from 'rxjs';
 import {TranscriptionGuidelinesModalComponent} from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {NavbarService} from '../navbar/navbar.service';
 import {OverviewModalComponent} from '../../modals/overview-modal/overview-modal.component';
 import {AppInfo} from '../../../app.info';
+import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 
 @Component({
   selector: 'app-transcription',
@@ -157,15 +157,41 @@ export class TranscriptionComponent implements OnInit,
   private audiomanager: AudioManager;
   private _currentEditor: ComponentRef<Component>;
   abortTranscription = () => {
-    this.modService.show('transcription_stop').then((answer: TranscriptionStopModalAnswer) => {
-      if (answer === TranscriptionStopModalAnswer.QUIT) {
-        this.transcrService.endTranscription();
-        Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
-      }
-    }).catch((error) => {
-      console.error(error);
-    });
+    if (this.appStorage.usemode === 'online'
+      && !(this.settingsService.projectsettings.octra === null || this.settingsService.projectsettings.octra === undefined)
+      && !(this.settingsService.projectsettings.octra.theme === null || this.settingsService.projectsettings.octra.theme === undefined)
+      && this.settingsService.projectsettings.octra.theme === 'shortAudioFiles') {
+      // clear transcription
+
+      this.transcrService.endTranscription();
+
+      this.api.setOnlineSessionToFree(this.appStorage, () => {
+        console.log(`old:`);
+        console.log(this.appStorage.user);
+        Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).then(() => {
+          this.appStorage.clearSession();
+          const data = JSON.parse(JSON.stringify(this.appStorage.user));
+
+          this.appStorage.clearLocalStorage().then(() => {
+            this.appStorage.saveUser();
+          }).catch((error) => {
+            console.error(error);
+          });
+        });
+      });
+    } else {
+      this.modService.show('transcription_stop').then((answer: TranscriptionStopModalAnswer) => {
+        if (answer === TranscriptionStopModalAnswer.QUIT) {
+          this.transcrService.endTranscription();
+
+          Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
+        }
+      }).catch((error) => {
+        console.error(error);
+      });
+    }
   };
+
   onSendError = (error) => {
     this.send_error = error.message;
     return throwError(error);

@@ -197,4 +197,28 @@ export class APIService implements API {
 
     return this.post(cmd_json);
   }
+
+  public setOnlineSessionToFree = (appStorage, callback: () => void) => {
+    // check if old annotation is already annotated
+    this.fetchAnnotation(appStorage.data_id).subscribe(
+      (json) => {
+        if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
+          this.closeSession(appStorage.user.id, appStorage.data_id, '').subscribe(
+            (result2) => {
+              this.fetchAnnotation(appStorage.data_id).subscribe((res) => {
+                console.log(res);
+              });
+              callback();
+            }
+          );
+        } else {
+          callback();
+        }
+      },
+      () => {
+        // ignore error because this isn't important
+        callback();
+      }
+    );
+  };
 }

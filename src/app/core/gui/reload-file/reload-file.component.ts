@@ -9,6 +9,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
 import {AudioService} from '../../shared/service/audio.service';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
+import {AppInfo} from '../../../app.info';
 
 @Component({
   selector: 'app-reload-file',
@@ -19,9 +20,7 @@ export class ReloadFileComponent implements OnInit {
   @ViewChild('dropzone') dropzone: OctraDropzoneComponent;
   abortTranscription = () => {
     this.transcrServ.endTranscription();
-    this.router.navigate(['/logout'], {
-      queryParamsHandling: 'preserve'
-    });
+    Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
   };
   newTranscription = () => {
     this.modService.show('transcription_delete').then(() => {
@@ -77,9 +76,7 @@ export class ReloadFileComponent implements OnInit {
   };
   private error = '';
   private navigate = () => {
-    this.router.navigate(['/user/load'], {
-      queryParamsHandling: 'preserve'
-    });
+    Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling);
   };
 
   get sessionfile(): SessionFile {

@@ -17,6 +17,7 @@ import {BugReportService, ConsoleType} from '../../shared/service/bug-report.ser
 import {environment} from '../../../../environments/environment';
 import {ModalService} from '../../modals/modal.service';
 import {ExportFilesModalComponent} from '../../modals/exported-files-modal/export-files-modal.component';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-navigation',
@@ -76,7 +77,8 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
               public langService: TranslateService,
               public modService: ModalService,
               public settService: SettingsService,
-              public bugService: BugReportService) {
+              public bugService: BugReportService,
+              private route: ActivatedRoute) {
   }
 
   ngOnDestroy() {
@@ -146,8 +148,10 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     this.collapsed = true;
   }
 
-  openBugReport() {
+  public openBugReport() {
     this.modService.show('bugreport').then((action) => {
+      console.log(`bugreport closed`);
+      window.location.hash = '';
     }).catch((err) => {
       console.error(err);
     });

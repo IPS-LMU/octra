@@ -3,6 +3,8 @@ import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 import {AppStorageService} from '../service/appstorage.service';
+import {AppInfo} from '../../../app.info';
+import {Functions} from '../Functions';
 
 @Injectable()
 export class TranscrEndGuard implements CanActivate {
@@ -13,9 +15,7 @@ export class TranscrEndGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
     if (!this.appStorage.submitted) {
-      this.router.navigate(['/user/load'], {
-        queryParamsHandling: 'preserve'
-      });
+      Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling);
       return false;
     }
     return true;

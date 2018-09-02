@@ -3,6 +3,8 @@ import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 import {AppStorageService, SettingsService} from '../service';
+import {AppInfo} from '../../../app.info';
+import {Functions} from '../Functions';
 
 @Injectable()
 export class TranscActivateGuard implements CanActivate {
@@ -17,16 +19,21 @@ export class TranscActivateGuard implements CanActivate {
     if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
       if (!this.settService.allloaded) {
         console.log('go back to load');
-        this.router.navigate(['/user/load'], {
-          queryParamsHandling: 'preserve'
-        });
+
+        const params = AppInfo.queryParamsHandling;
+        params.fragment = route.fragment;
+        params.queryParams = route.queryParams;
+
+        Functions.navigateTo(this.router, ['/user/load'], params);
         return false;
       }
     } else if (this.appStorage.usemode === 'local') {
       if (!this.settService.allloaded) {
-        this.router.navigate(['/user/transcr/reload-file'], {
-          queryParamsHandling: 'preserve'
-        });
+        const params = AppInfo.queryParamsHandling;
+        params.fragment = route.fragment;
+        params.queryParams = route.queryParams;
+
+        Functions.navigateTo(this.router, ['/user/transcr/reload-file'], params);
         return false;
       }
     }

@@ -2,12 +2,13 @@ import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core'
 import {TranslateService} from '@ngx-translate/core';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppStorageService, AudioService, SettingsService, TranscriptionService} from '../../shared/service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
 import {IFile, ImportResult} from '../../obj/Converters';
 import {OAudiofile, OLevel} from '../../obj/Annotation';
 import {OIDBLevel} from '../../shared/service/appstorage.service';
 import {AppInfo} from '../../../app.info';
+import {Functions} from '../../shared';
 
 @Component({
   selector: 'app-loading',
@@ -36,10 +37,14 @@ export class LoadingComponent implements OnInit, OnDestroy {
               public audio: AudioService,
               private router: Router,
               private transcrService: TranscriptionService,
-              private http: HttpClient) {
+              private http: HttpClient,
+              private route: ActivatedRoute) {
   }
 
   ngOnInit() {
+    this.route.fragment.subscribe((fragment) => {
+      console.log(`LOADING fragment ${fragment}`);
+    });
 
     new Promise<void>((resolve, reject) => {
       if (this.settService.isDBLoadded) {
@@ -202,9 +207,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
           } else {
             console.error('audio not loaded');
             if (this.appStorage.usemode === 'local') {
-              this.router.navigate(['/user/transcr/reload-file'], {
-                queryParamsHandling: 'preserve'
-              });
+              Functions.navigateTo(this.router, ['/user/transcr/reload-file'], AppInfo.queryParamsHandling);
             }
           }
         }
@@ -228,9 +231,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                 )
                 && this.settService.projectsettings.agreement.enabled && this.appStorage.usemode === 'online') {
                 this.transcrService.load().then(() => {
-                  this.router.navigate(['/user/agreement'], {
-                    queryParamsHandling: 'preserve'
-                  });
+                  Functions.navigateTo(this.router, ['/user/agreement'], AppInfo.queryParamsHandling);
                 }).catch((err) => {
                   console.error(err);
                 });
@@ -238,9 +239,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                 console.log(`load segments`);
                 this.transcrService.load().then(() => {
                   console.log(`ALL LOADED!`);
-                  this.router.navigate(['/user/transcr'], {
-                    queryParamsHandling: 'preserve'
-                  });
+                  Functions.navigateTo(this.router, ['/user/transcr'], AppInfo.queryParamsHandling);
                 }).catch((err) => {
                   console.error(err);
                 });
@@ -272,18 +271,14 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
       if (this.appStorage.usemode !== 'url' && !this.appStorage.LoggedIn) {
         // not logged in, go back
-        this.router.navigate(['/login'], {
-          queryParamsHandling: 'preserve'
-        });
+        Functions.navigateTo(this.router, ['/login'], AppInfo.queryParamsHandling);
       }
 
       this.settService.loadProjectSettings();
 
       if (this.appStorage.usemode === 'local' && (this.appStorage.file === null || this.appStorage.file === undefined)) {
         console.log('use mode is local, redirect to reload-file');
-        this.router.navigate(['/user/transcr/reload-file'], {
-          queryParamsHandling: 'preserve'
-        });
+        Functions.navigateTo(this.router, ['/user/transcr/reload-file'], AppInfo.queryParamsHandling);
       } else {
         if (this.appStorage.usemode === 'url' || this.appStorage.usemode === 'online') {
           if (this.appStorage.usemode === 'url') {
@@ -311,8 +306,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
   goBack() {
     this.appStorage.clearSession();
-    this.router.navigate(['/login'], {
-      queryParamsHandling: 'preserve'
-    });
+    Functions.navigateTo(this.router, ['/login'], AppInfo.queryParamsHandling);
   }
 }

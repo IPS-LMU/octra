@@ -13,6 +13,7 @@ import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component
 import 'rxjs/add/operator/catch';
 import {ModalService} from '../../modals/modal.service';
 import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
+import {AppInfo} from '../../../app.info';
 
 @Component({
   selector: 'app-login',
@@ -140,9 +141,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   };
   private subscrmanager: SubscriptionManager;
   private navigate = (): void => {
-    this.router.navigate(['user'], {
-      queryParamsHandling: 'preserve'
-    });
+    Functions.navigateTo(this.router, ['user'], AppInfo.queryParamsHandling);
   };
   private setOnlineSessionToFree = (callback: () => void) => {
     // check if old annotation is already annotated

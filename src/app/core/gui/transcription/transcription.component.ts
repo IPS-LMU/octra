@@ -28,7 +28,7 @@ import {
   UserInteractionsService
 } from '../../shared/service';
 
-import {BrowserInfo, SubscriptionManager} from '../../shared';
+import {BrowserInfo, Functions, SubscriptionManager} from '../../shared';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 import {ProjectSettings} from '../../obj/Settings';
@@ -46,6 +46,7 @@ import {TranscriptionGuidelinesModalComponent} from '../../modals/transcription-
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {NavbarService} from '../navbar/navbar.service';
 import {OverviewModalComponent} from '../../modals/overview-modal/overview-modal.component';
+import {AppInfo} from '../../../app.info';
 
 @Component({
   selector: 'app-transcription',
@@ -159,9 +160,7 @@ export class TranscriptionComponent implements OnInit,
     this.modService.show('transcription_stop').then((answer: TranscriptionStopModalAnswer) => {
       if (answer === TranscriptionStopModalAnswer.QUIT) {
         this.transcrService.endTranscription();
-        this.router.navigate(['/logout'], {
-          queryParamsHandling: 'preserve'
-        });
+        Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
       }
     }).catch((error) => {
       console.error(error);
@@ -479,14 +478,10 @@ export class TranscriptionComponent implements OnInit,
           this.appStorage.jobs_left = Number(json.message);
         }
 
-        this.router.navigate(['/user/load'], {
-          queryParamsHandling: 'preserve'
-        });
+        Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling);
       } else {
         this.appStorage.submitted = true;
-        this.router.navigate(['/user/transcr/end'], {
-          queryParamsHandling: 'preserve'
-        });
+        Functions.navigateTo(this.router, ['/user/transcr/end'], AppInfo.queryParamsHandling);
       }
     } else {
       console.error(`json array for transcription next is null`);

@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {APIService, AppStorageService, SettingsService} from './core/shared/service';
 import {TranslateService} from '@ngx-translate/core';
 import {SubscriptionManager} from './core/obj/SubscriptionManager';
@@ -6,6 +6,7 @@ import {BugReportService, ConsoleType} from './core/shared/service/bug-report.se
 import {AppInfo} from './app.info';
 import {environment} from '../environments/environment';
 import {ActivatedRoute, Router} from '@angular/router';
+import {NavigationComponent} from './core/gui/navbar';
 
 @Component({
   selector: 'app-octra',
@@ -16,6 +17,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
 
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
+  @ViewChild('navigation') navigation: NavigationComponent;
 
   public get version(): string {
     return AppInfo.version;
@@ -32,6 +34,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
               private bugService: BugReportService,
               private router: Router,
               private route: ActivatedRoute) {
+
     // overwrite console.log
     const oldLog = console.log;
     const serv = this.bugService;
@@ -109,6 +112,15 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       console.log(`Application settings loaded`);
     }).catch((error) => {
       console.error(error);
+    });
+
+    this.route.fragment.subscribe((fragment) => {
+      console.log(`fragment is ${fragment}`);
+      switch (fragment) {
+        case('feedback'):
+          this.navigation.openBugReport();
+          break;
+      }
     });
   }
 

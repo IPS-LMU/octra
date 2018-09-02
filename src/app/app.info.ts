@@ -11,6 +11,7 @@ import {MantisBugReporter} from './core/obj/BugAPI/MantisBugReporter';
 import {OggFormat, WavFormat} from './media-components/obj/media/audio/AudioFormats';
 import {BundleJSONConverter} from './core/obj/Converters/BundleJSONConverter';
 import {EmailBugReporter} from './core/obj/BugAPI/EmailBugReporter';
+import {NavigationExtras} from '@angular/router';
 
 export class AppInfo {
   public static readonly audioformats = [
@@ -39,4 +40,9 @@ export class AppInfo {
   ];
 
   static readonly version = '1.2.6';
+
+  public static readonly queryParamsHandling: NavigationExtras = {
+    queryParamsHandling: '',
+    preserveFragment: false
+  };
 }

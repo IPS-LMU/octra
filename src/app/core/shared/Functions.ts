@@ -1,5 +1,6 @@
 import {Observable} from 'rxjs/Observable';
 import {HttpClient} from '@angular/common/http';
+import {NavigationExtras, Router} from '@angular/router';
 
 export interface FileSize {
   size: number;
@@ -212,5 +213,9 @@ export class Functions {
       bytes[i] = binary_string.charCodeAt(i);
     }
     return (<ArrayBuffer> bytes.buffer);
+  }
+
+  public static navigateTo(router: Router, commands: any[], navigationExtras?: NavigationExtras) {
+    router.navigate(commands, navigationExtras);
   }
 }

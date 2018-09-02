@@ -3,6 +3,8 @@ import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '
 import {Observable} from 'rxjs';
 import {CompatibilityService} from '../service/compatibility.service';
 import {SettingsService} from '../service';
+import {AppInfo} from '../../../app.info';
+import {Functions} from '../Functions';
 
 @Injectable({
   providedIn: 'root'
@@ -30,12 +32,20 @@ export class CompatibilityGuard implements CanActivate {
         this.compatibility.testCompability().then((result) => {
           if (result) {
             if (next.url[0].path === 'test') {
-              this.router.navigate(['login']);
+              const params = AppInfo.queryParamsHandling;
+              params.fragment = next.fragment;
+              params.queryParams = next.queryParams;
+
+              Functions.navigateTo(this.router, ['login'], params);
             }
             resolve(true);
           } else {
             if (next.url[0].path !== 'test') {
-              this.router.navigate(['test']);
+              const params = AppInfo.queryParamsHandling;
+              params.fragment = next.fragment;
+              params.queryParams = next.queryParams;
+
+              Functions.navigateTo(this.router, ['test'], params);
               resolve(result);
             } else {
               resolve(true);

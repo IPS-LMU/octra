@@ -215,7 +215,7 @@ export class Functions {
     return (<ArrayBuffer> bytes.buffer);
   }
 
-  public static navigateTo(router: Router, commands: any[], navigationExtras?: NavigationExtras) {
-    router.navigate(commands, navigationExtras);
+  public static navigateTo(router: Router, commands: any[], navigationExtras?: NavigationExtras): Promise<boolean> {
+    return router.navigate(commands, navigationExtras);
   }
 }

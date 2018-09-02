@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {CompatibilityService} from '../../shared/service/compatibility.service';
+import {BrowserInfo} from '../../shared';
 
 @Component({
   selector: 'app-browser-test',
@@ -8,6 +9,10 @@ import {CompatibilityService} from '../../shared/service/compatibility.service';
   styleUrls: ['./browser-test.component.css']
 })
 export class BrowserTestComponent implements OnInit {
+  public get BrowserInfo(): BrowserInfo {
+    return BrowserInfo;
+  }
+
   constructor(private router: Router, public compatibility: CompatibilityService) {
   }
 
@@ -34,6 +39,10 @@ export class BrowserTestComponent implements OnInit {
       case('ok'):
         return 'forestgreen';
     }
+  }
+
+  test() {
+    window.location.href = 'chrome://settings/content/cookies';
   }
 
 }

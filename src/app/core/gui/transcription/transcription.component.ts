@@ -443,8 +443,14 @@ export class TranscriptionComponent implements OnInit,
 
     if (!(json === null || json === undefined)) {
       if (json.data && json.data.hasOwnProperty('url') && json.data.hasOwnProperty('id')) {
+        // transcription available
         this.appStorage.audio_url = json.data.url;
         this.appStorage.data_id = json.data.id;
+
+        // change number of remaining jobs
+        if (json.hasOwnProperty('message')) {
+          this.appStorage.jobs_left = Number(json.message);
+        }
 
         // get transcript data that already exists
         if (json.data.hasOwnProperty('transcript')) {

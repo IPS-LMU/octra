@@ -70,14 +70,12 @@
     "transcription window": "Transcription window",
     "supported files": "Supported files",
     "select one tier": "Select one tier",
-    "prompt": "Prompt"
+    "prompt": "Prompt",
+    "feedback": "Feedback"
   },
   "bug report": {
-    "report an error": "Report an error",
-    "where does the error occur": "Where did the error occur?",
-    "have you found bugs": "Do you found other bugs?",
-    "Does something go wrong": "Does something go wrong?",
-    "Please send us your bug report": "Please send us your bug report.",
+    "give feedback": "Give feedback",
+    "description": "Please tell us what you are thinking about OCTRA. What can we do better? Did you find any bugs?",
     "sent": "Your bug was successfully reported.",
     "send protocol": "Add Protocol (recommended)",
     "protocol": "Protocol"

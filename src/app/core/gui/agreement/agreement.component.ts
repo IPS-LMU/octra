@@ -4,6 +4,8 @@ import {Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {AppInfo} from '../../../app.info';
+import {Functions} from '../../shared';
 
 @Component({
   selector: 'app-agreement',
@@ -19,9 +21,7 @@ export class AgreementComponent implements OnInit {
               private langService: TranslateService,
               private appStorage: AppStorageService) {
     if ((this.settService.projectsettings === null || this.settService.projectsettings === undefined)) {
-      this.router.navigate(['/user/load'], {
-        queryParamsHandling: 'preserve'
-      });
+      Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling);
     }
   }
 
@@ -48,9 +48,7 @@ export class AgreementComponent implements OnInit {
 
   logout() {
     this.settService.clearSettings();
-    this.router.navigate(['/logout'], {
-      queryParamsHandling: 'preserve'
-    });
+    Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
   }
 
   accept() {
@@ -59,8 +57,6 @@ export class AgreementComponent implements OnInit {
     }
     this.appStorage.agreement[this.appStorage.user.project] = true;
     this.appStorage.sessStr.store('agreement', this.appStorage.agreement);
-    this.router.navigate(['/user/transcr'], {
-      queryParamsHandling: 'preserve'
-    });
+    Functions.navigateTo(this.router, ['/user/transcr'], AppInfo.queryParamsHandling);
   }
 }

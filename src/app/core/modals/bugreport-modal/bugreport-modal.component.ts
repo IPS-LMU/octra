@@ -41,7 +41,7 @@ export class BugreportModalComponent implements OnInit {
     }
   }
 
-  constructor(private modalService: BsModalService, private appStorage: AppStorageService, private bugService: BugReportService, private settService: SettingsService) {
+  constructor(private modalService: BsModalService, private appStorage: AppStorageService, public bugService: BugReportService, private settService: SettingsService) {
   }
 
   ngOnInit() {

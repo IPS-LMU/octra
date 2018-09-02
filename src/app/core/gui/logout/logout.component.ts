@@ -3,6 +3,8 @@ import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {SettingsService} from '../../shared/service/settings.service';
+import {AppInfo} from '../../../app.info';
+import {Functions} from '../../shared';
 
 @Component({
 
@@ -27,9 +29,7 @@ export class LogoutComponent implements OnInit {
   ngOnInit() {
     this.settingsService.clearSettings();
     this.sessionService.endSession(() => {
-      this.router.navigate(['login'], {
-        queryParamsHandling: 'preserve'
-      });
+      Functions.navigateTo(this.router, ['login'], AppInfo.queryParamsHandling);
     });
   }
 }

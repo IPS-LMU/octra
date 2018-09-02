@@ -70,14 +70,12 @@
     "transcription window": "Transkriptionsfenster",
     "supported files": "Unterstützte Dateien",
     "select one tier": "Einen Tier auswählen",
-    "prompt": "Textvorlage"
+    "prompt": "Textvorlage",
+    "feedback": "Feedback"
   },
   "bug report": {
-    "report an error": "Fehler melden",
-    "where does the error occur": "Wo trat der Fehler auf?",
-    "have you found bugs": "Haben Sie andere Fehler gefunden?",
-    "Does something go wrong": "Funktioniert etwas nicht richtig?",
-    "Please send us your bug report": "Senden Sie uns bitte ihren Fehlerbericht.",
+    "give feedback": "Feedback geben",
+    "description": "Bitte teile uns dein Feedback mit. Was können wir besser machen? Hast Du irgendwelche Schwierigkeiten mit der Verwendung von OCTRA?",
     "sent": "Der Fehlerbericht wurde erfolgreich gesendet.",
     "send protocol": "Protokoll beifügen (empfohlen)"
   },

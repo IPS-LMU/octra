@@ -3,10 +3,16 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="dialog-sizes-name1" class="modal-title pull-left">{{'bug report.report an error' |
+                <h3 id="dialog-sizes-name1" class="modal-title pull-left">{{'bug report.give feedback' |
                     translate}}</h3>
+                <button type="button" class="close pull-right" aria-label="Close" (click)="close('CANCEL')">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
+                <p>
+                    {{"bug report.description" | translate}}
+                </p>
                 <div *ngIf="bugsent" class="text-success bugsent">{{'bug report.sent' | translate}}</div>
 
                 <form>
@@ -41,7 +47,7 @@
                                 translate}}:</label>
                             <textarea class="form-control" #bgProtocol *ngIf="visible"
                                       id="bgProtocol"
-                                      disabled [innerHTML]="bugService.getText()"></textarea>
+                                      disabled>{{bugService.getText()}}</textarea>
                         </div>
                     </fieldset>
                 </form>
@@ -51,7 +57,7 @@
                     {{"general.abort" | translate}}
                 </button>
                 <button type="button" class="btn btn-primary" (click)="sendBugReport();" [disabled]="!isvalid">
-                    {{"bug report.report an error" | translate}}
+                    {{"bug report.give feedback" | translate}}
                 </button>
             </div>
         </div>

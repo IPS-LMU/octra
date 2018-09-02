@@ -150,6 +150,11 @@ export class TranscriptionComponent implements OnInit,
   public feedback_expanded = false;
   user: number;
   public platform = BrowserInfo.platform;
+  private subscrmanager: SubscriptionManager;
+  private send_ok = false;
+  private level_subscription_id = 0;
+  private audiomanager: AudioManager;
+  private _currentEditor: ComponentRef<Component>;
   abortTranscription = () => {
     this.modService.show('transcription_stop').then((answer: TranscriptionStopModalAnswer) => {
       if (answer === TranscriptionStopModalAnswer.QUIT) {
@@ -166,11 +171,6 @@ export class TranscriptionComponent implements OnInit,
     this.send_error = error.message;
     return throwError(error);
   };
-  private subscrmanager: SubscriptionManager;
-  private send_ok = false;
-  private level_subscription_id = 0;
-  private audiomanager: AudioManager;
-  private _currentEditor: ComponentRef<Component>;
 
   ngOnChanges(changes: SimpleChanges) {
   }
@@ -417,9 +417,9 @@ export class TranscriptionComponent implements OnInit,
               this.modal2.close();
 
               setTimeout(() => {
-                this.nextTranscription();
+                this.nextTranscription(result);
               }, 1000);
-            }, 2000);
+            }, 1000);
           } else {
             this.send_error = this.langService.instant('send error');
           }
@@ -438,62 +438,59 @@ export class TranscriptionComponent implements OnInit,
     }
   }
 
-  nextTranscription() {
+  nextTranscription(json: any) {
     this.transcrService.endTranscription(false);
     this.clearData();
 
+    if (!(json === null || json === undefined)) {
+      if (json.data && json.data.hasOwnProperty('url') && json.data.hasOwnProperty('id')) {
+        this.appStorage.audio_url = json.data.url;
+        this.appStorage.data_id = json.data.id;
 
-    this.subscrmanager.add(this.api.beginSession(this.appStorage.user.project, this.appStorage.user.id,
-      Number(this.appStorage.user.jobno), '')
-      .subscribe((json) => {
-        if (json !== null) {
-          if (json.data && json.data.hasOwnProperty('url') && json.data.hasOwnProperty('id')) {
-            this.appStorage.audio_url = json.data.url;
-            this.appStorage.data_id = json.data.id;
+        // get transcript data that already exists
+        if (json.data.hasOwnProperty('transcript')) {
+          const transcript = JSON.parse(json.data.transcript);
 
-            // get transcript data that already exists
-            if (json.data.hasOwnProperty('transcript')) {
-              const transcript = JSON.parse(json.data.transcript);
-
-              if (Array.isArray(transcript) && transcript.length > 0) {
-                this.appStorage.servertranscipt = transcript;
-              }
-            }
-
-            if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
-              // get transcript data that already exists
-              if (json.data.hasOwnProperty('prompt')) {
-                const prompt = json.data.prompt;
-
-                if (prompt) {
-                  this.appStorage.prompttext = prompt;
-                }
-              } else if (json.data.hasOwnProperty('prompttext')) {
-                const prompt = json.data.prompttext;
-
-                if (prompt) {
-                  this.appStorage.prompttext = prompt;
-                }
-              }
-            } else {
-              this.appStorage.prompttext = '';
-            }
-
-            if (json.hasOwnProperty('message') && typeof (json.message) === 'number') {
-              this.appStorage.jobs_left = Number(json.message);
-            }
-
-            this.router.navigate(['/user/load'], {
-              queryParamsHandling: 'preserve'
-            });
-          } else {
-            this.appStorage.submitted = true;
-            this.router.navigate(['/user/transcr/end'], {
-              queryParamsHandling: 'preserve'
-            });
+          if (Array.isArray(transcript) && transcript.length > 0) {
+            this.appStorage.servertranscipt = transcript;
           }
         }
-      }));
+
+        if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
+          // get transcript data that already exists
+          if (json.data.hasOwnProperty('prompt')) {
+            const prompt = json.data.prompt;
+
+            if (prompt) {
+              this.appStorage.prompttext = prompt;
+            }
+          } else if (json.data.hasOwnProperty('prompttext')) {
+            const prompt = json.data.prompttext;
+
+            if (prompt) {
+              this.appStorage.prompttext = prompt;
+            }
+          }
+        } else {
+          this.appStorage.prompttext = '';
+        }
+
+        if (json.hasOwnProperty('message') && typeof (json.message) === 'number') {
+          this.appStorage.jobs_left = Number(json.message);
+        }
+
+        this.router.navigate(['/user/load'], {
+          queryParamsHandling: 'preserve'
+        });
+      } else {
+        this.appStorage.submitted = true;
+        this.router.navigate(['/user/transcr/end'], {
+          queryParamsHandling: 'preserve'
+        });
+      }
+    } else {
+      console.error(`json array for transcription next is null`);
+    }
   }
 
   clearData() {

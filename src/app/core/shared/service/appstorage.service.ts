@@ -312,6 +312,7 @@ export class AppStorageService {
   @SessionStorage() _logged_in: boolean;
   @SessionStorage() logInTime: number; // timestamp
   @SessionStorage('jobs_left') jobs_left: number;
+
   public file: File;
   public saving: EventEmitter<string> = new EventEmitter<string>();
   public beginLocalSession = (files: {

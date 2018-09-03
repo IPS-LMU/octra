@@ -177,46 +177,48 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   } */
 
   private updateSegments() {
-    if (!this.segments || !this.transcrService.guidelines) {
-      this.shown_segments = [];
-    }
-
-    this.show_loading = true;
-    let start_time = 0;
-    const result = [];
-
-    for (let i = 0; i < this.segments.length; i++) {
-      const segment = this.segments[i];
-
-      const obj = {
-        start: start_time,
-        end: segment.time.seconds,
-        transcription: {
-          text: segment.transcript,
-          html: segment.transcript
-        },
-        validation: ''
-      };
-
-      if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function') {
-        obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
-          validateAnnotation(obj.transcription.text, this.transcrService.guidelines));
+    if (this.transcrService.validationArray.length > 0) {
+      if (!this.segments || !this.transcrService.guidelines) {
+        this.shown_segments = [];
       }
 
-      obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
-      obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
-        if (g1 == '[[[') {
-          return '<';
+      this.show_loading = true;
+      let start_time = 0;
+      const result = [];
+
+      for (let i = 0; i < this.segments.length; i++) {
+        const segment = this.segments[i];
+
+        const obj = {
+          start: start_time,
+          end: segment.time.seconds,
+          transcription: {
+            text: segment.transcript,
+            html: segment.transcript
+          },
+          validation: ''
+        };
+
+        if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function') {
+          obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
+            this.transcrService.validationArray[i].validation);
         }
-        return '>';
-      });
 
-      result.push(obj);
+        obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
+        obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
+          if (g1 == '[[[') {
+            return '<';
+          }
+          return '>';
+        });
 
-      start_time = segment.time.seconds;
+        result.push(obj);
+
+        start_time = segment.time.seconds;
+      }
+
+      this.shown_segments = result;
+      this.show_loading = false;
     }
-
-    this.shown_segments = result;
-    this.show_loading = false;
   }
 }

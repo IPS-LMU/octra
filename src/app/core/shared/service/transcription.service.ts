@@ -21,41 +21,10 @@ import {AudioManager} from '../../../media-components/obj/media/audio/AudioManag
 export class TranscriptionService {
   public dataloaded = new EventEmitter<any>();
   public segmentrequested = new EventEmitter<number>();
-  public filename = '';
-  public levelchanged: EventEmitter<Level> = new EventEmitter<Level>();
-  public saveSegments = () => {
-    // make sure, that no saving overhead exist. After saving request wait 1 second
-    if (!this.saving) {
-      this.saving = true;
-      setTimeout(() => {
-        this.appStorage.save('annotation', {
-          num: this._selectedlevel,
-          level: this._annotation.levels[this._selectedlevel].getObj(this.audiomanager.sampleRateFactor, this.audiomanager.originalInfo.duration.samples)
-        });
-        this.saving = false;
-      }, 2000);
-    }
-  };
-  /**
-   * resets the parent object values. Call this function after transcription was saved
-   */
-  public endTranscription = (destroyaudio: boolean = true) => {
-    this.audio.destroy(destroyaudio);
-    this.destroy();
-  };
-  private subscrmanager: SubscriptionManager;
-  private _segments: Segments;
-  private saving = false;
-  private state = 'ANNOTATED';
-
-  private _last_sample: number;
-  private _annotation: Annotation;
 
   get last_sample(): number {
     return this._last_sample;
   }
-
-  private _guidelines: any;
 
   set last_sample(value: number) {
     this._last_sample = value;
@@ -65,19 +34,13 @@ export class TranscriptionService {
     return this._guidelines;
   }
 
-  private _audiofile: OAudiofile;
-
   set guidelines(value: any) {
     this._guidelines = value;
   }
 
-  private _feedback: FeedBackForm;
-
   get audiofile(): OAudiofile {
     return this._audiofile;
   }
-
-  private _break_marker: any = null;
 
   get feedback(): FeedBackForm {
     return this._feedback;
@@ -86,8 +49,6 @@ export class TranscriptionService {
   get break_marker(): any {
     return this._break_marker;
   }
-
-  private _selectedlevel = 0;
 
   get selectedlevel(): number {
     return this._selectedlevel;
@@ -107,12 +68,6 @@ export class TranscriptionService {
     this._break_marker = value;
   }
 
-  private _statistic: any = {
-    transcribed: 0,
-    empty: 0,
-    pause: 0
-  };
-
   get statistic(): any {
     return this._statistic;
   }
@@ -124,15 +79,6 @@ export class TranscriptionService {
   set annotation(value: Annotation) {
     this._annotation = value;
   }
-
-  /*
-   get segments(): Segments {
-
-   return this._segments;
-   }
-   */
-
-  private _audiomanager: AudioManager;
 
   /*
    set segments(value: Segments) {
@@ -163,6 +109,75 @@ export class TranscriptionService {
               private settingsService: SettingsService,
               private http: HttpClient) {
     this.subscrmanager = new SubscriptionManager();
+  }
+
+  public filename = '';
+  public levelchanged: EventEmitter<Level> = new EventEmitter<Level>();
+  public saveSegments = () => {
+    // make sure, that no saving overhead exist. After saving request wait 1 second
+    if (!this.saving) {
+      this.saving = true;
+      setTimeout(() => {
+        this.appStorage.save('annotation', {
+          num: this._selectedlevel,
+          level: this._annotation.levels[this._selectedlevel].getObj(this.audiomanager.sampleRateFactor, this.audiomanager.originalInfo.duration.samples)
+        });
+        this.saving = false;
+      }, 2000);
+    }
+  };
+  /**
+   * resets the parent object values. Call this function after transcription was saved
+   */
+  public endTranscription = (destroyaudio: boolean = true) => {
+    this.audio.destroy(destroyaudio);
+    this.destroy();
+  };
+  private subscrmanager: SubscriptionManager;
+  private _segments: Segments;
+  private saving = false;
+  private state = 'ANNOTATED';
+
+  private _last_sample: number;
+  private _annotation: Annotation;
+
+  private _guidelines: any;
+
+  private _audiofile: OAudiofile;
+
+  private _feedback: FeedBackForm;
+
+  private _break_marker: any = null;
+
+  private _selectedlevel = 0;
+
+  private _statistic: any = {
+    transcribed: 0,
+    empty: 0,
+    pause: 0
+  };
+  private _audiomanager: AudioManager;
+
+  private _validationArray: {
+    segment: number,
+    validation: any[]
+  }[] = [];
+
+  /*
+   get segments(): Segments {
+
+   return this._segments;
+   }
+   */
+
+  get validationArray(): { segment: number; validation: any[] }[] {
+    return this._validationArray;
+  }
+
+  private _transcriptValid = false;
+
+  get transcriptValid(): boolean {
+    return this._transcriptValid;
   }
 
   public getSegmentFirstLevel(): number {
@@ -739,5 +754,34 @@ export class TranscriptionService {
 
     jQuery.each(dom.children(), replace_func);
     return dom.text();
+  }
+
+  public validateAll() {
+    this._validationArray = [];
+
+    let invalid = false;
+
+    for (let i = 0; i < this.currentlevel.segments.length; i++) {
+      const segment = this.currentlevel.segments.segments[i];
+
+      let segmentValidation = [];
+
+      if (segment.transcript.length > 0) {
+        segmentValidation = validateAnnotation(segment.transcript, this._guidelines);
+      }
+
+      this._validationArray.push(
+        {
+          segment: i,
+          validation: segmentValidation
+        }
+      );
+
+      if (segmentValidation.length > 0) {
+        invalid = true;
+      }
+    }
+    this._transcriptValid = !invalid;
+    console.log(this.validationArray);
   }
 }

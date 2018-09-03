@@ -190,12 +190,12 @@ export class TranscriptionComponent implements OnInit,
         console.error(error);
       });
     }
-  };
+  }
 
   onSendError = (error) => {
     this.send_error = error.message;
     return throwError(error);
-  };
+  }
 
   ngOnChanges(changes: SimpleChanges) {
   }
@@ -456,7 +456,17 @@ export class TranscriptionComponent implements OnInit,
   }
 
   onSendButtonClick() {
-    if (!this.modal_overview.feedBackComponent.valid) {
+    let validTranscript = true;
+    let showOverview = true;
+
+    if (!(this.projectsettings.octra === null || this.projectsettings.octra === undefined)
+      && !(this.projectsettings.octra.showOverviewIfTranscriptNotValid === null || this.projectsettings.octra.showOverviewIfTranscriptNotValid === undefined)) {
+      this.transcrService.validateAll();
+      validTranscript = this.transcrService.transcriptValid;
+      showOverview = this.projectsettings.octra.showOverviewIfTranscriptNotValid;
+    }
+
+    if ((!validTranscript && showOverview) || !this.modal_overview.feedBackComponent.valid) {
       this.modal_overview.open();
     } else {
       this.onSendNowClick();

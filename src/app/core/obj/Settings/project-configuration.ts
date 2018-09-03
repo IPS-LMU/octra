@@ -23,6 +23,8 @@ export interface ProjectSettings {
   plugins: any;
   feedback_form: Group[];
   octra: {
+    'sendValidatedTranscriptionOnly': boolean;
+    'showOverviewIfTranscriptNotValid': boolean;
     theme: string
   };
 }

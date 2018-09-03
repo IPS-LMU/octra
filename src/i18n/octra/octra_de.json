@@ -86,7 +86,8 @@
     "stop": "Transkription beenden",
     "check": "Transkription überprüfen",
     "send": "Transkription senden",
-    "complete": "Transkription abschließen"
+    "complete": "Transkription abschließen",
+    "invalid": "Es werden nur korrekte Transkriptionen angenommen. Korrigiere bitte die Fehler."
   },
   "segments": {
     "total": "Segmente insgesamt",

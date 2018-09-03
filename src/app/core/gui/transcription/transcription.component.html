@@ -6,7 +6,6 @@
 <app-transcription-success-modal #success></app-transcription-success-modal>
 <app-transcription-guidelines-modal #modal_guidelines
                                     [guidelines]="transcrService.guidelines"></app-transcription-guidelines-modal>
-
 <div class="flex">
     <span id='saving'>
         <fa-icon *ngIf="saving === 'saving'" style="color:#333333" icon="save"></fa-icon>
@@ -29,31 +28,6 @@
     <div class="flex">
         <ng-template appLoadeditor></ng-template>
     </div>
-
-    <!--
-    <div id="bottom-feedback" class="card" #feedback
-         *ngIf="settingsService.projectsettings.octra.theme === 'default' && (appStorage.usemode === 'online' && transcrService.feedback !== null && transcrService.feedback !== undefined)">
-        <div class="card-header">
-            <table style="width:100%;">
-                <tbody>
-                <tr>
-                    <td><span class="link" (click)="expandFeedback()"
-                              style="width:100%;display: block;vertical-align: middle;">FEEDBACK <span
-                            class="required_marker" *ngIf="transcrService.feedback.required">*</span></span>
-                    </td>
-                    <td style="text-align: right">
-                        <fa-icon *ngIf="!feedback_expanded" icon="chevron-up" (click)="expandFeedback()"
-                                 style="color:grey; display: block; padding:0;cursor:pointer;vertical-align: middle;"></fa-icon>
-
-                        <fa-icon *ngIf="feedback_expanded" icon="chevron-down" (click)="expandFeedback()"
-                                 style="color:grey; display: block; padding:0;cursor:pointer;vertical-align: middle;"></fa-icon>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    -->
     <div class="row" id="bottom-navigation" role="group">
         <button class="btn btn-secondary btn-raised col-md-6"
                 *ngIf="appStorage.usemode === 'local' || appStorage.usemode === 'online'"

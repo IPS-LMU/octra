@@ -27,8 +27,14 @@
                         <h4>Feedback</h4>
                         <app-transcription-feedback #feedback
                                                     [feedback_data]="appStorage.feedback"></app-transcription-feedback>
+
+                        <p style="color:red; text-align: center"
+                           *ngIf="sendValidTranscriptOnly && !transcrService.transcriptValid">
+                            {{"transcription.invalid" | translate}}
+                        </p>
                         <button class="btn btn-primary btn-outline btn-success" id="transcr-send-btn"
-                                (click)="sendTranscription()" [disabled]="!feedback.valid">
+                                (click)="sendTranscription()"
+                                [disabled]="!feedback.valid || (sendValidTranscriptOnly && !transcrService.transcriptValid)">
                             <fa-icon icon="paper-plane"></fa-icon>
                             {{"transcription.send" | translate}}
                         </button>

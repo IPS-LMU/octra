@@ -131,6 +131,8 @@
     }
   ],
   "octra": {
+    "sendValidatedTranscriptionOnly": false,
+    "showOverviewIfTranscriptNotValid": true,
     "theme": "shortAudioFiles"
   }
 }

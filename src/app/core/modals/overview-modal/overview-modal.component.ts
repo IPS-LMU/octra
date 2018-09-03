@@ -14,6 +14,7 @@ import {TranscriptionFeedbackComponent} from '../../gui/transcription-feedback/t
 export class OverviewModalComponent implements OnInit, OnDestroy {
   modalRef: BsModalRef;
   public visible = false;
+
   config: ModalOptions = {
     keyboard: false,
     backdrop: false,
@@ -28,6 +29,17 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
 
   public get feedBackComponent(): TranscriptionFeedbackComponent {
     return this.feedback;
+  }
+
+  public get sendValidTranscriptOnly(): boolean {
+    return (
+      !(this.settingsService.projectsettings.octra === null || this.settingsService.projectsettings.octra === undefined)
+      && !(
+        this.settingsService.projectsettings.octra.sendValidatedTranscriptionOnly === null
+        || this.settingsService.projectsettings.octra.sendValidatedTranscriptionOnly === undefined
+      )
+      && this.settingsService.projectsettings.octra.sendValidatedTranscriptionOnly
+    );
   }
 
   private subscrmanager = new SubscriptionManager();
@@ -59,9 +71,14 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
     this.subscrmanager.destroy();
   }
 
-  public open(): Promise<void> {
+  public open(validate = true): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.modal.show(this.modal, this.config);
+
+      if (validate) {
+        this.transcrService.validateAll();
+      }
+
       this.visible = true;
 
       // this.loadForm();

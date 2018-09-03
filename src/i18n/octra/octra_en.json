@@ -87,7 +87,8 @@
     "stop": "Stop transcription",
     "check": "Check transcription",
     "send": "Send transcription",
-    "complete": "Complete Transcription"
+    "complete": "Complete Transcription",
+    "invalid": "Only valid transcripts are accepted. Please correct your transcript."
   },
   "segments": {
     "total": "Total segments",

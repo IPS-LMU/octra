@@ -166,14 +166,17 @@
   "login": {
     "online mode": "Online Modus",
     "online mode disabled": "Der Online Modus ist derzeit deaktiviert. Sie können OCTRA stattdessen lokal nutzen.",
+    "online mode description": "Im online Modus werden automatisch Audiodateien zugewiesen, die verschriftlicht werden sollen.",
     "local mode": "Lokaler Modus",
+    "local mode description": "Im lokalen Modus kannst Du selbst eine Audiodatei von deiner Festplatte laden und transkribieren.",
     "old file found": "Es wurden Daten zu einer vorherigen Transkription gefunden. Um diese fortzusetzen, ziehen Sie die folgende Datei per Drag & Drop in das graue Feld:<br/><br/>{{file_label}}",
     "online mode data warning": "Es sind lokale Daten vorhanden, die im lokalen Modus erstellt worden sind. Das Nutzen des Online Modus überschreibt diese lokalen Daten.",
     "offline mode data warning": "Es sind lokale Daten vorhanden, die im online Modus erstellt worden sind. Das Nutzen des lokalen Modus überschreibt diese lokalen Daten.",
     "online mode continue": "Es wurden alte Daten gefunden. Zum Fortsetzen folgende Daten angeben: {{member_id}} , {{member_project}}, {{member_jobno}}",
     "last used": "zuletzt genutzt",
     "login and remove": "Daten des lokalen Modus löschen & anmelden",
-    "local and remove": "Daten des online Modus löschen & weiter"
+    "local and remove": "Daten des online Modus löschen & weiter",
+    "demo": "Klicke hier um OCTRA mit einer beliebigen Audiodatei zu öffnen (Demo)"
   },
   "dropzone": {
     "drag&drop here": "Audiodatei (*.wav) (+ optional Datei zum Importieren) hier hineinziehen oder hier klicken",

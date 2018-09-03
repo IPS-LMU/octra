@@ -129,5 +129,10 @@
         }
       ]
     }
-  ]
+  ],
+  "octra": {
+    "sendValidatedTranscriptionOnly": false,
+    "showOverviewIfTranscriptNotValid": true,
+    "theme": "default"
+  }
 }

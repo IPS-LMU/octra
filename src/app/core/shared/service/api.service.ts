@@ -205,9 +205,6 @@ export class APIService implements API {
         if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
           this.closeSession(appStorage.user.id, appStorage.data_id, '').subscribe(
             (result2) => {
-              this.fetchAnnotation(appStorage.data_id).subscribe((res) => {
-                console.log(res);
-              });
               callback();
             }
           );

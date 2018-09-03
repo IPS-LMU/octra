@@ -28,8 +28,6 @@ export class Segments {
         throw new Error('sampleRateFactor is null!');
       }
 
-      console.log(`last s: ${last_sample}, ${sample_rate}`);
-
       if (segments.length === 0) {
         this._segments.push(new Segment(new AudioTime(last_sample, sample_rate)));
       }
@@ -38,7 +36,6 @@ export class Segments {
         // divide samples through sampleRateFactor in order to get decodedValue
         segments[i].sampleDur = Math.round(segments[i].sampleDur / sampleRateFactor);
         segments[i].sampleStart = Math.round(segments[i].sampleStart / sampleRateFactor);
-        console.log(`sample[${i}] = ${segments[i].sampleStart},${segments[i].sampleDur}`);
 
         const new_segment = Segment.fromObj(segments[i], sample_rate);
 

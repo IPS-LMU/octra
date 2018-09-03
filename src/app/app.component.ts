@@ -115,7 +115,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
     });
 
     this.route.fragment.subscribe((fragment) => {
-      console.log(`fragment is ${fragment}`);
       switch (fragment) {
         case('feedback'):
           this.navigation.openBugReport();

@@ -196,8 +196,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     }
 
     const loaduser = () => {
-      console.log(`LOAD USER!`);
-      console.log(this.appStorage.user);
       if (!(this.appStorage.user === null || this.appStorage.user === undefined) && this.appStorage.user.id !== '-1') {
         this.member.id = this.appStorage.user.id;
       }
@@ -210,8 +208,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         && this.appStorage.user.jobno !== null && this.appStorage.user.jobno > -1) {
         this.member.jobno = this.appStorage.user.jobno.toString();
       }
-
-      console.log(this.member);
     };
 
     if (!this.appStorage.idbloaded) {

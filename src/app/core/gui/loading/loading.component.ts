@@ -42,10 +42,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.route.fragment.subscribe((fragment) => {
-      console.log(`LOADING fragment ${fragment}`);
-    });
-
     new Promise<void>((resolve, reject) => {
       if (this.settService.isDBLoadded) {
         resolve();
@@ -236,9 +232,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                   console.error(err);
                 });
               } else {
-                console.log(`load segments`);
                 this.transcrService.load().then(() => {
-                  console.log(`ALL LOADED!`);
                   Functions.navigateTo(this.router, ['/user/transcr'], AppInfo.queryParamsHandling);
                 }).catch((err) => {
                   console.error(err);
@@ -277,7 +271,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
       this.settService.loadProjectSettings();
 
       if (this.appStorage.usemode === 'local' && (this.appStorage.file === null || this.appStorage.file === undefined)) {
-        console.log('use mode is local, redirect to reload-file');
         Functions.navigateTo(this.router, ['/user/transcr/reload-file'], AppInfo.queryParamsHandling);
       } else {
         if (this.appStorage.usemode === 'url' || this.appStorage.usemode === 'online') {

@@ -389,16 +389,6 @@ export class TranscriptionService {
           return a.validation.length > 0;
         }))
       });
-
-
-      console.log(JSON.stringify({
-        timestamp: Date.now(),
-        type: 'errors',
-        context: 'transcript',
-        value: JSON.stringify(this.validationArray.filter((a) => {
-          return a.validation.length > 0;
-        }))
-      }));
     }
 
     return data;
@@ -803,6 +793,5 @@ export class TranscriptionService {
       }
     }
     this._transcriptValid = !invalid;
-    console.log(this.validationArray);
   }
 }

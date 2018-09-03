@@ -258,8 +258,6 @@ export class AppStorageService {
     jobno: number
   }) {
     this._user = value;
-    console.log(`save user`);
-    console.log(value);
     this._idb.save('options', 'user', {value: this._user}).catch((err) => {
       console.error(err);
     });

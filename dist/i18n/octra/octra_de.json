@@ -38,7 +38,7 @@
     "validation": "Validierung",
     "search": "Suche",
     "project": "Projekt",
-    "authors": "Authoren",
+    "authors": "Autoren",
     "no guidelines found": "Keine Transkriptionsrichtlinien gefunden",
     "example": "Beispiel",
     "select database": "Datenbank wählen",
@@ -70,14 +70,12 @@
     "transcription window": "Transkriptionsfenster",
     "supported files": "Unterstützte Dateien",
     "select one tier": "Einen Tier auswählen",
-    "prompt": "Textvorlage"
+    "prompt": "Textvorlage",
+    "feedback": "Feedback"
   },
   "bug report": {
-    "report an error": "Fehler melden",
-    "where does the error occur": "Wo trat der Fehler auf?",
-    "have you found bugs": "Haben Sie andere Fehler gefunden?",
-    "Does something go wrong": "Funktioniert etwas nicht richtig?",
-    "Please send us your bug report": "Senden Sie uns bitte ihren Fehlerbericht.",
+    "give feedback": "Feedback geben",
+    "description": "Bitte teile uns dein Feedback mit. Was können wir besser machen? Hast Du irgendwelche Schwierigkeiten mit der Verwendung von OCTRA?",
     "sent": "Der Fehlerbericht wurde erfolgreich gesendet.",
     "send protocol": "Protokoll beifügen (empfohlen)"
   },
@@ -87,7 +85,9 @@
     "finish": "Transkription fertigstellen",
     "stop": "Transkription beenden",
     "check": "Transkription überprüfen",
-    "send": "Transkription senden"
+    "send": "Transkription senden",
+    "complete": "Transkription abschließen",
+    "invalid": "Es werden nur korrekte Transkriptionen angenommen. Korrigiere bitte die Fehler."
   },
   "segments": {
     "total": "Segmente insgesamt",
@@ -166,14 +166,17 @@
   "login": {
     "online mode": "Online Modus",
     "online mode disabled": "Der Online Modus ist derzeit deaktiviert. Sie können OCTRA stattdessen lokal nutzen.",
+    "online mode description": "Im online Modus werden automatisch Audiodateien zugewiesen, die verschriftlicht werden sollen.",
     "local mode": "Lokaler Modus",
+    "local mode description": "Im lokalen Modus können Sie selbst eine Audiodatei von Ihrer Festplatte laden und transkribieren.",
     "old file found": "Es wurden Daten zu einer vorherigen Transkription gefunden. Um diese fortzusetzen, ziehen Sie die folgende Datei per Drag & Drop in das graue Feld:<br/><br/>{{file_label}}",
     "online mode data warning": "Es sind lokale Daten vorhanden, die im lokalen Modus erstellt worden sind. Das Nutzen des Online Modus überschreibt diese lokalen Daten.",
     "offline mode data warning": "Es sind lokale Daten vorhanden, die im online Modus erstellt worden sind. Das Nutzen des lokalen Modus überschreibt diese lokalen Daten.",
     "online mode continue": "Es wurden alte Daten gefunden. Zum Fortsetzen folgende Daten angeben: {{member_id}} , {{member_project}}, {{member_jobno}}",
     "last used": "zuletzt genutzt",
     "login and remove": "Daten des lokalen Modus löschen & anmelden",
-    "local and remove": "Daten des online Modus löschen & weiter"
+    "local and remove": "Daten des online Modus löschen & weiter",
+    "demo": "Klicke hier um OCTRA mit einer beliebigen Audiodatei zu öffnen (Demo)"
   },
   "dropzone": {
     "drag&drop here": "Audiodatei (*.wav) (+ optional Datei zum Importieren) hier hineinziehen oder hier klicken",
@@ -217,8 +220,8 @@
   },
   "special_markers": {
     "boundary": {
-      "insert": "Schnittmarke",
-      "description": "Nachdem die aktuelle Audioposition im Audioplayer oder im Signaldisplay gesetzt wurde, kann hiermit an einer bestimmten Textstelle eine Schnittmarke eingefügt werden."
+      "insert": "Segmentgrenze",
+      "description": "Nachdem die aktuelle Audioposition im Audioplayer oder im Signaldisplay gesetzt wurde, kann hiermit an einer bestimmten Textstelle eine Segmentgrenze eingefügt werden."
     }
   },
   "settings": {

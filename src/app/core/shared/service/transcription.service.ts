@@ -19,8 +19,6 @@ import {AudioManager} from '../../../media-components/obj/media/audio/AudioManag
 
 @Injectable()
 export class TranscriptionService {
-  public dataloaded = new EventEmitter<any>();
-  public segmentrequested = new EventEmitter<number>();
 
   get last_sample(): number {
     return this._last_sample;
@@ -111,8 +109,15 @@ export class TranscriptionService {
     this.subscrmanager = new SubscriptionManager();
   }
 
-  public filename = '';
-  public levelchanged: EventEmitter<Level> = new EventEmitter<Level>();
+  /*
+   get segments(): Segments {
+
+   return this._segments;
+   }
+   */
+
+  public dataloaded = new EventEmitter<any>();
+  public segmentrequested = new EventEmitter<number>();
   public saveSegments = () => {
     // make sure, that no saving overhead exist. After saving request wait 1 second
     if (!this.saving) {
@@ -133,6 +138,9 @@ export class TranscriptionService {
     this.audio.destroy(destroyaudio);
     this.destroy();
   };
+
+  public filename = '';
+  public levelchanged: EventEmitter<Level> = new EventEmitter<Level>();
   private subscrmanager: SubscriptionManager;
   private _segments: Segments;
   private saving = false;
@@ -163,18 +171,11 @@ export class TranscriptionService {
     validation: any[]
   }[] = [];
 
-  /*
-   get segments(): Segments {
-
-   return this._segments;
-   }
-   */
+  private _transcriptValid = false;
 
   get validationArray(): { segment: number; validation: any[] }[] {
     return this._validationArray;
   }
-
-  private _transcriptValid = false;
 
   get transcriptValid(): boolean {
     return this._transcriptValid;
@@ -370,7 +371,7 @@ export class TranscriptionService {
           text: segment.transcript
         };
 
-        if (i == this.currentlevel.segments.length - 1) {
+        if (i === this.currentlevel.segments.length - 1) {
           segment_json.length = this._audiomanager.originalInfo.duration.samples - last_bound;
         }
 
@@ -378,6 +379,26 @@ export class TranscriptionService {
       }
 
       data.transcript = transcript;
+
+      // add number of errors as last element to the log
+      data.log.push({
+        timestamp: Date.now(),
+        type: 'errors',
+        context: 'transcript',
+        value: JSON.stringify(this.validationArray.filter((a) => {
+          return a.validation.length > 0;
+        }))
+      });
+
+
+      console.log(JSON.stringify({
+        timestamp: Date.now(),
+        type: 'errors',
+        context: 'transcript',
+        value: JSON.stringify(this.validationArray.filter((a) => {
+          return a.validation.length > 0;
+        }))
+      }));
     }
 
     return data;

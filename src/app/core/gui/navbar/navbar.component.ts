@@ -201,7 +201,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     const newlevel = new Level(this.appStorage.levelcounter + 1, levelname, 'SEGMENT',
-      new Segments(this.transcrServ.audiofile.samplerate, [], this.transcrServ.last_sample));
+      new Segments(this.transcrServ.audiofile.samplerate, [], this.transcrServ.last_sample, this.transcrServ.audiomanager.sampleRateFactor));
     this.appStorage.addAnnotationLevel(
       newlevel.getObj(this.transcrServ.audiomanager.sampleRateFactor, this.transcrServ.audiomanager.originalInfo.duration.samples))
       .then(

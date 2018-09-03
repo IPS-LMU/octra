@@ -35,8 +35,9 @@ export class Segments {
       }
 
       for (let i = 0; i < segments.length; i++) {
-        segments[i].sampleDur = Math.round(segments[i].sampleDur);
-        segments[i].sampleStart = Math.round(segments[i].sampleStart);
+        // divide samples through sampleRateFactor in order to get decodedValue
+        segments[i].sampleDur = Math.round(segments[i].sampleDur / sampleRateFactor);
+        segments[i].sampleStart = Math.round(segments[i].sampleStart / sampleRateFactor);
         console.log(`sample[${i}] = ${segments[i].sampleStart},${segments[i].sampleDur}`);
 
         const new_segment = Segment.fromObj(segments[i], sample_rate);
@@ -235,11 +236,11 @@ export class Segments {
     this._segments = [];
   }
 
-  public getObj(labelname: string, sampleRateFactor: number, lastOriganlSample: number): OSegment[] {
+  public getObj(labelname: string, sampleRateFactor: number, lastOriginalSample: number): OSegment[] {
 
     if (!(sampleRateFactor === null || sampleRateFactor === undefined)
-      && !(lastOriganlSample === null || lastOriganlSample === undefined)
-      && lastOriganlSample > 0 && sampleRateFactor > 0) {
+      && !(lastOriginalSample === null || lastOriginalSample === undefined)
+      && lastOriginalSample > 0 && sampleRateFactor > 0) {
       const result: OSegment[] = [];
 
       let start = 0;
@@ -252,7 +253,7 @@ export class Segments {
         if (i < this._segments.length - 1) {
           annotSegment = new OSegment((i + 1), start, (Math.round(segment.time.samples * sampleRateFactor) - start), labels);
         } else {
-          annotSegment = new OSegment((i + 1), start, lastOriganlSample - start, labels);
+          annotSegment = new OSegment((i + 1), start, lastOriginalSample - start, labels);
         }
         result.push(annotSegment);
 

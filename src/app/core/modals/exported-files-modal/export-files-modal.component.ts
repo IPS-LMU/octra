@@ -1,5 +1,5 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {BsModalRef, ModalOptions} from 'ngx-bootstrap';
+import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs/Subject';
 import {TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
@@ -17,7 +17,7 @@ import {OAudiofile} from '../../obj/Annotation';
   animations: OCTRANIMATIONS
 })
 
-export class ExportFilesModalComponent implements OnInit {
+export class ExportFilesModalComponent implements OnInit, OnDestroy {
   modalRef: BsModalRef;
   AppInfo = AppInfo;
   public visible = false;
@@ -51,7 +51,7 @@ export class ExportFilesModalComponent implements OnInit {
       && this.navbarServ.transcrService.audiomanager.ressource.arraybuffer.byteLength > 0);
   }
 
-  constructor(private sanitizer: DomSanitizer, private navbarServ: NavbarService) {
+  constructor(private sanitizer: DomSanitizer, private navbarServ: NavbarService, private modalService: BsModalService) {
   }
 
   ngOnInit() {
@@ -63,6 +63,7 @@ export class ExportFilesModalComponent implements OnInit {
   public open(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.modal.show(this.modal, this.config);
+
       this.visible = true;
       const subscr = this.actionperformed.subscribe(
         (action) => {
@@ -79,6 +80,7 @@ export class ExportFilesModalComponent implements OnInit {
   public close() {
     this.modal.hide();
     this.visible = false;
+
     this.actionperformed.next();
   }
 
@@ -145,7 +147,8 @@ export class ExportFilesModalComponent implements OnInit {
 
   updateParentFormat(converter: Converter, levelnum?: number) {
     if (!this.preparing.preparing) {
-      const oannotjson = this.navbarServ.transcrService.annotation.getObj(this.transcrService.audiomanager.sampleRateFactor, this.transcrService.audiomanager.originalInfo.duration.samples);
+      const oannotjson = this.navbarServ.transcrService.annotation.getObj(this.transcrService.audiomanager.sampleRateFactor,
+        this.transcrService.audiomanager.originalInfo.duration.samples);
       this.preparing = {
         name: converter.name,
         preparing: true
@@ -203,4 +206,18 @@ export class ExportFilesModalComponent implements OnInit {
     }
   }
 
+  onDownloadClick(i: number) {
+    setTimeout(() => {
+      this.export_states[i] = 'inactive';
+    }, 500);
+  }
+
+  ngOnDestroy() {
+  }
+
+  onHidden() {
+    for (let i = 0; i < this.export_states.length; i++) {
+      this.export_states[i] = 'inactive';
+    }
+  }
 }

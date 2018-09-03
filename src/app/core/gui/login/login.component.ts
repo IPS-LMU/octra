@@ -523,4 +523,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       }
     ));
   }
+
+  public startDemo() {
+    this.member.id = 'demo_user';
+    this.member.project = 'test';
+    this.member.jobno = '0';
+
+    this.onSubmit(this.loginform);
+  }
 }

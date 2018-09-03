@@ -1,4 +1,11 @@
 <div class="section" id="login">
+    <div class="ro">
+        <div class="col-12" style="text-align: center;">
+            <p style="padding-top:10px;margin-bottom:10px;">
+                <a routerLink fragment="" (click)="startDemo()">{{"login.demo"|translate}}</a>
+            </p>
+        </div>
+    </div>
     <div id="loginrow" class="row">
         <div #onlinemode id='onlinemode' class="col-md-6 card" style="padding:40px;margin-bottom:20px;">
             <p *ngIf="!apc.octra.responsive.enabled && !valid_size" class="warning"
@@ -8,6 +15,9 @@
                 <h4 [ngClass]="{
                 'alert-success': appStorage.usemode === 'online'
                 }">{{ 'login.online mode' | translate}}</h4>
+                <p style="text-align: center;">
+                    {{"login.online mode description" | translate}}
+                </p>
                 <div *ngIf="!apc.octra.login.enabled" id="login-disabled">
                     {{'login.online mode disabled' | translate}}
                 </div>
@@ -75,6 +85,9 @@
                 'alert-success': appStorage.usemode === 'local'
                 }">{{'login.local mode' | translate}}
                 </h4>
+                <p style="text-align: center;">
+                    {{"login.local mode description" | translate}}
+                </p>
                 <div>
                     <div class="alert alert-warning"
                          *ngIf="appStorage.usemode === 'local' && appStorage.sessionfile !== null"

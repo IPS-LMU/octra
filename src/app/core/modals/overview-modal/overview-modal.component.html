@@ -1,5 +1,5 @@
 <div bsModal #modal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1"
-     id="bugreport" style="padding: 20px;">
+     id="bugreport" style="padding: 20px;overflow: -moz-hidde-unscrollable;">
     <div class="modal-dialog modal-lg flex" style="height:93%;display: contents;" [ngStyle]="{
         'max-width': (appStorage.usemode === 'online') ? '100%' : '750px;',
         'display': (appStorage.usemode === 'online') ? 'contents' : 'block'
@@ -10,7 +10,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body flex" style="flex:auto;">
+            <div class="modal-body flex" style="flex:auto; height:300px;">
                 <div class="row" style="overflow: auto; flex:auto;">
                     <div [ngClass]="{
                         'col-md-6': appStorage.usemode === 'online',

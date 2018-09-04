@@ -195,7 +195,7 @@ export class AudioChunk {
     }
 
     if (!this._audiomanger.audioplaying) {
-      this._state = PlayBackState.STARTED;
+      this.setState(PlayBackState.STARTED);
 
       this._lastplayedpos = this.playposition.clone();
       this.audiomanager.playposition = this._lastplayedpos.samples;
@@ -220,6 +220,8 @@ export class AudioChunk {
       return this._audiomanger.startPlayback(
         this.selection.start, this.selection.duration, this._volume, this._speed, drawFunc, playonhover
       );
+    } else {
+      console.error(`can't start playback on chunk because audiomanager is still playing`);
     }
     return false;
   }
@@ -237,6 +239,9 @@ export class AudioChunk {
   }
 
   public pausePlayback(): boolean {
+    if (this.audiomanager.state !== this.state && this.state === PlayBackState.PLAYING) {
+      console.error(`audiomanager and chunk have different states: a:${this.audiomanager.state}, c:${this.state}`);
+    }
     return this.audiomanager.pausePlayback();
   }
 

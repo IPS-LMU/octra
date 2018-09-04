@@ -936,6 +936,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * @returns {string}
    */
   private rawToHTML(rawtext: string): string {
+    // TODO remove duplicate code here and in transcrService!
     let result: string = rawtext;
 
     if (rawtext !== '') {
@@ -944,30 +945,25 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
       const markers = this.markers;
       // replace all tags that are not markers
-      result = result.replace(new RegExp('(<[\\w\+\*:=~ ";]+>)', 'g'), function (x) {
+      result = result.replace(new RegExp('(<\/?)?([^<>]+)(>)', 'g'), (g0, g1, g2, g3) => {
         for (let i = 0; i < markers.length; i++) {
           const marker = markers[i];
-          if (arguments[0] === marker.code) {
-            return marker.code.replace(/(<)|(>)/g, (g0, g1, g2) => {
-              if (g2 === undefined && g1 !== undefined) {
-                return '[[[';
-              } else {
-                return ']]]';
-              }
-            });
+
+          if (`${g1}${g2}${g3}` === marker.code) {
+            return `[[[${g2}]]]`;
           }
         }
 
-        return arguments[0];
+        return `${g1}${g2}${g3}`;
       });
 
       // replace
-      result = result.replace(/(?:(<)(?!(?:img)|(?:span)|(?:div)|(?:\/span)|(?:\/div)))|(?:(?:(?:\/?((?:span)|(?:div)|(?:\/))))?(>))/g, (g0, g1, g2, g3) => {
-        if (g1 !== undefined && g1 === '<') {
-          return '&lt;';
-        } else if (g3 === '>' && g2 === undefined) {
-          return '&gt;';
+      result = result.replace(/(<\/?)?([^<>]+)(>)/g, (g0, g1, g2, g3) => {
+        // define allowed html tags here
+        if (g2 !== 'img' && g2 !== 'span' && g2 !== 'div' && g2 !== 'i' && g2 !== 'b' && g2 !== 'u' && g2 !== 's') {
+          return `&lt;${g2}&gt;`;
         }
+        return `${g1}${g2}${g3}`;
       });
 
       result = result.replace(/(\[\[\[)|(]]])/g, (g0, g1, g2) => {

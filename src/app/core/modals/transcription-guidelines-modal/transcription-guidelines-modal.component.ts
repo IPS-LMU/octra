@@ -32,7 +32,7 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();
 
-  constructor(private modalService: BsModalService, private lang: TranslateService, private transcrService: TranscriptionService,
+  constructor(private modalService: BsModalService, private lang: TranslateService, public transcrService: TranscriptionService,
               private appStorage: AppStorageService, private bugService: BugReportService, private settService: SettingsService,
               private cd: ChangeDetectorRef) {
   }

@@ -37,6 +37,102 @@ import {Segment} from '../../../../core/obj/Annotation/Segment';
 })
 export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
 
+  public get Chunk(): AudioChunk {
+    return this.audiochunk;
+  }
+
+  get focused(): boolean {
+    return this.av.focused;
+  }
+
+  set focused(value: boolean) {
+    this.av.focused = value;
+  }
+
+  get MouseCursor(): AVMousePos {
+    return this.av.Mousecursor;
+  }
+
+  public get Settings(): AudioviewerConfig {
+    return this.av.Settings;
+  }
+
+  public set Settings(new_settings: AudioviewerConfig) {
+    this.av.Settings = new_settings;
+  }
+
+  get AudioPxWidth(): number {
+    return this.av.AudioPxWidth;
+  }
+
+  public get selection(): AudioSelection {
+    return this.audiochunk.selection;
+  }
+
+  public get PlayCursor(): PlayCursor {
+    return this.av.PlayCursor;
+  }
+
+  public get audiomanager(): AudioManager {
+    return this.audiochunk.audiomanager;
+  }
+
+  public get audioressource(): AudioRessource {
+    return this.audiochunk.audiomanager.ressource;
+  }
+
+  get visibleLines(): Interval {
+    return this.av.visibleLines;
+  }
+
+  get viewRect(): Rectangle {
+    return this.av.viewRect;
+  }
+
+  get realRect(): Rectangle {
+    return this.av.realRect;
+  }
+
+  get round_values(): boolean {
+    return this.Settings.round_values;
+  }
+
+  set round_values(value: boolean) {
+    this.Settings.round_values = value;
+  }
+
+  @Output('pos_time')
+  get pos_time(): number {
+    return this.av.PlayCursor.time_pos.samples;
+  }
+
+  get innerWidth(): number {
+    return this._innerWidth;
+  }
+
+  get initialized(): boolean {
+    return this._initialized;
+  }
+
+  get deactivate_shortcuts(): boolean {
+    return this._deactivate_shortcuts;
+  }
+
+  set deactivate_shortcuts(value: boolean) {
+    this._deactivate_shortcuts = value;
+  }
+
+  constructor(public av: AudioviewerService,
+              private transcr: TranscriptionService,
+              private keyMap: KeymappingService,
+              private langService: TranslateService) {
+
+    this.av.initializeSettings();
+
+    this.subscrmanager = new SubscriptionManager();
+    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown));
+  }
+
   subscrmanager: SubscriptionManager;
   @ViewChild('audioview') aview;
   @ViewChild('graphicscan') graphicscanRef;
@@ -63,6 +159,28 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   };
   public updating = false;
   public audioplaying = false;
+  // canvas
+  private graphicscanvas: HTMLCanvasElement = null;
+  private overlaycanvas: HTMLCanvasElement = null;
+  private playcanvas: HTMLCanvasElement = null;
+  private mousecanvas: HTMLCanvasElement = null;
+  // contexts
+  private g_context: CanvasRenderingContext2D = null;
+  private p_context: CanvasRenderingContext2D = null;
+  private o_context: CanvasRenderingContext2D = null;
+  private m_context: CanvasRenderingContext2D = null;
+  private wheeling;
+  private resizing = false;
+  // for animation of playcursor
+  private anim: CanvasAnimation;
+  private oldInnerWidth = 0;
+
+  // size settings
+  private _innerWidth = 0;
+
+  private _initialized = false;
+
+  private _deactivate_shortcuts = false;
   /**
    * update and redraw audioviewer
    * @param computeDisplayData should display data be recomputed?
@@ -135,7 +253,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     } else {
       console.error('audiopx 0');
     }
-  };
+  }
   /**
    * drawSignal(array) draws the min-max pairs of values in the canvas
    *
@@ -220,7 +338,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
               switch (shortc) {
                 case('play_pause'):
                   this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'audio'});
-                  if (this.audiochunk.isPlaying) {
+                  if (this.audiochunk.isPlaying || this.audiochunk.audiomanager.state === PlayBackState.PLAYING) {
                     this.pausePlayback();
                   } else {
                     this.startPlayback();
@@ -436,7 +554,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         }
       }
     }
-  };
+  }
   /**
    * playSelection() plays the selected signal fragment or the selection in this chunk
    */
@@ -447,7 +565,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     };
 
     return this.audiochunk.startPlayback(drawFunc);
-  };
+  }
   /**
    * draw PlayCursor. Call this method only while animation.
    */
@@ -465,7 +583,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       this.av.LastLine = line;
     } else {
     }
-  };
+  }
   /**
    * draw playcursor at its current position. You can call this method to update the playcursor view.
    * @param curr_line
@@ -496,7 +614,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         this.p_context.stroke();
       }
     }
-  };
+  }
   /**
    * draws the timeline if timeline ist enabled
    */
@@ -557,21 +675,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       this.g_context.strokeStyle = null;
     }
   };
-  // canvas
-  private graphicscanvas: HTMLCanvasElement = null;
-  private overlaycanvas: HTMLCanvasElement = null;
-  private playcanvas: HTMLCanvasElement = null;
-  private mousecanvas: HTMLCanvasElement = null;
-  // contexts
-  private g_context: CanvasRenderingContext2D = null;
-  private p_context: CanvasRenderingContext2D = null;
-  private o_context: CanvasRenderingContext2D = null;
-  private m_context: CanvasRenderingContext2D = null;
-  private wheeling;
-  private resizing = false;
-  // for animation of playcursor
-  private anim: CanvasAnimation;
-  private oldInnerWidth = 0;
   /**
    * method called when audioplayback ended
    */
@@ -602,7 +705,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
     this.audiomanager.stepbackward = false;
     this.audiomanager.paused = false;
-  };
+  }
   /**
    * change the absolute positon of playcursor
    * @param new_value
@@ -610,7 +713,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   private changePlayCursorAbsX = (new_value: number) => {
     this.av.PlayCursor.changeAbsX(new_value, this.av.audioTCalculator, this.av.AudioPxWidth, this.audiochunk);
     this.playcursorchange.emit(this.av.PlayCursor);
-  };
+  }
   /**
    * change samples of playcursor
    * @param new_value
@@ -619,7 +722,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   private changePlayCursorSamples = (new_value: number, chunk?: AudioChunk) => {
     this.av.PlayCursor.changeSamples(new_value, this.av.audioTCalculator, chunk);
     this.playcursorchange.emit(this.av.PlayCursor);
-  };
+  }
   private drawSelection = (line: Line) => {
     if (!(this.av.drawnselection === null || this.av.drawnselection === undefined)) {
       // draw gray selection
@@ -657,109 +760,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         this.o_context.globalAlpha = 1.0;
       }
     }
-  };
-
-  public get Chunk(): AudioChunk {
-    return this.audiochunk;
-  }
-
-  get focused(): boolean {
-    return this.av.focused;
-  }
-
-  set focused(value: boolean) {
-    this.av.focused = value;
-  }
-
-  get MouseCursor(): AVMousePos {
-    return this.av.Mousecursor;
-  }
-
-  public get Settings(): AudioviewerConfig {
-    return this.av.Settings;
-  }
-
-  public set Settings(new_settings: AudioviewerConfig) {
-    this.av.Settings = new_settings;
-  }
-
-  get AudioPxWidth(): number {
-    return this.av.AudioPxWidth;
-  }
-
-  public get selection(): AudioSelection {
-    return this.audiochunk.selection;
-  }
-
-  public get PlayCursor(): PlayCursor {
-    return this.av.PlayCursor;
-  }
-
-  public get audiomanager(): AudioManager {
-    return this.audiochunk.audiomanager;
-  }
-
-  public get audioressource(): AudioRessource {
-    return this.audiochunk.audiomanager.ressource;
-  }
-
-  get visibleLines(): Interval {
-    return this.av.visibleLines;
-  }
-
-  get viewRect(): Rectangle {
-    return this.av.viewRect;
-  }
-
-  get realRect(): Rectangle {
-    return this.av.realRect;
-  }
-
-  get round_values(): boolean {
-    return this.Settings.round_values;
-  }
-
-  set round_values(value: boolean) {
-    this.Settings.round_values = value;
-  }
-
-  @Output('pos_time')
-  get pos_time(): number {
-    return this.av.PlayCursor.time_pos.samples;
-  }
-
-  // size settings
-  private _innerWidth = 0;
-
-  get innerWidth(): number {
-    return this._innerWidth;
-  }
-
-  private _initialized = false;
-
-  get initialized(): boolean {
-    return this._initialized;
-  }
-
-  private _deactivate_shortcuts = false;
-
-  get deactivate_shortcuts(): boolean {
-    return this._deactivate_shortcuts;
-  }
-
-  set deactivate_shortcuts(value: boolean) {
-    this._deactivate_shortcuts = value;
-  }
-
-  constructor(public av: AudioviewerService,
-              private transcr: TranscriptionService,
-              private keyMap: KeymappingService,
-              private langService: TranslateService) {
-
-    this.av.initializeSettings();
-
-    this.subscrmanager = new SubscriptionManager();
-    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown));
   }
 
   ngOnInit() {

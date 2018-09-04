@@ -113,22 +113,25 @@ export class TranscriptionComponent implements OnInit,
     this.uiService.enabled = this.appStorage.logging;
 
     this.subscrmanager.add(this.audiomanager.statechange.subscribe((state) => {
-      if (!this.audiomanager.playonhover) {
-        let caretpos = -1;
+        if (!this.audiomanager.playonhover) {
+          let caretpos = -1;
 
-        if (!(((<any> this.currentEditor.instance).editor) === null || ((<any> this.currentEditor.instance).editor) === undefined)) {
-          caretpos = (<any> this.currentEditor.instance).editor.caretpos;
-        }
+          if (!(((<any> this.currentEditor.instance).editor) === null || ((<any> this.currentEditor.instance).editor) === undefined)) {
+            caretpos = (<any> this.currentEditor.instance).editor.caretpos;
+          }
 
-        // make sure that events from playonhover are not logged
-        if (state !== PlayBackState.PLAYING && state !== PlayBackState.INITIALIZED && state !== PlayBackState.PREPARE) {
-          this.uiService.addElementFromEvent('audio',
-            {value: getPlayBackString(state).toLowerCase()}, Date.now(),
-            Math.round(this.audiomanager.playposition * this.transcrService.audiomanager.sampleRateFactor),
-            caretpos, this.appStorage.Interface);
+          // make sure that events from playonhover are not logged
+          if (state !== PlayBackState.PLAYING && state !== PlayBackState.INITIALIZED && state !== PlayBackState.PREPARE) {
+            this.uiService.addElementFromEvent('audio',
+              {value: getPlayBackString(state).toLowerCase()}, Date.now(),
+              Math.round(this.audiomanager.playposition * this.transcrService.audiomanager.sampleRateFactor),
+              caretpos, this.appStorage.Interface);
+          }
         }
-      }
-    }));
+      },
+      (error) => {
+        console.error(error);
+      }));
 
     this.interface = this.appStorage.Interface;
 
@@ -188,12 +191,12 @@ export class TranscriptionComponent implements OnInit,
         console.error(error);
       });
     }
-  }
+  };
 
   onSendError = (error) => {
     this.send_error = error.message;
     return throwError(error);
-  }
+  };
 
   ngOnChanges(changes: SimpleChanges) {
   }

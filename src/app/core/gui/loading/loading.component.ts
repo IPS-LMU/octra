@@ -159,7 +159,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                       for (let i = 0; i < importResult.annotjson.levels.length; i++) {
                         new_levels.push(new OIDBLevel(i + 1, importResult.annotjson.levels[i], i));
                       }
-                      this.appStorage.overwriteAnnotation(new_levels).then(
+                      this.appStorage.overwriteAnnotation(new_levels, false).then(
                         () => {
                           resolve();
                         }
@@ -181,15 +181,16 @@ export class LoadingComponent implements OnInit, OnDestroy {
                   const new_levels: OIDBLevel[] = [];
                   new_levels.push(new OIDBLevel(1, new OLevel('OCTRA_1', 'SEGMENT'), 1));
 
-                  this.appStorage.overwriteAnnotation(new_levels).then(
+                  this.appStorage.overwriteAnnotation(new_levels, false).then(
                     () => {
                       resolve();
                     }
                   ).catch((error) => {
                     reject(error);
                   });
+                } else {
+                  resolve();
                 }
-                resolve();
               }
             }).then(() => {
               this.loadedtable.audio = true;
@@ -259,8 +260,17 @@ export class LoadingComponent implements OnInit, OnDestroy {
       }
     }).then(() => {
 
-      if ((this.appStorage.usemode === null || this.appStorage.usemode === undefined) && this.appStorage.url_params.hasOwnProperty('audio') && this.appStorage.url_params['audio'] !== '') {
+      if (this.appStorage.url_params.hasOwnProperty('audio') && this.appStorage.url_params['audio'] !== ''
+        && !(this.appStorage.url_params['audio'] === null || this.appStorage.url_params['audio'] === undefined)) {
         this.appStorage.usemode = 'url';
+        this.appStorage.LoggedIn = false;
+      } else if (this.appStorage.usemode === 'url') {
+        // url mode set, but no params => change mode
+        console.warn(`use mode is url but no params found. Reset use mode.`);
+        this.appStorage.usemode = (!(this.appStorage.user.id === null || this.appStorage.user.id === undefined) && this.appStorage.user.id !== ''
+          && ((this.appStorage.sessionfile === null || this.appStorage.sessionfile === undefined)))
+          ? 'online' : 'local';
+        this.appStorage.LoggedIn = false;
       }
 
       if (this.appStorage.usemode !== 'url' && !this.appStorage.LoggedIn) {
@@ -273,12 +283,11 @@ export class LoadingComponent implements OnInit, OnDestroy {
       if (this.appStorage.usemode === 'local' && (this.appStorage.file === null || this.appStorage.file === undefined)) {
         Functions.navigateTo(this.router, ['/user/transcr/reload-file'], AppInfo.queryParamsHandling);
       } else {
-        if (this.appStorage.usemode === 'url' || this.appStorage.usemode === 'online') {
+        if (this.appStorage.usemode === 'url') {
           if (this.appStorage.usemode === 'url') {
             this.state = 'Get transcript from URL...';
             // set audio url from url params
             this.appStorage.audio_url = decodeURI(this.appStorage.url_params['audio']);
-            console.log(`load audio from ${this.appStorage.audio_url}`);
           }
         }
         this.settService.loadAudioFile(this.audio);

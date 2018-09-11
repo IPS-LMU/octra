@@ -152,9 +152,11 @@ export class AppStorageService {
 
   set audio_url(value: string) {
     this._audio_url = value;
-    this.idb.save('options', 'audio_url', {value: value}).catch((err) => {
-      console.error(err);
-    });
+    if (this.usemode !== 'url') {
+      this.idb.save('options', 'audio_url', {value: value}).catch((err) => {
+        console.error(err);
+      });
+    }
   }
 
   get usemode(): 'online' | 'local' | 'url' {
@@ -366,25 +368,47 @@ export class AppStorageService {
       file.type
     );
   };
-  public overwriteAnnotation = (value: OIDBLevel[]): Promise<any> => {
-    return this.clearAnnotationData()
-      .then(() => {
-        this._annotation = value;
-      }).catch((err) => {
-        console.error(err);
-      }).then(() => {
-        return this._idb.saveArraySequential(value, 'annotation_levels', 'id').then(
-          () => {
-            let max = 0;
+  public overwriteAnnotation = (value: OIDBLevel[], saveToDB = true): Promise<any> => {
+    return new Promise<any>((resolve, reject) => {
+      if (saveToDB) {
+        this.clearAnnotationData().then(() => {
+          resolve();
+        }).catch((error) => {
+          reject(error);
+        });
+      } else {
+        resolve();
+      }
+    }).then(() => {
+      this._annotation = value;
+    }).catch((err) => {
+      console.error(err);
+    }).then(() => {
+      return new Promise<any>((resolve, reject) => {
+        if (saveToDB) {
+          this._idb.saveArraySequential(value, 'annotation_levels', 'id').then((r) => {
+            resolve();
+          }).catch((error) => {
+            reject(error);
+          });
+        } else {
+          resolve();
+        }
+      }).then(
+        () => {
+          let max = 0;
 
-            for (let i = 0; i < value.length; i++) {
-              max = Math.max(max, value[i].id);
-            }
-            this._levelcounter = max;
+          for (let i = 0; i < value.length; i++) {
+            max = Math.max(max, value[i].id);
           }
-        );
+          this._levelcounter = max;
+        }
+      ).catch((err) => {
+        console.error(err);
       });
+    });
   };
+
   public overwriteLinks = (value: OIDBLink[]): Promise<any> => {
     return this.clearIDBTable('annotation_links')
       .then(() => {
@@ -559,35 +583,36 @@ export class AppStorageService {
   }
 
   public save(key: string, value: any): boolean {
-    if (key === 'annotation' || key === 'feedback') {
-      this.saving.emit('saving');
-    }
+    if (this.usemode !== 'url') {
+      if (key === 'annotation' || key === 'feedback') {
+        this.saving.emit('saving');
+      }
 
-    switch (key) {
-      case 'annotation':
-        this.changeAnnotationLevel(value.num, value.level).then(
-          () => {
-            this.saving.emit('success');
-          }
-        ).catch((err) => {
-          this.saving.emit('error');
-          console.error(err);
-        });
-        break;
-      case 'feedback':
-        this._idb.save('options', 'feedback', {value: value}).then(
-          () => {
-            this.saving.emit('success');
-          }
-        ).catch((err) => {
-          this.saving.emit('error');
-          console.error(err);
-        });
-        break;
-      default:
-        return false; // if key not found return false
+      switch (key) {
+        case 'annotation':
+          this.changeAnnotationLevel(value.num, value.level).then(
+            () => {
+              this.saving.emit('success');
+            }
+          ).catch((err) => {
+            this.saving.emit('error');
+            console.error(err);
+          });
+          break;
+        case 'feedback':
+          this._idb.save('options', 'feedback', {value: value}).then(
+            () => {
+              this.saving.emit('success');
+            }
+          ).catch((err) => {
+            this.saving.emit('error');
+            console.error(err);
+          });
+          break;
+        default:
+          return false; // if key not found return false
+      }
     }
-
     return true;
   }
 

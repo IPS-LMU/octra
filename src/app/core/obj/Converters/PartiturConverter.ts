@@ -129,7 +129,7 @@ LBD:\n`;
             } else {
               const transcript = lines[pointer].match(new RegExp('TRN: ([0-9]+) ([0-9]+) ([0-9]+,?)+ (.*)'));
               level.items.push(new OSegment(
-                counter, Number(transcript[1]), Number(transcript[2]) + 1, [new OLabel(previous_tier, transcript[4])]
+                counter, Number(transcript[1]), Number(transcript[2]), [new OLabel(previous_tier, transcript[4])]
                 )
               );
             }

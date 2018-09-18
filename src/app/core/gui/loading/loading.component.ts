@@ -113,6 +113,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
           if (result.status === 'success') {
             new Promise<void>((resolve, reject) => {
               if (this.appStorage.usemode === 'url' && this.appStorage.url_params['transcript'] !== null) {
+                console.log(`LOAD TRANSCRIPT`);
                 // load transcript file via URL
                 this.http.get(this.appStorage.url_params['transcript'], {
                   responseType: 'text'
@@ -135,7 +136,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                     const oAudioFile = new OAudiofile();
                     oAudioFile.arraybuffer = audioRessource.arraybuffer;
                     oAudioFile.duration = audioRessource.info.duration.samples;
-                    oAudioFile.name = audioRessource.name;
+                    oAudioFile.name = audioRessource.info.fullname;
                     oAudioFile.samplerate = audioRessource.info.samplerate;
                     oAudioFile.size = audioRessource.size;
 
@@ -159,6 +160,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
                       for (let i = 0; i < importResult.annotjson.levels.length; i++) {
                         new_levels.push(new OIDBLevel(i + 1, importResult.annotjson.levels[i], i));
                       }
+                      console.log(`NEW LEVELS`);
+                      console.log(new_levels);
                       this.appStorage.overwriteAnnotation(new_levels, false).then(
                         () => {
                           resolve();

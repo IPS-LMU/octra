@@ -338,7 +338,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
               switch (shortc) {
                 case('play_pause'):
                   this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'audio'});
-                  if (this.audiochunk.isPlaying || this.audiochunk.audiomanager.state === PlayBackState.PLAYING) {
+                  if (this.audiomanager.state === PlayBackState.PLAYING) {
                     this.pausePlayback();
                   } else {
                     this.startPlayback();

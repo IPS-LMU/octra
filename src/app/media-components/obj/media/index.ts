@@ -5,32 +5,13 @@ export const enum SourceType {
 }
 
 export const enum PlayBackState {
-  PREPARE,
-  INITIALIZED,
-  STARTED,
-  PLAYING,
-  PAUSED,
-  STOPPED,
-  ENDED
-}
-
-export function getPlayBackString(state: PlayBackState) {
-  switch (state) {
-    case(PlayBackState.PREPARE):
-      return 'PREPARE';
-    case(PlayBackState.INITIALIZED):
-      return 'INITIALIZED';
-    case(PlayBackState.STARTED):
-      return 'STARTED';
-    case(PlayBackState.PLAYING):
-      return 'PLAYING';
-    case(PlayBackState.PAUSED):
-      return 'PAUSED';
-    case(PlayBackState.STOPPED):
-      return 'STOPPED';
-    case(PlayBackState.ENDED):
-      return 'ENDED';
-  }
+  PREPARE = 'PREPARE',
+  INITIALIZED = 'INITIALIZED',
+  STARTED = 'STARTED',
+  PLAYING = 'PLAYING',
+  PAUSED = 'PAUSED',
+  STOPPED = 'STOPPED',
+  ENDED = 'ENDED'
 }
 
 export * from './audio';

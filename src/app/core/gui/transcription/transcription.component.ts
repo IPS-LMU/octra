@@ -34,7 +34,7 @@ import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 import {ProjectSettings} from '../../obj/Settings';
 import {EditorComponents} from '../../../editors/components';
 import {Level} from '../../obj/Annotation';
-import {getPlayBackString, PlayBackState} from '../../../media-components/obj/media';
+import {PlayBackState} from '../../../media-components/obj/media';
 import {HttpClient} from '@angular/common/http';
 import {IFile, PartiturConverter} from '../../obj/Converters';
 import {BugReportService} from '../../shared/service/bug-report.service';
@@ -123,7 +123,7 @@ export class TranscriptionComponent implements OnInit,
           // make sure that events from playonhover are not logged
           if (state !== PlayBackState.PLAYING && state !== PlayBackState.INITIALIZED && state !== PlayBackState.PREPARE) {
             this.uiService.addElementFromEvent('audio',
-              {value: getPlayBackString(state).toLowerCase()}, Date.now(),
+              {value: state.toLowerCase()}, Date.now(),
               Math.round(this.audiomanager.playposition * this.transcrService.audiomanager.sampleRateFactor),
               caretpos, this.appStorage.Interface);
           }
@@ -191,12 +191,12 @@ export class TranscriptionComponent implements OnInit,
         console.error(error);
       });
     }
-  };
+  }
 
   onSendError = (error) => {
     this.send_error = error.message;
     return throwError(error);
-  };
+  }
 
   ngOnChanges(changes: SimpleChanges) {
   }
@@ -461,7 +461,8 @@ export class TranscriptionComponent implements OnInit,
     let showOverview = true;
 
     if (!(this.projectsettings.octra === null || this.projectsettings.octra === undefined)
-      && !(this.projectsettings.octra.showOverviewIfTranscriptNotValid === null || this.projectsettings.octra.showOverviewIfTranscriptNotValid === undefined)) {
+      && !(this.projectsettings.octra.showOverviewIfTranscriptNotValid === null
+        || this.projectsettings.octra.showOverviewIfTranscriptNotValid === undefined)) {
       this.transcrService.validateAll();
       validTranscript = this.transcrService.transcriptValid;
       showOverview = this.projectsettings.octra.showOverviewIfTranscriptNotValid;

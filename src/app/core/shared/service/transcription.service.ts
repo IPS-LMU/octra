@@ -100,6 +100,8 @@ export class TranscriptionService {
     return this.settingsService.projectsettings;
   }
 
+  public defaultFontSize = 14;
+
   constructor(private audio: AudioService,
               private appStorage: AppStorageService,
               private uiService: UserInteractionsService,

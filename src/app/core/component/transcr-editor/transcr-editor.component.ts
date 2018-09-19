@@ -112,8 +112,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     const Navigation = this.initNavigation();
 
     if (this.Settings.special_markers.boundary) {
-      Navigation.buttons['boundary'] = this.createCustomButtonsArray()[0];
+      const customArray = this.createCustomButtonsArray();
+      Navigation.buttons['boundary'] = customArray[0];
+      Navigation.buttons['fontSizeUp'] = customArray[1];
+      Navigation.buttons['fontSizeDown'] = customArray[2];
       Navigation.str_array.push('boundary');
+      Navigation.str_array.push('fontSizeDown');
+      Navigation.str_array.push('fontSizeUp');
     }
 
     /*
@@ -219,6 +224,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     this.segpopover.insertBefore('.note-editing-area');
 
+    jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
     this.loaded.emit(true);
   };
   /**
@@ -395,6 +401,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         result += `{${segments.get(i).time.samples}}`;
       }
     }
+
+    jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
     this.rawText = result;
   }
 
@@ -418,11 +426,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   set rawText(value: string) {
+    jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
     this._rawText = this.tidyUpRaw(value);
     this.init = 0;
     const html = this.rawToHTML(this._rawText);
     this.textfield.summernote('code', html);
-
     this.initPopover();
   }
 
@@ -629,6 +637,44 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     result.push(boundary_btn);
 
+    // create boundary button
+    const fontSizeUp = () => {
+      let icon = '<img src=\'assets/img/components/transcr-editor/increaseFont.png\' class=\'btn-icon\' style=\'height:20px;\'/>';
+      // create button
+      const btn_js = {
+        contents: icon,
+        tooltip: 'increase font size',
+        container: false,
+        click: () => {
+          jQuery('.transcr-editor .note-editable.card-block').css('font-size', (++this.transcrService.defaultFontSize) + 'px');
+        }
+      };
+      const button = jQuery.summernote.ui.button(btn_js);
+
+      return button.render();   // return button as jquery object
+    };
+
+    result.push(fontSizeUp);
+
+    // create boundary button
+    const fontSizeDown = () => {
+      let icon = '<img src=\'assets/img/components/transcr-editor/decreaseFont.png\' class=\'btn-icon\' style=\'height:20px;\'/>';
+      // create button
+      const btn_js = {
+        contents: icon,
+        tooltip: 'decrease font size',
+        container: false,
+        click: () => {
+          jQuery('.transcr-editor .note-editable.card-block').css('font-size', (--this.transcrService.defaultFontSize) + 'px');
+        }
+      };
+      const button = jQuery.summernote.ui.button(btn_js);
+
+      return button.render();   // return button as jquery object
+    };
+
+    result.push(fontSizeDown);
+
     return result;
   }
 
@@ -775,6 +821,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    */
   updateTextField() {
     this._rawText = this.getRawText();
+    jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
   }
 
   /**

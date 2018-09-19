@@ -66,6 +66,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         if (this.segment_index < this.transcrService.currentlevel.segments.length - 1) {
           this.doit('right');
         } else {
+          this.save();
           this.close();
           this.act.emit('overview');
         }
@@ -219,6 +220,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         segment.transcript = this.editor.rawText;
         this.transcrService.currentlevel.segments.change(this.segment_index, segment);
       }
+    } else {
+      console.log(`could not save segment`);
     }
   }
 

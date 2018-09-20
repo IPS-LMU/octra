@@ -143,19 +143,23 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
         this.viewer.startPlayback();
         break;
       case('pause'):
-        this.viewer.pausePlayback();
+        this.viewer.pausePlayback(() => {
+        });
         break;
       case('stop'):
-        this.viewer.stopPlayback();
+        this.viewer.stopPlayback(() => {
+        });
         break;
       case('replay'):
         this.viewer.rePlayback();
         break;
       case('backward'):
-        this.viewer.stepBackward();
+        this.viewer.stepBackward(() => {
+        });
         break;
       case('backward time'):
-        this.viewer.stepBackwardTime(0.5);
+        this.viewer.stepBackwardTime(() => {
+        }, 0.5);
         break;
       case('default'):
         break;

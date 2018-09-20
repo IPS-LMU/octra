@@ -36,48 +36,6 @@ import {AudioManager} from '../../media-components/obj/media/audio/AudioManager'
   styleUrls: ['./linear-editor.component.css']
 })
 export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
-  public static editorname = 'Linear Editor';
-
-  public static initialized: EventEmitter<void> = new EventEmitter<void>();
-
-  @ViewChild('viewer') viewer: AudioviewerComponent;
-  @ViewChild('miniloupe') miniloupe: CircleLoupeComponent;
-  @ViewChild('loupe') loupe: LoupeComponent;
-  @ViewChild('nav') nav: AudioNavigationComponent;
-  @ViewChild('transcr') public editor: TranscrEditorComponent;
-  public miniloupe_hidden = true;
-  public segmentselected = false;
-  public top_selected = false;
-  public loupe_settings: AudioviewerConfig;
-  public mini_loupecoord: any = {
-    component: 'viewer',
-    x: 0,
-    y: 0
-  };
-  public audiomanager: AudioManager;
-  public audiochunk_top: AudioChunk;
-  public audiochunk_down: AudioChunk;
-  public audiochunk_loupe: AudioChunk;
-  /**
-   * hits when user is typing something in the editor
-   * @param status
-   */
-  onEditorTyping = (status: string) => {
-    this.viewer.focused = false;
-    this.loupe.viewer.focused = false;
-    if (status === 'stopped') {
-      this.save();
-      setTimeout(() => {
-        this.loupe.update(false);
-      }, 200);
-    }
-  };
-  private subscrmanager: SubscriptionManager;
-  private saving = false;
-  private factor = 6;
-  private mouseTimer = null;
-  private platform = BrowserInfo.platform;
-  private selected_index: number;
 
   public get app_settings(): any {
     return this.settingsService.app_settings;
@@ -100,6 +58,49 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
               public settingsService: SettingsService,
               public appStorage: AppStorageService) {
     this.subscrmanager = new SubscriptionManager();
+  }
+
+  public static editorname = 'Linear Editor';
+
+  public static initialized: EventEmitter<void> = new EventEmitter<void>();
+
+  @ViewChild('viewer') viewer: AudioviewerComponent;
+  @ViewChild('miniloupe') miniloupe: CircleLoupeComponent;
+  @ViewChild('loupe') loupe: LoupeComponent;
+  @ViewChild('nav') nav: AudioNavigationComponent;
+  @ViewChild('transcr') public editor: TranscrEditorComponent;
+  public miniloupe_hidden = true;
+  public segmentselected = false;
+  public top_selected = false;
+  public loupe_settings: AudioviewerConfig;
+  public mini_loupecoord: any = {
+    component: 'viewer',
+    x: 0,
+    y: 0
+  };
+  public audiomanager: AudioManager;
+  public audiochunk_top: AudioChunk;
+  public audiochunk_down: AudioChunk;
+  public audiochunk_loupe: AudioChunk;
+  private subscrmanager: SubscriptionManager;
+  private saving = false;
+  private factor = 6;
+  private mouseTimer = null;
+  private platform = BrowserInfo.platform;
+  private selected_index: number;
+  /**
+   * hits when user is typing something in the editor
+   * @param status
+   */
+  onEditorTyping = (status: string) => {
+    this.viewer.focused = false;
+    this.loupe.viewer.focused = false;
+    if (status === 'stopped') {
+      this.save();
+      setTimeout(() => {
+        this.loupe.update(false);
+      }, 200);
+    }
   }
 
   ngOnInit() {
@@ -213,19 +214,23 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
         this.viewer.startPlayback();
         break;
       case('pause'):
-        this.viewer.pausePlayback();
+        this.viewer.pausePlayback(() => {
+        });
         break;
       case('stop'):
-        this.viewer.stopPlayback();
+        this.viewer.stopPlayback(() => {
+        });
         break;
       case('replay'):
         this.nav.replay = this.viewer.rePlayback();
         break;
       case('backward'):
-        this.viewer.stepBackward();
+        this.viewer.stepBackward(() => {
+        });
         break;
       case('backward time'):
-        this.viewer.stepBackwardTime(0.5);
+        this.viewer.stepBackwardTime(() => {
+        }, 0.5);
         break;
       case('default'):
         break;
@@ -283,6 +288,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
       this.audiochunk_top.selection.end.samples = this.viewer.av.Mousecursor.timePos.samples +
         this.audiomanager.ressource.info.samplerate / 10;
       this.audiochunk_top.startPlayback(() => {
+      }, () => {
       }, true);
     }
 
@@ -393,7 +399,8 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
       }
 
       this.uiService.addElementFromEvent('shortcut', {value: marker_code}, Date.now(),
-        Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor_markers', segment);
+        Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor),
+        this.editor.caretpos, 'texteditor_markers', segment);
     }
   }
 
@@ -419,7 +426,8 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
       }
 
       this.uiService.addElementFromEvent('mouseclick', {value: marker_code}, Date.now(),
-        Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor_toolbar', segment);
+        Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor),
+        this.editor.caretpos, 'texteditor_toolbar', segment);
     }
   }
 

@@ -162,8 +162,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
                       for (let i = 0; i < importResult.annotjson.levels.length; i++) {
                         new_levels.push(new OIDBLevel(i + 1, importResult.annotjson.levels[i], i));
                       }
-                      console.log(`NEW LEVELS`);
-                      console.log(new_levels);
                       this.appStorage.overwriteAnnotation(new_levels, false).then(
                         () => {
                           resolve();
@@ -206,7 +204,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
               this.loadedchanged.emit(false);
             }).catch((error) => {
-              console.log(error);
+              console.error(error);
             });
           } else {
             console.error('audio not loaded');

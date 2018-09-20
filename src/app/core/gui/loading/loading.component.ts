@@ -113,6 +113,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
           if (result.status === 'success') {
             new Promise<void>((resolve, reject) => {
               if (this.appStorage.usemode === 'url' && this.appStorage.url_params['transcript'] !== null) {
+                this.transcrService.defaultFontSize = 16;
+
                 console.log(`LOAD TRANSCRIPT`);
                 // load transcript file via URL
                 this.http.get(this.appStorage.url_params['transcript'], {
@@ -181,6 +183,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
               } else {
                 if (this.appStorage.usemode === 'url') {
                   // overwrite
+                  this.transcrService.defaultFontSize = 16;
+
                   const new_levels: OIDBLevel[] = [];
                   new_levels.push(new OIDBLevel(1, new OLevel('OCTRA_1', 'SEGMENT'), 1));
 

@@ -233,7 +233,7 @@ export class AudioManager {
         });
       }
     });
-  };
+  }
 
   public static getFileFormat(extension: string, audioformats: AudioFormat[]): AudioFormat {
     for (let i = 0; i < audioformats.length; i++) {
@@ -290,6 +290,12 @@ export class AudioManager {
     });
   }
 
+  /***
+   * this method is called after audio playback ended
+   */
+  private toDoCall = () => {
+  }
+
   private afterAudioEnded = () => {
     if (this._state === PlayBackState.PLAYING) {
       // audio ended normally
@@ -300,26 +306,39 @@ export class AudioManager {
       this.javascriptNode.disconnect();
     }
 
+    // toDoCall is very important. It's relative to its context (pause, stop, back etc.).
+    this.toDoCall();
     this.statechange.emit(this._state);
-  };
+  }
 
-  public stopPlayback(): boolean {
+  public stopPlayback(afterAudioEnded: () => void): boolean {
     this._replay = false;
     if (this.audioplaying) {
       // don't use changeState
-      this._state = PlayBackState.STOPPED;
+      this.toDoCall = () => {
+        this._state = PlayBackState.STOPPED;
+        afterAudioEnded();
+      };
       this._source.stop(0);
       return true;
+    } else {
+      console.log(`can't stop because audio manager is not playing`);
     }
     return false;
   }
 
-  public pausePlayback(): boolean {
+  public pausePlayback(afterAudioEnded: () => void): boolean {
     if (this.audioplaying) {
       this._paused = true;
-      // don't use changeState
-      this._state = PlayBackState.PAUSED;
+
+      // do this after paused
+      this.toDoCall = () => {
+        // don't use changeState
+        this._state = PlayBackState.PAUSED;
+        afterAudioEnded();
+      };
       this._source.stop(0);
+
       return true;
     } else {
       this.statechange.error(new Error('cant pause because not playing'));
@@ -329,7 +348,9 @@ export class AudioManager {
 
   public startPlayback(begintime: AudioTime,
                        duration: AudioTime = new AudioTime(0, this._ressource.info.samplerate),
-                       volume: number, speed: number, drawFunc: () => void, playonhover: boolean = false): boolean {
+                       volume: number, speed: number, drawFunc: () => void,
+                       afterAudioEnded: () => void, playonhover: boolean = false
+  ): boolean {
     if (!this.audioplaying) {
       this._playonhover = playonhover;
       this.changeState(PlayBackState.STARTED);
@@ -344,6 +365,7 @@ export class AudioManager {
       this._source.connect(this._gainNode);
       this._javascriptNode.connect(this._audiocontext.destination);
       this._gainNode.connect(this._audiocontext.destination);
+      this.toDoCall = afterAudioEnded;
       this._source.onended = this.afterAudioEnded;
 
       this._startplaying = new Date().getTime();
@@ -372,23 +394,18 @@ export class AudioManager {
     return this._replay;
   }
 
-  public stepBackward(): boolean {
+  public stepBackward(afterAudioEnded: () => void): boolean {
     this._stepbackward = true;
     if (this.audioplaying) {
-      this.changeState(PlayBackState.STOPPED);
-      this._source.stop(0);
-      return true;
-    }
-    return false;
-  }
 
-  public stepBackwardTime(back_samples: number): boolean {
-    this._stepbackward = true;
-
-    if (this.audioplaying) {
-      this.changeState(PlayBackState.STOPPED);
-      this._source.stop(0);
+      this.toDoCall = () => {
+        this.changeState(PlayBackState.STOPPED);
+        afterAudioEnded();
+      };
+      this._source.stop();
       return true;
+    } else {
+      afterAudioEnded();
     }
     return false;
   }

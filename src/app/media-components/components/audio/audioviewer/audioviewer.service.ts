@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 
 import {TranslateService} from '@ngx-translate/core';
-import {PlayBackState} from '../../../obj/media';
 import {AudioviewerComponent} from './audioviewer.component';
 import {AudioviewerConfig} from './audioviewer.config';
 import {Interval, Position, Rectangle, Size} from '../../../objects';
@@ -12,20 +11,11 @@ import {AVMousePos} from '../../../obj/AVMousePos';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
 import {AudioService, KeymappingService, TranscriptionService} from '../../../../core/shared/service';
 import {PlayCursor} from '../../../obj/PlayCursor';
+import {PlayBackState} from '../../../obj/media';
 
 
 @Injectable()
 export class AudioviewerService extends AudioComponentService {
-  public overboundary = false;
-  public focused = false;
-  public shift_pressed = false;
-  onKeyUp = (event) => {
-    this.shift_pressed = false;
-  };
-  private _settings: AudioviewerConfig;
-  private subscrmanager: SubscriptionManager;
-  // LINES
-  private Lines: Line[] = [];
 
   get LinesArray(): Line[] {
     return this.Lines;
@@ -55,13 +45,9 @@ export class AudioviewerService extends AudioComponentService {
     this._settings = value;
   }
 
-  private _dragableBoundaryNumber = -1;
-
   get dragableBoundaryNumber(): number {
     return this._dragableBoundaryNumber;
   }
-
-  private _zoomY = 1;
 
   get zoomY(): number {
     return this._zoomY;
@@ -71,21 +57,15 @@ export class AudioviewerService extends AudioComponentService {
     this._zoomY = value;
   }
 
-  private _zoomX = 1;
-
   get zoomX(): number {
     return this._zoomX;
   }
-
-  private _minmaxarray: number[] = [];
 
   // AUDIO
 
   get minmaxarray(): number[] {
     return this._minmaxarray;
   }
-
-  private _drawnselection: AudioSelection;
 
   get drawnselection(): AudioSelection {
     return this._drawnselection;
@@ -95,19 +75,13 @@ export class AudioviewerService extends AudioComponentService {
     this._drawnselection = value;
   }
 
-  private _realRect: Rectangle = new Rectangle(new Position(0, 0), new Size(0, 0));
-
   get realRect(): Rectangle {
     return this._realRect;
   }
 
-  private _viewRect: Rectangle = new Rectangle(new Position(0, 0), new Size(0, 0));
-
   get viewRect(): Rectangle {
     return this._viewRect;
   }
-
-  private _visibleLines: Interval = new Interval(0, 0);
 
   get visibleLines(): Interval {
     return this._visibleLines;
@@ -122,6 +96,33 @@ export class AudioviewerService extends AudioComponentService {
     this.subscrmanager = new SubscriptionManager();
     this.subscrmanager.add(this.keyMap.onkeyup.subscribe(this.onKeyUp));
   }
+
+  public overboundary = false;
+  public focused = false;
+  public shift_pressed = false;
+  private _settings: AudioviewerConfig;
+  private subscrmanager: SubscriptionManager;
+  // LINES
+  private Lines: Line[] = [];
+
+  private _dragableBoundaryNumber = -1;
+
+  private _zoomY = 1;
+
+  private _zoomX = 1;
+
+  private _minmaxarray: number[] = [];
+
+  private _drawnselection: AudioSelection;
+
+  private _realRect: Rectangle = new Rectangle(new Position(0, 0), new Size(0, 0));
+
+  private _viewRect: Rectangle = new Rectangle(new Position(0, 0), new Size(0, 0));
+
+  private _visibleLines: Interval = new Interval(0, 0);
+  onKeyUp = (event) => {
+    this.shift_pressed = false;
+  };
 
   /**
    * initializes audioviewer using inner width
@@ -241,7 +242,6 @@ export class AudioviewerService extends AudioComponentService {
               this.mouse_click_pos.line = curr_line;
 
               this.audiochunk.startpos = this.mouse_click_pos.timePos.clone();
-              this._drawnselection = this.audiochunk.selection.clone();
               this._drawnselection.end = this.audiochunk.selection.start.clone();
 
               this._dragableBoundaryNumber = this.getBoundaryNumber(this.mouse_click_pos.absX);
@@ -269,7 +269,6 @@ export class AudioviewerService extends AudioComponentService {
             this.mouse_down = false;
           }
         } else if ($event.type === 'mouseup') {
-
           if (this._dragableBoundaryNumber > -1 && this._dragableBoundaryNumber < this.transcrService.currentlevel.segments.length) {
             // some boundary dragged
             const segment = this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber);
@@ -291,21 +290,19 @@ export class AudioviewerService extends AudioComponentService {
           this.overboundary = false;
           this.mouse_down = false;
         }
-      } else if (this.audiochunk.isPlaying && ($event.type === 'mouseup')) {
-        const pos = this.audiochunk.playposition.clone();
-        const id = this.subscrmanager.add(this.audiochunk.statechange.subscribe(
-          (state) => {
-            if (state === PlayBackState.STOPPED) {
-              this.audiochunk.startpos = new AudioTime(absXInTime, this.audiomanager.ressource.info.samplerate);
-              this.audiochunk.selection.end = this.audiochunk.playposition.clone();
-              this.drawnselection = null;
-              this.PlayCursor.changeSamples(this.audiochunk.playposition.samples, this.audioTCalculator, this.audiochunk);
-              viewer.drawSegments();
-              this.subscrmanager.remove(id);
-            }
-          }
-        ));
-        this.audiochunk.stopPlayback();
+      } else if (this.audiomanager.state === PlayBackState.PLAYING && ($event.type === 'mouseup')) {
+        this.audiochunk.stopPlayback(() => {
+          const time = new AudioTime(absXInTime, this.audiomanager.ressource.info.samplerate);
+          this.audiochunk.startpos = time;
+          this.audiochunk.selection.end = time.clone();
+          this.PlayCursor.changeSamples(absXInTime, this.audioTCalculator, this.audiochunk);
+          viewer.drawSegments();
+          viewer.drawCursor(this.Mousecursor.line);
+          viewer.drawPlayCursorOnly(this.Mousecursor.line);
+          viewer.startPlayback();
+          this.mouse_down = false;
+          this._dragableBoundaryNumber = -1;
+        });
       }
 
       resolve(this.mouse_click_pos.line);
@@ -601,7 +598,8 @@ export class AudioviewerService extends AudioComponentService {
       y: this.Settings.margin.top
     };
 
-    position.y += (this.Lines.length > line_num - 1 && !(this.Lines[line_num - 1] === null || this.Lines[line_num - 1] === undefined)) ? this.Lines[line_num - 1].Pos.y : 0;
+    position.y += (this.Lines.length > line_num - 1 && !(this.Lines[line_num - 1] === null
+      || this.Lines[line_num - 1] === undefined)) ? this.Lines[line_num - 1].Pos.y : 0;
     const line_obj = new Line(line_num, size, position);
     this.Lines.push(line_obj);
   }

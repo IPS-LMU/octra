@@ -35,59 +35,6 @@ import {AudioManager} from '../../../media-components/obj/media/audio/AudioManag
 })
 export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterViewInit, OnDestroy, OnChanges {
 
-  @ViewChild('loupe') loupe: LoupeComponent;
-  @ViewChild('editor') editor: TranscrEditorComponent;
-  @ViewChild('audionav') audionav: AudioNavigationComponent;
-  @ViewChild('window') window: ElementRef;
-  @Output('act') act: EventEmitter<string> = new EventEmitter<string>();
-  @Input('easymode') easymode = false;
-  public pos_y = 0;
-  @Input() audiochunk: AudioChunk;
-  @Input() segment_index: number;
-  public doit = (direction: string) => {
-    if (this.audiomanager.audioplaying) {
-      this.loupe.viewer.stopPlayback();
-    }
-    this.save();
-    if (direction !== 'down') {
-      this.goToSegment(direction);
-      setTimeout(() => {
-        this.loupe.viewer.startPlayback();
-      }, 500);
-    } else {
-      this.close();
-    }
-  };
-
-  onKeyDown = ($event) => {
-    switch ($event.comboKey) {
-      case ('ALT + ARROWRIGHT'):
-        $event.event.preventDefault();
-        if (this.segment_index < this.transcrService.currentlevel.segments.length - 1) {
-          this.doit('right');
-        } else {
-          this.save();
-          this.close();
-          this.act.emit('overview');
-        }
-        break;
-      case ('ALT + ARROWLEFT'):
-        $event.event.preventDefault();
-        this.doit('left');
-        break;
-      case ('ALT + ARROWDOWN'):
-        $event.event.preventDefault();
-        this.doit('down');
-        break;
-      case ('ESC'):
-        this.doit('down');
-        break;
-    }
-  };
-  private showWindow = false;
-  private subscrmanager: SubscriptionManager;
-  private temp_segments: Segments;
-
   @Output('shortcuttriggered')
   get shortcuttriggered(): EventEmitter<string> {
     return this.loupe.shortcuttriggered;
@@ -131,6 +78,67 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
               private appStorage: AppStorageService) {
 
     this.subscrmanager = new SubscriptionManager();
+  }
+
+  @ViewChild('loupe') loupe: LoupeComponent;
+  @ViewChild('editor') editor: TranscrEditorComponent;
+  @ViewChild('audionav') audionav: AudioNavigationComponent;
+  @ViewChild('window') window: ElementRef;
+  @Output('act') act: EventEmitter<string> = new EventEmitter<string>();
+  @Input('easymode') easymode = false;
+  public pos_y = 0;
+  @Input() audiochunk: AudioChunk;
+  @Input() segment_index: number;
+  private showWindow = false;
+  private subscrmanager: SubscriptionManager;
+  private temp_segments: Segments;
+  public doit = (direction: string) => {
+    this.save();
+
+    new Promise<void>((resolve, reject) => {
+      if (this.audiomanager.audioplaying) {
+        this.loupe.viewer.stopPlayback(() => {
+          resolve();
+        });
+      } else {
+        resolve();
+      }
+    }).then(() => {
+      if (direction !== 'down') {
+        this.goToSegment(direction);
+        setTimeout(() => {
+          this.loupe.viewer.startPlayback();
+        }, 500);
+      } else {
+        this.close();
+      }
+    });
+  }
+
+  onKeyDown = ($event) => {
+    switch ($event.comboKey) {
+      case ('ALT + ARROWRIGHT'):
+        $event.event.preventDefault();
+        if (this.segment_index < this.transcrService.currentlevel.segments.length - 1) {
+          this.doit('right');
+        } else {
+          this.save();
+          this.close();
+          this.act.emit('overview');
+        }
+        break;
+      case ('ALT + ARROWLEFT'):
+        $event.event.preventDefault();
+        this.doit('left');
+        break;
+      case ('ALT + ARROWDOWN'):
+        $event.event.preventDefault();
+        this.doit('down');
+        break;
+      case ('ESC'):
+        this.doit('down');
+        break;
+    }
   }
 
   ngOnInit() {

@@ -111,17 +111,20 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
 
   onButtonClick(event: { type: string, timestamp: number }) {
     this.uiService.addElementFromEvent('mouseclick', {value: event.type},
-      event.timestamp, Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_buttons');
+      event.timestamp, Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor),
+      this.editor.caretpos, 'audio_buttons');
 
     switch (event.type) {
       case('play'):
-        this.audioplayer.startPlayback();
+        this.audioplayer.startPlayback(() => {
+        });
         break;
       case('pause'):
         this.audioplayer.pausePlayback();
         break;
       case('stop'):
-        this.audioplayer.stopPlayback();
+        this.audioplayer.stopPlayback(() => {
+        });
         break;
       case('replay'):
         this.audioplayer.rePlayback();
@@ -176,43 +179,20 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     if (i > -1) {
       const start = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.samples : 0;
 
-      // this.highlightSegment(i);
-      // make sure that audio is stopped
-      const id = this.subscrmanager.add(this.audiochunk.statechange.subscribe(
-        (state: PlayBackState) => {
-          if (state === PlayBackState.STOPPED) {
-            this.audiochunk.startpos = new AudioTime(start, this.audiomanager.ressource.info.samplerate);
-            this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(i).time.clone();
+      this.audiochunk.stopPlayback(() => {
+        if (this.audiochunk.state === PlayBackState.STOPPED) {
+          this.audiochunk.startpos = new AudioTime(start, this.audiomanager.ressource.info.samplerate);
+          this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(i).time.clone();
+          this.audioplayer.update();
+
+          this.audioplayer.startPlayback(() => {
+            // set start pos and playback length to end of audio file
+            this.audiochunk.startpos = this.audiochunk.selection.end.clone();
             this.audioplayer.update();
-            this.subscrmanager.remove(id);
-
-            const id2 = this.subscrmanager.add(this.audiochunk.statechange.subscribe(
-              (state2: PlayBackState) => {
-                this.boundaryselected = false;
-                if (this.audiochunk.isPlaybackEnded) {
-                  // set start pos and playback length to end of audio file
-                  this.audiochunk.startpos = this.audiochunk.selection.end.clone();
-                  this.audioplayer.update();
-                }
-
-                if (state2 === PlayBackState.STOPPED
-                  || state2 === PlayBackState.PAUSED
-                  || state2 === PlayBackState.ENDED) {
-                  this.subscrmanager.remove(id2);
-                }
-              },
-              (error) => {
-                console.error(error);
-              }
-            ));
-            this.audioplayer.startPlayback(true);
-          }
-        },
-        (error) => {
-          console.error(error);
+          });
+          this.boundaryselected = false;
         }
-      ));
-      this.audiochunk.stopPlayback();
+      });
     } else {
       this.boundaryselected = false;
     }

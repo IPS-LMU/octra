@@ -36,171 +36,6 @@ import {AudioManager} from '../../../obj/media/audio/AudioManager';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
-  @ViewChild('audioplay') apview;
-  @ViewChild('ap_graphicscan') graphicscanRef: ElementRef;
-  @ViewChild('ap_overlaycan') overlaynacRef: ElementRef;
-  @ViewChild('ap_playcan') playcanRef: ElementRef;
-
-  /**
-   * after Shortcut was triggered.
-   * @type {EventEmitter<any>}
-   */
-  @Output() shortcuttriggered = new EventEmitter<any>();
-  @Input() audiochunk: AudioChunk;
-  public focused = false;
-  /**
-   * updates the GUI
-   */
-  public update = () => {
-    this.updateCanvasSizes();
-    if (this.audiomanager.channel) {
-      this.draw();
-      this.drawPlayCursor();
-    }
-
-    // update oldinnerWidth
-    this.oldInnerWidth = this.innerWidth;
-  };
-  private subscrmanager: SubscriptionManager;
-  // canvas Elements
-  private graphicscanvas: HTMLCanvasElement = null;
-  private overlaycanvas: HTMLCanvasElement = null;
-  private playcanvas: HTMLCanvasElement = null;
-  // animation for requesting AnimationFrames
-  private anim: CanvasAnimation;
-  // canvas contexts
-  private context: CanvasRenderingContext2D = null;
-  // timer for updating the time with interval of 200ms
-  private timer = null;
-  // size informations
-  private width = 0;
-  private height = 0;
-  private innerWidth = 0;
-  private oldInnerWidth = 0;
-  private mouseclick_obj = {
-    clicked: false,
-    x: 0,
-    y: 0,
-    curr_line: null,
-    event: null
-  };
-  /**
-   * drawSignal(array) draws the min-max pairs of values in the canvas
-   *
-   * in a different color. This is probable due to there being only a final
-   * stroke()-command after the loop.
-   *
-   */
-  private draw = function () {
-    // get canvas
-    const line = this.ap.Line;
-
-    if (line) {
-      this.clearDisplay();
-
-      this.drawLine();
-      this.drawPlayCursorOnly(line);
-
-    } else {
-      throw new Error('Line Object not found');
-    }
-  };
-  private onKeyDown = ($event) => {
-    if (this.settings.shortcuts_enabled) {
-      const comboKey = $event.comboKey;
-
-      const platform = BrowserInfo.platform;
-      if (this.settings.shortcuts) {
-        let key_active = false;
-        let a = 0;
-        for (const shortc in this.settings.shortcuts) {
-          a++;
-          if (this.settings.shortcuts.hasOwnProperty(shortc)) {
-            const focuscheck = this.settings.shortcuts['' + shortc + ''].focusonly === false
-              || (this.settings.shortcuts['' + shortc + ''].focusonly === this.focused === true);
-
-            if (focuscheck && this.settings.shortcuts['' + shortc + '']['keys']['' + platform + ''] === comboKey) {
-              switch (shortc) {
-                case('play_pause'):
-                  this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
-                  if (this.audiochunk.isPlaying) {
-                    this.pausePlayback();
-                  } else {
-                    this.startPlayback();
-                  }
-                  key_active = true;
-                  break;
-                case('stop'):
-                  this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
-                  this.stopPlayback();
-                  key_active = true;
-                  break;
-                case('step_backward'):
-                  this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
-                  this.stepBackward();
-                  key_active = true;
-                  break;
-                case('step_backwardtime'):
-                  this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
-                  this.stepBackwardTime(0.5);
-                  key_active = true;
-                  break;
-              }
-            }
-
-            if (key_active) {
-              break;
-            }
-          }
-        }
-
-        if (key_active) {
-          $event.event.preventDefault();
-        }
-      }
-    }
-  };
-  private onAudioChunkStateChanged = () => {
-    if (this.audiochunk.isPlaybackEnded) {
-      if (this.audiomanager.replay) {
-        this.playSelection();
-      }
-    }
-
-    if (this.audiochunk.isPlayBackStopped && this.audiomanager.stepbackward) {
-
-      this.ap.PlayCursor.changeSamples(this.audiochunk.playposition.samples,
-        this.ap.audioTCalculator, this.audiochunk);
-
-      this.startPlayback(true);
-    }
-
-    if (this.audiochunk.isPlayBackStopped && this.mouseclick_obj.clicked) {
-      this.mouseclick_obj.clicked = false;
-      this.ap.setMouseClickPosition(this.mouseclick_obj.x, this.mouseclick_obj.y,
-        this.mouseclick_obj.curr_line, this.mouseclick_obj.event, this.innerWidth);
-      setTimeout(() => {
-        this.startPlayback(false);
-      }, 200);
-    }
-
-    this.audiomanager.stepbackward = false;
-    this.audiomanager.paused = false;
-    this.drawPlayCursor();
-  };
-  /**
-   * draws the playcursor during animation
-   */
-  private drawPlayCursor = () => {
-    // set new position of playcursor
-    const absX = this.ap.audioTCalculator.samplestoAbsX(this.audiochunk.playposition.samples);
-    this.changePlayCursorAbsX(absX);
-    const line = this.ap.Line;
-
-    if (line) {
-      this.drawPlayCursorOnly(line);
-    }
-  };
 
   /**
    * gets or sets the settings of this audioplayer component
@@ -238,6 +73,154 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
 
     this.subscrmanager = new SubscriptionManager();
     this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown));
+  }
+
+  @ViewChild('audioplay') apview;
+  @ViewChild('ap_graphicscan') graphicscanRef: ElementRef;
+  @ViewChild('ap_overlaycan') overlaynacRef: ElementRef;
+  @ViewChild('ap_playcan') playcanRef: ElementRef;
+
+  /**
+   * after Shortcut was triggered.
+   * @type {EventEmitter<any>}
+   */
+  @Output() shortcuttriggered = new EventEmitter<any>();
+  @Input() audiochunk: AudioChunk;
+  public focused = false;
+  private subscrmanager: SubscriptionManager;
+  // canvas Elements
+  private graphicscanvas: HTMLCanvasElement = null;
+  private overlaycanvas: HTMLCanvasElement = null;
+  private playcanvas: HTMLCanvasElement = null;
+  // animation for requesting AnimationFrames
+  private anim: CanvasAnimation;
+  // canvas contexts
+  private context: CanvasRenderingContext2D = null;
+  // timer for updating the time with interval of 200ms
+  private timer = null;
+  // size informations
+  private width = 0;
+  private height = 0;
+  private innerWidth = 0;
+  private oldInnerWidth = 0;
+  private mouseclick_obj = {
+    clicked: false,
+    x: 0,
+    y: 0,
+    curr_line: null,
+    event: null
+  };
+  /**
+   * updates the GUI
+   */
+  public update = () => {
+    this.updateCanvasSizes();
+    if (this.audiomanager.channel) {
+      this.draw();
+      this.drawPlayCursor();
+    }
+
+    // update oldinnerWidth
+    this.oldInnerWidth = this.innerWidth;
+  }
+  /**
+   * drawSignal(array) draws the min-max pairs of values in the canvas
+   *
+   * in a different color. This is probable due to there being only a final
+   * stroke()-command after the loop.
+   *
+   */
+  private draw = function () {
+    // get canvas
+    const line = this.ap.Line;
+
+    if (line) {
+      this.clearDisplay();
+
+      this.drawLine();
+      this.drawPlayCursorOnly(line);
+
+    } else {
+      throw new Error('Line Object not found');
+    }
+  };
+  private onKeyDown = ($event) => {
+    if (this.settings.shortcuts_enabled) {
+      const comboKey = $event.comboKey;
+
+      const platform = BrowserInfo.platform;
+      if (this.settings.shortcuts) {
+        let key_active = false;
+        let a = 0;
+        for (const shortc in this.settings.shortcuts) {
+          if (this.settings.shortcuts.hasOwnProperty(shortc)) {
+            a++;
+            if (this.settings.shortcuts.hasOwnProperty(shortc)) {
+              const focuscheck = this.settings.shortcuts['' + shortc + ''].focusonly === false
+                || (this.settings.shortcuts['' + shortc + ''].focusonly === this.focused === true);
+
+              if (focuscheck && this.settings.shortcuts['' + shortc + '']['keys']['' + platform + ''] === comboKey) {
+                switch (shortc) {
+                  case('play_pause'):
+                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
+                    if (this.audiochunk.isPlaying) {
+                      this.pausePlayback();
+                    } else {
+                      this.startPlayback(() => {
+                      });
+                    }
+                    key_active = true;
+                    break;
+                  case('stop'):
+                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
+                    this.stopPlayback(this.afterAudioStopped);
+                    key_active = true;
+                    break;
+                  case('step_backward'):
+                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
+                    this.stepBackward();
+                    key_active = true;
+                    break;
+                  case('step_backwardtime'):
+                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
+                    this.stepBackwardTime(0.5);
+                    key_active = true;
+                    break;
+                }
+              }
+
+              if (key_active) {
+                break;
+              }
+            }
+          }
+        }
+
+        if (key_active) {
+          $event.event.preventDefault();
+        }
+      }
+    }
+  }
+
+  private onAudioChunkStateChanged = () => {
+
+    this.audiomanager.stepbackward = false;
+    this.audiomanager.paused = false;
+    this.drawPlayCursor();
+  }
+  /**
+   * draws the playcursor during animation
+   */
+  private drawPlayCursor = () => {
+    // set new position of playcursor
+    const absX = this.ap.audioTCalculator.samplestoAbsX(this.audiochunk.playposition.samples);
+    this.changePlayCursorAbsX(absX);
+    const line = this.ap.Line;
+
+    if (line) {
+      this.drawPlayCursorOnly(line);
+    }
   }
 
   ngOnInit() {
@@ -286,7 +269,8 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   ngOnDestroy() {
-    this.stopPlayback();
+    this.stopPlayback(() => {
+    });
     this.subscrmanager.destroy();
   }
 
@@ -321,7 +305,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.mouseclick_obj.y = y;
         this.mouseclick_obj.curr_line = curr_line;
         this.mouseclick_obj.event = $event;
-        this.audiochunk.stopPlayback();
+        this.audiochunk.stopPlayback(this.afterAudioStopped);
       } else {
         this.ap.setMouseClickPosition(x, y, curr_line, $event, this.innerWidth);
       }
@@ -333,23 +317,23 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   /**
    * stops the playback and sets the current playcursor position to 0.
    */
-  public stopPlayback() {
-    this.audiochunk.stopPlayback();
+  public stopPlayback(afterAudioEnded: () => void) {
+    this.audiochunk.stopPlayback(afterAudioEnded);
   }
 
   /**
    * pause playback
    */
   public pausePlayback() {
-    this.audiochunk.pausePlayback();
+    this.audiochunk.pausePlayback(this.afterAudioPaused);
   }
 
   /**
    * start playback
    */
-  public startPlayback(computetimes: boolean = true): boolean {
+  public startPlayback(afterAudioEnded: () => void): boolean {
     if (!this.audiochunk.isPlaying) {
-      return this.playSelection();
+      return this.playSelection(afterAudioEnded);
     } else {
       return false;
     }
@@ -365,11 +349,11 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
    steps back to last position
    */
   public stepBackward() {
-    this.audiochunk.stepBackward();
+    this.audiochunk.stepBackward(this.afterAudioStepBackward);
   }
 
   stepBackwardTime(back_sec: number) {
-    this.audiochunk.stepBackwardTime(back_sec);
+    this.audiochunk.stepBackwardTime(this.drawFunc, this.afterAudioBackwardTime, back_sec);
   }
 
   /**
@@ -475,13 +459,13 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
    * playSelection() plays the selected signal fragment. Playback start and duration
    * depend on the current selection.
    */
-  private playSelection(): boolean {
-    const drawFunc = () => {
-      this.audiochunk.updatePlayPosition();
-      this.anim.requestFrame(this.drawPlayCursor);
-    };
+  private playSelection(afterAudioEnded: () => void): boolean {
+    return this.audiochunk.startPlayback(this.drawFunc, afterAudioEnded);
+  }
 
-    return this.audiochunk.startPlayback(drawFunc);
+  private drawFunc = () => {
+    this.audiochunk.updatePlayPosition();
+    this.anim.requestFrame(this.drawPlayCursor);
   }
 
   /**
@@ -524,5 +508,34 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
    */
   private changePlayCursorAbsX(new_value: number) {
     this.ap.PlayCursor.changeAbsX(new_value, this.ap.audioTCalculator, this.ap.AudioPxWidth, this.audiochunk);
+  }
+
+  private afterAudioStopped = () => {
+    if (this.audiochunk.isPlayBackStopped && this.mouseclick_obj.clicked) {
+      this.mouseclick_obj.clicked = false;
+      this.ap.setMouseClickPosition(this.mouseclick_obj.x, this.mouseclick_obj.y,
+        this.mouseclick_obj.curr_line, this.mouseclick_obj.event, this.innerWidth);
+      setTimeout(() => {
+        this.startPlayback(() => {
+        });
+      }, 200);
+    }
+  }
+
+  private afterAudioPaused = () => {
+
+  }
+
+  private afterAudioStepBackward = () => {
+    this.ap.PlayCursor.changeSamples(this.audiochunk.playposition.samples,
+      this.ap.audioTCalculator, this.audiochunk);
+
+    this.startPlayback(() => {
+    });
+  }
+
+  private afterAudioBackwardTime = () => {
+    // do the same
+    this.afterAudioStepBackward();
   }
 }

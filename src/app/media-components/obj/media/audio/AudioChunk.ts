@@ -11,35 +11,6 @@ interface Interval {
 }
 
 export class AudioChunk {
-  private static _counter = 0;
-  public statechange: EventEmitter<PlayBackState> = new EventEmitter<PlayBackState>();
-  /**
-   * calculate current position of the current audio playback.
-   * TODO when does this method must be called? Animation of playcursor or at another time else?
-   * @returns {number}
-   */
-  public updatePlayPosition = () => {
-    if (!(this.selection === null || this.selection === undefined)) {
-      const timestamp = new Date().getTime();
-
-      if ((this._playposition === null || this._playposition === undefined)) {
-        this._playposition = this.time.start.clone();
-      }
-
-      if (this.isPlaying) {
-        const playduration = (this._audiomanger.endplaying - timestamp) * this.speed;
-        this._playposition.unix = this.selection.start.unix + this.selection.duration.unix - playduration;
-
-      } else if (this.state === PlayBackState.ENDED) {
-        this._playposition = this.selection.start.clone();
-      } else if (this.state === PlayBackState.PAUSED) {
-      }
-
-      this.audiomanager.playposition = this._playposition.samples;
-    }
-  };
-  private _audiomanger: AudioManager;
-  private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
   static get counter(): number {
     return this._counter;
@@ -55,6 +26,9 @@ export class AudioChunk {
    * @param value
    */
   public set startpos(value: AudioTime) {
+    if ((value === null || value === undefined)) {
+      throw new Error('start pos is null!');
+    }
     if ((this.selection === null || this.selection === undefined)) {
       this.selection = new AudioSelection(value.clone(), this.time.end.clone());
     } else {
@@ -64,8 +38,6 @@ export class AudioChunk {
     this._playposition = this.selection.start.clone();
   }
 
-  private _selection: AudioSelection = null;
-
   get selection(): AudioSelection {
     return this._selection;
   }
@@ -73,8 +45,6 @@ export class AudioChunk {
   set selection(value: AudioSelection) {
     this._selection = value;
   }
-
-  private _time: AudioSelection = null;
 
   get time(): AudioSelection {
     return this._time;
@@ -84,19 +54,13 @@ export class AudioChunk {
     this._time = value;
   }
 
-  private _id;
-
   get id() {
     return this._id;
   }
 
-  private _state: PlayBackState = PlayBackState.PREPARE;
-
   get state(): PlayBackState {
     return this._state;
   }
-
-  private _volume = 1;
 
   get volume(): number {
     return this._volume;
@@ -106,8 +70,6 @@ export class AudioChunk {
     this._volume = value;
     this._audiomanger.gainNode.gain.value = value;
   }
-
-  private _speed = 1;
 
   get speed(): number {
     return this._speed;
@@ -121,8 +83,6 @@ export class AudioChunk {
     }
   }
 
-  private _playposition: AudioTime;
-
   get playposition(): AudioTime {
     return this._playposition;
   }
@@ -130,8 +90,6 @@ export class AudioChunk {
   set playposition(value: AudioTime) {
     this._playposition = value;
   }
-
-  private _lastplayedpos: AudioTime;
 
   get lastplayedpos(): AudioTime {
     return this._lastplayedpos;
@@ -177,6 +135,52 @@ export class AudioChunk {
     this._id = ++AudioChunk._counter;
   }
 
+  private static _counter = 0;
+  public statechange: EventEmitter<PlayBackState> = new EventEmitter<PlayBackState>();
+  private _audiomanger: AudioManager;
+  private subscrmanager: SubscriptionManager = new SubscriptionManager();
+
+  private _selection: AudioSelection = null;
+
+  private _time: AudioSelection = null;
+
+  private _id;
+
+  private _state: PlayBackState = PlayBackState.PREPARE;
+
+  private _volume = 1;
+
+  private _speed = 1;
+
+  private _playposition: AudioTime;
+
+  private _lastplayedpos: AudioTime;
+  /**
+   * calculate current position of the current audio playback.
+   * TODO when does this method must be called? Animation of playcursor or at another time else?
+   * @returns {number}
+   */
+  public updatePlayPosition = () => {
+    if (!(this.selection === null || this.selection === undefined)) {
+      const timestamp = new Date().getTime();
+
+      if ((this._playposition === null || this._playposition === undefined)) {
+        this._playposition = this.time.start.clone();
+      }
+
+      if (this.isPlaying) {
+        const playduration = (this._audiomanger.endplaying - timestamp) * this.speed;
+        this._playposition.unix = this.selection.start.unix + this.selection.duration.unix - playduration;
+
+      } else if (this.state === PlayBackState.ENDED) {
+        this._playposition = this.selection.start.clone();
+      } else if (this.state === PlayBackState.PAUSED) {
+      }
+
+      this.audiomanager.playposition = this._playposition.samples;
+    }
+  }
+
   public getChannelBuffer(selection: AudioSelection): Float32Array {
     if (!(selection === null || selection === undefined)) {
       return this.audiomanager.channel.subarray(selection.start.samples, selection.end.samples);
@@ -185,7 +189,7 @@ export class AudioChunk {
     return null;
   }
 
-  public startPlayback(drawFunc: () => void, playonhover: boolean = false): boolean {
+  public startPlayback(drawFunc: () => void, afterAudioEnded: () => void, playonhover: boolean = false): boolean {
     if ((this._selection === null || this._selection === undefined)) {
       this.selection = new AudioSelection(this.time.start.clone(), this.time.end.clone());
     }
@@ -218,7 +222,7 @@ export class AudioChunk {
       ));
 
       return this._audiomanger.startPlayback(
-        this.selection.start, this.selection.duration, this._volume, this._speed, drawFunc, playonhover
+        this.selection.start, this.selection.duration, this._volume, this._speed, drawFunc, afterAudioEnded, playonhover
       );
     } else {
       console.error(`can't start playback on chunk because audiomanager is still playing`);
@@ -226,39 +230,33 @@ export class AudioChunk {
     return false;
   }
 
-  public stopPlayback(): boolean {
-    const stopped = this._audiomanger.stopPlayback();
-    this.startpos = this.time.start.clone();
-
-    if (!stopped) {
-      // audio was not playing
-      this.setState(PlayBackState.STOPPED);
-    }
-
-    return true;
+  public stopPlayback = (afterAudioEnded: () => void) => {
+    this._audiomanger.stopPlayback(() => {
+      this.afterPlaybackStopped();
+      afterAudioEnded();
+    });
   }
 
-  public pausePlayback(): boolean {
+  public pausePlayback(afterAudioEnded: () => void): boolean {
     if (this.audiomanager.state !== this.state && this.state === PlayBackState.PLAYING) {
       console.error(`audiomanager and chunk have different states: a:${this.audiomanager.state}, c:${this.state}`);
     }
-    return this.audiomanager.pausePlayback();
+    return this.audiomanager.pausePlayback(() => {
+      this.afterPlaybackPaused();
+      afterAudioEnded();
+    });
   }
 
   public rePlayback(): boolean {
     return this._audiomanger.rePlayback();
   }
 
-  public stepBackward() {
+  public stepBackward(afterAudioEnded: () => void) {
     if (!(this.lastplayedpos === null || this.lastplayedpos === undefined)) {
       this.startpos = this.lastplayedpos.clone();
-      const result = this.audiomanager.stepBackward();
-
-      if (!result) {
-        // audio was not playing
-        this.audiomanager.stepbackward = true;
-        this.setState(PlayBackState.STOPPED);
-      }
+      const result = this.audiomanager.stepBackward(() => {
+        afterAudioEnded();
+      });
 
       return result;
     } else {
@@ -268,18 +266,19 @@ export class AudioChunk {
     return false;
   }
 
-  public stepBackwardTime(back_sec: number) {
+  public stepBackwardTime(drawFunc: () => void, afterAudioEnded: () => void, back_sec: number) {
     const back_samples = Math.max(0, (this.playposition.samples
       - (Math.round(back_sec * this.audiomanager.ressource.info.samplerate))));
     this.startpos = new AudioTime(back_samples, this.audiomanager.ressource.info.samplerate);
 
-    const result = this.audiomanager.stepBackwardTime(back_samples);
+    const result = this.audiomanager.stepBackward(() => {
+      if (this.audiomanager.state !== PlayBackState.PLAYING) {
+        this.startPlayback(drawFunc, afterAudioEnded);
+      } else {
+        afterAudioEnded();
+      }
+    });
 
-    if (!result) {
-      // audio was not playing
-      this.audiomanager.stepbackward = true;
-      this.setState(PlayBackState.STOPPED);
-    }
     return result;
   }
 
@@ -298,36 +297,21 @@ export class AudioChunk {
     }
   }
 
-  private afterPlaybackStopped() {
+  private afterPlaybackStopped = () => {
     this.startpos = this.time.start.clone();
     this.audiomanager.replay = false;
   }
 
-  private afterPlaybackPaused() {
+  private afterPlaybackPaused = () => {
     this.startpos = this.playposition.clone();
   }
 
-  private afterPlaybackEnded() {
+  private afterPlaybackEnded = () => {
     if (this.selection.end.samples === this.time.end.samples) {
       this.startpos = this.time.start.clone();
     }
   }
 
   private checkState(newstate: PlayBackState) {
-    switch (newstate) {
-      case(PlayBackState.STOPPED):
-        if (!this.audiomanager.stepbackward) {
-          this.afterPlaybackStopped();
-        }
-        break;
-      case (PlayBackState.PAUSED):
-        this.afterPlaybackPaused();
-        break;
-      case (PlayBackState.ENDED):
-        this.afterPlaybackEnded();
-        break;
-      default:
-        break;
-    }
   }
 }

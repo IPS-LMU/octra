@@ -94,7 +94,7 @@
                          [innerHTML]="'login.old file found' | translate:{file_label: getDropzoneFileString(sessionfile)}">
                     </div>
                     <app-octra-dropzone #dropzone></app-octra-dropzone>
-                    <input *ngIf="(appStorage.usemode === null || appStorage.usemode === 'local') && getFileStatus() != 'new'"
+                    <input *ngIf="(appStorage.usemode === null || appStorage.usemode === 'local' || appStorage.usemode === 'url') && getFileStatus() != 'new'"
                            [disabled]="!(getFileStatus() == 'start')" type="submit"
                            id="offline-submit"
                            class="btn btn-raised btn-primary" value="{{'transcription.start' | translate}}"

@@ -24,6 +24,29 @@ import {AppInfo} from '../../../app.info';
 })
 export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate, AfterViewInit {
 
+  get sessionfile(): SessionFile {
+    return this.appStorage.sessionfile;
+  }
+
+  get apc(): any {
+    return this.settingsService.app_settings;
+  }
+
+  public get Math(): Math {
+    return Math;
+  }
+
+  constructor(private router: Router,
+              public appStorage: AppStorageService,
+              private api: APIService,
+              private cd: ChangeDetectorRef,
+              private settingsService: SettingsService,
+              public modService: ModalService,
+              private langService: TranslateService,
+              private audioService: AudioService) {
+    this.subscrmanager = new SubscriptionManager();
+  }
+
   @ViewChild('f') loginform: NgForm;
   @ViewChild('dropzone') dropzone: OctraDropzoneComponent;
   @ViewChild('agreement') agreement: ElementRef;
@@ -40,7 +63,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     jobno: ''
   };
   err = '';
-  onOfflineSubmit = (form: NgForm) => {
+  private subscrmanager: SubscriptionManager;
+  onOfflineSubmit = () => {
     if (!(this.appStorage.data_id === null || this.appStorage.data_id === undefined) && typeof this.appStorage.data_id === 'number') {
       // last was online mode
       this.setOnlineSessionToFree(() => {
@@ -101,7 +125,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         alert(error);
       });
     }
-  };
+  }
   newTranscription = () => {
     this.audioService.registerAudioManager(this.dropzone.audiomanager);
 
@@ -138,11 +162,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         }
       }
     );
-  };
-  private subscrmanager: SubscriptionManager;
+  }
   private navigate = (): void => {
     Functions.navigateTo(this.router, ['user'], AppInfo.queryParamsHandling);
-  };
+  }
   private setOnlineSessionToFree = (callback: () => void) => {
     // check if old annotation is already annotated
     this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
@@ -163,29 +186,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         callback();
       }
     ));
-  };
-
-  get sessionfile(): SessionFile {
-    return this.appStorage.sessionfile;
-  }
-
-  get apc(): any {
-    return this.settingsService.app_settings;
-  }
-
-  public get Math(): Math {
-    return Math;
-  }
-
-  constructor(private router: Router,
-              public appStorage: AppStorageService,
-              private api: APIService,
-              private cd: ChangeDetectorRef,
-              private settingsService: SettingsService,
-              public modService: ModalService,
-              private langService: TranslateService,
-              private audioService: AudioService) {
-    this.subscrmanager = new SubscriptionManager();
   }
 
   ngOnInit() {

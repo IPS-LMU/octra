@@ -210,6 +210,8 @@ export class TranscriptionService {
       this._audiofile.samplerate = this._audiomanager.originalInfo.samplerate;
       this._audiofile.duration = this._audiomanager.originalInfo.duration.samples;
       this._audiofile.size = this._audiomanager.originalInfo.size;
+      this._audiofile.url = (this.appStorage.usemode === 'online') ? `${this.app_settings.audio_server.url}${this.appStorage.audio_url}` : '';
+      this._audiofile.type = this._audiomanager.originalInfo.type;
 
       this.last_sample = this._audiomanager.ressource.info.duration.samples;
       console.log(`LAST Sample: ${this.last_sample}`);

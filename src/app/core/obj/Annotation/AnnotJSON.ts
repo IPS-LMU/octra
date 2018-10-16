@@ -44,6 +44,8 @@ export interface IAudioFile {
   size: number;
   duration: number;
   samplerate: number;
+  url: string;
+  type: string;
 }
 
 /*
@@ -84,6 +86,8 @@ export class OAudiofile implements IAudioFile {
   size: number;
   duration: number;
   samplerate: number;
+  url: string;
+  type: string;
 
   constructor() {
   }

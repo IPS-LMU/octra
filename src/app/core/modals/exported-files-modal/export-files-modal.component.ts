@@ -8,7 +8,6 @@ import {Converter, IFile} from '../../obj/Converters';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {OCTRANIMATIONS} from '../../shared';
 import {NavbarService} from '../../gui/navbar/navbar.service';
-import {OAudiofile} from '../../obj/Annotation';
 
 @Component({
   selector: 'app-export-files-modal',
@@ -159,7 +158,6 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
           this.navbarServ.transcrService.audiofile.arraybuffer = this.transcrService.audiomanager.ressource.arraybuffer;
         }
 
-        const oAudiofile = new OAudiofile();
         const result: IFile = converter.export(oannotjson, this.navbarServ.transcrService.audiofile, levelnum).file;
         this.parentformat.download = result.name;
 

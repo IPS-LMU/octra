@@ -12,6 +12,7 @@ import {OggFormat, WavFormat} from './media-components/obj/media/audio/AudioForm
 import {BundleJSONConverter} from './core/obj/Converters/BundleJSONConverter';
 import {EmailBugReporter} from './core/obj/BugAPI/EmailBugReporter';
 import {NavigationExtras} from '@angular/router';
+import {ELANConverter} from './core/obj/Converters/ELANConverter';
 
 export class AppInfo {
   public static readonly audioformats = [
@@ -31,7 +32,8 @@ export class AppInfo {
     new CTMConverter(),
     new PartiturConverter(),
     new BundleJSONConverter(),
-    new TextConverter()
+    new TextConverter(),
+    new ELANConverter()
   ];
 
   public static readonly themes: string[] = [

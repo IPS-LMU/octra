@@ -9,8 +9,8 @@ export class PraatTableConverter extends Converter {
     this._application = 'Praat';
     this._name = 'Text';
     this._extension = '.Table';
-    this._website.title = '';
-    this._website.url = '';
+    this._website.title = 'Praat';
+    this._website.url = 'http://www.fon.hum.uva.nl/praat/';
     this._conversion.export = true;
     this._conversion.import = true;
     this._encoding = 'UTF-8';

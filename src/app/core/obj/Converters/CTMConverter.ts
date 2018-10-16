@@ -11,8 +11,8 @@ export class CTMConverter extends Converter {
     this._application = 'CTM';
     this._name = 'CTM';
     this._extension = '.ctm';
-    this._website.title = '';
-    this._website.url = '';
+    this._website.title = 'CTM Format';
+    this._website.url = 'http://www1.icsi.berkeley.edu/Speech/docs/sctk-1.2/infmts.htm';
     this._conversion.export = true;
     this._conversion.import = true;
     this._encoding = 'UTF-8';

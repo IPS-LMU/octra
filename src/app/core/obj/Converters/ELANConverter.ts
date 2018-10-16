@@ -7,15 +7,17 @@ export class ELANConverter extends Converter {
 
   public constructor() {
     super();
-    this._application = '';
+    this._application = 'ELAN';
     this._name = 'ELAN';
     this._extension = '.eaf';
-    this._website.title = '';
-    this._website.url = '';
+    this._website.title = 'ELAN';
+    this._website.url = 'https://tla.mpi.nl/tools/tla-tools/elan/';
     this._conversion.export = true;
     this._conversion.import = false;
     this._encoding = 'UTF-8';
     this._multitiers = true;
+    this._notice = 'The attributes MEDIA_URL and MEDIA_RELATIVE_URL will be both set with the relative path. In order to open the ' +
+      'transcript in ELAN the transcript file must be in the same folder as the audio file.';
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {

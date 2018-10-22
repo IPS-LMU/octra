@@ -1,10 +1,10 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {LocalStorageService, SessionStorage, SessionStorageService} from 'ngx-webstorage';
 import {SessionFile} from '../../obj/SessionFile';
 import {OLevel, OLink} from '../../obj';
 import {AppInfo} from '../../../app.info';
 import {IndexedDBManager} from '../../obj/IndexedDBManager';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
+import {LocalStorageService, SessionStorage, SessionStorageService} from '@rars/ngx-webstorage';
 
 export interface IIDBLevel {
   id: number;
@@ -41,8 +41,16 @@ export class OIDBLink implements IIDBLink {
 
 @Injectable()
 export class AppStorageService {
-  // SESSION STORAGE
-  @SessionStorage('session_key') session_key: string;
+  get servercomment(): string {
+    return this._servercomment;
+  }
+
+  set servercomment(value: string) {
+    this._servercomment = value;
+    this.idb.save('options', 'servercomment', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
 
   get Interface(): string {
     return this._interface;
@@ -311,12 +319,60 @@ export class AppStorageService {
               public localStr: LocalStorageService) {
   }
 
+  set feedback(value: any) {
+    this._feedback = value;
+    this._idb.save('options', 'feedback', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  // SESSION STORAGE
+  @SessionStorage('session_key') session_key: string;
+
   @SessionStorage() _logged_in: boolean;
   @SessionStorage() logInTime: number; // timestamp
   @SessionStorage('jobs_left') jobs_left: number;
 
   public file: File;
   public saving: EventEmitter<string> = new EventEmitter<string>();
+  private _interface: string = null;
+  // is user on the login page?
+  private login: boolean;
+  @SessionStorage('followplaycursor') private _followplaycursor: boolean;
+  // IDB STORAGE
+  private _idbloaded = false;
+  private _loaded = new EventEmitter();
+  private _idb: IndexedDBManager;
+  private _sessionfile: any = null;
+  private _user: {
+    id: string,
+    project: string,
+    jobno: number
+  } = null;
+  @SessionStorage('agreement') private _agreement: any;
+  @SessionStorage('playonhover') private _playonhover: boolean;
+  @SessionStorage('reloaded') private _reloaded: boolean;
+  @SessionStorage('email') private _email: string;
+  @SessionStorage('servertranscript') private _servertranscipt: any[];
+
+  private _submitted: boolean = null;
+  private _feedback: any = null;
+  private _logs: any[] = [];
+  private _data_id: number = null;
+  private _audio_url: string = null;
+  private _usemode: 'local' | 'online' | 'url' = null;
+  private _language = 'en';
+  private _version: string = null;
+  private _logging = false;
+  private _show_loupe = true;
+  private _prompttext = '';
+  private _url_params: any = {};
+  private _easymode = false;
+  private _comment = '';
+  private _servercomment = '';
+  private _annotation: OIDBLevel[] = null;
+  private _annotation_links: OIDBLink[] = null;
+  private _levelcounter = 0;
   public beginLocalSession = (files: {
     status: string,
     file: File,
@@ -359,15 +415,15 @@ export class AppStorageService {
         err('type not supported');
       }
     }
-  };
+  }
   public getSessionFile = (file: File) => {
     return new SessionFile(
       file.name,
       file.size,
-      file.lastModifiedDate,
+      new Date(file.lastModified),
       file.type
     );
-  };
+  }
   public overwriteAnnotation = (value: OIDBLevel[], saveToDB = true): Promise<any> => {
     return new Promise<any>((resolve, reject) => {
       if (saveToDB) {
@@ -407,7 +463,7 @@ export class AppStorageService {
         console.error(err);
       });
     });
-  };
+  }
 
   public overwriteLinks = (value: OIDBLink[]): Promise<any> => {
     return this.clearIDBTable('annotation_links')
@@ -418,43 +474,7 @@ export class AppStorageService {
       }).then(() => {
         return this._idb.saveArraySequential(value, 'annotation_links', 'id');
       });
-  };
-  private _interface: string = null;
-  // is user on the login page?
-  private login: boolean;
-  @SessionStorage('followplaycursor') private _followplaycursor: boolean;
-  // IDB STORAGE
-  private _idbloaded = false;
-  private _loaded = new EventEmitter();
-  private _idb: IndexedDBManager;
-  private _sessionfile: any = null;
-  private _user: {
-    id: string,
-    project: string,
-    jobno: number
-  } = null;
-  @SessionStorage('agreement') private _agreement: any;
-  @SessionStorage('playonhover') private _playonhover: boolean;
-  @SessionStorage('reloaded') private _reloaded: boolean;
-  @SessionStorage('email') private _email: string;
-  @SessionStorage('servertranscript') private _servertranscipt: any[];
-  private _submitted: boolean = null;
-  private _feedback: any = null;
-  private _logs: any[] = [];
-  private _data_id: number = null;
-  private _audio_url: string = null;
-  private _usemode: 'local' | 'online' | 'url' = null;
-  private _language = 'en';
-  private _version: string = null;
-  private _logging = false;
-  private _show_loupe = true;
-  private _prompttext = '';
-  private _url_params: any = {};
-  private _easymode = false;
-  private _comment = '';
-  private _annotation: OIDBLevel[] = null;
-  private _annotation_links: OIDBLink[] = null;
-  private _levelcounter = 0;
+  }
   private loadOptions = (variables: { attribute: string, key: string }[]): Promise<void> => {
     return new Promise<void>(
       (resolve, reject) => {
@@ -490,13 +510,6 @@ export class AppStorageService {
         );
       }
     );
-  };
-
-  set feedback(value: any) {
-    this._feedback = value;
-    this._idb.save('options', 'feedback', {value: value}).catch((err) => {
-      console.error(err);
-    });
   }
 
   public setSessionData(member: any, data_id: number, audio_url: string, offline: boolean = false): { error: string } {
@@ -697,6 +710,10 @@ export class AppStorageService {
         {
           attribute: '_prompttext',
           key: 'prompttext'
+        },
+        {
+          attribute: '_servercomment',
+          key: 'servercomment'
         }
       ]
     ).then(() => {

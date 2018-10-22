@@ -499,6 +499,19 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
                 this.appStorage.prompttext = '';
               }
 
+              if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('comment') || json.data.hasOwnProperty('comment')) {
+                // get transcript data that already exists
+                if (json.data.hasOwnProperty('comment')) {
+                  const comment = json.data.comment;
+
+                  if (comment) {
+                    this.appStorage.servercomment = comment;
+                  }
+                }
+              } else {
+                this.appStorage.servercomment = '';
+              }
+
               if (json.hasOwnProperty('message')) {
                 const counter = (json.message === '') ? '0' : json.message;
                 this.appStorage.sessStr.store('jobs_left', Number(counter));

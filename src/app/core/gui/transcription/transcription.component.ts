@@ -518,6 +518,19 @@ export class TranscriptionComponent implements OnInit,
           this.appStorage.prompttext = '';
         }
 
+        if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('comment') || json.data.hasOwnProperty('comment')) {
+          // get transcript data that already exists
+          if (json.data.hasOwnProperty('comment')) {
+            const comment = json.data.comment;
+
+            if (comment) {
+              this.appStorage.comment = comment;
+            }
+          }
+        } else {
+          this.appStorage.comment = '';
+        }
+
         if (json.hasOwnProperty('message') && typeof (json.message) === 'number') {
           this.appStorage.jobs_left = Number(json.message);
         }
@@ -575,8 +588,6 @@ export class TranscriptionComponent implements OnInit,
 
     xhr.onerror = (e) => {
       console.error(e);
-      // add messages to protocol
-      console.error(`${e.message}`);
     };
 
     xhr.onloadend = (e) => {

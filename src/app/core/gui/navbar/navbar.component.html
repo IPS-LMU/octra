@@ -104,6 +104,14 @@
                 </div>
             </li>
 
+            <!-- online mode counter -->
+            <li class="nav-item"
+                *ngIf="(appStorage.LoggedIn && navbarServ.dataloaded && appStorage.usemode === 'online')">
+                <a href="#" class="nav-link">
+                    {{appStorage.user.project}}: {{appStorage.jobs_left}}
+                </a>
+            </li>
+
             <!--
             infoDropdown
             -->
@@ -282,14 +290,11 @@
 </nav>
 <div id="subnav" class="panel" *ngIf="appStorage.LoggedIn && appStorage.usemode === 'online' && navbarServ.dataloaded">
     <div class="row">
-        <div class="col-6 col-sm-3">{{"general.project" | translate}}: {{appStorage.user.project}}</div>
-        <div class="col-6 col-sm-3">{{"general.name" |translate}}:
-            {{navbarServ.originalInfo?.fullname}}
+        <div class="col-12 col-sm-9" style="text-align: left;padding-left:20px;">
+            {{navbarServ.originalInfo?.fullname}}: <i>{{appStorage.servercomment}}</i>
         </div>
-        <div class="col-6 col-sm-3">{{'general.free jobs' | translate}}:
-            {{appStorage.jobs_left}}
-        </div>
-        <div class="col-6 col-sm-3"><a (click)="promptmodal.open()" style="cursor: pointer; color:#009688;">{{'general.prompt'
+        <div class="col-12 col-sm-3" style="text-align: right;padding-right:20px;"><a (click)="promptmodal.open()"
+                                                                                      style="cursor: pointer; color:#009688;">{{'general.prompt'
             |
             translate}}</a></div>
     </div>

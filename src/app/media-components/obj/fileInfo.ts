@@ -155,7 +155,7 @@ export class FileInfo extends DataInfo {
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsText(file, encoding);
-      reader.onload = () => resolve(reader.result);
+      reader.onload = () => resolve(<string> reader.result);
       reader.onerror = error => reject(error);
     });
   }
@@ -238,7 +238,7 @@ export class FileInfo extends DataInfo {
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
+      reader.onload = () => resolve(<string> reader.result);
       reader.onerror = error => reject(error);
     });
   }

@@ -4,7 +4,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {TranslateLoader, TranslateModule, TranslateService} from '@ngx-translate/core';
 // third-party
-import {Ng2Webstorage} from 'ngx-webstorage';
+import {Ng2Webstorage} from '@rars/ngx-webstorage';
 // other
 import {LanguageLoader} from './core/shared';
 import {AlertComponent, DropZoneComponent, OctraModalComponent} from './core/component';

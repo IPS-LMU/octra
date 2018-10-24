@@ -73,19 +73,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       };
     })();
 
-    // overwrite console.info
-    const oldInfo = console.info;
-    (() => {
-      console.info = function (message) {
-        if (typeof  message === 'string') {
-          // makes sure that only strings are logged
-          serv.addEntry(ConsoleType.INFO, message);
-        }
-
-        oldInfo.apply(console, arguments);
-      };
-    })();
-
     // overwrite console.warn
     const oldWarn = console.warn;
     (() => {

@@ -14,9 +14,10 @@ import {
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
 import {AudioService, TranscriptionService} from '../../shared/service';
-import {SubscriptionManager} from '../../shared';
+import {AudioTime, SubscriptionManager} from '../../shared';
 import {isFunction} from 'util';
 import {Segment} from '../../obj/Annotation/Segment';
+import {PlayBackState} from '../../../media-components/obj/media';
 
 @Component({
   selector: 'app-transcr-overview',
@@ -31,11 +32,29 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   @Input() segments: Segment[];
   @Input() public show_transcriptiontable = true;
   public show_loading = true;
+
   @Output('segmentclicked') segmentclicked: EventEmitter<number> = new EventEmitter<number>();
+
   private errortooltip: any;
   private subscrmanager: SubscriptionManager;
   private updating = false;
   private errorY = 0;
+  private playAllState: {
+    state: 'started' | 'stopped',
+    icon: 'play' | 'stop',
+    currentSegment: number,
+    skipSilence: boolean
+  } = {
+    state: 'stopped',
+    icon: 'play',
+    currentSegment: 0,
+    skipSilence: false
+  };
+
+  private playStateSegments: {
+    state: 'started' | 'stopped',
+    icon: 'play' | 'stop'
+  }[] = [];
 
   private _visible = false;
 
@@ -177,6 +196,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   } */
 
   private updateSegments() {
+    this.playStateSegments = [];
     if (this.transcrService.validationArray.length > 0) {
       if (!this.segments || !this.transcrService.guidelines) {
         this.shown_segments = [];
@@ -206,7 +226,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
         obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
         obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
-          if (g1 == '[[[') {
+          if (g1 === '[[[') {
             return '<';
           }
           return '>';
@@ -215,10 +235,136 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
         result.push(obj);
 
         start_time = segment.time.seconds;
+
+        // set playState
+        this.playStateSegments.push({
+          state: 'stopped',
+          icon: 'play'
+        });
       }
 
       this.shown_segments = result;
       this.show_loading = false;
     }
+  }
+
+  playAll(nextSegment: number) {
+    const segment = this.segments[nextSegment];
+
+    if (nextSegment < this.segments.length && this.playAllState.state === 'started') {
+      if (!this.playAllState.skipSilence ||
+        (this.playAllState.skipSilence && segment.transcript !== ''
+          && segment.transcript.indexOf(this.transcrService.break_marker.code) < 0)
+      ) {
+        this.playAllState.currentSegment = nextSegment;
+        this.playSegement(nextSegment).then(() => {
+          this.playAll(++nextSegment);
+        });
+      } else {
+        // skip segment with silence
+        this.playAll(++nextSegment);
+      }
+    } else {
+      // last segment reached
+      this.playAllState.state = 'stopped';
+      this.playAllState.icon = 'play';
+
+      this.cd.markForCheck();
+      this.cd.detectChanges();
+    }
+  }
+
+  togglePlayAll() {
+    this.playAllState.state = (this.playAllState.state === 'started') ? 'stopped' : 'started';
+    this.playAllState.icon = (this.playAllState.icon === 'play') ? 'stop' : 'play';
+    this.cd.markForCheck();
+    this.cd.detectChanges();
+
+    if (this.playAllState.state === 'started') {
+      // start
+      this.playAll(0);
+    } else {
+      // stop
+      this.audio.audiomanagers[0].stopPlayback(() => {
+        this.playStateSegments[this.playAllState.currentSegment].state = 'stopped';
+        this.playStateSegments[this.playAllState.currentSegment].icon = 'play';
+
+        this.cd.markForCheck();
+        this.cd.detectChanges();
+      });
+    }
+  }
+
+  playSegement(segmentNumber: number): Promise<void> {
+    return new Promise<void>((resolve) => {
+      if (this.playStateSegments[segmentNumber].state === 'stopped') {
+        const segment: Segment = this.segments[segmentNumber];
+
+        this.playStateSegments[segmentNumber].state = 'started';
+        this.playStateSegments[segmentNumber].icon = 'stop';
+        this.cd.markForCheck();
+        this.cd.detectChanges();
+
+        const startSample = (segmentNumber > 0) ? this.segments[segmentNumber - 1].time.samples : 0;
+
+        this.playAllState.currentSegment = segmentNumber;
+
+        this.audio.audiomanagers[0].startPlayback(new AudioTime(startSample, this.audio.audiomanagers[0].originalInfo.samplerate),
+          new AudioTime(segment.time.samples - startSample, this.audio.audiomanagers[0].originalInfo.samplerate), 1, 1, () => {
+          }, () => {
+            this.playStateSegments[segmentNumber].state = 'stopped';
+            this.playStateSegments[segmentNumber].icon = 'play';
+
+            this.cd.markForCheck();
+            this.cd.detectChanges();
+
+            setTimeout(() => {
+              resolve();
+            }, 1000);
+          });
+      } else {
+        // stop playback
+        this.audio.audiomanagers[0].stopPlayback(() => {
+          this.playStateSegments[segmentNumber].state = 'stopped';
+          this.playStateSegments[segmentNumber].icon = 'play';
+
+          this.cd.markForCheck();
+          this.cd.detectChanges();
+
+          resolve();
+        });
+      }
+    });
+  }
+
+  playSelectedSegment(segmentNumber: number) {
+    // make sure that audio is not playing
+    this.stopPlayback().then(() => {
+
+      this.playSegement(segmentNumber);
+    });
+  }
+
+  toggleSkipCheckbox() {
+    this.playAllState.skipSilence = !this.playAllState.skipSilence;
+  }
+
+  public stopPlayback(): Promise<void> {
+    return new Promise<void>((resolve) => {
+      this.playAllState.state = 'stopped';
+      this.playAllState.icon = 'play';
+      this.playStateSegments[this.playAllState.currentSegment].state = 'stopped';
+      this.playStateSegments[this.playAllState.currentSegment].icon = 'play';
+      this.cd.markForCheck();
+      this.cd.detectChanges();
+
+      if (this.audio.audiomanagers[0].state === PlayBackState.PLAYING) {
+        this.audio.audiomanagers[0].stopPlayback(() => {
+          resolve();
+        });
+      } else {
+        resolve();
+      }
+    });
   }
 }

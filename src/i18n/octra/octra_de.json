@@ -71,7 +71,8 @@
     "supported files": "Unterstützte Dateien",
     "select one tier": "Einen Tier auswählen",
     "prompt": "Textvorlage",
-    "feedback": "Feedback"
+    "feedback": "Feedback",
+    "skip silence": "Stille überspringen"
   },
   "bug report": {
     "give feedback": "Feedback geben",

@@ -19,3 +19,23 @@
 #statistics td {
     text-align: center;
 }
+
+.table thead th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table .last-column {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table fa-icon {
+    cursor: pointer;
+}
+
+#skip-silence-checkbox {
+    margin-left: 5px;
+    display: inline-flex;
+    margin-right: 3px;
+}

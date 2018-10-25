@@ -71,7 +71,8 @@
     "supported files": "Supported files",
     "select one tier": "Select one tier",
     "prompt": "Prompt",
-    "feedback": "Feedback"
+    "feedback": "Feedback",
+    "skip silence": "skip silence"
   },
   "bug report": {
     "give feedback": "Give feedback",

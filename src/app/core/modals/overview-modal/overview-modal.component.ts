@@ -4,6 +4,7 @@ import {Subject} from 'rxjs/Subject';
 import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {TranscriptionFeedbackComponent} from '../../gui/transcription-feedback/transcription-feedback.component';
+import {TranscrOverviewComponent} from '../../gui/transcr-overview';
 
 @Component({
   selector: 'app-overview-modal',
@@ -23,6 +24,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
 
   @ViewChild('modal') modal: any;
   @ViewChild('feedback') feedback: TranscriptionFeedbackComponent;
+  @ViewChild('overview') overview: TranscrOverviewComponent;
   @Output() transcriptionSend = new EventEmitter<void>();
 
   protected data = null;
@@ -106,10 +108,12 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
     if (this.appStorage.usemode === 'online') {
       this.feedback.saveFeedbackform();
     }
+    this.overview.stopPlayback();
   }
 
   public beforeDismiss() {
     this.actionperformed.next();
+    this.overview.stopPlayback();
   }
 
   onSegmentInOverviewClicked(segnumber: number) {

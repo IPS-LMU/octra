@@ -31,12 +31,19 @@
         <i class="fa fa-spinner fa-spin" style="font-size:32px"></i>
     </div>
 </div>
-<table *ngIf="shown_segments.length > 0" class="table table-bordered" [hidden]="!show_transcriptiontable">
+<table id="transcription-table" *ngIf="shown_segments.length > 0" class="table table-bordered"
+       [hidden]="!show_transcriptiontable">
     <thead>
     <tr>
         <th></th>
         <th>{{"general.segment" | translate}}</th>
         <th>{{"general.transcription" | translate}}</th>
+        <th class="last-column">
+            <fa-icon [icon]="['fas', playAllState.icon]" (click)="togglePlayAll()"></fa-icon>
+            <input type="checkbox" id="skip-silence-checkbox" (click)="toggleSkipCheckbox()"
+                   [checked]="playAllState.skipSilence">
+            <label for="skip-silence-checkbox">{{"general.skip silence" | translate}}</label>
+        </th>
     </tr>
     </thead>
     <tr *ngFor="let segment of shown_segments; let i = index"
@@ -46,9 +53,12 @@
                   'display': ((segment.transcription.html.indexOf('<span class=\'val-error\'') > -1) ? 'normal': 'none')}">
             </fa-icon>
         </td>
-        <td><span class="link segment-number" (click)="onSegmentClicked(i)"># {{i+1 | leadingnull: shown_segments.length}}</span>
+        <td><span class="link segment-number" (click)="onSegmentClicked(i)"># {{i + 1 | leadingnull: shown_segments.length}}</span>
         </td>
         <td [innerHTML]="sanitizeHTML(segment.transcription.html)" (mousemove)="onMouseOver($event)"
             (mousedown)="onMouseOver($event)"></td>
+        <td class="last-column">
+            <fa-icon [icon]="['fas', playStateSegments[i].icon]" (click)="playSelectedSegment(i)"></fa-icon>
+        </td>
     </tr>
 </table>

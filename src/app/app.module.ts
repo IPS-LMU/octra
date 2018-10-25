@@ -51,7 +51,7 @@ import {AudioviewerConfig} from './media-components/components/audio/audioviewer
 import {MediaComponentsModule} from './media-components/media-components.module';
 import {TranscrEditorComponent} from './core/component/transcr-editor';
 import {Error404Component} from './core/gui/error404';
-//icons
+// icons
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {
@@ -87,7 +87,7 @@ import {
   faTrash,
   faWindowMaximize
 } from '@fortawesome/free-solid-svg-icons';
-//modules
+// modules
 import {ModalModule} from 'ngx-bootstrap';
 import {YesNoModalComponent} from './core/modals/yes-no-modal/yes-no-modal.component';
 import {ModalService} from './core/modals/modal.service';

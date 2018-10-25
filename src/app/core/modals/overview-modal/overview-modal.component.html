@@ -16,10 +16,12 @@
                         'col-md-6': appStorage.usemode === 'online',
                         'col-12': appStorage.usemode !== 'online'
                     }" class="col-md-6" style="overflow: auto; max-height:1200px;border-right:1px solid lightgray;">
-                        <app-transcr-overview [visible]="visible"
-                                              [segments]="(transcrService.annotation !== null && transcrService.annotation !== undefined)
+                        <app-transcr-overview
+                                #overview
+                                [visible]="visible"
+                                [segments]="(transcrService.annotation !== null && transcrService.annotation !== undefined)
                               ? transcrService.annotation.levels[transcrService.selectedlevel].segments.segments: null"
-                                              (segmentclicked)="onSegmentInOverviewClicked($event)">
+                                (segmentclicked)="onSegmentInOverviewClicked($event)">
                         </app-transcr-overview>
                     </div>
                     <div class="col-md-6" style="overflow: auto;max-height:1200px;"

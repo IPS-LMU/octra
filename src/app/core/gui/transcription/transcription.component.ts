@@ -524,11 +524,11 @@ export class TranscriptionComponent implements OnInit,
             const comment = json.data.comment;
 
             if (comment) {
-              this.appStorage.comment = comment;
+              this.appStorage.servercomment = comment;
             }
           }
         } else {
-          this.appStorage.comment = '';
+          this.appStorage.servercomment = '';
         }
 
         if (json.hasOwnProperty('message') && typeof (json.message) === 'number') {

@@ -113,7 +113,7 @@ export class TranscriptionComponent implements OnInit,
     this.uiService.enabled = this.appStorage.logging;
 
     this.subscrmanager.add(this.audiomanager.statechange.subscribe((state) => {
-        if (!this.audiomanager.playonhover) {
+        if (!this.audiomanager.playonhover && !this.modal_overview.visible) {
           let caretpos = -1;
 
           if (!(((<any> this.currentEditor.instance).editor) === null || ((<any> this.currentEditor.instance).editor) === undefined)) {

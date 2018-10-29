@@ -74,19 +74,6 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     this.editor.Settings.special_markers.boundary = true;
 
     EditorWSignaldisplayComponent.initialized.emit();
-
-    /* does not work
-    setInterval(() => {
-      if (this.audiochunk.isPlaying) {
-        const samples = this.audiochunk.playposition.samples;
-        let i: number = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(samples);
-        if (i < 0) {
-          i = this.transcrService.currentlevel.segments.length - 1;
-        }
-        this.highlightSegment(i);
-      }
-    }, 500);
-    */
   }
 
   ngAfterViewInit() {

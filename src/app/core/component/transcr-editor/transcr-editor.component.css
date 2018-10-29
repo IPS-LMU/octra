@@ -76,3 +76,14 @@
     flex-direction: column;
     flex: 1 0 auto;
 }
+
+.error-card {
+    max-width: 300px !important;
+    position: absolute;
+    margin-top: 300px;
+    z-index: 200;
+}
+
+.note-editor.note-frame .note-editing-area .note-editable .val-error {
+    cursor: pointer !important;
+}

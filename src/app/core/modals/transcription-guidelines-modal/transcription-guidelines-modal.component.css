@@ -73,3 +73,7 @@ audio {
 .card-header.example {
     background-color: #84d5d3;
 }
+
+.modal-dialog.modal-lg {
+    max-width: 1200px;
+}

@@ -58,6 +58,12 @@ audio {
 
 .media {
     margin-bottom: 10px;
+    text-align: center;
+    display: block;
+}
+
+.media img {
+    max-width: 100%;
 }
 
 .card-header {

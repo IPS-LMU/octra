@@ -47,7 +47,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   } = {
     state: 'stopped',
     icon: 'play',
-    currentSegment: 0,
+    currentSegment: -1,
     skipSilence: false
   };
 
@@ -339,10 +339,16 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
   playSelectedSegment(segmentNumber: number) {
     // make sure that audio is not playing
-    this.stopPlayback().then(() => {
-
-      this.playSegement(segmentNumber);
-    });
+    if ((this.playAllState.state === 'started' && this.playAllState.currentSegment !== segmentNumber)
+      || this.playAllState.currentSegment !== segmentNumber) {
+      this.stopPlayback().then(() => {
+        this.playSegement(segmentNumber);
+      });
+    } else {
+      this.stopPlayback().then(() => {
+        this.playAllState.currentSegment = -1;
+      });
+    }
   }
 
   toggleSkipCheckbox() {
@@ -351,12 +357,14 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
   public stopPlayback(): Promise<void> {
     return new Promise<void>((resolve) => {
-      this.playAllState.state = 'stopped';
-      this.playAllState.icon = 'play';
-      this.playStateSegments[this.playAllState.currentSegment].state = 'stopped';
-      this.playStateSegments[this.playAllState.currentSegment].icon = 'play';
-      this.cd.markForCheck();
-      this.cd.detectChanges();
+      if (this.playAllState.currentSegment > -1) {
+        this.playAllState.state = 'stopped';
+        this.playAllState.icon = 'play';
+        this.playStateSegments[this.playAllState.currentSegment].state = 'stopped';
+        this.playStateSegments[this.playAllState.currentSegment].icon = 'play';
+        this.cd.markForCheck();
+        this.cd.detectChanges();
+      }
 
       if (this.audio.audiomanagers[0].state === PlayBackState.PLAYING) {
         this.audio.audiomanagers[0].stopPlayback(() => {

@@ -20,6 +20,76 @@ declare let document: any;
   providers: [TranscrEditorConfig]
 })
 export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
+  get textSelection(): { start: number; end: number } {
+    return this._textSelection;
+  }
+
+  public get summernote() {
+    return this.textfield.summernote;
+  }
+
+  public get caretpos(): number {
+    if (!this.focused) {
+      return -1;
+    }
+    return jQuery('.note-editable:eq(0)').caret('pos');
+  }
+
+  get audiomanager(): AudioManager {
+    return this.audiochunk.audiomanager;
+  }
+
+  set segments(segments: Segments) {
+    let result = '';
+
+    for (let i = 0; i < segments.length; i++) {
+      const seg = segments.get(i);
+      result += seg.transcript;
+
+      if (i < segments.length - 1) {
+        result += `{${segments.get(i).time.samples}}`;
+      }
+    }
+
+    jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
+    this.rawText = result;
+  }
+
+  get Settings(): any {
+    return this._settings;
+  }
+
+  set Settings(value: any) {
+    this._settings = value;
+  }
+
+  get html(): string {
+    return (this.textfield) ? this.textfield.summernote('code') : '';
+  }
+
+  get rawText(): string {
+    const result = this.tidyUpRaw(this._rawText);
+    return result;
+  }
+
+  set rawText(value: string) {
+    jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
+    this._rawText = this.tidyUpRaw(value);
+    this.init = 0;
+    const html = this.rawToHTML(this._rawText);
+    this.textfield.summernote('code', html);
+    // this.validate();
+    this.initPopover();
+  }
+
+  constructor(private cd: ChangeDetectorRef,
+              private langService: TranslateService,
+              private transcrService: TranscriptionService) {
+
+    this._settings = new TranscrEditorConfig().Settings;
+    this.subscrmanager = new SubscriptionManager();
+  }
+
   @Output('loaded') loaded: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output('onkeyup') onkeyup: EventEmitter<any> = new EventEmitter<any>();
   @Output('marker_insert') marker_insert: EventEmitter<string> = new EventEmitter<string>();
@@ -38,7 +108,25 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   public textfield: any = null;
   public focused = false;
-  public segpopover: any = null;
+
+  public popovers = {
+    segmentBoundary: null,
+    validationError: null
+  };
+
+  private _settings: TranscrEditorConfig;
+  private subscrmanager: SubscriptionManager;
+  private init = 0;
+  private summernote_ui: any = null;
+  private _is_typing = false;
+  private lastkeypress = 0;
+
+  private _textSelection = {
+    start: 0,
+    end: 0
+  };
+
+  private _rawText = '';
 
   /**
    * converts the editor's html text to raw text
@@ -47,7 +135,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   getRawText = () => {
     let html = this.textfield.summernote('code');
 
-
     html = html.replace(/<((p)|(\s?\/p))>/g, '');
     html = html.replace(/&nbsp;/g, ' ');
 
@@ -55,10 +142,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     html = `<p>${html}</p>`;
     const dom = jQuery(html);
+    let charCounter = 0;
 
     const replace_func = (i, elem) => {
-      if (jQuery(elem).children() !== null && jQuery(elem).children().length > 0) {
-        jQuery.each(jQuery(elem).children(), replace_func);
+      if (jQuery(elem).contents() !== null && jQuery(elem).contents().length > 0) {
+        jQuery.each(jQuery(elem).contents(), replace_func);
       } else {
         const tagName = jQuery(elem).prop('tagName');
 
@@ -74,11 +162,18 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             const marker = this.markers[j];
             if (marker_code === marker.code) {
               jQuery(elem).replaceWith(Functions.escapeHtml(marker_code));
+              charCounter += marker_code.length;
               break;
             }
           }
+        } else if (elem.nodeType === 3) {
+          // is textNode
+          const text = jQuery(elem).text();
+          jQuery(elem).text(text);
+          charCounter += text.length;
         } else if (tagName.toLowerCase() === 'img') {
           if (!(jQuery(elem).attr('data-samples') === null || jQuery(elem).attr('data-samples') === undefined)) {
+            // TODO check if this is working
             const textnode = document.createTextNode(`{${jQuery(elem).attr('data-samples')}}`);
             jQuery(elem).before(textnode);
             jQuery(elem).remove();
@@ -91,19 +186,29 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         } else if (
           tagName.toLowerCase() === 'span'
         ) {
-          const textnode = document.createTextNode(jQuery(elem).text());
+          const elemText = jQuery(elem).text();
+          const textnode = document.createTextNode(elemText);
           jQuery(elem).before(textnode);
           jQuery(elem).remove();
+          charCounter += elemText.length;
+        } else if (tagName.toLowerCase() === 'sel-start') {
+          // save start selection
+          this._textSelection.start = charCounter;
+          console.log(`save start to ${charCounter}!`);
+        } else if (tagName.toLowerCase() === 'sel-end') {
+          // save start selection
+          this._textSelection.end = charCounter;
+          console.log(`save end to ${charCounter}!`);
         }
       }
     };
 
-    jQuery.each(dom.children(), replace_func);
+    jQuery.each(dom.contents(), replace_func);
 
-    const rawText = dom.text();
+    const rawText = dom.text().replace(/[\s ]+/g, ' ');
 
     return rawText;
-  };
+  }
   /**
    * initializes the editor and the containing summernote editor
    */
@@ -217,16 +322,33 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     // create seg popover
 
-    this.segpopover = jQuery('<div></div>')
+    this.popovers.segmentBoundary = jQuery('<div></div>')
       .addClass('panel')
       .addClass('seg-popover')
       .html('00:00:000');
 
-    this.segpopover.insertBefore('.note-editing-area');
+    this.popovers.segmentBoundary.insertBefore('.note-editing-area');
+
+    this.popovers.validationError = jQuery('<div></div>')
+      .addClass('card error-card')
+      .html(`
+      <div class="card-header" style="padding:5px 10px; font-weight: bold;background-color:whitesmoke;">
+      <span style="color:red;">( ! )</span> <span class="error-title"></span></div>
+      <div class="card-body" style="padding:5px 10px;"></div>
+      `)
+      .css({
+        'max-width': '500px',
+        'position': 'absolute',
+        'margin-top': '0px',
+        'z-index': '200',
+        'display': 'none'
+      });
+
+    this.popovers.validationError.insertBefore('.note-editing-area');
 
     jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
     this.loaded.emit(true);
-  };
+  }
   /**
    * inserts a marker to the editors html
    * @param marker_code
@@ -255,7 +377,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       this.textfield.summernote('editor.insertNode', element);
     }
     this.updateTextField();
-  };
+    console.log(`validate after inserting marker!`);
+  }
   /**
    * called when key pressed in editor
    * @param $event
@@ -286,7 +409,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
     }
-  };
+  }
   /**
    * called after key up in editor
    * @param $event
@@ -296,9 +419,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.updateTextField();
     this.onkeyup.emit($event);
 
-
     setTimeout(() => {
-      if (Date.now() - this.lastkeypress >= 700) {
+      if (Date.now() - this.lastkeypress >= 700 && this.lastkeypress > -1) {
         if (this._is_typing && this.focused) {
           this.typing.emit('stopped');
         }
@@ -312,37 +434,17 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this._is_typing = true;
     this.lastkeypress = Date.now();
 
-    /*
-    TODO implement auto-validation
 
     setTimeout(() => {
-      if (Date.now() - this.lastkeypress >= 1000) {
-        this.saveSelection();
-        let code = this.textfield.summernote('code');
-        code = code.replace('<span class="val-error"><sel-start></sel-start><sel-end></sel-end></span>', '<sel-start></sel-start><sel-end></sel-end>');
-        console.log(`BEFORE`);
-        console.log(code);
-        console.log(`AFTER!`);
-
-        code = code.replace(/(<span(?:[\s ]|(?:&nbsp;))class=['"]val-error['"]>)|(<\/span>)/g, '');
-
-        /*
-        code = code.replace(/<span(?:[\s ]|(?:&nbsp;))class=['"]val-error['"]>(.*)(?:[\s ]|(?:&nbsp;))<\/span>/g, (g0, g1) => {
-          return g1;
-        });
-
-        code = this.convertEntitiesToString(code);
-        console.log(code);
-        code = this.transcrService.underlineTextRed(code, validateAnnotation(code, this.transcrService.guidelines));
-        code = code.replace('<br>', '');
-        this.textfield.summernote('code', code);
-        console.log(`END:`);
-        console.log(code);
-        this.restoreSelection();
+      if (Date.now() - this.lastkeypress >= 1000 && this.lastkeypress > -1) {
+        // this.validate();
+        this.initPopover();
+        this.lastkeypress = -1;
       }
     }, 1000);
-    */
-  };
+
+  }
+
   /**
    * set focus to the very last position of the editors text
    */
@@ -367,79 +469,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     } else {
       func();
     }
-  };
-  private _settings: TranscrEditorConfig;
-  private subscrmanager: SubscriptionManager;
-  private init = 0;
-  private summernote_ui: any = null;
-  private _is_typing = false;
-  private lastkeypress = 0;
-
-  public get summernote() {
-    return this.textfield.summernote;
-  }
-
-  public get caretpos(): number {
-    if (!this.focused) {
-      return -1;
-    }
-    return jQuery('.note-editable:eq(0)').caret('pos');
-  }
-
-  get audiomanager(): AudioManager {
-    return this.audiochunk.audiomanager;
-  }
-
-  set segments(segments: Segments) {
-    let result = '';
-
-    for (let i = 0; i < segments.length; i++) {
-      const seg = segments.get(i);
-      result += seg.transcript;
-
-      if (i < segments.length - 1) {
-        result += `{${segments.get(i).time.samples}}`;
-      }
-    }
-
-    jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
-    this.rawText = result;
-  }
-
-  get Settings(): any {
-    return this._settings;
-  }
-
-  set Settings(value: any) {
-    this._settings = value;
-  }
-
-  get html(): string {
-    return (this.textfield) ? this.textfield.summernote('code') : '';
-  }
-
-  private _rawText = '';
-
-  get rawText(): string {
-    const result = this.tidyUpRaw(this._rawText);
-    return result;
-  }
-
-  set rawText(value: string) {
-    jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
-    this._rawText = this.tidyUpRaw(value);
-    this.init = 0;
-    const html = this.rawToHTML(this._rawText);
-    this.textfield.summernote('code', html);
-    this.initPopover();
-  }
-
-  constructor(private cd: ChangeDetectorRef,
-              private langService: TranslateService,
-              private transcrService: TranscriptionService) {
-
-    this._settings = new TranscrEditorConfig().Settings;
-    this.subscrmanager = new SubscriptionManager();
   }
 
   ngOnInit() {
@@ -516,8 +545,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         } else {
           icon = marker.button_text;
         }
-      }
-      else {
+      } else {
         if (!this.easymode) {
           icon = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
             '<span class=\'btn-description\'>' + marker.button_text + '</span><span class=\'btn-shortcut\'> ' +
@@ -539,8 +567,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         click: () => {
           // invoke insertText method with 'hello' on editor module.
           this.insertMarker(marker.code, marker.icon_url);
+          // this.validate();
           this.marker_click.emit(marker.name);
-          // this.initPopover();
+          this.initPopover();
         }
       };
       const button = jQuery.summernote.ui.button(btn_js);
@@ -550,51 +579,47 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   initPopover() {
-    // set popover
-    jQuery('.btn-icon-text[data-samples]').off('click');
+    this.popovers.validationError.css('display', 'none');
+    this.popovers.segmentBoundary.css('display', 'none');
+    // set popover for boundaries
+    jQuery('.btn-icon-text[data-samples]')
+      .off('click')
+      .off('mouseover')
+      .off('mouseleave');
+
     setTimeout(() => {
-      jQuery('.btn-icon-text[data-samples]').on('click', (event) => {
-        const jqueryobj = jQuery(event.target);
-        const samples = jqueryobj.attr('data-samples');
-
-        if (isNumeric(samples)) {
-          this.boundaryclicked.emit(Number(samples));
-        }
-      })
-        .on('mouseover', (event) => {
+      jQuery('.btn-icon-text[data-samples]')
+        .on('click', (event) => {
           const jqueryobj = jQuery(event.target);
-          const seg_popover = jQuery('.seg-popover');
+          const samples = jqueryobj.attr('data-samples');
 
-          const width = seg_popover.width();
-          const height = seg_popover.height();
-          const editor_pos = jQuery('.note-toolbar-wrapper').offset();
-          const seg_samples = jqueryobj.attr('data-samples');
-
-          if (!(seg_samples === null || seg_samples === undefined) && Functions.isNumber(seg_samples)) {
-            const samples = Number(seg_samples);
-            const time = new AudioTime(samples, this.audiomanager.ressource.info.samplerate);
-
-            seg_popover.css({
-              'margin-left': (event.target.offsetLeft - (width / 2)) + 'px',
-              'margin-top': (jqueryobj.offset().top - editor_pos.top - height - 10) + 'px',
-              'z-index': 30,
-              'position': 'absolute',
-              'background-color': 'white',
-              'display': 'inherit'
-            });
-
-            jqueryobj.css({
-              'cursor': 'pointer'
-            });
-            const timespan = new TimespanPipe();
-            const text = timespan.transform(time.unix.toString());
-            seg_popover.text(text);
+          if (isNumeric(samples)) {
+            this.boundaryclicked.emit(Number(samples));
           }
+        })
+        .on('mouseover', (event) => {
+          this.onSegmentBoundaryMouseOver(jQuery(event.target), event);
         })
         .on('mouseleave', () => {
           jQuery('.seg-popover').css({
             'display': 'none'
           });
+        });
+    }, 200);
+
+
+    // set popover for errors
+    jQuery('.val-error')
+      .off('mouseover')
+      .off('mouseleave');
+
+    setTimeout(() => {
+      jQuery('.val-error')
+        .on('mouseover', (event) => {
+          this.onValidationErrorMouseOver(jQuery(event.target), event);
+        })
+        .on('mouseleave', (event) => {
+          this.onValidationErrorMouseLeave(jQuery(event.target), event);
         });
     }, 200);
   }
@@ -639,7 +664,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     // create boundary button
     const fontSizeUp = () => {
-      let icon = '<img src=\'assets/img/components/transcr-editor/increaseFont.png\' class=\'btn-icon\' style=\'height:20px;\'/>';
+      const icon = '<img src=\'assets/img/components/transcr-editor/increaseFont.png\' class=\'btn-icon\' style=\'height:20px;\'/>';
       // create button
       const btn_js = {
         contents: icon,
@@ -658,7 +683,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     // create boundary button
     const fontSizeDown = () => {
-      let icon = '<img src=\'assets/img/components/transcr-editor/decreaseFont.png\' class=\'btn-icon\' style=\'height:20px;\'/>';
+      const icon = '<img src=\'assets/img/components/transcr-editor/decreaseFont.png\' class=\'btn-icon\' style=\'height:20px;\'/>';
       // create button
       const btn_js = {
         contents: icon,
@@ -701,31 +726,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         }
       })
         .on('mouseover', (event) => {
-          const jqueryobj = jQuery(event.target);
-          const seg_popover = jQuery('.seg-popover');
-
-          const width = seg_popover.width();
-          const height = seg_popover.height();
-          const editor_pos = jQuery('.note-toolbar-wrapper').offset();
-          const seg_samples = jqueryobj.attr('data-samples');
-
-          if (!(seg_samples === null || seg_samples === undefined) && Functions.isNumber(seg_samples)) {
-            const samples = Number(seg_samples);
-            const time = new AudioTime(samples, this.audiomanager.ressource.info.samplerate);
-
-            seg_popover.css({
-              'margin-left': (event.target.offsetLeft - (width / 2)) + 'px',
-              'margin-top': (jqueryobj.offset().top - editor_pos.top - height - 10) + 'px',
-              'display': 'inherit'
-            });
-
-            jqueryobj.css({
-              'cursor': 'pointer'
-            });
-            const timespan = new TimespanPipe();
-            const text = timespan.transform(time.unix.toString());
-            seg_popover.text(text);
-          }
+          this.onTextMouseOver(event);
         })
         .on('mouseleave', () => {
           jQuery('.seg-popover').css({
@@ -738,7 +739,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   saveSelection() {
-    let sel, range, expandedSelRange, node;
+    let sel, range, node;
 
     jQuery('sel-start').remove();
     jQuery('sel-end').remove();
@@ -747,11 +748,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       sel = window.getSelection();
       if (sel.getRangeAt && sel.rangeCount) {
         range = window.getSelection().getRangeAt(0);
-        let range2 = range.cloneRange();
+        const range2 = range.cloneRange();
 
         // Range.createContextualFragment() would be useful here but is
         // non-standard and not supported in all browsers (IE9, for one)
-        let el = document.createElement('sel-end');
+        const el = document.createElement('sel-end');
         let frag = document.createDocumentFragment(), node, lastNode;
         while ((node = el.firstChild)) {
           lastNode = frag.appendChild(node);
@@ -760,7 +761,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         range.insertNode(el);
 
         range2.collapse(true);
-        let el2 = document.createElement('sel-start');
+        const el2 = document.createElement('sel-start');
         range2.insertNode(el2);
       }
     } else if (document.hasOwnProperty('selection') && document.selection.hasOwnProperty('createRange')) {
@@ -777,18 +778,18 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   restoreSelection() {
-    let elem = document.getElementsByClassName('note-editable')[0];
+    const elem = document.getElementsByClassName('note-editable')[0];
 
     if (!(elem === null || elem === undefined) && elem.getElementsByTagName('sel-start')[0] !== undefined) {
-      let el = elem;
-      let range = document.createRange();
-      let sel = window.getSelection();
-      let selStart = elem.getElementsByTagName('sel-start')[0].previousSibling;
-      let selEnd = elem.getElementsByTagName('sel-end')[0].nextSibling;
+      const el = elem;
+      const range = document.createRange();
+      const sel = window.getSelection();
+      const selStart = elem.getElementsByTagName('sel-start')[0].previousSibling;
+      const selEnd = elem.getElementsByTagName('sel-end')[0].nextSibling;
 
-      let endOffset = 0;
+      const endOffset = 0;
 
-      let childLength = el.childNodes.length;
+      const childLength = el.childNodes.length;
 
       if (selStart !== null) {
         // set start position
@@ -930,13 +931,34 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.subscrmanager.destroy();
   }
 
-  /*
-
   private validate() {
-    const val: any[] = this.transcrService.validate(this._rawText);
-    let ok = this.underlineTextRed(val);
-    ok = this.rawToHTML(ok);
-    this.textfield.summernote('code', ok);
+    this.saveSelection();
+
+    this._rawText = this.getRawText();
+
+    // insert selection placeholders
+    let code = Functions.insertString(this._rawText, this._textSelection.start, '[[[sel-start]]][[[/sel-start]]]');
+    code = Functions.insertString(code, this._textSelection.end + '[[[sel-start]]][[[/sel-start]]]'.length, '[[[sel-end]]][[[/sel-end]]]');
+
+    code = this.transcrService.underlineTextRed(code, validateAnnotation(code, this.transcrService.guidelines));
+    code = this.transcrService.rawToHTML(code);
+    code = code.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
+      if (g1 === '[[[') {
+        return '<';
+      }
+      return '>';
+    });
+
+    let segmentCounter = 0;
+    code = code.replace(/{([0-9]+)}/g, (g0, g1) => {
+      return `<img src="assets/img/components/transcr-editor/boundary.png" class="btn-icon-text boundary" style="height: 16px; cursor: pointer;" data-samples="${g1}" alt="[|${++segmentCounter}|]" />`;
+    });
+
+
+    this.textfield.summernote('code', code);
+    console.log(`END:`);
+    console.log(code);
+    this.restoreSelection();
   }
 
 
@@ -960,8 +982,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
     return result;
   }
-
-*/
 
   /**
    * checks if the combokey is part of the configs disabledkeys
@@ -1070,6 +1090,80 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    */
   private tidyUpRaw(raw: string): string {
     return tidyUpAnnotation(raw, this.transcrService.guidelines);
+  }
+
+  private onTextMouseOver = (event) => {
+    const jqueryObj = jQuery(event.target);
+
+    console.log(`in text mouseover!`);
+    if (!(jqueryObj.attr('data-samples') === null || jqueryObj.attr('data-samples') === undefined)) {
+      this.onSegmentBoundaryMouseOver(jqueryObj, event);
+    } else if (!(jqueryObj.attr('data-errorcode') === null || jqueryObj.attr('data-errorcode') === undefined)) {
+      this.onValidationErrorMouseOver(jqueryObj, event);
+    }
+  }
+
+  private onSegmentBoundaryMouseOver(jqueryObj: any, event: any) {
+    const seg_popover = jQuery('.seg-popover');
+    const width = seg_popover.width();
+    const height = seg_popover.height();
+    const editor_pos = jQuery('.note-toolbar-wrapper').offset();
+    const seg_samples = jqueryObj.attr('data-samples');
+
+    if (!(seg_samples === null || seg_samples === undefined) && Functions.isNumber(seg_samples)) {
+      const samples = Number(seg_samples);
+      const time = new AudioTime(samples, this.audiomanager.ressource.info.samplerate);
+
+      seg_popover.css({
+        'margin-left': (event.target.offsetLeft - (width / 2)) + 'px',
+        'margin-top': (jqueryObj.offset().top - editor_pos.top - height - 10) + 'px',
+        'z-index': 30,
+        'position': 'absolute',
+        'background-color': 'white',
+        'display': 'inherit'
+      });
+
+      jqueryObj.css({
+        'cursor': 'pointer'
+      });
+      const timespan = new TimespanPipe();
+      const text = timespan.transform(time.unix.toString());
+      seg_popover.text(text);
+    }
+  }
+
+  private onValidationErrorMouseOver(jQueryObj: any, event: any) {
+    const errorCode = jQueryObj.attr('data-errorcode');
+
+    if (!(errorCode === null || errorCode === undefined)) {
+      const errorDetails = this.transcrService.getErrorDetails(errorCode);
+
+      if (!(errorDetails === null || errorDetails === undefined)) {
+        // set values
+        this.popovers.validationError.css('display', 'inherit');
+        this.popovers.validationError.find('.error-title').text(errorDetails.title);
+        this.popovers.validationError.find('.card-body').text(errorDetails.description);
+
+        const width = this.popovers.validationError.width();
+        const height = this.popovers.validationError.height();
+        const editor_pos = jQuery('.note-toolbar-wrapper').offset();
+
+        let marginLeft = event.target.offsetLeft;
+        if (event.target.offsetLeft + width > jQuery('.note-toolbar-wrapper').width()) {
+          marginLeft = event.target.offsetLeft - width;
+        }
+        this.popovers.validationError.css(
+          {
+            'margin-left': marginLeft + 'px',
+            'margin-top': (jQueryObj.offset().top - editor_pos.top - height) + 'px'
+          }
+        );
+      }
+    }
+  }
+
+  private onValidationErrorMouseLeave(jQueryObj: any, event: any) {
+    this.popovers.validationError.css('display', 'none');
   }
 
   /*

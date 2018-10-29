@@ -88,6 +88,10 @@
                                                                 </p>
                                                             </video>
                                                         </div>
+                                                        <div *ngIf="example.url.indexOf('.png') > -1 || example.url.indexOf('.jpg') > -1"
+                                                             class="media">
+                                                            <img [src]="example.url"/>
+                                                        </div>
                                                         <div class="text">
                                                             <code [innerHTML]="transcrService.rawToHTML(example.annotation)"></code>
                                                         </div>

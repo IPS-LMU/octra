@@ -61,8 +61,15 @@
                                             <div *ngIf="entry.examples.length > 0" class="col-md-12">
                                                 <div *ngFor="let example of entry.examples; let i = index;"
                                                      class="card card-example">
-                                                    <div class="card-header example">
-                                                        {{"general.example" | translate}} {{i + 1}}
+                                                    <div class="card-header example"
+                                                         *ngIf="settService.projectsettings.guidelines === undefined
+                                                         || settService.projectsettings.guidelines?.showExampleHeader">
+                                                        {{"general.example" | translate}}
+                                                        <ng-container
+                                                                *ngIf="settService.projectsettings.guidelines === undefined
+                                                         || settService.projectsettings.guidelines?.showExampleNumbers">
+                                                            {{i + 1}}
+                                                        </ng-container>
                                                     </div>
                                                     <div class="card-body">
                                                         <div *ngIf="example.url.indexOf('.wav') > -1" class="media">

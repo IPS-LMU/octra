@@ -8,7 +8,7 @@ import {IFile, ImportResult} from '../../obj/Converters';
 import {OAudiofile, OLevel} from '../../obj/Annotation';
 import {OIDBLevel} from '../../shared/service/appstorage.service';
 import {AppInfo} from '../../../app.info';
-import {Functions} from '../../shared';
+import {Functions} from '../../shared/Functions';
 
 @Component({
   selector: 'app-loading',

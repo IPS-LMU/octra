@@ -26,9 +26,10 @@ import {LoupeComponent} from '../../media-components/components/audio/loupe';
 import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
-import {BrowserInfo, Functions} from '../../core/shared';
+import {BrowserInfo} from '../../core/shared';
 import {AVMousePos} from '../../media-components/obj';
 import {AudioManager} from '../../media-components/obj/media/audio/AudioManager';
+import {Functions} from '../../core/shared/Functions';
 
 @Component({
   selector: 'app-signal-gui',

@@ -5,7 +5,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
-import {Functions} from '../../shared';
+import {Functions} from '../../shared/Functions';
 
 @Component({
   selector: 'app-agreement',

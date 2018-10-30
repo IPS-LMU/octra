@@ -4,23 +4,9 @@ import {BrowserInfo} from '../BrowserInfo';
 
 @Injectable()
 export class KeymappingService {
-  private shortcuts: any[] = [];
-  private onKeyDown = ($event) => {
-    const combo = KeyMapping.getShortcutCombination($event);
-    this._onkeydown.emit({comboKey: combo, event: $event});
-  };
-  private onKeyUp = ($event) => {
-    const combo = KeyMapping.getShortcutCombination($event);
-    this._onkeyup.emit({comboKey: combo, event: $event});
-  };
-
-  private _onkeydown: EventEmitter<any>;
-
   get onkeydown(): EventEmitter<any> {
     return this._onkeydown;
   }
-
-  private _onkeyup: EventEmitter<any>;
 
   get onkeyup(): EventEmitter<any> {
     return this._onkeyup;
@@ -32,6 +18,20 @@ export class KeymappingService {
 
     this._onkeyup = new EventEmitter<any>();
     window.onkeyup = this.onKeyUp;
+  }
+
+  private shortcuts: any[] = [];
+
+  private _onkeydown: EventEmitter<any>;
+
+  private _onkeyup: EventEmitter<any>;
+  private onKeyDown = ($event) => {
+    const combo = KeyMapping.getShortcutCombination($event);
+    this._onkeydown.emit({comboKey: combo, event: $event});
+  }
+  private onKeyUp = ($event) => {
+    const combo = KeyMapping.getShortcutCombination($event);
+    this._onkeyup.emit({comboKey: combo, event: $event});
   }
 
   public getEntryList(name: string): Entry[] {

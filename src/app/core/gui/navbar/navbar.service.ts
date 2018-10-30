@@ -3,7 +3,7 @@ import {AppStorageService} from '../../shared/service/appstorage.service';
 import {TranscriptionService} from '../../shared/service/transcription.service';
 import {UserInteractionsService} from '../../shared/service/userInteractions.service';
 import {AudioInfo} from '../../../media-components/obj/media/audio';
-import {FileSize} from '../../shared';
+import {FileSize} from '../../shared/Functions';
 
 @Injectable()
 export class NavbarService {

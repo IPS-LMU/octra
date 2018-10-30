@@ -3,10 +3,11 @@ import {Router} from '@angular/router';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {TranscriptionService} from '../../shared/service/transcription.service';
 import {UserInteractionsService} from '../../shared/service/userInteractions.service';
-import {Functions, SubscriptionManager} from '../../shared';
+import {SubscriptionManager} from '../../shared';
 import {SettingsService} from '../../shared/service/settings.service';
 import {NavbarService} from '../navbar/navbar.service';
 import {AppInfo} from '../../../app.info';
+import {Functions} from '../../shared/Functions';
 
 
 @Component({

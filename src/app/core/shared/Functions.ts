@@ -7,6 +7,10 @@ export interface FileSize {
   label: string;
 }
 
+export function isNullOrUndefined(obj: any) {
+  return (obj === null || obj === undefined);
+}
+
 export class Functions {
   public static scrollTo(y: number, target?: string) {
     setTimeout(() => {

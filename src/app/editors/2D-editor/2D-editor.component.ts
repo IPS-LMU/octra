@@ -21,7 +21,7 @@ import {
   UserInteractionsService
 } from '../../core/shared/service';
 
-import {AudioSelection, AudioTime, Functions} from '../../core/shared';
+import {AudioSelection, AudioTime} from '../../core/shared';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
 import {AudioChunk} from '../../media-components/obj/media/audio';
 import {TranscrWindowComponent} from './transcr-window';
@@ -36,6 +36,7 @@ import {CircleLoupeComponent} from '../../media-components/components/audio/circ
 import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
 import {Line} from '../../media-components/obj';
 import {AudioManager} from '../../media-components/obj/media/audio/AudioManager';
+import {Functions} from '../../core/shared/Functions';
 
 @Component({
   selector: 'app-overlay-gui',

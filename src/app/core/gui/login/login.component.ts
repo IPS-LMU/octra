@@ -5,7 +5,7 @@ import {LoginService} from './login.service';
 import {APIService, AppStorageService, AudioService, OIDBLevel, OIDBLink, SettingsService} from '../../shared/service';
 import {ComponentCanDeactivate} from './login.deactivateguard';
 import {Observable} from 'rxjs/Observable';
-import {FileSize, Functions, OCTRANIMATIONS, SubscriptionManager} from '../../shared';
+import {OCTRANIMATIONS, SubscriptionManager} from '../../shared';
 import {SessionFile} from '../../obj/SessionFile';
 import {TranslateService} from '@ngx-translate/core';
 import {Converter} from '../../obj/Converters';
@@ -14,6 +14,7 @@ import 'rxjs/add/operator/catch';
 import {ModalService} from '../../modals/modal.service';
 import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
 import {AppInfo} from '../../../app.info';
+import {FileSize, Functions} from '../../shared/Functions';
 
 @Component({
   selector: 'app-login',

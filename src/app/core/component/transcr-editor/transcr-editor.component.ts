@@ -2,13 +2,14 @@ import {ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy,
 import {TranscrEditorConfig} from './config';
 import {TranslateService} from '@ngx-translate/core';
 
-import {BrowserInfo, Functions, KeyMapping, SubscriptionManager} from '../../shared';
+import {BrowserInfo, KeyMapping, SubscriptionManager} from '../../shared';
 import {TranscriptionService} from '../../shared/service';
 import {Segments} from '../../obj/Annotation/Segments';
 import {AudioChunk, AudioTime} from '../../../media-components/obj/media/audio';
 import {isNumeric} from 'rxjs/util/isNumeric';
 import {TimespanPipe} from '../../../media-components/pipe';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
+import {Functions} from '../../shared/Functions';
 
 declare let lang: any;
 declare let document: any;

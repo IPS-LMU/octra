@@ -4,7 +4,7 @@ import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '
 import {Observable} from 'rxjs/Observable';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {AppInfo} from '../../../app.info';
-import {Functions} from '../../shared';
+import {Functions} from '../../shared/Functions';
 
 @Injectable()
 export class LogoutGuard implements CanActivate {

@@ -7,7 +7,7 @@ import {AppStorageService} from '../../shared/service/appstorage.service';
 import {SettingsService} from '../../shared/service/settings.service';
 import 'rxjs/add/operator/first';
 import {AppInfo} from '../../../app.info';
-import {Functions} from '../../shared';
+import {Functions} from '../../shared/Functions';
 
 @Injectable()
 export class ReloadFileGuard implements CanActivate {

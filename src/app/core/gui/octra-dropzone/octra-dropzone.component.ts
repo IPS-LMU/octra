@@ -1,13 +1,13 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {OAnnotJSON, OAudiofile, OLabel, OSegment} from '../../obj/Annotation';
-import {FileSize, Functions, IFile} from '../../shared';
 import {AppInfo} from '../../../app.info';
-import {Converter, ImportResult} from '../../obj/Converters';
+import {Converter, IFile, ImportResult} from '../../obj/Converters';
 import {DropZoneComponent} from '../../component/drop-zone';
 import {SessionFile} from '../../obj/SessionFile';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {ModalService} from '../../modals/modal.service';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
+import {FileSize, Functions} from '../../shared/Functions';
 
 @Component({
   selector: 'app-octra-dropzone',

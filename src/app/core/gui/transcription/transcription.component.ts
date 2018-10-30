@@ -47,6 +47,7 @@ import {NavbarService} from '../navbar/navbar.service';
 import {OverviewModalComponent} from '../../modals/overview-modal/overview-modal.component';
 import {AppInfo} from '../../../app.info';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
+import {TranscriptionSendingModalComponent} from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
 
 @Component({
   selector: 'app-transcription',
@@ -142,7 +143,7 @@ export class TranscriptionComponent implements OnInit,
   @ViewChild('modal_overview') modal_overview: OverviewModalComponent;
   @ViewChild(LoadeditorDirective) appLoadeditor: LoadeditorDirective;
   @ViewChild('modal') modal: any;
-  @ViewChild('modal2') modal2: any;
+  @ViewChild('transcrSendingModal') transcrSendingModal: TranscriptionSendingModalComponent;
   @ViewChild('modal_guidelines') modal_guidelines: TranscriptionGuidelinesModalComponent;
 
   public send_error = '';
@@ -427,7 +428,7 @@ export class TranscriptionComponent implements OnInit,
   }
 
   public onSendNowClick() {
-    this.modal2.open();
+    this.transcrSendingModal.open();
     this.send_ok = true;
 
     const json: any = this.transcrService.exportDataToJSON();
@@ -440,12 +441,13 @@ export class TranscriptionComponent implements OnInit,
             this.appStorage.submitted = true;
 
             setTimeout(() => {
-              this.modal2.close();
+              this.transcrSendingModal.close();
 
-              setTimeout(() => {
-                this.nextTranscription(result);
-              }, 1000);
-            }, 1000);
+              // only if opened
+              this.modal_overview.close();
+
+              this.nextTranscription(result);
+            }, 500);
           } else {
             this.send_error = this.langService.instant('send error');
           }

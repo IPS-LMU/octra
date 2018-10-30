@@ -134,5 +134,9 @@
     "sendValidatedTranscriptionOnly": false,
     "showOverviewIfTranscriptNotValid": true,
     "theme": "default"
+  },
+  "guidelines": {
+    "showExampleNumbers": false,
+    "showExampleHeader": false
   }
 }

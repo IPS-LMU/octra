@@ -101,14 +101,16 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
   }
 
   public close() {
-    this.modal.hide();
-    this.visible = false;
-    this.actionperformed.next();
+    if (this.visible) {
+      this.modal.hide();
+      this.visible = false;
+      this.actionperformed.next();
 
-    if (this.appStorage.usemode === 'online') {
-      this.feedback.saveFeedbackform();
+      if (this.appStorage.usemode === 'online') {
+        this.feedback.saveFeedbackform();
+      }
+      this.overview.stopPlayback();
     }
-    this.overview.stopPlayback();
   }
 
   public beforeDismiss() {
@@ -122,7 +124,6 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
   }
 
   sendTranscription() {
-    this.close();
     this.transcriptionSend.emit();
   }
 

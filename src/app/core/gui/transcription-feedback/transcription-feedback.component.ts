@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {AppStorageService, TranscriptionService} from '../../shared/service';
+import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
 import {TranslateService} from '@ngx-translate/core';
 import {NgForm} from '@angular/forms';
 
@@ -11,13 +11,15 @@ import {NgForm} from '@angular/forms';
 export class TranscriptionFeedbackComponent implements OnInit {
 
   @Input() feedback_data = {};
+  @Input() showCommentFieldOnly = false;
   @ViewChild('fo') feedback_form: NgForm;
 
   public get valid(): boolean {
     return this.feedback_form.valid;
   }
 
-  constructor(public transcrService: TranscriptionService, public langService: TranslateService, private appStorage: AppStorageService) {
+  constructor(public transcrService: TranscriptionService, public langService: TranslateService, private appStorage: AppStorageService,
+              private settingsService: SettingsService) {
   }
 
   ngOnInit() {
@@ -42,12 +44,14 @@ export class TranscriptionFeedbackComponent implements OnInit {
     }
     this.appStorage.comment = this.transcrService.feedback.comment;
 
-    for (const control in this.feedback_data) {
-      if (this.feedback_data.hasOwnProperty(control)) {
-        this.changeValue(control, this.feedback_data[control]);
+    if (!this.settingsService.isTheme('shortAudioFiles')) {
+      for (const control in this.feedback_data) {
+        if (this.feedback_data.hasOwnProperty(control)) {
+          this.changeValue(control, this.feedback_data[control]);
+        }
       }
+      this.appStorage.save('feedback', this.transcrService.feedback.exportData());
     }
-    this.appStorage.save('feedback', this.transcrService.feedback.exportData());
   }
 
   changeValue(control: string, value: any) {

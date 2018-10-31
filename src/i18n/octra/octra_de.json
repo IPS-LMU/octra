@@ -72,7 +72,10 @@
     "select one tier": "Einen Tier auswählen",
     "prompt": "Textvorlage",
     "feedback": "Feedback",
-    "skip silence": "Stille überspringen"
+    "skip silence": "Stille überspringen",
+    "good": "Gut",
+    "bad": "Schlecht",
+    "middle": "Mittel"
   },
   "bug report": {
     "give feedback": "Feedback geben",

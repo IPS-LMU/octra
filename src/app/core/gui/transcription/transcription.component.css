@@ -101,3 +101,11 @@
 #bottom-navigation button {
     margin-bottom: 0;
 }
+
+#bottom-comment {
+    width: 100%;
+    border: 1px solid gray;
+    height: 40px;
+    margin-bottom: 0;
+    background-color: lightyellow;
+}

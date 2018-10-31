@@ -1,7 +1,7 @@
 import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs/Subject';
-import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
+import {AppStorageService, KeymappingService, SettingsService, TranscriptionService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {TranscriptionFeedbackComponent} from '../../gui/transcription-feedback/transcription-feedback.component';
 import {TranscrOverviewComponent} from '../../gui/transcr-overview';
@@ -28,6 +28,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
   @Output() transcriptionSend = new EventEmitter<void>();
 
   protected data = null;
+  private shortcutID = -1;
 
   public get feedBackComponent(): TranscriptionFeedbackComponent {
     return this.feedback;
@@ -51,7 +52,8 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
   constructor(public transcrService: TranscriptionService,
               public ms: BsModalService,
               private settingsService: SettingsService,
-              public appStorage: AppStorageService) {
+              public appStorage: AppStorageService,
+              private keyService: KeymappingService) {
   }
 
   ngOnInit() {
@@ -77,6 +79,23 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
     return new Promise<void>((resolve, reject) => {
       this.modal.show(this.modal, this.config);
 
+      if (this.settingsService.isTheme('shortAudioFiles')) {
+        this.shortcutID = this.subscrmanager.add(this.keyService.onkeyup.subscribe((keyObj: any) => {
+          console.log(`keystroke! ${keyObj.comboKey}`);
+          switch (keyObj.comboKey) {
+            case('1'):
+              this.sendTranscriptionForShortAudioFiles('good');
+              break;
+            case('2'):
+              this.sendTranscriptionForShortAudioFiles('middle');
+              break;
+            case('3'):
+              this.sendTranscriptionForShortAudioFiles('bad');
+              break;
+          }
+        }));
+      }
+
       if (validate) {
         this.transcrService.validateAll();
       }
@@ -84,6 +103,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
       this.visible = true;
 
       // this.loadForm();
+
       if (this.appStorage.usemode === 'online') {
         this.feedback.feedback_data = (this.appStorage.feedback === null) ? {} : this.appStorage.feedback;
       }
@@ -106,6 +126,12 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
       this.visible = false;
       this.actionperformed.next();
 
+      // unsubscribe shortcut listener
+      if (this.shortcutID > -1) {
+        this.subscrmanager.remove(this.shortcutID);
+        this.shortcutID = -1;
+      }
+
       if (this.appStorage.usemode === 'online') {
         this.feedback.saveFeedbackform();
       }
@@ -124,11 +150,16 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
   }
 
   sendTranscription() {
+    if (this.appStorage.usemode === 'online') {
+      this.feedback.saveFeedbackform();
+    }
+    this.overview.stopPlayback();
     this.transcriptionSend.emit();
   }
 
+  /* TODO dead code?
   private loadForm() {
-    // create emty attribute
+    // create empty attribute
     const feedback = this.transcrService.feedback;
     if (!(this.settingsService.projectsettings === null || this.settingsService.projectsettings === undefined)
       && !(feedback === null || feedback === undefined)
@@ -153,6 +184,25 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
           }
         }
       }
+    }
+  }*/
+
+  public sendTranscriptionForShortAudioFiles(type: 'bad' | 'middle' | 'good') {
+    switch (type) {
+      case('bad'):
+        this.appStorage.feedback = 'SEVERE';
+        break;
+      case('middle'):
+        this.appStorage.feedback = 'SLIGHT';
+        break;
+      case('good'):
+        this.appStorage.feedback = 'OK';
+        break;
+      default:
+    }
+
+    if (this.sendValidTranscriptOnly && this.transcrService.transcriptValid || !this.sendValidTranscriptOnly) {
+      this.sendTranscription();
     }
   }
 }

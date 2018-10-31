@@ -28,7 +28,7 @@ import {
   UserInteractionsService
 } from '../../shared/service';
 
-import {BrowserInfo, Functions, SubscriptionManager} from '../../shared';
+import {BrowserInfo, SubscriptionManager} from '../../shared';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 import {ProjectSettings} from '../../obj/Settings';
@@ -48,6 +48,7 @@ import {OverviewModalComponent} from '../../modals/overview-modal/overview-modal
 import {AppInfo} from '../../../app.info';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 import {TranscriptionSendingModalComponent} from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
+import {Functions, isNullOrUndefined} from '../../shared/Functions';
 
 @Component({
   selector: 'app-transcription',
@@ -164,7 +165,7 @@ export class TranscriptionComponent implements OnInit,
     if (this.appStorage.usemode === 'online'
       && !(this.settingsService.projectsettings.octra === null || this.settingsService.projectsettings.octra === undefined)
       && !(this.settingsService.projectsettings.octra.theme === null || this.settingsService.projectsettings.octra.theme === undefined)
-      && this.settingsService.projectsettings.octra.theme === 'shortAudioFiles') {
+      && this.settingsService.isTheme('shortAudioFiles')) {
       // clear transcription
 
       this.transcrService.endTranscription();
@@ -433,6 +434,16 @@ export class TranscriptionComponent implements OnInit,
 
     const json: any = this.transcrService.exportDataToJSON();
 
+    if (this.settingsService.isTheme('shortAudioFiles')) {
+      if (this.appStorage.feedback === 'SEVERE') {
+        // postpone audio file
+        json.status = 'POSTPONED';
+        // don't overwrite server comment
+        json.comment = this.appStorage.servercomment;
+      }
+    }
+
+
     this.subscrmanager.add(this.api.saveSession(json.transcript, json.project, json.annotator,
       json.jobno, json.id, json.status, json.comment, json.quality, json.log)
       .catch(this.onSendError)
@@ -461,16 +472,23 @@ export class TranscriptionComponent implements OnInit,
   onSendButtonClick() {
     let validTranscript = true;
     let showOverview = true;
+    let validTranscriptOnly = false;
 
-    if (!(this.projectsettings.octra === null || this.projectsettings.octra === undefined)
-      && !(this.projectsettings.octra.showOverviewIfTranscriptNotValid === null
-        || this.projectsettings.octra.showOverviewIfTranscriptNotValid === undefined)) {
-      this.transcrService.validateAll();
-      validTranscript = this.transcrService.transcriptValid;
+    this.transcrService.validateAll();
+    validTranscript = this.transcrService.transcriptValid;
+
+    if (!isNullOrUndefined(this.projectsettings.octra) && !isNullOrUndefined(this.projectsettings.octra.showOverviewIfTranscriptNotValid)) {
       showOverview = this.projectsettings.octra.showOverviewIfTranscriptNotValid;
     }
 
-    if ((!validTranscript && showOverview) || !this.modal_overview.feedBackComponent.valid) {
+    if (!isNullOrUndefined(this.projectsettings.octra) && !isNullOrUndefined(this.projectsettings.octra.sendValidatedTranscriptionOnly)) {
+      validTranscriptOnly = this.projectsettings.octra.sendValidatedTranscriptionOnly;
+    }
+
+    if ((
+      (!validTranscript && showOverview) || !this.modal_overview.feedBackComponent.valid)
+      || (validTranscriptOnly && !validTranscript)
+    ) {
       this.modal_overview.open();
     } else {
       this.onSendNowClick();
@@ -627,5 +645,22 @@ export class TranscriptionComponent implements OnInit,
       }
     };
     xhr.send(form);
+  }
+
+  public sendTranscriptionForShortAudioFiles(type: 'bad' | 'middle' | 'good') {
+    switch (type) {
+      case('bad'):
+        this.appStorage.feedback = 'SEVERE';
+        break;
+      case('middle'):
+        this.appStorage.feedback = 'SLIGHT';
+        break;
+      case('good'):
+        this.appStorage.feedback = 'OK';
+        break;
+      default:
+    }
+
+    this.onSendButtonClick();
   }
 }

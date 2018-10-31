@@ -121,7 +121,7 @@ export class APIService implements API {
         comment: comment,
         jobno: jobno,
         status: status,
-        quality: JSON.stringify(quality),
+        quality: quality,
         id: data_id,
         log: log
       };

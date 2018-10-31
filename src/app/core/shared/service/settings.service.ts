@@ -6,7 +6,7 @@ import {Subscription} from 'rxjs/Subscription';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
 import {Logger} from '../Logger';
-import {Functions} from '../Functions';
+import {Functions, isNullOrUndefined} from '../Functions';
 import {Observable} from 'rxjs/Observable';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
@@ -477,5 +477,16 @@ export class SettingsService {
     } else {
       throw new Error('parameters of loadSettings() are not correct.');
     }
+  }
+
+  /**
+   * checks jif the specific theme is active
+   * @param theme
+   */
+  public isTheme(theme: string) {
+    const selectedTheme = (isNullOrUndefined(this.projectsettings.octra) || isNullOrUndefined(this.projectsettings.octra.theme))
+      ? 'default' : this.projectsettings.octra.theme;
+
+    return (selectedTheme === theme);
   }
 }

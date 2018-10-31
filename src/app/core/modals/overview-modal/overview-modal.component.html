@@ -28,18 +28,49 @@
                          *ngIf="appStorage.usemode === 'online'">
                         <h4>Feedback</h4>
                         <app-transcription-feedback #feedback
-                                                    [feedback_data]="appStorage.feedback"></app-transcription-feedback>
+                                                    [feedback_data]="appStorage.feedback"
+                                                    [showCommentFieldOnly]="settingsService.isTheme('shortAudioFiles')">
+                        </app-transcription-feedback>
 
                         <p style="color:red; text-align: center"
                            *ngIf="sendValidTranscriptOnly && !transcrService.transcriptValid">
                             {{"transcription.invalid" | translate}}
                         </p>
-                        <button class="btn btn-primary btn-outline btn-success" id="transcr-send-btn"
-                                (click)="sendTranscription()"
-                                [disabled]="!feedback.valid || (sendValidTranscriptOnly && !transcrService.transcriptValid)">
-                            <fa-icon icon="paper-plane"></fa-icon>
-                            {{"transcription.send" | translate}}
-                        </button>
+                        <ng-container
+                                *ngIf="!settingsService.isTheme('shortAudioFiles'); else isShortAudioFilesTheme">
+                            <button class="btn btn-primary btn-outline btn-success" id="transcr-send-btn"
+                                    (click)="sendTranscription()"
+                                    [disabled]="!feedback.valid || (sendValidTranscriptOnly && !transcrService.transcriptValid)">
+                                <fa-icon icon="paper-plane"></fa-icon>
+                                {{"transcription.send" | translate}}
+                            </button>
+                        </ng-container>
+                        <ng-template #isShortAudioFilesTheme>
+                            <div class="row" id="bottom-navigation" role="group">
+
+                                <button class="btn btn-raised btn-primary w-100"
+                                        (click)="sendTranscriptionForShortAudioFiles('good')">
+                                    <fa-icon icon="paper-plane"></fa-icon>
+                                    <span>
+                                           {{"general.good" | translate}}
+                                    </span>
+                                </button>
+                                <button class="btn btn-raised btn-warning w-100" style="background-color: orange"
+                                        (click)="sendTranscriptionForShortAudioFiles('middle')">
+                                    <fa-icon icon="paper-plane"></fa-icon>
+                                    <span>
+                                           {{"general.middle" | translate}}
+                                    </span>
+                                </button>
+                                <button class="btn btn-raised btn-danger w-100"
+                                        (click)="sendTranscriptionForShortAudioFiles('bad')">
+                                    <fa-icon icon="paper-plane"></fa-icon>
+                                    <span>
+                                           {{"general.bad" | translate}}
+                                    </span>
+                                </button>
+                            </div>
+                        </ng-template>
                     </div>
                 </div>
             </div>

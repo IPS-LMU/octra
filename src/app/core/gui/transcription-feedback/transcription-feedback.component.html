@@ -1,43 +1,45 @@
 <form #fo="ngForm" class="form-inline">
     <fieldset>
         <ng-container *ngIf="transcrService.feedback !== null && feedback_data !== null">
-            <ng-container *ngFor="let group of transcrService.feedback.groups">
-                <span>{{translate(group.title, langService.currentLang)}}</span>
-                <span class="required_marker" *ngIf="group.controls[0].required"> *</span><br/>
-                <div class="form-group" style="padding-top:0px;">
-                    <ng-container *ngFor="let control of group.controls;">
-                        <div class="radio" *ngIf="control.type.type === 'radiobutton'">
-                            <label>
-                                <input type="radio"
-                                       name="{{group.name}}" value="{{control.value}}"
-                                       [checked]="control.custom.checked"
-                                       [required]="control.required"
-                                       [(ngModel)]="feedback_data[group.name]"
-                                />{{translate(control.label.languages, langService.currentLang)}}
-                            </label>
-                        </div>
-                        <div class="checkbox" *ngIf="control.type.type === 'checkbox'">
-                            <label>
-                                <input type="checkbox"
-                                       name="{{control.value}}" value="true"
-                                       [checked]="control.custom.checked" #checkb
-                                       [required]="control.required"
-                                       (change)="checkBoxChanged(group.name, control.value)">
-                                <span class="required_marker" *ngIf="control.required">*</span>
-                                {{translate(control.label.languages, langService.currentLang)}}
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <div *ngIf="control.type.type === 'textarea'">
-                                <label>{{translate(control.label.languages, langService.currentLang)}}</label>
-                                <textarea class="form-control"
-                                          name="{{group.name}}" value="{{control.value}}"
-                                          [required]="control.required"></textarea>
-                                [(ngModel)]="feedback_data[group.name]"
+            <ng-container *ngIf="!showCommentFieldOnly">
+                <ng-container *ngFor="let group of transcrService.feedback.groups">
+                    <span>{{translate(group.title, langService.currentLang)}}</span>
+                    <span class="required_marker" *ngIf="group.controls[0].required"> *</span><br/>
+                    <div class="form-group" style="padding-top:0px;">
+                        <ng-container *ngFor="let control of group.controls;">
+                            <div class="radio" *ngIf="control.type.type === 'radiobutton'">
+                                <label>
+                                    <input type="radio"
+                                           name="{{group.name}}" value="{{control.value}}"
+                                           [checked]="control.custom.checked"
+                                           [required]="control.required"
+                                           [(ngModel)]="feedback_data[group.name]"
+                                    />{{translate(control.label.languages, langService.currentLang)}}
+                                </label>
                             </div>
-                        </div>
-                    </ng-container>
-                </div>
+                            <div class="checkbox" *ngIf="control.type.type === 'checkbox'">
+                                <label>
+                                    <input type="checkbox"
+                                           name="{{control.value}}" value="true"
+                                           [checked]="control.custom.checked" #checkb
+                                           [required]="control.required"
+                                           (change)="checkBoxChanged(group.name, control.value)">
+                                    <span class="required_marker" *ngIf="control.required">*</span>
+                                    {{translate(control.label.languages, langService.currentLang)}}
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <div *ngIf="control.type.type === 'textarea'">
+                                    <label>{{translate(control.label.languages, langService.currentLang)}}</label>
+                                    <textarea class="form-control"
+                                              name="{{group.name}}" value="{{control.value}}"
+                                              [required]="control.required"></textarea>
+                                    [(ngModel)]="feedback_data[group.name]"
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </ng-container>
             </ng-container>
             <div class="form-group">
                 <label>{{"transcription-submit.comment description" | translate}}</label>

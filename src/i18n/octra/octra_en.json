@@ -72,7 +72,10 @@
     "select one tier": "Select one tier",
     "prompt": "Prompt",
     "feedback": "Feedback",
-    "skip silence": "skip silence"
+    "skip silence": "skip silence",
+    "good": "Good",
+    "bad": "Bad",
+    "middle": "Middle"
   },
   "bug report": {
     "give feedback": "Give feedback",

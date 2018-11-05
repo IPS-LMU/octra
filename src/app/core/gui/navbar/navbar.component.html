@@ -107,7 +107,7 @@
             <!-- online mode counter -->
             <li class="nav-item"
                 *ngIf="(appStorage.LoggedIn && navbarServ.dataloaded && appStorage.usemode === 'online')">
-                <a href="#" class="nav-link">
+                <a class="nav-link">
                     {{appStorage.user.project}}: {{appStorage.jobs_left}}
                 </a>
             </li>

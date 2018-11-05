@@ -29,12 +29,12 @@
         <ng-template appLoadeditor></ng-template>
     </div>
 
-    <div *ngIf="settingsService.isTheme('shortAudioFiles')">
+    <div *ngIf="settingsService.isTheme('shortAudioFiles') && appStorage.usemode === 'online' && transcrService.feedback !== null">
         <form class="form-inline" id="bottom-comment">
             <fieldset class="w-100">
                 <div class="form-group" style="padding-top:0;">
                 <textarea class="form-control w-100" [(ngModel)]="transcrService.feedback.comment"
-                          placeholder="Kommentar hier eingeben... (optional)"
+                          placeholder="{{'general.insert comment'| translate}}"
                           name="comment"
                           style="height:40px;padding:10px;resize: none;"></textarea>
                 </div>

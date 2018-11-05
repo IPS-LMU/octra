@@ -75,7 +75,8 @@
     "skip silence": "Stille überspringen",
     "good": "Gut",
     "bad": "Schlecht",
-    "middle": "Mittel"
+    "middle": "Mittel",
+    "insert comment": "Kommentar hier eingeben... (optional)"
   },
   "bug report": {
     "give feedback": "Feedback geben",

@@ -173,7 +173,6 @@ export class TranscriptionComponent implements OnInit,
       this.api.setOnlineSessionToFree(this.appStorage, () => {
         Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).then(() => {
           this.appStorage.clearSession();
-          const data = JSON.parse(JSON.stringify(this.appStorage.user));
 
           this.appStorage.clearLocalStorage().then(() => {
             this.appStorage.saveUser();

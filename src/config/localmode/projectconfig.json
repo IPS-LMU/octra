@@ -133,7 +133,7 @@
   "octra": {
     "sendValidatedTranscriptionOnly": false,
     "showOverviewIfTranscriptNotValid": true,
-    "theme": "default"
+    "theme": "shortAudioFiles"
   },
   "guidelines": {
     "showExampleNumbers": false,

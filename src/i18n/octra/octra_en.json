@@ -75,7 +75,8 @@
     "skip silence": "skip silence",
     "good": "Good",
     "bad": "Bad",
-    "middle": "Middle"
+    "middle": "Middle",
+    "insert comment": "Insert comment here... (optional)"
   },
   "bug report": {
     "give feedback": "Give feedback",

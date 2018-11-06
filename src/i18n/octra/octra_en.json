@@ -76,7 +76,8 @@
     "good": "Good",
     "bad": "Bad",
     "middle": "Middle",
-    "insert comment": "Insert comment here... (optional)"
+    "insert comment": "Insert comment here... (optional)",
+    "password": "Passwort"
   },
   "bug report": {
     "give feedback": "Give feedback",

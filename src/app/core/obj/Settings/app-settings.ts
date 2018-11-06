@@ -23,7 +23,8 @@ export interface AppSettings {
     },
     allowed_browsers: any[],
     allowed_projects: {
-      name: string
+      name: string,
+      password: string
     }[],
     languages: string[]
   };

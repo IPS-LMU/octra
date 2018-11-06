@@ -14,7 +14,8 @@ import 'rxjs/add/operator/catch';
 import {ModalService} from '../../modals/modal.service';
 import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
 import {AppInfo} from '../../../app.info';
-import {FileSize, Functions} from '../../shared/Functions';
+import {FileSize, Functions, isNullOrUndefined} from '../../shared/Functions';
+import {sha256} from 'js-sha256';
 
 @Component({
   selector: 'app-login',
@@ -61,7 +62,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     id: '',
     agreement: '',
     project: '',
-    jobno: ''
+    jobno: '',
+    password: ''
   };
   err = '';
   private subscrmanager: SubscriptionManager;
@@ -251,103 +253,108 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     let new_session_after_old = false;
     let continue_session = false;
 
-    if ((this.member.jobno === null || this.member.jobno === undefined) || this.member.jobno === '') {
-      this.member.jobno = '0';
-    }
-
-    if (this.appStorage.sessionfile !== null) {
-      // last was offline mode, begin new Session
-      new_session = true;
-
+    if (!this.isPasswordCorrect(this.member.project, this.member.password)) {
+      this.modService.show('login_invalid');
     } else {
-      if (!(this.appStorage.data_id === null || this.appStorage.data_id === undefined) && typeof this.appStorage.data_id === 'number') {
-        // last session was online session
-        // check if credentials are available
-        if (
-          !(this.appStorage.user.project === null || this.appStorage.user.project === undefined) &&
-          !(this.appStorage.user.jobno === null || this.appStorage.user.jobno === undefined) &&
-          !(this.appStorage.user.id === null || this.appStorage.user.id === undefined)
-        ) {
-          // check if credentials are the same like before
-          if (
-            this.appStorage.user.id === this.member.id &&
-            Number(this.appStorage.user.jobno) === Number(this.member.jobno) &&
-            this.appStorage.user.project === this.member.project
-          ) {
-            continue_session = true;
-          } else {
-            new_session_after_old = true;
-          }
-        }
-      } else {
-        new_session = true;
+
+      if ((this.member.jobno === null || this.member.jobno === undefined) || this.member.jobno === '') {
+        this.member.jobno = '0';
       }
-    }
 
-    if (new_session_after_old) {
-      this.setOnlineSessionToFree(
-        () => {
-          this.createNewSession(form);
-        }
-      );
-    }
+      if (this.appStorage.sessionfile !== null) {
+        // last was offline mode, begin new Session
+        new_session = true;
 
-    if (new_session) {
-      this.createNewSession(form);
-    } else if (continue_session) {
-      this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
-        (json) => {
-          if (json.hasOwnProperty('message')) {
-            const counter = (json.message === '') ? '0' : json.message;
-            this.appStorage.sessStr.store('jobs_left', Number(counter));
-          }
-
-          if (form.valid && this.agreement_checked
-            && json.message !== '0'
+      } else {
+        if (!(this.appStorage.data_id === null || this.appStorage.data_id === undefined) && typeof this.appStorage.data_id === 'number') {
+          // last session was online session
+          // check if credentials are available
+          if (
+            !(this.appStorage.user.project === null || this.appStorage.user.project === undefined) &&
+            !(this.appStorage.user.jobno === null || this.appStorage.user.jobno === undefined) &&
+            !(this.appStorage.user.id === null || this.appStorage.user.id === undefined)
           ) {
-            if (this.appStorage.sessionfile !== null) {
-              // last was offline mode
-              this.appStorage.clearLocalStorage().catch((err) => {
-                console.error(err);
-              });
+            // check if credentials are the same like before
+            if (
+              this.appStorage.user.id === this.member.id &&
+              Number(this.appStorage.user.jobno) === Number(this.member.jobno) &&
+              this.appStorage.user.project === this.member.project
+            ) {
+              continue_session = true;
+            } else {
+              new_session_after_old = true;
+            }
+          }
+        } else {
+          new_session = true;
+        }
+      }
+
+      if (new_session_after_old) {
+        this.setOnlineSessionToFree(
+          () => {
+            this.createNewSession(form);
+          }
+        );
+      }
+
+      if (new_session) {
+        this.createNewSession(form);
+      } else if (continue_session) {
+        this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
+          (json) => {
+            if (json.hasOwnProperty('message')) {
+              const counter = (json.message === '') ? '0' : json.message;
+              this.appStorage.sessStr.store('jobs_left', Number(counter));
             }
 
-            if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
-              // get transcript data that already exists
-              if (json.data.hasOwnProperty('prompt')) {
-                const prompt = json.data.prompt;
+            if (form.valid && this.agreement_checked
+              && json.message !== '0'
+            ) {
+              if (this.appStorage.sessionfile !== null) {
+                // last was offline mode
+                this.appStorage.clearLocalStorage().catch((err) => {
+                  console.error(err);
+                });
+              }
 
-                if (prompt) {
-                  this.appStorage.prompttext = prompt;
-                }
-              } else if (json.data.hasOwnProperty('prompttext')) {
-                const prompt = json.data.prompttext;
+              if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
+                // get transcript data that already exists
+                if (json.data.hasOwnProperty('prompt')) {
+                  const prompt = json.data.prompt;
 
-                if (prompt) {
-                  this.appStorage.prompttext = prompt;
+                  if (prompt) {
+                    this.appStorage.prompttext = prompt;
+                  }
+                } else if (json.data.hasOwnProperty('prompttext')) {
+                  const prompt = json.data.prompttext;
+
+                  if (prompt) {
+                    this.appStorage.prompttext = prompt;
+                  }
                 }
+              } else {
+                this.appStorage.prompttext = '';
+              }
+
+              const res = this.appStorage.setSessionData(this.member, json.data.id, json.data.url);
+              if (res.error === '') {
+                this.navigate();
+              } else {
+                alert(res.error);
               }
             } else {
-              this.appStorage.prompttext = '';
+              this.modService.show('login_invalid');
             }
-
-            const res = this.appStorage.setSessionData(this.member, json.data.id, json.data.url);
-            if (res.error === '') {
-              this.navigate();
-            } else {
-              alert(res.error);
-            }
-          } else {
-            this.modService.show('login_invalid');
+          },
+          (error) => {
+            this.modService.show('error', {
+              text: 'Server cannot be requested. Please check if you are online.'
+            });
+            console.error(error);
           }
-        },
-        (error) => {
-          this.modService.show('error', {
-            text: 'Server cannot be requested. Please check if you are online.'
-          });
-          console.error(error);
-        }
-      ));
+        ));
+      }
     }
   }
 
@@ -540,5 +547,29 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     this.member.jobno = '0';
 
     this.onSubmit(this.loginform);
+  }
+
+  public isPasswordCorrect(selectedProject, password) {
+
+    const inputHash = sha256(password).toUpperCase();
+    const projectData = this.settingsService.app_settings.octra.allowed_projects.find((a) => {
+      return a.name === selectedProject;
+    });
+
+    if (!isNullOrUndefined(projectData)) {
+      if (projectData.hasOwnProperty('password') && projectData.password !== '') {
+        return projectData.password.toUpperCase() === inputHash;
+      }
+    }
+
+    return true;
+  }
+
+  passwordExists() {
+    const projectData = this.settingsService.app_settings.octra.allowed_projects.find((a) => {
+      return a.name === this.member.project;
+    });
+
+    return (!isNullOrUndefined(projectData) && projectData.hasOwnProperty('password')) && projectData.password !== '';
   }
 }

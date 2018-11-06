@@ -25,6 +25,17 @@
                     <form (ngSubmit)="onSubmit(f)" #f="ngForm">
                         <fieldset>
                             <div class="form-group">
+                                <label for="select111" class="control-label">
+                                    {{"general.select database" | translate}}
+                                </label>
+                                <select id="select111" class="form-control" #selection aria-describedby="databaseName"
+                                        [(ngModel)]="member.project" name="project" required>
+                                    <option value="">{{"general.select database" | translate}}</option>
+                                    <option *ngFor="let project of projects;" value="{{project}}">{{project}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
                                 <label for="login-id" class="control-label">
                                     {{ 'general.name' | translate}}
                                 </label>
@@ -35,16 +46,15 @@
                                        required
                                 />
                             </div>
-                            <div class="form-group">
-                                <label for="select111" class="control-label">
-                                    {{"general.select database" | translate}}
+                            <div class="form-group" *ngIf="passwordExists()">
+                                <label for="login-password" class="control-label">
+                                    {{ 'general.password' | translate}}
                                 </label>
-                                <select id="select111" class="form-control" #selection aria-describedby="databaseName"
-                                        [(ngModel)]="member.project" name="project" required>
-                                    <option value="">{{"general.select database" | translate}}</option>
-                                    <option *ngFor="let project of projects;" value="{{project}}">{{project}}
-                                    </option>
-                                </select>
+                                <input class="form-control" id="login-password" type="password"
+                                       aria-describedby="password"
+                                       name="login-password"
+                                       placeholder="{{ 'general.password' | translate }}" [(ngModel)]="member.password"
+                                />
                             </div>
                             <div class="form-group">
                                 <label for="jobno" class="control-label">

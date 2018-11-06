@@ -76,7 +76,8 @@
     "good": "Gut",
     "bad": "Schlecht",
     "middle": "Mittel",
-    "insert comment": "Kommentar hier eingeben... (optional)"
+    "insert comment": "Kommentar hier eingeben... (optional)",
+    "password": "Passwort"
   },
   "bug report": {
     "give feedback": "Feedback geben",

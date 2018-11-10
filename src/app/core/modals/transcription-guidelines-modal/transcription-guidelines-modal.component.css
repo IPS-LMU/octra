@@ -77,3 +77,13 @@ audio {
 .modal-dialog.modal-lg {
     max-width: 1200px;
 }
+
+.table td {
+    padding: 5px !important;
+    font-size: 0.9em;
+}
+
+.table thead td {
+    font-weight: bold;
+    text-align: center;
+}

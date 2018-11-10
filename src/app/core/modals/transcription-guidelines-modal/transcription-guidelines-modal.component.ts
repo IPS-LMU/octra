@@ -1,16 +1,28 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SecurityContext,
+  ViewChild,
+  ViewEncapsulation
+} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs/Subject';
 import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import {TranslateService} from '@ngx-translate/core';
+import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-transcription-guidelines-modal',
   templateUrl: './transcription-guidelines-modal.component.html',
   styleUrls: ['./transcription-guidelines-modal.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None
 })
 
 export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges {
@@ -34,7 +46,7 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
 
   constructor(private modalService: BsModalService, private lang: TranslateService, public transcrService: TranscriptionService,
               private appStorage: AppStorageService, private bugService: BugReportService, private settService: SettingsService,
-              private cd: ChangeDetectorRef) {
+              private cd: ChangeDetectorRef, private sanitizer: DomSanitizer) {
   }
 
   ngOnInit() {
@@ -187,5 +199,18 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
     } else {
       this.shown_guidelines = JSON.parse(JSON.stringify(this.guidelines));
     }
+  }
+
+  public getGuidelineHTML(text): SafeHtml {
+    let html = text;
+    if (text.indexOf('{{') > -1) {
+      html = text.replace(/{{([^{}]+)}}/g, (g0, g1) => {
+        return this.transcrService.rawToHTML(g1).replace(/(<p>)|(<\/p>)|(<br\/>)/g, '');
+      });
+    } else {
+      html = `${html}`;
+    }
+
+    return this.sanitizer.sanitize(SecurityContext.HTML, html);
   }
 }

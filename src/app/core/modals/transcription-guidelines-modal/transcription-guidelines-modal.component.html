@@ -54,9 +54,9 @@
                                     </div>
                                     <div class="col-8">
                                         <span class="guidelines-title" (click)="toggle(j,k)">{{entry.title}}</span>
-                                        <p class="guidelines-descr" [collapse]="collapsed[j][k]">
-                                            {{entry.description}}
-                                        </p>
+                                        <div class="guidelines-descr" [collapse]="collapsed[j][k]"
+                                             [innerHTML]="getGuidelineHTML(entry.description)">
+                                        </div>
                                         <div class="row entry-row" [collapse]="collapsed[j][k]">
                                             <div *ngIf="entry.examples.length > 0" class="col-md-12">
                                                 <div *ngFor="let example of entry.examples; let i = index;"
@@ -101,7 +101,7 @@
                                                                     [src]="example.url"/></a>
                                                         </div>
                                                         <div class="text">
-                                                            <code [innerHTML]="transcrService.rawToHTML(example.annotation)"></code>
+                                                            <div [innerHTML]="getGuidelineHTML(example.annotation)"></div>
                                                         </div>
                                                     </div>
                                                 </div>

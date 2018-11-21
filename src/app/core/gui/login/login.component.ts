@@ -320,48 +320,57 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         } else {
           this.api.fetchAnnotation(this.appStorage.data_id).then((json) => {
 
-            if (json.hasOwnProperty('message')) {
-              const counter = (json.message === '') ? '0' : json.message;
-              this.appStorage.sessStr.store('jobs_left', Number(counter));
-            }
+            if (isNullOrUndefined(json.data)) {
+              // job doesn't exist anymore
+              this.createNewSession(form);
+            } else {
+              // continue job
 
-            if (form.valid && this.agreement_checked
-              && json.message !== '0'
-            ) {
-              if (this.appStorage.sessionfile !== null) {
-                // last was offline mode
-                this.appStorage.clearLocalStorage().catch((err) => {
-                  console.error(err);
-                });
+              if (json.hasOwnProperty('message')) {
+                const counter = (json.message === '') ? '0' : json.message;
+                this.appStorage.sessStr.store('jobs_left', Number(counter));
               }
 
-              if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
-                // get transcript data that already exists
-                if (json.data.hasOwnProperty('prompt')) {
-                  const prompt = json.data.prompt;
+              if (form.valid && this.agreement_checked
+                && json.message !== '0'
+              ) {
+                if (this.appStorage.sessionfile !== null) {
+                  // last was offline mode
+                  this.appStorage.clearLocalStorage().catch((err) => {
+                    console.error(err);
+                  });
+                }
 
-                  if (prompt) {
-                    this.appStorage.prompttext = prompt;
-                  }
-                } else if (json.data.hasOwnProperty('prompttext')) {
-                  const prompt = json.data.prompttext;
+                if (this.appStorage.usemode === 'online'
+                  && (json.data.hasOwnProperty('prompt')
+                    || json.data.hasOwnProperty('prompttext'))) {
+                  // get transcript data that already exists
+                  if (json.data.hasOwnProperty('prompt')) {
+                    const prompt = json.data.prompt;
 
-                  if (prompt) {
-                    this.appStorage.prompttext = prompt;
+                    if (prompt) {
+                      this.appStorage.prompttext = prompt;
+                    }
+                  } else if (json.data.hasOwnProperty('prompttext')) {
+                    const prompt = json.data.prompttext;
+
+                    if (prompt) {
+                      this.appStorage.prompttext = prompt;
+                    }
                   }
+                } else {
+                  this.appStorage.prompttext = '';
+                }
+
+                const res = this.appStorage.setSessionData(this.member, this.appStorage.data_id, this.appStorage.audio_url);
+                if (res.error === '') {
+                  this.navigate();
+                } else {
+                  alert(res.error);
                 }
               } else {
-                this.appStorage.prompttext = '';
+                this.modService.show('login_invalid');
               }
-
-              const res = this.appStorage.setSessionData(this.member, json.data.id, json.data.url);
-              if (res.error === '') {
-                this.navigate();
-              } else {
-                alert(res.error);
-              }
-            } else {
-              this.modService.show('login_invalid');
             }
           }).catch((error) => {
             this.modService.show('error', {
@@ -564,15 +573,16 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   public isPasswordCorrect(selectedProject, password) {
+    if (!isNullOrUndefined(this.settingsService.app_settings.octra.allowed_projects)) {
+      const inputHash = sha256(password).toUpperCase();
+      const projectData = this.settingsService.app_settings.octra.allowed_projects.find((a) => {
+        return a.name === selectedProject;
+      });
 
-    const inputHash = sha256(password).toUpperCase();
-    const projectData = this.settingsService.app_settings.octra.allowed_projects.find((a) => {
-      return a.name === selectedProject;
-    });
-
-    if (!isNullOrUndefined(projectData)) {
-      if (projectData.hasOwnProperty('password') && projectData.password !== '') {
-        return projectData.password.toUpperCase() === inputHash;
+      if (!isNullOrUndefined(projectData)) {
+        if (projectData.hasOwnProperty('password') && projectData.password !== '') {
+          return projectData.password.toUpperCase() === inputHash;
+        }
       }
     }
 
@@ -580,10 +590,14 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   passwordExists() {
-    const projectData = this.settingsService.app_settings.octra.allowed_projects.find((a) => {
-      return a.name === this.member.project;
-    });
+    if (!isNullOrUndefined(this.settingsService.app_settings.octra.allowed_projects)) {
+      const projectData = this.settingsService.app_settings.octra.allowed_projects.find((a) => {
+        return a.name === this.member.project;
+      });
 
-    return (!isNullOrUndefined(projectData) && projectData.hasOwnProperty('password')) && projectData.password !== '';
+      return (!isNullOrUndefined(projectData) && projectData.hasOwnProperty('password')) && projectData.password !== '';
+    }
+
+    return false;
   }
 }

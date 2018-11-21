@@ -112,6 +112,7 @@ import {BrowserTestComponent} from './core/gui/browser-test/browser-test.compone
 import {NavbarService} from './core/gui/navbar/navbar.service';
 import {CompatibilityService} from './core/shared/service/compatibility.service';
 import {TranscriptionFeedbackComponent} from './core/gui/transcription-feedback/transcription-feedback.component';
+import {GuidelinesComponent} from './core/gui/guidelines/guidelines.component';
 
 library.add(
   faSpinner, faCheck, faTimes, faTrash, faExclamationCircle, faInfoCircle, faDownload, faHeadphones, faPrint, faSearch, faExclamationTriangle,
@@ -174,6 +175,7 @@ export const ngmodule = {
     ShortcutsModalComponent,
     TranscriptionSuccessModalComponent,
     TranscriptionGuidelinesModalComponent,
+    GuidelinesComponent,
     BrowserTestComponent,
     TranscriptionFeedbackComponent
   ],

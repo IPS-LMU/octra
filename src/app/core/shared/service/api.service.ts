@@ -3,6 +3,7 @@ import {API} from '../../obj/API/api.interface';
 import {DomSanitizer} from '@angular/platform-browser';
 import {Observable} from 'rxjs/Observable';
 import {HttpClient} from '@angular/common/http';
+import {isNullOrUndefined} from '../Functions';
 
 @Injectable()
 export class APIService implements API {
@@ -210,20 +211,23 @@ export class APIService implements API {
     // check if old annotation is already annotated
     return new Promise<void>((resolve, reject) => {
       this.fetchAnnotation(appStorage.data_id).then((json) => {
-        if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
-          this.closeSession(appStorage.user.id, appStorage.data_id, '').then(() => {
+        if (!isNullOrUndefined(json) && !isNullOrUndefined(json.data)) {
+          if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
+            this.closeSession(appStorage.user.id, appStorage.data_id, '').then(() => {
+              resolve();
+            }).catch((error) => {
+              reject(error);
+            });
+          } else {
             resolve();
-          }).catch((error) => {
-            reject(error);
-          });
+          }
         } else {
+          // json data is null or undefined, ignore
           resolve();
         }
       }).catch((error) => {
         console.error(error);
       });
-    }).then(() => {
-    }).catch((error) => {
     });
   }
 }

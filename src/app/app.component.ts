@@ -118,24 +118,19 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
   }
 
   test(id: string) {
-    this.subscrmanager.add(
-      this.api.fetchAnnotation(Number(id)).subscribe(
-        (result) => {
-          console.log(result);
-        }
-      )
-    );
+    this.api.fetchAnnotation(Number(id)).then((json) => {
+      console.log(json);
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   reset(id: string) {
-
-    this.subscrmanager.add(
-      this.api.closeSession('julian_test', Number(id), '').subscribe(
-        (result) => {
-          console.log(result);
-        }
-      )
-    );
+    this.api.closeSession('julian_test', Number(id), '').then((json) => {
+      console.log(json);
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   queryParamsSet(route: ActivatedRoute): boolean {

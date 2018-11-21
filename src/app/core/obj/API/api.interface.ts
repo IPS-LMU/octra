@@ -1,15 +1,12 @@
-import {Observable} from 'rxjs/Observable';
-import {Response} from '@angular/http';
-
 /***
  * API Interface which have to be implemented by an API Service
  */
 export interface API {
-  beginSession(project: string, annotator: string, jobno: number, errorhandler: any, password?: string): Observable<Response>;
+  beginSession(project: string, annotator: string, jobno: number, errorhandler: any, password?: string): Promise<any>;
 
-  continueSession(project: string, annotator: string, jobno: number, errorhandler: any): Observable<Response>;
+  continueSession(project: string, annotator: string, jobno: number, errorhandler: any): Promise<any>;
 
-  fetchAnnotation(id: number): Observable<Response>;
+  fetchAnnotation(id: number): Promise<any>;
 
   saveSession(transcript: any[],
               project: string,
@@ -19,7 +16,7 @@ export interface API {
               status: string,
               comment: string,
               quality: any,
-              log: any[]): Observable<Response>;
+              log: any[]): Promise<any>;
 
   lockSession(transcript: any[],
               project: string,
@@ -28,14 +25,14 @@ export interface API {
               data_id: number,
               comment: string,
               quality: any,
-              log: any[]): Observable<Response>;
+              log: any[]): Promise<any>;
 
   unlockSession(project: string,
-                data_id: number): Observable<Response>;
+                data_id: number): Promise<any>;
 
-  closeSession(annotator: string, id: number, comment: string): Observable<Response>;
+  closeSession(annotator: string, id: number, comment: string): Promise<any>;
 
   getAudioURL(dir: string, src: string): string;
 
-  post(json: any, errorhandler: any): Observable<Response>;
+  post(json: any, errorhandler: any): Promise<any>;
 }

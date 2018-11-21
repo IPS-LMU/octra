@@ -7,7 +7,7 @@
     "version": "1.0",
     "date": "2018-10-28",
     "encoding": "UTF-8",
-    "validation_url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/config/localmode/functions.js"
+    "validation_url": "config/localmode/functions.js"
   },
   "instructions": [
     {

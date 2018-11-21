@@ -43,7 +43,7 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
         }
       );
     } else if (this.appStorage.usemode === 'online') {
-      this.api.setOnlineSessionToFree(this.appStorage, () => {
+      this.api.setOnlineSessionToFree(this.appStorage).then(() => {
         this.appStorage.clearAnnotationData().then(() => {
           this.appStorage.clearLoggingData();
         }).then(() => {
@@ -54,6 +54,8 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
             document.location.reload(true);
           }
         );
+      }).catch((error) => {
+        console.error(error);
       });
     } else if (this.appStorage.usemode === 'url') {
       this.appStorage.clearAnnotationData().then(() => {

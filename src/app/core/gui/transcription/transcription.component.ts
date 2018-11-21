@@ -170,7 +170,7 @@ export class TranscriptionComponent implements OnInit,
 
       this.transcrService.endTranscription();
 
-      this.api.setOnlineSessionToFree(this.appStorage, () => {
+      this.api.setOnlineSessionToFree(this.appStorage).then(() => {
         Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).then(() => {
           this.appStorage.clearSession();
 
@@ -180,6 +180,8 @@ export class TranscriptionComponent implements OnInit,
             console.error(error);
           });
         });
+      }).catch((error) => {
+        console.error(error);
       });
     } else {
       this.modService.show('transcription_stop').then((answer: TranscriptionStopModalAnswer) => {
@@ -442,30 +444,25 @@ export class TranscriptionComponent implements OnInit,
       }
     }
 
+    this.api.saveSession(json.transcript, json.project, json.annotator,
+      json.jobno, json.id, json.status, json.comment, json.quality, json.log).then((result) => {
+      if (result !== null) {
+        this.appStorage.submitted = true;
 
-    this.subscrmanager.add(this.api.saveSession(json.transcript, json.project, json.annotator,
-      json.jobno, json.id, json.status, json.comment, json.quality, json.log)
-      .catch(this.onSendError)
-      .subscribe((result) => {
-          if (result !== null) {
-            this.appStorage.submitted = true;
+        setTimeout(() => {
+          this.transcrSendingModal.close();
 
-            setTimeout(() => {
-              this.transcrSendingModal.close();
+          // only if opened
+          this.modal_overview.close();
 
-              // only if opened
-              this.modal_overview.close();
-
-              this.nextTranscription(result);
-            }, 500);
-          } else {
-            this.send_error = this.langService.instant('send error');
-          }
-        },
-        (error) => {
-          console.error(error);
-        }
-      ));
+          this.nextTranscription(result);
+        }, 500);
+      } else {
+        this.send_error = this.langService.instant('send error');
+      }
+    }).catch((error) => {
+      this.onSendError(error);
+    });
   }
 
   onSendButtonClick() {

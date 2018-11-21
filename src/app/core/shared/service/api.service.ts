@@ -12,7 +12,7 @@ export class APIService implements API {
               private sanitizer: DomSanitizer) {
   }
 
-  public beginSession(project: string, annotator: string, jobno: number, password?: string): Observable<any> {
+  public beginSession(project: string, annotator: string, jobno: number, password?: string): Promise<any> {
     // validation
     if (project !== '' && (annotator !== '')) {
 
@@ -28,7 +28,7 @@ export class APIService implements API {
     throw new Error('beginSession - validation false');
   }
 
-  public continueSession(project: string, annotator: string, jobno: number): Observable<any> {
+  public continueSession(project: string, annotator: string, jobno: number): Promise<any> {
     if (project !== null && project !== '' &&
       annotator !== null && annotator !== ''
     ) {
@@ -44,7 +44,7 @@ export class APIService implements API {
     }
   }
 
-  public fetchAnnotation(id: number): Observable<any> {
+  public fetchAnnotation(id: number): Promise<any> {
     const cmd_json = {
       querytype: 'fetchannotation',
       id: id
@@ -53,7 +53,7 @@ export class APIService implements API {
   }
 
   public lockSession(transcript: any[], project: string, annotator: string, jobno: number,
-                     data_id: number, comment: string, quality: any, log: any[]): Observable<any> {
+                     data_id: number, comment: string, quality: any, log: any[]): Promise<any> {
     if (
       project !== '' &&
       transcript.length > 0 &&
@@ -85,7 +85,7 @@ export class APIService implements API {
    * @returns {Observable<any>}
    */
   public unlockSession(project: string,
-                       data_id: number): Observable<any> {
+                       data_id: number): Promise<any> {
     if (
       project !== ''
     ) {
@@ -108,7 +108,7 @@ export class APIService implements API {
   }
 
   public saveSession(transcript: any[], project: string, annotator: string, jobno: number, data_id: number,
-                     status: string, comment: string, quality: any, log: any[]): Observable<any> {
+                     status: string, comment: string, quality: any, log: any[]): Promise<any> {
     if (
       project !== '' &&
       transcript.length > 0 &&
@@ -133,7 +133,7 @@ export class APIService implements API {
     }
   }
 
-  public closeSession(annotator: string, id: number, comment: string): Observable<any> {
+  public closeSession(annotator: string, id: number, comment: string): Promise<any> {
     comment = (comment) ? comment : '';
 
     if (
@@ -174,11 +174,18 @@ export class APIService implements API {
     return this.post(cmd_json);
   }
 
-  public post(json: any): Observable<any> {
+  public post(json: any): Promise<any> {
     const body = JSON.stringify(json);
 
-    return this.http.post(this.server_url, body, {
-      responseType: 'json'
+    return new Promise<void>((resolve, reject) => {
+      this.http.post(this.server_url, body, {
+        responseType: 'json'
+      }).subscribe((obj) => {
+          resolve(<any> obj);
+        },
+        (err) => {
+          reject(err);
+        });
     });
   }
 
@@ -187,7 +194,7 @@ export class APIService implements API {
     this.server_url = sanitized_url;
   }
 
-  public sendBugReport(email: string = '', description: string = '', log: any): Observable<any> {
+  public sendBugReport(email: string = '', description: string = '', log: any): Promise<any> {
     const json = JSON.stringify(log);
 
     const cmd_json = {
@@ -199,24 +206,24 @@ export class APIService implements API {
     return this.post(cmd_json);
   }
 
-  public setOnlineSessionToFree = (appStorage, callback: () => void) => {
+  public setOnlineSessionToFree: (appStorageService) => Promise<void> = (appStorage) => {
     // check if old annotation is already annotated
-    this.fetchAnnotation(appStorage.data_id).subscribe(
-      (json) => {
+    return new Promise<void>((resolve, reject) => {
+      this.fetchAnnotation(appStorage.data_id).then((json) => {
         if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
-          this.closeSession(appStorage.user.id, appStorage.data_id, '').subscribe(
-            (result2) => {
-              callback();
-            }
-          );
+          this.closeSession(appStorage.user.id, appStorage.data_id, '').then(() => {
+            resolve();
+          }).catch((error) => {
+            reject(error);
+          });
         } else {
-          callback();
+          resolve();
         }
-      },
-      () => {
-        // ignore error because this isn't important
-        callback();
-      }
-    );
-  };
+      }).catch((error) => {
+        console.error(error);
+      });
+    }).then(() => {
+    }).catch((error) => {
+    });
+  }
 }

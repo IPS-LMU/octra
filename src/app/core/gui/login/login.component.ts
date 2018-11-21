@@ -16,6 +16,7 @@ import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcr
 import {AppInfo} from '../../../app.info';
 import {FileSize, Functions, isNullOrUndefined} from '../../shared/Functions';
 import {sha256} from 'js-sha256';
+import {throwError} from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -236,7 +237,11 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         }));
       }
     }).then(() => {
-      this.loadPojectsList();
+      this.settingsService.loadProjectSettings().then(() => {
+        this.loadPojectsList();
+      }).catch((error) => {
+        console.error(error);
+      });
     });
 
   }
@@ -301,59 +306,97 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       if (new_session) {
         this.createNewSession(form);
       } else if (continue_session) {
-        this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
-          (json) => {
-            if (json.hasOwnProperty('message')) {
-              const counter = (json.message === '') ? '0' : json.message;
-              this.appStorage.sessStr.store('jobs_left', Number(counter));
-            }
+        if (this.settingsService.isTheme('shortAudioFiles')) {
+          // create new session
 
-            if (form.valid && this.agreement_checked
-              && json.message !== '0'
-            ) {
-              if (this.appStorage.sessionfile !== null) {
-                // last was offline mode
-                this.appStorage.clearLocalStorage().catch((err) => {
-                  console.error(err);
-                });
+          // check if annotation is annotated
+          new Promise<void>((resolve, reject) => {
+            if (!isNullOrUndefined(this.appStorage.data_id)) {
+              this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
+                (entry) => {
+                  console.log(`status: ${entry.data.status}`);
+                  if (entry.data.status === 'ANNOTATED' || entry.data.status === 'FREE') {
+                    resolve();
+                  } else {
+                    // reset annotation
+                    console.log(`reset annotation`);
+                    this.subscrmanager.add(this.api.closeSession(this.member.id, this.appStorage.data_id, '').subscribe(
+                      () => {
+                        resolve();
+                      },
+                      () => {
+                        resolve();
+                      }
+                    ));
+                  }
+                },
+                (err) => {
+                  reject(err);
+                }));
+            } else {
+              resolve();
+            }
+          }).then(() => {
+            // all prepared, create new session
+            this.createNewSession(form);
+          }).catch((error) => {
+            console.error(error);
+          });
+        } else {
+          this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
+            (json) => {
+              if (json.hasOwnProperty('message')) {
+                const counter = (json.message === '') ? '0' : json.message;
+                this.appStorage.sessStr.store('jobs_left', Number(counter));
               }
 
-              if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
-                // get transcript data that already exists
-                if (json.data.hasOwnProperty('prompt')) {
-                  const prompt = json.data.prompt;
+              if (form.valid && this.agreement_checked
+                && json.message !== '0'
+              ) {
+                if (this.appStorage.sessionfile !== null) {
+                  // last was offline mode
+                  this.appStorage.clearLocalStorage().catch((err) => {
+                    console.error(err);
+                  });
+                }
 
-                  if (prompt) {
-                    this.appStorage.prompttext = prompt;
-                  }
-                } else if (json.data.hasOwnProperty('prompttext')) {
-                  const prompt = json.data.prompttext;
+                if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
+                  // get transcript data that already exists
+                  if (json.data.hasOwnProperty('prompt')) {
+                    const prompt = json.data.prompt;
 
-                  if (prompt) {
-                    this.appStorage.prompttext = prompt;
+                    if (prompt) {
+                      this.appStorage.prompttext = prompt;
+                    }
+                  } else if (json.data.hasOwnProperty('prompttext')) {
+                    const prompt = json.data.prompttext;
+
+                    if (prompt) {
+                      this.appStorage.prompttext = prompt;
+                    }
                   }
+                } else {
+                  this.appStorage.prompttext = '';
+                }
+
+                const res = this.appStorage.setSessionData(this.member, json.data.id, json.data.url);
+                if (res.error === '') {
+                  this.navigate();
+                } else {
+                  alert(res.error);
                 }
               } else {
-                this.appStorage.prompttext = '';
+                this.modService.show('login_invalid');
               }
-
-              const res = this.appStorage.setSessionData(this.member, json.data.id, json.data.url);
-              if (res.error === '') {
-                this.navigate();
-              } else {
-                alert(res.error);
-              }
-            } else {
-              this.modService.show('login_invalid');
+            },
+            (error) => {
+              this.modService.show('error', {
+                text: 'Server cannot be requested. Please check if you are online.'
+              });
+              console.error(error);
             }
-          },
-          (error) => {
-            this.modService.show('error', {
-              text: 'Server cannot be requested. Please check if you are online.'
-            });
-            console.error(error);
-          }
-        ));
+          ));
+        }
       }
     }
   }
@@ -466,7 +509,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   private createNewSession(form: NgForm) {
     this.subscrmanager.add(this.api.beginSession(this.member.project, this.member.id, Number(this.member.jobno)).catch((error) => {
       alert('Server cannot be requested. Please check if you are online.');
-      return Observable.throw(error);
+      return throwError(error);
     }).subscribe(
       (json) => {
         if (form.valid && this.agreement_checked

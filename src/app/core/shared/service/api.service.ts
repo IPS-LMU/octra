@@ -18,6 +18,7 @@ export class APIService implements API {
 
       const cmd_json = {
         querytype: 'startannotation',
+        annotator: annotator,
         project: project,
         jobno: jobno
       };
@@ -136,7 +137,7 @@ export class APIService implements API {
     comment = (comment) ? comment : '';
 
     if (
-      annotator !== null && annotator !== '' &&
+      annotator !== null &&
       id !== null && id > -1) {
       const cmd_json = {
         querytype: 'endannotation',

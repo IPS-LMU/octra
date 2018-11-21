@@ -233,31 +233,37 @@ export class SettingsService {
       console.error(error.target.error);
     });
   }
-  public loadProjectSettings = () => {
-    this.loadSettings(
-      {
-        loading: 'Load project Settings...'
-      },
-      {
-        json: './config/localmode/projectconfig.json',
-        schema: './schemata/projectconfig.schema.json'
-      },
-      {
-        json: 'projectconfig.json',
-        schema: 'projectconfig.schema.json'
-      },
-      (result: ProjectSettings) => {
-        this._projectsettings = result;
-      },
-      () => {
-        Logger.log('Projectconfig loaded.');
-        this.projectsettingsloaded.emit(this._projectsettings);
-      },
-      (error) => {
-        Logger.err(error);
-      }
-    );
+
+  public loadProjectSettings: () => Promise<void> = () => {
+    return new Promise<void>((resolve, reject) => {
+      this.loadSettings(
+        {
+          loading: 'Load project Settings...'
+        },
+        {
+          json: './config/localmode/projectconfig.json',
+          schema: './schemata/projectconfig.schema.json'
+        },
+        {
+          json: 'projectconfig.json',
+          schema: 'projectconfig.schema.json'
+        },
+        (result: ProjectSettings) => {
+          this._projectsettings = result;
+        },
+        () => {
+          Logger.log('Projectconfig loaded.');
+          resolve();
+          this.projectsettingsloaded.emit(this._projectsettings);
+        },
+        (error) => {
+          Logger.err(error);
+          reject(error);
+        }
+      );
+    });
   }
+
   public loadGuidelines = (language: string, url: string) => {
     this.loadSettings(
       {
@@ -484,7 +490,10 @@ export class SettingsService {
    * @param theme
    */
   public isTheme(theme: string) {
-    const selectedTheme = (isNullOrUndefined(this.projectsettings.octra) || isNullOrUndefined(this.projectsettings.octra.theme))
+    const selectedTheme = (
+      isNullOrUndefined(this.projectsettings.octra)
+      || isNullOrUndefined(this.projectsettings.octra.theme)
+    )
       ? 'default' : this.projectsettings.octra.theme;
 
     return (selectedTheme === theme);

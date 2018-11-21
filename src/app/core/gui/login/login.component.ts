@@ -314,12 +314,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
             if (!isNullOrUndefined(this.appStorage.data_id)) {
               this.subscrmanager.add(this.api.fetchAnnotation(this.appStorage.data_id).subscribe(
                 (entry) => {
-                  console.log(`status: ${entry.data.status}`);
                   if (entry.data.status === 'ANNOTATED' || entry.data.status === 'FREE') {
                     resolve();
                   } else {
                     // reset annotation
-                    console.log(`reset annotation`);
                     this.subscrmanager.add(this.api.closeSession(this.member.id, this.appStorage.data_id, '').subscribe(
                       () => {
                         resolve();

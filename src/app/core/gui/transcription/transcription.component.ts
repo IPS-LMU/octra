@@ -118,8 +118,8 @@ export class TranscriptionComponent implements OnInit,
         if (!this.audiomanager.playonhover && !this.modal_overview.visible) {
           let caretpos = -1;
 
-          if (!(((<any> this.currentEditor.instance).editor) === null || ((<any> this.currentEditor.instance).editor) === undefined)) {
-            caretpos = (<any> this.currentEditor.instance).editor.caretpos;
+          if (!(((<any>this.currentEditor.instance).editor) === null || ((<any>this.currentEditor.instance).editor) === undefined)) {
+            caretpos = (<any>this.currentEditor.instance).editor.caretpos;
           }
 
           // make sure that events from playonhover are not logged
@@ -135,7 +135,8 @@ export class TranscriptionComponent implements OnInit,
         console.error(error);
       }));
 
-    this.interface = this.appStorage.Interface;
+    // TODO remove this case for later versions
+    this.interface = (this.appStorage.Interface === 'Editor without signal display') ? 'Dictaphone Editor' : this.appStorage.Interface;
 
   }
 
@@ -297,7 +298,7 @@ export class TranscriptionComponent implements OnInit,
 
     this.subscrmanager.add(this.transcrService.levelchanged.subscribe(
       (level: Level) => {
-        (<any> this.currentEditor.instance).update();
+        (<any>this.currentEditor.instance).update();
 
         // important: subscribe to level changes in order to save proceedings
         this.subscrmanager.remove(this.level_subscription_id);
@@ -396,12 +397,12 @@ export class TranscriptionComponent implements OnInit,
 
         let caretpos = -1;
 
-        if (!((<any> this.currentEditor.instance).editor === null || (<any> this.currentEditor.instance).editor === undefined)) {
-          caretpos = (<any> this.currentEditor.instance).editor.caretpos;
+        if (!((<any>this.currentEditor.instance).editor === null || (<any>this.currentEditor.instance).editor === undefined)) {
+          caretpos = (<any>this.currentEditor.instance).editor.caretpos;
         }
 
-        if ((<any> this.currentEditor.instance).hasOwnProperty('openModal')) {
-          this.subscrmanager.add((<any> this.currentEditor.instance).openModal.subscribe(() => {
+        if ((<any>this.currentEditor.instance).hasOwnProperty('openModal')) {
+          this.subscrmanager.add((<any>this.currentEditor.instance).openModal.subscribe(() => {
             this.modal_overview.open();
           }));
         }

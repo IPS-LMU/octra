@@ -15,12 +15,12 @@ import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 
 @Component({
   selector: 'app-audioplayer-gui',
-  templateUrl: './editor-w-signaldisplay.component.html',
-  styleUrls: ['./editor-w-signaldisplay.component.css']
+  templateUrl: './dictaphone-editor.component.html',
+  styleUrls: ['./dictaphone-editor.component.css']
 })
-export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
+export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
 
-  public static editorname = 'Editor without signal display';
+  public static editorname = 'Dictaphone Editor';
 
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
 
@@ -73,7 +73,7 @@ export class EditorWSignaldisplayComponent implements OnInit, OnDestroy, AfterVi
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.special_markers.boundary = true;
 
-    EditorWSignaldisplayComponent.initialized.emit();
+    DictaphoneEditorComponent.initialized.emit();
   }
 
   ngAfterViewInit() {

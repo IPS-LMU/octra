@@ -41,7 +41,7 @@ import {OctraDropzoneComponent} from './core/gui/octra-dropzone/octra-dropzone.c
 import {LoadeditorDirective} from './core/shared/directive/loadeditor.directive';
 import {NewsComponent} from './core/gui/news/news.component';
 import {FaqComponent} from './core/gui/faq/faq.component';
-import {EditorWSignaldisplayComponent, LinearEditorComponent, TwoDEditorComponent} from './editors';
+import {DictaphoneEditorComponent, LinearEditorComponent, TwoDEditorComponent} from './editors';
 import {HelpComponent} from './core/gui/help/';
 import {NewEditorComponent} from './editors/new-editor/new-editor.component';
 import {HelpToolsComponent} from './core/gui/help-tools/';
@@ -125,7 +125,7 @@ export function HttpLoaderFactory(http: HttpClient) {
 }
 
 export const EDITORS: any[] = [
-  EditorWSignaldisplayComponent,
+  DictaphoneEditorComponent,
   TwoDEditorComponent,
   LinearEditorComponent
 ];

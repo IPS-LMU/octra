@@ -83,8 +83,7 @@
     "give feedback": "Give feedback",
     "description": "Please tell us what you are thinking about OCTRA. What can we do better? Did you find any bugs?",
     "sent": "Your bug was successfully reported.",
-    "send protocol": "Add Protocol (recommended)",
-    "protocol": "Protocol"
+    "send protocol": "Add Protocol (recommended)"
   },
   "transcription": {
     "start": "Continue transcription",
@@ -102,8 +101,7 @@
     "with breaks": "Segments with breaks",
     "not transcribed": "Segments without content",
     "previous": "previous segment",
-    "next": "next segment",
-    "no guidelines found": "No guidelines found"
+    "next": "next segment"
   },
   "feedback": {
     "unintelligible": "unintelligible",

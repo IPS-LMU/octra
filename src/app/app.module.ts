@@ -99,7 +99,7 @@ import {faCopy, faTimesCircle} from '@fortawesome/free-regular-svg-icons';
 import {faCheckCircle} from '@fortawesome/free-regular-svg-icons/faCheckCircle';
 import {LoginInvalidModalComponent} from './core/modals/login-invalid-modal/login-invalid-modal.component';
 import {ErrorModalComponent} from './core/modals/error-modal/error-modal.component';
-import {ExportFilesModalComponent} from './core/modals/exported-files-modal/export-files-modal.component';
+import {ExportFilesModalComponent} from './core/modals/export-files-modal/export-files-modal.component';
 import {StatisticsModalComponent} from './core/modals/statistics-modal/statistics-modal.component';
 import {PromptModalComponent} from './core/modals/prompt-modal/prompt-modal.component';
 import {TranscriptionSendModalComponent} from './core/modals/transcription-send-modal/transcription-send-modal.component';

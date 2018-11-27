@@ -37,8 +37,11 @@ export class TextConverter extends Converter {
         result += '\n';
       }
 
-      filename = `${annotation.name}-${level.name}${this._extension}`;
-
+      filename = `${annotation.name}`;
+      if (annotation.levels.length > 1) {
+        filename += `-${level.name}`;
+      }
+      filename += `${this._extension}`;
     } else {
       console.error('TextConverter needs a level number');
       return null;

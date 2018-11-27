@@ -8,6 +8,7 @@ import {Converter, IFile} from '../../obj/Converters';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {OCTRANIMATIONS} from '../../shared';
 import {NavbarService} from '../../gui/navbar/navbar.service';
+import {isNullOrUndefined} from '../../shared/Functions';
 
 @Component({
   selector: 'app-export-files-modal',
@@ -85,7 +86,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
 
   onLineClick(converter: Converter, index: number) {
-    if (converter.multitiers) {
+    if (converter.multitiers || (!converter.multitiers && this.transcrService.annotation.levels.length === 1)) {
       this.updateParentFormat(converter);
     }
     this.toggleLine(index);
@@ -119,8 +120,8 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       };
       this.parentformat.download = this.transcrService.audiomanager.ressource.name + this.transcrService.audiomanager.ressource.extension;
 
-      window.URL = (((<any> window).URL) ||
-        ((<any> window).webkitURL) || false);
+      window.URL = (((<any>window).URL) ||
+        ((<any>window).webkitURL) || false);
 
       if (this.parentformat.uri !== null) {
         window.URL.revokeObjectURL(this.parentformat.uri.toString());
@@ -145,6 +146,10 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   }
 
   updateParentFormat(converter: Converter, levelnum?: number) {
+    if (isNullOrUndefined(levelnum) && !converter.multitiers) {
+      levelnum = 0;
+    }
+
     if (!this.preparing.preparing) {
       const oannotjson = this.navbarServ.transcrService.annotation.getObj(this.transcrService.audiomanager.sampleRateFactor,
         this.transcrService.audiomanager.originalInfo.duration.samples);
@@ -159,10 +164,11 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
         }
 
         const result: IFile = converter.export(oannotjson, this.navbarServ.transcrService.audiofile, levelnum).file;
+
         this.parentformat.download = result.name;
 
-        window.URL = (((<any> window).URL) ||
-          ((<any> window).webkitURL) || false);
+        window.URL = (((<any>window).URL) ||
+          ((<any>window).webkitURL) || false);
 
         if (this.parentformat.uri !== null) {
           window.URL.revokeObjectURL(this.parentformat.uri.toString());
@@ -186,8 +192,8 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       };
       this.parentformat.download = this.transcrService.audiofile.name + '.json';
 
-      window.URL = (((<any> window).URL) ||
-        ((<any> window).webkitURL) || false);
+      window.URL = (((<any>window).URL) ||
+        ((<any>window).webkitURL) || false);
 
       if (this.parentformat.uri !== null) {
         window.URL.revokeObjectURL(this.parentformat.uri.toString());

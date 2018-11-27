@@ -43,8 +43,10 @@
                             </td>
                         </tr>
                         <tr [@fadeToggle]="export_states[i]" *ngIf="converter.conversion.export">
-                            <td colspan="5" style="padding-left:20px;">
-                                <select #val *ngIf="navbarServ.transcrService !== undefined && !converter.multitiers"
+                            <td></td>
+                            <td colspan="4" style="padding-left:20px;">
+                                <select #val
+                                        *ngIf="navbarServ.transcrService !== undefined && !converter.multitiers && transcrService.annotation.levels.length > 1"
                                         (change)="onSelectionChange(converter, val.value)">
                                     <option value="">{{"general.select one tier" | translate}}</option>
                                     <option *ngFor="let level of navbarServ.transcrService.annotation.levels; let l = index;"

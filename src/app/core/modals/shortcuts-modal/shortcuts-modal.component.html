@@ -3,7 +3,8 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content" *ngIf="visible">
             <div class="modal-body">
-                <div *ngIf="editor == 'Editor without signal display'">
+                <!-- TODO remove old editor name in later versions -->
+                <div *ngIf="editor == 'Editor without signal display' || editor == 'Dictaphone Editor'">
                     <h3>{{"modal.shortcuts.audioplayer" | translate}}</h3>
                     <div *ngIf="keyMap.getEntryList('AP') !== null">
                         <table class="table table-striped">

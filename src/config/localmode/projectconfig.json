@@ -28,7 +28,7 @@
     "en"
   ],
   "interfaces": [
-    "Editor without signal display",
+    "Dictaphone Editor",
     "Linear Editor",
     "2D-Editor"
   ],

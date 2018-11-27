@@ -115,7 +115,7 @@
     "no noises": "no noises"
   },
   "interfaces": {
-    "simple editor": "Editor without signal display",
+    "simple editor": "Dictaphone Editor",
     "linear editor": "Linear Editor",
     "2D editor": "2D-Editor"
   },

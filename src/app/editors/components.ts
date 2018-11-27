@@ -1,11 +1,11 @@
 import {TwoDEditorComponent} from './2D-editor/2D-editor.component';
 import {LinearEditorComponent} from './linear-editor/linear-editor.component';
-import {EditorWSignaldisplayComponent} from './editor-without-signaldisplay/editor-w-signaldisplay.component';
+import {DictaphoneEditorComponent} from './dictaphone-editor/dictaphone-editor.component';
 
 export const EditorComponents = [
   {
-    name: EditorWSignaldisplayComponent.editorname,
-    editor: EditorWSignaldisplayComponent,
+    name: DictaphoneEditorComponent.editorname,
+    editor: DictaphoneEditorComponent,
     translate: 'interfaces.simple editor',
     icon: 'minus'
   },

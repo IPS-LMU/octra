@@ -14,7 +14,6 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/observable/timer';
 // other
 // import {AudioplayerService} from './audioplayer.service';
@@ -27,6 +26,7 @@ import {AudioService, KeymappingService} from '../../../../core/shared/service';
 import {BrowserInfo, Logger} from '../../../../core/shared';
 import {Line} from '../../../obj';
 import {AudioManager} from '../../../obj/media/audio/AudioManager';
+import {timer} from 'rxjs';
 
 @Component({
   selector: 'app-audioplayer',
@@ -225,7 +225,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
 
   ngOnInit() {
     this.anim = new CanvasAnimation(25);
-    this.timer = Observable.timer(0, 200);
+    this.timer = timer(0, 200);
 
     this.subscrmanager.add(this.audiochunk.statechange.subscribe(
       (state: PlayBackState) => {

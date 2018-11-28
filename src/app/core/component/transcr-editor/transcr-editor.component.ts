@@ -1098,6 +1098,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     console.log(`in text mouseover!`);
     if (!(jqueryObj.attr('data-samples') === null || jqueryObj.attr('data-samples') === undefined)) {
+      console.log(`on text mouse over target`);
       this.onSegmentBoundaryMouseOver(jqueryObj, event);
     } else if (!(jqueryObj.attr('data-errorcode') === null || jqueryObj.attr('data-errorcode') === undefined)) {
       this.onValidationErrorMouseOver(jqueryObj, event);
@@ -1108,7 +1109,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     const seg_popover = jQuery('.seg-popover');
     const width = seg_popover.width();
     const height = seg_popover.height();
-    const editor_pos = jQuery('.note-toolbar-wrapper').offset();
+    const editor_pos = jQuery('.note-toolbar').offset();
     const seg_samples = jqueryObj.attr('data-samples');
 
     if (!(seg_samples === null || seg_samples === undefined) && Functions.isNumber(seg_samples)) {

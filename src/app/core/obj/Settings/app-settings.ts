@@ -26,6 +26,13 @@ export interface AppSettings {
       name: string,
       password: string
     }[],
-    languages: string[]
+    languages: string[],
+    tracking: {
+      active: string
+      matomo: {
+        host: string,
+        siteID: number
+      }
+    }
   };
 }

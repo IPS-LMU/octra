@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0",
+  "version": "1.2.5",
   "audio_server": {
     "url": ""
   },
@@ -22,9 +22,17 @@
       "url": ""
     },
     "allowed_browsers": [],
+    "allowed_projects": [],
     "languages": [
       "de",
       "en"
-    ]
+    ],
+    "tracking": {
+      "active": "",
+      "matomo": {
+        "host": "",
+        "siteID": 0
+      }
+    }
   }
 }

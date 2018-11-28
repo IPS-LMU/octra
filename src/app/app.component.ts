@@ -7,6 +7,7 @@ import {AppInfo} from './app.info';
 import {environment} from '../environments/environment';
 import {ActivatedRoute, Router} from '@angular/router';
 import {NavigationComponent} from './core/gui/navbar';
+import {isNullOrUndefined} from './core/shared/Functions';
 
 @Component({
   selector: 'app-octra',
@@ -97,6 +98,12 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
 
     this.settingsService.loadApplicationSettings(this.route).then(() => {
       console.log(`Application settings loaded`);
+
+      if (!isNullOrUndefined(this.settingsService.app_settings.octra.tracking)
+        && !isNullOrUndefined(this.settingsService.app_settings.octra.tracking.active)
+        && this.settingsService.app_settings.octra.tracking.active !== '') {
+        this.appendTrackingCode(this.settingsService.app_settings.octra.tracking.active);
+      }
     }).catch((error) => {
       console.error(error);
     });
@@ -148,5 +155,47 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
     style.type = 'text/css';
     style.innerText = '.container {width:' + this.settingsService.responsive.fixedwidth + 'px}';
     head.appendChild(style);
+  }
+
+  private appendTrackingCode(type: string) {
+
+    if (type === 'matomo') {
+      if (!isNullOrUndefined(this.settingsService.app_settings.octra.tracking.matomo)
+        && !isNullOrUndefined(this.settingsService.app_settings.octra.tracking.matomo.host)
+        && !isNullOrUndefined(this.settingsService.app_settings.octra.tracking.matomo.siteID)) {
+        const piwikSettings = this.settingsService.app_settings.octra.tracking.matomo;
+
+        const trackingCode = `
+<!-- Piwik -->
+<script type="text/javascript">
+    if(window.location.host.lastIndexOf("localhost")==-1){ //execute if not on debug system
+        var _paq = _paq || [];
+        _paq.push([ 'trackPageView' ]);
+        _paq.push([ 'enableLinkTracking' ]);
+        (function() {
+            //var u = (("https:" == document.location.protocol) ? "https" : "http")
+            var u = "${piwikSettings.host}";
+            _paq.push([ 'setTrackerUrl', u + 'piwik.php' ]);
+            _paq.push([ 'setSiteId', ${piwikSettings.siteID}]);
+            var d = document;
+            var g = d.createElement('script');
+            var s = d.getElementsByTagName('script')[0];
+            g.type = 'text/javascript';
+            g.defer = true;
+            g.async = true;
+            g.src = u + 'piwik.js';
+            s.parentNode.insertBefore(g, s);
+            console.log("Sent statistics to piwik");
+        })();
+    }
+</script> `;
+
+        jQuery(trackingCode).insertAfter('main');
+      } else {
+        console.error(`attributes for piwik tracking in appconfig.json are invalid.`);
+      }
+    } else {
+      console.error(`tracking type ${type} is not supported.`);
+    }
   }
 }

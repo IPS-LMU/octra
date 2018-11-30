@@ -16,169 +16,24 @@
         {
           "code": "R01",
           "priority": 100,
-          "title": "Transcribe according to the german spelling",
-          "description": "Bei der Tranksription sollte die Deutsche Rechtschreibung nach Duden befolgt werden. Bei Unklarheiten bitte www.duden.de aufsuchen.",
+          "title": "Make use of correct spelling",
+          "description": "Please take attention to correct spelling.",
           "examples": [
-          ]
-        },
-        {
-          "code": "R02",
-          "priority": 100,
-          "title": "Zahlen ausschreiben",
-          "description": "Zahlen müssen so wie sie gesprochen werden ausgeschrieben werden, ab 100 in einzelnen Worten",
-          "examples": [
-            {
-              "annotation": "20: zwanzig",
-              "url":""
-            },
-            {
-              "annotation": "1991: neunzehn hundert und einundzeunzig",
-              "url":""
-            }
-          ]
-        },
-        {
-          "code": "R03",
-          "priority": 100,
-          "title": "Buchstabierfolgen als Folge von Großbuchstaben",
-          "description": "Buchstabierfolgen als Folge von Großbuchstaben, Rest orthografisch.",
-          "examples": [
-            {
-              "annotation": "A B B ß: A doppel B scharfes S",
-              "url":""
-            },
-            {
-              "annotation": "D: /D/",
-              "url": ""
-            }
           ]
         }
       ]
     },
     {
-      "group": "Zeichensetzung",
+      "group": "Punctuation",
       "entries": [
         {
-          "code": "Z01",
+          "code": "R06",
           "priority": 100,
-          "title": "Keine Satzzeichen",
-          "description": "keine Satzzeichen => keine Sätze im herkömmlichen Sinn; keine Spezialsymbole wie %, \", #. Ausnahme: Satzeichen in Wörtern, nicht zwischen Wörtern",
+          "title": "No punctuation characters",
+          "description": "Do not use any punctuation characters.",
           "examples": [
             {
-              "annotation": "Kein (.,!?;-)",
-              "url": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "group": "Groß und Kleinschreibung",
-      "entries": [
-        {
-          "code": "GK01",
-          "priority": 100,
-          "title": "Beachtung der Groß- und Kleinschreibung, auch bei Namen und Abkürzungen.",
-          "description": "Ausnahme: Personalpronomina, keine Großschreibung am Satzanfang.",
-          "examples": [
-            {
-              "annotation": "Josef, GmbH, AG",
-              "url": ""
-            },
-            {
-              "annotation": "Du, Sie, Ihr",
-              "url": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "group": "Komposita und Abkürzungen",
-      "entries": [
-        {
-          "code": "KA01",
-          "priority": 100,
-          "title": "Komposita und Abkürzungen nicht künstlich trennen",
-          "description": "Diese sollten nicht künstlich getrennt oder in Buchstabierform geschrieben werden.",
-          "examples": [
-            {
-              "annotation": "'SPD-Fraktionsvorsitzender' wenn gelesen ist ok",
-              "url": ""
-            },
-            {
-              "annotation": "'S P D Fraktionsvorsitzender' wenn gelesen ist NICHT ok",
-              "url": ""
-            },
-            {
-              "annotation": "'UdSSR' ok, wenn so in der Vorlage (gelesen)",
-              "url": ""
-            },
-            {
-              "annotation": "'U D S S R' ok, wenn so in der Vorlage (zB. beim Buchstabieren)",
-              "url": ""
-            },
-            {
-              "annotation": "'Adam J Krusenstern' ok, wenn Eigenname",
-              "url": ""
-            },
-            {
-              "annotation": "'Adam-J. Krusenstern' NICHT ok, wenn Eigenname",
-              "url": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "group": "Aussprache",
-      "entries": [
-        {
-          "code": "A01",
-          "priority": 100,
-          "title": "Bei falscher Aussprache, das erratene Wort mit * vorranstellen",
-          "description": "Bei falscher Aussprache, das erratene Wort mit * vorranstellen",
-          "examples": [
-            {
-              "annotation": "'achter vierter *fünfund nein sechsundneunzig' ist ok",
-              "url": ""
-            },
-            {
-              "annotation": "'[~abc]*chter vierter oder *sechsundneunz[abc~]' ist nicht ok",
-              "url": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "group": "Unverständliche Sprache",
-      "entries": [
-        {
-          "code": "US01",
-          "priority": 100,
-          "title": "Unverständliche Sprache",
-          "description": "Passagen unverständlicher Sprache mit ** markieren",
-          "examples": [
-            {
-              "annotation": "du bist ein solches ** wie ich noch nie eines getroffen habe",
-              "url": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "group": "Geräusche",
-      "entries": [
-        {
-          "code": "G01",
-          "priority": 100,
-          "title": "Geräuschmarker verwenden",
-          "description": "Bei Geräuschen müssen die Geräuschmarken verwendet werden. Ein Marker wird dabei an dem ersten Vorkommen eines Geräusches gesetzt, nicht aber zwischen Wörtern. Für weitere Informationen in der Toolbar des Editors mit der Maus über die Marker fahren. Mehrere gleiche Marker sollten nicht direkt aufeinander folgen.",
-          "examples": [
-            {
-              "annotation": "du bist ein solches ** wie ich noch nie eines getroffen habe",
+              "annotation": "Do not use any of <code>(.,!?;-)</code>",
               "url": ""
             }
           ]

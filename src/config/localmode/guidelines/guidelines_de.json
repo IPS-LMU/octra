@@ -2,39 +2,87 @@
   "meta": {
     "object_language": "deu",
     "language": "de",
-    "project": "Sprachstand",
-    "authors": "Sarah Faidt, Moiken Jessen, Natalia Kapica, Christian Meyer, Svenja Uth, Nicole Weidinger",
+    "project": "Sprecherinnen",
+    "authors": "Test Person (testperson@email.de)",
     "version": "1.0",
-    "date": "2018-10-28",
+    "date": "2017-04-10",
     "encoding": "UTF-8",
     "validation_url": "config/localmode/functions.js"
   },
   "instructions": [
     {
-      "group": "Allgemein",
+      "group": "Rechtschreibung",
       "entries": [
         {
-          "code": "A01",
+          "code": "R01",
           "priority": 100,
-          "title": "Arbeitsschritte",
-          "description": "Die Verschriftlichung erfolgt in zwei Durchgängen: 1.) Anhören des kompletten Signals und optionales Setzen von Segmentgrenzen (z.B. am Ende von Äußerungseinheiten, s. dazu Abschnitt 4.1: Einteilung von Äußerungseinheiten). 2.) Erneutes Anhören der einzelnen Signalsegmente, rein orthografische Verschriftung und Annotation mit Hilfe der Marker (s. Abschnitt 3.: Segmentierung des Audio-Signals und Annotation und 4.: Konventionen zur orthografischen Transkription).",
+          "title": "Rechtschreibung",
+          "description": "Die Transkription erfolgt nach den Regeln der deutschen Rechtschreibung nach Duden.",
           "examples": []
         },
         {
-          "code": "A02",
+          "code": "R02",
           "priority": 100,
-          "title": "Benutzung von Kopfhörern",
-          "description": "Die Sprachsignale müssen mit Kopfhörern in ruhiger Umgebung angehört werden.",
-          "examples": []
-        },
-        {
-          "code": "A03",
-          "priority": 100,
-          "title": "Syntax von Markern",
-          "description": "Marker beginnen immer mit '<' und schließen mit '>'",
+          "title": "verschliffene Formen",
+          "description": "verschliffene oder verkürzte Formen in der langen Form schreiben.",
           "examples": [
             {
-              "annotation": "Irgend ein anderes Beispiel. <code>{{Das ist ein test <unverständlich>}}</code> ok es klappt.",
+              "annotation": "\"gibt es\" für \"gibt's\" \"haben wir\" für \"hammwa\" usw.",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "code": "R03",
+          "priority": 100,
+          "title": "Leerzeichen",
+          "description": "Wörter durch einfache Leerzeichen trennen",
+          "examples": []
+        },
+        {
+          "code": "R04",
+          "priority": 100,
+          "title": "Buchstabierungen in Großbuchstaben",
+          "description": "Buchstaben als Großbuchstaben schreiben, Formatieranweisungen ausschreiben, phonetische Buchstabierung in Schrägstrichte.",
+          "examples": [
+            {
+              "annotation": "A B B ß: A doppel B scharfes S",
+              "url": ""
+            },
+            {
+              "annotation": "B wie in Buch: /b/ wie in Buch",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "code": "R05",
+          "priority": 100,
+          "title": "Groß- und Kleinschreibung",
+          "description": "Wörter unabhängig von der Position im Satz nach Wortart groß oder klein schreiben. Du, Höflichkeits-Sie und -Ihr groß schreiben. Namen und Abkürzungen wie üblich schreiben.",
+          "examples": [
+            {
+              "annotation": "heute ist schönes Frühlingswetter am blauen Himme ziehen die Wolken",
+              "url": ""
+            },
+            {
+              "annotation": "Josef, GmbH, AG",
+              "url": ""
+            },
+            {
+              "annotation": "Du, Sie, Ihr",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "code": "R06",
+          "priority": 100,
+          "title": "Keine Satzzeichen",
+          "description": "Keine Satzzeichen verwenden.",
+          "examples": [
+            {
+              "annotation": "Kein (.,!?;-)",
               "url": ""
             }
           ]
@@ -42,418 +90,85 @@
       ]
     },
     {
-      "group": "3.1 Segmentierung der Audio-Schnipsel",
+      "group": "Marker",
       "entries": [
         {
-          "code": "3.1.a)",
+          "code": "M01",
           "priority": 100,
-          "title": "Segmentierung der Audio-Schnipsel",
-          "description": "Zunächst ist das Audio-Signal unsegmentiert (ein Segment). Zur Vereinfachung der Transkription empfiehlt es sich, die Anfangs- und Endpunkte einzelner Passagen, z.B. bei Äußerungseinheiten (s. Abschnitt 4.1) oder schwer verständlichen Passagen, die mehrfaches Abhören erfordern, mit Hilfe von Segmentgrenzen zu markieren. Eine Unterteilung des Signals in Segmente ist optional und kann der Erleichterung des Transkriptionsprozesses dienen, ist aber keinesfalls notwendig (für Beispiele siehe Transkriptionsmanual 3.1).",
-          "examples": [
-          ]
-        },
-        {
-          "code": "3.1.b)",
-          "priority": 100,
-          "title": "Inhalt eines Segments",
-          "description": "Jedes Segment muss <b>verschriftet</b> bzw. durch einen Marker annotiert werden.<br/><ol><li>das ist ein test</li><li>ein anderer Test</li></ol>",
-          "examples": [
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel1.png"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "group": "3.2. Marker ohne Textergänzung",
-      "entries": [
-        {
-          "code": "3.2.1.",
-          "priority": 100,
-          "title": "<unverständlich>",
-          "description": "Unverständliche Wörter, die nicht rekonstruierbar sind (zu rekonstruierbaren Wörtern s. Abschnitt 3.2.6: <rekonstruierbar>), werden durch Setzen des Markers <unverständlich> verschriftet. Der Marker ersetzt das Gesagte komplett.",
-          "examples": [
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel2.png"
-            }
-          ]
-        },
-        {
-          "code": "3.2.2.",
-          "priority": 100,
-          "title": "<unvollständig>",
-          "description": "Der Marker <unvollständig> ersetzt abgebrochene, unvollständige einzelne Wörter (nicht abgebrochene Satzteile). Werden mehrere Wörter direkt nacheinander abgebrochen, reicht es, den Marker einmal zu setzen.",
-          "examples": [
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel3.png"
-            }
-          ]
-        },
-        {
-          "code": "3.2.3.",
-          "priority": 100,
-          "title": "<Füller>",
-          "description": "Artikulatorische Äußerungen, die kein Wort bilden (Füller), werden durch Setzen des Markers <Füller> verschriftet. Als Füller markiert werden bspw. Häsitationen („ähm“, „hm“, „äh“), Exklamationen („Oh!“, „Aha!“, „Hey!“) oder Lautmalereien („hui“).",
-          "examples": [
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel4a.png"
-            },
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel4b.png"
-            }
-          ]
-        },
-        {
-          "code": "3.2.4.",
-          "priority": 100,
-          "title": "<Geräusch>",
-          "description": "Externe, nicht vom Kind artikulierte Geräusche (z.B. Telefonklingeln, Sirene, Hintergrundgeräusche), die die Kindesäußerung unterbrechen oder den Sprachfluss beeinflussen, werden mit dem Marker <Geräusch> verschriftet. Geräusche werden nur markiert, wenn das Kind dadurch stark abgelenkt wird.",
-          "examples": [
-          ]
-        },
-        {
-          "code": "3.2.5.",
-          "priority": 100,
-          "title": "<leer>",
-          "description": "Enthält ein Audio-Schnipsel überhaupt keine sprachliche Reaktion des Kindes auf einen Prompt, wird der Marker <leer> für den gesamten Schnipsel gesetzt. Werden längere ungefüllte Pausen innerhalb eines Schnipsels, der Kindesäußerungen enthält, oder Systemansagen (also Wuschel-Äußerungen) zur Erleichterung des Transkriptionsprozesses als einzelne Segmente abgetrennt, so sind diese ebenfalls als <leer> zu markieren.",
-          "examples": [
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel5.png"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "group": "3.2 Marker mit Textergänzung",
-      "entries": [
-        {
-          "code": "3.2.6.",
-          "priority": 100,
-          "title": "<rekonstruierbar>",
-          "description": "Die Sprachproduktion weicht artikulatorisch nur gering vom Zielwort ab und das intendierte Zielwort ist ohne Kontext erkennbar (s. erstes Bsp.). Regelmäßige phonetisch-phonologische Fehler werden ebenfalls mit <rekonstruierbar> markiert. Formale Abweichungen und Fehler morphosyntaktischer Art werden nicht markiert, diese werden übernommen (z.B. Kasusfehler oder falsche Verbbildungen wie z.B. „runter gefallt“, s. zweites Bsp.).",
-          "examples": [
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel6a.png"
-            },
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel6b.png"
-            }
-          ]
-        },
-        {
-          "code": "3.2.7.a)",
-          "priority": 100,
-          "title": "<unsicher> (Option a)",
-          "description": "Der Marker <unsicher> kann anzeigen, dass ein Wort nicht zweifelsfrei von einer Alternative abgegrenzt werden kann. In diesem Fall wird der Marker <unsicher> gesetzt und dahinter die (wenn auch nicht zweifelsfrei) gehörte Alternative verschriftet (s. Bsp).",
-          "examples": [
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel7a.png"
-            }
-          ]
-        },
-        {
-          "code": "3.2.7.b)",
-          "priority": 100,
-          "title": "<unsicher> (Option b)",
-          "description": "Der Marker <unsicher> kann anzeigen, dass Unsicherheit bei der Einteilung von Äußerungseinheiten besteht. Hierzu wird vor dem Punkt oder Fragezeichen, der das mögliche Ende der Äußerungseinheit kennzeichnet, der Marker <unsicher> gesetzt (s. Bsp.). Für eine Definition von Äußerungseinheit s. Abschnitt 4.1.: Einteilung von Äußerungseinheiten.",
-          "examples": [
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel7b.png"
-            }
-          ]
-        },
-        {
-          "code": "3.2.8.",
-          "priority": 100,
-          "title": "<Imperativ>",
-          "description": "Imperative werden mit dem Marker <Imperativ> annotiert. Die geäußerte Imperativform (auch umgangssprachliche oder verkürzte Bildungen) wird hinter dem Marker verschriftet.",
-          "examples": [
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel8a.png"
-            },
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel8b.png"
-            },
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel8c.png"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "group": "4.1 Einteilung von Äußerungseinheiten (ÄE)",
-      "entries": [
-        {
-          "code": "4.1.1.",
-          "priority": 100,
-          "title": "Äußerungseinheit erster Ordnung: Hauptsatz",
-          "description": "Die ÄE erster Ordnung entspricht „main clause“ bzw. „Hauptsatz“, d.h. im Normalfall enthält eine Äußerungseinheit ein (finites) Verb.",
-          "examples": [
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel9.png"
-            }
-          ]
-        },
-        {
-          "code": "4.1.2.",
-          "priority": 100,
-          "title": "Satzgefüge",
-          "description": "Ist dem Hauptsatz eine untergeordnete Phrase, z.B. ein Nebensatz, beigefügt, bilden Haupt- und Nebensatz zusammen eine ÄE. In diesem Fall können auch mehrere (finite) Verben in einer ÄE enthalten sein.",
-          "examples": [
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel10a.png"
-            },
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel10b.png"
-            }
-          ]
-        },
-        {
-          "code": "4.1.3.",
-          "priority": 100,
-          "title": "Elliptische Phrasen",
-          "description": "Auch Phrasen, die kein vollständiger Hauptsatz sind, können eine abgeschlossene ÄE bilden. So bspw. im Falle pragmatisch angemessener Verbellipsen oder bei Ja-/Nein-Antworten.",
-          "examples": [
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel11.png"
-            }
-          ]
-        },
-        {
-          "code": "4.1.4.",
-          "priority": 100,
-          "title": "Intonatorische Strukturierung von Äußerungseinheiten",
-          "description": "In Zweifelsfällen werden Pausen und intonatorische Merkmale zur Abgrenzung von ÄE herangezogen. Längere Pausen deuten auf separate ÄE hin (s. Bsp. 1 in 4.1.4.a)). Äußerungen, die eindeutig innerhalb einer Intonationssequenz geäußert werden und die zusammen eine kohärente Kommunikationseinheit bilden, werden als eine ÄE aufgefasst (s. Bsp. 2 in 4.1.4.b)).",
-          "examples": [
-          ]
-        },
-        {
-          "code": "4.1.4.a)",
-          "priority": 100,
-          "title": "Intonatorische Strukturierung von Äußerungseinheiten a)",
-          "description": "Mehrere elliptische aneinandergereihte Äußerungen werden dementsprechend, je nach Pausen und Intonation, als eine oder mehrere ÄE erfasst:",
-          "examples": [
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel12a.png"
-            },
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel12b.png"
-            }
-          ]
-        },
-        {
-          "code": "4.1.4.b)",
-          "priority": 100,
-          "title": "Intonatorische Strukturierung von Äußerungseinheiten b)",
-          "description": "Je nach Intonation können Anreden, Nachträge und Ergänzungen als eigene ÄE oder zu einer anderen ÄE zugehörig aufgefasst werden:",
-          "examples": [
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel12c.png"
-            },
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel12d.png"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "group": "4.2. (Ungefüllte) Pausen",
-      "entries": [
-        {
-          "code": "4.2.a)",
-          "priority": 100,
-          "title": "(Ungefüllte) Pausen a)",
-          "description": "Längere ungefüllte Pausen können, müssen jedoch nicht, als einzelne Segmente markiert werden. Wird eine ungefüllte Pause als eigenes Segment markiert, muss dieses mit dem Marker <leer> versehen werden (s. Bsp. 13a im Transkriptionsmanual). Werden ungefüllte Pausen nicht als einzelne Segmente markiert, werden sie auch nicht mit <leer> annotiert, sondern bleiben unverschriftet (s. Bsp. 13b im Transkriptionsmanual). Sind im kompletten Audio-Schnipsel sind keine sprachlichen Reaktionen des Kindes enthalten, wird für den ganzen Schnipsel der Marker <leer> gesetzt (s. Abschnitt 3.2.5: <leer> im Transkriptionsmanual).",
-          "examples": [
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel13a.png"
-            },
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel13b.png"
-            }
-          ]
-        },
-        {
-          "code": "4.2.b)",
-          "priority": 100,
-          "title": "(Ungefüllte) Pausen b)",
-          "description": "Gefüllte Pausen bzw. Häsitationen werden durch Setzen des Markers <Füller> notiert (s. Abschnitt 3.2.3: <Füller>).",
-          "examples": [
-          ]
-        }
-      ]
-    },
-    {
-      "group": "4.3. Rechtschreibung",
-      "entries": [
-        {
-          "code": "4.3.",
-          "priority": 100,
-          "title": "Rechtschreibung",
-          "description": "Die Verschriftung erfolgt orthografisch und gemäß der Duden-Rechtschreibung. Alle Zweifelsfälle müssen nachgeschlagen werden. Eine korrekte orthografische Verschriftung bildet die Grundlage für die computergestützte Worterkennung. Zur Vermeidung von Tippfehlern ist die automatische Rechtschreibüberprüfung in den Browser-Einstellungen zu aktivieren. Es ist sicherzustellen, dass dem Browser das Wörterbuch Deutsch (de_DE) (Hunspell-Version) hinzugefügt ist.",
-          "examples": [
-          ]
-        },
-        {
-          "code": "4.3.1.",
-          "priority": 100,
-          "title": "Groß- und Kleinschreibung",
-          "description": "Groß- und Kleinschreibung richten sich nach Wortklassen. Großschreibung: Substantive (keine Großschreibung bei Substantivierungen, also das gehen, der böse), Eigennamen (auch Abkürzungen wie z.B. AG, GmbH); Kleinschreibung: alle anderen Wortklassen (also auch die Höflichkeitsform der Personalpronomina du, sie, ihr), am Beginn von ÄE, außer es handelt sich um ein Substantiv.",
-          "examples": [
-          ]
-        },
-        {
-          "code": "4.3.2.",
-          "priority": 100,
-          "title": "Zahlen",
-          "description": "Zahlen werden mit arabischen Ziffern verschriftlicht (z.B. 1,2,365, 7862)",
+          "title": "Marker sparsam verwenden!",
+          "description": "Marker nur setzen, wenn sie den Sprachfluss stark beeinträchtigen.",
           "examples": []
         },
         {
-          "code": "4.4.",
+          "code": "M02",
           "priority": 100,
-          "title": "Zeichensetzung",
-          "description": "Das ÄE-Ende wird durch Punkt (.) oder bei Fragen durch Fragezeichen (?) markiert (s. Abschnitt 4.1.: Einteilung von Äußerungseinheiten). Abgesehen von Punkt (.) und Fragezeichen (?) am ÄE-Ende werden keine weiteren Satzzeichen (,!;-) verwendet, da es in der gesprochenen Sprache u.a. keine Sätze im herkömmlichen Sinn gibt. Kommas werden auch nicht zur Abtrennung von Relativ- oder Infinitivsätzen gesetzt (s. Bsp. von 4.1.2.).",
-          "examples": [
-          ]
-        }
-      ]
-    },
-    {
-      "group": "4.5 Aussprache",
-      "entries": [
-        {
-          "code": "4.5.1.",
-          "priority": 100,
-          "title": "Fehlerhaft ausgesprochene Wörter",
-          "description": "Bei fehlerhaft ausgesprochenen Wörtern, die rekonstruierbar sind, wird der Marker <rekonstruierbar> gesetzt und dahinter das intendierte Zielwort verschriftet (s. Abschnitt 3.2.6: <rekonstruierbar> und das Bsp.). Auch konstante Aussprachefehler werden mit <rekonstruierbar> markiert. Grammatikfehler (z.B. falsche Kasusendungen oder falsche Perfektbildungen) werden übernommen und nicht markiert (s. Bsp. von 3.2.6.).",
-          "examples": [
-          ]
-        },
-        {
-          "code": "4.5.2.",
-          "priority": 100,
-          "title": "Verkürzungen und phonologische Verschmelzungen",
-          "description": "Umgangssprachliche, allgemein übliche Verschmelzungen zweier Wörter zu einer phonologischen Einheit werden in der verkürzten Form notiert. Verschmelzung mit dem Pronomen es: Verschriftung mit Apostroph (z.B. gibt’s, hab’s, wär’s). Verschmelzung von Präposition und Artikel: Verschriftung ohne Apostroph (z.B. hinterm, vorm, überm).",
+          "title": "Nonverbale Sprechergeräusche",
+          "description": "Nonverbale Sprechergeräusche wie Husten, Lachen, Schmatzen usw. werden mit {{<usb>}} und Leerzeichen vor jedem betroffenen Wort markiert. ",
           "examples": []
         },
         {
-          "code": "4.5.3.",
+          "code": "M02",
           "priority": 100,
-          "title": "Dialektale Formen und Umgangssprache",
-          "description": "Dialektale Formen werden in Standarddeutsch notiert.",
+          "title": "Andere Geräusche",
+          "description": "Geräusche, die nicht vom Sprecher stammen, z.B. Türschlagen, Klopfen, Motoren, werden mit {{<nib>}} und Leerzeichen vor dem betroffenen Wort markiert. ",
+          "examples": []
+        },
+        {
+          "code": "M03",
+          "priority": 100,
+          "title": "Weitere Sprecher",
+          "description": "Sprache eines dritten Sprechers wird mit {{**}} (mit Leerzeichen von den benachbarten Wörtern getrennt) markiert, ebenso unverständliche Passagen.",
+          "examples": []
+        },
+        {
+          "code": "M04",
+          "priority": 100,
+          "title": "Versprecher",
+          "description": "Versprecher werden soweit möglich transkribiert und mit * am Wortanfang markiert. ",
           "examples": [
             {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel14a.png"
-            },
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel14b.png"
-            },
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel14c.png"
-            },
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel14d.png"
+              "annotation": "am *drit nein vierten April",
+              "url": ""
             }
           ]
+        },
+        {
+          "code": "M05",
+          "priority": 100,
+          "title": "Phrasengrenzen",
+          "description": "Markieren Sie Phrasengrenzen (möglichst in Sprechpausen) mit einem senkrechten Strich.",
+          "examples": []
         }
       ]
     },
     {
-      "group": "4.6 Adverbiale Formen und trennbare Verben",
+      "group": "Häsitationen",
       "entries": [
         {
-          "code": "4.6.a)",
+          "code": "H01",
           "priority": 100,
-          "title": "Partikeln",
-          "description": "Partikeln und abtrennbare Verbzusätze werden von Verben getrennt notiert:",
+          "title": "Häsitationsmarker",
+          "description": "Häsitationsphänomene wie 'äh', 'öh', 'ähm' oder 'mhm' werden unabhängig vom produzierten Vokal mit standardisierten Wörtern transkribiert:",
           "examples": [
             {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel15a.png"
+              "annotation": "äh - wenn kein Nasal zu hören ist",
+              "url": ""
             },
             {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel15b.png"
+              "annotation": "ähm - wenn ein Vokal und ein Nasal zu hören sind",
+              "url": ""
             },
             {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel15c.png"
-            }
-          ]
-        },
-        {
-          "code": "4.6.b)",
-          "priority": 100,
-          "title": "Adverbiale Formen",
-          "description": "Kurze adverbiale Formen werden als Kurzform notiert (s. Bsp. 1 und 2).",
-          "examples": [
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel16a.png"
+              "annotation": "mhm - wenn zwei Nasale zu hören sind",
+              "url": ""
             },
             {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel16b.png"
-            }
-          ]
-        },
-        {
-          "code": "4.6.c)",
-          "priority": 100,
-          "title": "Kontrahierte adverbiale Formen",
-          "description": "Kontrahierte adverbiale Formen werden in der Kurzform verschriftet (s. folgende Bsp. und Abschnitt 4.5.2.: Verkürzungen und phonologische Verschmelzungen).",
-          "examples": [
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel17a.png"
+              "annotation": "ach - wenn ein Frikativ zu hören ist",
+              "url": ""
             },
             {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel17b.png"
-            }
-          ]
-        },
-        {
-          "code": "4.6.d)",
-          "priority": 100,
-          "title": "Adverbien",
-          "description": "Adverbien mit deiktischem Part werden zusammen geschrieben (z.B. darüber, darunter, dahinter, davor etc., s. Bsp.).",
-          "examples": [
-            {
-              "annotation": "",
-              "url": "https://www.phonetik.uni-muenchen.de/apps/octra/Sprachstand/screenshots/Beispiel18.png"
+              "annotation": "ne, nee - bei initialem Nasal",
+              "url": ""
             }
           ]
         }
@@ -463,11 +178,12 @@
   "markers": [
     {
       "id": 1,
-      "name": "unverständlich",
-      "code": "<unverständlich>",
+      "name": "truncation marker start",
+      "code": "[~abc]",
       "type": "normal",
-      "button_text": "unverständlich",
-      "description": "Unverständliche Wörter, die nicht rekonstruierbar sind (zu rekonstruierbaren Wörtern s. Abschnitt 3.2.6: <rekonstruierbar>), werden durch Setzen des Markers <unverständlich> verschriftet. Der Marker ersetzt das Gesagte komplett.",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_start.png",
+      "button_text": "~abc",
+      "description": "Diesen Marker nur am Anfang setzen, sollte die Audiosequenz mit einem abgeschnittenem Wort beginnen",
       "shortcut": {
         "mac": "ALT + 1",
         "pc": "ALT + 1"
@@ -475,11 +191,12 @@
     },
     {
       "id": 2,
-      "name": "unvollständig",
-      "code": "<unvollständig>",
+      "name": "filled pause",
+      "code": "<nib>",
       "type": "normal",
-      "button_text": "unvollständig",
-      "description": "Der Marker <unvollständig> ersetzt abgebrochene, unvollständige einzelne Wörter (nicht abgebrochene Satzteile). Werden mehrere Wörter direkt nacheinander abgebrochen, reicht es, den Marker einmal zu setzen.",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/fil.png",
+      "button_text": "Gefüllte Pause",
+      "description": "Für Zögern des Sprechers wie hm, ähm, äh und andere.",
       "shortcut": {
         "mac": "ALT + 2",
         "pc": "ALT + 2"
@@ -487,11 +204,12 @@
     },
     {
       "id": 3,
-      "name": "füller",
-      "code": "<Füller>",
+      "name": "intermittent noise",
+      "code": "[int]",
       "type": "normal",
-      "button_text": "Füller",
-      "description": "Artikulatorische Äußerungen, die kein Wort bilden (Füller), werden durch Setzen des Markers <Füller> verschriftet. Als Füller markiert werden bspw. Häsitationen („ähm“, „hm“, „äh“), Exklamationen („Oh!“, „Aha!“, „Hey!“) oder Lautmalereien („hui“).",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/int.png",
+      "button_text": "unterbrechendes Geräusch",
+      "description": "Für kurzes, eindeutiges Geräusch wie z.B. Türknallen, das Berühren des Mirkrofons, oder ähnliches.",
       "shortcut": {
         "mac": "ALT + 3",
         "pc": "ALT + 3"
@@ -499,11 +217,12 @@
     },
     {
       "id": 4,
-      "name": "geräusch",
-      "code": "<Geräusch>",
+      "name": "speaker noise",
+      "code": "<usb>",
       "type": "normal",
-      "button_text": "Geräusch",
-      "description": "Externe, nicht vom Kind artikulierte Geräusche (z.B. Telefonklingeln, Sirene, Hintergrundgeräusche), die die Kindesäußerung unterbrechen oder den Sprachfluss beeinflussen, werden mit dem Marker <Geräusch> verschriftet. Geräusche werden nur markiert, wenn das Kind dadurch stark abgelenkt wird.",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/spk.png",
+      "button_text": "Sprechergeräusch",
+      "description": "Für Geräusche und Unterbrechungen, die der Sprecher produziert wie z.B. lautes Atmen, Lachen oder ähnliches.",
       "shortcut": {
         "mac": "ALT + 4",
         "pc": "ALT + 4"
@@ -511,50 +230,54 @@
     },
     {
       "id": 5,
-      "name": "leer",
-      "code": "<leer>",
-      "type": "break",
-      "button_text": "leer",
-      "description": "Enthält ein Audio-Schnipsel überhaupt keine sprachliche Reaktion des Kindes auf einen Prompt, wird der Marker <leer> für den gesamten Schnipsel gesetzt. Werden längere ungefüllte Pausen innerhalb eines Schnipsels, der Kindesäußerungen enthält, oder Systemansagen (also Wuschel-Äußerungen) zur Erleichterung des Transkriptionsprozesses als einzelne Segmente abgetrennt, so sind diese ebenfalls als <leer> zu markieren.",
-      "shortcut": {
-        "mac": "ALT + P",
-        "pc": "ALT + P"
-      }
-    },
-    {
-      "id": 6,
-      "name": "rekonstruierbar",
-      "code": "<rekonstruierbar>",
+      "name": "stationary noise",
+      "code": "[sta]",
       "type": "normal",
-      "button_text": "rekonstruierbar",
-      "description": "Die Äußerung weicht artikulatorisch nur gering vom Zielwert ab und das intendierte Zielwort ist ohne Kontext erkennbar.",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/sta.png",
+      "button_text": "Andauerndes Geräusch",
+      "description": "Für lang andauerndes, lautes Geräusch wie Verkehrslärm, Musik oder Radio im Hintergrund.",
       "shortcut": {
         "mac": "ALT + 5",
         "pc": "ALT + 5"
       }
     },
     {
-      "id": 7,
-      "name": "unsicher",
-      "code": "<unsicher>",
+      "id": 6,
+      "name": "unclear word",
+      "code": "**",
       "type": "normal",
-      "button_text": "unsicher",
-      "description": "Siehe Transkriptionsrichtlinien 3.2.7.",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/stars.png",
+      "button_text": "**",
+      "description": "Diesen Marker vor einem Wort setzen, welches einer unverständlichen Sprache entstammt.",
       "shortcut": {
         "mac": "ALT + 6",
         "pc": "ALT + 6"
       }
     },
     {
-      "id": 8,
-      "name": "imperativ",
-      "code": "<Imperativ>",
+      "id": 7,
+      "name": "truncation marker end",
+      "code": "[abc~]",
       "type": "normal",
-      "button_text": "Imperativ",
-      "description": "Imperative werden mit dem Marker <Imperativ> annotiert. Die geäußerte Imperativform (auch umgangssprachliche oder verkürzte Bildungen) wird hinter dem Marker verschriftet.",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_end.png",
+      "button_text": "abc~",
+      "description": "Diesen Marker nur am Ende setzen, sollte die Audiosequenz mit einem abgeschnittenem Wort enden.",
       "shortcut": {
         "mac": "ALT + 7",
         "pc": "ALT + 7"
+      }
+    },
+    {
+      "id": 8,
+      "name": "break",
+      "code": "<P>",
+      "type": "break",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/break.png",
+      "button_text": "Pause",
+      "description": "Dieser Marker stellt eine Pause dar, d.h. eine Sequenz in der nicht gesprochen wird",
+      "shortcut": {
+        "mac": "ALT + P",
+        "pc": "ALT + P"
       }
     }
   ]

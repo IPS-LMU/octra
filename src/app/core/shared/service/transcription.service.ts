@@ -476,9 +476,9 @@ export class TranscriptionService {
         if (elem instanceof MouseStatisticElem) {
           new_elem.value = elem.value;
         } else if (elem instanceof KeyStatisticElem) {
-          new_elem.value = (<KeyStatisticElem> elem).value;
+          new_elem.value = (<KeyStatisticElem>elem).value;
         } else {
-          new_elem.value = (<StatisticElem> elem).value;
+          new_elem.value = (<StatisticElem>elem).value;
         }
 
         result.logs.push(new_elem);
@@ -705,6 +705,9 @@ export class TranscriptionService {
           const entry = instruction.entries[j];
 
           if (entry.code === code) {
+            entry.description = entry.description.replace(/{{([^{}]+)}}/g, (g0, g1) => {
+              return this.rawToHTML(g1).replace(/(<p>)|(<\/p>)/g, '');
+            });
             return entry;
           }
         }

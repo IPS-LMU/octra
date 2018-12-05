@@ -1,0 +1,29 @@
+<div bsModal #modal="bs-modal" class="modal fade" [config]="config" tabindex="-1" role="dialog"
+     aria-labelledby="dialog-sizes-name1"
+     id="bugreport">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">{{"modal.inactivity.header" | translate}}</h4>
+            </div>
+            <div class="modal-body"
+                 [innerHTML]="'modal.inactivity.body' | translate:{value: settService.app_settings.octra.inactivityNotice.showAfter}">
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group-vertical w-100">
+                    <button type="button" class="btn btn-primary btn-raised w-100" data-dismiss="modal"
+                            (click)="close('new')">
+                        {{"modal.inactivity.new" | translate}}
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-raised w-100" data-dismiss="modal"
+                            (click)="close('continue')">
+                        {{"modal.inactivity.continue" | translate}}
+                    </button>
+                    <button type="button" class="btn btn-secondary w-100" data-dismiss="modal" (click)="close('quit')">
+                        {{"modal.inactivity.quit" | translate}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

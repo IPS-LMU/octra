@@ -167,6 +167,13 @@
       "jump_last_segment": "Save & jump to previous segment",
       "jump_next_segment": "Save & jump to next segment",
       "close_save": "Save & close window"
+    },
+    "inactivity": {
+      "header": "Longer absence detected",
+      "body": "You were absent for at least {{value}} minutes without finishing OCTRA. It is recommended to exit OCTRA if longer absence is predictable. If you do not continue the transcription at the moment you can quit OCTRA now. What Do you want to do?",
+      "new": "Start new transcription",
+      "continue": "Continue transcription",
+      "quit": "Quit OCTRA"
     }
   },
   "login": {

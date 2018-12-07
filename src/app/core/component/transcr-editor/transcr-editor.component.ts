@@ -278,7 +278,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         onKeyup: this.onKeyUpSummernote,
         onPaste: (e) => {
           e.preventDefault();
-          const bufferText = ((e.originalEvent || e).clipboardData || (<any> window).clipboardData).getData('Text');
+          const bufferText = ((e.originalEvent || e).clipboardData || (<any>window).clipboardData).getData('Text');
           let html = bufferText.replace(/(<p>)|(<\/p>)/g, '')
             .replace(new RegExp('\\\[\\\|', 'g'), '{').replace(new RegExp('\\\|\\\]', 'g'), '}');
           html = Functions.unEscapeHtml(html);
@@ -453,11 +453,16 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     const func = () => {
       try {
         if (this.rawText !== '' && this.html !== '<p><br/></p>') {
-          Functions.placeAtEnd(jQuery('.note-editable')[0]);
+          if (this.html.indexOf('<p>') === 0) {
+            Functions.placeAtEnd(jQuery('.note-editable').find('p')[0]);
+          } else {
+            Functions.placeAtEnd(jQuery('.note-editable')[0]);
+          }
         }
         this.textfield.summernote('focus');
       } catch (exception) {
         // ignore errors
+        console.error(exception);
       }
     };
 

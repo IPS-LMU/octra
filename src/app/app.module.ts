@@ -113,6 +113,7 @@ import {NavbarService} from './core/gui/navbar/navbar.service';
 import {CompatibilityService} from './core/shared/service/compatibility.service';
 import {TranscriptionFeedbackComponent} from './core/gui/transcription-feedback/transcription-feedback.component';
 import {GuidelinesComponent} from './core/gui/guidelines/guidelines.component';
+import {InactivityModalComponent} from './core/modals/inactivity-modal/inactivity-modal.component';
 
 library.add(
   faSpinner, faCheck, faTimes, faTrash, faExclamationCircle, faInfoCircle, faDownload, faHeadphones, faPrint, faSearch, faExclamationTriangle,
@@ -177,7 +178,8 @@ export const ngmodule = {
     TranscriptionGuidelinesModalComponent,
     GuidelinesComponent,
     BrowserTestComponent,
-    TranscriptionFeedbackComponent
+    TranscriptionFeedbackComponent,
+    InactivityModalComponent
   ],
   entryComponents: EDITORS,
   imports: [

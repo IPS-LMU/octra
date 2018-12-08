@@ -33,6 +33,9 @@ export interface AppSettings {
         host: string,
         siteID: number
       }
+    },
+    'inactivityNotice': {
+      'showAfter': number;
     }
   };
 }

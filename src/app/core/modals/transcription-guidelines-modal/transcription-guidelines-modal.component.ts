@@ -213,4 +213,22 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
 
     return this.sanitizer.sanitize(SecurityContext.HTML, html);
   }
+
+  public isPDFExportEnabled() {
+    return this.settService.projectsettings.plugins.pdfexport !== undefined
+      && this.settService.projectsettings.plugins.pdfexport.url !== undefined;
+  }
+
+  public isPDFLinkOnly() {
+    return this.isPDFExportEnabled() && this.settService.projectsettings.plugins.pdfexport.url.indexOf('pdfconverter') < 0;
+  }
+
+  public getPDFNameFromLink() {
+    const url = this.settService.projectsettings.plugins.pdfexport.url;
+    if (this.isPDFLinkOnly() && url.lastIndexOf('/') > -1) {
+      return url.substr(url.lastIndexOf('/') + 1);
+    }
+
+    return '';
+  }
 }

@@ -7,9 +7,26 @@ import {OLog} from '../../obj/Settings/logging';
 
 @Injectable()
 export class UserInteractionsService {
-  public afteradd: EventEmitter<StatisticElem> = new EventEmitter<StatisticElem>();
+  set lastAction(value: number) {
+    this._lastAction = value;
+  }
+
+  get lastAction(): number {
+    return this._lastAction;
+  }
+
+  get afteradd(): EventEmitter<StatisticElem> {
+    return this._afteradd;
+  }
+
+  private _afteradd: EventEmitter<StatisticElem> = new EventEmitter<StatisticElem>();
 
   private _elements: StatisticElem[];
+
+  /**
+   * timestamp of lastAction
+   */
+  private _lastAction: number;
 
   get elements(): StatisticElem[] {
     return this._elements;
@@ -44,6 +61,7 @@ export class UserInteractionsService {
       length: number,
       textlength: number
     }) {
+    this._lastAction = Date.now();
 
     if (this._enabled) {
       let name = '';
@@ -93,7 +111,7 @@ export class UserInteractionsService {
 
       if (elem) {
         this._elements.push(elem);
-        this.afteradd.emit(elem);
+        this._afteradd.emit(elem);
         const new_elem = new OLog(
           elem.timestamp,
           elem.type,
@@ -106,9 +124,9 @@ export class UserInteractionsService {
         if (elem instanceof MouseStatisticElem) {
           new_elem.value = elem.value;
         } else if (elem instanceof KeyStatisticElem) {
-          new_elem.value = (<KeyStatisticElem> elem).value;
+          new_elem.value = (<KeyStatisticElem>elem).value;
         } else {
-          new_elem.value = (<StatisticElem> elem).value;
+          new_elem.value = (<StatisticElem>elem).value;
         }
 
       }

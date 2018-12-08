@@ -84,8 +84,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   @ViewChild('editor') editor: TranscrEditorComponent;
   @ViewChild('audionav') audionav: AudioNavigationComponent;
   @ViewChild('window') window: ElementRef;
-  @Output('act') act: EventEmitter<string> = new EventEmitter<string>();
-  @Input('easymode') easymode = false;
+  @Output() act: EventEmitter<string> = new EventEmitter<string>();
+  @Input() easymode = false;
   public pos_y = 0;
   @Input() audiochunk: AudioChunk;
   @Input() segment_index: number;
@@ -227,6 +227,21 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         const segment = this.transcrService.currentlevel.segments.get(this.segment_index).clone();
         segment.transcript = this.editor.rawText;
         this.transcrService.currentlevel.segments.change(this.segment_index, segment);
+        const startSample = (this.segment_index > 0) ? this.transcrService.currentlevel.segments.get(this.segment_index - 1).time.samples : 0;
+        this.uiService.addElementFromEvent('transcription:segment_exited', {
+            value: {
+              segment: {
+                start: startSample,
+                length: segment.time.samples - startSample,
+                transcript: segment.transcript
+              }
+            }
+          }, Date.now(), -1, -1, '2D-Editor',
+          {
+            start: startSample,
+            length: segment.time.samples - startSample,
+            textlength: segment.transcript.length
+          });
       }
     } else {
       console.log(`could not save segment`);

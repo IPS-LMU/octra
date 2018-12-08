@@ -40,7 +40,7 @@ import {IFile, PartiturConverter} from '../../obj/Converters';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import * as X2JS from 'x2js';
 import {ModalService} from '../../modals/modal.service';
-import {throwError} from 'rxjs';
+import {Observable, throwError} from 'rxjs';
 import {TranscriptionGuidelinesModalComponent} from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {NavbarService} from '../navbar/navbar.service';
@@ -49,6 +49,7 @@ import {AppInfo} from '../../../app.info';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 import {TranscriptionSendingModalComponent} from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
 import {Functions, isNullOrUndefined} from '../../shared/Functions';
+import {InactivityModalComponent} from '../../modals/inactivity-modal/inactivity-modal.component';
 
 @Component({
   selector: 'app-transcription',
@@ -147,6 +148,7 @@ export class TranscriptionComponent implements OnInit,
   @ViewChild('modal') modal: any;
   @ViewChild('transcrSendingModal') transcrSendingModal: TranscriptionSendingModalComponent;
   @ViewChild('modal_guidelines') modal_guidelines: TranscriptionGuidelinesModalComponent;
+  @ViewChild('inactivityModal') inactivityModal: InactivityModalComponent;
 
   public send_error = '';
   public showdetails = false;
@@ -308,6 +310,39 @@ export class TranscriptionComponent implements OnInit,
         this.uiService.addElementFromEvent('level', {value: 'changed'}, Date.now(), 0, -1, level.name);
       }
     ));
+
+    if (this.appStorage.usemode === 'online') {
+      if (!isNullOrUndefined(this.settingsService.app_settings.octra.inactivityNotice)
+        && !isNullOrUndefined(this.settingsService.app_settings.octra.inactivityNotice.showAfter)
+        && this.settingsService.app_settings.octra.inactivityNotice.showAfter > 0) {
+        // if waitTime is 0 the inactivity modal isn't shown
+        let waitTime = this.settingsService.app_settings.octra.inactivityNotice.showAfter;
+        waitTime = waitTime * 60 * 1000;
+        this.subscrmanager.add(Observable.interval(5000).subscribe(
+          () => {
+            if (Date.now() - this.uiService.lastAction > waitTime && !this.inactivityModal.visible) {
+              this.inactivityModal.open().then((answer) => {
+                switch (answer) {
+                  case('quit'):
+                    this.abortTranscription();
+                    break;
+                  case('new'):
+                    this.closeTranscriptionAndGetNew();
+                    break;
+                  case('continue'):
+                    // reload OCTRA to continue
+                    window.location.reload(true);
+                    break;
+                }
+                this.uiService.lastAction = Date.now();
+              }).catch((error) => {
+                console.error(error);
+              });
+            }
+          }
+        ));
+      }
+    }
 
     this.bugService.init(this.transcrService);
   }
@@ -560,6 +595,21 @@ export class TranscriptionComponent implements OnInit,
     } else {
       console.error(`json array for transcription next is null`);
     }
+  }
+
+  closeTranscriptionAndGetNew() {
+    // close current session
+    this.api.closeSession(this.appStorage.user.id, this.appStorage.data_id, this.appStorage.servercomment).then(() => {
+      // begin new session
+      this.api.beginSession(this.appStorage.user.project, this.appStorage.user.id, this.appStorage.user.jobno).then((json) => {
+        // new session
+        this.nextTranscription(json);
+      }).catch((error) => {
+        console.error(error);
+      });
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   clearData() {

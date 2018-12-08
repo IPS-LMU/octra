@@ -20,7 +20,11 @@ export interface ProjectSettings {
   };
   languages: string[];
   interfaces: string[];
-  plugins: any;
+  plugins: {
+    pdfexport: {
+      url: ''
+    }
+  };
   feedback_form: Group[];
   octra: {
     'sendValidatedTranscriptionOnly': boolean;

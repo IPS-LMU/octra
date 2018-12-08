@@ -62,7 +62,6 @@ export class UserInteractionsService {
       textlength: number
     }) {
     this._lastAction = Date.now();
-    console.log(`set last action to ${this._lastAction}`);
 
     if (this._enabled) {
       let name = '';

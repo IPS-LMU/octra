@@ -9,10 +9,20 @@
                         <h3 style="display:inline;">{{"general.guidelines" | translate }}<span class="version">
                      v {{ guidelines.meta.version }}
                 </span></h3>
-                        <button class="btn btn-sm btn-danger" style="border:1px solid red;" (click)="exportPDF()">
+                        <button *ngIf="isPDFExportEnabled() && !isPDFLinkOnly() else pdfNotEnabled"
+                                class="btn btn-sm btn-danger" style="border:1px solid red;" (click)="exportPDF()">
                             <fa-icon icon="print"></fa-icon>
                             PDF
                         </button>
+                        <ng-template #pdfNotEnabled>
+                            <a *ngIf="isPDFLinkOnly() && getPDFNameFromLink() !== ''" class="btn btn-sm btn-danger"
+                               style="border:1px solid red;"
+                               [href]="settService.projectsettings.plugins.pdfexport.url"
+                               [download]="getPDFNameFromLink()" target="_blank">
+                                <fa-icon icon="print"></fa-icon>
+                                PDF
+                            </a>
+                        </ng-template>
                         <span class="project">
                      {{"general.project" | translate }}: {{guidelines.meta.project }}
                 </span>

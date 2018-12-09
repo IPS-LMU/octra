@@ -84,6 +84,6 @@
     z-index: 200;
 }
 
-.note-editor.note-frame .note-editing-area .note-editable .val-error {
+.note-editable.card-block .val-error {
     cursor: pointer !important;
 }

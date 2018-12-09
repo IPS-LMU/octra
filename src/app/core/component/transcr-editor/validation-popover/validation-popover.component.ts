@@ -51,13 +51,20 @@ export class ValidationPopoverComponent implements OnInit, AfterViewChecked {
   ngAfterViewChecked(): void {
   }
 
-  public toggleVisibility() {
-    if (this.visible) {
-      this.el.nativeElement.style.display = 'none';
-    } else {
+  public show() {
+    if (!this.visible) {
       this.el.nativeElement.style.display = 'flex';
     }
-    this.visible = !this.visible;
+    this.visible = true;
+    this.cd.markForCheck();
+    this.cd.detectChanges();
+  }
+
+  public hide() {
+    if (this.visible) {
+      this.el.nativeElement.style.display = 'none';
+    }
+    this.visible = false;
     this.cd.markForCheck();
     this.cd.detectChanges();
   }

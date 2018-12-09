@@ -247,7 +247,9 @@ footer {
 }
 
 .val-error {
-    border-bottom: 2px solid red;
+    border: 1px solid red;
+    border-radius: 2px;
+    cursor: pointer;
 }
 
 .note-editor.note-frame.card {

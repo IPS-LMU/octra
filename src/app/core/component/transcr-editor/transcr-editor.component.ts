@@ -9,7 +9,7 @@ import {AudioChunk, AudioTime} from '../../../media-components/obj/media/audio';
 import {isNumeric} from 'rxjs/util/isNumeric';
 import {TimespanPipe} from '../../../media-components/pipe';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
-import {Functions} from '../../shared/Functions';
+import {Functions, isNullOrUndefined} from '../../shared/Functions';
 import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
 
 declare let lang: any;
@@ -80,7 +80,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.init = 0;
     const html = this.rawToHTML(this._rawText);
     this.textfield.summernote('code', html);
-    // this.validate();
+    this.validate();
     this.initPopover();
   }
 
@@ -396,7 +396,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       this.textfield.summernote('editor.insertNode', element);
     }
     this.updateTextField();
-    this.validate();
+
+    this.triggerTyping();
   }
   /**
    * called when key pressed in editor
@@ -438,6 +439,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.updateTextField();
     this.onkeyup.emit($event);
 
+    this.triggerTyping();
+  }
+
+  private triggerTyping() {
     setTimeout(() => {
       if (Date.now() - this.lastkeypress >= 700 && this.lastkeypress > -1) {
         if (this._is_typing && this.focused) {
@@ -637,9 +642,22 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       .off('mouseenter')
       .off('mouseleave');
 
+    jQuery('.val-error').children()
+      .off('mouseenter')
+      .off('mouseleave');
+
     setTimeout(() => {
       jQuery('.val-error')
         .on('mouseenter', (event) => {
+          this.onValidationErrorMouseOver(jQuery(event.target), event);
+        })
+        .on('mouseleave', (event) => {
+          this.onValidationErrorMouseLeave();
+        });
+
+      jQuery('.val-error').children()
+        .on('mouseenter', (event) => {
+          console.log(`enter child`);
           this.onValidationErrorMouseOver(jQuery(event.target), event);
         })
         .on('mouseleave', (event) => {
@@ -1147,6 +1165,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private onValidationErrorMouseOver(jQueryObj: any, event: any) {
+    if (isNullOrUndefined(jQueryObj.attr('data-errorcode'))) {
+      jQueryObj = jQueryObj.parent();
+    }
+
     const errorCode = jQueryObj.attr('data-errorcode');
 
     if (!(errorCode === null || errorCode === undefined)) {
@@ -1154,7 +1176,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
       if (!(errorDetails === null || errorDetails === undefined)) {
         // set values
-        this.validationPopover.toggleVisibility();
+        this.validationPopover.show();
         this.cd.markForCheck();
         this.cd.detectChanges();
         this.validationPopover.description = errorDetails.description;
@@ -1177,11 +1199,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
         this.changeValidationPopoverLocation(marginLeft, (jQueryObj.offset().top - editor_pos.top - height));
       }
+    } else {
+      console.error(`errorcode is null!`);
     }
   }
 
   private onValidationErrorMouseLeave() {
-    this.validationPopover.toggleVisibility();
+    this.validationPopover.hide();
   }
 
   public changeValidationPopoverLocation(x: number, y: number) {

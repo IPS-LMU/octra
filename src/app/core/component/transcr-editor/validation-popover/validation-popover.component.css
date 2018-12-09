@@ -3,7 +3,7 @@
     max-height: 100px;
     position: absolute;
     z-index: 100;
-    display: flex;
+    display: none;
 }
 
 .card {
@@ -11,7 +11,9 @@
 }
 
 .card-header {
-    background-color: orangered;
+    background-color: red;
+    color: white;
+    font-weight: bold;
 }
 
 .card-body, .card-header {

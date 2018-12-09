@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
+import {ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {TranscrEditorConfig} from './config';
 import {TranslateService} from '@ngx-translate/core';
 
@@ -10,6 +10,7 @@ import {isNumeric} from 'rxjs/util/isNumeric';
 import {TimespanPipe} from '../../../media-components/pipe';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {Functions} from '../../shared/Functions';
+import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
 
 declare let lang: any;
 declare let document: any;
@@ -91,14 +92,14 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.subscrmanager = new SubscriptionManager();
   }
 
-  @Output('loaded') loaded: EventEmitter<boolean> = new EventEmitter<boolean>();
-  @Output('onkeyup') onkeyup: EventEmitter<any> = new EventEmitter<any>();
-  @Output('marker_insert') marker_insert: EventEmitter<string> = new EventEmitter<string>();
-  @Output('marker_click') marker_click: EventEmitter<string> = new EventEmitter<string>();
-  @Output('typing') typing: EventEmitter<string> = new EventEmitter<string>();
-  @Output('boundaryclicked') boundaryclicked: EventEmitter<number> = new EventEmitter<number>();
-  @Output('boundaryinserted') boundaryinserted: EventEmitter<number> = new EventEmitter<number>();
-  @Output('selectionchanged') selectionchanged: EventEmitter<number> = new EventEmitter<number>();
+  @Output() loaded: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() onkeyup: EventEmitter<any> = new EventEmitter<any>();
+  @Output() marker_insert: EventEmitter<string> = new EventEmitter<string>();
+  @Output() marker_click: EventEmitter<string> = new EventEmitter<string>();
+  @Output() typing: EventEmitter<string> = new EventEmitter<string>();
+  @Output() boundaryclicked: EventEmitter<number> = new EventEmitter<number>();
+  @Output() boundaryinserted: EventEmitter<number> = new EventEmitter<number>();
+  @Output() selectionchanged: EventEmitter<number> = new EventEmitter<number>();
 
   @Input() visible = true;
   @Input() markers: any = true;
@@ -107,12 +108,29 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Input() playposition: AudioTime;
   @Input() audiochunk: AudioChunk;
 
+  @ViewChild('validationPopover') validationPopover: ValidationPopoverComponent;
+
   public textfield: any = null;
   public focused = false;
 
   public popovers = {
     segmentBoundary: null,
     validationError: null
+  };
+
+  public popoversNew = {
+    validation: {
+      location: {
+        x: 0,
+        y: 0
+      },
+      visible: false,
+      currentGuideline: {
+        description: '',
+        title: ''
+      }
+    }
+
   };
 
   private _settings: TranscrEditorConfig;
@@ -175,9 +193,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         } else if (tagName.toLowerCase() === 'img') {
           if (!(jQuery(elem).attr('data-samples') === null || jQuery(elem).attr('data-samples') === undefined)) {
             // TODO check if this is working
-            const textnode = document.createTextNode(`{${jQuery(elem).attr('data-samples')}}`);
+            const boundaryText = `{${jQuery(elem).attr('data-samples')}}`;
+            const textnode = document.createTextNode(boundaryText);
             jQuery(elem).before(textnode);
             jQuery(elem).remove();
+            charCounter += boundaryText.length;
           }
         } else if (
           jQuery(elem).attr('class') === 'val-error'
@@ -195,11 +215,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         } else if (tagName.toLowerCase() === 'sel-start') {
           // save start selection
           this._textSelection.start = charCounter;
-          console.log(`save start to ${charCounter}!`);
         } else if (tagName.toLowerCase() === 'sel-end') {
           // save start selection
           this._textSelection.end = charCounter;
-          console.log(`save end to ${charCounter}!`);
         }
       }
     };
@@ -378,7 +396,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       this.textfield.summernote('editor.insertNode', element);
     }
     this.updateTextField();
-    console.log(`validate after inserting marker!`);
+    this.validate();
   }
   /**
    * called when key pressed in editor
@@ -438,7 +456,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     setTimeout(() => {
       if (Date.now() - this.lastkeypress >= 1000 && this.lastkeypress > -1) {
-        // this.validate();
+        this.validate();
         this.initPopover();
         this.lastkeypress = -1;
       }
@@ -616,16 +634,16 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     // set popover for errors
     jQuery('.val-error')
-      .off('mouseover')
+      .off('mouseenter')
       .off('mouseleave');
 
     setTimeout(() => {
       jQuery('.val-error')
-        .on('mouseover', (event) => {
+        .on('mouseenter', (event) => {
           this.onValidationErrorMouseOver(jQuery(event.target), event);
         })
         .on('mouseleave', (event) => {
-          this.onValidationErrorMouseLeave(jQuery(event.target), event);
+          this.onValidationErrorMouseLeave();
         });
     }, 200);
   }
@@ -939,7 +957,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   private validate() {
     this.saveSelection();
-
     this._rawText = this.getRawText();
 
     // insert selection placeholders
@@ -955,15 +972,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       return '>';
     });
 
-    let segmentCounter = 0;
-    code = code.replace(/{([0-9]+)}/g, (g0, g1) => {
-      return `<img src="assets/img/components/transcr-editor/boundary.png" class="btn-icon-text boundary" style="height: 16px; cursor: pointer;" data-samples="${g1}" alt="[|${++segmentCounter}|]" />`;
-    });
-
-
     this.textfield.summernote('code', code);
-    console.log(`END:`);
-    console.log(code);
     this.restoreSelection();
   }
 
@@ -1101,9 +1110,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   private onTextMouseOver = (event) => {
     const jqueryObj = jQuery(event.target);
 
-    console.log(`in text mouseover!`);
     if (!(jqueryObj.attr('data-samples') === null || jqueryObj.attr('data-samples') === undefined)) {
-      console.log(`on text mouse over target`);
       this.onSegmentBoundaryMouseOver(jqueryObj, event);
     } else if (!(jqueryObj.attr('data-errorcode') === null || jqueryObj.attr('data-errorcode') === undefined)) {
       this.onValidationErrorMouseOver(jqueryObj, event);
@@ -1147,30 +1154,39 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
       if (!(errorDetails === null || errorDetails === undefined)) {
         // set values
-        this.popovers.validationError.css('display', 'inherit');
-        this.popovers.validationError.find('.error-title').text(errorDetails.title);
-        this.popovers.validationError.find('.card-body').text(errorDetails.description);
+        this.validationPopover.toggleVisibility();
+        this.cd.markForCheck();
+        this.cd.detectChanges();
+        this.validationPopover.description = errorDetails.description;
+        this.validationPopover.title = errorDetails.title;
+        this.cd.markForCheck();
+        this.cd.detectChanges();
 
-        const width = this.popovers.validationError.width();
-        const height = this.popovers.validationError.height();
-        const editor_pos = jQuery('.note-toolbar-wrapper').offset();
+        const editor_pos = jQuery('.note-toolbar.card-header').offset();
 
         let marginLeft = event.target.offsetLeft;
-        if (event.target.offsetLeft + width > jQuery('.note-toolbar-wrapper').width()) {
-          marginLeft = event.target.offsetLeft - width;
-        }
-        this.popovers.validationError.css(
-          {
-            'margin-left': marginLeft + 'px',
-            'margin-top': (jQueryObj.offset().top - editor_pos.top - height) + 'px'
+        const height = this.validationPopover.height;
+
+        if (this.validationPopover.width + marginLeft > jQuery('.note-toolbar.card-header').width()) {
+          marginLeft -= this.validationPopover.width;
+
+          if (jQueryObj.width() > 10) {
+            marginLeft += 10;
           }
-        );
+        }
+
+        this.changeValidationPopoverLocation(marginLeft, (jQueryObj.offset().top - editor_pos.top - height));
       }
     }
   }
 
-  private onValidationErrorMouseLeave(jQueryObj: any, event: any) {
-    this.popovers.validationError.css('display', 'none');
+  private onValidationErrorMouseLeave() {
+    this.validationPopover.toggleVisibility();
+  }
+
+  public changeValidationPopoverLocation(x: number, y: number) {
+    this.popoversNew.validation.location.x = x;
+    this.popoversNew.validation.location.y = y;
   }
 
   /*

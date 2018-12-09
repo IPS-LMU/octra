@@ -8,7 +8,6 @@ import {Segment} from '../../core/obj/Annotation/Segment';
 import {AudioManager} from '../../media-components/obj/media/audio/AudioManager';
 import {AudioChunk} from '../../media-components/obj/media/audio/AudioChunk';
 import {AudioTime} from '../../media-components/obj/media/audio/AudioTime';
-import {PlayBackState} from '../../media-components/obj/media/index';
 import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
 import {AudioplayerComponent} from '../../media-components/components/audio/audioplayer';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
@@ -166,19 +165,23 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
     if (i > -1) {
       const start = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.samples : 0;
 
-      this.audiochunk.stopPlayback(() => {
-        if (this.audiochunk.state === PlayBackState.STOPPED) {
-          this.audiochunk.startpos = new AudioTime(start, this.audiomanager.ressource.info.samplerate);
-          this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(i).time.clone();
-          this.audioplayer.update();
-
-          this.audioplayer.startPlayback(() => {
-            // set start pos and playback length to end of audio file
-            this.audiochunk.startpos = this.audiochunk.selection.end.clone();
-            this.audioplayer.update();
-          });
-          this.boundaryselected = false;
+      new Promise<void>((resolve) => {
+        if (this.audiochunk.isPlaying) {
+          this.audiochunk.stopPlayback(resolve);
+        } else {
+          resolve();
         }
+      }).then(() => {
+        this.audiochunk.startpos = new AudioTime(start, this.audiomanager.ressource.info.samplerate);
+        this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(i).time.clone();
+        this.audioplayer.update();
+
+        this.audioplayer.startPlayback(() => {
+          // set start pos and playback length to end of audio file
+          this.audiochunk.startpos = this.audiochunk.selection.end.clone();
+          this.audioplayer.update();
+        });
+        this.boundaryselected = false;
       });
     } else {
       this.boundaryselected = false;

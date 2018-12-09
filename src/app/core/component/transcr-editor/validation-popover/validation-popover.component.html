@@ -1,4 +1,6 @@
-<div class="card shadow">
-    <div class="card-header">{{guideline?.title}}</div>
-    <div class="card-body">{{guideline?.description}}</div>
+<div class="card shadow" #validationContainer [ngClass]="{
+    'hide-popover': visible
+}">
+    <div class="card-header">{{title}}</div>
+    <div class="card-body">{{description}}</div>
 </div>

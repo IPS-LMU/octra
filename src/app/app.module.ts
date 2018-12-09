@@ -114,11 +114,45 @@ import {CompatibilityService} from './core/shared/service/compatibility.service'
 import {TranscriptionFeedbackComponent} from './core/gui/transcription-feedback/transcription-feedback.component';
 import {GuidelinesComponent} from './core/gui/guidelines/guidelines.component';
 import {InactivityModalComponent} from './core/modals/inactivity-modal/inactivity-modal.component';
+import {ValidationPopoverComponent} from './core/component/transcr-editor/validation-popover/validation-popover.component';
 
 library.add(
-  faSpinner, faCheck, faTimes, faTrash, faExclamationCircle, faInfoCircle, faDownload, faHeadphones, faPrint, faSearch, faExclamationTriangle,
-  faTimesCircle, faCog, faFolderOpen, faCheckCircle, faThList, faBook, faCopy, faPlus, faSignOutAlt, faEdit, faFile, faArrowLeft, faArrowRight,
-  faKeyboard, faEye, faExclamationTriangle, faSave, faQuestionCircle, faChevronUp, faChevronDown, faPaperPlane, faMinus, faWindowMaximize, faAlignJustify);
+  faSpinner,
+  faCheck,
+  faTimes,
+  faTrash,
+  faExclamationCircle,
+  faInfoCircle,
+  faDownload,
+  faHeadphones,
+  faPrint,
+  faSearch,
+  faExclamationTriangle,
+  faTimesCircle,
+  faCog,
+  faFolderOpen,
+  faCheckCircle,
+  faThList,
+  faBook,
+  faCopy,
+  faPlus,
+  faSignOutAlt,
+  faEdit,
+  faFile,
+  faArrowLeft,
+  faArrowRight,
+  faKeyboard,
+  faEye,
+  faExclamationTriangle,
+  faSave,
+  faQuestionCircle,
+  faChevronUp,
+  faChevronDown,
+  faPaperPlane,
+  faMinus,
+  faWindowMaximize,
+  faAlignJustify
+);
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -179,7 +213,8 @@ export const ngmodule = {
     GuidelinesComponent,
     BrowserTestComponent,
     TranscriptionFeedbackComponent,
-    InactivityModalComponent
+    InactivityModalComponent,
+    ValidationPopoverComponent
   ],
   entryComponents: EDITORS,
   imports: [

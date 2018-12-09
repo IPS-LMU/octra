@@ -575,10 +575,16 @@ export class TranscriptionService {
       for (let i = 0; i < markers.length; i++) {
         const marker = markers[i];
 
-        const regex = new RegExp('(\\s)*(' + Functions.escapeRegex(marker.code) + ')(\\s)*', 'g');
-        const regex2 = /{([0-9]+)}/g;
+        // replace {<number>} with boundary HTMLElement
+        result = result.replace(/{([0-9]+)}/g, (x, g1) => {
+          return '<img src="assets/img/components/transcr-editor/boundary.png" ' +
+            'class="btn-icon-text boundary" style="height:16px;" ' +
+            'data-samples="' + g1 + '" alt="\[|' + g1 + '|\]">';
+        });
 
-        const replace_func = (x, g1, g2, g3) => {
+        // replace markers
+        const regex = new RegExp('(\\s)*(' + Functions.escapeRegex(marker.code) + ')(\\s)*', 'g');
+        result = result.replace(regex, (x, g1, g2, g3) => {
           const s1 = (g1) ? g1 : '';
           const s3 = (g3) ? g3 : '';
 
@@ -592,19 +598,10 @@ export class TranscriptionService {
           }
 
           return s1 + img + s3;
-        };
-
-
-        const replace_func2 = (x, g1) => {
-          return ' <img src=\'assets/img/components/transcr-editor/boundary.png\' ' +
-            'class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
-            'data-samples=\'' + g1 + '\' alt=\'\[|' + g1 + '|\]\' /> ';
-        };
-
-        result = result.replace(regex2, replace_func2);
-        result = result.replace(regex, replace_func);
+        });
       }
 
+      // replace more than one empty spaces
       result = result.replace(/\s+$/g, '&nbsp;');
     }
 

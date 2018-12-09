@@ -36,7 +36,7 @@ export class ValidationPopoverComponent implements OnInit, AfterViewChecked {
 
   @ViewChild('validationContainer') validationContainer: ElementRef;
 
-  private visible = false;
+  public visible = false;
 
   public get height() {
     return this.validationContainer.nativeElement.offsetHeight;

@@ -3,7 +3,8 @@
     <app-navigation #navigation [version]="version"></app-navigation>
 </header>
 <main>
-    <div id="beta_mark" class="d-none d-md-block" *ngIf="environment.dev_version">in developement</div>
+    <div id="beta_mark" class="d-none d-md-block" *ngIf="environment.dev_version">in development</div>
+    <div id="beta_mark" class="d-none d-md-block" *ngIf="environment.beta_version">BETA</div>
     <!-- <button (click)="test(textfield.value)">fetch</button>
          <input type="text" value="" #textfield/>
          <button (click)="reset(textfield.value)">reset</button>

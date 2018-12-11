@@ -8,6 +8,7 @@ h4 {
     display: flex;
     flex-direction: column;
     flex: auto;
+    background-color: white;
 }
 
 .login-id-label,
@@ -49,8 +50,12 @@ h4 {
     }
 }
 
+footer {
+    margin-top: 20px;
+}
+
 footer .logo {
-    height: 60px;
+    height: 40px;
     margin-bottom: 10px;
 }
 

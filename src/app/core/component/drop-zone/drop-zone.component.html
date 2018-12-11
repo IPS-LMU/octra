@@ -4,7 +4,6 @@
 }" (dragover)="onDragOver($event)" (drop)="onFileDrop($event)" (click)="onClick($event)">
         <div class="inner" style="margin: auto 0;">
             <ng-content></ng-content>
-            <br/>
             <fa-icon icon="folder-open" class="dragndrop"></fa-icon>
             <input type="file" multiple class="fileinput" value="Select audio file" style="display:none;" #fileinput
                    (change)="onFileChange($event)"/>

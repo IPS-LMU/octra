@@ -7,7 +7,7 @@
         </div>
     </div>
     <div id="loginrow" class="row">
-        <div #onlinemode id='onlinemode' class="col-md-6 card" style="padding:40px;margin-bottom:20px;">
+        <div #onlinemode id='onlinemode' class="col-md-6 card" style="padding:40px;">
             <p *ngIf="!apc.octra.responsive.enabled && !valid_size" class="warning"
                [innerHTML]="'browser.small window width' | translate">
             </p>
@@ -89,7 +89,7 @@
                 <br/>
             </section>
         </div>
-        <div #localmode id='localmode' class="col-md-6 card" style="padding:40px;margin-bottom:20px;">
+        <div #localmode id='localmode' class="col-md-6 card" style="padding:40px;">
             <section>
                 <h4 [ngClass]="{
                 'alert-success': appStorage.usemode === 'local'
@@ -103,7 +103,9 @@
                          *ngIf="appStorage.usemode === 'local' && appStorage.sessionfile !== null"
                          [innerHTML]="'login.old file found' | translate:{file_label: getDropzoneFileString(sessionfile)}">
                     </div>
-                    <app-octra-dropzone #dropzone></app-octra-dropzone>
+                    <div style="margin-top: 40px;">
+                        <app-octra-dropzone #dropzone [height]="'147px'"></app-octra-dropzone>
+                    </div>
                     <input *ngIf="(appStorage.usemode === null || appStorage.usemode === 'local' || appStorage.usemode === 'url') && getFileStatus() != 'new'"
                            [disabled]="!(getFileStatus() == 'start')" type="submit"
                            id="offline-submit"

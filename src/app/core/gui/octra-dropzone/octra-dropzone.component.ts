@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {OAnnotJSON, OAudiofile, OLabel, OSegment} from '../../obj/Annotation';
 import {AppInfo} from '../../../app.info';
 import {Converter, IFile, ImportResult} from '../../obj/Converters';
@@ -48,6 +48,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
   }
 
   @ViewChild('dropzone') dropzone: DropZoneComponent;
+  @Input() height = '250px';
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
   public _files: {
@@ -63,6 +64,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
   private _status: string;
 
   private _audiomanager: AudioManager;
+
   public afterDrop = () => {
     this._oannotation = null;
     for (let i = 0; i < this.dropzone.files.length; i++) {
@@ -90,7 +92,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
         const extension = file_process.file.name.substr(file_process.file.name.lastIndexOf('.'));
 
         reader.onloadend = () => {
-          this.decodeArrayBuffer(<ArrayBuffer> reader.result, file_process);
+          this.decodeArrayBuffer(<ArrayBuffer>reader.result, file_process);
         };
 
         reader.readAsArrayBuffer(file_process.file);
@@ -159,7 +161,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
             if (file.status === 'progress') {
               const ofile: IFile = {
                 name: file.file.name,
-                content: <string> reader.result,
+                content: <string>reader.result,
                 type: file.file.type,
                 encoding: converter.encoding
               };

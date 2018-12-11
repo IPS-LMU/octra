@@ -1,4 +1,4 @@
-<app-drop-zone #dropzone [height]="'250px'" (afterdrop)="afterDrop()">
+<app-drop-zone #dropzone [height]="height" (afterdrop)="afterDrop()">
     <table [hidden]="(files.length === 0)" class="dropzone-table">
         <tr *ngFor="let file of files">
             <td>

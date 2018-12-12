@@ -21,7 +21,8 @@
     <ng-container *ngIf="validationFound">
         <span *ngIf="foundErrors == 0"
               class="text-success found-errors">{{"general.no errors found" | translate}}</span>
-        <span *ngIf="foundErrors > 0" class="text-danger found-errors">{{"general.errors found" | translate : {errors: foundErrors} }}</span>
+        <span *ngIf="foundErrors > 0"
+              class="text-danger found-errors">{{"general.errors found" | translate : {errors: foundErrors} }}</span>
     </ng-container>
     <span *ngIf="!validationFound">No validation methods found</span>
 </p>
@@ -31,13 +32,18 @@
         <i class="fa fa-spinner fa-spin" style="font-size:32px"></i>
     </div>
 </div>
+<app-validation-popover #validationPopover
+                        [ngStyle]="{
+                                'margin-left': popovers.validation.location.x + 'px',
+                                'margin-top': popovers.validation.location.y + 'px'
+                            }"></app-validation-popover>
 <table id="transcription-table" *ngIf="shown_segments.length > 0" class="table table-bordered"
        [hidden]="!show_transcriptiontable">
-    <thead>
+    <thead id="table-head">
     <tr>
-        <th></th>
-        <th>{{"general.segment" | translate}}</th>
-        <th>{{"general.transcription" | translate}}</th>
+        <th id="table-first-column"></th>
+        <th id="table-second-column">{{"general.segment" | translate}}</th>
+        <th id="table-third-column">{{"general.transcription" | translate}}</th>
         <th class="last-column">
             <fa-icon [icon]="['fas', playAllState.icon]" (click)="togglePlayAll()"></fa-icon>
             <input type="checkbox" id="skip-silence-checkbox" (click)="toggleSkipCheckbox()"
@@ -46,19 +52,23 @@
         </th>
     </tr>
     </thead>
+    <tbody>
     <tr *ngFor="let segment of shown_segments; let i = index"
+        class="segment-row"
         [ngClass]="{'alert-success': (segment.transcription.text != '' && segment.transcription.text != transcrService.break_marker.code), 'alert-info': (segment.transcription.text == transcrService.break_marker.code), 'alert-danger': (segment.transcription.text == '')}">
         <td style="width:25px;">
             <fa-icon [icon]="['fas', 'exclamation-triangle']" class="segment-warning" [ngStyle]="{
                   'display': ((segment.transcription.html.indexOf('<span class=\'val-error\'') > -1) ? 'normal': 'none')}">
             </fa-icon>
         </td>
-        <td><span class="link segment-number" (click)="onSegmentClicked(i)"># {{i + 1 | leadingnull: shown_segments.length}}</span>
+        <td><span class="link segment-number"
+                  (click)="onSegmentClicked(i)"># {{i + 1 | leadingnull: shown_segments.length}}</span>
         </td>
-        <td [innerHTML]="sanitizeHTML(segment.transcription.html)" (mousemove)="onMouseOver($event)"
-            (mousedown)="onMouseOver($event)"></td>
+        <td [innerHTML]="sanitizeHTML(segment.transcription.html)" (mousemove)="onMouseOver($event, i)"
+            (mousedown)="onMouseOver($event, i)"></td>
         <td class="last-column">
             <fa-icon [icon]="['fas', playStateSegments[i].icon]" (click)="playSelectedSegment(i)"></fa-icon>
         </td>
     </tr>
+    </tbody>
 </table>

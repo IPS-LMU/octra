@@ -9,7 +9,8 @@ import {
   OnDestroy,
   OnInit,
   Output,
-  SimpleChanges
+  SimpleChanges,
+  ViewChild
 } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
@@ -18,6 +19,7 @@ import {AudioTime, SubscriptionManager} from '../../shared';
 import {isFunction} from 'util';
 import {Segment} from '../../obj/Annotation/Segment';
 import {PlayBackState} from '../../../media-components/obj/media';
+import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
 
 @Component({
   selector: 'app-transcr-overview',
@@ -33,9 +35,9 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   @Input() public show_transcriptiontable = true;
   public show_loading = true;
 
-  @Output('segmentclicked') segmentclicked: EventEmitter<number> = new EventEmitter<number>();
+  @Output() segmentclicked: EventEmitter<number> = new EventEmitter<number>();
+  @ViewChild('validationPopover') validationPopover: ValidationPopoverComponent;
 
-  private errortooltip: any;
   private subscrmanager: SubscriptionManager;
   private updating = false;
   private errorY = 0;
@@ -57,6 +59,24 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   }[] = [];
 
   private _visible = false;
+
+  public popovers = {
+    validation: {
+      location: {
+        x: 0,
+        y: 0
+      },
+      visible: false,
+      currentGuideline: {
+        description: '',
+        title: ''
+      },
+      mouse: {
+        enter: false
+      }
+    }
+
+  };
 
   @Input('visible') set visible(value: boolean) {
     this._visible = value;
@@ -111,7 +131,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
   ngOnDestroy() {
     this.subscrmanager.destroy();
-    this.errortooltip.css('display', 'none');
   }
 
   ngOnInit() {
@@ -125,29 +144,45 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     return this.sanitizer.bypassSecurityTrustHtml(str);
   }
 
-  onMouseOver($event) {
+  onMouseOver($event, rowNumber) {
     let target = jQuery($event.target);
     if (target.is('.val-error') || target.parent().is('.val-error')) {
-      if (!target.is('.val-error')) {
-        target = target.parent();
-      }
+      if (!this.popovers.validation.mouse.enter) {
+        if (!target.is('.val-error')) {
+          target = target.parent();
+        }
 
-      const errorcode = target.attr('data-errorcode');
+        let marginTop = 0;
 
-      this.selectedError = this.transcrService.getErrorDetails(errorcode);
+        for (let i = 0; i < rowNumber; i++) {
+          const elem = jQuery(jQuery('.segment-row').get(i));
+          marginTop += elem.outerHeight();
+        }
 
-      if (this.selectedError !== null) {
-        this.errortooltip.children('.title').text(this.selectedError.title);
-        this.errortooltip.children('.description').html(this.selectedError.description);
-        const y = target.offset().top - jQuery(this.errortooltip).height() - 20;
-        const x = target.offset().left;
-        this.errortooltip.css('margin-top', y + 'px');
-        this.errortooltip.css('margin-left', x + 'px');
-        this.errortooltip.fadeIn('fast');
+        const headHeight = jQuery('#table-head').outerHeight();
+
+        const errorcode = target.attr('data-errorcode');
+
+        this.selectedError = this.transcrService.getErrorDetails(errorcode);
+
+        if (this.selectedError !== null) {
+          this.validationPopover.show();
+          this.cd.markForCheck();
+          this.cd.detectChanges();
+          this.validationPopover.description = this.selectedError.description;
+          this.validationPopover.title = this.selectedError.title;
+          this.cd.markForCheck();
+          this.cd.detectChanges();
+
+          this.popovers.validation.location.y = headHeight + marginTop - this.validationPopover.height + 10;
+          this.popovers.validation.location.x = $event.offsetX - 24;
+          this.popovers.validation.mouse.enter = true;
+        }
       }
     } else {
       this.selectedError = null;
-      this.errortooltip.css('display', 'none');
+      this.popovers.validation.mouse.enter = false;
+      this.validationPopover.hide();
     }
   }
 
@@ -156,23 +191,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   updateView() {
-    this.errortooltip = jQuery('<div></div>');
-    this.errortooltip.addClass('error-tooltip');
-    this.errortooltip.append(jQuery('<div></div>').addClass('title').text('Title'));
-    this.errortooltip.append(jQuery('<div></div>')
-      .addClass('description').text(''));
-
-    this.errortooltip.on('mouseleave', function () {
-      jQuery(this).css('display', 'none');
-    });
-    this.errortooltip.on('mouseout', function () {
-      jQuery(this).css('display', 'none');
-    });
-
-    jQuery('body').append(this.errortooltip);
-
-    this.errortooltip = jQuery('.error-tooltip');
-
     this.updateSegments();
     this.transcrService.analyse();
 
@@ -183,17 +201,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   public onSegmentClicked(segnumber: number) {
     this.segmentclicked.emit(segnumber);
   }
-
-  /*
-  ngOnChanges(event) {
-    this.show_loading = true;
-    if (!(event.visible === null || event.visible === undefined) && event.visible.currentValue === true) {
-      this.updateSegments();
-      this.transcrService.analyse();
-    } else if (!(event.visible === null || event.visible === undefined) && event.visible.currentValue === false) {
-      jQuery('.error-tooltip').css('display', 'none');
-    }
-  } */
 
   private updateSegments() {
     this.playStateSegments = [];

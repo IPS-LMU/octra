@@ -1,0 +1,83 @@
+<div *ngIf="shown_guidelines.instructions.length == 0" class="bg-warning">
+    {{"general.no guidelines found" | translate}}
+</div>
+<div class="row" style="margin-bottom:20px;"
+     *ngFor="let instructions of shown_guidelines.instructions;let j = index;">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                {{instructions.group}}
+            </div>
+            <div class="card-body" *ngIf="collapsed.length > 0">
+                <div class="row select-row" *ngFor="let entry of instructions.entries;let k = index;">
+                    <div class="col-1 chevron" (click)="toggle(j,k)">
+                        <fa-icon
+                                [icon]="['fas', (collapsed[j][k])? 'chevron-down': 'chevron-up']"></fa-icon>
+                    </div>
+                    <div class="col-2 code" (click)="toggle(j,k)">
+                        {{entry.code}}
+                    </div>
+                    <div class="col-8">
+                        <span class="guidelines-title" (click)="toggle(j,k)">{{entry.title}}</span>
+                        <div class="guidelines-descr" [collapse]="collapsed[j][k]"
+                             [innerHTML]="getGuidelineHTML(entry.description)">
+                        </div>
+                        <div class="row entry-row" [collapse]="collapsed[j][k]">
+                            <div *ngIf="entry.examples.length > 0" class="col-md-12">
+                                <div *ngFor="let example of entry.examples; let i = index;"
+                                     class="card card-example">
+                                    <div class="card-header example"
+                                         *ngIf="settService.projectsettings.guidelines === undefined
+                                                         || settService.projectsettings.guidelines?.showExampleHeader">
+                                        {{"general.example" | translate}}
+                                        <ng-container
+                                                *ngIf="settService.projectsettings.guidelines === undefined
+                                                         || settService.projectsettings.guidelines?.showExampleNumbers">
+                                            {{i + 1}}
+                                        </ng-container>
+                                    </div>
+                                    <div class="card-body">
+                                        <div *ngIf="example.url.indexOf('.wav') > -1" class="media">
+                                            <audio src="{{example.url}}" controls></audio>
+                                        </div>
+                                        <div *ngIf="example.url.indexOf('.mp4') > -1" class="media">
+                                            <video
+                                                    id="my-player_g{{j}}i{{k}}e{{i}}"
+                                                    class="video-js vjs-default-skin vjs-big-play-centered"
+                                                    controls
+                                                    preload="auto"
+                                                    data-setup='{}'>
+                                                <source src="{{example.url}}" type="video/mp4">
+                                                <p class="vjs-no-js">
+                                                    To view this video please enable JavaScript, and
+                                                    consider
+                                                    upgrading to a
+                                                    web browser that
+                                                    <a href="http://videojs.com/html5-video-support/"
+                                                       target="_blank">
+                                                        supports HTML5 video
+                                                    </a>
+                                                </p>
+                                            </video>
+                                        </div>
+                                        <div *ngIf="example.url.indexOf('.png') > -1 || example.url.indexOf('.jpg') > -1"
+                                             class="media">
+                                            <a [href]="example.url" target="_blank"><img
+                                                    [src]="example.url"/></a>
+                                        </div>
+                                        <div class="text">
+                                            <div [innerHTML]="getGuidelineHTML(example.annotation)"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-1 d-none d-sm-inline col-priority" (click)="toggle(j,k)">
+                        <span class="label label-info">{{entry.priority}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

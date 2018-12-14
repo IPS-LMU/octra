@@ -37,6 +37,7 @@
                                 'margin-left': popovers.validation.location.x + 'px',
                                 'margin-top': popovers.validation.location.y + 'px'
                             }"></app-validation-popover>
+
 <table id="transcription-table" *ngIf="shown_segments.length > 0" class="table table-bordered"
        [hidden]="!show_transcriptiontable">
     <thead id="table-head">
@@ -56,16 +57,29 @@
     <tr *ngFor="let segment of shown_segments; let i = index"
         class="segment-row"
         [ngClass]="{'alert-success': (segment.transcription.text != '' && segment.transcription.text != transcrService.break_marker.code), 'alert-info': (segment.transcription.text == transcrService.break_marker.code), 'alert-danger': (segment.transcription.text == '')}">
-        <td style="width:25px;">
+        <td style="width:25px;vertical-align:middle;">
             <fa-icon [icon]="['fas', 'exclamation-triangle']" class="segment-warning" [ngStyle]="{
                   'display': ((segment.transcription.html.indexOf('<span class=\'val-error\'') > -1) ? 'normal': 'none')}">
             </fa-icon>
         </td>
-        <td><span class="link segment-number"
-                  (click)="onSegmentClicked(i)"># {{i + 1 | leadingnull: shown_segments.length}}</span>
+        <td class="segment-number"><span class="link"
+                                         (click)="onSegmentClicked(i)"># {{i + 1 | leadingnull: shown_segments.length}}</span>
         </td>
-        <td [innerHTML]="sanitizeHTML(segment.transcription.html)" (mousemove)="onMouseOver($event, i)"
-            (mousedown)="onMouseOver($event, i)"></td>
+        <td *ngIf="textEditor.state === 'active' && textEditor.selectedSegment === i; else editorNotActive"
+            (mouseleave)="onTextEditorLeave($event, i)">
+            <div>
+                <app-transcr-editor #transcrEditor
+                                    [height]="60"
+                                    [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
+                                    [easymode]="true"
+                                    [audiochunk]="textEditor.audiochunk"
+                ></app-transcr-editor>
+            </div>
+        </td>
+        <ng-template #editorNotActive>
+            <td [innerHTML]="sanitizeHTML(segment.transcription.html)" (mousemove)="onMouseOver($event, i)"
+                (mousedown)="onMouseOver($event, i); onMouseDown($event, i);" class="segment-transcript"></td>
+        </ng-template>
         <td class="last-column">
             <fa-icon [icon]="['fas', playStateSegments[i].icon]" (click)="playSelectedSegment(i)"></fa-icon>
         </td>

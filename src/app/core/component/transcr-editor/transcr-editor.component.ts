@@ -133,7 +133,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   };
 
-  private _settings: TranscrEditorConfig;
+  private _settings: any;
   private subscrmanager: SubscriptionManager;
   private init = 0;
   private summernote_ui: any = null;
@@ -273,6 +273,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
      },
 
      */
+
+    if (!isNullOrUndefined(this.textfield)) {
+      this.textfield.summernote('destroy');
+    }
+
     this.textfield = jQuery('.textfield');
     this.textfield.summernote({
       height: this.Settings.height,
@@ -591,7 +596,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       // create button
       const btn_js = {
         contents: icon,
-        tooltip: marker.description,
+        tooltip: (isNullOrUndefined(this.Settings) || this.Settings.btnPopover) ? marker.description : '',
         container: false,
         click: () => {
           // invoke insertText method with 'hello' on editor module.
@@ -657,7 +662,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
       jQuery('.val-error').children()
         .on('mouseenter', (event) => {
-          console.log(`enter child`);
           this.onValidationErrorMouseOver(jQuery(event.target), event);
         })
         .on('mouseleave', (event) => {
@@ -823,15 +827,16 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     const elem = document.getElementsByClassName('note-editable')[0];
 
     if (!(elem === null || elem === undefined) && elem.getElementsByTagName('sel-start')[0] !== undefined) {
-      const el = elem;
       const range = document.createRange();
       const sel = window.getSelection();
-      const selStart = elem.getElementsByTagName('sel-start')[0].previousSibling;
+      let selStart = elem.getElementsByTagName('sel-start')[0].previousSibling;
       const selEnd = elem.getElementsByTagName('sel-end')[0].nextSibling;
 
       const endOffset = 0;
 
-      const childLength = el.childNodes.length;
+      if (selStart === null) {
+        selStart = selEnd;
+      }
 
       if (selStart !== null) {
         // set start position
@@ -854,8 +859,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       } else {
         console.error('cursor is null!');
       }
-    } else {
-      console.error('elem is null');
     }
   }
 
@@ -1189,7 +1192,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         let marginLeft = event.target.offsetLeft;
         const height = this.validationPopover.height;
 
-        if (this.validationPopover.width + marginLeft > jQuery('.note-toolbar.card-header').width()) {
+        if (
+          this.validationPopover.width + marginLeft > jQuery('.note-toolbar.card-header').width()
+          && marginLeft - this.validationPopover.width > 0
+        ) {
           marginLeft -= this.validationPopover.width;
 
           if (jQueryObj.width() > 10) {

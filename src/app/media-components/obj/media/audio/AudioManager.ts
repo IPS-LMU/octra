@@ -459,6 +459,16 @@ export class AudioManager {
     }
   }
 
+  public removeChunk(chunk: AudioChunk) {
+
+    // remove by id
+    this.chunks = this.chunks.filter(
+      (a) => {
+        return a.id !== chunk.id;
+      }
+    );
+  }
+
   private getSource(): AudioBufferSourceNode {
     this._source = this._audiocontext.createBufferSource();
     return this._source;

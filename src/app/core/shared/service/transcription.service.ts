@@ -162,6 +162,7 @@ export class TranscriptionService {
   }[] = [];
 
   private _transcriptValid = false;
+
   public saveSegments = () => {
     // make sure, that no saving overhead exist. After saving request wait 1 second
     if (!this.saving) {

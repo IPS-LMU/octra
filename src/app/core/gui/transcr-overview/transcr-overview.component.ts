@@ -14,12 +14,13 @@ import {
 } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
-import {AudioService, TranscriptionService} from '../../shared/service';
-import {AudioTime, SubscriptionManager} from '../../shared';
-import {isFunction} from 'util';
-import {Segment} from '../../obj/Annotation/Segment';
+import {AppStorageService, AudioService, TranscriptionService} from '../../shared/service';
+import {AudioChunk, AudioSelection, AudioTime, SubscriptionManager} from '../../shared';
+import {Segment} from '../../obj/Annotation';
 import {PlayBackState} from '../../../media-components/obj/media';
 import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
+import {isFunction} from '../../shared/Functions';
+import {TranscrEditorComponent} from '../../component/transcr-editor';
 
 @Component({
   selector: 'app-transcr-overview',
@@ -28,15 +29,25 @@ import {ValidationPopoverComponent} from '../../component/transcr-editor/validat
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
+  get textEditor(): { selectedSegment: number; state: string, audiochunk: AudioChunk } {
+    return this._textEditor;
+  }
 
   public selectedError: any = '';
-  public shown_segments: any[] = [];
+  public shown_segments: {
+    transcription: {
+      html: string,
+      text: string
+    }
+  }[] = [];
+
   @Input() segments: Segment[];
   @Input() public show_transcriptiontable = true;
   public show_loading = true;
 
   @Output() segmentclicked: EventEmitter<number> = new EventEmitter<number>();
   @ViewChild('validationPopover') validationPopover: ValidationPopoverComponent;
+  @ViewChild('transcrEditor') transcrEditor: TranscrEditorComponent;
 
   private subscrmanager: SubscriptionManager;
   private updating = false;
@@ -76,6 +87,12 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       }
     }
 
+  };
+
+  private _textEditor = {
+    state: 'inactive',
+    selectedSegment: -1,
+    audiochunk: null
   };
 
   @Input('visible') set visible(value: boolean) {
@@ -124,7 +141,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   constructor(public transcrService: TranscriptionService,
               public audio: AudioService,
               public sanitizer: DomSanitizer,
-              private cd: ChangeDetectorRef) {
+              private cd: ChangeDetectorRef,
+              private appStorage: AppStorageService) {
 
     this.subscrmanager = new SubscriptionManager();
   }
@@ -145,45 +163,89 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   onMouseOver($event, rowNumber) {
-    let target = jQuery($event.target);
-    if (target.is('.val-error') || target.parent().is('.val-error')) {
-      if (!this.popovers.validation.mouse.enter) {
-        if (!target.is('.val-error')) {
-          target = target.parent();
+    if (this.textEditor.state === 'inactive') {
+      let target = jQuery($event.target);
+      if (target.is('.val-error') || target.parent().is('.val-error')) {
+        if (!this.popovers.validation.mouse.enter) {
+          if (!target.is('.val-error')) {
+            target = target.parent();
+          }
+
+          let marginTop = 0;
+
+          for (let i = 0; i < rowNumber; i++) {
+            const elem = jQuery(jQuery('.segment-row').get(i));
+            marginTop += elem.outerHeight();
+          }
+
+          const headHeight = jQuery('#table-head').outerHeight();
+
+          const errorcode = target.attr('data-errorcode');
+
+          this.selectedError = this.transcrService.getErrorDetails(errorcode);
+
+          if (this.selectedError !== null) {
+            this.validationPopover.show();
+            this.validationPopover.description = this.selectedError.description;
+            this.validationPopover.title = this.selectedError.title;
+            this.cd.markForCheck();
+            this.cd.detectChanges();
+
+            this.popovers.validation.location.y = headHeight + marginTop - this.validationPopover.height + 10;
+            this.popovers.validation.location.x = $event.offsetX - 24;
+            this.popovers.validation.mouse.enter = true;
+            this.cd.markForCheck();
+            this.cd.detectChanges();
+          }
         }
-
-        let marginTop = 0;
-
-        for (let i = 0; i < rowNumber; i++) {
-          const elem = jQuery(jQuery('.segment-row').get(i));
-          marginTop += elem.outerHeight();
-        }
-
-        const headHeight = jQuery('#table-head').outerHeight();
-
-        const errorcode = target.attr('data-errorcode');
-
-        this.selectedError = this.transcrService.getErrorDetails(errorcode);
-
-        if (this.selectedError !== null) {
-          this.validationPopover.show();
-          this.cd.markForCheck();
-          this.cd.detectChanges();
-          this.validationPopover.description = this.selectedError.description;
-          this.validationPopover.title = this.selectedError.title;
-          this.cd.markForCheck();
-          this.cd.detectChanges();
-
-          this.popovers.validation.location.y = headHeight + marginTop - this.validationPopover.height + 10;
-          this.popovers.validation.location.x = $event.offsetX - 24;
-          this.popovers.validation.mouse.enter = true;
-        }
+      } else {
+        this.selectedError = null;
+        this.popovers.validation.mouse.enter = false;
+        this.validationPopover.hide();
       }
     } else {
-      this.selectedError = null;
-      this.popovers.validation.mouse.enter = false;
-      this.validationPopover.hide();
+      this.popovers.validation.visible = false;
     }
+  }
+
+  onMouseDown($event, i) {
+    if (this.textEditor.state === 'inactive') {
+      this.textEditor.state = 'active';
+      this.textEditor.selectedSegment = i;
+
+      const segment = this.segments[i];
+      const nextSegmentTime: AudioTime = (i < this.segments.length - 1)
+        ? this.segments[i + 1].time : this.audio.audiomanagers[0].originalInfo.duration;
+      const audiochunk = new AudioChunk(new AudioSelection(segment.time, nextSegmentTime), this.audio.audiomanagers[0]);
+
+      this.audio.audiomanagers[0].addChunk(audiochunk);
+      this.textEditor.audiochunk = audiochunk;
+
+      this.cd.markForCheck();
+      this.cd.detectChanges();
+
+      this.transcrEditor.Settings.btnPopover = false;
+      this.transcrEditor.initialize();
+
+      this.transcrEditor.rawText = segment.transcript;
+      this.transcrEditor.focus();
+    }
+  }
+
+  onTextEditorLeave($event, i) {
+    this.segments[i].transcript = this.transcrEditor.rawText;
+    const segment = this.segments[i];
+    this.transcrService.validateAll();
+    this.updateSegments();
+
+    this.transcrService.currentlevel.segments.change(i, segment);
+    this.transcrService.saveSegments();
+    this.textEditor.state = 'inactive';
+    this.textEditor.selectedSegment = -1;
+    this.audio.audiomanagers[0].removeChunk(this.textEditor.audiochunk);
+    this.textEditor.audiochunk = null;
+    this.cd.markForCheck();
+    this.cd.detectChanges();
   }
 
   ngAfterViewInit() {
@@ -216,28 +278,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       for (let i = 0; i < this.segments.length; i++) {
         const segment = this.segments[i];
 
-        const obj = {
-          start: start_time,
-          end: segment.time.seconds,
-          transcription: {
-            text: segment.transcript,
-            html: segment.transcript
-          },
-          validation: ''
-        };
-
-        if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function') {
-          obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
-            this.transcrService.validationArray[i].validation);
-        }
-
-        obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
-        obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
-          if (g1 === '[[[') {
-            return '<';
-          }
-          return '>';
-        });
+        const obj = this.getShownSegment(start_time, segment.time.samples, segment.transcript, i);
 
         result.push(obj);
 
@@ -253,6 +294,42 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       this.shown_segments = result;
       this.show_loading = false;
     }
+  }
+
+  getShownSegment(startSamples: number, endSamples: number, rawText: string, i: number): {
+    start: number,
+    end: number,
+    transcription: {
+      text: string,
+      html: string
+    },
+    validation: string
+  } {
+    const obj = {
+      start: startSamples,
+      end: endSamples,
+      transcription: {
+        text: rawText,
+        html: rawText
+      },
+      validation: ''
+    };
+
+    if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function') {
+      obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
+        this.transcrService.validationArray[i].validation);
+    }
+
+    obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
+    obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
+      if (g1 === '[[[') {
+        return '<';
+      }
+      return '>';
+    });
+
+    obj.transcription.html = obj.transcription.html.replace(/(<p>)|(<\/p>)/g, '');
+    return obj;
   }
 
   playAll(nextSegment: number) {

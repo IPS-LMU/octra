@@ -5,6 +5,7 @@ export class TranscrEditorConfig {
     disabled_keys: ['ENTER', 'SHIFT + ENTER', 'TAB'],
     height: 300,
     responsive: false,
+    btnPopover: true,
     special_markers: {
       boundary: false
     }

@@ -119,7 +119,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     switch ($event.comboKey) {
       case ('ALT + ARROWRIGHT'):
         $event.event.preventDefault();
-        if (this.segment_index < this.transcrService.currentlevel.segments.length - 1) {
+        if (!this.isNextSegmentLastAndBreak(this.segment_index)
+          && this.segment_index < this.transcrService.currentlevel.segments.length - 1) {
           this.doit('right');
         } else {
           this.save();

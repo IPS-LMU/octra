@@ -6,11 +6,14 @@ import {AudioChunk} from './AudioChunk';
 import {AudioSelection} from './AudioSelection';
 import {AudioFormat} from './AudioFormats';
 import {AudioInfo, PlayBackState, SourceType} from '../index';
-import {BrowserInfo} from '../../../../core/shared';
 
 declare var window: any;
 
 export class AudioManager {
+  get bufferedOLA(): any {
+    return this._bufferedOLA;
+  }
+
   get state(): PlayBackState {
     return this._state;
   }
@@ -112,9 +115,10 @@ export class AudioManager {
     return this._javascriptNode;
   }
 
-  constructor(audioinfo) {
+  constructor(audioinfo: AudioInfo) {
     this._id = ++AudioManager.counter;
     this._originalInfo = audioinfo;
+    this._bufferedOLA = new BufferedOLA(2048);
 
     if (!(audioinfo === null || audioinfo === undefined)) {
       // Fix up for prefixing
@@ -138,6 +142,8 @@ export class AudioManager {
   }
 
   private static counter = 0;
+
+  private _bufferedOLA: any;
   public afterdecoded: EventEmitter<AudioRessource> = new EventEmitter<AudioRessource>();
   public loaded = false;
   public afterloaded: EventEmitter<any> = new EventEmitter<any>();
@@ -176,6 +182,8 @@ export class AudioManager {
   private _channel: Float32Array;
 
   private _javascriptNode = null;
+
+  private first_time = false;
   public static decodeAudio = (filename: string, type: string, buffer: ArrayBuffer,
                                audioformats: AudioFormat[], keepbuffer = false): Promise<AudioManager> => {
     return new Promise<AudioManager>((resolve, reject) => {
@@ -202,8 +210,10 @@ export class AudioManager {
         const buffer_length = buffer.byteLength;
 
         AudioManager.decodeAudioFile(buffer, audioinfo.samplerate).then((audiobuffer: AudioBuffer) => {
-          console.log(`audio decoded`);
+          console.log(`audio decoded, samplerate ${audioinfo.samplerate}, ${audiobuffer.sampleRate}`);
+
           const result = new AudioManager(audioinfo);
+          result.bufferedOLA.set_audio_buffer(audiobuffer);
 
           console.log(`original samplerate: ${audioinfo.samplerate}`);
           audioinfo = new AudioInfo(filename, type, buffer_length, audiobuffer.sampleRate,
@@ -252,41 +262,45 @@ export class AudioManager {
     return new Promise<AudioBuffer>((resolve, reject) => {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-      if (BrowserInfo.browser.indexOf('Safari') > -1) {
-        console.log(`safari`);
-        if (audioCtx) {
-          audioCtx.decodeAudioData(file, function (buffer) {
-            resolve(buffer);
-          });
-        } else {
-          reject('AudioContext not supported by the browser.');
-        }
-      } else {
-        // not Safari Browser
-        console.log(`not safari`);
-        const OfflineAudioContext = (<any>window).OfflineAudioContext // Default
-          || (<any>window).webkitOfflineAudioContext // Safari and old versions of Chrome
-          || (<any>window).mozOfflineAudioContext
-          || false;
+      audioCtx.decodeAudioData(file, function (buffer) {
+        resolve(buffer);
+      });
+      /*
+            if (BrowserInfo.browser.indexOf('Safari') > -1) {
+              console.log(`safari`);
+              if (audioCtx) {
+                audioCtx.decodeAudioData(file, function (buffer) {
+                  resolve(buffer);
+                });
+              } else {
+                reject('AudioContext not supported by the browser.');
+              }
+            } else {
+              // not Safari Browser
+              console.log(`not safari`);
+              const OfflineAudioContext = (<any>window).OfflineAudioContext // Default
+                || (<any>window).webkitOfflineAudioContext // Safari and old versions of Chrome
+                || (<any>window).mozOfflineAudioContext
+                || false;
 
-        if (OfflineAudioContext === false) {
-          console.error(`OfflineAudioContext is not supported!`);
-        }
+              if (OfflineAudioContext === false) {
+                console.error(`OfflineAudioContext is not supported!`);
+              }
 
-        audioCtx.decodeAudioData(file, function (buffer) {
-          // do downsampling in order to allow bigger files
-          const context = new OfflineAudioContext(1, Math.ceil(buffer.duration * sampleRate), sampleRate);
-          const source = context.createBufferSource();
-          source.buffer = buffer;
-          source.connect(context.destination);
-          source.start();
-          context.startRendering().then((rendered) => {
-            resolve(rendered);
-          }).catch((error) => {
-            reject(error);
-          });
-        });
-      }
+              audioCtx.decodeAudioData(file, function (buffer) {
+                // do downsampling in order to allow bigger files
+                const context = new OfflineAudioContext(2, Math.ceil(buffer.duration * sampleRate), sampleRate);
+                const source = context.createBufferSource();
+                source.buffer = buffer;
+                source.connect(context.destination);
+                source.start();
+                context.startRendering().then((rendered) => {
+                  resolve(rendered);
+                }).catch((error) => {
+                  reject(error);
+                });
+              });
+            }*/
     });
   }
 
@@ -319,7 +333,7 @@ export class AudioManager {
         this._state = PlayBackState.STOPPED;
         afterAudioEnded();
       };
-      this._source.stop(0);
+      this.source.disconnect();
       return true;
     } else {
       console.log(`can't stop because audio manager is not playing`);
@@ -355,13 +369,10 @@ export class AudioManager {
       this._playonhover = playonhover;
       this.changeState(PlayBackState.STARTED);
       this._stepbackward = false;
-      this._source = this.getSource();
-      this._source.buffer = this._ressource.audiobuffer;
-      this._javascriptNode = this._audiocontext.createScriptProcessor(2048, 1, 1);
+      this._javascriptNode = this._audiocontext.createScriptProcessor(2048, 2, 2);
 
       // connect modules of Web Audio API
       this._gainNode.gain.value = volume;
-      this._source.playbackRate.value = speed;
       this._source.connect(this._gainNode);
       this._javascriptNode.connect(this._audiocontext.destination);
       this._gainNode.connect(this._audiocontext.destination);
@@ -370,7 +381,22 @@ export class AudioManager {
 
       this._startplaying = new Date().getTime();
       this._endplaying = this._startplaying + (duration.unix / speed);
-      this._javascriptNode.onaudioprocess = drawFunc;
+      this._javascriptNode.onaudioprocess = (e) => {
+        drawFunc();
+        if (this.audioplaying) {
+          if (!this.first_time) {
+            this._bufferedOLA.alpha = speed;
+            this._bufferedOLA.position = begintime.samples;
+            console.log(`play position is ${begintime.samples}, speed is ${speed}`);
+            this.first_time = true;
+          }
+          this._bufferedOLA.process(e.outputBuffer);
+          console.log(`input:`);
+          console.log(e.inputBuffer.getChannelData(0));
+          console.log(`output:`);
+          console.log(e.outputBuffer.getChannelData(0));
+        }
+      };
 
       this.changeState(PlayBackState.PLAYING);
 

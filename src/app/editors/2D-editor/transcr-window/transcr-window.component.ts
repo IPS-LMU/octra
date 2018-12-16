@@ -564,4 +564,15 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       }
     }
   }
+
+  /**
+   * checks if next segment is the last one and contains only a break.
+   * @param segment_index
+   */
+  public isNextSegmentLastAndBreak(segment_index: number) {
+    const currentLevel = this.transcrService.currentlevel;
+    const nextSegment = currentLevel.segments.get(segment_index + 1);
+    return segment_index === currentLevel.segments.length - 2
+      && nextSegment.transcript === this.transcrService.break_marker.code;
+  }
 }

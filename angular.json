@@ -42,7 +42,10 @@
               "node_modules/platform/platform.js",
               "node_modules/ajv/dist/ajv.min.js",
               "node_modules/jquery.caret/dist/jquery.caret.min.js",
-              "node_modules/moment/min/moment.min.js"
+              "node_modules/moment/min/moment.min.js",
+              "src/assets/js/cbuffer.js",
+              "src/assets/js/OLA.js",
+              "src/assets/js/buffered-ola.js"
             ]
           },
           "configurations": {

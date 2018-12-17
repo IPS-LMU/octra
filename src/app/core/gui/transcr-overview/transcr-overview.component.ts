@@ -231,6 +231,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
           }
           return '>';
         });
+        obj.transcription.html = obj.transcription.html.replace(/(<p>)|(<\/p>)/g, '');
 
         result.push(obj);
 

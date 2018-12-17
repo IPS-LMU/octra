@@ -4,6 +4,7 @@
 
 .segment-number {
     padding: 3px;
+    width: 40px;
 }
 
 .segment-warning {
@@ -28,10 +29,15 @@
 .table .last-column {
     text-align: center;
     vertical-align: middle;
+    width: 40px;
 }
 
 .table fa-icon {
     cursor: pointer;
+}
+
+table tr td {
+    vertical-align: middle;
 }
 
 #skip-silence-checkbox {

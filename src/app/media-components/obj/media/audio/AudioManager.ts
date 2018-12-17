@@ -6,6 +6,10 @@ import {Subscription} from 'rxjs';
 declare var window: any;
 
 export class AudioManager {
+  get bufferedOLA(): any {
+    return this._bufferedOLA;
+  }
+
   get mainchunk(): AudioChunk {
     return this._mainchunk;
   }
@@ -46,9 +50,10 @@ export class AudioManager {
     return this._channel;
   }
 
+  /*
   get source(): AudioBufferSourceNode {
     return this._source;
-  }
+  }*/
 
   get audioContext(): AudioContext {
     return this._audioContext;
@@ -90,7 +95,8 @@ export class AudioManager {
   constructor(audioinfo: AudioInfo) {
     this._id = ++AudioManager.counter;
     this._originalInfo = audioinfo;
-    // this._bufferedOLA = new BufferedOLA(2048);
+    this._bufferedOLA = new BufferedOLA(this._bufferSize);
+    this._bufferedOLA.set_window_type('Triangular');
 
     if (!(audioinfo === null || audioinfo === undefined)) {
       // Fix up for prefixing
@@ -123,6 +129,7 @@ export class AudioManager {
   private _stepBackward = false;
   private stateRequest: PlayBackState = null;
   private _isScriptProcessorCanceled = false;
+  private _bufferedOLA: any;
 
   // timestamp when playing should teminate
   private _playbackInfo = {
@@ -131,15 +138,15 @@ export class AudioManager {
   };
 
   // variables needed for initializing audio
-  private _source: AudioBufferSourceNode = null;
+  // private _source: AudioBufferSourceNode = null;
   private _audioContext: AudioContext = null;
   private _gainNode: GainNode = null;
   private _scriptProcessorNode: ScriptProcessorNode = null;
   // only the Audiomanager may have the channel array
   private _channel: Float32Array;
 
-  private _frameSize = 2048;
-  private _bufferSize = 2048;
+  private _frameSize = 4096;
+  private _bufferSize = 4096;
 
   private chunks: AudioChunk[] = [];
 
@@ -190,7 +197,7 @@ export class AudioManager {
             console.log(`audio decoded, samplerate ${audioinfo.samplerate}, ${audiobuffer.sampleRate}`);
 
             const result = new AudioManager(audioinfo);
-            // result.bufferedOLA.set_audio_buffer(audiobuffer);
+            result.bufferedOLA.set_audio_buffer(audiobuffer);
 
             console.log(`original samplerate: ${audioinfo.samplerate}`);
             audioinfo = new AudioInfo(filename, type, buffer_length, audiobuffer.sampleRate,
@@ -288,18 +295,17 @@ export class AudioManager {
 
         // connect modules of Web Audio API
         this._gainNode.gain.value = volume;
-        this._source = this.getSource();
-        this._source.buffer = this._ressource.audiobuffer;
-        this._source.connect(this._gainNode);
         let lastCheck = Date.now();
         this._scriptProcessorNode.connect(this._audioContext.destination);
         this._gainNode.connect(this._audioContext.destination);
+        /*
         this._source.onended = () => {
           this.afterAudioEnded();
           if (this.state === PlayBackState.ENDED) {
             resolve();
           }
         };
+        */
 
         this._playbackInfo.started = new Date().getTime();
         this._playbackInfo.endAt = this._playbackInfo.started + (duration.unix / speed);
@@ -309,8 +315,11 @@ export class AudioManager {
           this._isScriptProcessorCanceled = true;
           if (this.isPlaying) {
             this._playposition.unix += Math.round((Date.now() - lastCheck));
+            this._bufferedOLA.alpha = 1 / speed;
+            // this._bufferedOLA.position = this._playposition.samples;
             onProcess();
           }
+          this._bufferedOLA.process(e.inputBuffer, e.outputBuffer);
           lastCheck = Date.now();
         });
 
@@ -318,10 +327,10 @@ export class AudioManager {
 
         if (duration.samples <= 0) {
           // important: source.start needs seconds, not samples!
-          this._source.start(0, Math.max(0, begintime.seconds));
+          // this._source.start(0, Math.max(0, begintime.seconds));
         } else {
           // important: source.start needs seconds, not samples!
-          this._source.start(0, Math.max(0, begintime.seconds), duration.seconds);
+          // this._source.start(0, Math.max(0, begintime.seconds), duration.seconds);
         }
 
         return true;
@@ -345,7 +354,7 @@ export class AudioManager {
           reject(error);
         });
 
-        this.source.stop(0);
+        //this.source.stop(0);
       } else {
         reject(`can't stop because audio manager is not playing`);
       }
@@ -364,7 +373,7 @@ export class AudioManager {
         }, (error) => {
           reject(error);
         });
-        this._source.stop(0);
+        //this._source.stop(0);
       } else {
         reject('cant pause because not playing');
       }
@@ -420,10 +429,12 @@ export class AudioManager {
   /**
    * return the source node
    */
+
+  /*
   private getSource(): AudioBufferSourceNode {
     this._source = this._audioContext.createBufferSource();
     return this._source;
-  }
+  }*/
 
   public createNewAudioChunk(time: AudioSelection, selection?: AudioSelection): AudioChunk {
     if (
@@ -473,9 +484,10 @@ export class AudioManager {
           );
       }
 
+      /*
       if (!(this._source === null || this._source === undefined)) {
         this._source.disconnect();
-      }
+      }*/
     }
   }
 }

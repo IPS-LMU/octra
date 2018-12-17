@@ -170,7 +170,7 @@
     },
     "inactivity": {
       "header": "Längere Inaktivität entdeckt",
-      "body": "Du warst seit {{value}} Minuten inaktiv ohne OCTRA zu beenden. Es ist empfehlenswert, OCTRA bei vorrausichtlich längerer Inaktivität zu beenden. Falls Du die Transkription gerade nicht fortsetzen möchtest, solltest Du OCTRA jetzt beenden. Was möchtest Du tun?",
+      "body": "Du warst seit mindestens {{value}} Minuten inaktiv ohne OCTRA zu beenden. Es ist empfehlenswert, OCTRA bei vorrausichtlich längerer Inaktivität zu beenden. Falls Du die Transkription gerade nicht fortsetzen möchtest, solltest Du OCTRA jetzt beenden. Was möchtest Du tun?",
       "new": "Neue Transkription beginnen",
       "continue": "Transkription fortsetzen",
       "quit": "OCTRA beenden"

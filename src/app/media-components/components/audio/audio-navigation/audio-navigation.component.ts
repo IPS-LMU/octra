@@ -33,7 +33,7 @@ export interface Buttons {
   styleUrls: ['./audio-navigation.component.css']
 })
 export class AudioNavigationComponent implements AfterViewInit {
-  @Input() audioplaying = false;
+  @Input() isAudioPlaying = false;
   @Input() responsive = false;
   @Input() easymode = false;
   @Output() buttonclick = new EventEmitter<{ type: string, timestamp: number }>();

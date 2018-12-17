@@ -43,9 +43,9 @@
           "type": "radiobutton",
           "label": {
             "de": "unverständlich",
-            "en": "unknowable"
+            "en": "incomprehensible"
           },
-          "value": "0",
+          "value": "incomprehensible",
           "custom": {},
           "required": true
         },
@@ -53,9 +53,9 @@
           "type": "radiobutton",
           "label": {
             "de": "weniger verständlich",
-            "en": "less clear"
+            "en": "unclear"
           },
-          "value": "1",
+          "value": "unclear",
           "custom": {},
           "required": true
         },
@@ -65,17 +65,17 @@
             "de": "verständlich",
             "en": "clear"
           },
-          "value": "2",
+          "value": "clear",
           "custom": {},
           "required": true
         },
         {
           "type": "radiobutton",
           "label": {
-            "de": "sehr gut verständlich",
-            "en": "very clear"
+            "de": "keine Sprache",
+            "en": "no speech"
           },
-          "value": "3",
+          "value": "no speech",
           "custom": {},
           "required": true
         }
@@ -90,30 +90,20 @@
         {
           "type": "radiobutton",
           "label": {
-            "de": "viele Störgeräusche",
-            "en": "lot of noises"
+            "de": "starke Störgeräusche",
+            "en": "very noisy"
           },
-          "value": "0",
+          "value": "very noisy",
           "custom": {},
           "required": true
         },
         {
           "type": "radiobutton",
           "label": {
-            "de": "wenige Störgeräusche",
-            "en": "less noises"
+            "de": "leichte Störgeräusche",
+            "en": "some noise"
           },
-          "value": "1",
-          "custom": {},
-          "required": true
-        },
-        {
-          "type": "radiobutton",
-          "label": {
-            "de": "sehr wenig Störgeräusche",
-            "en": "very clear"
-          },
-          "value": "2",
+          "value": "some noise",
           "custom": {},
           "required": true
         },
@@ -121,9 +111,19 @@
           "type": "radiobutton",
           "label": {
             "de": "keine Störgeräusche",
-            "en": "no noises"
+            "en": "no noise"
           },
-          "value": "3",
+          "value": "no noise",
+          "custom": {},
+          "required": true
+        },
+        {
+          "type": "radiobutton",
+          "label": {
+            "de": "kein Signal",
+            "en": "no signal"
+          },
+          "value": "no signal",
           "custom": {},
           "required": true
         }

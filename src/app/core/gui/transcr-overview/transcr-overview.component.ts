@@ -21,6 +21,7 @@ import {PlayBackState} from '../../../media-components/obj/media';
 import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
 import {isFunction} from '../../shared/Functions';
 import {TranscrEditorComponent} from '../../component/transcr-editor';
+import {reject} from 'q';
 
 @Component({
   selector: 'app-transcr-overview',
@@ -369,12 +370,14 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       this.playAll(0);
     } else {
       // stop
-      this.audio.audiomanagers[0].stopPlayback(() => {
+      this.audio.audiomanagers[0].stopPlayback().then(() => {
         this.playStateSegments[this.playAllState.currentSegment].state = 'stopped';
         this.playStateSegments[this.playAllState.currentSegment].icon = 'play';
 
         this.cd.markForCheck();
         this.cd.detectChanges();
+      }).catch((error) => {
+        console.error(error);
       });
     }
   }
@@ -395,20 +398,22 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
         this.audio.audiomanagers[0].startPlayback(new AudioTime(startSample, this.audio.audiomanagers[0].originalInfo.samplerate),
           new AudioTime(segment.time.samples - startSample, this.audio.audiomanagers[0].originalInfo.samplerate), 1, 1, () => {
-          }, () => {
-            this.playStateSegments[segmentNumber].state = 'stopped';
-            this.playStateSegments[segmentNumber].icon = 'play';
+          }).then(() => {
+          this.playStateSegments[segmentNumber].state = 'stopped';
+          this.playStateSegments[segmentNumber].icon = 'play';
 
-            this.cd.markForCheck();
-            this.cd.detectChanges();
+          this.cd.markForCheck();
+          this.cd.detectChanges();
 
-            setTimeout(() => {
-              resolve();
-            }, 1000);
-          });
+          setTimeout(() => {
+            resolve();
+          }, 1000);
+        }).catch((error) => {
+          console.error(error);
+        });
       } else {
         // stop playback
-        this.audio.audiomanagers[0].stopPlayback(() => {
+        this.audio.audiomanagers[0].stopPlayback().then(() => {
           this.playStateSegments[segmentNumber].state = 'stopped';
           this.playStateSegments[segmentNumber].icon = 'play';
 
@@ -416,6 +421,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
           this.cd.detectChanges();
 
           resolve();
+        }).catch((error) => {
+          console.error(error);
         });
       }
     });
@@ -451,9 +458,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       }
 
       if (this.audio.audiomanagers[0].state === PlayBackState.PLAYING) {
-        this.audio.audiomanagers[0].stopPlayback(() => {
-          resolve();
-        });
+        this.audio.audiomanagers[0].stopPlayback().then(resolve).catch(reject);
       } else {
         resolve();
       }

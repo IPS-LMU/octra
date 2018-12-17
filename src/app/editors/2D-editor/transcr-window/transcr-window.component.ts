@@ -96,7 +96,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.save();
 
     new Promise<void>((resolve, reject) => {
-      if (this.audiomanager.audioplaying) {
+      if (this.audiomanager.isPlaying) {
         this.loupe.viewer.stopPlayback(() => {
           resolve();
         });
@@ -269,7 +269,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       }
 
       this.uiService.addElementFromEvent('mouse_clicked', {value: event.type},
-        event.timestamp, Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor),
+        event.timestamp, Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor),
         this.editor.caretpos, 'audio_buttons', segment);
     }
 
@@ -358,7 +358,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
 
     this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
-      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, type, segment);
+      Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, type, segment);
   }
 
   onMarkerInsert(marker_code: string) {
@@ -381,7 +381,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
 
     this.uiService.addElementFromEvent('shortcut', {value: marker_code}, Date.now(),
-      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'markers', segment);
+      Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'markers', segment);
   }
 
   onMarkerClick(marker_code: string) {
@@ -404,7 +404,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
 
     this.uiService.addElementFromEvent('mouse_clicked', {value: marker_code}, Date.now(),
-      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor_toolbar', segment);
+      Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor_toolbar', segment);
   }
 
   onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
@@ -431,7 +431,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
 
     this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
-      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_speed', segment);
+      Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_speed', segment);
 
   }
 
@@ -459,7 +459,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
 
     this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
-      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_volume', segment);
+      Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_volume', segment);
   }
 
   onBoundaryClicked(samples: number) {

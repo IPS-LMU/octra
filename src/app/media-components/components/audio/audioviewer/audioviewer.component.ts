@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   HostListener,
@@ -125,7 +126,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   constructor(public av: AudioviewerService,
               private transcr: TranscriptionService,
               private keyMap: KeymappingService,
-              private langService: TranslateService) {
+              private langService: TranslateService,
+              private cd: ChangeDetectorRef) {
 
     this.av.initializeSettings();
 
@@ -141,18 +143,18 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   @ViewChild('playcan') playcanRef;
   @ViewChild('mousecan') mousecanRef;
   // EVENTS
-  @Output('selchange') selchange = new EventEmitter<AudioSelection>();
-  @Output('segmententer') segmententer: EventEmitter<any> = new EventEmitter<any>();
-  @Output('segmentchange') segmentchange: EventEmitter<number> = new EventEmitter<number>();
-  @Output('mousecursorchange') mousecursorchange = new EventEmitter<AVMousePos>();
-  @Output('playcursorchange') playcursorchange = new EventEmitter<PlayCursor>();
-  @Output('shortcuttriggered') shortcuttriggered = new EventEmitter<any>();
+  @Output() selchange = new EventEmitter<AudioSelection>();
+  @Output() segmententer: EventEmitter<any> = new EventEmitter<any>();
+  @Output() segmentchange: EventEmitter<number> = new EventEmitter<number>();
+  @Output() mousecursorchange = new EventEmitter<AVMousePos>();
+  @Output() playcursorchange = new EventEmitter<PlayCursor>();
+  @Output() shortcuttriggered = new EventEmitter<any>();
   @Output() alerttriggered = new EventEmitter<{ type: string, message: string }>();
   @Output() scrolling = new EventEmitter<{ state: string }>();
   @Output() scrollbarchange = new EventEmitter<{ state: string }>();
   @Input() margin: Margin = new Margin(0, 0, 0, 0);
-  @Input('audiochunk') audiochunk: AudioChunk;
-  @Input('name') name: string;
+  @Input() audiochunk: AudioChunk;
+  @Input() name: string;
   public scrollbar = {
     dragging: false,
     mouseover: false
@@ -278,7 +280,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       this.g_context.beginPath();
       this.g_context.moveTo(line_obj.Pos.x, line_obj.Pos.y + midline - this.av.minmaxarray[x_pos] - this.av.viewRect.position.y);
 
-      if (!(midline === null || midline === undefined) && !(line_obj.Pos === null || line_obj.Pos === undefined) && !(this.av.minmaxarray === null || this.av.minmaxarray === undefined)
+      if (!(midline === null || midline === undefined) &&
+        !(line_obj.Pos === null || line_obj.Pos === undefined)
+        && !(this.av.minmaxarray === null || this.av.minmaxarray === undefined)
         && !(zoomY === null || zoomY === undefined)) {
         for (let x = 0; (x + x_pos) < x_pos + line_obj.Size.width; x++) {
 
@@ -552,13 +556,14 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   /**
    * playSelection() plays the selected signal fragment or the selection in this chunk
    */
-  playSelection = (afterAudioEnded: () => void): boolean => {
+  playSelection = (afterAudioEnded: () => void, onProcess: () => void = () => {
+  }) => {
     const drawFunc = () => {
-      this.audiochunk.updatePlayPosition();
       this.anim.requestFrame(this.drawPlayCursor);
+      onProcess();
     };
 
-    return this.audiochunk.startPlayback(drawFunc, afterAudioEnded);
+    this.audiochunk.startPlayback(drawFunc).then(afterAudioEnded);
   }
 
   private drawFunc = () => {
@@ -580,6 +585,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     if (line) {
       this.drawPlayCursorOnly(line);
       this.av.LastLine = line;
+      this.cd.markForCheck();
+      this.cd.detectChanges();
     } else {
     }
   }
@@ -770,7 +777,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         if (!(current === null || current === undefined)) {
           if (!(obj.audiochunk.previousValue === null || obj.audiochunk.previousValue === undefined)) {
             // audiochunk already exists
-            (<AudioChunk> obj.audiochunk.previousValue).destroy();
+            (<AudioChunk>obj.audiochunk.previousValue).destroy();
           }
           if (!this.av.Settings.justify_signal_height) {
             const zoomY = this.av.zoomY;
@@ -1291,9 +1298,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    */
   stopPlayback(afterAudioEnded: () => void) {
     if (this.audiomanager.state === PlayBackState.PLAYING) {
-      this.audiochunk.stopPlayback(() => {
+      this.audiochunk.stopPlayback().then(() => {
         this.afterAudioStopped();
         afterAudioEnded();
+      }).catch((error) => {
+        console.error(error);
       });
     } else {
       afterAudioEnded();
@@ -1305,9 +1314,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    */
   pausePlayback(afterAudioEnded: () => void) {
     if (this.audiomanager.state === PlayBackState.PLAYING) {
-      this.audiochunk.pausePlayback(() => {
+      this.audiochunk.pausePlayback().then(() => {
         this.afterAudioPaused();
         afterAudioEnded();
+      }).catch((error) => {
+        console.error(error);
       });
     } else {
       console.error(`can't pause!!`);
@@ -1318,21 +1329,21 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   /**
    * start audio playback
    */
-  startPlayback(): boolean {
+  startPlayback(onProcess: () => void = () => {
+  }) {
     if (this.audiomanager.state !== PlayBackState.PLAYING && this.av.MouseClickPos.absX < this.av.AudioPxWidth - 5) {
-      return this.playSelection(this.afterAudioEnded);
+      this.playSelection(this.afterAudioEnded, onProcess);
     } else {
       console.error(`can't start PlayBack`);
     }
-    return false;
   }
 
   /**
    * set audio for replay and returns if replay is active
    * @returns {boolean}
    */
-  rePlayback(): boolean {
-    return this.audiochunk.rePlayback();
+  rePlayback() {
+    this.audiochunk.toggleReplay();
   }
 
   /**
@@ -1346,10 +1357,12 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   }
 
   stepBackwardTime(afterAudioEnded: () => void, back_sec: number) {
-    this.audiochunk.stepBackwardTime(this.drawFunc, () => {
+    this.audiochunk.stepBackwardTime(back_sec, this.drawFunc).then(() => {
       this.afterAudioStepBackTime();
       afterAudioEnded();
-    }, back_sec);
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   /**
@@ -1434,8 +1447,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           this.audiochunk.playposition.samples = this.audiochunk.selection.start.samples;
           this.changePlayCursorSamples(this.audiochunk.selection.start.samples);
           this.drawPlayCursorOnly(this.av.LastLine);
-          this.audiochunk.stopPlayback(() => {
-          });
+          this.audiochunk.stopPlayback();
         }
         successcallback(posY1, posY2);
 
@@ -1589,18 +1601,15 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   }
 
   private afterAudioPaused = () => {
-    this.audiomanager.paused = false;
     this.drawPlayCursor();
   }
 
   private afterAudioStepBack = () => {
-    this.audiomanager.stepbackward = false;
     this.av.PlayCursor.changeSamples(this.audiochunk.lastplayedpos.samples, this.av.audioTCalculator, this.audiochunk);
     this.startPlayback();
   }
 
   private afterAudioStepBackTime = () => {
-    this.audiomanager.stepbackward = false;
     this.av.PlayCursor.changeSamples(this.audiochunk.lastplayedpos.samples, this.av.audioTCalculator, this.audiochunk);
     this.startPlayback();
   }
@@ -1609,11 +1618,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    * called if audio ended normally because end of segment reached
    */
   private afterAudioEnded = () => {
-    if (this.audiomanager.replay) {
-      // do replay
-      this.audiochunk.playposition = this.audiochunk.time.start.clone();
-      this.playSelection(this.afterAudioEnded);
-    } else {
+    if (!this.audiochunk.replay) {
       // let cursor jump to start
       this.audiochunk.playposition = this.audiochunk.selection.start.clone();
       this.av.drawnselection = this.av.drawnselection.clone();

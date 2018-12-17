@@ -208,7 +208,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
   }) {
     const caretpos = this.editor.caretpos;
     this.uiService.addElementFromEvent('mouseclick', {value: event.type},
-      event.timestamp, Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), caretpos, 'audio_buttons');
+      event.timestamp, Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), caretpos, 'audio_buttons');
 
     switch (event.type) {
       case('play'):
@@ -223,7 +223,8 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
         });
         break;
       case('replay'):
-        this.nav.replay = this.viewer.rePlayback();
+        this.viewer.rePlayback();
+        this.nav.replay = this.viewer.audiochunk.replay;
         break;
       case('backward'):
         this.viewer.stepBackward(() => {
@@ -283,13 +284,12 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
 
     this.mini_loupecoord.component = this.viewer;
 
-    if (!this.audiomanager.audioplaying && this.appStorage.playonhover) {
+    if (!this.audiomanager.isPlaying && this.appStorage.playonhover) {
       // play audio
       this.audiochunk_top.selection.start = this.viewer.av.Mousecursor.timePos.clone();
       this.audiochunk_top.selection.end.samples = this.viewer.av.Mousecursor.timePos.samples +
         this.audiomanager.ressource.info.samplerate / 10;
       this.audiochunk_top.startPlayback(() => {
-      }, () => {
       }, true);
     }
 
@@ -358,7 +358,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
         }
 
         this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
-          Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), caretpos, control, segment);
+          Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), caretpos, control, segment);
       } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
         this.appStorage.playonhover = !this.appStorage.playonhover;
       }
@@ -400,7 +400,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
       }
 
       this.uiService.addElementFromEvent('shortcut', {value: marker_code}, Date.now(),
-        Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor),
+        Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor),
         this.editor.caretpos, 'texteditor_markers', segment);
     }
   }
@@ -427,7 +427,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
       }
 
       this.uiService.addElementFromEvent('mouseclick', {value: marker_code}, Date.now(),
-        Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor),
+        Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor),
         this.editor.caretpos, 'texteditor_toolbar', segment);
     }
   }
@@ -465,7 +465,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
       }
 
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_speed', segment);
+        Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_speed', segment);
     }
   }
 
@@ -498,7 +498,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
       }
 
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_volume', segment);
+        Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_volume', segment);
     }
   }
 

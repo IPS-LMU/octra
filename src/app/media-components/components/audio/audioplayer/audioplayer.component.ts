@@ -204,9 +204,6 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   private onAudioChunkStateChanged = () => {
-
-    this.audiomanager.stepbackward = false;
-    this.audiomanager.paused = false;
     this.drawPlayCursor();
   }
   /**
@@ -305,7 +302,9 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.mouseclick_obj.y = y;
         this.mouseclick_obj.curr_line = curr_line;
         this.mouseclick_obj.event = $event;
-        this.audiochunk.stopPlayback(this.afterAudioStopped);
+        this.audiochunk.stopPlayback().then(this.afterAudioStopped).catch((error) => {
+          console.error(error);
+        });
       } else {
         this.ap.setMouseClickPosition(x, y, curr_line, $event, this.innerWidth);
       }
@@ -318,30 +317,32 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
    * stops the playback and sets the current playcursor position to 0.
    */
   public stopPlayback(afterAudioEnded: () => void) {
-    this.audiochunk.stopPlayback(afterAudioEnded);
+    this.audiochunk.stopPlayback().then(this.afterAudioStopped).catch((error) => {
+      console.error(error);
+    });
   }
 
   /**
    * pause playback
    */
   public pausePlayback() {
-    this.audiochunk.pausePlayback(this.afterAudioPaused);
+    this.audiochunk.pausePlayback().then(this.afterAudioPaused).catch((error) => {
+      console.error(error);
+    });
   }
 
   /**
    * start playback
    */
-  public startPlayback(afterAudioEnded: () => void): boolean {
+  public startPlayback(afterAudioEnded: () => void) {
     if (!this.audiochunk.isPlaying) {
-      return this.playSelection(afterAudioEnded);
-    } else {
-      return false;
+      this.playSelection(afterAudioEnded);
     }
   }
 
   // sets the loop of playback
-  public rePlayback(): boolean {
-    return this.audiochunk.rePlayback();
+  public rePlayback() {
+    this.audiochunk.toggleReplay();
   }
 
   /**
@@ -353,7 +354,9 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   stepBackwardTime(back_sec: number) {
-    this.audiochunk.stepBackwardTime(this.drawFunc, this.afterAudioBackwardTime, back_sec);
+    this.audiochunk.stepBackwardTime(back_sec, this.drawFunc).then(this.afterAudioBackwardTime).catch((error) => {
+      console.error(error);
+    });
   }
 
   /**
@@ -459,8 +462,10 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
    * playSelection() plays the selected signal fragment. Playback start and duration
    * depend on the current selection.
    */
-  private playSelection(afterAudioEnded: () => void): boolean {
-    return this.audiochunk.startPlayback(this.drawFunc, afterAudioEnded);
+  private playSelection(afterAudioEnded: () => void) {
+    this.audiochunk.startPlayback(this.drawFunc).then(afterAudioEnded).catch((error) => {
+      console.error(error);
+    });
   }
 
   private drawFunc = () => {

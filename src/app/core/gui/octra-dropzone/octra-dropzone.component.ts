@@ -6,8 +6,8 @@ import {DropZoneComponent} from '../../component/drop-zone';
 import {SessionFile} from '../../obj/SessionFile';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {ModalService} from '../../modals/modal.service';
-import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {FileSize, Functions} from '../../shared/Functions';
+import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 
 @Component({
   selector: 'app-octra-dropzone',

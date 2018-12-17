@@ -1,6 +1,7 @@
 import {
   AfterContentChecked,
   AfterViewInit,
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   EventEmitter,
@@ -41,7 +42,8 @@ import {Functions} from '../../core/shared/Functions';
 @Component({
   selector: 'app-overlay-gui',
   templateUrl: './2D-editor.component.html',
-  styleUrls: ['./2D-editor.component.css']
+  styleUrls: ['./2D-editor.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentChecked, OnChanges, OnDestroy {
   public static editorname = '2D-Editor';
@@ -295,13 +297,12 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     }
     this.mousestate = 'moving';
 
-    if (!this.audiomanager.audioplaying && this.appStorage.playonhover) {
+    if (!this.audiomanager.isPlaying && this.appStorage.playonhover) {
       // play audio
       this.audiochunk_lines.selection.start.samples = this.viewer.av.Mousecursor.timePos.samples;
       this.audiochunk_lines.selection.end.samples = this.viewer.av.Mousecursor.timePos.samples +
         this.audiomanager.ressource.info.samplerate / 10;
       this.audiochunk_lines.startPlayback(() => {
-      }, () => {
       }, true);
     }
 
@@ -370,7 +371,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
 
       this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
-        Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), caretpos, 'multi-lines-viewer', segment);
+        Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), caretpos, 'multi-lines-viewer', segment);
 
     } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
       this.appStorage.playonhover = !this.appStorage.playonhover;
@@ -404,7 +405,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
       const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), caretpos, 'audio_speed', segment);
+        Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), caretpos, 'audio_speed', segment);
     }
   }
 
@@ -434,7 +435,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
       const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), caretpos, 'audio_volume', segment);
+        Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), caretpos, 'audio_volume', segment);
     }
   }
 
@@ -461,7 +462,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
         segment.textlength = anno_segment.transcript.length;
       }
-      const justifiedPlayPosition = Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor);
+      const justifiedPlayPosition = Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor);
 
       this.uiService.addElementFromEvent('mouseclick', {value: 'click:' + event.type},
         event.timestamp,
@@ -470,7 +471,10 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
     switch (event.type) {
       case('play'):
-        this.viewer.startPlayback();
+        this.viewer.startPlayback(() => {
+          this.cd.markForCheck();
+          this.cd.detectChanges();
+        });
         break;
       case('pause'):
         this.viewer.pausePlayback(() => {
@@ -481,7 +485,8 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         });
         break;
       case('replay'):
-        this.audionav.replay = this.viewer.rePlayback();
+        this.viewer.rePlayback();
+        this.audionav.replay = this.viewer.audiochunk.replay;
         break;
       case('backward'):
         this.viewer.stepBackward(() => {

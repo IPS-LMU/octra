@@ -2,7 +2,7 @@
  * class initialized with samples which can output other units like seconds, miliseconds
  */
 export class AudioTime {
-  public static sampleRateFactor: number = 1;
+  public static sampleRateFactor = 1;
 
   set sample_rate(value) {
     this._sample_rate = value;
@@ -29,7 +29,7 @@ export class AudioTime {
   }
 
   set seconds(value: number) {
-    this.samples = value * this._sample_rate;
+    this.samples = Math.round(value * this._sample_rate);
   }
 
   constructor(private _samples: number,

@@ -122,7 +122,7 @@ export class AudioviewerService extends AudioComponentService {
   private _visibleLines: Interval = new Interval(0, 0);
   onKeyUp = (event) => {
     this.shift_pressed = false;
-  };
+  }
 
   /**
    * initializes audioviewer using inner width
@@ -230,7 +230,7 @@ export class AudioviewerService extends AudioComponentService {
       const absX = this.getAbsXByLine(curr_line, x - curr_line.Pos.x, innerWidth);
       const absXInTime = this.audioTCalculator.absXChunktoSamples(absX, this.audiochunk);
 
-      if (!this.audiomanager.audioplaying) {
+      if (!this.audiomanager.isPlaying) {
         if (this.last_line === null || this.last_line === curr_line) {
           // same line
           // fix margin settings
@@ -291,7 +291,7 @@ export class AudioviewerService extends AudioComponentService {
           this.mouse_down = false;
         }
       } else if (this.audiomanager.state === PlayBackState.PLAYING && ($event.type === 'mouseup')) {
-        this.audiochunk.stopPlayback(() => {
+        this.audiochunk.stopPlayback().then(() => {
           const time = new AudioTime(absXInTime, this.audiomanager.ressource.info.samplerate);
           this.audiochunk.startpos = time;
           this.audiochunk.selection.end = time.clone();
@@ -302,6 +302,8 @@ export class AudioviewerService extends AudioComponentService {
           viewer.startPlayback();
           this.mouse_down = false;
           this._dragableBoundaryNumber = -1;
+        }).catch((error) => {
+          console.error(error);
         });
       }
 

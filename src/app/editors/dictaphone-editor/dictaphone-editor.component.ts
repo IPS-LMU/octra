@@ -97,7 +97,7 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
 
   onButtonClick(event: { type: string, timestamp: number }) {
     this.uiService.addElementFromEvent('mouseclick', {value: event.type},
-      event.timestamp, Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor),
+      event.timestamp, Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor),
       this.editor.caretpos, 'audio_buttons');
 
     switch (event.type) {
@@ -132,7 +132,7 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
     this.uiService.addElementFromEvent('slider', event, event.timestamp,
-      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_speed');
+      Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_speed');
   }
 
   onVolumeChange(event: { old_value: number, new_value: number, timestamp: number }) {
@@ -141,7 +141,7 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
     this.uiService.addElementFromEvent('slider', event, event.timestamp,
-      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_volume');
+      Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_volume');
   }
 
   afterTyping(status) {
@@ -154,7 +154,7 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
   onShortcutTriggered(event) {
     event.value = `audio:${event.value}`;
     this.uiService.addElementFromEvent('shortcut', event, Date.now(),
-      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor');
+      Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor');
   }
 
   onBoundaryClicked(samples: number) {
@@ -167,7 +167,7 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
 
       new Promise<void>((resolve) => {
         if (this.audiochunk.isPlaying) {
-          this.audiochunk.stopPlayback(resolve);
+          this.audiochunk.stopPlayback().then(resolve);
         } else {
           resolve();
         }
@@ -190,19 +190,19 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
 
   onBoundaryInserted() {
     this.uiService.addElementFromEvent('segment', {value: 'boundaries:add'}, Date.now(),
-      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor');
+      Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor');
   }
 
   onMarkerInsert(marker_code: string) {
     this.uiService.addElementFromEvent('shortcut', {value: 'markers:' + marker_code}, Date.now(),
-      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor');
+      Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor');
   }
 
   onMarkerClick(marker_code: string) {
     this.afterTyping('stopped');
 
     this.uiService.addElementFromEvent('mouseclick', {value: marker_code}, Date.now(),
-      Math.round(this.audiomanager.playposition * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor_toolbar');
+      Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor_toolbar');
   }
 
   saveTranscript() {

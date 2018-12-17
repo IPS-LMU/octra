@@ -51,7 +51,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
 
   constructor(public transcrService: TranscriptionService,
               public ms: BsModalService,
-              private settingsService: SettingsService,
+              public settingsService: SettingsService,
               public appStorage: AppStorageService,
               private keyService: KeymappingService) {
   }

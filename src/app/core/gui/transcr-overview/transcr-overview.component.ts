@@ -21,7 +21,6 @@ import {PlayBackState} from '../../../media-components/obj/media';
 import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
 import {isFunction} from '../../shared/Functions';
 import {TranscrEditorComponent} from '../../component/transcr-editor';
-import {reject} from 'q';
 
 @Component({
   selector: 'app-transcr-overview',
@@ -434,10 +433,14 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       || this.playAllState.currentSegment !== segmentNumber) {
       this.stopPlayback().then(() => {
         this.playSegement(segmentNumber);
+      }).catch((error) => {
+        console.error(error);
       });
     } else {
       this.stopPlayback().then(() => {
         this.playAllState.currentSegment = -1;
+      }).catch((error) => {
+        console.error(error);
       });
     }
   }
@@ -447,7 +450,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   public stopPlayback(): Promise<void> {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>((resolve, reject) => {
       if (this.playAllState.currentSegment > -1) {
         this.playAllState.state = 'stopped';
         this.playAllState.icon = 'play';

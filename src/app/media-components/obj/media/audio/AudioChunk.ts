@@ -187,61 +187,69 @@ export class AudioChunk {
 
   public startPlayback(onProcess: () => void = () => {
   }, playonhover: boolean = false): Promise<void> {
-    if (!this._audiomanger.isPlaying) {
-      if ((this._selection === null || this._selection === undefined)) {
-        this.selection = new AudioSelection(this.time.start.clone(), this.time.end.clone());
-      }
-
-      if (this._selection.start.samples === this._selection.end.samples) {
-        this.startpos = this._selection.start.clone();
-      }
-
-      this.setState(PlayBackState.STARTED);
-
-      this._lastplayedpos = this.playposition.clone();
-      this.audiomanager.playposition = this._lastplayedpos.clone();
-
-      this.setState(PlayBackState.PLAYING);
-
-      // console.log(`play from ${this.selection.start.seconds} to ${this.selection.start.seconds + this.selection.duration.seconds}`);
-      const id = this.subscrmanager.add(this.audiomanager.statechange.subscribe(
-        (state: PlayBackState) => {
-          this.setState(state);
-
-          if (state === PlayBackState.STOPPED || state === PlayBackState.PAUSED || state === PlayBackState.ENDED) {
-            this.subscrmanager.remove(id);
-          }
-
-          if (state === PlayBackState.ENDED) {
-            // reset to beginning of selection
-            this.startpos = this.selection.start.clone();
-            if (this._replay) {
-              this.startPlayback(onProcess, playonhover);
-            }
-          }
-        },
-        (error) => {
-          console.error(error);
+    return new Promise<void>((resolve, reject) => {
+      if (!this.isPlaying) {
+        if ((this._selection === null || this._selection === undefined)) {
+          this.selection = new AudioSelection(this.time.start.clone(), this.time.end.clone());
         }
-      ));
 
-      return this._audiomanger.startPlayback(
-        this.selection.start, this.selection.duration, this._volume, this._speed, () => {
-          this.updatePlayPosition();
-          onProcess();
-        }, playonhover
-      );
-    } else {
-      console.error(`can't start playback on chunk because audiomanager is still playing`);
-    }
+        if (this._selection.start.samples === this._selection.end.samples) {
+          this.startpos = this._selection.start.clone();
+        }
+
+        this.setState(PlayBackState.STARTED);
+
+        this._lastplayedpos = this.playposition.clone();
+        this.audiomanager.playposition = this._lastplayedpos.clone();
+
+        this.setState(PlayBackState.PLAYING);
+
+        // console.log(`play from ${this.selection.start.seconds} to ${this.selection.start.seconds + this.selection.duration.seconds}`);
+        const id = this.subscrmanager.add(this.audiomanager.statechange.subscribe(
+          (state: PlayBackState) => {
+            this.setState(state);
+
+            if (state === PlayBackState.STOPPED || state === PlayBackState.PAUSED || state === PlayBackState.ENDED) {
+              this.subscrmanager.remove(id);
+            }
+
+            if (state === PlayBackState.ENDED) {
+              // reset to beginning of selection
+              if (this._replay) {
+                this.playposition = this.selection.start.clone();
+                this.startPlayback(onProcess, playonhover);
+              } else {
+                this.startpos = this._time.start.clone();
+                resolve();
+              }
+            }
+          },
+          (error) => {
+            console.error(error);
+          }
+        ));
+
+        this._audiomanger.startPlayback(
+          this.selection.start, this.selection.duration, this._volume, this._speed, () => {
+            this.updatePlayPosition();
+            onProcess();
+          }, playonhover
+        ).catch(reject);
+      } else {
+        reject(`can't start playback on chunk because audiomanager is still playing`);
+      }
+    });
   }
 
   /**
    * stops the playback
    */
   public stopPlayback: () => Promise<void> = () => {
-    return this._audiomanger.stopPlayback().then(() => {
-      this.afterPlaybackStopped();
+    return new Promise<void>((resolve, reject) => {
+      this._audiomanger.stopPlayback().then(() => {
+        this.afterPlaybackStopped();
+        resolve();
+      }).catch(reject);
     });
   }
 

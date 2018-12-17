@@ -163,10 +163,11 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
                 switch (shortc) {
                   case('play_pause'):
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
-                    if (this.audiochunk.isPlaying) {
+                    if (this.audiomanager.isPlaying) {
                       this.pausePlayback();
                     } else {
                       this.startPlayback(() => {
+                        this.update();
                       });
                     }
                     key_active = true;
@@ -317,7 +318,11 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
    * stops the playback and sets the current playcursor position to 0.
    */
   public stopPlayback(afterAudioEnded: () => void) {
-    this.audiochunk.stopPlayback().then(this.afterAudioStopped).catch((error) => {
+    this.audiochunk.stopPlayback().then(
+      () => {
+        afterAudioEnded();
+        this.afterAudioStopped();
+      }).catch((error) => {
       console.error(error);
     });
   }
@@ -336,7 +341,9 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
    */
   public startPlayback(afterAudioEnded: () => void) {
     if (!this.audiochunk.isPlaying) {
-      this.playSelection(afterAudioEnded);
+      this.playSelection(() => {
+        afterAudioEnded();
+      });
     }
   }
 
@@ -350,7 +357,14 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
    steps back to last position
    */
   public stepBackward() {
-    this.audiochunk.stepBackward(this.afterAudioStepBackward);
+    this.audiochunk.stepBackward(() => {
+      this.drawFunc();
+    }).then(() => {
+      // this.afterAudioStepBackward();
+    }).catch((error) => {
+      console.error(error);
+    });
+    ;
   }
 
   stepBackwardTime(back_sec: number) {
@@ -516,7 +530,10 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   private afterAudioStopped = () => {
+    this.audiochunk.playposition.samples = 0;
+    /*
     if (this.audiochunk.isPlayBackStopped && this.mouseclick_obj.clicked) {
+      console.log(`AUDIO STOPPED!`);
       this.mouseclick_obj.clicked = false;
       this.ap.setMouseClickPosition(this.mouseclick_obj.x, this.mouseclick_obj.y,
         this.mouseclick_obj.curr_line, this.mouseclick_obj.event, this.innerWidth);
@@ -524,7 +541,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.startPlayback(() => {
         });
       }, 200);
-    }
+    }*/
   }
 
   private afterAudioPaused = () => {
@@ -541,6 +558,6 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
 
   private afterAudioBackwardTime = () => {
     // do the same
-    this.afterAudioStepBackward();
+    //this.afterAudioStepBackward();
   }
 }

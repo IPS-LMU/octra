@@ -103,6 +103,7 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
     switch (event.type) {
       case('play'):
         this.audioplayer.startPlayback(() => {
+          this.audioplayer.update();
         });
         break;
       case('pause'):
@@ -110,6 +111,9 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
         break;
       case('stop'):
         this.audioplayer.stopPlayback(() => {
+          console.log(`update audioplayer after stop`);
+          this.audioplayer.audiochunk.playposition.samples = 0;
+          this.audioplayer.update();
         });
         break;
       case('replay'):

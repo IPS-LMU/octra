@@ -2,11 +2,11 @@
     <div class="row">
         <div class="col-md-7">
             <div class="row" role="group" style="height:100%;">
-                <button *ngIf="!audioplaying" class="btn btn-info btn-raised w-20" name="play"
+                <button *ngIf="!isAudioPlaying" class="btn btn-info btn-raised w-20" name="play"
                         (mousedown)="onButtonClick('play'); " title="{{buttons.play.label}}">
                     <fa-icon icon="play"></fa-icon>
                 </button>
-                <button *ngIf="audioplaying" class="btn btn-info btn-raised w-20" name="pause"
+                <button *ngIf="isAudioPlaying" class="btn btn-info btn-raised w-20" name="pause"
                         (mousedown)="onButtonClick('pause')" title="{{buttons.pause.label}}">
                     <fa-icon icon="pause"></fa-icon>
                 </button>
@@ -59,7 +59,7 @@
                             <input class="slider" type="range" name="speed" min="0.2" max="1.8" step="0.2" value="1"
                                    id="speed-slider"
                                    [(ngModel)]="speed" (change)="afterSpeedChange()"
-                                   [disabled]="audioplaying"/>
+                                   [disabled]="isAudioPlaying"/>
                         </div>
                         <div class="col-1 col-sm-4 col-md-3"><img
                                 src="assets/img/components/audio-navigation/fast_white.png" style="height:16px;"

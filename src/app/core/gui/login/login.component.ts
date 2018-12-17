@@ -290,6 +290,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         if (this.settingsService.isTheme('shortAudioFiles')) {
           // create new session
 
+          // TODO fehler hier suchen
           // check if annotation is annotated
           new Promise<void>((resolve, reject) => {
             if (!isNullOrUndefined(this.appStorage.data_id)) {

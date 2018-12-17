@@ -465,7 +465,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                               // after stopping start audio playback
                               this.audiochunk.selection = boundary_select.clone();
                               this.playSelection(this.afterAudioEnded);
-                            });
+                            })
                           }
 
                           if (!this.Settings.multi_line) {
@@ -563,7 +563,13 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       onProcess();
     };
 
-    this.audiochunk.startPlayback(drawFunc).then(afterAudioEnded);
+    this.audiochunk.startPlayback(drawFunc).then(() => {
+      if (this.av.drawnselection.duration.samples > 0) {
+        this.audiochunk.selection = this.av.drawnselection.clone();
+        this.audiochunk.playposition = this.audiochunk.selection.start.clone();
+      }
+      afterAudioEnded();
+    });
   }
 
   private drawFunc = () => {
@@ -1332,6 +1338,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   startPlayback(onProcess: () => void = () => {
   }) {
     if (this.audiomanager.state !== PlayBackState.PLAYING && this.av.MouseClickPos.absX < this.av.AudioPxWidth - 5) {
+
       this.playSelection(this.afterAudioEnded, onProcess);
     } else {
       console.error(`can't start PlayBack`);
@@ -1447,7 +1454,12 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           this.audiochunk.playposition.samples = this.audiochunk.selection.start.samples;
           this.changePlayCursorSamples(this.audiochunk.selection.start.samples);
           this.drawPlayCursorOnly(this.av.LastLine);
-          this.audiochunk.stopPlayback();
+
+          if (this.audiomanager.isPlaying) {
+            this.audiomanager.stopPlayback().catch((error) => {
+              console.error(error);
+            });
+          }
         }
         successcallback(posY1, posY2);
 

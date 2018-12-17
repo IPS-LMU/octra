@@ -465,7 +465,8 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
       }
 
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_speed', segment);
+        Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor),
+        this.editor.caretpos, 'audio_speed', segment);
     }
   }
 
@@ -498,7 +499,8 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
       }
 
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_volume', segment);
+        Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor),
+        this.editor.caretpos, 'audio_volume', segment);
     }
   }
 

@@ -53,7 +53,8 @@
                   'display': ((segment.transcription.html.indexOf('<span class=\'val-error\'') > -1) ? 'normal': 'none')}">
             </fa-icon>
         </td>
-        <td><span class="link segment-number" (click)="onSegmentClicked(i)"># {{i + 1 | leadingnull: shown_segments.length}}</span>
+        <td class="segment-number"><span class="link"
+                                         (click)="onSegmentClicked(i)"># {{i + 1 | leadingnull: shown_segments.length}}</span>
         </td>
         <td [innerHTML]="sanitizeHTML(segment.transcription.html)" (mousemove)="onMouseOver($event)"
             (mousedown)="onMouseOver($event)"></td>

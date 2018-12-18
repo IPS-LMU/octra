@@ -43,9 +43,14 @@
               "node_modules/ajv/dist/ajv.min.js",
               "node_modules/jquery.caret/dist/jquery.caret.min.js",
               "node_modules/moment/min/moment.min.js",
-              "src/assets/js/cbuffer.js",
-              "src/assets/js/OLA.js",
-              "src/assets/js/buffered-ola.js"
+              "src/assets/js/soundtouch/buffer.js",
+              "src/assets/js/soundtouch/core.js",
+              "src/assets/js/soundtouch/filter.js",
+              "src/assets/js/soundtouch/pitchshifter.js",
+              "src/assets/js/soundtouch/rate-transposer.js",
+              "src/assets/js/soundtouch/pipe.js",
+              "src/assets/js/soundtouch/stretch.js",
+              "src/assets/js/soundtouch/soundtouch.js"
             ]
           },
           "configurations": {

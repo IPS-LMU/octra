@@ -4,10 +4,10 @@
 </header>
 <main>
     <div id="beta_mark" class="d-none d-md-block" *ngIf="environment.dev_version">in developement</div>
-    <!-- <button (click)="test(textfield.value)">fetch</button>
-         <input type="text" value="" #textfield/>
-         <button (click)="reset(textfield.value)">reset</button>
-         -->
+    <button (click)="test(textfield.value)">fetch</button>
+    <input type="text" value="" #textfield/>
+    <button (click)="reset(textfield.value)">reset</button>
+
     <div class="container-fluid flex">
         <router-outlet></router-outlet>
     </div><!-- /.container -->

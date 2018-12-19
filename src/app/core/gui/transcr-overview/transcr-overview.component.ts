@@ -18,6 +18,7 @@ import {AudioTime, SubscriptionManager} from '../../shared';
 import {isFunction} from 'util';
 import {Segment} from '../../obj/Annotation/Segment';
 import {PlayBackState} from '../../../media-components/obj/media';
+import {isNullOrUndefined} from '../../shared/Functions';
 
 @Component({
   selector: 'app-transcr-overview',
@@ -197,7 +198,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
   private updateSegments() {
     this.playStateSegments = [];
-    if (this.transcrService.validationArray.length > 0) {
+    if (!isNullOrUndefined(this.transcrService.validationArray) && this.transcrService.validationArray.length > 0) {
       if (!this.segments || !this.transcrService.guidelines) {
         this.shown_segments = [];
       }

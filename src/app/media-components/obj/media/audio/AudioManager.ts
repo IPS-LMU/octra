@@ -1,5 +1,14 @@
 import {AudioInfo} from './AudioInfo';
-import {AudioChunk, AudioFormat, AudioRessource, AudioSelection, AudioTime, PlayBackState, SourceType} from '../index';
+import {
+  AudioChunk,
+  AudioFormat,
+  AudioRessource,
+  AudioSelection,
+  BrowserAudioTime,
+  BrowserSample,
+  PlayBackState,
+  SourceType
+} from '../index';
 import {EventEmitter} from '@angular/core';
 import {Subscription} from 'rxjs';
 
@@ -18,7 +27,7 @@ export class AudioManager {
     return this._isScriptProcessorCanceled;
   }
 
-  get playposition(): AudioTime {
+  get playposition(): BrowserAudioTime {
     return this._playposition;
   }
 
@@ -28,6 +37,14 @@ export class AudioManager {
 
   get state(): PlayBackState {
     return this._state;
+  }
+
+  public get browserSampleRate(): number {
+    return this._ressource.audiobuffer.sampleRate;
+  }
+
+  public get originalSampleRate(): number {
+    return this._originalInfo.samplerate;
   }
 
   set playbackInfo(value: { endAt: number; started: number }) {
@@ -42,7 +59,7 @@ export class AudioManager {
     return this._playOnHover;
   }
 
-  set playposition(value: AudioTime) {
+  set playposition(value: BrowserAudioTime) {
     this._playposition = value;
   }
 
@@ -78,11 +95,13 @@ export class AudioManager {
   /**
    * return the factor of the difference between the original and the decoded sample rate. If it's not Safari, the factor is always 1.
    */
+
+  /*
   public get sampleRateFactor(): number {
     return (!(this._originalInfo.samplerate === null || this._originalInfo.samplerate === undefined)
       && !(this.ressource.info.samplerate === null || this.ressource.info.samplerate === undefined))
       ? this._originalInfo.samplerate / this.ressource.info.samplerate : 1;
-  }
+  }*/
 
   get isPlaying(): boolean {
     return (this._state === PlayBackState.PLAYING);
@@ -92,7 +111,7 @@ export class AudioManager {
    * initializes audio manager
    * @param audioinfo important info about the audio file linked to this manager
    */
-  constructor(audioinfo: AudioInfo) {
+  constructor(audioinfo: AudioInfo, browserSampleRate: number) {
     this._id = ++AudioManager.counter;
     this._originalInfo = audioinfo;
     this._bufferedOLA = new BufferedOLA(this._bufferSize);
@@ -110,7 +129,7 @@ export class AudioManager {
           this._audioContext = new AudioContext();
         }
 
-        this._playposition = new AudioTime(0, audioinfo.samplerate);
+        this._playposition = new BrowserAudioTime(new BrowserSample(0, browserSampleRate), audioinfo.samplerate);
         this._state = PlayBackState.PREPARE;
       } else {
         console.error('AudioContext not supported by this browser');
@@ -124,7 +143,7 @@ export class AudioManager {
   private _originalInfo: AudioInfo;
   private _state: PlayBackState;
   private _mainchunk: AudioChunk;
-  private _playposition: AudioTime;
+  private _playposition: BrowserAudioTime;
   private _playOnHover = false;
   private _stepBackward = false;
   private stateRequest: PlayBackState = null;
@@ -196,7 +215,7 @@ export class AudioManager {
 
             console.log(`audio decoded, samplerate ${audioinfo.samplerate}, ${audiobuffer.sampleRate}`);
 
-            const result = new AudioManager(audioinfo);
+            const result = new AudioManager(audioinfo, audiobuffer.sampleRate);
             result.bufferedOLA.set_audio_buffer(audiobuffer);
 
             console.log(`original samplerate: ${audioinfo.samplerate}`);
@@ -207,14 +226,18 @@ export class AudioManager {
               audioinfo, (buffer_copy === null) ? buffer : buffer_copy, audiobuffer, buffer_length));
 
             // set duration is very important
-            result.ressource.info.duration.samples = audiobuffer.length;
-            console.log(`duration: ${result.ressource.info.duration.seconds}`);
+            result.ressource.info.duration.browserSample.value = audiobuffer.length;
+            console.log(`duration browser: ${result.ressource.info.duration.browserSample.seconds}`);
+            console.log(`duration original: ${result.ressource.info.duration.originalSample.seconds}`);
             console.log(`dur ${audiobuffer.length / audiobuffer.sampleRate}`);
-            console.log(`factor is ${result.sampleRateFactor}!`);
             console.log(`decoded samplerate: ${audiobuffer.sampleRate}`);
 
-            const selection = new AudioSelection(new AudioTime(0, audiobuffer.sampleRate),
-              new AudioTime(audiobuffer.length, audiobuffer.sampleRate));
+            // TODO CHECK is originalSampleRate is correct!
+            console.log(`ORIGINAL SAMPLE RATE: ${result._originalInfo.samplerate}`);
+            const selection = new AudioSelection(
+              new BrowserAudioTime(new BrowserSample(0, audiobuffer.sampleRate), result._originalInfo.samplerate),
+              new BrowserAudioTime(new BrowserSample(audiobuffer.length, audiobuffer.sampleRate), audiobuffer.sampleRate)
+            );
             result._mainchunk = new AudioChunk(selection, result);
 
             result.afterdecoded.emit(result.ressource);
@@ -239,6 +262,10 @@ export class AudioManager {
     return new Promise<AudioBuffer>((resolve, reject) => {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
+      audioCtx.decodeAudioData(file, function (buffer) {
+        resolve(buffer);
+      });
+      /*
       // TODO CHANGE!
       if ('Firefox'.indexOf('Safari') > -1) {
         console.log(`safari`);
@@ -274,7 +301,7 @@ export class AudioManager {
             reject(error);
           });
         });
-      }
+      }*/
     });
   }
 
@@ -282,8 +309,10 @@ export class AudioManager {
     return AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats) !== null;
   }
 
-  public startPlayback(begintime: AudioTime,
-                       duration: AudioTime = new AudioTime(0, this._ressource.info.samplerate),
+  public startPlayback(begintime: BrowserAudioTime,
+                       duration: BrowserAudioTime = new BrowserAudioTime(
+                         new BrowserSample(0, this.originalSampleRate), this.originalSampleRate
+                       ),
                        volume: number, speed: number, onProcess: () => void, playOnHover: boolean = false
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -308,13 +337,13 @@ export class AudioManager {
         */
 
         this._playbackInfo.started = new Date().getTime();
-        this._playbackInfo.endAt = this._playbackInfo.started + (duration.unix / speed);
+        this._playbackInfo.endAt = this._playbackInfo.started + (duration.browserSample.unix / speed);
 
         this._playposition = begintime.clone();
         this._scriptProcessorNode.addEventListener('audioprocess', (e) => {
           this._isScriptProcessorCanceled = true;
           if (this.isPlaying) {
-            this._playposition.unix += Math.round((Date.now() - lastCheck));
+            this._playposition.browserSample.unix += Math.round((Date.now() - lastCheck));
             this._bufferedOLA.alpha = 1 / speed;
             // this._bufferedOLA.position = this._playposition.samples;
             onProcess();
@@ -325,7 +354,7 @@ export class AudioManager {
 
         this.changeState(PlayBackState.PLAYING);
 
-        if (duration.samples <= 0) {
+        if (duration.browserSample.value <= 0) {
           // important: source.start needs seconds, not samples!
           // this._source.start(0, Math.max(0, begintime.seconds));
         } else {
@@ -354,7 +383,6 @@ export class AudioManager {
           reject(error);
         });
 
-        //this.source.stop(0);
       } else {
         reject(`can't stop because audio manager is not playing`);
       }
@@ -373,7 +401,6 @@ export class AudioManager {
         }, (error) => {
           reject(error);
         });
-        //this._source.stop(0);
       } else {
         reject('cant pause because not playing');
       }
@@ -391,7 +418,7 @@ export class AudioManager {
 
     if (this._state === PlayBackState.PLAYING && this.stateRequest === null) {
       // audio ended normally
-      this.playposition.samples = 0;
+      this.playposition.browserSample.value = 0;
       this.changeState(PlayBackState.ENDED);
     } else if (this.stateRequest !== null) {
       this.changeState(this.stateRequest);
@@ -438,7 +465,7 @@ export class AudioManager {
 
   public createNewAudioChunk(time: AudioSelection, selection?: AudioSelection): AudioChunk {
     if (
-      time.start.samples + time.duration.samples <= this.ressource.info.duration.samples
+      time.start.browserSample.value + time.duration.browserSample.value <= this.ressource.info.duration.browserSample.value
     ) {
       const chunk = new AudioChunk(time, this, selection);
       this.addChunk(chunk);

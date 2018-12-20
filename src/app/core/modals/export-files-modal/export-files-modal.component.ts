@@ -47,7 +47,9 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   private subscrmanager = new SubscriptionManager();
 
   public get arraybufferExists(): boolean {
-    return (!(this.navbarServ.transcrService === null || this.navbarServ.transcrService === undefined) && !(this.navbarServ.transcrService.audiomanager.ressource.arraybuffer === null || this.navbarServ.transcrService.audiomanager.ressource.arraybuffer === undefined)
+    return (!(this.navbarServ.transcrService === null || this.navbarServ.transcrService === undefined)
+      && !(this.navbarServ.transcrService.audiomanager.ressource.arraybuffer === null
+        || this.navbarServ.transcrService.audiomanager.ressource.arraybuffer === undefined)
       && this.navbarServ.transcrService.audiomanager.ressource.arraybuffer.byteLength > 0);
   }
 
@@ -113,7 +115,9 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   }
 
   getAudioURI() {
-    if (!(this.transcrService === null || this.transcrService === undefined) && !(this.transcrService.audiomanager.ressource.arraybuffer === null || this.transcrService.audiomanager.ressource.arraybuffer === undefined)) {
+    if (!(this.transcrService === null || this.transcrService === undefined)
+      && !(this.transcrService.audiomanager.ressource.arraybuffer === null
+        || this.transcrService.audiomanager.ressource.arraybuffer === undefined)) {
       this.preparing = {
         name: 'Audio',
         preparing: true
@@ -151,8 +155,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     }
 
     if (!this.preparing.preparing) {
-      const oannotjson = this.navbarServ.transcrService.annotation.getObj(this.transcrService.audiomanager.sampleRateFactor,
-        this.transcrService.audiomanager.originalInfo.duration.samples);
+      const oannotjson = this.navbarServ.transcrService.annotation.getObj(this.transcrService.audiomanager.originalInfo.duration);
       this.preparing = {
         name: converter.name,
         preparing: true

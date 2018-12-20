@@ -1,43 +1,43 @@
-import {AudioTime} from './AudioTime';
+import {BrowserAudioTime, OriginalAudioTime} from './AudioTime';
 
 export class AudioSelection {
   get length(): number {
     // TODO is this implementation correct?
-    if (this._start && this._end && this._start.samples > this._end.samples) {
-      return Math.abs(this._start.samples - this._end.samples);
+    if (this._start && this._end && this._start.browserSample.value > this._end.browserSample.value) {
+      return Math.abs(this._start.browserSample.value - this._end.browserSample.value);
     } else {
-      return Math.abs(this._end.samples - this._start.samples);
+      return Math.abs(this._end.browserSample.value - this._start.browserSample.value);
     }
   }
 
-  get duration(): AudioTime {
+  get duration(): BrowserAudioTime | OriginalAudioTime {
     const result = this.start.clone();
-    result.samples = this.length;
+    result.browserSample.value = this.length;
     return result;
   }
 
-  private _start: AudioTime;
+  private _start: BrowserAudioTime | OriginalAudioTime;
 
-  get start(): AudioTime {
+  get start(): BrowserAudioTime | OriginalAudioTime {
     return this._start;
   }
 
-  set start(value: AudioTime) {
+  set start(value: BrowserAudioTime | OriginalAudioTime) {
     this._start = value;
   }
 
-  private _end: AudioTime;
+  private _end: BrowserAudioTime | OriginalAudioTime;
 
-  get end(): AudioTime {
+  get end(): BrowserAudioTime | OriginalAudioTime {
     return this._end;
   }
 
-  set end(value: AudioTime) {
+  set end(value: BrowserAudioTime | OriginalAudioTime) {
     this._end = value;
   }
 
-  constructor(start: AudioTime,
-              end: AudioTime) {
+  constructor(start: BrowserAudioTime | OriginalAudioTime,
+              end: BrowserAudioTime | OriginalAudioTime) {
     this.start = start.clone();
     this.end = end.clone();
   }
@@ -49,10 +49,10 @@ export class AudioSelection {
   }
 
   public checkSelection() {
-    if (this._start && this._end && this._start.samples > this._end.samples) {
-      const tmp = this._start.samples;
-      this._start.samples = this._end.samples;
-      this._end.samples = tmp;
+    if (this._start && this._end && this._start.browserSample.value > this._end.browserSample.value) {
+      const tmp = this._start.browserSample.value;
+      this._start.browserSample.value = this._end.browserSample.value;
+      this._end.browserSample.value = tmp;
     }
   }
 }

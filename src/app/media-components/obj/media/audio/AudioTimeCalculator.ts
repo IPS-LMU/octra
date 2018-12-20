@@ -1,13 +1,13 @@
-import {AudioTime} from './AudioTime';
 import {AudioChunk} from './AudioChunk';
+import {BrowserAudioTime} from './AudioTime';
 
 export class AudioTimeCalculator {
-  set duration(value: AudioTime) {
+  set duration(value: BrowserAudioTime) {
     this._duration = value;
   }
 
   constructor(public samplerate: number,
-              public _duration: AudioTime,
+              public _duration: BrowserAudioTime,
               public audio_px_width: number) {
     if (this.audio_px_width === null || this.audio_px_width < 1) {
       console.error('audio px null');
@@ -18,30 +18,30 @@ export class AudioTimeCalculator {
     return Math.round(samples);
   }
 
-  public samplestoAbsX(time_samples: number, duration?: AudioTime): number {
+  public samplestoAbsX(time_samples: number, duration?: BrowserAudioTime): number {
     const dur = (duration) ? duration : this._duration;
 
-    if (dur.samples === 0) {
+    if (dur.browserSample.value === 0) {
       throw new Error('time duration must have samples greater 0');
     }
 
-    return (time_samples / dur.samples) * this.audio_px_width;
+    return (time_samples / dur.browserSample.value) * this.audio_px_width;
   }
 
   public absXChunktoSamples(absX: number, chunk: AudioChunk): number {
-    const start = (chunk.time.start) ? chunk.time.start.samples : 1;
-    const duration = chunk.time.end.samples - start;
+    const start = (chunk.time.start) ? chunk.time.start.browserSample.value : 1;
+    const duration = chunk.time.end.browserSample.value - start;
     if (absX >= 0 && absX <= this.audio_px_width) {
       const ratio = absX / this.audio_px_width;
-      return AudioTimeCalculator.roundSamples((duration * ratio) + chunk.time.start.samples);
+      return AudioTimeCalculator.roundSamples((duration * ratio) + chunk.time.start.browserSample.value);
     }
 
     return -1;
   }
 
   public absXtoSamples2(absX: number, chunk: AudioChunk): number {
-    const start = (chunk.time.start) ? chunk.time.start.samples : 1;
-    const duration = chunk.time.end.samples - start;
+    const start = (chunk.time.start) ? chunk.time.start.browserSample.value : 1;
+    const duration = chunk.time.end.browserSample.value - start;
     if (absX >= 0 && absX <= this.audio_px_width) {
       const ratio = absX / this.audio_px_width;
 

@@ -8,7 +8,7 @@ import {IFile, ImportResult} from '../../obj/Converters';
 import {OAudiofile, OLevel} from '../../obj/Annotation';
 import {OIDBLevel} from '../../shared/service/appstorage.service';
 import {AppInfo} from '../../../app.info';
-import {Functions} from '../../shared/Functions';
+import {Functions, isNullOrUndefined} from '../../shared/Functions';
 
 @Component({
   selector: 'app-loading',
@@ -16,7 +16,7 @@ import {Functions} from '../../shared/Functions';
   styleUrls: ['./loading.component.css']
 })
 export class LoadingComponent implements OnInit, OnDestroy {
-  @Output('loaded') loaded: boolean;
+  @Output() loaded: boolean;
   public text = '';
 
   subscrmanager: SubscriptionManager = new SubscriptionManager();
@@ -137,7 +137,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                     const audioRessource = this.audio.audiomanagers[0].ressource;
                     const oAudioFile = new OAudiofile();
                     oAudioFile.arraybuffer = audioRessource.arraybuffer;
-                    oAudioFile.duration = audioRessource.info.duration.samples;
+                    oAudioFile.duration = audioRessource.info.duration.originalSample.value;
                     oAudioFile.name = audioRessource.info.fullname;
                     oAudioFile.samplerate = audioRessource.info.samplerate;
                     oAudioFile.size = audioRessource.size;
@@ -156,7 +156,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
                       }
                     }
 
-                    if (!(importResult === null || importResult === undefined) && !(importResult.annotjson === null || importResult.annotjson === undefined)) {
+                    if (!(importResult === null || importResult === undefined)
+                      && !(importResult.annotjson === null || importResult.annotjson === undefined)) {
                       // conversion successfully finished
                       const new_levels: OIDBLevel[] = [];
                       for (let i = 0; i < importResult.annotjson.levels.length; i++) {
@@ -228,7 +229,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
             this.subscrmanager.remove(id);
             setTimeout(() => {
               if (((this.appStorage.agreement === null || this.appStorage.agreement === undefined)
-                  || (this.appStorage.agreement[this.appStorage.user.project] === null || this.appStorage.agreement[this.appStorage.user.project] === undefined) ||
+                  || (this.appStorage.agreement[this.appStorage.user.project] === null
+                  || this.appStorage.agreement[this.appStorage.user.project] === undefined) ||
                   !this.appStorage.agreement[this.appStorage.user.project]
                 )
                 && this.settService.projectsettings.agreement.enabled && this.appStorage.usemode === 'online') {
@@ -272,7 +274,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
       } else if (this.appStorage.usemode === 'url') {
         // url mode set, but no params => change mode
         console.warn(`use mode is url but no params found. Reset use mode.`);
-        this.appStorage.usemode = (!(this.appStorage.user.id === null || this.appStorage.user.id === undefined) && this.appStorage.user.id !== ''
+        this.appStorage.usemode = (!isNullOrUndefined(this.appStorage.user.id) && this.appStorage.user.id !== ''
           && ((this.appStorage.sessionfile === null || this.appStorage.sessionfile === undefined)))
           ? 'online' : 'local';
         this.appStorage.LoggedIn = false;

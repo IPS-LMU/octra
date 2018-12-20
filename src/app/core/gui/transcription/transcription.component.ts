@@ -442,8 +442,8 @@ export class TranscriptionComponent implements OnInit,
           }));
         }
 
-        this.uiService.addElementFromEvent('editor', {value: 'changed'}, Date.now(),
-          null, null, name);
+        this.uiService.addElementFromEvent('editor:changed', {value: name}, Date.now(),
+          null, null, 'editors');
 
       } else {
         console.error('ERROR appLoadeditor is null');
@@ -480,6 +480,7 @@ export class TranscriptionComponent implements OnInit,
       }
     }
 
+    console.log(`log is:`);
     this.api.saveSession(json.transcript, json.project, json.annotator,
       json.jobno, json.id, json.status, json.comment, json.quality, json.log).then((result) => {
       if (result !== null) {

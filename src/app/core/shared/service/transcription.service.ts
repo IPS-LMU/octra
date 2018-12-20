@@ -19,15 +19,6 @@ import {AudioManager} from '../../../media-components/obj/media/audio/AudioManag
 
 @Injectable()
 export class TranscriptionService {
-
-  get last_sample(): number {
-    return this._last_sample;
-  }
-
-  set last_sample(value: number) {
-    this._last_sample = value;
-  }
-
   get guidelines(): any {
     return this._guidelines;
   }
@@ -136,7 +127,6 @@ export class TranscriptionService {
   private saving = false;
   private state = 'ANNOTATED';
 
-  private _last_sample: number;
   private _annotation: Annotation;
 
   private _guidelines: any;
@@ -170,9 +160,7 @@ export class TranscriptionService {
       setTimeout(() => {
         this.appStorage.save('annotation', {
           num: this._selectedlevel,
-          level: this._annotation.levels[this._selectedlevel].getObj(
-            this.audiomanager.sampleRateFactor, this.audiomanager.originalInfo.duration.samples
-          )
+          level: this._annotation.levels[this._selectedlevel].getObj(this.audiomanager.originalInfo.duration)
         });
         this.saving = false;
       }, 2000);
@@ -211,14 +199,11 @@ export class TranscriptionService {
       this._audiofile = new OAudiofile();
       this._audiofile.name = this._audiomanager.originalInfo.fullname;
       this._audiofile.samplerate = this._audiomanager.originalInfo.samplerate;
-      this._audiofile.duration = this._audiomanager.originalInfo.duration.samples;
+      this._audiofile.duration = this._audiomanager.originalInfo.duration.originalSample.value;
       this._audiofile.size = this._audiomanager.originalInfo.size;
       this._audiofile.url = (this.appStorage.usemode === 'online')
         ? `${this.app_settings.audio_server.url}${this.appStorage.audio_url}` : '';
       this._audiofile.type = this._audiomanager.originalInfo.type;
-
-      this.last_sample = this._audiomanager.ressource.info.duration.samples;
-      console.log(`LAST Sample: ${this.last_sample}`);
 
       this.loadSegments().then(
         () => {
@@ -240,7 +225,7 @@ export class TranscriptionService {
 
     if (!(this.annotation === null || this.annotation === undefined)) {
       result = converter.export(
-        this.annotation.getObj(this.audiomanager.sampleRateFactor, this.audiomanager.originalInfo.duration.samples),
+        this.annotation.getObj(this.audiomanager.originalInfo.duration),
         this.audiofile, 0
       ).file;
 
@@ -265,8 +250,11 @@ export class TranscriptionService {
             for (let i = 0; i < this.appStorage.annotation.length; i++) {
               const level: Level = Level.fromObj(this.appStorage.annotation[i],
                 this._audiomanager.ressource.info.samplerate,
-                this._audiomanager.ressource.info.duration.samples,
-                this.audiomanager.sampleRateFactor);
+                {
+                  browser: this._audiomanager.ressource.info.duration.browserSample.value,
+                  original: this._audiomanager.originalInfo.duration.originalSample.value
+                },
+                this.audiomanager.browserSampleRate);
               this._annotation.levels.push(level);
             }
 
@@ -312,9 +300,6 @@ export class TranscriptionService {
                 // load transcript from url
 
                 // TODO continue implementing
-                Functions.uniqueHTTPRequest(this.http, false, {
-                  responseType: 'text'
-                }, 'test.com', {});
               }
 
               if (!(this.appStorage.servertranscipt === null || this.appStorage.servertranscipt === undefined)) {
@@ -386,17 +371,17 @@ export class TranscriptionService {
 
         let last_bound = 0;
         if (i > 0) {
-          last_bound = Math.round(this.currentlevel.segments.get(i - 1).time.samples * this.audiomanager.sampleRateFactor);
+          last_bound = Math.round(this.currentlevel.segments.get(i - 1).time.originalSample.value);
         }
 
         const segment_json: any = {
           start: last_bound,
-          length: Math.round(segment.time.samples * this.audiomanager.sampleRateFactor) - last_bound,
+          length: segment.time.originalSample.value - last_bound,
           text: segment.transcript
         };
 
         if (i === this.currentlevel.segments.length - 1) {
-          segment_json.length = this._audiomanager.originalInfo.duration.samples - last_bound;
+          segment_json.length = this._audiomanager.originalInfo.duration.originalSample.value - last_bound;
         }
 
         transcript.push(segment_json);
@@ -423,7 +408,6 @@ export class TranscriptionService {
 
     // set data to null
     this._segments = null;
-    this._last_sample = null;
     this._guidelines = null;
     this.saving = false;
     this.filename = '';
@@ -743,7 +727,7 @@ export class TranscriptionService {
 
   public createNewAnnotation(): OAnnotJSON {
     const level: OLevel = new OLevel('OCTRA_1', 'SEGMENT', []);
-    level.items.push(new OSegment(1, 0, this._audiomanager.ressource.info.duration.samples, [(new OLabel('OCTRA_1', ''))]));
+    level.items.push(new OSegment(1, 0, this._audiomanager.originalInfo.duration.originalSample.value, [(new OLabel('OCTRA_1', ''))]));
     const levels: OLevel[] = [];
     levels.push(level);
 

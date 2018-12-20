@@ -15,7 +15,7 @@ import {
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
 import {AppStorageService, AudioService, TranscriptionService} from '../../shared/service';
-import {AudioChunk, AudioSelection, AudioTime, SubscriptionManager} from '../../shared';
+import {AudioChunk, AudioSelection, BrowserAudioTime, BrowserSample, OriginalAudioTime, SubscriptionManager} from '../../shared';
 import {Segment} from '../../obj/Annotation';
 import {PlayBackState} from '../../../media-components/obj/media';
 import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
@@ -214,7 +214,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       this.textEditor.selectedSegment = i;
 
       const segment = this.segments[i];
-      const nextSegmentTime: AudioTime = (i < this.segments.length - 1)
+      const nextSegmentTime: BrowserAudioTime | OriginalAudioTime = (i < this.segments.length - 1)
         ? this.segments[i + 1].time : this.audio.audiomanagers[0].originalInfo.duration;
       const audiochunk = new AudioChunk(new AudioSelection(segment.time, nextSegmentTime), this.audio.audiomanagers[0]);
 
@@ -278,11 +278,11 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       for (let i = 0; i < this.segments.length; i++) {
         const segment = this.segments[i];
 
-        const obj = this.getShownSegment(start_time, segment.time.samples, segment.transcript, i);
+        const obj = this.getShownSegment(start_time, segment.time.browserSample.value, segment.transcript, i);
 
         result.push(obj);
 
-        start_time = segment.time.seconds;
+        start_time = segment.time.browserSample.value;
 
         // set playState
         this.playStateSegments.push({
@@ -391,12 +391,18 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
         this.cd.markForCheck();
         this.cd.detectChanges();
 
-        const startSample = (segmentNumber > 0) ? this.segments[segmentNumber - 1].time.samples : 0;
+        const startSample = (segmentNumber > 0) ? this.segments[segmentNumber - 1].time.browserSample.value : 0;
 
         this.playAllState.currentSegment = segmentNumber;
 
-        this.audio.audiomanagers[0].startPlayback(new AudioTime(startSample, this.audio.audiomanagers[0].originalInfo.samplerate),
-          new AudioTime(segment.time.samples - startSample, this.audio.audiomanagers[0].originalInfo.samplerate), 1, 1, () => {
+        this.audio.audiomanagers[0].startPlayback(
+          new BrowserAudioTime(
+            new BrowserSample(startSample, this.audio.audiomanagers[0].browserSampleRate),
+            this.audio.audiomanagers[0].originalInfo.samplerate
+          ),
+          new BrowserAudioTime(new BrowserSample(segment.time.browserSample.value - startSample,
+            this.audio.audiomanagers[0].browserSampleRate),
+            this.audio.audiomanagers[0].originalInfo.samplerate), 1, 1, () => {
           }).then(() => {
           this.playStateSegments[segmentNumber].state = 'stopped';
           this.playStateSegments[segmentNumber].icon = 'play';

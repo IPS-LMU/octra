@@ -1,6 +1,5 @@
 import {AudioSelection} from './AudioSelection';
-import {AudioTime} from './AudioTime';
-import {PlayBackState} from '../index';
+import {BrowserAudioTime, BrowserSample, PlayBackState} from '../index';
 import {EventEmitter} from '@angular/core';
 import {AudioManager} from './AudioManager';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
@@ -20,7 +19,15 @@ export class AudioChunk {
   }
 
   get audiomanager(): AudioManager {
-    return this._audiomanger;
+    return this._audioManger;
+  }
+
+  public get browserSampleRate(): number {
+    return this._audioManger.browserSampleRate;
+  }
+
+  public get originalSampleRate(): number {
+    return this._audioManger.originalSampleRate;
   }
 
   /**
@@ -28,7 +35,7 @@ export class AudioChunk {
    * end position to the last sample every time it's called
    * @param value
    */
-  public set startpos(value: AudioTime) {
+  public set startpos(value: BrowserAudioTime) {
     if ((value === null || value === undefined)) {
       throw new Error('start pos is null!');
     }
@@ -71,7 +78,7 @@ export class AudioChunk {
 
   set volume(value: number) {
     this._volume = value;
-    this._audiomanger.gainNode.gain.value = value;
+    this._audioManger.gainNode.gain.value = value;
   }
 
   get speed(): number {
@@ -82,19 +89,19 @@ export class AudioChunk {
     if (value > 0) {
       this._speed = value;
       // TODO does this make sense?
-      this._audiomanger.playbackInfo.endAt = this._audiomanger.playbackInfo.endAt * this._speed;
+      this._audioManger.playbackInfo.endAt = this._audioManger.playbackInfo.endAt * this._speed;
     }
   }
 
-  get playposition(): AudioTime {
+  get playposition(): BrowserAudioTime {
     return this._playposition;
   }
 
-  set playposition(value: AudioTime) {
+  set playposition(value: BrowserAudioTime) {
     this._playposition = value;
   }
 
-  get lastplayedpos(): AudioTime {
+  get lastplayedpos(): BrowserAudioTime {
     return this._lastplayedpos;
   }
 
@@ -122,8 +129,8 @@ export class AudioChunk {
     }
 
     if (!(audio_manager === null || audio_manager === undefined)) {
-      this._audiomanger = audio_manager;
-      this._playposition = new AudioTime(time.start.samples, this._audiomanger.ressource.info.samplerate);
+      this._audioManger = audio_manager;
+      this._playposition = new BrowserAudioTime(time.start.browserSample, this._audioManger.ressource.info.samplerate);
       this._state = PlayBackState.INITIALIZED;
     } else {
       throw new Error('AudioChunk needs an audiomanger reference');
@@ -140,7 +147,7 @@ export class AudioChunk {
 
   private static _counter = 0;
   public statechange: EventEmitter<PlayBackState> = new EventEmitter<PlayBackState>();
-  private _audiomanger: AudioManager;
+  private _audioManger: AudioManager;
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
   private _selection: AudioSelection = null;
@@ -155,9 +162,9 @@ export class AudioChunk {
 
   private _speed = 1;
 
-  private _playposition: AudioTime;
+  private _playposition: BrowserAudioTime;
 
-  private _lastplayedpos: AudioTime;
+  private _lastplayedpos: BrowserAudioTime;
 
   private _replay = false;
   /**
@@ -172,14 +179,14 @@ export class AudioChunk {
       if ((this._playposition === null || this._playposition === undefined)) {
         this._playposition = this.time.start.clone();
       } else {
-        this._playposition.samples = this._audiomanger.playposition.samples;
+        this._playposition.browserSample.value = this._audioManger.playposition.browserSample.value;
       }
     }
   }
 
   public getChannelBuffer(selection: AudioSelection): Float32Array {
     if (!(selection === null || selection === undefined)) {
-      return this.audiomanager.channel.subarray(selection.start.samples, selection.end.samples);
+      return this.audiomanager.channel.subarray(selection.start.browserSample.value, selection.end.browserSample.value);
     }
 
     return null;
@@ -193,7 +200,7 @@ export class AudioChunk {
           this.selection = new AudioSelection(this.time.start.clone(), this.time.end.clone());
         }
 
-        if (this._selection.start.samples === this._selection.end.samples) {
+        if (this._selection.start.browserSample.value === this._selection.end.browserSample.value) {
           this.startpos = this._selection.start.clone();
         }
 
@@ -229,7 +236,7 @@ export class AudioChunk {
           }
         ));
 
-        this._audiomanger.startPlayback(
+        this._audioManger.startPlayback(
           this.selection.start, this.selection.duration, this._volume, this._speed, () => {
             this.updatePlayPosition();
             onProcess();
@@ -246,7 +253,7 @@ export class AudioChunk {
    */
   public stopPlayback: () => Promise<void> = () => {
     return new Promise<void>((resolve, reject) => {
-      this._audiomanger.stopPlayback().then(() => {
+      this._audioManger.stopPlayback().then(() => {
         this.afterPlaybackStopped();
         resolve();
       }).catch(reject);
@@ -254,7 +261,7 @@ export class AudioChunk {
   }
 
   public pausePlayback(): Promise<void> {
-    return this._audiomanger.pausePlayback().then(() => {
+    return this._audioManger.pausePlayback().then(() => {
       if (this.audiomanager.state !== this.state && this.state === PlayBackState.PLAYING) {
         console.error(`audiomanager and chunk have different states: a:${this.audiomanager.state}, c:${this.state}`);
       }
@@ -269,7 +276,7 @@ export class AudioChunk {
         if (this.audiomanager.isPlaying) {
           this.audiomanager.stopPlayback().then(() => {
             this.startpos = this.lastplayedpos.clone();
-            this._audiomanger.startPlayback(
+            this._audioManger.startPlayback(
               this.selection.start.clone(), this.selection.duration.clone(), 1, 1, () => {
                 this.updatePlayPosition();
                 onProcess();
@@ -278,7 +285,7 @@ export class AudioChunk {
           }).catch(reject);
         } else {
           this.startpos = this.lastplayedpos.clone();
-          this._audiomanger.startPlayback(
+          this._audioManger.startPlayback(
             this.selection.start.clone(), this.selection.duration.clone(), 1, 1, () => {
               this.updatePlayPosition();
               onProcess();
@@ -294,14 +301,15 @@ export class AudioChunk {
   public stepBackwardTime(back_sec: number, onProcess: () => void = () => {
   }): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const back_samples = Math.max(0, (this.playposition.samples
-        - (Math.round(back_sec * this.audiomanager.ressource.info.samplerate))));
+      const back_samples = Math.max(0, (this.playposition.browserSample.value
+        - (Math.round(back_sec * this._audioManger.browserSampleRate))));
+      const backSample = new BrowserSample(back_samples, this._audioManger.browserSampleRate);
 
       if (this.audiomanager.isPlaying) {
         this.audiomanager.stopPlayback().then(() => {
-          this.startpos = new AudioTime(back_samples, this.audiomanager.ressource.info.samplerate);
+          this.startpos = new BrowserAudioTime(backSample, this._audioManger.originalSampleRate);
 
-          this._audiomanger.startPlayback(
+          this._audioManger.startPlayback(
             this.selection.start.clone(), this.selection.duration.clone(), 1, 1, () => {
               this.updatePlayPosition();
               onProcess();
@@ -309,9 +317,9 @@ export class AudioChunk {
           ).then(resolve).catch(reject);
         }).catch(reject);
       } else {
-        this.startpos = new AudioTime(back_samples, this.audiomanager.ressource.info.samplerate);
+        this.startpos = new BrowserAudioTime(backSample, this._audioManger.originalSampleRate);
 
-        this._audiomanger.startPlayback(
+        this._audioManger.startPlayback(
           this.selection.start.clone(), this.selection.duration.clone(), 1, 1, () => {
             this.updatePlayPosition();
             onProcess();

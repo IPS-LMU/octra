@@ -1,6 +1,7 @@
 import {AnnotJSONType, ISegment, OEvent, OItem, OLevel} from './AnnotJSON';
 import {Segments} from './Segments';
 import {OIDBLevel} from '../../shared/service/appstorage.service';
+import {BrowserAudioTime, OriginalAudioTime} from '../../../media-components/obj/media/audio';
 
 export class Level {
   public static counter = 1;
@@ -50,36 +51,35 @@ export class Level {
     }
   }
 
-  public static fromObj(entry: OIDBLevel, samplerate: number, last_sample: number, sampleRateFactor: number): Level {
-    if (!(sampleRateFactor === null || sampleRateFactor === undefined) && sampleRateFactor > 0) {
-      console.log(`last samples ${last_sample}`);
-      let segments: Segments = null;
-      let events = [];
-      let items = [];
+  public static fromObj(entry: OIDBLevel, originalSampleRate: number, lastSamples: {
+    browser: number,
+    original: number
+  }, browserSampleRate: number): Level {
+    console.log(`last samples browser: ${lastSamples.browser}, original: ${lastSamples.original}`);
+    let segments: Segments = null;
+    let events = [];
+    let items = [];
 
-      if (entry.level.type === 'SEGMENT') {
-        const segment_entries: ISegment[] = <ISegment[]> entry.level.items;
-        segments = new Segments(samplerate, segment_entries, last_sample, sampleRateFactor);
-      } else if (entry.level.type === 'ITEM') {
-        items = entry.level.items;
-      } else if (entry.level.type === 'EVENT') {
-        events = entry.level.items;
-      }
-
-      const result = new Level(entry.id, entry.level.name, entry.level.type, segments);
-      result.items = items;
-      result.events = events;
-
-      return result;
-    } else {
-      throw new Error('can not load Level because sampleRateFactor is null!');
+    if (entry.level.type === 'SEGMENT') {
+      const segment_entries: ISegment[] = <ISegment[]>entry.level.items;
+      segments = new Segments(browserSampleRate, segment_entries, lastSamples, originalSampleRate);
+    } else if (entry.level.type === 'ITEM') {
+      items = entry.level.items;
+    } else if (entry.level.type === 'EVENT') {
+      events = entry.level.items;
     }
+
+    const result = new Level(entry.id, entry.level.name, entry.level.type, segments);
+    result.items = items;
+    result.events = events;
+
+    return result;
   }
 
-  public getObj(sampleRateFactor: number, lastOriginalSample: number): OLevel {
+  public getObj(lastOriginalBoundary: BrowserAudioTime | OriginalAudioTime): OLevel {
     let result: OLevel = null;
     if (this._type === AnnotJSONType.SEGMENT) {
-      result = new OLevel(this._name, this.getTypeString(), this.segments.getObj(this._name, sampleRateFactor, lastOriginalSample));
+      result = new OLevel(this._name, this.getTypeString(), this.segments.getObj(this._name, lastOriginalBoundary.originalSample.value));
     } else if (this._type === AnnotJSONType.ITEM) {
       result = new OLevel(this._name, this.getTypeString(), this.items);
     } else if (this._type === AnnotJSONType.EVENT) {

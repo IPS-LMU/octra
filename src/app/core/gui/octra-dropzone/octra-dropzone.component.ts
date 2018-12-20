@@ -316,7 +316,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
         this._oaudiofile = new OAudiofile();
         this._oaudiofile.name = file_process.file.name;
         this._oaudiofile.size = file_process.file.size;
-        this._oaudiofile.duration = this._audiomanager.ressource.info.duration.samples;
+        this._oaudiofile.duration = this._audiomanager.ressource.info.duration.browserSample.value;
         this._oaudiofile.samplerate = this._audiomanager.ressource.info.samplerate;
         this._oaudiofile.arraybuffer = buffer;
 

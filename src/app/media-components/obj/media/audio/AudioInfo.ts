@@ -1,10 +1,10 @@
-import {AudioTime} from './AudioTime';
 import {FileInfo} from '../../fileInfo';
+import {BrowserAudioTime, BrowserSample} from './AudioTime';
 
 export class AudioInfo extends FileInfo {
   private _bitrate = -1;
   private _channels = -1;
-  private _duration: AudioTime;
+  private _duration: BrowserAudioTime;
 
   get bitrate(): number {
     return this._bitrate;
@@ -20,18 +20,19 @@ export class AudioInfo extends FileInfo {
     return this._samplerate;
   }
 
-  get duration(): AudioTime {
+  get duration(): BrowserAudioTime {
     return this._duration;
   }
 
-  set duration(value: AudioTime) {
+  set duration(value: BrowserAudioTime) {
     this._duration = value;
   }
 
-  constructor(filename: string, type: string, size: number, samplerate: number, duration: number, channels: number, bitrate: number) {
+  constructor(filename: string, type: string, size: number, sampleRate: number, durationSamples: number,
+              channels: number, bitrate: number) {
     super(filename, type, size);
-    this._samplerate = samplerate;
-    this._duration = new AudioTime(duration, samplerate);
+    this._samplerate = sampleRate;
+    this._duration = new BrowserAudioTime(new BrowserSample(durationSamples, sampleRate), sampleRate);
     this._channels = channels;
     this._bitrate = bitrate;
   }

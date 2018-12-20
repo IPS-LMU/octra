@@ -22,7 +22,7 @@ import {
   UserInteractionsService
 } from '../../core/shared/service';
 
-import {AudioSelection, AudioTime} from '../../core/shared';
+import {AudioSelection, BrowserAudioTime, BrowserSample} from '../../core/shared';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
 import {AudioChunk} from '../../media-components/obj/media/audio';
 import {TranscrWindowComponent} from './transcr-window';
@@ -197,7 +197,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
             && this.appStorage.followplaycursor === true) {
 
             this.scrolltimer = Observable.interval(1000).subscribe(() => {
-              const absx = this.viewer.av.audioTCalculator.samplestoAbsX(this.audiochunk_lines.playposition.samples);
+              const absx = this.viewer.av.audioTCalculator.samplestoAbsX(this.audiochunk_lines.playposition.browserSample.value);
               let y = Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.lineheight;
               y += 10 + (Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.margin.bottom);
 
@@ -254,8 +254,8 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     if (this.transcrService.currentlevel.segments && selected.index > -1 &&
       selected.index < this.transcrService.currentlevel.segments.length) {
       const segment = this.transcrService.currentlevel.segments.get(selected.index);
-      const start: AudioTime = (selected.index > 0) ? this.transcrService.currentlevel.segments.get(selected.index - 1).time.clone()
-        : new AudioTime(0, this.audiomanager.ressource.info.samplerate);
+      const start: any = (selected.index > 0) ? this.transcrService.currentlevel.segments.get(selected.index - 1).time.clone()
+        : new BrowserAudioTime(new BrowserSample(0, this.audiomanager.browserSampleRate), this.audiomanager.ressource.info.samplerate);
       if (segment) {
         this.selected_index = selected.index;
         this.audiochunk_window = new AudioChunk(new AudioSelection(start, segment.time.clone()), this.audiomanager);
@@ -276,7 +276,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       this.viewer.drawSegments();
 
       const segment = this.transcrService.currentlevel.segments.get(this.selected_index);
-      const absx = this.viewer.av.audioTCalculator.samplestoAbsX(segment.time.samples);
+      const absx = this.viewer.av.audioTCalculator.samplestoAbsX(segment.time.browserSample.value);
 
       let y = Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.lineheight;
       y += 10 + (Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.margin.bottom);
@@ -299,8 +299,8 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
     if (!this.audiomanager.isPlaying && this.appStorage.playonhover) {
       // play audio
-      this.audiochunk_lines.selection.start.samples = this.viewer.av.Mousecursor.timePos.samples;
-      this.audiochunk_lines.selection.end.samples = this.viewer.av.Mousecursor.timePos.samples +
+      this.audiochunk_lines.selection.start.browserSample.value = this.viewer.av.Mousecursor.timePos.samples;
+      this.audiochunk_lines.selection.end.browserSample.value = this.viewer.av.Mousecursor.timePos.samples +
         this.audiomanager.ressource.info.samplerate / 10;
       this.audiochunk_lines.startPlayback(() => {
       }, true);
@@ -358,20 +358,19 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
       if (this.selected_index > -1 && this.selected_index < this.transcrService.currentlevel.segments.length) {
         const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
-        segment.start = anno_segment.time.samples;
+        segment.start = anno_segment.time.originalSample.value;
         segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
-          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.samples - anno_segment.time.samples
-          : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
+          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.originalSample.value
+          - anno_segment.time.originalSample.value
+          : this.audiomanager.originalInfo.duration.originalSample.value - anno_segment.time.originalSample.value;
 
-        segment.start = Math.round(segment.start * this.audiomanager.sampleRateFactor);
-        segment.length = Math.round(segment.length * this.audiomanager.sampleRateFactor);
         segment.textlength = anno_segment.transcript.length;
       }
 
       const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
 
       this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
-        Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), caretpos, 'multi-lines-viewer', segment);
+        this.audiomanager.playposition, caretpos, 'multi-lines-viewer', segment);
 
     } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
       this.appStorage.playonhover = !this.appStorage.playonhover;
@@ -392,20 +391,18 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
       if (this.selected_index > -1 && this.selected_index < this.transcrService.currentlevel.segments.length) {
         const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
-        segment.start = anno_segment.time.samples;
+        segment.start = anno_segment.time.originalSample.value;
         segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
-          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.samples - anno_segment.time.samples
-          : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
+          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.originalSample.value
+          - anno_segment.time.originalSample.value
+          : this.audiomanager.originalInfo.duration.originalSample.value - anno_segment.time.originalSample.value;
 
-
-        segment.start = Math.round(segment.start * this.audiomanager.sampleRateFactor);
-        segment.length = Math.round(segment.length * this.audiomanager.sampleRateFactor);
         segment.textlength = anno_segment.transcript.length;
       }
 
       const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), caretpos, 'audio_speed', segment);
+        this.audiomanager.playposition, caretpos, 'audio_speed', segment);
     }
   }
 
@@ -423,19 +420,18 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
       if (this.selected_index > -1 && this.selected_index < this.transcrService.currentlevel.segments.length) {
         const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
-        segment.start = anno_segment.time.samples;
+        segment.start = anno_segment.time.originalSample.value;
         segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
-          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.samples - anno_segment.time.samples
-          : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
+          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.originalSample.value
+          - anno_segment.time.originalSample.value
+          : this.audiomanager.ressource.info.duration.originalSample.value - anno_segment.time.originalSample.value;
 
-        segment.start = Math.round(segment.start * this.audiomanager.sampleRateFactor);
-        segment.length = Math.round(segment.length * this.audiomanager.sampleRateFactor);
         segment.textlength = anno_segment.transcript.length;
       }
 
       const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), caretpos, 'audio_volume', segment);
+        this.audiomanager.playposition, caretpos, 'audio_volume', segment);
     }
   }
 
@@ -451,22 +447,18 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
       if (this.selected_index > -1 && this.selected_index < this.transcrService.currentlevel.segments.length) {
         const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
-        segment.start = anno_segment.time.samples;
+        segment.start = anno_segment.time.originalSample.value;
         segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
-          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.samples - anno_segment.time.samples
-          : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
-
-
-        segment.start = Math.round(segment.start * this.audiomanager.sampleRateFactor);
-        segment.length = Math.round(segment.length * this.audiomanager.sampleRateFactor);
+          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.originalSample.value
+          - anno_segment.time.originalSample.value
+          : this.audiomanager.ressource.info.duration.originalSample.value - anno_segment.time.originalSample.value;
 
         segment.textlength = anno_segment.transcript.length;
       }
-      const justifiedPlayPosition = Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor);
 
       this.uiService.addElementFromEvent('mouseclick', {value: 'click:' + event.type},
         event.timestamp,
-        justifiedPlayPosition, caretpos, 'audio_buttons', segment);
+        this.audiomanager.playposition, caretpos, 'audio_buttons', segment);
     }
 
     switch (event.type) {
@@ -507,7 +499,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
   public update() {
     this.viewer.update();
-    this.audiochunk_lines.startpos = this.audiochunk_lines.time.start;
+    this.audiochunk_lines.startpos = <BrowserAudioTime>this.audiochunk_lines.time.start.clone();
   }
 
   onScrollbarMouse(event) {
@@ -542,11 +534,13 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     if (cursor && cursor.timePos && cursor.relPos) {
       const half_rate = Math.round(this.audiomanager.ressource.info.samplerate / factor);
       const start = (cursor.timePos.samples > half_rate)
-        ? new AudioTime(cursor.timePos.samples - half_rate, this.audiomanager.ressource.info.samplerate)
-        : new AudioTime(0, this.audiomanager.ressource.info.samplerate);
-      const end = (cursor.timePos.samples < this.audiomanager.ressource.info.duration.samples - half_rate)
-        ? new AudioTime(cursor.timePos.samples + half_rate, this.audiomanager.ressource.info.samplerate)
-        : this.audiomanager.ressource.info.duration.clone();
+        ? new BrowserAudioTime(new BrowserSample(cursor.timePos.samples - half_rate, this.audiomanager.browserSampleRate),
+          this.audiomanager.originalSampleRate)
+        : new BrowserAudioTime(new BrowserSample(cursor.timePos.samples - half_rate, this.audiomanager.browserSampleRate),
+          this.audiomanager.originalSampleRate);
+      const end = (cursor.timePos.samples < this.audiomanager.ressource.info.duration.browserSample.value - half_rate)
+        ? new BrowserAudioTime(new BrowserSample(cursor.timePos.samples + half_rate, this.audiomanager.browserSampleRate),
+          this.audiomanager.originalSampleRate) : this.audiomanager.ressource.info.duration.clone();
 
       loup.zoomY = factor;
       if (start && end) {

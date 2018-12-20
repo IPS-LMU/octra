@@ -1,5 +1,5 @@
-import {AudioTime} from '../../../media-components/obj/media/audio/AudioTime';
 import {OSegment} from './AnnotJSON';
+import {BrowserAudioTime, OriginalAudioTime, OriginalSample} from '../../../media-components/obj/media/audio';
 
 export class Segment {
   private _transcript = '';
@@ -25,13 +25,23 @@ export class Segment {
     this._changed = value;
   }
 
-  constructor(public time: AudioTime) {
+  constructor(public time: BrowserAudioTime | OriginalAudioTime) {
 
   }
 
-  public static fromObj(obj: OSegment, samplerate: number): Segment {
+  /**
+   * converts an object to a Segment. The conversion goes from original -> browser samples.
+   * @param obj
+   * @param originalSampleRate
+   * @param browserSampleRate
+   */
+  public static fromObj(obj: OSegment, originalSampleRate: number, browserSampleRate: number): Segment {
     if (obj) {
-      const seg = new Segment(AudioTime.fromSamples((obj.sampleStart + obj.sampleDur), samplerate));
+      const originalAudioTime = new OriginalAudioTime(
+        new OriginalSample(obj.sampleStart + obj.sampleDur, originalSampleRate), browserSampleRate
+      );
+      const browserAudioTime = originalAudioTime.convertToBrowserAudioTime();
+      const seg = new Segment(browserAudioTime);
 
       if (obj.labels[0].value) {
         seg._transcript = obj.labels[0].value;

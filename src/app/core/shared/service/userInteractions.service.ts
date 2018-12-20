@@ -4,6 +4,7 @@ import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
 import {Functions} from '../Functions';
 import {OLog} from '../../obj/Settings/logging';
+import {BrowserAudioTime} from '../../../media-components/obj/media/audio';
 
 @Injectable()
 export class UserInteractionsService {
@@ -55,13 +56,14 @@ export class UserInteractionsService {
    * @param type
    * @param event
    */
-  public addElementFromEvent(type: string, event: any, timestamp: number, playerpos: number, caretpos: number,
+  public addElementFromEvent(type: string, event: any, timestamp: number, playerpos: BrowserAudioTime, caretpos: number,
                              target_name?: string, segment?: {
       start: number,
       length: number,
       textlength: number
     }) {
     this._lastAction = Date.now();
+    const originalPlayerPos = playerpos.originalSample.value;
 
     if (this._enabled) {
       let name = '';
@@ -97,16 +99,16 @@ export class UserInteractionsService {
           name,
           event.value,
           timestamp,
-          playerpos,
+          playerpos.originalSample.value,
           caretpos,
           segment
         );
       } else if (Functions.contains(type, 'mouse')) {
-        elem = new MouseStatisticElem(type, name, event.value, timestamp, playerpos, caretpos, segment);
+        elem = new MouseStatisticElem(type, name, event.value, timestamp, originalPlayerPos, caretpos, segment);
       } else if (Functions.contains(type, 'slider')) {
-        elem = new MouseStatisticElem(type, name, event.new_value, timestamp, playerpos, caretpos, segment);
+        elem = new MouseStatisticElem(type, name, event.new_value, timestamp, originalPlayerPos, caretpos, segment);
       } else {
-        elem = new StatisticElem(type, name, event.value, timestamp, playerpos);
+        elem = new StatisticElem(type, name, event.value, timestamp, originalPlayerPos);
       }
 
       if (elem) {

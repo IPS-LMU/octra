@@ -28,7 +28,7 @@ import {
   UserInteractionsService
 } from '../../shared/service';
 
-import {BrowserInfo, SubscriptionManager} from '../../shared';
+import {BrowserAudioTime, BrowserInfo, BrowserSample, SubscriptionManager} from '../../shared';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 import {ProjectSettings} from '../../obj/Settings';
@@ -127,7 +127,7 @@ export class TranscriptionComponent implements OnInit,
           if (state !== PlayBackState.PLAYING && state !== PlayBackState.INITIALIZED && state !== PlayBackState.PREPARE) {
             this.uiService.addElementFromEvent('audio',
               {value: state.toLowerCase()}, Date.now(),
-              Math.round(this.audiomanager.playposition.samples * this.transcrService.audiomanager.sampleRateFactor),
+              this.audiomanager.playposition,
               caretpos, this.appStorage.Interface);
           }
         }
@@ -307,7 +307,9 @@ export class TranscriptionComponent implements OnInit,
         this.level_subscription_id = this.subscrmanager.add(
           this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
         );
-        this.uiService.addElementFromEvent('level', {value: 'changed'}, Date.now(), 0, -1, level.name);
+        this.uiService.addElementFromEvent('level', {value: 'changed'}, Date.now(),
+          new BrowserAudioTime(new BrowserSample(0, this.audiomanager.browserSampleRate), this.audiomanager.originalSampleRate),
+          -1, level.name);
       }
     ));
 
@@ -629,8 +631,7 @@ export class TranscriptionComponent implements OnInit,
 
   public onSaveTranscriptionButtonClicked() {
     const converter = new PartiturConverter();
-    const oannotjson = this.transcrService.annotation.getObj(this.transcrService.audiomanager.sampleRateFactor,
-      this.transcrService.audiomanager.originalInfo.duration.samples);
+    const oannotjson = this.transcrService.annotation.getObj(this.transcrService.audiomanager.originalInfo.duration);
     const result: IFile = converter.export(oannotjson, this.transcrService.audiofile, 0).file;
     result.name = result.name.replace('-' + oannotjson.levels[0].name, '');
 

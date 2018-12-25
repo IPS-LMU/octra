@@ -45,7 +45,7 @@ export class AudioChunk {
       this.selection.start = value.clone();
       this.selection.end = this.time.end.clone();
     }
-    this._playposition = this.selection.start.clone();
+    this._playposition = <BrowserAudioTime>this.selection.start.clone();
   }
 
   get selection(): AudioSelection {
@@ -177,7 +177,7 @@ export class AudioChunk {
       const timestamp = new Date().getTime();
 
       if ((this._playposition === null || this._playposition === undefined)) {
-        this._playposition = this.time.start.clone();
+        this._playposition = <BrowserAudioTime>this.time.start.clone();
       } else {
         this._playposition.browserSample.value = this._audioManger.playposition.browserSample.value;
       }
@@ -201,7 +201,7 @@ export class AudioChunk {
         }
 
         if (this._selection.start.browserSample.value === this._selection.end.browserSample.value) {
-          this.startpos = this._selection.start.clone();
+          this.startpos = <BrowserAudioTime>this._selection.start.clone();
         }
 
         this.setState(PlayBackState.STARTED);
@@ -223,10 +223,10 @@ export class AudioChunk {
             if (state === PlayBackState.ENDED) {
               // reset to beginning of selection
               if (this._replay) {
-                this.playposition = this.selection.start.clone();
+                this.playposition = <BrowserAudioTime>this.selection.start.clone();
                 this.startPlayback(onProcess, playonhover);
               } else {
-                this.startpos = this._time.start.clone();
+                this.startpos = <BrowserAudioTime>this._time.start.clone();
                 resolve();
               }
             }
@@ -237,7 +237,7 @@ export class AudioChunk {
         ));
 
         this._audioManger.startPlayback(
-          this.selection.start, this.selection.duration, this._volume, this._speed, () => {
+          <BrowserAudioTime>this.selection.start, <BrowserAudioTime>this.selection.duration, this._volume, this._speed, () => {
             this.updatePlayPosition();
             onProcess();
           }, playonhover
@@ -277,7 +277,7 @@ export class AudioChunk {
           this.audiomanager.stopPlayback().then(() => {
             this.startpos = this.lastplayedpos.clone();
             this._audioManger.startPlayback(
-              this.selection.start.clone(), this.selection.duration.clone(), 1, 1, () => {
+              <BrowserAudioTime>this.selection.start.clone(), <BrowserAudioTime>this.selection.duration.clone(), 1, 1, () => {
                 this.updatePlayPosition();
                 onProcess();
               }
@@ -286,7 +286,7 @@ export class AudioChunk {
         } else {
           this.startpos = this.lastplayedpos.clone();
           this._audioManger.startPlayback(
-            this.selection.start.clone(), this.selection.duration.clone(), 1, 1, () => {
+            <BrowserAudioTime>this.selection.start.clone(), <BrowserAudioTime>this.selection.duration.clone(), 1, 1, () => {
               this.updatePlayPosition();
               onProcess();
             }
@@ -310,7 +310,7 @@ export class AudioChunk {
           this.startpos = new BrowserAudioTime(backSample, this._audioManger.originalSampleRate);
 
           this._audioManger.startPlayback(
-            this.selection.start.clone(), this.selection.duration.clone(), 1, 1, () => {
+            <BrowserAudioTime>this.selection.start.clone(), <BrowserAudioTime>this.selection.duration.clone(), 1, 1, () => {
               this.updatePlayPosition();
               onProcess();
             }
@@ -320,7 +320,7 @@ export class AudioChunk {
         this.startpos = new BrowserAudioTime(backSample, this._audioManger.originalSampleRate);
 
         this._audioManger.startPlayback(
-          this.selection.start.clone(), this.selection.duration.clone(), 1, 1, () => {
+          <BrowserAudioTime>this.selection.start.clone(), <BrowserAudioTime>this.selection.duration.clone(), 1, 1, () => {
             this.updatePlayPosition();
             onProcess();
           }
@@ -345,7 +345,7 @@ export class AudioChunk {
   }
 
   private afterPlaybackStopped = () => {
-    this.startpos = this.time.start.clone();
+    this.startpos = <BrowserAudioTime>this.time.start.clone();
     if (this._replay) {
       this.toggleReplay();
     }

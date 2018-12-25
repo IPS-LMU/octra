@@ -5,7 +5,7 @@ import {AudioviewerComponent} from './audioviewer.component';
 import {AudioviewerConfig} from './audioviewer.config';
 import {Interval, Position, Rectangle, Size} from '../../../objects';
 import {AudioComponentService} from '../../../service';
-import {AudioChunk, AudioSelection, AudioTime, AudioTimeCalculator} from '../../../obj/media/audio';
+import {AudioChunk, AudioSelection, AudioTimeCalculator, BrowserAudioTime, BrowserSample} from '../../../obj/media/audio';
 import {Line} from '../../../obj/Line';
 import {AVMousePos} from '../../../obj/AVMousePos';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
@@ -134,7 +134,7 @@ export class AudioviewerService extends AudioComponentService {
     this.Lines = [];
 
     if (this.Settings.multi_line) {
-      this.AudioPxWidth = this.audiomanager.ressource.info.duration.seconds * this.Settings.pixel_per_sec;
+      this.AudioPxWidth = this.audiomanager.ressource.info.duration.browserSample.seconds * this.Settings.pixel_per_sec;
       this.AudioPxWidth = (this.AudioPxWidth < innerWidth) ? innerWidth : this.AudioPxWidth;
     } else {
       this.AudioPxWidth = innerWidth;
@@ -143,10 +143,15 @@ export class AudioviewerService extends AudioComponentService {
     if (this.AudioPxWidth > 0) {
       // initialize the default values
       this.audioTCalculator = new AudioTimeCalculator(this.audiomanager.ressource.info.samplerate,
-        this.audiochunk.time.duration, this.AudioPxWidth);
-      this.Mousecursor = new AVMousePos(0, 0, 0, new AudioTime(0, this.audiomanager.ressource.info.samplerate));
-      this.MouseClickPos = new AVMousePos(0, 0, 0, new AudioTime(0, this.audiomanager.ressource.info.samplerate));
-      this.PlayCursor = new PlayCursor(0, new AudioTime(0, this.audiomanager.ressource.info.samplerate), innerWidth);
+        <BrowserAudioTime>this.audiochunk.time.duration, this.AudioPxWidth);
+      this.Mousecursor = new AVMousePos(0, 0, 0, new BrowserAudioTime(
+        new BrowserSample(0, this.audiomanager.browserSampleRate), this.audiomanager.ressource.info.samplerate)
+      );
+      this.MouseClickPos = new AVMousePos(0, 0, 0, new BrowserAudioTime(
+        new BrowserSample(0, this.audiomanager.browserSampleRate), this.audiomanager.ressource.info.samplerate)
+      );
+      this.PlayCursor = new PlayCursor(0, new BrowserAudioTime(new BrowserSample(0, this.audiomanager.browserSampleRate),
+        this.audiomanager.ressource.info.samplerate), innerWidth);
     } else {
       return new Promise<void>((resolve, reject) => {
         console.error('audio px is 0.');
@@ -175,7 +180,9 @@ export class AudioviewerService extends AudioComponentService {
 
     if (this.mouse_down && this._dragableBoundaryNumber < 0) {
       // mouse down, nothing dragged
-      this.audiochunk.selection.end = new AudioTime(absXTime, this.audiomanager.ressource.info.samplerate);
+      this.audiochunk.selection.end = new BrowserAudioTime(
+        new BrowserSample(absXTime, this.audiomanager.browserSampleRate),
+        this.audiomanager.ressource.info.samplerate);
       this.drawnselection.end = this.audiochunk.selection.end.clone();
     } else if (this.mouse_down && this._dragableBoundaryNumber > -1) {
       // mouse down something dragged
@@ -189,18 +196,18 @@ export class AudioviewerService extends AudioComponentService {
         ? this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber + 1) : null;
       if (!(segment_before === null || segment_before === undefined)) {
         // check segment boundary before this segment
-        if (absXSeconds < segment_before.time.seconds + 0.02) {
-          absXTime = segment_before.time.samples + Math.round((0.02) * this.audiomanager.ressource.info.samplerate);
+        if (absXSeconds < segment_before.time.browserSample.seconds + 0.02) {
+          absXTime = segment_before.time.browserSample.value + Math.round((0.02) * this.audiomanager.ressource.info.samplerate);
         }
       }
       if (!(segment_after === null || segment_after === undefined)) {
         // check segment boundary after this segment
-        if (absXSeconds > segment_after.time.seconds - 0.02) {
-          absXTime = segment_after.time.samples - Math.round((0.02) * this.audiomanager.ressource.info.samplerate);
+        if (absXSeconds > segment_after.time.browserSample.seconds - 0.02) {
+          absXTime = segment_after.time.browserSample.value - Math.round((0.02) * this.audiomanager.ressource.info.samplerate);
         }
       }
 
-      segment.time.samples = absXTime;
+      segment.time.browserSample.value = absXTime;
       this.transcrService.currentlevel.segments.change(this._dragableBoundaryNumber, segment);
       this.transcrService.currentlevel.segments.sort();
       dragableBoundaryTemp = this.getBoundaryNumber(absX);
@@ -238,7 +245,8 @@ export class AudioviewerService extends AudioComponentService {
             if (this.last_line === null || this.last_line.number === this.last_line.number) {
               // no line defined or same line
               this.mouse_click_pos.absX = absX;
-              this.mouse_click_pos.timePos = new AudioTime(absXInTime, this.audiomanager.ressource.info.samplerate);
+              this.mouse_click_pos.timePos = new BrowserAudioTime(new BrowserSample(absXInTime, this.audiomanager.browserSampleRate),
+                this.audiomanager.originalSampleRate);
               this.mouse_click_pos.line = curr_line;
 
               this.audiochunk.startpos = this.mouse_click_pos.timePos.clone();
@@ -252,16 +260,17 @@ export class AudioviewerService extends AudioComponentService {
               this._dragableBoundaryNumber < this.transcrService.currentlevel.segments.length) {
               // some boundary dragged
               const segment = this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber);
-              segment.time.samples = this.audioTCalculator.absXChunktoSamples(absX, this.audiochunk);
+              segment.time.browserSample.value = this.audioTCalculator.absXChunktoSamples(absX, this.audiochunk);
               this.transcrService.currentlevel.segments.change(this._dragableBoundaryNumber, segment);
               this.transcrService.currentlevel.segments.sort();
             } else {
               // set selection
-              this.audiochunk.selection.end = new AudioTime(absXInTime, this.audiomanager.ressource.info.samplerate);
+              this.audiochunk.selection.end = new BrowserAudioTime(new BrowserSample(absXInTime, this.audiomanager.browserSampleRate),
+                this.audiomanager.ressource.info.samplerate);
 
               this.audiochunk.selection.checkSelection();
               this._drawnselection = this.audiochunk.selection.clone();
-              this.PlayCursor.changeSamples(this.audiochunk.playposition.samples, this.audioTCalculator, this.audiochunk);
+              this.PlayCursor.changeSamples(this.audiochunk.playposition.browserSample.value, this.audioTCalculator, this.audiochunk);
             }
 
             this._dragableBoundaryNumber = -1;
@@ -272,7 +281,7 @@ export class AudioviewerService extends AudioComponentService {
           if (this._dragableBoundaryNumber > -1 && this._dragableBoundaryNumber < this.transcrService.currentlevel.segments.length) {
             // some boundary dragged
             const segment = this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber);
-            segment.time.samples = this.audioTCalculator.absXChunktoSamples(absX, this.audiochunk);
+            segment.time.browserSample.value = this.audioTCalculator.absXChunktoSamples(absX, this.audiochunk);
             this.transcrService.currentlevel.segments.sort();
           } else {
             // set selection
@@ -280,10 +289,11 @@ export class AudioviewerService extends AudioComponentService {
               // click only
               this.audiochunk.selection.end = this.audiochunk.selection.start.clone();
             } else {
-              this.audiochunk.selection.end = new AudioTime(absXInTime, this.audiomanager.ressource.info.samplerate);
+              this.audiochunk.selection.end = new BrowserAudioTime(new BrowserSample(absXInTime, this.audiomanager.browserSampleRate),
+                this.audiomanager.ressource.info.samplerate);
             }
             this.audiochunk.selection.checkSelection();
-            this.PlayCursor.changeSamples(this.audiochunk.playposition.samples, this.audioTCalculator, this.audiochunk);
+            this.PlayCursor.changeSamples(this.audiochunk.playposition.browserSample.value, this.audioTCalculator, this.audiochunk);
           }
 
           this._dragableBoundaryNumber = -1;
@@ -292,7 +302,8 @@ export class AudioviewerService extends AudioComponentService {
         }
       } else if (this.audiomanager.state === PlayBackState.PLAYING && ($event.type === 'mouseup')) {
         this.audiochunk.stopPlayback().then(() => {
-          const time = new AudioTime(absXInTime, this.audiomanager.ressource.info.samplerate);
+          const time = new BrowserAudioTime(new BrowserSample(absXInTime, this.audiomanager.browserSampleRate),
+            this.audiomanager.ressource.info.samplerate);
           this.audiochunk.startpos = time;
           this.audiochunk.selection.end = time.clone();
           this.PlayCursor.changeSamples(absXInTime, this.audioTCalculator, this.audiochunk);
@@ -338,18 +349,20 @@ export class AudioviewerService extends AudioComponentService {
     this.audioTCalculator.audio_px_width = this.audio_px_w;
 
     if (!(line === null || line === undefined) && this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly) {
-      const absXTime = (!this.audiochunk.isPlaying) ? this.mousecursor.timePos.samples : this.audiochunk.playposition.samples;
+      const absXTime = (!this.audiochunk.isPlaying)
+        ? this.mousecursor.timePos.browserSample.value : this.audiochunk.playposition.browserSample.value;
       let b_width_time = this.audioTCalculator.absXtoSamples2(this.Settings.boundaries.width * 2, this.audiochunk);
       b_width_time = Math.round(b_width_time);
 
       if (this.transcrService.currentlevel.segments.length > 0 && !this.audiochunk.isPlaying) {
         for (i = 0; i < this.transcrService.currentlevel.segments.length; i++) {
-          if ((this.transcrService.currentlevel.segments.get(i).time.samples >= absXTime - b_width_time
-            && this.transcrService.currentlevel.segments.get(i).time.samples <= absXTime + b_width_time)
-            && this.transcrService.currentlevel.segments.get(i).time.samples !== this.audiomanager.ressource.info.duration.samples
+          const segment = this.transcrService.currentlevel.segments.get(i);
+          if ((segment.time.browserSample.value >= absXTime - b_width_time
+            && segment.time.browserSample.value <= absXTime + b_width_time)
+            && segment.time.browserSample.value !== this.audiomanager.ressource.info.duration.browserSample.value
           ) {
 
-            const seg_samples = this.transcrService.currentlevel.segments.get(i).time.samples;
+            const seg_samples = this.transcrService.currentlevel.segments.get(i).time.browserSample.value;
             this.transcrService.currentlevel.segments.removeByIndex(i, this.transcrService.break_marker.code);
 
             return {
@@ -366,20 +379,21 @@ export class AudioviewerService extends AudioComponentService {
 
       const selection: number = !(this.drawnselection === null || this.drawnselection === undefined) ? this.drawnselection.length : 0;
 
-      if (selection > 0 && absXTime >= this.drawnselection.start.samples && absXTime <= this.drawnselection.end.samples) {
+      if (selection > 0 && absXTime >= this.drawnselection.start.browserSample.value
+        && absXTime <= this.drawnselection.end.browserSample.value) {
         // some part selected
-        const segm1 = this.transcrService.currentlevel.segments.BetweenWhichSegment(this.drawnselection.start.samples);
-        const segm2 = this.transcrService.currentlevel.segments.BetweenWhichSegment(this.drawnselection.end.samples);
+        const segm1 = this.transcrService.currentlevel.segments.BetweenWhichSegment(this.drawnselection.start.browserSample.value);
+        const segm2 = this.transcrService.currentlevel.segments.BetweenWhichSegment(this.drawnselection.end.browserSample.value);
 
         if (segm1 === null && segm2 === null || (segm1 === segm2 || (segm1.transcript === '' && segm2.transcript === ''))) {
-          if (this.drawnselection.start.samples > 0) {
+          if (this.drawnselection.start.browserSample.value > 0) {
             // prevent setting boundary if first sample selected
-            this.transcrService.currentlevel.segments.add(this.drawnselection.start.samples);
+            this.transcrService.currentlevel.segments.add(this.drawnselection.start);
           }
-          this.transcrService.currentlevel.segments.add(this.drawnselection.end.samples);
+          this.transcrService.currentlevel.segments.add(this.drawnselection.end);
           return {
             type: 'add',
-            seg_samples: this.drawnselection.start.samples,
+            seg_samples: this.drawnselection.start.browserSample.value,
             msg: {
               type: 'success',
               text: ''
@@ -388,7 +402,7 @@ export class AudioviewerService extends AudioComponentService {
         } else {
           return {
             type: 'add',
-            seg_samples: this.drawnselection.start.samples,
+            seg_samples: this.drawnselection.start.browserSample.value,
             msg: {
               type: 'error',
               text: this.langService.instant('boundary cannot set')
@@ -400,7 +414,9 @@ export class AudioviewerService extends AudioComponentService {
         let segment = this.transcrService.currentlevel.segments.BetweenWhichSegment(absXTime);
         const transcript = segment.transcript;
         segment.transcript = '';
-        this.transcrService.currentlevel.segments.add(Math.round(absXTime));
+        this.transcrService.currentlevel.segments.add(
+          new BrowserAudioTime(new BrowserSample(Math.round(absXTime), this.audiomanager.browserSampleRate),
+            this.audiomanager.originalSampleRate));
         segment = this.transcrService.currentlevel.segments.BetweenWhichSegment(absXTime);
         segment.transcript = transcript;
         return {
@@ -427,17 +443,18 @@ export class AudioviewerService extends AudioComponentService {
     const length = this.transcrService.currentlevel.segments.length;
 
     if (length > 0) {
-      if (position_samples < segments.get(0).time.samples) {
+      if (position_samples < segments.get(0).time.browserSample.value) {
         // select in first Boundary
-        result = new AudioSelection(new AudioTime(0, this.audiomanager.ressource.info.samplerate), segments.get(0).time);
-      } else if (position_samples > segments.get(segments.length - 1).time.samples) {
+        result = new AudioSelection(new BrowserAudioTime(new BrowserSample(0, this.audiomanager.browserSampleRate)
+          , this.audiomanager.ressource.info.samplerate), segments.get(0).time);
+      } else if (position_samples > segments.get(segments.length - 1).time.browserSample.value) {
         // select in first Boundary
         const seg = segments.get(segments.length - 1).time.clone();
         result = new AudioSelection(seg, this.audiomanager.ressource.info.duration);
       } else {
         for (let i = 1; i < length; i++) {
-          if (position_samples > segments.get(i - 1).time.samples
-            && position_samples < segments.get(i).time.samples) {
+          if (position_samples > segments.get(i - 1).time.browserSample.value
+            && position_samples < segments.get(i).time.browserSample.value) {
             const seg1 = segments.get(i - 1).time;
             const seg2 = segments.get(i).time;
             result = new AudioSelection(seg1, seg2);
@@ -463,8 +480,8 @@ export class AudioviewerService extends AudioComponentService {
     if (!(line === null || line === undefined)) {
       const absX = line.number * innerWidth;
       const absEnd = absX + line.Size.width;
-      const SelAbsStart = this.audioTCalculator.samplestoAbsX(start_samples - this.audiochunk.time.start.samples);
-      const SelAbsEnd = this.audioTCalculator.samplestoAbsX(end_samples - this.audiochunk.time.start.samples);
+      const SelAbsStart = this.audioTCalculator.samplestoAbsX(start_samples - this.audiochunk.time.start.browserSample.value);
+      const SelAbsEnd = this.audioTCalculator.samplestoAbsX(end_samples - this.audiochunk.time.start.browserSample.value);
 
       const result = {
         start: SelAbsStart,
@@ -615,7 +632,8 @@ export class AudioviewerService extends AudioComponentService {
     // last boundary may not be returned!
     for (let i = 0; i < this.transcrService.currentlevel.segments.length - 1; i++) {
       const segment = this.transcrService.currentlevel.segments.get(i);
-      const segAbsX = this.audioTCalculator.samplestoAbsX(segment.time.samples - this.audiochunk.time.start.samples);
+      const segAbsX = this.audioTCalculator.samplestoAbsX(segment.time.browserSample.value
+        - this.audiochunk.time.start.browserSample.value);
       const next_unblocked = true;
 
       /*
@@ -644,25 +662,25 @@ export class AudioviewerService extends AudioComponentService {
   public moveCursor(direction: string, samples: number) {
     const line = this.mousecursor.line;
     if (samples > 0) {
+      const mouseCursorPosition = this.mousecursor.timePos.browserSample.value;
       if ((direction === 'left' || direction === 'right') &&
-        ((this.mousecursor.timePos.samples >= this.audiochunk.time.start.samples + samples && direction === 'left') ||
-          (this.mousecursor.timePos.samples <= this.audiochunk.time.end.samples - samples && direction === 'right')
+        ((mouseCursorPosition >= this.audiochunk.time.start.browserSample.value + samples && direction === 'left')
+          || (mouseCursorPosition <= this.audiochunk.time.end.browserSample.value - samples && direction === 'right')
         )) {
-
         if (direction === 'left') {
-          if (this.mousecursor.timePos.samples >= this.audiochunk.time.start.samples + samples) {
-            this.mousecursor.timePos.samples -= samples;
-            const rel_samples = this.mousecursor.timePos.samples - this.audiochunk.time.start.samples;
-            const absx = this.audioTCalculator.samplestoAbsX(rel_samples, this.audiochunk.time.duration);
+          if (this.mousecursor.timePos.browserSample.value >= this.audiochunk.time.start.browserSample.value + samples) {
+            this.mousecursor.timePos.browserSample.value -= samples;
+            const rel_samples = this.mousecursor.timePos.browserSample.value - this.audiochunk.time.start.browserSample.value;
+            const absx = this.audioTCalculator.samplestoAbsX(rel_samples, <BrowserAudioTime>this.audiochunk.time.duration);
             this.mousecursor.relPos.x = absx % line.Size.width;
             this.mousecursor.line = this.getLineByAbsX(absx, line.Size.width);
             this.last_line = this.mousecursor.line;
           }
         } else if (direction === 'right') {
-          if (this.mousecursor.timePos.samples <= this.audiochunk.time.end.samples - samples) {
-            this.mousecursor.timePos.samples += samples;
-            const rel_samples = this.mousecursor.timePos.samples - this.audiochunk.time.start.samples;
-            const absx = this.audioTCalculator.samplestoAbsX(rel_samples, this.audiochunk.time.duration);
+          if (this.mousecursor.timePos.browserSample.value <= this.audiochunk.time.end.browserSample.value - samples) {
+            this.mousecursor.timePos.browserSample.value += samples;
+            const rel_samples = this.mousecursor.timePos.browserSample.value - this.audiochunk.time.start.browserSample.value;
+            const absx = this.audioTCalculator.samplestoAbsX(rel_samples, <BrowserAudioTime>this.audiochunk.time.duration);
             this.mousecursor.relPos.x = absx % line.Size.width;
             this.mousecursor.line = this.getLineByAbsX(absx, line.Size.width);
             this.last_line = this.mousecursor.line;
@@ -694,8 +712,8 @@ export class AudioviewerService extends AudioComponentService {
         try {
           this._minmaxarray = this.computeDisplayData(this.AudioPxWidth / 2, this.Settings.lineheight, this.audiochunk.audiomanager.channel,
             {
-              start: this.audiochunk.selection.start.samples,
-              end: this.audiochunk.selection.end.samples
+              start: this.audiochunk.selection.start.browserSample.value,
+              end: this.audiochunk.selection.end.browserSample.value
             });
           resolve();
         } catch (err) {
@@ -808,7 +826,7 @@ export class AudioviewerService extends AudioComponentService {
           this.calculateZoom(this.Settings.lineheight, this.AudioPxWidth, this._minmaxarray);
         }
 
-        this.audiochunk.playposition = this.audiochunk.time.start.clone();
+        this.audiochunk.playposition = <BrowserAudioTime>this.audiochunk.time.start.clone();
         this.updateLines(innerWidth);
       })
       .catch((err) => {

@@ -75,7 +75,7 @@ export class AudioComponentService {
   public setMouseMovePosition(type: string, x: number, y: number, curr_line: Line, innerWidth) {
     this.mousecursor.relPos.x = x;
     this.mousecursor.absX = this.getAbsXByLine(curr_line, x, innerWidth);
-    this.mousecursor.timePos.samples = this.audioTCalculator.absXChunktoSamples(this.mousecursor.absX, this.audiochunk);
+    this.mousecursor.timePos.browserSample.value = this.audioTCalculator.absXChunktoSamples(this.mousecursor.absX, this.audiochunk);
     this.mousecursor.relPos.y = y;
     this.mousecursor.line = curr_line;
     this.last_line = curr_line;

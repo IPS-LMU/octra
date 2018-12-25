@@ -1,4 +1,4 @@
-import {AudioChunk, AudioTime, AudioTimeCalculator} from './media/audio';
+import {AudioChunk, AudioTimeCalculator, BrowserAudioTime} from './media/audio';
 
 export class PlayCursor {
 
@@ -10,9 +10,9 @@ export class PlayCursor {
     return this._absX;
   }
 
-  private _time_pos: AudioTime;
+  private _time_pos: BrowserAudioTime;
 
-  get time_pos(): AudioTime {
+  get time_pos(): BrowserAudioTime {
     return this._time_pos;
   }
 
@@ -21,7 +21,7 @@ export class PlayCursor {
     return (this._innerWidth > 0) ? (this._absX % this._innerWidth) : 0;
   }
 
-  constructor(absX: number, time_pos: AudioTime, innerWidth: number) {
+  constructor(absX: number, time_pos: BrowserAudioTime, innerWidth: number) {
     this._absX = absX;
     this._time_pos = time_pos;
     this._innerWidth = innerWidth;
@@ -29,15 +29,15 @@ export class PlayCursor {
 
   public changeAbsX(absx: number, audioTCalculator: AudioTimeCalculator, audio_px_width: number, chunk: AudioChunk) {
     this._absX = Math.max(0, Math.min(absx, audio_px_width));
-    this._time_pos.samples = audioTCalculator.absXChunktoSamples(absx, chunk);
+    this._time_pos.browserSample.value = audioTCalculator.absXChunktoSamples(absx, chunk);
   }
 
   public changeSamples(samples: number, audioTCalculator: AudioTimeCalculator, chunk?: AudioChunk) {
-    this._time_pos.samples = samples;
-    const duration = (!(chunk === null || chunk === undefined) && chunk.time.start.samples < chunk.time.end.samples)
-      ? new AudioTime(chunk.time.end.samples - chunk.time.start.samples, audioTCalculator.samplerate) : null;
+    this._time_pos.browserSample.value = samples;
+    const duration = (!(chunk === null || chunk === undefined) && chunk.time.start.browserSample.value < chunk.time.end.browserSample.value)
+      ? new BrowserAudioTime(chunk.time.end.browserSample.sub(chunk.time.start.browserSample), audioTCalculator.samplerate) : null;
 
-    const chunk_s = ((chunk) ? (chunk.time.start.samples) : 0);
+    const chunk_s = ((chunk) ? (chunk.time.start.browserSample.value) : 0);
     this._absX = audioTCalculator.samplestoAbsX(samples - chunk_s, duration);
   }
 }

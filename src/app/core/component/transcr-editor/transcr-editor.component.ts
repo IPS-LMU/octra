@@ -97,7 +97,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Output() marker_insert: EventEmitter<string> = new EventEmitter<string>();
   @Output() marker_click: EventEmitter<string> = new EventEmitter<string>();
   @Output() typing: EventEmitter<string> = new EventEmitter<string>();
-  @Output() boundaryclicked: EventEmitter<number> = new EventEmitter<number>();
+  @Output() boundaryclicked: EventEmitter<BrowserSample> = new EventEmitter<BrowserSample>();
   @Output() boundaryinserted: EventEmitter<number> = new EventEmitter<number>();
   @Output() selectionchanged: EventEmitter<number> = new EventEmitter<number>();
 
@@ -628,7 +628,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           const samples = jqueryobj.attr('data-samples');
 
           if (isNumeric(samples)) {
-            this.boundaryclicked.emit(Number(samples));
+            this.boundaryclicked.emit(new BrowserSample(Number(samples), this.audiomanager.browserSampleRate));
           }
         })
         .on('mouseover', (event) => {
@@ -768,7 +768,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         const samples = jqueryobj.attr('data-samples');
 
         if (isNumeric(samples)) {
-          this.boundaryclicked.emit(Number(samples));
+          this.boundaryclicked.emit(new BrowserSample(Number(samples), this.audiomanager.browserSampleRate));
         }
       })
         .on('mouseover', (event) => {
@@ -1147,7 +1147,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     if (!(seg_samples === null || seg_samples === undefined) && Functions.isNumber(seg_samples)) {
       const samples = Number(seg_samples);
-      const time = new BrowserAudioTime(new BrowserSample(samples, this.audiomanager.ressource.audiobuffer.sampleRate), this.audiomanager.ressource.info.samplerate);
+      const time = new BrowserAudioTime(
+        new BrowserSample(samples, this.audiomanager.ressource.audiobuffer.sampleRate), this.audiomanager.ressource.info.samplerate
+      );
 
       seg_popover.css({
         'margin-left': (event.target.offsetLeft - (width / 2)) + 'px',

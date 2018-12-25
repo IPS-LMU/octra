@@ -5,7 +5,7 @@ import {AudioplayerConfig} from './audioplayer.config';
 import {AudioComponentService} from '../../../service';
 import {Line} from '../../../obj/Line';
 import {AudioService} from '../../../../core/shared/service';
-import {AudioChunk, AudioTime, AudioTimeCalculator} from '../../../obj/media/audio';
+import {AudioChunk, AudioTimeCalculator, BrowserAudioTime, BrowserSample} from '../../../obj/media/audio';
 import {PlayCursor} from '../../../obj/PlayCursor';
 import {AVMousePos} from '../../../obj/AVMousePos';
 
@@ -42,7 +42,8 @@ export class AudioplayerService extends AudioComponentService {
    */
   public initialize(innerWidth: number) {
     this.audio_px_w = innerWidth;
-    this.playcursor = new PlayCursor(0, new AudioTime(0, this.audiomanager.ressource.info.samplerate), innerWidth);
+    this.playcursor = new PlayCursor(0, new BrowserAudioTime(new BrowserSample(0, this.audiomanager.browserSampleRate),
+      this.audiomanager.ressource.info.samplerate), innerWidth);
     this.initializeLine(this.audio_px_w, this._settings.height);
   }
 
@@ -94,7 +95,7 @@ export class AudioplayerService extends AudioComponentService {
           }
           this.mouse_click_pos.line = curr_line;
           this.mouse_click_pos.absX = this.getAbsXByLine(curr_line, x - curr_line.Pos.x, innerWidth);
-          this.audiochunk.playposition.samples = this.mouse_click_pos.timePos.samples;
+          this.audiochunk.playposition = this.mouse_click_pos.timePos.clone();
         }
         this.mouse_down = true;
       } else if ($event.type === 'mouseup') {
@@ -109,7 +110,7 @@ export class AudioplayerService extends AudioComponentService {
       this.drag_playcursor = false;
       // drag playcursor
       this.PlayCursor.changeAbsX(x - this._settings.margin.left, this.audioTCalculator, this.audio_px_w, this.audiochunk);
-      this.audiochunk.startpos.samples = this.audioTCalculator.absXChunktoSamples(this.PlayCursor.absX, this.audiochunk);
+      this.audiochunk.startpos.browserSample.value = this.audioTCalculator.absXChunktoSamples(this.PlayCursor.absX, this.audiochunk);
     }
   }
 
@@ -174,8 +175,10 @@ export class AudioplayerService extends AudioComponentService {
     this.audiochunk = audiochunk;
     this.initialize(innerWidth);
     this.audioTCalculator = new AudioTimeCalculator(this.audiomanager.ressource.info.samplerate,
-      this.audiochunk.time.duration, this.AudioPxWidth);
-    this.Mousecursor = new AVMousePos(0, 0, 0, new AudioTime(0, this.audiomanager.ressource.info.samplerate));
-    this.MouseClickPos = new AVMousePos(0, 0, 0, new AudioTime(0, this.audiomanager.ressource.info.samplerate));
+      <BrowserAudioTime>this.audiochunk.time.duration, this.AudioPxWidth);
+    this.Mousecursor = new AVMousePos(0, 0, 0, new BrowserAudioTime(
+      new BrowserSample(0, this.audiomanager.browserSampleRate), this.audiomanager.originalSampleRate));
+    this.MouseClickPos = new AVMousePos(0, 0, 0, new BrowserAudioTime(
+      new BrowserSample(0, this.audiomanager.browserSampleRate), this.audiomanager.originalSampleRate));
   }
 }

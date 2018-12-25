@@ -17,7 +17,7 @@ import {
 import 'rxjs/add/observable/timer';
 // other
 // import {AudioplayerService} from './audioplayer.service';
-import {AudioChunk, AudioRessource, AudioTimeCalculator} from '../../../obj/media/audio';
+import {AudioChunk, AudioRessource, AudioTimeCalculator, BrowserAudioTime} from '../../../obj/media/audio';
 import {PlayBackState} from '../../../obj/media';
 import {AudioplayerService} from './audioplayer.service';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
@@ -55,7 +55,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
    * @returns {number}
    */
   public get current_time(): number {
-    return this.audiochunk.playposition.unix;
+    return this.audiochunk.playposition.browserSample.unix;
   }
 
   private get audiomanager(): AudioManager {
@@ -212,7 +212,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
    */
   private drawPlayCursor = () => {
     // set new position of playcursor
-    const absX = this.ap.audioTCalculator.samplestoAbsX(this.audiochunk.playposition.samples);
+    const absX = this.ap.audioTCalculator.samplestoAbsX(this.audiochunk.playposition.browserSample.value);
     this.changePlayCursorAbsX(absX);
     const line = this.ap.Line;
 
@@ -256,8 +256,8 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
 
       if (!obj.audiochunk.firstChange) {
         if (((previous === null || previous === undefined) && !(current === null || current === undefined)) ||
-          (current.time.start.samples !== previous.time.start.samples &&
-            current.time.end.samples !== previous.time.end.samples)) {
+          (current.time.start.browserSample.value !== previous.time.start.browserSample.value &&
+            current.time.end.browserSample.value !== previous.time.end.browserSample.value)) {
           // audiochunk changed
           this.ap.init(this.innerWidth, this.audiochunk);
           this.update();
@@ -364,7 +364,6 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
     }).catch((error) => {
       console.error(error);
     });
-    ;
   }
 
   stepBackwardTime(back_sec: number) {
@@ -384,11 +383,11 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
 
     const ratio = this.innerWidth / this.oldInnerWidth;
     if (this.ap.PlayCursor) {
-      const ac = new AudioTimeCalculator(this.audioressource.info.samplerate, this.audiochunk.time.duration, this.innerWidth);
-      Logger.log('' + this.audiochunk.playposition.samples);
+      const ac = new AudioTimeCalculator(this.audioressource.info.samplerate, <BrowserAudioTime>this.audiochunk.time.duration, this.innerWidth);
+      Logger.log('' + this.audiochunk.playposition.browserSample.value);
 
       this.ap.audioTCalculator = ac;
-      this.ap.PlayCursor.changeSamples(this.audiochunk.playposition.samples, ac);
+      this.ap.PlayCursor.changeSamples(this.audiochunk.playposition.browserSample.value, ac);
 
       this.update();
     }
@@ -530,7 +529,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   private afterAudioStopped = () => {
-    this.audiochunk.playposition.samples = 0;
+    this.audiochunk.playposition.browserSample.value = 0;
     /*
     if (this.audiochunk.isPlayBackStopped && this.mouseclick_obj.clicked) {
       console.log(`AUDIO STOPPED!`);
@@ -549,7 +548,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   private afterAudioStepBackward = () => {
-    this.ap.PlayCursor.changeSamples(this.audiochunk.playposition.samples,
+    this.ap.PlayCursor.changeSamples(this.audiochunk.playposition.browserSample.value,
       this.ap.audioTCalculator, this.audiochunk);
 
     this.startPlayback(() => {

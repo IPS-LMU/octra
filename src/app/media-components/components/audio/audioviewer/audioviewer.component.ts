@@ -17,10 +17,10 @@ import {AudioviewerService} from './audioviewer.service';
 import {TranslateService} from '@ngx-translate/core';
 import {AudioManager} from '../../../obj/media/audio/AudioManager';
 import {AudioRessource} from '../../../obj/media/audio/AudioRessource';
-import {PlayBackState} from '../../../obj/media/index';
+import {BrowserAudioTime, BrowserSample, PlayBackState} from '../../../obj/media/index';
 import {Interval, Margin, Rectangle} from '../../../objects';
 import {AudioviewerConfig} from './audioviewer.config';
-import {AudioChunk, AudioSelection, AudioTime} from '../../../obj/media/audio';
+import {AudioChunk, AudioSelection} from '../../../obj/media/audio';
 import {AVMousePos} from '../../../obj/AVMousePos';
 import {PlayCursor} from '../../../obj/PlayCursor';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
@@ -104,7 +104,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
   @Output('pos_time')
   get pos_time(): number {
-    return this.av.PlayCursor.time_pos.samples;
+    return this.av.PlayCursor.time_pos.browserSample.value;
   }
 
   get innerWidth(): number {
@@ -398,7 +398,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                     const xSamples = this.av.audioTCalculator.absXChunktoSamples(this.av.Mousecursor.absX, this.audiochunk);
 
                     if (xSamples > -1) {
-                      const segment_i = this.transcr.currentlevel.segments.getSegmentBySamplePosition(xSamples);
+                      const segment_i = this.transcr.currentlevel.segments.getSegmentBySamplePosition(
+                        new BrowserSample(xSamples, this.audiomanager.browserSampleRate)
+                      );
                       const segment = this.transcr.currentlevel.segments.get(segment_i);
                       if (segment_i > -1) {
                         if (segment.transcript !== this.transcr.break_marker.code) {
@@ -423,28 +425,30 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
                     const xSamples = this.av.audioTCalculator.absXChunktoSamples(this.av.Mousecursor.absX, this.audiochunk);
 
-                    const boundary_select = this.av.getSegmentSelection(this.av.Mousecursor.timePos.samples);
+                    const boundary_select = this.av.getSegmentSelection(this.av.Mousecursor.timePos.browserSample.value);
                     if (boundary_select) {
-                      const segment_i = this.transcr.currentlevel.segments.getSegmentBySamplePosition(xSamples);
+                      const segment_i = this.transcr.currentlevel.segments.getSegmentBySamplePosition(
+                        new BrowserSample(xSamples, this.audiomanager.browserSampleRate));
                       if (segment_i > -1) {
                         const segment = this.transcr.currentlevel.segments.get(segment_i);
                         const start_time = this.transcr.currentlevel.segments.getStartTime(segment_i);
                         // make shure, that segments boundaries are visible
-                        if (start_time.samples >= this.audiochunk.time.start.samples &&
-                          segment.time.samples <= this.audiochunk.time.end.samples) {
+                        if (start_time.browserSample.value >= this.audiochunk.time.start.browserSample.value &&
+                          segment.time.browserSample.value <= this.audiochunk.time.end.browserSample.value) {
                           const absX = this.av.audioTCalculator.samplestoAbsX(
-                            this.transcr.currentlevel.segments.get(segment_i).time.samples
+                            this.transcr.currentlevel.segments.get(segment_i).time.browserSample.value
                           );
                           this.audiochunk.selection = boundary_select.clone();
                           this.av.drawnselection = boundary_select.clone();
                           this.selchange.emit(this.audiochunk.selection);
                           this.drawSegments();
 
-                          let begin = new Segment(new AudioTime(0, this.audioressource.info.samplerate));
+                          let begin = new Segment(new BrowserAudioTime(new BrowserSample(0, this.audiomanager.browserSampleRate),
+                            this.audioressource.info.samplerate));
                           if (segment_i > 0) {
                             begin = this.transcr.currentlevel.segments.get(segment_i - 1);
                           }
-                          const beginX = this.av.audioTCalculator.samplestoAbsX(begin.time.samples);
+                          const beginX = this.av.audioTCalculator.samplestoAbsX(begin.time.browserSample.value);
 
                           const posY1 = (this._innerWidth < this.AudioPxWidth)
                             ? Math.floor((beginX / this._innerWidth) + 1) *
@@ -456,16 +460,17 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                             (this.Settings.lineheight + this.Settings.margin.bottom) - this.Settings.margin.bottom
                             : 0;
 
-                          if (xSamples >= this.audiochunk.selection.start.samples && xSamples <= this.audiochunk.selection.end.samples) {
-                            this.audiochunk.playposition.samples = this.audiochunk.selection.start.samples;
-                            this.changePlayCursorSamples(this.audiochunk.selection.start.samples);
+                          if (xSamples >= this.audiochunk.selection.start.browserSample.value
+                            && xSamples <= this.audiochunk.selection.end.browserSample.value) {
+                            this.audiochunk.playposition.browserSample.value = this.audiochunk.selection.start.browserSample.value;
+                            this.changePlayCursorSamples(this.audiochunk.selection.start.browserSample.value);
                             this.drawPlayCursorOnly(this.av.LastLine);
 
                             this.stopPlayback(() => {
                               // after stopping start audio playback
                               this.audiochunk.selection = boundary_select.clone();
                               this.playSelection(this.afterAudioEnded);
-                            })
+                            });
                           }
 
                           if (!this.Settings.multi_line) {
@@ -489,7 +494,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                   if (this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly && this.focused) {
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'segment'});
                     const seg_index = this.transcr.currentlevel.segments.getSegmentBySamplePosition(
-                      this.av.Mousecursor.timePos.samples
+                      this.av.Mousecursor.timePos.browserSample
                     );
                     this.selectSegment(seg_index,
                       (posY1, posY2) => {
@@ -564,9 +569,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     };
 
     this.audiochunk.startPlayback(drawFunc).then(() => {
-      if (this.av.drawnselection.duration.samples > 0) {
+      if (this.av.drawnselection.duration.browserSample.value > 0) {
         this.audiochunk.selection = this.av.drawnselection.clone();
-        this.audiochunk.playposition = this.audiochunk.selection.start.clone();
+        this.audiochunk.playposition = <BrowserAudioTime>this.audiochunk.selection.start.clone();
       }
       afterAudioEnded();
     });
@@ -580,8 +585,10 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    * draw PlayCursor. Call this method only while animation.
    */
   drawPlayCursor = () => {
-    let currentAbsX = this.av.audioTCalculator.samplestoAbsX((this.audiochunk.playposition.samples - this.audiochunk.time.start.samples));
-    const endAbsX = this.av.audioTCalculator.samplestoAbsX((this.audiochunk.time.end.samples - this.audiochunk.time.start.samples));
+    let currentAbsX = this.av.audioTCalculator.samplestoAbsX(
+      (this.audiochunk.playposition.browserSample.value - this.audiochunk.time.start.browserSample.value));
+    const endAbsX = this.av.audioTCalculator.samplestoAbsX(
+      (this.audiochunk.time.end.browserSample.value - this.audiochunk.time.start.browserSample.value));
     currentAbsX = Math.min(currentAbsX, endAbsX - 1);
     this.changePlayCursorAbsX(currentAbsX);
 
@@ -630,30 +637,31 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   /**
    * draws the timeline if timeline ist enabled
    */
-  drawTimeLine = function () {
+  drawTimeLine = () => {
     if (this.Settings.timeline.enabled && this.av.LinesArray.length > 0
-      && this.audiochunk.time.start.samples > 0 && this.av.AudioPxWidth > 0
+      && this.audiochunk.time.start.browserSample.value > 0 && this.av.AudioPxWidth > 0
     ) {
       let max_width = this.g_context.measureText(this.getmaxString(
-        Math.round(this.audiochunk.time.duration.seconds * 100) / 100, 2)
+        Math.round(this.audiochunk.time.duration.browserSample.value * 100) / 100, 2)
       ).width + 12;
       const sec_px = (this.Settings.multi_line)
         ? this.Settings.pixel_per_sec
-        : this.av.audioTCalculator.samplestoAbsX(this.av.audioTCalculator.secondsToSamples(1), this.av.DurTime);
+        : this.av.audioTCalculator.samplestoAbsX(this.av.audioTCalculator.secondsToSamples(1),
+          <BrowserAudioTime>this.audiochunk.selection.duration);
 
       max_width = max_width / sec_px;
       let t = this.av.audioTCalculator.secondsToSamples(max_width);
-      max_width = this.av.audioTCalculator.samplestoAbsX(t, this.audiochunk.time.duration);
+      max_width = this.av.audioTCalculator.samplestoAbsX(t, <BrowserAudioTime>this.audiochunk.time.duration);
       t = this.av.audioTCalculator.absXChunktoSamples(max_width, this.audiochunk);
-      t = t - this.audiochunk.time.start.samples;
+      t = t - this.audiochunk.time.start.browserSample.value;
 
       let mwidth_seconds = this.av.audioTCalculator.samplesToSeconds(t);
       mwidth_seconds = Math.round(mwidth_seconds * 100) / 100;
       t = this.av.audioTCalculator.secondsToSamples(mwidth_seconds);
-      max_width = this.av.audioTCalculator.samplestoAbsX(t, this.audiochunk.time.duration);
+      max_width = this.av.audioTCalculator.samplestoAbsX(t, <BrowserAudioTime>this.audiochunk.time.duration);
 
       const parts = this.av.AudioPxWidth / max_width;
-      const start_time: AudioTime = this.audiochunk.time.start;
+      const start_time: BrowserAudioTime = <BrowserAudioTime>this.audiochunk.time.start;
 
       this.g_context.font = this.Settings.timeline.fontWeight + ' ' + this.Settings.timeline.fontSize + 'px ' + this.Settings.timeline.font;
       this.g_context.fillStyle = this.Settings.timeline.foreColor;
@@ -665,13 +673,15 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         for (let k = 0; k < parts - 1 && sum_width < this.av.AudioPxWidth; k++) {
           const line_num = Math.floor(sum_width / this.innerWidth);
           const line_obj = this.av.LinesArray[line_num];
-          let seconds = start_time.seconds + k * mwidth_seconds;
-          const time2 = AudioTime.fromSeconds(seconds, this.audio.samplerate);
-          let relX = this.av.audioTCalculator.samplestoAbsX(time2.samples - start_time.samples, this.audiochunk.time.duration);
+          let seconds = start_time.browserSample.seconds + k * mwidth_seconds;
+          const time2 = BrowserAudioTime.fromSeconds(seconds, this.audiomanager.browserSampleRate, this.audiomanager.originalSampleRate);
+          let relX = this.av.audioTCalculator.samplestoAbsX(
+            time2.browserSample.value - start_time.browserSample.value, <BrowserAudioTime>this.audiochunk.time.duration
+          );
           relX = relX % this.innerWidth;
           seconds = Math.round(seconds * 100) / 100;
           this.g_context.beginPath();
-          this.g_context.fillText(seconds, line_obj.Pos.x + relX + 6, line_obj.Pos.y + line_obj.Size.height -
+          this.g_context.fillText(seconds.toString(), line_obj.Pos.x + relX + 6, line_obj.Pos.y + line_obj.Size.height -
             ((this.Settings.timeline.height - this.Settings.timeline.fontSize)));
           this.g_context.moveTo(relX, line_obj.Pos.y + line_obj.Size.height);
           this.g_context.lineTo(relX, line_obj.Pos.y + (line_obj.Size.height - this.Settings.timeline.height));
@@ -686,7 +696,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
       this.g_context.strokeStyle = null;
     }
-  };
+  }
+
   /**
    * method called when audioplayback ended
    */
@@ -713,7 +724,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     if (!(this.av.drawnselection === null || this.av.drawnselection === undefined)) {
       // draw gray selection
       const select = this.av.getRelativeSelectionByLine(
-        line, this.av.drawnselection.start.samples, this.av.drawnselection.end.samples, this._innerWidth
+        line, this.av.drawnselection.start.browserSample.value, this.av.drawnselection.end.browserSample.value, this._innerWidth
       );
       if (line && select) {
         const left = select.start;
@@ -753,8 +764,12 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
     // drawn selection length is 0
     this.av.drawnselection = new AudioSelection(
-      new AudioTime(0, this.audiochunk.audiomanager.ressource.info.samplerate),
-      new AudioTime(0, this.audiochunk.audiomanager.ressource.info.samplerate)
+      new BrowserAudioTime(
+        new BrowserSample(0, this.audiomanager.browserSampleRate), this.audiochunk.audiomanager.ressource.info.samplerate
+      ),
+      new BrowserAudioTime(
+        new BrowserSample(0, this.audiomanager.browserSampleRate), this.audiochunk.audiomanager.ressource.info.samplerate
+      )
     );
 
     this.subscrmanager.add(this.audiochunk.statechange.subscribe((state: PlayBackState) => {
@@ -1004,7 +1019,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       // draw segments for this line only
       if (this.Settings.boundaries.enabled && this.transcr.currentlevel.segments) {
         const segments = this.transcr.currentlevel.segments.getSegmentsOfRange(
-          this.audiochunk.time.start.samples, this.audiochunk.time.end.samples
+          this.audiochunk.time.start.browserSample.value, this.audiochunk.time.end.browserSample.value
         );
 
         const startline: Line = (line_obj.number > 0) ? this.av.LinesArray[line_obj.number - 1] : line_obj;
@@ -1013,11 +1028,13 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
         const line_absx: number = startline.number * this._innerWidth;
         const line_samples: number = this.av.audioTCalculator.absXChunktoSamples(line_absx, this.audiochunk);
-        const line_start: AudioTime = new AudioTime(line_samples, this.audioressource.info.samplerate);
+        const line_start: BrowserAudioTime = new BrowserAudioTime(new BrowserSample(line_samples, this.audiomanager.browserSampleRate),
+          this.audioressource.info.samplerate);
 
         const endline_absx: number = endline.number * this._innerWidth;
         const line_samples_end: number = this.av.audioTCalculator.absXChunktoSamples(endline_absx + endline.Size.width, this.audiochunk);
-        const line_end: AudioTime = new AudioTime(line_samples_end, this.audioressource.info.samplerate);
+        const line_end: BrowserAudioTime = new BrowserAudioTime(new BrowserSample(line_samples_end, this.audiomanager.browserSampleRate),
+          this.audioressource.info.samplerate);
 
         const clearheight = endline.Pos.y - startline.Pos.y + line_obj.Size.height;
         cleared++;
@@ -1028,10 +1045,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
         for (let i = 0; i < segments.length; i++) {
           const segment = segments[i];
-          const start = AudioTime.sub(segments[i].time, this.audiochunk.time.start);
-          const absX = this.av.audioTCalculator.samplestoAbsX(start.samples);
+          const start = BrowserAudioTime.sub(<BrowserAudioTime>segments[i].time, <BrowserAudioTime>this.audiochunk.time.start);
+          const absX = this.av.audioTCalculator.samplestoAbsX(start.browserSample.value);
 
-          let begin = new Segment(new AudioTime(0, this.audioressource.info.samplerate));
+          let begin = new Segment(new BrowserAudioTime(new BrowserSample(0, this.audiomanager.browserSampleRate),
+            this.audioressource.info.samplerate));
 
           if (i > 0) {
             begin = segments[i - 1];
@@ -1053,13 +1071,14 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
            left border: begin.time.samples
            right border: segment.samples
            */
+          const beginSamples = begin.time.browserSample.value;
           if (
-            (begin.time.samples >= line_start.samples && segment.time.samples <= line_end.samples) ||
-            (begin.time.samples < line_start.samples && segment.time.samples <= line_end.samples
-              && segment.time.samples >= line_start.samples) ||
-            (begin.time.samples >= line_start.samples && begin.time.samples <= line_end.samples
-              && segment.time.samples > line_end.samples) ||
-            (begin.time.samples < line_start.samples && segment.time.samples > line_end.samples)
+            (beginSamples >= line_start.browserSample.value && beginSamples <= line_end.browserSample.value) ||
+            (beginSamples < line_start.browserSample.value && beginSamples <= line_end.browserSample.value
+              && beginSamples >= line_start.browserSample.value) ||
+            (beginSamples >= line_start.browserSample.value && beginSamples <= line_end.browserSample.value
+              && beginSamples > line_end.browserSample.value) ||
+            (beginSamples < line_start.browserSample.value && beginSamples > line_end.browserSample.value)
           ) {
             // sample in the lines space
             const line_num1 = startline.number;
@@ -1075,7 +1094,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
               relX = absX % this._innerWidth + this.Settings.margin.left;
 
-              const select = this.av.getRelativeSelectionByLine(line, begin.time.samples, segments[i].time.samples, this._innerWidth);
+              const select = this.av.getRelativeSelectionByLine(line, begin.time.browserSample.value, segments[i].time.browserSample.value,
+                this._innerWidth);
               let w = 0;
               let x = select.start;
 
@@ -1112,7 +1132,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             const seg_linenum = (this._innerWidth < this.AudioPxWidth) ? Math.floor(absX / this._innerWidth) : 0;
 
             const line = this.av.LinesArray[seg_linenum];
-            if (!(line === null || line === undefined) && segment.time.samples !== this.audioressource.info.duration.samples
+            if (!(line === null || line === undefined)
+              && segment.time.browserSample.value !== this.audioressource.info.duration.browserSample.value
               && seg_linenum >= line_num1 && seg_linenum <= line_num2) {
               const h = line.Size.height;
               let relX = 0;
@@ -1150,21 +1171,22 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       // draw segments for all visible lines
       if (this.Settings.boundaries.enabled && this.transcr.currentlevel.segments.length > 0) {
         const segments = this.transcr.currentlevel.segments.getSegmentsOfRange(
-          this.audiochunk.time.start.samples, this.audiochunk.time.end.samples
+          this.audiochunk.time.start.browserSample.value, this.audiochunk.time.end.browserSample.value
         );
 
         this.o_context.globalAlpha = 1.0;
 
         for (let i = 0; i < segments.length; i++) {
           const segment = segments[i];
-          const start = AudioTime.sub(segments[i].time, this.audiochunk.time.start);
-          const absX = this.av.audioTCalculator.samplestoAbsX(start.samples);
-          let begin = new Segment(new AudioTime(0, this.audioressource.info.samplerate));
+          const start = BrowserAudioTime.sub(<BrowserAudioTime>segments[i].time, <BrowserAudioTime>this.audiochunk.time.start);
+          const absX = this.av.audioTCalculator.samplestoAbsX(start.browserSample.value);
+          let begin = new Segment(new BrowserAudioTime(new BrowserSample(0, this.audiomanager.browserSampleRate),
+            this.audiomanager.originalSampleRate));
 
           if (i > 0) {
             begin = segments[i - 1];
           }
-          const beginX = this.av.audioTCalculator.samplestoAbsX(begin.time.samples);
+          const beginX = this.av.audioTCalculator.samplestoAbsX(begin.time.browserSample.value);
           const line_num1 = (this._innerWidth < this.AudioPxWidth) ? Math.floor(beginX / this._innerWidth) : 0;
           const line_num2 = (this._innerWidth < this.AudioPxWidth) ? Math.floor(absX / this._innerWidth) : 0;
 
@@ -1174,9 +1196,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
               (line_num1 >= this.av.visibleLines.start && line_num2 >= this.av.visibleLines.end) ||
               (line_num1 <= this.av.visibleLines.start && line_num2 >= this.av.visibleLines.end))
             &&
-            ((segment.time.samples >= this.audiochunk.time.start.samples && segment.time.samples <= this.audiochunk.time.end.samples)
-              || (begin.time.samples >= this.audiochunk.time.start.samples && begin.time.samples <= this.audiochunk.time.end.samples)
-              || (begin.time.samples < this.audiochunk.time.start.samples && segment.time.samples > this.audiochunk.time.end.samples))
+            ((segment.time.browserSample.value >= this.audiochunk.time.start.browserSample.value && segment.time.browserSample.value <= this.audiochunk.time.end.browserSample.value)
+              || (begin.time.browserSample.value >= this.audiochunk.time.start.browserSample.value && begin.time.browserSample.value <= this.audiochunk.time.end.browserSample.value)
+              || (begin.time.browserSample.value < this.audiochunk.time.start.browserSample.value && segment.time.browserSample.value > this.audiochunk.time.end.browserSample.value))
           ) {
             for (let j = Math.max(line_num1, this.av.visibleLines.start); j <= Math.min(line_num2, this.av.visibleLines.end); j++) {
               const line = this.av.LinesArray[j];
@@ -1187,7 +1209,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
                 relX = absX % this._innerWidth + this.Settings.margin.left;
 
-                const select = this.av.getRelativeSelectionByLine(line, begin.time.samples, segments[i].time.samples, this._innerWidth);
+                const select = this.av.getRelativeSelectionByLine(line, begin.time.browserSample.value, segments[i].time.browserSample.value, this._innerWidth);
                 let w = 0;
                 let x = select.start;
 
@@ -1226,7 +1248,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           // draw boundary
           const line = this.av.LinesArray[line_num2];
           if (line_num2 >= this.av.visibleLines.start && line_num2 <= this.av.visibleLines.end &&
-            !(line === null || line === undefined) && segment.time.samples !== this.audioressource.info.duration.samples) {
+            !(line === null || line === undefined) && segment.time.browserSample.value !== this.audioressource.info.duration.browserSample.value) {
             const h = line.Size.height;
             let relX = 0;
             if (this.Settings.multi_line) {
@@ -1249,8 +1271,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
       // draw selection
       if (!(this.av.drawnselection === null || this.av.drawnselection === undefined)) {
-        const sel_start = this.av.audioTCalculator.samplestoAbsX(this.av.drawnselection.start.samples);
-        const sel_end = this.av.audioTCalculator.samplestoAbsX(this.av.drawnselection.end.samples);
+        const sel_start = this.av.audioTCalculator.samplestoAbsX(this.av.drawnselection.start.browserSample.value);
+        const sel_end = this.av.audioTCalculator.samplestoAbsX(this.av.drawnselection.end.browserSample.value);
         const line_num1 = (this._innerWidth < this.AudioPxWidth) ? Math.floor(sel_start / this._innerWidth) : 0;
         const line_num2 = (this._innerWidth < this.AudioPxWidth) ? Math.floor(sel_end / this._innerWidth) : 0;
 
@@ -1426,13 +1448,15 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       const segment = this.transcr.currentlevel.segments.get(seg_index);
       const start_time = this.transcr.currentlevel.segments.getStartTime(seg_index);
       // make shure, that segments boundaries are visible
-      if (start_time.samples >= this.audiochunk.time.start.samples && segment.time.samples <= this.audiochunk.time.end.samples) {
-        const absX = this.av.audioTCalculator.samplestoAbsX(this.transcr.currentlevel.segments.get(seg_index).time.samples);
-        let begin = new Segment(new AudioTime(0, this.audioressource.info.samplerate));
+      if (start_time.browserSample.value >= this.audiochunk.time.start.browserSample.value
+        && segment.time.browserSample.value <= this.audiochunk.time.end.browserSample.value) {
+        const absX = this.av.audioTCalculator.samplestoAbsX(this.transcr.currentlevel.segments.get(seg_index).time.browserSample.value);
+        let begin = new Segment(new BrowserAudioTime(new BrowserSample(0, this.audiomanager.browserSampleRate),
+          this.audioressource.info.samplerate));
         if (seg_index > 0) {
           begin = this.transcr.currentlevel.segments.get(seg_index - 1);
         }
-        const beginX = this.av.audioTCalculator.samplestoAbsX(begin.time.samples);
+        const beginX = this.av.audioTCalculator.samplestoAbsX(begin.time.browserSample.value);
         const posY1 = (this._innerWidth < this.AudioPxWidth)
           ? Math.floor((beginX / this._innerWidth) + 1) * (this.Settings.lineheight + this.Settings.margin.bottom)
           - this.Settings.margin.bottom
@@ -1445,14 +1469,14 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             this.Settings.margin.bottom) - this.Settings.margin.bottom;
         }
 
-        const boundary_select = this.av.getSegmentSelection(segment.time.samples - 1);
+        const boundary_select = this.av.getSegmentSelection(segment.time.browserSample.value - 1);
         if (boundary_select) {
           this.audiochunk.selection = boundary_select;
           this.av.drawnselection = boundary_select.clone();
           this.drawSegments();
           this.Settings.selection.color = 'gray';
-          this.audiochunk.playposition.samples = this.audiochunk.selection.start.samples;
-          this.changePlayCursorSamples(this.audiochunk.selection.start.samples);
+          this.audiochunk.playposition.browserSample.value = this.audiochunk.selection.start.browserSample.value;
+          this.changePlayCursorSamples(this.audiochunk.selection.start.browserSample.value);
           this.drawPlayCursorOnly(this.av.LastLine);
 
           if (this.audiomanager.isPlaying) {
@@ -1617,12 +1641,12 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   }
 
   private afterAudioStepBack = () => {
-    this.av.PlayCursor.changeSamples(this.audiochunk.lastplayedpos.samples, this.av.audioTCalculator, this.audiochunk);
+    this.av.PlayCursor.changeSamples(this.audiochunk.lastplayedpos.browserSample.value, this.av.audioTCalculator, this.audiochunk);
     this.startPlayback();
   }
 
   private afterAudioStepBackTime = () => {
-    this.av.PlayCursor.changeSamples(this.audiochunk.lastplayedpos.samples, this.av.audioTCalculator, this.audiochunk);
+    this.av.PlayCursor.changeSamples(this.audiochunk.lastplayedpos.browserSample.value, this.av.audioTCalculator, this.audiochunk);
     this.startPlayback();
   }
 
@@ -1632,7 +1656,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   private afterAudioEnded = () => {
     if (!this.audiochunk.replay) {
       // let cursor jump to start
-      this.audiochunk.playposition = this.audiochunk.selection.start.clone();
+      this.audiochunk.playposition = <BrowserAudioTime>this.audiochunk.selection.start.clone();
       this.av.drawnselection = this.av.drawnselection.clone();
       this.drawSegments();
     }

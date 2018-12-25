@@ -7,7 +7,6 @@ import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {Segment} from '../../core/obj/Annotation/Segment';
 import {AudioManager} from '../../media-components/obj/media/audio/AudioManager';
 import {AudioChunk} from '../../media-components/obj/media/audio/AudioChunk';
-import {AudioTime} from '../../media-components/obj/media/audio/AudioTime';
 import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
 import {AudioplayerComponent} from '../../media-components/components/audio/audioplayer';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
@@ -97,7 +96,7 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
 
   onButtonClick(event: { type: string, timestamp: number }) {
     this.uiService.addElementFromEvent('mouseclick', {value: event.type},
-      event.timestamp, Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor),
+      event.timestamp, this.audiomanager.playposition,
       this.editor.caretpos, 'audio_buttons');
 
     switch (event.type) {

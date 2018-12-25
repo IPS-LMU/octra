@@ -1,17 +1,17 @@
 import {Line} from './Line';
-import {AudioTime} from './media/audio';
+import {BrowserAudioTime} from './media/audio';
 
 /**
  * class needed to determine mouse position in audioviewer compnents
  */
 export class AVMousePos {
-  private _timepos: AudioTime;
+  private _timepos: BrowserAudioTime;
 
-  get timePos(): AudioTime {
+  get timePos(): BrowserAudioTime {
     return this._timepos;
   }
 
-  set timePos(value: AudioTime) {
+  set timePos(value: BrowserAudioTime) {
     this._timepos = value;
   }
 
@@ -54,9 +54,9 @@ export class AVMousePos {
    * @param x relative Position
    * @param y relative Position
    * @param absX absolute posiiton
-   * @param time_pos - AudioTime
+   * @param time_pos - BrowserAudioTime
    */
-  constructor(x: number, y: number, absX: number, time_pos: AudioTime) {
+  constructor(x: number, y: number, absX: number, time_pos: BrowserAudioTime) {
     if (time_pos) {
       this._timepos = time_pos.clone();
     }

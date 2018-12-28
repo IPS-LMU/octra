@@ -325,9 +325,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         }
       }
 
-      let begin = new BrowserAudioTime(
-        new BrowserSample(0, this.audiomanager.browserSampleRate), this.audiomanager.ressource.info.samplerate
-      );
+      let begin = this.audiomanager.createBrowserAudioTime(0);
 
       if (this.segment_index > 0) {
         begin = <BrowserAudioTime>this.transcrService.currentlevel.segments.get(this.segment_index - 1).time.clone();
@@ -478,7 +476,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
     if (i > -1) {
       this.audiochunk.startpos = (i > 0) ? <BrowserAudioTime>this.temp_segments.get(i - 1).time.clone()
-        : new BrowserAudioTime(new BrowserSample(0, this.audiomanager.browserSampleRate), this.audiomanager.originalSampleRate);
+        : this.audiomanager.createBrowserAudioTime(0);
       this.audiochunk.selection.end = this.temp_segments.get(i).time.clone();
       this.loupe.viewer.av.drawnselection = this.audiochunk.selection;
       this.loupe.viewer.drawSegments();
@@ -541,9 +539,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       const new_raw = this.transcrService.htmlToRaw(seg_texts[i]);
 
       this.temp_segments.add(
-        new BrowserAudioTime(
-          new BrowserSample(samples_array[i], this.audiomanager.browserSampleRate), this.audiomanager.originalSampleRate
-        ), new_raw);
+        this.audiomanager.createBrowserAudioTime(samples_array[i]), new_raw
+      );
     }
 
     // shift rest of text to next segment

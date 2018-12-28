@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, EventEmitter, OnChanges, OnDestroy, OnInit, ViewChild} from '@angular/core';
 
 import {AudioService, KeymappingService, TranscriptionService, UserInteractionsService} from '../../core/shared/service';
-import {SubscriptionManager} from '../../core/shared';
+import {BrowserAudioTime, BrowserSample, SubscriptionManager} from '../../core/shared';
 import {SettingsService} from '../../core/shared/service/settings.service';
 import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {Segment} from '../../core/obj/Annotation/Segment';
@@ -111,7 +111,7 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
       case('stop'):
         this.audioplayer.stopPlayback(() => {
           console.log(`update audioplayer after stop`);
-          this.audioplayer.audiochunk.playposition.samples = 0;
+          this.audioplayer.audiochunk.playposition = this.audiomanager.createBrowserAudioTime(0);
           this.audioplayer.update();
         });
         break;
@@ -134,8 +134,8 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
-    this.uiService.addElementFromEvent('slider', event, event.timestamp,
-      Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_speed');
+    this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audiomanager.playposition,
+      this.editor.caretpos, 'audio_speed');
   }
 
   onVolumeChange(event: { old_value: number, new_value: number, timestamp: number }) {
@@ -144,7 +144,7 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
     this.uiService.addElementFromEvent('slider', event, event.timestamp,
-      Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'audio_volume');
+      this.audiomanager.playposition, this.editor.caretpos, 'audio_volume');
   }
 
   afterTyping(status) {
@@ -157,16 +157,18 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
   onShortcutTriggered(event) {
     event.value = `audio:${event.value}`;
     this.uiService.addElementFromEvent('shortcut', event, Date.now(),
-      Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor');
+      this.audiomanager.playposition, this.editor.caretpos, 'texteditor');
   }
 
   onBoundaryClicked(samples: number) {
-    const i: number = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(samples);
+    const i: number = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+      new BrowserSample(samples, this.audiomanager.browserSampleRate)
+    );
 
     this.boundaryselected = true;
 
     if (i > -1) {
-      const start = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.samples : 0;
+      const start = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.browserSample.value : 0;
 
       new Promise<void>((resolve) => {
         if (this.audiochunk.isPlaying) {
@@ -175,13 +177,13 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
           resolve();
         }
       }).then(() => {
-        this.audiochunk.startpos = new AudioTime(start, this.audiomanager.ressource.info.samplerate);
+        this.audiochunk.startpos = this.audiomanager.createBrowserAudioTime(start)
         this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(i).time.clone();
         this.audioplayer.update();
 
         this.audioplayer.startPlayback(() => {
           // set start pos and playback length to end of audio file
-          this.audiochunk.startpos = this.audiochunk.selection.end.clone();
+          this.audiochunk.startpos = <BrowserAudioTime>this.audiochunk.selection.end.clone();
           this.audioplayer.update();
         });
         this.boundaryselected = false;
@@ -193,19 +195,19 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
 
   onBoundaryInserted() {
     this.uiService.addElementFromEvent('segment', {value: 'boundaries:add'}, Date.now(),
-      Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor');
+      this.audiomanager.playposition, this.editor.caretpos, 'texteditor');
   }
 
   onMarkerInsert(marker_code: string) {
     this.uiService.addElementFromEvent('shortcut', {value: 'markers:' + marker_code}, Date.now(),
-      Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor');
+      this.audiomanager.playposition, this.editor.caretpos, 'texteditor');
   }
 
   onMarkerClick(marker_code: string) {
     this.afterTyping('stopped');
 
     this.uiService.addElementFromEvent('mouseclick', {value: marker_code}, Date.now(),
-      Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), this.editor.caretpos, 'texteditor_toolbar');
+      this.audiomanager.playposition, this.editor.caretpos, 'texteditor_toolbar');
   }
 
   saveTranscript() {
@@ -259,16 +261,16 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
         const segment: Segment = this.transcrService.currentlevel.segments.get(i).clone();
         segment.transcript = new_raw;
         if (i < seg_texts.length - 1) {
-          segment.time.samples = samples_array[i];
+          segment.time.browserSample.value = samples_array[i];
         }
 
         this.transcrService.currentlevel.segments.change(i, segment);
       } else {
         // add new segments
         if (i === seg_texts.length - 1) {
-          this.transcrService.currentlevel.segments.add(this.audiochunk.time.end.samples, new_raw);
+          this.transcrService.currentlevel.segments.add(this.audiochunk.time.end, new_raw);
         } else {
-          this.transcrService.currentlevel.segments.add(samples_array[i - 1], new_raw);
+          this.transcrService.currentlevel.segments.add(this.audiomanager.createBrowserAudioTime(samples_array[i - 1]), new_raw);
         }
       }
     }
@@ -279,7 +281,7 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
       this.transcrService.currentlevel.segments.segments.splice(seg_texts.length, (anno_seg_length - seg_texts.length));
       // because last segment was removed
       const seg = this.transcrService.currentlevel.segments.get(seg_texts.length - 1);
-      seg.time.samples = this.audiochunk.time.end.samples;
+      seg.time.browserSample.value = this.audiochunk.time.end.browserSample.value;
     }
   }
 
@@ -310,7 +312,7 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   public update() {
-    this.audiochunk.startpos = this.audiochunk.time.start;
+    this.audiochunk.startpos = <BrowserAudioTime>this.audiochunk.time.start;
     this.audioplayer.update();
     this.loadEditor();
   }

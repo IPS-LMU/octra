@@ -28,7 +28,7 @@ import {
   UserInteractionsService
 } from '../../shared/service';
 
-import {BrowserAudioTime, BrowserInfo, BrowserSample, SubscriptionManager} from '../../shared';
+import {BrowserInfo, SubscriptionManager} from '../../shared';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 import {ProjectSettings} from '../../obj/Settings';
@@ -308,7 +308,7 @@ export class TranscriptionComponent implements OnInit,
           this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
         );
         this.uiService.addElementFromEvent('level', {value: 'changed'}, Date.now(),
-          new BrowserAudioTime(new BrowserSample(0, this.audiomanager.browserSampleRate), this.audiomanager.originalSampleRate),
+          this.audiomanager.createBrowserAudioTime(0),
           -1, level.name);
       }
     ));

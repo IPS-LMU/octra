@@ -383,7 +383,8 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
 
     const ratio = this.innerWidth / this.oldInnerWidth;
     if (this.ap.PlayCursor) {
-      const ac = new AudioTimeCalculator(this.audioressource.info.samplerate, <BrowserAudioTime>this.audiochunk.time.duration, this.innerWidth);
+      const ac = new AudioTimeCalculator(this.audioressource.info.samplerate,
+        <BrowserAudioTime>this.audiochunk.time.duration, this.innerWidth);
       Logger.log('' + this.audiochunk.playposition.browserSample.value);
 
       this.ap.audioTCalculator = ac;

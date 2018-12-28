@@ -443,8 +443,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                           this.selchange.emit(this.audiochunk.selection);
                           this.drawSegments();
 
-                          let begin = new Segment(new BrowserAudioTime(new BrowserSample(0, this.audiomanager.browserSampleRate),
-                            this.audioressource.info.samplerate));
+                          let begin = new Segment(this.audiomanager.createBrowserAudioTime(0));
                           if (segment_i > 0) {
                             begin = this.transcr.currentlevel.segments.get(segment_i - 1);
                           }
@@ -764,12 +763,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
     // drawn selection length is 0
     this.av.drawnselection = new AudioSelection(
-      new BrowserAudioTime(
-        new BrowserSample(0, this.audiomanager.browserSampleRate), this.audiochunk.audiomanager.ressource.info.samplerate
-      ),
-      new BrowserAudioTime(
-        new BrowserSample(0, this.audiomanager.browserSampleRate), this.audiochunk.audiomanager.ressource.info.samplerate
-      )
+      this.audiomanager.createBrowserAudioTime(0),
+      this.audiomanager.createBrowserAudioTime(0)
     );
 
     this.subscrmanager.add(this.audiochunk.statechange.subscribe((state: PlayBackState) => {
@@ -1028,13 +1023,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
         const line_absx: number = startline.number * this._innerWidth;
         const line_samples: number = this.av.audioTCalculator.absXChunktoSamples(line_absx, this.audiochunk);
-        const line_start: BrowserAudioTime = new BrowserAudioTime(new BrowserSample(line_samples, this.audiomanager.browserSampleRate),
-          this.audioressource.info.samplerate);
+        const line_start: BrowserAudioTime = this.audiomanager.createBrowserAudioTime(line_samples);
 
         const endline_absx: number = endline.number * this._innerWidth;
         const line_samples_end: number = this.av.audioTCalculator.absXChunktoSamples(endline_absx + endline.Size.width, this.audiochunk);
-        const line_end: BrowserAudioTime = new BrowserAudioTime(new BrowserSample(line_samples_end, this.audiomanager.browserSampleRate),
-          this.audioressource.info.samplerate);
+        const line_end: BrowserAudioTime = this.audiomanager.createBrowserAudioTime(line_samples_end);
 
         const clearheight = endline.Pos.y - startline.Pos.y + line_obj.Size.height;
         cleared++;
@@ -1045,11 +1038,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
         for (let i = 0; i < segments.length; i++) {
           const segment = segments[i];
+          console.log(`sub`);
           const start = BrowserAudioTime.sub(<BrowserAudioTime>segments[i].time, <BrowserAudioTime>this.audiochunk.time.start);
           const absX = this.av.audioTCalculator.samplestoAbsX(start.browserSample.value);
 
-          let begin = new Segment(new BrowserAudioTime(new BrowserSample(0, this.audiomanager.browserSampleRate),
-            this.audioressource.info.samplerate));
+          let begin = new Segment(this.audiomanager.createBrowserAudioTime(0));
 
           if (i > 0) {
             begin = segments[i - 1];
@@ -1180,8 +1173,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           const segment = segments[i];
           const start = BrowserAudioTime.sub(<BrowserAudioTime>segments[i].time, <BrowserAudioTime>this.audiochunk.time.start);
           const absX = this.av.audioTCalculator.samplestoAbsX(start.browserSample.value);
-          let begin = new Segment(new BrowserAudioTime(new BrowserSample(0, this.audiomanager.browserSampleRate),
-            this.audiomanager.originalSampleRate));
+          let begin = new Segment(this.audiomanager.createBrowserAudioTime(0));
 
           if (i > 0) {
             begin = segments[i - 1];
@@ -1451,8 +1443,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       if (start_time.browserSample.value >= this.audiochunk.time.start.browserSample.value
         && segment.time.browserSample.value <= this.audiochunk.time.end.browserSample.value) {
         const absX = this.av.audioTCalculator.samplestoAbsX(this.transcr.currentlevel.segments.get(seg_index).time.browserSample.value);
-        let begin = new Segment(new BrowserAudioTime(new BrowserSample(0, this.audiomanager.browserSampleRate),
-          this.audioressource.info.samplerate));
+        let begin = new Segment(this.audiomanager.createBrowserAudioTime(0));
         if (seg_index > 0) {
           begin = this.transcr.currentlevel.segments.get(seg_index - 1);
         }

@@ -248,8 +248,9 @@ export class TranscriptionService {
           if (!(this.appStorage.annotation === null || this.appStorage.annotation === undefined)) {
             // load levels
             for (let i = 0; i < this.appStorage.annotation.length; i++) {
+              console.log(`new level with ${this._audiomanager.originalSampleRate} and ${this.audiomanager.browserSampleRate}`);
               const level: Level = Level.fromObj(this.appStorage.annotation[i],
-                this._audiomanager.ressource.info.samplerate,
+                this._audiomanager.originalSampleRate,
                 {
                   browser: this._audiomanager.ressource.info.duration.browserSample.value,
                   original: this._audiomanager.originalInfo.duration.originalSample.value

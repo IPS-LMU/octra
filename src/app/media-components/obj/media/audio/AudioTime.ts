@@ -230,7 +230,7 @@ export class OriginalAudioTime {
       );
 
     } else {
-      throw new Error('Two AudioTime Objects of different sample_rates can not be added.');
+      throw new Error('Two AudioTime Objects of different sample_rates can not be subtracted.');
     }
   }
 
@@ -350,7 +350,7 @@ export class BrowserAudioTime {
       );
 
     } else {
-      throw new Error('Two BrowserAudioTime Objects of different sample_rates can not be added.');
+      throw new Error('Two BrowserAudioTime Objects of different sample_rates can not be subtracted.');
     }
   }
 

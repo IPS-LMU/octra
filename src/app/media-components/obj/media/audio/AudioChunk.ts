@@ -1,8 +1,9 @@
 import {AudioSelection} from './AudioSelection';
-import {BrowserAudioTime, BrowserSample, PlayBackState} from '../index';
 import {EventEmitter} from '@angular/core';
 import {AudioManager} from './AudioManager';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
+import {BrowserAudioTime, BrowserSample} from './AudioTime';
+import {PlayBackState} from '../index';
 
 interface Interval {
   start: number;
@@ -130,7 +131,7 @@ export class AudioChunk {
 
     if (!(audio_manager === null || audio_manager === undefined)) {
       this._audioManger = audio_manager;
-      this._playposition = new BrowserAudioTime(time.start.browserSample, this._audioManger.ressource.info.samplerate);
+      this._playposition = this._audioManger.createBrowserAudioTime(time.start.browserSample.value);
       this._state = PlayBackState.INITIALIZED;
     } else {
       throw new Error('AudioChunk needs an audiomanger reference');
@@ -307,7 +308,7 @@ export class AudioChunk {
 
       if (this.audiomanager.isPlaying) {
         this.audiomanager.stopPlayback().then(() => {
-          this.startpos = new BrowserAudioTime(backSample, this._audioManger.originalSampleRate);
+          this.startpos = this._audioManger.createBrowserAudioTime(backSample.value);
 
           this._audioManger.startPlayback(
             <BrowserAudioTime>this.selection.start.clone(), <BrowserAudioTime>this.selection.duration.clone(), 1, 1, () => {
@@ -317,7 +318,7 @@ export class AudioChunk {
           ).then(resolve).catch(reject);
         }).catch(reject);
       } else {
-        this.startpos = new BrowserAudioTime(backSample, this._audioManger.originalSampleRate);
+        this.startpos = this._audioManger.createBrowserAudioTime(backSample.value);
 
         this._audioManger.startPlayback(
           <BrowserAudioTime>this.selection.start.clone(), <BrowserAudioTime>this.selection.duration.clone(), 1, 1, () => {

@@ -1147,9 +1147,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     if (!(seg_samples === null || seg_samples === undefined) && Functions.isNumber(seg_samples)) {
       const samples = Number(seg_samples);
-      const time = new BrowserAudioTime(
-        new BrowserSample(samples, this.audiomanager.ressource.audiobuffer.sampleRate), this.audiomanager.ressource.info.samplerate
-      );
+      const time = this.audiomanager.createBrowserAudioTime(samples);
 
       seg_popover.css({
         'margin-left': (event.target.offsetLeft - (width / 2)) + 'px',

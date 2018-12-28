@@ -19,7 +19,7 @@ import {
   TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
-import {AudioChunk, AudioSelection, AudioTime} from '../../media-components/obj/media/audio';
+import {AudioChunk, AudioSelection, BrowserAudioTime} from '../../media-components/obj/media/audio';
 import {AudioviewerComponent, AudioviewerConfig} from '../../media-components/components/audio/audioviewer';
 import {CircleLoupeComponent} from '../../media-components/components/audio/circleloupe';
 import {LoupeComponent} from '../../media-components/components/audio/loupe';
@@ -161,10 +161,10 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
 
               if (this.viewer.focused) {
                 this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
-                  this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
+                  this.viewer.MouseCursor.timePos.browserSample.value, this.viewer.MouseCursor.relPos.x, this.factor);
               } else if (!(this.loupe === null || this.loupe === undefined) && this.loupe.focused) {
                 this.changeArea(this.audiochunk_loupe, this.loupe.viewer, this.mini_loupecoord,
-                  this.viewer.MouseCursor.timePos.samples, this.loupe.MouseCursor.relPos.x, this.factor);
+                  this.viewer.MouseCursor.timePos.browserSample.value, this.loupe.MouseCursor.relPos.x, this.factor);
               }
             } else if (event.key === '-') {
               if (this.factor > 3) {
@@ -172,10 +172,10 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
                 this.miniloupe.zoomY = Math.max(4, this.factor);
                 if (this.viewer.focused) {
                   this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
-                    this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
+                    this.viewer.MouseCursor.timePos.browserSample.value, this.viewer.MouseCursor.relPos.x, this.factor);
                 } else if (!(this.loupe === null || this.loupe === undefined) && this.loupe.focused) {
                   this.changeArea(this.audiochunk_loupe, this.loupe.viewer, this.mini_loupecoord,
-                    this.viewer.MouseCursor.timePos.samples, this.loupe.MouseCursor.relPos.x, this.factor);
+                    this.viewer.MouseCursor.timePos.browserSample.value, this.loupe.MouseCursor.relPos.x, this.factor);
                 }
               }
             }
@@ -208,7 +208,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
   }) {
     const caretpos = this.editor.caretpos;
     this.uiService.addElementFromEvent('mouseclick', {value: event.type},
-      event.timestamp, Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), caretpos, 'audio_buttons');
+      event.timestamp, this.audiomanager.playposition, caretpos, 'audio_buttons');
 
     switch (event.type) {
       case('play'):
@@ -287,7 +287,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
     if (!this.audiomanager.isPlaying && this.appStorage.playonhover) {
       // play audio
       this.audiochunk_top.selection.start = this.viewer.av.Mousecursor.timePos.clone();
-      this.audiochunk_top.selection.end.samples = this.viewer.av.Mousecursor.timePos.samples +
+      this.audiochunk_top.selection.end.browserSample.value = this.viewer.av.Mousecursor.timePos.browserSample.value +
         this.audiomanager.ressource.info.samplerate / 10;
       this.audiochunk_top.startPlayback(() => {
       }, true);
@@ -301,7 +301,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
 
     this.mouseTimer = window.setTimeout(() => {
       this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
-        this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
+        this.viewer.MouseCursor.timePos.browserSample.value, this.viewer.MouseCursor.relPos.x, this.factor);
     }, 20);
   }
 
@@ -315,7 +315,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
   onLoupeSegmentEnter($event) {
     this.selectSegment($event.index).then((selection: AudioSelection) => {
       this.audiochunk_down.selection = selection.clone();
-      this.audiochunk_down.playposition = selection.start.clone();
+      this.audiochunk_down.playposition = <BrowserAudioTime>selection.start.clone();
       this.loupe.viewer.drawPlayCursor();
     });
   }
@@ -347,18 +347,16 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
 
         if (this.segmentselected && this.selected_index > -1) {
           const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
-          segment.start = anno_segment.time.samples;
+          segment.start = anno_segment.time.originalSample.value;
           segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
-            ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.samples - anno_segment.time.samples
-            : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
+            ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.originalSample.value
+            - anno_segment.time.originalSample.value
+            : this.audiomanager.ressource.info.duration.originalSample.value - anno_segment.time.originalSample.value;
 
-          segment.start = Math.round(segment.start * this.audiomanager.sampleRateFactor);
-          segment.length = Math.round(segment.length * this.audiomanager.sampleRateFactor);
           segment.textlength = anno_segment.transcript.length;
         }
 
-        this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
-          Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor), caretpos, control, segment);
+        this.uiService.addElementFromEvent('shortcut', $event, Date.now(), this.audiomanager.playposition, caretpos, control, segment);
       } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
         this.appStorage.playonhover = !this.appStorage.playonhover;
       }
@@ -367,13 +365,13 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
 
   onLoupeClick(event) {
     if (this.selected_index > -1) {
-      const end_samples = this.transcrService.currentlevel.segments.get(this.selected_index).time.samples;
+      const end_samples = this.transcrService.currentlevel.segments.get(this.selected_index).time.browserSample.value;
       let start_samples = 0;
       if (this.selected_index > 0) {
-        start_samples = this.transcrService.currentlevel.segments.get(this.selected_index - 1).time.samples;
+        start_samples = this.transcrService.currentlevel.segments.get(this.selected_index - 1).time.browserSample.value;
       }
-      if (this.loupe.viewer.MouseCursor.timePos.samples < start_samples
-        || this.loupe.viewer.MouseCursor.timePos.samples > end_samples) {
+      if (this.loupe.viewer.MouseCursor.timePos.browserSample.value < start_samples
+        || this.loupe.viewer.MouseCursor.timePos.browserSample.value > end_samples) {
         this.segmentselected = false;
       }
     }
@@ -389,18 +387,16 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
 
       if (this.segmentselected && this.selected_index > -1) {
         const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
-        segment.start = anno_segment.time.samples;
+        segment.start = anno_segment.time.originalSample.value;
         segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
-          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.samples - anno_segment.time.samples
-          : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
+          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.originalSample.value
+          - anno_segment.time.originalSample.value
+          : this.audiomanager.ressource.info.duration.originalSample.value - anno_segment.time.originalSample.value;
 
-        segment.start = Math.round(segment.start * this.audiomanager.sampleRateFactor);
-        segment.length = Math.round(segment.length * this.audiomanager.sampleRateFactor);
         segment.textlength = anno_segment.transcript.length;
       }
 
-      this.uiService.addElementFromEvent('shortcut', {value: marker_code}, Date.now(),
-        Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor),
+      this.uiService.addElementFromEvent('shortcut', {value: marker_code}, Date.now(), this.audiomanager.playposition,
         this.editor.caretpos, 'texteditor_markers', segment);
     }
   }
@@ -416,18 +412,16 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
 
       if (this.segmentselected && this.selected_index > -1) {
         const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
-        segment.start = anno_segment.time.samples;
+        segment.start = anno_segment.time.originalSample.value;
         segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
-          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.samples - anno_segment.time.samples
-          : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
+          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.originalSample.value
+          - anno_segment.time.originalSample.value
+          : this.audiomanager.ressource.info.duration.originalSample.value - anno_segment.time.originalSample.value;
 
-        segment.start = Math.round(segment.start * this.audiomanager.sampleRateFactor);
-        segment.length = Math.round(segment.length * this.audiomanager.sampleRateFactor);
         segment.textlength = anno_segment.transcript.length;
       }
 
-      this.uiService.addElementFromEvent('mouseclick', {value: marker_code}, Date.now(),
-        Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor),
+      this.uiService.addElementFromEvent('mouseclick', {value: marker_code}, Date.now(), this.audiomanager.playposition,
         this.editor.caretpos, 'texteditor_toolbar', segment);
     }
   }
@@ -454,18 +448,16 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
 
       if (this.segmentselected && this.selected_index > -1) {
         const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
-        segment.start = anno_segment.time.samples;
+        segment.start = anno_segment.time.originalSample.value;
         segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
-          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.samples - anno_segment.time.samples
-          : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
+          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.originalSample.value
+          - anno_segment.time.originalSample.value
+          : this.audiomanager.ressource.info.duration.originalSample.value - anno_segment.time.originalSample.value;
 
-        segment.start = Math.round(segment.start * this.audiomanager.sampleRateFactor);
-        segment.length = Math.round(segment.length * this.audiomanager.sampleRateFactor);
         segment.textlength = anno_segment.transcript.length;
       }
 
-      this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor),
+      this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audiomanager.playposition,
         this.editor.caretpos, 'audio_speed', segment);
     }
   }
@@ -488,18 +480,16 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
 
       if (this.segmentselected && this.selected_index > -1) {
         const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
-        segment.start = anno_segment.time.samples;
+        segment.start = anno_segment.time.originalSample.value;
         segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
-          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.samples - anno_segment.time.samples
-          : this.audiomanager.ressource.info.duration.samples - anno_segment.time.samples;
+          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.originalSample.value
+          - anno_segment.time.originalSample.value
+          : this.audiomanager.ressource.info.duration.originalSample.value - anno_segment.time.originalSample.value;
 
-        segment.start = Math.round(segment.start * this.audiomanager.sampleRateFactor);
-        segment.length = Math.round(segment.length * this.audiomanager.sampleRateFactor);
         segment.textlength = anno_segment.transcript.length;
       }
 
-      this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        Math.round(this.audiomanager.playposition.samples * this.audiomanager.sampleRateFactor),
+      this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audiomanager.playposition,
         this.editor.caretpos, 'audio_volume', segment);
     }
   }
@@ -512,23 +502,23 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
     this.loupe.update();
     this.viewer.update();
     this.segmentselected = false;
-    this.audiochunk_top.startpos = this.audiochunk_top.time.start;
-    this.audiochunk_down.startpos = this.audiochunk_down.time.start;
+    this.audiochunk_top.startpos = <BrowserAudioTime>this.audiochunk_top.time.start;
+    this.audiochunk_down.startpos = <BrowserAudioTime>this.audiochunk_down.time.start;
   }
 
   private changeArea(audiochunk: AudioChunk, viewer: AudioviewerComponent, coord: any,
                      cursor: number, relX: number, factor: number = 4) {
-    const range = ((viewer.Chunk.time.duration.samples / this.audiomanager.ressource.info.duration.samples)
+    const range = ((viewer.Chunk.time.duration.browserSample.value / this.audiomanager.ressource.info.duration.browserSample.value)
       * this.audiomanager.ressource.info.samplerate) / factor;
 
     if (cursor && relX > -1) {
       coord.x = ((relX) ? relX - 80 : 0);
       const half_rate = Math.round(range);
       const start = (cursor > half_rate)
-        ? new AudioTime(cursor - half_rate, this.audiomanager.ressource.info.samplerate)
-        : new AudioTime(0, this.audiomanager.ressource.info.samplerate);
-      const end = (cursor < this.audiomanager.ressource.info.duration.samples - half_rate)
-        ? new AudioTime(cursor + half_rate, this.audiomanager.ressource.info.samplerate)
+        ? this.audiomanager.createBrowserAudioTime(cursor - half_rate)
+        : this.audiomanager.createBrowserAudioTime(0);
+      const end = (cursor < this.audiomanager.ressource.info.duration.browserSample.value - half_rate)
+        ? this.audiomanager.createBrowserAudioTime(cursor + half_rate)
         : this.audiomanager.ressource.info.duration.clone();
 
       this.audiochunk_loupe.destroy();
@@ -543,9 +533,9 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
         this.editor.rawText = segment.transcript;
         this.selected_index = index;
         this.segmentselected = true;
-        let start = new AudioTime(0, this.audiomanager.ressource.info.samplerate);
+        let start = this.audiomanager.createBrowserAudioTime(0);
         if (index > 0) {
-          start = this.transcrService.currentlevel.segments.get(index - 1).time;
+          start = <BrowserAudioTime>this.transcrService.currentlevel.segments.get(index - 1).time;
         }
         resolve(new AudioSelection(start, segment.time));
       }

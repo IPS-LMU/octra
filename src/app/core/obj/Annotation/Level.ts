@@ -62,6 +62,7 @@ export class Level {
 
     if (entry.level.type === 'SEGMENT') {
       const segment_entries: ISegment[] = <ISegment[]>entry.level.items;
+      console.log(`before new ${browserSampleRate}, ${originalSampleRate}`);
       segments = new Segments(browserSampleRate, segment_entries, lastSamples, originalSampleRate);
     } else if (entry.level.type === 'ITEM') {
       items = entry.level.items;

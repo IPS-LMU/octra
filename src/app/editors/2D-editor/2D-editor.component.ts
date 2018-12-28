@@ -22,7 +22,7 @@ import {
   UserInteractionsService
 } from '../../core/shared/service';
 
-import {AudioSelection, BrowserAudioTime, BrowserSample} from '../../core/shared';
+import {AudioSelection, BrowserAudioTime} from '../../core/shared';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
 import {AudioChunk} from '../../media-components/obj/media/audio';
 import {TranscrWindowComponent} from './transcr-window';
@@ -255,7 +255,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       selected.index < this.transcrService.currentlevel.segments.length) {
       const segment = this.transcrService.currentlevel.segments.get(selected.index);
       const start: any = (selected.index > 0) ? this.transcrService.currentlevel.segments.get(selected.index - 1).time.clone()
-        : new BrowserAudioTime(new BrowserSample(0, this.audiomanager.browserSampleRate), this.audiomanager.ressource.info.samplerate);
+        : this.audiomanager.createBrowserAudioTime(0);
       if (segment) {
         this.selected_index = selected.index;
         this.audiochunk_window = new AudioChunk(new AudioSelection(start, segment.time.clone()), this.audiomanager);
@@ -299,9 +299,9 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
     if (!this.audiomanager.isPlaying && this.appStorage.playonhover) {
       // play audio
-      this.audiochunk_lines.selection.start.browserSample.value = this.viewer.av.Mousecursor.timePos.samples;
-      this.audiochunk_lines.selection.end.browserSample.value = this.viewer.av.Mousecursor.timePos.samples +
-        this.audiomanager.ressource.info.samplerate / 10;
+      this.audiochunk_lines.selection.start.browserSample.value = this.viewer.av.Mousecursor.timePos.browserSample.value;
+      this.audiochunk_lines.selection.end.browserSample.value = this.viewer.av.Mousecursor.timePos.browserSample.value +
+        this.audiomanager.browserSampleRate / 10;
       this.audiochunk_lines.startPlayback(() => {
       }, true);
     }
@@ -533,14 +533,13 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
     if (cursor && cursor.timePos && cursor.relPos) {
       const half_rate = Math.round(this.audiomanager.ressource.info.samplerate / factor);
-      const start = (cursor.timePos.samples > half_rate)
-        ? new BrowserAudioTime(new BrowserSample(cursor.timePos.samples - half_rate, this.audiomanager.browserSampleRate),
-          this.audiomanager.originalSampleRate)
-        : new BrowserAudioTime(new BrowserSample(cursor.timePos.samples - half_rate, this.audiomanager.browserSampleRate),
-          this.audiomanager.originalSampleRate);
-      const end = (cursor.timePos.samples < this.audiomanager.ressource.info.duration.browserSample.value - half_rate)
-        ? new BrowserAudioTime(new BrowserSample(cursor.timePos.samples + half_rate, this.audiomanager.browserSampleRate),
-          this.audiomanager.originalSampleRate) : this.audiomanager.ressource.info.duration.clone();
+      const start = (cursor.timePos.browserSample.value > half_rate)
+        ? this.audiomanager.createBrowserAudioTime(cursor.timePos.browserSample.value - half_rate)
+        : this.audiomanager.createBrowserAudioTime(0);
+
+      const end = (cursor.timePos.browserSample.value < this.audiomanager.ressource.info.duration.browserSample.value - half_rate)
+        ? this.audiomanager.createBrowserAudioTime(cursor.timePos.browserSample.value + half_rate)
+        : this.audiomanager.ressource.info.duration.clone();
 
       loup.zoomY = factor;
       if (start && end) {

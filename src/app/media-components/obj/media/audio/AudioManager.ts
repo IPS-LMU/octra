@@ -6,6 +6,8 @@ import {
   AudioSelection,
   BrowserAudioTime,
   BrowserSample,
+  OriginalAudioTime,
+  OriginalSample,
   PlayBackState,
   SourceType
 } from '../index';
@@ -235,8 +237,8 @@ export class AudioManager {
             // TODO CHECK is originalSampleRate is correct!
             console.log(`ORIGINAL SAMPLE RATE: ${result._originalInfo.samplerate}`);
             const selection = new AudioSelection(
-              new BrowserAudioTime(new BrowserSample(0, audiobuffer.sampleRate), result._originalInfo.samplerate),
-              new BrowserAudioTime(new BrowserSample(audiobuffer.length, audiobuffer.sampleRate), audiobuffer.sampleRate)
+              result.createBrowserAudioTime(0),
+              result.createBrowserAudioTime(audiobuffer.length)
             );
             result._mainchunk = new AudioChunk(selection, result);
 
@@ -311,7 +313,7 @@ export class AudioManager {
 
   public startPlayback(begintime: BrowserAudioTime,
                        duration: BrowserAudioTime = new BrowserAudioTime(
-                         new BrowserSample(0, this.originalSampleRate), this.originalSampleRate
+                         new BrowserSample(0, this.browserSampleRate), this.originalSampleRate
                        ),
                        volume: number, speed: number, onProcess: () => void, playOnHover: boolean = false
   ): Promise<void> {
@@ -516,6 +518,14 @@ export class AudioManager {
         this._source.disconnect();
       }*/
     }
+  }
+
+  public createBrowserAudioTime(sample: number): BrowserAudioTime {
+    return new BrowserAudioTime(new BrowserSample(sample, this.browserSampleRate), this.originalSampleRate);
+  }
+
+  public createOriginalAudioTime(sample: number): OriginalAudioTime {
+    return new OriginalAudioTime(new OriginalSample(sample, this.originalSampleRate), this.browserSampleRate);
   }
 }
 

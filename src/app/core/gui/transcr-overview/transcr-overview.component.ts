@@ -15,7 +15,7 @@ import {
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
 import {AppStorageService, AudioService, TranscriptionService} from '../../shared/service';
-import {AudioChunk, AudioSelection, BrowserAudioTime, BrowserSample, OriginalAudioTime, SubscriptionManager} from '../../shared';
+import {AudioChunk, AudioSelection, BrowserAudioTime, OriginalAudioTime, SubscriptionManager} from '../../shared';
 import {Segment} from '../../obj/Annotation';
 import {PlayBackState} from '../../../media-components/obj/media';
 import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
@@ -396,13 +396,9 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
         this.playAllState.currentSegment = segmentNumber;
 
         this.audio.audiomanagers[0].startPlayback(
-          new BrowserAudioTime(
-            new BrowserSample(startSample, this.audio.audiomanagers[0].browserSampleRate),
-            this.audio.audiomanagers[0].originalInfo.samplerate
-          ),
-          new BrowserAudioTime(new BrowserSample(segment.time.browserSample.value - startSample,
-            this.audio.audiomanagers[0].browserSampleRate),
-            this.audio.audiomanagers[0].originalInfo.samplerate), 1, 1, () => {
+          this.audio.audiomanagers[0].createBrowserAudioTime(startSample),
+          this.audio.audiomanagers[0].createBrowserAudioTime(segment.time.browserSample.value - startSample)
+          , 1, 1, () => {
           }).then(() => {
           this.playStateSegments[segmentNumber].state = 'stopped';
           this.playStateSegments[segmentNumber].icon = 'play';

@@ -5,7 +5,7 @@ import {AudioplayerConfig} from './audioplayer.config';
 import {AudioComponentService} from '../../../service';
 import {Line} from '../../../obj/Line';
 import {AudioService} from '../../../../core/shared/service';
-import {AudioChunk, AudioTimeCalculator, BrowserAudioTime, BrowserSample} from '../../../obj/media/audio';
+import {AudioChunk, AudioTimeCalculator, BrowserAudioTime} from '../../../obj/media/audio';
 import {PlayCursor} from '../../../obj/PlayCursor';
 import {AVMousePos} from '../../../obj/AVMousePos';
 
@@ -42,8 +42,7 @@ export class AudioplayerService extends AudioComponentService {
    */
   public initialize(innerWidth: number) {
     this.audio_px_w = innerWidth;
-    this.playcursor = new PlayCursor(0, new BrowserAudioTime(new BrowserSample(0, this.audiomanager.browserSampleRate),
-      this.audiomanager.ressource.info.samplerate), innerWidth);
+    this.playcursor = new PlayCursor(0, this.audiomanager.createBrowserAudioTime(0), innerWidth);
     this.initializeLine(this.audio_px_w, this._settings.height);
   }
 
@@ -176,9 +175,7 @@ export class AudioplayerService extends AudioComponentService {
     this.initialize(innerWidth);
     this.audioTCalculator = new AudioTimeCalculator(this.audiomanager.ressource.info.samplerate,
       <BrowserAudioTime>this.audiochunk.time.duration, this.AudioPxWidth);
-    this.Mousecursor = new AVMousePos(0, 0, 0, new BrowserAudioTime(
-      new BrowserSample(0, this.audiomanager.browserSampleRate), this.audiomanager.originalSampleRate));
-    this.MouseClickPos = new AVMousePos(0, 0, 0, new BrowserAudioTime(
-      new BrowserSample(0, this.audiomanager.browserSampleRate), this.audiomanager.originalSampleRate));
+    this.Mousecursor = new AVMousePos(0, 0, 0, this.audiomanager.createBrowserAudioTime(0));
+    this.MouseClickPos = new AVMousePos(0, 0, 0, this.audiomanager.createBrowserAudioTime(0));
   }
 }

@@ -12,6 +12,7 @@ import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
 import {AudioService, KeymappingService, TranscriptionService} from '../../../../core/shared/service';
 import {PlayCursor} from '../../../obj/PlayCursor';
 import {PlayBackState} from '../../../obj/media';
+import {TaskManager} from '../../../../core/obj/TaskManager';
 
 
 @Injectable()
@@ -119,6 +120,7 @@ export class AudioviewerService extends AudioComponentService {
 
   private _viewRect: Rectangle = new Rectangle(new Position(0, 0), new Size(0, 0));
 
+  private tManager: TaskManager;
   private _visibleLines: Interval = new Interval(0, 0);
   onKeyUp = (event) => {
     this.shift_pressed = false;
@@ -154,6 +156,65 @@ export class AudioviewerService extends AudioComponentService {
       });
     }
 
+    this.tManager = new TaskManager([{
+      'name': 'compute',
+      'do': function (args) {
+        var width = args[0];
+        var height = args[1];
+        var cha = args[2];
+        var _interval = args[3];
+        var round_values = args[4];
+        width = Math.floor(width);
+
+        if (_interval.start !== null && _interval.end !== null && _interval.end >= _interval.start) {
+          const min_maxarray = [], len = _interval.end - _interval.start;
+
+          let min = 0,
+            max = 0,
+            val = 0,
+            offset = 0,
+            maxindex = 0;
+
+          const xZoom = len / width;
+
+          const yZoom = height / 2;
+
+          for (let i = 0; i < width; i++) {
+            offset = Math.round(i * xZoom) + _interval.start;
+            min = cha[offset];
+            max = cha[offset];
+
+            if (isNaN(cha[offset])) {
+              break;
+            }
+
+            if ((offset + xZoom) > _interval.start + len) {
+              maxindex = len;
+            } else {
+              maxindex = Math.round(offset + xZoom);
+            }
+
+            for (let j = offset; j < maxindex; j++) {
+              val = cha[j];
+              max = Math.max(max, val);
+              min = Math.min(min, val);
+            }
+
+            if (round_values) {
+              min_maxarray.push(Math.round(min * yZoom));
+              min_maxarray.push(Math.round(max * yZoom));
+            } else {
+              min_maxarray.push(min * yZoom);
+              min_maxarray.push(max * yZoom);
+            }
+          }
+
+          return min_maxarray;
+        } else {
+          throw new Error('interval.end is less than interval.start');
+        }
+      }
+    }]);
     return this.afterChannelInititialized(innerWidth);
   }
 

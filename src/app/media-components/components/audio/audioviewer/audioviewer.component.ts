@@ -29,6 +29,7 @@ import {KeymappingService, TranscriptionService} from '../../../../core/shared/s
 import {Line} from '../../../obj/Line';
 import {BrowserInfo, Logger} from '../../../../core/shared';
 import {Segment} from '../../../../core/obj/Annotation/Segment';
+import {TaskManager} from '../../../../core/obj/TaskManager';
 
 @Component({
   selector: 'app-audioviewer',
@@ -263,7 +264,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    * stroke()-command after the loop.
    *
    */
-  drawSignal = function (line_num) {
+  drawSignal = (line_num) => {
     // get canvas
     const line_obj = this.av.LinesArray[line_num];
     const timeline_height = (this.Settings.timeline.enabled) ? this.Settings.timeline.height : 0;
@@ -285,7 +286,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         && !(this.av.minmaxarray === null || this.av.minmaxarray === undefined)
         && !(zoomY === null || zoomY === undefined)) {
         for (let x = 0; (x + x_pos) < x_pos + line_obj.Size.width; x++) {
-
           const x_draw = (!this.Settings.round_values) ? line_obj.Pos.x + (x * zoomX) : Math.round(line_obj.Pos.x + (x * zoomX));
           const y_draw = (!this.Settings.round_values)
             ? (line_obj.Pos.y - this.av.viewRect.position.y + midline - (this.av.minmaxarray[x + x_pos] * zoomY))
@@ -313,7 +313,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       return true;
     }
     return false;
-  };
+  }
+
   /**
    * on key pressed down, searches for shortcuts and takes action if shortcut found
    *
@@ -1038,7 +1039,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
         for (let i = 0; i < segments.length; i++) {
           const segment = segments[i];
-          console.log(`sub`);
           const start = BrowserAudioTime.sub(<BrowserAudioTime>segments[i].time, <BrowserAudioTime>this.audiochunk.time.start);
           const absX = this.av.audioTCalculator.samplestoAbsX(start.browserSample.value);
 
@@ -1278,7 +1278,65 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     }
 
     this.drawTimeLine();
+    const tmanager = new TaskManager([{
+      'name': 'compute',
+      'do': function (args) {
+        var width = args[0];
+        var height = args[1];
+        var cha = args[2];
+        var _interval = args[3];
+        var round_values = args[4];
+        width = Math.floor(width);
 
+        if (_interval.start !== null && _interval.end !== null && _interval.end >= _interval.start) {
+          const min_maxarray = [], len = _interval.end - _interval.start;
+
+          let min = 0,
+            max = 0,
+            val = 0,
+            offset = 0,
+            maxindex = 0;
+
+          const xZoom = len / width;
+
+          const yZoom = height / 2;
+
+          for (let i = 0; i < width; i++) {
+            offset = Math.round(i * xZoom) + _interval.start;
+            min = cha[offset];
+            max = cha[offset];
+
+            if (isNaN(cha[offset])) {
+              break;
+            }
+
+            if ((offset + xZoom) > _interval.start + len) {
+              maxindex = len;
+            } else {
+              maxindex = Math.round(offset + xZoom);
+            }
+
+            for (let j = offset; j < maxindex; j++) {
+              val = cha[j];
+              max = Math.max(max, val);
+              min = Math.min(min, val);
+            }
+
+            if (round_values) {
+              min_maxarray.push(Math.round(min * yZoom));
+              min_maxarray.push(Math.round(max * yZoom));
+            } else {
+              min_maxarray.push(min * yZoom);
+              min_maxarray.push(max * yZoom);
+            }
+          }
+
+          return min_maxarray;
+        } else {
+          throw new Error('interval.end is less than interval.start');
+        }
+      }
+    }]);
     const log = new Logger('draw segments');
     log.addEntry('log', `cleared: ${cleared}`);
     log.addEntry('log', `drawn_areas: ${drawn_segments}`);

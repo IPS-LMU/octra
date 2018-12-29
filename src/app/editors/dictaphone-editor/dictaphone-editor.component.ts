@@ -110,7 +110,6 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
         break;
       case('stop'):
         this.audioplayer.stopPlayback(() => {
-          console.log(`update audioplayer after stop`);
           this.audioplayer.audiochunk.playposition = this.audiomanager.createBrowserAudioTime(0);
           this.audioplayer.update();
         });

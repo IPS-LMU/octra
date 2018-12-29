@@ -24,7 +24,6 @@ export class Segments {
     browser: number,
     original: number
   }, private _originalSampleRate: number) {
-    console.log(`new Segments: ${browserSampleRate}, ${_originalSampleRate}`);
     this._segments = [];
 
     if (segments !== null) {

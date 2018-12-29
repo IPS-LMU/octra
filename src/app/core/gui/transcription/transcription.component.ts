@@ -482,7 +482,6 @@ export class TranscriptionComponent implements OnInit,
       }
     }
 
-    console.log(`log is:`);
     this.api.saveSession(json.transcript, json.project, json.annotator,
       json.jobno, json.id, json.status, json.comment, json.quality, json.log).then((result) => {
       if (result !== null) {

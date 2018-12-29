@@ -49,7 +49,8 @@ export class CircleLoupeComponent implements AfterViewInit, OnChanges {
     if (changes.hasOwnProperty('height')) {
       if (!(this.loupe === null || this.loupe === undefined)) {
         this.loupe.Settings.lineheight = changes.height.currentValue;
-        if ((this.loupe.Settings.lineheight === null || this.loupe.Settings.lineheight === undefined) || this.loupe.Settings.lineheight < 1) {
+        if ((this.loupe.Settings.lineheight === null || this.loupe.Settings.lineheight === undefined)
+          || this.loupe.Settings.lineheight < 1) {
           this.loupe.Settings.lineheight = 80;
         }
         if (this.initialized) {

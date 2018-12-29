@@ -138,7 +138,8 @@
                         <tr>
                             <td><span>{{'general.duration' | translate}}:</span></td>
                             <td>
-                                <span>{{navbarServ.originalInfo?.duration.unix | timespan2}} (H:m:s)</span>
+                                <span>{{navbarServ.originalInfo?.duration.browserSample.unix | timespan2}}
+                                    (H:m:s)</span>
                             </td>
                         </tr>
                         <tr>

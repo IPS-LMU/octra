@@ -47,7 +47,7 @@ export class AudioSample implements Sample {
   }
 
   public get unix(): number {
-    return Math.floor((this.sampleRate * 1000) / this.sampleRate);
+    return Math.floor((this._value * 1000) / this._sampleRate);
   }
 
   public set unix(value: number) {
@@ -55,7 +55,7 @@ export class AudioSample implements Sample {
   }
 
   public get seconds(): number {
-    return this.sampleRate / this.sampleRate;
+    return this._value / this._sampleRate;
   }
 }
 
@@ -237,7 +237,7 @@ export class OriginalAudioTime {
   public static fromSamples(samples: number, originalSampleRate: number, browserSampleRate: number): OriginalAudioTime {
     if (!(samples === null || samples === undefined)
       && !(originalSampleRate === null || originalSampleRate === undefined)
-      && !(originalSampleRate === null || originalSampleRate === undefined)
+      && !(browserSampleRate === null || browserSampleRate === undefined)
       && Number.isInteger(samples) && samples > -1) {
       const originalSample = new OriginalSample(samples, originalSampleRate);
       return new OriginalAudioTime(originalSample, browserSampleRate);

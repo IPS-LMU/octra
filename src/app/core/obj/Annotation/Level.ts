@@ -55,14 +55,12 @@ export class Level {
     browser: number,
     original: number
   }, browserSampleRate: number): Level {
-    console.log(`last samples browser: ${lastSamples.browser}, original: ${lastSamples.original}`);
     let segments: Segments = null;
     let events = [];
     let items = [];
 
     if (entry.level.type === 'SEGMENT') {
       const segment_entries: ISegment[] = <ISegment[]>entry.level.items;
-      console.log(`before new ${browserSampleRate}, ${originalSampleRate}`);
       segments = new Segments(browserSampleRate, segment_entries, lastSamples, originalSampleRate);
     } else if (entry.level.type === 'ITEM') {
       items = entry.level.items;

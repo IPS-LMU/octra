@@ -217,6 +217,8 @@ export class AudioManager {
 
             console.log(`audio decoded, samplerate ${audioinfo.samplerate}, ${audiobuffer.sampleRate}`);
 
+            console.log(`audioinfo:`);
+            console.log(audioinfo);
             const result = new AudioManager(audioinfo, audiobuffer.sampleRate);
             result.bufferedOLA.set_audio_buffer(audiobuffer);
 
@@ -234,8 +236,6 @@ export class AudioManager {
             console.log(`dur ${audiobuffer.length / audiobuffer.sampleRate}`);
             console.log(`decoded samplerate: ${audiobuffer.sampleRate}`);
 
-            // TODO CHECK is originalSampleRate is correct!
-            console.log(`ORIGINAL SAMPLE RATE: ${result._originalInfo.samplerate}`);
             const selection = new AudioSelection(
               result.createBrowserAudioTime(0),
               result.createBrowserAudioTime(audiobuffer.length)
@@ -329,40 +329,42 @@ export class AudioManager {
         let lastCheck = Date.now();
         this._scriptProcessorNode.connect(this._audioContext.destination);
         this._gainNode.connect(this._audioContext.destination);
-        /*
-        this._source.onended = () => {
-          this.afterAudioEnded();
-          if (this.state === PlayBackState.ENDED) {
-            resolve();
-          }
-        };
-        */
 
         this._playbackInfo.started = new Date().getTime();
         this._playbackInfo.endAt = this._playbackInfo.started + (duration.browserSample.unix / speed);
 
         this._playposition = begintime.clone();
+        this._bufferedOLA.position = this._playposition.browserSample.value;
         this._scriptProcessorNode.addEventListener('audioprocess', (e) => {
-          this._isScriptProcessorCanceled = true;
-          if (this.isPlaying) {
-            this._playposition.browserSample.unix += Math.round((Date.now() - lastCheck));
-            this._bufferedOLA.alpha = 1 / speed;
-            // this._bufferedOLA.position = this._playposition.samples;
-            onProcess();
+          if (this.stateRequest === PlayBackState.PLAYING) {
+            // start playback
+            this.stateRequest = null;
+            this.changeState(PlayBackState.PLAYING);
+            lastCheck = Date.now();
           }
-          this._bufferedOLA.process(e.inputBuffer, e.outputBuffer);
-          lastCheck = Date.now();
+          if (!this._isScriptProcessorCanceled) {
+            if (this.stateRequest === PlayBackState.STOPPED || this.stateRequest === PlayBackState.PAUSED) {
+              // audio ended
+              this.afterAudioEnded();
+            } else {
+              this._isScriptProcessorCanceled = false;
+              if (this.isPlaying) {
+                this._playposition.browserSample.unix += Math.round((Date.now() - lastCheck) * speed);
+                onProcess();
+                const endTime = this.createBrowserAudioTime(begintime.browserSample.value + duration.browserSample.value);
+                if (this._playposition.browserSample.unix <= endTime.browserSample.unix) {
+                  this._bufferedOLA.alpha = 1 / speed;
+                  this._bufferedOLA.process(e.inputBuffer, e.outputBuffer);
+                } else {
+                  this.afterAudioEnded();
+                }
+              }
+            }
+            lastCheck = Date.now();
+          }
         });
 
         this.changeState(PlayBackState.PLAYING);
-
-        if (duration.browserSample.value <= 0) {
-          // important: source.start needs seconds, not samples!
-          // this._source.start(0, Math.max(0, begintime.seconds));
-        } else {
-          // important: source.start needs seconds, not samples!
-          // this._source.start(0, Math.max(0, begintime.seconds), duration.seconds);
-        }
 
         return true;
       } else {

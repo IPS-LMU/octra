@@ -209,7 +209,7 @@ export class TranscriptionService {
         () => {
           this.selectedlevel = 0;
           this.navbarServ.originalInfo = this._audiomanager.originalInfo;
-
+          console.log(this.navbarServ.originalInfo);
           this.navbarServ.filesize = Functions.getFileSize(this._audiomanager.ressource.size);
 
           resolve();
@@ -248,7 +248,6 @@ export class TranscriptionService {
           if (!(this.appStorage.annotation === null || this.appStorage.annotation === undefined)) {
             // load levels
             for (let i = 0; i < this.appStorage.annotation.length; i++) {
-              console.log(`new level with ${this._audiomanager.originalSampleRate} and ${this.audiomanager.browserSampleRate}`);
               const level: Level = Level.fromObj(this.appStorage.annotation[i],
                 this._audiomanager.originalSampleRate,
                 {
@@ -452,7 +451,6 @@ export class TranscriptionService {
   }
 
   public extractUI(ui_elements: StatisticElem[]): OLogging {
-    console.log(`extract UI`);
     const now = new Date();
     const result: OLogging = new OLogging(
       '1.0',

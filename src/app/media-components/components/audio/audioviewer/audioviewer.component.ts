@@ -575,6 +575,27 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       }
       afterAudioEnded();
     });
+    /*
+
+    const id = this.subscrmanager.add(Observable.interval(40).subscribe(
+      () => {
+        const difference = Date.now() - this.audiomanager.lastUpdate;
+        if (difference > 40) {
+          this.audiochunk.playposition.browserSample.unix += difference;
+          console.log(difference);
+        }
+        this.anim.requestFrame(this.drawPlayCursor);
+      }
+    ));
+
+    const id2 = this.subscrmanager.add(this.audiochunk.statechange.subscribe(
+      (state) => {
+        if (state === PlayBackState.STOPPED || state === PlayBackState.PAUSED || state === PlayBackState.ENDED) {
+          this.subscrmanager.remove(id);
+          this.subscrmanager.remove(id2);
+        }
+      }
+    ));*/
   }
 
   private drawFunc = () => {

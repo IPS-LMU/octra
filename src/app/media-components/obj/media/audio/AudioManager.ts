@@ -17,6 +17,9 @@ import {Subscription} from 'rxjs';
 declare var window: any;
 
 export class AudioManager {
+  get lastUpdate(): number {
+    return this._lastUpdate;
+  }
   get bufferedOLA(): any {
     return this._bufferedOLA;
   }
@@ -151,6 +154,7 @@ export class AudioManager {
   private stateRequest: PlayBackState = null;
   private _isScriptProcessorCanceled = false;
   private _bufferedOLA: any;
+  private _lastUpdate: number;
 
   // timestamp when playing should teminate
   private _playbackInfo = {
@@ -166,8 +170,8 @@ export class AudioManager {
   // only the Audiomanager may have the channel array
   private _channel: Float32Array;
 
-  private _frameSize = 4096;
-  private _bufferSize = 4096;
+  private _frameSize = 2048;
+  private _bufferSize = 2048;
 
   private chunks: AudioChunk[] = [];
 
@@ -349,7 +353,7 @@ export class AudioManager {
             } else {
               this._isScriptProcessorCanceled = false;
               if (this.isPlaying) {
-                this._playposition.browserSample.unix += Math.round((Date.now() - lastCheck) * speed);
+                this._playposition.browserSample.value = this._bufferedOLA.position;
                 onProcess();
                 const endTime = this.createBrowserAudioTime(begintime.browserSample.value + duration.browserSample.value);
                 if (this._playposition.browserSample.unix <= endTime.browserSample.unix) {
@@ -361,6 +365,7 @@ export class AudioManager {
               }
             }
             lastCheck = Date.now();
+            this._lastUpdate = lastCheck;
           }
         });
 

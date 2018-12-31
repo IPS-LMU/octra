@@ -25,7 +25,7 @@ export class AudioTimeCalculator {
       throw new Error('time duration must have samples greater 0');
     }
 
-    return (time_samples / dur.browserSample.value) * this.audio_px_width;
+    return Math.round((time_samples / dur.browserSample.value) * this.audio_px_width);
   }
 
   public absXChunktoSamples(absX: number, chunk: AudioChunk): number {

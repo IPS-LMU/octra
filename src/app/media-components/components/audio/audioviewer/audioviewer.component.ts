@@ -1069,12 +1069,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             begin = segments[i - 1];
           }
 
-          /* if(i === 0) {
-           console.log(`draw segment ${i}`);
-           console.log(`check ${line_start.samples} <= ${begin.time.samples}
-           && ${line_start.samples} + ${line_end.samples} <= ${segment.time.samples}`);
-           } */
-
           /*
            three cases where segment has to be drawn:
            1. segment full visible in line
@@ -1086,13 +1080,27 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
            right border: segment.samples
            */
           const beginSamples = begin.time.browserSample.value;
+          const durationSamples = this.av.audioTCalculator.samplestoAbsX(segment.time.browserSample.value);
           if (
-            (beginSamples >= line_start.browserSample.value && beginSamples <= line_end.browserSample.value) ||
-            (beginSamples < line_start.browserSample.value && beginSamples <= line_end.browserSample.value
-              && beginSamples >= line_start.browserSample.value) ||
-            (beginSamples >= line_start.browserSample.value && beginSamples <= line_end.browserSample.value
-              && beginSamples > line_end.browserSample.value) ||
-            (beginSamples < line_start.browserSample.value && beginSamples > line_end.browserSample.value)
+            (
+              // segment started before the line and ended before the line ends
+              beginSamples <= line_start.browserSample.value && beginSamples + durationSamples < line_end.browserSample.value
+            )
+            ||
+            (
+              // segment is full visible in line
+              beginSamples >= line_start.browserSample.value && beginSamples <= line_end.browserSample.value
+            )
+            ||
+            (
+              // segment started after the line starts
+              beginSamples >= line_start.browserSample.value && beginSamples + durationSamples > line_end.browserSample.value
+            )
+            ||
+            (
+              // segment started before and ends after the line
+              beginSamples < line_start.browserSample.value && beginSamples + durationSamples > line_end.browserSample.value
+            )
           ) {
             // sample in the lines space
             const line_num1 = startline.number;
@@ -1108,7 +1116,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
               relX = absX % this._innerWidth + this.Settings.margin.left;
 
-              const select = this.av.getRelativeSelectionByLine(line, begin.time.browserSample.value, segments[i].time.browserSample.value,
+              let select = this.av.getRelativeSelectionByLine(line, begin.time.browserSample.value, segments[i].time.browserSample.value,
                 this._innerWidth);
               let w = 0;
               let x = select.start;
@@ -1127,6 +1135,10 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 w = select.end;
               }
 
+              if (line.number === Math.min(line_num2, this.av.visibleLines.end) && i === segments.length - 1) {
+                w = line.Size.width - select.start + 1;
+              }
+
               if (segment.transcript === '') {
                 this.o_context.globalAlpha = 0.2;
                 this.o_context.fillStyle = 'red';
@@ -1139,7 +1151,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
               }
 
               drawn_segments++;
-              this.o_context.fillRect(x + this.Settings.margin.left - 1, line.Pos.y - this.av.viewRect.position.y, w, h);
+              if (w > 0) {
+                this.o_context.fillRect(x + this.Settings.margin.left - 1, line.Pos.y - this.av.viewRect.position.y, w, h);
+              }
             }
 
             // draw boundaries
@@ -1226,6 +1240,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 let w = 0;
                 let x = select.start;
 
+
                 if (select.start > -1 && select.end > -1) {
                   w = Math.abs(select.end - select.start);
                 }
@@ -1240,6 +1255,10 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                   w = select.end;
                 }
 
+                if (line.number === this.av.LinesArray.length - 1 && i === segments.length - 1) {
+                  w = line.Size.width - select.start + 1;
+                }
+
                 if (segment.transcript === '') {
                   this.o_context.globalAlpha = 0.2;
                   this.o_context.fillStyle = 'red';
@@ -1252,7 +1271,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 }
 
                 drawn_segments++;
+
                 this.o_context.fillRect(x + this.Settings.margin.left - 1, line.Pos.y - this.av.viewRect.position.y, w, h);
+                // console.log(`draw segment with color ${this.o_context.fillStyle} of size (${w}, ${h}) and location (${x}, ${line.Pos.y - this.av.viewRect.position.y})`);
+              } else {
+                console.log(`can't draw line because line is null!`);
               }
             }
           } else if (line_num2 > this.av.visibleLines.end + 2) {

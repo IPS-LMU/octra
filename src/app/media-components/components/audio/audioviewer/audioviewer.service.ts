@@ -541,7 +541,7 @@ export class AudioviewerService extends AudioComponentService {
           if (SelAbsStart > -1) {
             // check start selection
             if (SelAbsStart >= absX) {
-              result.start = SelAbsStart - (line.number * innerWidth);
+              result.start = SelAbsStart - absX;
             } else {
               result.start = 0;
             }

@@ -45,7 +45,6 @@
     "bootstrap": "^4.1.3",
     "bootstrap-material-design": "^4.1.1",
     "core-js": "^2.5.7",
-    "intl": "^1.2.5",
     "jquery": "^3.1.0",
     "jquery.caret": "^0.3.1",
     "js-sha256": "^0.9.0",
@@ -64,7 +63,7 @@
     "zone.js": "^0.8.26"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.11.0",
+    "@angular-devkit/build-angular": "^0.11.4",
     "@angular/cli": "^7.1.0",
     "@angular/compiler-cli": "^7.1.0",
     "@angular/language-service": "^7.1.0",

@@ -1,16 +1,4 @@
-import {
-  AfterContentChecked,
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  ViewChild
-} from '@angular/core';
+import {AfterContentChecked, AfterViewInit, Component, EventEmitter, OnChanges, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 
 import {
   AppStorageService,
@@ -42,8 +30,7 @@ import {Functions} from '../../core/shared/Functions';
 @Component({
   selector: 'app-overlay-gui',
   templateUrl: './2D-editor.component.html',
-  styleUrls: ['./2D-editor.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./2D-editor.component.css']
 })
 export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentChecked, OnChanges, OnDestroy {
   public static editorname = '2D-Editor';
@@ -113,7 +100,6 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
               public keyMap: KeymappingService,
               public audio: AudioService,
               public uiService: UserInteractionsService,
-              public cd: ChangeDetectorRef,
               public msg: MessageService,
               public settingsService: SettingsService,
               public appStorage: AppStorageService) {
@@ -464,8 +450,6 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     switch (event.type) {
       case('play'):
         this.viewer.startPlayback(() => {
-          this.cd.markForCheck();
-          this.cd.detectChanges();
         });
         break;
       case('pause'):
@@ -532,7 +516,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     const cursor = this.viewer.MouseCursor;
 
     if (cursor && cursor.timePos && cursor.relPos) {
-      const half_rate = Math.round(this.audiomanager.ressource.info.samplerate / factor);
+      const half_rate = Math.round(this.audiomanager.browserSampleRate / factor);
       const start = (cursor.timePos.browserSample.value > half_rate)
         ? this.audiomanager.createBrowserAudioTime(cursor.timePos.browserSample.value - half_rate)
         : this.audiomanager.createBrowserAudioTime(0);
@@ -543,6 +527,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
 
       loup.zoomY = factor;
       if (start && end) {
+        this.audiochunk_loupe.destroy();
         this.audiochunk_loupe = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
       }
     }

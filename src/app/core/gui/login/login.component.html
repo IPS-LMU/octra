@@ -22,7 +22,24 @@
                     {{'login.online mode disabled' | translate}}
                 </div>
                 <div class="form-horizontal" *ngIf="apc.octra.login.enabled">
-                    <form (ngSubmit)="onSubmit(f)" #f="ngForm">
+                    <div style="text-align: center;margin-top:20%;" *ngIf="apiStatus === 'init'">
+                        <ng-container>
+                            <fa-icon icon="spinner" style="color:lightgray" spin="true" [size]="'4x'"></fa-icon>
+                        </ng-container>
+                    </div>
+                    <div style="text-align: center;margin-top:20%;" *ngIf="apiStatus !== 'available'">
+                        <ng-container *ngIf="apiStatus === 'unavailable'">
+                            <div class="alert alert-danger" style="padding:20px;">
+                                <div style="text-align: center;">
+                                    <fa-icon icon="exclamation-triangle" style="color:red" [size]="'4x'"></fa-icon>
+                                </div>
+                                <p style="text-align: justify; margin-top:10px;">
+                                    {{"login.api not available" | translate}}
+                                </p>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <form (ngSubmit)="onSubmit(f)" #f="ngForm" *ngIf="apiStatus === 'available'">
                         <fieldset>
                             <div class="form-group">
                                 <label for="select111" class="control-label">

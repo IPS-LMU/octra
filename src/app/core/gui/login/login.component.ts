@@ -67,6 +67,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     password: ''
   };
   err = '';
+
+  private apiStatus: 'init' | 'available' | 'unavailable' = 'init';
+
   private subscrmanager: SubscriptionManager;
   onOfflineSubmit = () => {
     if (!(this.appStorage.data_id === null || this.appStorage.data_id === undefined) && typeof this.appStorage.data_id === 'number') {
@@ -459,8 +462,11 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           }
         }
       }
+
+      this.apiStatus = 'available';
     }).catch((error) => {
       console.error(`ERROR: could not load list of projects:\n${error}`);
+      this.apiStatus = 'unavailable';
     });
   }
 

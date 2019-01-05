@@ -189,7 +189,8 @@
     "last used": "zuletzt genutzt",
     "login and remove": "Daten des lokalen Modus löschen & anmelden",
     "local and remove": "Daten des online Modus löschen & weiter",
-    "demo": "Klicke hier um OCTRA mit einer beliebigen Audiodatei zu öffnen (Demo)"
+    "demo": "Klicke hier um OCTRA mit einer beliebigen Audiodatei zu öffnen (Demo)",
+    "api not available": "Der Server ist aktuell nicht erreichbar. Bitte versuche es später erneut. Sollte sich das auch nach 4 Stunden nicht ändern, sende uns bitte eine Nachricht über das Feedback Formular."
   },
   "dropzone": {
     "drag&drop here": "Audiodatei (*.wav) (+ optional Datei zum Importieren) hier hineinziehen oder hier klicken",

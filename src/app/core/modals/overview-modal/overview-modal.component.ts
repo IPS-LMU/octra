@@ -83,13 +83,13 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
         this.shortcutID = this.subscrmanager.add(this.keyService.onkeyup.subscribe((keyObj: any) => {
           console.log(`keystroke! ${keyObj.comboKey}`);
           switch (keyObj.comboKey) {
-            case('1'):
+            case('CTRL + 1'):
               this.sendTranscriptionForShortAudioFiles('good');
               break;
-            case('2'):
+            case('CTRL + 2'):
               this.sendTranscriptionForShortAudioFiles('middle');
               break;
-            case('3'):
+            case('CTRL + 3'):
               this.sendTranscriptionForShortAudioFiles('bad');
               break;
           }

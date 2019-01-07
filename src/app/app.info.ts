@@ -42,7 +42,7 @@ export class AppInfo {
   ];
 
   static readonly version = '1.2.7';
-  static readonly lastUpdate = '2018-01-03 11:10';
+  static readonly lastUpdate = '2018-01-07 13:09';
 
   public static readonly queryParamsHandling: NavigationExtras = {
     queryParamsHandling: '',

@@ -189,7 +189,8 @@
     "last used": "recently used",
     "login and remove": "Remove local mode data & login",
     "local and remove": "Remove online mode data & continue",
-    "demo": "Click here to use OCTRA on a default audio file (demo)"
+    "demo": "Click here to use OCTRA on a default audio file (demo)",
+    "api not available": "The server is currently not available. Please try it again later. If this message is still visible after 4 hours please send us a message via the feedback form."
   },
   "dropzone": {
     "drag&drop here": "Drag & Drop audio file (*.wav) (+ optional file for import) here or click here.",

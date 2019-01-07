@@ -19,7 +19,7 @@ import {AudioChunk, AudioSelection, BrowserAudioTime, OriginalAudioTime, Subscri
 import {Segment} from '../../obj/Annotation';
 import {PlayBackState} from '../../../media-components/obj/media';
 import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
-import {isFunction} from '../../shared/Functions';
+import {isFunction, isNullOrUndefined} from '../../shared/Functions';
 import {TranscrEditorComponent} from '../../component/transcr-editor';
 
 @Component({
@@ -315,10 +315,13 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       validation: ''
     };
 
-    if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function') {
-      obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
-        this.transcrService.validationArray[i].validation);
-    }
+        if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function'
+          && !isNullOrUndefined(this.transcrService.validationArray[i])) {
+          obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
+            this.transcrService.validationArray[i].validation);
+        } else {
+          obj.transcription.html = segment.transcript;
+        }
 
     obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
     obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {

@@ -167,12 +167,27 @@ export class APIService implements API {
     }
   }
 
-  public getProjects() {
+  public getProjects(): Promise<any> {
     const cmd_json = {
       querytype: 'listprojects'
     };
 
-    return this.post(cmd_json);
+    return new Promise<any>((resolve, reject) => {
+      let checked = false;
+
+      setTimeout(() => {
+        checked = true;
+        reject(new Error('API timeout: server does not answer.'));
+      }, 2000);
+
+      this.post(cmd_json).then((result) => {
+        if (!checked) {
+          resolve(result);
+        }
+      }).catch((error) => {
+        reject(error);
+      });
+    });
   }
 
   public post(json: any): Promise<any> {
@@ -182,7 +197,7 @@ export class APIService implements API {
       this.http.post(this.server_url, body, {
         responseType: 'json'
       }).subscribe((obj) => {
-          resolve(<any> obj);
+          resolve(<any>obj);
         },
         (err) => {
           reject(err);

@@ -82,13 +82,13 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
       if (this.settingsService.isTheme('shortAudioFiles')) {
         this.shortcutID = this.subscrmanager.add(this.keyService.onkeyup.subscribe((keyObj: any) => {
           switch (keyObj.comboKey) {
-            case('1'):
+            case('CTRL + 1'):
               this.sendTranscriptionForShortAudioFiles('good');
               break;
-            case('2'):
+            case('CTRL + 2'):
               this.sendTranscriptionForShortAudioFiles('middle');
               break;
-            case('3'):
+            case('CTRL + 3'):
               this.sendTranscriptionForShortAudioFiles('bad');
               break;
           }

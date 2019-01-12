@@ -149,6 +149,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     this.viewer.Settings.scrollable = true;
     this.viewer.Settings.margin.right = 20;
     this.viewer.Settings.round_values = false;
+    // this.viewer.Settings.timeline.enabled = true;
     this.viewer.Settings.step_width_ratio = (this.viewer.Settings.pixel_per_sec / this.audiomanager.ressource.info.samplerate);
 
     this.viewer.alerttriggered.subscribe(

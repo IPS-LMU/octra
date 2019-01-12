@@ -64,6 +64,15 @@
                             </td>
                         </tr>
                     </ng-container>
+                    <tr>
+                        <td>
+                        </td>
+                        <td (click)="splitAudio()" colspan="4">
+                            <a #a>
+                                Split audio file (Alpha)
+                            </a>
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
                 <span class="link" *ngIf="arraybufferExists" (click)="getAudioURI();">

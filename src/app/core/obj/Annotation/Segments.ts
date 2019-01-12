@@ -274,19 +274,21 @@ export class Segments {
   private cleanup() {
     const remove: number[] = [];
 
-    for (let i = 0; i < this.segments.length; i++) {
-      if (i > 0) {
-        const last = this.segments[i - 1];
+    if (this.segments.length > 1) {
+      let last = this.segments[0];
+      for (let i = 1; i < this.segments.length; i++) {
         if (last.time.samples === this.segments[i].time.samples) {
           remove.push(i);
         }
+        last = this.segments[i - 1];
       }
-    }
 
-    for (let i = 0; i < remove.length; i++) {
-      this.segments.splice(remove[i], 1);
-      remove.splice(i, 1);
-      --i;
+      for (let i = 0; i < remove.length; i++) {
+        this.segments.splice(remove[i], 1);
+        remove.splice(i, 1);
+        console.log(this.segments);
+        --i;
+      }
     }
   }
 }

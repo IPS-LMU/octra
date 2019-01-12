@@ -1,14 +1,16 @@
 import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs/Subject';
-import {TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {AppStorageService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
 import {Converter, IFile} from '../../obj/Converters';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
-import {OCTRANIMATIONS} from '../../shared';
+import {OCTRANIMATIONS, Segment} from '../../shared';
 import {NavbarService} from '../../gui/navbar/navbar.service';
 import {isNullOrUndefined} from '../../shared/Functions';
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-export-files-modal',
@@ -53,7 +55,11 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       && this.navbarServ.transcrService.audiomanager.ressource.arraybuffer.byteLength > 0);
   }
 
-  constructor(private sanitizer: DomSanitizer, private navbarServ: NavbarService, private modalService: BsModalService) {
+  constructor(private sanitizer: DomSanitizer,
+              public navbarServ: NavbarService,
+              private modalService: BsModalService,
+              private httpClient: HttpClient,
+              private appStorage: AppStorageService) {
   }
 
   ngOnInit() {
@@ -226,5 +232,54 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     for (let i = 0; i < this.export_states.length; i++) {
       this.export_states[i] = 'inactive';
     }
+  }
+
+  public splitAudio() {
+    const cutList = [];
+    let startSample = 0;
+    for (let i = 0; i < this.transcrService.currentlevel.segments.length; i++) {
+      const segment: Segment = this.transcrService.currentlevel.segments.get(i);
+      cutList.push({
+        sampleStart: startSample,
+        sampleDur: segment.time.originalSample.value - startSample
+      });
+      startSample = segment.time.originalSample.value;
+    }
+
+    const formData: FormData = new FormData();
+    formData.append('files', this.appStorage.file, this.transcrService.audiofile.name);
+    formData.append('segments', JSON.stringify(cutList));
+
+    this.httpClient
+      .post('http://localhost:8080/v1/cutAudio', formData, {
+        headers: {
+          'authorization': '73426T79ER58VASAD435$1542352AWEQTNBRE'
+        }, responseType: 'json'
+      }).subscribe((result: any) => {
+      console.log(`result:`);
+      console.log(result);
+
+      const hash = result.data.hash;
+      const id = this.subscrmanager.add(Observable.interval(1000).subscribe(
+        () => {
+          this.httpClient.get('http://localhost:8080/v1/tasks?hash=' + hash, {
+            headers: {
+              'authorization': '73426T79ER58VASAD435$1542352AWEQTNBRE'
+            }, responseType: 'json'
+          }).subscribe((result2: any) => {
+            console.log(result2);
+            if (result2.data.status === 'finished') {
+              alert('finished!');
+              this.subscrmanager.remove(id);
+            } else if (result2.data.status === 'finished') {
+              alert('failed!');
+              this.subscrmanager.remove(id);
+            }
+          });
+        }
+      ));
+    }, (error) => {
+      console.error(error);
+    });
   }
 }

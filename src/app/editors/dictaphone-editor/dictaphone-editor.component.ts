@@ -247,8 +247,8 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
       return a.replace(/(^\s+)|(\s+$)/g, '');
     });
 
+    let anno_seg_length = this.transcrService.currentlevel.segments.length;
     for (let i = 0; i < seg_texts.length; i++) {
-      const anno_seg_length = this.transcrService.currentlevel.segments.length;
       const new_raw = this.transcrService.htmlToRaw(seg_texts[i]);
 
       if (i < anno_seg_length) {
@@ -265,12 +265,12 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
         if (i === seg_texts.length - 1) {
           this.transcrService.currentlevel.segments.add(this.audiochunk.time.end.samples, new_raw);
         } else {
-          this.transcrService.currentlevel.segments.add(samples_array[i - 1], new_raw);
+          this.transcrService.currentlevel.segments.add(samples_array[i], new_raw);
         }
       }
     }
 
-    const anno_seg_length = this.transcrService.currentlevel.segments.length;
+    anno_seg_length = this.transcrService.currentlevel.segments.length;
     if (anno_seg_length > seg_texts.length) {
       // remove left segments
       this.transcrService.currentlevel.segments.segments.splice(seg_texts.length, (anno_seg_length - seg_texts.length));

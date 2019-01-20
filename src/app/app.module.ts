@@ -88,7 +88,7 @@ import {
   faWindowMaximize
 } from '@fortawesome/free-solid-svg-icons';
 // modules
-import {ModalModule} from 'ngx-bootstrap';
+import {ModalModule, ProgressbarModule} from 'ngx-bootstrap';
 import {YesNoModalComponent} from './core/modals/yes-no-modal/yes-no-modal.component';
 import {ModalService} from './core/modals/modal.service';
 import {BugreportModalComponent} from './core/modals/bugreport-modal/bugreport-modal.component';
@@ -115,6 +115,8 @@ import {TranscriptionFeedbackComponent} from './core/gui/transcription-feedback/
 import {GuidelinesComponent} from './core/gui/guidelines/guidelines.component';
 import {InactivityModalComponent} from './core/modals/inactivity-modal/inactivity-modal.component';
 import {ValidationPopoverComponent} from './core/component/transcr-editor/validation-popover/validation-popover.component';
+import {NamingDragAndDropComponent} from './core/component/naming-drag-and-drop/naming-drag-and-drop.component';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 
 library.add(
   faSpinner,
@@ -214,13 +216,15 @@ export const ngmodule = {
     BrowserTestComponent,
     TranscriptionFeedbackComponent,
     InactivityModalComponent,
-    ValidationPopoverComponent
+    ValidationPopoverComponent,
+    NamingDragAndDropComponent
   ],
   entryComponents: EDITORS,
   imports: [
     BrowserModule,
     FontAwesomeModule,
     ModalModule.forRoot(),
+    DragDropModule,
     BsDropdownModule.forRoot(),
     TranslateModule.forRoot({
       loader: {
@@ -240,6 +244,7 @@ export const ngmodule = {
     BrowserAnimationsModule,
     ReactiveFormsModule,
     MediaComponentsModule,
+    ProgressbarModule.forRoot(),
     routing
   ],
   bootstrap: [

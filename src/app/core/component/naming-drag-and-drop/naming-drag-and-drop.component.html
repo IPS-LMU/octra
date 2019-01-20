@@ -1,0 +1,43 @@
+<div class="namingConventionSelection">
+    <div class="namingConvention-dropdown">
+        <div class="btn-group" dropdown>
+            <button id="button-basic" dropdownToggle type="button" class="btn dropdown-toggle btn-raised btn-primary"
+                    aria-controls="dropdown-basic" style="background-color:#009688;">
+                Add placeholder <span class="caret"></span>
+            </button>
+            <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu"
+                role="menu" aria-labelledby="button-basic">
+                <li role="menuitem">
+                    <a class="dropdown-item" *ngFor="let item of namingConventionArray;let i = index;"
+                       (click)="addItem(item)">
+                        {{item}}
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div contenteditable="true">
+        test
+    </div>
+    <div cdkDropList [cdkDropListOrientation]="'horizontal'" class="namingConventionDragDrop"
+         (cdkDropListDropped)="drop($event)">
+        <ng-container *ngFor="let item of resultConvention; let i = index;">
+            <div cdkDrag class="pop naming-placeholder" *ngIf="item.type === 'placeholder'">
+                {{item.value}}
+                <fa-icon (click)="remove(i)" icon="times-circle"></fa-icon>
+            </div>
+            <div cdkDrag class="pop" *ngIf="item.type === 'text'" [contentEditable]="true"
+                 (cdkDragEnded)="onDragEnd($event)" (mousedown)="onItemClick($event)">
+                {{item.value}}
+                <fa-icon (click)="remove(i)" icon="times-circle"></fa-icon>
+            </div>
+            <div class="pop deactivated" *ngIf="item.type === 'extension'">
+                {{item.value}}
+            </div>
+        </ng-container>
+    </div>
+    <div class="naming-convention preview">
+        <span>Preview:</span>
+        {{preview}}
+    </div>
+</div>

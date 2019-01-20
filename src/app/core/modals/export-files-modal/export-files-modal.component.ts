@@ -48,6 +48,15 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();
 
+  public cutting = {
+    progress: 0,
+    result: {
+      url: '',
+      filename: ''
+    },
+    status: 'idle'
+  };
+
   public get arraybufferExists(): boolean {
     return (!(this.navbarServ.transcrService === null || this.navbarServ.transcrService === undefined)
       && !(this.navbarServ.transcrService.audiomanager.ressource.arraybuffer === null
@@ -249,32 +258,43 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     const formData: FormData = new FormData();
     formData.append('files', this.appStorage.file, this.transcrService.audiofile.name);
     formData.append('segments', JSON.stringify(cutList));
+    formData.append('cuttingOptions', JSON.stringify({
+      exportFormats: ['json', 'textTable'],
+      namingConvention: 'superKlappt_<sequenceNumber>'
+    }));
 
     this.httpClient
       .post('http://localhost:8080/v1/cutAudio', formData, {
         headers: {
-          'authorization': '73426T79ER58VASAD435$1542352AWEQTNBRE'
+          'authorization': '7234rhuiweafauosijfaw89e77z23t'
         }, responseType: 'json'
       }).subscribe((result: any) => {
       console.log(`result:`);
       console.log(result);
 
       const hash = result.data.hash;
-      const id = this.subscrmanager.add(Observable.interval(1000).subscribe(
+      const id = this.subscrmanager.add(Observable.interval(200).subscribe(
         () => {
-          this.httpClient.get('http://localhost:8080/v1/tasks?hash=' + hash, {
+          this.httpClient.get(`http://localhost:8080/v1/tasks/${hash}`, {
             headers: {
-              'authorization': '73426T79ER58VASAD435$1542352AWEQTNBRE'
+              'authorization': '7234rhuiweafauosijfaw89e77z23t'
             }, responseType: 'json'
           }).subscribe((result2: any) => {
-            console.log(result2);
+            this.cutting.progress = (!isNullOrUndefined(result2.data.progress)) ? Math.round(result2.data.progress * 100) : 0;
+            this.cutting.status = result2.data.status;
+
             if (result2.data.status === 'finished') {
-              alert('finished!');
+              const url: string = result2.data['resultURL'];
+              this.cutting.result.url = url;
+              this.cutting.result.filename = url.substring(url.lastIndexOf('/')) + 1;
               this.subscrmanager.remove(id);
             } else if (result2.data.status === 'finished') {
               alert('failed!');
               this.subscrmanager.remove(id);
             }
+          }, () => {
+            alert('failed!');
+            this.subscrmanager.remove(id);
           });
         }
       ));

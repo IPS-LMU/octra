@@ -9,3 +9,7 @@
 #export-table a {
     cursor: pointer;
 }
+
+progressbar {
+    height: 20px;
+}

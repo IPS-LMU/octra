@@ -73,6 +73,26 @@
                             </a>
                         </td>
                     </tr>
+                    <tr>
+                        <td></td>
+                        <td colspan="4" style="padding-left:20px;">
+
+                            <div class="mb-2" style="height:20px;">
+                                <progressbar [animate]="true" [value]="cutting.progress" type="success">
+                                    <b>{{cutting.progress}}%</b>
+                                </progressbar>
+                            </div>
+                            <a style="margin-left:10px;"
+                               *ngIf="cutting.result.url !== ''"
+                               download="{{cutting.result.filename}}" [href]="cutting.result.url"
+                               class="link" (click)="onDownloadClick(i)">
+                                <fa-icon icon="save"></fa-icon>
+                                Download
+                            </a>
+
+                            <app-naming-drag-and-drop></app-naming-drag-and-drop>
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
                 <span class="link" *ngIf="arraybufferExists" (click)="getAudioURI();">

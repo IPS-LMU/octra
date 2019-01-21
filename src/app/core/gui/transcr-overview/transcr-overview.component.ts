@@ -319,8 +319,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
           && !isNullOrUndefined(this.transcrService.validationArray[i])) {
           obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
             this.transcrService.validationArray[i].validation);
-        } else {
-          obj.transcription.html = segment.transcript;
         }
 
     obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);

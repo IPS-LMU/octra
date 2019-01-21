@@ -138,7 +138,6 @@ export class TranscriptionComponent implements OnInit,
 
     // TODO remove this case for later versions
     this.interface = (this.appStorage.Interface === 'Editor without signal display') ? 'Dictaphone Editor' : this.appStorage.Interface;
-
   }
 
   // TODO change to ModalComponents!
@@ -164,6 +163,7 @@ export class TranscriptionComponent implements OnInit,
   private level_subscription_id = 0;
   private audiomanager: AudioManager;
   private _currentEditor: ComponentRef<Component>;
+
   abortTranscription = () => {
     if (this.appStorage.usemode === 'online'
       && !(this.settingsService.projectsettings.octra === null || this.settingsService.projectsettings.octra === undefined)

@@ -315,10 +315,13 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       validation: ''
     };
 
-    if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function') {
-      obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
-        this.transcrService.validationArray[i].validation);
-    }
+        if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function'
+          && !isNullOrUndefined(this.transcrService.validationArray[i])) {
+          obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
+            this.transcrService.validationArray[i].validation);
+        } else {
+          obj.transcription.html = segment.transcript;
+        }
 
     obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
     obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {

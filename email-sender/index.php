@@ -151,6 +151,10 @@ if (!empty($data) && !is_null($headers["Authorization"]) && $headers["Authorizat
                 padding: 40px;
                 box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
             }
+
+            .date-col {
+                width: 50px;
+            }
         </style>
         <body>
         <div class="container">
@@ -231,7 +235,7 @@ if (!empty($data) && !is_null($headers["Authorization"]) && $headers["Authorizat
                     <thead>
                     <tr>
                         <th class="num-col">#</th>
-                        <th>Date</th>
+                        <th class="date-col">Date</th>
                         <th class="type-col">Type</th>
                         <th>Description</th>
                     </tr>
@@ -251,7 +255,7 @@ if (!empty($data) && !is_null($headers["Authorization"]) && $headers["Authorizat
 
                         <tr>
                             <td class="num-col"><?php echo $lineNumber; ?></td>
-                            <td><?php echo (!empty($entry["timestamp"])) ? $entry["timestamp"] : "No date recorded"; ?></td>
+                            <td class="date-col"><?php echo (!empty($entry["timestamp"])) ? $entry["timestamp"] : "No date recorded"; ?></td>
                             <td class="type-col">
                                 <?php switch ($entry["type"]):
                                     case(0):

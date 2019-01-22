@@ -23,7 +23,7 @@ import {AudioplayerService} from './audioplayer.service';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
 import {CanvasAnimation} from '../../../obj/CanvasAnimation';
 import {AudioService, KeymappingService} from '../../../../core/shared/service';
-import {BrowserInfo, Logger} from '../../../../core/shared';
+import {BrowserInfo} from '../../../../core/shared';
 import {Line} from '../../../obj';
 import {AudioManager} from '../../../obj/media/audio/AudioManager';
 import {timer} from 'rxjs';
@@ -368,7 +368,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
     const ratio = this.innerWidth / this.oldInnerWidth;
     if (this.ap.PlayCursor) {
       const ac = new AudioTimeCalculator(this.audioressource.info.samplerate, this.audiochunk.time.duration, this.innerWidth);
-      Logger.log('' + this.audiochunk.playposition.samples);
+      console.log('' + this.audiochunk.playposition.samples);
 
       this.ap.audioTCalculator = ac;
       this.ap.PlayCursor.changeSamples(this.audiochunk.playposition.samples, ac);

@@ -5,7 +5,6 @@ import {AppSettings, ProjectSettings} from '../../obj/Settings';
 import {Subscription} from 'rxjs/Subscription';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
-import {Logger} from '../Logger';
 import {Functions, isNullOrUndefined} from '../Functions';
 import {Observable} from 'rxjs/Observable';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
@@ -141,7 +140,7 @@ export class SettingsService {
           if (validate.errors.hasOwnProperty(err)) {
             const err_obj: any = (validate.errors['' + err + '']);
             if (err_obj.hasOwnProperty('dataPath') && !(err_obj.dataPath === null || err_obj.dataPath === undefined)) {
-              Logger.err(`JSON Validation Error (${filename}): ${err_obj.dataPath} ${err_obj.message}`);
+              console.error(`JSON Validation Error (${filename}): ${err_obj.dataPath} ${err_obj.message}`);
             }
           }
         }
@@ -226,7 +225,7 @@ export class SettingsService {
         }
       ).catch((error) => {
         this.dbloaded.error(error);
-        Logger.err(error);
+        console.error(error);
       });
     }).catch((error) => {
       this.dbloaded.error(error);
@@ -252,12 +251,12 @@ export class SettingsService {
           this._projectsettings = result;
         },
         () => {
-          Logger.log('Projectconfig loaded.');
+          console.log('Projectconfig loaded.');
           resolve();
           this.projectsettingsloaded.emit(this._projectsettings);
         },
         (error) => {
-          Logger.err(error);
+          console.error(error);
           reject(error);
         }
       );
@@ -281,17 +280,17 @@ export class SettingsService {
         this._guidelines = result;
       },
       () => {
-        Logger.log('Guidelines loaded.');
+        console.log('Guidelines loaded.');
         this.loadValidationMethod(this._guidelines.meta.validation_url);
         this.guidelinesloaded.emit(this._guidelines);
       },
       (error) => {
-        Logger.err(error);
+        console.error(error);
       }
     );
   }
   public loadValidationMethod: ((url: string) => Subscription) = (url: string) => {
-    Logger.log('Load methods...');
+    console.log('Load methods...');
     return Functions.uniqueHTTPRequest(this.http, false, {
       responseType: 'text'
     }, url, null).subscribe(
@@ -308,7 +307,7 @@ export class SettingsService {
           ) {
             this._validationmethod = validateAnnotation;
             this._tidyUpMethod = tidyUpAnnotation;
-            Logger.log('Methods loaded.');
+            console.log('Methods loaded.');
             this.validationmethodloaded.emit();
           } else {
             this._log += 'Loading functions failed [Error: S02]';
@@ -323,7 +322,7 @@ export class SettingsService {
     );
   }
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
-    Logger.log('Load audio file 2...');
+    console.log('Load audio file 2...');
     if ((this.appStorage.usemode === null || this.appStorage.usemode === undefined)) {
       console.error(`usemode is null`);
     }
@@ -344,7 +343,7 @@ export class SettingsService {
         }
 
         audioService.loadAudio(src, () => {
-          Logger.log('Audio loaded.');
+          console.log('Audio loaded.');
 
           this.audioloaded.emit({status: 'success'});
         }, () => {
@@ -370,12 +369,12 @@ export class SettingsService {
             AudioManager.decodeAudio(this.appStorage.sessionfile.name, 'audio/wav', t.result, AppInfo.audioformats, true).then(
               (audiomanager: AudioManager) => {
                 audioService.registerAudioManager(audiomanager);
-                Logger.log('Audio loaded.');
+                console.log('Audio loaded.');
                 this.audioloaded.emit({status: 'success'});
               }
             );
           } else {
-            Logger.log('Audio loaded.');
+            console.log('Audio loaded.');
             this.audioloaded.emit({status: 'success'});
           }
         };
@@ -418,7 +417,7 @@ export class SettingsService {
           this._app_settings = result;
         },
         () => {
-          Logger.log('AppSettings loaded.');
+          console.log('AppSettings loaded.');
           this.validation.app = true;
 
           this.app_settingsloaded.emit(true);
@@ -430,7 +429,7 @@ export class SettingsService {
           this.loadDB(appRoute);
         },
         (error) => {
-          Logger.err(error);
+          console.error(error);
           reject();
         }
       );
@@ -455,14 +454,14 @@ export class SettingsService {
       urls.hasOwnProperty('json') && urls.hasOwnProperty('schema') &&
       filenames.hasOwnProperty('json') && filenames.hasOwnProperty('schema')
     ) {
-      Logger.log(messages.loading);
+      console.log(messages.loading);
       this.subscrmanager.add(Functions.uniqueHTTPRequest(this.http, false, null, urls.json, null).subscribe(
         (appsettings: AppSettings) => {
           onhttpreturn(appsettings);
 
           this.subscrmanager.add(Functions.uniqueHTTPRequest(this.http, false, null, urls.schema, null).subscribe(
             (schema) => {
-              Logger.log(filenames.json + ' schema file loaded');
+              console.log(filenames.json + ' schema file loaded');
 
               const validation_ok = SettingsService.validateJSON(filenames.json, appsettings, schema);
 

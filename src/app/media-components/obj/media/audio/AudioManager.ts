@@ -1,4 +1,3 @@
-import {Logger} from '../../../../core/shared/Logger';
 import {AudioRessource} from './AudioRessource';
 import {EventEmitter} from '@angular/core';
 import {AudioTime} from './AudioTime';
@@ -179,7 +178,7 @@ export class AudioManager {
   public static decodeAudio = (filename: string, type: string, buffer: ArrayBuffer,
                                audioformats: AudioFormat[], keepbuffer = false): Promise<AudioManager> => {
     return new Promise<AudioManager>((resolve, reject) => {
-      Logger.log('Decode audio... ' + filename);
+      console.log('Decode audio... ' + filename);
 
       const audioformat: AudioFormat = AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats);
       audioformat.init(buffer);

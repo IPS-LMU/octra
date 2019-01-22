@@ -169,6 +169,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
       this.appStorage.changeAnnotationLevel(tiernum,
         level.getObj(this.transcrServ.audiomanager.sampleRateFactor, this.transcrServ.audiomanager.originalInfo.duration.samples))
         .catch((err) => {
+          console.error(`error on leaving level name`);
           console.error(err);
         }).then(() => {
         // update value for annoation object in transcr service

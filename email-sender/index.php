@@ -37,7 +37,7 @@ if (!empty($data) && !is_null($headers["Authorization"]) && $headers["Authorizat
 
         $from_email = $data["additional_information"]["email"];
         $timestamp = date("Y-m-d-H-i-s");
-        $topic = "OCTRA BUG [$timestamp]";
+        $topic = "OCTRA Feedback [$timestamp]";
 
 
         if (empty($from_email)) {

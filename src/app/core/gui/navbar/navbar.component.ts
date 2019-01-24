@@ -170,6 +170,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
         level.getObj(this.transcrServ.audiomanager.originalInfo.duration)
       )
         .catch((err) => {
+          console.error(`error on leaving level name`);
           console.error(err);
         }).then(() => {
         // update value for annoation object in transcr service

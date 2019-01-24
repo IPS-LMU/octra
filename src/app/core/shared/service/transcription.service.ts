@@ -318,6 +318,7 @@ export class TranscriptionService {
                   this.appStorage.annotation[this._selectedlevel].level)
                   .catch(
                     (err) => {
+                      console.error(`error on overwriting annotation`);
                       console.error(err);
                     }
                   );

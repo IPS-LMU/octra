@@ -2,7 +2,6 @@ import {AppInfo} from '../../app.info';
 import {AppStorageService, OIDBLevel} from './service/appstorage.service';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../obj/Annotation/AnnotJSON';
 import {IndexedDBManager} from '../obj/IndexedDBManager';
-import {Logger} from './Logger';
 import {SubscriptionManager} from '../obj/SubscriptionManager';
 
 export class UpdateManager {
@@ -42,12 +41,12 @@ export class UpdateManager {
               console.log(result.type);
               if (result.type === 'success') {
                 // database opened
-                Logger.log('IDB opened');
+                console.log('IDB opened');
                 idbm.save('options', 'version', {value: AppInfo.version});
                 resolve(idbm);
               } else if (result.type === 'upgradeneeded') {
                 // database opened and needs upgrade/installation
-                Logger.log(`IDB needs upgrade from v${result.oldVersion} to v${result.newVersion}...`);
+                console.log(`IDB needs upgrade from v${result.oldVersion} to v${result.newVersion}...`);
                 let version = result.oldVersion;
 
                 // foreach step to the latest version you need to define the uprade
@@ -119,7 +118,7 @@ export class UpdateManager {
 
                       const convertAnnotation = () => {
                         if (!(this.appStorage.localStr.retrieve('annotation') === null || this.appStorage.localStr.retrieve('annotation') === undefined)) {
-                          Logger.log(`Convert annotation to IDB...`);
+                          console.log(`Convert annotation to IDB...`);
 
                           const levels = this.appStorage.localStr.retrieve('annotation').levels;
                           const new_levels: OIDBLevel[] = [];
@@ -131,7 +130,7 @@ export class UpdateManager {
                             console.log(`converted annotation levels to IDB`);
 
                             version++;
-                            Logger.log(`IDB upgraded to v${version}`);
+                            console.log(`IDB upgraded to v${version}`);
                             this.appStorage.localStr.clear();
                             // do not insert a resolve call here!
                             // after an successful upgrade the success is automatically triggered
@@ -142,13 +141,13 @@ export class UpdateManager {
                         } else {
                           version++;
                           this.appStorage.localStr.clear();
-                          Logger.log(`IDB upgraded to v${version}`);
+                          console.log(`IDB upgraded to v${version}`);
                         }
                       };
 
                       if (!(this.appStorage.localStr.retrieve('logs') === null || this.appStorage.localStr.retrieve('logs') === undefined)) {
-                        Logger.log('Convert logging data...');
-                        Logger.log(`${this.appStorage.localStr.retrieve('logs').length} logs to convert:`);
+                        console.log('Convert logging data...');
+                        console.log(`${this.appStorage.localStr.retrieve('logs').length} logs to convert:`);
                         idbm.saveArraySequential(this.appStorage.localStr.retrieve('logs'), logsStore, 'timestamp').then(() => {
                           console.log(`converted ${this.appStorage.localStr.retrieve('logs').length} logging items to IDB`);
                           convertAnnotation();
@@ -208,7 +207,7 @@ export class UpdateManager {
         this.subscrmanager.add(idb.open().subscribe(
           (result) => {
             // database opened
-            Logger.log('get version');
+            console.log('get version');
             idb.get('options', 'version').then((version) => {
               if (version !== null && version.hasOwnProperty('value')) {
                 this.version = version.value;

@@ -712,7 +712,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           sum_width += max_width;
         }
       } else {
-        Logger.err('Audioviewer, number of parts of timeline is infinite!');
+        console.error('Audioviewer, number of parts of timeline is infinite!');
       }
 
       this.g_context.strokeStyle = null;

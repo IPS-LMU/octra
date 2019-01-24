@@ -68,7 +68,7 @@ export class BugreportModalComponent implements OnInit {
   public close(action: string) {
     this.modal.hide();
     this.visible = false;
-    this.actionperformed.next(<ModalAnswer> action);
+    this.actionperformed.next(<ModalAnswer>action);
   }
 
   sendBugReport() {
@@ -79,8 +79,9 @@ export class BugreportModalComponent implements OnInit {
         auth_token: this.settService.app_settings.octra.bugreport.auth_token,
         url: this.settService.app_settings.octra.bugreport.url
       }).subscribe(
-        (result) => {
+        () => {
           this.bugsent = true;
+          console.log('Bugreport sent');
           setTimeout(() => {
             this.bgdescr = '';
             this.modal.hide();

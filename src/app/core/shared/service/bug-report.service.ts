@@ -9,6 +9,7 @@ import {BugReporter} from '../../obj/BugAPI/BugReporter';
 import {TranscriptionService} from './transcription.service';
 import {Functions} from '../Functions';
 import {HttpClient} from '@angular/common/http';
+import * as moment from 'moment';
 
 export enum ConsoleType {
   LOG,
@@ -19,6 +20,7 @@ export enum ConsoleType {
 
 export interface ConsoleEntry {
   type: ConsoleType;
+  timestamp: string;
   message: string;
 }
 
@@ -44,12 +46,13 @@ export class BugReportService {
   }
 
   public addEntry(type: ConsoleType, message: any) {
-    const console: ConsoleEntry = {
+    const consoleItem: ConsoleEntry = {
       type: type,
+      timestamp: moment().format('DD.MM.YY HH:mm:ss'),
       message: message
     };
 
-    this._console.push(console);
+    this._console.push(consoleItem);
   }
 
   public clear() {
@@ -62,7 +65,6 @@ export class BugReportService {
         version: AppInfo.version,
         language: this.langService.currentLang,
         signed_in: this.appStorage.LoggedIn,
-        dataid: this.appStorage.data_id,
         usemode: this.appStorage.usemode,
         url: window.location.href,
         lastUpdated: AppInfo.lastUpdate
@@ -77,6 +79,12 @@ export class BugReportService {
       },
       entries: this._console
     };
+
+    if (this.appStorage.usemode === 'online') {
+      result.octra['project'] = this.appStorage.user.project;
+      result.octra['user'] = this.appStorage.user.id;
+      result.octra['jobID'] = this.appStorage.data_id;
+    }
 
     if (!(this.transcrService === null || this.transcrService === undefined)) {
       const file = Functions.getFileSize(this.transcrService.audiofile.size);

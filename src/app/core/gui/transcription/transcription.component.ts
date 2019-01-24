@@ -347,6 +347,9 @@ export class TranscriptionComponent implements OnInit,
     }
 
     this.bugService.init(this.transcrService);
+    if (this.appStorage.usemode === 'online') {
+      console.log(`opened job ${this.appStorage.data_id} in project ${this.appStorage.user.project}`);
+    }
   }
 
   ngAfterViewInit() {
@@ -485,6 +488,7 @@ export class TranscriptionComponent implements OnInit,
     this.api.saveSession(json.transcript, json.project, json.annotator,
       json.jobno, json.id, json.status, json.comment, json.quality, json.log).then((result) => {
       if (result !== null) {
+        console.log(`job ${json.id} saved.`);
         this.appStorage.submitted = true;
 
         setTimeout(() => {
@@ -538,6 +542,8 @@ export class TranscriptionComponent implements OnInit,
         // transcription available
         this.appStorage.audio_url = json.data.url;
         this.appStorage.data_id = json.data.id;
+        console.log(`next job: ${json.data.id}`);
+        console.log(`next url: ${json.data.url}`);
 
         // change number of remaining jobs
         if (json.hasOwnProperty('message')) {

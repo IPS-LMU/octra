@@ -5,6 +5,8 @@ import {AppInfo} from '../../../app.info';
 import {IndexedDBManager} from '../../obj/IndexedDBManager';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {LocalStorageService, SessionStorage, SessionStorageService} from '@rars/ngx-webstorage';
+import {isNullOrUndefined} from '../Functions';
+import {reject} from 'q';
 
 export interface IIDBLevel {
   id: number;
@@ -609,6 +611,7 @@ export class AppStorageService {
             }
           ).catch((err) => {
             this.saving.emit('error');
+            console.error(`error on saving`);
             console.error(err);
           });
           break;
@@ -774,21 +777,25 @@ export class AppStorageService {
   }
 
   public changeAnnotationLevel(tiernum: number, level: OLevel): Promise<any> {
-    if (!(level === null || level === undefined)) {
-      if (this._annotation.length > tiernum) {
-        const id = this._annotation[tiernum].id;
+    if (!isNullOrUndefined(this._annotation)) {
+      if (!(level === null || level === undefined)) {
+        if (this._annotation.length > tiernum) {
+          const id = this._annotation[tiernum].id;
 
-        this._annotation[tiernum].level = level;
-        return this.idb.save('annotation_levels', id, this._annotation[tiernum]);
+          this._annotation[tiernum].level = level;
+          return this.idb.save('annotation_levels', id, this._annotation[tiernum]);
+        } else {
+          return new Promise((resolve, reject) => {
+            reject(new Error('number of level that should be changed is invalid'));
+          });
+        }
       } else {
         return new Promise((resolve, reject) => {
-          reject(new Error('number of level that should be changed is invalid'));
+          reject(new Error('level is undefined or null'));
         });
       }
     } else {
-      return new Promise((resolve, reject) => {
-        reject(new Error('level is undefined or null'));
-      });
+      reject(new Error('annotation object is undefined or null'));
     }
   }
 

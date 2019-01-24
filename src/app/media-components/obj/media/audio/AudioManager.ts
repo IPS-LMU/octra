@@ -195,7 +195,7 @@ export class AudioManager {
   public static decodeAudio = (filename: string, type: string, buffer: ArrayBuffer,
                                audioformats: AudioFormat[], keepbuffer = false): Promise<AudioManager> => {
     return new Promise<AudioManager>((resolve, reject) => {
-      console.log(`Decode audio... ${filename}`);
+      console.log('Decode audio... ' + filename);
 
       const audioformat: AudioFormat = AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats);
 

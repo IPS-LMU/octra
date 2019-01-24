@@ -1,7 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
-
-import {Logger} from '../Logger';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
@@ -50,7 +48,7 @@ export class AudioService {
           (manager: AudioManager) => {
             this.registerAudioManager(manager);
 
-            Logger.log('Audio (Length: ' + manager.ressource.size + ') loaded. Decode now...');
+            console.log('Audio (Length: ' + manager.ressource.size + ') loaded. Decode now...');
             this.afterloaded.emit({status: 'success'});
             callback({});
           }

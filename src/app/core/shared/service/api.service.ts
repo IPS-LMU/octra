@@ -225,24 +225,28 @@ export class APIService implements API {
   public setOnlineSessionToFree: (appStorageService) => Promise<void> = (appStorage) => {
     // check if old annotation is already annotated
     return new Promise<void>((resolve, reject) => {
-      this.fetchAnnotation(appStorage.data_id).then((json) => {
-        if (!isNullOrUndefined(json) && !isNullOrUndefined(json.data)) {
-          if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
-            this.closeSession(appStorage.user.id, appStorage.data_id, '').then(() => {
+      if (!isNullOrUndefined(appStorage.data_id) && appStorage.data_id > -1) {
+        this.fetchAnnotation(appStorage.data_id).then((json) => {
+          if (!isNullOrUndefined(json) && !isNullOrUndefined(json.data)) {
+            if (json.data.hasOwnProperty('status') && json.data.status === 'BUSY') {
+              this.closeSession(appStorage.user.id, appStorage.data_id, '').then(() => {
+                resolve();
+              }).catch((error) => {
+                reject(error);
+              });
+            } else {
               resolve();
-            }).catch((error) => {
-              reject(error);
-            });
+            }
           } else {
+            // json data is null or undefined, ignore
             resolve();
           }
-        } else {
-          // json data is null or undefined, ignore
-          resolve();
-        }
-      }).catch((error) => {
-        console.error(error);
-      });
+        }).catch((error) => {
+          console.error(error);
+        });
+      } else {
+        resolve();
+      }
     });
   }
 }

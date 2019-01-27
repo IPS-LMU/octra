@@ -52,7 +52,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       console.error = function (message) {
         let debug = '';
 
-        if (typeof debug === 'string') {
+        if (typeof message === 'string') {
           debug = message;
         } else {
           debug = (

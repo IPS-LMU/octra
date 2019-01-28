@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
 @Component({
@@ -18,6 +18,11 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
     '<secondsDur>'
   ];
 
+  @ViewChild('list') list: ElementRef;
+  @Input() fileName = '';
+
+  public clicked = -1;
+
   public get preview(): string {
     let result = '';
     for (let i = 0; i < this.resultConvention.length; i++) {
@@ -27,7 +32,7 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
       } else if (item.type === 'placeholder') {
         switch (item.value) {
           case('<name>'):
-            result += 'TestAudioFile';
+            result += (this.fileName.lastIndexOf('.') > -1) ? this.fileName.substring(0, this.fileName.lastIndexOf('.')) : this.fileName;
             break;
           case('<sequNumber>'):
             result += '01';
@@ -55,12 +60,16 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
 
   public resultConvention = [
     {
+      type: 'placeholder',
+      value: '<name>'
+    },
+    {
       type: 'text',
-      value: 'TestName_'
+      value: '_'
     },
     {
       type: 'placeholder',
-      value: '<name>'
+      value: '<sequNumber>'
     },
     {
       type: 'extension',
@@ -85,6 +94,7 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
     if (i < this.resultConvention.length - 1) {
       this.resultConvention.splice(i, 1);
     }
+    this.clicked = -1;
   }
 
   addItem(item: string) {
@@ -122,14 +132,42 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
     console.log(`keyup`);
   }
 
-  onItemClick(event) {
-    if (event.target !== document.activeElement) {
-      event.target.focus();
-      console.log('FOCUS!');
-    }
+  onItemClick(event, i) {
+    this.clicked = i;
   }
 
   onDragEnd(event) {
     console.log(`drag ended!`);
+  }
+
+  private deselect() {
+    if (window.getSelection) {
+      if (window.getSelection().empty) {  // Chrome
+        window.getSelection().empty();
+      } else if (window.getSelection().removeAllRanges) {  // Firefox
+        window.getSelection().removeAllRanges();
+      }
+    }
+  }
+
+  public get namingConvention(): string {
+    let result = '';
+    for (let i = 0; i < this.resultConvention.length; i++) {
+      const item = this.resultConvention[i];
+      if (item.type !== 'extension') {
+        result += item.value;
+      }
+    }
+
+    return result;
+  }
+
+  onKeyDown($event, text) {
+    if ($event.code === 'Enter') {
+      $event.preventDefault();
+      this.deselect();
+      this.resultConvention[this.clicked].value = text.innerText;
+      this.clicked = -1;
+    }
   }
 }

@@ -1,11 +1,12 @@
 .item {
     margin-right: 3px;
     border-radius: 3px;
+    height: 40px;
 }
 
 .pop {
     border: 1px solid gray;
-    padding: 3px 5px;
+    padding: 5px 5px;
     background-color: whitesmoke;
     border-radius: 3px;
     display: inline-block;
@@ -40,4 +41,18 @@
 /* Animate an item that has been dropped. */
 .cdk-drag-animating .deactivated {
     transition: none;
+}
+
+.namingConvention-dropdown {
+    display: inline;
+}
+
+.namingConventionDragDrop {
+    display: inline-block;
+    height: 40px;
+    margin-left: 5px;
+}
+
+.naming-convention.preview {
+    margin-top: -10px;
 }

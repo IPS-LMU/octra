@@ -1,9 +1,10 @@
 <div class="namingConventionSelection">
     <div class="namingConvention-dropdown">
         <div class="btn-group" dropdown>
-            <button id="button-basic" dropdownToggle type="button" class="btn dropdown-toggle btn-raised btn-primary"
-                    aria-controls="dropdown-basic" style="background-color:#009688;">
-                Add placeholder <span class="caret"></span>
+            <button id="button-basic" dropdownToggle type="button" class="btn btn-secondary btn-sm btn-raised"
+                    aria-controls="dropdown-basic" style="background-color:gray;">
+                Add placeholder
+                <fa-icon icon="plus"></fa-icon>
             </button>
             <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu"
                 role="menu" aria-labelledby="button-basic">
@@ -16,24 +17,30 @@
             </ul>
         </div>
     </div>
-    <div contenteditable="true">
-        test
-    </div>
     <div cdkDropList [cdkDropListOrientation]="'horizontal'" class="namingConventionDragDrop"
-         (cdkDropListDropped)="drop($event)">
+         (cdkDropListDropped)="drop($event)" #list>
         <ng-container *ngFor="let item of resultConvention; let i = index;">
-            <div cdkDrag class="pop naming-placeholder" *ngIf="item.type === 'placeholder'">
-                {{item.value}}
-                <fa-icon (click)="remove(i)" icon="times-circle"></fa-icon>
-            </div>
-            <div cdkDrag class="pop" *ngIf="item.type === 'text'" [contentEditable]="true"
-                 (cdkDragEnded)="onDragEnd($event)" (mousedown)="onItemClick($event)">
-                {{item.value}}
-                <fa-icon (click)="remove(i)" icon="times-circle"></fa-icon>
-            </div>
-            <div class="pop deactivated" *ngIf="item.type === 'extension'">
-                {{item.value}}
-            </div>
+            <ng-container *ngIf="i !== clicked">
+                <div cdkDrag class="pop naming-placeholder"
+                     *ngIf="item.type === 'placeholder'">
+                    <span style="margin-right:3px;">{{item.value}}</span>
+                    <fa-icon (click)="remove(i)" icon="times-circle"></fa-icon>
+                </div>
+                <div cdkDrag class="pop" *ngIf="item.type === 'text'"
+                     (cdkDragEnded)="onDragEnd($event)" (mouseup)="onItemClick(event, i)">
+                    <span style="margin-right:3px;">{{item.value}}</span>
+                    <fa-icon (click)="remove(i)" icon="times-circle"></fa-icon>
+                </div>
+                <div class="pop deactivated" *ngIf="item.type === 'extension'">
+                    <span style="margin-right:3px;">{{item.value}}</span>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="i === clicked">
+                <div class="pop clicked" *ngIf="item.type === 'text'" (keydown)="onKeyDown($event, text)">
+                    <span #text style="margin-right:3px;" contenteditable="true">{{item.value}}</span>
+                    <fa-icon (click)="remove(i)" icon="times-circle"></fa-icon>
+                </div>
+            </ng-container>
         </ng-container>
     </div>
     <div class="naming-convention preview">

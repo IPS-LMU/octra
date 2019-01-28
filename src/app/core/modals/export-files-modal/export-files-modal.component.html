@@ -65,32 +65,38 @@
                         </tr>
                     </ng-container>
                     <tr>
-                        <td>
+                        <td (click)="audioCuttingLine = (audioCuttingLine === 'active') ? 'inactive' : 'active'">
+                            <fa-icon style="color:gray;"
+                                     [icon]="['fas', ((audioCuttingLine === 'active') ? 'chevron-up' : 'chevron-down')]"></fa-icon>
                         </td>
                         <td (click)="splitAudio()" colspan="4">
                             <a #a>
-                                Split audio file (Alpha)
+                                Cut audio file
                             </a>
                         </td>
                     </tr>
-                    <tr>
+                    <tr [@fadeToggle]="audioCuttingLine">
                         <td></td>
                         <td colspan="4" style="padding-left:20px;">
-
-                            <div class="mb-2" style="height:20px;">
-                                <progressbar [animate]="true" [value]="cutting.progress" type="success">
-                                    <b>{{cutting.progress}}%</b>
-                                </progressbar>
+                            <div class="card" style="padding:10px;">
+                                <app-naming-drag-and-drop #namingConvention
+                                                          [fileName]="(navbarServ.transcrService !== undefined) ? navbarServ.transcrService.audiomanager.ressource.name : ''"></app-naming-drag-and-drop>
+                                <button class="btn btn-primary btn-raised" (click)="splitAudio()"
+                                        style="max-width:200px;margin-top:20px;">CUT AUDIO
+                                </button>
+                                <div class="mb-2" style="height:20px;" *ngIf="cutting.status !== 'idle'">
+                                    <progressbar [animate]="false" [value]="cutting.progress" type="success">
+                                        <b>{{cutting.progress}}%</b>
+                                    </progressbar>
+                                </div>
+                                <a style="margin-left:10px;"
+                                   *ngIf="cutting.result.url !== ''"
+                                   download="{{cutting.result.filename}}" [href]="cutting.result.url"
+                                   class="link" (click)="onDownloadClick(i)">
+                                    <fa-icon icon="save"></fa-icon>
+                                    Download
+                                </a>
                             </div>
-                            <a style="margin-left:10px;"
-                               *ngIf="cutting.result.url !== ''"
-                               download="{{cutting.result.filename}}" [href]="cutting.result.url"
-                               class="link" (click)="onDownloadClick(i)">
-                                <fa-icon icon="save"></fa-icon>
-                                Download
-                            </a>
-
-                            <app-naming-drag-and-drop></app-naming-drag-and-drop>
                         </td>
                     </tr>
                     </tbody>

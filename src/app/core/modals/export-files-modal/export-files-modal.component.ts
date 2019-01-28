@@ -1,7 +1,7 @@
 import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs/Subject';
-import {AppStorageService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {AppStorageService, AudioService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
 import {Converter, IFile} from '../../obj/Converters';
@@ -11,6 +11,7 @@ import {NavbarService} from '../../gui/navbar/navbar.service';
 import {isNullOrUndefined} from '../../shared/Functions';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
+import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
 
 @Component({
   selector: 'app-export-files-modal',
@@ -41,7 +42,12 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     backdrop: false,
     ignoreBackdropClick: false
   };
+
+  public audioCuttingLine = 'inactive';
+
   @ViewChild('modal') modal: any;
+  @ViewChild('namingConvention') namingConvention: NamingDragAndDropComponent;
+
   @Input() transcrService: TranscriptionService;
   @Input() uiService: UserInteractionsService;
   protected data = null;
@@ -68,7 +74,8 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
               public navbarServ: NavbarService,
               private modalService: BsModalService,
               private httpClient: HttpClient,
-              private appStorage: AppStorageService) {
+              private appStorage: AppStorageService,
+              private audio: AudioService) {
   }
 
   ngOnInit() {
@@ -256,24 +263,22 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     }
 
     const formData: FormData = new FormData();
-    formData.append('files', this.appStorage.file, this.transcrService.audiofile.name);
+    formData.append('files', this.audio.audiomanagers[0].ressource.info.file, this.transcrService.audiofile.name);
     formData.append('segments', JSON.stringify(cutList));
     formData.append('cuttingOptions', JSON.stringify({
       exportFormats: ['json', 'textTable'],
-      namingConvention: 'superKlappt_<sequenceNumber>'
+      namingConvention: this.namingConvention.namingConvention
     }));
 
+    this.cutting.status = 'started';
     this.httpClient
       .post('http://localhost:8080/v1/cutAudio', formData, {
         headers: {
           'authorization': '7234rhuiweafauosijfaw89e77z23t'
         }, responseType: 'json'
       }).subscribe((result: any) => {
-      console.log(`result:`);
-      console.log(result);
-
       const hash = result.data.hash;
-      const id = this.subscrmanager.add(Observable.interval(200).subscribe(
+      const id = this.subscrmanager.add(Observable.interval(500).subscribe(
         () => {
           this.httpClient.get(`http://localhost:8080/v1/tasks/${hash}`, {
             headers: {

@@ -21,6 +21,13 @@ export interface AppSettings {
       auth_token: string,
       url: string
     },
+    plugins: {
+      audioCutter: {
+        enabled: boolean,
+        authToken: string,
+        url: string
+      }
+    },
     allowed_browsers: any[],
     allowed_projects: {
       name: string,

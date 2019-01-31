@@ -64,43 +64,79 @@
                             </td>
                         </tr>
                     </ng-container>
+                    </tbody>
+                </table>
+
+                <h5>Tools</h5>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>{{'general.name' | translate}}</th>
+                        <th>{{'general.description' | translate}}</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
                     <tr>
                         <td (click)="audioCuttingLine = (audioCuttingLine === 'active') ? 'inactive' : 'active'">
                             <fa-icon style="color:gray;"
                                      [icon]="['fas', ((audioCuttingLine === 'active') ? 'chevron-up' : 'chevron-down')]"></fa-icon>
                         </td>
-                        <td (click)="splitAudio()" colspan="4">
+                        <td (click)="audioCuttingLine = (audioCuttingLine === 'active') ? 'inactive' : 'active'">
                             <a #a>
-                                Cut audio file
+                                {{'tools.cut audio.name' | translate}}
                             </a>
                         </td>
+                        <td colspan="3">{{'tools.cut audio.description' | translate}}</td>
                     </tr>
                     <tr [@fadeToggle]="audioCuttingLine">
                         <td></td>
                         <td colspan="4" style="padding-left:20px;">
-                            <div class="card" style="padding:10px;">
-                                <app-naming-drag-and-drop #namingConvention
-                                                          [fileName]="(navbarServ.transcrService !== undefined) ? navbarServ.transcrService.audiomanager.ressource.name : ''"></app-naming-drag-and-drop>
-                                <button class="btn btn-primary btn-raised" (click)="splitAudio()"
-                                        style="max-width:200px;margin-top:20px;">CUT AUDIO
-                                </button>
-                                <div class="mb-2" style="height:20px;" *ngIf="cutting.status !== 'idle'">
-                                    <progressbar [animate]="false" [value]="cutting.progress" type="success">
-                                        <b>{{cutting.progress}}%</b>
-                                    </progressbar>
+                            <div class="card" style="padding:10px;" *ngIf="navbarServ.transcrService !== undefined">
+                                <div class="configurator">
+                                    <app-naming-drag-and-drop #namingConvention
+                                                              [fileName]="navbarServ.transcrService.audiomanager.ressource.name"
+                                                              [firstSegment]="navbarServ.transcrService.currentlevel.segments.get(0)"
+                                    ></app-naming-drag-and-drop>
+
+                                    <div class="form-control">
+                                        <span>{{'tools.cut audio.append meta files' | translate}}: </span>
+                                        <div class="form-check form-check-inline"
+                                             *ngFor="let exportFormat of exportFormats; let i = index;">
+                                            <input class="form-check-input" type="checkbox" id="inlineCheckbox{{i}}"
+                                                   [value]="exportFormat.value"
+                                                   [(ngModel)]="cutting.selectedExportFormats[exportFormat.value]">
+                                            <label class="form-check-label"
+                                                   for="inlineCheckbox{{i}}">{{exportFormat.label}}</label>
+                                        </div>
+                                    </div>
                                 </div>
-                                <a style="margin-left:10px;"
-                                   *ngIf="cutting.result.url !== ''"
-                                   download="{{cutting.result.filename}}" [href]="cutting.result.url"
-                                   class="link" (click)="onDownloadClick(i)">
-                                    <fa-icon icon="save"></fa-icon>
-                                    Download
-                                </a>
+                                <div class="progress-area" style="text-align: center;">
+                                    <button class="btn btn-primary btn-raised" (click)="splitAudio()"
+                                            [disabled]="namingConvention.resultConvention.length === 1"
+                                            style="max-width:200px;margin-top:20px;">{{'tools.cut audio.name' | translate}}
+                                    </button>
+                                    <div class="mb-2" style="height:20px;" *ngIf="cutting.status !== 'idle'">
+                                        <progressbar [animate]="true" [value]="cutting.progress"
+                                                     [type]="cutting.progressbarType">
+                                            <b>{{cutting.progress}}%</b>
+                                        </progressbar>
+                                    </div>
+                                    <a style="margin-left:10px;"
+                                       *ngIf="cutting.result.url !== ''"
+                                       download="{{cutting.result.filename}}" [href]="cutting.result.url"
+                                       class="link" (click)="onDownloadClick(i)">
+                                        <fa-icon icon="save"></fa-icon>
+                                        {{'general.download' | translate}}
+                                    </a>
+                                </div>
                             </div>
                         </td>
                     </tr>
                     </tbody>
                 </table>
+
                 <span class="link" *ngIf="arraybufferExists" (click)="getAudioURI();">
                     <fa-icon icon="headphones"></fa-icon> Audio file (experimental)</span>
                 <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === 'Audio' && preparing.preparing"></i>

@@ -1,7 +1,7 @@
 import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs/Subject';
-import {AppStorageService, AudioService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
 import {Converter, IFile} from '../../obj/Converters';
@@ -60,8 +60,25 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       url: '',
       filename: ''
     },
-    status: 'idle'
-  };
+    status: 'idle',
+    progressbarType: 'info',
+    selectedExportFormats: {
+      textTable: true,
+      json: true
+    }
+  }
+  ;
+
+  public exportFormats = [
+    {
+      'label': 'TextTable',
+      'value': 'textTable'
+    },
+    {
+      'label': 'JSON',
+      'value': 'json'
+    }
+  ];
 
   public get arraybufferExists(): boolean {
     return (!(this.navbarServ.transcrService === null || this.navbarServ.transcrService === undefined)
@@ -75,7 +92,8 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
               private modalService: BsModalService,
               private httpClient: HttpClient,
               private appStorage: AppStorageService,
-              private audio: AudioService) {
+              private audio: AudioService,
+              private settService: SettingsService) {
   }
 
   ngOnInit() {
@@ -103,7 +121,6 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
   public close() {
     this.modal.hide();
-    this.visible = false;
 
     this.actionperformed.next();
   }
@@ -248,11 +265,23 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     for (let i = 0; i < this.export_states.length; i++) {
       this.export_states[i] = 'inactive';
     }
+
+    this.cutting.status = 'idle';
+    this.cutting.progressbarType = 'idle';
+    this.cutting.progress = 0;
+    this.cutting.result.filename = '';
+    this.cutting.result.url = '';
+    this.audioCuttingLine = 'inactive';
+    this.visible = false;
   }
 
   public splitAudio() {
     const cutList = [];
     let startSample = 0;
+    this.cutting.progress = 0;
+    this.cutting.progressbarType = 'info';
+    this.cutting.result.url = '';
+
     for (let i = 0; i < this.transcrService.currentlevel.segments.length; i++) {
       const segment: Segment = this.transcrService.currentlevel.segments.get(i);
       cutList.push({
@@ -262,48 +291,72 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       startSample = segment.time.originalSample.value;
     }
 
+    const exportFormats = [];
+
+    if (this.cutting.selectedExportFormats.json) {
+      exportFormats.push('json');
+    }
+    if (this.cutting.selectedExportFormats.textTable) {
+      exportFormats.push('textTable');
+    }
+
     const formData: FormData = new FormData();
     formData.append('files', this.audio.audiomanagers[0].ressource.info.file, this.transcrService.audiofile.name);
     formData.append('segments', JSON.stringify(cutList));
     formData.append('cuttingOptions', JSON.stringify({
-      exportFormats: ['json', 'textTable'],
+      exportFormats: exportFormats,
       namingConvention: this.namingConvention.namingConvention
     }));
 
     this.cutting.status = 'started';
     this.httpClient
-      .post('http://localhost:8080/v1/cutAudio', formData, {
+      .post(`${this.settService.app_settings.octra.plugins.audioCutter.url}/v1/cutAudio`, formData, {
         headers: {
           'authorization': '7234rhuiweafauosijfaw89e77z23t'
         }, responseType: 'json'
       }).subscribe((result: any) => {
-      const hash = result.data.hash;
+      const hash = result.hash;
       const id = this.subscrmanager.add(Observable.interval(500).subscribe(
         () => {
-          this.httpClient.get(`http://localhost:8080/v1/tasks/${hash}`, {
+          this.httpClient.get(`${this.settService.app_settings.octra.plugins.audioCutter.url}/v1/tasks/${hash}`, {
             headers: {
-              'authorization': '7234rhuiweafauosijfaw89e77z23t'
+              'authorization': this.settService.app_settings.octra.plugins.audioCutter.authToken
             }, responseType: 'json'
           }).subscribe((result2: any) => {
-            this.cutting.progress = (!isNullOrUndefined(result2.data.progress)) ? Math.round(result2.data.progress * 100) : 0;
-            this.cutting.status = result2.data.status;
+            this.cutting.progress = (!isNullOrUndefined(result2.progress)) ? Math.round(result2.progress * 100) : 0;
+            this.cutting.status = result2.status;
 
-            if (result2.data.status === 'finished') {
-              const url: string = result2.data['resultURL'];
+            if (result2.status === 'finished') {
+              const url: string = result2['resultURL'];
               this.cutting.result.url = url;
-              this.cutting.result.filename = url.substring(url.lastIndexOf('/')) + 1;
+              this.cutting.result.filename = url.substring(url.lastIndexOf('/') + 1);
               this.subscrmanager.remove(id);
-            } else if (result2.data.status === 'finished') {
-              alert('failed!');
+            } else if (result2.status === 'failed') {
               this.subscrmanager.remove(id);
             }
-          }, () => {
-            alert('failed!');
+
+            switch (result2.status) {
+              case ('finished'):
+                console.log(`set success!`);
+                this.cutting.progressbarType = 'success';
+                break;
+              case ('pending'):
+                this.cutting.progressbarType = 'info';
+                break;
+              case ('failed'):
+                this.cutting.progressbarType = 'danger';
+                break;
+            }
+          }, (e) => {
+            console.log(e);
             this.subscrmanager.remove(id);
           });
         }
       ));
     }, (error) => {
+      this.cutting.progressbarType = 'danger';
+      this.cutting.progress = 1;
+      this.cutting.status = 'failed';
       console.error(error);
     });
   }

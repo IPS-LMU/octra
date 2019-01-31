@@ -77,7 +77,8 @@
     "bad": "Schlecht",
     "middle": "Mittel",
     "insert comment": "Kommentar hier eingeben... (optional)",
-    "password": "Passwort"
+    "password": "Passwort",
+    "preview": "Vorschau"
   },
   "bug report": {
     "give feedback": "Feedback geben",
@@ -244,5 +245,13 @@
     "follow playcursor": "Abspielposition folgen",
     "logging": "Aktionen protkollieren",
     "show loupe": "Lupe anzeigen"
+  },
+  "tools": {
+    "cut audio": {
+      "name": "Audiodatei schneiden",
+      "description": "Hiermit kann die Audiodatei ahängig von den gesetzten Segmentgrenzen geschnitten werden.",
+      "append meta files": "Meta Dateien hinzufügen",
+      "add placeholder": "Platzhalter hinzufügen"
+    }
   }
 }

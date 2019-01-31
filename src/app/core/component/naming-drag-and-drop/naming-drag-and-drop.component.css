@@ -12,10 +12,12 @@
     display: inline-block;
     justify-content: center;
     align-items: normal;
+    cursor: grab;
 }
 
 .deactivated {
     opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .naming-placeholder {
@@ -55,4 +57,17 @@
 
 .naming-convention.preview {
     margin-top: -10px;
+}
+
+.ng-fa-icon {
+    cursor: default;
+}
+
+:host {
+    padding: 5px;
+    display: block;
+    background-color: whitesmoke;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
 }

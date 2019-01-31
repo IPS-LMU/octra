@@ -1,5 +1,7 @@
 import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
+import {Segment} from '../../obj/Annotation';
+import {isNullOrUndefined} from '../../shared/Functions';
 
 @Component({
   selector: 'app-naming-drag-and-drop',
@@ -20,38 +22,42 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
 
   @ViewChild('list') list: ElementRef;
   @Input() fileName = '';
+  @Input() firstSegment: Segment;
 
   public clicked = -1;
 
   public get preview(): string {
     let result = '';
-    for (let i = 0; i < this.resultConvention.length; i++) {
-      const item = this.resultConvention[i];
-      if (item.type === 'text') {
-        result += item.value;
-      } else if (item.type === 'placeholder') {
-        switch (item.value) {
-          case('<name>'):
-            result += (this.fileName.lastIndexOf('.') > -1) ? this.fileName.substring(0, this.fileName.lastIndexOf('.')) : this.fileName;
-            break;
-          case('<sequNumber>'):
-            result += '01';
-            break;
-          case('<sampleStart>'):
-            result += '324123';
-            break;
-          case('<sampleDur>'):
-            result += '231423';
-            break;
-          case('<secondsStart>'):
-            result += '12.123123123';
-            break;
-          case('<secondsDur>'):
-            result += '12.21312312';
-            break;
+    if (!isNullOrUndefined(this.firstSegment)) {
+      for (let i = 0; i < this.resultConvention.length; i++) {
+        const item = this.resultConvention[i];
+        if (item.type === 'text') {
+          result += item.value;
+        } else if (item.type === 'placeholder') {
+          switch (item.value) {
+            case('<name>'):
+              result += (this.fileName.lastIndexOf('.') > -1) ? this.fileName.substring(0, this.fileName.lastIndexOf('.')) : this.fileName;
+              break;
+            case('<sequNumber>'):
+              result += '01';
+              break;
+            case('<sampleStart>'):
+              result += '0';
+              break;
+            case('<sampleDur>'):
+              result += this.firstSegment.time.originalSample.value.toString();
+              break;
+            case('<secondsStart>'):
+              result += '0';
+              break;
+            case('<secondsDur>'):
+              result += (Math.round((this.firstSegment.time.originalSample.seconds * 10000)) / 10000)
+                .toString().replace('.', ',');
+              break;
+          }
+        } else if (item.type === 'extension') {
+          result += item.value;
         }
-      } else if (item.type === 'extension') {
-        result += item.value;
       }
     }
 

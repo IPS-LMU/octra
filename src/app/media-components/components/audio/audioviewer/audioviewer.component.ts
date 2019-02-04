@@ -480,6 +480,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                             });
                           }
                         } else {
+                          // TODO check this case again!
+                          console.log(`segment invisible error: can't play because start and endtime not between the audiochunk time`);
                           this.alerttriggered.emit({
                             type: 'error',
                             message: this.langService.instant('segment invisible')
@@ -1580,14 +1582,17 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             });
           }
         }
+
         successcallback(posY1, posY2);
 
         return true;
       } else {
+        console.log(`segment invisible error: start and endtime not between the audiochunk time`);
         errorcallback();
       }
       return false;
     } else {
+      console.log(`segment invisible error: seg-index is -1`);
       errorcallback();
     }
     return false;

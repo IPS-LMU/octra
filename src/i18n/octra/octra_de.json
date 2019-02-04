@@ -251,7 +251,9 @@
       "name": "Audiodatei schneiden",
       "description": "Hiermit kann die Audiodatei ahängig von den gesetzten Segmentgrenzen geschnitten werden.",
       "append meta files": "Meta Dateien hinzufügen",
-      "add placeholder": "Platzhalter hinzufügen"
+      "add placeholder": "Platzhalter hinzufügen",
+      "hide configurator": "Verstecke den Konfigurator",
+      "show configurator": "Zeige den Konfigurator"
     }
   }
 }

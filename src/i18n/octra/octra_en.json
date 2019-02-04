@@ -251,7 +251,9 @@
       "name": "Cut audio file",
       "description": "This tool offers to cut the audio file to sequences depending on the created segments.",
       "append meta files": "Append meta files",
-      "add placeholder": "Add placeholder"
+      "add placeholder": "Add placeholder",
+      "hide configurator": "Hide configurator",
+      "show configurator": "Show configurator"
     }
   }
 }

@@ -39,7 +39,7 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
       }).then(
         () => {
           alert('All cleared. The app will be reloaded.');
-          document.location.reload(true);
+          document.location.reload();
         }
       );
     } else if (this.appStorage.usemode === 'online') {
@@ -51,7 +51,7 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
         }).then(
           () => {
             alert('All cleared. The app will be reloaded.');
-            document.location.reload(true);
+            document.location.reload();
           }
         );
       }).catch((error) => {
@@ -65,7 +65,7 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
       }).then(
         () => {
           alert('All cleared. The app will be reloaded.');
-          document.location.reload(true);
+          document.location.reload();
         }
       );
     }

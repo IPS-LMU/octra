@@ -1,7 +1,8 @@
-import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {Segment} from '../../obj/Annotation';
 import {isNullOrUndefined} from '../../shared/Functions';
+import {Subject} from 'rxjs';
 
 @Component({
   selector: 'app-naming-drag-and-drop',
@@ -24,6 +25,7 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
   @Input() fileName = '';
   @Input() firstSegment: Segment;
 
+  @Output() namingConventionchanged: Subject<string> = new Subject<string>();
   public clicked = -1;
 
   public get preview(): string {
@@ -93,12 +95,14 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
   drop(event: CdkDragDrop<string[]>) {
     if (event.previousIndex < this.resultConvention.length - 1) {
       moveItemInArray(this.resultConvention, event.previousIndex, event.currentIndex);
+      this.namingConventionchanged.next(this.namingConvention);
     }
   }
 
   remove(i: number) {
     if (i < this.resultConvention.length - 1) {
       this.resultConvention.splice(i, 1);
+      this.namingConventionchanged.next(this.namingConvention);
     }
     this.clicked = -1;
   }
@@ -116,6 +120,7 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
       });
     }
     this.sortItems();
+    this.namingConventionchanged.next(this.namingConvention);
   }
 
   ngAfterViewInit() {

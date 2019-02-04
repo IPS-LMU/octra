@@ -1,0 +1,73 @@
+.item {
+    margin-right: 3px;
+    border-radius: 3px;
+    height: 40px;
+}
+
+.pop {
+    border: 1px solid gray;
+    padding: 5px 5px;
+    background-color: whitesmoke;
+    border-radius: 3px;
+    display: inline-block;
+    justify-content: center;
+    align-items: normal;
+    cursor: grab;
+}
+
+.deactivated {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.naming-placeholder {
+    border: 1px solid cornflowerblue;
+    background-color: lightblue;
+}
+
+/* Animate items as they’re being sorted. */
+.cdk-drop-list-dragging .cdk-drag {
+    transition: transform 250ms cubic-bezier(0.2, 0, 1, 0);
+}
+
+/* Animate an item that has been dropped. */
+.cdk-drag-animating {
+    transition: transform 300ms cubic-bezier(0.2, 0, 1, 0);
+}
+
+/* Animate items as they’re being sorted. */
+.cdk-drop-list-dragging .cdk-drag .deactivated {
+    transition: none;
+}
+
+/* Animate an item that has been dropped. */
+.cdk-drag-animating .deactivated {
+    transition: none;
+}
+
+.namingConvention-dropdown {
+    display: inline;
+}
+
+.namingConventionDragDrop {
+    display: inline-block;
+    height: 40px;
+    margin-left: 5px;
+}
+
+.naming-convention.preview {
+    margin-top: -10px;
+}
+
+.ng-fa-icon {
+    cursor: default;
+}
+
+:host {
+    padding: 5px;
+    display: block;
+    background-color: whitesmoke;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}

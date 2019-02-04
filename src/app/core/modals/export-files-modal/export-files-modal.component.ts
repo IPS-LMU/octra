@@ -1,14 +1,17 @@
 import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs/Subject';
-import {TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
 import {Converter, IFile} from '../../obj/Converters';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
-import {OCTRANIMATIONS} from '../../shared';
+import {OCTRANIMATIONS, Segment} from '../../shared';
 import {NavbarService} from '../../gui/navbar/navbar.service';
 import {isNullOrUndefined} from '../../shared/Functions';
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs';
+import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
 
 @Component({
   selector: 'app-export-files-modal',
@@ -39,7 +42,38 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     backdrop: false,
     ignoreBackdropClick: false
   };
+
+  public tools = {
+    audioCutting: {
+      opened: false,
+      progress: 0,
+      result: {
+        url: '',
+        filename: ''
+      },
+      status: 'idle',
+      message: '',
+      progressbarType: 'info',
+      showConfigurator: false,
+      subscriptionIDs: [-1, -1],
+      exportFormats: [
+        {
+          label: 'TextTable',
+          value: 'textTable',
+          selected: false
+        },
+        {
+          label: 'JSON',
+          value: 'json',
+          selected: false
+        }
+      ]
+    }
+  };
+
   @ViewChild('modal') modal: any;
+  @ViewChild('namingConvention') namingConvention: NamingDragAndDropComponent;
+
   @Input() transcrService: TranscriptionService;
   @Input() uiService: UserInteractionsService;
   protected data = null;
@@ -53,7 +87,13 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       && this.navbarServ.transcrService.audiomanager.ressource.arraybuffer.byteLength > 0);
   }
 
-  constructor(private sanitizer: DomSanitizer, private navbarServ: NavbarService, private modalService: BsModalService) {
+  constructor(private sanitizer: DomSanitizer,
+              public navbarServ: NavbarService,
+              private modalService: BsModalService,
+              private httpClient: HttpClient,
+              private appStorage: AppStorageService,
+              private audio: AudioService,
+              private settService: SettingsService) {
   }
 
   ngOnInit() {
@@ -76,12 +116,12 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
           reject(err);
         }
       );
+
     });
   }
 
   public close() {
     this.modal.hide();
-    this.visible = false;
 
     this.actionperformed.next();
   }
@@ -226,5 +266,121 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     for (let i = 0; i < this.export_states.length; i++) {
       this.export_states[i] = 'inactive';
     }
+
+    this.tools.audioCutting.status = 'idle';
+    this.tools.audioCutting.progressbarType = 'idle';
+    this.tools.audioCutting.progress = 0;
+    this.tools.audioCutting.result.filename = '';
+    this.tools.audioCutting.result.url = '';
+    this.tools.audioCutting.opened = false;
+    this.tools.audioCutting.subscriptionIDs = [-1, -1];
+    this.visible = false;
+    this.subscrmanager.destroy();
+  }
+
+  public splitAudio() {
+    const cutList = [];
+    let startSample = 0;
+    this.tools.audioCutting.progress = 0;
+    this.tools.audioCutting.progressbarType = 'info';
+    this.tools.audioCutting.result.url = '';
+
+    for (let i = 0; i < this.transcrService.currentlevel.segments.length; i++) {
+      const segment: Segment = this.transcrService.currentlevel.segments.get(i);
+      cutList.push({
+        sampleStart: startSample,
+        sampleDur: segment.time.originalSample.value - startSample
+      });
+      startSample = segment.time.originalSample.value;
+    }
+
+    const exportFormats = [];
+
+    if (this.tools.audioCutting.exportFormats[0].selected) {
+      exportFormats.push('json');
+    }
+    if (this.tools.audioCutting.exportFormats[1].selected) {
+      exportFormats.push('textTable');
+    }
+
+    const formData: FormData = new FormData();
+    formData.append('files', this.audio.audiomanagers[0].ressource.info.file, this.transcrService.audiofile.name);
+    formData.append('segments', JSON.stringify(cutList));
+    formData.append('cuttingOptions', JSON.stringify({
+      exportFormats: exportFormats,
+      namingConvention: this.namingConvention.namingConvention
+    }));
+
+    this.tools.audioCutting.status = 'started';
+    this.tools.audioCutting.subscriptionIDs[0] = this.subscrmanager.add(
+      this.httpClient.post(`${this.settService.app_settings.octra.plugins.audioCutter.url}/v1/cutAudio`, formData, {
+        headers: {
+          'authorization': '7234rhuiweafauosijfaw89e77z23t'
+        }, responseType: 'json'
+      }).subscribe((result: any) => {
+        const hash = result.hash;
+        this.tools.audioCutting.subscriptionIDs[1] = this.subscrmanager.add(Observable.interval(500).subscribe(
+          () => {
+            this.httpClient.get(`${this.settService.app_settings.octra.plugins.audioCutter.url}/v1/tasks/${hash}`, {
+              headers: {
+                'authorization': this.settService.app_settings.octra.plugins.audioCutter.authToken
+              }, responseType: 'json'
+            }).subscribe((result2: any) => {
+              this.tools.audioCutting.progress = (!isNullOrUndefined(result2.progress)) ? Math.round(result2.progress * 100) : 0;
+              this.tools.audioCutting.status = result2.status;
+
+              if (result2.status === 'finished') {
+                const url: string = result2['resultURL'];
+                this.tools.audioCutting.result.url = url;
+                this.tools.audioCutting.result.filename = url.substring(url.lastIndexOf('/') + 1);
+                this.subscrmanager.remove(this.tools.audioCutting.subscriptionIDs[1]);
+                this.tools.audioCutting.subscriptionIDs[1] = -1;
+              } else if (result2.status === 'failed') {
+                this.subscrmanager.remove(this.tools.audioCutting.subscriptionIDs[1]);
+                this.tools.audioCutting.subscriptionIDs[1] = -1;
+              }
+
+              switch (result2.status) {
+                case ('finished'):
+                  console.log(`set success!`);
+                  this.tools.audioCutting.progressbarType = 'success';
+                  break;
+                case ('pending'):
+                  this.tools.audioCutting.progressbarType = 'info';
+                  break;
+                case ('failed'):
+                  this.tools.audioCutting.progressbarType = 'danger';
+                  this.tools.audioCutting.progress = 100;
+                  this.tools.audioCutting.status = 'failed';
+                  this.tools.audioCutting.message = (!isNullOrUndefined(result2.message) && result2.message !== '') ? result2.message : '';
+                  break;
+              }
+            }, (e) => {
+              console.log(e);
+              this.subscrmanager.remove(this.tools.audioCutting.subscriptionIDs[1]);
+              this.tools.audioCutting.subscriptionIDs[1] = -1;
+            });
+          }
+        ));
+      }, (error) => {
+        this.tools.audioCutting.progressbarType = 'danger';
+        this.tools.audioCutting.progress = 100;
+        this.tools.audioCutting.status = 'failed';
+        this.tools.audioCutting.message = 'API not available. Please send a message via the feedback form.';
+        console.error(error);
+      }));
+  }
+
+  public stopAudioSplitting() {
+    for (let i = 0; i < this.tools.audioCutting.subscriptionIDs.length; i++) {
+      const subscriptionID = this.tools.audioCutting.subscriptionIDs[i];
+
+      if (subscriptionID > -1) {
+        this.subscrmanager.remove(subscriptionID);
+      }
+      this.tools.audioCutting.subscriptionIDs[i] = -1;
+    }
+
+    this.tools.audioCutting.status = 'idle';
   }
 }

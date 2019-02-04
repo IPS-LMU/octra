@@ -20,6 +20,7 @@ export class AudioManager {
   get lastUpdate(): number {
     return this._lastUpdate;
   }
+
   get bufferedOLA(): any {
     return this._bufferedOLA;
   }
@@ -214,9 +215,7 @@ export class AudioManager {
           const buffer_length = buffer.byteLength;
           let buffer_copy = null;
 
-          if (keepbuffer) {
-            buffer_copy = buffer.slice(0);
-          }
+          buffer_copy = buffer.slice(0);
           AudioManager.decodeAudioFile(buffer, audioinfo.samplerate).then((audiobuffer: AudioBuffer) => {
 
             console.log(`audio decoded, samplerate ${audioinfo.samplerate}, ${audiobuffer.sampleRate}`);
@@ -230,9 +229,11 @@ export class AudioManager {
             audioinfo = new AudioInfo(filename, type, buffer_length, audiobuffer.sampleRate,
               audiobuffer.length, audiobuffer.numberOfChannels, audioinfo.bitrate);
 
+            audioinfo.file = new File([buffer_copy], filename, {type: 'audio/wav'});
             result.setRessource(new AudioRessource(filename, SourceType.ArrayBuffer,
-              audioinfo, (buffer_copy === null) ? buffer : buffer_copy, audiobuffer, buffer_length));
+              audioinfo, buffer, audiobuffer, buffer_length));
 
+            console.log(result.ressource);
             // set duration is very important
             result.ressource.info.duration.browserSample.value = audiobuffer.length;
             console.log(`duration browser: ${result.ressource.info.duration.browserSample.seconds}`);

@@ -165,7 +165,7 @@ export class AudioviewerConfig {
 
   public disabled_keys = ['SHIFT + SPACE'];
   public timeline: {
-    enabled: false,
+    enabled: boolean,
     height: number,
     fontSize: number,
     fontWeight: string,

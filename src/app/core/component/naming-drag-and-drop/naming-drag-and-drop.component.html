@@ -1,0 +1,50 @@
+<div class="namingConventionSelection">
+    <div class="namingConvention-dropdown">
+        <div class="btn-group" dropdown>
+            <button id="button-basic" dropdownToggle type="button" class="btn btn-secondary btn-sm btn-raised"
+                    aria-controls="dropdown-basic" style="background-color:gray;">
+                {{"tools.cut audio.add placeholder" | translate}}
+                <fa-icon icon="plus"></fa-icon>
+            </button>
+            <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu"
+                role="menu" aria-labelledby="button-basic">
+                <li role="menuitem">
+                    <a class="dropdown-item" *ngFor="let item of namingConventionArray;let i = index;"
+                       (click)="addItem(item)">
+                        {{item}}
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div cdkDropList [cdkDropListOrientation]="'horizontal'" class="namingConventionDragDrop"
+         (cdkDropListDropped)="drop($event)" #list>
+        <ng-container *ngFor="let item of resultConvention; let i = index;">
+            <ng-container *ngIf="i !== clicked">
+                <div cdkDrag class="pop naming-placeholder"
+                     *ngIf="item.type === 'placeholder'">
+                    <span style="margin-right:3px;">{{item.value}}</span>
+                    <fa-icon (click)="remove(i)" icon="times-circle"></fa-icon>
+                </div>
+                <div cdkDrag class="pop" *ngIf="item.type === 'text'"
+                     (cdkDragEnded)="onDragEnd($event)" (mouseup)="onItemClick(event, i)">
+                    <span style="margin-right:3px;">{{item.value}}</span>
+                    <fa-icon (click)="remove(i)" icon="times-circle"></fa-icon>
+                </div>
+                <div class="pop deactivated" *ngIf="item.type === 'extension'">
+                    <span style="margin-right:3px;">{{item.value}}</span>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="i === clicked">
+                <div class="pop clicked" *ngIf="item.type === 'text'" (keydown)="onKeyDown($event, text)">
+                    <span #text style="margin-right:3px;" contenteditable="true">{{item.value}}</span>
+                    <fa-icon (click)="remove(i)" icon="times-circle"></fa-icon>
+                </div>
+            </ng-container>
+        </ng-container>
+    </div>
+    <div class="naming-convention preview">
+        <span>{{"general.preview" | translate}}:</span>
+        {{preview}}
+    </div>
+</div>

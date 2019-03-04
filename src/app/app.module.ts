@@ -88,7 +88,7 @@ import {
   faWindowMaximize
 } from '@fortawesome/free-solid-svg-icons';
 // modules
-import {ModalModule} from 'ngx-bootstrap';
+import {ButtonsModule, ModalModule} from 'ngx-bootstrap';
 import {YesNoModalComponent} from './core/modals/yes-no-modal/yes-no-modal.component';
 import {ModalService} from './core/modals/modal.service';
 import {BugreportModalComponent} from './core/modals/bugreport-modal/bugreport-modal.component';
@@ -205,7 +205,8 @@ export const ngmodule = {
     BrowserAnimationsModule,
     ReactiveFormsModule,
     MediaComponentsModule,
-    routing
+    routing,
+    ButtonsModule.forRoot()
   ],
   bootstrap: [
     AppComponent

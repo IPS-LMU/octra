@@ -162,6 +162,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     this.viewer.Settings.margin.right = 20;
     this.viewer.Settings.round_values = false;
     this.viewer.Settings.step_width_ratio = (this.viewer.Settings.pixel_per_sec / this.audiomanager.ressource.info.samplerate);
+    this.viewer.Settings.showTimePerLine = true;
 
     this.viewer.alerttriggered.subscribe(
       (result) => {
@@ -212,6 +213,17 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       }
     ));
 
+    this.subscrmanager.add(this.appStorage.settingschange.subscribe(
+      (event) => {
+        switch (event.key) {
+          case('secondsPerLine'):
+            console.log(event);
+            this.viewer.onSecondsPerLineUpdated(event.value);
+            break;
+        }
+      }
+    ));
+
     TwoDEditorComponent.initialized.emit();
   }
 
@@ -242,7 +254,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     if (this.appStorage.show_loupe) {
       this.loupe.zoomY = this.factor;
     }
-    this.viewer.update(true);
+    this.viewer.onSecondsPerLineUpdated(this.appStorage.secondsPerLine);
   }
 
   ngAfterContentChecked() {

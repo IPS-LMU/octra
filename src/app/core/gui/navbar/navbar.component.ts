@@ -71,6 +71,8 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     }).length > 0);
   }
 
+  public secondsPerLine: number;
+
   constructor(public appStorage: AppStorageService,
               public navbarServ: NavbarService,
               public sanitizer: DomSanitizer,
@@ -255,5 +257,10 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public selectLevel(tiernum: number) {
     this.transcrServ.selectedlevel = tiernum;
+  }
+
+  public changeSecondsPerLine(seconds: number) {
+    console.log(`set seconds to ${seconds}`);
+    this.appStorage.secondsPerLine = seconds;
   }
 }

@@ -15,7 +15,8 @@
 .graphicscanvas,
 .mousecanvas,
 .playcanvas,
-.overlaycanvas {
+.overlaycanvas,
+.textcanvas {
     position: absolute;
     user-select: none;
     -webkit-user-select: none;
@@ -32,12 +33,16 @@
     z-index: 2;
 }
 
-.mousecanvas {
+.textcanvas {
     z-index: 3;
 }
 
-.playcanvas {
+.mousecanvas {
     z-index: 4;
+}
+
+.playcanvas {
+    z-index: 5;
     cursor: default;
 }
 

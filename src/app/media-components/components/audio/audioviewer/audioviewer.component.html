@@ -14,6 +14,7 @@
     <canvas class="graphicscanvas" #graphicscan=audioview
             appAudioviewer></canvas>
     <canvas class="overlaycanvas" #overlaycan=audioview appAudioviewer></canvas>
+    <canvas class="textcanvas" #textcan=audioview appAudioviewer></canvas>
     <canvas class="playcanvas" [ngClass]="{dragable: (av.overboundary)}" #playcan=audioview appAudioviewer
             (mousedown)="onClick($event)"
             (mouseup)="onClick($event)"

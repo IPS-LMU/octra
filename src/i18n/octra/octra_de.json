@@ -243,6 +243,7 @@
     "play on hover": "Audiowiedergabe bei Mausbewegung",
     "follow playcursor": "Abspielposition folgen",
     "logging": "Aktionen protkollieren",
-    "show loupe": "Lupe anzeigen"
+    "show loupe": "Lupe anzeigen",
+    "seconds per line": "Sekunden je Zeile"
   }
 }

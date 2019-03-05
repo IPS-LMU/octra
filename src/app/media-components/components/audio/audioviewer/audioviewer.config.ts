@@ -186,4 +186,5 @@ export class AudioviewerConfig {
   public round_values = true;
 
   public showTimePerLine = false;
+  public showTranscripts = false;
 }

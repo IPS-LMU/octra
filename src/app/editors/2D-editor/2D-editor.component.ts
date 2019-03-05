@@ -163,6 +163,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     this.viewer.Settings.round_values = false;
     this.viewer.Settings.step_width_ratio = (this.viewer.Settings.pixel_per_sec / this.audiomanager.ressource.info.samplerate);
     this.viewer.Settings.showTimePerLine = true;
+    this.viewer.Settings.showTranscripts = true;
 
     this.viewer.alerttriggered.subscribe(
       (result) => {

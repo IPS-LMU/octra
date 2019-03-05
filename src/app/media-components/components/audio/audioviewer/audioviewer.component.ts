@@ -29,6 +29,7 @@ import {Line} from '../../../obj/Line';
 import {BrowserInfo, Logger} from '../../../../core/shared';
 import {Segment} from '../../../../core/obj/Annotation/Segment';
 import {Timespan2Pipe} from '../../../pipe/timespan2.pipe';
+import {isNullOrUndefined} from '../../../../core/shared/Functions';
 
 @Component({
   selector: 'app-audioviewer',
@@ -277,6 +278,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     const line_obj = this.av.LinesArray[line_num];
     const timeline_height = (this.Settings.timeline.enabled) ? this.Settings.timeline.height : 0;
 
+    console.log(`DRAW SIGNAL`);
     if (!(line_obj === null || line_obj === undefined)) {
       // line_obj found
       const midline = Math.round((this.Settings.lineheight - timeline_height) / 2);
@@ -1245,66 +1247,105 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 drawn_segments++;
                 this.o_context.fillRect(x + this.Settings.margin.left, line.Pos.y - this.av.viewRect.position.y, w, h);
 
-                // draw text
-                this.t_context.globalAlpha = 0.75;
-                this.t_context.fillStyle = 'white';
-                this.t_context.fillRect(x + this.Settings.margin.left, line.Pos.y - this.av.viewRect.position.y + line.Size.height - 5 - 11, w, 18);
-                this.t_context.globalAlpha = 1;
-                this.t_context.fillStyle = 'black';
-                this.t_context.font = '11px Arial';
-                this.t_context.textAlign = 'center';
+                if (this.Settings.showTranscripts) {
+                  // draw text
+                  this.t_context.globalAlpha = 0.75;
+                  this.t_context.fillStyle = 'white';
+                  this.t_context.fillRect(x + this.Settings.margin.left, line.Pos.y - this.av.viewRect.position.y + line.Size.height - 5 - 11, w, 18);
+                  this.t_context.globalAlpha = 1;
+                  this.t_context.fillStyle = 'black';
+                  this.t_context.font = '11px Arial';
+                  this.t_context.textAlign = 'center';
 
-                const text = segment.transcript;
+                  const text = segment.transcript;
 
-                if (line_num1 === line_num2) {
-                  if (text !== '') {
-                    const textLength = this.o_context.measureText(text).width;
-                    let newText = text;
-                    // segment in same line
-                    if (textLength > w) {
-                      // crop text
-                      const overflow = textLength / w - 1;
-                      const leftHalf = (1 - overflow) / 2;
-                      newText = text.substring(0, Math.floor(text.length * leftHalf) - 1);
-                      newText += '...';
-                      newText += text.substring(Math.round(text.length * leftHalf) + Math.round(text.length * overflow) + 1);
-                    }
-                    this.t_context.fillText(newText, x + this.Settings.margin.left + 2 + w / 2, line.Pos.y - this.av.viewRect.position.y + line.Size.height - 5);
-
-                  }
-                } else {
-                  const totalWidth = this.av.audioTCalculator.samplestoAbsX(segment.time.samples - begin.time.samples);
-                  console.log(`segment ${i} width is ${totalWidth}`);
-
-                  if (j === line_num1) {
-                    // current line is start line
-                    const ratio = w / totalWidth;
-                    console.log(`start ratio of segment ${i} is: ${ratio}`);
-
-                    // crop text
+                  if (line_num1 === line_num2) {
                     if (text !== '') {
-                      let newText = text.substring(0, Math.floor(text.length * ratio) - 2);
-                      const textLength = this.o_context.measureText(newText).width;
-
+                      const textLength = this.o_context.measureText(text).width;
+                      let newText = text;
+                      // segment in same line
                       if (textLength > w) {
                         // crop text
                         const overflow = textLength / w - 1;
-                        const leftHalf = w / textLength;
-                        newText = newText.substring(0, Math.floor(newText.length * leftHalf) - 2);
+                        const leftHalf = (1 - overflow) / 2;
+                        newText = text.substring(0, Math.floor(text.length * leftHalf) - 1);
+                        newText += '...';
+                        newText += text.substring(Math.round(text.length * leftHalf) + Math.round(text.length * overflow) + 1);
                       }
-                      lastI = newText.length;
-                      newText += '...';
-
                       this.t_context.fillText(newText, x + this.Settings.margin.left + 2 + w / 2, line.Pos.y - this.av.viewRect.position.y + line.Size.height - 5);
-                    }
-                  } else if (j === line_num2) {
-                    // current line is end line
-                    const ratio = w / totalWidth;
-                    console.log(`end ratio of segment ${i} is: ${ratio}`);
 
-                    // crop text
-                    if (text !== '') {
-                      let newText = text.substring(lastI);
+                    }
+                  } else {
+                    const totalWidth = this.av.audioTCalculator.samplestoAbsX(segment.time.samples - begin.time.samples);
+
+                    if (j === line_num1) {
+                      // current line is start line
+                      const ratio = w / totalWidth;
+
+                      // crop text
+                      if (text !== '') {
+                        let newText = text.substring(0, Math.floor(text.length * ratio) - 2);
+                        const textLength = this.o_context.measureText(newText).width;
+
+                        if (textLength > w) {
+                          // crop text
+                          const overflow = textLength / w - 1;
+                          const leftHalf = w / textLength;
+                          newText = newText.substring(0, Math.floor(newText.length * leftHalf) - 2);
+                        }
+                        lastI = newText.length;
+                        newText += '...';
+
+                        this.t_context.fillText(newText, x + this.Settings.margin.left + 2 + w / 2, line.Pos.y - this.av.viewRect.position.y + line.Size.height - 5);
+                      }
+                    } else if (j === line_num2) {
+                      // current line is end line
+                      const ratio = w / totalWidth;
+
+                      // crop text
+                      if (text !== '') {
+                        let newText = text.substring(lastI);
+
+                        const textLength = this.o_context.measureText(newText).width;
+
+                        if (textLength > w) {
+                          // crop text
+                          const leftHalf = w / textLength;
+                          newText = newText.substring(0, Math.floor(newText.length * leftHalf) - 3);
+                          newText = '...' + newText + '...';
+                        } else if (segment.transcript !== this.transcr.break_marker.code) {
+                          newText = '...' + newText;
+                        } else {
+                          newText = segment.transcript;
+                        }
+
+                        this.t_context.fillText(newText, x + this.Settings.margin.left + 2 + w / 2, line.Pos.y - this.av.viewRect.position.y + line.Size.height - 5);
+                      }
+                      lastI = 0;
+                    } else if (text !== '') {
+                      let w2 = 0;
+
+                      if (line_num1 > -1) {
+                        const lastPart = this.av.getRelativeSelectionByLine(this.av.LinesArray[line_num1], begin.time.samples, segments[i].time.samples, this._innerWidth);
+
+                        if (lastPart.start > -1 && lastPart.end > -1) {
+                          w2 = Math.abs(lastPart.end - lastPart.start);
+                        }
+                        if (lastPart.end < 1) {
+                          w2 = 0;
+                        }
+                        if (lastPart.end < 1 || lastPart.end > this.av.LinesArray[line_num1].Size.width) {
+                          w2 = lastPart.end;
+                        }
+                      }
+
+                      const ratio = w / totalWidth;
+
+                      const startRatio = Math.floor(((j - line_num1 - 1) * this._innerWidth + w2) / totalWidth);
+                      const endIndex = lastI + Math.floor(text.length * ratio);
+
+                      // placeholder
+                      let newText = text.substring(lastI, endIndex);
 
                       const textLength = this.o_context.measureText(newText).width;
 
@@ -1312,60 +1353,17 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                         // crop text
                         const leftHalf = w / textLength;
                         newText = newText.substring(0, Math.floor(newText.length * leftHalf) - 3);
+                      }
+                      lastI += newText.length;
+
+                      if (segment.transcript !== this.transcr.break_marker.code) {
                         newText = '...' + newText + '...';
-                      } else if (segment.transcript !== this.transcr.break_marker.code) {
-                        newText = '...' + newText;
                       } else {
                         newText = segment.transcript;
                       }
 
                       this.t_context.fillText(newText, x + this.Settings.margin.left + 2 + w / 2, line.Pos.y - this.av.viewRect.position.y + line.Size.height - 5);
                     }
-                    lastI = 0;
-                  } else if (text !== '') {
-                    let w2 = 0;
-
-                    if (line_num1 > -1) {
-                      const lastPart = this.av.getRelativeSelectionByLine(this.av.LinesArray[line_num1], begin.time.samples, segments[i].time.samples, this._innerWidth);
-
-                      if (lastPart.start > -1 && lastPart.end > -1) {
-                        w2 = Math.abs(lastPart.end - lastPart.start);
-                      }
-                      if (lastPart.end < 1) {
-                        w2 = 0;
-                      }
-                      if (lastPart.end < 1 || lastPart.end > this.av.LinesArray[line_num1].Size.width) {
-                        w2 = lastPart.end;
-                      }
-                    }
-
-                    const ratio = w / totalWidth;
-                    console.log(`between ${j - line_num1 - 1} ratio of segment ${i} is: ${ratio}`);
-
-                    const startRatio = Math.floor(((j - line_num1 - 1) * this._innerWidth + w2) / totalWidth);
-                    const endIndex = lastI + Math.floor(text.length * ratio);
-
-                    console.log(`between ${startRatio}, ${ratio + startRatio}`);
-
-                    // placeholder
-                    let newText = text.substring(lastI, endIndex);
-
-                    const textLength = this.o_context.measureText(newText).width;
-
-                    if (textLength > w) {
-                      // crop text
-                      const leftHalf = w / textLength;
-                      newText = newText.substring(0, Math.floor(newText.length * leftHalf) - 3);
-                    }
-                    lastI += newText.length;
-
-                    if (segment.transcript !== this.transcr.break_marker.code) {
-                      newText = '...' + newText + '...';
-                    } else {
-                      newText = segment.transcript;
-                    }
-
-                    this.t_context.fillText(newText, x + this.Settings.margin.left + 2 + w / 2, line.Pos.y - this.av.viewRect.position.y + line.Size.height - 5);
                   }
                 }
               }
@@ -1413,25 +1411,27 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           for (let j = this.av.visibleLines.start; j <= this.av.visibleLines.end; j++) {
             const line = this.av.LinesArray[j];
 
-            // draw time label
-            const startSecond = line.number * this.secondsPerLine;
-            const endSecond = Math.min(startSecond + this.secondsPerLine, this.audiochunk.time.duration.seconds);
+            if (!isNullOrUndefined(line)) {
+              // draw time label
+              const startSecond = line.number * this.secondsPerLine;
+              const endSecond = Math.min(startSecond + this.secondsPerLine, this.audiochunk.time.duration.seconds);
 
-            // start time
-            this.t_context.font = '10px Arial';
-            this.t_context.fillStyle = 'black';
-            const pipe = new Timespan2Pipe();
-            this.t_context.fillText(pipe.transform(startSecond * 1000), line.Pos.x + 22, line.Pos.y + 10 - this.av.viewRect.position.y);
+              // start time
+              this.t_context.font = '10px Arial';
+              this.t_context.fillStyle = 'black';
+              const pipe = new Timespan2Pipe();
+              this.t_context.fillText(pipe.transform(startSecond * 1000), line.Pos.x + 22, line.Pos.y + 10 - this.av.viewRect.position.y);
 
-            // end time
-            const length = this.t_context.measureText(pipe.transform(endSecond * 1000)).width;
-            this.t_context.fillText(pipe.transform(endSecond * 1000), line.Pos.x + line.Size.width - length + 15, line.Pos.y + 10 - this.av.viewRect.position.y);
+              // end time
+              const length = this.t_context.measureText(pipe.transform(endSecond * 1000)).width;
+              this.t_context.fillText(pipe.transform(endSecond * 1000), line.Pos.x + line.Size.width - length + 15, line.Pos.y + 10 - this.av.viewRect.position.y);
 
 
-            // redraw line border
-            this.t_context.strokeStyle = '#b5b5b5';
-            this.t_context.lineWidth = 1;
-            this.t_context.strokeRect(line.Pos.x, line.Pos.y - this.av.viewRect.position.y, line.Size.width, line.Size.height);
+              // redraw line border
+              this.t_context.strokeStyle = '#b5b5b5';
+              this.t_context.lineWidth = 1;
+              this.t_context.strokeRect(line.Pos.x, line.Pos.y - this.av.viewRect.position.y, line.Size.width, line.Size.height);
+            }
           }
         }
       }
@@ -1575,7 +1575,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
           this.changePlayCursorAbsX((this.av.PlayCursor.absX * ratio));
           this.update(true);
-        } else if (this.Settings.multi_line) {
+        } else if (this.Settings.multi_line && !this.resizing) {
           this.onSecondsPerLineUpdated(this.secondsPerLine);
         }
 
@@ -1833,8 +1833,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     this.secondsPerLine = seconds;
     console.log(`calculated: ${this.getPixelPerSecond(seconds)}`);
     console.log(`pixel per sec: ${this.Settings.pixel_per_sec}`);
-    this.initialize();
     this.clearAll();
+    this.initialize();
     this.update(true);
   }
 

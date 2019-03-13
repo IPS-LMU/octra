@@ -82,7 +82,7 @@
                     >
                         <div class="col-2" style="cursor: pointer;"
                              [ngClass]="{ disabled: (level.getTypeString() !== 'SEGMENT') }"
-                             (click)="selectLevel(i)">{{i+1}}:
+                             (click)="selectLevel(i)">{{i + 1}}:
                         </div>
                         <div class="col-7" [ngClass]="{ disabled: (level.getTypeString() !== 'SEGMENT') }"><input
                                 (click)="onLevelNameClick($event)"
@@ -255,6 +255,39 @@
                                 </div>
                             </td>
                         </tr>
+                        <ng-container *ngIf="appStorage.Interface === '2D-Editor'">
+                            <tr>
+                                <td colspan="2">
+                                    <hr style="border:0.5px solid lightgray;"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"><label>{{"settings.seconds per line" | translate}}:
+                                    '{{appStorage.secondsPerLine}}'</label></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <div class="btn-group">
+                                        <button class="btn btn-outline-secondary" [(ngModel)]="secondsPerLine"
+                                                btnRadio="5" tabindex="0" role="button"
+                                                (click)="changeSecondsPerLine(5)">5
+                                        </button>
+                                        <button class="btn btn-outline-secondary" [(ngModel)]="secondsPerLine"
+                                                btnRadio="10" tabindex="0" role="button"
+                                                (click)="changeSecondsPerLine(10)">10
+                                        </button>
+                                        <button class="btn btn-outline-secondary" [(ngModel)]="secondsPerLine"
+                                                btnRadio="15" tabindex="0" role="button"
+                                                (click)="changeSecondsPerLine(15)">15
+                                        </button>
+                                        <button class="btn btn-outline-secondary" [(ngModel)]="secondsPerLine"
+                                                btnRadio="20" tabindex="0" role="button"
+                                                (click)="changeSecondsPerLine(20)">20
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-container>
                     </table>
                 </div>
             </li>

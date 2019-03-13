@@ -244,7 +244,8 @@
     "play on hover": "Play on hover",
     "follow playcursor": "Follow playcursor",
     "logging": "Log user actions",
-    "show loupe": "Show loupe"
+    "show loupe": "Show loupe",
+    "seconds per line": "Seconds per line"
   },
   "tools": {
     "cut audio": {

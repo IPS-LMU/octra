@@ -205,6 +205,8 @@ export class TranscriptionService {
         ? `${this.app_settings.audio_server.url}${this.appStorage.audio_url}` : '';
       this._audiofile.type = this._audiomanager.originalInfo.type;
 
+      this.last_sample = this._audiomanager.ressource.info.duration.samples;
+
       this.loadSegments().then(
         () => {
           this.selectedlevel = 0;

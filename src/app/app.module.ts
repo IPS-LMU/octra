@@ -88,7 +88,7 @@ import {
   faWindowMaximize
 } from '@fortawesome/free-solid-svg-icons';
 // modules
-import {ModalModule, ProgressbarModule} from 'ngx-bootstrap';
+import {ButtonsModule, ModalModule, ProgressbarModule} from 'ngx-bootstrap';
 import {YesNoModalComponent} from './core/modals/yes-no-modal/yes-no-modal.component';
 import {ModalService} from './core/modals/modal.service';
 import {BugreportModalComponent} from './core/modals/bugreport-modal/bugreport-modal.component';
@@ -245,7 +245,8 @@ export const ngmodule = {
     ReactiveFormsModule,
     MediaComponentsModule,
     ProgressbarModule.forRoot(),
-    routing
+    routing,
+    ButtonsModule.forRoot()
   ],
   bootstrap: [
     AppComponent

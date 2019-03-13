@@ -286,7 +286,6 @@ export class Segments {
       for (let i = 0; i < remove.length; i++) {
         this.segments.splice(remove[i], 1);
         remove.splice(i, 1);
-        console.log(this.segments);
         --i;
       }
     }

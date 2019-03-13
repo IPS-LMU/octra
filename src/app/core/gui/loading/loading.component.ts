@@ -115,7 +115,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
               if (this.appStorage.usemode === 'url' && this.appStorage.url_params['transcript'] !== null) {
                 this.transcrService.defaultFontSize = 16;
 
-                console.log(`LOAD TRANSCRIPT`);
                 // load transcript file via URL
                 this.http.get(this.appStorage.url_params['transcript'], {
                   responseType: 'text'

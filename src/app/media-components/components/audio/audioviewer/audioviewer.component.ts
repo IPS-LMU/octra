@@ -278,7 +278,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     const line_obj = this.av.LinesArray[line_num];
     const timeline_height = (this.Settings.timeline.enabled) ? this.Settings.timeline.height : 0;
 
-    console.log(`DRAW SIGNAL`);
     if (!(line_obj === null || line_obj === undefined)) {
       // line_obj found
       const midline = Math.round((this.Settings.lineheight - timeline_height) / 2);
@@ -397,7 +396,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                           type: 'boundary',
                           samplepos: result.seg_samples
                         });
-                        this.drawSegments(this.av.LastLine);
+                        this.drawSegments();
                       }
                     }
                     key_active = true;
@@ -905,6 +904,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       if (this.Settings.cropping !== 'none') {
         this.crop(this.Settings.cropping, this.g_context);
         this.crop(this.Settings.cropping, this.o_context);
+        this.crop(this.Settings.cropping, this.t_context);
       }
 
       const timeline_height = (this.Settings.timeline.enabled) ? this.Settings.timeline.height : 0;
@@ -953,7 +953,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         if (!(this.av.drawnselection === null || this.av.drawnselection === undefined) &&
           (this.av.drawnselection.length > 0 || this.av.dragableBoundaryNumber > -1)) {
           // only if there is something selected or boundary dragged you need to redraw the segments around this line
-          this.drawSegments(curr_line);
+          this.drawSegments();
         }
       }
     } else {
@@ -967,12 +967,12 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   drawCropBorder() {
     const radius = Math.round(this._innerWidth / 2);
     if (radius > 0) {
-      this.g_context.moveTo(0, 0);
-      this.g_context.beginPath();
-      this.g_context.arc(radius, radius, radius - 2, 0, 2 * Math.PI, false);
-      this.g_context.strokeStyle = 'black';
-      this.g_context.lineWidth = 3;
-      this.g_context.stroke();
+      this.t_context.moveTo(0, 0);
+      this.t_context.beginPath();
+      this.t_context.arc(radius, radius, radius - 2, 0, 2 * Math.PI, false);
+      this.t_context.strokeStyle = 'black';
+      this.t_context.lineWidth = 3;
+      this.t_context.stroke();
     }
   }
 
@@ -997,7 +997,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   /**
    * drawSegments() draws a vertical line for every boundary in the current audio viewer
    */
-  drawSegments(line_obj: Line = null) {
+  drawSegments() {
     this.o_context.fillStyle = 'white';
     this.o_context.globalAlpha = 1.0;
 
@@ -1005,6 +1005,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     let drawn_boundaries = 0;
     let cleared = 0;
     let drawn_selection = 0;
+    const line_obj = null;
 
     if (!(line_obj === null || line_obj === undefined)) {
       // draw segments for this line only
@@ -1165,8 +1166,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       }
     } else {
       cleared++;
-      this.o_context.clearRect(0, 0, this.av.viewRect.size.width, this.av.viewRect.size.height);
-      this.t_context.clearRect(0, 0, this.av.viewRect.size.width, this.av.viewRect.size.height);
 
       // draw segments for all visible lines
       if (this.Settings.boundaries.enabled && this.transcr.currentlevel.segments.length > 0) {
@@ -1180,6 +1179,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           x: number,
           y: number
         }[] = [];
+
+        this.o_context.clearRect(0, 0, this.av.viewRect.size.width, this.av.viewRect.size.height);
+        this.t_context.clearRect(0, 0, this.av.viewRect.size.width, this.av.viewRect.size.height);
 
         for (let i = 0; i < segments.length; i++) {
           const segment = segments[i];
@@ -1261,16 +1263,16 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
                   if (line_num1 === line_num2) {
                     if (text !== '') {
-                      const textLength = this.o_context.measureText(text).width;
+                      const textLength = this.t_context.measureText(text).width;
                       let newText = text;
                       // segment in same line
-                      if (textLength > w) {
+                      if (textLength > w - 4) {
                         // crop text
-                        const overflow = textLength / w - 1;
+                        const overflow = textLength / (w - 4) - 1;
                         const leftHalf = (1 - overflow) / 2;
                         newText = text.substring(0, Math.floor(text.length * leftHalf) - 1);
                         newText += '...';
-                        newText += text.substring(Math.round(text.length * leftHalf) + Math.round(text.length * overflow) + 1);
+                        newText += text.substring(Math.floor(text.length * leftHalf) + Math.floor(text.length * overflow));
                       }
                       this.t_context.fillText(newText, x + this.Settings.margin.left + 2 + w / 2, line.Pos.y - this.av.viewRect.position.y + line.Size.height - 5);
 
@@ -1374,6 +1376,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
           // draw boundary
           const line = this.av.LinesArray[line_num2];
+          let boundaryCounter = 0;
+
           if (line_num2 >= this.av.visibleLines.start && line_num2 <= this.av.visibleLines.end &&
             !(line === null || line === undefined) && segment.time.samples !== this.audioressource.info.duration.samples) {
             let relX = 0;
@@ -1396,13 +1400,13 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           const line = this.av.LinesArray[0];
           const h = line.Size.height;
 
-          this.o_context.globalAlpha = 1;
-          this.o_context.beginPath();
-          this.o_context.strokeStyle = this.Settings.boundaries.color;
-          this.o_context.lineWidth = this.Settings.boundaries.width;
-          this.o_context.moveTo(boundary.x, boundary.y);
-          this.o_context.lineTo(boundary.x, boundary.y + h);
-          this.o_context.stroke();
+          this.t_context.globalAlpha = 1;
+          this.t_context.beginPath();
+          this.t_context.strokeStyle = this.Settings.boundaries.color;
+          this.t_context.lineWidth = this.Settings.boundaries.width;
+          this.t_context.moveTo(boundary.x, boundary.y);
+          this.t_context.lineTo(boundary.x, boundary.y + h);
+          this.t_context.stroke();
           drawn_boundaries++;
         }
 
@@ -1567,7 +1571,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     // only resize if size has changed and resizing not in processing state
     if (this._innerWidth !== this.oldInnerWidth) {
       setTimeout(() => {
-        this.updateCanvasSizes();
         if ((!this.Settings.multi_line || this.av.AudioPxWidth < this._innerWidth) && !this.resizing) {
           this.av.AudioPxWidth = this._innerWidth;
           this.av.audioTCalculator.audio_px_width = this._innerWidth;
@@ -1831,11 +1834,18 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   public onSecondsPerLineUpdated(seconds: number) {
     this.Settings.pixel_per_sec = this.getPixelPerSecond(seconds);
     this.secondsPerLine = seconds;
-    console.log(`calculated: ${this.getPixelPerSecond(seconds)}`);
-    console.log(`pixel per sec: ${this.Settings.pixel_per_sec}`);
     this.clearAll();
-    this.initialize();
-    this.update(true);
+    this.initialize().then(() => {
+      this.updateCanvasSizes();
+      this.update(true);
+
+      if (this.viewRect.position.y >= this.realRect.size.height) {
+        this.scrollTo(this.realRect.size.height - this.viewRect.size.height, true);
+      }
+    }).catch((err) => {
+      this.update(true);
+      console.error(err);
+    });
   }
 
   private getPixelPerSecond(secondsPerLine: number) {

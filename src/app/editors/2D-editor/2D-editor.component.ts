@@ -1,15 +1,4 @@
-import {
-  AfterContentChecked,
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  ViewChild
-} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 
 import {
   AppStorageService,
@@ -37,13 +26,14 @@ import {AudioNavigationComponent} from '../../media-components/components/audio/
 import {Line} from '../../media-components/obj';
 import {AudioManager} from '../../media-components/obj/media/audio/AudioManager';
 import {Functions} from '../../core/shared/Functions';
+import {NavbarService} from '../../core/gui/navbar/navbar.service';
 
 @Component({
   selector: 'app-overlay-gui',
   templateUrl: './2D-editor.component.html',
   styleUrls: ['./2D-editor.component.css']
 })
-export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentChecked, OnChanges, OnDestroy {
+export class TwoDEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   public static editorname = '2D-Editor';
 
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
@@ -114,7 +104,8 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
               public cd: ChangeDetectorRef,
               public msg: MessageService,
               public settingsService: SettingsService,
-              public appStorage: AppStorageService) {
+              public appStorage: AppStorageService,
+              public navbarService: NavbarService) {
 
     this.subscrmanager = new SubscriptionManager();
   }
@@ -228,9 +219,6 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     TwoDEditorComponent.initialized.emit();
   }
 
-  ngOnChanges(test) {
-  }
-
   ngOnDestroy() {
     clearInterval(this.intervalID);
     this.subscrmanager.destroy();
@@ -256,9 +244,6 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       this.loupe.zoomY = this.factor;
     }
     this.viewer.onSecondsPerLineUpdated(this.appStorage.secondsPerLine);
-  }
-
-  ngAfterContentChecked() {
   }
 
   onSegmentEntered(selected: any) {
@@ -299,9 +284,6 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     }
   }
 
-  onSegmentSelected() {
-  }
-
   onMouseOver(event) {
     if (!(this.mouseTimer === null || this.mouseTimer === undefined)) {
       window.clearTimeout(this.mouseTimer);
@@ -332,9 +314,6 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         this.loupe_hidden = true;
       }
     }
-  }
-
-  onSegmentChange() {
   }
 
   public changePosition(x: number, y: number) {

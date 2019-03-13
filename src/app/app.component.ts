@@ -85,13 +85,14 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-
     // after project settings loaded
     this.subscrmanager.add(this.settingsService.projectsettingsloaded.subscribe(
       () => {
         if (!this.settingsService.responsive.enabled) {
           this.setFixedWidth();
         }
+
+        this.navigation.changeSecondsPerLine(this.appStorage.secondsPerLine);
       }
     ));
 
@@ -104,6 +105,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
         && this.settingsService.app_settings.octra.tracking.active !== '') {
         this.appendTrackingCode(this.settingsService.app_settings.octra.tracking.active);
       }
+
     }).catch((error) => {
       console.error(error);
     });

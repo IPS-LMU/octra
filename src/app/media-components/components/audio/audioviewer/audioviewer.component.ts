@@ -1346,7 +1346,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
                     }
                   } else {
-                    const totalWidth = this.av.audioTCalculator.samplestoAbsX(segment.time.samples - begin.time.samples);
+                    const totalWidth = this.av.audioTCalculator.samplestoAbsX(segment.time.browserSample.value - begin.time.browserSample.value);
 
                     if (j === line_num1) {
                       // current line is start line
@@ -1396,7 +1396,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                       let w2 = 0;
 
                       if (line_num1 > -1) {
-                        const lastPart = this.av.getRelativeSelectionByLine(this.av.LinesArray[line_num1], begin.time.samples, segments[i].time.samples, this._innerWidth);
+                        const lastPart = this.av.getRelativeSelectionByLine(this.av.LinesArray[line_num1], begin.time.browserSample.value, segments[i].time.browserSample.value, this._innerWidth);
 
                         if (lastPart.start > -1 && lastPart.end > -1) {
                           w2 = Math.abs(lastPart.end - lastPart.start);
@@ -1487,7 +1487,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             if (!isNullOrUndefined(line)) {
               // draw time label
               const startSecond = line.number * this.secondsPerLine;
-              const endSecond = Math.min(startSecond + this.secondsPerLine, this.audiochunk.time.duration.seconds);
+              const endSecond = Math.min(startSecond + this.secondsPerLine, this.audiochunk.time.duration.browserSample.seconds);
 
               // start time
               this.t_context.font = '10px Arial';

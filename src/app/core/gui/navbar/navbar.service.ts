@@ -1,5 +1,4 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {AppStorageService} from '../../shared/service/appstorage.service';
 import {TranscriptionService} from '../../shared/service/transcription.service';
 import {UserInteractionsService} from '../../shared/service/userInteractions.service';
 import {AudioInfo} from '../../../media-components/obj/media/audio';
@@ -46,7 +45,7 @@ export class NavbarService {
     this._interfaces = value;
   }
 
-  constructor(private appStorage: AppStorageService) {
+  constructor() {
 
   }
 

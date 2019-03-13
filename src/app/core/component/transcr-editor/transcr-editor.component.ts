@@ -195,11 +195,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         } else if (tagName.toLowerCase() === 'sel-start') {
           // save start selection
           this._textSelection.start = charCounter;
-          console.log(`save start to ${charCounter}!`);
         } else if (tagName.toLowerCase() === 'sel-end') {
           // save start selection
           this._textSelection.end = charCounter;
-          console.log(`save end to ${charCounter}!`);
         }
       }
     };
@@ -378,7 +376,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       this.textfield.summernote('editor.insertNode', element);
     }
     this.updateTextField();
-    console.log(`validate after inserting marker!`);
   }
   /**
    * called when key pressed in editor
@@ -962,8 +959,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
 
     this.textfield.summernote('code', code);
-    console.log(`END:`);
-    console.log(code);
     this.restoreSelection();
   }
 
@@ -1101,9 +1096,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   private onTextMouseOver = (event) => {
     const jqueryObj = jQuery(event.target);
 
-    console.log(`in text mouseover!`);
     if (!(jqueryObj.attr('data-samples') === null || jqueryObj.attr('data-samples') === undefined)) {
-      console.log(`on text mouse over target`);
       this.onSegmentBoundaryMouseOver(jqueryObj, event);
     } else if (!(jqueryObj.attr('data-errorcode') === null || jqueryObj.attr('data-errorcode') === undefined)) {
       this.onValidationErrorMouseOver(jqueryObj, event);

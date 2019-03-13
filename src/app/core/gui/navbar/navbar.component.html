@@ -260,34 +260,27 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td colspan="2"><label>{{"settings.seconds per line" | translate}}:</label></td>
+                                <td colspan="2"><label>{{"settings.seconds per line" | translate}}:
+                                    '{{appStorage.secondsPerLine}}'</label></td>
                             </tr>
                             <tr>
                                 <td colspan="2">
                                     <div class="btn-group">
                                         <button class="btn btn-outline-secondary" [(ngModel)]="secondsPerLine"
-                                                btnRadio="5s" name="5s" tabindex="0" role="button"
-                                                (click)="changeSecondsPerLine(5)" [ngClass]="{
-                                                'active': appStorage.secondsPerLine === 5
-                                                }">5s
+                                                btnRadio="5" tabindex="0" role="button"
+                                                (click)="changeSecondsPerLine(5)">5
                                         </button>
                                         <button class="btn btn-outline-secondary" [(ngModel)]="secondsPerLine"
-                                                btnRadio="10s" name="10s" tabindex="0" role="button"
-                                                (click)="changeSecondsPerLine(10)" [ngClass]="{
-                                                'active': appStorage.secondsPerLine === 10
-                                                }">10s
+                                                btnRadio="10" tabindex="0" role="button"
+                                                (click)="changeSecondsPerLine(10)">10
                                         </button>
                                         <button class="btn btn-outline-secondary" [(ngModel)]="secondsPerLine"
-                                                btnRadio="15s" name="15s" tabindex="0" role="button"
-                                                (click)="changeSecondsPerLine(15)" [ngClass]="{
-                                                'active': appStorage.secondsPerLine === 15
-                                                }">15s
+                                                btnRadio="15" tabindex="0" role="button"
+                                                (click)="changeSecondsPerLine(15)">15
                                         </button>
                                         <button class="btn btn-outline-secondary" [(ngModel)]="secondsPerLine"
-                                                btnRadio="20s" name="20s" tabindex="0" role="button"
-                                                (click)="changeSecondsPerLine(20)" [ngClass]="{
-                                                'active': appStorage.secondsPerLine === 20
-                                                }">20s
+                                                btnRadio="20" tabindex="0" role="button"
+                                                (click)="changeSecondsPerLine(20)">20
                                         </button>
                                     </div>
                                 </td>

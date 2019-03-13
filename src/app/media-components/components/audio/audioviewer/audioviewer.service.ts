@@ -759,8 +759,8 @@ export class AudioviewerService extends AudioComponentService {
         try {
           this._minmaxarray = this.computeDisplayData(this.AudioPxWidth / 2, this.Settings.lineheight, this.audiochunk.audiomanager.channel,
             {
-              start: this.audiochunk.selection.start.browserSample.value,
-              end: this.audiochunk.selection.end.browserSample.value
+              start: this.audiochunk.time.start.browserSample.value,
+              end: this.audiochunk.time.end.browserSample.value
             });
           resolve();
         } catch (err) {

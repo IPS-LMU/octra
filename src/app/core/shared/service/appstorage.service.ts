@@ -7,6 +7,7 @@ import {AudioManager} from '../../../media-components/obj/media/audio/AudioManag
 import {LocalStorageService, SessionStorage, SessionStorageService} from '@rars/ngx-webstorage';
 import {isNullOrUndefined} from '../Functions';
 import {reject} from 'q';
+import {Subject} from 'rxjs';
 
 export interface IIDBLevel {
   id: number;
@@ -43,6 +44,21 @@ export class OIDBLink implements IIDBLink {
 
 @Injectable()
 export class AppStorageService {
+  get secondsPerLine(): number {
+    return this._secondsPerLine;
+  }
+
+  set secondsPerLine(value: number) {
+    this._secondsPerLine = value;
+    this.settingschange.next({
+      key: 'secondsPerLine',
+      value: value
+    });
+    this.idb.save('options', 'secondsPerLine', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
   get servercomment(): string {
     return this._servercomment;
   }
@@ -375,6 +391,11 @@ export class AppStorageService {
   private _annotation: OIDBLevel[] = null;
   private _annotation_links: OIDBLink[] = null;
   private _levelcounter = 0;
+
+  private _secondsPerLine = 5;
+
+  public settingschange = new Subject<{ key: string, value: any }>();
+
   public beginLocalSession = (files: {
     status: string,
     file: File,
@@ -717,6 +738,10 @@ export class AppStorageService {
         {
           attribute: '_servercomment',
           key: 'servercomment'
+        },
+        {
+          attribute: '_secondsPerLine',
+          key: 'secondsPerLine'
         }
       ]
     ).then(() => {

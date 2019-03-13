@@ -17,7 +17,6 @@ import {BugReportService, ConsoleType} from '../../shared/service/bug-report.ser
 import {environment} from '../../../../environments/environment';
 import {ModalService} from '../../modals/modal.service';
 import {ExportFilesModalComponent} from '../../modals/export-files-modal/export-files-modal.component';
-import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-navigation',
@@ -71,14 +70,15 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     }).length > 0);
   }
 
+  public secondsPerLine = '5';
+
   constructor(public appStorage: AppStorageService,
               public navbarServ: NavbarService,
               public sanitizer: DomSanitizer,
               public langService: TranslateService,
               public modService: ModalService,
               public settService: SettingsService,
-              public bugService: BugReportService,
-              private route: ActivatedRoute) {
+              public bugService: BugReportService) {
   }
 
   ngOnDestroy() {
@@ -260,5 +260,10 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public selectLevel(tiernum: number) {
     this.transcrServ.selectedlevel = tiernum;
+  }
+
+  public changeSecondsPerLine(seconds: number) {
+    this.secondsPerLine = seconds.toString();
+    this.appStorage.secondsPerLine = seconds;
   }
 }

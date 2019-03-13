@@ -40,7 +40,7 @@ export class AudioviewerConfig {
     enabled: true,
     readonly: false,
     width: 3,
-    color: 'rgb(160, 160, 0)'
+    color: '#ebaf4c'
   };
   public grid: {
     enabled: true;
@@ -65,7 +65,7 @@ export class AudioviewerConfig {
   public frame: {
     color: string
   } = {
-    color: 'rgb(0, 0, 0)'
+    color: '#b5b5b5'
   };
 
 
@@ -184,4 +184,7 @@ export class AudioviewerConfig {
   public scrollable = false;
   public type: string;
   public round_values = true;
+
+  public showTimePerLine = false;
+  public showTranscripts = false;
 }

@@ -73,6 +73,12 @@ nav .nav-link {
     color: black;
 }
 
+.dropdown-menu h4 {
+    font-weight: bold;
+    font-size: 1.3em;
+    color: black;
+}
+
 .dropdown-menu.options-menu label,
 .dropdown-menu.info-menu label,
 .dropdown-menu.info-menu table tr td,

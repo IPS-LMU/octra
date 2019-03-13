@@ -26,13 +26,14 @@ import {AudioNavigationComponent} from '../../media-components/components/audio/
 import {Line} from '../../media-components/obj';
 import {AudioManager} from '../../media-components/obj/media/audio/AudioManager';
 import {Functions} from '../../core/shared/Functions';
+import {NavbarService} from '../../core/gui/navbar/navbar.service';
 
 @Component({
   selector: 'app-overlay-gui',
   templateUrl: './2D-editor.component.html',
   styleUrls: ['./2D-editor.component.css']
 })
-export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentChecked, OnChanges, OnDestroy {
+export class TwoDEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   public static editorname = '2D-Editor';
 
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
@@ -102,7 +103,8 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
               public uiService: UserInteractionsService,
               public msg: MessageService,
               public settingsService: SettingsService,
-              public appStorage: AppStorageService) {
+              public appStorage: AppStorageService,
+              public navbarService: NavbarService) {
 
     this.subscrmanager = new SubscriptionManager();
   }
@@ -149,8 +151,9 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     this.viewer.Settings.scrollable = true;
     this.viewer.Settings.margin.right = 20;
     this.viewer.Settings.round_values = false;
-    // this.viewer.Settings.timeline.enabled = true;
     this.viewer.Settings.step_width_ratio = (this.viewer.Settings.pixel_per_sec / this.audiomanager.ressource.info.samplerate);
+    this.viewer.Settings.showTimePerLine = true;
+    this.viewer.Settings.showTranscripts = true;
 
     this.viewer.alerttriggered.subscribe(
       (result) => {
@@ -201,10 +204,18 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
       }
     ));
 
-    TwoDEditorComponent.initialized.emit();
-  }
+    this.subscrmanager.add(this.appStorage.settingschange.subscribe(
+      (event) => {
+        switch (event.key) {
+          case('secondsPerLine'):
+            console.log(event);
+            this.viewer.onSecondsPerLineUpdated(event.value);
+            break;
+        }
+      }
+    ));
 
-  ngOnChanges(test) {
+    TwoDEditorComponent.initialized.emit();
   }
 
   ngOnDestroy() {
@@ -231,10 +242,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
     if (this.appStorage.show_loupe) {
       this.loupe.zoomY = this.factor;
     }
-    this.viewer.update(true);
-  }
-
-  ngAfterContentChecked() {
+    this.viewer.onSecondsPerLineUpdated(this.appStorage.secondsPerLine);
   }
 
   onSegmentEntered(selected: any) {
@@ -307,9 +315,6 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, AfterContentC
         this.loupe_hidden = true;
       }
     }
-  }
-
-  onSegmentChange() {
   }
 
   public changePosition(x: number, y: number) {

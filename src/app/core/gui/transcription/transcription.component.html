@@ -54,23 +54,17 @@
             </span>
         </button>
         <button class="btn btn-raised btn-danger col-md-3" (click)="sendTranscriptionForShortAudioFiles('bad')">
-            <fa-icon icon="paper-plane"></fa-icon>
-            <span>
-                   {{"general.bad" | translate}}
-            </span>
+            <fa-icon icon="star"></fa-icon>
         </button>
         <button class="btn btn-raised btn-warning col-md-3" style="background-color: orange"
                 (click)="sendTranscriptionForShortAudioFiles('middle')">
-            <fa-icon icon="paper-plane"></fa-icon>
-            <span>
-                  {{"general.middle" | translate}}
-            </span>
+            <fa-icon icon="star"></fa-icon>
+            <fa-icon icon="star"></fa-icon>
         </button>
         <button class="btn btn-raised btn-primary col-md-3" (click)="sendTranscriptionForShortAudioFiles('good')">
-            <fa-icon icon="paper-plane"></fa-icon>
-            <span>
-                   {{"general.good" | translate}}
-            </span>
+            <fa-icon icon="star"></fa-icon>
+            <fa-icon icon="star"></fa-icon>
+            <fa-icon icon="star"></fa-icon>
         </button>
     </div>
     <ng-template #defaultBottom>

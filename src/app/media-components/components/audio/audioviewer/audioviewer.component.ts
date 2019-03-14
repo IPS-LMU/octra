@@ -496,6 +496,31 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                     key_active = true;
                   }
                   break;
+                case('delete_boundaries'):
+                  if (this.av.focused) {
+                    // TODO trigger event for logging?
+
+                    for (let i = 0; i < this.transcr.currentlevel.segments.length; i++) {
+                      const segment = this.transcr.currentlevel.segments.get(i);
+
+                      if (segment.time.samples >= this.selection.start.samples && segment.time.samples <= this.selection.end.samples) {
+                        this.transcr.currentlevel.segments.removeByIndex(i, this.transcr.break_marker.code);
+                        i--;
+                      } else if (this.selection.end.samples < segment.time.samples) {
+                        break;
+                      }
+                    }
+
+                    this.selection.start = new AudioTime(0, this.audiomanager.ressource.info.samplerate);
+                    this.selection.end = this.selection.start.clone();
+                    this.av.drawnselection = this.selection;
+                    this.update(false);
+                    this.drawCursor(this.av.Mousecursor.line);
+                    this.transcr.currentlevel.segments.onsegmentchange.emit();
+
+                    key_active = true;
+                  }
+                  break;
                 case('segment_enter'):
                   if (this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly && this.focused) {
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'segment'});

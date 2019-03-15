@@ -17,10 +17,12 @@
             <span *ngIf="!appStorage.easymode"
                   [ngClass]="{'d-none d-lg-inline': responsive}"> [ALT + 0]</span>
         </a>
-        <a [routerLink]="['/user/transcr/help']" [queryParamsHandling]="'merge'" class="btn w-100">
-            <fa-icon icon="question-circle"></fa-icon>
-            <span *ngIf="!appStorage.easymode"
-                  [ngClass]="{'d-none d-md-inline': responsive}"> {{button_labels.help}}</span>
-        </a>
+        <div class="w-100">
+            <a [routerLink]="['/user/transcr/help']" [queryParamsHandling]="'merge'" class="btn">
+                <fa-icon icon="question-circle"></fa-icon>
+                <span *ngIf="!appStorage.easymode"
+                      [ngClass]="{'d-none d-md-inline': responsive}"> {{button_labels.help}}</span>
+            </a>
+        </div>
     </div>
 </div>

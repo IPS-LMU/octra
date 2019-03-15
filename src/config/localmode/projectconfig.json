@@ -6,7 +6,7 @@
   "navigation": {
     "export": true,
     "interfaces": true,
-    "help_url": "https://www.phonetik.uni-muenchen.de/apps/octra/help/"
+    "help_url": "https://www.phonetik.uni-muenchen.de/apps/octra/manual/"
   },
   "responsive": {
     "enabled": true,

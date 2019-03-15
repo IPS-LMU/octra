@@ -1,3 +1,14 @@
 <h2>{{'general.help' |translate}}</h2>
-<a [routerLink]="['/user/transcr/']" [queryParamsHandling]="'merge'">{{'general.back' | translate}}</a>
-<iframe [src]="sanitized_url"></iframe>
+<a class="btn btn-raised btn-secondary back-button" [routerLink]="['/user/transcr/']"
+   [queryParamsHandling]="'merge'">{{'general.back' | translate}}</a>
+
+<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+        <div class="btn-group-vertical" role="group" aria-label="Vertical button group" style="width:100%;">
+            <a class="btn btn-info btn-raised" data-bcup-haslogintext="no"
+               href="https://www.phonetik.uni-muenchen.de/apps/octra/manual/en/" target="_blank">Open OCTRA Manual </a>
+        </div>
+    </div>
+    <div class="col-md-4"></div>
+</div>

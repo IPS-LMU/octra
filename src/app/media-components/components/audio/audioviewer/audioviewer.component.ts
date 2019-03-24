@@ -914,27 +914,35 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    * drawGrid(h, v) draws a grid with h horizontal and v vertical lines over the canvas
    */
   drawGrid(startSamples: number, endSamples: number, hLines: number, line: Line) {
-    const vLines = Math.floor((endSamples - startSamples) / this.audiomanager.originalInfo.samplerate);
-    const pxSecond = Math.round(this.av.audioTCalculator.samplestoAbsX(this.audiomanager.originalInfo.samplerate));
-    const timeline_height = (this.Settings.timeline.enabled) ? this.Settings.timeline.height : 0;
-    const hZoom = Math.round(this._innerWidth / vLines);
-    const vZoom = Math.round((this.Settings.lineheight - timeline_height) / hLines);
+    if (startSamples >= 0 && endSamples >= startSamples) {
+      const vLines = Math.floor((endSamples - startSamples) / this.audiomanager.originalInfo.samplerate);
+      const pxSecond = Math.round(this.av.audioTCalculator.samplestoAbsX(this.audiomanager.originalInfo.samplerate));
+      const timeline_height = (this.Settings.timeline.enabled) ? this.Settings.timeline.height : 0;
+      const hZoom = Math.round(this._innerWidth / vLines);
+      const vZoom = Math.round((this.Settings.lineheight - timeline_height) / hLines);
 
-    // --- get the appropriate context
-    this.g_context.beginPath();
-    this.g_context.strokeStyle = this.Settings.grid.color;
-    // set vertical lines
-    for (let x = pxSecond; x < line.Size.width; x = x + pxSecond) {
-      this.g_context.moveTo(line.Pos.x + x, line.Pos.y - this.av.viewRect.position.y);
-      this.g_context.lineTo(line.Pos.x + x, line.Pos.y - this.av.viewRect.position.y + this.Settings.lineheight - timeline_height);
-    }
+      if (pxSecond > 0 && vZoom > 0) {
+        // --- get the appropriate context
+        this.g_context.beginPath();
+        this.g_context.strokeStyle = this.Settings.grid.color;
+        // set vertical lines
+        for (let x = pxSecond; x < line.Size.width; x = x + pxSecond) {
+          this.g_context.moveTo(line.Pos.x + x, line.Pos.y - this.av.viewRect.position.y);
+          this.g_context.lineTo(line.Pos.x + x, line.Pos.y - this.av.viewRect.position.y + this.Settings.lineheight - timeline_height);
+        }
 
-    // set horicontal lines
-    for (let y = Math.round(vZoom / 2); y < this.Settings.lineheight - timeline_height; y = y + vZoom) {
-      this.g_context.moveTo(line.Pos.x, y + line.Pos.y - this.av.viewRect.position.y);
-      this.g_context.lineTo(line.Pos.x + line.Size.width, y + line.Pos.y - this.av.viewRect.position.y);
+        // set horicontal lines
+        for (let y = Math.round(vZoom / 2); y < this.Settings.lineheight - timeline_height; y = y + vZoom) {
+          this.g_context.moveTo(line.Pos.x, y + line.Pos.y - this.av.viewRect.position.y);
+          this.g_context.lineTo(line.Pos.x + line.Size.width, y + line.Pos.y - this.av.viewRect.position.y);
+        }
+        this.g_context.stroke();
+      } else {
+        console.error(`pcSecond is 0!`);
+      }
+    } else {
+      console.error(`invalid start end samples`);
     }
-    this.g_context.stroke();
   }
 
   /**

@@ -524,6 +524,10 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 case('segment_enter'):
                   if (this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly && this.focused) {
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'segment'});
+                    console.log(`enter segment`);
+                    console.log(`mouse sample position is ${this.av.Mousecursor.timePos.samples}`);
+                    console.log(`last segment boundary is ${this.transcr.currentlevel.segments.get(this.transcr.currentlevel.segments.length - 1).time.samples}`);
+
                     const seg_index = this.transcr.currentlevel.segments.getSegmentBySamplePosition(
                       this.av.Mousecursor.timePos.samples
                     );

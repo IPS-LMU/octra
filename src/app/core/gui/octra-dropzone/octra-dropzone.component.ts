@@ -187,7 +187,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
                         }
 
                         const last = level.items[level.items.length - 1];
-                        if (last.sampleStart + last.sampleDur !== this._oaudiofile.duration * this._oaudiofile.samplerate) {
+                        if (last.sampleStart + last.sampleDur !== this._oaudiofile.duration) {
                           level.items.push(new OSegment(last.id + 1, last.sampleStart + last.sampleDur,
                             (this._oaudiofile.duration * this._oaudiofile.samplerate) - (last.sampleStart + last.sampleDur),
                             [new OLabel(level.name, '')]));

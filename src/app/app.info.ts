@@ -13,6 +13,7 @@ import {BundleJSONConverter} from './core/obj/Converters/BundleJSONConverter';
 import {EmailBugReporter} from './core/obj/BugAPI/EmailBugReporter';
 import {NavigationExtras} from '@angular/router';
 import {ELANConverter} from './core/obj/Converters/ELANConverter';
+import {SRTConverter} from './core/obj/Converters/SRTConverter';
 
 export class AppInfo {
   public static readonly audioformats = [
@@ -33,7 +34,8 @@ export class AppInfo {
     new PartiturConverter(),
     new BundleJSONConverter(),
     new TextConverter(),
-    new ELANConverter()
+    new ELANConverter(),
+    new SRTConverter()
   ];
 
   public static readonly themes: string[] = [

@@ -34,6 +34,11 @@
                 <a class="nav-link" [routerLink]="['/faq']" [queryParamsHandling]="'merge'">{{'general.faq' |
                     translate}}</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="https://www.phonetik.uni-muenchen.de/apps/octra/manual/en/" target="_blank">
+                    Manual
+                </a>
+            </li>
         </ul>
         <ul class="navbar-nav mr-auto" *ngIf="appStorage.LoggedIn">
             <ng-template ngFor let-editor [ngForOf]="editors">

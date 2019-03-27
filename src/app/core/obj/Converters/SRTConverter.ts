@@ -67,8 +67,10 @@ export class SRTConverter extends Converter {
       const olevel = new OLevel('OCTRA_1', 'SEGMENT');
 
       let counterID = 1;
+      let lastEnd = 0;
+
       if (content !== '') {
-        const regex = new RegExp(/([0-9]+)\n([0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3}) --> ([0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3})\n((?:(?:(?![0-9]).+)?\n)+)/g);
+        const regex = new RegExp(/([0-9]+)\n([0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3}) --> ([0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3})\n((?:(?:(?![0-9]).+)?\n?)+)/g);
 
         let matches = regex.exec(content);
         while (matches !== null) {
@@ -76,16 +78,19 @@ export class SRTConverter extends Converter {
           const timeEnd = this.getSamplesFromTimeString(matches[3], audiofile.samplerate);
           const segmentContent = matches[4].replace(/(\n|\s)+$/g, '');
 
-          const olabels: OLabel[] = [];
-          olabels.push((new OLabel('OCTRA_1', segmentContent)));
-          const osegment = new OSegment(
-            counterID, timeStart, timeEnd - timeStart, olabels
-          );
+          if (timeStart > lastEnd) {
+            // add additional segment
+            olevel.items.push(new OSegment(
+              counterID++, lastEnd, timeStart - lastEnd, [new OLabel('OCTRA_1', '')]
+            ));
+          }
 
-          olevel.items.push(osegment);
+          olevel.items.push(new OSegment(
+            counterID++, timeStart, timeEnd - timeStart, [new OLabel('OCTRA_1', segmentContent)]
+          ));
 
-          counterID++;
           matches = regex.exec(content);
+          lastEnd = timeEnd;
         }
       }
 

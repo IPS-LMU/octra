@@ -32,7 +32,8 @@
         <ng-template appLoadeditor></ng-template>
     </div>
 
-    <div *ngIf="settingsService.isTheme('shortAudioFiles') && appStorage.usemode === 'online' && transcrService.feedback !== null">
+    <div *ngIf="(settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('korbinian'))
+    && appStorage.usemode === 'online' && transcrService.feedback !== null">
         <form class="form-inline" id="bottom-comment">
             <fieldset class="w-100">
                 <div class="form-group" style="padding-top:0;">
@@ -46,7 +47,7 @@
     </div>
 
     <div class="row" id="bottom-navigation" role="group"
-         *ngIf="settingsService.isTheme('shortAudioFiles') && appStorage.usemode === 'online'; else defaultBottom">
+         *ngIf="settingsService.isTheme('shortAudioFiles') && appStorage.usemode === 'online'; else defaultBottom2">
         <button class="btn btn-secondary btn-raised col-md-3" (click)="abortTranscription()">
             <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
             <span>
@@ -67,6 +68,29 @@
             <fa-icon icon="star"></fa-icon>
         </button>
     </div>
+    <ng-template #defaultBottom2>
+        <div class="row" id="bottom-navigation" role="group"
+             *ngIf="settingsService.isTheme('korbinian') && appStorage.usemode === 'online'; else defaultBottom">
+            <button class="btn btn-secondary btn-raised col-md-4" (click)="abortTranscription()">
+                <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
+                <span>
+                   {{"general.quit" | translate}}
+            </span>
+            </button>
+            <button class="btn btn-raised btn-info col-md-2" (click)="sendTranscriptionForKorbinian('NO')">
+                NO
+            </button>
+            <button class="btn btn-raised btn-danger col-md-2" (click)="sendTranscriptionForKorbinian('VE')">
+                VE
+            </button>
+            <button class="btn btn-raised btn-secondary col-md-2" (click)="sendTranscriptionForKorbinian('EE')">
+                EE
+            </button>
+            <button class="btn btn-raised btn-primary col-md-2" (click)="sendTranscriptionForKorbinian('AN')">
+                AN
+            </button>
+        </div>
+    </ng-template>
     <ng-template #defaultBottom>
         <div class="row" id="bottom-navigation" role="group">
             <button class="btn btn-secondary btn-raised col-md-6"

@@ -717,4 +717,18 @@ export class TranscriptionComponent implements OnInit,
 
     this.onSendButtonClick();
   }
+
+  public sendTranscriptionForKorbinian(type: 'NO' | 'VE' | 'EE' | 'AN') {
+    this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(((?:NO)|(?:VE)|(?:EE)|(?:AN))(\s*;\s*)*)/g, '');
+    if (this.appStorage.servercomment !== '' && this.transcrService.feedback.comment === '') {
+      this.transcrService.feedback.comment = type + '; ' + this.appStorage.servercomment;
+    } else if ((this.appStorage.servercomment === '' && this.transcrService.feedback.comment !== '')
+      || (this.appStorage.servercomment !== '' && this.transcrService.feedback.comment !== '')) {
+      this.transcrService.feedback.comment = type + '; ' + this.transcrService.feedback.comment;
+    } else {
+      this.transcrService.feedback.comment = type;
+    }
+    this.onSendButtonClick();
+  }
+
 }

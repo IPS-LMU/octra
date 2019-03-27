@@ -2,7 +2,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {Annotation, Level, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment, Segments} from '../../obj/Annotation';
 import {AudioService} from './audio.service';
 import {AppStorageService, OIDBLevel} from './appstorage.service';
-import {Functions} from '../Functions';
+import {Functions, isNullOrUndefined} from '../Functions';
 import {UserInteractionsService} from './userInteractions.service';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
@@ -167,12 +167,18 @@ export class TranscriptionService {
     if (!this.saving) {
       this.saving = true;
       setTimeout(() => {
-        this.appStorage.save('annotation', {
-          num: this._selectedlevel,
-          level: this._annotation.levels[this._selectedlevel].getObj(
-            this.audiomanager.sampleRateFactor, this.audiomanager.originalInfo.duration.samples
-          )
-        });
+        if (!isNullOrUndefined(this._annotation)
+          && this._annotation.levels.length > 0
+          && !isNullOrUndefined(this._annotation.levels[this._selectedlevel])) {
+          this.appStorage.save('annotation', {
+            num: this._selectedlevel,
+            level: this._annotation.levels[this._selectedlevel].getObj(
+              this.audiomanager.sampleRateFactor, this.audiomanager.originalInfo.duration.samples
+            )
+          });
+        } else {
+          console.error(new Error('can not save segments because annotation is null'));
+        }
         this.saving = false;
       }, 2000);
     }
@@ -371,6 +377,9 @@ export class TranscriptionService {
         log: log_data.getObj()
       };
 
+      if (this.settingsService.isTheme('korbinian')) {
+        data.quality = '';
+      }
 
       for (let i = 0; i < data.log.length; i++) {
         if (data.log[i].type === 'transcription:segment_exited') {

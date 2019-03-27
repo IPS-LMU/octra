@@ -68,7 +68,7 @@ export class WebVTTConverter extends Converter {
 
       let counterID = 1;
       if (content !== '') {
-        const regex = new RegExp(/([0-9]+)\n([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}) --> ([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3})\n((?:(?:(?![0-9]).+)?\n)+)/g);
+        const regex = new RegExp(/([0-9]+)\n([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}) --> ([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3})\n((?:(?:(?![0-9]).+)?\n?)+)/g);
 
         let matches = regex.exec(content);
         let lastEnd = 0;

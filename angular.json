@@ -45,7 +45,8 @@
               "node_modules/moment/min/moment.min.js",
               "src/assets/js/cbuffer.js",
               "src/assets/js/OLA.js",
-              "src/assets/js/buffered-ola.js"
+              "src/assets/js/buffered-ola.js",
+              "node_modules/jszip/dist/jszip.min.js"
             ]
           },
           "configurations": {

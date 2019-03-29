@@ -366,7 +366,7 @@ export class SettingsService {
         reader.onloadend = (ev) => {
           const t: any = ev.target;
           if (audioService.audiomanagers.length === 0) {
-            AudioManager.decodeAudio(this.appStorage.sessionfile.name, 'audio/wav', t.result, AppInfo.audioformats, true).then(
+            AudioManager.decodeAudio(this.appStorage.sessionfile.name, 'audio/wav', t.result, AppInfo.audioformats).then(
               (audiomanager: AudioManager) => {
                 audioService.registerAudioManager(audiomanager);
                 console.log('Audio loaded.');

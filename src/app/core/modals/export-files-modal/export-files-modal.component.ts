@@ -12,6 +12,10 @@ import {isNullOrUndefined} from '../../shared/Functions';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
+import {WavFormat} from '../../../media-components/obj/media/audio/AudioFormats';
+import {error} from '@angular/compiler/src/util';
+
+declare var JSZip;
 
 @Component({
   selector: 'app-export-files-modal',
@@ -19,7 +23,6 @@ import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/n
   styleUrls: ['./export-files-modal.component.css'],
   animations: OCTRANIMATIONS
 })
-
 export class ExportFilesModalComponent implements OnInit, OnDestroy {
   modalRef: BsModalRef;
   AppInfo = AppInfo;
@@ -46,9 +49,9 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   public tools = {
     audioCutting: {
       opened: false,
-      progress: 0,
+      progress: '0',
       result: {
-        url: '',
+        url: null,
         filename: ''
       },
       status: 'idle',
@@ -269,7 +272,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
     this.tools.audioCutting.status = 'idle';
     this.tools.audioCutting.progressbarType = 'idle';
-    this.tools.audioCutting.progress = 0;
+    this.tools.audioCutting.progress = '0';
     this.tools.audioCutting.result.filename = '';
     this.tools.audioCutting.result.url = '';
     this.tools.audioCutting.opened = false;
@@ -278,10 +281,10 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     this.subscrmanager.destroy();
   }
 
-  public splitAudio() {
+  public splitAudioAPI() {
     const cutList = [];
     let startSample = 0;
-    this.tools.audioCutting.progress = 0;
+    this.tools.audioCutting.progress = '0';
     this.tools.audioCutting.progressbarType = 'info';
     this.tools.audioCutting.result.url = '';
 
@@ -326,7 +329,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
                 'authorization': this.settService.app_settings.octra.plugins.audioCutter.authToken
               }, responseType: 'json'
             }).subscribe((result2: any) => {
-              this.tools.audioCutting.progress = (!isNullOrUndefined(result2.progress)) ? Math.round(result2.progress * 100) : 0;
+              this.tools.audioCutting.progress = ((!isNullOrUndefined(result2.progress)) ? Math.round(result2.progress * 100) : 0).toFixed(2);
               this.tools.audioCutting.status = result2.status;
 
               if (result2.status === 'finished') {
@@ -350,7 +353,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
                   break;
                 case ('failed'):
                   this.tools.audioCutting.progressbarType = 'danger';
-                  this.tools.audioCutting.progress = 100;
+                  this.tools.audioCutting.progress = '100';
                   this.tools.audioCutting.status = 'failed';
                   this.tools.audioCutting.message = (!isNullOrUndefined(result2.message) && result2.message !== '') ? result2.message : '';
                   break;
@@ -362,13 +365,202 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
             });
           }
         ));
-      }, (error) => {
+      }, (err) => {
         this.tools.audioCutting.progressbarType = 'danger';
-        this.tools.audioCutting.progress = 100;
+        this.tools.audioCutting.progress = '100';
         this.tools.audioCutting.status = 'failed';
         this.tools.audioCutting.message = 'API not available. Please send a message via the feedback form.';
         console.error(error);
       }));
+  }
+
+  public splitAudioClient() {
+    const cutList = [];
+    let startSample = 0;
+    this.tools.audioCutting.progress = '0';
+    this.tools.audioCutting.progressbarType = 'info';
+    this.tools.audioCutting.result.url = '';
+
+    for (let i = 0; i < this.transcrService.currentlevel.segments.length; i++) {
+      const segment: Segment = this.transcrService.currentlevel.segments.get(i);
+      cutList.push({
+        number: i,
+        sampleStart: startSample,
+        sampleDur: segment.time.originalSample.value - startSample
+      });
+      startSample = segment.time.originalSample.value;
+      console.log(`dur: ${segment.time.originalSample.value - startSample / this.transcrService.audiomanager.ressource.info.samplerate}`);
+    }
+
+    // start cutting
+    const wavFormat = new WavFormat();
+    console.log(this.transcrService.audiomanager.ressource.arraybuffer.byteLength);
+    wavFormat.init(this.transcrService.audiomanager.ressource.info.name, this.transcrService.audiomanager.ressource.arraybuffer);
+
+    let zip = new JSZip();
+
+    /*
+    const taskManager = new TaskManager([
+      {
+        name: 'cutAudioFile',
+        do: (args: any[]) => {
+          const filename = args[0];
+          const buffer: ArrayBuffer = args[1];
+          const channels: number = args[2];
+          const blockAlign: number = args[3];
+          const segments: {
+            number: number,
+            sampleStart: number,
+            sampleDur: number
+          }[] = args[4];
+          const bitsPerSample: number = args[5];
+          const sampleRate: number = args[6];
+
+          const results = [];
+
+          const calculateData = function (start: number, duration: number, u8array: Uint8Array): number[] {
+            const result: number[] = [];
+            let counter = 0;
+
+            for (let i = 44 + start; i < 44 + start + duration; i++) {
+              try {
+                for (let j = 0; j < channels; j++) {
+                  for (let k = 0; k < blockAlign / channels; k++) {
+                    result.push(u8array[i + k]);
+                  }
+                  if (channels === 2) {
+                    i += blockAlign / channels;
+                  } else {
+                    i += blockAlign;
+                  }
+                }
+
+                i--;
+                counter++;
+              } catch (e) {
+                console.error(e);
+                break;
+              }
+            }
+            return result;
+          };
+
+          const writeString = function (view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+              view.setUint8(offset + i, string.charCodeAt(i));
+            }
+          };
+
+          const getFileFromBufferPart = function (data: number[], filename2: string): File {
+            const samples = (data.length * 2 * 8) / (bitsPerSample);
+
+            const buffer2 = new ArrayBuffer(44 + data.length);
+            const dataView = new DataView(buffer2);
+
+            // RIFF identifier
+            writeString(dataView, 0, 'RIFF');
+            // RIFF chunk length
+            dataView.setUint32(4, 36 + samples, true);
+            // RIFF type
+            writeString(dataView, 8, 'WAVE');
+            // format chunk identifier
+            writeString(dataView, 12, 'fmt ');
+            // format chunk length
+            dataView.setUint32(16, 16, true);
+            // sample format (raw)
+            dataView.setUint16(20, 1, true);
+            // channel count
+            dataView.setUint16(22, channels, true);
+            // sample rate
+            dataView.setUint32(24, sampleRate, true);
+            // byte rate (sample rate * block align)
+            dataView.setUint32(28, sampleRate * 2, true);
+            // block align (channel count * bytes per sample)
+            dataView.setUint16(32, 2, true);
+            // bits per sample
+            dataView.setUint16(34, bitsPerSample, true);
+            // data chunk identifier
+            writeString(dataView, 36, 'data');
+            // data chunk length
+            dataView.setUint32(40, data.length, true);
+
+            for (let i = 0; i < data.length; i++) {
+              dataView.setUint8(44 + i, data[i]);
+            }
+            return new File([dataView], filename2 + '.wav', {type: 'audio/wav'});
+          };
+
+          for (let i = 0; i < segments.length; i++) {
+            const segment = segments[i];
+
+            const start = segment.sampleStart * channels * 2;
+            const duration = segment.sampleDur * channels * 2;
+            const newFileName = filename + '_' + segment.number + '.wav';
+
+            const u8array = new Uint8Array(buffer);
+            // @ts-ignore
+
+            const data = calculateData(start, duration, u8array);
+            results.push(getFileFromBufferPart(data, newFileName));
+            console.log(results);
+          }
+
+          return results;
+        }
+      }
+    ]);
+    console.log(`cut ${cutList.length} segments`);
+
+    taskManager.run('cutAudioFile', [
+      this.transcrService.audiomanager.ressource.info.file.name,
+      this.transcrService.audiomanager.ressource.arraybuffer,
+      this.transcrService.audiomanager.ressource.info.channels,
+      wavFormat.blockAlign,
+      cutList,
+      wavFormat.bitsPerSample,
+      wavFormat.sampleRate
+    ]).then((results) => {
+      console.log(`FINISHED!?`);
+      console.log(results);
+    }).catch((err) => {
+      console.error(err);
+    });*/
+
+    this.subscrmanager.add(wavFormat.onaudiocut.subscribe(
+      (status: {
+        finishedSegments: number,
+        file: File
+      }) => {
+        console.log(`finished: ${status.finishedSegments}`);
+
+        this.tools.audioCutting.progress = Math.round(status.finishedSegments / (cutList.length + 1) * 100).toFixed(2);
+        zip = zip.file(status.file.name, status.file);
+
+        if (status.finishedSegments === cutList.length) {
+          // finished
+          // create zip file
+          zip.generateAsync({type: 'blob', streamFiles: true}, (metadata) => {
+            this.tools.audioCutting.progress = (((status.finishedSegments + (metadata.percent / 100)) / (cutList.length + 1)) * 100).toFixed(2);
+          })
+            .then((blob) => {
+              this.tools.audioCutting.status = 'finished';
+              this.tools.audioCutting.progress = '100';
+              this.tools.audioCutting.progressbarType = 'success';
+              this.tools.audioCutting.result.url = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(blob));
+              this.tools.audioCutting.result.filename = this.transcrService.audiomanager.ressource.info.name + '.zip';
+              // finished
+            });
+        }
+      },
+      (err) => {
+        error(err);
+      }
+    ));
+
+    this.tools.audioCutting.status = 'running';
+    this.tools.audioCutting.progressbarType = 'info';
+    wavFormat.cutAudioFileSequentially(this.transcrService.audiomanager.ressource.info.type, this.namingConvention.namingConvention,
+      this.transcrService.audiomanager.ressource.arraybuffer, cutList);
   }
 
   public stopAudioSplitting() {

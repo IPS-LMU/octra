@@ -194,28 +194,25 @@ export class AudioManager {
   }
 
   public static decodeAudio = (filename: string, type: string, buffer: ArrayBuffer,
-                               audioformats: AudioFormat[], keepbuffer = false): Promise<AudioManager> => {
+                               audioformats: AudioFormat[]): Promise<AudioManager> => {
     return new Promise<AudioManager>((resolve, reject) => {
       console.log('Decode audio... ' + filename);
 
       const audioformat: AudioFormat = AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats);
 
       if (audioformat !== undefined) {
-        audioformat.init(buffer);
+        audioformat.init(filename, buffer);
 
         let audioinfo = null;
         try {
           audioinfo = audioformat.getAudioInfo(filename, type, buffer);
-
         } catch (err) {
           reject(err.message);
         }
 
         if (audioinfo !== null) {
           const buffer_length = buffer.byteLength;
-          let buffer_copy = null;
-
-          buffer_copy = buffer.slice(0);
+          const buffer_copy = buffer.slice(0);
           AudioManager.decodeAudioFile(buffer, audioinfo.samplerate).then((audiobuffer: AudioBuffer) => {
 
             console.log(`audio decoded, samplerate ${audioinfo.samplerate}, ${audiobuffer.sampleRate}`);
@@ -229,9 +226,9 @@ export class AudioManager {
             audioinfo = new AudioInfo(filename, type, buffer_length, audiobuffer.sampleRate,
               audiobuffer.length, audiobuffer.numberOfChannels, audioinfo.bitrate);
 
-            audioinfo.file = new File([buffer_copy], filename, {type: 'audio/wav'});
+            // audioinfo.file = new File([buffer_copy], filename, {type: 'audio/wav'});
             result.setRessource(new AudioRessource(filename, SourceType.ArrayBuffer,
-              audioinfo, buffer, audiobuffer, buffer_length));
+              audioinfo, buffer_copy, audiobuffer, buffer_length));
 
             console.log(result.ressource);
             // set duration is very important

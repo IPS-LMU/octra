@@ -128,7 +128,7 @@
                                 </div>
                                 <div class="progress-area" style="text-align: center;">
                                     <button *ngIf="tools.audioCutting.status !== 'running'"
-                                            class="btn btn-primary btn-raised" (click)="splitAudio()"
+                                            class="btn btn-primary btn-raised" (click)="splitAudioClient()"
                                             [disabled]="namingConvention.resultConvention.length === 1"
                                             style="max-width:200px;margin-top:20px;">{{'tools.cut audio.name' | translate}}
                                     </button>
@@ -145,7 +145,7 @@
                                              *ngIf="tools.audioCutting.status === 'failed'">{{tools.audioCutting.message}}</div>
                                     </div>
                                     <a style="margin-left:10px;"
-                                       *ngIf="this.tools.audioCutting.result.url !== ''"
+                                       *ngIf="this.tools.audioCutting.result.url !== null"
                                        download="{{this.tools.audioCutting.result.filename}}"
                                        [href]="this.tools.audioCutting.result.url"
                                        class="link">

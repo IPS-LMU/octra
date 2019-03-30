@@ -108,6 +108,20 @@
                                         {{"tools.cut audio.show configurator" | translate}}
                                     </ng-container>
                                 </a>
+                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                    <label class="btn btn-secondary"
+                                           [ngClass]="{ 'active': tools.audioCutting.selectedMethod === 'client'}">
+                                        <input type="radio" name="cuttingMethod" value="client" autocomplete="off"
+                                               [checked]="tools.audioCutting.selectedMethod === 'client'"
+                                               [(ngModel)]="tools.audioCutting.selectedMethod"> Client
+                                    </label>
+                                    <label class="btn btn-secondary"
+                                           [ngClass]="{ 'active': tools.audioCutting.selectedMethod === 'server'}">
+                                        <input type="radio" name="cuttingMethod" value="server" autocomplete="off"
+                                               [checked]="tools.audioCutting.selectedMethod === 'server'"
+                                               [(ngModel)]="tools.audioCutting.selectedMethod"> Server
+                                    </label>
+                                </div>
                                 <div class="configurator" [hidden]="!tools.audioCutting.showConfigurator">
                                     <app-naming-drag-and-drop #namingConvention
                                                               [fileName]="navbarServ.transcrService.audiomanager.ressource.name"
@@ -128,7 +142,7 @@
                                 </div>
                                 <div class="progress-area" style="text-align: center;">
                                     <button *ngIf="tools.audioCutting.status !== 'running'"
-                                            class="btn btn-primary btn-raised" (click)="splitAudioClient()"
+                                            class="btn btn-primary btn-raised" (click)="splitAudio()"
                                             [disabled]="namingConvention.resultConvention.length === 1"
                                             style="max-width:200px;margin-top:20px;">{{'tools.cut audio.name' | translate}}
                                     </button>
@@ -136,6 +150,7 @@
                                             class="btn btn-danger btn-raised" (click)="stopAudioSplitting()"
                                             style="max-width:200px;margin-top:20px;">{{'general.stop' | translate}}
                                     </button>
+                                    {{tools.audioCutting.selectedMethod}}
                                     <div class="mb-2" *ngIf="this.tools.audioCutting.status !== 'idle'">
                                         <progressbar [animate]="true" [value]="this.tools.audioCutting.progress"
                                                      [type]="this.tools.audioCutting.progressbarType">

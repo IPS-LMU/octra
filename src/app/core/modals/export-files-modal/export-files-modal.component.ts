@@ -49,7 +49,8 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   public tools = {
     audioCutting: {
       opened: false,
-      progress: '0',
+      selectedMethod: 'client',
+      progress: 0,
       result: {
         url: null,
         filename: ''
@@ -272,9 +273,10 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
     this.tools.audioCutting.status = 'idle';
     this.tools.audioCutting.progressbarType = 'idle';
-    this.tools.audioCutting.progress = '0';
+    this.tools.audioCutting.progressbarType = 'idle';
+    this.tools.audioCutting.progress = 0;
     this.tools.audioCutting.result.filename = '';
-    this.tools.audioCutting.result.url = '';
+    this.tools.audioCutting.result.url = null;
     this.tools.audioCutting.opened = false;
     this.tools.audioCutting.subscriptionIDs = [-1, -1];
     this.visible = false;
@@ -284,9 +286,9 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   public splitAudioAPI() {
     const cutList = [];
     let startSample = 0;
-    this.tools.audioCutting.progress = '0';
+    this.tools.audioCutting.progress = 0;
     this.tools.audioCutting.progressbarType = 'info';
-    this.tools.audioCutting.result.url = '';
+    this.tools.audioCutting.result.url = null;
 
     for (let i = 0; i < this.transcrService.currentlevel.segments.length; i++) {
       const segment: Segment = this.transcrService.currentlevel.segments.get(i);
@@ -307,7 +309,8 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     }
 
     const formData: FormData = new FormData();
-    formData.append('files', this.audio.audiomanagers[0].ressource.info.file, this.transcrService.audiofile.name);
+    const file = new File([this.audio.audiomanagers[0].ressource.arraybuffer], this.audio.audiomanagers[0].ressource.info.fullname, {type: this.audio.audiomanagers[0].ressource.info.type});
+    formData.append('files', file, this.transcrService.audiofile.name);
     formData.append('segments', JSON.stringify(cutList));
     formData.append('cuttingOptions', JSON.stringify({
       exportFormats: exportFormats,
@@ -329,7 +332,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
                 'authorization': this.settService.app_settings.octra.plugins.audioCutter.authToken
               }, responseType: 'json'
             }).subscribe((result2: any) => {
-              this.tools.audioCutting.progress = ((!isNullOrUndefined(result2.progress)) ? Math.round(result2.progress * 100) : 0).toFixed(2);
+              this.tools.audioCutting.progress = ((!isNullOrUndefined(result2.progress)) ? Math.round(result2.progress * 100) : 0);
               this.tools.audioCutting.status = result2.status;
 
               if (result2.status === 'finished') {
@@ -353,7 +356,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
                   break;
                 case ('failed'):
                   this.tools.audioCutting.progressbarType = 'danger';
-                  this.tools.audioCutting.progress = '100';
+                  this.tools.audioCutting.progress = 100;
                   this.tools.audioCutting.status = 'failed';
                   this.tools.audioCutting.message = (!isNullOrUndefined(result2.message) && result2.message !== '') ? result2.message : '';
                   break;
@@ -367,19 +370,27 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
         ));
       }, (err) => {
         this.tools.audioCutting.progressbarType = 'danger';
-        this.tools.audioCutting.progress = '100';
+        this.tools.audioCutting.progress = 100;
         this.tools.audioCutting.status = 'failed';
         this.tools.audioCutting.message = 'API not available. Please send a message via the feedback form.';
         console.error(error);
       }));
   }
 
+  public splitAudio() {
+    if (this.tools.audioCutting.selectedMethod === 'client') {
+      this.splitAudioClient();
+    } else {
+      this.splitAudioAPI();
+    }
+  }
+
   public splitAudioClient() {
     const cutList = [];
     let startSample = 0;
-    this.tools.audioCutting.progress = '0';
+    this.tools.audioCutting.progress = 0;
     this.tools.audioCutting.progressbarType = 'info';
-    this.tools.audioCutting.result.url = '';
+    this.tools.audioCutting.result.url = null;
 
     for (let i = 0; i < this.transcrService.currentlevel.segments.length; i++) {
       const segment: Segment = this.transcrService.currentlevel.segments.get(i);
@@ -395,7 +406,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     // start cutting
     const wavFormat = new WavFormat();
     console.log(this.transcrService.audiomanager.ressource.arraybuffer.byteLength);
-    wavFormat.init(this.transcrService.audiomanager.ressource.info.name, this.transcrService.audiomanager.ressource.arraybuffer);
+    wavFormat.init(this.transcrService.audiomanager.ressource.info.fullname, this.transcrService.audiomanager.ressource.arraybuffer);
 
     let zip = new JSZip();
 
@@ -531,20 +542,27 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
         finishedSegments: number,
         file: File
       }) => {
-        console.log(`finished: ${status.finishedSegments}`);
-
-        this.tools.audioCutting.progress = Math.round(status.finishedSegments / (cutList.length + 1) * 100).toFixed(2);
+        this.tools.audioCutting.progress = Math.round(status.finishedSegments / (cutList.length + 1) * 100);
         zip = zip.file(status.file.name, status.file);
 
         if (status.finishedSegments === cutList.length) {
           // finished
           // create zip file
+          let percentsPerSecond = -1;
+          let percents = 0;
+          let lastCheck = -1;
           zip.generateAsync({type: 'blob', streamFiles: true}, (metadata) => {
-            this.tools.audioCutting.progress = (((status.finishedSegments + (metadata.percent / 100)) / (cutList.length + 1)) * 100).toFixed(2);
+            this.tools.audioCutting.progress = Number((((status.finishedSegments + (metadata.percent / 100)) / (cutList.length + 1)) * 100).toFixed(2));
+            if (Date.now() - lastCheck >= 1000) {
+              percentsPerSecond = metadata.percent - percents;
+              const secondsLeft = Math.ceil((100 - metadata.percent) / percentsPerSecond);
+              lastCheck = Date.now();
+              percents = metadata.percent;
+            }
           })
             .then((blob) => {
               this.tools.audioCutting.status = 'finished';
-              this.tools.audioCutting.progress = '100';
+              this.tools.audioCutting.progress = 100;
               this.tools.audioCutting.progressbarType = 'success';
               this.tools.audioCutting.result.url = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(blob));
               this.tools.audioCutting.result.filename = this.transcrService.audiomanager.ressource.info.name + '.zip';

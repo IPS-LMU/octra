@@ -124,12 +124,9 @@ export class WavFormat extends AudioFormat {
       // start and duration are the position in bytes after the header
 
       const filename = this.getNewFileName(namingConvention, this.filename, segment);
-
+      console.log(`naming convention ${namingConvention} => new file name is ${filename}`);
       if (this.isValid(buffer)) {
         const u8array = new Uint8Array(buffer);
-        console.log(`uintArray:`);
-        // @ts-ignore
-        console.log(window.performance.memory);
 
         this.calculateData(start, duration, u8array).then((data: Uint8Array) => {
           resolve(this.getFileFromBufferPart(data, filename));
@@ -190,9 +187,6 @@ export class WavFormat extends AudioFormat {
     sampleStart: number,
     sampleDur: number
   }) {
-    const name = fileName.substring(0, fileName.lastIndexOf('.'));
-    const extension = fileName.substring(fileName.lastIndexOf('.'));
-
     let leadingNull = '';
     const maxDecimals = 4;
     const decimals = (segment.number + 1).toString().length;
@@ -202,23 +196,23 @@ export class WavFormat extends AudioFormat {
       leadingNull += '0';
     }
 
-    return namingConvention.replace(/<([^<>]+)>/g, (g0, g1) => {
+    return (namingConvention.replace(/\<([^<>]+)\>/g, (g0, g1) => {
       switch (g1) {
         case('name'):
-          return name;
+          return fileName;
         case('sequNumber'):
           return `${leadingNull}${segment.number + 1}`;
         case('sampleStart'):
-          return segment.sampleStart;
+          return segment.sampleStart.toString();
         case('sampleDur'):
-          return segment.sampleDur;
+          return segment.sampleDur.toString();
         case('secondsStart'):
-          return Math.round(segment.sampleStart / this.sampleRate * 1000) / 1000;
+          return (Math.round(segment.sampleStart / this.sampleRate * 1000) / 1000).toString();
         case('secondsDur'):
-          return Math.round(segment.sampleStart / this.sampleRate * 1000) / 1000;
+          return (Math.round(segment.sampleStart / this.sampleRate * 1000) / 1000).toString();
       }
       return g1;
-    }) + extension;
+    }) + this._extension);
   }
 
   protected setSampleRate(buffer: ArrayBuffer) {
@@ -272,7 +266,7 @@ export class WavFormat extends AudioFormat {
   }
 
   private getFileFromBufferPart(data: Uint8Array, filename: string): File {
-    return new File([this.getFileDataView(data)], filename + '.wav', {type: 'audio/wav'});
+    return new File([this.getFileDataView(data)], filename, {type: 'audio/wav'});
   }
 
   public getFileDataView(data: Uint8Array): ArrayBuffer {

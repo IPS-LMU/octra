@@ -11,6 +11,7 @@
     "test/es6/promises",
     "test/indexeddb",
     "test/file/api",
-    "test/url/bloburls"
+    "test/url/bloburls",
+    "test/workers/webworkers"
   ]
 }

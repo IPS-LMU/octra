@@ -81,7 +81,7 @@
                     <tr>
                         <td (click)="tools.audioCutting.opened = !tools.audioCutting.opened">
                             <fa-icon style="color:gray;"
-                                     [icon]="['fas', ((this.tools.audioCutting.opened) ? 'chevron-up' : 'chevron-down')]"></fa-icon>
+                                     [icon]="['fas', ((tools.audioCutting.opened) ? 'chevron-up' : 'chevron-down')]"></fa-icon>
                         </td>
                         <td (click)="tools.audioCutting.opened = !tools.audioCutting.opened">
                             <a #a>
@@ -90,10 +90,16 @@
                         </td>
                         <td colspan="3">{{'tools.cut audio.description' | translate}}</td>
                     </tr>
-                    <tr [@fadeToggle]="(this.tools.audioCutting.opened) ? 'active': 'inactive'">
+                    <tr [@fadeToggle]="(tools.audioCutting.opened) ? 'active': 'inactive'">
                         <td></td>
                         <td colspan="4" style="padding-left:20px;">
                             <div class="card" style="padding:10px;" *ngIf="navbarServ.transcrService !== undefined">
+                                <div class="btn-group">
+                                    <label class="btn btn-primary" [(ngModel)]="tools.audioCutting.selectedMethod"
+                                           btnRadio="client" tabindex="0" role="button">client-side</label>
+                                    <label class="btn btn-primary" [(ngModel)]="tools.audioCutting.selectedMethod"
+                                           btnRadio="server" tabindex="0" role="button">server-side</label>
+                                </div>
                                 <a (click)="tools.audioCutting.showConfigurator = !tools.audioCutting.showConfigurator"
                                    class="show-configurator-link"
                                 >
@@ -108,20 +114,6 @@
                                         {{"tools.cut audio.show configurator" | translate}}
                                     </ng-container>
                                 </a>
-                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                    <label class="btn btn-secondary"
-                                           [ngClass]="{ 'active': tools.audioCutting.selectedMethod === 'client'}">
-                                        <input type="radio" name="cuttingMethod" value="client" autocomplete="off"
-                                               [checked]="tools.audioCutting.selectedMethod === 'client'"
-                                               [(ngModel)]="tools.audioCutting.selectedMethod"> Client
-                                    </label>
-                                    <label class="btn btn-secondary"
-                                           [ngClass]="{ 'active': tools.audioCutting.selectedMethod === 'server'}">
-                                        <input type="radio" name="cuttingMethod" value="server" autocomplete="off"
-                                               [checked]="tools.audioCutting.selectedMethod === 'server'"
-                                               [(ngModel)]="tools.audioCutting.selectedMethod"> Server
-                                    </label>
-                                </div>
                                 <div class="configurator" [hidden]="!tools.audioCutting.showConfigurator">
                                     <app-naming-drag-and-drop #namingConvention
                                                               [fileName]="navbarServ.transcrService.audiomanager.ressource.name"
@@ -131,10 +123,10 @@
                                     <div class="form-control">
                                         <span>{{'tools.cut audio.append meta files' | translate}}: </span>
                                         <div class="form-check form-check-inline"
-                                             *ngFor="let exportFormat of this.tools.audioCutting.exportFormats; let i = index;">
+                                             *ngFor="let exportFormat of tools.audioCutting.exportFormats; let i = index;">
                                             <input class="form-check-input" type="checkbox" id="inlineCheckbox{{i}}"
                                                    [value]="exportFormat.value"
-                                                   [(ngModel)]="this.tools.audioCutting.exportFormats[i].selected">
+                                                   [(ngModel)]="tools.audioCutting.exportFormats[i].selected">
                                             <label class="form-check-label"
                                                    for="inlineCheckbox{{i}}">{{exportFormat.label}}</label>
                                         </div>
@@ -150,19 +142,18 @@
                                             class="btn btn-danger btn-raised" (click)="stopAudioSplitting()"
                                             style="max-width:200px;margin-top:20px;">{{'general.stop' | translate}}
                                     </button>
-                                    {{tools.audioCutting.selectedMethod}}
-                                    <div class="mb-2" *ngIf="this.tools.audioCutting.status !== 'idle'">
-                                        <progressbar [animate]="true" [value]="this.tools.audioCutting.progress"
-                                                     [type]="this.tools.audioCutting.progressbarType">
-                                            <b>{{this.tools.audioCutting.progress}}%</b>
+                                    <div class="mb-2" *ngIf="tools.audioCutting.status !== 'idle'">
+                                        <progressbar [animate]="true" [value]="tools.audioCutting.progress"
+                                                     [type]="tools.audioCutting.progressbarType">
+                                            <b>{{tools.audioCutting.progress}}%</b>
                                         </progressbar>
                                         <div class="text-danger" style="padding:10px;"
                                              *ngIf="tools.audioCutting.status === 'failed'">{{tools.audioCutting.message}}</div>
                                     </div>
                                     <a style="margin-left:10px;"
-                                       *ngIf="this.tools.audioCutting.result.url !== null"
-                                       download="{{this.tools.audioCutting.result.filename}}"
-                                       [href]="this.tools.audioCutting.result.url"
+                                       *ngIf="tools.audioCutting.result.url !== null"
+                                       download="{{tools.audioCutting.result.filename}}"
+                                       [href]="tools.audioCutting.result.url"
                                        class="link">
                                         <fa-icon icon="save"></fa-icon>
                                         {{'general.download' | translate}}

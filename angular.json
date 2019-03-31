@@ -18,10 +18,7 @@
             "polyfills": "src/polyfills.ts",
             "assets": [
               "src/assets",
-              "src/i18n",
               "src/config",
-              "src/favicon.ico",
-              "src/schemata",
               "src/LICENSE.txt"
             ],
             "styles": [

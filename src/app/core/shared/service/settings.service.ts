@@ -241,7 +241,7 @@ export class SettingsService {
         },
         {
           json: './config/localmode/projectconfig.json',
-          schema: './schemata/projectconfig.schema.json'
+          schema: './assets/schemata/projectconfig.schema.json'
         },
         {
           json: 'projectconfig.json',
@@ -270,7 +270,7 @@ export class SettingsService {
       },
       {
         json: url,
-        schema: './schemata/guidelines.schema.json'
+        schema: './assets/schemata/guidelines.schema.json'
       },
       {
         json: 'guidelines_' + language + '.json',
@@ -407,7 +407,7 @@ export class SettingsService {
         },
         {
           json: './config/appconfig.json',
-          schema: './schemata/appconfig.schema.json'
+          schema: './assets/schemata/appconfig.schema.json'
         },
         {
           json: 'appconfig.json',

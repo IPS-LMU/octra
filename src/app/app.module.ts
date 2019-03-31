@@ -158,7 +158,7 @@ library.add(
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
-  return new LanguageLoader(http, './i18n/octra/octra_', '.json');
+  return new LanguageLoader(http, './assets/i18n/octra/octra_', '.json');
 }
 
 export const EDITORS: any[] = [

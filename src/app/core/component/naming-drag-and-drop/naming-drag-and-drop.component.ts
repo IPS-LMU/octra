@@ -41,7 +41,7 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
               result += (this.fileName.lastIndexOf('.') > -1) ? this.fileName.substring(0, this.fileName.lastIndexOf('.')) : this.fileName;
               break;
             case('<sequNumber>'):
-              result += '01';
+              result += '0001';
               break;
             case('<sampleStart>'):
               result += '0';

@@ -145,11 +145,18 @@
                                     <div class="mb-2" *ngIf="tools.audioCutting.status !== 'idle'">
                                         <progressbar [animate]="true" [value]="tools.audioCutting.progress"
                                                      [type]="tools.audioCutting.progressbarType">
-                                            <b>{{tools.audioCutting.progress}}%</b>
+                                            <b>
+
+                                                {{ tools.audioCutting.progress | number : '1.2-2'}}%
+                                            </b>
                                         </progressbar>
                                         <div class="text-danger" style="padding:10px;"
                                              *ngIf="tools.audioCutting.status === 'failed'">{{tools.audioCutting.message}}</div>
                                     </div>
+                                    <ng-container
+                                            *ngIf="tools.audioCutting.status !== 'idle' && tools.audioCutting.status !== 'finished' && tools.audioCutting.timeLeft > 0">
+                                        Time left: {{tools.audioCutting.timeLeft | timespan2}}
+                                    </ng-container>
                                     <a style="margin-left:10px;"
                                        *ngIf="tools.audioCutting.result.url !== null"
                                        download="{{tools.audioCutting.result.filename}}"

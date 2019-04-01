@@ -59,8 +59,8 @@ export class TextTableConverter extends CuttingFormat {
       const segment = cutList[i];
       const secondsStart = segment.sampleStart / audioInfo.duration.originalSample.sampleRate;
       const secondsDuration = segment.sampleDur / audioInfo.duration.originalSample.sampleRate;
-      text += `${getNewFileName(nameConvention, fileName, i, cutList, audioInfo)}\t${fileName}\t${secondsStart}\t${secondsDuration}\t
-${segment.sampleStart}\t${segment.sampleDur}\t${audioInfo.duration.originalSample.sampleRate}\n`;
+      text += `${getNewFileName(nameConvention, fileName, i, cutList, audioInfo)}\t${fileName}\t${secondsStart}\t${secondsDuration}\t`
+        + `${segment.sampleStart}\t${segment.sampleDur}\t${audioInfo.duration.originalSample.sampleRate}\n`;
     }
 
     return text;

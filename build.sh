@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 buildDir="dist/"
-appName="test"
+appName="octra-dev"
 
 echo "Building OCTRA..."
 ng build --prod --base-href "https://www.phonetik.uni-muenchen.de/apps/octra/${appName}/"

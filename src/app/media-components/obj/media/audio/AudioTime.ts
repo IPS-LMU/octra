@@ -254,13 +254,13 @@ export class OriginalAudioTime {
   }
 
   public toString(): string {
-    return 'Samples: ' + this.browserSample.value;
+    return 'Samples: ' + this._originalSample.value;
   }
 
   public toAny(): any {
     return {
-      browserSamples: this._sampleRates.browser,
-      originalSamples: this._sampleRates.original,
+      browserSamples: this.browserSample.value,
+      originalSamples: this._originalSample.value,
       browserSampleRate: this._sampleRates.browser,
       originalSampleRate: this._sampleRates.original
     };
@@ -268,7 +268,7 @@ export class OriginalAudioTime {
 }
 
 export class BrowserAudioTime {
-  get sampleRates(): { original: null; browser: null } {
+  get sampleRates(): { original: number; browser: number } {
     return this._sampleRates;
   }
 
@@ -280,7 +280,10 @@ export class BrowserAudioTime {
     return OriginalSample.fromBrowserSample(this._browserSample, this._sampleRates.original);
   }
 
-  private _sampleRates = {
+  private _sampleRates: {
+    browser: number,
+    original: number
+  } = {
     browser: null,
     original: null
   };
@@ -375,8 +378,8 @@ export class BrowserAudioTime {
 
   public toAny(): any {
     return {
-      browserSamples: this._sampleRates.browser,
-      originalSamples: this._sampleRates.original,
+      browserSamples: this._browserSample.value,
+      originalSamples: this.originalSample.value,
       browserSampleRate: this._sampleRates.browser,
       originalSampleRate: this._sampleRates.original
     };

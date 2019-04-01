@@ -211,28 +211,29 @@ export class AudioManager {
         }
 
         if (audioinfo !== null) {
+          console.log(audioinfo);
           const buffer_length = buffer.byteLength;
           const buffer_copy = buffer.slice(0);
           AudioManager.decodeAudioFile(buffer, audioinfo.samplerate).then((audiobuffer: AudioBuffer) => {
 
             console.log(`audio decoded, samplerate ${audioinfo.samplerate}, ${audiobuffer.sampleRate}`);
 
-            console.log(`audioinfo:`);
-            console.log(audioinfo);
             const result = new AudioManager(audioinfo, audiobuffer.sampleRate);
             result.bufferedOLA.set_audio_buffer(audiobuffer);
 
-            console.log(`original samplerate: ${audioinfo.samplerate}`);
+            const originalSampleRate = audioinfo.samplerate;
+            const originalDuration = audioinfo.duration.browserSample.value;
+            const originalAudioTime = new OriginalAudioTime(new OriginalSample(originalDuration, originalSampleRate), audiobuffer.sampleRate);
+
             audioinfo = new AudioInfo(filename, type, buffer_length, audiobuffer.sampleRate,
               audiobuffer.length, audiobuffer.numberOfChannels, audioinfo.bitrate);
+            audioinfo.duration = new BrowserAudioTime(BrowserSample.fromOriginalSample(originalAudioTime.originalSample, audiobuffer.sampleRate), originalAudioTime.originalSample.sampleRate);
 
             // audioinfo.file = new File([buffer_copy], filename, {type: 'audio/wav'});
-            result.setRessource(new AudioRessource(filename, SourceType.ArrayBuffer,
-              audioinfo, buffer_copy, audiobuffer, buffer_length));
+            const ressource = new AudioRessource(filename, SourceType.ArrayBuffer,
+              audioinfo, buffer_copy, audiobuffer, buffer_length);
+            result.setRessource(ressource);
 
-            console.log(result.ressource);
-            // set duration is very important
-            result.ressource.info.duration.browserSample.value = audiobuffer.length;
             console.log(`duration browser: ${result.ressource.info.duration.browserSample.seconds}`);
             console.log(`duration original: ${result.ressource.info.duration.originalSample.seconds}`);
             console.log(`dur ${audiobuffer.length / audiobuffer.sampleRate}`);

@@ -28,11 +28,12 @@ export class AudioInfo extends FileInfo {
     this._duration = value;
   }
 
-  constructor(filename: string, type: string, size: number, sampleRate: number, durationSamples: number,
-              channels: number, bitrate: number) {
+  constructor(filename: string, type: string, size: number, browserSampleRate: number, durationSamples: number,
+              channels: number, bitrate: number, originalSampleRate: number = null) {
     super(filename, type, size);
-    this._samplerate = sampleRate;
-    this._duration = new BrowserAudioTime(new BrowserSample(durationSamples, sampleRate), sampleRate);
+    this._samplerate = browserSampleRate;
+    const samplerate = (originalSampleRate !== null) ? originalSampleRate : browserSampleRate;
+    this._duration = new BrowserAudioTime(new BrowserSample(durationSamples, browserSampleRate), samplerate);
     this._channels = channels;
     this._bitrate = bitrate;
   }

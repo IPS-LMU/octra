@@ -1,6 +1,7 @@
 import {AudioFormat} from './AudioFormat';
 
 // specification found on https://wiki.xiph.org/OggVorbis
+// https://www.file-recovery.com/ogg-signature-format.htm
 export class OggFormat extends AudioFormat {
   constructor() {
     super();

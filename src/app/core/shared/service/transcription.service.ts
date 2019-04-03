@@ -379,8 +379,8 @@ export class TranscriptionService {
                       }
                     );
                 }
-                process();
               }
+            process();
             }
           ).catch((err) => {
             console.error(err);

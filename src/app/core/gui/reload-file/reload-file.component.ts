@@ -23,43 +23,48 @@ export class ReloadFileComponent implements OnInit {
     Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
   };
   newTranscription = () => {
-    this.modService.show('transcription_delete').then(() => {
-      let keep_data = false;
+    this.modService.show('transcription_delete').then((decision) => {
+      if (decision === 'DELETE') {
 
-      new Promise<void>((resolve) => {
-        if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
-          const new_levels: OIDBLevel[] = [];
-          for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
-            new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
-          }
+        let keep_data = false;
 
-          const new_links: OIDBLink[] = [];
-          for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
-            new_links.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
-          }
-          this.appStorage.overwriteAnnotation(new_levels).then(
-            () => {
-              return this.appStorage.overwriteLinks(new_links);
+        new Promise<void>((resolve) => {
+          if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
+            const new_levels: OIDBLevel[] = [];
+            for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
+              new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
             }
-          ).then(() => {
-            keep_data = true;
+
+            const new_links: OIDBLink[] = [];
+            for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
+              new_links.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
+            }
+            this.appStorage.overwriteAnnotation(new_levels).then(
+              () => {
+                return this.appStorage.overwriteLinks(new_links);
+              }
+            ).then(() => {
+              keep_data = true;
+              resolve();
+            }).catch((err) => {
+              console.error(err);
+            });
+          } else {
             resolve();
-          }).catch((err) => {
-            console.error(err);
-          });
-        } else {
-          resolve();
-        }
-      }).then(() => {
-        this.audioService.registerAudioManager(this.dropzone.audiomanager);
-        this.appStorage.beginLocalSession(this.dropzone.files, keep_data, this.navigate,
-          (error) => {
-            if (error === 'file not supported') {
-              this.showErrorMessage(this.langService.instant('reload-file.file not supported', {type: ''}));
-            }
           }
-        );
-      });
+        }).then(() => {
+          this.audioService.registerAudioManager(this.dropzone.audiomanager);
+          this.appStorage.beginLocalSession(this.dropzone.files, keep_data, this.navigate,
+            (error) => {
+              if (error === 'file not supported') {
+                this.showErrorMessage(this.langService.instant('reload-file.file not supported', {type: ''}));
+              }
+            }
+          );
+        });
+      } else {
+        // do nothing because abort
+      }
     }).catch((error) => {
       console.error(error);
     });

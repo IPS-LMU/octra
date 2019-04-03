@@ -41,9 +41,7 @@ export class PromptModalComponent implements OnInit {
   ngOnInit() {
   }
 
-  public open(data: {
-    text: string
-  }): Promise<void> {
+  public open(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.modal.show(this.modal, this.config);
       this.visible = true;

@@ -117,7 +117,7 @@
             </button>
             <button type="button" class="btn btn-primary btn-raised w-100"
                     (click)="onSaveTranscriptionButtonClicked()" *ngIf="appStorage.usemode === 'url'">
-                <span>SAVE TRANSCRIPTION</span>
+                <span>{{"transcription.send" | translate}} </span>
                 <fa-icon icon="paper-plane"></fa-icon>
             </button>
         </div>

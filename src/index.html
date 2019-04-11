@@ -32,7 +32,6 @@
           content="https://www.phonetik.uni-muenchen.de/apps/octra/octra/assets/img/socialmedia/octra_logo_fb.jpg"/>
     <meta property="og:description"
           content="OCTRA is a modern online tool for the orthographic transcription of audio files. It can be used online or local and is free to use. What makes it special is its user-friendly appearance and its features: multiple editors and tiers, auto-saving, transcription guidelines support various file formats and a lot more."/>
-
     <style>
         #logo {
             text-align: center;
@@ -86,13 +85,15 @@
             background-color: #f44336;
         }
     </style>
+    <link rel="stylesheet" id="bootstrap" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" id="bootstrap-material" href="assets/css/bootstrap-material-design.min.css">
 </head>
 <!-- 3. Display the application -->
 <body>
 
 <app-octra>
-    <div id="loading" style="margin-top:10%;padding:20px;">
-        <span id="logo">OCTRA</span>
+    <div id="loading" style="margin-top:150px;padding:20px;">
+        <span id="logo" style="font-size:5em;">OCTRA</span>
         <div class="progress">
             <div class="progress-bar progress-animated" style="width:100%">
             </div>

@@ -167,7 +167,8 @@
       "play audio on hover": "Audio mit Mausbewegung abspielen",
       "jump_last_segment": "Speichern & zum vorherigen Segment springen",
       "jump_next_segment": "Speichern & zum nächsten Segment springen",
-      "close_save": "Speichern & Fenster schließen"
+      "close_save": "Speichern & Fenster schließen",
+      "delete boundaries": "Ausgewählte Segmentgrenzen entfernen und Transkript zusammenführen"
     },
     "inactivity": {
       "header": "Längere Inaktivität entdeckt",

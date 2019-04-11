@@ -35,6 +35,11 @@
                 <a class="nav-link" [routerLink]="['/faq']" [queryParamsHandling]="'merge'">{{'general.faq' |
                     translate}}</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="https://www.phonetik.uni-muenchen.de/apps/octra/manual/en/" target="_blank">
+                    Manual
+                </a>
+            </li>
         </ul>
         <ul class="navbar-nav mr-auto" *ngIf="appStorage.LoggedIn">
             <ng-template ngFor let-editor [ngForOf]="editors">
@@ -284,6 +289,10 @@
                                                 btnRadio="20" tabindex="0" role="button"
                                                 (click)="changeSecondsPerLine(20)">20
                                         </button>
+                                        <button class="btn btn-outline-secondary" [(ngModel)]="secondsPerLine"
+                                                btnRadio="60" tabindex="0" role="button"
+                                                (click)="changeSecondsPerLine(60)">60
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -325,12 +334,15 @@
 </nav>
 <div id="subnav" class="panel" *ngIf="appStorage.LoggedIn && appStorage.usemode === 'online' && navbarServ.dataloaded">
     <div class="row">
-        <div class="col-12 col-sm-9" style="text-align: left;padding-left:20px;">
+        <div class="col-12 col-sm-9" [ngClass]="{
+        'col-12 col-sm-9': appStorage.prompttext !== null && appStorage.prompttext !== undefined && appStorage.prompttext !== '',
+        'col-12': appStorage.prompttext !== null && appStorage.prompttext !== undefined && appStorage.prompttext === ''
+        }" style="text-align: left;padding-left:20px;">
             {{navbarServ.originalInfo?.fullname}}: <i>{{appStorage.servercomment}}</i>
         </div>
-        <div class="col-12 col-sm-3" style="text-align: right;padding-right:20px;"><a (click)="promptmodal.open()"
-                                                                                      style="cursor: pointer; color:#009688;">{{'general.prompt'
-            |
-            translate}}</a></div>
+        <div class="col-12 col-sm-3" style="text-align: right;padding-right:20px;"
+             *ngIf="appStorage.prompttext !== null && appStorage.prompttext !== undefined && appStorage.prompttext !== ''">
+            <a (click)="promptmodal.open()" style="cursor: pointer; color:#009688;">{{'general.prompt'| translate}}</a>
+        </div>
     </div>
 </div>

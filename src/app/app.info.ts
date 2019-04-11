@@ -13,6 +13,8 @@ import {BundleJSONConverter} from './core/obj/Converters/BundleJSONConverter';
 import {EmailBugReporter} from './core/obj/BugAPI/EmailBugReporter';
 import {NavigationExtras} from '@angular/router';
 import {ELANConverter} from './core/obj/Converters/ELANConverter';
+import {SRTConverter} from './core/obj/Converters/SRTConverter';
+import {WebVTTConverter} from './core/obj/Converters/WebVTTConverter';
 
 export class AppInfo {
   public static readonly audioformats = [
@@ -33,7 +35,9 @@ export class AppInfo {
     new PartiturConverter(),
     new BundleJSONConverter(),
     new TextConverter(),
-    new ELANConverter()
+    new ELANConverter(),
+    new SRTConverter(),
+    new WebVTTConverter()
   ];
 
   public static readonly themes: string[] = [
@@ -41,8 +45,8 @@ export class AppInfo {
     'shortAudioFiles'
   ];
 
-  static readonly version = '1.3.0';
-  static readonly lastUpdate = '2018-03-13 12:20';
+  static readonly version = '1.2.7';
+  static readonly lastUpdate = '2018-04-11 11:33';
 
   public static readonly queryParamsHandling: NavigationExtras = {
     queryParamsHandling: '',

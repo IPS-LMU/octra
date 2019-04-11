@@ -29,7 +29,7 @@
                         <h4>Feedback</h4>
                         <app-transcription-feedback #feedback
                                                     [feedback_data]="appStorage.feedback"
-                                                    [showCommentFieldOnly]="settingsService.isTheme('shortAudioFiles')">
+                                                    [showCommentFieldOnly]="settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('korbinian')">
                         </app-transcription-feedback>
 
                         <p style="color:red; text-align: center"
@@ -37,7 +37,7 @@
                             {{"transcription.invalid" | translate}}
                         </p>
                         <ng-container
-                                *ngIf="!settingsService.isTheme('shortAudioFiles'); else isShortAudioFilesTheme">
+                                *ngIf="settingsService.isTheme('default'); else isShortAudioFilesTheme">
                             <button class="btn btn-primary btn-outline btn-success" id="transcr-send-btn"
                                     (click)="sendTranscription()"
                                     [disabled]="!feedback.valid || (sendValidTranscriptOnly && !transcrService.transcriptValid)">
@@ -46,28 +46,42 @@
                             </button>
                         </ng-container>
                         <ng-template #isShortAudioFilesTheme>
-                            <div class="row" id="bottom-navigation" role="group">
-
+                            <div class="row" *ngIf="settingsService.isTheme('shortAudioFiles'); else isKorbinianTheme"
+                                 id="bottom-navigation" role="group">
                                 <button class="btn btn-raised btn-primary w-100"
                                         (click)="sendTranscriptionForShortAudioFiles('good')">
-                                    <fa-icon icon="paper-plane"></fa-icon>
-                                    <span>
-                                           {{"general.good" | translate}}
-                                    </span>
+                                    <fa-icon icon="star"></fa-icon>
+                                    <fa-icon icon="star"></fa-icon>
+                                    <fa-icon icon="star"></fa-icon>
                                 </button>
                                 <button class="btn btn-raised btn-warning w-100" style="background-color: orange"
                                         (click)="sendTranscriptionForShortAudioFiles('middle')">
-                                    <fa-icon icon="paper-plane"></fa-icon>
-                                    <span>
-                                           {{"general.middle" | translate}}
-                                    </span>
+                                    <fa-icon icon="star"></fa-icon>
+                                    <fa-icon icon="star"></fa-icon>
                                 </button>
                                 <button class="btn btn-raised btn-danger w-100"
                                         (click)="sendTranscriptionForShortAudioFiles('bad')">
-                                    <fa-icon icon="paper-plane"></fa-icon>
-                                    <span>
-                                           {{"general.bad" | translate}}
-                                    </span>
+                                    <fa-icon icon="star"></fa-icon>
+                                </button>
+                            </div>
+                        </ng-template>
+                        <ng-template #isKorbinianTheme>
+                            <div class="row" id="bottom-navigation" role="group">
+                                <button class="btn btn-raised btn-info w-100"
+                                        (click)="sendTranscriptionForKorbinian('NO')">
+                                    NO
+                                </button>
+                                <button class="btn btn-raised btn-danger w-100"
+                                        (click)="sendTranscriptionForKorbinian('VE')">
+                                    VE
+                                </button>
+                                <button class="btn btn-raised btn-secondary w-100"
+                                        (click)="sendTranscriptionForKorbinian('EE')">
+                                    EE
+                                </button>
+                                <button class="btn btn-raised btn-primary w-100"
+                                        (click)="sendTranscriptionForKorbinian('AN')">
+                                    AN
                                 </button>
                             </div>
                         </ng-template>

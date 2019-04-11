@@ -13,7 +13,7 @@ export class Timespan2Pipe implements PipeTransform {
       result = '0' + result;
     }
     return result;
-  };
+  }
 
   private get Seconds(): number {
     return Math.floor(this.timespan / 1000) % 60;

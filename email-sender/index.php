@@ -155,6 +155,10 @@ if (!empty($data) && !is_null($headers["Authorization"]) && $headers["Authorizat
             .date-col {
                 width: 50px;
             }
+
+            .error {
+                color: red;
+            }
         </style>
         <body>
         <div class="container">
@@ -277,7 +281,9 @@ if (!empty($data) && !is_null($headers["Authorization"]) && $headers["Authorizat
                                         <?php break; ?>
                                     <?php endswitch; ?>
                             </td>
-                            <td><?php echo $entry["message"]; ?></td>
+                            <td <?php if ($entry["type"] === 3) {
+                                echo "class='error'";
+                            } ?>><?php echo str_replace("\n", "<br/>", $entry["message"]); ?></td>
                         </tr>
                     <?php endforeach; ?>
                     </tbody>
@@ -313,6 +319,5 @@ if (!empty($data) && !is_null($headers["Authorization"]) && $headers["Authorizat
 }
 
 echo json_encode($result);
-
 
 ?>

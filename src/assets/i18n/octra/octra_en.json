@@ -167,7 +167,8 @@
       "play audio on hover": "Play audio on hover",
       "jump_last_segment": "Save & jump to previous segment",
       "jump_next_segment": "Save & jump to next segment",
-      "close_save": "Save & close window"
+      "close_save": "Save & close window",
+      "delete boundaries": "Delete selected segment boundaries and join transcripts"
     },
     "inactivity": {
       "header": "Longer absence detected",

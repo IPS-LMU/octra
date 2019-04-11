@@ -95,6 +95,25 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
         }));
       }
 
+      if (this.settingsService.isTheme('korbinian')) {
+        this.shortcutID = this.subscrmanager.add(this.keyService.onkeyup.subscribe((keyObj: any) => {
+          switch (keyObj.comboKey) {
+            case('CTRL + 1'):
+              this.sendTranscriptionForKorbinian('NO');
+              break;
+            case('CTRL + 2'):
+              this.sendTranscriptionForKorbinian('VE');
+              break;
+            case('CTRL + 3'):
+              this.sendTranscriptionForKorbinian('EE');
+              break;
+            case('CTRL + 4'):
+              this.sendTranscriptionForKorbinian('AN');
+              break;
+          }
+        }));
+      }
+
       if (validate) {
         this.transcrService.validateAll();
       }
@@ -198,6 +217,23 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
         this.appStorage.feedback = 'OK';
         break;
       default:
+    }
+
+    if (this.sendValidTranscriptOnly && this.transcrService.transcriptValid || !this.sendValidTranscriptOnly) {
+      this.sendTranscription();
+    }
+  }
+
+  public sendTranscriptionForKorbinian(type: 'NO' | 'VE' | 'EE' | 'AN') {
+    this.transcrService.feedback.comment = this.transcrService.feedback.comment.replace(/(((?:NO)|(?:VE)|(?:EE)|(?:AN))(\s*;\s*)*)/g, '');
+
+    if (this.appStorage.servercomment !== '' && this.transcrService.feedback.comment === '') {
+      this.transcrService.feedback.comment = type + '; ' + this.appStorage.servercomment;
+    } else if ((this.appStorage.servercomment === '' && this.transcrService.feedback.comment !== '')
+      || (this.appStorage.servercomment !== '' && this.transcrService.feedback.comment !== '')) {
+      this.transcrService.feedback.comment = type + '; ' + this.transcrService.feedback.comment;
+    } else {
+      this.transcrService.feedback.comment = type;
     }
 
     if (this.sendValidTranscriptOnly && this.transcrService.transcriptValid || !this.sendValidTranscriptOnly) {

@@ -114,6 +114,7 @@ import {CompatibilityService} from './core/shared/service/compatibility.service'
 import {TranscriptionFeedbackComponent} from './core/gui/transcription-feedback/transcription-feedback.component';
 import {GuidelinesComponent} from './core/gui/guidelines/guidelines.component';
 import {InactivityModalComponent} from './core/modals/inactivity-modal/inactivity-modal.component';
+import {faStar} from '@fortawesome/free-solid-svg-icons/faStar';
 import {ValidationPopoverComponent} from './core/component/transcr-editor/validation-popover/validation-popover.component';
 import {NamingDragAndDropComponent} from './core/component/naming-drag-and-drop/naming-drag-and-drop.component';
 import {DragDropModule} from '@angular/cdk/drag-drop';
@@ -153,7 +154,8 @@ library.add(
   faPaperPlane,
   faMinus,
   faWindowMaximize,
-  faAlignJustify
+  faAlignJustify,
+  faStar
 );
 
 // AoT requires an exported function for factories

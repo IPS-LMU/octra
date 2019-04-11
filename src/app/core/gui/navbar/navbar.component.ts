@@ -24,7 +24,6 @@ import {ExportFilesModalComponent} from '../../modals/export-files-modal/export-
   styleUrls: ['./navbar.component.css'],
   animations: OCTRANIMATIONS
 })
-
 export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChild('modalexport') modalexport: ExportFilesModalComponent;

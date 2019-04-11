@@ -59,10 +59,13 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
           if (error instanceof Error) {
             debug = error.message;
             stack = error.stack;
-          } else {
+          }
+          if (typeof error === 'object') {
             // some other type of object
             debug = 'OBJECT';
             stack = JSON.stringify(error);
+          } else {
+            debug = error;
           }
         }
 

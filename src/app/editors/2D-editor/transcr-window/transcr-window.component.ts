@@ -27,6 +27,7 @@ import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
 import {LoupeComponent} from '../../../media-components/components/audio/loupe';
 import {AudioNavigationComponent} from '../../../media-components/components/audio/audio-navigation';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
+import {isNullOrUndefined} from '../../../core/shared/Functions';
 
 @Component({
   selector: 'app-transcr-window',
@@ -222,7 +223,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         const segment = this.transcrService.currentlevel.segments.get(this.segment_index).clone();
         segment.transcript = this.editor.rawText;
         this.transcrService.currentlevel.segments.change(this.segment_index, segment);
-        const startSample = (this.segment_index > 0) ? this.transcrService.currentlevel.segments.get(this.segment_index - 1).time.samples : 0;
+        const startSample = (this.segment_index > 0)
+          ? this.transcrService.currentlevel.segments.get(this.segment_index - 1).time.samples
+          : 0;
         this.uiService.addElementFromEvent('transcription:segment_exited', {
             value: {
               segment: {
@@ -239,7 +242,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           });
       }
     } else {
-      console.log(`could not save segment`);
+      const isNull = isNullOrUndefined(this.transcrService.currentlevel.segments);
+      console.log(`could not save segment. segment index=${this.segment_index},
+segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     }
   }
 

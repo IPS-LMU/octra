@@ -497,9 +497,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                   }
                   break;
                 case('delete_boundaries'):
-                  if (this.av.focused) {
+                  if (this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly && this.av.focused) {
                     // TODO trigger event for logging?
-
                     for (let i = 0; i < this.transcr.currentlevel.segments.length; i++) {
                       const segment = this.transcr.currentlevel.segments.get(i);
 

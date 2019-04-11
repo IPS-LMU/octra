@@ -148,6 +148,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.special_markers.boundary = true;
     this.loupe.viewer.Settings.justify_signal_height = true;
+
+    // remove annoying shortcut for break marker
+    this.loupe.Settings.shortcuts['set_break'] = null;
     this.loupe.viewer.round_values = false;
     const segments = this.transcrService.currentlevel.segments;
     this.temp_segments = segments.clone();

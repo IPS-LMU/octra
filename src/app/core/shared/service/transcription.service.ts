@@ -314,7 +314,7 @@ export class TranscriptionService {
                     console.log(`overwrite server transcript with prompt!`);
                     this.appStorage.annotation[this._selectedlevel].level.items = [];
                     this.appStorage.annotation[this.selectedlevel].level.items.push(
-                      new OSegment(0, 0, this.audiomanager.originalInfo.duration.samples,
+                      new OSegment(0, 0, this.audiomanager.originalInfo.duration.originalSample.value,
                         [new OLabel('OCTRA_1', this.appStorage.prompttext)])
                     );
 
@@ -353,7 +353,7 @@ export class TranscriptionService {
                   console.log(`set prompt text as NEW transcript!`);
                   this.appStorage.annotation[this._selectedlevel].level.items = [];
                   this.appStorage.annotation[this.selectedlevel].level.items.push(
-                    new OSegment(0, 0, this.audiomanager.originalInfo.duration.samples,
+                    new OSegment(0, 0, this.audiomanager.originalInfo.duration.originalSample.value,
                       [new OLabel('OCTRA_1', this.appStorage.prompttext)])
                   );
 

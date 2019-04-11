@@ -333,10 +333,6 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
     if (this.transcrService.currentlevel.segments.length > 0) {
       this.editor.segments = this.transcrService.currentlevel.segments;
     }
-    if (this.appStorage.prompttext !== '' && (this.transcrService.currentlevel.segments.length <= 1 &&
-      this.transcrService.currentlevel.segments.get(0).transcript === '')) {
-      this.editor.rawText = this.appStorage.prompttext;
-    }
     this.editor.Settings.height = 100;
     this.editor.update();
   }

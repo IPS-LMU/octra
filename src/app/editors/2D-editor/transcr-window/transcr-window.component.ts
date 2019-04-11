@@ -27,6 +27,7 @@ import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
 import {LoupeComponent} from '../../../media-components/components/audio/loupe';
 import {AudioNavigationComponent} from '../../../media-components/components/audio/audio-navigation';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
+import {isNullOrUndefined} from '../../../core/shared/Functions';
 
 @Component({
   selector: 'app-transcr-window',
@@ -147,6 +148,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.special_markers.boundary = true;
     this.loupe.viewer.Settings.justify_signal_height = true;
+
+    // remove annoying shortcut for break marker
+    this.loupe.Settings.shortcuts['set_break'] = null;
     this.loupe.viewer.round_values = false;
     const segments = this.transcrService.currentlevel.segments;
     this.temp_segments = segments.clone();
@@ -154,13 +158,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       () => {
         if (this.segment_index > -1 && this.transcrService.currentlevel.segments &&
           this.segment_index < this.transcrService.currentlevel.segments.length) {
-
-          if (this.appStorage.prompttext !== '' && (this.transcrService.currentlevel.segments.length <= 1 &&
-            this.transcrService.currentlevel.segments.get(0).transcript === '')) {
-            this.editor_rawText(this.appStorage.prompttext);
-          } else {
-            this.editor_rawText(this.transcrService.currentlevel.segments.get(this.segment_index).transcript);
-          }
+          this.editor_rawText(this.transcrService.currentlevel.segments.get(this.segment_index).transcript);
         }
       }
     ));
@@ -247,7 +245,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           });
       }
     } else {
-      console.log(`could not save segment`);
+      const isNull = isNullOrUndefined(this.transcrService.currentlevel.segments);
+      console.log(`could not save segment. segment index=${this.segment_index},
+segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     }
   }
 

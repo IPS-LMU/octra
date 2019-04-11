@@ -160,6 +160,14 @@ export class AudioviewerConfig {
       },
       focusonly: true,
       title: 'play audio on hover'
+    },
+    delete_boundaries: {
+      keys: {
+        mac: 'D',
+        pc: 'D'
+      },
+      focusonly: true,
+      title: 'delete boundaries'
     }
   };
 

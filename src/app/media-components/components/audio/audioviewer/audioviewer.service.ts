@@ -13,6 +13,7 @@ import {AudioService, KeymappingService, TranscriptionService} from '../../../..
 import {PlayCursor} from '../../../obj/PlayCursor';
 import {PlayBackState} from '../../../obj/media';
 import {TaskManager} from '../../../../core/obj/TaskManager';
+import {isNullOrUndefined} from '../../../../core/shared/Functions';
 
 
 @Injectable()
@@ -462,8 +463,11 @@ export class AudioviewerService extends AudioComponentService {
       } else {
         // no selection
         let segment = this.transcrService.currentlevel.segments.BetweenWhichSegment(absXTime);
-        const transcript = segment.transcript;
-        segment.transcript = '';
+        let transcript = '';
+        if (!isNullOrUndefined(segment)) {
+          const transcript = segment.transcript;
+          segment.transcript = '';
+        }
         this.transcrService.currentlevel.segments.add(this.audiomanager.createBrowserAudioTime(Math.round(absXTime)));
         segment = this.transcrService.currentlevel.segments.BetweenWhichSegment(absXTime);
         segment.transcript = transcript;

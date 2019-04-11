@@ -50,22 +50,25 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
     // overwrite console.err
     const oldError = console.error;
     (() => {
-      console.error = function (message) {
+      console.error = function (error) {
         let debug = '';
+        let stack = '';
 
-        if (typeof message === 'string') {
-          debug = message;
+        if (typeof error === 'string') {
+          debug = error;
         } else {
-          debug = (
-            arguments.length > 1
-            && !(arguments[1].message === null || arguments[1].message === undefined)
-          ) ? arguments[1].message : '';
+          if (error instanceof Error) {
+            debug = error.message;
+            stack = error.stack;
+          }
+          if (typeof error === 'object') {
+            // some other type of object
+            debug = 'OBJECT';
+            stack = JSON.stringify(error);
+          } else {
+            debug = error;
+          }
         }
-
-        const stack = (
-          arguments.length > 1
-          && !(arguments[1].stack === null || arguments[1].stack === undefined)
-        ) ? arguments[1].stack : '';
 
         if (debug !== '') {
           serv.addEntry(ConsoleType.ERROR, `${debug}: ${stack}`);

@@ -619,6 +619,7 @@ export class AppStorageService {
   }
 
   public save(key: string, value: any): boolean {
+    // TODO why not url?
     if (this.usemode !== 'url') {
       if (key === 'annotation' || key === 'feedback') {
         this.saving.emit('saving');

@@ -510,15 +510,18 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                     for (let i = 0; i < this.transcr.currentlevel.segments.length; i++) {
                       const segment = this.transcr.currentlevel.segments.get(i);
 
-                      if (segment.time.samples >= this.selection.start.samples && segment.time.samples <= this.selection.end.samples) {
+                      if (segment.time.browserSample.value >= this.selection.start.browserSample.value
+                        && segment.time.browserSample.value <= this.selection.end.browserSample.value) {
                         this.transcr.currentlevel.segments.removeByIndex(i, this.transcr.break_marker.code);
                         i--;
-                      } else if (this.selection.end.samples < segment.time.samples) {
+                      } else if (this.selection.end.browserSample.value < segment.time.browserSample.value) {
                         break;
                       }
                     }
 
-                    this.selection.start = new AudioTime(0, this.audiomanager.ressource.info.samplerate);
+                    this.selection.start = BrowserAudioTime.fromSamples(
+                      0, this.audiomanager.browserSampleRate, this.audiomanager.originalSampleRate
+                    );
                     this.selection.end = this.selection.start.clone();
                     this.av.drawnselection = this.selection;
                     this.update(false);
@@ -531,9 +534,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 case('segment_enter'):
                   if (this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly && this.focused) {
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'segment'});
-                    console.log(`enter segment`);
-                    console.log(`mouse sample position is ${this.av.Mousecursor.timePos.samples}`);
-                    console.log(`last segment boundary is ${this.transcr.currentlevel.segments.get(this.transcr.currentlevel.segments.length - 1).time.samples}`);
 
                     const seg_index = this.transcr.currentlevel.segments.getSegmentBySamplePosition(
                       this.av.Mousecursor.timePos.browserSample

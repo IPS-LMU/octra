@@ -30,26 +30,23 @@ export class TaskManager {
    * @param {any[]} args
    * @returns {Promise<any>}
    */
-  public run(function_name: string, args: any[]): Promise<any> {
+  public run(doFunction: () => any, args: any[]): Promise<any> {
     const start = Date.now();
+    console.log(JSON.stringify(doFunction));
     return new Promise<any>(
       (resolve, reject) => {
-        if (this.hasFunction(function_name) !== null) {
-          this.worker.onmessage = (ev) => {
-            resolve(ev);
-          };
+        this.worker.onmessage = (ev) => {
+          resolve(ev);
+        };
 
-          this.worker.onerror = (err) => {
-            reject(err);
-          };
+        this.worker.onerror = (err) => {
+          reject(err);
+        };
 
-          this.worker.postMessage({
-            do: function_name,
-            args: args
-          });
-        } else {
-          reject(new Error('Function does not exist in Taskmanager\'s list of functions'));
-        }
+        this.worker.postMessage({
+          do: JSON.stringify(doFunction),
+          args: args
+        });
       }
     );
   }
@@ -80,13 +77,13 @@ export class TaskManager {
    * @returns {string}
    */
   private getFunctionsString(): string {
-    let result = 'var functions = {\n';
-    for (let i = 0; i < this.functions.length; i++) {
-      result += this.functions[i].name + ': ' + this.functions[i].do.toString();
-    }
-    result += '\n};\n\n';
-    result += 'onmessage = function(msg){' +
-      'var func = functions[msg.data.do]; var result = func(msg.data.args); self.postMessage(result);};';
+    let result = '';
+
+    result += `onmessage = function(msg) {
+      var func = msg.data.do;
+      var result = func(msg.data.args);
+      self.postMessage(result);
+    };`;
     return result;
   }
 }

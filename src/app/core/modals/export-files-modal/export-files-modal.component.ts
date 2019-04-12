@@ -65,12 +65,12 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
         {
           label: 'TextTable',
           value: 'textTable',
-          selected: false
+          selected: true
         },
         {
           label: 'JSON',
           value: 'json',
-          selected: false
+          selected: true
         }
       ],
       clientStreamHelper: null,
@@ -353,7 +353,6 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
               switch (result2.status) {
                 case ('finished'):
-                  console.log(`set success!`);
                   this.tools.audioCutting.progressbarType = 'success';
                   break;
                 case ('pending'):
@@ -367,7 +366,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
                   break;
               }
             }, (e) => {
-              console.log(e);
+              console.error(e);
               this.subscrmanager.remove(this.tools.audioCutting.subscriptionIDs[1]);
               this.tools.audioCutting.subscriptionIDs[1] = -1;
             });
@@ -402,7 +401,8 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       cutList.push({
         number: i,
         sampleStart: startSample,
-        sampleDur: segment.time.originalSample.value - startSample
+        sampleDur: segment.time.originalSample.value - startSample,
+        transcript: segment.transcript
       });
       startSample = segment.time.originalSample.value;
     }
@@ -421,7 +421,6 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
     // start cutting
     const wavFormat = new WavFormat();
-    console.log(this.transcrService.audiomanager.ressource.arraybuffer.byteLength);
     wavFormat.init(this.transcrService.audiomanager.ressource.info.fullname, this.transcrService.audiomanager.ressource.arraybuffer);
 
     let zip = new JSZip();
@@ -627,7 +626,6 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
             })
             .on('end', () => {
               // no parameter
-              console.log(`end`);
             });
 
           this.tools.audioCutting.clientStreamHelper.accumulate().then((data) => {
@@ -665,7 +663,6 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
     if (this.tools.audioCutting.clientStreamHelper !== null) {
       this.tools.audioCutting.clientStreamHelper.pause();
-      console.log(`client zipping paused`);
     }
 
     this.tools.audioCutting.status = 'idle';

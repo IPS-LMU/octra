@@ -8,6 +8,7 @@ import {environment} from '../environments/environment';
 import {ActivatedRoute, Router} from '@angular/router';
 import {NavigationComponent} from './core/gui/navbar';
 import {isNullOrUndefined} from './core/shared/Functions';
+import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
 
 @Component({
   selector: 'app-octra',
@@ -34,8 +35,8 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
               private settingsService: SettingsService,
               private bugService: BugReportService,
               private router: Router,
-              private route: ActivatedRoute) {
-
+              private route: ActivatedRoute,
+              private multiThreading: MultiThreadingService) {
     /*
     // overwrite console.log
     const oldLog = console.log;
@@ -129,6 +130,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
 
   ngOnDestroy() {
     this.subscrmanager.destroy();
+    this.multiThreading.destroy();
   }
 
   test(id: string) {

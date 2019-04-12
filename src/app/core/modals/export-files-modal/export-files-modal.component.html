@@ -78,7 +78,8 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
+                    <tr *ngIf="navbarServ.transcrService !== undefined
+                     && navbarServ.transcrService.audiomanager.originalInfo.extension === '.wav'">
                         <td (click)="tools.audioCutting.opened = !tools.audioCutting.opened">
                             <fa-icon style="color:gray;"
                                      [icon]="['fas', ((tools.audioCutting.opened) ? 'chevron-up' : 'chevron-down')]"></fa-icon>
@@ -90,7 +91,9 @@
                         </td>
                         <td colspan="3">{{'tools.cut audio.description' | translate}}</td>
                     </tr>
-                    <tr [@fadeToggle]="(tools.audioCutting.opened) ? 'active': 'inactive'">
+                    <tr *ngIf="navbarServ.transcrService !== undefined
+                    && navbarServ.transcrService.audiomanager.originalInfo.extension === '.wav'"
+                        [@fadeToggle]="(tools.audioCutting.opened) ? 'active': 'inactive'">
                         <td></td>
                         <td colspan="4" style="padding-left:20px;">
                             <div class="card" style="padding:10px;" *ngIf="navbarServ.transcrService !== undefined">

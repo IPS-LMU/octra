@@ -124,7 +124,6 @@ export class WavFormat extends AudioFormat {
       // start and duration are the position in bytes after the header
 
       const filename = this.getNewFileName(namingConvention, this.filename, segment);
-      console.log(`naming convention ${namingConvention} => new file name is ${filename}`);
       if (this.isValid(buffer)) {
         const u8array = new Uint8Array(buffer);
 
@@ -168,16 +167,12 @@ export class WavFormat extends AudioFormat {
   private calculateData(start: number, duration: number, u8array: Uint8Array): Promise<Uint8Array> {
     return new Promise<Uint8Array>((resolve, reject) => {
       const arrayLength = duration;
-      console.log(`arrayLength is ${arrayLength}`);
-      console.log(`clokcAlign is ${this._blockAlign}`);
-      console.log(`duration is: ${duration / this.sampleRate}`);
       const result: Uint8Array = new Uint8Array(arrayLength);
 
       const startPos = 44 + start;
       const endPos = startPos + duration;
 
       result.set(u8array.slice(startPos, endPos));
-      console.log(`length is ${endPos - startPos}`);
       resolve(result);
     });
   }

@@ -118,6 +118,7 @@ import {faStar} from '@fortawesome/free-solid-svg-icons/faStar';
 import {ValidationPopoverComponent} from './core/component/transcr-editor/validation-popover/validation-popover.component';
 import {NamingDragAndDropComponent} from './core/component/naming-drag-and-drop/naming-drag-and-drop.component';
 import {DragDropModule} from '@angular/cdk/drag-drop';
+import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
 
 library.add(
   faSpinner,
@@ -272,7 +273,8 @@ export const ngmodule = {
     TranscrEndGuard,
     TranslateService,
     BugReportService,
-    CompatibilityService
+    CompatibilityService,
+    MultiThreadingService
   ]
 };
 

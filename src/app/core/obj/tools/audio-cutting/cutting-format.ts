@@ -39,7 +39,8 @@ export class JSONConverter extends CuttingFormat {
       json.segments.push({
         fileName: getNewFileName(nameConvention, fileName, i, cutList, audioInfo),
         sampleStart: segment.sampleStart,
-        sampleDur: segment.sampleDur
+        sampleDur: segment.sampleDur,
+        transcript: segment.transcript
       });
     }
 
@@ -53,14 +54,16 @@ export class TextTableConverter extends CuttingFormat {
   }
 
   public exportList(cutList: Segment[], audioInfo: AudioInfo, fileName: string, nameConvention: string) {
-    let text = 'Name\tFile\tSecondsStart\tSecondsDuration\tSampleStart\tSampleDuration\tSampleRate\n';
+    let text = 'Name\tFile\tSecondsStart\tSecondsDuration\tSampleStart\tSampleDuration\tSampleRate\tTranscript\n';
 
     for (let i = 0; i < cutList.length; i++) {
       const segment = cutList[i];
       const secondsStart = segment.sampleStart / audioInfo.duration.originalSample.sampleRate;
       const secondsDuration = segment.sampleDur / audioInfo.duration.originalSample.sampleRate;
       text += `${getNewFileName(nameConvention, fileName, i, cutList, audioInfo)}\t${fileName}\t${secondsStart}\t${secondsDuration}\t`
-        + `${segment.sampleStart}\t${segment.sampleDur}\t${audioInfo.duration.originalSample.sampleRate}\n`;
+        + `${segment.sampleStart}\t${segment.sampleDur}\t${audioInfo.duration.originalSample.sampleRate}`
+        + `\t${segment.transcript}\n`;
+
     }
 
     return text;

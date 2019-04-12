@@ -5,6 +5,8 @@ import {Subject} from 'rxjs';
 export class WavFormat extends AudioFormat {
   protected _blockAlign: number;
 
+  private status: 'running' | 'stopRequested' | 'stopped' = 'stopped';
+
   public onaudiocut: Subject<{
     finishedSegments: number,
     file: File
@@ -79,7 +81,16 @@ export class WavFormat extends AudioFormat {
     return result;
   }
 
-  public cutAudioFileSequentially(type: string, namingConvention: string, buffer: ArrayBuffer, segments: {
+  public startAudioCutting(type: string, namingConvention: string, buffer: ArrayBuffer, segments: {
+    number: number,
+    sampleStart: number,
+    sampleDur: number
+  }[], pointer = 0): void {
+    this.status = 'running';
+    this.cutAudioFileSequentially(type, namingConvention, buffer, segments, pointer);
+  }
+
+  private cutAudioFileSequentially(type: string, namingConvention: string, buffer: ArrayBuffer, segments: {
     number: number,
     sampleStart: number,
     sampleDur: number
@@ -98,7 +109,11 @@ export class WavFormat extends AudioFormat {
           // @ts-ignore
           // const freeSpace = window.performance.memory.totalJSHeapSize - window.performance.memory.usedJSHeapSize;
           // console.log(`${freeSpace / 1024 / 1024} MB left.`);
-          setTimeout(() => this.cutAudioFileSequentially(type, namingConvention, buffer, segments, ++pointer), 200);
+          if (this.status === 'running') {
+            setTimeout(() => this.cutAudioFileSequentially(type, namingConvention, buffer, segments, ++pointer), 200);
+          } else {
+            this.status = 'stopped';
+          }
         } else {
           // stop
           this.onaudiocut.complete();
@@ -136,6 +151,12 @@ export class WavFormat extends AudioFormat {
         reject('no valid wav format!');
       }
     });
+  }
+
+  public stopAudioSplitting() {
+    if (this.status === 'running') {
+      this.status = 'stopRequested';
+    }
   }
 
   public getAudioCutAsArrayBuffer(buffer: ArrayBuffer, segment: {

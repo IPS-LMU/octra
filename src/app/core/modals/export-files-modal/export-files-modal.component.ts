@@ -60,7 +60,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       message: '',
       progressbarType: 'info',
       showConfigurator: false,
-      subscriptionIDs: [-1, -1],
+      subscriptionIDs: [-1, -1, -1],
       exportFormats: [
         {
           label: 'TextTable',
@@ -74,7 +74,11 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
         }
       ],
       clientStreamHelper: null,
-      timeLeft: 0
+      zippingSpeed: -1,
+      cuttingSpeed: -1,
+      cuttingTimeLeft: 0,
+      timeLeft: 0,
+      wavFormat: null
     }
   };
 
@@ -420,140 +424,17 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     }
 
     // start cutting
-    const wavFormat = new WavFormat();
-    wavFormat.init(this.transcrService.audiomanager.ressource.info.fullname, this.transcrService.audiomanager.ressource.arraybuffer);
+    this.tools.audioCutting.wavFormat = new WavFormat();
+    this.tools.audioCutting.wavFormat.init(
+      this.transcrService.audiomanager.ressource.info.fullname, this.transcrService.audiomanager.ressource.arraybuffer
+    );
 
     let zip = new JSZip();
 
-    /*
-    const taskManager = new TaskManager([
-      {
-        name: 'cutAudioFile',
-        do: (args: any[]) => {
-          const filename = args[0];
-          const buffer: ArrayBuffer = args[1];
-          const channels: number = args[2];
-          const blockAlign: number = args[3];
-          const segments: {
-            number: number,
-            sampleStart: number,
-            sampleDur: number
-          }[] = args[4];
-          const bitsPerSample: number = args[5];
-          const sampleRate: number = args[6];
-
-          const results = [];
-
-          const calculateData = function (start: number, duration: number, u8array: Uint8Array): number[] {
-            const result: number[] = [];
-            let counter = 0;
-
-            for (let i = 44 + start; i < 44 + start + duration; i++) {
-              try {
-                for (let j = 0; j < channels; j++) {
-                  for (let k = 0; k < blockAlign / channels; k++) {
-                    result.push(u8array[i + k]);
-                  }
-                  if (channels === 2) {
-                    i += blockAlign / channels;
-                  } else {
-                    i += blockAlign;
-                  }
-                }
-
-                i--;
-                counter++;
-              } catch (e) {
-                console.error(e);
-                break;
-              }
-            }
-            return result;
-          };
-
-          const writeString = function (view, offset, string) {
-            for (let i = 0; i < string.length; i++) {
-              view.setUint8(offset + i, string.charCodeAt(i));
-            }
-          };
-
-          const getFileFromBufferPart = function (data: number[], filename2: string): File {
-            const samples = (data.length * 2 * 8) / (bitsPerSample);
-
-            const buffer2 = new ArrayBuffer(44 + data.length);
-            const dataView = new DataView(buffer2);
-
-            // RIFF identifier
-            writeString(dataView, 0, 'RIFF');
-            // RIFF chunk length
-            dataView.setUint32(4, 36 + samples, true);
-            // RIFF type
-            writeString(dataView, 8, 'WAVE');
-            // format chunk identifier
-            writeString(dataView, 12, 'fmt ');
-            // format chunk length
-            dataView.setUint32(16, 16, true);
-            // sample format (raw)
-            dataView.setUint16(20, 1, true);
-            // channel count
-            dataView.setUint16(22, channels, true);
-            // sample rate
-            dataView.setUint32(24, sampleRate, true);
-            // byte rate (sample rate * block align)
-            dataView.setUint32(28, sampleRate * 2, true);
-            // block align (channel count * bytes per sample)
-            dataView.setUint16(32, 2, true);
-            // bits per sample
-            dataView.setUint16(34, bitsPerSample, true);
-            // data chunk identifier
-            writeString(dataView, 36, 'data');
-            // data chunk length
-            dataView.setUint32(40, data.length, true);
-
-            for (let i = 0; i < data.length; i++) {
-              dataView.setUint8(44 + i, data[i]);
-            }
-            return new File([dataView], filename2 + '.wav', {type: 'audio/wav'});
-          };
-
-          for (let i = 0; i < segments.length; i++) {
-            const segment = segments[i];
-
-            const start = segment.sampleStart * channels * 2;
-            const duration = segment.sampleDur * channels * 2;
-            const newFileName = filename + '_' + segment.number + '.wav';
-
-            const u8array = new Uint8Array(buffer);
-            // @ts-ignore
-
-            const data = calculateData(start, duration, u8array);
-            results.push(getFileFromBufferPart(data, newFileName));
-            console.log(results);
-          }
-
-          return results;
-        }
-      }
-    ]);
-    console.log(`cut ${cutList.length} segments`);
-
-    taskManager.run('cutAudioFile', [
-      this.transcrService.audiomanager.ressource.info.fullname,
-      this.transcrService.audiomanager.ressource.arraybuffer,
-      this.transcrService.audiomanager.ressource.info.channels,
-      wavFormat.blockAlign,
-      cutList,
-      wavFormat.bitsPerSample,
-      wavFormat.sampleRate
-    ]).then((results) => {
-      console.log(`FINISHED!?`);
-      console.log(results);
-    }).catch((err) => {
-      console.error(err);
-    });*/
-
     let totalSize = 0;
-    this.subscrmanager.add(wavFormat.onaudiocut.subscribe(
+    let cuttingStarted = 0;
+
+    this.tools.audioCutting.subscriptionIDs[1] = this.subscrmanager.add(this.tools.audioCutting.wavFormat.onaudiocut.subscribe(
       (status: {
         finishedSegments: number,
         file: File
@@ -562,11 +443,27 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
         zip = zip.file(status.file.name, status.file);
         totalSize += status.file.size;
 
+        if (this.tools.audioCutting.cuttingSpeed < 0) {
+          const now = Date.now();
+          this.tools.audioCutting.cuttingSpeed = (now - cuttingStarted) / 1000 / status.file.size;
+
+          const rest = (this.transcrService.audiomanager.ressource.arraybuffer.byteLength - totalSize);
+          this.tools.audioCutting.cuttingTimeLeft = this.tools.audioCutting.cuttingSpeed * rest;
+
+          const zippingSpeed = this.tools.audioCutting.zippingSpeed;
+          this.tools.audioCutting.timeLeft = Math.ceil((this.tools.audioCutting.cuttingTimeLeft
+            + (this.transcrService.audiomanager.ressource.arraybuffer.byteLength * zippingSpeed)) * 1000);
+
+          this.tools.audioCutting.subscriptionIDs[2] = this.subscrmanager.add(Observable.interval(1000).subscribe(
+            () => {
+              this.tools.audioCutting.timeLeft -= 1000;
+            }
+          ));
+        }
+
         if (status.finishedSegments === cutList.length) {
           // all segments cutted
           let finished = cutList.length;
-          let percentsPerSecond = -1;
-          let percents = 0;
           let lastCheck = -1;
 
           if (this.tools.audioCutting.exportFormats[0].selected) {
@@ -602,22 +499,30 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
           }
 
           let sizeProcessed = 0;
+          const startZipping = Date.now();
           this.tools.audioCutting.clientStreamHelper = zip.generateInternalStream({type: 'blob', streamFiles: true})
             .on('data', (data, metadata) => {
+              if (sizeProcessed === 0) {
+                // first process
+                if (this.tools.audioCutting.subscriptionIDs[2] > -1) {
+                  this.subscrmanager.remove(this.tools.audioCutting.subscriptionIDs[2]);
+                  this.tools.audioCutting.subscriptionIDs[2] = -1;
+                }
+                this.tools.audioCutting.cuttingSpeed = -1;
+                this.tools.audioCutting.zippingSpeed = -1;
+              }
               sizeProcessed += data.length;
               const overAllProgress = sizeProcessed / totalSize;
               // data is a Uint8Array because that's the type asked in generateInternalStream
               // metadata contains for example currentFile and percent, see the generateInternalStream doc.
               this.tools.audioCutting.progress = Number((((finished + overAllProgress) / overallTasks) * 100).toFixed(2));
               if (Date.now() - lastCheck >= 1000) {
-                percentsPerSecond = overAllProgress - percents;
 
-                if (percentsPerSecond > 0.00001) {
-                  this.tools.audioCutting.timeLeft = Math.ceil((1 - overAllProgress) / percentsPerSecond * 1000);
+                if (sizeProcessed > 1024 * 1024 * 2) {
+                  this.tools.audioCutting.timeLeft = ((Date.now() - startZipping) / sizeProcessed) * (totalSize - sizeProcessed);
                 }
 
                 lastCheck = Date.now();
-                percents = overAllProgress;
               }
             })
             .on('error', (e) => {
@@ -641,14 +546,28 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
         }
       },
       (err) => {
-        error(err);
+        if (this.tools.audioCutting.subscriptionIDs[2] > -1) {
+          this.subscrmanager.remove(this.tools.audioCutting.subscriptionIDs[2]);
+          this.tools.audioCutting.subscriptionIDs[2] = -1;
+        }
+        this.tools.audioCutting.cuttingSpeed = -1;
+        this.tools.audioCutting.zippingSpeed = -1;
+        console.error(err);
       }
     ));
 
     this.tools.audioCutting.status = 'running';
     this.tools.audioCutting.progressbarType = 'info';
-    wavFormat.cutAudioFileSequentially(this.transcrService.audiomanager.ressource.info.type, this.namingConvention.namingConvention,
-      this.transcrService.audiomanager.ressource.arraybuffer, cutList);
+
+    this.getDurationFactorForZipping().then((zipFactor) => {
+      this.tools.audioCutting.zippingSpeed = zipFactor;
+
+      cuttingStarted = Date.now();
+      this.tools.audioCutting.wavFormat.startAudioCutting(this.transcrService.audiomanager.ressource.info.type, this.namingConvention.namingConvention,
+        this.transcrService.audiomanager.ressource.arraybuffer, cutList);
+    }).catch((err) => {
+      console.error(err);
+    });
   }
 
   public stopAudioSplitting() {
@@ -666,5 +585,31 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     }
 
     this.tools.audioCutting.status = 'idle';
+
+    this.tools.audioCutting.cuttingSpeed = -1;
+    this.tools.audioCutting.zippingSpeed = -1;
+
+    if (!isNullOrUndefined(this.tools.audioCutting.wavFormat)) {
+      (this.tools.audioCutting.wavFormat as WavFormat).stopAudioSplitting();
+    }
+  }
+
+  private getDurationFactorForZipping(): Promise<number> {
+    return new Promise<number>((resolve, reject) => {
+
+      let zip = new JSZip();
+
+      const file = new File([new ArrayBuffer(1024 * 1024)], 'test.txt');
+
+      zip = zip.file('test.txt', file);
+
+      const started = Date.now();
+      zip.generateAsync({type: 'blob'}).then(() => {
+        const dur = (Date.now() - started) / 1000;
+        resolve(dur / file.size);
+      }).catch((err) => {
+        reject(err);
+      });
+    });
   }
 }

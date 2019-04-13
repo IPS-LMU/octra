@@ -170,7 +170,7 @@ export const EDITORS: any[] = [
   LinearEditorComponent
 ];
 
-export const ngmodule = {
+@NgModule({
   declarations: [
     AgreementComponent,
     AlertComponent,
@@ -276,9 +276,7 @@ export const ngmodule = {
     CompatibilityService,
     MultiThreadingService
   ]
-};
-
-@NgModule(ngmodule)
+})
 
 export class AppModule {
 }

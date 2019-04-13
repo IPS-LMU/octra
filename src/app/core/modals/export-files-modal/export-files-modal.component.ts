@@ -13,7 +13,6 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
 import {WavFormat} from '../../../media-components/obj/media/audio/AudioFormats';
-import {error} from '@angular/compiler/src/util';
 import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/cutting-format';
 
 declare var JSZip;
@@ -381,7 +380,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
         this.tools.audioCutting.progress = 100;
         this.tools.audioCutting.status = 'failed';
         this.tools.audioCutting.message = 'API not available. Please send a message via the feedback form.';
-        console.error(error);
+        console.error(err);
       }));
   }
 

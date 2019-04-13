@@ -7,15 +7,17 @@
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
+      "prefix": "app",
+      "schematics": {},
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist",
+            "outputPath": "dist/octra",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "tsConfig": "src/tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
+            "tsConfig": "src/tsconfig.app.json",
             "assets": [
               "src/assets",
               "src/config",
@@ -42,27 +44,17 @@
               "src/assets/js/OLA.js",
               "src/assets/js/buffered-ola.js",
               "node_modules/jszip/dist/jszip.min.js"
-            ]
+            ],
+            "es5BrowserSupport": true
           },
           "configurations": {
             "production": {
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
                 }
-              ]
-            },
-            "special": {
+              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -72,27 +64,11 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
-              "fileReplacements": [
+              "budgets": [
                 {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.dev.ts"
-                }
-              ]
-            },
-            "beta": {
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.beta.ts"
+                  "type": "initial",
+                  "maximumWarning": "4mb",
+                  "maximumError": "6mb"
                 }
               ]
             }
@@ -106,9 +82,6 @@
           "configurations": {
             "production": {
               "browserTarget": "octra:build:production"
-            },
-            "special": {
-              "browserTarget": "octra:build:special"
             }
           }
         },
@@ -122,34 +95,16 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "main": "src/test.ts",
-            "karmaConfig": "./karma.conf.js",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.spec.json",
-            "scripts": [
-              "node_modules/jquery/dist/jquery.min.js",
-              "node_modules/bootstrap/dist/js/bootstrap.min.js",
-              "node_modules/bootstrap-material-design/dist/js/bootstrap-material-design.min.js",
-              "node_modules/summernote/dist/summernote.min.js",
-              "node_modules/video.js/dist/video.js",
-              "node_modules/platform/platform.js",
-              "node_modules/ajv/dist/ajv.min.js",
-              "node_modules/jquery.caret/dist/jquery.caret.min.js"
-            ],
+            "karmaConfig": "src/karma.conf.js",
             "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "node_modules/bootstrap-material-design/dist/css/bootstrap-material-design.min.css",
-              "node_modules/font-awesome/css/font-awesome.min.css",
-              "node_modules/video.js/dist/video-js.min.css",
-              "node_modules/summernote/dist/summernote.css",
               "src/styles.css"
             ],
+            "scripts": [],
             "assets": [
-              "src/assets",
-              "src/i18n",
-              "src/config",
               "src/favicon.ico",
-              "src/schemata",
-              "src/LICENSE.txt"
+              "src/assets"
             ]
           }
         },
@@ -157,45 +112,44 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "src/tsconfig.json"
+              "src/tsconfig.app.json",
+              "src/tsconfig.spec.json"
             ],
-            "exclude": []
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
     },
     "octra-e2e": {
-      "root": "",
-      "sourceRoot": "",
+      "root": "e2e/",
       "projectType": "application",
+      "prefix": "",
       "architect": {
         "e2e": {
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
-            "protractorConfig": "./protractor.conf.js",
+            "protractorConfig": "e2e/protractor.conf.js",
             "devServerTarget": "octra:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "octra:serve:production"
+            }
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": [
-              "e2e/tsconfig.json"
-            ],
-            "exclude": []
+            "tsConfig": "e2e/tsconfig.e2e.json",
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
     }
   },
-  "defaultProject": "octra",
-  "schematics": {
-    "@schematics/angular:component": {
-      "prefix": "app",
-      "styleext": "css"
-    },
-    "@schematics/angular:directive": {
-      "prefix": "app"
-    }
-  }
+  "defaultProject": "octra"
 }

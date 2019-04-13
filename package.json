@@ -46,7 +46,7 @@
     "bootstrap": "^4.3.1",
     "bootstrap-material-design": "^4.1.1",
     "core-js": "^2.6.3",
-    "jquery": "^3.1.0",
+    "jquery": "^3.4.0",
     "jquery.caret": "^0.3.1",
     "js-sha256": "^0.9.0",
     "jszip": "^3.2.1",
@@ -65,8 +65,8 @@
     "zone.js": "^0.8.29"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.13.7",
-    "@angular/cli": "^7.3.0",
+    "@angular-devkit/build-angular": "^0.13.8",
+    "@angular/cli": "^7.3.8",
     "@angular/compiler-cli": "^7.2.9",
     "@angular/language-service": "^7.2.3",
     "@types/jasmine": "^3.3.8",

@@ -106,10 +106,10 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
     this.settingsService.loadApplicationSettings(this.route).then(() => {
       console.log(`Application settings loaded`);
 
-      if (!isNullOrUndefined(this.settingsService.app_settings.octra.tracking)
-        && !isNullOrUndefined(this.settingsService.app_settings.octra.tracking.active)
-        && this.settingsService.app_settings.octra.tracking.active !== '') {
-        this.appendTrackingCode(this.settingsService.app_settings.octra.tracking.active);
+      if (!isNullOrUndefined(this.settingsService.appSettings.octra.tracking)
+        && !isNullOrUndefined(this.settingsService.appSettings.octra.tracking.active)
+        && this.settingsService.appSettings.octra.tracking.active !== '') {
+        this.appendTrackingCode(this.settingsService.appSettings.octra.tracking.active);
       }
 
     }).catch((error) => {
@@ -169,10 +169,10 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
   private appendTrackingCode(type: string) {
 
     if (type === 'matomo') {
-      if (!isNullOrUndefined(this.settingsService.app_settings.octra.tracking.matomo)
-        && !isNullOrUndefined(this.settingsService.app_settings.octra.tracking.matomo.host)
-        && !isNullOrUndefined(this.settingsService.app_settings.octra.tracking.matomo.siteID)) {
-        const piwikSettings = this.settingsService.app_settings.octra.tracking.matomo;
+      if (!isNullOrUndefined(this.settingsService.appSettings.octra.tracking.matomo)
+        && !isNullOrUndefined(this.settingsService.appSettings.octra.tracking.matomo.host)
+        && !isNullOrUndefined(this.settingsService.appSettings.octra.tracking.matomo.siteID)) {
+        const piwikSettings = this.settingsService.appSettings.octra.tracking.matomo;
 
         const trackingCode = `
 <!-- Piwik -->

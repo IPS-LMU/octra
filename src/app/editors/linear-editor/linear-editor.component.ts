@@ -39,7 +39,7 @@ import {Functions} from '../../core/shared/Functions';
 export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
 
   public get app_settings(): any {
-    return this.settingsService.app_settings;
+    return this.settingsService.appSettings;
   }
 
   public get projectsettings(): any {

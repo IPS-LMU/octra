@@ -114,11 +114,11 @@ export class CompatibilityService {
   getValidBrowsers(): string {
     let result = '';
 
-    if (!(this.settingsService.app_settings === null || this.settingsService.app_settings === undefined)) {
-      for (let i = 0; i < this.settingsService.app_settings.octra.allowed_browsers.length; i++) {
-        const browser = this.settingsService.app_settings.octra.allowed_browsers[i];
+    if (!(this.settingsService.appSettings === null || this.settingsService.appSettings === undefined)) {
+      for (let i = 0; i < this.settingsService.appSettings.octra.allowed_browsers.length; i++) {
+        const browser = this.settingsService.appSettings.octra.allowed_browsers[i];
         result += browser.name;
-        if (i < this.settingsService.app_settings.octra.allowed_browsers.length - 1) {
+        if (i < this.settingsService.appSettings.octra.allowed_browsers.length - 1) {
           result += ', ';
         }
       }
@@ -138,8 +138,8 @@ export class CompatibilityService {
           resolve(Modernizr['' + name]);
         }
       } else {
-        if (this.settingsService.app_settings.octra.allowed_browsers.length > 0) {
-          const valid = this.isValidBrowser(this.settingsService.app_settings.octra.allowed_browsers);
+        if (this.settingsService.appSettings.octra.allowed_browsers.length > 0) {
+          const valid = this.isValidBrowser(this.settingsService.appSettings.octra.allowed_browsers);
           resolve(valid);
         } else {
           resolve(true);

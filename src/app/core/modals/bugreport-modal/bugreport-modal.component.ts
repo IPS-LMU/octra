@@ -76,8 +76,8 @@ export class BugreportModalComponent implements OnInit {
 
     this.subscrmanager.add(
       this.bugService.sendReport(this.bgemail, this.bgdescr, this.sendpro_obj, {
-        auth_token: this.settService.app_settings.octra.bugreport.auth_token,
-        url: this.settService.app_settings.octra.bugreport.url
+        auth_token: this.settService.appSettings.octra.bugreport.auth_token,
+        url: this.settService.appSettings.octra.bugreport.url
       }).subscribe(
         () => {
           this.bugsent = true;

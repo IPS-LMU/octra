@@ -84,7 +84,7 @@ export class TranscriptionService {
   }
 
   private get app_settings(): AppSettings {
-    return this.settingsService.app_settings;
+    return this.settingsService.appSettings;
   }
 
   private get projectsettings(): ProjectSettings {

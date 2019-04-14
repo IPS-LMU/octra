@@ -1,6 +1,7 @@
 import {AudioFormat, WavFormat} from './AudioFormats';
 import {Subject} from 'rxjs';
 import {AudioInfo} from './AudioInfo';
+import {OriginalSample} from './AudioTime';
 
 declare var window: any;
 
@@ -30,97 +31,103 @@ export class AudioDecoder {
     }
   }
 
-  decodeChunked(pointer = 0) {
+  decodeChunked(sampleStart: number, sampleDur: number) {
     if (this.format instanceof WavFormat) {
-      const numberOfParts = this.getNumberOfDataParts(this.arrayBuffer.byteLength);
-
-      console.log(`pointer is ${pointer}`);
+      console.log(`decode from sample ${sampleStart} to ${sampleDur}`);
       // cut the audio file into 10 parts:
-      const partSamples = Math.round(this.audioInfo.duration.originalSample.value / numberOfParts);
+      const partSamples = this.createOriginalSample(
+        sampleDur
+      );
 
-      const startSamples = partSamples * pointer;
+      const startSamples = this.createOriginalSample(
+        sampleStart
+      );
 
-      if (pointer < numberOfParts) {
+      if (sampleStart + sampleDur <= this.audioInfo.duration.originalSample.value && sampleStart >= 0 && sampleDur >= sampleDur) {
+
         this.format.getAudioCutAsArrayBuffer(this.arrayBuffer, {
           number: 0,
           sampleStart: startSamples,
           sampleDur: partSamples
         }).then((dataPart: ArrayBuffer) => {
+          console.log(`cutted, decode ${this.audioInfo.duration.originalSample.value - sampleStart - sampleDur} left`);
           this.decodeAudioFile(dataPart).then((audioBuffer: AudioBuffer) => {
-            this.audioBuffer = audioBuffer;
-            // send complete audiobuffer
-            this.onaudiodecode.next({
-              progress: 1,
-              result: this.audioBuffer
-            });
-            this.onaudiodecode.complete();
-          }).catch((error) => {
-            console.error(error);
+            if (!(this.audioBuffer === null || this.audioBuffer === undefined)) {
+              this.audioBuffer = this.appendAudioBuffer(this.audioBuffer, audioBuffer);
+            } else {
+              this.audioBuffer = audioBuffer;
+            }
+
+
+            if (sampleStart + sampleDur === this.audioInfo.duration.originalSample.value) {
+              // send complete audiobuffer
+              this.onaudiodecode.next({
+                progress: 1,
+                result: this.audioBuffer
+              });
+              this.onaudiodecode.complete();
+            } else {
+              this.onaudiodecode.next({
+                progress: (sampleStart + sampleDur) / this.audioInfo.duration.originalSample.value,
+                result: null
+              });
+
+              setTimeout(() => {
+                const sampleDur2 = Math.min(sampleDur, this.audioInfo.duration.originalSample.value - sampleStart - sampleDur);
+                this.decodeChunked(sampleStart + sampleDur, sampleDur2);
+              }, 200);
+            }
+
+          }).catch((error2) => {
+            console.error(error2);
           });
-        }).catch((error) => {
-          this.onaudiodecode.error(error);
+        }).catch((error3) => {
+          this.onaudiodecode.error(error3);
         });
       } else {
-        // finished
-        this.onaudiodecode.complete();
+        console.error(`can not decode part because samples are not correct`);
       }
     } else {
+      console.log(`not instance of WavFormat`);
       this.decodeAudioFile(this.arrayBuffer).then((result) => {
         this.onaudiodecode.next({
           progress: 1,
-          result: result
+          result
         });
-      }).catch((error) => {
-        this.onaudiodecode.error(error);
+      }).catch((error4) => {
+        this.onaudiodecode.error(error4);
       });
     }
   }
 
-  private getNumberOfDataParts(fileSize: number): number {
-    const mb = fileSize / 1024 / 1024;
-
-    if (mb < 10) {
-      return 1;
-    }
-    if (mb < 100) {
-      return 5;
-    }
-    if (mb < 500) {
-      return 10;
-    }
-    if (mb < 1024) {
-      return 20;
-    }
-
-    return 30;
-  }
-
-  public decodePartOfAudioFile: (segment: {
-    number: number,
-    sampleStart: number,
-    sampleDur: number
-  }) => Promise<AudioBuffer> = (segment) => {
+  public decodePartOfAudioFile: (segment: SegmentToDecode) => Promise<AudioBuffer> = (segment) => {
     return new Promise<AudioBuffer>((resolve, reject) => {
       if (!(segment === null || segment === undefined)) {
-        if (segment.sampleStart >= 0 && segment.sampleStart + segment.sampleDur <= this.audioInfo.duration.browserSample.value
-          && segment.sampleDur > 0) {
-          (<WavFormat>this.format).getAudioCutAsArrayBuffer(this.arrayBuffer, segment)
-            .then((arrayBuffer: ArrayBuffer) => {
-              this.decodeAudioFile(arrayBuffer).then((audioBuffer: AudioBuffer) => {
-                resolve(audioBuffer);
+        if (segment.sampleStart.equalSampleRate(segment.sampleDur)) {
+          const sampleStart = segment.sampleStart.value;
+          const sampleDur = Math.min(this.audioInfo.duration.originalSample.value - sampleStart, segment.sampleDur.value);
+
+          if (sampleStart >= 0 && sampleStart + sampleDur <= this.audioInfo.duration.originalSample.value
+            && sampleDur > 0) {
+            (this.format as WavFormat).getAudioCutAsArrayBuffer(this.arrayBuffer, segment)
+              .then((arrayBuffer: ArrayBuffer) => {
+                this.decodeAudioFile(arrayBuffer).then((audioBuffer: AudioBuffer) => {
+                  resolve(audioBuffer);
+                }).catch((error) => {
+                  reject(error);
+                });
               }).catch((error) => {
-                console.log(`catched 5`);
-                reject(error);
-              });
-            }).catch((error) => {
-            console.log(`catched 4`);
-            reject(error);
-          });
+              reject(error);
+            });
+          } else {
+            console.error(segment);
+            reject(new Error('values of segment are invalid'));
+          }
         } else {
-          reject(new Error('values of segment are invalid'));
+          reject(new Error('sample rates of sampleStart and sampleDur do not match.'));
         }
       } else {
-        reject(new Error('segment is null or undefined'));
+        console.error(`segment is null or undefined`);
       }
     });
   }
@@ -144,7 +151,7 @@ export class AudioDecoder {
 
   public appendAudioBuffer(oldBuffer: AudioBuffer, newBuffer: AudioBuffer) {
     const tmp = this.audioContext.createBuffer(this.audioInfo.channels,
-      (oldBuffer.length + newBuffer.length), this.audioInfo.samplerate);
+      (oldBuffer.length + newBuffer.length), oldBuffer.sampleRate);
 
     for (let i = 0; i < this.audioInfo.channels; i++) {
       const channel = tmp.getChannelData(i);
@@ -153,4 +160,14 @@ export class AudioDecoder {
     }
     return tmp;
   }
+
+  public createOriginalSample(sample: number): OriginalSample {
+    return new OriginalSample(sample, this.audioInfo.samplerate);
+  }
+}
+
+export interface SegmentToDecode {
+  number: number;
+  sampleStart: OriginalSample;
+  sampleDur: OriginalSample;
 }

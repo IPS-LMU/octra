@@ -1,5 +1,6 @@
 import {AudioFormat} from './AudioFormat';
 import {Subject} from 'rxjs';
+import {SegmentToDecode} from '../AudioDecoder';
 
 // http://soundfile.sapp.org/doc/WaveFormat/
 export class WavFormat extends AudioFormat {
@@ -101,7 +102,7 @@ export class WavFormat extends AudioFormat {
       this.cutAudioFile(type, namingConvention, buffer, segment).then((file) => {
         this.onaudiocut.next({
           finishedSegments: pointer + 1,
-          file: file
+          file
         });
 
         if (pointer < segments.length - 1) {
@@ -159,16 +160,14 @@ export class WavFormat extends AudioFormat {
     }
   }
 
-  public getAudioCutAsArrayBuffer(buffer: ArrayBuffer, segment: {
-    number: number,
-    sampleStart: number,
-    sampleDur: number
-  }): Promise<ArrayBuffer> {
+  public getAudioCutAsArrayBuffer(buffer: ArrayBuffer, segment: SegmentToDecode): Promise<ArrayBuffer> {
     return new Promise<ArrayBuffer>((resolve, reject) => {
+      const sampleStart = segment.sampleStart.value;
+      const sampleDur = segment.sampleDur.value;
       // one block contains one sample of each channel
       // eg. blockAlign = 4 Byte => 2 * 8 Channel1 + 2 * 8 Channel2 = 32Bit = 4 Byte
-      const start = segment.sampleStart * this._channels * 2;
-      const duration = segment.sampleDur * this._channels * 2;
+      const start = sampleStart * this._channels * 2;
+      const duration = sampleDur * this._channels * 2;
       // start and duration are the position in bytes after the header
 
       if (this.isValid(buffer)) {

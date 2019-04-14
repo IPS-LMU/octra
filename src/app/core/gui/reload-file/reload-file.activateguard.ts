@@ -26,7 +26,7 @@ export class ReloadFileGuard implements CanActivate {
       Functions.navigateTo(this.router, ['/login'], params);
       return false;
     } else {
-      if ((this.settingsService.app_settings === null || this.settingsService.app_settings === undefined)) {
+      if ((this.settingsService.appSettings === null || this.settingsService.appSettings === undefined)) {
         return this.settingsService.settingsloaded.first();
       } else {
         return this.settingsService.validated;

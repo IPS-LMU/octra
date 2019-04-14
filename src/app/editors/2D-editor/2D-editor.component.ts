@@ -1,4 +1,4 @@
-import {AfterContentChecked, AfterViewInit, Component, EventEmitter, OnChanges, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 
 import {
   AppStorageService,
@@ -90,7 +90,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public get app_settings(): any {
-    return this.settingsService.app_settings;
+    return this.settingsService.appSettings;
   }
 
   public get projectsettings(): any {

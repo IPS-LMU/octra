@@ -57,7 +57,7 @@
                 </li>
             </ng-template>
             <li class="nav-item"
-                *ngIf="appStorage.LoggedIn && navbarServ.show_interfaces && settService.app_settings.octra.showdetails">
+                *ngIf="appStorage.LoggedIn && navbarServ.show_interfaces && settService.appSettings.octra.showdetails">
                 <a class="nav-link" (mouseup)="modalstatistics.open()">
                     <fa-icon icon="th-list" class="navbar-icon"></fa-icon>
                     <span class="d-md-none d-lg-inline"> Statistics</span></a>
@@ -305,7 +305,7 @@
             BugReport
             -->
             <li class="nav-item"
-                *ngIf="settService.app_settings !== undefined && settService.app_settings.octra.bugreport !== undefined && settService.app_settings.octra.bugreport.enabled">
+                *ngIf="settService.appSettings !== undefined && settService.appSettings.octra.bugreport !== undefined && settService.appSettings.octra.bugreport.enabled">
                 <a class="nav-link" (mouseup)="openBugReport()">
                     <fa-icon icon="exclamation-circle" class="navbar-icon" style="color:#fcffba"
                              [ngStyle]="{

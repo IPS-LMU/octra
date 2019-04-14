@@ -71,6 +71,7 @@
     "use-pipe-transform-interface": true,
     "component-class-suffix": true,
     "directive-class-suffix": true,
+    "prefer-for-of": false,
     "variable-name": [
       true,
       "allow-leading-underscore"

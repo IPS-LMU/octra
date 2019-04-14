@@ -44,7 +44,7 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   public get app_settings(): any {
-    return this.settingsService.app_settings;
+    return this.settingsService.appSettings;
   }
 
   public get projectsettings(): any {

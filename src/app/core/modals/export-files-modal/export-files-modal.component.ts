@@ -327,7 +327,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
     this.tools.audioCutting.status = 'started';
     this.tools.audioCutting.subscriptionIDs[0] = this.subscrmanager.add(
-      this.httpClient.post(`${this.settService.app_settings.octra.plugins.audioCutter.url}/v1/cutAudio`, formData, {
+      this.httpClient.post(`${this.settService.appSettings.octra.plugins.audioCutter.url}/v1/cutAudio`, formData, {
         headers: {
           'authorization': '7234rhuiweafauosijfaw89e77z23t'
         }, responseType: 'json'
@@ -335,9 +335,9 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
         const hash = result.hash;
         this.tools.audioCutting.subscriptionIDs[1] = this.subscrmanager.add(Observable.interval(500).subscribe(
           () => {
-            this.httpClient.get(`${this.settService.app_settings.octra.plugins.audioCutter.url}/v1/tasks/${hash}`, {
+            this.httpClient.get(`${this.settService.appSettings.octra.plugins.audioCutter.url}/v1/tasks/${hash}`, {
               headers: {
-                'authorization': this.settService.app_settings.octra.plugins.audioCutter.authToken
+                'authorization': this.settService.appSettings.octra.plugins.audioCutter.authToken
               }, responseType: 'json'
             }).subscribe((result2: any) => {
               this.tools.audioCutting.progress = ((!isNullOrUndefined(result2.progress)) ? Math.round(result2.progress * 100) : 0);

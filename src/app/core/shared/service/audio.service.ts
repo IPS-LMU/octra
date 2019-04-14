@@ -4,6 +4,7 @@ import {AudioManager} from '../../../media-components/obj/media/audio/AudioManag
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
 import {HttpClient} from '@angular/common/http';
+import {isNullOrUndefined} from '../Functions';
 
 @Injectable()
 export class AudioService {
@@ -21,6 +22,12 @@ export class AudioService {
    */
   constructor(private http: HttpClient) {
   }
+
+  private subscrmanager: SubscriptionManager = new SubscriptionManager();
+  private afterloaded: EventEmitter<any> = new EventEmitter<any>();
+  private _audiomanagers: AudioManager[] = [];
+  private _loaded = false;
+
   /**
    * loadAudio(url) loads the audio data referred to via the URL in an AJAX call.
    * The audiodata is written to the local audiobuffer field.
@@ -44,27 +51,28 @@ export class AudioService {
           filename = url;
         }
 
-        AudioManager.decodeAudio(filename, 'audio/wav', buffer, AppInfo.audioformats).then(
-          (manager: AudioManager) => {
-            this.registerAudioManager(manager);
+        this.subscrmanager.add(AudioManager.decodeAudio(filename, 'audio/wav', buffer, AppInfo.audioformats).subscribe(
+          (result) => {
+            if (!isNullOrUndefined(result.audioManager)) {
+              // finished
+              this.registerAudioManager(result.audioManager);
 
-            console.log('Audio (Length: ' + manager.ressource.size + ') loaded. Decode now...');
-            this.afterloaded.emit({status: 'success'});
-            callback({});
-          }
-        ).catch((err) => {
-          errorcallback(err);
-        });
+              console.log('Audio (Length: ' + result.audioManager.ressource.size + ') loaded. Decode now...');
+              this.afterloaded.emit({status: 'success'});
+              callback({});
+            } else {
+              console.log(`decode progress: ${result.decodeProgress}`);
+            }
+          },
+          (error) => {
+            console.error(error);
+          }));
       },
       error => {
         errorcallback(error);
       }
     );
   }
-  private subscrmanager: SubscriptionManager = new SubscriptionManager();
-  private afterloaded: EventEmitter<any> = new EventEmitter<any>();
-  private _audiomanagers: AudioManager[] = [];
-  private _loaded = false;
 
   public registerAudioManager(manager: AudioManager) {
     const found = this._audiomanagers.find((a: AudioManager) => {

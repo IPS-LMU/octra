@@ -69,7 +69,7 @@ export class TranscriptionComponent implements OnInit,
   }
 
   get appc(): any {
-    return this.settingsService.app_settings;
+    return this.settingsService.appSettings;
   }
 
   get projectsettings(): ProjectSettings {
@@ -85,7 +85,7 @@ export class TranscriptionComponent implements OnInit,
   }
 
   private get app_settings() {
-    return this.settingsService.app_settings;
+    return this.settingsService.appSettings;
   }
 
   constructor(public router: Router,
@@ -314,11 +314,11 @@ export class TranscriptionComponent implements OnInit,
     ));
 
     if (this.appStorage.usemode === 'online') {
-      if (!isNullOrUndefined(this.settingsService.app_settings.octra.inactivityNotice)
-        && !isNullOrUndefined(this.settingsService.app_settings.octra.inactivityNotice.showAfter)
-        && this.settingsService.app_settings.octra.inactivityNotice.showAfter > 0) {
+      if (!isNullOrUndefined(this.settingsService.appSettings.octra.inactivityNotice)
+        && !isNullOrUndefined(this.settingsService.appSettings.octra.inactivityNotice.showAfter)
+        && this.settingsService.appSettings.octra.inactivityNotice.showAfter > 0) {
         // if waitTime is 0 the inactivity modal isn't shown
-        let waitTime = this.settingsService.app_settings.octra.inactivityNotice.showAfter;
+        let waitTime = this.settingsService.appSettings.octra.inactivityNotice.showAfter;
         waitTime = waitTime * 60 * 1000;
         this.subscrmanager.add(Observable.interval(5000).subscribe(
           () => {

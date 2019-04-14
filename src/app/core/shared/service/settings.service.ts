@@ -32,7 +32,7 @@ export class SettingsService {
       return this.projectsettings.responsive;
 
     } else {
-      return this.app_settings.octra.responsive;
+      return this.appSettings.octra.responsive;
     }
   }
 
@@ -40,8 +40,8 @@ export class SettingsService {
     return this._projectsettings;
   }
 
-  get app_settings(): AppSettings {
-    return this._app_settings;
+  get appSettings(): AppSettings {
+    return this._appSettings;
   }
 
   get guidelines(): any {
@@ -92,7 +92,7 @@ export class SettingsService {
   }
 
   public dbloaded = new EventEmitter<any>();
-  public app_settingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
+  public appsettingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
   public projectsettingsloaded: EventEmitter<any> = new EventEmitter<any>();
   public validationmethodloaded = new EventEmitter<void>();
   public audioloaded: EventEmitter<any> = new EventEmitter<any>();
@@ -106,7 +106,7 @@ export class SettingsService {
 
   private _projectsettings: ProjectSettings;
 
-  private _app_settings: AppSettings;
+  private _appSettings: AppSettings;
 
   private _guidelines: any;
 
@@ -138,9 +138,9 @@ export class SettingsService {
       if (!valid) {
         for (const err in validate.errors) {
           if (validate.errors.hasOwnProperty(err)) {
-            const err_obj: any = (validate.errors['' + err + '']);
-            if (err_obj.hasOwnProperty('dataPath') && !(err_obj.dataPath === null || err_obj.dataPath === undefined)) {
-              console.error(`JSON Validation Error (${filename}): ${err_obj.dataPath} ${err_obj.message}`);
+            const errObj: any = (validate.errors['' + err + '']);
+            if (errObj.hasOwnProperty('dataPath') && !(errObj.dataPath === null || errObj.dataPath === undefined)) {
+              console.error(`JSON Validation Error (${filename}): ${errObj.dataPath} ${errObj.message}`);
             }
           }
         }
@@ -156,20 +156,20 @@ export class SettingsService {
     // check for Updates
     if (SettingsService.queryParamsSet(appRoute)) {
       // URL MODE, overwrite db name with 'url'
-      this.app_settings.octra.database.name = 'url';
+      this.appSettings.octra.database.name = 'url';
     } else {
     }
 
     const umanager = new UpdateManager(this.appStorage);
-    umanager.checkForUpdates(this.app_settings.octra.database.name).then((idb) => {
+    umanager.checkForUpdates(this.appSettings.octra.database.name).then((idb) => {
 
-      const audio_url = appRoute.snapshot.queryParams['audio'];
-      const transcript_url = (appRoute.snapshot.queryParams['transcript'] !== undefined)
+      const audioURL = appRoute.snapshot.queryParams['audio'];
+      const transcriptURL = (appRoute.snapshot.queryParams['transcript'] !== undefined)
         ? appRoute.snapshot.queryParams['transcript'] : null;
       const embedded = appRoute.snapshot.queryParams['embedded'];
 
-      this.appStorage.url_params['audio'] = audio_url;
-      this.appStorage.url_params['transcript'] = transcript_url;
+      this.appStorage.url_params['audio'] = audioURL;
+      this.appStorage.url_params['transcript'] = transcriptURL;
       this.appStorage.url_params['embedded'] = (embedded === '1');
       this.appStorage.url_params['host'] = appRoute.snapshot.queryParams['host'];
 
@@ -177,16 +177,16 @@ export class SettingsService {
       this.appStorage.load(idb).then(
         () => {
           // define languages
-          const languages = this.app_settings.octra.languages;
-          const browser_lang = this.langService.getBrowserLang();
+          const languages = this.appSettings.octra.languages;
+          const browserLang = this.langService.getBrowserLang();
           this.langService.addLangs(languages);
 
           // check if browser language is available in translations
           if ((this.appStorage.language === null || this.appStorage.language === undefined) || this.appStorage.language === '') {
             if ((this.langService.getLangs().find((value) => {
-              return value === browser_lang;
+              return value === browserLang;
             })) !== undefined) {
-              this.langService.use(browser_lang);
+              this.langService.use(browserLang);
             } else {
               // use first language defined as default language
               this.langService.use(languages[0]);
@@ -211,11 +211,11 @@ export class SettingsService {
           if (this.validated) {
 
             // settings have been loaded
-            if ((this.app_settings === null || this.app_settings === undefined)) {
+            if ((this.appSettings === null || this.appSettings === undefined)) {
               throw new Error('config.json does not exist');
             } else {
               if (this.validated) {
-                this.api.init(this.app_settings.audio_server.url + 'WebTranscribe');
+                this.api.init(this.appSettings.audio_server.url + 'WebTranscribe');
               }
             }
           }
@@ -331,7 +331,7 @@ export class SettingsService {
       if (!(this.appStorage.audio_url === null || this.appStorage.audio_url === undefined)) {
         let src = '';
         if (this.appStorage.usemode === 'online') {
-          src = this.app_settings.audio_server.url + this.appStorage.audio_url;
+          src = this.appSettings.audio_server.url + this.appStorage.audio_url;
         } else {
           src = this.appStorage.audio_url;
         }
@@ -366,13 +366,21 @@ export class SettingsService {
         reader.onloadend = (ev) => {
           const t: any = ev.target;
           if (audioService.audiomanagers.length === 0) {
-            AudioManager.decodeAudio(this.appStorage.sessionfile.name, 'audio/wav', t.result, AppInfo.audioformats).then(
-              (audiomanager: AudioManager) => {
-                audioService.registerAudioManager(audiomanager);
-                console.log('Audio loaded.');
-                this.audioloaded.emit({status: 'success'});
-              }
-            );
+            console.log(`LOAD AGAIN!????`);
+
+            this.subscrmanager.add(AudioManager.decodeAudio(this.appStorage.sessionfile.name, 'audio/wav', t.result, AppInfo.audioformats).subscribe(
+              (result) => {
+                if (!isNullOrUndefined(result)) {
+                  audioService.registerAudioManager(result.audioManager);
+                  console.log('Audio loaded.');
+                  this.audioloaded.emit({status: 'success'});
+                } else {
+                  console.log(`decode progress: ${result.decodeProgress}`);
+                }
+              },
+              (error) => {
+                console.error(error);
+              }));
           } else {
             console.log('Audio loaded.');
             this.audioloaded.emit({status: 'success'});
@@ -398,7 +406,7 @@ export class SettingsService {
   public loadApplicationSettings(appRoute: ActivatedRoute): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.subscrmanager.add(
-        this.app_settingsloaded.subscribe(this.triggerSettingsLoaded)
+        this.appsettingsloaded.subscribe(this.triggerSettingsLoaded)
       );
 
       this.loadSettings(
@@ -414,13 +422,13 @@ export class SettingsService {
           schema: 'appconfig.schema.json'
         },
         (result: AppSettings) => {
-          this._app_settings = result;
+          this._appSettings = result;
         },
         () => {
           console.log('AppSettings loaded.');
           this.validation.app = true;
 
-          this.app_settingsloaded.emit(true);
+          this.appsettingsloaded.emit(true);
           // App Settings loaded
 
           // settings finally loaded
@@ -463,9 +471,9 @@ export class SettingsService {
             (schema) => {
               console.log(filenames.json + ' schema file loaded');
 
-              const validation_ok = SettingsService.validateJSON(filenames.json, appsettings, schema);
+              const validationOK = SettingsService.validateJSON(filenames.json, appsettings, schema);
 
-              if (validation_ok) {
+              if (validationOK) {
                 onvalidated();
               }
             },

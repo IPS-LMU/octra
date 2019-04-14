@@ -20,10 +20,10 @@ export class CompatibilityGuard implements CanActivate {
 
     return new Promise<boolean>((resolve, reject) => {
       new Promise<void>((resolve2, reject2) => {
-        if (!(this.settingsService.app_settings === null || this.settingsService.app_settings === undefined)) {
+        if (!(this.settingsService.appSettings === null || this.settingsService.appSettings === undefined)) {
           resolve2();
         } else {
-          const subscr = this.settingsService.app_settingsloaded.subscribe(() => {
+          const subscr = this.settingsService.appsettingsloaded.subscribe(() => {
             resolve2();
             subscr.unsubscribe();
           });

@@ -32,7 +32,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   get apc(): any {
-    return this.settingsService.app_settings;
+    return this.settingsService.appSettings;
   }
 
   public get Math(): Math {
@@ -440,12 +440,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       if (Array.isArray(json.data)) {
         this.projects = json.data;
 
-        if (!(this.settingsService.app_settings.octra.allowed_projects === null ||
-          this.settingsService.app_settings.octra.allowed_projects === undefined)
-          && this.settingsService.app_settings.octra.allowed_projects.length > 0) {
+        if (!(this.settingsService.appSettings.octra.allowed_projects === null ||
+          this.settingsService.appSettings.octra.allowed_projects === undefined)
+          && this.settingsService.appSettings.octra.allowed_projects.length > 0) {
           // filter disabled projects
           this.projects = this.projects.filter((a) => {
-            return (this.settingsService.app_settings.octra.allowed_projects.findIndex((b) => {
+            return (this.settingsService.appSettings.octra.allowed_projects.findIndex((b) => {
               return a === b.name;
             }) > -1);
           });
@@ -580,9 +580,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   public isPasswordCorrect(selectedProject, password) {
-    if (!isNullOrUndefined(this.settingsService.app_settings.octra.allowed_projects)) {
+    if (!isNullOrUndefined(this.settingsService.appSettings.octra.allowed_projects)) {
       const inputHash = sha256(password).toUpperCase();
-      const projectData = this.settingsService.app_settings.octra.allowed_projects.find((a) => {
+      const projectData = this.settingsService.appSettings.octra.allowed_projects.find((a) => {
         return a.name === selectedProject;
       });
 
@@ -597,8 +597,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   passwordExists() {
-    if (!isNullOrUndefined(this.settingsService.app_settings.octra.allowed_projects)) {
-      const projectData = this.settingsService.app_settings.octra.allowed_projects.find((a) => {
+    if (!isNullOrUndefined(this.settingsService.appSettings.octra.allowed_projects)) {
+      const projectData = this.settingsService.appSettings.octra.allowed_projects.find((a) => {
         return a.name === this.member.project;
       });
 

@@ -103,7 +103,7 @@ export class BugReportService {
   }
 
   public getText(): string {
-    const bugreport_settings = this.settService.app_settings.octra.bugreport;
+    const bugreport_settings = this.settService.appSettings.octra.bugreport;
 
     for (let i = 0; i < AppInfo.bugreporters.length; i++) {
       const bugreporter = AppInfo.bugreporters[i];
@@ -122,7 +122,7 @@ export class BugReportService {
     auth_token: string,
     url: string
   }): Observable<any> {
-    const bugreport_settings = this.settService.app_settings.octra.bugreport;
+    const bugreport_settings = this.settService.appSettings.octra.bugreport;
 
     if (!(bugreport_settings === null || bugreport_settings === undefined) && bugreport_settings.enabled) {
       const auth_token = credentials.auth_token;

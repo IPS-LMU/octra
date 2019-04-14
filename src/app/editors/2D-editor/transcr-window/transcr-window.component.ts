@@ -52,7 +52,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   get app_settings(): any {
-    return this.settingsService.app_settings;
+    return this.settingsService.appSettings;
   }
 
   get projectsettings(): any {

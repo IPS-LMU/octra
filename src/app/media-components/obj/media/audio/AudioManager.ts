@@ -135,6 +135,7 @@ export class AudioManager {
   }
 
   private static counter = 0;
+  private static decoder: AudioDecoder;
   private _id: number;
   private _ressource: AudioRessource;
   private _originalInfo: AudioInfo;
@@ -209,12 +210,12 @@ export class AudioManager {
 
       if (audioinfo !== null) {
         const bufferLength = buffer.byteLength;
-        const decoder = new AudioDecoder(audioformat, buffer);
+        AudioManager.decoder = new AudioDecoder(audioformat, buffer);
 
         // const sampleDur = new OriginalSample(Math.min(30 * audioformat.sampleRate, audioformat.duration), audioformat.sampleRate);
 
         console.log(`decode!`);
-        decoder.onaudiodecode.subscribe((obj) => {
+        AudioManager.decoder.onaudiodecode.subscribe((obj) => {
           if (obj.result !== null) {
             // get result;
             const audioBuffer = obj.result;
@@ -234,7 +235,9 @@ export class AudioManager {
             // set duration is very important
             console.log(`sampleRate browser: ${result.browserSampleRate}`);
             console.log(`sampleRate original: ${result.originalSampleRate}`);
-            console.log(`dur ${audioBuffer.length / audioBuffer.sampleRate}`);
+            console.log(`original duration ${result.ressource.info.duration.originalSample.seconds}`);
+            console.log(`browser duration ${result.ressource.info.duration.browserSample.seconds}`);
+            console.log(`audiobuffer duration ${audioBuffer.duration}`);
             console.log(`decoded samplerate: ${audioBuffer.sampleRate}`);
 
             const selection = new AudioSelection(
@@ -252,11 +255,24 @@ export class AudioManager {
               decodeProgress: 1
             });
             subj.complete();
+          } else {
+            subj.next({
+              audioManager: null,
+              decodeProgress: obj.progress
+            });
           }
         }, error => console.error(error));
 
-        const sampleDur = Math.round(audioformat.duration / AudioManager.getNumberOfDataParts(bufferLength));
-        decoder.decodeChunked(0, sampleDur);
+        const numOfParts = AudioManager.getNumberOfDataParts(bufferLength);
+        let sampleDur = Math.round(audioformat.duration / numOfParts);
+        // tweak that enables to decode full seconds
+
+        if (numOfParts > 1) {
+          sampleDur = Math.round(sampleDur / audioformat.sampleRate) * audioformat.sampleRate;
+        }
+        console.log(`sampleDur has length of ${sampleDur / audioformat.sampleRate} seconds`);
+
+        AudioManager.decoder.decodeChunked(0, sampleDur);
       }
     } else {
       subj.error(`audio format not supported`);
@@ -304,6 +320,12 @@ export class AudioManager {
 
   public static isValidFileName(filename: string, audioformats: AudioFormat[]): boolean {
     return AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats) !== null;
+  }
+
+  public static stopDecoding() {
+    if (!(AudioManager.decoder === null || AudioManager.decoder === undefined)) {
+      AudioManager.decoder.requeststopDecoding();
+    }
   }
 
   public startPlayback(begintime: BrowserAudioTime,

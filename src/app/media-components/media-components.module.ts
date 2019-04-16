@@ -63,7 +63,8 @@ library.add(faPlay, faPause, faStop, faForward, faStepForward, faStepBackward, f
     SecondsPipe,
     LeadingNullPipe,
     TimespanPipe,
-    Timespan2Pipe
+    Timespan2Pipe,
+    ProcentPipe
   ]
 })
 export class MediaComponentsModule {

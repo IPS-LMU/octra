@@ -20,6 +20,8 @@ export class AudioDecoder {
   private audioContext: AudioContext;
   private arrayBuffer: ArrayBuffer;
 
+  private stopDecoding = false;
+
   constructor(format: AudioFormat, arrayBuffer: ArrayBuffer) {
     if (!(format === null || format === undefined)) {
       this.audioInfo = format.getAudioInfo('file.wav', 'audio/wav', arrayBuffer);
@@ -33,7 +35,7 @@ export class AudioDecoder {
 
   decodeChunked(sampleStart: number, sampleDur: number) {
     if (this.format instanceof WavFormat) {
-      console.log(`decode from sample ${sampleStart} to ${sampleDur}`);
+      console.log(`decode from sample ${sampleStart} to ${sampleStart + sampleDur}`);
       // cut the audio file into 10 parts:
       const partSamples = this.createOriginalSample(
         sampleDur
@@ -43,6 +45,10 @@ export class AudioDecoder {
         sampleStart
       );
 
+      if (sampleStart === 0) {
+        this.stopDecoding = false;
+      }
+
       if (sampleStart + sampleDur <= this.audioInfo.duration.originalSample.value && sampleStart >= 0 && sampleDur >= sampleDur) {
 
         this.format.getAudioCutAsArrayBuffer(this.arrayBuffer, {
@@ -50,8 +56,15 @@ export class AudioDecoder {
           sampleStart: startSamples,
           sampleDur: partSamples
         }).then((dataPart: ArrayBuffer) => {
-          console.log(`cutted, decode ${this.audioInfo.duration.originalSample.value - sampleStart - sampleDur} left`);
+          console.log(`cutted start ${startSamples.value} with dur ${partSamples.value}`);
           this.decodeAudioFile(dataPart).then((audioBuffer: AudioBuffer) => {
+            // console.log(`decoded part duration: ${audioBuffer.duration} (diff: ${audioBuffer.duration - partSamples.seconds}) (browser samplerate = ${this.audioInfo.duration.sampleRates.browser}`);
+
+            if (audioBuffer.duration - partSamples.seconds !== 0) {
+              console.error(`diff of audio durations is ${audioBuffer.duration - partSamples.seconds} = ${(partSamples.seconds - audioBuffer.duration) * 44800} samples!`);
+              console.log(`${audioBuffer.length - Math.round(partSamples.seconds * 48000)}`);
+            }
+
             if (!(this.audioBuffer === null || this.audioBuffer === undefined)) {
               this.audioBuffer = this.appendAudioBuffer(this.audioBuffer, audioBuffer);
             } else {
@@ -67,15 +80,30 @@ export class AudioDecoder {
               });
               this.onaudiodecode.complete();
             } else {
+              const progress = (sampleStart + sampleDur) / this.audioInfo.duration.originalSample.value;
+              console.log(`${Math.round(progress * 100)}%`);
               this.onaudiodecode.next({
-                progress: (sampleStart + sampleDur) / this.audioInfo.duration.originalSample.value,
+                progress,
                 result: null
               });
 
-              setTimeout(() => {
-                const sampleDur2 = Math.min(sampleDur, this.audioInfo.duration.originalSample.value - sampleStart - sampleDur);
-                this.decodeChunked(sampleStart + sampleDur, sampleDur2);
-              }, 200);
+              if (!this.stopDecoding) {
+                setTimeout(() => {
+                  let sampleDur2 = Math.min(sampleDur, this.audioInfo.duration.originalSample.value - sampleStart - sampleDur);
+
+                  if (this.audioInfo.duration.originalSample.value - sampleStart - sampleDur < 2 * sampleDur) {
+                    sampleDur2 = this.audioInfo.duration.originalSample.value - sampleStart - sampleDur;
+
+                    const diff = sampleStart + sampleDur + sampleDur2 - this.audioInfo.duration.originalSample.value;
+                    console.log(`last segment! decode from ${sampleStart + sampleDur} to ${sampleStart + sampleDur + sampleDur2} (${diff})`);
+                  }
+                  this.decodeChunked(sampleStart + sampleDur, sampleDur2);
+                }, 0);
+              } else {
+                console.log(`decoding stopped!`);
+                this.onaudiodecode.complete();
+              }
+              this.stopDecoding = false;
             }
 
           }).catch((error2) => {
@@ -162,7 +190,12 @@ export class AudioDecoder {
   }
 
   public createOriginalSample(sample: number): OriginalSample {
+    console.log(`create origin sample with samplerate ${this.audioInfo.samplerate}`);
     return new OriginalSample(sample, this.audioInfo.samplerate);
+  }
+
+  public requeststopDecoding() {
+    this.stopDecoding = true;
   }
 }
 

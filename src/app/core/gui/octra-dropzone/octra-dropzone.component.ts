@@ -23,7 +23,8 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
   public get files(): {
     status: string,
     file: File,
-    checked_converters: number
+    checked_converters: number,
+    progress: number
   }[] {
     return this._files;
   }
@@ -54,7 +55,8 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
   public _files: {
     status: string,
     file: File,
-    checked_converters: number
+    checked_converters: number,
+    progress: number
   }[] = [];
 
   private _oaudiofile: OAudiofile;
@@ -71,7 +73,8 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
       const fileProcess = {
         status: 'progress',
         file: this.dropzone.files[i],
-        checked_converters: 0
+        checked_converters: 0,
+        progress: 0
       };
 
       let dataFile = null;
@@ -88,17 +91,17 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
         fileProcess.status = 'progress';
         const reader = new FileReader();
 
-        reader.onloadend = () => {
-          this.decodeArrayBuffer((reader.result as ArrayBuffer), fileProcess);
-        };
-
-        reader.readAsArrayBuffer(fileProcess.file);
-
         // drop previous audio files
         for (const audioFormat of AppInfo.audioformats) {
           this.dropFile(audioFormat.extension, true);
         }
         this._files.push(fileProcess);
+
+        reader.onloadend = () => {
+          this.decodeArrayBuffer((reader.result as ArrayBuffer), this._files.length - 1);
+        };
+
+        reader.readAsArrayBuffer(fileProcess.file);
         break;
       } else {
         if (!(audioFile === null || audioFile === undefined)) {
@@ -113,7 +116,8 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
               const newfile = {
                 status: 'progress',
                 file: this.dropzone.files[j],
-                checked_converters: 0
+                checked_converters: 0,
+                progress: 0
               };
               this._files.push(newfile);
               this.isValidImportData(newfile);
@@ -130,7 +134,8 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
             const newfile = {
               status: 'progress',
               file: this.dropzone.files[j],
-              checked_converters: 0
+              checked_converters: 0,
+              progress: 0
             };
             this._files.push(newfile);
             this.isValidImportData(newfile);
@@ -212,7 +217,8 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
                 const audioProcess = {
                   status: 'progress',
                   file: new File([importResult.audiofile.arraybuffer], importResult.audiofile.name),
-                  checked_converters: 0
+                  checked_converters: 0,
+                  progress: 0
                 };
                 this._files.push(audioProcess);
                 // TODO bundle file check
@@ -260,6 +266,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
       this.dropFile(entry);
       if (Functions.contains(entry, '.wav') || Functions.contains(entry, '.ogg')) {
         this._oaudiofile = null;
+        AudioManager.stopDecoding();
       } else {
         this._oannotation = null;
       }
@@ -296,14 +303,16 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
   }
 
   private decodeArrayBuffer(buffer: ArrayBuffer,
-                            fileProcess: { status: string, file: File, checked_converters: number },
+                            fileProcessIndex: number,
                             checkimport = true) {
+    const fileProcess = this._files[fileProcessIndex];
     const extension = fileProcess.file.name.substr(fileProcess.file.name.lastIndexOf('.'));
-
     // check audio
     this.subscrmanager.add(AudioManager.decodeAudio(fileProcess.file.name, fileProcess.file.type, buffer, AppInfo.audioformats).subscribe(
       (result) => {
-        if (isNullOrUndefined(result)) {
+        fileProcess.progress = result.decodeProgress;
+
+        if (isNullOrUndefined(result.audioManager)) {
           // not finished
           console.log(`decode progress: ${result.decodeProgress}`);
         } else {
@@ -335,7 +344,8 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
                 const newfile = {
                   status: 'progress',
                   file: this.dropzone.files[j],
-                  checked_converters: 0
+                  checked_converters: 0,
+                  progress: 0
                 };
                 this.dropFile(extension, true, true);
                 this._files.push(newfile);

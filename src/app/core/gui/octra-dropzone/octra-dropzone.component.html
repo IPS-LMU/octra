@@ -2,7 +2,8 @@
     <table [hidden]="(files.length === 0)" class="dropzone-table">
         <tr *ngFor="let file of files">
             <td>
-                <fa-icon class="icon-delete" icon="trash" *ngIf="file.status === 'invalid'"
+                <fa-icon class="icon-delete" icon="trash"
+                         *ngIf="file.status === 'invalid' || file.status === 'progress'"
                          style="font-size:14px; color:dimgray"
                          (click)="onDeleteEntry(file.file.name)"></fa-icon>
             </td>
@@ -13,8 +14,13 @@
                          style="font-size:16px"></fa-icon>
                 <fa-icon class="icon-success" icon="check" *ngIf="file.status === 'valid'"
                          style="font-size:16px"></fa-icon>
-                <fa-icon class="icon-wait" icon="spinner" *ngIf="file.status === 'progress'" style="font-size:16px"
-                         [spin]="true"></fa-icon>
+                <ng-container *ngIf="file.file.name.indexOf('.wav') < 0">
+                    <fa-icon class="icon-wait" icon="spinner" *ngIf="file.status === 'progress'" style="font-size:16px"
+                             [spin]="true"></fa-icon>
+                </ng-container>
+                <ng-container *ngIf="file.file.name.indexOf('.wav') > -1 && file.status === 'progress'">
+                    {{file.progress | procent}}%
+                </ng-container>
             </td>
         </tr>
     </table>

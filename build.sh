@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 buildDir="dist/octra/"
+targetFolder="assets"
 baseHref="https://www.phonetik.uni-muenchen.de/apps/octra/octra-dev/"
 
 # change this list to your needs (for exclusion of files or folders in the dist folder)
@@ -13,12 +14,12 @@ echo "Building OCTRA..."
 ng build --prod --base-href "${baseHref}"
 echo "Change index.html..."
 indexHTML=$(<${buildDir}index.html)
-indexHTML=$(echo "${indexHTML}" | sed -e 's/\(scripts\.[0-9a-z]*\.js\)/.\/assets\/\1/g')
-indexHTML=$(echo "${indexHTML}" | sed -e 's/\(es2015-polyfills\.[0-9a-z]*\.js\)/.\/assets\/\1/g')
-indexHTML=$(echo "${indexHTML}" | sed -e 's/\(src="\)\(polyfills\.[0-9a-z]*\.js\)/\1.\/assets\/\2/g')
-indexHTML=$(echo "${indexHTML}" | sed -e 's/\(main\.[0-9a-z]*\.js\)/.\/assets\/\1/g')
-indexHTML=$(echo "${indexHTML}" | sed -e 's/\(runtime\.[0-9a-z]*\.js\)/.\/assets\/\1/g')
-indexHTML=$(echo "${indexHTML}" | sed -e 's/\(styles\.[0-9a-z]*\.css\)/.\/assets\/\1/g')
+indexHTML=$(echo "${indexHTML}" | sed -e "s/\(scripts\.[0-9a-z]*\.js\)/.\/${targetFolder}\/\1/g")
+indexHTML=$(echo "${indexHTML}" | sed -e "s/\(es2015-polyfills\.[0-9a-z]*\.js\)/.\/${targetFolder}\/\1/g")
+indexHTML=$(echo "${indexHTML}" | sed -e "s/\(src=\"\)\(polyfills\.[0-9a-z]*\.js\)/\1.\/${targetFolder}\/\2/g")
+indexHTML=$(echo "${indexHTML}" | sed -e "s/\(main\.[0-9a-z]*\.js\)/.\/${targetFolder}\/\1/g")
+indexHTML=$(echo "${indexHTML}" | sed -e "s/\(runtime\.[0-9a-z]*\.js\)/.\/${targetFolder}\/\1/g")
+indexHTML=$(echo "${indexHTML}" | sed -e "s/\(styles\.[0-9a-z]*\.css\)/.\/${targetFolder}\/\1/g")
 
 if [[ ${disableRobots} == 0 ]]
 then
@@ -47,9 +48,9 @@ for old in ./${buildDir}*; do
       done
     fi
 
-    if [[ ${entry} != 'index.html' ]] && [[ ${entry} != 'assets' ]] && [[ ${found} == 0 ]]
+    if [[ ${entry} != 'index.html' ]] && [[ ${entry} != ${targetFolder} ]] && [[ ${found} == 0 ]]
     then
-      mv "./${buildDir}${entry}" "./${buildDir}assets/${entry}"
+      mv "./${buildDir}${entry}" "./${buildDir}${targetFolder}/${entry}"
     fi
   done
 # you can add more jobs here

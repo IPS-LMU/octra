@@ -222,8 +222,7 @@ export class AudioManager {
             const result = new AudioManager(audioinfo, audioBuffer.sampleRate);
 
             audioinfo = new AudioInfo(filename, type, bufferLength, audioBuffer.sampleRate,
-              audioBuffer.sampleRate * audioformat.duration / audioformat.sampleRate,
-              audioformat.sampleRate, audioBuffer.numberOfChannels, audioinfo.bitrate);
+              audioBuffer.length, audioformat.channels, audioformat.bitsPerSample, audioformat.sampleRate);
 
             audioinfo.file = new File([buffer], filename, {type: 'audio/wav'});
             result.setRessource(new AudioRessource(filename, SourceType.ArrayBuffer,
@@ -235,6 +234,7 @@ export class AudioManager {
             // set duration is very important
             console.log(`sampleRate browser: ${result.browserSampleRate}`);
             console.log(`sampleRate original: ${result.originalSampleRate}`);
+            console.log(`original duration in samples = ${result.ressource.info.duration.originalSample.value}`);
             console.log(`original duration ${result.ressource.info.duration.originalSample.seconds}`);
             console.log(`browser duration ${result.ressource.info.duration.browserSample.seconds}`);
             console.log(`audiobuffer duration ${audioBuffer.duration}`);
@@ -285,10 +285,10 @@ export class AudioManager {
   private static getNumberOfDataParts(fileSize: number): number {
     const mb = fileSize / 1024 / 1024;
 
-    if (mb > 10) {
+    if (mb > 20) {
 
       // make chunks of 10 mb
-      return Math.ceil(mb / 10);
+      return Math.ceil(mb / 20);
     }
 
     return 1;

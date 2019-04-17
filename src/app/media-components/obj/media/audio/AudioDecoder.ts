@@ -51,6 +51,16 @@ export class AudioDecoder {
 
       if (sampleStart + sampleDur <= this.audioInfo.duration.originalSample.value && sampleStart >= 0 && sampleDur >= sampleDur) {
 
+        /*
+        this.decodeAudioFile(this.arrayBuffer).then((audiobuffer) => {
+          console.log(`audiobuffer samples: ${audiobuffer.length}, ${audiobuffer.duration}`);
+          this.onaudiodecode.next({
+            progress: 1,
+            result: audiobuffer
+          });
+        }).catch((error) => {
+          console.error(error);
+        });*/
         this.format.getAudioCutAsArrayBuffer(this.arrayBuffer, {
           number: 0,
           sampleStart: startSamples,
@@ -58,11 +68,12 @@ export class AudioDecoder {
         }).then((dataPart: ArrayBuffer) => {
           console.log(`cutted start ${startSamples.value} with dur ${partSamples.value}`);
           this.decodeAudioFile(dataPart).then((audioBuffer: AudioBuffer) => {
+            console.log(`audiobuffer duration is ${audioBuffer.length}`);
             // console.log(`decoded part duration: ${audioBuffer.duration} (diff: ${audioBuffer.duration - partSamples.seconds}) (browser samplerate = ${this.audioInfo.duration.sampleRates.browser}`);
 
             if (audioBuffer.duration - partSamples.seconds !== 0) {
-              console.error(`diff of audio durations is ${audioBuffer.duration - partSamples.seconds} = ${(partSamples.seconds - audioBuffer.duration) * 44800} samples!`);
-              console.log(`${audioBuffer.length - Math.round(partSamples.seconds * 48000)}`);
+              console.error(`diff of audio durations is ${audioBuffer.duration - partSamples.seconds} = ${(partSamples.seconds - audioBuffer.duration) * partSamples.sampleRate} samples! (sample rate = ${partSamples.sampleRate})`);
+              console.log(`${audioBuffer.length - Math.round(partSamples.seconds * audioBuffer.sampleRate)}`);
             }
 
             if (!(this.audioBuffer === null || this.audioBuffer === undefined)) {
@@ -74,6 +85,7 @@ export class AudioDecoder {
 
             if (sampleStart + sampleDur === this.audioInfo.duration.originalSample.value) {
               // send complete audiobuffer
+              console.log(`final audiobuffer duration is ${this.audioBuffer.length}`);
               this.onaudiodecode.next({
                 progress: 1,
                 result: this.audioBuffer
@@ -167,6 +179,7 @@ export class AudioDecoder {
     return new Promise<AudioBuffer>((resolve, reject) => {
       if (!(arrayBuffer === null || arrayBuffer === undefined)) {
         this.audioContext.decodeAudioData(arrayBuffer).then((audiobuffer: AudioBuffer) => {
+          console.log(`decoded audiobuffer samplerate is ${audiobuffer.sampleRate}`);
           resolve(audiobuffer);
         }).catch((error) => {
           reject(error);
@@ -181,6 +194,7 @@ export class AudioDecoder {
     const tmp = this.audioContext.createBuffer(this.audioInfo.channels,
       (oldBuffer.length + newBuffer.length), oldBuffer.sampleRate);
 
+    console.log(`append audio buffers with sample rate ${oldBuffer.sampleRate}`);
     for (let i = 0; i < this.audioInfo.channels; i++) {
       const channel = tmp.getChannelData(i);
       channel.set(oldBuffer.getChannelData(i), 0);

@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../Annotation/AnnotJSON';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../Annotation';
 
 export class TextConverter extends Converter {
 
@@ -61,7 +61,6 @@ export class TextConverter extends Converter {
     if (audiofile !== null && audiofile !== undefined) {
       const result = new OAnnotJSON(audiofile.name, audiofile.samplerate);
 
-      const content = file.content;
       const olevel = new OLevel('OCTRA_1', 'SEGMENT');
       const samplerate = audiofile.samplerate;
 
@@ -76,10 +75,15 @@ export class TextConverter extends Converter {
 
       return {
         annotjson: result,
-        audiofile: null
+        audiofile: null,
+        error: ''
       };
     }
 
-    return null;
+    return {
+      annotjson: null,
+      audiofile: null,
+      error: 'Could not read text file beacuse audio file is undefined'
+    };
   }
 }

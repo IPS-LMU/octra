@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {ILevel, ISegment, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../Annotation/AnnotJSON';
+import {ILevel, ISegment, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../Annotation';
 import {Functions} from '../../shared/Functions';
 
 export class PraatTableConverter extends Converter {
@@ -40,7 +40,7 @@ export class PraatTableConverter extends Converter {
         // export segments only
         if (level.type === 'SEGMENT') {
           for (let j = 0; j < level.items.length; j++) {
-            const segment: ISegment = <ISegment> level.items[j];
+            const segment: ISegment = level.items[j] as ISegment;
             result = addEntry(result, level, segment);
           }
         }
@@ -76,10 +76,7 @@ export class PraatTableConverter extends Converter {
         for (let i = 1; i < lines.length; i++) {
           if (lines[i] !== '') {
             const columns: string[] = lines[i].split('\t');
-            const tmin = Number(columns[0]);
             const tier = columns[1];
-            const text = columns[2];
-            const tmax = Number(columns[3]);
 
             if (tiers.filter((a) => {
               if (a === tier) {
@@ -118,7 +115,8 @@ export class PraatTableConverter extends Converter {
                 if (isNaN(tmin)) {
                   return null;
                 } else {
-                  const last = (olevel.items.length > 0 && !(olevel.items[olevel.items.length - 1] === null || olevel.items[olevel.items.length - 1] === undefined))
+                  const last = (olevel.items.length > 0
+                    && !(olevel.items[olevel.items.length - 1] === null || olevel.items[olevel.items.length - 1] === undefined))
                     ? olevel.items[olevel.items.length - 1] : null;
                   if (last !== null && last.sampleStart + last.sampleDur === Math.round(Number(tmin))) {
                     start = tmin;
@@ -156,13 +154,22 @@ export class PraatTableConverter extends Converter {
         }
         return {
           annotjson: result,
-          audiofile: null
+          audiofile: null,
+          error: ''
         };
       } else {
-        console.error('filenames for .Table extension does not match!');
+        return {
+          annotjson: null,
+          audiofile: null,
+          error: `Filenames for .Table extension does not match.`
+        };
       }
     }
 
-    return null;
+    return {
+      annotjson: null,
+      audiofile: null,
+      error: `This PraatTable file is not compatible with this audio file`
+    };
   }
 }

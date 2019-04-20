@@ -79,10 +79,11 @@ export class CTMConverter extends Converter {
               length = Number(columns[3]);
             }
             const samplerate = audiofile.samplerate;
+            let osegment;
 
             if (i === 0 && start > 0) {
               // first segment not set
-              const osegment = new OSegment((i + 1),
+              osegment = new OSegment((i + 1),
                 0,
                 start * samplerate,
                 [(new OLabel('Tier_1', ''))]
@@ -93,7 +94,7 @@ export class CTMConverter extends Converter {
 
             const olabels: OLabel[] = [];
             olabels.push((new OLabel('Tier_1', columns[4])));
-            const osegment = new OSegment(
+            osegment = new OSegment(
               (i + 1),
               Math.round(start * samplerate),
               Math.round(length * samplerate),
@@ -104,14 +105,14 @@ export class CTMConverter extends Converter {
 
             if (i === lines.length - 2) {
               if ((start + length) < audiofile.duration) {
-                const osegment_end = new OSegment(
+                const osegmentEnd = new OSegment(
                   (i + 2),
                   Math.round((start + length) * samplerate),
                   Math.round((audiofile.duration - (start + length)) * samplerate),
                   [(new OLabel('Tier_1', ''))]
                 );
 
-                olevel.items.push(osegment_end);
+                olevel.items.push(osegmentEnd);
               }
             }
 
@@ -122,11 +123,22 @@ export class CTMConverter extends Converter {
 
         return {
           annotjson: result,
-          audiofile: null
+          audiofile: null,
+          error: ''
+        };
+      } else {
+        return {
+          annotjson: null,
+          audiofile: null,
+          error: `The file name stated in the CTM file is not the same as the audio file's.`
         };
       }
     }
 
-    return null;
+    return {
+      annotjson: null,
+      audiofile: null,
+      error: `This CTM file is not compatible with this audio file.`
+    };
   }
 }

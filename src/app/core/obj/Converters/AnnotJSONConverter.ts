@@ -38,18 +38,39 @@ export class AnnotJSONConverter extends Converter {
         try {
           result = JSON.parse(content);
 
-          if (result.annotates === audiofile.name) {
+          if (result.annotates === audiofile.name && result.sampleRate === audiofile.samplerate) {
             return {
               annotjson: result,
-              audiofile: null
+              audiofile: null,
+              error: ''
+            };
+          } else {
+            return {
+              annotjson: null,
+              audiofile: null,
+              error: 'Either the "annotates" field or the sample rate are not equal to the audio file.'
             };
           }
         } catch (e) {
-          return null;
+          return {
+            annotjson: null,
+            audiofile: null,
+            error: 'Could not read AnnotJSON (parse error).'
+          };
         }
+      } else {
+        return {
+          annotjson: null,
+          audiofile: null,
+          error: `Could not read AnnotJSON. (empty content)`
+        };
       }
     }
 
-    return null;
+    return {
+      annotjson: null,
+      audiofile: null,
+      error: `This AnnotJSON is not compatible.`
+    };
   }
 }

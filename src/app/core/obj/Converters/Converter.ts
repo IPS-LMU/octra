@@ -10,6 +10,7 @@ export interface IFile {
 export interface ImportResult {
   annotjson: OAnnotJSON;
   audiofile: OAudiofile;
+  error: string;
 }
 
 export interface ExportResult {

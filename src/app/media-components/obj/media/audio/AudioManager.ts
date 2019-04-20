@@ -6,15 +6,12 @@ import {
   AudioSelection,
   BrowserAudioTime,
   BrowserSample,
-  OriginalAudioTime,
-  OriginalSample,
   PlayBackState,
-  SourceType,
-  WavFormat
+  SourceType
 } from '../index';
 import {EventEmitter} from '@angular/core';
 import {Subject, Subscription} from 'rxjs';
-import {AudioDecoder, SegmentToDecode} from './AudioDecoder';
+import {AudioDecoder} from './AudioDecoder';
 
 declare var window: any;
 
@@ -179,7 +176,7 @@ export class AudioManager {
    * @param extension file extension
    * @param audioformats list of supported audio formats
    */
-  public static getFileFormat(extension: string, audioformats: AudioFormat[]): AudioFormat {
+  public static getFileFormat(extension: string, audioformats: AudioFormat[]): AudioFormat | undefined {
     return audioformats.find((a) => {
       return a.extension === extension;
     });
@@ -212,9 +209,6 @@ export class AudioManager {
         const bufferLength = buffer.byteLength;
         AudioManager.decoder = new AudioDecoder(audioformat, buffer);
 
-        // const sampleDur = new OriginalSample(Math.min(30 * audioformat.sampleRate, audioformat.duration), audioformat.sampleRate);
-
-        console.log(`decode!`);
         AudioManager.decoder.onaudiodecode.subscribe((obj) => {
           if (obj.result !== null) {
             // get result;
@@ -230,7 +224,6 @@ export class AudioManager {
 
             result.bufferedOLA.set_audio_buffer(audioBuffer);
 
-            console.log(result.ressource);
             // set duration is very important
             console.log(`sampleRate browser: ${result.browserSampleRate}`);
             console.log(`sampleRate original: ${result.originalSampleRate}`);
@@ -270,7 +263,6 @@ export class AudioManager {
         if (numOfParts > 1) {
           sampleDur = Math.round(sampleDur / audioformat.sampleRate) * audioformat.sampleRate;
         }
-        console.log(`sampleDur has length of ${sampleDur / audioformat.sampleRate} seconds`);
 
         AudioManager.decoder.decodeChunked(0, sampleDur);
       }
@@ -281,14 +273,13 @@ export class AudioManager {
     return subj;
   }
 
-
-  private static getNumberOfDataParts(fileSize: number): number {
+  public static getNumberOfDataParts(fileSize: number): number {
     const mb = fileSize / 1024 / 1024;
 
-    if (mb > 20) {
+    if (mb > 50) {
 
-      // make chunks of 10 mb
-      return Math.ceil(mb / 20);
+      // make chunks of 50 mb
+      return Math.ceil(mb / 50);
     }
 
     return 1;
@@ -318,8 +309,8 @@ export class AudioManager {
     });
   }
 
-  public static isValidFileName(filename: string, audioformats: AudioFormat[]): boolean {
-    return AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats) !== null;
+  public static isValidAudioFileName(filename: string, audioformats: AudioFormat[]): boolean {
+    return AudioManager.getFileFormat(filename.substr(filename.lastIndexOf('.')), audioformats) !== undefined;
   }
 
   public static stopDecoding() {
@@ -475,16 +466,6 @@ export class AudioManager {
     }
   }
 
-  /**
-   * return the source node
-   */
-
-  /*
-  private getSource(): AudioBufferSourceNode {
-    this._source = this._audioContext.createBufferSource();
-    return this._source;
-  }*/
-
   public createNewAudioChunk(time: AudioSelection, selection?: AudioSelection): AudioChunk {
     if (
       time.start.browserSample.value + time.duration.browserSample.value <= this.ressource.info.duration.browserSample.value
@@ -532,64 +513,11 @@ export class AudioManager {
             }
           );
       }
-
-      /*
-      if (!(this._source === null || this._source === undefined)) {
-        this._source.disconnect();
-      }*/
     }
   }
 
   public createBrowserAudioTime(sample: number): BrowserAudioTime {
     return new BrowserAudioTime(new BrowserSample(sample, this.browserSampleRate), this.originalSampleRate);
-  }
-
-  public createOriginalAudioTime(sample: number): OriginalAudioTime {
-    return new OriginalAudioTime(new OriginalSample(sample, this.originalSampleRate), this.browserSampleRate);
-  }
-
-  private decodeNewPart(segmentToDecode: SegmentToDecode, isFirst = false): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      console.log(`DECODE NEW PART:`);
-      const started = Date.now();
-      console.log(segmentToDecode);
-      const format = new WavFormat();
-      format.init(this.ressource.info.name, this.ressource.arraybuffer);
-      const decoder = new AudioDecoder(format, this.ressource.arraybuffer);
-      console.log(`BROWSER SAMPLERATE IS: ${this._ressource.info.samplerate}`);
-
-      decoder.decodePartOfAudioFile(segmentToDecode).then((audiobuffer2) => {
-        const length = Date.now() - started;
-        console.log(`NEW BUFFER! ${length / 1000}`);
-        if (!isFirst) {
-          // append
-          const newBuffer = decoder.appendAudioBuffer(this._ressource.audiobuffer, audiobuffer2);
-          this._ressource.audiobuffer = newBuffer;
-          this.bufferedOLA.set_audio_buffer(this._ressource.audiobuffer);
-        } else {
-          this._ressource.audiobuffer = audiobuffer2;
-          this.bufferedOLA.set_audio_buffer(this._ressource.audiobuffer);
-        }
-
-        console.log('buffer set ok!');
-        resolve();
-      }).catch((error) => {
-        reject(error);
-      });
-    });
-  }
-
-  private decodeAudioChunked(): Subject<{
-    progress: number,
-    result: AudioBuffer
-  }> {
-    const subj = new Subject<{
-      progress: number,
-      result: AudioBuffer
-    }>();
-
-
-    return subj;
   }
 }
 

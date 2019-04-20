@@ -2,16 +2,16 @@
     <table [hidden]="(files.length === 0)" class="dropzone-table">
         <tr *ngFor="let file of files">
             <td>
-                <fa-icon class="icon-delete" icon="trash"
-                         *ngIf="file.status === 'invalid' || file.status === 'progress'"
-                         style="font-size:14px; color:dimgray"
+                <fa-icon class="icon-delete" icon="trash" style="font-size:14px; color:dimgray"
                          (click)="onDeleteEntry(file.file.name)"></fa-icon>
             </td>
             <td>{{getDropzoneFileString(file.file)}}
             </td>
             <td>
                 <fa-icon class="icon-invalid" icon="times" *ngIf="file.status === 'invalid'"
-                         style="font-size:16px"></fa-icon>
+                         style="font-size:16px" [popover]="file.error" [popoverTitle]="'Validation Error'"
+                         triggers="mouseenter:mouseleave"
+                         placement="top"></fa-icon>
                 <fa-icon class="icon-success" icon="check" *ngIf="file.status === 'valid'"
                          style="font-size:16px"></fa-icon>
                 <ng-container *ngIf="file.file.name.indexOf('.wav') < 0">
@@ -19,7 +19,10 @@
                              [spin]="true"></fa-icon>
                 </ng-container>
                 <ng-container *ngIf="file.file.name.indexOf('.wav') > -1 && file.status === 'progress'">
-                    {{file.progress | procent}}%
+                    <progressbar [animate]="false" [value]="file.progress | procent" type="info" [style.height]="'20px'"
+                                 [style.width]="'100px'">
+                        <b>{{file.progress | procent}}%</b>
+                    </progressbar>
                 </ng-container>
             </td>
         </tr>

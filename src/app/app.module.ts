@@ -88,7 +88,7 @@ import {
   faWindowMaximize
 } from '@fortawesome/free-solid-svg-icons';
 // modules
-import {ButtonsModule, ModalModule, ProgressbarModule} from 'ngx-bootstrap';
+import {ButtonsModule, ModalModule, PopoverModule, ProgressbarModule} from 'ngx-bootstrap';
 import {YesNoModalComponent} from './core/modals/yes-no-modal/yes-no-modal.component';
 import {ModalService} from './core/modals/modal.service';
 import {BugreportModalComponent} from './core/modals/bugreport-modal/bugreport-modal.component';
@@ -249,7 +249,8 @@ export const EDITORS: any[] = [
     MediaComponentsModule,
     ProgressbarModule.forRoot(),
     routing,
-    ButtonsModule.forRoot()
+    ButtonsModule.forRoot(),
+    PopoverModule.forRoot()
   ],
   bootstrap: [
     AppComponent

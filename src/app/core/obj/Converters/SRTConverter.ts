@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../Annotation/AnnotJSON';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../Annotation';
 
 export class SRTConverter extends Converter {
 
@@ -14,6 +14,34 @@ export class SRTConverter extends Converter {
     this._conversion.import = true;
     this._encoding = 'UTF-8';
     this._multitiers = false;
+  }
+
+  public static getSamplesFromTimeString(timeString: string, sampleRate: number) {
+    if (sampleRate > 0) {
+      const regex = new RegExp(/([0-9]+):([0-9]+):([0-9]+),([0-9]+)/g);
+
+      const matches = regex.exec(timeString);
+
+      if (matches.length > -1) {
+        const hours = Number(matches[1]);
+        const minutes = Number(matches[2]);
+        const seconds = Number(matches[3]);
+        const miliseconds = Number(matches[4]);
+
+        let totalMiliSeconds = hours * 60 * 60;
+        totalMiliSeconds += minutes * 60;
+        totalMiliSeconds += seconds;
+        totalMiliSeconds *= 1000;
+        totalMiliSeconds += miliseconds;
+        totalMiliSeconds = Math.round(totalMiliSeconds);
+
+        return Math.round(totalMiliSeconds / 1000 * sampleRate);
+      } else {
+        console.error(`time string does not match`);
+      }
+    } else {
+      console.error(`invalid sample rate`);
+    }
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
@@ -70,12 +98,13 @@ export class SRTConverter extends Converter {
       let lastEnd = 0;
 
       if (content !== '') {
-        const regex = new RegExp(/([0-9]+)\n([0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3}) --> ([0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3})\n((?:(?:(?![0-9]).+)?\n?)+)/g);
+        const regex = new RegExp('([0-9]+)\n([0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3}) --> ([0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3})\n' +
+          '((?:(?:(?![0-9]).+)?\n?)+)', 'g');
 
         let matches = regex.exec(content);
         while (matches !== null) {
-          const timeStart = this.getSamplesFromTimeString(matches[2], audiofile.samplerate);
-          const timeEnd = this.getSamplesFromTimeString(matches[3], audiofile.samplerate);
+          const timeStart = SRTConverter.getSamplesFromTimeString(matches[2], audiofile.samplerate);
+          const timeEnd = SRTConverter.getSamplesFromTimeString(matches[3], audiofile.samplerate);
           const segmentContent = matches[4].replace(/(\n|\s)+$/g, '');
 
           if (timeStart > lastEnd) {
@@ -96,17 +125,23 @@ export class SRTConverter extends Converter {
 
       if (olevel.items.length > 0) {
         // set last segment duration to fit last sample
-        olevel.items[olevel.items.length - 1].sampleDur = Number(audiofile.duration) - Number(olevel.items[olevel.items.length - 1].sampleStart);
+        const lastItem = olevel.items[olevel.items.length - 1];
+        olevel.items[olevel.items.length - 1].sampleDur = Number(audiofile.duration) - Number(lastItem.sampleStart);
       }
 
       result.levels.push(olevel);
       return {
         annotjson: result,
-        audiofile: null
+        audiofile: null,
+        error: ''
       };
     }
 
-    return null;
+    return {
+      annotjson: null,
+      audiofile: null,
+      error: `This SRT file is not compatible with this audio file.`
+    };
   }
 
   public getTimeStringFromSamples(samples: number, sampleRate: number) {
@@ -122,35 +157,6 @@ export class SRTConverter extends Converter {
 
     return `${hoursStr}:${minutesStr}:${secondsStr},${miliStr}`;
   }
-
-  public getSamplesFromTimeString(timeString: string, sampleRate: number) {
-    if (sampleRate > 0) {
-      const regex = new RegExp(/([0-9]+):([0-9]+):([0-9]+),([0-9]+)/g);
-
-      const matches = regex.exec(timeString);
-
-      if (matches.length > -1) {
-        const hours = Number(matches[1]);
-        const minutes = Number(matches[2]);
-        const seconds = Number(matches[3]);
-        const miliseconds = Number(matches[4]);
-
-        let totalMiliSeconds = hours * 60 * 60;
-        totalMiliSeconds += minutes * 60;
-        totalMiliSeconds += seconds;
-        totalMiliSeconds *= 1000;
-        totalMiliSeconds += miliseconds;
-        totalMiliSeconds = Math.round(totalMiliSeconds);
-
-        return Math.round(totalMiliSeconds / 1000 * sampleRate);
-      } else {
-        console.error(`time string does not match`);
-      }
-    } else {
-      console.error(`invalid sample rate`);
-    }
-  }
-
 
   public formatNumber = (num, length): string => {
     let result = '' + num.toFixed(0);

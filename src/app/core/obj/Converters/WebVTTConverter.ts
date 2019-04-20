@@ -68,7 +68,8 @@ export class WebVTTConverter extends Converter {
 
       let counterID = 1;
       if (content !== '') {
-        const regex = new RegExp(/([0-9]+)\n([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}) --> ([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3})\n((?:(?:(?![0-9]).+)?\n?)+)/g);
+        const regex = new RegExp('([0-9]+)\n([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}) --> ([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3})\n' +
+          '((?:(?:(?![0-9]).+)?\n?)+)', 'g');
 
         let matches = regex.exec(content);
         let lastEnd = 0;
@@ -96,18 +97,25 @@ export class WebVTTConverter extends Converter {
 
       if (olevel.items.length > 0) {
         // set last segment duration to fit last sample
-        olevel.items[olevel.items.length - 1].sampleDur = Number(audiofile.duration) - Number(olevel.items[olevel.items.length - 1].sampleStart);
+        const lastSegment = olevel.items[olevel.items.length - 1];
+        olevel.items[olevel.items.length - 1].sampleDur = Number(audiofile.duration) - Number(lastSegment.sampleStart);
       }
 
       console.log(olevel);
       result.levels.push(olevel);
+
       return {
         annotjson: result,
-        audiofile: null
+        audiofile: null,
+        error: ''
       };
     }
 
-    return null;
+    return {
+      annotjson: null,
+      audiofile: null,
+      error: 'This WebVTT file is not compatible with this audio file.'
+    };
   }
 
   public getTimeStringFromSamples(samples: number, sampleRate: number) {

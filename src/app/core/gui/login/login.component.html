@@ -123,22 +123,24 @@
                     <div style="margin-top: 40px;">
                         <app-octra-dropzone #dropzone [height]="'147px'"></app-octra-dropzone>
                     </div>
-                    <input *ngIf="(appStorage.usemode === null || appStorage.usemode === 'local' || appStorage.usemode === 'url') && getFileStatus() != 'new'"
-                           [disabled]="!(getFileStatus() == 'start')" type="submit"
-                           id="offline-submit"
-                           class="btn btn-raised btn-primary" value="{{'transcription.start' | translate}}"
-                           (click)="onOfflineSubmit()"/>
+                    <button *ngIf="(appStorage.usemode === null || appStorage.usemode === 'local' || appStorage.usemode === 'url') && getFileStatus() != 'new'"
+                            [disabled]="!(getFileStatus() == 'start')" type="submit"
+                            id="offline-submit"
+                            class="btn btn-raised btn-primary"
+                            (click)="onOfflineSubmit()">
+                        {{'transcription.start' | translate}}
+                    </button>
 
-                    <input *ngIf="appStorage.usemode === 'local' && getFileStatus() == 'new'"
-                           class="btn btn-raised btn-danger offline-delete-btn"
-                           (click)="onTranscriptionDelete()"
-                           value="{{'transcription.new' |translate}}"/>
-                    <input *ngIf="(appStorage.usemode !== null && appStorage.usemode !== undefined) &&
+                    <button *ngIf="appStorage.usemode === 'local' && getFileStatus() == 'new'"
+                            class="btn btn-raised btn-danger offline-delete-btn"
+                            (click)="onTranscriptionDelete()">
+                        {{'transcription.new' |translate}}
+                    </button>
+                    <button *ngIf="(appStorage.usemode !== null && appStorage.usemode !== undefined) &&
                     appStorage.usemode === 'online' && (getFileStatus() != 'new' || getFileStatus() != 'start')"
-                           [disabled]="(getFileStatus() !== 'new' && getFileStatus() !== 'start')"
-                           class="btn btn-raised btn-danger offline-delete-btn"
-                           (click)="onOfflineSubmit()"
-                           value="{{'login.local and remove' |translate}}"/>
+                            [disabled]="(getFileStatus() !== 'new' && getFileStatus() !== 'start')"
+                            class="btn btn-raised btn-danger offline-delete-btn"
+                            (click)="onOfflineSubmit()">{{'login.local and remove' |translate}}</button>
                 </div>
             </section>
         </div>

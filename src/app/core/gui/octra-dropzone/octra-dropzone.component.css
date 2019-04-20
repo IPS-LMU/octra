@@ -19,12 +19,26 @@
 .dropzone-table tr td {
     border: none;
     text-align: left;
+    vertical-align: middle;
 }
 
 .dropzone-table tr td:first-child {
-    padding-right: 10px;
+    text-align: center;
+    padding-right: 5px;
+}
+
+.icon-delete {
+    cursor: pointer;
 }
 
 .delete-icon {
     z-index: 1000;
+}
+
+.dropzone-table tbody td {
+}
+
+.dropzone-table tbody td:last-child {
+    padding-left: 5px;
+    text-align: left;
 }

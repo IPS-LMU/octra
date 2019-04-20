@@ -405,7 +405,7 @@ export class AppStorageService {
       // get audio file
       let audiofile;
       for (let i = 0; i < files.length; i++) {
-        if (AudioManager.isValidFileName(files[i].file.name, AppInfo.audioformats)) {
+        if (AudioManager.isValidAudioFileName(files[i].file.name, AppInfo.audioformats)) {
           audiofile = files[i].file;
           break;
         }

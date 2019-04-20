@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {OAnnotJSON, OAudiofile, OItem, OLabel, OLevel, OSegment} from '../Annotation/AnnotJSON';
+import {OAnnotJSON, OAudiofile, OItem, OLabel, OLevel, OSegment} from '../Annotation';
 
 export class PartiturConverter extends Converter {
 
@@ -37,23 +37,23 @@ LBD:\n`;
       let ort = [];
       const trn = [];
 
-      let ort_counter = 0;
+      let ortCounter = 0;
 
       for (let i = 0; i < annotation.levels[levelnum].items.length; i++) {
         const item = annotation.levels[levelnum].items[i];
         const words = item.labels[0].value.split(' ');
         ort = ort.concat(words);
-        let trn_line = `TRN: ${item.sampleStart} ${item.sampleDur} `;
+        let trnLine = `TRN: ${item.sampleStart} ${item.sampleDur} `;
 
         for (let j = 0; j < words.length; j++) {
-          trn_line += `${ort_counter + j}`;
+          trnLine += `${ortCounter + j}`;
           if (j < words.length - 1) {
-            trn_line += ',';
+            trnLine += ',';
           }
         }
-        ort_counter += words.length;
-        trn_line += ` ${item.labels[0].value}\n`;
-        trn.push(trn_line);
+        ortCounter += words.length;
+        trnLine += ` ${item.labels[0].value}\n`;
+        trn.push(trnLine);
       }
 
       for (let i = 0; i < ort.length; i++) {
@@ -77,33 +77,18 @@ LBD:\n`;
     if (audiofile !== null && audiofile !== undefined) {
       const lines = file.content.split(/\r?\n/g);
       let pointer = 0;
-      // const sam_found = lines[pointer].match(/SAM: ([0-9]+)/);
-      /*
-      if ((sam_found === null || sam_found === undefined)) {
-        console.error(this._name + ' Converter Error: samplerate not found in .par file');
-        return null;
-      }
-      const samplerate = Number(sam_found[1]);
-
-
-      if (samplerate !== audiofile.samplerate) {
-        console.error(this._name + ' Converter Error: samplerate of audiofile is not equal with samplerate of .par file.');
-        return null;
-      }
-      pointer++;
-      */
 
       const result = new OAnnotJSON(audiofile.name, audiofile.samplerate);
       const tiers = {};
 
       // skip not needed information and read needed information
-      let previous_tier = '';
+      let previousTier = '';
       let level = null;
       let counter = 1;
-      const start = 0;
       while (pointer < lines.length) {
         const search = lines[pointer].match(
-          new RegExp(/^((LHD)|(SAM)|(KAN)|(ORT)|(DAS)|(TR2)|(SUP)|(PRS)|(NOI)|(LBP)|(LBG)|(PRO)|(POS)|(LMA)|(SYN)|(FUN)|(LEX)|(IPA)|(TRN)|(TRS)|(GES)|(USH)|(USM)|(OCC)|(USP)|(GES)|(TLN)|(PRM)|(TRW)|(MAS))/g));
+          new RegExp('^((LHD)|(SAM)|(KAN)|(ORT)|(DAS)|(TR2)|(SUP)|(PRS)|(NOI)|(LBP)|(LBG)|(PRO)|(POS)|(LMA)|(SYN)|(FUN)|(LEX)|' +
+            '(IPA)|(TRN)|(TRS)|(GES)|(USH)|(USM)|(OCC)|(USP)|(GES)|(TLN)|(PRM)|(TRW)|(MAS))', 'g'));
 
         if (!(search === null || search === undefined)) {
           const columns = lines[pointer].split(' ');
@@ -115,21 +100,37 @@ LBD:\n`;
           }
 
           if (search[0] === 'TRN') {
-            if (previous_tier !== search[0]) {
+            if (previousTier !== search[0]) {
               if (level !== null) {
                 result.levels.push(level);
               }
               level = (search[0] !== 'TRN') ? new OLevel(search[0], 'ITEM', []) : new OLevel(search[0], 'SEGMENT', []);
-              previous_tier = search[0];
-              tiers[`${previous_tier}`] = [];
+              previousTier = search[0];
+              tiers[`${previousTier}`] = [];
             }
-            if (previous_tier !== 'TRN') {
-              level.items.push(new OItem(counter, [new OLabel(previous_tier, columns[2])]));
-              tiers[`${previous_tier}`].push(columns[2]);
+            if (previousTier !== 'TRN') {
+              if (level === null) {
+                return {
+                  annotjson: result,
+                  audiofile: null,
+                  error: 'A level is missing.'
+                };
+              }
+              level.items.push(new OItem(counter, [new OLabel(previousTier, columns[2])]));
+              tiers[`${previousTier}`].push(columns[2]);
             } else {
-              const transcript = lines[pointer].match(new RegExp('TRN: ([0-9]+) ([0-9]+) ([0-9]+,?)+ (.*)'));
+              const transcript = lines[pointer].match(new RegExp('TRN: ([0-9]+) ([0-9]+) ([0-9]+,?)+ (.*)', 'g'));
+
+              if (level === null) {
+                return {
+                  annotjson: result,
+                  audiofile: null,
+                  error: 'A level is missing.'
+                };
+              }
+
               level.items.push(new OSegment(
-                counter, Number(transcript[1]), Number(transcript[2]), [new OLabel(previous_tier, transcript[4])]
+                counter, Number(transcript[1]), Number(transcript[2]), [new OLabel(previousTier, transcript[4])]
                 )
               );
             }
@@ -143,10 +144,15 @@ LBD:\n`;
 
       return {
         annotjson: result,
-        audiofile: null
+        audiofile: null,
+        error: ''
       };
     }
 
-    return null;
+    return {
+      annotjson: null,
+      audiofile: null,
+      error: `This Partitur file is not compatble with this audio file.`
+    };
   }
 }

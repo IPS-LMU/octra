@@ -54,6 +54,6 @@ for old in ./${buildDir}*; do
     fi
   done
 # you can add more jobs here
-# mv "./${buildDir}assets/.htaccess" "./${buildDir}.htaccess"
+mv "./${buildDir}assets/.htaccess" "./${buildDir}.htaccess"
 
 echo "Building COMPLETE"

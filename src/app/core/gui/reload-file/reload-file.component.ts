@@ -17,11 +17,24 @@ import {AppInfo} from '../../../app.info';
   styleUrls: ['./reload-file.component.css']
 })
 export class ReloadFileComponent implements OnInit {
+
+  get sessionfile(): SessionFile {
+    return this.appStorage.sessionfile;
+  }
+
+  constructor(public router: Router,
+              public appStorage: AppStorageService,
+              public transcrServ: TranscriptionService,
+              public modService: ModalService,
+              public langService: TranslateService,
+              private audioService: AudioService) {
+  }
   @ViewChild('dropzone') dropzone: OctraDropzoneComponent;
+  private error = '';
   abortTranscription = () => {
     this.transcrServ.endTranscription();
     Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
-  };
+  }
   newTranscription = () => {
     this.modService.show('transcription_delete').then((decision) => {
       if (decision === 'DELETE') {
@@ -68,7 +81,8 @@ export class ReloadFileComponent implements OnInit {
     }).catch((error) => {
       console.error(error);
     });
-  };
+  }
+
   onOfflineSubmit = () => {
     this.audioService.registerAudioManager(this.dropzone.audiomanager);
     this.appStorage.beginLocalSession(this.dropzone.files, true, this.navigate,
@@ -78,22 +92,9 @@ export class ReloadFileComponent implements OnInit {
         }
       }
     );
-  };
-  private error = '';
+  }
   private navigate = () => {
     Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling);
-  };
-
-  get sessionfile(): SessionFile {
-    return this.appStorage.sessionfile;
-  }
-
-  constructor(public router: Router,
-              public appStorage: AppStorageService,
-              public transcrServ: TranscriptionService,
-              public modService: ModalService,
-              public langService: TranslateService,
-              private audioService: AudioService) {
   }
 
   public isN(obj: any): boolean {

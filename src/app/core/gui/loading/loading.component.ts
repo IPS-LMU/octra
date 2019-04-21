@@ -1,12 +1,11 @@
 import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {AppStorageService, AudioService, SettingsService, TranscriptionService} from '../../shared/service';
+import {AppStorageService, AudioService, OIDBLevel, SettingsService, TranscriptionService} from '../../shared/service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
 import {IFile, ImportResult} from '../../obj/Converters';
 import {OAudiofile, OLevel} from '../../obj/Annotation';
-import {OIDBLevel} from '../../shared/service/appstorage.service';
 import {AppInfo} from '../../../app.info';
 import {Functions, isNullOrUndefined} from '../../shared/Functions';
 
@@ -85,7 +84,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
     this.subscrmanager.add(
       this.settService.guidelinesloaded.subscribe(
-        (guidelines) => {
+        () => {
           this.loadedtable.guidelines = true;
           this.progress += 25;
           this.state = 'Guidelines loaded';
@@ -287,7 +286,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
       this.settService.loadProjectSettings();
 
-      if (this.appStorage.usemode === 'local' && (this.appStorage.file === null || this.appStorage.file === undefined)) {
+      if (this.appStorage.usemode === 'local' && this.audio.audiomanagers.length === 0) {
         Functions.navigateTo(this.router, ['/user/transcr/reload-file'], AppInfo.queryParamsHandling);
       } else {
         if (this.appStorage.usemode === 'url') {

@@ -6,12 +6,14 @@ import {AppStorageService} from '../../shared/service/appstorage.service';
 import {SettingsService} from '../../shared/service/settings.service';
 import {AppInfo} from '../../../app.info';
 import {Functions} from '../../shared/Functions';
+import {AudioService} from '../../shared/service';
 
 @Injectable()
 export class MembersAreaGuard implements CanActivate {
 
   constructor(private appStorage: AppStorageService, private router: Router,
-              private settService: SettingsService, private activatedRoute: ActivatedRoute) {
+              private settService: SettingsService, private activatedRoute: ActivatedRoute,
+              private audioService: AudioService) {
 
   }
 
@@ -25,7 +27,7 @@ export class MembersAreaGuard implements CanActivate {
       Functions.navigateTo(this.router, ['/login'], params);
       return false;
     } else if (this.appStorage.usemode === 'local') {
-      if (this.appStorage.file === null) {
+      if (this.audioService.audiomanagers.length === 0) {
         // navigate to reload-file
         const params = AppInfo.queryParamsHandling;
         params.fragment = route.fragment;

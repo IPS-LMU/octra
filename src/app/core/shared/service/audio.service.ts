@@ -39,7 +39,7 @@ export class AudioService {
   }) => {
     this._loaded = false;
 
-    const request = this.http.get(url, {responseType: 'arraybuffer'}).subscribe(
+    this.http.get(url, {responseType: 'arraybuffer'}).subscribe(
       (buffer: ArrayBuffer) => {
         const regex: RegExp = new RegExp(/((%|-|\.|[A-ZÄÖÜß]|[a-zäöü]|_|[0-9])+)\.(wav|ogg)/, 'g');
         const matches: RegExpExecArray = regex.exec(url);
@@ -56,8 +56,6 @@ export class AudioService {
             if (!isNullOrUndefined(result.audioManager)) {
               // finished
               this.registerAudioManager(result.audioManager);
-
-              console.log('Audio (Length: ' + result.audioManager.ressource.size + ') loaded. Decode now...');
               this.afterloaded.emit({status: 'success'});
               callback({});
             } else {

@@ -8,8 +8,6 @@ import {AudioService} from './audio.service';
 import {Functions, isNullOrUndefined} from '../Functions';
 import {Observable} from 'rxjs/Observable';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
-import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
-import {AppInfo} from '../../../app.info';
 import {HttpClient} from '@angular/common/http';
 import {APIService} from './api.service';
 import {TranslateService} from '@ngx-translate/core';
@@ -163,15 +161,15 @@ export class SettingsService {
     const umanager = new UpdateManager(this.appStorage);
     umanager.checkForUpdates(this.appSettings.octra.database.name).then((idb) => {
 
-      const audioURL = appRoute.snapshot.queryParams['audio'];
-      const transcriptURL = (appRoute.snapshot.queryParams['transcript'] !== undefined)
-        ? appRoute.snapshot.queryParams['transcript'] : null;
-      const embedded = appRoute.snapshot.queryParams['embedded'];
+      const audioURL = appRoute.snapshot.queryParams.audio;
+      const transcriptURL = (appRoute.snapshot.queryParams.transcript !== undefined)
+        ? appRoute.snapshot.queryParams.transcript : null;
+      const embedded = appRoute.snapshot.queryParams.embedded;
 
-      this.appStorage.url_params['audio'] = audioURL;
-      this.appStorage.url_params['transcript'] = transcriptURL;
-      this.appStorage.url_params['embedded'] = (embedded === '1');
-      this.appStorage.url_params['host'] = appRoute.snapshot.queryParams['host'];
+      this.appStorage.url_params.audio = audioURL;
+      this.appStorage.url_params.transcript = transcriptURL;
+      this.appStorage.url_params.embedded = (embedded === '1');
+      this.appStorage.url_params.host = appRoute.snapshot.queryParams.host;
 
       // load from indexedDB
       this.appStorage.load(idb).then(
@@ -360,37 +358,9 @@ export class SettingsService {
         this._filename = this.appStorage.sessionfile.name;
         this._filename = this._filename.substr(0, this._filename.lastIndexOf('.'));
 
-        // read file
-        const reader = new FileReader();
+        console.log('Audio loaded.');
+        this.audioloaded.emit({status: 'success'});
 
-        reader.onloadend = (ev) => {
-          const t: any = ev.target;
-          if (audioService.audiomanagers.length === 0) {
-            console.log(`LOAD AGAIN!????`);
-
-            this.subscrmanager.add(AudioManager.decodeAudio(this.appStorage.sessionfile.name, 'audio/wav', t.result, AppInfo.audioformats).subscribe(
-              (result) => {
-                if (!isNullOrUndefined(result)) {
-                  audioService.registerAudioManager(result.audioManager);
-                  console.log('Audio loaded.');
-                  this.audioloaded.emit({status: 'success'});
-                } else {
-                  console.log(`decode progress: ${result.decodeProgress}`);
-                }
-              },
-              (error) => {
-                console.error(error);
-              }));
-          } else {
-            console.log('Audio loaded.');
-            this.audioloaded.emit({status: 'success'});
-          }
-        };
-
-        if (!(this.appStorage.file === null || this.appStorage.file === undefined)) {
-          // read audio file to array buffer
-          reader.readAsArrayBuffer(this.appStorage.file);
-        }
       } else {
         console.error('session file is null.');
       }

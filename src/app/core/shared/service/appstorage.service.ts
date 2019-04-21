@@ -264,11 +264,11 @@ export class AppStorageService {
     });
   }
 
-  get url_params(): any[] {
+  get url_params(): any {
     return this._url_params;
   }
 
-  set url_params(value: any[]) {
+  set url_params(value: any) {
     this._url_params = value;
   }
 
@@ -351,7 +351,6 @@ export class AppStorageService {
   @SessionStorage() logInTime: number; // timestamp
   @SessionStorage('jobs_left') jobs_left: number;
 
-  public file: File;
   public saving: EventEmitter<string> = new EventEmitter<string>();
   private _interface: string = null;
   // is user on the login page?
@@ -416,7 +415,6 @@ export class AppStorageService {
         if (res.error === '') {
           this.usemode = 'local';
           this.sessionfile = this.getSessionFile(audiofile);
-          this.file = audiofile;
           navigate();
         } else {
           err(res.error);

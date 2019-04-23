@@ -1,8 +1,8 @@
-import {TwoDEditorComponent} from './2D-editor/2D-editor.component';
-import {LinearEditorComponent} from './linear-editor/linear-editor.component';
-import {DictaphoneEditorComponent} from './dictaphone-editor/dictaphone-editor.component';
+import {TwoDEditorComponent} from './2D-editor';
+import {LinearEditorComponent} from './linear-editor';
+import {DictaphoneEditorComponent} from './dictaphone-editor';
 
-export const EditorComponents = [
+export const editorComponents = [
   {
     name: DictaphoneEditorComponent.editorname,
     editor: DictaphoneEditorComponent,

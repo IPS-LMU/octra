@@ -1,12 +1,17 @@
 import {AfterViewInit, Component, EventEmitter, OnChanges, OnDestroy, OnInit, ViewChild} from '@angular/core';
 
-import {AudioService, KeymappingService, TranscriptionService, UserInteractionsService} from '../../core/shared/service';
+import {
+  AppStorageService,
+  AudioService,
+  KeymappingService,
+  SettingsService,
+  TranscriptionService,
+  UserInteractionsService
+} from '../../core/shared/service';
 import {BrowserAudioTime, BrowserSample, SubscriptionManager} from '../../core/shared';
-import {SettingsService} from '../../core/shared/service/settings.service';
-import {AppStorageService} from '../../core/shared/service/appstorage.service';
-import {Segment} from '../../core/obj/Annotation/Segment';
+import {Segment} from '../../core/obj/Annotation';
 import {AudioManager} from '../../media-components/obj/media/audio/AudioManager';
-import {AudioChunk} from '../../media-components/obj/media/audio/AudioChunk';
+import {AudioChunk} from '../../media-components/obj/media/audio';
 import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
 import {AudioplayerComponent} from '../../media-components/components/audio/audioplayer';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
@@ -85,11 +90,11 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
   ngOnChanges(obj: any) {
   }
 
-  highlightSegment(seg_number: number) {
+  highlightSegment(segNumber: number) {
     jQuery('.note-editable.panel-body textspan').css({
       'background-color': ''
     });
-    jQuery('.note-editable.panel-body textspan:eq(' + seg_number + ')').css({
+    jQuery('.note-editable.panel-body textspan:eq(' + segNumber + ')').css({
       'background-color': 'yellow'
     });
   }

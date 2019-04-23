@@ -1,5 +1,5 @@
 export class AudioplayerConfig {
-  public Settings: any = {
+  public settings: any = {
     audiosrc: '',
     height: 30,
     backgroundcolor: 'rgb(255,255,255)',

@@ -1,7 +1,7 @@
 export class AudioviewerConfig {
-  public multi_line = false;
-  public pixel_per_sec = 200; // only relevant for multiline
-  public justify_signal_height = true;
+  public multiLine = false;
+  public pixelPerSec = 200; // only relevant for multiline
+  public justifySignalHeight = true;
   public cropping = 'none';
   public lineheight = 150;
   public backgroundcolor = 'rgb(255, 248, 248)';
@@ -71,7 +71,7 @@ export class AudioviewerConfig {
 
   // SHORTCUTS
   // SHORTCUTS sheme= KeyMapping [+ <char or charCode>]
-  public shortcuts_enabled = true;
+  public shortcutsEnabled = true;
   public shortcuts = {
     play_pause: {
       keys: {
@@ -171,7 +171,7 @@ export class AudioviewerConfig {
     }
   };
 
-  public disabled_keys = ['SHIFT + SPACE'];
+  public disabledKeys = ['SHIFT + SPACE'];
   public timeline: {
     enabled: boolean,
     height: number,
@@ -188,10 +188,10 @@ export class AudioviewerConfig {
     foreColor: 'black'
   };
 
-  public step_width_ratio = 0.0226;
+  public stepWidthRatio = 0.0226;
   public scrollable = false;
   public type: string;
-  public round_values = true;
+  public roundValues = true;
 
   public showTimePerLine = false;
   public showTranscripts = false;

@@ -1,11 +1,13 @@
 import {Component, EventEmitter, OnInit} from '@angular/core';
-import {LinearEditorComponent} from '../linear-editor/linear-editor.component';
-import {KeymappingService} from '../../core/shared/service/keymapping.service';
-import {AudioService} from '../../core/shared/service/audio.service';
-import {TranscriptionService} from '../../core/shared/service/transcription.service';
-import {UserInteractionsService} from '../../core/shared/service/userInteractions.service';
-import {SettingsService} from '../../core/shared/service/settings.service';
-import {AppStorageService} from '../../core/shared/service/appstorage.service';
+import {LinearEditorComponent} from '../linear-editor';
+import {
+  AppStorageService,
+  AudioService,
+  KeymappingService,
+  SettingsService,
+  TranscriptionService,
+  UserInteractionsService
+} from '../../core/shared/service';
 
 @Component({
   selector: 'app-new-editor',

@@ -1,21 +1,21 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {Annotation, Level, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment, Segments} from '../../obj/Annotation';
-import {AudioService} from './audio.service';
-import {AppStorageService, OIDBLevel} from './appstorage.service';
 import {Functions, isNullOrUndefined} from '../Functions';
-import {UserInteractionsService} from './userInteractions.service';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
 import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {NavbarService} from '../../gui/navbar/navbar.service';
 import {SubscriptionManager} from '../';
-import {SettingsService} from './settings.service';
 import {FeedBackForm} from '../../obj/FeedbackForm/FeedBackForm';
 import {Converter, IFile} from '../../obj/Converters';
 import {OLog, OLogging} from '../../obj/Settings/logging';
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
 import {HttpClient} from '@angular/common/http';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
+import {AudioService} from './audio.service';
+import {AppStorageService, OIDBLevel} from './appstorage.service';
+import {UserInteractionsService} from './userInteractions.service';
+import {SettingsService} from './settings.service';
 
 @Injectable()
 export class TranscriptionService {
@@ -208,7 +208,7 @@ export class TranscriptionService {
       this._audiofile.duration = this._audiomanager.originalInfo.duration.originalSample.value;
       this._audiofile.size = this._audiomanager.originalInfo.size;
       this._audiofile.url = (this.appStorage.usemode === 'online')
-        ? `${this.app_settings.audio_server.url}${this.appStorage.audio_url}` : '';
+        ? `${this.app_settings.audio_server.url}${this.appStorage.audioURL}` : '';
       this._audiofile.type = this._audiomanager.originalInfo.type;
 
       this.loadSegments().then(
@@ -264,8 +264,8 @@ export class TranscriptionService {
               this._annotation.levels.push(level);
             }
 
-            for (let i = 0; i < this.appStorage.annotation_links.length; i++) {
-              this._annotation.links.push(this.appStorage.annotation_links[i].link);
+            for (let i = 0; i < this.appStorage.annotationLinks.length; i++) {
+              this._annotation.links.push(this.appStorage.annotationLinks[i].link);
             }
 
 
@@ -305,8 +305,8 @@ export class TranscriptionService {
                 if (this.appStorage.usemode === 'url') {
                   // load transcript from url
 
-                // TODO continue implementing
-              }
+                  // TODO continue implementing
+                }
 
                 if (!(this.appStorage.servertranscipt === null || this.appStorage.servertranscipt === undefined)) {
                   // check if servertranscript's segment is empty
@@ -397,7 +397,7 @@ export class TranscriptionService {
         quality: (this.settingsService.isTheme('shortAudioFiles'))
           ? this.appStorage.feedback : JSON.stringify(this._feedback.exportData()),
         status: 'ANNOTATED',
-        id: this.appStorage.data_id,
+        id: this.appStorage.dataID,
         log: log_data.getObj()
       };
 

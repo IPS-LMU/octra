@@ -111,12 +111,12 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
     this.audiochunk_loupe = this.audiomanager.mainchunk.clone();
 
     this.viewer.Settings.shortcuts = this.keyMap.register('AV', this.viewer.Settings.shortcuts);
-    this.viewer.Settings.multi_line = false;
+    this.viewer.Settings.multiLine = false;
     this.viewer.Settings.lineheight = 80;
-    this.viewer.Settings.shortcuts_enabled = true;
+    this.viewer.Settings.shortcutsEnabled = true;
     this.viewer.Settings.boundaries.readonly = false;
-    this.viewer.Settings.justify_signal_height = true;
-    this.viewer.Settings.round_values = false;
+    this.viewer.Settings.justifySignalHeight = true;
+    this.viewer.Settings.roundValues = false;
 
     this.loupe_settings = new AudioviewerConfig();
     this.loupe_settings.shortcuts = this.keyMap.register('Loupe', this.loupe_settings.shortcuts);
@@ -126,12 +126,12 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
     this.loupe_settings.shortcuts.step_backwardtime = null;
     this.loupe_settings.shortcuts.step_backward.keys.mac = 'SHIFT + ENTER';
     this.loupe_settings.shortcuts.step_backward.keys.pc = 'SHIFT + ENTER';
-    this.loupe_settings.justify_signal_height = true;
-    this.loupe_settings.round_values = false;
+    this.loupe_settings.justifySignalHeight = true;
+    this.loupe_settings.roundValues = false;
 
     this.editor.Settings.markers = this.transcrService.guidelines.markers;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
-    this.editor.Settings.disabled_keys.push('SHIFT + SPACE');
+    this.editor.Settings.disabledKeys.push('SHIFT + SPACE');
 
     this.subscrmanager.add(this.transcrService.currentlevel.segments.onsegmentchange.subscribe(
       ($event) => {
@@ -152,7 +152,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
 
     this.subscrmanager.add(this.keyMap.onkeydown.subscribe(
       (obj) => {
-        if (this.appStorage.show_loupe) {
+        if (this.appStorage.showLoupe) {
           const event = obj.event;
           if (this.viewer.focused || (!(this.loupe === null || this.loupe === undefined) && this.loupe.focused)) {
             if (event.key === '+') {
@@ -188,11 +188,11 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
 
   ngOnChanges(obj: SimpleChanges) {
     if (!(obj.mini_loupe === null || obj.mini_loupe === undefined)) {
-      if (obj.mini_loupe.isFirstChange() && this.appStorage.show_loupe) {
-        this.miniloupe.Settings.shortcuts_enabled = false;
+      if (obj.mini_loupe.isFirstChange() && this.appStorage.showLoupe) {
+        this.miniloupe.Settings.shortcutsEnabled = false;
         this.miniloupe.Settings.boundaries.enabled = false;
         this.miniloupe.Settings.height = 160;
-        this.miniloupe.loupe.viewer.round_values = false;
+        this.miniloupe.loupe.viewer.roundValues = false;
       }
     }
   }
@@ -241,7 +241,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
 
   ngAfterViewInit() {
     this.cd.detectChanges();
-    if (this.appStorage.show_loupe) {
+    if (this.appStorage.showLoupe) {
       this.miniloupe.zoomY = this.factor;
     }
 

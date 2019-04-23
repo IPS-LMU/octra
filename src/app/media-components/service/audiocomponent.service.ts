@@ -1,6 +1,4 @@
-import {Line} from '../obj/Line';
-import {AVMousePos} from '../obj/AVMousePos';
-import {PlayCursor} from '../obj/PlayCursor';
+import {AVMousePos, Line, PlayCursor} from '../obj';
 import {AudioChunk, AudioTimeCalculator} from '../obj/media/audio';
 import {AudioviewerComponent} from '../components/audio/audioviewer';
 import {AudioManager} from '../obj/media/audio/AudioManager';
@@ -8,10 +6,10 @@ import {AudioManager} from '../obj/media/audio/AudioManager';
 export class AudioComponentService {
   public audioTCalculator: AudioTimeCalculator;
   // LINES
-  protected last_line: Line = null;
+  protected lastLine: Line = null;
   // MOUSE
-  protected mouse_down = false;
-  protected mouse_click_pos: AVMousePos = new AVMousePos(
+  protected mouseDown = false;
+  protected mouseClickPos: AVMousePos = new AVMousePos(
     0,
     0,
     0,
@@ -20,24 +18,24 @@ export class AudioComponentService {
   protected mousecursor: AVMousePos = null;
   protected playcursor: PlayCursor = null;
   // AUDIO
-  protected audio_px_w = 0;
+  protected audioPxW = 0;
   protected hZoom = 0;
   protected audiochunk: AudioChunk;
 
   get AudioPxWidth(): number {
-    return this.audio_px_w;
+    return this.audioPxW;
   }
 
-  set AudioPxWidth(audio_px: number) {
-    this.audio_px_w = audio_px;
+  set AudioPxWidth(audioPx: number) {
+    this.audioPxW = audioPx;
   }
 
   get MouseClickPos(): AVMousePos {
-    return this.mouse_click_pos;
+    return this.mouseClickPos;
   }
 
-  set MouseClickPos(mouse_click_pos: AVMousePos) {
-    this.mouse_click_pos = mouse_click_pos;
+  set MouseClickPos(mouseClickPos: AVMousePos) {
+    this.mouseClickPos = mouseClickPos;
   }
 
   get Mousecursor(): any {
@@ -72,22 +70,22 @@ export class AudioComponentService {
    *        ALL FUNCTIONS RELATED TO MOUSE
    */
 
-  public setMouseMovePosition(type: string, x: number, y: number, curr_line: Line, innerWidth) {
+  public setMouseMovePosition(type: string, x: number, y: number, currLine: Line, innerWidth) {
     this.mousecursor.relPos.x = x;
-    this.mousecursor.absX = this.getAbsXByLine(curr_line, x, innerWidth);
+    this.mousecursor.absX = this.getAbsXByLine(currLine, x, innerWidth);
     this.mousecursor.timePos.browserSample.value = this.audioTCalculator.absXChunktoSamples(this.mousecursor.absX, this.audiochunk);
     this.mousecursor.relPos.y = y;
-    this.mousecursor.line = curr_line;
-    this.last_line = curr_line;
+    this.mousecursor.line = currLine;
+    this.lastLine = currLine;
   }
 
-  public setMouseClickPosition(x: number, y: number, curr_line: Line, $event: Event, innerWidth: number, viewer?: AudioviewerComponent) {
+  public setMouseClickPosition(x: number, y: number, currLine: Line, $event: Event, innerWidth: number, viewer?: AudioviewerComponent) {
     this.mousecursor.relPos.x = x;
     this.mousecursor.relPos.y = y;
   }
 
-  public getAbsXByLine(line: Line, rel_x, innerWidth): number {
-    return (line.number * innerWidth + rel_x);
+  public getAbsXByLine(line: Line, relX, innerWidth): number {
+    return (line.number * innerWidth + relX);
   }
 
   /***

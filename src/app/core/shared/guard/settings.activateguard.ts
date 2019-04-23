@@ -2,8 +2,7 @@ import {Injectable} from '@angular/core';
 
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
-import {AppStorageService} from '../service/appstorage.service';
-import {SettingsService} from '../service/settings.service';
+import {AppStorageService, SettingsService} from '../service';
 import 'rxjs/add/operator/first';
 
 @Injectable()

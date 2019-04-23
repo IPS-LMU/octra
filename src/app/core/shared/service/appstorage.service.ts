@@ -52,9 +52,9 @@ export class AppStorageService {
     this._secondsPerLine = value;
     this.settingschange.next({
       key: 'secondsPerLine',
-      value: value
+      value
     });
-    this.idb.save('options', 'secondsPerLine', {value: value}).catch((err) => {
+    this.idb.save('options', 'secondsPerLine', {value}).catch((err) => {
       console.error(err);
     });
   }
@@ -65,7 +65,7 @@ export class AppStorageService {
 
   set servercomment(value: string) {
     this._servercomment = value;
-    this.idb.save('options', 'servercomment', {value: value}).catch((err) => {
+    this.idb.save('options', 'servercomment', {value}).catch((err) => {
       console.error(err);
     });
   }
@@ -74,9 +74,9 @@ export class AppStorageService {
     return this._interface;
   }
 
-  set Interface(new_interface: string) {
-    this._interface = new_interface;
-    this.idb.save('options', 'interface', {value: new_interface}).catch((err) => {
+  set Interface(newInterface: string) {
+    this._interface = newInterface;
+    this.idb.save('options', 'interface', {value: newInterface}).catch((err) => {
       console.error(err);
     });
   }
@@ -117,12 +117,12 @@ export class AppStorageService {
     return this._email;
   }
 
-  get idbloaded(): boolean {
-    return this._idbloaded;
-  }
-
   set email(value: string) {
     this._email = value;
+  }
+
+  get idbloaded(): boolean {
+    return this._idbloaded;
   }
 
   get loaded(): EventEmitter<any> {
@@ -148,7 +148,7 @@ export class AppStorageService {
 
   set submitted(value: boolean) {
     this._submitted = value;
-    this.idb.save('options', 'submitted', {value: value}).catch((err) => {
+    this.idb.save('options', 'submitted', {value}).catch((err) => {
       console.error(err);
     });
   }
@@ -157,29 +157,36 @@ export class AppStorageService {
     return this._feedback;
   }
 
-  get logs(): any[] {
-    return this._logs;
-  }
-
-  get data_id(): number {
-    return this._data_id;
-  }
-
-  set data_id(value: number) {
-    this._data_id = value;
-    this.idb.save('options', 'data_id', {value: value}).catch((err) => {
+  set feedback(value: any) {
+    this._feedback = value;
+    this._idb.save('options', 'feedback', {value}).catch((err) => {
       console.error(err);
     });
   }
 
-  get audio_url(): string {
-    return this._audio_url;
+  get logs(): any[] {
+    return this._logs;
   }
 
-  set audio_url(value: string) {
-    this._audio_url = value;
+  get dataID(): number {
+    return this._dataID;
+  }
+
+  set dataID(value: number) {
+    this._dataID = value;
+    this.idb.save('options', 'dataID', {value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  get audioURL(): string {
+    return this._audioURL;
+  }
+
+  set audioURL(value: string) {
+    this._audioURL = value;
     if (this.usemode !== 'url') {
-      this.idb.save('options', 'audio_url', {value: value}).catch((err) => {
+      this.idb.save('options', 'audioURL', {value}).catch((err) => {
         console.error(err);
       });
     }
@@ -189,15 +196,15 @@ export class AppStorageService {
     return this._usemode;
   }
 
-  get sessionfile(): SessionFile {
-    return SessionFile.fromAny(this._sessionfile);
-  }
-
   set usemode(value: 'online' | 'local' | 'url') {
     this._usemode = value;
-    this.idb.save('options', 'usemode', {value: value}).catch((err) => {
+    this.idb.save('options', 'usemode', {value}).catch((err) => {
       console.error(err);
     });
+  }
+
+  get sessionfile(): SessionFile {
+    return SessionFile.fromAny(this._sessionfile);
   }
 
   set sessionfile(value: SessionFile) {
@@ -214,7 +221,7 @@ export class AppStorageService {
 
   set language(value: string) {
     this._language = value;
-    this.idb.save('options', 'language', {value: value}).catch((err) => {
+    this.idb.save('options', 'language', {value}).catch((err) => {
       console.error(err);
     });
   }
@@ -226,7 +233,7 @@ export class AppStorageService {
 
   set version(value: string) {
     this._version = value;
-    this._idb.save('options', 'version', {value: value}).catch((err) => {
+    this._idb.save('options', 'version', {value}).catch((err) => {
       console.error(err);
     });
   }
@@ -237,18 +244,18 @@ export class AppStorageService {
 
   set logging(value: boolean) {
     this._logging = value;
-    this._idb.save('options', 'logging', {value: value}).catch((err) => {
+    this._idb.save('options', 'logging', {value}).catch((err) => {
       console.error(err);
     });
   }
 
-  get show_loupe(): boolean {
-    return this._show_loupe;
+  get showLoupe(): boolean {
+    return this._showLoupe;
   }
 
-  set show_loupe(value: boolean) {
-    this._show_loupe = value;
-    this._idb.save('options', 'show_loupe', {value: value}).catch((err) => {
+  set showLoupe(value: boolean) {
+    this._showLoupe = value;
+    this._idb.save('options', 'showLoupe', {value}).catch((err) => {
       console.error(err);
     });
   }
@@ -259,17 +266,17 @@ export class AppStorageService {
 
   set prompttext(value: string) {
     this._prompttext = value;
-    this._idb.save('options', 'prompttext', {value: value}).catch((err) => {
+    this._idb.save('options', 'prompttext', {value}).catch((err) => {
       console.error(err);
     });
   }
 
-  get url_params(): any {
-    return this._url_params;
+  get urlParams(): any {
+    return this._urlParams;
   }
 
-  set url_params(value: any) {
-    this._url_params = value;
+  set urlParams(value: any) {
+    this._urlParams = value;
   }
 
   get user(): {
@@ -297,7 +304,7 @@ export class AppStorageService {
 
   set easymode(value: boolean) {
     this._easymode = value;
-    this.idb.save('options', 'easymode', {value: value}).catch((err) => {
+    this.idb.save('options', 'easymode', {value}).catch((err) => {
       console.error(err);
     });
   }
@@ -308,7 +315,7 @@ export class AppStorageService {
 
   set comment(value: string) {
     this._comment = value;
-    this._idb.save('options', 'comment', {value: value}).catch((err) => {
+    this._idb.save('options', 'comment', {value}).catch((err) => {
       console.error(err);
     });
   }
@@ -317,8 +324,8 @@ export class AppStorageService {
     return this._annotation;
   }
 
-  get annotation_links(): OIDBLink[] {
-    return this._annotation_links;
+  get annotationLinks(): OIDBLink[] {
+    return this._annotationLinks;
   }
 
   get levelcounter(): number {
@@ -326,30 +333,23 @@ export class AppStorageService {
   }
 
   get LoggedIn(): boolean {
-    return this._logged_in;
+    return this._loggedIn;
   }
 
   set LoggedIn(value: boolean) {
-    this._logged_in = value;
+    this._loggedIn = value;
   }
 
   constructor(public sessStr: SessionStorageService,
               public localStr: LocalStorageService) {
   }
 
-  set feedback(value: any) {
-    this._feedback = value;
-    this._idb.save('options', 'feedback', {value: value}).catch((err) => {
-      console.error(err);
-    });
-  }
-
   // SESSION STORAGE
-  @SessionStorage('session_key') session_key: string;
+  @SessionStorage('sessionKey') sessionKey: string;
 
-  @SessionStorage() _logged_in: boolean;
+  @SessionStorage() _loggedIn: boolean;
   @SessionStorage() logInTime: number; // timestamp
-  @SessionStorage('jobs_left') jobs_left: number;
+  @SessionStorage('jobsLeft') jobsLeft: number;
 
   public saving: EventEmitter<string> = new EventEmitter<string>();
   private _interface: string = null;
@@ -375,20 +375,20 @@ export class AppStorageService {
   private _submitted: boolean = null;
   private _feedback: any = null;
   private _logs: any[] = [];
-  private _data_id: number = null;
-  private _audio_url: string = null;
+  private _dataID: number = null;
+  private _audioURL: string = null;
   private _usemode: 'local' | 'online' | 'url' = null;
   private _language = 'en';
   private _version: string = null;
   private _logging = false;
-  private _show_loupe = true;
+  private _showLoupe = true;
   private _prompttext = '';
-  private _url_params: any = {};
+  private _urlParams: any = {};
   private _easymode = false;
   private _comment = '';
   private _servercomment = '';
   private _annotation: OIDBLevel[] = null;
-  private _annotation_links: OIDBLink[] = null;
+  private _annotationLinks: OIDBLink[] = null;
   private _levelcounter = 0;
 
   private _secondsPerLine = 5;
@@ -399,7 +399,7 @@ export class AppStorageService {
     status: string,
     file: File,
     checked_converters: number
-  }[], keep_data: boolean, navigate: () => void, err: (error: string) => void) => {
+  }[], keepData: boolean, navigate: () => void, err: (error: string) => void) => {
     if (!(files === null || files === undefined)) {
       // get audio file
       let audiofile;
@@ -422,7 +422,7 @@ export class AppStorageService {
       };
 
       if (!(audiofile === null || audiofile === undefined)) {
-        if (!keep_data || (!(this._user === null || this._user === undefined) &&
+        if (!keepData || (!(this._user === null || this._user === undefined) &&
           !(this._user.id === null || this._user.id === undefined) && this._user.id !== '-1' && this._user.id !== '')) {
           // last was online mode
           this.clearSession();
@@ -461,12 +461,12 @@ export class AppStorageService {
     }).catch((err) => {
       console.error(err);
     }).then(() => {
-      return new Promise<any>((resolve, reject) => {
+      return new Promise<any>((resolve, reject2) => {
         if (saveToDB) {
           this._idb.saveArraySequential(value, 'annotation_levels', 'id').then((r) => {
             resolve();
           }).catch((error) => {
-            reject(error);
+            reject2(error);
           });
         } else {
           resolve();
@@ -489,7 +489,7 @@ export class AppStorageService {
   public overwriteLinks = (value: OIDBLink[]): Promise<any> => {
     return this.clearIDBTable('annotation_links')
       .then(() => {
-        this._annotation_links = value;
+        this._annotationLinks = value;
       }).catch((err) => {
         console.error(err);
       }).then(() => {
@@ -533,7 +533,7 @@ export class AppStorageService {
     );
   }
 
-  public setSessionData(member: any, data_id: number, audio_url: string, offline: boolean = false): { error: string } {
+  public setSessionData(member: any, dataID: number, audioURL: string, offline: boolean = false): { error: string } {
     if ((this._easymode === null || this._easymode === undefined)) {
       this._easymode = false;
     }
@@ -549,7 +549,7 @@ export class AppStorageService {
         jobno: -1
       };
       this.login = true;
-      this._logged_in = true;
+      this._loggedIn = true;
 
       return {error: ''};
     }
@@ -560,11 +560,11 @@ export class AppStorageService {
       }
       this.setNewSessionKey();
 
-      this.data_id = data_id;
-      this._logged_in = true;
-      this.sessStr.store('_logged_in', this._logged_in);
+      this.dataID = dataID;
+      this._loggedIn = true;
+      this.sessStr.store('_loggedIn', this._loggedIn);
       this.sessStr.store('interface', this._interface);
-      this.audio_url = audio_url;
+      this.audioURL = audioURL;
       this.user = {
         id: member.id,
         project: member.project,
@@ -580,27 +580,27 @@ export class AppStorageService {
   }
 
   public clearSession(): boolean {
-    this._logged_in = false;
+    this._loggedIn = false;
     this.login = false;
 
     this.sessStr.clear();
 
-    return ((this.sessStr.retrieve('session_key') === null || this.sessStr.retrieve('session_key') === undefined)
+    return ((this.sessStr.retrieve('sessionKey') === null || this.sessStr.retrieve('sessionKey') === undefined)
       && (this.sessStr.retrieve('member_id') === null || this.sessStr.retrieve('member_id') === undefined));
   }
 
   public clearLocalStorage(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this._logged_in = false;
+      this._loggedIn = false;
       this.login = false;
-      this.data_id = null;
+      this.dataID = null;
 
       const promises: Promise<any>[] = [];
       promises.push(this.idb.save('options', 'user', {value: null}));
       promises.push(this.idb.save('options', 'feedback', {value: null}));
       promises.push(this.idb.save('options', 'comment', {value: ''}));
-      promises.push(this.idb.save('options', 'audio_url', {value: null}));
-      promises.push(this.idb.save('options', 'data_id', {value: null}));
+      promises.push(this.idb.save('options', 'audioURL', {value: null}));
+      promises.push(this.idb.save('options', 'dataID', {value: null}));
       promises.push(this.idb.save('options', 'sessionfile', {value: null}));
       promises.push(this.clearLoggingData());
 
@@ -636,7 +636,7 @@ export class AppStorageService {
           });
           break;
         case 'feedback':
-          this._idb.save('options', 'feedback', {value: value}).then(
+          this._idb.save('options', 'feedback', {value}).then(
             () => {
               this.saving.emit('success');
             }
@@ -687,16 +687,16 @@ export class AppStorageService {
           key: 'easymode'
         },
         {
-          attribute: '_audio_url',
-          key: 'audio_url'
+          attribute: '_audioURL',
+          key: 'audioURL'
         },
         {
           attribute: '_comment',
           key: 'comment'
         },
         {
-          attribute: '_data_id',
-          key: 'data_id'
+          attribute: '_dataID',
+          key: 'dataID'
         },
         {
           attribute: '_feedback',
@@ -727,8 +727,8 @@ export class AppStorageService {
           key: 'logging'
         },
         {
-          attribute: '_show_loupe',
-          key: 'show_loupe'
+          attribute: '_showLoupe',
+          key: 'showLoupe'
         },
         {
           attribute: '_prompttext',
@@ -770,14 +770,14 @@ export class AppStorageService {
       });
     }).then(() => {
       idb.getAll('annotation_links', 'id').then((links: IIDBLink[]) => {
-        this._annotation_links = [];
+        this._annotationLinks = [];
         for (let i = 0; i < links.length; i++) {
           if (!links[i].hasOwnProperty('id')) {
-            this._annotation_links.push(
+            this._annotationLinks.push(
               new OIDBLink(i + 1, links[i].link)
             );
           } else {
-            this._annotation_links.push(links[i]);
+            this._annotationLinks.push(links[i]);
           }
         }
       });
@@ -827,16 +827,16 @@ export class AppStorageService {
     if (!(level === null || level === undefined)) {
       this._annotation.push({
         id: ++this._levelcounter,
-        level: level,
+        level,
         sortorder: this._annotation.length
       });
       return this.idb.save('annotation_levels', this._levelcounter, {
         id: this._levelcounter,
-        level: level
+        level
       });
     } else {
-      return new Promise((resolve, reject) => {
-        reject(new Error('level is undefined or null'));
+      return new Promise((resolve, reject2) => {
+        reject2(new Error('level is undefined or null'));
       });
     }
   }
@@ -849,8 +849,8 @@ export class AppStorageService {
         }
       );
     } else {
-      return new Promise((resolve, reject) => {
-        reject(new Error('level is undefined or null'));
+      return new Promise((resolve, reject2) => {
+        reject2(new Error('level is undefined or null'));
       });
     }
   }
@@ -870,19 +870,16 @@ export class AppStorageService {
   }
 
   /**
-   * Sets session_key. Returns true on success, false on failure
-   * @param member_id
-   * @returns {boolean}
+   * Sets sessionKey. Returns true on success, false on failure
    */
   private setNewSessionKey() {
-    this.session_key = '';
-    this.sessStr.store('session_key', this.session_key);
+    this.sessionKey = '';
+    this.sessStr.store('sessionKey', this.sessionKey);
   }
 
   /**
    * loads the option by its key and sets its variable.
    * Notice: the variable is defined by '_' before the key string
-   * @param {string} key
    */
   private loadOptionFromIDB(key: string): Promise<any> {
     return new Promise<any>(
@@ -891,8 +888,8 @@ export class AppStorageService {
           if (typeof key === 'string') {
             this._idb.get('options', key).then(
               (result) => {
-                const res_obj = (!(result === null || result === undefined)) ? result.value : null;
-                resolve(res_obj);
+                const resObj = (!(result === null || result === undefined)) ? result.value : null;
+                resolve(resObj);
               }
             ).catch((err) => {
               reject(err);

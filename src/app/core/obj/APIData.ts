@@ -1,66 +1,66 @@
 export class APIData {
 
-  private _id: number;
+  private readonly _id: number;
 
   get id(): number {
     return this._id;
   }
 
-  private _annotator: string;
+  private readonly _annotator: string;
 
   get annotator(): string {
     return this._annotator;
   }
 
-  private _annobegin: string;
+  private readonly _annobegin: string;
 
   get annobegin(): string {
     return this._annobegin;
   }
 
-  private _annoend: string;
+  private readonly _annoend: string;
 
   get annoend(): string {
     return this._annoend;
   }
 
-  private _url: string;
+  private readonly _url: string;
 
   get url(): string {
     return this._url;
   }
 
-  private _segmentbegin: number;
+  private readonly _segmentbegin: number;
 
   get segmentbegin(): number {
     return this._segmentbegin;
   }
 
-  private _segmentend: number;
+  private readonly _segmentend: number;
 
   get segmentend(): number {
     return this._segmentend;
   }
 
-  private _priority: number;
+  private readonly _priority: number;
 
   get priority(): number {
     return this._priority;
   }
 
-  private _status: string;
+  private readonly _status: string;
 
   get status(): string {
     return this._status;
   }
 
-  private _project: string;
+  private readonly _project: string;
 
   get project(): string {
     return this._project;
   }
 
-  private _jobno: number;
+  private readonly _jobno: number;
 
   get jobno(): number {
     return this._jobno;

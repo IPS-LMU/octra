@@ -1,6 +1,6 @@
 export class Logger {
-  private entries: any[];
-  private group_name: string;
+  private readonly entries: any[];
+  private readonly group_name: string;
 
   constructor(groupe_name: string) {
     this.entries = [];

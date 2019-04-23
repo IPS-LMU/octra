@@ -72,7 +72,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   private subscrmanager: SubscriptionManager;
   onOfflineSubmit = () => {
-    if (!(this.appStorage.data_id === null || this.appStorage.data_id === undefined) && typeof this.appStorage.data_id === 'number') {
+    if (!(this.appStorage.dataID === null || this.appStorage.dataID === undefined) && typeof this.appStorage.dataID === 'number') {
       // last was online mode
       this.api.setOnlineSessionToFree(this.appStorage).then(() => {
         this.audioService.registerAudioManager(this.dropzone.audiomanager);
@@ -255,7 +255,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         new_session = true;
 
       } else {
-        if (!(this.appStorage.data_id === null || this.appStorage.data_id === undefined) && typeof this.appStorage.data_id === 'number') {
+        if (!(this.appStorage.dataID === null || this.appStorage.dataID === undefined) && typeof this.appStorage.dataID === 'number') {
           // last session was online session
           // check if credentials are available
           if (
@@ -296,13 +296,13 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           // TODO fehler hier suchen
           // check if annotation is annotated
           new Promise<void>((resolve, reject) => {
-            if (!isNullOrUndefined(this.appStorage.data_id)) {
-              this.api.fetchAnnotation(this.appStorage.data_id).then((entry) => {
+            if (!isNullOrUndefined(this.appStorage.dataID)) {
+              this.api.fetchAnnotation(this.appStorage.dataID).then((entry) => {
                 if (entry.data.status === 'ANNOTATED' || entry.data.status === 'FREE') {
                   resolve();
                 } else {
                   // reset annotation
-                  this.api.closeSession(this.member.id, this.appStorage.data_id, '').then(() => {
+                  this.api.closeSession(this.member.id, this.appStorage.dataID, '').then(() => {
                     resolve();
                   }).catch(() => {
                     // ignore error
@@ -322,7 +322,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
             console.error(error);
           });
         } else {
-          this.api.fetchAnnotation(this.appStorage.data_id).then((json) => {
+          this.api.fetchAnnotation(this.appStorage.dataID).then((json) => {
 
             if (isNullOrUndefined(json.data)) {
               // job doesn't exist anymore
@@ -332,7 +332,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
               if (json.hasOwnProperty('message')) {
                 const counter = (json.message === '') ? '0' : json.message;
-                this.appStorage.sessStr.store('jobs_left', Number(counter));
+                this.appStorage.sessStr.store('jobsLeft', Number(counter));
               }
 
               if (form.valid && this.agreement_checked
@@ -366,7 +366,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
                   this.appStorage.prompttext = '';
                 }
 
-                const res = this.appStorage.setSessionData(this.member, this.appStorage.data_id, this.appStorage.audio_url);
+                const res = this.appStorage.setSessionData(this.member, this.appStorage.dataID, this.appStorage.audioURL);
                 if (res.error === '') {
                   this.navigate();
                 } else {
@@ -550,7 +550,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
             if (json.hasOwnProperty('message')) {
               const counter = (json.message === '') ? '0' : json.message;
-              this.appStorage.sessStr.store('jobs_left', Number(counter));
+              this.appStorage.sessStr.store('jobsLeft', Number(counter));
             }
 
             if (res.error === '') {

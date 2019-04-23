@@ -22,9 +22,9 @@ export class KeymappingService {
 
   private shortcuts: any[] = [];
 
-  private _onkeydown: EventEmitter<any>;
+  private readonly _onkeydown: EventEmitter<any>;
 
-  private _onkeyup: EventEmitter<any>;
+  private readonly _onkeyup: EventEmitter<any>;
   private onKeyDown = ($event) => {
     const combo = KeyMapping.getShortcutCombination($event);
     this._onkeydown.emit({comboKey: combo, event: $event});

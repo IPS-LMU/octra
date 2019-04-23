@@ -1,7 +1,6 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {AppStorageService} from '../../shared/service/appstorage.service';
+import {APIService, AppStorageService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {APIService} from '../../shared/service/api.service';
 
 @Component({
   selector: 'app-help-tools',
@@ -29,7 +28,7 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
   }
 
   clearAllData() {
-    this.appStorage._logged_in = false;
+    this.appStorage._loggedIn = false;
 
     if (this.appStorage.usemode === 'local') {
       this.appStorage.clearAnnotationData().then(() => {

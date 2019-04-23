@@ -2,15 +2,15 @@ import {FileInfo} from '../../fileInfo';
 import {BrowserAudioTime, BrowserSample} from './AudioTime';
 
 export class AudioInfo extends FileInfo {
-  private _bitrate = -1;
-  private _channels = -1;
+  private readonly _bitrate: number = -1;
+  private readonly _channels: number = -1;
   private _duration: BrowserAudioTime;
 
   get bitrate(): number {
     return this._bitrate;
   }
 
-  private _samplerate: number;
+  private readonly _samplerate: number;
 
   get channels(): number {
     return this._channels;

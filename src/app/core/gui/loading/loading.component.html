@@ -1,17 +1,17 @@
 <div id="loading">
     <span id="logo">OCTRA</span>
     <div class="progress">
-        <div *ngIf="settService.log == ''" class="progress-bar" [ngStyle]="{
+        <div *ngIf="settService.log === ''" class="progress-bar" [ngStyle]="{
             width: (progress + '%')
         }">
         </div>
-        <div *ngIf="settService.log != ''" class="progress-bar" [ngStyle]="{
+        <div *ngIf="settService.log !== ''" class="progress-bar" [ngStyle]="{
             width: '100%',
             'background-color': 'red'
         }">
         </div>
     </div>
-    <div *ngIf="settService.log == ''" c2lass="description">
+    <div *ngIf="settService.log === ''" c2lass="description">
         {{text}}{{state}}<br/>
         <div class="text-info">{{warning}}</div>
         <div *ngIf="warning !== null && warning !== ''">
@@ -22,7 +22,7 @@
     </div>
     <div class="log" [innerHTML]="settService.log">
     </div>
-    <div *ngIf="settService.log != ''">
+    <div *ngIf="settService.log !== ''">
         <span class="link" (click)="retry()">Retry </span>
         <ng-container *ngIf="appStorage.usemode !== 'url'">or <span class="link" (click)="goBack()"> Back</span>
         </ng-container>

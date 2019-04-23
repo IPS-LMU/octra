@@ -37,7 +37,7 @@ export class TsWorkerJob {
     ended: -1
   };
 
-  private _id: number;
+  private readonly _id: number;
   private _result: any;
   private _status: TsWorkerStatus = TsWorkerStatus.INITIALIZED;
 

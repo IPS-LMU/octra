@@ -21,7 +21,7 @@ export class BugreportModalComponent implements OnInit {
   public visible = false;
   public bgemail = '';
   public bgdescr = '';
-  public sendpro_obj = true;
+  public sendProObj = true;
   public bugsent = false;
   config: ModalOptions = {
     keyboard: false,
@@ -34,14 +34,15 @@ export class BugreportModalComponent implements OnInit {
   private subscrmanager = new SubscriptionManager();
 
   public get isvalid(): boolean {
-    if (this.sendpro_obj || this.bgdescr !== '') {
+    if (this.sendProObj || this.bgdescr !== '') {
       return true;
     } else {
       return false;
     }
   }
 
-  constructor(private modalService: BsModalService, private appStorage: AppStorageService, public bugService: BugReportService, private settService: SettingsService) {
+  constructor(private modalService: BsModalService, private appStorage: AppStorageService,
+              public bugService: BugReportService, private settService: SettingsService) {
   }
 
   ngOnInit() {
@@ -68,14 +69,14 @@ export class BugreportModalComponent implements OnInit {
   public close(action: string) {
     this.modal.hide();
     this.visible = false;
-    this.actionperformed.next(<ModalAnswer>action);
+    this.actionperformed.next(action as ModalAnswer);
   }
 
   sendBugReport() {
     this.appStorage.email = this.bgemail;
 
     this.subscrmanager.add(
-      this.bugService.sendReport(this.bgemail, this.bgdescr, this.sendpro_obj, {
+      this.bugService.sendReport(this.bgemail, this.bgdescr, this.sendProObj, {
         auth_token: this.settService.appSettings.octra.bugreport.auth_token,
         url: this.settService.appSettings.octra.bugreport.url
       }).subscribe(

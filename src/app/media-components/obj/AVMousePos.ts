@@ -54,11 +54,11 @@ export class AVMousePos {
    * @param x relative Position
    * @param y relative Position
    * @param absX absolute posiiton
-   * @param time_pos - BrowserAudioTime
+   * @param timePos - BrowserAudioTime
    */
-  constructor(x: number, y: number, absX: number, time_pos: BrowserAudioTime) {
-    if (time_pos) {
-      this._timepos = time_pos.clone();
+  constructor(x: number, y: number, absX: number, timePos: BrowserAudioTime) {
+    if (timePos) {
+      this._timepos = timePos.clone();
     }
 
     this._relPos.x = x;

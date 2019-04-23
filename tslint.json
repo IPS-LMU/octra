@@ -75,6 +75,7 @@
     "variable-name": [
       true,
       "allow-leading-underscore"
-    ]
+    ],
+    "align": false
   }
 }

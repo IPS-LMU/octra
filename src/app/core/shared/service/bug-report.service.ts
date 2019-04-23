@@ -47,9 +47,9 @@ export class BugReportService {
 
   public addEntry(type: ConsoleType, message: any) {
     const consoleItem: ConsoleEntry = {
-      type: type,
+      type,
       timestamp: moment().format('DD.MM.YY HH:mm:ss'),
-      message: message
+      message
     };
 
     this._console.push(consoleItem);
@@ -67,7 +67,19 @@ export class BugReportService {
         signed_in: this.appStorage.LoggedIn,
         usemode: this.appStorage.usemode,
         url: window.location.href,
-        lastUpdated: AppInfo.lastUpdate
+        lastUpdated: AppInfo.lastUpdate,
+        project: null,
+        user: null,
+        jobID: null,
+        audiofile_size: null,
+        audiofile_duration: null,
+        audiofile_samplerate: null,
+        audiofile_bitrate: null,
+        audiofile_channels: null,
+        audiofile_type: null,
+        levels: null,
+        currentlevel: null,
+        segments: null
       },
       system: {
         os: {
@@ -81,33 +93,33 @@ export class BugReportService {
     };
 
     if (this.appStorage.usemode === 'online') {
-      result.octra['project'] = this.appStorage.user.project;
-      result.octra['user'] = this.appStorage.user.id;
-      result.octra['jobID'] = this.appStorage.data_id;
+      result.octra.project = this.appStorage.user.project;
+      result.octra.user = this.appStorage.user.id;
+      result.octra.jobID = this.appStorage.dataID;
     }
 
     if (!(this.transcrService === null || this.transcrService === undefined)) {
       const file = Functions.getFileSize(this.transcrService.audiofile.size);
-      result.octra['audiofile_size'] = file.size + ' ' + file.label;
-      result.octra['audiofile_duration'] = this.transcrService.audiomanager.ressource.info.duration.browserSample.seconds;
-      result.octra['audiofile_samplerate'] = this.transcrService.audiofile.samplerate;
-      result.octra['audiofile_bitrate'] = this.transcrService.audiomanager.ressource.info.bitrate;
-      result.octra['audiofile_channels'] = this.transcrService.audiomanager.ressource.info.channels;
-      result.octra['audiofile_type'] = this.transcrService.audiomanager.ressource.extension;
-      result.octra['levels'] = this.transcrService.annotation.levels.length;
-      result.octra['currentlevel'] = this.transcrService.selectedlevel;
-      result.octra['segments'] = this.transcrService.currentlevel.segments.length;
+      result.octra.audiofile_size = file.size + ' ' + file.label;
+      result.octra.audiofile_duration = this.transcrService.audiomanager.ressource.info.duration.browserSample.seconds;
+      result.octra.audiofile_samplerate = this.transcrService.audiofile.samplerate;
+      result.octra.audiofile_bitrate = this.transcrService.audiomanager.ressource.info.bitrate;
+      result.octra.audiofile_channels = this.transcrService.audiomanager.ressource.info.channels;
+      result.octra.audiofile_type = this.transcrService.audiomanager.ressource.extension;
+      result.octra.levels = this.transcrService.annotation.levels.length;
+      result.octra.currentlevel = this.transcrService.selectedlevel;
+      result.octra.segments = this.transcrService.currentlevel.segments.length;
     }
 
     return result;
   }
 
   public getText(): string {
-    const bugreport_settings = this.settService.appSettings.octra.bugreport;
+    const bugreportSettings = this.settService.appSettings.octra.bugreport;
 
     for (let i = 0; i < AppInfo.bugreporters.length; i++) {
       const bugreporter = AppInfo.bugreporters[i];
-      if (bugreporter.name === bugreport_settings.name) {
+      if (bugreporter.name === bugreportSettings.name) {
         this.reporter = bugreporter;
       }
     }
@@ -122,14 +134,14 @@ export class BugReportService {
     auth_token: string,
     url: string
   }): Observable<any> {
-    const bugreport_settings = this.settService.appSettings.octra.bugreport;
+    const bugreportSettings = this.settService.appSettings.octra.bugreport;
 
-    if (!(bugreport_settings === null || bugreport_settings === undefined) && bugreport_settings.enabled) {
+    if (!(bugreportSettings === null || bugreportSettings === undefined) && bugreportSettings.enabled) {
       const auth_token = credentials.auth_token;
       const url = credentials.url;
       const form = {
-        email: email,
-        description: description
+        email,
+        description
       };
 
       return this.reporter.sendBugReport(this.http, this.getPackage(), form, url, auth_token, sendbugreport);

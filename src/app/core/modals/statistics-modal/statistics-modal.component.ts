@@ -3,7 +3,7 @@ import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs/Subject';
 import {AppStorageService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {TextConverter} from '../../obj/Converters/TextConverter';
+import {TextConverter} from '../../obj/Converters';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {NavbarService} from '../../gui/navbar/navbar.service';
 

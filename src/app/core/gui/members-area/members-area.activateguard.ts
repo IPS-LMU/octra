@@ -2,11 +2,9 @@ import {Injectable} from '@angular/core';
 
 import {ActivatedRoute, ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
-import {AppStorageService} from '../../shared/service/appstorage.service';
-import {SettingsService} from '../../shared/service/settings.service';
+import {AppStorageService, AudioService, SettingsService} from '../../shared/service';
 import {AppInfo} from '../../../app.info';
 import {Functions} from '../../shared/Functions';
-import {AudioService} from '../../shared/service';
 
 @Injectable()
 export class MembersAreaGuard implements CanActivate {

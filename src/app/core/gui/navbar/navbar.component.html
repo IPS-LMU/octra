@@ -114,7 +114,7 @@
             <li class="nav-item"
                 *ngIf="(appStorage.LoggedIn && navbarServ.dataloaded && appStorage.usemode === 'online')">
                 <a class="nav-link">
-                    {{appStorage.user.project}}: {{appStorage.jobs_left}}
+                    {{appStorage.user.project}}: {{appStorage.jobsLeft}}
                 </a>
             </li>
 
@@ -168,13 +168,13 @@
                         <tr *ngIf="appStorage.usemode === 'online'">
                             <td><span>{{'general.id' | translate}}:</span></td>
                             <td>
-                                <span>{{appStorage.data_id}}</span>
+                                <span>{{appStorage.dataID}}</span>
                             </td>
                         </tr>
                         <tr *ngIf="appStorage.usemode === 'online'">
                             <td><span>{{'general.free jobs' | translate}}:</span></td>
                             <td>
-                                <span>{{appStorage.jobs_left}}</span>
+                                <span>{{appStorage.jobsLeft}}</span>
                             </td>
                         </tr>
                     </table>
@@ -253,8 +253,8 @@
                             <td>
                                 <div class="switch">
                                     <label>
-                                        <input (click)="toggleSettings('show_loupe')"
-                                               [checked]="appStorage.show_loupe"
+                                        <input (click)="toggleSettings('showLoupe')"
+                                               [checked]="appStorage.showLoupe"
                                                id="show_loupe" type="checkbox">
                                     </label>
                                 </div>
@@ -263,7 +263,7 @@
                         <ng-container *ngIf="appStorage.Interface === '2D-Editor'">
                             <tr>
                                 <td colspan="2">
-                                    <hr style="border:0.5px solid lightgray;"/>
+                                    <hr style="border:1px solid lightgray;"/>
                                 </td>
                             </tr>
                             <tr>

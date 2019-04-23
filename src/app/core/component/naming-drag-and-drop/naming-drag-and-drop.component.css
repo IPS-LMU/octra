@@ -26,11 +26,13 @@
 }
 
 /* Animate items as they’re being sorted. */
+/*noinspection CssUnusedSymbol*/
 .cdk-drop-list-dragging .cdk-drag {
     transition: transform 250ms cubic-bezier(0.2, 0, 1, 0);
 }
 
 /* Animate an item that has been dropped. */
+/*noinspection CssUnusedSymbol*/
 .cdk-drag-animating {
     transition: transform 300ms cubic-bezier(0.2, 0, 1, 0);
 }

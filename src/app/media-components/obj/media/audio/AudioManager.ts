@@ -135,7 +135,7 @@ export class AudioManager {
   private static decoder: AudioDecoder;
   private _id: number;
   private _ressource: AudioRessource;
-  private _originalInfo: AudioInfo;
+  private readonly _originalInfo: AudioInfo;
   private _state: PlayBackState;
   private _mainchunk: AudioChunk;
   private _playposition: BrowserAudioTime;
@@ -143,7 +143,7 @@ export class AudioManager {
   private _stepBackward = false;
   private stateRequest: PlayBackState = null;
   private _isScriptProcessorCanceled = false;
-  private _bufferedOLA: any;
+  private readonly _bufferedOLA: any;
   private _lastUpdate: number;
 
   // timestamp when playing should teminate
@@ -154,7 +154,7 @@ export class AudioManager {
 
   // variables needed for initializing audio
   // private _source: AudioBufferSourceNode = null;
-  private _audioContext: AudioContext = null;
+  private readonly _audioContext: AudioContext = null;
   private _gainNode: GainNode = null;
   private _scriptProcessorNode: ScriptProcessorNode = null;
   // only the Audiomanager may have the channel array

@@ -2,10 +2,10 @@ import {SourceType} from './index';
 
 export class MediaRessource {
   private source: SourceType;
-  private _extension: string;
+  private readonly _extension: string;
   private _arraybuffer: ArrayBuffer;
 
-  private _name: string;
+  private readonly _name: string;
 
   get extension(): string {
     return this._extension;
@@ -15,7 +15,7 @@ export class MediaRessource {
     return this._name;
   }
 
-  private _size: number;
+  private readonly _size: number;
 
   get size(): number {
     return this._size;

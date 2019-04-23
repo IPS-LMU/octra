@@ -34,7 +34,6 @@ export class AudioChunk {
   /**
    * sets the playposition and the audio chunk's selection. Be aware that this methods changes the
    * end position to the last sample every time it's called
-   * @param value
    */
   public set startpos(value: BrowserAudioTime) {
     if ((value === null || value === undefined)) {
@@ -46,7 +45,7 @@ export class AudioChunk {
       this.selection.start = value.clone();
       this.selection.end = this.time.end.clone();
     }
-    this._playposition = <BrowserAudioTime>this.selection.start.clone();
+    this._playposition = this.selection.start.clone() as BrowserAudioTime;
   }
 
   get selection(): AudioSelection {
@@ -122,15 +121,15 @@ export class AudioChunk {
     return this._state === PlayBackState.STOPPED;
   }
 
-  constructor(time: AudioSelection, audio_manager: AudioManager, selection?: AudioSelection) {
+  constructor(time: AudioSelection, audioManager: AudioManager, selection?: AudioSelection) {
     if (time && time.start && time.end) {
       this.time = time.clone();
     } else {
       throw new Error('AudioChunk constructor needs two correct AudioTime objects');
     }
 
-    if (!(audio_manager === null || audio_manager === undefined)) {
-      this._audioManger = audio_manager;
+    if (!(audioManager === null || audioManager === undefined)) {
+      this._audioManger = audioManager;
       this._playposition = this._audioManger.createBrowserAudioTime(time.start.browserSample.value);
       this._state = PlayBackState.INITIALIZED;
     } else {
@@ -148,14 +147,14 @@ export class AudioChunk {
 
   private static _counter = 0;
   public statechange: EventEmitter<PlayBackState> = new EventEmitter<PlayBackState>();
-  private _audioManger: AudioManager;
+  private readonly _audioManger: AudioManager;
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
   private _selection: AudioSelection = null;
 
   private _time: AudioSelection = null;
 
-  private _id;
+  private readonly _id;
 
   private _state: PlayBackState = PlayBackState.PREPARE;
 
@@ -171,14 +170,13 @@ export class AudioChunk {
   /**
    * calculate current position of the current audio playback.
    * TODO when does this method must be called? Animation of playcursor or at another time else?
-   * @returns {number}
    */
   public updatePlayPosition = () => {
     if (!(this.selection === null || this.selection === undefined)) {
       const timestamp = new Date().getTime();
 
       if ((this._playposition === null || this._playposition === undefined)) {
-        this._playposition = <BrowserAudioTime>this.time.start.clone();
+        this._playposition = this.time.start.clone() as BrowserAudioTime;
       } else {
         this._playposition.browserSample.value = this._audioManger.playposition.browserSample.value;
       }
@@ -194,7 +192,7 @@ export class AudioChunk {
   }
 
   public startPlayback(onProcess: () => void = () => {
-  }, playonhover: boolean = false): Promise<void> {
+  }, playOnHover: boolean = false): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (!this.isPlaying) {
         if ((this._selection === null || this._selection === undefined)) {
@@ -202,7 +200,7 @@ export class AudioChunk {
         }
 
         if (this._selection.start.browserSample.value === this._selection.end.browserSample.value) {
-          this.startpos = <BrowserAudioTime>this._selection.start.clone();
+          this.startpos = this._selection.start.clone() as BrowserAudioTime;
         }
 
         this.setState(PlayBackState.STARTED);
@@ -224,10 +222,10 @@ export class AudioChunk {
             if (state === PlayBackState.ENDED) {
               // reset to beginning of selection
               if (this._replay) {
-                this.playposition = <BrowserAudioTime>this.selection.start.clone();
-                this.startPlayback(onProcess, playonhover);
+                this.playposition = this.selection.start.clone() as BrowserAudioTime;
+                this.startPlayback(onProcess, playOnHover);
               } else {
-                this.startpos = <BrowserAudioTime>this._time.start.clone();
+                this.startpos = this._time.start.clone() as BrowserAudioTime;
                 resolve();
               }
             }
@@ -238,10 +236,10 @@ export class AudioChunk {
         ));
 
         this._audioManger.startPlayback(
-          <BrowserAudioTime>this.selection.start, <BrowserAudioTime>this.selection.duration, this._volume, this._speed, () => {
+          this.selection.start as BrowserAudioTime, this.selection.duration as BrowserAudioTime, this._volume, this._speed, () => {
             this.updatePlayPosition();
             onProcess();
-          }, playonhover
+          }, playOnHover
         ).catch(reject);
       } else {
         reject(`can't start playback on chunk because audiomanager is still playing`);
@@ -278,7 +276,7 @@ export class AudioChunk {
           this.audiomanager.stopPlayback().then(() => {
             this.startpos = this.lastplayedpos.clone();
             this._audioManger.startPlayback(
-              <BrowserAudioTime>this.selection.start.clone(), <BrowserAudioTime>this.selection.duration.clone(), 1, 1, () => {
+              this.selection.start.clone() as BrowserAudioTime, this.selection.duration.clone() as BrowserAudioTime, 1, 1, () => {
                 this.updatePlayPosition();
                 onProcess();
               }
@@ -287,7 +285,7 @@ export class AudioChunk {
         } else {
           this.startpos = this.lastplayedpos.clone();
           this._audioManger.startPlayback(
-            <BrowserAudioTime>this.selection.start.clone(), <BrowserAudioTime>this.selection.duration.clone(), 1, 1, () => {
+            this.selection.start.clone() as BrowserAudioTime, this.selection.duration.clone() as BrowserAudioTime, 1, 1, () => {
               this.updatePlayPosition();
               onProcess();
             }
@@ -299,19 +297,19 @@ export class AudioChunk {
     });
   }
 
-  public stepBackwardTime(back_sec: number, onProcess: () => void = () => {
+  public stepBackwardTime(backSec: number, onProcess: () => void = () => {
   }): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const back_samples = Math.max(0, (this.playposition.browserSample.value
-        - (Math.round(back_sec * this._audioManger.browserSampleRate))));
-      const backSample = new BrowserSample(back_samples, this._audioManger.browserSampleRate);
+      const backSamples = Math.max(0, (this.playposition.browserSample.value
+        - (Math.round(backSec * this._audioManger.browserSampleRate))));
+      const backSample = new BrowserSample(backSamples, this._audioManger.browserSampleRate);
 
       if (this.audiomanager.isPlaying) {
         this.audiomanager.stopPlayback().then(() => {
           this.startpos = this._audioManger.createBrowserAudioTime(backSample.value);
 
           this._audioManger.startPlayback(
-            <BrowserAudioTime>this.selection.start.clone(), <BrowserAudioTime>this.selection.duration.clone(), 1, 1, () => {
+            this.selection.start.clone() as BrowserAudioTime, this.selection.duration.clone() as BrowserAudioTime, 1, 1, () => {
               this.updatePlayPosition();
               onProcess();
             }
@@ -321,7 +319,7 @@ export class AudioChunk {
         this.startpos = this._audioManger.createBrowserAudioTime(backSample.value);
 
         this._audioManger.startPlayback(
-          <BrowserAudioTime>this.selection.start.clone(), <BrowserAudioTime>this.selection.duration.clone(), 1, 1, () => {
+          this.selection.start.clone() as BrowserAudioTime, this.selection.duration.clone() as BrowserAudioTime, 1, 1, () => {
             this.updatePlayPosition();
             onProcess();
           }
@@ -346,7 +344,7 @@ export class AudioChunk {
   }
 
   private afterPlaybackStopped = () => {
-    this.startpos = <BrowserAudioTime>this.time.start.clone();
+    this.startpos = this.time.start.clone() as BrowserAudioTime;
     if (this._replay) {
       this.toggleReplay();
     }

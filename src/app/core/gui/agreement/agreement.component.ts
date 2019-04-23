@@ -1,8 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {SettingsService} from '../../shared/service/settings.service';
+import {AppStorageService, SettingsService} from '../../shared/service';
 import {Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
-import {AppStorageService} from '../../shared/service/appstorage.service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
 import {Functions} from '../../shared/Functions';

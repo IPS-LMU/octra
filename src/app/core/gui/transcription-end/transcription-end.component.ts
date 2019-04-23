@@ -23,8 +23,8 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
               private navService: NavbarService) {
 
     this.subscrmanager = new SubscriptionManager();
-    this.navService.show_interfaces = false;
-    this.navService.show_export = false;
+    this.navService.showInterfaces = false;
+    this.navService.showExport = false;
     this.navService.dataloaded = false;
   }
 

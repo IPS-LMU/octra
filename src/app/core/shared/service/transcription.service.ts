@@ -35,8 +35,12 @@ export class TranscriptionService {
     return this._feedback;
   }
 
-  get break_marker(): any {
-    return this._break_marker;
+  get breakMarker(): any {
+    return this._breakMarker;
+  }
+
+  set breakMarker(value: any) {
+    this._breakMarker = value;
   }
 
   get selectedlevel(): number {
@@ -51,10 +55,6 @@ export class TranscriptionService {
     }
 
     this.levelchanged.emit(this._annotation.levels[this._selectedlevel]);
-  }
-
-  set break_marker(value: any) {
-    this._break_marker = value;
   }
 
   get statistic(): any {
@@ -135,7 +135,7 @@ export class TranscriptionService {
 
   private _feedback: FeedBackForm;
 
-  private _break_marker: any = null;
+  private _breakMarker: any = null;
 
   private _selectedlevel = 0;
 
@@ -294,13 +294,13 @@ export class TranscriptionService {
         };
 
         if ((this.appStorage.annotation === null || this.appStorage.annotation === undefined) || this.appStorage.annotation.length === 0) {
-          const new_levels = [];
+          const newLevels = [];
           const levels = this.createNewAnnotation().levels;
           for (let i = 0; i < levels.length; i++) {
-            new_levels.push(new OIDBLevel(i + 1, levels[i], i));
+            newLevels.push(new OIDBLevel(i + 1, levels[i], i));
           }
 
-          this.appStorage.overwriteAnnotation(new_levels).then(() => {
+          this.appStorage.overwriteAnnotation(newLevels).then(() => {
               if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
                 if (this.appStorage.usemode === 'url') {
                   // load transcript from url
@@ -329,9 +329,9 @@ export class TranscriptionService {
                   } else {
                     this.appStorage.annotation[this._selectedlevel].level.items = [];
                     for (let i = 0; i < this.appStorage.servertranscipt.length; i++) {
-                      const seg_t = this.appStorage.servertranscipt[i];
+                      const segT = this.appStorage.servertranscipt[i];
 
-                      const oseg = new OSegment(i, seg_t.start, seg_t.length, [new OLabel('OCTRA_1', seg_t.text)]);
+                      const oseg = new OSegment(i, segT.start, segT.length, [new OLabel('OCTRA_1', segT.text)]);
                       this.appStorage.annotation[this.selectedlevel].level.items.push(oseg);
                     }
                     // clear servertranscript
@@ -383,7 +383,7 @@ export class TranscriptionService {
     let data: any = {};
 
     if (!(this.annotation === null || this.annotation === undefined)) {
-      const log_data: OLogging = this.extractUI(this.uiService.elements);
+      const logData: OLogging = this.extractUI(this.uiService.elements);
 
       data = {
         project: ((this.appStorage.user.project === null || this.appStorage.user.project === undefined))
@@ -398,7 +398,7 @@ export class TranscriptionService {
           ? this.appStorage.feedback : JSON.stringify(this._feedback.exportData()),
         status: 'ANNOTATED',
         id: this.appStorage.dataID,
-        log: log_data.getObj()
+        log: logData.getObj()
       };
 
       if (this.settingsService.isTheme('korbinian')) {
@@ -416,22 +416,22 @@ export class TranscriptionService {
       for (let i = 0; i < this.currentlevel.segments.length; i++) {
         const segment = this.currentlevel.segments.get(i);
 
-        let last_bound = 0;
+        let lastBound = 0;
         if (i > 0) {
-          last_bound = Math.round(this.currentlevel.segments.get(i - 1).time.originalSample.value);
+          lastBound = Math.round(this.currentlevel.segments.get(i - 1).time.originalSample.value);
         }
 
-        const segment_json: any = {
-          start: last_bound,
-          length: segment.time.originalSample.value - last_bound,
+        const segmentJSON: any = {
+          start: lastBound,
+          length: segment.time.originalSample.value - lastBound,
           text: segment.transcript
         };
 
         if (i === this.currentlevel.segments.length - 1) {
-          segment_json.length = this._audiomanager.originalInfo.duration.originalSample.value - last_bound;
+          segmentJSON.length = this._audiomanager.originalInfo.duration.originalSample.value - lastBound;
         }
 
-        transcript.push(segment_json);
+        transcript.push(segmentJSON);
       }
 
       data.transcript = transcript;
@@ -461,7 +461,7 @@ export class TranscriptionService {
 
     this._feedback = null;
 
-    this._break_marker = null;
+    this._breakMarker = null;
 
     this.state = 'ANNOTATED';
 
@@ -497,7 +497,7 @@ export class TranscriptionService {
     return html;
   }
 
-  public extractUI(ui_elements: StatisticElem[]): OLogging {
+  public extractUI(uiElements: StatisticElem[]): OLogging {
     const now = new Date();
     const result: OLogging = new OLogging(
       '1.0',
@@ -511,11 +511,11 @@ export class TranscriptionService {
       []
     );
 
-    if (ui_elements) {
-      for (let i = 0; i < ui_elements.length; i++) {
-        const elem = ui_elements[i];
+    if (uiElements) {
+      for (let i = 0; i < uiElements.length; i++) {
+        const elem = uiElements[i];
 
-        const new_elem = new OLog(
+        const newElem = new OLog(
           elem.timestamp,
           elem.type,
           elem.context,
@@ -525,14 +525,14 @@ export class TranscriptionService {
         );
 
         if (elem instanceof MouseStatisticElem) {
-          new_elem.value = elem.value;
+          newElem.value = elem.value;
         } else if (elem instanceof KeyStatisticElem) {
-          new_elem.value = (<KeyStatisticElem>elem).value;
+          newElem.value = (elem as KeyStatisticElem).value;
         } else {
-          new_elem.value = (<StatisticElem>elem).value;
+          newElem.value = (elem as StatisticElem).value;
         }
 
-        result.logs.push(new_elem);
+        result.logs.push(newElem);
       }
     }
 
@@ -550,7 +550,7 @@ export class TranscriptionService {
       const segment = this._annotation.levels[this._selectedlevel].segments.get(i);
 
       if (segment.transcript !== '') {
-        if (this.break_marker !== null && segment.transcript.indexOf(this.break_marker.code) > -1) {
+        if (this.breakMarker !== null && segment.transcript.indexOf(this.breakMarker.code) > -1) {
           this._statistic.pause++;
         } else {
           this._statistic.transcribed++;
@@ -563,8 +563,6 @@ export class TranscriptionService {
 
   /**
    * converts raw text of markers to html
-   * @param rawtext
-   * @returns {string}
    */
   public rawToHTML(rawtext: string): string {
     let result: string = rawtext;
@@ -621,9 +619,9 @@ export class TranscriptionService {
 
           let img = '';
           if (!((marker.icon_url === null || marker.icon_url === undefined) || marker.icon_url === '')) {
-            const marker_code = marker.code.replace(/</g, '&amp;lt;').replace(/>/g, '&amp;gt;');
+            const markerCode = marker.code.replace(/</g, '&amp;lt;').replace(/>/g, '&amp;gt;');
             img = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
-              'data-marker-code=\'' + marker_code + '\' alt=\'' + marker_code + '\'/>';
+              'data-marker-code=\'' + markerCode + '\' alt=\'' + markerCode + '\'/>';
           } else {
             img = marker.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
           }
@@ -644,9 +642,6 @@ export class TranscriptionService {
 
   /**
    * replace markers of the input string with its html pojection
-   * @param input
-   * @param use_wrap
-   * @returns {string}
    */
   public replaceMarkersWithHTML(input: string): string {
     // TODO optimization possible
@@ -718,7 +713,7 @@ export class TranscriptionService {
         }
       }
 
-      insertions = insertions.sort(function (a, b) {
+      insertions = insertions.sort((a, b) => {
         if (a.start === b.start) {
           return 0;
         }
@@ -784,9 +779,9 @@ export class TranscriptionService {
     html = '<p>' + html + '</p>';
     const dom = jQuery(html);
 
-    const replace_func = (i, elem) => {
+    const replaceFunc = (i, elem) => {
       if (jQuery(elem).children() !== null && jQuery(elem).children().length > 0) {
-        jQuery.each(jQuery(elem).children(), replace_func);
+        jQuery.each(jQuery(elem).children(), replaceFunc);
       } else {
         let attr = jQuery(elem).attr('data-marker-code');
         if (elem.type === 'select-one') {
@@ -813,7 +808,7 @@ export class TranscriptionService {
       }
     };
 
-    jQuery.each(dom.children(), replace_func);
+    jQuery.each(dom.children(), replaceFunc);
     return dom.text();
   }
 

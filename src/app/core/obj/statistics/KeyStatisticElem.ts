@@ -40,13 +40,13 @@ export class KeyStatisticElem extends StatisticElem {
     }) {
     super(type, name, value, timestamp, playerpos);
     this.data = {
-      timestamp: timestamp,
-      type: type,
+      timestamp,
+      type,
       context: name,
-      value: value,
-      playerpos: playerpos,
-      caretpos: caretpos,
-      segment: segment
+      value,
+      playerpos,
+      caretpos,
+      segment
     };
   }
 

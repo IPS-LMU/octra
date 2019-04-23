@@ -10,12 +10,12 @@ import {NgForm} from '@angular/forms';
 })
 export class TranscriptionFeedbackComponent implements OnInit {
 
-  @Input() feedback_data = {};
+  @Input() feedbackData = {};
   @Input() showCommentFieldOnly = false;
-  @ViewChild('fo') feedback_form: NgForm;
+  @ViewChild('fo') feedbackForm: NgForm;
 
   public get valid(): boolean {
-    return this.feedback_form.valid;
+    return this.feedbackForm.valid;
   }
 
   constructor(public transcrService: TranscriptionService, public langService: TranslateService, private appStorage: AppStorageService,
@@ -45,9 +45,9 @@ export class TranscriptionFeedbackComponent implements OnInit {
     this.appStorage.comment = this.transcrService.feedback.comment;
 
     if (!this.settingsService.isTheme('shortAudioFiles')) {
-      for (const control in this.feedback_data) {
-        if (this.feedback_data.hasOwnProperty(control)) {
-          this.changeValue(control, this.feedback_data[control]);
+      for (const control in this.feedbackData) {
+        if (this.feedbackData.hasOwnProperty(control)) {
+          this.changeValue(control, this.feedbackData[control]);
         }
       }
       this.appStorage.save('feedback', this.transcrService.feedback.exportData());
@@ -59,15 +59,15 @@ export class TranscriptionFeedbackComponent implements OnInit {
     console.warn(result);
   }
 
-  public checkBoxChanged(group: string, checkb: string) {
+  public checkBoxChanged(groupName: string, checkb: string) {
     for (let i = 0; i < this.transcrService.feedback.groups.length; i++) {
-      const group_ = this.transcrService.feedback.groups[i];
-      if (group_.name === group) {
-        for (let j = 0; j < group_.controls.length; j++) {
-          const control = group_.controls[j];
+      const group = this.transcrService.feedback.groups[i];
+      if (group.name === groupName) {
+        for (let j = 0; j < group.controls.length; j++) {
+          const control = group.controls[j];
           if (control.value === checkb) {
-            control.custom['checked'] = ((control.custom['checked'] === null || control.custom['checked'] === undefined))
-              ? true : !control.custom['checked'];
+            control.custom.checked = ((control.custom.checked === null || control.custom.checked === undefined))
+              ? true : !control.custom.checked;
             break;
           }
         }

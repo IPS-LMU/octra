@@ -47,8 +47,8 @@
                [height]="150"
     ></app-loupe>
     <app-transcr-editor #editor id="trancr"
-                        (marker_insert)="onMarkerInsert($event)"
-                        (marker_click)="onMarkerClick($event)"
+                        (markerInsert)="onMarkerInsert($event)"
+                        (markerClick)="onMarkerClick($event)"
                         [markers]="transcrService.guidelines.markers"
                         [easymode]="easymode"
                         [audiochunk]="audiochunk"
@@ -77,8 +77,8 @@
                             </span>
             </button>
             <button class="btn btn-info btn-raised col-md-4" (click)="save();doit('right');"
-                    *ngIf="!isNextSegmentLastAndBreak(segment_index)
-                    && segment_index < transcrService.currentlevel.segments.length - 1">
+                    *ngIf="!isNextSegmentLastAndBreak(segmentIndex)
+                    && segmentIndex < transcrService.currentlevel.segments.length - 1">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'d-lg-none': responsive && !easymode}">
                                 <fa-icon icon="save"></fa-icon> & <fa-icon icon="arrow-right"></fa-icon>
@@ -90,8 +90,8 @@
             </button>
             <!-- check if last segment ord if the next segment is a break -->
             <button class="btn btn-info btn-raised col-md-4" (click)="save();close();openOverview();"
-                    *ngIf="segment_index === transcrService.currentlevel.segments.length - 1
-                    || isNextSegmentLastAndBreak(segment_index)">
+                    *ngIf="segmentIndex === transcrService.currentlevel.segments.length - 1
+                    || isNextSegmentLastAndBreak(segmentIndex)">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'d-lg-none': responsive && !easymode}">
                                 <fa-icon icon="save"></fa-icon> & <fa-icon icon="eye"></fa-icon>

@@ -38,17 +38,15 @@ export class Segments {
         segments[i].sampleDur = Math.round(segments[i].sampleDur);
         segments[i].sampleStart = Math.round(segments[i].sampleStart);
 
-        const new_segment = Segment.fromObj(segments[i], this._originalSampleRate, browserSampleRate);
+        const newSegment = Segment.fromObj(segments[i], this._originalSampleRate, browserSampleRate);
 
-        this._segments.push(new_segment);
+        this._segments.push(newSegment);
       }
     }
   }
 
   /**
    * adds new Segment
-   * @param time_samples
-   * @returns {boolean}
    */
   public add(time: BrowserAudioTime | OriginalAudioTime, transcript: string = null): boolean {
     const newSegment: Segment = new Segment(time);
@@ -65,7 +63,6 @@ export class Segments {
 
   /**
    * removes Segment by number of samples
-   * @param time
    */
   public removeBySamples(timeSamples: BrowserSample) {
     for (let i = 0; i < this.segments.length; i++) {
@@ -80,18 +77,18 @@ export class Segments {
   public removeByIndex(index: number, breakmarker: string) {
     if (index > -1 && index < this.segments.length) {
       if (index < this.segments.length - 1) {
-        const next_segment = this.segments[index + 1];
+        const newxtSegment = this.segments[index + 1];
         const transcription: string = this.segments[index].transcript;
-        if (next_segment.transcript !== breakmarker && transcription !== breakmarker) {
+        if (newxtSegment.transcript !== breakmarker && transcription !== breakmarker) {
           // concat transcripts
-          if (next_segment.transcript !== '' && transcription !== '') {
-            next_segment.transcript = transcription + ' ' + next_segment.transcript;
-          } else if (next_segment.transcript === '' && transcription !== '') {
-            next_segment.transcript = transcription;
+          if (newxtSegment.transcript !== '' && transcription !== '') {
+            newxtSegment.transcript = transcription + ' ' + newxtSegment.transcript;
+          } else if (newxtSegment.transcript === '' && transcription !== '') {
+            newxtSegment.transcript = transcription;
           }
-        } else if (next_segment.transcript === breakmarker) {
+        } else if (newxtSegment.transcript === breakmarker) {
           // delete pause
-          next_segment.transcript = transcription;
+          newxtSegment.transcript = transcription;
         }
       }
 
@@ -102,9 +99,6 @@ export class Segments {
 
   /**
    * changes samples of segment by given index and sorts the List after adding
-   * @param i
-   * @param new_time
-   * @returns {boolean}
    */
   public change(i: number, segment: Segment): boolean {
     if (i > -1 && this._segments[i]) {
@@ -128,7 +122,7 @@ export class Segments {
    * sorts the segments by time in samples
    */
   public sort() {
-    this.segments.sort(function (a, b) {
+    this.segments.sort((a, b) => {
       if (a.time.browserSample.value < b.time.browserSample.value) {
         return -1;
       }
@@ -145,8 +139,6 @@ export class Segments {
 
   /**
    * gets Segment by index
-   * @param i
-   * @returns {any}
    */
   public get(i: number): Segment {
     if (i > -1 && i < this.segments.length) {
@@ -167,7 +159,6 @@ export class Segments {
 
   /**
    * returns the segment by the sample position (BrowserSample)
-   * @param samples
    */
   public getSegmentBySamplePosition(samples: BrowserSample): number {
     let begin = 0;
@@ -182,17 +173,17 @@ export class Segments {
     return -1;
   }
 
-  public getSegmentsOfRange(start_samples: number, end_samples: number): Segment[] {
+  public getSegmentsOfRange(startSamples: number, endSamples: number): Segment[] {
     const result: Segment[] = [];
     let start = 0;
 
     for (let i = 0; i < this._segments.length; i++) {
       const segment = this._segments[i];
       if (
-        (segment.time.browserSample.value >= start_samples && segment.time.browserSample.value <= end_samples) ||
-        (start >= start_samples && start <= end_samples)
+        (segment.time.browserSample.value >= startSamples && segment.time.browserSample.value <= endSamples) ||
+        (start >= startSamples && start <= endSamples)
         ||
-        (start <= start_samples && segment.time.browserSample.value >= end_samples)
+        (start <= startSamples && segment.time.browserSample.value >= endSamples)
 
       ) {
         result.push(segment);
@@ -210,7 +201,7 @@ export class Segments {
     if (segment) {
       for (let i = 0; i < this.segments.length; i++) {
         if (id === i) {
-          const res: BrowserAudioTime = <BrowserAudioTime>segment.time.clone();
+          const res: BrowserAudioTime = segment.time.clone() as BrowserAudioTime;
           res.browserSample.value = samples;
           return res;
         }
@@ -240,8 +231,6 @@ export class Segments {
 
   /**
    * returns an array of normal segment objects with original values.
-   * @param labelname
-   * @param lastOriginalSample
    */
   public getObj(labelname: string, lastOriginalSample: number): OSegment[] {
     const result: OSegment[] = [];

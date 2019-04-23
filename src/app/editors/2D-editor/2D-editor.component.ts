@@ -266,7 +266,7 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     if (state === 'close') {
       this.showWindow = false;
       this.viewer.deactivateShortcuts = false;
-      this.selectedIndex = this.window.segment_index;
+      this.selectedIndex = this.window.segmentIndex;
       this.viewer.selectSegment(this.selectedIndex);
       this.viewer.drawSegments();
 

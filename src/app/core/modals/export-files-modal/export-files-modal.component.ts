@@ -27,7 +27,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   modalRef: BsModalRef;
   AppInfo = AppInfo;
   public visible = false;
-  public export_states = [];
+  public exportStates = [];
   public preparing = {
     name: '',
     preparing: false
@@ -108,7 +108,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     for (let i = 0; i < AppInfo.converters.length; i++) {
-      this.export_states.push('inactive');
+      this.exportStates.push('inactive');
     }
   }
 
@@ -149,17 +149,17 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   }
 
   toggleLine(index: number) {
-    for (let i = 0; i < this.export_states.length; i++) {
-      if (this.export_states[i] === 'active') {
-        this.export_states[i] = 'close';
+    for (let i = 0; i < this.exportStates.length; i++) {
+      if (this.exportStates[i] === 'active') {
+        this.exportStates[i] = 'close';
       }
     }
 
-    if (index < this.export_states.length) {
-      if (this.export_states[index] === 'active') {
-        this.export_states[index] = 'inactive';
+    if (index < this.exportStates.length) {
+      if (this.exportStates[index] === 'active') {
+        this.exportStates[index] = 'inactive';
       } else {
-        this.export_states[index] = 'active';
+        this.exportStates[index] = 'active';
       }
     }
   }
@@ -173,9 +173,6 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
         preparing: true
       };
       this.parentformat.download = this.transcrService.audiomanager.ressource.name + this.transcrService.audiomanager.ressource.extension;
-
-      window.URL = (((<any>window).URL) ||
-        ((<any>window).webkitURL) || false);
 
       if (this.parentformat.uri !== null) {
         window.URL.revokeObjectURL(this.parentformat.uri.toString());
@@ -220,9 +217,6 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
         this.parentformat.download = result.name;
 
-        window.URL = (((<any>window).URL) ||
-          ((<any>window).webkitURL) || false);
-
         if (this.parentformat.uri !== null) {
           window.URL.revokeObjectURL(this.parentformat.uri.toString());
         }
@@ -245,9 +239,6 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       };
       this.parentformat.download = this.transcrService.audiofile.name + '.json';
 
-      window.URL = (((<any>window).URL) ||
-        ((<any>window).webkitURL) || false);
-
       if (this.parentformat.uri !== null) {
         window.URL.revokeObjectURL(this.parentformat.uri.toString());
       }
@@ -265,7 +256,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
   onDownloadClick(i: number) {
     setTimeout(() => {
-      this.export_states[i] = 'inactive';
+      this.exportStates[i] = 'inactive';
     }, 500);
   }
 
@@ -274,8 +265,8 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   }
 
   onHidden() {
-    for (let i = 0; i < this.export_states.length; i++) {
-      this.export_states[i] = 'inactive';
+    for (let i = 0; i < this.exportStates.length; i++) {
+      this.exportStates[i] = 'inactive';
     }
 
     this.tools.audioCutting.status = 'idle';
@@ -321,7 +312,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     formData.append('files', file, this.transcrService.audiofile.name);
     formData.append('segments', JSON.stringify(cutList));
     formData.append('cuttingOptions', JSON.stringify({
-      exportFormats: exportFormats,
+      exportFormats,
       namingConvention: this.namingConvention.namingConvention
     }));
 
@@ -329,7 +320,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     this.tools.audioCutting.subscriptionIDs[0] = this.subscrmanager.add(
       this.httpClient.post(`${this.settService.appSettings.octra.plugins.audioCutter.url}/v1/cutAudio`, formData, {
         headers: {
-          'authorization': '7234rhuiweafauosijfaw89e77z23t'
+          authorization: '7234rhuiweafauosijfaw89e77z23t'
         }, responseType: 'json'
       }).subscribe((result: any) => {
         const hash = result.hash;
@@ -337,14 +328,14 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
           () => {
             this.httpClient.get(`${this.settService.appSettings.octra.plugins.audioCutter.url}/v1/tasks/${hash}`, {
               headers: {
-                'authorization': this.settService.appSettings.octra.plugins.audioCutter.authToken
+                authorization: this.settService.appSettings.octra.plugins.audioCutter.authToken
               }, responseType: 'json'
             }).subscribe((result2: any) => {
               this.tools.audioCutting.progress = ((!isNullOrUndefined(result2.progress)) ? Math.round(result2.progress * 100) : 0);
               this.tools.audioCutting.status = result2.status;
 
               if (result2.status === 'finished') {
-                const url: string = result2['resultURL'];
+                const url: string = result2.resultURL;
                 this.tools.audioCutting.result.url = url;
                 this.tools.audioCutting.result.filename = url.substring(url.lastIndexOf('/') + 1);
                 this.subscrmanager.remove(this.tools.audioCutting.subscriptionIDs[1]);
@@ -499,7 +490,8 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
             zip = zip.file(
               this.transcrService.audiomanager.ressource.info.name + '_meta.json',
-              new File([JSON.stringify(content, null, 2)], this.transcrService.audiomanager.ressource.info.name + '_meta.json', {type: 'text/plain'})
+              new File([JSON.stringify(content, null, 2)],
+                this.transcrService.audiomanager.ressource.info.name + '_meta.json', {type: 'text/plain'})
             );
             finished++;
           }
@@ -569,7 +561,8 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       this.tools.audioCutting.zippingSpeed = zipFactor;
 
       cuttingStarted = Date.now();
-      this.tools.audioCutting.wavFormat.startAudioCutting(this.transcrService.audiomanager.ressource.info.type, this.namingConvention.namingConvention,
+      this.tools.audioCutting.wavFormat.startAudioCutting(
+        this.transcrService.audiomanager.ressource.info.type, this.namingConvention.namingConvention,
         this.transcrService.audiomanager.ressource.arraybuffer, cutList);
     }).catch((err) => {
       console.error(err);

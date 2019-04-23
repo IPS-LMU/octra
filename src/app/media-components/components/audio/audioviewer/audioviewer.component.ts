@@ -101,7 +101,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
   @Output('pos_time')
   get pos_time(): number {
-    return this.av.PlayCursor.time_pos.browserSample.value;
+    return this.av.PlayCursor.timePos.browserSample.value;
   }
 
   get innerWidth(): number {
@@ -410,8 +410,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                       );
                       const segment = this.transcr.currentlevel.segments.get(segmentI);
                       if (segmentI > -1) {
-                        if (segment.transcript !== this.transcr.break_marker.code) {
-                          segment.transcript = this.transcr.break_marker.code;
+                        if (segment.transcript !== this.transcr.breakMarker.code) {
+                          segment.transcript = this.transcr.breakMarker.code;
                           this.shortcuttriggered.emit({shortcut: comboKey, value: 'set_break', type: 'segment'});
                         } else {
                           segment.transcript = '';
@@ -506,7 +506,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
                       if (segment.time.browserSample.value >= this.selection.start.browserSample.value
                         && segment.time.browserSample.value <= this.selection.end.browserSample.value) {
-                        this.transcr.currentlevel.segments.removeByIndex(i, this.transcr.break_marker.code);
+                        this.transcr.currentlevel.segments.removeByIndex(i, this.transcr.breakMarker.code);
                         i--;
                       } else if (this.selection.end.browserSample.value < segment.time.browserSample.value) {
                         break;
@@ -1196,7 +1196,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
               if (segment.transcript === '') {
                 this.oContext.globalAlpha = 0.2;
                 this.oContext.fillStyle = 'red';
-              } else if (segment.transcript === this.transcr.break_marker.code) {
+              } else if (segment.transcript === this.transcr.breakMarker.code) {
                 this.oContext.globalAlpha = 0.2;
                 this.oContext.fillStyle = 'blue';
               } else if (segment.transcript !== '') {
@@ -1341,7 +1341,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 if (segment.transcript === '') {
                   this.oContext.globalAlpha = 0.2;
                   this.oContext.fillStyle = 'red';
-                } else if (segment.transcript === this.transcr.break_marker.code) {
+                } else if (segment.transcript === this.transcr.breakMarker.code) {
                   this.oContext.globalAlpha = 0.2;
                   this.oContext.fillStyle = 'blue';
                 } else if (segment.transcript !== '') {
@@ -1417,7 +1417,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                           const leftHalf = w / textLength;
                           newText = newText.substring(0, Math.floor(newText.length * leftHalf) - 3);
                           newText = '...' + newText + '...';
-                        } else if (segment.transcript !== this.transcr.break_marker.code) {
+                        } else if (segment.transcript !== this.transcr.breakMarker.code) {
                           newText = '...' + newText;
                         } else {
                           newText = segment.transcript;
@@ -1460,7 +1460,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                       }
                       lastI += newText.length;
 
-                      if (segment.transcript !== this.transcr.break_marker.code) {
+                      if (segment.transcript !== this.transcr.breakMarker.code) {
                         newText = '...' + newText + '...';
                       } else {
                         newText = segment.transcript;

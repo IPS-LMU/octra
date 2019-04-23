@@ -43,11 +43,11 @@
                 </div>
             </div>
             <div class="modal-body">
-                <div *ngIf="shown_guidelines.instructions.length === 0" class="bg-warning">
+                <div *ngIf="shownGuidelines.instructions.length === 0" class="bg-warning">
                     {{"general.no guidelines found" | translate}}
                 </div>
                 <div class="row" style="margin-bottom:20px;"
-                     *ngFor="let instructions of shown_guidelines.instructions;let j = index;">
+                     *ngFor="let instructions of shownGuidelines.instructions;let j = index;">
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">

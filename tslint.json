@@ -76,6 +76,7 @@
       true,
       "allow-leading-underscore"
     ],
-    "align": false
+    "align": false,
+    "no-shadowed-variable": false
   }
 }

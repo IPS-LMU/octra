@@ -394,7 +394,7 @@ export class AudioviewerService extends AudioComponentService {
           ) {
 
             const segSamples = this.transcrService.currentlevel.segments.get(i).time.browserSample.value;
-            this.transcrService.currentlevel.segments.removeByIndex(i, this.transcrService.break_marker.code);
+            this.transcrService.currentlevel.segments.removeByIndex(i, this.transcrService.breakMarker.code);
 
             return {
               type: 'remove',
@@ -655,13 +655,13 @@ export class AudioviewerService extends AudioComponentService {
       /*
        if (i < this.transcrService.currentlevel.segments.length - 1) {
        const next_segment = this.transcrService.currentlevel.segments.get(i + 1);
-       if (next_segment.transcript !== '' && next_segment.transcript !== this.transcrService.break_marker.code) {
+       if (next_segment.transcript !== '' && next_segment.transcript !== this.transcrService.breakMarker.code) {
        nextUnblocked = false;
        }
        }*/
       if (segAbsX >= absX - this.Settings.boundaries.width / 2
         && segAbsX <= absX + this.Settings.boundaries.width / 2
-        // && (segment.transcript === '' || segment.transcript === this.transcrService.break_marker.code)
+        // && (segment.transcript === '' || segment.transcript === this.transcrService.breakMarker.code)
         && nextUnblocked
       ) {
         return i;

@@ -464,7 +464,6 @@ export class SettingsService {
 
   /**
    * checks jif the specific theme is active
-   * @param theme
    */
   public isTheme(theme: string) {
     const selectedTheme = (

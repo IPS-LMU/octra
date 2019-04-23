@@ -74,10 +74,10 @@ export class CompatibilityService {
   constructor(private settingsService: SettingsService) {
   }
 
-  public isValidBrowser(allowed_browsers: any[]): boolean {
+  public isValidBrowser(allowedBrowsers: any[]): boolean {
 
-    for (let i = 0; i < allowed_browsers.length; i++) {
-      const browser = allowed_browsers[i];
+    for (let i = 0; i < allowedBrowsers.length; i++) {
+      const browser = allowedBrowsers[i];
       if (browser.name === BrowserInfo.browser) {
         return true;
       }

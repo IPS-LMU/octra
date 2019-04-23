@@ -47,8 +47,8 @@ export class TranscriptionStopModalComponent implements OnInit {
     });
   }
 
-  public close(action: TranscriptionStopModalAnswer) {
+  public close(action: string) {
     this.modalRef.hide();
-    this.actionperformed.next(action);
+    this.actionperformed.next(action as TranscriptionStopModalAnswer);
   }
 }

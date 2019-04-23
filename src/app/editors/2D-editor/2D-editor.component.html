@@ -2,7 +2,7 @@
     <app-transcr-window #window (act)="onWindowAction($event)" *ngIf="showWindow"
                         [easymode]="appStorage.easymode"
                         [audiochunk]="audioChunkWindow"
-                        [segment_index]="selectedIndex"
+                        [segmentIndex]="selectedIndex"
     ></app-transcr-window>
     <app-audio-navigation #audionav
                           (buttonclick)="onButtonClick($event)"

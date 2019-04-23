@@ -51,7 +51,6 @@ export class TsWorkerJob {
 
   /**
    * this function will be run in the web worker
-   * @param args
    */
   doFunction = (args: any[]) => {
     return new Promise<any>((resolve, reject) => {

@@ -1,4 +1,5 @@
 import {Observable} from 'rxjs/Observable';
+import {isNullOrUndefined} from '../shared/Functions';
 
 export enum IDBMode {
   READONLY,
@@ -6,10 +7,68 @@ export enum IDBMode {
 }
 
 export class IndexedDBManager {
-  public get = (store_name: string | IDBObjectStore, key: string | number): Promise<any> => {
+
+  get idbtransaction(): IDBTransaction {
+    return this._idbtransaction;
+  }
+
+  get db(): IDBDatabase {
+    return this._db;
+  }
+
+  constructor(dbname: string) {
+    this.dbname = dbname;
+
+    if (!IndexedDBManager.isCompatible()) {
+      console.error('Browser doesn\'t support a stable version of IndexedDB.');
+    } else {
+      this.indexedDB = (window as any).indexedDB
+        || (window as any).mozIndexedDB
+        || (window as any).webkitIndexedDB
+        || (window as any).msIndexedDB;
+
+      this._idbtransaction = (window as any).IDBTransaction
+        || (window as any).webkitIDBTransaction
+        || (window as any).msIDBTransaction;
+
+      this.idbkeyrange = (window as any).IDBKeyRange
+        || (window as any).webkitIDBKeyRange
+        || (window as any).msIDBKeyRange;
+    }
+  }
+
+  private indexedDB: IDBFactory;
+  private idbkeyrange: IDBKeyRange;
+  private readonly dbname: string;
+
+  private readonly _idbtransaction: IDBTransaction;
+
+  private _db: IDBDatabase;
+
+  /***
+   * checks if browser supports indexedDB
+   */
+  public static isCompatible(): boolean {
+    const indexedDB = (window as any).indexedDB
+      || (window as any).mozIndexedDB
+      || (window as any).webkitIndexedDB
+      || (window as any).msIndexedDB;
+
+    const idbtransaction = (window as any).IDBTransaction
+      || (window as any).webkitIDBTransaction
+      || (window as any).msIDBTransaction;
+
+    const idbkeyrange = (window as any).IDBKeyRange
+      || (window as any).webkitIDBKeyRange
+      || (window as any).msIDBKeyRange;
+
+    return (!(isNullOrUndefined(indexedDB) || isNullOrUndefined(idbtransaction) || isNullOrUndefined(idbkeyrange)));
+  }
+
+  public get = (storeName: string | IDBObjectStore, key: string | number): Promise<any> => {
     return new Promise<any>(
       (resolve, reject) => {
-        const store = (typeof store_name !== 'string') ? store_name : this.getObjectStore(store_name, IDBMode.READONLY);
+        const store = (typeof storeName !== 'string') ? storeName : this.getObjectStore(storeName, IDBMode.READONLY);
         if (key !== null && key !== undefined) {
           const request: IDBRequest = store.get(key);
           request.onsuccess = (idbrequest: any) => {
@@ -24,16 +83,17 @@ export class IndexedDBManager {
         }
       }
     );
-  };
-  public getAll = (store_name: string | IDBObjectStore, key: string | number): Promise<any[]> => {
+  }
+
+  public getAll = (storeName: string | IDBObjectStore, key: string | number): Promise<any[]> => {
     return new Promise<any>(
       (resolve, reject) => {
         const result = [];
-        const store = (typeof store_name !== 'string') ? store_name : this.getObjectStore(store_name, IDBMode.READONLY);
+        const store = (typeof storeName !== 'string') ? storeName : this.getObjectStore(storeName, IDBMode.READONLY);
         if (key !== null && key !== undefined) {
           const cursorRequest = store.openCursor();
 
-          cursorRequest.onsuccess = function (event: any) {
+          cursorRequest.onsuccess = (event: any) => {
             const cursor = event.target.result;
 
             if (cursor) {
@@ -53,11 +113,12 @@ export class IndexedDBManager {
         }
       }
     );
-  };
-  public save = (store_name: string | IDBObjectStore, key, data): Promise<any> => {
+  }
+
+  public save = (storeName: string | IDBObjectStore, key, data): Promise<any> => {
     return new Promise<any>(
       (resolve, reject) => {
-        const store = (typeof store_name !== 'string') ? store_name : this.getObjectStore(store_name, IDBMode.READWRITE);
+        const store = (typeof storeName !== 'string') ? storeName : this.getObjectStore(storeName, IDBMode.READWRITE);
 
         if (data === null || data === undefined) {
           data = {};
@@ -75,14 +136,15 @@ export class IndexedDBManager {
         };
       }
     );
-  };
-  public saveSequential = (store_name: string | IDBObjectStore, data: { key: string, value: any }[]): Promise<void> => {
+  }
+
+  public saveSequential = (storeName: string | IDBObjectStore, data: { key: string, value: any }[]): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
 
         const wrapper = (acc: number) => {
           if (acc < data.length) {
             if (data[acc].hasOwnProperty('key') && data[acc].hasOwnProperty('value')) {
-              return this.save(store_name, data[acc].key, data[acc].value).then(wrapper(++acc));
+              return this.save(storeName, data[acc].key, data[acc].value).then(wrapper(++acc));
             } else {
               reject(new Error('saveSync data parameter has invalid elements'));
             }
@@ -94,11 +156,12 @@ export class IndexedDBManager {
         wrapper(0);
       }
     );
-  };
-  public remove = (store_name: string | IDBObjectStore, key: string | number): Promise<any> => {
+  }
+
+  public remove = (storeName: string | IDBObjectStore, key: string | number): Promise<any> => {
     return new Promise<any>(
       (resolve, reject) => {
-        const store = (typeof store_name !== 'string') ? store_name : this.getObjectStore(store_name, IDBMode.READWRITE);
+        const store = (typeof storeName !== 'string') ? storeName : this.getObjectStore(storeName, IDBMode.READWRITE);
         const request = store.delete(key);
         request.onsuccess = (result: any) => {
           resolve(result);
@@ -108,11 +171,12 @@ export class IndexedDBManager {
           reject(error);
         };
       });
-  };
-  public clear = (store_name: string | IDBObjectStore): Promise<any> => {
+  }
+
+  public clear = (storeName: string | IDBObjectStore): Promise<any> => {
     return new Promise<any>(
       (resolve, reject) => {
-        const store = (typeof store_name !== 'string') ? store_name : this.getObjectStore(store_name, IDBMode.READWRITE);
+        const store = (typeof storeName !== 'string') ? storeName : this.getObjectStore(storeName, IDBMode.READWRITE);
         const request = store.clear();
         request.onsuccess = (result: any) => {
           resolve(result);
@@ -122,14 +186,16 @@ export class IndexedDBManager {
           reject(error);
         };
       });
-  };
+  }
+
   public close = () => {
     this.db.close();
-  };
-  public saveArraySequential = (array: any[], store_name: string | IDBObjectStore, key: any): Promise<void> => {
+  }
+
+  public saveArraySequential = (array: any[], storeName: string | IDBObjectStore, key: any): Promise<void> => {
     return new Promise<void>(
       (resolve, reject) => {
-        const store = (typeof store_name !== 'string') ? store_name : this.getObjectStore(store_name, IDBMode.READWRITE);
+        const store = (typeof storeName !== 'string') ? storeName : this.getObjectStore(storeName, IDBMode.READWRITE);
 
         const wrapper = (acc: number) => {
           if (acc < array.length) {
@@ -148,72 +214,16 @@ export class IndexedDBManager {
         wrapper(0);
       }
     );
-  };
-  private indexedDB: IDBFactory;
-  private idbkeyrange: IDBKeyRange;
-  private readonly dbname: string;
-  private getObjectStore = (store_name: string, mode: IDBMode): IDBObjectStore => {
-    let mode_str: IDBTransactionMode = 'readonly';
+  }
+
+  private getObjectStore = (storeName: string, mode: IDBMode): IDBObjectStore => {
+    let modeStr: IDBTransactionMode = 'readonly';
 
     if (mode === IDBMode.READWRITE) {
-      mode_str = 'readwrite';
+      modeStr = 'readwrite';
     }
-    const txn = this.db.transaction([store_name], mode_str);
-    return txn.objectStore(store_name);
-  };
-
-  private readonly _idbtransaction: IDBTransaction;
-
-  get idbtransaction(): IDBTransaction {
-    return this._idbtransaction;
-  }
-
-  private _db: IDBDatabase;
-
-  get db(): IDBDatabase {
-    return this._db;
-  }
-
-  constructor(dbname: string) {
-    this.dbname = dbname;
-
-    if (!IndexedDBManager.isCompatible()) {
-      console.error('Browser doesn\'t support a stable version of IndexedDB.');
-    } else {
-      this.indexedDB = (<any> window).indexedDB
-        || (<any> window).mozIndexedDB
-        || (<any> window).webkitIndexedDB
-        || (<any> window).msIndexedDB;
-
-      this._idbtransaction = (<any> window).IDBTransaction
-        || (<any> window).webkitIDBTransaction
-        || (<any> window).msIDBTransaction;
-
-      this.idbkeyrange = (<any> window).IDBKeyRange
-        || (<any> window).webkitIDBKeyRange
-        || (<any> window).msIDBKeyRange;
-    }
-  }
-
-  /***
-   * checks if browser supports indexedDB
-   * @returns {boolean}
-   */
-  public static isCompatible(): boolean {
-    const indexedDB = (<any> window).indexedDB
-      || (<any> window).mozIndexedDB
-      || (<any> window).webkitIndexedDB
-      || (<any> window).msIndexedDB;
-
-    const idbtransaction = (<any> window).IDBTransaction
-      || (<any> window).webkitIDBTransaction
-      || (<any> window).msIDBTransaction;
-
-    const idbkeyrange = (<any> window).IDBKeyRange
-      || (<any> window).webkitIDBKeyRange
-      || (<any> window).msIDBKeyRange;
-
-    return (!((indexedDB === null || indexedDB === undefined) || (idbtransaction === null || idbtransaction === undefined) || (idbkeyrange === null || idbkeyrange === undefined)));
+    const txn = this.db.transaction([storeName], modeStr);
+    return txn.objectStore(storeName);
   }
 
   public open(version?: number): Observable<any> {

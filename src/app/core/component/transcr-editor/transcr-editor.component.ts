@@ -88,14 +88,14 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
               private langService: TranslateService,
               private transcrService: TranscriptionService) {
 
-    this._settings = new TranscrEditorConfig().Settings;
+    this._settings = new TranscrEditorConfig().settings;
     this.subscrmanager = new SubscriptionManager();
   }
 
   @Output() loaded: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() onkeyup: EventEmitter<any> = new EventEmitter<any>();
-  @Output() marker_insert: EventEmitter<string> = new EventEmitter<string>();
-  @Output() marker_click: EventEmitter<string> = new EventEmitter<string>();
+  @Output() markerInsert: EventEmitter<string> = new EventEmitter<string>();
+  @Output() markerClick: EventEmitter<string> = new EventEmitter<string>();
   @Output() typing: EventEmitter<string> = new EventEmitter<string>();
   @Output() boundaryclicked: EventEmitter<BrowserSample> = new EventEmitter<BrowserSample>();
   @Output() boundaryinserted: EventEmitter<number> = new EventEmitter<number>();
@@ -136,8 +136,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   private _settings: any;
   private subscrmanager: SubscriptionManager;
   private init = 0;
-  private summernote_ui: any = null;
-  private _is_typing = false;
+  private summernoteUI: any = null;
+  private _isTyping = false;
   private lastkeypress = 0;
 
   private _textSelection = {
@@ -149,7 +149,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   /**
    * converts the editor's html text to raw text
-   * @returns {string}
    */
   getRawText = () => {
     let html = this.textfield.summernote('code');
@@ -163,9 +162,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     const dom = jQuery(html);
     let charCounter = 0;
 
-    const replace_func = (i, elem) => {
+    const replaceFunc = (i, elem) => {
       if (jQuery(elem).contents() !== null && jQuery(elem).contents().length > 0) {
-        jQuery.each(jQuery(elem).contents(), replace_func);
+        jQuery.each(jQuery(elem).contents(), replaceFunc);
       } else {
         const tagName = jQuery(elem).prop('tagName');
 
@@ -175,13 +174,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           attr += '=' + value;
         }
         if (attr) {
-          const marker_code = Functions.unEscapeHtml(attr);
+          const markerCode = Functions.unEscapeHtml(attr);
 
           for (let j = 0; j < this.markers.length; j++) {
             const marker = this.markers[j];
-            if (marker_code === marker.code) {
-              jQuery(elem).replaceWith(Functions.escapeHtml(marker_code));
-              charCounter += marker_code.length;
+            if (markerCode === marker.code) {
+              jQuery(elem).replaceWith(Functions.escapeHtml(markerCode));
+              charCounter += markerCode.length;
               break;
             }
           }
@@ -222,7 +221,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       }
     };
 
-    jQuery.each(dom.contents(), replace_func);
+    jQuery.each(dom.contents(), replaceFunc);
 
     const rawText = dom.text().replace(/[\s ]+/g, ' ');
 
@@ -232,17 +231,17 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * initializes the editor and the containing summernote editor
    */
   public initialize = () => {
-    this.summernote_ui = jQuery.summernote.ui;
-    const Navigation = this.initNavigation();
+    this.summernoteUI = jQuery.summernote.ui;
+    const navigation = this.initNavigation();
 
     if (this.Settings.special_markers.boundary) {
       const customArray = this.createCustomButtonsArray();
-      Navigation.buttons['boundary'] = customArray[0];
-      Navigation.buttons['fontSizeUp'] = customArray[1];
-      Navigation.buttons['fontSizeDown'] = customArray[2];
-      Navigation.str_array.push('boundary');
-      Navigation.str_array.push('fontSizeDown');
-      Navigation.str_array.push('fontSizeUp');
+      navigation.buttons.boundary = customArray[0];
+      navigation.buttons.fontSizeUp = customArray[1];
+      navigation.buttons.fontSizeDown = customArray[2];
+      navigation.str_array.push('boundary');
+      navigation.str_array.push('fontSizeDown');
+      navigation.str_array.push('fontSizeUp');
     }
 
     /*
@@ -292,24 +291,24 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       },
       airPopover: [],
       toolbar: [
-        ['default', Navigation.str_array]
+        ['default', navigation.str_array]
       ],
       shortcuts: false,
-      buttons: Navigation.buttons,
+      buttons: navigation.buttons,
       callbacks: {
         onKeydown: this.onKeyDownSummernote,
         onKeyup: this.onKeyUpSummernote,
         onPaste: (e) => {
           e.preventDefault();
-          const bufferText = ((e.originalEvent || e).clipboardData || (<any>window).clipboardData).getData('Text');
+          const bufferText = ((e.originalEvent || e).clipboardData || (window as any).clipboardData).getData('Text');
           let html = bufferText.replace(/(<p>)|(<\/p>)/g, '')
             .replace(new RegExp('\\\[\\\|', 'g'), '{').replace(new RegExp('\\\|\\\]', 'g'), '}');
           html = Functions.unEscapeHtml(html);
           html = '<span>' + this.rawToHTML(html) + '</span>';
           html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
-          const html_obj = jQuery(html);
+          const htmlObj = jQuery(html);
           if (!(this.rawText === null || this.rawText === undefined) && this._rawText !== '') {
-            this.textfield.summernote('editor.insertNode', html_obj[0]);
+            this.textfield.summernote('editor.insertNode', htmlObj[0]);
           } else {
             this.textfield.summernote('code', html);
             this.focus(true);
@@ -362,10 +361,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       `)
       .css({
         'max-width': '500px',
-        'position': 'absolute',
+        position: 'absolute',
         'margin-top': '0px',
         'z-index': '200',
-        'display': 'none'
+        display: 'none'
       });
 
     this.popovers.validationError.insertBefore('.note-editing-area');
@@ -375,15 +374,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
   /**
    * inserts a marker to the editors html
-   * @param marker_code
-   * @param icon_url
    */
-  insertMarker = (marker_code, icon_url) => {
-    if ((icon_url === null || icon_url === undefined) || icon_url === '') {
+  insertMarker = (markerCode, iconURL) => {
+    if ((iconURL === null || iconURL === undefined) || iconURL === '') {
       // text only
-      this.textfield.summernote('editor.insertText', marker_code + ' ');
+      this.textfield.summernote('editor.insertText', markerCode + ' ');
     } else {
-      marker_code = marker_code.replace(/(<)|(>)/g, (g0, g1, g2) => {
+      markerCode = markerCode.replace(/(<)|(>)/g, (g0, g1, g2) => {
         if (g2 === undefined && g1 !== undefined) {
           return '&lt;';
         } else {
@@ -392,11 +389,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       });
 
       const element = document.createElement('img');
-      element.setAttribute('src', icon_url);
+      element.setAttribute('src', iconURL);
       element.setAttribute('class', 'btn-icon-text');
       element.setAttribute('style', 'height:16px');
-      element.setAttribute('data-marker-code', marker_code);
-      element.setAttribute('alt', marker_code);
+      element.setAttribute('data-marker-code', markerCode);
+      element.setAttribute('alt', markerCode);
 
       this.textfield.summernote('editor.insertNode', element);
     }
@@ -406,7 +403,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
   /**
    * called when key pressed in editor
-   * @param $event
    */
   onKeyDownSummernote = ($event) => {
     const comboKey = KeyMapping.getShortcutCombination($event);
@@ -427,7 +423,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             if (marker.shortcut[platform] === comboKey) {
               $event.preventDefault();
               this.insertMarker(marker.code, marker.icon_url);
-              this.marker_insert.emit(marker.name);
+              this.markerInsert.emit(marker.name);
               return;
             }
           }
@@ -437,7 +433,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
   /**
    * called after key up in editor
-   * @param $event
    */
   onKeyUpSummernote = ($event) => {
     // update rawText
@@ -450,17 +445,17 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   private triggerTyping() {
     setTimeout(() => {
       if (Date.now() - this.lastkeypress >= 700 && this.lastkeypress > -1) {
-        if (this._is_typing && this.focused) {
+        if (this._isTyping && this.focused) {
           this.typing.emit('stopped');
         }
-        this._is_typing = false;
+        this._isTyping = false;
       }
     }, 700);
 
-    if (!this._is_typing && this.focused) {
+    if (!this._isTyping && this.focused) {
       this.typing.emit('started');
     }
-    this._is_typing = true;
+    this._isTyping = true;
     this.lastkeypress = Date.now();
 
 
@@ -542,7 +537,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    */
   initNavigation() {
     const result = {
-      buttons: {},
+      buttons: {
+        boundary: undefined,
+        fontSizeUp: undefined,
+        fontSizeDown: undefined
+      },
       str_array: []
     };
 
@@ -558,8 +557,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   /**
    * creates a marker button for the toolbar
-   * @param marker
-   * @returns {any}
    */
   createButton(marker): any {
     return () => {
@@ -594,7 +591,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
       // create button
-      const btn_js = {
+      const btnJS = {
         contents: icon,
         tooltip: (isNullOrUndefined(this.Settings) || this.Settings.btnPopover) ? marker.description : '',
         container: false,
@@ -602,11 +599,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           // invoke insertText method with 'hello' on editor module.
           this.insertMarker(marker.code, marker.icon_url);
           // this.validate();
-          this.marker_click.emit(marker.name);
+          this.markerClick.emit(marker.name);
           this.initPopover();
         }
       };
-      const button = jQuery.summernote.ui.button(btn_js);
+      const button = jQuery.summernote.ui.button(btnJS);
 
       return button.render();   // return button as jquery object
     };
@@ -636,7 +633,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         })
         .on('mouseleave', () => {
           jQuery('.seg-popover').css({
-            'display': 'none'
+            display: 'none'
           });
         });
     }, 200);
@@ -674,17 +671,17 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     const result: any[] = [];
 
     // create boundary button
-    const boundary_btn = () => {
-      const boundary_label = this.langService.instant('special_markers.boundary.insert', {type: ''});
-      const boundary_descr = this.langService.instant('special_markers.boundary.description', {type: ''});
+    const boundaryBtn = () => {
+      const boundaryLabel = this.langService.instant('special_markers.boundary.insert', {type: ''});
+      const boundaryDescr = this.langService.instant('special_markers.boundary.description', {type: ''});
       let icon = '';
       if (!this.easymode) {
         icon = '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
-          '<span class=\'btn-description\'>' + boundary_label + '</span><span class=\'btn-shortcut\'> ' +
+          '<span class=\'btn-description\'>' + boundaryLabel + '</span><span class=\'btn-shortcut\'> ' +
           '[ALT + S]</span>';
         if (this.Settings.responsive) {
           icon = '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
-            '<span class=\'btn-description d-none d-md-inline\'>' + boundary_label + '</span>' +
+            '<span class=\'btn-description d-none d-md-inline\'>' + boundaryLabel + '</span>' +
             '<span class=\'btn-shortcut d-none d-lg-inline\'> ' +
             '[ALT + S]</span>';
         }
@@ -692,27 +689,27 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         icon = '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon\' style=\'height:16px;\'/>';
       }
       // create button
-      const btn_js = {
+      const btnJS = {
         contents: icon,
-        tooltip: boundary_descr,
+        tooltip: boundaryDescr,
         container: false,
         click: () => {
-          this.marker_click.emit('boundary');
+          this.markerClick.emit('boundary');
           this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
         }
       };
-      const button = jQuery.summernote.ui.button(btn_js);
+      const button = jQuery.summernote.ui.button(btnJS);
 
       return button.render();   // return button as jquery object
     };
 
-    result.push(boundary_btn);
+    result.push(boundaryBtn);
 
     // create boundary button
     const fontSizeUp = () => {
       const icon = '<img src=\'assets/img/components/transcr-editor/increaseFont.png\' class=\'btn-icon\' style=\'height:20px;\'/>';
       // create button
-      const btn_js = {
+      const btnJS = {
         contents: icon,
         tooltip: 'increase font size',
         container: false,
@@ -720,7 +717,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           jQuery('.transcr-editor .note-editable.card-block').css('font-size', (++this.transcrService.defaultFontSize) + 'px');
         }
       };
-      const button = jQuery.summernote.ui.button(btn_js);
+      const button = jQuery.summernote.ui.button(btnJS);
 
       return button.render();   // return button as jquery object
     };
@@ -731,7 +728,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     const fontSizeDown = () => {
       const icon = '<img src=\'assets/img/components/transcr-editor/decreaseFont.png\' class=\'btn-icon\' style=\'height:20px;\'/>';
       // create button
-      const btn_js = {
+      const btnJS = {
         contents: icon,
         tooltip: 'decrease font size',
         container: false,
@@ -739,7 +736,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           jQuery('.transcr-editor .note-editable.card-block').css('font-size', (--this.transcrService.defaultFontSize) + 'px');
         }
       };
-      const button = jQuery.summernote.ui.button(btn_js);
+      const button = jQuery.summernote.ui.button(btnJS);
 
       return button.render();   // return button as jquery object
     };
@@ -749,9 +746,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     return result;
   }
 
-  insertBoundary(img_url: string) {
+  insertBoundary(imgURL: string) {
     const element = document.createElement('img');
-    element.setAttribute('src', img_url);
+    element.setAttribute('src', imgURL);
     element.setAttribute('class', 'btn-icon-text boundary');
     element.setAttribute('style', 'height:16px');
     element.setAttribute('data-samples', this.audiochunk.playposition.browserSample.value.toString());
@@ -776,7 +773,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         })
         .on('mouseleave', () => {
           jQuery('.seg-popover').css({
-            'display': 'none'
+            display: 'none'
           });
         });
     }, 200);
@@ -785,7 +782,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   saveSelection() {
-    let sel, range, node;
+    let sel;
+    let range = null;
+    let node = null;
 
     jQuery('sel-start').remove();
     jQuery('sel-end').remove();
@@ -799,10 +798,15 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         // Range.createContextualFragment() would be useful here but is
         // non-standard and not supported in all browsers (IE9, for one)
         const el = document.createElement('sel-end');
-        let frag = document.createDocumentFragment(), node, lastNode;
-        while ((node = el.firstChild)) {
+        const frag = document.createDocumentFragment();
+        let lastNode = null;
+        node = el.firstChild;
+
+        while (node) {
           lastNode = frag.appendChild(node);
+          node = el.firstChild;
         }
+
         range.collapse(false);
         range.insertNode(el);
 
@@ -872,8 +876,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   /**
    * adds the comboKey to the list of disabled Keys
-   * @param comboKey
-   * @returns {boolean}
    */
   public addDisableKey(comboKey: string): boolean {
     for (let i = 0; i < this.Settings.disabledKeys.length; i++) {
@@ -887,8 +889,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   /**
    * removes the combokey of list of disabled keys
-   * @param comboKey
-   * @returns {boolean}
    */
   public removeDisableKey(comboKey: string): boolean {
     let j = -1;
@@ -923,7 +923,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     for (let i = 0; i < this.markers.length; i++) {
       const marker = this.markers[i];
 
-      const replace_func = (x, g1, g2, g3) => {
+      const replaceFunc = (x, g1, g2, g3) => {
         const s1 = (g1) ? g1 : '';
         const s3 = (g3) ? g3 : '';
         return s1 + 'X' + s3;
@@ -931,10 +931,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
       const regex = new RegExp('(\\s)*(' + Functions.escapeRegex(marker.code) + ')(\\s)*', 'g');
 
-      rawtext = rawtext.replace(regex, replace_func);
+      rawtext = rawtext.replace(regex, replaceFunc);
     }
 
-    const seg_texts = rawtext.split(regex2).filter((a) => {
+    const segTexts = rawtext.split(regex2).filter((a) => {
       if (!isNumeric(a)) {
         return a;
       }
@@ -942,15 +942,15 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     let start = 0;
 
-    if (seg_texts.length > 1) {
+    if (segTexts.length > 1) {
       if (caretpos === 0) {
         return 0;
       } else if (caretpos >= rawtext.replace(/\s?{([0-9]+)}\s?/g, ' ').length) {
-        return seg_texts.length - 1;
+        return segTexts.length - 1;
       }
 
-      for (let i = 0; i < seg_texts.length; i++) {
-        const text = seg_texts[i];
+      for (let i = 0; i < segTexts.length; i++) {
+        const text = segTexts[i];
         if (start >= caretpos) {
           return Math.max(0, i - 1);
         }
@@ -958,7 +958,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       }
 
       if (start >= caretpos) {
-        return seg_texts.length - 1;
+        return segTexts.length - 1;
       }
 
     }
@@ -1021,8 +1021,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   /**
    * checks if the combokey is part of the configs disabledkeys
-   * @param comboKey
-   * @returns {boolean}
    */
   private isDisabledKey(comboKey: string): boolean {
     for (let i = 0; i < this.Settings.disabledKeys.length; i++) {
@@ -1035,8 +1033,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   /**
    * converts raw text of markers to html
-   * @param rawtext
-   * @returns {string}
    */
   private rawToHTML(rawtext: string): string {
     // TODO remove duplicate code here and in transcrService!
@@ -1083,31 +1079,14 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         const regex = new RegExp('(\\s)*(' + Functions.escapeRegex(marker.code) + ')(\\s)*', 'g');
         const regex2 = /{([0-9]+)}/g;
 
-        const replace_func = (x, g1, g2, g3) => {
-          const s1 = (g1) ? g1 : '';
-          const s3 = (g3) ? g3 : '';
-
-          let img = '';
-          if (!((marker.icon_url === null || marker.icon_url === undefined) || marker.icon_url === '')) {
-            const marker_code = marker.code.replace(/</g, '&amp;lt;').replace(/>/g, '&amp;gt;');
-            img = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
-              'data-marker-code=\'' + marker_code + '\' alt=\'' + marker_code + '\'/>';
-          } else {
-            img = marker.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          }
-
-          return s1 + img + s3;
-        };
-
-
-        const replace_func2 = (x, g1) => {
+        const replaceFunc = (x, g1) => {
           return ' <img src=\'assets/img/components/transcr-editor/boundary.png\' ' +
             'class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
             'data-samples=\'' + g1 + '\' alt=\'\[|' + g1 + '|\]\' /> ';
         };
 
-        result = result.replace(regex2, replace_func2);
-        result = result.replace(regex, replace_func);
+        result = result.replace(regex2, replaceFunc);
+        result = result.replace(regex, replaceFunc);
       }
 
       result = result.replace(/\s+$/g, '&nbsp;');
@@ -1121,8 +1100,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   /**
    * tidy up the raw text, remove white spaces etc.
-   * @param raw
-   * @returns {string}
    */
   private tidyUpRaw(raw: string): string {
     return tidyUpAnnotation(raw, this.transcrService.guidelines);
@@ -1139,31 +1116,31 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private onSegmentBoundaryMouseOver(jqueryObj: any, event: any) {
-    const seg_popover = jQuery('.seg-popover');
-    const width = seg_popover.width();
-    const height = seg_popover.height();
-    const editor_pos = jQuery('.note-toolbar').offset();
-    const seg_samples = jqueryObj.attr('data-samples');
+    const segPopover = jQuery('.seg-popover');
+    const width = segPopover.width();
+    const height = segPopover.height();
+    const editorPos = jQuery('.note-toolbar').offset();
+    const segSamples = jqueryObj.attr('data-samples');
 
-    if (!(seg_samples === null || seg_samples === undefined) && Functions.isNumber(seg_samples)) {
-      const samples = Number(seg_samples);
+    if (!(segSamples === null || segSamples === undefined) && Functions.isNumber(segSamples)) {
+      const samples = Number(segSamples);
       const time = this.audiomanager.createBrowserAudioTime(samples);
 
-      seg_popover.css({
+      segPopover.css({
         'margin-left': (event.target.offsetLeft - (width / 2)) + 'px',
-        'margin-top': (jqueryObj.offset().top - editor_pos.top - height - 10) + 'px',
+        'margin-top': (jqueryObj.offset().top - editorPos.top - height - 10) + 'px',
         'z-index': 30,
-        'position': 'absolute',
+        position: 'absolute',
         'background-color': 'white',
-        'display': 'inherit'
+        display: 'inherit'
       });
 
       jqueryObj.css({
-        'cursor': 'pointer'
+        cursor: 'pointer'
       });
       const timespan = new TimespanPipe();
       const text = timespan.transform(time.browserSample.unix.toString());
-      seg_popover.text(text);
+      segPopover.text(text);
     }
   }
 
@@ -1187,7 +1164,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         this.cd.markForCheck();
         this.cd.detectChanges();
 
-        const editor_pos = jQuery('.note-toolbar.card-header').offset();
+        const editorPos = jQuery('.note-toolbar.card-header').offset();
 
         let marginLeft = event.target.offsetLeft;
         const height = this.validationPopover.height;
@@ -1203,7 +1180,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           }
         }
 
-        this.changeValidationPopoverLocation(marginLeft, (jQueryObj.offset().top - editor_pos.top - height));
+        this.changeValidationPopoverLocation(marginLeft, (jQueryObj.offset().top - editorPos.top - height));
       }
     } else {
       console.error(`errorcode is null!`);

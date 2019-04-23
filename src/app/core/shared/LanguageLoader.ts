@@ -9,8 +9,6 @@ export class LanguageLoader implements TranslateLoader {
 
   /**
    * Gets the translations from the server
-   * @param lang
-   * @returns {any}
    */
   public getTranslation(lang: string): any {
     return Functions.uniqueHTTPRequest(this.http, false, null, `${this.prefix}${lang}${this.suffix}`, null);

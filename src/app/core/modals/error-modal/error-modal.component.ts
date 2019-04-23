@@ -48,8 +48,8 @@ export class ErrorModalComponent implements OnInit {
     });
   }
 
-  public close(action: void) {
+  public close() {
     this.modalRef.hide();
-    this.actionperformed.next(action);
+    this.actionperformed.next();
   }
 }

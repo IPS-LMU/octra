@@ -16,6 +16,7 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import {TranslateService} from '@ngx-translate/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
+import {isNullOrUndefined} from '../../shared/Functions';
 
 @Component({
   selector: 'app-transcription-guidelines-modal',
@@ -29,7 +30,7 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
   modalRef: BsModalRef;
   public visible = false;
   @Input() guidelines = null;
-  public shown_guidelines: any = {};
+  public shownGuidelines: any = {};
   public collapsed: any[][] = [];
   config: ModalOptions = {
     keyboard: false,
@@ -40,7 +41,7 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
   protected data = null;
   private entries = 0;
   private counter = 0;
-  private video_players: any[] = [];
+  private videoPlayers: any[] = [];
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();
 
@@ -54,10 +55,11 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
 
   ngOnChanges($event) {
     if (!($event.guidelines.currentValue === null || $event.guidelines.currentValue === undefined)) {
-      this.shown_guidelines = JSON.parse(JSON.stringify($event.guidelines.currentValue));
+      this.shownGuidelines = JSON.parse(JSON.stringify($event.guidelines.currentValue));
       this.unCollapseAll();
     }
-    if (($event.guidelines.previousValue === null || $event.guidelines.previousValue === undefined) && !($event.guidelines.currentValue === null || $event.guidelines.currentValue === undefined)) {
+    if (($event.guidelines.previousValue === null || $event.guidelines.previousValue === undefined) &&
+      !($event.guidelines.currentValue === null || $event.guidelines.currentValue === undefined)) {
       setTimeout(() => {
         this.initVideoPlayers();
       }, 1000);
@@ -84,8 +86,8 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
   }
 
   videoplayerExists(player: string): number {
-    for (let i = 0; i < this.video_players.length; i++) {
-      if (this.video_players[i].id_ === player) {
+    for (let i = 0; i < this.videoPlayers.length; i++) {
+      if (this.videoPlayers[i].id_ === player) {
         return i;
       }
     }
@@ -96,22 +98,22 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
     for (let g = 0; g < this.guidelines.instructions.length; g++) {
       for (let i = 0; i < this.guidelines.instructions[g].entries.length; i++) {
         for (let e = 0; e < this.guidelines.instructions[g].entries[i].examples.length; e++) {
-          const id_v = 'my-player_g' + g + 'i' + i + 'e' + e;
-          if (document.getElementById(id_v)) {
+          const idV = 'my-player_g' + g + 'i' + i + 'e' + e;
+          if (document.getElementById(idV)) {
 
-            const old_player = this.videoplayerExists(id_v);
+            const oldPlayer = this.videoplayerExists(idV);
 
-            if (old_player > -1) {
+            if (oldPlayer > -1) {
               // videojs(document.getElementById(id_v)).dispose();
             } else {
-              const player = videojs(id_v, {
-                'fluid': true,
-                'autoplay': false,
-                'preload': 'auto'
+              const player = videojs(idV, {
+                fluid: true,
+                autoplay: false,
+                preload: 'auto'
               }, function onPlayerReady() {
               });
 
-              this.video_players.push(player);
+              this.videoPlayers.push(player);
             }
           }
         }
@@ -120,17 +122,19 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
   }
 
   public exportPDF() {
-    if (!(this.settService.projectsettings === null || this.settService.projectsettings === undefined)
-      && !(this.settService.projectsettings.plugins === null || this.settService.projectsettings.plugins === undefined)
-      && !(this.settService.projectsettings.plugins.pdfexport === null || this.settService.projectsettings.plugins.pdfexport === undefined)
-      && !(this.settService.projectsettings.plugins.pdfexport.url === null || this.settService.projectsettings.plugins.pdfexport.url === undefined)) {
+    if (
+      !isNullOrUndefined(this.settService.projectsettings)
+      && !isNullOrUndefined(this.settService.projectsettings.plugins)
+      && !isNullOrUndefined(this.settService.projectsettings.plugins.pdfexport)
+      && !isNullOrUndefined(this.settService.projectsettings.plugins.pdfexport.url)
+    ) {
       const form = jQuery('<form></form>')
         .attr('method', 'post')
         .attr('target', 'blank')
         .attr('action', this.settService.projectsettings.plugins.pdfexport.url)
         .appendTo('body');
 
-      const json_obj = {
+      const jsonObj = {
         translation: this.lang.instant('general'),
         guidelines: this.guidelines
       };
@@ -138,7 +142,7 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
       const json = jQuery('<input/>')
         .attr('name', 'json')
         .attr('type', 'text')
-        .attr('value', JSON.stringify(json_obj));
+        .attr('value', JSON.stringify(jsonObj));
       form.append(json);
       form.submit().remove();
     }
@@ -172,12 +176,12 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
 
   private search(text: string) {
     if (text !== '') {
-      this.shown_guidelines.instructions = [];
+      this.shownGuidelines.instructions = [];
 
       for (let i = 0; i < this.guidelines.instructions.length; i++) {
         const instruction = this.guidelines.instructions[i];
         if (instruction.group.indexOf(text) > -1) {
-          this.shown_guidelines.instructions.push(instruction);
+          this.shownGuidelines.instructions.push(instruction);
         } else {
           const instr = JSON.parse(JSON.stringify(instruction));
           instr.entries = [];
@@ -192,12 +196,12 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
           }
 
           if (instr.entries.length > 0) {
-            this.shown_guidelines.instructions.push(instr);
+            this.shownGuidelines.instructions.push(instr);
           }
         }
       }
     } else {
-      this.shown_guidelines = JSON.parse(JSON.stringify(this.guidelines));
+      this.shownGuidelines = JSON.parse(JSON.stringify(this.guidelines));
     }
   }
 

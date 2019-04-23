@@ -92,16 +92,16 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    jQuery(document).on('click', '.options-menu', function (e) {
+    jQuery(document).on('click', '.options-menu', (e) => {
       e.stopPropagation();
     });
 
     jQuery('body').bootstrapMaterialDesign();
   }
 
-  setInterface(new_interface: string) {
-    this.appStorage.Interface = new_interface;
-    this.navbarServ.interfacechange.emit(new_interface);
+  setInterface(newInterface: string) {
+    this.appStorage.Interface = newInterface;
+    this.navbarServ.interfacechange.emit(newInterface);
   }
 
   onNavBarLeave($event) {
@@ -176,9 +176,9 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onLevelAddClick() {
-    const level_nums = this.transcrServ.annotation.levels.length;
-    let levelname = `OCTRA_${level_nums + 1}`;
-    let index = level_nums;
+    const levelNums = this.transcrServ.annotation.levels.length;
+    let levelname = `OCTRA_${levelNums + 1}`;
+    let index = levelNums;
 
     const nameexists = (newname: string) => {
       for (let i = 0; i < this.transcrServ.annotation.levels.length; i++) {

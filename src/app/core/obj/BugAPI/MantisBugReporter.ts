@@ -9,7 +9,7 @@ export class MantisBugReporter extends BugReporter {
     this._name = 'MantisBT';
   }
 
-  public sendBugReport(http: HttpClient, pkg: any, form: any, url: string, auth_token: string, sendbugreport: boolean): Observable<any> {
+  public sendBugReport(http: HttpClient, pkg: any, form: any, url: string, authToken: string, sendbugreport: boolean): Observable<any> {
 
     const report = (sendbugreport) ? this.getText(pkg) : '';
 
@@ -25,7 +25,7 @@ export class MantisBugReporter extends BugReporter {
         id: 1
       },
       category: 'General',
-      summary: summary,
+      summary,
       description: form.description,
       additional_information: 'Email: ' + form.email,
       os: json.system.os.name,
@@ -35,29 +35,25 @@ export class MantisBugReporter extends BugReporter {
     };
 
     if (sendbugreport) {
-      body['additional_information'] += '\n\n' + report;
+      body.additional_information += '\n\n' + report;
     }
 
     return http.post(url, JSON.stringify(body), {
       headers: {
-        Authorization: auth_token
+        Authorization: authToken
       },
       responseType: 'json'
     });
   }
 
-  public getTest(http: HttpClient, url: string, auth_token: string) {
+  public getTest(http: HttpClient, url: string, authToken: string) {
     const requestOptions = {
-      params: {},
-      headers: new HttpHeaders()
-    };
-    requestOptions.params['id'] = '10';
-    requestOptions.headers.set('Authorization', auth_token);
-
-    const body = {
-      project: {
-        id: 1
-      }
+      params: {
+        id: '10'
+      },
+      headers: new HttpHeaders({
+        Authorization: authToken
+      })
     };
 
     return http.get(url, requestOptions);

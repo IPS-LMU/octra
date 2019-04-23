@@ -70,28 +70,27 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
   @ViewChild('loupe') loupe: LoupeComponent;
   @ViewChild('nav') nav: AudioNavigationComponent;
   @ViewChild('transcr') public editor: TranscrEditorComponent;
-  public miniloupe_hidden = true;
+  public miniLoupeHidden = true;
   public segmentselected = false;
-  public top_selected = false;
-  public loupe_settings: AudioviewerConfig;
-  public mini_loupecoord: any = {
+  public topSelected = false;
+  public loupeSettings: AudioviewerConfig;
+  public miniLoupeCoord: any = {
     component: 'viewer',
     x: 0,
     y: 0
   };
   public audiomanager: AudioManager;
-  public audiochunk_top: AudioChunk;
-  public audiochunk_down: AudioChunk;
-  public audiochunk_loupe: AudioChunk;
+  public audiochunkTop: AudioChunk;
+  public audiochunkDown: AudioChunk;
+  public audioChunkLoupe: AudioChunk;
   private subscrmanager: SubscriptionManager;
   private saving = false;
   private factor = 6;
   private mouseTimer = null;
   private platform = BrowserInfo.platform;
-  private selected_index: number;
+  private selectedIndex: number;
   /**
    * hits when user is typing something in the editor
-   * @param status
    */
   onEditorTyping = (status: string) => {
     this.viewer.focused = false;
@@ -106,9 +105,9 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
 
   ngOnInit() {
     this.audiomanager = this.audio.audiomanagers[0];
-    this.audiochunk_top = this.audiomanager.mainchunk.clone();
-    this.audiochunk_down = this.audiomanager.mainchunk.clone();
-    this.audiochunk_loupe = this.audiomanager.mainchunk.clone();
+    this.audiochunkTop = this.audiomanager.mainchunk.clone();
+    this.audiochunkDown = this.audiomanager.mainchunk.clone();
+    this.audioChunkLoupe = this.audiomanager.mainchunk.clone();
 
     this.viewer.Settings.shortcuts = this.keyMap.register('AV', this.viewer.Settings.shortcuts);
     this.viewer.Settings.multiLine = false;
@@ -118,16 +117,16 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
     this.viewer.Settings.justifySignalHeight = true;
     this.viewer.Settings.roundValues = false;
 
-    this.loupe_settings = new AudioviewerConfig();
-    this.loupe_settings.shortcuts = this.keyMap.register('Loupe', this.loupe_settings.shortcuts);
-    this.loupe_settings.shortcuts.play_pause.keys.mac = 'SHIFT + SPACE';
-    this.loupe_settings.shortcuts.play_pause.keys.pc = 'SHIFT + SPACE';
-    this.loupe_settings.shortcuts.play_pause.focusonly = false;
-    this.loupe_settings.shortcuts.step_backwardtime = null;
-    this.loupe_settings.shortcuts.step_backward.keys.mac = 'SHIFT + ENTER';
-    this.loupe_settings.shortcuts.step_backward.keys.pc = 'SHIFT + ENTER';
-    this.loupe_settings.justifySignalHeight = true;
-    this.loupe_settings.roundValues = false;
+    this.loupeSettings = new AudioviewerConfig();
+    this.loupeSettings.shortcuts = this.keyMap.register('Loupe', this.loupeSettings.shortcuts);
+    this.loupeSettings.shortcuts.play_pause.keys.mac = 'SHIFT + SPACE';
+    this.loupeSettings.shortcuts.play_pause.keys.pc = 'SHIFT + SPACE';
+    this.loupeSettings.shortcuts.play_pause.focusonly = false;
+    this.loupeSettings.shortcuts.step_backwardtime = null;
+    this.loupeSettings.shortcuts.step_backward.keys.mac = 'SHIFT + ENTER';
+    this.loupeSettings.shortcuts.step_backward.keys.pc = 'SHIFT + ENTER';
+    this.loupeSettings.justifySignalHeight = true;
+    this.loupeSettings.roundValues = false;
 
     this.editor.Settings.markers = this.transcrService.guidelines.markers;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
@@ -160,10 +159,10 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
               this.miniloupe.zoomY = Math.max(1, this.factor);
 
               if (this.viewer.focused) {
-                this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
+                this.changeArea(this.audioChunkLoupe, this.viewer, this.miniLoupeCoord,
                   this.viewer.MouseCursor.timePos.browserSample.value, this.viewer.MouseCursor.relPos.x, this.factor);
               } else if (!(this.loupe === null || this.loupe === undefined) && this.loupe.focused) {
-                this.changeArea(this.audiochunk_loupe, this.loupe.viewer, this.mini_loupecoord,
+                this.changeArea(this.audioChunkLoupe, this.loupe.viewer, this.miniLoupeCoord,
                   this.viewer.MouseCursor.timePos.browserSample.value, this.loupe.MouseCursor.relPos.x, this.factor);
               }
             } else if (event.key === '-') {
@@ -171,10 +170,10 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
                 this.factor = Math.max(1, this.factor - 1);
                 this.miniloupe.zoomY = Math.max(4, this.factor);
                 if (this.viewer.focused) {
-                  this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
+                  this.changeArea(this.audioChunkLoupe, this.viewer, this.miniLoupeCoord,
                     this.viewer.MouseCursor.timePos.browserSample.value, this.viewer.MouseCursor.relPos.x, this.factor);
                 } else if (!(this.loupe === null || this.loupe === undefined) && this.loupe.focused) {
-                  this.changeArea(this.audiochunk_loupe, this.loupe.viewer, this.mini_loupecoord,
+                  this.changeArea(this.audioChunkLoupe, this.loupe.viewer, this.miniLoupeCoord,
                     this.viewer.MouseCursor.timePos.browserSample.value, this.loupe.MouseCursor.relPos.x, this.factor);
                 }
               }
@@ -259,11 +258,11 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
       if (selection.length > 0) {
         selection.checkSelection();
         this.segmentselected = false;
-        this.audiochunk_down.destroy();
-        this.audiochunk_down = new AudioChunk(this.audiochunk_top.selection.clone(), this.audiomanager);
-        this.top_selected = true;
+        this.audiochunkDown.destroy();
+        this.audiochunkDown = new AudioChunk(this.audiochunkTop.selection.clone(), this.audiomanager);
+        this.topSelected = true;
       } else {
-        this.top_selected = false;
+        this.topSelected = false;
       }
     }
   }
@@ -282,40 +281,40 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
       window.clearTimeout(this.mouseTimer);
     }
 
-    this.mini_loupecoord.component = this.viewer;
+    this.miniLoupeCoord.component = this.viewer;
 
     if (!this.audiomanager.isPlaying && this.appStorage.playonhover) {
       // play audio
-      this.audiochunk_top.selection.start = this.viewer.av.Mousecursor.timePos.clone();
-      this.audiochunk_top.selection.end.browserSample.value = this.viewer.av.Mousecursor.timePos.browserSample.value +
+      this.audiochunkTop.selection.start = this.viewer.av.Mousecursor.timePos.clone();
+      this.audiochunkTop.selection.end.browserSample.value = this.viewer.av.Mousecursor.timePos.browserSample.value +
         this.audiomanager.ressource.info.samplerate / 10;
-      this.audiochunk_top.startPlayback(() => {
+      this.audiochunkTop.startPlayback(() => {
       }, true);
     }
 
     const a = this.viewer.getLocation();
-    this.mini_loupecoord.y = this.viewer.Settings.lineheight;
+    this.miniLoupeCoord.y = this.viewer.Settings.lineheight;
     if (this.appStorage.usemode === 'local' || this.appStorage.usemode === 'url') {
-      this.mini_loupecoord.y += 24;
+      this.miniLoupeCoord.y += 24;
     }
 
     this.mouseTimer = window.setTimeout(() => {
-      this.changeArea(this.audiochunk_loupe, this.viewer, this.mini_loupecoord,
+      this.changeArea(this.audioChunkLoupe, this.viewer, this.miniLoupeCoord,
         this.viewer.MouseCursor.timePos.browserSample.value, this.viewer.MouseCursor.relPos.x, this.factor);
     }, 20);
   }
 
   onSegmentEnter($event) {
     this.selectSegment($event.index).then((selection: AudioSelection) => {
-      this.top_selected = true;
-      this.audiochunk_down = new AudioChunk(selection, this.audiomanager);
+      this.topSelected = true;
+      this.audiochunkDown = new AudioChunk(selection, this.audiomanager);
     });
   }
 
   onLoupeSegmentEnter($event) {
     this.selectSegment($event.index).then((selection: AudioSelection) => {
-      this.audiochunk_down.selection = selection.clone();
-      this.audiochunk_down.playposition = <BrowserAudioTime>selection.start.clone();
+      this.audiochunkDown.selection = selection.clone();
+      this.audiochunkDown.playposition = selection.start.clone() as BrowserAudioTime;
       this.loupe.viewer.drawPlayCursor();
     });
   }
@@ -345,15 +344,15 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
           textlength: -1
         };
 
-        if (this.segmentselected && this.selected_index > -1) {
-          const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
-          segment.start = anno_segment.time.originalSample.value;
-          segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
-            ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.originalSample.value
-            - anno_segment.time.originalSample.value
-            : this.audiomanager.ressource.info.duration.originalSample.value - anno_segment.time.originalSample.value;
+        if (this.segmentselected && this.selectedIndex > -1) {
+          const annoSegment = this.transcrService.currentlevel.segments.get(this.selectedIndex);
+          segment.start = annoSegment.time.originalSample.value;
+          segment.length = (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
+            ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.originalSample.value
+            - annoSegment.time.originalSample.value
+            : this.audiomanager.ressource.info.duration.originalSample.value - annoSegment.time.originalSample.value;
 
-          segment.textlength = anno_segment.transcript.length;
+          segment.textlength = annoSegment.transcript.length;
         }
 
         this.uiService.addElementFromEvent('shortcut', $event, Date.now(), this.audiomanager.playposition, caretpos, control, segment);
@@ -364,20 +363,20 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
   }
 
   onLoupeClick(event) {
-    if (this.selected_index > -1) {
-      const end_samples = this.transcrService.currentlevel.segments.get(this.selected_index).time.browserSample.value;
-      let start_samples = 0;
-      if (this.selected_index > 0) {
-        start_samples = this.transcrService.currentlevel.segments.get(this.selected_index - 1).time.browserSample.value;
+    if (this.selectedIndex > -1) {
+      const endSamples = this.transcrService.currentlevel.segments.get(this.selectedIndex).time.browserSample.value;
+      let startSamples = 0;
+      if (this.selectedIndex > 0) {
+        startSamples = this.transcrService.currentlevel.segments.get(this.selectedIndex - 1).time.browserSample.value;
       }
-      if (this.loupe.viewer.MouseCursor.timePos.browserSample.value < start_samples
-        || this.loupe.viewer.MouseCursor.timePos.browserSample.value > end_samples) {
+      if (this.loupe.viewer.MouseCursor.timePos.browserSample.value < startSamples
+        || this.loupe.viewer.MouseCursor.timePos.browserSample.value > endSamples) {
         this.segmentselected = false;
       }
     }
   }
 
-  onMarkerInsert(marker_code: string) {
+  onMarkerInsert(markerCode: string) {
     if (this.appStorage.logging) {
       const segment = {
         start: -1,
@@ -385,23 +384,23 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
         textlength: -1
       };
 
-      if (this.segmentselected && this.selected_index > -1) {
-        const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
-        segment.start = anno_segment.time.originalSample.value;
-        segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
-          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.originalSample.value
-          - anno_segment.time.originalSample.value
-          : this.audiomanager.ressource.info.duration.originalSample.value - anno_segment.time.originalSample.value;
+      if (this.segmentselected && this.selectedIndex > -1) {
+        const annoSegment = this.transcrService.currentlevel.segments.get(this.selectedIndex);
+        segment.start = annoSegment.time.originalSample.value;
+        segment.length = (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
+          ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.originalSample.value
+          - annoSegment.time.originalSample.value
+          : this.audiomanager.ressource.info.duration.originalSample.value - annoSegment.time.originalSample.value;
 
-        segment.textlength = anno_segment.transcript.length;
+        segment.textlength = annoSegment.transcript.length;
       }
 
-      this.uiService.addElementFromEvent('shortcut', {value: marker_code}, Date.now(), this.audiomanager.playposition,
+      this.uiService.addElementFromEvent('shortcut', {value: markerCode}, Date.now(), this.audiomanager.playposition,
         this.editor.caretpos, 'texteditor_markers', segment);
     }
   }
 
-  onMarkerClick(marker_code: string) {
+  onMarkerClick(markerCode: string) {
     this.onTranscriptionChanged(null);
     if (this.appStorage.logging) {
       const segment = {
@@ -410,18 +409,18 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
         textlength: -1
       };
 
-      if (this.segmentselected && this.selected_index > -1) {
-        const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
-        segment.start = anno_segment.time.originalSample.value;
-        segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
-          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.originalSample.value
-          - anno_segment.time.originalSample.value
-          : this.audiomanager.ressource.info.duration.originalSample.value - anno_segment.time.originalSample.value;
+      if (this.segmentselected && this.selectedIndex > -1) {
+        const annoSegment = this.transcrService.currentlevel.segments.get(this.selectedIndex);
+        segment.start = annoSegment.time.originalSample.value;
+        segment.length = (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
+          ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.originalSample.value
+          - annoSegment.time.originalSample.value
+          : this.audiomanager.ressource.info.duration.originalSample.value - annoSegment.time.originalSample.value;
 
-        segment.textlength = anno_segment.transcript.length;
+        segment.textlength = annoSegment.transcript.length;
       }
 
-      this.uiService.addElementFromEvent('mouseclick', {value: marker_code}, Date.now(), this.audiomanager.playposition,
+      this.uiService.addElementFromEvent('mouseclick', {value: markerCode}, Date.now(), this.audiomanager.playposition,
         this.editor.caretpos, 'texteditor_toolbar', segment);
     }
   }
@@ -433,7 +432,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
   onSpeedChange(event: {
     old_value: number, new_value: number, timestamp: number
   }) {
-    this.audiochunk_top.speed = event.new_value;
+    this.audiochunkTop.speed = event.new_value;
   }
 
   afterSpeedChange(event: {
@@ -446,15 +445,15 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
         textlength: -1
       };
 
-      if (this.segmentselected && this.selected_index > -1) {
-        const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
-        segment.start = anno_segment.time.originalSample.value;
-        segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
-          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.originalSample.value
-          - anno_segment.time.originalSample.value
-          : this.audiomanager.ressource.info.duration.originalSample.value - anno_segment.time.originalSample.value;
+      if (this.segmentselected && this.selectedIndex > -1) {
+        const annoSegment = this.transcrService.currentlevel.segments.get(this.selectedIndex);
+        segment.start = annoSegment.time.originalSample.value;
+        segment.length = (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
+          ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.originalSample.value
+          - annoSegment.time.originalSample.value
+          : this.audiomanager.ressource.info.duration.originalSample.value - annoSegment.time.originalSample.value;
 
-        segment.textlength = anno_segment.transcript.length;
+        segment.textlength = annoSegment.transcript.length;
       }
 
       this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audiomanager.playposition,
@@ -465,7 +464,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
   onVolumeChange(event: {
     old_value: number, new_value: number, timestamp: number
   }) {
-    this.audiochunk_top.volume = event.new_value;
+    this.audiochunkTop.volume = event.new_value;
   }
 
   afterVolumeChange(event: {
@@ -478,15 +477,15 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
         textlength: -1
       };
 
-      if (this.segmentselected && this.selected_index > -1) {
-        const anno_segment = this.transcrService.currentlevel.segments.get(this.selected_index);
-        segment.start = anno_segment.time.originalSample.value;
-        segment.length = (this.selected_index < this.transcrService.currentlevel.segments.length - 1)
-          ? this.transcrService.currentlevel.segments.get(this.selected_index + 1).time.originalSample.value
-          - anno_segment.time.originalSample.value
-          : this.audiomanager.ressource.info.duration.originalSample.value - anno_segment.time.originalSample.value;
+      if (this.segmentselected && this.selectedIndex > -1) {
+        const annoSegment = this.transcrService.currentlevel.segments.get(this.selectedIndex);
+        segment.start = annoSegment.time.originalSample.value;
+        segment.length = (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
+          ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.originalSample.value
+          - annoSegment.time.originalSample.value
+          : this.audiomanager.ressource.info.duration.originalSample.value - annoSegment.time.originalSample.value;
 
-        segment.textlength = anno_segment.transcript.length;
+        segment.textlength = annoSegment.transcript.length;
       }
 
       this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audiomanager.playposition,
@@ -502,8 +501,8 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
     this.loupe.update();
     this.viewer.update();
     this.segmentselected = false;
-    this.audiochunk_top.startpos = <BrowserAudioTime>this.audiochunk_top.time.start;
-    this.audiochunk_down.startpos = <BrowserAudioTime>this.audiochunk_down.time.start;
+    this.audiochunkTop.startpos = this.audiochunkTop.time.start as BrowserAudioTime;
+    this.audiochunkDown.startpos = this.audiochunkDown.time.start as BrowserAudioTime;
   }
 
   private changeArea(audiochunk: AudioChunk, viewer: AudioviewerComponent, coord: any,
@@ -513,16 +512,16 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
 
     if (cursor && relX > -1) {
       coord.x = ((relX) ? relX - 80 : 0);
-      const half_rate = Math.round(range);
-      const start = (cursor > half_rate)
-        ? this.audiomanager.createBrowserAudioTime(cursor - half_rate)
+      const halfRate = Math.round(range);
+      const start = (cursor > halfRate)
+        ? this.audiomanager.createBrowserAudioTime(cursor - halfRate)
         : this.audiomanager.createBrowserAudioTime(0);
-      const end = (cursor < this.audiomanager.ressource.info.duration.browserSample.value - half_rate)
-        ? this.audiomanager.createBrowserAudioTime(cursor + half_rate)
+      const end = (cursor < this.audiomanager.ressource.info.duration.browserSample.value - halfRate)
+        ? this.audiomanager.createBrowserAudioTime(cursor + halfRate)
         : this.audiomanager.ressource.info.duration.clone();
 
-      this.audiochunk_loupe.destroy();
-      this.audiochunk_loupe = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
+      this.audioChunkLoupe.destroy();
+      this.audioChunkLoupe = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
     }
   }
 
@@ -531,11 +530,11 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
       (resolve) => {
         const segment = this.transcrService.currentlevel.segments.get(index);
         this.editor.rawText = segment.transcript;
-        this.selected_index = index;
+        this.selectedIndex = index;
         this.segmentselected = true;
         let start = this.audiomanager.createBrowserAudioTime(0);
         if (index > 0) {
-          start = <BrowserAudioTime>this.transcrService.currentlevel.segments.get(index - 1).time;
+          start = this.transcrService.currentlevel.segments.get(index - 1).time as BrowserAudioTime;
         }
         resolve(new AudioSelection(start, segment.time));
       }
@@ -544,13 +543,12 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
 
   private save() {
     if (this.segmentselected) {
-      if (this.selected_index > -1 && this.transcrService.currentlevel.segments &&
-        this.selected_index < this.transcrService.currentlevel.segments.length) {
-        const segment = this.transcrService.currentlevel.segments.get(this.selected_index).clone();
+      if (this.selectedIndex > -1 && this.transcrService.currentlevel.segments &&
+        this.selectedIndex < this.transcrService.currentlevel.segments.length) {
+        const segment = this.transcrService.currentlevel.segments.get(this.selectedIndex).clone();
         this.viewer.focused = false;
         this.loupe.viewer.focused = false;
         segment.transcript = this.editor.rawText;
-        const saved = this.transcrService.currentlevel.segments.change(this.selected_index, segment);
       }
     }
   }

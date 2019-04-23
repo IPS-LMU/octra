@@ -15,7 +15,7 @@ export class TsWorker {
   }
 
   constructor() {
-    this._id = TsWorker.WorkerID++;
+    this._id = TsWorker.workerID++;
     // creates an worker that runs a job
     this.blobURL = URL.createObjectURL(new Blob([
         this.getWorkerScript()
@@ -27,7 +27,7 @@ export class TsWorker {
     this.worker = new Worker(this.blobURL);
   }
 
-  private static WorkerID = 1;
+  private static workerID = 1;
   private readonly blobURL: string;
   private worker: Worker;
   private _queue: TsWorkerJob[] = [];
@@ -74,7 +74,6 @@ export class TsWorker {
 
   /**
    * converts a job to an JSON object
-   * @param job
    */
   private convertJobToObj(job: TsWorkerJob) {
     return {

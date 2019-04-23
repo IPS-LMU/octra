@@ -31,4 +31,5 @@ export interface ProjectSettings {
     'showOverviewIfTranscriptNotValid': boolean;
     theme: string
   };
+  guidelines: any
 }

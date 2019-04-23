@@ -30,8 +30,8 @@ export class HelpComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    this.navService.show_interfaces = false;
-    this.navService.show_export = false;
+    this.navService.showInterfaces = false;
+    this.navService.showExport = false;
   }
 
   ngOnChanges(obj) {

@@ -9,7 +9,7 @@ import {AppStorageService} from '../../shared/service';
 export class FastbarComponent implements OnInit {
 
   @Input() responsive = false;
-  @Input() button_labels: any = {
+  @Input() buttonLabels: any = {
     shortcuts: 'Shortcuts',
     guidelines: 'Guidlines',
     overview: 'Overview',

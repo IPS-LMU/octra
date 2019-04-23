@@ -18,7 +18,7 @@ export class TranscriptionSendingModalComponent implements OnInit {
   };
 
   @ViewChild('modal') modal: TemplateRef<any>;
-  @Input('sendError') send_error: string = '';
+  @Input() sendError = '';
 
   private actionperformed: Subject<void> = new Subject<void>();
 

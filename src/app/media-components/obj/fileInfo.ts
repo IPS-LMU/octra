@@ -5,7 +5,6 @@ import {HttpClient} from '@angular/common/http';
 export class FileInfo extends DataInfo {
   /**
    * returns if the file is ready for processing
-   * @returns {boolean}
    */
   get available(): boolean {
     return this.online || !(this._file === undefined || this._file === null);
@@ -15,7 +14,6 @@ export class FileInfo extends DataInfo {
 
   /**
    * extension including the dot. (this must contain a dot!)
-   * @returns {string}
    */
   get extension(): string {
     return this._extension;
@@ -93,16 +91,16 @@ export class FileInfo extends DataInfo {
   }
 
   public static escapeFileName(name: string) {
-    return name.replace(/[\s\/\?\!%\*\(\)\{}&:=\+#'<>\^;,Ââ°]/g, '_');
+    return name.replace(/[\s\/?!%*(){}&:=+#'<>^;,Ââ°]/g, '_');
   }
 
-  public static renameFile(file: File, new_name: string, attributes: any): Promise<File> {
+  public static renameFile(file: File, newName: string, attributes: any): Promise<File> {
     return new Promise<File>(
       (resolve, reject) => {
         const reader = new FileReader();
 
         reader.onload = (result: any) => {
-          resolve(new File([result.target.result], new_name, attributes));
+          resolve(new File([result.target.result], newName, attributes));
         };
         reader.onerror = (error) => {
           reject(error);
@@ -113,23 +111,23 @@ export class FileInfo extends DataInfo {
     );
   }
 
-  public static extractFileName(fullname: string): { name: string, extension: string } {
-    if (!(fullname === null || fullname === undefined) && fullname !== '') {
-      let lastslash;
-      if ((lastslash = fullname.lastIndexOf('/')) > -1) {
+  public static extractFileName(fullName: string): { name: string, extension: string } {
+    if (!(fullName === null || fullName === undefined) && fullName !== '') {
+      const lastslash = fullName.lastIndexOf('/');
+      if (lastslash > -1) {
         // if path remove all but the filename
-        fullname = fullname.substr(lastslash + 1);
+        fullName = fullName.substr(lastslash + 1);
       }
 
-      let extension_begin;
-      if ((extension_begin = fullname.lastIndexOf('.')) > -1) {
+      const extensionBegin = fullName.lastIndexOf('.');
+      if (extensionBegin > -1) {
         // split name and extension
-        const name = fullname.substr(0, extension_begin);
-        const extension = fullname.substr(extension_begin);
+        const name = fullName.substr(0, extensionBegin);
+        const extension = fullName.substr(extensionBegin);
 
         return {
-          name: name,
-          extension: extension
+          name,
+          extension
         };
       } else {
         throw new Error('invalid fullname. Fullname must contain the file extension');
@@ -140,7 +138,7 @@ export class FileInfo extends DataInfo {
   }
 
   public static fromAny(object): FileInfo {
-    let file = undefined;
+    let file;
     if (object.content !== undefined && object.content !== '') {
       file = this.getFileFromContent(object.content, object.fullname);
     }
@@ -155,17 +153,15 @@ export class FileInfo extends DataInfo {
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsText(file, encoding);
-      reader.onload = () => resolve(<string> reader.result);
+      reader.onload = () => resolve(reader.result as string);
       reader.onerror = error => reject(error);
     });
   }
 
   public static getFileFromContent(content: string, filename: string, type?: string): File {
-    let properties = {};
-
-    if (type !== undefined && type !== '') {
-      properties['type'] = type;
-    }
+    const properties = {
+      type: (type !== undefined && type !== '') ? type : undefined
+    };
 
     return new File([content], filename, properties);
   }
@@ -173,10 +169,11 @@ export class FileInfo extends DataInfo {
   public static getFileFromBase64(base64: string, filename: string) {
     // convert base64/URLEncoded data component to raw binary data held in a string
     let byteString;
-    if (base64.split(',')[0].indexOf('base64') >= 0)
+    if (base64.split(',')[0].indexOf('base64') >= 0) {
       byteString = atob(base64.split(',')[1]);
-    else
+    } else {
       byteString = unescape(base64.split(',')[1]);
+    }
 
     // separate out the mime component
     const mimeString = base64.split(',')[0].split(':')[1].split(';')[0];
@@ -238,7 +235,7 @@ export class FileInfo extends DataInfo {
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = () => resolve(<string> reader.result);
+      reader.onload = () => resolve(reader.result as string);
       reader.onerror = error => reject(error);
     });
   }

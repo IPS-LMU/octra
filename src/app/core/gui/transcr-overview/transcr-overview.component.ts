@@ -34,7 +34,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   public selectedError: any = '';
-  public shown_segments: {
+  public shownSegments: {
     transcription: {
       html: string,
       text: string
@@ -42,8 +42,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   }[] = [];
 
   @Input() segments: Segment[];
-  @Input() public show_transcriptiontable = true;
-  public show_loading = true;
+  @Input() public showTranscriptionTable = true;
+  public showLoading = true;
 
   @Output() segmentclicked: EventEmitter<number> = new EventEmitter<number>();
   @ViewChild('validationPopover') validationPopover: ValidationPopoverComponent;
@@ -121,13 +121,13 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   public get foundErrors(): number {
     let found = 0;
 
-    if (this.shown_segments.length > 0) {
-      let result_str = '';
-      for (let i = 0; i < this.shown_segments.length; i++) {
-        result_str += this.shown_segments[i].transcription.html;
+    if (this.shownSegments.length > 0) {
+      let resultStr = '';
+      for (let i = 0; i < this.shownSegments.length; i++) {
+        resultStr += this.shownSegments[i].transcription.html;
       }
 
-      found = (result_str.match(/<span class='val-error'/g) || []).length;
+      found = (resultStr.match(/<span class='val-error'/g) || []).length;
     }
 
     return found;
@@ -268,21 +268,21 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     this.playStateSegments = [];
     if (this.transcrService.validationArray.length > 0) {
       if (!this.segments || !this.transcrService.guidelines) {
-        this.shown_segments = [];
+        this.shownSegments = [];
       }
 
-      this.show_loading = true;
-      let start_time = 0;
+      this.showLoading = true;
+      let startTime = 0;
       const result = [];
 
       for (let i = 0; i < this.segments.length; i++) {
         const segment = this.segments[i];
 
-        const obj = this.getShownSegment(start_time, segment.time.browserSample.value, segment.transcript, i);
+        const obj = this.getShownSegment(startTime, segment.time.browserSample.value, segment.transcript, i);
 
         result.push(obj);
 
-        start_time = segment.time.browserSample.value;
+        startTime = segment.time.browserSample.value;
 
         // set playState
         this.playStateSegments.push({
@@ -291,8 +291,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
         });
       }
 
-      this.shown_segments = result;
-      this.show_loading = false;
+      this.shownSegments = result;
+      this.showLoading = false;
     }
   }
 
@@ -339,7 +339,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     if (nextSegment < this.segments.length && this.playAllState.state === 'started') {
       if (!this.playAllState.skipSilence ||
         (this.playAllState.skipSilence && segment.transcript !== ''
-          && segment.transcript.indexOf(this.transcrService.break_marker.code) < 0)
+          && segment.transcript.indexOf(this.transcrService.breakMarker.code) < 0)
       ) {
         this.playAllState.currentSegment = nextSegment;
         this.playSegement(nextSegment).then(() => {

@@ -7,13 +7,13 @@ import {Pipe, PipeTransform} from '@angular/core';
 export class TimespanPipe implements PipeTransform {
 
   private timespan = 0;
-  private FormatNumber = (num, length): string => {
+  private formatNumber = (num, length): string => {
     let result = '' + num.toFixed(0);
     while (result.length < length) {
       result = '0' + result;
     }
     return result;
-  };
+  }
 
   private get MiliSeconds(): number {
     return (this.timespan % 1000);
@@ -34,9 +34,9 @@ export class TimespanPipe implements PipeTransform {
     }
 
     let result = '';
-    const minutes: string = this.FormatNumber(this.Minutes, 2);
-    const seconds: string = this.FormatNumber(this.Seconds, 2);
-    const miliseconds: string = this.FormatNumber(this.MiliSeconds, 3);
+    const minutes: string = this.formatNumber(this.Minutes, 2);
+    const seconds: string = this.formatNumber(this.Seconds, 2);
+    const miliseconds: string = this.formatNumber(this.MiliSeconds, 3);
 
     result += minutes + ':' + seconds + ':' + miliseconds;
 

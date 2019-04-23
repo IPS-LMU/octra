@@ -1,34 +1,7 @@
 /***
  * Creates new Line Object for the canvas
- * @param number
- * @param size {width:w, height:h}
- * @param pos {x: x, y: y}
- * @constructor
  */
 export class Line {
-
-  public number = -1;
-  mouseIn = function (x, y) {
-    const result =
-      (x > this.pos.x && x < (this.pos.x + this.size.width)) &&
-      (y > this.pos.y && y < (this.pos.y + this.size.height));
-
-    return result;
-  };
-  private size = {
-    width: 0,
-    height: 0
-  };
-  private readonly pos = {
-    x: 0,
-    y: 0
-  };
-
-
-  /*
-   GETTER / SETTER
-   */
-  private isMouseIn = false;
 
   get Size(): any {
     return {
@@ -61,5 +34,28 @@ export class Line {
       x: pos.x,
       y: pos.y
     };
+  }
+
+  public number = -1;
+  private size = {
+    width: 0,
+    height: 0
+  };
+  private readonly pos = {
+    x: 0,
+    y: 0
+  };
+
+
+  /*
+   GETTER / SETTER
+   */
+  private isMouseIn = false;
+  mouseIn = (x, y) => {
+    const result =
+      (x > this.pos.x && x < (this.pos.x + this.size.width)) &&
+      (y > this.pos.y && y < (this.pos.y + this.size.height));
+
+    return result;
   }
 }

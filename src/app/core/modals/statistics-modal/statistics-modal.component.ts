@@ -18,7 +18,7 @@ export class StatisticsModalComponent implements OnInit {
   public visible = false;
   public bgemail = '';
   public bgdescr = '';
-  public sendpro_obj = true;
+  public sendProObj = true;
   public bugsent = false;
   config: ModalOptions = {
     keyboard: false,
@@ -39,7 +39,7 @@ export class StatisticsModalComponent implements OnInit {
   }
 
   public get isvalid(): boolean {
-    if (this.sendpro_obj || this.bgdescr !== '') {
+    if (this.sendProObj || this.bgdescr !== '') {
       return true;
     } else {
       return false;
@@ -60,9 +60,7 @@ export class StatisticsModalComponent implements OnInit {
   ngOnInit() {
   }
 
-  public open(data: {
-    text: string
-  }): Promise<void> {
+  public open(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.modal.show(this.modal, this.config);
       this.visible = true;

@@ -16,7 +16,7 @@ import {BrowserInfo} from '../../shared';
 export class ShortcutsModalComponent implements OnInit {
   modalRef: BsModalRef;
   public visible = false;
-  @Input() editor: string = '';
+  @Input() editor = '';
   public shortcuts = [];
   config: ModalOptions = {
     keyboard: false,
@@ -32,16 +32,15 @@ export class ShortcutsModalComponent implements OnInit {
     return BrowserInfo.platform;
   }
 
-  constructor(private modalService: BsModalService, private appStorage: AppStorageService, private bugService: BugReportService, private settService: SettingsService,
+  constructor(private modalService: BsModalService, private appStorage: AppStorageService,
+              private bugService: BugReportService, private settService: SettingsService,
               private keyMap: KeymappingService, private cd: ChangeDetectorRef) {
   }
 
   ngOnInit() {
   }
 
-  public open(data: {
-    text: string
-  }): Promise<void> {
+  public open(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.modal.show(this.modal, this.config);
       this.visible = true;

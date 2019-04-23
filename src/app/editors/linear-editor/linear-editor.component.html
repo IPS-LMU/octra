@@ -1,15 +1,15 @@
 <app-circleloupe *ngIf="appStorage.showLoupe" #miniloupe [ngStyle]="{
 'position':'absolute',
-'margin-left':mini_loupecoord.x + 'px',
-'margin-top':mini_loupecoord.y + 'px',
+'margin-left':miniLoupeCoord.x + 'px',
+'margin-top':miniLoupeCoord.y + 'px',
 'width' : '160px',
 'height': '160px',
 'display': 'flex',
 'z-index':'900',
-'visibility': (miniloupe_hidden) ? 'hidden' : 'inherit',
+'visibility': (miniLoupeHidden) ? 'hidden' : 'inherit',
 'flex': 'auto',
 'flex-direction': 'column'}"
-                 [audiochunk]="audiochunk_loupe" [height]="160">
+                 [audiochunk]="audioChunkLoupe" [height]="160">
 </app-circleloupe>
 <app-audio-navigation #nav
                       (buttonclick)="onButtonClick($event)"
@@ -19,7 +19,7 @@
                       (afterspeedchange)="afterSpeedChange($event)"
                       [isAudioPlaying]="audiomanager.isPlaying"
                       [responsive]="settingsService.responsive.enabled"
-                      [replay]="audiochunk_top.replay"
+                      [replay]="audiochunkTop.replay"
                       [buttons]="{
                         play: {
                             label: ('general.play' | translate),
@@ -55,44 +55,44 @@
                      (segmentchange)="onSegmentChange()"
                      (segmententer)="onSegmentEnter($event)"
                      (mousecursorchange)="onMouseOver($event)"
-                     (mouseenter)="miniloupe_hidden = false;"
-                     (mouseleave)="miniloupe_hidden = true;"
+                     (mouseenter)="miniLoupeHidden = false;"
+                     (mouseleave)="miniLoupeHidden = true;"
                      (mousedown)="onViewerMouseDown($event)"
                      (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_top')"
-                     [audiochunk]="audiochunk_top"
+                     [audiochunk]="audiochunkTop"
                      style="height:80px;"
     >
     </app-audioviewer>
 </div>
 
 <app-loupe #loupe
-           *ngIf="top_selected"
+           *ngIf="topSelected"
            [margin]="{
             top:2
            }"
            (segmententer)="onLoupeSegmentEnter($event)"
            (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_down')"
            (click)="onLoupeClick($event)"
-           [audiochunk]="audiochunk_down"
+           [audiochunk]="audiochunkDown"
            [height]="150"
-           [Settings]="loupe_settings"
+           [Settings]="loupeSettings"
            (alerttriggered)="onAlertTriggered($event)"
 >
 </app-loupe>
 <div *ngIf="!segmentselected" id="editor-placeholder">
-    <div *ngIf="!segmentselected && top_selected" class="inner"
+    <div *ngIf="!segmentselected && topSelected" class="inner"
          [innerHTML]="'signal-gui.segment enter text' | translate:{value: segmententer_shortc}">
     </div>
-    <div *ngIf="!top_selected" class="inner" [innerHTML]="'signal-gui.selection text' | translate">
+    <div *ngIf="!topSelected" class="inner" [innerHTML]="'signal-gui.selection text' | translate">
     </div>
 </div>
 <app-transcr-editor #transcr
-                    (marker_insert)="onMarkerInsert($event)"
-                    (marker_click)="onMarkerClick($event)"
+                    (markerInsert)="onMarkerInsert($event)"
+                    (markerClick)="onMarkerClick($event)"
                     (typing)="onEditorTyping($event)"
                     [ngStyle]="{display: (segmentselected) ? 'inherit': 'none'}"
                     [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
                     [easymode]="appStorage.easymode"
-                    [audiochunk]="audiochunk_down"
+                    [audiochunk]="audiochunkDown"
 >
 </app-transcr-editor>

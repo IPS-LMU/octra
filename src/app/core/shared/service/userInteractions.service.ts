@@ -53,11 +53,9 @@ export class UserInteractionsService {
 
   /**
    * Parse Events
-   * @param type
-   * @param event
    */
   public addElementFromEvent(type: string, event: any, timestamp: number, playerpos: BrowserAudioTime, caretpos: number,
-                             target_name?: string, segment?: {
+                             targetName?: string, segment?: {
       start: number,
       length: number,
       textlength: number
@@ -77,7 +75,7 @@ export class UserInteractionsService {
         };
       }
 
-      if (!target_name) {
+      if (!targetName) {
         if (event && event.target) {
           context = event.target;
           name = context.getAttribute('name');
@@ -90,7 +88,7 @@ export class UserInteractionsService {
           }
         }
       } else {
-        name = target_name;
+        name = targetName;
       }
       let elem = null;
       if (Functions.contains(type, 'key') || Functions.contains(type, 'shortcut')) {
@@ -114,7 +112,7 @@ export class UserInteractionsService {
       if (elem) {
         this._elements.push(elem);
         this._afteradd.emit(elem);
-        const new_elem = new OLog(
+        const newElem = new OLog(
           elem.timestamp,
           elem.type,
           elem.context,
@@ -124,11 +122,11 @@ export class UserInteractionsService {
         );
 
         if (elem instanceof MouseStatisticElem) {
-          new_elem.value = elem.value;
+          newElem.value = elem.value;
         } else if (elem instanceof KeyStatisticElem) {
-          new_elem.value = (<KeyStatisticElem>elem).value;
+          newElem.value = (elem as KeyStatisticElem).value;
         } else {
-          new_elem.value = (<StatisticElem>elem).value;
+          newElem.value = (elem as StatisticElem).value;
         }
 
       }
@@ -147,23 +145,23 @@ export class UserInteractionsService {
   public fromAnyArray(array: any[]) {
     for (let i = 0; i < array.length; i++) {
       const elem = array[i];
-      let new_elem = null;
+      let newElem = null;
 
-      if (new_elem) {
+      if (newElem) {
       } else {
-        new_elem = MouseStatisticElem.fromAny(elem);
-        if (new_elem) {
+        newElem = MouseStatisticElem.fromAny(elem);
+        if (newElem) {
         } else {
-          new_elem = StatisticElem.fromAny(elem);
-          if (new_elem) {
+          newElem = StatisticElem.fromAny(elem);
+          if (newElem) {
           }
 
         }
       }
 
-      if (new_elem) {
-        this.elements.push(new_elem);
-        new_elem = {};
+      if (newElem) {
+        this.elements.push(newElem);
+        newElem = {};
       }
     }
   }
@@ -172,14 +170,14 @@ export class UserInteractionsService {
     this._elements = [];
   }
 
-  private getElements(type_str: string): StatisticElem[] {
+  private getElements(typeStr: string): StatisticElem[] {
     const result: StatisticElem[] = [];
 
     let type: any;
 
-    if (type_str === 'key') {
+    if (typeStr === 'key') {
       type = KeyStatisticElem;
-    } else if (type_str === 'mouse') {
+    } else if (typeStr === 'mouse') {
       type = MouseStatisticElem;
     }
 

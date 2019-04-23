@@ -7,7 +7,6 @@
 }
 
 .ap-graphicscanvas,
-.ap-mousecanvas,
 .ap-playcanvas,
 .ap-overlaycanvas {
     position: absolute;
@@ -37,11 +36,6 @@
 
 #volume-slider {
     width: 100%;
-}
-
-.slider-descr {
-    text-align: center;
-    font-size: 0.7em;
 }
 
 .ap-time-start-display,

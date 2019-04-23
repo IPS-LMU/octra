@@ -165,7 +165,7 @@ export class OriginalAudioTime {
     original: null
   };
 
-  private _originalSample: OriginalSample;
+  private readonly _originalSample: OriginalSample;
 
   constructor(originalSample: OriginalSample,
               private browserSampleRate: number) {
@@ -180,9 +180,6 @@ export class OriginalAudioTime {
 
   /**
    * converts seconds given sample_rate to Audiotime
-   * @param seconds
-   * @param sample_rate
-   * @returns {AudioTime}
    */
   public static fromSeconds(seconds: number, originalSampleRate: number, browserSampleRate: number): OriginalAudioTime {
     const originalSample = new OriginalSample(seconds * originalSampleRate, originalSampleRate);
@@ -191,9 +188,6 @@ export class OriginalAudioTime {
 
   /**
    * converts miliseconds given sample_rate to Audiotime
-   * @param seconds
-   * @param sample_rate
-   * @returns {AudioTime}
    */
   public static fromMiliSeconds(miliseconds: number, browserSampleRate: number, originalSampleRate: number): OriginalAudioTime {
     const originalSample = new OriginalSample(miliseconds / 1000 * originalSampleRate, originalSampleRate);
@@ -202,9 +196,6 @@ export class OriginalAudioTime {
 
   /**
    * sums two Audiotimes with the same sample rate and returns the result as new AudioTime.
-   * @param time1
-   * @param time2
-   * @returns {AudioTime}
    */
   public static add(time1: OriginalAudioTime, time2: OriginalAudioTime): OriginalAudioTime {
     if (time1._sampleRates.original === time2._sampleRates.original
@@ -218,9 +209,6 @@ export class OriginalAudioTime {
 
   /**
    * subs two AudioTimes with the same sample_rate and returns the result as new AudioTime
-   * @param time1
-   * @param time2
-   * @returns {AudioTime}
    */
   public static sub(time1: OriginalAudioTime, time2: OriginalAudioTime): OriginalAudioTime {
     if (time1._sampleRates.original === time2._sampleRates.original
@@ -288,7 +276,7 @@ export class BrowserAudioTime {
     original: null
   };
 
-  private _browserSample: BrowserSample;
+  private readonly _browserSample: BrowserSample;
 
   constructor(browserSample: BrowserSample,
               private originalSampleRate: number) {
@@ -303,9 +291,6 @@ export class BrowserAudioTime {
 
   /**
    * converts seconds given sample_rate to Audiotime
-   * @param seconds
-   * @param sample_rate
-   * @returns {BrowserAudioTime}
    */
   public static fromSeconds(seconds: number, browserSampleRate: number, originalSampleRate: number): BrowserAudioTime {
     const browserSample = new BrowserSample(seconds * browserSampleRate, browserSampleRate);
@@ -314,9 +299,6 @@ export class BrowserAudioTime {
 
   /**
    * converts miliseconds given sample_rate to Audiotime
-   * @param seconds
-   * @param sample_rate
-   * @returns {BrowserAudioTime}
    */
   public static fromMiliSeconds(miliseconds: number, browserSampleRate: number, originalSampleRate: number): BrowserAudioTime {
     const browserSample = new BrowserSample(miliseconds / 1000 * browserSampleRate, browserSampleRate);
@@ -325,9 +307,6 @@ export class BrowserAudioTime {
 
   /**
    * sums two Audiotimes with the same sample rate and returns the result as new BrowserAudioTime.
-   * @param time1
-   * @param time2
-   * @returns {BrowserAudioTime}
    */
   public static add(time1: BrowserAudioTime, time2: BrowserAudioTime): BrowserAudioTime {
     if (time1._sampleRates.original === time2._sampleRates.original
@@ -341,9 +320,6 @@ export class BrowserAudioTime {
 
   /**
    * subs two AudioTimes with the same sample_rate and returns the result as new BrowserAudioTime
-   * @param time1
-   * @param time2
-   * @returns {BrowserAudioTime}
    */
   public static sub(time1: BrowserAudioTime, time2: BrowserAudioTime): BrowserAudioTime {
     if (time1._sampleRates.original === time2._sampleRates.original

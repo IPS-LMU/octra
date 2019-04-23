@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../Annotation/AnnotJSON';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../Annotation';
 import {Functions} from '../../shared/Functions';
 
 export class CTMConverter extends Converter {

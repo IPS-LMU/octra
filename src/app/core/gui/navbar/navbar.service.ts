@@ -1,6 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {TranscriptionService} from '../../shared/service/transcription.service';
-import {UserInteractionsService} from '../../shared/service/userInteractions.service';
+import {TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AudioInfo} from '../../../media-components/obj/media/audio';
 import {FileSize} from '../../shared/Functions';
 

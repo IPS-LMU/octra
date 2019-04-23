@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 import {AudioviewerComponent, AudioviewerConfig, AudioviewerService} from '../audioviewer';
 import {AudioChunk} from '../../../obj/media/audio';
-import {AVMousePos} from '../../../obj/AVMousePos';
+import {AVMousePos} from '../../../obj';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
 
 declare var window: any;
@@ -73,8 +73,8 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
   }
 
   @Input()
-  set Settings(new_settings: AudioviewerConfig) {
-    this.viewer.Settings = new_settings;
+  set Settings(newSettings: AudioviewerConfig) {
+    this.viewer.Settings = newSettings;
   }
 
   constructor() {
@@ -94,11 +94,11 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
 
   ngOnInit() {
     if (!(this.height === null || this.height === undefined)) {
-      this.viewer.Settings.multi_line = false;
+      this.viewer.Settings.multiLine = false;
       this.viewer.Settings.lineheight = this.height;
-      this.viewer.Settings.justify_signal_height = true;
+      this.viewer.Settings.justifySignalHeight = true;
       this.viewer.Settings.boundaries.enabled = true;
-      this.viewer.Settings.disabled_keys = [];
+      this.viewer.Settings.disabledKeys = [];
       this.viewer.Settings.type = 'line';
     } else {
       throw new Error('you have to set [height] to the loupe component');

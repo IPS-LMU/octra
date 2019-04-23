@@ -60,13 +60,13 @@ export class OAnnotJSON implements IAnnotJSON {
   levels: OLevel[] = [];
   links: OLink[] = [];
 
-  constructor(audio_file: string, samplerate: number, levels?: ILevel[], links?: ILink[]) {
-    this.annotates = audio_file;
-    this.name = audio_file;
+  constructor(audioFile: string, samplerate: number, levels?: ILevel[], links?: ILink[]) {
+    this.annotates = audioFile;
+    this.name = audioFile;
     this.sampleRate = samplerate;
 
-    if (audio_file.lastIndexOf('.') > -1) {
-      this.name = audio_file.substr(0, audio_file.lastIndexOf('.'));
+    if (audioFile.lastIndexOf('.') > -1) {
+      this.name = audioFile.substr(0, audioFile.lastIndexOf('.'));
     }
 
     if (!(levels === null || levels === undefined)) {

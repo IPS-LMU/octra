@@ -3,8 +3,6 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {SubscriptionManager} from '../';
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
 import {Subscription} from 'rxjs/Subscription';
-import {AppStorageService} from './appstorage.service';
-import {AudioService} from './audio.service';
 import {Functions, isNullOrUndefined} from '../Functions';
 import {Observable} from 'rxjs/Observable';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
@@ -13,6 +11,8 @@ import {APIService} from './api.service';
 import {TranslateService} from '@ngx-translate/core';
 import {UpdateManager} from '../UpdateManager';
 import {ActivatedRoute} from '@angular/router';
+import {AppStorageService} from './appstorage.service';
+import {AudioService} from './audio.service';
 
 @Injectable()
 export class SettingsService {
@@ -166,10 +166,10 @@ export class SettingsService {
         ? appRoute.snapshot.queryParams.transcript : null;
       const embedded = appRoute.snapshot.queryParams.embedded;
 
-      this.appStorage.url_params.audio = audioURL;
-      this.appStorage.url_params.transcript = transcriptURL;
-      this.appStorage.url_params.embedded = (embedded === '1');
-      this.appStorage.url_params.host = appRoute.snapshot.queryParams.host;
+      this.appStorage.urlParams.audio = audioURL;
+      this.appStorage.urlParams.transcript = transcriptURL;
+      this.appStorage.urlParams.embedded = (embedded === '1');
+      this.appStorage.urlParams.host = appRoute.snapshot.queryParams.host;
 
       // load from indexedDB
       this.appStorage.load(idb).then(
@@ -235,7 +235,7 @@ export class SettingsService {
     return new Promise<void>((resolve, reject) => {
       this.loadSettings(
         {
-          loading: 'Load project Settings...'
+          loading: 'Load project settings...'
         },
         {
           json: './config/localmode/projectconfig.json',
@@ -326,15 +326,15 @@ export class SettingsService {
     }
     if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
       // online
-      if (!(this.appStorage.audio_url === null || this.appStorage.audio_url === undefined)) {
+      if (!(this.appStorage.audioURL === null || this.appStorage.audioURL === undefined)) {
         let src = '';
         if (this.appStorage.usemode === 'online') {
-          src = this.appSettings.audio_server.url + this.appStorage.audio_url;
+          src = this.appSettings.audio_server.url + this.appStorage.audioURL;
         } else {
-          src = this.appStorage.audio_url;
+          src = this.appStorage.audioURL;
         }
         // extract filename
-        this._filename = this.appStorage.audio_url.substr(this.appStorage.audio_url.lastIndexOf('/') + 1);
+        this._filename = this.appStorage.audioURL.substr(this.appStorage.audioURL.lastIndexOf('/') + 1);
         this._filename = this._filename.substr(0, this._filename.lastIndexOf('.'));
         if (this._filename.indexOf('src=') > -1) {
           this._filename = this._filename.substr(this._filename.indexOf('src=') + 4);
@@ -399,7 +399,7 @@ export class SettingsService {
           this.validation.app = true;
 
           this.appsettingsloaded.emit(true);
-          // App Settings loaded
+          // App settings loaded
 
           // settings finally loaded
           resolve();

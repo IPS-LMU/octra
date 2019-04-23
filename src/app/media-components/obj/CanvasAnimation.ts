@@ -1,7 +1,7 @@
 declare var window: any;
 
 export class CanvasAnimation {
-  private requestAnimationFrame: any;
+  private readonly requestAnimationFrame: any;
 
   constructor(private interval: number) {
     this.requestAnimationFrame = window.requestAnimationFrame ||

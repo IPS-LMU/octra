@@ -15,7 +15,7 @@ export class AudioDecoder {
   }>();
 
   private audioInfo: AudioInfo;
-  private format: AudioFormat;
+  private readonly format: AudioFormat;
   private audioBuffer: AudioBuffer;
   private audioContext: AudioContext;
   private arrayBuffer: ArrayBuffer;
@@ -67,10 +67,13 @@ export class AudioDecoder {
             sampleDur: partSamples
           }).then((dataPart: ArrayBuffer) => {
             this.decodeAudioFile(dataPart).then((audioBuffer: AudioBuffer) => {
-              // console.log(`decoded part duration: ${audioBuffer.duration} (diff: ${audioBuffer.duration - partSamples.seconds}) (browser samplerate = ${this.audioInfo.duration.sampleRates.browser}`);
+              // console.log(`decoded part duration: ${audioBuffer.duration} (diff: ${audioBuffer.duration - partSamples.seconds})
+              // (browser samplerate = ${this.audioInfo.duration.sampleRates.browser}`);
 
               if (audioBuffer.duration - partSamples.seconds !== 0) {
-                console.error(`diff of audio durations is ${audioBuffer.duration - partSamples.seconds} = ${(partSamples.seconds - audioBuffer.duration) * partSamples.sampleRate} samples! (sample rate = ${partSamples.sampleRate})`);
+                console.error(`diff of audio durations is ${audioBuffer.duration - partSamples.seconds} = `
+                  + `${(partSamples.seconds - audioBuffer.duration) * partSamples.sampleRate} samples! ` +
+                  `(sample rate = ${partSamples.sampleRate})`);
               }
 
               if (!(this.audioBuffer === null || this.audioBuffer === undefined)) {

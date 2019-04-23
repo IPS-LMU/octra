@@ -112,17 +112,17 @@ export class LoadingComponent implements OnInit, OnDestroy {
         (result) => {
           if (result.status === 'success') {
             new Promise<void>((resolve, reject) => {
-              if (this.appStorage.usemode === 'url' && this.appStorage.url_params['transcript'] !== null) {
+              if (this.appStorage.usemode === 'url' && this.appStorage.urlParams['transcript'] !== null) {
                 this.transcrService.defaultFontSize = 16;
 
                 // load transcript file via URL
-                this.http.get(this.appStorage.url_params['transcript'], {
+                this.http.get(this.appStorage.urlParams['transcript'], {
                   responseType: 'text'
                 }).subscribe(
                   (res) => {
 
                     this.state = 'Import transcript...';
-                    let filename = this.appStorage.url_params['transcript'];
+                    let filename = this.appStorage.urlParams['transcript'];
                     filename = filename.substr(filename.lastIndexOf('/') + 1);
 
                     const file: IFile = {
@@ -266,8 +266,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
       }
     }).then(() => {
 
-      if (this.appStorage.url_params.hasOwnProperty('audio') && this.appStorage.url_params['audio'] !== ''
-        && !(this.appStorage.url_params['audio'] === null || this.appStorage.url_params['audio'] === undefined)) {
+      if (this.appStorage.urlParams.hasOwnProperty('audio') && this.appStorage.urlParams['audio'] !== ''
+        && !(this.appStorage.urlParams['audio'] === null || this.appStorage.urlParams['audio'] === undefined)) {
         this.appStorage.usemode = 'url';
         this.appStorage.LoggedIn = false;
       } else if (this.appStorage.usemode === 'url') {
@@ -293,7 +293,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
           if (this.appStorage.usemode === 'url') {
             this.state = 'Get transcript from URL...';
             // set audio url from url params
-            this.appStorage.audio_url = decodeURI(this.appStorage.url_params['audio']);
+            this.appStorage.audioURL = decodeURI(this.appStorage.urlParams['audio']);
           }
         }
         this.settService.loadAudioFile(this.audio);

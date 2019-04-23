@@ -1,8 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {UserInteractionsService} from '../../shared/service/userInteractions.service';
-import {TranscriptionService} from '../../shared/service/transcription.service';
+import {SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {Router} from '@angular/router';
-import {SettingsService} from '../../shared/service/settings.service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 
 @Component({

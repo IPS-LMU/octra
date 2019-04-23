@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 
-import {MessageService} from '../../shared/service/message.service';
-import {OCTRANIMATIONS} from '../../shared/OCTRAnimations';
+import {MessageService} from '../../shared/service';
+import {OCTRANIMATIONS} from '../../shared';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 
 @Component({
@@ -13,7 +13,17 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
 })
 export class AlertComponent implements OnInit, OnDestroy {
 
+  constructor(private cd: ChangeDetectorRef,
+              private msgService: MessageService) {
+    this.subscrmanager = new SubscriptionManager();
+  }
+
   public type = 'error';
+  private state = 'inactive';
+  private text = '';
+  private show = false;
+  private subscrmanager: SubscriptionManager;
+
   /**
    * show alert on the right top corner of the screen.
    * @param type "log", "error" or "info"
@@ -30,15 +40,6 @@ export class AlertComponent implements OnInit, OnDestroy {
       this.state = 'inactive';
       this.cd.markForCheck();
     }, 3000);
-  };
-  private state = 'inactive';
-  private text = '';
-  private show = false;
-  private subscrmanager: SubscriptionManager;
-
-  constructor(private cd: ChangeDetectorRef,
-              private msgService: MessageService) {
-    this.subscrmanager = new SubscriptionManager();
   }
 
   ngOnInit() {

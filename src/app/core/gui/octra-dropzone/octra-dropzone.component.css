@@ -31,10 +31,6 @@
     cursor: pointer;
 }
 
-.delete-icon {
-    z-index: 1000;
-}
-
 .dropzone-table tbody td {
 }
 

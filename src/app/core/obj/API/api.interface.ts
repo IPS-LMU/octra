@@ -12,7 +12,7 @@ export interface API {
               project: string,
               annotator: string,
               jobno: number,
-              data_id: number,
+              dataID: number,
               status: string,
               comment: string,
               quality: any,
@@ -22,13 +22,13 @@ export interface API {
               project: string,
               annotator: string,
               jobno: number,
-              data_id: number,
+              dataID: number,
               comment: string,
               quality: any,
               log: any[]): Promise<any>;
 
   unlockSession(project: string,
-                data_id: number): Promise<any>;
+                dataID: number): Promise<any>;
 
   closeSession(annotator: string, id: number, comment: string): Promise<any>;
 

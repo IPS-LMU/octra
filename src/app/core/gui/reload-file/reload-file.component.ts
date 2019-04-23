@@ -1,13 +1,11 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {AppStorageService, OIDBLevel, OIDBLink} from '../../shared/service/appstorage.service';
+import {AppStorageService, AudioService, OIDBLevel, OIDBLink, TranscriptionService} from '../../shared/service';
 import {SessionFile} from '../../obj/SessionFile';
 import {FileSize, Functions} from '../../shared/Functions';
 import {Router} from '@angular/router';
-import {TranscriptionService} from '../../shared/service/transcription.service';
 import {ModalService} from '../../modals/modal.service';
 import {TranslateService} from '@ngx-translate/core';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
-import {AudioService} from '../../shared/service/audio.service';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 import {AppInfo} from '../../../app.info';
 
@@ -29,6 +27,7 @@ export class ReloadFileComponent implements OnInit {
               public langService: TranslateService,
               private audioService: AudioService) {
   }
+
   @ViewChild('dropzone') dropzone: OctraDropzoneComponent;
   private error = '';
   abortTranscription = () => {

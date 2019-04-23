@@ -19,7 +19,7 @@ export class Line {
     width: 0,
     height: 0
   };
-  private pos = {
+  private readonly pos = {
     x: 0,
     y: 0
   };

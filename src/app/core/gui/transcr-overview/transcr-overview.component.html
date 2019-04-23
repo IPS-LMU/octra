@@ -17,9 +17,9 @@
     </tr>
     </tbody>
 </table>
-<p [hidden]="shown_segments.length == 0" style="text-align: center">
+<p [hidden]="shown_segments.length === 0" style="text-align: center">
     <ng-container *ngIf="validationFound">
-        <span *ngIf="foundErrors == 0"
+        <span *ngIf="foundErrors === 0"
               class="text-success found-errors">{{"general.no errors found" | translate}}</span>
         <span *ngIf="foundErrors > 0"
               class="text-danger found-errors">{{"general.errors found" | translate : {errors: foundErrors} }}</span>
@@ -56,7 +56,7 @@
     <tbody>
     <tr *ngFor="let segment of shown_segments; let i = index"
         class="segment-row"
-        [ngClass]="{'alert-success': (segment.transcription.text != '' && segment.transcription.text != transcrService.break_marker.code), 'alert-info': (segment.transcription.text == transcrService.break_marker.code), 'alert-danger': (segment.transcription.text == '')}">
+        [ngClass]="{'alert-success': (segment.transcription.text !== '' && segment.transcription.text != transcrService.break_marker.code), 'alert-info': (segment.transcription.text == transcrService.break_marker.code), 'alert-danger': (segment.transcription.text === '')}">
         <td style="width:25px;vertical-align:middle;">
             <fa-icon [icon]="['fas', 'exclamation-triangle']" class="segment-warning" [ngStyle]="{
                   'display': ((segment.transcription.html.indexOf('<span class=\'val-error\'') > -1) ? 'normal': 'none')}">

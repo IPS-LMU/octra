@@ -32,7 +32,7 @@ import {BrowserInfo, SubscriptionManager} from '../../shared';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 import {ProjectSettings} from '../../obj/Settings';
-import {EditorComponents} from '../../../editors/components';
+import {editorComponents} from '../../../editors/components';
 import {Level} from '../../obj/Annotation';
 import {PlayBackState} from '../../../media-components/obj/media';
 import {HttpClient} from '@angular/common/http';
@@ -348,7 +348,7 @@ export class TranscriptionComponent implements OnInit,
 
     this.bugService.init(this.transcrService);
     if (this.appStorage.usemode === 'online') {
-      console.log(`opened job ${this.appStorage.data_id} in project ${this.appStorage.user.project}`);
+      console.log(`opened job ${this.appStorage.dataID} in project ${this.appStorage.user.project}`);
     }
   }
 
@@ -405,13 +405,13 @@ export class TranscriptionComponent implements OnInit,
 
     if ((name === null || name === undefined) || name === '') {
       // fallback to last editor
-      name = EditorComponents[EditorComponents.length - 1].name;
+      name = editorComponents[editorComponents.length - 1].name;
     }
-    for (let i = 0; i < EditorComponents.length; i++) {
-      if (name === EditorComponents[i].name) {
+    for (let i = 0; i < editorComponents.length; i++) {
+      if (name === editorComponents[i].name) {
         this.appStorage.Interface = name;
         this.interface = name;
-        comp = EditorComponents[i].editor;
+        comp = editorComponents[i].editor;
         break;
       }
     }
@@ -540,14 +540,14 @@ export class TranscriptionComponent implements OnInit,
     if (!(json === null || json === undefined)) {
       if (json.data && json.data.hasOwnProperty('url') && json.data.hasOwnProperty('id')) {
         // transcription available
-        this.appStorage.audio_url = json.data.url;
-        this.appStorage.data_id = json.data.id;
+        this.appStorage.audioURL = json.data.url;
+        this.appStorage.dataID = json.data.id;
         console.log(`next job: ${json.data.id}`);
         console.log(`next url: ${json.data.url}`);
 
         // change number of remaining jobs
         if (json.hasOwnProperty('message')) {
-          this.appStorage.jobs_left = Number(json.message);
+          this.appStorage.jobsLeft = Number(json.message);
         }
 
         // get transcript data that already exists
@@ -592,7 +592,7 @@ export class TranscriptionComponent implements OnInit,
         }
 
         if (json.hasOwnProperty('message') && typeof (json.message) === 'number') {
-          this.appStorage.jobs_left = Number(json.message);
+          this.appStorage.jobsLeft = Number(json.message);
         }
 
         Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling);
@@ -607,7 +607,7 @@ export class TranscriptionComponent implements OnInit,
 
   closeTranscriptionAndGetNew() {
     // close current session
-    this.api.closeSession(this.appStorage.user.id, this.appStorage.data_id, this.appStorage.servercomment).then(() => {
+    this.api.closeSession(this.appStorage.user.id, this.appStorage.dataID, this.appStorage.servercomment).then(() => {
       // begin new session
       this.api.beginSession(this.appStorage.user.project, this.appStorage.user.id, this.appStorage.user.jobno).then((json) => {
         // new session
@@ -644,8 +644,8 @@ export class TranscriptionComponent implements OnInit,
     const form: FormData = new FormData();
     let host = 'https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/';
 
-    if (!(this.appStorage.url_params['host'] === null || this.appStorage.url_params['host'] === undefined)) {
-      host = this.appStorage.url_params['host'];
+    if (!(this.appStorage.urlParams['host'] === null || this.appStorage.urlParams['host'] === undefined)) {
+      host = this.appStorage.urlParams['host'];
     }
 
     const url = `${host}uploadFileMulti`;

@@ -1,5 +1,5 @@
 export class ControlType {
-  private _type: string;
+  private readonly _type: string;
 
   get type(): string {
     return this._type;

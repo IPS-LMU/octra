@@ -4,7 +4,7 @@ import {TranslateService} from '@ngx-translate/core';
 
 import {BrowserAudioTime, BrowserInfo, BrowserSample, KeyMapping, SubscriptionManager} from '../../shared';
 import {TranscriptionService} from '../../shared/service';
-import {Segments} from '../../obj/Annotation/Segments';
+import {Segments} from '../../obj/Annotation';
 import {AudioChunk} from '../../../media-components/obj/media/audio';
 import {isNumeric} from 'rxjs/util/isNumeric';
 import {TimespanPipe} from '../../../media-components/pipe';
@@ -876,12 +876,12 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * @returns {boolean}
    */
   public addDisableKey(comboKey: string): boolean {
-    for (let i = 0; i < this.Settings.disabled_keys.length; i++) {
-      if (this.Settings.disabled_keys[i] === comboKey) {
+    for (let i = 0; i < this.Settings.disabledKeys.length; i++) {
+      if (this.Settings.disabledKeys[i] === comboKey) {
         return false;
       }
     }
-    this.Settings.disabled_keys.push(comboKey);
+    this.Settings.disabledKeys.push(comboKey);
     return true;
   }
 
@@ -892,13 +892,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    */
   public removeDisableKey(comboKey: string): boolean {
     let j = -1;
-    for (let i = 0; i < this.Settings.disabled_keys.length; i++) {
-      if (this.Settings.disabled_keys[i] === comboKey) {
+    for (let i = 0; i < this.Settings.disabledKeys.length; i++) {
+      if (this.Settings.disabledKeys[i] === comboKey) {
         j = i;
         return true;
       }
     }
-    this.Settings.disabled_keys.splice(j, 1);
+    this.Settings.disabledKeys.splice(j, 1);
 
     return (j > -1);
   }
@@ -1025,8 +1025,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * @returns {boolean}
    */
   private isDisabledKey(comboKey: string): boolean {
-    for (let i = 0; i < this.Settings.disabled_keys.length; i++) {
-      if (this.Settings.disabled_keys[i] === comboKey) {
+    for (let i = 0; i < this.Settings.disabledKeys.length; i++) {
+      if (this.Settings.disabledKeys[i] === comboKey) {
         return true;
       }
     }

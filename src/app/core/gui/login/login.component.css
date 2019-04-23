@@ -11,24 +11,13 @@ h4 {
     background-color: white;
 }
 
-.login-id-label,
-.login-pw-label {
-    font-size: 1em;
-}
-
-#login-pw,
-#login-id {
-    font-size: 1.3em;
-    width: 100%;
-    padding: 5px;
-}
-
 .login-submit,
 #offline-submit,
 .offline-delete-btn {
     width: 100%;
 }
 
+/*noinspection ALL*/
 .ng-touched .ng-invalid {
     border-bottom: 2px solid red;
 }

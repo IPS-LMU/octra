@@ -35,7 +35,7 @@ export class AudioService {
    * audio data; for longer data, a MediaElementAudioSourceNode should be used.
    */
   public loadAudio = (url: string, callback: any = () => {
-  }, errorcallback: (err: any) => void = () => {
+  }, errorCallback: (err: any) => void = () => {
   }) => {
     this._loaded = false;
 
@@ -67,7 +67,7 @@ export class AudioService {
           }));
       },
       error => {
-        errorcallback(error);
+        errorCallback(error);
       }
     );
   }

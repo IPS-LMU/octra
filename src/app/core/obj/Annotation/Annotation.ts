@@ -4,7 +4,7 @@ import {Link} from './Link';
 import {BrowserAudioTime, OriginalAudioTime} from '../../../media-components/obj/media/audio';
 
 export class Annotation {
-  private _annotates: string;
+  private readonly _annotates: string;
 
   get annotates(): string {
     return this._annotates;
@@ -20,7 +20,7 @@ export class Annotation {
     this._audiofile = value;
   }
 
-  private _levels: Level[];
+  private readonly _levels: Level[];
 
   get levels(): Level[] {
     return this._levels;
@@ -54,11 +54,11 @@ export class Annotation {
       const result = new OAnnotJSON(this._audiofile.name, this._audiofile.samplerate, [], this._links);
       result.annotates = this._annotates;
 
-      let start_id = 1;
+    let startID = 1;
       for (let i = 0; i < this._levels.length; i++) {
         const level = this._levels[i].getObj(lastOriginalBoundary);
         for (let j = 0; j < level.items.length; j++) {
-          level.items[j].id = start_id++;
+          level.items[j].id = startID++;
           if (!(level.items[j].labels === null || level.items[j].labels === undefined) && level.items[j].labels.length > 0) {
             if (level.items[j].labels[0].name === '') {
               level.items[j].labels[0].name = level.name;

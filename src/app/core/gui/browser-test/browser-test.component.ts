@@ -19,7 +19,7 @@ export class BrowserTestComponent implements OnInit {
   ngOnInit() {
   }
 
-  getStateIcon(rule: any): string {
+  getStateIcon(rule: any): 'spinner' | 'times' | 'check' {
     switch (rule.state) {
       case('processing'):
         return 'spinner';

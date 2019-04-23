@@ -2,10 +2,8 @@ import {Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/co
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {ModalService} from '../modal.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
-import {APIService} from '../../shared/service/api.service';
-import {AppStorageService} from '../../shared/service/appstorage.service';
+import {APIService, AppStorageService, SettingsService} from '../../shared/service';
 import {AppInfo} from '../../../app.info';
-import {SettingsService} from '../../shared/service/settings.service';
 import {BsModalRef} from 'ngx-bootstrap';
 
 @Component({

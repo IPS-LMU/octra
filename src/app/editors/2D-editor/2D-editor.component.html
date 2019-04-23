@@ -1,8 +1,8 @@
 <div id="overlay-transcr" style="position:relative">
     <app-transcr-window #window (act)="onWindowAction($event)" *ngIf="showWindow"
                         [easymode]="appStorage.easymode"
-                        [audiochunk]="audiochunk_window"
-                        [segment_index]="selected_index"
+                        [audiochunk]="audioChunkWindow"
+                        [segment_index]="selectedIndex"
     ></app-transcr-window>
     <app-audio-navigation #audionav
                           (buttonclick)="onButtonClick($event)"
@@ -11,7 +11,7 @@
                           (speedchange)="onSpeedChange($event)"
                           (afterspeedchange)="afterSpeedChange($event)"
                           [isAudioPlaying]="audiomanager.isPlaying"
-                          [replay]="audiochunk_lines.replay"
+                          [replay]="audioChunkLines.replay"
                           [responsive]="settingsService.responsive.enabled"
                           [buttons]="{
                                 play: {
@@ -41,7 +41,7 @@
                               }"
                           [easymode]="appStorage.easymode"
     ></app-audio-navigation>
-    <div *ngIf="appStorage.show_loupe" (mouseenter)="loupe_hidden = false;" (mouseleave)="loupe_hidden = true;">
+    <div *ngIf="appStorage.showLoupe" (mouseenter)="loupeHidden = false;" (mouseleave)="loupeHidden = true;">
         <app-circleloupe #loupe (mousemove)="onCircleLoupeMouseOver($event)" [ngStyle]="{
         'width': miniloupe.size.width + 'px',
         'height': miniloupe.size.height + 'px',
@@ -50,18 +50,18 @@
         'margin-top':miniloupe.location.y + 'px',
         'z-index':'90',
         'display': 'flex',
-        'visibility': (loupe_hidden) ? 'hidden' : 'inherit',
+        'visibility': (loupeHidden) ? 'hidden' : 'inherit',
         'flex': 'auto',
         'flex-direction': 'column'}" [height]="miniloupe.size.height"
-                         [audiochunk]="audiochunk_loupe"></app-circleloupe>
+                         [audiochunk]="audioChunkLoupe"></app-circleloupe>
     </div>
     <app-audioviewer #viewer id="special"
                      (segmententer)="onSegmentEntered($event)"
                      (mousecursorchange)="onMouseOver($event);"
                      (mousemove)="changePosition($event.layerX, $event.layerY)"
-                     (mouseleave)="loupe_hidden = true;"
+                     (mouseleave)="loupeHidden = true;"
                      (shortcuttriggered)="onShortCutTriggered($event, 'mult-lines-viewer')"
-                     [audiochunk]="audiochunk_lines" (scrolling)="onScrolling($event)"
+                     [audiochunk]="audioChunkLines" (scrolling)="onScrolling($event)"
                      (scrollbarchange)="onScrollbarMouse($event)">
     </app-audioviewer>
 </div>

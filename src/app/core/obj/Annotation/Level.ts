@@ -1,6 +1,6 @@
 import {AnnotJSONType, ISegment, OEvent, OItem, OLevel} from './AnnotJSON';
 import {Segments} from './Segments';
-import {OIDBLevel} from '../../shared/service/appstorage.service';
+import {OIDBLevel} from '../../shared/service';
 import {BrowserAudioTime, OriginalAudioTime} from '../../../media-components/obj/media/audio';
 
 export class Level {
@@ -19,13 +19,13 @@ export class Level {
     this._name = value;
   }
 
-  private _type: AnnotJSONType;
+  private readonly _type: AnnotJSONType;
 
   get type(): AnnotJSONType {
     return this._type;
   }
 
-  private _id: number;
+  private readonly _id: number;
 
   get id(): number {
     return this._id;

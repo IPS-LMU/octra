@@ -2,7 +2,7 @@ import {AudioChunk, AudioTimeCalculator, BrowserAudioTime} from './media/audio';
 
 export class PlayCursor {
 
-  private _innerWidth: number;
+  private readonly _innerWidth: number;
 
   private _absX: number;
 
@@ -10,7 +10,7 @@ export class PlayCursor {
     return this._absX;
   }
 
-  private _time_pos: BrowserAudioTime;
+  private readonly _time_pos: BrowserAudioTime;
 
   get time_pos(): BrowserAudioTime {
     return this._time_pos;

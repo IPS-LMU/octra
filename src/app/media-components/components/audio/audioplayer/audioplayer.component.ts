@@ -21,10 +21,9 @@ import {AudioChunk, AudioRessource, AudioTimeCalculator, BrowserAudioTime} from 
 import {PlayBackState} from '../../../obj/media';
 import {AudioplayerService} from './audioplayer.service';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
-import {CanvasAnimation} from '../../../obj/CanvasAnimation';
+import {CanvasAnimation, Line} from '../../../obj';
 import {AudioService, KeymappingService} from '../../../../core/shared/service';
 import {BrowserInfo} from '../../../../core/shared';
-import {Line} from '../../../obj';
 import {AudioManager} from '../../../obj/media/audio/AudioManager';
 import {timer} from 'rxjs';
 
@@ -39,8 +38,6 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
 
   /**
    * gets or sets the settings of this audioplayer component
-   * @returns {any}
-   * @constructor
    */
   public get settings(): any {
     return this.ap.Settings;
@@ -52,7 +49,6 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
 
   /**
    * gets the current time of the audio playback
-   * @returns {number}
    */
   public get current_time(): number {
     return this.audiochunk.playposition.browserSample.unix;
@@ -82,7 +78,6 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
 
   /**
    * after Shortcut was triggered.
-   * @type {EventEmitter<any>}
    */
   @Output() shortcuttriggered = new EventEmitter<any>();
   @Input() audiochunk: AudioChunk;
@@ -103,7 +98,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   private height = 0;
   private innerWidth = 0;
   private oldInnerWidth = 0;
-  private mouseclick_obj = {
+  private mouseClickObj = {
     clicked: false,
     x: 0,
     y: 0,
@@ -130,7 +125,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
    * stroke()-command after the loop.
    *
    */
-  private draw = function () {
+  private draw = () => {
     // get canvas
     const line = this.ap.Line;
 
@@ -143,14 +138,15 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
     } else {
       throw new Error('Line Object not found');
     }
-  };
+  }
+
   private onKeyDown = ($event) => {
-    if (this.settings.shortcuts_enabled) {
+    if (this.settings.shortcutsEnabled) {
       const comboKey = $event.comboKey;
 
       const platform = BrowserInfo.platform;
       if (this.settings.shortcuts) {
-        let key_active = false;
+        let keyActive = false;
         let a = 0;
         for (const shortc in this.settings.shortcuts) {
           if (this.settings.shortcuts.hasOwnProperty(shortc)) {
@@ -159,7 +155,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
               const focuscheck = this.settings.shortcuts['' + shortc + ''].focusonly === false
                 || (this.settings.shortcuts['' + shortc + ''].focusonly === this.focused === true);
 
-              if (focuscheck && this.settings.shortcuts['' + shortc + '']['keys']['' + platform + ''] === comboKey) {
+              if (focuscheck && this.settings.shortcuts['' + shortc + ''].keys['' + platform + ''] === comboKey) {
                 switch (shortc) {
                   case('play_pause'):
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
@@ -170,34 +166,34 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
                         this.update();
                       });
                     }
-                    key_active = true;
+                    keyActive = true;
                     break;
                   case('stop'):
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
                     this.stopPlayback(this.afterAudioStopped);
-                    key_active = true;
+                    keyActive = true;
                     break;
                   case('step_backward'):
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
                     this.stepBackward();
-                    key_active = true;
+                    keyActive = true;
                     break;
                   case('step_backwardtime'):
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
                     this.stepBackwardTime(0.5);
-                    key_active = true;
+                    keyActive = true;
                     break;
                 }
               }
 
-              if (key_active) {
+              if (keyActive) {
                 break;
               }
             }
           }
         }
 
-        if (key_active) {
+        if (keyActive) {
           $event.event.preventDefault();
         }
       }
@@ -279,11 +275,11 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
     const x = $event.offsetX;
     const y = $event.offsetY;
 
-    const curr_line = this.ap.LastLine;
+    const currLine = this.ap.LastLine;
 
-    if (curr_line) {
-      this.ap.setMouseMovePosition($event.type, x, y, curr_line, this.innerWidth);
-      this.drawPlayCursorOnly(curr_line);
+    if (currLine) {
+      this.ap.setMouseMovePosition($event.type, x, y, currLine, this.innerWidth);
+      this.drawPlayCursorOnly(currLine);
     }
   }
 
@@ -294,23 +290,23 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
     const x = $event.offsetX;
     const y = $event.offsetY;
 
-    const curr_line = this.ap.Line;
+    const currLine = this.ap.Line;
 
-    if (curr_line) {
+    if (currLine) {
       if (this.audiochunk.isPlaying) {
-        this.mouseclick_obj.clicked = true;
-        this.mouseclick_obj.x = x;
-        this.mouseclick_obj.y = y;
-        this.mouseclick_obj.curr_line = curr_line;
-        this.mouseclick_obj.event = $event;
+        this.mouseClickObj.clicked = true;
+        this.mouseClickObj.x = x;
+        this.mouseClickObj.y = y;
+        this.mouseClickObj.curr_line = currLine;
+        this.mouseClickObj.event = $event;
         this.audiochunk.stopPlayback().then(this.afterAudioStopped).catch((error) => {
           console.error(error);
         });
       } else {
-        this.ap.setMouseClickPosition(x, y, curr_line, $event, this.innerWidth);
+        this.ap.setMouseClickPosition(x, y, currLine, $event, this.innerWidth);
       }
 
-      this.drawPlayCursorOnly(curr_line);
+      this.drawPlayCursorOnly(currLine);
     }
   }
 
@@ -353,8 +349,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   /**
-   *
-   steps back to last position
+   * steps back to last position
    */
   public stepBackward() {
     this.audiochunk.stepBackward(() => {
@@ -366,25 +361,23 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
     });
   }
 
-  stepBackwardTime(back_sec: number) {
-    this.audiochunk.stepBackwardTime(back_sec, this.drawFunc).then(this.afterAudioBackwardTime).catch((error) => {
+  stepBackwardTime(backSec: number) {
+    this.audiochunk.stepBackwardTime(backSec, this.drawFunc).then(this.afterAudioBackwardTime).catch((error) => {
       console.error(error);
     });
   }
 
   /**
    * this method updates the gui on resizing
-   * @param $event
    */
   @HostListener('window:resize', ['$event'])
-  onResize($event) {
+  onResize() {
     this.width = this.apview.elementRef.nativeElement.clientWidth;
     this.innerWidth = this.width - this.settings.margin.left - this.settings.margin.right;
 
-    const ratio = this.innerWidth / this.oldInnerWidth;
     if (this.ap.PlayCursor) {
       const ac = new AudioTimeCalculator(this.audioressource.info.samplerate,
-        <BrowserAudioTime>this.audiochunk.time.duration, this.innerWidth);
+        this.audiochunk.time.duration as BrowserAudioTime, this.innerWidth);
       console.log('' + this.audiochunk.playposition.browserSample.value);
 
       this.ap.audioTCalculator = ac;
@@ -395,7 +388,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   @HostListener('window:beforeunload', ['$event'])
-  onReload($event) {
+  onReload() {
     this.subscrmanager.destroy();
   }
 
@@ -441,8 +434,8 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
    */
   private clearDisplay() {
     // get canvas
-    const play_c = this.playcanvas;
-    const overlay_c = this.overlaycanvas;
+    const playC = this.playcanvas;
+    const overlayC = this.overlaycanvas;
     const line = this.ap.Line;
 
     if (line) {
@@ -451,12 +444,12 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
       this.context.clearRect(line.Pos.x - 1, line.Pos.y - 1, this.innerWidth + 1, line.Size.height + 1);
 
       // --- get the appropriate context
-      this.context = overlay_c.getContext('2d');
+      this.context = overlayC.getContext('2d');
       this.context.globalAlpha = 1.0;
       this.context.clearRect(line.Pos.x - 1, line.Pos.y - 1, this.innerWidth + 1, line.Size.height + 1);
       this.context.strokeStyle = this.settings.cursor.color;
 
-      this.context = play_c.getContext('2d');
+      this.context = playC.getContext('2d');
       this.context.globalAlpha = 1.0;
       this.context.clearRect(line.Pos.x - 1, line.Pos.y - 1, this.innerWidth + 1, line.Size.height + 1);
       this.context.strokeStyle = this.settings.playcursor.color;
@@ -502,13 +495,12 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
 
   /**
    * draws playcursor at its current position
-   * @param curr_line
    */
-  private drawPlayCursorOnly(curr_line: Line) {
+  private drawPlayCursorOnly(currLine: Line) {
     const relX = this.ap.PlayCursor.absX + this.settings.margin.left;
-    const relY = Math.round((curr_line.Size.height - this.settings.playcursor.height) / 2);
+    const relY = Math.round((currLine.Size.height - this.settings.playcursor.height) / 2);
 
-    if (relX <= curr_line.Size.width + this.settings.margin.left) {
+    if (relX <= currLine.Size.width + this.settings.margin.left) {
       this.context = this.playcanvas.getContext('2d');
       this.context.clearRect(0, 0, this.width, this.height);
       this.context.strokeStyle = this.settings.playcursor.color;
@@ -522,11 +514,10 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   /**
-   * changes the playcursors absolute position in pixels to a new one.
-   * @param new_value
+   * changes the playcursors absolute position in pixels to a new one
    */
-  private changePlayCursorAbsX(new_value: number) {
-    this.ap.PlayCursor.changeAbsX(new_value, this.ap.audioTCalculator, this.ap.AudioPxWidth, this.audiochunk);
+  private changePlayCursorAbsX(newValue: number) {
+    this.ap.PlayCursor.changeAbsX(newValue, this.ap.audioTCalculator, this.ap.AudioPxWidth, this.audiochunk);
   }
 
   private afterAudioStopped = () => {
@@ -558,6 +549,6 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
 
   private afterAudioBackwardTime = () => {
     // do the same
-    //this.afterAudioStepBackward();
+    // this.afterAudioStepBackward();
   }
 }

@@ -1,8 +1,8 @@
 import {AppInfo} from '../../app.info';
-import {AppStorageService, OIDBLevel} from './service/appstorage.service';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../obj/Annotation/AnnotJSON';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../obj/Annotation';
 import {IndexedDBManager} from '../obj/IndexedDBManager';
 import {SubscriptionManager} from '../obj/SubscriptionManager';
+import {AppStorageService, OIDBLevel} from './service/appstorage.service';
 
 export class UpdateManager {
   private version = '';
@@ -24,7 +24,7 @@ export class UpdateManager {
         }
 
 
-        const continue_check = () => {
+        const continueCheck = () => {
           if ((this.version === null || this.version === undefined)) {
             console.log('update...');
             console.log(appversion);
@@ -73,12 +73,12 @@ export class UpdateManager {
                         value: {value: this.appStorage.localStr.retrieve('feedback')}
                       },
                       {
-                        key: 'data_id',
-                        value: {value: this.appStorage.localStr.retrieve('data_id')}
+                        key: 'dataID',
+                        value: {value: this.appStorage.localStr.retrieve('dataID')}
                       },
                       {
-                        key: 'audio_url',
-                        value: {value: this.appStorage.localStr.retrieve('audio_url')}
+                        key: 'audioURL',
+                        value: {value: this.appStorage.localStr.retrieve('audioURL')}
                       },
                       {
                         key: 'usemode',
@@ -212,17 +212,17 @@ export class UpdateManager {
               if (version !== null && version.hasOwnProperty('value')) {
                 this.version = version.value;
                 idb.close();
-                continue_check();
+                continueCheck();
               }
             }).catch(() => {
               console.log('version empty');
               idb.close();
-              continue_check();
+              continueCheck();
             });
           },
           (err) => {
             // IDB does not exist
-            continue_check();
+            continueCheck();
           }
         ));
       }

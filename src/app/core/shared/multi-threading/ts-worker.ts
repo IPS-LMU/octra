@@ -28,12 +28,12 @@ export class TsWorker {
   }
 
   private static WorkerID = 1;
-  private blobURL: string;
+  private readonly blobURL: string;
   private worker: Worker;
   private _queue: TsWorkerJob[] = [];
   private status: TsWorkerStatus = TsWorkerStatus.INITIALIZED;
 
-  private _id: number;
+  private readonly _id: number;
 
   /**
    * triggers whenever a job changed its status

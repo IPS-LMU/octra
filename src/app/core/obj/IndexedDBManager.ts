@@ -151,7 +151,7 @@ export class IndexedDBManager {
   };
   private indexedDB: IDBFactory;
   private idbkeyrange: IDBKeyRange;
-  private dbname: string;
+  private readonly dbname: string;
   private getObjectStore = (store_name: string, mode: IDBMode): IDBObjectStore => {
     let mode_str: IDBTransactionMode = 'readonly';
 
@@ -162,7 +162,7 @@ export class IndexedDBManager {
     return txn.objectStore(store_name);
   };
 
-  private _idbtransaction: IDBTransaction;
+  private readonly _idbtransaction: IDBTransaction;
 
   get idbtransaction(): IDBTransaction {
     return this._idbtransaction;

@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {IAnnotJSON, OAnnotJSON, OAudiofile} from '../Annotation/AnnotJSON';
+import {IAnnotJSON, OAnnotJSON, OAudiofile} from '../Annotation';
 import {Functions} from '../../shared/Functions';
 
 export interface Bundle {

@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
-import {SettingsService} from '../../shared/service/settings.service';
-import {ProjectSettings} from '../../obj/Settings/project-configuration';
+import {SettingsService} from '../../shared/service';
+import {ProjectSettings} from '../../obj/Settings';
 import {NavbarService} from '../navbar/navbar.service';
 
 @Component({

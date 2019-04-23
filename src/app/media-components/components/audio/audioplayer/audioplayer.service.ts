@@ -3,125 +3,111 @@ import {Injectable} from '@angular/core';
 // other
 import {AudioplayerConfig} from './audioplayer.config';
 import {AudioComponentService} from '../../../service';
-import {Line} from '../../../obj/Line';
+import {AVMousePos, Line, PlayCursor} from '../../../obj';
 import {AudioService} from '../../../../core/shared/service';
 import {AudioChunk, AudioTimeCalculator, BrowserAudioTime} from '../../../obj/media/audio';
-import {PlayCursor} from '../../../obj/PlayCursor';
-import {AVMousePos} from '../../../obj/AVMousePos';
 
 
 @Injectable()
 export class AudioplayerService extends AudioComponentService {
-  private drag_playcursor = false;
+  private dragPlayCursor = false;
   private _settings: any;
 
   get Settings(): any {
     return this._settings;
   }
 
-  set Settings(new_settings: any) {
-    this._settings = new_settings;
+  set Settings(newSettings: any) {
+    this._settings = newSettings;
   }
 
   get Line(): Line {
-    return this.last_line;
+    return this.lastLine;
   }
 
   get LastLine(): Line {
-    return this.last_line;
+    return this.lastLine;
   }
 
   constructor(protected audio: AudioService) {
     super();
-    this._settings = new AudioplayerConfig().Settings;
+    this._settings = new AudioplayerConfig().settings;
   }
 
   /**
    * initializes the audioplayer
-   * @param innerWidth
    */
   public initialize(innerWidth: number) {
-    this.audio_px_w = innerWidth;
+    this.audioPxW = innerWidth;
     this.playcursor = new PlayCursor(0, this.audiomanager.createBrowserAudioTime(0), innerWidth);
-    this.initializeLine(this.audio_px_w, this._settings.height);
+    this.initializeLine(this.audioPxW, this._settings.height);
   }
 
   /**
    * sets mouse position on moving and updates the drag status of the slider
-   * @param type
-   * @param x
-   * @param y
-   * @param curr_line
-   * @param innerWidth
    */
-  public setMouseMovePosition(type: string, x: number, y: number, curr_line: Line, innerWidth: number) {
-    super.setMouseMovePosition(type, x, y, curr_line, innerWidth);
+  public setMouseMovePosition(type: string, x: number, y: number, currLine: Line, innerWidth: number) {
+    super.setMouseMovePosition(type, x, y, currLine, innerWidth);
 
-    if (this.mouse_down) {
-      if (this.drag_playcursor) {
+    if (this.mouseDown) {
+      if (this.dragPlayCursor) {
         // drag playcursor
-        this.PlayCursor.changeAbsX(x - this._settings.margin.left, this.audioTCalculator, this.audio_px_w, this.audiochunk);
+        this.PlayCursor.changeAbsX(x - this._settings.margin.left, this.audioTCalculator, this.audioPxW, this.audiochunk);
         this.audiochunk.playposition = this.PlayCursor.time_pos.clone();
       }
     }
 
     if (type === 'mouseleave') {
-      this.drag_playcursor = false;
+      this.dragPlayCursor = false;
     }
   }
 
   /**
    * sets mouse click position and the current time position of the cursor. It also checks if slider si dropped.
-   * @param x
-   * @param y
-   * @param curr_line
-   * @param $event
-   * @param innerWidth
    */
-  public setMouseClickPosition(x: number, y: number, curr_line: Line, $event: Event, innerWidth: number) {
-    super.setMouseClickPosition(x, y, curr_line, $event, innerWidth);
+  public setMouseClickPosition(x: number, y: number, currLine: Line, $event: Event, innerWidth: number) {
+    super.setMouseClickPosition(x, y, currLine, $event, innerWidth);
 
-    if (this.last_line === null || this.last_line === curr_line) {
+    if (this.lastLine === null || this.lastLine === currLine) {
       // same line
       // fix margin _settings
       if ($event.type === 'mousedown') {
-        if (this.last_line === null || this.last_line.number === this.last_line.number) {
+        if (this.lastLine === null || this.lastLine.number === this.lastLine.number) {
           if (x < this.PlayCursor.absX - 5 && x > this.PlayCursor.absX + 5) {
             // selection disabled
           } else {
             // drag only if audioplaying = false
-            this.drag_playcursor = true;
+            this.dragPlayCursor = true;
           }
-          this.mouse_click_pos.line = curr_line;
-          this.mouse_click_pos.absX = this.getAbsXByLine(curr_line, x - curr_line.Pos.x, innerWidth);
-          this.audiochunk.playposition = this.mouse_click_pos.timePos.clone();
+          this.mouseClickPos.line = currLine;
+          this.mouseClickPos.absX = this.getAbsXByLine(currLine, x - currLine.Pos.x, innerWidth);
+          this.audiochunk.playposition = this.mouseClickPos.timePos.clone();
         }
-        this.mouse_down = true;
+        this.mouseDown = true;
       } else if ($event.type === 'mouseup') {
-        this.mouse_down = false;
-        this.drag_playcursor = false;
+        this.mouseDown = false;
+        this.dragPlayCursor = false;
         // drag playcursor
-        this.PlayCursor.changeAbsX(x - this._settings.margin.left, this.audioTCalculator, this.audio_px_w, this.audiochunk);
+        this.PlayCursor.changeAbsX(x - this._settings.margin.left, this.audioTCalculator, this.audioPxW, this.audiochunk);
         this.audiochunk.startpos = this.PlayCursor.time_pos.clone();
       }
     } else if ($event.type === 'mouseup') {
-      this.mouse_down = false;
-      this.drag_playcursor = false;
+      this.mouseDown = false;
+      this.dragPlayCursor = false;
       // drag playcursor
-      this.PlayCursor.changeAbsX(x - this._settings.margin.left, this.audioTCalculator, this.audio_px_w, this.audiochunk);
+      this.PlayCursor.changeAbsX(x - this._settings.margin.left, this.audioTCalculator, this.audioPxW, this.audiochunk);
       this.audiochunk.startpos.browserSample.value = this.audioTCalculator.absXChunktoSamples(this.PlayCursor.absX, this.audiochunk);
     }
   }
 
   /**
    * updates all lines' width and checks if line is defined. If not this method creates a new one.
-   * @param innerWidth
    */
   public updateLines(innerWidth: number) {
-    this.audio_px_w = innerWidth;
+    this.audioPxW = innerWidth;
     const w = innerWidth;
 
-    const line = this.last_line;
+    const line = this.lastLine;
     if (line) {
       line.number = 0;
       line.Size = {
@@ -136,8 +122,6 @@ export class AudioplayerService extends AudioComponentService {
 
   /**
    * creates a new line given height and width.
-   * @param w
-   * @param h
    */
   initializeLine(w: number, h: number) {
     const size = {
@@ -150,31 +134,25 @@ export class AudioplayerService extends AudioComponentService {
       y: this._settings.margin.top
     };
 
-    this.last_line = new Line(0, size, position);
+    this.lastLine = new Line(0, size, position);
   }
 
   /**
    * calculates the absolute pixels given line, the relative position and the inner width
-   * @param line
-   * @param rel_x
-   * @param innerWidth
-   * @returns {any}
    */
-  public getAbsXByLine(line: Line, rel_x, innerWidth): number {
-    return (line.number * innerWidth + rel_x);
+  public getAbsXByLine(line: Line, relX, innerWidth): number {
+    return (line.number * innerWidth + relX);
   }
 
   /**
    * initializes all attributes needed for initialization of the audioplayer
-   * @param innerWidth
-   * @param audiochunk
    */
   public init(innerWidth: number, audiochunk: AudioChunk) {
     this.AudioPxWidth = innerWidth;
     this.audiochunk = audiochunk;
     this.initialize(innerWidth);
     this.audioTCalculator = new AudioTimeCalculator(this.audiomanager.ressource.info.samplerate,
-      <BrowserAudioTime>this.audiochunk.time.duration, this.AudioPxWidth);
+      this.audiochunk.time.duration as BrowserAudioTime, this.AudioPxWidth);
     this.Mousecursor = new AVMousePos(0, 0, 0, this.audiomanager.createBrowserAudioTime(0));
     this.MouseClickPos = new AVMousePos(0, 0, 0, this.audiomanager.createBrowserAudioTime(0));
   }

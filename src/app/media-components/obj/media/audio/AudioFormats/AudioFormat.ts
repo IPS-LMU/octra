@@ -73,7 +73,6 @@ export abstract class AudioFormat {
 
   /**
    * TODO is this needed?
-   * @param buffer
    */
   protected abstract setByteRate(buffer: ArrayBuffer);
 

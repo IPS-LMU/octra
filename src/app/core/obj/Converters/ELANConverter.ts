@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {OAnnotJSON, OAudiofile} from '../Annotation/AnnotJSON';
+import {OAnnotJSON, OAudiofile} from '../Annotation';
 import * as moment from 'moment';
 import * as X2JS from 'x2js';
 

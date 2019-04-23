@@ -99,29 +99,34 @@ export class WavFormat extends AudioFormat {
     if (pointer > -1 && pointer < segments.length) {
       const segment = segments[pointer];
 
-      this.cutAudioFile(type, namingConvention, buffer, segment).then((file) => {
-        this.onaudiocut.next({
-          finishedSegments: pointer + 1,
-          file
-        });
+      if (segment.sampleStart !== segment.sampleDur) {
+        this.cutAudioFile(type, namingConvention, buffer, segment).then((file) => {
+          this.onaudiocut.next({
+            finishedSegments: pointer + 1,
+            file
+          });
 
-        if (pointer < segments.length - 1) {
-          // continue
-          // @ts-ignore
-          // const freeSpace = window.performance.memory.totalJSHeapSize - window.performance.memory.usedJSHeapSize;
-          // console.log(`${freeSpace / 1024 / 1024} MB left.`);
-          if (this.status === 'running') {
-            setTimeout(() => this.cutAudioFileSequentially(type, namingConvention, buffer, segments, ++pointer), 200);
+          if (pointer < segments.length - 1) {
+            // continue
+            // @ts-ignore
+            // const freeSpace = window.performance.memory.totalJSHeapSize - window.performance.memory.usedJSHeapSize;
+            // console.log(`${freeSpace / 1024 / 1024} MB left.`);
+            if (this.status === 'running') {
+              setTimeout(() => this.cutAudioFileSequentially(type, namingConvention, buffer, segments, ++pointer), 200);
+            } else {
+              this.status = 'stopped';
+            }
           } else {
-            this.status = 'stopped';
+            // stop
+            this.onaudiocut.complete();
           }
-        } else {
-          // stop
-          this.onaudiocut.complete();
-        }
-      }).catch((error) => {
-        this.onaudiocut.error(error);
-      });
+        }).catch((error) => {
+          this.onaudiocut.error(error);
+        });
+      } else {
+        console.error(`could not cut segment because start and end samples are equal`);
+        setTimeout(() => this.cutAudioFileSequentially(type, namingConvention, buffer, segments, ++pointer), 200);
+      }
     } else {
       this.onaudiocut.error(new Error('pointer is invalid!'));
     }

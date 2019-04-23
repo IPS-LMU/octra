@@ -39,8 +39,8 @@
                  [audiochunk]="audiochunk"></app-audioplayer>
 <app-transcr-editor #transcr
                     (typing)="afterTyping($event);"
-                    (marker_insert)="onMarkerInsert($event)"
-                    (marker_click)="onMarkerClick($event)"
+                    (markerInsert)="onMarkerInsert($event)"
+                    (markerClick)="onMarkerClick($event)"
                     [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
                     [easymode]="appStorage.easymode"
                     [audiochunk]="audiochunk"

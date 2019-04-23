@@ -53,7 +53,7 @@ export class AudioplayerService extends AudioComponentService {
       if (this.dragPlayCursor) {
         // drag playcursor
         this.PlayCursor.changeAbsX(x - this._settings.margin.left, this.audioTCalculator, this.audioPxW, this.audiochunk);
-        this.audiochunk.playposition = this.PlayCursor.time_pos.clone();
+        this.audiochunk.playposition = this.PlayCursor.timePos.clone();
       }
     }
 
@@ -89,7 +89,7 @@ export class AudioplayerService extends AudioComponentService {
         this.dragPlayCursor = false;
         // drag playcursor
         this.PlayCursor.changeAbsX(x - this._settings.margin.left, this.audioTCalculator, this.audioPxW, this.audiochunk);
-        this.audiochunk.startpos = this.PlayCursor.time_pos.clone();
+        this.audiochunk.startpos = this.PlayCursor.timePos.clone();
       }
     } else if ($event.type === 'mouseup') {
       this.mouseDown = false;

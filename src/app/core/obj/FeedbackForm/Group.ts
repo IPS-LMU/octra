@@ -59,13 +59,13 @@ export class Group {
 
   public toAny(): any {
     const result = {
-      title: this._title
+      title: this._title,
+      controls: []
     };
 
-    result['controls'] = [];
     for (let i = 0; i < this._controls.length; i++) {
       const control = this._controls[i];
-      result['controls'].push(control.toAny());
+      result.controls.push(control.toAny());
     }
 
     return result;

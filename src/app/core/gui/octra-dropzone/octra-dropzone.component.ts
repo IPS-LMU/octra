@@ -274,7 +274,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
 
   getDropzoneFileString(file: File | SessionFile) {
     const fsize: FileSize = Functions.getFileSize(file.size);
-    return Functions.buildStr('{0} ({1} {2})', [file.name, (Math.round(fsize.size * 100) / 100), fsize.label]);
+    return `${file.name} (${(Math.round(fsize.size * 100) / 100)} ${fsize.label})`;
   }
 
   showSupported() {

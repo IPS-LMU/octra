@@ -28,7 +28,7 @@
                          *ngIf="appStorage.usemode === 'online'">
                         <h4>Feedback</h4>
                         <app-transcription-feedback #feedback
-                                                    [feedback_data]="appStorage.feedback"
+                                                    [feedbackData]="appStorage.feedback"
                                                     [showCommentFieldOnly]="settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('korbinian')">
                         </app-transcription-feedback>
 

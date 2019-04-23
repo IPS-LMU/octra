@@ -34,6 +34,6 @@ export class DataInfo {
   public constructor(name: string, type: string, size?: any) {
     this._name = name;
     this._type = type;
-    this._size = (size != undefined) ? size : 0;
+    this._size = (size !== undefined) ? size : 0;
   }
 }

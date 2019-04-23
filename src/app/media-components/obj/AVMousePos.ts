@@ -50,7 +50,7 @@ export class AVMousePos {
   }
 
   /**
-   * initializes AVMousePos. time_pos will be cloned.
+   * initializes AVMousePos. timePos will be cloned.
    * @param x relative Position
    * @param y relative Position
    * @param absX absolute posiiton

@@ -18,7 +18,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
   @Output() loaded: boolean;
   public text = '';
 
-  subscrmanager: SubscriptionManager = new SubscriptionManager();
+  private subscrmanager: SubscriptionManager = new SubscriptionManager();
   public progress = 0;
   public state = '';
   public warning = '';
@@ -112,17 +112,17 @@ export class LoadingComponent implements OnInit, OnDestroy {
         (result) => {
           if (result.status === 'success') {
             new Promise<void>((resolve, reject) => {
-              if (this.appStorage.usemode === 'url' && this.appStorage.urlParams['transcript'] !== null) {
+              if (this.appStorage.usemode === 'url' && this.appStorage.urlParams.transcript !== null) {
                 this.transcrService.defaultFontSize = 16;
 
                 // load transcript file via URL
-                this.http.get(this.appStorage.urlParams['transcript'], {
+                this.http.get(this.appStorage.urlParams.transcript, {
                   responseType: 'text'
                 }).subscribe(
                   (res) => {
 
                     this.state = 'Import transcript...';
-                    let filename = this.appStorage.urlParams['transcript'];
+                    let filename = this.appStorage.urlParams.transcript;
                     filename = filename.substr(filename.lastIndexOf('/') + 1);
 
                     const file: IFile = {
@@ -158,11 +158,11 @@ export class LoadingComponent implements OnInit, OnDestroy {
                     if (!(importResult === null || importResult === undefined)
                       && !(importResult.annotjson === null || importResult.annotjson === undefined)) {
                       // conversion successfully finished
-                      const new_levels: OIDBLevel[] = [];
+                      const newLevels: OIDBLevel[] = [];
                       for (let i = 0; i < importResult.annotjson.levels.length; i++) {
-                        new_levels.push(new OIDBLevel(i + 1, importResult.annotjson.levels[i], i));
+                        newLevels.push(new OIDBLevel(i + 1, importResult.annotjson.levels[i], i));
                       }
-                      this.appStorage.overwriteAnnotation(new_levels, false).then(
+                      this.appStorage.overwriteAnnotation(newLevels, false).then(
                         () => {
                           resolve();
                         }
@@ -183,10 +183,10 @@ export class LoadingComponent implements OnInit, OnDestroy {
                   // overwrite
                   this.transcrService.defaultFontSize = 16;
 
-                  const new_levels: OIDBLevel[] = [];
-                  new_levels.push(new OIDBLevel(1, new OLevel('OCTRA_1', 'SEGMENT'), 1));
+                  const newLevels: OIDBLevel[] = [];
+                  newLevels.push(new OIDBLevel(1, new OLevel('OCTRA_1', 'SEGMENT'), 1));
 
-                  this.appStorage.overwriteAnnotation(new_levels, false).then(
+                  this.appStorage.overwriteAnnotation(newLevels, false).then(
                     () => {
                       resolve();
                     }
@@ -266,8 +266,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
       }
     }).then(() => {
 
-      if (this.appStorage.urlParams.hasOwnProperty('audio') && this.appStorage.urlParams['audio'] !== ''
-        && !(this.appStorage.urlParams['audio'] === null || this.appStorage.urlParams['audio'] === undefined)) {
+      if (this.appStorage.urlParams.hasOwnProperty('audio') && this.appStorage.urlParams.audio !== ''
+        && !(this.appStorage.urlParams.audio === null || this.appStorage.urlParams.audio === undefined)) {
         this.appStorage.usemode = 'url';
         this.appStorage.LoggedIn = false;
       } else if (this.appStorage.usemode === 'url') {
@@ -293,7 +293,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
           if (this.appStorage.usemode === 'url') {
             this.state = 'Get transcript from URL...';
             // set audio url from url params
-            this.appStorage.audioURL = decodeURI(this.appStorage.urlParams['audio']);
+            this.appStorage.audioURL = decodeURI(this.appStorage.urlParams.audio);
           }
         }
         this.settService.loadAudioFile(this.audio);

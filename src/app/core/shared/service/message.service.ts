@@ -9,8 +9,8 @@ export class MessageService {
 
   public showMessage(type: string, message: string) {
     this.showmessage.emit({
-      type: type,
-      message: message
+      type,
+      message
     });
   }
 }

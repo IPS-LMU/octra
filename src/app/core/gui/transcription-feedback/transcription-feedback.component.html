@@ -1,6 +1,6 @@
 <form #fo="ngForm" class="form-inline">
     <fieldset>
-        <ng-container *ngIf="transcrService.feedback !== null && feedback_data !== null">
+        <ng-container *ngIf="transcrService.feedback !== null && feedbackData !== null">
             <ng-container *ngIf="!showCommentFieldOnly">
                 <ng-container *ngFor="let group of transcrService.feedback.groups">
                     <span>{{translate(group.title, langService.currentLang)}}</span>
@@ -13,7 +13,7 @@
                                            name="{{group.name}}" value="{{control.value}}"
                                            [checked]="control.custom.checked"
                                            [required]="control.required"
-                                           [(ngModel)]="feedback_data[group.name]"
+                                           [(ngModel)]="feedbackData[group.name]"
                                     />{{translate(control.label.languages, langService.currentLang)}}
                                 </label>
                             </div>
@@ -34,7 +34,7 @@
                                     <textarea class="form-control"
                                               name="{{group.name}}" value="{{control.value}}"
                                               [required]="control.required"></textarea>
-                                    [(ngModel)]="feedback_data[group.name]"
+                                    [(ngModel)]="feedbackData[group.name]"
                                 </div>
                             </div>
                         </ng-container>

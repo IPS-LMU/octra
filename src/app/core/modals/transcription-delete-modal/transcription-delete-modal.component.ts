@@ -57,6 +57,6 @@ export class TranscriptionDeleteModalComponent implements OnInit {
   public close(action: string) {
     this.modal.hide();
     this.visible = false;
-    this.actionperformed.next(<ModalDeleteAnswer> action);
+    this.actionperformed.next(action as ModalDeleteAnswer);
   }
 }

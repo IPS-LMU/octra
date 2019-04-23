@@ -10,7 +10,7 @@ export class EmailBugReporter extends BugReporter {
   }
 
   public sendBugReport(http: HttpClient, pkg: any, form: any, url: string,
-                       auth_token: string, sendbugreport: boolean): Observable<HttpResponse<any>> {
+                       authToken: string, sendbugreport: boolean): Observable<HttpResponse<any>> {
 
     const report = (sendbugreport) ? JSON.parse(JSON.stringify(pkg)) : null;
 
@@ -25,12 +25,12 @@ export class EmailBugReporter extends BugReporter {
       os_build: json.system.os.version,
       platform: json.system.browser,
       version: json.octra.version,
-      report: report
+      report
     };
 
     return http.post(url, JSON.stringify(body), {
       headers: {
-        Authorization: auth_token
+        Authorization: authToken
       },
       observe: 'response',
       responseType: 'json'

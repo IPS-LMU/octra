@@ -164,10 +164,8 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
       this.audiomanager.playposition, this.editor.caretpos, 'texteditor');
   }
 
-  onBoundaryClicked(samples: number) {
-    const i: number = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
-      new BrowserSample(samples, this.audiomanager.browserSampleRate)
-    );
+  onBoundaryClicked(samples: BrowserSample) {
+    const i: number = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(samples);
 
     this.boundaryselected = true;
 
@@ -181,13 +179,13 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
           resolve();
         }
       }).then(() => {
-        this.audiochunk.startpos = this.audiomanager.createBrowserAudioTime(start)
+        this.audiochunk.startpos = this.audiomanager.createBrowserAudioTime(start);
         this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(i).time.clone();
         this.audioplayer.update();
 
         this.audioplayer.startPlayback(() => {
           // set start pos and playback length to end of audio file
-          this.audiochunk.startpos = <BrowserAudioTime>this.audiochunk.selection.end.clone();
+          this.audiochunk.startpos = this.audiochunk.selection.end.clone() as BrowserAudioTime;
           this.audioplayer.update();
         });
         this.boundaryselected = false;
@@ -202,15 +200,15 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
       this.audiomanager.playposition, this.editor.caretpos, 'texteditor');
   }
 
-  onMarkerInsert(marker_code: string) {
-    this.uiService.addElementFromEvent('shortcut', {value: 'markers:' + marker_code}, Date.now(),
+  onMarkerInsert(markerCode: string) {
+    this.uiService.addElementFromEvent('shortcut', {value: 'markers:' + markerCode}, Date.now(),
       this.audiomanager.playposition, this.editor.caretpos, 'texteditor');
   }
 
-  onMarkerClick(marker_code: string) {
+  onMarkerClick(markerCode: string) {
     this.afterTyping('stopped');
 
-    this.uiService.addElementFromEvent('mouseclick', {value: marker_code}, Date.now(),
+    this.uiService.addElementFromEvent('mouseclick', {value: markerCode}, Date.now(),
       this.audiomanager.playposition, this.editor.caretpos, 'texteditor_toolbar');
   }
 
@@ -218,73 +216,74 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
     let html: string = this.editor.html.replace(/(&nbsp;)+/g, ' ');
     // split text at the position of every boundary marker
     html = html.replace(/(<textspan([ \w:"\-%;]|[0-9])*>)|(<\/textspan>)/g, '');
-    let seg_texts: string[] = html.split(
-      /\s*<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="[0-9]+" alt="\[\|[0-9]+\|\]">\s*/g
+    let segTexts: string[] = html.split(
+      new RegExp('/\s*<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="[0-9]+" ' +
+        'alt="\[\|[0-9]+\|\]">\s*', 'g')
     );
 
-    const samples_array: number[] = [];
-    html.replace(/\s*<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s*/g,
-      function (match, g1, g2) {
-        samples_array.push(Number(g1));
+    const samplesArray: number[] = [];
+    html.replace(new RegExp('/\s*<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s*', 'g'),
+      (match, g1) => {
+        samplesArray.push(Number(g1));
         return '';
       });
 
-    seg_texts = seg_texts.map((a: string) => {
+    segTexts = segTexts.map((a: string) => {
       return a.replace(/(<span>)|(<\/span>)|(<p>)|(<\/p>)/g, '');
     });
     // remove invalid boundaries
-    if (seg_texts.length > 1) {
+    if (segTexts.length > 1) {
       let start = 0;
-      for (let i = 0; i < samples_array.length; i++) {
-        if (!(samples_array[i] > start)) {
+      for (let i = 0; i < samplesArray.length; i++) {
+        if (!(samplesArray[i] > start)) {
           // remove boundary
-          samples_array.splice(i, 1);
+          samplesArray.splice(i, 1);
 
           // concat
-          seg_texts[i + 1] = seg_texts[i] + seg_texts[i + 1];
-          seg_texts.splice(i, 1);
+          segTexts[i + 1] = segTexts[i] + segTexts[i + 1];
+          segTexts.splice(i, 1);
 
 
           --i;
         } else {
-          start = samples_array[i];
+          start = samplesArray[i];
         }
       }
     }
 
-    seg_texts = seg_texts.map((a: string) => {
+    segTexts = segTexts.map((a: string) => {
       return a.replace(/(^\s+)|(\s+$)/g, '');
     });
 
-    let anno_seg_length = this.transcrService.currentlevel.segments.length;
-    for (let i = 0; i < seg_texts.length; i++) {
-      const new_raw = this.transcrService.htmlToRaw(seg_texts[i]);
+    let annoSegLength = this.transcrService.currentlevel.segments.length;
+    for (let i = 0; i < segTexts.length; i++) {
+      const newRaw = this.transcrService.htmlToRaw(segTexts[i]);
 
-      if (i < anno_seg_length) {
+      if (i < annoSegLength) {
         // probably overwrite old files
         const segment: Segment = this.transcrService.currentlevel.segments.get(i).clone();
-        segment.transcript = new_raw;
-        if (i < seg_texts.length - 1) {
-          segment.time.browserSample.value = samples_array[i];
+        segment.transcript = newRaw;
+        if (i < segTexts.length - 1) {
+          segment.time.browserSample.value = samplesArray[i];
         }
 
         this.transcrService.currentlevel.segments.change(i, segment);
       } else {
         // add new segments
-        if (i === seg_texts.length - 1) {
-          this.transcrService.currentlevel.segments.add(this.audiochunk.time.end, new_raw);
+        if (i === segTexts.length - 1) {
+          this.transcrService.currentlevel.segments.add(this.audiochunk.time.end, newRaw);
         } else {
-          this.transcrService.currentlevel.segments.add(this.audiomanager.createBrowserAudioTime(samples_array[i]), new_raw);
+          this.transcrService.currentlevel.segments.add(this.audiomanager.createBrowserAudioTime(samplesArray[i]), newRaw);
         }
       }
     }
 
-    anno_seg_length = this.transcrService.currentlevel.segments.length;
-    if (anno_seg_length > seg_texts.length) {
+    annoSegLength = this.transcrService.currentlevel.segments.length;
+    if (annoSegLength > segTexts.length) {
       // remove left segments
-      this.transcrService.currentlevel.segments.segments.splice(seg_texts.length, (anno_seg_length - seg_texts.length));
+      this.transcrService.currentlevel.segments.segments.splice(segTexts.length, (annoSegLength - segTexts.length));
       // because last segment was removed
-      const seg = this.transcrService.currentlevel.segments.get(seg_texts.length - 1);
+      const seg = this.transcrService.currentlevel.segments.get(segTexts.length - 1);
       seg.time.browserSample.value = this.audiochunk.time.end.browserSample.value;
     }
   }
@@ -292,16 +291,16 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
   public highlight() {
     const html: string = this.editor.html.replace(/&nbsp;/g, ' ');
 
-    const samples_array: number[] = [];
+    const samplesArray: number[] = [];
     html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s?/g,
-      function (match, g1, g2) {
-        samples_array.push(Number(g1));
+      (match, g1, g2) => {
+        samplesArray.push(Number(g1));
         return '';
       });
 
     let start = 0;
-    for (let i = 0; i < samples_array.length; i++) {
-      if (!(samples_array[i] > start)) {
+    for (let i = 0; i < samplesArray.length; i++) {
+      if (!(samplesArray[i] > start)) {
         // mark boundary red
         jQuery('.note-editable.panel-body img[data-samples]:eq(' + i + ')').css({
           'background-color': 'red'
@@ -310,13 +309,13 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
         jQuery('.note-editable.panel-body img[data-samples]:eq(' + i + ')').css({
           'background-color': 'white'
         });
-        start = samples_array[i];
+        start = samplesArray[i];
       }
     }
   }
 
   public update() {
-    this.audiochunk.startpos = <BrowserAudioTime>this.audiochunk.time.start;
+    this.audiochunk.startpos = this.audiochunk.time.start as BrowserAudioTime;
     this.audioplayer.update();
     this.loadEditor();
   }

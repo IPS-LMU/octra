@@ -32,14 +32,13 @@ export class SubscriptionManager {
 
   /**
    * add subscription to the manager. Returns the id of the subscriptions
-   * @param subscription
    * @returns number
    */
   public add(subscription: Subscription): number {
     this.subscriptions.push(
       {
         id: ++this.counter,
-        subscription: subscription
+        subscription
       }
     );
     return this.counter;
@@ -59,7 +58,6 @@ export class SubscriptionManager {
 
   /**
    * unsubscribes specific Subscription with specific id.
-   * @param id
    */
   public remove(id: number): boolean {
     for (let i = 0; i < this.subscriptions.length; i++) {

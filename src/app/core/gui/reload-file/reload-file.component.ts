@@ -35,28 +35,28 @@ export class ReloadFileComponent implements OnInit {
     Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
   }
   newTranscription = () => {
-    this.modService.show('transcription_delete').then((decision) => {
+    this.modService.show('transcriptionDelete').then((decision) => {
       if (decision === 'DELETE') {
 
-        let keep_data = false;
+        let keepData = false;
 
         new Promise<void>((resolve) => {
           if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
-            const new_levels: OIDBLevel[] = [];
+            const newLevels: OIDBLevel[] = [];
             for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
-              new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
+              newLevels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
             }
 
-            const new_links: OIDBLink[] = [];
+            const newLinks: OIDBLink[] = [];
             for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
-              new_links.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
+              newLinks.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
             }
-            this.appStorage.overwriteAnnotation(new_levels).then(
+            this.appStorage.overwriteAnnotation(newLevels).then(
               () => {
-                return this.appStorage.overwriteLinks(new_links);
+                return this.appStorage.overwriteLinks(newLinks);
               }
             ).then(() => {
-              keep_data = true;
+              keepData = true;
               resolve();
             }).catch((err) => {
               console.error(err);
@@ -66,7 +66,7 @@ export class ReloadFileComponent implements OnInit {
           }
         }).then(() => {
           this.audioService.registerAudioManager(this.dropzone.audiomanager);
-          this.appStorage.beginLocalSession(this.dropzone.files, keep_data, this.navigate,
+          this.appStorage.beginLocalSession(this.dropzone.files, keepData, this.navigate,
             (error) => {
               if (error === 'file not supported') {
                 this.showErrorMessage(this.langService.instant('reload-file.file not supported', {type: ''}));
@@ -112,7 +112,7 @@ export class ReloadFileComponent implements OnInit {
   }
 
   askForAbort() {
-    this.modService.show('transcription_stop').then((answer: TranscriptionStopModalAnswer) => {
+    this.modService.show('transcriptionStop').then((answer: TranscriptionStopModalAnswer) => {
       if (answer === TranscriptionStopModalAnswer.QUIT) {
         this.abortTranscription();
       }

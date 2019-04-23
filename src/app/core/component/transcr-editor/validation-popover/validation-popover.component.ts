@@ -20,17 +20,17 @@ export class ValidationPopoverComponent implements OnInit, AfterViewChecked {
     return this._description;
   }
 
-  get width(): number {
-    return this.validationContainer.nativeElement.offsetWidth;
-  }
-
-  private _title = '';
-
   public set description(value: string) {
     this._description = value;
     this.cd.markForCheck();
     this.cd.detectChanges();
   }
+
+  get width(): number {
+    return this.validationContainer.nativeElement.offsetWidth;
+  }
+
+  private _title = '';
 
   public _description = '';
 

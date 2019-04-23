@@ -31,9 +31,6 @@ export class Segment {
 
   /**
    * converts an object to a Segment. The conversion goes from original -> browser samples.
-   * @param obj
-   * @param originalSampleRate
-   * @param browserSampleRate
    */
   public static fromObj(obj: OSegment, originalSampleRate: number, browserSampleRate: number): Segment {
     if (obj) {

@@ -55,8 +55,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   @ViewChild('agreement') agreement: ElementRef;
   @ViewChild('localmode') localmode: ElementRef;
   @ViewChild('onlinemode') onlinemode: ElementRef;
-  public valid_size = false;
-  public agreement_checked = true;
+  public validSize = false;
+  public agreementChecked = true;
   public projects: string[] = [];
   valid = false;
   member = {
@@ -78,19 +78,19 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         this.audioService.registerAudioManager(this.dropzone.audiomanager);
         this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
           if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
-            const new_levels: OIDBLevel[] = [];
+            const newLevels: OIDBLevel[] = [];
             for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
-              new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
+              newLevels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
             }
 
-            const new_links: OIDBLink[] = [];
+            const newLinks: OIDBLink[] = [];
             for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
-              new_links.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
+              newLinks.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
             }
 
-            this.appStorage.overwriteAnnotation(new_levels).then(
+            this.appStorage.overwriteAnnotation(newLevels).then(
               () => {
-                return this.appStorage.overwriteLinks(new_links);
+                return this.appStorage.overwriteLinks(newLinks);
               }
             ).then(() => {
               this.navigate();
@@ -110,18 +110,18 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.audioService.registerAudioManager(this.dropzone.audiomanager);
       this.appStorage.beginLocalSession(this.dropzone.files, true, () => {
         if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
-          const new_levels: OIDBLevel[] = [];
+          const newLevels: OIDBLevel[] = [];
           for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
-            new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
+            newLevels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
           }
 
-          const new_links: OIDBLink[] = [];
+          const newLinks: OIDBLink[] = [];
           for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
-            new_links.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
+            newLinks.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
           }
 
-          this.appStorage.overwriteAnnotation(new_levels).then(() => {
-            return this.appStorage.overwriteLinks(new_links);
+          this.appStorage.overwriteAnnotation(newLevels).then(() => {
+            return this.appStorage.overwriteLinks(newLinks);
           }).then(() => {
             this.navigate();
           }).catch((err) => {
@@ -140,19 +140,19 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
     this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
         if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
-          const new_levels: OIDBLevel[] = [];
+          const newLevels: OIDBLevel[] = [];
           for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
-            new_levels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
+            newLevels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
           }
 
-          const new_links: OIDBLink[] = [];
+          const newLinks: OIDBLink[] = [];
           for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
-            new_links.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
+            newLinks.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
           }
 
-          this.appStorage.overwriteAnnotation(new_levels).then(
+          this.appStorage.overwriteAnnotation(newLevels).then(
             () => {
-              return this.appStorage.overwriteLinks(new_links);
+              return this.appStorage.overwriteLinks(newLinks);
             }
           ).then(() => {
             this.navigate();
@@ -178,9 +178,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   ngOnInit() {
     if (this.settingsService.responsive.enabled === false) {
-      this.valid_size = window.innerWidth >= this.settingsService.responsive.fixedwidth;
+      this.validSize = window.innerWidth >= this.settingsService.responsive.fixedwidth;
     } else {
-      this.valid_size = true;
+      this.validSize = true;
     }
 
     const loaduser = () => {
@@ -238,12 +238,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   onSubmit(form: NgForm) {
-    let new_session = false;
-    let new_session_after_old = false;
-    let continue_session = false;
+    let newSession = false;
+    let newSessionAfterOld = false;
+    let continueSession = false;
 
     if (!this.isPasswordCorrect(this.member.project, this.member.password)) {
-      this.modService.show('login_invalid');
+      this.modService.show('loginInvalid');
     } else {
 
       if ((this.member.jobno === null || this.member.jobno === undefined) || this.member.jobno === '') {
@@ -252,7 +252,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
       if (this.appStorage.sessionfile !== null) {
         // last was offline mode, begin new Session
-        new_session = true;
+        newSession = true;
 
       } else {
         if (!(this.appStorage.dataID === null || this.appStorage.dataID === undefined) && typeof this.appStorage.dataID === 'number') {
@@ -269,17 +269,17 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               Number(this.appStorage.user.jobno) === Number(this.member.jobno) &&
               this.appStorage.user.project === this.member.project
             ) {
-              continue_session = true;
+              continueSession = true;
             } else {
-              new_session_after_old = true;
+              newSessionAfterOld = true;
             }
           }
         } else {
-          new_session = true;
+          newSession = true;
         }
       }
 
-      if (new_session_after_old) {
+      if (newSessionAfterOld) {
         this.api.setOnlineSessionToFree(this.appStorage).then(() => {
           this.createNewSession(form);
         }).catch((error) => {
@@ -287,9 +287,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         });
       }
 
-      if (new_session) {
+      if (newSession) {
         this.createNewSession(form);
-      } else if (continue_session) {
+      } else if (continueSession) {
         if (this.settingsService.isTheme('shortAudioFiles')) {
           // create new session
 
@@ -335,7 +335,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
                 this.appStorage.sessStr.store('jobsLeft', Number(counter));
               }
 
-              if (form.valid && this.agreement_checked
+              if (form.valid && this.agreementChecked
                 && json.message !== '0'
               ) {
                 if (this.appStorage.sessionfile !== null) {
@@ -373,7 +373,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
                   alert(res.error);
                 }
               } else {
-                this.modService.show('login_invalid');
+                this.modService.show('loginInvalid');
               }
             }
           }).catch((error) => {
@@ -394,15 +394,15 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   @HostListener('window:resize', ['$event'])
   onResize($event) {
     if (this.settingsService.responsive.enabled === false) {
-      this.valid_size = window.innerWidth >= this.settingsService.responsive.fixedwidth;
+      this.validSize = window.innerWidth >= this.settingsService.responsive.fixedwidth;
     } else {
-      this.valid_size = true;
+      this.validSize = true;
     }
   }
 
   getDropzoneFileString(file: File | SessionFile) {
     const fsize: FileSize = Functions.getFileSize(file.size);
-    return Functions.buildStr('{0} ({1} {2})', [file.name, (Math.round(fsize.size * 100) / 100), fsize.label]);
+    return `${file.name} (${(Math.round(fsize.size * 100) / 100)} ${fsize.label})`;
   }
 
   getFileStatus(): string {
@@ -477,15 +477,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   public testFile(converter: Converter, file: File) {
     const reader: FileReader = new FileReader();
-    reader.onload = function (e) {
-      // e.target.result should contain the text
-    };
     reader.readAsText(file);
     reader.readAsText(file, 'utf-8');
   }
 
   onTranscriptionDelete() {
-    this.modService.show('transcription_delete').then((answer: ModalDeleteAnswer) => {
+    this.modService.show('transcriptionDelete').then((answer: ModalDeleteAnswer) => {
       if (answer === ModalDeleteAnswer.DELETE) {
         this.newTranscription();
       }
@@ -497,7 +494,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   private createNewSession(form: NgForm) {
     this.api.beginSession(this.member.project, this.member.id, Number(this.member.jobno)).then((json) => {
 
-      if (form.valid && this.agreement_checked
+      if (form.valid && this.agreementChecked
         && json.message !== '0'
       ) {
 
@@ -563,7 +560,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           console.error(err);
         });
       } else {
-        this.modService.show('login_invalid');
+        this.modService.show('loginInvalid');
       }
     }).catch((error) => {
       alert('Server cannot be requested. Please check if you are online.');

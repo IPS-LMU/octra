@@ -66,7 +66,7 @@ export class KeymappingService {
   public register(identifier: string, shortcuts: any): any {
     if (!this.getShortcuts(identifier)) {
       this.shortcuts.push({
-        identifier: identifier,
+        identifier,
         shortcuts: this.cloneShortcuts(shortcuts)
       });
     }
@@ -102,8 +102,6 @@ export class KeymappingService {
 
   /**
    * get Shortcut for labels
-   * @param key
-   * @returns {any}
    */
   public getShortcut(identifier: string, key: string): string {
     const shortcuts = this.getShortcuts(identifier);

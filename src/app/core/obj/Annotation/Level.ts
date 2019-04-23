@@ -60,8 +60,8 @@ export class Level {
     let items = [];
 
     if (entry.level.type === 'SEGMENT') {
-      const segment_entries: ISegment[] = <ISegment[]>entry.level.items;
-      segments = new Segments(browserSampleRate, segment_entries, lastSamples, originalSampleRate);
+      const segmentEntries: ISegment[] = entry.level.items as ISegment[];
+      segments = new Segments(browserSampleRate, segmentEntries, lastSamples, originalSampleRate);
     } else if (entry.level.type === 'ITEM') {
       items = entry.level.items;
     } else if (entry.level.type === 'EVENT') {

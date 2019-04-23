@@ -25,28 +25,9 @@ export class Functions {
     }, 200);
   }
 
-  public static buildStr(str: string, replace_arr: any[]) {
-    let result: string = str;
-
-    const reg: RegExp = /({[0-9]+})+/g;
-    const count = result.match(reg).length;
-
-    if (count === replace_arr.length) {
-      for (let i = 0; i < replace_arr.length; i++) {
-        const replace_str = (replace_arr[i] !== null) ? replace_arr[i].toString() : 'null';
-
-        result = result.replace('{' + i + '}', replace_str);
-      }
-    } else {
-      throw new Error('buildStr: number of placeholders do not match with array');
-    }
-
-    return result;
-  }
-
   public static isNumber(str: string): boolean {
     const res = parseInt(str, 10);
-    return isNaN(res) ? false : true;
+    return !isNaN(res);
   }
 
   public static equalProperties(elem: any, elem2: any) {
@@ -54,9 +35,9 @@ export class Functions {
 
     for (const el in elem) {
       if (elem.hasOwnProperty(el)) {
-        const prop_str = '' + el + '';
+        const propStr = '' + el + '';
         result = true;
-        if (!(prop_str in elem2)) {
+        if (!(propStr in elem2)) {
           return false;
         }
       }
@@ -105,9 +86,9 @@ export class Functions {
     }
   }
 
-  public static escapeRegex(regex_str: string) {
+  public static escapeRegex(regexStr: string) {
     // escape special chars in regex
-    return regex_str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    return regexStr.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
   }
 
   public static getFileSize(bytes: number): FileSize {
@@ -174,20 +155,20 @@ export class Functions {
     return result;
   }
 
-  public static uniqueHTTPRequest(http: HttpClient, post: boolean = false, requestoptions: any,
+  public static uniqueHTTPRequest(http: HttpClient, post: boolean = false, requestOptions: any,
                                   url: string, body: any): Observable<any> {
     if (!post) {
-      const options = (!(requestoptions === null || requestoptions === undefined)) ? requestoptions : {};
+      const options = (!(requestOptions === null || requestOptions === undefined)) ? requestOptions : {};
 
       if (!options.hasOwnProperty('params')) {
-        options['params'] = {};
+        options.params = {};
       }
 
       const d = Date.now();
-      options['params']['v'] = d.toString();
+      options.params.v = d.toString();
       return http.get(url, options);
     } else {
-      return http.post(url, body, requestoptions);
+      return http.post(url, body, requestOptions);
     }
   }
 
@@ -213,13 +194,13 @@ export class Functions {
   }
 
   public static base64ToArrayBuffer(base64): ArrayBuffer {
-    const binary_string = window.atob(base64);
-    const len = binary_string.length;
+    const binaryString = window.atob(base64);
+    const len = binaryString.length;
     const bytes = new Uint8Array(len);
     for (let i = 0; i < len; i++) {
-      bytes[i] = binary_string.charCodeAt(i);
+      bytes[i] = binaryString.charCodeAt(i);
     }
-    return (<ArrayBuffer>bytes.buffer);
+    return (bytes.buffer as ArrayBuffer);
   }
 
   public static navigateTo(router: Router, commands: any[], navigationExtras?: NavigationExtras): Promise<boolean> {

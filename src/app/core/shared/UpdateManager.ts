@@ -3,6 +3,7 @@ import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../obj/Annotatio
 import {IndexedDBManager} from '../obj/IndexedDBManager';
 import {SubscriptionManager} from '../obj/SubscriptionManager';
 import {AppStorageService, OIDBLevel} from './service/appstorage.service';
+import {isNullOrUndefined} from './Functions';
 
 export class UpdateManager {
   private version = '';
@@ -117,16 +118,16 @@ export class UpdateManager {
                     ]).then(() => {
 
                       const convertAnnotation = () => {
-                        if (!(this.appStorage.localStr.retrieve('annotation') === null || this.appStorage.localStr.retrieve('annotation') === undefined)) {
+                        if (!isNullOrUndefined(this.appStorage.localStr.retrieve('annotation'))) {
                           console.log(`Convert annotation to IDB...`);
 
                           const levels = this.appStorage.localStr.retrieve('annotation').levels;
-                          const new_levels: OIDBLevel[] = [];
+                          const newLevels: OIDBLevel[] = [];
                           for (let i = 0; i < levels.length; i++) {
-                            new_levels.push(new OIDBLevel(i + 1, levels[i], i));
+                            newLevels.push(new OIDBLevel(i + 1, levels[i], i));
                           }
 
-                          idbm.saveArraySequential(new_levels, annoLevelsStore, 'id').then(() => {
+                          idbm.saveArraySequential(newLevels, annoLevelsStore, 'id').then(() => {
                             console.log(`converted annotation levels to IDB`);
 
                             version++;
@@ -145,7 +146,7 @@ export class UpdateManager {
                         }
                       };
 
-                      if (!(this.appStorage.localStr.retrieve('logs') === null || this.appStorage.localStr.retrieve('logs') === undefined)) {
+                      if (!isNullOrUndefined(this.appStorage.localStr.retrieve('logs'))) {
                         console.log('Convert logging data...');
                         console.log(`${this.appStorage.localStr.retrieve('logs').length} logs to convert:`);
                         idbm.saveArraySequential(this.appStorage.localStr.retrieve('logs'), logsStore, 'timestamp').then(() => {
@@ -237,8 +238,8 @@ export class UpdateManager {
     const appversion = AppInfo.version;
 
     if ((this.version === null || this.version === undefined)) {
-      const old_transcription = this.appStorage.localStr.retrieve('transcription');
-      if (!(old_transcription === null || old_transcription === undefined)) {
+      const oldTranscription = this.appStorage.localStr.retrieve('transcription');
+      if (!(oldTranscription === null || oldTranscription === undefined)) {
         console.log('Convert to new AnnotJSON...');
 
         const audiofile: OAudiofile = new OAudiofile();
@@ -250,9 +251,9 @@ export class UpdateManager {
         const segments: OSegment[] = [];
 
         let start = 0;
-        for (let i = 0; i < old_transcription.length; i++) {
-          const transcript = old_transcription[i].transcript;
-          const time = old_transcription[i].time.samples;
+        for (let i = 0; i < oldTranscription.length; i++) {
+          const transcript = oldTranscription[i].transcript;
+          const time = oldTranscription[i].time.samples;
 
           const segment = new OSegment((i + 1), start, (time - start));
           segment.labels.push(new OLabel('Orthographic', transcript));

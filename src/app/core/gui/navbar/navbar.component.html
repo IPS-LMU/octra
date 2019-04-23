@@ -44,7 +44,7 @@
         <ul class="navbar-nav mr-auto" *ngIf="appStorage.LoggedIn">
             <ng-template ngFor let-editor [ngForOf]="editors">
                 <li class="nav-item"
-                    *ngIf="appStorage.LoggedIn && navbarServ.show_interfaces && interfaceActive(editor.name)"
+                    *ngIf="appStorage.LoggedIn && navbarServ.showInterfaces && interfaceActive(editor.name)"
                     [ngClass]="{
                         'active': appStorage.Interface === editor.name
                     }"
@@ -57,7 +57,7 @@
                 </li>
             </ng-template>
             <li class="nav-item"
-                *ngIf="appStorage.LoggedIn && navbarServ.show_interfaces && settService.appSettings.octra.showdetails">
+                *ngIf="appStorage.LoggedIn && navbarServ.showInterfaces && settService.appSettings.octra.showdetails">
                 <a class="nav-link" (mouseup)="modalstatistics.open()">
                     <fa-icon icon="th-list" class="navbar-icon"></fa-icon>
                     <span class="d-md-none d-lg-inline"> Statistics</span></a>
@@ -180,7 +180,7 @@
                     </table>
                 </div>
             </li>
-            <li class="nav-item" *ngIf="appStorage.LoggedIn && navbarServ.show_export">
+            <li class="nav-item" *ngIf="appStorage.LoggedIn && navbarServ.showExport">
                 <a class="nav-link" (mouseup)="modalexport.open()">
                     <fa-icon icon="download" class="navbar-icon"></fa-icon>
                     <!-- TODO CHNAGE this! -->

@@ -4,7 +4,7 @@ import {HttpClient} from '@angular/common/http';
 
 @Injectable()
 export class LoginService {
-  private db_data: any[] = [];
+  private dbData: any[] = [];
 
   private subscrmanager: SubscriptionManager;
 
@@ -12,9 +12,9 @@ export class LoginService {
     this.subscrmanager = new SubscriptionManager();
   }
 
-  public checkLoginData(user_name: string) {
-    for (let i = 0; i < this.db_data.length; i++) {
-      if (user_name === this.db_data[i].name) {
+  public checkLoginData(userName: string) {
+    for (let i = 0; i < this.dbData.length; i++) {
+      if (userName === this.dbData[i].name) {
         return true;
       }
     }

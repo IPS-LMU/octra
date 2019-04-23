@@ -84,7 +84,7 @@ export class TranscriptionComponent implements OnInit,
     return this._currentEditor;
   }
 
-  private get app_settings() {
+  private get appSettings() {
     return this.settingsService.appSettings;
   }
 
@@ -116,11 +116,11 @@ export class TranscriptionComponent implements OnInit,
     this.uiService.enabled = this.appStorage.logging;
 
     this.subscrmanager.add(this.audiomanager.statechange.subscribe((state) => {
-        if (!this.audiomanager.playOnHover && !this.modal_overview.visible) {
+        if (!this.audiomanager.playOnHover && !this.modalOverview.visible) {
           let caretpos = -1;
 
-          if (!(((<any>this.currentEditor.instance).editor) === null || ((<any>this.currentEditor.instance).editor) === undefined)) {
-            caretpos = (<any>this.currentEditor.instance).editor.caretpos;
+          if (!(((this.currentEditor.instance as any).editor) === null || ((this.currentEditor.instance as any).editor) === undefined)) {
+            caretpos = (this.currentEditor.instance as any).editor.caretpos;
           }
 
           // make sure that events from playonhover are not logged
@@ -141,26 +141,26 @@ export class TranscriptionComponent implements OnInit,
   }
 
   // TODO change to ModalComponents!
-  @ViewChild('modal_shortcuts') modal_shortcuts: any;
-  @ViewChild('modal_overview') modal_overview: OverviewModalComponent;
+  @ViewChild('modal_shortcuts') modalShortcuts: any;
+  @ViewChild('modal_overview') modalOverview: OverviewModalComponent;
   @ViewChild(LoadeditorDirective) appLoadeditor: LoadeditorDirective;
   @ViewChild('modal') modal: any;
   @ViewChild('transcrSendingModal') transcrSendingModal: TranscriptionSendingModalComponent;
-  @ViewChild('modal_guidelines') modal_guidelines: TranscriptionGuidelinesModalComponent;
+  @ViewChild('modal_guidelines') modalGuidelines: TranscriptionGuidelinesModalComponent;
   @ViewChild('inactivityModal') inactivityModal: InactivityModalComponent;
 
-  public send_error = '';
+  public sendError = '';
   public showdetails = false;
   public saving = '';
   public interface = '';
   public shortcutslist: Entry[] = [];
   public editorloaded = false;
-  public feedback_expanded = false;
+  public feedbackExpanded = false;
   user: number;
   public platform = BrowserInfo.platform;
   private subscrmanager: SubscriptionManager;
-  private send_ok = false;
-  private level_subscription_id = 0;
+  private sendOk = false;
+  private levelSubscriptionID = 0;
   private audiomanager: AudioManager;
   private _currentEditor: ComponentRef<Component>;
 
@@ -187,7 +187,7 @@ export class TranscriptionComponent implements OnInit,
         console.error(error);
       });
     } else {
-      this.modService.show('transcription_stop').then((answer: TranscriptionStopModalAnswer) => {
+      this.modService.show('transcriptionStop').then((answer: TranscriptionStopModalAnswer) => {
         if (answer === TranscriptionStopModalAnswer.QUIT) {
           this.transcrService.endTranscription();
 
@@ -200,7 +200,7 @@ export class TranscriptionComponent implements OnInit,
   }
 
   onSendError = (error) => {
-    this.send_error = error.message;
+    this.sendError = error.message;
     return throwError(error);
   }
 
@@ -230,13 +230,13 @@ export class TranscriptionComponent implements OnInit,
     for (let i = 0; i < this.transcrService.guidelines.markers.length; i++) {
       const marker = this.transcrService.guidelines.markers[i];
       if (marker.type === 'break') {
-        this.transcrService.break_marker = marker;
+        this.transcrService.breakMarker = marker;
         break;
       }
     }
 
     // this.transcrService.annotation.audiofile.samplerate = this.audiomanager.ressource.info.samplerate;
-    this.navbarServ.show_interfaces = this.settingsService.projectsettings.navigation.interfaces;
+    this.navbarServ.showInterfaces = this.settingsService.projectsettings.navigation.interfaces;
 
     // load guidelines on language change
     this.subscrmanager.add(this.langService.onLangChange.subscribe(
@@ -284,15 +284,15 @@ export class TranscriptionComponent implements OnInit,
       }
     ));
 
-    this.navbarServ.show_export = this.settingsService.projectsettings.navigation.export;
+    this.navbarServ.showExport = this.settingsService.projectsettings.navigation.export;
 
     if (!(this.transcrService.annotation === null || this.transcrService.annotation === undefined)) {
-      this.level_subscription_id = this.subscrmanager.add(
+      this.levelSubscriptionID = this.subscrmanager.add(
         this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
       );
     } else {
       this.subscrmanager.add(this.transcrService.dataloaded.subscribe(() => {
-        this.level_subscription_id = this.subscrmanager.add(
+        this.levelSubscriptionID = this.subscrmanager.add(
           this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
         );
       }));
@@ -300,11 +300,11 @@ export class TranscriptionComponent implements OnInit,
 
     this.subscrmanager.add(this.transcrService.levelchanged.subscribe(
       (level: Level) => {
-        (<any>this.currentEditor.instance).update();
+        (this.currentEditor.instance as any).update();
 
         // important: subscribe to level changes in order to save proceedings
-        this.subscrmanager.remove(this.level_subscription_id);
-        this.level_subscription_id = this.subscrmanager.add(
+        this.subscrmanager.remove(this.levelSubscriptionID);
+        this.levelSubscriptionID = this.subscrmanager.add(
           this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
         );
         this.uiService.addElementFromEvent('level', {value: 'changed'}, Date.now(),
@@ -375,26 +375,26 @@ export class TranscriptionComponent implements OnInit,
   @HostListener('window:keydown', ['$event'])
   onKeyUp($event) {
     if ($event.altKey && $event.which === 56) {
-      if (!this.modal_shortcuts.visible) {
-        this.modal_shortcuts.open();
+      if (!this.modalShortcuts.visible) {
+        this.modalShortcuts.open();
       } else {
-        this.modal_shortcuts.close();
+        this.modalShortcuts.close();
       }
       $event.preventDefault();
     } else if ($event.altKey && $event.which === 57) {
-      if (!this.modal_guidelines.visible) {
-        this.modal_guidelines.open();
+      if (!this.modalGuidelines.visible) {
+        this.modalGuidelines.open();
       } else {
-        this.modal_guidelines.close();
+        this.modalGuidelines.close();
       }
       $event.preventDefault();
     }
     if ($event.altKey && $event.which === 48) {
-      if (!this.modal_overview.visible) {
+      if (!this.modalOverview.visible) {
         this.transcrService.analyse();
-        this.modal_overview.open();
+        this.modalOverview.open();
       } else {
-        this.modal_overview.close();
+        this.modalOverview.close();
       }
       $event.preventDefault();
     }
@@ -437,13 +437,13 @@ export class TranscriptionComponent implements OnInit,
 
         let caretpos = -1;
 
-        if (!((<any>this.currentEditor.instance).editor === null || (<any>this.currentEditor.instance).editor === undefined)) {
-          caretpos = (<any>this.currentEditor.instance).editor.caretpos;
+        if (!((this.currentEditor.instance as any).editor === null || (this.currentEditor.instance as any).editor === undefined)) {
+          caretpos = (this.currentEditor.instance as any).editor.caretpos;
         }
 
-        if ((<any>this.currentEditor.instance).hasOwnProperty('openModal')) {
-          this.subscrmanager.add((<any>this.currentEditor.instance).openModal.subscribe(() => {
-            this.modal_overview.open();
+        if ((this.currentEditor.instance as any).hasOwnProperty('openModal')) {
+          this.subscrmanager.add((this.currentEditor.instance as any).openModal.subscribe(() => {
+            this.modalOverview.open();
           }));
         }
 
@@ -472,7 +472,7 @@ export class TranscriptionComponent implements OnInit,
 
   public onSendNowClick() {
     this.transcrSendingModal.open();
-    this.send_ok = true;
+    this.sendOk = true;
 
     const json: any = this.transcrService.exportDataToJSON();
 
@@ -495,12 +495,12 @@ export class TranscriptionComponent implements OnInit,
           this.transcrSendingModal.close();
 
           // only if opened
-          this.modal_overview.close();
+          this.modalOverview.close();
 
           this.nextTranscription(result);
         }, 500);
       } else {
-        this.send_error = this.langService.instant('send error');
+        this.sendError = this.langService.instant('send error');
       }
     }).catch((error) => {
       this.onSendError(error);
@@ -524,10 +524,10 @@ export class TranscriptionComponent implements OnInit,
     }
 
     if ((
-      (!validTranscript && showOverview) || !this.modal_overview.feedBackComponent.valid)
+      (!validTranscript && showOverview) || !this.modalOverview.feedBackComponent.valid)
       || (validTranscriptOnly && !validTranscript)
     ) {
-      this.modal_overview.open();
+      this.modalOverview.open();
     } else {
       this.onSendNowClick();
     }
@@ -644,8 +644,8 @@ export class TranscriptionComponent implements OnInit,
     const form: FormData = new FormData();
     let host = 'https://clarin.phonetik.uni-muenchen.de/BASWebServices/services/';
 
-    if (!(this.appStorage.urlParams['host'] === null || this.appStorage.urlParams['host'] === undefined)) {
-      host = this.appStorage.urlParams['host'];
+    if (!(this.appStorage.urlParams.host === null || this.appStorage.urlParams.host === undefined)) {
+      host = this.appStorage.urlParams.host;
     }
 
     const url = `${host}uploadFileMulti`;
@@ -665,7 +665,7 @@ export class TranscriptionComponent implements OnInit,
     };
 
     xhr.onloadend = (e) => {
-      const result2 = e.currentTarget['responseText'];
+      const result2 = (e.currentTarget as any).responseText;
 
       const x2js = new X2JS();
       let json: any = x2js.xml2js(result2);
@@ -675,13 +675,10 @@ export class TranscriptionComponent implements OnInit,
         // TODO set urls to results only
         let resulturl = '';
         if (Array.isArray(json.fileList.entry)) {
-          for (let i = 0; i < json.fileList.length; i++) {
-            resulturl = json.fileList.entry[i].value;
-            break;
-          }
+          resulturl = json.fileList.entry[0].value;
         } else {
           // json attribute entry is an object
-          resulturl = json.fileList.entry['value'];
+          resulturl = json.fileList.entry.value;
         }
 
         // send upload url to iframe owner
@@ -694,7 +691,7 @@ export class TranscriptionComponent implements OnInit,
       } else {
         window.parent.postMessage({
           status: 'error',
-          error: json['message']
+          error: json.message
         }, '*');
       }
     };

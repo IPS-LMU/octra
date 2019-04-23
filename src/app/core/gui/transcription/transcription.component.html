@@ -1,10 +1,9 @@
 <app-alert #alert></app-alert>
 <app-transcription-send-modal #modal></app-transcription-send-modal>
-<app-transcription-sending-modal [sendError]="send_error" #transcrSendingModal></app-transcription-sending-modal>
-<app-overview-modal #modal_overview id="overview" (transcriptionSend)="onSendNowClick()"></app-overview-modal>
-<app-shortcuts-modal #modal_shortcuts [editor]="Interface"></app-shortcuts-modal>
-<app-transcription-success-modal #success></app-transcription-success-modal>
-<app-transcription-guidelines-modal #modal_guidelines
+<app-transcription-sending-modal [sendError]="sendError" #transcrSendingModal></app-transcription-sending-modal>
+<app-overview-modal #modalOverview id="overview" (transcriptionSend)="onSendNowClick()"></app-overview-modal>
+<app-shortcuts-modal #modalShortcuts [editor]="Interface"></app-shortcuts-modal>
+<app-transcription-guidelines-modal #modalGuidelines
                                     [guidelines]="transcrService.guidelines"></app-transcription-guidelines-modal>
 <app-activity-timeout-modal #inactivityModal *ngIf="settingsService.appSettings.octra.inactivityNotice !== undefined
 && settingsService.appSettings.octra.inactivityNotice.showAfter !== undefined"></app-activity-timeout-modal>
@@ -16,16 +15,16 @@
     </span>
     <app-fastbar
             [responsive]="responsive"
-            [button_labels]="{
+            [buttonLabels]="{
             shortcuts: 'general.shortcuts' | translate,
             guidelines: 'general.guidelines' | translate,
             overview: 'general.overview' | translate,
             help: 'general.help' | translate
             }"
 
-            (shortcutbtnclicked)="modal_shortcuts.open()"
-            (guidelinesbtnclicked)="modal_guidelines.open()"
-            (overviewbtnclicked)="modal_overview.open()"
+            (shortcutbtnclicked)="modalShortcuts.open()"
+            (guidelinesbtnclicked)="modalGuidelines.open()"
+            (overviewbtnclicked)="modalOverview.open()"
     ></app-fastbar>
 
     <div class="flex">

@@ -47,8 +47,8 @@ export class TranscriptionSendModalComponent implements OnInit {
     });
   }
 
-  public close(action: ModalSendAnswer) {
+  public close(action: string) {
     this.modalRef.hide();
-    this.actionperformed.next(action);
+    this.actionperformed.next(action as ModalSendAnswer);
   }
 }

@@ -13,16 +13,16 @@ import {BsModalRef} from 'ngx-bootstrap';
 })
 export class OctraModalComponent implements OnInit, OnDestroy {
 
-  @ViewChild('login_invalid') login_invalid: BsModalRef;
-  @ViewChild('transcription_delete') transcription_delete: BsModalRef;
-  @ViewChild('transcription_stop') transcription_stop: BsModalRef;
+  @ViewChild('loginInvalid') loginInvalid: BsModalRef;
+  @ViewChild('transcriptionDelete') transcriptionDelete: BsModalRef;
+  @ViewChild('transcriptionStop') transcriptionStop: BsModalRef;
   @ViewChild('error') error: BsModalRef;
   @ViewChild('bugreport') bugreport: BsModalRef;
   @ViewChild('supportedfiles') supportedfiles: BsModalRef;
   @ViewChild('yesno') yesno: BsModalRef;
   public bgdescr = '';
   public bgemail = '';
-  public sendpro_obj = true;
+  public sendproObj = true;
   public bugsent = false;
   public data: any;
   private _subscrmanager: SubscriptionManager;

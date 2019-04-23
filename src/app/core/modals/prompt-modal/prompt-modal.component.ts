@@ -15,7 +15,7 @@ export class PromptModalComponent implements OnInit {
   public visible = false;
   public bgemail = '';
   public bgdescr = '';
-  public sendpro_obj = true;
+  public sendProObj = true;
   public bugsent = false;
   config: ModalOptions = {
     keyboard: false,
@@ -28,7 +28,7 @@ export class PromptModalComponent implements OnInit {
   private subscrmanager = new SubscriptionManager();
 
   public get isvalid(): boolean {
-    if (this.sendpro_obj || this.bgdescr !== '') {
+    if (this.sendProObj || this.bgdescr !== '') {
       return true;
     } else {
       return false;

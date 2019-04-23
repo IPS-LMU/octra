@@ -17,7 +17,7 @@
     </tr>
     </tbody>
 </table>
-<p [hidden]="shown_segments.length === 0" style="text-align: center">
+<p [hidden]="shownSegments.length === 0" style="text-align: center">
     <ng-container *ngIf="validationFound">
         <span *ngIf="foundErrors === 0"
               class="text-success found-errors">{{"general.no errors found" | translate}}</span>
@@ -26,8 +26,8 @@
     </ng-container>
     <span *ngIf="!validationFound">No validation methods found</span>
 </p>
-<h4 [hidden]="!show_transcriptiontable">{{"general.transcript" | translate}}</h4>
-<div [hidden]="!show_loading">
+<h4 [hidden]="!showTranscriptionTable">{{"general.transcript" | translate}}</h4>
+<div [hidden]="!showLoading">
     <div style="display:block; text-align:center; margin-top:-10px;position:absolute;width:100%;">
         <i class="fa fa-spinner fa-spin" style="font-size:32px"></i>
     </div>
@@ -38,8 +38,8 @@
                                 'margin-top': popovers.validation.location.y + 'px'
                             }"></app-validation-popover>
 
-<table id="transcription-table" *ngIf="shown_segments.length > 0" class="table table-bordered"
-       [hidden]="!show_transcriptiontable">
+<table id="transcription-table" *ngIf="shownSegments.length > 0" class="table table-bordered"
+       [hidden]="!showTranscriptionTable">
     <thead id="table-head">
     <tr>
         <th id="table-first-column"></th>
@@ -54,16 +54,16 @@
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let segment of shown_segments; let i = index"
+    <tr *ngFor="let segment of shownSegments; let i = index"
         class="segment-row"
-        [ngClass]="{'alert-success': (segment.transcription.text !== '' && segment.transcription.text != transcrService.break_marker.code), 'alert-info': (segment.transcription.text == transcrService.break_marker.code), 'alert-danger': (segment.transcription.text === '')}">
+        [ngClass]="{'alert-success': (segment.transcription.text !== '' && segment.transcription.text != transcrService.breakMarker.code), 'alert-info': (segment.transcription.text == transcrService.breakMarker.code), 'alert-danger': (segment.transcription.text === '')}">
         <td style="width:25px;vertical-align:middle;">
             <fa-icon [icon]="['fas', 'exclamation-triangle']" class="segment-warning" [ngStyle]="{
                   'display': ((segment.transcription.html.indexOf('<span class=\'val-error\'') > -1) ? 'normal': 'none')}">
             </fa-icon>
         </td>
         <td class="segment-number"><span class="link"
-                                         (click)="onSegmentClicked(i)"># {{i + 1 | leadingnull: shown_segments.length}}</span>
+                                         (click)="onSegmentClicked(i)"># {{i + 1 | leadingnull: shownSegments.length}}</span>
         </td>
         <td *ngIf="textEditor.state === 'active' && textEditor.selectedSegment === i; else editorNotActive"
             (mouseleave)="onTextEditorLeave($event, i)">

@@ -1,10 +1,10 @@
 export class Logger {
   private readonly entries: any[];
-  private readonly group_name: string;
+  private readonly groupName: string;
 
-  constructor(groupe_name: string) {
+  constructor(groupName: string) {
     this.entries = [];
-    this.group_name = groupe_name;
+    this.groupName = groupName;
   }
 
   public static getDateStr() {
@@ -15,14 +15,14 @@ export class Logger {
   public addEntry(type: string, message: any) {
     this.entries.push(
       {
-        type: type,
-        message: message
+        type,
+        message
       }
     );
   }
 
   public output() {
-    console.groupCollapsed(this.group_name);
+    console.groupCollapsed(this.groupName);
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
 

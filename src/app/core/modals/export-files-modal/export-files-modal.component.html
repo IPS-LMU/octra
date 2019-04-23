@@ -20,7 +20,7 @@
                         <tr *ngIf="converter.conversion.export">
                             <td (click)="onLineClick(converter, i)">
                                 <fa-icon style="color:gray;"
-                                         [icon]="['fas', ((export_states[i] === 'active') ? 'chevron-up' : 'chevron-down')]"></fa-icon>
+                                         [icon]="['fas', ((exportStates[i] === 'active') ? 'chevron-up' : 'chevron-down')]"></fa-icon>
                             </td>
                             <td (click)="onLineClick(converter, i)">
                                 <a #a>
@@ -42,7 +42,7 @@
                                          [attr.title]="converter.notice"></fa-icon>
                             </td>
                         </tr>
-                        <tr [@fadeToggle]="export_states[i]" *ngIf="converter.conversion.export">
+                        <tr [@fadeToggle]="exportStates[i]" *ngIf="converter.conversion.export">
                             <td></td>
                             <td colspan="4" style="padding-left:20px;">
                                 <select #val

@@ -1,21 +1,21 @@
-import {Component, Input, OnInit, SecurityContext} from '@angular/core';
+import {Component, Input, OnChanges, OnInit, SecurityContext} from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
-import {TranscriptionService} from '../../shared/service';
+import {SettingsService, TranscriptionService} from '../../shared/service';
 
 @Component({
   selector: 'app-guidelines',
   templateUrl: './guidelines.component.html',
   styleUrls: ['./guidelines.component.css']
 })
-export class GuidelinesComponent implements OnInit {
+export class GuidelinesComponent implements OnInit, OnChanges {
 
   public visible = false;
   @Input() guidelines = null;
-  public shown_guidelines: any = {};
+  public shownGuidelines: any = {};
   public collapsed: any[][] = [];
-  private video_players: any[] = [];
+  private videoPlayers: any[] = [];
 
-  constructor(private transcrService: TranscriptionService, private sanitizer: DomSanitizer) {
+  constructor(private transcrService: TranscriptionService, private sanitizer: DomSanitizer, private settService: SettingsService) {
   }
 
   ngOnInit() {
@@ -23,7 +23,7 @@ export class GuidelinesComponent implements OnInit {
 
   ngOnChanges($event) {
     if (!($event.guidelines.currentValue === null || $event.guidelines.currentValue === undefined)) {
-      this.shown_guidelines = JSON.parse(JSON.stringify($event.guidelines.currentValue));
+      this.shownGuidelines = JSON.parse(JSON.stringify($event.guidelines.currentValue));
       this.unCollapseAll();
     }
     if (($event.guidelines.previousValue === null || $event.guidelines.previousValue === undefined)
@@ -35,8 +35,8 @@ export class GuidelinesComponent implements OnInit {
   }
 
   videoplayerExists(player: string): number {
-    for (let i = 0; i < this.video_players.length; i++) {
-      if (this.video_players[i].id_ === player) {
+    for (let i = 0; i < this.videoPlayers.length; i++) {
+      if (this.videoPlayers[i].id_ === player) {
         return i;
       }
     }
@@ -47,22 +47,22 @@ export class GuidelinesComponent implements OnInit {
     for (let g = 0; g < this.guidelines.instructions.length; g++) {
       for (let i = 0; i < this.guidelines.instructions[g].entries.length; i++) {
         for (let e = 0; e < this.guidelines.instructions[g].entries[i].examples.length; e++) {
-          const id_v = 'my-player_g' + g + 'i' + i + 'e' + e;
-          if (document.getElementById(id_v)) {
+          const idV = 'my-player_g' + g + 'i' + i + 'e' + e;
+          if (document.getElementById(idV)) {
 
-            const old_player = this.videoplayerExists(id_v);
+            const oldPlayer = this.videoplayerExists(idV);
 
-            if (old_player > -1) {
+            if (oldPlayer > -1) {
               // videojs(document.getElementById(id_v)).dispose();
             } else {
-              const player = videojs(id_v, {
-                'fluid': true,
-                'autoplay': false,
-                'preload': 'auto'
+              const player = videojs(idV, {
+                fluid: true,
+                autoplay: false,
+                preload: 'auto'
               }, function onPlayerReady() {
               });
 
-              this.video_players.push(player);
+              this.videoPlayers.push(player);
             }
           }
         }
@@ -88,12 +88,12 @@ export class GuidelinesComponent implements OnInit {
 
   private search(text: string) {
     if (text !== '') {
-      this.shown_guidelines.instructions = [];
+      this.shownGuidelines.instructions = [];
 
       for (let i = 0; i < this.guidelines.instructions.length; i++) {
         const instruction = this.guidelines.instructions[i];
         if (instruction.group.indexOf(text) > -1) {
-          this.shown_guidelines.instructions.push(instruction);
+          this.shownGuidelines.instructions.push(instruction);
         } else {
           const instr = JSON.parse(JSON.stringify(instruction));
           instr.entries = [];
@@ -108,12 +108,12 @@ export class GuidelinesComponent implements OnInit {
           }
 
           if (instr.entries.length > 0) {
-            this.shown_guidelines.instructions.push(instr);
+            this.shownGuidelines.instructions.push(instr);
           }
         }
       }
     } else {
-      this.shown_guidelines = JSON.parse(JSON.stringify(this.guidelines));
+      this.shownGuidelines = JSON.parse(JSON.stringify(this.guidelines));
     }
   }
 

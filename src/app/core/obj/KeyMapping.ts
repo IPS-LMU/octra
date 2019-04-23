@@ -1,7 +1,6 @@
 export class KeyMapping {
   /**
    * mapping for special keys
-   * @type {{name: string; keyCode: number}[]}
    */
   private static table: any = [
     {
@@ -50,12 +49,9 @@ export class KeyMapping {
   /**
    *
    * gets the name of a special Key by number
-   * @param code
-   * @returns {string}
    */
   public static getNameByCode(code: number): string {
-    let i = 0;
-    for (i = 0; i < this.table.length; i++) {
+    for (let i = 0; i < this.table.length; i++) {
       if (this.table[i].keyCode === code) {
         return this.table[i].name;
       }
@@ -65,17 +61,15 @@ export class KeyMapping {
 
   /**
    * returns combination of shurtcut as a string
-   * @param $event
-   * @returns {string}
    */
   public static getShortcutCombination($event): string {
-    const keycode = $event.which; // which has better browser compatibility
+    const keyCode = $event.which; // which has better browser compatibility
     const alt = $event.altKey;
     const ctrl = $event.ctrlKey;
     const meta = $event.metaKey;
     const shift = $event.shiftKey;
 
-    let name = this.getNameByCode(keycode);
+    let name = this.getNameByCode(keyCode);
     if (name === '' && !($event.which === null || $event.which === undefined)) {
       name = String.fromCharCode($event.which).toUpperCase();
     }
@@ -88,21 +82,21 @@ export class KeyMapping {
       name = 'CTRL';
     }
 
-    let is_combination = false;
+    let isCombination = false;
     let comboKey = '';
 
     // only one kombination permitted
     if (alt && !(ctrl || meta || shift)) {
-      is_combination = true;
+      isCombination = true;
     } else if (ctrl && !(alt || meta || shift)) {
-      is_combination = true;
+      isCombination = true;
     } else if (meta && !(alt || ctrl || shift)) {
-      is_combination = true;
+      isCombination = true;
     } else if (shift && !(alt || ctrl || meta)) {
-      is_combination = true;
+      isCombination = true;
     }
 
-    if (is_combination) {
+    if (isCombination) {
       if (alt) {
         comboKey = 'ALT';
       } else if (ctrl) {
@@ -123,7 +117,7 @@ export class KeyMapping {
       if ($event.key !== '' && name !== '') {
         if (name.length === 1) {
           // keyName is normal char
-          name = String.fromCharCode(keycode);
+          name = String.fromCharCode(keyCode);
         }
         comboKey += name;
       }

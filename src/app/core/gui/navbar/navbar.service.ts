@@ -14,24 +14,24 @@ export class NavbarService {
   public originalInfo: AudioInfo;
   public filesize: FileSize;
 
-  private _show_export = false;
+  private _showExport = false;
 
-  get show_export(): boolean {
-    return this._show_export;
+  get showExport(): boolean {
+    return this._showExport;
   }
 
-  set show_export(value: boolean) {
-    this._show_export = value;
+  set showExport(value: boolean) {
+    this._showExport = value;
   }
 
-  private _show_interfaces = false;
+  private _showInterfaces = false;
 
-  get show_interfaces(): boolean {
-    return this._show_interfaces;
+  get showInterfaces(): boolean {
+    return this._showInterfaces;
   }
 
-  set show_interfaces(value: boolean) {
-    this._show_interfaces = value;
+  set showInterfaces(value: boolean) {
+    this._showInterfaces = value;
   }
 
   private _interfaces: string[] = [];

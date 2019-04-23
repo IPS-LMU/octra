@@ -1,5 +1,5 @@
 export class TranscrEditorConfig {
-  public Settings: any = {
+  public settings: any = {
     markers: [],
     // disabled shortcuts
     disabled_keys: ['ENTER', 'SHIFT + ENTER', 'TAB'],

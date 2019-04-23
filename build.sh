@@ -10,6 +10,9 @@ excludedList='"config" "LICENCE.txt"'
 # 1 = disable indexing, 2 = enable
 disableRobots=1
 
+timeNow=`date "+%Y-%m-%d %H:%M:%S"`
+octraVersion="1.3.0"
+
 echo "Building OCTRA..."
 ng build --prod --base-href "${baseHref}"
 echo "Change index.html..."
@@ -20,6 +23,8 @@ indexHTML=$(echo "${indexHTML}" | sed -e "s/\(src=\"\)\(polyfills\.[0-9a-z]*\.js
 indexHTML=$(echo "${indexHTML}" | sed -e "s/\(main\.[0-9a-z]*\.js\)/.\/${targetFolder}\/\1/g")
 indexHTML=$(echo "${indexHTML}" | sed -e "s/\(runtime\.[0-9a-z]*\.js\)/.\/${targetFolder}\/\1/g")
 indexHTML=$(echo "${indexHTML}" | sed -e "s/\(styles\.[0-9a-z]*\.css\)/.\/${targetFolder}\/\1/g")
+indexHTML=$(echo "${indexHTML}" | sed -e "s/\(const octraLastUpdated = \"\).*\(\";\)/\1${timeNow}\2/g")
+indexHTML=$(echo "${indexHTML}" | sed -e "s/\(const octraVersion = \"\).*\(\";\)/\1${octraVersion}\2/g")
 
 if [[ ${disableRobots} == 0 ]]
 then

@@ -45,7 +45,7 @@ export class AppInfo {
     'shortAudioFiles'
   ];
 
-  static readonly version = '1.2.7';
+  static readonly version = '1.3.0';
   static readonly lastUpdate = '2018-04-12 23:10';
 
   public static readonly queryParamsHandling: NavigationExtras = {

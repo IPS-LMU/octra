@@ -401,10 +401,17 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
     for (let i = 0; i < this.transcrService.currentlevel.segments.length; i++) {
       const segment: Segment = this.transcrService.currentlevel.segments.get(i);
+      let sampleDur = segment.time.originalSample.value - startSample;
+
+      if (startSample + sampleDur > this.audio.audiomanagers[0].originalInfo.duration.originalSample.value) {
+        console.error(`invalid sampleDur!!`);
+        sampleDur = this.audio.audiomanagers[0].originalInfo.duration.originalSample.value - startSample;
+      }
+
       cutList.push({
         number: i,
         sampleStart: startSample,
-        sampleDur: segment.time.originalSample.value - startSample,
+        sampleDur,
         transcript: segment.transcript
       });
       startSample = segment.time.originalSample.value;

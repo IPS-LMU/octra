@@ -16,6 +16,9 @@ import {ELANConverter} from './core/obj/Converters/ELANConverter';
 import {SRTConverter} from './core/obj/Converters/SRTConverter';
 import {WebVTTConverter} from './core/obj/Converters/WebVTTConverter';
 
+declare var octraVersion: string;
+declare var octraLastUpdated: string;
+
 export class AppInfo {
   public static readonly audioformats = [
     new WavFormat(),
@@ -45,8 +48,8 @@ export class AppInfo {
     'shortAudioFiles'
   ];
 
-  static readonly version = '1.3.0';
-  static readonly lastUpdate = '2018-04-12 23:10';
+  static readonly version = octraVersion;
+  static readonly lastUpdate = octraLastUpdated;
 
   public static readonly queryParamsHandling: NavigationExtras = {
     queryParamsHandling: '',

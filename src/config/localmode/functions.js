@@ -7,7 +7,7 @@ function validateAnnotation(annotation, guidelines) {
     var result = [];
 
     //R06 Satzzeichen
-    var re = /[\(\.,\!\?;\)]/g;
+    var re = /[(.,!?;)]/g;
     while ((match = re.exec(annotation)) != null) {
         result.push({
             start: match.index,

@@ -216,7 +216,7 @@ export class WavFormat extends AudioFormat {
       leadingNull += '0';
     }
 
-    return (namingConvention.replace(/\<([^<>]+)\>/g, (g0, g1) => {
+    return (namingConvention.replace(/<([^<>]+)>/g, (g0, g1) => {
       switch (g1) {
         case('name'):
           return fileName;

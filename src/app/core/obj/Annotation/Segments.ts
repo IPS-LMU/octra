@@ -77,18 +77,18 @@ export class Segments {
   public removeByIndex(index: number, breakmarker: string) {
     if (index > -1 && index < this.segments.length) {
       if (index < this.segments.length - 1) {
-        const newxtSegment = this.segments[index + 1];
+        const nextSegment = this.segments[index + 1];
         const transcription: string = this.segments[index].transcript;
-        if (newxtSegment.transcript !== breakmarker && transcription !== breakmarker) {
+        if (nextSegment.transcript !== breakmarker && transcription !== breakmarker) {
           // concat transcripts
-          if (newxtSegment.transcript !== '' && transcription !== '') {
-            newxtSegment.transcript = transcription + ' ' + newxtSegment.transcript;
-          } else if (newxtSegment.transcript === '' && transcription !== '') {
-            newxtSegment.transcript = transcription;
+          if (nextSegment.transcript !== '' && transcription !== '') {
+            nextSegment.transcript = transcription + ' ' + nextSegment.transcript;
+          } else if (nextSegment.transcript === '' && transcription !== '') {
+            nextSegment.transcript = transcription;
           }
-        } else if (newxtSegment.transcript === breakmarker) {
+        } else if (nextSegment.transcript === breakmarker) {
           // delete pause
-          newxtSegment.transcript = transcription;
+          nextSegment.transcript = transcription;
         }
       }
 

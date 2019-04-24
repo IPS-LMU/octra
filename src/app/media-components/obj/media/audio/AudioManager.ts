@@ -209,6 +209,8 @@ export class AudioManager {
         const bufferLength = buffer.byteLength;
         AudioManager.decoder = new AudioDecoder(audioformat, buffer);
 
+        const bufferCopy = buffer.slice(0);
+
         AudioManager.decoder.onaudiodecode.subscribe((obj) => {
           if (obj.result !== null) {
             // get result;
@@ -218,9 +220,9 @@ export class AudioManager {
             audioinfo = new AudioInfo(filename, type, bufferLength, audioBuffer.sampleRate,
               audioBuffer.length, audioformat.channels, audioformat.bitsPerSample, audioformat.sampleRate);
 
-            audioinfo.file = new File([buffer], filename, {type: 'audio/wav'});
+            // audioinfo.file = new File([buffer], filename, {type: 'audio/wav'});
             result.setRessource(new AudioRessource(filename, SourceType.ArrayBuffer,
-              audioinfo, buffer, audioBuffer, bufferLength));
+              audioinfo, bufferCopy, audioBuffer, bufferLength));
 
             result.bufferedOLA.set_audio_buffer(audioBuffer);
 

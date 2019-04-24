@@ -2,7 +2,7 @@ import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/c
 import {APIService, AppStorageService, SettingsService} from './core/shared/service';
 import {TranslateService} from '@ngx-translate/core';
 import {SubscriptionManager} from './core/obj/SubscriptionManager';
-import {BugReportService} from './core/shared/service/bug-report.service';
+import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
 import {AppInfo} from './app.info';
 import {environment} from '../environments/environment';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -37,11 +37,12 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
               private router: Router,
               private route: ActivatedRoute,
               private multiThreading: MultiThreadingService) {
-    /*
+
     // overwrite console.log
     const oldLog = console.log;
     const serv = this.bugService;
     (() => {
+      // tslint:disable-next-line:only-arrow-functions
       console.log = function (message) {
         serv.addEntry(ConsoleType.LOG, message);
         oldLog.apply(console, arguments);
@@ -51,6 +52,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
     // overwrite console.err
     const oldError = console.error;
     (() => {
+      // tslint:disable-next-line:only-arrow-functions
       console.error = function (error) {
         let debug = '';
         let stack = '';
@@ -82,12 +84,12 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
     // overwrite console.warn
     const oldWarn = console.warn;
     (() => {
+      // tslint:disable-next-line:only-arrow-functions
       console.warn = function (message) {
         serv.addEntry(ConsoleType.WARN, message);
         oldWarn.apply(console, arguments);
       };
     })();
-    */
   }
 
   ngOnInit() {

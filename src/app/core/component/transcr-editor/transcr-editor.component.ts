@@ -1079,14 +1079,30 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         const regex = new RegExp('(\\s)*(' + Functions.escapeRegex(marker.code) + ')(\\s)*', 'g');
         const regex2 = /{([0-9]+)}/g;
 
-        const replaceFunc = (x, g1) => {
+        const replaceMarkers = (x, g1, g2, g3) => {
+          const s1 = (g1) ? g1 : '';
+          const s3 = (g3) ? g3 : '';
+
+          let img = '';
+          if (!((marker.icon_url === null || marker.icon_url === undefined) || marker.icon_url === '')) {
+            const markerCode = marker.code.replace(/</g, '&amp;lt;').replace(/>/g, '&amp;gt;');
+            img = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
+              'data-marker-code=\'' + markerCode + '\' alt=\'' + markerCode + '\'/>';
+          } else {
+            img = marker.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          }
+
+          return s1 + img + s3;
+        };
+
+        const replaceBoundaries = (x, g1) => {
           return ' <img src=\'assets/img/components/transcr-editor/boundary.png\' ' +
             'class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
             'data-samples=\'' + g1 + '\' alt=\'\[|' + g1 + '|\]\' /> ';
         };
 
-        result = result.replace(regex2, replaceFunc);
-        result = result.replace(regex, replaceFunc);
+        result = result.replace(regex2, replaceBoundaries);
+        result = result.replace(regex, replaceMarkers);
       }
 
       result = result.replace(/\s+$/g, '&nbsp;');

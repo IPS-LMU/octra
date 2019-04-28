@@ -612,7 +612,7 @@ export class TranscriptionService {
         });
 
         // replace markers
-        const regex = new RegExp('(\\s)*(' + Functions.escapeRegex(marker.code) + ')(\\s)*', 'g');
+        const regex = new RegExp('(\s)*(' + Functions.escapeRegex(marker.code) + ')(\s)*', 'g');
         result = result.replace(regex, (x, g1, g2, g3) => {
           const s1 = (g1) ? g1 : '';
           const s3 = (g3) ? g3 : '';

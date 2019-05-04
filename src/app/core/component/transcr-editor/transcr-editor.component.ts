@@ -986,12 +986,14 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     code = this.transcrService.underlineTextRed(code, validateAnnotation(code, this.transcrService.guidelines));
     code = this.transcrService.rawToHTML(code);
-    code = code.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
+
+    /* code = code.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
       if (g1 === '[[[') {
         return '<';
       }
       return '>';
     });
+    */
 
     this.textfield.summernote('code', code);
     this.restoreSelection();
@@ -1045,6 +1047,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       const markers = this.markers;
       // replace all tags that are not markers
       result = result.replace(new RegExp('(<\/?)?([^<>]+)(>)', 'g'), (g0, g1, g2, g3) => {
+        g1 = (g1 === undefined) ? '' : g1;
+        g2 = (g2 === undefined) ? '' : g2;
+        g3 = (g3 === undefined) ? '' : g3;
+
         for (let i = 0; i < markers.length; i++) {
           const marker = markers[i];
 
@@ -1058,6 +1064,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
       // replace
       result = result.replace(/(<\/?)?([^<>]+)(>)/g, (g0, g1, g2, g3) => {
+        g1 = (g1 === undefined) ? '' : g1;
+        g2 = (g2 === undefined) ? '' : g2;
+        g3 = (g3 === undefined) ? '' : g3;
+
         // define allowed html tags here
         if (g2 !== 'img' && g2 !== 'span' && g2 !== 'div' && g2 !== 'i' && g2 !== 'b' && g2 !== 'u' && g2 !== 's') {
           return `&lt;${g2}&gt;`;

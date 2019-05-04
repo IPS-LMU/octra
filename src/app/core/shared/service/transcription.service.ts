@@ -574,6 +574,16 @@ export class TranscriptionService {
       const markers = this._guidelines.markers;
       // replace all tags that are not markers
       result = result.replace(new RegExp('(<\/?)?([^<>]+)(>)', 'g'), (g0, g1, g2, g3) => {
+        g1 = (g1 === undefined) ? '' : g1;
+        g2 = (g2 === undefined) ? '' : g2;
+        g3 = (g3 === undefined) ? '' : g3;
+
+        // check if its an html tag
+        if (g2 === 'img' && g2 === 'span' && g2 === 'div' && g2 === 'i' && g2 === 'b' && g2 === 'u' && g2 === 's') {
+          return `[[[${g2}]]]`;
+        }
+
+        // check if it's a marker
         for (let i = 0; i < markers.length; i++) {
           const marker = markers[i];
 
@@ -586,11 +596,12 @@ export class TranscriptionService {
       });
 
       // replace
-      result = result.replace(/(<\/?)?([^<>]+)(>)/g, (g0, g1, g2, g3) => {
-        if (g2 !== 'img' && g2 !== 'span' && g2 !== 'div' && g2 !== 'i' && g2 !== 'b' && g2 !== 'u' && g2 !== 's') {
-          return `&lt;${g2}&gt;`;
+      result = result.replace(/([<>])/g, (g0, g1) => {
+        if (g1 === '<') {
+          return '&lt;';
         }
-        return `${g1}${g2}${g3}`;
+
+        return '&gt;';
       });
 
       result = result.replace(/(\[\[\[)|(]]])/g, (g0, g1, g2) => {

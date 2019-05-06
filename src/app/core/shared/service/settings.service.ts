@@ -14,6 +14,8 @@ import {ActivatedRoute} from '@angular/router';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
 
+declare var validateAnnotation: ((string, any) => any);
+
 @Injectable()
 export class SettingsService {
 

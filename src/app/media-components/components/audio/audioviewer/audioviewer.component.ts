@@ -657,8 +657,13 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     if (line) {
       this.drawPlayCursorOnly(line);
       this.av.LastLine = line;
-      this.cd.markForCheck();
-      this.cd.detectChanges();
+
+      try {
+        this.cd.markForCheck();
+        this.cd.detectChanges();
+      } catch (e) {
+
+      }
     } else {
     }
   }

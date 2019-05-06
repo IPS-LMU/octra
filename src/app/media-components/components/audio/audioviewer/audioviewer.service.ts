@@ -10,8 +10,8 @@ import {AVMousePos, Line, PlayCursor} from '../../../obj';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
 import {AudioService, KeymappingService, TranscriptionService} from '../../../../core/shared/service';
 import {PlayBackState} from '../../../obj/media';
-import {TaskManager} from '../../../../core/obj/TaskManager';
 import {isNullOrUndefined} from '../../../../core/shared/Functions';
+import {MultiThreadingService} from '../../../../core/shared/multi-threading/multi-threading.service';
 
 
 @Injectable()
@@ -90,7 +90,8 @@ export class AudioviewerService extends AudioComponentService {
   constructor(protected audio: AudioService,
               protected transcrService: TranscriptionService,
               private keyMap: KeymappingService,
-              private langService: TranslateService) {
+              private langService: TranslateService,
+              private multiThreadingService: MultiThreadingService) {
     super();
 
     this.subscrmanager = new SubscriptionManager();
@@ -119,7 +120,6 @@ export class AudioviewerService extends AudioComponentService {
 
   private _viewRect: Rectangle = new Rectangle(new Position(0, 0), new Size(0, 0));
 
-  private tManager: TaskManager;
   private _visibleLines: Interval = new Interval(0, 0);
   onKeyUp = () => {
     this.shiftPressed = false;
@@ -154,66 +154,6 @@ export class AudioviewerService extends AudioComponentService {
       });
     }
 
-    this.tManager = new TaskManager([{
-      name: 'compute',
-      do(args) {
-        let width = args[0];
-        const height = args[1];
-        const cha = args[2];
-        const _interval = args[3];
-        const roundValues = args[4];
-        width = Math.floor(width);
-
-        if (_interval.start !== null && _interval.end !== null && _interval.end >= _interval.start) {
-          const minMaxArray = [];
-          const len = _interval.end - _interval.start;
-
-          let min = 0;
-          let max = 0;
-          let val = 0;
-          let offset = 0;
-          let maxindex = 0;
-
-          const xZoom = len / width;
-
-          const yZoom = height / 2;
-
-          for (let i = 0; i < width; i++) {
-            offset = Math.round(i * xZoom) + _interval.start;
-            min = cha[offset];
-            max = cha[offset];
-
-            if (isNaN(cha[offset])) {
-              break;
-            }
-
-            if ((offset + xZoom) > _interval.start + len) {
-              maxindex = len;
-            } else {
-              maxindex = Math.round(offset + xZoom);
-            }
-
-            for (let j = offset; j < maxindex; j++) {
-              val = cha[j];
-              max = Math.max(max, val);
-              min = Math.min(min, val);
-            }
-
-            if (roundValues) {
-              minMaxArray.push(Math.round(min * yZoom));
-              minMaxArray.push(Math.round(max * yZoom));
-            } else {
-              minMaxArray.push(min * yZoom);
-              minMaxArray.push(max * yZoom);
-            }
-          }
-
-          return minMaxArray;
-        } else {
-          throw new Error('interval.end is less than interval.start');
-        }
-      }
-    }]);
     return this.afterChannelInititialized(innerWidth);
   }
 

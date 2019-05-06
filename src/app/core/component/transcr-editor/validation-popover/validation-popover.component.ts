@@ -1,4 +1,5 @@
-import {AfterViewChecked, ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
+import {AfterViewChecked, ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, SecurityContext, ViewChild} from '@angular/core';
+import {DomSanitizer} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-validation-popover',
@@ -26,6 +27,10 @@ export class ValidationPopoverComponent implements OnInit, AfterViewChecked {
     this.cd.detectChanges();
   }
 
+  public get sanitizedDescription(): string {
+    return this.sanitizer.sanitize(SecurityContext.HTML, this._description);
+  }
+
   get width(): number {
     return this.validationContainer.nativeElement.offsetWidth;
   }
@@ -42,7 +47,7 @@ export class ValidationPopoverComponent implements OnInit, AfterViewChecked {
     return this.validationContainer.nativeElement.offsetHeight;
   }
 
-  constructor(private el: ElementRef, private cd: ChangeDetectorRef) {
+  constructor(private el: ElementRef, private cd: ChangeDetectorRef, private sanitizer: DomSanitizer) {
   }
 
   ngOnInit() {

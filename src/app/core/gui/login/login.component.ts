@@ -354,12 +354,16 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
                     if (prompt) {
                       this.appStorage.prompttext = prompt;
+                    } else {
+                      this.appStorage.prompttext = '';
                     }
                   } else if (json.data.hasOwnProperty('prompttext')) {
                     const prompt = json.data.prompttext;
 
                     if (prompt) {
                       this.appStorage.prompttext = prompt;
+                    } else {
+                      this.appStorage.prompttext = '';
                     }
                   }
                 } else {
@@ -520,12 +524,16 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
                 if (prompt) {
                   this.appStorage.prompttext = prompt;
+                } else {
+                  this.appStorage.prompttext = '';
                 }
               } else if (json.data.hasOwnProperty('prompttext')) {
                 const prompt = json.data.prompttext;
 
                 if (prompt) {
                   this.appStorage.prompttext = prompt;
+                } else {
+                  this.appStorage.prompttext = '';
                 }
               }
             } else {

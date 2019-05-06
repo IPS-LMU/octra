@@ -22,6 +22,8 @@ import {ValidationPopoverComponent} from '../../component/transcr-editor/validat
 import {isFunction, isNullOrUndefined} from '../../shared/Functions';
 import {TranscrEditorComponent} from '../../component/transcr-editor';
 
+declare var validateAnnotation: ((string, any) => any);
+
 @Component({
   selector: 'app-transcr-overview',
   templateUrl: './transcr-overview.component.html',

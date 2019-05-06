@@ -17,6 +17,8 @@ import {AppStorageService, OIDBLevel} from './appstorage.service';
 import {UserInteractionsService} from './userInteractions.service';
 import {SettingsService} from './settings.service';
 
+declare var validateAnnotation: ((string, any) => any);
+
 @Injectable()
 export class TranscriptionService {
   get guidelines(): any {
@@ -189,8 +191,46 @@ export class TranscriptionService {
     return -1;
   }
 
-  public validate(text: string): any {
-    return validateAnnotation(text, this._guidelines);
+  public validate(rawText: string): any {
+    const results = validateAnnotation(rawText, this._guidelines);
+
+    // check if selection is in the raw text
+    const sPos = rawText.indexOf('[[[sel-start/]]]');
+    const sLen = '[[[sel-start/]]]'.length;
+    const ePos = rawText.indexOf('[[[sel-end/]]]');
+    const eLen = '[[[sel-end/]]]'.length;
+
+    // look for segment boundaries like {23423424}
+    const segRegex = new RegExp(/{[0-9]+}/g);
+
+    for (let i = 0; i < results.length; i++) {
+      const validation = results[i];
+
+      if (sPos > -1 && ePos > -1) {
+        // check if error is between the selection marks
+        if (
+          (validation.start >= sPos && validation.start + validation.length <= sPos + sLen) ||
+          (validation.start >= ePos && validation.start + validation.length <= ePos + eLen)
+        ) {
+          // remove
+          results.splice(i, 1);
+          i--;
+        }
+      }
+
+      let match = segRegex.exec(rawText);
+      while (match != null) {
+        if (validation.start >= match.index && validation.start + validation.length <= match.index + match[0].length) {
+          // remove
+          results.splice(i, 1);
+          i--;
+        }
+
+        match = segRegex.exec(rawText);
+      }
+    }
+
+    return results;
   }
 
   /**
@@ -834,7 +874,7 @@ export class TranscriptionService {
       let segmentValidation = [];
 
       if (segment.transcript.length > 0) {
-        segmentValidation = validateAnnotation(segment.transcript, this._guidelines);
+        segmentValidation = this.validate(segment.transcript);
       }
 
       this._validationArray.push(

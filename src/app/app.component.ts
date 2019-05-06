@@ -49,6 +49,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       };
     })();
 
+    /*
     // overwrite console.err
     const oldError = console.error;
     (() => {
@@ -90,6 +91,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
         oldWarn.apply(console, arguments);
       };
     })();
+     */
   }
 
   ngOnInit() {

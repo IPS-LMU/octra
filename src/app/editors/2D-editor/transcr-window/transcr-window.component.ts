@@ -496,23 +496,18 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     );
 
     this.tempSegments = this.transcrService.currentlevel.segments.clone();
-    // TODO ! left and rigt boundary must not be changed !
-    const html: string = this.editor.html.replace(/&nbsp;/g, ' ');
+    const html = this.editor.getRawText();
     // split text at the position of every boundary marker
-    let segTexts: string[] = html.split(
-      /\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="[0-9]+" alt="\[\|[0-9]+\|\]">\s?/g
+    const segTexts: string[] = html.split(
+      /\s?{[0-9]+}\s?/g
     );
 
     const samplesArray: number[] = [];
-    html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s?/g,
-      function (match, g1, g2) {
+    html.replace(/\s?{([0-9]+)}\s?/g,
+      (match, g1, g2) => {
         samplesArray.push(Number(g1));
         return '';
       });
-
-    segTexts = segTexts.map((a: string) => {
-      return a.replace(/(<span>)|(<\/span>)|(<p>)|(<\/p>)/g, '');
-    });
 
     // remove invalid boundaries
     if (segTexts.length > 1) {
@@ -535,10 +530,8 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     }
 
     for (let i = 0; i < segTexts.length - 1; i++) {
-      const newRaw = this.transcrService.htmlToRaw(segTexts[i]);
-
       this.tempSegments.add(
-        this.audiomanager.createBrowserAudioTime(samplesArray[i]), newRaw
+        this.audiomanager.createBrowserAudioTime(samplesArray[i]), segTexts[i]
       );
     }
 

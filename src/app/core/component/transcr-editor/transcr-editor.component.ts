@@ -78,7 +78,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
     this._rawText = this.tidyUpRaw(value);
     this.init = 0;
-    const html = this.rawToHTML(this._rawText);
+    const html = this.transcrService.rawToHTML(value);
     this.textfield.summernote('code', html);
     this.validate();
     this.initPopover();
@@ -304,7 +304,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           let html = bufferText.replace(/(<p>)|(<\/p>)/g, '')
             .replace(new RegExp('\\\[\\\|', 'g'), '{').replace(new RegExp('\\\|\\\]', 'g'), '}');
           html = Functions.unEscapeHtml(html);
-          html = '<span>' + this.rawToHTML(html) + '</span>';
+          html = '<span>' + this.transcrService.rawToHTML(html) + '</span>';
           html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
           const htmlObj = jQuery(html);
           if (!(this.rawText === null || this.rawText === undefined) && this._rawText !== '') {
@@ -981,19 +981,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this._rawText = this.getRawText();
 
     // insert selection placeholders
-    let code = Functions.insertString(this._rawText, this._textSelection.start, '[[[sel-start]]][[[/sel-start]]]');
-    code = Functions.insertString(code, this._textSelection.end + '[[[sel-start]]][[[/sel-start]]]'.length, '[[[sel-end]]][[[/sel-end]]]');
+    let code = Functions.insertString(this._rawText, this._textSelection.start, '[[[sel-start/]]]');
+    code = Functions.insertString(code, this._textSelection.end + '[[[sel-start/]]]'.length, '[[[sel-end/]]]');
 
-    code = this.transcrService.underlineTextRed(code, validateAnnotation(code, this.transcrService.guidelines));
+    code = this.transcrService.underlineTextRed(code, this.transcrService.validate(code));
     code = this.transcrService.rawToHTML(code);
-
-    /* code = code.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
-      if (g1 === '[[[') {
-        return '<';
-      }
-      return '>';
-    });
-    */
 
     this.textfield.summernote('code', code);
     this.restoreSelection();

@@ -2,5 +2,5 @@
     'hide-popover': visible
 }">
     <div class="card-header">{{title}}</div>
-    <div class="card-body">{{description}}</div>
+    <div class="card-body" [innerHTML]="sanitizedDescription"></div>
 </div>

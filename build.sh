@@ -14,7 +14,7 @@ timeNow=`date "+%Y-%m-%d %H:%M:%S"`
 octraVersion="1.3.0"
 
 echo "Building OCTRA..."
-ng build --prod --base-href "${baseHref}"
+ng build --prod -c dev --base-href "${baseHref}"
 echo "Change index.html..."
 indexHTML=$(<${buildDir}index.html)
 indexHTML=$(echo "${indexHTML}" | sed -e "s/\(scripts\.[0-9a-z]*\.js\)/.\/${targetFolder}\/\1/g")

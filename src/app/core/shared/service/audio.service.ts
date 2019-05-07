@@ -2,9 +2,10 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {AppInfo} from '../../../app.info';
 import {HttpClient} from '@angular/common/http';
-import {isNullOrUndefined} from '../Functions';
+import {Functions, isNullOrUndefined} from '../Functions';
+import {Subject} from 'rxjs';
+import {AppInfo} from '../../../app.info';
 
 @Injectable()
 export class AudioService {
@@ -34,42 +35,52 @@ export class AudioService {
    *
    * audio data; for longer data, a MediaElementAudioSourceNode should be used.
    */
-  public loadAudio = (url: string, callback: any = () => {
-  }, errorCallback: (err: any) => void = () => {
+  public loadAudio: (url: string, callback: () => void) => Subject<any>
+    = (url: string, callback: any = () => {
   }) => {
     this._loaded = false;
 
-    this.http.get(url, {responseType: 'arraybuffer'}).subscribe(
-      (buffer: ArrayBuffer) => {
-        const regex: RegExp = new RegExp(/((%|-|\.|[A-ZÄÖÜß]|[a-zäöü]|_|[0-9])+)\.(wav|ogg)/, 'g');
-        const matches: RegExpExecArray = regex.exec(url);
+    const subj = new Subject<number>();
 
-        let filename = '';
-        if (matches !== null && matches[1].length > 0) {
-          filename = matches[1] + '.' + matches[3];
-        } else {
-          filename = url;
+    Functions.downloadFile(this.http, url).subscribe(
+      (event) => {
+        subj.next(0.5 * event.progress);
+        if (event.progress === 1 && event.result) {
+          const regex: RegExp = new RegExp(/((%|-|\.|[A-ZÄÖÜß]|[a-zäöü]|_|[0-9])+)\.(wav|ogg)/, 'g');
+          const matches: RegExpExecArray = regex.exec(url);
+
+          let filename = '';
+          if (matches !== null && matches[1].length > 0) {
+            filename = matches[1] + '.' + matches[3];
+          } else {
+            filename = url;
+          }
+
+          this.subscrmanager.add(AudioManager.decodeAudio(filename, 'audio/wav', event.result, AppInfo.audioformats).subscribe(
+            (result) => {
+              if (!isNullOrUndefined(result.audioManager)) {
+                subj.next(1);
+                subj.complete();
+                // finished
+                this.registerAudioManager(result.audioManager);
+                this.afterloaded.emit({status: 'success'});
+
+                callback({});
+              } else {
+                subj.next(0.5 + 0.5 * result.decodeProgress);
+              }
+            },
+            (error) => {
+              console.error(error);
+            }));
         }
-
-        this.subscrmanager.add(AudioManager.decodeAudio(filename, 'audio/wav', buffer, AppInfo.audioformats).subscribe(
-          (result) => {
-            if (!isNullOrUndefined(result.audioManager)) {
-              // finished
-              this.registerAudioManager(result.audioManager);
-              this.afterloaded.emit({status: 'success'});
-              callback({});
-            } else {
-              console.log(`decode progress: ${result.decodeProgress}`);
-            }
-          },
-          (error) => {
-            console.error(error);
-          }));
       },
       error => {
-        errorCallback(error);
+        subj.error(error);
       }
     );
+
+    return subj;
   }
 
   public registerAudioManager(manager: AudioManager) {

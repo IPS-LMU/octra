@@ -13,6 +13,7 @@ import {UpdateManager} from '../UpdateManager';
 import {ActivatedRoute} from '@angular/router';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
+import {Subject} from 'rxjs';
 
 declare var validateAnnotation: ((string, any) => any);
 
@@ -103,6 +104,8 @@ export class SettingsService {
   private validation: any = {
     app: false
   };
+
+  public audioloading = new Subject<number>();
 
   private _projectsettings: ProjectSettings;
 
@@ -346,9 +349,18 @@ export class SettingsService {
           console.log('Audio loaded.');
 
           this.audioloaded.emit({status: 'success'});
-        }, () => {
-          this._log += 'Loading audio file failed<br/>';
-        });
+        }).subscribe(
+          (progress) => {
+            this.audioloading.next(progress);
+            if (progress === 1) {
+              this.audioloading.complete();
+            }
+          },
+          (err) => {
+            this._log += 'Loading audio file failed<br/>';
+            console.error(err);
+          }
+        );
       } else {
         console.error('audio src is null');
         this.audioloaded.emit({status: 'error'});

@@ -2,7 +2,7 @@
     <span id="logo">OCTRA</span>
     <div class="progress">
         <div *ngIf="settService.log === ''" class="progress-bar" [ngStyle]="{
-            width: (progress + '%')
+            width: ((progress + audioLoadingProgress) + '%')
         }">
         </div>
         <div *ngIf="settService.log !== ''" class="progress-bar" [ngStyle]="{

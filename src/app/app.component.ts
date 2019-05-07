@@ -9,6 +9,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {NavigationComponent} from './core/gui/navbar';
 import {isNullOrUndefined} from './core/shared/Functions';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
+import {HttpClient} from '@angular/common/http';
 
 @Component({
   selector: 'app-octra',
@@ -36,7 +37,8 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
               private bugService: BugReportService,
               private router: Router,
               private route: ActivatedRoute,
-              private multiThreading: MultiThreadingService) {
+              private multiThreading: MultiThreadingService,
+              private http: HttpClient) {
 
     // overwrite console.log
     const oldLog = console.log;
@@ -49,7 +51,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       };
     })();
 
-    /*
     // overwrite console.err
     const oldError = console.error;
     (() => {
@@ -91,7 +92,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
         oldWarn.apply(console, arguments);
       };
     })();
-     */
+
   }
 
   ngOnInit() {

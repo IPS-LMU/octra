@@ -20,6 +20,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
   public progress = 0;
+  public audioLoadingProgress = 0;
   public state = '';
   public warning = '';
   private loadedchanged: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -199,7 +200,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
               }
             }).then(() => {
               this.loadedtable.audio = true;
-              this.progress += 25;
               this.state = 'Audio loaded';
 
               this.loadedchanged.emit(false);
@@ -296,6 +296,13 @@ export class LoadingComponent implements OnInit, OnDestroy {
             this.appStorage.audioURL = decodeURI(this.appStorage.urlParams.audio);
           }
         }
+
+        this.settService.audioloading.subscribe(
+          (progress) => {
+            this.audioLoadingProgress = progress * 25;
+          }
+        );
+
         this.settService.loadAudioFile(this.audio);
       }
     }).catch((error) => {

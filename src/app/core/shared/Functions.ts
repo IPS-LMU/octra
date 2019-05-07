@@ -1,6 +1,7 @@
 import {Observable} from 'rxjs/Observable';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpEventType, HttpRequest, HttpResponse} from '@angular/common/http';
 import {NavigationExtras, Router} from '@angular/router';
+import {Subject} from 'rxjs';
 
 export interface FileSize {
   size: number;
@@ -14,6 +15,7 @@ export function isNullOrUndefined(obj: any) {
 export function isFunction(value: any) {
   return typeof value === 'function';
 }
+
 export class Functions {
   public static scrollTo(y: number, target?: string) {
     setTimeout(() => {
@@ -170,6 +172,35 @@ export class Functions {
     } else {
       return http.post(url, body, requestOptions);
     }
+  }
+
+  public static downloadFile(http: HttpClient, url: string): Subject<{
+    progress: number,
+    result: any
+  }> {
+    const subj: Subject<any> = new Subject<any>();
+
+    const req = new HttpRequest('GET', url, {
+      reportProgress: true,
+      responseType: 'arraybuffer'
+    });
+
+    http.request(req).subscribe(event => {
+      if (event.type === HttpEventType.DownloadProgress) {
+        subj.next({
+          progress: event.loaded / event.total,
+          result: null
+        });
+      } else if (event instanceof HttpResponse) {
+        subj.next({
+          progress: 1,
+          result: event.body
+        });
+        subj.complete();
+      }
+    });
+
+    return subj;
   }
 
   public static setCursor(node, pos) {

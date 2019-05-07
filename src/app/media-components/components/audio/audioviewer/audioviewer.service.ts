@@ -383,8 +383,9 @@ export class AudioviewerService extends AudioComponentService {
       } else {
         // no selection
         let segment = this.transcrService.currentlevel.segments.BetweenWhichSegment(absXTime);
-        const transcript = '';
+        let transcript = '';
         if (!isNullOrUndefined(segment)) {
+          transcript = segment.transcript;
           segment.transcript = '';
         }
         this.transcrService.currentlevel.segments.add(this.audiomanager.createBrowserAudioTime(Math.round(absXTime)));

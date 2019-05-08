@@ -33,6 +33,11 @@ export class BugreportModalComponent implements OnInit {
   private actionperformed: Subject<ModalAnswer> = new Subject<ModalAnswer>();
   private subscrmanager = new SubscriptionManager();
 
+  private screenshots: {
+    blob: File,
+    previewURL: string
+  }[] = [];
+
   public get isvalid(): boolean {
     if (this.sendProObj || this.bgdescr !== '') {
       return true;
@@ -54,6 +59,8 @@ export class BugreportModalComponent implements OnInit {
     return new Promise<ModalAnswer>((resolve, reject) => {
       this.modal.show(this.modal, this.config);
       this.visible = true;
+      this.screenshots = [];
+
       const subscr = this.actionperformed.subscribe(
         (action) => {
           resolve(action);
@@ -79,7 +86,7 @@ export class BugreportModalComponent implements OnInit {
       this.bugService.sendReport(this.bgemail, this.bgdescr, this.sendProObj, {
         auth_token: this.settService.appSettings.octra.bugreport.auth_token,
         url: this.settService.appSettings.octra.bugreport.url
-      }).subscribe(
+      }, this.screenshots).subscribe(
         () => {
           this.bugsent = true;
           console.log('Bugreport sent');
@@ -92,5 +99,33 @@ export class BugreportModalComponent implements OnInit {
         }
       )
     );
+  }
+
+  public selectFileForUpload(input: HTMLInputElement) {
+    input.click();
+  }
+
+  public onFileChange($event) {
+    if ($event.target.files.length > 0) {
+      this.screenshots.push({
+        blob: $event.target.files[0],
+        previewURL: ''
+      });
+      this.createPreviewFromFile(this.screenshots.length - 1);
+    }
+  }
+
+  public createPreviewFromFile(index: number) {
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      this.screenshots[index].previewURL = reader.result as string;
+    };
+
+    reader.readAsDataURL(this.screenshots[index].blob);
+  }
+
+  public removeScreenshot(index: number) {
+    this.screenshots.splice(index, 1);
   }
 }

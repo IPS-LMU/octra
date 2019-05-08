@@ -133,7 +133,7 @@ export class BugReportService {
   sendReport(email: string, description: string, sendbugreport: boolean, credentials: {
     auth_token: string,
     url: string
-  }): Observable<any> {
+  }, screenshots: any[]): Observable<any> {
     const bugreportSettings = this.settService.appSettings.octra.bugreport;
 
     if (!(bugreportSettings === null || bugreportSettings === undefined) && bugreportSettings.enabled) {
@@ -144,7 +144,7 @@ export class BugReportService {
         description
       };
 
-      return this.reporter.sendBugReport(this.http, this.getPackage(), form, url, auth_token, sendbugreport);
+      return this.reporter.sendBugReport(this.http, this.getPackage(), form, url, auth_token, sendbugreport, screenshots);
     }
 
     return null;

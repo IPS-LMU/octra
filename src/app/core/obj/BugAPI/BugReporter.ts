@@ -9,8 +9,8 @@ export abstract class BugReporter {
   }
 
   public abstract sendBugReport(
-    http: HttpClient, form: any, pkg: any, url: string, authToken: string, sendbugreport: boolean
-  ): Observable<any>;
+    http: HttpClient, form: any, pkg: any, url: string, authToken: string, sendbugreport: boolean,
+    screenshots: any[]): Observable<any>;
 
   public abstract getText(pkg: any): string;
 }

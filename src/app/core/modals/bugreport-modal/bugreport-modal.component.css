@@ -1,3 +1,43 @@
 #bgProtocol {
     min-height: 200px;
 }
+
+.upload-screenshot {
+    width: 200px;
+    height: 150px;
+    border: 1px solid cornflowerblue;
+    border-radius: 9px;
+    padding: 5px;
+    text-align: center;
+    vertical-align: middle;
+    display: table-cell;
+    cursor: pointer;
+    float: left;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    overflow: hidden;
+    position: relative;
+}
+
+.upload-screenshot fa-icon {
+    color: cornflowerblue;
+    margin-top: 50px;
+    display: block;
+}
+
+.upload-screenshot .preview-image {
+    height: 100%;
+}
+
+.upload-screenshot .cross.rounded-circle {
+    background-color: aliceblue;
+    width: 30px;
+    height: 30px;
+    vertical-align: middle;
+    display: table-cell;
+    border: 1px solid blue;
+    padding-top: 2px;
+    position: absolute;
+    top: 0;
+    right: 0;
+}

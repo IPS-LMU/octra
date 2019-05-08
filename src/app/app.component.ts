@@ -2,7 +2,7 @@ import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/c
 import {APIService, AppStorageService, SettingsService} from './core/shared/service';
 import {TranslateService} from '@ngx-translate/core';
 import {SubscriptionManager} from './core/obj/SubscriptionManager';
-import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
+import {BugReportService} from './core/shared/service/bug-report.service';
 import {AppInfo} from './app.info';
 import {environment} from '../environments/environment';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -40,6 +40,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
               private multiThreading: MultiThreadingService,
               private http: HttpClient) {
 
+    /*
     // overwrite console.log
     const oldLog = console.log;
     const serv = this.bugService;
@@ -92,6 +93,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
         oldWarn.apply(console, arguments);
       };
     })();
+     */
 
   }
 

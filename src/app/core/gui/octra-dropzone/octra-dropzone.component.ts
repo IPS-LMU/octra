@@ -65,7 +65,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
 
   private _audiomanager: AudioManager;
 
-  private readonly maxAudioFileSize = 1500;
+  private readonly maxAudioFileSize = 600;
 
   public afterDrop = () => {
     this._oannotation = null;

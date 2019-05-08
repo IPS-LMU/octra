@@ -940,8 +940,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    */
   drawGrid(startSamples: number, endSamples: number, hLines: number, line: Line) {
     if (startSamples >= 0 && endSamples >= startSamples) {
-      const vLines = Math.floor((endSamples - startSamples) / this.audiomanager.originalInfo.samplerate);
-      const pxSecond = Math.round(this.av.audioTCalculator.samplestoAbsX(this.audiomanager.originalInfo.samplerate));
+      const vLines = Math.floor((endSamples - startSamples) / this.audiomanager.browserSampleRate);
+      const pxSecond = Math.round(this.av.audioTCalculator.samplestoAbsX(this.audiomanager.browserSampleRate));
       const timeLineHeight = (this.Settings.timeline.enabled) ? this.Settings.timeline.height : 0;
       const hZoom = Math.round(this._innerWidth / vLines);
       const vZoom = Math.round((this.Settings.lineheight - timeLineHeight) / hLines);

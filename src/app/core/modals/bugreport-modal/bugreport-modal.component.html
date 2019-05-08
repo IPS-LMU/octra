@@ -24,7 +24,7 @@
                             <input [(ngModel)]="bgemail" name="email" class="form-control" id="inputEmail"
                                    placeholder="{{'general.email' | translate}}" type="email" email>
                         </div>
-                        <div class="form-group" style="margin-bottom:20px;">
+                        <div class="form-group">
                             <label for="bgDescr">{{'general.description' |
                                 translate}}</label>
 
@@ -32,6 +32,28 @@
                                       id="bgDescr"
                                       maxlength="300" aria-describedby="descrHelp"></textarea>
                             <small id="descrHelp" class="form-text text-muted">(German or English)</small>
+                        </div>
+                        <div class="form-group" style="margin-bottom:20px;">
+                            <label>{{'general.screenshots' |
+                                translate}} (optional):</label><br/>
+                            <div class="preview-images">
+                                <div *ngFor="let screenshot of screenshots; let i = index;"
+                                     class="upload-screenshot" (click)="selectFileForUpload(uploadInput2)">
+                                    <span class="cross rounded-circle" (click)="removeScreenshot(i)">X</span>
+                                    <input #uploadInput2 type="file" name="upload" (change)="onFileChange($event)"
+                                           style="display: none;"/>
+                                    <img class="preview-image"
+                                         *ngIf="screenshot.previewURL !== ''"
+                                         [src]="screenshot.previewURL"/>
+                                </div>
+                                <div *ngIf="screenshots.length < 4"
+                                     class="upload-screenshot" (click)="selectFileForUpload(uploadInput)">
+                                    <input #uploadInput type="file" name="upload" (change)="onFileChange($event)"
+                                           style="display: none;"/>
+                                    <fa-icon icon="plus" [size]="'2x'"></fa-icon>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
                         </div>
                         <div class="form-group">
                             <div class="checkbox" style="margin-top:20px;">

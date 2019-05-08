@@ -10,7 +10,9 @@ export class EmailBugReporter extends BugReporter {
   }
 
   public sendBugReport(http: HttpClient, pkg: any, form: any, url: string,
-                       authToken: string, sendbugreport: boolean): Observable<HttpResponse<any>> {
+                       authToken: string, sendbugreport: boolean, screenshots: {
+      blob: File
+    }[]): Observable<HttpResponse<any>> {
 
     const report = (sendbugreport) ? JSON.parse(JSON.stringify(pkg)) : null;
 
@@ -28,7 +30,15 @@ export class EmailBugReporter extends BugReporter {
       report
     };
 
-    return http.post(url, JSON.stringify(body), {
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(body));
+
+    for (let i = 0; i < screenshots.length; i++) {
+      const screenshot = screenshots[i];
+      formData.append('files', screenshot.blob);
+    }
+
+    return http.post(url, formData, {
       headers: {
         Authorization: authToken
       },

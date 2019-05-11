@@ -90,12 +90,13 @@ export class BugreportModalComponent implements OnInit {
         () => {
           this.bugsent = true;
           console.log('Bugreport sent');
+          /*
           setTimeout(() => {
             this.bgdescr = '';
             this.modal.hide();
             this.visible = false;
             this.bugsent = false;
-          }, 2000);
+          }, 2000);*/
         }
       )
     );
@@ -107,11 +108,18 @@ export class BugreportModalComponent implements OnInit {
 
   public onFileChange($event) {
     if ($event.target.files.length > 0) {
-      this.screenshots.push({
-        blob: $event.target.files[0],
-        previewURL: ''
-      });
-      this.createPreviewFromFile(this.screenshots.length - 1);
+      if ($event.target.files[0].name.indexOf('.jpg') > -1 || $event.target.files[0].name.indexOf('.jpeg') > -1
+        || $event.target.files[0].name.indexOf('.png') > -1 || $event.target.files[0].name.indexOf('.PNG') > -1
+        || $event.target.files[0].name.indexOf('.JPG') > -1 || $event.target.files[0].name.indexOf('.JPEG') > -1
+      ) {
+        this.screenshots.push({
+          blob: $event.target.files[0],
+          previewURL: ''
+        });
+        this.createPreviewFromFile(this.screenshots.length - 1);
+      } else {
+        alert('Only files with the extensions ".jpg, jpeg,.png" are supported.');
+      }
     }
   }
 

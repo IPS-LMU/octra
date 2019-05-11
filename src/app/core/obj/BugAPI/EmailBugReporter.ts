@@ -35,9 +35,12 @@ export class EmailBugReporter extends BugReporter {
 
     for (let i = 0; i < screenshots.length; i++) {
       const screenshot = screenshots[i];
-      formData.append('files', screenshot.blob);
+      formData.append('file' + i, screenshot.blob, screenshot.blob.name);
     }
 
+    console.log({
+      Authorization: authToken
+    });
     return http.post(url, formData, {
       headers: {
         Authorization: authToken

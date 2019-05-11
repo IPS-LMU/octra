@@ -30,7 +30,7 @@
 
                             <textarea [(ngModel)]="bgdescr" name="bgdescr" class="form-control" rows="3"
                                       id="bgDescr"
-                                      maxlength="300" aria-describedby="descrHelp"></textarea>
+                                      maxlength="1000" aria-describedby="descrHelp"></textarea>
                             <small id="descrHelp" class="form-text text-muted">(German or English)</small>
                         </div>
                         <div class="form-group" style="margin-bottom:20px;">
@@ -41,7 +41,7 @@
                                      class="upload-screenshot" (click)="selectFileForUpload(uploadInput2)">
                                     <span class="cross rounded-circle" (click)="removeScreenshot(i)">X</span>
                                     <input #uploadInput2 type="file" name="upload" (change)="onFileChange($event)"
-                                           style="display: none;"/>
+                                           style="display: none;" accept=".jpg, .png, .jpeg|image/*"/>
                                     <img class="preview-image"
                                          *ngIf="screenshot.previewURL !== ''"
                                          [src]="screenshot.previewURL"/>

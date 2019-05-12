@@ -156,6 +156,18 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     html = html.replace(/<((p)|(\s?\/p))>/g, '');
     html = html.replace(/&nbsp;/g, ' ');
 
+    // check for markers that are utf8 symbols
+    for (let i = 0; i < this.markers.length; i++) {
+      const marker = this.markers[i];
+
+      if (marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0 && marker.icon.indexOf('.gif') < 0
+        && marker.icon !== '' && marker.code !== '' && marker.icon !== marker.code
+      ) {
+        // replace all utf8 symbols with the marker's code
+        html = html.replace(new RegExp(marker.icon, 'g'), marker.code);
+      }
+    }
+
     html = this.transcrService.replaceSingleTags(html);
 
     html = `<p>${html}</p>`;
@@ -187,8 +199,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         } else if (elem.nodeType === 3) {
           // is textNode
           const text = jQuery(elem).text();
-          jQuery(elem).text(text);
           charCounter += text.length;
+          jQuery(elem).text(text);
         } else if (tagName.toLowerCase() === 'img') {
           if (!(jQuery(elem).attr('data-samples') === null || jQuery(elem).attr('data-samples') === undefined)) {
             // TODO check if this is working
@@ -223,7 +235,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     jQuery.each(dom.contents(), replaceFunc);
 
-    const rawText = dom.text().replace(/[\s ]+/g, ' ');
+    let rawText = dom.text().replace(/[\s ]+/g, ' ');
 
     return rawText;
   }
@@ -375,30 +387,34 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   /**
    * inserts a marker to the editors html
    */
-  insertMarker = (markerCode, iconURL) => {
-    if ((iconURL === null || iconURL === undefined) || iconURL === '') {
+  insertMarker = (markerCode, icon) => {
+    if ((icon === null || icon === undefined) || icon === '') {
       // text only
       this.textfield.summernote('editor.insertText', markerCode + ' ');
     } else {
-      markerCode = markerCode.replace(/(<)|(>)/g, (g0, g1, g2) => {
-        if (g2 === undefined && g1 !== undefined) {
-          return '&lt;';
-        } else {
-          return '&gt;';
-        }
-      });
+      if (icon.indexOf('.png') > -1 || icon.indexOf('.jpg') > -1 || icon.indexOf('.gif') > -1) {
+        // it's an icon
+        markerCode = markerCode.replace(/(<)|(>)/g, (g0, g1, g2) => {
+          if (g2 === undefined && g1 !== undefined) {
+            return '&lt;';
+          } else {
+            return '&gt;';
+          }
+        });
 
-      const element = document.createElement('img');
-      element.setAttribute('src', iconURL);
-      element.setAttribute('class', 'btn-icon-text');
-      element.setAttribute('style', 'height:16px');
-      element.setAttribute('data-marker-code', markerCode);
-      element.setAttribute('alt', markerCode);
+        const element = document.createElement('img');
+        element.setAttribute('src', icon);
+        element.setAttribute('class', 'btn-icon-text');
+        element.setAttribute('style', 'height:16px');
+        element.setAttribute('data-marker-code', markerCode);
+        element.setAttribute('alt', markerCode);
 
-      this.textfield.summernote('editor.insertNode', element);
+        this.textfield.summernote('editor.insertNode', element);
+      } else {
+        this.textfield.summernote('editor.insertText', icon);
+      }
+
     }
-    this.updateTextField();
-
     this.triggerTyping();
   }
   /**
@@ -422,7 +438,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             const marker: any = this.markers[i];
             if (marker.shortcut[platform] === comboKey) {
               $event.preventDefault();
-              this.insertMarker(marker.code, marker.icon_url);
+              this.insertMarker(marker.code, marker.icon);
               this.markerInsert.emit(marker.name);
               return;
             }
@@ -436,17 +452,20 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    */
   onKeyUpSummernote = ($event) => {
     // update rawText
-    this.updateTextField();
     this.onkeyup.emit($event);
-
     this.triggerTyping();
   }
 
   private triggerTyping() {
     setTimeout(() => {
       if (Date.now() - this.lastkeypress >= 700 && this.lastkeypress > -1) {
+        this.updateTextField();
         if (this._isTyping && this.focused) {
-          this.typing.emit('stopped');
+          this.typing.emit('stopped')
+
+          this.validate();
+          this.initPopover();
+          this.lastkeypress = -1;
         }
         this._isTyping = false;
       }
@@ -457,16 +476,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
     this._isTyping = true;
     this.lastkeypress = Date.now();
-
-
-    setTimeout(() => {
-      if (Date.now() - this.lastkeypress >= 1000 && this.lastkeypress > -1) {
-        this.validate();
-        this.initPopover();
-        this.lastkeypress = -1;
-      }
-    }, 1000);
-
   }
 
   /**
@@ -562,32 +571,33 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     return () => {
       const platform = BrowserInfo.platform;
       let icon = '';
-      if ((marker.icon_url === null || marker.icon_url === undefined) || marker.icon_url === '') {
-        // text only
-        icon = marker.button_text;
+      if ((marker.icon === null || marker.icon === undefined) || marker.icon === '' ||
+        marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0) {
+        // text only or utf8 symbol
+        icon = (marker.icon.indexOf('.png') < 0 || marker.icon.indexOf('.jpg') < 0) ? marker.icon : '';
 
         if (!this.easymode) {
-          icon = marker.button_text + '<span class=\'btn-shortcut\'>  ' +
+          icon += ' ' + marker.button_text + '<span class=\'btn-shortcut\'>  ' +
             '[' + marker.shortcut[platform] + ']</span>';
           if (this.Settings.responsive) {
-            icon = marker.button_text + '<span class=\'btn-shortcut d-none d-lg-inline\'>  ' +
+            icon += '<span class=\'btn-shortcut d-none d-lg-inline\'>  ' +
               '[' + marker.shortcut[platform] + ']</span>';
           }
         } else {
-          icon = marker.button_text;
+          icon += ' ' + marker.button_text;
         }
       } else {
         if (!this.easymode) {
-          icon = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
+          icon = '<img src=\'' + marker.icon + '\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
             '<span class=\'btn-description\'>' + marker.button_text + '</span><span class=\'btn-shortcut\'> ' +
             '[' + marker.shortcut[platform] + ']</span>';
           if (this.Settings.responsive) {
-            icon = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
+            icon = '<img src=\'' + marker.icon + '\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
               '<span class=\'btn-description d-none d-lg-inline\'>' + marker.button_text +
               '</span><span class=\'btn-shortcut d-none d-lg-inline\'> [' + marker.shortcut[platform] + ']</span>';
           }
         } else {
-          icon = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon\' style=\'height:16px;\'/>';
+          icon = '<img src=\'' + marker.icon + '\' class=\'btn-icon\' style=\'height:16px;\'/>';
         }
       }
       // create button
@@ -597,7 +607,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         container: false,
         click: () => {
           // invoke insertText method with 'hello' on editor module.
-          this.insertMarker(marker.code, marker.icon_url);
+          this.insertMarker(marker.code, marker.icon);
           // this.validate();
           this.markerClick.emit(marker.name);
           this.initPopover();
@@ -778,7 +788,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         });
     }, 200);
 
-    this.updateTextField();
+    this.triggerTyping();
   }
 
   saveSelection() {
@@ -979,7 +989,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   private validate() {
     this.saveSelection();
     this._rawText = this.getRawText();
-
     // insert selection placeholders
     let code = Functions.insertString(this._rawText, this._textSelection.start, '[[[sel-start/]]]');
     code = Functions.insertString(code, this._textSelection.end + '[[[sel-start/]]]'.length, '[[[sel-end/]]]');
@@ -1023,97 +1032,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       }
     }
     return false;
-  }
-
-  /**
-   * converts raw text of markers to html
-   */
-  private rawToHTML(rawtext: string): string {
-    // TODO remove duplicate code here and in transcrService!
-    let result: string = rawtext;
-
-    if (rawtext !== '') {
-      result = result.replace(/\r?\n/g, ' '); // .replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      // replace markers with no wrap
-
-      const markers = this.markers;
-      // replace all tags that are not markers
-      result = result.replace(new RegExp('(<\/?)?([^<>]+)(>)', 'g'), (g0, g1, g2, g3) => {
-        g1 = (g1 === undefined) ? '' : g1;
-        g2 = (g2 === undefined) ? '' : g2;
-        g3 = (g3 === undefined) ? '' : g3;
-
-        for (let i = 0; i < markers.length; i++) {
-          const marker = markers[i];
-
-          if (`${g1}${g2}${g3}` === marker.code) {
-            return `[[[${g2}]]]`;
-          }
-        }
-
-        return `${g1}${g2}${g3}`;
-      });
-
-      // replace
-      result = result.replace(/(<\/?)?([^<>]+)(>)/g, (g0, g1, g2, g3) => {
-        g1 = (g1 === undefined) ? '' : g1;
-        g2 = (g2 === undefined) ? '' : g2;
-        g3 = (g3 === undefined) ? '' : g3;
-
-        // define allowed html tags here
-        if (g2 !== 'img' && g2 !== 'span' && g2 !== 'div' && g2 !== 'i' && g2 !== 'b' && g2 !== 'u' && g2 !== 's') {
-          return `&lt;${g2}&gt;`;
-        }
-        return `${g1}${g2}${g3}`;
-      });
-
-      result = result.replace(/(\[\[\[)|(]]])/g, (g0, g1, g2) => {
-        if (g2 === undefined && g1 !== undefined) {
-          return '<';
-        } else {
-          return '>';
-        }
-      });
-
-      for (let i = 0; i < this.markers.length; i++) {
-        const marker = this.markers[i];
-
-        const regex = new RegExp('(\\s)*(' + Functions.escapeRegex(marker.code) + ')(\\s)*', 'g');
-        const regex2 = /{([0-9]+)}/g;
-
-        const replaceMarkers = (x, g1, g2, g3) => {
-          const s1 = (g1) ? g1 : '';
-          const s3 = (g3) ? g3 : '';
-
-          let img = '';
-          if (!((marker.icon_url === null || marker.icon_url === undefined) || marker.icon_url === '')) {
-            const markerCode = marker.code.replace(/</g, '&amp;lt;').replace(/>/g, '&amp;gt;');
-            img = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
-              'data-marker-code=\'' + markerCode + '\' alt=\'' + markerCode + '\'/>';
-          } else {
-            img = marker.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          }
-
-          return s1 + img + s3;
-        };
-
-        const replaceBoundaries = (x, g1) => {
-          return ' <img src=\'assets/img/components/transcr-editor/boundary.png\' ' +
-            'class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
-            'data-samples=\'' + g1 + '\' alt=\'\[|' + g1 + '|\]\' /> ';
-        };
-
-        result = result.replace(regex2, replaceBoundaries);
-        result = result.replace(regex, replaceMarkers);
-      }
-
-      result = result.replace(/\s+$/g, '&nbsp;');
-    }
-
-    // wrap result with <p>. Missing this would cause the editor fail on marker insertion
-    result = (result !== '') ? '<p>' + result + '</p>' : '<p><br/></p>';
-
-    return result;
   }
 
   /**

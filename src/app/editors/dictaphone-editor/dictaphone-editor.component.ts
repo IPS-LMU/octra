@@ -213,24 +213,18 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   saveTranscript() {
-    let html: string = this.editor.html.replace(/(&nbsp;)+/g, ' ');
+    let rawText = this.editor.rawText;
     // split text at the position of every boundary marker
-    html = html.replace(/(<textspan([ \w:"\-%;]|[0-9])*>)|(<\/textspan>)/g, '');
-    let segTexts: string[] = html.split(
-      new RegExp('/\s*<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="[0-9]+" ' +
-        'alt="\[\|[0-9]+\|\]">\s*', 'g')
-    );
+    let segTexts: string[] = rawText.split(
+      /\s*{[0-9]+}\s*/g);
 
     const samplesArray: number[] = [];
-    html.replace(new RegExp('/\s*<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s*', 'g'),
+    rawText.replace(new RegExp('\s*{([0-9]+)}\s*', 'g'),
       (match, g1) => {
         samplesArray.push(Number(g1));
         return '';
       });
 
-    segTexts = segTexts.map((a: string) => {
-      return a.replace(/(<span>)|(<\/span>)|(<p>)|(<\/p>)/g, '');
-    });
     // remove invalid boundaries
     if (segTexts.length > 1) {
       let start = 0;

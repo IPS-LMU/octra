@@ -446,7 +446,6 @@ export class SettingsService {
       urls.hasOwnProperty('json') && urls.hasOwnProperty('schema') &&
       filenames.hasOwnProperty('json') && filenames.hasOwnProperty('schema')
     ) {
-      console.log(messages.loading);
       this.subscrmanager.add(Functions.uniqueHTTPRequest(this.http, false, null, urls.json, null).subscribe(
         (appsettings: AppSettings) => {
           onhttpreturn(appsettings);

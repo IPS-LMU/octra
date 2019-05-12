@@ -208,7 +208,6 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       (event) => {
         switch (event.key) {
           case('secondsPerLine'):
-            console.log(event);
             this.viewer.onSecondsPerLineUpdated(event.value);
             break;
         }

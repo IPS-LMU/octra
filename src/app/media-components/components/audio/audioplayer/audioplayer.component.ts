@@ -378,7 +378,6 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
     if (this.ap.PlayCursor) {
       const ac = new AudioTimeCalculator(this.audioressource.info.samplerate,
         this.audiochunk.time.duration as BrowserAudioTime, this.innerWidth);
-      console.log('' + this.audiochunk.playposition.browserSample.value);
 
       this.ap.audioTCalculator = ac;
       this.ap.PlayCursor.changeSamples(this.audiochunk.playposition.browserSample.value, ac);

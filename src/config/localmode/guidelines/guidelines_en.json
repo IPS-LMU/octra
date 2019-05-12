@@ -47,7 +47,7 @@
       "name": "truncation marker start",
       "code": "[~abc]",
       "type": "normal",
-      "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_start.png",
+      "icon": "assets/img/components/transcr-editor/default_markers/truncation_start.png",
       "button_text": "~abc",
       "description": "Set this marker at the beginning of the annotation if a word was cutted off.",
       "shortcut": {
@@ -60,7 +60,7 @@
       "name": "filled pause",
       "code": "<nib>",
       "type": "normal",
-      "icon_url": "assets/img/components/transcr-editor/default_markers/fil.png",
+      "icon": "assets/img/components/transcr-editor/default_markers/fil.png",
       "button_text": "filled pause",
       "description": "This marker is for the speakers hesitations like 'hm', 'ähm' and others.",
       "shortcut": {
@@ -73,7 +73,7 @@
       "name": "intermittent noise",
       "code": "[int]",
       "type": "normal",
-      "icon_url": "assets/img/components/transcr-editor/default_markers/int.png",
+      "icon": "assets/img/components/transcr-editor/default_markers/int.png",
       "button_text": "intermittent noise",
       "description": "This marker is for noise like door slam, touching the microphone or something like that.",
       "shortcut": {
@@ -86,7 +86,7 @@
       "name": "speaker noise",
       "code": "[spk]",
       "type": "normal",
-      "icon_url": "assets/img/components/transcr-editor/default_markers/spk.png",
+      "icon": "assets/img/components/transcr-editor/default_markers/spk.png",
       "button_text": "speaker noise",
       "description": "This marker is for noise which was produced by the speaker, e.g. breathing loudly, laughing or something like that.",
       "shortcut": {
@@ -99,7 +99,7 @@
       "name": "stationary noise",
       "code": "[sta]",
       "type": "normal",
-      "icon_url": "assets/img/components/transcr-editor/default_markers/sta.png",
+      "icon": "assets/img/components/transcr-editor/default_markers/sta.png",
       "button_text": "stationary noise",
       "description": "This marker is for continuous, loud noise like traffic jam, music or radio in the background",
       "shortcut": {
@@ -112,7 +112,7 @@
       "name": "unclear word",
       "code": "**",
       "type": "normal",
-      "icon_url": "assets/img/components/transcr-editor/default_markers/stars.png",
+      "icon": "assets/img/components/transcr-editor/default_markers/stars.png",
       "button_text": "**",
       "description": "Set this marker before a word if it is not recognizable or if it is from another language.",
       "shortcut": {
@@ -125,7 +125,7 @@
       "name": "truncation marker end",
       "code": "[abc~]",
       "type": "normal",
-      "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_end.png",
+      "icon": "assets/img/components/transcr-editor/default_markers/truncation_end.png",
       "button_text": "abc~",
       "description": "Set this marker only at the end of the annotation if the last word was cutted off",
       "shortcut": {
@@ -138,7 +138,7 @@
       "name": "break",
       "code": "<P>",
       "type": "break",
-      "icon_url": "assets/img/components/transcr-editor/default_markers/break.png",
+      "icon": "assets/img/components/transcr-editor/default_markers/break.png",
       "button_text": "Break",
       "description": "This marker represents a break that means a audio chunk without any speaking",
       "shortcut": {

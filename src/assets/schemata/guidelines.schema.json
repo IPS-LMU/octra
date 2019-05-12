@@ -94,7 +94,7 @@
           "type": {
             "type": "string"
           },
-          "icon_url": {
+          "icon": {
             "type": "string"
           },
           "button_text": {

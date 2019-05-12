@@ -1165,8 +1165,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             )
           ) {
             // sample in the lines space
-
-            console.log(`draw segment (${beginSamples}) from line ${lineNum1} to ${lineNum2}`);
             // console.warn(`(${lineNum1} | x | ${lineNum2})`);
 
             for (let j = lineNum1; j <= lineNum2; j++) {
@@ -1213,7 +1211,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
               drawnSegments++;
               if (w > 0) {
-                console.log(`draw (${x + this.Settings.margin.left - 1}, ${line.Pos.y - this.av.viewRect.position.y}) Size(${w}, ${h})`);
                 this.oContext.fillRect(x + this.Settings.margin.left - 1, line.Pos.y - this.av.viewRect.position.y, w, h);
               }
             }

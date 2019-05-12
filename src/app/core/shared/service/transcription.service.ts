@@ -255,7 +255,6 @@ export class TranscriptionService {
         () => {
           this.selectedlevel = 0;
           this.navbarServ.originalInfo = this._audiomanager.originalInfo;
-          console.log(this.navbarServ.originalInfo);
           this.navbarServ.filesize = Functions.getFileSize(this._audiomanager.ressource.size);
 
           resolve();
@@ -669,12 +668,18 @@ export class TranscriptionService {
           const s3 = (g3) ? g3 : '';
 
           let img = '';
-          if (!((marker.icon_url === null || marker.icon_url === undefined) || marker.icon_url === '')) {
+          if (!((marker.icon === null || marker.icon === undefined) || marker.icon === '') && (marker.icon.indexOf('.png') > -1
+            || marker.icon.indexOf('.jpg') > -1 || marker.icon.indexOf('.gif') > -1)) {
             const markerCode = marker.code.replace(/</g, '&amp;lt;').replace(/>/g, '&amp;gt;');
-            img = '<img src=\'' + marker.icon_url + '\' class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
+            img = '<img src=\'' + marker.icon + '\' class=\'btn-icon-text boundary\' style=\'height:16px;\' ' +
               'data-marker-code=\'' + markerCode + '\' alt=\'' + markerCode + '\'/>';
           } else {
-            img = marker.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            // is text or ut8 symbol
+            if (marker.icon !== '') {
+              img = marker.icon;
+            } else {
+              img = marker.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            }
           }
 
           return s1 + img + s3;
@@ -710,8 +715,8 @@ export class TranscriptionService {
         }
       });
 
-      if (!((marker.icon_url === null || marker.icon_url === undefined) || marker.icon_url === '')) {
-        result = result.replace(regex, '<img src=\'' + marker.icon_url + '\' class=\'btn-icon-text\' ' +
+      if (!((marker.icon === null || marker.icon === undefined) || marker.icon === '')) {
+        result = result.replace(regex, '<img src=\'' + marker.icon + '\' class=\'btn-icon-text\' ' +
           'style=\'height:16px;\' data-marker-code=\'' + code + '\'/>');
       } else {
         // marker is text only

@@ -182,7 +182,6 @@ export class UpdateManager {
                             value: 'online'
                           });
                         } else if (entry.value === true) {
-                          console.log('SET USEMODE to local');
                           idbm.save(options, 'usemode', {
                             name: 'usemode',
                             value: 'local'

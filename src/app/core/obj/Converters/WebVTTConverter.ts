@@ -101,7 +101,6 @@ export class WebVTTConverter extends Converter {
         olevel.items[olevel.items.length - 1].sampleDur = Number(audiofile.duration) - Number(lastSegment.sampleStart);
       }
 
-      console.log(olevel);
       result.levels.push(olevel);
 
       return {

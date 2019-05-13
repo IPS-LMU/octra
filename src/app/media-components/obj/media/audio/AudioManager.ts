@@ -230,9 +230,10 @@ export class AudioManager {
             console.log(`sampleRate browser: ${result.browserSampleRate}`);
             console.log(`sampleRate original: ${result.originalSampleRate}`);
             console.log(`original duration in samples = ${result.ressource.info.duration.originalSample.value}`);
+            console.log(`browser duration in samples = ${result.ressource.info.duration.browserSample.value}`);
             console.log(`original duration ${result.ressource.info.duration.originalSample.seconds}`);
             console.log(`browser duration ${result.ressource.info.duration.browserSample.seconds}`);
-            console.log(`audiobuffer duration ${audioBuffer.duration}`);
+            console.log(`audiobuffer duration ${audioBuffer.length}`);
             console.log(`decoded samplerate: ${audioBuffer.sampleRate}`);
 
             const selection = new AudioSelection(

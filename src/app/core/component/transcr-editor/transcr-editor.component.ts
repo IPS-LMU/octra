@@ -870,8 +870,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         // TODO change to specific textfield!
         jQuery('sel-start').remove();
         jQuery('sel-end').remove();
-      } else {
-        console.error('cursor is null!');
       }
     }
   }

@@ -37,7 +37,6 @@ export class ReloadFileComponent implements OnInit {
   newTranscription = () => {
     this.modService.show('transcriptionDelete').then((decision) => {
       if (decision === 'DELETE') {
-
         let keepData = false;
 
         new Promise<void>((resolve) => {

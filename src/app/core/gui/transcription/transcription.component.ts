@@ -337,7 +337,6 @@ export class TranscriptionComponent implements OnInit,
                     break;
                   case('continue'):
                     // reload OCTRA to continue
-                    window.location.reload(true);
                     break;
                 }
                 this.uiService.lastAction = Date.now();

@@ -443,7 +443,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                         const startTime = this.transcr.currentlevel.segments.getStartTime(segmentI);
                         // make shure, that segments boundaries are visible
                         if (startTime.browserSample.value >= this.audiochunk.time.start.browserSample.value &&
-                          segment.time.browserSample.value <= this.audiochunk.time.end.browserSample.value) {
+                          segment.time.browserSample.value <= (this.audiochunk.time.end.browserSample.value + 1)) {
                           const absX = this.av.audioTCalculator.samplestoAbsX(
                             this.transcr.currentlevel.segments.get(segmentI).time.browserSample.value
                           );
@@ -490,6 +490,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                         } else {
                           // TODO check this case again!
                           console.log(`segment invisible error: can't play because start and endtime not between the audiochunk time`);
+                          console.log(`${segment.time.browserSample.value} <= ${this.audiochunk.time.end.browserSample.value}`);
                           this.alerttriggered.emit({
                             type: 'error',
                             message: this.langService.instant('segment invisible')
@@ -943,7 +944,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       const vLines = Math.floor((endSamples - startSamples) / this.audiomanager.browserSampleRate);
       const pxSecond = Math.round(this.av.audioTCalculator.samplestoAbsX(this.audiomanager.browserSampleRate));
       const timeLineHeight = (this.Settings.timeline.enabled) ? this.Settings.timeline.height : 0;
-      const hZoom = Math.round(this._innerWidth / vLines);
       const vZoom = Math.round((this.Settings.lineheight - timeLineHeight) / hLines);
 
       if (pxSecond > 0 && vZoom > 0) {
@@ -962,8 +962,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           this.gContext.lineTo(line.Pos.x + line.Size.width, y + line.Pos.y - this.av.viewRect.position.y);
         }
         this.gContext.stroke();
-      } else {
-        console.error(`pcSecond is 0!`);
       }
     } else {
       console.error(`invalid start end samples`);
@@ -1485,8 +1483,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           line = this.av.LinesArray[lineNum2];
 
           if (lineNum2 >= this.av.visibleLines.start && lineNum2 <= this.av.visibleLines.end &&
-            !isNullOrUndefined(line) && segment.time.browserSample.value !== this.audioressource.info.duration.browserSample.value) {
-            const h = line.Size.height;
+            !isNullOrUndefined(line) && segment.time.browserSample.value !== this.audioressource.info.duration.browserSample.value
+            && segment.time.browserSample.value <= this.audiomanager.ressource.info.duration.browserSample.value
+          ) {
             let relX = 0;
             if (this.Settings.multiLine) {
               relX = absX % this._innerWidth + this.Settings.margin.left;
@@ -1725,7 +1724,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       const startTime = this.transcr.currentlevel.segments.getStartTime(segIndex);
       // make shure, that segments boundaries are visible
       if (startTime.browserSample.value >= this.audiochunk.time.start.browserSample.value
-        && segment.time.browserSample.value <= this.audiochunk.time.end.browserSample.value) {
+        && segment.time.browserSample.value <= (this.audiochunk.time.end.browserSample.value + 1)) {
         const absX = this.av.audioTCalculator.samplestoAbsX(this.transcr.currentlevel.segments.get(segIndex).time.browserSample.value);
         let begin = new Segment(this.audiomanager.createBrowserAudioTime(0));
         if (segIndex > 0) {

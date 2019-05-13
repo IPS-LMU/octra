@@ -33,7 +33,7 @@ export class BugreportModalComponent implements OnInit {
   private actionperformed: Subject<ModalAnswer> = new Subject<ModalAnswer>();
   private subscrmanager = new SubscriptionManager();
 
-  private screenshots: {
+  public screenshots: {
     blob: File,
     previewURL: string
   }[] = [];
@@ -51,6 +51,7 @@ export class BugreportModalComponent implements OnInit {
   }
 
   ngOnInit() {
+
   }
 
   public open(data: {

@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 // SETTINGS
 $to_email = '';
 $auth_token = '';
@@ -12,7 +15,6 @@ $data = $_POST["data"];
 
 function getHTMLText($data, $screenshots)
 {
-    print_r($data);
     ob_start();
     global $topic, $from_email;
     ?>
@@ -306,7 +308,6 @@ if (!empty($data) && !is_null($headers["Authorization"]) && $headers["Authorizat
 
         $attachments = array();
         foreach ($_FILES AS $file) {
-            echo "read file " . $file["tmp_name"];
             $size = $file["size"];
             $file_data = file_get_contents($file["tmp_name"]);
             $file_data = base64_encode($file_data);
@@ -358,7 +359,7 @@ if (!empty($data) && !is_null($headers["Authorization"]) && $headers["Authorizat
         }*/
         $body .= "--" . $separator . "--";
 
-        echo "send email to $to_email from $from_email, with topic $topic";
+        // echo "send email to $to_email from $from_email, with topic $topic";
         $send_ok = mail($to_email, $topic, $body, $header);
 
         if (!$send_ok) {

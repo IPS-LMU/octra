@@ -78,7 +78,8 @@
                 <button type="button" class="btn btn-secondary" (click)="close('CANCEL')">
                     {{"general.abort" | translate}}
                 </button>
-                <button type="button" class="btn btn-primary" (click)="sendBugReport();" [disabled]="!isvalid">
+                <button type="button" class="btn btn-primary" (click)="sendBugReport();"
+                        [disabled]="!isvalid || isSending">
                     {{"bug report.give feedback" | translate}}
                 </button>
             </div>

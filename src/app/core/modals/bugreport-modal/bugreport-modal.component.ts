@@ -33,6 +33,8 @@ export class BugreportModalComponent implements OnInit {
   private actionperformed: Subject<ModalAnswer> = new Subject<ModalAnswer>();
   private subscrmanager = new SubscriptionManager();
 
+  public isSending = false;
+
   public screenshots: {
     blob: File,
     previewURL: string
@@ -83,21 +85,27 @@ export class BugreportModalComponent implements OnInit {
   sendBugReport() {
     this.appStorage.email = this.bgemail;
 
+    this.isSending = true;
     this.subscrmanager.add(
       this.bugService.sendReport(this.bgemail, this.bgdescr, this.sendProObj, {
         auth_token: this.settService.appSettings.octra.bugreport.auth_token,
         url: this.settService.appSettings.octra.bugreport.url
       }, this.screenshots).subscribe(
         () => {
+          this.isSending = false;
           this.bugsent = true;
           console.log('Bugreport sent');
-          /*
+
           setTimeout(() => {
             this.bgdescr = '';
             this.modal.hide();
             this.visible = false;
             this.bugsent = false;
-          }, 2000);*/
+          }, 2000);
+        },
+        (error) => {
+          console.error(error);
+          this.isSending = false;
         }
       )
     );

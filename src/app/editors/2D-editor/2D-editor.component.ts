@@ -26,14 +26,14 @@ import {AudioNavigationComponent} from '../../media-components/components/audio/
 import {Line} from '../../media-components/obj';
 import {AudioManager} from '../../media-components/obj/media/audio/AudioManager';
 import {Functions} from '../../core/shared/Functions';
-import {NavbarService} from '../../core/gui/navbar/navbar.service';
+import {OCTRAEditor} from '../octra-editor';
 
 @Component({
   selector: 'app-overlay-gui',
   templateUrl: './2D-editor.component.html',
   styleUrls: ['./2D-editor.component.css']
 })
-export class TwoDEditorComponent implements OnInit, AfterViewInit, OnDestroy {
+export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy {
   public static editorname = '2D-Editor';
 
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
@@ -103,8 +103,8 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, OnDestroy {
               public uiService: UserInteractionsService,
               public msg: MessageService,
               public settingsService: SettingsService,
-              public appStorage: AppStorageService,
-              public navbarService: NavbarService) {
+              public appStorage: AppStorageService) {
+    super();
 
     this.subscrmanager = new SubscriptionManager();
   }
@@ -534,6 +534,19 @@ export class TwoDEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       if (start && end) {
         this.audioChunkLoupe.destroy();
         this.audioChunkLoupe = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
+      }
+    }
+  }
+
+  public afterFirstInitialization() {
+    const emptySegmentIndex = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
+      return a.transcript === '';
+    });
+    if (this.audioChunkLines.time.duration.browserSample.seconds <= 35) {
+      if (emptySegmentIndex > -1) {
+        this.openSegment(emptySegmentIndex);
+      } else if (this.transcrService.currentlevel.segments.length === 1) {
+        this.openSegment(0);
       }
     }
   }

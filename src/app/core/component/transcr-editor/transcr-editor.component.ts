@@ -405,7 +405,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         const element = document.createElement('img');
         element.setAttribute('src', icon);
         element.setAttribute('class', 'btn-icon-text');
-        element.setAttribute('style', 'height:16px');
         element.setAttribute('data-marker-code', markerCode);
         element.setAttribute('alt', markerCode);
 
@@ -588,16 +587,16 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         }
       } else {
         if (!this.easymode) {
-          icon = '<img src=\'' + marker.icon + '\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
+          icon = '<img src=\'' + marker.icon + '\' class=\'btn-icon\'/> ' +
             '<span class=\'btn-description\'>' + marker.button_text + '</span><span class=\'btn-shortcut\'> ' +
             '[' + marker.shortcut[platform] + ']</span>';
           if (this.Settings.responsive) {
-            icon = '<img src=\'' + marker.icon + '\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
+            icon = '<img src=\'' + marker.icon + '\' class=\'btn-icon\'/> ' +
               '<span class=\'btn-description d-none d-lg-inline\'>' + marker.button_text +
               '</span><span class=\'btn-shortcut d-none d-lg-inline\'> [' + marker.shortcut[platform] + ']</span>';
           }
         } else {
-          icon = '<img src=\'' + marker.icon + '\' class=\'btn-icon\' style=\'height:16px;\'/>';
+          icon = '<img src=\'' + marker.icon + '\' class=\'btn-icon\'/>';
         }
       }
       // create button
@@ -686,17 +685,17 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       const boundaryDescr = this.langService.instant('special_markers.boundary.description', {type: ''});
       let icon = '';
       if (!this.easymode) {
-        icon = '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
+        icon = '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon\'/> ' +
           '<span class=\'btn-description\'>' + boundaryLabel + '</span><span class=\'btn-shortcut\'> ' +
           '[ALT + S]</span>';
         if (this.Settings.responsive) {
-          icon = '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon\' style=\'height:16px;\'/> ' +
+          icon = '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon\'/> ' +
             '<span class=\'btn-description d-none d-md-inline\'>' + boundaryLabel + '</span>' +
             '<span class=\'btn-shortcut d-none d-lg-inline\'> ' +
             '[ALT + S]</span>';
         }
       } else {
-        icon = '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon\' style=\'height:16px;\'/>';
+        icon = '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon\'/>';
       }
       // create button
       const btnJS = {
@@ -717,7 +716,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     // create boundary button
     const fontSizeUp = () => {
-      const icon = '<img src=\'assets/img/components/transcr-editor/increaseFont.png\' class=\'btn-icon\' style=\'height:20px;\'/>';
+      const icon = '<img src=\'assets/img/components/transcr-editor/increaseFont.png\' class=\'btn-icon\' style=\'height:18px;\'/>';
       // create button
       const btnJS = {
         contents: icon,
@@ -736,7 +735,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     // create boundary button
     const fontSizeDown = () => {
-      const icon = '<img src=\'assets/img/components/transcr-editor/decreaseFont.png\' class=\'btn-icon\' style=\'height:20px;\'/>';
+      const icon = '<img src=\'assets/img/components/transcr-editor/decreaseFont.png\' class=\'btn-icon\' style=\'height:18px;\'/>';
       // create button
       const btnJS = {
         contents: icon,
@@ -760,7 +759,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     const element = document.createElement('img');
     element.setAttribute('src', imgURL);
     element.setAttribute('class', 'btn-icon-text boundary');
-    element.setAttribute('style', 'height:16px');
     element.setAttribute('data-samples', this.audiochunk.playposition.browserSample.value.toString());
     element.setAttribute('alt', '[|' + this.audiochunk.playposition.browserSample.value.toString() + '|]');
 

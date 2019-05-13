@@ -84,6 +84,10 @@
     z-index: 200;
 }
 
+.note-editable.card-block {
+    min-height: 100px !important;
+}
+
 .note-editable.card-block .val-error {
     cursor: pointer !important;
 }

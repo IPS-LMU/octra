@@ -30,13 +30,14 @@ import {BrowserInfo} from '../../core/shared';
 import {AVMousePos} from '../../media-components/obj';
 import {AudioManager} from '../../media-components/obj/media/audio/AudioManager';
 import {Functions} from '../../core/shared/Functions';
+import {OCTRAEditor} from '../octra-editor';
 
 @Component({
   selector: 'app-signal-gui',
   templateUrl: './linear-editor.component.html',
   styleUrls: ['./linear-editor.component.css']
 })
-export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
+export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy, OnChanges {
 
   public get app_settings(): any {
     return this.settingsService.appSettings;
@@ -58,6 +59,7 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
               public uiService: UserInteractionsService,
               public settingsService: SettingsService,
               public appStorage: AppStorageService) {
+    super();
     this.subscrmanager = new SubscriptionManager();
   }
 
@@ -549,6 +551,19 @@ export class LinearEditorComponent implements OnInit, AfterViewInit, OnDestroy, 
         this.viewer.focused = false;
         this.loupe.viewer.focused = false;
         segment.transcript = this.editor.rawText;
+      }
+    }
+  }
+
+  afterFirstInitialization() {
+    const emptySegmentIndex = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
+      return a.transcript === '';
+    });
+    if (this.audiochunkTop.time.duration.browserSample.seconds <= 35) {
+      if (emptySegmentIndex > -1) {
+        this.openSegment(emptySegmentIndex);
+      } else if (this.transcrService.currentlevel.segments.length === 1) {
+        this.openSegment(0);
       }
     }
   }

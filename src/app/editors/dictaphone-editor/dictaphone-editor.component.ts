@@ -15,13 +15,14 @@ import {AudioChunk} from '../../media-components/obj/media/audio';
 import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
 import {AudioplayerComponent} from '../../media-components/components/audio/audioplayer';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
+import {OCTRAEditor} from '../octra-editor';
 
 @Component({
   selector: 'app-audioplayer-gui',
   templateUrl: './dictaphone-editor.component.html',
   styleUrls: ['./dictaphone-editor.component.css']
 })
-export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
+export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, OnDestroy, AfterViewInit, OnChanges {
 
   public static editorname = 'Dictaphone Editor';
 
@@ -62,6 +63,7 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
               private uiService: UserInteractionsService,
               public settingsService: SettingsService,
               public appStorage: AppStorageService) {
+    super();
     this.subscrmanager = new SubscriptionManager();
   }
 
@@ -333,5 +335,9 @@ export class DictaphoneEditorComponent implements OnInit, OnDestroy, AfterViewIn
     }
     this.editor.Settings.height = 100;
     this.editor.update();
+  }
+
+  public afterFirstInitialization() {
+    // ignore
   }
 }

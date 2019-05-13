@@ -3,7 +3,6 @@ import {
   AfterContentInit,
   AfterViewChecked,
   AfterViewInit,
-  ChangeDetectorRef,
   Component,
   ComponentFactoryResolver,
   ComponentRef,
@@ -35,7 +34,6 @@ import {ProjectSettings} from '../../obj/Settings';
 import {editorComponents} from '../../../editors/components';
 import {Level} from '../../obj/Annotation';
 import {PlayBackState} from '../../../media-components/obj/media';
-import {HttpClient} from '@angular/common/http';
 import {IFile, PartiturConverter} from '../../obj/Converters';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import * as X2JS from 'x2js';
@@ -95,14 +93,12 @@ export class TranscriptionComponent implements OnInit,
               public transcrService: TranscriptionService,
               public appStorage: AppStorageService,
               public keyMap: KeymappingService,
-              public changeDetecorRef: ChangeDetectorRef,
               public navbarServ: NavbarService,
               public settingsService: SettingsService,
               public modService: ModalService,
               public langService: TranslateService,
               private api: APIService,
-              private bugService: BugReportService,
-              private http: HttpClient) {
+              private bugService: BugReportService) {
     this.subscrmanager = new SubscriptionManager();
     this.audiomanager = this.audio.audiomanagers[0];
 
@@ -269,7 +265,15 @@ export class TranscriptionComponent implements OnInit,
           this.appStorage.saveLogItem(elem.getDataClone());
         }
       }));
-    this.changeEditor(this.interface);
+
+    // first change
+    this.changeEditor(this.interface).then(() => {
+      (this._currentEditor.instance as any).afterFirstInitialization();
+    }).catch((error) => {
+      console.error(error);
+    });
+
+
     this.subscrmanager.add(this.appStorage.saving.subscribe(
       (saving: string) => {
         if (saving === 'saving') {
@@ -400,62 +404,67 @@ export class TranscriptionComponent implements OnInit,
     }
   }
 
-  changeEditor(name: string) {
-    let comp: any = null;
+  changeEditor(name: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let comp: any = null;
 
-    if ((name === null || name === undefined) || name === '') {
-      // fallback to last editor
-      name = editorComponents[editorComponents.length - 1].name;
-    }
-    for (let i = 0; i < editorComponents.length; i++) {
-      if (name === editorComponents[i].name) {
-        this.appStorage.Interface = name;
-        this.interface = name;
-        comp = editorComponents[i].editor;
-        break;
+      if ((name === null || name === undefined) || name === '') {
+        // fallback to last editor
+        name = editorComponents[editorComponents.length - 1].name;
       }
-    }
-
-    if (!(comp === null || comp === undefined)) {
-      this.editorloaded = false;
-      const id = this.subscrmanager.add(comp.initialized.subscribe(
-        () => {
-          setTimeout(() => {
-            this.editorloaded = true;
-            this.subscrmanager.remove(id);
-          }, 100);
+      for (let i = 0; i < editorComponents.length; i++) {
+        if (name === editorComponents[i].name) {
+          this.appStorage.Interface = name;
+          this.interface = name;
+          comp = editorComponents[i].editor;
+          break;
         }
-      ));
+      }
 
-      if (!(this.appLoadeditor === null || this.appLoadeditor === undefined)) {
-        const componentFactory = this._componentFactoryResolver.resolveComponentFactory(comp);
+      if (!(comp === null || comp === undefined)) {
+        this.editorloaded = false;
+        const id = this.subscrmanager.add(comp.initialized.subscribe(
+          () => {
+            setTimeout(() => {
+              this.editorloaded = true;
+              this.subscrmanager.remove(id);
+              resolve();
+            }, 100);
+          }
+        ));
 
-        const viewContainerRef = this.appLoadeditor.viewContainerRef;
-        viewContainerRef.clear();
+        if (!(this.appLoadeditor === null || this.appLoadeditor === undefined)) {
+          const componentFactory = this._componentFactoryResolver.resolveComponentFactory(comp);
 
-        this._currentEditor = viewContainerRef.createComponent(componentFactory);
+          const viewContainerRef = this.appLoadeditor.viewContainerRef;
+          viewContainerRef.clear();
 
-        let caretpos = -1;
+          this._currentEditor = viewContainerRef.createComponent(componentFactory);
 
-        if (!((this.currentEditor.instance as any).editor === null || (this.currentEditor.instance as any).editor === undefined)) {
-          caretpos = (this.currentEditor.instance as any).editor.caretpos;
+          let caretpos = -1;
+
+          if (!((this.currentEditor.instance as any).editor === null || (this.currentEditor.instance as any).editor === undefined)) {
+            caretpos = (this.currentEditor.instance as any).editor.caretpos;
+          }
+
+          if ((this.currentEditor.instance as any).hasOwnProperty('openModal')) {
+            this.subscrmanager.add((this.currentEditor.instance as any).openModal.subscribe(() => {
+              this.modalOverview.open();
+            }));
+          }
+
+          this.uiService.addElementFromEvent('editor:changed', {value: name}, Date.now(),
+            null, null, 'editors');
+
+        } else {
+          reject('ERROR appLoadeditor is null');
+          console.error('ERROR appLoadeditor is null');
         }
-
-        if ((this.currentEditor.instance as any).hasOwnProperty('openModal')) {
-          this.subscrmanager.add((this.currentEditor.instance as any).openModal.subscribe(() => {
-            this.modalOverview.open();
-          }));
-        }
-
-        this.uiService.addElementFromEvent('editor:changed', {value: name}, Date.now(),
-          null, null, 'editors');
-
       } else {
-        console.error('ERROR appLoadeditor is null');
+        reject('ERROR appLoadeditor is null');
+        console.error('ERROR editor component is null');
       }
-    } else {
-      console.error('ERROR editor component is null');
-    }
+    });
   }
 
   translate(languages: any, lang: string): string {

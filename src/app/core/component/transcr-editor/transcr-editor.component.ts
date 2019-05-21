@@ -150,7 +150,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   /**
    * converts the editor's html text to raw text
    */
-  getRawText = () => {
+  getRawText = (replaceEmptySpaces = true) => {
     let html = this.textfield.summernote('code');
 
     html = html.replace(/<((p)|(\s?\/p))>/g, '');
@@ -235,7 +235,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     jQuery.each(dom.contents(), replaceFunc);
 
-    let rawText = dom.text().replace(/[\s ]+/g, ' ');
+    let rawText = dom.text();
+
+    if (replaceEmptySpaces) {
+      rawText = rawText.replace(/[\s ]+/g, ' ');
+    }
 
     return rawText;
   }
@@ -841,8 +845,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     if (!(elem === null || elem === undefined) && elem.getElementsByTagName('sel-start')[0] !== undefined) {
       const range = document.createRange();
       const sel = window.getSelection();
-      let selStart = elem.getElementsByTagName('sel-start')[0].previousSibling;
-      const selEnd = elem.getElementsByTagName('sel-end')[0].nextSibling;
+      let selStart = elem.getElementsByTagName('sel-start')[0];
+      const selEnd = elem.getElementsByTagName('sel-end')[0];
 
       const endOffset = 0;
 
@@ -860,8 +864,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
         if (selEnd !== null) {
           range.setEnd(selEnd, endOffset);
-          range.collapse(false);
         }
+
+        range.collapse(false);
 
         sel.removeAllRanges();
         sel.addRange(range);
@@ -984,7 +989,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   private validate() {
     this.saveSelection();
-    this._rawText = this.getRawText();
+    this._rawText = this.getRawText(false);
+
     // insert selection placeholders
     let code = Functions.insertString(this._rawText, this._textSelection.start, '[[[sel-start/]]]');
     code = Functions.insertString(code, this._textSelection.end + '[[[sel-start/]]]'.length, '[[[sel-end/]]]');

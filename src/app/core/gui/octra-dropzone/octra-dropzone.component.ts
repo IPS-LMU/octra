@@ -65,7 +65,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
 
   private _audiomanager: AudioManager;
 
-  private readonly maxAudioFileSize = 600;
+  private readonly maxAudioFileSize = 5000;
 
   public afterDrop = () => {
     this._oannotation = null;
@@ -116,6 +116,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
           fileProcess.progress = ((e.loaded / e.total)) / (AudioManager.getNumberOfDataParts(fileProcess.file.size) + 1);
         };
 
+        console.log(`READ AUDIO FILE!`);
         reader.readAsArrayBuffer(fileProcess.file);
         break;
       } else {
@@ -334,12 +335,14 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
   private decodeArrayBuffer(buffer: ArrayBuffer,
                             fileProcessIndex: number,
                             checkimport = true) {
+    console.log(`DECODE ARRAYBUFFER`);
     const fileProcess = this._files[fileProcessIndex];
     const extension = fileProcess.file.name.substr(fileProcess.file.name.lastIndexOf('.'));
     // check audio
     this.subscrmanager.add(AudioManager.decodeAudio(fileProcess.file.name, fileProcess.file.type, buffer, AppInfo.audioformats).subscribe(
       (result) => {
         fileProcess.progress = (result.decodeProgress + 1) / 2;
+        // console.log((window.performance as any).memory.jsHeapSizeLimit - (window.performance as any).memory.usedJSHeapSize);
 
         if (isNullOrUndefined(result.audioManager)) {
           // not finished

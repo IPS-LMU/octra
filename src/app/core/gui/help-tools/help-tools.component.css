@@ -3,9 +3,14 @@ h2 {
     text-align: center;
 }
 
+
+.card {
+    margin-bottom: 20px;
+}
+
 @media only screen and (min-width: 768px) {
     .is-table-row {
-        display: table;
+        display: grid;
     }
 
     .is-table-row [class*="col-"] {

@@ -1,7 +1,7 @@
 <div class="container">
     <h2>Help tools</h2>
     <div class="row">
-        <div class="col-sm-4 is-table-row">
+        <div class="col-md-4 is-table-row">
             <div class="card">
                 <div class="card-header">
                     <button type="button" class="btn btn-success bmd-btn-fab bmd-btn-fab-sm">
@@ -15,7 +15,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-4 is-table-row">
+        <div class="col-md-4 is-table-row">
             <div class="card">
                 <div class="card-header">
                     <button type="button" class="btn btn-success bmd-btn-fab bmd-btn-fab-sm">
@@ -28,6 +28,22 @@
                     <button class="btn btn-raised btn-danger col-12" (click)="clearAllData()"> Clear all data
                         permanently
                     </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 is-table-row">
+            <div class="card">
+                <div class="card-header">
+                    <button type="button" class="btn btn-success bmd-btn-fab bmd-btn-fab-sm">
+                        3
+                    </button>
+                    Stresstest
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Test your browser's capabilities.</p>
+                    <a class="btn btn-raised btn-info w-100" [target]="'_blank'" [routerLink]="['/stresstest']"> Open
+                        Stresstest
+                    </a>
                 </div>
             </div>
         </div>

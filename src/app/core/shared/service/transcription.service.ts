@@ -655,10 +655,10 @@ export class TranscriptionService {
         const marker = markers[i];
 
         // replace {<number>} with boundary HTMLElement
-        result = result.replace(/{([0-9]+)}/g, (x, g1) => {
-          return '<img src="assets/img/components/transcr-editor/boundary.png" ' +
+        result = result.replace(/\s?{([0-9]+)}\s?/g, (x, g1) => {
+          return ' <img src="assets/img/components/transcr-editor/boundary.png" ' +
             'class="btn-icon-text boundary" style="height:16px;" ' +
-            'data-samples="' + g1 + '" alt="\[|' + g1 + '|\]">';
+            'data-samples="' + g1 + '" alt="\[|' + g1 + '|\]"> ';
         });
 
         // replace markers
@@ -693,36 +693,6 @@ export class TranscriptionService {
     // wrap result with <p>. Missing this would cause the editor fail on marker insertion
     result = (result !== '') ? '<p>' + result + '</p>' : '<p><br/></p>';
 
-    return result;
-  }
-
-  /**
-   * replace markers of the input string with its html pojection
-   */
-  public replaceMarkersWithHTML(input: string): string {
-    // TODO optimization possible
-
-    let result = input;
-    for (let i = 0; i < this._guidelines.markers.length; i++) {
-      const marker = this._guidelines.markers[i];
-      const regex = new RegExp(Functions.escapeRegex(marker.code), 'g');
-      const code = marker.code.replace(/([<>])/g, (g0, g1) => {
-        switch (g1) {
-          case('<'):
-            return '&lt;';
-          case('>'):
-            return '&gt;';
-        }
-      });
-
-      if (!((marker.icon === null || marker.icon === undefined) || marker.icon === '')) {
-        result = result.replace(regex, '<img src=\'' + marker.icon + '\' class=\'btn-icon-text\' ' +
-          'style=\'height:16px;\' data-marker-code=\'' + code + '\'/>');
-      } else {
-        // marker is text only
-        result = result.replace(regex, code);
-      }
-    }
     return result;
   }
 

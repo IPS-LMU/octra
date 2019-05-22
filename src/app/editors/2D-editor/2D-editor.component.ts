@@ -227,6 +227,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
   ngAfterViewInit() {
     if (this.audiomanager.channel) {
+      console.log(`2D Editor initilialize`);
       this.viewer.initialize();
     }
 

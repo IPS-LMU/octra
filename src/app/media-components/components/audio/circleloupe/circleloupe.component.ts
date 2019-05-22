@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import {LoupeComponent} from '../loupe';
 import {CircleLoupeService} from './circleloupe.service';
 import {AudioChunk} from '../../../obj/media/audio';
@@ -12,7 +12,7 @@ declare var window: any;
   providers: [CircleLoupeService]
 })
 
-export class CircleLoupeComponent implements AfterViewInit, OnChanges {
+export class CircleLoupeComponent implements AfterViewInit, OnChanges, OnInit {
   @ViewChild('loupe') loupe: LoupeComponent;
 
   @Input() audiochunk: AudioChunk;
@@ -61,6 +61,10 @@ export class CircleLoupeComponent implements AfterViewInit, OnChanges {
   }
 
   ngAfterViewInit() {
+
+  }
+
+  ngOnInit() {
     this.loupe.Settings.multiLine = false;
     this.loupe.Settings.justifySignalHeight = false;
     this.loupe.Settings.boundaries.enabled = true;
@@ -80,7 +84,8 @@ export class CircleLoupeComponent implements AfterViewInit, OnChanges {
     this.loupe.Settings.timeline.enabled = false;
     this.loupe.viewer.roundValues = false;
     this.loupe.name = 'circleloupe';
-    this.loupe.update();
+
+    // this.loupe.update();
 
     this.initialized = true;
   }

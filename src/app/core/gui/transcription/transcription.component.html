@@ -28,6 +28,9 @@
     ></app-fastbar>
 
     <div class="flex">
+        <div id="editor-loading" *ngIf="!editorloaded">
+            <span class="fa fa-spinner fa-spin fa-3x fa-fw"></span>
+        </div>
         <ng-template appLoadeditor></ng-template>
     </div>
 

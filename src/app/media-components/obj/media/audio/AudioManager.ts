@@ -68,7 +68,7 @@ export class AudioManager {
     return this._playOnHover;
   }
 
-  get channel(): SharedArrayBuffer {
+  get channel(): Float32Array {
     return this._channel;
   }
 
@@ -158,7 +158,7 @@ export class AudioManager {
   private _gainNode: GainNode = null;
   private _scriptProcessorNode: ScriptProcessorNode = null;
   // only the Audiomanager may have the channel array
-  private _channel: SharedArrayBuffer;
+  private _channel: Float32Array;
 
   private _frameSize = 2048;
   private _bufferSize = 2048;
@@ -452,25 +452,11 @@ export class AudioManager {
 
     // get channel data
     if ((this._channel === null || this._channel === undefined) || this._channel.length === 0) {
-      this._channel = this.getSharedArrayBufferFromFloat32Array(this._ressource.audiobuffer.getChannelData(0));
+      this._channel = this._ressource.audiobuffer.getChannelData(0);
     }
 
     this._state = PlayBackState.INITIALIZED;
     this.afterloaded.emit({status: 'success', error: ''});
-  }
-
-  private getSharedArrayBufferFromFloat32Array(array: Float32Array) {
-
-    const sharedBuffer = new SharedArrayBuffer(array.byteLength);
-    const view = new DataView(sharedBuffer);
-
-    for (let i = 0; i < array.length; i++) {
-      const value = array[i];
-
-      view.setFloat32(i * 4, value);
-    }
-
-    return sharedBuffer;
   }
 
   /**

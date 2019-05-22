@@ -244,6 +244,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
         if (!(this.audiomanager.channel === null || this.audiomanager.channel === undefined)) {
           if (computeDisplayData) {
+            console.log(`audioviewer update, refresh`);
             this.av.refresh().then(() => {
               draw();
             }).catch((err) => {
@@ -839,6 +840,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     this._innerWidth = this.viewRect.size.width - this.Settings.margin.left - this.Settings.margin.right;
     this.oldInnerWidth = this._innerWidth;
 
+    console.log(`ngAfterViewInit initialize`);
     this.initialize().then(() => {
       this.updateCanvasSizes();
       this.update(true);
@@ -860,11 +862,13 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           if (!this.av.Settings.justifySignalHeight) {
             const zoomY = this.av.zoomY;
             // audiochunk changed
+            console.log(`ngOnchanges Initialize 1`);
             this.initialize().then(() => {
               this.av.zoomY = zoomY;
               this.update(true);
             });
           } else {
+            console.log(`ngOnchanges Initialize 2`);
             this.initialize().then(() => {
               this.update(true);
             }).catch((err) => {
@@ -897,6 +901,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     this.mContext = this.mousecanvas.getContext('2d');
     this.tContext = this.textcanvas.getContext('2d');
 
+    console.log(`audioviewer initialize`);
     return this.av.initialize(this._innerWidth, this.audiochunk);
   }
 
@@ -1939,6 +1944,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     this.Settings.pixelPerSec = this.getPixelPerSecond(seconds);
     this.secondsPerLine = seconds;
     this.clearAll();
+    console.log(`onSecondsPerLineUpdated initialize`);
     this.initialize().then(() => {
       this.updateCanvasSizes();
       this.update(true);

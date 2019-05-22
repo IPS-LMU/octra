@@ -666,12 +666,17 @@ export class AudioviewerService extends AudioComponentService {
     return new Promise<void>(
       (resolve, reject) => {
         try {
+          const started = Date.now();
+          // TODO use visible width instead of hole width
           this.computeWholeDisplayData(this.AudioPxWidth / 2, this.Settings.lineheight, this.audiomanager.channel,
             {
               start: this.audiochunk.time.start.browserSample.value,
               end: this.audiochunk.time.end.browserSample.value
             }).then((result) => {
             this._minmaxarray = result;
+
+            const seconds = (Date.now() - started) / 1000;
+            console.log(`it took ${seconds} for width ${this.AudioPxWidth}`);
             resolve();
           }).catch((error) => {
             reject(error);
@@ -687,12 +692,12 @@ export class AudioviewerService extends AudioComponentService {
    * computeDisplayData() generates an array of min-max pairs representing the
    * audio signal. The values of the array are float in the range -1 .. 1.
    */
-  computeWholeDisplayData(width: number, height: number, cha: SharedArrayBuffer,
+  computeWholeDisplayData(width: number, height: number, cha: Float32Array,
                           _interval: { start: number; end: number; }): Promise<number[]> {
     return new Promise<number[]>((resolve, reject) => {
       const promises = [];
 
-      const numberOfPieces = 4;
+      const numberOfPieces = 2;
 
       const xZoom = (_interval.end - _interval.start) / width;
 
@@ -708,7 +713,10 @@ export class AudioviewerService extends AudioComponentService {
           piece = Math.round(width - (piece * (numberOfPieces - 1)));
           end = _interval.end;
         }
-        const tsJob = new TsWorkerJob(this.computeDisplayData, [piece, height, cha, {start, end}, this.Settings.roundValues, xZoom]);
+        const tsJob = new TsWorkerJob(this.computeDisplayData, [piece, height, cha.slice(start, end), {
+          start,
+          end
+        }, this.Settings.roundValues, xZoom]);
 
         promises.push(this.multiThreadingService.run(tsJob));
       }
@@ -731,10 +739,8 @@ export class AudioviewerService extends AudioComponentService {
     return new Promise<any>((resolve, reject) => {
       const width: number = args[0];
       const height: number = args[1];
-      const sharedArrayBuffer: SharedArrayBuffer = args[2];
+      const channel: Float32Array = args[2];
       const interval: { start: number, end: number } = args[3];
-      const view = new DataView(sharedArrayBuffer, interval.start * 4, (interval.end - interval.start) * 4);
-
 
       const roundValues: boolean = args[4];
       const xZoom = args[5];
@@ -753,7 +759,7 @@ export class AudioviewerService extends AudioComponentService {
 
         for (let i = 0; i < width; i++) {
           offset = Math.round(i * xZoom);
-          let floatValue = view.getFloat32(Math.min(offset * 4, view.byteLength - 4));
+          let floatValue = channel[offset];
 
           if (isNaN(floatValue)) {
             break;
@@ -769,7 +775,7 @@ export class AudioviewerService extends AudioComponentService {
           }
 
           for (let j = offset; j < maxIndex; j++) {
-            floatValue = view.getFloat32(Math.min(j * 4, view.byteLength - 4));
+            floatValue = channel[j];
 
             val = floatValue;
             max = Math.max(max, val);
@@ -830,6 +836,7 @@ export class AudioviewerService extends AudioComponentService {
    * after Channel was initialzed
    */
   private afterChannelInititialized(innerWidth: number, calculateZoom: boolean = true): Promise<void> {
+    console.log(`channel initialized, refresh`);
     return this.refresh()
       .then(() => {
         if (calculateZoom) {

@@ -183,13 +183,13 @@ export class AudioChunk {
     }
   }
 
-  public getChannelBuffer(selection: AudioSelection): Float32Array {
+  /* public getChannelBuffer(selection: AudioSelection): Float32Array {
     if (!(selection === null || selection === undefined)) {
       return this.audiomanager.channel.subarray(selection.start.browserSample.value, selection.end.browserSample.value);
     }
 
     return null;
-  }
+  }*/
 
   public startPlayback(onProcess: () => void = () => {
   }, playOnHover: boolean = false): Promise<void> {

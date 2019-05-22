@@ -12,6 +12,7 @@ import {AudioService, KeymappingService, TranscriptionService} from '../../../..
 import {PlayBackState} from '../../../obj/media';
 import {isNullOrUndefined} from '../../../../core/shared/Functions';
 import {MultiThreadingService} from '../../../../core/shared/multi-threading/multi-threading.service';
+import {TsWorkerJob} from '../../../../core/shared/multi-threading/ts-worker-job';
 
 
 @Injectable()
@@ -665,12 +666,16 @@ export class AudioviewerService extends AudioComponentService {
     return new Promise<void>(
       (resolve, reject) => {
         try {
-          this._minmaxarray = this.computeDisplayData(this.AudioPxWidth / 2, this.Settings.lineheight, this.audiochunk.audiomanager.channel,
+          this.computeWholeDisplayData(this.AudioPxWidth / 2, this.Settings.lineheight, this.audiomanager.channel,
             {
               start: this.audiochunk.time.start.browserSample.value,
               end: this.audiochunk.time.end.browserSample.value
-            });
-          resolve();
+            }).then((result) => {
+            this._minmaxarray = result;
+            resolve();
+          }).catch((error) => {
+            reject(error);
+          });
         } catch (err) {
           reject(err);
         }
@@ -682,57 +687,110 @@ export class AudioviewerService extends AudioComponentService {
    * computeDisplayData() generates an array of min-max pairs representing the
    * audio signal. The values of the array are float in the range -1 .. 1.
    */
-  computeDisplayData(width: number, height: number, cha: Float32Array, _interval: { start: number; end: number; }) {
-    width = Math.floor(width);
+  computeWholeDisplayData(width: number, height: number, cha: SharedArrayBuffer,
+                          _interval: { start: number; end: number; }): Promise<number[]> {
+    return new Promise<number[]>((resolve, reject) => {
+      const promises = [];
 
-    if (_interval.start !== null && _interval.end !== null && _interval.end >= _interval.start) {
-      const minMaxArray = [];
-      const len = _interval.end - _interval.start;
+      const numberOfPieces = 4;
 
-      let min = 0;
-      let max = 0;
-      let val = 0;
-      let offset = 0;
-      let maxIndex = 0;
+      const xZoom = (_interval.end - _interval.start) / width;
 
-      const xZoom = len / width;
+      let piece = Math.floor(width / numberOfPieces);
+      const samplePiece = Math.floor((_interval.end - _interval.start) / numberOfPieces);
 
-      const yZoom = height / 2;
+      for (let i = 1; i <= numberOfPieces; i++) {
 
-      for (let i = 0; i < width; i++) {
-        offset = Math.round(i * xZoom) + _interval.start;
-        min = cha[offset];
-        max = cha[offset];
-
-        if (isNaN(cha[offset])) {
-          break;
+        const start = _interval.start + (i - 1) * samplePiece;
+        let end = start + samplePiece;
+        if (i === numberOfPieces) {
+          // make sure to fit whole width
+          piece = Math.round(width - (piece * (numberOfPieces - 1)));
+          end = _interval.end;
         }
+        const tsJob = new TsWorkerJob(this.computeDisplayData, [piece, height, cha, {start, end}, this.Settings.roundValues, xZoom]);
 
-        if ((offset + xZoom) > _interval.start + len) {
-          maxIndex = len;
-        } else {
-          maxIndex = Math.round(offset + xZoom);
-        }
-
-        for (let j = offset; j < maxIndex; j++) {
-          val = cha[j];
-          max = Math.max(max, val);
-          min = Math.min(min, val);
-        }
-
-        if (this.Settings.roundValues) {
-          minMaxArray.push(Math.round(min * yZoom));
-          minMaxArray.push(Math.round(max * yZoom));
-        } else {
-          minMaxArray.push(min * yZoom);
-          minMaxArray.push(max * yZoom);
-        }
+        promises.push(this.multiThreadingService.run(tsJob));
       }
 
-      return minMaxArray;
-    } else {
-      throw new Error('interval.end is less than interval.start');
-    }
+      Promise.all(promises).then((values: number[][]) => {
+        let result = [];
+        for (let i = 0; i < values.length; i++) {
+          const value = values[i];
+          result = result.concat(value);
+        }
+
+        resolve(result);
+      }).catch((error) => {
+        reject(error);
+      });
+    });
+  }
+
+  private computeDisplayData(args: any[]): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      const width: number = args[0];
+      const height: number = args[1];
+      const sharedArrayBuffer: SharedArrayBuffer = args[2];
+      const interval: { start: number, end: number } = args[3];
+      const view = new DataView(sharedArrayBuffer, interval.start * 4, (interval.end - interval.start) * 4);
+
+
+      const roundValues: boolean = args[4];
+      const xZoom = args[5];
+
+      if (interval.start !== null && interval.end !== null && interval.end >= interval.start) {
+        const minMaxArray = [];
+        const len = interval.end - interval.start;
+
+        let min = 0;
+        let max = 0;
+        let val = 0;
+        let offset = 0;
+        let maxIndex = 0;
+
+        const yZoom = height / 2;
+
+        for (let i = 0; i < width; i++) {
+          offset = Math.round(i * xZoom);
+          let floatValue = view.getFloat32(Math.min(offset * 4, view.byteLength - 4));
+
+          if (isNaN(floatValue)) {
+            break;
+          }
+
+          min = floatValue;
+          max = floatValue;
+
+          if ((offset + xZoom) > len) {
+            maxIndex = len;
+          } else {
+            maxIndex = Math.round(offset + xZoom);
+          }
+
+          for (let j = offset; j < maxIndex; j++) {
+            floatValue = view.getFloat32(Math.min(j * 4, view.byteLength - 4));
+
+            val = floatValue;
+            max = Math.max(max, val);
+            min = Math.min(min, val);
+          }
+
+          if (roundValues) {
+            minMaxArray.push(Math.round(min * yZoom));
+            minMaxArray.push(Math.round(max * yZoom));
+          } else {
+            minMaxArray.push(min * yZoom);
+            minMaxArray.push(max * yZoom);
+          }
+        }
+
+        args[2] = null;
+        resolve(minMaxArray);
+      } else {
+        reject('interval.end is less than interval.start');
+      }
+    });
   }
 
   private calculateZoom(height: number, width: number, minmaxarray: number[]) {

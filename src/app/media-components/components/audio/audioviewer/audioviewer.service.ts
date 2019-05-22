@@ -662,12 +662,11 @@ export class AudioviewerService extends AudioComponentService {
     this._settings = new AudioviewerConfig();
   }
 
-  public refresh(): Promise<any> {
+  public refreshComputedData(): Promise<any> {
     return new Promise<void>(
       (resolve, reject) => {
         try {
           const started = Date.now();
-          // TODO use visible width instead of hole width
           this.computeWholeDisplayData(this.AudioPxWidth / 2, this.Settings.lineheight, this.audiomanager.channel,
             {
               start: this.audiochunk.time.start.browserSample.value,
@@ -676,7 +675,7 @@ export class AudioviewerService extends AudioComponentService {
             this._minmaxarray = result;
 
             const seconds = (Date.now() - started) / 1000;
-            console.log(`it took ${seconds} for width ${this.AudioPxWidth}`);
+            // console.log(`it took ${seconds} for width ${this.AudioPxWidth}`);
             resolve();
           }).catch((error) => {
             reject(error);
@@ -697,7 +696,7 @@ export class AudioviewerService extends AudioComponentService {
     return new Promise<number[]>((resolve, reject) => {
       const promises = [];
 
-      const numberOfPieces = 2;
+      const numberOfPieces = 4;
 
       const xZoom = (_interval.end - _interval.start) / width;
 
@@ -836,8 +835,7 @@ export class AudioviewerService extends AudioComponentService {
    * after Channel was initialzed
    */
   private afterChannelInititialized(innerWidth: number, calculateZoom: boolean = true): Promise<void> {
-    console.log(`channel initialized, refresh`);
-    return this.refresh()
+    return this.refreshComputedData()
       .then(() => {
         if (calculateZoom) {
           this.calculateZoom(this.Settings.lineheight, this.AudioPxWidth, this._minmaxarray);

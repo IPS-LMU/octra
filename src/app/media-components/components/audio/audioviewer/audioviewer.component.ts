@@ -26,6 +26,7 @@ import {KeymappingService, TranscriptionService} from '../../../../core/shared/s
 import {BrowserInfo, Logger, Segment} from '../../../../core/shared';
 import {Timespan2Pipe} from '../../../pipe/timespan2.pipe';
 import {isNullOrUndefined} from '../../../../core/shared/Functions';
+import {Subject} from 'rxjs';
 
 @Component({
   selector: 'app-audioviewer',
@@ -140,7 +141,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   @ViewChild('playcan') playcanRef;
   @ViewChild('mousecan') mousecanRef;
   @ViewChild('textcan') textcanRef;
+
   // EVENTS
+  public onInitialized = new Subject();
   @Output() selchange = new EventEmitter<AudioSelection>();
   @Output() segmententer: EventEmitter<any> = new EventEmitter<any>();
   @Output() segmentchange: EventEmitter<number> = new EventEmitter<number>();
@@ -180,7 +183,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
   // size settings
   private _innerWidth = 0;
-  private secondsPerLine = 5;
+  public secondsPerLine = 5;
 
   private _initialized = false;
 
@@ -237,6 +240,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
               this.drawCursor(this.av.Mousecursor.line);
             }
             this._initialized = true;
+            this.onInitialized.complete();
           } else {
             console.error('0 lines?');
           }
@@ -244,8 +248,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
         if (!(this.audiomanager.channel === null || this.audiomanager.channel === undefined)) {
           if (computeDisplayData) {
-            console.log(`audioviewer update, refresh`);
-            this.av.refresh().then(() => {
+            this.av.refreshComputedData().then(() => {
               draw();
             }).catch((err) => {
               console.error(err);
@@ -840,10 +843,13 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     this._innerWidth = this.viewRect.size.width - this.Settings.margin.left - this.Settings.margin.right;
     this.oldInnerWidth = this._innerWidth;
 
-    console.log(`ngAfterViewInit initialize`);
+    this.Settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
+
     this.initialize().then(() => {
       this.updateCanvasSizes();
-      this.update(true);
+      this.update(false);
+
+      // this.onSecondsPerLineUpdated(this.Settings.pixelPerSec, false);
     }).catch((err) => {
       console.error(err);
     });
@@ -862,13 +868,11 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           if (!this.av.Settings.justifySignalHeight) {
             const zoomY = this.av.zoomY;
             // audiochunk changed
-            console.log(`ngOnchanges Initialize 1`);
             this.initialize().then(() => {
               this.av.zoomY = zoomY;
               this.update(true);
             });
           } else {
-            console.log(`ngOnchanges Initialize 2`);
             this.initialize().then(() => {
               this.update(true);
             }).catch((err) => {
@@ -901,7 +905,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     this.mContext = this.mousecanvas.getContext('2d');
     this.tContext = this.textcanvas.getContext('2d');
 
-    console.log(`audioviewer initialize`);
     return this.av.initialize(this._innerWidth, this.audiochunk);
   }
 
@@ -1940,25 +1943,36 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     this.drawPlayCursor();
   }
 
-  public onSecondsPerLineUpdated(seconds: number) {
+  public onSecondsPerLineUpdated(seconds: number, initialize = true) {
     this.Settings.pixelPerSec = this.getPixelPerSecond(seconds);
     this.secondsPerLine = seconds;
-    this.clearAll();
-    console.log(`onSecondsPerLineUpdated initialize`);
-    this.initialize().then(() => {
+    // this.clearAll();
+
+    new Promise<void>((resolve, reject) => {
+      if (initialize) {
+        this.initialize().then(() => {
+          resolve();
+        }).catch((err) => {
+          this.update(true);
+          reject(err);
+        });
+      } else {
+        resolve();
+      }
+    }).then(() => {
       this.updateCanvasSizes();
       this.update(true);
 
       if (this.viewRect.position.y >= this.realRect.size.height) {
         this.scrollTo(this.realRect.size.height - this.viewRect.size.height, true);
       }
-    }).catch((err) => {
-      this.update(true);
-      console.error(err);
+    }).catch((error) => {
+      console.error(error);
     });
+
   }
 
-  private getPixelPerSecond(secondsPerLine: number) {
+  public getPixelPerSecond(secondsPerLine: number) {
     return (this._innerWidth / secondsPerLine);
   }
 

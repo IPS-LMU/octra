@@ -184,7 +184,6 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         }
       }
     ));
-    LinearEditorComponent.initialized.emit();
   }
 
   ngOnChanges(obj: SimpleChanges) {
@@ -253,6 +252,14 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         }
       )
     );
+
+    this.viewer.onInitialized.subscribe(
+      () => {
+      }, () => {
+      },
+      () => {
+        LinearEditorComponent.initialized.emit();
+      });
   }
 
   test(selection: AudioSelection) {

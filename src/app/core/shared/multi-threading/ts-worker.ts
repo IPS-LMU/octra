@@ -52,14 +52,17 @@ export class TsWorker {
           this.status = ev.data.status;
 
           if (ev.data.status === 'finished') {
+            this.removeJobByID(job.id);
             resolve(ev.data.result);
           } else if (ev.data.status === 'failed') {
+            this.removeJobByID(job.id);
             reject(ev.data.message);
           }
         };
 
         this.worker.onerror = (err) => {
           this.status = TsWorkerStatus.FAILED;
+          this.removeJobByID(job.id);
           reject(err);
         };
 

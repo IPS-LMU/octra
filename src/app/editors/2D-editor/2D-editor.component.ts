@@ -1,4 +1,14 @@
-import {AfterViewInit, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 
 import {
   AppStorageService,
@@ -25,13 +35,14 @@ import {CircleLoupeComponent} from '../../media-components/components/audio/circ
 import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
 import {Line} from '../../media-components/obj';
 import {AudioManager} from '../../media-components/obj/media/audio/AudioManager';
-import {Functions} from '../../core/shared/Functions';
+import {Functions, isNullOrUndefined} from '../../core/shared/Functions';
 import {OCTRAEditor} from '../octra-editor';
 
 @Component({
   selector: 'app-overlay-gui',
   templateUrl: './2D-editor.component.html',
-  styleUrls: ['./2D-editor.component.css']
+  styleUrls: ['./2D-editor.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy {
   public static editorname = '2D-Editor';
@@ -103,7 +114,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               public uiService: UserInteractionsService,
               public msg: MessageService,
               public settingsService: SettingsService,
-              public appStorage: AppStorageService) {
+              public appStorage: AppStorageService,
+              private cd: ChangeDetectorRef) {
     super();
 
     this.subscrmanager = new SubscriptionManager();
@@ -154,6 +166,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.viewer.Settings.stepWidthRatio = (this.viewer.Settings.pixelPerSec / this.audiomanager.ressource.info.samplerate);
     this.viewer.Settings.showTimePerLine = true;
     this.viewer.Settings.showTranscripts = true;
+    this.viewer.name = 'multiline viewer';
+    this.viewer.secondsPerLine = this.appStorage.secondsPerLine;
 
     this.viewer.alerttriggered.subscribe(
       (result) => {
@@ -213,8 +227,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         }
       }
     ));
-
-    TwoDEditorComponent.initialized.emit();
   }
 
   ngOnDestroy() {
@@ -226,11 +238,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   ngAfterViewInit() {
-    if (this.audiomanager.channel) {
-      console.log(`2D Editor initilialize`);
-      this.viewer.initialize();
-    }
-
     this.subscrmanager.add(
       this.transcrService.segmentrequested.subscribe(
         (segnumber: number) => {
@@ -242,7 +249,13 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     if (this.appStorage.showLoupe) {
       this.loupe.zoomY = this.factor;
     }
-    this.viewer.onSecondsPerLineUpdated(this.appStorage.secondsPerLine);
+    this.viewer.onInitialized.subscribe(
+      () => {
+      }, () => {
+      }, () => {
+        TwoDEditorComponent.initialized.emit();
+      });
+    // this.viewer.onSecondsPerLineUpdated(this.appStorage.secondsPerLine);
   }
 
   onSegmentEntered(selected: any) {
@@ -303,7 +316,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
     if (this.appStorage.showLoupe) {
       const lastlinevisible: Line = this.viewer.av.LinesArray[this.viewer.av.LinesArray.length - 1];
-      if (this.miniloupe.location.y <= (lastlinevisible.Pos.y - this.viewer.viewRect.position.y +
+      if (!isNullOrUndefined(lastlinevisible) && this.miniloupe.location.y <= (lastlinevisible.Pos.y - this.viewer.viewRect.position.y +
         lastlinevisible.Size.height + this.viewer.margin.top + this.viewer.margin.bottom)) {
         this.loupeHidden = false;
         this.mouseTimer = window.setTimeout(() => {
@@ -329,6 +342,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       this.miniloupe.location.y = y - 20 - this.miniloupe.size.height;
       this.miniloupe.location.x = x - (this.miniloupe.size.width / 2);
     }
+    this.cd.detectChanges();
   }
 
   onShortCutTriggered($event, type) {
@@ -367,6 +381,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
       this.appStorage.playonhover = !this.appStorage.playonhover;
     }
+
+    this.cd.detectChanges();
   }
 
   onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
@@ -537,6 +553,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         this.audioChunkLoupe = new AudioChunk(new AudioSelection(start, end), this.audiomanager);
       }
     }
+    this.cd.detectChanges();
   }
 
   public afterFirstInitialization() {
@@ -550,5 +567,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         this.openSegment(0);
       }
     }
+    this.cd.detectChanges();
   }
 }

@@ -25,6 +25,14 @@ declare var window: any;
   providers: [AudioviewerService]
 })
 export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
+  get name(): string {
+    return this._name;
+  }
+
+  set name(value: string) {
+    this.viewer.name = value;
+    this._name = value;
+  }
   @ViewChild('viewer') viewer: AudioviewerComponent;
   @ViewChild('loupe') loupe: ElementRef;
 
@@ -36,7 +44,7 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
 
   @Input() audiochunk: AudioChunk;
   @Input() height: number;
-  public name: string;
+  private _name: string;
   public pos: any = {
     x: 0,
     y: 0
@@ -132,7 +140,7 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
   }
 
   public update(compute = true) {
-    this.viewer.name = this.name;
+    this.viewer.name = this._name;
     // this.viewer.initialize();
     this.viewer.update(compute);
   }

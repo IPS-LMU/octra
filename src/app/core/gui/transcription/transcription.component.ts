@@ -3,6 +3,8 @@ import {
   AfterContentInit,
   AfterViewChecked,
   AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ComponentFactoryResolver,
   ComponentRef,
@@ -53,7 +55,8 @@ import {InactivityModalComponent} from '../../modals/inactivity-modal/inactivity
   selector: 'app-transcription',
   templateUrl: './transcription.component.html',
   styleUrls: ['./transcription.component.css'],
-  providers: [MessageService]
+  providers: [MessageService],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TranscriptionComponent implements OnInit,
   OnDestroy, AfterViewInit, AfterContentInit, OnChanges, AfterViewChecked, AfterContentChecked, AfterContentInit {
@@ -98,7 +101,8 @@ export class TranscriptionComponent implements OnInit,
               public modService: ModalService,
               public langService: TranslateService,
               private api: APIService,
-              private bugService: BugReportService) {
+              private bugService: BugReportService,
+              private cd: ChangeDetectorRef) {
     this.subscrmanager = new SubscriptionManager();
     this.audiomanager = this.audio.audiomanagers[0];
 
@@ -405,6 +409,8 @@ export class TranscriptionComponent implements OnInit,
 
   changeEditor(name: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
+      this.editorloaded = false;
+      this.cd.detectChanges();
       let comp: any = null;
 
       if ((name === null || name === undefined) || name === '') {
@@ -421,39 +427,41 @@ export class TranscriptionComponent implements OnInit,
       }
 
       if (!(comp === null || comp === undefined)) {
-        this.editorloaded = false;
         const id = this.subscrmanager.add(comp.initialized.subscribe(
           () => {
-            setTimeout(() => {
-              this.editorloaded = true;
-              this.subscrmanager.remove(id);
-              resolve();
-            }, 100);
+            this.editorloaded = true;
+            this.subscrmanager.remove(id);
+            this.cd.detectChanges();
+
+            resolve();
           }
         ));
 
         if (!(this.appLoadeditor === null || this.appLoadeditor === undefined)) {
           const componentFactory = this._componentFactoryResolver.resolveComponentFactory(comp);
 
-          const viewContainerRef = this.appLoadeditor.viewContainerRef;
-          viewContainerRef.clear();
+          setTimeout(() => {
+            const viewContainerRef = this.appLoadeditor.viewContainerRef;
+            viewContainerRef.clear();
 
-          this._currentEditor = viewContainerRef.createComponent(componentFactory);
+            this._currentEditor = viewContainerRef.createComponent(componentFactory);
+            let caretpos = -1;
 
-          let caretpos = -1;
+            if (!((this.currentEditor.instance as any).editor === null || (this.currentEditor.instance as any).editor === undefined)) {
+              caretpos = (this.currentEditor.instance as any).editor.caretpos;
+            }
 
-          if (!((this.currentEditor.instance as any).editor === null || (this.currentEditor.instance as any).editor === undefined)) {
-            caretpos = (this.currentEditor.instance as any).editor.caretpos;
-          }
+            if ((this.currentEditor.instance as any).hasOwnProperty('openModal')) {
+              this.subscrmanager.add((this.currentEditor.instance as any).openModal.subscribe(() => {
+                this.modalOverview.open();
+              }));
+            }
 
-          if ((this.currentEditor.instance as any).hasOwnProperty('openModal')) {
-            this.subscrmanager.add((this.currentEditor.instance as any).openModal.subscribe(() => {
-              this.modalOverview.open();
-            }));
-          }
+            this.uiService.addElementFromEvent('editor:changed', {value: name}, Date.now(),
+              null, null, 'editors');
 
-          this.uiService.addElementFromEvent('editor:changed', {value: name}, Date.now(),
-            null, null, 'editors');
+            this.cd.detectChanges();
+          }, 20);
 
         } else {
           reject('ERROR appLoadeditor is null');
@@ -496,7 +504,6 @@ export class TranscriptionComponent implements OnInit,
     this.api.saveSession(json.transcript, json.project, json.annotator,
       json.jobno, json.id, json.status, json.comment, json.quality, json.log).then((result) => {
       if (result !== null) {
-        console.log(`job ${json.id} saved.`);
         this.appStorage.submitted = true;
 
         setTimeout(() => {
@@ -550,8 +557,6 @@ export class TranscriptionComponent implements OnInit,
         // transcription available
         this.appStorage.audioURL = json.data.url;
         this.appStorage.dataID = json.data.id;
-        console.log(`next job: ${json.data.id}`);
-        console.log(`next url: ${json.data.url}`);
 
         // change number of remaining jobs
         if (json.hasOwnProperty('message')) {

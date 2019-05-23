@@ -667,12 +667,13 @@ export class AudioviewerService extends AudioComponentService {
       (resolve, reject) => {
         try {
           const started = Date.now();
-          this.computeWholeDisplayData(this.AudioPxWidth / 2, this.Settings.lineheight, this.audiomanager.channel,
+          this.computeWholeDisplayData(this.AudioPxWidth / 2, this.Settings.lineheight, this.audiomanager.channelData.data,
             {
-              start: this.audiochunk.time.start.browserSample.value,
-              end: this.audiochunk.time.end.browserSample.value
-            }).then((result) => {
+              start: this.audiochunk.time.start.browserSample.value / this.audiomanager.channelData.factor,
+              end: this.audiochunk.time.end.browserSample.value / this.audiomanager.channelData.factor
+            }, this.audiomanager.channelData.factor).then((result) => {
             this._minmaxarray = result;
+            console.log(this._minmaxarray);
 
             const seconds = (Date.now() - started) / 1000;
             // console.log(`it took ${seconds} for width ${this.AudioPxWidth}`);
@@ -692,13 +693,13 @@ export class AudioviewerService extends AudioComponentService {
    * audio signal. The values of the array are float in the range -1 .. 1.
    */
   computeWholeDisplayData(width: number, height: number, cha: Float32Array,
-                          _interval: { start: number; end: number; }): Promise<number[]> {
+                          _interval: { start: number; end: number; }, factor: number): Promise<number[]> {
     return new Promise<number[]>((resolve, reject) => {
       const promises = [];
 
       const numberOfPieces = 4;
 
-      const xZoom = (_interval.end - _interval.start) / width;
+      const xZoom = ((_interval.end - _interval.start) / width);
 
       let piece = Math.floor(width / numberOfPieces);
       const samplePiece = Math.floor((_interval.end - _interval.start) / numberOfPieces);
@@ -801,6 +802,7 @@ export class AudioviewerService extends AudioComponentService {
   private calculateZoom(height: number, width: number, minmaxarray: number[]) {
     if (this.Settings.justifySignalHeight) {
       // justify height to maximum top border
+      console.log(`calculate zoom ${width}, ${minmaxarray.length}`);
       let maxZoomX = 0;
       let maxZoomY = 0;
       const timeLineHeight = (this.Settings.timeline.enabled) ? this.Settings.timeline.height : 0;

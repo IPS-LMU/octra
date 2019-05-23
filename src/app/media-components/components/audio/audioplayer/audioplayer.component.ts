@@ -110,7 +110,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
    */
   public update = () => {
     this.updateCanvasSizes();
-    if (this.audiomanager.channel) {
+    if (this.audiomanager.channelData) {
       this.draw();
       this.drawPlayCursor();
     }
@@ -485,7 +485,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   private startTimer() {
     this.subscrmanager.add(this.timer.subscribe(
       () => {
-        if (this.audiomanager.channel && this.ap.PlayCursor) {
+        if (this.audiomanager.channelData && this.ap.PlayCursor) {
           this.changeDetectorRef.markForCheck();
         }
       }

@@ -68,8 +68,12 @@ export class AudioManager {
     return this._playOnHover;
   }
 
-  get channel(): Float32Array {
-    return this._channel;
+  get channelData(): {
+    sampleRate: number,
+    factor: number,
+    data: Float32Array
+  } {
+    return this._channelData;
   }
 
   /*
@@ -157,8 +161,12 @@ export class AudioManager {
   private readonly _audioContext: AudioContext = null;
   private _gainNode: GainNode = null;
   private _scriptProcessorNode: ScriptProcessorNode = null;
-  // only the Audiomanager may have the channel array
-  private _channel: Float32Array;
+  // only the Audiomanager may have the channelData array
+  private _channelData: {
+    sampleRate: number,
+    factor: number,
+    data: Float32Array
+  };
 
   private _frameSize = 2048;
   private _bufferSize = 2048;
@@ -450,13 +458,63 @@ export class AudioManager {
   public prepareAudioPlayBack() {
     this._gainNode = this._audioContext.createGain();
 
-    // get channel data
-    if ((this._channel === null || this._channel === undefined) || this._channel.length === 0) {
-      this._channel = this._ressource.audiobuffer.getChannelData(0);
+    // get channelData data
+    if ((this._channelData === null || this._channelData === undefined) || this._channelData.data.length === 0) {
+      this._channelData = {
+        data: this._ressource.audiobuffer.getChannelData(0),
+        factor: 1,
+        sampleRate: this._ressource.audiobuffer.sampleRate
+      };
+
+      console.log(`channel hast length of ${this._channelData.data.byteLength} bytes and ${this._channelData.data.length} values`);
+      console.log(this.ressource.audiobuffer.length);
+      this.minimizeChannelArray();
     }
 
     this._state = PlayBackState.INITIALIZED;
     this.afterloaded.emit({status: 'success', error: ''});
+  }
+
+  public minimizeChannelArray() {
+    let factor = 0;
+
+    if (this.ressource.info.samplerate === 48000) {
+      factor = 3;
+      // samplerate = 16000
+    } else if (this.ressource.info.samplerate === 44100) {
+      factor = 2;
+      // samplerate = 22050
+    } else {
+      factor = 1;
+    }
+
+    const newSampleRate = this.ressource.info.samplerate / factor;
+
+    if (newSampleRate !== this.ressource.info.samplerate) {
+      const result = new Float32Array(Math.ceil(this.ressource.info.duration.browserSample.seconds * newSampleRate));
+
+      let counter = 0;
+      for (let i = 0; i < this._channelData.data.length; i++) {
+
+        let sum = 0;
+        for (let j = 0; j < factor; j++) {
+          sum += this._channelData.data[i + j];
+        }
+
+        result[counter] = sum / factor;
+        i += factor - 1;
+        counter++;
+      }
+
+      this._channelData.data = result;
+      this._channelData.factor = factor;
+      this._channelData.sampleRate = newSampleRate;
+      console.log(`minimized channel (${newSampleRate}, ${factor}) has ${result.byteLength} bytes and ${result.length} items`);
+    } else {
+      // do nothing
+      this._channelData.factor = 1;
+      this._channelData.sampleRate = this.ressource.info.samplerate;
+    }
   }
 
   /**

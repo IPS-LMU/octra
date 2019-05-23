@@ -140,9 +140,9 @@ export class AudioDecoder {
   private decodeAudioFile(arrayBuffer: ArrayBuffer): Promise<AudioBuffer> {
     return new Promise<AudioBuffer>((resolve, reject) => {
       if (!(arrayBuffer === null || arrayBuffer === undefined)) {
-        this.audioContext.decodeAudioData(arrayBuffer).then((audiobuffer: AudioBuffer) => {
+        this.audioContext.decodeAudioData(arrayBuffer, (audiobuffer) => {
           resolve(audiobuffer);
-        }).catch((error) => {
+        }, (error) => {
           reject(error);
         });
       } else {

@@ -193,79 +193,96 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    * @param computeDisplayData should display data be recomputed?
    */
   public update = (computeDisplayData: boolean = false) => {
-    if (this.AudioPxWidth > 0) {
-      this.updateVisibleLines();
-      if (!this.updating) {
-        this.updating = true;
+    return new Promise<void>((resolve, reject) => {
 
-        const draw = () => {
-          this.av.updateLines(this._innerWidth);
-          if (this.av.LinesArray.length > 0) {
-            let startSamples = 0;
-            let endSamples = this.av.audioTCalculator.absXChunktoSamples(this.av.LinesArray[0].Size.width, this.audiochunk);
-            for (let i = this.av.visibleLines.start; i <= this.av.visibleLines.end; i++) {
-              const line = this.av.LinesArray[i];
-              if (!(line === null || line === undefined)) {
-                this.clearDisplay(i);
-                this.drawGrid(startSamples, endSamples, 3, line);
-                startSamples = endSamples;
-                endSamples += this.av.audioTCalculator.absXChunktoSamples(this.av.LinesArray[i].Size.width, this.audiochunk);
-              } else {
-                break;
+      if (this.AudioPxWidth > 0) {
+        this.updateVisibleLines();
+        if (!this.updating) {
+          this.updating = true;
+
+          const drawBackground = () => {
+            this.av.updateLines(this._innerWidth);
+            if (this.av.LinesArray.length > 0) {
+              let startSamples = 0;
+              let endSamples = this.av.audioTCalculator.absXChunktoSamples(this.av.LinesArray[0].Size.width, this.audiochunk);
+              for (let i = this.av.visibleLines.start; i <= this.av.visibleLines.end; i++) {
+                const line = this.av.LinesArray[i];
+                if (!(line === null || line === undefined)) {
+                  this.clearDisplay(i);
+                  this.drawGrid(startSamples, endSamples, 3, line);
+                  startSamples = endSamples;
+                  endSamples += this.av.audioTCalculator.absXChunktoSamples(this.av.LinesArray[i].Size.width, this.audiochunk);
+                } else {
+                  break;
+                }
               }
-            }
-            this.drawSegments();
-            if (this.Settings.cropping !== 'none') {
-              this.av.Mousecursor.relPos.x = Math.round(this._innerWidth / 2);
-              this.drawCropBorder();
-            }
-
-            if (this.Settings.timeline.enabled) {
-              this.drawTimeLine();
-            }
-
-            // draw signal. Separate for loop because of performance issues
-            for (let i = this.av.visibleLines.start; i <= this.av.visibleLines.end; i++) {
-              if (!this.drawSignal(i)) {
-                break;
+              this.drawSegments();
+              if (this.Settings.cropping !== 'none') {
+                this.av.Mousecursor.relPos.x = Math.round(this._innerWidth / 2);
+                this.drawCropBorder();
               }
-            }
-            if (this.Settings.cropping !== 'none') {
-              this.av.Mousecursor.relPos.x = Math.round(this._innerWidth / 2);
-              this.drawCursor(this.av.LinesArray[0]);
-              this.drawCropBorder();
-            }
-            if (this.Settings.selection.enabled) {
-              this.drawPlayCursor();
-              this.drawCursor(this.av.Mousecursor.line);
-            }
-            this._initialized = true;
-            this.onInitialized.complete();
-          } else {
-            console.error('0 lines?');
-          }
-        };
 
-        if (!(this.audiomanager.channelData === null || this.audiomanager.channelData === undefined)) {
-          if (computeDisplayData) {
-            this.av.refreshComputedData().then(() => {
-              draw();
-            }).catch((err) => {
-              console.error(err);
-            });
+              if (this.Settings.timeline.enabled) {
+                this.drawTimeLine();
+              }
+            } else {
+              console.error('0 lines?');
+            }
+          };
+
+          const drawSignal = () => {
+            this.av.updateLines(this._innerWidth);
+            if (this.av.LinesArray.length > 0) {
+              // draw signal. Separate for loop because of performance issues
+              for (let i = this.av.visibleLines.start; i <= this.av.visibleLines.end; i++) {
+                if (!this.drawSignal(i)) {
+                  break;
+                }
+              }
+              if (this.Settings.cropping !== 'none') {
+                this.av.Mousecursor.relPos.x = Math.round(this._innerWidth / 2);
+                this.drawCursor(this.av.LinesArray[0]);
+                this.drawCropBorder();
+              }
+              if (this.Settings.selection.enabled) {
+                this.drawPlayCursor();
+                this.drawCursor(this.av.Mousecursor.line);
+              }
+              this._initialized = true;
+              this.onInitialized.complete();
+            } else {
+              console.error('0 lines?');
+            }
+          };
+
+          drawBackground();
+
+          if (!(this.audiomanager.channelData === null || this.audiomanager.channelData === undefined)) {
+            if (computeDisplayData) {
+              this.av.refreshComputedData().then(() => {
+                drawSignal();
+                resolve();
+              }).catch((err) => {
+                console.error(err);
+                reject(err);
+              });
+            } else {
+              drawSignal();
+              resolve();
+            }
           } else {
-            draw();
+            console.error('audio channelData is null');
+            reject('audio channelData is null');
           }
-        } else {
-          console.error('audio channelData is null');
+
+          this.oldInnerWidth = this._innerWidth;
+          this.updating = false;
         }
-
-        this.oldInnerWidth = this._innerWidth;
-        this.updating = false;
+      } else {
+        console.error('audiopx 0');
+        reject('audiopx 0');
       }
-    } else {
-      console.error('audiopx 0');
-    }
+    });
   }
   /**
    * drawSignal(array) draws the min-max pairs of values in the canvas
@@ -1684,7 +1701,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    */
   @HostListener('window:resize', ['$event'])
   onResize() {
-    this.resizing = true;
     this.av.viewRect.size.width = this.aview.elementRef.nativeElement.clientWidth;
     this._innerWidth = this.av.viewRect.size.width - this.Settings.margin.left - this.Settings.margin.right;
 
@@ -1692,14 +1708,24 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     if (this._innerWidth !== this.oldInnerWidth) {
       setTimeout(() => {
         if ((!this.Settings.multiLine || this.av.AudioPxWidth < this._innerWidth) && !this.resizing) {
+          this.resizing = true;
           this.av.AudioPxWidth = this._innerWidth;
           this.av.audioTCalculator.audioPxWidth = this._innerWidth;
           const ratio = this._innerWidth / this.oldInnerWidth;
 
           this.changePlayCursorAbsX((this.av.PlayCursor.absX * ratio));
-          this.update(true);
+          this.update(true).then(() => {
+            this.resizing = false;
+          }).catch((error) => {
+            console.error(error);
+          });
         } else if (this.Settings.multiLine && !this.resizing) {
-          this.onSecondsPerLineUpdated(this.secondsPerLine);
+          this.resizing = true;
+          this.onSecondsPerLineUpdated(this.secondsPerLine).then(() => {
+            this.resizing = false;
+          }).catch((error) => {
+            console.error(error);
+          });
         }
 
         if (this.av.PlayCursor.absX > 0) {
@@ -1711,8 +1737,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         }
       }, 100);
     }
-
-    this.resizing = false;
   }
 
   public getLocation(): any {
@@ -1943,40 +1967,45 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     this.drawPlayCursor();
   }
 
-  public onSecondsPerLineUpdated(seconds: number, initialize = true) {
-    this.Settings.pixelPerSec = this.getPixelPerSecond(seconds);
-    this.secondsPerLine = seconds;
-    // this.clearAll();
+  public onSecondsPerLineUpdated(seconds: number, initialize = true): Promise<void> {
+    return new Promise<void>((resolve2, reject2) => {
+      this.Settings.pixelPerSec = this.getPixelPerSecond(seconds);
+      this.secondsPerLine = seconds;
+      // this.clearAll();
 
-    new Promise<void>((resolve, reject) => {
-      if (initialize) {
-        this.initialize().then(() => {
+      new Promise<void>((resolve, reject) => {
+        if (initialize) {
+          this.initialize().then(() => {
+            resolve();
+          }).catch((err) => {
+            this.update(true);
+            reject(err);
+          });
+        } else {
           resolve();
-        }).catch((err) => {
-          this.update(true);
-          reject(err);
+        }
+      }).then(() => {
+        this.updateCanvasSizes();
+        this.update(true).then(() => {
+          if (this.viewRect.position.y >= this.realRect.size.height) {
+            this.scrollTo(this.realRect.size.height - this.viewRect.size.height, true);
+          }
+          resolve2();
+        }).catch((error) => {
+          reject2(error);
         });
-      } else {
-        resolve();
-      }
-    }).then(() => {
-      this.updateCanvasSizes();
-      this.update(true);
-
-      if (this.viewRect.position.y >= this.realRect.size.height) {
-        this.scrollTo(this.realRect.size.height - this.viewRect.size.height, true);
-      }
-    }).catch((error) => {
-      console.error(error);
+      }).catch((error) => {
+        console.error(error);
+        reject2(error);
+      });
     });
-
   }
 
   public getPixelPerSecond(secondsPerLine: number) {
     return (this._innerWidth / secondsPerLine);
   }
 
-  public clearAll() {
+  private clearAll() {
     this.gContext.clearRect(0, 0, this.viewRect.size.width, this.viewRect.size.height);
     this.mContext.clearRect(0, 0, this.viewRect.size.width, this.viewRect.size.height);
     this.pContext.clearRect(0, 0, this.viewRect.size.width, this.viewRect.size.height);

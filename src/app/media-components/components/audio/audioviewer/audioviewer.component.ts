@@ -246,7 +246,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           }
         };
 
-        if (!(this.audiomanager.channel === null || this.audiomanager.channel === undefined)) {
+        if (!(this.audiomanager.channelData === null || this.audiomanager.channelData === undefined)) {
           if (computeDisplayData) {
             this.av.refreshComputedData().then(() => {
               draw();
@@ -257,7 +257,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             draw();
           }
         } else {
-          console.error('audio channel is null');
+          console.error('audio channelData is null');
         }
 
         this.oldInnerWidth = this._innerWidth;

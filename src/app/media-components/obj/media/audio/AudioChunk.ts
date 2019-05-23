@@ -185,7 +185,7 @@ export class AudioChunk {
 
   /* public getChannelBuffer(selection: AudioSelection): Float32Array {
     if (!(selection === null || selection === undefined)) {
-      return this.audiomanager.channel.subarray(selection.start.browserSample.value, selection.end.browserSample.value);
+      return this.audiomanager.channelData.subarray(selection.start.browserSample.value, selection.end.browserSample.value);
     }
 
     return null;

@@ -3,7 +3,6 @@ import {
   AfterContentInit,
   AfterViewChecked,
   AfterViewInit,
-  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   ComponentFactoryResolver,
@@ -55,8 +54,7 @@ import {InactivityModalComponent} from '../../modals/inactivity-modal/inactivity
   selector: 'app-transcription',
   templateUrl: './transcription.component.html',
   styleUrls: ['./transcription.component.css'],
-  providers: [MessageService],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  providers: [MessageService]
 })
 export class TranscriptionComponent implements OnInit,
   OnDestroy, AfterViewInit, AfterContentInit, OnChanges, AfterViewChecked, AfterContentChecked, AfterContentInit {

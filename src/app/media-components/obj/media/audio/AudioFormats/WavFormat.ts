@@ -45,7 +45,7 @@ export class WavFormat extends AudioFormat {
   public splitChannelsToFiles(filename: string, type: string, buffer: ArrayBuffer): File[] {
     const result = [];
 
-    // one block contains one sample of each channel
+    // one block contains one sample of each channelData
     // eg. blockAlign = 4 Byte => 2 * 8 Channel1 + 2 * 8 Channel2 = 32Bit = 4 Byte
 
     if (this.isValid(buffer)) {
@@ -138,7 +138,7 @@ export class WavFormat extends AudioFormat {
     sampleDur: number
   }): Promise<File> {
     return new Promise<File>((resolve, reject) => {
-      // one block contains one sample of each channel
+      // one block contains one sample of each channelData
       // eg. blockAlign = 4 Byte => 2 * 8 Channel1 + 2 * 8 Channel2 = 32Bit = 4 Byte
       const start = segment.sampleStart * this._channels * 2;
       const duration = segment.sampleDur * this._channels * 2;
@@ -169,7 +169,7 @@ export class WavFormat extends AudioFormat {
     return new Promise<ArrayBuffer>((resolve, reject) => {
       const sampleStart = segment.sampleStart.value;
       const sampleDur = segment.sampleDur.value;
-      // one block contains one sample of each channel
+      // one block contains one sample of each channelData
       // eg. blockAlign = 4 Byte => 2 * 8 Channel1 + 2 * 8 Channel2 = 32Bit = 4 Byte
       const start = sampleStart * this._channels * 2;
       const duration = sampleDur * this._channels * 2;
@@ -307,13 +307,13 @@ export class WavFormat extends AudioFormat {
     dataView.setUint32(16, 16, true);
     /* sample format (raw) */
     dataView.setUint16(20, 1, true);
-    /* channel count */
+    /* channelData count */
     dataView.setUint16(22, this._channels, true);
     /* sample rate */
     dataView.setUint32(24, this._sampleRate, true);
     /* byte rate (sample rate * block align) */
     dataView.setUint32(28, this._sampleRate * 2, true);
-    /* block align (channel count * bytes per sample) */
+    /* block align (channelData count * bytes per sample) */
     dataView.setUint16(32, 2, true);
     /* bits per sample */
     dataView.setUint16(34, this._bitsPerSample, true);

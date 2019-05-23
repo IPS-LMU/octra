@@ -673,7 +673,6 @@ export class AudioviewerService extends AudioComponentService {
               end: this.audiochunk.time.end.browserSample.value / this.audiomanager.channelData.factor
             }, this.audiomanager.channelData.factor).then((result) => {
             this._minmaxarray = result;
-            console.log(this._minmaxarray);
 
             const seconds = (Date.now() - started) / 1000;
             // console.log(`it took ${seconds} for width ${this.AudioPxWidth}`);
@@ -802,7 +801,6 @@ export class AudioviewerService extends AudioComponentService {
   private calculateZoom(height: number, width: number, minmaxarray: number[]) {
     if (this.Settings.justifySignalHeight) {
       // justify height to maximum top border
-      console.log(`calculate zoom ${width}, ${minmaxarray.length}`);
       let maxZoomX = 0;
       let maxZoomY = 0;
       const timeLineHeight = (this.Settings.timeline.enabled) ? this.Settings.timeline.height : 0;

@@ -21,7 +21,7 @@ export class StresstestComponent implements OnInit, OnDestroy {
   private sampleData: File;
   private arrayBuffer: ArrayBuffer;
 
-  private status = 'init';
+  public status = 'init';
 
   public get measuredString() {
     const size = Functions.getFileSize(this.measured);

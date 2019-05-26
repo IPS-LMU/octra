@@ -340,6 +340,35 @@ export class AppStorageService {
     this._loggedIn = value;
   }
 
+  private _audioSettings = {
+    volume: 1,
+    speed: 1
+  };
+
+  public set audioVolume(value: number) {
+    this._audioSettings.volume = value;
+
+    this.idb.save('options', 'audioSettings', {value: this._audioSettings}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  public get audioVolume(): number {
+    return this._audioSettings.volume;
+  }
+
+  public set audioSpeed(value: number) {
+    this._audioSettings.speed = value;
+
+    this.idb.save('options', 'audioSettings', {value: this._audioSettings}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  public get audioSpeed(): number {
+    return this._audioSettings.speed;
+  }
+
   constructor(public sessStr: SessionStorageService,
               public localStr: LocalStorageService) {
   }
@@ -509,6 +538,8 @@ export class AppStorageService {
                 (result) => {
                   if (!(result === null || result === undefined)) {
                     this['' + variable.attribute + ''] = result;
+                    console.log(`set ${variable.attribute} with:`);
+                    console.log(result);
                   }
                 }
               ));
@@ -741,12 +772,18 @@ export class AppStorageService {
         {
           attribute: '_secondsPerLine',
           key: 'secondsPerLine'
+        },
+        {
+          attribute: '_audioSettings',
+          key: 'audioSettings'
         }
       ]
     ).then(() => {
       idb.getAll('logs', 'timestamp').then((logs) => {
         this._logs = logs;
       });
+
+      console.log(this._audioSettings);
     }).then(() => {
       idb.getAll('annotation_levels', 'id').then((levels: any[]) => {
         this._annotation = [];

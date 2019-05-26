@@ -341,13 +341,13 @@ export class AudioManager {
         this._playOnHover = playOnHover;
         this.changeState(PlayBackState.STARTED);
         this._stepBackward = false;
-        this._scriptProcessorNode = this._audioContext.createScriptProcessor(this._bufferSize, 2, 2);
-
-        // connect modules of Web Audio API
         this._gainNode.gain.value = volume;
-        let lastCheck = Date.now();
-        this._scriptProcessorNode.connect(this._audioContext.destination);
         this._gainNode.connect(this._audioContext.destination);
+        this._scriptProcessorNode = this._audioContext.createScriptProcessor(this._bufferSize, 2, 2);
+        this._scriptProcessorNode.connect(this._gainNode);
+        // connect modules of Web Audio API
+        let lastCheck = Date.now();
+        // this._scriptProcessorNode.connect(this._audioContext.destination);
 
         this._playbackInfo.started = new Date().getTime();
         this._playbackInfo.endAt = this._playbackInfo.started + (duration.browserSample.unix / speed);

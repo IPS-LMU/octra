@@ -442,6 +442,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     old_value: number, new_value: number, timestamp: number
   }) {
     this.audiochunkTop.speed = event.new_value;
+    this.appStorage.audioSpeed = event.new_value;
   }
 
   afterSpeedChange(event: {
@@ -474,6 +475,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     old_value: number, new_value: number, timestamp: number
   }) {
     this.audiochunkTop.volume = event.new_value;
+    this.appStorage.audioVolume = event.new_value;
   }
 
   afterVolumeChange(event: {

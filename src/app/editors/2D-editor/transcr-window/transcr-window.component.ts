@@ -415,6 +415,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
   onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
     this.audiochunk.speed = event.new_value;
+    this.appStorage.audioSpeed = event.new_value;
   }
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {

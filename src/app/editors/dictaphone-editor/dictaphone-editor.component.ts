@@ -137,6 +137,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
     this.audiochunk.speed = event.new_value;
+    this.appStorage.audioSpeed = event.new_value;
   }
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
@@ -146,6 +147,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   onVolumeChange(event: { old_value: number, new_value: number, timestamp: number }) {
     this.audiochunk.volume = event.new_value;
+    this.appStorage.audioVolume = event.new_value;
   }
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {

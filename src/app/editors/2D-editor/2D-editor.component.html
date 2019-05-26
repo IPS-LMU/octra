@@ -11,6 +11,8 @@
                           (speedchange)="onSpeedChange($event)"
                           (afterspeedchange)="afterSpeedChange($event)"
                           [isAudioPlaying]="audiomanager.isPlaying"
+                          [speed]="appStorage.audioSpeed"
+                          [volume]="appStorage.audioVolume"
                           [replay]="audioChunkLines.replay"
                           [responsive]="settingsService.responsive.enabled"
                           [buttons]="{

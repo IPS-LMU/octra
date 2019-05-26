@@ -16,6 +16,8 @@
                       (volumechange)="onVolumeChange($event)"
                       (aftervolumechange)="afterVolumeChange($event)"
                       (speedchange)="onSpeedChange($event)"
+                      [speed]="appStorage.audioSpeed"
+                      [volume]="appStorage.audioVolume"
                       (afterspeedchange)="afterSpeedChange($event)"
                       [isAudioPlaying]="audiomanager.isPlaying"
                       [responsive]="settingsService.responsive.enabled"

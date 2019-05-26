@@ -75,7 +75,7 @@ export class AudioNavigationComponent implements AfterViewInit {
     return this._volume;
   }
 
-  set volume(value: number) {
+  @Input() set volume(value: number) {
     this.volumechange.emit({
       old_value: Number(this._volume),
       new_value: Number(value),
@@ -90,7 +90,7 @@ export class AudioNavigationComponent implements AfterViewInit {
     return this._speed;
   }
 
-  set speed(value: number) {
+  @Input() set speed(value: number) {
     this.speedchange.emit({
       old_value: Number(this._speed),
       new_value: Number(value),

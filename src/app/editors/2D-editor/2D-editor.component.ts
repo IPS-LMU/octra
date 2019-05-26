@@ -387,6 +387,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
   onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
     this.audioChunkLines.speed = event.new_value;
+    this.appStorage.audioSpeed = event.new_value;
   }
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
@@ -416,6 +417,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
   onVolumeChange(event: { old_value: number, new_value: number, timestamp: number }) {
     this.audioChunkLines.volume = event.new_value;
+    this.appStorage.audioVolume = event.new_value;
   }
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {

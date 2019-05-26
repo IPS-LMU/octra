@@ -76,7 +76,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
               public audio: AudioService,
               public uiService: UserInteractionsService,
               public settingsService: SettingsService,
-              private appStorage: AppStorageService) {
+              public appStorage: AppStorageService) {
 
     this.subscrmanager = new SubscriptionManager();
   }

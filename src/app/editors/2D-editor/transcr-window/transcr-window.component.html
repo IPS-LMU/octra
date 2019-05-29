@@ -79,8 +79,8 @@
                             </span>
             </button>
             <button class="btn btn-info btn-raised col-md-4" (click)="save();doit('right');"
-                    *ngIf="!isNextSegmentLastAndBreak(segmentIndex)
-                    && segmentIndex < transcrService.currentlevel.segments.length - 1">
+                    *ngIf="hasSegmentBoundaries || (!isNextSegmentLastAndBreak(segmentIndex)
+                    && segmentIndex < transcrService.currentlevel.segments.length - 1)">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'d-lg-none': responsive && !easymode}">
                                 <fa-icon icon="save"></fa-icon> & <fa-icon icon="arrow-right"></fa-icon>
@@ -92,8 +92,8 @@
             </button>
             <!-- check if last segment ord if the next segment is a break -->
             <button class="btn btn-info btn-raised col-md-4" (click)="save();close();openOverview();"
-                    *ngIf="segmentIndex === transcrService.currentlevel.segments.length - 1
-                    || isNextSegmentLastAndBreak(segmentIndex)">
+                    *ngIf="!hasSegmentBoundaries && (segmentIndex === transcrService.currentlevel.segments.length - 1
+                    || isNextSegmentLastAndBreak(segmentIndex))">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'d-lg-none': responsive && !easymode}">
                                 <fa-icon icon="save"></fa-icon> & <fa-icon icon="eye"></fa-icon>

@@ -71,6 +71,10 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     return this.audiochunk.audiomanager.ressource;
   }
 
+  public get hasSegmentBoundaries() {
+    return !isNullOrUndefined(this.editor.rawText.match(/{[0-9]+}/g));
+  }
+
   constructor(public keyMap: KeymappingService,
               public transcrService: TranscriptionService,
               public audio: AudioService,
@@ -120,8 +124,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     switch ($event.comboKey) {
       case ('ALT + ARROWRIGHT'):
         $event.event.preventDefault();
-        if (!this.isNextSegmentLastAndBreak(this.segmentIndex)
-          && this.segmentIndex < this.transcrService.currentlevel.segments.length - 1) {
+        if (this.hasSegmentBoundaries || (!this.isNextSegmentLastAndBreak(this.segmentIndex)
+          && this.segmentIndex < this.transcrService.currentlevel.segments.length - 1)) {
           this.doit('right');
         } else {
           this.save();

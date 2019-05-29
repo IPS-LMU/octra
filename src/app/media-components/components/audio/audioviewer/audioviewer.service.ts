@@ -399,8 +399,14 @@ export class AudioviewerService extends AudioComponentService {
         let segment = this.transcrService.currentlevel.segments.BetweenWhichSegment(absXTime);
         let transcript = '';
         if (!isNullOrUndefined(segment)) {
-          transcript = segment.transcript;
-          segment.transcript = '';
+          if (this.transcrService.currentlevel.segments.length > 1) {
+            // clear right
+            transcript = segment.transcript;
+            segment.transcript = '';
+          } else {
+            // clear left
+            transcript = '';
+          }
         }
         this.transcrService.currentlevel.segments.add(Math.round(absXTime));
         segment = this.transcrService.currentlevel.segments.BetweenWhichSegment(absXTime);

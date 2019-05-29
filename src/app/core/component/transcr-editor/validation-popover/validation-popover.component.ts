@@ -39,7 +39,7 @@ export class ValidationPopoverComponent implements OnInit, AfterViewChecked {
 
   public _description = '';
 
-  @ViewChild('validationContainer') validationContainer: ElementRef;
+  @ViewChild('validationContainer', {static: true}) validationContainer: ElementRef;
 
   public visible = false;
 

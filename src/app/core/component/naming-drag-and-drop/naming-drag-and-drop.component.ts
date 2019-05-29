@@ -21,7 +21,7 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
     '<secondsDur>'
   ];
 
-  @ViewChild('list') list: ElementRef;
+  @ViewChild('list', {static: true}) list: ElementRef;
   @Input() fileName = '';
   @Input() firstSegment: Segment;
 

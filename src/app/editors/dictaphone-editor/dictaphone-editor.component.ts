@@ -28,9 +28,9 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
 
-  @ViewChild('nav') nav: AudioNavigationComponent;
-  @ViewChild('audioplayer') audioplayer: AudioplayerComponent;
-  @ViewChild('transcr') public editor: TranscrEditorComponent;
+  @ViewChild('nav', {static: true}) nav: AudioNavigationComponent;
+  @ViewChild('audioplayer', {static: true}) audioplayer: AudioplayerComponent;
+  @ViewChild('transcr', {static: true}) public editor: TranscrEditorComponent;
   public audiochunk: AudioChunk;
   public audiomanager: AudioManager;
   private subscrmanager: SubscriptionManager;

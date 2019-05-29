@@ -13,7 +13,7 @@ declare var window: any;
 })
 
 export class CircleLoupeComponent implements AfterViewInit, OnChanges, OnInit {
-  @ViewChild('loupe') loupe: LoupeComponent;
+  @ViewChild('loupe', {static: true}) loupe: LoupeComponent;
 
   @Input() audiochunk: AudioChunk;
   @Input() height: number;

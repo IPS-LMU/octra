@@ -12,7 +12,7 @@ export class TranscriptionFeedbackComponent implements OnInit {
 
   @Input() feedbackData = {};
   @Input() showCommentFieldOnly = false;
-  @ViewChild('fo') feedbackForm: NgForm;
+  @ViewChild('fo', {static: true}) feedbackForm: NgForm;
 
   public get valid(): boolean {
     return this.feedbackForm.valid;

@@ -192,7 +192,7 @@ export class TsWorker {
     const result = `var job = null;
 var base = self;
 
-onmessage = function (msg) {
+onmessage = (msg) => {
     var data = msg.data;
     var command = data.command;
     var args = data.args;
@@ -200,13 +200,13 @@ onmessage = function (msg) {
     switch (command) {
         case("run"):
             base.job = args[0];
-            var func = new Function("return " + base.job.doFunction)();
-            func(base.job.args).then(function (result) {
+            var func = eval(base.job.doFunction);
+            func(base.job.args).then((result) => {
                 base.postMessage({
                     status: "finished",
                     result: result
                 });
-            }).catch(function (error) {
+            }).catch((error) => {
                 base.postMessage({
                     type: "failed",
                     message: error
@@ -220,7 +220,7 @@ onmessage = function (msg) {
             });
             break;
     }
-}`;
+};`;
     return result;
   }
 }

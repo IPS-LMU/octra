@@ -49,10 +49,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
 
-  @ViewChild('viewer') viewer: AudioviewerComponent;
-  @ViewChild('window') window: TranscrWindowComponent;
-  @ViewChild('loupe') loupe: CircleLoupeComponent;
-  @ViewChild('audionav') audionav: AudioNavigationComponent;
+  @ViewChild('viewer', {static: true}) viewer: AudioviewerComponent;
+  @ViewChild('window', {static: false}) window: TranscrWindowComponent;
+  @ViewChild('loupe', {static: false}) loupe: CircleLoupeComponent;
+  @ViewChild('audionav', {static: true}) audionav: AudioNavigationComponent;
 
   @Output() public openModal = new EventEmitter();
   public showWindow = false;

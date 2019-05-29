@@ -67,11 +67,11 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
 
-  @ViewChild('viewer') viewer: AudioviewerComponent;
-  @ViewChild('miniloupe') miniloupe: CircleLoupeComponent;
-  @ViewChild('loupe') loupe: LoupeComponent;
-  @ViewChild('nav') nav: AudioNavigationComponent;
-  @ViewChild('transcr') public editor: TranscrEditorComponent;
+  @ViewChild('viewer', {static: true}) viewer: AudioviewerComponent;
+  @ViewChild('miniloupe', {static: false}) miniloupe: CircleLoupeComponent;
+  @ViewChild('loupe', {static: false}) loupe: LoupeComponent;
+  @ViewChild('nav', {static: true}) nav: AudioNavigationComponent;
+  @ViewChild('transcr', {static: true}) public editor: TranscrEditorComponent;
   public miniLoupeHidden = true;
   public segmentselected = false;
   public topSelected = false;

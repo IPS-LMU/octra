@@ -108,7 +108,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Input() playposition: BrowserAudioTime;
   @Input() audiochunk: AudioChunk;
 
-  @ViewChild('validationPopover') validationPopover: ValidationPopoverComponent;
+  @ViewChild('validationPopover', {static: true}) validationPopover: ValidationPopoverComponent;
 
   public textfield: any = null;
   public focused = false;

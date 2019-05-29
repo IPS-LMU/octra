@@ -85,10 +85,10 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.subscrmanager = new SubscriptionManager();
   }
 
-  @ViewChild('loupe') loupe: LoupeComponent;
-  @ViewChild('editor') editor: TranscrEditorComponent;
-  @ViewChild('audionav') audionav: AudioNavigationComponent;
-  @ViewChild('window') window: ElementRef;
+  @ViewChild('loupe', {static: true}) loupe: LoupeComponent;
+  @ViewChild('editor', {static: true}) editor: TranscrEditorComponent;
+  @ViewChild('audionav', {static: true}) audionav: AudioNavigationComponent;
+  @ViewChild('window', {static: true}) window: ElementRef;
   @Output() act: EventEmitter<string> = new EventEmitter<string>();
   @Input() easymode = false;
   public posY = 0;

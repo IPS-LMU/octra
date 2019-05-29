@@ -50,11 +50,11 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     this.subscrmanager = new SubscriptionManager();
   }
 
-  @ViewChild('f') loginform: NgForm;
-  @ViewChild('dropzone') dropzone: OctraDropzoneComponent;
-  @ViewChild('agreement') agreement: ElementRef;
-  @ViewChild('localmode') localmode: ElementRef;
-  @ViewChild('onlinemode') onlinemode: ElementRef;
+  @ViewChild('f', {static: false}) loginform: NgForm;
+  @ViewChild('dropzone', {static: true}) dropzone: OctraDropzoneComponent;
+  @ViewChild('agreement', {static: false}) agreement: ElementRef;
+  @ViewChild('localmode', {static: true}) localmode: ElementRef;
+  @ViewChild('onlinemode', {static: true}) onlinemode: ElementRef;
   public validSize = false;
   public agreementChecked = true;
   public projects: string[] = [];

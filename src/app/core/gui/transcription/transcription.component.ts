@@ -139,13 +139,13 @@ export class TranscriptionComponent implements OnInit,
   }
 
   // TODO change to ModalComponents!
-  @ViewChild('modalShortcuts') modalShortcuts: any;
-  @ViewChild('modalOverview') modalOverview: OverviewModalComponent;
-  @ViewChild(LoadeditorDirective) appLoadeditor: LoadeditorDirective;
-  @ViewChild('modal') modal: any;
-  @ViewChild('transcrSendingModal') transcrSendingModal: TranscriptionSendingModalComponent;
-  @ViewChild('modalGuidelines') modalGuidelines: TranscriptionGuidelinesModalComponent;
-  @ViewChild('inactivityModal') inactivityModal: InactivityModalComponent;
+  @ViewChild('modalShortcuts', {static: true}) modalShortcuts: any;
+  @ViewChild('modalOverview', {static: true}) modalOverview: OverviewModalComponent;
+  @ViewChild(LoadeditorDirective, {static: true}) appLoadeditor: LoadeditorDirective;
+  @ViewChild('modal', {static: true}) modal: any;
+  @ViewChild('transcrSendingModal', {static: true}) transcrSendingModal: TranscriptionSendingModalComponent;
+  @ViewChild('modalGuidelines', {static: true}) modalGuidelines: TranscriptionGuidelinesModalComponent;
+  @ViewChild('inactivityModal', {static: false}) inactivityModal: InactivityModalComponent;
 
   public sendError = '';
   public showdetails = false;

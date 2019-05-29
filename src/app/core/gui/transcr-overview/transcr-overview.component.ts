@@ -48,8 +48,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   public showLoading = true;
 
   @Output() segmentclicked: EventEmitter<number> = new EventEmitter<number>();
-  @ViewChild('validationPopover') validationPopover: ValidationPopoverComponent;
-  @ViewChild('transcrEditor') transcrEditor: TranscrEditorComponent;
+  @ViewChild('validationPopover', {static: true}) validationPopover: ValidationPopoverComponent;
+  @ViewChild('transcrEditor', {static: false}) transcrEditor: TranscrEditorComponent;
 
   private subscrmanager: SubscriptionManager;
   private updating = false;

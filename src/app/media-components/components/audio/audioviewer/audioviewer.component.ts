@@ -134,13 +134,13 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   }
 
   subscrmanager: SubscriptionManager;
-  @ViewChild('audioview') aview;
-  @ViewChild('graphicscan') graphicscanRef;
-  @ViewChild('graphicscan2') graphicscanRef2;
-  @ViewChild('overlaycan') overlaynacRef;
-  @ViewChild('playcan') playcanRef;
-  @ViewChild('mousecan') mousecanRef;
-  @ViewChild('textcan') textcanRef;
+  @ViewChild('audioview', {static: true}) aview;
+  @ViewChild('graphicscan', {static: true}) graphicscanRef;
+  @ViewChild('graphicscan2', {static: false}) graphicscanRef2;
+  @ViewChild('overlaycan', {static: true}) overlaynacRef;
+  @ViewChild('playcan', {static: true}) playcanRef;
+  @ViewChild('mousecan', {static: true}) mousecanRef;
+  @ViewChild('textcan', {static: true}) textcanRef;
 
   // EVENTS
   public onInitialized = new Subject();

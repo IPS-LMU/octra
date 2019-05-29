@@ -22,9 +22,9 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
     ignoreBackdropClick: false
   };
 
-  @ViewChild('modal') modal: any;
-  @ViewChild('feedback') feedback: TranscriptionFeedbackComponent;
-  @ViewChild('overview') overview: TranscrOverviewComponent;
+  @ViewChild('modal', {static: true}) modal: any;
+  @ViewChild('feedback', {static: false}) feedback: TranscriptionFeedbackComponent;
+  @ViewChild('overview', {static: true}) overview: TranscrOverviewComponent;
   @Output() transcriptionSend = new EventEmitter<void>();
 
   protected data = null;

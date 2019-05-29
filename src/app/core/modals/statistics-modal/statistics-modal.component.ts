@@ -25,7 +25,7 @@ export class StatisticsModalComponent implements OnInit {
     backdrop: false,
     ignoreBackdropClick: false
   };
-  @ViewChild('modal') modal: any;
+  @ViewChild('modal', {static: true}) modal: any;
   protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();

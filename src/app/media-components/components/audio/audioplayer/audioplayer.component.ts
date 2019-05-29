@@ -71,10 +71,10 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
     this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown));
   }
 
-  @ViewChild('audioplay') apview;
-  @ViewChild('ap_graphicscan') graphicscanRef: ElementRef;
-  @ViewChild('ap_overlaycan') overlaynacRef: ElementRef;
-  @ViewChild('ap_playcan') playcanRef: ElementRef;
+  @ViewChild('audioplay', {static: true}) apview;
+  @ViewChild('ap_graphicscan', {static: true}) graphicscanRef: ElementRef;
+  @ViewChild('ap_overlaycan', {static: true}) overlaynacRef: ElementRef;
+  @ViewChild('ap_playcan', {static: true}) playcanRef: ElementRef;
 
   /**
    * after Shortcut was triggered.

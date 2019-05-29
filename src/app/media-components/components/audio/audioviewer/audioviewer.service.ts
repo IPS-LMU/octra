@@ -740,7 +740,7 @@ export class AudioviewerService extends AudioComponentService {
     });
   }
 
-  private computeDisplayData(args: any[]): Promise<any> {
+  private computeDisplayData: (args: any[]) => Promise<any> = (args: any[]) => {
     return new Promise<any>((resolve, reject) => {
       const width: number = args[0];
       const height: number = args[1];

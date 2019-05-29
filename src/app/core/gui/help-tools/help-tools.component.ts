@@ -8,7 +8,7 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
   styleUrls: ['./help-tools.component.css']
 })
 export class HelpToolsComponent implements OnInit, OnDestroy {
-  @ViewChild('canvas') canvas: ElementRef;
+  @ViewChild('canvas', {static: false}) canvas: ElementRef;
 
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
 

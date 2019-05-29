@@ -20,7 +20,7 @@ import {HttpClient} from '@angular/common/http';
 export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
 
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
-  @ViewChild('navigation') navigation: NavigationComponent;
+  @ViewChild('navigation', {static: true}) navigation: NavigationComponent;
 
   public get version(): string {
     return AppInfo.version;

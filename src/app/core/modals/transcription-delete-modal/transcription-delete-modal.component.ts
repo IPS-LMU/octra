@@ -26,7 +26,7 @@ export class TranscriptionDeleteModalComponent implements OnInit {
     backdrop: false,
     ignoreBackdropClick: false
   };
-  @ViewChild('modal') modal: any;
+  @ViewChild('modal', {static: true}) modal: any;
   protected data = null;
   private actionperformed: Subject<ModalDeleteAnswer> = new Subject<ModalDeleteAnswer>();
   private subscrmanager = new SubscriptionManager();

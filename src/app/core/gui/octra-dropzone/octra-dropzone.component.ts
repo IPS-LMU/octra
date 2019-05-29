@@ -51,7 +51,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
   constructor(private modService: ModalService) {
   }
 
-  @ViewChild('dropzone') dropzone: DropZoneComponent;
+  @ViewChild('dropzone', {static: true}) dropzone: DropZoneComponent;
   @Input() height = '250px';
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
 

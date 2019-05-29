@@ -22,7 +22,7 @@ export class TranscriptionStopModalComponent implements OnInit {
     ignoreBackdropClick: false
   };
 
-  @ViewChild('modal') modal: TemplateRef<any>;
+  @ViewChild('modal', {static: true}) modal: TemplateRef<any>;
 
   private actionperformed: Subject<TranscriptionStopModalAnswer> = new Subject<TranscriptionStopModalAnswer>();
 

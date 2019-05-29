@@ -33,8 +33,9 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
     this.viewer.name = value;
     this._name = value;
   }
-  @ViewChild('viewer') viewer: AudioviewerComponent;
-  @ViewChild('loupe') loupe: ElementRef;
+
+  @ViewChild('viewer', {static: true}) viewer: AudioviewerComponent;
+  @ViewChild('loupe', {static: true}) loupe: ElementRef;
 
   @Output() mousecursorchange: EventEmitter<AVMousePos> = new EventEmitter<AVMousePos>();
   @Output() shortcuttriggered: EventEmitter<string> = new EventEmitter<string>();

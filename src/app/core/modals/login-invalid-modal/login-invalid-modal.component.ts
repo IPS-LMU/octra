@@ -14,7 +14,7 @@ export class LoginInvalidModalComponent implements OnInit {
     backdrop: false,
     ignoreBackdropClick: false
   };
-  @ViewChild('modal') modal: TemplateRef<any>;
+  @ViewChild('modal', {static: true}) modal: TemplateRef<any>;
   protected data = {
     text: ''
   };

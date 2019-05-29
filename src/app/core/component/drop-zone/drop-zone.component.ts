@@ -15,7 +15,7 @@ export class DropZoneComponent implements OnInit {
   public clicklocked = false;
   @Output()
   public afterdrop: EventEmitter<FileList> = new EventEmitter<FileList>();
-  @ViewChild('fileinput') fileinput: ElementRef;
+  @ViewChild('fileinput', {static: true}) fileinput: ElementRef;
   private fileAPIsupported = false;
 
   private _files: FileList = null;

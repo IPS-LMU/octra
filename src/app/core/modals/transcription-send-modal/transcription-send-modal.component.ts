@@ -22,7 +22,7 @@ export class TranscriptionSendModalComponent implements OnInit {
     ignoreBackdropClick: false
   };
 
-  @ViewChild('modal') modal: TemplateRef<any>;
+  @ViewChild('modal', {static: true}) modal: TemplateRef<any>;
 
   private actionperformed: Subject<ModalSendAnswer> = new Subject<ModalSendAnswer>();
 

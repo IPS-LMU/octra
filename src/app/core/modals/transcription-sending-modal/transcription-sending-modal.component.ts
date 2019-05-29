@@ -17,7 +17,7 @@ export class TranscriptionSendingModalComponent implements OnInit {
     ignoreBackdropClick: false
   };
 
-  @ViewChild('modal') modal: TemplateRef<any>;
+  @ViewChild('modal', {static: true}) modal: TemplateRef<any>;
   @Input() sendError = '';
 
   private actionperformed: Subject<void> = new Subject<void>();

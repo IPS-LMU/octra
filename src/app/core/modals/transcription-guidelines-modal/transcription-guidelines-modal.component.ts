@@ -37,7 +37,7 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
     backdrop: false,
     ignoreBackdropClick: false
   };
-  @ViewChild('modal') modal: any;
+  @ViewChild('modal', {static: false}) modal: any;
   protected data = null;
   private entries = 0;
   private counter = 0;

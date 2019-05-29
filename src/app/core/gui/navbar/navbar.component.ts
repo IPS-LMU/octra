@@ -21,7 +21,7 @@ import {ExportFilesModalComponent} from '../../modals/export-files-modal/export-
 })
 export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
-  @ViewChild('modalexport') modalexport: ExportFilesModalComponent;
+  @ViewChild('modalexport', {static: true}) modalexport: ExportFilesModalComponent;
   @Input() version: string;
 
   public test = 'ok';

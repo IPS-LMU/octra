@@ -28,7 +28,7 @@ export class ReloadFileComponent implements OnInit {
               private audioService: AudioService) {
   }
 
-  @ViewChild('dropzone') dropzone: OctraDropzoneComponent;
+  @ViewChild('dropzone', {static: true}) dropzone: OctraDropzoneComponent;
   private error = '';
   abortTranscription = () => {
     this.transcrServ.endTranscription();

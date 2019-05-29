@@ -81,8 +81,8 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     }
   };
 
-  @ViewChild('modal') modal: any;
-  @ViewChild('namingConvention') namingConvention: NamingDragAndDropComponent;
+  @ViewChild('modal', {static: true}) modal: any;
+  @ViewChild('namingConvention', {static: false}) namingConvention: NamingDragAndDropComponent;
 
   @Input() transcrService: TranscriptionService;
   @Input() uiService: UserInteractionsService;

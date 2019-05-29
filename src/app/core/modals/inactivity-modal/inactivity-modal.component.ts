@@ -17,7 +17,7 @@ export class InactivityModalComponent implements OnInit {
     backdrop: 'static',
     ignoreBackdropClick: true
   };
-  @ViewChild('modal') modal: any;
+  @ViewChild('modal', {static: true}) modal: any;
   protected data = null;
   private actionperformed: Subject<string> = new Subject<string>();
 

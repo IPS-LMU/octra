@@ -109,6 +109,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       }
     ));
 
+    console.log('Language: ' + this.langService.currentLang);
 
     this.settingsService.loadApplicationSettings(this.route).then(() => {
       console.log(`Application settings loaded`);

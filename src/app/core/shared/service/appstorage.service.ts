@@ -410,7 +410,7 @@ export class AppStorageService {
   private _language = 'en';
   private _version: string = null;
   private _logging = false;
-  private _showLoupe = true;
+  private _showLoupe = false;
   private _prompttext = '';
   private _urlParams: any = {};
   private _easymode = false;

@@ -407,7 +407,7 @@ export class AppStorageService {
   private _dataID: number = null;
   private _audioURL: string = null;
   private _usemode: 'local' | 'online' | 'url' = null;
-  private _language = 'en';
+  private _language = null;
   private _version: string = null;
   private _logging = false;
   private _showLoupe = false;

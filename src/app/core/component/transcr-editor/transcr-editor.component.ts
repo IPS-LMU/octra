@@ -6,11 +6,11 @@ import {BrowserAudioTime, BrowserInfo, BrowserSample, KeyMapping, SubscriptionMa
 import {TranscriptionService} from '../../shared/service';
 import {Segments} from '../../obj/Annotation';
 import {AudioChunk} from '../../../media-components/obj/media/audio';
-import {isNumeric} from 'rxjs/util/isNumeric';
 import {TimespanPipe} from '../../../media-components/pipe';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {Functions, isNullOrUndefined} from '../../shared/Functions';
 import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
+import {isNumeric} from 'rxjs/internal-compatibility';
 
 declare let lang: any;
 declare let document: any;
@@ -464,7 +464,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       if (Date.now() - this.lastkeypress >= 700 && this.lastkeypress > -1) {
         this.updateTextField();
         if (this._isTyping && this.focused) {
-          this.typing.emit('stopped')
+          this.typing.emit('stopped');
 
           this.validate();
           this.initPopover();

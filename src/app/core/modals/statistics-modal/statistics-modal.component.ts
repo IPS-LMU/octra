@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
-import {Subject} from 'rxjs/Subject';
+import {Subject} from 'rxjs';
 import {AppStorageService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {TextConverter} from '../../obj/Converters';

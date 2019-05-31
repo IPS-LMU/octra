@@ -14,9 +14,7 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import 'rxjs/add/observable/timer';
 // other
-// import {AudioplayerService} from './audioplayer.service';
 import {AudioChunk, AudioRessource, AudioTimeCalculator, BrowserAudioTime} from '../../../obj/media/audio';
 import {PlayBackState} from '../../../obj/media';
 import {AudioplayerService} from './audioplayer.service';

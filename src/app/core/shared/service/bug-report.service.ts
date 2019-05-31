@@ -3,7 +3,7 @@ import {BrowserInfo} from '../BrowserInfo';
 import {TranslateService} from '@ngx-translate/core';
 import {AppInfo} from '../../../app.info';
 import {AppStorageService} from './appstorage.service';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {SettingsService} from './settings.service';
 import {BugReporter} from '../../obj/BugAPI/BugReporter';
 import {TranscriptionService} from './transcription.service';

@@ -1,4 +1,4 @@
-import {Subscription} from 'rxjs/Subscription';
+import {Subscription} from 'rxjs';
 
 /*
 If you are using subscriptions in a component these should always be unsubscribed when the component is destroyed.

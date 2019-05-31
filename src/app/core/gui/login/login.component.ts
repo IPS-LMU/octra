@@ -4,19 +4,17 @@ import {NgForm} from '@angular/forms';
 import {LoginService} from './login.service';
 import {APIService, AppStorageService, AudioService, OIDBLevel, OIDBLink, SettingsService} from '../../shared/service';
 import {ComponentCanDeactivate} from './login.deactivateguard';
-import {Observable} from 'rxjs/Observable';
 import {OCTRANIMATIONS, SubscriptionManager} from '../../shared';
 import {SessionFile} from '../../obj/SessionFile';
 import {TranslateService} from '@ngx-translate/core';
 import {Converter} from '../../obj/Converters';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
-import 'rxjs/add/operator/catch';
 import {ModalService} from '../../modals/modal.service';
 import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
 import {AppInfo} from '../../../app.info';
 import {FileSize, Functions, isNullOrUndefined} from '../../shared/Functions';
 import {sha256} from 'js-sha256';
-import {throwError} from 'rxjs';
+import {Observable, throwError} from 'rxjs';
 
 @Component({
   selector: 'app-login',

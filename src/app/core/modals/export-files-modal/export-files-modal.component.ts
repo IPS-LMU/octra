@@ -1,6 +1,5 @@
 import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
-import {Subject} from 'rxjs/Subject';
 import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
@@ -10,7 +9,7 @@ import {OCTRANIMATIONS, Segment} from '../../shared';
 import {NavbarService} from '../../gui/navbar/navbar.service';
 import {isNullOrUndefined} from '../../shared/Functions';
 import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {interval, Subject} from 'rxjs';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
 import {WavFormat} from '../../../media-components/obj/media/audio/AudioFormats';
 import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/cutting-format';
@@ -324,7 +323,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
         }, responseType: 'json'
       }).subscribe((result: any) => {
         const hash = result.hash;
-        this.tools.audioCutting.subscriptionIDs[1] = this.subscrmanager.add(Observable.interval(500).subscribe(
+        this.tools.audioCutting.subscriptionIDs[1] = this.subscrmanager.add(interval(500).subscribe(
           () => {
             this.httpClient.get(`${this.settService.appSettings.octra.plugins.audioCutter.url}/v1/tasks/${hash}`, {
               headers: {
@@ -451,7 +450,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
           this.tools.audioCutting.timeLeft = Math.ceil((this.tools.audioCutting.cuttingTimeLeft
             + (this.transcrService.audiomanager.ressource.arraybuffer.byteLength * zippingSpeed)) * 1000);
 
-          this.tools.audioCutting.subscriptionIDs[2] = this.subscrmanager.add(Observable.interval(1000).subscribe(
+          this.tools.audioCutting.subscriptionIDs[2] = this.subscrmanager.add(interval(1000).subscribe(
             () => {
               this.tools.audioCutting.timeLeft -= 1000;
             }

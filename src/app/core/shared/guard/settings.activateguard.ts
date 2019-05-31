@@ -1,9 +1,8 @@
 import {Injectable} from '@angular/core';
 
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {AppStorageService, SettingsService} from '../service';
-import 'rxjs/add/operator/first';
 
 @Injectable()
 export class SettingsGuard implements CanActivate {
@@ -15,7 +14,7 @@ export class SettingsGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     if ((this.settingsService.appSettings === null || this.settingsService.appSettings === undefined)) {
-      return this.settingsService.settingsloaded.first();
+      return this.settingsService.settingsloaded;
     } else {
       return this.settingsService.validated;
     }

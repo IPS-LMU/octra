@@ -1,12 +1,10 @@
 import {Injectable} from '@angular/core';
 
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/operator/catch';
 import {AppStorageService, SettingsService} from '../../shared/service';
-import 'rxjs/add/operator/first';
 import {AppInfo} from '../../../app.info';
 import {Functions} from '../../shared/Functions';
+import {Observable} from 'rxjs';
 
 @Injectable()
 export class ReloadFileGuard implements CanActivate {
@@ -26,7 +24,7 @@ export class ReloadFileGuard implements CanActivate {
       return false;
     } else {
       if ((this.settingsService.appSettings === null || this.settingsService.appSettings === undefined)) {
-        return this.settingsService.settingsloaded.first();
+        return this.settingsService.settingsloaded;
       } else {
         return this.settingsService.validated;
       }

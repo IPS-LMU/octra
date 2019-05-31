@@ -2,10 +2,8 @@ import {EventEmitter, Injectable} from '@angular/core';
 
 import {SubscriptionManager} from '../';
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
-import {Subscription} from 'rxjs/Subscription';
+import {Observable, ReplaySubject, Subject, Subscription} from 'rxjs';
 import {Functions, isNullOrUndefined} from '../Functions';
-import {Observable} from 'rxjs/Observable';
-import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {HttpClient} from '@angular/common/http';
 import {APIService} from './api.service';
 import {TranslateService} from '@ngx-translate/core';
@@ -13,7 +11,6 @@ import {UpdateManager} from '../UpdateManager';
 import {ActivatedRoute} from '@angular/router';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
-import {Subject} from 'rxjs';
 
 declare var validateAnnotation: ((string, any) => any);
 

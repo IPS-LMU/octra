@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
-import {Subject} from 'rxjs/Subject';
+import {Subject} from 'rxjs';
 import {AppStorageService, KeymappingService, SettingsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {BugReportService} from '../../shared/service/bug-report.service';

@@ -10,7 +10,7 @@ import {
   ViewEncapsulation
 } from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
-import {Subject} from 'rxjs/Subject';
+import {Subject} from 'rxjs';
 import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {BugReportService} from '../../shared/service/bug-report.service';

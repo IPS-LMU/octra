@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, ModalOptions} from 'ngx-bootstrap';
-import {Subject} from 'rxjs/Subject';
+import {Subject} from 'rxjs';
 import {AppStorageService, SettingsService} from '../../shared/service';
 
 @Component({

@@ -1,5 +1,4 @@
 import {TranslateLoader} from '@ngx-translate/core';
-import 'rxjs/add/operator/map';
 import {Functions} from './Functions';
 import {HttpClient} from '@angular/common/http';
 

@@ -1,7 +1,7 @@
 import {BugReporter} from './BugReporter';
-import {Observable} from 'rxjs/Observable';
-import {isArray} from 'rxjs/util/isArray';
+import {Observable} from 'rxjs';
 import {HttpClient, HttpResponse} from '@angular/common/http';
+import {isArray} from 'rxjs/internal-compatibility';
 
 export class EmailBugReporter extends BugReporter {
   constructor() {

@@ -25,11 +25,8 @@ import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
 import {AudioChunk} from '../../media-components/obj/media/audio';
 import {TranscrWindowComponent} from './transcr-window';
 import {PlayBackState} from '../../media-components/obj/media';
-import {Observable} from 'rxjs/Observable';
-import {Subscription} from 'rxjs/Subscription';
+import {interval, Subscription} from 'rxjs';
 import {TranscrEditorComponent} from '../../core/component';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/observable/interval';
 import {AudioviewerComponent} from '../../media-components/components/audio/audioviewer';
 import {CircleLoupeComponent} from '../../media-components/components/audio/circleloupe';
 import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
@@ -200,7 +197,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           if (!(this.appStorage.followplaycursor === null || this.appStorage.followplaycursor === undefined)
             && this.appStorage.followplaycursor === true) {
 
-            this.scrolltimer = Observable.interval(1000).subscribe(() => {
+            this.scrolltimer = interval(1000).subscribe(() => {
               const absx = this.viewer.av.audioTCalculator.samplestoAbsX(this.audioChunkLines.playposition.browserSample.value);
               let y = Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.lineheight;
               y += 10 + (Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.margin.bottom);

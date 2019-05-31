@@ -39,7 +39,7 @@ import {IFile, PartiturConverter} from '../../obj/Converters';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import * as X2JS from 'x2js';
 import {ModalService} from '../../modals/modal.service';
-import {Observable, throwError} from 'rxjs';
+import {interval, throwError} from 'rxjs';
 import {TranscriptionGuidelinesModalComponent} from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {NavbarService} from '../navbar/navbar.service';
@@ -326,7 +326,7 @@ export class TranscriptionComponent implements OnInit,
         // if waitTime is 0 the inactivity modal isn't shown
         let waitTime = this.settingsService.appSettings.octra.inactivityNotice.showAfter;
         waitTime = waitTime * 60 * 1000;
-        this.subscrmanager.add(Observable.interval(5000).subscribe(
+        this.subscrmanager.add(interval(5000).subscribe(
           () => {
             if (Date.now() - this.uiService.lastAction > waitTime && !this.inactivityModal.visible) {
               this.inactivityModal.open().then((answer) => {

@@ -268,6 +268,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         this.viewer.deactivateShortcuts = true;
         this.viewer.focused = false;
         this.showWindow = true;
+        this.cd.markForCheck();
+        this.cd.detectChanges();
       }
     }
   }

@@ -301,16 +301,19 @@
             </li>
 
             <!--
-            BugReport
+            Feedback
             -->
             <li class="nav-item"
                 *ngIf="settService.appSettings !== undefined && settService.appSettings.octra.bugreport !== undefined && settService.appSettings.octra.bugreport.enabled">
                 <a class="nav-link" (mouseup)="openBugReport()">
-                    <fa-icon icon="exclamation-circle" class="navbar-icon" style="color:#fcffba"
+                    <fa-icon icon="question-circle" class="navbar-icon" style="color:#fcffba"
                              [ngStyle]="{
                             color: (errorsFound) ? 'red' : '#fcffba'
                         }"
                     ></fa-icon>
+                    <ng-container *ngIf="!appStorage._loggedIn">
+                        {{"general.feedback" | translate}}
+                    </ng-container>
                 </a>
             </li>
 

@@ -20,10 +20,19 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
-    overflow-x: hidden;
 }
 
 .container-fluid.flex {
     padding: 0;
+}
+
+.overflow-box {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.do-overflow {
+    overflow-y: auto;
+    overflow-x: hidden;
 }

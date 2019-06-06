@@ -997,6 +997,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     code = this.transcrService.underlineTextRed(code, this.transcrService.validate(code));
     code = this.transcrService.rawToHTML(code);
+    code = code.replace(/([\s ]+)(<sel-start\/><sel-end\/><\/p>)?$/g, '&nbsp;$2');
 
     this.textfield.summernote('code', code);
     this.restoreSelection();

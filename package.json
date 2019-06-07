@@ -6,11 +6,12 @@
   "angular-cli": {},
   "scripts": {
     "ng": "ng",
-    "start": "npm run modernizr && ng serve --port 5321",
-    "build": "ng build",
+    "start": "npm run modernizr && node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng serve --port 5321",
+    "build": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng build",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
+    "ng-high-memory": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "modernizr": "modernizr -d src/assets/js/modernizr.js -c ./modernizr.json"
   },
@@ -63,8 +64,8 @@
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.800.0",
-    "@angular/cli": "^8.0.1",
+    "@angular-devkit/build-angular": "^0.800.2",
+    "@angular/cli": "^8.0.2",
     "@angular/compiler-cli": "^8.0.0",
     "@angular/language-service": "^8.0.0",
     "@types/jasmine": "^3.3.8",

@@ -29,7 +29,7 @@ import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
 import {BrowserInfo} from '../../core/shared';
 import {AVMousePos} from '../../media-components/obj';
 import {AudioManager} from '../../media-components/obj/media/audio/AudioManager';
-import {Functions} from '../../core/shared/Functions';
+import {Functions, isNullOrUndefined} from '../../core/shared/Functions';
 import {OCTRAEditor} from '../octra-editor';
 
 @Component({
@@ -302,9 +302,10 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     }
 
     const a = this.viewer.getLocation();
-    this.miniLoupeCoord.y = this.viewer.Settings.lineheight;
-    if (this.appStorage.usemode === 'local' || this.appStorage.usemode === 'url') {
-      this.miniLoupeCoord.y += 24;
+    this.miniLoupeCoord.y = this.viewer.Settings.lineheight - 10;
+
+    if (!isNullOrUndefined(this.nav)) {
+      this.miniLoupeCoord.y += this.nav.height;
     }
 
     this.mouseTimer = window.setTimeout(() => {
@@ -560,6 +561,9 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         this.viewer.focused = false;
         this.loupe.viewer.focused = false;
         segment.transcript = this.editor.rawText;
+        this.transcrService.currentlevel.segments.change(this.selectedIndex, segment);
+        this.cd.markForCheck();
+        this.cd.detectChanges();
       }
     }
   }

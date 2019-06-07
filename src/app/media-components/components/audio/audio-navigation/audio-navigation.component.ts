@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, Output} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 
 export interface Buttons {
   play: {
@@ -98,6 +98,12 @@ export class AudioNavigationComponent implements AfterViewInit {
     });
     this._speed = value;
   }
+
+  public get height(): number {
+    return this.container.nativeElement.offsetHeight;
+  }
+
+  @ViewChild('container', {static: true}) container: ElementRef;
 
   constructor(private cd: ChangeDetectorRef) {
   }

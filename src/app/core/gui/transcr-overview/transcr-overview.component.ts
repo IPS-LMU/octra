@@ -180,6 +180,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
             marginTop += elem.outerHeight();
           }
 
+          marginTop += target.position().top;
+
           const headHeight = jQuery('#table-head').outerHeight();
 
           const errorcode = target.attr('data-errorcode');
@@ -193,7 +195,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
             this.cd.markForCheck();
             this.cd.detectChanges();
 
-            this.popovers.validation.location.y = headHeight + marginTop - this.validationPopover.height + 10;
+            this.popovers.validation.location.y = headHeight + marginTop - this.validationPopover.height;
             this.popovers.validation.location.x = $event.offsetX - 24;
             this.popovers.validation.mouse.enter = true;
             this.cd.markForCheck();
@@ -317,11 +319,11 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       validation: ''
     };
 
-        if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function'
-          && !isNullOrUndefined(this.transcrService.validationArray[i])) {
-          obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
-            this.transcrService.validationArray[i].validation);
-        }
+    if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function'
+      && !isNullOrUndefined(this.transcrService.validationArray[i])) {
+      obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
+        this.transcrService.validationArray[i].validation);
+    }
 
     obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
     obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {

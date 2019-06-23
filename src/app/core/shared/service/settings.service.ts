@@ -326,8 +326,8 @@ export class SettingsService {
     if ((this.appStorage.usemode === null || this.appStorage.usemode === undefined)) {
       console.error(`usemode is null`);
     }
-    if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
-      // online
+    if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url' || this.appStorage.usemode === 'demo') {
+      // online, url or demo
       if (!(this.appStorage.audioURL === null || this.appStorage.audioURL === undefined)) {
         let src = '';
         if (this.appStorage.usemode === 'online') {
@@ -483,5 +483,22 @@ export class SettingsService {
       ? 'default' : this.projectsettings.octra.theme;
 
     return (selectedTheme === theme);
+  }
+
+  public getAudioExample(language: string) {
+    if (!isNullOrUndefined(this.appSettings.octra.audioExamples)) {
+      let example = this.appSettings.octra.audioExamples.find(
+        (a) => {
+          return a.language === language;
+        });
+
+      if (example === undefined) {
+        example = this.appSettings.octra.audioExamples[0];
+      }
+
+      return example;
+    }
+
+    return undefined;
   }
 }

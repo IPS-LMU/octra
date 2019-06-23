@@ -30,7 +30,7 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
   clearAllData() {
     this.appStorage._loggedIn = false;
 
-    if (this.appStorage.usemode === 'local') {
+    if (this.appStorage.usemode === 'local' || this.appStorage.usemode === 'demo') {
       this.appStorage.clearAnnotationData().then(() => {
         this.appStorage.clearOptions();
       }).then(() => {

@@ -16,7 +16,7 @@ export class TranscActivateGuard implements CanActivate {
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
-    if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
+    if (this.appStorage.usemode !== 'local') {
       if (!this.settService.allloaded) {
 
         const params = AppInfo.queryParamsHandling;
@@ -26,7 +26,7 @@ export class TranscActivateGuard implements CanActivate {
         Functions.navigateTo(this.router, ['/user/load'], params);
         return false;
       }
-    } else if (this.appStorage.usemode === 'local') {
+    } else {
       if (!this.settService.allloaded) {
         const params = AppInfo.queryParamsHandling;
         params.fragment = route.fragment;

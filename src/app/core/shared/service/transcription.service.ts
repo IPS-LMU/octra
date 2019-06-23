@@ -249,6 +249,9 @@ export class TranscriptionService {
       this._audiofile.size = this._audiomanager.originalInfo.size;
       this._audiofile.url = (this.appStorage.usemode === 'online')
         ? `${this.app_settings.audio_server.url}${this.appStorage.audioURL}` : '';
+
+      this._audiofile.url = (this.appStorage.usemode === 'demo')
+        ? `${this.appStorage.audioURL}` : this._audiofile.url;
       this._audiofile.type = this._audiomanager.originalInfo.type;
 
       this.loadSegments().then(
@@ -341,11 +344,6 @@ export class TranscriptionService {
 
           this.appStorage.overwriteAnnotation(newLevels).then(() => {
               if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
-                if (this.appStorage.usemode === 'url') {
-                  // load transcript from url
-
-                  // TODO continue implementing
-                }
 
                 if (!(this.appStorage.servertranscipt === null || this.appStorage.servertranscipt === undefined)) {
                   // check if servertranscript's segment is empty

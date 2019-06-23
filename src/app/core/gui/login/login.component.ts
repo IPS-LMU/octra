@@ -575,11 +575,29 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   public startDemo() {
-    this.member.id = 'demo_user';
-    this.member.project = 'TranskriptionTest';
-    this.member.jobno = '0';
+    const audioExample = this.settingsService.getAudioExample(this.langService.currentLang);
 
-    this.onSubmit(this.loginform);
+    if (!isNullOrUndefined(audioExample)) {
+      this.member.id = 'demo_user';
+      this.member.project = 'DemoProject';
+      this.member.jobno = '123';
+
+      // delete old data for fresh new session
+      this.appStorage.clearSession();
+      this.appStorage.clearLocalStorage().then(
+        () => {
+          this.appStorage.setSessionData(this.member, 21343134, audioExample.url);
+          this.appStorage.usemode = 'demo';
+          this.appStorage.prompttext = '';
+          this.appStorage.servercomment = audioExample.description;
+          this.appStorage.sessStr.store('jobsLeft', 1000);
+
+          this.navigate();
+        }
+      ).catch((err) => {
+        console.error(err);
+      });
+    }
   }
 
   public isPasswordCorrect(selectedProject, password) {

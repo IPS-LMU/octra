@@ -7,7 +7,7 @@
     <a class="navbar-brand" href="#" [title]="'last update: ' + (AppInfo.lastUpdate | date:'dd.MM.yyyy H:mm z')">OCTRA
         v{{version}}
         <ng-container
-                *ngIf="appStorage.usemode === 'url' || appStorage.usemode === 'local' || appStorage.usemode === 'online'">
+                *ngIf="appStorage.usemode !== undefined && appStorage.usemode !== null">
             ({{appStorage.usemode}})
         </ng-container>
     </a>
@@ -112,7 +112,7 @@
 
             <!-- online mode counter -->
             <li class="nav-item"
-                *ngIf="(appStorage.LoggedIn && navbarServ.dataloaded && appStorage.usemode === 'online')">
+                *ngIf="(appStorage.LoggedIn && navbarServ.dataloaded && (appStorage.usemode === 'online' ||appStorage.usemode === 'demo'))">
                 <a class="nav-link">
                     {{appStorage.user.project}}: {{appStorage.jobsLeft}}
                 </a>
@@ -128,7 +128,7 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-right info-menu" aria-labelledby="infoDropdown">
                     <table class="table">
-                        <tr *ngIf="appStorage.usemode === 'online'">
+                        <tr *ngIf="appStorage.usemode === 'online' ||appStorage.usemode === 'demo'">
                             <td><span>{{'general.project' |translate}}:</span></td>
                             <td>
                                 <span>{{appStorage.user.project}}</span>
@@ -165,13 +165,13 @@
                                 <span>{{navbarServ.filesize.size}} {{navbarServ.filesize.label}}</span>
                             </td>
                         </tr>
-                        <tr *ngIf="appStorage.usemode === 'online'">
+                        <tr *ngIf="appStorage.usemode === 'online' ||appStorage.usemode === 'demo'">
                             <td><span>{{'general.id' | translate}}:</span></td>
                             <td>
                                 <span>{{appStorage.dataID}}</span>
                             </td>
                         </tr>
-                        <tr *ngIf="appStorage.usemode === 'online'">
+                        <tr *ngIf="appStorage.usemode === 'online' || appStorage.usemode === 'demo'">
                             <td><span>{{'general.free jobs' | translate}}:</span></td>
                             <td>
                                 <span>{{appStorage.jobsLeft}}</span>
@@ -242,7 +242,7 @@
                                     <label>
                                         <input (click)="toggleSettings('logging')"
                                                [checked]="appStorage.logging"
-                                               [disabled]="appStorage.usemode === 'online'"
+                                               [disabled]="appStorage.usemode === 'online' || appStorage.usemode === 'demo'"
                                                id="logging" type="checkbox">
                                     </label>
                                 </div>
@@ -334,7 +334,8 @@
         </ul>
     </div>
 </nav>
-<div id="subnav" class="panel" *ngIf="appStorage.LoggedIn && appStorage.usemode === 'online' && navbarServ.dataloaded">
+<div id="subnav" class="panel"
+     *ngIf="appStorage.LoggedIn && (appStorage.usemode === 'online' || appStorage.usemode === 'demo') && navbarServ.dataloaded">
     <div class="row">
         <div class="col-12 col-sm-9" [ngClass]="{
         'col-12 col-sm-9': appStorage.prompttext !== null && appStorage.prompttext !== undefined && appStorage.prompttext !== '',

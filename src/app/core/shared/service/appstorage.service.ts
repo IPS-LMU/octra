@@ -192,11 +192,11 @@ export class AppStorageService {
     }
   }
 
-  get usemode(): 'online' | 'local' | 'url' {
+  get usemode(): 'online' | 'local' | 'url' | 'demo' {
     return this._usemode;
   }
 
-  set usemode(value: 'online' | 'local' | 'url') {
+  set usemode(value: 'online' | 'local' | 'url' | 'demo') {
     this._usemode = value;
     this.idb.save('options', 'usemode', {value}).catch((err) => {
       console.error(err);
@@ -406,7 +406,7 @@ export class AppStorageService {
   private _logs: any[] = [];
   private _dataID: number = null;
   private _audioURL: string = null;
-  private _usemode: 'local' | 'online' | 'url' = null;
+  private _usemode: 'local' | 'online' | 'url' | 'demo' = null;
   private _language = null;
   private _version: string = null;
   private _logging = false;

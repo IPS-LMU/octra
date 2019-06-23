@@ -108,7 +108,7 @@ export class TranscriptionComponent implements OnInit,
     this.navbarServ.uiService = this.uiService;
 
     // overwrite logging option using projectconfig
-    if (this.appStorage.usemode === 'online') {
+    if (this.appStorage.usemode === 'online' || appStorage.usemode === 'demo') {
       this.appStorage.logging = this.settingsService.projectsettings.logging.forced;
     }
     this.uiService.enabled = this.appStorage.logging;
@@ -163,27 +163,40 @@ export class TranscriptionComponent implements OnInit,
   private _currentEditor: ComponentRef<Component>;
 
   abortTranscription = () => {
-    if (this.appStorage.usemode === 'online'
-      && !(this.settingsService.projectsettings.octra === null || this.settingsService.projectsettings.octra === undefined)
-      && !(this.settingsService.projectsettings.octra.theme === null || this.settingsService.projectsettings.octra.theme === undefined)
+    if ((this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo')
+      && !isNullOrUndefined(this.settingsService.projectsettings.octra)
+      && !isNullOrUndefined(this.settingsService.projectsettings.octra.theme)
       && this.settingsService.isTheme('shortAudioFiles')) {
       // clear transcription
 
       this.transcrService.endTranscription();
 
-      this.api.setOnlineSessionToFree(this.appStorage).then(() => {
+      if (this.appStorage.usemode !== 'demo') {
+        this.api.setOnlineSessionToFree(this.appStorage).then(() => {
+          Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).then(() => {
+            this.appStorage.clearSession();
+
+            this.appStorage.clearLocalStorage().then(() => {
+              this.appStorage.saveUser();
+            }).catch((error) => {
+              console.error(error);
+            });
+          });
+        }).catch((error) => {
+          console.error(error);
+        });
+      } else {
+        // is demo mode
+        this.appStorage.user.id = '';
+        this.appStorage.user.jobno = -1;
+        this.appStorage.user.project = '';
         Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).then(() => {
           this.appStorage.clearSession();
-
-          this.appStorage.clearLocalStorage().then(() => {
-            this.appStorage.saveUser();
-          }).catch((error) => {
+          this.appStorage.clearLocalStorage().catch((error) => {
             console.error(error);
           });
         });
-      }).catch((error) => {
-        console.error(error);
-      });
+      }
     } else {
       this.modService.show('transcriptionStop').then((answer: TranscriptionStopModalAnswer) => {
         if (answer === TranscriptionStopModalAnswer.QUIT) {
@@ -319,7 +332,7 @@ export class TranscriptionComponent implements OnInit,
       }
     ));
 
-    if (this.appStorage.usemode === 'online') {
+    if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
       if (!isNullOrUndefined(this.settingsService.appSettings.octra.inactivityNotice)
         && !isNullOrUndefined(this.settingsService.appSettings.octra.inactivityNotice.showAfter)
         && this.settingsService.appSettings.octra.inactivityNotice.showAfter > 0) {
@@ -499,34 +512,44 @@ export class TranscriptionComponent implements OnInit,
       }
     }
 
-    this.api.saveSession(json.transcript, json.project, json.annotator,
-      json.jobno, json.id, json.status, json.comment, json.quality, json.log).then((result) => {
-      if (result !== null) {
-        this.appStorage.submitted = true;
+    if (this.appStorage.usemode === 'online') {
+      this.api.saveSession(json.transcript, json.project, json.annotator,
+        json.jobno, json.id, json.status, json.comment, json.quality, json.log).then((result) => {
+        if (result !== null) {
+          this.appStorage.submitted = true;
 
-        setTimeout(() => {
-          this.transcrSendingModal.close();
+          setTimeout(() => {
+            this.transcrSendingModal.close();
 
-          // only if opened
-          this.modalOverview.close();
+            // only if opened
+            this.modalOverview.close();
 
-          this.nextTranscription(result);
-        }, 500);
-      } else {
-        this.sendError = this.langService.instant('send error');
-      }
-    }).catch((error) => {
-      this.onSendError(error);
-    });
+            this.nextTranscription(result);
+          }, 500);
+        } else {
+          this.sendError = this.langService.instant('send error');
+        }
+      }).catch((error) => {
+        this.onSendError(error);
+      });
+    } else if (this.appStorage.usemode === 'demo') {
+      // simulate nextTranscription
+      setTimeout(() => {
+        this.transcrSendingModal.close();
+        // only if opened
+        this.modalOverview.close();
+
+        this.reloadDemo();
+      }, 1000);
+    }
   }
 
   onSendButtonClick() {
-    let validTranscript = true;
     let showOverview = true;
     let validTranscriptOnly = false;
 
     this.transcrService.validateAll();
-    validTranscript = this.transcrService.transcriptValid;
+    const validTranscript = this.transcrService.transcriptValid;
 
     if (!isNullOrUndefined(this.projectsettings.octra) && !isNullOrUndefined(this.projectsettings.octra.showOverviewIfTranscriptNotValid)) {
       showOverview = this.projectsettings.octra.showOverviewIfTranscriptNotValid;
@@ -620,19 +643,43 @@ export class TranscriptionComponent implements OnInit,
     }
   }
 
+  reloadDemo() {
+    this.transcrService.endTranscription(false);
+    this.clearData();
+
+    const audioExample = this.settingsService.getAudioExample(this.langService.currentLang);
+
+    if (!isNullOrUndefined(audioExample)) {
+      // transcription available
+      this.appStorage.audioURL = audioExample.url;
+      this.appStorage.dataID = 1232342;
+
+      // change number of remaining jobs
+      this.appStorage.jobsLeft--;
+      this.appStorage.prompttext = '';
+      this.appStorage.servercomment = audioExample.description;
+
+      Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling);
+    }
+  }
+
   closeTranscriptionAndGetNew() {
     // close current session
-    this.api.closeSession(this.appStorage.user.id, this.appStorage.dataID, this.appStorage.servercomment).then(() => {
-      // begin new session
-      this.api.beginSession(this.appStorage.user.project, this.appStorage.user.id, this.appStorage.user.jobno).then((json) => {
-        // new session
-        this.nextTranscription(json);
+    if (this.appStorage.usemode === 'online') {
+      this.api.closeSession(this.appStorage.user.id, this.appStorage.dataID, this.appStorage.servercomment).then(() => {
+        // begin new session
+        this.api.beginSession(this.appStorage.user.project, this.appStorage.user.id, this.appStorage.user.jobno).then((json) => {
+          // new session
+          this.nextTranscription(json);
+        }).catch((error) => {
+          console.error(error);
+        });
       }).catch((error) => {
         console.error(error);
       });
-    }).catch((error) => {
-      console.error(error);
-    });
+    } else if (this.appStorage.usemode === 'demo') {
+      this.reloadDemo();
+    }
   }
 
   clearData() {

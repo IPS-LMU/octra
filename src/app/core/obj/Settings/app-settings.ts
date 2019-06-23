@@ -41,6 +41,11 @@ export interface AppSettings {
         siteID: number
       }
     },
+    audioExamples: {
+      language: string;
+      url: string;
+      description: string;
+    }[],
     'inactivityNotice': {
       'showAfter': number;
     }

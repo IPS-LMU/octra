@@ -10,7 +10,7 @@
 .idea/vcs.xml
 .idea/jsLibraryMappings.xml
 
-# Sensitive or high-churn files:
+# Sensitive or higssasdsadasdasasdadsadsh-churn files:
 .idea/dataSources.ids
 .idea/dataSources.xml
 .idea/dataSources.local.xml
@@ -401,3 +401,4 @@ xcuserdata/
 /bdeploy.sh
 /backups/
 /dist/
+/src/assets/Bahnauskunft.wav

@@ -120,9 +120,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
 
       this.visible = true;
 
-      // this.loadForm();
-
-      if (this.appStorage.usemode === 'online') {
+      if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
         this.feedback.feedbackData = (this.appStorage.feedback === null) ? {} : this.appStorage.feedback;
       }
 
@@ -150,7 +148,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
         this.shortcutID = -1;
       }
 
-      if (this.appStorage.usemode === 'online') {
+      if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
         this.feedback.saveFeedbackform();
       }
       this.overview.stopPlayback();
@@ -168,7 +166,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
   }
 
   sendTranscription() {
-    if (this.appStorage.usemode === 'online') {
+    if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
       this.feedback.saveFeedbackform();
     }
     this.overview.stopPlayback();

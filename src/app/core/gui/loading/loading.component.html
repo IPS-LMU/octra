@@ -11,11 +11,11 @@
         }">
         </div>
     </div>
-    <div *ngIf="settService.log === ''" c2lass="description">
+    <div *ngIf="settService.log === ''" class="description">
         {{text}}{{state}}<br/>
         <div class="text-info">{{warning}}</div>
         <div *ngIf="warning !== null && warning !== ''">
-            <span class="link" (click)="retry()">Retry </span> or
+            <span class="link" (click)="retry()">Retry </span>
             <ng-container *ngIf="appStorage.usemode !== 'url'">or <span class="link" (click)="goBack()"> Back</span>
             </ng-container>
         </div>

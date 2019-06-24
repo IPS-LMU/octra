@@ -70,8 +70,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get rawText(): string {
-    const result = this.tidyUpRaw(this._rawText);
-    return result;
+    return this._rawText;
   }
 
   set rawText(value: string) {
@@ -881,7 +880,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * updates the raw text of the editor
    */
   updateTextField() {
-    this._rawText = this.getRawText();
+    this._rawText = this.tidyUpRaw(this.getRawText());
     jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
   }
 
@@ -999,30 +998,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     code = this.transcrService.rawToHTML(code);
     code = code.replace(/([\s ]+)(<sel-start\/><sel-end\/><\/p>)?$/g, '&nbsp;$2');
 
+    this._rawText = this.tidyUpRaw(this._rawText);
     this.textfield.summernote('code', code);
     this.restoreSelection();
-  }
-
-
-  private underlineTextRed(validation: any[]) {
-    const result = this._rawText;
-
-    const puffer = {};
-
-    if (validation.length > 0) {
-      for (let i = 0; i < validation.length; i++) {
-        if (!puffer.hasOwnProperty('p' + validation[i].start)) {
-          puffer['p' + validation[i].start] = '';
-        }
-        if (!puffer.hasOwnProperty('p' + (validation[i].start + validation[i].length))) {
-          puffer['p' + (validation[i].start + validation[i].length)] = '';
-        }
-
-        puffer['p' + validation[i].start] += '<div class=\'error_underline\'>';
-        puffer['p' + (validation[i].start + validation[i].length)] = '</div>' + puffer['p' + (validation[i].start + validation[i].length)];
-      }
-    }
-    return result;
   }
 
   /**
@@ -1128,6 +1106,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   private onValidationErrorMouseLeave() {
     this.validationPopover.hide();
+  }
+
+  public updateRawText() {
+    this._rawText = this.tidyUpRaw(this.getRawText());
   }
 
   public changeValidationPopoverLocation(x: number, y: number) {

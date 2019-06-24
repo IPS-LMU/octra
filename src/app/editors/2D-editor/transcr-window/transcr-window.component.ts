@@ -1,6 +1,8 @@
 import {
   AfterContentInit,
   AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
@@ -32,7 +34,8 @@ import {isNullOrUndefined} from '../../../core/shared/Functions';
 @Component({
   selector: 'app-transcr-window',
   templateUrl: './transcr-window.component.html',
-  styleUrls: ['./transcr-window.component.css']
+  styleUrls: ['./transcr-window.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterViewInit, OnDestroy, OnChanges {
 
@@ -80,7 +83,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
               public audio: AudioService,
               public uiService: UserInteractionsService,
               public settingsService: SettingsService,
-              public appStorage: AppStorageService) {
+              public appStorage: AppStorageService,
+              public cd: ChangeDetectorRef) {
 
     this.subscrmanager = new SubscriptionManager();
   }
@@ -91,16 +95,17 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   @ViewChild('window', {static: true}) window: ElementRef;
   @Output() act: EventEmitter<string> = new EventEmitter<string>();
   @Input() easymode = false;
-  public posY = 0;
   @Input() audiochunk: AudioChunk;
   @Input() segmentIndex: number;
+
   private showWindow = false;
   private subscrmanager: SubscriptionManager;
   private tempSegments: Segments;
+
   public doit = (direction: string) => {
     this.save();
 
-    new Promise<void>((resolve, reject) => {
+    new Promise<void>((resolve) => {
       if (this.audiomanager.isPlaying) {
         this.loupe.viewer.stopPlayback(() => {
           resolve();
@@ -220,7 +225,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   save() {
     if (this.segmentIndex > -1 && this.transcrService.currentlevel.segments &&
       this.segmentIndex < this.transcrService.currentlevel.segments.length) {
-
       if (this.editor.html.indexOf('<img src="assets/img/components/transcr-editor/boundary.png"') > -1) {
         // boundaries were inserted
         this.transcrService.currentlevel.segments.segments = this.tempSegments.segments;
@@ -228,8 +232,10 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       } else {
         // no boundaries inserted
         const segment = this.transcrService.currentlevel.segments.get(this.segmentIndex).clone();
+        this.editor.updateRawText();
         segment.transcript = this.editor.rawText;
-        this.transcrService.currentlevel.segments.change(this.segmentIndex, segment);
+        const result = this.transcrService.currentlevel.segments.change(this.segmentIndex, segment);
+
         const startSample = (this.segmentIndex > 0)
           ? this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value
           : 0;
@@ -299,7 +305,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       let segment: Segment = null;
 
       if (direction === 'right' && this.segmentIndex < segmentsLength - 1) {
-        let i = this.segmentIndex + 1;
+        let i;
         for (i = this.segmentIndex + 1; i < segmentsLength - 1; i++) {
           if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.breakMarker.code) {
             segment = this.transcrService.currentlevel.segments.get(i);
@@ -338,6 +344,8 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
         this.editor.rawText = this.transcrService.currentlevel.segments.get(this.segmentIndex).transcript;
         this.audiochunk = new AudioChunk(new AudioSelection(begin, segment.time.clone()), this.audiochunk.audiomanager);
       }
+      this.cd.markForCheck();
+      this.cd.detectChanges();
     }
   }
 

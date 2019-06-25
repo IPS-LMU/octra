@@ -384,7 +384,7 @@ export class AudioManager {
           }
         });
 
-        this.changeState(PlayBackState.PLAYING);
+        this.stateRequest = PlayBackState.PLAYING;
 
         return true;
       } else {
@@ -448,8 +448,6 @@ export class AudioManager {
       this.changeState(this.stateRequest);
       this.stateRequest = null;
     }
-    // toDoCall is very important. It's relative to its context (pause, stop, back etc.).
-    // this.toDoCall();
   }
 
   /**

@@ -70,7 +70,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   private subscrmanager: SubscriptionManager;
   onOfflineSubmit = () => {
-    if (!(this.appStorage.dataID === null || this.appStorage.dataID === undefined) && typeof this.appStorage.dataID === 'number') {
+    if (this.appStorage.usemode !== 'demo' && !isNullOrUndefined(this.appStorage.dataID) && typeof this.appStorage.dataID === 'number') {
       // last was online mode
       this.api.setOnlineSessionToFree(this.appStorage).then(() => {
         this.audioService.registerAudioManager(this.dropzone.audiomanager);

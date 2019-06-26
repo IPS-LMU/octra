@@ -157,6 +157,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.special_markers.boundary = true;
     this.loupe.viewer.Settings.justifySignalHeight = true;
+    this.loupe.viewer.Settings.boundaries.enabled = false;
 
     // remove annoying shortcut for break marker
     this.loupe.Settings.shortcuts.set_break = null;
@@ -172,6 +173,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       }
     ));
 
+    this.loupe.update(true);
     this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown));
   }
 

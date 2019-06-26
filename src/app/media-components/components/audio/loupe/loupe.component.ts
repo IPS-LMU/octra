@@ -106,7 +106,7 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
       this.viewer.Settings.multiLine = false;
       this.viewer.Settings.lineheight = this.height;
       this.viewer.Settings.justifySignalHeight = true;
-      this.viewer.Settings.boundaries.enabled = true;
+      this.viewer.Settings.boundaries.enabled = false;
       this.viewer.Settings.disabledKeys = [];
       this.viewer.Settings.type = 'line';
     } else {

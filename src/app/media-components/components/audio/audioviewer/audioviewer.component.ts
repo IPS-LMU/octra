@@ -1110,7 +1110,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
     if (!(lineObj === null || lineObj === undefined)) {
       // draw segments for this line only
-      if (this.Settings.boundaries.enabled && this.transcr.currentlevel.segments) {
+      if (this.transcr.currentlevel.segments) {
         const segments = this.transcr.currentlevel.segments.getSegmentsOfRange(
           this.audiochunk.time.start.browserSample.value, this.audiochunk.time.end.browserSample.value
         );
@@ -1266,24 +1266,27 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           drawnSelection++;
         }
 
-        for (let j = 0; j < boundariesToDraw.length; j++) {
-          const boundary = boundariesToDraw[j];
 
-          this.oContext.globalAlpha = 1;
-          this.oContext.beginPath();
-          this.oContext.strokeStyle = this.Settings.boundaries.color;
-          this.oContext.lineWidth = this.Settings.boundaries.width;
-          this.oContext.moveTo(boundary.x, boundary.y - this.av.viewRect.position.y);
-          this.oContext.lineTo(boundary.x, boundary.y - this.av.viewRect.position.y + this.av.LinesArray[j].Size.height);
-          this.oContext.stroke();
-          drawnBoundaries++;
+        if (this.Settings.boundaries.enabled) {
+          for (let j = 0; j < boundariesToDraw.length; j++) {
+            const boundary = boundariesToDraw[j];
+
+            this.oContext.globalAlpha = 1;
+            this.oContext.beginPath();
+            this.oContext.strokeStyle = this.Settings.boundaries.color;
+            this.oContext.lineWidth = this.Settings.boundaries.width;
+            this.oContext.moveTo(boundary.x, boundary.y - this.av.viewRect.position.y);
+            this.oContext.lineTo(boundary.x, boundary.y - this.av.viewRect.position.y + this.av.LinesArray[j].Size.height);
+            this.oContext.stroke();
+            drawnBoundaries++;
+          }
         }
       }
     } else {
       cleared++;
 
       // draw segments for all visible lines
-      if (this.Settings.boundaries.enabled && this.transcr.currentlevel.segments.length > 0) {
+      if (this.transcr.currentlevel.segments.length > 0) {
         const segments = this.transcr.currentlevel.segments.getSegmentsOfRange(
           this.audiochunk.time.start.browserSample.value, this.audiochunk.time.end.browserSample.value
         );
@@ -1526,19 +1529,22 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         }
 
         // draw boundaries
-        for (let i = 0; i < boundariesToDraw.length; i++) {
-          const boundary = boundariesToDraw[i];
-          const line = this.av.LinesArray[0];
-          const h = line.Size.height;
+        if (this.Settings.boundaries.enabled) {
+          console.log(`boundaries are enabled for ${this.name}`);
+          for (let i = 0; i < boundariesToDraw.length; i++) {
+            const boundary = boundariesToDraw[i];
+            const line = this.av.LinesArray[0];
+            const h = line.Size.height;
 
-          this.tContext.globalAlpha = 1;
-          this.tContext.beginPath();
-          this.tContext.strokeStyle = this.Settings.boundaries.color;
-          this.tContext.lineWidth = this.Settings.boundaries.width;
-          this.tContext.moveTo(boundary.x, boundary.y);
-          this.tContext.lineTo(boundary.x, boundary.y + h);
-          this.tContext.stroke();
-          drawnBoundaries++;
+            this.tContext.globalAlpha = 1;
+            this.tContext.beginPath();
+            this.tContext.strokeStyle = this.Settings.boundaries.color;
+            this.tContext.lineWidth = this.Settings.boundaries.width;
+            this.tContext.moveTo(boundary.x, boundary.y);
+            this.tContext.lineTo(boundary.x, boundary.y + h);
+            this.tContext.stroke();
+            drawnBoundaries++;
+          }
         }
 
         // draw time labels

@@ -37,10 +37,6 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   private shortcuts: any;
   private boundaryselected = false;
 
-  public set NavShortCuts(value: any) {
-    this.shortcuts = value;
-  }
-
   public get settings(): any {
     return this.audioplayer.settings;
   }
@@ -91,15 +87,6 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   }
 
   ngOnChanges(obj: any) {
-  }
-
-  highlightSegment(segNumber: number) {
-    jQuery('.note-editable.panel-body textspan').css({
-      'background-color': ''
-    });
-    jQuery('.note-editable.panel-body textspan:eq(' + segNumber + ')').css({
-      'background-color': 'yellow'
-    });
   }
 
   onButtonClick(event: { type: string, timestamp: number }) {
@@ -256,7 +243,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
     let annoSegLength = this.transcrService.currentlevel.segments.length;
     for (let i = 0; i < segTexts.length; i++) {
-      const newRaw = this.transcrService.htmlToRaw(segTexts[i]);
+      const newRaw = segTexts[i];
 
       if (i < annoSegLength) {
         // probably overwrite old files

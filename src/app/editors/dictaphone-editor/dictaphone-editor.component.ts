@@ -72,6 +72,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     this.audiochunk = this.audiomanager.mainchunk.clone();
     this.audiochunk.speed = 1;
     this.audiochunk.volume = 1;
+    this.audioplayer.settings.shortcutsEnabled = true;
     this.settings.shortcuts = this.keyMap.register('AP', this.settings.shortcuts);
     this.shortcuts = this.settings.shortcuts;
     this.editor.Settings.markers = this.transcrService.guidelines.markers.items;

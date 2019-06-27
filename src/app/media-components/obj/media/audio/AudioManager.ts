@@ -408,7 +408,8 @@ export class AudioManager {
         });
 
       } else {
-        reject(`can't stop because audio manager is not playing`);
+        console.log(`can't stop because audio manager is not playing`);
+        resolve();
       }
     });
   }

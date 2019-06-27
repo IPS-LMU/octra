@@ -159,7 +159,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     for (let i = 0; i < this.markers.length; i++) {
       const marker = this.markers[i];
 
-      if (marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0 && marker.icon.indexOf('.gif') < 0
+      if (!isNullOrUndefined(marker.icon) && marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0 && marker.icon.indexOf('.gif') < 0
         && marker.icon !== '' && marker.code !== '' && marker.icon !== marker.code
       ) {
         // replace all utf8 symbols with the marker's code
@@ -576,7 +576,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       if ((marker.icon === null || marker.icon === undefined) || marker.icon === '' ||
         marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0) {
         // text only or utf8 symbol
-        icon = (marker.icon.indexOf('.png') < 0 || marker.icon.indexOf('.jpg') < 0) ? marker.icon : '';
+        icon = (!isNullOrUndefined(marker.icon) && (marker.icon.indexOf('.png') < 0 || marker.icon.indexOf('.jpg') < 0)) ? marker.icon : '';
 
         if (!this.easymode) {
           icon += ' ' + marker.button_text + '<span class=\'btn-shortcut\'>  ' +
@@ -622,8 +622,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   initPopover() {
-    this.popovers.validationError.css('display', 'none');
-    this.popovers.segmentBoundary.css('display', 'none');
+    if (!isNullOrUndefined(this.popovers.validationError)) {
+      this.popovers.validationError.css('display', 'none');
+      this.popovers.segmentBoundary.css('display', 'none');
+    }
+
     // set popover for boundaries
     jQuery('.btn-icon-text[data-samples]')
       .off('click')

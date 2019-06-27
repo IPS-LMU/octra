@@ -139,10 +139,6 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
     });
   }
 
-  onTextKeyUp($event) {
-    console.log(`keyup`);
-  }
-
   onItemClick(event, i) {
     this.clicked = i;
   }

@@ -80,7 +80,6 @@ export class StresstestComponent implements OnInit, OnDestroy {
   private readFile(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       try {
-        console.log(`read...`);
         const reader = new FileReader();
 
         reader.onloadend = () => {

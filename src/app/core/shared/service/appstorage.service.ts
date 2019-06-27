@@ -538,8 +538,6 @@ export class AppStorageService {
                 (result) => {
                   if (!(result === null || result === undefined)) {
                     this['' + variable.attribute + ''] = result;
-                    console.log(`set ${variable.attribute} with:`);
-                    console.log(result);
                   }
                 }
               ));

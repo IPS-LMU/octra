@@ -348,7 +348,6 @@ export class TranscriptionService {
                 if (!(this.appStorage.servertranscipt === null || this.appStorage.servertranscipt === undefined)) {
                   // check if servertranscript's segment is empty
                   if (this.appStorage.servertranscipt.length === 1 && this.appStorage.servertranscipt[0].text === '') {
-                    console.log(`overwrite server transcript with prompt!`);
                     this.appStorage.annotation[this._selectedlevel].level.items = [];
                     this.appStorage.annotation[this.selectedlevel].level.items.push(
                       new OSegment(0, 0, this.audiomanager.originalInfo.duration.originalSample.value,
@@ -387,7 +386,6 @@ export class TranscriptionService {
                   && typeof this.appStorage.prompttext === 'string') {
                   // prompt text available and server transcript is null
                   // set prompt as new transcript
-                  console.log(`set prompt text as NEW transcript!`);
                   this.appStorage.annotation[this._selectedlevel].level.items = [];
                   this.appStorage.annotation[this.selectedlevel].level.items.push(
                     new OSegment(0, 0, this.audiomanager.originalInfo.duration.originalSample.value,

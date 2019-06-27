@@ -15,7 +15,6 @@ export class MultiThreadingService {
   private subscrManager: SubscriptionManager = new SubscriptionManager();
 
   constructor() {
-    console.log(`MultiThreaded Service started`);
     for (let i = 0; i < this.numberOfThreads; i++) {
       this._workers.push(new TsWorker());
     }

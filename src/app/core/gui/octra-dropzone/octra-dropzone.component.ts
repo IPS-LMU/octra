@@ -116,7 +116,6 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
           fileProcess.progress = ((e.loaded / e.total)) / (AudioManager.getNumberOfDataParts(fileProcess.file.size) + 1);
         };
 
-        console.log(`READ AUDIO FILE!`);
         reader.readAsArrayBuffer(fileProcess.file);
         break;
       } else {
@@ -335,7 +334,6 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
   private decodeArrayBuffer(buffer: ArrayBuffer,
                             fileProcessIndex: number,
                             checkimport = true) {
-    console.log(`DECODE ARRAYBUFFER`);
     const fileProcess = this._files[fileProcessIndex];
     const extension = fileProcess.file.name.substr(fileProcess.file.name.lastIndexOf('.'));
     // check audio

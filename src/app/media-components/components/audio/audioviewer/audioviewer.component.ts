@@ -1530,7 +1530,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
         // draw boundaries
         if (this.Settings.boundaries.enabled) {
-          console.log(`boundaries are enabled for ${this.name}`);
           for (let i = 0; i < boundariesToDraw.length; i++) {
             const boundary = boundariesToDraw[i];
             const line = this.av.LinesArray[0];

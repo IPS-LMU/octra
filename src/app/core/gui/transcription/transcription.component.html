@@ -3,6 +3,7 @@
 <app-transcription-sending-modal [sendError]="sendError" #transcrSendingModal></app-transcription-sending-modal>
 <app-overview-modal #modalOverview id="overview" (transcriptionSend)="onSendNowClick()"></app-overview-modal>
 <app-shortcuts-modal #modalShortcuts [editor]="Interface"></app-shortcuts-modal>
+<app-transcription-demo-end-modal #modalDemoEnd></app-transcription-demo-end-modal>
 <app-transcription-guidelines-modal #modalGuidelines
                                     [guidelines]="transcrService.guidelines"></app-transcription-guidelines-modal>
 <app-activity-timeout-modal #inactivityModal *ngIf="settingsService.appSettings.octra.inactivityNotice !== undefined

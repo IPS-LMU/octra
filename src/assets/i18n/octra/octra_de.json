@@ -139,6 +139,11 @@
       "sending": {
         "header": "Transkription wird übertragen...",
         "text": "Ihre Ergebnisse werden übertragen... Bitte bis zum Abschluss der Übertragung warten..."
+      },
+      "demoEnd": {
+        "header": "Demo Modus",
+        "text": "Du befindest Dich gerade im Demo-Modus.<br/><br/>Klicke auf...<ul><li>\"Weiter\" um die gleiche Audiodatei erneut zu laden. Der Fortschritt wird verworfen und eine Übertragung des Transkripts simuliert.</li><li>\"Beenden\", um OCTRA zu beenden. Der Fortschritt wird verworfen.</li><li>\"Zurück\", um zur Transkription zurückzukehren.</li></ul>",
+        "exportText": "Du kannst Dein Transkript exportieren, indem Du auf \"Zurück\" und dann auf \"Exportieren\" klickst:"
       }
     },
     "login": {

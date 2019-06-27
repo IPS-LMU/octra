@@ -139,6 +139,11 @@
       "sending": {
         "header": "Send transcription now...",
         "text": "Your results are being transmitted to the server... Please wait for the transmission to finish successfully."
+      },
+      "demoEnd": {
+        "header": "Demo Mode",
+        "text": "You are currently using the Demo Mode. <br/><br/>Click on...<ul><li>\"Continue\" in order to reload the current audio file. The proceedings will be deleted and the transmission of the transcript will be simulated.</li><li>\"Quit\" in order to quit OCTRA. The proceedings will be deleted.</li><li>\"Back\" in order to continue the transcription.</li></ul>",
+        "exportText": "You can export your transcript if you click on \"Back\" and then on \"Export\":"
       }
     },
     "login": {

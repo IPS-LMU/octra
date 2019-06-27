@@ -119,6 +119,7 @@ import {NamingDragAndDropComponent} from './core/component/naming-drag-and-drop/
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
 import {StresstestComponent} from './core/tools/stresstest/stresstest.component';
+import {TranscriptionDemoEndModalComponent} from './core/modals/transcription-demo-end/transcription-demo-end-modal.component';
 
 library.add(
   faSpinner,
@@ -220,7 +221,8 @@ export const EDITORS: any[] = [
     InactivityModalComponent,
     ValidationPopoverComponent,
     NamingDragAndDropComponent,
-    StresstestComponent
+    StresstestComponent,
+    TranscriptionDemoEndModalComponent
   ],
   entryComponents: EDITORS,
   imports: [

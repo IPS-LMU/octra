@@ -49,6 +49,10 @@ import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-moda
 import {TranscriptionSendingModalComponent} from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
 import {Functions, isNullOrUndefined} from '../../shared/Functions';
 import {InactivityModalComponent} from '../../modals/inactivity-modal/inactivity-modal.component';
+import {
+  ModalEndAnswer,
+  TranscriptionDemoEndModalComponent
+} from '../../modals/transcription-demo-end/transcription-demo-end-modal.component';
 
 @Component({
   selector: 'app-transcription',
@@ -141,6 +145,7 @@ export class TranscriptionComponent implements OnInit,
   // TODO change to ModalComponents!
   @ViewChild('modalShortcuts', {static: true}) modalShortcuts: any;
   @ViewChild('modalOverview', {static: true}) modalOverview: OverviewModalComponent;
+  @ViewChild('modalDemoEnd', {static: true}) modalDemoEnd: TranscriptionDemoEndModalComponent;
   @ViewChild(LoadeditorDirective, {static: true}) appLoadeditor: LoadeditorDirective;
   @ViewChild('modal', {static: true}) modal: any;
   @ViewChild('transcrSendingModal', {static: true}) transcrSendingModal: TranscriptionSendingModalComponent;
@@ -498,7 +503,6 @@ export class TranscriptionComponent implements OnInit,
   }
 
   public onSendNowClick() {
-    this.transcrSendingModal.open();
     this.sendOk = true;
 
     const json: any = this.transcrService.exportDataToJSON();
@@ -513,6 +517,7 @@ export class TranscriptionComponent implements OnInit,
     }
 
     if (this.appStorage.usemode === 'online') {
+      this.transcrSendingModal.open();
       this.api.saveSession(json.transcript, json.project, json.annotator,
         json.jobno, json.id, json.status, json.comment, json.quality, json.log).then((result) => {
         if (result !== null) {
@@ -533,14 +538,30 @@ export class TranscriptionComponent implements OnInit,
         this.onSendError(error);
       });
     } else if (this.appStorage.usemode === 'demo') {
-      // simulate nextTranscription
-      setTimeout(() => {
-        this.transcrSendingModal.close();
-        // only if opened
-        this.modalOverview.close();
+      // only if opened
+      this.modalOverview.close();
 
-        this.reloadDemo();
-      }, 1000);
+      this.modalDemoEnd.open().then((action: ModalEndAnswer) => {
+        this.modalDemoEnd.close(action);
+
+        switch (action) {
+          case(ModalEndAnswer.CANCEL):
+            break;
+          case(ModalEndAnswer.QUIT):
+            this.abortTranscription();
+            break;
+          case(ModalEndAnswer.CONTINUE):
+            this.transcrSendingModal.open();
+            setTimeout(() => {
+              // simulate nextTranscription
+              this.transcrSendingModal.close();
+              this.reloadDemo();
+            }, 1000);
+            break;
+        }
+      }).catch((error) => {
+        console.error(error);
+      });
     }
   }
 

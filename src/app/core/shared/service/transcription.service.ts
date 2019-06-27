@@ -671,7 +671,7 @@ export class TranscriptionService {
               'data-marker-code=\'' + markerCode + '\' alt=\'' + markerCode + '\'/>';
           } else {
             // is text or ut8 symbol
-            if (marker.icon !== '') {
+            if (!isNullOrUndefined(marker.icon) && marker.icon !== '') {
               img = marker.icon;
             } else {
               img = marker.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');

@@ -102,7 +102,7 @@ export class PraatTextgridConverter extends Converter {
             // is TextGrid
 
             let lvlNum = 0;
-            const found = lines[7].match(/item\s\[]:\s*/g);
+            const found = lines[7].match(/item\s\[]:\s*/);
 
             if (found !== null) {
               // start reading segments
@@ -147,13 +147,13 @@ export class PraatTextgridConverter extends Converter {
                     i++;
 
                     // read items
-                    let match = lines[i].match('item \\[([0-9]+)\\]:');
+                    let match = lines[i].match(/item \[([0-9]+)]:/);
 
                     while (lines[i] !== '' && (match === null || match === undefined) && i < lines.length) {
                       let isActive = true;
-                      test = lines[i].match(new RegExp('intervals \\[[0-9]+\]:', 'g'));
+                      test = lines[i].match(/intervals \[[0-9]+]:/);
                       if ((test === null || test === undefined)) {
-                        test = lines[i].match(new RegExp('points \\[[0-9]+\]:', 'g'));
+                        test = lines[i].match(/points \[[0-9]+]:/);
                         if ((test === null || test === undefined)) {
                           return {
                             annotjson: null,
@@ -240,7 +240,7 @@ export class PraatTextgridConverter extends Converter {
                       }
 
                       segNum++;
-                      match = lines[i].match('item \\[([0-9]+)\\]:');
+                      match = lines[i].match(/item \[([0-9]+)]:/);
                     }
                     segNum++;
                     i--;

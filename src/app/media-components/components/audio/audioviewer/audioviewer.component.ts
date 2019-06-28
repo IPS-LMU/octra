@@ -1992,9 +1992,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       }).then(() => {
         this.updateCanvasSizes();
         this.update(true).then(() => {
-          if (this.viewRect.position.y >= this.realRect.size.height) {
-            this.scrollTo(this.realRect.size.height - this.viewRect.size.height, true);
-          }
+          this.scrollTo(0, true);
           resolve2();
         }).catch((error) => {
           reject2(error);

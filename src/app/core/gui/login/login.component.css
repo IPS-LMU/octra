@@ -52,6 +52,8 @@ footer .logo {
     display: flex;
     flex-direction: column;
     flex: auto;
+    overflow-y: auto;
+    height: 200px;
 }
 
 .alert-success,

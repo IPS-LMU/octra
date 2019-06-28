@@ -15,7 +15,7 @@ export class DropZoneComponent implements OnInit {
   public clicklocked = false;
   @Output()
   public afterdrop: EventEmitter<FileList> = new EventEmitter<FileList>();
-  @ViewChild('fileinput', {static: true}) fileinput: ElementRef;
+  @ViewChild('fileinput', {static: true}) public fileinput: ElementRef;
   private fileAPIsupported = false;
 
   private _files: FileList = null;
@@ -60,10 +60,6 @@ export class DropZoneComponent implements OnInit {
   onClick($event) {
     if (!this.clicklocked) {
       this.fileinput.nativeElement.click();
-
-      if ($event.target.files === this._files) {
-        this.afterdrop.emit(this._files);
-      }
     }
   }
 

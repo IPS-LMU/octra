@@ -51,8 +51,8 @@ import {AudioviewerConfig} from './media-components/components/audio/audioviewer
 import {MediaComponentsModule} from './media-components/media-components.module';
 import {TranscrEditorComponent} from './core/component/transcr-editor';
 import {Error404Component} from './core/gui/error404';
-// icons
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+// icons
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {
   faAlignJustify,

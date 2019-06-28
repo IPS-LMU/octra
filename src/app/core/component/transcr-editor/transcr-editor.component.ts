@@ -106,6 +106,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Input() height = 0;
   @Input() playposition: BrowserAudioTime;
   @Input() audiochunk: AudioChunk;
+  @Input() validationEnabled = false;
 
   @ViewChild('validationPopover', {static: true}) validationPopover: ValidationPopoverComponent;
 
@@ -990,20 +991,22 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private validate() {
-    this.saveSelection();
-    this._rawText = this.getRawText(false);
+    if (this.validationEnabled) {
+      this.saveSelection();
+      this._rawText = this.getRawText(false);
 
-    // insert selection placeholders
-    let code = Functions.insertString(this._rawText, this._textSelection.start, '[[[sel-start/]]]');
-    code = Functions.insertString(code, this._textSelection.end + '[[[sel-start/]]]'.length, '[[[sel-end/]]]');
+      // insert selection placeholders
+      let code = Functions.insertString(this._rawText, this._textSelection.start, '[[[sel-start/]]]');
+      code = Functions.insertString(code, this._textSelection.end + '[[[sel-start/]]]'.length, '[[[sel-end/]]]');
 
-    code = this.transcrService.underlineTextRed(code, this.transcrService.validate(code));
-    code = this.transcrService.rawToHTML(code);
-    code = code.replace(/([\s ]+)(<sel-start\/><sel-end\/><\/p>)?$/g, '&nbsp;$2');
+      code = this.transcrService.underlineTextRed(code, this.transcrService.validate(code));
+      code = this.transcrService.rawToHTML(code);
+      code = code.replace(/([\s ]+)(<sel-start\/><sel-end\/><\/p>)?$/g, '&nbsp;$2');
 
-    this._rawText = this.tidyUpRaw(this._rawText);
-    this.textfield.summernote('code', code);
-    this.restoreSelection();
+      this._rawText = this.tidyUpRaw(this._rawText);
+      this.textfield.summernote('code', code);
+      this.restoreSelection();
+    }
   }
 
   /**

@@ -114,7 +114,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
         }));
       }
 
-      if (validate) {
+      if (validate && this.appStorage.usemode !== 'url') {
         this.transcrService.validateAll();
       }
 

@@ -129,7 +129,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
         resultStr += this.shownSegments[i].transcription.html;
       }
 
-      found = (resultStr.match(/<span class='val-error'/g) || []).length;
+      found = (resultStr.match(/<span class='val-error'/) || []).length;
     }
 
     return found;

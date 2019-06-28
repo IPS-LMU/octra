@@ -95,7 +95,7 @@ LBD:\n`;
 
           if (search[0] === 'SAM') {
             if (audiofile.samplerate !== Number(columns[1])) {
-              console.error(`Sample Rate of audio file is not equal to the value from Partitur file!`);
+              console.error(`Sample Rate of audio file is not equal to the value from Partitur file! ${audiofile.samplerate} !== ${columns[1]}`);
             }
           }
 
@@ -119,7 +119,8 @@ LBD:\n`;
               level.items.push(new OItem(counter, [new OLabel(previousTier, columns[2])]));
               tiers[`${previousTier}`].push(columns[2]);
             } else {
-              const transcript = lines[pointer].match(new RegExp('TRN: ([0-9]+) ([0-9]+) ([0-9]+,?)+ (.*)', 'g'));
+              const transcript = lines[pointer];
+              const transcriptArray = transcript.match(/TRN:\s([0-9]+)\s([0-9]+)\s([0-9]+,?)+ (.*)/);
 
               if (level === null) {
                 return {
@@ -130,7 +131,7 @@ LBD:\n`;
               }
 
               level.items.push(new OSegment(
-                counter, Number(transcript[1]), Number(transcript[2]), [new OLabel(previousTier, transcript[4])]
+                counter, Number(transcriptArray[1]), Number(transcriptArray[2]), [new OLabel(previousTier, transcriptArray[4])]
                 )
               );
             }

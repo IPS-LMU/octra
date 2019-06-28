@@ -75,7 +75,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   public get hasSegmentBoundaries() {
-    return !isNullOrUndefined(this.editor.rawText.match(/{[0-9]+}/g));
+    return !isNullOrUndefined(this.editor.rawText.match(/{[0-9]+}/));
   }
 
   constructor(public keyMap: KeymappingService,

@@ -139,19 +139,22 @@ export class LoadingComponent implements OnInit, OnDestroy {
                     oAudioFile.arraybuffer = audioRessource.arraybuffer;
                     oAudioFile.duration = audioRessource.info.duration.originalSample.value;
                     oAudioFile.name = audioRessource.info.fullname;
-                    oAudioFile.samplerate = audioRessource.info.samplerate;
+                    oAudioFile.samplerate = audioRessource.info.duration.originalSample.sampleRate;
                     oAudioFile.size = audioRessource.size;
 
                     let importResult: ImportResult;
                     // find valid converter...
                     for (let i = 0; i < AppInfo.converters.length; i++) {
                       const converter = AppInfo.converters[i];
-                      if (filename.indexOf(converter.extension)) {
+                      if (filename.indexOf(converter.extension) > -1) {
                         // test converter
-                        importResult = converter.import(file, oAudioFile);
+                        const tempImportResult = converter.import(file, oAudioFile);
 
-                        if (!(importResult === null || importResult === undefined)) {
+                        if (!isNullOrUndefined(tempImportResult) && tempImportResult.error === '') {
+                          importResult = tempImportResult;
                           break;
+                        } else {
+                          console.error(tempImportResult.error);
                         }
                       }
                     }
@@ -163,6 +166,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                       for (let i = 0; i < importResult.annotjson.levels.length; i++) {
                         newLevels.push(new OIDBLevel(i + 1, importResult.annotjson.levels[i], i));
                       }
+
                       this.appStorage.overwriteAnnotation(newLevels, false).then(
                         () => {
                           resolve();

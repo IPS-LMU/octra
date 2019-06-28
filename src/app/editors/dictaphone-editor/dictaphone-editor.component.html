@@ -49,5 +49,6 @@
                     (boundaryclicked)="onBoundaryClicked($event)"
                     (boundaryinserted)="onBoundaryInserted()"
                     (selectionchanged)="onSelectionChanged($event)"
+                    [validationEnabled]="appStorage.usemode !== 'url'"
 >
 </app-transcr-editor>

@@ -14,7 +14,7 @@
                 <div class="row" style="overflow: auto; flex:auto;">
                     <div [ngClass]="{
                         'col-md-6 col-lg-9': appStorage.usemode === 'online' || this.appStorage.usemode === 'demo',
-                        'col-12': appStorage.usemode !== 'online' && this.appStorage.usemode === 'demo'
+                        'col-12': appStorage.usemode !== 'online' && this.appStorage.usemode !== 'demo'
                     }" class="col-md-6" style="overflow: auto; max-height:1200px;border-right:1px solid lightgray;">
                         <app-transcr-overview
                             #overview

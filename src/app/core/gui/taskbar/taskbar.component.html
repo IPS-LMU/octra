@@ -6,7 +6,7 @@
                   [ngClass]="{'d-none d-md-inline': responsive}"> {{buttonLabels.shortcuts}}</span>
             <span *ngIf="!appStorage.easymode" [ngClass]="{'d-none d-lg-inline': responsive}"> [ALT +
                             8]</span></a>
-        <a class='btn w-100' (click)="guidelinesbtnclicked.emit()">
+        <a class='btn w-100' (click)="guidelinesbtnclicked.emit()" *ngIf="appStorage.usemode !== 'url'">
             <fa-icon icon="th-list"></fa-icon>
             <span *ngIf="!appStorage.easymode"
                   [ngClass]="{'d-none d-md-inline': responsive}"> {{buttonLabels.guidelines}}</span>

@@ -270,7 +270,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
   private updateSegments() {
     this.playStateSegments = [];
-    if (this.transcrService.validationArray.length > 0) {
+    if (this.transcrService.validationArray.length > 0 || this.appStorage.usemode === 'url') {
       if (!this.segments || !this.transcrService.guidelines) {
         this.shownSegments = [];
       }
@@ -319,19 +319,29 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       validation: ''
     };
 
-    if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function'
-      && !isNullOrUndefined(this.transcrService.validationArray[i])) {
-      obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
-        this.transcrService.validationArray[i].validation);
-    }
-
-    obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
-    obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
-      if (g1 === '[[[') {
-        return '<';
+    if (this.appStorage.usemode !== 'url') {
+      if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function'
+        && !isNullOrUndefined(this.transcrService.validationArray[i])) {
+        obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
+          this.transcrService.validationArray[i].validation);
       }
-      return '>';
-    });
+
+      obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
+      obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
+        if (g1 === '[[[') {
+          return '<';
+        }
+        return '>';
+      });
+    } else {
+      obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
+      obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
+        if (g1 === '[[[') {
+          return '<';
+        }
+        return '>';
+      });
+    }
 
     obj.transcription.html = obj.transcription.html.replace(/(<p>)|(<\/p>)/g, '');
     return obj;

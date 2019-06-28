@@ -123,7 +123,6 @@
                     <div style="margin-top: 40px;">
                         <app-octra-dropzone #dropzone [height]="'147px'"></app-octra-dropzone>
                     </div>
-                    {{getFileStatus()}}
                     <button *ngIf="(appStorage.usemode === null || appStorage.usemode !== 'online') && (getFileStatus() != 'new' || appStorage.usemode === 'url')
                             else newTranscription;"
                             [disabled]="!(getFileStatus() == 'start' || appStorage.usemode === 'url')" type="submit"

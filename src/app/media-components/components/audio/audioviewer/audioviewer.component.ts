@@ -279,7 +279,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           this.updating = false;
         }
       } else {
-        console.error('audiopx 0');
+        console.error('audiopx 0, ' + this.name);
         reject('audiopx 0');
       }
     });

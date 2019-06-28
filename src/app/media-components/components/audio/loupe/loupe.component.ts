@@ -142,7 +142,7 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
 
   public update(compute = true) {
     this.viewer.name = this._name;
-    // this.viewer.initialize();
+    this.viewer.initialize();
     this.viewer.update(compute);
   }
 

@@ -156,6 +156,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.editor.Settings.markers = this.transcrService.guidelines.markers;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.special_markers.boundary = true;
+    this.loupe.viewer.name = 'transcription window';
     this.loupe.viewer.Settings.justifySignalHeight = true;
     this.loupe.viewer.Settings.boundaries.enabled = false;
 
@@ -172,6 +173,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         }
       }
     ));
+
+    this.cd.markForCheck();
+    this.cd.detectChanges();
 
     this.loupe.update(true);
     this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown));

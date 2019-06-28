@@ -120,7 +120,6 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
         break;
       } else {
         // the latest dropped file is a format file
-
         if (!(audioFile === null || audioFile === undefined)) {
           const extension = audioFile.file.name.substr(audioFile.file.name.lastIndexOf('.'));
           this.loadImportFileData(extension);
@@ -164,7 +163,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
     if (!isNullOrUndefined(this._oaudiofile)) {
       for (let i = 0; i < AppInfo.converters.length; i++) {
         const converter: Converter = AppInfo.converters[i];
-        if (Functions.contains(file.file.name, AppInfo.converters[i].extension)) {
+        if (Functions.contains(file.file.name.toLowerCase(), AppInfo.converters[i].extension.toLowerCase())) {
           if (converter.conversion.import) {
 
             const reader: FileReader = new FileReader();
@@ -178,7 +177,8 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
                 };
 
                 const audioName = this._oaudiofile.name.substr(0, this._oaudiofile.name.lastIndexOf('.'));
-                if (file.file.name === audioName + AppInfo.converters[i].extension) {
+                if ((file.file.name === audioName + AppInfo.converters[i].extension)
+                  || file.file.name === audioName + AppInfo.converters[i].extension.toLowerCase()) {
                   const importResult: ImportResult = converter.import(ofile, this._oaudiofile);
 
                   const setAnnotation = () => {

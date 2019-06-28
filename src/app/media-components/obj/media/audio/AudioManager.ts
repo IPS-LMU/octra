@@ -186,7 +186,7 @@ export class AudioManager {
    */
   public static getFileFormat(extension: string, audioformats: AudioFormat[]): AudioFormat | undefined {
     return audioformats.find((a) => {
-      return a.extension === extension;
+      return a.extension.toLowerCase() === extension;
     });
   }
 

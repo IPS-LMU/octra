@@ -123,24 +123,29 @@
                     <div style="margin-top: 40px;">
                         <app-octra-dropzone #dropzone [height]="'147px'"></app-octra-dropzone>
                     </div>
-                    <button *ngIf="(appStorage.usemode === null || appStorage.usemode !== 'online') && getFileStatus() != 'new'"
+
+                    <button *ngIf="(appStorage.usemode === null || appStorage.usemode !== 'online') && getFileStatus() != 'new'
+                            else newTranscription;"
                             [disabled]="!(getFileStatus() == 'start')" type="submit"
                             id="offline-submit"
                             class="btn btn-raised btn-primary"
                             (click)="onOfflineSubmit()">
                         {{'transcription.start' | translate}}
                     </button>
-
-                    <button *ngIf="appStorage.usemode === 'local' && getFileStatus() == 'new'"
-                            class="btn btn-raised btn-danger offline-delete-btn"
-                            (click)="onTranscriptionDelete()">
-                        {{'transcription.new' |translate}}
-                    </button>
-                    <button *ngIf="(appStorage.usemode !== null && appStorage.usemode !== undefined) &&
+                    <ng-template #newTranscription>
+                        <button *ngIf="appStorage.usemode === 'local' && getFileStatus() == 'new' else removeOldTranscription;"
+                                class="btn btn-raised btn-danger offline-delete-btn"
+                                (click)="onTranscriptionDelete()">
+                            {{'transcription.new' |translate}}
+                        </button>
+                    </ng-template>
+                    <ng-template #removeOldTranscription>
+                        <button *ngIf="(appStorage.usemode !== null && appStorage.usemode !== undefined) &&
                     appStorage.usemode === 'online' && (getFileStatus() != 'new' || getFileStatus() != 'start')"
-                            [disabled]="(getFileStatus() !== 'new' && getFileStatus() !== 'start')"
-                            class="btn btn-raised btn-danger offline-delete-btn"
-                            (click)="onOfflineSubmit()">{{'login.local and remove' |translate}}</button>
+                                [disabled]="(getFileStatus() !== 'new' && getFileStatus() !== 'start')"
+                                class="btn btn-raised btn-danger offline-delete-btn"
+                                (click)="onOfflineSubmit()">{{'login.local and remove' |translate}}</button>
+                    </ng-template>
                 </div>
             </section>
         </div>

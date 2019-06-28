@@ -30,6 +30,12 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
     return environment;
   }
 
+  public get isLoggedIn() {
+    return this.loggedIn;
+  }
+
+  private loggedIn = false;
+
   constructor(private api: APIService,
               private langService: TranslateService,
               public appStorage: AppStorageService,
@@ -131,6 +137,12 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
           break;
       }
     });
+
+    this.subscrmanager.add(this.appStorage.loginActivityChanged.subscribe(
+      (a) => {
+        this.loggedIn = a;
+      }
+    ));
   }
 
   ngAfterViewInit() {

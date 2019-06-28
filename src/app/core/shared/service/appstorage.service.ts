@@ -337,6 +337,7 @@ export class AppStorageService {
   }
 
   set LoggedIn(value: boolean) {
+    this.loginActivityChanged.next(value);
     this._loggedIn = value;
   }
 
@@ -420,6 +421,8 @@ export class AppStorageService {
   private _annotationLinks: OIDBLink[] = null;
   private _levelcounter = 0;
 
+
+  public loginActivityChanged = new Subject<boolean>();
   private _secondsPerLine = 5;
 
   public settingschange = new Subject<{ key: string, value: any }>();

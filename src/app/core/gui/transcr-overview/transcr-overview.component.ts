@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
-import {AppStorageService, AudioService, TranscriptionService} from '../../shared/service';
+import {AppStorageService, AudioService, SettingsService, TranscriptionService} from '../../shared/service';
 import {AudioChunk, AudioSelection, BrowserAudioTime, OriginalAudioTime, SubscriptionManager} from '../../shared';
 import {Segment} from '../../obj/Annotation';
 import {PlayBackState} from '../../../media-components/obj/media';
@@ -144,7 +144,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
               public audio: AudioService,
               public sanitizer: DomSanitizer,
               private cd: ChangeDetectorRef,
-              private appStorage: AppStorageService) {
+              private appStorage: AppStorageService,
+              private settingsService: SettingsService) {
 
     this.subscrmanager = new SubscriptionManager();
   }
@@ -229,7 +230,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       this.cd.detectChanges();
 
       this.transcrEditor.Settings.btnPopover = false;
-      this.transcrEditor.validationEnabled = true;
+      this.transcrEditor.validationEnabled = this.appStorage.usemode !== 'url' && (this.appStorage.usemode === 'demo' || this.settingsService.projectsettings.octra.validationEnabled);
       this.transcrEditor.initialize();
 
       this.transcrEditor.rawText = segment.transcript;
@@ -276,7 +277,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
   private updateSegments() {
     this.playStateSegments = [];
-    if (this.transcrService.validationArray.length > 0 || this.appStorage.usemode === 'url') {
+    if (this.transcrService.validationArray.length > 0 || this.appStorage.usemode === 'url' || !this.settingsService.projectsettings.octra.validationEnabled) {
       if (!this.segments || !this.transcrService.guidelines) {
         this.shownSegments = [];
       }

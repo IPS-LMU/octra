@@ -97,6 +97,6 @@
                     [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
                     [easymode]="appStorage.easymode"
                     [audiochunk]="audiochunkDown"
-                    [validationEnabled]="appStorage.usemode !== 'url'"
+                    [validationEnabled]="appStorage.usemode !== 'url' && (appStorage.usemode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
 >
 </app-transcr-editor>

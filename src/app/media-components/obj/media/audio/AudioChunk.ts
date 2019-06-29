@@ -223,7 +223,7 @@ export class AudioChunk {
               // reset to beginning of selection
               if (this._replay) {
                 this.playposition = this.selection.start.clone() as BrowserAudioTime;
-                this.startPlayback(onProcess, playOnHover);
+                this.startPlayback(onProcess, playOnHover).then(resolve).catch(reject);
               } else {
                 this.startpos = this._time.start.clone() as BrowserAudioTime;
                 resolve();
@@ -232,6 +232,7 @@ export class AudioChunk {
           },
           (error) => {
             console.error(error);
+            reject(error);
           }
         ));
 
@@ -240,7 +241,7 @@ export class AudioChunk {
             this.updatePlayPosition();
             onProcess();
           }, playOnHover
-        ).catch(reject);
+        ).then(resolve).catch(reject);
       } else {
         reject(`can't start playback on chunk because audiomanager is still playing`);
       }

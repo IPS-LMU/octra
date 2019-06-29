@@ -364,6 +364,7 @@ export class AudioManager {
           if (!this._isScriptProcessorCanceled) {
             if (this.stateRequest === PlayBackState.STOPPED || this.stateRequest === PlayBackState.PAUSED) {
               // audio ended
+              resolve();
               this.afterAudioEnded();
             } else {
               this._isScriptProcessorCanceled = false;
@@ -375,6 +376,7 @@ export class AudioManager {
                   this._bufferedOLA.alpha = 1 / speed;
                   this._bufferedOLA.process(e.inputBuffer, e.outputBuffer);
                 } else {
+                  resolve();
                   this.afterAudioEnded();
                 }
               }
@@ -385,11 +387,9 @@ export class AudioManager {
         });
 
         this.stateRequest = PlayBackState.PLAYING;
-
-        return true;
       } else {
         this.statechange.error(new Error('AudioManager: Can\'t play audio because it is already playing'));
-        return false;
+        reject('AudioManager: Can\'t play audio because it is already playing');
       }
     });
   }

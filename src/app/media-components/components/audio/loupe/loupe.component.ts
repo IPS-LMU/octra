@@ -100,11 +100,9 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
   }
 
   ngOnChanges(obj: SimpleChanges) {
-    console.log(obj);
   }
 
   ngOnInit() {
-    console.log(`LOUPE INIT`);
     if (!(this.height === null || this.height === undefined)) {
       this.viewer.Settings.multiLine = false;
       this.viewer.Settings.lineheight = this.height;

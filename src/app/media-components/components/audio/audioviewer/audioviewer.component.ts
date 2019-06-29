@@ -1425,7 +1425,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     log.addEntry('log', `drawn_areas: ${drawnSegments}`);
     log.addEntry('log', `drawn_boundaries: ${drawnBoundaries}`);
     log.addEntry('log', `drawn_selection: ${drawnSelection}`);
-    log.output();
+    // log.output();
   }
 
   /**
@@ -1511,15 +1511,16 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    * step to last position
    */
   stepBackward(afterAudioEnded: () => void) {
-    this.audiochunk.stepBackward(() => {
-      this.afterAudioStepBack();
+    this.audiochunk.stepBackward(this.drawFunc).then(() => {
       afterAudioEnded();
+    }).catch((error) => {
+      console.error(error);
     });
   }
 
   stepBackwardTime(afterAudioEnded: () => void, backSec: number) {
     this.audiochunk.stepBackwardTime(backSec, this.drawFunc).then(() => {
-      this.afterAudioStepBackTime();
+      // this.afterAudioStepBackTime();
       afterAudioEnded();
     }).catch((error) => {
       console.error(error);
@@ -1779,8 +1780,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   }
 
   private afterAudioStepBackTime = () => {
-    this.av.PlayCursor.changeSamples(this.audiochunk.lastplayedpos.browserSample.value, this.av.audioTCalculator, this.audiochunk);
-    this.startPlayback();
+    // this.av.PlayCursor.changeSamples(this.audiochunk.lastplayedpos.browserSample.value, this.av.audioTCalculator, this.audiochunk);
+    // this.startPlayback();
   }
 
   /**

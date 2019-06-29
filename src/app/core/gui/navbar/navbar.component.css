@@ -163,3 +163,8 @@ nav .nav-link {
     }
 }
 
+.switch {
+    margin-top: -5px;
+    display: flex;
+}
+

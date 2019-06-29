@@ -306,11 +306,12 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
     if (!this.audiomanager.isPlaying && this.appStorage.playonhover) {
       // play audio
+      /*
       this.audioChunkLines.selection.start.browserSample.value = this.viewer.av.Mousecursor.timePos.browserSample.value;
       this.audioChunkLines.selection.end.browserSample.value = this.viewer.av.Mousecursor.timePos.browserSample.value +
         this.audiomanager.browserSampleRate / 10;
       this.audioChunkLines.startPlayback(() => {
-      }, true);
+      });*/
     }
 
     if (this.appStorage.showLoupe) {

@@ -214,7 +214,7 @@ export class OriginalAudioTime {
     if (time1._sampleRates.original === time2._sampleRates.original
       && time1._sampleRates.browser === time2._sampleRates.browser) {
       return new OriginalAudioTime(
-        time1.originalSample.add(time2.originalSample), time1._sampleRates.original
+        time1.originalSample.sub(time2.originalSample), time1._sampleRates.original
       );
 
     } else {
@@ -325,7 +325,7 @@ export class BrowserAudioTime {
     if (time1._sampleRates.original === time2._sampleRates.original
       && time1._sampleRates.browser === time2._sampleRates.browser) {
       return new BrowserAudioTime(
-        time1.browserSample.add(time2.browserSample), time1._sampleRates.original
+        time1.browserSample.sub(time2.browserSample), time1._sampleRates.original
       );
 
     } else {

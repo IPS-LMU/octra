@@ -129,6 +129,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.loupeSettings.shortcuts.step_backward.keys.pc = 'SHIFT + ENTER';
     this.loupeSettings.justifySignalHeight = true;
     this.loupeSettings.roundValues = false;
+    this.loupeSettings.boundaries.enabled = true;
 
     this.editor.Settings.markers = this.transcrService.guidelines.markers;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
@@ -184,6 +185,8 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         }
       }
     ));
+    this.cd.markForCheck();
+    this.cd.detectChanges();
   }
 
   ngOnChanges(obj: SimpleChanges) {
@@ -262,7 +265,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       });
   }
 
-  test(selection: AudioSelection) {
+  onSelectionChanged(selection: AudioSelection) {
     if (selection) {
       if (selection.length > 0) {
         selection.checkSelection();

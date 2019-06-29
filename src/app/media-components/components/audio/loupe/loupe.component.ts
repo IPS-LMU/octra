@@ -29,7 +29,7 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
     return this._name;
   }
 
-  set name(value: string) {
+  @Input() set name(value: string) {
     this.viewer.name = value;
     this._name = value;
   }
@@ -45,6 +45,7 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
 
   @Input() audiochunk: AudioChunk;
   @Input() height: number;
+
   private _name: string;
   public pos: any = {
     x: 0,
@@ -99,22 +100,23 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
   }
 
   ngOnChanges(obj: SimpleChanges) {
+    console.log(obj);
   }
 
   ngOnInit() {
+    console.log(`LOUPE INIT`);
     if (!(this.height === null || this.height === undefined)) {
       this.viewer.Settings.multiLine = false;
       this.viewer.Settings.lineheight = this.height;
       this.viewer.Settings.justifySignalHeight = true;
-      this.viewer.Settings.boundaries.enabled = false;
+      this.viewer.Settings.boundaries.enabled = true;
       this.viewer.Settings.disabledKeys = [];
       this.viewer.Settings.type = 'line';
-    } else {
-      throw new Error('you have to set [height] to the loupe component');
     }
   }
 
   ngAfterViewInit() {
+    this.update(true);
     this.subscrmanager.add(this.viewer.mousecursorchange.subscribe(
       (mousepos) => {
         this.mousecursorchange.emit(mousepos);
@@ -142,8 +144,11 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
 
   public update(compute = true) {
     this.viewer.name = this._name;
-    this.viewer.initialize();
-    this.viewer.update(compute);
+    this.viewer.initialize().then(() => {
+      this.viewer.update(compute);
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   onButtonClick(event: { type: string, timestamp: number }) {

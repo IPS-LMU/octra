@@ -297,11 +297,12 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
     if (!this.audiomanager.isPlaying && this.appStorage.playonhover) {
       // play audio
-      this.audiochunkTop.selection.start = this.viewer.av.Mousecursor.timePos.clone();
+      /* this.audiochunkTop.selection.start = this.viewer.av.Mousecursor.timePos.clone();
       this.audiochunkTop.selection.end.browserSample.value = this.viewer.av.Mousecursor.timePos.browserSample.value +
         this.audiomanager.ressource.info.samplerate / 10;
       this.audiochunkTop.startPlayback(() => {
       }, true);
+       */
     }
 
     const a = this.viewer.getLocation();

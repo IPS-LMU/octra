@@ -114,7 +114,6 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
   }
 
   ngAfterViewInit() {
-    this.update(true);
     this.subscrmanager.add(this.viewer.mousecursorchange.subscribe(
       (mousepos) => {
         this.mousecursorchange.emit(mousepos);
@@ -142,11 +141,7 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
 
   public update(compute = true) {
     this.viewer.name = this._name;
-    this.viewer.initialize().then(() => {
-      this.viewer.update(compute);
-    }).catch((error) => {
-      console.error(error);
-    });
+    this.viewer.update(compute);
   }
 
   onButtonClick(event: { type: string, timestamp: number }) {

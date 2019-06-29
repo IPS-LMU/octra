@@ -347,13 +347,14 @@ export class AudioManager {
         this._scriptProcessorNode.connect(this._gainNode);
         // connect modules of Web Audio API
         let lastCheck = Date.now();
-        // this._scriptProcessorNode.connect(this._audioContext.destination);
 
         this._playbackInfo.started = new Date().getTime();
         this._playbackInfo.endAt = this._playbackInfo.started + (duration.browserSample.unix / speed);
 
         this._playposition = begintime.clone();
-        this._bufferedOLA.position = this._playposition.browserSample.value;
+        this._bufferedOLA.position = begintime.browserSample.value;
+        this._playposition.browserSample.value = begintime.browserSample.value;
+
         this._scriptProcessorNode.addEventListener('audioprocess', (e) => {
           if (this.stateRequest === PlayBackState.PLAYING) {
             // start playback
@@ -439,6 +440,7 @@ export class AudioManager {
 
   private afterAudioEnded = () => {
     this._scriptProcessorNode.disconnect();
+    this._gainNode.disconnect();
     this._isScriptProcessorCanceled = false;
 
     if (this._state === PlayBackState.PLAYING && this.stateRequest === null) {

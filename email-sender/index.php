@@ -1,13 +1,11 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 // SETTINGS
+// $to_email = '';
 $to_email = '';
 $auth_token = '';
 
 // Do not set this in production environment
-// header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Origin: *');
 
 header('Access-Control-Allow-Headers: authorization, content-type');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -155,6 +153,18 @@ function getHTMLText($data, $screenshots)
                 <td><?php echo $data["platform"] . " " . $data["version"]; ?></td>
             </tr>
         </table>
+
+        <?php if (sizeof($screenshots) > 0): ?>
+            <p>Screenshots:</p>
+            <div class="screenshots">
+                <?php foreach ($screenshots as $screenshot): ?>
+                    <img class="screenshot" src="data:image/png;base64,<?php echo $screenshot["data"]; ?>"
+                         alt="scrrenshot"/>
+                    <br/>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
         <h3>Report:</h3>
         <?php if (!empty($data["report"])):
             $errors = 0;
@@ -187,16 +197,7 @@ function getHTMLText($data, $screenshots)
                 <?php endforeach; ?>
                 </tbody>
             </table>
-            <?php if (sizeof($screenshots) > 0): ?>
-            <p>Screenshots:</p>
-            <div class="screenshots">
-                <?php foreach ($screenshots as $screenshot): ?>
-                    <img class="screenshot" src="data:image/png;base64,<?php echo $screenshot["data"]; ?>"
-                         alt="scrrenshot"/>
-                    <br/>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
+
 
             <table id="error-table">
                 <thead>

@@ -229,6 +229,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       this.cd.detectChanges();
 
       this.transcrEditor.Settings.btnPopover = false;
+      this.transcrEditor.validationEnabled = true;
       this.transcrEditor.initialize();
 
       this.transcrEditor.rawText = segment.transcript;
@@ -237,9 +238,14 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   onTextEditorLeave($event, i) {
+    this.transcrEditor.updateRawText();
     this.segments[i].transcript = this.transcrEditor.rawText;
     const segment = this.segments[i];
     this.transcrService.validateAll();
+
+    this.cd.markForCheck();
+    this.cd.detectChanges();
+
     this.updateSegments();
 
     this.transcrService.currentlevel.segments.change(i, segment);
@@ -410,6 +416,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
         this.playAllState.currentSegment = segmentNumber;
 
+        this.cd.markForCheck();
+        this.cd.detectChanges();
         this.audio.audiomanagers[0].startPlayback(
           this.audio.audiomanagers[0].createBrowserAudioTime(startSample),
           this.audio.audiomanagers[0].createBrowserAudioTime(segment.time.browserSample.value - startSample)
@@ -417,13 +425,15 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
           }).then(() => {
           this.playStateSegments[segmentNumber].state = 'stopped';
           this.playStateSegments[segmentNumber].icon = 'play';
-
           this.cd.markForCheck();
           this.cd.detectChanges();
 
           setTimeout(() => {
+            this.cd.markForCheck();
+            this.cd.detectChanges();
+
             resolve();
-          }, 1000);
+          }, 500);
         }).catch((error) => {
           console.error(error);
         });
@@ -449,12 +459,21 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     if ((this.playAllState.state === 'started' && this.playAllState.currentSegment !== segmentNumber)
       || this.playAllState.currentSegment !== segmentNumber) {
       this.stopPlayback().then(() => {
-        this.playSegement(segmentNumber);
+        this.cd.markForCheck();
+        this.cd.detectChanges();
+        this.playSegement(segmentNumber).then(() => {
+          this.cd.markForCheck();
+          this.cd.detectChanges();
+        }).catch((error) => {
+          console.error(error);
+        });
       }).catch((error) => {
         console.error(error);
       });
     } else {
       this.stopPlayback().then(() => {
+        this.cd.markForCheck();
+        this.cd.detectChanges();
         this.playAllState.currentSegment = -1;
       }).catch((error) => {
         console.error(error);

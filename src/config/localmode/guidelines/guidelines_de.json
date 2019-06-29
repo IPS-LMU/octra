@@ -178,11 +178,12 @@
   "markers": [
     {
       "id": 1,
-      "name": "unverständlich",
-      "code": "<unverständlich>",
+      "name": "truncation marker start",
+      "code": "[~abc]",
       "type": "normal",
-      "button_text": "unverständlich",
-      "description": "Unverständliche Wörter, die nicht rekonstruierbar sind (zu rekonstruierbaren Wörtern s. Abschnitt 3.2.6: {{<rekonstruierbar>}}), werden durch Setzen des Markers {{<unverständlich>}} verschriftet. Der Marker ersetzt das Gesagte komplett.",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_start.png",
+      "button_text": "~abc",
+      "description": "Diesen Marker nur am Anfang setzen, sollte die Audiosequenz mit einem abgeschnittenem Wort beginnen",
       "shortcut": {
         "mac": "ALT + 1",
         "pc": "ALT + 1"
@@ -190,11 +191,12 @@
     },
     {
       "id": 2,
-      "name": "unvollständig",
-      "code": "<unvollständig>",
+      "name": "filled pause",
+      "code": "<nib>",
       "type": "normal",
-      "button_text": "unvollständig",
-      "description": "Der Marker {{<unvollständig>}} ersetzt abgebrochene, unvollständige einzelne Wörter (nicht abgebrochene Satzteile). Werden mehrere Wörter direkt nacheinander abgebrochen, reicht es, den Marker einmal zu setzen.",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/fil.png",
+      "button_text": "Gefüllte Pause",
+      "description": "Für Zögern des Sprechers wie hm, ähm, äh und andere.",
       "shortcut": {
         "mac": "ALT + 2",
         "pc": "ALT + 2"
@@ -202,11 +204,12 @@
     },
     {
       "id": 3,
-      "name": "füller",
-      "code": "<Füller>",
+      "name": "intermittent noise",
+      "code": "[int]",
       "type": "normal",
-      "button_text": "Füller",
-      "description": "Artikulatorische Äußerungen, die kein Wort bilden (Füller), werden durch Setzen des Markers {{<Füller>}} verschriftet. Als Füller markiert werden bspw. Häsitationen („ähm“, „hm“, „äh“), Exklamationen („Oh!“, „Aha!“, „Hey!“) oder Lautmalereien („hui“).",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/int.png",
+      "button_text": "unterbrechendes Geräusch",
+      "description": "Für kurzes, eindeutiges Geräusch wie z.B. Türknallen, das Berühren des Mirkrofons, oder ähnliches.",
       "shortcut": {
         "mac": "ALT + 3",
         "pc": "ALT + 3"
@@ -214,11 +217,12 @@
     },
     {
       "id": 4,
-      "name": "geräusch",
-      "code": "<Geräusch>",
+      "name": "speaker noise",
+      "code": "<usb>",
       "type": "normal",
-      "button_text": "Geräusch",
-      "description": "Externe, nicht vom Kind artikulierte Geräusche (z.B. Telefonklingeln, Sirene, Hintergrundgeräusche), die die Kindesäußerung unterbrechen oder den Sprachfluss beeinflussen, werden mit dem Marker {{<Geräusch>}} verschriftet. Geräusche werden nur markiert, wenn das Kind dadurch stark abgelenkt wird.",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/spk.png",
+      "button_text": "Sprechergeräusch",
+      "description": "Für Geräusche und Unterbrechungen, die der Sprecher produziert wie z.B. lautes Atmen, Lachen oder ähnliches.",
       "shortcut": {
         "mac": "ALT + 4",
         "pc": "ALT + 4"
@@ -226,74 +230,54 @@
     },
     {
       "id": 5,
-      "name": "leer",
-      "code": "<leer>",
-      "type": "break",
-      "button_text": "leer",
-      "description": "Enthält ein Audio-Schnipsel überhaupt keine sprachliche Reaktion des Kindes auf einen Prompt, wird der Marker <leer> für den gesamten Schnipsel gesetzt. Werden längere ungefüllte Pausen innerhalb eines Schnipsels, der Kindesäußerungen enthält, oder Systemansagen (also Wuschel-Äußerungen) zur Erleichterung des Transkriptionsprozesses als einzelne Segmente abgetrennt, so sind diese ebenfalls als <leer> zu markieren.",
-      "shortcut": {
-        "mac": "ALT + P",
-        "pc": "ALT + P"
-      }
-    },
-    {
-      "id": 6,
-      "name": "rekonstruierbar",
-      "code": "<rekonstruierbar>",
+      "name": "stationary noise",
+      "code": "[sta]",
       "type": "normal",
-      "button_text": "rekonstruierbar",
-      "description": "Die Äußerung weicht artikulatorisch nur gering vom Zielwert ab und das intendierte Zielwort ist ohne Kontext erkennbar.",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/sta.png",
+      "button_text": "Andauerndes Geräusch",
+      "description": "Für lang andauerndes, lautes Geräusch wie Verkehrslärm, Musik oder Radio im Hintergrund.",
       "shortcut": {
         "mac": "ALT + 5",
         "pc": "ALT + 5"
       }
     },
     {
-      "id": 7,
-      "name": "unsicher",
-      "code": "<unsicher>",
+      "id": 6,
+      "name": "unclear word",
+      "code": "**",
       "type": "normal",
-      "button_text": "unsicher",
-      "description": "Siehe Transkriptionsrichtlinien 3.2.7.",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/stars.png",
+      "button_text": "**",
+      "description": "Diesen Marker vor einem Wort setzen, welches einer unverständlichen Sprache entstammt.",
       "shortcut": {
         "mac": "ALT + 6",
         "pc": "ALT + 6"
       }
     },
     {
-      "id": 8,
-      "name": "imperativ",
-      "code": "<Imperativ>",
+      "id": 7,
+      "name": "truncation marker end",
+      "code": "[abc~]",
       "type": "normal",
-      "button_text": "Imperativ",
-      "description": "Imperative werden mit dem Marker {{<Imperativ>}} annotiert. Die geäußerte Imperativform (auch umgangssprachliche oder verkürzte Bildungen) wird hinter dem Marker verschriftet.",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/truncation_end.png",
+      "button_text": "abc~",
+      "description": "Diesen Marker nur am Ende setzen, sollte die Audiosequenz mit einem abgeschnittenem Wort enden.",
       "shortcut": {
         "mac": "ALT + 7",
         "pc": "ALT + 7"
       }
     },
     {
-      "id": 9,
-      "name": "sprecher_extern",
-      "code": "<Sprecher extern>",
-      "type": "normal",
-      "button_text": "Sprecher extern",
-      "description": "Enthält der Audio-Schnipsel sprachliche Reaktionen, die nicht vom Kind stammen (also von einer anderen in der Testsituation anwesenden Person wie bspw. TestleiterIn oder ErzieherIn), so ist die entsprechende Passage als separates Segment zu markieren und mit dem Marker <Sprecher extern> zu versehen. Hinter dem Marker erfolgt die Verschriftung der Äußerung des externen Sprechers.",
+      "id": 8,
+      "name": "break",
+      "code": "<P>",
+      "type": "break",
+      "icon_url": "assets/img/components/transcr-editor/default_markers/break.png",
+      "button_text": "Pause",
+      "description": "Dieser Marker stellt eine Pause dar, d.h. eine Sequenz in der nicht gesprochen wird",
       "shortcut": {
-        "mac": "ALT + E",
-        "pc": "ALT + E"
-      }
-    },
-    {
-      "id": 10,
-      "name": "kind_extern",
-      "code": "<Kind extern>",
-      "type": "normal",
-      "button_text": "Kind extern",
-      "description": "Richtet das Kind seine sprachliche Reaktion nicht an einen test-internen Charakter, sondern an eine in der Testsituation anwesende Person, so ist die entsprechende Passage als separates Segment zu markieren und mit dem Marker <Kind extern> zu versehen (bspw. bei Nachfragen des Kindes an TestleiterIn oder ErzieherIn). Hinter dem Marker erfolgt die Verschriftung der Kindes-Äußerung.",
-      "shortcut": {
-        "mac": "ALT + K",
-        "pc": "ALT + K"
+        "mac": "ALT + P",
+        "pc": "ALT + P"
       }
     }
   ]

@@ -837,28 +837,34 @@ export class TranscriptionService {
   public validateAll() {
     this._validationArray = [];
 
-    let invalid = false;
+    if (this.appStorage.usemode !== 'url' && (this.appStorage.usemode === 'demo' || this.settingsService.projectsettings.octra.validationEnabled)) {
+      let invalid = false;
 
-    for (let i = 0; i < this.currentlevel.segments.length; i++) {
-      const segment = this.currentlevel.segments.segments[i];
+      for (let i = 0; i < this.currentlevel.segments.length; i++) {
+        const segment = this.currentlevel.segments.segments[i];
 
-      let segmentValidation = [];
+        let segmentValidation = [];
 
-      if (segment.transcript.length > 0) {
-        segmentValidation = this.validate(segment.transcript);
-      }
-
-      this._validationArray.push(
-        {
-          segment: i,
-          validation: segmentValidation
+        if (segment.transcript.length > 0) {
+          segmentValidation = this.validate(segment.transcript);
         }
-      );
 
-      if (segmentValidation.length > 0) {
-        invalid = true;
+        this._validationArray.push(
+          {
+            segment: i,
+            validation: segmentValidation
+          }
+        );
+
+        if (segmentValidation.length > 0) {
+          invalid = true;
+        }
       }
+      this._transcriptValid = !invalid;
+    } else {
+      console.log(this.settingsService.projectsettings.octra.validationEnabled);
+      console.log(`validationEnabled is disabled`);
+      this._transcriptValid = true;
     }
-    this._transcriptValid = !invalid;
   }
 }

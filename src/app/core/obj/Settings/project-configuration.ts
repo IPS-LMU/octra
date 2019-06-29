@@ -27,6 +27,7 @@ export interface ProjectSettings {
   };
   feedback_form: Group[];
   octra: {
+    'validationEnabled': boolean;
     'sendValidatedTranscriptionOnly': boolean;
     'showOverviewIfTranscriptNotValid': boolean;
     theme: string

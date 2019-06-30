@@ -53,6 +53,7 @@ footer .logo {
     flex-direction: column;
     flex: auto;
     overflow-y: auto;
+    overflow-x: hidden;
     height: 200px;
 }
 

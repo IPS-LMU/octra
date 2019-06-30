@@ -1,10 +1,12 @@
-<h1 align="center">OCTRA v1.2</h1>
+<h1 align="center">OCTRA v1.3.x</h1>
 
 <p align="center">
-  <img width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.2/img/features/editor3_1.png" alt="2D-Editor">
-  <img width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.2/img/features/editor3_2.png" alt="2D-Editor">
-  <img width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.2/img/features/editor2_new.png" alt="Linear Editor">
-  <img width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.2/img/features/editor1_new.png" alt="Dictaphone Editor">
+  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor3_1.png" alt="2D-Editor">
+  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor3_2.png" alt="2D-Editor">
+  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor2.png" alt="Linear Editor">
+  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor1.png" alt="Dictaphone Editor">
+  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/overview.png" alt="Linear Editor">
+  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/export.png" alt="Dictaphone Editor">
 </p>
 
 This is a web-application for the orthographic transcription of longer
@@ -14,7 +16,21 @@ audiofiles. For now, it uses three editors for the orthographic transcription:
 * Linear-Editor: This editor shows two signaldisplays: One for the whole view of the signal and one as loupe. You can set boundaries and define segments.
 * 2D-Editor: This editor breaks the whole view of the signal to pieces and shows the pieces as lines one after one. Here you can set boundaries und define segments too.
 
-One special feature of OCTRA is that it saves your proceedings automatically in your browser. If the browser is closed (abruptly) you can continue your transcription without data-loss.
+## Features
+* Three different editors
+* Noise markers (placeholders) in the form of icons in text. **New**: Icons can be UTF-8 symbols, too.  
+* Auto-saving of the transcription progress to prevent data loss
+* Import/Export support for various file formats like AnnotJSON, Textgrid, Text, Table and more.
+* Validation using project specific guidelines. **New: text editor supports inline validation **
+* Shortcuts for faster transcriptions
+* Multi-Tiers support in local mode
+* Logging of user activities for further studies
+* Localization of the GUI
+* Customization with configuration files for the app, project, guidelines and validation methods.
+* Segment boundaries as markers in text
+* Overview window to see the whole transcript
+* **New:** Cutting audio files up to 300 MB
+* **New:** Visible transcripts in 2D-Editor
 
 
 ## Remarks
@@ -77,7 +93,8 @@ Then you can install OCTRA:
 
 ## Documentation
 
-You can find a detailed documentation on OCTRA's configuration files [here](https://github.com/IPS-LMU/octra/wiki).
+* For users: [CTRA manual](https://www.phonetik.uni-muenchen.de/apps/octra/manual/1.3.0/)
+* For project leaders/administrators: [Github Wiki](https://github.com/IPS-LMU/octra/wiki).
 
 ## Contribution
 
@@ -96,8 +113,12 @@ If the language you would like translate to does not exist please send us an ema
 [INSTITUTE OF PHONETICS AND SPEECH PROCESSING](http://www.en.phonetik.uni-muenchen.de/)
 
 #### Used third-party packages:
-* angular-cli: https://github.com/angular/angular-cli
 * summernote: https://github.com/summernote/summernote
 * bootstrap: http://getbootstrap.com/
 * bootstrap-material-design: http://fezvrasta.github.io/bootstrap-material-design/
+* font-awesome: https://origin.fontawesome.com/
+* ola-ts: https://github.com/echo66/OLA-TS.js?files=1
+* modernizr: https://modernizr.com/
 * platform: https://github.com/bestiejs/platform.js/
+
+For more see package.json file

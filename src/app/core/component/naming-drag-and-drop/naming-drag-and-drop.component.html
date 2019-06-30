@@ -24,12 +24,12 @@
                 <div cdkDrag class="pop naming-placeholder"
                      *ngIf="item.type === 'placeholder'">
                     <span style="margin-right:3px;">{{item.value}}</span>
-                    <fa-icon (click)="remove(i)" icon="times-circle"></fa-icon>
+                    <fa-icon (click)="remove(i)" [icon]="['far', 'times-circle']"></fa-icon>
                 </div>
                 <div cdkDrag class="pop" *ngIf="item.type === 'text'"
-                     (cdkDragEnded)="onDragEnd($event)" (mouseup)="onItemClick(event, i)">
+                     (cdkDragEnded)="onDragEnd($event)" (mouseup)="onItemClick($event, i)">
                     <span style="margin-right:3px;">{{item.value}}</span>
-                    <fa-icon (click)="remove(i)" icon="times-circle"></fa-icon>
+                    <fa-icon (click)="remove(i)" [icon]="['far', 'times-circle']"></fa-icon>
                 </div>
                 <div class="pop deactivated" *ngIf="item.type === 'extension'">
                     <span style="margin-right:3px;">{{item.value}}</span>
@@ -38,7 +38,7 @@
             <ng-container *ngIf="i === clicked">
                 <div class="pop clicked" *ngIf="item.type === 'text'" (keydown)="onKeyDown($event, text)">
                     <span #text style="margin-right:3px;" contenteditable="true">{{item.value}}</span>
-                    <fa-icon (click)="remove(i)" icon="times-circle"></fa-icon>
+                    <fa-icon (click)="remove(i)" [icon]="['far', 'times-circle']"></fa-icon>
                 </div>
             </ng-container>
         </ng-container>

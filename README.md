@@ -93,7 +93,7 @@ Then you can install OCTRA:
 
 ## Documentation
 
-* For users: [CTRA manual](https://www.phonetik.uni-muenchen.de/apps/octra/manual/1.3.0/)
+* For users: [OCTRA manual](https://www.phonetik.uni-muenchen.de/apps/octra/manual/1.3.0/)
 * For project leaders/administrators: [Github Wiki](https://github.com/IPS-LMU/octra/wiki).
 
 ## Contribution

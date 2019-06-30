@@ -22,7 +22,6 @@ import {
 
 import {AudioSelection, BrowserAudioTime} from '../../core/shared';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
-import {AudioChunk} from '../../media-components/obj/media/audio';
 import {TranscrWindowComponent} from './transcr-window';
 import {PlayBackState} from '../../media-components/obj/media';
 import {interval, Subscription} from 'rxjs';
@@ -31,7 +30,7 @@ import {AudioviewerComponent} from '../../media-components/components/audio/audi
 import {CircleLoupeComponent} from '../../media-components/components/audio/circleloupe';
 import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
 import {Line} from '../../media-components/obj';
-import {AudioManager} from '../../media-components/obj/media/audio/AudioManager';
+import {AudioChunk, AudioManager} from '../../media-components/obj/media/audio/AudioManager';
 import {Functions, isNullOrUndefined} from '../../core/shared/Functions';
 import {OCTRAEditor} from '../octra-editor';
 

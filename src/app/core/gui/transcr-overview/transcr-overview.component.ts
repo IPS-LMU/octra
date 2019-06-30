@@ -15,12 +15,13 @@ import {
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
 import {AppStorageService, AudioService, SettingsService, TranscriptionService} from '../../shared/service';
-import {AudioChunk, AudioSelection, BrowserAudioTime, OriginalAudioTime, SubscriptionManager} from '../../shared';
+import {AudioSelection, BrowserAudioTime, OriginalAudioTime, SubscriptionManager} from '../../shared';
 import {Segment} from '../../obj/Annotation';
 import {PlayBackState} from '../../../media-components/obj/media';
 import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
 import {isFunction, isNullOrUndefined} from '../../shared/Functions';
 import {TranscrEditorComponent} from '../../component/transcr-editor';
+import {AudioChunk} from '../../../media-components/obj/media/audio/AudioManager';
 
 declare var validateAnnotation: ((string, any) => any);
 

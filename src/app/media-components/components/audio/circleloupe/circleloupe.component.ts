@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import {LoupeComponent} from '../loupe';
 import {CircleLoupeService} from './circleloupe.service';
-import {AudioChunk} from '../../../obj/media/audio';
+import {AudioChunk} from '../../../obj/media/audio/AudioManager';
 
 declare var window: any;
 

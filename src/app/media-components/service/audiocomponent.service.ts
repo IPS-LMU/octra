@@ -1,7 +1,7 @@
 import {AVMousePos, Line, PlayCursor} from '../obj';
-import {AudioChunk, AudioTimeCalculator} from '../obj/media/audio';
+import {AudioTimeCalculator} from '../obj/media/audio';
 import {AudioviewerComponent} from '../components/audio/audioviewer';
-import {AudioManager} from '../obj/media/audio/AudioManager';
+import {AudioChunk, AudioManager} from '../obj/media/audio/AudioManager';
 
 export class AudioComponentService {
   public audioTCalculator: AudioTimeCalculator;

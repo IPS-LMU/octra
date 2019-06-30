@@ -10,8 +10,7 @@ import {
 } from '../../core/shared/service';
 import {BrowserAudioTime, BrowserSample, SubscriptionManager} from '../../core/shared';
 import {Segment} from '../../core/obj/Annotation';
-import {AudioManager} from '../../media-components/obj/media/audio/AudioManager';
-import {AudioChunk} from '../../media-components/obj/media/audio';
+import {AudioChunk, AudioManager} from '../../media-components/obj/media/audio/AudioManager';
 import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
 import {AudioplayerComponent} from '../../media-components/components/audio/audioplayer';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';

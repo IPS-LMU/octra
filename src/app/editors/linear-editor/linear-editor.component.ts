@@ -19,7 +19,7 @@ import {
   TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
-import {AudioChunk, AudioSelection, BrowserAudioTime} from '../../media-components/obj/media/audio';
+import {AudioSelection, BrowserAudioTime} from '../../media-components/obj/media/audio';
 import {AudioviewerComponent, AudioviewerConfig} from '../../media-components/components/audio/audioviewer';
 import {CircleLoupeComponent} from '../../media-components/components/audio/circleloupe';
 import {LoupeComponent} from '../../media-components/components/audio/loupe';
@@ -28,7 +28,7 @@ import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
 import {BrowserInfo} from '../../core/shared';
 import {AVMousePos} from '../../media-components/obj';
-import {AudioManager} from '../../media-components/obj/media/audio/AudioManager';
+import {AudioChunk, AudioManager} from '../../media-components/obj/media/audio/AudioManager';
 import {Functions, isNullOrUndefined} from '../../core/shared/Functions';
 import {OCTRAEditor} from '../octra-editor';
 

@@ -5,7 +5,7 @@ import {AudioviewerComponent} from './audioviewer.component';
 import {AudioviewerConfig} from './audioviewer.config';
 import {Interval, Position, Rectangle, Size} from '../../../objects';
 import {AudioComponentService} from '../../../service';
-import {AudioChunk, AudioSelection, AudioTimeCalculator, BrowserAudioTime} from '../../../obj/media/audio';
+import {AudioSelection, AudioTimeCalculator, BrowserAudioTime} from '../../../obj/media/audio';
 import {AVMousePos, Line, PlayCursor} from '../../../obj';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
 import {AudioService, KeymappingService, TranscriptionService} from '../../../../core/shared/service';
@@ -13,6 +13,7 @@ import {PlayBackState} from '../../../obj/media';
 import {isNullOrUndefined} from '../../../../core/shared/Functions';
 import {MultiThreadingService} from '../../../../core/shared/multi-threading/multi-threading.service';
 import {TsWorkerJob} from '../../../../core/shared/multi-threading/ts-worker-job';
+import {AudioChunk} from '../../../obj/media/audio/AudioManager';
 
 
 @Injectable()

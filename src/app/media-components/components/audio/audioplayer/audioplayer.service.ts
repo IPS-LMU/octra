@@ -5,7 +5,8 @@ import {AudioplayerConfig} from './audioplayer.config';
 import {AudioComponentService} from '../../../service';
 import {AVMousePos, Line, PlayCursor} from '../../../obj';
 import {AudioService} from '../../../../core/shared/service';
-import {AudioChunk, AudioTimeCalculator, BrowserAudioTime} from '../../../obj/media/audio';
+import {AudioTimeCalculator, BrowserAudioTime} from '../../../obj/media/audio';
+import {AudioChunk} from '../../../obj/media/audio/AudioManager';
 
 
 @Injectable()

@@ -11,7 +11,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {LeadingNullPipe, ProcentPipe, SecondsPipe, TimespanPipe} from './pipe';
 import {Timespan2Pipe} from './pipe/timespan2.pipe';
 // icons
-import {library} from '@fortawesome/fontawesome';
+import {library} from '@fortawesome/fontawesome-svg-core';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {
   faClock,
@@ -24,7 +24,7 @@ import {
   faStop,
   faVolumeDown,
   faVolumeUp
-} from '@fortawesome/fontawesome-free-solid';
+} from '@fortawesome/free-solid-svg-icons';
 
 library.add(faPlay, faPause, faStop, faForward, faStepForward, faStepBackward, faRetweet, faClock, faVolumeUp, faVolumeDown);
 

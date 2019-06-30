@@ -1,9 +1,8 @@
 import {AudioSelection} from './AudioSelection';
 import {EventEmitter} from '@angular/core';
-import {AudioManager} from './AudioManager';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
 import {BrowserAudioTime, BrowserSample} from './AudioTime';
-import {PlayBackState} from '../index';
+import {AudioManager, PlayBackState} from '../index';
 
 interface Interval {
   start: number;

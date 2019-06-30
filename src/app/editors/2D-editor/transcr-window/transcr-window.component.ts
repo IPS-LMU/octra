@@ -23,12 +23,12 @@ import {
   UserInteractionsService
 } from '../../../core/shared/service';
 import {BrowserAudioTime, BrowserSample, Segment, SubscriptionManager} from '../../../core/shared';
-import {AudioChunk, AudioRessource, AudioSelection} from '../../../media-components/obj/media/audio';
+import {AudioRessource, AudioSelection} from '../../../media-components/obj/media/audio';
 import {Segments} from '../../../core/obj/Annotation';
 import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
 import {LoupeComponent} from '../../../media-components/components/audio/loupe';
 import {AudioNavigationComponent} from '../../../media-components/components/audio/audio-navigation';
-import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
+import {AudioChunk, AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {isNullOrUndefined} from '../../../core/shared/Functions';
 
 @Component({

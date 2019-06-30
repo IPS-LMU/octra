@@ -14,5 +14,4 @@ export const enum PlayBackState {
   ENDED = 'ENDED'
 }
 
-export * from './audio';
 export * from './MediaRessource';

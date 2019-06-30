@@ -12,9 +12,9 @@ import {
   ViewChild
 } from '@angular/core';
 import {AudioviewerComponent, AudioviewerConfig, AudioviewerService} from '../audioviewer';
-import {AudioChunk} from '../../../obj/media/audio';
 import {AVMousePos} from '../../../obj';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
+import {AudioChunk} from '../../../obj/media/audio/AudioManager';
 
 declare var window: any;
 

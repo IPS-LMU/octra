@@ -1,5 +1,5 @@
-import {AudioChunk} from './AudioChunk';
 import {BrowserAudioTime} from './AudioTime';
+import {AudioChunk} from './AudioManager';
 
 export class AudioTimeCalculator {
   set duration(value: BrowserAudioTime) {

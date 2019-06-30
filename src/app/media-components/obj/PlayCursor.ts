@@ -1,4 +1,5 @@
-import {AudioChunk, AudioTimeCalculator, BrowserAudioTime} from './media/audio';
+import {AudioTimeCalculator, BrowserAudioTime} from './media/audio';
+import {AudioChunk} from './media/audio/AudioManager';
 
 export class PlayCursor {
 

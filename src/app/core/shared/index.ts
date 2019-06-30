@@ -3,7 +3,6 @@ export * from '../obj/APIResponse';
 export * from '../../media-components/obj/media/audio/AudioTime';
 export * from '../../media-components/obj/media/audio/AudioTimeCalculator';
 export * from './BrowserInfo';
-export * from '../../media-components/obj/media/audio/AudioChunk';
 export * from '../obj/KeyMapping';
 export * from '../obj/statistics/KeyStatisticElem';
 export * from '../obj/statistics/MouseStatisticElem';

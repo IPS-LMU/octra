@@ -15,9 +15,8 @@ import {
 
 import {AudioviewerService} from './audioviewer.service';
 import {TranslateService} from '@ngx-translate/core';
-import {AudioManager} from '../../../obj/media/audio/AudioManager';
-import {AudioChunk, AudioRessource, AudioSelection} from '../../../obj/media/audio';
-import {BrowserAudioTime, BrowserSample, PlayBackState} from '../../../obj/media/index';
+import {AudioRessource, AudioSelection, BrowserAudioTime, BrowserSample} from '../../../obj/media/audio';
+import {PlayBackState} from '../../../obj/media';
 import {Interval, Margin, Rectangle} from '../../../objects';
 import {AudioviewerConfig} from './audioviewer.config';
 import {AVMousePos, CanvasAnimation, Line, PlayCursor} from '../../../obj';
@@ -27,6 +26,7 @@ import {BrowserInfo, Logger, Segment} from '../../../../core/shared';
 import {Timespan2Pipe} from '../../../pipe/timespan2.pipe';
 import {isNullOrUndefined} from '../../../../core/shared/Functions';
 import {Subject} from 'rxjs';
+import {AudioChunk, AudioManager} from '../../../obj/media/audio/AudioManager';
 
 @Component({
   selector: 'app-audioviewer',

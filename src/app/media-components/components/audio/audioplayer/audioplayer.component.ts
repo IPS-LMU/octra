@@ -15,14 +15,14 @@ import {
   ViewChild
 } from '@angular/core';
 // other
-import {AudioChunk, AudioRessource, AudioTimeCalculator, BrowserAudioTime} from '../../../obj/media/audio';
+import {AudioRessource, AudioTimeCalculator, BrowserAudioTime} from '../../../obj/media/audio';
 import {PlayBackState} from '../../../obj/media';
 import {AudioplayerService} from './audioplayer.service';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
 import {CanvasAnimation, Line} from '../../../obj';
 import {AudioService, KeymappingService} from '../../../../core/shared/service';
 import {BrowserInfo} from '../../../../core/shared';
-import {AudioManager} from '../../../obj/media/audio/AudioManager';
+import {AudioChunk, AudioManager} from '../../../obj/media/audio/AudioManager';
 import {timer} from 'rxjs';
 
 @Component({

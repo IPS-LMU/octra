@@ -700,38 +700,49 @@ export class TranscriptionService {
       puffer: string;
     }
 
+    const markerPositions = this.getMarkerPositions(rawtext);
+
     let insertions: Pos[] = [];
 
     if (validation.length > 0) {
       // prepare insertions
       for (let i = 0; i < validation.length; i++) {
-        let insertStart = insertions.find((val) => {
-          return val.start === validation[i].start;
-        });
 
-        if ((insertStart === null || insertStart === undefined)) {
-          insertStart = {
-            start: validation[i].start,
-            puffer: '[[[span class=\'val-error\' data-errorcode=\'' + validation[i].code + '\']]]'
-          };
-          insertions.push(insertStart);
-        } else {
-          insertStart.puffer += '[[[span class=\'val-error\' data-errorcode=\'' + validation[i].code + '\']]]';
-        }
+        const foundMarker = markerPositions.find(
+          (a) => {
+            return (validation[i].start >= a.start && validation[i].start + validation[i].length <= a.end);
+          }
+        );
 
-        let insertEnd = insertions.find((val) => {
-          return val.start === validation[i].start + validation[i].length;
-        });
+        if (foundMarker === undefined) {
+          let insertStart = insertions.find((val) => {
+            return val.start === validation[i].start;
+          });
 
-        if ((insertEnd === null || insertEnd === undefined)) {
-          insertEnd = {
-            start: insertStart.start + validation[i].length,
-            puffer: ''
-          };
-          insertEnd.puffer = '[[[/span]]]';
-          insertions.push(insertEnd);
-        } else {
-          insertEnd.puffer = '[[[/span]]]' + insertEnd.puffer;
+          if ((insertStart === null || insertStart === undefined)) {
+            insertStart = {
+              start: validation[i].start,
+              puffer: '[[[span class=\'val-error\' data-errorcode=\'' + validation[i].code + '\']]]'
+            };
+            insertions.push(insertStart);
+          } else {
+            insertStart.puffer += '[[[span class=\'val-error\' data-errorcode=\'' + validation[i].code + '\']]]';
+          }
+
+          let insertEnd = insertions.find((val) => {
+            return val.start === validation[i].start + validation[i].length;
+          });
+
+          if ((insertEnd === null || insertEnd === undefined)) {
+            insertEnd = {
+              start: insertStart.start + validation[i].length,
+              puffer: ''
+            };
+            insertEnd.puffer = '[[[/span]]]';
+            insertions.push(insertEnd);
+          } else {
+            insertEnd.puffer = '[[[/span]]]' + insertEnd.puffer;
+          }
         }
       }
 
@@ -837,7 +848,8 @@ export class TranscriptionService {
   public validateAll() {
     this._validationArray = [];
 
-    if (this.appStorage.usemode !== 'url' && (this.appStorage.usemode === 'demo' || this.settingsService.projectsettings.octra.validationEnabled)) {
+    if (this.appStorage.usemode !== 'url' && (this.appStorage.usemode === 'demo'
+      || this.settingsService.projectsettings.octra.validationEnabled)) {
       let invalid = false;
 
       for (let i = 0; i < this.currentlevel.segments.length; i++) {
@@ -866,5 +878,30 @@ export class TranscriptionService {
       console.log(`validationEnabled is disabled`);
       this._transcriptValid = true;
     }
+  }
+
+  public getMarkerPositions(rawText: string): { start: number; end: number }[] {
+    const result = [];
+    let regexStr = '';
+    for (let i = 0; i < this._guidelines.markers.length; i++) {
+      const marker = this._guidelines.markers[i];
+      regexStr += `(${Functions.escapeRegex(marker.code)})`;
+
+      if (i < this._guidelines.markers.length - 1) {
+        regexStr += '|';
+      }
+    }
+    const regex = new RegExp(regexStr, 'g');
+
+    let match = regex.exec(rawText);
+    while (match != null) {
+      result.push({
+        start: match.index,
+        end: match.index + match[0].length
+      });
+      match = regex.exec(rawText);
+    }
+
+    return result;
   }
 }

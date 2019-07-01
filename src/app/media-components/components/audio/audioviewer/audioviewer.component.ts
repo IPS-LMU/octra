@@ -1015,7 +1015,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       const timeLineHeight = (this.settings.timeline.enabled) ? this.settings.timeline.height : 0;
 
       this.gContext.globalAlpha = 1.0;
-      this.gContext.strokeStyle = this.settings.frame.color;
       this.gContext.fillStyle = this.settings.backgroundcolor;
       this.gContext.clearRect(lineObj.Pos.x, lineObj.Pos.y - this.av.viewRect.position.y, this._innerWidth,
         this.settings.lineheight + this.margin.bottom);
@@ -1036,6 +1035,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
       }
 
       this.gContext.lineWidth = 1;
+      this.gContext.strokeStyle = this.settings.frame.color;
+      this.gContext.strokeRect(lineObj.Pos.x, lineObj.Pos.y - this.av.viewRect.position.y, lineObj.Size.width,
+        this.settings.lineheight - timeLineHeight);
     }
   }
 

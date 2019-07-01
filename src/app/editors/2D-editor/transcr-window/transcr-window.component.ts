@@ -163,6 +163,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.loupeSettings.boundaries.enabled = false;
     this.loupeSettings.boundaries.readonly = true;
     this.loupeSettings.shortcuts.set_break = null;
+    this.loupeSettings.frame.color = '#222222';
     this.loupeSettings.roundValues = false;
     this.loupe.viewer.av.drawnselection = null;
 

@@ -256,6 +256,10 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             }
           };
 
+          if (this.settings.multiLine || this.resizing) {
+            drawBackground();
+          }
+
           if (!(this.audiomanager.channelData === null || this.audiomanager.channelData === undefined)) {
             if (computeDisplayData) {
               this.av.refreshComputedData().then(() => {
@@ -806,7 +810,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
   private drawSelection = (line: Line) => {
     if (!isNullOrUndefined(this.av.drawnselection) && this.av.drawnselection.length > 0) {
-      console.log(`drawn selection duration is ${this.av.drawnselection.duration.browserSample.value}`);
       // draw gray selection
       const select = this.av.getRelativeSelectionByLine(
         line, this.av.drawnselection.start.browserSample.value, this.av.drawnselection.end.browserSample.value, this._innerWidth
@@ -1550,6 +1553,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           this.av.AudioPxWidth = this._innerWidth;
           this.av.audioTCalculator.audioPxWidth = this._innerWidth;
           const ratio = this._innerWidth / this.oldInnerWidth;
+          this.updateCanvasSizes();
 
           this.changePlayCursorAbsX((this.av.PlayCursor.absX * ratio));
           this.update(true).then(() => {

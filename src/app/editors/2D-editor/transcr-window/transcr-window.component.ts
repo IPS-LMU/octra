@@ -102,7 +102,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   private showWindow = false;
   private subscrmanager: SubscriptionManager;
   private tempSegments: Segments;
-  private loupeSettings = new AudioviewerConfig();
+  public loupeSettings = new AudioviewerConfig();
 
   public doit = (direction: string) => {
     this.save();

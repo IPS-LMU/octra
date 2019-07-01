@@ -1,4 +1,4 @@
 <div class="loupe" [ngStyle]="{height: this.height + 'px'}" #loupe>
-    <app-audioviewer #viewer [settings]="_settings" [audiochunk]="audiochunk"
+    <app-audioviewer #viewer [settings]="settings" [audiochunk]="audiochunk"
                      (alerttriggered)="alerttriggered.emit($event)"></app-audioviewer>
 </div>

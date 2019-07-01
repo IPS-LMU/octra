@@ -182,17 +182,34 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     }
 
     const loaduser = () => {
-      if (!(this.appStorage.user === null || this.appStorage.user === undefined) && this.appStorage.user.id !== '-1') {
-        this.member.id = this.appStorage.user.id;
-      }
+      if (this.appStorage.usemode !== 'demo') {
+        if (!isNullOrUndefined(this.appStorage.user)) {
+          if (this.appStorage.user.id !== '-1') {
+            this.member.id = this.appStorage.user.id;
+          }
 
-      if (!(this.appStorage.user === null || this.appStorage.user === undefined) && this.appStorage.user.hasOwnProperty('project')) {
-        this.member.project = this.appStorage.user.project;
-      }
+          if (this.appStorage.user.hasOwnProperty('project')) {
+            this.member.project = this.appStorage.user.project;
+          }
 
-      if (!(this.appStorage.user === null || this.appStorage.user === undefined) && this.appStorage.user.hasOwnProperty('jobno')
-        && this.appStorage.user.jobno !== null && this.appStorage.user.jobno > -1) {
-        this.member.jobno = this.appStorage.user.jobno.toString();
+          if (this.appStorage.user.hasOwnProperty('jobno')
+            && this.appStorage.user.jobno !== null && this.appStorage.user.jobno > -1) {
+            this.member.jobno = this.appStorage.user.jobno.toString();
+          }
+        }
+      } else {
+        this.appStorage.usemode = null;
+        this.appStorage.dataID = null;
+        this.appStorage.user.id = '';
+        this.appStorage.user.jobno = -1;
+        this.appStorage.user.project = '';
+        this.member = {
+          id: '',
+          agreement: '',
+          project: '',
+          jobno: '',
+          password: ''
+        };
       }
     };
 

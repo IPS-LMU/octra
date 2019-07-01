@@ -2,19 +2,19 @@
 
 buildDir="dist/octra/"
 targetFolder="assets"
-baseHref="https://www.phonetik.uni-muenchen.de/apps/octra/octra-dev/"
+baseHref="https://www.phonetik.uni-muenchen.de/apps/octra/octra/"
 
 # change this list to your needs (for exclusion of files or folders in the dist folder)
 excludedList='"config" "LICENCE.txt"'
 
 # 1 = disable indexing, 2 = enable
-disableRobots=1
+disableRobots=0
 
 timeNow=`date "+%Y-%m-%d %H:%M:%S"`
 octraVersion="1.3.0"
 
 echo "Building OCTRA..."
-ng build --prod -c dev --base-href "${baseHref}"
+node --max-old-space-size=12000 ./node_modules/@angular/cli/bin/ng build --prod --base-href "${baseHref}"
 echo "Change index.html..."
 indexHTML=$(<${buildDir}index.html)
 indexHTML=$(echo "${indexHTML}" | sed -e "s/\(scripts\.[0-9a-z]*\.js\)/.\/${targetFolder}\/\1/g")

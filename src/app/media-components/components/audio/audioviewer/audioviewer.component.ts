@@ -256,11 +256,10 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             }
           };
 
-          drawBackground();
-
           if (!(this.audiomanager.channelData === null || this.audiomanager.channelData === undefined)) {
             if (computeDisplayData) {
               this.av.refreshComputedData().then(() => {
+                drawBackground();
                 drawSignal();
                 resolve();
               }).catch((err) => {
@@ -268,6 +267,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 reject(err);
               });
             } else {
+              drawBackground();
               drawSignal();
               resolve();
             }

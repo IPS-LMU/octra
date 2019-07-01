@@ -582,7 +582,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           icon += ' ' + marker.button_text + '<span class=\'btn-shortcut\'>  ' +
             '[' + marker.shortcut[platform] + ']</span>';
           if (this.Settings.responsive) {
-            icon += '<span class=\'btn-shortcut d-none d-lg-inline\'>  ' +
+            icon = ' ' + marker.button_text + '<span class=\'btn-shortcut d-none d-lg-inline\'>  ' +
               '[' + marker.shortcut[platform] + ']</span>';
           }
         } else {
@@ -994,17 +994,21 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       this.saveSelection();
       this._rawText = this.getRawText(false);
 
-      // insert selection placeholders
-      let code = Functions.insertString(this._rawText, this._textSelection.start, '[[[sel-start/]]]');
-      code = Functions.insertString(code, this._textSelection.end + '[[[sel-start/]]]'.length, '[[[sel-end/]]]');
+      if (this._rawText !== '') {
+        this.saveSelection();
 
-      code = this.transcrService.underlineTextRed(code, this.transcrService.validate(code));
-      code = this.transcrService.rawToHTML(code);
-      code = code.replace(/([\s ]+)(<sel-start\/><sel-end\/><\/p>)?$/g, '&nbsp;$2');
+        // insert selection placeholders
+        let code = Functions.insertString(this._rawText, this._textSelection.start, '[[[sel-start/]]]');
+        code = Functions.insertString(code, this._textSelection.end + '[[[sel-start/]]]'.length, '[[[sel-end/]]]');
 
-      this._rawText = this.tidyUpRaw(this._rawText);
-      this.textfield.summernote('code', code);
-      this.restoreSelection();
+        code = this.transcrService.underlineTextRed(code, this.transcrService.validate(code));
+        code = this.transcrService.rawToHTML(code);
+        code = code.replace(/([\s ]+)(<sel-start\/><sel-end\/><\/p>)?$/g, '&nbsp;$2');
+
+        this._rawText = this.tidyUpRaw(this._rawText);
+        this.textfield.summernote('code', code);
+        this.restoreSelection();
+      }
     }
   }
 

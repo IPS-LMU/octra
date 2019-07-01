@@ -30,6 +30,7 @@ import {LoupeComponent} from '../../../media-components/components/audio/loupe';
 import {AudioNavigationComponent} from '../../../media-components/components/audio/audio-navigation';
 import {AudioChunk, AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {isNullOrUndefined} from '../../../core/shared/Functions';
+import {AudioviewerConfig} from '../../../media-components/components/audio/audioviewer';
 
 @Component({
   selector: 'app-transcr-window',
@@ -101,6 +102,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   private showWindow = false;
   private subscrmanager: SubscriptionManager;
   private tempSegments: Segments;
+  private loupeSettings = new AudioviewerConfig();
 
   public doit = (direction: string) => {
     this.save();
@@ -157,12 +159,13 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.special_markers.boundary = true;
     this.loupe.viewer.name = 'transcription window';
-    this.loupe.viewer.Settings.justifySignalHeight = true;
-    this.loupe.viewer.Settings.boundaries.enabled = false;
+    this.loupeSettings.justifySignalHeight = true;
+    this.loupeSettings.boundaries.enabled = false;
+    this.loupeSettings.boundaries.readonly = true;
+    this.loupeSettings.shortcuts.set_break = null;
+    this.loupeSettings.roundValues = false;
+    this.loupe.viewer.av.drawnselection = null;
 
-    // remove annoying shortcut for break marker
-    this.loupe.Settings.shortcuts.set_break = null;
-    this.loupe.viewer.roundValues = false;
     const segments = this.transcrService.currentlevel.segments;
     this.tempSegments = segments.clone();
     this.subscrmanager.add(this.editor.loaded.subscribe(
@@ -202,9 +205,12 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   ngAfterViewInit() {
-    this.loupe.Settings.boundaries.readonly = true;
     this.loupe.zoomY = 6;
     this.audiochunk.startpos = this.audiochunk.time.start.clone() as BrowserAudioTime;
+    this.loupe.viewer.av.drawnselection = new AudioSelection(
+      this.audiomanager.createBrowserAudioTime(0),
+      this.audiomanager.createBrowserAudioTime(0)
+    );
 
     setTimeout(() => {
       this.loupe.viewer.startPlayback();

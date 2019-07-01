@@ -25,6 +25,14 @@ declare var window: any;
   providers: [AudioviewerService]
 })
 export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
+  get settings(): AudioviewerConfig {
+    return this._settings;
+  }
+
+  @Input()
+  set settings(value: AudioviewerConfig) {
+    this._settings = value;
+  }
   get name(): string {
     return this._name;
   }
@@ -78,14 +86,7 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
     this.viewer.margin = value;
   }
 
-  get Settings(): AudioviewerConfig {
-    return this.viewer.Settings;
-  }
-
-  @Input()
-  set Settings(newSettings: AudioviewerConfig) {
-    this.viewer.Settings = newSettings;
-  }
+  private _settings: AudioviewerConfig = new AudioviewerConfig();
 
   constructor() {
     this.subscrmanager = new SubscriptionManager();
@@ -104,12 +105,10 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
 
   ngOnInit() {
     if (!(this.height === null || this.height === undefined)) {
-      this.viewer.Settings.multiLine = false;
-      this.viewer.Settings.lineheight = this.height;
-      this.viewer.Settings.justifySignalHeight = true;
-      this.viewer.Settings.boundaries.enabled = true;
-      this.viewer.Settings.disabledKeys = [];
-      this.viewer.Settings.type = 'line';
+      this._settings.multiLine = false;
+      this._settings.lineheight = this.height;
+      this._settings.disabledKeys = [];
+      this._settings.type = 'line';
     }
   }
 

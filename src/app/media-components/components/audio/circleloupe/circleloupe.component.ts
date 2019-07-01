@@ -2,6 +2,7 @@ import {AfterViewInit, Component, Input, OnChanges, OnInit, SimpleChanges, ViewC
 import {LoupeComponent} from '../loupe';
 import {CircleLoupeService} from './circleloupe.service';
 import {AudioChunk} from '../../../obj/media/audio/AudioManager';
+import {AudioviewerConfig} from '../audioviewer';
 
 declare var window: any;
 
@@ -33,12 +34,14 @@ export class CircleLoupeComponent implements AfterViewInit, OnChanges, OnInit {
   }
 
   get Settings(): any {
-    return this.loupe.Settings;
+    return this.settings;
   }
 
   set Settings(newSettings: any) {
-    this.loupe.Settings = newSettings;
+    this.settings = newSettings;
   }
+
+  private settings: AudioviewerConfig = new AudioviewerConfig();
 
   constructor() {
     this.height = 80;
@@ -48,10 +51,10 @@ export class CircleLoupeComponent implements AfterViewInit, OnChanges, OnInit {
   ngOnChanges(changes: SimpleChanges) {
     if (changes.hasOwnProperty('height')) {
       if (!(this.loupe === null || this.loupe === undefined)) {
-        this.loupe.Settings.lineheight = changes.height.currentValue;
-        if ((this.loupe.Settings.lineheight === null || this.loupe.Settings.lineheight === undefined)
-          || this.loupe.Settings.lineheight < 1) {
-          this.loupe.Settings.lineheight = 80;
+        this.settings.lineheight = changes.height.currentValue;
+        if ((this.settings.lineheight === null || this.settings.lineheight === undefined)
+          || this.settings.lineheight < 1) {
+          this.settings.lineheight = 80;
         }
         if (this.initialized) {
           this.loupe.update();
@@ -65,24 +68,23 @@ export class CircleLoupeComponent implements AfterViewInit, OnChanges, OnInit {
   }
 
   ngOnInit() {
-    this.loupe.Settings.multiLine = false;
-    this.loupe.Settings.justifySignalHeight = false;
-    this.loupe.Settings.boundaries.enabled = true;
-    this.loupe.Settings.disabledKeys = [];
-    this.loupe.Settings.type = 'line';
-    this.loupe.Settings.backgroundcolor = 'white';
-    this.loupe.Settings.frame.color = 'transparent';
-    this.loupe.Settings.cropping = 'circle';
-    this.loupe.Settings.margin.left = 0;
-    this.loupe.Settings.margin.top = 0;
-    this.loupe.Settings.margin.right = 0;
-    this.loupe.Settings.margin.bottom = 0;
-    this.loupe.Settings.lineheight = this.height;
-    this.loupe.Settings.selection.enabled = false;
-    this.loupe.Settings.shortcutsEnabled = false;
-    this.loupe.Settings.boundaries.enabled = true;
-    this.loupe.Settings.timeline.enabled = false;
-    this.loupe.viewer.roundValues = false;
+    this.settings.multiLine = false;
+    this.settings.justifySignalHeight = true;
+    this.settings.disabledKeys = [];
+    this.settings.type = 'line';
+    this.settings.backgroundcolor = 'white';
+    this.settings.frame.color = 'transparent';
+    this.settings.cropping = 'circle';
+    this.settings.margin.left = 0;
+    this.settings.margin.top = 0;
+    this.settings.margin.right = 0;
+    this.settings.margin.bottom = 0;
+    this.settings.lineheight = this.height;
+    this.settings.selection.enabled = false;
+    this.settings.shortcutsEnabled = false;
+    this.settings.boundaries.enabled = true;
+    this.settings.timeline.enabled = false;
+    this.settings.roundValues = false;
     this.loupe.name = 'circleloupe';
 
     // this.loupe.update();

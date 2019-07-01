@@ -48,7 +48,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   get segmententer_shortc(): string {
-    return (this.viewer.Settings) ? this.viewer.Settings.shortcuts.segment_enter.keys[this.platform] : '';
+    return (this.viewer.settings) ? this.viewer.settings.shortcuts.segment_enter.keys[this.platform] : '';
   }
 
   constructor(public audio: AudioService,
@@ -111,13 +111,13 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.audiochunkDown = this.audiomanager.mainchunk.clone();
     this.audioChunkLoupe = this.audiomanager.mainchunk.clone();
 
-    this.viewer.Settings.shortcuts = this.keyMap.register('AV', this.viewer.Settings.shortcuts);
-    this.viewer.Settings.multiLine = false;
-    this.viewer.Settings.lineheight = 80;
-    this.viewer.Settings.shortcutsEnabled = true;
-    this.viewer.Settings.boundaries.readonly = false;
-    this.viewer.Settings.justifySignalHeight = true;
-    this.viewer.Settings.roundValues = false;
+    this.viewer.settings.shortcuts = this.keyMap.register('AV', this.viewer.settings.shortcuts);
+    this.viewer.settings.multiLine = false;
+    this.viewer.settings.lineheight = 80;
+    this.viewer.settings.shortcutsEnabled = true;
+    this.viewer.settings.boundaries.readonly = false;
+    this.viewer.settings.justifySignalHeight = true;
+    this.viewer.settings.roundValues = false;
 
     this.loupeSettings = new AudioviewerConfig();
     this.loupeSettings.shortcuts = this.keyMap.register('Loupe', this.loupeSettings.shortcuts);
@@ -306,7 +306,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     }
 
     const a = this.viewer.getLocation();
-    this.miniLoupeCoord.y = this.viewer.Settings.lineheight - 10;
+    this.miniLoupeCoord.y = this.viewer.settings.lineheight - 10;
 
     if (!isNullOrUndefined(this.nav)) {
       this.miniLoupeCoord.y += this.nav.height;

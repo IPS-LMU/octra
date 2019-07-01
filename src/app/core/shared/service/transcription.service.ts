@@ -687,7 +687,7 @@ export class TranscriptionService {
     }
 
     // wrap result with <p>. Missing this would cause the editor fail on marker insertion
-    result = (result !== '') ? '<p>' + result + '</p>' : '<p><br/></p>';
+    result = (result !== '' && result !== ' ') ? '<p>' + result + '</p>' : '<p><br/></p>';
 
     return result;
   }

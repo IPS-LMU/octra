@@ -24,7 +24,7 @@
             (wheel)="onWheel($event)"
     ></canvas>
     <canvas class="mousecanvas" #mousecan=audioview appAudioviewer></canvas>
-    <div *ngIf="Settings.scrollable" class="scrollbar"
+    <div *ngIf="settings.scrollable" class="scrollbar"
          (mousemove)="scrollbar.mouseover = true; scrollbarchange.emit({state:'mousemove'});onSliderChanged($event)"
          (mouseleave)="scrollbar.mouseover = false; scrollbarchange.emit({state:'mouseleave'});onSliderChanged($event);"
          (mouseout)="scrollbar.mouseover = false;"

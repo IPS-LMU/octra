@@ -122,7 +122,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.audioChunkLines = this.audiomanager.mainchunk.clone();
     this.audioChunkLoupe = this.audiomanager.mainchunk.clone();
     this.audioChunkWindow = this.audiomanager.mainchunk.clone();
-    this.shortcuts = this.keyMap.register('2D-Editor', this.viewer.Settings.shortcuts);
+    this.shortcuts = this.keyMap.register('2D-Editor', this.viewer.settings.shortcuts);
     const windowShortcuts = {
       jump_left: {
         keys: {
@@ -151,17 +151,17 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     };
     this.keyMap.register('Transcription Window', windowShortcuts);
 
-    this.viewer.Settings.multiLine = true;
-    this.viewer.Settings.lineheight = 70;
-    this.viewer.Settings.margin.bottom = 5;
-    this.viewer.Settings.margin.right = 0;
-    this.viewer.Settings.justifySignalHeight = true;
-    this.viewer.Settings.scrollable = true;
-    this.viewer.Settings.margin.right = 20;
-    this.viewer.Settings.roundValues = false;
-    this.viewer.Settings.stepWidthRatio = (this.viewer.Settings.pixelPerSec / this.audiomanager.ressource.info.samplerate);
-    this.viewer.Settings.showTimePerLine = true;
-    this.viewer.Settings.showTranscripts = true;
+    this.viewer.settings.multiLine = true;
+    this.viewer.settings.lineheight = 70;
+    this.viewer.settings.margin.bottom = 5;
+    this.viewer.settings.margin.right = 0;
+    this.viewer.settings.justifySignalHeight = true;
+    this.viewer.settings.scrollable = true;
+    this.viewer.settings.margin.right = 20;
+    this.viewer.settings.roundValues = false;
+    this.viewer.settings.stepWidthRatio = (this.viewer.settings.pixelPerSec / this.audiomanager.ressource.info.samplerate);
+    this.viewer.settings.showTimePerLine = true;
+    this.viewer.settings.showTranscripts = true;
     this.viewer.name = 'multiline viewer';
     this.viewer.secondsPerLine = this.appStorage.secondsPerLine;
 
@@ -198,8 +198,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
             this.scrolltimer = interval(1000).subscribe(() => {
               const absx = this.viewer.av.audioTCalculator.samplestoAbsX(this.audioChunkLines.playposition.browserSample.value);
-              let y = Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.lineheight;
-              y += 10 + (Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.margin.bottom);
+              let y = Math.floor(absx / this.viewer.innerWidth) * this.viewer.settings.lineheight;
+              y += 10 + (Math.floor(absx / this.viewer.innerWidth) * this.viewer.settings.margin.bottom);
 
               if (y > this.viewer.viewRect.size.height) {
                 this.viewer.scrollTo(y);
@@ -284,8 +284,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       const segment = this.transcrService.currentlevel.segments.get(this.selectedIndex);
       const absx = this.viewer.av.audioTCalculator.samplestoAbsX(segment.time.browserSample.value);
 
-      let y = Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.lineheight;
-      y += 10 + (Math.floor(absx / this.viewer.innerWidth) * this.viewer.Settings.margin.bottom);
+      let y = Math.floor(absx / this.viewer.innerWidth) * this.viewer.settings.lineheight;
+      y += 10 + (Math.floor(absx / this.viewer.innerWidth) * this.viewer.settings.margin.bottom);
       Functions.scrollTo(y, '#special');
 
     } else if (state === 'open') {

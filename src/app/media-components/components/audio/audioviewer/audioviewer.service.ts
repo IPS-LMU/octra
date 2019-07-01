@@ -168,13 +168,13 @@ export class AudioviewerService extends AudioComponentService {
     const absX = this.getAbsXByLine(currLine, x - currLine.Pos.x, innerWidth);
     let absXTime = this.audioTCalculator.absXChunktoSamples(absX, this.audiochunk);
 
-    let dragableBoundaryTemp = this.getBoundaryNumber(absX);
+    let dragableBoundaryTemp = (this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly) ? this.getBoundaryNumber(absX) : -1;
 
     if (this.mouseDown && this._dragableBoundaryNumber < 0) {
       // mouse down, nothing dragged
       this.audiochunk.selection.end = this.audiomanager.createBrowserAudioTime(absXTime);
       this.drawnselection.end = this.audiochunk.selection.end.clone();
-    } else if (this.mouseDown && this._dragableBoundaryNumber > -1) {
+    } else if (this.Settings.boundaries.enabled && this.mouseDown && this._dragableBoundaryNumber > -1) {
       // mouse down something dragged
       const segment = this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber).clone();
       const absXSeconds = (absXTime / this.audiomanager.ressource.info.samplerate);
@@ -239,7 +239,7 @@ export class AudioviewerService extends AudioComponentService {
             }
             this.mouseDown = true;
           } else if ($event.type === 'mouseup') {
-            if (this._dragableBoundaryNumber > -1 &&
+            if (this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly && this._dragableBoundaryNumber > -1 &&
               this._dragableBoundaryNumber < this.transcrService.currentlevel.segments.length) {
               // some boundary dragged
               const segment = this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber);
@@ -260,7 +260,8 @@ export class AudioviewerService extends AudioComponentService {
             this.mouseDown = false;
           }
         } else if ($event.type === 'mouseup') {
-          if (this._dragableBoundaryNumber > -1 && this._dragableBoundaryNumber < this.transcrService.currentlevel.segments.length) {
+          if (this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly &&
+            this._dragableBoundaryNumber > -1 && this._dragableBoundaryNumber < this.transcrService.currentlevel.segments.length) {
             // some boundary dragged
             const segment = this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber);
             segment.time.browserSample.value = this.audioTCalculator.absXChunktoSamples(absX, this.audiochunk);

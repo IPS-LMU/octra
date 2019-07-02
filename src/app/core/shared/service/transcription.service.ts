@@ -710,7 +710,7 @@ export class TranscriptionService {
 
         const foundMarker = markerPositions.find(
           (a) => {
-            return (validation[i].start >= a.start && validation[i].start + validation[i].length <= a.end);
+            return (validation[i].start > a.start && validation[i].start + validation[i].length < a.end);
           }
         );
 

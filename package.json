@@ -43,7 +43,6 @@
     "arrive": "^2.4.1",
     "bootstrap": "^4.3.1",
     "bootstrap-material-design": "4.1.1",
-    "core-js": "^2.6.9",
     "jquery": "^3.4.1",
     "jquery.caret": "^0.3.1",
     "js-sha256": "^0.9.0",

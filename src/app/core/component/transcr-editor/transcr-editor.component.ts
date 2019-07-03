@@ -461,7 +461,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   private triggerTyping() {
     setTimeout(() => {
       if (Date.now() - this.lastkeypress >= 700 && this.lastkeypress > -1) {
-        this.updateTextField();
         if (this._isTyping && this.focused) {
           this.typing.emit('stopped');
 

@@ -331,56 +331,61 @@ export class AudioManager {
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (!this.isPlaying) {
-        this._playOnHover = playOnHover;
-        this.changeState(PlayBackState.STARTED);
-        this._stepBackward = false;
-        this._gainNode.gain.value = volume;
-        this._gainNode.connect(this._audioContext.destination);
-        this._scriptProcessorNode = this._audioContext.createScriptProcessor(this._bufferSize, 2, 2);
-        this._scriptProcessorNode.connect(this._gainNode);
-        // connect modules of Web Audio API
-        let lastCheck = Date.now();
+        this.audioContext.resume().then(() => {
+          this._playOnHover = playOnHover;
+          this.changeState(PlayBackState.STARTED);
+          this._stepBackward = false;
+          this._gainNode.gain.value = volume;
+          this._gainNode.connect(this._audioContext.destination);
+          this._scriptProcessorNode = this._audioContext.createScriptProcessor(this._bufferSize, 2, 2);
+          this._scriptProcessorNode.connect(this._gainNode);
+          // connect modules of Web Audio API
+          let lastCheck = Date.now();
 
-        this._playbackInfo.started = new Date().getTime();
-        this._playbackInfo.endAt = this._playbackInfo.started + (duration.browserSample.unix / speed);
+          this._playbackInfo.started = new Date().getTime();
+          this._playbackInfo.endAt = this._playbackInfo.started + (duration.browserSample.unix / speed);
 
-        this._playposition = begintime.clone();
-        this._bufferedOLA.position = begintime.browserSample.value;
-        this._playposition.browserSample.value = begintime.browserSample.value;
+          this._playposition = begintime.clone();
+          this._bufferedOLA.position = begintime.browserSample.value;
+          this._playposition.browserSample.value = begintime.browserSample.value;
 
-        this._scriptProcessorNode.addEventListener('audioprocess', (e) => {
-          if (this.stateRequest === PlayBackState.PLAYING) {
-            // start playback
-            this.stateRequest = null;
-            this.changeState(PlayBackState.PLAYING);
-            lastCheck = Date.now();
-          }
-          if (!this._isScriptProcessorCanceled) {
-            if (this.stateRequest === PlayBackState.STOPPED || this.stateRequest === PlayBackState.PAUSED) {
-              // audio ended
-              resolve();
-              this.afterAudioEnded();
-            } else {
-              this._isScriptProcessorCanceled = false;
-              if (this.isPlaying) {
-                this._playposition.browserSample.value = this._bufferedOLA.position;
-                onProcess();
-                const endTime = this.createBrowserAudioTime(begintime.browserSample.value + duration.browserSample.value);
-                if (this._playposition.browserSample.unix <= endTime.browserSample.unix) {
-                  this._bufferedOLA.alpha = 1 / speed;
-                  this._bufferedOLA.process(e.inputBuffer, e.outputBuffer);
-                } else {
-                  resolve();
-                  this.afterAudioEnded();
+          this._scriptProcessorNode.addEventListener('audioprocess', (e) => {
+            if (this.stateRequest === PlayBackState.PLAYING) {
+              // start playback
+              this.stateRequest = null;
+              this.changeState(PlayBackState.PLAYING);
+              lastCheck = Date.now();
+            }
+            if (!this._isScriptProcessorCanceled) {
+              if (this.stateRequest === PlayBackState.STOPPED || this.stateRequest === PlayBackState.PAUSED) {
+                // audio ended
+                resolve();
+                this.afterAudioEnded();
+              } else {
+                this._isScriptProcessorCanceled = false;
+                if (this.isPlaying) {
+                  this._playposition.browserSample.value = this._bufferedOLA.position;
+                  onProcess();
+                  const endTime = this.createBrowserAudioTime(begintime.browserSample.value + duration.browserSample.value);
+                  if (this._playposition.browserSample.unix <= endTime.browserSample.unix) {
+                    this._bufferedOLA.alpha = 1 / speed;
+                    this._bufferedOLA.process(e.inputBuffer, e.outputBuffer);
+                  } else {
+                    resolve();
+                    this.afterAudioEnded();
+                  }
                 }
               }
+              lastCheck = Date.now();
+              this._lastUpdate = lastCheck;
             }
-            lastCheck = Date.now();
-            this._lastUpdate = lastCheck;
-          }
-        });
+          });
 
-        this.stateRequest = PlayBackState.PLAYING;
+          this.stateRequest = PlayBackState.PLAYING;
+        }).catch((error) => {
+          this.statechange.error(new Error(error));
+          reject(error);
+        });
       } else {
         this.statechange.error(new Error('AudioManager: Can\'t play audio because it is already playing'));
         reject('AudioManager: Can\'t play audio because it is already playing');

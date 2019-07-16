@@ -5,6 +5,7 @@ import {SegmentToDecode} from '../AudioDecoder';
 // http://soundfile.sapp.org/doc/WaveFormat/
 export class WavFormat extends AudioFormat {
   protected _blockAlign: number;
+  protected dataStart = -1;
 
   private status: 'running' | 'stopRequested' | 'stopped' = 'stopped';
 
@@ -26,6 +27,7 @@ export class WavFormat extends AudioFormat {
   }
 
   public init(filename: string, buffer: ArrayBuffer) {
+    this.setDataStart(buffer);
     super.init(filename, buffer);
     this.setBlockAlign(buffer);
   }
@@ -271,10 +273,36 @@ export class WavFormat extends AudioFormat {
   }
 
   protected getDataChunkSize(buffer: ArrayBuffer): number {
-    const bufferPart = buffer.slice(40, 44);
+    // skip "data" part
+    const bufferPart = buffer.slice(this.dataStart, this.dataStart + 4);
     const bufferView = new Uint32Array(bufferPart);
 
+
     return bufferView[0];
+  }
+
+  private setDataStart(buffer: ArrayBuffer) {
+    // search "data" info
+    let result = -1;
+    let test = '';
+
+    while (test !== 'data') {
+      result++;
+      if (result + 4 < buffer.byteLength) {
+        const part = String.fromCharCode.apply(null, new Uint8Array(buffer.slice(result, result + 4)));
+        test = '' + part.slice(0, 4) + '';
+      } else {
+        break;
+      }
+    }
+
+    result += 4;
+
+    if (result >= buffer.byteLength) {
+      this.dataStart = -1;
+    } else {
+      this.dataStart = result;
+    }
   }
 
   protected getDataChunk(buffer: ArrayBuffer): ArrayBuffer {

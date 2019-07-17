@@ -240,6 +240,8 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
       return a.replace(/(^\s+)|(\s+$)/g, '');
     });
 
+    console.log(segTexts);
+
     let annoSegLength = this.transcrService.currentlevel.segments.length;
     for (let i = 0; i < segTexts.length; i++) {
       const newRaw = segTexts[i];
@@ -256,7 +258,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
       } else {
         // add new segments
         if (i === segTexts.length - 1) {
-          this.transcrService.currentlevel.segments.add(this.audiochunk.time.end, newRaw);
+          this.transcrService.currentlevel.segments.add(this.audiochunk.time.end.clone(), newRaw);
         } else {
           this.transcrService.currentlevel.segments.add(this.audiomanager.createBrowserAudioTime(samplesArray[i]), newRaw);
         }
@@ -274,6 +276,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   }
 
   public highlight() {
+    /*
     const html: string = this.editor.html.replace(/&nbsp;/g, ' ');
 
     const samplesArray: number[] = [];
@@ -296,7 +299,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
         });
         start = samplesArray[i];
       }
-    }
+    }*/
   }
 
   public update() {

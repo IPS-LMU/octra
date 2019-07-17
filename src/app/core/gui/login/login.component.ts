@@ -525,7 +525,15 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
             // get transcript data that already exists
             if (json.data.hasOwnProperty('transcript')) {
-              const transcript = JSON.parse(json.data.transcript);
+              let transcript = '';
+
+              if (transcript !== '') {
+                try {
+                  transcript = JSON.parse(json.data.transcript);
+                } catch (e) {
+                  console.error(`could not parse transcript. Invalid format?`);
+                }
+              }
 
               if (Array.isArray(transcript) && transcript.length > 0) {
                 this.appStorage.servertranscipt = transcript;

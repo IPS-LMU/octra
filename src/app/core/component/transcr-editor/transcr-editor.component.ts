@@ -462,11 +462,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     setTimeout(() => {
       if (Date.now() - this.lastkeypress >= 700 && this.lastkeypress > -1) {
         if (this._isTyping && this.focused) {
-          this.typing.emit('stopped');
-
           this.validate();
           this.initPopover();
           this.lastkeypress = -1;
+          this.typing.emit('stopped');
         }
         this._isTyping = false;
       }
@@ -1008,6 +1007,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         this.textfield.summernote('code', code);
         this.restoreSelection();
       }
+    } else {
+      this._rawText = this.getRawText(false);
+      this._rawText = this.tidyUpRaw(this._rawText);
     }
   }
 

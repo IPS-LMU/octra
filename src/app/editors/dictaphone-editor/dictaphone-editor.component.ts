@@ -240,8 +240,6 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
       return a.replace(/(^\s+)|(\s+$)/g, '');
     });
 
-    console.log(segTexts);
-
     let annoSegLength = this.transcrService.currentlevel.segments.length;
     for (let i = 0; i < segTexts.length; i++) {
       const newRaw = segTexts[i];

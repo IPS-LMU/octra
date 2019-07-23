@@ -1207,7 +1207,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
               if (segment.transcript === '') {
                 this.oContext.globalAlpha = 0.2;
                 this.oContext.fillStyle = 'red';
-              } else if (segment.transcript === this.transcr.breakMarker.code) {
+              } else if (!isNullOrUndefined(this.transcr.breakMarker) && segment.transcript === this.transcr.breakMarker.code) {
                 this.oContext.globalAlpha = 0.2;
                 this.oContext.fillStyle = 'blue';
               } else if (segment.transcript !== '') {

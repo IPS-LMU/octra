@@ -82,34 +82,26 @@ export class KeyMapping {
       name = 'CTRL';
     }
 
-    let isCombination = false;
     let comboKey = '';
 
-    // only one kombination permitted
-    if (alt && !(ctrl || meta || shift)) {
-      isCombination = true;
-    } else if (ctrl && !(alt || meta || shift)) {
-      isCombination = true;
-    } else if (meta && !(alt || ctrl || shift)) {
-      isCombination = true;
-    } else if (shift && !(alt || ctrl || meta)) {
-      isCombination = true;
+    if (ctrl) {
+      comboKey = 'CTRL';
     }
-
-    if (isCombination) {
-      if (alt) {
-        comboKey = 'ALT';
-      } else if (ctrl) {
-        comboKey = 'CTRL';
-      } else if (meta) {
-        comboKey = 'META';
-      } else if (shift) {
-        comboKey = 'SHIFT';
-      }
+    if (alt) {
+      comboKey += (comboKey !== '') ? ' + ' : '';
+      comboKey += 'ALT';
+    }
+    if (meta) {
+      comboKey += (comboKey !== '') ? ' + ' : '';
+      comboKey += 'META';
+    }
+    if (shift) {
+      comboKey += (comboKey !== '') ? ' + ' : '';
+      comboKey += 'SHIFT';
     }
 
     // if name == comboKey, only one special Key pressed
-    if (name !== comboKey) {
+    if (comboKey.indexOf(name) < 0) {
       if (comboKey !== '') {
         comboKey += ' + ';
       }

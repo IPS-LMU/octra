@@ -93,6 +93,8 @@ export class TranscriptionService {
     return this.settingsService.projectsettings;
   }
 
+  public tasksBeforeSend: Promise<any>[] = [];
+
   constructor(private audio: AudioService,
               private appStorage: AppStorageService,
               private uiService: UserInteractionsService,

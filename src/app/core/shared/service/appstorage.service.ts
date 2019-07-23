@@ -44,6 +44,9 @@ export class OIDBLink implements IIDBLink {
 
 @Injectable()
 export class AppStorageService {
+  get isSaving(): boolean {
+    return this._isSaving;
+  }
   get secondsPerLine(): number {
     return this._secondsPerLine;
   }
@@ -382,6 +385,8 @@ export class AppStorageService {
   @SessionStorage('jobsLeft') jobsLeft: number;
 
   public saving: EventEmitter<string> = new EventEmitter<string>();
+  private _isSaving = false;
+
   private _interface: string = null;
   // is user on the login page?
   private login: boolean;
@@ -652,6 +657,7 @@ export class AppStorageService {
     // TODO why not url?
     if (this.usemode !== 'url') {
       if (key === 'annotation' || key === 'feedback') {
+        this._isSaving = true;
         this.saving.emit('saving');
       }
 
@@ -659,9 +665,11 @@ export class AppStorageService {
         case 'annotation':
           this.changeAnnotationLevel(value.num, value.level).then(
             () => {
+              this._isSaving = false;
               this.saving.emit('success');
             }
           ).catch((err) => {
+            this._isSaving = false;
             this.saving.emit('error');
             console.error(`error on saving`);
             console.error(err);
@@ -670,9 +678,11 @@ export class AppStorageService {
         case 'feedback':
           this._idb.save('options', 'feedback', {value}).then(
             () => {
+              this._isSaving = false;
               this.saving.emit('success');
             }
           ).catch((err) => {
+            this._isSaving = false;
             this.saving.emit('error');
             console.error(err);
           });

@@ -548,14 +548,6 @@ export class TranscriptionComponent implements OnInit,
     this.sendOk = true;
 
     const json: any = this.transcrService.exportDataToJSON();
-    if (this.settingsService.isTheme('shortAudioFiles')) {
-      if (this.appStorage.feedback === 'SEVERE') {
-        // postpone audio file
-        json.status = 'POSTPONED';
-        // don't overwrite server comment
-        json.comment = this.appStorage.servercomment;
-      }
-    }
 
     if (this.appStorage.usemode === 'online') {
       this.transcrSendingModal.open();

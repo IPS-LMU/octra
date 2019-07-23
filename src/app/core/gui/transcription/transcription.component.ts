@@ -20,7 +20,6 @@ import {
   APIService,
   AppStorageService,
   AudioService,
-  Entry,
   KeymappingService,
   MessageService,
   SettingsService,
@@ -53,6 +52,7 @@ import {
   ModalEndAnswer,
   TranscriptionDemoEndModalComponent
 } from '../../modals/transcription-demo-end/transcription-demo-end-modal.component';
+import {GeneralShortcut} from '../../modals/shortcuts-modal/shortcuts-modal.component';
 
 @Component({
   selector: 'app-transcription',
@@ -90,6 +90,8 @@ export class TranscriptionComponent implements OnInit,
   private get appSettings() {
     return this.settingsService.appSettings;
   }
+
+  public generalShortcuts: GeneralShortcut[] = [];
 
   constructor(public router: Router,
               private _componentFactoryResolver: ComponentFactoryResolver,
@@ -138,6 +140,19 @@ export class TranscriptionComponent implements OnInit,
         console.error(error);
       }));
 
+    this.subscrmanager.add(this.keyMap.onkeydown.subscribe((event) => {
+      if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
+        if (event.comboKey === 'ALT + SHIFT + 1') {
+          this.sendTranscriptionForShortAudioFiles('bad');
+        } else if (event.comboKey === 'ALT + SHIFT + 2') {
+          this.sendTranscriptionForShortAudioFiles('middle');
+        } else if (event.comboKey === 'ALT + SHIFT + 3') {
+          this.sendTranscriptionForShortAudioFiles('good');
+        }
+      }
+    }));
+
+
     // TODO remove this case for later versions
     this.interface = (this.appStorage.Interface === 'Editor without signal display') ? 'Dictaphone Editor' : this.appStorage.Interface;
   }
@@ -153,12 +168,9 @@ export class TranscriptionComponent implements OnInit,
   @ViewChild('inactivityModal', {static: false}) inactivityModal: InactivityModalComponent;
 
   public sendError = '';
-  public showdetails = false;
   public saving = '';
   public interface = '';
-  public shortcutslist: Entry[] = [];
   public editorloaded = false;
-  public feedbackExpanded = false;
   user: number;
   public platform = BrowserInfo.platform;
   private subscrmanager: SubscriptionManager;
@@ -373,6 +385,36 @@ export class TranscriptionComponent implements OnInit,
     if (this.appStorage.usemode === 'online') {
       console.log(`opened job ${this.appStorage.dataID} in project ${this.appStorage.user.project}`);
     }
+
+    // set general shortcuts
+    this.generalShortcuts.push({
+      label: 'feedback and send 1',
+      focusonly: false,
+      combination: {
+        mac: 'SHIFT + ALT + 1',
+        pc: 'SHIFT + ALT + 1'
+      }
+    });
+
+    this.generalShortcuts.push({
+      label: 'feedback and send 2',
+      focusonly: false,
+      combination: {
+        mac: 'SHIFT + ALT + 2',
+        pc: 'SHIFT + ALT + 2'
+      }
+    });
+
+    this.generalShortcuts.push({
+      label: 'feedback and send 3',
+      focusonly: false,
+      combination: {
+        mac: 'SHIFT + ALT + 3',
+        pc: 'SHIFT + ALT + 3'
+      }
+    });
+    this.cd.markForCheck();
+    this.cd.detectChanges();
   }
 
   ngAfterViewInit() {
@@ -506,7 +548,6 @@ export class TranscriptionComponent implements OnInit,
     this.sendOk = true;
 
     const json: any = this.transcrService.exportDataToJSON();
-
     if (this.settingsService.isTheme('shortAudioFiles')) {
       if (this.appStorage.feedback === 'SEVERE') {
         // postpone audio file
@@ -566,28 +607,57 @@ export class TranscriptionComponent implements OnInit,
   }
 
   onSendButtonClick() {
-    let showOverview = true;
-    let validTranscriptOnly = false;
+    new Promise<void>((resolve) => {
+      // make sure, that transcription is send after saving
+      if (!this.appStorage.isSaving) {
+        resolve();
+      } else {
+        this.subscrmanager.add(this.appStorage.saving.subscribe((status) => {
+          if (status === 'success' || status === 'error') {
+            resolve();
+          }
+        }));
+      }
+    }).then(() => {
+      // after saving
 
-    this.transcrService.validateAll();
-    const validTranscript = this.transcrService.transcriptValid;
+      // make sure no tasks are pending
+      new Promise<void>((resolve) => {
+        if (this.transcrService.tasksBeforeSend.length === 0) {
+          resolve();
+        } else {
+          Promise.all(this.transcrService.tasksBeforeSend).then(() => {
+            this.transcrService.tasksBeforeSend = [];
+            resolve();
+          });
+        }
+      }).then(() => {
+        let showOverview = true;
+        let validTranscriptOnly = false;
 
-    if (!isNullOrUndefined(this.projectsettings.octra) && !isNullOrUndefined(this.projectsettings.octra.showOverviewIfTranscriptNotValid)) {
-      showOverview = this.projectsettings.octra.showOverviewIfTranscriptNotValid;
-    }
+        this.transcrService.validateAll();
+        const validTranscript = this.transcrService.transcriptValid;
 
-    if (!isNullOrUndefined(this.projectsettings.octra) && !isNullOrUndefined(this.projectsettings.octra.sendValidatedTranscriptionOnly)) {
-      validTranscriptOnly = this.projectsettings.octra.sendValidatedTranscriptionOnly;
-    }
+        if (!isNullOrUndefined(this.projectsettings.octra) &&
+          !isNullOrUndefined(this.projectsettings.octra.showOverviewIfTranscriptNotValid)) {
+          showOverview = this.projectsettings.octra.showOverviewIfTranscriptNotValid;
+        }
 
-    if ((
-      (!validTranscript && showOverview) || !this.modalOverview.feedBackComponent.valid)
-      || (validTranscriptOnly && !validTranscript)
-    ) {
-      this.modalOverview.open();
-    } else {
-      this.onSendNowClick();
-    }
+        if (!isNullOrUndefined(this.projectsettings.octra)
+          && !isNullOrUndefined(this.projectsettings.octra.sendValidatedTranscriptionOnly)) {
+          validTranscriptOnly = this.projectsettings.octra.sendValidatedTranscriptionOnly;
+        }
+
+        if ((
+          (!validTranscript && showOverview) || !this.modalOverview.feedBackComponent.valid)
+          || (validTranscriptOnly && !validTranscript)
+        ) {
+          this.modalOverview.open();
+        } else {
+          this.onSendNowClick();
+        }
+      });
+    });
   }
 
   nextTranscription(json: any) {

@@ -12,6 +12,10 @@ export class KeymappingService {
     return this._onkeyup;
   }
 
+  get beforeKeyDown(): EventEmitter<any> {
+    return this._beforeKeyDown;
+  }
+
   constructor() {
     this._onkeydown = new EventEmitter<any>();
     window.onkeydown = this.onKeyDown;
@@ -22,11 +26,14 @@ export class KeymappingService {
 
   private shortcuts: any[] = [];
 
+  private readonly _beforeKeyDown: EventEmitter<any> = new EventEmitter<any>();
   private readonly _onkeydown: EventEmitter<any>;
 
   private readonly _onkeyup: EventEmitter<any>;
+
   private onKeyDown = ($event) => {
     const combo = KeyMapping.getShortcutCombination($event);
+    this._beforeKeyDown.emit({comboKey: combo, event: $event});
     this._onkeydown.emit({comboKey: combo, event: $event});
   }
   private onKeyUp = ($event) => {

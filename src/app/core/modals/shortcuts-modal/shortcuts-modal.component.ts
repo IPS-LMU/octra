@@ -6,18 +6,28 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import {BrowserInfo} from '../../shared';
 
+export interface GeneralShortcut {
+  label: string;
+  combination: {
+    mac: string;
+    pc: string;
+  },
+  focusonly: boolean;
+}
+
 @Component({
   selector: 'app-shortcuts-modal',
   templateUrl: './shortcuts-modal.component.html',
   styleUrls: ['./shortcuts-modal.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-
 export class ShortcutsModalComponent implements OnInit {
   modalRef: BsModalRef;
   public visible = false;
   @Input() editor = '';
-  public shortcuts = [];
+
+  @Input() public generalShortcuts: GeneralShortcut[] = [];
+
   config: ModalOptions = {
     keyboard: false,
     backdrop: false,
@@ -26,6 +36,7 @@ export class ShortcutsModalComponent implements OnInit {
   @ViewChild('modal', {static: true}) modal: any;
   protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
+
   private subscrmanager = new SubscriptionManager();
 
   public get platform(): string {
@@ -45,6 +56,7 @@ export class ShortcutsModalComponent implements OnInit {
       this.modal.show(this.modal, this.config);
       this.visible = true;
       this.cd.markForCheck();
+      this.cd.detectChanges();
       const subscr = this.actionperformed.subscribe(
         (action) => {
           resolve(action);

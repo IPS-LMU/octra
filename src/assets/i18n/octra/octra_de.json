@@ -174,7 +174,11 @@
       "jump_last_segment": "Speichern & zum vorherigen Segment springen",
       "jump_next_segment": "Speichern & zum nächsten Segment springen",
       "close_save": "Speichern & Fenster schließen",
-      "delete boundaries": "Ausgewählte Segmentgrenzen entfernen und Transkript zusammenführen"
+      "delete boundaries": "Ausgewählte Segmentgrenzen entfernen und Transkript zusammenführen",
+      "general shortcuts": "Allgmeneine Tastenkombinationen",
+      "feedback and send 1": "Transcription mit einem Stern senden",
+      "feedback and send 2": "Transcription mit zwei Sternen senden",
+      "feedback and send 3": "Transcription mit drei Sternen senden"
     },
     "inactivity": {
       "header": "Längere Inaktivität entdeckt",

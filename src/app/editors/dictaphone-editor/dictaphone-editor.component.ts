@@ -60,6 +60,19 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
               public appStorage: AppStorageService) {
     super();
     this.subscrmanager = new SubscriptionManager();
+
+    if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
+      this.subscrmanager.add(this.keyMap.beforeKeyDown.subscribe((event) => {
+        if (event.comboKey === 'ALT + SHIFT + 1' ||
+          event.comboKey === 'ALT + SHIFT + 2' ||
+          event.comboKey === 'ALT + SHIFT + 3') {
+          this.transcrService.tasksBeforeSend.push(new Promise<void>((resolve) => {
+            this.saveTranscript();
+            resolve();
+          }));
+        }
+      }));
+    }
   }
 
   ngOnInit() {

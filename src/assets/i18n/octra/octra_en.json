@@ -174,7 +174,11 @@
       "jump_last_segment": "Save & jump to previous segment",
       "jump_next_segment": "Save & jump to next segment",
       "close_save": "Save & close window",
-      "delete boundaries": "Delete selected segment boundaries and join transcripts"
+      "delete boundaries": "Delete selected segment boundaries and join transcripts",
+      "general shortcuts": "General shortcuts",
+      "feedback and send 1": "Send transcription with one star",
+      "feedback and send 2": "Send transcription with two stars",
+      "feedback and send 3": "Send transcription with three stars"
     },
     "inactivity": {
       "header": "Longer absence detected",

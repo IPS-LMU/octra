@@ -12,7 +12,7 @@
 This is a web-application for the orthographic transcription of longer
 audiofiles. For now, it uses three editors for the orthographic transcription:
 
-* Dictaphone: An typical, easy-to-use editor with just a texteditor and an audioplayer.
+* Dictaphone Editor: An typical, easy-to-use editor with just a texteditor and an audioplayer.
 * Linear-Editor: This editor shows two signaldisplays: One for the whole view of the signal and one as loupe. You can set boundaries and define segments.
 * 2D-Editor: This editor breaks the whole view of the signal to pieces and shows the pieces as lines one after one. Here you can set boundaries und define segments too.
 

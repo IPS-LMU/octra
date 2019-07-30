@@ -524,6 +524,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
             })
             .on('error', (e) => {
               // e is the error
+              console.error(`cutting error`);
               console.error(e);
             })
             .on('end', () => {
@@ -549,6 +550,8 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
         }
         this.tools.audioCutting.cuttingSpeed = -1;
         this.tools.audioCutting.zippingSpeed = -1;
+
+        console.error(`other error`);
         console.error(err);
       }
     ));

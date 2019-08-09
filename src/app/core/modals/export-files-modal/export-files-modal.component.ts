@@ -177,8 +177,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
         window.URL.revokeObjectURL(this.parentformat.uri.toString());
       }
       const test = new File([this.transcrService.audiomanager.ressource.arraybuffer], this.parentformat.download);
-      const urlobj = window.URL.createObjectURL(test);
-      this.parentformat.uri = this.sanitize(urlobj);
+      this.setParentFormatURI(window.URL.createObjectURL(test));
       this.preparing = {
         name: 'Audio',
         preparing: false
@@ -188,6 +187,12 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     }
   }
 
+  private setParentFormatURI(url: string) {
+    if (!isNullOrUndefined(this.parentformat.uri)) {
+      window.URL.revokeObjectURL(this.parentformat.uri['changingThisBreaksApplicationSecurity']);
+    }
+    this.parentformat.uri = this.sanitize(url);
+  }
 
   onSelectionChange(converter: Converter, value: any) {
     if (value !== '') {
@@ -220,8 +225,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
           window.URL.revokeObjectURL(this.parentformat.uri.toString());
         }
         const test = new File([result.content], result.name);
-        const urlobj = window.URL.createObjectURL(test);
-        this.parentformat.uri = this.sanitize(urlobj);
+        this.setParentFormatURI(window.URL.createObjectURL(test));
         this.preparing = {
           name: converter.name,
           preparing: false
@@ -242,8 +246,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
         window.URL.revokeObjectURL(this.parentformat.uri.toString());
       }
       const json = new File([JSON.stringify(this.transcrService.extractUI(this.uiService.elements), null, 2)], this.parentformat.download);
-      const urlobj = window.URL.createObjectURL(json);
-      this.parentformat.uri = this.sanitize(urlobj);
+      this.setParentFormatURI(window.URL.createObjectURL(json));
       this.preparing = {
         name: 'Protocol',
         preparing: false
@@ -278,6 +281,15 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     this.tools.audioCutting.subscriptionIDs = [-1, -1];
     this.visible = false;
     this.subscrmanager.destroy();
+
+    if (!isNullOrUndefined(this.tools.audioCutting.result.url)) {
+      window.URL.revokeObjectURL(this.tools.audioCutting.result.url);
+    }
+
+    if (!isNullOrUndefined(this.parentformat.uri)) {
+      const url = this.parentformat.uri['changingThisBreaksApplicationSecurity'];
+      window.URL.revokeObjectURL(url);
+    }
   }
 
   public splitAudioAPI() {
@@ -535,6 +547,11 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
             this.tools.audioCutting.status = 'finished';
             this.tools.audioCutting.progress = 100;
             this.tools.audioCutting.progressbarType = 'success';
+
+            if (!isNullOrUndefined(this.tools.audioCutting.result.url)) {
+              window.URL.revokeObjectURL(this.tools.audioCutting.result.url);
+            }
+
             this.tools.audioCutting.result.url = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(data));
             this.tools.audioCutting.result.filename = this.transcrService.audiomanager.ressource.info.name + '.zip';
             // finished

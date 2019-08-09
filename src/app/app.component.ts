@@ -46,62 +46,61 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
               private multiThreading: MultiThreadingService,
               private http: HttpClient) {
 
-
     // overwrite console.log
-    const oldLog = console.log;
-    const serv = this.bugService;
-    (() => {
-      // tslint:disable-next-line:only-arrow-functions
-      console.log = function (message) {
-        serv.addEntry(ConsoleType.LOG, message);
-        oldLog.apply(console, arguments);
-      };
-    })();
+    if (!AppInfo.debugging) {
+      const oldLog = console.log;
+      const serv = this.bugService;
+      (() => {
+        // tslint:disable-next-line:only-arrow-functions
+        console.log = function (message) {
+          serv.addEntry(ConsoleType.LOG, message);
+          oldLog.apply(console, arguments);
+        };
+      })();
 
-    // overwrite console.err
-    const oldError = console.error;
-    (() => {
-      // tslint:disable-next-line:only-arrow-functions
-      console.error = function (error) {
-        let debug = '';
-        let stack = '';
+      // overwrite console.err
+      const oldError = console.error;
+      (() => {
+        // tslint:disable-next-line:only-arrow-functions
+        console.error = function (error) {
+          let debug = '';
+          let stack = '';
 
-        if (typeof error === 'string') {
-          debug = error;
-        } else {
-          if (error instanceof Error) {
-            debug = error.message;
-            stack = error.stack;
+          if (typeof error === 'string') {
+            debug = error;
           } else {
-            if (typeof error === 'object') {
-              // some other type of object
-              debug = 'OBJECT';
-              stack = JSON.stringify(error);
+            if (error instanceof Error) {
+              debug = error.message;
+              stack = error.stack;
             } else {
-              debug = error;
+              if (typeof error === 'object') {
+                // some other type of object
+                debug = 'OBJECT';
+                stack = JSON.stringify(error);
+              } else {
+                debug = error;
+              }
             }
           }
-        }
 
-        if (debug !== '') {
-          serv.addEntry(ConsoleType.ERROR, `${debug}: ${stack}`);
-        }
+          if (debug !== '') {
+            serv.addEntry(ConsoleType.ERROR, `${debug}: ${stack}`);
+          }
 
-        oldError.apply(console, arguments);
-      };
-    })();
+          oldError.apply(console, arguments);
+        };
+      })();
 
-    // overwrite console.warn
-    const oldWarn = console.warn;
-    (() => {
-      // tslint:disable-next-line:only-arrow-functions
-      console.warn = function (message) {
-        serv.addEntry(ConsoleType.WARN, message);
-        oldWarn.apply(console, arguments);
-      };
-    })();
-
-
+      // overwrite console.warn
+      const oldWarn = console.warn;
+      (() => {
+        // tslint:disable-next-line:only-arrow-functions
+        console.warn = function (message) {
+          serv.addEntry(ConsoleType.WARN, message);
+          oldWarn.apply(console, arguments);
+        };
+      })();
+    }
   }
 
   ngOnInit() {

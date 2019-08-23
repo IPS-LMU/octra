@@ -1,7 +1,9 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {AppStorageService, SettingsService} from '../../shared/service';
 import {AppSettings, ASRLanguage} from '../../obj/Settings';
 import {AsrService} from '../../shared/service/asr.service';
+import {isNullOrUndefined} from '../../shared/Functions';
+import {AudioChunk} from '../../../media-components/obj/media/audio/AudioManager';
 
 @Component({
   selector: 'app-asr-options',
@@ -15,6 +17,12 @@ export class AsrOptionsComponent implements OnInit {
   }
 
   public serviceProviders = {};
+  public settings = {
+    onlyForThisOne: false,
+    allSegmentsNext: false
+  };
+
+  @Input() audioChunk: AudioChunk;
 
   constructor(public appStorage: AppStorageService, public settingsService: SettingsService,
               public asrService: AsrService) {
@@ -41,5 +49,20 @@ export class AsrOptionsComponent implements OnInit {
 
   onASRLangChanged(lang: ASRLanguage) {
     this.asrService.selectedLanguage = lang;
+  }
+
+  checkBoxesChanged() {
+    // test ASR
+    if (!isNullOrUndefined(this.asrService.selectedLanguage)) {
+      this.asrService.transcribeSignalWithASR(this.audioChunk).subscribe(
+        (result: string) => {
+          console.log('ASR Result:');
+          console.log(result);
+        },
+        error => {
+          console.error(error);
+        }
+      );
+    }
   }
 }

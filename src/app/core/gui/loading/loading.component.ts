@@ -42,7 +42,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-
     new Promise<void>((resolve, reject) => {
       if (this.settService.isDBLoadded) {
         resolve();

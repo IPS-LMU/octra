@@ -229,6 +229,28 @@ export class AppStorageService {
     });
   }
 
+  get asrSelectedLanguage(): string {
+    return this._asr.selectedLanguage;
+  }
+
+  set asrSelectedLanguage(value: string) {
+    this._asr.selectedLanguage = value;
+    this.idb.save('options', 'asr', {value: this._asr}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  get asrSelectedService(): string {
+    return this._asr.selectedService;
+  }
+
+  set asrSelectedService(value: string) {
+    this._asr.selectedService = value;
+    this.idb.save('options', 'asr', {value: this._asr}).catch((err) => {
+      console.error(err);
+    });
+  }
+
   /* Getter/Setter IDB Storage */
   get version(): string {
     return this._version;
@@ -425,6 +447,10 @@ export class AppStorageService {
   private _annotation: OIDBLevel[] = null;
   private _annotationLinks: OIDBLink[] = null;
   private _levelcounter = 0;
+  private _asr = {
+    selectedLanguage: null,
+    selectedService: null
+  };
 
 
   public loginActivityChanged = new Subject<boolean>();
@@ -540,6 +566,7 @@ export class AppStorageService {
         for (let i = 0; i < variables.length; i++) {
           const variable = variables[i];
 
+          console.log('read ' + variable.attribute);
           if (this['' + variable.attribute + ''] !== undefined) {
             if (variable.hasOwnProperty('attribute') && variable.hasOwnProperty('key')) {
               promises.push(this.loadOptionFromIDB(variable.key).then(
@@ -550,10 +577,10 @@ export class AppStorageService {
                 }
               ));
             } else {
-              reject(Error('loadOptions: variables parameter must be of type {attribute:string, key:string}[]'));
+              console.error(Error('loadOptions: variables parameter must be of type {attribute:string, key:string}[]'));
             }
           } else {
-            reject(Error(`session service needs an attribute called \'${variable.attribute}\'`));
+            console.error(Error(`session service needs an attribute called \'${variable.attribute}\'`));
           }
         }
 
@@ -787,6 +814,10 @@ export class AppStorageService {
         {
           attribute: '_audioSettings',
           key: 'audioSettings'
+        },
+        {
+          attribute: '_asr',
+          key: 'asr'
         }
       ]
     ).then(() => {

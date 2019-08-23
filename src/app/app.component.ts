@@ -9,7 +9,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {NavigationComponent} from './core/gui/navbar';
 import {isNullOrUndefined} from './core/shared/Functions';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
-import {HttpClient} from '@angular/common/http';
+import {AsrService} from './core/shared/service/asr.service';
+import {ASRLanguage} from './core/obj/Settings';
 
 @Component({
   selector: 'app-octra',
@@ -44,7 +45,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
               private router: Router,
               private route: ActivatedRoute,
               private multiThreading: MultiThreadingService,
-              private http: HttpClient) {
+              private asrService: AsrService) {
 
     // overwrite console.log
     if (!AppInfo.debugging) {
@@ -104,6 +105,23 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    this.subscrmanager.add(this.settingsService.dbloaded.subscribe(
+      () => {
+        console.log('ASR test');
+        if (!isNullOrUndefined(this.appStorage.asrSelectedService) && !isNullOrUndefined(this.appStorage.asrSelectedLanguage)) {
+          // set asr settings
+          const lang: ASRLanguage = this.asrService.getLanguageByCode(this.appStorage.asrSelectedLanguage, this.appStorage.asrSelectedService);
+          if (!isNullOrUndefined(lang)) {
+            this.asrService.selectedLanguage = lang;
+          } else {
+            console.error('Could not read ASR language from database');
+            console.log(this.appStorage.asrSelectedService);
+            console.log(this.appStorage.asrSelectedLanguage);
+          }
+        }
+      }
+    ));
+
     // after project settings loaded
     this.subscrmanager.add(this.settingsService.projectsettingsloaded.subscribe(
       () => {
@@ -125,6 +143,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
         && this.settingsService.appSettings.octra.tracking.active !== '') {
         this.appendTrackingCode(this.settingsService.appSettings.octra.tracking.active);
       }
+
 
     }).catch((error) => {
       console.error(error);

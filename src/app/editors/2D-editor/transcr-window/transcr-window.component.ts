@@ -31,6 +31,7 @@ import {AudioNavigationComponent} from '../../../media-components/components/aud
 import {AudioChunk, AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {isNullOrUndefined} from '../../../core/shared/Functions';
 import {AudioviewerConfig} from '../../../media-components/components/audio/audioviewer';
+import {AsrService} from '../../../core/shared/service/asr.service';
 
 @Component({
   selector: 'app-transcr-window',
@@ -85,7 +86,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
               public uiService: UserInteractionsService,
               public settingsService: SettingsService,
               public appStorage: AppStorageService,
-              public cd: ChangeDetectorRef) {
+              public cd: ChangeDetectorRef,
+              private asrService: AsrService) {
 
     this.subscrmanager = new SubscriptionManager();
 
@@ -104,6 +106,22 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
       }));
     }
+
+    this.subscrmanager.add(this.asrService.resultRetrieved.subscribe(
+      (result: {
+        sampleStart: number,
+        sampleLength: number,
+        text: string
+      }) => {
+        if (result.sampleStart === this.audiochunk.time.start.originalSample.value && result.sampleLength === this.audiochunk.time.duration.originalSample.value) {
+          // text for this chunk retrieved
+          this.editor.rawText = result.text;
+        }
+      },
+      (error) => {
+
+      }
+    ));
   }
 
   @ViewChild('loupe', {static: true}) loupe: LoupeComponent;

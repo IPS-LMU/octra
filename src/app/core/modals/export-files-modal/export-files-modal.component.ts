@@ -432,6 +432,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     }
 
     // start cutting
+    // TODO arraybuffer is c
     this.tools.audioCutting.wavFormat = new WavFormat();
     this.tools.audioCutting.wavFormat.init(
       this.transcrService.audiomanager.ressource.info.fullname, this.transcrService.audiomanager.ressource.arraybuffer

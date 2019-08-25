@@ -65,3 +65,23 @@
 #dropdown-button {
   margin: 0 1px;
 }
+
+:host {
+  background-color: whitesmoke;
+  border: 3px;
+  flex: auto;
+  flex-direction: column;
+  display: flex;
+  padding: 10px 10px 5px;
+  margin-bottom: 5px;
+}
+
+#asr-bar {
+  float: right;
+  margin-left: 50px;
+}
+
+.asr-label {
+  position: absolute;
+  margin-top: 4px;
+}

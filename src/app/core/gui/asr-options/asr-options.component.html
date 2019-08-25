@@ -1,106 +1,111 @@
-<div id="dropdown-button" class="btn-group" dropdown placement="down right" (mousemove)="onMouseMove()"
-     (mouseleave)="onMouseOut();"
-     [insideClick]="true" #dropdown="bs-dropdown">
-  <label for="button-basic" style="vertical-align: middle;margin-right:10px;">Language: </label>
-  <button id="button-basic" dropdownToggle type="button"
-          class="btn btn-outline-secondary btn-sm dropdown-toggle"
-          aria-controls="dropdown-basic">
-    <ng-container *ngIf="asrService.selectedLanguage === null; else asrAllSet">
-      {{appSettings.octra.plugins.asr.languages[0].code | uppercase}}
-      ({{getShortCode(appSettings.octra.plugins.asr.languages[0].code)}})
-      [{{appSettings.octra.plugins.asr.languages[0].asr}}]
-    </ng-container>
-    <ng-template #asrAllSet>
-      {{asrService.selectedLanguage.name}} ({{getShortCode(asrService.selectedLanguage.code)}})
-      [{{asrService.selectedLanguage.asr}}]
-    </ng-template>
-    <span class="caret"></span>
-  </button>
-  <div id="dropdown-basic" *dropdownMenu class="dropdown-menu" (mousemove)="onMouseMove()" (mouseleave)="onMouseOut();"
-       role="menu" aria-labelledby="button-basic" style="padding:5px;">
-    <p style="font-size: 0.9em;text-align: center;">
-      Click on a service logo for more information.
-    </p>
-    <table class="table table-hover languageTable">
-      <thead>
-      <tr>
-        <th>Language</th>
-        <th>Speech Recognition</th>
-      </tr>
-      </thead>
-      <tbody>
-      <ng-container *ngFor="let lang of appSettings.octra.plugins.asr.languages; let i = index;">
-        <tr [ngClass]="{
+<span class="asr-label">ASR -</span>
+<div id="asr-bar">
+  <div id="dropdown-button" class="btn-group" dropdown placement="down right" (mousemove)="onMouseMove()"
+       (mouseleave)="onMouseOut();"
+       [insideClick]="true" #dropdown="bs-dropdown">
+    <label for="button-basic" style="vertical-align: middle;margin-right:10px;">Language: </label>
+    <button id="button-basic" dropdownToggle type="button"
+            class="btn btn-outline-secondary btn-sm dropdown-toggle"
+            aria-controls="dropdown-basic">
+      <ng-container *ngIf="asrService.selectedLanguage === null; else asrAllSet">
+        {{appSettings.octra.plugins.asr.languages[0].code | uppercase}}
+        ({{getShortCode(appSettings.octra.plugins.asr.languages[0].code)}})
+        [{{appSettings.octra.plugins.asr.languages[0].asr}}]
+      </ng-container>
+      <ng-template #asrAllSet>
+        {{asrService.selectedLanguage.name}} ({{getShortCode(asrService.selectedLanguage.code)}})
+        [{{asrService.selectedLanguage.asr}}]
+      </ng-template>
+      <span class="caret"></span>
+    </button>
+    <div id="dropdown-basic" *dropdownMenu class="dropdown-menu" (mousemove)="onMouseMove()"
+         (mouseleave)="onMouseOut();"
+         role="menu" aria-labelledby="button-basic" style="padding:5px;">
+      <p style="font-size: 0.9em;text-align: center;">
+        Click on a service logo for more information.
+      </p>
+      <table class="table table-hover languageTable">
+        <thead>
+        <tr>
+          <th>Language</th>
+          <th>Speech Recognition</th>
+        </tr>
+        </thead>
+        <tbody>
+        <ng-container *ngFor="let lang of appSettings.octra.plugins.asr.languages; let i = index;">
+          <tr [ngClass]="{
                             selected:  !(asrService.selectedLanguage === null)
                                         && (asrService.selectedLanguage.code === lang.code)
                                         && (asrService.selectedLanguage.asr === lang.asr)
                             }"
-        >
-          <td class="col-language"
-              (click)="onASRLangChanged(lang)">
-            <ng-container
-              *ngIf="lang !== undefined && lang.state === 'active'">
-              {{lang.name}} ({{getShortCode(lang.code)}}) [{{lang.asr}}]
-            </ng-container>
-            <ng-container
-              *ngIf="lang !== undefined && lang.state === 'inactive'">
-              {{lang.name}} ({{getShortCode(lang.code)}}) [{{lang.asr}}] (currently not
-              available)
-            </ng-container>
-          </td>
-          <td class="col-asr">
-            <img [src]="serviceProviders[lang.asr]?.logoURL" class="logo"
-                 popoverTitle="Service Information"
-                 [popover]="asrDescription" triggers="focus" #pop="bs-popover" [outsideClick]="true"
-                 (click)="pop.toggle();">
-            <ng-template #asrDescription>
-              <table class="table table-sm table-borderless">
-                <tbody>
-                <tr>
-                  <td>
-                    <fa-icon icon="database"></fa-icon>
-                  </td>
-                  <td>
-                    {{serviceProviders[lang.asr]?.dataStoragePolicy}}
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <fa-icon [icon]="['far', 'handshake']"></fa-icon>
-                  </td>
-                  <td>
-                    <a [href]="serviceProviders[lang.asr]?.termsURL"
-                       target="_blank">Terms
-                      &amp; Conditions</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <fa-icon icon="globe"></fa-icon>
-                  </td>
-                  <td>
-                    <a [href]="serviceProviders[lang.asr]?.homepageURL"
-                       target="_blank">Homepage</a>
-                  </td>
-                </tr>
-                </tbody>
-              </table>
-            </ng-template>
-          </td>
-        </tr>
-      </ng-container>
-      </tbody>
-    </table>
+          >
+            <td class="col-language"
+                (click)="onASRLangChanged(lang)">
+              <ng-container
+                *ngIf="lang !== undefined && lang.state === 'active'">
+                {{lang.name}} ({{getShortCode(lang.code)}}) [{{lang.asr}}]
+              </ng-container>
+              <ng-container
+                *ngIf="lang !== undefined && lang.state === 'inactive'">
+                {{lang.name}} ({{getShortCode(lang.code)}}) [{{lang.asr}}] (currently not
+                available)
+              </ng-container>
+            </td>
+            <td class="col-asr">
+              <img [src]="serviceProviders[lang.asr]?.logoURL" class="logo"
+                   popoverTitle="Service Information"
+                   [popover]="asrDescription" triggers="focus" #pop="bs-popover" [outsideClick]="true"
+                   (click)="pop.toggle();">
+              <ng-template #asrDescription>
+                <table class="table table-sm table-borderless">
+                  <tbody>
+                  <tr>
+                    <td>
+                      <fa-icon icon="database"></fa-icon>
+                    </td>
+                    <td>
+                      {{serviceProviders[lang.asr]?.dataStoragePolicy}}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <fa-icon [icon]="['far', 'handshake']"></fa-icon>
+                    </td>
+                    <td>
+                      <a [href]="serviceProviders[lang.asr]?.termsURL"
+                         target="_blank">Terms
+                        &amp; Conditions</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <fa-icon icon="globe"></fa-icon>
+                    </td>
+                    <td>
+                      <a [href]="serviceProviders[lang.asr]?.homepageURL"
+                         target="_blank">Homepage</a>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </ng-template>
+            </td>
+          </tr>
+        </ng-container>
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
-<div id="checkboxes">
-  <div class="entry">
-    <input type="checkbox" id="for-all-next" [(ngModel)]="settings.allSegmentsNext" (change)="checkBoxesChanged()"/>
-    <label for="for-all-next">for all segments coming next</label>
+  <div id="checkboxes">
+    <div class="entry">
+      <input type="checkbox" id="for-all-next" [(ngModel)]="settings.allSegmentsNext" (change)="checkBoxesChanged()"/>
+      <label for="for-all-next">for all segments coming next</label>
+    </div>
+    <div class="entry">
+      <input type="checkbox" id="only-this-one" [(ngModel)]="settings.onlyForThisOne" (change)="checkBoxesChanged()"/>
+      <label for="only-this-one">only this one</label>
+    </div>
   </div>
-  <div class="entry">
-    <input type="checkbox" id="only-this-one" [(ngModel)]="settings.onlyForThisOne" (change)="checkBoxesChanged()"/>
-    <label for="only-this-one">only this one</label>
-  </div>
+  <div class="clearfix"></div>
 </div>
 <div class="clearfix"></div>

@@ -53,6 +53,7 @@ import {
   TranscriptionDemoEndModalComponent
 } from '../../modals/transcription-demo-end/transcription-demo-end-modal.component';
 import {GeneralShortcut} from '../../modals/shortcuts-modal/shortcuts-modal.component';
+import {AsrService} from '../../shared/service/asr.service';
 
 @Component({
   selector: 'app-transcription',
@@ -106,7 +107,8 @@ export class TranscriptionComponent implements OnInit,
               public langService: TranslateService,
               private api: APIService,
               private bugService: BugReportService,
-              private cd: ChangeDetectorRef) {
+              private cd: ChangeDetectorRef,
+              private asrService: AsrService) {
     this.subscrmanager = new SubscriptionManager();
     this.audiomanager = this.audio.audiomanagers[0];
 
@@ -385,6 +387,8 @@ export class TranscriptionComponent implements OnInit,
     if (this.appStorage.usemode === 'online') {
       console.log(`opened job ${this.appStorage.dataID} in project ${this.appStorage.user.project}`);
     }
+
+    this.asrService.init();
 
     // set general shortcuts
     this.generalShortcuts.push({

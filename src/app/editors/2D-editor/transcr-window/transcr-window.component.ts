@@ -31,7 +31,7 @@ import {AudioNavigationComponent} from '../../../media-components/components/aud
 import {AudioChunk, AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {isNullOrUndefined} from '../../../core/shared/Functions';
 import {AudioviewerConfig} from '../../../media-components/components/audio/audioviewer';
-import {AsrService} from '../../../core/shared/service/asr.service';
+import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../../core/shared/service/asr.service';
 
 @Component({
   selector: 'app-transcr-window',
@@ -107,21 +107,21 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       }));
     }
 
-    this.subscrmanager.add(this.asrService.resultRetrieved.subscribe(
-      (result: {
-        sampleStart: number,
-        sampleLength: number,
-        text: string
-      }) => {
-        if (result.sampleStart === this.audiochunk.time.start.originalSample.value && result.sampleLength === this.audiochunk.time.duration.originalSample.value) {
-          // text for this chunk retrieved
-          this.editor.rawText = result.text;
+    this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
+        if (item.time.sampleStart === this.audiochunk.time.start.originalSample.value
+          && item.time.sampleLength === this.audiochunk.time.duration.originalSample.value) {
+          if (item.status === ASRProcessStatus.FINISHED && item.result !== null) {
+            this.editor.rawText = item.result;
+          }
+
+          this.cd.markForCheck();
+          this.cd.detectChanges();
         }
       },
       (error) => {
-
-      }
-    ));
+      },
+      () => {
+      }));
   }
 
   @ViewChild('loupe', {static: true}) loupe: LoupeComponent;

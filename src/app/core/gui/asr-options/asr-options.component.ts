@@ -1,7 +1,7 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {AppStorageService, SettingsService} from '../../shared/service';
 import {AppSettings, ASRLanguage} from '../../obj/Settings';
-import {AsrService} from '../../shared/service/asr.service';
+import {ASRProcessStatus, AsrService} from '../../shared/service/asr.service';
 import {isNullOrUndefined} from '../../shared/Functions';
 import {AudioChunk} from '../../../media-components/obj/media/audio/AudioManager';
 
@@ -25,7 +25,7 @@ export class AsrOptionsComponent implements OnInit {
   @Input() audioChunk: AudioChunk;
 
   constructor(public appStorage: AppStorageService, public settingsService: SettingsService,
-              public asrService: AsrService) {
+              public asrService: AsrService, private cd: ChangeDetectorRef) {
     for (let i = 0; i < this.appSettings.octra.plugins.asr.services.length; i++) {
       const provider = this.appSettings.octra.plugins.asr.services[i];
       this.serviceProviders['' + provider.provider] = provider;
@@ -54,15 +54,10 @@ export class AsrOptionsComponent implements OnInit {
   checkBoxesChanged() {
     // test ASR
     if (!isNullOrUndefined(this.asrService.selectedLanguage)) {
-      this.asrService.transcribeSignalWithASR(this.audioChunk).subscribe(
-        (result: string) => {
-          console.log('ASR Result:');
-          console.log(result);
-        },
-        error => {
-          console.error(error);
-        }
-      );
+      if (this.asrService.queue.status !== ASRProcessStatus.STARTED) {
+        this.asrService.startASR();
+      }
+      this.asrService.addToQueue(this.audioChunk);
     }
   }
 }

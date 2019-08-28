@@ -1,7 +1,7 @@
 import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {AppStorageService, SettingsService} from '../../shared/service';
 import {AppSettings, ASRLanguage} from '../../obj/Settings';
-import {ASRProcessStatus, AsrService} from '../../shared/service/asr.service';
+import {AsrService} from '../../shared/service/asr.service';
 import {isNullOrUndefined} from '../../shared/Functions';
 import {AudioChunk} from '../../../media-components/obj/media/audio/AudioManager';
 
@@ -54,10 +54,8 @@ export class AsrOptionsComponent implements OnInit {
   checkBoxesChanged() {
     // test ASR
     if (!isNullOrUndefined(this.asrService.selectedLanguage)) {
-      if (this.asrService.queue.status !== ASRProcessStatus.STARTED) {
-        this.asrService.startASR();
-      }
       this.asrService.addToQueue(this.audioChunk);
+      this.asrService.startASR();
     }
   }
 }

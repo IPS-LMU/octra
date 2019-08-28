@@ -1,4 +1,15 @@
-import {ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 import {TranscrEditorConfig} from './config';
 import {TranslateService} from '@ngx-translate/core';
 
@@ -10,6 +21,7 @@ import {AudioChunk, AudioManager} from '../../../media-components/obj/media/audi
 import {Functions, isNullOrUndefined} from '../../shared/Functions';
 import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
 import {isNumeric} from 'rxjs/internal-compatibility';
+import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../shared/service/asr.service';
 
 declare let lang: any;
 declare let document: any;
@@ -80,11 +92,17 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.textfield.summernote('code', html);
     this.validate();
     this.initPopover();
+    this.asr = {
+      status: 'inactive',
+      result: '',
+      error: ''
+    }
   }
 
   constructor(private cd: ChangeDetectorRef,
               private langService: TranslateService,
-              private transcrService: TranscriptionService) {
+              private transcrService: TranscriptionService,
+              private asrService: AsrService) {
 
     this._settings = new TranscrEditorConfig().settings;
     this.subscrmanager = new SubscriptionManager();
@@ -108,9 +126,16 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Input() validationEnabled = false;
 
   @ViewChild('validationPopover', {static: true}) validationPopover: ValidationPopoverComponent;
+  @ViewChild('transcrEditor', {static: true}) transcrEditor: ElementRef;
 
   public textfield: any = null;
   public focused = false;
+
+  public asr = {
+    status: 'inactive',
+    result: '',
+    error: ''
+  };
 
   public popovers = {
     segmentBoundary: null,
@@ -129,7 +154,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         title: ''
       }
     }
-
   };
 
   private _settings: any;
@@ -259,35 +283,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       navigation.str_array.push('fontSizeUp');
     }
 
-    /*
-
-     modules: {
-     'editor': Editor,
-     'clipboard': Clipboard,
-     'dropzone': Dropzone,
-     'codeview': Codeview,
-     'statusbar': Statusbar,
-     'fullscreen': Fullscreen,
-     'handle': Handle,
-     // FIXME: HintPopover must be front of autolink
-     //  - Script error about range when Enter key is pressed on hint popover
-     'hintPopover': HintPopover,
-     'autoLink': AutoLink,
-     'autoSync': AutoSync,
-     'placeholder': Placeholder,
-     'buttons': Buttons,
-     'toolbar': Toolbar,
-     'linkDialog': LinkDialog,
-     'linkPopover': LinkPopover,
-     'imageDialog': ImageDialog,
-     'imagePopover': ImagePopover,
-     'videoDialog': VideoDialog,
-     'helpDialog': HelpDialog,
-     'airPopover': AirPopover
-     },
-
-     */
-
     if (!isNullOrUndefined(this.textfield)) {
       this.textfield.summernote('destroy');
     }
@@ -386,7 +381,46 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
     this.loaded.emit(true);
+
+    this.asr.status = 'inactive';
+    this.asr.error = '';
+    this.asr.result = '';
+
+    const item = this.asrService.queue.getItemByTime(this.audiochunk.time.start.originalSample.value,
+      this.audiochunk.time.duration.originalSample.value);
+
+    console.log(`initialize called`);
+    this.onASRItemChange(item);
+  };
+
+  onASRItemChange(item: ASRQueueItem) {
+    console.log(`ITEMCHANGE`);
+    if (!isNullOrUndefined(item)) {
+      console.log(`ITEMCHANGE OK`);
+      if (item.time.sampleStart === this.audiochunk.time.start.originalSample.value
+        && item.time.sampleLength === this.audiochunk.time.duration.originalSample.value) {
+        if (item.status === ASRProcessStatus.FINISHED) {
+          this.asr.status = 'finished';
+          this.asr.result = item.result;
+        } else if (item.status === ASRProcessStatus.FAILED) {
+          this.asr.status = 'failed';
+          this.asr.error = this.asr.result;
+        } else if (item.status === ASRProcessStatus.STARTED) {
+          this.asr.status = 'active';
+        }
+
+        console.log(this.asr);
+        this.cd.markForCheck();
+        this.cd.detectChanges();
+      }
+    } else {
+      console.error(`item is null`);
+      this.asr.status = 'inactive';
+      this.asr.error = '';
+      this.asr.result = '';
+    }
   }
+
   /**
    * inserts a marker to the editors html
    */
@@ -418,7 +452,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     }
     this.triggerTyping();
-  }
+  };
+
   /**
    * called when key pressed in editor
    */
@@ -512,6 +547,17 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   ngOnInit() {
     this.Settings.height = this.height;
     this.initialize();
+
+    console.log(`add itemchange listener!`);
+    this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
+        console.log(`ITEMCHANGE WORKS`);
+        this.onASRItemChange(item);
+      },
+      (error) => {
+        console.error(error);
+      },
+      () => {
+      }));
   }
 
   ngOnChanges(obj) {
@@ -1125,6 +1171,14 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   public changeValidationPopoverLocation(x: number, y: number) {
     this.popoversNew.validation.location.x = x;
     this.popoversNew.validation.location.y = y;
+  }
+
+  public getHeight(): number {
+    return jQuery(this.transcrEditor.nativeElement).height();
+  }
+
+  public getWidth(): number {
+    return jQuery(this.transcrEditor.nativeElement).width();
   }
 
   /*

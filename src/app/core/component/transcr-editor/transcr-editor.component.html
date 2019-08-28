@@ -1,10 +1,30 @@
-<div class="transcr-editor" [ngStyle]="{display: (visible) ? 'inherit' : 'none'}" (change)="updateTextField()">
-    <app-validation-popover #validationPopover
-                            [ngStyle]="{
+<div class="transcr-editor" #transcrEditor [ngStyle]="{display: (visible) ? 'inherit' : 'none'}"
+     (change)="updateTextField()">
+  <app-validation-popover #validationPopover
+                          [ngStyle]="{
                                 'margin-left': popoversNew.validation.location.x + 'px',
                                 'margin-top': popoversNew.validation.location.y + 'px'
                             }"
-    ></app-validation-popover>
-    <div class="textfield">
-    </div>
+  ></app-validation-popover>
+  <div id="asrOverlay" [ngClass]="{
+    'asr-running': asr.status === 'active',
+    'asr-error': asr.status === 'failed'
+  }" [ngStyle]="{
+  'height': getHeight() + 'px',
+  'width': getWidth() + 'px',
+  'display': (asr.status === 'active' || asr.status === 'failed')? 'block' : 'none'
+  }">
+    <!--
+    (asr.status === 'active' || asr.status === 'failed')? 'block' : 'none'
+    -->
+    <p style="margin-top:50px;text-align: center;" *ngIf="asr.status === 'active'">
+      ASR currently running
+    </p>
+    <p style="margin-top:50px;text-align: center;" *ngIf="asr.status === 'failed'">
+      ASR failed
+    </p>
+  </div>
+  <!-- (asr.status === 'active' || asr.status === 'failed')? 'block' : 'none' -->
+  <div class="textfield">
+  </div>
 </div>

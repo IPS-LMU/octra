@@ -47,6 +47,7 @@ export class AsrService {
   }
 
   public init() {
+    console.log(`QUEUE INITIALIZED`);
     this._queue = new ASRQueue(this.asrSettings, this.audioService.audiomanagers[0], this.httpClient);
   }
 
@@ -84,6 +85,9 @@ export class AsrService {
 }
 
 class ASRQueue {
+  get itemChange(): Subject<ASRQueueItem> {
+    return this._itemChange;
+  }
   get statistics(): { running: number; stopped: number; finished: number; failed: number } {
     return this._statistics;
   }
@@ -110,7 +114,7 @@ class ASRQueue {
   private _status: ASRProcessStatus;
   private readonly _audiomanager: AudioManager;
 
-  public readonly itemChange: Subject<ASRQueueItem>;
+  private readonly _itemChange: Subject<ASRQueueItem>;
 
   private _statistics = {
     running: 0,
@@ -132,7 +136,7 @@ class ASRQueue {
     this._status = ASRProcessStatus.IDLE;
     this._audiomanager = audioManager;
 
-    this.itemChange = new Subject<ASRQueueItem>();
+    this._itemChange = new Subject<ASRQueueItem>();
   }
 
   public add(queueItem: ASRQueueItem) {
@@ -155,19 +159,12 @@ class ASRQueue {
     if (index > -1) {
       this.queue.splice(index, 1);
     } else {
-      console.error(`coulld not remove queueItem with id ${id}`);
+      console.error(`could not remove queueItem with id ${id}`);
     }
   }
 
   public start() {
     this._status = ASRProcessStatus.STARTED;
-    this._statistics = {
-      failed: 0,
-      running: 0,
-      stopped: 0,
-      finished: 0
-    };
-
     this.startNext();
   }
 
@@ -184,7 +181,8 @@ class ASRQueue {
               old: ASRProcessStatus.IDLE,
               new: ASRProcessStatus.STARTED
             });
-            this.itemChange.next(nextItem);
+            console.log(`itemchange next`);
+            this._itemChange.next(nextItem);
             nextItem.statusChange.subscribe((status) => {
                 this.updateStatistics(status);
 
@@ -194,7 +192,12 @@ class ASRQueue {
                   console.log(nextItem.result);
                   console.log(`-----------`);
                 }
-                this.itemChange.next(nextItem);
+                console.log(`itemchange next`);
+                this._itemChange.next(nextItem);
+
+                setTimeout(() => {
+                  this.startNext();
+                }, 1000);
               },
               (error) => {
               },
@@ -203,11 +206,11 @@ class ASRQueue {
           } else {
             nextItem.changeStatus(ASRProcessStatus.FAILED);
           }
-        }
 
-        setTimeout(() => {
-          this.startNext();
-        }, 1000);
+          setTimeout(() => {
+            this.startNext();
+          }, 1000);
+        }
       } else {
         setTimeout(() => {
           this.startNext();
@@ -219,6 +222,12 @@ class ASRQueue {
   private getFirstFreeItem(): ASRQueueItem | undefined {
     return this.queue.find((a) => {
       return a.status === ASRProcessStatus.IDLE;
+    });
+  }
+
+  public getItemByTime(sampleStart: number, sampleLength: number): ASRQueueItem | undefined {
+    return this.queue.find((a) => {
+      return a.time.sampleStart === sampleStart && a.time.sampleLength === sampleLength;
     });
   }
 
@@ -256,7 +265,10 @@ class ASRQueue {
 
   public stop() {
     this._status = ASRProcessStatus.STOPPED;
-    this.itemChange.complete();
+  }
+
+  public destroy() {
+    this._itemChange.complete();
   }
 }
 

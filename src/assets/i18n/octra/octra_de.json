@@ -269,6 +269,6 @@
     }
   },
   "asr": {
-    "file too big": "Die Spracherkennung unterstützt nur Audiosequenzen mit einer Dauer von max. 10 Minuten."
+    "file too big": "Die Spracherkennung unterstützt nur Audiosequenzen mit einer Dauer von max. 10 Minuten. Betroffene Segmente wurden übersprungen."
   }
 }

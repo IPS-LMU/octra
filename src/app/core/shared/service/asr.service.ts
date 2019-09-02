@@ -9,7 +9,9 @@ import * as X2JS from 'x2js';
 import {AudioService} from './audio.service';
 import {WavFormat} from '../../../media-components/obj/media/audio/AudioFormats';
 import {Subject} from 'rxjs';
-import {AudioChunk, AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
+import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
+import {TranscriptionService} from './transcription.service';
+import {BrowserSample, OriginalSample} from '../../../media-components/obj/media/audio';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +45,7 @@ export class AsrService {
   }
 
   constructor(private settingsService: SettingsService, private appStorage: AppStorageService, private httpClient: HttpClient,
-              private audioService: AudioService) {
+              private audioService: AudioService, private transcrService: TranscriptionService) {
   }
 
   public init() {
@@ -75,18 +77,52 @@ export class AsrService {
     this._queue.start();
   }
 
-  public addToQueue(audiochunk: AudioChunk): ASRQueueItem {
-    const item = new ASRQueueItem(audiochunk, this.queue, this.selectedLanguage);
+  public addToQueue(timeInterval: { sampleStart: number, sampleLength: number }): ASRQueueItem {
+    const item = new ASRQueueItem({
+      sampleStart: timeInterval.sampleStart,
+      sampleLength: timeInterval.sampleLength
+    }, this.queue, this.selectedLanguage);
     this.queue.add(item);
     return item;
   }
 
   public stopASR() {
+    // change status to STOPPED
     this._queue.stop();
+
+    for (let i = 0; i < this._queue.queue.length; i++) {
+      const item = this._queue.queue[i];
+      this.stopASROfItem(item);
+    }
+  }
+
+  public stopASROfItem(item: ASRQueueItem) {
+    if (item !== undefined && item !== null) {
+      const audioManager = this.audioService.audiomanagers[0];
+      const segmentBoundary = BrowserSample.fromOriginalSample(
+        new OriginalSample(item.time.sampleStart + item.time.sampleLength, audioManager.originalSampleRate),
+        audioManager.browserSampleRate);
+      const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+        segmentBoundary
+      );
+
+      if (segNumber > -1) {
+        this.transcrService.currentlevel.segments.get(segNumber).isBlockedBy = 'none';
+        item.stopProcessing();
+      } else {
+        console.error(new Error(`could not find segment.`));
+      }
+    } else {
+      console.error(new Error('item is undefined!'));
+    }
   }
 }
 
 class ASRQueue {
+  get queue(): ASRQueueItem[] {
+    return this._queue;
+  }
+
   get itemChange(): Subject<ASRQueueItem> {
     return this._itemChange;
   }
@@ -111,7 +147,7 @@ class ASRQueue {
     return this._asrSettings;
   }
 
-  private queue: ASRQueueItem[];
+  private _queue: ASRQueueItem[];
   private readonly _asrSettings: ASRSettings;
   private readonly _httpClient: HttpClient;
   private _status: ASRProcessStatus;
@@ -129,13 +165,13 @@ class ASRQueue {
   private readonly MAX_PARALLEL_ITEMS = 3;
 
   public get length(): number {
-    return this.queue.length;
+    return this._queue.length;
   }
 
   constructor(asrSettings: ASRSettings, audioManager: AudioManager, httpClient: HttpClient) {
     this._asrSettings = asrSettings;
     this._httpClient = httpClient;
-    this.queue = [];
+    this._queue = [];
     this._status = ASRProcessStatus.IDLE;
     this._audiomanager = audioManager;
 
@@ -143,31 +179,31 @@ class ASRQueue {
   }
 
   public add(queueItem: ASRQueueItem) {
-    const found = this.queue.find((a) => {
+    const found = this._queue.find((a) => {
       return a.id === queueItem.id;
     }) !== undefined;
 
     if (!found) {
-      this.queue.push(queueItem);
+      this._queue.push(queueItem);
     } else {
       console.error(Error('QueueItem with id ' + queueItem.id + ' already added!'));
     }
   }
 
   public remove(id: number) {
-    const index = this.queue.findIndex((a) => {
+    const index = this._queue.findIndex((a) => {
       return a.id === id;
     });
 
     if (index > -1) {
-      this.queue.splice(index, 1);
+      this._queue.splice(index, 1);
     } else {
       console.error(`could not remove queueItem with id ${id}`);
     }
   }
 
   public clear() {
-    this.queue = [];
+    this._queue = [];
     this.clearStatistics();
     this._itemChange.complete();
   }
@@ -209,8 +245,15 @@ class ASRQueue {
                 }, 1000);
               },
               (error) => {
+                console.error(error);
+                setTimeout(() => {
+                  this.startNext();
+                }, 1000);
               },
               () => {
+                setTimeout(() => {
+                  this.startNext();
+                }, 1000);
               });
           } else {
             nextItem.changeStatus(ASRProcessStatus.FAILED);
@@ -220,22 +263,18 @@ class ASRQueue {
             this.startNext();
           }, 1000);
         }
-      } else {
-        setTimeout(() => {
-          this.startNext();
-        }, 1000);
       }
     }
   }
 
   private getFirstFreeItem(): ASRQueueItem | undefined {
-    return this.queue.find((a) => {
+    return this._queue.find((a) => {
       return a.status === ASRProcessStatus.IDLE;
     });
   }
 
   public getItemByTime(sampleStart: number, sampleLength: number): ASRQueueItem | undefined {
-    return this.queue.find((a) => {
+    return this._queue.find((a) => {
       return a.time.sampleStart === sampleStart && a.time.sampleLength === sampleLength;
     });
   }
@@ -334,11 +373,14 @@ export class ASRQueueItem {
   private _selectedLanguage: ASRLanguage;
   private _result: string;
 
-  constructor(audioChunk: AudioChunk, asrQueue: ASRQueue, selectedLanguage: ASRLanguage) {
+  constructor(timeInterval: {
+    sampleStart: number,
+    sampleLength: number
+  }, asrQueue: ASRQueue, selectedLanguage: ASRLanguage) {
     this._id = ASRQueueItem.counter++;
     this._time = {
-      sampleStart: audioChunk.time.start.originalSample.value,
-      sampleLength: audioChunk.time.duration.originalSample.value
+      sampleStart: timeInterval.sampleStart,
+      sampleLength: timeInterval.sampleLength
     };
     this._status = ASRProcessStatus.IDLE;
     this._statusChange = new Subject<{

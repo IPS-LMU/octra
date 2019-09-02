@@ -101,14 +101,7 @@
     <button id="button-basic2" dropdownToggle type="button"
             class="btn btn-outline-primary btn-sm dropdown-toggle"
             aria-controls="dropdown-basic">
-      <ng-container *ngIf="asrService.selectedLanguage === null; else asrAllSet2">
-        {{appSettings.octra.plugins.asr.languages[0].code | uppercase}}
-        ({{getShortCode(appSettings.octra.plugins.asr.languages[0].code)}})
-        [{{appSettings.octra.plugins.asr.languages[0].asr}}]
-      </ng-container>
-      <ng-template #asrAllSet2>
-        Select Action
-      </ng-template>
+      Select Action
       <span class="caret"></span>
     </button>
     <div id="dropdown-basic2" *dropdownMenu class="dropdown-menu" (mousemove)="onMouseMove()"
@@ -116,7 +109,8 @@
          role="menu" aria-labelledby="button-basic" style="padding:5px;">
       <li role="menuitem"><a class="dropdown-item" (click)="startASRForThisSegment()">Start for this segment only</a>
       </li>
-      <li role="menuitem"><a class="dropdown-item">Start for this and the next segments</a></li>
+      <li role="menuitem"><a class="dropdown-item" (click)="startASRForAllSegmentsNext()">Start for this and the next
+        segments</a></li>
       <li role="menuitem"><a class="dropdown-item" (click)="stopASRForThisSegment()">Stop for this segment</a></li>
       <li role="menuitem"><a class="dropdown-item">Stop all segments coming after this one</a></li>
       <li role="menuitem"><a class="dropdown-item" (click)="stopASRForAll()">Stop all</a></li>

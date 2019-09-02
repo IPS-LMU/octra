@@ -1,7 +1,7 @@
-import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
-import {AppStorageService, SettingsService} from '../../shared/service';
+import {Component, Input, OnInit} from '@angular/core';
+import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
 import {AppSettings, ASRLanguage} from '../../obj/Settings';
-import {ASRQueueItem, AsrService} from '../../shared/service/asr.service';
+import {AsrService} from '../../shared/service/asr.service';
 import {isNullOrUndefined} from '../../shared/Functions';
 import {AudioChunk} from '../../../media-components/obj/media/audio/AudioManager';
 
@@ -25,10 +25,8 @@ export class AsrOptionsComponent implements OnInit {
   @Input() audioChunk: AudioChunk;
   @Input() enabled = true;
 
-  private asrQueueItem: ASRQueueItem;
-
   constructor(public appStorage: AppStorageService, public settingsService: SettingsService,
-              public asrService: AsrService, private cd: ChangeDetectorRef) {
+              public asrService: AsrService, private transcrService: TranscriptionService) {
     for (let i = 0; i < this.appSettings.octra.plugins.asr.services.length; i++) {
       const provider = this.appSettings.octra.plugins.asr.services[i];
       this.serviceProviders['' + provider.provider] = provider;
@@ -36,6 +34,7 @@ export class AsrOptionsComponent implements OnInit {
   }
 
   ngOnInit() {
+
   }
 
   onMouseMove() {
@@ -55,15 +54,43 @@ export class AsrOptionsComponent implements OnInit {
   }
 
   startASRForThisSegment() {
-    // test ASR
     if (!isNullOrUndefined(this.asrService.selectedLanguage)) {
-      this.asrQueueItem = this.asrService.addToQueue(this.audioChunk);
-      this.asrService.startASR();
+      const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+        this.audioChunk.time.start.browserSample.add(this.audioChunk.time.duration.browserSample)
+      );
+
+      if (segNumber > -1) {
+        this.transcrService.currentlevel.segments.get(segNumber).isBlockedBy = 'asr';
+        this.asrService.addToQueue({
+          sampleStart: this.audioChunk.time.start.originalSample.value,
+          sampleLength: this.audioChunk.time.duration.originalSample.value
+        });
+        this.asrService.startASR();
+      } else {
+        console.error(`could not start ASR because segment number was not found.`);
+      }
     }
   }
 
   startASRForAllSegmentsNext() {
+    const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+      this.audioChunk.time.start.browserSample.add(this.audioChunk.time.duration.browserSample)
+    );
 
+    if (segNumber > -1) {
+      for (let i = segNumber; i < this.transcrService.currentlevel.segments.length; i++) {
+        const segment = this.transcrService.currentlevel.segments.get(i);
+        const sampleStart = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.originalSample.value
+          : 0;
+        const sampleLength = segment.time.originalSample.value - sampleStart;
+
+        segment.isBlockedBy = 'asr';
+        this.asrService.addToQueue({sampleStart, sampleLength});
+      }
+      this.asrService.startASR();
+    } else {
+      console.error(`could not start ASR for all next because segment number was not found.`);
+    }
   }
 
   stopASRForAll() {
@@ -72,7 +99,15 @@ export class AsrOptionsComponent implements OnInit {
   }
 
   stopASRForThisSegment() {
-    this.asrService.queue.remove(this.asrQueueItem.id);
-    this.asrQueueItem.stopProcessing();
+    if (!isNullOrUndefined(this.asrService.selectedLanguage)) {
+      const item = this.asrService.queue.getItemByTime(this.audioChunk.time.start.originalSample.value, this.audioChunk.time.duration.originalSample.value);
+
+      if (item !== undefined) {
+        this.asrService.stopASROfItem(item);
+        this.asrService.queue.remove(item.id);
+      }
+    } else {
+      console.error(`could not stop ASR because segment number was not found.`);
+    }
   }
 }

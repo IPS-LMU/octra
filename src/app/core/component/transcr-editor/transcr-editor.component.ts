@@ -389,14 +389,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     const item = this.asrService.queue.getItemByTime(this.audiochunk.time.start.originalSample.value,
       this.audiochunk.time.duration.originalSample.value);
 
-    console.log(`initialize called`);
     this.onASRItemChange(item);
   };
 
   onASRItemChange(item: ASRQueueItem) {
-    console.log(`ITEMCHANGE`);
     if (!isNullOrUndefined(item)) {
-      console.log(`ITEMCHANGE OK`);
       if (item.time.sampleStart === this.audiochunk.time.start.originalSample.value
         && item.time.sampleLength === this.audiochunk.time.duration.originalSample.value) {
         if (item.status === ASRProcessStatus.FINISHED) {
@@ -413,12 +410,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           this.asr.status = 'inactive';
         }
 
-        console.log(this.asr);
         this.cd.markForCheck();
         this.cd.detectChanges();
       }
     } else {
-      console.error(`item is null`);
       this.asr.status = 'inactive';
       this.asr.error = '';
       this.asr.result = '';
@@ -554,7 +549,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     console.log(`add itemchange listener!`);
     this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
-        console.log(`ITEMCHANGE WORKS`);
         this.onASRItemChange(item);
       },
       (error) => {

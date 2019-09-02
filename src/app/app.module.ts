@@ -123,7 +123,6 @@ import {MultiThreadingService} from './core/shared/multi-threading/multi-threadi
 import {StresstestComponent} from './core/tools/stresstest/stresstest.component';
 import {TranscriptionDemoEndModalComponent} from './core/modals/transcription-demo-end/transcription-demo-end-modal.component';
 import {AsrOptionsComponent} from './core/gui/asr-options/asr-options.component';
-import {AsrService} from './core/shared/service/asr.service';
 
 library.add(
   faSpinner,
@@ -285,8 +284,7 @@ export const EDITORS: any[] = [
     TranslateService,
     BugReportService,
     CompatibilityService,
-    MultiThreadingService,
-    AsrService
+    MultiThreadingService
   ]
 })
 

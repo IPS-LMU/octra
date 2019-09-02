@@ -19,7 +19,9 @@ import {SettingsService} from './settings.service';
 
 declare var validateAnnotation: ((string, any) => any);
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class TranscriptionService {
   get guidelines(): any {
     return this._guidelines;

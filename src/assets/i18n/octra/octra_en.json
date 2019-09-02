@@ -267,5 +267,8 @@
       "hide configurator": "Hide configurator",
       "show configurator": "Show configurator"
     }
+  },
+  "asr": {
+    "file too big": "The ASR only supports audio sequences with max. duration of 10 minutes."
   }
 }

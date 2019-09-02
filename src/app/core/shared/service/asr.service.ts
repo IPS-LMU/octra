@@ -75,8 +75,10 @@ export class AsrService {
     this._queue.start();
   }
 
-  public addToQueue(audiochunk: AudioChunk) {
-    return this.queue.add(new ASRQueueItem(audiochunk, this.queue, this.selectedLanguage));
+  public addToQueue(audiochunk: AudioChunk): ASRQueueItem {
+    const item = new ASRQueueItem(audiochunk, this.queue, this.selectedLanguage);
+    this.queue.add(item);
+    return item;
   }
 
   public stopASR() {
@@ -88,6 +90,7 @@ class ASRQueue {
   get itemChange(): Subject<ASRQueueItem> {
     return this._itemChange;
   }
+
   get statistics(): { running: number; stopped: number; finished: number; failed: number } {
     return this._statistics;
   }
@@ -163,6 +166,12 @@ class ASRQueue {
     }
   }
 
+  public clear() {
+    this.queue = [];
+    this.clearStatistics();
+    this._itemChange.complete();
+  }
+
   public start() {
     this._status = ASRProcessStatus.STARTED;
     this.startNext();
@@ -186,7 +195,7 @@ class ASRQueue {
             nextItem.statusChange.subscribe((status) => {
                 this.updateStatistics(status);
 
-                if (status.new === ASRProcessStatus.FINISHED) {
+                if (status.old === ASRProcessStatus.STARTED && status.new === ASRProcessStatus.FINISHED) {
                   // retrieve result
                   console.log(`item finished: ${nextItem.id}`);
                   console.log(nextItem.result);
@@ -261,6 +270,15 @@ class ASRQueue {
         this._statistics.stopped += 1;
         break;
     }
+  }
+
+  private clearStatistics() {
+    this._statistics = {
+      failed: 0,
+      finished: 0,
+      stopped: 0,
+      running: 0
+    };
   }
 
   public stop() {
@@ -355,6 +373,12 @@ export class ASRQueueItem {
     return false;
   }
 
+  public stopProcessing(): boolean {
+    this.changeStatus(ASRProcessStatus.STOPPED);
+    this.statusChange.complete();
+    return true;
+  }
+
   private uploadFile(file: File, language: ASRLanguage): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       const url = `${language.host}uploadFileMulti`;
@@ -445,36 +469,42 @@ export class ASRQueueItem {
         sampleStart: this.time.sampleStart,
         sampleDur: this.time.sampleLength
       }).then((file) => {
-      // 2) upload signal
-      console.log('UPLOAD AUDIO');
-      this.uploadFile(file, this.selectedLanguage).then((url: string) => {
-        // 3) signal audio url to ASR
-        console.log('callASR ' + this.selectedLanguage.asr + ' - ' + this.selectedLanguage.code);
-        this.callASR(this.selectedLanguage, url, timestamp).then((file) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            this._result = reader.result as string;
-            this.changeStatus(ASRProcessStatus.FINISHED);
-            subj.complete();
-          };
+      if (this._status !== ASRProcessStatus.STOPPED) {
+        // 2) upload signal
+        console.log('UPLOAD AUDIO');
+        this.uploadFile(file, this.selectedLanguage).then((url: string) => {
+          if (this._status !== ASRProcessStatus.STOPPED) {
+            // 3) signal audio url to ASR
+            console.log('callASR ' + this.selectedLanguage.asr + ' - ' + this.selectedLanguage.code);
+            this.callASR(this.selectedLanguage, url, timestamp).then((file) => {
+              if (this._status !== ASRProcessStatus.STOPPED) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                  this._result = reader.result as string;
+                  this.changeStatus(ASRProcessStatus.FINISHED);
+                  subj.complete();
+                };
 
-          reader.onerror = (error: any) => {
-            this._result = 'Could not read result';
-            this.changeStatus(ASRProcessStatus.FAILED);
-            subj.error(error);
-          };
+                reader.onerror = (error: any) => {
+                  this._result = 'Could not read result';
+                  this.changeStatus(ASRProcessStatus.FAILED);
+                  subj.error(error);
+                };
 
-          reader.readAsText(file, 'utf-8');
+                reader.readAsText(file, 'utf-8');
+              }
+            }).catch((error) => {
+              subj.error(error);
+              this._result = error;
+              this.changeStatus(ASRProcessStatus.FAILED);
+            });
+          }
         }).catch((error) => {
           subj.error(error);
           this._result = error;
           this.changeStatus(ASRProcessStatus.FAILED);
         });
-      }).catch((error) => {
-        subj.error(error);
-        this._result = error;
-        this.changeStatus(ASRProcessStatus.FAILED);
-      });
+      }
     }).catch((error) => {
       subj.error(error);
       this._result = error;

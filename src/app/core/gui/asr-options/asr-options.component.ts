@@ -1,7 +1,7 @@
 import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {AppStorageService, SettingsService} from '../../shared/service';
 import {AppSettings, ASRLanguage} from '../../obj/Settings';
-import {AsrService} from '../../shared/service/asr.service';
+import {ASRQueueItem, AsrService} from '../../shared/service/asr.service';
 import {isNullOrUndefined} from '../../shared/Functions';
 import {AudioChunk} from '../../../media-components/obj/media/audio/AudioManager';
 
@@ -23,6 +23,9 @@ export class AsrOptionsComponent implements OnInit {
   };
 
   @Input() audioChunk: AudioChunk;
+  @Input() enabled = true;
+
+  private asrQueueItem: ASRQueueItem;
 
   constructor(public appStorage: AppStorageService, public settingsService: SettingsService,
               public asrService: AsrService, private cd: ChangeDetectorRef) {
@@ -51,11 +54,25 @@ export class AsrOptionsComponent implements OnInit {
     this.asrService.selectedLanguage = lang;
   }
 
-  checkBoxesChanged() {
+  startASRForThisSegment() {
     // test ASR
     if (!isNullOrUndefined(this.asrService.selectedLanguage)) {
-      this.asrService.addToQueue(this.audioChunk);
+      this.asrQueueItem = this.asrService.addToQueue(this.audioChunk);
       this.asrService.startASR();
     }
+  }
+
+  startASRForAllSegmentsNext() {
+
+  }
+
+  stopASRForAll() {
+    this.asrService.stopASR();
+    this.asrService.queue.clear();
+  }
+
+  stopASRForThisSegment() {
+    this.asrService.queue.remove(this.asrQueueItem.id);
+    this.asrQueueItem.stopProcessing();
   }
 }

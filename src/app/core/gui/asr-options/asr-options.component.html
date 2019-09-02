@@ -96,14 +96,30 @@
       </table>
     </div>
   </div>
-  <div id="checkboxes">
-    <div class="entry">
-      <input type="checkbox" id="for-all-next" [(ngModel)]="settings.allSegmentsNext" (change)="checkBoxesChanged()"/>
-      <label for="for-all-next">for all segments coming next</label>
-    </div>
-    <div class="entry">
-      <input type="checkbox" id="only-this-one" [(ngModel)]="settings.onlyForThisOne" (change)="checkBoxesChanged()"/>
-      <label for="only-this-one">only this one</label>
+  <div id="dropdown-button2" class="btn-group" dropdown placement="down right" (mousemove)="onMouseMove()"
+       (mouseleave)="onMouseOut();" #dropdown2="bs-dropdown" style="margin-left:10px;">
+    <button id="button-basic2" dropdownToggle type="button"
+            class="btn btn-outline-primary btn-sm dropdown-toggle"
+            aria-controls="dropdown-basic">
+      <ng-container *ngIf="asrService.selectedLanguage === null; else asrAllSet2">
+        {{appSettings.octra.plugins.asr.languages[0].code | uppercase}}
+        ({{getShortCode(appSettings.octra.plugins.asr.languages[0].code)}})
+        [{{appSettings.octra.plugins.asr.languages[0].asr}}]
+      </ng-container>
+      <ng-template #asrAllSet2>
+        Select Action
+      </ng-template>
+      <span class="caret"></span>
+    </button>
+    <div id="dropdown-basic2" *dropdownMenu class="dropdown-menu" (mousemove)="onMouseMove()"
+         (mouseleave)="onMouseOut();"
+         role="menu" aria-labelledby="button-basic" style="padding:5px;">
+      <li role="menuitem"><a class="dropdown-item" (click)="startASRForThisSegment()">Start for this segment only</a>
+      </li>
+      <li role="menuitem"><a class="dropdown-item">Start for this and the next segments</a></li>
+      <li role="menuitem"><a class="dropdown-item" (click)="stopASRForThisSegment()">Stop for this segment</a></li>
+      <li role="menuitem"><a class="dropdown-item">Stop all segments coming after this one</a></li>
+      <li role="menuitem"><a class="dropdown-item" (click)="stopASRForAll()">Stop all</a></li>
     </div>
   </div>
   <div class="clearfix"></div>

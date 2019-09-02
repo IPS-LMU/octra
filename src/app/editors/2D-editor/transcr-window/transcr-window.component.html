@@ -2,7 +2,7 @@
   <div class="window-nav-top">
     <fa-icon icon="times" class="close" (click)="close();"></fa-icon>
   </div>
-  <app-asr-options [audioChunk]="audiochunk"></app-asr-options>
+  <app-asr-options [audioChunk]="audiochunk" [enabled]="editor.rawText === ''"></app-asr-options>
   <app-audio-navigation #audionav
                         (buttonclick)="onButtonClick($event)"
                         (volumechange)="onVolumeChange($event)"

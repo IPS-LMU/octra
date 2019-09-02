@@ -119,6 +119,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         }
       },
       (error) => {
+        console.error(error);
       },
       () => {
       }));

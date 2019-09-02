@@ -37,32 +37,10 @@
   opacity: 1;
 }
 
-#checkboxes {
-  margin-left: 280px;
-}
-
-#dropdown-button {
+#dropdown-button,
+#dropdown-button2 {
   float: left;
   display: block;
-}
-
-#checkboxes .entry {
-  display: block;
-  line-height: 1.1;
-}
-
-#checkboxes .entry input {
-  margin-right: 3px;
-}
-
-#checkboxes .entry label {
-  margin-bottom: 0;
-  margin-left: 3px;
-  font-size: 0.8em;
-  cursor: pointer;
-}
-
-#dropdown-button {
   margin: 0 1px;
 }
 

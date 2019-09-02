@@ -1204,15 +1204,19 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 w = line.Size.width - select.start + 1;
               }
 
-              if (segment.transcript === '') {
-                this.oContext.globalAlpha = 0.2;
-                this.oContext.fillStyle = 'red';
-              } else if (!isNullOrUndefined(this.transcr.breakMarker) && segment.transcript === this.transcr.breakMarker.code) {
-                this.oContext.globalAlpha = 0.2;
-                this.oContext.fillStyle = 'blue';
-              } else if (segment.transcript !== '') {
-                this.oContext.globalAlpha = 0.2;
-                this.oContext.fillStyle = 'green';
+              this.oContext.globalAlpha = 0.2;
+              if (segment.isBlockedBy !== 'asr') {
+                if (segment.transcript === '') {
+                  this.oContext.fillStyle = 'red';
+                } else if (!isNullOrUndefined(this.transcr.breakMarker) && segment.transcript === this.transcr.breakMarker.code) {
+                  this.oContext.fillStyle = 'blue';
+                } else if (segment.transcript !== '') {
+                  this.oContext.fillStyle = 'green';
+                }
+              } else {
+                // blocked by ASR
+                this.oContext.globalAlpha = 0.5;
+                this.oContext.fillStyle = '#ffcf3f';
               }
 
               drawnSegments++;

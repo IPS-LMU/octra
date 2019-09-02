@@ -113,6 +113,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           if (item.status === ASRProcessStatus.FINISHED && item.result !== null) {
             this.editor.rawText = item.result;
           }
+          this.loupe.update(false);
 
           this.cd.markForCheck();
           this.cd.detectChanges();

@@ -80,12 +80,16 @@ export class AsrOptionsComponent implements OnInit {
     if (segNumber > -1) {
       for (let i = segNumber; i < this.transcrService.currentlevel.segments.length; i++) {
         const segment = this.transcrService.currentlevel.segments.get(i);
-        const sampleStart = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.originalSample.value
-          : 0;
-        const sampleLength = segment.time.originalSample.value - sampleStart;
 
-        segment.isBlockedBy = 'asr';
-        this.asrService.addToQueue({sampleStart, sampleLength});
+        if (segment.transcript.trim() === '' && segment.transcript.indexOf(this.transcrService.breakMarker.code) < 0) {
+          // segment is empty and contains not a break
+          const sampleStart = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.originalSample.value
+            : 0;
+          const sampleLength = segment.time.originalSample.value - sampleStart;
+
+          segment.isBlockedBy = 'asr';
+          this.asrService.addToQueue({sampleStart, sampleLength});
+        }
       }
       this.asrService.startASR();
     } else {

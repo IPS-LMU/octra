@@ -79,7 +79,11 @@
     "insert comment": "Kommentar hier eingeben... (optional)",
     "password": "Passwort",
     "preview": "Vorschau",
-    "screenshots": "Bildschirmfotos"
+    "screenshots": "Bildschirmfotos",
+    "Language": "Language",
+    "Speech Recognition": "Spracherkennung",
+    "Service Provider": "Dienstleister",
+    "SELECT ACTION": "AKTION WÄHLEN"
   },
   "bug report": {
     "give feedback": "Feedback geben",
@@ -269,6 +273,13 @@
     }
   },
   "asr": {
-    "file too big": "Die Spracherkennung unterstützt nur Audiosequenzen mit einer Dauer von max. 10 Minuten. Betroffene Segmente wurden übersprungen."
+    "without asr": "Ohne ASR",
+    "file too big": "Die Spracherkennung unterstützt nur Audiosequenzen mit einer Dauer von max. 10 Minuten. Betroffene Segmente wurden übersprungen.",
+    "click on logo": "Klicke für weitere Informationen auf ein Logo.",
+    "start this segment": "Verarbeite nur dieses Segment",
+    "start for all next": "Verarbeite alle folgende Segmente",
+    "stop this segment": "Beende Verarbeitung für dieses Segment",
+    "stop for all next": "Beende Verarbeitung für alle folgende Segmente",
+    "stop all": "Beende Verarbeitung für alle Segmente"
   }
 }

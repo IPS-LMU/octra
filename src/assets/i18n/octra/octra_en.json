@@ -79,7 +79,11 @@
     "insert comment": "Insert comment here... (optional)",
     "password": "Password",
     "preview": "Preview",
-    "screenshots": "Screenshots"
+    "screenshots": "Screenshots",
+    "Language": "Language",
+    "Speech Recognition": "Speech Recognition",
+    "Service Provider": "Service Provider",
+    "SELECT ACTION": "SELECT ACTION"
   },
   "bug report": {
     "give feedback": "Give feedback",
@@ -269,6 +273,13 @@
     }
   },
   "asr": {
-    "file too big": "The ASR only supports audio sequences with max. duration of 10 minutes. Affected segments were skipped."
+    "without asr": "No ASR",
+    "file too big": "The ASR only supports audio sequences with max. duration of 10 minutes. Affected segments were skipped.",
+    "click on logo": "Click on a service logo for further information.",
+    "start this segment": "Start it only for this segment",
+    "start for all next": "Start it for this and all segments coming next",
+    "stop this segment": "Stop it for this segment only",
+    "stop for all next": "Stop it for all segments coming next",
+    "stop all": "Stop it for all segments"
   }
 }

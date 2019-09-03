@@ -63,3 +63,13 @@
   position: absolute;
   margin-top: 4px;
 }
+
+.col-asr {
+  text-align: center;
+}
+
+#dropdown-basic2 .dropdown-item {
+  min-height: 0.9em;
+  font-size: 0.8em;
+  max-width: none;
+}

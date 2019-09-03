@@ -68,6 +68,10 @@ export class AudioviewerConfig {
     color: '#b5b5b5'
   };
 
+  public asr = {
+    enabled: false
+  };
+
 
   // SHORTCUTS
   // SHORTCUTS sheme= KeyMapping [+ <char or charCode>]

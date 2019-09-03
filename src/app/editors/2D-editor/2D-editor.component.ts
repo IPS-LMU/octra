@@ -164,7 +164,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.viewer.settings.stepWidthRatio = (this.viewer.settings.pixelPerSec / this.audiomanager.ressource.info.samplerate);
     this.viewer.settings.showTimePerLine = true;
     this.viewer.settings.showTranscripts = true;
+    this.viewer.settings.asr.enabled = (this.appStorage.usemode === 'demo' || this.appStorage.usemode === 'local');
     this.viewer.name = 'multiline viewer';
+
     this.viewer.secondsPerLine = this.appStorage.secondsPerLine;
 
     this.viewer.alerttriggered.subscribe(

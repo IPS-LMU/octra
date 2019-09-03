@@ -609,7 +609,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                   }
                   break;
                 case('do_asr'):
-                  if (this.settings.boundaries.enabled && this.av.focused) {
+                  if (this.settings.boundaries.enabled && this.av.focused && this.settings.asr.enabled) {
                     const xSamples = this.av.audioTCalculator.absXChunktoSamples(this.av.Mousecursor.absX, this.audiochunk);
 
                     if (xSamples > -1) {

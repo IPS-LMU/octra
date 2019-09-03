@@ -281,6 +281,7 @@
     "stop this segment": "Stop it for this segment only",
     "stop for all next": "Stop it for this one and all segments coming next",
     "stop all": "Stop it for all segments",
-    "asr running": "ASR is currently running. If you want to stop ASR for this segment, click here."
+    "asr running": "ASR is currently running. If you want to stop ASR for this segment, click here.",
+    "no asr selected": "Please select ASR options before using the shortcut."
   }
 }

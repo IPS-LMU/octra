@@ -34,6 +34,7 @@ import {AudioChunk, AudioManager} from '../../media-components/obj/media/audio/A
 import {Functions, isNullOrUndefined} from '../../core/shared/Functions';
 import {OCTRAEditor} from '../octra-editor';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../core/shared/service/asr.service';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-overlay-gui',
@@ -113,7 +114,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               public settingsService: SettingsService,
               public appStorage: AppStorageService,
               private asrService: AsrService,
-              private cd: ChangeDetectorRef) {
+              private cd: ChangeDetectorRef,
+              private langService: TranslateService) {
     super();
 
     this.subscrmanager = new SubscriptionManager();
@@ -389,29 +391,36 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         console.log(`event triggered!`);
         console.log($event);
         console.log(`segNumber: ${segmentNumber}`);
-        const segment = this.transcrService.currentlevel.segments.get(segmentNumber);
 
-        const sampleStart = (segmentNumber > 0)
-          ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.originalSample.value
-          : 0;
+        if (!isNullOrUndefined(this.asrService.selectedLanguage)) {
+          const segment = this.transcrService.currentlevel.segments.get(segmentNumber);
 
-        const selection = {
-          sampleStart: sampleStart,
-          sampleLength: segment.time.originalSample.value - sampleStart
-        };
+          const sampleStart = (segmentNumber > 0)
+            ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.originalSample.value
+            : 0;
+
+          const selection = {
+            sampleStart: sampleStart,
+            sampleLength: segment.time.originalSample.value - sampleStart
+          };
 
 
-        if (segment.isBlockedBy !== 'asr') {
-          this.asrService.addToQueue(selection);
-          segment.isBlockedBy = 'asr';
-          this.asrService.startASR();
+          if (segment.isBlockedBy !== 'asr') {
+            this.asrService.addToQueue(selection);
+            segment.isBlockedBy = 'asr';
+            this.asrService.startASR();
+          } else {
+            const item = this.asrService.queue.getItemByTime(selection.sampleStart, selection.sampleLength);
+            this.asrService.stopASROfItem(item);
+            segment.isBlockedBy = 'none';
+          }
+
+          this.viewer.update();
         } else {
-          const item = this.asrService.queue.getItemByTime(selection.sampleStart, selection.sampleLength);
-          this.asrService.stopASROfItem(item);
-          segment.isBlockedBy = 'none';
+          // open transcr window
+          this.openSegment(segmentNumber);
+          this.msg.showMessage('warning', this.langService.instant('asr.no asr selected'));
         }
-
-        this.viewer.update();
       }
     }
 

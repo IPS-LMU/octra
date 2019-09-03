@@ -1,10 +1,11 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {AppStorageService, MessageService, SettingsService, TranscriptionService} from '../../shared/service';
 import {AppSettings, ASRLanguage} from '../../obj/Settings';
 import {AsrService} from '../../shared/service/asr.service';
 import {isNullOrUndefined} from '../../shared/Functions';
 import {AudioChunk} from '../../../media-components/obj/media/audio/AudioManager';
 import {TranslateService} from '@ngx-translate/core';
+import {BsDropdownDirective} from 'ngx-bootstrap';
 
 @Component({
   selector: 'app-asr-options',
@@ -25,6 +26,7 @@ export class AsrOptionsComponent implements OnInit {
 
   @Input() audioChunk: AudioChunk;
   @Input() enabled = true;
+  @ViewChild('dropdown', {static: true}) dropdown: BsDropdownDirective;
 
   constructor(public appStorage: AppStorageService, public settingsService: SettingsService,
               public asrService: AsrService, private transcrService: TranscriptionService,
@@ -53,6 +55,7 @@ export class AsrOptionsComponent implements OnInit {
 
   onASRLangChanged(lang: ASRLanguage) {
     this.asrService.selectedLanguage = lang;
+    this.dropdown.hide();
   }
 
   startASRForThisSegment() {

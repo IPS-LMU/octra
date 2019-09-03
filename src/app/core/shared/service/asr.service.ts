@@ -27,8 +27,13 @@ export class AsrService {
 
   set selectedLanguage(value: ASRLanguage) {
     this._selectedLanguage = value;
-    this.appStorage.asrSelectedLanguage = value.code;
-    this.appStorage.asrSelectedService = value.asr;
+    if (!isNullOrUndefined(value)) {
+      this.appStorage.asrSelectedLanguage = value.code;
+      this.appStorage.asrSelectedService = value.asr;
+    } else {
+      this.appStorage.asrSelectedLanguage = null;
+      this.appStorage.asrSelectedService = null;
+    }
   }
 
   private _selectedLanguage: ASRLanguage = null;
@@ -51,6 +56,9 @@ export class AsrService {
   public init() {
     console.log(`QUEUE INITIALIZED`);
     this._queue = new ASRQueue(this.asrSettings, this.audioService.audiomanagers[0], this.httpClient);
+    if (!isNullOrUndefined(this.appStorage.asrSelectedLanguage) && !isNullOrUndefined(this.appStorage.asrSelectedService)) {
+      this._selectedLanguage = this.getLanguageByCode(this.appStorage.asrSelectedLanguage, this.appStorage.asrSelectedService);
+    }
   }
 
   public getLanguageByCode(code: string, asr: string): ASRLanguage {
@@ -370,7 +378,7 @@ export class ASRQueueItem {
     new: ASRProcessStatus
   }>;
   private parent: ASRQueue;
-  private _selectedLanguage: ASRLanguage;
+  private readonly _selectedLanguage: ASRLanguage;
   private _result: string;
 
   constructor(timeInterval: {

@@ -7,21 +7,17 @@
                             }"
   ></app-validation-popover>
   <div id="asrOverlay" [ngClass]="{
-    'asr-running': asr.status === 'active',
-    'asr-error': asr.status === 'failed'
+    'asr-running': asr.status === 'active'
   }" [ngStyle]="{
   'height': getHeight() + 'px',
   'width': getWidth() + 'px',
-  'display': (asr.status === 'active' || asr.status === 'failed')? 'block' : 'none'
-  }">
+  'display': (asr.status === 'active')? 'block' : 'none'
+  }" (click)="onASROverlayClick()">
     <!--
     (asr.status === 'active' || asr.status === 'failed')? 'block' : 'none'
     -->
     <p style="margin-top:50px;text-align: center;" *ngIf="asr.status === 'active'">
-      ASR currently running
-    </p>
-    <p style="margin-top:50px;text-align: center;" *ngIf="asr.status === 'failed'">
-      ASR failed
+      {{"asr.asr running" | translate}}
     </p>
   </div>
   <!-- (asr.status === 'active' || asr.status === 'failed')? 'block' : 'none' -->

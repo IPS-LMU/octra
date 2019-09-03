@@ -91,6 +91,7 @@ export class AsrService {
       sampleLength: timeInterval.sampleLength
     }, this.queue, this.selectedLanguage);
     this.queue.add(item);
+    console.log(`ADDED id ${item.id}`);
     return item;
   }
 
@@ -237,14 +238,18 @@ class ASRQueue {
             console.log(`itemchange next`);
             this._itemChange.next(nextItem);
             nextItem.statusChange.subscribe((status) => {
-                this.updateStatistics(status);
-
-                if (status.old === ASRProcessStatus.STARTED && status.new === ASRProcessStatus.FINISHED) {
+                if (status.new === ASRProcessStatus.FINISHED) {
                   // retrieve result
                   console.log(`item finished: ${nextItem.id}`);
                   console.log(nextItem.result);
                   console.log(`-----------`);
                 }
+
+                if (status.new !== ASRProcessStatus.STARTED) {
+                  this.remove(nextItem.id);
+                  console.log(`removed item ${nextItem.id} from queue!`);
+                }
+                this.updateStatistics(status);
                 console.log(`itemchange next`);
                 this._itemChange.next(nextItem);
 
@@ -270,6 +275,13 @@ class ASRQueue {
           setTimeout(() => {
             this.startNext();
           }, 1000);
+        } else {
+          // no free items left, check if something running
+          if (this._queue.find((a) => {
+            return a.status === ASRProcessStatus.STARTED;
+          }) === undefined) {
+            this._status = ASRProcessStatus.IDLE;
+          }
         }
       }
     }
@@ -407,7 +419,7 @@ export class ASRQueueItem {
         old,
         new: this._status
       });
-      console.log(`send change status`);
+      console.log(`send change status ${this.id}`);
       console.log({
         old,
         new: this._status
@@ -426,6 +438,7 @@ export class ASRQueueItem {
   public stopProcessing(): boolean {
     this.changeStatus(ASRProcessStatus.STOPPED);
     this.statusChange.complete();
+    console.log(`stop id ${this._id}`);
     return true;
   }
 

@@ -168,6 +168,14 @@ export class AudioviewerConfig {
       },
       focusonly: true,
       title: 'delete boundaries'
+    },
+    do_asr: {
+      keys: {
+        mac: 'R',
+        pc: 'R'
+      },
+      focusonly: true,
+      title: 'do asr'
     }
   };
 

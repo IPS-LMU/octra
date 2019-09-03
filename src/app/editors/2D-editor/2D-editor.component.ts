@@ -237,7 +237,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
           if (segNumber > -1) {
             console.log(`change segnumber ${segNumber}`);
-            const segment = this.transcrService.currentlevel.segments.get(segNumber);
+            const segment = this.transcrService.currentlevel.segments.get(segNumber).clone();
             segment.isBlockedBy = 'none';
             if (item.status === ASRProcessStatus.FINISHED && item.result !== '') {
               segment.transcript = item.result;
@@ -380,6 +380,39 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   onShortCutTriggered($event, type) {
+    if (($event.value === 'do_asr' || $event.value === 'cancel_asr') && $event.type === 'segment') {
+      const segmentNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(this.viewer.MouseCursor.timePos.browserSample);
+
+      if (segmentNumber > -1) {
+        console.log(`event triggered!`);
+        console.log($event);
+        console.log(`segNumber: ${segmentNumber}`);
+        const segment = this.transcrService.currentlevel.segments.get(segmentNumber);
+
+        const sampleStart = (segmentNumber > 0)
+          ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.originalSample.value
+          : 0;
+
+        const selection = {
+          sampleStart: sampleStart,
+          sampleLength: segment.time.originalSample.value - sampleStart
+        };
+
+
+        if (segment.isBlockedBy !== 'asr') {
+          this.asrService.addToQueue(selection);
+          segment.isBlockedBy = 'asr';
+          this.asrService.startASR();
+        } else {
+          const item = this.asrService.queue.getItemByTime(selection.sampleStart, selection.sampleLength);
+          this.asrService.stopASROfItem(item);
+          segment.isBlockedBy = 'none';
+        }
+
+        this.viewer.update();
+      }
+    }
+
     if (
       $event.value === null || !(
         // cursor move by keyboard events are note saved because this would be too much

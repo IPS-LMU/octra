@@ -279,7 +279,8 @@
     "start this segment": "Start it only for this segment",
     "start for all next": "Start it for this and all segments coming next",
     "stop this segment": "Stop it for this segment only",
-    "stop for all next": "Stop it for all segments coming next",
-    "stop all": "Stop it for all segments"
+    "stop for all next": "Stop it for this one and all segments coming next",
+    "stop all": "Stop it for all segments",
+    "asr running": "ASR is currently running. If you want to stop ASR for this segment, click here."
   }
 }

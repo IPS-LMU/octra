@@ -60,7 +60,7 @@ export class AsrOptionsComponent implements OnInit {
 
   startASRForThisSegment() {
     if (!isNullOrUndefined(this.asrService.selectedLanguage)) {
-      if (this.audioChunk.time.duration.originalSample.seconds > 10) {
+      if (this.audioChunk.time.duration.originalSample.seconds > 600) {
         // trigger alert, too big audio duration
         this.messageService.showMessage('error', this.langService.instant('asr.file too big'));
       } else {
@@ -94,8 +94,9 @@ export class AsrOptionsComponent implements OnInit {
           : 0;
         const sampleLength = segment.time.originalSample.value - sampleStart;
 
-        if (sampleLength / this.transcrService.audiomanager.originalSampleRate > 10) {
+        if (sampleLength / this.transcrService.audiomanager.originalSampleRate > 600) {
           this.messageService.showMessage('error', this.langService.instant('asr.file too big'));
+          segment.isBlockedBy = 'none';
         } else {
           if (segment.transcript.trim() === '' && segment.transcript.indexOf(this.transcrService.breakMarker.code) < 0) {
             // segment is empty and contains not a break
@@ -121,7 +122,6 @@ export class AsrOptionsComponent implements OnInit {
 
       if (item !== undefined) {
         this.asrService.stopASROfItem(item);
-        this.asrService.queue.remove(item.id);
       }
     } else {
       console.error(`could not stop ASR because segment number was not found.`);

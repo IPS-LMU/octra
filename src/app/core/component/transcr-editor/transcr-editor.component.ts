@@ -1425,4 +1425,15 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    });
 
    */
+
+  public onASROverlayClick() {
+    if (!isNullOrUndefined(this.asrService.selectedLanguage)) {
+      const item = this.asrService.queue.getItemByTime(this.audiochunk.time.start.originalSample.value, this.audiochunk.time.duration.originalSample.value);
+      if (item !== undefined) {
+        this.asrService.stopASROfItem(item);
+      }
+    } else {
+      console.error(`could not stop ASR because segment number was not found.`);
+    }
+  }
 }

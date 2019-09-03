@@ -4,23 +4,23 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">{{"modal.inactivity.header" | translate}}</h4>
+              <h4 class="modal-title">{{"modal.inactivity.header" | transloco}}</h4>
             </div>
             <div class="modal-body"
-                 [innerHTML]="'modal.inactivity.body' | translate:{value: settService.appSettings.octra.inactivityNotice.showAfter}">
+                 [innerHTML]="'modal.inactivity.body' | transloco:{value: settService.appSettings.octra.inactivityNotice.showAfter}">
             </div>
             <div class="modal-footer">
                 <div class="btn-group-vertical w-100">
                     <button type="button" class="btn btn-primary btn-raised w-100" data-dismiss="modal"
                             (click)="close('new')">
-                        {{"modal.inactivity.new" | translate}}
+                      {{"modal.inactivity.new" | transloco}}
                     </button>
                     <button type="button" class="btn btn-secondary btn-raised w-100" data-dismiss="modal"
                             (click)="close('continue')">
-                        {{"modal.inactivity.continue" | translate}}
+                      {{"modal.inactivity.continue" | transloco}}
                     </button>
                     <button type="button" class="btn btn-secondary w-100" data-dismiss="modal" (click)="close('quit')">
-                        {{"modal.inactivity.quit" | translate}}
+                      {{"modal.inactivity.quit" | transloco}}
                     </button>
                 </div>
             </div>

@@ -3,16 +3,16 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">{{"general.export data" | translate}}</h4>
+              <h4 class="modal-title">{{"general.export data" | transloco}}</h4>
             </div>
             <div class="modal-body" id="export-table">
                 <table class="table table-striped">
                     <thead>
                     <tr>
                         <th></th>
-                        <th>{{'general.download' | translate}}</th>
-                        <th>{{'general.application' | translate}}</th>
-                        <th>{{'general.website' | translate}}</th>
+                      <th>{{'general.download' | transloco}}</th>
+                      <th>{{'general.application' | transloco}}</th>
+                      <th>{{'general.website' | transloco}}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -48,7 +48,7 @@
                                 <select #val
                                         *ngIf="navbarServ.transcrService !== undefined && !converter.multitiers && transcrService.annotation.levels.length > 1"
                                         (change)="onSelectionChange(converter, val.value)">
-                                    <option value="">{{"general.select one tier" | translate}}</option>
+                                  <option value="">{{"general.select one tier" | transloco}}</option>
                                     <option *ngFor="let level of navbarServ.transcrService.annotation.levels; let l = index;"
                                             value="{{l}}">{{level.name}}
                                     </option>
@@ -72,8 +72,8 @@
                     <thead>
                     <tr>
                         <th></th>
-                        <th>{{'general.name' | translate}}</th>
-                        <th>{{'general.description' | translate}}</th>
+                      <th>{{'general.name' | transloco}}</th>
+                      <th>{{'general.description' | transloco}}</th>
                         <th></th>
                     </tr>
                     </thead>
@@ -86,10 +86,10 @@
                         </td>
                         <td (click)="tools.audioCutting.opened = !tools.audioCutting.opened">
                             <a #a>
-                                {{'tools.cut audio.name' | translate}}
+                              {{'tools.cut audio.name' | transloco}}
                             </a>
                         </td>
-                        <td colspan="3">{{'tools.cut audio.description' | translate}}</td>
+                      <td colspan="3">{{'tools.cut audio.description' | transloco}}</td>
                     </tr>
                     <tr *ngIf="navbarServ.transcrService !== undefined
                     && navbarServ.transcrService.audiomanager.originalInfo.extension === '.wav'"
@@ -109,12 +109,12 @@
                                     <ng-container *ngIf="tools.audioCutting.showConfigurator">
                                         <fa-icon style="color:gray;"
                                                  [icon]="['fas', 'chevron-up']"></fa-icon>
-                                        {{"tools.cut audio.hide configurator" | translate}}
+                                      {{"tools.cut audio.hide configurator" | transloco}}
                                     </ng-container>
                                     <ng-container *ngIf="!tools.audioCutting.showConfigurator">
                                         <fa-icon style="color:gray;"
                                                  [icon]="['fas', 'chevron-down']"></fa-icon>
-                                        {{"tools.cut audio.show configurator" | translate}}
+                                      {{"tools.cut audio.show configurator" | transloco}}
                                     </ng-container>
                                 </a>
                                 <div class="configurator" [hidden]="!tools.audioCutting.showConfigurator">
@@ -124,7 +124,7 @@
                                     ></app-naming-drag-and-drop>
 
                                     <div class="form-control">
-                                        <span>{{'tools.cut audio.append meta files' | translate}}: </span>
+                                      <span>{{'tools.cut audio.append meta files' | transloco}}: </span>
                                         <div class="form-check form-check-inline"
                                              *ngFor="let exportFormat of tools.audioCutting.exportFormats; let i = index;">
                                             <input class="form-check-input" type="checkbox" id="inlineCheckbox{{i}}"
@@ -139,11 +139,11 @@
                                     <button *ngIf="tools.audioCutting.status !== 'running'"
                                             class="btn btn-primary btn-raised" (click)="splitAudio()"
                                             [disabled]="namingConvention.resultConvention.length === 1"
-                                            style="max-width:200px;margin-top:20px;">{{'tools.cut audio.name' | translate}}
+                                            style="max-width:200px;margin-top:20px;">{{'tools.cut audio.name' | transloco}}
                                     </button>
                                     <button *ngIf="tools.audioCutting.status === 'running'"
                                             class="btn btn-danger btn-raised" (click)="stopAudioSplitting()"
-                                            style="max-width:200px;margin-top:20px;">{{'general.stop' | translate}}
+                                            style="max-width:200px;margin-top:20px;">{{'general.stop' | transloco}}
                                     </button>
                                     <div class="mb-2" *ngIf="tools.audioCutting.status !== 'idle'">
                                         <progressbar [animate]="true" [value]="tools.audioCutting.progress"
@@ -166,7 +166,7 @@
                                        [href]="tools.audioCutting.result.url"
                                        class="link">
                                         <fa-icon icon="save"></fa-icon>
-                                        {{'general.download' | translate}}
+                                      {{'general.download' | transloco}}
                                     </a>
                                 </div>
                             </div>
@@ -195,7 +195,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="close()">
-                    {{"general.close" | translate}}
+                  {{"general.close" | transloco}}
                 </button>
             </div>
         </div>

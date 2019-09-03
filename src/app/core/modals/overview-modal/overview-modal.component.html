@@ -34,7 +34,7 @@
 
                         <p style="color:red; text-align: center"
                            *ngIf="sendValidTranscriptOnly && !transcrService.transcriptValid">
-                            {{"transcription.invalid" | translate}}
+                          {{"transcription.invalid" | transloco}}
                         </p>
                         <ng-container
                                 *ngIf="settingsService.isTheme('default'); else isShortAudioFilesTheme">
@@ -42,7 +42,7 @@
                                     (click)="sendTranscription()"
                                     [disabled]="!feedback.valid || (sendValidTranscriptOnly && !transcrService.transcriptValid)">
                                 <fa-icon icon="paper-plane"></fa-icon>
-                                {{"transcription.send" | translate}}
+                              {{"transcription.send" | transloco}}
                             </button>
                         </ng-container>
                         <ng-template #isShortAudioFilesTheme>
@@ -90,7 +90,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary mr-auto" data-dismiss="modal" (click)="close()">
-                    {{"general.close" | translate}}
+                  {{"general.close" | transloco}}
                 </button>
             </div>
         </div>

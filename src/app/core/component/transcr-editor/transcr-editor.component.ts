@@ -1,6 +1,6 @@
 import {ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {TranscrEditorConfig} from './config';
-import {TranslateService} from '@ngx-translate/core';
+import {TranslocoService} from '@ngneat/transloco';
 
 import {BrowserAudioTime, BrowserInfo, BrowserSample, KeyMapping, SubscriptionManager} from '../../shared';
 import {TranscriptionService} from '../../shared/service';
@@ -83,7 +83,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   constructor(private cd: ChangeDetectorRef,
-              private langService: TranslateService,
+              private langService: TranslocoService,
               private transcrService: TranscriptionService) {
 
     this._settings = new TranscrEditorConfig().settings;
@@ -685,8 +685,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     // create boundary button
     const boundaryBtn = () => {
-      const boundaryLabel = this.langService.instant('special_markers.boundary.insert', {type: ''});
-      const boundaryDescr = this.langService.instant('special_markers.boundary.description', {type: ''});
+      const boundaryLabel = this.langService.translate('special_markers.boundary.insert', {type: ''});
+      const boundaryDescr = this.langService.translate('special_markers.boundary.description', {type: ''});
       let icon = '';
       if (!this.easymode) {
         icon = '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon\'/> ' +

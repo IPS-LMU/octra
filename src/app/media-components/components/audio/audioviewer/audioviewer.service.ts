@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 
-import {TranslateService} from '@ngx-translate/core';
+import {TranslocoService} from '@ngneat/transloco';
 import {AudioviewerComponent} from './audioviewer.component';
 import {AudioviewerConfig} from './audioviewer.config';
 import {Interval, Position, Rectangle, Size} from '../../../objects';
@@ -92,7 +92,7 @@ export class AudioviewerService extends AudioComponentService {
   constructor(protected audio: AudioService,
               protected transcrService: TranscriptionService,
               private keyMap: KeymappingService,
-              private langService: TranslateService,
+              private langService: TranslocoService,
               private multiThreadingService: MultiThreadingService) {
     super();
 
@@ -379,7 +379,7 @@ export class AudioviewerService extends AudioComponentService {
             seg_samples: this.drawnselection.start.browserSample.value,
             msg: {
               type: 'error',
-              text: this.langService.instant('boundary cannot set')
+              text: this.langService.translate('boundary cannot set')
             }
           };
         }

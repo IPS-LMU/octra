@@ -3,18 +3,18 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">{{"modal.transcription.delete.header" | translate}}</h4>
+              <h4 class="modal-title">{{"modal.transcription.delete.header" | transloco}}</h4>
             </div>
             <div class="modal-body">
-                <div [innerHTML]="'modal.transcription.delete.text' | translate"></div>
+              <div [innerHTML]="'modal.transcription.delete.text' | transloco"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal" (click)="close('ABORT')">
-                    {{"general.abort" | translate}}
+                  {{"general.abort" | transloco}}
                 </button>
                 <button type="button" class="btn btn-danger"
                         (click)="close('DELETE')">
-                    {{"modal.transcription.delete.delete old" | translate}}
+                  {{"modal.transcription.delete.delete old" | transloco}}
                 </button>
             </div>
         </div>

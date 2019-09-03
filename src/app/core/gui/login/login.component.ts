@@ -6,7 +6,7 @@ import {APIService, AppStorageService, AudioService, OIDBLevel, OIDBLink, Settin
 import {ComponentCanDeactivate} from './login.deactivateguard';
 import {OCTRANIMATIONS, SubscriptionManager} from '../../shared';
 import {SessionFile} from '../../obj/SessionFile';
-import {TranslateService} from '@ngx-translate/core';
+import {TranslocoService} from '@ngneat/transloco';
 import {Converter} from '../../obj/Converters';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
 import {ModalService} from '../../modals/modal.service';
@@ -43,7 +43,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               private cd: ChangeDetectorRef,
               private settingsService: SettingsService,
               public modService: ModalService,
-              private langService: TranslateService,
+              private langService: TranslocoService,
               private audioService: AudioService) {
     this.subscrmanager = new SubscriptionManager();
   }
@@ -164,7 +164,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       (error) => {
         if (error === 'file not supported') {
           this.modService.show('error', {
-            text: this.langService.instant('reload-file.file not supported', {type: ''})
+            text: this.langService.translate('reload-file.file not supported', {type: ''})
           });
         }
       }
@@ -600,7 +600,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   public startDemo() {
-    const audioExample = this.settingsService.getAudioExample(this.langService.currentLang);
+    const audioExample = this.settingsService.getAudioExample(this.langService.getActiveLang());
 
     if (!isNullOrUndefined(audioExample)) {
       this.member.id = 'demo_user';

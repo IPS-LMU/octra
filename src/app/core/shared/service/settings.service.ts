@@ -6,7 +6,7 @@ import {Observable, ReplaySubject, Subject, Subscription} from 'rxjs';
 import {Functions, isNullOrUndefined} from '../Functions';
 import {HttpClient} from '@angular/common/http';
 import {APIService} from './api.service';
-import {TranslateService} from '@ngx-translate/core';
+import {TranslocoService} from '@ngneat/transloco';
 import {UpdateManager} from '../UpdateManager';
 import {ActivatedRoute} from '@angular/router';
 import {AppStorageService} from './appstorage.service';
@@ -85,7 +85,7 @@ export class SettingsService {
   }
 
   constructor(private http: HttpClient,
-              private appStorage: AppStorageService, private api: APIService, private langService: TranslateService) {
+              private appStorage: AppStorageService, private api: APIService, private langService: TranslocoService) {
     this.subscrmanager = new SubscriptionManager();
   }
 
@@ -178,26 +178,26 @@ export class SettingsService {
         () => {
           // define languages
           const languages = this.appSettings.octra.languages;
-          const browserLang = this.langService.getBrowserLang();
-          this.langService.addLangs(languages);
+          // @ts-ignore
+          const browserLang = navigator.language || navigator.userLanguage;
 
           // check if browser language is available in translations
           if ((this.appStorage.language === null || this.appStorage.language === undefined) || this.appStorage.language === '') {
-            if ((this.langService.getLangs().find((value) => {
+            if ((this.appSettings.octra.languages.find((value) => {
               return value === browserLang;
             })) !== undefined) {
-              this.langService.use(browserLang);
+              this.langService.setActiveLang(browserLang);
             } else {
               // use first language defined as default language
-              this.langService.use(languages[0]);
+              this.langService.setActiveLang(languages[0]);
             }
           } else {
-            if ((this.langService.getLangs().find((value) => {
+            if ((this.appSettings.octra.languages.find((value) => {
               return value === this.appStorage.language;
             })) !== undefined) {
-              this.langService.use(this.appStorage.language);
+              this.langService.setActiveLang(this.appStorage.language);
             } else {
-              this.langService.use(languages[0]);
+              this.langService.setActiveLang(languages[0]);
             }
           }
 

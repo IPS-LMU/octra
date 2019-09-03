@@ -17,10 +17,10 @@
     <app-fastbar
             [responsive]="responsive"
             [buttonLabels]="{
-            shortcuts: 'general.shortcuts' | translate,
-            guidelines: 'general.guidelines' | translate,
-            overview: 'general.overview' | translate,
-            help: 'general.help' | translate
+            shortcuts: 'general.shortcuts' | transloco,
+            guidelines: 'general.guidelines' | transloco,
+            overview: 'general.overview' | transloco,
+            help: 'general.help' | transloco
             }"
 
             (shortcutbtnclicked)="modalShortcuts.open()"
@@ -41,7 +41,7 @@
             <fieldset class="w-100">
                 <div class="form-group" style="padding-top:0;">
                 <textarea class="form-control w-100" [(ngModel)]="transcrService.feedback.comment"
-                          placeholder="{{'general.insert comment'| translate}}"
+                          placeholder="{{'general.insert comment'| transloco}}"
                           name="comment"
                           style="height:40px;padding:10px;resize: none;"></textarea>
                 </div>
@@ -54,7 +54,7 @@
         <button class="btn btn-secondary btn-raised col-md-3" (click)="abortTranscription()">
             <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
             <span>
-                   {{"general.quit" | translate}}
+                   {{"general.quit" | transloco}}
             </span>
         </button>
         <button class="btn btn-raised btn-danger col-md-3" (click)="sendTranscriptionForShortAudioFiles('bad')">
@@ -77,7 +77,7 @@
             <button class="btn btn-secondary btn-raised col-md-4" (click)="abortTranscription()">
                 <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
                 <span>
-                   {{"general.quit" | translate}}
+                   {{"general.quit" | transloco}}
             </span>
             </button>
             <button class="btn btn-raised btn-info col-md-2" (click)="sendTranscriptionForKorbinian('NO')">
@@ -101,27 +101,27 @@
                     (click)="abortTranscription()">
                 <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
                 <span *ngIf="!appStorage.easymode" [ngClass]="{' d-none d-md-inline': appc.octra.responsive.enabled}">
-                    {{"general.quit" | translate}}
+                    {{"general.quit" | transloco}}
             </span>
             </button>
             <button type="button" class="btn btn-primary btn-raised col-md-6"
                     (click)="navbarServ.doclick('export');" *ngIf="appStorage.usemode === 'local'">
                 <fa-icon icon="download"></fa-icon>
                 <span
-                        *ngIf="!appStorage.easymode"
-                        [ngClass]="{'d-none d-md-inline': appc.octra.responsive.enabled}"> {{"general.export data" | translate}}</span>
+                  *ngIf="!appStorage.easymode"
+                  [ngClass]="{'d-none d-md-inline': appc.octra.responsive.enabled}"> {{"general.export data" | transloco}}</span>
             </button>
             <button type="button" class="btn btn-primary btn-raised col-md-6"
                     (click)="onSendButtonClick()"
                     *ngIf="appStorage.usemode === 'online' || appStorage.usemode === 'demo'">
             <span
-                    *ngIf="!appStorage.easymode"
-                    [ngClass]="{'d-none d-md-inline': appc.octra.responsive.enabled}"> {{"transcription.send" | translate}} </span>
+              *ngIf="!appStorage.easymode"
+              [ngClass]="{'d-none d-md-inline': appc.octra.responsive.enabled}"> {{"transcription.send" | transloco}} </span>
                 <fa-icon icon="paper-plane"></fa-icon>
             </button>
             <button type="button" class="btn btn-primary btn-raised w-100"
                     (click)="onSaveTranscriptionButtonClicked()" *ngIf="appStorage.usemode === 'url'">
-                <span>{{"transcription.send" | translate}} </span>
+              <span>{{"transcription.send" | transloco}} </span>
                 <fa-icon icon="paper-plane"></fa-icon>
             </button>
         </div>

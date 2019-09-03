@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {APIService, AppStorageService, SettingsService} from './core/shared/service';
-import {TranslateService} from '@ngx-translate/core';
+import {TranslocoService} from '@ngneat/transloco';
 import {SubscriptionManager} from './core/obj/SubscriptionManager';
 import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
 import {AppInfo} from './app.info';
@@ -37,7 +37,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
   private loggedIn = false;
 
   constructor(private api: APIService,
-              private langService: TranslateService,
+              private langService: TranslocoService,
               public appStorage: AppStorageService,
               private settingsService: SettingsService,
               private bugService: BugReportService,
@@ -115,7 +115,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       }
     ));
 
-    console.log('Language: ' + this.langService.currentLang);
+    console.log('Language: ' + this.langService.getActiveLang());
 
     this.settingsService.loadApplicationSettings(this.route).then(() => {
       console.log(`Application settings loaded`);

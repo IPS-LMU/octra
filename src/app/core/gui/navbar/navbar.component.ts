@@ -2,7 +2,7 @@ import {AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild} from '@an
 import {AppStorageService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {NavbarService} from './navbar.service';
 import {DomSanitizer} from '@angular/platform-browser';
-import {TranslateService} from '@ngx-translate/core';
+import {TranslocoService} from '@ngneat/transloco';
 import {AppInfo} from '../../../app.info';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {editorComponents} from '../../../editors/components';
@@ -69,7 +69,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(public appStorage: AppStorageService,
               public navbarServ: NavbarService,
               public sanitizer: DomSanitizer,
-              public langService: TranslateService,
+              public langService: TranslocoService,
               public modService: ModalService,
               public settService: SettingsService,
               public bugService: BugReportService) {
@@ -120,7 +120,8 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   changeLanguage(lang: string) {
-    this.langService.use(lang);
+    this.langService.setActiveLang(lang);
+    console.log(`language is now: ${lang}`);
     this.appStorage.language = lang;
   }
 

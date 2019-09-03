@@ -4,7 +4,7 @@ import {SessionFile} from '../../obj/SessionFile';
 import {FileSize, Functions} from '../../shared/Functions';
 import {Router} from '@angular/router';
 import {ModalService} from '../../modals/modal.service';
-import {TranslateService} from '@ngx-translate/core';
+import {TranslocoService} from '@ngneat/transloco';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 import {AppInfo} from '../../../app.info';
@@ -24,7 +24,7 @@ export class ReloadFileComponent implements OnInit {
               public appStorage: AppStorageService,
               public transcrServ: TranscriptionService,
               public modService: ModalService,
-              public langService: TranslateService,
+              public langService: TranslocoService,
               private audioService: AudioService) {
   }
 
@@ -68,7 +68,7 @@ export class ReloadFileComponent implements OnInit {
           this.appStorage.beginLocalSession(this.dropzone.files, keepData, this.navigate,
             (error) => {
               if (error === 'file not supported') {
-                this.showErrorMessage(this.langService.instant('reload-file.file not supported', {type: ''}));
+                this.showErrorMessage(this.langService.translate('reload-file.file not supported', {type: ''}));
               }
             }
           );
@@ -86,7 +86,7 @@ export class ReloadFileComponent implements OnInit {
     this.appStorage.beginLocalSession(this.dropzone.files, true, this.navigate,
       (error) => {
         if (error === 'file not supported') {
-          this.showErrorMessage(this.langService.instant('reload-file.file not supported', {type: ''}));
+          this.showErrorMessage(this.langService.translate('reload-file.file not supported', {type: ''}));
         }
       }
     );

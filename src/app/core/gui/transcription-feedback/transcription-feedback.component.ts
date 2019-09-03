@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
-import {TranslateService} from '@ngx-translate/core';
+import {TranslocoService} from '@ngneat/transloco';
 import {NgForm} from '@angular/forms';
 
 @Component({
@@ -18,7 +18,7 @@ export class TranscriptionFeedbackComponent implements OnInit {
     return this.feedbackForm.valid;
   }
 
-  constructor(public transcrService: TranscriptionService, public langService: TranslateService, private appStorage: AppStorageService,
+  constructor(public transcrService: TranscriptionService, public langService: TranslocoService, private appStorage: AppStorageService,
               private settingsService: SettingsService) {
   }
 

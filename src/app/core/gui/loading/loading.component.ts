@@ -1,5 +1,5 @@
 import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
-import {TranslateService} from '@ngx-translate/core';
+import {TranslocoService} from '@ngneat/transloco';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppStorageService, AudioService, OIDBLevel, SettingsService, TranscriptionService} from '../../shared/service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -31,7 +31,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
     audio: false
   };
 
-  constructor(private langService: TranslateService,
+  constructor(private langService: TranslocoService,
               public settService: SettingsService,
               private appStorage: AppStorageService,
               public audio: AudioService,
@@ -53,7 +53,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
           }));
       }
     }).then(() => {
-      this.langService.get('general.please wait').subscribe(
+      this.langService.selectTranslate('general.please wait').subscribe(
         (translation) => {
           this.text = translation + '... ';
         }
@@ -67,7 +67,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
           this.loadedtable.projectconfig = true;
           this.progress += 25;
           this.state = 'Project configuration loaded';
-          let language = this.langService.currentLang;
+          let language = this.langService.getActiveLang();
 
           const found = projectsettings.languages.find((x) => {
             return x === language;

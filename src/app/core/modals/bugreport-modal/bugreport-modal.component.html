@@ -4,29 +4,29 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="dialog-sizes-name1" class="modal-title pull-left">{{'bug report.give feedback' |
-                    translate}}</h3>
+                    transloco}}</h3>
                 <button type="button" class="close pull-right" aria-label="Close" (click)="close('CANCEL')">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <p>
-                    {{"bug report.description" | translate}}
+                  {{"bug report.description" | transloco}}
                 </p>
-                <div *ngIf="bugsent" class="text-success bugsent">{{'bug report.sent' | translate}}</div>
+              <div *ngIf="bugsent" class="text-success bugsent">{{'bug report.sent' | transloco}}</div>
 
                 <form>
                     <fieldset>
                         <div class="form-group">
                             <label for="inputEmail">{{'general.email' |
-                                translate}}</label>
+                                transloco}}</label>
 
                             <input [(ngModel)]="bgemail" name="email" class="form-control" id="inputEmail"
-                                   placeholder="{{'general.email' | translate}}" type="email" email>
+                                   placeholder="{{'general.email' | transloco}}" type="email" email>
                         </div>
                         <div class="form-group">
                             <label for="bgDescr">{{'general.description' |
-                                translate}}</label>
+                                transloco}}</label>
 
                             <textarea [(ngModel)]="bgdescr" name="bgdescr" class="form-control" rows="3"
                                       id="bgDescr"
@@ -35,7 +35,7 @@
                         </div>
                         <div class="form-group" style="margin-bottom:20px;">
                             <label>{{'general.screenshots' |
-                                translate}} (optional):</label><br/>
+                                transloco}} (optional):</label><br/>
                             <div class="preview-images">
                                 <div *ngFor="let screenshot of screenshots; let i = index;"
                                      class="upload-screenshot" (click)="selectFileForUpload(uploadInput2)">
@@ -60,13 +60,13 @@
                                 <label>
                                     <input [(ngModel)]="sendProObj" name="sendpro" #sendpro type="checkbox"
                                            checked>
-                                    {{"bug report.send protocol" | translate}}
+                                  {{"bug report.send protocol" | transloco}}
                                 </label>
                             </div>
                         </div>
                         <div class="form-group" [hidden]="!sendpro.checked">
                             <label for="bgProtocol">{{'general.protocol' |
-                                translate}}:</label>
+                                transloco}}:</label>
                             <textarea class="form-control" #bgProtocol *ngIf="visible"
                                       id="bgProtocol"
                                       disabled>{{bugService.getText()}}</textarea>
@@ -76,11 +76,11 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" (click)="close('CANCEL')">
-                    {{"general.abort" | translate}}
+                  {{"general.abort" | transloco}}
                 </button>
                 <button type="button" class="btn btn-primary" (click)="sendBugReport();"
                         [disabled]="!isvalid || isSending">
-                    {{"bug report.give feedback" | translate}}
+                  {{"bug report.give feedback" | transloco}}
                 </button>
             </div>
         </div>

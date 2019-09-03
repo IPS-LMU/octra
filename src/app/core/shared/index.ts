@@ -15,4 +15,3 @@ export * from '../obj/SessionFile';
 export * from './OCTRAnimations';
 export * from '../obj/SubscriptionManager';
 export * from '../obj/Converters';
-export * from './LanguageLoader';

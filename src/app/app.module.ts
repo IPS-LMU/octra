@@ -2,11 +2,9 @@
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {TranslateLoader, TranslateModule, TranslateService} from '@ngx-translate/core';
 // third-party
 import {Ng2Webstorage} from '@rars/ngx-webstorage';
 // other
-import {LanguageLoader} from './core/shared';
 import {AlertComponent, DropZoneComponent, OctraModalComponent} from './core/component';
 import {
   FastbarComponent,
@@ -46,7 +44,7 @@ import {HelpComponent} from './core/gui/help/';
 import {NewEditorComponent} from './editors/new-editor/new-editor.component';
 import {HelpToolsComponent} from './core/gui/help-tools/';
 import {FeaturesComponent} from './core/gui/features';
-import {HttpClient, HttpClientModule} from '@angular/common/http';
+import {HttpClientModule} from '@angular/common/http';
 import {AudioviewerConfig} from './media-components/components/audio/audioviewer';
 import {MediaComponentsModule} from './media-components/media-components.module';
 import {TranscrEditorComponent} from './core/component/transcr-editor';
@@ -120,6 +118,9 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
 import {StresstestComponent} from './core/tools/stresstest/stresstest.component';
 import {TranscriptionDemoEndModalComponent} from './core/modals/transcription-demo-end/transcription-demo-end-modal.component';
+import {environment} from '../environments/environment';
+import {translocoLoader} from './transloco.loader';
+import {TRANSLOCO_CONFIG, TranslocoConfig, TranslocoModule} from '@ngneat/transloco';
 
 library.add(
   faSpinner,
@@ -159,11 +160,6 @@ library.add(
   faAlignJustify,
   faStar
 );
-
-// AoT requires an exported function for factories
-export function HttpLoaderFactory(http: HttpClient) {
-  return new LanguageLoader(http, './assets/i18n/octra/octra_', '.json');
-}
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -231,13 +227,6 @@ export const EDITORS: any[] = [
     ModalModule.forRoot(),
     DragDropModule,
     BsDropdownModule.forRoot(),
-    TranslateModule.forRoot({
-      loader: {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient]
-      }
-    }),
     CollapseModule.forRoot(),
     FormsModule,
     HttpClientModule,
@@ -252,7 +241,8 @@ export const EDITORS: any[] = [
     ProgressbarModule.forRoot(),
     routing,
     ButtonsModule.forRoot(),
-    PopoverModule.forRoot()
+    PopoverModule.forRoot(),
+    TranslocoModule
   ],
   bootstrap: [
     AppComponent
@@ -274,10 +264,21 @@ export const EDITORS: any[] = [
     SettingsGuard,
     SettingsService,
     TranscrEndGuard,
-    TranslateService,
     BugReportService,
     CompatibilityService,
-    MultiThreadingService
+    MultiThreadingService,
+    {
+      provide: TRANSLOCO_CONFIG,
+      useValue: {
+        listenToLangChange: true,
+        defaultLang: 'en',
+        fallbackLang: 'en',
+        prodMode: environment.production,
+        scopeStrategy: 'shared'
+      } as TranslocoConfig
+    },
+    translocoLoader
+
   ]
 })
 

@@ -1,5 +1,5 @@
 <div id="agreement" class="panel">
-    <h2>{{"general.agreement" | translate}}</h2>
+  <h2>{{"general.agreement" | transloco}}</h2>
     <p [innerHTML]="toHTML(settService.projectsettings.agreement.text)">
     </p>
     <div id="bottom-nav">
@@ -7,10 +7,10 @@
             <a class="btn btn-default btn-raised"
                (click)="logout()">
                 <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
-                <span class=" d-none d-md-inline"> {{"general.quit" | translate}}</span></a>
+              <span class=" d-none d-md-inline"> {{"general.quit" | transloco}}</span></a>
             <a class="btn btn-default btn-raised"
                (click)="accept()">
-                <span class=" d-none d-md-inline"> {{"general.continue" | translate}}</span>
+              <span class=" d-none d-md-inline"> {{"general.continue" | transloco}}</span>
                 <fa-icon [icon]="['far', 'check-circle']"></fa-icon>
             </a>
         </div>

@@ -14,7 +14,7 @@ import {Subject} from 'rxjs';
 import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {BugReportService} from '../../shared/service/bug-report.service';
-import {TranslateService} from '@ngx-translate/core';
+import {TranslocoService} from '@ngneat/transloco';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {isNullOrUndefined} from '../../shared/Functions';
 
@@ -45,7 +45,7 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();
 
-  constructor(private modalService: BsModalService, private lang: TranslateService, public transcrService: TranscriptionService,
+  constructor(private modalService: BsModalService, private lang: TranslocoService, public transcrService: TranscriptionService,
               private appStorage: AppStorageService, private bugService: BugReportService, private settService: SettingsService,
               private cd: ChangeDetectorRef, private sanitizer: DomSanitizer) {
   }
@@ -135,7 +135,7 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
         .appendTo('body');
 
       const jsonObj = {
-        translation: this.lang.instant('general'),
+        translation: this.lang.translate('general'),
         guidelines: this.guidelines
       };
 

@@ -2,7 +2,7 @@ import {Component, OnInit, SecurityContext, TemplateRef, ViewChild} from '@angul
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs';
 import {DomSanitizer} from '@angular/platform-browser';
-import {TranslateService} from '@ngx-translate/core';
+import {TranslocoService} from '@ngneat/transloco';
 
 export enum ModalEndAnswer {
   CANCEL = 'CANCEL',
@@ -30,7 +30,7 @@ export class TranscriptionDemoEndModalComponent implements OnInit {
   private actionperformed: Subject<ModalEndAnswer> = new Subject<ModalEndAnswer>();
 
   constructor(private modalService: BsModalService, private sanitizer: DomSanitizer,
-              private languageService: TranslateService) {
+              private languageService: TranslocoService) {
   }
 
   ngOnInit() {

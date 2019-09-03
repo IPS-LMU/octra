@@ -6,7 +6,7 @@
             <div class="modal-header">
                 <div class="row" style="width:100%;">
                     <div class="col-md-7">
-                        <h3 style="display:inline;">{{"general.guidelines" | translate }}<span class="version">
+                      <h3 style="display:inline;">{{"general.guidelines" | transloco }}<span class="version">
                      v {{ guidelines.meta.version }}
                 </span></h3>
                         <button *ngIf="isPDFExportEnabled() && !isPDFLinkOnly() else pdfNotEnabled"
@@ -24,10 +24,10 @@
                             </a>
                         </ng-template>
                         <span class="project">
-                     {{"general.project" | translate }}: {{guidelines.meta.project }}
+                     {{"general.project" | transloco }}: {{guidelines.meta.project }}
                 </span>
                         <span class="authors">
-                     {{"general.authors" | translate }}: {{ guidelines.meta.authors }}
+                     {{"general.authors" | transloco }}: {{ guidelines.meta.authors }}
                 </span>
                     </div>
                     <div class="col-md-5">
@@ -35,8 +35,8 @@
                             <div class="input-group">
                                 <span class="input-group-addon">
                                     <fa-icon icon="search"></fa-icon></span>
-                                <input type="text" id="addon1" placeholder="{{'general.search' |translate}}"
-                                       class="form-control" #input (keyup)="search(input.value)">
+                              <input type="text" id="addon1" placeholder="{{'general.search' |transloco}}"
+                                     class="form-control" #input (keyup)="search(input.value)">
                             </div>
                         </div>
                     </div>
@@ -44,7 +44,7 @@
             </div>
             <div class="modal-body">
                 <div *ngIf="shownGuidelines.instructions.length === 0" class="bg-warning">
-                    {{"general.no guidelines found" | translate}}
+                  {{"general.no guidelines found" | transloco}}
                 </div>
                 <div class="row" style="margin-bottom:20px;"
                      *ngFor="let instructions of shownGuidelines.instructions;let j = index;">
@@ -74,7 +74,7 @@
                                                     <div class="card-header example"
                                                          *ngIf="settService.projectsettings.guidelines === undefined
                                                          || settService.projectsettings.guidelines?.showExampleHeader">
-                                                        {{"general.example" | translate}}
+                                                      {{"general.example" | transloco}}
                                                         <ng-container
                                                                 *ngIf="settService.projectsettings.guidelines === undefined
                                                          || settService.projectsettings.guidelines?.showExampleNumbers">
@@ -129,7 +129,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="close()">
-                    {{"general.close" | translate}}
+                  {{"general.close" | transloco}}
                 </button>
             </div>
         </div>

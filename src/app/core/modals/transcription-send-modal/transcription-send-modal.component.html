@@ -1,13 +1,13 @@
 <ng-template #modal>
     <div class="modal-header">
-        <h4 class="modal-title">{{"modal.transcription.send.header" | translate}}</h4>
+      <h4 class="modal-title">{{"modal.transcription.send.header" | transloco}}</h4>
     </div>
     <div class="modal-body">
-        {{"modal.transcription.send.text" | translate}}
+      {{"modal.transcription.send.text" | transloco}}
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-primary" (click)="close('CANCEL')">{{"general.abort" | translate}}</button>
-        <button type="button" class="btn btn-default" (click)="close('SEND')">{{"general.send now" | translate}}
+      <button type="button" class="btn btn-primary" (click)="close('CANCEL')">{{"general.abort" | transloco}}</button>
+      <button type="button" class="btn btn-default" (click)="close('SEND')">{{"general.send now" | transloco}}
         </button>
     </div>
 </ng-template>

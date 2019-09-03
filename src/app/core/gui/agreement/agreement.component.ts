@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {AppStorageService, SettingsService} from '../../shared/service';
 import {Router} from '@angular/router';
-import {TranslateService} from '@ngx-translate/core';
+import {TranslocoService} from '@ngneat/transloco';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
 import {Functions} from '../../shared/Functions';
@@ -17,7 +17,7 @@ export class AgreementComponent implements OnInit {
 
   constructor(public settService: SettingsService,
               private router: Router,
-              private langService: TranslateService,
+              private langService: TranslocoService,
               private appStorage: AppStorageService) {
     if ((this.settService.projectsettings === null || this.settService.projectsettings === undefined)) {
       Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling);
@@ -31,8 +31,9 @@ export class AgreementComponent implements OnInit {
 
   public toHTML(text: any): string {
     if (!(text === null || text === undefined)) {
-      if (!(text[this.langService.currentLang] === null || text[this.langService.currentLang] === undefined)) {
-        return text[this.langService.currentLang].replace('\n', '<br/>');
+      const currentLang = this.langService.getActiveLang();
+      if (!(text[currentLang] === null || text[currentLang] === undefined)) {
+        return text[currentLang].replace('\n', '<br/>');
       } else {
         for (const l in text) {
           if (!(text[l] === null || text[l] === undefined)) {

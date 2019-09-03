@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {BrowserInfo} from '../BrowserInfo';
-import {TranslateService} from '@ngx-translate/core';
+import {TranslocoService} from '@ngneat/transloco';
 import {AppInfo} from '../../../app.info';
 import {AppStorageService} from './appstorage.service';
 import {Observable} from 'rxjs';
@@ -35,7 +35,7 @@ export class BugReportService {
     return this._console;
   }
 
-  constructor(private langService: TranslateService,
+  constructor(private langService: TranslocoService,
               private appStorage: AppStorageService,
               private settService: SettingsService,
               private http: HttpClient) {
@@ -63,7 +63,7 @@ export class BugReportService {
     const result = {
       octra: {
         version: AppInfo.version,
-        language: this.langService.currentLang,
+        language: this.langService.getActiveLang(),
         signed_in: this.appStorage.LoggedIn,
         usemode: this.appStorage.usemode,
         url: window.location.href,

@@ -1,12 +1,12 @@
-<h4>{{"general.statistics" | translate}}</h4>
+<h4>{{"general.statistics" | transloco}}</h4>
 
 <table id="statistics" class="table table-bordered">
     <thead>
     <tr>
-        <th>{{"segments.total" | translate}}</th>
-        <th>{{"segments.transcribed" | translate}}</th>
-        <th>{{"segments.with breaks" | translate}}</th>
-        <th>{{"segments.not transcribed" | translate}}</th>
+      <th>{{"segments.total" | transloco}}</th>
+      <th>{{"segments.transcribed" | transloco}}</th>
+      <th>{{"segments.with breaks" | transloco}}</th>
+      <th>{{"segments.not transcribed" | transloco}}</th>
     </tr>
     </thead>
     <tbody>
@@ -21,13 +21,13 @@
 <p [hidden]="shownSegments.length === 0" style="text-align: center">
     <ng-container *ngIf="validationFound">
         <span *ngIf="foundErrors === 0"
-              class="text-success found-errors">{{"general.no errors found" | translate}}</span>
+              class="text-success found-errors">{{"general.no errors found" | transloco}}</span>
         <span *ngIf="foundErrors > 0"
-              class="text-danger found-errors">{{"general.errors found" | translate : {errors: foundErrors} }}</span>
+              class="text-danger found-errors">{{"general.errors found" | transloco : {errors: foundErrors} }}</span>
     </ng-container>
     <span *ngIf="!validationFound">No validation methods found</span>
 </p>
-<h4 [hidden]="!showTranscriptionTable">{{"general.transcript" | translate}}</h4>
+<h4 [hidden]="!showTranscriptionTable">{{"general.transcript" | transloco}}</h4>
 <div [hidden]="!showLoading">
     <div style="display:block; text-align:center; margin-top:-10px;position:absolute;width:100%;">
         <i class="fa fa-spinner fa-spin" style="font-size:32px"></i>
@@ -44,13 +44,13 @@
     <thead id="table-head">
     <tr>
         <th id="table-first-column"></th>
-        <th id="table-second-column">{{"general.segment" | translate}}</th>
-        <th id="table-third-column">{{"general.transcription" | translate}}</th>
+      <th id="table-second-column">{{"general.segment" | transloco}}</th>
+      <th id="table-third-column">{{"general.transcription" | transloco}}</th>
         <th class="last-column">
             <fa-icon [icon]="['fas', playAllState.icon]" (click)="togglePlayAll()"></fa-icon>
             <input type="checkbox" id="skip-silence-checkbox" (click)="toggleSkipCheckbox()"
                    [checked]="playAllState.skipSilence">
-            <label for="skip-silence-checkbox">{{"general.skip silence" | translate}}</label>
+          <label for="skip-silence-checkbox">{{"general.skip silence" | transloco}}</label>
         </th>
     </tr>
     </thead>

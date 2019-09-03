@@ -1,13 +1,13 @@
 <ng-template #modal>
     <div class="modal-header">
-        <h4 class="modal-title">{{"modal.transcription.sending.header" | translate}}</h4>
+      <h4 class="modal-title">{{"modal.transcription.sending.header" | transloco}}</h4>
     </div>
     <div class="modal-body">
-        {{"modal.transcription.sending.text" | translate}}<br/><br/>
+      {{"modal.transcription.sending.text" | transloco}}<br/><br/>
         <div style="color:red">{{sendError}}</div>
         <div *ngIf="sendError === ''" class="text-success" style="text-align: center;display:block;">
             {{"general.submission success" |
-            translate}}
+            transloco}}
         </div>
     </div>
 </ng-template>

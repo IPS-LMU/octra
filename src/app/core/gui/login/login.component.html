@@ -2,24 +2,24 @@
     <div class="ro">
         <div class="col-12" style="text-align: center;">
             <p style="padding-top:10px;margin-bottom:10px;">
-                <a routerLink fragment="" (click)="startDemo()">{{"login.demo"|translate}}</a>
+              <a routerLink fragment="" (click)="startDemo()">{{"login.demo"|transloco}}</a>
             </p>
         </div>
     </div>
     <div id="loginrow" class="row">
         <div #onlinemode id='onlinemode' class="col-md-6 card" style="padding:40px;">
             <p *ngIf="!apc.octra.responsive.enabled && !validSize" class="warning"
-               [innerHTML]="'browser.small window width' | translate">
+               [innerHTML]="'browser.small window width' | transloco">
             </p>
             <section>
                 <h4 [ngClass]="{
                 'alert-success': appStorage.usemode === 'online'
-                }">{{ 'login.online mode' | translate}}</h4>
+                }">{{ 'login.online mode' | transloco}}</h4>
                 <p style="text-align: center;">
-                    {{"login.online mode description" | translate}}
+                  {{"login.online mode description" | transloco}}
                 </p>
                 <div *ngIf="!apc.octra.login.enabled" id="login-disabled">
-                    {{'login.online mode disabled' | translate}}
+                  {{'login.online mode disabled' | transloco}}
                 </div>
                 <div class="form-horizontal" *ngIf="apc.octra.login.enabled">
                     <div style="text-align: center;margin-top:20%;" *ngIf="apiStatus === 'init'">
@@ -34,7 +34,7 @@
                                     <fa-icon icon="exclamation-triangle" style="color:red" [size]="'4x'"></fa-icon>
                                 </div>
                                 <p style="text-align: justify; margin-top:10px;">
-                                    {{"login.api not available" | translate}}
+                                  {{"login.api not available" | transloco}}
                                 </p>
                             </div>
                         </ng-container>
@@ -43,43 +43,43 @@
                         <fieldset>
                             <div class="form-group">
                                 <label for="select111" class="control-label">
-                                    {{"general.select database" | translate}}
+                                  {{"general.select database" | transloco}}
                                 </label>
                                 <select id="select111" class="form-control" #selection aria-describedby="databaseName"
                                         [(ngModel)]="member.project" name="project" required>
-                                    <option value="">{{"general.select database" | translate}}</option>
+                                  <option value="">{{"general.select database" | transloco}}</option>
                                     <option *ngFor="let project of projects;" value="{{project}}">{{project}}
                                     </option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="login-id" class="control-label">
-                                    {{ 'general.name' | translate}}
+                                  {{ 'general.name' | transloco}}
                                 </label>
                                 <input class="form-control" id="login-id" aria-describedby="loginName"
                                        name="login-id"
-                                       placeholder="{{ 'general.name' | translate }}" [(ngModel)]="member.id"
+                                       placeholder="{{ 'general.name' | transloco }}" [(ngModel)]="member.id"
                                        pattern="\w+"
                                        required
                                 />
                             </div>
                             <div class="form-group" *ngIf="passwordExists()">
                                 <label for="login-password" class="control-label">
-                                    {{ 'general.password' | translate}}
+                                  {{ 'general.password' | transloco}}
                                 </label>
                                 <input class="form-control" id="login-password" type="password"
                                        aria-describedby="password"
                                        name="login-password"
-                                       placeholder="{{ 'general.password' | translate }}" [(ngModel)]="member.password"
+                                       placeholder="{{ 'general.password' | transloco }}" [(ngModel)]="member.password"
                                 />
                             </div>
                             <div class="form-group">
                                 <label for="jobno" class="control-label">
-                                    {{"general.job number" | translate}}
+                                  {{"general.job number" | transloco}}
                                 </label>
                                 <input class="form-control" type="number" id="jobno" aria-describedby="jobNumber"
                                        name="jobno"
-                                       placeholder="{{'general.job number' | translate}}" #t
+                                       placeholder="{{'general.job number' | transloco}}" #t
                                        [(ngModel)]="member.jobno"
                                        pattern="[0-9]+"
                                 />
@@ -91,13 +91,13 @@
                                            'btn-danger': (appStorage.usemode === 'local' && appStorage.sessionfile !== null)
                                            }"
                                         [disabled]="!f.valid"
-                                        name="login-submit">{{'general.login' | translate}}
+                                        name="login-submit">{{'general.login' | transloco}}
                                 </button>
                                 <button *ngIf="appStorage.usemode === 'local'"
                                         class="btn btn-raised btn-primary btn-danger login-submit"
                                         aria-describedby="submitButton"
                                         [disabled]="!f.valid"
-                                        name="login-submit">{{'login.login and remove' | translate}}
+                                        name="login-submit">{{'login.login and remove' | transloco}}
                                 </button>
                             </div>
                         </fieldset>
@@ -110,15 +110,15 @@
             <section>
                 <h4 [ngClass]="{
                 'alert-success': appStorage.usemode === 'local'
-                }">{{'login.local mode' | translate}}
+                }">{{'login.local mode' | transloco}}
                 </h4>
                 <p style="text-align: center;">
-                    {{"login.local mode description" | translate}}
+                  {{"login.local mode description" | transloco}}
                 </p>
                 <div>
                     <div class="alert alert-warning"
                          *ngIf="appStorage.usemode === 'local' && appStorage.sessionfile !== null"
-                         [innerHTML]="'login.old file found' | translate:{file_label: getDropzoneFileString(sessionfile)}">
+                         [innerHTML]="'login.old file found' | transloco:{file_label: getDropzoneFileString(sessionfile)}">
                     </div>
                     <div style="margin-top: 40px;">
                         <app-octra-dropzone #dropzone [height]="'147px'"></app-octra-dropzone>
@@ -129,13 +129,13 @@
                             id="offline-submit"
                             class="btn btn-raised btn-primary"
                             (click)="onOfflineSubmit()">
-                        {{'transcription.start' | translate}}
+                      {{'transcription.start' | transloco}}
                     </button>
                     <ng-template #newTranscription>
                         <button *ngIf="appStorage.usemode === 'local' && getFileStatus() == 'new' else removeOldTranscription;"
                                 class="btn btn-raised btn-danger offline-delete-btn"
                                 (click)="onTranscriptionDelete()">
-                            {{'transcription.new' |translate}}
+                          {{'transcription.new' |transloco}}
                         </button>
                     </ng-template>
                     <ng-template #removeOldTranscription>
@@ -143,7 +143,7 @@
                     appStorage.usemode === 'online' && (getFileStatus() != 'new' || getFileStatus() != 'start')"
                                 [disabled]="(getFileStatus() !== 'new' && getFileStatus() !== 'start')"
                                 class="btn btn-raised btn-danger offline-delete-btn"
-                                (click)="onOfflineSubmit()">{{'login.local and remove' |translate}}</button>
+                                (click)="onOfflineSubmit()">{{'login.local and remove' |transloco}}</button>
                     </ng-template>
                 </div>
             </section>

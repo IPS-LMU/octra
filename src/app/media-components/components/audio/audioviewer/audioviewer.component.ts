@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 
 import {AudioviewerService} from './audioviewer.service';
-import {TranslateService} from '@ngx-translate/core';
+import {TranslocoService} from '@ngneat/transloco';
 import {AudioRessource, AudioSelection, BrowserAudioTime, BrowserSample} from '../../../obj/media/audio';
 import {PlayBackState} from '../../../obj/media';
 import {Interval, Margin, Rectangle} from '../../../objects';
@@ -125,7 +125,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   constructor(public av: AudioviewerService,
               private transcr: TranscriptionService,
               private keyMap: KeymappingService,
-              private langService: TranslateService,
+              private langService: TranslocoService,
               private cd: ChangeDetectorRef) {
 
     this.av.initializeSettings();
@@ -519,7 +519,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                           console.log(`${segment.time.browserSample.value} <= ${this.audiochunk.time.end.browserSample.value}`);
                           this.alerttriggered.emit({
                             type: 'error',
-                            message: this.langService.instant('segment invisible')
+                            message: this.langService.translate('segment invisible')
                           });
                         }
                       }
@@ -572,7 +572,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                       () => {
                         this.alerttriggered.emit({
                           type: 'error',
-                          message: this.langService.instant('segment invisible')
+                          message: this.langService.translate('segment invisible')
                         });
                       });
 

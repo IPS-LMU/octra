@@ -24,27 +24,27 @@
                       [replay]="audiochunkTop.replay"
                       [buttons]="{
                         play: {
-                            label: ('general.play' | translate),
+                            label: ('general.play' | transloco),
                             shortcut: keyMap.getShortcut('AV', 'play_pause')
                         },
                         pause: {
-                            label: ('general.pause' | translate),
+                            label: ('general.pause' | transloco),
                             shortcut: keyMap.getShortcut('AV', 'play_pause')
                         },
                         stop: {
-                            label: ('general.stop' | translate),
+                            label: ('general.stop' | transloco),
                             shortcut: keyMap.getShortcut('AV', 'stop')
                         },
                         replay: {
-                            label: ('general.replay' | translate),
+                            label: ('general.replay' | transloco),
                             shortcut: ''
                         },
                         backward: {
-                            label: ('general.backward' | translate),
+                            label: ('general.backward' | transloco),
                             shortcut: keyMap.getShortcut('AV', 'step_backward')
                         },
                         backwardtime: {
-                            label: ('general.backwardtime' | translate),
+                            label: ('general.backwardtime' | transloco),
                             shortcut: keyMap.getShortcut('overlay', 'step_backward')
                         }
                       }"
@@ -84,9 +84,9 @@
 </app-loupe>
 <div [hidden]="segmentselected" id="editor-placeholder">
     <div *ngIf="!segmentselected && topSelected" class="inner"
-         [innerHTML]="'signal-gui.segment enter text' | translate:{value: segmententer_shortc}">
+         [innerHTML]="'signal-gui.segment enter text' | transloco:{value: segmententer_shortc}">
     </div>
-    <div *ngIf="!topSelected" class="inner" [innerHTML]="'signal-gui.selection text' | translate">
+  <div *ngIf="!topSelected" class="inner" [innerHTML]="'signal-gui.selection text' | transloco">
     </div>
 </div>
 <app-transcr-editor #transcr

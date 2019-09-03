@@ -28,7 +28,7 @@ import {
 } from '../../shared/service';
 
 import {BrowserInfo, SubscriptionManager} from '../../shared';
-import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
+import {TranslocoService} from '@ngneat/transloco';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 import {ProjectSettings} from '../../obj/Settings';
 import {editorComponents} from '../../../editors/components';
@@ -103,7 +103,7 @@ export class TranscriptionComponent implements OnInit,
               public navbarServ: NavbarService,
               public settingsService: SettingsService,
               public modService: ModalService,
-              public langService: TranslateService,
+              public langService: TranslocoService,
               private api: APIService,
               private bugService: BugReportService,
               private cd: ChangeDetectorRef) {
@@ -267,9 +267,8 @@ export class TranscriptionComponent implements OnInit,
     this.navbarServ.showInterfaces = this.settingsService.projectsettings.navigation.interfaces;
 
     // load guidelines on language change
-    this.subscrmanager.add(this.langService.onLangChange.subscribe(
-      (event: LangChangeEvent) => {
-        let lang = event.lang;
+    this.subscrmanager.add(this.langService.langChanges$.subscribe(
+      (lang: string) => {
         const found = this.settingsService.projectsettings.languages.find(
           x => {
             return x === lang;
@@ -280,7 +279,7 @@ export class TranscriptionComponent implements OnInit,
           lang = this.settingsService.projectsettings.languages[0];
         }
 
-        this.settingsService.loadGuidelines(event.lang, './config/localmode/guidelines/guidelines_' + lang + '.json');
+        this.settingsService.loadGuidelines(lang, './config/localmode/guidelines/guidelines_' + lang + '.json');
       }
     ));
 
@@ -565,7 +564,7 @@ export class TranscriptionComponent implements OnInit,
             this.nextTranscription(result);
           }, 500);
         } else {
-          this.sendError = this.langService.instant('send error');
+          this.sendError = this.langService.translate('send error');
         }
       }).catch((error) => {
         this.onSendError(error);
@@ -738,7 +737,7 @@ export class TranscriptionComponent implements OnInit,
     this.transcrService.endTranscription(false);
     this.clearData();
 
-    const audioExample = this.settingsService.getAudioExample(this.langService.currentLang);
+    const audioExample = this.settingsService.getAudioExample(this.langService.getActiveLang());
 
     if (!isNullOrUndefined(audioExample)) {
       // transcription available

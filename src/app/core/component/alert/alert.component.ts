@@ -19,9 +19,9 @@ export class AlertComponent implements OnInit, OnDestroy {
   }
 
   public type = 'error';
-  private state = 'inactive';
-  private text = '';
-  private show = false;
+  public state = 'inactive';
+  public text = '';
+  public show = false;
   private subscrmanager: SubscriptionManager;
 
   /**

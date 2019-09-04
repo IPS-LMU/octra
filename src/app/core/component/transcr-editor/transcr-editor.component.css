@@ -1,93 +1,109 @@
 .transcr-editor {
-    width: 100%;
-    min-height: 100px;
+  width: 100%;
+  min-height: 100px;
 }
 
 .textspan {
-    display: inline;
+  display: inline;
 }
 
 .transcr-editor .editor-nav {
-    width: 100%;
-    height: 2em;
+  width: 100%;
+  height: 2em;
 }
 
 .transcr-editor .textfield {
-    margin: 5px;
-    display: block;
+  margin: 5px;
+  display: block;
 }
 
 .transcr-editor .marker-btn {
-    height: 100%;
-    display: inline-block;
-    padding: 3px 5px;
-    margin-right: 2px;
-    vertical-align: middle;
+  height: 100%;
+  display: inline-block;
+  padding: 3px 5px;
+  margin-right: 2px;
+  vertical-align: middle;
 }
 
 .transcr-editor .marker-btn:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .transcr-editor .marker-icon {
-    display: inline;
-    margin-right: 3px;
+  display: inline;
+  margin-right: 3px;
 }
 
 .transcr-editor .btn-shortcut {
-    font-size: 0.7em;
-    margin: auto 0;
+  font-size: 0.7em;
+  margin: auto 0;
 }
 
 .transcr-editor .btn-description {
-    font-size: 0.3em;
+  font-size: 0.3em;
 }
 
 .btn-icon {
-    height: 16px;
+  height: 16px;
 }
 
 .note-toolbar .btn-icon,
 .note-editable .btn-icon-text {
-    height: 16px;
+  height: 16px;
 }
 
 .note-toolbar .btn-descr,
 .note-toolbar .btn-shortcut {
-    margin-left: 3px;
+  margin-left: 3px;
 }
 
 .note-editable {
-    border: 1px solid red;
+  border: 1px solid red;
 }
 
 .transcr-editor {
-    -webkit-box-flex: 1;
-    -ms-flex: 1 0 auto;
-    display: flex;
-    flex-direction: column;
-    flex: 1 0 auto;
+  -webkit-box-flex: 1;
+  -ms-flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
 }
 
 :host {
-    -webkit-box-flex: 1;
-    -ms-flex: 1 0 auto;
-    display: flex;
-    flex-direction: column;
-    flex: 1 0 auto;
+  -webkit-box-flex: 1;
+  -ms-flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
 }
 
 .error-card {
-    max-width: 300px !important;
-    position: absolute;
-    margin-top: 300px;
-    z-index: 200;
+  max-width: 300px !important;
+  position: absolute;
+  margin-top: 300px;
+  z-index: 200;
 }
 
 .note-editable.card-block {
-    min-height: 100px !important;
+  min-height: 100px !important;
 }
 
 .note-editable.card-block .val-error {
-    cursor: pointer !important;
+  cursor: pointer !important;
+}
+
+#asrOverlay {
+  width: 100%;
+  opacity: 0.5;
+  position: absolute;
+  z-index: 30;
+  font-weight: bolder;
+}
+
+.asr-running {
+  background-color: rgba(255, 202, 37, 0.6);
+}
+
+.asr-error {
+  background-color: rgba(255, 98, 107, 0.6);
 }

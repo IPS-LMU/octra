@@ -20,7 +20,7 @@ import {
   UserInteractionsService
 } from '../../core/shared/service';
 
-import {AudioSelection, BrowserAudioTime} from '../../core/shared';
+import {AudioSelection, BrowserAudioTime, BrowserSample, OriginalSample} from '../../core/shared';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
 import {TranscrWindowComponent} from './transcr-window';
 import {PlayBackState} from '../../media-components/obj/media';
@@ -33,6 +33,8 @@ import {Line} from '../../media-components/obj';
 import {AudioChunk, AudioManager} from '../../media-components/obj/media/audio/AudioManager';
 import {Functions, isNullOrUndefined} from '../../core/shared/Functions';
 import {OCTRAEditor} from '../octra-editor';
+import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../core/shared/service/asr.service';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-overlay-gui',
@@ -111,7 +113,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               public msg: MessageService,
               public settingsService: SettingsService,
               public appStorage: AppStorageService,
-              private cd: ChangeDetectorRef) {
+              private asrService: AsrService,
+              private cd: ChangeDetectorRef,
+              private langService: TranslateService) {
     super();
 
     this.subscrmanager = new SubscriptionManager();
@@ -162,7 +166,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.viewer.settings.stepWidthRatio = (this.viewer.settings.pixelPerSec / this.audiomanager.ressource.info.samplerate);
     this.viewer.settings.showTimePerLine = true;
     this.viewer.settings.showTranscripts = true;
+    this.viewer.settings.asr.enabled = (this.appStorage.usemode === 'demo' || this.appStorage.usemode === 'local');
     this.viewer.name = 'multiline viewer';
+
     this.viewer.secondsPerLine = this.appStorage.secondsPerLine;
 
     this.viewer.alerttriggered.subscribe(
@@ -223,6 +229,39 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         }
       }
     ));
+
+    this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
+        if (item.status !== ASRProcessStatus.STARTED && item.status !== ASRProcessStatus.IDLE) {
+          const segmentBoundary = BrowserSample.fromOriginalSample(
+            new OriginalSample(item.time.sampleStart + item.time.sampleLength, this.audiomanager.originalSampleRate),
+            this.audiomanager.browserSampleRate);
+          const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+            segmentBoundary
+          );
+
+          if (segNumber > -1) {
+            console.log(`change segnumber ${segNumber}`);
+            const segment = this.transcrService.currentlevel.segments.get(segNumber).clone();
+            segment.isBlockedBy = 'none';
+            if (item.status === ASRProcessStatus.FINISHED && item.result !== '') {
+              segment.transcript = item.result;
+              console.log(`OK ES KLAPPT!`);
+            }
+            // STOPPED and FAILED status is ignored because OCTRA should do nothing
+
+            this.transcrService.currentlevel.segments.change(segNumber, segment);
+
+            // update GUI
+            this.viewer.update();
+          } else {
+            console.error(new Error(`couldn't find segment number`));
+          }
+        }
+      },
+      (error) => {
+      },
+      () => {
+      }));
   }
 
   ngOnDestroy() {
@@ -345,6 +384,46 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   onShortCutTriggered($event, type) {
+    if (($event.value === 'do_asr' || $event.value === 'cancel_asr') && $event.type === 'segment') {
+      const segmentNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(this.viewer.MouseCursor.timePos.browserSample);
+
+      if (segmentNumber > -1) {
+        console.log(`event triggered!`);
+        console.log($event);
+        console.log(`segNumber: ${segmentNumber}`);
+
+        if (!isNullOrUndefined(this.asrService.selectedLanguage)) {
+          const segment = this.transcrService.currentlevel.segments.get(segmentNumber);
+
+          const sampleStart = (segmentNumber > 0)
+            ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.originalSample.value
+            : 0;
+
+          const selection = {
+            sampleStart: sampleStart,
+            sampleLength: segment.time.originalSample.value - sampleStart
+          };
+
+
+          if (segment.isBlockedBy !== 'asr') {
+            this.asrService.addToQueue(selection);
+            segment.isBlockedBy = 'asr';
+            this.asrService.startASR();
+          } else {
+            const item = this.asrService.queue.getItemByTime(selection.sampleStart, selection.sampleLength);
+            this.asrService.stopASROfItem(item);
+            segment.isBlockedBy = 'none';
+          }
+
+          this.viewer.update();
+        } else {
+          // open transcr window
+          this.openSegment(segmentNumber);
+          this.msg.showMessage('warning', this.langService.instant('asr.no asr selected'));
+        }
+      }
+    }
+
     if (
       $event.value === null || !(
         // cursor move by keyboard events are note saved because this would be too much

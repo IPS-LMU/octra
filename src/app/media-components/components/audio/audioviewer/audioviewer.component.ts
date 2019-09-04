@@ -608,6 +608,31 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                     keyActive = true;
                   }
                   break;
+                case('do_asr'):
+                  if (this.settings.boundaries.enabled && this.av.focused && this.settings.asr.enabled) {
+                    const xSamples = this.av.audioTCalculator.absXChunktoSamples(this.av.Mousecursor.absX, this.audiochunk);
+
+                    if (xSamples > -1) {
+                      const segmentI = this.transcr.currentlevel.segments.getSegmentBySamplePosition(
+                        new BrowserSample(xSamples, this.audiomanager.browserSampleRate)
+                      );
+                      const segment = this.transcr.currentlevel.segments.get(segmentI);
+
+                      if (segmentI > -1) {
+                        console.log(`DO ASR!`);
+                        if (segment.isBlockedBy !== 'asr') {
+                          this.shortcuttriggered.emit({shortcut: comboKey, value: 'do_asr', type: 'segment'});
+                        } else {
+                          this.shortcuttriggered.emit({shortcut: comboKey, value: 'cancel_asr', type: 'segment'});
+                        }
+                        this.update(false);
+                        this.drawCursor(this.av.Mousecursor.line);
+                        this.transcr.currentlevel.segments.onsegmentchange.emit();
+                      }
+                    }
+
+                    keyActive = true;
+                  }
               }
 
               if (keyActive) {
@@ -1204,15 +1229,19 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 w = line.Size.width - select.start + 1;
               }
 
-              if (segment.transcript === '') {
-                this.oContext.globalAlpha = 0.2;
-                this.oContext.fillStyle = 'red';
-              } else if (!isNullOrUndefined(this.transcr.breakMarker) && segment.transcript === this.transcr.breakMarker.code) {
-                this.oContext.globalAlpha = 0.2;
-                this.oContext.fillStyle = 'blue';
-              } else if (segment.transcript !== '') {
-                this.oContext.globalAlpha = 0.2;
-                this.oContext.fillStyle = 'green';
+              this.oContext.globalAlpha = 0.2;
+              if (segment.isBlockedBy !== 'asr') {
+                if (segment.transcript === '') {
+                  this.oContext.fillStyle = 'red';
+                } else if (!isNullOrUndefined(this.transcr.breakMarker) && segment.transcript === this.transcr.breakMarker.code) {
+                  this.oContext.fillStyle = 'blue';
+                } else if (segment.transcript !== '') {
+                  this.oContext.fillStyle = 'green';
+                }
+              } else {
+                // blocked by ASR
+                this.oContext.globalAlpha = 0.5;
+                this.oContext.fillStyle = '#ffcf3f';
               }
 
               drawnSegments++;

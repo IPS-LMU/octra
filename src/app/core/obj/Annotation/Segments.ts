@@ -109,6 +109,7 @@ export class Segments {
 
       this._segments[i].time.browserSample.value = segment.time.browserSample.value;
       this._segments[i].transcript = segment.transcript;
+      this._segments[i].isBlockedBy = segment.isBlockedBy;
 
       if (old.samples !== segment.time.browserSample.value || old.transcript !== segment.transcript) {
         this.onsegmentchange.emit();

@@ -6,7 +6,9 @@ import {Functions, isNullOrUndefined} from '../Functions';
 import {OLog} from '../../obj/Settings/logging';
 import {BrowserAudioTime} from '../../../media-components/obj/media/audio';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class UserInteractionsService {
   set lastAction(value: number) {
     this._lastAction = value;

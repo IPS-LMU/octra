@@ -68,6 +68,10 @@ export class AudioviewerConfig {
     color: '#b5b5b5'
   };
 
+  public asr = {
+    enabled: false
+  };
+
 
   // SHORTCUTS
   // SHORTCUTS sheme= KeyMapping [+ <char or charCode>]
@@ -168,6 +172,14 @@ export class AudioviewerConfig {
       },
       focusonly: true,
       title: 'delete boundaries'
+    },
+    do_asr: {
+      keys: {
+        mac: 'R',
+        pc: 'R'
+      },
+      focusonly: true,
+      title: 'do asr'
     }
   };
 

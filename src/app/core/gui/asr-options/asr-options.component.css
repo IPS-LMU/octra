@@ -1,0 +1,75 @@
+.languageTable thead th {
+  text-align: center;
+  font-size: 0.8em;
+  vertical-align: middle;
+}
+
+.languageTable .selected {
+  background-color: powderblue;
+}
+
+.languageTable tr td {
+  font-size: 0.8em;
+  cursor: pointer;
+  vertical-align: middle;
+  z-index: 10;
+}
+
+.languageTable .logo {
+  width: 120px;
+  border: 1px solid lightgray;
+  z-index: 30;
+}
+
+.languageTable a {
+  display: block;
+}
+
+.popover-header {
+  font-size: 0.9em;
+}
+
+.languageTable {
+  width: 350px;
+}
+
+.ngb-tooltip-window {
+  opacity: 1;
+}
+
+#dropdown-button,
+#dropdown-button2 {
+  float: left;
+  display: block;
+  margin: 0 1px;
+}
+
+:host {
+  background-color: whitesmoke;
+  border: 3px;
+  flex: auto;
+  flex-direction: column;
+  display: flex;
+  padding: 10px 10px 5px;
+  margin-bottom: 5px;
+}
+
+#asr-bar {
+  float: right;
+  margin-left: 50px;
+}
+
+.asr-label {
+  position: absolute;
+  margin-top: 4px;
+}
+
+.col-asr {
+  text-align: center;
+}
+
+#dropdown-basic2 .dropdown-item {
+  min-height: 0.9em;
+  font-size: 0.8em;
+  max-width: none;
+}

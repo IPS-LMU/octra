@@ -61,6 +61,7 @@ import {
   faChevronDown,
   faChevronUp,
   faCog,
+  faDatabase,
   faDownload,
   faEdit,
   faExclamationCircle,
@@ -68,6 +69,7 @@ import {
   faEye,
   faFile,
   faFolderOpen,
+  faGlobe,
   faHeadphones,
   faInfoCircle,
   faKeyboard,
@@ -93,7 +95,7 @@ import {BugreportModalComponent} from './core/modals/bugreport-modal/bugreport-m
 import {SupportedFilesModalComponent} from './core/modals/supportedfiles-modal/supportedfiles-modal.component';
 import {TranscriptionDeleteModalComponent} from './core/modals/transcription-delete-modal/transcription-delete-modal.component';
 import {TranscriptionStopModalComponent} from './core/modals/transcription-stop-modal/transcription-stop-modal.component';
-import {faCopy, faTimesCircle} from '@fortawesome/free-regular-svg-icons';
+import {faCopy, faHandshake, faTimesCircle} from '@fortawesome/free-regular-svg-icons';
 import {faCheckCircle} from '@fortawesome/free-regular-svg-icons/faCheckCircle';
 import {LoginInvalidModalComponent} from './core/modals/login-invalid-modal/login-invalid-modal.component';
 import {ErrorModalComponent} from './core/modals/error-modal/error-modal.component';
@@ -118,6 +120,7 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
 import {StresstestComponent} from './core/tools/stresstest/stresstest.component';
 import {TranscriptionDemoEndModalComponent} from './core/modals/transcription-demo-end/transcription-demo-end-modal.component';
+import {AsrOptionsComponent} from './core/gui/asr-options/asr-options.component';
 import {environment} from '../environments/environment';
 import {translocoLoader} from './transloco.loader';
 import {TRANSLOCO_CONFIG, TranslocoConfig, TranslocoModule} from '@ngneat/transloco';
@@ -158,7 +161,10 @@ library.add(
   faMinus,
   faWindowMaximize,
   faAlignJustify,
-  faStar
+  faStar,
+  faGlobe,
+  faHandshake,
+  faDatabase
 );
 
 export const EDITORS: any[] = [
@@ -218,7 +224,8 @@ export const EDITORS: any[] = [
     ValidationPopoverComponent,
     NamingDragAndDropComponent,
     StresstestComponent,
-    TranscriptionDemoEndModalComponent
+    TranscriptionDemoEndModalComponent,
+    AsrOptionsComponent
   ],
   entryComponents: EDITORS,
   imports: [

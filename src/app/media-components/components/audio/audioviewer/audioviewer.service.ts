@@ -233,6 +233,7 @@ export class AudioviewerService extends AudioComponentService {
               this.mouseClickPos.line = currLine;
 
               this.audiochunk.startpos = this.mouseClickPos.timePos.clone();
+              this._drawnselection.start = this.audiochunk.selection.start.clone();
               this._drawnselection.end = this.audiochunk.selection.start.clone();
 
               this._dragableBoundaryNumber = this.getBoundaryNumber(this.mouseClickPos.absX);

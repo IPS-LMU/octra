@@ -1,6 +1,6 @@
 {
   "name": "octra",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "author": "Julian Pömp, Christoph Draxler; Institut für Phonetik und Sprachverarbeitung, LMU MÜnchen",
   "license": "MIT",
   "angular-cli": {},
@@ -69,6 +69,7 @@
     "@types/jasminewd2": "~2.0.6",
     "@types/node": "^12.6.8",
     "codelyzer": "^5.1.0",
+    "conventional-changelog-cli": "^2.0.23",
     "jasmine": "^3.4.0",
     "jasmine-core": "~3.4.0",
     "jasmine-spec-reporter": "~4.2.1",

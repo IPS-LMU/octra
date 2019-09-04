@@ -19,7 +19,9 @@ import {SettingsService} from './settings.service';
 
 declare var validateAnnotation: ((string, any) => any);
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class TranscriptionService {
   get guidelines(): any {
     return this._guidelines;
@@ -158,6 +160,7 @@ export class TranscriptionService {
   private _transcriptValid = false;
 
   public saveSegments = () => {
+    console.log(`SAVE SEGMENTS!`);
     // make sure, that no saving overhead exist. After saving request wait 1 second
     if (!this.saving) {
       this.saving = true;

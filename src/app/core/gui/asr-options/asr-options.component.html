@@ -1,0 +1,139 @@
+<span class="asr-label">ASR -</span>
+<div id="asr-bar">
+  <div id="dropdown-button" class="btn-group" dropdown placement="down right" (mousemove)="onMouseMove()"
+       (mouseleave)="onMouseOut();"
+       [insideClick]="true" #dropdown="bs-dropdown">
+    <label for="button-basic" style="vertical-align: middle;margin-right:10px;">{{"general.Language" | translate}}
+      : </label>
+    <button id="button-basic" dropdownToggle type="button"
+            class="btn btn-outline-secondary btn-sm dropdown-toggle"
+            aria-controls="dropdown-basic">
+      <ng-container *ngIf="asrService.selectedLanguage === null; else asrAllSet">
+        {{"asr.without asr" | translate}}
+      </ng-container>
+      <ng-template #asrAllSet>
+        {{asrService.selectedLanguage.name}} ({{getShortCode(asrService.selectedLanguage.code)}})
+        [{{asrService.selectedLanguage.asr}}]
+      </ng-template>
+      <span class="caret"></span>
+    </button>
+    <div id="dropdown-basic" *dropdownMenu class="dropdown-menu" (mousemove)="onMouseMove()"
+         (mouseleave)="onMouseOut();"
+         role="menu" aria-labelledby="button-basic" style="padding:5px;">
+      <p style="font-size: 0.9em;text-align: center;">
+        {{"asr.click on logo" | translate}}
+      </p>
+      <table class="table table-hover languageTable">
+        <thead>
+        <tr>
+          <th>{{"general.Language" | translate}}</th>
+          <th>{{"general.Service Provider" | translate}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td colspan="2" (click)="onASRLangChanged(null)">{{"asr.without asr" | translate}}</td>
+        </tr>
+        <ng-container *ngFor="let lang of appSettings.octra.plugins.asr.languages; let i = index;">
+          <tr [ngClass]="{
+                            selected:  !(asrService.selectedLanguage === null)
+                                        && (asrService.selectedLanguage.code === lang.code)
+                                        && (asrService.selectedLanguage.asr === lang.asr)
+                            }"
+          >
+            <td class="col-language" (click)="onASRLangChanged(lang)">
+              <ng-container
+                *ngIf="lang !== undefined && lang.state === 'active'">
+                {{lang.name}} ({{getShortCode(lang.code)}}) [{{lang.asr}}]
+              </ng-container>
+              <ng-container
+                *ngIf="lang !== undefined && lang.state === 'inactive'">
+                {{lang.name}} ({{getShortCode(lang.code)}}) [{{lang.asr}}] (currently not
+                available)
+              </ng-container>
+            </td>
+            <td class="col-asr">
+              <img [src]="serviceProviders[lang.asr]?.logoURL" class="logo"
+                   popoverTitle="Service Information"
+                   [popover]="asrDescription" triggers="focus" #pop="bs-popover" [outsideClick]="true"
+                   (click)="pop.toggle();">
+              <ng-template #asrDescription>
+                <table class="table table-sm table-borderless">
+                  <tbody>
+                  <tr>
+                    <td>
+                      <fa-icon icon="database"></fa-icon>
+                    </td>
+                    <td>
+                      {{serviceProviders[lang.asr]?.dataStoragePolicy}}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <fa-icon [icon]="['far', 'handshake']"></fa-icon>
+                    </td>
+                    <td>
+                      <a [href]="serviceProviders[lang.asr]?.termsURL"
+                         target="_blank">Terms
+                        &amp; Conditions</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <fa-icon icon="globe"></fa-icon>
+                    </td>
+                    <td>
+                      <a [href]="serviceProviders[lang.asr]?.homepageURL"
+                         target="_blank">Homepage</a>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </ng-template>
+            </td>
+          </tr>
+        </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div id="dropdown-button2" class="btn-group" dropdown placement="down right" (mousemove)="onMouseMove()"
+       (mouseleave)="onMouseOut();" #dropdown2="bs-dropdown" style="margin-left:10px;"
+       [isDisabled]="asrService.selectedLanguage === null || asrService.selectedLanguage === undefined">
+    <button id="button-basic2" dropdownToggle type="button"
+            class="btn btn-outline-primary btn-sm dropdown-toggle"
+            aria-controls="dropdown-basic">
+      {{"general.SELECT ACTION" | translate}}
+      <span class="caret"></span>
+    </button>
+    <div id="dropdown-basic2" *dropdownMenu class="dropdown-menu" (mousemove)="onMouseMove()"
+         (mouseleave)="onMouseOut();"
+         role="menu" aria-labelledby="button-basic" style="padding:5px;">
+
+      <ng-container *ngIf="asrService.queue.status !== 'STARTED'">
+        <li role="menuitem">
+          <button class="dropdown-item"
+                  (click)="startASRForThisSegment()">{{"asr.start this segment" | translate}}</button>
+        </li>
+        <li role="menuitem">
+          <button class="dropdown-item"
+                  (click)="startASRForAllSegmentsNext()">{{"asr.start for all next" | translate}}</button>
+        </li>
+      </ng-container>
+      <ng-container *ngIf="asrService.queue.status === 'STARTED'">
+        <li role="menuitem">
+          <button class="dropdown-item"
+                  (click)="stopASRForThisSegment()">{{"asr.stop this segment" | translate}}</button>
+        </li>
+        <li role="menuitem">
+          <button class="dropdown-item">{{"asr.stop for all next" | translate}}</button>
+        </li>
+        <li role="menuitem">
+          <button class="dropdown-item" (click)="stopASRForAll()">{{"asr.stop all" | translate}}</button>
+        </li>
+      </ng-container>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+</div>
+<div class="clearfix"></div>

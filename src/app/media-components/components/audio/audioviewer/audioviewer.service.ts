@@ -236,6 +236,20 @@ export class AudioviewerService extends AudioComponentService {
               this._drawnselection.end = this.audiochunk.selection.start.clone();
 
               this._dragableBoundaryNumber = this.getBoundaryNumber(this.mouseClickPos.absX);
+              if (this._dragableBoundaryNumber > -1) {
+                const segmentBefore = (this._dragableBoundaryNumber > 0)
+                  ? this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber - 1)
+                  : this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber);
+                const segment = this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber);
+                const segmentAfter = (this._dragableBoundaryNumber < this.transcrService.currentlevel.segments.length - 1)
+                  ? this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber + 1)
+                  : this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber);
+
+                if (segment.isBlockedBy === 'asr' || segmentBefore.isBlockedBy === 'asr' || segmentAfter.isBlockedBy === 'asr') {
+                  // prevent dragging boundary of blocked segment
+                  this._dragableBoundaryNumber = -1;
+                }
+              }
             }
             this.mouseDown = true;
           } else if ($event.type === 'mouseup') {

@@ -26,7 +26,8 @@ export interface AppSettings {
         enabled: boolean,
         authToken: string,
         url: string
-      }
+      },
+      asr: ASRSettings
     },
     allowed_browsers: any[],
     allowed_projects: {
@@ -50,4 +51,28 @@ export interface AppSettings {
       'showAfter': number;
     }
   };
+}
+
+export interface ASRLanguage {
+  code: string,
+  name: string,
+  asr: string,
+  state: string,
+  host: string
+}
+
+export interface ASRService {
+  provider: string,
+  type: string,
+  termsURL: string,
+  dataStoragePolicy: string,
+  homepageURL: string,
+  logoURL: string
+}
+
+export interface ASRSettings {
+  enabled: boolean,
+  calls: string[],
+  services: ASRService[],
+  languages: ASRLanguage[]
 }

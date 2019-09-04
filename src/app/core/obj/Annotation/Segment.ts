@@ -2,7 +2,13 @@ import {OSegment} from './AnnotJSON';
 import {BrowserAudioTime, OriginalAudioTime, OriginalSample} from '../../../media-components/obj/media/audio';
 
 export class Segment {
-  private _transcript = '';
+  set isBlockedBy(value: 'asr' | 'none') {
+    this._isBlockedBy = value;
+  }
+
+  get isBlockedBy(): 'asr' | 'none' {
+    return this._isBlockedBy;
+  }
 
   get transcript(): string {
     return this._transcript;
@@ -15,8 +21,6 @@ export class Segment {
     this._transcript = value;
   }
 
-  private _changed = false;
-
   get changed(): boolean {
     return this._changed;
   }
@@ -25,8 +29,11 @@ export class Segment {
     this._changed = value;
   }
 
-  constructor(public time: BrowserAudioTime | OriginalAudioTime) {
+  private _transcript = '';
+  private _changed = false;
+  private _isBlockedBy: 'asr' | 'none' = 'none';
 
+  constructor(public time: BrowserAudioTime | OriginalAudioTime) {
   }
 
   /**

@@ -79,7 +79,11 @@
     "insert comment": "Kommentar hier eingeben... (optional)",
     "password": "Passwort",
     "preview": "Vorschau",
-    "screenshots": "Bildschirmfotos"
+    "screenshots": "Bildschirmfotos",
+    "Language": "Sprache",
+    "Speech Recognition": "Spracherkennung",
+    "Service Provider": "Dienstleister",
+    "SELECT ACTION": "AKTION WÄHLEN"
   },
   "bug report": {
     "give feedback": "Feedback geben",
@@ -267,5 +271,17 @@
       "hide configurator": "Verstecke den Konfigurator",
       "show configurator": "Zeige den Konfigurator"
     }
+  },
+  "asr": {
+    "without asr": "Ohne ASR",
+    "file too big": "Die Spracherkennung unterstützt nur Audiosequenzen mit einer Dauer von max. 10 Minuten. Betroffene Segmente wurden übersprungen.",
+    "click on logo": "Klicke für weitere Informationen auf ein Logo.",
+    "start this segment": "Verarbeite nur dieses Segment",
+    "start for all next": "Verarbeite alle folgende Segmente",
+    "stop this segment": "Beende Verarbeitung für dieses Segment",
+    "stop for all next": "Beende Verarbeitung für dieses und für alle folgende Segmente",
+    "stop all": "Beende Verarbeitung für alle Segmente",
+    "asr running": "Die automatische Spracherkennung läuft gerade. Wenn Du sie für dieses Segment abbrechen möchtest, klicke hier.",
+    "no asr selected": "Bevor Du das Tastenkürzel verwenden kannst, musst Du ASR Einstellungen vornehmen."
   }
 }

@@ -530,15 +530,19 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 case('delete_boundaries'):
                   if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this.av.focused) {
                     // TODO trigger event for logging?
-                    for (let i = 0; i < this.transcr.currentlevel.segments.length; i++) {
-                      const segment = this.transcr.currentlevel.segments.get(i);
+                    if (this.transcr.currentlevel.segments.length > 0) {
+                      for (let i = 0; i < this.transcr.currentlevel.segments.length; i++) {
+                        const segment = this.transcr.currentlevel.segments.get(i);
 
-                      if (segment.time.browserSample.value >= this.selection.start.browserSample.value
-                        && segment.time.browserSample.value <= this.selection.end.browserSample.value) {
-                        this.transcr.currentlevel.segments.removeByIndex(i, this.transcr.breakMarker.code);
-                        i--;
-                      } else if (this.selection.end.browserSample.value < segment.time.browserSample.value) {
-                        break;
+                        if (segment.time.browserSample.value >= this.selection.start.browserSample.value
+                          && segment.time.browserSample.value <= this.selection.end.browserSample.value
+                          && i < this.transcr.currentlevel.segments.length - 1
+                        ) {
+                          this.transcr.currentlevel.segments.removeByIndex(i, this.transcr.breakMarker.code);
+                          i--;
+                        } else if (this.selection.end.browserSample.value < segment.time.browserSample.value) {
+                          break;
+                        }
                       }
                     }
 
@@ -546,7 +550,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                       0, this.audiomanager.browserSampleRate, this.audiomanager.originalSampleRate
                     );
                     this.selection.end = this.selection.start.clone();
-                    this.av.drawnselection = this.selection;
+                    this.av.drawnselection = this.selection.clone();
                     this.update(false);
                     this.drawCursor(this.av.Mousecursor.line);
                     this.transcr.currentlevel.segments.onsegmentchange.emit();

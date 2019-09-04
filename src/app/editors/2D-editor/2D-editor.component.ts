@@ -34,7 +34,7 @@ import {AudioChunk, AudioManager} from '../../media-components/obj/media/audio/A
 import {Functions, isNullOrUndefined} from '../../core/shared/Functions';
 import {OCTRAEditor} from '../octra-editor';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../core/shared/service/asr.service';
-import {TranslateService} from '@ngx-translate/core';
+import {TranslocoService} from '@ngneat/transloco';
 
 @Component({
   selector: 'app-overlay-gui',
@@ -115,7 +115,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               public appStorage: AppStorageService,
               private asrService: AsrService,
               private cd: ChangeDetectorRef,
-              private langService: TranslateService) {
+              private langService: TranslocoService) {
     super();
 
     this.subscrmanager = new SubscriptionManager();
@@ -240,7 +240,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           );
 
           if (segNumber > -1) {
-            console.log(`change segnumber ${segNumber}`);
+            console.log(`change segnumber ${segNumber}, ${segmentBoundary.seconds}`);
             const segment = this.transcrService.currentlevel.segments.get(segNumber).clone();
             segment.isBlockedBy = 'none';
             if (item.status === ASRProcessStatus.FINISHED && item.result !== '') {
@@ -419,7 +419,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         } else {
           // open transcr window
           this.openSegment(segmentNumber);
-          this.msg.showMessage('warning', this.langService.instant('asr.no asr selected'));
+          this.msg.showMessage('warning', this.langService.translate('asr.no asr selected').toString());
         }
       }
     }

@@ -4,8 +4,8 @@ import {AppSettings, ASRLanguage} from '../../obj/Settings';
 import {AsrService} from '../../shared/service/asr.service';
 import {isNullOrUndefined} from '../../shared/Functions';
 import {AudioChunk} from '../../../media-components/obj/media/audio/AudioManager';
-import {TranslateService} from '@ngx-translate/core';
 import {BsDropdownDirective} from 'ngx-bootstrap';
+import {TranslocoService} from '@ngneat/transloco';
 
 @Component({
   selector: 'app-asr-options',
@@ -30,7 +30,7 @@ export class AsrOptionsComponent implements OnInit {
 
   constructor(public appStorage: AppStorageService, public settingsService: SettingsService,
               public asrService: AsrService, private transcrService: TranscriptionService,
-              private messageService: MessageService, private langService: TranslateService) {
+              private messageService: MessageService, private langService: TranslocoService) {
     for (let i = 0; i < this.appSettings.octra.plugins.asr.services.length; i++) {
       const provider = this.appSettings.octra.plugins.asr.services[i];
       this.serviceProviders['' + provider.provider] = provider;
@@ -62,7 +62,7 @@ export class AsrOptionsComponent implements OnInit {
     if (!isNullOrUndefined(this.asrService.selectedLanguage)) {
       if (this.audioChunk.time.duration.originalSample.seconds > 600) {
         // trigger alert, too big audio duration
-        this.messageService.showMessage('error', this.langService.instant('asr.file too big'));
+        this.messageService.showMessage('error', this.langService.translate('asr.file too big').toString());
       } else {
         const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
           this.audioChunk.time.start.browserSample.add(this.audioChunk.time.duration.browserSample)
@@ -95,7 +95,7 @@ export class AsrOptionsComponent implements OnInit {
         const sampleLength = segment.time.originalSample.value - sampleStart;
 
         if (sampleLength / this.transcrService.audiomanager.originalSampleRate > 600) {
-          this.messageService.showMessage('error', this.langService.instant('asr.file too big'));
+          this.messageService.showMessage('error', this.langService.translate('asr.file too big'));
           segment.isBlockedBy = 'none';
         } else {
           if (segment.transcript.trim() === '' && segment.transcript.indexOf(this.transcrService.breakMarker.code) < 0) {

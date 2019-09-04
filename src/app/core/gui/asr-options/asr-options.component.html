@@ -3,13 +3,13 @@
   <div id="dropdown-button" class="btn-group" dropdown placement="down right" (mousemove)="onMouseMove()"
        (mouseleave)="onMouseOut();"
        [insideClick]="true" #dropdown="bs-dropdown">
-    <label for="button-basic" style="vertical-align: middle;margin-right:10px;">{{"general.Language" | translate}}
+    <label for="button-basic" style="vertical-align: middle;margin-right:10px;">{{"general.Language" | transloco}}
       : </label>
     <button id="button-basic" dropdownToggle type="button"
             class="btn btn-outline-secondary btn-sm dropdown-toggle"
             aria-controls="dropdown-basic">
       <ng-container *ngIf="asrService.selectedLanguage === null; else asrAllSet">
-        {{"asr.without asr" | translate}}
+        {{"asr.without asr" | transloco}}
       </ng-container>
       <ng-template #asrAllSet>
         {{asrService.selectedLanguage.name}} ({{getShortCode(asrService.selectedLanguage.code)}})
@@ -21,18 +21,18 @@
          (mouseleave)="onMouseOut();"
          role="menu" aria-labelledby="button-basic" style="padding:5px;">
       <p style="font-size: 0.9em;text-align: center;">
-        {{"asr.click on logo" | translate}}
+        {{"asr.click on logo" | transloco}}
       </p>
       <table class="table table-hover languageTable">
         <thead>
         <tr>
-          <th>{{"general.Language" | translate}}</th>
-          <th>{{"general.Service Provider" | translate}}</th>
+          <th>{{"general.Language" | transloco}}</th>
+          <th>{{"general.Service Provider" | transloco}}</th>
         </tr>
         </thead>
         <tbody>
         <tr>
-          <td colspan="2" (click)="onASRLangChanged(null)">{{"asr.without asr" | translate}}</td>
+          <td colspan="2" (click)="onASRLangChanged(null)">{{"asr.without asr" | transloco}}</td>
         </tr>
         <ng-container *ngFor="let lang of appSettings.octra.plugins.asr.languages; let i = index;">
           <tr [ngClass]="{
@@ -103,7 +103,7 @@
     <button id="button-basic2" dropdownToggle type="button"
             class="btn btn-outline-primary btn-sm dropdown-toggle"
             aria-controls="dropdown-basic">
-      {{"general.SELECT ACTION" | translate}}
+      {{"general.SELECT ACTION" | transloco}}
       <span class="caret"></span>
     </button>
     <div id="dropdown-basic2" *dropdownMenu class="dropdown-menu" (mousemove)="onMouseMove()"
@@ -113,23 +113,23 @@
       <ng-container *ngIf="asrService.queue.status !== 'STARTED'">
         <li role="menuitem">
           <button class="dropdown-item"
-                  (click)="startASRForThisSegment()">{{"asr.start this segment" | translate}}</button>
+                  (click)="startASRForThisSegment()">{{"asr.start this segment" | transloco}}</button>
         </li>
         <li role="menuitem">
           <button class="dropdown-item"
-                  (click)="startASRForAllSegmentsNext()">{{"asr.start for all next" | translate}}</button>
+                  (click)="startASRForAllSegmentsNext()">{{"asr.start for all next" | transloco}}</button>
         </li>
       </ng-container>
       <ng-container *ngIf="asrService.queue.status === 'STARTED'">
         <li role="menuitem">
           <button class="dropdown-item"
-                  (click)="stopASRForThisSegment()">{{"asr.stop this segment" | translate}}</button>
+                  (click)="stopASRForThisSegment()">{{"asr.stop this segment" | transloco}}</button>
         </li>
         <li role="menuitem">
-          <button class="dropdown-item">{{"asr.stop for all next" | translate}}</button>
+          <button class="dropdown-item">{{"asr.stop for all next" | transloco}}</button>
         </li>
         <li role="menuitem">
-          <button class="dropdown-item" (click)="stopASRForAll()">{{"asr.stop all" | translate}}</button>
+          <button class="dropdown-item" (click)="stopASRForAll()">{{"asr.stop all" | transloco}}</button>
         </li>
       </ng-container>
     </div>

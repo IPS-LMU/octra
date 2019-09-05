@@ -1,12 +1,27 @@
+# INFORMATION
+# For new versions of this Gist go to:
+# https://gist.github.com/julianpoemp/bcf277cb56d2420cc53ec630a04a3566
+# Version 1.2.0
+#
+# Contributors:
+# - RaschidJFR [https://gist.github.com/RaschidJFR/f6d21a03b0692f5c7a6a23954003f00b]
+#-------------
+
+# Notice:
+# If you have issues with browser caching you can uncomment the BROWSER CACHING part
+
 <IfModule mod_rewrite.c>
-    RewriteEngine on
-    RewriteCond %{REQUEST_FILENAME} -s [OR]
-    RewriteCond %{REQUEST_FILENAME} -l [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
-    RewriteRule ^.*$ - [NC,L]
-    RewriteRule ^(.*) index.html [NC,L]
+	RewriteEngine On
+	# If an existing asset or directory is requested go to it as it is
+	RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f [OR]
+	RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -d
+
+	RewriteRule ^.*$ - [NC,L]
+	RewriteRule ^(.*) index.html [NC,L]
 </IfModule>
 
+#------------ BROWSER CACHING
+# disable browser caching in production.
 <FilesMatch "\.(html|htm|js|json|css)$">
 	<IfModule mod_headers.c>
 		FileETag None
@@ -19,3 +34,4 @@
 		Header set Expires "Mon, 10 Apr 1972 00:00:00 GMT"
 	</IfModule>
 </FilesMatch>
+#------------

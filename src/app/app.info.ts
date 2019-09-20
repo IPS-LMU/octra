@@ -15,6 +15,7 @@ import {NavigationExtras} from '@angular/router';
 import {ELANConverter} from './core/obj/Converters/ELANConverter';
 import {SRTConverter} from './core/obj/Converters/SRTConverter';
 import {WebVTTConverter} from './core/obj/Converters/WebVTTConverter';
+import {TEIConverter} from './core/obj/Converters/TEIConverter';
 
 declare var octraVersion: string;
 declare var octraLastUpdated: string;
@@ -40,7 +41,8 @@ export class AppInfo {
     new TextConverter(),
     new ELANConverter(),
     new SRTConverter(),
-    new WebVTTConverter()
+    new WebVTTConverter(),
+    new TEIConverter()
   ];
 
   public static readonly themes: string[] = [

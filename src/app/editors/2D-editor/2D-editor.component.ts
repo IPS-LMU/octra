@@ -20,7 +20,7 @@ import {
   UserInteractionsService
 } from '../../core/shared/service';
 
-import {AudioSelection, BrowserAudioTime, BrowserSample, OriginalSample} from '../../core/shared';
+import {AudioSelection, BrowserAudioTime, BrowserSample} from '../../core/shared';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
 import {TranscrWindowComponent} from './transcr-window';
 import {PlayBackState} from '../../media-components/obj/media';
@@ -232,20 +232,17 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
     this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
         if (item.status !== ASRProcessStatus.STARTED && item.status !== ASRProcessStatus.IDLE) {
-          const segmentBoundary = BrowserSample.fromOriginalSample(
-            new OriginalSample(item.time.sampleStart + item.time.sampleLength, this.audiomanager.originalSampleRate),
-            this.audiomanager.browserSampleRate);
+          const segmentBoundary = new BrowserSample(item.time.browserSampleEnd, this.audiomanager.browserSampleRate);
           const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
-            segmentBoundary
+            segmentBoundary, true
           );
+          console.log(`change segnumber ${segNumber}, ${segmentBoundary.value}`);
 
           if (segNumber > -1) {
-            console.log(`change segnumber ${segNumber}, ${segmentBoundary.seconds}`);
             const segment = this.transcrService.currentlevel.segments.get(segNumber).clone();
             segment.isBlockedBy = 'none';
             if (item.status === ASRProcessStatus.FINISHED && item.result !== '') {
               segment.transcript = item.result;
-              console.log(`OK ES KLAPPT!`);
             }
             // STOPPED and FAILED status is ignored because OCTRA should do nothing
 
@@ -388,10 +385,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       const segmentNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(this.viewer.MouseCursor.timePos.browserSample);
 
       if (segmentNumber > -1) {
-        console.log(`event triggered!`);
-        console.log($event);
-        console.log(`segNumber: ${segmentNumber}`);
-
         if (!isNullOrUndefined(this.asrService.selectedLanguage)) {
           const segment = this.transcrService.currentlevel.segments.get(segmentNumber);
 
@@ -401,7 +394,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
           const selection = {
             sampleStart: sampleStart,
-            sampleLength: segment.time.originalSample.value - sampleStart
+            sampleLength: segment.time.originalSample.value - sampleStart,
+            browserSampleEnd: segment.time.browserSample.value
           };
 
 

@@ -121,7 +121,6 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   changeLanguage(lang: string) {
     this.langService.setActiveLang(lang);
-    console.log(`language is now: ${lang}`);
     this.appStorage.language = lang;
   }
 

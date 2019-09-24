@@ -39,12 +39,6 @@ export class AsrService {
   private _selectedLanguage: ASRLanguage = null;
   private _queue: ASRQueue;
 
-  public resultRetrieved = new Subject<{
-    sampleStart: number,
-    sampleLength: number,
-    text: string
-  }>();
-
   public get asrSettings(): ASRSettings {
     return this.settingsService.appSettings.octra.plugins.asr;
   }
@@ -54,7 +48,6 @@ export class AsrService {
   }
 
   public init() {
-    console.log(`QUEUE INITIALIZED`);
     this._queue = new ASRQueue(this.asrSettings, this.audioService.audiomanagers[0], this.httpClient);
     if (!isNullOrUndefined(this.appStorage.asrSelectedLanguage) && !isNullOrUndefined(this.appStorage.asrSelectedService)) {
       this._selectedLanguage = this.getLanguageByCode(this.appStorage.asrSelectedLanguage, this.appStorage.asrSelectedService);
@@ -85,13 +78,13 @@ export class AsrService {
     this._queue.start();
   }
 
-  public addToQueue(timeInterval: { sampleStart: number, sampleLength: number }): ASRQueueItem {
+  public addToQueue(timeInterval: { sampleStart: number, sampleLength: number, browserSampleEnd: number }): ASRQueueItem {
     const item = new ASRQueueItem({
       sampleStart: timeInterval.sampleStart,
-      sampleLength: timeInterval.sampleLength
+      sampleLength: timeInterval.sampleLength,
+      browserSampleEnd: timeInterval.browserSampleEnd
     }, this.queue, this.selectedLanguage);
     this.queue.add(item);
-    console.log(`ADDED id ${item.id}`);
     return item;
   }
 
@@ -223,34 +216,23 @@ class ASRQueue {
   }
 
   private startNext() {
-    console.log(`start next...`);
     if (this.status === ASRProcessStatus.STARTED) {
       if (this._statistics.running < this.MAX_PARALLEL_ITEMS) {
         const nextItem = this.getFirstFreeItem();
 
         if (nextItem !== undefined) {
-          console.log(`start next: ${nextItem.id}`);
           if (nextItem.startProcessing()) {
             this.updateStatistics({
               old: ASRProcessStatus.IDLE,
               new: ASRProcessStatus.STARTED
             });
-            console.log(`itemchange next`);
             this._itemChange.next(nextItem);
             nextItem.statusChange.subscribe((status) => {
-                if (status.new === ASRProcessStatus.FINISHED) {
-                  // retrieve result
-                  console.log(`item finished: ${nextItem.id}`);
-                  console.log(nextItem.result);
-                  console.log(`-----------`);
-                }
 
                 if (status.new !== ASRProcessStatus.STARTED) {
                   this.remove(nextItem.id);
-                  console.log(`removed item ${nextItem.id} from queue!`);
                 }
                 this.updateStatistics(status);
-                console.log(`itemchange next`);
                 this._itemChange.next(nextItem);
 
                 setTimeout(() => {
@@ -369,7 +351,7 @@ export class ASRQueueItem {
     return this._status;
   }
 
-  get time(): { sampleStart: number; sampleLength: number } {
+  get time(): { sampleStart: number; sampleLength: number; browserSampleEnd: number } {
     return this._time;
   }
 
@@ -383,6 +365,7 @@ export class ASRQueueItem {
   private readonly _time: {
     sampleStart: number;
     sampleLength: number;
+    browserSampleEnd: number;
   };
   private _status: ASRProcessStatus;
   private readonly _statusChange: Subject<{
@@ -395,12 +378,14 @@ export class ASRQueueItem {
 
   constructor(timeInterval: {
     sampleStart: number,
-    sampleLength: number
+    sampleLength: number,
+    browserSampleEnd: number
   }, asrQueue: ASRQueue, selectedLanguage: ASRLanguage) {
     this._id = ASRQueueItem.counter++;
     this._time = {
       sampleStart: timeInterval.sampleStart,
-      sampleLength: timeInterval.sampleLength
+      sampleLength: timeInterval.sampleLength,
+      browserSampleEnd: timeInterval.browserSampleEnd
     };
     this._status = ASRProcessStatus.IDLE;
     this._statusChange = new Subject<{
@@ -419,11 +404,6 @@ export class ASRQueueItem {
         old,
         new: this._status
       });
-      console.log(`send change status ${this.id}`);
-      console.log({
-        old,
-        new: this._status
-      });
     }
   }
 
@@ -438,7 +418,6 @@ export class ASRQueueItem {
   public stopProcessing(): boolean {
     this.changeStatus(ASRProcessStatus.STOPPED);
     this.statusChange.complete();
-    console.log(`stop id ${this._id}`);
     return true;
   }
 
@@ -457,10 +436,8 @@ export class ASRQueueItem {
 
       xhr.onloadend = (e) => {
         const result = (e.currentTarget as any).responseText;
-        console.log(result);
         const x2js = new X2JS();
         let json: any = x2js.xml2js(result);
-        console.log(json);
         json = json.UploadFileMultiResponse;
 
         if (json.success === 'true') {
@@ -482,16 +459,12 @@ export class ASRQueueItem {
         .replace('{{asrType}}', languageObject.asr)
         .replace('{{language}}', languageObject.code);
 
-      console.log(`Call ${languageObject.asr}ASR:`);
-      console.log(audioURL);
       this.parent.httpClient.post(asrUrl, {}, {
         headers: {
           'Content-Type': 'multipart/form-data'
         },
         responseType: 'text'
       }).subscribe((result: string) => {
-          console.log(`XML Result:`);
-          console.log(result);
           // convert result to json
           const x2js = new X2JS();
           let json: any = x2js.xml2js(result);
@@ -524,8 +497,6 @@ export class ASRQueueItem {
     // 1) cut signal
     const format = new WavFormat();
     format.init(audioManager.ressource.info.fullname, audioManager.ressource.arraybuffer);
-
-    console.log('CUT AUDIO');
     format.cutAudioFile(audioManager.ressource.info.type, `OCTRA_ASRqueueItem_${this._id}`, audioManager.ressource.arraybuffer,
       {
         number: 1,
@@ -534,11 +505,9 @@ export class ASRQueueItem {
       }).then((file) => {
       if (this._status !== ASRProcessStatus.STOPPED) {
         // 2) upload signal
-        console.log('UPLOAD AUDIO');
         this.uploadFile(file, this.selectedLanguage).then((url: string) => {
           if (this._status !== ASRProcessStatus.STOPPED) {
             // 3) signal audio url to ASR
-            console.log('callASR ' + this.selectedLanguage.asr + ' - ' + this.selectedLanguage.code);
             this.callASR(this.selectedLanguage, url, timestamp).then((file) => {
               if (this._status !== ASRProcessStatus.STOPPED) {
                 const reader = new FileReader();

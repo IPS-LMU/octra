@@ -547,7 +547,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.Settings.height = this.height;
     this.initialize();
 
-    console.log(`add itemchange listener!`);
     this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
         this.onASRItemChange(item);
       },

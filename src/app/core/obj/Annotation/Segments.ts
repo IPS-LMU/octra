@@ -161,14 +161,20 @@ export class Segments {
   /**
    * returns the segment by the sample position (BrowserSample)
    */
-  public getSegmentBySamplePosition(samples: BrowserSample): number {
+  public getSegmentBySamplePosition(samples: BrowserSample, exact: boolean = false): number {
     let begin = 0;
     for (let i = 0; i < this._segments.length; i++) {
       if (i > 0) {
         begin = this._segments[i - 1].time.browserSample.value;
       }
-      if (samples.value > begin.valueOf() && samples.value <= this._segments[i].time.browserSample.value) {
-        return i;
+      if (!exact) {
+        if (samples.value > begin && samples.value <= this._segments[i].time.browserSample.value) {
+          return i;
+        }
+      } else {
+        if (samples.value === this._segments[i].time.browserSample.value) {
+          return i;
+        }
       }
     }
     return -1;

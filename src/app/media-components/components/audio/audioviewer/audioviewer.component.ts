@@ -623,7 +623,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                       const segment = this.transcr.currentlevel.segments.get(segmentI);
 
                       if (segmentI > -1) {
-                        console.log(`DO ASR!`);
                         if (segment.isBlockedBy !== 'asr') {
                           this.shortcuttriggered.emit({shortcut: comboKey, value: 'do_asr', type: 'segment'});
                         } else {

@@ -64,15 +64,17 @@ export class AsrOptionsComponent implements OnInit {
         // trigger alert, too big audio duration
         this.messageService.showMessage('error', this.langService.translate('asr.file too big').toString());
       } else {
-        const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
-          this.audioChunk.time.start.browserSample.add(this.audioChunk.time.duration.browserSample)
-        );
+        const time = this.audioChunk.time.start.browserSample.add(this.audioChunk.time.duration.browserSample);
+        const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(time);
 
         if (segNumber > -1) {
-          this.transcrService.currentlevel.segments.get(segNumber).isBlockedBy = 'asr';
+          console.log(`SEGNUMBER = ${segNumber} browser sample is ${time.value}`);
+          const segment = this.transcrService.currentlevel.segments.get(segNumber);
+          segment.isBlockedBy = 'asr';
           this.asrService.addToQueue({
             sampleStart: this.audioChunk.time.start.originalSample.value,
-            sampleLength: this.audioChunk.time.duration.originalSample.value
+            sampleLength: this.audioChunk.time.duration.originalSample.value,
+            browserSampleEnd: this.audioChunk.time.start.browserSample.add(this.audioChunk.time.duration.browserSample).value
           });
           this.asrService.startASR();
         } else {
@@ -101,7 +103,10 @@ export class AsrOptionsComponent implements OnInit {
           if (segment.transcript.trim() === '' && segment.transcript.indexOf(this.transcrService.breakMarker.code) < 0) {
             // segment is empty and contains not a break
             segment.isBlockedBy = 'asr';
-            this.asrService.addToQueue({sampleStart, sampleLength});
+            this.asrService.addToQueue({
+              sampleStart, sampleLength, browserSampleEnd:
+              segment.time.browserSample.value
+            });
           }
         }
       }

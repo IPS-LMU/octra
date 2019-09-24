@@ -107,7 +107,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
   ngOnInit() {
     this.subscrmanager.add(this.settingsService.dbloaded.subscribe(
       () => {
-        console.log('ASR test');
         if (!isNullOrUndefined(this.appStorage.asrSelectedService) && !isNullOrUndefined(this.appStorage.asrSelectedLanguage)) {
           // set asr settings
           const lang: ASRLanguage = this.asrService.getLanguageByCode(this.appStorage.asrSelectedLanguage, this.appStorage.asrSelectedService);
@@ -115,8 +114,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
             this.asrService.selectedLanguage = lang;
           } else {
             console.error('Could not read ASR language from database');
-            console.log(this.appStorage.asrSelectedService);
-            console.log(this.appStorage.asrSelectedLanguage);
           }
         }
       }
@@ -132,8 +129,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
         this.navigation.changeSecondsPerLine(this.appStorage.secondsPerLine);
       }
     ));
-
-    console.log('Language: ' + this.langService.getActiveLang());
 
     this.settingsService.loadApplicationSettings(this.route).then(() => {
       console.log(`Application settings loaded`);

@@ -58,4 +58,16 @@ export class AppInfo {
     queryParamsHandling: '',
     preserveFragment: false
   };
+
+  public static initialize() {
+    Converter.octraInformation = {
+      version: AppInfo.version,
+      lastUpdated: AppInfo.lastUpdate
+    };
+  }
+}
+
+export interface OctraInformation {
+  version: string,
+  lastUpdated: string
 }

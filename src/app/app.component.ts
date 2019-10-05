@@ -143,6 +143,8 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
         this.loggedIn = a;
       }
     ));
+
+    AppInfo.initialize();
   }
 
   ngAfterViewInit() {

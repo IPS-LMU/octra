@@ -1,4 +1,5 @@
 import {OAnnotJSON, OAudiofile} from '../Annotation';
+import {OctraInformation} from '../../../app.info';
 
 export interface IFile {
   name: string;
@@ -18,6 +19,8 @@ export interface ExportResult {
 }
 
 export abstract class Converter {
+  public static octraInformation: OctraInformation;
+
   protected _conversion = {
     import: false,
     export: false
@@ -82,7 +85,7 @@ export abstract class Converter {
 
   }
 
-  public abstract export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum?: number): ExportResult;
+  public abstract export(octraInfoannotation: OAnnotJSON, audiofile: OAudiofile, levelnum?: number): ExportResult;
 
   public abstract import(file: IFile, audiofile: OAudiofile): ImportResult;
 }

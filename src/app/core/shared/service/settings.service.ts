@@ -16,6 +16,16 @@ declare var validateAnnotation: ((string, any) => any);
 
 @Injectable()
 export class SettingsService {
+  public get isASREnabled(): boolean {
+    return (!isNullOrUndefined(this.appSettings.octra.plugins.asr) &&
+      !isNullOrUndefined(this.appSettings.octra.plugins.asr.enabled)
+      && this.appSettings.octra.plugins.asr.enabled == true
+      && !isNullOrUndefined(this.appSettings.octra.plugins.asr.calls)
+      && this.appSettings.octra.plugins.asr.calls.length === 2
+      && this.appSettings.octra.plugins.asr.calls[0] !== ''
+      && this.appSettings.octra.plugins.asr.calls[1] !== ''
+    );
+  }
 
   get validated(): boolean {
     return this.validation.app;

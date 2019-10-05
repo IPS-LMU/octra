@@ -3,7 +3,8 @@
     <fa-icon icon="times" class="close" (click)="close();"></fa-icon>
   </div>
   <app-asr-options [audioChunk]="audiochunk" [enabled]="editor.rawText === ''"
-                   *ngIf="appStorage.usemode === 'demo' || appStorage.usemode === 'local'"></app-asr-options>
+                   *ngIf="(appStorage.usemode === 'demo' || appStorage.usemode === 'local')
+                   && settingsService.isASREnabled"></app-asr-options>
   <app-audio-navigation #audionav
                         (buttonclick)="onButtonClick($event)"
                         (volumechange)="onVolumeChange($event)"

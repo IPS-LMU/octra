@@ -23,6 +23,15 @@ declare var JSZip;
   animations: OCTRANIMATIONS
 })
 export class ExportFilesModalComponent implements OnInit, OnDestroy {
+  public get isCuttingServerEnabled(): boolean {
+    return (!isNullOrUndefined(this.settService.appSettings.octra.plugins.audioCutter)
+      && this.settService.appSettings.octra.plugins.audioCutter.enabled
+      && !isNullOrUndefined(this.settService.appSettings.octra.plugins.audioCutter.authToken)
+      && this.settService.appSettings.octra.plugins.audioCutter.authToken !== ''
+      && !isNullOrUndefined(this.settService.appSettings.octra.plugins.audioCutter.url)
+      && this.settService.appSettings.octra.plugins.audioCutter.url !== '');
+  }
+
   modalRef: BsModalRef;
   AppInfo = AppInfo;
   public visible = false;

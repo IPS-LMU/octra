@@ -101,7 +101,7 @@
                                     <label class="btn btn-primary" [(ngModel)]="tools.audioCutting.selectedMethod"
                                            btnRadio="client" tabindex="0" role="button">client-side</label>
                                     <label class="btn btn-primary" [(ngModel)]="tools.audioCutting.selectedMethod"
-                                           btnRadio="server" tabindex="0" role="button">server-side</label>
+                                           btnRadio="server" tabindex="0" role="button" *ngIf="isCuttingServerEnabled">server-side</label>
                                 </div>
                                 <a (click)="tools.audioCutting.showConfigurator = !tools.audioCutting.showConfigurator"
                                    class="show-configurator-link"

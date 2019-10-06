@@ -7,10 +7,12 @@ baseHref="https://www.phonetik.uni-muenchen.de/apps/octra/octra-dev/"
 dev="-c dev"
 
 # change this list to your needs (for exclusion of files or folders in the dist folder)
-excludedList='"config" "LICENCE.txt"'
+excludedList='"config" "LICENCE.txt" "media"'
 
-# 1 = disable indexing, 2 = enable
+# 1 = disable indexing, 0 = enable
 disableRobots=1
+# 1 = enable isUpdate, 0 = disable
+isUpdate=0
 
 timeNow=`date "+%Y-%m-%d %H:%M:%S"`
 octraVersion="1.3.1"
@@ -66,5 +68,10 @@ for old in ./${buildDir}*; do
   done
 # you can add more jobs here
 mv "./${buildDir}assets/.htaccess" "./${buildDir}.htaccess"
+
+if [[ ${isUpdate} == 1 ]]
+then
+  rm -rf "./${buildDir}config" "./${buildDir}media" "./${buildDir}.htaccess"
+fi
 
 echo "Building COMPLETE"

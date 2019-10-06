@@ -21,6 +21,7 @@
             "assets": [
               "src/assets",
               "src/config",
+              "src/media",
               "src/LICENSE.txt"
             ],
             "styles": [

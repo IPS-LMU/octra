@@ -513,6 +513,10 @@ export class ASRQueueItem {
                 const reader = new FileReader();
                 reader.onload = () => {
                   this._result = reader.result as string;
+
+                  // make sure that there are not any white spaces at the end or new lines
+                  this._result = this._result.replace(/\n/g, '').trim();
+
                   this.changeStatus(ASRProcessStatus.FINISHED);
                   subj.complete();
                 };

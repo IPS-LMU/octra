@@ -116,7 +116,6 @@ import {InactivityModalComponent} from './core/modals/inactivity-modal/inactivit
 import {faStar} from '@fortawesome/free-solid-svg-icons/faStar';
 import {ValidationPopoverComponent} from './core/component/transcr-editor/validation-popover/validation-popover.component';
 import {NamingDragAndDropComponent} from './core/component/naming-drag-and-drop/naming-drag-and-drop.component';
-import {DragDropModule} from '@angular/cdk/drag-drop';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
 import {StresstestComponent} from './core/tools/stresstest/stresstest.component';
 import {TranscriptionDemoEndModalComponent} from './core/modals/transcription-demo-end/transcription-demo-end-modal.component';
@@ -124,6 +123,7 @@ import {AsrOptionsComponent} from './core/gui/asr-options/asr-options.component'
 import {environment} from '../environments/environment';
 import {translocoLoader} from './transloco.loader';
 import {TRANSLOCO_CONFIG, TranslocoConfig, TranslocoModule} from '@ngneat/transloco';
+import {DragulaModule} from 'ng2-dragula';
 
 library.add(
   faSpinner,
@@ -232,7 +232,6 @@ export const EDITORS: any[] = [
     BrowserModule,
     FontAwesomeModule,
     ModalModule.forRoot(),
-    DragDropModule,
     BsDropdownModule.forRoot(),
     CollapseModule.forRoot(),
     FormsModule,
@@ -249,7 +248,8 @@ export const EDITORS: any[] = [
     routing,
     ButtonsModule.forRoot(),
     PopoverModule.forRoot(),
-    TranslocoModule
+    TranslocoModule,
+    DragulaModule.forRoot()
   ],
   bootstrap: [
     AppComponent

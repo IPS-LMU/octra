@@ -270,6 +270,14 @@
       "add placeholder": "Add placeholder",
       "hide configurator": "Hide configurator",
       "show configurator": "Show configurator"
+    },
+    "table configurator": {
+      "name": "Table Configurator",
+      "description": "This tool enables to create your own table format.",
+      "number of columns": "Number of columns",
+      "remove all columns": "Remove all columns",
+      "divider": "Divider",
+      "add header": "Add header to the table"
     }
   },
   "asr": {

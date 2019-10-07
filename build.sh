@@ -17,6 +17,8 @@ isUpdate=0
 timeNow=`date "+%Y-%m-%d %H:%M:%S"`
 octraVersion="1.3.1"
 
+echo "Remove cache..."
+rm -rf ./node_modules/.cache
 echo "Building OCTRA..."
 node --max-old-space-size=12000 ./node_modules/@angular/cli/bin/ng build --prod ${dev} --base-href "${baseHref}"
 echo "Change index.html..."

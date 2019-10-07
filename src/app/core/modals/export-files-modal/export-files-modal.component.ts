@@ -13,6 +13,7 @@ import {interval, Subject} from 'rxjs';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
 import {WavFormat} from '../../../media-components/obj/media/audio/AudioFormats';
 import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/cutting-format';
+import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
 declare var JSZip;
 
@@ -86,8 +87,21 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       cuttingTimeLeft: 0,
       timeLeft: 0,
       wavFormat: null
+    },
+    tableConfigurator: {
+      opened: false,
+      numberOfColumns: 3,
+      columns: [],
+      result: {
+        url: null,
+        filename: ''
+      }
     }
   };
+
+  drop(event: CdkDragDrop<string[]>) {
+    moveItemInArray(this.tools.tableConfigurator.columns, event.previousIndex, event.currentIndex);
+  }
 
   @ViewChild('modal', {static: true}) modal: any;
   @ViewChild('namingConvention', {static: false}) namingConvention: NamingDragAndDropComponent;
@@ -638,6 +652,15 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       }).catch((err) => {
         reject(err);
       });
+    });
+  }
+
+  tableConfiguratorAddColumn() {
+    this.tools.tableConfigurator.columns.push({
+      title: 'Title',
+      dataName: 'sampleStart',
+      timeUnit: 'seconds',
+      value: 21312
     });
   }
 }

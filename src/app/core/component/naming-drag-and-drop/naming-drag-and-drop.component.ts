@@ -1,15 +1,28 @@
-import {AfterViewInit, Component, ElementRef, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 import {Segment} from '../../obj/Annotation';
 import {isNullOrUndefined} from '../../shared/Functions';
 import {Subject} from 'rxjs';
+import {DragulaService} from 'ng2-dragula';
+import {SubscriptionManager} from '../../obj/SubscriptionManager';
 
 @Component({
   selector: 'app-naming-drag-and-drop',
   templateUrl: './naming-drag-and-drop.component.html',
-  styleUrls: ['./naming-drag-and-drop.component.css']
+  styleUrls: ['./naming-drag-and-drop.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
+export class NamingDragAndDropComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public namingConventionArray = [
     'text',
@@ -27,6 +40,8 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
 
   @Output() namingConventionchanged: Subject<string> = new Subject<string>();
   public clicked = -1;
+
+  private subcrManager = new SubscriptionManager();
 
   public get preview(): string {
     let result = '';
@@ -57,10 +72,9 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
                 .toString().replace('.', ',');
               break;
           }
-        } else if (item.type === 'extension') {
-          result += item.value;
         }
       }
+      result += '.wav';
     }
 
     return result;
@@ -78,25 +92,27 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
     {
       type: 'placeholder',
       value: '<sequNumber>'
-    },
-    {
-      type: 'extension',
-      value: '.wav'
     }
   ];
 
 
-  constructor() {
+  constructor(private dragulaService: DragulaService, private cd: ChangeDetectorRef) {
+    this.dragulaService.createGroup('namingDragDrop', {
+      direction: 'horizontal',
+      revertOnSpill: true,
+      removeOnSpill: false
+    });
+
+    this.subcrManager.add(this.dragulaService.dragend('namingDragDrop').subscribe(() => {
+        this.cd.detectChanges();
+      },
+      (error) => {
+      },
+      () => {
+      }));
   }
 
   ngOnInit() {
-  }
-
-  drop(event: CdkDragDrop<string[]>) {
-    if (event.previousIndex < this.resultConvention.length - 1) {
-      moveItemInArray(this.resultConvention, event.previousIndex, event.currentIndex);
-      this.namingConventionchanged.next(this.namingConvention);
-    }
   }
 
   remove(i: number) {
@@ -119,28 +135,18 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
         value: item
       });
     }
-    this.sortItems();
     this.namingConventionchanged.next(this.namingConvention);
   }
 
   ngAfterViewInit() {
   }
 
-  sortItems() {
-    this.resultConvention = this.resultConvention.sort((a, b) => {
-      if (a.type !== 'extension' && b.type !== 'extension') {
-        return 0;
-      } else if (a.type === 'extension' && b.type !== 'extension') {
-        return 1;
-      } else if (a.type !== 'extension' && b.type === 'extension') {
-        return -1;
-      }
-      return 0;
-    });
-  }
-
   onItemClick(event, i) {
-    this.clicked = i;
+    if (this.resultConvention[i].type === 'text') {
+      this.clicked = i;
+    } else {
+      this.clicked = -1;
+    }
   }
 
   onDragEnd(event) {
@@ -158,15 +164,7 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
   }
 
   public get namingConvention(): string {
-    let result = '';
-    for (let i = 0; i < this.resultConvention.length; i++) {
-      const item = this.resultConvention[i];
-      if (item.type !== 'extension') {
-        result += item.value;
-      }
-    }
-
-    return result;
+    return this.resultConvention.join('');
   }
 
   onKeyDown($event, text) {
@@ -176,5 +174,9 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit {
       this.resultConvention[this.clicked].value = text.innerText;
       this.clicked = -1;
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subcrManager.destroy();
   }
 }

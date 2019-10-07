@@ -1,50 +1,53 @@
 <div class="namingConventionSelection">
-    <div class="namingConvention-dropdown">
-        <div class="btn-group" dropdown>
-            <button id="button-basic" dropdownToggle type="button" class="btn btn-secondary btn-sm btn-raised"
-                    aria-controls="dropdown-basic" style="background-color:gray;">
-              {{"tools.cut audio.add placeholder" | transloco}}
-                <fa-icon icon="plus"></fa-icon>
-            </button>
-            <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu"
-                role="menu" aria-labelledby="button-basic">
-                <li role="menuitem">
-                    <a class="dropdown-item" *ngFor="let item of namingConventionArray;let i = index;"
-                       (click)="addItem(item)">
-                        {{item}}
-                    </a>
-                </li>
-            </ul>
-        </div>
+  <div class="namingConvention-dropdown">
+    <div class="btn-group" dropdown>
+      <button id="button-basic" dropdownToggle type="button" class="btn btn-secondary btn-sm btn-raised"
+              aria-controls="dropdown-basic" style="background-color:gray;">
+        {{"tools.cut audio.add placeholder" | transloco}}
+        <fa-icon icon="plus"></fa-icon>
+      </button>
+      <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu"
+          role="menu" aria-labelledby="button-basic">
+        <li role="menuitem">
+          <a class="dropdown-item" *ngFor="let item of namingConventionArray;let i = index;"
+             (click)="addItem(item)">
+            {{item}}
+          </a>
+        </li>
+      </ul>
     </div>
-    <div cdkDropList [cdkDropListOrientation]="'horizontal'" class="namingConventionDragDrop"
-         (cdkDropListDropped)="drop($event)" #list>
-        <ng-container *ngFor="let item of resultConvention; let i = index;">
-            <ng-container *ngIf="i !== clicked">
-                <div cdkDrag class="pop naming-placeholder"
-                     *ngIf="item.type === 'placeholder'">
-                    <span style="margin-right:3px;">{{item.value}}</span>
-                    <fa-icon (click)="remove(i)" [icon]="['far', 'times-circle']"></fa-icon>
-                </div>
-                <div cdkDrag class="pop" *ngIf="item.type === 'text'"
-                     (cdkDragEnded)="onDragEnd($event)" (mouseup)="onItemClick($event, i)">
-                    <span style="margin-right:3px;">{{item.value}}</span>
-                    <fa-icon (click)="remove(i)" [icon]="['far', 'times-circle']"></fa-icon>
-                </div>
-                <div class="pop deactivated" *ngIf="item.type === 'extension'">
-                    <span style="margin-right:3px;">{{item.value}}</span>
-                </div>
-            </ng-container>
-            <ng-container *ngIf="i === clicked">
-                <div class="pop clicked" *ngIf="item.type === 'text'" (keydown)="onKeyDown($event, text)">
-                    <span #text style="margin-right:3px;" contenteditable="true">{{item.value}}</span>
-                    <fa-icon (click)="remove(i)" [icon]="['far', 'times-circle']"></fa-icon>
-                </div>
-            </ng-container>
-        </ng-container>
+  </div>
+  <div class="namingConventionDragDrop"
+       #list dragula="namingDragDrop" [(dragulaModel)]="resultConvention">
+    <div class="naming-item" *ngFor="let item of resultConvention; let i = index;"
+         [ngClass]="{
+    'naming-placeholder': item.type === 'placeholder',
+    'naming-text': item.type === 'text',
+    'deactivated': item.type === 'extension',
+    'clicked': item.type === 'clicked'
+    }"
+         (mouseup)="onItemClick($event, i)"
+    >
+      <div class="naming-content" *ngIf="i !== clicked">
+        <span class="value">{{item.value}}</span>
+        <fa-icon (click)="remove(i)" [icon]="['far', 'times-circle']"></fa-icon>
+      </div>
+      <div class="naming-content" *ngIf="i === clicked">
+          <span #text contenteditable="true" class="value" style="min-width: 10px;"
+                (keydown)="onKeyDown($event, text)">
+            {{item.value}}
+          </span>
+        <fa-icon (click)="remove(i)" [icon]="['far', 'times-circle']"></fa-icon>
+      </div>
     </div>
-    <div class="naming-convention preview">
-      <span>{{"general.preview" | transloco}}:</span>
-        {{preview}}
+  </div>
+  <div class="naming-item deactivated">
+    <div class="naming-content">
+      <span class="value">.wav</span>
     </div>
+  </div>
+  <div class="naming-convention preview">
+    <span>{{"general.preview" | transloco}}:</span>
+    {{preview}}
+  </div>
 </div>

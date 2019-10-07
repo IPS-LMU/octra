@@ -270,6 +270,14 @@
       "add placeholder": "Platzhalter hinzufügen",
       "hide configurator": "Verstecke den Konfigurator",
       "show configurator": "Zeige den Konfigurator"
+    },
+    "table configurator": {
+      "name": "Table Konfigurator",
+      "description": "Dieses Tool erlaubt es ein eigenes Tabellenformat zu erstellen",
+      "number of columns": "Anzahl der Spalten",
+      "remove all columns": "Alle Spalten entfernen",
+      "divider": "Trennzeichen",
+      "add header": "Füge Kopfzeile zur Tabelle hinzu"
     }
   },
   "asr": {

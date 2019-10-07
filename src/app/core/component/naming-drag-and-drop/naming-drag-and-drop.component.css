@@ -1,75 +1,75 @@
 .item {
-    margin-right: 3px;
-    border-radius: 3px;
-    height: 40px;
-}
-
-.pop {
-    border: 1px solid gray;
-    padding: 5px 5px;
-    background-color: whitesmoke;
-    border-radius: 3px;
-    display: inline-block;
-    justify-content: center;
-    align-items: normal;
-    cursor: grab;
+  margin-right: 3px;
+  border-radius: 3px;
+  height: 40px;
 }
 
 .deactivated {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .naming-placeholder {
-    border: 1px solid cornflowerblue;
-    background-color: lightblue;
-}
-
-/* Animate items as they’re being sorted. */
-/*noinspection CssUnusedSymbol*/
-.cdk-drop-list-dragging .cdk-drag {
-    transition: transform 250ms cubic-bezier(0.2, 0, 1, 0);
-}
-
-/* Animate an item that has been dropped. */
-/*noinspection CssUnusedSymbol*/
-.cdk-drag-animating {
-    transition: transform 300ms cubic-bezier(0.2, 0, 1, 0);
-}
-
-/* Animate items as they’re being sorted. */
-.cdk-drop-list-dragging .cdk-drag .deactivated {
-    transition: none;
-}
-
-/* Animate an item that has been dropped. */
-.cdk-drag-animating .deactivated {
-    transition: none;
+  border: 1px solid cornflowerblue;
+  background-color: lightblue;
 }
 
 .namingConvention-dropdown {
-    display: inline;
+  display: inline;
 }
 
 .namingConventionDragDrop {
-    display: inline-block;
-    height: 40px;
-    margin-left: 5px;
+  display: inline-block;
+  height: 40px;
+  margin-left: 5px;
 }
 
 .naming-convention.preview {
-    margin-top: -10px;
+  margin-top: -10px;
 }
 
 .ng-fa-icon {
-    cursor: default;
+  cursor: default;
 }
 
 :host {
-    padding: 5px;
-    display: block;
-    background-color: whitesmoke;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
+  padding: 5px;
+  display: block;
+  background-color: whitesmoke;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+
+.naming-item {
+  display: inline-block;
+  border: 1px solid gray;
+  padding: 6px;
+  user-select: none;
+  font-size: 13px;
+  border-radius: 3px;
+  justify-content: center;
+  align-items: normal;
+  cursor: grab;
+}
+
+.naming-item.naming-placeholder.ng-star-inserted.gu-mirror {
+  font-size: 13px !important;
+  height: unset !important;
+  padding: 5px !important;
+  width: auto !important;
+}
+
+.naming-content {
+  display: inline;
+}
+
+.naming-text {
+  background-color: white;
+  cursor: pointer;
+}
+
+.naming-content fa-icon {
+  margin-left: 3px;
+  cursor: pointer;
 }

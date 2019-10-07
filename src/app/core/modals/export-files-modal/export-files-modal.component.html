@@ -194,9 +194,9 @@
                   Add Column
                 </button>
 
-                <div cdkDropList cdkDropListOrientation="horizontal" class="example-list"
-                     (cdkDropListDropped)="drop($event)">
-                  <div class="example-box" *ngFor="let column of tools.tableConfigurator.columns" cdkDrag>
+                <div class="example-list" dragula="tableConfiguratorColumns"
+                     [(dragulaModel)]="tools.tableConfigurator.columns">
+                  <div class="example-box" *ngFor="let column of tools.tableConfigurator.columns">
                     <input type="text" [(ngModel)]="column.title"/>
                     <select>
                       <option>Options</option>

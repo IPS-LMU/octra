@@ -70,6 +70,7 @@ import {
   faFile,
   faFolderOpen,
   faGlobe,
+  faGripLines,
   faHeadphones,
   faInfoCircle,
   faKeyboard,
@@ -124,6 +125,7 @@ import {environment} from '../environments/environment';
 import {translocoLoader} from './transloco.loader';
 import {TRANSLOCO_CONFIG, TranslocoConfig, TranslocoModule} from '@ngneat/transloco';
 import {DragulaModule} from 'ng2-dragula';
+import {TableConfiguratorComponent} from './core/component/table-configurator/table-configurator.component';
 
 library.add(
   faSpinner,
@@ -164,7 +166,8 @@ library.add(
   faStar,
   faGlobe,
   faHandshake,
-  faDatabase
+  faDatabase,
+  faGripLines
 );
 
 export const EDITORS: any[] = [
@@ -225,7 +228,8 @@ export const EDITORS: any[] = [
     NamingDragAndDropComponent,
     StresstestComponent,
     TranscriptionDemoEndModalComponent,
-    AsrOptionsComponent
+    AsrOptionsComponent,
+    TableConfiguratorComponent
   ],
   entryComponents: EDITORS,
   imports: [

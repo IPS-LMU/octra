@@ -13,6 +13,7 @@ import {interval, Subject} from 'rxjs';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
 import {WavFormat} from '../../../media-components/obj/media/audio/AudioFormats';
 import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/cutting-format';
+import {DragulaService} from 'ng2-dragula';
 
 declare var JSZip;
 
@@ -125,7 +126,12 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
               private httpClient: HttpClient,
               private appStorage: AppStorageService,
               private audio: AudioService,
-              private settService: SettingsService) {
+              private settService: SettingsService,
+              private dragulaService: DragulaService) {
+    this.dragulaService.createGroup('tableConfiguratorColumns', {
+      revertOnSpill: true,
+      removeOnSpill: false
+    });
   }
 
   ngOnInit() {
@@ -655,12 +661,4 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     });
   }
 
-  tableConfiguratorAddColumn() {
-    this.tools.tableConfigurator.columns.push({
-      title: 'Title',
-      dataName: 'sampleStart',
-      timeUnit: 'seconds',
-      value: 21312
-    });
-  }
 }

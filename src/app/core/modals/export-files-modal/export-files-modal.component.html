@@ -189,26 +189,9 @@
             <td></td>
             <td colspan="4" style="padding-left:20px;">
               <div class="card" style="padding:10px;" *ngIf="navbarServ.transcrService !== undefined">
-                <button class="btn btn-secondary" (click)="tableConfiguratorAddColumn()">
-                  <fa-icon icon="plus"></fa-icon>
-                  Add Column
-                </button>
-
-                <div class="example-list" dragula="tableConfiguratorColumns"
-                     [(dragulaModel)]="tools.tableConfigurator.columns">
-                  <div class="example-box" *ngFor="let column of tools.tableConfigurator.columns">
-                    <input type="text" [(ngModel)]="column.title"/>
-                    <select>
-                      <option>Options</option>
-                      <option>{{column.timeUnit}}</option>
-                    </select>
-                    <p>
-                      {{column.value}}
-                    </p>
-                  </div>
-                  <div class="clearfix"></div>
-                </div>
-
+                <app-table-configurator [columns]="tools.tableConfigurator.columns"
+                                        [annotation]="transcrService.annotation"
+                                        [currentLevelID]="transcrService.currentlevel.id"></app-table-configurator>
               </div>
             </td>
           </tr>

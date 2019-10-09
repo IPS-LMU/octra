@@ -1,0 +1,87 @@
+.columns-list {
+  max-width: 100%;
+  min-height: 150px;
+  display: block;
+  background: whitesmoke;
+  border: 2px dotted gray;
+  border-radius: 4px;
+}
+
+.column {
+  padding: 0;
+  border: 1px solid gray;
+  border-radius: 5px;
+  float: left;
+  color: rgba(0, 0, 0, 0.87);
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  cursor: move;
+  background: white;
+  font-size: 14px;
+  margin: 5px;
+}
+
+.column .grip {
+  border: 1px solid lightgray;
+  border-radius: 3px;
+  padding: 3px;
+  vertical-align: middle;
+  /* width: 30px; */
+  text-align: center;
+  background-color: ghostwhite;
+  color: gray;
+  position: relative;
+}
+
+.column .grip .column-number {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 6px 0 0 6px;
+  font-size: 0.9em;
+  color: black;
+}
+
+
+.column .content {
+  padding: 5px;
+}
+
+.column .title {
+  display: block;
+  border: 1px solid lightgray;
+  border-bottom: none;
+  text-align: center;
+  font-weight: bold;
+  width: 100%;
+}
+
+.dropdown-item.active {
+  background-color: whitesmoke;
+}
+
+.btn-group {
+  margin: 0;
+}
+
+.btn {
+  text-transform: initial;
+}
+
+.example {
+  border: 1px solid lightgray;
+}
+
+.example .example-content {
+  text-align: center;
+  word-break: keep-all;
+  overflow: hidden;
+  clip: auto;
+  padding: 10px;
+}
+
+.table-options {
+  margin-top: 30px;
+  max-width: 400px;
+}

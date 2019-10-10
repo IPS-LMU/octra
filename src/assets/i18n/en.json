@@ -83,7 +83,10 @@
     "Language": "Language",
     "Speech Recognition": "Speech Recognition",
     "Service Provider": "Service Provider",
-    "SELECT ACTION": "SELECT ACTION"
+    "SELECT ACTION": "SELECT ACTION",
+    "Format": "Format",
+    "Type": "Type",
+    "File extension": "File extension"
   },
   "bug report": {
     "give feedback": "Give feedback",
@@ -272,12 +275,12 @@
       "show configurator": "Show configurator"
     },
     "table configurator": {
-      "name": "Table Configurator",
+      "name": "Table-Configurator",
       "description": "This tool enables to create your own table format.",
-      "number of columns": "Number of columns",
-      "remove all columns": "Remove all columns",
+      "add column": "Add column",
       "divider": "Divider",
-      "add header": "Add header to the table"
+      "add header": "Add header to the table",
+      "generate table": "generate table"
     }
   },
   "asr": {

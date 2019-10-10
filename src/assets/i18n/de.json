@@ -83,7 +83,10 @@
     "Language": "Sprache",
     "Speech Recognition": "Spracherkennung",
     "Service Provider": "Dienstleister",
-    "SELECT ACTION": "AKTION WÄHLEN"
+    "SELECT ACTION": "AKTION WÄHLEN",
+    "Format": "Format",
+    "Type": "Typ",
+    "File extension": "Dateiendung"
   },
   "bug report": {
     "give feedback": "Feedback geben",
@@ -272,12 +275,12 @@
       "show configurator": "Zeige den Konfigurator"
     },
     "table configurator": {
-      "name": "Table Konfigurator",
+      "name": "Tabellen-Konfigurator",
       "description": "Dieses Tool erlaubt es ein eigenes Tabellenformat zu erstellen",
-      "number of columns": "Anzahl der Spalten",
-      "remove all columns": "Alle Spalten entfernen",
+      "add column": "Spalte hinzufügen",
       "divider": "Trennzeichen",
-      "add header": "Füge Kopfzeile zur Tabelle hinzu"
+      "add header": "Füge Kopfzeile zur Tabelle hinzu",
+      "generate table": "generate table"
     }
   },
   "asr": {

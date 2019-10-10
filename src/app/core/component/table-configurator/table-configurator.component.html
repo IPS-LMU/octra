@@ -1,6 +1,6 @@
 <button class="btn btn-secondary" (click)="tableConfiguratorAddColumn()">
   <fa-icon icon="plus"></fa-icon>
-  Add Column
+  {{"tools.table configurator.add column" | transloco}}
 </button>
 
 <div class="columns-list" dragula="tableConfiguratorColumns"
@@ -18,7 +18,7 @@
         <div class="btn-group" dropdown style="display:block; width:100%;">
           <button id="button-basic" dropdownToggle type="button" class="btn btn-info btn-outline btn-sm"
                   aria-controls="dropdown-basic" style="width: 100%;">
-            Type: {{column.columnDefinition.type}}
+            {{"general.Type" | transloco}}: {{column.columnDefinition.type}}
           </button>
           <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu"
               role="menu" aria-labelledby="button-basic" style="cursor: pointer">
@@ -34,7 +34,7 @@
         <div class="btn-group" dropdown style="display:block; width:100%;">
           <button id="button-basic2" dropdownToggle type="button" class="btn btn-info btn-outline btn-sm"
                   aria-controls="dropdown-basic" style="width:100%;">
-            Format: {{column.columnDefinition.selectedFormat.name}}
+            {{"general.Format" | transloco}}: {{column.columnDefinition.selectedFormat.name}}
           </button>
           <ul id="dropdown-basic2" *dropdownMenu class="dropdown-menu"
               role="menu" aria-labelledby="button-basic" style="cursor: pointer">
@@ -50,7 +50,7 @@
       </div>
       <div class="example">
         <div class="example-content">
-          Example:<br/>
+          {{"general.example" | transloco}}:<br/>
           {{column.columnDefinition.selectedFormat.defaultValue}}
         </div>
       </div>
@@ -63,7 +63,7 @@
   <form>
     <fieldset class="form-group">
       <div class="row">
-        <legend class="col-form-label col-sm-4 pt-0">Divider:</legend>
+        <legend class="col-form-label col-sm-4 pt-0">{{"tools.table configurator.divider" | transloco}}:</legend>
         <div class="col-sm-8">
           <div class="btn-group" dropdown style="display:block; width:100%;">
             <button dropdownToggle type="button" class="btn btn-info btn-raised btn-sm"
@@ -84,7 +84,7 @@
     </fieldset>
     <fieldset class="form-group">
       <div class="row">
-        <legend class="col-form-label col-sm-4 pt-0">File extension:</legend>
+        <legend class="col-form-label col-sm-4 pt-0">{{"general.File extension" | transloco}}:</legend>
         <div class="col-sm-8">
           <div class="btn-group" dropdown style="display:block; width:100%;">
             <button dropdownToggle type="button" class="btn btn-info btn-raised btn-sm"
@@ -109,7 +109,7 @@
           <input class="form-check-input" type="checkbox" id="gridCheck1" name="addHeader"
                  [(ngModel)]="tableOptions.addHeader" (ngModelChange)="onSomethingDone()">
           <label class="form-check-label" for="gridCheck1" style="font-size: 14px;">
-            add table header
+            {{"tools.table configurator.add header" | transloco}}
           </label>
         </div>
       </div>
@@ -117,10 +117,10 @@
     <div class="form-group row">
       <div class="col-sm-10">
         <button type="submit" class="btn btn-primary btn-raised" (click)="generateFile()"
-                [disabled]="this.columns.length < 1">Generate Table
+                [disabled]="this.columns.length < 1">{{"tools.table configurator.generate table" | transloco}}
         </button>
         <a [href]="this.resultURL" *ngIf="this.resultURL !== null" [download]="'test' + tableOptions.fileExtension"
-           style="margin-left:10px;">Download</a>
+           style="margin-left:10px;">{{"general.download" | transloco}}</a>
       </div>
     </div>
   </form>

@@ -145,6 +145,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       this.modal.show(this.modal, this.config);
 
       this.visible = true;
+
       const subscr = this.actionperformed.subscribe(
         (action) => {
           resolve(action);

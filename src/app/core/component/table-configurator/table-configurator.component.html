@@ -10,6 +10,9 @@
       <span class="column-number">#{{i + 1}}</span>
       <fa-icon [icon]="['fas', 'grip-lines']"></fa-icon>
     </div>
+    <div class="delete-column" (click)="onDeleteColumnClick(i)">
+      <fa-icon icon="times"></fa-icon>
+    </div>
     <div class="content">
       <div class="options">
         <div class="btn-group" dropdown style="display:block; width:100%;">
@@ -38,11 +41,12 @@
             <li role="menuitem" class="dropdown-item" *ngFor="let format of column.columnDefinition.formats" [ngClass]="{
               'active': format.name === column.columnDefinition.selectedFormat.name
               }" (click)="onFormatClick(i, format)">
-              {{format.name}} ({{format.formatString}})
+              {{format.name}} <span *ngIf="format.formatString !== ''" style="margin-left:5px;">({{format.formatString}}
+              )</span>
             </li>
           </ul>
         </div>
-        <input type="text" [(ngModel)]="column.title" class="title"/>
+        <input type="text" [(ngModel)]="column.title" (keyup)="onSomethingDone()" class="title"/>
       </div>
       <div class="example">
         <div class="example-content">
@@ -64,21 +68,14 @@
           <div class="btn-group" dropdown style="display:block; width:100%;">
             <button dropdownToggle type="button" class="btn btn-info btn-raised btn-sm"
                     aria-controls="dropdown-basic" style="width:100%;">
-              Semikolon (;)
+              {{tableOptions.divider.name}} ({{tableOptions.divider.value}})
             </button>
             <ul id="dropdown-basic3" *dropdownMenu class="dropdown-menu"
                 role="menu" aria-labelledby="button-basic" style="cursor: pointer">
-              <li role="menuitem" class="dropdown-item">
-                Tab (\t)
-              </li>
-              <li role="menuitem" class="dropdown-item">
-                Semikolon (;)
-              </li>
-              <li role="menuitem" class="dropdown-item">
-                Komma (,)
-              </li>
-              <li role="menuitem" class="dropdown-item">
-                Line (|)
+              <li role="menuitem" class="dropdown-item" *ngFor="let divider of tableOptions.selection.dividers"
+                  (click)="onDividerClick(divider.value)"
+              >
+                {{divider.name}} ({{divider.value}})
               </li>
             </ul>
           </div>
@@ -92,18 +89,14 @@
           <div class="btn-group" dropdown style="display:block; width:100%;">
             <button dropdownToggle type="button" class="btn btn-info btn-raised btn-sm"
                     aria-controls="dropdown-basic" style="width:100%;">
-              .csv
+              {{tableOptions.fileExtension}}
             </button>
             <ul *dropdownMenu class="dropdown-menu"
                 role="menu" aria-labelledby="button-basic" style="cursor: pointer">
-              <li role="menuitem" class="dropdown-item">
-                .table
-              </li>
-              <li role="menuitem" class="dropdown-item">
-                .txt
-              </li>
-              <li role="menuitem" class="dropdown-item">
-                .csv
+              <li role="menuitem" class="dropdown-item" *ngFor="let extension of tableOptions.selection.extension"
+                  (click)="onExtensionClick(extension)"
+              >
+                {{extension}}
               </li>
             </ul>
           </div>
@@ -113,7 +106,8 @@
     <div class="form-group row">
       <div class="col-sm-12">
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="gridCheck1">
+          <input class="form-check-input" type="checkbox" id="gridCheck1" name="addHeader"
+                 [(ngModel)]="tableOptions.addHeader" (ngModelChange)="onSomethingDone()">
           <label class="form-check-label" for="gridCheck1" style="font-size: 14px;">
             add table header
           </label>
@@ -122,7 +116,11 @@
     </div>
     <div class="form-group row">
       <div class="col-sm-10">
-        <button type="submit" class="btn btn-primary btn-raised" (click)="generateFile()">Download</button>
+        <button type="submit" class="btn btn-primary btn-raised" (click)="generateFile()"
+                [disabled]="this.columns.length < 1">Generate Table
+        </button>
+        <a [href]="this.resultURL" *ngIf="this.resultURL !== null" [download]="'test' + tableOptions.fileExtension"
+           style="margin-left:10px;">Download</a>
       </div>
     </div>
   </form>

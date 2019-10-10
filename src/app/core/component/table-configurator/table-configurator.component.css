@@ -9,6 +9,7 @@
 
 .column {
   padding: 0;
+  position: relative;
   border: 1px solid gray;
   border-radius: 5px;
   float: left;
@@ -57,6 +58,12 @@
   width: 100%;
 }
 
+.dropdown-item {
+  font-size: 12px;
+  padding: 3px 3px 3px 10px;
+  min-height: 30px;
+}
+
 .dropdown-item.active {
   background-color: whitesmoke;
 }
@@ -65,7 +72,7 @@
   margin: 0;
 }
 
-.btn {
+.btn-info {
   text-transform: initial;
 }
 
@@ -84,4 +91,26 @@
 .table-options {
   margin-top: 30px;
   max-width: 400px;
+}
+
+.dropdown-menu {
+  margin-top: -5px;
+}
+
+.delete-column {
+  cursor: pointer;
+  position: absolute;
+  display: inline;
+  margin-right: 10px;
+  margin-top: 5px;
+  top: 0;
+  right: 0;
+}
+
+.delete-column fa-icon {
+  color: gray;
+}
+
+.delete-column fa-icon:hover {
+  color: red;
 }

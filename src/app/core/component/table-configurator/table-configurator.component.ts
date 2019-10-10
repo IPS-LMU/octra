@@ -279,7 +279,6 @@ export class TableConfiguratorComponent implements OnInit {
   onFormatClick(columnIndex: number, format: ColumnFormat) {
     const column = this.columns[columnIndex];
     this.updateTitle(column, column.columnDefinition.type);
-    console.log(`selected format ${format.name}`);
 
     const colDef = this.columns[columnIndex].columnDefinition;
     this.columns[columnIndex].columnDefinition = {
@@ -381,8 +380,6 @@ export class TableConfiguratorComponent implements OnInit {
       result += `${textLines[i].text}\n`
     }
     result += '\n';
-
-    console.log(result);
 
     const file = new File([result], 'test' + this.tableOptions.fileExtension);
     this.resultURL = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(file));

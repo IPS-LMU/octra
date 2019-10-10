@@ -1,6 +1,6 @@
 .columns-list {
   max-width: 100%;
-  min-height: 150px;
+  min-height: 220px;
   display: block;
   background: whitesmoke;
   border: 2px dotted gray;
@@ -39,7 +39,7 @@
   position: absolute;
   left: 0;
   top: 0;
-  margin: 6px 0 0 6px;
+  margin: 5px 0 0 6px;
   font-size: 0.9em;
   color: black;
 }
@@ -102,7 +102,7 @@
   position: absolute;
   display: inline;
   margin-right: 10px;
-  margin-top: 5px;
+  margin-top: 4px;
   top: 0;
   right: 0;
 }
@@ -113,4 +113,12 @@
 
 .delete-column fa-icon:hover {
   color: red;
+}
+
+legend {
+  margin-top: 7px;
+}
+
+label {
+  margin-top: 3px;
 }

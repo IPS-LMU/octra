@@ -90,7 +90,7 @@ export class TableConfiguratorComponent implements OnInit {
         formatString: '120345',
         formatFunction: (level: Level, segmentNumber: number, counter: number) => {
           // the value must be a unix timestamp
-          return ((segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.originalSample.value : 0) + '';
+          return ((segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.originalSample.value + 1 : 1) + '';
         }
       },
       {
@@ -154,7 +154,7 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '120345',
           formatFunction: (level: Level, segmentNumber: number, counter: number) => {
             // the value must be a unix timestamp
-            let segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.originalSample.value : 0;
+            let segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.originalSample.value + 1 : 1;
             return (level.segments.get(segmentNumber).time.originalSample.value - segmentStart) + '';
           }
         },

@@ -5,7 +5,7 @@
       <div class="modal-header">
         <h4 class="modal-title">{{"general.export data" | transloco}}</h4>
       </div>
-      <div class="modal-body" id="export-table">
+      <div class="modal-body" id="export-table" #content>
         <table class="table table-striped">
           <thead>
           <tr>
@@ -68,7 +68,9 @@
         </table>
 
         <h5>Tools</h5>
-        <table class="table table-striped">
+        <table class="table table-striped" [ngStyle]="{
+          width: content.offsetWidth - 50 + 'px'
+        }">
           <thead>
           <tr>
             <th></th>
@@ -191,7 +193,10 @@
               <div class="card" style="padding:10px;" *ngIf="navbarServ.transcrService !== undefined">
                 <app-table-configurator [columns]="tools.tableConfigurator.columns"
                                         [annotation]="transcrService.annotation"
-                                        [currentLevelID]="transcrService.currentlevel.id"></app-table-configurator>
+                                        [currentLevelID]="transcrService.currentlevel.id"
+                                        [tableWidth]="content.offsetWidth - 100"
+                                        #tableConfigurator
+                ></app-table-configurator>
               </div>
             </td>
           </tr>

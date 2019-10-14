@@ -1,31 +1,5 @@
-.columns-list {
-  max-width: 100%;
-  min-height: 220px;
-  display: block;
-  background: whitesmoke;
-  border: 2px dotted gray;
-  border-radius: 4px;
-}
-
-.column {
-  padding: 0;
-  position: relative;
-  border: 1px solid gray;
-  border-radius: 5px;
-  float: left;
-  color: rgba(0, 0, 0, 0.87);
-  align-items: center;
-  justify-content: space-between;
-  box-sizing: border-box;
-  cursor: move;
-  background: white;
-  font-size: 14px;
-  margin: 5px;
-}
-
-.column .grip {
-  border: 1px solid lightgray;
-  border-radius: 3px;
+.easy-table .column .grip {
+  border-bottom: 1px solid lightgray;
   padding: 3px;
   vertical-align: middle;
   /* width: 30px; */
@@ -35,27 +9,33 @@
   position: relative;
 }
 
-.column .grip .column-number {
-  position: absolute;
-  left: 0;
-  top: 0;
-  margin: 5px 0 0 6px;
-  font-size: 0.9em;
-  color: black;
-}
-
-
-.column .content {
-  padding: 5px;
-}
-
-.column .title {
+.easy-table .column .title {
   display: block;
-  border: 1px solid lightgray;
-  border-bottom: none;
-  text-align: center;
+  border: none;
+  border-bottom: 1px solid lightgray;
+  text-align: left;
+  padding: 5px;
+  cursor: text;
   font-weight: bold;
   width: 100%;
+}
+
+.easy-table .delete-column {
+  cursor: pointer;
+  position: absolute;
+  display: inline;
+  margin-right: 10px;
+  margin-top: 4px;
+  top: 0;
+  right: 0;
+}
+
+.easy-table .delete-column fa-icon {
+  color: gray;
+}
+
+.easy-table .delete-column fa-icon:hover {
+  color: red;
 }
 
 .dropdown-item {
@@ -76,49 +56,68 @@
   text-transform: initial;
 }
 
-.example {
-  border: 1px solid lightgray;
-}
-
-.example .example-content {
-  text-align: center;
-  word-break: keep-all;
-  overflow: hidden;
-  clip: auto;
-  padding: 10px;
-}
-
-.table-options {
-  margin-top: 30px;
-  max-width: 400px;
-}
-
 .dropdown-menu {
   margin-top: -5px;
 }
 
-.delete-column {
-  cursor: pointer;
-  position: absolute;
-  display: inline;
-  margin-right: 10px;
-  margin-top: 4px;
-  top: 0;
-  right: 0;
+.easy-table {
+  white-space: nowrap;
+  overflow: auto;
 }
 
-.delete-column fa-icon {
-  color: gray;
+.table-options {
+  padding: 20px;
 }
 
-.delete-column fa-icon:hover {
-  color: red;
+.table-options legend {
+  margin-top: 5px;
 }
 
-legend {
-  margin-top: 7px;
+.easy-table .header {
+  font-weight: bold;
 }
 
-label {
-  margin-top: 3px;
+.easy-table .column .title {
+  display: block;
+  border: none;
+  border-bottom: 1px solid lightgray;
+  text-align: left;
+  padding: 5px;
+  cursor: text;
+  font-weight: bold;
+  width: 100%;
+}
+
+.easy-table .column {
+  padding: 0;
+  position: relative;
+  border-right: 1px solid gray;
+  border-top: 1px solid gray;
+  border-bottom: 1px solid gray;
+  border-collapse: collapse;
+  display: inline-grid;
+  white-space: nowrap;
+  color: rgba(0, 0, 0, 0.87);
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  cursor: move;
+  background: white;
+  font-size: 14px;
+  margin: 0;
+}
+
+.easy-table .column:first-of-type {
+  border-left: 1px solid gray;
+}
+
+.easy-table .cell {
+  border-bottom: 1px solid lightgray;
+  padding: 5px;
+  height: 35px;
+  background-color: white;
+}
+
+.easy-table .cell:last-of-type {
+  border-bottom: none;
 }

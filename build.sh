@@ -12,7 +12,7 @@ excludedList='"config" "LICENCE.txt" "media"'
 # 1 = disable indexing, 0 = enable
 disableRobots=1
 # 1 = enable isUpdate, 0 = disable
-isUpdate=0
+isUpdate=1
 
 timeNow=`date "+%Y-%m-%d %H:%M:%S"`
 octraVersion="1.3.1"

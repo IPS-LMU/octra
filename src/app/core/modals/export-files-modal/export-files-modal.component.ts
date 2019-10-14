@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
@@ -14,6 +14,7 @@ import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/n
 import {WavFormat} from '../../../media-components/obj/media/audio/AudioFormats';
 import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/cutting-format';
 import {DragulaService} from 'ng2-dragula';
+import {TableConfiguratorComponent} from '../../component/table-configurator/table-configurator.component';
 
 declare var JSZip;
 
@@ -99,13 +100,10 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     }
   };
 
-  /*
-  drop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.tools.tableConfigurator.columns, event.previousIndex, event.currentIndex);
-  }*/
-
   @ViewChild('modal', {static: true}) modal: any;
   @ViewChild('namingConvention', {static: false}) namingConvention: NamingDragAndDropComponent;
+  @ViewChild('content', {static: false}) contentElement: ElementRef;
+  @ViewChild('tableConfigurator', {static: false}) tableConfigurator: TableConfiguratorComponent;
 
   @Input() transcrService: TranscriptionService;
   @Input() uiService: UserInteractionsService;
@@ -145,6 +143,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       this.modal.show(this.modal, this.config);
 
       this.visible = true;
+      this.tableConfigurator.updateAllTableCells();
 
       const subscr = this.actionperformed.subscribe(
         (action) => {

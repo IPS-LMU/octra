@@ -3,35 +3,26 @@
   {{"tools.table configurator.add column" | transloco}}
 </button>
 
-<div class="columns-list" dragula="tableConfiguratorColumns"
-     [(dragulaModel)]="columns">
-  <div class="column" *ngFor="let column of columns; let i = index;">
-    <div class="grip">
-      <span class="column-number">#{{i + 1}}</span>
-      <fa-icon [icon]="['fas', 'grip-lines']"></fa-icon>
-    </div>
-    <div class="delete-column" (click)="onDeleteColumnClick(i)">
-      <fa-icon icon="times"></fa-icon>
-    </div>
-    <div class="content">
-      <div class="options">
-        <div class="btn-group" dropdown style="display:block; width:100%;">
-          <button id="button-basic" dropdownToggle type="button" class="btn btn-info btn-outline btn-sm"
-                  aria-controls="dropdown-basic" style="width: 100%;">
-            {{"general.Type" | transloco}}: {{column.columnDefinition.type}}
-          </button>
-          <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu"
-              role="menu" aria-labelledby="button-basic" style="cursor: pointer">
-            <ng-container *ngFor="let colDef of columnDefinitions">
-              <li role="menuitem" class="dropdown-item" [ngClass]="{
-              'active': column.columnDefinition.type === colDef.type
-              }" (click)="onTypeClick(i, colDef)">
-                {{colDef.type}}
-              </li>
-            </ng-container>
-          </ul>
+<div class="easy-table" [ngStyle]="{
+width: tableWidth + 'px'
+}">
+  <div class="inner" dragula="tableConfiguratorColumns"
+       [(dragulaModel)]="columns" (dragulaModelChange)="onDragulaModelChange($event)">
+    <div class="column" *ngFor="let column of columns; let i = index;">
+      <div class="grip">
+        <fa-icon [icon]="['fas', 'grip-lines']"></fa-icon>
+      </div>
+      <div class="delete-column" (click)="onDeleteColumnClick(i)">
+        <fa-icon icon="times"></fa-icon>
+      </div>
+      <div class="header">
+        <div contenteditable="true" #title
+             (mouseleave)="onTitleLeave(title, i)"
+             (keydown)="onTitleKeyDown($event)"
+             (keyup)="onTitleKeyUp($event, title, i)" class="title">
+          {{column.title}}
         </div>
-        <div class="btn-group" dropdown style="display:block; width:100%;">
+        <div class="btn-group" dropdown style="display:block; width:100%;margin:0;">
           <button id="button-basic2" dropdownToggle type="button" class="btn btn-info btn-outline btn-sm"
                   aria-controls="dropdown-basic" style="width:100%;">
             {{"general.Format" | transloco}}: {{column.columnDefinition.selectedFormat.name}}
@@ -46,26 +37,22 @@
             </li>
           </ul>
         </div>
-        <input type="text" [(ngModel)]="column.title" (keyup)="onSomethingDone()" class="title"/>
       </div>
-      <div class="example">
-        <div class="example-content">
-          {{"general.example" | transloco}}:<br/>
-          {{column.columnDefinition.selectedFormat.defaultValue}}
-        </div>
+      <div class="cell" *ngFor="let cell of columns[i].columnDefinition.cells">
+        {{cell.text | cliptext}}
       </div>
     </div>
+    <div class="clearfix"></div>
   </div>
-  <div style="clear: left;"></div>
 </div>
 
 <div class="table-options">
   <form>
     <fieldset class="form-group">
       <div class="row">
-        <legend class="col-form-label col-sm-4 pt-0">{{"tools.table configurator.divider" | transloco}}:</legend>
-        <div class="col-sm-8">
-          <div class="btn-group" dropdown style="display:block; width:100%;">
+        <legend class="col-form-label col-sm-2 pt-0">{{"tools.table configurator.divider" | transloco}}:</legend>
+        <div class="col-sm-10">
+          <div class="btn-group" dropdown>
             <button dropdownToggle type="button" class="btn btn-info btn-raised btn-sm"
                     aria-controls="dropdown-basic" style="width:100%;">
               {{tableOptions.divider.name}} ({{tableOptions.divider.value}})
@@ -84,9 +71,9 @@
     </fieldset>
     <fieldset class="form-group">
       <div class="row">
-        <legend class="col-form-label col-sm-4 pt-0">{{"general.File extension" | transloco}}:</legend>
-        <div class="col-sm-8">
-          <div class="btn-group" dropdown style="display:block; width:100%;">
+        <legend class="col-form-label col-sm-2 pt-0">{{"general.File extension" | transloco}}:</legend>
+        <div class="col-sm-10">
+          <div class="btn-group" dropdown>
             <button dropdownToggle type="button" class="btn btn-info btn-raised btn-sm"
                     aria-controls="dropdown-basic" style="width:100%;">
               {{tableOptions.fileExtension}}

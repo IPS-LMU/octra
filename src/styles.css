@@ -312,3 +312,65 @@ footer {
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
   filter: alpha(opacity=20);
 }
+
+column.ng-star-inserted.gu-mirror .delete-column fa-icon {
+  color: gray;
+}
+
+.column.ng-star-inserted.gu-mirror .delete-column {
+  cursor: pointer;
+  position: absolute;
+  display: inline;
+  margin-right: 10px;
+  margin-top: 4px;
+  top: 0;
+  right: 0;
+}
+
+.column.ng-star-inserted.gu-mirror .grip {
+  border: 1px solid lightgray;
+  padding: 3px;
+  vertical-align: middle;
+  /* width: 30px; */
+  text-align: center;
+  background-color: ghostwhite;
+  color: gray;
+  position: relative;
+}
+
+.column.ng-star-inserted.gu-mirror .title {
+  display: block;
+  border: none;
+  border-bottom: 1px solid lightgray;
+  text-align: left;
+  padding: 5px;
+  cursor: text;
+  font-weight: bold;
+  width: 100%;
+}
+
+.column.ng-star-inserted.gu-mirror {
+  padding: 0;
+  position: relative;
+  border: 1px solid gray;
+  white-space: nowrap;
+  color: rgba(0, 0, 0, 0.87);
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  cursor: move;
+  background: white;
+  font-size: 14px;
+  margin: 0;
+}
+
+.column.ng-star-inserted.gu-mirror .cell {
+  border-bottom: 1px solid lightgray;
+  padding: 5px;
+  height: 35px;
+  background-color: white;
+}
+
+.column.ng-star-inserted.gu-mirror .cell:last-of-type {
+  border-bottom: none;
+}

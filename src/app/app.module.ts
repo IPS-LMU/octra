@@ -126,6 +126,7 @@ import {translocoLoader} from './transloco.loader';
 import {TRANSLOCO_CONFIG, TranslocoConfig, TranslocoModule} from '@ngneat/transloco';
 import {DragulaModule} from 'ng2-dragula';
 import {TableConfiguratorComponent} from './core/component/table-configurator/table-configurator.component';
+import {ClipTextPipe} from './core/shared/clip-text.pipe';
 
 library.add(
   faSpinner,
@@ -229,7 +230,8 @@ export const EDITORS: any[] = [
     StresstestComponent,
     TranscriptionDemoEndModalComponent,
     AsrOptionsComponent,
-    TableConfiguratorComponent
+    TableConfiguratorComponent,
+    ClipTextPipe
   ],
   entryComponents: EDITORS,
   imports: [

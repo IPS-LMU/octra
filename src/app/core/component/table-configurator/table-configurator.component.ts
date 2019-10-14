@@ -27,13 +27,19 @@ export class TableConfiguratorComponent implements OnInit {
     columnDefinition: {
       type: string,
       selectedFormat: ColumnFormat,
-      formats: ColumnFormat[]
+      formats: ColumnFormat[],
+      cells: {
+        level: number,
+        text: string,
+        samples: number
+      }[]
     }
   }[] = [];
   @Input() annotation: Annotation;
   @Input() options = {};
   @Input() currentLevelID;
-
+  @Input() view: 'expert' | 'easy' = 'easy';
+  @Input() tableWidth: number = 300;
   resultURL: SafeResourceUrl = null;
 
   tableOptions = {
@@ -93,7 +99,7 @@ export class TableConfiguratorComponent implements OnInit {
         defaultValue: '23.4567',
         formatFunction: (level: Level, segmentNumber: number, counter: number) => {
           // the value must be a unix timestamp
-          return (level.segments.get(segmentNumber).time.originalSample.seconds) + '';
+          return ((segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.originalSample.seconds : 0) + '';
         }
       }]
   },
@@ -165,6 +171,30 @@ export class TableConfiguratorComponent implements OnInit {
       ]
     },
     {
+      type: 'transcript',
+      formats: [{
+        name: 'raw text',
+        defaultValue: 'Some transcript...',
+        formatString: '',
+        formatFunction: (level: Level, segmentNumber: number, counter: number) => {
+          // the value must be a unix timestamp
+          return level.segments.get(segmentNumber).transcript;
+        }
+      }]
+    },
+    {
+      type: 'tier',
+      formats: [{
+        name: 'tier name',
+        defaultValue: 'OCTRA_1',
+        formatString: '',
+        formatFunction: (level: Level, segmentNumber: number, counter: number) => {
+          // the value must be a unix timestamp
+          return level.name;
+        }
+      }]
+    },
+    {
       type: 'sampleRate',
       formats: [{
         name: 'full',
@@ -186,29 +216,6 @@ export class TableConfiguratorComponent implements OnInit {
         }]
     },
     {
-      type: 'transcript',
-      formats: [{
-        name: 'raw text',
-        defaultValue: 'Some transcript...',
-        formatString: '',
-        formatFunction: (level: Level, segmentNumber: number, counter: number) => {
-          // the value must be a unix timestamp
-          return level.segments.get(segmentNumber).transcript;
-        }
-      }]
-    }, {
-      type: 'tier',
-      formats: [{
-        name: 'tier name',
-        defaultValue: 'OCTRA_1',
-        formatString: '',
-        formatFunction: (level: Level, segmentNumber: number, counter: number) => {
-          // the value must be a unix timestamp
-          return level.name;
-        }
-      }]
-    },
-    {
       type: 'lineNumber',
       formats: [{
         name: 'short',
@@ -226,23 +233,28 @@ export class TableConfiguratorComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.tableConfiguratorAddColumn();
+    this.tableConfiguratorAddColumn();
+    this.tableConfiguratorAddColumn();
+    this.tableConfiguratorAddColumn();
+    this.tableConfiguratorAddColumn();
   }
 
   tableConfiguratorAddColumn() {
     let colDef: ColumnDefinition = this.findNextUnusedColumnDefinition();
-    if (colDef === null) {
-      colDef = this.columnDefinitions[0];
+    if (colDef !== null) {
+      this.columns.push({
+        title: colDef.type,
+        columnDefinition: {
+          type: colDef.type,
+          selectedFormat: colDef.formats[0],
+          formats: colDef.formats,
+          cells: []
+        }
+      });
+      this.updateAllTableCells();
+      this.onSomethingDone();
     }
-
-    this.columns.push({
-      title: colDef.type,
-      columnDefinition: {
-        type: colDef.type,
-        selectedFormat: colDef.formats[0],
-        formats: colDef.formats
-      }
-    });
-    this.onSomethingDone();
   }
 
   convertMilliSecondsIntoLegibleString(milliSecondsIn) {
@@ -256,6 +268,7 @@ export class TableConfiguratorComponent implements OnInit {
 
     hours = (hours < 10) ? '0' + hours : hours;
     minutes = (minutes < 10) ? '0' + minutes : minutes;
+    milliSecs = (milliSecs < 100) ? '0' + milliSecs : milliSecs;
     milliSecs = (milliSecs < 10) ? '0' + milliSecs : milliSecs;
     seconds = (seconds < 10) ? '0' + seconds : seconds;
 
@@ -264,28 +277,31 @@ export class TableConfiguratorComponent implements OnInit {
       + seconds + '.' + milliSecs);
   }
 
-  onTypeClick(columnIndex: number, colDef: ColumnDefinition) {
-    const column = this.columns[columnIndex];
-    this.updateTitle(column, colDef.type);
-
-    column.columnDefinition = {
-      type: colDef.type,
-      selectedFormat: colDef.formats[0],
-      formats: colDef.formats
-    };
-    this.onSomethingDone();
-  }
-
   onFormatClick(columnIndex: number, format: ColumnFormat) {
     const column = this.columns[columnIndex];
     this.updateTitle(column, column.columnDefinition.type);
 
     const colDef = this.columns[columnIndex].columnDefinition;
-    this.columns[columnIndex].columnDefinition = {
-      type: colDef.type,
-      selectedFormat: format,
-      formats: colDef.formats
-    };
+
+    for (let i = 0; i < this.columns.length; i++) {
+      const column = this.columns[i];
+      if (
+        column.columnDefinition.type === 'segmentStart' ||
+        column.columnDefinition.type === 'segmentEnd' ||
+        column.columnDefinition.type === 'segmentDuration'
+      ) {
+        const selFormat = column.columnDefinition.formats.find((a) => {
+          return a.name === format.name;
+        });
+        column.columnDefinition = {
+          type: column.columnDefinition.type,
+          selectedFormat: selFormat,
+          formats: column.columnDefinition.formats,
+          cells: column.columnDefinition.cells
+        };
+      }
+    }
+    this.updateAllTableCells();
     this.onSomethingDone();
   }
 
@@ -321,9 +337,9 @@ export class TableConfiguratorComponent implements OnInit {
       samples: number
     }[] = [];
     const divider = this.tableOptions.divider.value.replace('\\t', '\t');
+    let colOfLineNum = -1;
 
     // create header
-
     let hasTierColumn = false;
     for (let k = 0; k < this.columns.length; k++) {
       header += this.columns[k].title;
@@ -333,10 +349,13 @@ export class TableConfiguratorComponent implements OnInit {
       if (this.columns[k].columnDefinition.type === 'tier') {
         hasTierColumn = true;
       }
+      if (this.columns[k].columnDefinition.type === 'lineNumber') {
+        colOfLineNum = k;
+      }
     }
     header += '\n';
 
-    let counter = 1;
+    let counter = 0;
     const levelNum = this.getLevelNumber();
     let startAt = (hasTierColumn) ? 0 : levelNum;
     for (let i = startAt; i < this.annotation.levels.length; i++) {
@@ -348,7 +367,7 @@ export class TableConfiguratorComponent implements OnInit {
         let text = '';
 
         for (let k = 0; k < this.columns.length; k++) {
-          text += this.columns[k].columnDefinition.selectedFormat.formatFunction(level, j, counter);
+          text += this.columns[k].columnDefinition.cells[counter].text;
           if (k < this.columns.length - 1) {
             text += divider;
           }
@@ -368,13 +387,6 @@ export class TableConfiguratorComponent implements OnInit {
     }
 
     let result = (this.tableOptions.addHeader) ? header : '';
-
-    textLines = textLines.sort((a, b) => {
-      if (a.samples === b.samples) {
-        return 0;
-      }
-      return (a.samples < b.samples) ? -1 : 1;
-    });
 
     for (let i = 0; i < textLines.length; i++) {
       result += `${textLines[i].text}\n`
@@ -432,6 +444,93 @@ export class TableConfiguratorComponent implements OnInit {
   onDeleteColumnClick(columnNumber: number) {
     if (columnNumber < this.columns.length) {
       this.columns.splice(columnNumber, 1);
+    }
+  }
+
+  updateTableCells(index: number) {
+    const def = this.columns[index].columnDefinition.selectedFormat;
+    let hasTierColumn = false;
+    for (let k = 0; k < this.columns.length; k++) {
+      if (this.columns[k].columnDefinition.type === 'tier') {
+        hasTierColumn = true;
+        break;
+      }
+    }
+
+    let counter = 1;
+    const levelNum = this.getLevelNumber();
+    let startAt = (hasTierColumn) ? 0 : levelNum;
+    this.columns[index].columnDefinition.cells = [];
+
+    for (let i = startAt; i < this.annotation.levels.length; i++) {
+      const level = this.annotation.levels[i];
+      let start = 0;
+
+      for (let j = 0; j < level.segments.length; j++) {
+        const segment = level.segments.get(j);
+        let text = def.formatFunction(level, j, counter);
+
+        this.columns[index].columnDefinition.cells.push({
+          level: i,
+          text,
+          samples: start
+        });
+        counter++;
+        start = segment.time.originalSample.value;
+      }
+
+      if (!hasTierColumn) {
+        // stop after actual level
+        break;
+      }
+    }
+
+    if (this.columns[index].columnDefinition.type !== 'lineNumber') {
+      this.columns[index].columnDefinition.cells = this.columns[index].columnDefinition.cells.sort(
+        (a, b) => {
+          if (a.samples === b.samples) {
+            if (a.level > b.level) {
+              return 1;
+            } else if (a.level < b.level) {
+              return -1;
+            }
+            return 0;
+          } else if (a.samples > b.samples) {
+            return 1;
+          } else if (a.samples < b.samples) {
+            return -1;
+          }
+        }
+      );
+    }
+
+  }
+
+  onDragulaModelChange(event) {
+    this.updateAllTableCells();
+  }
+
+  onTitleKeyDown(event: KeyboardEvent) {
+    if (event.code === 'Enter') {
+      event.preventDefault();
+    }
+  }
+
+  onTitleKeyUp(event: KeyboardEvent, title: HTMLDivElement, colIndex: number) {
+    if (event.code === 'Enter') {
+      this.columns[colIndex].title = title.innerText;
+      this.onSomethingDone();
+    }
+  }
+
+  onTitleLeave(title: HTMLDivElement, colIndex: number) {
+    this.columns[colIndex].title = title.innerText;
+    this.onSomethingDone();
+  }
+
+  public updateAllTableCells() {
+    for (let i = 0; i < this.columns.length; i++) {
+      this.updateTableCells(i);
     }
   }
 }

@@ -318,7 +318,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
   }
 
   retry() {
-    alert('retry!');
     location.reload();
   }
 

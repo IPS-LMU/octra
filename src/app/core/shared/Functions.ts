@@ -185,19 +185,22 @@ export class Functions {
     });
 
     http.request(req).subscribe(event => {
-      if (event.type === HttpEventType.DownloadProgress) {
-        subj.next({
-          progress: event.loaded / event.total,
-          result: null
-        });
-      } else if (event instanceof HttpResponse) {
-        subj.next({
-          progress: 1,
-          result: event.body
-        });
-        subj.complete();
-      }
-    });
+        if (event.type === HttpEventType.DownloadProgress) {
+          subj.next({
+            progress: event.loaded / event.total,
+            result: null
+          });
+        } else if (event instanceof HttpResponse) {
+          subj.next({
+            progress: 1,
+            result: event.body
+          });
+          subj.complete();
+        }
+      },
+      error => {
+        subj.error(error);
+      });
 
     return subj;
   }

@@ -47,6 +47,7 @@ export class AppStorageService {
   get isSaving(): boolean {
     return this._isSaving;
   }
+
   get secondsPerLine(): number {
     return this._secondsPerLine;
   }
@@ -646,6 +647,7 @@ export class AppStorageService {
   public clearSession(): boolean {
     this._loggedIn = false;
     this.login = false;
+    this.audioURL = null;
 
     this.sessStr.clear();
 

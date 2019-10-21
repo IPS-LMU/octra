@@ -283,6 +283,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         const segment = this.transcrService.currentlevel.segments.get(this.segmentIndex).clone();
         this.editor.updateRawText();
         segment.transcript = this.editor.rawText;
+        segment.isBlockedBy = this.transcrService.currentlevel.segments.get(this.segmentIndex).isBlockedBy;
         const result = this.transcrService.currentlevel.segments.change(this.segmentIndex, segment);
 
         const startSample = (this.segmentIndex > 0)

@@ -532,7 +532,11 @@ export class ASRQueueItem {
             }).catch((error) => {
               subj.error(error);
               this._result = error;
-              this.changeStatus(ASRProcessStatus.FAILED);
+              if (error.indexOf("quota") > -1){
+                this.changeStatus(ASRProcessStatus.NOQUOTA);
+              } else {
+                this.changeStatus(ASRProcessStatus.FAILED);
+              }
             });
           }
         }).catch((error) => {
@@ -555,6 +559,7 @@ export enum ASRProcessStatus {
   IDLE = 'IDLE',
   STARTED = 'STARTED',
   STOPPED = 'STOPPED',
+  NOQUOTA = 'NOQUOTA',
   FAILED = 'FAILED',
   FINISHED = 'FINISHED'
 }

@@ -293,6 +293,7 @@
     "stop for all next": "Beende Verarbeitung für dieses und für alle folgende Segmente",
     "stop all": "Beende Verarbeitung für alle Segmente",
     "asr running": "Die automatische Spracherkennung läuft gerade. Wenn Du sie für dieses Segment abbrechen möchtest, klicke hier.",
-    "no asr selected": "Bevor Du das Tastenkürzel verwenden kannst, musst Du ASR Einstellungen vornehmen."
+    "no asr selected": "Bevor Du das Tastenkürzel verwenden kannst, musst Du ASR Einstellungen vornehmen.",
+    "no quota": "Es ist keine Kontingente mehr verfügbar. Bitte nutze einen anderen ASR Provider."
   }
 }

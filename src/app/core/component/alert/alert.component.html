@@ -1,7 +1,7 @@
-<div [hidden]="!show" class="alert alert-dismissible alert-success"
+<div [hidden]="!show" class="alert alert-dismissible alert-success shadow"
      [@fadeToggle]="state" [ngClass]="{
      'alert-success': type === 'success',
-     'alert-error': type === 'error',
+     'alert-danger': type === 'error',
      'alert-info': type === 'info',
      'alert-warning': type === 'warning'
      }">

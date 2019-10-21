@@ -63,6 +63,9 @@
 .easy-table {
   white-space: nowrap;
   overflow: auto;
+  height:300px;
+  background-color: whitesmoke;
+  padding: 10px;
 }
 
 .table-options {

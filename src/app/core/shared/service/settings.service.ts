@@ -334,7 +334,7 @@ export class SettingsService {
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
     console.log('Load audio file 2...');
     if ((this.appStorage.usemode === null || this.appStorage.usemode === undefined)) {
-      console.error(`usemode is null`);
+      this._log += `An error occured. Please click on "Back" and try it again.`;
     }
     if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url' || this.appStorage.usemode === 'demo') {
       // online, url or demo
@@ -353,18 +353,18 @@ export class SettingsService {
         }
 
         audioService.loadAudio(src, () => {
-          console.log('Audio loaded.');
 
           this.audioloaded.emit({status: 'success'});
         }).subscribe(
           (progress) => {
             this.audioloading.next(progress);
+
             if (progress === 1) {
               this.audioloading.complete();
             }
           },
           (err) => {
-            this._log += 'Loading audio file failed<br/>';
+            this._log = 'Loading audio file failed<br/>';
             console.error(err);
           }
         );

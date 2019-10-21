@@ -70,7 +70,7 @@ export class AudioService {
               }
             },
             (error) => {
-              console.error(error);
+              subj.error(error);
             }));
         }
       },

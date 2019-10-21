@@ -123,21 +123,18 @@
                     <div style="margin-top: 40px;">
                         <app-octra-dropzone #dropzone [height]="'147px'"></app-octra-dropzone>
                     </div>
-                    <button *ngIf="(appStorage.usemode === null || appStorage.usemode !== 'online') && (getFileStatus() != 'new' || appStorage.usemode === 'url')
-                            else newTranscription;"
+                    <button *ngIf="(appStorage.usemode === null || appStorage.usemode !== 'online') && (getFileStatus() != 'new' || appStorage.usemode === 'url')"
                             [disabled]="!(getFileStatus() == 'start' || appStorage.usemode === 'url')" type="submit"
                             id="offline-submit"
                             class="btn btn-raised btn-primary"
                             (click)="onOfflineSubmit()">
                       {{'transcription.start' | transloco}}
                     </button>
-                    <ng-template #newTranscription>
-                        <button *ngIf="appStorage.usemode === 'local' && getFileStatus() == 'new' else removeOldTranscription;"
+                        <button *ngIf="appStorage.usemode === 'local' && (getFileStatus() == 'new' || getFileStatus() === 'start') else removeOldTranscription;"
                                 class="btn btn-raised btn-danger offline-delete-btn"
                                 (click)="onTranscriptionDelete()">
                           {{'transcription.new' |transloco}}
                         </button>
-                    </ng-template>
                     <ng-template #removeOldTranscription>
                         <button *ngIf="(appStorage.usemode !== null && appStorage.usemode !== undefined) &&
                     appStorage.usemode === 'online' && (getFileStatus() != 'new' || getFileStatus() != 'start')"

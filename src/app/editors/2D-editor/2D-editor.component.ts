@@ -245,7 +245,11 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
             if (item.status === ASRProcessStatus.FINISHED && item.result !== '') {
               segment.transcript = item.result;
             }
-            // STOPPED and FAILED status is ignored because OCTRA should do nothing
+            // STOPPED status is ignored because OCTRA should do nothing
+
+            if (item.status === ASRProcessStatus.NOQUOTA) {
+              this.msg.showMessage('error', this.langService.translate("asr.no quota"));
+            }
 
             this.transcrService.currentlevel.segments.change(segNumber, segment);
 

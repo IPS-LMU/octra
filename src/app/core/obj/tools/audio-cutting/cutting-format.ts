@@ -1,5 +1,6 @@
 import {AudioInfo} from '../../../../media-components/obj/media/audio';
 import * as moment from 'moment';
+import {setClassMetadata} from '@angular/core/src/r3_symbols';
 
 abstract class CuttingFormat {
   public abstract exportList(cutList: Segment[], audioInfo: AudioInfo, fileName: string, nameConvention: string);
@@ -58,8 +59,12 @@ export class TextTableConverter extends CuttingFormat {
 
     for (let i = 0; i < cutList.length; i++) {
       const segment = cutList[i];
-      const secondsStart = segment.sampleStart / audioInfo.duration.originalSample.sampleRate;
-      const secondsDuration = segment.sampleDur / audioInfo.duration.originalSample.sampleRate;
+      let secondsStart = (segment.sampleStart / audioInfo.duration.originalSample.sampleRate) + '';
+      let secondsDuration = (segment.sampleDur / audioInfo.duration.originalSample.sampleRate) + '';
+
+      // set divider to comma separation
+      secondsStart = secondsStart.replace(".", ",");
+      secondsDuration = secondsDuration.replace(".", ",");
       text += `${getNewFileName(nameConvention, fileName, i, cutList, audioInfo)}\t${fileName}\t${secondsStart}\t${secondsDuration}\t`
         + `${segment.sampleStart}\t${segment.sampleDur}\t${audioInfo.duration.originalSample.sampleRate}`
         + `\t${segment.transcript}\n`;

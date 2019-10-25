@@ -164,7 +164,12 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit, OnDest
   }
 
   public get namingConvention(): string {
-    return this.resultConvention.join('');
+    let result = '';
+
+    for (let i = 0; i < this.resultConvention.length; i++) {
+      result += this.resultConvention[i].value;
+    }
+    return result;
   }
 
   onKeyDown($event, text) {

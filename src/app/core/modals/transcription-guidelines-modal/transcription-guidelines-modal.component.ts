@@ -46,7 +46,7 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
   private subscrmanager = new SubscriptionManager();
 
   constructor(private modalService: BsModalService, private lang: TranslocoService, public transcrService: TranscriptionService,
-              private appStorage: AppStorageService, private bugService: BugReportService, private settService: SettingsService,
+              private appStorage: AppStorageService, private bugService: BugReportService, public settService: SettingsService,
               private cd: ChangeDetectorRef, private sanitizer: DomSanitizer) {
   }
 
@@ -170,11 +170,11 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
     }
   }
 
-  private toggle(group: number, entry: number) {
+  toggle(group: number, entry: number) {
     this.collapsed[group][entry] = !this.collapsed[group][entry];
   }
 
-  private search(text: string) {
+  search(text: string) {
     if (text !== '') {
       this.shownGuidelines.instructions = [];
 

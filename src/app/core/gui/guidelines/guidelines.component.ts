@@ -15,7 +15,7 @@ export class GuidelinesComponent implements OnInit, OnChanges {
   public collapsed: any[][] = [];
   private videoPlayers: any[] = [];
 
-  constructor(private transcrService: TranscriptionService, private sanitizer: DomSanitizer, private settService: SettingsService) {
+  constructor(private transcrService: TranscriptionService, private sanitizer: DomSanitizer, public settService: SettingsService) {
   }
 
   ngOnInit() {
@@ -82,7 +82,7 @@ export class GuidelinesComponent implements OnInit, OnChanges {
     }
   }
 
-  private toggle(group: number, entry: number) {
+  toggle(group: number, entry: number) {
     this.collapsed[group][entry] = !this.collapsed[group][entry];
   }
 

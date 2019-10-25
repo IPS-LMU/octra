@@ -30,7 +30,7 @@ export class TranscriptionDemoEndModalComponent implements OnInit {
   private actionperformed: Subject<ModalEndAnswer> = new Subject<ModalEndAnswer>();
 
   constructor(private modalService: BsModalService, private sanitizer: DomSanitizer,
-              private languageService: TranslocoService) {
+              public languageService: TranslocoService) {
   }
 
   ngOnInit() {

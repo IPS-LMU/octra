@@ -15,7 +15,7 @@ export class YesNoModalComponent implements OnInit {
     ignoreBackdropClick: false
   };
   @ViewChild('modal', {static: true}) modal: TemplateRef<any>;
-  protected data = {
+  public data = {
     text: ''
   };
   private actionperformed: Subject<('yes' | 'no')> = new Subject<('yes' | 'no')>();

@@ -75,7 +75,7 @@ export class ValidationPopoverComponent implements OnInit, AfterViewChecked {
   }
 
   @HostListener('mouseleave')
-  public onMouseLeave(e) {
+  public onMouseLeave() {
     this.visible = false;
     this.el.nativeElement.style.display = 'none';
   }

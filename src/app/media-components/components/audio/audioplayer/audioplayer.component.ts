@@ -369,7 +369,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
    * this method updates the gui on resizing
    */
   @HostListener('window:resize', ['$event'])
-  onResize() {
+  onResize($event) {
     this.width = this.apview.elementRef.nativeElement.clientWidth;
     this.innerWidth = this.width - this.settings.margin.left - this.settings.margin.right;
 
@@ -385,7 +385,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   @HostListener('window:beforeunload', ['$event'])
-  onReload() {
+  onReload($event) {
     this.subscrmanager.destroy();
   }
 

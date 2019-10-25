@@ -45,7 +45,7 @@ export class ShortcutsModalComponent implements OnInit {
 
   constructor(private modalService: BsModalService, private appStorage: AppStorageService,
               private bugService: BugReportService, private settService: SettingsService,
-              private keyMap: KeymappingService, private cd: ChangeDetectorRef) {
+              public keyMap: KeymappingService, private cd: ChangeDetectorRef) {
   }
 
   ngOnInit() {

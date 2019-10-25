@@ -10,7 +10,7 @@
             <td>{{rule.description}}
                 <p [innerHTML]="rule.help" *ngIf="rule.state === 'failed' && rule.help !== ''" style="color:red;"></p>
                 <p *ngIf="rule.name === 'cookies'" style="color:red;">
-                    <ng-container *ngIf="BrowserInfo.browser === 'Chrome'">
+                    <ng-container *ngIf="browserName === 'Chrome'">
                         To use OCTRA with this browser please follow the instructions:
                         <ul>
                             <li>Open a new tab.</li>
@@ -19,7 +19,7 @@
                             <li>Reload this page.</li>
                         </ul>
                     </ng-container>
-                    <ng-container *ngIf="BrowserInfo.browser === 'Firefox'">
+                    <ng-container *ngIf="browserName === 'Firefox'">
                         To use OCTRA with this browser please follow the instructions:
                         <ul>
                             <li>Open a new tab.</li>

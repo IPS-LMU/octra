@@ -1573,7 +1573,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
    * adjust the view when window resized
    */
   @HostListener('window:resize', ['$event'])
-  onResize() {
+  onResize($event) {
     this.av.viewRect.size.width = this.aview.elementRef.nativeElement.clientWidth;
     this._innerWidth = this.av.viewRect.size.width - this.settings.margin.left - this.settings.margin.right;
 

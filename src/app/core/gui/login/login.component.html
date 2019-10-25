@@ -87,9 +87,6 @@
                             <div class="form-group">
                                 <button *ngIf="appStorage.usemode !== 'local'" aria-describedby="submitButton"
                                         class="btn btn-primary btn-raised login-submit"
-                                        [ngClass]="{
-                                           'btn-danger': (appStorage.usemode === 'local' && appStorage.sessionfile !== null)
-                                           }"
                                         [disabled]="!f.valid"
                                         name="login-submit">{{'general.login' | transloco}}
                                 </button>

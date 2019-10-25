@@ -9,8 +9,9 @@ import {BrowserInfo} from '../../shared';
   styleUrls: ['./browser-test.component.css']
 })
 export class BrowserTestComponent implements OnInit {
-  public get BrowserInfo(): BrowserInfo {
-    return BrowserInfo;
+
+  public get browserName(): string {
+    return BrowserInfo.browser;
   }
 
   constructor(private router: Router, public compatibility: CompatibilityService) {

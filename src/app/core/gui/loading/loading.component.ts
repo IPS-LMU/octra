@@ -33,7 +33,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
   constructor(private langService: TranslocoService,
               public settService: SettingsService,
-              private appStorage: AppStorageService,
+              public appStorage: AppStorageService,
               public audio: AudioService,
               private router: Router,
               private transcrService: TranscriptionService,

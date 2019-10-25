@@ -55,7 +55,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   private subscrmanager: SubscriptionManager;
   private updating = false;
   private errorY = 0;
-  private playAllState: {
+  public playAllState: {
     state: 'started' | 'stopped',
     icon: 'play' | 'stop',
     currentSegment: number,
@@ -67,7 +67,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     skipSilence: false
   };
 
-  private playStateSegments: {
+  public playStateSegments: {
     state: 'started' | 'stopped',
     icon: 'play' | 'stop'
   }[] = [];

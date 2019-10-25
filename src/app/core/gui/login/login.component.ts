@@ -66,7 +66,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   };
   err = '';
 
-  private apiStatus: 'init' | 'available' | 'unavailable' = 'init';
+  public apiStatus: 'init' | 'available' | 'unavailable' = 'init';
 
   private subscrmanager: SubscriptionManager;
   onOfflineSubmit = () => {

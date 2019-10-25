@@ -62,9 +62,6 @@ export class TextTableConverter extends CuttingFormat {
       let secondsStart = (segment.sampleStart / audioInfo.duration.originalSample.sampleRate) + '';
       let secondsDuration = (segment.sampleDur / audioInfo.duration.originalSample.sampleRate) + '';
 
-      // set divider to comma separation
-      secondsStart = secondsStart.replace(".", ",");
-      secondsDuration = secondsDuration.replace(".", ",");
       text += `${getNewFileName(nameConvention, fileName, i, cutList, audioInfo)}\t${fileName}\t${secondsStart}\t${secondsDuration}\t`
         + `${segment.sampleStart}\t${segment.sampleDur}\t${audioInfo.duration.originalSample.sampleRate}`
         + `\t${segment.transcript}\n`;

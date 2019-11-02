@@ -14,7 +14,8 @@
     "e2e": "ng e2e",
     "ng-high-memory": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
-    "modernizr": "modernizr -d src/assets/js/modernizr.js -c ./modernizr.json"
+    "modernizr": "modernizr -d src/assets/js/modernizr.js -c ./modernizr.json",
+    "postinstall": "node postinstall.js"
   },
   "private": true,
   "dependencies": {

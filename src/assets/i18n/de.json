@@ -61,7 +61,7 @@
     "bitspersecond": "Bits pro Sekunde",
     "filesize": "Dateigröße",
     "id": "ID",
-    "download": "Download",
+    "download": "Herunterladen",
     "application": "Anwendung",
     "website": "Webseite",
     "news": "Neuigkeiten",
@@ -280,7 +280,9 @@
       "add column": "Spalte hinzufügen",
       "divider": "Trennzeichen",
       "add header": "Füge Kopfzeile zur Tabelle hinzu",
-      "generate table": "generate table"
+      "generate table": "Tabelle erstellen",
+      "include line numbers": "Zeilennummern hinzufügen",
+      "time format": "Zeitformat"
     }
   },
   "asr": {

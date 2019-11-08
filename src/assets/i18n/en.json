@@ -280,7 +280,9 @@
       "add column": "Add column",
       "divider": "Divider",
       "add header": "Add header to the table",
-      "generate table": "generate table"
+      "generate table": "Generate table",
+      "include line numbers": "include line numbers",
+      "time format": "time format"
     }
   },
   "asr": {

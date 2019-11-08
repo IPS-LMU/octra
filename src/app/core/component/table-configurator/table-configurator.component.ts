@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Annotation, Level} from '../../obj/Annotation';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
+import {isNullOrUndefined} from '../../shared/Functions';
 
 export interface ColumnDefinition {
   type: string;
@@ -42,6 +43,8 @@ export class TableConfiguratorComponent implements OnInit {
   @Input() tableWidth: number = 300;
   resultURL: SafeResourceUrl = null;
 
+  includeLineNumbers = false;
+
   tableOptions = {
     addHeader: false,
     fileExtension: '.csv',
@@ -67,7 +70,13 @@ export class TableConfiguratorComponent implements OnInit {
       extension: [
         '.csv', '.txt', '.table', '.tsv'
       ]
-    }
+    },
+    timeFormat: 'Timestamp',
+    timeFormats: [
+      'Timestamp',
+      'Seconds',
+      'Samples'
+    ]
   };
 
   private columnDefinitions: ColumnDefinition[] = [{
@@ -99,7 +108,7 @@ export class TableConfiguratorComponent implements OnInit {
         defaultValue: '23.4567',
         formatFunction: (level: Level, segmentNumber: number, counter: number) => {
           // the value must be a unix timestamp
-          return ((segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.originalSample.seconds : 0) + '';
+          return ((segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.originalSample.seconds.toFixed(4) : '0') + '';
         }
       }]
   },
@@ -130,7 +139,7 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '23.4567',
           formatFunction: (level: Level, segmentNumber: number, counter: number) => {
             // the value must be a unix timestamp
-            return level.segments.get(segmentNumber).time.originalSample.seconds + '';
+            return level.segments.get(segmentNumber).time.originalSample.seconds.toFixed(4) + '';
           }
         }]
     },
@@ -165,7 +174,7 @@ export class TableConfiguratorComponent implements OnInit {
           formatFunction: (level: Level, segmentNumber: number, counter: number) => {
             // the value must be a unix timestamp
             let segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.originalSample.seconds : 0;
-            return (level.segments.get(segmentNumber).time.originalSample.seconds - segmentStart) + '';
+            return (level.segments.get(segmentNumber).time.originalSample.seconds - segmentStart).toFixed(4) + '';
           }
         }
       ]
@@ -238,12 +247,21 @@ export class TableConfiguratorComponent implements OnInit {
     this.tableConfiguratorAddColumn();
     this.tableConfiguratorAddColumn();
     this.tableConfiguratorAddColumn();
+    this.tableConfiguratorAddColumn();
   }
 
-  tableConfiguratorAddColumn() {
-    let colDef: ColumnDefinition = this.findNextUnusedColumnDefinition();
-    if (colDef !== null) {
-      this.columns.push({
+  tableConfiguratorAddColumn(position = -1, type: string = '') {
+    let colDef: ColumnDefinition;
+
+    if (type === '') {
+      colDef = this.findNextUnusedColumnDefinition();
+    } else {
+      colDef = this.columnDefinitions.find((a) => {
+        return a.type === type;
+      });
+    }
+    if (!isNullOrUndefined(colDef)) {
+      const item = {
         title: colDef.type,
         columnDefinition: {
           type: colDef.type,
@@ -251,7 +269,12 @@ export class TableConfiguratorComponent implements OnInit {
           formats: colDef.formats,
           cells: []
         }
-      });
+      };
+      if (position < 0) {
+        this.columns.push(item);
+      } else {
+        this.columns.splice(position, 0, item);
+      }
       this.updateAllTableCells();
       this.onSomethingDone();
     }
@@ -277,12 +300,7 @@ export class TableConfiguratorComponent implements OnInit {
       + seconds + '.' + milliSecs);
   }
 
-  onFormatClick(columnIndex: number, format: ColumnFormat) {
-    const column = this.columns[columnIndex];
-    this.updateTitle(column, column.columnDefinition.type);
-
-    const colDef = this.columns[columnIndex].columnDefinition;
-
+  onFormatClick(format: string) {
     for (let i = 0; i < this.columns.length; i++) {
       const column = this.columns[i];
       if (
@@ -290,8 +308,10 @@ export class TableConfiguratorComponent implements OnInit {
         column.columnDefinition.type === 'segmentEnd' ||
         column.columnDefinition.type === 'segmentDuration'
       ) {
+        this.updateTitle(column, column.columnDefinition.type);
+
         const selFormat = column.columnDefinition.formats.find((a) => {
-          return a.name === format.name;
+          return a.name === format;
         });
         column.columnDefinition = {
           type: column.columnDefinition.type,
@@ -532,5 +552,44 @@ export class TableConfiguratorComponent implements OnInit {
     for (let i = 0; i < this.columns.length; i++) {
       this.updateTableCells(i);
     }
+  }
+
+  onCheckboxChange() {
+    if (this.includeLineNumbers) {
+      this.tableConfiguratorAddColumn(0, 'lineNumber');
+    } else {
+      this.removeColumn('lineNumber');
+      this.updateAllTableCells();
+      this.onSomethingDone();
+    }
+  }
+
+  private removeColumn(type: string) {
+    const index = this.columns.findIndex((a) => {
+      return a.columnDefinition.type === type;
+    });
+
+    if (index > -1) {
+      this.columns.splice(index, 1);
+    }
+  }
+
+  public onTimeFormatChange(format: string) {
+    this.tableOptions.timeFormat = format;
+    this.onFormatClick(format)
+  }
+
+  public get remainingColDefs(): ColumnDefinition[] {
+    const remaining: ColumnDefinition[] = [];
+
+    for (const colDef of this.columnDefinitions) {
+      if (this.columns.find((a) => {
+        return a.columnDefinition.type === colDef.type;
+      }) === undefined && colDef.type !== 'lineNumber') {
+        remaining.push(colDef);
+      }
+    }
+
+    return remaining;
   }
 }

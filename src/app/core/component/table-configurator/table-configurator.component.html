@@ -1,7 +1,45 @@
-<button class="btn btn-secondary" (click)="tableConfiguratorAddColumn()">
-  <fa-icon icon="plus"></fa-icon>
-  {{"tools.table configurator.add column" | transloco}}
-</button>
+<div style="margin-bottom: 10px">
+  <div class="btn-group" dropdown>
+    <button dropdownToggle type="button" class="btn btn-secondary btn-raised btn-sm"
+            aria-controls="dropdown-basic" style="width:100%; margin-left:5px;">
+      <fa-icon icon="plus"></fa-icon>
+      {{"tools.table configurator.add column" | transloco}}
+    </button>
+    <ul *dropdownMenu class="dropdown-menu"
+        role="menu" aria-labelledby="button-basic" style="cursor: pointer">
+      <li role="menuitem" class="dropdown-item" *ngFor="let colDef of remainingColDefs"
+          (click)="tableConfiguratorAddColumn(-1, colDef.type)"
+      >
+        {{colDef.type}}
+      </li>
+    </ul>
+  </div>
+
+  <div class="settings">
+    <input type="checkbox" name="includeLines"
+           id="includeLineNumbers"
+           [(ngModel)]="includeLineNumbers"
+           (ngModelChange)="onCheckboxChange()"/>
+    <label for="includeLineNumbers" style="margin-left: 15px;">{{"tools.table configurator.include line numbers"| transloco}}</label>
+  </div>
+  <div class="settings">
+    <label>{{"tools.table configurator.time format"| transloco}}: </label>
+    <div class="btn-group" dropdown>
+      <button dropdownToggle type="button" class="btn btn-info btn-raised btn-sm"
+              aria-controls="dropdown-basic" style="width:150px; margin-left:5px;">
+        {{tableOptions.timeFormat}}
+      </button>
+      <ul *dropdownMenu class="dropdown-menu"
+          role="menu" aria-labelledby="button-basic" style="cursor: pointer">
+        <li role="menuitem" class="dropdown-item" *ngFor="let timeFormat of tableOptions.timeFormats"
+            (click)="onTimeFormatChange(timeFormat)"
+        >
+          {{timeFormat}}
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
 
 <div class="easy-table" [ngStyle]="{
 width: tableWidth + 'px'
@@ -21,21 +59,6 @@ width: tableWidth + 'px'
              (keydown)="onTitleKeyDown($event)"
              (keyup)="onTitleKeyUp($event, title, i)" class="title">
           {{column.title}}
-        </div>
-        <div class="btn-group" dropdown style="display:block; width:100%;margin:0;">
-          <button id="button-basic2" dropdownToggle type="button" class="btn btn-info btn-outline btn-sm"
-                  aria-controls="dropdown-basic" style="width:100%;">
-            {{"general.Format" | transloco}}: {{column.columnDefinition.selectedFormat.name}}
-          </button>
-          <ul id="dropdown-basic2" *dropdownMenu class="dropdown-menu"
-              role="menu" aria-labelledby="button-basic" style="cursor: pointer">
-            <li role="menuitem" class="dropdown-item" *ngFor="let format of column.columnDefinition.formats" [ngClass]="{
-              'active': format.name === column.columnDefinition.selectedFormat.name
-              }" (click)="onFormatClick(i, format)">
-              {{format.name}} <span *ngIf="format.formatString !== ''" style="margin-left:5px;">({{format.formatString}}
-              )</span>
-            </li>
-          </ul>
         </div>
       </div>
       <div class="cell" *ngFor="let cell of columns[i].columnDefinition.cells">

@@ -102,7 +102,8 @@
     "check": "Check transcription",
     "send": "Send transcription",
     "complete": "Complete Transcription",
-    "invalid": "Only valid transcripts are accepted. Please correct your transcript."
+    "invalid": "Only valid transcripts are accepted. Please correct your transcript.",
+    "no prompttext": "The prompt text can not be shown."
   },
   "segments": {
     "total": "Total segments",

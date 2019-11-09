@@ -37,10 +37,10 @@ export class AppInfo {
     new CTMConverter(),
     new PartiturConverter(),
     new BundleJSONConverter(),
-    new TextConverter(),
     new ELANConverter(),
     new SRTConverter(),
-    new WebVTTConverter()
+    new WebVTTConverter(),
+    new TextConverter(),
   ];
 
   public static readonly themes: string[] = [

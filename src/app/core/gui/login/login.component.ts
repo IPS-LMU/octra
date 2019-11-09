@@ -361,26 +361,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
                 }
 
                 if (this.appStorage.usemode === 'online'
-                  && (json.data.hasOwnProperty('prompt')
-                    || json.data.hasOwnProperty('prompttext'))) {
+                  && json.data.hasOwnProperty('prompttext')) {
                   // get transcript data that already exists
-                  if (json.data.hasOwnProperty('prompt')) {
-                    const prompt = json.data.prompt;
-
-                    if (prompt) {
-                      this.appStorage.prompttext = prompt;
-                    } else {
-                      this.appStorage.prompttext = '';
-                    }
-                  } else if (json.data.hasOwnProperty('prompttext')) {
-                    const prompt = json.data.prompttext;
-
-                    if (prompt) {
-                      this.appStorage.prompttext = prompt;
-                    } else {
-                      this.appStorage.prompttext = '';
-                    }
-                  }
+                  const prompt = json.data.prompttext;
+                  this.appStorage.prompttext = (prompt) ? prompt : '';
                 } else {
                   this.appStorage.prompttext = '';
                 }
@@ -542,22 +526,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
             if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
               // get transcript data that already exists
-              if (json.data.hasOwnProperty('prompt')) {
-                const prompt = json.data.prompt;
-
-                if (prompt) {
-                  this.appStorage.prompttext = prompt;
-                } else {
-                  this.appStorage.prompttext = '';
-                }
-              } else if (json.data.hasOwnProperty('prompttext')) {
+              if (json.data.hasOwnProperty('prompttext')) {
                 const prompt = json.data.prompttext;
-
-                if (prompt) {
-                  this.appStorage.prompttext = prompt;
-                } else {
-                  this.appStorage.prompttext = '';
-                }
+                this.appStorage.prompttext = (prompt) ? prompt : '';
               }
             } else {
               this.appStorage.prompttext = '';

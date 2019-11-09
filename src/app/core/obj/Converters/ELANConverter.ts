@@ -134,7 +134,7 @@ export class ELANConverter extends Converter {
 
     let counter = 1;
 
-    if (!isNullOrUndefined(jsonXML)) {
+    if (!isNullOrUndefined(jsonXML) && jsonXML.hasOwnProperty('ANNOTATION_DOCUMENT')) {
       const timeUnit = jsonXML.ANNOTATION_DOCUMENT.HEADER._TIME_UNITS;
 
       if (!isNullOrUndefined(timeUnit) && timeUnit === 'milliseconds') {

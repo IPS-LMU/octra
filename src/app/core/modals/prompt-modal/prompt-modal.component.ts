@@ -1,50 +1,74 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs';
 import {AppStorageService, SettingsService} from '../../shared/service';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {AppInfo} from '../../../app.info';
+import {OAudiofile} from '../../obj/Annotation';
+import {AnnotJSONConverter, PartiturConverter, TextConverter} from '../../obj/Converters';
 
 @Component({
   selector: 'app-prompt-modal',
   templateUrl: './prompt-modal.component.html',
-  styleUrls: ['./prompt-modal.component.css']
+  styleUrls: ['./prompt-modal.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class PromptModalComponent implements OnInit {
   modalRef: BsModalRef;
   public visible = false;
-  public bgemail = '';
-  public bgdescr = '';
-  public sendProObj = true;
-  public bugsent = false;
+
   config: ModalOptions = {
     keyboard: false,
     backdrop: false,
     ignoreBackdropClick: false
   };
   @ViewChild('modal', {static: true}) modal: any;
+
   protected data = null;
+  private formatConverter;
   private actionperformed: Subject<void> = new Subject<void>();
-  private subscrmanager = new SubscriptionManager();
 
-  public get isvalid(): boolean {
-    if (this.sendProObj || this.bgdescr !== '') {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  constructor(private modalService: BsModalService, public appStorage: AppStorageService, private settService: SettingsService) {
+  constructor(private modalService: BsModalService, public appStorage: AppStorageService, private settService: SettingsService,
+              private cd: ChangeDetectorRef) {
   }
 
   ngOnInit() {
   }
 
-  public open(): Promise<void> {
+  public open(audiofile: OAudiofile): Promise<void> {
     return new Promise<void>((resolve, reject) => {
+      let found = false;
+      if (this.formatConverter === undefined) {
+        for (const converter of AppInfo.converters) {
+          if(converter instanceof AnnotJSONConverter || converter instanceof PartiturConverter){
+            const result = converter.import({
+              name: audiofile.name,
+              content: this.appStorage.prompttext,
+              type: 'text',
+              encoding: 'utf8'
+            }, audiofile);
+
+            if (result !== null && result !== undefined
+              && result.annotjson !== null && result.annotjson.levels.length > 0
+              && result.annotjson.levels[0] !== null
+              && !(converter instanceof TextConverter)) {
+              this.formatConverter = converter;
+              found = true;
+              break;
+            }
+          }
+        }
+        if (!found) {
+          this.formatConverter = null;
+        }
+      }
+
+
       this.modal.show(this.modal, this.config);
       this.visible = true;
+      this.cd.markForCheck();
+      this.cd.detectChanges();
+
       const subscr = this.actionperformed.subscribe(
         (action) => {
           resolve(action);
@@ -61,5 +85,7 @@ export class PromptModalComponent implements OnInit {
     this.modal.hide();
     this.visible = false;
     this.actionperformed.next();
+    this.cd.markForCheck();
+    this.cd.detectChanges();
   }
 }

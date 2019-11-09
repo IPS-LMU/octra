@@ -25,7 +25,7 @@ export class PromptModalComponent implements OnInit {
   @ViewChild('modal', {static: true}) modal: any;
 
   protected data = null;
-  private formatConverter;
+  public formatConverter;
   private actionperformed: Subject<void> = new Subject<void>();
 
   constructor(private modalService: BsModalService, public appStorage: AppStorageService, private settService: SettingsService,

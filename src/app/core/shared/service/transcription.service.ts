@@ -301,7 +301,7 @@ export class TranscriptionService {
             }
 
             this.appStorage.overwriteAnnotation(newLevels).then(() => {
-                if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url' || this.appStorage.usemode === 'demo') {
+                if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
                   this.appStorage.annotation[this._selectedlevel].level.items = [];
 
                   if (!(this.appStorage.servertranscipt === null || this.appStorage.servertranscipt === undefined)) {
@@ -413,6 +413,8 @@ export class TranscriptionService {
                   } else {
                     resolve2();
                   }
+                } else {
+                  resolve2();
                 }
               }
             ).catch((err) => {

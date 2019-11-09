@@ -61,7 +61,16 @@ export class BundleJSONConverter extends Converter {
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     const content = file.content;
-    const json: Bundle = JSON.parse(content);
+    let json: Bundle;
+    try {
+      json = JSON.parse(content);
+    } catch (e) {
+      return {
+        annotjson: null,
+        audiofile: null,
+        error: `This BundleJSON file is not compatible with this audio file.`
+      };
+    }
 
     if (!(json === null || json === undefined) && json.hasOwnProperty('mediaFile') && json.mediaFile.hasOwnProperty('data')
       && json.hasOwnProperty('annotation')) {

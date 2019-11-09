@@ -5,7 +5,7 @@ import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
 import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {NavbarService} from '../../gui/navbar/navbar.service';
-import {SubscriptionManager} from '../';
+import {AnnotJSONConverter, PartiturConverter, SubscriptionManager, TextConverter} from '../';
 import {FeedBackForm} from '../../obj/FeedbackForm/FeedBackForm';
 import {Converter, IFile} from '../../obj/Converters';
 import {OLog, OLogging} from '../../obj/Settings/logging';
@@ -16,6 +16,7 @@ import {AudioService} from './audio.service';
 import {AppStorageService, OIDBLevel} from './appstorage.service';
 import {UserInteractionsService} from './userInteractions.service';
 import {SettingsService} from './settings.service';
+import {AppInfo} from '../../../app.info';
 
 declare var validateAnnotation: ((string, any) => any);
 
@@ -291,9 +292,137 @@ export class TranscriptionService {
   public loadSegments(): Promise<void> {
     return new Promise<void>(
       (resolve, reject) => {
+        new Promise<void>((resolve2) => {
+          if (isNullOrUndefined(this.appStorage.annotation) || this.appStorage.annotation.length === 0) {
+            const newLevels = [];
+            const levels = this.createNewAnnotation().levels;
+            for (let i = 0; i < levels.length; i++) {
+              newLevels.push(new OIDBLevel(i + 1, levels[i], i));
+            }
 
-        // TODO use Promise instead of func variable
-        const process = () => {
+            this.appStorage.overwriteAnnotation(newLevels).then(() => {
+                if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url' || this.appStorage.usemode === 'demo') {
+                  this.appStorage.annotation[this._selectedlevel].level.items = [];
+
+                  if (!(this.appStorage.servertranscipt === null || this.appStorage.servertranscipt === undefined)) {
+                    // check if servertranscript's segment is empty
+                    if (this.appStorage.servertranscipt.length === 1 && this.appStorage.servertranscipt[0].text === '') {
+                      this.appStorage.annotation[this.selectedlevel].level.items.push(
+                        new OSegment(0, 0, this.audiomanager.originalInfo.duration.originalSample.value,
+                          [new OLabel('OCTRA_1', this.appStorage.prompttext)])
+                      );
+
+                      this.appStorage.changeAnnotationLevel(this._selectedlevel,
+                        this.appStorage.annotation[this._selectedlevel].level)
+                        .then(() => {
+                          resolve2();
+                        })
+                        .catch(
+                          (err) => {
+                            console.error(`error on overwriting annotation`);
+                            console.error(err);
+                            resolve2();
+                          }
+                        );
+                    } else {
+                      this.appStorage.annotation[this._selectedlevel].level.items = [];
+                      for (let i = 0; i < this.appStorage.servertranscipt.length; i++) {
+                        const segT = this.appStorage.servertranscipt[i];
+
+                        const oseg = new OSegment(i, segT.start, segT.length, [new OLabel('OCTRA_1', segT.text)]);
+                        this.appStorage.annotation[this.selectedlevel].level.items.push(oseg);
+                      }
+                      // clear servertranscript
+                      this.appStorage.servertranscipt = null;
+
+                      this.appStorage.changeAnnotationLevel(this._selectedlevel,
+                        this.appStorage.annotation[this._selectedlevel].level)
+                        .then(() => {
+                          resolve2();
+                        })
+                        .catch(
+                          (err) => {
+                            console.error(`error on overwriting annotation`);
+                            console.error(err);
+                            resolve2();
+                          }
+                        );
+                    }
+                  } else if (!isNullOrUndefined(this.appStorage.prompttext) && this.appStorage.prompttext !== ''
+                    && typeof this.appStorage.prompttext === 'string') {
+                    // prompt text available and server transcript is null
+                    // set prompt as new transcript
+
+                    // check if prompttext ist a transcription format like AnnotJSON
+                    let converted: OAnnotJSON;
+                    for (const converter of AppInfo.converters) {
+                      if (converter instanceof AnnotJSONConverter || converter instanceof PartiturConverter) {
+                        const result = converter.import({
+                          name: this._audiofile.name,
+                          content: this.appStorage.prompttext,
+                          type: 'text',
+                          encoding: 'utf8'
+                        }, this._audiofile);
+
+                        if (result !== null && result !== undefined
+                          && result.annotjson !== null && result.annotjson.levels.length > 0
+                          && result.annotjson.levels[0] !== null
+                          && !(converter instanceof TextConverter)) {
+                          converted = result.annotjson;
+                          break;
+                        }
+                      }
+                    }
+
+                    if (converted === undefined) {
+                      this.appStorage.annotation[this.selectedlevel].level.items.push(
+                        new OSegment(0, 0, this.audiomanager.originalInfo.duration.originalSample.value,
+                          [new OLabel('OCTRA_1', this.appStorage.prompttext)])
+                      );
+
+                      this.appStorage.changeAnnotationLevel(this._selectedlevel,
+                        this.appStorage.annotation[this._selectedlevel].level)
+                        .then(() => {
+                          resolve2();
+                        })
+                        .catch(
+                          (err) => {
+                            console.error(`error on overwriting annotation`);
+                            console.error(err);
+                            resolve2();
+                          }
+                        );
+                    } else {
+                      // use imported annotJSON
+                      const promises: Promise<any>[] = [];
+                      for (let i = 0; i < converted.levels.length; i++) {
+                        if (i >= this.appStorage.annotation.length) {
+                          this.appStorage.annotation.push(new OIDBLevel(i + 1, converted.levels[i], i));
+                        } else {
+                          promises.push(this.appStorage.changeAnnotationLevel(i, converted.levels[i]));
+                        }
+                      }
+
+                      Promise.all(promises).then(() => {
+                        resolve2();
+                      }).catch((error) => {
+                        console.error(error);
+                        resolve2();
+                      });
+                    }
+                  } else {
+                    resolve2();
+                  }
+                }
+              }
+            ).catch((err) => {
+              console.error(err);
+              resolve2();
+            });
+          } else {
+            resolve2();
+          }
+        }).then(() => {
           const annotates = this._audiomanager.ressource.name + this._audiomanager.ressource.extension;
 
           this._annotation = new Annotation(annotates, this._audiofile);
@@ -338,83 +467,7 @@ export class TranscriptionService {
             reject(Error('annotation object in appStorage is null'));
           }
           resolve();
-        };
-
-        if ((this.appStorage.annotation === null || this.appStorage.annotation === undefined) || this.appStorage.annotation.length === 0) {
-          const newLevels = [];
-          const levels = this.createNewAnnotation().levels;
-          for (let i = 0; i < levels.length; i++) {
-            newLevels.push(new OIDBLevel(i + 1, levels[i], i));
-          }
-
-          this.appStorage.overwriteAnnotation(newLevels).then(() => {
-              if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
-
-                if (!(this.appStorage.servertranscipt === null || this.appStorage.servertranscipt === undefined)) {
-                  // check if servertranscript's segment is empty
-                  if (this.appStorage.servertranscipt.length === 1 && this.appStorage.servertranscipt[0].text === '') {
-                    this.appStorage.annotation[this._selectedlevel].level.items = [];
-                    this.appStorage.annotation[this.selectedlevel].level.items.push(
-                      new OSegment(0, 0, this.audiomanager.originalInfo.duration.originalSample.value,
-                        [new OLabel('OCTRA_1', this.appStorage.prompttext)])
-                    );
-
-                    this.appStorage.changeAnnotationLevel(this._selectedlevel,
-                      this.appStorage.annotation[this._selectedlevel].level)
-                      .catch(
-                        (err) => {
-                          console.error(`error on overwriting annotation`);
-                          console.error(err);
-                        }
-                      );
-                  } else {
-                    this.appStorage.annotation[this._selectedlevel].level.items = [];
-                    for (let i = 0; i < this.appStorage.servertranscipt.length; i++) {
-                      const segT = this.appStorage.servertranscipt[i];
-
-                      const oseg = new OSegment(i, segT.start, segT.length, [new OLabel('OCTRA_1', segT.text)]);
-                      this.appStorage.annotation[this.selectedlevel].level.items.push(oseg);
-                    }
-                    // clear servertranscript
-                    this.appStorage.servertranscipt = null;
-
-                    this.appStorage.changeAnnotationLevel(this._selectedlevel,
-                      this.appStorage.annotation[this._selectedlevel].level)
-                      .catch(
-                        (err) => {
-                          console.error(`error on overwriting annotation`);
-                          console.error(err);
-                        }
-                      );
-                  }
-                } else if (!isNullOrUndefined(this.appStorage.prompttext) && this.appStorage.prompttext !== ''
-                  && typeof this.appStorage.prompttext === 'string') {
-                  // prompt text available and server transcript is null
-                  // set prompt as new transcript
-                  this.appStorage.annotation[this._selectedlevel].level.items = [];
-                  this.appStorage.annotation[this.selectedlevel].level.items.push(
-                    new OSegment(0, 0, this.audiomanager.originalInfo.duration.originalSample.value,
-                      [new OLabel('OCTRA_1', this.appStorage.prompttext)])
-                  );
-
-                  this.appStorage.changeAnnotationLevel(this._selectedlevel,
-                    this.appStorage.annotation[this._selectedlevel].level)
-                    .catch(
-                      (err) => {
-                        console.error(`error on overwriting annotation`);
-                        console.error(err);
-                      }
-                    );
-                }
-              }
-              process();
-            }
-          ).catch((err) => {
-            console.error(err);
-          });
-        } else {
-          process();
-        }
+        })
       }
     );
   }

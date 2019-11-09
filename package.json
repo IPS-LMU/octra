@@ -7,8 +7,9 @@
   "scripts": {
     "ng": "ng",
     "start": "npm run modernizr && node --max-old-space-size=12000 ./node_modules/@angular/cli/bin/ng serve --port 5321",
-    "build": "node --max-old-space-size=12000 ./node_modules/@angular/cli/bin/ng build",
-    "build-prod": "echo 'fast build' && node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng build --prod --aot=false --optimization=true --sourceMap=false --buildOptimizer=false",
+    "build": " sh ./build.sh 0 1 https://www.phonetik.uni-muenchen.de/apps/octra/octra/",
+    "build-dev": " sh ./build.sh 1 1 https://www.phonetik.uni-muenchen.de/apps/octra/octra-dev/",
+    "build-prod": "sh ./build.sh 0 0 /",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",

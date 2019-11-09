@@ -2,9 +2,8 @@
 
 buildDir="dist/octra/"
 targetFolder="assets"
-baseHref="https://www.phonetik.uni-muenchen.de/apps/octra/octra-dev/"
-#dev=""
-dev="-c dev"
+baseHref="$3"
+dev=""
 
 # change this list to your needs (for exclusion of files or folders in the dist folder)
 excludedList='"config" "LICENCE.txt" "media"'
@@ -12,14 +11,19 @@ excludedList='"config" "LICENCE.txt" "media"'
 # 1 = disable indexing, 0 = enable
 disableRobots=1
 # 1 = enable isUpdate, 0 = disable
-isUpdate=1
+isUpdate=$2
 
 timeNow=`date "+%Y-%m-%d %H:%M:%S"`
 octraVersion="1.3.1"
 
+if [[ $1 == 1 ]]
+then
+  dev="-c dev"
+fi
+
 echo "Remove cache..."
 rm -rf ./node_modules/.cache
-echo "Building OCTRA..."
+echo "Building OCTRA with dev=$dev, isUpdate=$2 for $3"
 node --max-old-space-size=12000 ./node_modules/@angular/cli/bin/ng build --prod ${dev} --base-href "${baseHref}"
 echo "Change index.html..."
 indexHTML=$(<${buildDir}index.html)

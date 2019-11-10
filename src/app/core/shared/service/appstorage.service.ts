@@ -8,6 +8,7 @@ import {LocalStorageService, SessionStorage, SessionStorageService} from '@rars/
 import {isNullOrUndefined} from '../Functions';
 import {reject} from 'q';
 import {Subject} from 'rxjs';
+import {IDataEntry} from '../../obj/data-entry';
 
 export interface IIDBLevel {
   id: number;
@@ -44,6 +45,12 @@ export class OIDBLink implements IIDBLink {
 
 @Injectable()
 export class AppStorageService {
+  set logs(value: any[]) {
+    this._idb.saveArraySequential(value, "logs", 'timestamp').catch((err) => {
+      console.error(err);
+    });
+    this._logs = value;
+  }
   get isSaving(): boolean {
     return this._isSaving;
   }
@@ -138,12 +145,12 @@ export class AppStorageService {
   }
 
   /* Getter/Setter SessionStorage */
-  get servertranscipt(): any[] {
-    return this._servertranscipt;
+  get serverDataEntry(): IDataEntry {
+    return this._serverDataEntry;
   }
 
-  set servertranscipt(value: any[]) {
-    this._servertranscipt = value;
+  set serverDataEntry(value: IDataEntry) {
+    this._serverDataEntry = value;
   }
 
   get submitted(): boolean {
@@ -428,7 +435,7 @@ export class AppStorageService {
   @SessionStorage('playonhover') private _playonhover: boolean;
   @SessionStorage('reloaded') private _reloaded: boolean;
   @SessionStorage('email') private _email: string;
-  @SessionStorage('servertranscript') private _servertranscipt: any[];
+  @SessionStorage('serverDataEntry') private _serverDataEntry: IDataEntry;
 
   private _submitted: boolean = null;
   private _feedback: any = null;

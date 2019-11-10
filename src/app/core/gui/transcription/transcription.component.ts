@@ -54,6 +54,7 @@ import {
 } from '../../modals/transcription-demo-end/transcription-demo-end-modal.component';
 import {GeneralShortcut} from '../../modals/shortcuts-modal/shortcuts-modal.component';
 import {AsrService} from '../../shared/service/asr.service';
+import {parseServerDataEntry} from '../../obj/data-entry';
 
 @Component({
   selector: 'app-transcription',
@@ -671,23 +672,21 @@ export class TranscriptionComponent implements OnInit,
         }
 
         // get transcript data that already exists
-        if (json.data.hasOwnProperty('transcript')) {
-          let transcript = '';
+        const jsonStr = JSON.stringify(json.data);
+        this.appStorage.serverDataEntry = parseServerDataEntry(jsonStr);
 
-          if (transcript !== '') {
-            try {
-              transcript = JSON.parse(json.data.transcript);
-            } catch (e) {
-              console.error(`could not parse transcript. Invalid format?`);
-            }
-          }
-
-          if (Array.isArray(transcript) && transcript.length > 0) {
-            this.appStorage.servertranscipt = transcript;
+        if (this.appStorage.serverDataEntry.hasOwnProperty('transcript')) {
+          if (!Array.isArray(this.appStorage.serverDataEntry)) {
+            this.appStorage.serverDataEntry.transcript = [];
           }
         }
 
-        if (this.appStorage.usemode === 'online' && (json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext'))) {
+        if (isNullOrUndefined(this.appStorage.serverDataEntry.logtext) ||
+          !Array.isArray(this.appStorage.serverDataEntry.logtext)) {
+          this.appStorage.serverDataEntry.logtext = [];
+        }
+
+        if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('prompttext')) {
           // get transcript data that already exists
           if (json.data.hasOwnProperty('prompttext')) {
             const prompt = json.data.prompttext;

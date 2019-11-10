@@ -149,16 +149,10 @@ export class UserInteractionsService {
       const elem = array[i];
       let newElem = null;
 
+      newElem = MouseStatisticElem.fromAny(elem);
       if (newElem) {
       } else {
-        newElem = MouseStatisticElem.fromAny(elem);
-        if (newElem) {
-        } else {
-          newElem = StatisticElem.fromAny(elem);
-          if (newElem) {
-          }
-
-        }
+        newElem = StatisticElem.fromAny(elem);
       }
 
       if (newElem) {

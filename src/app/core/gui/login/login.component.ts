@@ -15,6 +15,7 @@ import {AppInfo} from '../../../app.info';
 import {FileSize, Functions, isNullOrUndefined} from '../../shared/Functions';
 import {sha256} from 'js-sha256';
 import {Observable, throwError} from 'rxjs';
+import {parseServerDataEntry} from '../../obj/data-entry';
 
 @Component({
   selector: 'app-login',
@@ -508,40 +509,112 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
             const res = this.appStorage.setSessionData(this.member, json.data.id, json.data.url);
 
             // get transcript data that already exists
-            if (json.data.hasOwnProperty('transcript')) {
-              let transcript = '';
+            json.data.logtext = `[
+    {
+      "timestamp": 1573374224755,
+      "type": "editor:changed",
+      "context": "editors",
+      "value": "2D-Editor",
+      "playerpos": -1
+    },
+    {
+      "timestamp": 1573374225484,
+      "type": "audio",
+      "context": "2D-Editor",
+      "value": "started",
+      "playerpos": 0
+    },
+    {
+      "timestamp": 1573374227555,
+      "type": "audio",
+      "context": "2D-Editor",
+      "value": "stopped",
+      "playerpos": 94393
+    },
+    {
+      "timestamp": 1573374229652,
+      "type": "mouseclick",
+      "context": "audio_buttons",
+      "value": "click:replay",
+      "playerpos": 94393,
+      "caretpos": -1
+    },
+    {
+      "timestamp": 1573374231092,
+      "type": "mouseclick",
+      "context": "audio_buttons",
+      "value": "click:replay",
+      "playerpos": 94393,
+      "caretpos": -1
+    },
+    {
+      "timestamp": 1573374232234,
+      "type": "shortcut",
+      "context": "multi-lines-viewer",
+      "value": "boundary:add",
+      "playerpos": 94393,
+      "caretpos": -1
+    },
+    {
+      "timestamp": 1573374233687,
+      "type": "shortcut",
+      "context": "multi-lines-viewer",
+      "value": "boundary:add",
+      "playerpos": 94393,
+      "caretpos": -1
+    },
+    {
+      "timestamp": 1573374234002,
+      "type": "shortcut",
+      "context": "multi-lines-viewer",
+      "value": "segment:set_break",
+      "playerpos": 94393,
+      "caretpos": -1
+    },
+    {
+      "timestamp": 1573374235982,
+      "type": "shortcut",
+      "context": "multi-lines-viewer",
+      "value": "boundary:add",
+      "playerpos": 94393,
+      "caretpos": -1
+    },
+    {
+      "timestamp": 1573374236269,
+      "type": "shortcut",
+      "context": "multi-lines-viewer",
+      "value": "segment:set_break",
+      "playerpos": 94393,
+      "caretpos": -1
+    }]
+  `;
+            const jsonStr = JSON.stringify(json.data);
+            this.appStorage.serverDataEntry = parseServerDataEntry(jsonStr);
 
-              if (transcript !== '') {
-                try {
-                  transcript = JSON.parse(json.data.transcript);
-                } catch (e) {
-                  console.error(`could not parse transcript. Invalid format?`);
-                }
-              }
-
-              if (Array.isArray(transcript) && transcript.length > 0) {
-                this.appStorage.servertranscipt = transcript;
-              }
+            if (isNullOrUndefined(this.appStorage.serverDataEntry.transcript) ||
+              !Array.isArray(this.appStorage.serverDataEntry.transcript)) {
+              this.appStorage.serverDataEntry.transcript = [];
             }
 
-            if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('prompt') || json.data.hasOwnProperty('prompttext')) {
+            if (isNullOrUndefined(this.appStorage.serverDataEntry.logtext) ||
+              !Array.isArray(this.appStorage.serverDataEntry.logtext)) {
+              this.appStorage.serverDataEntry.logtext = [];
+            }
+
+            if (this.appStorage.usemode === 'online' && this.appStorage.serverDataEntry.hasOwnProperty('prompttext')) {
               // get transcript data that already exists
-              if (json.data.hasOwnProperty('prompttext')) {
-                const prompt = json.data.prompttext;
-                this.appStorage.prompttext = (prompt) ? prompt : '';
-              }
+              const prompt = this.appStorage.serverDataEntry.prompttext;
+              this.appStorage.prompttext = (prompt) ? prompt : '';
             } else {
               this.appStorage.prompttext = '';
             }
 
-            if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('comment') || json.data.hasOwnProperty('comment')) {
+            if (this.appStorage.usemode === 'online' && this.appStorage.serverDataEntry.hasOwnProperty('comment')) {
               // get transcript data that already exists
-              if (json.data.hasOwnProperty('comment')) {
-                const comment = json.data.comment;
+              const comment = this.appStorage.serverDataEntry.comment;
 
-                if (comment) {
-                  this.appStorage.servercomment = comment;
-                }
+              if (comment) {
+                this.appStorage.servercomment = comment;
               }
             } else {
               this.appStorage.servercomment = '';

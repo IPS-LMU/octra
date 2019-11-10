@@ -304,9 +304,12 @@ export class TranscriptionService {
                 if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
                   this.appStorage.annotation[this._selectedlevel].level.items = [];
 
-                  if (!(this.appStorage.servertranscipt === null || this.appStorage.servertranscipt === undefined)) {
+                  if (!isNullOrUndefined(this.appStorage.serverDataEntry.transcript) && this.appStorage.serverDataEntry.transcript.length > 0) {
+                    // import logs
+                    this.appStorage.logs = this.appStorage.serverDataEntry.logtext;
+
                     // check if servertranscript's segment is empty
-                    if (this.appStorage.servertranscipt.length === 1 && this.appStorage.servertranscipt[0].text === '') {
+                    if (this.appStorage.serverDataEntry.transcript.length === 1 && this.appStorage.serverDataEntry[0].text === '') {
                       this.appStorage.annotation[this.selectedlevel].level.items.push(
                         new OSegment(0, 0, this.audiomanager.originalInfo.duration.originalSample.value,
                           [new OLabel('OCTRA_1', this.appStorage.prompttext)])
@@ -326,14 +329,12 @@ export class TranscriptionService {
                         );
                     } else {
                       this.appStorage.annotation[this._selectedlevel].level.items = [];
-                      for (let i = 0; i < this.appStorage.servertranscipt.length; i++) {
-                        const segT = this.appStorage.servertranscipt[i];
+                      for (let i = 0; i < this.appStorage.serverDataEntry.transcript.length; i++) {
+                        const segT = this.appStorage.serverDataEntry[i];
 
                         const oseg = new OSegment(i, segT.start, segT.length, [new OLabel('OCTRA_1', segT.text)]);
                         this.appStorage.annotation[this.selectedlevel].level.items.push(oseg);
                       }
-                      // clear servertranscript
-                      this.appStorage.servertranscipt = null;
 
                       this.appStorage.changeAnnotationLevel(this._selectedlevel,
                         this.appStorage.annotation[this._selectedlevel].level)

@@ -305,103 +305,68 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       if (newSession) {
         this.createNewSession(form);
       } else if (continueSession) {
-        if (this.settingsService.isTheme('shortAudioFiles')) {
-          // create new session
-
-          // TODO fehler hier suchen
-          // check if annotation is annotated
-          new Promise<void>((resolve, reject) => {
-            if (!isNullOrUndefined(this.appStorage.dataID)) {
-              this.api.fetchAnnotation(this.appStorage.dataID).then((entry) => {
-                if (entry.data.status === 'ANNOTATED' || entry.data.status === 'FREE') {
-                  resolve();
-                } else {
-                  // reset annotation
-                  this.api.closeSession(this.member.id, this.appStorage.dataID, '').then(() => {
-                    resolve();
-                  }).catch(() => {
-                    // ignore error
-                    resolve();
-                  });
-                }
-              }).catch((error) => {
-                reject(error);
-              });
-            } else {
-              resolve();
-            }
-          }).then(() => {
-            // all prepared, create new session
+        this.api.fetchAnnotation(this.appStorage.dataID).then((json) => {
+          if (isNullOrUndefined(json.data)) {
+            // job doesn't exist anymore
             this.createNewSession(form);
-          }).catch((error) => {
-            console.error(error);
-          });
-        } else {
-          this.api.fetchAnnotation(this.appStorage.dataID).then((json) => {
+          } else {
+            // continue job
+            if (json.hasOwnProperty('message')) {
+              const counter = (json.message === '') ? '0' : json.message;
+              this.appStorage.sessStr.store('jobsLeft', Number(counter));
+            }
 
-            if (isNullOrUndefined(json.data)) {
-              // job doesn't exist anymore
-              this.createNewSession(form);
-            } else {
-              // continue job
-
-              if (json.hasOwnProperty('message')) {
-                const counter = (json.message === '') ? '0' : json.message;
-                this.appStorage.sessStr.store('jobsLeft', Number(counter));
+            if (form.valid && this.agreementChecked
+              && json.message !== '0'
+            ) {
+              if (this.appStorage.sessionfile !== null) {
+                // last was offline mode
+                this.appStorage.clearLocalStorage().catch((err) => {
+                  console.error(err);
+                });
               }
 
-              if (form.valid && this.agreementChecked
-                && json.message !== '0'
-              ) {
-                if (this.appStorage.sessionfile !== null) {
-                  // last was offline mode
-                  this.appStorage.clearLocalStorage().catch((err) => {
-                    console.error(err);
-                  });
-                }
+              if (this.appStorage.usemode === 'online'
+                && (json.data.hasOwnProperty('prompt')
+                  || json.data.hasOwnProperty('prompttext'))) {
+                // get transcript data that already exists
+                if (json.data.hasOwnProperty('prompt')) {
+                  const prompt = json.data.prompt;
 
-                if (this.appStorage.usemode === 'online'
-                  && (json.data.hasOwnProperty('prompt')
-                    || json.data.hasOwnProperty('prompttext'))) {
-                  // get transcript data that already exists
-                  if (json.data.hasOwnProperty('prompt')) {
-                    const prompt = json.data.prompt;
-
-                    if (prompt) {
-                      this.appStorage.prompttext = prompt;
-                    } else {
-                      this.appStorage.prompttext = '';
-                    }
-                  } else if (json.data.hasOwnProperty('prompttext')) {
-                    const prompt = json.data.prompttext;
-
-                    if (prompt) {
-                      this.appStorage.prompttext = prompt;
-                    } else {
-                      this.appStorage.prompttext = '';
-                    }
+                  if (prompt) {
+                    this.appStorage.prompttext = prompt;
+                  } else {
+                    this.appStorage.prompttext = '';
                   }
-                } else {
-                  this.appStorage.prompttext = '';
-                }
+                } else if (json.data.hasOwnProperty('prompttext')) {
+                  const prompt = json.data.prompttext;
 
-                const res = this.appStorage.setSessionData(this.member, this.appStorage.dataID, this.appStorage.audioURL);
-                if (res.error === '') {
-                  this.navigate();
-                } else {
-                  alert(res.error);
+                  if (prompt) {
+                    this.appStorage.prompttext = prompt;
+                  } else {
+                    this.appStorage.prompttext = '';
+                  }
                 }
               } else {
-                this.modService.show('loginInvalid');
+                this.appStorage.prompttext = '';
               }
+
+              const res = this.appStorage.setSessionData(this.member, this.appStorage.dataID, this.appStorage.audioURL);
+              if (res.error === '') {
+                this.navigate();
+              } else {
+                alert(res.error);
+              }
+            } else {
+              this.modService.show('loginInvalid');
             }
-          }).catch((error) => {
-            this.modService.show('error', {
-              text: 'Server cannot be requested. Please check if you are online.'
-            });
-            console.error(error);
+          }
+        }).catch((error) => {
+          this.modService.show('error', {
+            text: 'Server cannot be requested. Please check if you are online.'
           });
-        }
+          console.error(error);
+        });
       }
     }
   }

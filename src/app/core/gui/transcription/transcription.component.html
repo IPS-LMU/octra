@@ -23,31 +23,31 @@
             help: 'general.help' | transloco
             }"
 
-            (shortcutbtnclicked)="modalShortcuts.open()"
-            (guidelinesbtnclicked)="modalGuidelines.open()"
-            (overviewbtnclicked)="modalOverview.open()"
-    ></app-fastbar>
+    (shortcutbtnclicked)="modalShortcuts.open()"
+    (guidelinesbtnclicked)="modalGuidelines.open()"
+    (overviewbtnclicked)="modalOverview.open()"
+  ></app-fastbar>
 
-    <div class="flex">
-        <div id="editor-loading" *ngIf="!editorloaded">
-            <span class="fa fa-spinner fa-spin fa-3x fa-fw"></span>
-        </div>
-        <ng-template appLoadeditor></ng-template>
+  <div class="flex">
+    <div id="editor-loading" *ngIf="!editorloaded || waitForSend">
+      <fa-icon icon="spinner" [spin]="true" [size]="'4x'" style="color:lightgray"></fa-icon>
     </div>
+    <ng-template appLoadeditor></ng-template>
+  </div>
 
-    <div *ngIf="(settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('korbinian'))
+  <div *ngIf="(settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('korbinian'))
     && (appStorage.usemode === 'online' || appStorage.usemode === 'demo') && transcrService.feedback !== null">
-        <form class="form-inline" id="bottom-comment">
-            <fieldset class="w-100">
-                <div class="form-group" style="padding-top:0;">
+    <form class="form-inline" id="bottom-comment">
+      <fieldset class="w-100">
+        <div class="form-group" style="padding-top:0;">
                 <textarea class="form-control w-100" [(ngModel)]="transcrService.feedback.comment"
                           placeholder="{{'general.insert comment'| transloco}}"
                           name="comment"
                           style="height:40px;padding:10px;resize: none;"></textarea>
-                </div>
-            </fieldset>
-        </form>
-    </div>
+        </div>
+      </fieldset>
+    </form>
+  </div>
 
     <div class="row" id="bottom-navigation" role="group"
          *ngIf="settingsService.isTheme('shortAudioFiles') && (appStorage.usemode === 'online' || appStorage.usemode === 'demo'); else defaultBottom2">

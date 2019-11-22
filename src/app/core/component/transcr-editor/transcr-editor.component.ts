@@ -495,7 +495,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   private triggerTyping() {
     setTimeout(() => {
       if (Date.now() - this.lastkeypress >= 700 && this.lastkeypress > -1) {
-        if (this._isTyping && this.focused) {
+        if (this._isTyping) {
           this.validate();
           this.initPopover();
           this.lastkeypress = -1;
@@ -505,7 +505,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       }
     }, 700);
 
-    if (!this._isTyping && this.focused) {
+    if (!this._isTyping) {
       this.typing.emit('started');
     }
     this._isTyping = true;

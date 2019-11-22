@@ -14,116 +14,116 @@
         <fa-icon *ngIf="saving === 'saving'" style="color:#333333" icon="save"></fa-icon>
         <fa-icon *ngIf="saving === 'error'" style="color:red" icon="save"></fa-icon>
     </span>
-    <app-fastbar
-            [responsive]="responsive"
-            [buttonLabels]="{
+  <app-fastbar
+    [responsive]="responsive"
+    [buttonLabels]="{
             shortcuts: 'general.shortcuts' | translate,
             guidelines: 'general.guidelines' | translate,
             overview: 'general.overview' | translate,
             help: 'general.help' | translate
             }"
 
-            (shortcutbtnclicked)="modalShortcuts.open()"
-            (guidelinesbtnclicked)="modalGuidelines.open()"
-            (overviewbtnclicked)="modalOverview.open()"
-    ></app-fastbar>
+    (shortcutbtnclicked)="modalShortcuts.open()"
+    (guidelinesbtnclicked)="modalGuidelines.open()"
+    (overviewbtnclicked)="modalOverview.open()"
+  ></app-fastbar>
 
-    <div class="flex">
-        <div id="editor-loading" *ngIf="!editorloaded">
-            <span class="fa fa-spinner fa-spin fa-3x fa-fw"></span>
-        </div>
-        <ng-template appLoadeditor></ng-template>
+  <div class="flex">
+    <div id="editor-loading" *ngIf="!editorloaded || waitForSend">
+      <fa-icon icon="spinner" [spin]="true" [size]="'4x'" style="color:lightgray"></fa-icon>
     </div>
+    <ng-template appLoadeditor></ng-template>
+  </div>
 
-    <div *ngIf="(settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('korbinian'))
+  <div *ngIf="(settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('korbinian'))
     && (appStorage.usemode === 'online' || appStorage.usemode === 'demo') && transcrService.feedback !== null">
-        <form class="form-inline" id="bottom-comment">
-            <fieldset class="w-100">
-                <div class="form-group" style="padding-top:0;">
+    <form class="form-inline" id="bottom-comment">
+      <fieldset class="w-100">
+        <div class="form-group" style="padding-top:0;">
                 <textarea class="form-control w-100" [(ngModel)]="transcrService.feedback.comment"
                           placeholder="{{'general.insert comment'| translate}}"
                           name="comment"
                           style="height:40px;padding:10px;resize: none;"></textarea>
-                </div>
-            </fieldset>
-        </form>
-    </div>
-
-    <div class="row" id="bottom-navigation" role="group"
-         *ngIf="settingsService.isTheme('shortAudioFiles') && (appStorage.usemode === 'online' || appStorage.usemode === 'demo'); else defaultBottom2">
-        <button class="btn btn-secondary btn-raised col-md-3" (click)="abortTranscription()">
-            <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
-            <span>
-                   {{"general.quit" | translate}}
-            </span>
-        </button>
-        <button class="btn btn-raised btn-danger col-md-3" (click)="sendTranscriptionForShortAudioFiles('bad')">
-            <fa-icon icon="star"></fa-icon>
-        </button>
-        <button class="btn btn-raised btn-warning col-md-3" style="background-color: orange"
-                (click)="sendTranscriptionForShortAudioFiles('middle')">
-            <fa-icon icon="star"></fa-icon>
-            <fa-icon icon="star"></fa-icon>
-        </button>
-        <button class="btn btn-raised btn-primary col-md-3" (click)="sendTranscriptionForShortAudioFiles('good')">
-            <fa-icon icon="star"></fa-icon>
-            <fa-icon icon="star"></fa-icon>
-            <fa-icon icon="star"></fa-icon>
-        </button>
-    </div>
-    <ng-template #defaultBottom2>
-        <div class="row" id="bottom-navigation" role="group"
-             *ngIf="settingsService.isTheme('korbinian') && (appStorage.usemode === 'online' || appStorage.usemode === 'demo'); else defaultBottom">
-            <button class="btn btn-secondary btn-raised col-md-4" (click)="abortTranscription()">
-                <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
-                <span>
-                   {{"general.quit" | translate}}
-            </span>
-            </button>
-            <button class="btn btn-raised btn-info col-md-2" (click)="sendTranscriptionForKorbinian('NO')">
-                NO
-            </button>
-            <button class="btn btn-raised btn-danger col-md-2" (click)="sendTranscriptionForKorbinian('VE')">
-                VE
-            </button>
-            <button class="btn btn-raised btn-secondary col-md-2" (click)="sendTranscriptionForKorbinian('EE')">
-                EE
-            </button>
-            <button class="btn btn-raised btn-primary col-md-2" (click)="sendTranscriptionForKorbinian('AN')">
-                AN
-            </button>
         </div>
-    </ng-template>
-    <ng-template #defaultBottom>
-        <div class="row" id="bottom-navigation" role="group">
-            <button class="btn btn-secondary btn-raised col-md-6"
-                    *ngIf="appStorage.usemode !== 'url'"
-                    (click)="abortTranscription()">
-                <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
-                <span *ngIf="!appStorage.easymode" [ngClass]="{' d-none d-md-inline': appc.octra.responsive.enabled}">
+      </fieldset>
+    </form>
+  </div>
+
+  <div class="row" id="bottom-navigation" role="group"
+       *ngIf="settingsService.isTheme('shortAudioFiles') && (appStorage.usemode === 'online' || appStorage.usemode === 'demo'); else defaultBottom2">
+    <button class="btn btn-secondary btn-raised col-md-3" (click)="abortTranscription()">
+      <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
+      <span>
+                   {{"general.quit" | translate}}
+            </span>
+    </button>
+    <button class="btn btn-raised btn-danger col-md-3" (click)="sendTranscriptionForShortAudioFiles('bad')">
+      <fa-icon icon="star"></fa-icon>
+    </button>
+    <button class="btn btn-raised btn-warning col-md-3" style="background-color: orange"
+            (click)="sendTranscriptionForShortAudioFiles('middle')">
+      <fa-icon icon="star"></fa-icon>
+      <fa-icon icon="star"></fa-icon>
+    </button>
+    <button class="btn btn-raised btn-primary col-md-3" (click)="sendTranscriptionForShortAudioFiles('good')">
+      <fa-icon icon="star"></fa-icon>
+      <fa-icon icon="star"></fa-icon>
+      <fa-icon icon="star"></fa-icon>
+    </button>
+  </div>
+  <ng-template #defaultBottom2>
+    <div class="row" id="bottom-navigation" role="group"
+         *ngIf="settingsService.isTheme('korbinian') && (appStorage.usemode === 'online' || appStorage.usemode === 'demo'); else defaultBottom">
+      <button class="btn btn-secondary btn-raised col-md-4" (click)="abortTranscription()">
+        <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
+        <span>
+                   {{"general.quit" | translate}}
+            </span>
+      </button>
+      <button class="btn btn-raised btn-info col-md-2" (click)="sendTranscriptionForKorbinian('NO')">
+        NO
+      </button>
+      <button class="btn btn-raised btn-danger col-md-2" (click)="sendTranscriptionForKorbinian('VE')">
+        VE
+      </button>
+      <button class="btn btn-raised btn-secondary col-md-2" (click)="sendTranscriptionForKorbinian('EE')">
+        EE
+      </button>
+      <button class="btn btn-raised btn-primary col-md-2" (click)="sendTranscriptionForKorbinian('AN')">
+        AN
+      </button>
+    </div>
+  </ng-template>
+  <ng-template #defaultBottom>
+    <div class="row" id="bottom-navigation" role="group">
+      <button class="btn btn-secondary btn-raised col-md-6"
+              *ngIf="appStorage.usemode !== 'url'"
+              (click)="abortTranscription()">
+        <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
+        <span *ngIf="!appStorage.easymode" [ngClass]="{' d-none d-md-inline': appc.octra.responsive.enabled}">
                     {{"general.quit" | translate}}
             </span>
-            </button>
-            <button type="button" class="btn btn-primary btn-raised col-md-6"
-                    (click)="navbarServ.doclick('export');" *ngIf="appStorage.usemode === 'local'">
-                <fa-icon icon="download"></fa-icon>
-                <span
-                        *ngIf="!appStorage.easymode"
-                        [ngClass]="{'d-none d-md-inline': appc.octra.responsive.enabled}"> {{"general.export data" | translate}}</span>
-            </button>
-            <button type="button" class="btn btn-primary btn-raised col-md-6"
-                    (click)="onSendButtonClick()"
-                    *ngIf="appStorage.usemode === 'online' || appStorage.usemode === 'demo'">
+      </button>
+      <button type="button" class="btn btn-primary btn-raised col-md-6"
+              (click)="navbarServ.doclick('export');" *ngIf="appStorage.usemode === 'local'">
+        <fa-icon icon="download"></fa-icon>
+        <span
+          *ngIf="!appStorage.easymode"
+          [ngClass]="{'d-none d-md-inline': appc.octra.responsive.enabled}"> {{"general.export data" | translate}}</span>
+      </button>
+      <button type="button" class="btn btn-primary btn-raised col-md-6"
+              (click)="onSendButtonClick()"
+              *ngIf="appStorage.usemode === 'online' || appStorage.usemode === 'demo'">
             <span
-                    *ngIf="!appStorage.easymode"
-                    [ngClass]="{'d-none d-md-inline': appc.octra.responsive.enabled}"> {{"transcription.send" | translate}} </span>
-                <fa-icon icon="paper-plane"></fa-icon>
-            </button>
-            <button type="button" class="btn btn-primary btn-raised w-100"
-                    (click)="onSaveTranscriptionButtonClicked()" *ngIf="appStorage.usemode === 'url'">
-                <span>{{"transcription.send" | translate}} </span>
-                <fa-icon icon="paper-plane"></fa-icon>
-            </button>
-        </div>
-    </ng-template>
+              *ngIf="!appStorage.easymode"
+              [ngClass]="{'d-none d-md-inline': appc.octra.responsive.enabled}"> {{"transcription.send" | translate}} </span>
+        <fa-icon icon="paper-plane"></fa-icon>
+      </button>
+      <button type="button" class="btn btn-primary btn-raised w-100"
+              (click)="onSaveTranscriptionButtonClicked()" *ngIf="appStorage.usemode === 'url'">
+        <span>{{"transcription.send" | translate}} </span>
+        <fa-icon icon="paper-plane"></fa-icon>
+      </button>
+    </div>
+  </ng-template>
 </div>

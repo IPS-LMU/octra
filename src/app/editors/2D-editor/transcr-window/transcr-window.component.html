@@ -6,6 +6,7 @@
     <app-audio-navigation #audionav
                           (buttonclick)="onButtonClick($event)"
                           (volumechange)="onVolumeChange($event)"
+                          (keyup)="onKeyUp()"
                           (aftervolumechange)="afterVolumeChange($event)"
                           (speedchange)="onSpeedChange($event)"
                           [volume]="appStorage.audioVolume"

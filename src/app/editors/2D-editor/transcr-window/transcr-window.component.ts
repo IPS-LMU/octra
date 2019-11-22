@@ -95,8 +95,13 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           event.comboKey === 'ALT + SHIFT + 2' ||
           event.comboKey === 'ALT + SHIFT + 3') {
           this.transcrService.tasksBeforeSend.push(new Promise<void>((resolve) => {
-            this.afterTyping('stopped');
+            this.saveTranscript();
             this.save();
+
+            if (this.oldRaw === this.editor.rawText) {
+              this.appStorage.saving.emit('success');
+            }
+
             this.close();
             resolve();
           }));
@@ -119,6 +124,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   private subscrmanager: SubscriptionManager;
   private tempSegments: Segments;
   public loupeSettings = new AudioviewerConfig();
+
+  private oldRaw = '';
 
   public doit = (direction: string) => {
     this.save();
@@ -252,6 +259,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   save() {
+    console.log(`SAVE from transcr window`);
     if (this.segmentIndex > -1 && this.transcrService.currentlevel.segments &&
       this.segmentIndex < this.transcrService.currentlevel.segments.length) {
       if (this.editor.html.indexOf('<img src="assets/img/components/transcr-editor/boundary.png"') > -1) {
@@ -526,7 +534,16 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   }
 
   afterTyping(status) {
+    if (status === 'started') {
+      this.oldRaw = this.editor.rawText;
+    }
+
     if (status === 'stopped') {
+      if (this.oldRaw === this.editor.rawText) {
+        this.appStorage.savingNeeded = false;
+        this.oldRaw = this.editor.rawText;
+      }
+
       this.saveTranscript();
       this.highlight();
     }
@@ -620,5 +637,9 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     const nextSegment = currentLevel.segments.get(segmentIndex + 1);
     return segmentIndex === currentLevel.segments.length - 2
       && nextSegment.transcript === this.transcrService.breakMarker.code;
+  }
+
+  public onKeyUp() {
+    this.appStorage.savingNeeded = true;
   }
 }

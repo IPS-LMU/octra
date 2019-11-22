@@ -30,11 +30,14 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   @ViewChild('nav', {static: true}) nav: AudioNavigationComponent;
   @ViewChild('audioplayer', {static: true}) audioplayer: AudioplayerComponent;
   @ViewChild('transcr', {static: true}) public editor: TranscrEditorComponent;
+
   public audiochunk: AudioChunk;
   public audiomanager: AudioManager;
   private subscrmanager: SubscriptionManager;
   private shortcuts: any;
   private boundaryselected = false;
+
+  private oldRaw = '';
 
   public get settings(): any {
     return this.audioplayer.settings;
@@ -67,8 +70,9 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
           event.comboKey === 'ALT + SHIFT + 2' ||
           event.comboKey === 'ALT + SHIFT + 3') {
           this.transcrService.tasksBeforeSend.push(new Promise<void>((resolve) => {
-            this.saveTranscript();
-            resolve();
+            this.appStorage.afterSaving().then(() => {
+              resolve();
+            });
           }));
         }
       }));
@@ -156,9 +160,22 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   }
 
   afterTyping(status) {
+    if (status === 'started') {
+      this.oldRaw = this.editor.rawText;
+    }
+
     if (status === 'stopped') {
+      if (this.oldRaw === this.editor.rawText) {
+        this.appStorage.savingNeeded = false;
+        this.oldRaw = this.editor.rawText;
+      }
+
       this.saveTranscript();
       this.highlight();
+
+      if (this.oldRaw === this.editor.rawText) {
+        this.appStorage.saving.emit('success');
+      }
     }
   }
 
@@ -217,6 +234,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   }
 
   saveTranscript() {
+    console.log(`save transcript!`);
     let rawText = this.editor.rawText;
     // split text at the position of every boundary marker
     let segTexts: string[] = rawText.split(
@@ -338,9 +356,14 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     }
     this.editor.Settings.height = 100;
     this.editor.update();
+    this.oldRaw = this.editor.rawText;
   }
 
   public afterFirstInitialization() {
     // ignore
+  }
+
+  onKeyUp() {
+    this.appStorage.savingNeeded = true;
   }
 }

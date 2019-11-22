@@ -50,6 +50,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   get segmententer_shortc(): string {
     return (this.viewer.settings) ? this.viewer.settings.shortcuts.segment_enter.keys[this.platform] : '';
   }
+  private oldRaw = "";
 
   constructor(public audio: AudioService,
               public msg: MessageService,
@@ -116,11 +117,25 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   onEditorTyping = (status: string) => {
     this.viewer.focused = false;
     this.loupe.viewer.focused = false;
+
+    if (status === 'started') {
+      this.oldRaw = this.editor.rawText;
+    }
+
     if (status === 'stopped') {
+      if (this.oldRaw === this.editor.rawText) {
+        this.appStorage.savingNeeded = false;
+        this.oldRaw = this.editor.rawText;
+      }
+
       this.save();
       setTimeout(() => {
         this.loupe.update(false);
       }, 200);
+
+      if (this.oldRaw === this.editor.rawText) {
+        this.appStorage.saving.emit('success');
+      }
     }
   }
 
@@ -602,5 +617,9 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         this.openSegment(0);
       }
     }
+  }
+
+  onKeyUp() {
+    this.appStorage.savingNeeded = true;
   }
 }

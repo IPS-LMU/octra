@@ -595,6 +595,8 @@ export class TranscriptionComponent implements OnInit,
       this.modalOverview.close();
 
       this.modalDemoEnd.open().then((action: ModalEndAnswer) => {
+        this.appStorage.savingNeeded = false;
+        this.waitForSend = false;
         this.modalDemoEnd.close(action);
 
         switch (action) {

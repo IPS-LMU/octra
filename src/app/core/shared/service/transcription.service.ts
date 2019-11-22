@@ -131,7 +131,6 @@ export class TranscriptionService {
   public levelchanged: EventEmitter<Level> = new EventEmitter<Level>();
   private subscrmanager: SubscriptionManager;
   private _segments: Segments;
-  private saving = false;
   private state = 'ANNOTATED';
 
   private _annotation: Annotation;
@@ -163,21 +162,15 @@ export class TranscriptionService {
   public saveSegments = () => {
     console.log(`SAVE SEGMENTS!`);
     // make sure, that no saving overhead exist. After saving request wait 1 second
-    if (!this.saving) {
-      this.saving = true;
-      setTimeout(() => {
-        if (!isNullOrUndefined(this._annotation)
-          && this._annotation.levels.length > 0
-          && !isNullOrUndefined(this._annotation.levels[this._selectedlevel])) {
-          this.appStorage.save('annotation', {
-            num: this._selectedlevel,
-            level: this._annotation.levels[this._selectedlevel].getObj(this.audiomanager.originalInfo.duration)
-          });
-        } else {
-          console.error(new Error('can not save segments because annotation is null'));
-        }
-        this.saving = false;
-      }, 2000);
+    if (!isNullOrUndefined(this._annotation)
+      && this._annotation.levels.length > 0
+      && !isNullOrUndefined(this._annotation.levels[this._selectedlevel])) {
+      this.appStorage.save('annotation', {
+        num: this._selectedlevel,
+        level: this._annotation.levels[this._selectedlevel].getObj(this.audiomanager.originalInfo.duration)
+      });
+    } else {
+      console.error(new Error('can not save segments because annotation is null'));
     }
   }
   /**
@@ -552,7 +545,6 @@ export class TranscriptionService {
     // set data to null
     this._segments = null;
     this._guidelines = null;
-    this.saving = false;
     this.filename = '';
 
     this._feedback = null;

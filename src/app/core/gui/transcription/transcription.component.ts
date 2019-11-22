@@ -95,6 +95,8 @@ export class TranscriptionComponent implements OnInit,
 
   public generalShortcuts: GeneralShortcut[] = [];
 
+  public waitForSend = false;
+
   constructor(public router: Router,
               private _componentFactoryResolver: ComponentFactoryResolver,
               public audio: AudioService,
@@ -145,12 +147,20 @@ export class TranscriptionComponent implements OnInit,
 
     this.subscrmanager.add(this.keyMap.onkeydown.subscribe((event) => {
       if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
-        if (event.comboKey === 'ALT + SHIFT + 1') {
-          this.sendTranscriptionForShortAudioFiles('bad');
-        } else if (event.comboKey === 'ALT + SHIFT + 2') {
-          this.sendTranscriptionForShortAudioFiles('middle');
-        } else if (event.comboKey === 'ALT + SHIFT + 3') {
-          this.sendTranscriptionForShortAudioFiles('good');
+        if (['ALT + SHIFT + 1', 'ALT + SHIFT + 2', 'ALT + SHIFT + 3'].includes(event.comboKey)) {
+          this.waitForSend = true;
+          this.appStorage.afterSaving().then(() => {
+            this.waitForSend = false;
+            if (event.comboKey === 'ALT + SHIFT + 1') {
+              this.sendTranscriptionForShortAudioFiles('bad');
+            } else if (event.comboKey === 'ALT + SHIFT + 2') {
+              this.sendTranscriptionForShortAudioFiles('middle');
+            } else if (event.comboKey === 'ALT + SHIFT + 3') {
+              this.sendTranscriptionForShortAudioFiles('good');
+            }
+          }).catch((error) => {
+            console.error(error);
+          });
         }
       }
     }));
@@ -242,6 +252,7 @@ export class TranscriptionComponent implements OnInit,
   }
 
   ngOnInit() {
+    console.log(`init transcription component`);
     this.navbarServ.interfaces = this.projectsettings.interfaces;
 
     // because of the loading data before through the loading component you can be sure the audio was loaded
@@ -325,11 +336,13 @@ export class TranscriptionComponent implements OnInit,
     this.navbarServ.showExport = this.settingsService.projectsettings.navigation.export;
 
     if (!(this.transcrService.annotation === null || this.transcrService.annotation === undefined)) {
+      console.log(`subscribe for id ${this.appStorage.dataID}`);
       this.levelSubscriptionID = this.subscrmanager.add(
         this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
       );
     } else {
       this.subscrmanager.add(this.transcrService.dataloaded.subscribe(() => {
+        console.log(`subscribe2 for id ${this.appStorage.dataID}`);
         this.levelSubscriptionID = this.subscrmanager.add(
           this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
         );
@@ -417,6 +430,7 @@ export class TranscriptionComponent implements OnInit,
         pc: 'SHIFT + ALT + 3'
       }
     });
+
     this.cd.markForCheck();
     this.cd.detectChanges();
   }
@@ -558,9 +572,11 @@ export class TranscriptionComponent implements OnInit,
       this.api.saveSession(json.transcript, json.project, json.annotator,
         json.jobno, json.id, json.status, json.comment, json.quality, json.log).then((result) => {
         if (result !== null) {
+          this.unsubscribeSubscriptionsForThisAnnotation();
           this.appStorage.submitted = true;
 
           setTimeout(() => {
+            this.waitForSend = false;
             this.transcrSendingModal.close();
 
             // only if opened
@@ -603,20 +619,9 @@ export class TranscriptionComponent implements OnInit,
   }
 
   onSendButtonClick() {
-    new Promise<void>((resolve) => {
-      // make sure, that transcription is send after saving
-      if (!this.appStorage.isSaving) {
-        resolve();
-      } else {
-        this.subscrmanager.add(this.appStorage.saving.subscribe((status) => {
-          if (status === 'success' || status === 'error') {
-            resolve();
-          }
-        }));
-      }
-    }).then(() => {
+    this.waitForSend = true;
+    this.appStorage.afterSaving().then(() => {
       // after saving
-
       // make sure no tasks are pending
       new Promise<void>((resolve) => {
         if (this.transcrService.tasksBeforeSend.length === 0) {
@@ -648,6 +653,7 @@ export class TranscriptionComponent implements OnInit,
           (!validTranscript && showOverview) || !this.modalOverview.feedBackComponent.valid)
           || (validTranscriptOnly && !validTranscript)
         ) {
+          this.waitForSend = false;
           this.modalOverview.open();
         } else {
           this.onSendNowClick();
@@ -870,6 +876,14 @@ export class TranscriptionComponent implements OnInit,
       this.transcrService.feedback.comment = type;
     }
     this.onSendButtonClick();
+  }
+
+  private unsubscribeSubscriptionsForThisAnnotation() {
+    if (this.levelSubscriptionID > 0) {
+      console.log(`unsubscribe!`);
+      this.subscrmanager.remove(this.levelSubscriptionID);
+      this.levelSubscriptionID = 0;
+    }
   }
 
 }

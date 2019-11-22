@@ -51,6 +51,12 @@ export class AppStorageService {
     });
     this._logs = value;
   }
+  set savingNeeded(value: boolean) {
+    this._savingNeeded = value;
+  }
+  get savingNeeded(): boolean {
+    return this._savingNeeded;
+  }
   get isSaving(): boolean {
     return this._isSaving;
   }
@@ -403,6 +409,8 @@ export class AppStorageService {
     return this._audioSettings.speed;
   }
 
+  private _savingNeeded = false;
+
   constructor(public sessStr: SessionStorageService,
               public localStr: LocalStorageService) {
   }
@@ -702,10 +710,12 @@ export class AppStorageService {
           this.changeAnnotationLevel(value.num, value.level).then(
             () => {
               this._isSaving = false;
+              this._savingNeeded = false;
               this.saving.emit('success');
             }
           ).catch((err) => {
             this._isSaving = false;
+            this._savingNeeded = false;
             this.saving.emit('error');
             console.error(`error on saving`);
             console.error(err);
@@ -715,10 +725,12 @@ export class AppStorageService {
           this._idb.save('options', 'feedback', {value}).then(
             () => {
               this._isSaving = false;
+              this._savingNeeded = false;
               this.saving.emit('success');
             }
           ).catch((err) => {
             this._isSaving = false;
+            this._savingNeeded = false;
             this.saving.emit('error');
             console.error(err);
           });
@@ -876,6 +888,22 @@ export class AppStorageService {
     );
   }
 
+  public afterSaving(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (this._isSaving || this._savingNeeded) {
+        const subscr = this.saving.subscribe(() => {
+          subscr.unsubscribe();
+          resolve();
+        }, (err) => {
+          subscr.unsubscribe();
+          reject(err)
+        });
+      } else {
+        resolve();
+      }
+    });
+  }
+
   public clearAnnotationData(): Promise<any> {
     this._annotation = null;
     return this.clearIDBTable('annotation_levels').then(
@@ -907,7 +935,9 @@ export class AppStorageService {
         });
       }
     } else {
-      reject(new Error('annotation object is undefined or null'));
+      return new Promise((resolve, reject) => {
+        reject(new Error('annotation object is undefined or null'));
+      });
     }
   }
 

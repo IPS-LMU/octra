@@ -92,6 +92,7 @@
 <app-transcr-editor #transcr
                     (markerInsert)="onMarkerInsert($event)"
                     (markerClick)="onMarkerClick($event)"
+                    (keyup)="onKeyUp()"
                     (typing)="onEditorTyping($event)"
                     [ngStyle]="{display: (segmentselected) ? 'inherit': 'none'}"
                     [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"

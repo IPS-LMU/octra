@@ -45,14 +45,6 @@ export class AudioManager {
     return this._originalInfo.samplerate;
   }
 
-  set playbackInfo(value: { endAt: number; started: number }) {
-    this._playbackInfo = value;
-  }
-
-  get playbackInfo(): { endAt: number; started: number } {
-    return this._playbackInfo;
-  }
-
   get playOnHover(): boolean {
     return this._playOnHover;
   }
@@ -135,12 +127,6 @@ export class AudioManager {
   private _stepBackward = false;
   private _isScriptProcessorCanceled = false;
   private _lastUpdate: number;
-
-  // timestamp when playing should teminate
-  private _playbackInfo = {
-    started: 0,
-    endAt: 0
-  };
 
   // variables needed for initializing audio
   private _source: AudioBufferSourceNode = null;
@@ -338,9 +324,6 @@ export class AudioManager {
           this._scriptProcessorNode.connect(this._gainNode);
           // connect modules of Web Audio API
           let lastCheck = Date.now();
-
-          this._playbackInfo.started = new Date().getTime();
-          this._playbackInfo.endAt = this._playbackInfo.started + (duration.browserSample.unix / speed);
 
           this._playposition = begintime.clone();
           // this._bufferedOLA.position = begintime.browserSample.value;
@@ -631,8 +614,6 @@ export class AudioChunk {
   set speed(value: number) {
     if (value > 0) {
       this._speed = value;
-      // TODO does this make sense?
-      this._audioManger.playbackInfo.endAt = this._audioManger.playbackInfo.endAt * this._speed;
     }
   }
 

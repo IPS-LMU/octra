@@ -30,7 +30,7 @@ export class AudioManager {
   }
 
   public get browserSampleRate(): number {
-    return this._ressource.audiobuffer.sampleRate;
+    return this._ressource.info.duration.browserSample.sampleRate;
   }
 
   public get originalSampleRate(): number {
@@ -71,7 +71,6 @@ export class AudioManager {
 
   private _startedAt = 0;
   private _audio: HTMLAudioElement;
-  private _audioURL: string;
 
   /**
    * initializes audio manager
@@ -185,7 +184,7 @@ export class AudioManager {
 
             // audioinfo.file = new File([buffer], filename, {type: 'audio/wav'});
             result.setRessource(new AudioRessource(filename, SourceType.ArrayBuffer,
-              audioinfo, bufferCopy, audioBuffer, bufferLength));
+              audioinfo, bufferCopy, bufferLength));
 
             // set duration is very important
             console.log(`sampleRate browser: ${result.browserSampleRate}`);
@@ -204,7 +203,7 @@ export class AudioManager {
 
             result._mainchunk = new AudioChunk(selection, result);
 
-            result.prepareAudioPlayBack();
+            result.prepareAudioPlayBack(audioBuffer);
             result.afterdecoded.emit(result.ressource);
 
             subj.next({
@@ -325,14 +324,15 @@ export class AudioManager {
             this._lastUpdate = lastCheck;
           });
 
-          this._source.addEventListener('ended', this.afterAudioEnded);
-
-          this._audio.currentTime = begintime.browserSample.seconds;
           this._audio.playbackRate = speed;
-          this._audio.play();
-          //this._source.(0, begintime.browserSample.seconds, duration.browserSample.seconds);
-          this._startedAt = Date.now();
-          this.changeState(PlayBackState.PLAYING);
+          this._audio.currentTime = begintime.browserSample.seconds;
+          this._audio.play().then(() => {
+            this._startedAt = Date.now();
+            this.changeState(PlayBackState.PLAYING);
+          }).catch((error) => {
+            this.statechange.error(new Error(error));
+            reject(error);
+          });
         }).catch((error) => {
           this.statechange.error(new Error(error));
           reject(error);
@@ -348,8 +348,7 @@ export class AudioManager {
     return new Promise<void>((resolve, reject) => {
       if (this.isPlaying) {
         this.changeState(PlayBackState.STOPPED);
-        this._audio.pause();
-        resolve();
+        return this._audio.pause();
       } else {
         console.log(`can't stop because audio manager is not playing`);
         resolve();
@@ -361,9 +360,7 @@ export class AudioManager {
     return new Promise<void>((resolve, reject) => {
       if (this.isPlaying) {
         this.changeState(PlayBackState.PAUSED);
-        this._audio.pause();
-        this.afterAudioEnded();
-        resolve();
+        return this._audio.pause();
       } else {
         reject('cant pause because not playing');
       }
@@ -393,30 +390,33 @@ export class AudioManager {
   /**
    * prepares the audio manager for play back
    */
-  private prepareAudioPlayBack() {
+  private prepareAudioPlayBack(audiobuffer: AudioBuffer) {
     this._gainNode = this._audioContext.createGain();
-    this._audioURL = URL.createObjectURL(new File([this._ressource.arraybuffer], this._ressource.info.fullname, {
-      type: 'audio/wav'
-    }));
-    console.log(this._audioURL);
-    this._audio = new Audio(this._audioURL);
+    this._audio = new Audio(this._ressource.objectURL);
     this._source = this._audioContext.createMediaElementSource(this._audio);
 
     // get channelData data
     if ((this._channelData === null || this._channelData === undefined) || this._channelData.data.length === 0) {
       this._channelData = {
-        data: this._ressource.audiobuffer.getChannelData(0),
+        data: audiobuffer.getChannelData(0),
         factor: 1,
-        sampleRate: this._ressource.audiobuffer.sampleRate
+        sampleRate: audiobuffer.sampleRate
       };
 
       console.log(`channel has length of ${this._channelData.data.byteLength} bytes and ${this._channelData.data.length} values`);
-      console.log(this.ressource.audiobuffer.length);
+      console.log(audiobuffer.length);
       this.minimizeChannelArray();
     }
 
     this._state = PlayBackState.INITIALIZED;
-    this.afterloaded.emit({status: 'success', error: ''});
+
+    const check = () => {
+      console.log(`FINISHED LOADING!`);
+      this.afterloaded.emit({status: 'success', error: ''});
+      this._audio.removeEventListener('canplay', check);
+    };
+
+    this._audio.addEventListener('canplay', check)
   }
 
   public minimizeChannelArray() {
@@ -508,7 +508,6 @@ export class AudioManager {
   public destroy(disconnect: boolean = true) {
     if (!(this._audioContext === null || this._audioContext === undefined)) {
       if (disconnect) {
-        URL.revokeObjectURL(this._audioURL);
         this._audioContext.close()
           .then(() => {
             console.log('AudioManager successfully destroyed its AudioContext');

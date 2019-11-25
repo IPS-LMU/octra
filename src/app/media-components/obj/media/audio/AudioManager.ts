@@ -9,18 +9,9 @@ import {PlayBackState, SourceType} from '../index';
 declare var window: any;
 
 export class AudioManager {
-  get lastUpdate(): number {
-    return this._lastUpdate;
-  }
-
   get mainchunk(): AudioChunk {
     return this._mainchunk;
   }
-
-  get isScriptProcessorCanceled(): boolean {
-    return this._isScriptProcessorCanceled;
-  }
-
   get playposition(): BrowserAudioTime {
     return this._playposition;
   }
@@ -67,14 +58,6 @@ export class AudioManager {
 
   get gainNode(): any {
     return this._gainNode;
-  }
-
-  get bufferSize(): number {
-    return this._bufferSize;
-  }
-
-  get frameSize(): number {
-    return this._frameSize;
   }
 
   get ressource(): AudioRessource {
@@ -139,9 +122,6 @@ export class AudioManager {
     factor: number,
     data: Float32Array
   };
-
-  private _frameSize = 2048;
-  private _bufferSize = 2048;
 
   private chunks: AudioChunk[] = [];
 
@@ -320,7 +300,7 @@ export class AudioManager {
           if (this._scriptProcessorNode !== null) {
             this._scriptProcessorNode.disconnect();
           }
-          this._scriptProcessorNode = this._audioContext.createScriptProcessor(this._bufferSize);
+          this._scriptProcessorNode = this._audioContext.createScriptProcessor();
           this._scriptProcessorNode.connect(this._gainNode);
           // connect modules of Web Audio API
           let lastCheck = Date.now();

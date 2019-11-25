@@ -668,7 +668,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
   }
 
   private drawFunc = () => {
-    this.audiochunk.updatePlayPosition();
     this.anim.requestFrame(this.drawPlayCursor);
   }
   /**

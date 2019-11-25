@@ -1,10 +1,12 @@
 import {AudioInfo} from './AudioInfo';
 import {AudioFormat, AudioRessource, AudioSelection, BrowserAudioTime, BrowserSample} from './index';
 import {EventEmitter} from '@angular/core';
-import {Subject} from 'rxjs';
+import {interval, Subject, Subscription} from 'rxjs';
 import {AudioDecoder} from './AudioDecoder';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
 import {PlayBackState, SourceType} from '../index';
+import {BrowserInfo} from '../../../../core/shared';
+import {isNullOrUndefined} from '../../../../core/shared/Functions';
 
 declare var window: any;
 
@@ -72,6 +74,8 @@ export class AudioManager {
   private _startedAt = 0;
   private _audio: HTMLAudioElement;
 
+  private _positionInterval: Subscription;
+
   /**
    * initializes audio manager
    * @param audioinfo important info about the audio file linked to this manager
@@ -110,14 +114,12 @@ export class AudioManager {
   private _playposition: BrowserAudioTime;
   private _playOnHover = false;
   private _stepBackward = false;
-  private _isScriptProcessorCanceled = false;
   private _lastUpdate: number;
 
   // variables needed for initializing audio
   private _source: MediaElementAudioSourceNode = null;
   private readonly _audioContext: AudioContext = null;
   private _gainNode: GainNode = null;
-  private _scriptProcessorNode: ScriptProcessorNode = null;
   // only the Audiomanager may have the channelData array
   private _channelData: {
     sampleRate: number,
@@ -294,27 +296,37 @@ export class AudioManager {
           this._playOnHover = playOnHover;
           this._stepBackward = false;
           this.changeState(PlayBackState.STARTED);
-          this._source.connect(this._audioContext.destination);
-          this._gainNode.gain.value = volume;
-          this._gainNode.connect(this._audioContext.destination);
-          if (this._scriptProcessorNode !== null) {
-            this._scriptProcessorNode.disconnect();
+
+          if (BrowserInfo.browser.indexOf('Firefox') > -1) {
+            if (volume > 1) {
+              console.log(`SET VOLUME!`);
+              this._gainNode.gain.value = volume;
+              this._source.connect(this._gainNode);
+              this._gainNode.connect(this._audioContext.destination);
+            } else {
+              this._audio.volume = volume;
+            }
+          } else {
+            this._gainNode.gain.value = volume;
+            this._source.connect(this._gainNode);
+            this._gainNode.connect(this._audioContext.destination);
           }
-          this._scriptProcessorNode = this._audioContext.createScriptProcessor();
-          this._scriptProcessorNode.connect(this._gainNode);
+
           // connect modules of Web Audio API
           let lastCheck = Date.now();
 
           this._playposition = begintime.clone();
-          // this._bufferedOLA.position = begintime.browserSample.value;
           this._playposition.browserSample.value = begintime.browserSample.value;
 
-          this._scriptProcessorNode.addEventListener('audioprocess', (e) => {
-            if (this.isPlaying) {
-              const currentSamples = Math.round(((Date.now() - this._startedAt) / 1000) * begintime.browserSample.sampleRate * speed);
+          if(!isNullOrUndefined(this._positionInterval)){
+            this._positionInterval.unsubscribe();
+          }
 
-              if (currentSamples < duration.browserSample.value) {
-                this._playposition.browserSample.value = begintime.browserSample.value + currentSamples;
+          this._positionInterval = interval(35).subscribe(() => {
+            if (this.isPlaying) {
+              const currentSamples = Math.round(this._audio.currentTime * begintime.browserSample.sampleRate);
+              if (currentSamples < duration.browserSample.value + begintime.browserSample.value) {
+                this._playposition.browserSample.value = currentSamples;
                 onProcess();
               } else {
                 this._audio.pause();
@@ -348,7 +360,8 @@ export class AudioManager {
     return new Promise<void>((resolve, reject) => {
       if (this.isPlaying) {
         this.changeState(PlayBackState.STOPPED);
-        return this._audio.pause();
+        this._audio.pause();
+        resolve();
       } else {
         console.log(`can't stop because audio manager is not playing`);
         resolve();
@@ -360,7 +373,8 @@ export class AudioManager {
     return new Promise<void>((resolve, reject) => {
       if (this.isPlaying) {
         this.changeState(PlayBackState.PAUSED);
-        return this._audio.pause();
+        this._audio.pause();
+        resolve();
       } else {
         reject('cant pause because not playing');
       }
@@ -373,13 +387,10 @@ export class AudioManager {
   }
 
   private afterAudioEnded = () => {
-    console.log(`AUDIO ENDED!`);
-    if (this._scriptProcessorNode !== null) {
-      this._scriptProcessorNode.disconnect();
-    }
-    this._scriptProcessorNode = null;
+    this._source.disconnect();
     this._gainNode.disconnect();
-    this._isScriptProcessorCanceled = false;
+    this._positionInterval.unsubscribe();
+    this._positionInterval = null;
 
     if (this._state === PlayBackState.PLAYING) {
       // audio ended normally
@@ -394,6 +405,7 @@ export class AudioManager {
     this._gainNode = this._audioContext.createGain();
     this._audio = new Audio(this._ressource.objectURL);
     this._source = this._audioContext.createMediaElementSource(this._audio);
+    this._audio.addEventListener('ended', this.afterAudioEnded);
 
     // get channelData data
     if ((this._channelData === null || this._channelData === undefined) || this._channelData.data.length === 0) {
@@ -690,7 +702,7 @@ export class AudioChunk {
    * calculate current position of the current audio playback.
    * TODO when does this method must be called? Animation of playcursor or at another time else?
    */
-  public updatePlayPosition = () => {
+  private updatePlayPosition = () => {
     if (!(this.selection === null || this.selection === undefined)) {
       const timestamp = new Date().getTime();
 

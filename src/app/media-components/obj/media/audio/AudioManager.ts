@@ -1,7 +1,7 @@
 import {AudioInfo} from './AudioInfo';
 import {AudioFormat, AudioRessource, AudioSelection, BrowserAudioTime, BrowserSample} from './index';
 import {EventEmitter} from '@angular/core';
-import {Subject, Subscription} from 'rxjs';
+import {Subject} from 'rxjs';
 import {AudioDecoder} from './AudioDecoder';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
 import {PlayBackState, SourceType} from '../index';
@@ -11,10 +11,6 @@ declare var window: any;
 export class AudioManager {
   get lastUpdate(): number {
     return this._lastUpdate;
-  }
-
-  get bufferedOLA(): any {
-    return this._bufferedOLA;
   }
 
   get mainchunk(): AudioChunk {
@@ -69,10 +65,9 @@ export class AudioManager {
     return this._channelData;
   }
 
-  /*
   get source(): AudioBufferSourceNode {
     return this._source;
-  }*/
+  }
 
   get audioContext(): AudioContext {
     return this._audioContext;
@@ -98,6 +93,8 @@ export class AudioManager {
     return (this._state === PlayBackState.PLAYING);
   }
 
+  private _startedAt = 0;
+
   /**
    * initializes audio manager
    * @param audioinfo important info about the audio file linked to this manager
@@ -105,8 +102,6 @@ export class AudioManager {
   constructor(audioinfo: AudioInfo, browserSampleRate: number) {
     this._id = ++AudioManager.counter;
     this._originalInfo = audioinfo;
-    this._bufferedOLA = new BufferedOLA(this._bufferSize);
-    this._bufferedOLA.set_window_type('Triangular');
 
     if (!(audioinfo === null || audioinfo === undefined)) {
       // Fix up for prefixing
@@ -138,9 +133,7 @@ export class AudioManager {
   private _playposition: BrowserAudioTime;
   private _playOnHover = false;
   private _stepBackward = false;
-  private stateRequest: PlayBackState = null;
   private _isScriptProcessorCanceled = false;
-  private readonly _bufferedOLA: any;
   private _lastUpdate: number;
 
   // timestamp when playing should teminate
@@ -150,7 +143,7 @@ export class AudioManager {
   };
 
   // variables needed for initializing audio
-  // private _source: AudioBufferSourceNode = null;
+  private _source: AudioBufferSourceNode = null;
   private readonly _audioContext: AudioContext = null;
   private _gainNode: GainNode = null;
   private _scriptProcessorNode: ScriptProcessorNode = null;
@@ -224,8 +217,6 @@ export class AudioManager {
             // audioinfo.file = new File([buffer], filename, {type: 'audio/wav'});
             result.setRessource(new AudioRessource(filename, SourceType.ArrayBuffer,
               audioinfo, bufferCopy, audioBuffer, bufferLength));
-
-            result.bufferedOLA.set_audio_buffer(audioBuffer);
 
             // set duration is very important
             console.log(`sampleRate browser: ${result.browserSampleRate}`);
@@ -333,11 +324,17 @@ export class AudioManager {
       if (!this.isPlaying) {
         this.audioContext.resume().then(() => {
           this._playOnHover = playOnHover;
-          this.changeState(PlayBackState.STARTED);
           this._stepBackward = false;
+          this.changeState(PlayBackState.STARTED);
+          this._source = this._audioContext.createBufferSource();
+          this._source.buffer = this._ressource.audiobuffer;
+          this._source.connect(this._audioContext.destination);
           this._gainNode.gain.value = volume;
           this._gainNode.connect(this._audioContext.destination);
-          this._scriptProcessorNode = this._audioContext.createScriptProcessor(this._bufferSize, 2, 2);
+          if (this._scriptProcessorNode !== null) {
+            this._scriptProcessorNode.disconnect();
+          }
+          this._scriptProcessorNode = this._audioContext.createScriptProcessor(this._bufferSize);
           this._scriptProcessorNode.connect(this._gainNode);
           // connect modules of Web Audio API
           let lastCheck = Date.now();
@@ -346,42 +343,24 @@ export class AudioManager {
           this._playbackInfo.endAt = this._playbackInfo.started + (duration.browserSample.unix / speed);
 
           this._playposition = begintime.clone();
-          this._bufferedOLA.position = begintime.browserSample.value;
+          // this._bufferedOLA.position = begintime.browserSample.value;
           this._playposition.browserSample.value = begintime.browserSample.value;
 
           this._scriptProcessorNode.addEventListener('audioprocess', (e) => {
-            if (this.stateRequest === PlayBackState.PLAYING) {
-              // start playback
-              this.stateRequest = null;
-              this.changeState(PlayBackState.PLAYING);
-              lastCheck = Date.now();
+            if (this.isPlaying) {
+              const currentSamples = Math.round(((Date.now() - this._startedAt) / 1000) * begintime.browserSample.sampleRate * speed);
+              this._playposition.browserSample.value = begintime.browserSample.value + currentSamples;
+              onProcess();
             }
-            if (!this._isScriptProcessorCanceled) {
-              if (this.stateRequest === PlayBackState.STOPPED || this.stateRequest === PlayBackState.PAUSED) {
-                // audio ended
-                resolve();
-                this.afterAudioEnded();
-              } else {
-                this._isScriptProcessorCanceled = false;
-                if (this.isPlaying) {
-                  this._playposition.browserSample.value = this._bufferedOLA.position;
-                  onProcess();
-                  const endTime = this.createBrowserAudioTime(begintime.browserSample.value + duration.browserSample.value);
-                  if (this._playposition.browserSample.unix <= endTime.browserSample.unix) {
-                    this._bufferedOLA.alpha = 1 / speed;
-                    this._bufferedOLA.process(e.inputBuffer, e.outputBuffer);
-                  } else {
-                    resolve();
-                    this.afterAudioEnded();
-                  }
-                }
-              }
-              lastCheck = Date.now();
-              this._lastUpdate = lastCheck;
-            }
+            this._lastUpdate = lastCheck;
           });
 
-          this.stateRequest = PlayBackState.PLAYING;
+          this._source.playbackRate.value = speed;
+          this._source.onended = this.afterAudioEnded;
+
+          this._source.start(0, begintime.browserSample.seconds, duration.browserSample.seconds);
+          this._startedAt = Date.now();
+          this.changeState(PlayBackState.PLAYING);
         }).catch((error) => {
           this.statechange.error(new Error(error));
           reject(error);
@@ -396,16 +375,9 @@ export class AudioManager {
   public stopPlayback(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.isPlaying) {
-        this.stateRequest = PlayBackState.STOPPED;
-        const subscr: Subscription = this.statechange.subscribe((state) => {
-          if (state === PlayBackState.STOPPED) {
-            subscr.unsubscribe();
-            resolve();
-          }
-        }, (error) => {
-          reject(error);
-        });
-
+        this.changeState(PlayBackState.STOPPED);
+        this._source.stop();
+        resolve();
       } else {
         console.log(`can't stop because audio manager is not playing`);
         resolve();
@@ -416,15 +388,10 @@ export class AudioManager {
   public pausePlayback(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.isPlaying) {
-        this.stateRequest = PlayBackState.PAUSED;
-        const subscr: Subscription = this.statechange.subscribe((state) => {
-          if (state === PlayBackState.PAUSED) {
-            subscr.unsubscribe();
-            resolve();
-          }
-        }, (error) => {
-          reject(error);
-        });
+        this.changeState(PlayBackState.PAUSED);
+        this._source.stop();
+        this.afterAudioEnded();
+        resolve();
       } else {
         reject('cant pause because not playing');
       }
@@ -437,17 +404,17 @@ export class AudioManager {
   }
 
   private afterAudioEnded = () => {
-    this._scriptProcessorNode.disconnect();
+    if (this._scriptProcessorNode !== null) {
+      this._scriptProcessorNode.disconnect();
+    }
+    this._scriptProcessorNode = null;
     this._gainNode.disconnect();
     this._isScriptProcessorCanceled = false;
 
-    if (this._state === PlayBackState.PLAYING && this.stateRequest === null) {
+    if (this._state === PlayBackState.PLAYING) {
       // audio ended normally
       this.playposition.browserSample.value = 0;
       this.changeState(PlayBackState.ENDED);
-    } else if (this.stateRequest !== null) {
-      this.changeState(this.stateRequest);
-      this.stateRequest = null;
     }
   }
 

@@ -299,14 +299,35 @@ export class AudioManager {
 
           if (BrowserInfo.browser.indexOf('Firefox') > -1) {
             if (volume > 1) {
-              console.log(`SET VOLUME!`);
+              if (isNullOrUndefined(this._gainNode)) {
+                this._gainNode = this._audioContext.createGain();
+              }
+              if (isNullOrUndefined(this._source)) {
+                this._source = this._audioContext.createMediaElementSource(this._audio);
+              }
               this._gainNode.gain.value = volume;
               this._source.connect(this._gainNode);
               this._gainNode.connect(this._audioContext.destination);
             } else {
+              console.log(`VOLUME via Audio`);
+
+              if (!isNullOrUndefined(this._gainNode)) {
+                this._gainNode.disconnect();
+                this._gainNode = null;
+              }
+              if (!isNullOrUndefined(this._source)) {
+                this._source.disconnect();
+                this._source = null;
+              }
               this._audio.volume = volume;
             }
           } else {
+            if (isNullOrUndefined(this._gainNode)) {
+              this._gainNode = this._audioContext.createGain();
+            }
+            if (isNullOrUndefined(this._source)) {
+              this._source = this._audioContext.createMediaElementSource(this._audio);
+            }
             this._gainNode.gain.value = volume;
             this._source.connect(this._gainNode);
             this._gainNode.connect(this._audioContext.destination);
@@ -318,7 +339,7 @@ export class AudioManager {
           this._playposition = begintime.clone();
           this._playposition.browserSample.value = begintime.browserSample.value;
 
-          if(!isNullOrUndefined(this._positionInterval)){
+          if (!isNullOrUndefined(this._positionInterval)) {
             this._positionInterval.unsubscribe();
           }
 
@@ -402,9 +423,7 @@ export class AudioManager {
    * prepares the audio manager for play back
    */
   private prepareAudioPlayBack(audiobuffer: AudioBuffer) {
-    this._gainNode = this._audioContext.createGain();
     this._audio = new Audio(this._ressource.objectURL);
-    this._source = this._audioContext.createMediaElementSource(this._audio);
     this._audio.addEventListener('ended', this.afterAudioEnded);
 
     // get channelData data
@@ -611,7 +630,9 @@ export class AudioChunk {
 
   set volume(value: number) {
     this._volume = value;
-    this._audioManger.gainNode.gain.value = value;
+    if (!isNullOrUndefined(this._audioManger.gainNode)) {
+      this._audioManger.gainNode.gain.value = value;
+    }
   }
 
   get speed(): number {

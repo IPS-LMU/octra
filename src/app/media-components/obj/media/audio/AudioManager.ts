@@ -12,6 +12,7 @@ export class AudioManager {
   get mainchunk(): AudioChunk {
     return this._mainchunk;
   }
+
   get playposition(): BrowserAudioTime {
     return this._playposition;
   }
@@ -48,7 +49,7 @@ export class AudioManager {
     return this._channelData;
   }
 
-  get source(): AudioBufferSourceNode {
+  get source(): MediaElementAudioSourceNode {
     return this._source;
   }
 
@@ -69,6 +70,8 @@ export class AudioManager {
   }
 
   private _startedAt = 0;
+  private _audio: HTMLAudioElement;
+  private _audioURL: string;
 
   /**
    * initializes audio manager
@@ -112,7 +115,7 @@ export class AudioManager {
   private _lastUpdate: number;
 
   // variables needed for initializing audio
-  private _source: AudioBufferSourceNode = null;
+  private _source: MediaElementAudioSourceNode = null;
   private readonly _audioContext: AudioContext = null;
   private _gainNode: GainNode = null;
   private _scriptProcessorNode: ScriptProcessorNode = null;
@@ -201,8 +204,8 @@ export class AudioManager {
 
             result._mainchunk = new AudioChunk(selection, result);
 
-            result.afterdecoded.emit(result.ressource);
             result.prepareAudioPlayBack();
+            result.afterdecoded.emit(result.ressource);
 
             subj.next({
               audioManager: result,
@@ -292,8 +295,6 @@ export class AudioManager {
           this._playOnHover = playOnHover;
           this._stepBackward = false;
           this.changeState(PlayBackState.STARTED);
-          this._source = this._audioContext.createBufferSource();
-          this._source.buffer = this._ressource.audiobuffer;
           this._source.connect(this._audioContext.destination);
           this._gainNode.gain.value = volume;
           this._gainNode.connect(this._audioContext.destination);
@@ -312,16 +313,24 @@ export class AudioManager {
           this._scriptProcessorNode.addEventListener('audioprocess', (e) => {
             if (this.isPlaying) {
               const currentSamples = Math.round(((Date.now() - this._startedAt) / 1000) * begintime.browserSample.sampleRate * speed);
-              this._playposition.browserSample.value = begintime.browserSample.value + currentSamples;
-              onProcess();
+
+              if (currentSamples < duration.browserSample.value) {
+                this._playposition.browserSample.value = begintime.browserSample.value + currentSamples;
+                onProcess();
+              } else {
+                this._audio.pause();
+                this.afterAudioEnded();
+              }
             }
             this._lastUpdate = lastCheck;
           });
 
-          this._source.playbackRate.value = speed;
-          this._source.onended = this.afterAudioEnded;
+          this._source.addEventListener('ended', this.afterAudioEnded);
 
-          this._source.start(0, begintime.browserSample.seconds, duration.browserSample.seconds);
+          this._audio.currentTime = begintime.browserSample.seconds;
+          this._audio.playbackRate = speed;
+          this._audio.play();
+          //this._source.(0, begintime.browserSample.seconds, duration.browserSample.seconds);
           this._startedAt = Date.now();
           this.changeState(PlayBackState.PLAYING);
         }).catch((error) => {
@@ -339,7 +348,7 @@ export class AudioManager {
     return new Promise<void>((resolve, reject) => {
       if (this.isPlaying) {
         this.changeState(PlayBackState.STOPPED);
-        this._source.stop();
+        this._audio.pause();
         resolve();
       } else {
         console.log(`can't stop because audio manager is not playing`);
@@ -352,7 +361,7 @@ export class AudioManager {
     return new Promise<void>((resolve, reject) => {
       if (this.isPlaying) {
         this.changeState(PlayBackState.PAUSED);
-        this._source.stop();
+        this._audio.pause();
         this.afterAudioEnded();
         resolve();
       } else {
@@ -367,6 +376,7 @@ export class AudioManager {
   }
 
   private afterAudioEnded = () => {
+    console.log(`AUDIO ENDED!`);
     if (this._scriptProcessorNode !== null) {
       this._scriptProcessorNode.disconnect();
     }
@@ -376,7 +386,6 @@ export class AudioManager {
 
     if (this._state === PlayBackState.PLAYING) {
       // audio ended normally
-      this.playposition.browserSample.value = 0;
       this.changeState(PlayBackState.ENDED);
     }
   }
@@ -384,8 +393,14 @@ export class AudioManager {
   /**
    * prepares the audio manager for play back
    */
-  public prepareAudioPlayBack() {
+  private prepareAudioPlayBack() {
     this._gainNode = this._audioContext.createGain();
+    this._audioURL = URL.createObjectURL(new File([this._ressource.arraybuffer], this._ressource.info.fullname, {
+      type: 'audio/wav'
+    }));
+    console.log(this._audioURL);
+    this._audio = new Audio(this._audioURL);
+    this._source = this._audioContext.createMediaElementSource(this._audio);
 
     // get channelData data
     if ((this._channelData === null || this._channelData === undefined) || this._channelData.data.length === 0) {
@@ -395,7 +410,7 @@ export class AudioManager {
         sampleRate: this._ressource.audiobuffer.sampleRate
       };
 
-      console.log(`channel hast length of ${this._channelData.data.byteLength} bytes and ${this._channelData.data.length} values`);
+      console.log(`channel has length of ${this._channelData.data.byteLength} bytes and ${this._channelData.data.length} values`);
       console.log(this.ressource.audiobuffer.length);
       this.minimizeChannelArray();
     }
@@ -493,6 +508,7 @@ export class AudioManager {
   public destroy(disconnect: boolean = true) {
     if (!(this._audioContext === null || this._audioContext === undefined)) {
       if (disconnect) {
+        URL.revokeObjectURL(this._audioURL);
         this._audioContext.close()
           .then(() => {
             console.log('AudioManager successfully destroyed its AudioContext');

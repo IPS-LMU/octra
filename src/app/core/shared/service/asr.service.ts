@@ -36,6 +36,7 @@ export class AsrService {
     }
   }
 
+  public static authURL = '';
   private _selectedLanguage: ASRLanguage = null;
   private _queue: ASRQueue;
 
@@ -483,6 +484,12 @@ export class ASRQueueItem {
           }
         },
         (error) => {
+          console.log(error.message);
+          if (error.message.indexOf('0 Unknown Error') > -1) {
+            // do redirect
+            AsrService.authURL = asrUrl;
+            this.changeStatus(ASRProcessStatus.NOAUTH);
+          }
           reject(error.message);
         });
     });
@@ -532,8 +539,10 @@ export class ASRQueueItem {
             }).catch((error) => {
               subj.error(error);
               this._result = error;
-              if (error.indexOf("quota") > -1){
+              if (error.indexOf('quota') > -1) {
                 this.changeStatus(ASRProcessStatus.NOQUOTA);
+              } else if (error.indexOf('0 Unknown Error')) {
+                this.changeStatus(ASRProcessStatus.NOAUTH);
               } else {
                 this.changeStatus(ASRProcessStatus.FAILED);
               }
@@ -560,6 +569,7 @@ export enum ASRProcessStatus {
   STARTED = 'STARTED',
   STOPPED = 'STOPPED',
   NOQUOTA = 'NOQUOTA',
+  NOAUTH = 'NOAUTH',
   FAILED = 'FAILED',
   FINISHED = 'FINISHED'
 }

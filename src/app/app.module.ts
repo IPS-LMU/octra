@@ -127,6 +127,7 @@ import {TRANSLOCO_CONFIG, TranslocoConfig, TranslocoModule} from '@ngneat/transl
 import {DragulaModule} from 'ng2-dragula';
 import {TableConfiguratorComponent} from './core/component/table-configurator/table-configurator.component';
 import {ClipTextPipe} from './core/shared/clip-text.pipe';
+import {AuthenticationModalComponent} from './core/modals/authentication-modal/authentication-modal.component';
 
 library.add(
   faSpinner,
@@ -231,7 +232,8 @@ export const EDITORS: any[] = [
     TranscriptionDemoEndModalComponent,
     AsrOptionsComponent,
     TableConfiguratorComponent,
-    ClipTextPipe
+    ClipTextPipe,
+    AuthenticationModalComponent
   ],
   entryComponents: EDITORS,
   imports: [

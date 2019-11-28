@@ -35,6 +35,7 @@ import {Functions, isNullOrUndefined} from '../../core/shared/Functions';
 import {OCTRAEditor} from '../octra-editor';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../core/shared/service/asr.service';
 import {TranslocoService} from '@ngneat/transloco';
+import {AuthenticationModalComponent} from '../../core/modals/authentication-modal/authentication-modal.component';
 
 @Component({
   selector: 'app-overlay-gui',
@@ -51,6 +52,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   @ViewChild('window', {static: false}) window: TranscrWindowComponent;
   @ViewChild('loupe', {static: false}) loupe: CircleLoupeComponent;
   @ViewChild('audionav', {static: true}) audionav: AudioNavigationComponent;
+  @ViewChild('authModal', {static: true}) authModal: AuthenticationModalComponent;
 
   @Output() public openModal = new EventEmitter();
   public showWindow = false;
@@ -232,7 +234,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     ));
 
     this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
-        if (item.status !== ASRProcessStatus.STARTED && item.status !== ASRProcessStatus.IDLE) {
+        if (item.status !== ASRProcessStatus.STARTED && item.status !== ASRProcessStatus.IDLE && item.status !== ASRProcessStatus.NOAUTH) {
           const segmentBoundary = new BrowserSample(item.time.browserSampleEnd, this.audiomanager.browserSampleRate);
           const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
             segmentBoundary, true
@@ -258,6 +260,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           } else {
             console.error(new Error(`couldn't find segment number`));
           }
+        } else if(item.status === ASRProcessStatus.NOAUTH) {
+            this.authModal.open();
         }
       },
       (error) => {

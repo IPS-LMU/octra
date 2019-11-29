@@ -296,16 +296,17 @@ export class AudioManager {
           this._playOnHover = playOnHover;
           this._stepBackward = false;
           this.changeState(PlayBackState.STARTED);
+          this._audioContext.destination.disconnect();
 
           if (BrowserInfo.browser.indexOf('Firefox') > -1) {
             if (volume > 1) {
               if (isNullOrUndefined(this._gainNode)) {
                 this._gainNode = this._audioContext.createGain();
+                this._gainNode.gain.value = volume;
               }
               if (isNullOrUndefined(this._source)) {
                 this._source = this._audioContext.createMediaElementSource(this._audio);
               }
-              this._gainNode.gain.value = volume;
               this._source.connect(this._gainNode);
               this._gainNode.connect(this._audioContext.destination);
             } else {

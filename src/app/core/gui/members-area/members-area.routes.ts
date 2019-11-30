@@ -9,6 +9,7 @@ import {LoadingComponent} from '../loading';
 import {TranscActivateGuard} from '../../shared/guard/transcr.activateguard';
 import {AgreementComponent} from '../agreement/agreement.component';
 import {HelpComponent} from '../help';
+import {AuthComponent} from '../auth/auth.component';
 
 export const MEMBER_ROUTES: Routes = [
   {path: 'load', component: LoadingComponent},
@@ -25,6 +26,7 @@ export const MEMBER_ROUTES: Routes = [
     canActivate: [TranscrEndGuard]
   },
   {path: 'transcr/reload-file', component: ReloadFileComponent, canActivate: [ReloadFileGuard]},
+  {path: 'auth', component: AuthComponent},
   {path: '', redirectTo: 'load', pathMatch: 'full'},
   {path: '**', redirectTo: '/404', pathMatch: 'full'}
 ];

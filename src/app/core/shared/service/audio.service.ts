@@ -83,6 +83,7 @@ export class AudioService {
   }
 
   public registerAudioManager(manager: AudioManager) {
+    console.log(`register new audio manager`);
     const found = this._audiomanagers.find((a: AudioManager) => {
       return a.ressource.name === manager.ressource.name;
     });
@@ -93,6 +94,7 @@ export class AudioService {
   }
 
   public destroy(disconnect: boolean = true) {
+    console.log(`destroy all!`);
     for (let i = 0; i < this._audiomanagers.length; i++) {
       this._audiomanagers[i].destroy(disconnect);
     }

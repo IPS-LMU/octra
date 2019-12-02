@@ -42,9 +42,6 @@
               "node_modules/ajv/dist/ajv.min.js",
               "node_modules/jquery.caret/dist/jquery.caret.min.js",
               "node_modules/moment/min/moment.min.js",
-              "src/assets/js/cbuffer.js",
-              "src/assets/js/OLA.js",
-              "src/assets/js/buffered-ola.js",
               "node_modules/jszip/dist/jszip.min.js"
             ],
             "es5BrowserSupport": true

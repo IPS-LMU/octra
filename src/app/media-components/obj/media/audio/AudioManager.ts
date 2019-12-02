@@ -1,28 +1,18 @@
 import {AudioInfo} from './AudioInfo';
 import {AudioFormat, AudioRessource, AudioSelection, BrowserAudioTime, BrowserSample} from './index';
 import {EventEmitter} from '@angular/core';
-import {Subject, Subscription} from 'rxjs';
+import {interval, Subject, Subscription} from 'rxjs';
 import {AudioDecoder} from './AudioDecoder';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
 import {PlayBackState, SourceType} from '../index';
+import {BrowserInfo} from '../../../../core/shared';
+import {isNullOrUndefined} from '../../../../core/shared/Functions';
 
 declare var window: any;
 
 export class AudioManager {
-  get lastUpdate(): number {
-    return this._lastUpdate;
-  }
-
-  get bufferedOLA(): any {
-    return this._bufferedOLA;
-  }
-
   get mainchunk(): AudioChunk {
     return this._mainchunk;
-  }
-
-  get isScriptProcessorCanceled(): boolean {
-    return this._isScriptProcessorCanceled;
   }
 
   get playposition(): BrowserAudioTime {
@@ -42,19 +32,11 @@ export class AudioManager {
   }
 
   public get browserSampleRate(): number {
-    return this._ressource.audiobuffer.sampleRate;
+    return this._ressource.info.duration.browserSample.sampleRate;
   }
 
   public get originalSampleRate(): number {
     return this._originalInfo.samplerate;
-  }
-
-  set playbackInfo(value: { endAt: number; started: number }) {
-    this._playbackInfo = value;
-  }
-
-  get playbackInfo(): { endAt: number; started: number } {
-    return this._playbackInfo;
   }
 
   get playOnHover(): boolean {
@@ -69,10 +51,9 @@ export class AudioManager {
     return this._channelData;
   }
 
-  /*
-  get source(): AudioBufferSourceNode {
+  get source(): MediaElementAudioSourceNode {
     return this._source;
-  }*/
+  }
 
   get audioContext(): AudioContext {
     return this._audioContext;
@@ -80,14 +61,6 @@ export class AudioManager {
 
   get gainNode(): any {
     return this._gainNode;
-  }
-
-  get bufferSize(): number {
-    return this._bufferSize;
-  }
-
-  get frameSize(): number {
-    return this._frameSize;
   }
 
   get ressource(): AudioRessource {
@@ -98,6 +71,11 @@ export class AudioManager {
     return (this._state === PlayBackState.PLAYING);
   }
 
+  private _startedAt = 0;
+  private _audio: HTMLAudioElement;
+
+  private _positionInterval: Subscription;
+
   /**
    * initializes audio manager
    * @param audioinfo important info about the audio file linked to this manager
@@ -105,25 +83,29 @@ export class AudioManager {
   constructor(audioinfo: AudioInfo, browserSampleRate: number) {
     this._id = ++AudioManager.counter;
     this._originalInfo = audioinfo;
-    this._bufferedOLA = new BufferedOLA(this._bufferSize);
-    this._bufferedOLA.set_window_type('Triangular');
 
     if (!(audioinfo === null || audioinfo === undefined)) {
       // Fix up for prefixing
-      const audioContext = window.AudioContext // Default
-        || window.webkitAudioContext // Safari and old versions of Chrome
-        || window.mozAudioContext
-        || false;
-      if (audioContext) {
-        if ((this._audioContext === null || this._audioContext === undefined)) {
-          // reuse old audiocontext
-          this._audioContext = new audioContext();
-        }
+      this.initAudioContext();
 
+      if (this._audioContext) {
         this._playposition = new BrowserAudioTime(new BrowserSample(0, browserSampleRate), audioinfo.samplerate);
         this._state = PlayBackState.PREPARE;
       } else {
         console.error('AudioContext not supported by this browser');
+      }
+    }
+  }
+
+  private initAudioContext() {
+    const audioContext = window.AudioContext // Default
+      || window.webkitAudioContext // Safari and old versions of Chrome
+      || window.mozAudioContext
+      || false;
+    if (audioContext) {
+      if ((this._audioContext === null || this._audioContext === undefined)) {
+        // reuse old audiocontext
+        this._audioContext = new audioContext();
       }
     }
   }
@@ -138,22 +120,12 @@ export class AudioManager {
   private _playposition: BrowserAudioTime;
   private _playOnHover = false;
   private _stepBackward = false;
-  private stateRequest: PlayBackState = null;
-  private _isScriptProcessorCanceled = false;
-  private readonly _bufferedOLA: any;
   private _lastUpdate: number;
 
-  // timestamp when playing should teminate
-  private _playbackInfo = {
-    started: 0,
-    endAt: 0
-  };
-
   // variables needed for initializing audio
-  // private _source: AudioBufferSourceNode = null;
-  private readonly _audioContext: AudioContext = null;
+  private _source: MediaElementAudioSourceNode = null;
+  private _audioContext: AudioContext = null;
   private _gainNode: GainNode = null;
-  private _scriptProcessorNode: ScriptProcessorNode = null;
   // only the Audiomanager may have the channelData array
   private _channelData: {
     sampleRate: number,
@@ -161,10 +133,8 @@ export class AudioManager {
     data: Float32Array
   };
 
-  private _frameSize = 2048;
-  private _bufferSize = 2048;
-
   private chunks: AudioChunk[] = [];
+  private lastPlaybackViaVolume = false;
 
   // events
   public afterdecoded: EventEmitter<AudioRessource> = new EventEmitter<AudioRessource>();
@@ -223,9 +193,7 @@ export class AudioManager {
 
             // audioinfo.file = new File([buffer], filename, {type: 'audio/wav'});
             result.setRessource(new AudioRessource(filename, SourceType.ArrayBuffer,
-              audioinfo, bufferCopy, audioBuffer, bufferLength));
-
-            result.bufferedOLA.set_audio_buffer(audioBuffer);
+              audioinfo, bufferCopy, bufferLength));
 
             // set duration is very important
             console.log(`sampleRate browser: ${result.browserSampleRate}`);
@@ -244,8 +212,8 @@ export class AudioManager {
 
             result._mainchunk = new AudioChunk(selection, result);
 
+            result.prepareAudioPlayBack(audioBuffer);
             result.afterdecoded.emit(result.ressource);
-            result.prepareAudioPlayBack();
 
             subj.next({
               audioManager: result,
@@ -333,55 +301,45 @@ export class AudioManager {
       if (!this.isPlaying) {
         this.audioContext.resume().then(() => {
           this._playOnHover = playOnHover;
-          this.changeState(PlayBackState.STARTED);
           this._stepBackward = false;
-          this._gainNode.gain.value = volume;
-          this._gainNode.connect(this._audioContext.destination);
-          this._scriptProcessorNode = this._audioContext.createScriptProcessor(this._bufferSize, 2, 2);
-          this._scriptProcessorNode.connect(this._gainNode);
-          // connect modules of Web Audio API
-          let lastCheck = Date.now();
+          this.changeState(PlayBackState.STARTED);
 
-          this._playbackInfo.started = new Date().getTime();
-          this._playbackInfo.endAt = this._playbackInfo.started + (duration.browserSample.unix / speed);
+          this.checkBrowserCompatibility(volume, speed).then(() => {
+            // connect modules of Web Audio API
+            let lastCheck = Date.now();
 
-          this._playposition = begintime.clone();
-          this._bufferedOLA.position = begintime.browserSample.value;
-          this._playposition.browserSample.value = begintime.browserSample.value;
+            this._playposition = begintime.clone();
+            this._playposition.browserSample.value = begintime.browserSample.value;
 
-          this._scriptProcessorNode.addEventListener('audioprocess', (e) => {
-            if (this.stateRequest === PlayBackState.PLAYING) {
-              // start playback
-              this.stateRequest = null;
-              this.changeState(PlayBackState.PLAYING);
-              lastCheck = Date.now();
+            if (!isNullOrUndefined(this._positionInterval)) {
+              this._positionInterval.unsubscribe();
             }
-            if (!this._isScriptProcessorCanceled) {
-              if (this.stateRequest === PlayBackState.STOPPED || this.stateRequest === PlayBackState.PAUSED) {
-                // audio ended
-                resolve();
-                this.afterAudioEnded();
-              } else {
-                this._isScriptProcessorCanceled = false;
-                if (this.isPlaying) {
-                  this._playposition.browserSample.value = this._bufferedOLA.position;
+
+            this._positionInterval = interval(35).subscribe(() => {
+              if (this.isPlaying) {
+                const currentSamples = Math.round(this._audio.currentTime * begintime.browserSample.sampleRate);
+                if (currentSamples < duration.browserSample.value + begintime.browserSample.value) {
+                  this._playposition.browserSample.value = currentSamples;
                   onProcess();
-                  const endTime = this.createBrowserAudioTime(begintime.browserSample.value + duration.browserSample.value);
-                  if (this._playposition.browserSample.unix <= endTime.browserSample.unix) {
-                    this._bufferedOLA.alpha = 1 / speed;
-                    this._bufferedOLA.process(e.inputBuffer, e.outputBuffer);
-                  } else {
-                    resolve();
-                    this.afterAudioEnded();
-                  }
+                } else {
+                  this._audio.pause();
+                  this.afterAudioEnded();
                 }
               }
-              lastCheck = Date.now();
               this._lastUpdate = lastCheck;
-            }
-          });
+            });
 
-          this.stateRequest = PlayBackState.PLAYING;
+            this._audio.playbackRate = speed;
+            this._audio.currentTime = begintime.browserSample.seconds;
+
+            this._audio.play().then(() => {
+              this._startedAt = Date.now();
+              this.changeState(PlayBackState.PLAYING);
+            }).catch((error) => {
+              this.statechange.error(new Error(error));
+              reject(error);
+            });
+          });
         }).catch((error) => {
           this.statechange.error(new Error(error));
           reject(error);
@@ -393,19 +351,62 @@ export class AudioManager {
     });
   }
 
+  private checkBrowserCompatibility(volume: number, speed: number) {
+    return new Promise<void>((resolve, reject) => {
+      if (BrowserInfo.browser.indexOf('Firefox') > -1) {
+        this.disconnectSource();
+        this.disconnectGain();
+        if (volume > 1) {
+          if (isNullOrUndefined(this._gainNode)) {
+            this._gainNode = this._audioContext.createGain();
+            this._gainNode.gain.value = volume;
+          }
+          if (isNullOrUndefined(this._source)) {
+            this._source = this._audioContext.createMediaElementSource(this._audio);
+          }
+          this._source.connect(this._gainNode);
+          this._gainNode.connect(this._audioContext.destination);
+          this.lastPlaybackViaVolume = false;
+          resolve();
+        } else {
+          if (!this.lastPlaybackViaVolume) {
+            this._audio = new Audio(this._ressource.objectURL);
+            this._audio.addEventListener('ended', this.afterAudioEnded);
+
+            const check = () => {
+              this._audio.removeEventListener('canplay', check);
+              this.lastPlaybackViaVolume = true;
+              resolve();
+            };
+            this._audio.addEventListener('canplay', check);
+          } else {
+            resolve();
+          }
+          this._audio.playbackRate = speed;
+          this._audio.volume = volume;
+        }
+      } else {
+        if (isNullOrUndefined(this._gainNode)) {
+          this._gainNode = this._audioContext.createGain();
+        }
+        if (isNullOrUndefined(this._source)) {
+          this.audioContext.destination.disconnect();
+          this._source = this._audioContext.createMediaElementSource(this._audio);
+        }
+        this._gainNode.gain.value = volume;
+        this._source.connect(this._gainNode);
+        this._gainNode.connect(this._audioContext.destination);
+        resolve();
+      }
+    });
+  }
+
   public stopPlayback(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.isPlaying) {
-        this.stateRequest = PlayBackState.STOPPED;
-        const subscr: Subscription = this.statechange.subscribe((state) => {
-          if (state === PlayBackState.STOPPED) {
-            subscr.unsubscribe();
-            resolve();
-          }
-        }, (error) => {
-          reject(error);
-        });
-
+        this.changeState(PlayBackState.STOPPED);
+        this._audio.pause();
+        resolve();
       } else {
         console.log(`can't stop because audio manager is not playing`);
         resolve();
@@ -416,15 +417,9 @@ export class AudioManager {
   public pausePlayback(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.isPlaying) {
-        this.stateRequest = PlayBackState.PAUSED;
-        const subscr: Subscription = this.statechange.subscribe((state) => {
-          if (state === PlayBackState.PAUSED) {
-            subscr.unsubscribe();
-            resolve();
-          }
-        }, (error) => {
-          reject(error);
-        });
+        this.changeState(PlayBackState.PAUSED);
+        this._audio.pause();
+        resolve();
       } else {
         reject('cant pause because not playing');
       }
@@ -437,41 +432,58 @@ export class AudioManager {
   }
 
   private afterAudioEnded = () => {
-    this._scriptProcessorNode.disconnect();
-    this._gainNode.disconnect();
-    this._isScriptProcessorCanceled = false;
+    this._positionInterval.unsubscribe();
+    this._positionInterval = null;
 
-    if (this._state === PlayBackState.PLAYING && this.stateRequest === null) {
+    if (this._state === PlayBackState.PLAYING) {
       // audio ended normally
-      this.playposition.browserSample.value = 0;
       this.changeState(PlayBackState.ENDED);
-    } else if (this.stateRequest !== null) {
-      this.changeState(this.stateRequest);
-      this.stateRequest = null;
+    }
+  }
+
+  private disconnectSource() {
+    if (!isNullOrUndefined(this._source)) {
+      this._source.disconnect();
+      this._source = null;
+    }
+  }
+
+  private disconnectGain() {
+    if (!isNullOrUndefined(this._gainNode)) {
+      this._gainNode.disconnect();
+      this._gainNode = null;
     }
   }
 
   /**
    * prepares the audio manager for play back
    */
-  public prepareAudioPlayBack() {
-    this._gainNode = this._audioContext.createGain();
+  private prepareAudioPlayBack(audiobuffer: AudioBuffer) {
+    this._audio = new Audio(this._ressource.objectURL);
+    this._audio.addEventListener('ended', this.afterAudioEnded);
 
     // get channelData data
     if ((this._channelData === null || this._channelData === undefined) || this._channelData.data.length === 0) {
       this._channelData = {
-        data: this._ressource.audiobuffer.getChannelData(0),
+        data: audiobuffer.getChannelData(0),
         factor: 1,
-        sampleRate: this._ressource.audiobuffer.sampleRate
+        sampleRate: audiobuffer.sampleRate
       };
 
-      console.log(`channel hast length of ${this._channelData.data.byteLength} bytes and ${this._channelData.data.length} values`);
-      console.log(this.ressource.audiobuffer.length);
+      console.log(`channel has length of ${this._channelData.data.byteLength} bytes and ${this._channelData.data.length} values`);
+      console.log(audiobuffer.length);
       this.minimizeChannelArray();
     }
 
     this._state = PlayBackState.INITIALIZED;
-    this.afterloaded.emit({status: 'success', error: ''});
+
+    const check = () => {
+      console.log(`FINISHED LOADING!`);
+      this.afterloaded.emit({status: 'success', error: ''});
+      this._audio.removeEventListener('canplay', check);
+    };
+
+    this._audio.addEventListener('canplay', check)
   }
 
   public minimizeChannelArray() {
@@ -561,6 +573,7 @@ export class AudioManager {
   }
 
   public destroy(disconnect: boolean = true) {
+    console.log(`destroy audio manager!`);
     if (!(this._audioContext === null || this._audioContext === undefined)) {
       if (disconnect) {
         this._audioContext.close()
@@ -574,6 +587,8 @@ export class AudioManager {
           );
       }
     }
+    console.log(`revoke URL!`);
+    URL.revokeObjectURL(this._ressource.objectURL);
   }
 
   public createBrowserAudioTime(sample: number): BrowserAudioTime {
@@ -654,7 +669,9 @@ export class AudioChunk {
 
   set volume(value: number) {
     this._volume = value;
-    this._audioManger.gainNode.gain.value = value;
+    if (!isNullOrUndefined(this._audioManger.gainNode)) {
+      this._audioManger.gainNode.gain.value = value;
+    }
   }
 
   get speed(): number {
@@ -664,8 +681,6 @@ export class AudioChunk {
   set speed(value: number) {
     if (value > 0) {
       this._speed = value;
-      // TODO does this make sense?
-      this._audioManger.playbackInfo.endAt = this._audioManger.playbackInfo.endAt * this._speed;
     }
   }
 
@@ -747,7 +762,7 @@ export class AudioChunk {
    * calculate current position of the current audio playback.
    * TODO when does this method must be called? Animation of playcursor or at another time else?
    */
-  public updatePlayPosition = () => {
+  private updatePlayPosition = () => {
     if (!(this.selection === null || this.selection === undefined)) {
       const timestamp = new Date().getTime();
 

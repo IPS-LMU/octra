@@ -86,20 +86,26 @@ export class AudioManager {
 
     if (!(audioinfo === null || audioinfo === undefined)) {
       // Fix up for prefixing
-      const audioContext = window.AudioContext // Default
-        || window.webkitAudioContext // Safari and old versions of Chrome
-        || window.mozAudioContext
-        || false;
-      if (audioContext) {
-        if ((this._audioContext === null || this._audioContext === undefined)) {
-          // reuse old audiocontext
-          this._audioContext = new audioContext();
-        }
+      this.initAudioContext();
 
+      if (this._audioContext) {
         this._playposition = new BrowserAudioTime(new BrowserSample(0, browserSampleRate), audioinfo.samplerate);
         this._state = PlayBackState.PREPARE;
       } else {
         console.error('AudioContext not supported by this browser');
+      }
+    }
+  }
+
+  private initAudioContext() {
+    const audioContext = window.AudioContext // Default
+      || window.webkitAudioContext // Safari and old versions of Chrome
+      || window.mozAudioContext
+      || false;
+    if (audioContext) {
+      if ((this._audioContext === null || this._audioContext === undefined)) {
+        // reuse old audiocontext
+        this._audioContext = new audioContext();
       }
     }
   }
@@ -118,7 +124,7 @@ export class AudioManager {
 
   // variables needed for initializing audio
   private _source: MediaElementAudioSourceNode = null;
-  private readonly _audioContext: AudioContext = null;
+  private _audioContext: AudioContext = null;
   private _gainNode: GainNode = null;
   // only the Audiomanager may have the channelData array
   private _channelData: {
@@ -128,6 +134,7 @@ export class AudioManager {
   };
 
   private chunks: AudioChunk[] = [];
+  private lastPlaybackViaVolume = false;
 
   // events
   public afterdecoded: EventEmitter<AudioRessource> = new EventEmitter<AudioRessource>();
@@ -296,76 +303,42 @@ export class AudioManager {
           this._playOnHover = playOnHover;
           this._stepBackward = false;
           this.changeState(PlayBackState.STARTED);
-          this._audioContext.destination.disconnect();
 
-          if (BrowserInfo.browser.indexOf('Firefox') > -1) {
-            if (volume > 1) {
-              if (isNullOrUndefined(this._gainNode)) {
-                this._gainNode = this._audioContext.createGain();
-                this._gainNode.gain.value = volume;
-              }
-              if (isNullOrUndefined(this._source)) {
-                this._source = this._audioContext.createMediaElementSource(this._audio);
-              }
-              this._source.connect(this._gainNode);
-              this._gainNode.connect(this._audioContext.destination);
-            } else {
-              console.log(`VOLUME via Audio`);
+          this.checkBrowserCompatibility(volume, speed).then(() => {
+            // connect modules of Web Audio API
+            let lastCheck = Date.now();
 
-              if (!isNullOrUndefined(this._gainNode)) {
-                this._gainNode.disconnect();
-                this._gainNode = null;
-              }
-              if (!isNullOrUndefined(this._source)) {
-                this._source.disconnect();
-                this._source = null;
-              }
-              this._audio.volume = volume;
+            this._playposition = begintime.clone();
+            this._playposition.browserSample.value = begintime.browserSample.value;
+
+            if (!isNullOrUndefined(this._positionInterval)) {
+              this._positionInterval.unsubscribe();
             }
-          } else {
-            if (isNullOrUndefined(this._gainNode)) {
-              this._gainNode = this._audioContext.createGain();
-            }
-            if (isNullOrUndefined(this._source)) {
-              this._source = this._audioContext.createMediaElementSource(this._audio);
-            }
-            this._gainNode.gain.value = volume;
-            this._source.connect(this._gainNode);
-            this._gainNode.connect(this._audioContext.destination);
-          }
 
-          // connect modules of Web Audio API
-          let lastCheck = Date.now();
-
-          this._playposition = begintime.clone();
-          this._playposition.browserSample.value = begintime.browserSample.value;
-
-          if (!isNullOrUndefined(this._positionInterval)) {
-            this._positionInterval.unsubscribe();
-          }
-
-          this._positionInterval = interval(35).subscribe(() => {
-            if (this.isPlaying) {
-              const currentSamples = Math.round(this._audio.currentTime * begintime.browserSample.sampleRate);
-              if (currentSamples < duration.browserSample.value + begintime.browserSample.value) {
-                this._playposition.browserSample.value = currentSamples;
-                onProcess();
-              } else {
-                this._audio.pause();
-                this.afterAudioEnded();
+            this._positionInterval = interval(35).subscribe(() => {
+              if (this.isPlaying) {
+                const currentSamples = Math.round(this._audio.currentTime * begintime.browserSample.sampleRate);
+                if (currentSamples < duration.browserSample.value + begintime.browserSample.value) {
+                  this._playposition.browserSample.value = currentSamples;
+                  onProcess();
+                } else {
+                  this._audio.pause();
+                  this.afterAudioEnded();
+                }
               }
-            }
-            this._lastUpdate = lastCheck;
-          });
+              this._lastUpdate = lastCheck;
+            });
 
-          this._audio.playbackRate = speed;
-          this._audio.currentTime = begintime.browserSample.seconds;
-          this._audio.play().then(() => {
-            this._startedAt = Date.now();
-            this.changeState(PlayBackState.PLAYING);
-          }).catch((error) => {
-            this.statechange.error(new Error(error));
-            reject(error);
+            this._audio.playbackRate = speed;
+            this._audio.currentTime = begintime.browserSample.seconds;
+
+            this._audio.play().then(() => {
+              this._startedAt = Date.now();
+              this.changeState(PlayBackState.PLAYING);
+            }).catch((error) => {
+              this.statechange.error(new Error(error));
+              reject(error);
+            });
           });
         }).catch((error) => {
           this.statechange.error(new Error(error));
@@ -374,6 +347,56 @@ export class AudioManager {
       } else {
         this.statechange.error(new Error('AudioManager: Can\'t play audio because it is already playing'));
         reject('AudioManager: Can\'t play audio because it is already playing');
+      }
+    });
+  }
+
+  private checkBrowserCompatibility(volume: number, speed: number) {
+    return new Promise<void>((resolve, reject) => {
+      if (BrowserInfo.browser.indexOf('Firefox') > -1) {
+        this.disconnectSource();
+        this.disconnectGain();
+        if (volume > 1) {
+          if (isNullOrUndefined(this._gainNode)) {
+            this._gainNode = this._audioContext.createGain();
+            this._gainNode.gain.value = volume;
+          }
+          if (isNullOrUndefined(this._source)) {
+            this._source = this._audioContext.createMediaElementSource(this._audio);
+          }
+          this._source.connect(this._gainNode);
+          this._gainNode.connect(this._audioContext.destination);
+          this.lastPlaybackViaVolume = false;
+          resolve();
+        } else {
+          if (!this.lastPlaybackViaVolume) {
+            this._audio = new Audio(this._ressource.objectURL);
+            this._audio.addEventListener('ended', this.afterAudioEnded);
+
+            const check = () => {
+              this._audio.removeEventListener('canplay', check);
+              this.lastPlaybackViaVolume = true;
+              resolve();
+            };
+            this._audio.addEventListener('canplay', check);
+          } else {
+            resolve();
+          }
+          this._audio.playbackRate = speed;
+          this._audio.volume = volume;
+        }
+      } else {
+        if (isNullOrUndefined(this._gainNode)) {
+          this._gainNode = this._audioContext.createGain();
+        }
+        if (isNullOrUndefined(this._source)) {
+          this.audioContext.destination.disconnect();
+          this._source = this._audioContext.createMediaElementSource(this._audio);
+        }
+        this._gainNode.gain.value = volume;
+        this._source.connect(this._gainNode);
+        this._gainNode.connect(this._audioContext.destination);
+        resolve();
       }
     });
   }
@@ -409,14 +432,26 @@ export class AudioManager {
   }
 
   private afterAudioEnded = () => {
-    this._source.disconnect();
-    this._gainNode.disconnect();
     this._positionInterval.unsubscribe();
     this._positionInterval = null;
 
     if (this._state === PlayBackState.PLAYING) {
       // audio ended normally
       this.changeState(PlayBackState.ENDED);
+    }
+  }
+
+  private disconnectSource() {
+    if (!isNullOrUndefined(this._source)) {
+      this._source.disconnect();
+      this._source = null;
+    }
+  }
+
+  private disconnectGain() {
+    if (!isNullOrUndefined(this._gainNode)) {
+      this._gainNode.disconnect();
+      this._gainNode = null;
     }
   }
 

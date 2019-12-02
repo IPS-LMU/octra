@@ -16,6 +16,9 @@ audiofiles. For now, it uses three editors for the orthographic transcription:
 * Linear-Editor: This editor shows two signaldisplays: One for the whole view of the signal and one as loupe. You can set boundaries and define segments.
 * 2D-Editor: This editor breaks the whole view of the signal to pieces and shows the pieces as lines one after one. Here you can set boundaries und define segments too.
 
+## Manual
+You can find the manual for users here: [OCTRA Manual](https://www.phonetik.uni-muenchen.de/apps/octra/manual/1.3.0/)
+
 ## Features
 * Three different editors
 * Noise markers (placeholders) in the form of icons in text. **New**: Icons can be UTF-8 symbols, too.  

@@ -573,6 +573,7 @@ export class AudioManager {
   }
 
   public destroy(disconnect: boolean = true) {
+    console.log(`destroy audio manager!`);
     if (!(this._audioContext === null || this._audioContext === undefined)) {
       if (disconnect) {
         this._audioContext.close()
@@ -586,6 +587,8 @@ export class AudioManager {
           );
       }
     }
+    console.log(`revoke URL!`);
+    URL.revokeObjectURL(this._ressource.objectURL);
   }
 
   public createBrowserAudioTime(sample: number): BrowserAudioTime {

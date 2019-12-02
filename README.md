@@ -113,11 +113,10 @@ If the language you would like translate to does not exist please send us an ema
 [INSTITUTE OF PHONETICS AND SPEECH PROCESSING](http://www.en.phonetik.uni-muenchen.de/)
 
 #### Used third-party packages:
-* summernote: https://github.com/summernote/summernote
 * bootstrap: http://getbootstrap.com/
 * bootstrap-material-design: http://fezvrasta.github.io/bootstrap-material-design/
+* summernote: https://github.com/summernote/summernote
 * font-awesome: https://origin.fontawesome.com/
-* ola-ts: https://github.com/echo66/OLA-TS.js?files=1
 * modernizr: https://modernizr.com/
 * platform: https://github.com/bestiejs/platform.js/
 

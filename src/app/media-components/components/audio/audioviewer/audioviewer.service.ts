@@ -14,6 +14,7 @@ import {isNullOrUndefined} from '../../../../core/shared/Functions';
 import {MultiThreadingService} from '../../../../core/shared/multi-threading/multi-threading.service';
 import {TsWorkerJob} from '../../../../core/shared/multi-threading/ts-worker-job';
 import {AudioChunk} from '../../../obj/media/audio/AudioManager';
+import {ASRQueueItemType} from '../../../../core/shared/service/asr.service';
 
 
 @Injectable()
@@ -246,7 +247,7 @@ export class AudioviewerService extends AudioComponentService {
                   ? this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber + 1)
                   : this.transcrService.currentlevel.segments.get(this._dragableBoundaryNumber);
 
-                if (segment.isBlockedBy === 'asr' || segmentBefore.isBlockedBy === 'asr' || segmentAfter.isBlockedBy === 'asr') {
+                if (segment.isBlockedBy !== null || segmentBefore.isBlockedBy !== null || segmentAfter.isBlockedBy !== null) {
                   // prevent dragging boundary of blocked segment
                   this._dragableBoundaryNumber = -1;
                 }

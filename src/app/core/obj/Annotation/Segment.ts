@@ -1,12 +1,13 @@
 import {OSegment} from './AnnotJSON';
 import {BrowserAudioTime, OriginalAudioTime, OriginalSample} from '../../../media-components/obj/media/audio';
+import {ASRQueueItemType} from '../../shared/service/asr.service';
 
 export class Segment {
-  set isBlockedBy(value: 'asr' | 'none') {
+  set isBlockedBy(value: ASRQueueItemType) {
     this._isBlockedBy = value;
   }
 
-  get isBlockedBy(): 'asr' | 'none' {
+  get isBlockedBy(): ASRQueueItemType {
     return this._isBlockedBy;
   }
 
@@ -31,7 +32,7 @@ export class Segment {
 
   private _transcript = '';
   private _changed = false;
-  private _isBlockedBy: 'asr' | 'none' = 'none';
+  private _isBlockedBy: ASRQueueItemType = null;
 
   constructor(public time: BrowserAudioTime | OriginalAudioTime) {
   }

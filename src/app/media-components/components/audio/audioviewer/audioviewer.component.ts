@@ -27,6 +27,7 @@ import {Timespan2Pipe} from '../../../pipe/timespan2.pipe';
 import {isNullOrUndefined} from '../../../../core/shared/Functions';
 import {Subject} from 'rxjs';
 import {AudioChunk, AudioManager} from '../../../obj/media/audio/AudioManager';
+import {ASRQueueItemType} from '../../../../core/shared/service/asr.service';
 
 @Component({
   selector: 'app-audioviewer',
@@ -623,7 +624,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                       const segment = this.transcr.currentlevel.segments.get(segmentI);
 
                       if (segmentI > -1) {
-                        if (segment.isBlockedBy !== 'asr') {
+                        if (segment.isBlockedBy === null) {
                           this.shortcuttriggered.emit({shortcut: comboKey, value: 'do_asr', type: 'segment'});
                         } else {
                           this.shortcuttriggered.emit({shortcut: comboKey, value: 'cancel_asr', type: 'segment'});
@@ -636,6 +637,32 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
                     keyActive = true;
                   }
+                  break;
+                case('do_asr_maus'):
+                  if (this.settings.boundaries.enabled && this.av.focused && this.settings.asr.enabled) {
+                    const xSamples = this.av.audioTCalculator.absXChunktoSamples(this.av.Mousecursor.absX, this.audiochunk);
+
+                    if (xSamples > -1) {
+                      const segmentI = this.transcr.currentlevel.segments.getSegmentBySamplePosition(
+                        new BrowserSample(xSamples, this.audiomanager.browserSampleRate)
+                      );
+                      const segment = this.transcr.currentlevel.segments.get(segmentI);
+
+                      if (segmentI > -1) {
+                        if (segment.isBlockedBy === null) {
+                          this.shortcuttriggered.emit({shortcut: comboKey, value: 'do_asr_maus', type: 'segment'});
+                        } else {
+                          this.shortcuttriggered.emit({shortcut: comboKey, value: 'cancel_asr_maus', type: 'segment'});
+                        }
+                        this.update(false);
+                        this.drawCursor(this.av.Mousecursor.line);
+                        this.transcr.currentlevel.segments.onsegmentchange.emit();
+                      }
+                    }
+
+                    keyActive = true;
+                  }
+                  break;
               }
 
               if (keyActive) {
@@ -1232,7 +1259,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
               }
 
               this.oContext.globalAlpha = 0.2;
-              if (segment.isBlockedBy !== 'asr') {
+              if (segment.isBlockedBy === null) {
                 if (segment.transcript === '') {
                   this.oContext.fillStyle = 'red';
                 } else if (!isNullOrUndefined(this.transcr.breakMarker) && segment.transcript === this.transcr.breakMarker.code) {
@@ -1241,9 +1268,14 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                   this.oContext.fillStyle = 'green';
                 }
               } else {
-                // blocked by ASR
-                this.oContext.globalAlpha = 0.5;
-                this.oContext.fillStyle = '#ffcf3f';
+                if (segment.isBlockedBy === ASRQueueItemType.ASR) {
+                  // blocked by ASR
+                  this.oContext.globalAlpha = 0.5;
+                  this.oContext.fillStyle = '#ffcf3f';
+                } else if (segment.isBlockedBy === ASRQueueItemType.ASRMAUS) {
+                  this.oContext.globalAlpha = 0.5;
+                  this.oContext.fillStyle = '#8d1aff';
+                }
               }
 
               drawnSegments++;

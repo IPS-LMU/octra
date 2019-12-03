@@ -55,7 +55,13 @@ export class Segments {
       newSegment.transcript = transcript;
     }
 
-    this.segments.push(newSegment);
+    if (this.segments.find((a) => {
+      return a.time.browserSample.seconds === time.browserSample.seconds
+    }) === undefined) {
+      this.segments.push(newSegment);
+    } else {
+      console.error(`segment with this timestamp already exists!`);
+    }
     this.sort();
     this.cleanup();
     return true;

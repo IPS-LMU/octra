@@ -160,7 +160,6 @@ export class TranscriptionService {
   private _transcriptValid = false;
 
   public saveSegments = () => {
-    console.log(`SAVE SEGMENTS!`);
     // make sure, that no saving overhead exist. After saving request wait 1 second
     if (!isNullOrUndefined(this._annotation)
       && this._annotation.levels.length > 0

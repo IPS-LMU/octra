@@ -79,12 +79,12 @@ export class AsrService {
     this._queue.start();
   }
 
-  public addToQueue(timeInterval: { sampleStart: number, sampleLength: number, browserSampleEnd: number }): ASRQueueItem {
+  public addToQueue(timeInterval: { sampleStart: number, sampleLength: number, browserSampleEnd: number }, type: ASRQueueItemType): ASRQueueItem {
     const item = new ASRQueueItem({
       sampleStart: timeInterval.sampleStart,
       sampleLength: timeInterval.sampleLength,
       browserSampleEnd: timeInterval.browserSampleEnd
-    }, this.queue, this.selectedLanguage);
+    }, this.queue, this.selectedLanguage, type);
     this.queue.add(item);
     return item;
   }
@@ -110,7 +110,7 @@ export class AsrService {
       );
 
       if (segNumber > -1) {
-        this.transcrService.currentlevel.segments.get(segNumber).isBlockedBy = 'none';
+        this.transcrService.currentlevel.segments.get(segNumber).isBlockedBy = null;
         item.stopProcessing();
       } else {
         console.error(new Error(`could not find segment.`));
@@ -333,6 +333,10 @@ class ASRQueue {
 }
 
 export class ASRQueueItem {
+  get type(): ASRQueueItemType {
+    return this._type;
+  }
+
   get result(): string {
     return this._result;
   }
@@ -376,12 +380,13 @@ export class ASRQueueItem {
   private parent: ASRQueue;
   private readonly _selectedLanguage: ASRLanguage;
   private _result: string;
+  private readonly _type: ASRQueueItemType;
 
   constructor(timeInterval: {
     sampleStart: number,
     sampleLength: number,
     browserSampleEnd: number
-  }, asrQueue: ASRQueue, selectedLanguage: ASRLanguage) {
+  }, asrQueue: ASRQueue, selectedLanguage: ASRLanguage, type: ASRQueueItemType) {
     this._id = ASRQueueItem.counter++;
     this._time = {
       sampleStart: timeInterval.sampleStart,
@@ -395,6 +400,7 @@ export class ASRQueueItem {
     }>();
     this.parent = asrQueue;
     this._selectedLanguage = selectedLanguage;
+    this._type = type;
   }
 
   public changeStatus(newStatus: ASRProcessStatus) {
@@ -410,7 +416,36 @@ export class ASRQueueItem {
 
   public startProcessing(): boolean {
     if (this.status !== ASRProcessStatus.STARTED) {
-      this.transcribeSignalWithASR();
+      if (this._type === ASRQueueItemType.ASR) {
+        console.log(`CALL ASR ONLY`);
+        this.transcribeSignalWithASR('txt').then(() => {
+          this.changeStatus(ASRProcessStatus.FINISHED);
+        });
+      } else {
+        console.log(`CALL ASR MAUS`);
+        // call ASR and than MAUS
+        this.transcribeSignalWithASR('bpf').then((result) => {
+          console.log(result);
+
+          this.callMAUS(this._selectedLanguage, result.audioURL, result.transcriptURL).then((result) => {
+            const reader = new FileReader();
+
+            reader.readAsText(result.file, 'utf-8');
+            reader.onerror = (error) => {
+              console.error(error);
+              this.changeStatus(ASRProcessStatus.FAILED);
+            };
+
+            reader.onload = () => {
+              this._result = reader.result as string;
+              this.changeStatus(ASRProcessStatus.FINISHED);
+            };
+          }).catch((error) => {
+            console.error(error);
+            this.changeStatus(ASRProcessStatus.FAILED);
+          });
+        });
+      }
       return true;
     }
     return false;
@@ -453,12 +488,19 @@ export class ASRQueueItem {
     });
   }
 
-  private callASR(languageObject: ASRLanguage, audioURL: string, timestamp: number): Promise<File> {
-    return new Promise<File>((resolve, reject) => {
+  private callASR(languageObject: ASRLanguage, audioURL: string, outFormat: string): Promise<{
+    file: File,
+    url: string
+  }> {
+    return new Promise<{
+      file: File,
+      url: string
+    }>((resolve, reject) => {
       const asrUrl = this.parent.asrSettings.calls[0].replace('{{host}}', languageObject.host)
         .replace('{{audioURL}}', audioURL)
         .replace('{{asrType}}', languageObject.asr)
-        .replace('{{language}}', languageObject.code);
+        .replace('{{language}}', languageObject.code)
+        .replace('{{outFormat}}', outFormat);
 
       this.parent.httpClient.post(asrUrl, {}, {
         headers: {
@@ -475,7 +517,10 @@ export class ASRQueueItem {
             const file = FileInfo.fromURL(json.downloadLink, `OCTRA_ASRqueueItem_${this._id}.txt`, 'text/plain');
             file.updateContentFromURL(this.parent.httpClient).then(() => {
               // add messages to protocol
-              resolve(file.file);
+              resolve({
+                file: file.file,
+                url: json.downloadLink
+              });
             }).catch((error) => {
               reject(error);
             });
@@ -495,73 +540,136 @@ export class ASRQueueItem {
     });
   }
 
-  public transcribeSignalWithASR(): Subject<string> {
-    this.changeStatus(ASRProcessStatus.STARTED);
-    const subj = new Subject<string>();
-    const audioManager = this.parent.audiomanager;
-    const timestamp = Date.now();
+  private callMAUS(languageObject: ASRLanguage, audioURL: string, transcriptURL: string): Promise<{
+    file: File,
+    url: string
+  }> {
+    return new Promise<{
+      file: File,
+      url: string
+    }>((resolve, reject) => {
+      const mausURL = this.parent.asrSettings.calls[1].replace('{{host}}', languageObject.host)
+        .replace('{{audioURL}}', audioURL)
+        .replace('{{transcriptURL}}', transcriptURL)
+        .replace('{{asrType}}', languageObject.asr)
+        .replace('{{language}}', languageObject.code);
 
-    // 1) cut signal
-    const format = new WavFormat();
-    format.init(audioManager.ressource.info.fullname, audioManager.ressource.arraybuffer);
-    format.cutAudioFile(audioManager.ressource.info.type, `OCTRA_ASRqueueItem_${this._id}`, audioManager.ressource.arraybuffer,
-      {
-        number: 1,
-        sampleStart: this.time.sampleStart,
-        sampleDur: this.time.sampleLength
-      }).then((file) => {
-      if (this._status !== ASRProcessStatus.STOPPED) {
-        // 2) upload signal
-        this.uploadFile(file, this.selectedLanguage).then((url: string) => {
-          if (this._status !== ASRProcessStatus.STOPPED) {
-            // 3) signal audio url to ASR
-            this.callASR(this.selectedLanguage, url, timestamp).then((file) => {
-              if (this._status !== ASRProcessStatus.STOPPED) {
-                const reader = new FileReader();
-                reader.onload = () => {
-                  this._result = reader.result as string;
+      this.parent.httpClient.post(mausURL, {}, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        responseType: 'text'
+      }).subscribe((result: string) => {
+          // convert result to json
+          const x2js = new X2JS();
+          let json: any = x2js.xml2js(result);
+          json = json.WebServiceResponseLink;
 
-                  // make sure that there are not any white spaces at the end or new lines
-                  this._result = this._result.replace(/\n/g, '').trim();
-
-                  this.changeStatus(ASRProcessStatus.FINISHED);
-                  subj.complete();
-                };
-
-                reader.onerror = (error: any) => {
-                  this._result = 'Could not read result';
-                  this.changeStatus(ASRProcessStatus.FAILED);
-                  subj.error(error);
-                };
-
-                reader.readAsText(file, 'utf-8');
-              }
+          if (json.success === 'true') {
+            const file = FileInfo.fromURL(json.downloadLink, `OCTRA_ASRqueueItem_${this._id}.txt`, 'text/plain');
+            file.updateContentFromURL(this.parent.httpClient).then(() => {
+              // add messages to protocol
+              resolve({
+                file: file.file,
+                url: json.downloadLink
+              });
             }).catch((error) => {
-              subj.error(error);
-              this._result = error;
-              if (error.indexOf('quota') > -1) {
-                this.changeStatus(ASRProcessStatus.NOQUOTA);
-              } else if (error.indexOf('0 Unknown Error')) {
-                this.changeStatus(ASRProcessStatus.NOAUTH);
-              } else {
-                this.changeStatus(ASRProcessStatus.FAILED);
-              }
+              reject(error);
             });
+          } else {
+            reject(json.output);
           }
-        }).catch((error) => {
-          subj.error(error);
-          this._result = error;
-          this.changeStatus(ASRProcessStatus.FAILED);
+        },
+        (error) => {
+          console.log(error.message);
+          if (error.message.indexOf('0 Unknown Error') > -1) {
+            // do redirect
+            AsrService.authURL = mausURL;
+            this.changeStatus(ASRProcessStatus.NOAUTH);
+          }
+          reject(error.message);
         });
-      }
-    }).catch((error) => {
-      subj.error(error);
-      this._result = error;
-      this.changeStatus(ASRProcessStatus.FAILED);
     });
-
-    return subj;
   }
+
+  public transcribeSignalWithASR(outFormat: string): Promise<{
+    audioURL: string,
+    transcriptURL: string
+  }> {
+    return new Promise<{
+      audioURL: string,
+      transcriptURL: string
+    }>((resolve, reject) => {
+      this.changeStatus(ASRProcessStatus.STARTED);
+      const audioManager = this.parent.audiomanager;
+
+      // 1) cut signal
+      const format = new WavFormat();
+      format.init(audioManager.ressource.info.fullname, audioManager.ressource.arraybuffer);
+      format.cutAudioFile(audioManager.ressource.info.type, `OCTRA_ASRqueueItem_${this._id}`, audioManager.ressource.arraybuffer,
+        {
+          number: 1,
+          sampleStart: this.time.sampleStart,
+          sampleDur: this.time.sampleLength
+        }).then((file) => {
+        if (this._status !== ASRProcessStatus.STOPPED) {
+          // 2) upload signal
+          this.uploadFile(file, this.selectedLanguage).then((audioURL: string) => {
+            if (this._status !== ASRProcessStatus.STOPPED) {
+              // 3) signal audio url to ASR
+              this.callASR(this.selectedLanguage, audioURL, outFormat).then((asrResult) => {
+                if (this._status !== ASRProcessStatus.STOPPED) {
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    this._result = reader.result as string;
+
+                    // make sure that there are not any white spaces at the end or new lines
+                    this._result = this._result.replace(/\n/g, '').trim();
+
+                    resolve({
+                      audioURL,
+                      transcriptURL: asrResult.url
+                    })
+                  };
+
+                  reader.onerror = (error: any) => {
+                    this._result = 'Could not read result';
+                    this.changeStatus(ASRProcessStatus.FAILED);
+                    reject(error);
+                  };
+
+                  reader.readAsText(asrResult.file, 'utf-8');
+                }
+              }).catch((error) => {
+                this._result = error;
+                if (error.indexOf('quota') > -1) {
+                  this.changeStatus(ASRProcessStatus.NOQUOTA);
+                } else if (error.indexOf('0 Unknown Error')) {
+                  this.changeStatus(ASRProcessStatus.NOAUTH);
+                } else {
+                  this.changeStatus(ASRProcessStatus.FAILED);
+                }
+                reject(error);
+              });
+            }
+          }).catch((error) => {
+            this._result = error;
+            this.changeStatus(ASRProcessStatus.FAILED);
+            reject(error);
+          });
+        }
+      }).catch((error) => {
+        this._result = error;
+        this.changeStatus(ASRProcessStatus.FAILED);
+        reject(error);
+      });
+    });
+  }
+}
+
+export enum ASRQueueItemType {
+  ASR = 'ASR',
+  ASRMAUS = 'ASRMAUS'
 }
 
 export enum ASRProcessStatus {

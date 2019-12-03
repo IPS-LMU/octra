@@ -1,7 +1,7 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {AppStorageService, MessageService, SettingsService, TranscriptionService} from '../../shared/service';
 import {AppSettings, ASRLanguage} from '../../obj/Settings';
-import {AsrService} from '../../shared/service/asr.service';
+import {ASRQueueItemType, AsrService} from '../../shared/service/asr.service';
 import {isNullOrUndefined} from '../../shared/Functions';
 import {AudioChunk} from '../../../media-components/obj/media/audio/AudioManager';
 import {BsDropdownDirective} from 'ngx-bootstrap';
@@ -70,12 +70,12 @@ export class AsrOptionsComponent implements OnInit {
         if (segNumber > -1) {
           console.log(`SEGNUMBER = ${segNumber} browser sample is ${time.value}`);
           const segment = this.transcrService.currentlevel.segments.get(segNumber);
-          segment.isBlockedBy = 'asr';
+          segment.isBlockedBy = ASRQueueItemType.ASR;
           this.asrService.addToQueue({
             sampleStart: this.audioChunk.time.start.originalSample.value,
             sampleLength: this.audioChunk.time.duration.originalSample.value,
             browserSampleEnd: this.audioChunk.time.start.browserSample.add(this.audioChunk.time.duration.browserSample).value
-          });
+          }, ASRQueueItemType.ASR);
           this.asrService.startASR();
         } else {
           console.error(`could not start ASR because segment number was not found.`);
@@ -98,15 +98,15 @@ export class AsrOptionsComponent implements OnInit {
 
         if (sampleLength / this.transcrService.audiomanager.originalSampleRate > 600) {
           this.messageService.showMessage('error', this.langService.translate('asr.file too big'));
-          segment.isBlockedBy = 'none';
+          segment.isBlockedBy = null;
         } else {
           if (segment.transcript.trim() === '' && segment.transcript.indexOf(this.transcrService.breakMarker.code) < 0) {
             // segment is empty and contains not a break
-            segment.isBlockedBy = 'asr';
+            segment.isBlockedBy = ASRQueueItemType.ASR;
             this.asrService.addToQueue({
               sampleStart, sampleLength, browserSampleEnd:
               segment.time.browserSample.value
-            });
+            }, ASRQueueItemType.ASR);
           }
         }
       }

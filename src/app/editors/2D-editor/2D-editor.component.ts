@@ -284,7 +284,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                   });
 
                   if (!isNullOrUndefined(wordsTier)) {
-                    let wordCounter = 0;
                     let segmentText = '';
                     console.log(wordsTier);
                     for (const wordItem of wordsTier.items) {
@@ -294,11 +293,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                           this.audiomanager.originalSampleRate, this.audiomanager.browserSampleRate);
                         if (readSegment.transcript !== '<p:>' && readSegment.transcript !== '') {
                           segmentText += ` ${readSegment.transcript}`;
-                          wordCounter++;
                         }
-                        const isBreak = ((readSegment.transcript === '<p:>' || readSegment.transcript === '') && duration > 1);
+                        const isBreak = (readSegment.transcript === '<p:>' || readSegment.transcript === '');
 
-                        if (isBreak || wordCounter === maxWords) {
+                        if (isBreak) {
                           segmentText = segmentText.trim();
                           const breakPuffer = (isBreak) ? wordItem.sampleDur : 0;
                           let origTime = new OriginalAudioTime(new OriginalSample(item.time.sampleStart + readSegment.time.originalSample.value - breakPuffer, this.audiomanager.originalSampleRate),
@@ -317,7 +315,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                             this.transcrService.currentlevel.segments.add(browserTime, segmentText);
                           }
                           segmentText = '';
-                          wordCounter = 0;
                         }
                       } else {
                         segmentText += wordItem.labels[0].value;

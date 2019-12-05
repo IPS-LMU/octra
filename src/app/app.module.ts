@@ -127,7 +127,6 @@ import {TRANSLOCO_CONFIG, TranslocoConfig, TranslocoModule} from '@ngneat/transl
 import {DragulaModule} from 'ng2-dragula';
 import {TableConfiguratorComponent} from './core/component/table-configurator/table-configurator.component';
 import {ClipTextPipe} from './core/shared/clip-text.pipe';
-import {AuthenticationModalComponent} from './core/modals/authentication-modal/authentication-modal.component';
 import { AuthComponent } from './core/gui/auth/auth.component';
 
 library.add(
@@ -234,7 +233,6 @@ export const EDITORS: any[] = [
     AsrOptionsComponent,
     TableConfiguratorComponent,
     ClipTextPipe,
-    AuthenticationModalComponent,
     AuthComponent
   ],
   entryComponents: EDITORS,

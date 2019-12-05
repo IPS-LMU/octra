@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {AppStorageService} from '../../shared/service';
 
 @Component({
   selector: 'app-auth',
@@ -6,10 +8,12 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./auth.component.css']
 })
 export class AuthComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit() {
+  constructor(private router: Router, private appStorage: AppStorageService) {
   }
 
+  ngOnInit() {
+    // if this is accessed, the authentication was valid
+    this.appStorage.shibbolethOK = true;
+    this.router.navigate(['/user/transcr'])
+  }
 }

@@ -12,6 +12,7 @@ import {Subject} from 'rxjs';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {TranscriptionService} from './transcription.service';
 import {BrowserSample, OriginalSample} from '../../../media-components/obj/media/audio';
+import {Router} from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -45,7 +46,7 @@ export class AsrService {
   }
 
   constructor(private settingsService: SettingsService, private appStorage: AppStorageService, private httpClient: HttpClient,
-              private audioService: AudioService, private transcrService: TranscriptionService) {
+              private audioService: AudioService, private transcrService: TranscriptionService, private router: Router) {
   }
 
   public init() {
@@ -76,7 +77,12 @@ export class AsrService {
   }
 
   public startASR() {
-    this._queue.start();
+    if (!isNullOrUndefined(this.appStorage.shibbolethOK) && this.appStorage.shibbolethOK) {
+      this._queue.start();
+    } else {
+      // redirect via location href is important because it's not working otherwise!
+      document.location.href = 'user/auth/';
+    }
   }
 
   public addToQueue(timeInterval: { sampleStart: number, sampleLength: number, browserSampleEnd: number }, type: ASRQueueItemType): ASRQueueItem {
@@ -532,8 +538,9 @@ export class ASRQueueItem {
           console.log(error.message);
           if (error.message.indexOf('0 Unknown Error') > -1) {
             // do redirect
-            AsrService.authURL = asrUrl;
             this.changeStatus(ASRProcessStatus.NOAUTH);
+            // redirect via location href is important because it's not working otherwise!
+            document.location.href = 'user/auth/';
           }
           reject(error.message);
         });

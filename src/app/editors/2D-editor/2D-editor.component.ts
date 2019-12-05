@@ -43,7 +43,6 @@ import {Functions, isNullOrUndefined} from '../../core/shared/Functions';
 import {OCTRAEditor} from '../octra-editor';
 import {ASRProcessStatus, ASRQueueItem, ASRQueueItemType, AsrService} from '../../core/shared/service/asr.service';
 import {TranslocoService} from '@ngneat/transloco';
-import {AuthenticationModalComponent} from '../../core/modals/authentication-modal/authentication-modal.component';
 import {OAudiofile, OSegment} from '../../core/obj/Annotation';
 
 @Component({
@@ -61,7 +60,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   @ViewChild('window', {static: false}) window: TranscrWindowComponent;
   @ViewChild('loupe', {static: false}) loupe: CircleLoupeComponent;
   @ViewChild('audionav', {static: true}) audionav: AudioNavigationComponent;
-  @ViewChild('authModal', {static: true}) authModal: AuthenticationModalComponent;
 
   @Output() public openModal = new EventEmitter();
   public showWindow = false;
@@ -348,8 +346,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           } else {
             console.error(new Error(`couldn't find segment number`));
           }
-        } else if (item.status === ASRProcessStatus.NOAUTH) {
-          this.authModal.open();
         }
       },
       (error) => {

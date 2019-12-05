@@ -6,7 +6,6 @@ import {IndexedDBManager} from '../../obj/IndexedDBManager';
 import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {LocalStorageService, SessionStorage, SessionStorageService} from '@rars/ngx-webstorage';
 import {isNullOrUndefined} from '../Functions';
-import {reject} from 'q';
 import {Subject} from 'rxjs';
 import {IDataEntry} from '../../obj/data-entry';
 
@@ -46,17 +45,20 @@ export class OIDBLink implements IIDBLink {
 @Injectable()
 export class AppStorageService {
   set logs(value: any[]) {
-    this._idb.saveArraySequential(value, "logs", 'timestamp').catch((err) => {
+    this._idb.saveArraySequential(value, 'logs', 'timestamp').catch((err) => {
       console.error(err);
     });
     this._logs = value;
   }
+
   set savingNeeded(value: boolean) {
     this._savingNeeded = value;
   }
+
   get savingNeeded(): boolean {
     return this._savingNeeded;
   }
+
   get isSaving(): boolean {
     return this._isSaving;
   }
@@ -405,6 +407,14 @@ export class AppStorageService {
     });
   }
 
+  public set shibbolethOK(value: boolean) {
+    this._shibbolethOK = value;
+  }
+
+  public get shibbolethOK(): boolean {
+    return this._shibbolethOK;
+  }
+
   public get audioSpeed(): number {
     return this._audioSettings.speed;
   }
@@ -428,6 +438,7 @@ export class AppStorageService {
   private _interface: string = null;
   // is user on the login page?
   private login: boolean;
+
   @SessionStorage('followplaycursor') private _followplaycursor: boolean;
   // IDB STORAGE
   private _idbloaded = false;
@@ -439,11 +450,13 @@ export class AppStorageService {
     project: string,
     jobno: number
   } = null;
+
   @SessionStorage('agreement') private _agreement: any;
   @SessionStorage('playonhover') private _playonhover: boolean;
   @SessionStorage('reloaded') private _reloaded: boolean;
   @SessionStorage('email') private _email: string;
   @SessionStorage('serverDataEntry') private _serverDataEntry: IDataEntry;
+  @SessionStorage('shibbolethOK') private _shibbolethOK: boolean;
 
   private _submitted: boolean = null;
   private _feedback: any = null;

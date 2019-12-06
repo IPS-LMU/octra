@@ -81,7 +81,7 @@ export class AsrService {
       this._queue.start();
     } else {
       // redirect via location href is important because it's not working otherwise!
-      document.location.href = 'user/auth/';
+      document.location.href = 'user/auth';
     }
   }
 
@@ -540,7 +540,7 @@ export class ASRQueueItem {
             // do redirect
             this.changeStatus(ASRProcessStatus.NOAUTH);
             // redirect via location href is important because it's not working otherwise!
-            document.location.href = 'user/auth/';
+            document.location.href = 'user/auth';
           }
           reject(error.message);
         });

@@ -77,12 +77,7 @@ export class AsrService {
   }
 
   public startASR() {
-    if (!isNullOrUndefined(this.appStorage.shibbolethOK) && this.appStorage.shibbolethOK) {
-      this._queue.start();
-    } else {
-      // redirect via location href is important because it's not working otherwise!
-      document.location.href = 'user/auth';
-    }
+    this._queue.start();
   }
 
   public addToQueue(timeInterval: { sampleStart: number, sampleLength: number, browserSampleEnd: number }, type: ASRQueueItemType): ASRQueueItem {

@@ -13,7 +13,6 @@ export class AuthComponent implements OnInit {
 
   ngOnInit() {
     // if this is accessed, the authentication was valid
-    this.appStorage.shibbolethOK = true;
     this.router.navigate(['/user/transcr'])
   }
 }

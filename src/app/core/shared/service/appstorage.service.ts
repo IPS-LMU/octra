@@ -407,14 +407,6 @@ export class AppStorageService {
     });
   }
 
-  public set shibbolethOK(value: boolean) {
-    this._shibbolethOK = value;
-  }
-
-  public get shibbolethOK(): boolean {
-    return this._shibbolethOK;
-  }
-
   public get audioSpeed(): number {
     return this._audioSettings.speed;
   }
@@ -456,7 +448,6 @@ export class AppStorageService {
   @SessionStorage('reloaded') private _reloaded: boolean;
   @SessionStorage('email') private _email: string;
   @SessionStorage('serverDataEntry') private _serverDataEntry: IDataEntry;
-  @SessionStorage('shibbolethOK') private _shibbolethOK: boolean;
 
   private _submitted: boolean = null;
   private _feedback: any = null;

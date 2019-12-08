@@ -408,6 +408,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           this.asr.result = '';
         } else if (item.status === ASRProcessStatus.STOPPED) {
           this.asr.status = 'inactive';
+        } else if (item.status === ASRProcessStatus.NOAUTH) {
+          this.asr.status = 'inactive';
         }
 
         this.cd.markForCheck();

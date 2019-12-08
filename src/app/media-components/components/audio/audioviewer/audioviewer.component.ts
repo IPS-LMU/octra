@@ -407,9 +407,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                   break;
                 case('set_boundary'):
                   if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this.av.focused) {
-                    let segments = this.transcr.currentlevel.segments;
                     const result = this.av.addSegment();
-                    segments = this.transcr.currentlevel.segments;
                     if (result !== null && result.msg !== null) {
                       if (result.msg.text && result.msg.text !== '') {
                         this.alerttriggered.emit({

@@ -297,6 +297,7 @@
     "stop all": "Beende Verarbeitung für alle Segmente",
     "asr running": "Die automatische Spracherkennung läuft gerade. Wenn Du sie für dieses Segment abbrechen möchtest, klicke hier.",
     "no asr selected": "Bevor Du das Tastenkürzel verwenden kannst, musst Du ASR Einstellungen vornehmen.",
-    "no quota": "Es ist keine Kontingente mehr verfügbar. Bitte nutze einen anderen ASR Provider."
+    "no quota": "Es ist keine Kontingente mehr verfügbar. Bitte nutze einen anderen ASR Provider.",
+    "no auth": "Um weiter zu transkribieren ist eine erneute Authentifizierung notwendig."
   }
 }

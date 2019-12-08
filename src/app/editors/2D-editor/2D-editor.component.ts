@@ -241,7 +241,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     ));
 
     this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
-        if (item.status !== ASRProcessStatus.STARTED && item.status !== ASRProcessStatus.IDLE && item.status !== ASRProcessStatus.NOAUTH) {
+        if (item.status !== ASRProcessStatus.STARTED && item.status !== ASRProcessStatus.IDLE) {
           const segmentBoundary = new BrowserSample(item.time.browserSampleEnd, this.audiomanager.browserSampleRate);
           const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
             segmentBoundary, true
@@ -254,6 +254,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
             if (item.status === ASRProcessStatus.NOQUOTA) {
               this.msg.showMessage('error', this.langService.translate('asr.no quota'));
+            } else if (item.status === ASRProcessStatus.NOAUTH) {
+              this.msg.showMessage('warning', this.langService.translate('asr.no auth'));
             } else {
               if (item.status === ASRProcessStatus.FINISHED && item.result !== '') {
                 if (item.type === ASRQueueItemType.ASR) {

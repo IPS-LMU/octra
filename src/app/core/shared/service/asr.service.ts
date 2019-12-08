@@ -235,6 +235,14 @@ class ASRQueue {
                   this.remove(nextItem.id);
                 }
                 this.updateStatistics(status);
+
+                if (status.new === ASRProcessStatus.NOAUTH) {
+                  if (this._statistics.running === 0) {
+                    // redirect via location href is important because it's not working otherwise!
+                    document.location.href = 'user/auth';
+                  }
+                }
+
                 this._itemChange.next(nextItem);
 
                 setTimeout(() => {
@@ -288,6 +296,9 @@ class ASRQueue {
       case ASRProcessStatus.FAILED:
         this._statistics.failed = Math.max(0, this._statistics.failed - 1);
         break;
+      case ASRProcessStatus.NOAUTH:
+        this._statistics.failed = Math.max(0, this._statistics.stopped - 1);
+        break;
       case ASRProcessStatus.STARTED:
         this._statistics.running = Math.max(0, this._statistics.running - 1);
         break;
@@ -297,10 +308,19 @@ class ASRQueue {
       case ASRProcessStatus.STOPPED:
         this._statistics.stopped = Math.max(0, this._statistics.stopped - 1);
         break;
+      case ASRProcessStatus.NOQUOTA:
+        this._statistics.stopped = Math.max(0, this._statistics.stopped - 1);
+        break;
     }
 
     switch (status.new) {
       case ASRProcessStatus.FAILED:
+        this._statistics.failed += 1;
+        break;
+      case ASRProcessStatus.NOAUTH:
+        this._statistics.failed += 1;
+        break;
+      case ASRProcessStatus.NOQUOTA:
         this._statistics.failed += 1;
         break;
       case ASRProcessStatus.STARTED:
@@ -532,10 +552,7 @@ export class ASRQueueItem {
         (error) => {
           console.log(error.message);
           if (error.message.indexOf('0 Unknown Error') > -1) {
-            // do redirect
             this.changeStatus(ASRProcessStatus.NOAUTH);
-            // redirect via location href is important because it's not working otherwise!
-            document.location.href = 'user/auth';
           }
           reject(error.message);
         });
@@ -585,7 +602,6 @@ export class ASRQueueItem {
         (error) => {
           console.log(error.message);
           if (error.message.indexOf('0 Unknown Error') > -1) {
-            // do redirect
             AsrService.authURL = mausURL;
             this.changeStatus(ASRProcessStatus.NOAUTH);
           }

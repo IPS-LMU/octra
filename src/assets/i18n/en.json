@@ -297,6 +297,7 @@
     "stop all": "Stop it for all segments",
     "asr running": "ASR is currently running. If you want to stop ASR for this segment, click here.",
     "no asr selected": "Please select ASR options before using the shortcut.",
-    "no quota": "No quota left. Please use another ASR provider."
+    "no quota": "No quota left. Please use another ASR provider.",
+    "no auth": "Authentication needed for further transcription."
   }
 }

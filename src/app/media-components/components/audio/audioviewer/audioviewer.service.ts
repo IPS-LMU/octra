@@ -14,7 +14,6 @@ import {isNullOrUndefined} from '../../../../core/shared/Functions';
 import {MultiThreadingService} from '../../../../core/shared/multi-threading/multi-threading.service';
 import {TsWorkerJob} from '../../../../core/shared/multi-threading/ts-worker-job';
 import {AudioChunk} from '../../../obj/media/audio/AudioManager';
-import {ASRQueueItemType} from '../../../../core/shared/service/asr.service';
 
 
 @Injectable()
@@ -338,7 +337,16 @@ export class AudioviewerService extends AudioComponentService {
     const line = this.lastLine;
     this.audioTCalculator.audioPxWidth = this.audioPxW;
 
-    if (!(line === null || line === undefined) && this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly) {
+    let isBlocked = false;
+    if (!this.audiomanager.isPlaying) {
+      const segmentI = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+        this.mousecursor.timePos.browserSample.clone()
+      );
+      const segment = this.transcrService.currentlevel.segments.get(segmentI);
+      isBlocked = !isNullOrUndefined(segment.isBlockedBy);
+    }
+
+    if (!isBlocked && !(line === null || line === undefined) && this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly) {
       const absXTime = (!this.audiochunk.isPlaying)
         ? this.mousecursor.timePos.browserSample.value : this.audiochunk.playposition.browserSample.value;
       let bWidthTime = this.audioTCalculator.absXtoSamples2(this.Settings.boundaries.width * 2, this.audiochunk);

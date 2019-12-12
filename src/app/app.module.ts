@@ -84,7 +84,7 @@ import {
   faSignOutAlt,
   faSpinner,
   faThList,
-  faTimes,
+  faTimes, faTools,
   faTrash,
   faWindowMaximize
 } from '@fortawesome/free-solid-svg-icons';
@@ -127,7 +127,8 @@ import {TRANSLOCO_CONFIG, TranslocoConfig, TranslocoModule} from '@ngneat/transl
 import {DragulaModule} from 'ng2-dragula';
 import {TableConfiguratorComponent} from './core/component/table-configurator/table-configurator.component';
 import {ClipTextPipe} from './core/shared/clip-text.pipe';
-import { AuthComponent } from './core/gui/auth/auth.component';
+import {AuthComponent} from './core/gui/auth/auth.component';
+import {ToolsModalComponent} from './core/modals/tools-modal/tools-modal.component';
 
 library.add(
   faSpinner,
@@ -169,7 +170,8 @@ library.add(
   faGlobe,
   faHandshake,
   faDatabase,
-  faGripLines
+  faGripLines,
+  faTools
 );
 
 export const EDITORS: any[] = [
@@ -233,7 +235,8 @@ export const EDITORS: any[] = [
     AsrOptionsComponent,
     TableConfiguratorComponent,
     ClipTextPipe,
-    AuthComponent
+    AuthComponent,
+    ToolsModalComponent
   ],
   entryComponents: EDITORS,
   imports: [

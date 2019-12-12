@@ -3,7 +3,7 @@
     <button dropdownToggle type="button" class="btn btn-secondary btn-raised btn-sm"
             aria-controls="dropdown-basic" style="width:100%; margin-left:5px;">
       <fa-icon icon="plus"></fa-icon>
-      {{"tools.table configurator.add column" | transloco}}
+      {{"custom.table configurator.add column" | transloco}}
     </button>
     <ul *dropdownMenu class="dropdown-menu"
         role="menu" aria-labelledby="button-basic" style="cursor: pointer">
@@ -20,10 +20,11 @@
            id="includeLineNumbers"
            [(ngModel)]="includeLineNumbers"
            (ngModelChange)="onCheckboxChange()"/>
-    <label for="includeLineNumbers" style="margin-left: 15px;">{{"tools.table configurator.include line numbers"| transloco}}</label>
+    <label for="includeLineNumbers"
+           style="margin-left: 15px;">{{"custom.table configurator.include line numbers"| transloco}}</label>
   </div>
   <div class="settings">
-    <label>{{"tools.table configurator.time format"| transloco}}: </label>
+    <label>{{"custom.table configurator.time format"| transloco}}: </label>
     <div class="btn-group" dropdown>
       <button dropdownToggle type="button" class="btn btn-info btn-raised btn-sm"
               aria-controls="dropdown-basic" style="width:150px; margin-left:5px;">
@@ -73,7 +74,7 @@ width: tableWidth + 'px'
   <form>
     <fieldset class="form-group">
       <div class="row">
-        <legend class="col-form-label col-sm-2 pt-0">{{"tools.table configurator.divider" | transloco}}:</legend>
+        <legend class="col-form-label col-sm-2 pt-0">{{"custom.table configurator.divider" | transloco}}:</legend>
         <div class="col-sm-10">
           <div class="btn-group" dropdown>
             <button dropdownToggle type="button" class="btn btn-info btn-raised btn-sm"
@@ -119,7 +120,7 @@ width: tableWidth + 'px'
           <input class="form-check-input" type="checkbox" id="gridCheck1" name="addHeader"
                  [(ngModel)]="tableOptions.addHeader" (ngModelChange)="onSomethingDone()">
           <label class="form-check-label" for="gridCheck1" style="font-size: 14px;">
-            {{"tools.table configurator.add header" | transloco}}
+            {{"custom.table configurator.add header" | transloco}}
           </label>
         </div>
       </div>
@@ -127,7 +128,7 @@ width: tableWidth + 'px'
     <div class="form-group row">
       <div class="col-sm-10">
         <button type="submit" class="btn btn-primary btn-raised" (click)="generateFile()"
-                [disabled]="this.columns.length < 1">{{"tools.table configurator.generate table" | transloco}}
+                [disabled]="this.columns.length < 1">{{"custom.table configurator.generate table" | transloco}}
         </button>
         <a [href]="this.resultURL" *ngIf="this.resultURL !== null" [download]="'test' + tableOptions.fileExtension"
            style="margin-left:10px;">{{"general.download" | transloco}}</a>

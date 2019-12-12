@@ -1,5 +1,7 @@
 <app-export-files-modal #modalexport [transcrService]="navbarServ.transcrService" [uiService]="navbarServ.uiService">
 </app-export-files-modal>
+<app-tools-modal #toolsModal [transcrService]="navbarServ.transcrService"
+                 [uiService]="navbarServ.uiService"></app-tools-modal>
 <app-statistics-modal #modalstatistics></app-statistics-modal>
 <app-prompt-modal #promptmodal></app-prompt-modal>
 
@@ -181,9 +183,14 @@
         </div>
       </li>
       <li class="nav-item" *ngIf="appStorage.LoggedIn && navbarServ.showExport">
+        <a class="nav-link" (mouseup)="toolsModal.open()">
+          <fa-icon icon="tools" class="navbar-icon"></fa-icon>
+          <span class="d-md-none d-lg-inline"> {{"general.tools" | transloco}}</span>
+        </a>
+      </li>
+      <li class="nav-item" *ngIf="appStorage.LoggedIn && navbarServ.showExport">
         <a class="nav-link" (mouseup)="modalexport.open()">
           <fa-icon icon="download" class="navbar-icon"></fa-icon>
-          <!-- TODO CHNAGE this! -->
           <span class="d-md-none d-lg-inline"> {{"general.export" | transloco}}</span>
         </a>
       </li>

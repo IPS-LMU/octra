@@ -4,6 +4,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">{{"general.export data" | transloco}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
       <div class="modal-body" id="export-table" #content>
         <table class="table table-striped">
@@ -67,7 +70,7 @@
           </tbody>
         </table>
 
-        <h5>Tools</h5>
+        <h5>{{"general.custom formats" | transloco}}</h5>
         <table class="table table-striped" [ngStyle]="{
           width: content.offsetWidth - 50 + 'px'
         }">
@@ -80,101 +83,6 @@
           </tr>
           </thead>
           <tbody>
-          <tr *ngIf="navbarServ.transcrService !== undefined
-                     && navbarServ.transcrService.audiomanager.originalInfo.extension === '.wav'">
-            <td (click)="tools.audioCutting.opened = !tools.audioCutting.opened">
-              <fa-icon style="color:gray;"
-                       [icon]="['fas', ((tools.audioCutting.opened) ? 'chevron-up' : 'chevron-down')]"></fa-icon>
-            </td>
-            <td (click)="tools.audioCutting.opened = !tools.audioCutting.opened">
-              <a #a>
-                {{'tools.cut audio.name' | transloco}}
-              </a>
-            </td>
-            <td colspan="3">{{'tools.cut audio.description' | transloco}}</td>
-          </tr>
-          <tr *ngIf="navbarServ.transcrService !== undefined
-                    && navbarServ.transcrService.audiomanager.originalInfo.extension === '.wav'"
-              [@fadeToggle]="(tools.audioCutting.opened) ? 'active': 'inactive'">
-            <td></td>
-            <td colspan="4" style="padding-left:20px;">
-              <div class="card" style="padding:10px;" *ngIf="navbarServ.transcrService !== undefined">
-                <div class="btn-group">
-                  <label class="btn btn-primary" [(ngModel)]="tools.audioCutting.selectedMethod"
-                         btnRadio="client" tabindex="0" role="button">client-side</label>
-                  <label class="btn btn-primary" [(ngModel)]="tools.audioCutting.selectedMethod"
-                         btnRadio="server" tabindex="0" role="button" *ngIf="isCuttingServerEnabled">server-side</label>
-                </div>
-                <a (click)="tools.audioCutting.showConfigurator = !tools.audioCutting.showConfigurator"
-                   class="show-configurator-link"
-                >
-                  <ng-container *ngIf="tools.audioCutting.showConfigurator">
-                    <fa-icon style="color:gray;"
-                             [icon]="['fas', 'chevron-up']"></fa-icon>
-                    {{"tools.cut audio.hide configurator" | transloco}}
-                  </ng-container>
-                  <ng-container *ngIf="!tools.audioCutting.showConfigurator">
-                    <fa-icon style="color:gray;"
-                             [icon]="['fas', 'chevron-down']"></fa-icon>
-                    {{"tools.cut audio.show configurator" | transloco}}
-                  </ng-container>
-                </a>
-                <div class="configurator" [hidden]="!tools.audioCutting.showConfigurator">
-                  <app-naming-drag-and-drop #namingConvention
-                                            [fileName]="navbarServ.transcrService.audiomanager.ressource.name"
-                                            [firstSegment]="navbarServ.transcrService.currentlevel.segments.get(0)"
-                  ></app-naming-drag-and-drop>
-
-                  <div class="form-control">
-                    <span>{{'tools.cut audio.append meta files' | transloco}}: </span>
-                    <div class="form-check form-check-inline"
-                         *ngFor="let exportFormat of tools.audioCutting.exportFormats; let i = index;">
-                      <input class="form-check-input" type="checkbox" id="inlineCheckbox{{i}}"
-                             [value]="exportFormat.value"
-                             [(ngModel)]="tools.audioCutting.exportFormats[i].selected">
-                      <label class="form-check-label"
-                             for="inlineCheckbox{{i}}">{{exportFormat.label}}</label>
-                    </div>
-                  </div>
-                </div>
-                <div class="progress-area" style="text-align: center;">
-                  <button *ngIf="tools.audioCutting.status !== 'running'"
-                          class="btn btn-primary btn-raised" (click)="splitAudio()"
-                          [disabled]="namingConvention.resultConvention.length === 1"
-                          style="max-width:200px;margin-top:20px;">{{'tools.cut audio.name' | transloco}}
-                  </button>
-                  <button *ngIf="tools.audioCutting.status === 'running'"
-                          class="btn btn-danger btn-raised" (click)="stopAudioSplitting()"
-                          style="max-width:200px;margin-top:20px;">{{'general.stop' | transloco}}
-                  </button>
-                  <div class="mb-2" *ngIf="tools.audioCutting.status !== 'idle'">
-                    <progressbar [animate]="true" [value]="tools.audioCutting.progress"
-                                 [type]="tools.audioCutting.progressbarType">
-                      <b>
-
-                        {{ tools.audioCutting.progress | number : '1.2-2'}}%
-                      </b>
-                    </progressbar>
-                    <div class="text-danger" style="padding:10px;"
-                         *ngIf="tools.audioCutting.status === 'failed'">{{tools.audioCutting.message}}</div>
-                  </div>
-                  <ng-container
-                    *ngIf="tools.audioCutting.status !== 'idle' && tools.audioCutting.status !== 'finished' && tools.audioCutting.timeLeft > 0">
-                    Time left: {{tools.audioCutting.timeLeft | timespan2}}
-                  </ng-container>
-                  <a style="margin-left:10px;"
-                     *ngIf="tools.audioCutting.result.url !== null"
-                     download="{{tools.audioCutting.result.filename}}"
-                     [href]="tools.audioCutting.result.url"
-                     class="link">
-                    <fa-icon icon="save"></fa-icon>
-                    {{'general.download' | transloco}}
-                  </a>
-                </div>
-              </div>
-            </td>
-          </tr>
-
           <tr>
             <td (click)="tools.tableConfigurator.opened = !tools.tableConfigurator.opened">
               <fa-icon style="color:gray;"
@@ -182,10 +90,10 @@
             </td>
             <td (click)="tools.tableConfigurator.opened = !tools.tableConfigurator.opened">
               <a #a>
-                {{'tools.table configurator.name' | transloco}}
+                {{'custom.table configurator.name' | transloco}}
               </a>
             </td>
-            <td colspan="3">{{'tools.table configurator.description' | transloco}}</td>
+            <td colspan="3">{{'custom.table configurator.description' | transloco}}</td>
           </tr>
           <tr [@fadeToggle]="(tools.tableConfigurator.opened) ? 'active': 'inactive'">
             <td></td>
@@ -203,23 +111,44 @@
           </tbody>
         </table>
 
-        <span class="link" *ngIf="arraybufferExists" (click)="getAudioURI();">
-                    <fa-icon icon="headphones"></fa-icon> Audio file (experimental)</span>
-        <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === 'Audio' && preparing.preparing"></i>
-        <a style="margin-left:10px;" *ngIf="preparing.name === 'Audio' && !preparing.preparing"
-           download="{{parentformat.download}}" [href]="parentformat.uri"
-           class="link">
-          <fa-icon icon="save"></fa-icon>
-          Download
-        </a><br/>
-        <span class="link" (click)="getProtocol()"><fa-icon icon="th-list"></fa-icon> Protocol</span>
-        <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === 'Protocol' && preparing.preparing"></i>
-        <a style="margin-left:10px;" *ngIf="preparing.name === 'Protocol' && !preparing.preparing"
-           download="{{parentformat.download}}" [href]="parentformat.uri"
-           class="link">
-          <fa-icon icon="save"></fa-icon>
-          Download
-        </a><br/>
+        <h5>{{"general.meta data" | transloco}}</h5>
+
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th style="width:25px;"></th>
+            <th>{{'general.name' | transloco}}</th>
+            <th>{{'general.description' | transloco}}</th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td (click)="getProtocol()">
+              <fa-icon style="color:gray;"
+                       [icon]="['fas', ((preparing.name === 'Protocol') ? 'chevron-up' : 'chevron-down')]"></fa-icon>
+            </td>
+            <td (click)="getProtocol()">
+              <a #a>
+                {{'general.protocol' | transloco}}
+              </a>
+            </td>
+            <td colspan="3">{{'export.meta data.description' | transloco}}</td>
+          </tr>
+          <tr [@fadeToggle]="(preparing.name === 'Protocol') ? 'active': 'inactive'">
+            <td></td>
+            <td colspan="4">
+              <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === 'Protocol' && preparing.preparing"></i>
+              <a *ngIf="preparing.name === 'Protocol' && !preparing.preparing"
+                 download="{{parentformat.download}}" [href]="parentformat.uri"
+                 class="link">
+                <fa-icon icon="save"></fa-icon>
+                Download
+              </a>
+            </td>
+          </tr>
+          </tbody>
+        </table>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="close()">

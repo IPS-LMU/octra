@@ -3,7 +3,10 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-              <h3 id="dialog-sizes-name1" class="modal-title pull-left">{{'modal.supported.header' | transloco}}</h3>
+              <h4 class="modal-title pull-left">{{'modal.supported.header' | transloco}}</h4>
+              <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+                <span aria-hidden="true">&times;</span>
+              </button>
             </div>
             <div class="modal-body">
               <h4>{{'modal.supported.audio files' | transloco}} (max. 300 MB):</h4>

@@ -86,7 +86,10 @@
     "SELECT ACTION": "SELECT ACTION",
     "Format": "Format",
     "Type": "Type",
-    "File extension": "File extension"
+    "File extension": "File extension",
+    "tools": "Tools",
+    "custom formats": "Custom formats",
+    "meta data": "Mata data"
   },
   "bug report": {
     "give feedback": "Give feedback",
@@ -266,6 +269,18 @@
     "show loupe": "Show loupe",
     "seconds per line": "Seconds per line"
   },
+  "custom": {
+    "table configurator": {
+      "name": "Table-Configurator",
+      "description": "This tool enables you to create your own table format.",
+      "add column": "Add column",
+      "divider": "Divider",
+      "add header": "Add header to the table",
+      "generate table": "Generate table",
+      "include line numbers": "include line numbers",
+      "time format": "time format"
+    }
+  },
   "tools": {
     "cut audio": {
       "name": "Cut audio file",
@@ -274,16 +289,6 @@
       "add placeholder": "Add placeholder",
       "hide configurator": "Hide configurator",
       "show configurator": "Show configurator"
-    },
-    "table configurator": {
-      "name": "Table-Configurator",
-      "description": "This tool enables to create your own table format.",
-      "add column": "Add column",
-      "divider": "Divider",
-      "add header": "Add header to the table",
-      "generate table": "Generate table",
-      "include line numbers": "include line numbers",
-      "time format": "time format"
     }
   },
   "asr": {
@@ -299,5 +304,10 @@
     "no asr selected": "Please select ASR options before using the shortcut.",
     "no quota": "No quota left. Please use another ASR provider.",
     "no auth": "Authentication needed for further transcription."
+  },
+  "export": {
+    "meta data": {
+      "description": "Download the meta data that was logged while your transcription progress. (Only available when logging was enabled in the settings menu)."
+    }
   }
 }

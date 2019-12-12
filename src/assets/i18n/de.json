@@ -86,7 +86,10 @@
     "SELECT ACTION": "AKTION WÄHLEN",
     "Format": "Format",
     "Type": "Typ",
-    "File extension": "Dateiendung"
+    "File extension": "Dateiendung",
+    "tools": "Werkzeuge",
+    "custom formats": "Eigene Formate",
+    "meta data": "Metadaten"
   },
   "bug report": {
     "give feedback": "Feedback geben",
@@ -266,6 +269,18 @@
     "show loupe": "Lupe anzeigen",
     "seconds per line": "Sekunden je Zeile"
   },
+  "custom": {
+    "table configurator": {
+      "name": "Tabellen-Konfigurator",
+      "description": "Mit diesem Konfigurator kannst Du dein eigenes Tabellenformat erstellen.",
+      "add column": "Spalte hinzufügen",
+      "divider": "Trennzeichen",
+      "add header": "Füge Kopfzeile zur Tabelle hinzu",
+      "generate table": "Tabelle erstellen",
+      "include line numbers": "Zeilennummern hinzufügen",
+      "time format": "Zeitformat"
+    }
+  },
   "tools": {
     "cut audio": {
       "name": "Audiodatei schneiden",
@@ -274,16 +289,6 @@
       "add placeholder": "Platzhalter hinzufügen",
       "hide configurator": "Verstecke den Konfigurator",
       "show configurator": "Zeige den Konfigurator"
-    },
-    "table configurator": {
-      "name": "Tabellen-Konfigurator",
-      "description": "Dieses Tool erlaubt es ein eigenes Tabellenformat zu erstellen",
-      "add column": "Spalte hinzufügen",
-      "divider": "Trennzeichen",
-      "add header": "Füge Kopfzeile zur Tabelle hinzu",
-      "generate table": "Tabelle erstellen",
-      "include line numbers": "Zeilennummern hinzufügen",
-      "time format": "Zeitformat"
     }
   },
   "asr": {
@@ -299,5 +304,10 @@
     "no asr selected": "Bevor Du das Tastenkürzel verwenden kannst, musst Du ASR Einstellungen vornehmen.",
     "no quota": "Es ist keine Kontingente mehr verfügbar. Bitte nutze einen anderen ASR Provider.",
     "no auth": "Um weiter zu transkribieren ist eine erneute Authentifizierung notwendig."
+  },
+  "export": {
+    "meta data": {
+      "description": "Lade die Daten herunter, die während deiner Transkription aufgezeichnet wurden. (Nur verfügbar, wenn die Protokollierung in den Einstellungen aktiviert wurde)."
+    }
   }
 }

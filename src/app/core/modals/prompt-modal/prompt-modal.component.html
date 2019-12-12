@@ -3,7 +3,10 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">{{"general.prompt" | transloco}}</h4>
+        <h4 class="modal-title pull-left">{{'general.prompt' | transloco}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
       <div class="modal-body">
         <ng-container *ngIf="formatConverter === null || formatConverter === undefined">

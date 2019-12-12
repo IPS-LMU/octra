@@ -2,100 +2,106 @@
      id="bugreport">
     <div class="modal-dialog modal-lg">
         <div class="modal-content" *ngIf="visible">
-            <div class="modal-body">
-                <!-- TODO remove old editor name in later versions -->
-                <div *ngIf="editor == 'Editor without signal display' || editor == 'Dictaphone Editor'">
-                  <h3>{{"modal.shortcuts.audioplayer" | transloco}}</h3>
-                    <div *ngIf="keyMap.getEntryList('AP') !== null">
-                        <table class="table table-striped">
-                            <tbody>
-                            <tr *ngFor="let entry of keyMap.getEntryList('AP')">
-                              <td>{{"modal.shortcuts." + entry.value.title | transloco}}</td>
-                                <td>{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly"
-                                                                         class="focus-info">({{"general.on focus only" | transloco}}
-                                  )</span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+          <div class="modal-header">
+            <h4 class="modal-title">{{"general.shortcuts" | transloco}}</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <!-- TODO remove old editor name in later versions -->
+            <div *ngIf="editor == 'Editor without signal display' || editor == 'Dictaphone Editor'">
+              <h5>{{"modal.shortcuts.audioplayer" | transloco}}</h5>
+              <div *ngIf="keyMap.getEntryList('AP') !== null">
+                <table class="table table-striped table-bordered">
+                  <tbody>
+                  <tr *ngFor="let entry of keyMap.getEntryList('AP')">
+                    <td>{{"modal.shortcuts." + entry.value.title | transloco}}</td>
+                    <td>{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly"
+                                                             class="focus-info">({{"general.on focus only" | transloco}}
+                      )</span>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
                     </div>
                 </div>
 
                 <div *ngIf="(editor == 'Linear Editor')">
-                  <h3>{{"modal.shortcuts.top signaldisplay" | transloco}}</h3>
+                  <h5>{{"modal.shortcuts.top signaldisplay" | transloco}}</h5>
                     <div *ngIf="keyMap.getEntryList('AV') !== null">
-                        <table class="table table table-striped">
-                            <tbody>
-                            <tr *ngFor="let entry of keyMap.getEntryList('AV')">
-                              <td>{{"modal.shortcuts." + entry.value.title | transloco}}</td>
-                                <td>{{entry.value.keys[platform]}} <span
-                                  *ngIf="(entry.value !== null && entry.value.focusonly)"
-                                  class="focus-info">({{"general.on focus only" | transloco}})</span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                      <table class="table table table-striped table-bordered">
+                        <tbody>
+                        <tr *ngFor="let entry of keyMap.getEntryList('AV')">
+                          <td>{{"modal.shortcuts." + entry.value.title | transloco}}</td>
+                          <td>{{entry.value.keys[platform]}} <span
+                            *ngIf="(entry.value !== null && entry.value.focusonly)"
+                            class="focus-info">({{"general.on focus only" | transloco}})</span>
+                          </td>
+                        </tr>
+                        </tbody>
+                      </table>
                     </div>
-                  <h3>{{"modal.shortcuts.down signaldisplay" | transloco}}</h3>
+                  <h5>{{"modal.shortcuts.down signaldisplay" | transloco}}</h5>
                     <div *ngIf="keyMap.getEntryList('Loupe') !== null">
-                        <table class="table table-striped">
-                            <tbody>
-                            <tr *ngFor="let entry of keyMap.getEntryList('Loupe')">
-                              <td>{{"modal.shortcuts." + entry.value.title |transloco}}</td>
-                                <td>
-                                    {{entry.value.keys[platform]}}
-                                    <span *ngIf="(entry.value !== null && entry.value.focusonly)"
-                                          class="focus-info">({{"general.on focus only" | transloco}})</span>
-                                </td>
-                            </tr>
-                            </tbody>
+                      <table class="table table-striped table-bordered">
+                        <tbody>
+                        <tr *ngFor="let entry of keyMap.getEntryList('Loupe')">
+                          <td>{{"modal.shortcuts." + entry.value.title |transloco}}</td>
+                          <td>
+                            {{entry.value.keys[platform]}}
+                            <span *ngIf="(entry.value !== null && entry.value.focusonly)"
+                                  class="focus-info">({{"general.on focus only" | transloco}})</span>
+                          </td>
+                        </tr>
+                        </tbody>
                         </table>
                     </div>
                 </div>
                 <div *ngIf="(editor == '2D-Editor')">
-                  <h3>{{"modal.shortcuts.2D-Editor" | transloco}}</h3>
+                  <h5>{{"modal.shortcuts.2D-Editor" | transloco}}</h5>
                     <div>
-                        <table class="table table-striped">
-                            <tbody>
-                            <tr *ngFor="let entry of keyMap.getEntryList('2D-Editor')">
-                              <td>{{"modal.shortcuts." + entry.value.title | transloco}}</td>
-                                <td>{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly"
-                                                                         class="focus-info">({{"general.on focus only" | transloco}}
-                                  )</span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                      <table class="table table-striped table-bordered">
+                        <tbody>
+                        <tr *ngFor="let entry of keyMap.getEntryList('2D-Editor')">
+                          <td>{{"modal.shortcuts." + entry.value.title | transloco}}</td>
+                          <td>{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly"
+                                                                   class="focus-info">({{"general.on focus only" | transloco}}
+                            )</span>
+                          </td>
+                        </tr>
+                        </tbody>
+                      </table>
                     </div>
-                  <h3>{{"general.transcription window" | transloco}}</h3>
+                  <h5>{{"general.transcription window" | transloco}}</h5>
                     <div>
-                        <table class="table table-striped">
-                            <tbody>
-                            <tr *ngFor="let entry of keyMap.getEntryList('Transcription Window')">
-                              <td>{{"modal.shortcuts." + entry.value.title | transloco}}</td>
-                                <td>{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly"
-                                                                         class="focus-info">({{"general.on focus only" | transloco}}
-                                  )</span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                      <table class="table table-striped table-bordered">
+                        <tbody>
+                        <tr *ngFor="let entry of keyMap.getEntryList('Transcription Window')">
+                          <td>{{"modal.shortcuts." + entry.value.title | transloco}}</td>
+                          <td>{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly"
+                                                                   class="focus-info">({{"general.on focus only" | transloco}}
+                            )</span>
+                          </td>
+                        </tr>
+                        </tbody>
+                      </table>
                     </div>
                 </div>
                 <div>
-                  <h3>{{"modal.shortcuts.general shortcuts" | transloco}}</h3>
+                  <h5>{{"modal.shortcuts.general shortcuts" | transloco}}</h5>
                     <div>
-                        <table class="table table-striped">
-                            <tbody>
-                            <tr *ngFor="let entry of generalShortcuts">
-                              <td>{{"modal.shortcuts." + entry.label | transloco}}</td>
-                                <td>{{entry.combination[platform]}} <span *ngIf="entry.focusonly"
-                                                                          class="focus-info">({{"general.on focus only" | transloco}}
-                                    )</span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                      <table class="table table-striped table-bordered">
+                        <tbody>
+                        <tr *ngFor="let entry of generalShortcuts">
+                          <td>{{"modal.shortcuts." + entry.label | transloco}}</td>
+                          <td>{{entry.combination[platform]}} <span *ngIf="entry.focusonly"
+                                                                    class="focus-info">({{"general.on focus only" | transloco}}
+                            )</span>
+                          </td>
+                        </tr>
+                        </tbody>
+                      </table>
                     </div>
                 </div>
             </div>

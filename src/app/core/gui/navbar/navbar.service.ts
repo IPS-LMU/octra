@@ -14,6 +14,8 @@ export class NavbarService {
   public originalInfo: AudioInfo;
   public filesize: FileSize;
 
+  public toolApplied = new EventEmitter<string>();
+
   private _showExport = false;
 
   get showExport(): boolean {

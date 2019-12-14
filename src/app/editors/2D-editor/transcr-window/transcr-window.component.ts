@@ -297,6 +297,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         const startSample = (this.segmentIndex > 0)
           ? this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value
           : 0;
+        console.log(`LOG exited!`);
         this.uiService.addElementFromEvent('transcription:segment_exited', {
             value: {
               segment: {
@@ -305,12 +306,14 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
                 transcript: segment.transcript
               }
             }
-          }, Date.now(), null, -1, '2D-Editor',
+          }, Date.now(), null, -1, {
+            start: this.loupe.viewer.selection.start.originalSample.value,
+            length: this.loupe.viewer.selection.end.originalSample.value
+          },
           {
             start: startSample,
-            length: segment.time.originalSample.value - startSample,
-            textlength: segment.transcript.length
-          });
+            length: segment.time.originalSample.value - startSample
+          }, '2D-Editor');
       }
     } else {
       const isNull = isNullOrUndefined(this.transcrService.currentlevel.segments);
@@ -321,28 +324,32 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
   onButtonClick(event: { type: string, timestamp: number }) {
     if (this.appStorage.logging) {
-      const segment = {
+      let segment = {
         start: -1,
-        length: -1,
-        textlength: -1
+        length: -1
       };
 
       if (this.segmentIndex > -1) {
         const annoSegment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
-        segment.start = annoSegment.time.originalSample.value;
-        segment.length = (this.segmentIndex < this.transcrService.currentlevel.segments.length - 1)
-          ? this.transcrService.currentlevel.segments.get(this.segmentIndex + 1).time.originalSample.value
-          - annoSegment.time.originalSample.value
-          : this.audiomanager.ressource.info.duration.originalSample.value - annoSegment.time.originalSample.value;
+        segment.start = 0;
+        if (this.segmentIndex > 0) {
+          segment.start = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value;
+        }
+
+        segment.length = annoSegment.time.originalSample.value - segment.start;
 
         segment.start = Math.round(segment.start);
         segment.length = Math.round(segment.length);
-        segment.textlength = this.editor.rawText.length;
+      } else {
+        segment = null;
       }
 
       this.uiService.addElementFromEvent('mouse_clicked', {value: event.type},
         event.timestamp, this.audiomanager.playposition,
-        this.editor.caretpos, 'audio_buttons', segment);
+        this.editor.caretpos, {
+          start: this.loupe.viewer.selection.start.originalSample.value,
+          length: this.loupe.viewer.selection.duration.originalSample.value
+        }, segment, 'audio_buttons');
     }
 
     if (event.type === 'replay') {
@@ -414,21 +421,20 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   onShortCutTriggered($event, type) {
     const segment = {
       start: -1,
-      length: -1,
-      textlength: -1
+      length: -1
     };
 
     if (this.segmentIndex > -1) {
       const annoSegment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
-      segment.start = annoSegment.time.originalSample.value;
-      segment.length = (this.segmentIndex < this.transcrService.currentlevel.segments.length - 1)
-        ? this.transcrService.currentlevel.segments.get(this.segmentIndex + 1).time.originalSample.value
-        - annoSegment.time.originalSample.value
-        : this.audiomanager.ressource.info.duration.originalSample.value - annoSegment.time.originalSample.value;
+      segment.start = 0;
+      if (this.segmentIndex > 0) {
+        segment.start = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value;
+      }
+
+      segment.length = annoSegment.time.originalSample.value - segment.start;
 
       segment.start = Math.round(segment.start);
       segment.length = Math.round(segment.length);
-      segment.textlength = this.editor.rawText.length;
     }
 
     this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
@@ -436,51 +442,59 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   }
 
   onMarkerInsert(markerCode: string) {
-    const segment = {
+    let segment = {
       start: -1,
-      length: -1,
-      textlength: -1
+      length: -1
     };
 
     if (this.segmentIndex > -1) {
       const annoSegment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
-      segment.start = annoSegment.time.originalSample.value;
-      segment.length = (this.segmentIndex < this.transcrService.currentlevel.segments.length - 1)
-        ? this.transcrService.currentlevel.segments.get(this.segmentIndex + 1).time.originalSample.value
-        - annoSegment.time.originalSample.value
-        : this.audiomanager.ressource.info.duration.originalSample.value - annoSegment.time.originalSample.value;
+      segment.start = 0;
+      if (this.segmentIndex > 0) {
+        segment.start = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value;
+      }
+
+      segment.length = annoSegment.time.originalSample.value - segment.start;
 
       segment.start = Math.round(segment.start);
       segment.length = Math.round(segment.length);
-      segment.textlength = this.editor.rawText.length;
+    } else {
+      segment = null;
     }
 
     this.uiService.addElementFromEvent('shortcut', {value: markerCode}, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, 'markers', segment);
+      this.audiomanager.playposition, this.editor.caretpos, {
+        start: this.loupe.viewer.selection.start.originalSample.value,
+        length: this.loupe.viewer.selection.duration.originalSample.value
+      }, segment, 'markers');
   }
 
   onMarkerClick(markerCode: string) {
-    const segment = {
+    let segment = {
       start: -1,
-      length: -1,
-      textlength: -1
+      length: -1
     };
 
     if (this.segmentIndex > -1) {
       const annoSegment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
-      segment.start = annoSegment.time.originalSample.value;
-      segment.length = (this.segmentIndex < this.transcrService.currentlevel.segments.length - 1)
-        ? this.transcrService.currentlevel.segments.get(this.segmentIndex + 1).time.originalSample.value
-        - annoSegment.time.originalSample.value
-        : this.audiomanager.ressource.info.duration.originalSample.value - annoSegment.time.originalSample.value;
+      segment.start = 0;
+      if (this.segmentIndex > 0) {
+        segment.start = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value;
+      }
+
+      segment.length = annoSegment.time.originalSample.value - segment.start;
 
       segment.start = Math.round(segment.start);
       segment.length = Math.round(segment.length);
-      segment.textlength = this.editor.rawText.length;
+    } else {
+      segment = null;
     }
 
     this.uiService.addElementFromEvent('mouse_clicked', {value: markerCode}, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, 'texteditor_toolbar', segment);
+      this.audiomanager.playposition, this.editor.caretpos, {
+        start: this.loupe.viewer.selection.start.originalSample.value,
+        length: this.loupe.viewer.selection.duration.originalSample.value
+      }, segment, 'texteditor_toolbar');
   }
 
   onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
@@ -489,27 +503,30 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   }
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
-    const segment = {
+    let segment = {
       start: -1,
-      length: -1,
-      textlength: -1
+      length: -1
     };
 
     if (this.segmentIndex > -1) {
       const annoSegment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
-      segment.start = annoSegment.time.originalSample.value;
-      segment.length = (this.segmentIndex < this.transcrService.currentlevel.segments.length - 1)
-        ? this.transcrService.currentlevel.segments.get(this.segmentIndex + 1).time.originalSample.value
-        - annoSegment.time.originalSample.value
-        : this.audiomanager.ressource.info.duration.originalSample.value - annoSegment.time.originalSample.value;
+      segment.start = 0;
+      if (this.segmentIndex > 0) {
+        segment.start = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value;
+      }
 
+      segment.length = annoSegment.time.originalSample.value - segment.start;
       segment.start = Math.round(segment.start);
       segment.length = Math.round(segment.length);
-      segment.textlength = this.editor.rawText.length;
+    } else {
+      segment = null;
     }
 
     this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
-      this.audiomanager.playposition, this.editor.caretpos, 'audio_speed', segment);
+      this.audiomanager.playposition, this.editor.caretpos, {
+        start: this.loupe.viewer.selection.start.originalSample.value,
+        length: this.loupe.viewer.selection.duration.originalSample.value
+      }, segment, 'audio_speed');
 
   }
 
@@ -518,27 +535,29 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   }
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
-    const segment = {
+    let segment = {
       start: -1,
-      length: -1,
-      textlength: -1
+      length: -1
     };
 
     if (this.segmentIndex > -1) {
       const annoSegment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
-      segment.start = annoSegment.time.originalSample.value;
-      segment.length = (this.segmentIndex < this.transcrService.currentlevel.segments.length - 1)
-        ? this.transcrService.currentlevel.segments.get(this.segmentIndex + 1).time.originalSample.value
-        - annoSegment.time.originalSample.value
-        : this.audiomanager.ressource.info.duration.originalSample.value - annoSegment.time.originalSample.value;
+      segment.start = 0;
+      if (this.segmentIndex > 0) {
+        segment.start = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value;
+      }
+
+      segment.length = annoSegment.time.originalSample.value - segment.start;
 
       segment.start = Math.round(segment.start);
       segment.length = Math.round(segment.length);
-      segment.textlength = this.editor.rawText.length;
     }
 
     this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
-      this.audiomanager.playposition, this.editor.caretpos, 'audio_volume', segment);
+      this.audiomanager.playposition, this.editor.caretpos, {
+        start: this.loupe.viewer.selection.start.originalSample.value,
+        length: this.loupe.viewer.selection.duration.originalSample.value
+      }, segment, 'audio_volume');
   }
 
   onBoundaryClicked(sample: BrowserSample) {

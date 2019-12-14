@@ -4,12 +4,41 @@
 import {ILog} from '../Settings/logging';
 
 export class StatisticElem {
-  protected data: any = {
+  protected data: {
+    timestamp: number,
+    type: string,
+    context: string,
+    value: any,
+    selection?: {
+      start: number;
+      length: number;
+    },
+    segment?: {
+      start: number;
+      length: number;
+    },
+    playpos?: number;
+    caretpos?: number;
+  } = {
     timestamp: null,
     type: null,
     context: null,
     value: null
   };
+
+  get selection(): {
+    start: number;
+    length: number;
+  } {
+    return this.data.selection;
+  }
+
+  set selection(value: {
+    start: number;
+    length: number;
+  }) {
+    this.data.selection = value;
+  }
 
   get value(): any {
     return this.data.value;
@@ -39,7 +68,13 @@ export class StatisticElem {
     return this.data.caretpos;
   }
 
-  constructor(type: string, context: string, value: any, timestamp: number, playpos: number) {
+  constructor(type: string, context: string, value: any, timestamp: number, playpos: number, selection: {
+    start: number;
+    length: number;
+  }, segment: {
+    start: number;
+    length: number;
+  }) {
     this.data.type = type;
     this.data.context = context;
     this.data.timestamp = timestamp;
@@ -47,6 +82,8 @@ export class StatisticElem {
     if (!(playpos === null || playpos === undefined)) {
       this.data.playpos = playpos;
     }
+    this.data.selection = selection;
+    this.data.segment = segment;
   }
 
   public static fromAny(elem: any): StatisticElem {
@@ -55,7 +92,9 @@ export class StatisticElem {
       context: null,
       timestamp: null,
       type: null,
-      playpos: null
+      playpos: null,
+      selection: null,
+      segment: null
     };
 
     for (const attr in elem) {
@@ -77,7 +116,9 @@ export class StatisticElem {
       result.context,
       result.value,
       result.timestamp,
-      result.playpos
+      result.playpos,
+      result.selection,
+      result.segment
     );
   }
 

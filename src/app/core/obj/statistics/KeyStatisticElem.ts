@@ -4,28 +4,8 @@ import {StatisticElem} from './StatisticElement';
  * Statistic Element Class
  */
 export class KeyStatisticElem extends StatisticElem {
-  get char(): string {
-    return this.data.char;
-  }
-
   get value(): string {
     return this.data.value;
-  }
-
-  get keyCode(): number {
-    return this.data.keyCode;
-  }
-
-  get shiftPressed(): number {
-    return this.data.shiftPressed;
-  }
-
-  get ctrlPressed(): number {
-    return this.data.ctrlPressed;
-  }
-
-  get altPressed(): number {
-    return this.data.altPressed;
   }
 
   constructor(type: string,
@@ -33,12 +13,16 @@ export class KeyStatisticElem extends StatisticElem {
               value: any,
               timestamp: number,
               playpos: number,
-              caretpos: number, segment: {
-      start: number,
-      length: number,
-      textlength: number
-    }) {
-    super(type, name, value, timestamp, playpos);
+              caretpos: number,
+              selection: {
+                start: number,
+                length: number
+              },
+              segment: {
+                start: number,
+                length: number
+              }) {
+    super(type, name, value, timestamp, playpos, selection, segment);
     this.data = {
       timestamp,
       type,
@@ -46,6 +30,7 @@ export class KeyStatisticElem extends StatisticElem {
       value,
       playpos,
       caretpos,
+      selection,
       segment
     };
   }
@@ -58,11 +43,8 @@ export class KeyStatisticElem extends StatisticElem {
       type: null,
       playpos: -1,
       caretpos: -1,
-      segment: {
-        start: -1,
-        length: -1,
-        textlength: -1
-      }
+      selection: null,
+      segment: null
     };
 
     for (const attr in elem) {
@@ -82,6 +64,6 @@ export class KeyStatisticElem extends StatisticElem {
     }
 
     return new KeyStatisticElem(result.type, result.context, result.value, result.timestamp,
-      result.playpos, result.caretpos, result.segment);
+      result.playpos, result.caretpos, result.selection, result.segment);
   }
 }

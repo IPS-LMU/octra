@@ -323,6 +323,7 @@ export class AudioManager {
                   onProcess();
                 } else {
                   this._audio.pause();
+                  this._playposition.browserSample.value = duration.browserSample.value + begintime.browserSample.value;
                   this.afterAudioEnded();
                 }
               }
@@ -637,6 +638,7 @@ export class AudioChunk {
       this.selection.end = this.time.end.clone();
     }
     this._playposition = this.selection.start.clone() as BrowserAudioTime;
+    this._audioManger.playposition = this._playposition;
   }
 
   get selection(): AudioSelection {
@@ -690,6 +692,7 @@ export class AudioChunk {
 
   set playposition(value: BrowserAudioTime) {
     this._playposition = value;
+    this._audioManger.playposition = value;
   }
 
   get lastplayedpos(): BrowserAudioTime {
@@ -771,16 +774,9 @@ export class AudioChunk {
       } else {
         this._playposition.browserSample.value = this._audioManger.playposition.browserSample.value;
       }
+      this._audioManger.playposition = this._playposition;
     }
   }
-
-  /* public getChannelBuffer(selection: AudioSelection): Float32Array {
-    if (!(selection === null || selection === undefined)) {
-      return this.audiomanager.channelData.subarray(selection.start.browserSample.value, selection.end.browserSample.value);
-    }
-
-    return null;
-  }*/
 
   public startPlayback(onProcess: () => void = () => {
   }, playOnHover: boolean = false): Promise<void> {

@@ -108,7 +108,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   onButtonClick(event: { type: string, timestamp: number }) {
     this.uiService.addElementFromEvent('mouseclick', {value: event.type},
       event.timestamp, this.audiomanager.playposition,
-      this.editor.caretpos, 'audio_buttons');
+      this.editor.caretpos, null, null, 'audio_buttons');
 
     switch (event.type) {
       case('play'):
@@ -146,7 +146,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
     this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audiomanager.playposition,
-      this.editor.caretpos, 'audio_speed');
+      this.editor.caretpos, null, null, 'audio_speed');
   }
 
   onVolumeChange(event: { old_value: number, new_value: number, timestamp: number }) {
@@ -156,7 +156,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
     this.uiService.addElementFromEvent('slider', event, event.timestamp,
-      this.audiomanager.playposition, this.editor.caretpos, 'audio_volume');
+      this.audiomanager.playposition, this.editor.caretpos, null, null, 'audio_volume');
   }
 
   afterTyping(status) {
@@ -182,7 +182,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   onShortcutTriggered(event) {
     event.value = `audio:${event.value}`;
     this.uiService.addElementFromEvent('shortcut', event, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, 'texteditor');
+      this.audiomanager.playposition, this.editor.caretpos, null, null, 'texteditor');
   }
 
   onBoundaryClicked(samples: BrowserSample) {
@@ -218,19 +218,19 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   onBoundaryInserted() {
     this.uiService.addElementFromEvent('segment', {value: 'boundaries:add'}, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, 'texteditor');
+      this.audiomanager.playposition, this.editor.caretpos, null, null, 'texteditor');
   }
 
   onMarkerInsert(markerCode: string) {
     this.uiService.addElementFromEvent('shortcut', {value: 'markers:' + markerCode}, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, 'texteditor');
+      this.audiomanager.playposition, this.editor.caretpos, null, null, 'texteditor');
   }
 
   onMarkerClick(markerCode: string) {
     this.afterTyping('stopped');
 
     this.uiService.addElementFromEvent('mouseclick', {value: markerCode}, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, 'texteditor_toolbar');
+      this.audiomanager.playposition, this.editor.caretpos, null, null, 'texteditor_toolbar');
   }
 
   saveTranscript() {

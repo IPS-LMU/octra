@@ -61,7 +61,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   constructor(private audio: AudioService,
-              private ap: AudioplayerService,
+              public ap: AudioplayerService,
               private changeDetectorRef: ChangeDetectorRef,
               private keyMap: KeymappingService) {
 

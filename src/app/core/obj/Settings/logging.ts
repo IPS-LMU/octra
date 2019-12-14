@@ -16,6 +16,14 @@ export interface ILog {
   value: string | number | any;
   playpos: number; // Samples
   caretpos: number; // Position des Cursors im// Text (wird Caret genannt)
+  selection?: {
+    start: number;
+    length: number;
+  },
+  segment?: {
+    start: number;
+    length: number;
+  }
 }
 
 export class OLogging implements ILogging {
@@ -52,13 +60,37 @@ export class OLog implements ILog {
   value: string | number | any;
   playpos: number; // Samples
   caretpos: number; // Position des Cursors im Text (wird Caret genannt)
+  selection: {
+    start: number;
+    length: number
+  };
+  segment: {
+    start: number;
+    length: number
+  };
 
-  constructor(timestamp: number, type: string, context: string, value: any, playpos: number, caretpos: number) {
+  constructor(timestamp: number, type: string, context: string, value: any, playpos: number, caretpos: number,
+              selection?: {
+                start: number;
+                length: number;
+              }, segment?: {
+      start: number;
+      length: number;
+    }) {
     this.timestamp = timestamp;
     this.type = type;
     this.context = context;
     this.value = value;
     this.playpos = playpos;
     this.caretpos = caretpos;
+    this.selection = selection;
+    this.segment = segment;
+
+    if (selection === null) {
+      delete this.selection;
+    }
+    if (segment === null) {
+      delete this.segment;
+    }
   }
 }

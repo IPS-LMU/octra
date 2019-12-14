@@ -375,7 +375,14 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             if (focuscheck && this.settings.shortcuts['' + shortc + ''].keys['' + platform + ''] === comboKey) {
               switch (shortc) {
                 case('play_pause'):
-                  this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'audio'});
+                  let selection = null;
+                  if (this.av.drawnselection.duration.originalSample.value > 0) {
+                    selection = {
+                      start: this.av.drawnselection.start.originalSample.value,
+                      length: this.av.drawnselection.duration.originalSample.value
+                    }
+                  }
+                  this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'audio', selection: selection});
                   if (this.audiomanager.state === PlayBackState.PLAYING) {
                     this.pausePlayback(() => {
                     });
@@ -386,21 +393,18 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                   break;
                 case('stop'):
                   this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'audio'});
-
                   this.stopPlayback(() => {
                   });
                   keyActive = true;
                   break;
                 case('step_backward'):
                   this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'audio'});
-
                   this.stepBackward(() => {
                   });
                   keyActive = true;
                   break;
                 case('step_backwardtime'):
                   this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'audio'});
-
                   this.stepBackwardTime(() => {
                   }, 0.5);
                   keyActive = true;
@@ -455,8 +459,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                   break;
                 case('play_selection'):
                   if (this.av.focused) {
-                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'audio'});
-
                     const xSamples = this.av.audioTCalculator.absXChunktoSamples(this.av.Mousecursor.absX, this.audiochunk);
 
                     const boundarySelect = this.av.getSegmentSelection(this.av.Mousecursor.timePos.browserSample.value);
@@ -499,6 +501,13 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                             this.changePlayCursorSamples(this.audiochunk.selection.start.browserSample.value);
                             this.drawPlayCursorOnly(this.av.LastLine);
 
+                            this.shortcuttriggered.emit({
+                              shortcut: comboKey, value: shortc, type: 'audio',
+                              selection: {
+                                start: boundarySelect.start.originalSample.value,
+                                length: boundarySelect.duration.originalSample.value
+                              }
+                            });
                             this.stopPlayback(() => {
                               // after stopping start audio playback
                               this.audiochunk.selection = boundarySelect.clone();
@@ -528,8 +537,19 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                   break;
                 case('delete_boundaries'):
                   if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this.av.focused) {
-                    // TODO trigger event for logging?
                     if (this.transcr.currentlevel.segments.length > 0) {
+
+                      console.log(`removed boundaries!`);
+                      this.shortcuttriggered.emit({
+                        shortcut: comboKey,
+                        value: 'remove_interval',
+                        type: 'boundary',
+                        selection: {
+                          start: this.selection.start.originalSample.value,
+                          length: this.selection.duration.originalSample.value
+                        }
+                      });
+
                       for (let i = 0; i < this.transcr.currentlevel.segments.length; i++) {
                         const segment = this.transcr.currentlevel.segments.get(i);
 

@@ -10,12 +10,15 @@ export class MouseStatisticElem extends StatisticElem {
               timestamp: number,
               playpos: number,
               caretpos: number,
+              selection: {
+                start: number;
+                length: number;
+              },
               segment: {
-                start: number,
-                length: number,
-                textlength: number
+                start: number;
+                length: number;
               }) {
-    super(type, name, value, timestamp, playpos);
+    super(type, name, value, timestamp, playpos, selection, segment);
 
     this.data = {
       timestamp,
@@ -24,6 +27,7 @@ export class MouseStatisticElem extends StatisticElem {
       value,
       playpos,
       caretpos,
+      selection,
       segment
     };
   }
@@ -36,11 +40,8 @@ export class MouseStatisticElem extends StatisticElem {
       type: null,
       playpos: -1,
       caretpos: -1,
-      segment: {
-        start: -1,
-        length: -1,
-        textlength: -1
-      }
+      selection: null,
+      segment: null
     };
 
     for (const attr in elem) {
@@ -59,6 +60,6 @@ export class MouseStatisticElem extends StatisticElem {
     }
 
     return new MouseStatisticElem(result.type, result.context,
-      result.value, result.timestamp, result.playpos, result.caretpos, result.segment);
+      result.value, result.timestamp, result.playpos, result.caretpos, result.selection, result.segment);
   }
 }

@@ -748,6 +748,12 @@ export class AppStorageService {
 
   public saveLogItem(log: any) {
     if (!(log === null || log === undefined)) {
+      for (let attr in log) {
+        if (log.hasOwnProperty(attr) && isNullOrUndefined(log['' + attr])) {
+          delete log['' + attr];
+        }
+      }
+
       this._idb.save('logs', log.timestamp, log).catch((err) => {
         console.error(err);
       });

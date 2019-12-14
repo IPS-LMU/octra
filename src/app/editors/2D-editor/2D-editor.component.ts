@@ -522,6 +522,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       }
     }
 
+    console.log($event);
     if (
       $event.value === null || !(
         // cursor move by keyboard events are note saved because this would be too much
@@ -532,11 +533,22 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     ) {
       $event.value = `${$event.type}:${$event.value}`;
 
-      const segment = {
+      let segment = {
         start: -1,
-        length: -1,
-        textlength: -1
+        length: -1
       };
+
+      let selection = {
+        start: -1,
+        length: -1
+      };
+
+      if ($event.hasOwnProperty('selection') && !isNullOrUndefined($event.selection)) {
+        selection.start = $event.selection.start;
+        selection.length = $event.selection.length;
+      } else {
+        selection = null;
+      }
 
       if (this.selectedIndex > -1 && this.selectedIndex < this.transcrService.currentlevel.segments.length) {
         const annoSegment = this.transcrService.currentlevel.segments.get(this.selectedIndex);
@@ -545,8 +557,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.originalSample.value
           - annoSegment.time.originalSample.value
           : this.audiomanager.originalInfo.duration.originalSample.value - annoSegment.time.originalSample.value;
-
-        segment.textlength = annoSegment.transcript.length;
+      } else {
+        segment = null;
       }
 
       const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
@@ -556,7 +568,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       }
 
       this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
-        playPosition, caretpos, 'multi-lines-viewer', segment);
+        playPosition, caretpos, selection, segment, 'multi-lines-viewer');
 
     } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
       this.appStorage.playonhover = !this.appStorage.playonhover;
@@ -572,10 +584,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
     if (this.appStorage.logging) {
-      const segment = {
+      let segment = {
         start: -1,
-        length: -1,
-        textlength: -1
+        length: -1
       };
 
       if (this.selectedIndex > -1 && this.selectedIndex < this.transcrService.currentlevel.segments.length) {
@@ -585,13 +596,13 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.originalSample.value
           - annoSegment.time.originalSample.value
           : this.audiomanager.originalInfo.duration.originalSample.value - annoSegment.time.originalSample.value;
-
-        segment.textlength = annoSegment.transcript.length;
+      } else {
+        segment = null;
       }
 
       const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        this.audiomanager.playposition, caretpos, 'audio_speed', segment);
+        this.audiomanager.playposition, caretpos, null, segment, 'audio_speed');
     }
   }
 
@@ -602,10 +613,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
     if (this.appStorage.logging) {
-      const segment = {
+      let segment = {
         start: -1,
-        length: -1,
-        textlength: -1
+        length: -1
       };
 
       if (this.selectedIndex > -1 && this.selectedIndex < this.transcrService.currentlevel.segments.length) {
@@ -615,13 +625,13 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.originalSample.value
           - annoSegment.time.originalSample.value
           : this.audiomanager.ressource.info.duration.originalSample.value - annoSegment.time.originalSample.value;
-
-        segment.textlength = annoSegment.transcript.length;
+      } else {
+        segment = null;
       }
 
       const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        this.audiomanager.playposition, caretpos, 'audio_volume', segment);
+        this.audiomanager.playposition, caretpos, null, segment, 'audio_volume');
     }
   }
 
@@ -629,10 +639,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     if (this.appStorage.logging) {
       const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
 
-      const segment = {
+      let segment = {
         start: -1,
-        length: -1,
-        textlength: -1
+        length: -1
       };
 
       if (this.selectedIndex > -1 && this.selectedIndex < this.transcrService.currentlevel.segments.length) {
@@ -642,13 +651,18 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.originalSample.value
           - annoSegment.time.originalSample.value
           : this.audiomanager.ressource.info.duration.originalSample.value - annoSegment.time.originalSample.value;
+      } else {
+        segment = null;
+      }
 
-        segment.textlength = annoSegment.transcript.length;
+      let selection = {
+        start: this.viewer.selection.start.originalSample.value,
+        length: this.viewer.selection.duration.originalSample.value
       }
 
       this.uiService.addElementFromEvent('mouseclick', {value: 'click:' + event.type},
         event.timestamp,
-        this.audiomanager.playposition, caretpos, 'audio_buttons', segment);
+        this.audiomanager.playposition, caretpos, selection, segment, 'audio_buttons');
     }
 
     switch (event.type) {

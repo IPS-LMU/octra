@@ -138,7 +138,7 @@ export class TranscriptionComponent implements OnInit,
             this.uiService.addElementFromEvent('audio',
               {value: state.toLowerCase()}, Date.now(),
               this.audiomanager.playposition,
-              caretpos, this.appStorage.Interface);
+              caretpos, null, null, this.appStorage.Interface);
           }
         }
       },
@@ -150,14 +150,24 @@ export class TranscriptionComponent implements OnInit,
       if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
         if (['ALT + SHIFT + 1', 'ALT + SHIFT + 2', 'ALT + SHIFT + 3'].includes(event.comboKey)) {
           this.waitForSend = true;
+
           this.appStorage.afterSaving().then(() => {
             this.waitForSend = false;
             if (event.comboKey === 'ALT + SHIFT + 1') {
               this.sendTranscriptionForShortAudioFiles('bad');
+              this.uiService.addElementFromEvent('shortcut', {
+                value: 'send_transcription:1'
+              }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, this.interface);
             } else if (event.comboKey === 'ALT + SHIFT + 2') {
               this.sendTranscriptionForShortAudioFiles('middle');
+              this.uiService.addElementFromEvent('shortcut', {
+                value: 'send_transcription:2'
+              }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, this.interface);
             } else if (event.comboKey === 'ALT + SHIFT + 3') {
               this.sendTranscriptionForShortAudioFiles('good');
+              this.uiService.addElementFromEvent('shortcut', {
+                value: 'send_transcription:3'
+              }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, this.interface);
             }
           }).catch((error) => {
             console.error(error);
@@ -376,7 +386,7 @@ export class TranscriptionComponent implements OnInit,
         );
         this.uiService.addElementFromEvent('level', {value: 'changed'}, Date.now(),
           this.audiomanager.createBrowserAudioTime(0),
-          -1, level.name);
+          -1, null, null, level.name);
       }
     ));
 
@@ -550,7 +560,7 @@ export class TranscriptionComponent implements OnInit,
             }
 
             this.uiService.addElementFromEvent('editor:changed', {value: name}, Date.now(),
-              null, null, 'editors');
+              null, null, null, null, 'editors');
 
             this.cd.detectChanges();
           }, 20);

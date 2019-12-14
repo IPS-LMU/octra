@@ -57,25 +57,20 @@ export class UserInteractionsService {
    * Parse Events
    */
   public addElementFromEvent(type: string, event: any, timestamp: number, playpos: BrowserAudioTime, caretpos: number,
-                             targetName?: string, segment?: {
-      start: number,
-      length: number,
-      textlength: number
-    }) {
+                             selection: {
+                               start: number,
+                               length: number
+                             },
+                             segment: {
+                               start: number,
+                               length: number
+                             }, targetName?: string) {
     this._lastAction = Date.now();
     const originalPlayerPos = (!isNullOrUndefined(playpos)) ? playpos.originalSample.value : -1;
 
     if (this._enabled) {
       let name = '';
       let context: any = null;
-
-      if ((segment === null || segment === undefined)) {
-        segment = {
-          start: -1,
-          length: -1,
-          textlength: -1
-        };
-      }
 
       if (!targetName) {
         if (event && event.target) {
@@ -101,14 +96,18 @@ export class UserInteractionsService {
           timestamp,
           (!isNullOrUndefined(playpos)) ? playpos.originalSample.value : -1,
           caretpos,
+          selection,
           segment
         );
       } else if (Functions.contains(type, 'mouse')) {
-        elem = new MouseStatisticElem(type, name, event.value, timestamp, originalPlayerPos, caretpos, segment);
+        elem = new MouseStatisticElem(type, name, event.value, timestamp, originalPlayerPos, caretpos,
+          selection, segment);
       } else if (Functions.contains(type, 'slider')) {
-        elem = new MouseStatisticElem(type, name, event.new_value, timestamp, originalPlayerPos, caretpos, segment);
+        elem = new MouseStatisticElem(type, name, event.new_value, timestamp, originalPlayerPos, caretpos,
+          selection, segment);
       } else {
-        elem = new StatisticElem(type, name, event.value, timestamp, originalPlayerPos);
+        elem = new StatisticElem(type, name, event.value, timestamp, originalPlayerPos,
+          selection, segment);
       }
 
       if (elem) {
@@ -144,7 +143,10 @@ export class UserInteractionsService {
     return result;
   }
 
-  public fromAnyArray(array: any[]) {
+  public fromAnyArray(array
+                        :
+                        any[]
+  ) {
     for (let i = 0; i < array.length; i++) {
       const elem = array[i];
       let newElem = null;
@@ -166,7 +168,8 @@ export class UserInteractionsService {
     this._elements = [];
   }
 
-  private getElements(typeStr: string): StatisticElem[] {
+  private getElements(typeStr: string):
+    StatisticElem[] {
     const result: StatisticElem[] = [];
 
     let type: any;

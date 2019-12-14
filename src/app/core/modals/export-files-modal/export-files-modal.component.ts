@@ -121,6 +121,9 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   public open(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.modal.show(this.modal, this.config);
+      this.uiService.addElementFromEvent('export', {
+        value: 'opened'
+      }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, 'modals');
 
       this.visible = true;
       this.tableConfigurator.updateAllTableCells();
@@ -140,6 +143,10 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
 
   public close() {
     this.modal.hide();
+
+    this.uiService.addElementFromEvent('export', {
+      value: 'closed'
+    }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, 'modals');
 
     this.actionperformed.next();
   }

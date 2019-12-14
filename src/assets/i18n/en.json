@@ -289,6 +289,20 @@
       "add placeholder": "Add placeholder",
       "hide configurator": "Hide configurator",
       "show configurator": "Show configurator"
+    },
+    "combine phrases": {
+      "name": "Combine Phrases",
+      "warning": "The word limitation is only possible if this tool is applied to an annotation with word segmentation. After the use of this tool, you can not revert the result.",
+      "description": "With this tool phrases between silence are combined in order to reduce short segments. Segments that contain silence, which is smaller than a specific length, are merged with their neighbours.",
+      "hide settings": "Hide settings",
+      "show settings": "Show settings",
+      "minimal silence desc": "All segments that contain silence are ignored if their duration are bigger than this value.",
+      "minimal silence": "Minimal length of silence",
+      "maximal words": "Maximal number of words",
+      "maximal words desc": "After the merge all segments will contain a maximal number of words. (Works only if each segment contains only one word). A value of 0 means that there is no limitation."
+    },
+    "alerts": {
+      "done": "Tool '{{value}}' was applied sucessfully."
     }
   },
   "asr": {

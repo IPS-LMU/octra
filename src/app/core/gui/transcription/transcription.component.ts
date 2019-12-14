@@ -111,7 +111,8 @@ export class TranscriptionComponent implements OnInit,
               private api: APIService,
               private bugService: BugReportService,
               private cd: ChangeDetectorRef,
-              private asrService: AsrService) {
+              private asrService: AsrService,
+              private msg: MessageService) {
     this.subscrmanager = new SubscriptionManager();
     this.audiomanager = this.audio.audiomanagers[0];
 
@@ -168,6 +169,21 @@ export class TranscriptionComponent implements OnInit,
 
     // TODO remove this case for later versions
     this.interface = (this.appStorage.Interface === 'Editor without signal display') ? 'Dictaphone Editor' : this.appStorage.Interface;
+
+    this.subscrmanager.add(this.navbarServ.toolApplied.subscribe((toolName: string) => {
+        switch (toolName) {
+          case('combinePhrases'):
+            this.msg.showMessage('success', this.langService.translate('tools.alerts.done', {
+              value: toolName
+            }));
+            (this._currentEditor.instance as any).update();
+            break;
+        }
+      },
+      (error) => {
+      },
+      () => {
+      }));
   }
 
   // TODO change to ModalComponents!

@@ -21,6 +21,67 @@
           </tr>
           </thead>
           <tbody>
+          <!-- combine phrases tool -->
+          <tr>
+            <td (click)="tools.combinePhrases.opened = !tools.combinePhrases.opened">
+              <fa-icon style="color:gray;"
+                       [icon]="['fas', ((tools.combinePhrases.opened) ? 'chevron-up' : 'chevron-down')]"></fa-icon>
+            </td>
+            <td (click)="tools.combinePhrases.opened = !tools.combinePhrases.opened">
+              <a #a>
+                {{'tools.combine phrases.name' | transloco}}
+              </a>
+            </td>
+            <td colspan="3"
+                (click)="tools.combinePhrases.opened = !tools.combinePhrases.opened">{{'tools.combine phrases.description' | transloco}}</td>
+          </tr>
+          <tr
+            [@fadeToggle]="(tools.combinePhrases.opened) ? 'active': 'inactive'">
+            <td></td>
+            <td colspan="4" style="padding-left:20px;">
+              <div class="card" style="padding:10px;" *ngIf="navbarServ.transcrService !== undefined">
+                <div class="alert alert-warning">
+                  {{'tools.combine phrases.warning' | transloco}}
+                </div>
+                <div class="configurator">
+                  <table class="table" style="max-width: 400px;">
+                    <tbody>
+                    <tr>
+                      <td><label for="minSilenceLength">{{'tools.combine phrases.minimal silence' | transloco}}</label>
+                      </td>
+                      <td>
+                        <input type="number" id="minSilenceLength" name="minSilenceLength"
+                               [(ngModel)]="tools.combinePhrases.options.minSilenceLength"/>
+                      </td>
+                      <td>
+                        <fa-icon icon="question-circle" style="color: darkblue;"
+                                 [tooltip]="transloco.translate('tools.combine phrases.minimal silence desc')"
+                                 placement="right"></fa-icon>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><label for="maxWordsPerSegment">{{'tools.combine phrases.maximal words' | transloco}}</label>
+                      </td>
+                      <td>
+                        <input type="number" id="maxWordsPerSegment" name="maxWordsPerSegment"
+                               [(ngModel)]="tools.combinePhrases.options.maxWordsPerSegment"/>
+                      </td>
+                      <td>
+                        <fa-icon icon="question-circle" style="color: darkblue;"
+                                 [tooltip]="transloco.translate('tools.combine phrases.maximal words desc')"
+                                 placement="right"></fa-icon>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+                  <button class="btn btn-primary btn-raised" (click)="onCombinePhrasesClick()"
+                          [disabled]="!isCombinePhrasesSettingsValid">{{'tools.combine phrases.name' | transloco}}</button>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- cut audio files -->
           <tr *ngIf="navbarServ.transcrService !== undefined
                      && navbarServ.transcrService.audiomanager.originalInfo.extension === '.wav'">
             <td (click)="tools.audioCutting.opened = !tools.audioCutting.opened">
@@ -32,7 +93,8 @@
                 {{'tools.cut audio.name' | transloco}}
               </a>
             </td>
-            <td colspan="3">{{'tools.cut audio.description' | transloco}}</td>
+            <td colspan="3"
+                (click)="tools.audioCutting.opened = !tools.audioCutting.opened">{{'tools.cut audio.description' | transloco}}</td>
           </tr>
           <tr *ngIf="navbarServ.transcrService !== undefined
                     && navbarServ.transcrService.audiomanager.originalInfo.extension === '.wav'"

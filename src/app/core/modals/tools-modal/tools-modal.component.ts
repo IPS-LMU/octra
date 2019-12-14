@@ -12,6 +12,7 @@ import {interval, Subject} from 'rxjs';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
 import {WavFormat} from '../../../media-components/obj/media/audio/AudioFormats';
 import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/cutting-format';
+import {TranslocoService} from '@ngneat/transloco';
 
 declare var JSZip;
 
@@ -72,6 +73,16 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
       cuttingTimeLeft: 0,
       timeLeft: 0,
       wavFormat: null
+    },
+    combinePhrases: {
+      opened: false,
+      status: 'idle',
+      message: '',
+      showOptions: false,
+      options: {
+        minSilenceLength: 100,
+        maxWordsPerSegment: 10
+      }
     }
   };
 
@@ -85,13 +96,22 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();
 
+  get isCombinePhrasesSettingsValid(): boolean {
+    return (Number.isInteger(this.tools.combinePhrases.options.minSilenceLength) &&
+      Number.isInteger(this.tools.combinePhrases.options.maxWordsPerSegment) &&
+      this.tools.combinePhrases.options.minSilenceLength >= 20
+      && this.tools.combinePhrases.options.maxWordsPerSegment >= 0);
+  }
+
   constructor(private sanitizer: DomSanitizer,
               public navbarServ: NavbarService,
               private modalService: BsModalService,
               private httpClient: HttpClient,
               private appStorage: AppStorageService,
               private audio: AudioService,
-              private settService: SettingsService) {
+              private settService: SettingsService,
+              public transloco: TranslocoService
+  ) {
   }
 
   ngOnInit() {
@@ -469,6 +489,18 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
     }
   }
 
+  onCombinePhrasesClick() {
+    if (!this.isSomethingBlocked()) {
+      this.combinePhrases();
+    }
+  }
+
+  isSomethingBlocked(): boolean {
+    return this.transcrService.currentlevel.segments.segments.find((a) => {
+      return !isNullOrUndefined(a.isBlockedBy);
+    }) !== undefined;
+  }
+
   private getDurationFactorForZipping(): Promise<number> {
     return new Promise<number>((resolve, reject) => {
 
@@ -488,4 +520,68 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
     });
   }
 
+  private combinePhrases() {
+    const maxWords = this.tools.combinePhrases.options.maxWordsPerSegment;
+    const minSilenceLength = this.tools.combinePhrases.options.minSilenceLength;
+    const isSilence = (segment: Segment) => {
+      return ((segment.transcript.trim() === '' ||
+        segment.transcript.trim() === this.transcrService.breakMarker.code ||
+        segment.transcript.trim() === '<p:>'));
+    };
+
+    const countWords = (text: string) => {
+      return text.trim().split(' ').length;
+    };
+
+    let wordCounter = 0;
+
+    for (let i = 0; i < this.transcrService.currentlevel.segments.segments.length; i++) {
+      const segment = this.transcrService.currentlevel.segments.segments[i];
+
+      let startPos = 0;
+      if (i > 0) {
+        startPos = this.transcrService.currentlevel.segments.segments[i - 1].time.browserSample.seconds;
+      }
+      let duration = Math.round((segment.time.browserSample.seconds - startPos) * 1000);
+      if (!isSilence(segment) || duration < minSilenceLength) {
+        if (maxWords > 0 && wordCounter >= maxWords) {
+          wordCounter = (isSilence(segment)) ? 0 : countWords(segment.transcript);
+        } else {
+          if (i > 0) {
+            const lastSegment = this.transcrService.currentlevel.segments.segments[i - 1];
+            startPos = 0;
+            if (i > 1) {
+              startPos = this.transcrService.currentlevel.segments.segments[i - 2].time.browserSample.seconds;
+            }
+            duration = Math.round((lastSegment.time.browserSample.seconds - startPos) * 1000);
+            if (!isSilence(lastSegment) || duration < minSilenceLength) {
+              let lastSegmentText = lastSegment.transcript;
+              let segmentText = segment.transcript;
+
+              if (isSilence(lastSegment)) {
+                lastSegmentText = '';
+              }
+
+              if (!isSilence(segment)) {
+                segment.transcript = `${lastSegmentText} ${segment.transcript}`;
+                wordCounter = countWords(segment.transcript);
+              } else {
+                segmentText = '';
+                segment.transcript = `${lastSegmentText}`;
+                console.log(`processed!`);
+              }
+              this.transcrService.currentlevel.segments.segments.splice(i - 1, 1);
+              this.transcrService.saveSegments();
+              i--;
+            }
+          }
+        }
+      }
+    }
+
+    this.close();
+    setTimeout(() => {
+      this.navbarServ.toolApplied.emit('combinePhrases');
+    }, 1000);
+  }
 }

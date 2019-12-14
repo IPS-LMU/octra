@@ -289,6 +289,20 @@
       "add placeholder": "Platzhalter hinzufügen",
       "hide configurator": "Verstecke den Konfigurator",
       "show configurator": "Zeige den Konfigurator"
+    },
+    "combine phrases": {
+      "name": "Kombiniere Phrasen",
+      "warning": "Die Begrenzung der Wortanzahl ist nur dann möglich, wenn es sich bei der angewendeten Annotation um eine Wort-Segmentierung handelt. Nach der Anwendung dieses Werkzeugs kann das Resultat nicht rückgängig gemacht werden.",
+      "description": "Mit diesem Werkzeug werden Phrasen miteinander kombiniert, sodass größere Segmente entstehen. Pausen, die kleiner sind als eine festgelegte Länge, werden bei dem Vorgang mit den Phrasen verschmolzen.",
+      "hide settings": "Verstecke die Einstellungen",
+      "show settings": "Zeige die Einstellungen",
+      "minimal silence": "Minimale Pausenlänge (ms)",
+      "minimal silence desc": "Alle Pausen, deren Länge größer oder gleich dem angegebenen Wert sind, werden nicht zusammengeführt.",
+      "maximal words": "Maximale Anzahl an Wörtern",
+      "maximal words desc": "Die Segmente werden so zusammengeführt, dass ein Segment eine maximale Anzahl an Wörtern besitzt (das funktioniert nur, wenn eine Wortsegmentierung vorliegt). Ein Wert von 0 bedeutet, dass keine Begrenzung existiert."
+    },
+    "alerts": {
+      "done": "Das Werkzeug '{{value}}' wurde erfolgreich angewendet."
     }
   },
   "asr": {

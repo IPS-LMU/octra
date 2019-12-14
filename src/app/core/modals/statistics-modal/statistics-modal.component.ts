@@ -50,9 +50,7 @@ export class StatisticsModalComponent implements OnInit {
     return (!(this.uiService === null || this.uiService === undefined)) ? this.uiService.elements : null;
   }
 
-  get transcrObjStr(): string {
-    return JSON.stringify(this.transcrServ.exportDataToJSON(), null, 3);
-  }
+  public transcrObjStr = '';
 
   constructor(private modalService: BsModalService, private navbarService: NavbarService, private appStorage: AppStorageService) {
   }
@@ -64,6 +62,7 @@ export class StatisticsModalComponent implements OnInit {
     return new Promise<void>((resolve, reject) => {
       this.modal.show(this.modal, this.config);
       this.visible = true;
+      this.transcrObjStr = this.stringify(this.transcrServ.exportDataToJSON());
       const subscr = this.actionperformed.subscribe(
         (action) => {
           resolve(action);
@@ -95,5 +94,9 @@ export class StatisticsModalComponent implements OnInit {
     }
 
     return '';
+  }
+
+  public stringify(value: string) {
+    return JSON.stringify(value, null, 2);
   }
 }

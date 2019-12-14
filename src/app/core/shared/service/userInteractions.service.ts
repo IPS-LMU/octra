@@ -56,14 +56,14 @@ export class UserInteractionsService {
   /**
    * Parse Events
    */
-  public addElementFromEvent(type: string, event: any, timestamp: number, playerpos: BrowserAudioTime, caretpos: number,
+  public addElementFromEvent(type: string, event: any, timestamp: number, playpos: BrowserAudioTime, caretpos: number,
                              targetName?: string, segment?: {
       start: number,
       length: number,
       textlength: number
     }) {
     this._lastAction = Date.now();
-    const originalPlayerPos = (!isNullOrUndefined(playerpos)) ? playerpos.originalSample.value : -1;
+    const originalPlayerPos = (!isNullOrUndefined(playpos)) ? playpos.originalSample.value : -1;
 
     if (this._enabled) {
       let name = '';
@@ -99,7 +99,7 @@ export class UserInteractionsService {
           name,
           event.value,
           timestamp,
-          (!isNullOrUndefined(playerpos)) ? playerpos.originalSample.value : -1,
+          (!isNullOrUndefined(playpos)) ? playpos.originalSample.value : -1,
           caretpos,
           segment
         );
@@ -119,7 +119,7 @@ export class UserInteractionsService {
           elem.type,
           elem.context,
           '',
-          elem.playerpos,
+          elem.playpos,
           elem.caretpos
         );
 

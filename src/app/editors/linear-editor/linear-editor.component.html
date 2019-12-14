@@ -53,18 +53,18 @@
 
 </app-audio-navigation>
 <div id="viewer">
-    <app-audioviewer #viewer (selchange)="onSelectionChanged($event)"
-                     (segmentchange)="onSegmentChange()"
-                     (segmententer)="onSegmentEnter($event)"
-                     (mousecursorchange)="onMouseOver($event)"
-                     (mouseenter)="miniLoupeHidden = false;"
-                     (mouseleave)="miniLoupeHidden = true;"
-                     (mousedown)="onViewerMouseDown($event)"
-                     (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_top')"
-                     [audiochunk]="audiochunkTop"
-                     style="height:80px;"
-    >
-    </app-audioviewer>
+  <app-audioviewer #viewer (selchange)="onSelectionChanged($event)"
+                   (segmentchange)="onSegmentChange()"
+                   (segmententer)="onSegmentEnter($event)"
+                   (mousecursorchange)="onMouseOver($event)"
+                   (mouseenter)="miniLoupeHidden = false;"
+                   (mouseleave)="miniLoupeHidden = true;"
+                   (mousedown)="onViewerMouseDown($event)"
+                   (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_top', viewer)"
+                   [audiochunk]="audiochunkTop"
+                   style="height:80px;"
+  >
+  </app-audioviewer>
 </div>
 
 <app-loupe #loupe
@@ -73,7 +73,7 @@
             top:2
            }"
            (segmententer)="onLoupeSegmentEnter($event)"
-           (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_down')"
+           (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_down', loupe)"
            (click)="onLoupeClick($event)"
            [audiochunk]="audiochunkDown"
            [height]="150"
@@ -83,11 +83,11 @@
 >
 </app-loupe>
 <div [hidden]="segmentselected" id="editor-placeholder">
-    <div *ngIf="!segmentselected && topSelected" class="inner"
-         [innerHTML]="'signal-gui.segment enter text' | transloco:{value: segmententer_shortc}">
-    </div>
+  <div *ngIf="!segmentselected && topSelected" class="inner"
+       [innerHTML]="'signal-gui.segment enter text' | transloco:{value: segmententer_shortc}">
+  </div>
   <div *ngIf="!topSelected" class="inner" [innerHTML]="'signal-gui.selection text' | transloco">
-    </div>
+  </div>
 </div>
 <app-transcr-editor #transcr
                     (markerInsert)="onMarkerInsert($event)"

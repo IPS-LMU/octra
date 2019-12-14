@@ -32,19 +32,19 @@ export class KeyStatisticElem extends StatisticElem {
               name: string,
               value: any,
               timestamp: number,
-              playerpos: number,
+              playpos: number,
               caretpos: number, segment: {
       start: number,
       length: number,
       textlength: number
     }) {
-    super(type, name, value, timestamp, playerpos);
+    super(type, name, value, timestamp, playpos);
     this.data = {
       timestamp,
       type,
       context: name,
       value,
-      playerpos,
+      playpos,
       caretpos,
       segment
     };
@@ -56,7 +56,7 @@ export class KeyStatisticElem extends StatisticElem {
       context: null,
       timestamp: null,
       type: null,
-      playerpos: -1,
+      playpos: -1,
       caretpos: -1,
       segment: {
         start: -1,
@@ -70,14 +70,18 @@ export class KeyStatisticElem extends StatisticElem {
         if (elem.hasOwnProperty('value') || elem.hasOwnProperty('context') || elem.hasOwnProperty('timestamp')
           || elem.hasOwnProperty('type') || elem.hasOwnProperty('keyCode') || elem.hasOwnProperty('shiftPressed')
           || elem.hasOwnProperty('ctrlPressed') || elem.hasOwnProperty('altPressed') || elem.hasOwnProperty('char')
-          || elem.hasOwnProperty('playerpos') || elem.hasOwnProperty('caretpos') || elem.hasOwnProperty('control')
+          || elem.hasOwnProperty('playpos') || elem.hasOwnProperty('playerpos') || elem.hasOwnProperty('caretpos') || elem.hasOwnProperty('control')
         ) {
-          result[`${attr}`] = elem[`${attr}`];
+          if (attr === 'playerpos') {
+            result['playpos'] = elem[`${attr}`];
+          } else {
+            result[`${attr}`] = elem[`${attr}`];
+          }
         }
       }
     }
 
     return new KeyStatisticElem(result.type, result.context, result.value, result.timestamp,
-      result.playerpos, result.caretpos, result.segment);
+      result.playpos, result.caretpos, result.segment);
   }
 }

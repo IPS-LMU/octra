@@ -550,9 +550,13 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       }
 
       const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
+      let playPosition = this.audiomanager.playposition;
+      if ($event.type === 'boundary') {
+        playPosition = this.viewer.MouseCursor.timePos
+      }
 
       this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
-        this.audiomanager.playposition, caretpos, 'multi-lines-viewer', segment);
+        playPosition, caretpos, 'multi-lines-viewer', segment);
 
     } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
       this.appStorage.playonhover = !this.appStorage.playonhover;

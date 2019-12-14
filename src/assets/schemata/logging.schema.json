@@ -29,7 +29,7 @@
               "object"
             ]
           },
-          "playerpos": {
+          "playpos": {
             "type": "integer"
           },
           "caretpos": {

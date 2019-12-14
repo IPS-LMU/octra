@@ -50,7 +50,8 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   get segmententer_shortc(): string {
     return (this.viewer.settings) ? this.viewer.settings.shortcuts.segment_enter.keys[this.platform] : '';
   }
-  private oldRaw = "";
+
+  private oldRaw = '';
 
   constructor(public audio: AudioService,
               public msg: MessageService,
@@ -371,7 +372,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.save();
   }
 
-  onShortCutTriggered($event, control) {
+  onShortCutTriggered($event, control, component: AudioviewerComponent) {
     if (this.appStorage.logging) {
 
       if (
@@ -402,8 +403,12 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
           segment.textlength = annoSegment.transcript.length;
         }
+        let playPosition = this.audiomanager.playposition;
+        if ($event.type === 'boundary') {
+          playPosition = component.MouseCursor.timePos
+        }
 
-        this.uiService.addElementFromEvent('shortcut', $event, Date.now(), this.audiomanager.playposition, caretpos, control, segment);
+        this.uiService.addElementFromEvent('shortcut', $event, Date.now(), playPosition, caretpos, control, segment);
       } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
         this.appStorage.playonhover = !this.appStorage.playonhover;
       }

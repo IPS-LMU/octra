@@ -46,17 +46,18 @@
                                 <td>{{elem.timestamp | date:"dd.MM.yy HH:mm:ss"}}</td>
                                 <td>{{elem.type}}</td>
                                 <td>{{elem.context}}</td>
-                                <td>
-                                    {{elem.value}}
-                                </td>
+                              <td>
+                                {{elem.value}}
+                              </td>
                             </tr>
                             </tbody>
                         </table>
                     </div>
-                    <h3>
-                        Das Transkriptionsobjekt:
-                    </h3>
-                    <!--<textarea style="width:100%; height:300px;">{{transcrObjStr}}</textarea>-->
+                  <h3>
+                    Das Transkriptionsobjekt:
+                  </h3>
+                  <textarea style="width: 100%;display: block;" [innerHTML]="transcrObjStr">
+                  </textarea>
                 </div>
             </div>
             <div class="modal-footer">

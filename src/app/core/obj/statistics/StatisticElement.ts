@@ -31,21 +31,21 @@ export class StatisticElem {
     return this.data.type;
   }
 
-  get playerpos(): number {
-    return this.data.playerpos;
+  get playpos(): number {
+    return this.data.playpos;
   }
 
   get caretpos(): number {
     return this.data.caretpos;
   }
 
-  constructor(type: string, context: string, value: any, timestamp: number, playerpos: number) {
+  constructor(type: string, context: string, value: any, timestamp: number, playpos: number) {
     this.data.type = type;
     this.data.context = context;
     this.data.timestamp = timestamp;
     this.data.value = value;
-    if (!(playerpos === null || playerpos === undefined)) {
-      this.data.playerpos = playerpos;
+    if (!(playpos === null || playpos === undefined)) {
+      this.data.playpos = playpos;
     }
   }
 
@@ -55,15 +55,19 @@ export class StatisticElem {
       context: null,
       timestamp: null,
       type: null,
-      playerpos: null
+      playpos: null
     };
 
     for (const attr in elem) {
       if (elem.hasOwnProperty(attr)) {
         if (elem.hasOwnProperty('value') || elem.hasOwnProperty('context') || elem.hasOwnProperty('timestamp') ||
-          elem.hasOwnProperty('type') || elem.hasOwnProperty('playerpos') || elem.hasOwnProperty('cursorpos')
+          elem.hasOwnProperty('type') || elem.hasOwnProperty('playpos') || elem.hasOwnProperty('playerpos') || elem.hasOwnProperty('cursorpos')
         ) {
-          result[`${attr}`] = elem[`${attr}`];
+          if (attr === 'playerpos') {
+            result['playpos'] = elem[`${attr}`];
+          } else {
+            result[`${attr}`] = elem[`${attr}`];
+          }
         }
       }
     }
@@ -73,7 +77,7 @@ export class StatisticElem {
       result.context,
       result.value,
       result.timestamp,
-      result.playerpos
+      result.playpos
     );
   }
 

@@ -14,7 +14,7 @@ export interface ILog {
   type: string;
   context: string; // Ziel der Aktion/betroffenes Control
   value: string | number | any;
-  playerpos: number; // Samples
+  playpos: number; // Samples
   caretpos: number; // Position des Cursors im// Text (wird Caret genannt)
 }
 
@@ -50,15 +50,15 @@ export class OLog implements ILog {
   type: string;
   context: string; // Ziel der Aktion/betroffenes Control
   value: string | number | any;
-  playerpos: number; // Samples
+  playpos: number; // Samples
   caretpos: number; // Position des Cursors im Text (wird Caret genannt)
 
-  constructor(timestamp: number, type: string, context: string, value: any, playerpos: number, caretpos: number) {
+  constructor(timestamp: number, type: string, context: string, value: any, playpos: number, caretpos: number) {
     this.timestamp = timestamp;
     this.type = type;
     this.context = context;
     this.value = value;
-    this.playerpos = playerpos;
+    this.playpos = playpos;
     this.caretpos = caretpos;
   }
 }

@@ -607,7 +607,7 @@ export class TranscriptionService {
           elem.type,
           elem.context,
           '',
-          elem.playerpos,
+          elem.playpos,
           elem.caretpos
         );
 

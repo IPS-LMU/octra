@@ -168,7 +168,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         this.close();
       }
     });
-  }
+  };
 
   onKeyDown = ($event) => {
     switch ($event.comboKey) {
@@ -267,6 +267,17 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
   public close() {
     this.showWindow = false;
+
+    const startSample = (this.segmentIndex > 0) ? this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value : 0;
+
+    this.uiService.addElementFromEvent('segment', {
+        value: 'exited'
+      }, Date.now(), this.loupe.viewer.av.PlayCursor.timePos, -1, null,
+      {
+        start: startSample,
+        length: this.transcrService.currentlevel.segments.get(this.segmentIndex).time.originalSample.value - startSample
+      }, 'transcription window');
+
     this.act.emit('close');
   }
 
@@ -306,20 +317,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
             length: this.loupe.viewer.av.drawnselection.duration.originalSample.value
           };
         }
-
-        this.uiService.addElementFromEvent('transcription:segment_exited', {
-            value: {
-              segment: {
-                start: startSample,
-                length: segment.time.originalSample.value - startSample,
-                transcript: segment.transcript
-              }
-            }
-          }, Date.now(), null, -1, selection,
-          {
-            start: startSample,
-            length: segment.time.originalSample.value - startSample
-          }, '2D-Editor');
       }
     } else {
       const isNull = isNullOrUndefined(this.transcrService.currentlevel.segments);
@@ -392,6 +389,14 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
         if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.breakMarker.code) {
           segment = this.transcrService.currentlevel.segments.get(i);
           this.segmentIndex = i;
+
+          const start = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.originalSample.value : 0;
+          this.uiService.addElementFromEvent('segment', {value: 'entered next'},
+            Date.now(), this.audiomanager.playposition,
+            this.editor.caretpos, null, {
+              start,
+              length: this.transcrService.currentlevel.segments.get(i).time.originalSample.value - start
+            }, 'transcription window');
         }
       } else if (direction === 'left' && this.segmentIndex > 0) {
         let i = this.segmentIndex - 1;
@@ -406,6 +411,14 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
         if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.breakMarker.code) {
           segment = this.transcrService.currentlevel.segments.get(i);
           this.segmentIndex = i;
+
+          const start = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.originalSample.value : 0;
+          this.uiService.addElementFromEvent('segment', {value: 'entered previous'},
+            Date.now(), this.audiomanager.playposition,
+            this.editor.caretpos, null, {
+              start,
+              length: this.transcrService.currentlevel.segments.get(i).time.originalSample.value - start
+            }, 'transcription window');
         }
       }
 

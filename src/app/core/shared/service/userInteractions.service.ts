@@ -129,7 +129,6 @@ export class UserInteractionsService {
         } else {
           newElem.value = (elem as StatisticElem).value;
         }
-
       }
     }
   }
@@ -143,10 +142,8 @@ export class UserInteractionsService {
     return result;
   }
 
-  public fromAnyArray(array
-                        :
-                        any[]
-  ) {
+  public fromAnyArray(array: any[]) {
+    // BUG all events are considered as MouseStatisticEvent!
     for (let i = 0; i < array.length; i++) {
       const elem = array[i];
       let newElem = null;
@@ -154,6 +151,7 @@ export class UserInteractionsService {
       newElem = MouseStatisticElem.fromAny(elem);
       if (newElem) {
       } else {
+        console.log(`is not mouse StatisticElem`);
         newElem = StatisticElem.fromAny(elem);
       }
 

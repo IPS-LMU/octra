@@ -390,7 +390,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       selected.index < this.transcrService.currentlevel.segments.length) {
       const segment = this.transcrService.currentlevel.segments.get(selected.index);
       if (segment.isBlockedBy !== ASRQueueItemType.ASRMAUS) {
-        const start: any = (selected.index > 0) ? this.transcrService.currentlevel.segments.get(selected.index - 1).time.clone()
+        const start: BrowserAudioTime | OriginalAudioTime = (selected.index > 0) ? this.transcrService.currentlevel.segments.get(selected.index - 1).time.clone()
           : this.audiomanager.createBrowserAudioTime(0);
         if (segment) {
           this.selectedIndex = selected.index;
@@ -399,6 +399,13 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           this.viewer.deactivateShortcuts = true;
           this.viewer.focused = false;
           this.showWindow = true;
+
+          this.uiService.addElementFromEvent('segment', {
+            value: 'entered'
+          }, Date.now(), this.audiomanager.playposition, -1, null, {
+            start: start.originalSample.value,
+            length: this.transcrService.currentlevel.segments.get(selected.index).time.originalSample.value - start.originalSample.value
+          }, TwoDEditorComponent.editorname);
           this.cd.markForCheck();
           this.cd.detectChanges();
         }

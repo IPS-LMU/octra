@@ -189,7 +189,9 @@
       "general shortcuts": "General shortcuts",
       "feedback and send 1": "Send transcription with one star",
       "feedback and send 2": "Send transcription with two stars",
-      "feedback and send 3": "Send transcription with three stars"
+      "feedback and send 3": "Send transcription with three stars",
+      "do asr": "Apply ASR on selected segment",
+      "do asr maus": "Apply ASR & MAUS segmentation on selected segment"
     },
     "inactivity": {
       "header": "Longer absence detected",

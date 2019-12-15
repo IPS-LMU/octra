@@ -189,7 +189,9 @@
       "general shortcuts": "Allgmeneine Tastenkombinationen",
       "feedback and send 1": "Transcription mit einem Stern senden",
       "feedback and send 2": "Transcription mit zwei Sternen senden",
-      "feedback and send 3": "Transcription mit drei Sternen senden"
+      "feedback and send 3": "Transcription mit drei Sternen senden",
+      "do asr": "Selektiertes Segment von ASR verarbeiten lassen",
+      "do asr maus": "Selektiertes Segment von ASR & MAUS segmentieren lassen"
     },
     "inactivity": {
       "header": "Längere Inaktivität entdeckt",

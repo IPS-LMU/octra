@@ -244,9 +244,13 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   onButtonClick(event: {
     type: string, timestamp: number
   }) {
+    // only top signal display
     const caretpos = this.editor.caretpos;
     this.uiService.addElementFromEvent('mouseclick', {value: event.type},
-      event.timestamp, this.audiomanager.playposition, caretpos, null, null, 'audio_buttons');
+      event.timestamp, this.audiomanager.playposition, caretpos, {
+        start: this.viewer.av.drawnselection.start.originalSample.value,
+        length: this.viewer.av.drawnselection.duration.originalSample.value
+      }, null, 'audio_buttons');
 
     switch (event.type) {
       case('play'):
@@ -372,9 +376,8 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.save();
   }
 
-  onShortCutTriggered($event, control, component: AudioviewerComponent) {
+  onShortCutTriggered($event, control, component: AudioviewerComponent | LoupeComponent) {
     if (this.appStorage.logging) {
-
       if (
         $event.value === null || !(
           // cursor move by keyboard events are note saved because this would be too much
@@ -387,25 +390,38 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         const caretpos = this.editor.caretpos;
         $event.value = $event.type + ':' + $event.value;
 
-        const segment = {
-          start: -1,
-          length: -1
-        };
+        let segment = null;
 
         if (this.segmentselected && this.selectedIndex > -1) {
           const annoSegment = this.transcrService.currentlevel.segments.get(this.selectedIndex);
-          segment.start = annoSegment.time.originalSample.value;
-          segment.length = (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
-            ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.originalSample.value
-            - annoSegment.time.originalSample.value
-            : this.audiomanager.ressource.info.duration.originalSample.value - annoSegment.time.originalSample.value;
-        }
-        let playPosition = this.audiomanager.playposition;
-        if ($event.type === 'boundary') {
-          playPosition = component.MouseCursor.timePos
+          segment = {
+            start: annoSegment.time.originalSample.value,
+            length: (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
+              ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.originalSample.value
+              - annoSegment.time.originalSample.value
+              : this.audiomanager.ressource.info.duration.originalSample.value - annoSegment.time.originalSample.value
+          };
         }
 
-        this.uiService.addElementFromEvent('shortcut', $event, Date.now(), playPosition, caretpos, null, segment, control);
+        let selection = {
+          start: -1,
+          length: 0
+        };
+
+        if (component instanceof AudioviewerComponent) {
+          selection.start = component.av.drawnselection.start.originalSample.value;
+          selection.length = component.av.drawnselection.duration.originalSample.value;
+        } else {
+          selection.start = component.viewer.av.drawnselection.start.originalSample.value;
+          selection.length = component.viewer.av.drawnselection.duration.originalSample.value;
+        }
+        let playPosition = component.audiochunk.playposition;
+
+        if ($event.type === 'boundary') {
+          playPosition = component.MouseCursor.timePos;
+        }
+
+        this.uiService.addElementFromEvent('shortcut', $event, Date.now(), playPosition, caretpos, selection, segment, control);
       } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
         this.appStorage.playonhover = !this.appStorage.playonhover;
       }
@@ -514,10 +530,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     new_value: number, timestamp: number
   }) {
     if (this.appStorage.logging) {
-      const segment = {
-        start: -1,
-        length: -1
-      };
+      const segment = null;
 
       if (this.segmentselected && this.selectedIndex > -1) {
         const annoSegment = this.transcrService.currentlevel.segments.get(this.selectedIndex);

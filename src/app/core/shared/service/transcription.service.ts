@@ -609,7 +609,8 @@ export class TranscriptionService {
           '',
           elem.playpos,
           elem.caretpos,
-          elem.selection
+          elem.selection,
+          elem.segment
         );
 
         if (elem instanceof MouseStatisticElem) {

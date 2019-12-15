@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
-import {AppStorageService, AudioService, SettingsService, TranscriptionService} from '../../shared/service';
+import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AudioSelection, BrowserAudioTime, OriginalAudioTime, SubscriptionManager} from '../../shared';
 import {Segment} from '../../obj/Annotation';
 import {PlayBackState} from '../../../media-components/obj/media';
@@ -146,7 +146,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
               public sanitizer: DomSanitizer,
               private cd: ChangeDetectorRef,
               private appStorage: AppStorageService,
-              private settingsService: SettingsService) {
+              private settingsService: SettingsService,
+              private uiService: UserInteractionsService) {
 
     this.subscrmanager = new SubscriptionManager();
   }
@@ -258,6 +259,14 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     this.textEditor.audiochunk = null;
     this.cd.markForCheck();
     this.cd.detectChanges();
+
+    const startSample = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.originalSample.value : 0;
+    this.uiService.addElementFromEvent('segment', {
+      value: 'updated'
+    }, Date.now(), null, null, null, {
+      start: startSample,
+      length: segment.time.originalSample.value - startSample
+    }, 'overview');
   }
 
   ngAfterViewInit() {
@@ -387,9 +396,16 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     this.cd.markForCheck();
     this.cd.detectChanges();
 
+    const playpos = this.transcrService.audiomanager.playposition.clone();
+    playpos.browserSample.value = 0;
     if (this.playAllState.state === 'started') {
       // start
       this.playAll(0);
+
+      this.uiService.addElementFromEvent('mouseclick', {
+        value: 'play_all'
+      }, Date.now(), playpos, null, null, null, 'overview');
+
     } else {
       // stop
       this.audio.audiomanagers[0].stopPlayback().then(() => {
@@ -398,6 +414,10 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
         this.cd.markForCheck();
         this.cd.detectChanges();
+
+        this.uiService.addElementFromEvent('mouseclick', {
+          value: 'stop_all'
+        }, Date.now(), playpos, null, null, null, 'overview');
       }).catch((error) => {
         console.error(error);
       });
@@ -463,6 +483,15 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       this.stopPlayback().then(() => {
         this.cd.markForCheck();
         this.cd.detectChanges();
+
+        const startSample = (segmentNumber > 0) ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.originalSample.value : 0;
+        this.uiService.addElementFromEvent('mouseclick', {
+          value: 'play_segment'
+        }, Date.now(), this.transcrService.audiomanager.playposition, null, null, {
+          start: startSample,
+          length: this.transcrService.currentlevel.segments.get(segmentNumber).time.originalSample.value - startSample
+        }, 'overview');
+
         this.playSegement(segmentNumber).then(() => {
           this.cd.markForCheck();
           this.cd.detectChanges();
@@ -473,6 +502,14 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
         console.error(error);
       });
     } else {
+      const startSample = (segmentNumber > 0) ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.originalSample.value : 0;
+      this.uiService.addElementFromEvent('mouseclick', {
+        value: 'stop_segment'
+      }, Date.now(), this.transcrService.audiomanager.playposition, null, null, {
+        start: startSample,
+        length: this.transcrService.currentlevel.segments.get(segmentNumber).time.originalSample.value - startSample
+      }, 'overview');
+
       this.stopPlayback().then(() => {
         this.cd.markForCheck();
         this.cd.detectChanges();

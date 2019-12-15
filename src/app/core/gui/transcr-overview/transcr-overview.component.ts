@@ -158,6 +158,21 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
   ngOnInit() {
     this.updateView();
+
+    this.subscrmanager.add(this.audio.audiomanagers[0].statechange.subscribe((state) => {
+        if (this._visible) {
+          // make sure that events from playonhover are not logged
+          if (state !== PlayBackState.PLAYING && state !== PlayBackState.INITIALIZED && state !== PlayBackState.PREPARE) {
+            this.uiService.addElementFromEvent('audio',
+              {value: state.toLowerCase()}, Date.now(),
+              this.audio.audiomanagers[0].playposition,
+              null, null, null, 'overview');
+          }
+        }
+      },
+      (error) => {
+        console.error(error);
+      }));
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -396,7 +411,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     this.cd.markForCheck();
     this.cd.detectChanges();
 
-    const playpos = this.transcrService.audiomanager.playposition.clone();
+    const playpos = this.audio.audiomanagers[0].playposition.clone();
     playpos.browserSample.value = 0;
     if (this.playAllState.state === 'started') {
       // start
@@ -487,7 +502,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
         const startSample = (segmentNumber > 0) ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.originalSample.value : 0;
         this.uiService.addElementFromEvent('mouseclick', {
           value: 'play_segment'
-        }, Date.now(), this.transcrService.audiomanager.playposition, null, null, {
+        }, Date.now(), this.audio.audiomanagers[0].playposition, null, null, {
           start: startSample,
           length: this.transcrService.currentlevel.segments.get(segmentNumber).time.originalSample.value - startSample
         }, 'overview');
@@ -505,7 +520,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       const startSample = (segmentNumber > 0) ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.originalSample.value : 0;
       this.uiService.addElementFromEvent('mouseclick', {
         value: 'stop_segment'
-      }, Date.now(), this.transcrService.audiomanager.playposition, null, null, {
+      }, Date.now(), this.audio.audiomanagers[0].playposition, null, null, {
         start: startSample,
         length: this.transcrService.currentlevel.segments.get(segmentNumber).time.originalSample.value - startSample
       }, 'overview');

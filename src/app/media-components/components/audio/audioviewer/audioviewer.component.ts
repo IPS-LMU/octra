@@ -545,8 +545,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                         value: 'remove_interval',
                         type: 'boundary',
                         selection: {
-                          start: this.selection.start.originalSample.value,
-                          length: this.selection.duration.originalSample.value
+                          start: this.av.drawnselection.start.originalSample.value,
+                          length: this.av.drawnselection.duration.originalSample.value
                         }
                       });
 

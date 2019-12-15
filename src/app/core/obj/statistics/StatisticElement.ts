@@ -40,6 +40,20 @@ export class StatisticElem {
     this.data.selection = value;
   }
 
+  get segment(): {
+    start: number;
+    length: number;
+  } {
+    return this.data.segment;
+  }
+
+  set segment(value: {
+    start: number;
+    length: number;
+  }) {
+    this.data.segment = value;
+  }
+
   get value(): any {
     return this.data.value;
   }

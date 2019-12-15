@@ -1,4 +1,5 @@
 import {StatisticElem} from './StatisticElement';
+import {KeyStatisticElem} from './KeyStatisticElem';
 
 /***
  * Statistic Element Class

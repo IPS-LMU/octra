@@ -297,7 +297,16 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         const startSample = (this.segmentIndex > 0)
           ? this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value
           : 0;
-        console.log(`LOG exited!`);
+
+        let selection = null;
+        if (this.loupe.viewer.av.drawnselection.start.originalSample.value >= startSample
+          && this.loupe.viewer.av.drawnselection.end.originalSample.value <= segment.time.originalSample.value) {
+          selection = {
+            start: this.loupe.viewer.av.drawnselection.start.originalSample.value,
+            length: this.loupe.viewer.av.drawnselection.duration.originalSample.value
+          };
+        }
+
         this.uiService.addElementFromEvent('transcription:segment_exited', {
             value: {
               segment: {
@@ -306,10 +315,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
                 transcript: segment.transcript
               }
             }
-          }, Date.now(), null, -1, {
-            start: this.loupe.viewer.selection.start.originalSample.value,
-            length: this.loupe.viewer.selection.end.originalSample.value
-          },
+          }, Date.now(), null, -1, selection,
           {
             start: startSample,
             length: segment.time.originalSample.value - startSample
@@ -326,7 +332,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     if (this.appStorage.logging) {
       let segment = {
         start: -1,
-        length: -1
+        length: 0
       };
 
       if (this.segmentIndex > -1) {
@@ -340,16 +346,20 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
         segment.start = Math.round(segment.start);
         segment.length = Math.round(segment.length);
-      } else {
-        segment = null;
+      }
+
+      let selection = null;
+      if (this.loupe.viewer.av.drawnselection.start.originalSample.value >= segment.start
+        && this.loupe.viewer.av.drawnselection.end.originalSample.value <= segment.start + segment.length) {
+        selection = {
+          start: this.loupe.viewer.av.drawnselection.start.originalSample.value,
+          length: this.loupe.viewer.av.drawnselection.duration.originalSample.value
+        };
       }
 
       this.uiService.addElementFromEvent('mouse_clicked', {value: event.type},
         event.timestamp, this.audiomanager.playposition,
-        this.editor.caretpos, {
-          start: this.loupe.viewer.selection.start.originalSample.value,
-          length: this.loupe.viewer.selection.duration.originalSample.value
-        }, segment, 'audio_buttons');
+        this.editor.caretpos, selection, segment, 'audio_buttons');
     }
 
     if (event.type === 'replay') {
@@ -421,7 +431,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   onShortCutTriggered($event, type) {
     const segment = {
       start: -1,
-      length: -1
+      length: 0
     };
 
     if (this.segmentIndex > -1) {
@@ -437,8 +447,17 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       segment.length = Math.round(segment.length);
     }
 
+    let selection = null;
+    if (this.loupe.viewer.av.drawnselection.start.originalSample.value >= segment.start
+      && this.loupe.viewer.av.drawnselection.end.originalSample.value <= segment.start + segment.length) {
+      selection = {
+        start: this.loupe.viewer.av.drawnselection.start.originalSample.value,
+        length: this.loupe.viewer.av.drawnselection.duration.originalSample.value
+      };
+    }
+
     this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, type, segment);
+      this.audiomanager.playposition, this.editor.caretpos, selection, segment, type);
   }
 
   onMarkerInsert(markerCode: string) {
@@ -458,15 +477,19 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
       segment.start = Math.round(segment.start);
       segment.length = Math.round(segment.length);
-    } else {
-      segment = null;
+    }
+
+    let selection = null;
+    if (this.loupe.viewer.av.drawnselection.start.originalSample.value >= segment.start
+      && this.loupe.viewer.av.drawnselection.end.originalSample.value <= segment.start + segment.length) {
+      selection = {
+        start: this.loupe.viewer.av.drawnselection.start.originalSample.value,
+        length: this.loupe.viewer.av.drawnselection.duration.originalSample.value
+      };
     }
 
     this.uiService.addElementFromEvent('shortcut', {value: markerCode}, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, {
-        start: this.loupe.viewer.selection.start.originalSample.value,
-        length: this.loupe.viewer.selection.duration.originalSample.value
-      }, segment, 'markers');
+      this.audiomanager.playposition, this.editor.caretpos, selection, segment, 'markers');
   }
 
   onMarkerClick(markerCode: string) {
@@ -486,15 +509,19 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
       segment.start = Math.round(segment.start);
       segment.length = Math.round(segment.length);
-    } else {
-      segment = null;
+    }
+
+    let selection = null;
+    if (this.loupe.viewer.av.drawnselection.start.originalSample.value >= segment.start
+      && this.loupe.viewer.av.drawnselection.end.originalSample.value <= segment.start + segment.length) {
+      selection = {
+        start: this.loupe.viewer.av.drawnselection.start.originalSample.value,
+        length: this.loupe.viewer.av.drawnselection.duration.originalSample.value
+      };
     }
 
     this.uiService.addElementFromEvent('mouse_clicked', {value: markerCode}, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, {
-        start: this.loupe.viewer.selection.start.originalSample.value,
-        length: this.loupe.viewer.selection.duration.originalSample.value
-      }, segment, 'texteditor_toolbar');
+      this.audiomanager.playposition, this.editor.caretpos, selection, segment, 'texteditor_toolbar');
   }
 
   onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
@@ -518,15 +545,19 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       segment.length = annoSegment.time.originalSample.value - segment.start;
       segment.start = Math.round(segment.start);
       segment.length = Math.round(segment.length);
-    } else {
-      segment = null;
+    }
+
+    let selection = null;
+    if (this.loupe.viewer.av.drawnselection.start.originalSample.value >= segment.start
+      && this.loupe.viewer.av.drawnselection.end.originalSample.value <= segment.start + segment.length) {
+      selection = {
+        start: this.loupe.viewer.av.drawnselection.start.originalSample.value,
+        length: this.loupe.viewer.av.drawnselection.duration.originalSample.value
+      };
     }
 
     this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
-      this.audiomanager.playposition, this.editor.caretpos, {
-        start: this.loupe.viewer.selection.start.originalSample.value,
-        length: this.loupe.viewer.selection.duration.originalSample.value
-      }, segment, 'audio_speed');
+      this.audiomanager.playposition, this.editor.caretpos, selection, segment, 'audio_speed');
 
   }
 
@@ -553,11 +584,17 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       segment.length = Math.round(segment.length);
     }
 
+    let selection = null;
+    if (this.loupe.viewer.av.drawnselection.start.originalSample.value >= segment.start
+      && this.loupe.viewer.av.drawnselection.end.originalSample.value <= segment.start + segment.length) {
+      selection = {
+        start: this.loupe.viewer.av.drawnselection.start.originalSample.value,
+        length: this.loupe.viewer.av.drawnselection.duration.originalSample.value
+      };
+    }
+
     this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
-      this.audiomanager.playposition, this.editor.caretpos, {
-        start: this.loupe.viewer.selection.start.originalSample.value,
-        length: this.loupe.viewer.selection.duration.originalSample.value
-      }, segment, 'audio_volume');
+      this.audiomanager.playposition, this.editor.caretpos, selection, segment, 'audio_volume');
   }
 
   onBoundaryClicked(sample: BrowserSample) {

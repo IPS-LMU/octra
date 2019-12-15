@@ -92,5 +92,12 @@ export class OLog implements ILog {
     if (segment === null) {
       delete this.segment;
     }
+
+    if (caretpos < 0) {
+      delete this.caretpos;
+    }
+    if (caretpos < 0) {
+      delete this.caretpos;
+    }
   }
 }

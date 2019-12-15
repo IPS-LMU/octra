@@ -1,7 +1,7 @@
 import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs';
-import {AppStorageService, KeymappingService, SettingsService, TranscriptionService} from '../../shared/service';
+import {AppStorageService, KeymappingService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {TranscriptionFeedbackComponent} from '../../gui/transcription-feedback/transcription-feedback.component';
 import {TranscrOverviewComponent} from '../../gui/transcr-overview';
@@ -19,7 +19,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
   config: ModalOptions = {
     keyboard: false,
     backdrop: false,
-    ignoreBackdropClick: false
+    ignoreBackdropClick: true
   };
 
   @ViewChild('modal', {static: true}) modal: any;
@@ -53,7 +53,8 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
               public ms: BsModalService,
               public settingsService: SettingsService,
               public appStorage: AppStorageService,
-              private keyService: KeymappingService) {
+              private keyService: KeymappingService,
+              private uiService: UserInteractionsService) {
   }
 
   ngOnInit() {
@@ -133,10 +134,13 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
           reject(err);
         }
       );
+
+      this.uiService.addElementFromEvent('overview', {value: 'opened'},
+        Date.now(), null, null, null, null, 'overview');
     });
   }
 
-  public close() {
+  public close(fromModal = false) {
     if (this.visible) {
       this.modal.hide();
       this.visible = false;
@@ -152,12 +156,12 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
         this.feedback.saveFeedbackform();
       }
       this.overview.stopPlayback();
-    }
-  }
 
-  public beforeDismiss() {
-    this.actionperformed.next();
-    this.overview.stopPlayback();
+      if (fromModal) {
+        this.uiService.addElementFromEvent('overview', {value: 'closed'},
+          Date.now(), null, null, null, null, 'overview');
+      }
+    }
   }
 
   onSegmentInOverviewClicked(segnumber: number) {
@@ -172,36 +176,6 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
     this.overview.stopPlayback();
     this.transcriptionSend.emit();
   }
-
-  /* TODO dead code?
-  private loadForm() {
-    // create empty attribute
-    const feedback = this.transcrService.feedback;
-    if (!(this.settingsService.projectsettings === null || this.settingsService.projectsettings === undefined)
-      && !(feedback === null || feedback === undefined)
-    ) {
-      for (const g in feedback.groups) {
-        if (!(g === null || g === undefined)) {
-          const group = feedback.groups[g];
-          for (const c in group.controls) {
-            if (!(c === null || c === undefined)) {
-              const control = group.controls[c];
-              if (control.type.type === 'textarea') {
-                this.settingsService[group.name] = control.value;
-              } else {
-                // radio skip checkboxes
-                if (control.type.type !== 'checkbox' && !(control.custom === null || control.custom === undefined)
-                  && !(control.custom.checked === null || control.custom.checked === undefined)
-                  && control.custom.checked) {
-                  this.settingsService[group.name] = control.value;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }*/
 
   public sendTranscriptionForShortAudioFiles(type: 'bad' | 'middle' | 'good') {
     switch (type) {

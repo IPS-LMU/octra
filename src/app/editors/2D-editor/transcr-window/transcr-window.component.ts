@@ -354,7 +354,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
         };
       }
 
-      this.uiService.addElementFromEvent('mouse_clicked', {value: event.type},
+      this.uiService.addElementFromEvent('mouseclick', {value: event.type},
         event.timestamp, this.audiomanager.playposition,
         this.editor.caretpos, selection, segment, 'audio_buttons');
     }
@@ -533,7 +533,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       };
     }
 
-    this.uiService.addElementFromEvent('mouse_clicked', {value: markerCode}, Date.now(),
+    this.uiService.addElementFromEvent('mouseclick', {value: markerCode}, Date.now(),
       this.audiomanager.playposition, this.editor.caretpos, selection, segment, 'texteditor_toolbar');
   }
 

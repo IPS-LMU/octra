@@ -7,7 +7,7 @@
         <div class="modal-content flex" style="flex:auto;height:100%;">
             <div class="modal-header">
               <h4 class="modal-title pull-left">{{'general.overview' | transloco}}</h4>
-              <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+              <button type="button" class="close pull-right" aria-label="Close" (click)="close(true)">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
@@ -90,9 +90,9 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary mr-auto" data-dismiss="modal" (click)="close()">
-                  {{"general.close" | transloco}}
-                </button>
+              <button type="button" class="btn btn-primary mr-auto" data-dismiss="modal" (click)="close(true)">
+                {{"general.close" | transloco}}
+              </button>
             </div>
         </div>
     </div>

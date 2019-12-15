@@ -325,6 +325,7 @@ export class AudioManager {
                   this._audio.pause();
                   this._playposition.browserSample.value = duration.browserSample.value + begintime.browserSample.value;
                   this.afterAudioEnded();
+                  resolve();
                 }
               }
               this._lastUpdate = lastCheck;

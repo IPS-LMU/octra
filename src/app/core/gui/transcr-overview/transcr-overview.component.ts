@@ -455,6 +455,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
         this.cd.markForCheck();
         this.cd.detectChanges();
+        this.audio.audiomanagers[0].playposition = this.audio.audiomanagers[0].createBrowserAudioTime(startSample);
         this.audio.audiomanagers[0].startPlayback(
           this.audio.audiomanagers[0].createBrowserAudioTime(startSample),
           this.audio.audiomanagers[0].createBrowserAudioTime(segment.time.browserSample.value - startSample)

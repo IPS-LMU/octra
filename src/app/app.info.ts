@@ -50,7 +50,7 @@ export class AppInfo {
 
   static readonly version = octraVersion;
   static readonly lastUpdate = octraLastUpdated;
-  static readonly debugging = true;
+  static readonly debugging = false;
 
   public static readonly queryParamsHandling: NavigationExtras = {
     queryParamsHandling: '',

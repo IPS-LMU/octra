@@ -239,7 +239,9 @@ class ASRQueue {
                 if (status.new === ASRProcessStatus.NOAUTH) {
                   if (this._statistics.running === 0) {
                     // redirect via location href is important because it's not working otherwise!
-                    document.location.href = 'user/auth';
+                    setTimeout(() => {
+                      document.location.href = 'user/auth';
+                    }, 500);
                   }
                 }
 

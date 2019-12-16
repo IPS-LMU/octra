@@ -359,18 +359,25 @@ export class AudioviewerService extends AudioComponentService {
             && segment.time.browserSample.value <= absXTime + bWidthTime)
             && segment.time.browserSample.value !== this.audiomanager.ressource.info.duration.browserSample.value
           ) {
+            const nextSegment = (i < this.transcrService.currentlevel.segments.length - 1) ? this.transcrService.currentlevel.segments.get(i + 1) : null;
+            const lastSegment = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1) : null;
 
-            const segSamples = this.transcrService.currentlevel.segments.get(i).time.browserSample.value;
-            this.transcrService.currentlevel.segments.removeByIndex(i, this.transcrService.breakMarker.code);
+            if (isNullOrUndefined(segment.isBlockedBy) && (nextSegment === null || isNullOrUndefined(nextSegment.isBlockedBy)
+              && (lastSegment === null || isNullOrUndefined(lastSegment.isBlockedBy)))) {
+              const segSamples = this.transcrService.currentlevel.segments.get(i).time.browserSample.value;
+              this.transcrService.currentlevel.segments.removeByIndex(i, this.transcrService.breakMarker.code);
 
-            return {
-              type: 'remove',
-              seg_samples: segSamples,
-              msg: {
-                type: 'success',
-                text: ''
-              }
-            };
+              return {
+                type: 'remove',
+                seg_samples: segSamples,
+                msg: {
+                  type: 'success',
+                  text: ''
+                }
+              };
+            } else {
+              return null;
+            }
           }
         }
       }

@@ -241,110 +241,118 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     ));
 
     this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
-        if (item.status !== ASRProcessStatus.STARTED && item.status !== ASRProcessStatus.IDLE) {
+        if (item.status !== ASRProcessStatus.IDLE) {
           const segmentBoundary = new BrowserSample(item.time.browserSampleEnd, this.audiomanager.browserSampleRate);
           const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
             segmentBoundary, true
           );
-          console.log(`change segnumber ${segNumber}, ${segmentBoundary.value}`);
-          console.log(`${item.status}`);
           if (segNumber > -1) {
-            const segment = this.transcrService.currentlevel.segments.get(segNumber).clone();
-            segment.isBlockedBy = null;
+            if (item.status !== ASRProcessStatus.STARTED) {
+              console.log(`change segnumber ${segNumber}, ${segmentBoundary.value}`);
+              console.log(`${item.status}`);
+              const segment = this.transcrService.currentlevel.segments.get(segNumber).clone();
+              segment.isBlockedBy = null;
 
-            if (item.status === ASRProcessStatus.NOQUOTA) {
-              this.msg.showMessage('error', this.langService.translate('asr.no quota'));
-            } else if (item.status === ASRProcessStatus.NOAUTH) {
-              this.msg.showMessage('warning', this.langService.translate('asr.no auth'));
-            } else {
-              if (item.status === ASRProcessStatus.FINISHED && item.result !== '') {
-                if (item.type === ASRQueueItemType.ASR) {
-                  segment.transcript = item.result;
-                } else if (item.type === ASRQueueItemType.ASRMAUS) {
-                  const converter = new PraatTextgridConverter();
+              if (item.status === ASRProcessStatus.NOQUOTA) {
+                this.msg.showMessage('error', this.langService.translate('asr.no quota'));
+                this.uiService.addElementFromEvent(item.type.toLowerCase(), {
+                  value: 'failed'
+                }, Date.now(), null, null, null, {
+                  start: item.time.sampleStart,
+                  length: item.time.sampleLength
+                }, 'automation');
+              } else if (item.status === ASRProcessStatus.NOAUTH) {
+                this.uiService.addElementFromEvent(item.type.toLowerCase(), {
+                  value: 'no_auth'
+                }, Date.now(), null, null, null, {
+                  start: item.time.sampleStart,
+                  length: item.time.sampleLength
+                }, 'automation');
+                this.msg.showMessage('warning', this.langService.translate('asr.no auth'));
+              } else {
+                if (item.status === ASRProcessStatus.FINISHED && item.result !== '') {
+                  this.uiService.addElementFromEvent(item.type.toLowerCase(), {
+                    value: 'finished'
+                  }, Date.now(), null, null, null, {
+                    start: item.time.sampleStart,
+                    length: item.time.sampleLength
+                  }, 'automation');
+                  if (item.type === ASRQueueItemType.ASR) {
+                    segment.transcript = item.result.replace(/(<\/p>)/g, '');
+                  } else if (item.type === ASRQueueItemType.ASRMAUS) {
+                    const converter = new PraatTextgridConverter();
 
-                  const audiofile = new OAudiofile();
-                  const audioInfo = this.audiomanager.ressource.info;
-                  audiofile.duration = audioInfo.duration.originalSample.value;
-                  audiofile.name = `OCTRA_ASRqueueItem_${item.id}.wav`;
-                  audiofile.samplerate = this.audiomanager.originalSampleRate;
-                  audiofile.size = this.audiomanager.ressource.info.size;
-                  audiofile.type = this.audiomanager.ressource.info.type;
+                    const audiofile = new OAudiofile();
+                    const audioInfo = this.audiomanager.ressource.info;
+                    audiofile.duration = audioInfo.duration.originalSample.value;
+                    audiofile.name = `OCTRA_ASRqueueItem_${item.id}.wav`;
+                    audiofile.samplerate = this.audiomanager.originalSampleRate;
+                    audiofile.size = this.audiomanager.ressource.info.size;
+                    audiofile.type = this.audiomanager.ressource.info.type;
 
-                  const convertedResult = converter.import({
-                    name: `OCTRA_ASRqueueItem_${item.id}.TextGrid`,
-                    content: item.result,
-                    type: 'text',
-                    encoding: 'utf-8'
-                  }, audiofile);
+                    const convertedResult = converter.import({
+                      name: `OCTRA_ASRqueueItem_${item.id}.TextGrid`,
+                      content: item.result,
+                      type: 'text',
+                      encoding: 'utf-8'
+                    }, audiofile);
 
-                  const maxWords = 5;
-                  const wordsTier = convertedResult.annotjson.levels.find((a) => {
-                    return a.name === 'ORT-MAU';
-                  });
+                    const maxWords = 5;
+                    const wordsTier = convertedResult.annotjson.levels.find((a) => {
+                      return a.name === 'ORT-MAU';
+                    });
 
-                  if (!isNullOrUndefined(wordsTier)) {
-                    let segmentText = '';
-                    console.log(wordsTier);
-                    for (const wordItem of wordsTier.items) {
-                      if (wordItem.sampleStart + wordItem.sampleDur < item.time.sampleStart + item.time.sampleLength) {
-                        const duration = wordItem.sampleDur / this.audiomanager.originalSampleRate;
-                        const readSegment = Segment.fromObj(new OSegment(1, wordItem.sampleStart, wordItem.sampleDur, wordItem.labels),
-                          this.audiomanager.originalSampleRate, this.audiomanager.browserSampleRate);
-                        if (readSegment.transcript !== '<p:>' && readSegment.transcript !== '') {
-                          segmentText += ` ${readSegment.transcript}`;
-                        }
-                        const isBreak = (readSegment.transcript === '<p:>' || readSegment.transcript === '');
+                    if (!isNullOrUndefined(wordsTier)) {
+                      console.log(wordsTier);
+                      for (const wordItem of wordsTier.items) {
+                        if (wordItem.sampleStart + wordItem.sampleDur <= item.time.sampleStart + item.time.sampleLength) {
+                          const readSegment = Segment.fromObj(new OSegment(1, wordItem.sampleStart, wordItem.sampleDur, wordItem.labels),
+                            this.audiomanager.originalSampleRate, this.audiomanager.browserSampleRate);
+                          if (readSegment.transcript === '<p:>' || readSegment.transcript === '') {
+                            readSegment.transcript = this.transcrService.breakMarker.code;
+                          }
 
-                        if (isBreak) {
-                          segmentText = segmentText.trim();
-                          const breakPuffer = (isBreak) ? wordItem.sampleDur : 0;
-                          let origTime = new OriginalAudioTime(new OriginalSample(item.time.sampleStart + readSegment.time.originalSample.value - breakPuffer, this.audiomanager.originalSampleRate),
+                          let origTime = new OriginalAudioTime(new OriginalSample(item.time.sampleStart + readSegment.time.originalSample.value, this.audiomanager.originalSampleRate),
                             this.audiomanager.browserSampleRate
                           );
                           let browserTime = origTime.convertToBrowserAudioTime();
-                          this.transcrService.currentlevel.segments.add(browserTime, segmentText);
-
-                          if (isBreak) {
-                            segmentText = this.transcrService.breakMarker.code;
-                            origTime = new OriginalAudioTime(
-                              readSegment.time.originalSample.add(new OriginalSample(item.time.sampleStart, this.audiomanager.originalSampleRate)),
-                              this.audiomanager.browserSampleRate
-                            );
-                            browserTime = origTime.convertToBrowserAudioTime();
-                            this.transcrService.currentlevel.segments.add(browserTime, segmentText);
+                          const segmentExists = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(browserTime.browserSample, true);
+                          if (segmentExists > -1) {
+                            this.transcrService.currentlevel.segments.segments[segmentExists].transcript = readSegment.transcript;
+                          } else {
+                            this.transcrService.currentlevel.segments.add(browserTime, readSegment.transcript);
                           }
-                          segmentText = '';
                         }
-                      } else {
-                        segmentText += wordItem.labels[0].value;
                       }
+                    } else {
+                      console.error(`word tier not found!`);
                     }
-
-                    if (segmentText !== '') {
-                      segment.transcript = segmentText.trim();
-                    }
-
-                  } else {
-                    console.error(`word tier not found!`);
                   }
                 }
-              }
 
-              const index = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
-                return a.time.browserSample.value === segment.time.browserSample.value;
-              });
-              if (index > -1) {
-                this.transcrService.currentlevel.segments.change(index, segment);
-              }
+                const index = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
+                  return a.time.browserSample.value === segment.time.browserSample.value;
+                });
+                if (index > -1) {
+                  this.transcrService.currentlevel.segments.change(index, segment);
+                }
 
-              this.viewer.update(true);
+                this.viewer.update(true);
+              }
+              // STOPPED status is ignored because OCTRA should do nothing
+
+
+              // update GUI
+              this.viewer.update();
+            } else {
+              // item started
+              this.uiService.addElementFromEvent(item.type.toLowerCase(), {
+                value: 'started'
+              }, Date.now(), null, null, null, {
+                start: item.time.sampleStart,
+                length: item.time.sampleLength
+              }, 'automation');
             }
-            // STOPPED status is ignored because OCTRA should do nothing
-
-
-            // update GUI
-            this.viewer.update();
           } else {
             console.error(new Error(`couldn't find segment number`));
           }
@@ -498,12 +506,17 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
             ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.originalSample.value
             : 0;
 
+          this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
+            this.audiomanager.playposition, -1, null, {
+              start: sampleStart,
+              length: segment.time.originalSample.value - sampleStart
+            }, 'multi-lines-viewer');
+
           const selection = {
             sampleStart: sampleStart,
             sampleLength: segment.time.originalSample.value - sampleStart,
             browserSampleEnd: segment.time.browserSample.value
           };
-
 
           if (segment.isBlockedBy === null) {
             if ($event.value === 'do_asr') {
@@ -533,10 +546,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     if (
       $event.value === null || !(
         // cursor move by keyboard events are note saved because this would be too much
-        Functions.contains($event.value, 'cursor') ||
-        Functions.contains($event.value, 'segment_enter') ||
-        Functions.contains($event.value, 'playonhover')
-      )
+      Functions.contains($event.value, 'cursor') ||
+      Functions.contains($event.value, 'segment_enter') ||
+      Functions.contains($event.value, 'playonhover') ||
+      Functions.contains($event.value, 'asr'))
     ) {
       $event.value = `${$event.type}:${$event.value}`;
 

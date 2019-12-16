@@ -8,7 +8,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body" id="export-table" #content>
+      <div class="modal-body" id="tools-table" #content>
         <table class="table table-striped" [ngStyle]="{
           width: content.offsetWidth - 50 + 'px'
         }">
@@ -44,36 +44,40 @@
                   {{'tools.combine phrases.warning' | transloco}}
                 </div>
                 <div class="configurator">
-                  <table class="table" style="max-width: 400px;">
-                    <tbody>
-                    <tr>
-                      <td><label for="minSilenceLength">{{'tools.combine phrases.minimal silence' | transloco}}</label>
-                      </td>
-                      <td>
-                        <input type="number" id="minSilenceLength" name="minSilenceLength"
-                               [(ngModel)]="tools.combinePhrases.options.minSilenceLength"/>
-                      </td>
-                      <td>
-                        <fa-icon icon="question-circle" style="color: darkblue;"
-                                 [tooltip]="transloco.translate('tools.combine phrases.minimal silence desc')"
-                                 placement="right"></fa-icon>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><label for="maxWordsPerSegment">{{'tools.combine phrases.maximal words' | transloco}}</label>
-                      </td>
-                      <td>
-                        <input type="number" id="maxWordsPerSegment" name="maxWordsPerSegment"
-                               [(ngModel)]="tools.combinePhrases.options.maxWordsPerSegment"/>
-                      </td>
-                      <td>
-                        <fa-icon icon="question-circle" style="color: darkblue;"
-                                 [tooltip]="transloco.translate('tools.combine phrases.maximal words desc')"
-                                 placement="right"></fa-icon>
-                      </td>
-                    </tr>
-                    </tbody>
-                  </table>
+                  <form>
+                    <table class="table" style="max-width: 400px;">
+                      <tbody>
+                      <tr>
+                        <td><label
+                          for="minSilenceLength">{{'tools.combine phrases.minimal silence' | transloco}}</label>
+                        </td>
+                        <td>
+                          <input type="number" id="minSilenceLength" name="minSilenceLength"
+                                 [(ngModel)]="tools.combinePhrases.options.minSilenceLength"/>
+                        </td>
+                        <td>
+                          <fa-icon icon="question-circle" style="color: darkblue;"
+                                   [tooltip]="transloco.translate('tools.combine phrases.minimal silence desc')"
+                                   placement="right"></fa-icon>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><label
+                          for="maxWordsPerSegment">{{'tools.combine phrases.maximal words' | transloco}}</label>
+                        </td>
+                        <td>
+                          <input type="number" id="maxWordsPerSegment" name="maxWordsPerSegment"
+                                 [(ngModel)]="tools.combinePhrases.options.maxWordsPerSegment"/>
+                        </td>
+                        <td>
+                          <fa-icon icon="question-circle" style="color: darkblue;"
+                                   [tooltip]="transloco.translate('tools.combine phrases.maximal words desc')"
+                                   placement="right"></fa-icon>
+                        </td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </form>
                   <button class="btn btn-primary btn-raised" (click)="onCombinePhrasesClick()"
                           [disabled]="!isCombinePhrasesSettingsValid">{{'tools.combine phrases.name' | transloco}}</button>
                 </div>

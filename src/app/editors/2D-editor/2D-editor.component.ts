@@ -567,8 +567,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
       const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
       let playPosition = this.audiomanager.playposition;
-      if ($event.type === 'boundary') {
-        playPosition = this.viewer.MouseCursor.timePos
+      if (!this.audioChunkLines.isPlaying) {
+        if ($event.type === 'boundary') {
+          playPosition = this.viewer.MouseCursor.timePos
+        }
       }
 
       this.uiService.addElementFromEvent('shortcut', $event, Date.now(),

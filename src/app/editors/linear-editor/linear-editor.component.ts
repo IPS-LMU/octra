@@ -418,6 +418,8 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
           length: 0
         };
 
+        let playPosition = component.audiochunk.playposition;
+
         if (component instanceof AudioviewerComponent) {
           selection.start = component.av.drawnselection.start.originalSample.value;
           selection.length = component.av.drawnselection.duration.originalSample.value;
@@ -425,10 +427,11 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
           selection.start = component.viewer.av.drawnselection.start.originalSample.value;
           selection.length = component.viewer.av.drawnselection.duration.originalSample.value;
         }
-        let playPosition = component.audiochunk.playposition;
 
-        if ($event.type === 'boundary') {
-          playPosition = component.MouseCursor.timePos;
+        if (!component.audiochunk.isPlaying) {
+          if ($event.type === 'boundary') {
+            playPosition = component.MouseCursor.timePos
+          }
         }
 
         this.uiService.addElementFromEvent('shortcut', $event, Date.now(), playPosition, caretpos, selection, segment, control);

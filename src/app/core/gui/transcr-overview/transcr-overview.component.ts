@@ -415,15 +415,19 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     playpos.browserSample.value = 0;
     if (this.playAllState.state === 'started') {
       // start
-      this.playAll(0);
-
-      this.uiService.addElementFromEvent('mouseclick', {
-        value: 'play_all'
-      }, Date.now(), playpos, null, null, null, 'overview');
+      this.stopPlayback().then(() => {
+        this.uiService.addElementFromEvent('mouseclick', {
+          value: 'play_all'
+        }, Date.now(), playpos, null, null, null, 'overview');
+        this.playAll(0);
+      }).catch((err) => {
+        console.error(err);
+      });
 
     } else {
       // stop
-      this.audio.audiomanagers[0].stopPlayback().then(() => {
+      this.stopPlayback().then(() => {
+        this.playAllState.state = 'started';
         this.playStateSegments[this.playAllState.currentSegment].state = 'stopped';
         this.playStateSegments[this.playAllState.currentSegment].icon = 'play';
 
@@ -550,12 +554,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
         this.cd.markForCheck();
         this.cd.detectChanges();
       }
-
-      if (this.audio.audiomanagers[0].state === PlayBackState.PLAYING) {
-        this.audio.audiomanagers[0].stopPlayback().then(resolve).catch(reject);
-      } else {
-        resolve();
-      }
+      this.audio.audiomanagers[0].stopPlayback().then(resolve).catch(reject);
     });
   }
 }

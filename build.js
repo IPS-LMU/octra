@@ -4,7 +4,7 @@ const {execSync, spawn} = require('child_process');
 const buildDir = "dist/octra/";
 const targetFolder = "assets";
 let baseHref = "";
-let dev = ['', ''];
+let dev = "";
 
 const excludedList = ["config", "LICENSE.txt", "media"];
 
@@ -21,8 +21,7 @@ const json = JSON.parse(packageText);
 version = json.version;
 
 if (process.argv[2] === "dev=true") {
-  dev[0] = "-c";
-  dev[1] = "dev";
+  dev = "-c dev";
 }
 
 if (process.argv[3] === "isUpdate=true") {
@@ -36,7 +35,13 @@ if (process.argv[4].indexOf("url=") > -1) {
 console.log(`Remove cache...`);
 execSync("rm -rf ./node_modules/.cache");
 console.log(`Building OCTRA with dev=${dev}, isUpdate=${isUpdate} for ${baseHref}`);
-const node = spawn('node', ['--max-old-space-size=12000', './node_modules/@angular/cli/bin/ng', 'build', dev[0], dev[1], '--prod', '--base-href', baseHref]);
+const command = ['--max-old-space-size=12000', './node_modules/@angular/cli/bin/ng', 'build', '--prod', '--base-href', baseHref];
+
+if (dev !== "") {
+  command.push(dev);
+}
+
+const node = spawn('node', command);
 node.stdout.on('data', function (data) {
   console.log(data.toString());
 });

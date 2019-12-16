@@ -31,7 +31,7 @@ import {AudioNavigationComponent} from '../../../media-components/components/aud
 import {AudioChunk, AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {isNullOrUndefined} from '../../../core/shared/Functions';
 import {AudioviewerConfig} from '../../../media-components/components/audio/audioviewer';
-import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../../core/shared/service/asr.service';
+import {ASRProcessStatus, ASRQueueItem, ASRQueueItemType, AsrService} from '../../../core/shared/service/asr.service';
 
 @Component({
   selector: 'app-transcr-window',
@@ -379,14 +379,16 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       if (direction === 'right' && this.segmentIndex < segmentsLength - 1) {
         let i;
         for (i = this.segmentIndex + 1; i < segmentsLength - 1; i++) {
-          if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.breakMarker.code) {
+          if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.breakMarker.code
+            && this.transcrService.currentlevel.segments.get(i).isBlockedBy !== ASRQueueItemType.ASRMAUS) {
             segment = this.transcrService.currentlevel.segments.get(i);
             this.segmentIndex = i;
             break;
           }
         }
 
-        if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.breakMarker.code) {
+        if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.breakMarker.code
+          && this.transcrService.currentlevel.segments.get(i).isBlockedBy !== ASRQueueItemType.ASRMAUS) {
           segment = this.transcrService.currentlevel.segments.get(i);
           this.segmentIndex = i;
 
@@ -399,16 +401,18 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
             }, 'transcription window');
         }
       } else if (direction === 'left' && this.segmentIndex > 0) {
-        let i = this.segmentIndex - 1;
+        let i = 0;
         for (i = this.segmentIndex - 1; i > 0; i--) {
-          if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.breakMarker.code) {
+          if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.breakMarker.code
+            && this.transcrService.currentlevel.segments.get(i).isBlockedBy !== ASRQueueItemType.ASRMAUS) {
             segment = this.transcrService.currentlevel.segments.get(i);
             this.segmentIndex = i;
             break;
           }
         }
 
-        if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.breakMarker.code) {
+        if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.breakMarker.code
+          && this.transcrService.currentlevel.segments.get(i).isBlockedBy !== ASRQueueItemType.ASRMAUS) {
           segment = this.transcrService.currentlevel.segments.get(i);
           this.segmentIndex = i;
 
@@ -726,7 +730,8 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     const currentLevel = this.transcrService.currentlevel;
     const nextSegment = currentLevel.segments.get(segmentIndex + 1);
     return segmentIndex === currentLevel.segments.length - 2
-      && nextSegment.transcript === this.transcrService.breakMarker.code;
+      && (nextSegment.transcript === this.transcrService.breakMarker.code
+        || nextSegment.isBlockedBy === ASRQueueItemType.ASRMAUS);
   }
 
   public onKeyUp() {

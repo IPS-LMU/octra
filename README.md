@@ -1,4 +1,4 @@
-<h1 align="center">OCTRA v1.3.x</h1>
+<h1 align="center">OCTRA v1.4.x</h1>
 
 <p align="center">
   <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor3_1.png" alt="2D-Editor">
@@ -16,12 +16,12 @@ audiofiles. For now, it uses three editors for the orthographic transcription:
 * Linear-Editor: This editor shows two signaldisplays: One for the whole view of the signal and one as loupe. You can set boundaries and define segments.
 * 2D-Editor: This editor breaks the whole view of the signal to pieces and shows the pieces as lines one after one. Here you can set boundaries und define segments too.
 
-## Manual
-You can find the manual for users here: [OCTRA Manual](https://www.phonetik.uni-muenchen.de/apps/octra/manual/1.3.0/)
+## User Manual
+You can find the manual for users here: [OCTRA Manual](https://www.phonetik.uni-muenchen.de/apps/octra/manual/1.4.0/)
 
 ## Features
 * Three different editors
-* Noise markers (placeholders) in the form of icons in text. **New**: Icons can be UTF-8 symbols, too.  
+* Noise markers (placeholders) in the form of icons in text. Icons can be UTF-8 symbols, too.  
 * Auto-saving of the transcription progress to prevent data loss
 * Import/Export support for various file formats like AnnotJSON, Textgrid, Text, Table and more.
 * Validation using project specific guidelines. **New: text editor supports inline validation **
@@ -32,13 +32,14 @@ You can find the manual for users here: [OCTRA Manual](https://www.phonetik.uni-
 * Customization with configuration files for the app, project, guidelines and validation methods.
 * Segment boundaries as markers in text
 * Overview window to see the whole transcript
-* **New:** Cutting audio files up to 300 MB
-* **New:** Visible transcripts in 2D-Editor
+* Cutting audio files up to 300 MB
+* Visible transcripts in 2D-Editor
+* **New:** Costum table generator
+* **New:** ASR support for transcription and segmentation
 
 
 ## Remarks
 At the moment, OCTRA's online mode supports only one specific server database. That means, if you install OCTRA on your server, you can only use the local mode. We are working on supporting other servers.
-
 
 ## Production Use
 
@@ -51,7 +52,7 @@ In a production environment you don't need to compile OCTRA again.
 
 1. Download the latest release from the releases page.``
 
-2. Copy the content of the ``dist`` folder to your http-server. If you have already installed an older version of OCTRA, please notice to not override the old config folder. More information about upgrading can be found in the next section.
+2. Extract and Copy its content to your http-server. If you have already installed an older version of OCTRA, please notice to not override the old config folder. More information about upgrading can be found in the next section.
 
 3. Before you can use OCTRA, duplicate and rename the `appconfig_sample.json` to `appconfig.json` in the config folder. Please make sure, that you offer all translation files for any language you defined in config.json.
 
@@ -114,13 +115,3 @@ If the language you would like translate to does not exist please send us an ema
 
 ### Affiliations
 [INSTITUTE OF PHONETICS AND SPEECH PROCESSING](http://www.en.phonetik.uni-muenchen.de/)
-
-#### Used third-party packages:
-* bootstrap: http://getbootstrap.com/
-* bootstrap-material-design: http://fezvrasta.github.io/bootstrap-material-design/
-* summernote: https://github.com/summernote/summernote
-* font-awesome: https://origin.fontawesome.com/
-* modernizr: https://modernizr.com/
-* platform: https://github.com/bestiejs/platform.js/
-
-For more see package.json file

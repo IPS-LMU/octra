@@ -8,7 +8,7 @@
   <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/overview.png" alt="Linear Editor">
   <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/export.png" alt="Dictaphone Editor">
 </p>
-<p style="text-align: center;">
+<p align="center">
 <a href="https://clarin.phonetik.uni-muenchen.de/apps/octra/octra/features">
   More information
 </a>

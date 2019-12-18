@@ -9,8 +9,8 @@
   <div id="asrOverlay" [ngClass]="{
     'asr-running': asr.status === 'active'
   }" [ngStyle]="{
-  'height': getHeight() + 'px',
-  'width': getWidth() + 'px',
+  'height': size.height + 'px',
+  'width': size.width + 'px',
   'display': (asr.status === 'active')? 'block' : 'none'
   }" (click)="onASROverlayClick()">
     <!--

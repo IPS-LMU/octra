@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  HostListener,
   Input,
   OnChanges,
   OnDestroy,
@@ -135,6 +136,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     status: 'inactive',
     result: '',
     error: ''
+  };
+
+  size = {
+    height: 100,
+    width: 100
   };
 
   public popovers = {
@@ -390,6 +396,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       this.audiochunk.time.duration.originalSample.value);
 
     this.onASRItemChange(item);
+    this.size.height = jQuery(this.transcrEditor.nativeElement).height();
+    this.size.width = jQuery(this.transcrEditor.nativeElement).width();
   };
 
   onASRItemChange(item: ASRQueueItem) {
@@ -1172,12 +1180,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.popoversNew.validation.location.y = y;
   }
 
-  public getHeight(): number {
-    return jQuery(this.transcrEditor.nativeElement).height();
-  }
-
-  public getWidth(): number {
-    return jQuery(this.transcrEditor.nativeElement).width();
+  @HostListener('window:resize', ['$event'])
+  onResize($event) {
+    this.size.height = jQuery(this.transcrEditor.nativeElement).height();
+    this.size.width = jQuery(this.transcrEditor.nativeElement).width();
   }
 
   /*

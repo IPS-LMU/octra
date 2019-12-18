@@ -23,23 +23,19 @@
     <ul class="navbar-nav mr-auto" *ngIf="!appStorage.LoggedIn">
       <li class="nav-item" [routerLinkActive]="['active']">
         <a class="nav-link" [routerLink]="['/login']" [queryParamsHandling]="'merge'">{{'general.login' |
-            transloco}}</a>
+          transloco}}</a>
       </li>
       <li class="nav-item" [routerLinkActive]="['active']">
         <a class="nav-link" [routerLink]="['/features']" [queryParamsHandling]="'merge'">{{'general.features' |
-            transloco}}</a>
+          transloco}}</a>
       </li>
       <li class="nav-item" [routerLinkActive]="['active']">
         <a class="nav-link" [routerLink]="['/news']" [queryParamsHandling]="'merge'">{{'general.news' |
-            transloco}}</a>
-      </li>
-      <li class="nav-item" [routerLinkActive]="['active']">
-        <a class="nav-link" [routerLink]="['/faq']" [queryParamsHandling]="'merge'">{{'general.faq' |
-            transloco}}</a>
+          transloco}}</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="https://www.phonetik.uni-muenchen.de/apps/octra/manual/en/" target="_blank">
-          Manual
+          {{"general.manual"| transloco}}
         </a>
       </li>
     </ul>
@@ -76,7 +72,7 @@
            aria-haspopup="true"
            aria-expanded="false">
           {{(transcrServ.currentlevel.name.length > 30) ? transcrServ.currentlevel.name.substr(0, 30) +
-            '...' : transcrServ.currentlevel.name}}
+          '...' : transcrServ.currentlevel.name}}
           <fa-icon icon="book" class="navbar-icon"></fa-icon>
         </a>
         <div class="dropdown-menu dropdown-menu-right options-menu" aria-labelledby="tiersDropdown" [ngClass]="{

@@ -38,7 +38,6 @@ import {BugReportService} from './core/shared/service/bug-report.service';
 import {OctraDropzoneComponent} from './core/gui/octra-dropzone/octra-dropzone.component';
 import {LoadeditorDirective} from './core/shared/directive/loadeditor.directive';
 import {NewsComponent} from './core/gui/news/news.component';
-import {FaqComponent} from './core/gui/faq/faq.component';
 import {DictaphoneEditorComponent, LinearEditorComponent, TwoDEditorComponent} from './editors';
 import {HelpComponent} from './core/gui/help/';
 import {NewEditorComponent} from './editors/new-editor/new-editor.component';
@@ -187,7 +186,6 @@ export const EDITORS: any[] = [
     AppComponent,
     DropZoneComponent,
     EDITORS,
-    FaqComponent,
     FastbarComponent,
     FeaturesComponent,
     HelpComponent,

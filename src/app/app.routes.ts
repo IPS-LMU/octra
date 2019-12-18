@@ -6,7 +6,6 @@ import {ALoginGuard} from './core/gui/login/login.activateguard';
 import {LogoutGuard} from './core/gui/logout/logout.guard';
 import {SettingsGuard} from './core/shared/guard';
 import {NewsComponent} from './core/gui/news/news.component';
-import {FaqComponent} from './core/gui/faq/faq.component';
 import {BrowserTestComponent} from './core/gui/browser-test/browser-test.component';
 import {CompatibilityGuard} from './core/shared/guard/compatibility.guard';
 import {StresstestComponent} from './core/tools/stresstest/stresstest.component';
@@ -17,7 +16,6 @@ const APP_ROUTES: Routes = [
   {path: 'test', component: BrowserTestComponent, canActivate: [SettingsGuard, CompatibilityGuard]},
   {path: '404', component: Error404Component},
   {path: 'news', component: NewsComponent, canActivate: [SettingsGuard]},
-  {path: 'faq', component: FaqComponent, canActivate: [SettingsGuard]},
   {path: 'features', component: FeaturesComponent, canActivate: [SettingsGuard]},
   {path: 'logout', component: LogoutComponent, canActivate: [SettingsGuard, LogoutGuard]},
   {

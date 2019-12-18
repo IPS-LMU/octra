@@ -42,7 +42,7 @@
               </td>
               <td (click)="onLineClick(converter, i)">
                 <fa-icon *ngIf="converter.notice !== ''" icon="info-circle"
-                         [attr.title]="converter.notice"></fa-icon>
+                         [tooltip]="converter.notice"></fa-icon>
               </td>
             </tr>
             <tr [@fadeToggle]="exportStates[i]" *ngIf="converter.conversion.export">

@@ -8,9 +8,13 @@
   <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/overview.png" alt="Linear Editor">
   <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/export.png" alt="Dictaphone Editor">
 </p>
+<p style="text-align: center;">
+<a href="https://clarin.phonetik.uni-muenchen.de/apps/octra/octra/features">
+  More information
+</a>
+</p>
 
-This is a web-application for the orthographic transcription of longer
-audiofiles. For now, it uses three editors for the orthographic transcription:
+This is a web-application for the orthographic transcription of audiofiles. For now, it uses three editors for the orthographic transcription:
 
 * Dictaphone Editor: An typical, easy-to-use editor with just a texteditor and an audioplayer.
 * Linear-Editor: This editor shows two signaldisplays: One for the whole view of the signal and one as loupe. You can set boundaries and define segments.

@@ -32,7 +32,7 @@
                             <td>*{{elem.extension}}</td>
                             <td>
                                 <fa-icon *ngIf="elem.notice !== ''" icon="info-circle"
-                                         [attr.title]="elem.notice"></fa-icon>
+                                         [tooltip]="elem.notice"></fa-icon>
                             </td>
                         </tr>
                     </ng-container>

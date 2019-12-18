@@ -382,7 +382,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   playAll(nextSegment: number) {
     const segment = this.segments[nextSegment];
 
-    if (nextSegment < this.segments.length && this.playAllState.state === 'started') {
+    if (nextSegment < this.segments.length && this.playAllState.state === 'stopped') {
       if (!this.playAllState.skipSilence ||
         (this.playAllState.skipSilence && segment.transcript !== ''
           && segment.transcript.indexOf(this.transcrService.breakMarker.code) < 0)
@@ -395,25 +395,26 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
         // skip segment with silence
         this.playAll(++nextSegment);
       }
-    } else {
+    } else if (nextSegment < this.segments.length) {
       // last segment reached
       this.playAllState.state = 'stopped';
       this.playAllState.icon = 'play';
 
       this.cd.markForCheck();
       this.cd.detectChanges();
+    } else {
+      console.log(`playAll failed`);
     }
   }
 
   togglePlayAll() {
-    this.playAllState.state = (this.playAllState.state === 'started') ? 'stopped' : 'started';
     this.playAllState.icon = (this.playAllState.icon === 'play') ? 'stop' : 'play';
     this.cd.markForCheck();
     this.cd.detectChanges();
 
     const playpos = this.audio.audiomanagers[0].playposition.clone();
     playpos.browserSample.value = 0;
-    if (this.playAllState.state === 'started') {
+    if (this.playAllState.icon === 'stop') {
       // start
       this.stopPlayback().then(() => {
         this.uiService.addElementFromEvent('mouseclick', {
@@ -427,7 +428,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     } else {
       // stop
       this.stopPlayback().then(() => {
-        this.playAllState.state = 'started';
+        this.playAllState.state = 'stopped';
         this.playStateSegments[this.playAllState.currentSegment].state = 'stopped';
         this.playStateSegments[this.playAllState.currentSegment].icon = 'play';
 
@@ -531,6 +532,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       }, 'overview');
 
       this.stopPlayback().then(() => {
+        this.playAllState.icon = 'play';
         this.cd.markForCheck();
         this.cd.detectChanges();
         this.playAllState.currentSegment = -1;
@@ -547,8 +549,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   public stopPlayback(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.playAllState.currentSegment > -1) {
-        this.playAllState.state = 'stopped';
-        this.playAllState.icon = 'play';
         this.playStateSegments[this.playAllState.currentSegment].state = 'stopped';
         this.playStateSegments[this.playAllState.currentSegment].icon = 'play';
         this.cd.markForCheck();

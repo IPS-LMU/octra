@@ -39,7 +39,6 @@ import {OctraDropzoneComponent} from './core/gui/octra-dropzone/octra-dropzone.c
 import {LoadeditorDirective} from './core/shared/directive/loadeditor.directive';
 import {NewsComponent} from './core/gui/news/news.component';
 import {DictaphoneEditorComponent, LinearEditorComponent, TwoDEditorComponent} from './editors';
-import {HelpComponent} from './core/gui/help/';
 import {NewEditorComponent} from './editors/new-editor/new-editor.component';
 import {HelpToolsComponent} from './core/gui/help-tools/';
 import {FeaturesComponent} from './core/gui/features';
@@ -83,7 +82,8 @@ import {
   faSignOutAlt,
   faSpinner,
   faThList,
-  faTimes, faTools,
+  faTimes,
+  faTools,
   faTrash,
   faWindowMaximize
 } from '@fortawesome/free-solid-svg-icons';
@@ -128,6 +128,7 @@ import {TableConfiguratorComponent} from './core/component/table-configurator/ta
 import {ClipTextPipe} from './core/shared/clip-text.pipe';
 import {AuthComponent} from './core/gui/auth/auth.component';
 import {ToolsModalComponent} from './core/modals/tools-modal/tools-modal.component';
+import {HelpModalComponent} from './core/modals/help-modal/help-modal.component';
 
 library.add(
   faSpinner,
@@ -188,7 +189,7 @@ export const EDITORS: any[] = [
     EDITORS,
     FastbarComponent,
     FeaturesComponent,
-    HelpComponent,
+    HelpModalComponent,
     HelpToolsComponent,
     LoadeditorDirective,
     LoadingComponent,
@@ -234,7 +235,8 @@ export const EDITORS: any[] = [
     TableConfiguratorComponent,
     ClipTextPipe,
     AuthComponent,
-    ToolsModalComponent
+    ToolsModalComponent,
+    HelpModalComponent
   ],
   entryComponents: EDITORS,
   imports: [

@@ -1,0 +1,22 @@
+<div bsModal #modal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1"
+     id="supportedfiles" (onHidden)="onHidden()">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">{{"general.help" | transloco}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="export-table" #content style="text-align: center;">
+        <a class="btn btn-raised btn-info" href="https://clarin.phonetik.uni-muenchen.de/apps/octra/manual/1.4.0/"
+           target="_blank">Open Manual</a>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="close()">
+          {{"general.close" | transloco}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

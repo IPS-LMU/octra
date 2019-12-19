@@ -11,5 +11,4 @@ export * from './reload-file';
 export * from './taskbar';
 export * from './error404';
 export * from './help-tools';
-export * from './help';
 export * from './features';

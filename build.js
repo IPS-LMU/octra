@@ -35,10 +35,10 @@ if (process.argv[4].indexOf("url=") > -1) {
 console.log(`Remove cache...`);
 execSync("rm -rf ./node_modules/.cache");
 console.log(`Building OCTRA with dev=${dev}, isUpdate=${isUpdate} for ${baseHref}`);
-const command = ['--max-old-space-size=12000', './node_modules/@angular/cli/bin/ng', 'build', '--prod', '--base-href', baseHref];
+const command = ['--max-old-space-size=12000', './node_modules/@angular/cli/bin/ng', 'build', '--prod', '-c', 'dev', '--base-href', baseHref];
 
-if (dev !== "") {
-  command.push(dev);
+if (dev === "") {
+  command.splice(4, 2);
 }
 
 const node = spawn('node', command);
@@ -97,6 +97,12 @@ node.on('exit', function (code) {
     if (item !== "index.html" && item !== targetFolder && !found) {
       execSync(`mv "./${buildDir}${item}" "./${buildDir}${targetFolder}/${item}"`);
     }
+  }
+
+  if (!isUpdate) {
+    execSync(`mv "./${buildDir}/assets/.htaccess" "./${buildDir}/.htaccess"`);
+  } else {
+    execSync(`rm "./${buildDir}/assets/.htaccess"`);
   }
 });
 

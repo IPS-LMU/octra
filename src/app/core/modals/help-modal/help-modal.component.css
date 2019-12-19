@@ -1,0 +1,15 @@
+#export-table td {
+  cursor: pointer;
+}
+
+#export-table a {
+  cursor: pointer;
+}
+
+progressbar {
+  height: 20px;
+}
+
+h5 {
+  margin-top: 40px;
+}

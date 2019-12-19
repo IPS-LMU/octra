@@ -8,7 +8,6 @@ import {ReloadFileGuard} from '../reload-file/reload-file.activateguard';
 import {LoadingComponent} from '../loading';
 import {TranscActivateGuard} from '../../shared/guard/transcr.activateguard';
 import {AgreementComponent} from '../agreement/agreement.component';
-import {HelpComponent} from '../help';
 import {AuthComponent} from '../auth/auth.component';
 
 export const MEMBER_ROUTES: Routes = [
@@ -19,7 +18,6 @@ export const MEMBER_ROUTES: Routes = [
     component: TranscriptionComponent,
     canActivate: [TranscActivateGuard, MembersAreaGuard]
   },
-  {path: 'transcr/help', component: HelpComponent, canActivate: [TranscActivateGuard, MembersAreaGuard]},
   {
     path: 'transcr/end',
     component: TranscriptionEndComponent,

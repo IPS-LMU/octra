@@ -40,8 +40,8 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   private oldRaw = '';
 
-  public get settings(): any {
-    return this.audioplayer;
+  public get settings() {
+    return this.audioplayer.settings;
   }
 
   public set settings(value: any) {
@@ -85,9 +85,8 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     this.audiochunk = this.audioManager.mainchunk.clone();
     // this.audiochunk.speed = 1;
     this.audiochunk.volume = 1;
-    // this.audioplayer.settings.shortcutsEnabled = true;
-    this.settings.shortcuts = this.keyMap.register('AP', this.settings.shortcuts);
-    this.shortcuts = this.settings.shortcuts;
+    // TODO important set shortcuts for keymapping service
+    // this.shortcuts = this.settings.shortcuts;
     this.editor.Settings.markers = this.transcrService.guidelines.markers.items;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.special_markers.boundary = true;
@@ -113,48 +112,30 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
     switch (event.type) {
       case('play'):
-        this.audiochunk.startPlayback();
         break;
       case('pause'):
-        this.audiochunk.pausePlayback();
         break;
       case('stop'):
-        this.audiochunk.stopPlayback().then(
-          () => {
-            this.audiochunk.playposition = this.audioManager.createSampleUnit(0);
-            // this.audiochunk.update();
-          });
         break;
       case('replay'):
-        this.audiochunk.toggleReplay();
         break;
       case('backward'):
-        this.audiochunk.stepBackward();
         break;
       case('backward time'):
-        this.audiochunk.stepBackwardTime(0.5);
         break;
       case('default'):
         break;
     }
   }
 
-  onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
-    // this.audiochunk.speed = event.new_value;
-    this.appStorage.audioSpeed = event.new_value;
-  }
-
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
+    this.appStorage.audioSpeed = event.new_value;
     this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audioManager.playposition,
       this.editor.caretpos, null, null, 'audio_speed');
   }
 
-  onVolumeChange(event: { old_value: number, new_value: number, timestamp: number }) {
-    this.audiochunk.volume = event.new_value;
-    this.appStorage.audioVolume = event.new_value;
-  }
-
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
+    this.appStorage.audioVolume = event.new_value;
     this.uiService.addElementFromEvent('slider', event, event.timestamp,
       this.audioManager.playposition, this.editor.caretpos, null, null, 'audio_volume');
   }

@@ -36,7 +36,7 @@ export interface IDataEntry {
   jobno: number;
   itemcode: any;
   filesize: any;
-  samplerate: number;
+  sampleRate: number;
   samples: null;
   nextannotation_id: number;
   admincomment: string;

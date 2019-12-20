@@ -245,7 +245,7 @@ export class UpdateManager {
         audiofile.name = '';
         audiofile.size = 0;
         audiofile.duration = 0;
-        audiofile.samplerate = 0;
+        audiofile.sampleRate = 0;
 
         const segments: OSegment[] = [];
 
@@ -266,7 +266,7 @@ export class UpdateManager {
         const levels: OLevel[] = [];
         levels.push(level);
 
-        const annotation: OAnnotJSON = new OAnnotJSON(audiofile.name, audiofile.samplerate, levels);
+        const annotation: OAnnotJSON = new OAnnotJSON(audiofile.name, audiofile.sampleRate, levels);
         console.log('IMPORTED:');
         this.appStorage.localStr.store('annotation', annotation);
         console.log('delete old transcription');

@@ -57,7 +57,7 @@
     "protocol": "Protokoll",
     "submission success": "Übertragung erfolgreich",
     "duration": "Dauer",
-    "samplerate": "Abtastrate",
+    "sampleRate": "Abtastrate",
     "bitspersecond": "Bits pro Sekunde",
     "filesize": "Dateigröße",
     "id": "ID",

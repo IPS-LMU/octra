@@ -1,7 +1,7 @@
 import {OAnnotJSON, OAudiofile} from './AnnotJSON';
 import {Level} from './Level';
 import {Link} from './Link';
-import {BrowserAudioTime, OriginalAudioTime} from '../../../media-components/obj/media/audio';
+import {SampleUnit} from '../../../media-components/obj/audio';
 
 export class Annotation {
   private readonly _annotates: string;
@@ -50,18 +50,18 @@ export class Annotation {
     }
   }
 
-  public getObj(lastOriginalBoundary: BrowserAudioTime | OriginalAudioTime): OAnnotJSON {
-      const result = new OAnnotJSON(this._audiofile.name, this._audiofile.samplerate, [], this._links);
-      result.annotates = this._annotates;
+  public getObj(lastOriginalBoundary: SampleUnit): OAnnotJSON {
+    const result = new OAnnotJSON(this._audiofile.name, this._audiofile.sampleRate, [], this._links);
+    result.annotates = this._annotates;
 
     let startID = 1;
-      for (let i = 0; i < this._levels.length; i++) {
-        const level = this._levels[i].getObj(lastOriginalBoundary);
-        for (let j = 0; j < level.items.length; j++) {
-          level.items[j].id = startID++;
-          if (!(level.items[j].labels === null || level.items[j].labels === undefined) && level.items[j].labels.length > 0) {
-            if (level.items[j].labels[0].name === '') {
-              level.items[j].labels[0].name = level.name;
+    for (let i = 0; i < this._levels.length; i++) {
+      const level = this._levels[i].getObj(lastOriginalBoundary);
+      for (let j = 0; j < level.items.length; j++) {
+        level.items[j].id = startID++;
+        if (!(level.items[j].labels === null || level.items[j].labels === undefined) && level.items[j].labels.length > 0) {
+          if (level.items[j].labels[0].name === '') {
+            level.items[j].labels[0].name = level.name;
             }
           }
         }

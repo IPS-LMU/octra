@@ -59,15 +59,15 @@ export class TextConverter extends Converter {
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile !== null && audiofile !== undefined) {
-      const result = new OAnnotJSON(audiofile.name, audiofile.samplerate);
+      const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
 
       const olevel = new OLevel('OCTRA_1', 'SEGMENT');
-      const samplerate = audiofile.samplerate;
+      const sampleRate = audiofile.sampleRate;
 
       const olabels: OLabel[] = [];
       olabels.push((new OLabel('OCTRA_1', file.content)));
       const osegment = new OSegment(
-        1, 0, Math.round(audiofile.duration * samplerate), olabels
+        1, 0, Math.round(audiofile.duration * sampleRate), olabels
       );
 
       olevel.items.push(osegment);

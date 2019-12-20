@@ -83,7 +83,7 @@ export class BundleJSONConverter extends Converter {
 
       if (Functions.contains(audioResult.name, '.wav') || Functions.contains(audioResult.name, '.ogg')) {
         audioResult.size = buffer.byteLength;
-        audioResult.samplerate = annotation.sampleRate;
+        audioResult.sampleRate = annotation.sampleRate;
         audioResult.arraybuffer = buffer;
 
         return {

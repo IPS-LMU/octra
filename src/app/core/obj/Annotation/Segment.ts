@@ -1,6 +1,6 @@
 import {OSegment} from './AnnotJSON';
-import {BrowserAudioTime, OriginalAudioTime, OriginalSample} from '../../../media-components/obj/media/audio';
 import {ASRQueueItemType} from '../../shared/service/asr.service';
+import {SampleUnit} from '../../../media-components/obj/audio';
 
 export class Segment {
   set isBlockedBy(value: ASRQueueItemType) {
@@ -34,7 +34,7 @@ export class Segment {
   private _changed = false;
   private _isBlockedBy: ASRQueueItemType = null;
 
-  constructor(public time: BrowserAudioTime | OriginalAudioTime) {
+  constructor(public time: SampleUnit) {
   }
 
   /**
@@ -42,11 +42,8 @@ export class Segment {
    */
   public static fromObj(obj: OSegment, originalSampleRate: number, browserSampleRate: number): Segment {
     if (obj) {
-      const originalAudioTime = new OriginalAudioTime(
-        new OriginalSample(obj.sampleStart + obj.sampleDur, originalSampleRate), browserSampleRate
-      );
-      const browserAudioTime = originalAudioTime.convertToBrowserAudioTime();
-      const seg = new Segment(browserAudioTime);
+      const originalAudioTime = new SampleUnit(obj.sampleStart + obj.sampleDur, originalSampleRate);
+      const seg = new Segment(originalAudioTime);
 
       if (obj.labels[0].value) {
         seg._transcript = obj.labels[0].value;

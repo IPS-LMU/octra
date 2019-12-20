@@ -3,11 +3,11 @@ import {SessionFile} from '../../obj/SessionFile';
 import {OLevel, OLink} from '../../obj';
 import {AppInfo} from '../../../app.info';
 import {IndexedDBManager} from '../../obj/IndexedDBManager';
-import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {LocalStorageService, SessionStorage, SessionStorageService} from '@rars/ngx-webstorage';
 import {isNullOrUndefined} from '../Functions';
 import {Subject} from 'rxjs';
 import {IDataEntry} from '../../obj/data-entry';
+import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
 
 export interface IIDBLevel {
   id: number;

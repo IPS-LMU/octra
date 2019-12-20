@@ -87,7 +87,7 @@ export class TableConfiguratorComponent implements OnInit {
       formatString: 'HH:mm:ss.mss',
       formatFunction: (level: Level, segmentNumber: number, counter: number) => {
         // the value must be a unix timestamp
-        let segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.originalSample.seconds * 1000 : 0;
+        let segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.seconds * 1000 : 0;
         segmentStart = Math.round(segmentStart);
 
         return this.convertMilliSecondsIntoLegibleString(segmentStart);
@@ -99,7 +99,7 @@ export class TableConfiguratorComponent implements OnInit {
         formatString: '120345',
         formatFunction: (level: Level, segmentNumber: number, counter: number) => {
           // the value must be a unix timestamp
-          return ((segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.originalSample.value + 1 : 1) + '';
+          return ((segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.samples + 1 : 1) + '';
         }
       },
       {
@@ -108,7 +108,7 @@ export class TableConfiguratorComponent implements OnInit {
         defaultValue: '23.4567',
         formatFunction: (level: Level, segmentNumber: number, counter: number) => {
           // the value must be a unix timestamp
-          return ((segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.originalSample.seconds.toFixed(4) : '0') + '';
+          return ((segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.seconds.toFixed(4) : '0') + '';
         }
       }]
   },
@@ -120,7 +120,7 @@ export class TableConfiguratorComponent implements OnInit {
         formatFunction: (level: Level, segmentNumber: number, counter: number) => {
           // the value must be a unix timestamp
           const segment = level.segments.get(segmentNumber);
-          return this.convertMilliSecondsIntoLegibleString(Math.round(segment.time.originalSample.seconds * 1000));
+          return this.convertMilliSecondsIntoLegibleString(Math.round(segment.time.seconds * 1000));
         },
         formatString: 'HH:mm:ss.mss'
       },
@@ -130,7 +130,7 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '120345',
           formatFunction: (level: Level, segmentNumber: number, counter: number) => {
             // the value must be a unix timestamp
-            return level.segments.get(segmentNumber).time.originalSample.value + '';
+            return level.segments.get(segmentNumber).time.samples + '';
           }
         },
         {
@@ -139,7 +139,7 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '23.4567',
           formatFunction: (level: Level, segmentNumber: number, counter: number) => {
             // the value must be a unix timestamp
-            return level.segments.get(segmentNumber).time.originalSample.seconds.toFixed(4) + '';
+            return level.segments.get(segmentNumber).time.seconds.toFixed(4) + '';
           }
         }]
     },
@@ -151,9 +151,9 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '01:30:02.234',
           formatFunction: (level: Level, segmentNumber: number, counter: number) => {
             // the value must be a unix timestamp
-            let segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.originalSample.seconds : 0;
+            let segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.seconds : 0;
             const segment = level.segments.get(segmentNumber);
-            return this.convertMilliSecondsIntoLegibleString(Math.round((segment.time.originalSample.seconds - segmentStart) * 1000));
+            return this.convertMilliSecondsIntoLegibleString(Math.round((segment.time.seconds - segmentStart) * 1000));
           },
           formatString: 'HH:mm:ss.mss'
         },
@@ -163,8 +163,8 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '120345',
           formatFunction: (level: Level, segmentNumber: number, counter: number) => {
             // the value must be a unix timestamp
-            let segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.originalSample.value + 1 : 1;
-            return (level.segments.get(segmentNumber).time.originalSample.value - segmentStart) + '';
+            let segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.samples + 1 : 1;
+            return (level.segments.get(segmentNumber).time.samples - segmentStart) + '';
           }
         },
         {
@@ -173,8 +173,8 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '23.4567',
           formatFunction: (level: Level, segmentNumber: number, counter: number) => {
             // the value must be a unix timestamp
-            let segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.originalSample.seconds : 0;
-            return (level.segments.get(segmentNumber).time.originalSample.seconds - segmentStart).toFixed(4) + '';
+            let segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.seconds : 0;
+            return (level.segments.get(segmentNumber).time.seconds - segmentStart).toFixed(4) + '';
           }
         }
       ]
@@ -211,7 +211,7 @@ export class TableConfiguratorComponent implements OnInit {
         formatString: '44100',
         formatFunction: (level: Level, segmentNumber: number, counter: number) => {
           // the value must be a unix timestamp
-          return `${level.segments.get(0).time.originalSample.sampleRate}`;
+          return `${level.segments.get(0).time.sampleRate}`;
         }
       },
         {
@@ -220,7 +220,7 @@ export class TableConfiguratorComponent implements OnInit {
           formatString: '44,1kHz',
           formatFunction: (level: Level, segmentNumber: number, counter: number) => {
             // the value must be a unix timestamp
-            return `${level.segments.get(0).time.originalSample.sampleRate / 1000}kHz`;
+            return `${level.segments.get(0).time.sampleRate / 1000}kHz`;
           }
         }]
     },
@@ -395,7 +395,7 @@ export class TableConfiguratorComponent implements OnInit {
 
         textLines.push({
           text,
-          samples: segment.time.originalSample.value
+          samples: segment.time.samples
         });
         counter++;
       }
@@ -496,7 +496,7 @@ export class TableConfiguratorComponent implements OnInit {
           samples: start
         });
         counter++;
-        start = segment.time.originalSample.value;
+        start = segment.time.samples;
       }
 
       if (!hasTierColumn) {

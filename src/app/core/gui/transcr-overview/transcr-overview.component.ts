@@ -15,13 +15,13 @@ import {
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
 import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
-import {AudioSelection, BrowserAudioTime, OriginalAudioTime, SubscriptionManager} from '../../shared';
+import {SubscriptionManager} from '../../shared';
 import {Segment} from '../../obj/Annotation';
-import {PlayBackState} from '../../../media-components/obj/media';
 import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
 import {isFunction, isNullOrUndefined} from '../../shared/Functions';
 import {TranscrEditorComponent} from '../../component/transcr-editor';
-import {AudioChunk} from '../../../media-components/obj/media/audio/AudioManager';
+import {AudioChunk} from '../../../media-components/obj/audio/AudioManager';
+import {AudioSelection, PlayBackStatus, SampleUnit} from '../../../media-components/obj/audio';
 
 declare var validateAnnotation: ((string, any) => any);
 
@@ -162,7 +162,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     this.subscrmanager.add(this.audio.audiomanagers[0].statechange.subscribe((state) => {
         if (this._visible) {
           // make sure that events from playonhover are not logged
-          if (state !== PlayBackState.PLAYING && state !== PlayBackState.INITIALIZED && state !== PlayBackState.PREPARE) {
+          if (state !== PlayBackStatus.PLAYING && state !== PlayBackStatus.INITIALIZED && state !== PlayBackStatus.PREPARE) {
             this.uiService.addElementFromEvent('audio',
               {value: state.toLowerCase()}, Date.now(),
               this.audio.audiomanagers[0].playposition,
@@ -236,7 +236,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       this.textEditor.selectedSegment = i;
 
       const segment = this.segments[i];
-      const nextSegmentTime: BrowserAudioTime | OriginalAudioTime = (i < this.segments.length - 1)
+      const nextSegmentTime: SampleUnit = (i < this.segments.length - 1)
         ? this.segments[i + 1].time : this.audio.audiomanagers[0].originalInfo.duration;
       const audiochunk = new AudioChunk(new AudioSelection(segment.time, nextSegmentTime), this.audio.audiomanagers[0]);
 
@@ -275,12 +275,12 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     this.cd.markForCheck();
     this.cd.detectChanges();
 
-    const startSample = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.originalSample.value : 0;
+    const startSample = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.samples : 0;
     this.uiService.addElementFromEvent('segment', {
       value: 'updated'
     }, Date.now(), null, null, null, {
       start: startSample,
-      length: segment.time.originalSample.value - startSample
+      length: segment.time.samples - startSample
     }, 'overview');
   }
 
@@ -314,11 +314,11 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       for (let i = 0; i < this.segments.length; i++) {
         const segment = this.segments[i];
 
-        const obj = this.getShownSegment(startTime, segment.time.browserSample.value, segment.transcript, i);
+        const obj = this.getShownSegment(startTime, segment.time.samples, segment.transcript, i);
 
         result.push(obj);
 
-        startTime = segment.time.browserSample.value;
+        startTime = segment.time.samples;
 
         // set playState
         this.playStateSegments.push({
@@ -412,8 +412,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     this.cd.markForCheck();
     this.cd.detectChanges();
 
-    const playpos = this.audio.audiomanagers[0].playposition.clone();
-    playpos.browserSample.value = 0;
+    const playpos = this.audio.audiomanagers[0].playposition = this.audio.audiomanagers[0].createSampleUnit(0);
+
     if (this.playAllState.icon === 'stop') {
       // start
       this.stopPlayback().then(() => {
@@ -454,18 +454,16 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
         this.cd.markForCheck();
         this.cd.detectChanges();
 
-        const startSample = (segmentNumber > 0) ? this.segments[segmentNumber - 1].time.browserSample.value : 0;
+        const startSample = (segmentNumber > 0) ? this.segments[segmentNumber - 1].time.samples : 0;
 
         this.playAllState.currentSegment = segmentNumber;
 
         this.cd.markForCheck();
         this.cd.detectChanges();
-        this.audio.audiomanagers[0].playposition = this.audio.audiomanagers[0].createBrowserAudioTime(startSample);
-        this.audio.audiomanagers[0].startPlayback(
-          this.audio.audiomanagers[0].createBrowserAudioTime(startSample),
-          this.audio.audiomanagers[0].createBrowserAudioTime(segment.time.browserSample.value - startSample)
-          , 1, 1, () => {
-          }).then(() => {
+        this.audio.audiomanagers[0].playposition = this.audio.audiomanagers[0].createSampleUnit(startSample);
+        this.audio.audiomanagers[0].startPlayback(new AudioSelection(this.audio.audiomanagers[0].createSampleUnit(startSample),
+          this.audio.audiomanagers[0].createSampleUnit(segment.time.samples - startSample))
+          , 1, 1).then(() => {
           this.playStateSegments[segmentNumber].state = 'stopped';
           this.playStateSegments[segmentNumber].icon = 'play';
           this.cd.markForCheck();
@@ -505,12 +503,12 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
         this.cd.markForCheck();
         this.cd.detectChanges();
 
-        const startSample = (segmentNumber > 0) ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.originalSample.value : 0;
+        const startSample = (segmentNumber > 0) ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.samples : 0;
         this.uiService.addElementFromEvent('mouseclick', {
           value: 'play_segment'
         }, Date.now(), this.audio.audiomanagers[0].playposition, null, null, {
           start: startSample,
-          length: this.transcrService.currentlevel.segments.get(segmentNumber).time.originalSample.value - startSample
+          length: this.transcrService.currentlevel.segments.get(segmentNumber).time.samples - startSample
         }, 'overview');
 
         this.playSegement(segmentNumber).then(() => {
@@ -523,12 +521,12 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
         console.error(error);
       });
     } else {
-      const startSample = (segmentNumber > 0) ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.originalSample.value : 0;
+      const startSample = (segmentNumber > 0) ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.samples : 0;
       this.uiService.addElementFromEvent('mouseclick', {
         value: 'stop_segment'
       }, Date.now(), this.audio.audiomanagers[0].playposition, null, null, {
         start: startSample,
-        length: this.transcrService.currentlevel.segments.get(segmentNumber).time.originalSample.value - startSample
+        length: this.transcrService.currentlevel.segments.get(segmentNumber).time.samples - startSample
       }, 'overview');
 
       this.stopPlayback().then(() => {

@@ -10,9 +10,9 @@ import {isNullOrUndefined} from '../../shared/Functions';
 import {HttpClient} from '@angular/common/http';
 import {interval, Subject} from 'rxjs';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
-import {WavFormat} from '../../../media-components/obj/media/audio/AudioFormats';
 import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/cutting-format';
 import {TranslocoService} from '@ngneat/transloco';
+import {WavFormat} from '../../../media-components/obj/audio/AudioFormats';
 
 declare var JSZip;
 
@@ -179,9 +179,9 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
       const segment: Segment = this.transcrService.currentlevel.segments.get(i);
       cutList.push({
         sampleStart: startSample,
-        sampleDur: segment.time.originalSample.value - startSample
+        sampleDur: segment.time.samples - startSample
       });
-      startSample = segment.time.originalSample.value;
+      startSample = segment.time.samples;
     }
 
     const exportFormats = [];
@@ -279,11 +279,11 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
 
     for (let i = 0; i < this.transcrService.currentlevel.segments.length; i++) {
       const segment: Segment = this.transcrService.currentlevel.segments.get(i);
-      let sampleDur = segment.time.originalSample.value - startSample;
+      let sampleDur = segment.time.samples - startSample;
 
-      if (startSample + sampleDur > this.audio.audiomanagers[0].originalInfo.duration.originalSample.value) {
+      if (startSample + sampleDur > this.audio.audiomanagers[0].originalInfo.duration.samples) {
         console.error(`invalid sampleDur!!`);
-        sampleDur = this.audio.audiomanagers[0].originalInfo.duration.originalSample.value - startSample;
+        sampleDur = this.audio.audiomanagers[0].originalInfo.duration.samples - startSample;
       }
 
       cutList.push({
@@ -292,7 +292,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
         sampleDur,
         transcript: segment.transcript
       });
-      startSample = segment.time.originalSample.value;
+      startSample = segment.time.samples;
     }
 
     // tasks = segments to cut + one for zipping
@@ -311,7 +311,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
     // TODO arraybuffer is c
     this.tools.audioCutting.wavFormat = new WavFormat();
     this.tools.audioCutting.wavFormat.init(
-      this.transcrService.audiomanager.ressource.info.fullname, this.transcrService.audiomanager.ressource.arraybuffer
+      this.transcrService.audioManager.ressource.info.fullname, this.transcrService.audioManager.ressource.arraybuffer
     );
 
     let zip = new JSZip();
@@ -332,12 +332,12 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
           const now = Date.now();
           this.tools.audioCutting.cuttingSpeed = (now - cuttingStarted) / 1000 / status.file.size;
 
-          const rest = (this.transcrService.audiomanager.ressource.arraybuffer.byteLength - totalSize);
+          const rest = (this.transcrService.audioManager.ressource.arraybuffer.byteLength - totalSize);
           this.tools.audioCutting.cuttingTimeLeft = this.tools.audioCutting.cuttingSpeed * rest;
 
           const zippingSpeed = this.tools.audioCutting.zippingSpeed;
           this.tools.audioCutting.timeLeft = Math.ceil((this.tools.audioCutting.cuttingTimeLeft
-            + (this.transcrService.audiomanager.ressource.arraybuffer.byteLength * zippingSpeed)) * 1000);
+            + (this.transcrService.audioManager.ressource.arraybuffer.byteLength * zippingSpeed)) * 1000);
 
           this.tools.audioCutting.subscriptionIDs[2] = this.subscrmanager.add(interval(1000).subscribe(
             () => {
@@ -355,14 +355,14 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
             // add TextTable
             const converter = new TextTableConverter();
             const content = converter.exportList(
-              cutList, this.transcrService.audiomanager.ressource.info,
-              this.transcrService.audiomanager.ressource.info.fullname,
+              cutList, this.transcrService.audioManager.ressource.info,
+              this.transcrService.audioManager.ressource.info.fullname,
               this.namingConvention.namingConvention
             );
 
             zip = zip.file(
-              this.transcrService.audiomanager.ressource.info.name + '_meta.txt',
-              new File([content], this.transcrService.audiomanager.ressource.info.name + '_meta.txt', {type: 'text/plain'})
+              this.transcrService.audioManager.ressource.info.name + '_meta.txt',
+              new File([content], this.transcrService.audioManager.ressource.info.name + '_meta.txt', {type: 'text/plain'})
             );
             finished++;
           }
@@ -371,15 +371,15 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
             // add JSON
             const converter = new JSONConverter();
             const content = converter.exportList(
-              cutList, this.transcrService.audiomanager.ressource.info,
-              this.transcrService.audiomanager.ressource.info.fullname,
+              cutList, this.transcrService.audioManager.ressource.info,
+              this.transcrService.audioManager.ressource.info.fullname,
               this.namingConvention.namingConvention
             );
 
             zip = zip.file(
-              this.transcrService.audiomanager.ressource.info.name + '_meta.json',
+              this.transcrService.audioManager.ressource.info.name + '_meta.json',
               new File([JSON.stringify(content, null, 2)],
-                this.transcrService.audiomanager.ressource.info.name + '_meta.json', {type: 'text/plain'})
+                this.transcrService.audioManager.ressource.info.name + '_meta.json', {type: 'text/plain'})
             );
             finished++;
           }
@@ -430,7 +430,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
             }
 
             this.tools.audioCutting.result.url = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(data));
-            this.tools.audioCutting.result.filename = this.transcrService.audiomanager.ressource.info.name + '.zip';
+            this.tools.audioCutting.result.filename = this.transcrService.audioManager.ressource.info.name + '.zip';
             // finished
           });
 
@@ -458,8 +458,8 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
 
       cuttingStarted = Date.now();
       this.tools.audioCutting.wavFormat.startAudioCutting(
-        this.transcrService.audiomanager.ressource.info.type, this.namingConvention.namingConvention,
-        this.transcrService.audiomanager.ressource.arraybuffer, cutList);
+        this.transcrService.audioManager.ressource.info.type, this.namingConvention.namingConvention,
+        this.transcrService.audioManager.ressource.arraybuffer, cutList);
     }).catch((err) => {
       console.error(err);
     });
@@ -540,9 +540,9 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
 
       let startPos = 0;
       if (i > 0) {
-        startPos = this.transcrService.currentlevel.segments.segments[i - 1].time.browserSample.seconds;
+        startPos = this.transcrService.currentlevel.segments.segments[i - 1].time.seconds;
       }
-      let duration = Math.round((segment.time.browserSample.seconds - startPos) * 1000);
+      let duration = Math.round((segment.time.seconds - startPos) * 1000);
       if (!isSilence(segment) || duration < minSilenceLength) {
         if (maxWords > 0 && wordCounter >= maxWords) {
           wordCounter = (isSilence(segment)) ? 0 : countWords(segment.transcript);
@@ -551,9 +551,9 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
             const lastSegment = this.transcrService.currentlevel.segments.segments[i - 1];
             startPos = 0;
             if (i > 1) {
-              startPos = this.transcrService.currentlevel.segments.segments[i - 2].time.browserSample.seconds;
+              startPos = this.transcrService.currentlevel.segments.segments[i - 2].time.seconds;
             }
-            duration = Math.round((lastSegment.time.browserSample.seconds - startPos) * 1000);
+            duration = Math.round((lastSegment.time.seconds - startPos) * 1000);
             if (!isSilence(lastSegment) || duration < minSilenceLength) {
               let lastSegmentText = lastSegment.transcript;
               let segmentText = segment.transcript;

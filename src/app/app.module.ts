@@ -43,7 +43,6 @@ import {NewEditorComponent} from './editors/new-editor/new-editor.component';
 import {HelpToolsComponent} from './core/gui/help-tools/';
 import {FeaturesComponent} from './core/gui/features';
 import {HttpClientModule} from '@angular/common/http';
-import {AudioviewerConfig} from './media-components/components/audio/audioviewer';
 import {MediaComponentsModule} from './media-components/media-components.module';
 import {TranscrEditorComponent} from './core/component/transcr-editor';
 import {Error404Component} from './core/gui/error404';
@@ -129,6 +128,7 @@ import {ClipTextPipe} from './core/shared/clip-text.pipe';
 import {AuthComponent} from './core/gui/auth/auth.component';
 import {ToolsModalComponent} from './core/modals/tools-modal/tools-modal.component';
 import {HelpModalComponent} from './core/modals/help-modal/help-modal.component';
+import {AudioviewerConfig} from './media-components/components/audio/audio-viewer/audio-viewer.config';
 
 library.add(
   faSpinner,

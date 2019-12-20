@@ -19,7 +19,7 @@ export class PraatTextgridConverter extends Converter {
   public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult {
     if (!(annotation === null || annotation === undefined)) {
       let result = '';
-      const durSeconds = (audiofile.duration / audiofile.samplerate);
+      const durSeconds = (audiofile.duration / audiofile.sampleRate);
 
       let segLevels = 0;
 
@@ -56,8 +56,8 @@ export class PraatTextgridConverter extends Converter {
           for (let j = 0; j < level.items.length; j++) {
             const segment = level.items[j];
 
-            const secondsStart = segment.sampleStart / audiofile.samplerate;
-            const secondsEnd = (segment.sampleStart + segment.sampleDur) / audiofile.samplerate;
+            const secondsStart = segment.sampleStart / audiofile.sampleRate;
+            const secondsEnd = (segment.sampleStart + segment.sampleDur) / audiofile.sampleRate;
 
             result += `        intervals [${j + 1}]:\n` +
               `            xmin = ${secondsStart} \n` +
@@ -84,7 +84,7 @@ export class PraatTextgridConverter extends Converter {
     if (audiofile !== null && audiofile !== undefined) {
       const name = audiofile.name.substr(0, audiofile.name.lastIndexOf('.'));
       if (name === file.name.substr(0, file.name.lastIndexOf('.'))) {
-        const result = new OAnnotJSON(audiofile.name, audiofile.samplerate);
+        const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
 
         let content = file.content;
         // replace
@@ -204,8 +204,8 @@ export class PraatTextgridConverter extends Converter {
                         olabels.push((new OLabel(lvlName, text)));
                         const osegment = new OSegment(
                           (segNum),
-                          Math.round(xmin * audiofile.samplerate),
-                          Math.round((xmax - xmin) * audiofile.samplerate),
+                          Math.round(xmin * audiofile.sampleRate),
+                          Math.round((xmax - xmin) * audiofile.sampleRate),
                           olabels
                         );
                         olevel.items.push(osegment);
@@ -235,7 +235,7 @@ export class PraatTextgridConverter extends Converter {
 
                         const olabels: OLabel[] = [];
                         olabels.push((new OLabel(lvlName, mark)));
-                        const oevent = new OEvent(segNum, Math.round(number * audiofile.samplerate), olabels);
+                        const oevent = new OEvent(segNum, Math.round(number * audiofile.sampleRate), olabels);
                         olevel.items.push(oevent);
                       }
 

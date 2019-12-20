@@ -1,7 +1,5 @@
 export * from '../obj/APIData';
 export * from '../obj/APIResponse';
-export * from '../../media-components/obj/media/audio/AudioTime';
-export * from '../../media-components/obj/media/audio/AudioTimeCalculator';
 export * from './BrowserInfo';
 export * from '../obj/KeyMapping';
 export * from '../obj/statistics/KeyStatisticElem';
@@ -9,7 +7,6 @@ export * from '../obj/statistics/MouseStatisticElem';
 export * from '../obj/Annotation/Segment';
 export * from '../obj/Annotation/Segments';
 export * from '../obj/statistics/StatisticElement';
-export * from '../../media-components/obj/media/audio/AudioSelection';
 export * from './Logger';
 export * from '../obj/SessionFile';
 export * from './OCTRAnimations';

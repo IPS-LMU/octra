@@ -1,9 +1,15 @@
-import {AudioTimeCalculator, BrowserAudioTime} from './media/audio';
-import {AudioChunk} from './media/audio/AudioManager';
+import {AudioTimeCalculator, SampleUnit} from './audio';
+import {AudioChunk} from './audio/AudioManager';
 
 export class PlayCursor {
 
   private readonly _innerWidth: number;
+
+  constructor(absX: number, timePos: SampleUnit, innerWidth: number) {
+    this._absX = absX;
+    this._timePos = timePos;
+    this._innerWidth = innerWidth;
+  }
 
   private _absX: number;
 
@@ -11,9 +17,9 @@ export class PlayCursor {
     return this._absX;
   }
 
-  private readonly _timePos: BrowserAudioTime;
+  private _timePos: SampleUnit;
 
-  get timePos(): BrowserAudioTime {
+  get timePos(): SampleUnit {
     return this._timePos;
   }
 
@@ -22,23 +28,17 @@ export class PlayCursor {
     return (this._innerWidth > 0) ? (this._absX % this._innerWidth) : 0;
   }
 
-  constructor(absX: number, timePos: BrowserAudioTime, innerWidth: number) {
-    this._absX = absX;
-    this._timePos = timePos;
-    this._innerWidth = innerWidth;
-  }
-
   public changeAbsX(absx: number, audioTCalculator: AudioTimeCalculator, audioPxWidth: number, chunk: AudioChunk) {
     this._absX = Math.max(0, Math.min(absx, audioPxWidth));
-    this._timePos.browserSample.value = audioTCalculator.absXChunktoSamples(absx, chunk);
+    this._timePos = audioTCalculator.absXChunktoSampleUnit(absx, chunk);
   }
 
-  public changeSamples(samples: number, audioTCalculator: AudioTimeCalculator, chunk?: AudioChunk) {
-    this._timePos.browserSample.value = samples;
-    const duration = (!(chunk === null || chunk === undefined) && chunk.time.start.browserSample.value < chunk.time.end.browserSample.value)
-      ? new BrowserAudioTime(chunk.time.end.browserSample.sub(chunk.time.start.browserSample), audioTCalculator.samplerate) : null;
+  public changeSamples(sample: SampleUnit, audioTCalculator: AudioTimeCalculator, chunk?: AudioChunk) {
+    this._timePos = sample.clone();
+    const duration = (!(chunk === null || chunk === undefined) && chunk.time.start.samples < chunk.time.end.samples)
+      ? chunk.time.end.sub(chunk.time.start) : null;
 
-    const chunkS = ((chunk) ? (chunk.time.start.browserSample.value) : 0);
-    this._absX = audioTCalculator.samplestoAbsX(samples - chunkS, duration);
+    const chunkS = ((chunk) ? (chunk.time.start.clone()) : new SampleUnit(0, sample.sampleRate));
+    this._absX = audioTCalculator.samplestoAbsX(sample.sub(chunkS), duration);
   }
 }

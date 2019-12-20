@@ -64,7 +64,7 @@ export class ReloadFileComponent implements OnInit {
             resolve();
           }
         }).then(() => {
-          this.audioService.registerAudioManager(this.dropzone.audiomanager);
+          this.audioService.registerAudioManager(this.dropzone.audioManager);
           this.appStorage.beginLocalSession(this.dropzone.files, keepData, this.navigate,
             (error) => {
               if (error === 'file not supported') {
@@ -82,7 +82,7 @@ export class ReloadFileComponent implements OnInit {
   }
 
   onOfflineSubmit = () => {
-    this.audioService.registerAudioManager(this.dropzone.audiomanager);
+    this.audioService.registerAudioManager(this.dropzone.audioManager);
     this.appStorage.beginLocalSession(this.dropzone.files, true, this.navigate,
       (error) => {
         if (error === 'file not supported') {

@@ -1,10 +1,10 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
-import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {HttpClient} from '@angular/common/http';
 import {Functions, isNullOrUndefined} from '../Functions';
 import {AppInfo} from '../../../app.info';
+import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
 
 @Injectable()
 export class AudioService {

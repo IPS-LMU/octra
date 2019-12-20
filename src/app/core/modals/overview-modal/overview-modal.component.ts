@@ -5,7 +5,6 @@ import {AppStorageService, KeymappingService, SettingsService, TranscriptionServ
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {TranscriptionFeedbackComponent} from '../../gui/transcription-feedback/transcription-feedback.component';
 import {TranscrOverviewComponent} from '../../gui/transcr-overview';
-import {PlayBackState} from '../../../media-components/obj/media';
 
 @Component({
   selector: 'app-overview-modal',

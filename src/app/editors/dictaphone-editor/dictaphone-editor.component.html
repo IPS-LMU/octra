@@ -1,15 +1,10 @@
-<app-audio-navigation #nav
-                      (volumechange)="onVolumeChange($event)"
-                      (aftervolumechange)="afterVolumeChange($event)"
-                      (speedchange)="onSpeedChange($event)"
-                      [speed]="appStorage.audioSpeed"
-                      [volume]="appStorage.audioVolume"
-                      (afterspeedchange)="afterSpeedChange($event)"
-                      (buttonclick)="onButtonClick($event)"
-                      [isAudioPlaying]="audiomanager.isPlaying"
-                      [responsive]="settingsService.responsive.enabled"
-                      [replay]="audiochunk.replay"
-                      [buttons]="{
+<octra-audio-navigation #nav
+                        [audioChunk]="audiochunk"
+                        (afterVolumeChange)="afterVolumeChange($event)"
+                        (afterPlaybackRateChange)="afterSpeedChange($event)"
+                        (buttonClick)="onButtonClick($event)"
+                        [responsive]="settingsService.responsive.enabled"
+                        [buttons]="{
                         play: {
                             label: ('general.play' | transloco),
                             shortcut: keyMap.getShortcut('AP', 'play_pause')
@@ -35,10 +30,10 @@
                             shortcut: keyMap.getShortcut('overlay', 'step_backward')
                         }
                       }"
-                      [easymode]="appStorage.easymode"
-></app-audio-navigation>
-<app-audioplayer #audioplayer (shortcuttriggered)="onShortcutTriggered($event)"
-                 [audiochunk]="audiochunk"></app-audioplayer>
+                        [easyMode]="appStorage.easymode"
+></octra-audio-navigation>
+<octra-audioplayer #audioplayer
+                   [audioChunk]="audiochunk"></octra-audioplayer>
 <app-transcr-editor #transcr
                     (typing)="afterTyping($event);"
                     (keyup)="onKeyUp()"

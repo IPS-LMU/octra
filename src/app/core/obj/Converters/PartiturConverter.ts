@@ -24,13 +24,13 @@ export class PartiturConverter extends Converter {
       const result: ExportResult = {
         file: {
           name: `${annotation.name}-${annotation.levels[levelnum].name}${this._extension}`,
-          content: 'SAM ' + audiofile.samplerate,
+          content: 'SAM ' + audiofile.sampleRate,
           encoding: 'UTF-8',
           type: 'text'
         }
       };
       let content = `LHD: Partitur 1.3
-SAM: ${audiofile.samplerate}
+SAM: ${audiofile.sampleRate}
 NCH: 1
 LBD:\n`;
 
@@ -78,7 +78,7 @@ LBD:\n`;
       const lines = file.content.split(/\r?\n/g);
       let pointer = 0;
 
-      const result = new OAnnotJSON(audiofile.name, audiofile.samplerate);
+      const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
       const tiers = {};
 
       // skip not needed information and read needed information
@@ -94,8 +94,8 @@ LBD:\n`;
           const columns = lines[pointer].split(' ');
 
           if (search[0] === 'SAM') {
-            if (audiofile.samplerate !== Number(columns[1])) {
-              console.error(`Sample Rate of audio file is not equal to the value from Partitur file! ${audiofile.samplerate} !== ${columns[1]}`);
+            if (audiofile.sampleRate !== Number(columns[1])) {
+              console.error(`Sample Rate of audio file is not equal to the value from Partitur file! ${audiofile.sampleRate} !== ${columns[1]}`);
             }
           }
 

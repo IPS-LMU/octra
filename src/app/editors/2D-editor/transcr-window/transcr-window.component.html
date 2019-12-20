@@ -5,19 +5,13 @@
   <app-asr-options [audioChunk]="audiochunk" [enabled]="editor.rawText === ''"
                    *ngIf="(appStorage.usemode === 'demo' || appStorage.usemode === 'local')
                    && settingsService.isASREnabled"></app-asr-options>
-  <app-audio-navigation #audionav
-                        (buttonclick)="onButtonClick($event)"
-                        (volumechange)="onVolumeChange($event)"
-                        (keyup)="onKeyUp()"
-                        (aftervolumechange)="afterVolumeChange($event)"
-                        (speedchange)="onSpeedChange($event)"
-                        [volume]="appStorage.audioVolume"
-                        [speed]="appStorage.audioSpeed"
-                        (afterspeedchange)="afterSpeedChange($event)"
-                        [isAudioPlaying]="audiomanager.isPlaying"
-                        [replay]="audiochunk.replay"
-                        [responsive]="settingsService.responsive.enabled"
-                        [buttons]="{
+  <octra-audio-navigation #audionav
+                          (buttonClick)="onButtonClick($event)"
+                          (keyup)="onKeyUp()"
+                          (afterVolumeChange)="afterVolumeChange($event)"
+                          (afterPlaybackRateChange)="afterSpeedChange($event)"
+                          [responsive]="settingsService.responsive.enabled"
+                          [buttons]="{
                         play: {
                             label: ('general.play' | transloco),
                             shortcut: keyMap.getShortcut('overlay', 'play_pause')
@@ -43,15 +37,13 @@
                             shortcut: keyMap.getShortcut('overlay', 'step_backwardtime')
                         }
                       }"
-                        [easymode]="easymode"
+                          [easyMode]="easymode"
 
-  ></app-audio-navigation>
-  <app-loupe #loupe id="loupe"
-             (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
-             [audiochunk]="audiochunk"
-             [height]="150"
-             [settings]="loupeSettings"
-  ></app-loupe>
+  ></octra-audio-navigation>
+  <octra-audio-viewer #loupe id="loupe"
+                      (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
+                      [audioChunk]="audiochunk"
+  ></octra-audio-viewer>
   <app-transcr-editor #editor id="trancr"
                       (markerInsert)="onMarkerInsert($event)"
                       (markerClick)="onMarkerClick($event)"

@@ -7,12 +7,11 @@ import {HttpClient} from '@angular/common/http';
 import {FileInfo} from '../../../media-components/obj/fileInfo';
 import * as X2JS from 'x2js';
 import {AudioService} from './audio.service';
-import {WavFormat} from '../../../media-components/obj/media/audio/AudioFormats';
 import {Subject} from 'rxjs';
-import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {TranscriptionService} from './transcription.service';
-import {BrowserSample, OriginalSample} from '../../../media-components/obj/media/audio';
 import {Router} from '@angular/router';
+import {SampleUnit, WavFormat} from '../../../media-components/obj/audio';
+import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
 
 @Injectable({
   providedIn: 'root'
@@ -103,9 +102,7 @@ export class AsrService {
   public stopASROfItem(item: ASRQueueItem) {
     if (item !== undefined && item !== null) {
       const audioManager = this.audioService.audiomanagers[0];
-      const segmentBoundary = BrowserSample.fromOriginalSample(
-        new OriginalSample(item.time.sampleStart + item.time.sampleLength, audioManager.originalSampleRate),
-        audioManager.browserSampleRate);
+      const segmentBoundary = new SampleUnit(item.time.sampleStart + item.time.sampleLength, audioManager.sampleRate);
       const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
         segmentBoundary
       );
@@ -135,7 +132,7 @@ class ASRQueue {
     return this._statistics;
   }
 
-  get audiomanager(): AudioManager {
+  get audioManager(): AudioManager {
     return this._audiomanager;
   }
 
@@ -621,7 +618,7 @@ export class ASRQueueItem {
       transcriptURL: string
     }>((resolve, reject) => {
       this.changeStatus(ASRProcessStatus.STARTED);
-      const audioManager = this.parent.audiomanager;
+      const audioManager = this.parent.audioManager;
 
       // 1) cut signal
       const format = new WavFormat();

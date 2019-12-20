@@ -62,13 +62,13 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit, OnDest
               result += '0';
               break;
             case('<sampleDur>'):
-              result += this.firstSegment.time.originalSample.value.toString();
+              result += this.firstSegment.time.samples.toString();
               break;
             case('<secondsStart>'):
               result += '0';
               break;
             case('<secondsDur>'):
-              result += (Math.round((this.firstSegment.time.originalSample.seconds * 10000)) / 10000)
+              result += (Math.round((this.firstSegment.time.seconds * 10000)) / 10000)
                 .toString().replace('.', ',');
               break;
           }

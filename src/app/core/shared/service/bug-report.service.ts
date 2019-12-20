@@ -101,11 +101,11 @@ export class BugReportService {
     if (!(this.transcrService === null || this.transcrService === undefined)) {
       const file = Functions.getFileSize(this.transcrService.audiofile.size);
       result.octra.audiofile_size = file.size + ' ' + file.label;
-      result.octra.audiofile_duration = this.transcrService.audiomanager.ressource.info.duration.browserSample.seconds;
-      result.octra.audiofile_samplerate = this.transcrService.audiofile.samplerate;
-      result.octra.audiofile_bitrate = this.transcrService.audiomanager.ressource.info.bitrate;
-      result.octra.audiofile_channels = this.transcrService.audiomanager.ressource.info.channels;
-      result.octra.audiofile_type = this.transcrService.audiomanager.ressource.extension;
+      result.octra.audiofile_duration = this.transcrService.audioManager.ressource.info.duration.seconds;
+      result.octra.audiofile_samplerate = this.transcrService.audiofile.sampleRate;
+      result.octra.audiofile_bitrate = this.transcrService.audioManager.ressource.info.bitrate;
+      result.octra.audiofile_channels = this.transcrService.audioManager.ressource.info.channels;
+      result.octra.audiofile_type = this.transcrService.audioManager.ressource.extension;
       result.octra.levels = this.transcrService.annotation.levels.length;
       result.octra.currentlevel = this.transcrService.selectedlevel;
       result.octra.segments = this.transcrService.currentlevel.segments.length;

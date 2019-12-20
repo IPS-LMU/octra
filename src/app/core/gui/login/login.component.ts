@@ -74,7 +74,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     if (this.appStorage.usemode !== 'demo' && !isNullOrUndefined(this.appStorage.dataID) && typeof this.appStorage.dataID === 'number') {
       // last was online mode
       this.api.setOnlineSessionToFree(this.appStorage).then(() => {
-        this.audioService.registerAudioManager(this.dropzone.audiomanager);
+        this.audioService.registerAudioManager(this.dropzone.audioManager);
         this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
           if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
             const newLevels: OIDBLevel[] = [];
@@ -106,7 +106,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         console.error(error);
       });
     } else {
-      this.audioService.registerAudioManager(this.dropzone.audiomanager);
+      this.audioService.registerAudioManager(this.dropzone.audioManager);
       this.appStorage.beginLocalSession(this.dropzone.files, true, () => {
         if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
           const newLevels: OIDBLevel[] = [];
@@ -135,7 +135,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     }
   }
   newTranscription = () => {
-    this.audioService.registerAudioManager(this.dropzone.audiomanager);
+    this.audioService.registerAudioManager(this.dropzone.audioManager);
 
     this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
         if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {

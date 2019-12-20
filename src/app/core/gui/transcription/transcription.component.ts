@@ -33,14 +33,12 @@ import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 import {ProjectSettings} from '../../obj/Settings';
 import {editorComponents} from '../../../editors/components';
 import {Level} from '../../obj/Annotation';
-import {PlayBackState} from '../../../media-components/obj/media';
 import {IFile, PartiturConverter} from '../../obj/Converters';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import * as X2JS from 'x2js';
 import {ModalService} from '../../modals/modal.service';
 import {interval, throwError} from 'rxjs';
 import {TranscriptionGuidelinesModalComponent} from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
-import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {NavbarService} from '../navbar/navbar.service';
 import {OverviewModalComponent} from '../../modals/overview-modal/overview-modal.component';
 import {AppInfo} from '../../../app.info';
@@ -55,6 +53,8 @@ import {
 import {GeneralShortcut} from '../../modals/shortcuts-modal/shortcuts-modal.component';
 import {AsrService} from '../../shared/service/asr.service';
 import {parseServerDataEntry} from '../../obj/data-entry';
+import {PlayBackStatus} from '../../../media-components/obj/audio';
+import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
 
 @Component({
   selector: 'app-transcription',
@@ -114,7 +114,7 @@ export class TranscriptionComponent implements OnInit,
               private asrService: AsrService,
               private msg: MessageService) {
     this.subscrmanager = new SubscriptionManager();
-    this.audiomanager = this.audio.audiomanagers[0];
+    this.audioManager = this.audio.audiomanagers[0];
 
     this.navbarServ.transcrService = this.transcrService;
     this.navbarServ.uiService = this.uiService;
@@ -125,8 +125,8 @@ export class TranscriptionComponent implements OnInit,
     }
     this.uiService.enabled = this.appStorage.logging;
 
-    this.subscrmanager.add(this.audiomanager.statechange.subscribe((state) => {
-        if (!this.audiomanager.playOnHover && !this.modalOverview.visible) {
+    this.subscrmanager.add(this.audioManager.statechange.subscribe((state) => {
+        if (!this.audioManager.playOnHover && !this.modalOverview.visible) {
           let caretpos = -1;
 
           if (!(((this.currentEditor.instance as any).editor) === null || ((this.currentEditor.instance as any).editor) === undefined)) {
@@ -134,10 +134,10 @@ export class TranscriptionComponent implements OnInit,
           }
 
           // make sure that events from playonhover are not logged
-          if (state !== PlayBackState.PLAYING && state !== PlayBackState.INITIALIZED && state !== PlayBackState.PREPARE) {
+          if (state !== PlayBackStatus.PLAYING && state !== PlayBackStatus.INITIALIZED && state !== PlayBackStatus.PREPARE) {
             this.uiService.addElementFromEvent('audio',
               {value: state.toLowerCase()}, Date.now(),
-              this.audiomanager.playposition,
+              this.audioManager.playposition,
               caretpos, null, null, this.appStorage.Interface);
           }
         }
@@ -215,7 +215,7 @@ export class TranscriptionComponent implements OnInit,
   private subscrmanager: SubscriptionManager;
   private sendOk = false;
   private levelSubscriptionID = 0;
-  private audiomanager: AudioManager;
+  private audioManager: AudioManager;
   private _currentEditor: ComponentRef<Component>;
 
   abortTranscription = () => {
@@ -303,7 +303,7 @@ export class TranscriptionComponent implements OnInit,
       }
     }
 
-    // this.transcrService.annotation.audiofile.samplerate = this.audiomanager.ressource.info.samplerate;
+    // this.transcrService.annotation.audiofile.sampleRate = this.audioManager.ressource.info.sampleRate;
     this.navbarServ.showInterfaces = this.settingsService.projectsettings.navigation.interfaces;
 
     // load guidelines on language change
@@ -385,7 +385,7 @@ export class TranscriptionComponent implements OnInit,
           this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
         );
         this.uiService.addElementFromEvent('level', {value: 'changed'}, Date.now(),
-          this.audiomanager.createBrowserAudioTime(0),
+          this.audioManager.createSampleUnit(0),
           -1, null, null, level.name);
       }
     ));
@@ -812,7 +812,7 @@ export class TranscriptionComponent implements OnInit,
 
   public onSaveTranscriptionButtonClicked() {
     const converter = new PartiturConverter();
-    const oannotjson = this.transcrService.annotation.getObj(this.transcrService.audiomanager.originalInfo.duration);
+    const oannotjson = this.transcrService.annotation.getObj(this.transcrService.audioManager.originalInfo.duration);
     const result: IFile = converter.export(oannotjson, this.transcrService.audiofile, 0).file;
     result.name = result.name.replace('-' + oannotjson.levels[0].name, '');
 

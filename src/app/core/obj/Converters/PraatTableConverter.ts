@@ -61,7 +61,7 @@ export class PraatTableConverter extends Converter {
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile !== null && audiofile !== undefined) {
-      const result = new OAnnotJSON(audiofile.name, audiofile.samplerate);
+      const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
 
       const content = file.content;
       const lines: string[] = content.split('\n');
@@ -109,7 +109,7 @@ export class PraatTableConverter extends Converter {
               } else {
                 length = Number(tmax - tmin);
               }
-              const samplerate = audiofile.samplerate;
+              const sampleRate = audiofile.sampleRate;
 
               if (tier === tiers[t]) {
                 if (isNaN(tmin)) {
@@ -126,7 +126,7 @@ export class PraatTableConverter extends Converter {
                 if (puffer > 0) {
                   // fill
                   const pufferItem = new OSegment(
-                    id, Math.round(start * samplerate), Math.round(puffer * samplerate), [new OLabel(tier, '')]
+                    id, Math.round(start * sampleRate), Math.round(puffer * sampleRate), [new OLabel(tier, '')]
                   );
                   start = start + puffer;
                   olevel.items.push(pufferItem);
@@ -137,8 +137,8 @@ export class PraatTableConverter extends Converter {
                 olabels.push((new OLabel(tier, text)));
                 const osegment = new OSegment(
                   (id),
-                  Math.round(start * samplerate),
-                  Math.round(length * samplerate),
+                  Math.round(start * sampleRate),
+                  Math.round(length * sampleRate),
                   olabels
                 );
 

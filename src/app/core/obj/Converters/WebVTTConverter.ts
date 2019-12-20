@@ -61,7 +61,7 @@ export class WebVTTConverter extends Converter {
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile !== null && audiofile !== undefined) {
-      const result = new OAnnotJSON(audiofile.name, audiofile.samplerate);
+      const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
 
       const content = file.content;
       const olevel = new OLevel('OCTRA_1', 'SEGMENT');
@@ -74,8 +74,8 @@ export class WebVTTConverter extends Converter {
         let matches = regex.exec(content);
         let lastEnd = 0;
         while (matches !== null) {
-          const timeStart = this.getSamplesFromTimeString(matches[2], audiofile.samplerate);
-          const timeEnd = this.getSamplesFromTimeString(matches[3], audiofile.samplerate);
+          const timeStart = this.getSamplesFromTimeString(matches[2], audiofile.sampleRate);
+          const timeEnd = this.getSamplesFromTimeString(matches[3], audiofile.sampleRate);
           const segmentContent = matches[4].replace(/NOTE[^\n]+\n/g, '').replace(/(\n|\s)+$/g, '')
             .replace('&lt;', '<').replace('&gt;', '>');
 

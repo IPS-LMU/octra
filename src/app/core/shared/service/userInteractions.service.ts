@@ -4,7 +4,7 @@ import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
 import {Functions, isNullOrUndefined} from '../Functions';
 import {OLog} from '../../obj/Settings/logging';
-import {BrowserAudioTime} from '../../../media-components/obj/media/audio';
+import {SampleUnit} from '../../../media-components/obj/audio';
 
 @Injectable({
   providedIn: 'root'
@@ -56,7 +56,7 @@ export class UserInteractionsService {
   /**
    * Parse Events
    */
-  public addElementFromEvent(type: string, event: any, timestamp: number, playpos: BrowserAudioTime, caretpos: number,
+  public addElementFromEvent(type: string, event: any, timestamp: number, playpos: SampleUnit, caretpos: number,
                              selection: {
                                start: number,
                                length: number
@@ -66,7 +66,7 @@ export class UserInteractionsService {
                                length: number
                              }, targetName?: string) {
     this._lastAction = Date.now();
-    const originalPlayerPos = (!isNullOrUndefined(playpos)) ? playpos.originalSample.value : -1;
+    const originalPlayerPos = (!isNullOrUndefined(playpos)) ? playpos.samples : -1;
 
     if (this._enabled) {
       let name = '';
@@ -94,7 +94,7 @@ export class UserInteractionsService {
           name,
           event.value,
           timestamp,
-          (!isNullOrUndefined(playpos)) ? playpos.originalSample.value : -1,
+          (!isNullOrUndefined(playpos)) ? playpos.samples : -1,
           caretpos,
           selection,
           segment

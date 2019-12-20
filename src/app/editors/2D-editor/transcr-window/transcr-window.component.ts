@@ -22,16 +22,16 @@ import {
   TranscriptionService,
   UserInteractionsService
 } from '../../../core/shared/service';
-import {BrowserAudioTime, BrowserSample, Segment, SubscriptionManager} from '../../../core/shared';
-import {AudioRessource, AudioSelection} from '../../../media-components/obj/media/audio';
+import {Segment, SubscriptionManager} from '../../../core/shared';
 import {Segments} from '../../../core/obj/Annotation';
 import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
-import {LoupeComponent} from '../../../media-components/components/audio/loupe';
 import {AudioNavigationComponent} from '../../../media-components/components/audio/audio-navigation';
-import {AudioChunk, AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {isNullOrUndefined} from '../../../core/shared/Functions';
-import {AudioviewerConfig} from '../../../media-components/components/audio/audioviewer';
 import {ASRProcessStatus, ASRQueueItem, ASRQueueItemType, AsrService} from '../../../core/shared/service/asr.service';
+import {AudioChunk, AudioManager} from '../../../media-components/obj/audio/AudioManager';
+import {AudioRessource, AudioSelection, SampleUnit} from '../../../media-components/obj/audio';
+import {AudioViewerComponent} from '../../../media-components/components/audio/audio-viewer/audio-viewer.component';
+import {AudioviewerConfig} from '../../../media-components/components/audio/audio-viewer/audio-viewer.config';
 
 @Component({
   selector: 'app-transcr-window',
@@ -68,12 +68,12 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     return this.settingsService.responsive.enabled;
   }
 
-  get audiomanager(): AudioManager {
-    return this.audiochunk.audiomanager;
+  get audioManager(): AudioManager {
+    return this.audiochunk.audioManager;
   }
 
   get ressource(): AudioRessource {
-    return this.audiochunk.audiomanager.ressource;
+    return this.audiochunk.audioManager.ressource;
   }
 
   public get hasSegmentBoundaries() {
@@ -113,12 +113,13 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
 
     this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
-        if (item.time.sampleStart === this.audiochunk.time.start.originalSample.value
-          && item.time.sampleLength === this.audiochunk.time.duration.originalSample.value) {
+        if (item.time.sampleStart === this.audiochunk.time.start.samples
+          && item.time.sampleLength === this.audiochunk.time.duration.samples) {
           if (item.status === ASRProcessStatus.FINISHED && item.result !== null) {
             this.editor.rawText = item.result;
           }
-          this.loupe.update(false);
+          // TODO update needed?
+          // this.loupe.update(false);
 
           this.cd.markForCheck();
           this.cd.detectChanges();
@@ -131,7 +132,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       }));
   }
 
-  @ViewChild('loupe', {static: true}) loupe: LoupeComponent;
+  @ViewChild('loupe', {static: true}) loupe: AudioViewerComponent;
   @ViewChild('editor', {static: true}) editor: TranscrEditorComponent;
   @ViewChild('audionav', {static: true}) audionav: AudioNavigationComponent;
   @ViewChild('window', {static: true}) window: ElementRef;
@@ -151,10 +152,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.save();
 
     new Promise<void>((resolve) => {
-      if (this.audiomanager.isPlaying) {
-        this.loupe.viewer.stopPlayback(() => {
-          resolve();
-        });
+      if (this.audioManager.isPlaying) {
+        return this.audiochunk.stopPlayback();
       } else {
         resolve();
       }
@@ -162,7 +161,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       if (direction !== 'down') {
         this.goToSegment(direction);
         setTimeout(() => {
-          this.loupe.viewer.startPlayback();
+          this.audiochunk.startPlayback();
         }, 500);
       } else {
         this.close();
@@ -201,14 +200,14 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.editor.Settings.markers = this.transcrService.guidelines.markers;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.special_markers.boundary = true;
-    this.loupe.viewer.name = 'transcription window';
+    this.loupe.name = 'transcription window';
     this.loupeSettings.justifySignalHeight = true;
     this.loupeSettings.boundaries.enabled = false;
     this.loupeSettings.boundaries.readonly = true;
     this.loupeSettings.shortcuts.set_break = null;
     this.loupeSettings.frame.color = '#222222';
     this.loupeSettings.roundValues = false;
-    this.loupe.viewer.av.drawnselection = null;
+    this.loupe.av.drawnSelection = null;
 
     const segments = this.transcrService.currentlevel.segments;
     this.tempSegments = segments.clone();
@@ -224,7 +223,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.cd.markForCheck();
     this.cd.detectChanges();
 
-    this.loupe.update(true);
+    // TODO important update needed?
+    // this.loupe.update(true);
     this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown));
   }
 
@@ -235,10 +235,11 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
       if (!obj.audiochunk.firstChange) {
         if (((previous === null || previous === undefined) && !(current === null || current === undefined)) ||
-          (current.time.start.browserSample.value !== previous.time.start.browserSample.value &&
-            current.time.end.browserSample.value !== previous.time.end.browserSample.value)) {
+          (current.time.start.samples !== previous.time.start.samples &&
+            current.time.end.samples !== previous.time.end.samples)) {
           // audiochunk changed
-          this.loupe.update();
+          // TODO important update needed?
+          // this.loupe.update();
         }
       }
     }
@@ -249,15 +250,15 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   ngAfterViewInit() {
-    this.loupe.zoomY = 6;
-    this.audiochunk.startpos = this.audiochunk.time.start.clone() as BrowserAudioTime;
-    this.loupe.viewer.av.drawnselection = new AudioSelection(
-      this.audiomanager.createBrowserAudioTime(0),
-      this.audiomanager.createBrowserAudioTime(0)
+    this.loupe.av.zoomY = 6;
+    this.audiochunk.startpos = this.audiochunk.time.start.clone();
+    this.loupe.av.drawnSelection = new AudioSelection(
+      this.audioManager.createSampleUnit(0),
+      this.audioManager.createSampleUnit(0)
     );
 
     setTimeout(() => {
-      this.loupe.viewer.startPlayback();
+      this.audiochunk.startPlayback();
     }, 500);
   }
 
@@ -268,14 +269,14 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   public close() {
     this.showWindow = false;
 
-    const startSample = (this.segmentIndex > 0) ? this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value : 0;
+    const startSample = (this.segmentIndex > 0) ? this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.samples : 0;
 
     this.uiService.addElementFromEvent('segment', {
         value: 'exited'
-      }, Date.now(), this.loupe.viewer.av.PlayCursor.timePos, -1, null,
+      }, Date.now(), this.loupe.av.PlayCursor.timePos, -1, null,
       {
         start: startSample,
-        length: this.transcrService.currentlevel.segments.get(this.segmentIndex).time.originalSample.value - startSample
+        length: this.transcrService.currentlevel.segments.get(this.segmentIndex).time.samples - startSample
       }, 'transcription window');
 
     this.act.emit('close');
@@ -306,15 +307,15 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         const result = this.transcrService.currentlevel.segments.change(this.segmentIndex, segment);
 
         const startSample = (this.segmentIndex > 0)
-          ? this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value
+          ? this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.samples
           : 0;
 
         let selection = null;
-        if (this.loupe.viewer.av.drawnselection.start.originalSample.value >= startSample
-          && this.loupe.viewer.av.drawnselection.end.originalSample.value <= segment.time.originalSample.value) {
+        if (this.loupe.av.drawnSelection.start.samples >= startSample
+          && this.loupe.av.drawnSelection.end.samples <= segment.time.samples) {
           selection = {
-            start: this.loupe.viewer.av.drawnselection.start.originalSample.value,
-            length: this.loupe.viewer.av.drawnselection.duration.originalSample.value
+            start: this.loupe.av.drawnSelection.start.samples,
+            length: this.loupe.av.drawnSelection.duration.samples
           };
         }
       }
@@ -336,34 +337,31 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
         const annoSegment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
         segment.start = 0;
         if (this.segmentIndex > 0) {
-          segment.start = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value;
+          segment.start = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.samples;
         }
 
-        segment.length = annoSegment.time.originalSample.value - segment.start;
+        segment.length = annoSegment.time.samples - segment.start;
 
         segment.start = Math.round(segment.start);
         segment.length = Math.round(segment.length);
       }
 
       let selection = null;
-      if (this.loupe.viewer.av.drawnselection.start.originalSample.value >= segment.start
-        && this.loupe.viewer.av.drawnselection.end.originalSample.value <= segment.start + segment.length) {
+      if (this.loupe.av.drawnSelection.start.samples >= segment.start
+        && this.loupe.av.drawnSelection.end.samples <= segment.start + segment.length) {
         selection = {
-          start: this.loupe.viewer.av.drawnselection.start.originalSample.value,
-          length: this.loupe.viewer.av.drawnselection.duration.originalSample.value
+          start: this.loupe.av.drawnSelection.start.samples,
+          length: this.loupe.av.drawnSelection.duration.samples
         };
       }
 
       this.uiService.addElementFromEvent('mouseclick', {value: event.type},
-        event.timestamp, this.audiomanager.playposition,
+        event.timestamp, this.audioManager.playposition,
         this.editor.caretpos, selection, segment, 'audio_buttons');
     }
 
-    if (event.type === 'replay') {
-      this.audionav.replay = !this.audionav.replay;
-    }
-
-    this.loupe.onButtonClick(event);
+    // TODO important what about this?
+    // this.loupe.onButtonClick(event);
   }
 
   /**
@@ -392,12 +390,12 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
           segment = this.transcrService.currentlevel.segments.get(i);
           this.segmentIndex = i;
 
-          const start = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.originalSample.value : 0;
+          const start = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.samples : 0;
           this.uiService.addElementFromEvent('segment', {value: 'entered next'},
-            Date.now(), this.audiomanager.playposition,
+            Date.now(), this.audioManager.playposition,
             this.editor.caretpos, null, {
               start,
-              length: this.transcrService.currentlevel.segments.get(i).time.originalSample.value - start
+              length: this.transcrService.currentlevel.segments.get(i).time.samples - start
             }, 'transcription window');
         }
       } else if (direction === 'left' && this.segmentIndex > 0) {
@@ -416,25 +414,25 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
           segment = this.transcrService.currentlevel.segments.get(i);
           this.segmentIndex = i;
 
-          const start = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.originalSample.value : 0;
+          const start = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.samples : 0;
           this.uiService.addElementFromEvent('segment', {value: 'entered previous'},
-            Date.now(), this.audiomanager.playposition,
+            Date.now(), this.audioManager.playposition,
             this.editor.caretpos, null, {
               start,
-              length: this.transcrService.currentlevel.segments.get(i).time.originalSample.value - start
+              length: this.transcrService.currentlevel.segments.get(i).time.samples - start
             }, 'transcription window');
         }
       }
 
-      let begin = this.audiomanager.createBrowserAudioTime(0);
+      let begin = this.audioManager.createSampleUnit(0);
 
       if (this.segmentIndex > 0) {
-        begin = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.clone() as BrowserAudioTime;
+        begin = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.clone();
       }
 
       if (!(segment === null || segment === undefined)) {
         this.editor.rawText = this.transcrService.currentlevel.segments.get(this.segmentIndex).transcript;
-        this.audiochunk = new AudioChunk(new AudioSelection(begin, segment.time.clone()), this.audiochunk.audiomanager);
+        this.audiochunk = new AudioChunk(new AudioSelection(begin, segment.time.clone()), this.audiochunk.audioManager);
       }
       this.cd.markForCheck();
       this.cd.detectChanges();
@@ -455,26 +453,26 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       const annoSegment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
       segment.start = 0;
       if (this.segmentIndex > 0) {
-        segment.start = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value;
+        segment.start = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.samples;
       }
 
-      segment.length = annoSegment.time.originalSample.value - segment.start;
+      segment.length = annoSegment.time.samples - segment.start;
 
       segment.start = Math.round(segment.start);
       segment.length = Math.round(segment.length);
     }
 
     let selection = null;
-    if (this.loupe.viewer.av.drawnselection.start.originalSample.value >= segment.start
-      && this.loupe.viewer.av.drawnselection.end.originalSample.value <= segment.start + segment.length) {
+    if (this.loupe.av.drawnSelection.start.samples >= segment.start
+      && this.loupe.av.drawnSelection.end.samples <= segment.start + segment.length) {
       selection = {
-        start: this.loupe.viewer.av.drawnselection.start.originalSample.value,
-        length: this.loupe.viewer.av.drawnselection.duration.originalSample.value
+        start: this.loupe.av.drawnSelection.start.samples,
+        length: this.loupe.av.drawnSelection.duration.samples
       };
     }
 
     this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, selection, segment, type);
+      this.audioManager.playposition, this.editor.caretpos, selection, segment, type);
   }
 
   onMarkerInsert(markerCode: string) {
@@ -487,26 +485,26 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       const annoSegment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
       segment.start = 0;
       if (this.segmentIndex > 0) {
-        segment.start = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value;
+        segment.start = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.samples;
       }
 
-      segment.length = annoSegment.time.originalSample.value - segment.start;
+      segment.length = annoSegment.time.samples - segment.start;
 
       segment.start = Math.round(segment.start);
       segment.length = Math.round(segment.length);
     }
 
     let selection = null;
-    if (this.loupe.viewer.av.drawnselection.start.originalSample.value >= segment.start
-      && this.loupe.viewer.av.drawnselection.end.originalSample.value <= segment.start + segment.length) {
+    if (this.loupe.av.drawnSelection.start.samples >= segment.start
+      && this.loupe.av.drawnSelection.end.samples <= segment.start + segment.length) {
       selection = {
-        start: this.loupe.viewer.av.drawnselection.start.originalSample.value,
-        length: this.loupe.viewer.av.drawnselection.duration.originalSample.value
+        start: this.loupe.av.drawnSelection.start.samples,
+        length: this.loupe.av.drawnSelection.duration.samples
       };
     }
 
     this.uiService.addElementFromEvent('shortcut', {value: markerCode}, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, selection, segment, 'markers');
+      this.audioManager.playposition, this.editor.caretpos, selection, segment, 'markers');
   }
 
   onMarkerClick(markerCode: string) {
@@ -519,30 +517,31 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       const annoSegment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
       segment.start = 0;
       if (this.segmentIndex > 0) {
-        segment.start = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value;
+        segment.start = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.samples;
       }
 
-      segment.length = annoSegment.time.originalSample.value - segment.start;
+      segment.length = annoSegment.time.samples - segment.start;
 
       segment.start = Math.round(segment.start);
       segment.length = Math.round(segment.length);
     }
 
     let selection = null;
-    if (this.loupe.viewer.av.drawnselection.start.originalSample.value >= segment.start
-      && this.loupe.viewer.av.drawnselection.end.originalSample.value <= segment.start + segment.length) {
+    if (this.loupe.av.drawnSelection.start.samples >= segment.start
+      && this.loupe.av.drawnSelection.end.samples <= segment.start + segment.length) {
       selection = {
-        start: this.loupe.viewer.av.drawnselection.start.originalSample.value,
-        length: this.loupe.viewer.av.drawnselection.duration.originalSample.value
+        start: this.loupe.av.drawnSelection.start.samples,
+        length: this.loupe.av.drawnSelection.duration.samples
       };
     }
 
     this.uiService.addElementFromEvent('mouseclick', {value: markerCode}, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, selection, segment, 'texteditor_toolbar');
+      this.audioManager.playposition, this.editor.caretpos, selection, segment, 'texteditor_toolbar');
   }
 
   onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
-    this.audiochunk.speed = event.new_value;
+    // TODO speed?
+    // this.audiochunk.speed = event.new_value;
     this.appStorage.audioSpeed = event.new_value;
   }
 
@@ -556,25 +555,25 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       const annoSegment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
       segment.start = 0;
       if (this.segmentIndex > 0) {
-        segment.start = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value;
+        segment.start = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.samples;
       }
 
-      segment.length = annoSegment.time.originalSample.value - segment.start;
+      segment.length = annoSegment.time.samples - segment.start;
       segment.start = Math.round(segment.start);
       segment.length = Math.round(segment.length);
     }
 
     let selection = null;
-    if (this.loupe.viewer.av.drawnselection.start.originalSample.value >= segment.start
-      && this.loupe.viewer.av.drawnselection.end.originalSample.value <= segment.start + segment.length) {
+    if (this.loupe.av.drawnSelection.start.samples >= segment.start
+      && this.loupe.av.drawnSelection.end.samples <= segment.start + segment.length) {
       selection = {
-        start: this.loupe.viewer.av.drawnselection.start.originalSample.value,
-        length: this.loupe.viewer.av.drawnselection.duration.originalSample.value
+        start: this.loupe.av.drawnSelection.start.samples,
+        length: this.loupe.av.drawnSelection.duration.samples
       };
     }
 
     this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
-      this.audiomanager.playposition, this.editor.caretpos, selection, segment, 'audio_speed');
+      this.audioManager.playposition, this.editor.caretpos, selection, segment, 'audio_speed');
 
   }
 
@@ -592,38 +591,37 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       const annoSegment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
       segment.start = 0;
       if (this.segmentIndex > 0) {
-        segment.start = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value;
+        segment.start = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.samples;
       }
 
-      segment.length = annoSegment.time.originalSample.value - segment.start;
+      segment.length = annoSegment.time.samples - segment.start;
 
       segment.start = Math.round(segment.start);
       segment.length = Math.round(segment.length);
     }
 
     let selection = null;
-    if (this.loupe.viewer.av.drawnselection.start.originalSample.value >= segment.start
-      && this.loupe.viewer.av.drawnselection.end.originalSample.value <= segment.start + segment.length) {
+    if (this.loupe.av.drawnSelection.start.samples >= segment.start
+      && this.loupe.av.drawnSelection.end.samples <= segment.start + segment.length) {
       selection = {
-        start: this.loupe.viewer.av.drawnselection.start.originalSample.value,
-        length: this.loupe.viewer.av.drawnselection.duration.originalSample.value
+        start: this.loupe.av.drawnSelection.start.samples,
+        length: this.loupe.av.drawnSelection.duration.samples
       };
     }
 
     this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
-      this.audiomanager.playposition, this.editor.caretpos, selection, segment, 'audio_volume');
+      this.audioManager.playposition, this.editor.caretpos, selection, segment, 'audio_volume');
   }
 
-  onBoundaryClicked(sample: BrowserSample) {
+  onBoundaryClicked(sample: SampleUnit) {
     const i: number = this.tempSegments.getSegmentBySamplePosition(sample);
 
     if (i > -1) {
-      this.audiochunk.startpos = (i > 0) ? this.tempSegments.get(i - 1).time.clone() as BrowserAudioTime
-        : this.audiomanager.createBrowserAudioTime(0);
+      this.audiochunk.startpos = (i > 0) ? this.tempSegments.get(i - 1).time.clone()
+        : this.audioManager.createSampleUnit(0);
       this.audiochunk.selection.end = this.tempSegments.get(i).time.clone();
-      this.loupe.viewer.av.drawnselection = this.audiochunk.selection;
-      this.loupe.viewer.drawSegments();
-      this.loupe.viewer.startPlayback();
+      this.loupe.av.drawnSelection = this.audiochunk.selection;
+      this.audiochunk.startPlayback();
     }
   }
 
@@ -645,7 +643,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
   saveTranscript() {
     const segStart = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
-      this.audiochunk.time.start.browserSample.add(new BrowserSample(20, this.audiomanager.browserSampleRate))
+      this.audiochunk.time.start.add(new SampleUnit(20, this.audioManager.sampleRate))
     );
 
     this.tempSegments = this.transcrService.currentlevel.segments.clone();
@@ -684,7 +682,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
     for (let i = 0; i < segTexts.length - 1; i++) {
       this.tempSegments.add(
-        this.audiomanager.createBrowserAudioTime(samplesArray[i]), segTexts[i]
+        this.audioManager.createSampleUnit(samplesArray[i]), segTexts[i]
       );
     }
 

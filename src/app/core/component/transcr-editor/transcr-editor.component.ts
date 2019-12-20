@@ -14,15 +14,16 @@ import {
 import {TranscrEditorConfig} from './config';
 import {TranslocoService} from '@ngneat/transloco';
 
-import {BrowserAudioTime, BrowserInfo, BrowserSample, KeyMapping, SubscriptionManager} from '../../shared';
+import {BrowserInfo, KeyMapping, SubscriptionManager} from '../../shared';
 import {TranscriptionService} from '../../shared/service';
 import {Segments} from '../../obj/Annotation';
-import {TimespanPipe} from '../../../media-components/pipe';
-import {AudioChunk, AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {Functions, isNullOrUndefined} from '../../shared/Functions';
 import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
 import {isNumeric} from 'rxjs/internal-compatibility';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../shared/service/asr.service';
+import {AudioChunk, AudioManager} from '../../../media-components/obj/audio/AudioManager';
+import {SampleUnit} from '../../../media-components/obj/audio';
+import {TimespanPipe} from '../../../media-components/pipe/timespan.pipe';
 
 declare let lang: any;
 declare let document: any;
@@ -49,8 +50,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     return jQuery('.note-editable:eq(0)').caret('pos');
   }
 
-  get audiomanager(): AudioManager {
-    return this.audiochunk.audiomanager;
+  get audioManager(): AudioManager {
+    return this.audiochunk.audioManager;
   }
 
   set segments(segments: Segments) {
@@ -61,7 +62,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       result += seg.transcript;
 
       if (i < segments.length - 1) {
-        result += `{${segments.get(i).time.browserSample.value}}`;
+        result += `{${segments.get(i).time.samples}}`;
       }
     }
 
@@ -114,7 +115,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Output() markerInsert: EventEmitter<string> = new EventEmitter<string>();
   @Output() markerClick: EventEmitter<string> = new EventEmitter<string>();
   @Output() typing: EventEmitter<string> = new EventEmitter<string>();
-  @Output() boundaryclicked: EventEmitter<BrowserSample> = new EventEmitter<BrowserSample>();
+  @Output() boundaryclicked: EventEmitter<SampleUnit> = new EventEmitter<SampleUnit>();
   @Output() boundaryinserted: EventEmitter<number> = new EventEmitter<number>();
   @Output() selectionchanged: EventEmitter<number> = new EventEmitter<number>();
 
@@ -122,7 +123,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Input() markers: any = true;
   @Input() easymode = true;
   @Input() height = 0;
-  @Input() playposition: BrowserAudioTime;
+  @Input() playposition: SampleUnit;
   @Input() audiochunk: AudioChunk;
   @Input() validationEnabled = false;
 
@@ -392,8 +393,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.asr.error = '';
     this.asr.result = '';
 
-    const item = this.asrService.queue.getItemByTime(this.audiochunk.time.start.originalSample.value,
-      this.audiochunk.time.duration.originalSample.value);
+    const item = this.asrService.queue.getItemByTime(this.audiochunk.time.start.samples,
+      this.audiochunk.time.duration.samples);
 
     this.onASRItemChange(item);
     this.size.height = jQuery(this.transcrEditor.nativeElement).height();
@@ -402,8 +403,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   onASRItemChange(item: ASRQueueItem) {
     if (!isNullOrUndefined(item)) {
-      if (item.time.sampleStart === this.audiochunk.time.start.originalSample.value
-        && item.time.sampleLength === this.audiochunk.time.duration.originalSample.value) {
+      if (item.time.sampleStart === this.audiochunk.time.start.samples
+        && item.time.sampleLength === this.audiochunk.time.duration.samples) {
         if (item.status === ASRProcessStatus.FINISHED) {
           this.asr.status = 'finished';
           this.asr.result = item.result;
@@ -477,7 +478,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         if (comboKey === 'ALT + S' && this.Settings.special_markers.boundary) {
           // add boundary
           this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
-          this.boundaryinserted.emit(this.audiochunk.playposition.browserSample.value);
+          this.boundaryinserted.emit(this.audiochunk.playposition.samples);
           $event.preventDefault();
         } else {
           for (let i = 0; i < this.markers.length; i++) {
@@ -691,7 +692,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           const samples = jqueryobj.attr('data-samples');
 
           if (isNumeric(samples)) {
-            this.boundaryclicked.emit(new BrowserSample(Number(samples), this.audiomanager.browserSampleRate));
+            this.boundaryclicked.emit(new SampleUnit(Number(samples), this.audioManager.sampleRate));
           }
         })
         .on('mouseover', (event) => {
@@ -816,8 +817,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     const element = document.createElement('img');
     element.setAttribute('src', imgURL);
     element.setAttribute('class', 'btn-icon-text boundary');
-    element.setAttribute('data-samples', this.audiochunk.playposition.browserSample.value.toString());
-    element.setAttribute('alt', '[|' + this.audiochunk.playposition.browserSample.value.toString() + '|]');
+    element.setAttribute('data-samples', this.audiochunk.playposition.samples.toString());
+    element.setAttribute('alt', '[|' + this.audiochunk.playposition.samples.toString() + '|]');
 
     this.textfield.summernote('editor.insertText', ' ');
     this.textfield.summernote('editor.insertNode', element);
@@ -830,7 +831,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         const samples = jqueryobj.attr('data-samples');
 
         if (isNumeric(samples)) {
-          this.boundaryclicked.emit(new BrowserSample(Number(samples), this.audiomanager.browserSampleRate));
+          this.boundaryclicked.emit(new SampleUnit(Number(samples), this.audioManager.sampleRate));
         }
       })
         .on('mouseover', (event) => {
@@ -1104,7 +1105,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     if (!(segSamples === null || segSamples === undefined) && Functions.isNumber(segSamples)) {
       const samples = Number(segSamples);
-      const time = this.audiomanager.createBrowserAudioTime(samples);
+      const time = new SampleUnit(samples, this.audioManager.sampleRate);
 
       segPopover.css({
         'margin-left': (event.target.offsetLeft - (width / 2)) + 'px',
@@ -1119,7 +1120,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         cursor: 'pointer'
       });
       const timespan = new TimespanPipe();
-      const text = timespan.transform(time.browserSample.unix.toString());
+      const text = timespan.transform(time.unix.toString());
       segPopover.text(text);
     }
   }
@@ -1435,7 +1436,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   public onASROverlayClick() {
     if (!isNullOrUndefined(this.asrService.selectedLanguage)) {
-      const item = this.asrService.queue.getItemByTime(this.audiochunk.time.start.originalSample.value, this.audiochunk.time.duration.originalSample.value);
+      const item = this.asrService.queue.getItemByTime(this.audiochunk.time.start.samples, this.audiochunk.time.duration.samples);
       if (item !== undefined) {
         this.asrService.stopASROfItem(item);
       }

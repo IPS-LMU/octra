@@ -5,7 +5,7 @@ export interface ILogging {
   lastupdate: string; // Bsp.: "2017-06-26 13:00"
   audiofile: string;
   duration: number;
-  samplerate: number;
+  sampleRate: number;
   logs: ILog[];
 }
 
@@ -33,17 +33,17 @@ export class OLogging implements ILogging {
   lastupdate: string; // Bsp.: "2017-06-26 13:00"
   audiofile: string;
   duration: number;
-  samplerate: number;
+  sampleRate: number;
   logs: ILog[];
 
   constructor(version: string, encoding: string, projectname: string, lastupdate: string, audiofile: string,
-              samplerate: number, duration: number, logs: OLog[]) {
+              sampleRate: number, duration: number, logs: OLog[]) {
     this.version = version;
     this.encoding = encoding;
     this.projectname = projectname;
     this.lastupdate = lastupdate;
     this.duration = duration;
-    this.samplerate = samplerate;
+    this.sampleRate = sampleRate;
     this.audiofile = audiofile;
     this.logs = logs;
   }

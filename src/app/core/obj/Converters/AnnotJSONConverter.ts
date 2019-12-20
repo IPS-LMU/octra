@@ -31,14 +31,14 @@ export class AnnotJSONConverter extends Converter {
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile !== null && audiofile !== undefined) {
-      let result = new OAnnotJSON(audiofile.name, audiofile.samplerate);
+      let result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
       const content = file.content;
 
       if (content !== '') {
         try {
           result = JSON.parse(content);
 
-          if (result.annotates === audiofile.name && result.sampleRate === audiofile.samplerate) {
+          if (result.annotates === audiofile.name && result.sampleRate === audiofile.sampleRate) {
             return {
               annotjson: result,
               audiofile: null,

@@ -198,7 +198,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     }
 
     if (!this.preparing.preparing) {
-      const oannotjson = this.navbarServ.transcrService.annotation.getObj(this.transcrService.audiomanager.originalInfo.duration);
+      const oannotjson = this.navbarServ.transcrService.annotation.getObj(this.transcrService.audioManager.originalInfo.duration);
       this.preparing = {
         name: converter.name,
         preparing: true
@@ -206,7 +206,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       setTimeout(() => {
         if (converter.name === 'Bundle') {
           // only this converter needs an array buffer
-          this.navbarServ.transcrService.audiofile.arraybuffer = this.transcrService.audiomanager.ressource.arraybuffer;
+          this.navbarServ.transcrService.audiofile.arraybuffer = this.transcrService.audioManager.ressource.arraybuffer;
         }
 
         const result: IFile = converter.export(oannotjson, this.navbarServ.transcrService.audiofile, levelnum).file;

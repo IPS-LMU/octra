@@ -1,15 +1,11 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {LoupeComponent} from './components/audio/loupe';
-import {CircleLoupeComponent} from './components/audio/circleloupe';
-import {AudioviewerComponent, AudioviewerDirective} from './components/audio/audioviewer';
-import {AudioNavigationComponent} from './components/audio/audio-navigation';
-import {AudioplayerComponent, AudioplayerDirective} from './components/audio/audioplayer';
 import {HttpClientModule} from '@angular/common/http';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {LeadingNullPipe, ProcentPipe, SecondsPipe, TimespanPipe} from './pipe';
-import {Timespan2Pipe} from './pipe/timespan2.pipe';
+import {AudioplayerComponent} from './components/audio/audioplayer/audioplayer.component';
+import {TimespanPipe} from './pipe/timespan.pipe';
+import {AudioNavigationComponent} from './components/audio/audio-navigation';
 // icons
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
@@ -25,6 +21,10 @@ import {
   faVolumeDown,
   faVolumeUp
 } from '@fortawesome/free-solid-svg-icons';
+import {ProcentPipe} from './pipe/procent.pipe';
+import {AudioViewerComponent} from './components/audio/audio-viewer/audio-viewer.component';
+import {Timespan2Pipe} from './pipe/timespan2.pipe';
+import {LeadingNullPipe} from './pipe/leadingnull.pipe';
 
 library.add(faPlay, faPause, faStop, faForward, faStepForward, faStepBackward, faRetweet, faClock, faVolumeUp, faVolumeDown);
 
@@ -34,37 +34,25 @@ library.add(faPlay, faPause, faStop, faForward, faStepForward, faStepBackward, f
     FormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    ReactiveFormsModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    ReactiveFormsModule
   ],
   declarations: [
-    AudioNavigationComponent,
     AudioplayerComponent,
-    AudioplayerDirective,
-    AudioviewerComponent,
-    AudioviewerDirective,
-    CircleLoupeComponent,
-    LoupeComponent,
-    ProcentPipe,
-    TimespanPipe,
-    SecondsPipe,
-    LeadingNullPipe,
-    Timespan2Pipe
-  ],
-  exports: [
-    CommonModule,
     AudioNavigationComponent,
-    AudioplayerComponent,
-    AudioplayerDirective,
-    AudioviewerComponent,
-    AudioviewerDirective,
-    CircleLoupeComponent,
-    LoupeComponent,
-    SecondsPipe,
-    LeadingNullPipe,
     TimespanPipe,
     Timespan2Pipe,
-    ProcentPipe
+    ProcentPipe,
+    AudioViewerComponent,
+    LeadingNullPipe
+  ],
+  exports: [
+    AudioNavigationComponent,
+    AudioplayerComponent,
+    AudioViewerComponent,
+    Timespan2Pipe,
+    ProcentPipe,
+    LeadingNullPipe
   ]
 })
 export class MediaComponentsModule {

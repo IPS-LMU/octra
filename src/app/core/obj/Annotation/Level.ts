@@ -1,7 +1,7 @@
 import {AnnotJSONType, ISegment, OEvent, OItem, OLevel} from './AnnotJSON';
 import {Segments} from './Segments';
 import {OIDBLevel} from '../../shared/service';
-import {BrowserAudioTime, OriginalAudioTime} from '../../../media-components/obj/media/audio';
+import {SampleUnit} from '../../../media-components/obj/audio';
 
 export class Level {
   public static counter = 1;
@@ -75,10 +75,10 @@ export class Level {
     return result;
   }
 
-  public getObj(lastOriginalBoundary: BrowserAudioTime | OriginalAudioTime): OLevel {
+  public getObj(lastOriginalBoundary: SampleUnit): OLevel {
     let result: OLevel = null;
     if (this._type === AnnotJSONType.SEGMENT) {
-      result = new OLevel(this._name, this.getTypeString(), this.segments.getObj(this._name, lastOriginalBoundary.originalSample.value));
+      result = new OLevel(this._name, this.getTypeString(), this.segments.getObj(this._name, lastOriginalBoundary.samples));
     } else if (this._type === AnnotJSONType.ITEM) {
       result = new OLevel(this._name, this.getTypeString(), this.items);
     } else if (this._type === AnnotJSONType.EVENT) {

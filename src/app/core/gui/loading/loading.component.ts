@@ -136,9 +136,9 @@ export class LoadingComponent implements OnInit, OnDestroy {
                     const audioRessource = this.audio.audiomanagers[0].ressource;
                     const oAudioFile = new OAudiofile();
                     oAudioFile.arraybuffer = audioRessource.arraybuffer;
-                    oAudioFile.duration = audioRessource.info.duration.originalSample.value;
+                    oAudioFile.duration = audioRessource.info.duration.samples;
                     oAudioFile.name = audioRessource.info.fullname;
-                    oAudioFile.samplerate = audioRessource.info.duration.originalSample.sampleRate;
+                    oAudioFile.sampleRate = audioRessource.info.duration.sampleRate;
                     oAudioFile.size = audioRessource.size;
 
                     let importResult: ImportResult;

@@ -7,7 +7,7 @@ import {SessionFile} from '../../obj/SessionFile';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {ModalService} from '../../modals/modal.service';
 import {FileSize, Functions, isNullOrUndefined} from '../../shared/Functions';
-import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
+import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
 
 interface FileProgress {
   status: 'progress' | 'valid' | 'invalid';
@@ -44,7 +44,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
     return this._status;
   }
 
-  get audiomanager(): AudioManager {
+  get audioManager(): AudioManager {
     return this._audiomanager;
   }
 
@@ -206,7 +206,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
                             const last = level.items[level.items.length - 1];
                             if (last.sampleStart + last.sampleDur !== this._oaudiofile.duration) {
                               level.items.push(new OSegment(last.id + 1, last.sampleStart + last.sampleDur,
-                                (this._oaudiofile.duration * this._oaudiofile.samplerate) - (last.sampleStart + last.sampleDur),
+                                (this._oaudiofile.duration * this._oaudiofile.sampleRate) - (last.sampleStart + last.sampleDur),
                                 [new OLabel(level.name, '')]));
                             }
                           }
@@ -360,8 +360,8 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
           this._oaudiofile = new OAudiofile();
           this._oaudiofile.name = fileProcess.file.name;
           this._oaudiofile.size = fileProcess.file.size;
-          this._oaudiofile.duration = this._audiomanager.ressource.info.duration.originalSample.value;
-          this._oaudiofile.samplerate = this._audiomanager.originalSampleRate;
+          this._oaudiofile.duration = this._audiomanager.ressource.info.duration.samples;
+          this._oaudiofile.sampleRate = this._audiomanager.sampleRate;
           this._oaudiofile.arraybuffer = buffer;
 
           this.checkState();

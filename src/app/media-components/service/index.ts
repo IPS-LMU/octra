@@ -1,1 +1,0 @@
-export * from './audiocomponent.service';

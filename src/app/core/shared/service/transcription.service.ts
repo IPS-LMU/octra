@@ -11,12 +11,12 @@ import {Converter, IFile} from '../../obj/Converters';
 import {OLog, OLogging} from '../../obj/Settings/logging';
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
 import {HttpClient} from '@angular/common/http';
-import {AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 import {AudioService} from './audio.service';
 import {AppStorageService, OIDBLevel} from './appstorage.service';
 import {UserInteractionsService} from './userInteractions.service';
 import {SettingsService} from './settings.service';
 import {AppInfo} from '../../../app.info';
+import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
 
 declare var validateAnnotation: ((string, any) => any);
 
@@ -80,7 +80,7 @@ export class TranscriptionService {
    }
    */
 
-  get audiomanager(): AudioManager {
+  get audioManager(): AudioManager {
     return this._audiomanager;
   }
 
@@ -166,7 +166,7 @@ export class TranscriptionService {
       && !isNullOrUndefined(this._annotation.levels[this._selectedlevel])) {
       this.appStorage.save('annotation', {
         num: this._selectedlevel,
-        level: this._annotation.levels[this._selectedlevel].getObj(this.audiomanager.originalInfo.duration)
+        level: this._annotation.levels[this._selectedlevel].getObj(this.audioManager.originalInfo.duration)
       });
     } else {
       console.error(new Error('can not save segments because annotation is null'));
@@ -242,8 +242,8 @@ export class TranscriptionService {
 
       this._audiofile = new OAudiofile();
       this._audiofile.name = this._audiomanager.originalInfo.fullname;
-      this._audiofile.samplerate = this._audiomanager.originalInfo.samplerate;
-      this._audiofile.duration = this._audiomanager.originalInfo.duration.originalSample.value;
+      this._audiofile.sampleRate = this._audiomanager.originalInfo.sampleRate;
+      this._audiofile.duration = this._audiomanager.originalInfo.duration.samples;
       this._audiofile.size = this._audiomanager.originalInfo.size;
       this._audiofile.url = (this.appStorage.usemode === 'online')
         ? `${this.app_settings.audio_server.url}${this.appStorage.audioURL}` : '';
@@ -271,7 +271,7 @@ export class TranscriptionService {
 
     if (!(this.annotation === null || this.annotation === undefined)) {
       result = converter.export(
-        this.annotation.getObj(this.audiomanager.originalInfo.duration),
+        this.annotation.getObj(this.audioManager.originalInfo.duration),
         this.audiofile, 0
       ).file;
 
@@ -303,7 +303,7 @@ export class TranscriptionService {
                     // check if servertranscript's segment is empty
                     if (this.appStorage.serverDataEntry.transcript.length === 1 && this.appStorage.serverDataEntry[0].text === '') {
                       this.appStorage.annotation[this.selectedlevel].level.items.push(
-                        new OSegment(0, 0, this.audiomanager.originalInfo.duration.originalSample.value,
+                        new OSegment(0, 0, this.audioManager.originalInfo.duration.samples,
                           [new OLabel('OCTRA_1', this.appStorage.prompttext)])
                       );
 
@@ -369,7 +369,7 @@ export class TranscriptionService {
 
                     if (converted === undefined) {
                       this.appStorage.annotation[this.selectedlevel].level.items.push(
-                        new OSegment(0, 0, this.audiomanager.originalInfo.duration.originalSample.value,
+                        new OSegment(0, 0, this.audioManager.originalInfo.duration.samples,
                           [new OLabel('OCTRA_1', this.appStorage.prompttext)])
                       );
 
@@ -426,12 +426,12 @@ export class TranscriptionService {
             // load levels
             for (let i = 0; i < this.appStorage.annotation.length; i++) {
               const level: Level = Level.fromObj(this.appStorage.annotation[i],
-                this._audiomanager.originalSampleRate,
+                this._audiomanager.sampleRate,
                 {
-                  browser: this._audiomanager.ressource.info.duration.browserSample.value,
-                  original: this._audiomanager.originalInfo.duration.originalSample.value
+                  browser: this._audiomanager.ressource.info.duration.samples,
+                  original: this._audiomanager.originalInfo.duration.samples
                 },
-                this.audiomanager.browserSampleRate);
+                this.audioManager.sampleRate);
               this._annotation.levels.push(level);
             }
 
@@ -506,17 +506,17 @@ export class TranscriptionService {
 
         let lastBound = 0;
         if (i > 0) {
-          lastBound = Math.round(this.currentlevel.segments.get(i - 1).time.originalSample.value);
+          lastBound = Math.round(this.currentlevel.segments.get(i - 1).time.samples);
         }
 
         const segmentJSON: any = {
           start: lastBound,
-          length: segment.time.originalSample.value - lastBound,
+          length: segment.time.samples - lastBound,
           text: segment.transcript
         };
 
         if (i === this.currentlevel.segments.length - 1) {
-          segmentJSON.length = this._audiomanager.originalInfo.duration.originalSample.value - lastBound;
+          segmentJSON.length = this._audiomanager.originalInfo.duration.samples - lastBound;
         }
 
         transcript.push(segmentJSON);
@@ -593,7 +593,7 @@ export class TranscriptionService {
         ? 'local' : this.appStorage.user.project,
       now.toUTCString(),
       this._annotation.audiofile.name,
-      this._annotation.audiofile.samplerate,
+      this._annotation.audiofile.sampleRate,
       this._annotation.audiofile.duration,
       []
     );
@@ -855,11 +855,11 @@ export class TranscriptionService {
 
   public createNewAnnotation(): OAnnotJSON {
     const level: OLevel = new OLevel('OCTRA_1', 'SEGMENT', []);
-    level.items.push(new OSegment(1, 0, this._audiomanager.originalInfo.duration.originalSample.value, [(new OLabel('OCTRA_1', ''))]));
+    level.items.push(new OSegment(1, 0, this._audiomanager.originalInfo.duration.samples, [(new OLabel('OCTRA_1', ''))]));
     const levels: OLevel[] = [];
     levels.push(level);
 
-    return new OAnnotJSON(this.filename, this._audiomanager.ressource.info.samplerate, levels);
+    return new OAnnotJSON(this.filename, this._audiomanager.ressource.info.sampleRate, levels);
   }
 
   public htmlToRaw(html: string): string {

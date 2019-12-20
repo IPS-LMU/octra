@@ -3,9 +3,9 @@ import {AppStorageService, MessageService, SettingsService, TranscriptionService
 import {AppSettings, ASRLanguage} from '../../obj/Settings';
 import {ASRQueueItemType, AsrService} from '../../shared/service/asr.service';
 import {isNullOrUndefined} from '../../shared/Functions';
-import {AudioChunk} from '../../../media-components/obj/media/audio/AudioManager';
 import {BsDropdownDirective} from 'ngx-bootstrap';
 import {TranslocoService} from '@ngneat/transloco';
+import {AudioChunk} from '../../../media-components/obj/audio/AudioManager';
 
 @Component({
   selector: 'app-asr-options',
@@ -60,21 +60,21 @@ export class AsrOptionsComponent implements OnInit {
 
   startASRForThisSegment() {
     if (!isNullOrUndefined(this.asrService.selectedLanguage)) {
-      if (this.audioChunk.time.duration.originalSample.seconds > 600) {
+      if (this.audioChunk.time.duration.seconds > 600) {
         // trigger alert, too big audio duration
         this.messageService.showMessage('error', this.langService.translate('asr.file too big').toString());
       } else {
-        const time = this.audioChunk.time.start.browserSample.add(this.audioChunk.time.duration.browserSample);
+        const time = this.audioChunk.time.start.add(this.audioChunk.time.duration);
         const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(time);
 
         if (segNumber > -1) {
-          console.log(`SEGNUMBER = ${segNumber} browser sample is ${time.value}`);
+          console.log(`SEGNUMBER = ${segNumber} browser sample is ${time.samples}`);
           const segment = this.transcrService.currentlevel.segments.get(segNumber);
           segment.isBlockedBy = ASRQueueItemType.ASR;
           this.asrService.addToQueue({
-            sampleStart: this.audioChunk.time.start.originalSample.value,
-            sampleLength: this.audioChunk.time.duration.originalSample.value,
-            browserSampleEnd: this.audioChunk.time.start.browserSample.add(this.audioChunk.time.duration.browserSample).value
+            sampleStart: this.audioChunk.time.start.samples,
+            sampleLength: this.audioChunk.time.duration.samples,
+            browserSampleEnd: this.audioChunk.time.start.add(this.audioChunk.time.duration).samples
           }, ASRQueueItemType.ASR);
           this.asrService.startASR();
         } else {
@@ -86,17 +86,17 @@ export class AsrOptionsComponent implements OnInit {
 
   startASRForAllSegmentsNext() {
     const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
-      this.audioChunk.time.start.browserSample.add(this.audioChunk.time.duration.browserSample)
+      this.audioChunk.time.start.add(this.audioChunk.time.duration)
     );
 
     if (segNumber > -1) {
       for (let i = segNumber; i < this.transcrService.currentlevel.segments.length; i++) {
         const segment = this.transcrService.currentlevel.segments.get(i);
-        const sampleStart = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.originalSample.value
+        const sampleStart = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.samples
           : 0;
-        const sampleLength = segment.time.originalSample.value - sampleStart;
+        const sampleLength = segment.time.samples - sampleStart;
 
-        if (sampleLength / this.transcrService.audiomanager.originalSampleRate > 600) {
+        if (sampleLength / this.transcrService.audioManager.sampleRate > 600) {
           this.messageService.showMessage('error', this.langService.translate('asr.file too big'));
           segment.isBlockedBy = null;
         } else {
@@ -105,7 +105,7 @@ export class AsrOptionsComponent implements OnInit {
             segment.isBlockedBy = ASRQueueItemType.ASR;
             this.asrService.addToQueue({
               sampleStart, sampleLength, browserSampleEnd:
-              segment.time.browserSample.value
+              segment.time.samples
             }, ASRQueueItemType.ASR);
           }
         }
@@ -123,7 +123,7 @@ export class AsrOptionsComponent implements OnInit {
 
   stopASRForThisSegment() {
     if (!isNullOrUndefined(this.asrService.selectedLanguage)) {
-      const item = this.asrService.queue.getItemByTime(this.audioChunk.time.start.originalSample.value, this.audioChunk.time.duration.originalSample.value);
+      const item = this.asrService.queue.getItemByTime(this.audioChunk.time.start.samples, this.audioChunk.time.duration.samples);
 
       if (item !== undefined) {
         this.asrService.stopASROfItem(item);

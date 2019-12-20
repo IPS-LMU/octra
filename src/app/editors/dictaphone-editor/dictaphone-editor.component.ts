@@ -8,13 +8,14 @@ import {
   TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
-import {BrowserAudioTime, BrowserSample, SubscriptionManager} from '../../core/shared';
+import {SubscriptionManager} from '../../core/shared';
 import {Segment} from '../../core/obj/Annotation';
-import {AudioChunk, AudioManager} from '../../media-components/obj/media/audio/AudioManager';
 import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
-import {AudioplayerComponent} from '../../media-components/components/audio/audioplayer';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {OCTRAEditor} from '../octra-editor';
+import {AudioplayerComponent} from '../../media-components/components/audio/audioplayer/audioplayer.component';
+import {AudioChunk, AudioManager} from '../../media-components/obj/audio/AudioManager';
+import {SampleUnit} from '../../media-components/obj/audio';
 
 @Component({
   selector: 'app-audioplayer-gui',
@@ -32,7 +33,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   @ViewChild('transcr', {static: true}) public editor: TranscrEditorComponent;
 
   public audiochunk: AudioChunk;
-  public audiomanager: AudioManager;
+  public audioManager: AudioManager;
   private subscrmanager: SubscriptionManager;
   private shortcuts: any;
   private boundaryselected = false;
@@ -40,7 +41,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   private oldRaw = '';
 
   public get settings(): any {
-    return this.audioplayer.settings;
+    return this.audioplayer;
   }
 
   public set settings(value: any) {
@@ -80,11 +81,11 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   }
 
   ngOnInit() {
-    this.audiomanager = this.audio.audiomanagers[0];
-    this.audiochunk = this.audiomanager.mainchunk.clone();
-    this.audiochunk.speed = 1;
+    this.audioManager = this.audio.audiomanagers[0];
+    this.audiochunk = this.audioManager.mainchunk.clone();
+    // this.audiochunk.speed = 1;
     this.audiochunk.volume = 1;
-    this.audioplayer.settings.shortcutsEnabled = true;
+    // this.audioplayer.settings.shortcutsEnabled = true;
     this.settings.shortcuts = this.keyMap.register('AP', this.settings.shortcuts);
     this.shortcuts = this.settings.shortcuts;
     this.editor.Settings.markers = this.transcrService.guidelines.markers.items;
@@ -107,32 +108,31 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   onButtonClick(event: { type: string, timestamp: number }) {
     this.uiService.addElementFromEvent('mouseclick', {value: event.type},
-      event.timestamp, this.audiomanager.playposition,
+      event.timestamp, this.audioManager.playposition,
       this.editor.caretpos, null, null, 'audio_buttons');
 
     switch (event.type) {
       case('play'):
-        this.audioplayer.startPlayback(() => {
-          this.audioplayer.update();
-        });
+        this.audiochunk.startPlayback();
         break;
       case('pause'):
-        this.audioplayer.pausePlayback();
+        this.audiochunk.pausePlayback();
         break;
       case('stop'):
-        this.audioplayer.stopPlayback(() => {
-          this.audioplayer.audiochunk.playposition = this.audiomanager.createBrowserAudioTime(0);
-          this.audioplayer.update();
-        });
+        this.audiochunk.stopPlayback().then(
+          () => {
+            this.audiochunk.playposition = this.audioManager.createSampleUnit(0);
+            // this.audiochunk.update();
+          });
         break;
       case('replay'):
-        this.audioplayer.rePlayback();
+        this.audiochunk.toggleReplay();
         break;
       case('backward'):
-        this.audioplayer.stepBackward();
+        this.audiochunk.stepBackward();
         break;
       case('backward time'):
-        this.audioplayer.stepBackwardTime(0.5);
+        this.audiochunk.stepBackwardTime(0.5);
         break;
       case('default'):
         break;
@@ -140,12 +140,12 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   }
 
   onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
-    this.audiochunk.speed = event.new_value;
+    // this.audiochunk.speed = event.new_value;
     this.appStorage.audioSpeed = event.new_value;
   }
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
-    this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audiomanager.playposition,
+    this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audioManager.playposition,
       this.editor.caretpos, null, null, 'audio_speed');
   }
 
@@ -156,7 +156,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
     this.uiService.addElementFromEvent('slider', event, event.timestamp,
-      this.audiomanager.playposition, this.editor.caretpos, null, null, 'audio_volume');
+      this.audioManager.playposition, this.editor.caretpos, null, null, 'audio_volume');
   }
 
   afterTyping(status) {
@@ -182,16 +182,16 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   onShortcutTriggered(event) {
     event.value = `audio:${event.value}`;
     this.uiService.addElementFromEvent('shortcut', event, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, null, null, 'texteditor');
+      this.audioManager.playposition, this.editor.caretpos, null, null, 'texteditor');
   }
 
-  onBoundaryClicked(samples: BrowserSample) {
+  onBoundaryClicked(samples: SampleUnit) {
     const i: number = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(samples);
 
     this.boundaryselected = true;
 
     if (i > -1) {
-      const start = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.browserSample.value : 0;
+      const start = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.samples : 0;
 
       new Promise<void>((resolve) => {
         if (this.audiochunk.isPlaying) {
@@ -200,14 +200,14 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
           resolve();
         }
       }).then(() => {
-        this.audiochunk.startpos = this.audiomanager.createBrowserAudioTime(start);
+        this.audiochunk.startpos = this.audioManager.createSampleUnit(start);
         this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(i).time.clone();
-        this.audioplayer.update();
+        // this.audioplayer.update();
 
-        this.audioplayer.startPlayback(() => {
+        this.audiochunk.startPlayback().then(() => {
           // set start pos and playback length to end of audio file
-          this.audiochunk.startpos = this.audiomanager.createBrowserAudioTime(samples.value);
-          this.audioplayer.update();
+          this.audiochunk.startpos = this.audioManager.createSampleUnit(samples.samples);
+          // this.audioplayer.update();
         });
         this.boundaryselected = false;
       });
@@ -218,19 +218,19 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   onBoundaryInserted() {
     this.uiService.addElementFromEvent('segment', {value: 'boundaries:add'}, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, null, null, 'texteditor');
+      this.audioManager.playposition, this.editor.caretpos, null, null, 'texteditor');
   }
 
   onMarkerInsert(markerCode: string) {
     this.uiService.addElementFromEvent('shortcut', {value: 'markers:' + markerCode}, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, null, null, 'texteditor');
+      this.audioManager.playposition, this.editor.caretpos, null, null, 'texteditor');
   }
 
   onMarkerClick(markerCode: string) {
     this.afterTyping('stopped');
 
     this.uiService.addElementFromEvent('mouseclick', {value: markerCode}, Date.now(),
-      this.audiomanager.playposition, this.editor.caretpos, null, null, 'texteditor_toolbar');
+      this.audioManager.playposition, this.editor.caretpos, null, null, 'texteditor_toolbar');
   }
 
   saveTranscript() {
@@ -280,7 +280,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
         const segment: Segment = this.transcrService.currentlevel.segments.get(i).clone();
         segment.transcript = newRaw;
         if (i < segTexts.length - 1) {
-          segment.time.browserSample.value = samplesArray[i];
+          segment.time = this.audioManager.createSampleUnit(samplesArray[i]);
         }
 
         this.transcrService.currentlevel.segments.change(i, segment);
@@ -289,7 +289,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
         if (i === segTexts.length - 1) {
           this.transcrService.currentlevel.segments.add(this.audiochunk.time.end.clone(), newRaw);
         } else {
-          this.transcrService.currentlevel.segments.add(this.audiomanager.createBrowserAudioTime(samplesArray[i]), newRaw);
+          this.transcrService.currentlevel.segments.add(this.audioManager.createSampleUnit(samplesArray[i]), newRaw);
         }
       }
     }
@@ -300,7 +300,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
       this.transcrService.currentlevel.segments.segments.splice(segTexts.length, (annoSegLength - segTexts.length));
       // because last segment was removed
       const seg = this.transcrService.currentlevel.segments.get(segTexts.length - 1);
-      seg.time.browserSample.value = this.audiochunk.time.end.browserSample.value;
+      seg.time = this.audiochunk.time.end.clone();
     }
   }
 
@@ -332,8 +332,8 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   }
 
   public update() {
-    this.audiochunk.startpos = this.audiochunk.time.start as BrowserAudioTime;
-    this.audioplayer.update();
+    this.audiochunk.startpos = this.audiochunk.time.start;
+    // this.audioplayer.update();
     this.loadEditor();
   }
 
@@ -343,7 +343,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
       const seg_num = this.editor.getSegmentByCaretPos(caretpos);
       if (seg_num > -1) {
         const samples = (seg_num > 0) ? this.transcrService.currentlevel.segments.get(seg_num - 1).time.samples : 0;
-        this.audiochunk.startpos = new AudioTime(samples, this.audiochunk.audiomanager.ressource.info.samplerate);
+        this.audiochunk.startpos = new AudioTime(samples, this.audiochunk.audioManager.ressource.info.sampleRate);
         this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(seg_num).time.clone();
         this.audioplayer.update();
       }

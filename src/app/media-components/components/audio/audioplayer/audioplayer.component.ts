@@ -1,550 +1,347 @@
-// angular
 import {
   AfterViewInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   ElementRef,
-  EventEmitter,
-  HostListener,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
-  Output,
+  SimpleChanges,
   ViewChild
 } from '@angular/core';
-// other
-import {AudioRessource, AudioTimeCalculator, BrowserAudioTime} from '../../../obj/media/audio';
-import {PlayBackState} from '../../../obj/media';
-import {AudioplayerService} from './audioplayer.service';
-import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
-import {CanvasAnimation, Line} from '../../../obj';
-import {AudioService, KeymappingService} from '../../../../core/shared/service';
-import {BrowserInfo} from '../../../../core/shared';
-import {AudioChunk, AudioManager} from '../../../obj/media/audio/AudioManager';
-import {timer} from 'rxjs';
+import {PlayBackStatus, SampleUnit} from '../../../obj/audio';
+import {SubscriptionManager} from '../../../obj/SubscriptionManager';
+import {AudioChunk} from '../../../obj/audio/AudioManager';
+import {Subscription} from 'rxjs';
+import {isNullOrUndefined} from 'util';
+import Konva from 'konva';
 
 @Component({
-  selector: 'app-audioplayer',
+  selector: 'octra-audioplayer',
   templateUrl: './audioplayer.component.html',
-  styleUrls: ['./audioplayer.component.css'],
-  providers: [AudioplayerService],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./audioplayer.component.css']
 })
-export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
-
-  /**
-   * gets or sets the settings of this audioplayer component
-   */
-  public get settings(): any {
-    return this.ap.Settings;
+export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
+  set settings(value: { bufferedBar: { height: number }; border: { color: string; width: number }; slider: { margin: { top: number; left: number; bottom: number; right: number }; height: number }; playHead: { backgroundColor: string; width: number; height: number }; background: { color: string }; height: number }) {
+    this._settings = value;
   }
 
-  public set settings(value: any) {
-    this.ap.Settings = value;
+  get settings(): { bufferedBar: { height: number }; border: { color: string; width: number }; slider: { margin: { top: number; left: number; bottom: number; right: number }; height: number }; playHead: { backgroundColor: string; width: number; height: number }; background: { color: string }; height: number } {
+    return this._settings;
   }
 
-  /**
-   * gets the current time of the audio playback
-   */
-  public get current_time(): number {
-    return this.audiochunk.playposition.browserSample.unix;
-  }
+  @Input() audioChunk: AudioChunk;
+  @ViewChild('konvaContainer', {static: true}) konvaContainer: ElementRef;
 
-  private get audiomanager(): AudioManager {
-    return this.audiochunk.audiomanager;
-  }
-
-  private get audioressource(): AudioRessource {
-    return this.audiomanager.ressource;
-  }
-
-  constructor(private audio: AudioService,
-              public ap: AudioplayerService,
-              private changeDetectorRef: ChangeDetectorRef,
-              private keyMap: KeymappingService) {
-
-    this.subscrmanager = new SubscriptionManager();
-    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown));
-  }
-
-  @ViewChild('audioplay', {static: true}) apview;
-  @ViewChild('ap_graphicscan', {static: true}) graphicscanRef: ElementRef;
-  @ViewChild('ap_overlaycan', {static: true}) overlaynacRef: ElementRef;
-  @ViewChild('ap_playcan', {static: true}) playcanRef: ElementRef;
-
-  /**
-   * after Shortcut was triggered.
-   */
-  @Output() shortcuttriggered = new EventEmitter<any>();
-  @Input() audiochunk: AudioChunk;
-  public focused = false;
-  private subscrmanager: SubscriptionManager;
-  // canvas Elements
-  private graphicscanvas: HTMLCanvasElement = null;
-  private overlaycanvas: HTMLCanvasElement = null;
-  private playcanvas: HTMLCanvasElement = null;
-  // animation for requesting AnimationFrames
-  private anim: CanvasAnimation;
-  // canvas contexts
-  private context: CanvasRenderingContext2D = null;
-  // timer for updating the time with interval of 200ms
-  private timer = null;
-  // size informations
-  private width = 0;
-  private height = 0;
-  private innerWidth = 0;
-  private oldInnerWidth = 0;
-  private mouseClickObj = {
-    clicked: false,
-    x: 0,
-    y: 0,
-    curr_line: null,
-    event: null
+  private stage: Konva.Stage;
+  private _settings = {
+    slider: {
+      margin: {
+        left: 20,
+        top: 20,
+        right: 20,
+        bottom: 0
+      },
+      height: 5
+    },
+    bufferedBar: {
+      height: 2
+    },
+    playHead: {
+      height: 20,
+      backgroundColor: '#56a09e',
+      width: 10
+    },
+    height: 60,
+    border: {
+      width: 1,
+      color: '#b5b5b5'
+    },
+    background: {
+      color: '#e2e6ff'
+    }
   };
-  /**
-   * updates the GUI
-   */
-  public update = () => {
-    this.updateCanvasSizes();
-    if (this.audiomanager.channelData) {
-      this.draw();
-      this.drawPlayCursor();
-    }
+  private animation: {
+    playHead: Konva.Animation
+  } = {
+    playHead: null
+  };
+  private subscrmanager = new SubscriptionManager();
+  private bufferedSubscr = -1;
+  private backgroundLayer: Konva.Layer;
 
-    // update oldinnerWidth
-    this.oldInnerWidth = this.innerWidth;
-  }
-  /**
-   * drawSignal(array) draws the min-max pairs of values in the canvas
-   *
-   * in a different color. This is probable due to there being only a final
-   * stroke()-command after the loop.
-   *
-   */
-  private draw = () => {
-    // get canvas
-    const line = this.ap.Line;
+  private canvasElements = {
+    panel: null,
+    sliderBar: null,
+    playHead: null
+  };
 
-    if (line) {
-      this.clearDisplay();
+  private audiochunkSubscription: Subscription;
 
-      this.drawLine();
-      this.drawPlayCursorOnly(line);
-
-    } else {
-      throw new Error('Line Object not found');
-    }
+  constructor() {
   }
 
-  private onKeyDown = ($event) => {
-    if (this.settings.shortcutsEnabled) {
-      const comboKey = $event.comboKey;
-
-      const platform = BrowserInfo.platform;
-      if (this.settings.shortcuts) {
-        let keyActive = false;
-        let a = 0;
-        for (const shortc in this.settings.shortcuts) {
-          if (this.settings.shortcuts.hasOwnProperty(shortc)) {
-            a++;
-            if (this.settings.shortcuts.hasOwnProperty(shortc)) {
-              const focuscheck = this.settings.shortcuts['' + shortc + ''].focusonly === false
-                || (this.settings.shortcuts['' + shortc + ''].focusonly === this.focused === true);
-
-              if (focuscheck && this.settings.shortcuts['' + shortc + ''].keys['' + platform + ''] === comboKey) {
-                switch (shortc) {
-                  case('play_pause'):
-                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
-                    if (this.audiomanager.isPlaying) {
-                      this.pausePlayback();
-                    } else {
-                      this.startPlayback(() => {
-                        this.update();
-                      });
-                    }
-                    keyActive = true;
-                    break;
-                  case('stop'):
-                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
-                    this.stopPlayback(this.afterAudioStopped);
-                    keyActive = true;
-                    break;
-                  case('step_backward'):
-                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
-                    this.stepBackward();
-                    keyActive = true;
-                    break;
-                  case('step_backwardtime'):
-                    this.shortcuttriggered.emit({shortcut: comboKey, value: shortc});
-                    this.stepBackwardTime(0.5);
-                    keyActive = true;
-                    break;
-                }
-              }
-
-              if (keyActive) {
-                break;
-              }
-            }
-          }
-        }
-
-        if (keyActive) {
-          $event.event.preventDefault();
-        }
-      }
-    }
+  public get width(): number {
+    return this.konvaContainer.nativeElement.offsetWidth;
   }
 
-  private onAudioChunkStateChanged = () => {
-    this.drawPlayCursor();
-  }
-  /**
-   * draws the playcursor during animation
-   */
-  private drawPlayCursor = () => {
-    // set new position of playcursor
-    const absX = this.ap.audioTCalculator.samplestoAbsX(this.audiochunk.playposition.browserSample.value);
-    this.changePlayCursorAbsX(absX);
-    const line = this.ap.Line;
-
-    if (line) {
-      this.drawPlayCursorOnly(line);
+  public get getPlayHeadX(): number {
+    if (!(this.audioChunk === null || this.audioChunk === undefined)) {
+      const relativePlayPosition = this.audioChunk.playposition.samples / this.audioChunk.time.duration.samples;
+      return this._settings.slider.margin.left +
+        (relativePlayPosition * this.canvasElements.sliderBar.width()) - this._settings.playHead.width / 2;
     }
+    return this._settings.slider.margin.left - this._settings.playHead.width / 2;
+  }
+
+  public get timeLeft(): number {
+    if (!(this.audioChunk === null || this.audioChunk === undefined)) {
+      return (this.audioChunk.time.duration.unix - this.audioChunk.playposition.unix);
+    }
+    return 0;
   }
 
   ngOnInit() {
-    this.anim = new CanvasAnimation(25);
-    this.timer = timer(0, 200);
-
-    this.subscrmanager.add(this.audiochunk.statechange.subscribe(
-      (state: PlayBackState) => {
-        this.onAudioChunkStateChanged();
-      }
-    ));
+    this.afterChunkUpdated();
   }
 
-  ngAfterViewInit() {
-    // initialization of canvases
-    this.graphicscanvas = this.graphicscanRef.nativeElement;
-    this.playcanvas = this.playcanRef.nativeElement;
-    this.overlaycanvas = this.overlaynacRef.nativeElement;
-
-    // initailization of width and height of the control
-    this.width = this.apview.elementRef.nativeElement.clientWidth;
-    this.innerWidth = this.width - this.settings.margin.left - this.settings.margin.right;
-    this.oldInnerWidth = this.innerWidth;
-
-    this.ap.init(this.innerWidth, this.audiochunk);
-    // this.audiochunk.updateChannel();
-    this.update();
-    this.startTimer();
-  }
-
-  ngOnChanges(obj) {
-    if (obj.hasOwnProperty('audiochunk')) {
-      const previous: AudioChunk = obj.audiochunk.previousValue;
-      const current: AudioChunk = obj.audiochunk.currentValue;
-
-      if (!obj.audiochunk.firstChange) {
-        if (((previous === null || previous === undefined) && !(current === null || current === undefined)) ||
-          (current.time.start.browserSample.value !== previous.time.start.browserSample.value &&
-            current.time.end.browserSample.value !== previous.time.end.browserSample.value)) {
-          // audiochunk changed
-          this.ap.init(this.innerWidth, this.audiochunk);
-          this.update();
-        }
-      }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.hasOwnProperty('audioChunk') && changes.audioChunk.currentValue !== null) {
+      this.afterChunkUpdated();
     }
   }
 
-  ngOnDestroy() {
-    this.stopPlayback(() => {
-    });
-    this.subscrmanager.destroy();
-  }
+  afterChunkUpdated() {
+    if (!(this.audioChunk === null || this.audioChunk === undefined)) {
+      if (this.bufferedSubscr > -1) {
+        this.subscrmanager.removeById(this.bufferedSubscr);
+      }
 
-  /**
-   * onMouseMove sets the selection to the current x values of the mouse move
-   */
-  onMouseMove($event) {
-    const x = $event.offsetX;
-    const y = $event.offsetY;
+      if (!isNullOrUndefined(this.audiochunkSubscription)) {
+        this.audiochunkSubscription.unsubscribe();
+      }
 
-    const currLine = this.ap.LastLine;
-
-    if (currLine) {
-      this.ap.setMouseMovePosition($event.type, x, y, currLine, this.innerWidth);
-      this.drawPlayCursorOnly(currLine);
-    }
-  }
-
-  /**
-   * onClick sets the selection to the current x values of the click
-   */
-  onClick($event) {
-    const x = $event.offsetX;
-    const y = $event.offsetY;
-
-    const currLine = this.ap.Line;
-
-    if (currLine) {
-      if (this.audiochunk.isPlaying) {
-        this.mouseClickObj.clicked = true;
-        this.mouseClickObj.x = x;
-        this.mouseClickObj.y = y;
-        this.mouseClickObj.curr_line = currLine;
-        this.mouseClickObj.event = $event;
-        this.audiochunk.stopPlayback().then(this.afterAudioStopped).catch((error) => {
+      this.audiochunkSubscription = this.audioChunk.statuschange.subscribe(
+        this.onAudioChunkStatusChanged
+        , (error) => {
           console.error(error);
         });
+    }
+  }
+
+  ngAfterViewInit(): void {
+    const settings = this._settings;
+
+    this.stage = new Konva.Stage({
+      container: this.konvaContainer.nativeElement,   // id of container <div>,
+      width: this.width,
+      height: this._settings.height
+    });
+
+    // then create layer
+    this.backgroundLayer = new Konva.Layer();
+
+    // add the layer to the stage
+    this.stage.add(this.backgroundLayer);
+
+    // create our shape
+    // noinspection JSSuspiciousNameCombination
+    this.canvasElements.panel = new Konva.Rect({
+      x: this._settings.border.width,
+      y: this._settings.border.width,
+      width: this.width - this._settings.border.width * 2,
+      id: 'panel',
+      height: this._settings.height - this._settings.border.width * 2,
+      fill: this._settings.background.color,
+      stroke: this._settings.border.color,
+      strokeWidth: this._settings.border.width,
+      cornerRadius: 5
+    });
+    this.canvasElements.panel.on('click', this.onPanelClick);
+    this.canvasElements.panel.on('mouseover', this.onPanelMouseMove);
+    this.canvasElements.panel.on('mouseleave', this.onPanelMouseMove);
+
+    this.canvasElements.sliderBar = new Konva.Rect({
+      x: settings.slider.margin.left,
+      y: settings.slider.margin.top,
+      id: 'sliderBar',
+      width: this.canvasElements.panel.width() - settings.slider.margin.left - settings.slider.margin.right,
+      height: settings.slider.height,
+      fill: '#84d5d3'
+    });
+
+    this.canvasElements.sliderBar.on('click', this.onSliderClick);
+    this.canvasElements.sliderBar.on('mousemove', this.onPanelMouseMove);
+
+    this.canvasElements.playHead = new Konva.Rect({
+      x: settings.slider.margin.left - (this._settings.playHead.width / 2),
+      y: settings.slider.margin.top + this._settings.slider.height / 2 - this._settings.playHead.height / 2,
+      id: 'playHead',
+      draggable: true,
+      dragBoundFunc: this.onPlayHeadDragging,
+      width: this._settings.playHead.width,
+      height: this._settings.playHead.height,
+      fill: this._settings.playHead.backgroundColor
+    });
+    this.canvasElements.playHead.on('mouseover', this.onPlayHeadMouseMove);
+    this.canvasElements.playHead.on('mouseleave', this.onPlayHeadMouseMove);
+    this.canvasElements.playHead.on('dragmove', this.onPlayHeadDragging);
+
+    // add the shape to the layer
+    this.backgroundLayer.add(this.canvasElements.panel);
+    this.backgroundLayer.add(this.canvasElements.sliderBar);
+    this.backgroundLayer.add(this.canvasElements.playHead);
+
+    window.onresize = () => {
+      this.onResize();
+    };
+    this.onResize();
+  }
+
+  onPlayHeadDragging = (pos) => {
+    const maxWidth = this.canvasElements.panel.width() - this._settings.slider.margin.left - (this._settings.playHead.width / 2);
+    let x = Math.min(Math.max(this._settings.slider.margin.left, pos.x) - (this._settings.playHead.width / 2), maxWidth);
+
+    const samples = this.pxToSample(x - this._settings.slider.margin.left + (this._settings.playHead.width / 2));
+
+    if (!isNaN(samples.samples)) {
+      if (this.audioChunk.status === PlayBackStatus.PLAYING) {
+        this.audioChunk.stopPlayback().then(() => {
+          this.audioChunk.playposition = this.pxToSample(x - this._settings.slider.margin.left + (this._settings.playHead.width / 2));
+        });
       } else {
-        this.ap.setMouseClickPosition(x, y, currLine, $event, this.innerWidth);
+        this.audioChunk.playposition = this.pxToSample(x - this._settings.slider.margin.left + (this._settings.playHead.width / 2));
       }
-
-      this.drawPlayCursorOnly(currLine);
+    } else {
+      x = pos.x;
     }
+
+    return {
+      x,
+      y: this._settings.slider.margin.top + this._settings.slider.height / 2 - this._settings.playHead.height / 2
+    };
   }
 
-  /**
-   * stops the playback and sets the current playcursor position to 0.
-   */
-  public stopPlayback(afterAudioEnded: () => void) {
-    this.audiochunk.stopPlayback().then(
-      () => {
-        afterAudioEnded();
-        this.afterAudioStopped();
-      }).catch((error) => {
-      console.error(error);
-    });
+  onResize() {
+    this.stage.width(this.width);
+    this.stage.height((this._settings.height + this._settings.border.width));
+
+    this.canvasElements.panel.width(this.width - this._settings.border.width * 2);
+
+    this.canvasElements.sliderBar.width(this.canvasElements.panel.width() - this._settings.slider.margin.left
+      - this._settings.slider.margin.right);
+
+    this.canvasElements.playHead.x(this.getPlayHeadX);
+
+    this.stage.draw();
   }
 
-  /**
-   * pause playback
-   */
-  public pausePlayback() {
-    this.audiochunk.pausePlayback().then(this.afterAudioPaused).catch((error) => {
-      console.error(error);
-    });
-  }
+  private onPlaybackStarted(alreadyStarted = false) {
+    const playHead = this.canvasElements.playHead;
+    const layer = this.stage.getLayers()[0];
 
-  /**
-   * start playback
-   */
-  public startPlayback(afterAudioEnded: () => void) {
-    if (!this.audiochunk.isPlaying) {
-      this.playSelection(() => {
-        afterAudioEnded();
-      });
+    if (isNullOrUndefined(this.animation.playHead)) {
+      this.animation.playHead = new Konva.Animation(this.doPlayHeadAnimation, layer);
     }
+    this.animation.playHead.start();
+    playHead.x(this.getPlayHeadX);
   }
 
-  // sets the loop of playback
-  public rePlayback() {
-    this.audiochunk.toggleReplay();
-  }
-
-  /**
-   * steps back to last position
-   */
-  public stepBackward() {
-    this.audiochunk.stepBackward(() => {
-      this.drawFunc();
-    }).then(() => {
-      // this.afterAudioStepBackward();
-    }).catch((error) => {
-      console.error(error);
-    });
-  }
-
-  stepBackwardTime(backSec: number) {
-    this.audiochunk.stepBackwardTime(backSec, this.drawFunc).then(this.afterAudioBackwardTime).catch((error) => {
-      console.error(error);
-    });
-  }
-
-  /**
-   * this method updates the gui on resizing
-   */
-  @HostListener('window:resize', ['$event'])
-  onResize($event) {
-    this.width = this.apview.elementRef.nativeElement.clientWidth;
-    this.innerWidth = this.width - this.settings.margin.left - this.settings.margin.right;
-
-    if (this.ap.PlayCursor) {
-      const ac = new AudioTimeCalculator(this.audioressource.info.samplerate,
-        this.audiochunk.time.duration as BrowserAudioTime, this.innerWidth);
-
-      this.ap.audioTCalculator = ac;
-      this.ap.PlayCursor.changeSamples(this.audiochunk.playposition.browserSample.value, ac);
-
-      this.update();
+  public ngOnDestroy(): void {
+    if (!isNullOrUndefined(this.audiochunkSubscription)) {
+      this.audiochunkSubscription.unsubscribe();
     }
-  }
-
-  @HostListener('window:beforeunload', ['$event'])
-  onReload($event) {
     this.subscrmanager.destroy();
   }
 
-  /**
-   * updateCanvasSizes is needed to update the size of the canvas respective to window resizing
-   */
-  private updateCanvasSizes() {
-    this.width = Number(this.apview.elementRef.nativeElement.clientWidth);
-    this.innerWidth = Number(this.width - this.settings.margin.left - this.settings.margin.right);
-    this.height = (this.settings.margin.top + this.settings.height + this.settings.margin.bottom);
-    // set width
-    this.graphicscanvas.width = this.width;
-    this.overlaycanvas.width = this.width;
-    this.playcanvas.width = this.width;
-
-    // set height
-    this.graphicscanvas.height = this.height;
-    this.overlaycanvas.height = this.height;
-    this.playcanvas.height = this.height;
-    this.apview.changeStyle('height', this.height.toString() + 'px');
-
-    this.ap.updateLines(this.innerWidth);
+  private onPlaybackPaused() {
+    const layer = this.stage.getLayers()[0];
+    this.animation.playHead.stop();
+    layer.draw();
   }
 
-  /**
-   * drawGrid(h, v) draws a grid with h horizontal and v vertical lines over the canvas
-   */
-  private drawLine() {
-    this.context = this.graphicscanvas.getContext('2d');
-    this.context.globalAlpha = 1.0;
-    this.context.fillStyle = this.settings.slider.color;
-    const x = this.settings.margin.left;
-    const h = this.settings.height;
-    const middle = Math.round(h / 2) - (this.settings.slider.height / 2);
-
-    this.context.fillRect(x, middle, this.innerWidth, this.settings.slider.height);
-    this.context.stroke();
+  public pxToSample(px: number): SampleUnit {
+    return new SampleUnit(px * this.audioChunk.time.duration.samples / this.canvasElements.sliderBar.width(),
+      this.audioChunk.audioManager.sampleRate);
   }
 
-  /**
-   * clearDisplay() draws a rectangle with the given canvas size and
-   * fills it with a slightly smaller rectangle in the given color.
-   */
-  private clearDisplay() {
-    // get canvas
-    const playC = this.playcanvas;
-    const overlayC = this.overlaycanvas;
-    const line = this.ap.Line;
+  private onPlaybackEnded() {
+    const playHead = this.canvasElements.playHead;
+    this.animation.playHead.stop();
+    playHead.x(this._settings.slider.margin.left - this._settings.playHead.width / 2);
+    this.stage.draw();
+  }
 
-    if (line) {
-      // --- get the appropriate context
-      this.context = this.playcanvas.getContext('2d');
-      this.context.clearRect(line.Pos.x - 1, line.Pos.y - 1, this.innerWidth + 1, line.Size.height + 1);
+  private onPlaybackStopped() {
+    const playHead = this.canvasElements.playHead;
+    const layer = this.stage.getLayers()[0];
 
-      // --- get the appropriate context
-      this.context = overlayC.getContext('2d');
-      this.context.globalAlpha = 1.0;
-      this.context.clearRect(line.Pos.x - 1, line.Pos.y - 1, this.innerWidth + 1, line.Size.height + 1);
-      this.context.strokeStyle = this.settings.cursor.color;
+    this.animation.playHead.stop();
+    this.stage.draw();
+  }
 
-      this.context = playC.getContext('2d');
-      this.context.globalAlpha = 1.0;
-      this.context.clearRect(line.Pos.x - 1, line.Pos.y - 1, this.innerWidth + 1, line.Size.height + 1);
-      this.context.strokeStyle = this.settings.playcursor.color;
+  private onAudioChunkStatusChanged = (status: PlayBackStatus) => {
+    switch (status) {
+      case PlayBackStatus.INITIALIZED:
+        break;
+      case PlayBackStatus.PREPARE:
+        break;
+      case PlayBackStatus.STARTED:
+        this.onPlaybackStarted(true);
+        break;
+      case PlayBackStatus.PLAYING:
+        break;
+      case PlayBackStatus.PAUSED:
+        this.onPlaybackPaused();
+        break;
+      case PlayBackStatus.STOPPED:
+        this.onPlaybackStopped();
+        break;
+      case PlayBackStatus.ENDED:
+        this.onPlaybackEnded();
+        break;
+    }
+  }
 
-      this.context = this.graphicscanvas.getContext('2d');
-      this.context.globalAlpha = 1.0;
-      this.context.strokeStyle = this.settings.framecolor;
-      this.context.fillStyle = this.settings.backgroundcolor;
-      this.context.fillRect(0, 0, this.width, this.height);
-      // context.strokeRect(line_obj.Pos.x, line_obj.Pos.y, w, settings.height);
+  private doPlayHeadAnimation = () => {
+    this.canvasElements.playHead.x(this.getPlayHeadX);
+  }
+
+  private onSliderClick = (event) => {
+    this.onPanelClick(event);
+  }
+
+  private onPlayHeadMouseMove = (event) => {
+    if (event.type === 'mouseover') {
+      this.konvaContainer.nativeElement.style.cursor = 'grab';
     } else {
-      throw new Error('Line Object not found');
+      this.konvaContainer.nativeElement.style.cursor = 'pointer';
     }
   }
 
-  /**
-   * playSelection() plays the selected signal fragment. Playback start and duration
-   * depend on the current selection.
-   */
-  private playSelection(afterAudioEnded: () => void) {
-    this.audiochunk.startPlayback(this.drawFunc).then(afterAudioEnded).catch((error) => {
-      console.error(error);
-    });
-  }
-
-  private drawFunc = () => {
-    this.anim.requestFrame(this.drawPlayCursor);
-  }
-
-  /**
-   * starts the timer needed for updating the timestamps for the gui.
-   */
-  private startTimer() {
-    this.subscrmanager.add(this.timer.subscribe(
-      () => {
-        if (this.audiomanager.channelData && this.ap.PlayCursor) {
-          this.changeDetectorRef.markForCheck();
-        }
-      }
-    ));
-  }
-
-  /**
-   * draws playcursor at its current position
-   */
-  private drawPlayCursorOnly(currLine: Line) {
-    const relX = this.ap.PlayCursor.absX + this.settings.margin.left;
-    const relY = Math.round((currLine.Size.height - this.settings.playcursor.height) / 2);
-
-    if (relX <= currLine.Size.width + this.settings.margin.left) {
-      this.context = this.playcanvas.getContext('2d');
-      this.context.clearRect(0, 0, this.width, this.height);
-      this.context.strokeStyle = this.settings.playcursor.color;
-      this.context.beginPath();
-      this.context.moveTo(relX, relY + 1);
-      this.context.lineTo(relX, relY + this.settings.playcursor.height);
-      this.context.globalAlpha = 1;
-      this.context.lineWidth = this.settings.playcursor.width;
-      this.context.stroke();
+  private onPanelMouseMove = (event) => {
+    if (event.type === 'mouseover') {
+      this.konvaContainer.nativeElement.style.cursor = 'pointer';
     }
   }
 
-  /**
-   * changes the playcursors absolute position in pixels to a new one
-   */
-  private changePlayCursorAbsX(newValue: number) {
-    this.ap.PlayCursor.changeAbsX(newValue, this.ap.audioTCalculator, this.ap.AudioPxWidth, this.audiochunk);
-  }
+  private onPanelClick = (event) => {
+    const maxWidth = this.canvasElements.panel.width() - this._settings.slider.margin.left;
+    const px = Math.min(Math.max(this._settings.slider.margin.left, event.evt.x), maxWidth)
+      - (this._settings.playHead.width / 2);
+    this.canvasElements.playHead.x(px);
+    // hide bufferedBar
+    this.stage.draw();
 
-  private afterAudioStopped = () => {
-    this.audiochunk.playposition.browserSample.value = 0;
-    /*
-    if (this.audiochunk.isPlayBackStopped && this.mouseclick_obj.clicked) {
-      console.log(`AUDIO STOPPED!`);
-      this.mouseclick_obj.clicked = false;
-      this.ap.setMouseClickPosition(this.mouseclick_obj.x, this.mouseclick_obj.y,
-        this.mouseclick_obj.curr_line, this.mouseclick_obj.event, this.innerWidth);
-      setTimeout(() => {
-        this.startPlayback(() => {
-        });
-      }, 200);
-    }*/
-  }
-
-  private afterAudioPaused = () => {
-
-  }
-
-  private afterAudioStepBackward = () => {
-    this.ap.PlayCursor.changeSamples(this.audiochunk.playposition.browserSample.value,
-      this.ap.audioTCalculator, this.audiochunk);
-
-    this.startPlayback(() => {
-    });
-  }
-
-  private afterAudioBackwardTime = () => {
-    // do the same
-    // this.afterAudioStepBackward();
+    if (this.audioChunk.status === PlayBackStatus.PLAYING) {
+      this.audioChunk.stopPlayback().then(() => {
+        this.audioChunk.playposition = this.pxToSample(px - this._settings.slider.margin.left + this._settings.playHead.width / 2);
+        this.onPlaybackStarted();
+      }).catch((error) => {
+        console.error(error);
+      });
+    } else {
+      this.audioChunk.playposition = this.pxToSample(px - this._settings.slider.margin.left + this._settings.playHead.width / 2);
+    }
   }
 }

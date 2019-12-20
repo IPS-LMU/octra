@@ -1,4 +1,19 @@
-import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges
+} from '@angular/core';
+import {AudioChunk} from '../../../obj/audio/AudioManager';
+import {isNullOrUndefined} from 'util';
+import {SubscriptionManager} from '../../../obj/SubscriptionManager';
+import {PlayBackStatus} from '../../../obj/audio';
 
 export interface Buttons {
   play: {
@@ -28,20 +43,70 @@ export interface Buttons {
 }
 
 @Component({
-  selector: 'app-audio-navigation',
+  selector: 'octra-audio-navigation',
   templateUrl: './audio-navigation.component.html',
   styleUrls: ['./audio-navigation.component.css']
 })
-export class AudioNavigationComponent implements AfterViewInit {
-  @Input() isAudioPlaying = false;
+export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChanges, OnDestroy {
+  get isReady(): boolean {
+    return this._isReady;
+  }
+
+  get replay(): boolean {
+    return this._replay;
+  }
+
+  get isAudioPlaying(): boolean {
+    return this._isAudioPlaying;
+  }
+
+  set volume(value: number) {
+    this.volumeChange.emit({
+      old_value: Number(this._volume),
+      new_value: Number(value),
+      timestamp: Date.now()
+    });
+    this._volume = value;
+    this.audioChunk.volume = value;
+  }
+
+  get volume(): number {
+    return this._volume;
+  }
+
+  get playbackRate(): number {
+    return this._playbackRate;
+  }
+
+  set playbackRate(value: number) {
+    this.playbackRateChange.emit({
+      old_value: Number(this._playbackRate),
+      new_value: Number(value),
+      timestamp: Date.now()
+    });
+    this._playbackRate = value;
+    this.audioChunk.playbackRate = value;
+  }
+
+  @Output() buttonClick = new EventEmitter<{ type: string, timestamp: number }>();
+  @Output() volumeChange = new EventEmitter<{ old_value: number, new_value: number, timestamp: number }>();
+  @Output() afterVolumeChange = new EventEmitter<{ new_value: number, timestamp: number }>();
+  @Output() playbackRateChange = new EventEmitter<{ old_value: number, new_value: number, timestamp: number }>();
+  @Output() afterPlaybackRateChange = new EventEmitter<{ new_value: number, timestamp: number }>();
+
   @Input() responsive = false;
-  @Input() easymode = false;
-  @Output() buttonclick = new EventEmitter<{ type: string, timestamp: number }>();
-  @Output() volumechange = new EventEmitter<{ old_value: number, new_value: number, timestamp: number }>();
-  @Output() aftervolumechange = new EventEmitter<{ new_value: number, timestamp: number }>();
-  @Output() speedchange = new EventEmitter<{ old_value: number, new_value: number, timestamp: number }>();
-  @Output() afterspeedchange = new EventEmitter<{ new_value: number, timestamp: number }>();
-  @Input() public replay = false;
+  @Input() easyMode = false;
+  @Input() audioChunk: AudioChunk;
+  @Input() stepBackwardTime = 500;
+
+  private _replay = false;
+  private _isReady = false;
+  private _isAudioPlaying = false;
+  private _volume = 1;
+  private _playbackRate = 1;
+
+  private subscrManager = new SubscriptionManager();
+
   @Input() buttons: Buttons = {
     play: {
       label: 'Play',
@@ -69,46 +134,48 @@ export class AudioNavigationComponent implements AfterViewInit {
     }
   };
 
-  private _volume = 1;
-
-  get volume(): number {
-    return this._volume;
-  }
-
-  @Input() set volume(value: number) {
-    this.volumechange.emit({
-      old_value: Number(this._volume),
-      new_value: Number(value),
-      timestamp: Date.now()
-    });
-    this._volume = value;
-  }
-
-  private _speed = 1;
-
-  get speed(): number {
-    return this._speed;
-  }
-
-  @Input() set speed(value: number) {
-    this.speedchange.emit({
-      old_value: Number(this._speed),
-      new_value: Number(value),
-      timestamp: Date.now()
-    });
-    this._speed = value;
-  }
-
-  public get height(): number {
-    return this.container.nativeElement.offsetHeight;
-  }
-
-  @ViewChild('container', {static: true}) container: ElementRef;
-
   constructor(private cd: ChangeDetectorRef) {
   }
 
+  ngOnInit(): void {
+  }
+
   ngAfterViewInit() {
+  }
+
+  /**
+   * this method is called only after a input changed (dirty check)
+   */
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!isNullOrUndefined(changes.audioChunk)) {
+      const newAudioChunk: AudioChunk = changes.audioChunk.currentValue;
+
+      console.log(`audio chunk changed`);
+      if (!isNullOrUndefined(newAudioChunk)) {
+        this.subscrManager.destroy();
+        this.connectEvents();
+        this._isReady = true;
+      } else {
+        // not ready
+        this._isReady = false;
+      }
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.subscrManager.destroy();
+  }
+
+  private connectEvents() {
+    this.subscrManager.add(this.audioChunk.statuschange.subscribe((status: PlayBackStatus) => {
+        this._isAudioPlaying = status === PlayBackStatus.PLAYING;
+      },
+      (error) => {
+        console.error(error);
+      },
+      () => {
+
+      }));
   }
 
   /**
@@ -118,45 +185,81 @@ export class AudioNavigationComponent implements AfterViewInit {
   onButtonClick(type: string) {
     switch (type) {
       case('play'):
-        this.buttonclick.emit({type: 'play', timestamp: Date.now()});
+        this.onPlayButtonClicked();
         break;
       case('pause'):
-        this.buttonclick.emit({type: 'pause', timestamp: Date.now()});
+        this.onPauseButtonClicked();
         break;
       case('stop'):
-        this.buttonclick.emit({type: 'stop', timestamp: Date.now()});
+        this.onStopButtonClicked();
         break;
       case('replay'):
-        this.buttonclick.emit({type: 'replay', timestamp: Date.now()});
+        this.onReplayButtonClicked();
         break;
       case('backward'):
-        this.buttonclick.emit({type: 'backward', timestamp: Date.now()});
+        this.onBackwardButtonClicked();
         break;
       case('backward time'):
-        this.buttonclick.emit({type: 'backward time', timestamp: Date.now()});
+        this.onBackwardTimeButtonClicked();
         break;
       case('default'):
+        console.error('button not found');
         break;
     }
     this.cd.detectChanges();
   }
 
+  private onPlayButtonClicked() {
+    this.triggerButtonClick('play');
+    this.audioChunk.startPlayback(false);
+  }
+
+  private onPauseButtonClicked() {
+    this.triggerButtonClick('pause');
+    this.audioChunk.pausePlayback();
+  }
+
+  private onStopButtonClicked() {
+    this.triggerButtonClick('stop');
+    this.audioChunk.stopPlayback();
+  }
+
+  private onReplayButtonClicked() {
+    this.audioChunk.toggleReplay();
+    this.triggerButtonClick('replay');
+    this._replay = this.audioChunk.replay;
+  }
+
+  private onBackwardButtonClicked() {
+    this.triggerButtonClick('backward');
+    this.audioChunk.stepBackward();
+  }
+
+  private onBackwardTimeButtonClicked() {
+    this.triggerButtonClick('backward time');
+    this.audioChunk.stepBackwardTime(500 / 1000);
+  }
+
+  private triggerButtonClick(type: string) {
+    this.buttonClick.emit({type, timestamp: Date.now()});
+  }
+
   /***
    * after value of volume was changed
    */
-  afterVolumeChange() {
-    this.aftervolumechange.emit({
+  afterVolumeChanged() {
+    this.afterVolumeChange.emit({
       new_value: this.volume,
       timestamp: Date.now()
     });
   }
 
   /***
-   * after value of speed was changed
+   * after value of playbackRate was changed
    */
-  afterSpeedChange() {
-    this.afterspeedchange.emit({
-      new_value: this.speed,
+  afterPlaybackRateChanged() {
+    this.afterPlaybackRateChange.emit({
+      new_value: this.playbackRate,
       timestamp: Date.now()
     });
   }

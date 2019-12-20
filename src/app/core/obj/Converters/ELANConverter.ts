@@ -127,7 +127,7 @@ export class ELANConverter extends Converter {
       error: ''
     };
 
-    result.annotjson = new OAnnotJSON(audiofile.name, audiofile.samplerate);
+    result.annotjson = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
 
     const x2js = new X2JS();
     const jsonXML = x2js.xml2js<ELAN30Object>(file.content);
@@ -146,8 +146,8 @@ export class ELANConverter extends Converter {
           if (Array.isArray(tier.ANNOTATION)) {
             for (let j = 0; j < tier.ANNOTATION.length; j++) {
               const annotationElement = tier.ANNOTATION[j];
-              const t1 = this.getSamplesFromTimeSlot(jsonXML, annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF1, audiofile.samplerate);
-              const t2 = this.getSamplesFromTimeSlot(jsonXML, annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF2, audiofile.samplerate);
+              const t1 = this.getSamplesFromTimeSlot(jsonXML, annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF1, audiofile.sampleRate);
+              const t2 = this.getSamplesFromTimeSlot(jsonXML, annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF2, audiofile.sampleRate);
 
               if (t1 < 0 || t2 < 0) {
                 result.error = 'Invalid time unit found';
@@ -169,8 +169,8 @@ export class ELANConverter extends Converter {
             }
           } else {
             const annotationElement = tier.ANNOTATION as any;
-            const t1 = this.getSamplesFromTimeSlot(jsonXML, annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF1, audiofile.samplerate);
-            const t2 = this.getSamplesFromTimeSlot(jsonXML, annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF2, audiofile.samplerate);
+            const t1 = this.getSamplesFromTimeSlot(jsonXML, annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF1, audiofile.sampleRate);
+            const t2 = this.getSamplesFromTimeSlot(jsonXML, annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF2, audiofile.sampleRate);
 
             if (t1 < 0 || t2 < 0) {
               result.error = 'Invalid time unit found';

@@ -1,6 +1,5 @@
-import {AudioInfo} from '../../../../media-components/obj/media/audio';
 import * as moment from 'moment';
-import {setClassMetadata} from '@angular/core/src/r3_symbols';
+import {AudioInfo} from '../../../../media-components/obj/audio';
 
 abstract class CuttingFormat {
   public abstract exportList(cutList: Segment[], audioInfo: AudioInfo, fileName: string, nameConvention: string);
@@ -24,10 +23,10 @@ export class JSONConverter extends CuttingFormat {
         version: '1.0.0',
         audioFile: {
           name: fileName,
-          sampleRate: audioInfo.duration.originalSample.sampleRate,
+          sampleRate: audioInfo.duration.sampleRate,
           channels: audioInfo.channels,
-          duration: audioInfo.duration.originalSample.value,
-          sampleEncoding: audioInfo.duration.originalSample.sampleRate,
+          duration: audioInfo.duration.samples,
+          sampleEncoding: audioInfo.duration.sampleRate,
           bitRate: audioInfo.bitrate
         }
       },
@@ -59,11 +58,11 @@ export class TextTableConverter extends CuttingFormat {
 
     for (let i = 0; i < cutList.length; i++) {
       const segment = cutList[i];
-      let secondsStart = (segment.sampleStart / audioInfo.duration.originalSample.sampleRate) + '';
-      let secondsDuration = (segment.sampleDur / audioInfo.duration.originalSample.sampleRate) + '';
+      let secondsStart = (segment.sampleStart / audioInfo.duration.sampleRate) + '';
+      let secondsDuration = (segment.sampleDur / audioInfo.duration.sampleRate) + '';
 
       text += `${getNewFileName(nameConvention, fileName, i, cutList, audioInfo)}\t${fileName}\t${secondsStart}\t${secondsDuration}\t`
-        + `${segment.sampleStart}\t${segment.sampleDur}\t${audioInfo.duration.originalSample.sampleRate}`
+        + `${segment.sampleStart}\t${segment.sampleDur}\t${audioInfo.duration.sampleRate}`
         + `\t${segment.transcript}\n`;
 
     }
@@ -97,9 +96,9 @@ export function getNewFileName(namingConvention: string, fileName: string, segme
       case('sampleDur'):
         return cutList[segmentNumber].sampleDur;
       case('secondsStart'):
-        return Math.round(cutList[segmentNumber].sampleStart / audioInfo.duration.originalSample.sampleRate * 1000) / 1000;
+        return Math.round(cutList[segmentNumber].sampleStart / audioInfo.duration.sampleRate * 1000) / 1000;
       case('secondsDur'):
-        return Math.round(cutList[segmentNumber].sampleDur / audioInfo.duration.originalSample.sampleRate * 1000) / 1000;
+        return Math.round(cutList[segmentNumber].sampleDur / audioInfo.duration.sampleRate * 1000) / 1000;
     }
     return g1;
   }) + extension;

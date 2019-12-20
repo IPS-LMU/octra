@@ -30,8 +30,8 @@ export class CTMConverter extends Converter {
 
       for (let j = 0; j < level.items.length; j++) {
         const transcript = level.items[j].labels[0].value;
-        const start = Math.round((level.items[j].sampleStart / audiofile.samplerate) * 100) / 100;
-        const duration = Math.round((level.items[j].sampleDur / audiofile.samplerate) * 100) / 100;
+        const start = Math.round((level.items[j].sampleStart / audiofile.sampleRate) * 100) / 100;
+        const duration = Math.round((level.items[j].sampleDur / audiofile.sampleRate) * 100) / 100;
         result += `${annotation.name} 1 ${start} ${duration} ${transcript} 1.00\n`;
       }
 
@@ -51,7 +51,7 @@ export class CTMConverter extends Converter {
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile !== null && audiofile !== undefined) {
-      const result = new OAnnotJSON(audiofile.name, audiofile.samplerate);
+      const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
 
       const content = file.content;
       const lines: string[] = content.split('\n');
@@ -79,14 +79,14 @@ export class CTMConverter extends Converter {
             } else {
               length = Number(columns[3]);
             }
-            const samplerate = audiofile.samplerate;
+            const sampleRate = audiofile.sampleRate;
             let osegment;
 
             if (i === 0 && start > 0) {
               // first segment not set
               osegment = new OSegment((i + 1),
                 0,
-                start * samplerate,
+                start * sampleRate,
                 [(new OLabel('Tier_1', ''))]
               );
 
@@ -97,8 +97,8 @@ export class CTMConverter extends Converter {
             olabels.push((new OLabel('Tier_1', columns[4])));
             osegment = new OSegment(
               (i + 1),
-              Math.round(start * samplerate),
-              Math.round(length * samplerate),
+              Math.round(start * sampleRate),
+              Math.round(length * sampleRate),
               olabels
             );
 
@@ -108,8 +108,8 @@ export class CTMConverter extends Converter {
               if ((start + length) < audiofile.duration) {
                 const osegmentEnd = new OSegment(
                   (i + 2),
-                  Math.round((start + length) * samplerate),
-                  Math.round((audiofile.duration - (start + length)) * samplerate),
+                  Math.round((start + length) * sampleRate),
+                  Math.round((audiofile.duration - (start + length)) * sampleRate),
                   [(new OLabel('Tier_1', ''))]
                 );
 

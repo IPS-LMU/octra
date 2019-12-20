@@ -161,7 +161,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
       const level = this.transcrServ.annotation.levels[tiernum];
       level.name = event.target.value.replace(' ', '_');
       this.appStorage.changeAnnotationLevel(tiernum,
-        level.getObj(this.transcrServ.audiomanager.originalInfo.duration)
+        level.getObj(this.transcrServ.audioManager.originalInfo.duration)
       )
         .catch((err) => {
           console.error(`error on leaving level name`);
@@ -196,13 +196,13 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     const newlevel = new Level(this.appStorage.levelcounter + 1, levelname, 'SEGMENT',
-      new Segments(this.transcrServ.audiomanager.ressource.info.samplerate, [],
+      new Segments(this.transcrServ.audioManager.ressource.info.sampleRate, [],
         {
-          browser: this.transcrServ.audiomanager.ressource.info.duration.browserSample.value,
-          original: this.transcrServ.audiomanager.originalInfo.duration.originalSample.value
-        }, this.transcrServ.audiomanager.originalInfo.samplerate));
+          browser: this.transcrServ.audioManager.ressource.info.duration.samples,
+          original: this.transcrServ.audioManager.originalInfo.duration.samples
+        }, this.transcrServ.audioManager.originalInfo.sampleRate));
     this.appStorage.addAnnotationLevel(
-      newlevel.getObj(this.transcrServ.audiomanager.originalInfo.duration))
+      newlevel.getObj(this.transcrServ.audioManager.originalInfo.duration))
       .then(
         () => {
           // update value for annoation object in transc servcie
@@ -241,7 +241,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   onLevelDuplicateClick(tiernum: number, id: number) {
     const newlevel = this.transcrServ.annotation.levels[tiernum].clone();
     this.appStorage.addAnnotationLevel(
-      newlevel.getObj(this.transcrServ.audiomanager.originalInfo.duration))
+      newlevel.getObj(this.transcrServ.audioManager.originalInfo.duration))
       .then(
         () => {
           // update value for annoation object in transc servcie

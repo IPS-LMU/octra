@@ -12,6 +12,7 @@ import {TranscriptionService} from './transcription.service';
 import {Router} from '@angular/router';
 import {SampleUnit, WavFormat} from '../../../media-components/obj/audio';
 import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
+import {ASRQueueItemType} from '../../../media-components/obj/annotation/asr';
 
 @Injectable({
   providedIn: 'root'
@@ -682,11 +683,6 @@ export class ASRQueueItem {
       });
     });
   }
-}
-
-export enum ASRQueueItemType {
-  ASR = 'ASR',
-  ASRMAUS = 'ASRMAUS'
 }
 
 export enum ASRProcessStatus {

@@ -4,7 +4,7 @@ import {AppStorageService, AudioService, SettingsService, TranscriptionService, 
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
-import {OCTRANIMATIONS, Segment} from '../../shared';
+import {OCTRANIMATIONS} from '../../shared';
 import {NavbarService} from '../../gui/navbar/navbar.service';
 import {isNullOrUndefined} from '../../shared/Functions';
 import {HttpClient} from '@angular/common/http';
@@ -13,6 +13,7 @@ import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/n
 import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/cutting-format';
 import {TranslocoService} from '@ngneat/transloco';
 import {WavFormat} from '../../../media-components/obj/audio/AudioFormats';
+import {Segment} from '../../../media-components/obj/annotation';
 
 declare var JSZip;
 
@@ -281,9 +282,9 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
       const segment: Segment = this.transcrService.currentlevel.segments.get(i);
       let sampleDur = segment.time.samples - startSample;
 
-      if (startSample + sampleDur > this.audio.audiomanagers[0].originalInfo.duration.samples) {
+      if (startSample + sampleDur > this.audio.audiomanagers[0].ressource.info.duration.samples) {
         console.error(`invalid sampleDur!!`);
-        sampleDur = this.audio.audiomanagers[0].originalInfo.duration.samples - startSample;
+        sampleDur = this.audio.audiomanagers[0].ressource.info.duration.samples - startSample;
       }
 
       cutList.push({

@@ -87,7 +87,7 @@
 
           <!-- cut audio files -->
           <tr *ngIf="navbarServ.transcrService !== undefined
-                     && navbarServ.transcrService.audioManager.originalInfo.extension === '.wav'">
+                     && navbarServ.transcrService.audioManager.ressource.info.extension === '.wav'">
             <td (click)="tools.audioCutting.opened = !tools.audioCutting.opened">
               <fa-icon style="color:gray;"
                        [icon]="['fas', ((tools.audioCutting.opened) ? 'chevron-up' : 'chevron-down')]"></fa-icon>
@@ -101,7 +101,7 @@
                 (click)="tools.audioCutting.opened = !tools.audioCutting.opened">{{'tools.cut audio.description' | transloco}}</td>
           </tr>
           <tr *ngIf="navbarServ.transcrService !== undefined
-                    && navbarServ.transcrService.audioManager.originalInfo.extension === '.wav'"
+                    && navbarServ.transcrService.audioManager.ressource.info.extension === '.wav'"
               [@fadeToggle]="(tools.audioCutting.opened) ? 'active': 'inactive'">
             <td></td>
             <td colspan="4" style="padding-left:20px;">

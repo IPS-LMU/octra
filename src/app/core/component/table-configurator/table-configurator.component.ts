@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Annotation, Level} from '../../obj/Annotation';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {isNullOrUndefined} from '../../shared/Functions';
+import {Annotation, Level} from '../../../media-components/obj/annotation';
 
 export interface ColumnDefinition {
   type: string;

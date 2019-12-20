@@ -9,6 +9,7 @@ import {Level} from '../../../obj/annotation';
 import {MultiThreadingService} from '../../../obj/worker/multi-threading.service';
 import {TsWorkerJob} from '../../../obj/worker/ts-worker-job';
 import {Subject} from 'rxjs';
+import {ASRQueueItemType} from '../../../obj/annotation/asr';
 
 @Injectable({
   providedIn: 'root'
@@ -181,7 +182,7 @@ export class AudioViewerService {
               ? this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber + 1)
               : this._currentTranscriptionLevel.segments.get(this._dragableBoundaryNumber);
 
-            if (segment.isBlockedBy === 'asr' || segmentBefore.isBlockedBy === 'asr' || segmentAfter.isBlockedBy === 'asr') {
+            if (segment.isBlockedBy === ASRQueueItemType.ASR || segmentBefore.isBlockedBy === ASRQueueItemType.ASR || segmentAfter.isBlockedBy === ASRQueueItemType.ASR) {
               // prevent dragging boundary of blocked segment
               this._dragableBoundaryNumber = -1;
             }

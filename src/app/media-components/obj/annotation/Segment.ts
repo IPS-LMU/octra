@@ -1,5 +1,6 @@
 import {OSegment} from './AnnotJSON';
 import {SampleUnit} from '../audio';
+import {ASRQueueItemType} from './asr';
 
 export class Segment {
   private static counter = 1;
@@ -41,13 +42,13 @@ export class Segment {
     this._changed = value;
   }
 
-  private _isBlockedBy: 'asr' | 'none' = 'none';
+  private _isBlockedBy: ASRQueueItemType;
 
-  get isBlockedBy(): 'asr' | 'none' {
+  get isBlockedBy(): ASRQueueItemType {
     return this._isBlockedBy;
   }
 
-  set isBlockedBy(value: 'asr' | 'none') {
+  set isBlockedBy(value: ASRQueueItemType) {
     this._isBlockedBy = value;
   }
 

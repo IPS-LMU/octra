@@ -32,7 +32,6 @@ import {TranslocoService} from '@ngneat/transloco';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 import {ProjectSettings} from '../../obj/Settings';
 import {editorComponents} from '../../../editors/components';
-import {Level} from '../../obj/Annotation';
 import {IFile, PartiturConverter} from '../../obj/Converters';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import * as X2JS from 'x2js';
@@ -55,6 +54,7 @@ import {AsrService} from '../../shared/service/asr.service';
 import {parseServerDataEntry} from '../../obj/data-entry';
 import {PlayBackStatus} from '../../../media-components/obj/audio';
 import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
+import {Level} from '../../../media-components/obj/annotation';
 
 @Component({
   selector: 'app-transcription',
@@ -812,7 +812,7 @@ export class TranscriptionComponent implements OnInit,
 
   public onSaveTranscriptionButtonClicked() {
     const converter = new PartiturConverter();
-    const oannotjson = this.transcrService.annotation.getObj(this.transcrService.audioManager.originalInfo.duration);
+    const oannotjson = this.transcrService.annotation.getObj(this.transcrService.audioManager.ressource.info.duration);
     const result: IFile = converter.export(oannotjson, this.transcrService.audiofile, 0).file;
     result.name = result.name.replace('-' + oannotjson.levels[0].name, '');
 

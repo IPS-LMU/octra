@@ -57,6 +57,13 @@
                       (mousemove)="changePosition($event.layerX, $event.layerY)"
                       (mouseleave)="loupeHidden = true;"
                       (shortcuttriggered)="onShortCutTriggered($event, 'mult-lines-viewer')"
-                      [audioChunk]="audioChunkLines">
+                      [audioChunk]="audioChunkLines"
+                      [breakMarker]="{
+                        code: '<P>'
+                      }"
+                      style="height:400px; display: flex; flex: auto; flex-direction: column;"
+
+                      [transcriptionLevel]="transcrService.currentlevel"
+  >
   </octra-audio-viewer>
 </div>

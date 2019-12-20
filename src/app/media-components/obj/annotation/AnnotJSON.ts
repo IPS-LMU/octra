@@ -168,4 +168,3 @@ export enum AnnotJSONType {
   EVENT,
   SEGMENT
 }
-

@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {OAnnotJSON, OAudiofile} from '../Annotation';
+import {OAnnotJSON, OAudiofile} from '../../../media-components/obj/annotation';
 
 export class AnnotJSONConverter extends Converter {
 

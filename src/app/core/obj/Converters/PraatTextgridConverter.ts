@@ -1,6 +1,6 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {OAnnotJSON, OAudiofile, OEvent, OLabel, OLevel, OSegment} from '../Annotation';
 import {Functions} from '../../shared/Functions';
+import {OAnnotJSON, OAudiofile, OEvent, OLabel, OLevel, OSegment} from '../../../media-components/obj/annotation';
 
 export class PraatTextgridConverter extends Converter {
 

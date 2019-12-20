@@ -5,9 +5,9 @@ import {AppStorageService, AudioService, OIDBLevel, SettingsService, Transcripti
 import {ActivatedRoute, Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
 import {IFile, ImportResult} from '../../obj/Converters';
-import {OAudiofile, OLevel} from '../../obj/Annotation';
 import {AppInfo} from '../../../app.info';
 import {Functions, isNullOrUndefined} from '../../shared/Functions';
+import {OAudiofile, OLevel} from '../../../media-components/obj/annotation';
 
 @Component({
   selector: 'app-loading',

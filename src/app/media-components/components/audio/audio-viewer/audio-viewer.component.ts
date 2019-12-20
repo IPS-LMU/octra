@@ -27,6 +27,7 @@ import {BrowserInfo} from '../../../obj/browser-info';
 import {PlayCursor} from '../../../obj/PlayCursor';
 import {AVMousePos} from '../../../obj/audio/AVMousePos';
 import {Context} from 'konva/types/Context';
+import {ASRQueueItemType} from '../../../obj/annotation/asr';
 
 @Component({
   selector: 'octra-audio-viewer',
@@ -46,6 +47,15 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   @Input() name: string;
+
+  @Input()
+  public set height(value: number) {
+    if (!isNullOrUndefined(this.stage)) {
+      console.log(`update stage`);
+      this.stage.height(value);
+    }
+  }
+
   @Input() breakMarker: any;
 
   @Output() shortcuttriggered = new EventEmitter<any>();
@@ -182,9 +192,15 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     if (changes.hasOwnProperty('breakMarker') && changes.transcriptionLevel.currentValue !== null) {
       this.av.breakMarker = this.breakMarker;
     }
+
+
+    if (!isNullOrUndefined(this.stage)) {
+      this.stage.height(this.height);
+    }
   }
 
   ngAfterViewInit(): void {
+    console.log(`INIT VIEWER! ${this.height}`);
     this.widthOnInit = this.width;
     this.styles.height = this.height;
     this.settings.lineheight = 70;
@@ -289,6 +305,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   afterChunkUpdated() {
     if (!(this.audioChunk === null || this.audioChunk === undefined)) {
+      console.log(`channel audiochunk updated`);
       this.subscrManager.removeByTag('audioChunkStatusChange');
       this.subscrManager.removeByTag('audioChunkChannelFinished');
 
@@ -320,10 +337,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
         this.av.initializeSettings().then((result) => {
           this.initializeView();
-        })
-          .catch((error) => {
-            console.error(error);
-          });
+        }).catch((error) => {
+          console.error(error);
+        });
       }).catch((error) => {
         console.error(error);
       });
@@ -375,6 +391,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   public initializeView() {
     console.log(`initializeView`);
+    this.onInitialized.complete();
     for (const attr in this.layers) {
       if (this.layers.hasOwnProperty(attr)) {
         this.layers['' + attr].removeChildren();
@@ -989,7 +1006,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                     w = lineWidth - select.start + 1;
                   }
 
-                  if (segment.isBlockedBy !== 'asr') {
+                  if (segment.isBlockedBy !== ASRQueueItemType.ASR) {
                     if (segment.transcript === '') {
                       context.fillStyle = 'red';
                     } else if (!isNullOrUndefined(this.breakMarker) && segment.transcript === this.breakMarker.code) {

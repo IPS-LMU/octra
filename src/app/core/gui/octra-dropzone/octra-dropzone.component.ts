@@ -1,5 +1,4 @@
 import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {OAnnotJSON, OAudiofile, OLabel, OSegment} from '../../obj/Annotation';
 import {AppInfo} from '../../../app.info';
 import {Converter, IFile, ImportResult} from '../../obj/Converters';
 import {DropZoneComponent} from '../../component/drop-zone';
@@ -8,6 +7,7 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {ModalService} from '../../modals/modal.service';
 import {FileSize, Functions, isNullOrUndefined} from '../../shared/Functions';
 import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
+import {OAnnotJSON, OAudiofile, OLabel, OSegment} from '../../../media-components/obj/annotation';
 
 interface FileProgress {
   status: 'progress' | 'valid' | 'invalid';

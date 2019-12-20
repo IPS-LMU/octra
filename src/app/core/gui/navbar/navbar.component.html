@@ -135,26 +135,26 @@
             <tr>
               <td><span>{{'general.name' | transloco}}:</span></td>
               <td>
-                <span>{{navbarServ.originalInfo?.fullname}}</span>
+                <span>{{navbarServ.ressource?.info.fullname}}</span>
               </td>
             </tr>
             <tr>
               <td><span>{{'general.duration' | transloco}}:</span></td>
               <td>
-                                <span>{{navbarServ.originalInfo?.duration.unix | timespan2}}
+                                <span>{{navbarServ.ressource?.info.duration.unix | timespan2}}
                                   (H:m:s)</span>
               </td>
             </tr>
             <tr>
               <td><span>{{'general.sampleRate' | transloco}}:</span></td>
               <td>
-                <span>{{navbarServ.originalInfo?.sampleRate}}</span>
+                <span>{{navbarServ.ressource?.info.sampleRate}}</span>
               </td>
             </tr>
             <tr>
               <td><span>{{'general.bitspersecond' | transloco}}:</span></td>
               <td>
-                <span>{{navbarServ.originalInfo?.bitrate}} Bit/s</span>
+                <span>{{navbarServ.ressource?.info.bitrate}} Bit/s</span>
               </td>
             </tr>
             <tr>
@@ -346,7 +346,7 @@
         'col-12 col-sm-9': appStorage.prompttext !== null && appStorage.prompttext !== undefined && appStorage.prompttext !== '',
         'col-12': appStorage.prompttext !== null && appStorage.prompttext !== undefined && appStorage.prompttext === ''
         }" style="text-align: left;padding-left:20px;">
-      {{navbarServ.originalInfo?.fullname}}: <i>{{appStorage.servercomment}}</i>
+      {{navbarServ.ressource?.info.fullname}}: <i>{{appStorage.servercomment}}</i>
     </div>
     <div class="col-12 col-sm-3" style="text-align: right;padding-right:20px;"
          *ngIf="appStorage.prompttext !== null && appStorage.prompttext !== undefined && appStorage.prompttext !== ''">

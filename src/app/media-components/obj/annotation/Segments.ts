@@ -14,6 +14,7 @@ export class Segments {
 
   constructor(private sampleRate, segments: ISegment[], lastSampleUnit: SampleUnit) {
     this._segments = [];
+    console.log(`LAST SAMPLE is ${lastSampleUnit.seconds}`);
 
     if (segments !== null) {
       if (segments.length === 0) {

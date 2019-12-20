@@ -6,12 +6,12 @@ import {TranslocoService} from '@ngneat/transloco';
 import {AppInfo} from '../../../app.info';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {editorComponents} from '../../../editors/components';
-import {AnnotJSONType, Level, Segments} from '../../obj/Annotation';
 import {OCTRANIMATIONS} from '../../shared';
 import {BugReportService, ConsoleType} from '../../shared/service/bug-report.service';
 import {environment} from '../../../../environments/environment';
 import {ModalService} from '../../modals/modal.service';
 import {ExportFilesModalComponent} from '../../modals/export-files-modal/export-files-modal.component';
+import {Level, Segments, AnnotJSONType} from '../../../media-components/obj/annotation';
 
 @Component({
   selector: 'app-navigation',
@@ -161,7 +161,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
       const level = this.transcrServ.annotation.levels[tiernum];
       level.name = event.target.value.replace(' ', '_');
       this.appStorage.changeAnnotationLevel(tiernum,
-        level.getObj(this.transcrServ.audioManager.originalInfo.duration)
+        level.getObj(this.transcrServ.audioManager.ressource.info.duration)
       )
         .catch((err) => {
           console.error(`error on leaving level name`);
@@ -197,12 +197,9 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
     const newlevel = new Level(this.appStorage.levelcounter + 1, levelname, 'SEGMENT',
       new Segments(this.transcrServ.audioManager.ressource.info.sampleRate, [],
-        {
-          browser: this.transcrServ.audioManager.ressource.info.duration.samples,
-          original: this.transcrServ.audioManager.originalInfo.duration.samples
-        }, this.transcrServ.audioManager.originalInfo.sampleRate));
+        this.transcrServ.audioManager.ressource.info.duration));
     this.appStorage.addAnnotationLevel(
-      newlevel.getObj(this.transcrServ.audioManager.originalInfo.duration))
+      newlevel.getObj(this.transcrServ.audioManager.ressource.info.duration))
       .then(
         () => {
           // update value for annoation object in transc servcie
@@ -241,7 +238,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   onLevelDuplicateClick(tiernum: number, id: number) {
     const newlevel = this.transcrServ.annotation.levels[tiernum].clone();
     this.appStorage.addAnnotationLevel(
-      newlevel.getObj(this.transcrServ.audioManager.originalInfo.duration))
+      newlevel.getObj(this.transcrServ.audioManager.ressource.info.duration))
       .then(
         () => {
           // update value for annoation object in transc servcie

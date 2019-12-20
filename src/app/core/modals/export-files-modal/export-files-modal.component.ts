@@ -198,7 +198,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     }
 
     if (!this.preparing.preparing) {
-      const oannotjson = this.navbarServ.transcrService.annotation.getObj(this.transcrService.audioManager.originalInfo.duration);
+      const oannotjson = this.navbarServ.transcrService.annotation.getObj(this.transcrService.audioManager.ressource.info.duration);
       this.preparing = {
         name: converter.name,
         preparing: true

@@ -16,7 +16,6 @@ import {TranslocoService} from '@ngneat/transloco';
 
 import {BrowserInfo, KeyMapping, SubscriptionManager} from '../../shared';
 import {TranscriptionService} from '../../shared/service';
-import {Segments} from '../../obj/Annotation';
 import {Functions, isNullOrUndefined} from '../../shared/Functions';
 import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
 import {isNumeric} from 'rxjs/internal-compatibility';
@@ -24,6 +23,7 @@ import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../shared/service/a
 import {AudioChunk, AudioManager} from '../../../media-components/obj/audio/AudioManager';
 import {SampleUnit} from '../../../media-components/obj/audio';
 import {TimespanPipe} from '../../../media-components/pipe/timespan.pipe';
+import {Segments} from '../../../media-components/obj/annotation';
 
 declare let lang: any;
 declare let document: any;

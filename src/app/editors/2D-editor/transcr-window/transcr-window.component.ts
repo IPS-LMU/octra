@@ -22,16 +22,17 @@ import {
   TranscriptionService,
   UserInteractionsService
 } from '../../../core/shared/service';
-import {Segment, SubscriptionManager} from '../../../core/shared';
-import {Segments} from '../../../core/obj/Annotation';
+import {SubscriptionManager} from '../../../core/shared';
 import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
 import {AudioNavigationComponent} from '../../../media-components/components/audio/audio-navigation';
 import {isNullOrUndefined} from '../../../core/shared/Functions';
-import {ASRProcessStatus, ASRQueueItem, ASRQueueItemType, AsrService} from '../../../core/shared/service/asr.service';
+import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../../core/shared/service/asr.service';
 import {AudioChunk, AudioManager} from '../../../media-components/obj/audio/AudioManager';
 import {AudioRessource, AudioSelection, SampleUnit} from '../../../media-components/obj/audio';
 import {AudioViewerComponent} from '../../../media-components/components/audio/audio-viewer/audio-viewer.component';
 import {AudioviewerConfig} from '../../../media-components/components/audio/audio-viewer/audio-viewer.config';
+import {Segment, Segments} from '../../../media-components/obj/annotation';
+import {ASRQueueItemType} from '../../../media-components/obj/annotation/asr';
 
 @Component({
   selector: 'app-transcr-window',

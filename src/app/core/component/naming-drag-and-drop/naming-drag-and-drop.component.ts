@@ -10,11 +10,11 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import {Segment} from '../../obj/Annotation';
 import {isNullOrUndefined} from '../../shared/Functions';
 import {Subject} from 'rxjs';
 import {DragulaService} from 'ng2-dragula';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {Segment} from '../../../media-components/obj/annotation';
 
 @Component({
   selector: 'app-naming-drag-and-drop',

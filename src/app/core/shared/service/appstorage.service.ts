@@ -1,6 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {SessionFile} from '../../obj/SessionFile';
-import {OLevel, OLink} from '../../obj';
 import {AppInfo} from '../../../app.info';
 import {IndexedDBManager} from '../../obj/IndexedDBManager';
 import {LocalStorageService, SessionStorage, SessionStorageService} from '@rars/ngx-webstorage';
@@ -8,6 +7,7 @@ import {isNullOrUndefined} from '../Functions';
 import {Subject} from 'rxjs';
 import {IDataEntry} from '../../obj/data-entry';
 import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
+import {OLevel, OLink} from '../../../media-components/obj/annotation';
 
 export interface IIDBLevel {
   id: number;
@@ -519,7 +519,8 @@ export class AppStorageService {
         err('type not supported');
       }
     }
-  }
+  };
+
   public getSessionFile = (file: File) => {
     return new SessionFile(
       file.name,

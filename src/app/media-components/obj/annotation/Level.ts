@@ -54,6 +54,8 @@ export class Level {
     let events = [];
     let items = [];
 
+    console.log(`FROM OBJECT!`);
+    console.log(`${lastSample.seconds}`);
     if (entry.level.type === 'SEGMENT') {
       const segmentEntries: ISegment[] = entry.level.items as ISegment[];
       segments = new Segments(sampleRate, segmentEntries, lastSample);

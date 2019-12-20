@@ -16,12 +16,12 @@ import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
 import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../shared';
-import {Segment} from '../../obj/Annotation';
 import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
 import {isFunction, isNullOrUndefined} from '../../shared/Functions';
 import {TranscrEditorComponent} from '../../component/transcr-editor';
 import {AudioChunk} from '../../../media-components/obj/audio/AudioManager';
 import {AudioSelection, PlayBackStatus, SampleUnit} from '../../../media-components/obj/audio';
+import {Segment} from '../../../media-components/obj/annotation';
 
 declare var validateAnnotation: ((string, any) => any);
 
@@ -237,7 +237,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
       const segment = this.segments[i];
       const nextSegmentTime: SampleUnit = (i < this.segments.length - 1)
-        ? this.segments[i + 1].time : this.audio.audiomanagers[0].originalInfo.duration;
+        ? this.segments[i + 1].time : this.audio.audiomanagers[0].ressource.info.duration;
       const audiochunk = new AudioChunk(new AudioSelection(segment.time, nextSegmentTime), this.audio.audiomanagers[0]);
 
       this.audio.audiomanagers[0].addChunk(audiochunk);

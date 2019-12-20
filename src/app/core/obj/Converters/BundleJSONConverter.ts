@@ -1,6 +1,6 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {IAnnotJSON, OAnnotJSON, OAudiofile} from '../Annotation';
 import {Functions} from '../../shared/Functions';
+import {IAnnotJSON, OAnnotJSON, OAudiofile} from '../../../media-components/obj/annotation';
 
 export interface Bundle {
   ssffFiles: {

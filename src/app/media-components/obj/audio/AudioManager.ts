@@ -35,16 +35,12 @@ export class AudioManager {
     this._playposition = value.clone();
   }
 
-  get originalInfo(): AudioInfo {
-    return this._originalInfo;
-  }
-
   get state(): PlayBackStatus {
     return this._state;
   }
 
   public get sampleRate(): number {
-    return this._originalInfo.sampleRate;
+    return this.ressource.info.sampleRate;
   }
 
   // timestamp when playing should teminate
@@ -103,7 +99,6 @@ export class AudioManager {
    */
   constructor(audioinfo: AudioInfo, sampleRate: number) {
     this._id = ++AudioManager.counter;
-    this._originalInfo = audioinfo;
     this._audio = new Audio();
     this._audio.autoplay = false;
     this._audio.defaultPlaybackRate = 1;
@@ -143,7 +138,6 @@ export class AudioManager {
   private subscrManager = new SubscriptionManager();
   private _id: number;
   private _ressource: AudioRessource;
-  private _originalInfo: AudioInfo;
   private _state: PlayBackStatus;
   private _mainchunk: AudioChunk;
   private _playposition: SampleUnit;

@@ -1,5 +1,4 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {Annotation, Level, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment, Segments} from '../../obj/Annotation';
 import {Functions, isNullOrUndefined} from '../Functions';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
@@ -17,6 +16,7 @@ import {UserInteractionsService} from './userInteractions.service';
 import {SettingsService} from './settings.service';
 import {AppInfo} from '../../../app.info';
 import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
+import {Annotation, Level, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment, Segments} from '../../../media-components/obj/annotation';
 
 declare var validateAnnotation: ((string, any) => any);
 
@@ -166,7 +166,7 @@ export class TranscriptionService {
       && !isNullOrUndefined(this._annotation.levels[this._selectedlevel])) {
       this.appStorage.save('annotation', {
         num: this._selectedlevel,
-        level: this._annotation.levels[this._selectedlevel].getObj(this.audioManager.originalInfo.duration)
+        level: this._annotation.levels[this._selectedlevel].getObj(this.audioManager.ressource.info.duration)
       });
     } else {
       console.error(new Error('can not save segments because annotation is null'));
@@ -241,21 +241,21 @@ export class TranscriptionService {
       this.filename = this._audiomanager.ressource.name;
 
       this._audiofile = new OAudiofile();
-      this._audiofile.name = this._audiomanager.originalInfo.fullname;
-      this._audiofile.sampleRate = this._audiomanager.originalInfo.sampleRate;
-      this._audiofile.duration = this._audiomanager.originalInfo.duration.samples;
-      this._audiofile.size = this._audiomanager.originalInfo.size;
+      this._audiofile.name = this._audiomanager.ressource.info.fullname;
+      this._audiofile.sampleRate = this._audiomanager.ressource.info.sampleRate;
+      this._audiofile.duration = this._audiomanager.ressource.info.duration.samples;
+      this._audiofile.size = this._audiomanager.ressource.info.size;
       this._audiofile.url = (this.appStorage.usemode === 'online')
         ? `${this.app_settings.audio_server.url}${this.appStorage.audioURL}` : '';
 
       this._audiofile.url = (this.appStorage.usemode === 'demo')
         ? `${this.appStorage.audioURL}` : this._audiofile.url;
-      this._audiofile.type = this._audiomanager.originalInfo.type;
+      this._audiofile.type = this._audiomanager.ressource.info.type;
 
       this.loadSegments().then(
         () => {
           this.selectedlevel = 0;
-          this.navbarServ.originalInfo = this._audiomanager.originalInfo;
+          this.navbarServ.ressource = this._audiomanager.ressource;
           this.navbarServ.filesize = Functions.getFileSize(this._audiomanager.ressource.size);
 
           resolve();
@@ -271,7 +271,7 @@ export class TranscriptionService {
 
     if (!(this.annotation === null || this.annotation === undefined)) {
       result = converter.export(
-        this.annotation.getObj(this.audioManager.originalInfo.duration),
+        this.annotation.getObj(this.audioManager.ressource.info.duration),
         this.audiofile, 0
       ).file;
 
@@ -303,7 +303,7 @@ export class TranscriptionService {
                     // check if servertranscript's segment is empty
                     if (this.appStorage.serverDataEntry.transcript.length === 1 && this.appStorage.serverDataEntry[0].text === '') {
                       this.appStorage.annotation[this.selectedlevel].level.items.push(
-                        new OSegment(0, 0, this.audioManager.originalInfo.duration.samples,
+                        new OSegment(0, 0, this.audioManager.ressource.info.duration.samples,
                           [new OLabel('OCTRA_1', this.appStorage.prompttext)])
                       );
 
@@ -369,7 +369,7 @@ export class TranscriptionService {
 
                     if (converted === undefined) {
                       this.appStorage.annotation[this.selectedlevel].level.items.push(
-                        new OSegment(0, 0, this.audioManager.originalInfo.duration.samples,
+                        new OSegment(0, 0, this.audioManager.ressource.info.duration.samples,
                           [new OLabel('OCTRA_1', this.appStorage.prompttext)])
                       );
 
@@ -424,14 +424,10 @@ export class TranscriptionService {
 
           if (!(this.appStorage.annotation === null || this.appStorage.annotation === undefined)) {
             // load levels
+            console.log(this.appStorage.annotation);
             for (let i = 0; i < this.appStorage.annotation.length; i++) {
               const level: Level = Level.fromObj(this.appStorage.annotation[i],
-                this._audiomanager.sampleRate,
-                {
-                  browser: this._audiomanager.ressource.info.duration.samples,
-                  original: this._audiomanager.originalInfo.duration.samples
-                },
-                this.audioManager.sampleRate);
+                this._audiomanager.sampleRate, this._audiomanager.ressource.info.duration);
               this._annotation.levels.push(level);
             }
 
@@ -516,7 +512,7 @@ export class TranscriptionService {
         };
 
         if (i === this.currentlevel.segments.length - 1) {
-          segmentJSON.length = this._audiomanager.originalInfo.duration.samples - lastBound;
+          segmentJSON.length = this._audiomanager.ressource.info.duration.samples - lastBound;
         }
 
         transcript.push(segmentJSON);
@@ -855,7 +851,7 @@ export class TranscriptionService {
 
   public createNewAnnotation(): OAnnotJSON {
     const level: OLevel = new OLevel('OCTRA_1', 'SEGMENT', []);
-    level.items.push(new OSegment(1, 0, this._audiomanager.originalInfo.duration.samples, [(new OLabel('OCTRA_1', ''))]));
+    level.items.push(new OSegment(1, 0, this._audiomanager.ressource.info.duration.samples, [(new OLabel('OCTRA_1', ''))]));
     const levels: OLevel[] = [];
     levels.push(level);
 

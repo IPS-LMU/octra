@@ -2,7 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component,
+  Component, ElementRef,
   EventEmitter,
   OnDestroy,
   OnInit,
@@ -20,7 +20,7 @@ import {
   UserInteractionsService
 } from '../../core/shared/service';
 
-import {PraatTextgridConverter, Segment} from '../../core/shared';
+import {PraatTextgridConverter} from '../../core/shared';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
 import {TranscrWindowComponent} from './transcr-window';
 import {Subscription} from 'rxjs';
@@ -28,18 +28,18 @@ import {TranscrEditorComponent} from '../../core/component';
 import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
 import {Functions, isNullOrUndefined} from '../../core/shared/Functions';
 import {OCTRAEditor} from '../octra-editor';
-import {ASRProcessStatus, ASRQueueItem, ASRQueueItemType, AsrService} from '../../core/shared/service/asr.service';
+import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../core/shared/service/asr.service';
 import {TranslocoService} from '@ngneat/transloco';
-import {OAudiofile, OSegment} from '../../core/obj/Annotation';
 import {AudioViewerComponent} from '../../media-components/components/audio/audio-viewer/audio-viewer.component';
 import {AudioChunk, AudioManager} from '../../media-components/obj/audio/AudioManager';
 import {AudioSelection, PlayBackStatus, SampleUnit} from '../../media-components/obj/audio';
+import {OAudiofile, OSegment, Segment} from '../../media-components/obj/annotation';
+import {ASRQueueItemType} from '../../media-components/obj/annotation/asr';
 
 @Component({
   selector: 'app-overlay-gui',
   templateUrl: './2D-editor.component.html',
-  styleUrls: ['./2D-editor.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./2D-editor.component.css']
 })
 export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy {
   public static editorname = '2D-Editor';
@@ -47,6 +47,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
 
   @ViewChild('viewer', {static: true}) viewer: AudioViewerComponent;
+  @ViewChild('viewer', {static: true}) viewer2: ElementRef;
   @ViewChild('window', {static: false}) window: TranscrWindowComponent;
   @ViewChild('loupe', {static: false}) loupe: AudioViewerComponent;
   @ViewChild('audionav', {static: true}) audionav: AudioNavigationComponent;
@@ -240,9 +241,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         if (item.status !== ASRProcessStatus.IDLE) {
           // TODO important change to original sample!
           const segmentBoundary = new SampleUnit(item.time.browserSampleEnd, this.audioManager.sampleRate);
-          const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
-            segmentBoundary, true
-          );
+          const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentBoundary);
           if (segNumber > -1) {
             if (item.status !== ASRProcessStatus.STARTED) {
               console.log(`change segnumber ${segNumber}, ${segmentBoundary.samples}`);
@@ -304,14 +303,14 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                       for (const wordItem of wordsTier.items) {
                         if (wordItem.sampleStart + wordItem.sampleDur <= item.time.sampleStart + item.time.sampleLength) {
                           const readSegment = Segment.fromObj(new OSegment(1, wordItem.sampleStart, wordItem.sampleDur, wordItem.labels),
-                            this.audioManager.sampleRate, this.audioManager.sampleRate);
+                            this.audioManager.sampleRate);
                           if (readSegment.transcript === '<p:>' || readSegment.transcript === '') {
                             readSegment.transcript = this.transcrService.breakMarker.code;
                           }
 
                           // TODO important check this code with old browser sample values!
                           let origTime = new SampleUnit(item.time.sampleStart + readSegment.time.samples, this.audioManager.sampleRate);
-                          const segmentExists = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(origTime, true);
+                          const segmentExists = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(origTime);
                           if (segmentExists > -1) {
                             this.transcrService.currentlevel.segments.segments[segmentExists].transcript = readSegment.transcript;
                           } else {
@@ -384,6 +383,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       () => {
       }, () => {
       }, () => {
+        console.log(`INITIALIZED!`);
         TwoDEditorComponent.initialized.emit();
       });
     // this.viewer.onSecondsPerLineUpdated(this.appStorage.secondsPerLine);

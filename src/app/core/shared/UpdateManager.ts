@@ -1,9 +1,9 @@
 import {AppInfo} from '../../app.info';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../obj/Annotation';
 import {IndexedDBManager} from '../obj/IndexedDBManager';
 import {SubscriptionManager} from '../obj/SubscriptionManager';
 import {AppStorageService, OIDBLevel} from './service/appstorage.service';
 import {isNullOrUndefined} from './Functions';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../../media-components/obj/annotation';
 
 export class UpdateManager {
   private version = '';

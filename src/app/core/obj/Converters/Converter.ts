@@ -1,4 +1,4 @@
-import {OAnnotJSON, OAudiofile} from '../Annotation';
+import {OAnnotJSON, OAudiofile} from '../../../media-components/obj/annotation';
 
 export interface IFile {
   name: string;

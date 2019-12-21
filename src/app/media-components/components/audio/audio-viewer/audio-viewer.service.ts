@@ -471,7 +471,7 @@ export class AudioViewerService {
 
     return {
       x: this.settings.margin.left - this.settings.playcursor.width / 2 + absX - lineNum * this._innerWidth,
-      y: lineNum * (this._settings.lineheight + this.settings.margin.top) + this.settings.margin.top
+      y: lineNum * (this._settings.lineheight + this.settings.margin.top)
     };
   }
 

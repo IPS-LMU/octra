@@ -6,6 +6,7 @@
                    *ngIf="(appStorage.usemode === 'demo' || appStorage.usemode === 'local')
                    && settingsService.isASREnabled"></app-asr-options>
   <octra-audio-navigation #audionav
+                          [audioChunk]="audiochunk"
                           (buttonClick)="onButtonClick($event)"
                           (keyup)="onKeyUp()"
                           (afterVolumeChange)="afterVolumeChange($event)"
@@ -41,6 +42,7 @@
 
   ></octra-audio-navigation>
   <octra-audio-viewer #loupe id="loupe"
+                      [transcriptionLevel]="transcrService.currentlevel"
                       (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
                       [audioChunk]="audiochunk"
   ></octra-audio-viewer>

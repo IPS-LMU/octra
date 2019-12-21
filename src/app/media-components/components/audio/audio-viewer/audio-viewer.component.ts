@@ -51,12 +51,20 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   @Input()
   public set height(value: number) {
     if (!isNullOrUndefined(this.stage)) {
-      console.log(`update stage`);
+      console.log(`update stage ${value}`);
       this.stage.height(value);
+      this.initializeView();
     }
   }
 
   @Input() breakMarker: any;
+
+  @Input()
+  public set isMultiLine(value: boolean) {
+    console.log(`is multiline ${value}`);
+    this.settings.multiLine = value;
+    this.init();
+  }
 
   @Output() shortcuttriggered = new EventEmitter<any>();
   @Output() alerttriggered = new EventEmitter<{ type: string, message: string }>();
@@ -200,7 +208,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   ngAfterViewInit(): void {
-    console.log(`INIT VIEWER! ${this.height}`);
+    this.init();
+  }
+
+  private init() {
     this.widthOnInit = this.width;
     this.styles.height = this.height;
     this.settings.lineheight = 70;
@@ -210,22 +221,16 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     this.settings.justifySignalHeight = true;
     this.settings.roundValues = false;
     this.settings.scrollbar.enabled = true;
-    this.settings.multiLine = true;
     this.settings.showTimePerLine = true;
     this.settings.showTranscripts = true;
 
     if (!this.settings.multiLine) {
-      this.settings.margin.top = 10;
-      this.settings.margin.left = 10;
-      this.settings.margin.right = 10;
-      this.settings.margin.bottom = 10;
       this.settings.lineheight = this.height - this.settings.margin.top - this.settings.margin.bottom;
       this.settings.scrollbar.enabled = false;
       this.settings.showTranscripts = false;
       this.settings.showTimePerLine = false;
       this.settings.boundaries.readonly = true;
       this.settings.selection.enabled = false;
-      this.settings.cropping = 'circle';
     }
     this.stage = new Konva.Stage({
       container: this.konvaContainer.nativeElement,   // id of container <div>,
@@ -402,7 +407,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       let lineWidth = this.av.innerWidth;
       const numOfLines = Math.ceil(this.av.AudioPxWidth / lineWidth);
 
-      let y = this.settings.margin.top;
+      let y = 0;
       for (let i = 0; i < numOfLines - 1; i++) {
         const line = this.createLine(new Size(lineWidth, this.settings.lineheight), new Position(this.settings.margin.left, y), i);
         this.layers.background.add(line);
@@ -420,7 +425,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     } else {
       const line = this.createLine(
         new Size(this.av.innerWidth, this.settings.lineheight),
-        new Position(this.settings.margin.left, this.settings.margin.top), 0);
+        new Position(this.settings.margin.left, 0), 0);
       this.layers.background.add(line);
       this.canvasElements.lastLine = line;
     }
@@ -543,7 +548,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       let newY = Math.max(0,
         Math.min(this.canvasElements.scrollBar.height(), this.canvasElements.scrollbarSelector.y() + (event.evt.deltaY / 2)));
       newY = Math.max(Math.min(
-        newY, this.height - this.settings.margin.bottom - this.canvasElements.scrollbarSelector.height()
+        newY, this.height - this.canvasElements.scrollbarSelector.height()
       ), 0);
       this.canvasElements.scrollbarSelector.y(newY);
       this.onScrollbarDragged();
@@ -609,7 +614,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
               // --- get the appropriate context
               context.beginPath();
 
-              // set horicontal lines
+              // set horizontal lines
               for (let y = Math.round(vZoom / 2); y < this.settings.lineheight - timeLineHeight; y = y + vZoom) {
                 context.moveTo(position.x, y + position.y);
                 context.lineTo(position.x + shape.width() - (this.settings.margin.left + this.settings.margin.right), y + position.y);
@@ -891,7 +896,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   private createSegmentsForCanvas(startSegment: number = -1, endSegment: number = -1) {
     let drawnSegments = 0;
     let drawnBoundaries = 0;
-    let y = this.settings.margin.top;
+    let y = 0;
     const maxLineWidth = this.av.innerWidth;
     let numOfLines = Math.ceil(this.av.AudioPxWidth / maxLineWidth);
     if (!this.settings.multiLine) {
@@ -972,9 +977,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
             height: segmentHeight,
             transformsEnabled: 'position',
             sceneFunc: (context: any, shape) => {
-              const absY = lineNum1 * (this.settings.lineheight + this.settings.margin.top) + this.settings.margin.top;
+              const absY = lineNum1 * (this.settings.lineheight + this.settings.margin.top);
               for (let j = lineNum1; j <= lineNum2; j++) {
-                const localY = j * (this.settings.lineheight + this.settings.margin.top) + this.settings.margin.top;
+                const localY = j * (this.settings.lineheight + this.settings.margin.top);
 
                 if (absY + segmentHeight >= Math.abs(this.layers.background.y())
                   && absY <= Math.abs(this.layers.background.y()) + this.stage.height()) {
@@ -1037,9 +1042,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
               height: segmentHeight,
               transformsEnabled: 'position',
               sceneFunc: (context: any, shape) => {
-                const absY = lineNum1 * (this.settings.lineheight + this.settings.margin.top) + this.settings.margin.top;
+                const absY = lineNum1 * (this.settings.lineheight + this.settings.margin.top);
                 for (let j = lineNum1; j <= lineNum2; j++) {
-                  const localY = j * (this.settings.lineheight + this.settings.margin.top) + this.settings.margin.top;
+                  const localY = j * (this.settings.lineheight + this.settings.margin.top);
 
                   if (absY + segmentHeight >= Math.abs(this.layers.background.y())
                     && absY <= Math.abs(this.layers.background.y()) + this.stage.height()) {
@@ -1097,7 +1102,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
           root.add(overlayGroup);
         }
 
-        y = lineNum2 * (this.settings.lineheight + this.settings.margin.top) + this.settings.margin.top;
+        y = lineNum2 * (this.settings.lineheight + this.settings.margin.top);
 
         // draw boundary
         if (segment.time.samples !== this.audioManager.ressource.info.duration.samples
@@ -1174,7 +1179,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
           sceneFunc: (context: any, shape) => {
             for (let j = 0; j < numOfLines; j++) {
               // draw time label
-              y = j * (this.settings.lineheight + this.settings.margin.top) + this.settings.margin.top;
+              y = j * (this.settings.lineheight + this.settings.margin.top);
 
               if (y + this.settings.lineheight >= Math.abs(this.layers.background.y())
                 && y <= Math.abs(this.layers.background.y()) + this.stage.height()) {
@@ -1255,7 +1260,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       dragBoundFunc: (pos) => {
         pos.x = this.av.innerWidth - ((rest > 0) ? rest / 2 : 0);
         pos.y = Math.max(Math.min(
-          pos.y, this.height - this.settings.margin.bottom - selector.height()
+          pos.y, this.height - selector.height()
         ), 0);
         return pos;
       }
@@ -1292,7 +1297,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       const selections = this.stage.find('.selection');
 
       if (selections.length > lineNum && selections.length > 0) {
-        const y = lineNum * (this.settings.lineheight + this.settings.margin.top) + this.settings.margin.top;
+        const y = lineNum * (this.settings.lineheight + this.settings.margin.top);
         if (lineNum > -1 && select) {
           const left = select.start;
           const right = select.end;
@@ -1401,7 +1406,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
       this.canvasElements.mouseCaret.position({
         x: event.evt.layerX,
-        y: this.hoveredLine * (this.settings.lineheight + this.settings.margin.top) + this.settings.margin.top
+        y: this.hoveredLine * (this.settings.lineheight + this.settings.margin.top)
       });
       this.layers.playhead.batchDraw();
 
@@ -1722,7 +1727,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     const absX = this.av.audioTCalculator.samplestoAbsX(newValue);
     const lines = Math.floor(absX / this.av.innerWidth);
     const x = absX % this.av.innerWidth;
-    const y = lines * (this.settings.lineheight + this.settings.margin.top) + this.settings.margin.top;
+    const y = lines * (this.settings.lineheight + this.settings.margin.top);
 
     this.canvasElements.mouseCaret.position({
       x,
@@ -1786,11 +1791,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   private drawTextLabel(context: Context, text: string, lineNum1: number, lineNum2: number, segmentEnd: SampleUnit, beginTime: SampleUnit,
                         lastI: number, segmentHeight: number, numOfLines: number, absX: number, segments: Segment[], i: number): number {
     if (text !== '') {
-      const y = lineNum1 * (this.settings.lineheight + this.settings.margin.top) + this.settings.margin.top;
+      const y = lineNum1 * (this.settings.lineheight + this.settings.margin.top);
       for (let j = lineNum1; j <= lineNum2; j++) {
-        const localY = (j + 1) * (this.settings.lineheight + this.settings.margin.top) + this.settings.margin.top;
+        const localY = (j + 1) * (this.settings.lineheight + this.settings.margin.top);
 
-        if (y + segmentHeight + this.settings.margin.top >= Math.abs(this.layers.background.y())
+        if (y + segmentHeight >= Math.abs(this.layers.background.y())
           && y <= Math.abs(this.layers.background.y()) + this.stage.height()) {
 
           const h = this.settings.lineheight;

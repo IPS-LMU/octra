@@ -5,6 +5,7 @@
                       [segmentIndex]="selectedIndex"
   ></app-transcr-window>
   <octra-audio-navigation #audionav
+                          [audioChunk]="audioChunkLines"
                           (buttonClick)="onButtonClick($event)"
                           (afterVolumeChange)="afterVolumeChange($event)"
                           (afterPlaybackRateChange)="afterSpeedChange($event)"
@@ -49,21 +50,26 @@
         'visibility': (loupeHidden) ? 'hidden' : 'inherit',
         'flex': 'auto',
         'flex-direction': 'column'}"
-                        [audioChunk]="audioChunkLoupe"></octra-audio-viewer>
+                        [audioChunk]="audioChunkLoupe"
+                        [isMultiLine]="true"
+    ></octra-audio-viewer>
   </div>
-  <octra-audio-viewer #viewer id="special"
-                      (segmententer)="onSegmentEntered($event)"
-                      (mousecursorchange)="onMouseOver($event);"
-                      (mousemove)="changePosition($event.layerX, $event.layerY)"
-                      (mouseleave)="loupeHidden = true;"
-                      (shortcuttriggered)="onShortCutTriggered($event, 'mult-lines-viewer')"
-                      [audioChunk]="audioChunkLines"
-                      [breakMarker]="{
+  <div id="lines-wrapper" #linesView>
+    <octra-audio-viewer #viewer id="special"
+                        (segmententer)="onSegmentEntered($event)"
+                        (mousecursorchange)="onMouseOver($event);"
+                        (mousemove)="changePosition($event.layerX, $event.layerY)"
+                        (mouseleave)="loupeHidden = true;"
+                        (shortcuttriggered)="onShortCutTriggered($event, 'multi-lines-viewer')"
+                        [audioChunk]="audioChunkLines"
+                        [breakMarker]="{
                         code: '<P>'
                       }"
-                      style="height:400px; display: flex; flex: auto; flex-direction: column;"
+                        style="height:400px; display: flex; flex: auto; flex-direction: column;"
 
-                      [transcriptionLevel]="transcrService.currentlevel"
-  >
-  </octra-audio-viewer>
+                        [height]="linesViewHeight"
+                        [transcriptionLevel]="transcrService.currentlevel"
+    >
+    </octra-audio-viewer>
+  </div>
 </div>

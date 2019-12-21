@@ -1,9 +1,10 @@
 import {
   AfterViewInit,
-  ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component, ElementRef,
+  Component,
+  ElementRef,
   EventEmitter,
+  HostListener,
   OnDestroy,
   OnInit,
   Output,
@@ -47,7 +48,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
 
   @ViewChild('viewer', {static: true}) viewer: AudioViewerComponent;
-  @ViewChild('viewer', {static: true}) viewer2: ElementRef;
+  @ViewChild('linesView', {static: true}) linesView: ElementRef;
   @ViewChild('window', {static: false}) window: TranscrWindowComponent;
   @ViewChild('loupe', {static: false}) loupe: AudioViewerComponent;
   @ViewChild('audionav', {static: true}) audionav: AudioNavigationComponent;
@@ -106,6 +107,13 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     return this.settingsService.projectsettings;
   }
 
+  public get linesViewHeight(): number {
+    if (!isNullOrUndefined(this.linesView) && !isNullOrUndefined(this.linesView.nativeElement)) {
+      return this.linesView.nativeElement.clientHeight;
+    }
+    return 0;
+  }
+
   constructor(public transcrService: TranscriptionService,
               public keyMap: KeymappingService,
               public audio: AudioService,
@@ -122,6 +130,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   ngOnInit() {
+    console.log(`2D-EDITOR INIT!`);
     this.audioManager = this.audio.audiomanagers[0];
     this.audioChunkLines = this.audioManager.mainchunk.clone();
     this.audioChunkLoupe = this.audioManager.mainchunk.clone();
@@ -157,7 +166,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
     this.viewer.settings.multiLine = true;
     this.viewer.settings.lineheight = 70;
-    this.viewer.settings.margin.bottom = 5;
+    this.viewer.settings.margin.bottom = 0;
     this.viewer.settings.margin.right = 0;
     this.viewer.settings.justifySignalHeight = true;
     this.viewer.settings.scrollbar.enabled = true;
@@ -169,6 +178,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.viewer.settings.asr.enabled = (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo' || this.appStorage.usemode === 'local')
       && this.settingsService.isASREnabled;
     this.viewer.name = 'multiline viewer';
+    this.viewer.height = this.linesViewHeight;
 
     this.viewer.secondsPerLine = this.appStorage.secondsPerLine;
 
@@ -384,6 +394,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       }, () => {
       }, () => {
         console.log(`INITIALIZED!`);
+        this.viewer.height = this.linesViewHeight;
         TwoDEditorComponent.initialized.emit();
       });
     // this.viewer.onSecondsPerLineUpdated(this.appStorage.secondsPerLine);
@@ -725,5 +736,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       }
     }
     this.cd.detectChanges();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize($event) {
+    this.viewer.height = this.linesViewHeight;
   }
 }

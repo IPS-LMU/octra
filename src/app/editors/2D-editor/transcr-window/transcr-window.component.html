@@ -45,6 +45,7 @@
                       [transcriptionLevel]="transcrService.currentlevel"
                       (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
                       [audioChunk]="audiochunk"
+                      [isMultiLine]="false"
   ></octra-audio-viewer>
   <app-transcr-editor #editor id="trancr"
                       (markerInsert)="onMarkerInsert($event)"

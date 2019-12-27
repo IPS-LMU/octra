@@ -39,6 +39,6 @@ export class PlayCursor {
       ? chunk.time.end.sub(chunk.time.start) : null;
 
     const chunkS = ((chunk) ? (chunk.time.start.clone()) : new SampleUnit(0, sample.sampleRate));
-    this._absX = audioTCalculator.samplestoAbsX(sample.sub(chunkS), duration);
+    this._absX = audioTCalculator.samplestoAbsX(sample, duration);
   }
 }

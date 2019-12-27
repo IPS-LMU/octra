@@ -214,24 +214,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   private init() {
     this.widthOnInit = this.width;
     this.styles.height = this.height;
-    this.settings.lineheight = 70;
-    this.settings.margin.left = 0;
-    this.settings.margin.top = 5;
-    this.settings.margin.right = 0;
-    this.settings.justifySignalHeight = true;
-    this.settings.roundValues = false;
-    this.settings.scrollbar.enabled = true;
-    this.settings.showTimePerLine = true;
-    this.settings.showTranscripts = true;
 
     if (!this.settings.multiLine) {
       this.settings.lineheight = this.height - this.settings.margin.top - this.settings.margin.bottom;
-      this.settings.scrollbar.enabled = false;
-      this.settings.showTranscripts = false;
-      this.settings.showTimePerLine = false;
-      this.settings.boundaries.readonly = true;
-      this.settings.selection.enabled = false;
     }
+
     this.stage = new Konva.Stage({
       container: this.konvaContainer.nativeElement,   // id of container <div>,
       width: this.width,

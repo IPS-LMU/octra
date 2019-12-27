@@ -166,7 +166,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
     this.viewer.settings.multiLine = true;
     this.viewer.settings.lineheight = 70;
-    this.viewer.settings.margin.bottom = 0;
+    this.viewer.settings.margin.top = 5;
     this.viewer.settings.margin.right = 0;
     this.viewer.settings.justifySignalHeight = true;
     this.viewer.settings.scrollbar.enabled = true;

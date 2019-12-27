@@ -30,7 +30,6 @@ import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../../core/shared/s
 import {AudioChunk, AudioManager} from '../../../media-components/obj/audio/AudioManager';
 import {AudioRessource, AudioSelection, SampleUnit} from '../../../media-components/obj/audio';
 import {AudioViewerComponent} from '../../../media-components/components/audio/audio-viewer/audio-viewer.component';
-import {AudioviewerConfig} from '../../../media-components/components/audio/audio-viewer/audio-viewer.config';
 import {Segment, Segments} from '../../../media-components/obj/annotation';
 import {ASRQueueItemType} from '../../../media-components/obj/annotation/asr';
 
@@ -161,8 +160,12 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       if (direction !== 'down') {
         this.goToSegment(direction);
         setTimeout(() => {
+          this.cd.markForCheck();
+          this.cd.detectChanges();
           this.audiochunk.startPlayback();
-        }, 500);
+          this.cd.markForCheck();
+          this.cd.detectChanges();
+        }, 2000);
       } else {
         this.close();
       }
@@ -204,8 +207,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.loupe.settings.margin.bottom = 0;
     this.loupe.settings.justifySignalHeight = true;
     this.loupe.settings.boundaries.enabled = false;
-    this.loupe.settings.boundaries.readonly = true;
-    this.loupe.settings.selection.enabled = false;
+    this.loupe.settings.boundaries.readonly = false;
+    this.loupe.settings.selection.enabled = true;
     this.loupe.settings.shortcuts.set_break = null;
     this.loupe.settings.frame.color = '#222222';
     this.loupe.settings.roundValues = false;
@@ -434,7 +437,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
       if (!(segment === null || segment === undefined)) {
         this.editor.rawText = this.transcrService.currentlevel.segments.get(this.segmentIndex).transcript;
-        this.audiochunk = new AudioChunk(new AudioSelection(begin, segment.time.clone()), this.audiochunk.audioManager);
+        this.audiochunk = this.audioManager.createNewAudioChunk(new AudioSelection(begin, segment.time.clone()));
       }
       this.cd.markForCheck();
       this.cd.detectChanges();

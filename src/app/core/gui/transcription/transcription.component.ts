@@ -362,13 +362,11 @@ export class TranscriptionComponent implements OnInit,
     this.navbarServ.showExport = this.settingsService.projectsettings.navigation.export;
 
     if (!(this.transcrService.annotation === null || this.transcrService.annotation === undefined)) {
-      console.log(`subscribe for id ${this.appStorage.dataID}`);
       this.levelSubscriptionID = this.subscrmanager.add(
         this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
       );
     } else {
       this.subscrmanager.add(this.transcrService.dataloaded.subscribe(() => {
-        console.log(`subscribe2 for id ${this.appStorage.dataID}`);
         this.levelSubscriptionID = this.subscrmanager.add(
           this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
         );
@@ -908,7 +906,6 @@ export class TranscriptionComponent implements OnInit,
 
   private unsubscribeSubscriptionsForThisAnnotation() {
     if (this.levelSubscriptionID > 0) {
-      console.log(`unsubscribe!`);
       this.subscrmanager.remove(this.levelSubscriptionID);
       this.levelSubscriptionID = 0;
     }

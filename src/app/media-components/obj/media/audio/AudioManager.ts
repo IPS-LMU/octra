@@ -472,8 +472,6 @@ export class AudioManager {
         sampleRate: audiobuffer.sampleRate
       };
 
-      console.log(`channel has length of ${this._channelData.data.byteLength} bytes and ${this._channelData.data.length} values`);
-      console.log(audiobuffer.length);
       this.minimizeChannelArray();
     }
 

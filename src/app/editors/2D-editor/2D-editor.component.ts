@@ -248,8 +248,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           );
           if (segNumber > -1) {
             if (item.status !== ASRProcessStatus.STARTED) {
-              console.log(`change segnumber ${segNumber}, ${segmentBoundary.value}`);
-              console.log(`${item.status}`);
               const segment = this.transcrService.currentlevel.segments.get(segNumber).clone();
               segment.isBlockedBy = null;
 
@@ -303,7 +301,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                     });
 
                     if (!isNullOrUndefined(wordsTier)) {
-                      console.log(wordsTier);
                       for (const wordItem of wordsTier.items) {
                         if (wordItem.sampleStart + wordItem.sampleDur <= item.time.sampleStart + item.time.sampleLength) {
                           const readSegment = Segment.fromObj(new OSegment(1, wordItem.sampleStart, wordItem.sampleDur, wordItem.labels),
@@ -542,7 +539,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       }
     }
 
-    console.log($event);
     if (
       $event.value === null || !(
         // cursor move by keyboard events are note saved because this would be too much

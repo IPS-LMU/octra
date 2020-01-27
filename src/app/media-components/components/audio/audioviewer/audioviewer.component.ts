@@ -539,7 +539,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                   if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this.av.focused) {
                     if (this.transcr.currentlevel.segments.length > 0) {
 
-                      console.log(`removed boundaries!`);
                       this.shortcuttriggered.emit({
                         shortcut: comboKey,
                         value: 'remove_interval',

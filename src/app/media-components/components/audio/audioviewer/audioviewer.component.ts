@@ -23,7 +23,7 @@ import {AVMousePos, CanvasAnimation, Line, PlayCursor} from '../../../obj';
 import {SubscriptionManager} from '../../../../core/obj/SubscriptionManager';
 import {KeymappingService, TranscriptionService} from '../../../../core/shared/service';
 import {BrowserInfo, Logger, Segment} from '../../../../core/shared';
-import {Timespan2Pipe} from '../../../pipe/timespan2.pipe';
+import {TimespanPipe} from '../../../pipe/timespan.pipe';
 import {isNullOrUndefined} from '../../../../core/shared/Functions';
 import {Subject} from 'rxjs';
 import {AudioChunk, AudioManager} from '../../../obj/media/audio/AudioManager';
@@ -1476,12 +1476,12 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
             // start time
             this.tContext.font = '10px Arial';
             this.tContext.fillStyle = 'black';
-            const pipe = new Timespan2Pipe();
-            this.tContext.fillText(pipe.transform(startSecond * 1000), line.Pos.x + 22, line.Pos.y + 10 - this.av.viewRect.position.y);
+            const pipe = new TimespanPipe();
+            this.tContext.fillText(pipe.transform(startSecond * 1000, [true, false, false]), line.Pos.x + 22, line.Pos.y + 10 - this.av.viewRect.position.y);
 
             // end time
-            const length = this.tContext.measureText(pipe.transform(endSecond * 1000)).width;
-            this.tContext.fillText(pipe.transform(endSecond * 1000), line.Pos.x + line.Size.width - length + 15,
+            const length = this.tContext.measureText(pipe.transform(endSecond * 1000, [true, false, false])).width;
+            this.tContext.fillText(pipe.transform(endSecond * 1000, [true, false, false]), line.Pos.x + line.Size.width - length + 15,
               line.Pos.y + 10 - this.av.viewRect.position.y);
 
 

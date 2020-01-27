@@ -1,4 +1,5 @@
 import {Pipe, PipeTransform} from '@angular/core';
+import {isNullOrUndefined} from '../../core/shared/Functions';
 
 @Pipe({
   name: 'timespan',
@@ -16,7 +17,7 @@ export class TimespanPipe implements PipeTransform {
   }
 
   private get MiliSeconds(): number {
-    return (this.timespan % 1000);
+    return Math.floor(this.timespan % 1000);
   }
 
   private get Seconds(): number {
@@ -24,21 +25,32 @@ export class TimespanPipe implements PipeTransform {
   }
 
   private get Minutes(): number {
-    return Math.floor(this.timespan / 1000 / 60);
+    return Math.floor(this.timespan / 1000 / 60) % 60;
   }
 
-  transform(value: any, args?: any): any {
+  private get Hours(): number {
+    return Math.floor(this.timespan / 1000 / 60 / 60);
+  }
+
+  transform(value: any, args?: [boolean, boolean, boolean]): any {
     this.timespan = Number(value);
     if (this.timespan < 0) {
       this.timespan = 0;
     }
 
     let result = '';
+
+    const options = (isNullOrUndefined(args)) ? [false, false, false] : args;
+
+    const miliSeconds: string = this.formatNumber(this.MiliSeconds, 3);
     const minutes: string = this.formatNumber(this.Minutes, 2);
     const seconds: string = this.formatNumber(this.Seconds, 2);
-    const miliseconds: string = this.formatNumber(this.MiliSeconds, 3);
+    const hours: string = (options[0] && (!options[1] || (options[1] && this.Hours > 0))) ? this.formatNumber(this.Hours, 2) + ':' : '';
 
-    result += minutes + ':' + seconds + ':' + miliseconds;
+    result += hours + minutes + ':' + seconds;
+    if (options[1]) {
+      result += '.' + miliSeconds;
+    }
 
     return result;
   }

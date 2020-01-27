@@ -9,7 +9,6 @@ import {HttpClientModule} from '@angular/common/http';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {LeadingNullPipe, ProcentPipe, SecondsPipe, TimespanPipe} from './pipe';
-import {Timespan2Pipe} from './pipe/timespan2.pipe';
 // icons
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
@@ -46,10 +45,9 @@ library.add(faPlay, faPause, faStop, faForward, faStepForward, faStepBackward, f
     CircleLoupeComponent,
     LoupeComponent,
     ProcentPipe,
-    TimespanPipe,
     SecondsPipe,
     LeadingNullPipe,
-    Timespan2Pipe
+    TimespanPipe
   ],
   exports: [
     CommonModule,
@@ -63,7 +61,6 @@ library.add(faPlay, faPause, faStop, faForward, faStepForward, faStepBackward, f
     SecondsPipe,
     LeadingNullPipe,
     TimespanPipe,
-    Timespan2Pipe,
     ProcentPipe
   ]
 })

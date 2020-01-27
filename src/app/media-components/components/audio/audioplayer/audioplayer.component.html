@@ -1,13 +1,15 @@
 <div class="audioplayer" #audioplay=audioplay appAudioPlayer>
-    <canvas class="ap-graphicscanvas" #ap_graphicscan canvasDir></canvas>
-    <canvas class="ap-overlaycanvas" #ap_overlaycan canvasDir></canvas>
-    <canvas class="ap-playcanvas" #ap_playcan canvasDir
-            (mouseleave)="onMouseMove($event);focused = false;"
-            (mouseenter)="focused = true;"
-            (mousedown)="onClick($event)"
-            (mouseup)="onClick($event)"
-            (click)="onClick($event)"
-            (mousemove)="onMouseMove($event)"></canvas>
-    <div class="ap-time-start-display">{{(audiochunk.playposition.browserSample.unix) | timespan}}</div>
-    <div class="ap-time-end-display">{{(audiochunk.time.end.browserSample.unix - audiochunk.playposition.browserSample.unix) | timespan}}</div>
+  <canvas class="ap-graphicscanvas" #ap_graphicscan canvasDir></canvas>
+  <canvas class="ap-overlaycanvas" #ap_overlaycan canvasDir></canvas>
+  <canvas class="ap-playcanvas" #ap_playcan canvasDir
+          (mouseleave)="onMouseMove($event);focused = false;"
+          (mouseenter)="focused = true;"
+          (mousedown)="onClick($event)"
+          (mouseup)="onClick($event)"
+          (click)="onClick($event)"
+          (mousemove)="onMouseMove($event)"></canvas>
+  <div
+    class="ap-time-start-display">{{(audiochunk.playposition.browserSample.unix) | timespan: [true, true, true]}}</div>
+  <div
+    class="ap-time-end-display">{{(audiochunk.time.end.browserSample.unix - audiochunk.playposition.browserSample.unix) | timespan : [true, true, true]}}</div>
 </div>

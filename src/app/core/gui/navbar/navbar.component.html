@@ -141,7 +141,7 @@
             <tr>
               <td><span>{{'general.duration' | transloco}}:</span></td>
               <td>
-                                <span>{{navbarServ.originalInfo?.duration.browserSample.unix | timespan2}}
+                                <span>{{navbarServ.originalInfo?.duration.browserSample.unix | timespan : [true, false, false]}}
                                   (H:m:s)</span>
               </td>
             </tr>

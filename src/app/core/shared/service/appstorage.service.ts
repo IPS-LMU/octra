@@ -586,7 +586,6 @@ export class AppStorageService {
         for (let i = 0; i < variables.length; i++) {
           const variable = variables[i];
 
-          console.log('read ' + variable.attribute);
           if (this['' + variable.attribute + ''] !== undefined) {
             if (variable.hasOwnProperty('attribute') && variable.hasOwnProperty('key')) {
               promises.push(this.loadOptionFromIDB(variable.key).then(

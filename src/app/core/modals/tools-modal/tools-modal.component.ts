@@ -568,7 +568,6 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
               } else {
                 segmentText = '';
                 segment.transcript = `${lastSegmentText}`;
-                console.log(`processed!`);
               }
               this.transcrService.currentlevel.segments.segments.splice(i - 1, 1);
               this.transcrService.saveSegments();

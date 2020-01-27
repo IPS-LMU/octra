@@ -234,7 +234,6 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   }
 
   saveTranscript() {
-    console.log(`save transcript!`);
     let rawText = this.editor.rawText;
     // split text at the position of every boundary marker
     let segTexts: string[] = rawText.split(

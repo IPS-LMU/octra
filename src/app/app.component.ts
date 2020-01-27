@@ -228,7 +228,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
             g.async = true;
             g.src = u + 'piwik.js';
             s.parentNode.insertBefore(g, s);
-            console.log("Sent statistics to piwik");
         })();
     }
 </script> `;

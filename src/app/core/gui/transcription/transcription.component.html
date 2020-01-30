@@ -52,7 +52,7 @@
     <div class="row" id="bottom-navigation" role="group"
          *ngIf="settingsService.isTheme('shortAudioFiles') && (appStorage.usemode === 'online' || appStorage.usemode === 'demo'); else defaultBottom2">
         <button class="btn btn-secondary btn-raised col-md-3" (click)="abortTranscription()">
-            <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
+            <fa-icon [icon]="['fas', 'times-circle']"></fa-icon>
             <span>
                    {{"general.quit" | transloco}}
             </span>
@@ -75,7 +75,7 @@
         <div class="row" id="bottom-navigation" role="group"
              *ngIf="settingsService.isTheme('korbinian') && (appStorage.usemode === 'online' || appStorage.usemode === 'demo'); else defaultBottom">
             <button class="btn btn-secondary btn-raised col-md-4" (click)="abortTranscription()">
-                <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
+              <fa-icon [icon]="['fas', 'times-circle']"></fa-icon>
                 <span>
                    {{"general.quit" | transloco}}
             </span>
@@ -99,7 +99,7 @@
             <button class="btn btn-secondary btn-raised col-md-6"
                     *ngIf="appStorage.usemode !== 'url'"
                     (click)="abortTranscription()">
-                <fa-icon [icon]="['far', 'times-circle']"></fa-icon>
+              <fa-icon [icon]="['fas', 'times-circle']"></fa-icon>
                 <span *ngIf="!appStorage.easymode" [ngClass]="{' d-none d-md-inline': appc.octra.responsive.enabled}">
                     {{"general.quit" | transloco}}
             </span>

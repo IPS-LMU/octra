@@ -47,18 +47,18 @@ import {AudioviewerConfig} from './media-components/components/audio/audioviewer
 import {MediaComponentsModule} from './media-components/media-components.module';
 import {TranscrEditorComponent} from './core/component/transcr-editor';
 import {Error404Component} from './core/gui/error404';
-import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {FontAwesomeModule, FaIconLibrary} from '@fortawesome/angular-fontawesome';
+
 // icons
-import {library} from '@fortawesome/fontawesome-svg-core';
 import {
   faAlignJustify,
   faArrowLeft,
   faArrowRight,
   faBook,
-  faCheck,
+  faCheck, faCheckCircle,
   faChevronDown,
   faChevronUp,
-  faCog,
+  faCog, faCopy,
   faDatabase,
   faDownload,
   faEdit,
@@ -68,7 +68,7 @@ import {
   faFile,
   faFolderOpen,
   faGlobe,
-  faGripLines,
+  faGripLines, faHandshake,
   faHeadphones,
   faInfoCircle,
   faKeyboard,
@@ -79,10 +79,9 @@ import {
   faQuestionCircle,
   faSave,
   faSearch,
-  faSignOutAlt,
-  faSpinner,
+  faSignOutAlt, faSpinner,
   faThList,
-  faTimes,
+  faTimes, faTimesCircle,
   faTools,
   faTrash,
   faWindowMaximize
@@ -95,8 +94,6 @@ import {BugreportModalComponent} from './core/modals/bugreport-modal/bugreport-m
 import {SupportedFilesModalComponent} from './core/modals/supportedfiles-modal/supportedfiles-modal.component';
 import {TranscriptionDeleteModalComponent} from './core/modals/transcription-delete-modal/transcription-delete-modal.component';
 import {TranscriptionStopModalComponent} from './core/modals/transcription-stop-modal/transcription-stop-modal.component';
-import {faCopy, faHandshake, faTimesCircle} from '@fortawesome/free-regular-svg-icons';
-import {faCheckCircle} from '@fortawesome/free-regular-svg-icons/faCheckCircle';
 import {LoginInvalidModalComponent} from './core/modals/login-invalid-modal/login-invalid-modal.component';
 import {ErrorModalComponent} from './core/modals/error-modal/error-modal.component';
 import {ExportFilesModalComponent} from './core/modals/export-files-modal/export-files-modal.component';
@@ -129,50 +126,6 @@ import {ClipTextPipe} from './core/shared/clip-text.pipe';
 import {AuthComponent} from './core/gui/auth/auth.component';
 import {ToolsModalComponent} from './core/modals/tools-modal/tools-modal.component';
 import {HelpModalComponent} from './core/modals/help-modal/help-modal.component';
-
-library.add(
-  faSpinner,
-  faCheck,
-  faTimes,
-  faTrash,
-  faExclamationCircle,
-  faInfoCircle,
-  faDownload,
-  faHeadphones,
-  faPrint,
-  faSearch,
-  faExclamationTriangle,
-  faTimesCircle,
-  faCog,
-  faFolderOpen,
-  faCheckCircle,
-  faThList,
-  faBook,
-  faCopy,
-  faPlus,
-  faSignOutAlt,
-  faEdit,
-  faFile,
-  faArrowLeft,
-  faArrowRight,
-  faKeyboard,
-  faEye,
-  faExclamationTriangle,
-  faSave,
-  faQuestionCircle,
-  faChevronUp,
-  faChevronDown,
-  faPaperPlane,
-  faMinus,
-  faWindowMaximize,
-  faAlignJustify,
-  faStar,
-  faGlobe,
-  faHandshake,
-  faDatabase,
-  faGripLines,
-  faTools
-);
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -302,4 +255,49 @@ export const EDITORS: any[] = [
 })
 
 export class AppModule {
+  constructor(library: FaIconLibrary) {
+    library.addIcons(
+      faSpinner,
+      faCheck,
+      faTimes,
+      faTrash,
+      faExclamationCircle,
+      faInfoCircle,
+      faDownload,
+      faHeadphones,
+      faPrint,
+      faSearch,
+      faExclamationTriangle,
+      faTimesCircle,
+      faCog,
+      faFolderOpen,
+      faCheckCircle,
+      faThList,
+      faBook,
+      faCopy,
+      faPlus,
+      faSignOutAlt,
+      faEdit,
+      faFile,
+      faArrowLeft,
+      faArrowRight,
+      faKeyboard,
+      faEye,
+      faExclamationTriangle,
+      faSave,
+      faQuestionCircle,
+      faChevronUp,
+      faChevronDown,
+      faPaperPlane,
+      faMinus,
+      faWindowMaximize,
+      faAlignJustify,
+      faStar,
+      faGlobe,
+      faHandshake,
+      faDatabase,
+      faGripLines,
+      faTools
+    );
+  }
 }

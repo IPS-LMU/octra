@@ -9,14 +9,13 @@ import {HttpClientModule} from '@angular/common/http';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {LeadingNullPipe, ProcentPipe, SecondsPipe, TimespanPipe} from './pipe';
+
 // icons
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {FaIconLibrary, FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {
   faClock,
   faForward,
-  faPause,
-  faPlay,
+  faPause, faPlay,
   faRetweet,
   faStepBackward,
   faStepForward,
@@ -25,7 +24,6 @@ import {
   faVolumeUp
 } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faPlay, faPause, faStop, faForward, faStepForward, faStepBackward, faRetweet, faClock, faVolumeUp, faVolumeDown);
 
 @NgModule({
   imports: [
@@ -65,4 +63,7 @@ library.add(faPlay, faPause, faStop, faForward, faStepForward, faStepBackward, f
   ]
 })
 export class MediaComponentsModule {
+  constructor(library: FaIconLibrary) {
+    library.addIcons(faPlay, faPause, faStop, faForward, faStepForward, faStepBackward, faRetweet, faClock, faVolumeUp, faVolumeDown);
+  }
 }

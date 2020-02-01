@@ -201,7 +201,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
   }
 
   private appendTrackingCode(type: string) {
-
+    // check if matomo is activated
     if (type === 'matomo') {
       if (!isNullOrUndefined(this.settingsService.appSettings.octra.tracking.matomo)
         && !isNullOrUndefined(this.settingsService.appSettings.octra.tracking.matomo.host)

@@ -206,33 +206,26 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       if (!isNullOrUndefined(this.settingsService.appSettings.octra.tracking.matomo)
         && !isNullOrUndefined(this.settingsService.appSettings.octra.tracking.matomo.host)
         && !isNullOrUndefined(this.settingsService.appSettings.octra.tracking.matomo.siteID)) {
-        const piwikSettings = this.settingsService.appSettings.octra.tracking.matomo;
+        const matomoSettings = this.settingsService.appSettings.octra.tracking.matomo;
 
         const trackingCode = `
-<!-- Piwik -->
+<!-- Matomo -->
 <script type="text/javascript">
-    if(window.location.host.lastIndexOf("localhost")==-1){ //execute if not on debug system
-        var _paq = _paq || [];
-        _paq.push([ 'trackPageView' ]);
-        _paq.push([ 'enableLinkTracking' ]);
-        (function() {
-            //var u = (("https:" == document.location.protocol) ? "https" : "http")
-            var u = "${piwikSettings.host}";
-            _paq.push([ 'setTrackerUrl', u + 'piwik.php' ]);
-            _paq.push([ 'setSiteId', ${piwikSettings.siteID}]);
-            var d = document;
-            var g = d.createElement('script');
-            var s = d.getElementsByTagName('script')[0];
-            g.type = 'text/javascript';
-            g.defer = true;
-            g.async = true;
-            g.src = u + 'piwik.js';
-            s.parentNode.insertBefore(g, s);
-        })();
-    }
-</script> `;
+  var _paq = window._paq || [];
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="${matomoSettings.host}";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', '${matomoSettings.siteID}']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Matomo Code -->`;
 
-        jQuery(trackingCode).insertAfter('main');
+        jQuery(trackingCode).insertAfter(jQuery('body').children().last());
       } else {
         console.error(`attributes for piwik tracking in appconfig.json are invalid.`);
       }

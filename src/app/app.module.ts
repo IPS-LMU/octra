@@ -5,7 +5,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 // third-party
 import {Ng2Webstorage} from '@rars/ngx-webstorage';
 // other
-import {AlertComponent, DropZoneComponent, OctraModalComponent} from './core/component';
+import {DropZoneComponent, OctraModalComponent} from './core/component';
 import {
   FastbarComponent,
   LoadingComponent,
@@ -126,6 +126,8 @@ import {ClipTextPipe} from './core/shared/clip-text.pipe';
 import {AuthComponent} from './core/gui/auth/auth.component';
 import {ToolsModalComponent} from './core/modals/tools-modal/tools-modal.component';
 import {HelpModalComponent} from './core/modals/help-modal/help-modal.component';
+import {AlertComponent} from './core/component/alert/alert.component';
+import {faTrashAlt} from '@fortawesome/free-regular-svg-icons';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -297,7 +299,8 @@ export class AppModule {
       faHandshake,
       faDatabase,
       faGripLines,
-      faTools
+      faTools,
+      faTrashAlt
     );
   }
 }

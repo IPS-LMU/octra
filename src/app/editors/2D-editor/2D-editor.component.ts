@@ -11,10 +11,10 @@ import {
 } from '@angular/core';
 
 import {
+  AlertService,
   AppStorageService,
   AudioService,
   KeymappingService,
-  MessageService,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
@@ -119,7 +119,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               public keyMap: KeymappingService,
               public audio: AudioService,
               public uiService: UserInteractionsService,
-              public msg: MessageService,
+              public alertService: AlertService,
               public settingsService: SettingsService,
               public appStorage: AppStorageService,
               private asrService: AsrService,
@@ -183,7 +183,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
     this.viewer.alerttriggered.subscribe(
       (result) => {
-        this.msg.showMessage(result.type, result.message);
+        this.alertService.showAlert(result.type, result.message);
       }
     );
 
@@ -252,7 +252,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               segment.isBlockedBy = null;
 
               if (item.status === ASRProcessStatus.NOQUOTA) {
-                this.msg.showMessage('error', this.langService.translate('asr.no quota'));
+                this.alertService.showAlert('danger', this.langService.translate('asr.no quota'));
                 this.uiService.addElementFromEvent(item.type.toLowerCase(), {
                   value: 'failed'
                 }, Date.now(), null, null, null, {
@@ -266,7 +266,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                   start: item.time.sampleStart,
                   length: item.time.sampleLength
                 }, 'automation');
-                this.msg.showMessage('warning', this.langService.translate('asr.no auth'));
+                this.alertService.showAlert('warning', this.langService.translate('asr.no auth'));
               } else {
                 if (item.status === ASRProcessStatus.FINISHED && item.result !== '') {
                   this.uiService.addElementFromEvent(item.type.toLowerCase(), {
@@ -433,7 +433,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           this.cd.detectChanges();
         }
       } else {
-        this.msg.showMessage('error', 'You can\'t open this segment while processing segmentation. If you need to open it, cancel segmentation first.');
+        this.alertService.showAlert('danger', 'You can\'t open this segment while processing segmentation. If you need to open it, cancel segmentation first.');
       }
     }
   }
@@ -552,7 +552,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         } else {
           // open transcr window
           this.openSegment(segmentNumber);
-          this.msg.showMessage('warning', this.langService.translate('asr.no asr selected').toString());
+          this.alertService.showAlert('warning', this.langService.translate('asr.no asr selected').toString());
         }
       }
     }

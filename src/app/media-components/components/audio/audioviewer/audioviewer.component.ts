@@ -526,7 +526,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                           console.log(`segment invisible error: can't play because start and endtime not between the audiochunk time`);
                           console.log(`${segment.time.browserSample.value} <= ${this.audiochunk.time.end.browserSample.value}`);
                           this.alerttriggered.emit({
-                            type: 'error',
+                            type: 'danger',
                             message: this.langService.translate('segment invisible')
                           });
                         }
@@ -593,7 +593,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                       },
                       () => {
                         this.alerttriggered.emit({
-                          type: 'error',
+                          type: 'danger',
                           message: this.langService.translate('segment invisible')
                         });
                       });

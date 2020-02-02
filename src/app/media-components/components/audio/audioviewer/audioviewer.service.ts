@@ -409,7 +409,7 @@ export class AudioviewerService extends AudioComponentService {
             type: 'add',
             seg_samples: this.drawnselection.start.browserSample.value,
             msg: {
-              type: 'error',
+              type: 'danger',
               text: this.langService.translate('boundary cannot set')
             }
           };

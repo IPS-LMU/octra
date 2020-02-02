@@ -17,11 +17,11 @@ import {
 import {Router} from '@angular/router';
 
 import {
+  AlertService,
   APIService,
   AppStorageService,
   AudioService,
   KeymappingService,
-  MessageService,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
@@ -60,7 +60,7 @@ import {parseServerDataEntry} from '../../obj/data-entry';
   selector: 'app-transcription',
   templateUrl: './transcription.component.html',
   styleUrls: ['./transcription.component.css'],
-  providers: [MessageService]
+  providers: [AlertService]
 })
 export class TranscriptionComponent implements OnInit,
   OnDestroy, AfterViewInit, AfterContentInit, OnChanges, AfterViewChecked, AfterContentChecked, AfterContentInit {
@@ -112,7 +112,7 @@ export class TranscriptionComponent implements OnInit,
               private bugService: BugReportService,
               private cd: ChangeDetectorRef,
               private asrService: AsrService,
-              private msg: MessageService) {
+              private alertService: AlertService) {
     this.subscrmanager = new SubscriptionManager();
     this.audiomanager = this.audio.audiomanagers[0];
 
@@ -183,7 +183,7 @@ export class TranscriptionComponent implements OnInit,
     this.subscrmanager.add(this.navbarServ.toolApplied.subscribe((toolName: string) => {
         switch (toolName) {
           case('combinePhrases'):
-            this.msg.showMessage('success', this.langService.translate('tools.alerts.done', {
+            this.alertService.showAlert('success', this.langService.translate('tools.alerts.done', {
               value: toolName
             }));
             (this._currentEditor.instance as any).update();

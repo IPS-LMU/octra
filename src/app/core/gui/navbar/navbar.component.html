@@ -50,7 +50,7 @@
           <a class="nav-link" (mouseup)="setInterface(editor.name)">
             <fa-icon [icon]="['fas', editor.icon]"></fa-icon>
             <span
-              class="d-md-none d-lg-inline"> {{editor.translate | transloco}}</span>
+              class="d-none d-xl-inline"> {{editor.translate | transloco}}</span>
           </a>
         </li>
       </ng-template>
@@ -58,7 +58,7 @@
           *ngIf="appStorage.LoggedIn && navbarServ.showInterfaces && settService.appSettings.octra.showdetails">
         <a class="nav-link" (mouseup)="modalstatistics.open()">
           <fa-icon icon="th-list" class="navbar-icon"></fa-icon>
-          <span class="d-md-none d-lg-inline"> Statistics</span></a>
+          <span class="d-none d-xl-inline"> Statistics</span></a>
       </li>
     </ul>
     <ul class="navbar-nav mt-2 mt-md-0">

@@ -240,8 +240,8 @@ class ASRQueue {
                   if (this._statistics.running === 0) {
                     // redirect via location href is important because it's not working otherwise!
                     setTimeout(() => {
-                      // document.location.href = 'user/auth';
-                    }, 500);
+                      document.location.href = 'user/auth';
+                    }, 1000);
                   }
                 }
 

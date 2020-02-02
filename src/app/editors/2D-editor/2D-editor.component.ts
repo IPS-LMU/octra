@@ -277,6 +277,13 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                   }, 'automation');
                   if (item.type === ASRQueueItemType.ASR) {
                     segment.transcript = item.result.replace(/(<\/p>)/g, '');
+
+                    const index = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
+                      return a.time.browserSample.value === segment.time.browserSample.value;
+                    });
+                    if (index > -1) {
+                      this.transcrService.currentlevel.segments.change(index, segment);
+                    }
                   } else if (item.type === ASRQueueItemType.ASRMAUS) {
                     const converter = new PraatTextgridConverter();
 
@@ -295,30 +302,48 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                       encoding: 'utf-8'
                     }, audiofile);
 
-                    const maxWords = 5;
                     const wordsTier = convertedResult.annotjson.levels.find((a) => {
                       return a.name === 'ORT-MAU';
                     });
 
                     if (!isNullOrUndefined(wordsTier)) {
-                      for (const wordItem of wordsTier.items) {
-                        if (wordItem.sampleStart + wordItem.sampleDur <= item.time.sampleStart + item.time.sampleLength) {
-                          const readSegment = Segment.fromObj(new OSegment(1, wordItem.sampleStart, wordItem.sampleDur, wordItem.labels),
-                            this.audiomanager.originalSampleRate, this.audiomanager.browserSampleRate);
-                          if (readSegment.transcript === '<p:>' || readSegment.transcript === '') {
-                            readSegment.transcript = this.transcrService.breakMarker.code;
-                          }
+                      let counter = 0;
+                      const segmentEndBrowserTime = new BrowserAudioTime(
+                        new BrowserSample(item.time.browserSampleEnd, this.audiomanager.browserSampleRate),
+                        this.audiomanager.originalSampleRate);
+                      let segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+                        segmentEndBrowserTime.browserSample, true);
 
-                          let origTime = new OriginalAudioTime(new OriginalSample(item.time.sampleStart + readSegment.time.originalSample.value, this.audiomanager.originalSampleRate),
-                            this.audiomanager.browserSampleRate
-                          );
-                          let browserTime = origTime.convertToBrowserAudioTime();
-                          const segmentExists = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(browserTime.browserSample, true);
-                          if (segmentExists > -1) {
-                            this.transcrService.currentlevel.segments.segments[segmentExists].transcript = readSegment.transcript;
+                      if (segmentIndex < 0) {
+                        console.error(`could not find segment to be precessed by ASRMAUS!`);
+                      } else {
+                        for (const wordItem of wordsTier.items) {
+                          if (wordItem.sampleStart + wordItem.sampleDur <= item.time.sampleStart + item.time.sampleLength) {
+                            const readSegment = Segment.fromObj(new OSegment(1, wordItem.sampleStart, wordItem.sampleDur, wordItem.labels),
+                              this.audiomanager.originalSampleRate, this.audiomanager.browserSampleRate);
+                            if (readSegment.transcript === '<p:>' || readSegment.transcript === '') {
+                              readSegment.transcript = this.transcrService.breakMarker.code;
+                            }
+
+                            if (counter === wordsTier.items.length - 1) {
+                              segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+                                segmentEndBrowserTime.browserSample, true);
+
+                              // the processed segment is now the very right one. Replace its content with the content of the last word item.
+                              this.transcrService.currentlevel.segments.segments[segmentIndex].transcript = readSegment.transcript;
+                              this.transcrService.currentlevel.segments.change(segmentIndex, this.transcrService.currentlevel.segments.segments[segmentIndex].clone());
+                            } else {
+                              let origTime = new OriginalAudioTime(new OriginalSample(item.time.sampleStart + readSegment.time.originalSample.value, this.audiomanager.originalSampleRate),
+                                this.audiomanager.browserSampleRate
+                              );
+                              let browserTime = origTime.convertToBrowserAudioTime();
+                              this.transcrService.currentlevel.segments.add(browserTime, readSegment.transcript);
+                            }
                           } else {
-                            this.transcrService.currentlevel.segments.add(browserTime, readSegment.transcript);
+                            console.error(`wordItem samples are out of the correct boundaries.`);
+                            console.error(`${wordItem.sampleStart} + ${wordItem.sampleDur} <= ${item.time.sampleStart} + ${item.time.sampleLength}`);
                           }
+                          counter++;
                         }
                       }
                     } else {
@@ -327,14 +352,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                   }
                 }
 
-                const index = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
-                  return a.time.browserSample.value === segment.time.browserSample.value;
-                });
-                if (index > -1) {
-                  this.transcrService.currentlevel.segments.change(index, segment);
-                }
-
-                this.viewer.update(true);
+                // this.viewer.update(true);
               }
               // STOPPED status is ignored because OCTRA should do nothing
 

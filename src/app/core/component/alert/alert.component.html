@@ -1,10 +1,25 @@
-<div [hidden]="!show" class="alert alert-dismissible alert-success shadow"
-     [@fadeToggle]="state" [ngClass]="{
-     'alert-success': type === 'success',
-     'alert-danger': type === 'error',
-     'alert-info': type === 'info',
-     'alert-warning': type === 'warning'
-     }">
-  <button type="button" class="close" data-dismiss="alert">×</button>
-  {{text}}
+<div id="alert" [ngStyle]="{
+    display: (queue.length > 0) ? 'inherit': 'none'
+}">
+  <button (click)="clear()" [@fadeToggle]="animation"
+          class="btn btn-sm btn-secondary clear-all-button">
+    <fa-icon
+      [icon]="['far', 'trash-alt']"></fa-icon>
+    Clear all
+  </button>
+  <div class="queue">
+    <ng-container *ngFor="let entry of queue">
+      <div [@fadeToggle]="entry.animation" class="alert alert-{{entry.type}} alert-dismissible fade show"
+           role="alert">
+        <p [innerHTML]="validate(entry.message)">
+        </p>
+        <p *ngIf="entry.duration > -1">
+          (dismissed in {{entry.duration}}s)
+        </p>
+        <button (click)="onClose(entry)" aria-label="Close" class="close" data-dismiss="alert" type="button">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </ng-container>
+  </div>
 </div>

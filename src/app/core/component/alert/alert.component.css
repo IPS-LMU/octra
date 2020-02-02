@@ -1,8 +1,39 @@
+#alert {
+  display: none;
+  position: absolute;
+  width: 400px;
+  top: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.queue {
+  overflow-y: auto;
+  height: 100%;
+}
+
 .alert {
-    top: 0;
-    right: 0;
-    position: fixed;
-    margin-top: 30px;
-    width: 30%;
-  z-index: 120;
+  margin-bottom: 5px;
+  font-size: 0.8em;
+  box-shadow: gray 5px 3px 5px;
+  padding: 10px;
+}
+
+.alert p {
+  margin: 0;
+  padding: 0;
+}
+
+#alert .clear-all-button {
+  font-size: 0.8em;
+  width: 100%;
+  background-color: lightgray;
+  border: none;
+  box-shadow: gray 5px 3px 10px;
+}
+
+.alert button {
+  padding-top: 5px;
+  padding-right: 10px;
+  font-size: 1.5em;
 }

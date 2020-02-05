@@ -5,7 +5,7 @@
 <app-statistics-modal #modalstatistics></app-statistics-modal>
 <app-prompt-modal #promptmodal></app-prompt-modal>
 
-<nav class="navbar navbar-expand-md navbar-fixed-top navbar-dark" style="z-index:1000;">
+<nav class="navbar navbar-expand-md navbar-fixed-top navbar-dark" style="z-index:1000;" *ngIf="navbarServ.showNavbar">
   <a class="navbar-brand" href="#" [title]="'last update: ' + (AppInfo.lastUpdate | date:'dd.MM.yyyy H:mm z')">OCTRA
     v{{version}}
     <ng-container

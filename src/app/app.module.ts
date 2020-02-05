@@ -83,7 +83,7 @@ import {
   faThList,
   faTimes, faTimesCircle,
   faTools,
-  faTrash,
+  faTrash, faUserCheck,
   faWindowMaximize
 } from '@fortawesome/free-solid-svg-icons';
 // modules
@@ -128,11 +128,18 @@ import {ToolsModalComponent} from './core/modals/tools-modal/tools-modal.compone
 import {HelpModalComponent} from './core/modals/help-modal/help-modal.component';
 import {AlertComponent} from './core/component/alert/alert.component';
 import {faTrashAlt} from '@fortawesome/free-regular-svg-icons';
+import {AuthenticationNeededComponent} from './core/alerts/authentication-needed/authentication-needed.component';
+import {DynComponentDirective} from './core/shared/directive/dyn-component.directive';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
   TwoDEditorComponent,
   LinearEditorComponent
+];
+
+
+export const ALERTS: any[] = [
+  AuthenticationNeededComponent
 ];
 
 @NgModule({
@@ -191,9 +198,11 @@ export const EDITORS: any[] = [
     ClipTextPipe,
     AuthComponent,
     ToolsModalComponent,
-    HelpModalComponent
+    HelpModalComponent,
+    ALERTS,
+    DynComponentDirective
   ],
-  entryComponents: EDITORS,
+  entryComponents: [EDITORS, ALERTS],
   imports: [
     BrowserModule,
     FontAwesomeModule,
@@ -300,7 +309,8 @@ export class AppModule {
       faDatabase,
       faGripLines,
       faTools,
-      faTrashAlt
+      faTrashAlt,
+      faUserCheck
     );
   }
 }

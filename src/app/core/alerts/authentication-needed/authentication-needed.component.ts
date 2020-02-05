@@ -1,0 +1,36 @@
+import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
+
+@Component({
+  selector: 'app-authentication-needed',
+  templateUrl: './authentication-needed.component.html',
+  styleUrls: ['./authentication-needed.component.css']
+})
+export class AuthenticationNeededComponent implements OnInit, OnDestroy {
+  @Output() authenticateClick = new EventEmitter<void>();
+  @Output() confirmationClick = new EventEmitter<void>();
+
+  public static componentName = 'AuthenticationNeededComponent';
+  public initialized = new EventEmitter<void>();
+  public destroyed = new EventEmitter<void>();
+  public clickedOnAuthenticate = false;
+
+  constructor() {
+  }
+
+  ngOnInit() {
+    this.initialized.emit();
+  }
+
+  public onAuthenticateClick() {
+    this.authenticateClick.emit();
+    this.clickedOnAuthenticate = true;
+  }
+
+  public onConfirmationClick() {
+    this.confirmationClick.emit();
+  }
+
+  public ngOnDestroy(): void {
+    this.destroyed.emit();
+  }
+}

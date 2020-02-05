@@ -13,6 +13,7 @@ export class NavbarService {
   public dataloaded = false;
   public originalInfo: AudioInfo;
   public filesize: FileSize;
+  public showNavbar = true;
 
   public toolApplied = new EventEmitter<string>();
 

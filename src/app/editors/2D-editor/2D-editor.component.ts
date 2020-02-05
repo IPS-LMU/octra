@@ -44,6 +44,7 @@ import {OCTRAEditor} from '../octra-editor';
 import {ASRProcessStatus, ASRQueueItem, ASRQueueItemType, AsrService} from '../../core/shared/service/asr.service';
 import {TranslocoService} from '@ngneat/transloco';
 import {OAudiofile, OSegment} from '../../core/obj/Annotation';
+import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
 
 @Component({
   selector: 'app-overlay-gui',
@@ -95,6 +96,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   private factor = 8;
   private scrolltimer: Subscription = null;
   private shortcuts: any = {};
+
+  private authWindow: Window = null;
 
   public get editor(): TranscrEditorComponent {
     if ((this.window === null || this.window === undefined)) {
@@ -266,7 +269,17 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                   start: item.time.sampleStart,
                   length: item.time.sampleLength
                 }, 'automation');
-                this.alertService.showAlert('warning', this.langService.translate('asr.no auth'));
+
+                this.alertService.showAlert('warning', AuthenticationNeededComponent, true, -1).then((item) => {
+                  const auth = item.component as AuthenticationNeededComponent;
+                  this.subscrmanager.add(auth.authenticateClick.subscribe(() => {
+                    this.openAuthWindow();
+                  }));
+                  this.subscrmanager.add(auth.confirmationClick.subscribe(() => {
+                    this.resetQueueItemsWithNoAuth();
+                    this.alertService.closeAlert(item.id);
+                  }));
+                });
               } else {
                 if (item.status === ASRProcessStatus.FINISHED && item.result !== '') {
                   this.uiService.addElementFromEvent(item.type.toLowerCase(), {
@@ -355,7 +368,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                 // this.viewer.update(true);
               }
               // STOPPED status is ignored because OCTRA should do nothing
-
 
               // update GUI
               this.viewer.update();
@@ -738,4 +750,27 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     }
     this.cd.detectChanges();
   }
+
+  openAuthWindow = () => {
+    const url = document.location.href.replace('transcr/', '').replace('transcr', '');
+    const left = (window.innerHeight - 200) / 2;
+    const tempWindow = window.open(url + 'auth', '_blank', 'toolbar=false,scrollbars=yes,resizable=true,top=100,left=' + left + ',width=760,height=550');
+
+    if (tempWindow !== null) {
+      console.log('window opened');
+      this.authWindow = tempWindow;
+    } else {
+      console.log('window can\'t be opened!');
+    }
+  };
+
+  resetQueueItemsWithNoAuth = () => {
+    for (const asrQueueItem of this.asrService.queue.queue) {
+      if (asrQueueItem.status === ASRProcessStatus.NOAUTH) {
+        // reset
+        asrQueueItem.changeStatus(ASRProcessStatus.IDLE);
+      }
+    }
+    this.asrService.queue.start();
+  };
 }

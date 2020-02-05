@@ -2,7 +2,7 @@
     display: (queue.length > 0) ? 'inherit': 'none'
 }">
   <button (click)="clear()" [@fadeToggle]="animation"
-          class="btn btn-sm btn-secondary clear-all-button">
+          class="btn btn-sm btn-secondary clear-all-button" *ngIf="queue.length > 1">
     <fa-icon
       [icon]="['far', 'trash-alt']"></fa-icon>
     Clear all
@@ -11,11 +11,20 @@
     <ng-container *ngFor="let entry of queue">
       <div [@fadeToggle]="entry.animation" class="alert alert-{{entry.type}} alert-dismissible fade show"
            role="alert">
-        <p [innerHTML]="validate(entry.message)">
-        </p>
-        <p *ngIf="entry.duration > -1">
-          (dismissed in {{entry.duration}}s)
-        </p>
+        <p *ngIf="entry.component === null" [innerHTML]="validate(entry.message)"></p>
+        <div style="margin-right: 10px;">
+          <ng-template *ngIf="entry.component !== null" appDynComponent [component]="entry.component"
+                       (initialized)="afterComponentInitialized($event)"
+                       (destroyed)="afterComponentDestroyed($event)"></ng-template>
+          <p *ngIf="entry.duration > -1">
+            ({{"general.dismissed" | transloco:
+            {
+              value: entry.duration
+            }
+            }})
+          </p>
+        </div>
+
         <button (click)="onClose(entry)" aria-label="Close" class="close" data-dismiss="alert" type="button">
           <span aria-hidden="true">&times;</span>
         </button>

@@ -90,7 +90,10 @@
     "tools": "Werkzeuge",
     "custom formats": "Eigene Formate",
     "meta data": "Metadaten",
-    "manual": "Handbuch"
+    "manual": "Handbuch",
+    "authenticate": "Authentifizieren",
+    "im authenticated": "Ich bin authentifiziert!",
+    "dismissed": "verschwindet in {{value}}s"
   },
   "bug report": {
     "give feedback": "Feedback geben",
@@ -320,7 +323,15 @@
     "asr running": "Die automatische Spracherkennung läuft gerade. Wenn Du sie für dieses Segment abbrechen möchtest, klicke hier.",
     "no asr selected": "Bevor Du das Tastenkürzel verwenden kannst, musst Du ASR Einstellungen vornehmen.",
     "no quota": "Es ist keine Kontingente mehr verfügbar. Bitte nutze einen anderen ASR Provider.",
-    "no auth": "Um weiter zu transkribieren ist eine erneute Authentifizierung notwendig."
+    "no auth": "Um weiter zu transkribieren ist eine erneute Authentifizierung notwendig. <a href='{{url}}'>Klicke hier um dich</a> zu authentifizieren."
+  },
+  "alerts": {
+    "authentication needed": "Authentifiziere Dich, damit Du Features wie die automatische Spracherkennung Wort-Segmentierung verwenden kannst. Nach einem Klick auf \"Authentifizieren\" erscheint ein separates Fenster. Falls sich kein Fenster öffnet, stelle sicher, dass dein Browser Popups für diese Seite erlaubt."
+  },
+  "authentication": {
+    "you are authenticated": "Du bist authentifiziert!",
+    "window closed": "Dieses Fenster wird in {{seconds}} Sekunden automatisch geschlossen.",
+    "description": "Schließe dieses Fenster und klicke auf die \"Ich bin authentifiziert!\"- Schaltfläche in OCTRA um deine Authentifizierung zu bestätigen. Danach wird die automatische Verarbeitung fortgesetzt."
   },
   "export": {
     "meta data": {

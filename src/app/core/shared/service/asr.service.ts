@@ -231,7 +231,8 @@ class ASRQueue {
             this._itemChange.next(nextItem);
             nextItem.statusChange.subscribe((status) => {
 
-                if (status.new !== ASRProcessStatus.STARTED) {
+                if (status.new !== ASRProcessStatus.STARTED && status.new !== ASRProcessStatus.NOAUTH
+                  && status.old !== ASRProcessStatus.NOAUTH) {
                   this.remove(nextItem.id);
                 }
                 this.updateStatistics(status);
@@ -239,9 +240,7 @@ class ASRQueue {
                 if (status.new === ASRProcessStatus.NOAUTH) {
                   if (this._statistics.running === 0) {
                     // redirect via location href is important because it's not working otherwise!
-                    setTimeout(() => {
-                      document.location.href = 'user/auth';
-                    }, 1000);
+                    // no redirect, show alert only!
                   }
                 }
 

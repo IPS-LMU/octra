@@ -1,17 +1,18 @@
-import {Component, OnDestroy, OnInit, SecurityContext} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ComponentFactoryResolver,
+  ComponentRef,
+  OnDestroy,
+  OnInit,
+  SecurityContext,
+  ViewChild
+} from '@angular/core';
 import {interval, Subscription} from 'rxjs';
-import {AlertService} from '../../shared/service/alert.service';
-import {OCTRANIMATIONS} from '../../shared';
+import {AlertEntry, AlertSendObj, AlertService} from '../../shared/service/alert.service';
+import {OCTRANIMATIONS, SubscriptionManager} from '../../shared';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
-
-export interface AlertEntry {
-  type: 'danger' | 'warning' | 'info' | 'success';
-  message: string;
-  duration: number;
-  animation: string;
-  unique: boolean;
-  id: number;
-}
+import {DynComponentDirective} from '../../shared/directive/dyn-component.directive';
 
 @Component({
   selector: 'app-alert',
@@ -20,26 +21,23 @@ export interface AlertEntry {
   animations: OCTRANIMATIONS
 })
 
-export class AlertComponent implements OnInit, OnDestroy {
+export class AlertComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild(DynComponentDirective, {static: false}) appDynComponent: DynComponentDirective;
 
-  private static counter = 0;
   public duration = 20;
-  public queue: AlertEntry[] = [];
   public animation = 'closed';
 
   private counter: Subscription;
 
-  constructor(private alert: AlertService, private sanitizer: DomSanitizer) {
-    this.alert.alertsend.subscribe(
-      obj => this.onAlertSend(obj),
-      (err) => {
-        console.error(err);
-      }
-    );
+  public get queue(): AlertEntry[] {
+    return this.alertService.queue;
+  }
 
+  constructor(private alertService: AlertService, private sanitizer: DomSanitizer,
+              private _componentFactoryResolver: ComponentFactoryResolver) {
     this.counter = interval(1000).subscribe(
       () => {
-        for (const queueItem of this.queue) {
+        for (const queueItem of this.alertService.queue) {
           queueItem.duration--;
           if (queueItem.duration === 0) {
             queueItem.animation = 'closed';
@@ -54,34 +52,10 @@ export class AlertComponent implements OnInit, OnDestroy {
     this.counter.unsubscribe();
   }
 
-  onAlertSend(obj: {
-    type: 'danger' | 'warning' | 'info' | 'success',
-    message: string,
-    duration: number,
-    unique: boolean
-  }) {
-    this.animation = 'opened';
-    if (obj.type === 'danger' || obj.type === 'warning' || obj.type === 'info' || obj.type === 'success') {
-      const entry: AlertEntry = {
-        type: obj.type,
-        animation: 'opened',
-        duration: obj.duration,
-        message: obj.message,
-        unique: obj.unique,
-        id: ++AlertComponent.counter
-      };
-
-      const alreadyExists = this.queue.findIndex((a) => {
-        return a.message === obj.message;
-      }) > -1;
-
-      if (!obj.unique || !alreadyExists) {
-        this.queue.push(entry);
-      }
-    }
+  ngOnInit(): void {
   }
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
   }
 
   onClose(entry: AlertEntry) {
@@ -96,8 +70,8 @@ export class AlertComponent implements OnInit, OnDestroy {
 
     this.animation = 'closed';
     setTimeout(() => {
-      this.queue = [];
-    }, 1000);
+      this.alertService.queue = [];
+    }, 500);
   }
 
   private removeFromQueue(entry: AlertEntry) {
@@ -124,5 +98,21 @@ export class AlertComponent implements OnInit, OnDestroy {
 
   public validate(message: string): SafeHtml {
     return this.sanitizer.sanitize(SecurityContext.HTML, message);
+  }
+
+  public afterComponentInitialized(item: {
+    id: number;
+    instance: any;
+  }) {
+    this.alertService.alertInitialized.emit({
+      id: item.id,
+      component: item.instance
+    })
+  }
+
+  afterComponentDestroyed(item: {
+    id: number
+  }) {
+    console.log(`alert with id ${item.id}`)
   }
 }

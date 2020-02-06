@@ -1,7 +1,7 @@
 {
   "name": "octra",
   "version": "1.4.0",
-  "author": "Julian Pömp, Christoph Draxler; Institut für Phonetik und Sprachverarbeitung, LMU MÜnchen",
+  "author": "Julian Pömp, Christoph Draxler; Institut für Phonetik und Sprachverarbeitung, LMU München",
   "license": "MIT",
   "angular-cli": {},
   "scripts": {

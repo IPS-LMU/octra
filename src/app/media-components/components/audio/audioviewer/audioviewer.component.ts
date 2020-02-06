@@ -1772,7 +1772,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     if (this.av.viewRect.size.height >= this.av.viewRect.size.height) {
       if ($event.type === 'mousemove') {
         if (this.scrollbar.dragging) {
-          this.scrollTo(($event.layerY / this.av.viewRect.size.height) * this.av.realRect.size.height, true);
+          this.scrollTo((($event as any).layerY / this.av.viewRect.size.height) * this.av.realRect.size.height, true);
         }
       } else if ($event.type === 'mousedown') {
         this.scrollbar.dragging = true;
@@ -1781,7 +1781,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         this.scrollbar.dragging = false;
       } else if ($event.type === 'click') {
         if (!this.scrollbar.dragging) {
-          this.scrollTo(($event.layerY / this.av.viewRect.size.height) * this.av.realRect.size.height, false);
+          this.scrollTo((($event as any).layerY / this.av.viewRect.size.height) * this.av.realRect.size.height, false);
         }
         this.scrollbar.dragging = false;
       }

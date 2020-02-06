@@ -202,7 +202,6 @@ export const ALERTS: any[] = [
     ALERTS,
     DynComponentDirective
   ],
-  entryComponents: [EDITORS, ALERTS],
   imports: [
     BrowserModule,
     FontAwesomeModule,

@@ -116,6 +116,16 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
             console.error('Could not read ASR language from database');
           }
         }
+
+        this.appStorage.loadConsoleEntries().then((dbEntry: any) => {
+          if (!isNullOrUndefined(dbEntry) && dbEntry.hasOwnProperty('value')) {
+            this.bugService.addEntriesFromDB(dbEntry.value);
+          } else {
+            this.bugService.addEntriesFromDB(null);
+          }
+        }).catch((error) => {
+          console.error(error);
+        });
       }
     ));
 

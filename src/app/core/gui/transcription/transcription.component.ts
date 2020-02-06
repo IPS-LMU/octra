@@ -421,6 +421,7 @@ export class TranscriptionComponent implements OnInit,
     }
 
     this.bugService.init(this.transcrService);
+
     if (this.appStorage.usemode === 'online') {
       console.log(`opened job ${this.appStorage.dataID} in project ${this.appStorage.user.project}`);
     }

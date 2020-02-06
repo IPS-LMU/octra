@@ -8,6 +8,7 @@ import {LocalStorageService, SessionStorage, SessionStorageService} from '@rars/
 import {isNullOrUndefined} from '../Functions';
 import {Subject} from 'rxjs';
 import {IDataEntry} from '../../obj/data-entry';
+import {ConsoleEntry} from './bug-report.service';
 
 export interface IIDBLevel {
   id: number;
@@ -1044,5 +1045,23 @@ export class AppStorageService {
     this._idb.save('options', 'user', {value: this._user}).catch((err) => {
       console.error(err);
     });
+  }
+
+  public loadConsoleEntries(): Promise<ConsoleEntry[]> {
+    return new Promise<ConsoleEntry[]>((resolve, reject) => {
+      this._idb.get('options', 'console').then((entries) => {
+        resolve(entries as ConsoleEntry[]);
+      }).catch((error) => {
+        reject(error);
+      });
+    });
+  }
+
+  public saveConsoleEntries(entries: ConsoleEntry[]) {
+    if (!isNullOrUndefined(this._idb)) {
+      this._idb.save('options', 'console', {value: entries}).catch((err) => {
+        console.error(err);
+      });
+    }
   }
 }

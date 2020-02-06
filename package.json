@@ -44,6 +44,7 @@
     "arrive": "~2.4.1",
     "bootstrap": "^4.4.1",
     "bootstrap-material-design": "^4.1.2",
+    "conventional-changelog-cli": "^2.0.31",
     "jquery": "~3.4.1",
     "jquery.caret": "~0.3.1",
     "js-sha256": "~0.9.0",

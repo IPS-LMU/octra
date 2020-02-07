@@ -1,6 +1,5 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {APIService, AppStorageService, SettingsService} from './core/shared/service';
-import {TranslocoService} from '@ngneat/transloco';
 import {SubscriptionManager} from './core/obj/SubscriptionManager';
 import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
 import {AppInfo} from './app.info';
@@ -11,6 +10,7 @@ import {isNullOrUndefined} from './core/shared/Functions';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
 import {AsrService} from './core/shared/service/asr.service';
 import {ASRLanguage} from './core/obj/Settings';
+import {TranslocoService} from '@ngneat/transloco';
 
 @Component({
   selector: 'app-octra',
@@ -142,6 +142,8 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
 
     this.settingsService.loadApplicationSettings(this.route).then(() => {
       console.log(`Application settings loaded`);
+
+      this.langService.setAvailableLangs(this.settingsService.appSettings.octra.languages);
 
       if (!isNullOrUndefined(this.settingsService.appSettings.octra.tracking)
         && !isNullOrUndefined(this.settingsService.appSettings.octra.tracking.active)

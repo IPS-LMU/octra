@@ -1,5 +1,5 @@
 // angular
-import {NgModule} from '@angular/core';
+import {Injectable, NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 // third-party
@@ -42,23 +42,24 @@ import {DictaphoneEditorComponent, LinearEditorComponent, TwoDEditorComponent} f
 import {NewEditorComponent} from './editors/new-editor/new-editor.component';
 import {HelpToolsComponent} from './core/gui/help-tools/';
 import {FeaturesComponent} from './core/gui/features';
-import {HttpClientModule} from '@angular/common/http';
+import {HttpClient, HttpClientModule} from '@angular/common/http';
 import {AudioviewerConfig} from './media-components/components/audio/audioviewer';
 import {MediaComponentsModule} from './media-components/media-components.module';
 import {TranscrEditorComponent} from './core/component/transcr-editor';
 import {Error404Component} from './core/gui/error404';
-import {FontAwesomeModule, FaIconLibrary} from '@fortawesome/angular-fontawesome';
-
+import {FaIconLibrary, FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 // icons
 import {
   faAlignJustify,
   faArrowLeft,
   faArrowRight,
   faBook,
-  faCheck, faCheckCircle,
+  faCheck,
+  faCheckCircle,
   faChevronDown,
   faChevronUp,
-  faCog, faCopy,
+  faCog,
+  faCopy,
   faDatabase,
   faDownload,
   faEdit,
@@ -68,7 +69,8 @@ import {
   faFile,
   faFolderOpen,
   faGlobe,
-  faGripLines, faHandshake,
+  faGripLines,
+  faHandshake,
   faHeadphones,
   faInfoCircle,
   faKeyboard,
@@ -79,11 +81,14 @@ import {
   faQuestionCircle,
   faSave,
   faSearch,
-  faSignOutAlt, faSpinner,
+  faSignOutAlt,
+  faSpinner,
   faThList,
-  faTimes, faTimesCircle,
+  faTimes,
+  faTimesCircle,
   faTools,
-  faTrash, faUserCheck,
+  faTrash,
+  faUserCheck,
   faWindowMaximize
 } from '@fortawesome/free-solid-svg-icons';
 // modules
@@ -118,8 +123,7 @@ import {StresstestComponent} from './core/tools/stresstest/stresstest.component'
 import {TranscriptionDemoEndModalComponent} from './core/modals/transcription-demo-end/transcription-demo-end-modal.component';
 import {AsrOptionsComponent} from './core/gui/asr-options/asr-options.component';
 import {environment} from '../environments/environment';
-import {translocoLoader} from './transloco.loader';
-import {TRANSLOCO_CONFIG, TranslocoConfig, TranslocoModule} from '@ngneat/transloco';
+import {Translation, TRANSLOCO_CONFIG, TRANSLOCO_LOADER, translocoConfig, TranslocoLoader, TranslocoModule} from '@ngneat/transloco';
 import {DragulaModule} from 'ng2-dragula';
 import {TableConfiguratorComponent} from './core/component/table-configurator/table-configurator.component';
 import {ClipTextPipe} from './core/shared/clip-text.pipe';
@@ -141,6 +145,17 @@ export const EDITORS: any[] = [
 export const ALERTS: any[] = [
   AuthenticationNeededComponent
 ];
+
+@Injectable({providedIn: 'root'})
+export class TranslocoHttpLoader implements TranslocoLoader {
+  constructor(private http: HttpClient) {
+  }
+
+  getTranslation(lang: string) {
+    console.log(`load translation...`);
+    return this.http.get<Translation>(`./assets/i18n/${lang}.json`);
+  }
+}
 
 @NgModule({
   declarations: [
@@ -251,16 +266,15 @@ export const ALERTS: any[] = [
     MultiThreadingService,
     {
       provide: TRANSLOCO_CONFIG,
-      useValue: {
-        listenToLangChange: true,
+      useValue: translocoConfig({
+        availableLangs: ['en'],
         defaultLang: 'en',
         fallbackLang: 'en',
         prodMode: environment.production,
-        scopeStrategy: 'shared'
-      } as TranslocoConfig
+        reRenderOnLangChange: true
+      })
     },
-    translocoLoader
-
+    {provide: TRANSLOCO_LOADER, useClass: TranslocoHttpLoader}
   ]
 })
 

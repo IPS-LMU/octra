@@ -228,7 +228,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
             && this.loadedtable.methods
             && this.loadedtable.audio
           ) {
-            this.subscrmanager.remove(id);
+            this.subscrmanager.removeById(id);
             setTimeout(() => {
               if (((this.appStorage.agreement === null || this.appStorage.agreement === undefined)
                   || (this.appStorage.agreement[this.appStorage.user.project] === null

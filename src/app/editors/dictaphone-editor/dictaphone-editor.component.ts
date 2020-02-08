@@ -100,6 +100,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   ngOnDestroy() {
     this.subscrmanager.destroy();
+    this.keyMap.unregister('AP');
   }
 
   ngOnChanges(obj: any) {
@@ -360,6 +361,16 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   public afterFirstInitialization() {
     // ignore
+  }
+
+  public enableAllShortcuts() {
+    this.settings.shortcuts = this.keyMap.register('AP', this.settings.shortcuts);
+    this.audioplayer.enableShortcuts();
+  }
+
+  public disableAllShortcuts() {
+    this.keyMap.unregister('AP');
+    this.audioplayer.disableShortcuts();
   }
 
   onKeyUp() {

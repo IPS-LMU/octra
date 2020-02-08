@@ -55,6 +55,7 @@ import {
 import {GeneralShortcut} from '../../modals/shortcuts-modal/shortcuts-modal.component';
 import {AsrService} from '../../shared/service/asr.service';
 import {parseServerDataEntry} from '../../obj/data-entry';
+import {OCTRAEditor} from '../../../editors/octra-editor';
 
 @Component({
   selector: 'app-transcription',
@@ -194,6 +195,16 @@ export class TranscriptionComponent implements OnInit,
       },
       () => {
       }));
+
+    this.subscrmanager.add(this.modService.showmodal.subscribe((event: { type: string, data, emitter: any }) => {
+      const editor = this._currentEditor.instance as OCTRAEditor;
+      editor.disableAllShortcuts();
+    }));
+
+    this.subscrmanager.add(this.modService.closemodal.subscribe((event: { type: string }) => {
+      const editor = this._currentEditor.instance as OCTRAEditor;
+      editor.enableAllShortcuts();
+    }));
   }
 
   // TODO change to ModalComponents!
@@ -378,7 +389,7 @@ export class TranscriptionComponent implements OnInit,
         (this.currentEditor.instance as any).update();
 
         // important: subscribe to level changes in order to save proceedings
-        this.subscrmanager.remove(this.levelSubscriptionID);
+        this.subscrmanager.removeById(this.levelSubscriptionID);
         this.levelSubscriptionID = this.subscrmanager.add(
           this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
         );
@@ -531,7 +542,7 @@ export class TranscriptionComponent implements OnInit,
         const id = this.subscrmanager.add(comp.initialized.subscribe(
           () => {
             this.editorloaded = true;
-            this.subscrmanager.remove(id);
+            this.subscrmanager.removeById(id);
             this.cd.detectChanges();
 
             resolve();
@@ -907,7 +918,7 @@ export class TranscriptionComponent implements OnInit,
 
   private unsubscribeSubscriptionsForThisAnnotation() {
     if (this.levelSubscriptionID > 0) {
-      this.subscrmanager.remove(this.levelSubscriptionID);
+      this.subscrmanager.removeById(this.levelSubscriptionID);
       this.levelSubscriptionID = 0;
     }
   }

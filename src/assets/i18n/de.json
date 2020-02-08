@@ -98,7 +98,8 @@
   "bug report": {
     "give feedback": "Feedback geben",
     "description": "Bitte teile uns dein Feedback mit. Was können wir besser machen? Hast Du irgendwelche Schwierigkeiten mit der Verwendung von OCTRA?",
-    "sent": "Der Fehlerbericht wurde erfolgreich gesendet.",
+    "sent": "Dein Feedback wurde erfolgreich gesendet \uD83D\uDE42",
+    "error": "Dein Feedback konnte leider nicht gesendet werden. Bitte sende uns direkt eine E-Mail an {{email}}.",
     "send protocol": "Protokoll beifügen (empfohlen)"
   },
   "transcription": {

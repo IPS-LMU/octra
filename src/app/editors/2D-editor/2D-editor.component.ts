@@ -99,6 +99,33 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
   private authWindow: Window = null;
 
+  private windowShortcuts = {
+    jump_left: {
+      keys: {
+        mac: 'ALT + ARROWLEFT',
+        pc: 'ALT + ARROWLEFT'
+      },
+      focusonly: false,
+      title: 'jump_last_segment'
+    },
+    jump_right: {
+      keys: {
+        mac: 'ALT + ARROWRIGHT',
+        pc: 'ALT + ARROWRIGHT'
+      },
+      focusonly: false,
+      title: 'jump_next_segment'
+    },
+    close_save: {
+      keys: {
+        mac: 'ALT + ARROWDOWN',
+        pc: 'ALT + ARROWDOWN'
+      },
+      focusonly: false,
+      title: 'close_save'
+    }
+  };
+
   public get editor(): TranscrEditorComponent {
     if ((this.window === null || this.window === undefined)) {
       return null;
@@ -139,33 +166,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.audioChunkLoupe = this.audiomanager.mainchunk.clone();
     this.audioChunkWindow = this.audiomanager.mainchunk.clone();
     this.shortcuts = this.keyMap.register('2D-Editor', this.viewer.settings.shortcuts);
-    const windowShortcuts = {
-      jump_left: {
-        keys: {
-          mac: 'ALT + ARROWLEFT',
-          pc: 'ALT + ARROWLEFT'
-        },
-        focusonly: false,
-        title: 'jump_last_segment'
-      },
-      jump_right: {
-        keys: {
-          mac: 'ALT + ARROWRIGHT',
-          pc: 'ALT + ARROWRIGHT'
-        },
-        focusonly: false,
-        title: 'jump_next_segment'
-      },
-      close_save: {
-        keys: {
-          mac: 'ALT + ARROWDOWN',
-          pc: 'ALT + ARROWDOWN'
-        },
-        focusonly: false,
-        title: 'close_save'
-      }
-    };
-    this.keyMap.register('Transcription Window', windowShortcuts);
+    this.keyMap.register('Transcription Window', this.windowShortcuts);
 
     this.viewer.settings.multiLine = true;
     this.viewer.settings.lineheight = 70;
@@ -773,4 +774,18 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     }
     this.asrService.queue.start();
   };
+
+  public enableAllShortcuts() {
+    this.viewer.enableShortcuts();
+    if (!isNullOrUndefined(this.window) && !isNullOrUndefined(this.window.loupe)) {
+      this.window.loupe.viewer.enableShortcuts();
+    }
+  }
+
+  public disableAllShortcuts() {
+    this.viewer.disableShortcuts();
+    if (!isNullOrUndefined(this.window) && !isNullOrUndefined(this.window.loupe)) {
+      this.window.loupe.viewer.disableShortcuts();
+    }
+  }
 }

@@ -49,7 +49,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
 
         if (!(result.type === null || result.type === undefined) && this[result.type] !== undefined) {
           this[result.type].open(result.data).then(
-            (answer) => {
+            (answer: any | undefined) => {
               result.emitter.emit(answer);
             }
           ).catch(
@@ -57,10 +57,6 @@ export class OctraModalComponent implements OnInit, OnDestroy {
               console.error(err);
             }
           );
-          /*
-          jQuery(function () {
-            jQuery('[data-toggle="tooltip"]').tooltip();
-          });*/
         } else {
           const emitter: EventEmitter<any> = result.emitter;
           emitter.error('modal function not supported');

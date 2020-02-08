@@ -149,7 +149,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
 
       // unsubscribe shortcut listener
       if (this.shortcutID > -1) {
-        this.subscrmanager.remove(this.shortcutID);
+        this.subscrmanager.removeById(this.shortcutID);
         this.shortcutID = -1;
       }
 

@@ -3,5 +3,9 @@ export abstract class OCTRAEditor {
   }
 
   public abstract afterFirstInitialization();
+
+  public abstract disableAllShortcuts();
+
+  public abstract enableAllShortcuts();
 }
 

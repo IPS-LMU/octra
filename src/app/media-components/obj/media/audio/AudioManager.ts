@@ -802,7 +802,7 @@ export class AudioChunk {
             this.setState(state);
 
             if (state === PlayBackState.STOPPED || state === PlayBackState.PAUSED || state === PlayBackState.ENDED) {
-              this.subscrmanager.remove(id);
+              this.subscrmanager.removeById(id);
             }
 
             if (state === PlayBackState.ENDED) {

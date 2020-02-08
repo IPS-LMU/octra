@@ -66,7 +66,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
               private keyMap: KeymappingService) {
 
     this.subscrmanager = new SubscriptionManager();
-    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown));
+    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown), 'keypress');
   }
 
   @ViewChild('audioplay', {static: true}) apview;
@@ -546,5 +546,13 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnDestroy, O
   private afterAudioBackwardTime = () => {
     // do the same
     // this.afterAudioStepBackward();
+  }
+
+  public enableShortcuts() {
+    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown), 'keypress');
+  }
+
+  public disableShortcuts() {
+    this.subscrmanager.removeByTag('keypress');
   }
 }

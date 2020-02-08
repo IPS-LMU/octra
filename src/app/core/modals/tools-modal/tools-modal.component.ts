@@ -225,10 +225,10 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
                 const url: string = result2.resultURL;
                 this.tools.audioCutting.result.url = url;
                 this.tools.audioCutting.result.filename = url.substring(url.lastIndexOf('/') + 1);
-                this.subscrmanager.remove(this.tools.audioCutting.subscriptionIDs[1]);
+                this.subscrmanager.removeById(this.tools.audioCutting.subscriptionIDs[1]);
                 this.tools.audioCutting.subscriptionIDs[1] = -1;
               } else if (result2.status === 'failed') {
-                this.subscrmanager.remove(this.tools.audioCutting.subscriptionIDs[1]);
+                this.subscrmanager.removeById(this.tools.audioCutting.subscriptionIDs[1]);
                 this.tools.audioCutting.subscriptionIDs[1] = -1;
               }
 
@@ -248,7 +248,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
               }
             }, (e) => {
               console.error(e);
-              this.subscrmanager.remove(this.tools.audioCutting.subscriptionIDs[1]);
+              this.subscrmanager.removeById(this.tools.audioCutting.subscriptionIDs[1]);
               this.tools.audioCutting.subscriptionIDs[1] = -1;
             });
           }
@@ -391,7 +391,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
               if (sizeProcessed === 0) {
                 // first process
                 if (this.tools.audioCutting.subscriptionIDs[2] > -1) {
-                  this.subscrmanager.remove(this.tools.audioCutting.subscriptionIDs[2]);
+                  this.subscrmanager.removeById(this.tools.audioCutting.subscriptionIDs[2]);
                   this.tools.audioCutting.subscriptionIDs[2] = -1;
                 }
                 this.tools.audioCutting.cuttingSpeed = -1;
@@ -439,7 +439,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
       },
       (err) => {
         if (this.tools.audioCutting.subscriptionIDs[2] > -1) {
-          this.subscrmanager.remove(this.tools.audioCutting.subscriptionIDs[2]);
+          this.subscrmanager.removeById(this.tools.audioCutting.subscriptionIDs[2]);
           this.tools.audioCutting.subscriptionIDs[2] = -1;
         }
         this.tools.audioCutting.cuttingSpeed = -1;
@@ -470,7 +470,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
       const subscriptionID = this.tools.audioCutting.subscriptionIDs[i];
 
       if (subscriptionID > -1) {
-        this.subscrmanager.remove(subscriptionID);
+        this.subscrmanager.removeById(subscriptionID);
       }
       this.tools.audioCutting.subscriptionIDs[i] = -1;
     }

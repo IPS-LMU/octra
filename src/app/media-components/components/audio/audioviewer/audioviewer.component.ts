@@ -728,8 +728,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     const id2 = this.subscrmanager.add(this.audiochunk.statechange.subscribe(
       (state) => {
         if (state === PlayBackState.STOPPED || state === PlayBackState.PAUSED || state === PlayBackState.ENDED) {
-          this.subscrmanager.remove(id);
-          this.subscrmanager.remove(id2);
+          this.subscrmanager.removeById(id);
+          this.subscrmanager.removeById(id2);
         }
       }
     ));*/
@@ -1930,5 +1930,13 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     this.mContext.clearRect(0, 0, this.viewRect.size.width, this.viewRect.size.height);
     this.pContext.clearRect(0, 0, this.viewRect.size.width, this.viewRect.size.height);
     this.tContext.clearRect(0, 0, this.viewRect.size.width, this.viewRect.size.height);
+  }
+
+  public enableShortcuts() {
+    this._deactivateShortcuts = false;
+  }
+
+  public disableShortcuts() {
+    this._deactivateShortcuts = true;
   }
 }

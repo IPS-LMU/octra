@@ -2,9 +2,9 @@ import {EventEmitter, Injectable} from '@angular/core';
 
 @Injectable()
 export class ModalService {
-  public showmodal: EventEmitter<{ type: string, data?: any, emitter: EventEmitter<any> }>
-    = new EventEmitter<{ type: string, data?: any, emitter: EventEmitter<any> }>();
-  private modalaction: EventEmitter<any> = new EventEmitter<any>();
+  public showmodal = new EventEmitter<{ type: string, data?: any, emitter: EventEmitter<any> }>();
+  public closemodal = new EventEmitter<{ type: string }>();
+  private modalaction = new EventEmitter<any>();
 
   constructor() {
   }
@@ -17,6 +17,7 @@ export class ModalService {
       this.showmodal.emit({type, data, emitter: this.modalaction});
       const subscr = this.modalaction.subscribe((result) => {
           subscr.unsubscribe();
+          this.closemodal.emit({type});
           resolve(result);
         },
         (err) => {

@@ -21,7 +21,8 @@ export class EmailBugReporter extends BugReporter {
     const body = {
       description: form.description,
       additional_information: {
-        email: form.email
+        email: form.email,
+        name: form.name
       },
       os: json.system.os.name,
       os_build: json.system.os.version,

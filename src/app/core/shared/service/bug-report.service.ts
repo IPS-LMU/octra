@@ -137,22 +137,24 @@ export class BugReportService {
   }
 
   public getText(): string {
-    const bugreportSettings = this.settService.appSettings.octra.bugreport;
+    if (!isNullOrUndefined(this.settService.appSettings)) {
+      const bugreportSettings = this.settService.appSettings.octra.bugreport;
 
-    for (let i = 0; i < AppInfo.bugreporters.length; i++) {
-      const bugreporter = AppInfo.bugreporters[i];
-      if (bugreporter.name === bugreportSettings.name) {
-        this.reporter = bugreporter;
+      for (let i = 0; i < AppInfo.bugreporters.length; i++) {
+        const bugreporter = AppInfo.bugreporters[i];
+        if (bugreporter.name === bugreportSettings.name) {
+          this.reporter = bugreporter;
+        }
       }
-    }
 
-    if (!(this.reporter === null || this.reporter === undefined)) {
-      return this.reporter.getText(this.getPackage());
+      if (!(this.reporter === null || this.reporter === undefined)) {
+        return this.reporter.getText(this.getPackage());
+      }
     }
     return '';
   }
 
-  sendReport(email: string, description: string, sendbugreport: boolean, credentials: {
+  sendReport(name: string, email: string, description: string, sendbugreport: boolean, credentials: {
     auth_token: string,
     url: string
   }, screenshots: any[]): Observable<any> {
@@ -163,6 +165,7 @@ export class BugReportService {
       const url = credentials.url;
       const form = {
         email,
+        name,
         description
       };
 

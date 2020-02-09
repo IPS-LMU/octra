@@ -45,6 +45,17 @@ export class OIDBLink implements IIDBLink {
 
 @Injectable()
 export class AppStorageService {
+  get userProfile(): { userName: string; email: string } {
+    return this._userProfile;
+  }
+
+  set userProfile(value: { userName: string; email: string }) {
+    this._idb.save('options', 'userProfile', {value}).catch((err) => {
+      console.error(err);
+    });
+    this._userProfile = value;
+  }
+
   set logs(value: any[]) {
     this._idb.saveArraySequential(value, 'logs', 'timestamp').catch((err) => {
       console.error(err);
@@ -444,6 +455,14 @@ export class AppStorageService {
     jobno: number
   } = null;
 
+  private _userProfile: {
+    userName: string,
+    email: string
+  } = {
+    userName: '',
+    email: ''
+  };
+
   @SessionStorage('agreement') private _agreement: any;
   @SessionStorage('playonhover') private _playonhover: boolean;
   @SessionStorage('reloaded') private _reloaded: boolean;
@@ -817,6 +836,10 @@ export class AppStorageService {
         {
           attribute: '_user',
           key: 'user'
+        },
+        {
+          attribute: '_userProfile',
+          key: 'userProfile'
         },
         {
           attribute: '_interface',

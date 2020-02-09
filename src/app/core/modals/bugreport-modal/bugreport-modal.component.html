@@ -19,61 +19,87 @@
              class="alert alert-success bugsent">{{'bug report.sent' | transloco}}</div>
 
         <form>
-          <fieldset>
-            <div class="form-group">
-              <label for="inputEmail">{{'general.email' |
-                transloco}}</label>
-
-              <input [(ngModel)]="bgemail" name="email" class="form-control" id="inputEmail"
-                     placeholder="{{'general.email' | transloco}}" type="email" email>
-            </div>
-            <div class="form-group">
-              <label for="bgDescr">{{'general.description' |
-                transloco}}</label>
-
-              <textarea [(ngModel)]="bgdescr" name="bgdescr" class="form-control" rows="3"
-                        id="bgDescr"
-                        maxlength="1000" aria-describedby="descrHelp"></textarea>
-              <small id="descrHelp" class="form-text text-muted">(German or English)</small>
-            </div>
-            <div class="form-group" style="margin-bottom:20px;">
-              <label>{{'general.screenshots' |
-                transloco}} (optional):</label><br/>
-              <div class="preview-images">
-                <div *ngFor="let screenshot of screenshots; let i = index;"
-                     class="upload-screenshot" (click)="selectFileForUpload(uploadInput2)">
-                  <span class="cross rounded-circle" (click)="removeScreenshot(i)">X</span>
-                  <input #uploadInput2 type="file" name="upload" (change)="onFileChange($event)"
-                         style="display: none;" accept=".jpg, .png, .jpeg|image/*"/>
-                  <img class="preview-image"
-                       *ngIf="screenshot.previewURL !== ''"
-                       [src]="screenshot.previewURL"/>
-                </div>
-                <div *ngIf="screenshots.length < 4"
-                     class="upload-screenshot" (click)="selectFileForUpload(uploadInput)">
-                  <input #uploadInput type="file" name="upload" (change)="onFileChange($event)"
-                         style="display: none;"/>
-                  <fa-icon icon="plus" [size]="'2x'"></fa-icon>
-                </div>
-              </div>
-              <div class="clearfix"></div>
-            </div>
-            <div class="form-group" style="padding-top:0;margin-bottom: 0;">
-              <div class="checkbox">
-                <label>
-                  <input [(ngModel)]="sendProObj" name="sendpro" #sendpro type="checkbox"
-                         checked>
-                  {{"bug report.send protocol" | transloco}}
-                </label>
+          <div class="form-row">
+            <div class="col-6">
+              <div class="form-group" [ngClass]="{
+              'is-filled': userName !== ''
+              }">
+                <label for="inputName" class="bmd-label-floating">{{'general.name' | transloco}}</label>
+                <input type="text" [(ngModel)]="userName" name="name" class="form-control" id="inputName" email>
               </div>
             </div>
-            <div class="form-group" [hidden]="!sendpro.checked" style="padding-top:0;margin-top:0;">
-              <span>{{'general.protocol' | transloco}}:</span>
-              <textarea class="form-control" #bgProtocol *ngIf="visible"
-                        id="bgProtocol"
-                        disabled>{{bugService.getText()}}</textarea>
+            <div class="col-6">
+              <div class="form-group" [ngClass]="{
+              'is-filled': email !== ''
+              }">
+                <label for="inputEmail" class="bmd-label-floating">{{'general.email' |
+                  transloco}}</label>
+
+                <input [(ngModel)]="email" name="email" class="form-control" id="inputEmail"
+                       type="email" email>
+              </div>
             </div>
-          </fieldset>
+          </div>
+          <div class="form-row">
+            <div class="col-12">
+              <div class="form-group" style="margin-top:-20px;margin-bottom:20px;">
+                <label for="bgDescr" class="bmd-label-floating">{{'general.description' |
+                  transloco}}</label>
+
+                <textarea [(ngModel)]="bgdescr" name="bgdescr" class="form-control" rows="3" id="bgDescr"
+                          maxlength="1000" aria-describedby="descrHelp"></textarea>
+                <small id="descrHelp" class="form-text text-muted">(German or English)</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="col-12">
+              <div class="form-group" style="margin-bottom:20px;">
+                <label>{{'general.screenshots' |
+                  transloco}} (optional):</label><br/>
+                <div class="preview-images">
+                  <div *ngFor="let screenshot of screenshots; let i = index;"
+                       class="upload-screenshot" (click)="selectFileForUpload(uploadInput2)">
+                    <span class="cross rounded-circle" (click)="removeScreenshot(i)">X</span>
+                    <input #uploadInput2 type="file" name="upload" (change)="onFileChange($event)"
+                           style="display: none;" accept=".jpg, .png, .jpeg|image/*"/>
+                    <img class="preview-image"
+                         *ngIf="screenshot.previewURL !== ''"
+                         [src]="screenshot.previewURL"/>
+                  </div>
+                  <div *ngIf="screenshots.length < 4"
+                       class="upload-screenshot" (click)="selectFileForUpload(uploadInput)">
+                    <input #uploadInput type="file" name="upload" (change)="onFileChange($event)"
+                           style="display: none;"/>
+                    <fa-icon icon="plus" [size]="'2x'"></fa-icon>
+                  </div>
+                </div>
+                <div class="clearfix"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="col-12">
+              <div class="form-group" style="padding-top:0;margin-bottom: 0;">
+                <div class="checkbox">
+                  <label>
+                    <input [(ngModel)]="sendProObj" name="sendpro" #sendpro type="checkbox"
+                           checked>
+                    {{"bug report.send protocol" | transloco}}
+                  </label>
+                </div>
+              </div>
+              <div class="form-group" [hidden]="!sendpro.checked" style="padding-top:0;margin-top:0;">
+                <span>{{'general.protocol' | transloco}}:</span>
+                <textarea class="form-control" #bgProtocol id="bgProtocol"
+                          [innerHTML]="(visible) ? bugService.getText(): ''"
+                          disabled>
+                </textarea>
+              </div>
+            </div>
+          </div>
         </form>
       </div>
       <div class="modal-footer">

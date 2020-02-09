@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs';
 import {AppStorageService, SettingsService} from '../../shared/service';
@@ -8,12 +8,12 @@ import {BugReportService} from '../../shared/service/bug-report.service';
 @Component({
   selector: 'app-bugreport-modal',
   templateUrl: './bugreport-modal.component.html',
-  styleUrls: ['./bugreport-modal.component.css']
+  styleUrls: ['./bugreport-modal.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BugreportModalComponent implements OnInit {
   modalRef: BsModalRef;
   public visible = false;
-  public bgemail = '';
   public bgdescr = '';
   public sendProObj = true;
   public bugsent = false;
@@ -23,6 +23,7 @@ export class BugreportModalComponent implements OnInit {
     ignoreBackdropClick: false
   };
   @ViewChild('modal', {static: true}) modal: any;
+
   protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();
@@ -34,12 +35,35 @@ export class BugreportModalComponent implements OnInit {
     previewURL: string
   }[] = [];
 
+  public get email(): string {
+    return this.appStorage.userProfile.email;
+  }
+
+  public get userName(): string {
+    return this.appStorage.userProfile.userName;
+  }
+
+  public set email(value: string) {
+    this.appStorage.userProfile = {
+      userName: this.userName,
+      email: value
+    }
+  }
+
+  public set userName(value: string) {
+    this.appStorage.userProfile = {
+      userName: value,
+      email: this.email
+    }
+  }
+
   public get isvalid(): boolean {
     return this.sendProObj || this.bgdescr !== '';
   }
 
   constructor(private modalService: BsModalService, private appStorage: AppStorageService,
-              public bugService: BugReportService, private settService: SettingsService) {
+              public bugService: BugReportService, private settService: SettingsService,
+              private cd: ChangeDetectorRef) {
   }
 
   ngOnInit() {
@@ -54,6 +78,7 @@ export class BugreportModalComponent implements OnInit {
       this.sendStatus = 'pending';
       this.visible = true;
       this.screenshots = [];
+      this.update();
 
       const subscr = this.modal.onHide.subscribe(() => {
         subscr.unsubscribe();
@@ -77,31 +102,35 @@ export class BugreportModalComponent implements OnInit {
 
   onHidden() {
     this.visible = false;
-    this.bgdescr = '';
     this.bugsent = false;
+    this.sendStatus = 'pending';
+    this.update();
   }
 
   sendBugReport() {
-    this.appStorage.email = this.bgemail;
+    this.appStorage.email = this.email;
 
     this.sendStatus = 'sending';
     this.subscrmanager.add(
-      this.bugService.sendReport(this.bgemail, this.bgdescr, this.sendProObj, {
+      this.bugService.sendReport(this.userName, this.email, this.bgdescr, this.sendProObj, {
         auth_token: this.settService.appSettings.octra.bugreport.auth_token,
         url: this.settService.appSettings.octra.bugreport.url
       }, this.screenshots).subscribe(
         () => {
-          this.sendStatus = 'pending';
+          this.sendStatus = 'success';
           this.bugsent = true;
+          this.update();
           console.log('Bugreport sent');
 
           setTimeout(() => {
+            this.bgdescr = '';
             this.modal.hide();
           }, 2000);
         },
         (error) => {
           console.error(error);
           this.sendStatus = 'error';
+          this.update();
         }
       )
     );
@@ -121,24 +150,41 @@ export class BugreportModalComponent implements OnInit {
           blob: $event.target.files[0],
           previewURL: ''
         });
-        this.createPreviewFromFile(this.screenshots.length - 1);
+        this.update();
+        this.createPreviewFromFile(this.screenshots.length - 1).then(() => {
+          this.update();
+        }).catch((error) => {
+          console.error(error);
+        });
       } else {
         alert('Only files with the extensions ".jpg, jpeg,.png" are supported.');
       }
     }
   }
 
-  public createPreviewFromFile(index: number) {
-    const reader = new FileReader();
+  public createPreviewFromFile(index: number): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      const reader = new FileReader();
 
-    reader.onloadend = () => {
-      this.screenshots[index].previewURL = reader.result as string;
-    };
+      reader.onloadend = () => {
+        this.screenshots[index].previewURL = reader.result as string;
+        resolve();
+      };
 
-    reader.readAsDataURL(this.screenshots[index].blob);
+      reader.onerror = reject;
+
+      reader.readAsDataURL(this.screenshots[index].blob);
+    });
   }
 
   public removeScreenshot(index: number) {
     this.screenshots.splice(index, 1);
+    this.update();
+  }
+
+  update() {
+    console.log(`update!`);
+    this.cd.markForCheck();
+    this.cd.detectChanges();
   }
 }

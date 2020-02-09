@@ -1,6 +1,7 @@
 #bgProtocol {
-  min-height: 200px;
+  min-height: 100px;
   overflow-y: scroll;
+  font-size: 0.8em;
 }
 
 .upload-screenshot {

@@ -45,6 +45,7 @@ import {ASRProcessStatus, ASRQueueItem, ASRQueueItemType, AsrService} from '../.
 import {TranslocoService} from '@ngneat/transloco';
 import {OAudiofile, OSegment} from '../../core/obj/Annotation';
 import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
+import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
 
 @Component({
   selector: 'app-overlay-gui',
@@ -298,7 +299,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                     if (index > -1) {
                       this.transcrService.currentlevel.segments.change(index, segment);
                     }
-                  } else if (item.type === ASRQueueItemType.ASRMAUS) {
+                  } else if (item.type === ASRQueueItemType.ASRMAUS || item.type === ASRQueueItemType.MAUS) {
                     const converter = new PraatTextgridConverter();
 
                     const audiofile = new OAudiofile();
@@ -364,6 +365,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                       console.error(`word tier not found!`);
                     }
                   }
+                } else if (item.status === ASRProcessStatus.FAILED) {
+                  this.alertService.showAlert('danger', ErrorOccurredComponent, true, -1);
+                  segment.isBlockedBy = null;
+                  this.transcrService.currentlevel.segments.change(segNumber, segment);
                 }
 
                 // this.viewer.update(true);
@@ -425,7 +430,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     if (this.transcrService.currentlevel.segments && selected.index > -1 &&
       selected.index < this.transcrService.currentlevel.segments.length) {
       const segment = this.transcrService.currentlevel.segments.get(selected.index);
-      if (segment.isBlockedBy !== ASRQueueItemType.ASRMAUS) {
+      if (segment.isBlockedBy !== ASRQueueItemType.ASRMAUS && segment.isBlockedBy !== ASRQueueItemType.MAUS) {
         const start: BrowserAudioTime | OriginalAudioTime = (selected.index > 0) ? this.transcrService.currentlevel.segments.get(selected.index - 1).time.clone()
           : this.audiomanager.createBrowserAudioTime(0);
         if (segment) {
@@ -523,7 +528,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   onShortCutTriggered($event, type) {
-    if (($event.value === 'do_asr' || $event.value === 'cancel_asr' || $event.value === 'do_asr_maus' || $event.value === 'cancel_asr_maus') && $event.type === 'segment') {
+    if (($event.value === 'do_asr' || $event.value === 'cancel_asr'
+      || $event.value === 'do_asr_maus' || $event.value === 'cancel_asr_maus'
+      || $event.value === 'do_maus' || $event.value === 'cancel_maus'
+    ) && $event.type === 'segment') {
       const segmentNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(this.viewer.MouseCursor.timePos.browserSample);
 
       if (segmentNumber > -1) {
@@ -547,12 +555,23 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           };
 
           if (segment.isBlockedBy === null) {
-            if ($event.value === 'do_asr') {
-              this.asrService.addToQueue(selection, ASRQueueItemType.ASR);
-              segment.isBlockedBy = ASRQueueItemType.ASR;
-            } else if ($event.value === 'do_asr_maus') {
-              this.asrService.addToQueue(selection, ASRQueueItemType.ASRMAUS);
-              segment.isBlockedBy = ASRQueueItemType.ASRMAUS;
+            if ($event.value === 'do_asr' || $event.value === 'do_asr_maus' || $event.value === 'do_maus') {
+              this.viewer.selectSegment(segmentNumber);
+
+              if ($event.value === 'do_asr') {
+                this.asrService.addToQueue(selection, ASRQueueItemType.ASR);
+                segment.isBlockedBy = ASRQueueItemType.ASR;
+              } else if ($event.value === 'do_asr_maus') {
+                this.asrService.addToQueue(selection, ASRQueueItemType.ASRMAUS);
+                segment.isBlockedBy = ASRQueueItemType.ASRMAUS;
+              } else if ($event.value === 'do_maus') {
+                if (segment.transcript.trim() === '' || segment.transcript.split(' ').length < 2) {
+                  this.alertService.showAlert('danger', this.langService.translate('asr.maus empty text'), false);
+                } else {
+                  this.asrService.addToQueue(selection, ASRQueueItemType.MAUS, segment.transcript);
+                  segment.isBlockedBy = ASRQueueItemType.MAUS;
+                }
+              }
             }
             this.asrService.startASR();
           } else {

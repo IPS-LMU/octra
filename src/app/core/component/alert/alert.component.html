@@ -11,7 +11,7 @@
     <ng-container *ngFor="let entry of queue">
       <div [@fadeToggle]="entry.animation" class="alert alert-{{entry.type}} alert-dismissible fade show"
            role="alert">
-        <p *ngIf="entry.component === null" [innerHTML]="validate(entry.message)"></p>
+        <p *ngIf="entry.component === null" [innerHTML]="validate(entry.message)" style="margin-right:10px;"></p>
         <div style="margin-right: 10px;">
           <ng-template *ngIf="entry.component !== null" appDynComponent [component]="entry.component"
                        (initialized)="afterComponentInitialized($event)"

@@ -149,10 +149,6 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit, OnDest
     }
   }
 
-  onDragEnd(event) {
-    console.log(`drag ended!`);
-  }
-
   private deselect() {
     if (window.getSelection) {
       if (window.getSelection().empty) {  // Chrome

@@ -296,7 +296,7 @@ export class TranscriptionService {
                 if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
                   this.appStorage.annotation[this._selectedlevel].level.items = [];
 
-                  if (!isNullOrUndefined(this.appStorage.serverDataEntry.transcript) && this.appStorage.serverDataEntry.transcript.length > 0) {
+                  if (!isNullOrUndefined(this.appStorage.serverDataEntry) && !isNullOrUndefined(this.appStorage.serverDataEntry.transcript) && this.appStorage.serverDataEntry.transcript.length > 0) {
                     // import logs
                     this.appStorage.logs = this.appStorage.serverDataEntry.logtext;
 

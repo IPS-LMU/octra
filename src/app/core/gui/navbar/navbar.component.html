@@ -5,7 +5,7 @@
 <app-statistics-modal #modalstatistics></app-statistics-modal>
 <app-prompt-modal #promptmodal></app-prompt-modal>
 
-<nav class="navbar navbar-expand-md navbar-fixed-top navbar-dark" style="z-index:1000;">
+<nav class="navbar navbar-expand-md navbar-fixed-top navbar-dark" style="z-index:1000;" *ngIf="navbarServ.showNavbar">
   <a class="navbar-brand" href="#" [title]="'last update: ' + (AppInfo.lastUpdate | date:'dd.MM.yyyy H:mm z')">OCTRA
     v{{version}}
     <ng-container
@@ -50,7 +50,7 @@
           <a class="nav-link" (mouseup)="setInterface(editor.name)">
             <fa-icon [icon]="['fas', editor.icon]"></fa-icon>
             <span
-              class="d-md-none d-lg-inline"> {{editor.translate | transloco}}</span>
+              class="d-none d-xl-inline"> {{editor.translate | transloco}}</span>
           </a>
         </li>
       </ng-template>
@@ -58,7 +58,7 @@
           *ngIf="appStorage.LoggedIn && navbarServ.showInterfaces && settService.appSettings.octra.showdetails">
         <a class="nav-link" (mouseup)="modalstatistics.open()">
           <fa-icon icon="th-list" class="navbar-icon"></fa-icon>
-          <span class="d-md-none d-lg-inline"> Statistics</span></a>
+          <span class="d-none d-xl-inline"> Statistics</span></a>
       </li>
     </ul>
     <ul class="navbar-nav mt-2 mt-md-0">
@@ -95,7 +95,7 @@
             <div class="col-3">
               <fa-icon icon="trash" style="cursor: pointer;"
                        (click)="onLevelRemoveClick(i, level.id)"></fa-icon>
-              <fa-icon [icon]="['far', 'copy']" *ngIf="level.type === AnnotJSONType.SEGMENT"
+              <fa-icon [icon]="['fas', 'copy']" *ngIf="level.type === AnnotJSONType.SEGMENT"
                        style="margin-left:3px;cursor:pointer;"
                        (click)="onLevelDuplicateClick(i, level.id)"></fa-icon>
             </div>
@@ -141,7 +141,7 @@
             <tr>
               <td><span>{{'general.duration' | transloco}}:</span></td>
               <td>
-                                <span>{{navbarServ.ressource?.info.duration.unix | timespan2}}
+                                <span>{{navbarServ.ressource?.info.duration.unix |  timespan : [true, false, false]}}
                                   (H:m:s)</span>
               </td>
             </tr>

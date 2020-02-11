@@ -90,12 +90,17 @@
     "tools": "Werkzeuge",
     "custom formats": "Eigene Formate",
     "meta data": "Metadaten",
-    "manual": "Handbuch"
+    "manual": "Handbuch",
+    "authenticate": "Authentifizieren",
+    "im authenticated": "Ich bin authentifiziert!",
+    "dismissed": "verschwindet in {{value}}s",
+    "Send feedback": "Feedback senden"
   },
   "bug report": {
     "give feedback": "Feedback geben",
     "description": "Bitte teile uns dein Feedback mit. Was können wir besser machen? Hast Du irgendwelche Schwierigkeiten mit der Verwendung von OCTRA?",
-    "sent": "Der Fehlerbericht wurde erfolgreich gesendet.",
+    "sent": "Dein Feedback wurde erfolgreich gesendet \uD83D\uDE42",
+    "error": "Dein Feedback konnte leider nicht gesendet werden. Bitte sende uns direkt eine E-Mail an {{email}}.",
     "send protocol": "Protokoll beifügen (empfohlen)"
   },
   "transcription": {
@@ -192,7 +197,8 @@
       "feedback and send 2": "Transcription mit zwei Sternen senden",
       "feedback and send 3": "Transcription mit drei Sternen senden",
       "do asr": "Selektiertes Segment von ASR verarbeiten lassen",
-      "do asr maus": "Selektiertes Segment von ASR & MAUS segmentieren lassen"
+      "do asr maus": "Selektiertes Segment von ASR & MAUS segmentieren lassen",
+      "do maus only": "Selektiertes Segment mit MAUS verarbeiten (Wort-Segmentierung)"
     },
     "inactivity": {
       "header": "Längere Inaktivität entdeckt",
@@ -320,7 +326,17 @@
     "asr running": "Die automatische Spracherkennung läuft gerade. Wenn Du sie für dieses Segment abbrechen möchtest, klicke hier.",
     "no asr selected": "Bevor Du das Tastenkürzel verwenden kannst, musst Du ASR Einstellungen vornehmen.",
     "no quota": "Es ist keine Kontingente mehr verfügbar. Bitte nutze einen anderen ASR Provider.",
-    "no auth": "Um weiter zu transkribieren ist eine erneute Authentifizierung notwendig."
+    "no auth": "Um weiter zu transkribieren ist eine erneute Authentifizierung notwendig. <a href='{{url}}'>Klicke hier um dich</a> zu authentifizieren.",
+    "maus empty text": "Das ausgewählte Segment enthält keinen Text oder der Text enthält weniger als zwei Wörter.",
+    "error": "Es ist ein Fehler aufgetreten. Sende uns bitte ein kurzes Feedback, damit der Fehler behoben werden kann."
+  },
+  "alerts": {
+    "authentication needed": "Authentifiziere Dich, damit Du Features wie die automatische Spracherkennung Wort-Segmentierung verwenden kannst. Nach einem Klick auf \"Authentifizieren\" erscheint ein separates Fenster. Falls sich kein Fenster öffnet, stelle sicher, dass dein Browser Popups für diese Seite erlaubt."
+  },
+  "authentication": {
+    "you are authenticated": "Du bist authentifiziert!",
+    "window closed": "Dieses Fenster wird in {{seconds}} Sekunden automatisch geschlossen.",
+    "description": "Schließe dieses Fenster und klicke auf die \"Ich bin authentifiziert!\"- Schaltfläche in OCTRA um deine Authentifizierung zu bestätigen. Danach wird die automatische Verarbeitung fortgesetzt."
   },
   "export": {
     "meta data": {

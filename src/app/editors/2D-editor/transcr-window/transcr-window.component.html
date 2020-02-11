@@ -56,6 +56,7 @@
                       (boundaryclicked)="onBoundaryClicked($event)"
                       (typing)="afterTyping($event)"
                       [validationEnabled]="appStorage.usemode !== 'url' && (appStorage.usemode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
+                      [height]="100"
   ></app-transcr-editor>
   <div class="window-nav-bottom">
     <div class="row" role="group">

@@ -1120,7 +1120,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         cursor: 'pointer'
       });
       const timespan = new TimespanPipe();
-      const text = timespan.transform(time.unix.toString());
+      const text = timespan.transform(time.unix.toString(), [true, true, true]);
       segPopover.text(text);
     }
   }

@@ -1,11 +1,11 @@
 // angular
-import {NgModule} from '@angular/core';
+import {Injectable, NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 // third-party
 import {Ng2Webstorage} from '@rars/ngx-webstorage';
 // other
-import {AlertComponent, DropZoneComponent, OctraModalComponent} from './core/component';
+import {DropZoneComponent, OctraModalComponent} from './core/component';
 import {
   FastbarComponent,
   LoadingComponent,
@@ -42,22 +42,24 @@ import {DictaphoneEditorComponent, LinearEditorComponent, TwoDEditorComponent} f
 import {NewEditorComponent} from './editors/new-editor/new-editor.component';
 import {HelpToolsComponent} from './core/gui/help-tools/';
 import {FeaturesComponent} from './core/gui/features';
-import {HttpClientModule} from '@angular/common/http';
+import {HttpClient, HttpClientModule} from '@angular/common/http';
+import {AudioviewerConfig} from './media-components/components/audio/audioviewer';
 import {MediaComponentsModule} from './media-components/media-components.module';
 import {TranscrEditorComponent} from './core/component/transcr-editor';
 import {Error404Component} from './core/gui/error404';
-import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {FaIconLibrary, FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 // icons
-import {library} from '@fortawesome/fontawesome-svg-core';
 import {
   faAlignJustify,
   faArrowLeft,
   faArrowRight,
   faBook,
   faCheck,
+  faCheckCircle,
   faChevronDown,
   faChevronUp,
   faCog,
+  faCopy,
   faDatabase,
   faDownload,
   faEdit,
@@ -68,6 +70,7 @@ import {
   faFolderOpen,
   faGlobe,
   faGripLines,
+  faHandshake,
   faHeadphones,
   faInfoCircle,
   faKeyboard,
@@ -82,8 +85,10 @@ import {
   faSpinner,
   faThList,
   faTimes,
+  faTimesCircle,
   faTools,
   faTrash,
+  faUserCheck,
   faWindowMaximize
 } from '@fortawesome/free-solid-svg-icons';
 // modules
@@ -94,8 +99,6 @@ import {BugreportModalComponent} from './core/modals/bugreport-modal/bugreport-m
 import {SupportedFilesModalComponent} from './core/modals/supportedfiles-modal/supportedfiles-modal.component';
 import {TranscriptionDeleteModalComponent} from './core/modals/transcription-delete-modal/transcription-delete-modal.component';
 import {TranscriptionStopModalComponent} from './core/modals/transcription-stop-modal/transcription-stop-modal.component';
-import {faCopy, faHandshake, faTimesCircle} from '@fortawesome/free-regular-svg-icons';
-import {faCheckCircle} from '@fortawesome/free-regular-svg-icons/faCheckCircle';
 import {LoginInvalidModalComponent} from './core/modals/login-invalid-modal/login-invalid-modal.component';
 import {ErrorModalComponent} from './core/modals/error-modal/error-modal.component';
 import {ExportFilesModalComponent} from './core/modals/export-files-modal/export-files-modal.component';
@@ -120,65 +123,41 @@ import {StresstestComponent} from './core/tools/stresstest/stresstest.component'
 import {TranscriptionDemoEndModalComponent} from './core/modals/transcription-demo-end/transcription-demo-end-modal.component';
 import {AsrOptionsComponent} from './core/gui/asr-options/asr-options.component';
 import {environment} from '../environments/environment';
-import {translocoLoader} from './transloco.loader';
-import {TRANSLOCO_CONFIG, TranslocoConfig, TranslocoModule} from '@ngneat/transloco';
+import {Translation, TRANSLOCO_CONFIG, TRANSLOCO_LOADER, translocoConfig, TranslocoLoader, TranslocoModule} from '@ngneat/transloco';
 import {DragulaModule} from 'ng2-dragula';
 import {TableConfiguratorComponent} from './core/component/table-configurator/table-configurator.component';
 import {ClipTextPipe} from './core/shared/clip-text.pipe';
 import {AuthComponent} from './core/gui/auth/auth.component';
 import {ToolsModalComponent} from './core/modals/tools-modal/tools-modal.component';
 import {HelpModalComponent} from './core/modals/help-modal/help-modal.component';
+import {AlertComponent} from './core/component/alert/alert.component';
+import {faTrashAlt} from '@fortawesome/free-regular-svg-icons';
+import {AuthenticationNeededComponent} from './core/alerts/authentication-needed/authentication-needed.component';
+import {DynComponentDirective} from './core/shared/directive/dyn-component.directive';
+import {ErrorOccurredComponent} from './core/alerts/error-occurred/error-occurred.component';
 import {AudioviewerConfig} from './media-components/components/audio/audio-viewer/audio-viewer.config';
-
-library.add(
-  faSpinner,
-  faCheck,
-  faTimes,
-  faTrash,
-  faExclamationCircle,
-  faInfoCircle,
-  faDownload,
-  faHeadphones,
-  faPrint,
-  faSearch,
-  faExclamationTriangle,
-  faTimesCircle,
-  faCog,
-  faFolderOpen,
-  faCheckCircle,
-  faThList,
-  faBook,
-  faCopy,
-  faPlus,
-  faSignOutAlt,
-  faEdit,
-  faFile,
-  faArrowLeft,
-  faArrowRight,
-  faKeyboard,
-  faEye,
-  faExclamationTriangle,
-  faSave,
-  faQuestionCircle,
-  faChevronUp,
-  faChevronDown,
-  faPaperPlane,
-  faMinus,
-  faWindowMaximize,
-  faAlignJustify,
-  faStar,
-  faGlobe,
-  faHandshake,
-  faDatabase,
-  faGripLines,
-  faTools
-);
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
   TwoDEditorComponent,
   LinearEditorComponent
 ];
+
+
+export const ALERTS: any[] = [
+  AuthenticationNeededComponent
+];
+
+@Injectable({providedIn: 'root'})
+export class TranslocoHttpLoader implements TranslocoLoader {
+  constructor(private http: HttpClient) {
+  }
+
+  getTranslation(lang: string) {
+    console.log(`load translation...`);
+    return this.http.get<Translation>(`./assets/i18n/${lang}.json`);
+  }
+}
 
 @NgModule({
   declarations: [
@@ -236,9 +215,11 @@ export const EDITORS: any[] = [
     ClipTextPipe,
     AuthComponent,
     ToolsModalComponent,
-    HelpModalComponent
+    HelpModalComponent,
+    ALERTS,
+    DynComponentDirective,
+    ErrorOccurredComponent
   ],
-  entryComponents: EDITORS,
   imports: [
     BrowserModule,
     FontAwesomeModule,
@@ -288,18 +269,64 @@ export const EDITORS: any[] = [
     MultiThreadingService,
     {
       provide: TRANSLOCO_CONFIG,
-      useValue: {
-        listenToLangChange: true,
+      useValue: translocoConfig({
+        availableLangs: ['en'],
         defaultLang: 'en',
         fallbackLang: 'en',
         prodMode: environment.production,
-        scopeStrategy: 'shared'
-      } as TranslocoConfig
+        reRenderOnLangChange: true
+      })
     },
-    translocoLoader
-
+    {provide: TRANSLOCO_LOADER, useClass: TranslocoHttpLoader}
   ]
 })
 
 export class AppModule {
+  constructor(library: FaIconLibrary) {
+    library.addIcons(
+      faSpinner,
+      faCheck,
+      faTimes,
+      faTrash,
+      faExclamationCircle,
+      faInfoCircle,
+      faDownload,
+      faHeadphones,
+      faPrint,
+      faSearch,
+      faExclamationTriangle,
+      faTimesCircle,
+      faCog,
+      faFolderOpen,
+      faCheckCircle,
+      faThList,
+      faBook,
+      faCopy,
+      faPlus,
+      faSignOutAlt,
+      faEdit,
+      faFile,
+      faArrowLeft,
+      faArrowRight,
+      faKeyboard,
+      faEye,
+      faExclamationTriangle,
+      faSave,
+      faQuestionCircle,
+      faChevronUp,
+      faChevronDown,
+      faPaperPlane,
+      faMinus,
+      faWindowMaximize,
+      faAlignJustify,
+      faStar,
+      faGlobe,
+      faHandshake,
+      faDatabase,
+      faGripLines,
+      faTools,
+      faTrashAlt,
+      faUserCheck
+    );
+  }
 }

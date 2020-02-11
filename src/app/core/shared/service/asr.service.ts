@@ -80,12 +80,12 @@ export class AsrService {
     this._queue.start();
   }
 
-  public addToQueue(timeInterval: { sampleStart: number, sampleLength: number, browserSampleEnd: number }, type: ASRQueueItemType): ASRQueueItem {
+  public addToQueue(timeInterval: { sampleStart: number, sampleLength: number, browserSampleEnd: number }, type: ASRQueueItemType, transcript = ''): ASRQueueItem {
     const item = new ASRQueueItem({
       sampleStart: timeInterval.sampleStart,
       sampleLength: timeInterval.sampleLength,
       browserSampleEnd: timeInterval.browserSampleEnd
-    }, this.queue, this.selectedLanguage, type);
+    }, this.queue, this.selectedLanguage, type, transcript);
     this.queue.add(item);
     return item;
   }
@@ -229,7 +229,8 @@ class ASRQueue {
             this._itemChange.next(nextItem);
             nextItem.statusChange.subscribe((status) => {
 
-                if (status.new !== ASRProcessStatus.STARTED) {
+                if (status.new !== ASRProcessStatus.STARTED && status.new !== ASRProcessStatus.NOAUTH
+                  && status.old !== ASRProcessStatus.NOAUTH) {
                   this.remove(nextItem.id);
                 }
                 this.updateStatistics(status);
@@ -237,9 +238,7 @@ class ASRQueue {
                 if (status.new === ASRProcessStatus.NOAUTH) {
                   if (this._statistics.running === 0) {
                     // redirect via location href is important because it's not working otherwise!
-                    setTimeout(() => {
-                      document.location.href = 'user/auth';
-                    }, 500);
+                    // no redirect, show alert only!
                   }
                 }
 
@@ -261,7 +260,7 @@ class ASRQueue {
                 }, 1000);
               });
           } else {
-            nextItem.changeStatus(ASRProcessStatus.FAILED);
+            // ignore
           }
 
           setTimeout(() => {
@@ -354,6 +353,10 @@ class ASRQueue {
 }
 
 export class ASRQueueItem {
+  get transcriptInput(): string {
+    return this._transcriptInput;
+  }
+
   get type(): ASRQueueItemType {
     return this._type;
   }
@@ -393,6 +396,8 @@ export class ASRQueueItem {
     sampleLength: number;
     browserSampleEnd: number;
   };
+  private _transcriptInput = '';
+
   private _status: ASRProcessStatus;
   private readonly _statusChange: Subject<{
     old: ASRProcessStatus,
@@ -407,7 +412,7 @@ export class ASRQueueItem {
     sampleStart: number,
     sampleLength: number,
     browserSampleEnd: number
-  }, asrQueue: ASRQueue, selectedLanguage: ASRLanguage, type: ASRQueueItemType) {
+  }, asrQueue: ASRQueue, selectedLanguage: ASRLanguage, type: ASRQueueItemType, transcriptInput = '') {
     this._id = ASRQueueItem.counter++;
     this._time = {
       sampleStart: timeInterval.sampleStart,
@@ -422,6 +427,7 @@ export class ASRQueueItem {
     this.parent = asrQueue;
     this._selectedLanguage = selectedLanguage;
     this._type = type;
+    this._transcriptInput = transcriptInput;
   }
 
   public changeStatus(newStatus: ASRProcessStatus) {
@@ -442,16 +448,14 @@ export class ASRQueueItem {
         this.transcribeSignalWithASR('txt').then(() => {
           this.changeStatus(ASRProcessStatus.FINISHED);
         });
-      } else {
+      } else if (this._type === ASRQueueItemType.ASRMAUS) {
         console.log(`CALL ASR MAUS`);
         // call ASR and than MAUS
         this.transcribeSignalWithASR('bpf').then((result) => {
-          console.log(result);
 
           this.callMAUS(this._selectedLanguage, result.audioURL, result.transcriptURL).then((result) => {
             const reader = new FileReader();
 
-            reader.readAsText(result.file, 'utf-8');
             reader.onerror = (error) => {
               console.error(error);
               this.changeStatus(ASRProcessStatus.FAILED);
@@ -461,10 +465,30 @@ export class ASRQueueItem {
               this._result = reader.result as string;
               this.changeStatus(ASRProcessStatus.FINISHED);
             };
+
+            reader.readAsText(result.file, 'utf-8');
           }).catch((error) => {
             console.error(error);
             this.changeStatus(ASRProcessStatus.FAILED);
           });
+        });
+      } else if (this._type === ASRQueueItemType.MAUS) {
+        console.log(`call MAUS only`);
+        this.processWithMAUSONLY().then((result) => {
+          const reader = new FileReader();
+          reader.onerror = (error) => {
+            console.error(error);
+            this.changeStatus(ASRProcessStatus.FAILED);
+          };
+
+          reader.onload = () => {
+            this._result = reader.result as string;
+            this.changeStatus(ASRProcessStatus.FINISHED);
+          };
+
+          reader.readAsText(result.file, 'utf-8');
+        }).catch((error) => {
+          console.error(error);
         });
       }
       return true;
@@ -550,7 +574,7 @@ export class ASRQueueItem {
           }
         },
         (error) => {
-          console.log(error.message);
+          console.log(JSON.stringify(error));
           if (error.message.indexOf('0 Unknown Error') > -1) {
             this.changeStatus(ASRProcessStatus.NOAUTH);
           }
@@ -567,7 +591,7 @@ export class ASRQueueItem {
       file: File,
       url: string
     }>((resolve, reject) => {
-      const mausURL = this.parent.asrSettings.calls[1].replace('{{host}}', languageObject.host)
+      let mausURL = this.parent.asrSettings.calls[1].replace('{{host}}', languageObject.host)
         .replace('{{audioURL}}', audioURL)
         .replace('{{transcriptURL}}', transcriptURL)
         .replace('{{asrType}}', languageObject.asr)
@@ -662,7 +686,91 @@ export class ASRQueueItem {
                 this._result = error;
                 if (error.indexOf('quota') > -1) {
                   this.changeStatus(ASRProcessStatus.NOQUOTA);
-                } else if (error.indexOf('0 Unknown Error')) {
+                } else if (error.indexOf('0 Unknown Error') > -1) {
+                  this.changeStatus(ASRProcessStatus.NOAUTH);
+                } else {
+                  this._result = error;
+                  this.changeStatus(ASRProcessStatus.FAILED);
+                }
+                reject(error);
+              });
+            }
+          }).catch((error) => {
+            this._result = error;
+            this.changeStatus(ASRProcessStatus.FAILED);
+            reject(error);
+          });
+        }
+      }).catch((error) => {
+        this._result = error;
+        this.changeStatus(ASRProcessStatus.FAILED);
+        reject(error);
+      });
+    });
+  }
+
+
+  public processWithMAUSONLY(): Promise<{
+    file: File,
+    url: string
+  }> {
+    return new Promise<{
+      file: File,
+      url: string
+    }>((resolve, reject) => {
+      this.changeStatus(ASRProcessStatus.STARTED);
+      const audioManager = this.parent.audiomanager;
+
+      // 1) cut signal
+      const format = new WavFormat();
+      format.init(audioManager.ressource.info.fullname, audioManager.ressource.arraybuffer);
+      format.cutAudioFile(audioManager.ressource.info.type, `OCTRA_ASRqueueItem_${this._id}`, audioManager.ressource.arraybuffer,
+        {
+          number: 1,
+          sampleStart: this.time.sampleStart,
+          sampleDur: this.time.sampleLength
+        }).then((file) => {
+        if (this._status !== ASRProcessStatus.STOPPED) {
+          // 2) upload signal
+          const promises: Promise<string>[] = [];
+          const transcriptFile = new File([this._transcriptInput], `OCTRA_ASRqueueItem_${this._id}.txt`, {type: 'text/plain'});
+          promises.push(this.uploadFile(transcriptFile, this.selectedLanguage));
+          promises.push(this.uploadFile(file, this.selectedLanguage));
+
+          Promise.all<string>(promises).then((values) => {
+            const transcriptURL = values[0];
+            const audioURL = values[1];
+
+
+            if (this._status !== ASRProcessStatus.STOPPED) {
+              // 3) signal audio url and transcriptURL to MAUS
+              this.callMAUS(this.selectedLanguage, audioURL, transcriptURL).then((resultMAUS) => {
+                if (this._status !== ASRProcessStatus.STOPPED) {
+
+                  const reader = new FileReader();
+
+                  reader.onload = () => {
+                    this._result = reader.result as string;
+
+                    // make sure that there are not any white spaces at the end or new lines
+                    this._result = this._result.replace(/\n/g, '').trim();
+
+                    resolve(resultMAUS);
+                  };
+
+                  reader.onerror = (error: any) => {
+                    this._result = 'Could not read result';
+                    this.changeStatus(ASRProcessStatus.FAILED);
+                    reject(error);
+                  };
+
+                  reader.readAsText(resultMAUS.file, 'utf-8');
+                }
+              }).catch((error) => {
+                this._result = error;
+                if (error.indexOf('quota') > -1) {
+                  this.changeStatus(ASRProcessStatus.NOQUOTA);
+                } else if (error.indexOf('0 Unknown Error') > -1) {
                   this.changeStatus(ASRProcessStatus.NOAUTH);
                 } else {
                   this.changeStatus(ASRProcessStatus.FAILED);
@@ -683,6 +791,12 @@ export class ASRQueueItem {
       });
     });
   }
+}
+
+export enum ASRQueueItemType {
+  ASR = 'ASR',
+  ASRMAUS = 'ASRMAUS',
+  MAUS = 'MAUS'
 }
 
 export enum ASRProcessStatus {

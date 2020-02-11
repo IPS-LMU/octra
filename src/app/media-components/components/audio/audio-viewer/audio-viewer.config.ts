@@ -196,6 +196,22 @@ export class AudioviewerConfig {
       },
       focusonly: true,
       title: 'do asr'
+    },
+    do_asr_maus: {
+      keys: {
+        mac: 'M',
+        pc: 'M'
+      },
+      focusonly: true,
+      title: 'do asr maus'
+    },
+    do_maus: {
+      keys: {
+        mac: 'W',
+        pc: 'W'
+      },
+      focusonly: true,
+      title: 'do maus only'
     }
   };
 

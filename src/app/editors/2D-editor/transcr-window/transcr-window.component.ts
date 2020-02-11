@@ -296,7 +296,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   save() {
-    console.log(`SAVE from transcr window`);
     if (this.segmentIndex > -1 && this.transcrService.currentlevel.segments &&
       this.segmentIndex < this.transcrService.currentlevel.segments.length) {
       if (this.editor.html.indexOf('<img src="assets/img/components/transcr-editor/boundary.png"') > -1) {

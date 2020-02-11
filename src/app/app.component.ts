@@ -1,6 +1,5 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {APIService, AppStorageService, SettingsService} from './core/shared/service';
-import {TranslocoService} from '@ngneat/transloco';
 import {SubscriptionManager} from './core/obj/SubscriptionManager';
 import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
 import {AppInfo} from './app.info';
@@ -11,6 +10,7 @@ import {isNullOrUndefined} from './core/shared/Functions';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
 import {AsrService} from './core/shared/service/asr.service';
 import {ASRLanguage} from './core/obj/Settings';
+import {TranslocoService} from '@ngneat/transloco';
 
 @Component({
   selector: 'app-octra',
@@ -116,6 +116,16 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
             console.error('Could not read ASR language from database');
           }
         }
+
+        this.appStorage.loadConsoleEntries().then((dbEntry: any) => {
+          if (!isNullOrUndefined(dbEntry) && dbEntry.hasOwnProperty('value')) {
+            this.bugService.addEntriesFromDB(dbEntry.value);
+          } else {
+            this.bugService.addEntriesFromDB(null);
+          }
+        }).catch((error) => {
+          console.error(error);
+        });
       }
     ));
 
@@ -132,6 +142,8 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
 
     this.settingsService.loadApplicationSettings(this.route).then(() => {
       console.log(`Application settings loaded`);
+
+      this.langService.setAvailableLangs(this.settingsService.appSettings.octra.languages);
 
       if (!isNullOrUndefined(this.settingsService.appSettings.octra.tracking)
         && !isNullOrUndefined(this.settingsService.appSettings.octra.tracking.active)
@@ -201,39 +213,31 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
   }
 
   private appendTrackingCode(type: string) {
-
+    // check if matomo is activated
     if (type === 'matomo') {
       if (!isNullOrUndefined(this.settingsService.appSettings.octra.tracking.matomo)
         && !isNullOrUndefined(this.settingsService.appSettings.octra.tracking.matomo.host)
         && !isNullOrUndefined(this.settingsService.appSettings.octra.tracking.matomo.siteID)) {
-        const piwikSettings = this.settingsService.appSettings.octra.tracking.matomo;
+        const matomoSettings = this.settingsService.appSettings.octra.tracking.matomo;
 
         const trackingCode = `
-<!-- Piwik -->
+<!-- Matomo -->
 <script type="text/javascript">
-    if(window.location.host.lastIndexOf("localhost")==-1){ //execute if not on debug system
-        var _paq = _paq || [];
-        _paq.push([ 'trackPageView' ]);
-        _paq.push([ 'enableLinkTracking' ]);
-        (function() {
-            //var u = (("https:" == document.location.protocol) ? "https" : "http")
-            var u = "${piwikSettings.host}";
-            _paq.push([ 'setTrackerUrl', u + 'piwik.php' ]);
-            _paq.push([ 'setSiteId', ${piwikSettings.siteID}]);
-            var d = document;
-            var g = d.createElement('script');
-            var s = d.getElementsByTagName('script')[0];
-            g.type = 'text/javascript';
-            g.defer = true;
-            g.async = true;
-            g.src = u + 'piwik.js';
-            s.parentNode.insertBefore(g, s);
-            console.log("Sent statistics to piwik");
-        })();
-    }
-</script> `;
+  var _paq = window._paq || [];
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="${matomoSettings.host}";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', '${matomoSettings.siteID}']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Matomo Code -->`;
 
-        jQuery(trackingCode).insertAfter('main');
+        jQuery(trackingCode).insertAfter(jQuery('body').children().last());
       } else {
         console.error(`attributes for piwik tracking in appconfig.json are invalid.`);
       }

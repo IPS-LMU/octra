@@ -1,25 +1,14 @@
+/*
+Version 1.1.0
+For new versions of this class go to https://gist.github.com/julianpoemp/0c4dc13541b863f6503026333eb6b2b6
+License: MIT
+*/
 import {Subscription} from 'rxjs';
 
-/*
-If you are using subscriptions in a component these should always be unsubscribed when the component is destroyed.
-In order to make it easier to handle subscriptions this class can be used.
-
-How to use it:
-
-1.) Create an private attribute "private subscrManager = new SubscriptionManager();" in your component
-2.) Wrap your subscription calls in:
-    this.subscrManager.add(someObservable.subscribe(()=>{
-      // some code
-    }));
-3.) Implement OnDestroy and ngOnDestroy function like that:
-    ngOnDestroy(){
-      this.subscrManager.destroy();
-    }
-4.) That's all! This is a easy and secure way to handle Subscriptions :)
- */
 export class SubscriptionManager {
   private subscriptions: {
     id: number,
+    tag: string,
     subscription: Subscription
   }[];
 
@@ -32,12 +21,15 @@ export class SubscriptionManager {
 
   /**
    * add subscription to the manager. Returns the id of the subscriptions
+   * @param subscription subscription that shall be added
+   * @param tag optional tag
    * @returns number
    */
-  public add(subscription: Subscription): number {
+  public add(subscription: Subscription, tag?: string): number {
     this.subscriptions.push(
       {
         id: ++this.counter,
+        tag,
         subscription
       }
     );
@@ -49,8 +41,8 @@ export class SubscriptionManager {
    */
   public destroy() {
     if (!(this.subscriptions === null || this.subscriptions === undefined)) {
-      for (let i = 0; i < this.subscriptions.length; i++) {
-        this.subscriptions[i].subscription.unsubscribe();
+      for (const elem of this.subscriptions) {
+        elem.subscription.unsubscribe();
       }
       this.subscriptions = [];
     }
@@ -58,8 +50,9 @@ export class SubscriptionManager {
 
   /**
    * unsubscribes specific Subscription with specific id.
+   * @param id id that is looked for
    */
-  public remove(id: number): boolean {
+  public removeById(id: number): boolean {
     for (let i = 0; i < this.subscriptions.length; i++) {
       const element = this.subscriptions[i];
 
@@ -70,5 +63,23 @@ export class SubscriptionManager {
       }
     }
     return false;
+  }
+
+  /***
+   * unsubscribes all subscriptions with a specific tag
+   * @param tag name that is tagged to the subscription
+   */
+  public removeByTag(tag: string): boolean {
+    let removed = false;
+    for (let i = 0; i < this.subscriptions.length; i++) {
+      const element = this.subscriptions[i];
+
+      if (element.tag === tag) {
+        element.subscription.unsubscribe();
+        this.subscriptions.splice(i, 1);
+        removed = true;
+      }
+    }
+    return removed;
   }
 }

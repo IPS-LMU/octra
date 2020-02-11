@@ -1,1 +1,30 @@
-<p>If you see this message, something failed. Please send us a feedback.</p>
+<div class="row">
+  <div class="col-md-4">
+    <span id="logo">OCTRA</span>
+
+    <table>
+      <tbody>
+      <tr>
+        <td>
+          <fa-icon icon="user-check" size="3x" style="color:forestgreen;"></fa-icon>
+        </td>
+        <td>
+          <h2>{{"authentication.you are authenticated" | transloco}}</h2>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="col-md-8">
+    <img src="assets/img/authenticated.jpg"/>
+  </div>
+</div>
+
+<p style="margin-top: 20px;">{{"authentication.description" | transloco}}</p>
+<p style="font-weight: bold">
+  {{"authentication.window closed" | transloco:
+  {
+    "seconds": secondsToClose
+  }
+  }}
+</p>

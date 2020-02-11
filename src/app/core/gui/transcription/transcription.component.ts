@@ -17,11 +17,11 @@ import {
 import {Router} from '@angular/router';
 
 import {
+  AlertService,
   APIService,
   AppStorageService,
   AudioService,
   KeymappingService,
-  MessageService,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
@@ -60,7 +60,7 @@ import {Level} from '../../../media-components/obj/annotation';
   selector: 'app-transcription',
   templateUrl: './transcription.component.html',
   styleUrls: ['./transcription.component.css'],
-  providers: [MessageService]
+  providers: [AlertService]
 })
 export class TranscriptionComponent implements OnInit,
   OnDestroy, AfterViewInit, AfterContentInit, OnChanges, AfterViewChecked, AfterContentChecked, AfterContentInit {
@@ -112,7 +112,7 @@ export class TranscriptionComponent implements OnInit,
               private bugService: BugReportService,
               private cd: ChangeDetectorRef,
               private asrService: AsrService,
-              private msg: MessageService) {
+              private alertService: AlertService) {
     this.subscrmanager = new SubscriptionManager();
     this.audioManager = this.audio.audiomanagers[0];
 
@@ -183,7 +183,7 @@ export class TranscriptionComponent implements OnInit,
     this.subscrmanager.add(this.navbarServ.toolApplied.subscribe((toolName: string) => {
         switch (toolName) {
           case('combinePhrases'):
-            this.msg.showMessage('success', this.langService.translate('tools.alerts.done', {
+            this.alertService.showAlert('success', this.langService.translate('tools.alerts.done', {
               value: toolName
             }));
             (this._currentEditor.instance as any).update();
@@ -194,6 +194,16 @@ export class TranscriptionComponent implements OnInit,
       },
       () => {
       }));
+
+    this.subscrmanager.add(this.modService.showmodal.subscribe((event: { type: string, data, emitter: any }) => {
+      const editor = this._currentEditor.instance as OCTRAEditor;
+      editor.disableAllShortcuts();
+    }));
+
+    this.subscrmanager.add(this.modService.closemodal.subscribe((event: { type: string }) => {
+      const editor = this._currentEditor.instance as OCTRAEditor;
+      editor.enableAllShortcuts();
+    }));
   }
 
   // TODO change to ModalComponents!
@@ -362,13 +372,11 @@ export class TranscriptionComponent implements OnInit,
     this.navbarServ.showExport = this.settingsService.projectsettings.navigation.export;
 
     if (!(this.transcrService.annotation === null || this.transcrService.annotation === undefined)) {
-      console.log(`subscribe for id ${this.appStorage.dataID}`);
       this.levelSubscriptionID = this.subscrmanager.add(
         this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
       );
     } else {
       this.subscrmanager.add(this.transcrService.dataloaded.subscribe(() => {
-        console.log(`subscribe2 for id ${this.appStorage.dataID}`);
         this.levelSubscriptionID = this.subscrmanager.add(
           this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
         );
@@ -380,7 +388,7 @@ export class TranscriptionComponent implements OnInit,
         (this.currentEditor.instance as any).update();
 
         // important: subscribe to level changes in order to save proceedings
-        this.subscrmanager.remove(this.levelSubscriptionID);
+        this.subscrmanager.removeById(this.levelSubscriptionID);
         this.levelSubscriptionID = this.subscrmanager.add(
           this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
         );
@@ -423,6 +431,7 @@ export class TranscriptionComponent implements OnInit,
     }
 
     this.bugService.init(this.transcrService);
+
     if (this.appStorage.usemode === 'online') {
       console.log(`opened job ${this.appStorage.dataID} in project ${this.appStorage.user.project}`);
     }
@@ -532,7 +541,7 @@ export class TranscriptionComponent implements OnInit,
         const id = this.subscrmanager.add(comp.initialized.subscribe(
           () => {
             this.editorloaded = true;
-            this.subscrmanager.remove(id);
+            this.subscrmanager.removeById(id);
             this.cd.detectChanges();
 
             resolve();
@@ -908,8 +917,7 @@ export class TranscriptionComponent implements OnInit,
 
   private unsubscribeSubscriptionsForThisAnnotation() {
     if (this.levelSubscriptionID > 0) {
-      console.log(`unsubscribe!`);
-      this.subscrmanager.remove(this.levelSubscriptionID);
+      this.subscrmanager.removeById(this.levelSubscriptionID);
       this.levelSubscriptionID = 0;
     }
   }

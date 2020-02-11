@@ -11,10 +11,10 @@ import {
 } from '@angular/core';
 
 import {
+  AlertService,
   AppStorageService,
   AudioService,
   KeymappingService,
-  MessageService,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
@@ -53,7 +53,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   private oldRaw = '';
 
   constructor(public audio: AudioService,
-              public msg: MessageService,
+              public alertService: AlertService,
               public keyMap: KeymappingService,
               public transcrService: TranscriptionService,
               public cd: ChangeDetectorRef,
@@ -182,7 +182,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
     this.subscrmanager.add(this.viewer.alerttriggered.subscribe(
       (result) => {
-        this.msg.showMessage(result.type, result.message);
+        this.alertService.showAlert(result.type, result.message);
       }
     ));
 
@@ -315,7 +315,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   onAlertTriggered(result) {
-    this.msg.showMessage(result.type, result.message);
+    this.alertService.showAlert(result.type, result.message);
   }
 
   onSegmentChange() {
@@ -630,5 +630,19 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
   onKeyUp() {
     this.appStorage.savingNeeded = true;
+  }
+
+  public enableAllShortcuts() {
+    this.viewer.enableShortcuts();
+    if (!isNullOrUndefined(this.loupe)) {
+      this.loupe.viewer.enableShortcuts();
+    }
+  }
+
+  public disableAllShortcuts() {
+    this.viewer.disableShortcuts();
+    if (!isNullOrUndefined(this.loupe)) {
+      this.loupe.viewer.disableShortcuts();
+    }
   }
 }

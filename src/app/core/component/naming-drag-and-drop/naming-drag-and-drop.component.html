@@ -30,14 +30,14 @@
     >
       <div class="naming-content" *ngIf="i !== clicked">
         <span class="value">{{item.value}}</span>
-        <fa-icon (click)="remove(i)" [icon]="['far', 'times-circle']"></fa-icon>
+        <fa-icon (click)="remove(i)" [icon]="['fas', 'times-circle']"></fa-icon>
       </div>
       <div class="naming-content" *ngIf="i === clicked">
           <span #text contenteditable="true" class="value" style="min-width: 10px;"
                 (keydown)="onKeyDown($event, text)">
             {{item.value}}
           </span>
-        <fa-icon (click)="remove(i)" [icon]="['far', 'times-circle']"></fa-icon>
+        <fa-icon (click)="remove(i)" [icon]="['fas', 'times-circle']"></fa-icon>
       </div>
     </div>
   </div>

@@ -93,7 +93,8 @@
     "manual": "Handbuch",
     "authenticate": "Authentifizieren",
     "im authenticated": "Ich bin authentifiziert!",
-    "dismissed": "verschwindet in {{value}}s"
+    "dismissed": "verschwindet in {{value}}s",
+    "Send feedback": "Feedback senden"
   },
   "bug report": {
     "give feedback": "Feedback geben",
@@ -196,7 +197,8 @@
       "feedback and send 2": "Transcription mit zwei Sternen senden",
       "feedback and send 3": "Transcription mit drei Sternen senden",
       "do asr": "Selektiertes Segment von ASR verarbeiten lassen",
-      "do asr maus": "Selektiertes Segment von ASR & MAUS segmentieren lassen"
+      "do asr maus": "Selektiertes Segment von ASR & MAUS segmentieren lassen",
+      "do maus only": "Selektiertes Segment mit MAUS verarbeiten (Wort-Segmentierung)"
     },
     "inactivity": {
       "header": "Längere Inaktivität entdeckt",
@@ -324,7 +326,9 @@
     "asr running": "Die automatische Spracherkennung läuft gerade. Wenn Du sie für dieses Segment abbrechen möchtest, klicke hier.",
     "no asr selected": "Bevor Du das Tastenkürzel verwenden kannst, musst Du ASR Einstellungen vornehmen.",
     "no quota": "Es ist keine Kontingente mehr verfügbar. Bitte nutze einen anderen ASR Provider.",
-    "no auth": "Um weiter zu transkribieren ist eine erneute Authentifizierung notwendig. <a href='{{url}}'>Klicke hier um dich</a> zu authentifizieren."
+    "no auth": "Um weiter zu transkribieren ist eine erneute Authentifizierung notwendig. <a href='{{url}}'>Klicke hier um dich</a> zu authentifizieren.",
+    "maus empty text": "Das ausgewählte Segment enthält keinen Text oder der Text enthält weniger als zwei Wörter.",
+    "error": "Es ist ein Fehler aufgetreten. Sende uns bitte ein kurzes Feedback, damit der Fehler behoben werden kann."
   },
   "alerts": {
     "authentication needed": "Authentifiziere Dich, damit Du Features wie die automatische Spracherkennung Wort-Segmentierung verwenden kannst. Nach einem Klick auf \"Authentifizieren\" erscheint ein separates Fenster. Falls sich kein Fenster öffnet, stelle sicher, dass dein Browser Popups für diese Seite erlaubt."

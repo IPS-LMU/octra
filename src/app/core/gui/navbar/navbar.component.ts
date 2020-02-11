@@ -57,10 +57,15 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public get errorsFound(): boolean {
+    let beginCheck = false;
     return (this.bugService.console.filter((a) => {
-      if (a.type === ConsoleType.ERROR) {
+      if (a.type === ConsoleType.ERROR && beginCheck) {
         return true;
       }
+      if (typeof a.message === 'string' && a.message.indexOf('AFTER RELOAD') > -1) {
+        beginCheck = true;
+      }
+      return false;
     }).length > 0);
   }
 

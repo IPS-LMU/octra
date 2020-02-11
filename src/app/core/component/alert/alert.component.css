@@ -5,6 +5,7 @@
   top: 0;
   right: 0;
   z-index: 1000;
+  height: 100%;
 }
 
 .queue {
@@ -15,8 +16,9 @@
 .alert {
   margin-bottom: 5px;
   font-size: 0.8em;
-  box-shadow: gray 5px 3px 5px;
+  box-shadow: #5a5a5a 0 0 10px;
   padding: 10px;
+  margin-left: 10px;
 }
 
 .alert p {
@@ -29,7 +31,8 @@
   width: 100%;
   background-color: lightgray;
   border: none;
-  box-shadow: gray 5px 3px 10px;
+  box-shadow: #5a5a5a 5px 3px 10px;
+  margin-left: 10px;
 }
 
 .alert button {

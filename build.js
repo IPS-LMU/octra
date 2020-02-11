@@ -32,8 +32,6 @@ if (process.argv[4].indexOf("url=") > -1) {
   baseHref = process.argv[4].replace("url=", "");
 }
 
-console.log(`Remove cache...`);
-execSync("rm -rf ./node_modules/.cache");
 console.log(`Building OCTRA with dev=${dev}, isUpdate=${isUpdate} for ${baseHref}`);
 const command = ['--max-old-space-size=12000', './node_modules/@angular/cli/bin/ng', 'build', '--prod', '-c', 'dev', '--base-href', baseHref];
 

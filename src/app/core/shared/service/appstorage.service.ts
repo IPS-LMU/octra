@@ -8,6 +8,7 @@ import {Subject} from 'rxjs';
 import {IDataEntry} from '../../obj/data-entry';
 import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
 import {OLevel, OLink} from '../../../media-components/obj/annotation';
+import {ConsoleEntry} from './bug-report.service';
 
 export interface IIDBLevel {
   id: number;
@@ -44,6 +45,17 @@ export class OIDBLink implements IIDBLink {
 
 @Injectable()
 export class AppStorageService {
+  get userProfile(): { userName: string; email: string } {
+    return this._userProfile;
+  }
+
+  set userProfile(value: { userName: string; email: string }) {
+    this._idb.save('options', 'userProfile', {value}).catch((err) => {
+      console.error(err);
+    });
+    this._userProfile = value;
+  }
+
   set logs(value: any[]) {
     this._idb.saveArraySequential(value, 'logs', 'timestamp').catch((err) => {
       console.error(err);
@@ -443,6 +455,14 @@ export class AppStorageService {
     jobno: number
   } = null;
 
+  private _userProfile: {
+    userName: string,
+    email: string
+  } = {
+    userName: '',
+    email: ''
+  };
+
   @SessionStorage('agreement') private _agreement: any;
   @SessionStorage('playonhover') private _playonhover: boolean;
   @SessionStorage('reloaded') private _reloaded: boolean;
@@ -587,7 +607,6 @@ export class AppStorageService {
         for (let i = 0; i < variables.length; i++) {
           const variable = variables[i];
 
-          console.log('read ' + variable.attribute);
           if (this['' + variable.attribute + ''] !== undefined) {
             if (variable.hasOwnProperty('attribute') && variable.hasOwnProperty('key')) {
               promises.push(this.loadOptionFromIDB(variable.key).then(
@@ -820,6 +839,10 @@ export class AppStorageService {
           key: 'user'
         },
         {
+          attribute: '_userProfile',
+          key: 'userProfile'
+        },
+        {
           attribute: '_interface',
           key: 'interface'
         },
@@ -1046,5 +1069,23 @@ export class AppStorageService {
     this._idb.save('options', 'user', {value: this._user}).catch((err) => {
       console.error(err);
     });
+  }
+
+  public loadConsoleEntries(): Promise<ConsoleEntry[]> {
+    return new Promise<ConsoleEntry[]>((resolve, reject) => {
+      this._idb.get('options', 'console').then((entries) => {
+        resolve(entries as ConsoleEntry[]);
+      }).catch((error) => {
+        reject(error);
+      });
+    });
+  }
+
+  public saveConsoleEntries(entries: ConsoleEntry[]) {
+    if (!isNullOrUndefined(this._idb)) {
+      this._idb.save('options', 'console', {value: entries}).catch((err) => {
+        console.error(err);
+      });
+    }
   }
 }

@@ -5,5 +5,5 @@ export * from '../../gui/login/login.service';
 export * from './appstorage.service';
 export * from './transcription.service';
 export * from './userInteractions.service';
-export * from './message.service';
 export * from './settings.service';
+export * from './alert.service';

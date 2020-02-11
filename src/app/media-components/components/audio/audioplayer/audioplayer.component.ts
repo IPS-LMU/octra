@@ -103,6 +103,8 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
 
   ngOnInit() {
     this.afterChunkUpdated();
+    this.subscrmanager = new SubscriptionManager();
+    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown), 'keypress');
   }
 
   ngOnChanges(changes: SimpleChanges): void {

@@ -1,44 +1,51 @@
 #bgProtocol {
-    min-height: 200px;
-    overflow-y: scroll;
+  min-height: 100px;
+  overflow-y: scroll;
+  font-size: 0.8em;
 }
 
 .upload-screenshot {
-    width: 200px;
-    height: 150px;
-    border: 1px solid cornflowerblue;
-    border-radius: 9px;
-    padding: 5px;
-    text-align: center;
-    vertical-align: middle;
-    display: table-cell;
-    cursor: pointer;
-    float: left;
-    margin-right: 5px;
-    margin-bottom: 5px;
-    overflow: hidden;
-    position: relative;
+  width: 150px;
+  height: 100px;
+  border: 1px solid cornflowerblue;
+  border-radius: 9px;
+  padding: 5px;
+  text-align: center;
+  vertical-align: middle;
+  display: table-cell;
+  cursor: pointer;
+  float: left;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  overflow: hidden;
+  position: relative;
 }
 
 .upload-screenshot fa-icon {
-    color: cornflowerblue;
-    margin-top: 50px;
-    display: block;
+  color: cornflowerblue;
+  margin-top: 30px;
+  display: block;
 }
 
 .upload-screenshot .preview-image {
-    height: 100%;
+  height: 100%;
 }
 
 .upload-screenshot .cross.rounded-circle {
-    background-color: aliceblue;
-    width: 30px;
-    height: 30px;
-    vertical-align: middle;
-    display: table-cell;
-    border: 1px solid blue;
-    padding-top: 2px;
-    position: absolute;
-    top: 0;
-    right: 0;
+  background-color: aliceblue;
+  font-size: 0.8em;
+  width: 22px;
+  height: 22px;
+  text-align: center;
+  vertical-align: middle;
+  display: table-cell;
+  border: 1px solid blue;
+  padding-top: 1px;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.modal-body {
+  padding-bottom: 0;
 }

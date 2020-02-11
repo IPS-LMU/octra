@@ -7,9 +7,10 @@ import {Observable} from 'rxjs';
 import {SettingsService} from './settings.service';
 import {BugReporter} from '../../obj/BugAPI/BugReporter';
 import {TranscriptionService} from './transcription.service';
-import {Functions} from '../Functions';
+import {Functions, isNullOrUndefined} from '../Functions';
 import {HttpClient} from '@angular/common/http';
 import * as moment from 'moment';
+import {isArray} from 'rxjs/internal-compatibility';
 
 export enum ConsoleType {
   LOG,
@@ -30,6 +31,7 @@ export class BugReportService {
   private transcrService: TranscriptionService;
 
   private _console: ConsoleEntry[] = [];
+  private fromDBLoaded = false;
 
   get console(): ConsoleEntry[] {
     return this._console;
@@ -53,10 +55,30 @@ export class BugReportService {
     };
 
     this._console.push(consoleItem);
+    if (this.fromDBLoaded) {
+      this.appStorage.saveConsoleEntries(this._console);
+    }
   }
 
   public clear() {
     this._console = [];
+  }
+
+  public addEntriesFromDB(entries: ConsoleEntry[]) {
+    if (!isNullOrUndefined(entries) && isArray(entries)) {
+      if (entries.length > 50) {
+        // crop down to 100 items
+        entries = entries.slice(-50);
+      }
+
+      this._console = entries.concat([{
+        type: 0,
+        timestamp: moment().format('DD.MM.YY HH:mm:ss'),
+        message: '--- AFTER RELOAD ---'
+      }], this._console);
+    }
+    this.appStorage.saveConsoleEntries(this._console);
+    this.fromDBLoaded = true;
   }
 
   public getPackage(): any {
@@ -115,22 +137,24 @@ export class BugReportService {
   }
 
   public getText(): string {
-    const bugreportSettings = this.settService.appSettings.octra.bugreport;
+    if (!isNullOrUndefined(this.settService.appSettings)) {
+      const bugreportSettings = this.settService.appSettings.octra.bugreport;
 
-    for (let i = 0; i < AppInfo.bugreporters.length; i++) {
-      const bugreporter = AppInfo.bugreporters[i];
-      if (bugreporter.name === bugreportSettings.name) {
-        this.reporter = bugreporter;
+      for (let i = 0; i < AppInfo.bugreporters.length; i++) {
+        const bugreporter = AppInfo.bugreporters[i];
+        if (bugreporter.name === bugreportSettings.name) {
+          this.reporter = bugreporter;
+        }
       }
-    }
 
-    if (!(this.reporter === null || this.reporter === undefined)) {
-      return this.reporter.getText(this.getPackage());
+      if (!(this.reporter === null || this.reporter === undefined)) {
+        return this.reporter.getText(this.getPackage());
+      }
     }
     return '';
   }
 
-  sendReport(email: string, description: string, sendbugreport: boolean, credentials: {
+  sendReport(name: string, email: string, description: string, sendbugreport: boolean, credentials: {
     auth_token: string,
     url: string
   }, screenshots: any[]): Observable<any> {
@@ -141,6 +165,7 @@ export class BugReportService {
       const url = credentials.url;
       const form = {
         email,
+        name,
         description
       };
 

@@ -1,0 +1,21 @@
+:host {
+  text-align: center;
+  padding: 20px;
+}
+
+p {
+  text-align: center;
+}
+
+table {
+  display: inline-table;
+}
+
+h2 {
+  margin-left: 10px;
+  text-align: left;
+}
+
+table tbody td {
+  vertical-align: middle;
+}

@@ -1,60 +1,118 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
-
-import {MessageService} from '../../shared/service';
-import {OCTRANIMATIONS} from '../../shared';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {
+  AfterViewInit,
+  Component,
+  ComponentFactoryResolver,
+  ComponentRef,
+  OnDestroy,
+  OnInit,
+  SecurityContext,
+  ViewChild
+} from '@angular/core';
+import {interval, Subscription} from 'rxjs';
+import {AlertEntry, AlertSendObj, AlertService} from '../../shared/service/alert.service';
+import {OCTRANIMATIONS, SubscriptionManager} from '../../shared';
+import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
+import {DynComponentDirective} from '../../shared/directive/dyn-component.directive';
 
 @Component({
   selector: 'app-alert',
   templateUrl: './alert.component.html',
   styleUrls: ['./alert.component.css'],
-  animations: OCTRANIMATIONS,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  animations: OCTRANIMATIONS
 })
-export class AlertComponent implements OnInit, OnDestroy {
 
-  constructor(private cd: ChangeDetectorRef,
-              private msgService: MessageService) {
-    this.subscrmanager = new SubscriptionManager();
+export class AlertComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild(DynComponentDirective, {static: false}) appDynComponent: DynComponentDirective;
+
+  public duration = 20;
+  public animation = 'closed';
+
+  private counter: Subscription;
+
+  public get queue(): AlertEntry[] {
+    return this.alertService.queue;
   }
 
-  public type = 'error';
-  public state = 'inactive';
-  public text = '';
-  public show = false;
-  private subscrmanager: SubscriptionManager;
-
-  /**
-   * show alert on the right top corner of the screen.
-   * @param type "log", "error" or "info"
-   * @param message Message which should be shown
-   */
-  public showMessage = (type: string, message: string) => {
-    this.show = true;
-    this.state = 'active';
-    this.type = type;
-    this.text = message;
-    this.cd.markForCheck();
-
-    setTimeout(() => {
-      this.state = 'inactive';
-      this.cd.markForCheck();
-    }, 3000);
-  }
-
-  ngOnInit() {
-    this.state = 'inactive';
-    this.show = false;
-
-    this.cd.markForCheck();
-    this.subscrmanager.add(this.msgService.showmessage.subscribe(
-      (result) => {
-        this.showMessage(result.type, result.message);
+  constructor(private alertService: AlertService, private sanitizer: DomSanitizer,
+              private _componentFactoryResolver: ComponentFactoryResolver) {
+    this.counter = interval(1000).subscribe(
+      () => {
+        for (const queueItem of this.alertService.queue) {
+          queueItem.duration--;
+          if (queueItem.duration === 0) {
+            queueItem.animation = 'closed';
+            this.removeFromQueue(queueItem);
+          }
+        }
       }
-    ));
+    );
   }
 
   ngOnDestroy() {
-    this.subscrmanager.destroy();
+    this.counter.unsubscribe();
+  }
+
+  ngOnInit(): void {
+  }
+
+  ngAfterViewInit(): void {
+  }
+
+  onClose(entry: AlertEntry) {
+    entry.animation = 'closed';
+    this.removeFromQueue(entry);
+  }
+
+  public clear() {
+    for (const queueItem of this.queue) {
+      queueItem.animation = 'closed';
+    }
+
+    this.animation = 'closed';
+    setTimeout(() => {
+      this.alertService.queue = [];
+    }, 500);
+  }
+
+  private removeFromQueue(entry: AlertEntry) {
+    let index = this.queue.findIndex((a) => {
+      return a.id === entry.id;
+    });
+
+    if (index > -1) {
+      if (this.queue.length <= 1) {
+        this.animation = 'closed';
+      }
+
+      setTimeout(() => {
+        index = this.queue.findIndex((a) => {
+          return a.id === entry.id;
+        });
+        this.queue.splice(index, 1);
+        if (this.queue.length === 0) {
+          this.animation = 'closed';
+        }
+      }, 500);
+    }
+  }
+
+  public validate(message: string): SafeHtml {
+    return this.sanitizer.sanitize(SecurityContext.HTML, message);
+  }
+
+  public afterComponentInitialized(item: {
+    id: number;
+    instance: any;
+  }) {
+    this.alertService.alertInitialized.emit({
+      id: item.id,
+      component: item.instance
+    })
+  }
+
+  afterComponentDestroyed(item: {
+    id: number
+  }) {
+    console.log(`alert with id ${item.id}`)
   }
 }

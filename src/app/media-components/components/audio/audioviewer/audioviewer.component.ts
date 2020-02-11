@@ -680,6 +680,32 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                     keyActive = true;
                   }
                   break;
+
+                case('do_maus'):
+                  if (this.settings.boundaries.enabled && this.av.focused && this.settings.asr.enabled) {
+                    const xSamples = this.av.audioTCalculator.absXChunktoSamples(this.av.Mousecursor.absX, this.audiochunk);
+
+                    if (xSamples > -1) {
+                      const segmentI = this.transcr.currentlevel.segments.getSegmentBySamplePosition(
+                        new BrowserSample(xSamples, this.audiomanager.browserSampleRate)
+                      );
+                      const segment = this.transcr.currentlevel.segments.get(segmentI);
+
+                      if (segmentI > -1) {
+                        if (segment.isBlockedBy === null) {
+                          this.shortcuttriggered.emit({shortcut: comboKey, value: 'do_maus', type: 'segment'});
+                        } else {
+                          this.shortcuttriggered.emit({shortcut: comboKey, value: 'cancel_maus', type: 'segment'});
+                        }
+                        this.update(false);
+                        this.drawCursor(this.av.Mousecursor.line);
+                        this.transcr.currentlevel.segments.onsegmentchange.emit();
+                      }
+                    }
+
+                    keyActive = true;
+                  }
+                  break;
               }
 
               if (keyActive) {
@@ -1292,6 +1318,9 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
                 } else if (segment.isBlockedBy === ASRQueueItemType.ASRMAUS) {
                   this.oContext.globalAlpha = 0.5;
                   this.oContext.fillStyle = '#8d1aff';
+                } else if (segment.isBlockedBy === ASRQueueItemType.MAUS) {
+                  this.oContext.globalAlpha = 0.5;
+                  this.oContext.fillStyle = '#23bc8a';
                 }
               }
 

@@ -134,6 +134,7 @@ import {AlertComponent} from './core/component/alert/alert.component';
 import {faTrashAlt} from '@fortawesome/free-regular-svg-icons';
 import {AuthenticationNeededComponent} from './core/alerts/authentication-needed/authentication-needed.component';
 import {DynComponentDirective} from './core/shared/directive/dyn-component.directive';
+import {ErrorOccurredComponent} from './core/alerts/error-occurred/error-occurred.component';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -215,7 +216,8 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     ToolsModalComponent,
     HelpModalComponent,
     ALERTS,
-    DynComponentDirective
+    DynComponentDirective,
+    ErrorOccurredComponent
   ],
   entryComponents: [EDITORS, ALERTS],
   imports: [

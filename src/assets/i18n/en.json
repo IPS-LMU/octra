@@ -93,7 +93,8 @@
     "manual": "Manual",
     "authenticate": "Authenticate",
     "im authenticated": "I'm authenticated!",
-    "dismissed": "dismissed in {{value}}s"
+    "dismissed": "dismissed in {{value}}s",
+    "Send feedback": "Send feedback"
   },
   "bug report": {
     "give feedback": "Give feedback",
@@ -196,7 +197,8 @@
       "feedback and send 2": "Send transcription with two stars",
       "feedback and send 3": "Send transcription with three stars",
       "do asr": "Apply ASR on selected segment",
-      "do asr maus": "Apply ASR & MAUS segmentation on selected segment"
+      "do asr maus": "Apply ASR & MAUS segmentation on the selected segment",
+      "do maus only": "Apply word-alignment on the selected segment using MAUS"
     },
     "inactivity": {
       "header": "Longer absence detected",
@@ -324,7 +326,9 @@
     "asr running": "ASR is currently running. If you want to stop ASR for this segment, click here.",
     "no asr selected": "Please select ASR options before using the shortcut.",
     "no quota": "No quota left. Please use another ASR provider.",
-    "no auth": "Authentication needed for further transcription."
+    "no auth": "Authentication needed for further transcription.",
+    "maus empty text": "The selected segment does not contain any text or less than two words.",
+    "error": "An error occurred. Please send us a short feedback for the error to be fixed."
   },
   "alerts": {
     "authentication needed": "Please authenticate in order to use features like ASR or word-alignment. After you clicked on \"Authenticate\" a separate window opens. If no window opens, make sure to have popups enabled in your browser."

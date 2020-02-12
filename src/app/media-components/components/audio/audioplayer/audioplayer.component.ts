@@ -104,7 +104,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
   ngOnInit() {
     this.afterChunkUpdated();
     this.subscrmanager = new SubscriptionManager();
-    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown), 'keypress');
+    // this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown), 'keypress');
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -345,5 +345,13 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
     } else {
       this.audioChunk.playposition = this.pxToSample(px - this._settings.slider.margin.left + this._settings.playHead.width / 2);
     }
+  }
+
+  public enableShortcuts() {
+    // this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown), 'keypress');
+  }
+
+  public disableShortcuts() {
+    this.subscrmanager.removeByTag('keypress');
   }
 }

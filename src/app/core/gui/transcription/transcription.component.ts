@@ -55,6 +55,7 @@ import {parseServerDataEntry} from '../../obj/data-entry';
 import {PlayBackStatus} from '../../../media-components/obj/audio';
 import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
 import {Level} from '../../../media-components/obj/annotation';
+import {OCTRAEditor} from '../../../editors/octra-editor';
 
 @Component({
   selector: 'app-transcription',

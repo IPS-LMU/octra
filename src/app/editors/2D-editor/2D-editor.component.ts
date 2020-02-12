@@ -31,7 +31,6 @@ import {Functions, isNullOrUndefined} from '../../core/shared/Functions';
 import {OCTRAEditor} from '../octra-editor';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../core/shared/service/asr.service';
 import {TranslocoService} from '@ngneat/transloco';
-import {OAudiofile, OSegment} from '../../core/obj/Annotation';
 import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
 import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
 import {AudioViewerComponent} from '../../media-components/components/audio/audio-viewer/audio-viewer.component';
@@ -79,6 +78,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       y: 0
     }
   };
+
   public audioManager: AudioManager;
   public audioChunkLines: AudioChunk;
   public audioChunkWindow: AudioChunk;
@@ -301,7 +301,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                     segment.transcript = item.result.replace(/(<\/p>)/g, '');
 
                     const index = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
-                      return a.time.browserSample.value === segment.time.browserSample.value;
+                      return a.time.samples === segment.time.samples;
                     });
                     if (index > -1) {
                       this.transcrService.currentlevel.segments.change(index, segment);
@@ -550,7 +550,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       || $event.value === 'do_asr_maus' || $event.value === 'cancel_asr_maus'
       || $event.value === 'do_maus' || $event.value === 'cancel_maus'
     ) && $event.type === 'segment') {
-      const segmentNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(this.viewer.MouseCursor.timePos.browserSample);
+      const segmentNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(this.viewer.av.MouseClickPos.timePos);
 
       if (segmentNumber > -1) {
         if (!isNullOrUndefined(this.asrService.selectedLanguage)) {
@@ -813,14 +813,14 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   public enableAllShortcuts() {
     this.viewer.enableShortcuts();
     if (!isNullOrUndefined(this.window) && !isNullOrUndefined(this.window.loupe)) {
-      this.window.loupe.viewer.enableShortcuts();
+      this.window.loupe.enableShortcuts();
     }
   }
 
   public disableAllShortcuts() {
     this.viewer.disableShortcuts();
     if (!isNullOrUndefined(this.window) && !isNullOrUndefined(this.window.loupe)) {
-      this.window.loupe.viewer.disableShortcuts();
+      this.window.loupe.disableShortcuts();
     }
   }
 

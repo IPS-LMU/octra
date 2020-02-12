@@ -635,14 +635,14 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   public enableAllShortcuts() {
     this.viewer.enableShortcuts();
     if (!isNullOrUndefined(this.loupe)) {
-      this.loupe.viewer.enableShortcuts();
+      this.loupe.enableShortcuts();
     }
   }
 
   public disableAllShortcuts() {
     this.viewer.disableShortcuts();
     if (!isNullOrUndefined(this.loupe)) {
-      this.loupe.viewer.disableShortcuts();
+      this.loupe.disableShortcuts();
     }
   }
 }

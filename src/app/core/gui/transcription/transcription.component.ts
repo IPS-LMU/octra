@@ -130,7 +130,7 @@ export class TranscriptionComponent implements OnInit,
         if (!this.audiomanager.playOnHover && !this.modalOverview.visible) {
           let caretpos = -1;
 
-          if (!(((this.currentEditor.instance as any).editor) === null || ((this.currentEditor.instance as any).editor) === undefined)) {
+          if (!isNullOrUndefined(this.currentEditor) && !isNullOrUndefined((this.currentEditor.instance as any).editor)) {
             caretpos = (this.currentEditor.instance as any).editor.caretpos;
           }
 
@@ -187,7 +187,9 @@ export class TranscriptionComponent implements OnInit,
             this.alertService.showAlert('success', this.langService.translate('tools.alerts.done', {
               value: toolName
             }));
-            (this._currentEditor.instance as any).update();
+            if (!isNullOrUndefined(this.currentEditor) && !isNullOrUndefined((this.currentEditor.instance as any).editor)) {
+              (this._currentEditor.instance as any).update();
+            }
             break;
         }
       },
@@ -197,13 +199,19 @@ export class TranscriptionComponent implements OnInit,
       }));
 
     this.subscrmanager.add(this.modService.showmodal.subscribe((event: { type: string, data, emitter: any }) => {
-      const editor = this._currentEditor.instance as OCTRAEditor;
-      editor.disableAllShortcuts();
+
+      if (!isNullOrUndefined(this.currentEditor) && !isNullOrUndefined((this.currentEditor.instance as any).editor)) {
+        const editor = this._currentEditor.instance as OCTRAEditor;
+        editor.disableAllShortcuts();
+      }
     }));
 
     this.subscrmanager.add(this.modService.closemodal.subscribe((event: { type: string }) => {
-      const editor = this._currentEditor.instance as OCTRAEditor;
-      editor.enableAllShortcuts();
+      if (!isNullOrUndefined(this.currentEditor) && !isNullOrUndefined((this.currentEditor.instance as any).editor)) {
+        const editor = this._currentEditor.instance as OCTRAEditor;
+        editor.enableAllShortcuts();
+      }
+
     }));
   }
 
@@ -559,7 +567,7 @@ export class TranscriptionComponent implements OnInit,
             this._currentEditor = viewContainerRef.createComponent(componentFactory);
             let caretpos = -1;
 
-            if (!((this.currentEditor.instance as any).editor === null || (this.currentEditor.instance as any).editor === undefined)) {
+            if (!isNullOrUndefined(this.currentEditor) && !isNullOrUndefined((this.currentEditor.instance as any).editor)) {
               caretpos = (this.currentEditor.instance as any).editor.caretpos;
             }
 

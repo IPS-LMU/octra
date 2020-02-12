@@ -375,60 +375,51 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
       let segment: Segment = null;
 
+      let startIndex = 0;
+      let limitFunc: (i: number) => boolean;
+      let counterFunc: (i: number) => number;
+      let appliedDirection = '';
+
       if (direction === 'right' && this.segmentIndex < segmentsLength - 1) {
-        let i;
-        for (i = this.segmentIndex + 1; i < segmentsLength - 1; i++) {
-          if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.breakMarker.code
-            && this.transcrService.currentlevel.segments.get(i).isBlockedBy !== ASRQueueItemType.ASRMAUS) {
-            segment = this.transcrService.currentlevel.segments.get(i);
-            this.segmentIndex = i;
-            break;
-          }
-        }
-
-        if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.breakMarker.code
-          && this.transcrService.currentlevel.segments.get(i).isBlockedBy !== ASRQueueItemType.ASRMAUS) {
-          segment = this.transcrService.currentlevel.segments.get(i);
-          this.segmentIndex = i;
-
-          const start = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.originalSample.value : 0;
-          this.uiService.addElementFromEvent('segment', {value: 'entered next'},
-            Date.now(), this.audiomanager.playposition,
-            this.editor.caretpos, null, {
-              start,
-              length: this.transcrService.currentlevel.segments.get(i).time.originalSample.value - start
-            }, 'transcription window');
-        }
+        startIndex = this.segmentIndex + 1;
+        limitFunc = j => j < segmentsLength;
+        counterFunc = j => j++;
+        appliedDirection = 'right';
       } else if (direction === 'left' && this.segmentIndex > 0) {
-        let i = 0;
-        for (i = this.segmentIndex - 1; i > 0; i--) {
-          if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.breakMarker.code
-            && this.transcrService.currentlevel.segments.get(i).isBlockedBy !== ASRQueueItemType.ASRMAUS) {
-            segment = this.transcrService.currentlevel.segments.get(i);
-            this.segmentIndex = i;
-            break;
-          }
-        }
-
-        if (this.transcrService.currentlevel.segments.get(i).transcript !== this.transcrService.breakMarker.code
-          && this.transcrService.currentlevel.segments.get(i).isBlockedBy !== ASRQueueItemType.ASRMAUS) {
-          segment = this.transcrService.currentlevel.segments.get(i);
-          this.segmentIndex = i;
-
-          const start = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.originalSample.value : 0;
-          this.uiService.addElementFromEvent('segment', {value: 'entered previous'},
-            Date.now(), this.audiomanager.playposition,
-            this.editor.caretpos, null, {
-              start,
-              length: this.transcrService.currentlevel.segments.get(i).time.originalSample.value - start
-            }, 'transcription window');
-        }
+        startIndex = this.segmentIndex - 1;
+        limitFunc = j => j >= 0;
+        counterFunc = j => j--;
+        appliedDirection = 'left';
       }
 
-      let begin = this.audiomanager.createBrowserAudioTime(0);
+      if (appliedDirection !== '') {
+        for (let i = startIndex; limitFunc(i); i = counterFunc(i)) {
+          const tempSegment = this.transcrService.currentlevel.segments.get(i);
 
+          if (tempSegment.transcript !== this.transcrService.breakMarker.code
+            && tempSegment.isBlockedBy !== ASRQueueItemType.ASRMAUS
+            && tempSegment.isBlockedBy !== ASRQueueItemType.MAUS) {
+            segment = tempSegment;
+            this.segmentIndex = i;
+            break;
+          }
+        }
+
+        const start = (this.segmentIndex > 0) ? this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value : 0;
+        const valueString = (appliedDirection === 'right') ? 'entered next' : 'entered previous';
+        this.uiService.addElementFromEvent('segment', {value: valueString},
+          Date.now(), this.audiomanager.playposition,
+          this.editor.caretpos, null, {
+            start,
+            length: this.transcrService.currentlevel.segments.get(this.segmentIndex).time.originalSample.value - start
+          }, 'transcription window');
+      }
+
+      let begin;
       if (this.segmentIndex > 0) {
         begin = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.clone() as BrowserAudioTime;
+      } else {
+        begin = this.audiomanager.createBrowserAudioTime(0);
       }
 
       if (!(segment === null || segment === undefined)) {
@@ -730,7 +721,8 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     const nextSegment = currentLevel.segments.get(segmentIndex + 1);
     return segmentIndex === currentLevel.segments.length - 2
       && (nextSegment.transcript === this.transcrService.breakMarker.code
-        || nextSegment.isBlockedBy === ASRQueueItemType.ASRMAUS);
+        || nextSegment.isBlockedBy === ASRQueueItemType.ASRMAUS
+        || nextSegment.isBlockedBy === ASRQueueItemType.MAUS);
   }
 
   public onKeyUp() {

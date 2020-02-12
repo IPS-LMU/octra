@@ -29,11 +29,16 @@
             </td>
             <td (click)="tools.combinePhrases.opened = !tools.combinePhrases.opened">
               <a #a>
-                {{'tools.combine phrases.name' | transloco}}
+                <span>{{'tools.combine phrases.name' | transloco}} </span>
               </a>
             </td>
             <td colspan="2"
-                (click)="tools.combinePhrases.opened = !tools.combinePhrases.opened">{{'tools.combine phrases.description' | transloco}}</td>
+                (click)="tools.combinePhrases.opened = !tools.combinePhrases.opened">
+              <span>{{'tools.combine phrases.description' | transloco}} </span>
+              <a [href]="manualURL + 'using-asr-with-word-alignment'" target="_blank">
+                <fa-icon icon="question-circle" class="text-info"></fa-icon>
+              </a>
+            </td>
           </tr>
           <tr
             [@fadeToggle]="(tools.combinePhrases.opened) ? 'active': 'inactive'">
@@ -98,7 +103,13 @@
               </a>
             </td>
             <td colspan="3"
-                (click)="tools.audioCutting.opened = !tools.audioCutting.opened">{{'tools.cut audio.description' | transloco}}</td>
+                (click)="tools.audioCutting.opened = !tools.audioCutting.opened">
+
+              <span>{{'tools.cut audio.description' | transloco}} </span>
+              <a [href]="manualURL + 'cutting-audio-files'" target="_blank">
+                <fa-icon icon="question-circle" class="text-info"></fa-icon>
+              </a>
+            </td>
           </tr>
           <tr *ngIf="navbarServ.transcrService !== undefined
                     && navbarServ.transcrService.audiomanager.originalInfo.extension === '.wav'"

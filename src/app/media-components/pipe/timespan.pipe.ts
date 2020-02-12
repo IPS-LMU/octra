@@ -55,4 +55,12 @@ export class TimespanPipe implements PipeTransform {
     return result;
   }
 
+  private formatNumber = (num, length): string => {
+    let result = '' + num.toFixed(0);
+    while (result.length < length) {
+      result = '0' + result;
+    }
+    return result;
+  }
+
 }

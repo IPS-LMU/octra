@@ -12,7 +12,6 @@ import {TranscriptionService} from './transcription.service';
 import {Router} from '@angular/router';
 import {SampleUnit, WavFormat} from '../../../media-components/obj/audio';
 import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
-import {ASRQueueItemType} from '../../../media-components/obj/annotation/asr';
 
 @Injectable({
   providedIn: 'root'
@@ -719,7 +718,7 @@ export class ASRQueueItem {
       url: string
     }>((resolve, reject) => {
       this.changeStatus(ASRProcessStatus.STARTED);
-      const audioManager = this.parent.audiomanager;
+      const audioManager = this.parent.audioManager;
 
       // 1) cut signal
       const format = new WavFormat();

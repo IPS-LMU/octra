@@ -1,4 +1,5 @@
 export enum ASRQueueItemType {
   ASR = 'ASR',
-  ASRMAUS = 'ASRMAUS'
+  ASRMAUS = 'ASRMAUS',
+  MAUS = 'MAUS'
 }

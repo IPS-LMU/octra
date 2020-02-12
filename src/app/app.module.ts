@@ -43,8 +43,6 @@ import {NewEditorComponent} from './editors/new-editor/new-editor.component';
 import {HelpToolsComponent} from './core/gui/help-tools/';
 import {FeaturesComponent} from './core/gui/features';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
-import {AudioviewerConfig} from './media-components/components/audio/audioviewer';
-import {MediaComponentsModule} from './media-components/media-components.module';
 import {TranscrEditorComponent} from './core/component/transcr-editor';
 import {Error404Component} from './core/gui/error404';
 import {FaIconLibrary, FontAwesomeModule} from '@fortawesome/angular-fontawesome';
@@ -136,6 +134,7 @@ import {AuthenticationNeededComponent} from './core/alerts/authentication-needed
 import {DynComponentDirective} from './core/shared/directive/dyn-component.directive';
 import {ErrorOccurredComponent} from './core/alerts/error-occurred/error-occurred.component';
 import {AudioviewerConfig} from './media-components/components/audio/audio-viewer/audio-viewer.config';
+import {MediaComponentsModule} from './media-components/media-components.module';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -235,7 +234,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     }),
     BrowserAnimationsModule,
     ReactiveFormsModule,
-    MediaComponentsModule,
     ProgressbarModule.forRoot(),
     routing,
     ButtonsModule.forRoot(),

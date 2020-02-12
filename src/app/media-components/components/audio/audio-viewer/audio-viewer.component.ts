@@ -122,6 +122,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   private subscrManager = new SubscriptionManager();
   private oldInnerWidth = 0;
   private _initialized = false;
+  private _deactivateShortcuts = false;
 
   private animation: {
     playHead: Konva.Animation
@@ -1915,5 +1916,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       }
       return lastI;
     }
+  }
+
+  public enableShortcuts() {
+    this._deactivateShortcuts = false;
+  }
+
+  public disableShortcuts() {
+    this._deactivateShortcuts = true;
   }
 }

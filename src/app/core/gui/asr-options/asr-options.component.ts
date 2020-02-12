@@ -6,6 +6,7 @@ import {isNullOrUndefined} from '../../shared/Functions';
 import {AudioChunk} from '../../../media-components/obj/media/audio/AudioManager';
 import {BsDropdownDirective} from 'ngx-bootstrap';
 import {TranslocoService} from '@ngneat/transloco';
+import {AppInfo} from '../../../app.info';
 
 @Component({
   selector: 'app-asr-options',
@@ -35,6 +36,10 @@ export class AsrOptionsComponent implements OnInit {
       const provider = this.appSettings.octra.plugins.asr.services[i];
       this.serviceProviders['' + provider.provider] = provider;
     }
+  }
+
+  public get manualURL(): string {
+    return AppInfo.manualURL;
   }
 
   ngOnInit() {

@@ -110,9 +110,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    setTimeout(() => {
-      console.error(`test fehler`);
-    }, 4000);
     this.subscrmanager.add(this.settingsService.dbloaded.subscribe(
       () => {
         if (!isNullOrUndefined(this.appStorage.asrSelectedService) && !isNullOrUndefined(this.appStorage.asrSelectedLanguage)) {

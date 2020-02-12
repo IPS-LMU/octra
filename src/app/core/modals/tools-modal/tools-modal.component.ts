@@ -24,7 +24,6 @@ declare var JSZip;
 })
 export class ToolsModalComponent implements OnInit, OnDestroy {
   modalRef: BsModalRef;
-  AppInfo = AppInfo;
   public visible = false;
 
   public parentformat: {
@@ -95,6 +94,10 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
   protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();
+
+  public get manualURL(): string {
+    return AppInfo.manualURL;
+  }
 
   get isCombinePhrasesSettingsValid(): boolean {
     return (Number.isInteger(this.tools.combinePhrases.options.minSilenceLength) &&

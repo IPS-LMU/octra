@@ -579,6 +579,7 @@ export class TranscriptionComponent implements OnInit,
 
             this.uiService.addElementFromEvent('editor:changed', {value: name}, Date.now(),
               null, null, null, null, 'editors');
+            console.log(`opened ${name}`);
 
             this.cd.detectChanges();
           }, 20);

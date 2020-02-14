@@ -320,13 +320,15 @@ export class TranscriptionService {
                           }
                         );
                     } else {
+                      console.log(`read serverData entry...`);
                       this.appStorage.annotation[this._selectedlevel].level.items = [];
                       for (let i = 0; i < this.appStorage.serverDataEntry.transcript.length; i++) {
-                        const segT = this.appStorage.serverDataEntry[i];
+                        const segT = this.appStorage.serverDataEntry.transcript[i];
 
                         const oseg = new OSegment(i, segT.start, segT.length, [new OLabel('OCTRA_1', segT.text)]);
                         this.appStorage.annotation[this.selectedlevel].level.items.push(oseg);
                       }
+                      console.log(`read serverData read with ${this.appStorage.serverDataEntry.transcript.length} items...`);
 
                       this.appStorage.changeAnnotationLevel(this._selectedlevel,
                         this.appStorage.annotation[this._selectedlevel].level)

@@ -728,10 +728,17 @@ export class TranscriptionComponent implements OnInit,
         const jsonStr = JSON.stringify(json.data);
         this.appStorage.serverDataEntry = parseServerDataEntry(jsonStr);
 
+
         if (this.appStorage.serverDataEntry.hasOwnProperty('transcript')) {
-          if (!Array.isArray(this.appStorage.serverDataEntry)) {
+          if (!Array.isArray(this.appStorage.serverDataEntry.transcript)) {
+            console.log(`server transcript is not array, set []`);
             this.appStorage.serverDataEntry.transcript = [];
+          } else {
+            console.log(`seervertranscript is array`);
           }
+        } else {
+          console.log(`no server transcript`);
+          // this.appStorage.serverDataEntry.transcript
         }
 
         if (isNullOrUndefined(this.appStorage.serverDataEntry.logtext) ||

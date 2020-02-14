@@ -131,7 +131,11 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
       this.save();
       setTimeout(() => {
-        this.loupe.update(false);
+        if (!isNullOrUndefined(this.loupe)) {
+          this.loupe.update(false);
+        } else {
+          console.error(`can't update loupe after typing because it's undefined!`);
+        }
       }, 200);
 
       if (this.oldRaw === this.editor.rawText) {
@@ -564,8 +568,12 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   public update() {
-    this.loupe.update();
-    this.viewer.update();
+    if (!isNullOrUndefined(this.loupe)) {
+      this.loupe.update();
+    }
+    if (!isNullOrUndefined(this.viewer)) {
+      this.viewer.update();
+    }
     this.segmentselected = false;
     this.audiochunkTop.startpos = this.audiochunkTop.time.start as BrowserAudioTime;
     this.audiochunkDown.startpos = this.audiochunkDown.time.start as BrowserAudioTime;

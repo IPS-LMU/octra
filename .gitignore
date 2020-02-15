@@ -403,3 +403,4 @@ xcuserdata/
 /dist/
 /src/assets/Bahnauskunft.wav
 /src/media/Bahnauskunft.wav
+deploy.config.json

@@ -434,7 +434,10 @@ export class AudioManager {
   }
 
   private afterAudioEnded = () => {
-    this._positionInterval.unsubscribe();
+    if (!isNullOrUndefined(this._positionInterval)) {
+      this._positionInterval.unsubscribe();
+    }
+
     this._positionInterval = null;
 
     if (this._state === PlayBackState.PLAYING) {

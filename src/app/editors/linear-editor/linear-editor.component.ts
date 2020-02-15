@@ -363,8 +363,9 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
   onSegmentEnter($event) {
     this.selectSegment($event.index).then((selection: AudioSelection) => {
-      this.topSelected = true;
+      this.viewer.selectSegment($event.index);
       this.audiochunkDown = new AudioChunk(selection, this.audiomanager);
+      this.topSelected = true;
     });
 
     if (this.appStorage.logging) {

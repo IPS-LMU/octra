@@ -1,14 +1,12 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef} from 'ngx-bootstrap';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {OCTRANIMATIONS} from '../../shared';
 import {Subject} from 'rxjs';
 
 @Component({
   selector: 'app-help-modal',
   templateUrl: './help-modal.component.html',
-  styleUrls: ['./help-modal.component.css'],
-  animations: OCTRANIMATIONS
+  styleUrls: ['./help-modal.component.css']
 })
 export class HelpModalComponent implements OnInit, OnDestroy {
   modalRef: BsModalRef;

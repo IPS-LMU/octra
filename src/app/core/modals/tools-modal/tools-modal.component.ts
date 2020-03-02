@@ -4,7 +4,7 @@ import {AppStorageService, AudioService, SettingsService, TranscriptionService, 
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
-import {OCTRANIMATIONS, Segment} from '../../shared';
+import {Segment} from '../../shared';
 import {NavbarService} from '../../gui/navbar/navbar.service';
 import {isNullOrUndefined} from '../../shared/Functions';
 import {HttpClient} from '@angular/common/http';
@@ -13,6 +13,7 @@ import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/n
 import {WavFormat} from '../../../media-components/obj/media/audio/AudioFormats';
 import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/cutting-format';
 import {TranslocoService} from '@ngneat/transloco';
+import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 
 declare var JSZip;
 
@@ -20,7 +21,10 @@ declare var JSZip;
   selector: 'app-tools-modal',
   templateUrl: './tools-modal.component.html',
   styleUrls: ['./tools-modal.component.css'],
-  animations: OCTRANIMATIONS
+  animations: [
+    fadeOutCollapseOnLeaveAnimation(),
+    fadeInExpandOnEnterAnimation()
+  ]
 })
 export class ToolsModalComponent implements OnInit, OnDestroy {
   modalRef: BsModalRef;

@@ -12,6 +12,5 @@ export * from '../obj/statistics/StatisticElement';
 export * from '../../media-components/obj/media/audio/AudioSelection';
 export * from './Logger';
 export * from '../obj/SessionFile';
-export * from './OCTRAnimations';
 export * from '../obj/SubscriptionManager';
 export * from '../obj/Converters';

@@ -9,7 +9,7 @@
         </button>
       </div>
       <div class="modal-body" id="export-table" #content>
-        <table class="table table-striped">
+        <table class="table">
           <thead>
           <tr>
             <th></th>
@@ -20,7 +20,7 @@
           </thead>
           <tbody>
           <ng-container *ngFor="let converter of converters; let i = index;">
-            <tr *ngIf="converter.conversion.export">
+            <tr *ngIf="converter.conversion.export" class="top-tr">
               <td (click)="onLineClick(converter, i)">
                 <fa-icon style="color:gray;"
                          [icon]="['fas', ((exportStates[i] === 'active') ? 'chevron-up' : 'chevron-down')]"></fa-icon>
@@ -45,35 +45,35 @@
                          [tooltip]="converter.notice"></fa-icon>
               </td>
             </tr>
-            <tr [@fadeToggle]="exportStates[i]" *ngIf="converter.conversion.export">
-              <td></td>
-              <td colspan="4" style="padding-left:20px;">
-                <select #val
-                        *ngIf="navbarServ.transcrService !== undefined && !converter.multitiers && transcrService.annotation.levels.length > 1"
-                        (change)="onSelectionChange(converter, val.value)">
-                  <option value="">{{"general.select one tier" | transloco}}</option>
-                  <option *ngFor="let level of navbarServ.transcrService.annotation.levels; let l = index;"
-                          value="{{l}}">{{level.name}}
-                  </option>
-                </select>
+            <ng-container *ngIf="converter.conversion.export">
+              <tr [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave] *ngIf="exportStates[i] === 'active'">
+                <td></td>
+                <td colspan="4" style="padding-left:20px;">
+                  <select #val
+                          *ngIf="navbarServ.transcrService !== undefined && !converter.multitiers && transcrService.annotation.levels.length > 1"
+                          (change)="onSelectionChange(converter, val.value)">
+                    <option value="">{{"general.select one tier" | transloco}}</option>
+                    <option *ngFor="let level of navbarServ.transcrService.annotation.levels; let l = index;"
+                            value="{{l}}">{{level.name}}
+                    </option>
+                  </select>
 
-                <a style="margin-left:10px;"
-                   *ngIf="preparing.name === converter.name && !preparing.preparing"
-                   download="{{parentformat.download}}" [href]="parentformat.uri"
-                   class="link" (click)="onDownloadClick(i)">
-                  <fa-icon icon="save"></fa-icon>
-                  Download
-                </a>
-              </td>
-            </tr>
+                  <a style="margin-left:10px;"
+                     *ngIf="preparing.name === converter.name && !preparing.preparing"
+                     download="{{parentformat.download}}" [href]="parentformat.uri"
+                     class="link" (click)="onDownloadClick(i)">
+                    <fa-icon icon="save"></fa-icon>
+                    Download
+                  </a>
+                </td>
+              </tr>
+            </ng-container>
           </ng-container>
           </tbody>
         </table>
 
         <h5>{{"general.custom formats" | transloco}}</h5>
-        <table class="table table-striped" [ngStyle]="{
-          width: content.offsetWidth - 50 + 'px'
-        }">
+        <table class="table table-striped">
           <thead>
           <tr>
             <th></th>
@@ -95,7 +95,7 @@
             </td>
             <td colspan="3">{{'custom.table configurator.description' | transloco}}</td>
           </tr>
-          <tr [@fadeToggle]="(tools.tableConfigurator.opened) ? 'active': 'inactive'">
+          <tr [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave] *ngIf="tools.tableConfigurator.opened">
             <td></td>
             <td colspan="4" style="padding-left:20px;">
               <div class="card" style="padding:10px;" *ngIf="navbarServ.transcrService !== undefined">
@@ -135,7 +135,7 @@
             </td>
             <td colspan="3">{{'export.meta data.description' | transloco}}</td>
           </tr>
-          <tr [@fadeToggle]="(preparing.name === 'Protocol') ? 'active': 'inactive'">
+          <tr [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave] *ngIf="preparing.name === 'Protocol'">
             <td></td>
             <td colspan="4">
               <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === 'Protocol' && preparing.preparing"></i>

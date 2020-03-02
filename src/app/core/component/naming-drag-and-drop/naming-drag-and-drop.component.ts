@@ -178,6 +178,7 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit, OnDest
   }
 
   ngOnDestroy(): void {
+    this.dragulaService.destroy('namingDragDrop');
     this.subcrManager.destroy();
   }
 }

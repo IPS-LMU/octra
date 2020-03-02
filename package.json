@@ -40,6 +40,7 @@
     "@types/es6-promise": "3.3.0",
     "@types/text-encoding": "0.0.35",
     "ajv": "~6.10.2",
+    "angular-animations": "0.0.10",
     "angular-fontawesome": "~1.0.0",
     "arrive": "~2.4.1",
     "bootstrap": "^4.4.1",
@@ -61,7 +62,7 @@
     "summernote": "0.8.11",
     "tslib": "^1.10.0",
     "video.js": "^7.6.6",
-    "web-animations-js": "2.3.2",
+    "web-animations-js": "^2.3.2",
     "x2js": "~3.3.1",
     "zone.js": "~0.9.1"
   },

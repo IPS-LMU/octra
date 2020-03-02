@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {APIService, AppStorageService, SettingsService} from './core/shared/service';
+import {AlertService, APIService, AppStorageService, SettingsService} from './core/shared/service';
 import {SubscriptionManager} from './core/obj/SubscriptionManager';
 import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
 import {AppInfo} from './app.info';

@@ -9,9 +9,7 @@
         </button>
       </div>
       <div class="modal-body" id="tools-table" #content>
-        <table class="table table-striped" [ngStyle]="{
-          width: content.offsetWidth - 50 + 'px'
-        }">
+        <table class="table">
           <thead>
           <tr>
             <th></th>
@@ -22,7 +20,7 @@
           </thead>
           <tbody>
           <!-- combine phrases tool -->
-          <tr>
+          <tr class="top-tr">
             <td (click)="tools.combinePhrases.opened = !tools.combinePhrases.opened">
               <fa-icon style="color:gray;"
                        [icon]="['fas', ((tools.combinePhrases.opened) ? 'chevron-up' : 'chevron-down')]"></fa-icon>
@@ -40,8 +38,8 @@
               </a>
             </td>
           </tr>
-          <tr
-            [@fadeToggle]="(tools.combinePhrases.opened) ? 'active': 'inactive'">
+          <tr *ngIf="tools.combinePhrases.opened" [@fadeInExpandOnEnter]
+              [@fadeOutCollapseOnLeave]>
             <td></td>
             <td colspan="4" style="padding-left:20px;">
               <div class="card" style="padding:10px;" *ngIf="navbarServ.transcrService !== undefined">
@@ -91,7 +89,7 @@
           </tr>
 
           <!-- cut audio files -->
-          <tr *ngIf="navbarServ.transcrService !== undefined
+          <tr class="top-tr" *ngIf="navbarServ.transcrService !== undefined
                      && navbarServ.transcrService.audiomanager.originalInfo.extension === '.wav'">
             <td (click)="tools.audioCutting.opened = !tools.audioCutting.opened">
               <fa-icon style="color:gray;"
@@ -111,81 +109,84 @@
               </a>
             </td>
           </tr>
-          <tr *ngIf="navbarServ.transcrService !== undefined
-                    && navbarServ.transcrService.audiomanager.originalInfo.extension === '.wav'"
-              [@fadeToggle]="(tools.audioCutting.opened) ? 'active': 'inactive'">
-            <td></td>
-            <td colspan="4" style="padding-left:20px;">
-              <div class="card" style="padding:10px;" *ngIf="navbarServ.transcrService !== undefined">
-                <a (click)="tools.audioCutting.showConfigurator = !tools.audioCutting.showConfigurator"
-                   class="show-configurator-link"
-                >
-                  <ng-container *ngIf="tools.audioCutting.showConfigurator">
-                    <fa-icon style="color:gray;"
-                             [icon]="['fas', 'chevron-up']"></fa-icon>
-                    {{"tools.cut audio.hide configurator" | transloco}}
-                  </ng-container>
-                  <ng-container *ngIf="!tools.audioCutting.showConfigurator">
-                    <fa-icon style="color:gray;"
-                             [icon]="['fas', 'chevron-down']"></fa-icon>
-                    {{"tools.cut audio.show configurator" | transloco}}
-                  </ng-container>
-                </a>
-                <div class="configurator" [hidden]="!tools.audioCutting.showConfigurator">
-                  <app-naming-drag-and-drop #namingConvention
-                                            [fileName]="navbarServ.transcrService.audiomanager.ressource.name"
-                                            [firstSegment]="navbarServ.transcrService.currentlevel.segments.get(0)"
-                  ></app-naming-drag-and-drop>
+          <ng-container
+            *ngIf="navbarServ.transcrService !== undefined && navbarServ.transcrService.audiomanager.originalInfo.extension === '.wav'">
+            <tr *ngIf="tools.audioCutting.opened"
+                [@fadeInExpandOnEnter]
+                [@fadeOutCollapseOnLeave]>
+              <td></td>
+              <td colspan="4" style="padding-left:20px;">
+                <div class="card" style="padding:10px;" *ngIf="navbarServ.transcrService !== undefined">
+                  <a (click)="tools.audioCutting.showConfigurator = !tools.audioCutting.showConfigurator"
+                     class="show-configurator-link"
+                  >
+                    <ng-container *ngIf="tools.audioCutting.showConfigurator">
+                      <fa-icon style="color:gray;"
+                               [icon]="['fas', 'chevron-up']"></fa-icon>
+                      {{"tools.cut audio.hide configurator" | transloco}}
+                    </ng-container>
+                    <ng-container *ngIf="!tools.audioCutting.showConfigurator">
+                      <fa-icon style="color:gray;"
+                               [icon]="['fas', 'chevron-down']"></fa-icon>
+                      {{"tools.cut audio.show configurator" | transloco}}
+                    </ng-container>
+                  </a>
+                  <div class="configurator" [hidden]="!tools.audioCutting.showConfigurator">
+                    <app-naming-drag-and-drop #namingConvention
+                                              [fileName]="navbarServ.transcrService.audiomanager.ressource.name"
+                                              [firstSegment]="navbarServ.transcrService.currentlevel.segments.get(0)"
+                    ></app-naming-drag-and-drop>
 
-                  <div class="form-control">
-                    <span>{{'tools.cut audio.append meta files' | transloco}}: </span>
-                    <div class="form-check form-check-inline"
-                         *ngFor="let exportFormat of tools.audioCutting.exportFormats; let i = index;">
-                      <input class="form-check-input" type="checkbox" id="inlineCheckbox{{i}}"
-                             [value]="exportFormat.value"
-                             [(ngModel)]="tools.audioCutting.exportFormats[i].selected">
-                      <label class="form-check-label"
-                             for="inlineCheckbox{{i}}">{{exportFormat.label}}</label>
+                    <div class="form-control">
+                      <span>{{'tools.cut audio.append meta files' | transloco}}: </span>
+                      <div class="form-check form-check-inline"
+                           *ngFor="let exportFormat of tools.audioCutting.exportFormats; let i = index;">
+                        <input class="form-check-input" type="checkbox" id="inlineCheckbox{{i}}"
+                               [value]="exportFormat.value"
+                               [(ngModel)]="tools.audioCutting.exportFormats[i].selected">
+                        <label class="form-check-label"
+                               for="inlineCheckbox{{i}}">{{exportFormat.label}}</label>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div class="progress-area" style="text-align: center;">
-                  <button *ngIf="tools.audioCutting.status !== 'running'"
-                          class="btn btn-primary btn-raised" (click)="splitAudio()"
-                          [disabled]="namingConvention.resultConvention.length === 1"
-                          style="max-width:200px;margin-top:20px;">{{'tools.cut audio.name' | transloco}}
-                  </button>
-                  <button *ngIf="tools.audioCutting.status === 'running'"
-                          class="btn btn-danger btn-raised" (click)="stopAudioSplitting()"
-                          style="max-width:200px;margin-top:20px;">{{'general.stop' | transloco}}
-                  </button>
-                  <div class="mb-2" *ngIf="tools.audioCutting.status !== 'idle'">
-                    <progressbar [animate]="true" [value]="tools.audioCutting.progress"
-                                 [type]="tools.audioCutting.progressbarType">
-                      <b>
+                  <div class="progress-area" style="text-align: center;">
+                    <button *ngIf="tools.audioCutting.status !== 'running'"
+                            class="btn btn-primary btn-raised" (click)="splitAudio()"
+                            [disabled]="namingConvention.resultConvention.length === 1"
+                            style="max-width:200px;margin-top:20px;">{{'tools.cut audio.name' | transloco}}
+                    </button>
+                    <button *ngIf="tools.audioCutting.status === 'running'"
+                            class="btn btn-danger btn-raised" (click)="stopAudioSplitting()"
+                            style="max-width:200px;margin-top:20px;">{{'general.stop' | transloco}}
+                    </button>
+                    <div class="mb-2" *ngIf="tools.audioCutting.status !== 'idle'">
+                      <progressbar [animate]="true" [value]="tools.audioCutting.progress"
+                                   [type]="tools.audioCutting.progressbarType">
+                        <b>
 
-                        {{ tools.audioCutting.progress | number : '1.2-2'}}%
-                      </b>
-                    </progressbar>
-                    <div class="text-danger" style="padding:10px;"
-                         *ngIf="tools.audioCutting.status === 'failed'">{{tools.audioCutting.message}}</div>
+                          {{ tools.audioCutting.progress | number : '1.2-2'}}%
+                        </b>
+                      </progressbar>
+                      <div class="text-danger" style="padding:10px;"
+                           *ngIf="tools.audioCutting.status === 'failed'">{{tools.audioCutting.message}}</div>
+                    </div>
+                    <ng-container
+                      *ngIf="tools.audioCutting.status !== 'idle' && tools.audioCutting.status !== 'finished' && tools.audioCutting.timeLeft > 0">
+                      Time left: {{tools.audioCutting.timeLeft | timespan}}
+                    </ng-container>
+                    <a style="margin-left:10px;"
+                       *ngIf="tools.audioCutting.result.url !== null"
+                       download="{{tools.audioCutting.result.filename}}"
+                       [href]="tools.audioCutting.result.url"
+                       class="link">
+                      <fa-icon icon="save"></fa-icon>
+                      {{'general.download' | transloco}}
+                    </a>
                   </div>
-                  <ng-container
-                    *ngIf="tools.audioCutting.status !== 'idle' && tools.audioCutting.status !== 'finished' && tools.audioCutting.timeLeft > 0">
-                    Time left: {{tools.audioCutting.timeLeft | timespan}}
-                  </ng-container>
-                  <a style="margin-left:10px;"
-                     *ngIf="tools.audioCutting.result.url !== null"
-                     download="{{tools.audioCutting.result.filename}}"
-                     [href]="tools.audioCutting.result.url"
-                     class="link">
-                    <fa-icon icon="save"></fa-icon>
-                    {{'general.download' | transloco}}
-                  </a>
                 </div>
-              </div>
-            </td>
-          </tr>
+              </td>
+            </tr>
+          </ng-container>
           </tbody>
         </table>
       </div>

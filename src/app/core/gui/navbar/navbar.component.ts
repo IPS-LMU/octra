@@ -7,7 +7,6 @@ import {AppInfo} from '../../../app.info';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {editorComponents} from '../../../editors/components';
 import {AnnotJSONType, Level, Segments} from '../../obj/Annotation';
-import {OCTRANIMATIONS} from '../../shared';
 import {BugReportService, ConsoleType} from '../../shared/service/bug-report.service';
 import {environment} from '../../../../environments/environment';
 import {ModalService} from '../../modals/modal.service';
@@ -16,8 +15,7 @@ import {ExportFilesModalComponent} from '../../modals/export-files-modal/export-
 @Component({
   selector: 'app-navigation',
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css'],
-  animations: OCTRANIMATIONS
+  styleUrls: ['./navbar.component.css']
 })
 export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 

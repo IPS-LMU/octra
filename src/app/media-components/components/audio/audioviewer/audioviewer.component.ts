@@ -737,6 +737,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         this.audiochunk.playposition = this.audiochunk.selection.start.clone() as BrowserAudioTime;
       }
       afterAudioEnded();
+    }).catch((e) => {
+      console.error(e);
     });
     /*
 

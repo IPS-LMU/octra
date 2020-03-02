@@ -140,7 +140,7 @@ export class AudioManager {
   public afterdecoded: EventEmitter<AudioRessource> = new EventEmitter<AudioRessource>();
   public afterloaded: EventEmitter<any> = new EventEmitter<any>();
   public statechange: EventEmitter<PlayBackState> = new EventEmitter<PlayBackState>();
-
+  public missingPermission = new EventEmitter<void>();
 
   /**
    * returns the FileFormat instance relative of the file extension or undefined if not found.
@@ -338,7 +338,14 @@ export class AudioManager {
               this._startedAt = Date.now();
               this.changeState(PlayBackState.PLAYING);
             }).catch((error) => {
-              this.statechange.error(new Error(error));
+              this._state = PlayBackState.STOPPED;
+              this.statechange.error(error);
+
+              if (error.name && error.name === 'NotAllowedError') {
+                // no permission
+                this.missingPermission.emit();
+              }
+
               reject(error);
             });
           });

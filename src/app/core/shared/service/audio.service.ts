@@ -23,6 +23,8 @@ export class AudioService {
   constructor(private http: HttpClient) {
   }
 
+  public missingPermission = new EventEmitter<void>();
+
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
   private afterloaded: EventEmitter<any> = new EventEmitter<any>();
   private _audiomanagers: AudioManager[] = [];
@@ -90,6 +92,11 @@ export class AudioService {
 
     if ((found === null || found === undefined)) {
       this._audiomanagers.push(manager);
+
+      this.subscrmanager.add(manager.missingPermission.subscribe(() => {
+        this.missingPermission.emit();
+        this.missingPermission.complete();
+      }));
     }
   }
 
@@ -99,6 +106,7 @@ export class AudioService {
       this._audiomanagers[i].destroy(disconnect);
     }
     this._audiomanagers = [];
+    this.subscrmanager.destroy();
   }
 
   private handleError(err: any) {

@@ -56,6 +56,7 @@ import {GeneralShortcut} from '../../modals/shortcuts-modal/shortcuts-modal.comp
 import {AsrService} from '../../shared/service/asr.service';
 import {parseServerDataEntry} from '../../obj/data-entry';
 import {OCTRAEditor} from '../../../editors/octra-editor';
+import {MissingPermissionsModalComponent} from '../../modals/missing-permissions/missing-permissions.component';
 
 @Component({
   selector: 'app-transcription',
@@ -213,6 +214,10 @@ export class TranscriptionComponent implements OnInit,
       }
 
     }));
+
+    this.subscrmanager.add(this.audio.missingPermission.subscribe(() => {
+      this.missingPermissionsModal.open();
+    }));
   }
 
   // TODO change to ModalComponents!
@@ -224,6 +229,7 @@ export class TranscriptionComponent implements OnInit,
   @ViewChild('transcrSendingModal', {static: true}) transcrSendingModal: TranscriptionSendingModalComponent;
   @ViewChild('modalGuidelines', {static: true}) modalGuidelines: TranscriptionGuidelinesModalComponent;
   @ViewChild('inactivityModal', {static: false}) inactivityModal: InactivityModalComponent;
+  @ViewChild('missingPermissionsModal', {static: false}) missingPermissionsModal: MissingPermissionsModalComponent;
 
   public sendError = '';
   public saving = '';

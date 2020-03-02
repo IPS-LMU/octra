@@ -116,7 +116,7 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit, OnDest
   }
 
   remove(i: number) {
-    if (i < this.resultConvention.length - 1) {
+    if (i < this.resultConvention.length) {
       this.resultConvention.splice(i, 1);
       this.namingConventionchanged.next(this.namingConvention);
     }

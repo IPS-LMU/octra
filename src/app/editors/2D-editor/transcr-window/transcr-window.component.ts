@@ -570,6 +570,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
   onVolumeChange(event: { old_value: number, new_value: number, timestamp: number }) {
     this.audiochunk.volume = event.new_value;
+    this.appStorage.audioVolume = event.new_value;
   }
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {

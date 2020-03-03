@@ -355,6 +355,7 @@ export class AudioManager {
         });
       } else {
         this.statechange.error(new Error('AudioManager: Can\'t play audio because it is already playing'));
+        this._state = PlayBackState.STOPPED;
         reject('AudioManager: Can\'t play audio because it is already playing');
       }
     });
@@ -839,7 +840,8 @@ export class AudioChunk {
           }, playOnHover
         ).then(resolve).catch(reject);
       } else {
-        reject(`can't start playback on chunk because audiomanager is still playing`);
+        reject(`can't start playback on chunk because audio chunk is still playing`);
+        this._state = PlayBackState.STOPPED;
       }
     });
   }

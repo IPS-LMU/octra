@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {AlertService, APIService, AppStorageService, SettingsService} from './core/shared/service';
+import {APIService, AppStorageService, SettingsService} from './core/shared/service';
 import {SubscriptionManager} from './core/obj/SubscriptionManager';
 import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
 import {AppInfo} from './app.info';
@@ -110,6 +110,13 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    const queryParams = {
+      audio: this.getParameterByName('audio'),
+      host: this.getParameterByName('host'),
+      transcript: this.getParameterByName('transcript'),
+      embedded: this.getParameterByName('embedded')
+    };
+
     this.subscrmanager.add(this.settingsService.dbloaded.subscribe(
       () => {
         if (!isNullOrUndefined(this.appStorage.asrSelectedService) && !isNullOrUndefined(this.appStorage.asrSelectedLanguage)) {
@@ -145,7 +152,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       }
     ));
 
-    this.settingsService.loadApplicationSettings(this.route).then(() => {
+    this.settingsService.loadApplicationSettings(queryParams).then(() => {
       console.log(`Application settings loaded`);
 
       this.langService.setAvailableLangs(this.settingsService.appSettings.octra.languages);
@@ -198,6 +205,16 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
     }).catch((error) => {
       console.error(error);
     });
+  }
+
+  private getParameterByName(name, url = null) {
+    if (!url) url = document.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+      results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
   }
 
   queryParamsSet(route: ActivatedRoute): boolean {

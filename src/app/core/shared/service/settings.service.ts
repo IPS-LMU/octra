@@ -8,9 +8,10 @@ import {HttpClient} from '@angular/common/http';
 import {APIService} from './api.service';
 import {TranslocoService} from '@ngneat/transloco';
 import {UpdateManager} from '../UpdateManager';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Params} from '@angular/router';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
+import {query} from '@angular/animations';
 
 declare var validateAnnotation: ((string, any) => any);
 
@@ -132,11 +133,10 @@ export class SettingsService {
 
   private _isDBLoadded = false;
 
-  public static queryParamsSet(route: ActivatedRoute): boolean {
-    const params = route.snapshot.queryParams;
+  public static queryParamsSet(queryParams: Params): boolean {
     return (
-      params.hasOwnProperty('audio') &&
-      params.hasOwnProperty('embedded')
+      !isNullOrUndefined(queryParams.audio) &&
+      !isNullOrUndefined(queryParams.embedded)
     );
   }
 
@@ -161,27 +161,28 @@ export class SettingsService {
     return false;
   }
 
-  public loadDB = (appRoute: ActivatedRoute) => {
-
+  public loadDB = (queryParams: Params) => {
     // check for Updates
-    if (SettingsService.queryParamsSet(appRoute)) {
+    if (SettingsService.queryParamsSet(queryParams)) {
       // URL MODE, overwrite db name with 'url'
-      this.appSettings.octra.database.name = 'url';
+      console.log('appRoute has params');
+      this.appSettings.octra.database.name = 'octra_url';
     } else {
+      console.log('appRoute has no params');
     }
 
     const umanager = new UpdateManager(this.appStorage);
     umanager.checkForUpdates(this.appSettings.octra.database.name).then((idb) => {
 
-      const audioURL = appRoute.snapshot.queryParams.audio;
-      const transcriptURL = (appRoute.snapshot.queryParams.transcript !== undefined)
-        ? appRoute.snapshot.queryParams.transcript : null;
-      const embedded = appRoute.snapshot.queryParams.embedded;
+      const audioURL = queryParams.audio;
+      const transcriptURL = (queryParams.transcript !== undefined)
+        ? queryParams.transcript : null;
+      const embedded = queryParams.embedded;
 
       this.appStorage.urlParams.audio = audioURL;
       this.appStorage.urlParams.transcript = transcriptURL;
       this.appStorage.urlParams.embedded = (embedded === '1');
-      this.appStorage.urlParams.host = appRoute.snapshot.queryParams.host;
+      this.appStorage.urlParams.host = queryParams.host;
 
       // load from indexedDB
       this.appStorage.load(idb).then(
@@ -212,7 +213,7 @@ export class SettingsService {
           }
 
           // if url mode, set it in options
-          if (SettingsService.queryParamsSet(appRoute)) {
+          if (SettingsService.queryParamsSet(queryParams)) {
             this.appStorage.usemode = 'url';
             this.appStorage.LoggedIn = true;
           }
@@ -369,6 +370,7 @@ export class SettingsService {
           }
         );
       } else {
+        this._log += `No audio source found. Please click on "Back" and try it again.`;
         console.error('audio src is null');
         this.audioloaded.emit({status: 'error'});
       }
@@ -394,7 +396,7 @@ export class SettingsService {
     }
   }
 
-  public loadApplicationSettings(appRoute: ActivatedRoute): Promise<void> {
+  public loadApplicationSettings(queryParams: any): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.subscrmanager.add(
         this.appsettingsloaded.subscribe(this.triggerSettingsLoaded)
@@ -425,7 +427,7 @@ export class SettingsService {
           // settings finally loaded
           resolve();
 
-          this.loadDB(appRoute);
+          this.loadDB(queryParams);
         },
         (error) => {
           console.error(error);

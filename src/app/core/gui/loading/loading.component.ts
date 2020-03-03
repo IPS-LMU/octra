@@ -272,11 +272,11 @@ export class LoadingComponent implements OnInit, OnDestroy {
       if (this.appStorage.urlParams.hasOwnProperty('audio') && this.appStorage.urlParams.audio !== ''
         && !(this.appStorage.urlParams.audio === null || this.appStorage.urlParams.audio === undefined)) {
         this.appStorage.usemode = 'url';
-        this.appStorage.LoggedIn = false;
+        this.appStorage.LoggedIn = true;
       } else if (this.appStorage.usemode === 'url') {
         // url mode set, but no params => change mode
         console.warn(`use mode is url but no params found. Reset use mode.`);
-        this.appStorage.usemode = (!isNullOrUndefined(this.appStorage.user.id) && this.appStorage.user.id !== ''
+        this.appStorage.usemode = (!isNullOrUndefined(this.appStorage.user) && !isNullOrUndefined(this.appStorage.user.id) && this.appStorage.user.id !== ''
           && ((this.appStorage.sessionfile === null || this.appStorage.sessionfile === undefined)))
           ? 'online' : 'local';
         this.appStorage.LoggedIn = false;
@@ -285,28 +285,32 @@ export class LoadingComponent implements OnInit, OnDestroy {
       if (this.appStorage.usemode !== 'url' && !this.appStorage.LoggedIn) {
         // not logged in, go back
         Functions.navigateTo(this.router, ['/login'], AppInfo.queryParamsHandling);
-      }
+      } else if (this.appStorage.LoggedIn) {
+        this.settService.loadProjectSettings();
 
-      this.settService.loadProjectSettings();
-
-      if (this.appStorage.usemode === 'local' && this.audio.audiomanagers.length === 0) {
-        Functions.navigateTo(this.router, ['/user/transcr/reload-file'], AppInfo.queryParamsHandling);
-      } else {
-        if (this.appStorage.usemode === 'url') {
+        if (this.appStorage.usemode === 'local' && this.audio.audiomanagers.length === 0) {
+          Functions.navigateTo(this.router, ['/user/transcr/reload-file'], AppInfo.queryParamsHandling);
+        } else {
           if (this.appStorage.usemode === 'url') {
-            this.state = 'Get transcript from URL...';
-            // set audio url from url params
-            this.appStorage.audioURL = decodeURI(this.appStorage.urlParams.audio);
+            if (this.appStorage.usemode === 'url') {
+              this.state = 'Get transcript from URL...';
+              // set audio url from url params
+              this.appStorage.audioURL = decodeURI(this.appStorage.urlParams.audio);
+            }
           }
+
+          console.log(`mode is ${this.appStorage.usemode} and audioSrc is ${this.appStorage.audioURL}`);
+
+          this.settService.audioloading.subscribe(
+            (progress) => {
+              this.audioLoadingProgress = progress * 25;
+            }
+          );
+
+          this.settService.loadAudioFile(this.audio);
         }
-
-        this.settService.audioloading.subscribe(
-          (progress) => {
-            this.audioLoadingProgress = progress * 25;
-          }
-        );
-
-        this.settService.loadAudioFile(this.audio);
+      } else {
+        console.warn(`special situation: loggedIn is null! usemode ${this.appStorage.usemode} url: ${this.appStorage.audioURL}`);
       }
     }).catch((error) => {
       console.error(error);

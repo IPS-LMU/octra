@@ -121,12 +121,6 @@ export class TranscriptionComponent implements OnInit,
     this.navbarServ.transcrService = this.transcrService;
     this.navbarServ.uiService = this.uiService;
 
-    // overwrite logging option using projectconfig
-    if (this.appStorage.usemode === 'online' || appStorage.usemode === 'demo') {
-      this.appStorage.logging = this.settingsService.projectsettings.logging.forced;
-    }
-    this.uiService.enabled = this.appStorage.logging;
-
     this.subscrmanager.add(this.audiomanager.statechange.subscribe((state) => {
         if (!this.audiomanager.playOnHover && !this.modalOverview.visible) {
           let caretpos = -1;
@@ -354,13 +348,6 @@ export class TranscriptionComponent implements OnInit,
         this.changeEditor(editor);
       }
     ));
-
-    this.subscrmanager.add(
-      this.uiService.afteradd.subscribe((elem) => {
-        if (this.appStorage.logging) {
-          this.appStorage.saveLogItem(elem.getDataClone());
-        }
-      }));
 
     // first change
     this.changeEditor(this.interface).then(() => {

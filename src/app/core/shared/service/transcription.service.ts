@@ -105,6 +105,13 @@ export class TranscriptionService {
               private settingsService: SettingsService,
               private http: HttpClient) {
     this.subscrmanager = new SubscriptionManager();
+
+    this.subscrmanager.add(
+      this.uiService.afteradd.subscribe((elem) => {
+        if (this.appStorage.logging) {
+          this.appStorage.saveLogItem(elem.getDataClone());
+        }
+      }));
   }
 
   get validationArray(): { segment: number; validation: any[] }[] {
@@ -251,6 +258,12 @@ export class TranscriptionService {
       this._audiofile.url = (this.appStorage.usemode === 'demo')
         ? `${this.appStorage.audioURL}` : this._audiofile.url;
       this._audiofile.type = this._audiomanager.originalInfo.type;
+
+      // overwrite logging option using projectconfig
+      if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
+        this.appStorage.logging = this.settingsService.projectsettings.logging.forced;
+      }
+      this.uiService.enabled = this.appStorage.logging;
 
       this.loadSegments().then(
         () => {
@@ -454,8 +467,10 @@ export class TranscriptionService {
             if (this.appStorage.logs === null) {
               this.appStorage.clearLoggingData();
               this.uiService.elements = [];
+              this.uiService.addElementFromEvent('octra', {value: AppInfo.version}, Date.now(), null, -1, null, null, 'version');
             } else {
               this.uiService.fromAnyArray(this.appStorage.logs);
+              this.uiService.addElementFromEvent('octra', {value: AppInfo.version}, Date.now(), null, -1, null, null, 'version');
             }
 
             this.navbarServ.dataloaded = true;

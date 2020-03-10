@@ -54,7 +54,7 @@
   <app-transcr-editor #editor id="trancr"
                       (markerInsert)="onMarkerInsert($event)"
                       (markerClick)="onMarkerClick($event)"
-                      [markers]="transcrService.guidelines.markers"
+                      [markers]="transcrService.guidelines?.markers"
                       [easymode]="easymode"
                       [audiochunk]="audiochunk"
                       (boundaryclicked)="onBoundaryClicked($event)"

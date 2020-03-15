@@ -330,11 +330,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
                     if (!isNullOrUndefined(wordsTier)) {
                       let counter = 0;
-                      const segmentEndBrowserTime = new BrowserAudioTime(
-                        new BrowserSample(item.time.browserSampleEnd, this.audiomanager.browserSampleRate),
-                        this.audiomanager.originalSampleRate);
-                      let segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
-                        segmentEndBrowserTime.browserSample, true);
+                      const segmentEndBrowserTime = new SampleUnit(item.time.browserSampleEnd, this.audioManager.sampleRate);
+                      let segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentEndBrowserTime);
 
                       if (segmentIndex < 0) {
                         console.error(`could not find segment to be precessed by ASRMAUS!`);
@@ -342,24 +339,20 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                         for (const wordItem of wordsTier.items) {
                           if (wordItem.sampleStart + wordItem.sampleDur <= item.time.sampleStart + item.time.sampleLength) {
                             const readSegment = Segment.fromObj(new OSegment(1, wordItem.sampleStart, wordItem.sampleDur, wordItem.labels),
-                              this.audiomanager.originalSampleRate, this.audiomanager.browserSampleRate);
+                              this.audioManager.sampleRate);
                             if (readSegment.transcript === '<p:>' || readSegment.transcript === '') {
                               readSegment.transcript = this.transcrService.breakMarker.code;
                             }
 
                             if (counter === wordsTier.items.length - 1) {
-                              segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
-                                segmentEndBrowserTime.browserSample, true);
+                              segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentEndBrowserTime);
 
                               // the processed segment is now the very right one. Replace its content with the content of the last word item.
                               this.transcrService.currentlevel.segments.segments[segmentIndex].transcript = readSegment.transcript;
                               this.transcrService.currentlevel.segments.change(segmentIndex, this.transcrService.currentlevel.segments.segments[segmentIndex].clone());
                             } else {
-                              let origTime = new OriginalAudioTime(new OriginalSample(item.time.sampleStart + readSegment.time.originalSample.value, this.audiomanager.originalSampleRate),
-                                this.audiomanager.browserSampleRate
-                              );
-                              let browserTime = origTime.convertToBrowserAudioTime();
-                              this.transcrService.currentlevel.segments.add(browserTime, readSegment.transcript);
+                              let origTime = new SampleUnit(item.time.sampleStart + readSegment.time.samples, this.audioManager.sampleRate);
+                              this.transcrService.currentlevel.segments.add(origTime, readSegment.transcript);
                             }
                           } else {
                             console.error(`wordItem samples are out of the correct boundaries.`);

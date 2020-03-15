@@ -161,7 +161,7 @@
                   </div>
                   <ng-container
                     *ngIf="tools.audioCutting.status !== 'idle' && tools.audioCutting.status !== 'finished' && tools.audioCutting.timeLeft > 0">
-                    Time left: {{tools.audioCutting.timeLeft | timespan}}
+                    Time left: {{tools.audioCutting.timeLeft | timespan2}}
                   </ng-container>
                   <a style="margin-left:10px;"
                      *ngIf="tools.audioCutting.result.url !== null"

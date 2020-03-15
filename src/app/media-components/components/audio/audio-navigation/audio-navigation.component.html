@@ -2,11 +2,11 @@
   <div class="row">
     <div class="col-md-7">
       <div class="row" role="group" style="height:100%;">
-        <button *ngIf="!_isAudioPlaying" [disabled]="!isReady" class="btn btn-info btn-raised w-20" name="play"
+        <button *ngIf="!isAudioPlaying" [disabled]="!isReady" class="btn btn-info btn-raised w-20" name="play"
                 (mousedown)="onButtonClick('play'); " title="{{buttons.play.label}}">
           <fa-icon icon="play"></fa-icon>
         </button>
-        <button *ngIf="_isAudioPlaying" class="btn btn-info btn-raised w-20" name="pause"
+        <button *ngIf="isAudioPlaying" class="btn btn-info btn-raised w-20" name="pause"
                 (mousedown)="onButtonClick('pause')" title="{{buttons.pause.label}}">
           <fa-icon icon="pause"></fa-icon>
         </button>
@@ -14,7 +14,7 @@
                         title="{{buttons.stop.label}}">
                     <fa-icon icon="stop"></fa-icon>
                 </button>
-        <button class="btn btn-info btn-raised w-20" [ngClass]="{active: _replay}"
+        <button class="btn btn-info btn-raised w-20" [ngClass]="{active: replay}"
                 name="replay" (mousedown)="onButtonClick('replay')" title="{{buttons.replay.label}}">
           <fa-icon icon="retweet"></fa-icon>
         </button>

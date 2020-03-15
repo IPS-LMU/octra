@@ -13,8 +13,8 @@ import {PlayBackStatus, SampleUnit} from '../../../obj/audio';
 import {SubscriptionManager} from '../../../obj/SubscriptionManager';
 import {AudioChunk} from '../../../obj/audio/AudioManager';
 import {Subscription} from 'rxjs';
-import {isNullOrUndefined} from 'util';
 import Konva from 'konva';
+import {isNullOrUndefined} from '../../../../core/shared/Functions';
 
 @Component({
   selector: 'octra-audioplayer',

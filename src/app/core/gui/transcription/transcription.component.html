@@ -8,6 +8,7 @@
                                     [guidelines]="transcrService.guidelines"></app-transcription-guidelines-modal>
 <app-activity-timeout-modal #inactivityModal *ngIf="settingsService.appSettings.octra.inactivityNotice !== undefined
 && settingsService.appSettings.octra.inactivityNotice.showAfter !== undefined"></app-activity-timeout-modal>
+<app-missing-permissions-modal #missingPermissionsModal></app-missing-permissions-modal>
 
 <div class="flex">
     <span id='saving'>

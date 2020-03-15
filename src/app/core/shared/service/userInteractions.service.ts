@@ -77,7 +77,7 @@ export class UserInteractionsService {
           context = event.target;
           name = context.getAttribute('name');
 
-          if (!name) {
+          if (!name && !isNullOrUndefined(context)) {
             name = context.parentNode.getAttribute('name');
           }
           if (!name) {

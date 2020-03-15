@@ -135,6 +135,7 @@ import {DynComponentDirective} from './core/shared/directive/dyn-component.direc
 import {ErrorOccurredComponent} from './core/alerts/error-occurred/error-occurred.component';
 import {AudioviewerConfig} from './media-components/components/audio/audio-viewer/audio-viewer.config';
 import {MediaComponentsModule} from './media-components/media-components.module';
+import {MissingPermissionsModalComponent} from './core/modals/missing-permissions/missing-permissions.component';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -217,8 +218,10 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     HelpModalComponent,
     ALERTS,
     DynComponentDirective,
-    ErrorOccurredComponent
+    ErrorOccurredComponent,
+    MissingPermissionsModalComponent
   ],
+  entryComponents: [EDITORS, ALERTS],
   imports: [
     BrowserModule,
     FontAwesomeModule,

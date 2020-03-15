@@ -5,6 +5,7 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {OCTRANIMATIONS} from '../../shared';
+import {Segment} from '../../shared';
 import {NavbarService} from '../../gui/navbar/navbar.service';
 import {isNullOrUndefined} from '../../shared/Functions';
 import {HttpClient} from '@angular/common/http';
@@ -14,6 +15,7 @@ import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/c
 import {TranslocoService} from '@ngneat/transloco';
 import {WavFormat} from '../../../media-components/obj/audio/AudioFormats';
 import {Segment} from '../../../media-components/obj/annotation';
+import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 
 declare var JSZip;
 
@@ -21,11 +23,13 @@ declare var JSZip;
   selector: 'app-tools-modal',
   templateUrl: './tools-modal.component.html',
   styleUrls: ['./tools-modal.component.css'],
-  animations: OCTRANIMATIONS
+  animations: [
+    fadeOutCollapseOnLeaveAnimation(),
+    fadeInExpandOnEnterAnimation()
+  ]
 })
 export class ToolsModalComponent implements OnInit, OnDestroy {
   modalRef: BsModalRef;
-  AppInfo = AppInfo;
   public visible = false;
 
   public parentformat: {
@@ -96,6 +100,10 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
   protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();
+
+  public get manualURL(): string {
+    return AppInfo.manualURL;
+  }
 
   get isCombinePhrasesSettingsValid(): boolean {
     return (Number.isInteger(this.tools.combinePhrases.options.minSilenceLength) &&

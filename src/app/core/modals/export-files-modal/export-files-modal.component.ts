@@ -5,7 +5,6 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
 import {Converter, IFile} from '../../obj/Converters';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
-import {OCTRANIMATIONS} from '../../shared';
 import {NavbarService} from '../../gui/navbar/navbar.service';
 import {isNullOrUndefined} from '../../shared/Functions';
 import {HttpClient} from '@angular/common/http';
@@ -13,12 +12,16 @@ import {Subject} from 'rxjs';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
 import {DragulaService} from 'ng2-dragula';
 import {TableConfiguratorComponent} from '../../component/table-configurator/table-configurator.component';
+import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 
 @Component({
   selector: 'app-export-files-modal',
   templateUrl: './export-files-modal.component.html',
   styleUrls: ['./export-files-modal.component.css'],
-  animations: OCTRANIMATIONS
+  animations: [
+    fadeInExpandOnEnterAnimation(),
+    fadeOutCollapseOnLeaveAnimation()
+  ]
 })
 export class ExportFilesModalComponent implements OnInit, OnDestroy {
   modalRef: BsModalRef;
@@ -126,7 +129,9 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, 'modals');
 
       this.visible = true;
-      this.tableConfigurator.updateAllTableCells();
+      if (!isNullOrUndefined(this.tableConfigurator)) {
+        this.tableConfigurator.updateAllTableCells();
+      }
 
       const subscr = this.actionperformed.subscribe(
         (action) => {

@@ -105,6 +105,13 @@ export class TranscriptionService {
               private settingsService: SettingsService,
               private http: HttpClient) {
     this.subscrmanager = new SubscriptionManager();
+
+    this.subscrmanager.add(
+      this.uiService.afteradd.subscribe((elem) => {
+        if (this.appStorage.logging) {
+          this.appStorage.saveLogItem(elem.getDataClone());
+        }
+      }));
   }
 
   get validationArray(): { segment: number; validation: any[] }[] {
@@ -252,6 +259,12 @@ export class TranscriptionService {
         ? `${this.appStorage.audioURL}` : this._audiofile.url;
       this._audiofile.type = this._audiomanager.ressource.info.type;
 
+      // overwrite logging option using projectconfig
+      if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
+        this.appStorage.logging = this.settingsService.projectsettings.logging.forced;
+      }
+      this.uiService.enabled = this.appStorage.logging;
+
       this.loadSegments().then(
         () => {
           this.selectedlevel = 0;
@@ -320,13 +333,15 @@ export class TranscriptionService {
                           }
                         );
                     } else {
+                      console.log(`read serverData entry...`);
                       this.appStorage.annotation[this._selectedlevel].level.items = [];
                       for (let i = 0; i < this.appStorage.serverDataEntry.transcript.length; i++) {
-                        const segT = this.appStorage.serverDataEntry[i];
+                        const segT = this.appStorage.serverDataEntry.transcript[i];
 
                         const oseg = new OSegment(i, segT.start, segT.length, [new OLabel('OCTRA_1', segT.text)]);
                         this.appStorage.annotation[this.selectedlevel].level.items.push(oseg);
                       }
+                      console.log(`read serverData read with ${this.appStorage.serverDataEntry.transcript.length} items...`);
 
                       this.appStorage.changeAnnotationLevel(this._selectedlevel,
                         this.appStorage.annotation[this._selectedlevel].level)
@@ -448,8 +463,10 @@ export class TranscriptionService {
             if (this.appStorage.logs === null) {
               this.appStorage.clearLoggingData();
               this.uiService.elements = [];
+              this.uiService.addElementFromEvent('octra', {value: AppInfo.version}, Date.now(), null, -1, null, null, 'version');
             } else {
               this.uiService.fromAnyArray(this.appStorage.logs);
+              this.uiService.addElementFromEvent('octra', {value: AppInfo.version}, Date.now(), null, -1, null, null, 'version');
             }
 
             this.navbarServ.dataloaded = true;

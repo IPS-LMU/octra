@@ -56,6 +56,7 @@ import {PlayBackStatus} from '../../../media-components/obj/audio';
 import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
 import {Level} from '../../../media-components/obj/annotation';
 import {OCTRAEditor} from '../../../editors/octra-editor';
+import {MissingPermissionsModalComponent} from '../../modals/missing-permissions/missing-permissions.component';
 
 @Component({
   selector: 'app-transcription',
@@ -120,17 +121,11 @@ export class TranscriptionComponent implements OnInit,
     this.navbarServ.transcrService = this.transcrService;
     this.navbarServ.uiService = this.uiService;
 
-    // overwrite logging option using projectconfig
-    if (this.appStorage.usemode === 'online' || appStorage.usemode === 'demo') {
-      this.appStorage.logging = this.settingsService.projectsettings.logging.forced;
-    }
-    this.uiService.enabled = this.appStorage.logging;
-
-    this.subscrmanager.add(this.audioManager.statechange.subscribe((state) => {
-        if (!this.audioManager.playOnHover && !this.modalOverview.visible) {
+    this.subscrmanager.add(this.audiomanager.statechange.subscribe((state) => {
+        if (!this.audiomanager.playOnHover && !this.modalOverview.visible) {
           let caretpos = -1;
 
-          if (!(((this.currentEditor.instance as any).editor) === null || ((this.currentEditor.instance as any).editor) === undefined)) {
+          if (!isNullOrUndefined(this.currentEditor) && !isNullOrUndefined((this.currentEditor.instance as any).editor)) {
             caretpos = (this.currentEditor.instance as any).editor.caretpos;
           }
 
@@ -187,7 +182,9 @@ export class TranscriptionComponent implements OnInit,
             this.alertService.showAlert('success', this.langService.translate('tools.alerts.done', {
               value: toolName
             }));
-            (this._currentEditor.instance as any).update();
+            if (!isNullOrUndefined(this.currentEditor) && !isNullOrUndefined((this.currentEditor.instance as any).editor)) {
+              (this._currentEditor.instance as any).update();
+            }
             break;
         }
       },
@@ -197,13 +194,23 @@ export class TranscriptionComponent implements OnInit,
       }));
 
     this.subscrmanager.add(this.modService.showmodal.subscribe((event: { type: string, data, emitter: any }) => {
-      const editor = this._currentEditor.instance as OCTRAEditor;
-      editor.disableAllShortcuts();
+
+      if (!isNullOrUndefined(this.currentEditor) && !isNullOrUndefined((this.currentEditor.instance as any).editor)) {
+        const editor = this._currentEditor.instance as OCTRAEditor;
+        editor.disableAllShortcuts();
+      }
     }));
 
     this.subscrmanager.add(this.modService.closemodal.subscribe((event: { type: string }) => {
-      const editor = this._currentEditor.instance as OCTRAEditor;
-      editor.enableAllShortcuts();
+      if (!isNullOrUndefined(this.currentEditor) && !isNullOrUndefined((this.currentEditor.instance as any).editor)) {
+        const editor = this._currentEditor.instance as OCTRAEditor;
+        editor.enableAllShortcuts();
+      }
+
+    }));
+
+    this.subscrmanager.add(this.audio.missingPermission.subscribe(() => {
+      this.missingPermissionsModal.open();
     }));
   }
 
@@ -216,6 +223,7 @@ export class TranscriptionComponent implements OnInit,
   @ViewChild('transcrSendingModal', {static: true}) transcrSendingModal: TranscriptionSendingModalComponent;
   @ViewChild('modalGuidelines', {static: true}) modalGuidelines: TranscriptionGuidelinesModalComponent;
   @ViewChild('inactivityModal', {static: false}) inactivityModal: InactivityModalComponent;
+  @ViewChild('missingPermissionsModal', {static: false}) missingPermissionsModal: MissingPermissionsModalComponent;
 
   public sendError = '';
   public saving = '';
@@ -340,13 +348,6 @@ export class TranscriptionComponent implements OnInit,
         this.changeEditor(editor);
       }
     ));
-
-    this.subscrmanager.add(
-      this.uiService.afteradd.subscribe((elem) => {
-        if (this.appStorage.logging) {
-          this.appStorage.saveLogItem(elem.getDataClone());
-        }
-      }));
 
     // first change
     this.changeEditor(this.interface).then(() => {
@@ -559,7 +560,7 @@ export class TranscriptionComponent implements OnInit,
             this._currentEditor = viewContainerRef.createComponent(componentFactory);
             let caretpos = -1;
 
-            if (!((this.currentEditor.instance as any).editor === null || (this.currentEditor.instance as any).editor === undefined)) {
+            if (!isNullOrUndefined(this.currentEditor) && !isNullOrUndefined((this.currentEditor.instance as any).editor)) {
               caretpos = (this.currentEditor.instance as any).editor.caretpos;
             }
 
@@ -571,6 +572,7 @@ export class TranscriptionComponent implements OnInit,
 
             this.uiService.addElementFromEvent('editor:changed', {value: name}, Date.now(),
               null, null, null, null, 'editors');
+            console.log(`opened ${name}`);
 
             this.cd.detectChanges();
           }, 20);
@@ -719,10 +721,17 @@ export class TranscriptionComponent implements OnInit,
         const jsonStr = JSON.stringify(json.data);
         this.appStorage.serverDataEntry = parseServerDataEntry(jsonStr);
 
+
         if (this.appStorage.serverDataEntry.hasOwnProperty('transcript')) {
-          if (!Array.isArray(this.appStorage.serverDataEntry)) {
+          if (!Array.isArray(this.appStorage.serverDataEntry.transcript)) {
+            console.log(`server transcript is not array, set []`);
             this.appStorage.serverDataEntry.transcript = [];
+          } else {
+            console.log(`seervertranscript is array`);
           }
+        } else {
+          console.log(`no server transcript`);
+          // this.appStorage.serverDataEntry.transcript
         }
 
         if (isNullOrUndefined(this.appStorage.serverDataEntry.logtext) ||

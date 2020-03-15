@@ -8,7 +8,6 @@ let dev = "";
 
 const excludedList = ["config", "LICENSE.txt", "media"];
 
-let disabledRobots = true;
 let isUpdate = false;
 
 let timeNow = getDateTimeString();
@@ -68,9 +67,6 @@ node.on('exit', function (code) {
   indexHTML = indexHTML.replace(/(const octraLastUpdated = ").*(";)/g, `$1${timeNow}$2`);
   indexHTML = indexHTML.replace(/(const octraVersion = ").*(";)/g, `$1${version}$2`);
 
-  if (!disabledRobots) {
-    indexHTML = indexHTML.replace(/(<meta name="robots" content="noindex">)/g, "");
-  }
   fs.writeFileSync(`${buildDir}index.html`, indexHTML, {
     encoding: "utf8"
   });

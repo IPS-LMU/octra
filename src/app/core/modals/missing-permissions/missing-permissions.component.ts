@@ -1,14 +1,14 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {BsModalRef} from 'ngx-bootstrap';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {Subject} from 'rxjs';
+import {SubscriptionManager} from '../../obj/SubscriptionManager';
 
 @Component({
-  selector: 'app-help-modal',
-  templateUrl: './help-modal.component.html',
-  styleUrls: ['./help-modal.component.css']
+  selector: 'app-missing-permissions-modal',
+  templateUrl: './missing-permissions.component.html',
+  styleUrls: ['./missing-permissions.component.css']
 })
-export class HelpModalComponent implements OnInit, OnDestroy {
+export class MissingPermissionsModalComponent implements OnInit {
   modalRef: BsModalRef;
   public visible = false;
 
@@ -19,7 +19,7 @@ export class HelpModalComponent implements OnInit, OnDestroy {
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();
 
-  constructor() {
+  constructor(private modalService: BsModalService) {
   }
 
   ngOnInit() {
@@ -56,5 +56,9 @@ export class HelpModalComponent implements OnInit, OnDestroy {
   onHidden() {
     this.visible = false;
     this.subscrmanager.destroy();
+  }
+
+  reload() {
+    document.location.reload(true);
   }
 }

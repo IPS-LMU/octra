@@ -40,7 +40,7 @@ export class AppInfo {
     new ELANConverter(),
     new SRTConverter(),
     new WebVTTConverter(),
-    new TextConverter(),
+    new TextConverter()
   ];
 
   public static readonly themes: string[] = [
@@ -50,6 +50,8 @@ export class AppInfo {
 
   static readonly version = octraVersion;
   static readonly lastUpdate = octraLastUpdated;
+  static readonly manualURL = 'https://clarin.phonetik.uni-muenchen.de/apps/octra/manual/1.4.0/en/';
+
   static readonly debugging = false;
 
   public static readonly queryParamsHandling: NavigationExtras = {

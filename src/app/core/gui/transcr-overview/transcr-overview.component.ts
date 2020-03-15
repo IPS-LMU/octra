@@ -157,8 +157,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   ngOnInit() {
-    this.updateView();
-
     this.subscrmanager.add(this.audio.audiomanagers[0].statechange.subscribe((state) => {
         if (this._visible) {
           // make sure that events from playonhover are not logged
@@ -285,10 +283,10 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   ngAfterViewInit() {
-    this.updateView();
   }
 
   updateView() {
+    console.log(`update View!`);
     this.updateSegments();
     this.transcrService.analyse();
 

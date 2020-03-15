@@ -94,7 +94,8 @@
     "authenticate": "Authentifizieren",
     "im authenticated": "Ich bin authentifiziert!",
     "dismissed": "verschwindet in {{value}}s",
-    "Send feedback": "Feedback senden"
+    "Send feedback": "Feedback senden",
+    "reload": "NEU LADEN"
   },
   "bug report": {
     "give feedback": "Feedback geben",
@@ -206,6 +207,14 @@
       "new": "Neue Transkription beginnen",
       "continue": "Transkription fortsetzen",
       "quit": "OCTRA beenden"
+    },
+    "missing permissions": {
+      "header": "Fehlende Berechtigungen",
+      "description": "OCTRA hat nicht die Berechtigung Audio abszuspielen. Damit Du OCTRA weiter nutzen kannst, musst Du diese Berechtigung erteilen. Führe die folgenden Schritte aus und klicke anschließend auf die \"NEU LADEN\" Schaltfläche am Ende dieses Fensters.",
+      "step1": "Klicke auf das durchgestrichene Play-Symbol links der Adresszeile.",
+      "step2": "Klicke auf die Schaltfläche rechts von \"Autoplay\".",
+      "step3": "Klicke aud \"Audio und Video erlauben\".",
+      "step4": "Klicke auf die \"NEU LADEN\" Schaltfläche unter diesem Schritt."
     }
   },
   "login": {

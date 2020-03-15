@@ -94,7 +94,8 @@
     "authenticate": "Authenticate",
     "im authenticated": "I'm authenticated!",
     "dismissed": "dismissed in {{value}}s",
-    "Send feedback": "Send feedback"
+    "Send feedback": "Send feedback",
+    "reload": "reload"
   },
   "bug report": {
     "give feedback": "Give feedback",
@@ -206,6 +207,14 @@
       "new": "Start new transcription",
       "continue": "Continue transcription",
       "quit": "Quit OCTRA"
+    },
+    "missing permissions": {
+      "header": "Missing permissions",
+      "description": "OCTRA detected that it does not get the permission to play audio. In order to continue you have to grant OCTRA the permission to play audio. Do the following three steps and hit the \"RELOAD\" button on the bottom of this window.",
+      "step1": "Click on the stroke-out play icon on the left of the address bar.",
+      "step2": "Click on the button next to 'Autoplay'.",
+      "step3": "Click on \"Allow Audio and Video\".",
+      "step4": "Click on the \"RELOAD\" button below."
     }
   },
   "login": {

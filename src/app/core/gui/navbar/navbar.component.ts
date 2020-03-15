@@ -16,8 +16,7 @@ import {Level, Segments, AnnotJSONType} from '../../../media-components/obj/anno
 @Component({
   selector: 'app-navigation',
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css'],
-  animations: OCTRANIMATIONS
+  styleUrls: ['./navbar.component.css']
 })
 export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 

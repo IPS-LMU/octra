@@ -1,0 +1,32 @@
+<div bsModal #modal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1"
+     [config]="{
+        backdrop:true,
+        ignoreBackdropClick: true
+        }">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title"> {{'modal.missing permissions.header' |transloco}}</h4>
+      </div>
+      <div class="modal-body" #content>
+        <p>
+          {{'modal.missing permissions.description' | transloco}}
+        </p>
+        <ol>
+          <li>{{'modal.missing permissions.step1' | transloco}}<br/>
+            <img src="assets/img/octraMissingAudioPermi01.png" alt="missing permission 1"/>
+          </li>
+          <li>{{'modal.missing permissions.step2' | transloco}}<br/>
+            <img src="assets/img/octraMissingAudioPermi02.png" alt="missing permission 1"/>
+          </li>
+          <li>{{'modal.missing permissions.step3' | transloco}}<br/>
+            <img src="assets/img/octraMissingAudioPermi03.png" alt="missing permission 1"/>
+          </li>
+          <li>{{'modal.missing permissions.step4' | transloco}}</li>
+        </ol>
+
+        <button class="btn btn-primary btn-raised w-100" (click)="reload()">{{"general.reload" |transloco }}</button>
+      </div>
+    </div>
+  </div>
+</div>

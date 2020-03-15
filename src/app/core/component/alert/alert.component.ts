@@ -1,24 +1,18 @@
-import {
-  AfterViewInit,
-  Component,
-  ComponentFactoryResolver,
-  ComponentRef,
-  OnDestroy,
-  OnInit,
-  SecurityContext,
-  ViewChild
-} from '@angular/core';
+import {AfterViewInit, Component, ComponentFactoryResolver, OnDestroy, OnInit, SecurityContext, ViewChild} from '@angular/core';
 import {interval, Subscription} from 'rxjs';
-import {AlertEntry, AlertSendObj, AlertService} from '../../shared/service/alert.service';
-import {OCTRANIMATIONS, SubscriptionManager} from '../../shared';
+import {AlertEntry, AlertService} from '../../shared/service/alert.service';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {DynComponentDirective} from '../../shared/directive/dyn-component.directive';
+import {fadeInOnEnterAnimation, fadeOutOnLeaveAnimation} from 'angular-animations';
 
 @Component({
   selector: 'app-alert',
   templateUrl: './alert.component.html',
   styleUrls: ['./alert.component.css'],
-  animations: OCTRANIMATIONS
+  animations: [
+    fadeInOnEnterAnimation(),
+    fadeOutOnLeaveAnimation()
+  ]
 })
 
 export class AlertComponent implements OnInit, OnDestroy, AfterViewInit {
@@ -59,7 +53,6 @@ export class AlertComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onClose(entry: AlertEntry) {
-    entry.animation = 'closed';
     this.removeFromQueue(entry);
   }
 

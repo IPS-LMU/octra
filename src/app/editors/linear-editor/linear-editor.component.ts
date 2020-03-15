@@ -130,7 +130,11 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
       this.save();
       setTimeout(() => {
-        // this.loupe.update(false);
+        if (!isNullOrUndefined(this.loupe)) {
+          this.loupe.update(false);
+        } else {
+          console.error(`can't update loupe after typing because it's undefined!`);
+        }
       }, 200);
 
       if (this.oldRaw === this.editor.rawText) {
@@ -358,6 +362,8 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
   onSegmentEnter($event) {
     this.selectSegment($event.index).then((selection: AudioSelection) => {
+      this.viewer.selectSegment($event.index);
+      this.audiochunkDown = new AudioChunk(selection, this.audiomanager);
       this.topSelected = true;
       this.audiochunkDown = new AudioChunk(selection, this.audioManager);
     });
@@ -557,8 +563,12 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   public update() {
-    // this.loupe.update();
-    // this.viewer.update();
+    /* if (!isNullOrUndefined(this.loupe)) {
+      this.loupe.update();
+    }
+    if (!isNullOrUndefined(this.viewer)) {
+      this.viewer.update();
+    } */
     this.segmentselected = false;
     this.audiochunkTop.startpos = this.audiochunkTop.time.start.clone();
     this.audiochunkDown.startpos = this.audiochunkDown.time.start.clone();

@@ -9,3 +9,7 @@
 progressbar {
   height: 20px;
 }
+
+.top-tr td {
+  background-color: rgb(242, 242, 242);
+}

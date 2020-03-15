@@ -4,7 +4,7 @@ import {NgForm} from '@angular/forms';
 import {LoginService} from './login.service';
 import {APIService, AppStorageService, AudioService, OIDBLevel, OIDBLink, SettingsService} from '../../shared/service';
 import {ComponentCanDeactivate} from './login.deactivateguard';
-import {OCTRANIMATIONS, SubscriptionManager} from '../../shared';
+import {SubscriptionManager} from '../../shared';
 import {SessionFile} from '../../obj/SessionFile';
 import {TranslocoService} from '@ngneat/transloco';
 import {Converter} from '../../obj/Converters';
@@ -21,8 +21,7 @@ import {parseServerDataEntry} from '../../obj/data-entry';
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
-  providers: [LoginService],
-  animations: OCTRANIMATIONS
+  providers: [LoginService]
 })
 export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate, AfterViewInit {
 

@@ -63,12 +63,17 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       const oldError = console.error;
       (() => {
         // tslint:disable-next-line:only-arrow-functions
-        console.error = function (error) {
+        console.error = function (error, context) {
           let debug = '';
           let stack = '';
 
           if (typeof error === 'string') {
             debug = error;
+
+            if (error === 'ERROR' && !isNullOrUndefined(context) && context.hasOwnProperty('stack') && context.hasOwnProperty('message')) {
+              debug = context.message;
+              stack = context.stack;
+            }
           } else {
             if (error instanceof Error) {
               debug = error.message;
@@ -85,7 +90,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
           }
 
           if (debug !== '') {
-            serv.addEntry(ConsoleType.ERROR, `${debug}: ${stack}`);
+            serv.addEntry(ConsoleType.ERROR, `${debug}${(stack !== '') ? ' ' + stack : ''}`);
           }
 
           oldError.apply(console, arguments);
@@ -105,6 +110,13 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    const queryParams = {
+      audio: this.getParameterByName('audio'),
+      host: this.getParameterByName('host'),
+      transcript: this.getParameterByName('transcript'),
+      embedded: this.getParameterByName('embedded')
+    };
+
     this.subscrmanager.add(this.settingsService.dbloaded.subscribe(
       () => {
         if (!isNullOrUndefined(this.appStorage.asrSelectedService) && !isNullOrUndefined(this.appStorage.asrSelectedLanguage)) {
@@ -140,7 +152,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       }
     ));
 
-    this.settingsService.loadApplicationSettings(this.route).then(() => {
+    this.settingsService.loadApplicationSettings(queryParams).then(() => {
       console.log(`Application settings loaded`);
 
       this.langService.setAvailableLangs(this.settingsService.appSettings.octra.languages);
@@ -193,6 +205,16 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
     }).catch((error) => {
       console.error(error);
     });
+  }
+
+  private getParameterByName(name, url = null) {
+    if (!url) url = document.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+      results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
   }
 
   queryParamsSet(route: ActivatedRoute): boolean {

@@ -16,7 +16,7 @@ import {TranslocoService} from '@ngneat/transloco';
 
 import {BrowserInfo, KeyMapping, SubscriptionManager} from '../../shared';
 import {TranscriptionService} from '../../shared/service';
-import {Functions, isNullOrUndefined} from '../../shared/Functions';
+import {Functions, isSet} from '../../shared/Functions';
 import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
 import {isNumeric} from 'rxjs/internal-compatibility';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../shared/service/asr.service';
@@ -190,7 +190,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     for (let i = 0; i < this.markers.length; i++) {
       const marker = this.markers[i];
 
-      if (!isNullOrUndefined(marker.icon) && marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0 && marker.icon.indexOf('.gif') < 0
+      if (!isSet(marker.icon) && marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0 && marker.icon.indexOf('.gif') < 0
         && marker.icon !== '' && marker.code !== '' && marker.icon !== marker.code
       ) {
         // replace all utf8 symbols with the marker's code
@@ -290,7 +290,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       navigation.str_array.push('fontSizeUp');
     }
 
-    if (!isNullOrUndefined(this.textfield)) {
+    if (!isSet(this.textfield)) {
       this.textfield.summernote('destroy');
     }
 
@@ -402,7 +402,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   };
 
   onASRItemChange(item: ASRQueueItem) {
-    if (!isNullOrUndefined(item)) {
+    if (!isSet(item)) {
       if (item.time.sampleStart === this.audiochunk.time.start.samples
         && item.time.sampleLength === this.audiochunk.time.duration.samples) {
         if (item.status === ASRProcessStatus.FINISHED) {
@@ -628,7 +628,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       if ((marker.icon === null || marker.icon === undefined) || marker.icon === '' ||
         marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0) {
         // text only or utf8 symbol
-        icon = (!isNullOrUndefined(marker.icon) && (marker.icon.indexOf('.png') < 0 || marker.icon.indexOf('.jpg') < 0)) ? marker.icon : '';
+        icon = (!isSet(marker.icon) && (marker.icon.indexOf('.png') < 0 || marker.icon.indexOf('.jpg') < 0)) ? marker.icon : '';
 
         if (!this.easymode) {
           icon += ' ' + marker.button_text + '<span class=\'btn-shortcut\'>  ' +
@@ -657,7 +657,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       // create button
       const btnJS = {
         contents: icon,
-        tooltip: (isNullOrUndefined(this.Settings) || this.Settings.btnPopover) ? marker.description : '',
+        tooltip: (isSet(this.Settings) || this.Settings.btnPopover) ? marker.description : '',
         container: false,
         click: () => {
           // invoke insertText method with 'hello' on editor module.
@@ -674,7 +674,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   initPopover() {
-    if (!isNullOrUndefined(this.popovers.validationError)) {
+    if (!isSet(this.popovers.validationError)) {
       this.popovers.validationError.css('display', 'none');
       this.popovers.segmentBoundary.css('display', 'none');
     }
@@ -1126,7 +1126,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private onValidationErrorMouseOver(jQueryObj: any, event: any) {
-    if (isNullOrUndefined(jQueryObj.attr('data-errorcode'))) {
+    if (isSet(jQueryObj.attr('data-errorcode'))) {
       jQueryObj = jQueryObj.parent();
     }
 
@@ -1435,7 +1435,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    */
 
   public onASROverlayClick() {
-    if (!isNullOrUndefined(this.asrService.selectedLanguage)) {
+    if (!isSet(this.asrService.selectedLanguage)) {
       const item = this.asrService.queue.getItemByTime(this.audiochunk.time.start.samples, this.audiochunk.time.duration.samples);
       if (item !== undefined) {
         this.asrService.stopASROfItem(item);

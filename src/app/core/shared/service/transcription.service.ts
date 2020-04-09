@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {Functions, isNullOrUndefined} from '../Functions';
+import {Functions, isSet} from '../Functions';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
 import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
@@ -168,9 +168,9 @@ export class TranscriptionService {
 
   public saveSegments = () => {
     // make sure, that no saving overhead exist. After saving request wait 1 second
-    if (!isNullOrUndefined(this._annotation)
+    if (!isSet(this._annotation)
       && this._annotation.levels.length > 0
-      && !isNullOrUndefined(this._annotation.levels[this._selectedlevel])) {
+      && !isSet(this._annotation.levels[this._selectedlevel])) {
       this.appStorage.save('annotation', {
         num: this._selectedlevel,
         level: this._annotation.levels[this._selectedlevel].getObj(this.audioManager.ressource.info.duration)
@@ -298,7 +298,7 @@ export class TranscriptionService {
     return new Promise<void>(
       (resolve, reject) => {
         new Promise<void>((resolve2) => {
-          if (isNullOrUndefined(this.appStorage.annotation) || this.appStorage.annotation.length === 0) {
+          if (isSet(this.appStorage.annotation) || this.appStorage.annotation.length === 0) {
             const newLevels = [];
             const levels = this.createNewAnnotation().levels;
             for (let i = 0; i < levels.length; i++) {
@@ -306,19 +306,19 @@ export class TranscriptionService {
             }
 
             this.appStorage.overwriteAnnotation(newLevels).then(() => {
-                if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
-                  this.appStorage.annotation[this._selectedlevel].level.items = [];
+              if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
+                this.appStorage.annotation[this._selectedlevel].level.items = [];
 
-                  if (!isNullOrUndefined(this.appStorage.serverDataEntry) && !isNullOrUndefined(this.appStorage.serverDataEntry.transcript) && this.appStorage.serverDataEntry.transcript.length > 0) {
-                    // import logs
-                    this.appStorage.logs = this.appStorage.serverDataEntry.logtext;
+                if (!isSet(this.appStorage.serverDataEntry) && !isSet(this.appStorage.serverDataEntry.transcript) && this.appStorage.serverDataEntry.transcript.length > 0) {
+                  // import logs
+                  this.appStorage.logs = this.appStorage.serverDataEntry.logtext;
 
-                    // check if servertranscript's segment is empty
-                    if (this.appStorage.serverDataEntry.transcript.length === 1 && this.appStorage.serverDataEntry[0].text === '') {
-                      this.appStorage.annotation[this.selectedlevel].level.items.push(
-                        new OSegment(0, 0, this.audioManager.ressource.info.duration.samples,
-                          [new OLabel('OCTRA_1', this.appStorage.prompttext)])
-                      );
+                  // check if servertranscript's segment is empty
+                  if (this.appStorage.serverDataEntry.transcript.length === 1 && this.appStorage.serverDataEntry[0].text === '') {
+                    this.appStorage.annotation[this.selectedlevel].level.items.push(
+                      new OSegment(0, 0, this.audioManager.ressource.info.duration.samples,
+                        [new OLabel('OCTRA_1', this.appStorage.prompttext)])
+                    );
 
                       this.appStorage.changeAnnotationLevel(this._selectedlevel,
                         this.appStorage.annotation[this._selectedlevel].level)
@@ -355,18 +355,18 @@ export class TranscriptionService {
                             resolve2();
                           }
                         );
-                    }
-                  } else if (!isNullOrUndefined(this.appStorage.prompttext) && this.appStorage.prompttext !== ''
-                    && typeof this.appStorage.prompttext === 'string') {
-                    // prompt text available and server transcript is null
-                    // set prompt as new transcript
+                  }
+                } else if (!isSet(this.appStorage.prompttext) && this.appStorage.prompttext !== ''
+                  && typeof this.appStorage.prompttext === 'string') {
+                  // prompt text available and server transcript is null
+                  // set prompt as new transcript
 
-                    // check if prompttext ist a transcription format like AnnotJSON
-                    let converted: OAnnotJSON;
-                    for (const converter of AppInfo.converters) {
-                      if (converter instanceof AnnotJSONConverter || converter instanceof PartiturConverter) {
-                        const result = converter.import({
-                          name: this._audiofile.name,
+                  // check if prompttext ist a transcription format like AnnotJSON
+                  let converted: OAnnotJSON;
+                  for (const converter of AppInfo.converters) {
+                    if (converter instanceof AnnotJSONConverter || converter instanceof PartiturConverter) {
+                      const result = converter.import({
+                        name: this._audiofile.name,
                           content: this.appStorage.prompttext,
                           type: 'text',
                           encoding: 'utf8'
@@ -738,7 +738,7 @@ export class TranscriptionService {
               'data-marker-code=\'' + markerCode + '\' alt=\'' + markerCode + '\'/>';
           } else {
             // is text or ut8 symbol
-            if (!isNullOrUndefined(marker.icon) && marker.icon !== '') {
+            if (!isSet(marker.icon) && marker.icon !== '') {
               img = marker.icon;
             } else {
               img = marker.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');

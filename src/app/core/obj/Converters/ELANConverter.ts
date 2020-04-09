@@ -1,7 +1,7 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 import * as moment from 'moment';
 import * as X2JS from 'x2js';
-import {isNullOrUndefined} from '../../shared/Functions';
+import {isSet} from '../../shared/Functions';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../../../media-components/obj/annotation';
 
 export class ELANConverter extends Converter {
@@ -134,10 +134,10 @@ export class ELANConverter extends Converter {
 
     let counter = 1;
 
-    if (!isNullOrUndefined(jsonXML) && jsonXML.hasOwnProperty('ANNOTATION_DOCUMENT')) {
+    if (!isSet(jsonXML) && jsonXML.hasOwnProperty('ANNOTATION_DOCUMENT')) {
       const timeUnit = jsonXML.ANNOTATION_DOCUMENT.HEADER._TIME_UNITS;
 
-      if (!isNullOrUndefined(timeUnit) && timeUnit === 'milliseconds') {
+      if (!isSet(timeUnit) && timeUnit === 'milliseconds') {
         let lastSample = 0;
         for (let i = 0; i < jsonXML.ANNOTATION_DOCUMENT.TIER.length; i++) {
           const tier = jsonXML.ANNOTATION_DOCUMENT.TIER[i];

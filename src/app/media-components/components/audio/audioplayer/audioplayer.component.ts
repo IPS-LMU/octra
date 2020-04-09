@@ -14,7 +14,7 @@ import {SubscriptionManager} from '../../../obj/SubscriptionManager';
 import {AudioChunk} from '../../../obj/audio/AudioManager';
 import {Subscription} from 'rxjs';
 import Konva from 'konva';
-import {isNullOrUndefined} from '../../../../core/shared/Functions';
+import {isSet} from '../../../../core/shared/Functions';
 
 @Component({
   selector: 'octra-audioplayer',
@@ -119,7 +119,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
         this.subscrmanager.removeById(this.bufferedSubscr);
       }
 
-      if (!isNullOrUndefined(this.audiochunkSubscription)) {
+      if (!isSet(this.audiochunkSubscription)) {
         this.audiochunkSubscription.unsubscribe();
       }
 
@@ -242,7 +242,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
     const playHead = this.canvasElements.playHead;
     const layer = this.stage.getLayers()[0];
 
-    if (isNullOrUndefined(this.animation.playHead)) {
+    if (isSet(this.animation.playHead)) {
       this.animation.playHead = new Konva.Animation(this.doPlayHeadAnimation, layer);
     }
     this.animation.playHead.start();
@@ -250,7 +250,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
   }
 
   public ngOnDestroy(): void {
-    if (!isNullOrUndefined(this.audiochunkSubscription)) {
+    if (!isSet(this.audiochunkSubscription)) {
       this.audiochunkSubscription.unsubscribe();
     }
     this.subscrmanager.destroy();

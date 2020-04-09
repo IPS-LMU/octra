@@ -43,7 +43,7 @@ import {OverviewModalComponent} from '../../modals/overview-modal/overview-modal
 import {AppInfo} from '../../../app.info';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 import {TranscriptionSendingModalComponent} from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
-import {Functions, isNullOrUndefined} from '../../shared/Functions';
+import {Functions, isSet} from '../../shared/Functions';
 import {InactivityModalComponent} from '../../modals/inactivity-modal/inactivity-modal.component';
 import {
   ModalEndAnswer,
@@ -125,7 +125,7 @@ export class TranscriptionComponent implements OnInit,
         if (!this.audioManager.playOnHover && !this.modalOverview.visible) {
           let caretpos = -1;
 
-          if (!isNullOrUndefined(this.currentEditor) && !isNullOrUndefined((this.currentEditor.instance as any).editor)) {
+          if (!isSet(this.currentEditor) && !isSet((this.currentEditor.instance as any).editor)) {
             caretpos = (this.currentEditor.instance as any).editor.caretpos;
           }
 
@@ -182,7 +182,7 @@ export class TranscriptionComponent implements OnInit,
             this.alertService.showAlert('success', this.langService.translate('tools.alerts.done', {
               value: toolName
             }));
-            if (!isNullOrUndefined(this.currentEditor) && !isNullOrUndefined((this.currentEditor.instance as any).editor)) {
+            if (!isSet(this.currentEditor) && !isSet((this.currentEditor.instance as any).editor)) {
               (this._currentEditor.instance as any).update();
             }
             break;
@@ -195,14 +195,14 @@ export class TranscriptionComponent implements OnInit,
 
     this.subscrmanager.add(this.modService.showmodal.subscribe((event: { type: string, data, emitter: any }) => {
 
-      if (!isNullOrUndefined(this.currentEditor) && !isNullOrUndefined((this.currentEditor.instance as any).editor)) {
+      if (!isSet(this.currentEditor) && !isSet((this.currentEditor.instance as any).editor)) {
         const editor = this._currentEditor.instance as OCTRAEditor;
         editor.disableAllShortcuts();
       }
     }));
 
     this.subscrmanager.add(this.modService.closemodal.subscribe((event: { type: string }) => {
-      if (!isNullOrUndefined(this.currentEditor) && !isNullOrUndefined((this.currentEditor.instance as any).editor)) {
+      if (!isSet(this.currentEditor) && !isSet((this.currentEditor.instance as any).editor)) {
         const editor = this._currentEditor.instance as OCTRAEditor;
         editor.enableAllShortcuts();
       }
@@ -239,8 +239,8 @@ export class TranscriptionComponent implements OnInit,
 
   abortTranscription = () => {
     if ((this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo')
-      && !isNullOrUndefined(this.settingsService.projectsettings.octra)
-      && !isNullOrUndefined(this.settingsService.projectsettings.octra.theme)
+      && !isSet(this.settingsService.projectsettings.octra)
+      && !isSet(this.settingsService.projectsettings.octra.theme)
       && this.settingsService.isTheme('shortAudioFiles')) {
       // clear transcription
 
@@ -401,8 +401,8 @@ export class TranscriptionComponent implements OnInit,
     ));
 
     if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
-      if (!isNullOrUndefined(this.settingsService.appSettings.octra.inactivityNotice)
-        && !isNullOrUndefined(this.settingsService.appSettings.octra.inactivityNotice.showAfter)
+      if (!isSet(this.settingsService.appSettings.octra.inactivityNotice)
+        && !isSet(this.settingsService.appSettings.octra.inactivityNotice.showAfter)
         && this.settingsService.appSettings.octra.inactivityNotice.showAfter > 0) {
         // if waitTime is 0 the inactivity modal isn't shown
         let waitTime = this.settingsService.appSettings.octra.inactivityNotice.showAfter;
@@ -560,7 +560,7 @@ export class TranscriptionComponent implements OnInit,
             this._currentEditor = viewContainerRef.createComponent(componentFactory);
             let caretpos = -1;
 
-            if (!isNullOrUndefined(this.currentEditor) && !isNullOrUndefined((this.currentEditor.instance as any).editor)) {
+            if (!isSet(this.currentEditor) && !isSet((this.currentEditor.instance as any).editor)) {
               caretpos = (this.currentEditor.instance as any).editor.caretpos;
             }
 
@@ -679,13 +679,13 @@ export class TranscriptionComponent implements OnInit,
         this.transcrService.validateAll();
         const validTranscript = this.transcrService.transcriptValid;
 
-        if (!isNullOrUndefined(this.projectsettings.octra) &&
-          !isNullOrUndefined(this.projectsettings.octra.showOverviewIfTranscriptNotValid)) {
+        if (!isSet(this.projectsettings.octra) &&
+          !isSet(this.projectsettings.octra.showOverviewIfTranscriptNotValid)) {
           showOverview = this.projectsettings.octra.showOverviewIfTranscriptNotValid;
         }
 
-        if (!isNullOrUndefined(this.projectsettings.octra)
-          && !isNullOrUndefined(this.projectsettings.octra.sendValidatedTranscriptionOnly)) {
+        if (!isSet(this.projectsettings.octra)
+          && !isSet(this.projectsettings.octra.sendValidatedTranscriptionOnly)) {
           validTranscriptOnly = this.projectsettings.octra.sendValidatedTranscriptionOnly;
         }
 
@@ -734,7 +734,7 @@ export class TranscriptionComponent implements OnInit,
           // this.appStorage.serverDataEntry.transcript
         }
 
-        if (isNullOrUndefined(this.appStorage.serverDataEntry.logtext) ||
+        if (isSet(this.appStorage.serverDataEntry.logtext) ||
           !Array.isArray(this.appStorage.serverDataEntry.logtext)) {
           this.appStorage.serverDataEntry.logtext = [];
         }
@@ -782,7 +782,7 @@ export class TranscriptionComponent implements OnInit,
 
     const audioExample = this.settingsService.getAudioExample(this.langService.getActiveLang());
 
-    if (!isNullOrUndefined(audioExample)) {
+    if (!isSet(audioExample)) {
       // transcription available
       this.appStorage.audioURL = audioExample.url;
       this.appStorage.dataID = 1232342;

@@ -6,7 +6,7 @@ import {AppInfo} from '../../../app.info';
 import {Converter, IFile} from '../../obj/Converters';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {NavbarService} from '../../gui/navbar/navbar.service';
-import {isNullOrUndefined} from '../../shared/Functions';
+import {isSet} from '../../shared/Functions';
 import {HttpClient} from '@angular/common/http';
 import {Subject} from 'rxjs';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
@@ -129,7 +129,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, 'modals');
 
       this.visible = true;
-      if (!isNullOrUndefined(this.tableConfigurator)) {
+      if (!isSet(this.tableConfigurator)) {
         this.tableConfigurator.updateAllTableCells();
       }
 
@@ -185,7 +185,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   }
 
   private setParentFormatURI(url: string) {
-    if (!isNullOrUndefined(this.parentformat.uri)) {
+    if (!isSet(this.parentformat.uri)) {
       window.URL.revokeObjectURL(this.parentformat.uri['changingThisBreaksApplicationSecurity']);
     }
     this.parentformat.uri = this.sanitize(url);
@@ -198,7 +198,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   }
 
   updateParentFormat(converter: Converter, levelnum?: number) {
-    if (isNullOrUndefined(levelnum) && !converter.multitiers) {
+    if (isSet(levelnum) && !converter.multitiers) {
       levelnum = 0;
     }
 
@@ -279,11 +279,11 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     this.visible = false;
     this.subscrmanager.destroy();
 
-    if (!isNullOrUndefined(this.tools.audioCutting.result.url)) {
+    if (!isSet(this.tools.audioCutting.result.url)) {
       window.URL.revokeObjectURL(this.tools.audioCutting.result.url);
     }
 
-    if (!isNullOrUndefined(this.parentformat.uri)) {
+    if (!isSet(this.parentformat.uri)) {
       const url = this.parentformat.uri['changingThisBreaksApplicationSecurity'];
       window.URL.revokeObjectURL(url);
     }

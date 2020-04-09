@@ -5,7 +5,7 @@ import {AudioDecoder} from './AudioDecoder';
 import {AudioRessource} from './AudioRessource';
 import {AudioFormat, AudioSelection, PlayBackStatus, SampleUnit, SourceType, WavFormat} from './index';
 import {SubscriptionManager} from '../SubscriptionManager';
-import {isNullOrUndefined} from 'util';
+import {isSet} from '../../../core/shared/Functions';
 
 declare var window: any;
 
@@ -271,11 +271,11 @@ export class AudioManager {
                        volume: number, playbackRate: number, playOnHover: boolean = false
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      if (isNullOrUndefined(this._gainNode)) {
+      if (isSet(this._gainNode)) {
         this._gainNode = this.audioContext.createGain();
       }
       // create an audio context and hook up the video element as the source
-      if (isNullOrUndefined(this._source)) {
+      if (isSet(this._source)) {
         this._source = this._audioContext.createMediaElementSource(this._audio);
       }
       this.changeState(PlayBackStatus.STARTED);
@@ -619,7 +619,7 @@ export class AudioChunk {
 
   set volume(value: number) {
     this._volume = value;
-    if (!isNullOrUndefined(this._audioManger.gainNode)) {
+    if (!isSet(this._audioManger.gainNode)) {
       this._audioManger.gainNode.gain.value = value;
     }
   }

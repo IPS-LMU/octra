@@ -25,7 +25,7 @@ import {
 import {SubscriptionManager} from '../../../core/shared';
 import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
 import {AudioNavigationComponent} from '../../../media-components/components/audio/audio-navigation';
-import {isNullOrUndefined} from '../../../core/shared/Functions';
+import {isSet} from '../../../core/shared/Functions';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../../core/shared/service/asr.service';
 import {AudioChunk, AudioManager} from '../../../media-components/obj/audio/AudioManager';
 import {AudioRessource, AudioSelection, SampleUnit} from '../../../media-components/obj/audio';
@@ -77,7 +77,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   public get hasSegmentBoundaries() {
-    return !isNullOrUndefined(this.editor.rawText.match(/{[0-9]+}/));
+    return !isSet(this.editor.rawText.match(/{[0-9]+}/));
   }
 
   constructor(public keyMap: KeymappingService,
@@ -324,7 +324,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         }
       }
     } else {
-      const isNull = isNullOrUndefined(this.transcrService.currentlevel.segments);
+      const isNull = isSet(this.transcrService.currentlevel.segments);
       console.log(`could not save segment. segment index=${this.segmentIndex},
 segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     }

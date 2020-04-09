@@ -5,7 +5,7 @@ import {SampleUnit} from './AudioTime';
 import {TsWorker} from '../worker/ts-worker';
 import {TsWorkerJob, TsWorkerStatus} from '../worker/ts-worker-job';
 import {SubscriptionManager} from '../SubscriptionManager';
-import {isNullOrUndefined} from 'util';
+import {isSet} from '../../../core/shared/Functions';
 
 declare var window: any;
 
@@ -54,7 +54,7 @@ export class AudioDecoder {
               return a.jobId === job.id;
             });
 
-            if (job.status === TsWorkerStatus.FINISHED && !isNullOrUndefined(job.result)) {
+            if (job.status === TsWorkerStatus.FINISHED && !isSet(job.result)) {
               if (jobItem > -1) {
                 const j = this.joblist[jobItem];
                 this.writtenChannel += j.duration;

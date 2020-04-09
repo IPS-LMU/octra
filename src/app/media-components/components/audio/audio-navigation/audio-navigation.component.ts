@@ -11,9 +11,9 @@ import {
   SimpleChanges
 } from '@angular/core';
 import {AudioChunk} from '../../../obj/audio/AudioManager';
-import {isNullOrUndefined} from 'util';
 import {SubscriptionManager} from '../../../obj/SubscriptionManager';
 import {PlayBackStatus} from '../../../obj/audio';
+import {isSet} from '../../../../core/shared/Functions';
 
 export interface Buttons {
   play: {
@@ -147,11 +147,11 @@ export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChange
    * this method is called only after a input changed (dirty check)
    */
   ngOnChanges(changes: SimpleChanges): void {
-    if (!isNullOrUndefined(changes.audioChunk)) {
+    if (!isSet(changes.audioChunk)) {
       const newAudioChunk: AudioChunk = changes.audioChunk.currentValue;
 
       console.log(`audio chunk changed`);
-      if (!isNullOrUndefined(newAudioChunk)) {
+      if (!isSet(newAudioChunk)) {
         this.subscrManager.destroy();
         this.connectEvents();
         this._isReady = true;

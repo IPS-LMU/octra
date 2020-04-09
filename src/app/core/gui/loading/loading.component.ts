@@ -6,7 +6,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
 import {IFile, ImportResult} from '../../obj/Converters';
 import {AppInfo} from '../../../app.info';
-import {Functions, isNullOrUndefined} from '../../shared/Functions';
+import {Functions, isSet} from '../../shared/Functions';
 import {OAudiofile, OLevel} from '../../../media-components/obj/annotation';
 
 @Component({
@@ -149,7 +149,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                         // test converter
                         const tempImportResult = converter.import(file, oAudioFile);
 
-                        if (!isNullOrUndefined(tempImportResult) && tempImportResult.error === '') {
+                        if (!isSet(tempImportResult) && tempImportResult.error === '') {
                           importResult = tempImportResult;
                           break;
                         } else {
@@ -276,7 +276,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
       } else if (this.appStorage.usemode === 'url') {
         // url mode set, but no params => change mode
         console.warn(`use mode is url but no params found. Reset use mode.`);
-        this.appStorage.usemode = (!isNullOrUndefined(this.appStorage.user) && !isNullOrUndefined(this.appStorage.user.id) && this.appStorage.user.id !== ''
+        this.appStorage.usemode = (!isSet(this.appStorage.user) && !isSet(this.appStorage.user.id) && this.appStorage.user.id !== ''
           && ((this.appStorage.sessionfile === null || this.appStorage.sessionfile === undefined)))
           ? 'online' : 'local';
         this.appStorage.LoggedIn = false;

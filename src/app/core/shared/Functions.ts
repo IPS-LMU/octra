@@ -7,8 +7,8 @@ export interface FileSize {
   label: string;
 }
 
-export function isNullOrUndefined(obj: any) {
-  return (obj === null || obj === undefined);
+export function isSet(obj: any) {
+  return (obj === null || typeof obj === 'undefined');
 }
 
 export function isFunction(value: any) {

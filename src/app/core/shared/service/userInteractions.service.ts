@@ -2,7 +2,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
-import {Functions, isNullOrUndefined} from '../Functions';
+import {Functions, isSet} from '../Functions';
 import {OLog} from '../../obj/Settings/logging';
 import {SampleUnit} from '../../../media-components/obj/audio';
 
@@ -66,7 +66,7 @@ export class UserInteractionsService {
                                length: number
                              }, targetName?: string) {
     this._lastAction = Date.now();
-    const originalPlayerPos = (!isNullOrUndefined(playpos)) ? playpos.samples : -1;
+    const originalPlayerPos = (!isSet(playpos)) ? playpos.samples : -1;
 
     if (this._enabled) {
       let name = '';
@@ -77,7 +77,7 @@ export class UserInteractionsService {
           context = event.target;
           name = context.getAttribute('name');
 
-          if (!name && !isNullOrUndefined(context)) {
+          if (!name && !isSet(context)) {
             name = context.parentNode.getAttribute('name');
           }
           if (!name) {
@@ -94,7 +94,7 @@ export class UserInteractionsService {
           name,
           event.value,
           timestamp,
-          (!isNullOrUndefined(playpos)) ? playpos.samples : -1,
+          (!isSet(playpos)) ? playpos.samples : -1,
           caretpos,
           selection,
           segment

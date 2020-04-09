@@ -3,7 +3,7 @@ import {SessionFile} from '../../obj/SessionFile';
 import {AppInfo} from '../../../app.info';
 import {IndexedDBManager} from '../../obj/IndexedDBManager';
 import {LocalStorageService, SessionStorage, SessionStorageService} from '@rars/ngx-webstorage';
-import {isNullOrUndefined} from '../Functions';
+import {isSet} from '../Functions';
 import {Subject} from 'rxjs';
 import {IDataEntry} from '../../obj/data-entry';
 import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
@@ -769,7 +769,7 @@ export class AppStorageService {
   public saveLogItem(log: any) {
     if (!(log === null || log === undefined)) {
       for (let attr in log) {
-        if (log.hasOwnProperty(attr) && isNullOrUndefined(log['' + attr])) {
+        if (log.hasOwnProperty(attr) && isSet(log['' + attr])) {
           delete log['' + attr];
         }
       }
@@ -951,7 +951,7 @@ export class AppStorageService {
   }
 
   public changeAnnotationLevel(tiernum: number, level: OLevel): Promise<any> {
-    if (!isNullOrUndefined(this._annotation)) {
+    if (!isSet(this._annotation)) {
       if (!(level === null || level === undefined)) {
         if (this._annotation.length > tiernum) {
           const id = this._annotation[tiernum].id;
@@ -1082,7 +1082,7 @@ export class AppStorageService {
   }
 
   public saveConsoleEntries(entries: ConsoleEntry[]) {
-    if (!isNullOrUndefined(this._idb)) {
+    if (!isSet(this._idb)) {
       this._idb.save('options', 'console', {value: entries}).catch((err) => {
         console.error(err);
       });

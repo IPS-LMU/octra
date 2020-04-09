@@ -5,7 +5,7 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {NavbarService} from '../../gui/navbar/navbar.service';
-import {isNullOrUndefined} from '../../shared/Functions';
+import {isSet} from '../../shared/Functions';
 import {HttpClient} from '@angular/common/http';
 import {interval, Subject} from 'rxjs';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
@@ -165,11 +165,11 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
     this.visible = false;
     this.subscrmanager.destroy();
 
-    if (!isNullOrUndefined(this.tools.audioCutting.result.url)) {
+    if (!isSet(this.tools.audioCutting.result.url)) {
       window.URL.revokeObjectURL(this.tools.audioCutting.result.url);
     }
 
-    if (!isNullOrUndefined(this.parentformat.uri)) {
+    if (!isSet(this.parentformat.uri)) {
       const url = this.parentformat.uri['changingThisBreaksApplicationSecurity'];
       window.URL.revokeObjectURL(url);
     }
@@ -225,7 +225,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
                 authorization: this.settService.appSettings.octra.plugins.audioCutter.authToken
               }, responseType: 'json'
             }).subscribe((result2: any) => {
-              this.tools.audioCutting.progress = ((!isNullOrUndefined(result2.progress)) ? Math.round(result2.progress * 100) : 0);
+              this.tools.audioCutting.progress = ((!isSet(result2.progress)) ? Math.round(result2.progress * 100) : 0);
               this.tools.audioCutting.status = result2.status;
 
               if (result2.status === 'finished') {
@@ -250,7 +250,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
                   this.tools.audioCutting.progressbarType = 'danger';
                   this.tools.audioCutting.progress = 100;
                   this.tools.audioCutting.status = 'failed';
-                  this.tools.audioCutting.message = (!isNullOrUndefined(result2.message) && result2.message !== '') ? result2.message : '';
+                  this.tools.audioCutting.message = (!isSet(result2.message) && result2.message !== '') ? result2.message : '';
                   break;
               }
             }, (e) => {
@@ -432,7 +432,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
             this.tools.audioCutting.progress = 100;
             this.tools.audioCutting.progressbarType = 'success';
 
-            if (!isNullOrUndefined(this.tools.audioCutting.result.url)) {
+            if (!isSet(this.tools.audioCutting.result.url)) {
               window.URL.revokeObjectURL(this.tools.audioCutting.result.url);
             }
 
@@ -491,7 +491,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
     this.tools.audioCutting.cuttingSpeed = -1;
     this.tools.audioCutting.zippingSpeed = -1;
 
-    if (!isNullOrUndefined(this.tools.audioCutting.wavFormat)) {
+    if (!isSet(this.tools.audioCutting.wavFormat)) {
       (this.tools.audioCutting.wavFormat as WavFormat).stopAudioSplitting();
     }
   }
@@ -504,7 +504,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
 
   isSomethingBlocked(): boolean {
     return this.transcrService.currentlevel.segments.segments.find((a) => {
-      return !isNullOrUndefined(a.isBlockedBy);
+      return !isSet(a.isBlockedBy);
     }) !== undefined;
   }
 

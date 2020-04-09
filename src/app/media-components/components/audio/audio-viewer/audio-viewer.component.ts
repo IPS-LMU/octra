@@ -12,7 +12,6 @@ import {
   ViewChild
 } from '@angular/core';
 import Konva from 'konva';
-import {isNullOrUndefined} from 'util';
 import {AudioChunk, AudioManager} from '../../../obj/audio/AudioManager';
 import {AudioSelection, PlayBackStatus, SampleUnit} from '../../../obj/audio';
 import {SubscriptionManager} from '../../../obj/SubscriptionManager';
@@ -28,6 +27,7 @@ import {PlayCursor} from '../../../obj/PlayCursor';
 import {AVMousePos} from '../../../obj/audio/AVMousePos';
 import {Context} from 'konva/types/Context';
 import {ASRQueueItemType} from '../../../obj/annotation/asr';
+import {isSet} from '../../../../core/shared/Functions';
 
 @Component({
   selector: 'octra-audio-viewer',
@@ -50,7 +50,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   @Input()
   public set height(value: number) {
-    if (!isNullOrUndefined(this.stage)) {
+    if (!isSet(this.stage)) {
       console.log(`update stage ${value}`);
       this.stage.height(value);
       this.initializeView();
@@ -203,7 +203,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     }
 
 
-    if (!isNullOrUndefined(this.stage)) {
+    if (!isSet(this.stage)) {
       this.stage.height(this.height);
     }
   }
@@ -309,7 +309,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         }), 'audioChunkStatusChange');
 
       new Promise<void>((resolve, reject) => {
-        if (isNullOrUndefined(this.audioChunk.audioManager.channel)) {
+        if (isSet(this.audioChunk.audioManager.channel)) {
           this.subscrManager.add(
             this.audioChunk.audioManager.onChannelDataChange.subscribe(() => {
                 resolve();
@@ -340,7 +340,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   afterLevelUpdated() {
-    if (!isNullOrUndefined(this._transcriptionLevel)) {
+    if (!isSet(this._transcriptionLevel)) {
       console.log(`LEVEL updated ${this._transcriptionLevel.segments.length}`);
       this.av.updateLevel(this._transcriptionLevel);
       this.subscrManager.removeByTag(`segmentchange`);
@@ -530,7 +530,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   onWheel = (event) => {
-    if (!isNullOrUndefined(this.audioChunk) && this.audioChunk.status !== PlayBackStatus.PREPARE
+    if (!isSet(this.audioChunk) && this.audioChunk.status !== PlayBackStatus.PREPARE
       && this.canvasElements.scrollBar !== null) {
       event.evt.preventDefault();
       let newY = Math.max(0,
@@ -1002,7 +1002,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   if (segment.isBlockedBy !== ASRQueueItemType.ASR) {
                     if (segment.transcript === '') {
                       context.fillStyle = 'red';
-                    } else if (!isNullOrUndefined(this.breakMarker) && segment.transcript === this.breakMarker.code) {
+                    } else if (!isSet(this.breakMarker) && segment.transcript === this.breakMarker.code) {
                       context.fillStyle = 'blue';
                     } else if (segment.transcript !== '') {
                       context.fillStyle = 'green';
@@ -1119,7 +1119,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
           const h = this.settings.lineheight;
 
           const foundBoundary = this.layers.boundaries.findOne(`#boundary_${boundary.id}`);
-          if (!isNullOrUndefined(foundBoundary)) {
+          if (!isSet(foundBoundary)) {
             foundBoundary.remove();
           }
 
@@ -1152,7 +1152,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       // draw time labels
       if (this.settings.showTimePerLine) {
         const foundText = this.layers.overlay.findOne('#timeStamps');
-        if (!isNullOrUndefined(foundText)) {
+        if (!isSet(foundText)) {
           foundText.remove();
         }
         const timeStampLabels = new Konva.Shape({
@@ -1276,7 +1276,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   private drawSelection = (lineNum: number, lineWidth: number): Konva.Rect | null => {
-    if (!isNullOrUndefined(this.av.drawnSelection) && this.av.drawnSelection.length > 0) {
+    if (!isSet(this.av.drawnSelection) && this.av.drawnSelection.length > 0) {
       // draw gray selection
       const select = this.av.getRelativeSelectionByLine(
         lineNum, lineWidth, this.av.drawnSelection.start, this.av.drawnSelection.end, this.av.innerWidth
@@ -1387,7 +1387,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   private onMouseMove = (event) => {
-    if (!isNullOrUndefined(this.canvasElements.mouseCaret)) {
+    if (!isSet(this.canvasElements.mouseCaret)) {
       const tempLine = this.getLineNumber(event.evt.layerX, event.evt.layerY + Math.abs(this.layers.background.y()));
       this.hoveredLine = (tempLine > -1) ? tempLine : this.hoveredLine;
       const absXPos = this.hoveredLine * this.av.innerWidth + event.evt.layerX;
@@ -1747,10 +1747,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       const overlayGroup = this.layers.overlay.findOne(`#segment_${segmentID}`);
       const boundary = this.layers.boundaries.findOne(`#boundary_${segmentID}`);
 
-      if (!isNullOrUndefined(overlayGroup)) {
+      if (!isSet(overlayGroup)) {
         overlayGroup.remove();
       }
-      if (!isNullOrUndefined(boundary)) {
+      if (!isSet(boundary)) {
         boundary.remove();
       }
     }

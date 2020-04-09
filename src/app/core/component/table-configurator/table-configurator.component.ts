@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
-import {isNullOrUndefined} from '../../shared/Functions';
+import {isSet} from '../../shared/Functions';
 import {Annotation, Level} from '../../../media-components/obj/annotation';
 
 export interface ColumnDefinition {
@@ -260,7 +260,7 @@ export class TableConfiguratorComponent implements OnInit {
         return a.type === type;
       });
     }
-    if (!isNullOrUndefined(colDef)) {
+    if (!isSet(colDef)) {
       const item = {
         title: colDef.type,
         columnDefinition: {

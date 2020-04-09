@@ -17,7 +17,7 @@ import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../shared';
 import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
-import {isFunction, isNullOrUndefined} from '../../shared/Functions';
+import {isFunction, isSet} from '../../shared/Functions';
 import {TranscrEditorComponent} from '../../component/transcr-editor';
 import {AudioChunk} from '../../../media-components/obj/audio/AudioManager';
 import {AudioSelection, PlayBackStatus, SampleUnit} from '../../../media-components/obj/audio';
@@ -351,7 +351,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
     if (this.appStorage.usemode !== 'url') {
       if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function'
-        && !isNullOrUndefined(this.transcrService.validationArray[i])) {
+        && !isSet(this.transcrService.validationArray[i])) {
         obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
           this.transcrService.validationArray[i].validation);
       }

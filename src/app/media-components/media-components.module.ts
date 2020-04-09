@@ -49,7 +49,8 @@ import {LeadingNullPipe} from './pipe/leadingnull.pipe';
     AudioViewerComponent,
     Timespan2Pipe,
     ProcentPipe,
-    LeadingNullPipe
+    LeadingNullPipe,
+    TimespanPipe
   ]
 })
 export class MediaComponentsModule {

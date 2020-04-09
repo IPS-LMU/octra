@@ -131,7 +131,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       this.save();
       setTimeout(() => {
         if (!isNullOrUndefined(this.loupe)) {
-          this.loupe.update(false);
+          // this.loupe.update(false);
         } else {
           console.error(`can't update loupe after typing because it's undefined!`);
         }
@@ -363,7 +363,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   onSegmentEnter($event) {
     this.selectSegment($event.index).then((selection: AudioSelection) => {
       this.viewer.selectSegment($event.index);
-      this.audiochunkDown = new AudioChunk(selection, this.audiomanager);
+      this.audiochunkDown = new AudioChunk(selection, this.audioManager);
       this.topSelected = true;
       this.audiochunkDown = new AudioChunk(selection, this.audioManager);
     });

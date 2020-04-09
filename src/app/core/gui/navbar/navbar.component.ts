@@ -6,7 +6,6 @@ import {TranslocoService} from '@ngneat/transloco';
 import {AppInfo} from '../../../app.info';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {editorComponents} from '../../../editors/components';
-import {OCTRANIMATIONS} from '../../shared';
 import {BugReportService, ConsoleType} from '../../shared/service/bug-report.service';
 import {environment} from '../../../../environments/environment';
 import {ModalService} from '../../modals/modal.service';

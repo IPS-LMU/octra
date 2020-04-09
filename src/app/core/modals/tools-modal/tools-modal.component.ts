@@ -4,8 +4,6 @@ import {AppStorageService, AudioService, SettingsService, TranscriptionService, 
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
-import {OCTRANIMATIONS} from '../../shared';
-import {Segment} from '../../shared';
 import {NavbarService} from '../../gui/navbar/navbar.service';
 import {isNullOrUndefined} from '../../shared/Functions';
 import {HttpClient} from '@angular/common/http';

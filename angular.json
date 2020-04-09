@@ -42,8 +42,7 @@
               "node_modules/ajv/dist/ajv.min.js",
               "node_modules/jquery.caret/dist/jquery.caret.min.js",
               "node_modules/moment/min/moment.min.js",
-              "node_modules/jszip/dist/jszip.min.js",
-              "node_modules/konva/konva.min.js"
+              "node_modules/jszip/dist/jszip.min.js"
             ],
             "es5BrowserSupport": true
           },

@@ -408,21 +408,21 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
           }
         }
 
-        const start = (this.segmentIndex > 0) ? this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.originalSample.value : 0;
+        const start = (this.segmentIndex > 0) ? this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.samples : 0;
         const valueString = (appliedDirection === 'right') ? 'entered next' : 'entered previous';
         this.uiService.addElementFromEvent('segment', {value: valueString},
-          Date.now(), this.audiomanager.playposition,
+          Date.now(), this.audioManager.playposition,
           this.editor.caretpos, null, {
             start,
-            length: this.transcrService.currentlevel.segments.get(this.segmentIndex).time.originalSample.value - start
+            length: this.transcrService.currentlevel.segments.get(this.segmentIndex).time.samples - start
           }, 'transcription window');
       }
 
       let begin;
       if (this.segmentIndex > 0) {
-        begin = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.clone() as BrowserAudioTime;
+        begin = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.clone();
       } else {
-        begin = this.audiomanager.createBrowserAudioTime(0);
+        begin = new SampleUnit(0, this.audioManager.sampleRate);
       }
 
       if (!(segment === null || segment === undefined)) {

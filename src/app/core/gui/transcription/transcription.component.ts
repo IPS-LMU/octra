@@ -121,8 +121,8 @@ export class TranscriptionComponent implements OnInit,
     this.navbarServ.transcrService = this.transcrService;
     this.navbarServ.uiService = this.uiService;
 
-    this.subscrmanager.add(this.audiomanager.statechange.subscribe((state) => {
-        if (!this.audiomanager.playOnHover && !this.modalOverview.visible) {
+    this.subscrmanager.add(this.audioManager.statechange.subscribe((state) => {
+        if (!this.audioManager.playOnHover && !this.modalOverview.visible) {
           let caretpos = -1;
 
           if (!isNullOrUndefined(this.currentEditor) && !isNullOrUndefined((this.currentEditor.instance as any).editor)) {

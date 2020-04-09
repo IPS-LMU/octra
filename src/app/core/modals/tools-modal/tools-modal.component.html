@@ -110,7 +110,7 @@
             </td>
           </tr>
           <ng-container
-            *ngIf="navbarServ.transcrService !== undefined && navbarServ.transcrService.audiomanager.originalInfo.extension === '.wav'">
+            *ngIf="navbarServ.transcrService !== undefined && navbarServ.transcrService.audioManager.ressource.info.extension === '.wav'">
             <tr *ngIf="tools.audioCutting.opened"
                 [@fadeInExpandOnEnter]
                 [@fadeOutCollapseOnLeave]>
@@ -133,7 +133,7 @@
                   </a>
                   <div class="configurator" [hidden]="!tools.audioCutting.showConfigurator">
                     <app-naming-drag-and-drop #namingConvention
-                                              [fileName]="navbarServ.transcrService.audiomanager.ressource.name"
+                                              [fileName]="navbarServ.transcrService.audioManager.ressource.name"
                                               [firstSegment]="navbarServ.transcrService.currentlevel.segments.get(0)"
                     ></app-naming-drag-and-drop>
 

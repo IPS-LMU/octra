@@ -47,48 +47,7 @@ import {TranscrEditorComponent} from './core/component/transcr-editor';
 import {Error404Component} from './core/gui/error404';
 import {FaIconLibrary, FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 // icons
-import {
-  faAlignJustify,
-  faArrowLeft,
-  faArrowRight,
-  faBook,
-  faCheck,
-  faCheckCircle,
-  faChevronDown,
-  faChevronUp,
-  faCog,
-  faCopy,
-  faDatabase,
-  faDownload,
-  faEdit,
-  faExclamationCircle,
-  faExclamationTriangle,
-  faEye,
-  faFile,
-  faFolderOpen,
-  faGlobe,
-  faGripLines,
-  faHandshake,
-  faHeadphones,
-  faInfoCircle,
-  faKeyboard,
-  faMinus,
-  faPaperPlane,
-  faPlus,
-  faPrint,
-  faQuestionCircle,
-  faSave,
-  faSearch,
-  faSignOutAlt,
-  faSpinner,
-  faThList,
-  faTimes,
-  faTimesCircle,
-  faTools,
-  faTrash,
-  faUserCheck,
-  faWindowMaximize
-} from '@fortawesome/free-solid-svg-icons';
+import {fas} from '@fortawesome/free-solid-svg-icons';
 // modules
 import {ButtonsModule, ModalModule, PopoverModule, ProgressbarModule, TooltipModule} from 'ngx-bootstrap';
 import {YesNoModalComponent} from './core/modals/yes-no-modal/yes-no-modal.component';
@@ -113,7 +72,6 @@ import {CompatibilityService} from './core/shared/service/compatibility.service'
 import {TranscriptionFeedbackComponent} from './core/gui/transcription-feedback/transcription-feedback.component';
 import {GuidelinesComponent} from './core/gui/guidelines/guidelines.component';
 import {InactivityModalComponent} from './core/modals/inactivity-modal/inactivity-modal.component';
-import {faStar} from '@fortawesome/free-solid-svg-icons/faStar';
 import {ValidationPopoverComponent} from './core/component/transcr-editor/validation-popover/validation-popover.component';
 import {NamingDragAndDropComponent} from './core/component/naming-drag-and-drop/naming-drag-and-drop.component';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
@@ -129,7 +87,7 @@ import {AuthComponent} from './core/gui/auth/auth.component';
 import {ToolsModalComponent} from './core/modals/tools-modal/tools-modal.component';
 import {HelpModalComponent} from './core/modals/help-modal/help-modal.component';
 import {AlertComponent} from './core/component/alert/alert.component';
-import {faTrashAlt} from '@fortawesome/free-regular-svg-icons';
+import {far} from '@fortawesome/free-regular-svg-icons';
 import {AuthenticationNeededComponent} from './core/alerts/authentication-needed/authentication-needed.component';
 import {DynComponentDirective} from './core/shared/directive/dyn-component.directive';
 import {ErrorOccurredComponent} from './core/alerts/error-occurred/error-occurred.component';
@@ -284,50 +242,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
 
 export class AppModule {
   constructor(library: FaIconLibrary) {
-    library.addIcons(
-      faSpinner,
-      faCheck,
-      faTimes,
-      faTrash,
-      faExclamationCircle,
-      faInfoCircle,
-      faDownload,
-      faHeadphones,
-      faPrint,
-      faSearch,
-      faExclamationTriangle,
-      faTimesCircle,
-      faCog,
-      faFolderOpen,
-      faCheckCircle,
-      faThList,
-      faBook,
-      faCopy,
-      faPlus,
-      faSignOutAlt,
-      faEdit,
-      faFile,
-      faArrowLeft,
-      faArrowRight,
-      faKeyboard,
-      faEye,
-      faExclamationTriangle,
-      faSave,
-      faQuestionCircle,
-      faChevronUp,
-      faChevronDown,
-      faPaperPlane,
-      faMinus,
-      faWindowMaximize,
-      faAlignJustify,
-      faStar,
-      faGlobe,
-      faHandshake,
-      faDatabase,
-      faGripLines,
-      faTools,
-      faTrashAlt,
-      faUserCheck
-    );
+    library.addIconPacks(fas, far);
   }
 }

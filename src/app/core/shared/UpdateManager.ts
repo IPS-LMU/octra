@@ -2,7 +2,7 @@ import {AppInfo} from '../../app.info';
 import {IndexedDBManager} from '../obj/IndexedDBManager';
 import {SubscriptionManager} from '../obj/SubscriptionManager';
 import {AppStorageService, OIDBLevel} from './service/appstorage.service';
-import {isSet} from './Functions';
+import {isUnset} from './Functions';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../../media-components/obj/annotation';
 
 export class UpdateManager {
@@ -118,7 +118,7 @@ export class UpdateManager {
                     ]).then(() => {
 
                       const convertAnnotation = () => {
-                        if (!isSet(this.appStorage.localStr.retrieve('annotation'))) {
+                        if (!isUnset(this.appStorage.localStr.retrieve('annotation'))) {
                           console.log(`Convert annotation to IDB...`);
 
                           const levels = this.appStorage.localStr.retrieve('annotation').levels;
@@ -146,7 +146,7 @@ export class UpdateManager {
                         }
                       };
 
-                      if (!isSet(this.appStorage.localStr.retrieve('logs'))) {
+                      if (!isUnset(this.appStorage.localStr.retrieve('logs'))) {
                         console.log('Convert logging data...');
                         console.log(`${this.appStorage.localStr.retrieve('logs').length} logs to convert:`);
                         idbm.saveArraySequential(this.appStorage.localStr.retrieve('logs'), logsStore, 'timestamp').then(() => {

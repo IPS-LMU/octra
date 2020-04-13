@@ -2,7 +2,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {HttpClient} from '@angular/common/http';
-import {Functions, isSet} from '../Functions';
+import {Functions, isUnset} from '../Functions';
 import {AppInfo} from '../../../app.info';
 import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
 
@@ -59,7 +59,7 @@ export class AudioService {
 
           this.subscrmanager.add(AudioManager.decodeAudio(filename, 'audio/wav', event.result, AppInfo.audioformats).subscribe(
             (result) => {
-              if (!isSet(result.audioManager)) {
+              if (!isUnset(result.audioManager)) {
                 subj.next(1);
                 subj.complete();
                 // finished

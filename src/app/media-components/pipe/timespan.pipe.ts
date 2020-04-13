@@ -1,5 +1,5 @@
 import {Pipe, PipeTransform} from '@angular/core';
-import {isSet} from '../../core/shared/Functions';
+import {isUnset} from '../../core/shared/Functions';
 
 @Pipe({
   name: 'timespan',
@@ -40,7 +40,7 @@ export class TimespanPipe implements PipeTransform {
 
     let result = '';
 
-    const options = (isSet(args)) ? [false, false, false] : args;
+    const options = (isUnset(args)) ? [false, false, false] : args;
 
     const miliSeconds: string = this.formatNumber(this.MiliSeconds, 3);
     const minutes: string = this.formatNumber(this.Minutes, 2);

@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {ASRLanguage, ASRSettings} from '../../obj/Settings';
 import {SettingsService} from './settings.service';
 import {AppStorageService} from './appstorage.service';
-import {isSet} from '../Functions';
+import {isUnset} from '../Functions';
 import {HttpClient} from '@angular/common/http';
 import {FileInfo} from '../../../media-components/obj/fileInfo';
 import * as X2JS from 'x2js';
@@ -27,7 +27,7 @@ export class AsrService {
 
   set selectedLanguage(value: ASRLanguage) {
     this._selectedLanguage = value;
-    if (!isSet(value)) {
+    if (!isUnset(value)) {
       this.appStorage.asrSelectedLanguage = value.code;
       this.appStorage.asrSelectedService = value.asr;
     } else {
@@ -50,13 +50,13 @@ export class AsrService {
 
   public init() {
     this._queue = new ASRQueue(this.asrSettings, this.audioService.audiomanagers[0], this.httpClient);
-    if (!isSet(this.appStorage.asrSelectedLanguage) && !isSet(this.appStorage.asrSelectedService)) {
+    if (!isUnset(this.appStorage.asrSelectedLanguage) && !isUnset(this.appStorage.asrSelectedService)) {
       this._selectedLanguage = this.getLanguageByCode(this.appStorage.asrSelectedLanguage, this.appStorage.asrSelectedService);
     }
   }
 
   public getLanguageByCode(code: string, asr: string): ASRLanguage {
-    if (isSet(asr) || isSet(code)) {
+    if (isUnset(asr) || isUnset(code)) {
       return null;
     }
 

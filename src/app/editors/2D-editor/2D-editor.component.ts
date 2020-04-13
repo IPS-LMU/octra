@@ -27,7 +27,7 @@ import {TranscrWindowComponent} from './transcr-window';
 import {Subscription} from 'rxjs';
 import {TranscrEditorComponent} from '../../core/component';
 import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
-import {Functions, isSet} from '../../core/shared/Functions';
+import {Functions, isUnset} from '../../core/shared/Functions';
 import {OCTRAEditor} from '../octra-editor';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../core/shared/service/asr.service';
 import {TranslocoService} from '@ngneat/transloco';
@@ -140,7 +140,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   public get linesViewHeight(): number {
-    if (!isSet(this.linesView) && !isSet(this.linesView.nativeElement)) {
+    if (!isUnset(this.linesView) && !isUnset(this.linesView.nativeElement)) {
       return this.linesView.nativeElement.clientHeight;
     }
     return 0;
@@ -327,7 +327,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                       return a.name === 'ORT-MAU';
                     });
 
-                    if (!isSet(wordsTier)) {
+                    if (!isUnset(wordsTier)) {
                       let counter = 0;
                       const segmentEndBrowserTime = new SampleUnit(item.time.browserSampleEnd, this.audioManager.sampleRate);
                       let segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentEndBrowserTime);
@@ -545,7 +545,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       const segmentNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(this.viewer.av.MouseClickPos.timePos);
 
       if (segmentNumber > -1) {
-        if (!isSet(this.asrService.selectedLanguage)) {
+        if (!isUnset(this.asrService.selectedLanguage)) {
           const segment = this.transcrService.currentlevel.segments.get(segmentNumber);
 
           const sampleStart = (segmentNumber > 0)
@@ -615,7 +615,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         length: -1
       };
 
-      if ($event.hasOwnProperty('selection') && !isSet($event.selection)) {
+      if ($event.hasOwnProperty('selection') && !isUnset($event.selection)) {
         selection.start = $event.selection.start;
         selection.length = $event.selection.length;
       } else {
@@ -804,14 +804,14 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
   public enableAllShortcuts() {
     this.viewer.enableShortcuts();
-    if (!isSet(this.window) && !isSet(this.window.loupe)) {
+    if (!isUnset(this.window) && !isUnset(this.window.loupe)) {
       this.window.loupe.enableShortcuts();
     }
   }
 
   public disableAllShortcuts() {
     this.viewer.disableShortcuts();
-    if (!isSet(this.window) && !isSet(this.window.loupe)) {
+    if (!isUnset(this.window) && !isUnset(this.window.loupe)) {
       this.window.loupe.disableShortcuts();
     }
   }

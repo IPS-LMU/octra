@@ -5,7 +5,7 @@ import {AudioDecoder} from './AudioDecoder';
 import {AudioRessource} from './AudioRessource';
 import {AudioFormat, AudioSelection, PlayBackStatus, SampleUnit, SourceType, WavFormat} from './index';
 import {SubscriptionManager} from '../SubscriptionManager';
-import {isSet} from '../../../core/shared/Functions';
+import {isUnset} from '../../../core/shared/Functions';
 
 declare var window: any;
 
@@ -271,11 +271,11 @@ export class AudioManager {
                        volume: number, playbackRate: number, playOnHover: boolean = false
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      if (isSet(this._gainNode)) {
+      if (isUnset(this._gainNode)) {
         this._gainNode = this.audioContext.createGain();
       }
       // create an audio context and hook up the video element as the source
-      if (isSet(this._source)) {
+      if (isUnset(this._source)) {
         this._source = this._audioContext.createMediaElementSource(this._audio);
       }
       this.changeState(PlayBackStatus.STARTED);
@@ -619,7 +619,7 @@ export class AudioChunk {
 
   set volume(value: number) {
     this._volume = value;
-    if (!isSet(this._audioManger.gainNode)) {
+    if (!isUnset(this._audioManger.gainNode)) {
       this._audioManger.gainNode.gain.value = value;
     }
   }
@@ -786,19 +786,10 @@ export class AudioChunk {
   public stopPlayback: () => Promise<void> = () => {
     return new Promise<void>((resolve, reject) => {
       if (this._audioManger.isPlaying) {
-        const subscr = this._audioManger.statechange.subscribe((status) => {
-            if (status === PlayBackStatus.STOPPED) {
-              this.afterPlaybackStopped();
-              subscr.unsubscribe();
-              resolve();
-            }
-          },
-          (error) => {
-          },
-          () => {
-          });
-
-        this._audioManger.stopPlayback();
+        this._audioManger.stopPlayback().then(() => {
+          this.afterPlaybackStopped();
+          resolve();
+        });
       } else {
         this.afterPlaybackStopped();
         resolve();
@@ -894,7 +885,6 @@ export class AudioChunk {
   }
 
   private afterPlaybackStopped = () => {
-    console.log(`after playpack stopped!`);
     this.startpos = this.time.start.clone() as SampleUnit;
     this._audioManger.playposition = this.time.start.clone();
   }

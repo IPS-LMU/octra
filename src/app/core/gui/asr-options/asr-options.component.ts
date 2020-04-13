@@ -2,7 +2,7 @@ import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {AlertService, AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
 import {AppSettings, ASRLanguage} from '../../obj/Settings';
 import {AsrService} from '../../shared/service/asr.service';
-import {isSet} from '../../shared/Functions';
+import {isUnset} from '../../shared/Functions';
 import {BsDropdownDirective} from 'ngx-bootstrap';
 import {TranslocoService} from '@ngneat/transloco';
 import {AudioChunk} from '../../../media-components/obj/audio/AudioManager';
@@ -65,7 +65,7 @@ export class AsrOptionsComponent implements OnInit {
   }
 
   startASRForThisSegment() {
-    if (!isSet(this.asrService.selectedLanguage)) {
+    if (!isUnset(this.asrService.selectedLanguage)) {
       if (this.audioChunk.time.duration.seconds > 600) {
         // trigger alert, too big audio duration
         this.alertService.showAlert('danger', this.langService.translate('asr.file too big').toString());
@@ -128,7 +128,7 @@ export class AsrOptionsComponent implements OnInit {
   }
 
   stopASRForThisSegment() {
-    if (!isSet(this.asrService.selectedLanguage)) {
+    if (!isUnset(this.asrService.selectedLanguage)) {
       const item = this.asrService.queue.getItemByTime(this.audioChunk.time.start.samples, this.audioChunk.time.duration.samples);
 
       if (item !== undefined) {

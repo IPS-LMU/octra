@@ -1,5 +1,5 @@
 import {Observable} from 'rxjs';
-import {isSet} from '../shared/Functions';
+import {isUnset} from '../shared/Functions';
 
 export enum IDBMode {
   READONLY,
@@ -62,7 +62,7 @@ export class IndexedDBManager {
       || (window as any).webkitIDBKeyRange
       || (window as any).msIDBKeyRange;
 
-    return (!(isSet(indexedDB) || isSet(idbtransaction) || isSet(idbkeyrange)));
+    return (!(isUnset(indexedDB) || isUnset(idbtransaction) || isUnset(idbkeyrange)));
   }
 
   public get = (storeName: string | IDBObjectStore, key: string | number): Promise<any> => {

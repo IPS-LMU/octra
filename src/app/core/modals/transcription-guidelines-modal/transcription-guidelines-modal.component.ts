@@ -16,7 +16,7 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import {TranslocoService} from '@ngneat/transloco';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
-import {isSet} from '../../shared/Functions';
+import {isUnset} from '../../shared/Functions';
 
 @Component({
   selector: 'app-transcription-guidelines-modal',
@@ -123,10 +123,10 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
 
   public exportPDF() {
     if (
-      !isSet(this.settService.projectsettings)
-      && !isSet(this.settService.projectsettings.plugins)
-      && !isSet(this.settService.projectsettings.plugins.pdfexport)
-      && !isSet(this.settService.projectsettings.plugins.pdfexport.url)
+      !isUnset(this.settService.projectsettings)
+      && !isUnset(this.settService.projectsettings.plugins)
+      && !isUnset(this.settService.projectsettings.plugins.pdfexport)
+      && !isUnset(this.settService.projectsettings.plugins.pdfexport.url)
     ) {
       const form = jQuery('<form></form>')
         .attr('method', 'post')

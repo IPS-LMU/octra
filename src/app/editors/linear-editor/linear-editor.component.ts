@@ -23,7 +23,7 @@ import {AudioNavigationComponent} from '../../media-components/components/audio/
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
 import {BrowserInfo} from '../../core/shared';
-import {Functions, isSet} from '../../core/shared/Functions';
+import {Functions, isUnset} from '../../core/shared/Functions';
 import {OCTRAEditor} from '../octra-editor';
 import {AudioviewerConfig} from '../../media-components/components/audio/audio-viewer/audio-viewer.config';
 import {AudioChunk, AudioManager} from '../../media-components/obj/audio/AudioManager';
@@ -130,7 +130,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
       this.save();
       setTimeout(() => {
-        if (!isSet(this.loupe)) {
+        if (!isUnset(this.loupe)) {
           // this.loupe.update(false);
         } else {
           console.error(`can't update loupe after typing because it's undefined!`);
@@ -347,7 +347,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     // const a = this.viewer.getLocation();
     this.miniLoupeCoord.y = this.viewer.settings.lineheight - 10;
 
-    if (!isSet(this.nav)) {
+    if (!isUnset(this.nav)) {
       // this.miniLoupeCoord.y += this.nav.height;
     }
 
@@ -644,14 +644,14 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
   public enableAllShortcuts() {
     this.viewer.enableShortcuts();
-    if (!isSet(this.loupe)) {
+    if (!isUnset(this.loupe)) {
       this.loupe.enableShortcuts();
     }
   }
 
   public disableAllShortcuts() {
     this.viewer.disableShortcuts();
-    if (!isSet(this.loupe)) {
+    if (!isUnset(this.loupe)) {
       this.loupe.disableShortcuts();
     }
   }

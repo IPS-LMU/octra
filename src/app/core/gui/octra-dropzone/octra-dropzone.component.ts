@@ -5,7 +5,7 @@ import {DropZoneComponent} from '../../component/drop-zone';
 import {SessionFile} from '../../obj/SessionFile';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {ModalService} from '../../modals/modal.service';
-import {FileSize, Functions, isSet} from '../../shared/Functions';
+import {FileSize, Functions, isUnset} from '../../shared/Functions';
 import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
 import {OAnnotJSON, OAudiofile, OLabel, OSegment} from '../../../media-components/obj/annotation';
 
@@ -144,7 +144,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
     for (let j = 0; j < this.dropzone.files.length; j++) {
       const importfile = this.dropzone.files[j];
 
-      if (isSet(extension)) {
+      if (isUnset(extension)) {
         extension = importfile.name.substr(importfile.name.lastIndexOf('.'));
       }
 
@@ -163,7 +163,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
   }
 
   public isValidImportData(file: FileProgress) {
-    if (!isSet(this._oaudiofile)) {
+    if (!isUnset(this._oaudiofile)) {
       for (let i = 0; i < AppInfo.converters.length; i++) {
         const converter: Converter = AppInfo.converters[i];
         if (Functions.contains(file.file.name.toLowerCase(), AppInfo.converters[i].extension.toLowerCase())) {
@@ -185,8 +185,8 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
                   const importResult: ImportResult = converter.import(ofile, this._oaudiofile);
 
                   const setAnnotation = () => {
-                    if (!isSet(this._oaudiofile) &&
-                      !isSet(importResult.annotjson) && importResult.error === '') {
+                    if (!isUnset(this._oaudiofile) &&
+                      !isUnset(importResult.annotjson) && importResult.error === '') {
                       file.status = 'valid';
                       if (!(this._oaudiofile === null || this._oaudiofile === undefined)) {
                         for (const level of importResult.annotjson.levels) {
@@ -345,7 +345,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
         fileProcess.progress = (result.decodeProgress + 1) / 2;
         // console.log((window.performance as any).memory.jsHeapSizeLimit - (window.performance as any).memory.usedJSHeapSize);
 
-        if (isSet(result.audioManager)) {
+        if (isUnset(result.audioManager)) {
           // not finished
         } else {
           // finished, get result

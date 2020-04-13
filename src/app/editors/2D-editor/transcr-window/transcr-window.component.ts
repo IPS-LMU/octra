@@ -25,7 +25,7 @@ import {
 import {SubscriptionManager} from '../../../core/shared';
 import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
 import {AudioNavigationComponent} from '../../../media-components/components/audio/audio-navigation';
-import {isSet} from '../../../core/shared/Functions';
+import {isUnset} from '../../../core/shared/Functions';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../../core/shared/service/asr.service';
 import {AudioChunk, AudioManager} from '../../../media-components/obj/audio/AudioManager';
 import {AudioRessource, AudioSelection, SampleUnit} from '../../../media-components/obj/audio';
@@ -77,7 +77,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   public get hasSegmentBoundaries() {
-    return !isSet(this.editor.rawText.match(/{[0-9]+}/));
+    return !isUnset(this.editor.rawText.match(/{[0-9]+}/));
   }
 
   constructor(public keyMap: KeymappingService,
@@ -147,12 +147,12 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
   private oldRaw = '';
 
-  public doit = (direction: string) => {
+  public doDirectionAction = (direction: string) => {
     this.save();
 
     new Promise<void>((resolve) => {
       if (this.audioManager.isPlaying) {
-        return this.audiochunk.stopPlayback();
+        this.audiochunk.stopPlayback().then(resolve);
       } else {
         resolve();
       }
@@ -165,7 +165,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           this.audiochunk.startPlayback();
           this.cd.markForCheck();
           this.cd.detectChanges();
-        }, 2000);
+        }, 500);
       } else {
         this.close();
       }
@@ -178,7 +178,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         $event.event.preventDefault();
         if (this.hasSegmentBoundaries || (!this.isNextSegmentLastAndBreak(this.segmentIndex)
           && this.segmentIndex < this.transcrService.currentlevel.segments.length - 1)) {
-          this.doit('right');
+          this.doDirectionAction('right');
         } else {
           this.save();
           this.close();
@@ -187,19 +187,20 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         break;
       case ('ALT + ARROWLEFT'):
         $event.event.preventDefault();
-        this.doit('left');
+        this.doDirectionAction('left');
         break;
       case ('ALT + ARROWDOWN'):
         $event.event.preventDefault();
-        this.doit('down');
+        this.doDirectionAction('down');
         break;
       case ('ESC'):
-        this.doit('down');
+        this.doDirectionAction('down');
         break;
     }
   }
 
   ngOnInit() {
+    console.log(`INIT TRANSCR WINDOW!`);
     this.editor.Settings.markers = this.transcrService.guidelines.markers;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.special_markers.boundary = true;
@@ -238,14 +239,14 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       const previous: AudioChunk = obj.audiochunk.previousValue;
       const current: AudioChunk = obj.audiochunk.currentValue;
 
-      if (!obj.audiochunk.firstChange) {
-        if (((previous === null || previous === undefined) && !(current === null || current === undefined)) ||
-          (current.time.start.samples !== previous.time.start.samples &&
-            current.time.end.samples !== previous.time.end.samples)) {
-          // audiochunk changed
-          // TODO important update needed?
-          // this.loupe.update();
-        }
+      if (!isUnset(current)) {
+        console.log(`_audiochunk change ok not null`);
+        // audiochunk changed
+        console.log(`_audiochunk changed ${current.status}`);
+        this.listenToAudioChunkStatusChanges();
+
+        // TODO important update needed?
+        // this.loupe.update();
       }
     }
   }
@@ -324,7 +325,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         }
       }
     } else {
-      const isNull = isSet(this.transcrService.currentlevel.segments);
+      const isNull = isUnset(this.transcrService.currentlevel.segments);
       console.log(`could not save segment. segment index=${this.segmentIndex},
 segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     }
@@ -538,6 +539,18 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     // TODO speed?
     // this.audiochunk.speed = event.new_value;
     this.appStorage.audioSpeed = event.new_value;
+  }
+
+  listenToAudioChunkStatusChanges() {
+    const res = this.subscrmanager.removeByTag('audiochunkStatus');
+    console.log(`deleted: ${res}`);
+    this.subscrmanager.add(this.audiochunk.statuschange.subscribe((status) => {
+      this.cd.markForCheck();
+      this.cd.detectChanges();
+    }, (error) => {
+      console.error(`couldn't update view for audio chunk in transcription window.`);
+      console.error(error);
+    }), 'audiochunkStatus');
   }
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {

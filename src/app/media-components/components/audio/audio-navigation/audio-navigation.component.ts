@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   EventEmitter,
@@ -13,7 +14,7 @@ import {
 import {AudioChunk} from '../../../obj/audio/AudioManager';
 import {SubscriptionManager} from '../../../obj/SubscriptionManager';
 import {PlayBackStatus} from '../../../obj/audio';
-import {isSet} from '../../../../core/shared/Functions';
+import {isUnset} from '../../../../core/shared/Functions';
 
 export interface Buttons {
   play: {
@@ -45,7 +46,8 @@ export interface Buttons {
 @Component({
   selector: 'octra-audio-navigation',
   templateUrl: './audio-navigation.component.html',
-  styleUrls: ['./audio-navigation.component.css']
+  styleUrls: ['./audio-navigation.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChanges, OnDestroy {
   get isReady(): boolean {
@@ -147,11 +149,10 @@ export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChange
    * this method is called only after a input changed (dirty check)
    */
   ngOnChanges(changes: SimpleChanges): void {
-    if (!isSet(changes.audioChunk)) {
+    if (!isUnset(changes.audioChunk)) {
       const newAudioChunk: AudioChunk = changes.audioChunk.currentValue;
 
-      console.log(`audio chunk changed`);
-      if (!isSet(newAudioChunk)) {
+      if (!isUnset(newAudioChunk)) {
         this.subscrManager.destroy();
         this.connectEvents();
         this._isReady = true;
@@ -159,6 +160,8 @@ export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChange
         // not ready
         this._isReady = false;
       }
+      this.cd.markForCheck();
+      this.cd.detectChanges();
     }
   }
 
@@ -169,6 +172,8 @@ export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChange
   private connectEvents() {
     this.subscrManager.add(this.audioChunk.statuschange.subscribe((status: PlayBackStatus) => {
         this._isAudioPlaying = status === PlayBackStatus.PLAYING;
+        this.cd.markForCheck();
+        this.cd.detectChanges();
       },
       (error) => {
         console.error(error);

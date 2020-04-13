@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {Functions, isSet} from '../Functions';
+import {Functions, isUnset} from '../Functions';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
 import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
@@ -168,9 +168,9 @@ export class TranscriptionService {
 
   public saveSegments = () => {
     // make sure, that no saving overhead exist. After saving request wait 1 second
-    if (!isSet(this._annotation)
+    if (!isUnset(this._annotation)
       && this._annotation.levels.length > 0
-      && !isSet(this._annotation.levels[this._selectedlevel])) {
+      && !isUnset(this._annotation.levels[this._selectedlevel])) {
       this.appStorage.save('annotation', {
         num: this._selectedlevel,
         level: this._annotation.levels[this._selectedlevel].getObj(this.audioManager.ressource.info.duration)
@@ -298,7 +298,7 @@ export class TranscriptionService {
     return new Promise<void>(
       (resolve, reject) => {
         new Promise<void>((resolve2) => {
-          if (isSet(this.appStorage.annotation) || this.appStorage.annotation.length === 0) {
+          if (isUnset(this.appStorage.annotation) || this.appStorage.annotation.length === 0) {
             const newLevels = [];
             const levels = this.createNewAnnotation().levels;
             for (let i = 0; i < levels.length; i++) {
@@ -309,7 +309,7 @@ export class TranscriptionService {
               if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
                 this.appStorage.annotation[this._selectedlevel].level.items = [];
 
-                if (!isSet(this.appStorage.serverDataEntry) && !isSet(this.appStorage.serverDataEntry.transcript) && this.appStorage.serverDataEntry.transcript.length > 0) {
+                if (!isUnset(this.appStorage.serverDataEntry) && !isUnset(this.appStorage.serverDataEntry.transcript) && this.appStorage.serverDataEntry.transcript.length > 0) {
                   // import logs
                   this.appStorage.logs = this.appStorage.serverDataEntry.logtext;
 
@@ -356,7 +356,7 @@ export class TranscriptionService {
                           }
                         );
                   }
-                } else if (!isSet(this.appStorage.prompttext) && this.appStorage.prompttext !== ''
+                } else if (!isUnset(this.appStorage.prompttext) && this.appStorage.prompttext !== ''
                   && typeof this.appStorage.prompttext === 'string') {
                   // prompt text available and server transcript is null
                   // set prompt as new transcript
@@ -738,7 +738,7 @@ export class TranscriptionService {
               'data-marker-code=\'' + markerCode + '\' alt=\'' + markerCode + '\'/>';
           } else {
             // is text or ut8 symbol
-            if (!isSet(marker.icon) && marker.icon !== '') {
+            if (!isUnset(marker.icon) && marker.icon !== '') {
               img = marker.icon;
             } else {
               img = marker.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');

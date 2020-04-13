@@ -7,7 +7,7 @@ export interface FileSize {
   label: string;
 }
 
-export function isSet(obj: any) {
+export function isUnset(obj: any) {
   return (obj === null || typeof obj === 'undefined');
 }
 

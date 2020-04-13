@@ -10,7 +10,7 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import {isSet} from '../../shared/Functions';
+import {isUnset} from '../../shared/Functions';
 import {Subject} from 'rxjs';
 import {DragulaService} from 'ng2-dragula';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
@@ -45,7 +45,7 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit, OnDest
 
   public get preview(): string {
     let result = '';
-    if (!isSet(this.firstSegment)) {
+    if (!isUnset(this.firstSegment)) {
       for (let i = 0; i < this.resultConvention.length; i++) {
         const item = this.resultConvention[i];
         if (item.type === 'text') {

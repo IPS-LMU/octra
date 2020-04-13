@@ -12,7 +12,7 @@ import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component
 import {ModalService} from '../../modals/modal.service';
 import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
 import {AppInfo} from '../../../app.info';
-import {FileSize, Functions, isSet} from '../../shared/Functions';
+import {FileSize, Functions, isUnset} from '../../shared/Functions';
 import {sha256} from 'js-sha256';
 import {Observable, throwError} from 'rxjs';
 import {parseServerDataEntry} from '../../obj/data-entry';
@@ -70,7 +70,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   private subscrmanager: SubscriptionManager;
   onOfflineSubmit = () => {
-    if (this.appStorage.usemode !== 'demo' && !isSet(this.appStorage.dataID) && typeof this.appStorage.dataID === 'number') {
+    if (this.appStorage.usemode !== 'demo' && !isUnset(this.appStorage.dataID) && typeof this.appStorage.dataID === 'number') {
       // last was online mode
       this.api.setOnlineSessionToFree(this.appStorage).then(() => {
         this.audioService.registerAudioManager(this.dropzone.audioManager);
@@ -183,7 +183,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
     const loaduser = () => {
       if (this.appStorage.usemode !== 'demo') {
-        if (!isSet(this.appStorage.user)) {
+        if (!isUnset(this.appStorage.user)) {
           if (this.appStorage.user.id !== '-1') {
             this.member.id = this.appStorage.user.id;
           }
@@ -306,7 +306,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         this.createNewSession(form);
       } else if (continueSession) {
         this.api.fetchAnnotation(this.appStorage.dataID).then((json) => {
-          if (isSet(json.data)) {
+          if (isUnset(json.data)) {
             // job doesn't exist anymore
             this.createNewSession(form);
           } else {
@@ -476,12 +476,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
             const jsonStr = JSON.stringify(json.data);
             this.appStorage.serverDataEntry = parseServerDataEntry(jsonStr);
 
-            if (isSet(this.appStorage.serverDataEntry.transcript) ||
+            if (isUnset(this.appStorage.serverDataEntry.transcript) ||
               !Array.isArray(this.appStorage.serverDataEntry.transcript)) {
               this.appStorage.serverDataEntry.transcript = [];
             }
 
-            if (isSet(this.appStorage.serverDataEntry.logtext) ||
+            if (isUnset(this.appStorage.serverDataEntry.logtext) ||
               !Array.isArray(this.appStorage.serverDataEntry.logtext)) {
               this.appStorage.serverDataEntry.logtext = [];
             }
@@ -531,7 +531,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   public startDemo() {
     const audioExample = this.settingsService.getAudioExample(this.langService.getActiveLang());
 
-    if (!isSet(audioExample)) {
+    if (!isUnset(audioExample)) {
       this.member.id = 'demo_user';
       this.member.project = 'DemoProject';
       this.member.jobno = '123';
@@ -555,13 +555,13 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   public isPasswordCorrect(selectedProject, password) {
-    if (!isSet(this.settingsService.appSettings.octra.allowed_projects)) {
+    if (!isUnset(this.settingsService.appSettings.octra.allowed_projects)) {
       const inputHash = sha256(password).toUpperCase();
       const projectData = this.settingsService.appSettings.octra.allowed_projects.find((a) => {
         return a.name === selectedProject;
       });
 
-      if (!isSet(projectData)) {
+      if (!isUnset(projectData)) {
         if (projectData.hasOwnProperty('password') && projectData.password !== '') {
           return projectData.password.toUpperCase() === inputHash;
         }
@@ -572,12 +572,12 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   passwordExists() {
-    if (!isSet(this.settingsService.appSettings.octra.allowed_projects)) {
+    if (!isUnset(this.settingsService.appSettings.octra.allowed_projects)) {
       const projectData = this.settingsService.appSettings.octra.allowed_projects.find((a) => {
         return a.name === this.member.project;
       });
 
-      return (!isSet(projectData) && projectData.hasOwnProperty('password')) && projectData.password !== '';
+      return (!isUnset(projectData) && projectData.hasOwnProperty('password')) && projectData.password !== '';
     }
 
     return false;

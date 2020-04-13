@@ -3,7 +3,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {SubscriptionManager} from '../';
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
 import {Observable, ReplaySubject, Subject, Subscription} from 'rxjs';
-import {Functions, isSet} from '../Functions';
+import {Functions, isUnset} from '../Functions';
 import {HttpClient} from '@angular/common/http';
 import {APIService} from './api.service';
 import {TranslocoService} from '@ngneat/transloco';
@@ -18,10 +18,10 @@ declare var validateAnnotation: ((string, any) => any);
 @Injectable()
 export class SettingsService {
   public get isASREnabled(): boolean {
-    return (!isSet(this.appSettings.octra.plugins.asr) &&
-      !isSet(this.appSettings.octra.plugins.asr.enabled)
+    return (!isUnset(this.appSettings.octra.plugins.asr) &&
+      !isUnset(this.appSettings.octra.plugins.asr.enabled)
       && this.appSettings.octra.plugins.asr.enabled == true
-      && !isSet(this.appSettings.octra.plugins.asr.calls)
+      && !isUnset(this.appSettings.octra.plugins.asr.calls)
       && this.appSettings.octra.plugins.asr.calls.length === 2
       && this.appSettings.octra.plugins.asr.calls[0] !== ''
       && this.appSettings.octra.plugins.asr.calls[1] !== ''
@@ -135,8 +135,8 @@ export class SettingsService {
 
   public static queryParamsSet(queryParams: Params): boolean {
     return (
-      !isSet(queryParams.audio) &&
-      !isSet(queryParams.embedded)
+      !isUnset(queryParams.audio) &&
+      !isUnset(queryParams.embedded)
     );
   }
 
@@ -489,8 +489,8 @@ export class SettingsService {
    */
   public isTheme(theme: string) {
     const selectedTheme = (
-      isSet(this.projectsettings.octra)
-      || isSet(this.projectsettings.octra.theme)
+      isUnset(this.projectsettings.octra)
+      || isUnset(this.projectsettings.octra.theme)
     )
       ? 'default' : this.projectsettings.octra.theme;
 
@@ -498,7 +498,7 @@ export class SettingsService {
   }
 
   public getAudioExample(language: string) {
-    if (!isSet(this.appSettings.octra.audioExamples)) {
+    if (!isUnset(this.appSettings.octra.audioExamples)) {
       let example = this.appSettings.octra.audioExamples.find(
         (a) => {
           return a.language === language;

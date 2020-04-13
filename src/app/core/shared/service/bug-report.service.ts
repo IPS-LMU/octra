@@ -7,7 +7,7 @@ import {Observable} from 'rxjs';
 import {SettingsService} from './settings.service';
 import {BugReporter} from '../../obj/BugAPI/BugReporter';
 import {TranscriptionService} from './transcription.service';
-import {Functions, isSet} from '../Functions';
+import {Functions, isUnset} from '../Functions';
 import {HttpClient} from '@angular/common/http';
 import * as moment from 'moment';
 import {isArray} from 'rxjs/internal-compatibility';
@@ -65,7 +65,7 @@ export class BugReportService {
   }
 
   public addEntriesFromDB(entries: ConsoleEntry[]) {
-    if (!isSet(entries) && isArray(entries)) {
+    if (!isUnset(entries) && isArray(entries)) {
       if (entries.length > 50) {
         // crop down to 100 items
         entries = entries.slice(-50);
@@ -137,7 +137,7 @@ export class BugReportService {
   }
 
   public getText(): string {
-    if (!isSet(this.settService.appSettings)) {
+    if (!isUnset(this.settService.appSettings)) {
       const bugreportSettings = this.settService.appSettings.octra.bugreport;
 
       for (let i = 0; i < AppInfo.bugreporters.length; i++) {

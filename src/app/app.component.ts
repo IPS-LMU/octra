@@ -6,7 +6,7 @@ import {AppInfo} from './app.info';
 import {environment} from '../environments/environment';
 import {ActivatedRoute, Router} from '@angular/router';
 import {NavigationComponent} from './core/gui/navbar';
-import {isSet} from './core/shared/Functions';
+import {isUnset} from './core/shared/Functions';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
 import {AsrService} from './core/shared/service/asr.service';
 import {ASRLanguage} from './core/obj/Settings';
@@ -70,7 +70,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
           if (typeof error === 'string') {
             debug = error;
 
-            if (error === 'ERROR' && !isSet(context) && context.hasOwnProperty('stack') && context.hasOwnProperty('message')) {
+            if (error === 'ERROR' && !isUnset(context) && context.hasOwnProperty('stack') && context.hasOwnProperty('message')) {
               debug = context.message;
               stack = context.stack;
             }
@@ -119,10 +119,10 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
 
     this.subscrmanager.add(this.settingsService.dbloaded.subscribe(
       () => {
-        if (!isSet(this.appStorage.asrSelectedService) && !isSet(this.appStorage.asrSelectedLanguage)) {
+        if (!isUnset(this.appStorage.asrSelectedService) && !isUnset(this.appStorage.asrSelectedLanguage)) {
           // set asr settings
           const lang: ASRLanguage = this.asrService.getLanguageByCode(this.appStorage.asrSelectedLanguage, this.appStorage.asrSelectedService);
-          if (!isSet(lang)) {
+          if (!isUnset(lang)) {
             this.asrService.selectedLanguage = lang;
           } else {
             console.error('Could not read ASR language from database');
@@ -130,7 +130,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
         }
 
         this.appStorage.loadConsoleEntries().then((dbEntry: any) => {
-          if (!isSet(dbEntry) && dbEntry.hasOwnProperty('value')) {
+          if (!isUnset(dbEntry) && dbEntry.hasOwnProperty('value')) {
             this.bugService.addEntriesFromDB(dbEntry.value);
           } else {
             this.bugService.addEntriesFromDB(null);
@@ -157,8 +157,8 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
 
       this.langService.setAvailableLangs(this.settingsService.appSettings.octra.languages);
 
-      if (!isSet(this.settingsService.appSettings.octra.tracking)
-        && !isSet(this.settingsService.appSettings.octra.tracking.active)
+      if (!isUnset(this.settingsService.appSettings.octra.tracking)
+        && !isUnset(this.settingsService.appSettings.octra.tracking.active)
         && this.settingsService.appSettings.octra.tracking.active !== '') {
         this.appendTrackingCode(this.settingsService.appSettings.octra.tracking.active);
       }
@@ -237,9 +237,9 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
   private appendTrackingCode(type: string) {
     // check if matomo is activated
     if (type === 'matomo') {
-      if (!isSet(this.settingsService.appSettings.octra.tracking.matomo)
-        && !isSet(this.settingsService.appSettings.octra.tracking.matomo.host)
-        && !isSet(this.settingsService.appSettings.octra.tracking.matomo.siteID)) {
+      if (!isUnset(this.settingsService.appSettings.octra.tracking.matomo)
+        && !isUnset(this.settingsService.appSettings.octra.tracking.matomo.host)
+        && !isUnset(this.settingsService.appSettings.octra.tracking.matomo.siteID)) {
         const matomoSettings = this.settingsService.appSettings.octra.tracking.matomo;
 
         const trackingCode = `

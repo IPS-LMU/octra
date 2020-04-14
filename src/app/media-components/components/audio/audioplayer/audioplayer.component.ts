@@ -87,7 +87,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
 
   public get getPlayHeadX(): number {
     if (!(this.audioChunk === null || this.audioChunk === undefined)) {
-      const relativePlayPosition = this.audioChunk.playposition.samples / this.audioChunk.time.duration.samples;
+      const relativePlayPosition = this.audioChunk.relativePlayposition.samples / this.audioChunk.time.duration.samples;
       return this._settings.slider.margin.left +
         (relativePlayPosition * this.canvasElements.sliderBar.width()) - this._settings.playHead.width / 2;
     }
@@ -96,7 +96,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
 
   public get timeLeft(): number {
     if (!(this.audioChunk === null || this.audioChunk === undefined)) {
-      return (this.audioChunk.time.duration.unix - this.audioChunk.playposition.unix);
+      return (this.audioChunk.time.duration.unix - this.audioChunk.relativePlayposition.unix);
     }
     return 0;
   }
@@ -209,10 +209,10 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
     if (!isNaN(samples.samples)) {
       if (this.audioChunk.status === PlayBackStatus.PLAYING) {
         this.audioChunk.stopPlayback().then(() => {
-          this.audioChunk.playposition = this.pxToSample(x - this._settings.slider.margin.left + (this._settings.playHead.width / 2));
+          this.audioChunk.relativePlayposition = this.pxToSample(x - this._settings.slider.margin.left + (this._settings.playHead.width / 2));
         });
       } else {
-        this.audioChunk.playposition = this.pxToSample(x - this._settings.slider.margin.left + (this._settings.playHead.width / 2));
+        this.audioChunk.relativePlayposition = this.pxToSample(x - this._settings.slider.margin.left + (this._settings.playHead.width / 2));
       }
     } else {
       x = pos.x;
@@ -337,13 +337,13 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
 
     if (this.audioChunk.status === PlayBackStatus.PLAYING) {
       this.audioChunk.stopPlayback().then(() => {
-        this.audioChunk.playposition = this.pxToSample(px - this._settings.slider.margin.left + this._settings.playHead.width / 2);
+        this.audioChunk.relativePlayposition = this.pxToSample(px - this._settings.slider.margin.left + this._settings.playHead.width / 2);
         this.onPlaybackStarted();
       }).catch((error) => {
         console.error(error);
       });
     } else {
-      this.audioChunk.playposition = this.pxToSample(px - this._settings.slider.margin.left + this._settings.playHead.width / 2);
+      this.audioChunk.relativePlayposition = this.pxToSample(px - this._settings.slider.margin.left + this._settings.playHead.width / 2);
     }
   }
 

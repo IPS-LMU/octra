@@ -202,7 +202,9 @@ export class AudioViewerService {
             this.audioChunk.selection.end = absXInTime.clone();
             this.audioChunk.selection.checkSelection();
             this._drawnSelection = this.audioChunk.selection.clone();
-            this.PlayCursor.changeSamples(this.audioChunk.playposition.clone(), this.audioTCalculator, this.audioChunk);
+
+            // TODO check this!
+            this.PlayCursor.changeSamples(this.audioChunk.absolutePlayposition.clone(), this.audioTCalculator, this.audioChunk);
           }
 
           this._dragableBoundaryNumber = -1;
@@ -450,7 +452,7 @@ export class AudioViewerService {
         if (calculateZoom) {
           this.calculateZoom(this._settings.lineheight, this.AudioPxWidth, this._minmaxarray);
         }
-        this.audioChunk.playposition = this.audioChunk.time.start.clone();
+        this.audioChunk.absolutePlayposition = this.audioChunk.time.start.clone();
         this.channelInitialized.next();
         this.channelInitialized.complete();
       })
@@ -581,7 +583,7 @@ export class AudioViewerService {
 
     if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly) {
       const absXTime = (!this.audioChunk.isPlaying)
-        ? this._mouseCursor.timePos.samples : this.audioChunk.playposition.samples;
+        ? this._mouseCursor.timePos.samples : this.audioChunk.absolutePlayposition.samples;
       let bWidthTime = this.audioTCalculator.absXtoSamples2(this.settings.boundaries.width * 2, this.audioChunk);
       bWidthTime = Math.round(bWidthTime);
 

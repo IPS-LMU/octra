@@ -382,7 +382,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   onLoupeSegmentEnter($event) {
     this.selectSegment($event.index).then((selection: AudioSelection) => {
       this.audiochunkDown.selection = selection.clone();
-      this.audiochunkDown.playposition = selection.start.clone();
+      this.audiochunkDown.absolutePlayposition = selection.start.clone();
     });
   }
 
@@ -422,7 +422,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
           length: 0
         };
 
-        let playPosition = component.audioChunk.playposition;
+        let playPosition = component.audioChunk.absolutePlayposition;
 
         selection.start = component.av.drawnSelection.start.samples;
         selection.length = component.av.drawnSelection.duration.samples;

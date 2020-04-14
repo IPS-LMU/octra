@@ -478,7 +478,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         if (comboKey === 'ALT + S' && this.Settings.special_markers.boundary) {
           // add boundary
           this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
-          this.boundaryinserted.emit(this.audiochunk.playposition.samples);
+          this.boundaryinserted.emit(this.audiochunk.absolutePlayposition.samples);
           $event.preventDefault();
         } else {
           for (let i = 0; i < this.markers.length; i++) {
@@ -817,8 +817,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     const element = document.createElement('img');
     element.setAttribute('src', imgURL);
     element.setAttribute('class', 'btn-icon-text boundary');
-    element.setAttribute('data-samples', this.audiochunk.playposition.samples.toString());
-    element.setAttribute('alt', '[|' + this.audiochunk.playposition.samples.toString() + '|]');
+    element.setAttribute('data-samples', this.audiochunk.absolutePlayposition.samples.toString());
+    element.setAttribute('alt', '[|' + this.audiochunk.absolutePlayposition.samples.toString() + '|]');
 
     this.textfield.summernote('editor.insertText', ' ');
     this.textfield.summernote('editor.insertNode', element);

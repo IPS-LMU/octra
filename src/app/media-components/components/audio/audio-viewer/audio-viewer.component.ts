@@ -363,14 +363,14 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   onResize() {
     clearTimeout(this.resizingTimer);
     this.resizingTimer = setTimeout(() => {
-      const playpos = this.audioChunk.playposition.clone();
+      const playpos = this.audioChunk.absolutePlayposition.clone();
       const drawnSelection = this.av.drawnSelection.clone();
       this.stage.width(this.width);
       this.av.initialize(this.width - (this.settings.margin.left + this.settings.margin.right), this.audioChunk, this._transcriptionLevel);
       this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
       this.av.initializeSettings().then(() => {
         if (!this.audioChunk.isPlaying) {
-          this.audioChunk.playposition = playpos.clone();
+          this.audioChunk.absolutePlayposition = playpos.clone();
         }
         this.av.drawnSelection = drawnSelection;
         this.updateLines();
@@ -808,7 +808,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   private updatePlayCursor = () => {
     if (this.settings.selection.enabled) {
-      let currentAbsX = this.av.audioTCalculator.samplestoAbsX(this.audioChunk.playposition);
+      // TODO check this!
+      let currentAbsX = this.av.audioTCalculator.samplestoAbsX(this.audioChunk.relativePlayposition);
       const endAbsX = this.av.audioTCalculator.samplestoAbsX(
         (this.audioChunk.time.end.sub(this.audioChunk.time.start)));
       currentAbsX = Math.min(currentAbsX, endAbsX - 1);
@@ -857,7 +858,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
           this.audioChunk.selection = boundarySelect;
           this.av.drawnSelection = boundarySelect.clone();
           this.settings.selection.color = 'gray';
-          this.audioChunk.playposition = this.audioChunk.selection.start.clone();
+          this.audioChunk.absolutePlayposition = this.audioChunk.selection.start.clone();
           this.changePlayCursorSamples(this.audioChunk.selection.start);
           this.updatePlayCursor();
 
@@ -1198,16 +1199,23 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   private mouseChange = (event) => {
     const absXPos = this.hoveredLine * this.av.innerWidth + event.evt.layerX;
 
-    if (absXPos > 0 && this.settings.selection.enabled) {
+    if (!isUnset(absXPos) && absXPos > 0 && this.settings.selection.enabled) {
       if (event.evt.type === 'mousedown') {
-        this.audioChunk.selection.start = this.audioChunk.playposition.clone();
-        this.audioChunk.selection.end = this.audioChunk.playposition.clone();
+        this.audioChunk.selection.start = this.audioChunk.absolutePlayposition.clone();
+        this.audioChunk.selection.end = this.audioChunk.absolutePlayposition.clone();
         this.av.drawnSelection = this.audioChunk.selection.clone();
       }
-      this.av.setMouseClickPosition(absXPos, this.hoveredLine, event.evt).then(() => {
-        this.updatePlayCursor();
-        this.layers.playhead.draw();
-      });
+
+      if (!isUnset(absXPos)) {
+        this.av.setMouseClickPosition(absXPos, this.hoveredLine, event.evt).then(() => {
+          const test = this.audioChunk.absolutePlayposition;
+          const test2 = this.audioChunk.relativePlayposition;
+          this.updatePlayCursor();
+          this.layers.playhead.draw();
+        });
+      } else {
+        console.error(`absX is unset!`);
+      }
 
       if (event.evt.type !== 'mousedown') {
         // this.selchange.emit(this.audioChunk.selection);
@@ -1365,7 +1373,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     this.audioChunk.startPlayback().then(() => {
       if (this.av.drawnSelection !== null && this.av.drawnSelection.duration.samples > 0) {
         this.audioChunk.selection = this.av.drawnSelection.clone();
-        this.audioChunk.playposition = this.audioChunk.selection.start.clone();
+        this.audioChunk.absolutePlayposition = this.audioChunk.selection.start.clone();
       }
       afterAudioEnded();
     }).catch((error) => {
@@ -1570,7 +1578,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
                           if (xSamples.samples >= this.audioChunk.selection.start.samples
                             && xSamples.samples <= this.audioChunk.selection.end.samples) {
-                            this.audioChunk.playposition = this.audioChunk.selection.start.clone();
+                            this.audioChunk.absolutePlayposition = this.audioChunk.selection.start.clone();
                             this.changePlayCursorSamples(this.audioChunk.selection.start);
                             this.updatePlayCursor();
 
@@ -1730,7 +1738,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   private afterAudioEnded = () => {
     if (!this.audioChunk.replay) {
       // let cursor jump to start
-      this.audioChunk.playposition = this.audioChunk.selection.start.clone();
+      this.audioChunk.absolutePlayposition = this.audioChunk.selection.start.clone();
       this.av.drawnSelection = (this.av.drawnSelection !== null) ? this.av.drawnSelection.clone() : null;
     }
 

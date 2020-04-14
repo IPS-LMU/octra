@@ -637,16 +637,40 @@ export class AudioChunk {
     }
   }
 
-  get playposition(): SampleUnit {
+  get relativePlayposition(): SampleUnit {
+    let result = this.audioManager.createSampleUnit(0);
+
     if (this._status === PlayBackStatus.PLAYING) {
-      return this.audioManager.playposition.sub(this._time.start);
+      result = this.audioManager.playposition.sub(this._time.start);
+    } else {
+      result = this._playposition.sub(this._time.start);
     }
 
-    return this._playposition;
+    if (result.samples < 0) {
+      console.error(`samples of relativePlayposition is less than 0!`);
+    }
+
+    return result;
   }
 
-  set playposition(value: SampleUnit) {
-    this._playposition = value;
+  set relativePlayposition(value: SampleUnit) {
+    if (!isUnset(value) && this._time.end.samples >= value.samples && value.samples > -1) {
+      this._playposition = this._time.start.add(value);
+    } else {
+      console.error(`invalid value for relative sample unit!`);
+    }
+  }
+
+  set absolutePlayposition(value: SampleUnit) {
+    if (!isUnset(value) && value.samples >= this._time.start.samples && value.samples <= this._time.end.samples) {
+      this._playposition = value;
+    } else {
+      console.error(`incorrect value for absolute playback position!`);
+    }
+  }
+
+  get absolutePlayposition(): SampleUnit {
+    return this._playposition;
   }
 
   get lastplayedpos(): SampleUnit {
@@ -727,7 +751,7 @@ export class AudioChunk {
           this.startpos = this._selection.start.clone() as SampleUnit;
         }
 
-        this._lastplayedpos = this.playposition.clone();
+        this._lastplayedpos = this._playposition.clone();
 
         // console.log(`play from ${this.selection.start.seconds} to ${this.selection.start.seconds + this.selection.duration.seconds}`);
         const id = this.subscrmanager.add(this.audioManager.statechange.subscribe(
@@ -742,7 +766,7 @@ export class AudioChunk {
 
             if (state === PlayBackStatus.ENDED) {
               // reset to beginning of selection
-              if (this.playposition.samples >= this.time.end.samples) {
+              if (this._playposition.samples >= this.time.end.samples) {
                 this.startpos = this.time.start.clone();
               } else {
                 this._playposition = this.selection.start.clone();
@@ -837,7 +861,7 @@ export class AudioChunk {
 
   public stepBackwardTime(backSec: number): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const backSamples = Math.max(0, (this.playposition.samples
+      const backSamples = Math.max(0, (this.absolutePlayposition.samples
         - (Math.round(backSec * this._audioManger.sampleRate))));
       const backSample = new SampleUnit(backSamples, this._audioManger.sampleRate);
 
@@ -890,8 +914,8 @@ export class AudioChunk {
   }
 
   private afterPlaybackPaused = () => {
-    this.playposition = this.audioManager.playposition.clone();
-    this.startpos = this.playposition.clone();
+    this.absolutePlayposition = this.audioManager.playposition.clone();
+    this.startpos = this.absolutePlayposition.clone();
   }
 
   public toggleReplay() {

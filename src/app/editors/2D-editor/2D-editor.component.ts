@@ -176,7 +176,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.viewer.settings.margin.right = 0;
     this.viewer.settings.justifySignalHeight = true;
     this.viewer.settings.scrollbar.enabled = true;
-    this.viewer.settings.margin.right = 20;
     this.viewer.settings.roundValues = false;
     this.viewer.settings.stepWidthRatio = (this.viewer.settings.pixelPerSec / this.audioManager.ressource.info.sampleRate);
     this.viewer.settings.showTimePerLine = true;

@@ -680,29 +680,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         event.timestamp,
         this.audioManager.playposition, caretpos, selection, null, 'audio_buttons');
     }
-
-    switch (event.type) {
-      case('play'):
-        this.audioChunkLines.startPlayback(false);
-        break;
-      case('pause'):
-        this.audioChunkLines.pausePlayback();
-        break;
-      case('stop'):
-        this.audioChunkLines.stopPlayback();
-        break;
-      case('replay'):
-        this.audioChunkLines.toggleReplay();
-        break;
-      case('backward'):
-        this.audioChunkLines.stepBackward();
-        break;
-      case('backward time'):
-        this.audioChunkLines.stepBackwardTime(0.5);
-        break;
-      case('default'):
-        break;
-    }
   }
 
   public openSegment(segnumber: number) {

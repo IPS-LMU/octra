@@ -61,16 +61,16 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
               public settingsService: SettingsService,
               public appStorage: AppStorageService) {
     super();
-    this.subscrmanager = new SubscriptionManager();
+    this.subscrManager = new SubscriptionManager();
 
     if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
-      this.subscrmanager.add(this.keyMap.beforeKeyDown.subscribe((event) => {
+      this.subscrManager.add(this.keyMap.beforeKeyDown.subscribe((event) => {
         if (event.comboKey === 'ALT + SHIFT + 1' ||
           event.comboKey === 'ALT + SHIFT + 2' ||
           event.comboKey === 'ALT + SHIFT + 3') {
 
           this.transcrService.tasksBeforeSend.push(new Promise<void>((resolve) => {
-            if (this.topSelected && this.segmentselected && this.selectedIndex > -1) {
+            if (!isUnset(this.audioChunkDown) && this.segmentselected && this.selectedIndex > -1) {
               this.editor.updateRawText();
               this.save();
               resolve();
@@ -94,7 +94,6 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   @ViewChild('transcr', {static: true}) public editor: TranscrEditorComponent;
   public miniLoupeHidden = true;
   public segmentselected = false;
-  public topSelected = false;
   public loupeSettings: AudioviewerConfig;
   public miniLoupeCoord: any = {
     component: 'viewer',
@@ -102,10 +101,10 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     y: 0
   };
   public audioManager: AudioManager;
-  public audiochunkTop: AudioChunk;
-  public audiochunkDown: AudioChunk;
+  public audioChunkTop: AudioChunk;
+  public audioChunkDown: AudioChunk;
   public audioChunkLoupe: AudioChunk;
-  private subscrmanager: SubscriptionManager;
+  private subscrManager: SubscriptionManager;
   private saving = false;
   private factor = 6;
   private mouseTimer = null;
@@ -145,8 +144,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
   ngOnInit() {
     this.audioManager = this.audio.audiomanagers[0];
-    this.audiochunkTop = this.audioManager.mainchunk.clone();
-    this.audiochunkDown = this.audioManager.mainchunk.clone();
+    this.audioChunkTop = this.audioManager.mainchunk.clone();
     this.audioChunkLoupe = this.audioManager.mainchunk.clone();
 
     this.viewer.settings.shortcuts = this.keyMap.register('AV', this.viewer.settings.shortcuts);
@@ -173,7 +171,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.disabledKeys.push('SHIFT + SPACE');
 
-    this.subscrmanager.add(this.transcrService.currentlevel.segments.onsegmentchange.subscribe(
+    this.subscrManager.add(this.transcrService.currentlevel.segments.onsegmentchange.subscribe(
       ($event) => {
         if (!this.saving) {
           setTimeout(() => {
@@ -184,7 +182,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       }
     ));
 
-    this.subscrmanager.add(this.viewer.alerttriggered.subscribe(
+    this.subscrManager.add(this.viewer.alerttriggered.subscribe(
       (result) => {
         this.alertService.showAlert(result.type, result.message);
       }
@@ -241,7 +239,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   ngOnDestroy() {
-    this.subscrmanager.destroy();
+    this.subscrManager.destroy();
     this.keyMap.unregister('AV');
     this.keyMap.unregister('Loupe');
   }
@@ -259,22 +257,22 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
     switch (event.type) {
       case('play'):
-        this.audiochunkTop.startPlayback();
+        this.audioChunkTop.startPlayback();
         break;
       case('pause'):
-        this.audiochunkTop.pausePlayback();
+        this.audioChunkTop.pausePlayback();
         break;
       case('stop'):
-        this.audiochunkTop.stopPlayback();
+        this.audioChunkTop.stopPlayback();
         break;
       case('replay'):
-        this.audiochunkTop.toggleReplay();
+        this.audioChunkTop.toggleReplay();
         break;
       case('backward'):
-        this.audiochunkTop.stepBackward();
+        this.audioChunkTop.stepBackward();
         break;
       case('backward time'):
-        this.audiochunkTop.stepBackwardTime(0.5);
+        this.audioChunkTop.stepBackwardTime(0.5);
         break;
       case('default'):
         break;
@@ -287,7 +285,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       this.miniloupe.av.zoomY = this.factor;
     }
 
-    this.subscrmanager.add(
+    this.subscrManager.add(
       this.transcrService.segmentrequested.subscribe(
         (segnumber: number) => {
           this.openSegment(segnumber);
@@ -309,11 +307,10 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       if (selection.length > 0) {
         selection.checkSelection();
         this.segmentselected = false;
-        this.audiochunkDown.destroy();
-        this.audiochunkDown = new AudioChunk(this.audiochunkTop.selection.clone(), this.audioManager);
-        this.topSelected = true;
+        this.audioChunkDown.destroy();
+        this.audioChunkDown = new AudioChunk(this.audioChunkTop.selection.clone(), this.audioManager);
       } else {
-        this.topSelected = false;
+        this.audioChunkDown = null;
       }
     }
   }
@@ -363,9 +360,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   onSegmentEnter($event) {
     this.selectSegment($event.index).then((selection: AudioSelection) => {
       this.viewer.selectSegment($event.index);
-      this.audiochunkDown = new AudioChunk(selection, this.audioManager);
-      this.topSelected = true;
-      this.audiochunkDown = new AudioChunk(selection, this.audioManager);
+      this.audioChunkDown = new AudioChunk(selection, this.audioManager);
     });
 
     if (this.appStorage.logging) {
@@ -381,8 +376,8 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
   onLoupeSegmentEnter($event) {
     this.selectSegment($event.index).then((selection: AudioSelection) => {
-      this.audiochunkDown.selection = selection.clone();
-      this.audiochunkDown.absolutePlayposition = selection.start.clone();
+      this.audioChunkDown.selection = selection.clone();
+      this.audioChunkDown.absolutePlayposition = selection.start.clone();
     });
   }
 
@@ -534,7 +529,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   onVolumeChange(event: {
     old_value: number, new_value: number, timestamp: number
   }) {
-    this.audiochunkTop.volume = event.new_value;
+    this.audioChunkTop.volume = event.new_value;
     this.appStorage.audioVolume = event.new_value;
   }
 
@@ -570,8 +565,8 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       this.viewer.update();
     } */
     this.segmentselected = false;
-    this.audiochunkTop.startpos = this.audiochunkTop.time.start.clone();
-    this.audiochunkDown.startpos = this.audiochunkDown.time.start.clone();
+    this.audioChunkTop.startpos = this.audioChunkTop.time.start.clone();
+    this.audioChunkDown.startpos = this.audioChunkDown.time.start.clone();
   }
 
   private changeArea(audiochunk: AudioChunk, viewer: AudioViewerComponent, coord: any,
@@ -629,7 +624,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     const emptySegmentIndex = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
       return a.transcript === '';
     });
-    if (this.audiochunkTop.time.duration.seconds <= 35) {
+    if (this.audioChunkTop.time.duration.seconds <= 35) {
       if (emptySegmentIndex > -1) {
         this.openSegment(emptySegmentIndex);
       } else if (this.transcrService.currentlevel.segments.length === 1) {

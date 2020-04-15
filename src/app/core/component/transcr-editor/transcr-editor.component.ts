@@ -89,11 +89,14 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   set rawText(value: string) {
     jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
     this._rawText = this.tidyUpRaw(value);
-    this.init = 0;
-    const html = this.transcrService.rawToHTML(value);
-    this.textfield.summernote('code', html);
-    this.validate();
-    this.initPopover();
+
+    if (!isUnset(this.textfield)) {
+      this.init = 0;
+      const html = this.transcrService.rawToHTML(value);
+      this.textfield.summernote('code', html);
+      this.validate();
+      this.initPopover();
+    }
     this.asr = {
       status: 'inactive',
       result: '',
@@ -277,128 +280,131 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * initializes the editor and the containing summernote editor
    */
   public initialize = () => {
-    this.summernoteUI = jQuery.summernote.ui;
-    const navigation = this.initNavigation();
+    if (!isUnset(this.audiochunk)) {
 
-    if (this.Settings.special_markers.boundary) {
-      const customArray = this.createCustomButtonsArray();
-      navigation.buttons.boundary = customArray[0];
-      navigation.buttons.fontSizeUp = customArray[1];
-      navigation.buttons.fontSizeDown = customArray[2];
-      navigation.str_array.push('boundary');
-      navigation.str_array.push('fontSizeDown');
-      navigation.str_array.push('fontSizeUp');
-    }
+      this.summernoteUI = jQuery.summernote.ui;
+      const navigation = this.initNavigation();
 
-    if (!isUnset(this.textfield)) {
-      this.textfield.summernote('destroy');
-    }
-
-    this.textfield = jQuery('.textfield');
-    this.textfield.summernote({
-      height: this.Settings.height,
-      focus: false,
-      disableDragAndDrop: true,
-      disableResizeEditor: true,
-      disableResizeImage: true,
-      popover: {
-        image: [],
-        link: [],
-        air: []
-      },
-      airPopover: [],
-      toolbar: [
-        ['default', navigation.str_array]
-      ],
-      shortcuts: false,
-      buttons: navigation.buttons,
-      callbacks: {
-        onKeydown: this.onKeyDownSummernote,
-        onKeyup: this.onKeyUpSummernote,
-        onPaste: (e) => {
-          e.preventDefault();
-          const bufferText = ((e.originalEvent || e).clipboardData || (window as any).clipboardData).getData('Text');
-          let html = bufferText.replace(/(<p>)|(<\/p>)/g, '')
-            .replace(new RegExp('\\\[\\\|', 'g'), '{').replace(new RegExp('\\\|\\\]', 'g'), '}');
-          html = Functions.unEscapeHtml(html);
-          html = '<span>' + this.transcrService.rawToHTML(html) + '</span>';
-          html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
-          const htmlObj = jQuery(html);
-          if (!(this.rawText === null || this.rawText === undefined) && this._rawText !== '') {
-            this.textfield.summernote('editor.insertNode', htmlObj[0]);
-          } else {
-            this.textfield.summernote('code', html);
-            this.focus(true);
-          }
-          this.updateTextField();
-          this.initPopover();
-        },
-        onChange: () => {
-          this.init++;
-
-          if (this.init === 1) {
-            this.focus(true);
-          } else if (this.init > 1) {
-            this.textfield.summernote('restoreRange');
-          }
-        },
-        onBlur: () => {
-          this.focused = false;
-        },
-        onFocus: () => {
-          this.focused = true;
-        },
-        onMouseup: () => {
-          this.selectionchanged.emit(this.caretpos);
-        }
+      if (this.Settings.special_markers.boundary) {
+        const customArray = this.createCustomButtonsArray();
+        navigation.buttons.boundary = customArray[0];
+        navigation.buttons.fontSizeUp = customArray[1];
+        navigation.buttons.fontSizeDown = customArray[2];
+        navigation.str_array.push('boundary');
+        navigation.str_array.push('fontSizeDown');
+        navigation.str_array.push('fontSizeUp');
       }
-    });
 
-    this.textfield.summernote('removeModule', 'statusbar');
-    this.textfield.summernote('removeModule', 'handle');
-    this.textfield.summernote('removeModule', 'hintPopover');
-    this.textfield.summernote('removeModule', 'imageDialog');
-    this.textfield.summernote('removeModule', 'airPopover');
+      if (!isUnset(this.textfield)) {
+        this.textfield.summernote('destroy');
+      }
 
-    // create seg popover
+      this.textfield = jQuery('.textfield');
+      this.textfield.summernote({
+        height: this.Settings.height,
+        focus: false,
+        disableDragAndDrop: true,
+        disableResizeEditor: true,
+        disableResizeImage: true,
+        popover: {
+          image: [],
+          link: [],
+          air: []
+        },
+        airPopover: [],
+        toolbar: [
+          ['default', navigation.str_array]
+        ],
+        shortcuts: false,
+        buttons: navigation.buttons,
+        callbacks: {
+          onKeydown: this.onKeyDownSummernote,
+          onKeyup: this.onKeyUpSummernote,
+          onPaste: (e) => {
+            e.preventDefault();
+            const bufferText = ((e.originalEvent || e).clipboardData || (window as any).clipboardData).getData('Text');
+            let html = bufferText.replace(/(<p>)|(<\/p>)/g, '')
+              .replace(new RegExp('\\\[\\\|', 'g'), '{').replace(new RegExp('\\\|\\\]', 'g'), '}');
+            html = Functions.unEscapeHtml(html);
+            html = '<span>' + this.transcrService.rawToHTML(html) + '</span>';
+            html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
+            const htmlObj = jQuery(html);
+            if (!(this.rawText === null || this.rawText === undefined) && this._rawText !== '') {
+              this.textfield.summernote('editor.insertNode', htmlObj[0]);
+            } else {
+              this.textfield.summernote('code', html);
+              this.focus(true);
+            }
+            this.updateTextField();
+            this.initPopover();
+          },
+          onChange: () => {
+            this.init++;
 
-    this.popovers.segmentBoundary = jQuery('<div></div>')
-      .addClass('panel')
-      .addClass('seg-popover')
-      .html('00:00:000');
+            if (this.init === 1) {
+              this.focus(true);
+            } else if (this.init > 1) {
+              this.textfield.summernote('restoreRange');
+            }
+          },
+          onBlur: () => {
+            this.focused = false;
+          },
+          onFocus: () => {
+            this.focused = true;
+          },
+          onMouseup: () => {
+            this.selectionchanged.emit(this.caretpos);
+          }
+        }
+      });
 
-    this.popovers.segmentBoundary.insertBefore('.note-editing-area');
+      this.textfield.summernote('removeModule', 'statusbar');
+      this.textfield.summernote('removeModule', 'handle');
+      this.textfield.summernote('removeModule', 'hintPopover');
+      this.textfield.summernote('removeModule', 'imageDialog');
+      this.textfield.summernote('removeModule', 'airPopover');
 
-    this.popovers.validationError = jQuery('<div></div>')
-      .addClass('card error-card')
-      .html(`
+      // create seg popover
+
+      this.popovers.segmentBoundary = jQuery('<div></div>')
+        .addClass('panel')
+        .addClass('seg-popover')
+        .html('00:00:000');
+
+      this.popovers.segmentBoundary.insertBefore('.note-editing-area');
+
+      this.popovers.validationError = jQuery('<div></div>')
+        .addClass('card error-card')
+        .html(`
       <div class="card-header" style="padding:5px 10px; font-weight: bold;background-color:whitesmoke;">
       <span style="color:red;">( ! )</span> <span class="error-title"></span></div>
       <div class="card-body" style="padding:5px 10px;"></div>
       `)
-      .css({
-        'max-width': '500px',
-        position: 'absolute',
-        'margin-top': '0px',
-        'z-index': '200',
-        display: 'none'
-      });
+        .css({
+          'max-width': '500px',
+          position: 'absolute',
+          'margin-top': '0px',
+          'z-index': '200',
+          display: 'none'
+        });
 
-    this.popovers.validationError.insertBefore('.note-editing-area');
+      this.popovers.validationError.insertBefore('.note-editing-area');
 
-    jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
-    this.loaded.emit(true);
+      jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
+      this.loaded.emit(true);
 
-    this.asr.status = 'inactive';
-    this.asr.error = '';
-    this.asr.result = '';
+      this.asr.status = 'inactive';
+      this.asr.error = '';
+      this.asr.result = '';
 
-    const item = this.asrService.queue.getItemByTime(this.audiochunk.time.start.samples,
-      this.audiochunk.time.duration.samples);
+      const item = this.asrService.queue.getItemByTime(this.audiochunk.time.start.samples,
+        this.audiochunk.time.duration.samples);
 
-    this.onASRItemChange(item);
-    this.size.height = jQuery(this.transcrEditor.nativeElement).height();
-    this.size.width = jQuery(this.transcrEditor.nativeElement).width();
+      this.onASRItemChange(item);
+      this.size.height = jQuery(this.transcrEditor.nativeElement).height();
+      this.size.width = jQuery(this.transcrEditor.nativeElement).width();
+    }
   };
 
   onASRItemChange(item: ASRQueueItem) {
@@ -570,15 +576,20 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnChanges(obj) {
     let renew = false;
-    if (!(obj.markers === null || obj.markers === undefined) && obj.markers.previousValue !== obj.markers.newValue) {
+    if (!(obj.markers === null || obj.markers === undefined) && obj.markers.previousValue !== obj.markers.currentValue) {
       renew = true;
     }
-    if (!(obj.easymode === null || obj.easymode === undefined) && obj.easymode.previousValue !== obj.easymode.newValue) {
+    if (!(obj.easymode === null || obj.easymode === undefined) && obj.easymode.previousValue !== obj.easymode.currentValue) {
       renew = true;
+    }
+    if (!isUnset(obj.audiochunk) && !isUnset(obj.audiochunk.currentValue)) {
+      this.initialize();
     }
 
     if (renew) {
-      this.textfield.summernote('destroy');
+      if (!isUnset(this.textfield)) {
+        this.textfield.summernote('destroy');
+      }
       this.initialize();
       this.initPopover();
     }

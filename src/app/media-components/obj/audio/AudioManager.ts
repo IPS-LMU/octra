@@ -107,21 +107,26 @@ export class AudioManager {
 
     if (!(audioinfo === null || audioinfo === undefined)) {
       // Fix up for prefixing
-      const audioContext = window.AudioContext // Default
-        || window.webkitAudioContext // Safari and old versions of Chrome
-        || window.mozAudioContext
-        || false;
+      this.initAudioContext();
 
-      if (audioContext) {
-        if ((this._audioContext === null || this._audioContext === undefined)) {
-          // reuse old audiocontext
-          this._audioContext = new audioContext();
-        }
-
+      if (this._audioContext) {
         this._playposition = new SampleUnit(0, sampleRate);
         this._state = PlayBackStatus.PREPARE;
       } else {
-        console.error('AudioContext not supported by this samples');
+        console.error('AudioContext not supported by this browser');
+      }
+    }
+  }
+
+  private initAudioContext() {
+    const audioContext = window.AudioContext // Default
+      || window.webkitAudioContext // Safari and old versions of Chrome
+      || window.mozAudioContext
+      || false;
+    if (audioContext) {
+      if ((this._audioContext === null || this._audioContext === undefined)) {
+        // reuse old audiocontext
+        this._audioContext = new audioContext();
       }
     }
   }
@@ -271,52 +276,61 @@ export class AudioManager {
                        volume: number, playbackRate: number, playOnHover: boolean = false
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      if (isUnset(this._gainNode)) {
-        this._gainNode = this.audioContext.createGain();
+      if (isUnset(this._audioContext)) {
+        this.initAudioContext();
       }
-      // create an audio context and hook up the video element as the source
-      if (isUnset(this._source)) {
-        this._source = this._audioContext.createMediaElementSource(this._audio);
-      }
-      this.changeState(PlayBackStatus.STARTED);
 
-      // Firefox issue causes playBackRate working only for volume up to 1
+      this._audioContext.resume().then(() => {
+        if (isUnset(this._gainNode)) {
+          this._gainNode = this.audioContext.createGain();
+        }
+        // create an audio context and hook up the video element as the source
+        if (isUnset(this._source)) {
+          this._source = this._audioContext.createMediaElementSource(this._audio);
+        }
+        this.changeState(PlayBackStatus.STARTED);
 
-      // create a gain node
-      this._gainNode.gain.value = volume;
-      this._source.connect(this._gainNode);
+        // Firefox issue causes playBackRate working only for volume up to 1
 
-      // connect the gain node to an output destination
-      this._gainNode.connect(this._audioContext.destination);
+        // create a gain node
+        this._gainNode.gain.value = volume;
+        this._source.connect(this._gainNode);
 
-      this._audio.playbackRate = playbackRate;
-      this._audio.onerror = reject;
+        // connect the gain node to an output destination
+        this._gainNode.connect(this._audioContext.destination);
 
-      this._playOnHover = playOnHover;
-      this._stepBackward = false;
-      this.playposition = audioSelection.start.clone();
-      this._playbackInfo.started = new Date().getTime();
-      this._playbackInfo.endAt = this._playbackInfo.started + audioSelection.start.seconds;
-      this._playbackInfo.selection = audioSelection.clone();
-      this._statusRequest = PlayBackStatus.PLAYING;
-      this.changeState(PlayBackStatus.PLAYING);
+        this._audio.playbackRate = playbackRate;
+        this._audio.onerror = reject;
 
-      this._audio.addEventListener('pause', this.onPlayBackChanged);
-      this._audio.addEventListener('ended', this.onPlayBackChanged);
-      this._audio.addEventListener('error', this.onPlaybackFailed);
+        this._playOnHover = playOnHover;
+        this._stepBackward = false;
+        this.playposition = audioSelection.start.clone();
+        this._playbackInfo.started = new Date().getTime();
+        this._playbackInfo.endAt = this._playbackInfo.started + audioSelection.start.seconds;
+        this._playbackInfo.selection = audioSelection.clone();
+        this._statusRequest = PlayBackStatus.PLAYING;
+        this.changeState(PlayBackStatus.PLAYING);
 
-      this._playbackChecker = interval(40).subscribe(this.onTimeUpdate);
+        this._audio.addEventListener('pause', this.onPlayBackChanged);
+        this._audio.addEventListener('ended', this.onPlayBackChanged);
+        this._audio.addEventListener('error', this.onPlaybackFailed);
 
-      this._audio.play()
-        .catch((error) => {
-          if (error.name && error.name === 'NotAllowedError') {
-            // no permission
-            this.missingPermission.emit();
-          }
+        this._playbackChecker = interval(40).subscribe(this.onTimeUpdate);
 
-          console.error(error);
-        });
-      resolve();
+        this._audio.play()
+          .catch((error) => {
+            if (error.name && error.name === 'NotAllowedError') {
+              // no permission
+              this.missingPermission.emit();
+            }
+
+            console.error(error);
+          });
+        resolve();
+      }).catch((error) => {
+        this.statechange.error(new Error(error));
+        reject(error);
+      });
     });
   }
 
@@ -447,12 +461,12 @@ export class AudioManager {
     return new Promise<void>((resolve, reject) => {
       const format = new WavFormat();
       format.init(this._ressource.info.name, this._ressource.arraybuffer);
-      const decoder = new AudioDecoder(format, this._ressource.info, this._ressource.arraybuffer);
-      const subj = decoder.onChannelDataCalculate.subscribe((status) => {
+      AudioManager.decoder = new AudioDecoder(format, this._ressource.info, this._ressource.arraybuffer);
+      const subj = AudioManager.decoder.onChannelDataCalculate.subscribe((status) => {
           if (status.progress === 1 && status.result !== null) {
-            decoder.destroy();
+            AudioManager.decoder.destroy();
             this._channel = status.result;
-            this._channelDataFactor = decoder.channelDataFactor;
+            this._channelDataFactor = AudioManager.decoder.channelDataFactor;
             this.onChannelDataChange.next();
             this.onChannelDataChange.complete();
             resolve();
@@ -465,8 +479,8 @@ export class AudioManager {
         },
         () => {
         });
-      decoder.started = Date.now();
-      decoder.getChunkedChannelData(sampleStart, sampleDur);
+      AudioManager.decoder.started = Date.now();
+      AudioManager.decoder.getChunkedChannelData(sampleStart, sampleDur);
     });
   }
 
@@ -822,11 +836,14 @@ export class AudioChunk {
   }
 
   public pausePlayback() {
-    this._audioManger.pausePlayback();
-    if (this.audioManager.state !== this.status && this.status === PlayBackStatus.PLAYING) {
-      console.error(new Error(`audioManager and chunk have different states: a:${this.audioManager.state}, c:${this.status}`));
-    }
-    this.afterPlaybackPaused();
+    this._audioManger.pausePlayback().then(() => {
+      if (this.audioManager.state !== this.status && this.status === PlayBackStatus.PLAYING) {
+        console.error(new Error(`audioManager and chunk have different states: a:${this.audioManager.state}, c:${this.status}`));
+      }
+      this.afterPlaybackPaused();
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   public stepBackward(): Promise<void> {

@@ -1418,9 +1418,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         this.layers.boundaries.batchDraw();
       } else {
         this.drawWholeSelection();
-
       }
 
+      console.log(`set focus to true while moving`);
       this.focused = true;
     }
   }
@@ -1747,6 +1747,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   private onMouseLeave = () => {
+    console.log(`set focus to false after leave`);
     this.focused = false;
   }
 

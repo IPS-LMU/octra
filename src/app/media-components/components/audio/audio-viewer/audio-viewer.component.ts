@@ -894,7 +894,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     let numOfLines = Math.ceil(this.av.AudioPxWidth / maxLineWidth);
     if (!this.settings.multiLine) {
       numOfLines = 1;
-      this.layers.overlay.removeChildren();
     }
 
     if (this._transcriptionLevel.segments.length > 0) {
@@ -1502,13 +1501,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       }
 
                       if (result.seg_samples > -1 && result.seg_ID > -1) {
-                        const num = segments.getSegmentBySamplePosition(this.audioManager.createSampleUnit(result.seg_samples));
+                        const num = segments.getNumberByID(result.seg_ID);
                         const startSegment = Math.max(num - 1, 0);
                         const endSegment = (num < segments.length - 2) ? num + 1 : segments.length - 1;
 
                         this.createSegmentsForCanvas(startSegment, endSegment);
-                        this.layers.overlay.batchDraw();
-                        this.layers.boundaries.batchDraw();
+                        this.layers.overlay.draw();
+                        this.layers.boundaries.draw();
                       }
                     }
                     keyActive = true;

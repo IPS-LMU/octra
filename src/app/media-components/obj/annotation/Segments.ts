@@ -170,6 +170,20 @@ export class Segments {
     return null;
   }
 
+  /**
+   * gets Segment by ID
+   */
+  public getByID(id: number): Segment | undefined {
+    return this.segments.find(a => a.id === id);
+  }
+
+  /**
+   * gets Segment by ID
+   */
+  public getNumberByID(id: number): number {
+    return this.segments.findIndex(a => a.id === id);
+  }
+
   public getFullTranscription(): string {
     let result = '';
 

@@ -263,6 +263,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         evt: event
       });
     });
+
     for (const attr in this.layers) {
       if (this.layers.hasOwnProperty(attr)) {
         this.stage.add(this.layers['' + attr]);
@@ -270,11 +271,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     }
     const container = this.stage.container();
     container.tabIndex = 1;
+
     // focus it
     // also stage will be in focus on its click
     container.focus();
     container.addEventListener('keydown', this.onKeyDown);
     container.addEventListener('mouseleave', this.onMouseLeave);
+    container.addEventListener('mouseenter', this.onMouseEnter);
 
     window.onresize = () => {
       this.onResize();
@@ -291,6 +294,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
     this.konvaContainer.nativeElement.removeEventListener('keydown', this.onKeyDown);
     this.konvaContainer.nativeElement.removeEventListener('mouseleave', this.onMouseLeave);
+    this.konvaContainer.nativeElement.removeEventListener('mouseenter', this.onMouseEnter);
     this.konvaContainer.nativeElement.removeEventListener('mousemove', this.onMouseMove);
     this.konvaContainer.nativeElement.removeEventListener('mousedown', this.mouseChange);
     this.konvaContainer.nativeElement.removeEventListener('mouseup', this.mouseChange);
@@ -1420,7 +1424,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         this.drawWholeSelection();
       }
 
-      console.log(`set focus to true while moving`);
+      this.stage.container().focus();
       this.focused = true;
     }
   }
@@ -1643,6 +1647,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   }
                   break;
                 case('segment_enter'):
+                  console.log(`${this.settings.boundaries.enabled} && ${!this.settings.boundaries.readonly} && ${this.focused}`);
                   if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this.focused) {
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'segment'});
 
@@ -1652,6 +1657,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                     this.selectSegment(segInde,
                       (posY1, posY2) => {
                         this.focused = false;
+                        this.drawWholeSelection();
+                        this.stage.draw();
                         this.segmententer.emit({
                           index: segInde,
                           pos: {Y1: posY1, Y2: posY2}
@@ -1746,8 +1753,12 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     this.layers.playhead.batchDraw();
   }
 
+  private onMouseEnter = () => {
+    this.stage.container().focus();
+    this.focused = true;
+  }
+
   private onMouseLeave = () => {
-    console.log(`set focus to false after leave`);
     this.focused = false;
   }
 

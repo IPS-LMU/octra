@@ -361,6 +361,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.selectSegment($event.index).then((selection: AudioSelection) => {
       this.viewer.selectSegment($event.index);
       this.audioChunkDown = new AudioChunk(selection, this.audioManager);
+      this.editor.focus(true);
     });
 
     if (this.appStorage.logging) {
@@ -378,6 +379,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.selectSegment($event.index).then((selection: AudioSelection) => {
       this.audioChunkDown.selection = selection.clone();
       this.audioChunkDown.absolutePlayposition = selection.start.clone();
+      this.editor.focus(true);
     });
   }
 

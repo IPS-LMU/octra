@@ -392,6 +392,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       this.popovers.validationError.insertBefore('.note-editing-area');
 
       jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
+      this.rawText = this._rawText;
       this.loaded.emit(true);
 
       this.asr.status = 'inactive';
@@ -583,7 +584,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       renew = true;
     }
     if (!isUnset(obj.audiochunk) && !isUnset(obj.audiochunk.currentValue)) {
-      this.initialize();
+      renew = true;
     }
 
     if (renew) {
@@ -1046,7 +1047,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * destroys the summernote editor
    */
   private destroy() {
-    this.textfield.summernote('destroy');
+    if (!isUnset(this.textfield)) {
+      this.textfield.summernote('destroy');
+    }
     // delete tooltip overlays
     jQuery('.tooltip').remove();
     this.subscrmanager.destroy();

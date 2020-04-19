@@ -162,6 +162,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     return this.av.settings;
   }
 
+  @Input()
+  public set settings(value: AudioviewerConfig) {
+    this.av.settings = value;
+  }
+
   public get audioManager(): AudioManager {
     return this.audioChunk.audioManager;
   }
@@ -193,11 +198,18 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.hasOwnProperty('audioChunk') && changes.audioChunk.currentValue !== null) {
+      console.log(`chunk updated`);
       this.afterChunkUpdated();
     }
     if (changes.hasOwnProperty('transcriptionLevel') && changes.transcriptionLevel.currentValue !== null) {
+      console.log(`level updated`);
       this.afterLevelUpdated();
     }
+
+    if (changes.hasOwnProperty('settings') && changes.settings.currentValue !== null) {
+      this.afterSettingsUpdated();
+    }
+
     if (changes.hasOwnProperty('breakMarker') && changes.transcriptionLevel.currentValue !== null) {
       this.av.breakMarker = this.breakMarker;
     }
@@ -282,6 +294,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     window.onresize = () => {
       this.onResize();
     };
+  }
+
+  private afterSettingsUpdated() {
+    console.log(`settings were updated!`);
   }
 
   public getPixelPerSecond(secondsPerLine: number) {
@@ -1221,7 +1237,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       }
 
       if (event.evt.type !== 'mousedown') {
-        // this.selchange.emit(this.audioChunk.selection);
+        this.selchange.emit(this.audioChunk.selection);
       }
 
       this.drawWholeSelection();
@@ -1412,13 +1428,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       this.av.setMouseMovePosition(absXPos);
       if (this.av.dragableBoundaryNumber > -1) {
         // something dragged
-        const segment = this._transcriptionLevel.segments.get(this.av.dragableBoundaryNumber);
-        const end = (this.av.dragableBoundaryNumber < this._transcriptionLevel.segments.length - 1)
-          ? this.av.dragableBoundaryNumber + 1 : this.av.dragableBoundaryNumber;
-        segment.time = this.av.mouseCursor.timePos.clone();
-        this.createSegmentsForCanvas(this.av.dragableBoundaryNumber, end);
-        this.layers.overlay.batchDraw();
-        this.layers.boundaries.batchDraw();
+        this.createSegmentsForCanvas();
+        this.stage.batchDraw();
       } else {
         this.drawWholeSelection();
       }

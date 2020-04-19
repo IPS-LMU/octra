@@ -30,6 +30,7 @@ import {AudioChunk, AudioManager} from '../../media-components/obj/audio/AudioMa
 import {AudioViewerComponent} from '../../media-components/components/audio/audio-viewer/audio-viewer.component';
 import {AudioSelection} from '../../media-components/obj/audio';
 import {AVMousePos} from '../../media-components/obj/audio/AVMousePos';
+import {timeout} from 'rxjs/operators';
 
 @Component({
   selector: 'app-signal-gui',
@@ -307,7 +308,9 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       if (selection.length > 0) {
         selection.checkSelection();
         this.segmentselected = false;
-        this.audioChunkDown.destroy();
+        if (!isUnset(this.audioChunkDown)) {
+          this.audioChunkDown.destroy();
+        }
         this.audioChunkDown = new AudioChunk(this.audioChunkTop.selection.clone(), this.audioManager);
       } else {
         this.audioChunkDown = null;

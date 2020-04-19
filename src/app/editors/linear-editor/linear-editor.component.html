@@ -68,12 +68,17 @@
 <octra-audio-viewer #loupe
                     *ngIf="audioChunkDown !== null && audioChunkDown !== undefined"
                     (segmententer)="onLoupeSegmentEnter($event)"
+                    (mousecursorchange)="onMouseOver($event)"
+                    (mouseenter)="miniLoupeHidden = false;"
+                    (mouseleave)="miniLoupeHidden = true;"
+                    (mousedown)="onViewerMouseDown($event)"
                     (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_down', loupe)"
-                    (click)="onLoupeClick($event)"
                     [audioChunk]="audioChunkDown"
-                    (alerttriggered)="onAlertTriggered($event)"
                     [transcriptionLevel]="transcrService.currentlevel"
+                    (click)="onLoupeClick($event)"
+                    (alerttriggered)="onAlertTriggered($event)"
                     [name]="'downLoupe'"
+                    [settings]="loupeSettings"
                     [breakMarker]="{
                         code: '<P>'
                       }"

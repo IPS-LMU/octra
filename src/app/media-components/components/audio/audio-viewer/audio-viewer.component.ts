@@ -28,6 +28,8 @@ import {Context} from 'konva/types/Context';
 import {ASRQueueItemType} from '../../../obj/annotation/asr';
 import {isUnset} from '../../../../core/shared/Functions';
 import Vector2d = Konva.Vector2d;
+import Group = Konva.Group;
+import Layer = Konva.Layer;
 
 @Component({
   selector: 'octra-audio-viewer',
@@ -106,6 +108,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   public secondsPerLine = 5;
   public mouseStatus = 'auto';
   private hoveredLine = -1;
+  private croppingData: {
+    x: number,
+    y: number,
+    radius: number
+  };
 
   private styles = {
     playHead: {
@@ -430,6 +437,16 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         this.audioManager.createSampleUnit(0)
       }
     }
+
+    if (this.settings.cropping === 'circle') {
+      this.settings.lineheight = this.av.innerWidth;
+      const circleWidth = this.av.innerWidth - 5;
+      this.croppingData = {
+        x: circleWidth / 2 + 2 + this.settings.margin.left,
+        y: circleWidth / 2 + 2 + this.settings.margin.top,
+        radius: circleWidth / 2
+      };
+    }
     if (this.settings.multiLine) {
       const optionalScrollbarWidth = (this.settings.scrollbar.enabled) ? this.settings.scrollbar.width : 0;
       let lineWidth = this.av.innerWidth;
@@ -470,16 +487,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
 
     if (this.settings.cropping === 'circle') {
-      const croppingData = {
-        x: this.av.innerWidth / 2 + this.settings.margin.left,
-        y: this.av.innerWidth / 2 + this.settings.margin.top,
-        radius: this.av.innerWidth / 2
-      };
-      const cropGroup = new Konva.Group({
-        clipFunc: (ctx) => {
-          ctx.arc(croppingData.x, croppingData.y, croppingData.radius, 0, Math.PI * 2, false);
-        }
-      });
+      const cropGroup = this.createCropContainer();
       this.layers.playhead.removeChildren();
       cropGroup.add(this.canvasElements.playHead);
       cropGroup.add(this.canvasElements.mouseCaret);
@@ -492,6 +500,15 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     }
 
     this.stage.batchDraw();
+  }
+
+  private createCropContainer(id?: string): Group {
+    return new Konva.Group({
+      id,
+      clipFunc: (ctx) => {
+        ctx.arc(this.croppingData.x, this.croppingData.y, this.croppingData.radius, 0, Math.PI * 2, false);
+      }
+    });
   }
 
   private onPlaybackStarted() {
@@ -717,22 +734,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       transformsEnabled: 'position'
     });
 
-    const croppingData = {
-      x: (this.av.innerWidth - 10) / 2 + 2,
-      y: (this.av.innerWidth - 10) / 2 + 2,
-      radius: (this.av.innerWidth - 10) / 2
-    };
-    const cropGroup = new Konva.Group({
-      clipFunc: (ctx) => {
-        ctx.arc(croppingData.x, croppingData.y, croppingData.radius, 0, Math.PI * 2, false);
-      }
-    });
-
     let selectedGroup = result;
 
 
     if (this.settings.cropping === 'circle') {
-      selectedGroup = cropGroup;
+      selectedGroup = this.createCropContainer();
       size = new Size(this.av.innerWidth, this.av.innerWidth);
     }
 
@@ -746,9 +752,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       const shadowCircle = new Konva.Circle({
         stroke: 'black',
         strokeWidth: 1,
-        x: croppingData.x,
-        y: croppingData.y,
-        radius: croppingData.radius,
+        x: this.croppingData.x,
+        y: this.croppingData.y,
+        radius: this.croppingData.radius,
         shadowColor: 'black',
         shadowEnabled: true,
         shadowBlur: 5,
@@ -756,13 +762,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         shadowOpacity: 1
       });
       result.add(shadowCircle);
-      result.add(cropGroup);
+      result.add(selectedGroup);
       const borderedCircle = new Konva.Circle({
         stroke: 'black',
         strokeWidth: 2,
-        x: croppingData.x,
-        y: croppingData.y,
-        radius: croppingData.radius
+        x: this.croppingData.x,
+        y: this.croppingData.y,
+        radius: this.croppingData.radius
       });
       result.add(borderedCircle);
     }
@@ -937,14 +943,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       let root: Konva.Group | Konva.Layer = this.layers.overlay;
 
       if (this.settings.cropping === 'circle') {
-        const croppingData = {
-          x: (this.av.innerWidth - 10) / 2 + 2 + this.settings.margin.left,
-          y: (this.av.innerWidth - 10) / 2 + 2 + this.settings.margin.top,
-          radius: (this.av.innerWidth - 10) / 2
-        };
         const cropGroup = new Konva.Group({
           clipFunc: (ctx) => {
-            ctx.arc(croppingData.x, croppingData.y, croppingData.radius, 0, Math.PI * 2, false);
+            ctx.arc(this.croppingData.x, this.croppingData.y, this.croppingData.radius, 0, Math.PI * 2, false);
           }
         });
 
@@ -1153,42 +1154,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         }
       }
 
-      // draw boundaries after all overlays were drawn
-      if (this.settings.boundaries.enabled) {
-        for (let i = 0; i < boundariesToDraw.length; i++) {
-          const boundary = boundariesToDraw[i];
-          const h = this.settings.lineheight;
-
-          const foundBoundary = this.layers.boundaries.findOne(`#boundary_${boundary.id}`);
-          if (!isUnset(foundBoundary)) {
-            foundBoundary.remove();
-          }
-
-          const boundaryObj = new Konva.Line({
-            id: `boundary_${boundary.id}`,
-            strokeWidth: this.settings.boundaries.width,
-            stroke: this.settings.boundaries.color,
-            points: [boundary.x, boundary.y, boundary.x, boundary.y + h],
-            transformsEnabled: 'position'
-          });
-
-          boundaryObj.on('mousedown', () => {
-            if (!this.settings.boundaries.readonly) {
-              this.av.dragableBoundaryNumber = boundary.num;
-            }
-          });
-          boundaryObj.on('mouseenter', () => {
-            this.mouseStatus = 'move';
-          });
-          boundaryObj.on('mouseleave', () => {
-            this.mouseStatus = 'auto';
-          });
-
-          this.layers.boundaries.add(boundaryObj);
-          drawnBoundaries++;
-        }
-      }
-
       // draw time labels
       if (this.settings.showTimePerLine) {
         const foundText = this.layers.overlay.findOne('#timeStamps');
@@ -1231,6 +1196,52 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
           }
         });
         this.layers.overlay.add(timeStampLabels);
+      }
+
+      // draw boundaries after all overlays were drawn
+      if (this.settings.boundaries.enabled) {
+        let boundaryRoot: Group | Layer = this.layers.boundaries;
+        if (this.settings.cropping === 'circle') {
+          boundaryRoot = this.layers.boundaries.findOne(`#boundary-root`);
+
+          if (isUnset(boundaryRoot)) {
+            boundaryRoot = this.createCropContainer('boundary-root');
+            this.layers.boundaries.add(boundaryRoot);
+          }
+        }
+
+        for (let i = 0; i < boundariesToDraw.length; i++) {
+          const boundary = boundariesToDraw[i];
+          const h = this.settings.lineheight;
+
+          const foundBoundary = this.layers.boundaries.findOne(`#boundary_${boundary.id}`);
+          if (!isUnset(foundBoundary)) {
+            foundBoundary.remove();
+          }
+
+          const boundaryObj = new Konva.Line({
+            id: `boundary_${boundary.id}`,
+            strokeWidth: this.settings.boundaries.width,
+            stroke: this.settings.boundaries.color,
+            points: [boundary.x, boundary.y, boundary.x, boundary.y + h],
+            transformsEnabled: 'position'
+          });
+
+          boundaryObj.on('mousedown', () => {
+            if (!this.settings.boundaries.readonly) {
+              this.av.dragableBoundaryNumber = boundary.num;
+            }
+          });
+          boundaryObj.on('mouseenter', () => {
+            this.mouseStatus = 'move';
+          });
+          boundaryObj.on('mouseleave', () => {
+            this.mouseStatus = 'auto';
+          });
+
+          boundaryRoot.add(boundaryObj);
+          drawnBoundaries++;
+        }
       }
     }
   }

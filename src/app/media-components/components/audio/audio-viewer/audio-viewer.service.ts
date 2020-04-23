@@ -160,8 +160,8 @@ export class AudioViewerService {
           this.mouseClickPos = absXInTime.clone();
 
           this.audioChunk.startpos = this.mouseClickPos.clone();
-          this.audioChunk.selection.start = this.audioChunk.selection.start.clone();
-          this.audioChunk.selection.end = this.audioChunk.selection.start.clone();
+          this.audioChunk.selection.start = absXInTime.clone();
+          this.audioChunk.selection.end = absXInTime.clone();
           this._drawnSelection = this.audioChunk.selection.clone();
 
           if (this._dragableBoundaryNumber > -1) {
@@ -502,11 +502,15 @@ export class AudioViewerService {
         } else if (selAbsEnd <= absEnd) {
           result.end = selAbsEnd - (lineNum * innerWidth);
         }
+        if (result.start > result.end) {
+          const tmp = result.start;
+          result.start = result.end;
+          result.end = tmp;
+        }
         return result;
-      } else {
-        return {start: -3, end: -1};
       }
     }
+    return {start: -3, end: -1};
   }
 
   /**

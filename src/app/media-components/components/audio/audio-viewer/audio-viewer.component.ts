@@ -289,21 +289,14 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     };
 
     this.stage.on('wheel', this.onWheel);
-    this.konvaContainer.nativeElement.addEventListener('mousemove', (event) => {
-      this.onMouseMove({
-        evt: event
-      });
-    });
-    this.konvaContainer.nativeElement.addEventListener('mousedown', (event) => {
-      this.mouseChange({
-        evt: event
-      });
-    });
-    this.konvaContainer.nativeElement.addEventListener('mouseup', (event) => {
-      this.mouseChange({
-        evt: event
-      });
-    });
+
+    this.konvaContainer.nativeElement.removeEventListener('mousemove', this.onMouseMove);
+    this.konvaContainer.nativeElement.addEventListener('mousemove', this.onMouseMove);
+
+    this.konvaContainer.nativeElement.removeEventListener('mousedown', this.mouseChange);
+    this.konvaContainer.nativeElement.addEventListener('mousedown', this.mouseChange);
+    this.konvaContainer.nativeElement.removeEventListener('mouseup', this.mouseChange);
+    this.konvaContainer.nativeElement.addEventListener('mouseup', this.mouseChange);
 
     for (const attr in this.layers) {
       if (this.layers.hasOwnProperty(attr)) {
@@ -316,8 +309,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     // focus it
     // also stage will be in focus on its click
     container.focus();
+    container.removeEventListener('keydown', this.onKeyDown);
     container.addEventListener('keydown', this.onKeyDown);
+    container.removeEventListener('mouseleave', this.onMouseLeave);
     container.addEventListener('mouseleave', this.onMouseLeave);
+    container.removeEventListener('mouseenter', this.onMouseEnter);
     container.addEventListener('mouseenter', this.onMouseEnter);
 
     window.onresize = () => {
@@ -1247,17 +1243,17 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   private mouseChange = (event) => {
-    const absXPos = this.hoveredLine * this.av.innerWidth + event.evt.layerX;
+    const absXPos = this.hoveredLine * this.av.innerWidth + event.layerX;
 
     if (!isUnset(absXPos) && absXPos > 0 && this.settings.selection.enabled) {
-      if (event.evt.type === 'mousedown') {
+      if (event.type === 'mousedown') {
         this.audioChunk.selection.start = this.audioChunk.absolutePlayposition.clone();
         this.audioChunk.selection.end = this.audioChunk.absolutePlayposition.clone();
         this.av.drawnSelection = this.audioChunk.selection.clone();
       }
 
       if (!isUnset(absXPos)) {
-        this.av.setMouseClickPosition(absXPos, this.hoveredLine, event.evt).then(() => {
+        this.av.setMouseClickPosition(absXPos, this.hoveredLine, event).then(() => {
           this.updatePlayCursor();
           this.layers.playhead.draw();
         });
@@ -1265,7 +1261,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         console.error(`absX is unset!`);
       }
 
-      if (event.evt.type !== 'mousedown') {
+      if (event.type !== 'mousedown') {
         this.selchange.emit(this.audioChunk.selection);
       }
 
@@ -1372,6 +1368,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
         this.layers.background.batchDraw();
       }
+    } else {
+      console.log(`no draw`);
     }
     return null;
   }
@@ -1389,6 +1387,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     // draw selection
     this.resetSelection();
     if (!(this.av.drawnSelection.duration.equals(this.audioChunk.time.duration)) && this.av.drawnSelection.duration.samples !== 0) {
+      this.av.drawnSelection.checkSelection();
       const selStart = this.av.audioTCalculator.samplestoAbsX(this.av.drawnSelection.start);
       const selEnd = this.av.audioTCalculator.samplestoAbsX(this.av.drawnSelection.end);
       const lineNum1 = (this.av.innerWidth < this.AudioPxWidth) ? Math.floor(selStart / this.av.innerWidth) : 0;
@@ -1444,12 +1443,12 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   private onMouseMove = (event) => {
     if (!isUnset(this.canvasElements.mouseCaret)) {
-      const tempLine = this.getLineNumber(event.evt.layerX, event.evt.layerY + Math.abs(this.layers.background.y()));
+      const tempLine = this.getLineNumber(event.layerX, event.layerY + Math.abs(this.layers.background.y()));
       this.hoveredLine = (tempLine > -1) ? tempLine : this.hoveredLine;
-      const absXPos = this.hoveredLine * this.av.innerWidth + event.evt.layerX;
+      const absXPos = this.hoveredLine * this.av.innerWidth + event.layerX;
 
       this.canvasElements.mouseCaret.position({
-        x: event.evt.layerX,
+        x: event.layerX,
         y: this.hoveredLine * (this.settings.lineheight + this.settings.margin.top)
       });
       this.layers.playhead.batchDraw();

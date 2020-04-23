@@ -28,9 +28,7 @@ import {OCTRAEditor} from '../octra-editor';
 import {AudioviewerConfig} from '../../media-components/components/audio/audio-viewer/audio-viewer.config';
 import {AudioChunk, AudioManager} from '../../media-components/obj/audio/AudioManager';
 import {AudioViewerComponent} from '../../media-components/components/audio/audio-viewer/audio-viewer.component';
-import {AudioSelection} from '../../media-components/obj/audio';
-import {AVMousePos} from '../../media-components/obj/audio/AVMousePos';
-import {timeout} from 'rxjs/operators';
+import {AudioSelection, SampleUnit} from '../../media-components/obj/audio';
 
 @Component({
   selector: 'app-signal-gui',
@@ -283,7 +281,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   ngAfterViewInit() {
     this.cd.detectChanges();
     if (this.appStorage.showLoupe) {
-      this.miniloupe.av.zoomY = this.factor;
+      // this.miniloupe.av.zoomY = this.factor;
     }
 
     this.subscrManager.add(
@@ -327,7 +325,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.saving = false;
   }
 
-  onMouseOver(cursor: AVMousePos) {
+  onMouseOver(cursor: SampleUnit) {
     if (!(this.mouseTimer === null || this.mouseTimer === undefined)) {
       window.clearTimeout(this.mouseTimer);
     }
@@ -428,7 +426,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
         if (!component.audioChunk.isPlaying) {
           if ($event.type === 'boundary') {
-            playPosition = component.av.MouseClickPos.timePos
+            playPosition = component.av.MouseClickPos
           }
         }
 
@@ -446,8 +444,8 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       if (this.selectedIndex > 0) {
         startSamples = this.transcrService.currentlevel.segments.get(this.selectedIndex - 1).time.samples;
       }
-      if (this.loupe.av.MouseClickPos.timePos.samples < startSamples
-        || this.loupe.av.MouseClickPos.timePos.samples > endSamples) {
+      if (this.loupe.av.MouseClickPos.samples < startSamples
+        || this.loupe.av.MouseClickPos.samples > endSamples) {
         this.segmentselected = false;
       }
     }

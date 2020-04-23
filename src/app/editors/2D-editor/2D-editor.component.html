@@ -39,9 +39,11 @@
                           [easyMode]="appStorage.easymode"
   ></octra-audio-navigation>
   <div *ngIf="appStorage.showLoupe" (mouseenter)="loupeHidden = false;" (mouseleave)="loupeHidden = true;">
-    <octra-audio-viewer #loupe (mousemove)="onCircleLoupeMouseOver($event)" [ngStyle]="{
+    <octra-audio-viewer #loupe
+                        (mousemove)="onCircleLoupeMouseOver($event)"
+                        [height]="miniloupe.size.height"
+                        [ngStyle]="{
         'width': miniloupe.size.width + 'px',
-        'height': miniloupe.size.height + 'px',
         'position':'absolute',
         'margin-left':miniloupe.location.x + 'px',
         'margin-top':miniloupe.location.y + 'px',
@@ -51,15 +53,18 @@
         'flex': 'auto',
         'flex-direction': 'column'}"
                         [audioChunk]="audioChunkLoupe"
-                        [isMultiLine]="true"
+                        [transcriptionLevel]="transcrService.currentlevel"
+                        [settings]="miniLoupeSettings"
+                        [isMultiLine]="false"
+                        [breakMarker]="{
+                        code: '<P>'
+                      }"
     ></octra-audio-viewer>
   </div>
   <div id="lines-wrapper" #linesView>
     <octra-audio-viewer #viewer id="special"
                         (segmententer)="onSegmentEntered($event)"
                         (mousecursorchange)="onMouseOver($event);"
-                        (mousemove)="changePosition($event.layerX, $event.layerY)"
-                        (mouseleave)="loupeHidden = true;"
                         (shortcuttriggered)="onShortCutTriggered($event, 'multi-lines-viewer')"
                         [audioChunk]="audioChunkLines"
                         [isMultiLine]="true"

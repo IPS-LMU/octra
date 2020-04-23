@@ -24,10 +24,10 @@ import {Timespan2Pipe} from '../../../pipe/timespan2.pipe';
 import {KeyMapping} from '../../../obj/key-mapping';
 import {BrowserInfo} from '../../../obj/browser-info';
 import {PlayCursor} from '../../../obj/PlayCursor';
-import {AVMousePos} from '../../../obj/audio/AVMousePos';
 import {Context} from 'konva/types/Context';
 import {ASRQueueItemType} from '../../../obj/annotation/asr';
 import {isUnset} from '../../../../core/shared/Functions';
+import Vector2d = Konva.Vector2d;
 
 @Component({
   selector: 'octra-audio-viewer',
@@ -66,12 +66,36 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     this.init();
   }
 
+  public get mouseCursor(): {
+    location: Vector2d,
+    size: {
+      height: number;
+      width: number;
+    }
+  } {
+    if (isUnset(this.canvasElements.mouseCaret)) {
+      return {
+        location: {
+          x: 0, y: 0
+        },
+        size: {
+          width: 0, height: 0
+        }
+      };
+    } else {
+      return {
+        location: this.canvasElements.mouseCaret.position(),
+        size: this.canvasElements.mouseCaret.size()
+      };
+    }
+  }
+
   @Output() shortcuttriggered = new EventEmitter<any>();
   @Output() alerttriggered = new EventEmitter<{ type: string, message: string }>();
   @Output() selchange = new EventEmitter<AudioSelection>();
   @Output() playcursorchange = new EventEmitter<PlayCursor>();
   @Output() segmententer: EventEmitter<any> = new EventEmitter<any>();
-  @Output() mousecursorchange = new EventEmitter<AVMousePos>();
+  @Output() mousecursorchange = new EventEmitter<SampleUnit>();
 
   @ViewChild('konvaContainer', {static: true}) konvaContainer: ElementRef;
 
@@ -198,11 +222,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.hasOwnProperty('audioChunk') && changes.audioChunk.currentValue !== null) {
-      console.log(`chunk updated`);
       this.afterChunkUpdated();
     }
     if (changes.hasOwnProperty('transcriptionLevel') && changes.transcriptionLevel.currentValue !== null) {
-      console.log(`level updated`);
       this.afterLevelUpdated();
     }
 
@@ -318,7 +340,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   afterChunkUpdated() {
     if (!(this.audioChunk === null || this.audioChunk === undefined)) {
-      console.log(`channel audiochunk updated`);
       this.subscrManager.removeByTag('audioChunkStatusChange');
       this.subscrManager.removeByTag('audioChunkChannelFinished');
 
@@ -344,7 +365,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
           resolve();
         }
       }).then(() => {
-        console.log(`channel ok`);
         this.av.initialize(this.width - (this.settings.margin.left + this.settings.margin.right), this.audioChunk, this._transcriptionLevel);
         this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
 
@@ -403,11 +423,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   public initializeView() {
-    console.log(`initializeView`);
     this.onInitialized.complete();
     for (const attr in this.layers) {
       if (this.layers.hasOwnProperty(attr)) {
         this.layers['' + attr].removeChildren();
+        this.audioManager.createSampleUnit(0)
       }
     }
     if (this.settings.multiLine) {
@@ -471,7 +491,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       this.layers.scrollBars.add(this.canvasElements.scrollBar);
     }
 
-    this.stage.draw();
+    this.stage.batchDraw();
   }
 
   private onPlaybackStarted() {
@@ -698,9 +718,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     });
 
     const croppingData = {
-      x: this.av.innerWidth / 2,
-      y: this.av.innerWidth / 2,
-      radius: this.av.innerWidth / 2
+      x: (this.av.innerWidth - 10) / 2 + 2,
+      y: (this.av.innerWidth - 10) / 2 + 2,
+      radius: (this.av.innerWidth - 10) / 2
     };
     const cropGroup = new Konva.Group({
       clipFunc: (ctx) => {
@@ -730,9 +750,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         y: croppingData.y,
         radius: croppingData.radius,
         shadowColor: 'black',
+        shadowEnabled: true,
         shadowBlur: 5,
         shadowOffset: {x: 2.5, y: 0},
-        shadowOpacity: 0.8
+        shadowOpacity: 1
       });
       result.add(shadowCircle);
       result.add(cropGroup);
@@ -917,9 +938,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
       if (this.settings.cropping === 'circle') {
         const croppingData = {
-          x: this.av.innerWidth / 2 + this.settings.margin.left,
-          y: this.av.innerWidth / 2 + this.settings.margin.top,
-          radius: this.av.innerWidth / 2
+          x: (this.av.innerWidth - 10) / 2 + 2 + this.settings.margin.left,
+          y: (this.av.innerWidth - 10) / 2 + 2 + this.settings.margin.top,
+          radius: (this.av.innerWidth - 10) / 2
         };
         const cropGroup = new Konva.Group({
           clipFunc: (ctx) => {
@@ -1164,7 +1185,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
           });
 
           this.layers.boundaries.add(boundaryObj);
-          // boundaryObj.moveToTop();
           drawnBoundaries++;
         }
       }
@@ -1227,8 +1247,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
       if (!isUnset(absXPos)) {
         this.av.setMouseClickPosition(absXPos, this.hoveredLine, event.evt).then(() => {
-          const test = this.audioChunk.absolutePlayposition;
-          const test2 = this.audioChunk.relativePlayposition;
           this.updatePlayCursor();
           this.layers.playhead.draw();
         });
@@ -1434,6 +1452,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         this.drawWholeSelection();
       }
 
+      this.mousecursorchange.emit(this.av.mouseCursor);
       this.stage.container().focus();
       this.focused = true;
     }
@@ -1526,7 +1545,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   break;
                 case('set_break'):
                   if (this.settings.boundaries.enabled && this.focused) {
-                    const xSamples = this.av.mouseCursor.timePos.clone();
+                    const xSamples = this.av.mouseCursor.clone();
 
                     if (xSamples !== null) {
                       const segmentI = this._transcriptionLevel.segments.getSegmentBySamplePosition(xSamples);
@@ -1554,9 +1573,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   if (this.focused) {
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'audio'});
 
-                    const xSamples = this.av.mouseCursor.timePos.clone();
+                    const xSamples = this.av.mouseCursor.clone();
 
-                    const boundarySelect = this.av.getSegmentSelection(this.av.mouseCursor.timePos.samples);
+                    const boundarySelect = this.av.getSegmentSelection(this.av.mouseCursor.samples);
                     if (boundarySelect) {
                       const segmentI = this._transcriptionLevel.segments.getSegmentBySamplePosition(
                         xSamples);
@@ -1657,12 +1676,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   }
                   break;
                 case('segment_enter'):
-                  console.log(`${this.settings.boundaries.enabled} && ${!this.settings.boundaries.readonly} && ${this.focused}`);
                   if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this.focused) {
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'segment'});
 
                     const segInde = this._transcriptionLevel.segments.getSegmentBySamplePosition(
-                      this.av.mouseCursor.timePos
+                      this.av.mouseCursor
                     );
                     this.selectSegment(segInde,
                       (posY1, posY2) => {
@@ -1689,7 +1707,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                     // move cursor to left
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'mouse'});
                     this.av.moveCursor('left', this.settings.stepWidthRatio * this.audioManager.sampleRate);
-                    this.changeMouseCursorSamples(this.av.mouseCursor.timePos);
+                    this.changeMouseCursorSamples(this.av.mouseCursor);
                     this.mousecursorchange.emit(this.av.mouseCursor);
                     keyActive = true;
                   }
@@ -1700,7 +1718,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'mouse'});
 
                     this.av.moveCursor('right', this.settings.stepWidthRatio * this.audioManager.sampleRate);
-                    this.changeMouseCursorSamples(this.av.mouseCursor.timePos);
+                    this.changeMouseCursorSamples(this.av.mouseCursor);
                     this.mousecursorchange.emit(this.av.mouseCursor);
                     keyActive = true;
                   }

@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {AudioSelection, AudioTimeCalculator, PlayBackStatus, SampleUnit} from '../../../obj/audio';
 import {PlayCursor} from '../../../obj/PlayCursor';
 import {AudioChunk, AudioManager} from '../../../obj/audio/AudioManager';
-import {AVMousePos} from '../../../obj/audio/AVMousePos';
 import {SubscriptionManager} from '../../../obj/SubscriptionManager';
 import {AudioviewerConfig} from './audio-viewer.config';
 import {Level} from '../../../obj/annotation';
@@ -33,9 +32,9 @@ export class AudioViewerService {
     return this._innerWidth;
   }
 
-  private _mouseCursor: AVMousePos;
+  private _mouseCursor: SampleUnit;
 
-  get mouseCursor(): AVMousePos {
+  get mouseCursor(): SampleUnit {
     return this._mouseCursor;
   }
 
@@ -45,10 +44,6 @@ export class AudioViewerService {
 
   public breakMarker: any;
 
-  set mouseCursor(newPos: AVMousePos) {
-    this._mouseCursor = newPos;
-  }
-
   set drawnSelection(value: AudioSelection) {
     this._drawnSelection = value;
   }
@@ -57,11 +52,7 @@ export class AudioViewerService {
     return this._mouseDown;
   }
 
-  protected mouseClickPos: AVMousePos = new AVMousePos(
-    0,
-    0,
-    null
-  );
+  protected mouseClickPos: SampleUnit = null;
   protected playcursor: PlayCursor = null;
   // AUDIO
   protected audioPxW = 0;
@@ -84,11 +75,11 @@ export class AudioViewerService {
     return this.audioPxW;
   }
 
-  get MouseClickPos(): AVMousePos {
+  get MouseClickPos(): SampleUnit {
     return this.mouseClickPos;
   }
 
-  set MouseClickPos(mouseClickPos: AVMousePos) {
+  set MouseClickPos(mouseClickPos: SampleUnit) {
     this.mouseClickPos = mouseClickPos;
   }
 
@@ -159,16 +150,16 @@ export class AudioViewerService {
   public setMouseClickPosition(absX: number, lineNum: number, $event: Event): Promise<number> {
     return new Promise<number>((resolve) => {
       const absXInTime = this.audioTCalculator.absXChunktoSampleUnit(absX, this.audioChunk);
-      this._mouseCursor.timePos = absXInTime.clone();
+      this._mouseCursor = absXInTime.clone();
 
       if (!this.audioManager.isPlaying) {
         // same line
         // fix margin settings
         if ($event.type === 'mousedown' && !this.shiftPressed) {
           // no line defined or same line
-          this.mouseClickPos.timePos = absXInTime.clone();
+          this.mouseClickPos = absXInTime.clone();
 
-          this.audioChunk.startpos = this.mouseClickPos.timePos.clone();
+          this.audioChunk.startpos = this.mouseClickPos.clone();
           this.audioChunk.selection.start = this.audioChunk.selection.start.clone();
           this.audioChunk.selection.end = this.audioChunk.selection.start.clone();
           this._drawnSelection = this.audioChunk.selection.clone();
@@ -260,8 +251,8 @@ export class AudioViewerService {
     if (this.AudioPxWidth > 0) {
       // initialize the default values
       this.audioTCalculator = new AudioTimeCalculator(this.audioChunk.time.duration, this.AudioPxWidth);
-      this.MouseClickPos = new AVMousePos(0, 0, new SampleUnit(0, this.audioChunk.sampleRate));
-      this._mouseCursor = new AVMousePos(0, 0, this.audioManager.createSampleUnit(0));
+      this.MouseClickPos = this.audioManager.createSampleUnit(0)
+      this._mouseCursor = this.audioManager.createSampleUnit(0);
       this.PlayCursor = new PlayCursor(0, new SampleUnit(0, this.audioChunk.sampleRate), this._innerWidth);
       this._drawnSelection = this.audioChunk.selection.clone();
       this._drawnSelection.end = this.drawnSelection.start.clone();
@@ -525,7 +516,7 @@ export class AudioViewerService {
     let absXTime = this.audioTCalculator.absXChunktoSampleUnit(absX, this.audioChunk);
 
     if (absXTime !== null) {
-      this.mouseCursor.timePos = absXTime.clone();
+      this._mouseCursor = absXTime.clone();
 
       // let dragableBoundaryTemp = (this.settings.boundaries.enabled && !this.settings.boundaries.readonly) ? this.getBoundaryNumber(absX) : -1;
 
@@ -583,7 +574,7 @@ export class AudioViewerService {
 
     if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly) {
       const absXTime = (!this.audioChunk.isPlaying)
-        ? this._mouseCursor.timePos.samples : this.audioChunk.absolutePlayposition.samples;
+        ? this._mouseCursor.samples : this.audioChunk.absolutePlayposition.samples;
       let bWidthTime = this.audioTCalculator.absXtoSamples2(this.settings.boundaries.width * 2, this.audioChunk);
       bWidthTime = Math.round(bWidthTime);
 
@@ -714,18 +705,18 @@ export class AudioViewerService {
    */
   public moveCursor(direction: string, samples: number) {
     if (samples > 0) {
-      const mouseCursorPosition = this._mouseCursor.timePos.samples;
+      const mouseCursorPosition = this._mouseCursor.samples;
       if ((direction === 'left' || direction === 'right') &&
         ((mouseCursorPosition >= this.audioChunk.time.start.samples + samples && direction === 'left')
           || (mouseCursorPosition <= this.audioChunk.time.end.samples - samples && direction === 'right')
         )) {
         if (direction === 'left') {
-          if (this._mouseCursor.timePos.samples >= this.audioChunk.time.start.samples + samples) {
-            this._mouseCursor.timePos = this._mouseCursor.timePos.sub(this.audioManager.createSampleUnit(samples));
+          if (this._mouseCursor.samples >= this.audioChunk.time.start.samples + samples) {
+            this._mouseCursor = this._mouseCursor.sub(this.audioManager.createSampleUnit(samples));
           }
         } else if (direction === 'right') {
-          if (this._mouseCursor.timePos.samples <= this.audioChunk.time.end.samples - samples) {
-            this._mouseCursor.timePos = this._mouseCursor.timePos.add(this.audioManager.createSampleUnit(samples));
+          if (this._mouseCursor.samples <= this.audioChunk.time.end.samples - samples) {
+            this._mouseCursor = this._mouseCursor.add(this.audioManager.createSampleUnit(samples));
           }
         }
       }

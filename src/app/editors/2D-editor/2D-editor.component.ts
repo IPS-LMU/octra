@@ -38,6 +38,9 @@ import {AudioChunk, AudioManager} from '../../media-components/obj/audio/AudioMa
 import {AudioSelection, PlayBackStatus, SampleUnit} from '../../media-components/obj/audio';
 import {OAudiofile, OSegment, Segment} from '../../media-components/obj/annotation';
 import {ASRQueueItemType} from '../../media-components/obj/annotation/asr';
+import {AudioviewerConfig} from '../../media-components/components/audio/audio-viewer/audio-viewer.config';
+import Konva from 'konva';
+import Vector2d = Konva.Vector2d;
 
 @Component({
   selector: 'app-overlay-gui',
@@ -90,6 +93,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   private factor = 8;
   private scrolltimer: Subscription = null;
   private shortcuts: any = {};
+  public miniLoupeSettings: AudioviewerConfig;
 
   private authWindow: Window = null;
 
@@ -157,6 +161,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               private cd: ChangeDetectorRef,
               private langService: TranslocoService) {
     super();
+    this.miniLoupeSettings = new AudioviewerConfig();
 
     this.subscrmanager = new SubscriptionManager();
   }
@@ -165,7 +170,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     console.log(`2D-EDITOR INIT!`);
     this.audioManager = this.audio.audiomanagers[0];
     this.audioChunkLines = this.audioManager.mainchunk.clone();
-    this.audioChunkLoupe = this.audioManager.mainchunk.clone();
     this.audioChunkWindow = this.audioManager.mainchunk.clone();
     this.shortcuts = this.keyMap.register('2D-Editor', this.viewer.settings.shortcuts);
     this.keyMap.register('Transcription Window', this.windowShortcuts);
@@ -185,6 +189,12 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.viewer.height = this.linesViewHeight;
 
     this.viewer.secondsPerLine = this.appStorage.secondsPerLine;
+
+    this.miniLoupeSettings.roundValues = false;
+    this.miniLoupeSettings.boundaries.readonly = true;
+    this.miniLoupeSettings.asr.enabled = false;
+    this.miniLoupeSettings.cropping = 'circle';
+    this.audioChunkLoupe = this.audioManager.mainchunk.clone();
 
     this.viewer.alerttriggered.subscribe(
       (result) => {
@@ -484,7 +494,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   onSegmentSelected() {
   }
 
-  onMouseOver(event) {
+  onMouseOver(cursor: SampleUnit) {
     if (!(this.mouseTimer === null || this.mouseTimer === undefined)) {
       window.clearTimeout(this.mouseTimer);
     }
@@ -500,39 +510,30 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       });*/
     }
 
-    // TODO important CHANGE?
-    /*
     if (this.appStorage.showLoupe) {
-      const lastlinevisible: Line = this.viewer.av.LinesArray[this.viewer.av.LinesArray.length - 1];
-      if (!isNullOrUndefined(lastlinevisible) && this.miniloupe.location.y <= (lastlinevisible.Pos.y - this.viewer.viewRect.position.y +
-        lastlinevisible.Size.height + this.viewer.margin.top + this.viewer.margin.bottom)) {
-        this.loupeHidden = false;
-        this.mouseTimer = window.setTimeout(() => {
-          this.changeArea(this.loupe, this.miniloupe, this.factor);
-          this.mousestate = 'ended';
-
-        }, 50);
-      } else {
-        this.loupeHidden = true;
-      }
-    }*/
+      this.loupeHidden = false;
+      // TODO change this
+      this.mouseTimer = window.setTimeout(() => {
+        this.changeLoupePosition(this.viewer.mouseCursor, cursor);
+        this.mousestate = 'ended';
+      }, 50);
+    }
   }
 
-  public changePosition(x: number, y: number) {
-    const fullY = y + this.miniloupe.size.height;
+  public changeLoupePosition(cursor: { location: Vector2d, size: { width: number, height: number } }, cursorTime: SampleUnit) {
+    const fullY = cursor.location.y + this.miniloupe.size.height;
 
-    // TODO important change?
-    /*
-    if (fullY < this.viewer.size.height) {
+    if (fullY < this.viewer.height) {
       // loupe is fully visible
-      this.miniloupe.location.y = y + 20;
-      this.miniloupe.location.x = x - (this.miniloupe.size.width / 2);
+      this.miniloupe.location.y = cursor.location.y - 10 + cursor.size.height;
+      this.miniloupe.location.x = cursor.location.x - ((this.miniloupe.size.width - 10) / 2);
     } else {
       // loupe out of the bottom border of view rectangle
-      this.miniloupe.location.y = y - 20 - this.miniloupe.size.height;
-      this.miniloupe.location.x = x - (this.miniloupe.size.width / 2);
+      this.miniloupe.location.y = cursor.location.y + 10 - this.miniloupe.size.height;
+      this.miniloupe.location.x = cursor.location.x - ((this.miniloupe.size.width - 10) / 2);
     }
-     */
+    this.loupeHidden = false;
+    this.changeArea(this.loupe, this.miniloupe, cursorTime, this.factor);
     this.cd.detectChanges();
   }
 
@@ -541,7 +542,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       || $event.value === 'do_asr_maus' || $event.value === 'cancel_asr_maus'
       || $event.value === 'do_maus' || $event.value === 'cancel_maus'
     ) && $event.type === 'segment') {
-      const segmentNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(this.viewer.av.MouseClickPos.timePos);
+      const segmentNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(this.viewer.av.MouseClickPos);
 
       if (segmentNumber > -1) {
         if (!isUnset(this.asrService.selectedLanguage)) {
@@ -625,7 +626,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       let playPosition = this.audioManager.playposition;
       if (!this.audioChunkLines.isPlaying) {
         if ($event.type === 'boundary') {
-          playPosition = this.viewer.av.MouseClickPos.timePos
+          playPosition = this.viewer.av.MouseClickPos
         }
       }
 
@@ -719,17 +720,16 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       x: number,
       y: number
     }
-  }, factor: number) {
-    const cursor = this.viewer.av.MouseClickPos;
-
-    if (cursor && cursor.timePos) {
+  }, cursorTime: SampleUnit, factor: number) {
+    const cursorLocation = this.viewer.mouseCursor;
+    if (cursorLocation && cursorTime) {
       const halfRate = Math.round(this.audioManager.sampleRate / factor);
-      const start = (cursor.timePos.samples > halfRate)
-        ? this.audioManager.createSampleUnit(cursor.timePos.samples - halfRate)
+      const start = (cursorTime.samples > halfRate)
+        ? this.audioManager.createSampleUnit(cursorTime.samples - halfRate)
         : this.audioManager.createSampleUnit(0);
 
-      const end = (cursor.timePos.samples < this.audioManager.ressource.info.duration.samples - halfRate)
-        ? this.audioManager.createSampleUnit(cursor.timePos.samples + halfRate)
+      const end = (cursorTime.samples < this.audioManager.ressource.info.duration.samples - halfRate)
+        ? this.audioManager.createSampleUnit(cursorTime.samples + halfRate)
         : this.audioManager.ressource.info.duration.clone();
 
       loup.av.zoomY = factor;

@@ -38,7 +38,7 @@
                               }"
                           [easyMode]="appStorage.easymode"
   ></octra-audio-navigation>
-  <div *ngIf="appStorage.showLoupe" (mouseenter)="loupeHidden = false;" (mouseleave)="loupeHidden = true;">
+  <div *ngIf="appStorage.showLoupe">
     <octra-audio-viewer #loupe
                         (mousemove)="onCircleLoupeMouseOver($event)"
                         [height]="miniloupe.size.height"

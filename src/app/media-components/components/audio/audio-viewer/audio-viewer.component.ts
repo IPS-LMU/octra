@@ -97,7 +97,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   @Output() selchange = new EventEmitter<AudioSelection>();
   @Output() playcursorchange = new EventEmitter<PlayCursor>();
   @Output() segmententer: EventEmitter<any> = new EventEmitter<any>();
-  @Output() mousecursorchange = new EventEmitter<SampleUnit>();
+  @Output() mousecursorchange = new EventEmitter<{
+    event: MouseEvent,
+    time: SampleUnit
+  }>();
 
   @ViewChild('konvaContainer', {static: true}) konvaContainer: ElementRef;
 
@@ -485,6 +488,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     if (this.settings.cropping === 'circle') {
       const cropGroup = this.createCropContainer();
       this.layers.playhead.removeChildren();
+      this.canvasElements.mouseCaret.position({
+        x: this.croppingData.radius + 2,
+        y: 2
+      });
+
       cropGroup.add(this.canvasElements.playHead);
       cropGroup.add(this.canvasElements.mouseCaret);
       this.layers.playhead.add(cropGroup);
@@ -1462,7 +1470,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         this.drawWholeSelection();
       }
 
-      this.mousecursorchange.emit(this.av.mouseCursor);
+      this.mousecursorchange.emit({
+        event: event,
+        time: this.av.mouseCursor
+      });
       this.stage.container().focus();
       this.focused = true;
     }
@@ -1718,7 +1729,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'mouse'});
                     this.av.moveCursor('left', this.settings.stepWidthRatio * this.audioManager.sampleRate);
                     this.changeMouseCursorSamples(this.av.mouseCursor);
-                    this.mousecursorchange.emit(this.av.mouseCursor);
+                    this.mousecursorchange.emit({
+                      event: null,
+                      time: this.av.mouseCursor
+                    });
                     keyActive = true;
                   }
                   break;
@@ -1729,7 +1743,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
                     this.av.moveCursor('right', this.settings.stepWidthRatio * this.audioManager.sampleRate);
                     this.changeMouseCursorSamples(this.av.mouseCursor);
-                    this.mousecursorchange.emit(this.av.mouseCursor);
+                    this.mousecursorchange.emit({
+                      event: null,
+                      time: this.av.mouseCursor
+                    });
                     keyActive = true;
                   }
                   break;

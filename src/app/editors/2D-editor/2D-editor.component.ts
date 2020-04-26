@@ -494,7 +494,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   onSegmentSelected() {
   }
 
-  onMouseOver(cursor: SampleUnit) {
+  onMouseOver($event: {
+    event: MouseEvent | null
+    time: SampleUnit
+  }) {
     if (!(this.mouseTimer === null || this.mouseTimer === undefined)) {
       window.clearTimeout(this.mouseTimer);
     }
@@ -514,23 +517,24 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       this.loupeHidden = false;
       // TODO change this
       this.mouseTimer = window.setTimeout(() => {
-        this.changeLoupePosition(this.viewer.mouseCursor, cursor);
+        this.changeLoupePosition($event.event, $event.time);
         this.mousestate = 'ended';
-      }, 50);
+      }, 33);
     }
   }
 
-  public changeLoupePosition(cursor: { location: Vector2d, size: { width: number, height: number } }, cursorTime: SampleUnit) {
-    const fullY = cursor.location.y + this.miniloupe.size.height;
+  public changeLoupePosition(mouseEvent: MouseEvent, cursorTime: SampleUnit) {
+    const fullY = mouseEvent.layerY + 20 + this.miniloupe.size.height;
+    const x = mouseEvent.layerX - ((this.miniloupe.size.width - 10) / 2) - 2;
 
     if (fullY < this.viewer.height) {
       // loupe is fully visible
-      this.miniloupe.location.y = cursor.location.y - 10 + cursor.size.height;
-      this.miniloupe.location.x = cursor.location.x - ((this.miniloupe.size.width - 10) / 2);
+      this.miniloupe.location.y = mouseEvent.layerY + 20;
+      this.miniloupe.location.x = x;
     } else {
       // loupe out of the bottom border of view rectangle
-      this.miniloupe.location.y = cursor.location.y + 10 - this.miniloupe.size.height;
-      this.miniloupe.location.x = cursor.location.x - ((this.miniloupe.size.width - 10) / 2);
+      this.miniloupe.location.y = mouseEvent.layerY - 20 - this.miniloupe.size.height;
+      this.miniloupe.location.x = x;
     }
     this.loupeHidden = false;
     this.changeArea(this.loupe, this.miniloupe, cursorTime, this.factor);

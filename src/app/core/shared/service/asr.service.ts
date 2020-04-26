@@ -202,7 +202,7 @@ class ASRQueue {
     if (index > -1) {
       this._queue.splice(index, 1);
     } else {
-      console.error(`could not remove queueItem with id ${id}`);
+      console.error(`queueItem with id ${id} does not exist and can't be removed.`);
     }
   }
 
@@ -449,6 +449,9 @@ export class ASRQueueItem {
         console.log(`CALL ASR ONLY`);
         this.transcribeSignalWithASR('txt').then(() => {
           this.changeStatus(ASRProcessStatus.FINISHED);
+        }).catch((error) => {
+          console.error(`ASR only failed`);
+          console.error(error);
         });
       } else if (this._type === ASRQueueItemType.ASRMAUS) {
         console.log(`CALL ASR MAUS`);
@@ -473,6 +476,9 @@ export class ASRQueueItem {
             console.error(error);
             this.changeStatus(ASRProcessStatus.FAILED);
           });
+        }).catch((error) => {
+          console.error(`ASR MAUS failed`);
+          console.error(error);
         });
       } else if (this._type === ASRQueueItemType.MAUS) {
         console.log(`call MAUS only`);
@@ -576,11 +582,10 @@ export class ASRQueueItem {
           }
         },
         (error) => {
-          console.log(JSON.stringify(error));
           if (error.message.indexOf('0 Unknown Error') > -1) {
             this.changeStatus(ASRProcessStatus.NOAUTH);
           }
-          reject(error.message);
+          reject(`Authentication needed`);
         });
     });
   }

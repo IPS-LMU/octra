@@ -201,7 +201,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.editor.Settings.markers = this.transcrService.guidelines.markers;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.special_markers.boundary = true;
-    this.loupe.viewer.name = 'transcription window';
+    this.loupe.name = 'transcr-window viewer';
     this.loupeSettings.justifySignalHeight = true;
     this.loupeSettings.boundaries.enabled = false;
     this.loupeSettings.boundaries.readonly = true;

@@ -343,7 +343,7 @@ export class AudioviewerService extends AudioComponentService {
         this.mousecursor.timePos.browserSample.clone()
       );
       const segment = this.transcrService.currentlevel.segments.get(segmentI);
-      isBlocked = !isNullOrUndefined(segment.isBlockedBy);
+      isBlocked = !isNullOrUndefined(segment) && !isNullOrUndefined(segment.isBlockedBy);
     }
 
     if (!isBlocked && !(line === null || line === undefined) && this.Settings.boundaries.enabled && !this.Settings.boundaries.readonly) {
@@ -355,7 +355,7 @@ export class AudioviewerService extends AudioComponentService {
       if (this.transcrService.currentlevel.segments.length > 0 && !this.audiochunk.isPlaying) {
         for (i = 0; i < this.transcrService.currentlevel.segments.length; i++) {
           const segment = this.transcrService.currentlevel.segments.get(i);
-          if ((segment.time.browserSample.value >= absXTime - bWidthTime
+          if (!isNullOrUndefined(segment) && (segment.time.browserSample.value >= absXTime - bWidthTime
             && segment.time.browserSample.value <= absXTime + bWidthTime)
             && segment.time.browserSample.value !== this.audiomanager.ressource.info.duration.browserSample.value
           ) {

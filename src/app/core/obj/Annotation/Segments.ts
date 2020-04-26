@@ -60,7 +60,7 @@ export class Segments {
     }) === undefined) {
       this.segments.push(newSegment);
     } else {
-      console.error(`segment with this timestamp already exists!`);
+      console.error(`Segment with timestamp ${time.browserSample.seconds} already exists and can not be added.`);
     }
     this.sort();
     this.cleanup();

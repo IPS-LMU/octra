@@ -111,7 +111,11 @@ export class AsrService {
       );
 
       if (segNumber > -1) {
-        this.transcrService.currentlevel.segments.get(segNumber).isBlockedBy = null;
+        const segment = this.transcrService.currentlevel.segments.get(segNumber);
+
+        if (!isNullOrUndefined(segment)) {
+          segment.isBlockedBy = null;
+        }
         item.stopProcessing();
       } else {
         console.error(new Error(`could not find segment.`));

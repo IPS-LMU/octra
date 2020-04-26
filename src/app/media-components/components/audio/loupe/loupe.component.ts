@@ -140,7 +140,10 @@ export class LoupeComponent implements OnInit, AfterViewInit, OnDestroy, OnChang
 
   public update(compute = true) {
     this.viewer.name = this._name;
-    this.viewer.update(compute);
+    this.viewer.update(compute).catch((error) => {
+      console.error(`could not update GUI for ${this._name}`);
+      console.error(error);
+    });
   }
 
   onButtonClick(event: { type: string, timestamp: number }) {

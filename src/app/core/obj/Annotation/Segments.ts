@@ -2,6 +2,7 @@ import {Segment} from './Segment';
 import {EventEmitter} from '@angular/core';
 import {ISegment, OLabel, OSegment} from './AnnotJSON';
 import {BrowserAudioTime, BrowserSample, OriginalAudioTime} from '../../../media-components/obj/media/audio';
+import {isNullOrUndefined} from '../../shared/Functions';
 
 export class Segments {
   public onsegmentchange: EventEmitter<void> = new EventEmitter<void>();
@@ -107,7 +108,7 @@ export class Segments {
    * changes samples of segment by given index and sorts the List after adding
    */
   public change(i: number, segment: Segment): boolean {
-    if (i > -1 && this._segments[i]) {
+    if (i > -1 && !isNullOrUndefined(this._segments[i])) {
       const old = {
         samples: this._segments[i].time.browserSample.value,
         transcript: this._segments[i].transcript

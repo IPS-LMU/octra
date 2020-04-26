@@ -535,7 +535,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             Functions.placeAtEnd(jQuery('.note-editable')[0]);
           }
         }
-        this.textfield.summernote('focus');
+        if (!isNullOrUndefined(this.textfield)) {
+          this.textfield.summernote('focus');
+        }
       } catch (exception) {
         // ignore errors
         console.error(exception);

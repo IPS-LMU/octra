@@ -75,12 +75,18 @@ export class AsrOptionsComponent implements OnInit {
         if (segNumber > -1) {
           console.log(`SEGNUMBER = ${segNumber} browser sample is ${time.value}`);
           const segment = this.transcrService.currentlevel.segments.get(segNumber);
-          segment.isBlockedBy = ASRQueueItemType.ASR;
-          this.asrService.addToQueue({
-            sampleStart: this.audioChunk.time.start.originalSample.value,
-            sampleLength: this.audioChunk.time.duration.originalSample.value,
-            browserSampleEnd: this.audioChunk.time.start.browserSample.add(this.audioChunk.time.duration.browserSample).value
-          }, ASRQueueItemType.ASR);
+
+          if (!isNullOrUndefined(segment)) {
+            segment.isBlockedBy = ASRQueueItemType.ASR;
+
+            this.asrService.addToQueue({
+              sampleStart: this.audioChunk.time.start.originalSample.value,
+              sampleLength: this.audioChunk.time.duration.originalSample.value,
+              browserSampleEnd: this.audioChunk.time.start.browserSample.add(this.audioChunk.time.duration.browserSample).value
+            }, ASRQueueItemType.ASR);
+          } else {
+            console.error(`could not find segment for doing ASR.`);
+          }
           this.asrService.startASR();
         } else {
           console.error(`could not start ASR because segment number was not found.`);
@@ -97,22 +103,26 @@ export class AsrOptionsComponent implements OnInit {
     if (segNumber > -1) {
       for (let i = segNumber; i < this.transcrService.currentlevel.segments.length; i++) {
         const segment = this.transcrService.currentlevel.segments.get(i);
-        const sampleStart = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.originalSample.value
-          : 0;
-        const sampleLength = segment.time.originalSample.value - sampleStart;
+        if (!isNullOrUndefined(segment)) {
+          const sampleStart = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.originalSample.value
+            : 0;
+          const sampleLength = segment.time.originalSample.value - sampleStart;
 
-        if (sampleLength / this.transcrService.audiomanager.originalSampleRate > 600) {
-          this.alertService.showAlert('danger', this.langService.translate('asr.file too big'));
-          segment.isBlockedBy = null;
-        } else {
-          if (segment.transcript.trim() === '' && segment.transcript.indexOf(this.transcrService.breakMarker.code) < 0) {
-            // segment is empty and contains not a break
-            segment.isBlockedBy = ASRQueueItemType.ASR;
-            this.asrService.addToQueue({
-              sampleStart, sampleLength, browserSampleEnd:
-              segment.time.browserSample.value
-            }, ASRQueueItemType.ASR);
+          if (sampleLength / this.transcrService.audiomanager.originalSampleRate > 600) {
+            this.alertService.showAlert('danger', this.langService.translate('asr.file too big'));
+            segment.isBlockedBy = null;
+          } else {
+            if (segment.transcript.trim() === '' && segment.transcript.indexOf(this.transcrService.breakMarker.code) < 0) {
+              // segment is empty and contains not a break
+              segment.isBlockedBy = ASRQueueItemType.ASR;
+              this.asrService.addToQueue({
+                sampleStart, sampleLength, browserSampleEnd:
+                segment.time.browserSample.value
+              }, ASRQueueItemType.ASR);
+            }
           }
+        } else {
+          console.error(`could not find segment in startASRForAllSegmentsNext()`);
         }
       }
       this.asrService.startASR();

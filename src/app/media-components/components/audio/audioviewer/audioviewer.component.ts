@@ -285,8 +285,8 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           this.updating = false;
         }
       } else {
-        console.error('audiopx 0, ' + this.name);
-        reject('audiopx 0');
+        console.error(new Error('this.AudioPxWidth is <= 0'));
+        reject('this.AudioPxWidth is <= 0 ' + this.name);
       }
     });
   }
@@ -970,8 +970,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
     this.initialize().then(() => {
       this.updateCanvasSizes();
       this.update(false);
-
-      // this.onSecondsPerLineUpdated(this.settings.pixelPerSec, false);
     }).catch((err) => {
       console.error(err);
     });
@@ -1928,6 +1926,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
 
       new Promise<void>((resolve, reject) => {
         if (initialize) {
+          // this.updateCanvasSizes();
           this.initialize().then(() => {
             resolve();
           }).catch((err) => {
@@ -1938,7 +1937,6 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
           resolve();
         }
       }).then(() => {
-        this.updateCanvasSizes();
         this.update(true).then(() => {
           this.scrollTo(0, true);
           resolve2();

@@ -40,6 +40,13 @@ import {ASRProcessStatus, ASRQueueItem, ASRQueueItemType, AsrService} from '../.
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterViewInit, OnDestroy, OnChanges {
+  get loading(): boolean {
+    return this._loading;
+  }
+
+  get validationEnabled(): boolean {
+    return this._validationEnabled;
+  }
 
   @Output('shortcuttriggered')
   get shortcuttriggered(): EventEmitter<string> {
@@ -80,6 +87,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     return !isNullOrUndefined(this.editor.rawText.match(/{[0-9]+}/));
   }
 
+  private _validationEnabled = false;
+  private _loading = false;
+
   constructor(public keyMap: KeymappingService,
               public transcrService: TranscriptionService,
               public audio: AudioService,
@@ -97,7 +107,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           event.comboKey === 'ALT + SHIFT + 2' ||
           event.comboKey === 'ALT + SHIFT + 3') {
           this.transcrService.tasksBeforeSend.push(new Promise<void>((resolve) => {
-            this.saveTranscript();
             this.save();
 
             if (this.oldRaw === this.editor.rawText) {
@@ -135,10 +144,29 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   @ViewChild('editor', {static: true}) editor: TranscrEditorComponent;
   @ViewChild('audionav', {static: true}) audionav: AudioNavigationComponent;
   @ViewChild('window', {static: true}) window: ElementRef;
+  @ViewChild('main', {static: true}) main: ElementRef;
+
   @Output() act: EventEmitter<string> = new EventEmitter<string>();
   @Input() easymode = false;
   @Input() audiochunk: AudioChunk;
   @Input() segmentIndex: number;
+
+  public get mainSize(): {
+    width: number,
+    height: number
+  } {
+    if (!isNullOrUndefined(this.main)) {
+      return {
+        width: this.main.nativeElement.clientWidth,
+        height: this.main.nativeElement.clientHeight
+      };
+    } else {
+      return {
+        width: 0,
+        height: 0
+      }
+    }
+  }
 
   private showWindow = false;
   private subscrmanager: SubscriptionManager;
@@ -148,16 +176,27 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   private oldRaw = '';
 
   public doit = (direction: string) => {
-    this.save();
+    this._loading = true;
+    this.cd.markForCheck();
+    this.cd.detectChanges();
+
 
     new Promise<void>((resolve) => {
-      if (this.audiomanager.isPlaying) {
-        this.loupe.viewer.stopPlayback(() => {
+      setTimeout(() => {
+        this._validationEnabled = false;
+        this.editor.updateRawText();
+        this.save();
+        this.setValidationEnabledToDefault();
+
+        if (this.audiomanager.isPlaying) {
+          this.loupe.viewer.stopPlayback(() => {
+            resolve();
+          });
+        } else {
           resolve();
-        });
-      } else {
-        resolve();
-      }
+        }
+      }, 50);
+      // timeout to show loading status correctly
     }).then(() => {
       if (direction !== 'down') {
         this.goToSegment(direction);
@@ -167,37 +206,43 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       } else {
         this.close();
       }
+      this._loading = false;
     });
   };
 
   onKeyDown = ($event) => {
-    switch ($event.comboKey) {
-      case ('ALT + ARROWRIGHT'):
-        $event.event.preventDefault();
-        if (this.hasSegmentBoundaries || (!this.isNextSegmentLastAndBreak(this.segmentIndex)
-          && this.segmentIndex < this.transcrService.currentlevel.segments.length - 1)) {
-          this.doit('right');
-        } else {
-          this.save();
-          this.close();
-          this.act.emit('overview');
-        }
-        break;
-      case ('ALT + ARROWLEFT'):
-        $event.event.preventDefault();
-        this.doit('left');
-        break;
-      case ('ALT + ARROWDOWN'):
-        $event.event.preventDefault();
-        this.doit('down');
-        break;
-      case ('ESC'):
-        this.doit('down');
-        break;
+    if (!this.loading) {
+      switch ($event.comboKey) {
+        case ('ALT + ARROWRIGHT'):
+          $event.event.preventDefault();
+          if (this.hasSegmentBoundaries || (!this.isNextSegmentLastAndBreak(this.segmentIndex)
+            && this.segmentIndex < this.transcrService.currentlevel.segments.length - 1)) {
+            this.doit('right');
+          } else {
+            this.save();
+            this.close();
+            this.act.emit('overview');
+          }
+          break;
+        case ('ALT + ARROWLEFT'):
+          $event.event.preventDefault();
+          this.doit('left');
+          break;
+        case ('ALT + ARROWDOWN'):
+          $event.event.preventDefault();
+          this.doit('down');
+          break;
+        case ('ESC'):
+          this.doit('down');
+          break;
+      }
     }
   }
 
   ngOnInit() {
+    this._loading = false;
+    this.setValidationEnabledToDefault();
+
     this.editor.Settings.markers = this.transcrService.guidelines.markers;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.special_markers.boundary = true;
@@ -228,6 +273,11 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown));
   }
 
+  private setValidationEnabledToDefault() {
+    this._validationEnabled = this.appStorage.usemode !== 'url'
+      && (this.appStorage.usemode === 'demo' || this.settingsService.projectsettings.octra.validationEnabled);
+  }
+
   ngOnChanges(obj) {
     if (obj.hasOwnProperty('audiochunk')) {
       const previous: AudioChunk = obj.audiochunk.previousValue;
@@ -238,6 +288,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           (current.time.start.browserSample.value !== previous.time.start.browserSample.value &&
             current.time.end.browserSample.value !== previous.time.end.browserSample.value)) {
           // audiochunk changed
+          this.setValidationEnabledToDefault();
           this.loupe.update();
         }
       }
@@ -290,6 +341,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   save() {
+    this.saveTranscript();
+
     if (this.segmentIndex > -1 && this.transcrService.currentlevel.segments &&
       this.segmentIndex < this.transcrService.currentlevel.segments.length) {
       if (this.editor.html.indexOf('<img src="assets/img/components/transcr-editor/boundary.png"') > -1) {
@@ -369,6 +422,8 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
    * selects the next segment on the left or on the right side
    */
   goToSegment(direction: string) {
+    this.editor.isTyping = false;
+
     if (this.segmentIndex > -1 && this.transcrService.currentlevel.segments &&
       this.segmentIndex < this.transcrService.currentlevel.segments.length) {
       const segmentsLength = this.transcrService.currentlevel.segments.length;
@@ -423,6 +478,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       }
 
       if (!(segment === null || segment === undefined)) {
+        this.editor.initialize();
         this.editor.rawText = this.transcrService.currentlevel.segments.get(this.segmentIndex).transcript;
         this.audiochunk = new AudioChunk(new AudioSelection(begin, segment.time.clone()), this.audiochunk.audiomanager);
       }
@@ -625,12 +681,10 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
     if (status === 'stopped') {
       if (this.oldRaw === this.editor.rawText) {
-        this.appStorage.savingNeeded = false;
-        this.oldRaw = this.editor.rawText;
+        // this.appStorage.savingNeeded = false;
       }
 
-      this.saveTranscript();
-      this.highlight();
+      // this.highlight();
     }
   }
 

@@ -674,6 +674,11 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     }
   }
 
+  onBoundaryInserted() {
+    this.uiService.addElementFromEvent('segment', {value: 'boundaries:add'}, Date.now(),
+      this.audiomanager.playposition, this.editor.caretpos, null, null, 'texteditor');
+  }
+
   afterTyping(status) {
     if (status === 'started') {
       this.oldRaw = this.editor.rawText;

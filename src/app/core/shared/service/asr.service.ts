@@ -478,7 +478,11 @@ export class ASRQueueItem {
             reader.readAsText(result.file, 'utf-8');
           }).catch((error) => {
             console.error(error);
-            this.changeStatus(ASRProcessStatus.FAILED);
+
+            if (this.status !== ASRProcessStatus.NOAUTH) {
+              this._result = error;
+              this.changeStatus(ASRProcessStatus.FAILED);
+            }
           });
         }).catch((error) => {
           console.error(`ASR MAUS failed`);
@@ -700,8 +704,10 @@ export class ASRQueueItem {
                 } else if (error.indexOf('0 Unknown Error') > -1) {
                   this.changeStatus(ASRProcessStatus.NOAUTH);
                 } else {
-                  this._result = error;
-                  this.changeStatus(ASRProcessStatus.FAILED);
+                  if (this.status !== ASRProcessStatus.NOAUTH) {
+                    this._result = error;
+                    this.changeStatus(ASRProcessStatus.FAILED);
+                  }
                 }
                 reject(error);
               });
@@ -784,7 +790,10 @@ export class ASRQueueItem {
                 } else if (error.indexOf('0 Unknown Error') > -1) {
                   this.changeStatus(ASRProcessStatus.NOAUTH);
                 } else {
-                  this.changeStatus(ASRProcessStatus.FAILED);
+                  if (this.status !== ASRProcessStatus.NOAUTH) {
+                    this._result = error;
+                    this.changeStatus(ASRProcessStatus.FAILED);
+                  }
                 }
                 reject(error);
               });

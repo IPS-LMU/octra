@@ -171,6 +171,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
         this.oldRaw = this.editor.rawText;
       }
 
+      this.editor.updateRawText();
       this.saveTranscript();
       this.highlight();
 

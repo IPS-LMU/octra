@@ -34,6 +34,10 @@ declare let document: any;
   providers: [TranscrEditorConfig]
 })
 export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
+  set isTyping(value: boolean) {
+    this._isTyping = value;
+  }
+
   get textSelection(): { start: number; end: number } {
     return this._textSelection;
   }
@@ -85,13 +89,14 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     return this._rawText;
   }
 
+  private _lastAudioChunkID = -1;
+
   set rawText(value: string) {
     jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
     this._rawText = this.tidyUpRaw(value);
     this.init = 0;
     const html = this.transcrService.rawToHTML(value);
     this.textfield.summernote('code', html);
-    this.validate();
     this.initPopover();
     this.asr = {
       status: 'inactive',
@@ -504,16 +509,22 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   private triggerTyping() {
     setTimeout(() => {
-      if (Date.now() - this.lastkeypress >= 700 && this.lastkeypress > -1) {
+      if (Date.now() - this.lastkeypress >= 450 && this.lastkeypress > -1) {
         if (this._isTyping) {
-          this.validate();
-          this.initPopover();
-          this.lastkeypress = -1;
-          this.typing.emit('stopped');
+          if (this.audiochunk.id === this._lastAudioChunkID) {
+            this._isTyping = false;
+            this.typing.emit('stopped');
+
+            this.validate();
+            this.initPopover();
+            this.lastkeypress = -1;
+          } else {
+            // ignore typing stop after audioChunk was changed
+            this._lastAudioChunkID = this.audiochunk.id;
+          }
         }
-        this._isTyping = false;
       }
-    }, 700);
+    }, 500);
 
     if (!this._isTyping) {
       this.typing.emit('started');
@@ -557,6 +568,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnInit() {
     this.Settings.height = this.height;
+    if (!isNullOrUndefined(this.audiochunk)) {
+      this._lastAudioChunkID = this.audiochunk.id;
+    }
     this.initialize();
 
     this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
@@ -1042,7 +1056,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.subscrmanager.destroy();
   }
 
-  private validate() {
+  public validate() {
     if (this.validationEnabled) {
       this.saveSelection();
       this._rawText = this.getRawText(false);

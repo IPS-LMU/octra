@@ -1748,6 +1748,7 @@ export class AudioviewerComponent implements OnInit, OnDestroy, AfterViewInit, O
         return true;
       } else {
         console.log(`segment invisible error: start and endtime not between the audiochunk time`);
+        console.log(`audiochunk time: (${this.audiochunk.time.start.browserSample.value} - ${this.audiochunk.time.end.browserSample.value})\nsegment time: (${startTime.browserSample.value} - ${segment.time.browserSample.value})`);
         errorcallback();
       }
       return false;

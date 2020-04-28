@@ -270,10 +270,12 @@ export class Segments {
   }
 
   public clone(): Segments {
-    const result = new Segments(this.browserSampleRate, null, {
+    const lastSamples = {
       browser: this.segments[this.length - 1].time.browserSample.value,
       original: this.segments[this.length - 1].time.originalSample.value
-    }, this._originalSampleRate);
+    };
+
+    const result = new Segments(this.browserSampleRate, null, lastSamples, this._originalSampleRate);
     for (let i = 0; i < this.segments.length; i++) {
       result.add(this.segments[i].time, this.segments[i].transcript);
     }

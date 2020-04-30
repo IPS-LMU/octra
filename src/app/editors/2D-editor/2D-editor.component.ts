@@ -24,7 +24,7 @@ import {
 import {PraatTextgridConverter} from '../../core/shared';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
 import {TranscrWindowComponent} from './transcr-window';
-import {Subscription} from 'rxjs';
+import {interval, Subscription} from 'rxjs';
 import {TranscrEditorComponent} from '../../core/component';
 import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
 import {Functions, isUnset} from '../../core/shared/Functions';
@@ -39,7 +39,6 @@ import {AudioSelection, PlayBackStatus, SampleUnit} from '../../media-components
 import {OAudiofile, OSegment, Segment} from '../../media-components/obj/annotation';
 import {ASRQueueItemType} from '../../media-components/obj/annotation/asr';
 import {AudioviewerConfig} from '../../media-components/components/audio/audio-viewer/audio-viewer.config';
-import Konva from 'konva';
 
 @Component({
   selector: 'app-overlay-gui',
@@ -209,19 +208,15 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         if (this.appStorage.showLoupe) {
           const event = obj.event;
 
-          // TODO IMPORTANT!
-          /*
-          if (this.viewer.focused) {
-            if (event.key === '+') {
-              this.factor = Math.min(20, this.factor + 1);
-              this.changeArea(this.loupe, this.miniloupe, this.factor);
-            } else if (event.key === '-') {
-              if (this.factor > 3) {
-                this.factor = Math.max(1, this.factor - 1);
-                this.changeArea(this.loupe, this.miniloupe, this.factor);
-              }
+          if (event.key === '+') {
+            this.factor = Math.min(20, this.factor + 1);
+            this.changeArea(this.loupe, this.miniloupe, this.viewer.av.mouseCursor, this.factor);
+          } else if (event.key === '-') {
+            if (this.factor > 3) {
+              this.factor = Math.max(1, this.factor - 1);
+              this.changeArea(this.loupe, this.miniloupe, this.viewer.av.mouseCursor, this.factor);
             }
-          }*/
+          }
         }
       }
     ));
@@ -232,17 +227,18 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           if (!(this.appStorage.followplaycursor === null || this.appStorage.followplaycursor === undefined)
             && this.appStorage.followplaycursor === true) {
 
-            /* TODO important!
-            this.scrolltimer = interval(1000).subscribe(() => {
-              const absx = this.viewer.av.audioTCalculator.samplestoAbsX(this.audioChunkLines.playposition.samples);
-              let y = Math.floor(absx / this.viewer.av.innerWidth) * this.viewer.settings.lineheight;
-              y += 10 + (Math.floor(absx / this.viewer.av.innerWidth) * this.viewer.settings.margin.bottom);
+            if (this.scrolltimer !== null) {
+              this.scrolltimer.unsubscribe();
+            }
 
-              if (y > this.viewer.viewRect.size.height) {
-                this.viewer.scrollTo(y);
-              }
+            this.scrolltimer = interval(1000).subscribe(() => {
+              const absx = this.viewer.av.audioTCalculator.samplestoAbsX(this.audioChunkLines.relativePlayposition);
+
+              const lines = Math.floor(absx / this.viewer.av.innerWidth);
+              let y = lines * (this.viewer.settings.lineheight + this.viewer.settings.margin.bottom);
+
+              this.viewer.scrollToAbsY(y);
             });
-             */
           }
         } else {
           if (this.scrolltimer !== null) {
@@ -256,8 +252,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       (event) => {
         switch (event.key) {
           case('secondsPerLine'):
-            // TODO important!
-            // this.viewer.onSecondsPerLineUpdated(event.value);
+            this.viewer.onSecondsPerLineChanged(event.value);
             break;
         }
       }
@@ -436,7 +431,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         this.viewer.height = this.linesViewHeight;
         TwoDEditorComponent.initialized.emit();
       });
-    // this.viewer.onSecondsPerLineUpdated(this.appStorage.secondsPerLine);
   }
 
   onSegmentEntered(selected: any) {
@@ -451,9 +445,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           this.audioChunkWindow = new AudioChunk(new AudioSelection(start, segment.time.clone()), this.audioManager);
 
           this.viewer.settings.shortcutsEnabled = false;
-
-          // TODO important?
-          // this.viewer.focused = false;
           this.showWindow = true;
 
           this.uiService.addElementFromEvent('segment', {
@@ -517,11 +508,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
     if (this.appStorage.showLoupe) {
       this.loupeHidden = false;
-      // TODO change this
       this.mouseTimer = window.setTimeout(() => {
         this.changeLoupePosition($event.event, $event.time);
         this.mousestate = 'ended';
-      }, 33);
+      }, 20);
     }
   }
 
@@ -648,13 +638,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.cd.detectChanges();
   }
 
-  onSpeedChange(event: { old_value: number, new_value: number, timestamp: number }) {
-    // TODO important where to set speed?
-    // this.audioChunkLines.speed = event.new_value;
-    this.appStorage.audioSpeed = event.new_value;
-  }
-
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
+    this.appStorage.audioSpeed = event.new_value;
+
     if (this.appStorage.logging) {
       const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
       this.uiService.addElementFromEvent('slider', event, event.timestamp,
@@ -662,12 +648,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     }
   }
 
-  onVolumeChange(event: { old_value: number, new_value: number, timestamp: number }) {
-    this.audioChunkLines.volume = event.new_value;
-    this.appStorage.audioVolume = event.new_value;
-  }
-
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
+    this.appStorage.audioVolume = event.new_value;
+
     if (this.appStorage.logging) {
       const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
       this.uiService.addElementFromEvent('slider', event, event.timestamp,

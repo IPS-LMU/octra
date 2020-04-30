@@ -348,7 +348,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     if (!(this.audioChunk === null || this.audioChunk === undefined)) {
       this.subscrManager.removeByTag('audioChunkStatusChange');
       this.subscrManager.removeByTag('audioChunkChannelFinished');
-      console.log(`audioChunk changed! ${this.audioChunk.time.start.samples} - ${this.audioChunk.time.end.samples}`);
 
       this.subscrManager.add(this.audioChunk.statuschange.subscribe(
         this.onAudioChunkStatusChanged
@@ -407,6 +406,16 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     }
   }
 
+  onSecondsPerLineChanged(secondsPerLine: number) {
+    this.secondsPerLine = secondsPerLine;
+    this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
+    this.av.initializeSettings().then((result) => {
+      this.initializeView();
+    }).catch((error) => {
+      console.error(error);
+    });
+  }
+
   onResize() {
     clearTimeout(this.resizingTimer);
     this.resizingTimer = setTimeout(() => {
@@ -426,7 +435,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         this.stage.batchDraw();
       }).catch(() => {
       });
-    }, 50);
+    }, 200);
   }
 
   public initializeView() {
@@ -657,7 +666,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
             new SampleUnit(this.audioManager.sampleRate, this.audioManager.sampleRate)
           ));
 
-          if (pxPerSecond >= 20) {
+          if (pxPerSecond >= 5) {
             const timeLineHeight = (this.settings.timeline.enabled) ? this.settings.timeline.height : 0;
             const vZoom = Math.round((this.settings.lineheight - timeLineHeight) / this.grid.horizontalLines);
 
@@ -719,7 +728,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     return group;
   }
 
-  public scrollTo(deltaY: number) {
+  private scrollWithDeltaY(deltaY: number) {
     const newY = (this.canvasElements.lastLine.y() + this.canvasElements.lastLine.height()) * deltaY;
     this.layers.background.y(newY);
     this.layers.playhead.y(newY);
@@ -727,6 +736,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     this.layers.boundaries.y(newY);
 
     this.stage.batchDraw();
+  }
+
+  public scrollToAbsY(absY: number) {
+    const deltaY = absY / (this.canvasElements.lastLine.y() + this.canvasElements.lastLine.height());
+    this.scrollWithDeltaY(-deltaY);
   }
 
   private createLine(size: Size, position: Position, lineNum: number): Konva.Group {
@@ -854,7 +868,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   }
 
-  private doPlayHeadAnimation = () => {
+  private doPlayHeadAnimation = (frame) => {
     this.updatePlayCursor();
   }
 
@@ -1333,7 +1347,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     // delta in %
     const delta = (this.canvasElements.scrollbarSelector.y()) / this.canvasElements.scrollBar.height();
 
-    this.scrollTo(-delta);
+    this.scrollWithDeltaY(-delta);
   }
 
   private drawSelection = (lineNum: number, lineWidth: number): Konva.Rect | null => {

@@ -217,10 +217,8 @@ export class Segments {
     for (const segment of this.segments) {
       if (
         (segment.time.samples >= startSamples.samples && segment.time.samples <= endSamples.samples) ||
-        (start >= startSamples && start <= endSamples)
-        ||
-        (start <= startSamples && segment.time.samples >= endSamples.samples)
-
+        (start.samples >= startSamples.samples && start.samples <= endSamples.samples) ||
+        (start.samples <= startSamples.samples && segment.time.samples >= endSamples.samples)
       ) {
         result.push(segment);
       }

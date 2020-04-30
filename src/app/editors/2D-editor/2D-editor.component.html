@@ -44,6 +44,7 @@
                         [height]="miniloupe.size.height"
                         [ngStyle]="{
         'width': miniloupe.size.width + 'px',
+        'height': miniloupe.size.height + 'px',
         'position':'absolute',
         'margin-left':miniloupe.location.x + 'px',
         'margin-top':miniloupe.location.y + 'px',
@@ -59,6 +60,7 @@
                         [breakMarker]="{
                         code: '<P>'
                       }"
+                        [name]="'loupe'"
     ></octra-audio-viewer>
   </div>
   <div id="lines-wrapper" #linesView>

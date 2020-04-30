@@ -48,12 +48,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     return this._transcriptionLevel;
   }
 
-  @Input() name: string;
+  @Input() public name = '';
 
   @Input()
   public set height(value: number) {
     if (!isUnset(this.stage)) {
-      console.log(`update stage ${value}`);
       this.stage.height(value);
       this.initializeView();
     }
@@ -259,6 +258,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   private init() {
     this.widthOnInit = this.width;
     this.styles.height = this.height;
+    console.log(`height = ${this.height}`);
 
     if (!this.settings.multiLine) {
       this.settings.lineheight = this.height - this.settings.margin.top - this.settings.margin.bottom;
@@ -348,6 +348,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     if (!(this.audioChunk === null || this.audioChunk === undefined)) {
       this.subscrManager.removeByTag('audioChunkStatusChange');
       this.subscrManager.removeByTag('audioChunkChannelFinished');
+      console.log(`audioChunk changed! ${this.audioChunk.time.start.samples} - ${this.audioChunk.time.end.samples}`);
 
       this.subscrManager.add(this.audioChunk.statuschange.subscribe(
         this.onAudioChunkStatusChanged
@@ -1455,11 +1456,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       this.hoveredLine = (tempLine > -1) ? tempLine : this.hoveredLine;
       const absXPos = this.hoveredLine * this.av.innerWidth + event.layerX;
 
-      this.canvasElements.mouseCaret.position({
-        x: event.layerX,
-        y: this.hoveredLine * (this.settings.lineheight + this.settings.margin.top)
-      });
-      this.layers.playhead.batchDraw();
+      if (!this.settings.cursor.fixed) {
+        this.canvasElements.mouseCaret.position({
+          x: event.layerX,
+          y: this.hoveredLine * (this.settings.lineheight + this.settings.margin.top)
+        });
+        this.layers.playhead.batchDraw();
+      }
 
       this.av.setMouseMovePosition(absXPos);
       if (this.av.dragableBoundaryNumber > -1) {

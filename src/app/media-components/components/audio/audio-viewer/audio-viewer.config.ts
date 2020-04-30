@@ -17,8 +17,10 @@ export class AudioviewerConfig {
     left: 0
   };
   public cursor: {
-    color: string
+    color: string,
+    fixed: boolean
   } = {
+    fixed: false,
     color: 'rgb(255, 0, 0)'
   };
 

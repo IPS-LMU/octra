@@ -40,7 +40,6 @@ import {OAudiofile, OSegment, Segment} from '../../media-components/obj/annotati
 import {ASRQueueItemType} from '../../media-components/obj/annotation/asr';
 import {AudioviewerConfig} from '../../media-components/components/audio/audio-viewer/audio-viewer.config';
 import Konva from 'konva';
-import Vector2d = Konva.Vector2d;
 
 @Component({
   selector: 'app-overlay-gui',
@@ -191,9 +190,12 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.viewer.secondsPerLine = this.appStorage.secondsPerLine;
 
     this.miniLoupeSettings.roundValues = false;
+    this.miniLoupeSettings.selection.enabled = false;
     this.miniLoupeSettings.boundaries.readonly = true;
     this.miniLoupeSettings.asr.enabled = false;
     this.miniLoupeSettings.cropping = 'circle';
+    this.miniLoupeSettings.cursor.fixed = true;
+
     this.audioChunkLoupe = this.audioManager.mainchunk.clone();
 
     this.viewer.alerttriggered.subscribe(
@@ -524,6 +526,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   public changeLoupePosition(mouseEvent: MouseEvent, cursorTime: SampleUnit) {
+
     const fullY = mouseEvent.layerY + 20 + this.miniloupe.size.height;
     const x = mouseEvent.layerX - ((this.miniloupe.size.width - 10) / 2) - 2;
 
@@ -536,6 +539,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       this.miniloupe.location.y = mouseEvent.layerY - 20 - this.miniloupe.size.height;
       this.miniloupe.location.x = x;
     }
+
     this.loupeHidden = false;
     this.changeArea(this.loupe, this.miniloupe, cursorTime, this.factor);
     this.cd.detectChanges();
@@ -712,7 +716,15 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   onCircleLoupeMouseOver($event) {
     // TODO important what about focus?
     // this.viewer.focus();
-    this.miniloupe.location.y += $event.layerY + 20;
+
+    const fullY = this.miniloupe.location.y + 20 + this.miniloupe.size.height;
+    if (fullY < this.viewer.height) {
+      // loupe is fully visible
+      this.miniloupe.location.y = this.miniloupe.location.y + 20;
+    } else {
+      // loupe out of the bottom border of view rectangle
+      this.miniloupe.location.y = this.miniloupe.location.y - 20 - this.miniloupe.size.height;
+    }
   }
 
   private changeArea(loup: AudioViewerComponent, coord: {

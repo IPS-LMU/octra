@@ -21,7 +21,7 @@ export class SampleUnit {
   }
 
   public get unix(): number {
-    return Math.floor((this._samples * 1000) / this._sampleRate);
+    return Math.round((this._samples * 1000) / this._sampleRate);
   }
 
   public set unix(value: number) {

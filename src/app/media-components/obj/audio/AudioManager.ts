@@ -1,6 +1,6 @@
 import {AudioInfo} from './AudioInfo';
 import {EventEmitter} from '@angular/core';
-import {interval, Subject, Subscription} from 'rxjs';
+import {Subject, Subscription, timer} from 'rxjs';
 import {AudioDecoder} from './AudioDecoder';
 import {AudioRessource} from './AudioRessource';
 import {AudioFormat, AudioSelection, PlayBackStatus, SampleUnit, SourceType, WavFormat} from './index';
@@ -21,7 +21,6 @@ export class AudioManager {
   get mainchunk(): AudioChunk {
     return this._mainchunk;
   }
-
 
   get playposition(): SampleUnit {
     return new SampleUnit(
@@ -150,7 +149,7 @@ export class AudioManager {
   private _stepBackward = false;
   private _lastUpdate: number;
   private _statusRequest: PlayBackStatus = PlayBackStatus.INITIALIZED;
-  private _playbackChecker: Subscription = null;
+  private _playbackEndChecker: Subscription = null;
 
   private readonly _audio: HTMLAudioElement;
 
@@ -315,19 +314,26 @@ export class AudioManager {
         this._audio.addEventListener('ended', this.onPlayBackChanged);
         this._audio.addEventListener('error', this.onPlaybackFailed);
 
-        this._playbackChecker = interval(40).subscribe(this.onTimeUpdate);
-
         this._audio.play()
+          .then(() => {
+            this._playbackEndChecker = timer(Math.round(audioSelection.duration.unix / playbackRate)).subscribe(() => {
+              this.endPlayBack();
+            });
+
+            resolve();
+          })
           .catch((error) => {
+            this._playbackEndChecker.unsubscribe();
             if (error.name && error.name === 'NotAllowedError') {
               // no permission
               this.missingPermission.emit();
             }
 
-            console.error(error);
+            this.statechange.error(new Error(error));
+            reject(error);
           });
-        resolve();
       }).catch((error) => {
+        this._playbackEndChecker.unsubscribe();
         this.statechange.error(new Error(error));
         reject(error);
       });
@@ -369,7 +375,7 @@ export class AudioManager {
     this._audio.removeEventListener('pause', this.onPlayBackChanged);
     this._gainNode.disconnect();
     this._source.disconnect();
-    this._playbackChecker.unsubscribe();
+    this._playbackEndChecker.unsubscribe();
   }
 
   /**
@@ -652,7 +658,7 @@ export class AudioChunk {
   }
 
   get relativePlayposition(): SampleUnit {
-    let result = this.audioManager.createSampleUnit(0);
+    let result;
 
     if (this._status === PlayBackStatus.PLAYING) {
       result = this.audioManager.playposition.sub(this._time.start);

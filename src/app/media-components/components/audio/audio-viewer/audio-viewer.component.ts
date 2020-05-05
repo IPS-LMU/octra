@@ -38,6 +38,10 @@ import Layer = Konva.Layer;
   providers: [AudioViewerService]
 })
 export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+  get focused(): boolean {
+    return this._focused;
+  }
+
   constructor(public av: AudioViewerService) {
   }
 
@@ -185,7 +189,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   };
   private widthOnInit;
   private deactivateShortcuts = false;
-  private focused = false;
+  private _focused = false;
 
   @Input() set transcriptionLevel(value: Level) {
     this._transcriptionLevel = value;
@@ -1290,7 +1294,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
       this.drawWholeSelection();
     }
-    this.focused = true;
+    this._focused = true;
   }
 
   private createScrollBar = () => {
@@ -1492,7 +1496,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         time: this.av.mouseCursor
       });
       this.stage.container().focus();
-      this.focused = true;
+      this._focused = true;
     }
   }
 
@@ -1503,7 +1507,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     if (this.settings.shortcutsEnabled && !this.deactivateShortcuts) {
       const platform = BrowserInfo.platform;
 
-      if (this.focused && this.isDisabledKey(comboKey)) {
+      if (this._focused && this.isDisabledKey(comboKey)) {
         // key pressed is disabled by config
         event.preventDefault();
       }
@@ -1514,7 +1518,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
           if (this.settings.shortcuts.hasOwnProperty(shortc)) {
             const shortcut = this.settings.shortcuts['' + shortc + ''];
             const focuscheck = (!(shortcut === null || shortcut === undefined)) && (shortcut.focusonly === false
-              || (shortcut.focusonly === this.focused));
+              || (shortcut.focusonly === this._focused));
 
             if (focuscheck && this.settings.shortcuts['' + shortc + ''].keys['' + platform + ''] === comboKey) {
               switch (shortc) {
@@ -1546,7 +1550,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   keyActive = true;
                   break;
                 case('set_boundary'):
-                  if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this.focused) {
+                  if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
                     let segments = this._transcriptionLevel.segments;
                     const result = this.av.addSegment();
                     segments = this.av.currentTranscriptionLevel.segments;
@@ -1582,7 +1586,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   }
                   break;
                 case('set_break'):
-                  if (this.settings.boundaries.enabled && this.focused) {
+                  if (this.settings.boundaries.enabled && this._focused) {
                     const xSamples = this.av.mouseCursor.clone();
 
                     if (xSamples !== null) {
@@ -1608,7 +1612,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   }
                   break;
                 case('play_selection'):
-                  if (this.focused) {
+                  if (this._focused) {
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'audio'});
 
                     const xSamples = this.av.mouseCursor.clone();
@@ -1679,7 +1683,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   }
                   break;
                 case('delete_boundaries'):
-                  if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this.focused) {
+                  if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
                     // TODO trigger event for logging?
 
                     let start = null;
@@ -1714,7 +1718,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   }
                   break;
                 case('segment_enter'):
-                  if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this.focused) {
+                  if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'segment'});
 
                     const segInde = this._transcriptionLevel.segments.getSegmentBySamplePosition(
@@ -1722,7 +1726,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                     );
                     this.selectSegment(segInde,
                       (posY1, posY2) => {
-                        this.focused = false;
+                        this._focused = false;
                         this.drawWholeSelection();
                         this.stage.draw();
                         this.segmententer.emit({
@@ -1741,7 +1745,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   }
                   break;
                 case('cursor_left'):
-                  if (this.focused) {
+                  if (this._focused) {
                     // move cursor to left
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'mouse'});
                     this.av.moveCursor('left', this.settings.stepWidthRatio * this.audioManager.sampleRate);
@@ -1754,7 +1758,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   }
                   break;
                 case('cursor_right'):
-                  if (this.focused) {
+                  if (this._focused) {
                     // move cursor to right
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'mouse'});
 
@@ -1768,7 +1772,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   }
                   break;
                 case('playonhover'):
-                  if (this.focused && !this.settings.boundaries.readonly) {
+                  if (this._focused && !this.settings.boundaries.readonly) {
                     // move cursor to right
                     this.shortcuttriggered.emit({shortcut: comboKey, value: shortc, type: 'option'});
                     keyActive = true;
@@ -1827,11 +1831,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   private onMouseEnter = () => {
     this.stage.container().focus();
-    this.focused = true;
+    this._focused = true;
   }
 
   private onMouseLeave = () => {
-    this.focused = false;
+    this._focused = false;
   }
 
   private removeSegmentFromCanvas(segmentID: number) {

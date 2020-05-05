@@ -1,4 +1,4 @@
-<!-- <octra-audio-viewer *ngIf="appStorage.showLoupe" #miniloupe [ngStyle]="{
+<octra-audio-viewer *ngIf="appStorage.showLoupe" #miniloupe [ngStyle]="{
 'position':'absolute',
 'margin-left':miniLoupeCoord.x + 'px',
 'margin-top':miniLoupeCoord.y + 'px',
@@ -9,8 +9,17 @@
 'visibility': (miniLoupeHidden) ? 'hidden' : 'inherit',
 'flex': 'auto',
 'flex-direction': 'column'}"
-                    [audioChunk]="audioChunkLoupe">
-</octra-audio-viewer> -->
+                    [audioChunk]="audioChunkLoupe"
+                    [height]="160"
+                    [transcriptionLevel]="transcrService.currentlevel"
+                    [settings]="miniLoupeSettings"
+                    [isMultiLine]="false"
+                    [breakMarker]="{
+                        code: '<P>'
+                      }"
+                    [name]="'loupe'"
+>
+</octra-audio-viewer>
 <octra-audio-navigation #nav
                         (buttonClick)="onButtonClick($event)"
                         (afterVolumeChange)="afterVolumeChange($event)"
@@ -51,13 +60,13 @@
 
 </octra-audio-navigation>
 <div id="viewer">
-  <octra-audio-viewer #viewer (selchange)="onSelectionChanged($event)"
+  <octra-audio-viewer #signalDisplayTop (selchange)="onSelectionChanged($event)"
                       (segmententer)="onSegmentEnter($event)"
                       (mousecursorchange)="onMouseOver($event)"
                       (mouseenter)="miniLoupeHidden = false;"
                       (mouseleave)="miniLoupeHidden = true;"
                       (mousedown)="onViewerMouseDown($event)"
-                      (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_top', viewer)"
+                      (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_top', signalDisplayTop)"
                       [audioChunk]="audioChunkTop"
                       [transcriptionLevel]="transcrService.currentlevel"
                       [breakMarker]="{
@@ -68,14 +77,11 @@
   </octra-audio-viewer>
 </div>
 
-<octra-audio-viewer #loupe
+<octra-audio-viewer #signalDisplayDown
                     *ngIf="audioChunkDown !== null && audioChunkDown !== undefined"
                     (segmententer)="onLoupeSegmentEnter($event)"
-                    (mousecursorchange)="onMouseOver($event)"
-                    (mouseenter)="miniLoupeHidden = false;"
-                    (mouseleave)="miniLoupeHidden = true;"
                     (mousedown)="onViewerMouseDown($event)"
-                    (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_down', loupe)"
+                    (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_down', signalDisplayDown)"
                     [audioChunk]="audioChunkDown"
                     [transcriptionLevel]="transcrService.currentlevel"
                     (click)="onLoupeClick($event)"

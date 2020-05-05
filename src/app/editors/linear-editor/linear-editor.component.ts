@@ -36,6 +36,9 @@ import {AudioSelection, SampleUnit} from '../../media-components/obj/audio';
   styleUrls: ['./linear-editor.component.css']
 })
 export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy, OnChanges {
+  get miniLoupeSettings(): AudioviewerConfig {
+    return this._miniLoupeSettings;
+  }
 
   public get app_settings(): any {
     return this.settingsService.appSettings;
@@ -46,10 +49,11 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   get segmententer_shortc(): string {
-    return (this.viewer.settings) ? this.viewer.settings.shortcuts.segment_enter.keys[this.platform] : '';
+    return (this.signalDisplayTop.settings) ? this.signalDisplayTop.settings.shortcuts.segment_enter.keys[this.platform] : '';
   }
 
   private oldRaw = '';
+  private _miniLoupeSettings: AudioviewerConfig;
 
   constructor(public audio: AudioService,
               public alertService: AlertService,
@@ -86,11 +90,12 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
 
-  @ViewChild('viewer', {static: true}) viewer: AudioViewerComponent;
+  @ViewChild('signalDisplayTop', {static: true}) signalDisplayTop: AudioViewerComponent;
   @ViewChild('miniloupe', {static: false}) miniloupe: AudioViewerComponent;
-  @ViewChild('loupe', {static: false}) loupe: AudioViewerComponent;
+  @ViewChild('signalDisplayDown', {static: false}) signalDisplayDown: AudioViewerComponent;
   @ViewChild('nav', {static: true}) nav: AudioNavigationComponent;
   @ViewChild('transcr', {static: true}) public editor: TranscrEditorComponent;
+
   public miniLoupeHidden = true;
   public segmentselected = false;
   public loupeSettings: AudioviewerConfig;
@@ -128,7 +133,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
       this.save();
       setTimeout(() => {
-        if (!isUnset(this.loupe)) {
+        if (!isUnset(this.signalDisplayDown)) {
           // this.loupe.update(false);
         } else {
           console.error(`can't update loupe after typing because it's undefined!`);
@@ -146,13 +151,13 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.audioChunkTop = this.audioManager.mainchunk.clone();
     this.audioChunkLoupe = this.audioManager.mainchunk.clone();
 
-    this.viewer.settings.shortcuts = this.keyMap.register('AV', this.viewer.settings.shortcuts);
-    this.viewer.settings.multiLine = false;
-    this.viewer.settings.lineheight = 80;
-    this.viewer.settings.shortcutsEnabled = true;
-    this.viewer.settings.boundaries.readonly = false;
-    this.viewer.settings.justifySignalHeight = true;
-    this.viewer.settings.roundValues = false;
+    this.signalDisplayTop.settings.shortcuts = this.keyMap.register('AV', this.signalDisplayTop.settings.shortcuts);
+    this.signalDisplayTop.settings.multiLine = false;
+    this.signalDisplayTop.settings.lineheight = 80;
+    this.signalDisplayTop.settings.shortcutsEnabled = true;
+    this.signalDisplayTop.settings.boundaries.readonly = false;
+    this.signalDisplayTop.settings.justifySignalHeight = true;
+    this.signalDisplayTop.settings.roundValues = false;
 
     this.loupeSettings = new AudioviewerConfig();
     this.loupeSettings.shortcuts = this.keyMap.register('Loupe', this.loupeSettings.shortcuts);
@@ -165,6 +170,17 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.loupeSettings.justifySignalHeight = true;
     this.loupeSettings.roundValues = false;
     this.loupeSettings.boundaries.enabled = true;
+
+    // set settings for mini loupe
+    this._miniLoupeSettings = new AudioviewerConfig();
+    this._miniLoupeSettings.roundValues = false;
+    this._miniLoupeSettings.shortcutsEnabled = false;
+    this._miniLoupeSettings.selection.enabled = false;
+    this._miniLoupeSettings.boundaries.readonly = true;
+    this._miniLoupeSettings.asr.enabled = false;
+    this._miniLoupeSettings.cropping = 'circle';
+    this._miniLoupeSettings.cursor.fixed = true;
+    this._miniLoupeSettings.lineheight = 160;
 
     this.editor.Settings.markers = this.transcrService.guidelines.markers;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
@@ -181,39 +197,38 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       }
     ));
 
-    this.subscrManager.add(this.viewer.alerttriggered.subscribe(
+    this.subscrManager.add(this.signalDisplayTop.alerttriggered.subscribe(
       (result) => {
         this.alertService.showAlert(result.type, result.message);
       }
     ));
 
-    /*
-    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(
+    this.subscrManager.add(this.keyMap.onkeydown.subscribe(
       (obj) => {
         if (this.appStorage.showLoupe) {
           const event = obj.event;
-          if (this.viewer.focused || (!(this.loupe === null || this.loupe === undefined) && this.loupe.focused)) {
+          if (!isUnset(this.miniloupe) && (this.signalDisplayTop.focused || this.signalDisplayDown.focused)) {
             if (event.key === '+') {
               this.factor = Math.min(12, this.factor + 1);
-              this.miniloupe.zoomY = Math.max(1, this.factor);
+              this.miniloupe.av.zoomY = Math.max(1, this.factor);
 
-              if (this.viewer.focused) {
-                this.changeArea(this.audioChunkLoupe, this.viewer, this.miniLoupeCoord,
-                  this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
-              } else if (!(this.loupe === null || this.loupe === undefined) && this.loupe.focused) {
-                this.changeArea(this.audioChunkLoupe, this.loupe.viewer, this.miniLoupeCoord,
-                  this.viewer.MouseCursor.timePos.samples, this.loupe.MouseCursor.relPos.x, this.factor);
+              if (this.signalDisplayTop.focused) {
+                this.changeArea(this.audioChunkLoupe, this.signalDisplayTop, this.miniLoupeCoord,
+                  this.signalDisplayTop.av.mouseCursor.samples, this.signalDisplayTop.mouseCursor.location.x, this.factor);
+              } else if (!(this.signalDisplayDown === null || this.signalDisplayDown === undefined) && this.signalDisplayDown.focused) {
+                this.changeArea(this.audioChunkLoupe, this.signalDisplayDown, this.miniLoupeCoord,
+                  this.signalDisplayDown.av.mouseCursor.samples, this.signalDisplayTop.mouseCursor.location.x, this.factor);
               }
             } else if (event.key === '-') {
               if (this.factor > 3) {
                 this.factor = Math.max(1, this.factor - 1);
-                this.miniloupe.zoomY = Math.max(4, this.factor);
-                if (this.viewer.focused) {
-                  this.changeArea(this.audioChunkLoupe, this.viewer, this.miniLoupeCoord,
-                    this.viewer.MouseCursor.timePos.samples, this.viewer.MouseCursor.relPos.x, this.factor);
-                } else if (!(this.loupe === null || this.loupe === undefined) && this.loupe.focused) {
-                  this.changeArea(this.audioChunkLoupe, this.loupe.viewer, this.miniLoupeCoord,
-                    this.viewer.MouseCursor.timePos.samples, this.loupe.MouseCursor.relPos.x, this.factor);
+                this.miniloupe.av.zoomY = Math.max(4, this.factor);
+                if (this.signalDisplayTop.focused) {
+                  this.changeArea(this.audioChunkLoupe, this.signalDisplayTop, this.miniLoupeCoord,
+                    this.signalDisplayTop.av.mouseCursor.samples, this.signalDisplayTop.mouseCursor.location.x, this.factor);
+                } else if (!isUnset(this.signalDisplayDown) && this.signalDisplayDown.focused) {
+                  this.changeArea(this.audioChunkLoupe, this.signalDisplayDown, this.miniLoupeCoord,
+                    this.signalDisplayTop.av.mouseCursor.samples, this.signalDisplayDown.mouseCursor.location.x, this.factor);
                 }
               }
             }
@@ -221,7 +236,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         }
       }
     ));
-     */
+
     this.cd.markForCheck();
     this.cd.detectChanges();
   }
@@ -229,10 +244,6 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   ngOnChanges(obj: SimpleChanges) {
     if (!(obj.mini_loupe === null || obj.mini_loupe === undefined)) {
       if (obj.mini_loupe.isFirstChange() && this.appStorage.showLoupe) {
-        this.miniloupe.settings.shortcutsEnabled = false;
-        this.miniloupe.settings.boundaries.enabled = false;
-        this.miniloupe.settings.lineheight = 160;
-        this.miniloupe.settings.roundValues = false;
       }
     }
   }
@@ -250,15 +261,15 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     const caretpos = this.editor.caretpos;
     this.uiService.addElementFromEvent('mouseclick', {value: event.type},
       event.timestamp, this.audioManager.playposition, caretpos, {
-        start: this.viewer.av.drawnSelection.start.samples,
-        length: this.viewer.av.drawnSelection.duration.samples
+        start: this.signalDisplayTop.av.drawnSelection.start.samples,
+        length: this.signalDisplayTop.av.drawnSelection.duration.samples
       }, null, 'audio_buttons');
   }
 
   ngAfterViewInit() {
     this.cd.detectChanges();
     if (this.appStorage.showLoupe) {
-      // this.miniloupe.av.zoomY = this.factor;
+      this.miniloupe.av.zoomY = this.factor;
     }
 
     this.subscrManager.add(
@@ -269,7 +280,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       )
     );
 
-    this.viewer.onInitialized.subscribe(
+    this.signalDisplayTop.onInitialized.subscribe(
       () => {
       }, () => {
       },
@@ -298,16 +309,17 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   onSegmentChange() {
-    // this.viewer.update();
     this.saving = false;
   }
 
-  onMouseOver(cursor: SampleUnit) {
+  onMouseOver($event: {
+    event: MouseEvent, time: SampleUnit
+  }) {
     if (!(this.mouseTimer === null || this.mouseTimer === undefined)) {
       window.clearTimeout(this.mouseTimer);
     }
 
-    this.miniLoupeCoord.component = this.viewer;
+    this.miniLoupeCoord.component = this.signalDisplayTop;
 
     if (!this.audioManager.isPlaying && this.appStorage.playonhover) {
       // play audio
@@ -320,19 +332,15 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     }
 
     // const a = this.viewer.getLocation();
-    this.miniLoupeCoord.y = this.viewer.settings.lineheight - 10;
+    this.miniLoupeCoord.y = this.signalDisplayTop.settings.lineheight - 10;
 
     if (!isUnset(this.nav)) {
-      // this.miniLoupeCoord.y += this.nav.height;
+      this.miniLoupeCoord.y += this.nav.height;
     }
 
-
-    /*
     this.mouseTimer = window.setTimeout(() => {
-    this.changeArea(this.audioChunkLoupe, this.viewer, this.miniLoupeCoord
-    this.viewer.av.MouseClickPos.timePos.samples, this.viewer.avMpuseClickPos.relPos.x, this.factor);
-  }, 20);
-     */
+      this.changeArea(this.audioChunkLoupe, this.signalDisplayTop, this.miniLoupeCoord, this.signalDisplayTop.av.mouseCursor.samples, this.signalDisplayTop.mouseCursor.location.x, this.factor);
+    }, 20);
   }
 
   onSegmentEnter($event) {
@@ -421,8 +429,8 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       if (this.selectedIndex > 0) {
         startSamples = this.transcrService.currentlevel.segments.get(this.selectedIndex - 1).time.samples;
       }
-      if (this.loupe.av.MouseClickPos.samples < startSamples
-        || this.loupe.av.MouseClickPos.samples > endSamples) {
+      if (this.signalDisplayDown.av.MouseClickPos.samples < startSamples
+        || this.signalDisplayDown.av.MouseClickPos.samples > endSamples) {
         this.segmentselected = false;
       }
     }
@@ -475,13 +483,6 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.segmentselected = false;
   }
 
-  onSpeedChange(event: {
-    old_value: number, new_value: number, timestamp: number
-  }) {
-    // this.audiochunkTop.speed = event.new_value;
-    this.appStorage.audioSpeed = event.new_value;
-  }
-
   afterSpeedChange(event: {
     new_value: number, timestamp: number
   }) {
@@ -503,13 +504,6 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audioManager.playposition,
         this.editor.caretpos, null, segment, 'audio_speed');
     }
-  }
-
-  onVolumeChange(event: {
-    old_value: number, new_value: number, timestamp: number
-  }) {
-    this.audioChunkTop.volume = event.new_value;
-    this.appStorage.audioVolume = event.new_value;
   }
 
   afterVolumeChange(event: {
@@ -537,12 +531,6 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   public update() {
-    /* if (!isNullOrUndefined(this.loupe)) {
-      this.loupe.update();
-    }
-    if (!isNullOrUndefined(this.viewer)) {
-      this.viewer.update();
-    } */
     this.segmentselected = false;
     this.audioChunkTop.startpos = this.audioChunkTop.time.start.clone();
     this.audioChunkDown.startpos = this.audioChunkDown.time.start.clone();
@@ -617,16 +605,16 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   public enableAllShortcuts() {
-    this.viewer.enableShortcuts();
-    if (!isUnset(this.loupe)) {
-      this.loupe.enableShortcuts();
+    this.signalDisplayTop.enableShortcuts();
+    if (!isUnset(this.signalDisplayDown)) {
+      this.signalDisplayDown.enableShortcuts();
     }
   }
 
   public disableAllShortcuts() {
-    this.viewer.disableShortcuts();
-    if (!isUnset(this.loupe)) {
-      this.loupe.disableShortcuts();
+    this.signalDisplayTop.disableShortcuts();
+    if (!isUnset(this.signalDisplayDown)) {
+      this.signalDisplayDown.disableShortcuts();
     }
   }
 }

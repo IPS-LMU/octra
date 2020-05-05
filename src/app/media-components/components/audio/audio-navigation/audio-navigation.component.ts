@@ -3,13 +3,15 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
   Output,
-  SimpleChanges
+  SimpleChanges,
+  ViewChild
 } from '@angular/core';
 import {AudioChunk} from '../../../obj/audio/AudioManager';
 import {SubscriptionManager} from '../../../obj/SubscriptionManager';
@@ -50,6 +52,14 @@ export interface Buttons {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChanges, OnDestroy {
+  public get height() {
+    if (!isUnset(this.audioNavContainer)) {
+      return this.audioNavContainer.nativeElement.clientHeight;
+    }
+
+    return 0;
+  }
+
   get isReady(): boolean {
     return this._isReady;
   }
@@ -105,6 +115,8 @@ export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChange
   @Input() easyMode = false;
   @Input() audioChunk: AudioChunk;
   @Input() stepBackwardTime = 500;
+
+  @ViewChild('audioNavContainer', {static: true}) audioNavContainer: ElementRef;
 
   private _replay = false;
   private _isReady = false;

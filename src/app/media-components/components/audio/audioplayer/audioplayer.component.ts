@@ -1,14 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  SimpleChanges,
-  ViewChild
-} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import {PlayBackStatus, SampleUnit} from '../../../obj/audio';
 import {SubscriptionManager} from '../../../obj/SubscriptionManager';
 import {AudioChunk} from '../../../obj/audio/AudioManager';
@@ -202,24 +192,24 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
 
   onPlayHeadDragging = (pos) => {
     const maxWidth = this.canvasElements.panel.width() - this._settings.slider.margin.left - (this._settings.playHead.width / 2);
-    let x = Math.min(Math.max(this._settings.slider.margin.left, pos.x) - (this._settings.playHead.width / 2), maxWidth);
+    let xCoord = Math.min(Math.max(this._settings.slider.margin.left, pos.x) - (this._settings.playHead.width / 2), maxWidth);
 
-    const samples = this.pxToSample(x - this._settings.slider.margin.left + (this._settings.playHead.width / 2));
+    const samples = this.pxToSample(xCoord - this._settings.slider.margin.left + (this._settings.playHead.width / 2));
 
     if (!isNaN(samples.samples)) {
       if (this.audioChunk.status === PlayBackStatus.PLAYING) {
         this.audioChunk.stopPlayback().then(() => {
-          this.audioChunk.relativePlayposition = this.pxToSample(x - this._settings.slider.margin.left + (this._settings.playHead.width / 2));
+          this.setPlayPosition(xCoord);
         });
       } else {
-        this.audioChunk.relativePlayposition = this.pxToSample(x - this._settings.slider.margin.left + (this._settings.playHead.width / 2));
+        this.setPlayPosition(xCoord);
       }
     } else {
-      x = pos.x;
+      xCoord = pos.x;
     }
 
     return {
-      x,
+      x: xCoord,
       y: this._settings.slider.margin.top + this._settings.slider.height / 2 - this._settings.playHead.height / 2
     };
   }
@@ -329,22 +319,29 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
 
   private onPanelClick = (event) => {
     const maxWidth = this.canvasElements.panel.width() - this._settings.slider.margin.left;
-    const px = Math.min(Math.max(this._settings.slider.margin.left, event.evt.x), maxWidth)
+    const xCoord = Math.min(Math.max(this._settings.slider.margin.left, event.evt.x), maxWidth)
       - (this._settings.playHead.width / 2);
-    this.canvasElements.playHead.x(px);
+    this.canvasElements.playHead.x(xCoord);
     // hide bufferedBar
     this.stage.draw();
 
     if (this.audioChunk.status === PlayBackStatus.PLAYING) {
       this.audioChunk.stopPlayback().then(() => {
-        this.audioChunk.relativePlayposition = this.pxToSample(px - this._settings.slider.margin.left + this._settings.playHead.width / 2);
-        this.onPlaybackStarted();
+        this.setPlayPosition(xCoord);
+        setTimeout(() => {
+          this.audioChunk.startPlayback();
+        }, 200);
       }).catch((error) => {
         console.error(error);
       });
     } else {
-      this.audioChunk.relativePlayposition = this.pxToSample(px - this._settings.slider.margin.left + this._settings.playHead.width / 2);
+      this.setPlayPosition(xCoord);
     }
+  }
+
+  private setPlayPosition = (xCoord: number) => {
+    this.audioChunk.relativePlayposition = this.pxToSample(xCoord - this._settings.slider.margin.left + this._settings.playHead.width / 2);
+    this.audioChunk.startpos = this.audioChunk.absolutePlayposition;
   }
 
   public enableShortcuts() {

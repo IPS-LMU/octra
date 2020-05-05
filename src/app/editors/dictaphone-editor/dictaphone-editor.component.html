@@ -36,7 +36,8 @@
                         [easyMode]="appStorage.easymode"
 ></octra-audio-navigation>
 <octra-audioplayer #audioplayer
-                   [audioChunk]="audiochunk"></octra-audioplayer>
+                   [audioChunk]="audiochunk"
+></octra-audioplayer>
 <app-transcr-editor #transcr
                     (typing)="afterTyping($event);"
                     (keyup)="onKeyUp()"

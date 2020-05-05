@@ -83,8 +83,6 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   ngOnInit() {
     this.audioManager = this.audio.audiomanagers[0];
     this.audiochunk = this.audioManager.mainchunk.clone();
-    // this.audiochunk.speed = 1;
-    this.audiochunk.volume = 1;
     // TODO important set shortcuts for keymapping service
     // this.shortcuts = this.settings.shortcuts;
     this.editor.Settings.markers = this.transcrService.guidelines.markers.items;

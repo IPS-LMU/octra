@@ -527,7 +527,6 @@ export class AudioManager {
   }
 
   private onEnded = () => {
-    console.log(`ENDED normally`);
     if (this._state === PlayBackStatus.PLAYING) {
       // audio ended normally
       this.changeState(PlayBackStatus.ENDED);
@@ -785,8 +784,10 @@ export class AudioChunk {
             }
 
             if (state === PlayBackStatus.ENDED) {
+              this.absolutePlayposition = this.selection.end.clone();
               // reset to beginning of selection
-              if (this._playposition.samples >= this.time.end.samples) {
+
+              if (this._playposition.seconds >= this.time.end.seconds) {
                 this.startpos = this.time.start.clone();
               } else {
                 this._playposition = this.selection.start.clone();

@@ -253,29 +253,6 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         start: this.viewer.av.drawnSelection.start.samples,
         length: this.viewer.av.drawnSelection.duration.samples
       }, null, 'audio_buttons');
-
-    switch (event.type) {
-      case('play'):
-        this.audioChunkTop.startPlayback();
-        break;
-      case('pause'):
-        this.audioChunkTop.pausePlayback();
-        break;
-      case('stop'):
-        this.audioChunkTop.stopPlayback();
-        break;
-      case('replay'):
-        this.audioChunkTop.toggleReplay();
-        break;
-      case('backward'):
-        this.audioChunkTop.stepBackward();
-        break;
-      case('backward time'):
-        this.audioChunkTop.stepBackwardTime(0.5);
-        break;
-      case('default'):
-        break;
-    }
   }
 
   ngAfterViewInit() {

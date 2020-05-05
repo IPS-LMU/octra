@@ -408,7 +408,10 @@ export class AppStorageService {
   }
 
   public get audioVolume(): number {
-    return this._audioSettings.volume;
+    if (!isUnset(this._audioSettings) && !isUnset(this._audioSettings.volume)) {
+      return this._audioSettings.volume;
+    }
+    return 1;
   }
 
   public set audioSpeed(value: number) {
@@ -420,7 +423,10 @@ export class AppStorageService {
   }
 
   public get audioSpeed(): number {
-    return this._audioSettings.speed;
+    if (!isUnset(this._audioSettings) && !isUnset(this._audioSettings.speed)) {
+      return this._audioSettings.speed;
+    }
+    return 1;
   }
 
   private _savingNeeded = false;

@@ -7,6 +7,8 @@
                    && settingsService.isASREnabled"></app-asr-options>
   <octra-audio-navigation #audionav
                           [audioChunk]="audiochunk"
+                          [playbackRate]="appStorage.audioSpeed"
+                          [volume]="appStorage.audioVolume"
                           (buttonClick)="onButtonClick($event)"
                           (keyup)="onKeyUp()"
                           (afterVolumeChange)="afterVolumeChange($event)"

@@ -189,6 +189,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.viewer.secondsPerLine = this.appStorage.secondsPerLine;
 
     this.miniLoupeSettings.roundValues = false;
+    this.miniLoupeSettings.shortcutsEnabled = false;
     this.miniLoupeSettings.selection.enabled = false;
     this.miniLoupeSettings.boundaries.readonly = true;
     this.miniLoupeSettings.asr.enabled = false;

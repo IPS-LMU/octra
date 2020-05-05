@@ -16,6 +16,9 @@
                         (afterVolumeChange)="afterVolumeChange($event)"
                         (afterPlaybackRateChange)="afterSpeedChange($event)"
                         [responsive]="settingsService.responsive.enabled"
+                        [volume]="appStorage.audioVolume"
+                        [playbackRate]="appStorage.audioSpeed"
+
                         [buttons]="{
                         play: {
                             label: ('general.play' | transloco),

@@ -9,6 +9,9 @@
                           (buttonClick)="onButtonClick($event)"
                           (afterVolumeChange)="afterVolumeChange($event)"
                           (afterPlaybackRateChange)="afterSpeedChange($event)"
+
+                          [volume]="appStorage.audioVolume"
+                          [playbackRate]="appStorage.audioSpeed"
                           [responsive]="settingsService.responsive.enabled"
                           [buttons]="{
                                 play: {

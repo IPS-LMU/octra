@@ -62,14 +62,16 @@ export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChange
     return this._isAudioPlaying;
   }
 
-  set volume(value: number) {
+  @Input() set volume(value: number) {
     this.volumeChange.emit({
       old_value: Number(this._volume),
       new_value: Number(value),
       timestamp: Date.now()
     });
     this._volume = value;
-    this.audioChunk.volume = value;
+    if (!isUnset(this.audioChunk)) {
+      this.audioChunk.volume = value;
+    }
   }
 
   get volume(): number {
@@ -80,14 +82,17 @@ export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChange
     return this._playbackRate;
   }
 
-  set playbackRate(value: number) {
+  @Input() set playbackRate(value: number) {
     this.playbackRateChange.emit({
       old_value: Number(this._playbackRate),
       new_value: Number(value),
       timestamp: Date.now()
     });
     this._playbackRate = value;
-    this.audioChunk.playbackRate = value;
+
+    if (!isUnset(this.audioChunk)) {
+      this.audioChunk.playbackRate = value;
+    }
   }
 
   @Output() buttonClick = new EventEmitter<{ type: string, timestamp: number }>();
@@ -155,6 +160,7 @@ export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChange
       if (!isUnset(newAudioChunk)) {
         this.subscrManager.destroy();
         this.connectEvents();
+        this.initialize();
         this._isReady = true;
       } else {
         // not ready
@@ -167,6 +173,11 @@ export class AudioNavigationComponent implements AfterViewInit, OnInit, OnChange
 
   ngOnDestroy(): void {
     this.subscrManager.destroy();
+  }
+
+  private initialize() {
+    this.audioChunk.playbackRate = this._playbackRate;
+    this.audioChunk.volume = this._volume;
   }
 
   private connectEvents() {

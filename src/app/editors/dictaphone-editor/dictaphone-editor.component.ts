@@ -108,23 +108,6 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     this.uiService.addElementFromEvent('mouseclick', {value: event.type},
       event.timestamp, this.audioManager.playposition,
       this.editor.caretpos, null, null, 'audio_buttons');
-
-    switch (event.type) {
-      case('play'):
-        break;
-      case('pause'):
-        break;
-      case('stop'):
-        break;
-      case('replay'):
-        break;
-      case('backward'):
-        break;
-      case('backward time'):
-        break;
-      case('default'):
-        break;
-    }
   }
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {

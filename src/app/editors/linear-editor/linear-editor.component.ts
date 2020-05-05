@@ -322,13 +322,17 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.miniLoupeCoord.component = this.signalDisplayTop;
 
     if (!this.audioManager.isPlaying && this.appStorage.playonhover) {
-      // play audio
-      /* this.audiochunkTop.selection.start = this.viewer.av.Mousecursor.timePos.clone();
-      this.audiochunkTop.selection.end.samples = this.viewer.av.Mousecursor.timePos.samples +
-        this.audioManager.ressource.info.sampleRate / 10;
-      this.audiochunkTop.startPlayback(() => {
-      }, true);
-       */
+      // play audio on hover
+
+      // it's very important to use a seperate chunk for the hover playback!
+      const audioChunkHover = this.audioChunkTop.clone();
+      audioChunkHover.volume = 1;
+      audioChunkHover.playbackRate = 1;
+      audioChunkHover.selection.start = this.signalDisplayTop.av.mouseCursor.clone();
+      audioChunkHover.selection.end = this.signalDisplayTop.av.mouseCursor.add(
+        this.audioManager.createSampleUnit(this.audioManager.sampleRate / 10)
+      );
+      audioChunkHover.startPlayback(true);
     }
 
     // const a = this.viewer.getLocation();

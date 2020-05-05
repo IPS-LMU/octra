@@ -469,8 +469,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       this.viewer.settings.shortcutsEnabled = true;
       this.selectedIndex = this.window.segmentIndex;
       this.viewer.selectSegment(this.selectedIndex);
-      // important update needed?
-      // this.viewer.drawSegments();
 
       const segment = this.transcrService.currentlevel.segments.get(this.selectedIndex);
       const absx = this.viewer.av.audioTCalculator.samplestoAbsX(segment.time);
@@ -485,9 +483,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     }
   }
 
-  onSegmentSelected() {
-  }
-
   onMouseOver($event: {
     event: MouseEvent | null
     time: SampleUnit
@@ -498,13 +493,17 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.mousestate = 'moving';
 
     if (!this.audioManager.isPlaying && this.appStorage.playonhover) {
-      // play audio
-      /*
-      this.audioChunkLines.selection.start.samples = this.viewer.av.Mousecursor.timePos.samples;
-      this.audioChunkLines.selection.end.samples = this.viewer.av.Mousecursor.timePos.samples +
-        this.audioManager.sampleRate / 10;
-      this.audioChunkLines.startPlayback(() => {
-      });*/
+      // play audio on hover
+
+      // it's very important to use a seperate chunk for the hover playback!
+      const audioChunkHover = this.audioChunkLines.clone();
+      audioChunkHover.volume = 1;
+      audioChunkHover.playbackRate = 1;
+      audioChunkHover.selection.start = this.viewer.av.mouseCursor.clone();
+      audioChunkHover.selection.end = this.viewer.av.mouseCursor.add(
+        this.audioManager.createSampleUnit(this.audioManager.sampleRate / 10)
+      );
+      audioChunkHover.startPlayback(true);
     }
 
     if (this.appStorage.showLoupe) {

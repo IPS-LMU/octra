@@ -324,13 +324,17 @@ export class AudioManager {
           })
           .catch((error) => {
             this._playbackEndChecker.unsubscribe();
-            if (error.name && error.name === 'NotAllowedError') {
-              // no permission
-              this.missingPermission.emit();
-            }
+            if (!this.playOnHover) {
+              if (error.name && error.name === 'NotAllowedError') {
+                // no permission
+                this.missingPermission.emit();
+              }
 
-            this.statechange.error(new Error(error));
-            reject(error);
+              this.statechange.error(new Error(error));
+              reject(error);
+            } else {
+              resolve();
+            }
           });
       }).catch((error) => {
         this._playbackEndChecker.unsubscribe();

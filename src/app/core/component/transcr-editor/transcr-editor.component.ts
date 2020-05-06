@@ -555,7 +555,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             Functions.placeAtEnd(jQuery('.note-editable')[0]);
           }
         }
-        if (!isNullOrUndefined(this.textfield)) {
+        if (!isUnset(this.textfield)) {
           this.textfield.summernote('focus');
         }
       } catch (exception) {
@@ -577,7 +577,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnInit() {
     this.Settings.height = this.height;
-    if (!isNullOrUndefined(this.audiochunk)) {
+    if (!isUnset(this.audiochunk)) {
       this._lastAudioChunkID = this.audiochunk.id;
     }
     this.initialize();

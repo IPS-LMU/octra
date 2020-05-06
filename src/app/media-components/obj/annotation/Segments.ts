@@ -2,6 +2,7 @@ import {Segment} from './Segment';
 import {EventEmitter} from '@angular/core';
 import {ISegment, OLabel, OSegment} from './AnnotJSON';
 import {SampleUnit} from '../audio';
+import {isUnset} from '../../../core/shared/Functions';
 
 export interface SegmentChangeEvent {
   type: 'remove' | 'change' | 'add';
@@ -58,7 +59,7 @@ export class Segments {
     }
 
     if (this.segments.find((a) => {
-      return a.time.browserSample.seconds === time.browserSample.seconds
+      return a.time.seconds === time.seconds
     }) === undefined) {
       this.segments.push(newSegment);
     } else {
@@ -127,7 +128,7 @@ export class Segments {
    * changes samples of segment by given index and sorts the List after adding
    */
   public change(i: number, segment: Segment): boolean {
-    if (i > -1 && !isNullOrUndefined(this._segments[i])) {
+    if (i > -1 && !isUnset(this._segments[i])) {
       const old = {
         samples: this._segments[i].time.samples,
         transcript: this._segments[i].transcript

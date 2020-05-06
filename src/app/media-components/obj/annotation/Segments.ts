@@ -57,7 +57,13 @@ export class Segments {
       newSegment.transcript = transcript;
     }
 
-    this.segments.push(newSegment);
+    if (this.segments.find((a) => {
+      return a.time.browserSample.seconds === time.browserSample.seconds
+    }) === undefined) {
+      this.segments.push(newSegment);
+    } else {
+      console.error(`segment with this timestamp ${time.seconds} already exists and can not be added.`);
+    }
     this.sort();
     this.cleanup();
     this.onsegmentchange.emit({
@@ -121,7 +127,7 @@ export class Segments {
    * changes samples of segment by given index and sorts the List after adding
    */
   public change(i: number, segment: Segment): boolean {
-    if (i > -1 && this._segments[i]) {
+    if (i > -1 && !isNullOrUndefined(this._segments[i])) {
       const old = {
         samples: this._segments[i].time.samples,
         transcript: this._segments[i].transcript

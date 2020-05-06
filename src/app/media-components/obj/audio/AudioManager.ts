@@ -797,7 +797,7 @@ export class AudioChunk {
                 this._playposition = this.selection.start.clone();
               }
               if (this._replay) {
-                console.log(`REPLAY!`);
+                this.setState(state);
                 return new Promise<void>((resolve2, reject2) => {
                   setTimeout(() => {
                     this.startPlayback(playOnHover).then((result) => {
@@ -810,11 +810,12 @@ export class AudioChunk {
                   }, 200);
                 });
               } else {
-                console.log(`REPLAY OFF!`);
+                this.setState(state);
                 resolve();
               }
+            } else {
+              this.setState(state);
             }
-            this.setState(state);
           },
           (error) => {
             console.error(error);

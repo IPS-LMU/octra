@@ -131,6 +131,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         this.oldRaw = this.editor.rawText;
       }
 
+      this.editor.updateRawText();
       this.save();
       setTimeout(() => {
         if (!isUnset(this.signalDisplayDown)) {

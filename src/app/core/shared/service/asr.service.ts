@@ -108,7 +108,11 @@ export class AsrService {
       );
 
       if (segNumber > -1) {
-        this.transcrService.currentlevel.segments.get(segNumber).isBlockedBy = null;
+        const segment = this.transcrService.currentlevel.segments.get(segNumber);
+
+        if (!isNullOrUndefined(segment)) {
+          segment.isBlockedBy = null;
+        }
         item.stopProcessing();
       } else {
         console.error(new Error(`could not find segment.`));
@@ -199,7 +203,7 @@ class ASRQueue {
     if (index > -1) {
       this._queue.splice(index, 1);
     } else {
-      console.error(`could not remove queueItem with id ${id}`);
+      console.error(`queueItem with id ${id} does not exist and can't be removed.`);
     }
   }
 
@@ -446,6 +450,9 @@ export class ASRQueueItem {
         console.log(`CALL ASR ONLY`);
         this.transcribeSignalWithASR('txt').then(() => {
           this.changeStatus(ASRProcessStatus.FINISHED);
+        }).catch((error) => {
+          console.error(`ASR only failed`);
+          console.error(error);
         });
       } else if (this._type === ASRQueueItemType.ASRMAUS) {
         console.log(`CALL ASR MAUS`);
@@ -468,8 +475,15 @@ export class ASRQueueItem {
             reader.readAsText(result.file, 'utf-8');
           }).catch((error) => {
             console.error(error);
-            this.changeStatus(ASRProcessStatus.FAILED);
+
+            if (this.status !== ASRProcessStatus.NOAUTH) {
+              this._result = error;
+              this.changeStatus(ASRProcessStatus.FAILED);
+            }
           });
+        }).catch((error) => {
+          console.error(`ASR MAUS failed`);
+          console.error(error);
         });
       } else if (this._type === ASRQueueItemType.MAUS) {
         console.log(`call MAUS only`);
@@ -573,11 +587,10 @@ export class ASRQueueItem {
           }
         },
         (error) => {
-          console.log(JSON.stringify(error));
           if (error.message.indexOf('0 Unknown Error') > -1) {
             this.changeStatus(ASRProcessStatus.NOAUTH);
           }
-          reject(error.message);
+          reject(`Authentication needed`);
         });
     });
   }
@@ -688,8 +701,10 @@ export class ASRQueueItem {
                 } else if (error.indexOf('0 Unknown Error') > -1) {
                   this.changeStatus(ASRProcessStatus.NOAUTH);
                 } else {
-                  this._result = error;
-                  this.changeStatus(ASRProcessStatus.FAILED);
+                  if (this.status !== ASRProcessStatus.NOAUTH) {
+                    this._result = error;
+                    this.changeStatus(ASRProcessStatus.FAILED);
+                  }
                 }
                 reject(error);
               });
@@ -772,7 +787,10 @@ export class ASRQueueItem {
                 } else if (error.indexOf('0 Unknown Error') > -1) {
                   this.changeStatus(ASRProcessStatus.NOAUTH);
                 } else {
-                  this.changeStatus(ASRProcessStatus.FAILED);
+                  if (this.status !== ASRProcessStatus.NOAUTH) {
+                    this._result = error;
+                    this.changeStatus(ASRProcessStatus.FAILED);
+                  }
                 }
                 reject(error);
               });

@@ -67,7 +67,7 @@ export class TextConverter extends Converter {
       const olabels: OLabel[] = [];
       olabels.push((new OLabel('OCTRA_1', file.content)));
       const osegment = new OSegment(
-        1, 0, Math.round(audiofile.duration * sampleRate), olabels
+        1, 0, Math.round(audiofile.duration), olabels
       );
 
       olevel.items.push(osegment);

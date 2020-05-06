@@ -70,6 +70,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
   public get fileInput() {
     return this.dropzone.fileinput;
   }
+
   public afterDrop = () => {
     this._oannotation = null;
     for (let i = 0; i < this.dropzone.files.length; i++) {
@@ -208,6 +209,8 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
                               level.items.push(new OSegment(last.id + 1, last.sampleStart + last.sampleDur,
                                 (this._oaudiofile.duration * this._oaudiofile.sampleRate) - (last.sampleStart + last.sampleDur),
                                 [new OLabel(level.name, '')]));
+                            } else {
+                              console.error(`Import Error, last sample of result is bigger than the audio file's duration`);
                             }
                           }
                         }

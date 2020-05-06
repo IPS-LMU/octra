@@ -253,7 +253,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       (event) => {
         switch (event.key) {
           case('secondsPerLine'):
-            this.viewer.onSecondsPerLineChanged(event.value);
+            this.viewer.onSecondsPerLineChanged(event.value).catch((error) => {
+              console.error(error);
+            });
             break;
         }
       }
@@ -266,124 +268,130 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentBoundary);
           if (segNumber > -1) {
             if (item.status !== ASRProcessStatus.STARTED) {
-              const segment = this.transcrService.currentlevel.segments.get(segNumber).clone();
-              segment.isBlockedBy = null;
+              let segment = this.transcrService.currentlevel.segments.get(segNumber);
 
-              if (item.status === ASRProcessStatus.NOQUOTA) {
-                this.alertService.showAlert('danger', this.langService.translate('asr.no quota'));
-                this.uiService.addElementFromEvent(item.type.toLowerCase(), {
-                  value: 'failed'
-                }, Date.now(), null, null, null, {
-                  start: item.time.sampleStart,
-                  length: item.time.sampleLength
-                }, 'automation');
-              } else if (item.status === ASRProcessStatus.NOAUTH) {
-                this.uiService.addElementFromEvent(item.type.toLowerCase(), {
-                  value: 'no_auth'
-                }, Date.now(), null, null, null, {
-                  start: item.time.sampleStart,
-                  length: item.time.sampleLength
-                }, 'automation');
+              if (!isNullOrUndefined(segment)) {
+                segment = segment.clone();
+                segment.isBlockedBy = null;
 
-                this.alertService.showAlert('warning', AuthenticationNeededComponent, true, -1).then((item) => {
-                  const auth = item.component as AuthenticationNeededComponent;
-                  this.subscrmanager.add(auth.authenticateClick.subscribe(() => {
-                    this.openAuthWindow();
-                  }));
-                  this.subscrmanager.add(auth.confirmationClick.subscribe(() => {
-                    this.resetQueueItemsWithNoAuth();
-                    this.alertService.closeAlert(item.id);
-                  }));
-                });
-              } else {
-                if (item.status === ASRProcessStatus.FINISHED && item.result !== '') {
+                if (item.status === ASRProcessStatus.NOQUOTA) {
+                  this.alertService.showAlert('danger', this.langService.translate('asr.no quota'));
                   this.uiService.addElementFromEvent(item.type.toLowerCase(), {
-                    value: 'finished'
+                    value: 'failed'
                   }, Date.now(), null, null, null, {
                     start: item.time.sampleStart,
                     length: item.time.sampleLength
                   }, 'automation');
-                  if (item.type === ASRQueueItemType.ASR) {
-                    segment.transcript = item.result.replace(/(<\/p>)/g, '');
+                } else if (item.status === ASRProcessStatus.NOAUTH) {
+                  this.uiService.addElementFromEvent(item.type.toLowerCase(), {
+                    value: 'no_auth'
+                  }, Date.now(), null, null, null, {
+                    start: item.time.sampleStart,
+                    length: item.time.sampleLength
+                  }, 'automation');
 
-                    const index = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
-                      return a.time.samples === segment.time.samples;
-                    });
-                    if (index > -1) {
-                      this.transcrService.currentlevel.segments.change(index, segment);
-                    }
-                  } else if (item.type === ASRQueueItemType.ASRMAUS || item.type === ASRQueueItemType.MAUS) {
-                    const converter = new PraatTextgridConverter();
+                  this.alertService.showAlert('warning', AuthenticationNeededComponent, true, -1).then((item) => {
+                    const auth = item.component as AuthenticationNeededComponent;
+                    this.subscrmanager.add(auth.authenticateClick.subscribe(() => {
+                      this.openAuthWindow();
+                    }));
+                    this.subscrmanager.add(auth.confirmationClick.subscribe(() => {
+                      this.resetQueueItemsWithNoAuth();
+                      this.alertService.closeAlert(item.id);
+                    }));
+                  });
+                } else {
+                  if (item.status === ASRProcessStatus.FINISHED && item.result !== '') {
+                    this.uiService.addElementFromEvent(item.type.toLowerCase(), {
+                      value: 'finished'
+                    }, Date.now(), null, null, null, {
+                      start: item.time.sampleStart,
+                      length: item.time.sampleLength
+                    }, 'automation');
+                    if (item.type === ASRQueueItemType.ASR) {
+                      segment.transcript = item.result.replace(/(<\/p>)/g, '');
 
-                    const audiofile = new OAudiofile();
-                    const audioInfo = this.audioManager.ressource.info;
-                    audiofile.duration = audioInfo.duration.samples;
-                    audiofile.name = `OCTRA_ASRqueueItem_${item.id}.wav`;
-                    audiofile.sampleRate = this.audioManager.sampleRate;
-                    audiofile.size = this.audioManager.ressource.info.size;
-                    audiofile.type = this.audioManager.ressource.info.type;
-
-                    const convertedResult = converter.import({
-                      name: `OCTRA_ASRqueueItem_${item.id}.TextGrid`,
-                      content: item.result,
-                      type: 'text',
-                      encoding: 'utf-8'
-                    }, audiofile);
-
-                    const wordsTier = convertedResult.annotjson.levels.find((a) => {
-                      return a.name === 'ORT-MAU';
-                    });
-
-                    if (!isUnset(wordsTier)) {
-                      let counter = 0;
-                      const segmentEndBrowserTime = new SampleUnit(item.time.browserSampleEnd, this.audioManager.sampleRate);
-                      let segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentEndBrowserTime);
-
-                      if (segmentIndex < 0) {
-                        console.error(`could not find segment to be precessed by ASRMAUS!`);
-                      } else {
-                        for (const wordItem of wordsTier.items) {
-                          if (wordItem.sampleStart + wordItem.sampleDur <= item.time.sampleStart + item.time.sampleLength) {
-                            const readSegment = Segment.fromObj(new OSegment(1, wordItem.sampleStart, wordItem.sampleDur, wordItem.labels),
-                              this.audioManager.sampleRate);
-                            if (readSegment.transcript === '<p:>' || readSegment.transcript === '') {
-                              readSegment.transcript = this.transcrService.breakMarker.code;
-                            }
-
-                            if (counter === wordsTier.items.length - 1) {
-                              segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentEndBrowserTime);
-
-                              // the processed segment is now the very right one. Replace its content with the content of the last word item.
-                              this.transcrService.currentlevel.segments.segments[segmentIndex].transcript = readSegment.transcript;
-                              this.transcrService.currentlevel.segments.change(segmentIndex, this.transcrService.currentlevel.segments.segments[segmentIndex].clone());
-                            } else {
-                              let origTime = new SampleUnit(item.time.sampleStart + readSegment.time.samples, this.audioManager.sampleRate);
-                              this.transcrService.currentlevel.segments.add(origTime, readSegment.transcript);
-                            }
-                          } else {
-                            console.error(`wordItem samples are out of the correct boundaries.`);
-                            console.error(`${wordItem.sampleStart} + ${wordItem.sampleDur} <= ${item.time.sampleStart} + ${item.time.sampleLength}`);
-                          }
-                          counter++;
-                        }
+                      const index = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
+                        return a.time.samples === segment.time.samples;
+                      });
+                      if (index > -1) {
+                        this.transcrService.currentlevel.segments.change(index, segment);
                       }
-                    } else {
-                      console.error(`word tier not found!`);
+                    } else if (item.type === ASRQueueItemType.ASRMAUS || item.type === ASRQueueItemType.MAUS) {
+                      const converter = new PraatTextgridConverter();
+
+                      const audiofile = new OAudiofile();
+                      const audioInfo = this.audioManager.ressource.info;
+                      audiofile.duration = audioInfo.duration.samples;
+                      audiofile.name = `OCTRA_ASRqueueItem_${item.id}.wav`;
+                      audiofile.sampleRate = this.audioManager.sampleRate;
+                      audiofile.size = this.audioManager.ressource.info.size;
+                      audiofile.type = this.audioManager.ressource.info.type;
+
+                      const convertedResult = converter.import({
+                        name: `OCTRA_ASRqueueItem_${item.id}.TextGrid`,
+                        content: item.result,
+                        type: 'text',
+                        encoding: 'utf-8'
+                      }, audiofile);
+
+                      const wordsTier = convertedResult.annotjson.levels.find((a) => {
+                        return a.name === 'ORT-MAU';
+                      });
+
+                      if (!isUnset(wordsTier)) {
+                        let counter = 0;
+                        const segmentEndBrowserTime = new SampleUnit(item.time.browserSampleEnd, this.audioManager.sampleRate);
+                        let segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentEndBrowserTime);
+
+                        if (segmentIndex < 0) {
+                          console.error(`could not find segment to be precessed by ASRMAUS!`);
+                        } else {
+                          for (const wordItem of wordsTier.items) {
+                            if (wordItem.sampleStart + wordItem.sampleDur <= item.time.sampleStart + item.time.sampleLength) {
+                              const readSegment = Segment.fromObj(new OSegment(1, wordItem.sampleStart, wordItem.sampleDur, wordItem.labels),
+                                this.audioManager.sampleRate);
+                              if (readSegment.transcript === '<p:>' || readSegment.transcript === '') {
+                                readSegment.transcript = this.transcrService.breakMarker.code;
+                              }
+
+                              if (counter === wordsTier.items.length - 1) {
+                                segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentEndBrowserTime);
+
+                                // the processed segment is now the very right one. Replace its content with the content of the last word item.
+                                this.transcrService.currentlevel.segments.segments[segmentIndex].transcript = readSegment.transcript;
+                                this.transcrService.currentlevel.segments.change(segmentIndex, this.transcrService.currentlevel.segments.segments[segmentIndex].clone());
+                              } else {
+                                let origTime = new SampleUnit(item.time.sampleStart + readSegment.time.samples, this.audioManager.sampleRate);
+                                this.transcrService.currentlevel.segments.add(origTime, readSegment.transcript);
+                              }
+                            } else {
+                              console.error(`wordItem samples are out of the correct boundaries.`);
+                              console.error(`${wordItem.sampleStart} + ${wordItem.sampleDur} <= ${item.time.sampleStart} + ${item.time.sampleLength}`);
+                            }
+                            counter++;
+                          }
+                        }
+                      } else {
+                        console.error(`word tier not found!`);
+                      }
                     }
+                  } else if (item.status === ASRProcessStatus.FAILED) {
+                    this.alertService.showAlert('danger', ErrorOccurredComponent, true, -1);
+                    segment.isBlockedBy = null;
+                    this.transcrService.currentlevel.segments.change(segNumber, segment);
                   }
-                } else if (item.status === ASRProcessStatus.FAILED) {
-                  this.alertService.showAlert('danger', ErrorOccurredComponent, true, -1);
-                  segment.isBlockedBy = null;
-                  this.transcrService.currentlevel.segments.change(segNumber, segment);
+
+                  // this.viewer.update(true);
                 }
+                // STOPPED status is ignored because OCTRA should do nothing
 
-                // this.viewer.update(true);
+                // update GUI
+                // TODO important update?
+                // this.viewer.update();
+              } else {
+                console.error(`can't start ASR because segment not found!`);
               }
-              // STOPPED status is ignored because OCTRA should do nothing
-
-              // update GUI
-              // TODO important update?
-              // this.viewer.update();
             } else {
               // item started
               this.uiService.addElementFromEvent(item.type.toLowerCase(), {
@@ -438,10 +446,11 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     if (this.transcrService.currentlevel.segments && selected.index > -1 &&
       selected.index < this.transcrService.currentlevel.segments.length) {
       const segment = this.transcrService.currentlevel.segments.get(selected.index);
-      if (segment.isBlockedBy !== ASRQueueItemType.ASRMAUS && segment.isBlockedBy !== ASRQueueItemType.MAUS) {
-        const start: SampleUnit = (selected.index > 0) ? this.transcrService.currentlevel.segments.get(selected.index - 1).time.clone()
-          : this.audioManager.createSampleUnit(0);
-        if (segment) {
+
+      if (!isUnset(segment)) {
+        if (segment.isBlockedBy !== ASRQueueItemType.ASRMAUS && segment.isBlockedBy !== ASRQueueItemType.MAUS) {
+          const start: SampleUnit = (selected.index > 0) ? this.transcrService.currentlevel.segments.get(selected.index - 1).time.clone()
+            : this.audioManager.createSampleUnit(0);
           this.selectedIndex = selected.index;
           this.audioChunkWindow = new AudioChunk(new AudioSelection(start, segment.time.clone()), this.audioManager);
 
@@ -456,9 +465,11 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           }, TwoDEditorComponent.editorname);
           this.cd.markForCheck();
           this.cd.detectChanges();
+        } else {
+          this.alertService.showAlert('danger', 'You can\'t open this segment while processing segmentation. If you need to open it, cancel segmentation first.');
         }
       } else {
-        this.alertService.showAlert('danger', 'You can\'t open this segment while processing segmentation. If you need to open it, cancel segmentation first.');
+        console.error(`couldn't find segment with index ${selected.index}`);
       }
     }
   }
@@ -546,253 +557,388 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         if (!isUnset(this.asrService.selectedLanguage)) {
           const segment = this.transcrService.currentlevel.segments.get(segmentNumber);
 
-          const sampleStart = (segmentNumber > 0)
-            ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.samples
-            : 0;
+          if(!isUnset(segment)){
 
-          this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
-            this.audioManager.playposition, -1, null, {
-              start: sampleStart,
-              length: segment.time.samples - sampleStart
-            }, 'multi-lines-viewer');
+            const sampleStart = (segmentNumber > 0)
+              ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.samples
+              : 0;
 
-          const selection = {
-            sampleStart: sampleStart,
-            sampleLength: segment.time.samples - sampleStart,
-            browserSampleEnd: segment.time.samples
-          };
+            this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
+              this.audioManager.playposition, -1, null, {
+                start: sampleStart,
+                length: segment.time.samples - sampleStart
+              }, 'multi-lines-viewer');
 
-          if (segment.isBlockedBy === null) {
-            if ($event.value === 'do_asr' || $event.value === 'do_asr_maus' || $event.value === 'do_maus') {
-              this.viewer.selectSegment(segmentNumber);
+            const selection = {
+              sampleStart: sampleStart,
+              sampleLength: segment.time.samples - sampleStart,
+              browserSampleEnd: segment.time.samples
+            };
 
-              if ($event.value === 'do_asr') {
-                this.asrService.addToQueue(selection, ASRQueueItemType.ASR);
-                segment.isBlockedBy = ASRQueueItemType.ASR;
-              } else if ($event.value === 'do_asr_maus') {
-                this.asrService.addToQueue(selection, ASRQueueItemType.ASRMAUS);
-                segment.isBlockedBy = ASRQueueItemType.ASRMAUS;
-              } else if ($event.value === 'do_maus') {
-                if (segment.transcript.trim() === '' || segment.transcript.split(' ').length < 2) {
-                  this.alertService.showAlert('danger', this.langService.translate('asr.maus empty text'), false);
-                } else {
-                  this.asrService.addToQueue(selection, ASRQueueItemType.MAUS, segment.transcript);
-                  segment.isBlockedBy = ASRQueueItemType.MAUS;
+            if (segment.isBlockedBy === null) {
+              if ($event.value === 'do_asr' || $event.value === 'do_asr_maus' || $event.value === 'do_maus') {
+                this.viewer.selectSegment(segmentNumber);
+
+                if ($event.value === 'do_asr') {
+                  this.asrService.addToQueue(selection, ASRQueueItemType.ASR);
+                  segment.isBlockedBy = ASRQueueItemType.ASR;
+                } else if ($event.value === 'do_asr_maus') {
+                  this.asrService.addToQueue(selection, ASRQueueItemType.ASRMAUS);
+                  segment.isBlockedBy = ASRQueueItemType.ASRMAUS;
+                } else if ($event.value === 'do_maus') {
+                  if (segment.transcript.trim() === '' || segment.transcript.split(' ').length < 2) {
+                    this.alertService.showAlert('danger', this.langService.translate('asr.maus empty text'), false);
+                  } else {
+                    this.asrService.addToQueue(selection, ASRQueueItemType.MAUS, segment.transcript);
+                    segment.isBlockedBy = ASRQueueItemType.MAUS;
+                  }
                 }
               }
+              this.asrService.startASR();
+            } else {
+              const item = this.asrService.queue.getItemByTime(selection.sampleStart, selection.sampleLength);
+              this.asrService.stopASROfItem(item);
+              segment.isBlockedBy = null;
             }
-            this.asrService.startASR();
           } else {
-            const item = this.asrService.queue.getItemByTime(selection.sampleStart, selection.sampleLength);
-            this.asrService.stopASROfItem(item);
-            segment.isBlockedBy = null;
+
           }
+        }
 
           // TODO update needed?
-          // this.viewer.update();
-        } else {
-          // open transcr window
-          this.openSegment(segmentNumber);
-          this.alertService.showAlert('warning', this.langService.translate('asr.no asr selected').toString());
-        }
-      }
-    }
-
-    if (
-      $event.value === null || !(
-        // cursor move by keyboard events are note saved because this would be too much
-      Functions.contains($event.value, 'cursor') ||
-      Functions.contains($event.value, 'segment_enter') ||
-      Functions.contains($event.value, 'playonhover') ||
-      Functions.contains($event.value, 'asr'))
-    ) {
-      $event.value = `${$event.type}:${$event.value}`;
-
-      let selection = {
-        start: -1,
-        length: -1
-      };
-
-      if ($event.hasOwnProperty('selection') && !isUnset($event.selection)) {
-        selection.start = $event.selection.start;
-        selection.length = $event.selection.length;
+          // this.viewer.update().catch((error) => {
+        //             console.error(`could not update GUI for multiline-viewer`);
+        //             console.error(error);
+        //           });
       } else {
-        selection = null;
+        // open transcr window
+        this.openSegment(segmentNumber);
+        this.alertService.showAlert('warning', this.langService.translate('asr.no asr selected').toString());
       }
-
-      const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
-      let playPosition = this.audioManager.playposition;
-      if (!this.audioChunkLines.isPlaying) {
-        if ($event.type === 'boundary') {
-          playPosition = this.viewer.av.MouseClickPos
-        }
-      }
-
-      this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
-        playPosition, caretpos, selection, null, 'multi-lines-viewer');
-
-    } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
-      this.appStorage.playonhover = !this.appStorage.playonhover;
-    }
-
-    this.cd.detectChanges();
-  }
-
-  afterSpeedChange(event: { new_value: number, timestamp: number }) {
-    this.appStorage.audioSpeed = event.new_value;
-
-    if (this.appStorage.logging) {
-      const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
-      this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        this.audioManager.playposition, caretpos, null, null, 'audio_speed');
     }
   }
 
-  afterVolumeChange(event: { new_value: number, timestamp: number }) {
-    this.appStorage.audioVolume = event.new_value;
+  if(
+    $event
 
-    if (this.appStorage.logging) {
-      const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
-      this.uiService.addElementFromEvent('slider', event, event.timestamp,
-        this.audioManager.playposition, caretpos, null, null, 'audio_volume');
-    }
+.
+  value
+===
+  null
+|| !(
+  // cursor move by keyboard events are note saved because this would be too much
+  Functions
+.
+
+  contains($event
+
+.
+  value
+,
+  'cursor'
+) ||
+  Functions
+.
+
+  contains($event
+
+.
+  value
+,
+  'segment_enter'
+) ||
+  Functions
+.
+
+  contains($event
+
+.
+  value
+,
+  'playonhover'
+) ||
+  Functions
+.
+
+  contains($event
+
+.
+  value
+,
+  'asr'
+))
+) {
+  $event
+.
+  value = `${$event.type}:${$event.value}`;
+
+  let
+  selection = {
+    start: -1,
+    length: -1
+  };
+
+  if($event
+
+.
+
+  hasOwnProperty(
+
+  'selection'
+) && !
+
+  isUnset($event
+
+.
+  selection
+)) {
+  selection
+.
+  start = $event.selection.start;
+  selection
+.
+  length = $event.selection.length;
+}
+
+else
+{
+  selection = null;
+}
+
+const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
+let playPosition = this.audioManager.playposition;
+if (!this.audioChunkLines.isPlaying) {
+  if ($event.type === 'boundary') {
+    playPosition = this.viewer.av.MouseClickPos
   }
+}
 
-  onButtonClick(event: { type: string, timestamp: number }) {
-    this.selectedIndex = -1;
-    if (this.appStorage.logging) {
-      const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
+this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
+  playPosition, caretpos, selection, null, 'multi-lines-viewer');
 
-      let selection = {
-        start: this.viewer.av.drawnSelection.start.samples,
-        length: this.viewer.av.drawnSelection.duration.samples
-      };
+} else
+if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
+  this.appStorage.playonhover = !this.appStorage.playonhover;
+}
 
-      this.uiService.addElementFromEvent('mouseclick', {value: 'click:' + event.type},
-        event.timestamp,
-        this.audioManager.playposition, caretpos, selection, null, 'audio_buttons');
-    }
+this.cd.detectChanges();
+}
+
+afterSpeedChange(event
+:
+{
+  new_value: number, timestamp
+:
+  number
+}
+)
+{
+  this.appStorage.audioSpeed = event.new_value;
+
+  if (this.appStorage.logging) {
+    const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
+    this.uiService.addElementFromEvent('slider', event, event.timestamp,
+      this.audioManager.playposition, caretpos, null, null, 'audio_speed');
   }
+}
 
-  public openSegment(segnumber: number) {
-    this.onSegmentEntered({index: segnumber});
+afterVolumeChange(event
+:
+{
+  new_value: number, timestamp
+:
+  number
+}
+)
+{
+  this.appStorage.audioVolume = event.new_value;
+
+  if (this.appStorage.logging) {
+    const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
+    this.uiService.addElementFromEvent('slider', event, event.timestamp,
+      this.audioManager.playposition, caretpos, null, null, 'audio_volume');
   }
+}
 
-  public update() {
+onButtonClick(event
+:
+{
+  type: string, timestamp
+:
+  number
+}
+)
+{
+  this.selectedIndex = -1;
+  if (this.appStorage.logging) {
+    const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
+
+    let selection = {
+      start: this.viewer.av.drawnSelection.start.samples,
+      length: this.viewer.av.drawnSelection.duration.samples
+    };
+
+    this.uiService.addElementFromEvent('mouseclick', {value: 'click:' + event.type},
+      event.timestamp,
+      this.audioManager.playposition, caretpos, selection, null, 'audio_buttons');
+  }
+}
+
+public
+openSegment(segnumber
+:
+number
+)
+{
+  this.onSegmentEntered({index: segnumber});
+}
+
+public
+update()
+{
     // TODO important update needed?
-    // this.viewer.update();
+    // this.viewer.update().catch((error) => {
+  //       console.error(`could not update GUI for multiline-viewer`);
+  //       console.error(error);
+  //     });
     this.audioChunkLines.startpos = this.audioChunkLines.time.start.clone();
+}
+
+onScrollbarMouse(event)
+{
+  if (event.state === 'mousemove') {
+    this.loupeHidden = true;
   }
+}
 
-  onScrollbarMouse(event) {
-    if (event.state === 'mousemove') {
-      this.loupeHidden = true;
-    }
+onScrolling(event)
+{
+  if (event.state === 'scrolling') {
+    this.loupeHidden = true;
   }
+}
 
-  onScrolling(event) {
-    if (event.state === 'scrolling') {
-      this.loupeHidden = true;
-    }
+onCircleLoupeMouseOver($event)
+{
+  // TODO important what about focus?
+  // this.viewer.focus();
+
+  const fullY = this.miniloupe.location.y + 20 + this.miniloupe.size.height;
+  if (fullY < this.viewer.height) {
+    // loupe is fully visible
+    this.miniloupe.location.y = this.miniloupe.location.y + 20;
+  } else {
+    // loupe out of the bottom border of view rectangle
+    this.miniloupe.location.y = this.miniloupe.location.y - 20 - this.miniloupe.size.height;
   }
+}
 
-  onCircleLoupeMouseOver($event) {
-    // TODO important what about focus?
-    // this.viewer.focus();
-
-    const fullY = this.miniloupe.location.y + 20 + this.miniloupe.size.height;
-    if (fullY < this.viewer.height) {
-      // loupe is fully visible
-      this.miniloupe.location.y = this.miniloupe.location.y + 20;
-    } else {
-      // loupe out of the bottom border of view rectangle
-      this.miniloupe.location.y = this.miniloupe.location.y - 20 - this.miniloupe.size.height;
-    }
+private
+changeArea(loup
+:
+AudioViewerComponent, coord
+:
+{
+  size: {
+    width: number,
+      height
+  :
+    number
   }
-
-  private changeArea(loup: AudioViewerComponent, coord: {
-    size: {
-      width: number,
-      height: number
-    },
-    location: {
-      x: number,
-      y: number
-    }
-  }, cursorTime: SampleUnit, factor: number) {
-    const cursorLocation = this.viewer.mouseCursor;
-    if (cursorLocation && cursorTime) {
-      const halfRate = Math.round(this.audioManager.sampleRate / factor);
-      const start = (cursorTime.samples > halfRate)
-        ? this.audioManager.createSampleUnit(cursorTime.samples - halfRate)
-        : this.audioManager.createSampleUnit(0);
-
-      const end = (cursorTime.samples < this.audioManager.ressource.info.duration.samples - halfRate)
-        ? this.audioManager.createSampleUnit(cursorTime.samples + halfRate)
-        : this.audioManager.ressource.info.duration.clone();
-
-      loup.av.zoomY = factor;
-      if (start && end) {
-        this.audioChunkLoupe.destroy();
-        this.audioChunkLoupe = new AudioChunk(new AudioSelection(start, end), this.audioManager);
-      }
-    }
-    this.cd.detectChanges();
+,
+  location: {
+    x: number,
+      y
+  :
+    number
   }
+}
+,
+cursorTime: SampleUnit, factor
+:
+number
+)
+{
+  const cursorLocation = this.viewer.mouseCursor;
+  if (cursorLocation && cursorTime) {
+    const halfRate = Math.round(this.audioManager.sampleRate / factor);
+    const start = (cursorTime.samples > halfRate)
+      ? this.audioManager.createSampleUnit(cursorTime.samples - halfRate)
+      : this.audioManager.createSampleUnit(0);
 
-  public afterFirstInitialization() {
-    const emptySegmentIndex = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
-      return a.transcript === '';
-    });
-    if (this.audioChunkLines.time.duration.seconds <= 35) {
-      if (emptySegmentIndex > -1) {
-        this.openSegment(emptySegmentIndex);
-      } else if (this.transcrService.currentlevel.segments.length === 1) {
-        this.openSegment(0);
-      }
-    }
-    this.cd.detectChanges();
-  }
+    const end = (cursorTime.samples < this.audioManager.ressource.info.duration.samples - halfRate)
+      ? this.audioManager.createSampleUnit(cursorTime.samples + halfRate)
+      : this.audioManager.ressource.info.duration.clone();
 
-  openAuthWindow = () => {
-    const url = document.location.href.replace('transcr/', '').replace('transcr', '');
-    const left = (window.innerHeight - 200) / 2;
-    const tempWindow = window.open(url + 'auth', '_blank', 'toolbar=false,scrollbars=yes,resizable=true,top=100,left=' + left + ',width=760,height=550');
-
-    if (tempWindow !== null) {
-      console.log('window opened');
-      this.authWindow = tempWindow;
-    } else {
-      console.log('window can\'t be opened!');
-    }
-  };
-
-  resetQueueItemsWithNoAuth = () => {
-    for (const asrQueueItem of this.asrService.queue.queue) {
-      if (asrQueueItem.status === ASRProcessStatus.NOAUTH) {
-        // reset
-        asrQueueItem.changeStatus(ASRProcessStatus.IDLE);
-      }
-    }
-    this.asrService.queue.start();
-  };
-
-  public enableAllShortcuts() {
-    this.viewer.enableShortcuts();
-    if (!isUnset(this.window) && !isUnset(this.window.loupe)) {
-      this.window.loupe.enableShortcuts();
+    loup.av.zoomY = factor;
+    if (start && end) {
+      this.audioChunkLoupe.destroy();
+      this.audioChunkLoupe = new AudioChunk(new AudioSelection(start, end), this.audioManager);
     }
   }
+  this.cd.detectChanges();
+}
 
-  public disableAllShortcuts() {
-    this.viewer.disableShortcuts();
-    if (!isUnset(this.window) && !isUnset(this.window.loupe)) {
-      this.window.loupe.disableShortcuts();
+public
+afterFirstInitialization()
+{
+  const emptySegmentIndex = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
+    return a.transcript === '';
+  });
+  if (this.audioChunkLines.time.duration.seconds <= 35) {
+    if (emptySegmentIndex > -1) {
+      this.openSegment(emptySegmentIndex);
+    } else if (this.transcrService.currentlevel.segments.length === 1) {
+      this.openSegment(0);
     }
   }
+  this.cd.detectChanges();
+}
 
-  @HostListener('window:resize', ['$event'])
-  onResize($event) {
-    this.viewer.height = this.linesViewHeight;
+openAuthWindow = () => {
+  const url = document.location.href.replace('transcr/', '').replace('transcr', '');
+  const left = (window.innerHeight - 200) / 2;
+  const tempWindow = window.open(url + 'auth', '_blank', 'toolbar=false,scrollbars=yes,resizable=true,top=100,left=' + left + ',width=760,height=550');
+
+  if (tempWindow !== null) {
+    console.log('window opened');
+    this.authWindow = tempWindow;
+  } else {
+    console.log('window can\'t be opened!');
   }
+};
+
+resetQueueItemsWithNoAuth = () => {
+  for (const asrQueueItem of this.asrService.queue.queue) {
+    if (asrQueueItem.status === ASRProcessStatus.NOAUTH) {
+      // reset
+      asrQueueItem.changeStatus(ASRProcessStatus.IDLE);
+    }
+  }
+  this.asrService.queue.start();
+};
+
+public
+enableAllShortcuts()
+{
+  this.viewer.enableShortcuts();
+  if (!isUnset(this.window) && !isUnset(this.window.loupe)) {
+    this.window.loupe.enableShortcuts();
+  }
+}
+
+public
+disableAllShortcuts()
+{
+  this.viewer.disableShortcuts();
+  if (!isUnset(this.window) && !isUnset(this.window.loupe)) {
+    this.window.loupe.disableShortcuts();
+  }
+}
+
+@HostListener('window:resize', ['$event'])
+onResize($event)
+{
+  this.viewer.height = this.linesViewHeight;
+}
 }

@@ -179,7 +179,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     ErrorOccurredComponent,
     MissingPermissionsModalComponent
   ],
-  entryComponents: [EDITORS, ALERTS],
+  entryComponents: [EDITORS, ALERTS, ErrorOccurredComponent],
   imports: [
     BrowserModule,
     FontAwesomeModule,

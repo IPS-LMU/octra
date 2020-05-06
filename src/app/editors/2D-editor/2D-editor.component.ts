@@ -253,9 +253,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       (event) => {
         switch (event.key) {
           case('secondsPerLine'):
-            this.viewer.onSecondsPerLineChanged(event.value).catch((error) => {
-              console.error(error);
-            });
+            this.viewer.onSecondsPerLineChanged(event.value);
             break;
         }
       }
@@ -270,7 +268,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
             if (item.status !== ASRProcessStatus.STARTED) {
               let segment = this.transcrService.currentlevel.segments.get(segNumber);
 
-              if (!isNullOrUndefined(segment)) {
+              if (!isUnset(segment)) {
                 segment = segment.clone();
                 segment.isBlockedBy = null;
 
@@ -557,7 +555,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         if (!isUnset(this.asrService.selectedLanguage)) {
           const segment = this.transcrService.currentlevel.segments.get(segmentNumber);
 
-          if(!isUnset(segment)){
+          if (!isUnset(segment)) {
 
             const sampleStart = (segmentNumber > 0)
               ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.samples
@@ -605,8 +603,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           }
         }
 
-          // TODO update needed?
-          // this.viewer.update().catch((error) => {
+        // TODO update needed?
+        // this.viewer.update().catch((error) => {
         //             console.error(`could not update GUI for multiline-viewer`);
         //             console.error(error);
         //           });
@@ -616,329 +614,239 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         this.alertService.showAlert('warning', this.langService.translate('asr.no asr selected').toString());
       }
     }
+
+    if ($event.value === null || !(
+      // cursor move by keyboard events are note saved because this would be too much
+      Functions.contains($event.value, 'cursor') ||
+      Functions.contains($event.value, 'segment_enter') ||
+      Functions.contains($event.value, 'playonhover') ||
+      Functions.contains($event.value, 'asr')
+    )) {
+      $event.value = `${$event.type}:${$event.value}`;
+
+      let selection = {
+        start: -1,
+        length: -1
+      };
+
+      if ($event.hasOwnProperty('selection') && !isUnset($event.selection)) {
+        selection.start = $event.selection.start;
+        selection.length = $event.selection.length;
+      } else {
+        selection = null;
+      }
+
+      const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
+      let playPosition = this.audioManager.playposition;
+      if (!this.audioChunkLines.isPlaying) {
+        if ($event.type === 'boundary') {
+          playPosition = this.viewer.av.MouseClickPos
+        }
+      }
+
+      this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
+        playPosition, caretpos, selection, null, 'multi-lines-viewer');
+
+    } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
+      this.appStorage.playonhover = !this.appStorage.playonhover;
+    }
+
+    this.cd.detectChanges();
   }
 
-  if(
-    $event
+  afterSpeedChange(event
+                     :
+                     {
+                       new_value: number, timestamp
+                         :
+                         number
+                     }
+  ) {
+    this.appStorage.audioSpeed = event.new_value;
 
-.
-  value
-===
-  null
-|| !(
-  // cursor move by keyboard events are note saved because this would be too much
-  Functions
-.
-
-  contains($event
-
-.
-  value
-,
-  'cursor'
-) ||
-  Functions
-.
-
-  contains($event
-
-.
-  value
-,
-  'segment_enter'
-) ||
-  Functions
-.
-
-  contains($event
-
-.
-  value
-,
-  'playonhover'
-) ||
-  Functions
-.
-
-  contains($event
-
-.
-  value
-,
-  'asr'
-))
-) {
-  $event
-.
-  value = `${$event.type}:${$event.value}`;
-
-  let
-  selection = {
-    start: -1,
-    length: -1
-  };
-
-  if($event
-
-.
-
-  hasOwnProperty(
-
-  'selection'
-) && !
-
-  isUnset($event
-
-.
-  selection
-)) {
-  selection
-.
-  start = $event.selection.start;
-  selection
-.
-  length = $event.selection.length;
-}
-
-else
-{
-  selection = null;
-}
-
-const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
-let playPosition = this.audioManager.playposition;
-if (!this.audioChunkLines.isPlaying) {
-  if ($event.type === 'boundary') {
-    playPosition = this.viewer.av.MouseClickPos
+    if (this.appStorage.logging) {
+      const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
+      this.uiService.addElementFromEvent('slider', event, event.timestamp,
+        this.audioManager.playposition, caretpos, null, null, 'audio_speed');
+    }
   }
-}
 
-this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
-  playPosition, caretpos, selection, null, 'multi-lines-viewer');
+  afterVolumeChange(event
+                      :
+                      {
+                        new_value: number, timestamp
+                          :
+                          number
+                      }
+  ) {
+    this.appStorage.audioVolume = event.new_value;
 
-} else
-if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
-  this.appStorage.playonhover = !this.appStorage.playonhover;
-}
-
-this.cd.detectChanges();
-}
-
-afterSpeedChange(event
-:
-{
-  new_value: number, timestamp
-:
-  number
-}
-)
-{
-  this.appStorage.audioSpeed = event.new_value;
-
-  if (this.appStorage.logging) {
-    const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
-    this.uiService.addElementFromEvent('slider', event, event.timestamp,
-      this.audioManager.playposition, caretpos, null, null, 'audio_speed');
+    if (this.appStorage.logging) {
+      const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
+      this.uiService.addElementFromEvent('slider', event, event.timestamp,
+        this.audioManager.playposition, caretpos, null, null, 'audio_volume');
+    }
   }
-}
 
-afterVolumeChange(event
-:
-{
-  new_value: number, timestamp
-:
-  number
-}
-)
-{
-  this.appStorage.audioVolume = event.new_value;
+  onButtonClick(event: { type: string, timestamp: number }
+  ) {
+    this.selectedIndex = -1;
+    if (this.appStorage.logging) {
+      const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
 
-  if (this.appStorage.logging) {
-    const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
-    this.uiService.addElementFromEvent('slider', event, event.timestamp,
-      this.audioManager.playposition, caretpos, null, null, 'audio_volume');
+      let selection = {
+        start: this.viewer.av.drawnSelection.start.samples,
+        length: this.viewer.av.drawnSelection.duration.samples
+      };
+
+      this.uiService.addElementFromEvent('mouseclick', {value: 'click:' + event.type},
+        event.timestamp,
+        this.audioManager.playposition, caretpos, selection, null, 'audio_buttons');
+    }
   }
-}
 
-onButtonClick(event
-:
-{
-  type: string, timestamp
-:
-  number
-}
-)
-{
-  this.selectedIndex = -1;
-  if (this.appStorage.logging) {
-    const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
-
-    let selection = {
-      start: this.viewer.av.drawnSelection.start.samples,
-      length: this.viewer.av.drawnSelection.duration.samples
-    };
-
-    this.uiService.addElementFromEvent('mouseclick', {value: 'click:' + event.type},
-      event.timestamp,
-      this.audioManager.playposition, caretpos, selection, null, 'audio_buttons');
+  public openSegment(segnumber
+                       :
+                       number
+  ) {
+    this.onSegmentEntered({index: segnumber});
   }
-}
 
-public
-openSegment(segnumber
-:
-number
-)
-{
-  this.onSegmentEntered({index: segnumber});
-}
-
-public
-update()
-{
+  public update() {
     // TODO important update needed?
     // this.viewer.update().catch((error) => {
-  //       console.error(`could not update GUI for multiline-viewer`);
-  //       console.error(error);
-  //     });
+    //       console.error(`could not update GUI for multiline-viewer`);
+    //       console.error(error);
+    //     });
     this.audioChunkLines.startpos = this.audioChunkLines.time.start.clone();
-}
-
-onScrollbarMouse(event)
-{
-  if (event.state === 'mousemove') {
-    this.loupeHidden = true;
   }
-}
 
-onScrolling(event)
-{
-  if (event.state === 'scrolling') {
-    this.loupeHidden = true;
-  }
-}
-
-onCircleLoupeMouseOver($event)
-{
-  // TODO important what about focus?
-  // this.viewer.focus();
-
-  const fullY = this.miniloupe.location.y + 20 + this.miniloupe.size.height;
-  if (fullY < this.viewer.height) {
-    // loupe is fully visible
-    this.miniloupe.location.y = this.miniloupe.location.y + 20;
-  } else {
-    // loupe out of the bottom border of view rectangle
-    this.miniloupe.location.y = this.miniloupe.location.y - 20 - this.miniloupe.size.height;
-  }
-}
-
-private
-changeArea(loup
-:
-AudioViewerComponent, coord
-:
-{
-  size: {
-    width: number,
-      height
-  :
-    number
-  }
-,
-  location: {
-    x: number,
-      y
-  :
-    number
-  }
-}
-,
-cursorTime: SampleUnit, factor
-:
-number
-)
-{
-  const cursorLocation = this.viewer.mouseCursor;
-  if (cursorLocation && cursorTime) {
-    const halfRate = Math.round(this.audioManager.sampleRate / factor);
-    const start = (cursorTime.samples > halfRate)
-      ? this.audioManager.createSampleUnit(cursorTime.samples - halfRate)
-      : this.audioManager.createSampleUnit(0);
-
-    const end = (cursorTime.samples < this.audioManager.ressource.info.duration.samples - halfRate)
-      ? this.audioManager.createSampleUnit(cursorTime.samples + halfRate)
-      : this.audioManager.ressource.info.duration.clone();
-
-    loup.av.zoomY = factor;
-    if (start && end) {
-      this.audioChunkLoupe.destroy();
-      this.audioChunkLoupe = new AudioChunk(new AudioSelection(start, end), this.audioManager);
+  onScrollbarMouse(event) {
+    if (event.state === 'mousemove') {
+      this.loupeHidden = true;
     }
   }
-  this.cd.detectChanges();
-}
 
-public
-afterFirstInitialization()
-{
-  const emptySegmentIndex = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
-    return a.transcript === '';
-  });
-  if (this.audioChunkLines.time.duration.seconds <= 35) {
-    if (emptySegmentIndex > -1) {
-      this.openSegment(emptySegmentIndex);
-    } else if (this.transcrService.currentlevel.segments.length === 1) {
-      this.openSegment(0);
+  onScrolling(event) {
+    if (event.state === 'scrolling') {
+      this.loupeHidden = true;
     }
   }
-  this.cd.detectChanges();
-}
 
-openAuthWindow = () => {
-  const url = document.location.href.replace('transcr/', '').replace('transcr', '');
-  const left = (window.innerHeight - 200) / 2;
-  const tempWindow = window.open(url + 'auth', '_blank', 'toolbar=false,scrollbars=yes,resizable=true,top=100,left=' + left + ',width=760,height=550');
+  onCircleLoupeMouseOver($event) {
+    // TODO important what about focus?
+    // this.viewer.focus();
 
-  if (tempWindow !== null) {
-    console.log('window opened');
-    this.authWindow = tempWindow;
-  } else {
-    console.log('window can\'t be opened!');
-  }
-};
-
-resetQueueItemsWithNoAuth = () => {
-  for (const asrQueueItem of this.asrService.queue.queue) {
-    if (asrQueueItem.status === ASRProcessStatus.NOAUTH) {
-      // reset
-      asrQueueItem.changeStatus(ASRProcessStatus.IDLE);
+    const fullY = this.miniloupe.location.y + 20 + this.miniloupe.size.height;
+    if (fullY < this.viewer.height) {
+      // loupe is fully visible
+      this.miniloupe.location.y = this.miniloupe.location.y + 20;
+    } else {
+      // loupe out of the bottom border of view rectangle
+      this.miniloupe.location.y = this.miniloupe.location.y - 20 - this.miniloupe.size.height;
     }
   }
-  this.asrService.queue.start();
-};
 
-public
-enableAllShortcuts()
-{
-  this.viewer.enableShortcuts();
-  if (!isUnset(this.window) && !isUnset(this.window.loupe)) {
-    this.window.loupe.enableShortcuts();
+  private
+
+  changeArea(loup
+               :
+               AudioViewerComponent, coord
+               :
+               {
+                 size: {
+                   width: number,
+                   height
+                     :
+                     number
+                 },
+                 location: {
+                   x: number,
+                   y
+                     :
+                     number
+                 }
+               }
+    ,
+             cursorTime: SampleUnit, factor
+               :
+               number
+  ) {
+    const cursorLocation = this.viewer.mouseCursor;
+    if (cursorLocation && cursorTime) {
+      const halfRate = Math.round(this.audioManager.sampleRate / factor);
+      const start = (cursorTime.samples > halfRate)
+        ? this.audioManager.createSampleUnit(cursorTime.samples - halfRate)
+        : this.audioManager.createSampleUnit(0);
+
+      const end = (cursorTime.samples < this.audioManager.ressource.info.duration.samples - halfRate)
+        ? this.audioManager.createSampleUnit(cursorTime.samples + halfRate)
+        : this.audioManager.ressource.info.duration.clone();
+
+      loup.av.zoomY = factor;
+      if (start && end) {
+        this.audioChunkLoupe.destroy();
+        this.audioChunkLoupe = new AudioChunk(new AudioSelection(start, end), this.audioManager);
+      }
+    }
+    this.cd.detectChanges();
   }
-}
 
-public
-disableAllShortcuts()
-{
-  this.viewer.disableShortcuts();
-  if (!isUnset(this.window) && !isUnset(this.window.loupe)) {
-    this.window.loupe.disableShortcuts();
+  public
+
+  afterFirstInitialization() {
+    const emptySegmentIndex = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
+      return a.transcript === '';
+    });
+    if (this.audioChunkLines.time.duration.seconds <= 35) {
+      if (emptySegmentIndex > -1) {
+        this.openSegment(emptySegmentIndex);
+      } else if (this.transcrService.currentlevel.segments.length === 1) {
+        this.openSegment(0);
+      }
+    }
+    this.cd.detectChanges();
   }
-}
 
-@HostListener('window:resize', ['$event'])
-onResize($event)
-{
-  this.viewer.height = this.linesViewHeight;
-}
+  openAuthWindow = () => {
+    const url = document.location.href.replace('transcr/', '').replace('transcr', '');
+    const left = (window.innerHeight - 200) / 2;
+    const tempWindow = window.open(url + 'auth', '_blank', 'toolbar=false,scrollbars=yes,resizable=true,top=100,left=' + left + ',width=760,height=550');
+
+    if (tempWindow !== null) {
+      console.log('window opened');
+      this.authWindow = tempWindow;
+    } else {
+      console.log('window can\'t be opened!');
+    }
+  };
+
+  resetQueueItemsWithNoAuth = () => {
+    for (const asrQueueItem of this.asrService.queue.queue) {
+      if (asrQueueItem.status === ASRProcessStatus.NOAUTH) {
+        // reset
+        asrQueueItem.changeStatus(ASRProcessStatus.IDLE);
+      }
+    }
+    this.asrService.queue.start();
+  };
+
+  public enableAllShortcuts() {
+    this.viewer.enableShortcuts();
+    if (!isUnset(this.window) && !isUnset(this.window.loupe)) {
+      this.window.loupe.enableShortcuts();
+    }
+  }
+
+  public disableAllShortcuts() {
+    this.viewer.disableShortcuts();
+    if (!isUnset(this.window) && !isUnset(this.window.loupe)) {
+      this.window.loupe.disableShortcuts();
+    }
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize($event) {
+    this.viewer.height = this.linesViewHeight;
+  }
 }

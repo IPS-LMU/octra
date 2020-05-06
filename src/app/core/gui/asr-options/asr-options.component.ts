@@ -106,11 +106,11 @@ export class AsrOptionsComponent implements OnInit {
         const segment = this.transcrService.currentlevel.segments.get(i);
 
         if(!isUnset(segment)){
-          const sampleStart = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.originalSample.value
+          const sampleStart = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.samples
             : 0;
-          const sampleLength = segment.time.originalSample.value - sampleStart;
+          const sampleLength = segment.time.samples - sampleStart;
 
-          if (sampleLength / this.transcrService.audiomanager.originalSampleRate > 600) {
+          if (sampleLength / this.transcrService.audioManager.sampleRate > 600) {
             this.alertService.showAlert('danger', this.langService.translate('asr.file too big'));
             segment.isBlockedBy = null;
           } else {
@@ -119,7 +119,7 @@ export class AsrOptionsComponent implements OnInit {
               segment.isBlockedBy = ASRQueueItemType.ASR;
               this.asrService.addToQueue({
                 sampleStart, sampleLength, browserSampleEnd:
-                segment.time.browserSample.value
+                segment.time.samples
               }, ASRQueueItemType.ASR);
             }
           }

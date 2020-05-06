@@ -110,7 +110,7 @@ export class AsrService {
       if (segNumber > -1) {
         const segment = this.transcrService.currentlevel.segments.get(segNumber);
 
-        if (!isNullOrUndefined(segment)) {
+        if (!isUnset(segment)) {
           segment.isBlockedBy = null;
         }
         item.stopProcessing();

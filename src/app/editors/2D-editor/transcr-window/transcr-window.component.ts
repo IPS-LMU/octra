@@ -197,14 +197,13 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       }, 50);
     }).then(() => {
       if (direction !== 'down') {
-        this.goToSegment(direction);
-
-        setTimeout(
-          () => {
-            this.audiochunk.startPlayback();
-            this.cd.markForCheck();
-            this.cd.detectChanges();
-          }, 500);
+        this.goToSegment(direction).then(() => {
+          this.audiochunk.startPlayback();
+          this.cd.markForCheck();
+          this.cd.detectChanges();
+        }).catch((error) => {
+          console.error(error);
+        });
       } else {
         this.close();
       }
@@ -268,8 +267,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           this.segmentIndex < this.transcrService.currentlevel.segments.length) {
           this.editor_rawText(this.transcrService.currentlevel.segments.get(this.segmentIndex).transcript);
         }
+        this.subscrmanager.removeByTag('editor');
       }
-    ));
+    ), 'editor');
 
     this.cd.markForCheck();
     this.cd.detectChanges();
@@ -443,73 +443,79 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   /**
    * selects the next segment on the left or on the right side
    */
-  goToSegment(direction
-                :
-                string
-  ) {
-    this.editor.isTyping = false;
+  goToSegment(direction: string) {
+    return new Promise<void>((resolve, reject) => {
+      this.editor.isTyping = false;
 
-    if (this.segmentIndex > -1 && this.transcrService.currentlevel.segments &&
-      this.segmentIndex < this.transcrService.currentlevel.segments.length) {
-      const segmentsLength = this.transcrService.currentlevel.segments.length;
+      if (this.segmentIndex > -1 && this.transcrService.currentlevel.segments &&
+        this.segmentIndex < this.transcrService.currentlevel.segments.length) {
+        const segmentsLength = this.transcrService.currentlevel.segments.length;
 
-      let segment: Segment = null;
+        let segment: Segment = null;
 
-      let startIndex = 0;
-      let limitFunc: (i: number) => boolean;
-      let counterFunc: (i: number) => number;
-      let appliedDirection = '';
+        let startIndex = 0;
+        let limitFunc: (i: number) => boolean;
+        let counterFunc: (i: number) => number;
+        let appliedDirection = '';
 
-      if (direction === 'right' && this.segmentIndex < segmentsLength - 1) {
-        startIndex = this.segmentIndex + 1;
-        limitFunc = j => j < segmentsLength;
-        counterFunc = j => j++;
-        appliedDirection = 'right';
-      } else if (direction === 'left' && this.segmentIndex > 0) {
-        startIndex = this.segmentIndex - 1;
-        limitFunc = j => j >= 0;
-        counterFunc = j => j--;
-        appliedDirection = 'left';
-      }
-
-      if (appliedDirection !== '') {
-        for (let i = startIndex; limitFunc(i); i = counterFunc(i)) {
-          const tempSegment = this.transcrService.currentlevel.segments.get(i);
-
-          if (tempSegment.transcript !== this.transcrService.breakMarker.code
-            && tempSegment.isBlockedBy !== ASRQueueItemType.ASRMAUS
-            && tempSegment.isBlockedBy !== ASRQueueItemType.MAUS) {
-            segment = tempSegment;
-            this.segmentIndex = i;
-            break;
-          }
+        if (direction === 'right' && this.segmentIndex < segmentsLength - 1) {
+          startIndex = this.segmentIndex + 1;
+          limitFunc = j => j < segmentsLength;
+          counterFunc = j => j++;
+          appliedDirection = 'right';
+        } else if (direction === 'left' && this.segmentIndex > 0) {
+          startIndex = this.segmentIndex - 1;
+          limitFunc = j => j >= 0;
+          counterFunc = j => j--;
+          appliedDirection = 'left';
         }
 
-        const start = (this.segmentIndex > 0) ? this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.samples : 0;
-        const valueString = (appliedDirection === 'right') ? 'entered next' : 'entered previous';
-        this.uiService.addElementFromEvent('segment', {value: valueString},
-          Date.now(), this.audioManager.playposition,
-          this.editor.caretpos, null, {
-            start,
-            length: this.transcrService.currentlevel.segments.get(this.segmentIndex).time.samples - start
-          }, 'transcription window');
-      }
+        if (appliedDirection !== '') {
+          for (let i = startIndex; limitFunc(i); i = counterFunc(i)) {
+            const tempSegment = this.transcrService.currentlevel.segments.get(i);
 
-      let begin;
-      if (this.segmentIndex > 0) {
-        begin = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.clone();
+            if (tempSegment.transcript !== this.transcrService.breakMarker.code
+              && tempSegment.isBlockedBy !== ASRQueueItemType.ASRMAUS
+              && tempSegment.isBlockedBy !== ASRQueueItemType.MAUS) {
+              segment = tempSegment;
+              this.segmentIndex = i;
+              break;
+            }
+          }
+
+          const start = (this.segmentIndex > 0) ? this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.samples : 0;
+          const valueString = (appliedDirection === 'right') ? 'entered next' : 'entered previous';
+          this.uiService.addElementFromEvent('segment', {value: valueString},
+            Date.now(), this.audioManager.playposition,
+            this.editor.caretpos, null, {
+              start,
+              length: this.transcrService.currentlevel.segments.get(this.segmentIndex).time.samples - start
+            }, 'transcription window');
+        }
+
+        let begin;
+        if (this.segmentIndex > 0) {
+          begin = this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.clone();
+        } else {
+          begin = new SampleUnit(0, this.audioManager.sampleRate);
+        }
+
+        if (!isUnset(segment)) {
+          this.editor.rawText = this.transcrService.currentlevel.segments.get(this.segmentIndex).transcript;
+          this.audiochunk = this.audioManager.createNewAudioChunk(new AudioSelection(begin, segment.time.clone()));
+
+          // resolve only after the audio viewer is ready
+          const subscr = this.loupe.onInitialized.subscribe(() => {
+            subscr.unsubscribe();
+            resolve();
+          });
+        } else {
+          reject(new Error('can\'t got to segment, because it\'s null'));
+        }
       } else {
-        begin = new SampleUnit(0, this.audioManager.sampleRate);
+        resolve();
       }
-
-      if (!(segment === null || segment === undefined)) {
-        this.editor.initialize();
-        this.editor.rawText = this.transcrService.currentlevel.segments.get(this.segmentIndex).transcript;
-        this.audiochunk = this.audioManager.createNewAudioChunk(new AudioSelection(begin, segment.time.clone()));
-      }
-      this.cd.markForCheck();
-      this.cd.detectChanges();
-    }
+    });
   }
 
   public editor_rawText(text: string) {

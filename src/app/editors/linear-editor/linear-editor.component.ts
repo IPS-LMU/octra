@@ -281,12 +281,13 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       )
     );
 
-    this.signalDisplayTop.onInitialized.subscribe(
+    const subscr = this.signalDisplayTop.onInitialized.subscribe(
       () => {
+        LinearEditorComponent.initialized.emit();
+        subscr.unsubscribe();
       }, () => {
       },
       () => {
-        LinearEditorComponent.initialized.emit();
       });
   }
 

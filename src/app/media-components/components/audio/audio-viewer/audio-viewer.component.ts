@@ -110,7 +110,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   private stage: Konva.Stage;
   public updating = false;
   // EVENTS
-  public onInitialized = new Subject();
+  public onInitialized = new Subject<void>();
   public secondsPerLine = 5;
   public mouseStatus = 'auto';
   private hoveredLine = -1;
@@ -443,7 +443,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   public initializeView() {
-    this.onInitialized.complete();
+    this.onInitialized.next();
     for (const attr in this.layers) {
       if (this.layers.hasOwnProperty(attr)) {
         this.layers['' + attr].removeChildren();

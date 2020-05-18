@@ -349,7 +349,7 @@ column.ng-star-inserted.gu-mirror .delete-column fa-icon {
   width: 100%;
 }
 
-.column.ng-star-inserted.gu-mirror {
+star .column.ng-star-inserted.gu-mirror {
   padding: 0;
   position: relative;
   border: 1px solid gray;
@@ -373,4 +373,9 @@ column.ng-star-inserted.gu-mirror .delete-column fa-icon {
 
 .column.ng-star-inserted.gu-mirror .cell:last-of-type {
   border-bottom: none;
+}
+
+.note-toolbar.card-header {
+  padding: 0;
+  background-color: whitesmoke;
 }

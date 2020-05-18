@@ -213,6 +213,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     const dom = jQuery(html);
     let charCounter = 0;
 
+    const textSelection = {
+      start: -1,
+      end: -1
+    };
+
     const replaceFunc = (i, elem) => {
       if (jQuery(elem).contents() !== null && jQuery(elem).contents().length > 0) {
         jQuery.each(jQuery(elem).contents(), replaceFunc);
@@ -264,13 +269,20 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           charCounter += elemText.length;
         } else if (tagName.toLowerCase() === 'sel-start') {
           // save start selection
-          this._textSelection.start = charCounter;
+          textSelection.start = charCounter;
         } else if (tagName.toLowerCase() === 'sel-end') {
           // save start selection
-          this._textSelection.end = charCounter;
+          textSelection.end = charCounter;
         }
       }
     };
+
+    if (textSelection.start === -1 || textSelection.end === -1) {
+      textSelection.start = 0;
+      textSelection.end = 0;
+    }
+
+    this._textSelection = textSelection;
 
     jQuery.each(dom.contents(), replaceFunc);
 
@@ -350,7 +362,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             if (this.init === 1) {
               this.focus(true);
             } else if (this.init > 1) {
-              this.textfield.summernote('restoreRange');
+              // this.restoreSelection();
             }
           },
           onBlur: () => {
@@ -490,9 +502,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       } else {
         if (comboKey === 'ALT + S' && this.Settings.special_markers.boundary) {
           // add boundary
+          $event.preventDefault();
           this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
           this.boundaryinserted.emit(this.audiochunk.absolutePlayposition.samples);
-          $event.preventDefault();
+          return;
         } else {
           for (let i = 0; i < this.markers.length; i++) {
             const marker: any = this.markers[i];
@@ -691,7 +704,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         click: () => {
           // invoke insertText method with 'hello' on editor module.
           this.insertMarker(marker.code, marker.icon);
-          // this.validate();
+          this.validate();
           this.markerClick.emit(marker.name);
           this.initPopover();
         }
@@ -850,30 +863,34 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     element.setAttribute('alt', '[|' + this.audiochunk.absolutePlayposition.samples.toString() + '|]');
 
     this.textfield.summernote('editor.insertText', ' ');
-    this.textfield.summernote('editor.insertNode', element);
-    this.textfield.summernote('editor.insertText', ' ');
-
-    // set popover
-    setTimeout(() => {
-      jQuery(element).on('click', (event) => {
-        const jqueryobj = jQuery(event.target);
-        const samples = jqueryobj.attr('data-samples');
-
-        if (isNumeric(samples)) {
-          this.boundaryclicked.emit(new SampleUnit(Number(samples), this.audioManager.sampleRate));
-        }
-      })
-        .on('mouseover', (event) => {
-          this.onTextMouseOver(event);
-        })
-        .on('mouseleave', () => {
-          jQuery('.seg-popover').css({
-            display: 'none'
-          });
-        });
-    }, 200);
-
     this.triggerTyping();
+
+    // timeout needed to fix summernote
+    setTimeout(() => {
+      this.textfield.summernote('editor.insertNode', element);
+      this.textfield.summernote('editor.insertText', ' ');
+
+      // set popover
+      setTimeout(() => {
+        jQuery(element).on('click', (event) => {
+          const jqueryobj = jQuery(event.target);
+          const samples = jqueryobj.attr('data-samples');
+
+          if (isNumeric(samples)) {
+            this.boundaryclicked.emit(new SampleUnit(Number(samples), this.audioManager.sampleRate));
+          }
+        })
+          .on('mouseover', (event) => {
+            this.onTextMouseOver(event);
+          })
+          .on('mouseleave', () => {
+            jQuery('.seg-popover').css({
+              display: 'none'
+            });
+          });
+      }, 200);
+      this.triggerTyping();
+    }, 100);
   }
 
   saveSelection() {
@@ -884,48 +901,30 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     jQuery('sel-start').remove();
     jQuery('sel-end').remove();
 
-    if (window.getSelection) {
-      sel = window.getSelection();
-      if (sel.getRangeAt && sel.rangeCount) {
-        range = window.getSelection().getRangeAt(0);
-        const range2 = range.cloneRange();
 
-        // Range.createContextualFragment() would be useful here but is
-        // non-standard and not supported in all browsers (IE9, for one)
-        const el = document.createElement('sel-end');
-        const frag = document.createDocumentFragment();
-        let lastNode = null;
-        node = el.firstChild;
+    range = jQuery.summernote.range;
+    const rangeSelection: WrappedRange = range.createFromSelection();
 
-        while (node) {
-          lastNode = frag.appendChild(node);
-          node = el.firstChild;
-        }
-
-        range.collapse(false);
-        range.insertNode(el);
-
-        range2.collapse(true);
-        const el2 = document.createElement('sel-start');
-        range2.insertNode(el2);
+    if (!isUnset(rangeSelection) && this.focused) {
+      if (rangeSelection.so === rangeSelection.eo && rangeSelection.sc === rangeSelection.ec) {
+        // no selection length
+        const teElem = document.createElement('sel-start');
+        rangeSelection.collapse();
+        rangeSelection.insertNode(document.createElement('sel-end'));
+        rangeSelection.insertNode(teElem);
+      } else {
+        const endRange = rangeSelection.collapse();
+        endRange.insertNode(document.createElement('sel-end'));
+        const startRange = rangeSelection.collapse(true);
+        startRange.insertNode(document.createElement('sel-start'));
       }
-    } else if (document.hasOwnProperty('selection') && document.selection.hasOwnProperty('createRange')) {
-      alert('?');
-      /*
-      range = document.selection.createRange();
-      expandedSelRange = range.duplicate();
-      range.collapse(false);
-      range.pasteHTML(html);
-      expandedSelRange.setEndPoint('EndToEnd', range);
-      expandedSelRange.select();
-      */
     }
   }
 
   restoreSelection() {
     const elem = document.getElementsByClassName('note-editable')[0];
 
-    if (!(elem === null || elem === undefined) && elem.getElementsByTagName('sel-start')[0] !== undefined) {
+    if (!isUnset(elem) && elem.getElementsByTagName('sel-start')[0] !== undefined) {
       const range = document.createRange();
       const sel = window.getSelection();
       let selStart = elem.getElementsByTagName('sel-start')[0];
@@ -937,22 +936,20 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         selStart = selEnd;
       }
 
-      if (selStart !== null) {
+      if (selStart && selEnd) {
         // set start position
         let lastNodeChildren = selStart.childNodes.length;
         if (selStart.nodeName === '#text') {
           lastNodeChildren = selStart.textContent.length;
         }
         range.setStart(selStart, lastNodeChildren);
-
-        if (selEnd !== null) {
-          range.setEnd(selEnd, endOffset);
-        }
+        range.setEnd(selEnd, endOffset);
 
         range.collapse(false);
 
         sel.removeAllRanges();
         sel.addRange(range);
+
         // TODO change to specific textfield!
         jQuery('sel-start').remove();
         jQuery('sel-end').remove();
@@ -999,14 +996,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   public convertEntitiesToString(str: string) {
     return jQuery('<textarea />').html(str).text();
-  }
-
-  public saveRange() {
-    this.textfield.summernote('saveRange');
-  }
-
-  public restoreRange() {
-    this.textfield.summernote('restoreRange');
   }
 
   public getSegmentByCaretPos(caretpos: number): number {
@@ -1078,15 +1067,15 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       this._rawText = this.getRawText(false);
 
       if (this._rawText !== '') {
-        this.saveSelection();
-
         // insert selection placeholders
-        let code = Functions.insertString(this._rawText, this._textSelection.start, '[[[sel-start/]]]');
-        code = Functions.insertString(code, this._textSelection.end + '[[[sel-start/]]]'.length, '[[[sel-end/]]]');
+        const startMarker = '[[[sel-start]]][[[/sel-start]]]';
+        const endMarker = '[[[sel-end]]][[[/sel-end]]]';
+        let code = Functions.insertString(this._rawText, this._textSelection.start, startMarker);
+        code = Functions.insertString(code, this._textSelection.end + startMarker.length, endMarker);
 
         code = this.transcrService.underlineTextRed(code, this.transcrService.validate(code));
         code = this.transcrService.rawToHTML(code);
-        code = code.replace(/([\s ]+)(<sel-start\/><sel-end\/><\/p>)?$/g, '&nbsp;$2');
+        code = code.replace(/([\s ]+)(<sel-start><\/sel-start><sel-end><\/sel-end><\/p>)?$/g, '&nbsp;$2');
 
         this._rawText = this.tidyUpRaw(this._rawText);
         this.textfield.summernote('code', code);
@@ -1218,253 +1207,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.size.width = jQuery(this.transcrEditor.nativeElement).width();
   }
 
-  /*
-
-   summernote options
-
-
-   $.summernote = $.extend($.summernote, {
-   version: '0.8.4',
-   ui: ui,
-   dom: dom,
-
-   plugins: {},
-
-   options: {
-   modules: {
-   'editor': Editor,
-   'clipboard': Clipboard,
-   'dropzone': Dropzone,
-   'codeview': Codeview,
-   'statusbar': Statusbar,
-   'fullscreen': Fullscreen,
-   'handle': Handle,
-   // FIXME: HintPopover must be front of autolink
-   //  - Script error about range when Enter key is pressed on hint popover
-   'hintPopover': HintPopover,
-   'autoLink': AutoLink,
-   'autoSync': AutoSync,
-   'placeholder': Placeholder,
-   'buttons': Buttons,
-   'toolbar': Toolbar,
-   'linkDialog': LinkDialog,
-   'linkPopover': LinkPopover,
-   'imageDialog': ImageDialog,
-   'imagePopover': ImagePopover,
-   'videoDialog': VideoDialog,
-   'helpDialog': HelpDialog,
-   'airPopover': AirPopover
-   },
-
-   buttons: {},
-
-   lang: 'en-US',
-
-   // toolbar
-   toolbar: [
-   ['style', ['style']],
-   ['font', ['bold', 'underline', 'clear']],
-   ['fontname', ['fontname']],
-   ['color', ['color']],
-   ['para', ['ul', 'ol', 'paragraph']],
-   ['table', ['table']],
-   ['insert', ['link', 'picture', 'video']],
-   ['view', ['fullscreen', 'codeview', 'help']]
-   ],
-
-   // popover
-   popover: {
-   image: [
-   ['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
-   ['float', ['floatLeft', 'floatRight', 'floatNone']],
-   ['remove', ['removeMedia']]
-   ],
-   link: [
-   ['link', ['linkDialogShow', 'unlink']]
-   ],
-   air: [
-   ['color', ['color']],
-   ['font', ['bold', 'underline', 'clear']],
-   ['para', ['ul', 'paragraph']],
-   ['table', ['table']],
-   ['insert', ['link', 'picture']]
-   ]
-   },
-
-   // air mode: inline editor
-   airMode: false,
-
-   width: null,
-   height: null,
-   linkTargetBlank: true,
-
-   focus: false,
-   tabSize: 4,
-   styleWithSpan: true,
-   shortcuts: true,
-   textareaAutoSync: true,
-   direction: null,
-   tooltip: 'auto',
-
-   styleTags: ['p', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-
-   fontNames: [
-   'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New',
-   'Helvetica Neue', 'Helvetica', 'Impact', 'Lucida Grande',
-   'Tahoma', 'Times New Roman', 'Verdana'
-   ],
-
-   fontSizes: ['8', '9', '10', '11', '12', '14', '18', '24', '36'],
-
-   // pallete colors(n x n)
-   colors: [
-   ['#000000', '#424242', '#636363', '#9C9C94', '#CEC6CE', '#EFEFEF', '#F7F7F7', '#FFFFFF'],
-   ['#FF0000', '#FF9C00', '#FFFF00', '#00FF00', '#00FFFF', '#0000FF', '#9C00FF', '#FF00FF'],
-   ['#F7C6CE', '#FFE7CE', '#FFEFC6', '#D6EFD6', '#CEDEE7', '#CEE7F7', '#D6D6E7', '#E7D6DE'],
-   ['#E79C9C', '#FFC69C', '#FFE79C', '#B5D6A5', '#A5C6CE', '#9CC6EF', '#B5A5D6', '#D6A5BD'],
-   ['#E76363', '#F7AD6B', '#FFD663', '#94BD7B', '#73A5AD', '#6BADDE', '#8C7BC6', '#C67BA5'],
-   ['#CE0000', '#E79439', '#EFC631', '#6BA54A', '#4A7B8C', '#3984C6', '#634AA5', '#A54A7B'],
-   ['#9C0000', '#B56308', '#BD9400', '#397B21', '#104A5A', '#085294', '#311873', '#731842'],
-   ['#630000', '#7B3900', '#846300', '#295218', '#083139', '#003163', '#21104A', '#4A1031']
-   ],
-
-   lineHeights: ['1.0', '1.2', '1.4', '1.5', '1.6', '1.8', '2.0', '3.0'],
-
-   tableClassName: 'table table-bordered',
-
-   insertTableMaxSize: {
-   col: 10,
-   row: 10
-   },
-
-   dialogsInBody: false,
-   dialogsFade: false,
-
-   maximumImageFileSize: null,
-
-   callbacks: {
-   onInit: null,
-   onFocus: null,
-   onBlur: null,
-   onEnter: null,
-   onKeyup: null,
-   onKeydown: null,
-   onImageUpload: null,
-   onImageUploadError: null
-   },
-
-   codemirror: {
-   mode: 'text/html',
-   htmlMode: true,
-   lineNumbers: true
-   },
-
-   keyMap: {
-   pc: {
-   'ENTER': 'insertParagraph',
-   'CTRL+Z': 'undo',
-   'CTRL+Y': 'redo',
-   'TAB': 'tab',
-   'SHIFT+TAB': 'untab',
-   'CTRL+B': 'bold',
-   'CTRL+I': 'italic',
-   'CTRL+U': 'underline',
-   'CTRL+SHIFT+S': 'strikethrough',
-   'CTRL+BACKSLASH': 'removeFormat',
-   'CTRL+SHIFT+L': 'justifyLeft',
-   'CTRL+SHIFT+E': 'justifyCenter',
-   'CTRL+SHIFT+R': 'justifyRight',
-   'CTRL+SHIFT+J': 'justifyFull',
-   'CTRL+SHIFT+NUM7': 'insertUnorderedList',
-   'CTRL+SHIFT+NUM8': 'insertOrderedList',
-   'CTRL+LEFTBRACKET': 'outdent',
-   'CTRL+RIGHTBRACKET': 'indent',
-   'CTRL+NUM0': 'formatPara',
-   'CTRL+NUM1': 'formatH1',
-   'CTRL+NUM2': 'formatH2',
-   'CTRL+NUM3': 'formatH3',
-   'CTRL+NUM4': 'formatH4',
-   'CTRL+NUM5': 'formatH5',
-   'CTRL+NUM6': 'formatH6',
-   'CTRL+ENTER': 'insertHorizontalRule',
-   'CTRL+K': 'linkDialog.show'
-   },
-
-   mac: {
-   'ENTER': 'insertParagraph',
-   'CMD+Z': 'undo',
-   'CMD+SHIFT+Z': 'redo',
-   'TAB': 'tab',
-   'SHIFT+TAB': 'untab',
-   'CMD+B': 'bold',
-   'CMD+I': 'italic',
-   'CMD+U': 'underline',
-   'CMD+SHIFT+S': 'strikethrough',
-   'CMD+BACKSLASH': 'removeFormat',
-   'CMD+SHIFT+L': 'justifyLeft',
-   'CMD+SHIFT+E': 'justifyCenter',
-   'CMD+SHIFT+R': 'justifyRight',
-   'CMD+SHIFT+J': 'justifyFull',
-   'CMD+SHIFT+NUM7': 'insertUnorderedList',
-   'CMD+SHIFT+NUM8': 'insertOrderedList',
-   'CMD+LEFTBRACKET': 'outdent',
-   'CMD+RIGHTBRACKET': 'indent',
-   'CMD+NUM0': 'formatPara',
-   'CMD+NUM1': 'formatH1',
-   'CMD+NUM2': 'formatH2',
-   'CMD+NUM3': 'formatH3',
-   'CMD+NUM4': 'formatH4',
-   'CMD+NUM5': 'formatH5',
-   'CMD+NUM6': 'formatH6',
-   'CMD+ENTER': 'insertHorizontalRule',
-   'CMD+K': 'linkDialog.show'
-   }
-   },
-   icons: {
-   'align': 'note-icon-align',
-   'alignCenter': 'note-icon-align-center',
-   'alignJustify': 'note-icon-align-justify',
-   'alignLeft': 'note-icon-align-left',
-   'alignRight': 'note-icon-align-right',
-   'indent': 'note-icon-align-indent',
-   'outdent': 'note-icon-align-outdent',
-   'arrowsAlt': 'note-icon-arrows-alt',
-   'bold': 'note-icon-bold',
-   'caret': 'note-icon-caret',
-   'circle': 'note-icon-circle',
-   'close': 'note-icon-close',
-   'code': 'note-icon-code',
-   'eraser': 'note-icon-eraser',
-   'font': 'note-icon-font',
-   'frame': 'note-icon-frame',
-   'italic': 'note-icon-italic',
-   'link': 'note-icon-link',
-   'unlink': 'note-icon-chain-broken',
-   'magic': 'note-icon-magic',
-   'menuCheck': 'note-icon-check',
-   'minus': 'note-icon-minus',
-   'orderedlist': 'note-icon-orderedlist',
-   'pencil': 'note-icon-pencil',
-   'picture': 'note-icon-picture',
-   'question': 'note-icon-question',
-   'redo': 'note-icon-redo',
-   'square': 'note-icon-square',
-   'strikethrough': 'note-icon-strikethrough',
-   'subscript': 'note-icon-subscript',
-   'superscript': 'note-icon-superscript',
-   'table': 'note-icon-table',
-   'textHeight': 'note-icon-text-height',
-   'trash': 'note-icon-trash',
-   'underline': 'note-icon-underline',
-   'undo': 'note-icon-undo',
-   'unorderedlist': 'note-icon-unorderedlist',
-   'video': 'note-icon-video'
-   }
-   }
-   });
-
-   */
-
   public onASROverlayClick() {
     if (!isUnset(this.asrService.selectedLanguage)) {
       const item = this.asrService.queue.getItemByTime(this.audiochunk.time.start.samples, this.audiochunk.time.duration.samples);
@@ -1475,4 +1217,89 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       console.error(`could not stop ASR because segment number was not found.`);
     }
   }
+}
+
+// WrappedRange class for summernote
+// https://summernote.org/deep-dive/#wrappedrange-object
+abstract class WrappedRange {
+  public readonly sc: Node;
+  public readonly so: number;
+  public readonly ec: Node;
+  public readonly eo: number;
+
+  constructor(sc: Node, so: number, ec: Node, eo: number) {
+  }
+
+  // select update visible range
+  abstract select();
+
+  /**
+   * insert node at current cursor
+   *
+   * @param {Node} node
+   * @return {Node}
+   */
+  abstract insertNode(node: Node): Node;
+
+  /**
+   * @param {Boolean} isCollapseToStart
+   * @return {WrappedRange}
+   */
+  abstract collapse(isCollapseToStart?: boolean): WrappedRange;
+
+  // splitText on range
+  abstract splitText(): WrappedRange;
+
+  // delete contents on range
+  abstract deleteContents(): WrappedRange;
+
+  // returns whether range was collapsed or not
+  abstract isCollapsed(): boolean;
+
+  /**
+   * wrap inline nodes which children of body with paragraph
+   *
+   * @return {WrappedRange}
+   */
+  abstract wrapBodyInlineWithPara(): WrappedRange;
+
+  // insert html at current cursor
+  abstract pasteHTML(markup)
+
+  /**
+   * returns text in range
+   *
+   * @return {String}
+   */
+  abstract toString(): string;
+
+  /**
+   * returns range for word before cursor
+   *
+   * @param {Boolean} [findAfter] - find after cursor, default: false
+   * @return {WrappedRange}
+   */
+  abstract getWordRange(findAfter?: boolean): WrappedRange
+
+  /**
+   * returns range for words before cursor that match with a Regex
+   *
+   * example:
+   *  range: 'hi @Peter Pan'
+   *  regex: '/@[a-z ]+/i'
+   *  return range: '@Peter Pan'
+   *
+   * @param {RegExp} [regex]
+   * @return {WrappedRange|null}
+   */
+  abstract getWordsMatchRange(regex)
+
+  /**
+   * returns a list of DOMRect objects representing the area of the screen occupied by the range.
+   *
+   * https://developer.mozilla.org/en-US/docs/Web/API/Range/getClientRects
+   *
+   * @return {Rect[]}
+   */
+  abstract getClientRects()
 }

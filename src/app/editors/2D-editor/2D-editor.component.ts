@@ -430,13 +430,13 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     if (this.appStorage.showLoupe) {
       this.loupe.av.zoomY = this.factor;
     }
-    this.viewer.onInitialized.subscribe(
+    const subscr = this.viewer.onInitialized.subscribe(
       () => {
-      }, () => {
-      }, () => {
-        console.log(`INITIALIZED!`);
+        subscr.unsubscribe();
         this.viewer.height = this.linesViewHeight;
         TwoDEditorComponent.initialized.emit();
+      }, () => {
+      }, () => {
       });
   }
 

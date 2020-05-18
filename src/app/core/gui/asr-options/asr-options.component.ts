@@ -3,11 +3,11 @@ import {AlertService, AppStorageService, SettingsService, TranscriptionService} 
 import {AppSettings, ASRLanguage} from '../../obj/Settings';
 import {AsrService} from '../../shared/service/asr.service';
 import {isUnset} from '../../shared/Functions';
-import {BsDropdownDirective} from 'ngx-bootstrap';
 import {TranslocoService} from '@ngneat/transloco';
 import {AudioChunk} from '../../../media-components/obj/audio/AudioManager';
 import {ASRQueueItemType} from '../../../media-components/obj/annotation/asr';
 import {AppInfo} from '../../../app.info';
+import {BsDropdownDirective} from 'ngx-bootstrap/dropdown';
 
 @Component({
   selector: 'app-asr-options',

@@ -1,8 +1,8 @@
 import {Component, OnInit, SecurityContext, TemplateRef, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs';
 import {DomSanitizer} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
+import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 
 export enum ModalEndAnswer {
   CANCEL = 'CANCEL',

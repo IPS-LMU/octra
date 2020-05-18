@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {BsModalRef, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs';
 import {AppStorageService, SettingsService} from '../../shared/service';
+import {BsModalRef, ModalOptions} from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-activity-timeout-modal',

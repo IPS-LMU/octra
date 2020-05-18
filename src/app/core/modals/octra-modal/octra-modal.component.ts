@@ -4,7 +4,7 @@ import {ModalService} from '../modal.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import {APIService, AppStorageService, SettingsService} from '../../shared/service';
 import {AppInfo} from '../../../app.info';
-import {BsModalRef} from 'ngx-bootstrap';
+import {BsModalRef} from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-octra-modal',

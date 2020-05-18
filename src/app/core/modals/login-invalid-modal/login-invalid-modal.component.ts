@@ -1,6 +1,6 @@
 import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs';
+import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-login-invalid-modal',

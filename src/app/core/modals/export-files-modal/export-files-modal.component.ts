@@ -1,5 +1,4 @@
 import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
@@ -13,6 +12,7 @@ import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/n
 import {DragulaService} from 'ng2-dragula';
 import {TableConfiguratorComponent} from '../../component/table-configurator/table-configurator.component';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
+import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-export-files-modal',

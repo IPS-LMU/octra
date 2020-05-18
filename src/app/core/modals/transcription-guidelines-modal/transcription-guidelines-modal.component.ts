@@ -9,7 +9,6 @@ import {
   ViewChild,
   ViewEncapsulation
 } from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs';
 import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
@@ -17,6 +16,7 @@ import {BugReportService} from '../../shared/service/bug-report.service';
 import {TranslocoService} from '@ngneat/transloco';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {isUnset} from '../../shared/Functions';
+import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-transcription-guidelines-modal',

@@ -1,10 +1,10 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs';
 import {AppStorageService, SettingsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import {AppInfo} from '../../../app.info';
+import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 
 export enum ModalDeleteAnswer {
   DELETE = 'DELETE',

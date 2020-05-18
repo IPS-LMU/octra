@@ -1,7 +1,7 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {Subject} from 'rxjs';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-missing-permissions-modal',

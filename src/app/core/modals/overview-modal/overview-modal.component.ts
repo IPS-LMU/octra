@@ -1,10 +1,10 @@
 import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs';
 import {AppStorageService, KeymappingService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {TranscriptionFeedbackComponent} from '../../gui/transcription-feedback/transcription-feedback.component';
 import {TranscrOverviewComponent} from '../../gui/transcr-overview';
+import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-overview-modal',

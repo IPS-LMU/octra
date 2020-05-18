@@ -1,7 +1,7 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {BsModalRef} from 'ngx-bootstrap';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {Subject} from 'rxjs';
+import {BsModalRef} from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-help-modal',

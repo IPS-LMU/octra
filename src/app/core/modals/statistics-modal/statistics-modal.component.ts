@@ -1,11 +1,11 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs';
 import {AppStorageService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {TextConverter} from '../../obj/Converters';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {NavbarService} from '../../gui/navbar/navbar.service';
+import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-statistics-modal',
@@ -16,7 +16,6 @@ import {NavbarService} from '../../gui/navbar/navbar.service';
 export class StatisticsModalComponent implements OnInit {
   modalRef: BsModalRef;
   public visible = false;
-  public bgemail = '';
   public bgdescr = '';
   public sendProObj = true;
   public bugsent = false;

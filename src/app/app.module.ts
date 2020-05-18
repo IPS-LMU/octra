@@ -49,7 +49,6 @@ import {FaIconLibrary, FontAwesomeModule} from '@fortawesome/angular-fontawesome
 // icons
 import {fas} from '@fortawesome/free-solid-svg-icons';
 // modules
-import {ButtonsModule, ModalModule, PopoverModule, ProgressbarModule, TooltipModule} from 'ngx-bootstrap';
 import {YesNoModalComponent} from './core/modals/yes-no-modal/yes-no-modal.component';
 import {ModalService} from './core/modals/modal.service';
 import {BugreportModalComponent} from './core/modals/bugreport-modal/bugreport-modal.component';
@@ -94,6 +93,11 @@ import {ErrorOccurredComponent} from './core/alerts/error-occurred/error-occurre
 import {AudioviewerConfig} from './media-components/components/audio/audio-viewer/audio-viewer.config';
 import {MediaComponentsModule} from './media-components/media-components.module';
 import {MissingPermissionsModalComponent} from './core/modals/missing-permissions/missing-permissions.component';
+import {ModalModule} from 'ngx-bootstrap/modal';
+import {ProgressbarModule} from 'ngx-bootstrap/progressbar';
+import {ButtonsModule} from 'ngx-bootstrap/buttons';
+import {PopoverModule} from 'ngx-bootstrap/popover';
+import {TooltipModule} from 'ngx-bootstrap/tooltip';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -179,7 +183,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     ErrorOccurredComponent,
     MissingPermissionsModalComponent
   ],
-  entryComponents: [EDITORS, ALERTS, ErrorOccurredComponent],
   imports: [
     BrowserModule,
     FontAwesomeModule,

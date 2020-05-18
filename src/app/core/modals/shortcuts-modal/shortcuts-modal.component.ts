@@ -1,10 +1,9 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
 import {Subject} from 'rxjs';
 import {AppStorageService, KeymappingService, SettingsService} from '../../shared/service';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import {BrowserInfo} from '../../shared';
+import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 
 export interface GeneralShortcut {
   label: string;
@@ -36,8 +35,6 @@ export class ShortcutsModalComponent implements OnInit {
   @ViewChild('modal', {static: true}) modal: any;
   protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
-
-  private subscrmanager = new SubscriptionManager();
 
   public get platform(): string {
     return BrowserInfo.platform;

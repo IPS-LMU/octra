@@ -443,81 +443,86 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   public initializeView() {
-    this.onInitialized.next();
-    for (const attr in this.layers) {
-      if (this.layers.hasOwnProperty(attr)) {
-        this.layers['' + attr].removeChildren();
-        this.audioManager.createSampleUnit(0)
+    if (!isUnset(this._transcriptionLevel)) {
+
+      this.onInitialized.next();
+      for (const attr in this.layers) {
+        if (this.layers.hasOwnProperty(attr)) {
+          this.layers['' + attr].removeChildren();
+          this.audioManager.createSampleUnit(0)
+        }
       }
-    }
 
-    if (this.settings.cropping === 'circle') {
-      this.settings.lineheight = this.av.innerWidth;
-      const circleWidth = this.av.innerWidth - 5;
-      this.croppingData = {
-        x: circleWidth / 2 + 2 + this.settings.margin.left,
-        y: circleWidth / 2 + 2 + this.settings.margin.top,
-        radius: circleWidth / 2
-      };
-    }
-    if (this.settings.multiLine) {
-      const optionalScrollbarWidth = (this.settings.scrollbar.enabled) ? this.settings.scrollbar.width : 0;
-      let lineWidth = this.av.innerWidth;
-      const numOfLines = Math.ceil(this.av.AudioPxWidth / lineWidth);
+      if (this.settings.cropping === 'circle') {
+        this.settings.lineheight = this.av.innerWidth;
+        const circleWidth = this.av.innerWidth - 5;
+        this.croppingData = {
+          x: circleWidth / 2 + 2 + this.settings.margin.left,
+          y: circleWidth / 2 + 2 + this.settings.margin.top,
+          radius: circleWidth / 2
+        };
+      }
+      if (this.settings.multiLine) {
+        const optionalScrollbarWidth = (this.settings.scrollbar.enabled) ? this.settings.scrollbar.width : 0;
+        let lineWidth = this.av.innerWidth;
+        const numOfLines = Math.ceil(this.av.AudioPxWidth / lineWidth);
 
-      let y = 0;
-      for (let i = 0; i < numOfLines - 1; i++) {
-        const line = this.createLine(new Size(lineWidth, this.settings.lineheight), new Position(this.settings.margin.left, y), i);
+        let y = 0;
+        for (let i = 0; i < numOfLines - 1; i++) {
+          const line = this.createLine(new Size(lineWidth, this.settings.lineheight), new Position(this.settings.margin.left, y), i);
+          this.layers.background.add(line);
+          y += this.settings.lineheight + this.settings.margin.top;
+          this.canvasElements.lastLine = line;
+        }
+        // add last line
+        lineWidth = this.av.AudioPxWidth % lineWidth;
+        if (lineWidth > 0) {
+          const line = this.createLine(new Size(lineWidth, this.settings.lineheight), new Position(this.settings.margin.left, y), numOfLines - 1);
+          this.layers.background.add(line);
+          this.canvasElements.lastLine = line;
+        }
+
+      } else {
+        const line = this.createLine(
+          new Size(this.av.innerWidth, this.settings.lineheight),
+          new Position(this.settings.margin.left, 0), 0);
         this.layers.background.add(line);
-        y += this.settings.lineheight + this.settings.margin.top;
         this.canvasElements.lastLine = line;
       }
-      // add last line
-      lineWidth = this.av.AudioPxWidth % lineWidth;
-      if (lineWidth > 0) {
-        const line = this.createLine(new Size(lineWidth, this.settings.lineheight), new Position(this.settings.margin.left, y), numOfLines - 1);
-        this.layers.background.add(line);
-        this.canvasElements.lastLine = line;
+
+      this.createSegmentsForCanvas();
+
+      this.canvasElements.playHead = this.createLinePlayCursor();
+      if (this.settings.selection.enabled) {
+        this.layers.playhead.add(this.canvasElements.playHead);
       }
 
+      this.canvasElements.mouseCaret = this.createLineMouseCaret();
+      this.layers.playhead.add(this.canvasElements.mouseCaret);
+
+
+      if (this.settings.cropping === 'circle') {
+        const cropGroup = this.createCropContainer();
+        this.layers.playhead.removeChildren();
+        this.canvasElements.mouseCaret.position({
+          x: this.croppingData.radius + 2,
+          y: 2
+        });
+
+        cropGroup.add(this.canvasElements.playHead);
+        cropGroup.add(this.canvasElements.mouseCaret);
+        this.layers.playhead.add(cropGroup);
+      }
+
+      if (this.settings.scrollbar.enabled) {
+        this.canvasElements.scrollBar = this.createScrollBar();
+        this.layers.scrollBars.add(this.canvasElements.scrollBar);
+      }
+
+      this.stage.batchDraw();
     } else {
-      const line = this.createLine(
-        new Size(this.av.innerWidth, this.settings.lineheight),
-        new Position(this.settings.margin.left, 0), 0);
-      this.layers.background.add(line);
-      this.canvasElements.lastLine = line;
+      console.error(`transcriptionLevel is null`);
     }
-
-    this.createSegmentsForCanvas();
-
-    this.canvasElements.playHead = this.createLinePlayCursor();
-    if (this.settings.selection.enabled) {
-      this.layers.playhead.add(this.canvasElements.playHead);
-    }
-
-    this.canvasElements.mouseCaret = this.createLineMouseCaret();
-    this.layers.playhead.add(this.canvasElements.mouseCaret);
-
-
-    if (this.settings.cropping === 'circle') {
-      const cropGroup = this.createCropContainer();
-      this.layers.playhead.removeChildren();
-      this.canvasElements.mouseCaret.position({
-        x: this.croppingData.radius + 2,
-        y: 2
-      });
-
-      cropGroup.add(this.canvasElements.playHead);
-      cropGroup.add(this.canvasElements.mouseCaret);
-      this.layers.playhead.add(cropGroup);
-    }
-
-    if (this.settings.scrollbar.enabled) {
-      this.canvasElements.scrollBar = this.createScrollBar();
-      this.layers.scrollBars.add(this.canvasElements.scrollBar);
-    }
-
-    this.stage.batchDraw();
   }
 
   private createCropContainer(id?: string): Group {

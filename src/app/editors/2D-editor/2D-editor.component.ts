@@ -526,16 +526,16 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
   public changeLoupePosition(mouseEvent: MouseEvent, cursorTime: SampleUnit) {
 
-    const fullY = mouseEvent.layerY + 20 + this.miniloupe.size.height;
-    const x = mouseEvent.layerX - ((this.miniloupe.size.width - 10) / 2) - 2;
+    const fullY = mouseEvent.offsetY + 20 + this.miniloupe.size.height;
+    const x = mouseEvent.offsetX - ((this.miniloupe.size.width - 10) / 2) - 2;
 
     if (fullY < this.viewer.height) {
       // loupe is fully visible
-      this.miniloupe.location.y = mouseEvent.layerY + 20;
+      this.miniloupe.location.y = mouseEvent.offsetY + 20;
       this.miniloupe.location.x = x;
     } else {
       // loupe out of the bottom border of view rectangle
-      this.miniloupe.location.y = mouseEvent.layerY - 20 - this.miniloupe.size.height;
+      this.miniloupe.location.y = mouseEvent.offsetY - 20 - this.miniloupe.size.height;
       this.miniloupe.location.x = x;
     }
 

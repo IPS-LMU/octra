@@ -3,7 +3,7 @@ import {IndexedDBManager} from '../obj/IndexedDBManager';
 import {SubscriptionManager} from '../obj/SubscriptionManager';
 import {AppStorageService, OIDBLevel} from './service/appstorage.service';
 import {isUnset} from './Functions';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../../media-components/obj/annotation';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
 
 export class UpdateManager {
   private version = '';

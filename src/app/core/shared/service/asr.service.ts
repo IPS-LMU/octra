@@ -4,14 +4,14 @@ import {SettingsService} from './settings.service';
 import {AppStorageService} from './appstorage.service';
 import {isUnset} from '../Functions';
 import {HttpClient} from '@angular/common/http';
-import {FileInfo} from '../../../media-components/obj/fileInfo';
 import * as X2JS from 'x2js';
 import {AudioService} from './audio.service';
 import {Subject} from 'rxjs';
 import {TranscriptionService} from './transcription.service';
 import {Router} from '@angular/router';
-import {SampleUnit, WavFormat} from '../../../media-components/obj/audio';
-import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
+import {SampleUnit, WavFormat} from 'octra-components';
+import {AudioManager} from 'octra-components';
+import {FileInfo} from 'octra-components';
 
 @Injectable({
   providedIn: 'root'

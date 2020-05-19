@@ -15,16 +15,16 @@
     </div>
     <app-asr-options [audioChunk]="audiochunk" [enabled]="editor.rawText === ''"
                      *ngIf="settingsService.isASREnabled"></app-asr-options>
-    <octra-audio-navigation #audionav
-                            [audioChunk]="audiochunk"
-                            [playbackRate]="appStorage.audioSpeed"
-                            [volume]="appStorage.audioVolume"
-                            (buttonClick)="onButtonClick($event)"
-                            (keyup)="onKeyUp()"
-                            (afterVolumeChange)="afterVolumeChange($event)"
-                            (afterPlaybackRateChange)="afterSpeedChange($event)"
-                            [responsive]="settingsService.responsive.enabled"
-                            [buttons]="{
+    <occo-audio-navigation #audionav
+                           [audioChunk]="audiochunk"
+                           [playbackRate]="appStorage.audioSpeed"
+                           [volume]="appStorage.audioVolume"
+                           (buttonClick)="onButtonClick($event)"
+                           (keyup)="onKeyUp()"
+                           (afterVolumeChange)="afterVolumeChange($event)"
+                           (afterPlaybackRateChange)="afterSpeedChange($event)"
+                           [responsive]="settingsService.responsive.enabled"
+                           [buttons]="{
                         play: {
                             label: ('general.play' | transloco),
                             shortcut: keyMap.getShortcut('overlay', 'play_pause')
@@ -50,15 +50,15 @@
                             shortcut: keyMap.getShortcut('overlay', 'step_backwardtime')
                         }
                       }"
-                            [easyMode]="easymode"
+                           [easyMode]="easymode"
 
-    ></octra-audio-navigation>
-    <octra-audio-viewer #loupe id="loupe"
-                        [transcriptionLevel]="transcrService.currentlevel"
-                        (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
-                        [audioChunk]="audiochunk"
-                        [isMultiLine]="false"
-    ></octra-audio-viewer>
+    ></occo-audio-navigation>
+    <occo-audio-viewer #loupe id="loupe"
+                       [transcriptionLevel]="transcrService.currentlevel"
+                       (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
+                       [audioChunk]="audiochunk"
+                       [isMultiLine]="false"
+    ></occo-audio-viewer>
     <app-transcr-editor #editor id="trancr"
                         (markerInsert)="onMarkerInsert($event)"
                         (markerClick)="onMarkerClick($event)"

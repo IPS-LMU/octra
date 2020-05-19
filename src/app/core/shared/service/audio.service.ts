@@ -4,7 +4,7 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {HttpClient} from '@angular/common/http';
 import {Functions, isUnset} from '../Functions';
 import {AppInfo} from '../../../app.info';
-import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
+import {AudioManager} from 'octra-components';
 
 @Injectable()
 export class AudioService {

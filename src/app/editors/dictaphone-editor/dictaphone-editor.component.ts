@@ -9,13 +9,12 @@ import {
   UserInteractionsService
 } from '../../core/shared/service';
 import {SubscriptionManager} from '../../core/shared';
-import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {OCTRAEditor} from '../octra-editor';
-import {AudioplayerComponent} from '../../media-components/components/audio/audioplayer/audioplayer.component';
-import {AudioChunk, AudioManager} from '../../media-components/obj/audio/AudioManager';
-import {SampleUnit} from '../../media-components/obj/audio';
-import {Segment} from '../../media-components/obj/annotation';
+import {AudioNavigationComponent, AudioplayerComponent} from 'octra-components';
+import {AudioChunk, AudioManager} from 'octra-components';
+import {SampleUnit} from 'octra-components';
+import {Segment} from 'octra-components';
 
 @Component({
   selector: 'app-audioplayer-gui',

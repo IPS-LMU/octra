@@ -20,10 +20,10 @@ import {Functions, isUnset} from '../../shared/Functions';
 import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
 import {isNumeric} from 'rxjs/internal-compatibility';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../shared/service/asr.service';
-import {AudioChunk, AudioManager} from '../../../media-components/obj/audio/AudioManager';
-import {SampleUnit} from '../../../media-components/obj/audio';
-import {TimespanPipe} from '../../../media-components/pipe/timespan.pipe';
-import {Segments} from '../../../media-components/obj/annotation';
+import {AudioChunk, AudioManager} from 'octra-components';
+import {Segments} from 'octra-components';
+import {SampleUnit} from 'octra-components';
+import {TimespanPipe} from 'octra-components';
 
 declare let lang: any;
 declare let document: any;

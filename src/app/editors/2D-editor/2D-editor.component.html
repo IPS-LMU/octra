@@ -4,16 +4,16 @@
                       [audiochunk]="audioChunkWindow"
                       [segmentIndex]="selectedIndex"
   ></app-transcr-window>
-  <octra-audio-navigation #audionav
-                          [audioChunk]="audioChunkLines"
-                          (buttonClick)="onButtonClick($event)"
-                          (afterVolumeChange)="afterVolumeChange($event)"
-                          (afterPlaybackRateChange)="afterSpeedChange($event)"
+  <occo-audio-navigation #audionav
+                         [audioChunk]="audioChunkLines"
+                         (buttonClick)="onButtonClick($event)"
+                         (afterVolumeChange)="afterVolumeChange($event)"
+                         (afterPlaybackRateChange)="afterSpeedChange($event)"
 
-                          [volume]="appStorage.audioVolume"
-                          [playbackRate]="appStorage.audioSpeed"
-                          [responsive]="settingsService.responsive.enabled"
-                          [buttons]="{
+                         [volume]="appStorage.audioVolume"
+                         [playbackRate]="appStorage.audioSpeed"
+                         [responsive]="settingsService.responsive.enabled"
+                         [buttons]="{
                                 play: {
                                     label: ('general.play' | transloco),
                                     shortcut: keyMap.getShortcut('overlay', 'play_pause')
@@ -39,13 +39,13 @@
                                     shortcut: keyMap.getShortcut('overlay', 'step_backward')
                                 }
                               }"
-                          [easyMode]="appStorage.easymode"
-  ></octra-audio-navigation>
+                         [easyMode]="appStorage.easymode"
+  ></occo-audio-navigation>
   <div *ngIf="appStorage.showLoupe">
-    <octra-audio-viewer #loupe
-                        (mousemove)="onCircleLoupeMouseOver($event)"
-                        [height]="miniloupe.size.height"
-                        [ngStyle]="{
+    <occo-audio-viewer #loupe
+                       (mousemove)="onCircleLoupeMouseOver($event)"
+                       [height]="miniloupe.size.height"
+                       [ngStyle]="{
         'width': miniloupe.size.width + 'px',
         'height': miniloupe.size.height + 'px',
         'position':'absolute',
@@ -56,31 +56,31 @@
         'visibility': (loupeHidden) ? 'hidden' : 'inherit',
         'flex': 'auto',
         'flex-direction': 'column'}"
-                        [audioChunk]="audioChunkLoupe"
-                        [transcriptionLevel]="transcrService.currentlevel"
-                        [settings]="miniLoupeSettings"
-                        [isMultiLine]="false"
-                        [breakMarker]="{
+                       [audioChunk]="audioChunkLoupe"
+                       [transcriptionLevel]="transcrService.currentlevel"
+                       [settings]="miniLoupeSettings"
+                       [isMultiLine]="false"
+                       [breakMarker]="{
                         code: '<P>'
                       }"
-                        [name]="'loupe'"
-    ></octra-audio-viewer>
+                       [name]="'loupe'"
+    ></occo-audio-viewer>
   </div>
   <div id="lines-wrapper" #linesView>
-    <octra-audio-viewer #viewer id="special"
-                        (segmententer)="onSegmentEntered($event)"
-                        (mousecursorchange)="onMouseOver($event);"
-                        (shortcuttriggered)="onShortCutTriggered($event, 'multi-lines-viewer')"
-                        [audioChunk]="audioChunkLines"
-                        [isMultiLine]="true"
-                        [breakMarker]="{
+    <occo-audio-viewer #viewer id="special"
+                       (segmententer)="onSegmentEntered($event)"
+                       (mousecursorchange)="onMouseOver($event);"
+                       (shortcuttriggered)="onShortCutTriggered($event, 'multi-lines-viewer')"
+                       [audioChunk]="audioChunkLines"
+                       [isMultiLine]="true"
+                       [breakMarker]="{
                         code: '<P>'
                       }"
-                        style="height:400px; display: flex; flex: auto; flex-direction: column;"
+                       style="height:400px; display: flex; flex: auto; flex-direction: column;"
 
-                        [height]="linesViewHeight"
-                        [transcriptionLevel]="transcrService.currentlevel"
+                       [height]="linesViewHeight"
+                       [transcriptionLevel]="transcrService.currentlevel"
     >
-    </octra-audio-viewer>
+    </occo-audio-viewer>
   </div>
 </div>

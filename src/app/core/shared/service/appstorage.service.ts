@@ -6,9 +6,9 @@ import {LocalStorageService, SessionStorage, SessionStorageService} from '@rars/
 import {isUnset} from '../Functions';
 import {Subject} from 'rxjs';
 import {IDataEntry} from '../../obj/data-entry';
-import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
-import {OLevel, OLink} from '../../../media-components/obj/annotation';
 import {ConsoleEntry} from './bug-report.service';
+import {AudioManager} from 'octra-components';
+import {OLevel, OLink} from 'octra-components';
 
 export interface IIDBLevel {
   id: number;

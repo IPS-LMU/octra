@@ -15,8 +15,8 @@ import {AppStorageService, OIDBLevel} from './appstorage.service';
 import {UserInteractionsService} from './userInteractions.service';
 import {SettingsService} from './settings.service';
 import {AppInfo} from '../../../app.info';
-import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
-import {Annotation, Level, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment, Segments} from '../../../media-components/obj/annotation';
+import {Annotation, Level, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment, Segments} from 'octra-components';
+import {AudioManager} from 'octra-components';
 
 declare var validateAnnotation: ((string, any) => any);
 

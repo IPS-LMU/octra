@@ -52,11 +52,11 @@ import {
 import {GeneralShortcut} from '../../modals/shortcuts-modal/shortcuts-modal.component';
 import {AsrService} from '../../shared/service/asr.service';
 import {parseServerDataEntry} from '../../obj/data-entry';
-import {PlayBackStatus} from '../../../media-components/obj/audio';
-import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
-import {Level} from '../../../media-components/obj/annotation';
 import {OCTRAEditor} from '../../../editors/octra-editor';
 import {MissingPermissionsModalComponent} from '../../modals/missing-permissions/missing-permissions.component';
+import {PlayBackStatus} from 'octra-components';
+import {AudioManager} from 'octra-components';
+import {Level} from 'octra-components';
 
 @Component({
   selector: 'app-transcription',

@@ -1,13 +1,12 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {AlertService, AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
 import {AppSettings, ASRLanguage} from '../../obj/Settings';
-import {AsrService} from '../../shared/service/asr.service';
+import {ASRQueueItemType, AsrService} from '../../shared/service/asr.service';
 import {isUnset} from '../../shared/Functions';
 import {TranslocoService} from '@ngneat/transloco';
-import {AudioChunk} from '../../../media-components/obj/audio/AudioManager';
-import {ASRQueueItemType} from '../../../media-components/obj/annotation/asr';
 import {AppInfo} from '../../../app.info';
 import {BsDropdownDirective} from 'ngx-bootstrap/dropdown';
+import {AudioChunk} from 'octra-components/lib/obj/audio/AudioManager';
 
 @Component({
   selector: 'app-asr-options',

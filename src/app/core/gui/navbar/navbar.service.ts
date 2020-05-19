@@ -1,7 +1,7 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {FileSize} from '../../shared/Functions';
-import {AudioRessource} from '../../../media-components/obj/audio';
+import {AudioRessource} from 'octra-components';
 
 @Injectable()
 export class NavbarService {

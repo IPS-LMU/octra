@@ -1,13 +1,13 @@
-<occo-audio-navigation #nav
-                       [audioChunk]="audiochunk"
-                       (afterVolumeChange)="afterVolumeChange($event)"
-                       (afterPlaybackRateChange)="afterSpeedChange($event)"
-                       (buttonClick)="onButtonClick($event)"
-                       [responsive]="settingsService.responsive.enabled"
-                       [volume]="appStorage.audioVolume"
-                       [playbackRate]="appStorage.audioSpeed"
+<oco-audio-navigation #nav
+                      [audioChunk]="audiochunk"
+                      (afterVolumeChange)="afterVolumeChange($event)"
+                      (afterPlaybackRateChange)="afterSpeedChange($event)"
+                      (buttonClick)="onButtonClick($event)"
+                      [responsive]="settingsService.responsive.enabled"
+                      [volume]="appStorage.audioVolume"
+                      [playbackRate]="appStorage.audioSpeed"
 
-                       [buttons]="{
+                      [buttons]="{
                         play: {
                             label: ('general.play' | transloco),
                             shortcut: keyMap.getShortcut('AP', 'play_pause')
@@ -33,11 +33,11 @@
                             shortcut: keyMap.getShortcut('overlay', 'step_backward')
                         }
                       }"
-                       [easyMode]="appStorage.easymode"
-></occo-audio-navigation>
-<occo-audioplayer #audioplayer
-                  [audioChunk]="audiochunk"
-></occo-audioplayer>
+                      [easyMode]="appStorage.easymode"
+></oco-audio-navigation>
+<oco-audioplayer #audioplayer
+                 [audioChunk]="audiochunk"
+></oco-audioplayer>
 <app-transcr-editor #transcr
                     (typing)="afterTyping($event);"
                     (keyup)="onKeyUp()"

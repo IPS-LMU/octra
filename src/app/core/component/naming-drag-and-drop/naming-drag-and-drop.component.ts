@@ -14,7 +14,7 @@ import {isUnset} from '../../shared/Functions';
 import {Subject} from 'rxjs';
 import {DragulaService} from 'ng2-dragula';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {Segment} from '../../../media-components/obj/annotation';
+import {Segment} from 'octra-components';
 
 @Component({
   selector: 'app-naming-drag-and-drop',

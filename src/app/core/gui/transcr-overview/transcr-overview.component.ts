@@ -19,9 +19,9 @@ import {SubscriptionManager} from '../../shared';
 import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
 import {isFunction, isUnset} from '../../shared/Functions';
 import {TranscrEditorComponent} from '../../component/transcr-editor';
-import {AudioChunk} from '../../../media-components/obj/audio/AudioManager';
-import {AudioSelection, PlayBackStatus, SampleUnit} from '../../../media-components/obj/audio';
-import {Segment} from '../../../media-components/obj/annotation';
+import {AudioSelection, PlayBackStatus, SampleUnit} from 'octra-components';
+import {AudioChunk} from 'octra-components';
+import {Segment} from 'octra-components';
 
 declare var validateAnnotation: ((string, any) => any);
 

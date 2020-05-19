@@ -4,7 +4,7 @@ import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
 import {Functions, isUnset} from '../Functions';
 import {OLog} from '../../obj/Settings/logging';
-import {SampleUnit} from '../../../media-components/obj/audio';
+import {SampleUnit} from 'octra-components';
 
 @Injectable({
   providedIn: 'root'

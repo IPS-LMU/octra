@@ -7,7 +7,7 @@ import {HttpClient} from '@angular/common/http';
 import {IFile, ImportResult} from '../../obj/Converters';
 import {AppInfo} from '../../../app.info';
 import {Functions, isUnset} from '../../shared/Functions';
-import {OAudiofile, OLevel} from '../../../media-components/obj/annotation';
+import {OAudiofile, OLevel} from 'octra-components';
 
 @Component({
   selector: 'app-loading',

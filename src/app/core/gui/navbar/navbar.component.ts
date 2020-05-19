@@ -10,7 +10,7 @@ import {BugReportService, ConsoleType} from '../../shared/service/bug-report.ser
 import {environment} from '../../../../environments/environment';
 import {ModalService} from '../../modals/modal.service';
 import {ExportFilesModalComponent} from '../../modals/export-files-modal/export-files-modal.component';
-import {Level, Segments, AnnotJSONType} from '../../../media-components/obj/annotation';
+import {Level, Segments, AnnotJSONType} from 'octra-components';
 
 @Component({
   selector: 'app-navigation',

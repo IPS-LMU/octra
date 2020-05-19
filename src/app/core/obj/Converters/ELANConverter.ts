@@ -2,7 +2,7 @@ import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 import * as moment from 'moment';
 import * as X2JS from 'x2js';
 import {isUnset} from '../../shared/Functions';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../../../media-components/obj/annotation';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
 
 export class ELANConverter extends Converter {
 

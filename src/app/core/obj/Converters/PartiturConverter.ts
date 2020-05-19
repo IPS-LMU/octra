@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {OAnnotJSON, OAudiofile, OItem, OLabel, OLevel, OSegment} from '../../../media-components/obj/annotation';
+import {OAnnotJSON, OAudiofile, OItem, OLabel, OLevel, OSegment} from 'octra-components';
 
 export class PartiturConverter extends Converter {
 

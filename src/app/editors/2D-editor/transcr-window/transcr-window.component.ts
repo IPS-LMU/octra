@@ -24,14 +24,13 @@ import {
 } from '../../../core/shared/service';
 import {SubscriptionManager} from '../../../core/shared';
 import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
-import {AudioNavigationComponent} from '../../../media-components/components/audio/audio-navigation';
 import {isUnset} from '../../../core/shared/Functions';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../../core/shared/service/asr.service';
-import {AudioChunk, AudioManager} from '../../../media-components/obj/audio/AudioManager';
-import {AudioRessource, AudioSelection, SampleUnit} from '../../../media-components/obj/audio';
-import {AudioViewerComponent} from '../../../media-components/components/audio/audio-viewer/audio-viewer.component';
-import {Segment, Segments} from '../../../media-components/obj/annotation';
-import {ASRQueueItemType} from '../../../media-components/obj/annotation/asr';
+import {AudioNavigationComponent, AudioViewerComponent} from 'octra-components';
+import {AudioChunk, AudioManager} from 'octra-components';
+import {Segment, Segments} from 'octra-components';
+import {AudioRessource, AudioSelection, SampleUnit} from 'octra-components';
+import {ASRQueueItemType} from 'octra-components';
 
 @Component({
   selector: 'app-transcr-window',

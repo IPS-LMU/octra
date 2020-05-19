@@ -3,8 +3,8 @@ import {Subject} from 'rxjs';
 import {AppStorageService, SettingsService} from '../../shared/service';
 import {AppInfo} from '../../../app.info';
 import {AnnotJSONConverter, PartiturConverter, TextConverter} from '../../obj/Converters';
-import {OAudiofile} from '../../../media-components/obj/annotation';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
+import {OAudiofile} from 'octra-components';
 
 @Component({
   selector: 'app-prompt-modal',

@@ -26,19 +26,17 @@ import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
 import {TranscrWindowComponent} from './transcr-window';
 import {interval, Subscription} from 'rxjs';
 import {TranscrEditorComponent} from '../../core/component';
-import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
 import {Functions, isUnset} from '../../core/shared/Functions';
 import {OCTRAEditor} from '../octra-editor';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../core/shared/service/asr.service';
 import {TranslocoService} from '@ngneat/transloco';
 import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
 import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
-import {AudioViewerComponent} from '../../media-components/components/audio/audio-viewer/audio-viewer.component';
-import {AudioChunk, AudioManager} from '../../media-components/obj/audio/AudioManager';
-import {AudioSelection, PlayBackStatus, SampleUnit} from '../../media-components/obj/audio';
-import {OAudiofile, OSegment, Segment} from '../../media-components/obj/annotation';
-import {ASRQueueItemType} from '../../media-components/obj/annotation/asr';
-import {AudioviewerConfig} from '../../media-components/components/audio/audio-viewer/audio-viewer.config';
+import {AudioChunk, AudioManager} from 'octra-components';
+import {AudioSelection, PlayBackStatus, SampleUnit} from 'octra-components';
+import {ASRQueueItemType} from 'octra-components';
+import {OAudiofile, OSegment, Segment} from 'octra-components';
+import {AudioNavigationComponent, AudioViewerComponent, AudioviewerConfig} from 'octra-components';
 
 @Component({
   selector: 'app-overlay-gui',

@@ -19,16 +19,14 @@ import {
   TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
-import {AudioNavigationComponent} from '../../media-components/components/audio/audio-navigation';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
 import {BrowserInfo} from '../../core/shared';
 import {Functions, isUnset} from '../../core/shared/Functions';
 import {OCTRAEditor} from '../octra-editor';
-import {AudioviewerConfig} from '../../media-components/components/audio/audio-viewer/audio-viewer.config';
-import {AudioChunk, AudioManager} from '../../media-components/obj/audio/AudioManager';
-import {AudioViewerComponent} from '../../media-components/components/audio/audio-viewer/audio-viewer.component';
-import {AudioSelection, SampleUnit} from '../../media-components/obj/audio';
+import {AudioNavigationComponent, AudioViewerComponent, AudioviewerConfig} from 'octra-components';
+import {AudioChunk, AudioManager} from 'octra-components';
+import {AudioSelection, SampleUnit} from 'octra-components';
 
 @Component({
   selector: 'app-signal-gui',

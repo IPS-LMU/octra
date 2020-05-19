@@ -90,14 +90,13 @@ import {far} from '@fortawesome/free-regular-svg-icons';
 import {AuthenticationNeededComponent} from './core/alerts/authentication-needed/authentication-needed.component';
 import {DynComponentDirective} from './core/shared/directive/dyn-component.directive';
 import {ErrorOccurredComponent} from './core/alerts/error-occurred/error-occurred.component';
-import {AudioviewerConfig} from './media-components/components/audio/audio-viewer/audio-viewer.config';
-import {MediaComponentsModule} from './media-components/media-components.module';
 import {MissingPermissionsModalComponent} from './core/modals/missing-permissions/missing-permissions.component';
 import {ModalModule} from 'ngx-bootstrap/modal';
 import {ProgressbarModule} from 'ngx-bootstrap/progressbar';
 import {ButtonsModule} from 'ngx-bootstrap/buttons';
 import {PopoverModule} from 'ngx-bootstrap/popover';
 import {TooltipModule} from 'ngx-bootstrap/tooltip';
+import {OctraComponentsModule} from 'octra-components';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -191,7 +190,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     CollapseModule.forRoot(),
     FormsModule,
     HttpClientModule,
-    MediaComponentsModule,
+    OctraComponentsModule,
     Ng2Webstorage.forRoot({
       separator: '.',
       prefix: 'custom'
@@ -213,7 +212,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     ALoginGuard,
     APIService,
     AudioService,
-    AudioviewerConfig,
     DeALoginGuard,
     KeymappingService,
     LogoutGuard,

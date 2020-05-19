@@ -10,10 +10,10 @@ import {interval, Subject} from 'rxjs';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
 import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/cutting-format';
 import {TranslocoService} from '@ngneat/transloco';
-import {WavFormat} from '../../../media-components/obj/audio/AudioFormats';
-import {Segment} from '../../../media-components/obj/annotation';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
+import {WavFormat} from 'octra-components';
+import {Segment} from 'octra-components';
 
 declare var JSZip;
 

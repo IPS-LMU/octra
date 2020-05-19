@@ -6,8 +6,8 @@ import {SessionFile} from '../../obj/SessionFile';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {ModalService} from '../../modals/modal.service';
 import {FileSize, Functions, isUnset} from '../../shared/Functions';
-import {AudioManager} from '../../../media-components/obj/audio/AudioManager';
-import {OAnnotJSON, OAudiofile, OLabel, OSegment} from '../../../media-components/obj/annotation';
+import {AudioManager} from 'octra-components';
+import {OAnnotJSON, OAudiofile, OLabel, OSegment} from 'octra-components';
 
 interface FileProgress {
   status: 'progress' | 'valid' | 'invalid';

@@ -117,7 +117,8 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "browserTarget": "octra:build",
-            "port": 5321
+            "port": 5321,
+            "vendorSourceMap": true
           },
           "configurations": {
             "production": {

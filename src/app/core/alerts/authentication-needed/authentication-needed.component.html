@@ -1,8 +1,8 @@
 <p>{{"alerts.authentication needed" | transloco}}</p>
-<button class="btn btn-sm btn-info btn-raised" (click)="onAuthenticateClick()">
+<button (click)="onAuthenticateClick()" class="btn btn-sm btn-info btn-raised">
   {{"general.authenticate" | transloco}}
 </button>
-<button class="btn btn-sm btn-success btn-raised" style="margin-left: 5px;"
-        [disabled]="!clickedOnAuthenticate" (click)="onConfirmationClick()">
+<button (click)="onConfirmationClick()" [disabled]="!clickedOnAuthenticate"
+        class="btn btn-sm btn-success btn-raised" style="margin-left: 5px;">
   {{"general.im authenticated" | transloco}}
 </button>

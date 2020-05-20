@@ -1,5 +1,4 @@
 import {Component, EventEmitter, OnInit} from '@angular/core';
-import {LinearEditorComponent} from '../linear-editor';
 import {
   AppStorageService,
   AudioService,
@@ -8,6 +7,7 @@ import {
   TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
+import {LinearEditorComponent} from '../linear-editor';
 import {OCTRAEditor} from '../octra-editor';
 
 @Component({

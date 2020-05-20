@@ -1,9 +1,9 @@
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
 import {AppInfo} from '../../app.info';
 import {IndexedDBManager} from '../obj/IndexedDBManager';
 import {SubscriptionManager} from '../obj/SubscriptionManager';
-import {AppStorageService, OIDBLevel} from './service/appstorage.service';
 import {isUnset} from './Functions';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
+import {AppStorageService, OIDBLevel} from './service/appstorage.service';
 
 export class UpdateManager {
   private version = '';
@@ -23,7 +23,6 @@ export class UpdateManager {
         if (!(this.appStorage.localStr.retrieve('version') === null || this.appStorage.localStr.retrieve('version') === undefined)) {
           this.version = this.appStorage.localStr.retrieve('version');
         }
-
 
         const continueCheck = () => {
           if ((this.version === null || this.version === undefined)) {
@@ -200,7 +199,6 @@ export class UpdateManager {
               reject(error);
             }));
         };
-
 
         // check if version entry in IDB exists
         const idb = new IndexedDBManager(dbname);

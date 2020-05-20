@@ -1,8 +1,8 @@
-import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 import * as moment from 'moment';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
 import * as X2JS from 'x2js';
 import {isUnset} from '../../shared/Functions';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
+import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 
 export class ELANConverter extends Converter {
 
@@ -57,7 +57,6 @@ export class ELANConverter extends Converter {
         }
       }
     };
-
 
     let tsidCounter = 1;
     let aidCounter = 1;

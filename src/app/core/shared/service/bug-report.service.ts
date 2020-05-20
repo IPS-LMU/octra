@@ -1,16 +1,16 @@
-import {Injectable} from '@angular/core';
-import {BrowserInfo} from '../BrowserInfo';
-import {TranslocoService} from '@ngneat/transloco';
-import {AppInfo} from '../../../app.info';
-import {AppStorageService} from './appstorage.service';
-import {Observable} from 'rxjs';
-import {SettingsService} from './settings.service';
-import {BugReporter} from '../../obj/BugAPI/BugReporter';
-import {TranscriptionService} from './transcription.service';
-import {Functions, isUnset} from '../Functions';
 import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {TranslocoService} from '@ngneat/transloco';
 import * as moment from 'moment';
+import {Observable} from 'rxjs';
 import {isArray} from 'rxjs/internal-compatibility';
+import {AppInfo} from '../../../app.info';
+import {BugReporter} from '../../obj/BugAPI/BugReporter';
+import {BrowserInfo} from '../BrowserInfo';
+import {Functions, isUnset} from '../Functions';
+import {AppStorageService} from './appstorage.service';
+import {SettingsService} from './settings.service';
+import {TranscriptionService} from './transcription.service';
 
 export enum ConsoleType {
   LOG,
@@ -29,9 +29,9 @@ export interface ConsoleEntry {
 export class BugReportService {
   private reporter: BugReporter;
   private transcrService: TranscriptionService;
+  private fromDBLoaded = false;
 
   private _console: ConsoleEntry[] = [];
-  private fromDBLoaded = false;
 
   get console(): ConsoleEntry[] {
     return this._console;

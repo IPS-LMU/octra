@@ -1,21 +1,21 @@
 h2 {
-    padding: 20px;
-    text-align: center;
+  padding: 20px;
+  text-align: center;
 }
 
 
 .card {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 @media only screen and (min-width: 768px) {
-    .is-table-row {
-        display: grid;
-    }
+  .is-table-row {
+    display: grid;
+  }
 
-    .is-table-row [class*="col-"] {
-        float: none;
-        display: table-cell;
-        vertical-align: top;
-    }
+  .is-table-row [class*="col-"] {
+    float: none;
+    display: table-cell;
+    vertical-align: top;
+  }
 }

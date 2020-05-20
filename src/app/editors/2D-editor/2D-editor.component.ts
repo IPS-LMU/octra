@@ -10,6 +10,29 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
+import {TranslocoService} from '@ngneat/transloco';
+import {
+  ASRQueueItemType,
+  AudioChunk,
+  AudioManager,
+  AudioNavigationComponent,
+  AudioSelection,
+  AudioViewerComponent,
+  AudioviewerConfig,
+  OAudiofile,
+  OSegment,
+  PlayBackStatus,
+  SampleUnit,
+  Segment
+} from 'octra-components';
+import {interval, Subscription} from 'rxjs';
+import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
+import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
+import {TranscrEditorComponent} from '../../core/component';
+import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
+
+import {PraatTextgridConverter} from '../../core/shared';
+import {Functions, isUnset} from '../../core/shared/Functions';
 
 import {
   AlertService,
@@ -20,23 +43,9 @@ import {
   TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
-
-import {PraatTextgridConverter} from '../../core/shared';
-import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
-import {TranscrWindowComponent} from './transcr-window';
-import {interval, Subscription} from 'rxjs';
-import {TranscrEditorComponent} from '../../core/component';
-import {Functions, isUnset} from '../../core/shared/Functions';
-import {OCTRAEditor} from '../octra-editor';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../core/shared/service/asr.service';
-import {TranslocoService} from '@ngneat/transloco';
-import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
-import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
-import {AudioChunk, AudioManager} from 'octra-components';
-import {AudioSelection, PlayBackStatus, SampleUnit} from 'octra-components';
-import {ASRQueueItemType} from 'octra-components';
-import {OAudiofile, OSegment, Segment} from 'octra-components';
-import {AudioNavigationComponent, AudioViewerComponent, AudioviewerConfig} from 'octra-components';
+import {OCTRAEditor} from '../octra-editor';
+import {TranscrWindowComponent} from './transcr-window';
 
 @Component({
   selector: 'app-overlay-gui',
@@ -44,16 +53,14 @@ import {AudioNavigationComponent, AudioViewerComponent, AudioviewerConfig} from 
   styleUrls: ['./2D-editor.component.css']
 })
 export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy {
+
   public static editorname = '2D-Editor';
-
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
-
   @ViewChild('viewer', {static: true}) viewer: AudioViewerComponent;
   @ViewChild('linesView', {static: true}) linesView: ElementRef;
   @ViewChild('window', {static: false}) window: TranscrWindowComponent;
   @ViewChild('loupe', {static: false}) loupe: AudioViewerComponent;
   @ViewChild('audionav', {static: true}) audionav: AudioNavigationComponent;
-
   @Output() public openModal = new EventEmitter();
   public showWindow = false;
   public loupeHidden = true;
@@ -77,11 +84,13 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       y: 0
     }
   };
-
   public audioManager: AudioManager;
   public audioChunkLines: AudioChunk;
   public audioChunkWindow: AudioChunk;
   public audioChunkLoupe: AudioChunk;
+  public miniLoupeSettings: AudioviewerConfig;
+  private;
+  public;
   private subscrmanager: SubscriptionManager;
   private mousestate = 'initiliazied';
   private intervalID = null;
@@ -89,10 +98,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   private factor = 8;
   private scrolltimer: Subscription = null;
   private shortcuts: any = {};
-  public miniLoupeSettings: AudioviewerConfig;
-
   private authWindow: Window = null;
-
   private windowShortcuts = {
     jump_left: {
       keys: {
@@ -234,7 +240,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               const absx = this.viewer.av.audioTCalculator.samplestoAbsX(this.audioChunkLines.relativePlayposition);
 
               const lines = Math.floor(absx / this.viewer.av.innerWidth);
-              let y = lines * (this.viewer.settings.lineheight + this.viewer.settings.margin.bottom);
+              const y = lines * (this.viewer.settings.lineheight + this.viewer.settings.margin.bottom);
 
               this.viewer.scrollToAbsY(y);
             });
@@ -358,7 +364,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                                 this.transcrService.currentlevel.segments.segments[segmentIndex].transcript = readSegment.transcript;
                                 this.transcrService.currentlevel.segments.change(segmentIndex, this.transcrService.currentlevel.segments.segments[segmentIndex].clone());
                               } else {
-                                let origTime = new SampleUnit(item.time.sampleStart + readSegment.time.samples, this.audioManager.sampleRate);
+                                const origTime = new SampleUnit(item.time.sampleStart + readSegment.time.samples, this.audioManager.sampleRate);
                                 this.transcrService.currentlevel.segments.add(origTime, readSegment.transcript);
                               }
                             } else {
@@ -409,6 +415,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   ngOnDestroy() {
+    this.audioManager.stopPlayback().catch(() => {
+      console.error(`could not stop audio on editor switched`);
+    });
+
     clearInterval(this.intervalID);
     this.subscrmanager.destroy();
     if (this.scrolltimer !== null) {
@@ -566,7 +576,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               }, 'multi-lines-viewer');
 
             const selection = {
-              sampleStart: sampleStart,
+              sampleStart,
               sampleLength: segment.time.samples - sampleStart,
               browserSampleEnd: segment.time.samples
             };
@@ -638,7 +648,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       let playPosition = this.audioManager.playposition;
       if (!this.audioChunkLines.isPlaying) {
         if ($event.type === 'boundary') {
-          playPosition = this.viewer.av.MouseClickPos
+          playPosition = this.viewer.av.MouseClickPos;
         }
       }
 
@@ -692,7 +702,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     if (this.appStorage.logging) {
       const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
 
-      let selection = {
+      const selection = {
         start: this.viewer.av.drawnSelection.start.samples,
         length: this.viewer.av.drawnSelection.duration.samples
       };
@@ -745,8 +755,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     }
   }
 
-  private
-
   changeArea(loup
                :
                AudioViewerComponent, coord
@@ -789,8 +797,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     }
     this.cd.detectChanges();
   }
-
-  public
 
   afterFirstInitialization() {
     const emptySegmentIndex = this.transcrService.currentlevel.segments.segments.findIndex((a) => {

@@ -1,56 +1,56 @@
 .red {
-    background-color: #ff899d;
+  background-color: #ff899d;
 }
 
 .segment-number {
-    padding: 3px;
-    width: 50px;
-    vertical-align: middle;
+  padding: 3px;
+  width: 50px;
+  vertical-align: middle;
 }
 
 .segment-warning {
-    color: red;
+  color: red;
 }
 
 .segment-transcript {
-    vertical-align: middle;
-    cursor: pointer;
+  vertical-align: middle;
+  cursor: pointer;
 }
 
 .segment-transcript {
 }
 
 .found-errors {
-    padding: 5px;
-    display: block;
-    text-align: center;
+  padding: 5px;
+  display: block;
+  text-align: center;
 }
 
 #statistics td {
-    text-align: center;
+  text-align: center;
 }
 
 .table thead th {
-    text-align: center;
-    vertical-align: middle;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .table .last-column {
-    text-align: center;
-    vertical-align: middle;
-    width: 100px;
+  text-align: center;
+  vertical-align: middle;
+  width: 100px;
 }
 
 .table fa-icon {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 #skip-silence-checkbox {
-    margin-left: 5px;
-    display: inline-flex;
-    margin-right: 3px;
+  margin-left: 5px;
+  display: inline-flex;
+  margin-right: 3px;
 }
 
 .ripple-container {
-    display: none;
+  display: none;
 }

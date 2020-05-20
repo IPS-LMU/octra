@@ -1,10 +1,10 @@
 import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
-import {Subject} from 'rxjs';
-import {AppStorageService, KeymappingService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {TranscriptionFeedbackComponent} from '../../gui/transcription-feedback/transcription-feedback.component';
-import {TranscrOverviewComponent} from '../../gui/transcr-overview';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
+import {Subject} from 'rxjs';
+import {TranscrOverviewComponent} from '../../gui/transcr-overview';
+import {TranscriptionFeedbackComponent} from '../../gui/transcription-feedback/transcription-feedback.component';
+import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {AppStorageService, KeymappingService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 
 @Component({
   selector: 'app-overview-modal',
@@ -29,6 +29,8 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
 
   protected data = null;
   private shortcutID = -1;
+  private subscrmanager = new SubscriptionManager();
+  private actionperformed: Subject<void> = new Subject<void>();
 
   public get feedBackComponent(): TranscriptionFeedbackComponent {
     return this.feedback;
@@ -44,10 +46,6 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
       && this.settingsService.projectsettings.octra.sendValidatedTranscriptionOnly
     );
   }
-
-  private subscrmanager = new SubscriptionManager();
-
-  private actionperformed: Subject<void> = new Subject<void>();
 
   constructor(public transcrService: TranscriptionService,
               public ms: BsModalService,

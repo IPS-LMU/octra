@@ -1,6 +1,6 @@
-import {Group} from './Group';
-import {Control} from './Control';
 import {isArray} from 'rxjs/internal-compatibility';
+import {Control} from './Control';
+import {Group} from './Group';
 
 export class FeedBackForm {
   public get groups(): Group[] {

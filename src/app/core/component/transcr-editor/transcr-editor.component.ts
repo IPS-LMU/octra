@@ -11,19 +11,16 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import {TranscrEditorConfig} from './config';
 import {TranslocoService} from '@ngneat/transloco';
+import {AudioChunk, AudioManager, SampleUnit, Segments, TimespanPipe} from 'octra-components';
+import {isNumeric} from 'rxjs/internal-compatibility';
 
 import {BrowserInfo, KeyMapping, SubscriptionManager} from '../../shared';
-import {TranscriptionService} from '../../shared/service';
 import {Functions, isUnset} from '../../shared/Functions';
-import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
-import {isNumeric} from 'rxjs/internal-compatibility';
+import {TranscriptionService} from '../../shared/service';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../shared/service/asr.service';
-import {AudioChunk, AudioManager} from 'octra-components';
-import {Segments} from 'octra-components';
-import {SampleUnit} from 'octra-components';
-import {TimespanPipe} from 'octra-components';
+import {TranscrEditorConfig} from './config';
+import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
 
 declare let lang: any;
 declare let document: any;
@@ -35,13 +32,57 @@ declare let document: any;
   providers: [TranscrEditorConfig]
 })
 export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
-  set isTyping(value: boolean) {
-    this._isTyping = value;
-  }
-
-  get textSelection(): { start: number; end: number } {
-    return this._textSelection;
-  }
+  @Output() loaded: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() onkeyup: EventEmitter<any> = new EventEmitter<any>();
+  @Output() markerInsert: EventEmitter<string> = new EventEmitter<string>();
+  @Output() markerClick: EventEmitter<string> = new EventEmitter<string>();
+  @Output() typing: EventEmitter<string> = new EventEmitter<string>();
+  @Output() boundaryclicked: EventEmitter<SampleUnit> = new EventEmitter<SampleUnit>();
+  @Output() boundaryinserted: EventEmitter<number> = new EventEmitter<number>();
+  @Output() selectionchanged: EventEmitter<number> = new EventEmitter<number>();
+  @Input() visible = true;
+  @Input() markers: any = true;
+  @Input() easymode = true;
+  @Input() height = 0;
+  @Input() playposition: SampleUnit;
+  @Input() audiochunk: AudioChunk;
+  @Input() validationEnabled = false;
+  @ViewChild('validationPopover', {static: true}) validationPopover: ValidationPopoverComponent;
+  @ViewChild('transcrEditor', {static: true}) transcrEditor: ElementRef;
+  public textfield: any = null;
+  public focused = false;
+  public asr = {
+    status: 'inactive',
+    result: '',
+    error: ''
+  };
+  size = {
+    height: 100,
+    width: 100
+  };
+  public popovers = {
+    segmentBoundary: null,
+    validationError: null
+  };
+  public popoversNew = {
+    validation: {
+      location: {
+        x: 0,
+        y: 0
+      },
+      visible: false,
+      currentGuideline: {
+        description: '',
+        title: ''
+      }
+    }
+  };
+  private _lastAudioChunkID = -1;
+  private _settings: any;
+  private subscrmanager: SubscriptionManager;
+  private init = 0;
+  private summernoteUI: any = null;
+  private lastkeypress = 0;
 
   public get summernote() {
     return this.textfield.summernote;
@@ -86,11 +127,26 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     return (this.textfield) ? this.textfield.summernote('code') : '';
   }
 
+  private _isTyping = false;
+
+  set isTyping(value: boolean) {
+    this._isTyping = value;
+  }
+
+  private _textSelection = {
+    start: 0,
+    end: 0
+  };
+
+  get textSelection(): { start: number; end: number } {
+    return this._textSelection;
+  }
+
+  private _rawText = '';
+
   get rawText(): string {
     return this._rawText;
   }
-
-  private _lastAudioChunkID = -1;
 
   set rawText(value: string) {
     jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
@@ -107,7 +163,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       status: 'inactive',
       result: '',
       error: ''
-    }
+    };
   }
 
   constructor(private cd: ChangeDetectorRef,
@@ -118,73 +174,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this._settings = new TranscrEditorConfig().settings;
     this.subscrmanager = new SubscriptionManager();
   }
-
-  @Output() loaded: EventEmitter<boolean> = new EventEmitter<boolean>();
-  @Output() onkeyup: EventEmitter<any> = new EventEmitter<any>();
-  @Output() markerInsert: EventEmitter<string> = new EventEmitter<string>();
-  @Output() markerClick: EventEmitter<string> = new EventEmitter<string>();
-  @Output() typing: EventEmitter<string> = new EventEmitter<string>();
-  @Output() boundaryclicked: EventEmitter<SampleUnit> = new EventEmitter<SampleUnit>();
-  @Output() boundaryinserted: EventEmitter<number> = new EventEmitter<number>();
-  @Output() selectionchanged: EventEmitter<number> = new EventEmitter<number>();
-
-  @Input() visible = true;
-  @Input() markers: any = true;
-  @Input() easymode = true;
-  @Input() height = 0;
-  @Input() playposition: SampleUnit;
-  @Input() audiochunk: AudioChunk;
-  @Input() validationEnabled = false;
-
-  @ViewChild('validationPopover', {static: true}) validationPopover: ValidationPopoverComponent;
-  @ViewChild('transcrEditor', {static: true}) transcrEditor: ElementRef;
-
-  public textfield: any = null;
-  public focused = false;
-
-  public asr = {
-    status: 'inactive',
-    result: '',
-    error: ''
-  };
-
-  size = {
-    height: 100,
-    width: 100
-  };
-
-  public popovers = {
-    segmentBoundary: null,
-    validationError: null
-  };
-
-  public popoversNew = {
-    validation: {
-      location: {
-        x: 0,
-        y: 0
-      },
-      visible: false,
-      currentGuideline: {
-        description: '',
-        title: ''
-      }
-    }
-  };
-
-  private _settings: any;
-  private subscrmanager: SubscriptionManager;
-  private init = 0;
-  private summernoteUI: any = null;
-  private _isTyping = false;
-  private lastkeypress = 0;
-
-  private _textSelection = {
-    start: 0,
-    end: 0
-  };
-
-  private _rawText = '';
 
   /**
    * converts the editor's html text to raw text
@@ -293,7 +282,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     return rawText;
-  }
+  };
   /**
    * initializes the editor and the containing summernote editor
    */
@@ -519,7 +508,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
     }
-  }
+  };
   /**
    * called after key up in editor
    */
@@ -527,33 +516,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     // update rawText
     this.onkeyup.emit($event);
     this.triggerTyping();
-  }
-
-  private triggerTyping() {
-    setTimeout(() => {
-      if (Date.now() - this.lastkeypress >= 450 && this.lastkeypress > -1) {
-        if (this._isTyping) {
-          if (this.audiochunk.id === this._lastAudioChunkID) {
-            this._isTyping = false;
-            this.typing.emit('stopped');
-
-            this.validate();
-            this.initPopover();
-            this.lastkeypress = -1;
-          } else {
-            // ignore typing stop after audioChunk was changed
-            this._lastAudioChunkID = this.audiochunk.id;
-          }
-        }
-      }
-    }, 500);
-
-    if (!this._isTyping) {
-      this.typing.emit('started');
-    }
-    this._isTyping = true;
-    this.lastkeypress = Date.now();
-  }
+  };
 
   /**
    * set focus to the very last position of the editors text
@@ -586,7 +549,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     } else {
       func();
     }
-  }
+  };
 
   ngOnInit() {
     this.Settings.height = this.height;
@@ -747,7 +710,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         });
     }, 200);
 
-
     // set popover for errors
     jQuery('.val-error')
       .off('mouseenter')
@@ -901,7 +863,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     jQuery('sel-start').remove();
     jQuery('sel-end').remove();
 
-
     range = jQuery.summernote.range;
     const rangeSelection: WrappedRange = range.createFromSelection();
 
@@ -1049,18 +1010,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     return -1;
   }
 
-  /**
-   * destroys the summernote editor
-   */
-  private destroy() {
-    if (!isUnset(this.textfield)) {
-      this.textfield.summernote('destroy');
-    }
-    // delete tooltip overlays
-    jQuery('.tooltip').remove();
-    this.subscrmanager.destroy();
-  }
-
   public validate() {
     if (this.validationEnabled) {
       this.saveSelection();
@@ -1085,6 +1034,70 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       this._rawText = this.getRawText(false);
       this._rawText = this.tidyUpRaw(this._rawText);
     }
+  }
+
+  public updateRawText() {
+    this._rawText = this.tidyUpRaw(this.getRawText());
+  }
+
+  public changeValidationPopoverLocation(x: number, y: number) {
+    this.popoversNew.validation.location.x = x;
+    this.popoversNew.validation.location.y = y;
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize($event) {
+    this.size.height = jQuery(this.transcrEditor.nativeElement).height();
+    this.size.width = jQuery(this.transcrEditor.nativeElement).width();
+  }
+
+  public onASROverlayClick() {
+    if (!isUnset(this.asrService.selectedLanguage)) {
+      const item = this.asrService.queue.getItemByTime(this.audiochunk.time.start.samples, this.audiochunk.time.duration.samples);
+      if (item !== undefined) {
+        this.asrService.stopASROfItem(item);
+      }
+    } else {
+      console.error(`could not stop ASR because segment number was not found.`);
+    }
+  }
+
+  private triggerTyping() {
+    setTimeout(() => {
+      if (Date.now() - this.lastkeypress >= 450 && this.lastkeypress > -1) {
+        if (this._isTyping) {
+          if (this.audiochunk.id === this._lastAudioChunkID) {
+            this._isTyping = false;
+            this.typing.emit('stopped');
+
+            this.validate();
+            this.initPopover();
+            this.lastkeypress = -1;
+          } else {
+            // ignore typing stop after audioChunk was changed
+            this._lastAudioChunkID = this.audiochunk.id;
+          }
+        }
+      }
+    }, 500);
+
+    if (!this._isTyping) {
+      this.typing.emit('started');
+    }
+    this._isTyping = true;
+    this.lastkeypress = Date.now();
+  }
+
+  /**
+   * destroys the summernote editor
+   */
+  private destroy() {
+    if (!isUnset(this.textfield)) {
+      this.textfield.summernote('destroy');
+    }
+    // delete tooltip overlays
+    jQuery('.tooltip').remove();
+    this.subscrmanager.destroy();
   }
 
   /**
@@ -1114,7 +1127,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     } else if (!(jqueryObj.attr('data-errorcode') === null || jqueryObj.attr('data-errorcode') === undefined)) {
       this.onValidationErrorMouseOver(jqueryObj, event);
     }
-  }
+  };
 
   private onSegmentBoundaryMouseOver(jqueryObj: any, event: any) {
     const segPopover = jQuery('.seg-popover');
@@ -1190,32 +1203,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   private onValidationErrorMouseLeave() {
     this.validationPopover.hide();
-  }
-
-  public updateRawText() {
-    this._rawText = this.tidyUpRaw(this.getRawText());
-  }
-
-  public changeValidationPopoverLocation(x: number, y: number) {
-    this.popoversNew.validation.location.x = x;
-    this.popoversNew.validation.location.y = y;
-  }
-
-  @HostListener('window:resize', ['$event'])
-  onResize($event) {
-    this.size.height = jQuery(this.transcrEditor.nativeElement).height();
-    this.size.width = jQuery(this.transcrEditor.nativeElement).width();
-  }
-
-  public onASROverlayClick() {
-    if (!isUnset(this.asrService.selectedLanguage)) {
-      const item = this.asrService.queue.getItemByTime(this.audiochunk.time.start.samples, this.audiochunk.time.duration.samples);
-      if (item !== undefined) {
-        this.asrService.stopASROfItem(item);
-      }
-    } else {
-      console.error(`could not stop ASR because segment number was not found.`);
-    }
   }
 }
 

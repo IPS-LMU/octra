@@ -1,5 +1,5 @@
-import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
+import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 
 export class WebVTTConverter extends Converter {
 
@@ -159,12 +159,11 @@ export class WebVTTConverter extends Converter {
     }
   }
 
-
   public formatNumber = (num, length): string => {
     let result = '' + num.toFixed(0);
     while (result.length < length) {
       result = '0' + result;
     }
     return result;
-  }
+  };
 }

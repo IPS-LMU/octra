@@ -1,7 +1,7 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
-import {TranslocoService} from '@ngneat/transloco';
 import {NgForm} from '@angular/forms';
+import {TranslocoService} from '@ngneat/transloco';
+import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
 
 @Component({
   selector: 'app-transcription-feedback',

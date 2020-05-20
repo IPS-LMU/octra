@@ -6,10 +6,11 @@ import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core'
   styleUrls: ['./authentication-needed.component.css']
 })
 export class AuthenticationNeededComponent implements OnInit, OnDestroy {
+  public static componentName = 'AuthenticationNeededComponent';
+
   @Output() authenticateClick = new EventEmitter<void>();
   @Output() confirmationClick = new EventEmitter<void>();
 
-  public static componentName = 'AuthenticationNeededComponent';
   public initialized = new EventEmitter<void>();
   public destroyed = new EventEmitter<void>();
   public clickedOnAuthenticate = false;

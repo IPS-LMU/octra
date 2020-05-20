@@ -1,6 +1,6 @@
-import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {Functions} from '../../shared/Functions';
 import {OAnnotJSON, OAudiofile, OEvent, OLabel, OLevel, OSegment} from 'octra-components';
+import {Functions} from '../../shared/Functions';
+import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 
 export class PraatTextgridConverter extends Converter {
 
@@ -91,7 +91,6 @@ export class PraatTextgridConverter extends Converter {
         const ctrlChar = String.fromCharCode(13);
         content = content.replace(new RegExp(ctrlChar, 'g'), '');
         const lines: string[] = content.split('\n');
-
 
         let segNum = 1;
         // check if header is first

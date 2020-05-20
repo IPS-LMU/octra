@@ -1,99 +1,100 @@
-<div bsModal #modal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1"
-     id="bugreport" style="padding: 20px 0;/*noinspection CssInvalidPropertyValue*/overflow: -moz-hidde-unscrollable;">
-    <div class="modal-dialog modal-lg flex" style="height:93%;display: contents;" [ngStyle]="{
+<div #modal="bs-modal" aria-labelledby="dialog-sizes-name1" bsModal class="modal fade" id="bugreport" role="dialog"
+     style="padding: 20px 0;/*noinspection CssInvalidPropertyValue*/overflow: -moz-hidde-unscrollable;" tabindex="-1">
+  <div [ngStyle]="{
         'max-width': (appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') ? '100%' : '750px;',
         'display': (appStorage.usemode === 'online' ||  this.appStorage.usemode === 'demo') ? 'contents' : 'block'
-    }">
-        <div class="modal-content flex" style="flex:auto;height:100%;">
-            <div class="modal-header">
-              <h4 class="modal-title pull-left">{{'general.overview' | transloco}}</h4>
-              <button type="button" class="close pull-right" aria-label="Close" (click)="close(true)">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body flex" style="flex:auto; height:300px;">
-                <div class="row" style="overflow: auto; flex:auto;">
-                    <div [ngClass]="{
+    }" class="modal-dialog modal-lg flex" style="height:93%;display: contents;">
+    <div class="modal-content flex" style="flex:auto;height:100%;">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{'general.overview' | transloco}}</h4>
+        <button (click)="close(true)" aria-label="Close" class="close pull-right" type="button">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body flex" style="flex:auto; height:300px;">
+        <div class="row" style="overflow: auto; flex:auto;">
+          <div [ngClass]="{
                         'col-md-6 col-lg-9': appStorage.usemode === 'online' || this.appStorage.usemode === 'demo',
                         'col-12': appStorage.usemode !== 'online' && this.appStorage.usemode !== 'demo'
                     }" class="col-md-6" style="overflow: auto; max-height:1200px;border-right:1px solid lightgray;">
-                        <app-transcr-overview
-                            #overview
-                            [visible]="visible"
-                            [segments]="(transcrService.annotation !== null && transcrService.annotation !== undefined)
+            <app-transcr-overview
+              #overview
+              (segmentclicked)="onSegmentInOverviewClicked($event)"
+              [segments]="(transcrService.annotation !== null && transcrService.annotation !== undefined)
                               ? transcrService.annotation.levels[transcrService.selectedlevel].segments.segments: null"
-                            (segmentclicked)="onSegmentInOverviewClicked($event)">
-                        </app-transcr-overview>
-                    </div>
-                    <div class="col-md-6 col-lg-3" style="overflow: auto;max-height:1200px;"
-                         *ngIf="appStorage.usemode === 'online' || this.appStorage.usemode === 'demo'">
-                        <h4>Feedback</h4>
-                        <app-transcription-feedback #feedback
-                                                    [feedbackData]="appStorage.feedback"
-                                                    [showCommentFieldOnly]="settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('korbinian')">
-                        </app-transcription-feedback>
+              [visible]="visible">
+            </app-transcr-overview>
+          </div>
+          <div *ngIf="appStorage.usemode === 'online' || this.appStorage.usemode === 'demo'" class="col-md-6 col-lg-3"
+               style="overflow: auto;max-height:1200px;">
+            <h4>Feedback</h4>
+            <app-transcription-feedback #feedback
+                                        [feedbackData]="appStorage.feedback"
+                                        [showCommentFieldOnly]="settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('korbinian')">
+            </app-transcription-feedback>
 
-                        <p style="color:red; text-align: center"
-                           *ngIf="sendValidTranscriptOnly && !transcrService.transcriptValid">
-                          {{"transcription.invalid" | transloco}}
-                        </p>
-                        <ng-container
-                                *ngIf="settingsService.isTheme('default'); else isShortAudioFilesTheme">
-                            <button class="btn btn-primary btn-outline btn-success" id="transcr-send-btn"
-                                    (click)="sendTranscription()"
-                                    [disabled]="!feedback.valid || (sendValidTranscriptOnly && !transcrService.transcriptValid)">
-                                <fa-icon icon="paper-plane"></fa-icon>
-                              {{"transcription.send" | transloco}}
-                            </button>
-                        </ng-container>
-                        <ng-template #isShortAudioFilesTheme>
-                            <div class="row" *ngIf="settingsService.isTheme('shortAudioFiles'); else isKorbinianTheme"
-                                 id="bottom-navigation" role="group">
-                                <button class="btn btn-raised btn-primary w-100"
-                                        (click)="sendTranscriptionForShortAudioFiles('good')">
-                                    <fa-icon icon="star"></fa-icon>
-                                    <fa-icon icon="star"></fa-icon>
-                                    <fa-icon icon="star"></fa-icon>
-                                </button>
-                                <button class="btn btn-raised btn-warning w-100" style="background-color: orange"
-                                        (click)="sendTranscriptionForShortAudioFiles('middle')">
-                                    <fa-icon icon="star"></fa-icon>
-                                    <fa-icon icon="star"></fa-icon>
-                                </button>
-                                <button class="btn btn-raised btn-danger w-100"
-                                        (click)="sendTranscriptionForShortAudioFiles('bad')">
-                                    <fa-icon icon="star"></fa-icon>
-                                </button>
-                            </div>
-                        </ng-template>
-                        <ng-template #isKorbinianTheme>
-                            <div class="row" id="bottom-navigation" role="group">
-                                <button class="btn btn-raised btn-info w-100"
-                                        (click)="sendTranscriptionForKorbinian('NO')">
-                                    NO
-                                </button>
-                                <button class="btn btn-raised btn-danger w-100"
-                                        (click)="sendTranscriptionForKorbinian('VE')">
-                                    VE
-                                </button>
-                                <button class="btn btn-raised btn-secondary w-100"
-                                        (click)="sendTranscriptionForKorbinian('EE')">
-                                    EE
-                                </button>
-                                <button class="btn btn-raised btn-primary w-100"
-                                        (click)="sendTranscriptionForKorbinian('AN')">
-                                    AN
-                                </button>
-                            </div>
-                        </ng-template>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary mr-auto" data-dismiss="modal" (click)="close(true)">
-                {{"general.close" | transloco}}
+            <p *ngIf="sendValidTranscriptOnly && !transcrService.transcriptValid"
+               style="color:red; text-align: center">
+              {{"transcription.invalid" | transloco}}
+            </p>
+            <ng-container
+              *ngIf="settingsService.isTheme('default'); else isShortAudioFilesTheme">
+              <button (click)="sendTranscription()"
+                      [disabled]="!feedback.valid || (sendValidTranscriptOnly && !transcrService.transcriptValid)"
+                      class="btn btn-primary btn-outline btn-success"
+                      id="transcr-send-btn">
+                <fa-icon icon="paper-plane"></fa-icon>
+                {{"transcription.send" | transloco}}
               </button>
-            </div>
+            </ng-container>
+            <ng-template #isShortAudioFilesTheme>
+              <div *ngIf="settingsService.isTheme('shortAudioFiles'); else isKorbinianTheme" class="row"
+                   id="bottom-navigation" role="group">
+                <button (click)="sendTranscriptionForShortAudioFiles('good')"
+                        class="btn btn-raised btn-primary w-100">
+                  <fa-icon icon="star"></fa-icon>
+                  <fa-icon icon="star"></fa-icon>
+                  <fa-icon icon="star"></fa-icon>
+                </button>
+                <button (click)="sendTranscriptionForShortAudioFiles('middle')" class="btn btn-raised btn-warning w-100"
+                        style="background-color: orange">
+                  <fa-icon icon="star"></fa-icon>
+                  <fa-icon icon="star"></fa-icon>
+                </button>
+                <button (click)="sendTranscriptionForShortAudioFiles('bad')"
+                        class="btn btn-raised btn-danger w-100">
+                  <fa-icon icon="star"></fa-icon>
+                </button>
+              </div>
+            </ng-template>
+            <ng-template #isKorbinianTheme>
+              <div class="row" id="bottom-navigation" role="group">
+                <button (click)="sendTranscriptionForKorbinian('NO')"
+                        class="btn btn-raised btn-info w-100">
+                  NO
+                </button>
+                <button (click)="sendTranscriptionForKorbinian('VE')"
+                        class="btn btn-raised btn-danger w-100">
+                  VE
+                </button>
+                <button (click)="sendTranscriptionForKorbinian('EE')"
+                        class="btn btn-raised btn-secondary w-100">
+                  EE
+                </button>
+                <button (click)="sendTranscriptionForKorbinian('AN')"
+                        class="btn btn-raised btn-primary w-100">
+                  AN
+                </button>
+              </div>
+            </ng-template>
+          </div>
         </div>
+      </div>
+      <div class="modal-footer">
+        <button (click)="close(true)" class="btn btn-primary mr-auto" data-dismiss="modal" type="button">
+          {{"general.close" | transloco}}
+        </button>
+      </div>
     </div>
+  </div>
 </div>

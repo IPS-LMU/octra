@@ -1,12 +1,12 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {AudioChunk} from 'octra-components';
-import {AlertService, AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
-import {AppSettings, ASRLanguage} from '../../obj/Settings';
-import {ASRQueueItemType, AsrService} from '../../shared/service/asr.service';
-import {isUnset} from '../../shared/Functions';
 import {TranslocoService} from '@ngneat/transloco';
-import {AppInfo} from '../../../app.info';
 import {BsDropdownDirective} from 'ngx-bootstrap/dropdown';
+import {AudioChunk} from 'octra-components';
+import {AppInfo} from '../../../app.info';
+import {AppSettings, ASRLanguage} from '../../obj/Settings';
+import {isUnset} from '../../shared/Functions';
+import {AlertService, AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
+import {ASRQueueItemType, AsrService} from '../../shared/service/asr.service';
 
 @Component({
   selector: 'app-asr-options',
@@ -14,10 +14,6 @@ import {BsDropdownDirective} from 'ngx-bootstrap/dropdown';
   styleUrls: ['./asr-options.component.css']
 })
 export class AsrOptionsComponent implements OnInit {
-
-  public get appSettings(): AppSettings {
-    return this.settingsService.appSettings;
-  }
 
   public serviceProviders = {};
   public settings = {
@@ -29,6 +25,14 @@ export class AsrOptionsComponent implements OnInit {
   @Input() enabled = true;
   @ViewChild('dropdown', {static: true}) dropdown: BsDropdownDirective;
 
+  public get appSettings(): AppSettings {
+    return this.settingsService.appSettings;
+  }
+
+  public get manualURL(): string {
+    return AppInfo.manualURL;
+  }
+
   constructor(public appStorage: AppStorageService, public settingsService: SettingsService,
               public asrService: AsrService, private transcrService: TranscriptionService,
               private alertService: AlertService, private langService: TranslocoService) {
@@ -36,10 +40,6 @@ export class AsrOptionsComponent implements OnInit {
       const provider = this.appSettings.octra.plugins.asr.services[i];
       this.serviceProviders['' + provider.provider] = provider;
     }
-  }
-
-  public get manualURL(): string {
-    return AppInfo.manualURL;
   }
 
   ngOnInit() {
@@ -76,7 +76,7 @@ export class AsrOptionsComponent implements OnInit {
           console.log(`SEGNUMBER = ${segNumber} browser sample is ${time.samples}`);
           const segment = this.transcrService.currentlevel.segments.get(segNumber);
 
-          if(!isUnset(segment)) {
+          if (!isUnset(segment)) {
             segment.isBlockedBy = ASRQueueItemType.ASR;
 
             this.asrService.addToQueue({
@@ -104,7 +104,7 @@ export class AsrOptionsComponent implements OnInit {
       for (let i = segNumber; i < this.transcrService.currentlevel.segments.length; i++) {
         const segment = this.transcrService.currentlevel.segments.get(i);
 
-        if(!isUnset(segment)){
+        if (!isUnset(segment)) {
           const sampleStart = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.samples
             : 0;
           const sampleLength = segment.time.samples - sampleStart;

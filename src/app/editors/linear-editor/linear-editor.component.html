@@ -1,4 +1,11 @@
-<oco-audio-viewer *ngIf="appStorage.showLoupe" #miniloupe [ngStyle]="{
+<oco-audio-viewer #miniloupe *ngIf="appStorage.showLoupe" [audioChunk]="audioChunkLoupe"
+                  [breakMarker]="{
+                        code: '<P>'
+                      }"
+                  [height]="160"
+                  [isMultiLine]="false"
+                  [name]="'loupe'"
+                  [ngStyle]="{
 'position':'absolute',
 'margin-left':miniLoupeCoord.x + 'px',
 'margin-top':miniLoupeCoord.y + 'px',
@@ -9,25 +16,15 @@
 'visibility': (miniLoupeHidden) ? 'hidden' : 'inherit',
 'flex': 'auto',
 'flex-direction': 'column'}"
-                  [audioChunk]="audioChunkLoupe"
-                  [height]="160"
-                  [transcriptionLevel]="transcrService.currentlevel"
                   [settings]="miniLoupeSettings"
-                  [isMultiLine]="false"
-                  [breakMarker]="{
-                        code: '<P>'
-                      }"
-                  [name]="'loupe'"
+                  [transcriptionLevel]="transcrService.currentlevel"
 >
 </oco-audio-viewer>
 <oco-audio-navigation #nav
-                      (buttonClick)="onButtonClick($event)"
-                      (afterVolumeChange)="afterVolumeChange($event)"
                       (afterPlaybackRateChange)="afterSpeedChange($event)"
-                      [responsive]="settingsService.responsive.enabled"
-                      [volume]="appStorage.audioVolume"
-                      [playbackRate]="appStorage.audioSpeed"
-
+                      (afterVolumeChange)="afterVolumeChange($event)"
+                      (buttonClick)="onButtonClick($event)"
+                      [audioChunk]="audioChunkTop"
                       [buttons]="{
                         play: {
                             label: ('general.play' | transloco),
@@ -55,61 +52,66 @@
                         }
                       }"
                       [easyMode]="appStorage.easymode"
-                      [audioChunk]="audioChunkTop"
+
+                      [playbackRate]="appStorage.audioSpeed"
+                      [responsive]="settingsService.responsive.enabled"
+                      [volume]="appStorage.audioVolume"
 >
 
 </oco-audio-navigation>
 <div id="viewer">
-  <oco-audio-viewer #signalDisplayTop (selchange)="onSelectionChanged($event)"
-                    (segmententer)="onSegmentEnter($event)"
-                    (mousecursorchange)="onMouseOver($event)"
+  <oco-audio-viewer #signalDisplayTop (mousecursorchange)="onMouseOver($event)"
+                    (mousedown)="onViewerMouseDown($event)"
                     (mouseenter)="miniLoupeHidden = false;"
                     (mouseleave)="miniLoupeHidden = true;"
-                    (mousedown)="onViewerMouseDown($event)"
+                    (segmententer)="onSegmentEnter($event)"
+                    (selchange)="onSelectionChanged($event)"
                     (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_top', signalDisplayTop)"
                     [audioChunk]="audioChunkTop"
-                    [transcriptionLevel]="transcrService.currentlevel"
                     [breakMarker]="{
                         code: '<P>'
                       }"
+                    [transcriptionLevel]="transcrService.currentlevel"
                     style="height:80px;"
   >
   </oco-audio-viewer>
 </div>
 
 <oco-audio-viewer #signalDisplayDown
-                  *ngIf="audioChunkDown !== null && audioChunkDown !== undefined"
-                  (segmententer)="onLoupeSegmentEnter($event)"
-                  (mousedown)="onViewerMouseDown($event)"
-                  (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_down', signalDisplayDown)"
-                  [audioChunk]="audioChunkDown"
-                  [transcriptionLevel]="transcrService.currentlevel"
-                  (click)="onLoupeClick($event)"
                   (alerttriggered)="onAlertTriggered($event)"
-                  [name]="'downLoupe'"
-                  [settings]="loupeSettings"
+                  (click)="onLoupeClick($event)"
+                  (mousedown)="onViewerMouseDown($event)"
+                  (segmententer)="onLoupeSegmentEnter($event)"
+                  (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_down', signalDisplayDown)"
+                  *ngIf="audioChunkDown !== null && audioChunkDown !== undefined"
+                  [audioChunk]="audioChunkDown"
                   [breakMarker]="{
                         code: '<P>'
                       }"
+                  [name]="'downLoupe'"
+                  [settings]="loupeSettings"
+                  [transcriptionLevel]="transcrService.currentlevel"
 >
 </oco-audio-viewer>
 <div [hidden]="segmentselected" id="editor-placeholder">
-  <div *ngIf="!segmentselected && (audioChunkDown !== null && audioChunkDown !== undefined)" class="inner"
-       [innerHTML]="'signal-gui.segment enter text' | transloco:{value: segmententer_shortc}">
+  <div *ngIf="!segmentselected && (audioChunkDown !== null && audioChunkDown !== undefined)"
+       [innerHTML]="'signal-gui.segment enter text' | transloco:{value: segmententer_shortc}"
+       class="inner">
   </div>
-  <div *ngIf="!(audioChunkDown !== null && audioChunkDown !== undefined)" class="inner"
-       [innerHTML]="'signal-gui.selection text' | transloco">
+  <div *ngIf="!(audioChunkDown !== null && audioChunkDown !== undefined)"
+       [innerHTML]="'signal-gui.selection text' | transloco"
+       class="inner">
   </div>
 </div>
 <app-transcr-editor #transcr
-                    (markerInsert)="onMarkerInsert($event)"
-                    (markerClick)="onMarkerClick($event)"
                     (keyup)="onKeyUp()"
+                    (markerClick)="onMarkerClick($event)"
+                    (markerInsert)="onMarkerInsert($event)"
                     (typing)="onEditorTyping($event)"
-                    [ngStyle]="{display: (segmentselected) ? 'inherit': 'none'}"
-                    [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
-                    [easymode]="appStorage.easymode"
                     [audiochunk]="audioChunkDown"
+                    [easymode]="appStorage.easymode"
+                    [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
+                    [ngStyle]="{display: (segmentselected) ? 'inherit': 'none'}"
                     [validationEnabled]="appStorage.usemode !== 'url' && (appStorage.usemode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
 >
 </app-transcr-editor>

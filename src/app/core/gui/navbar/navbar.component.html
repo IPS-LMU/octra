@@ -5,32 +5,32 @@
 <app-statistics-modal #modalstatistics></app-statistics-modal>
 <app-prompt-modal #promptmodal></app-prompt-modal>
 
-<nav class="navbar navbar-expand-md navbar-fixed-top navbar-dark" style="z-index:1000;" *ngIf="navbarServ.showNavbar">
-  <a class="navbar-brand" href="#" [title]="'last update: ' + (AppInfo.lastUpdate | date:'dd.MM.yyyy H:mm z')">OCTRA
+<nav *ngIf="navbarServ.showNavbar" class="navbar navbar-expand-md navbar-fixed-top navbar-dark" style="z-index:1000;">
+  <a [title]="'last update: ' + (AppInfo.lastUpdate | date:'dd.MM.yyyy H:mm z')" class="navbar-brand" href="#">OCTRA
     v{{version}}
     <ng-container
       *ngIf="appStorage.usemode !== undefined && appStorage.usemode !== null">
       ({{appStorage.usemode}})
     </ng-container>
   </a>
-  <div class="d-block d-md-none" *ngIf="environment.dev_version" style="color:red;"><b>in development</b></div>
-  <div class="d-block d-md-none" *ngIf="environment.beta_version" style="color:red;"><b>BETA</b></div>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
-          aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+  <div *ngIf="environment.dev_version" class="d-block d-md-none" style="color:red;"><b>in development</b></div>
+  <div *ngIf="environment.beta_version" class="d-block d-md-none" style="color:red;"><b>BETA</b></div>
+  <button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
+          data-target="#navbarCollapse" data-toggle="collapse" type="button">
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarCollapse">
-    <ul class="navbar-nav mr-auto" *ngIf="!appStorage.LoggedIn">
-      <li class="nav-item" [routerLinkActive]="['active']">
-        <a class="nav-link" [routerLink]="['/login']" [queryParamsHandling]="'merge'">{{'general.login' |
+    <ul *ngIf="!appStorage.LoggedIn" class="navbar-nav mr-auto">
+      <li [routerLinkActive]="['active']" class="nav-item">
+        <a [queryParamsHandling]="'merge'" [routerLink]="['/login']" class="nav-link">{{'general.login' |
           transloco}}</a>
       </li>
-      <li class="nav-item" [routerLinkActive]="['active']">
-        <a class="nav-link" [routerLink]="['/features']" [queryParamsHandling]="'merge'">{{'general.features' |
+      <li [routerLinkActive]="['active']" class="nav-item">
+        <a [queryParamsHandling]="'merge'" [routerLink]="['/features']" class="nav-link">{{'general.features' |
           transloco}}</a>
       </li>
-      <li class="nav-item" [routerLinkActive]="['active']">
-        <a class="nav-link" [routerLink]="['/news']" [queryParamsHandling]="'merge'">{{'general.news' |
+      <li [routerLinkActive]="['active']" class="nav-item">
+        <a [queryParamsHandling]="'merge'" [routerLink]="['/news']" class="nav-link">{{'general.news' |
           transloco}}</a>
       </li>
       <li class="nav-item">
@@ -39,25 +39,25 @@
         </a>
       </li>
     </ul>
-    <ul class="navbar-nav mr-auto" *ngIf="appStorage.LoggedIn">
-      <ng-template ngFor let-editor [ngForOf]="editors">
-        <li class="nav-item"
-            *ngIf="appStorage.LoggedIn && navbarServ.showInterfaces && interfaceActive(editor.name)"
+    <ul *ngIf="appStorage.LoggedIn" class="navbar-nav mr-auto">
+      <ng-template [ngForOf]="editors" let-editor ngFor>
+        <li *ngIf="appStorage.LoggedIn && navbarServ.showInterfaces && interfaceActive(editor.name)"
             [ngClass]="{
                         'active': appStorage.Interface === editor.name
                     }"
+            class="nav-item"
         >
-          <a class="nav-link" (mouseup)="setInterface(editor.name)">
+          <a (mouseup)="setInterface(editor.name)" class="nav-link">
             <fa-icon [icon]="['fas', editor.icon]"></fa-icon>
             <span
               class="d-none d-xl-inline"> {{editor.translate | transloco}}</span>
           </a>
         </li>
       </ng-template>
-      <li class="nav-item"
-          *ngIf="appStorage.LoggedIn && navbarServ.showInterfaces && settService.appSettings.octra.showdetails">
-        <a class="nav-link" (mouseup)="modalstatistics.open()">
-          <fa-icon icon="th-list" class="navbar-icon"></fa-icon>
+      <li *ngIf="appStorage.LoggedIn && navbarServ.showInterfaces && settService.appSettings.octra.showdetails"
+          class="nav-item">
+        <a (mouseup)="modalstatistics.open()" class="nav-link">
+          <fa-icon class="navbar-icon" icon="th-list"></fa-icon>
           <span class="d-none d-xl-inline"> Statistics</span></a>
       </li>
     </ul>
@@ -65,42 +65,42 @@
       <!--
       tiersDropdown
       -->
-      <li class="nav-item dropdown" *ngIf="transcrServ !== undefined" [ngStyle]="{
+      <li *ngIf="transcrServ !== undefined" [ngStyle]="{
                 'display': (!(navbarServ.dataloaded && appStorage.LoggedIn && (appStorage.usemode === 'local' || appStorage.usemode === 'url'))) ? 'none': 'inherit'
-                }">
-        <a href="#" id="tiersDropdown" class="nav-link" data-toggle="dropdown" role="button"
-           aria-haspopup="true"
-           aria-expanded="false">
+                }" class="nav-item dropdown">
+        <a aria-expanded="false" aria-haspopup="true" class="nav-link" data-toggle="dropdown" href="#"
+           id="tiersDropdown"
+           role="button">
           {{(transcrServ.currentlevel.name.length > 30) ? transcrServ.currentlevel.name.substr(0, 30) +
           '...' : transcrServ.currentlevel.name}}
-          <fa-icon icon="book" class="navbar-icon"></fa-icon>
+          <fa-icon class="navbar-icon" icon="book"></fa-icon>
         </a>
-        <div class="dropdown-menu dropdown-menu-right options-menu" aria-labelledby="tiersDropdown" [ngClass]="{
+        <div [ngClass]="{
                         'collaps': collapsed
-                    }">
-          <div class="row level-row" *ngFor="let level of transcrServ.annotation.levels; let i = index;"
-               [ngClass]="{
+                    }" aria-labelledby="tiersDropdown" class="dropdown-menu dropdown-menu-right options-menu">
+          <div *ngFor="let level of transcrServ.annotation.levels; let i = index;" [ngClass]="{
                         selected: (transcrServ.selectedlevel === i)
                         }"
+               class="row level-row"
           >
-            <div class="col-2" style="cursor: pointer;"
-                 [ngClass]="{ disabled: (level.getTypeString() !== 'SEGMENT') }"
-                 (click)="selectLevel(i)">{{i + 1}}:
+            <div (click)="selectLevel(i)" [ngClass]="{ disabled: (level.getTypeString() !== 'SEGMENT') }"
+                 class="col-2"
+                 style="cursor: pointer;">{{i + 1}}:
             </div>
-            <div class="col-7" [ngClass]="{ disabled: (level.getTypeString() !== 'SEGMENT') }"><input
-              (click)="onLevelNameClick($event)"
-              (blur)="onLevelNameLeave($event, i)" type="text"
-              maxlength="100" value="{{level.name}}"/>
+            <div [ngClass]="{ disabled: (level.getTypeString() !== 'SEGMENT') }" class="col-7"><input
+              (blur)="onLevelNameLeave($event, i)"
+              (click)="onLevelNameClick($event)" maxlength="100"
+              type="text" value="{{level.name}}"/>
             </div>
             <div class="col-3">
-              <fa-icon icon="trash" style="cursor: pointer;"
-                       (click)="onLevelRemoveClick(i, level.id)"></fa-icon>
-              <fa-icon [icon]="['fas', 'copy']" *ngIf="level.type === AnnotJSONType.SEGMENT"
-                       style="margin-left:3px;cursor:pointer;"
-                       (click)="onLevelDuplicateClick(i, level.id)"></fa-icon>
+              <fa-icon (click)="onLevelRemoveClick(i, level.id)" icon="trash"
+                       style="cursor: pointer;"></fa-icon>
+              <fa-icon (click)="onLevelDuplicateClick(i, level.id)" *ngIf="level.type === AnnotJSONType.SEGMENT"
+                       [icon]="['fas', 'copy']"
+                       style="margin-left:3px;cursor:pointer;"></fa-icon>
             </div>
           </div>
-          <div class="row level-add-row" (click)="onLevelAddClick()">
+          <div (click)="onLevelAddClick()" class="row level-add-row">
             <div class="col-12">
               <fa-icon icon="plus"></fa-icon>
             </div>
@@ -109,8 +109,9 @@
       </li>
 
       <!-- online mode counter -->
-      <li class="nav-item"
-          *ngIf="(appStorage.LoggedIn && navbarServ.dataloaded && (appStorage.usemode === 'online' ||appStorage.usemode === 'demo'))">
+      <li
+        *ngIf="(appStorage.LoggedIn && navbarServ.dataloaded && (appStorage.usemode === 'online' ||appStorage.usemode === 'demo'))"
+        class="nav-item">
         <a class="nav-link">
           {{appStorage.user.project}}: {{appStorage.jobsLeft}}
         </a>
@@ -119,12 +120,12 @@
       <!--
       infoDropdown
       -->
-      <li class="nav-item dropdown" *ngIf="(appStorage.LoggedIn && navbarServ.dataloaded)">
-        <a class="nav-link" href="#" id="infoDropdown" data-toggle="dropdown"
-           aria-haspopup="true" aria-expanded="false">
-          <fa-icon icon="info-circle" class="navbar-icon"></fa-icon>
+      <li *ngIf="(appStorage.LoggedIn && navbarServ.dataloaded)" class="nav-item dropdown">
+        <a aria-expanded="false" aria-haspopup="true" class="nav-link" data-toggle="dropdown"
+           href="#" id="infoDropdown">
+          <fa-icon class="navbar-icon" icon="info-circle"></fa-icon>
         </a>
-        <div class="dropdown-menu dropdown-menu-right info-menu" aria-labelledby="infoDropdown">
+        <div aria-labelledby="infoDropdown" class="dropdown-menu dropdown-menu-right info-menu">
           <table class="table">
             <tr *ngIf="appStorage.usemode === 'online' ||appStorage.usemode === 'demo'">
               <td><span>{{'general.project' |transloco}}:</span></td>
@@ -178,15 +179,15 @@
           </table>
         </div>
       </li>
-      <li class="nav-item" *ngIf="appStorage.LoggedIn && navbarServ.showExport">
-        <a class="nav-link" (mouseup)="toolsModal.open()">
-          <fa-icon icon="tools" class="navbar-icon"></fa-icon>
+      <li *ngIf="appStorage.LoggedIn && navbarServ.showExport" class="nav-item">
+        <a (mouseup)="toolsModal.open()" class="nav-link">
+          <fa-icon class="navbar-icon" icon="tools"></fa-icon>
           <span class="d-md-none d-lg-inline"> {{"general.tools" | transloco}}</span>
         </a>
       </li>
-      <li class="nav-item" *ngIf="appStorage.LoggedIn && navbarServ.showExport">
-        <a class="nav-link" (mouseup)="modalexport.open()">
-          <fa-icon icon="download" class="navbar-icon"></fa-icon>
+      <li *ngIf="appStorage.LoggedIn && navbarServ.showExport" class="nav-item">
+        <a (mouseup)="modalexport.open()" class="nav-link">
+          <fa-icon class="navbar-icon" icon="download"></fa-icon>
           <span class="d-md-none d-lg-inline"> {{"general.export" | transloco}}</span>
         </a>
       </li>
@@ -194,14 +195,14 @@
       <!--
       optionsDropdown
       -->
-      <li class="nav-item dropdown" [ngStyle]="{
+      <li [ngStyle]="{
                 'display': (!(navbarServ.dataloaded && appStorage.LoggedIn)) ? 'none': 'inherit'
-                }">
-        <a class="nav-link" href="#" id="optionsDropdown" data-toggle="dropdown"
-           aria-haspopup="true" aria-expanded="false">
+                }" class="nav-item dropdown">
+        <a aria-expanded="false" aria-haspopup="true" class="nav-link" data-toggle="dropdown"
+           href="#" id="optionsDropdown">
           <fa-icon icon="cog"></fa-icon>
         </a>
-        <div class="dropdown-menu dropdown-menu-right options-menu" aria-labelledby="optionsDropdown">
+        <div aria-labelledby="optionsDropdown" class="dropdown-menu dropdown-menu-right options-menu">
           <table class="table">
             <tr>
               <td><label for="easymode">{{"settings.easy mode" | transloco}}:</label></td>
@@ -275,25 +276,25 @@
               <tr>
                 <td colspan="2">
                   <div class="btn-group">
-                    <button class="btn btn-outline-secondary" [(ngModel)]="secondsPerLine"
-                            btnRadio="5" tabindex="0" role="button"
-                            (click)="changeSecondsPerLine(5)">5
+                    <button (click)="changeSecondsPerLine(5)" [(ngModel)]="secondsPerLine"
+                            btnRadio="5" class="btn btn-outline-secondary" role="button"
+                            tabindex="0">5
                     </button>
-                    <button class="btn btn-outline-secondary" [(ngModel)]="secondsPerLine"
-                            btnRadio="10" tabindex="0" role="button"
-                            (click)="changeSecondsPerLine(10)">10
+                    <button (click)="changeSecondsPerLine(10)" [(ngModel)]="secondsPerLine"
+                            btnRadio="10" class="btn btn-outline-secondary" role="button"
+                            tabindex="0">10
                     </button>
-                    <button class="btn btn-outline-secondary" [(ngModel)]="secondsPerLine"
-                            btnRadio="15" tabindex="0" role="button"
-                            (click)="changeSecondsPerLine(15)">15
+                    <button (click)="changeSecondsPerLine(15)" [(ngModel)]="secondsPerLine"
+                            btnRadio="15" class="btn btn-outline-secondary" role="button"
+                            tabindex="0">15
                     </button>
-                    <button class="btn btn-outline-secondary" [(ngModel)]="secondsPerLine"
-                            btnRadio="20" tabindex="0" role="button"
-                            (click)="changeSecondsPerLine(20)">20
+                    <button (click)="changeSecondsPerLine(20)" [(ngModel)]="secondsPerLine"
+                            btnRadio="20" class="btn btn-outline-secondary" role="button"
+                            tabindex="0">20
                     </button>
-                    <button class="btn btn-outline-secondary" [(ngModel)]="secondsPerLine"
-                            btnRadio="60" tabindex="0" role="button"
-                            (click)="changeSecondsPerLine(60)">60
+                    <button (click)="changeSecondsPerLine(60)" [(ngModel)]="secondsPerLine"
+                            btnRadio="60" class="btn btn-outline-secondary" role="button"
+                            tabindex="0">60
                     </button>
                   </div>
                 </td>
@@ -306,13 +307,14 @@
       <!--
       Feedback
       -->
-      <li class="nav-item"
-          *ngIf="settService.appSettings !== undefined && settService.appSettings.octra.bugreport !== undefined && settService.appSettings.octra.bugreport.enabled">
-        <a class="nav-link" (mouseup)="openBugReport()">
-          <fa-icon icon="question-circle" class="navbar-icon" style="color:#fcffba"
-                   [ngStyle]="{
+      <li
+        *ngIf="settService.appSettings !== undefined && settService.appSettings.octra.bugreport !== undefined && settService.appSettings.octra.bugreport.enabled"
+        class="nav-item">
+        <a (mouseup)="openBugReport()" class="nav-link">
+          <fa-icon [ngStyle]="{
                             color: (errorsFound) ? 'red' : '#fcffba'
-                        }"
+                        }" class="navbar-icon" icon="question-circle"
+                   style="color:#fcffba"
           ></fa-icon>
           <ng-container *ngIf="!appStorage._loggedIn">
             {{"general.feedback" | transloco}}
@@ -324,14 +326,14 @@
       languageDropdown
       -->
       <li class="nav-item dropdown active">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
-           aria-haspopup="true" aria-expanded="false">
+        <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-toggle="dropdown"
+           href="#" id="navbarDropdownMenuLink">
           {{langService.getActiveLang() | uppercase}} <span class="caret"></span>
         </a>
-        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+        <div aria-labelledby="navbarDropdownMenuLink" class="dropdown-menu dropdown-menu-right">
           <ng-container *ngIf="settService.appSettings !== undefined">
-            <a class="dropdown-item" *ngFor="let item of settService.appSettings.octra.languages;"
-               (click)="changeLanguage(item)">
+            <a (click)="changeLanguage(item)" *ngFor="let item of settService.appSettings.octra.languages;"
+               class="dropdown-item">
               {{item | uppercase}}</a>
           </ng-container>
         </div>
@@ -339,17 +341,20 @@
     </ul>
   </div>
 </nav>
-<div id="subnav" class="panel"
-     *ngIf="appStorage.LoggedIn && (appStorage.usemode === 'online' || appStorage.usemode === 'demo') && navbarServ.dataloaded">
+<div
+  *ngIf="appStorage.LoggedIn && (appStorage.usemode === 'online' || appStorage.usemode === 'demo') && navbarServ.dataloaded"
+  class="panel"
+  id="subnav">
   <div class="row">
-    <div class="col-12 col-sm-9" [ngClass]="{
+    <div [ngClass]="{
         'col-12 col-sm-9': appStorage.prompttext !== null && appStorage.prompttext !== undefined && appStorage.prompttext !== '',
         'col-12': appStorage.prompttext !== null && appStorage.prompttext !== undefined && appStorage.prompttext === ''
-        }" style="text-align: left;padding-left:20px;">
+        }" class="col-12 col-sm-9" style="text-align: left;padding-left:20px;">
       {{navbarServ.ressource?.info.fullname}}: <i>{{appStorage.servercomment}}</i>
     </div>
-    <div class="col-12 col-sm-3" style="text-align: right;padding-right:20px;"
-         *ngIf="appStorage.prompttext !== null && appStorage.prompttext !== undefined && appStorage.prompttext !== ''">
+    <div *ngIf="appStorage.prompttext !== null && appStorage.prompttext !== undefined && appStorage.prompttext !== ''"
+         class="col-12 col-sm-3"
+         style="text-align: right;padding-right:20px;">
       <a (click)="promptmodal.open(this.transcrServ.audiofile)"
          style="cursor: pointer; color:#009688;">{{'general.prompt'| transloco}}</a>
     </div>

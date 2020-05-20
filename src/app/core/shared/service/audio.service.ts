@@ -1,17 +1,25 @@
-import {EventEmitter, Injectable} from '@angular/core';
-import {Observable, Subject} from 'rxjs';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {HttpClient} from '@angular/common/http';
-import {Functions, isUnset} from '../Functions';
-import {AppInfo} from '../../../app.info';
+import {EventEmitter, Injectable} from '@angular/core';
 import {AudioManager} from 'octra-components';
+import {Observable, Subject} from 'rxjs';
+import {AppInfo} from '../../../app.info';
+import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {Functions, isUnset} from '../Functions';
 
 @Injectable()
 export class AudioService {
 
+  public missingPermission = new EventEmitter<void>();
+  private subscrmanager: SubscriptionManager = new SubscriptionManager();
+  private afterloaded: EventEmitter<any> = new EventEmitter<any>();
+
+  private _audiomanagers: AudioManager[] = [];
+
   get audiomanagers(): AudioManager[] {
     return this._audiomanagers;
   }
+
+  private _loaded = false;
 
   get loaded(): boolean {
     return this._loaded;
@@ -22,13 +30,6 @@ export class AudioService {
    */
   constructor(private http: HttpClient) {
   }
-
-  public missingPermission = new EventEmitter<void>();
-
-  private subscrmanager: SubscriptionManager = new SubscriptionManager();
-  private afterloaded: EventEmitter<any> = new EventEmitter<any>();
-  private _audiomanagers: AudioManager[] = [];
-  private _loaded = false;
 
   /**
    * loadAudio(url) loads the audio data referred to via the URL in an AJAX call.
@@ -82,7 +83,7 @@ export class AudioService {
     );
 
     return subj;
-  }
+  };
 
   public registerAudioManager(manager: AudioManager) {
     console.log(`register new audio manager`);

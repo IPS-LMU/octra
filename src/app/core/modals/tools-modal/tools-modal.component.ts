@@ -1,19 +1,18 @@
-import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {AppInfo} from '../../../app.info';
-import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
-import {NavbarService} from '../../gui/navbar/navbar.service';
-import {isUnset} from '../../shared/Functions';
 import {HttpClient} from '@angular/common/http';
-import {interval, Subject} from 'rxjs';
-import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
-import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/cutting-format';
+import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
-import {WavFormat} from 'octra-components';
-import {Segment} from 'octra-components';
+import {Segment, WavFormat} from 'octra-components';
+import {interval, Subject} from 'rxjs';
+import {AppInfo} from '../../../app.info';
+import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
+import {NavbarService} from '../../gui/navbar/navbar.service';
+import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/cutting-format';
+import {isUnset} from '../../shared/Functions';
+import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 
 declare var JSZip;
 

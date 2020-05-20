@@ -1,10 +1,10 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {Subject} from 'rxjs';
-import {AppStorageService, SettingsService} from '../../shared/service';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {BugReportService} from '../../shared/service/bug-report.service';
-import {AppInfo} from '../../../app.info';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
+import {Subject} from 'rxjs';
+import {AppInfo} from '../../../app.info';
+import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {AppStorageService, SettingsService} from '../../shared/service';
+import {BugReportService} from '../../shared/service/bug-report.service';
 
 @Component({
   selector: 'app-supportedfiles-modal',

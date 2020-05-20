@@ -1,11 +1,11 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
+import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
-import {AppStorageService, TranscriptionService, UserInteractionsService} from '../../shared/service';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {NavbarService} from '../../gui/navbar/navbar.service';
 import {TextConverter} from '../../obj/Converters';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
-import {NavbarService} from '../../gui/navbar/navbar.service';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
+import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {AppStorageService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 
 @Component({
   selector: 'app-statistics-modal',
@@ -25,6 +25,7 @@ export class StatisticsModalComponent implements OnInit {
     ignoreBackdropClick: false
   };
   @ViewChild('modal', {static: true}) modal: any;
+  public transcrObjStr = '';
   protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();
@@ -48,8 +49,6 @@ export class StatisticsModalComponent implements OnInit {
   get UIElements(): StatisticElem[] {
     return (!(this.uiService === null || this.uiService === undefined)) ? this.uiService.elements : null;
   }
-
-  public transcrObjStr = '';
 
   constructor(private modalService: BsModalService, private navbarService: NavbarService, private appStorage: AppStorageService) {
   }

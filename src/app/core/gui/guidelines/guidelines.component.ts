@@ -70,6 +70,23 @@ export class GuidelinesComponent implements OnInit, OnChanges {
     }
   }
 
+  toggle(group: number, entry: number) {
+    this.collapsed[group][entry] = !this.collapsed[group][entry];
+  }
+
+  public getGuidelineHTML(text): SafeHtml {
+    let html = text;
+    if (text.indexOf('{{') > -1) {
+      html = text.replace(/{{([^{}]+)}}/g, (g0, g1) => {
+        return this.transcrService.rawToHTML(g1).replace(/(<p>)|(<\/p>)|(<br\/>)/g, '');
+      });
+    } else {
+      html = `${html}`;
+    }
+
+    return this.sanitizer.sanitize(SecurityContext.HTML, html);
+  }
+
   private unCollapseAll() {
     this.collapsed = [];
 
@@ -80,10 +97,6 @@ export class GuidelinesComponent implements OnInit, OnChanges {
       }
       this.collapsed.push(elem);
     }
-  }
-
-  toggle(group: number, entry: number) {
-    this.collapsed[group][entry] = !this.collapsed[group][entry];
   }
 
   private search(text: string) {
@@ -115,18 +128,5 @@ export class GuidelinesComponent implements OnInit, OnChanges {
     } else {
       this.shownGuidelines = JSON.parse(JSON.stringify(this.guidelines));
     }
-  }
-
-  public getGuidelineHTML(text): SafeHtml {
-    let html = text;
-    if (text.indexOf('{{') > -1) {
-      html = text.replace(/{{([^{}]+)}}/g, (g0, g1) => {
-        return this.transcrService.rawToHTML(g1).replace(/(<p>)|(<\/p>)|(<br\/>)/g, '');
-      });
-    } else {
-      html = `${html}`;
-    }
-
-    return this.sanitizer.sanitize(SecurityContext.HTML, html);
   }
 }

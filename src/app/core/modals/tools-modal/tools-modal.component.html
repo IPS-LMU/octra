@@ -1,14 +1,15 @@
-<div bsModal #modal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1"
-     id="supportedfiles" (onHidden)="onHidden()">
+<div #modal="bs-modal" (onHidden)="onHidden()" aria-labelledby="dialog-sizes-name1" bsModal class="modal fade"
+     id="supportedfiles"
+     role="dialog" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">{{"general.tools" | transloco}}</h4>
-        <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+        <button (click)="close()" aria-label="Close" class="close pull-right" type="button">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body" id="tools-table" #content>
+      <div #content class="modal-body" id="tools-table">
         <table class="table">
           <thead>
           <tr>
@@ -22,19 +23,19 @@
           <!-- combine phrases tool -->
           <tr class="top-tr">
             <td (click)="tools.combinePhrases.opened = !tools.combinePhrases.opened">
-              <fa-icon style="color:gray;"
-                       [icon]="['fas', ((tools.combinePhrases.opened) ? 'chevron-up' : 'chevron-down')]"></fa-icon>
+              <fa-icon [icon]="['fas', ((tools.combinePhrases.opened) ? 'chevron-up' : 'chevron-down')]"
+                       style="color:gray;"></fa-icon>
             </td>
             <td (click)="tools.combinePhrases.opened = !tools.combinePhrases.opened">
               <a #a>
                 <span>{{'tools.combine phrases.name' | transloco}} </span>
               </a>
             </td>
-            <td colspan="2"
-                (click)="tools.combinePhrases.opened = !tools.combinePhrases.opened">
+            <td (click)="tools.combinePhrases.opened = !tools.combinePhrases.opened"
+                colspan="2">
               <span>{{'tools.combine phrases.description' | transloco}} </span>
               <a [href]="manualURL + 'using-asr-with-word-alignment'" target="_blank">
-                <fa-icon icon="question-circle" class="text-info"></fa-icon>
+                <fa-icon class="text-info" icon="question-circle"></fa-icon>
               </a>
             </td>
           </tr>
@@ -42,7 +43,7 @@
               [@fadeOutCollapseOnLeave]>
             <td></td>
             <td colspan="4" style="padding-left:20px;">
-              <div class="card" style="padding:10px;" *ngIf="navbarServ.transcrService !== undefined">
+              <div *ngIf="navbarServ.transcrService !== undefined" class="card" style="padding:10px;">
                 <div class="alert alert-warning">
                   {{'tools.combine phrases.warning' | transloco}}
                 </div>
@@ -55,13 +56,15 @@
                           for="minSilenceLength">{{'tools.combine phrases.minimal silence' | transloco}}</label>
                         </td>
                         <td>
-                          <input type="number" id="minSilenceLength" name="minSilenceLength"
-                                 [(ngModel)]="tools.combinePhrases.options.minSilenceLength"/>
+                          <input [(ngModel)]="tools.combinePhrases.options.minSilenceLength" id="minSilenceLength"
+                                 name="minSilenceLength"
+                                 type="number"/>
                         </td>
                         <td>
-                          <fa-icon icon="question-circle" style="color: darkblue;"
-                                   [tooltip]="transloco.translate('tools.combine phrases.minimal silence desc')"
-                                   placement="right"></fa-icon>
+                          <fa-icon [tooltip]="transloco.translate('tools.combine phrases.minimal silence desc')"
+                                   icon="question-circle"
+                                   placement="right"
+                                   style="color: darkblue;"></fa-icon>
                         </td>
                       </tr>
                       <tr>
@@ -69,20 +72,22 @@
                           for="maxWordsPerSegment">{{'tools.combine phrases.maximal words' | transloco}}</label>
                         </td>
                         <td>
-                          <input type="number" id="maxWordsPerSegment" name="maxWordsPerSegment"
-                                 [(ngModel)]="tools.combinePhrases.options.maxWordsPerSegment"/>
+                          <input [(ngModel)]="tools.combinePhrases.options.maxWordsPerSegment" id="maxWordsPerSegment"
+                                 name="maxWordsPerSegment"
+                                 type="number"/>
                         </td>
                         <td>
-                          <fa-icon icon="question-circle" style="color: darkblue;"
-                                   [tooltip]="transloco.translate('tools.combine phrases.maximal words desc')"
-                                   placement="right"></fa-icon>
+                          <fa-icon [tooltip]="transloco.translate('tools.combine phrases.maximal words desc')"
+                                   icon="question-circle"
+                                   placement="right"
+                                   style="color: darkblue;"></fa-icon>
                         </td>
                       </tr>
                       </tbody>
                     </table>
                   </form>
-                  <button class="btn btn-primary btn-raised" (click)="onCombinePhrasesClick()"
-                          [disabled]="!isCombinePhrasesSettingsValid">{{'tools.combine phrases.name' | transloco}}</button>
+                  <button (click)="onCombinePhrasesClick()" [disabled]="!isCombinePhrasesSettingsValid"
+                          class="btn btn-primary btn-raised">{{'tools.combine phrases.name' | transloco}}</button>
                 </div>
               </div>
             </td>
@@ -92,20 +97,20 @@
           <tr *ngIf="navbarServ.transcrService !== undefined
                      && navbarServ.transcrService.audioManager.ressource.info.extension === '.wav'">
             <td (click)="tools.audioCutting.opened = !tools.audioCutting.opened">
-              <fa-icon style="color:gray;"
-                       [icon]="['fas', ((tools.audioCutting.opened) ? 'chevron-up' : 'chevron-down')]"></fa-icon>
+              <fa-icon [icon]="['fas', ((tools.audioCutting.opened) ? 'chevron-up' : 'chevron-down')]"
+                       style="color:gray;"></fa-icon>
             </td>
             <td (click)="tools.audioCutting.opened = !tools.audioCutting.opened">
               <a #a>
                 {{'tools.cut audio.name' | transloco}}
               </a>
             </td>
-            <td colspan="3"
-                (click)="tools.audioCutting.opened = !tools.audioCutting.opened">
+            <td (click)="tools.audioCutting.opened = !tools.audioCutting.opened"
+                colspan="3">
 
               <span>{{'tools.cut audio.description' | transloco}} </span>
               <a [href]="manualURL + 'cutting-audio-files'" target="_blank">
-                <fa-icon icon="question-circle" class="text-info"></fa-icon>
+                <fa-icon class="text-info" icon="question-circle"></fa-icon>
               </a>
             </td>
           </tr>
@@ -116,22 +121,22 @@
                 [@fadeOutCollapseOnLeave]>
               <td></td>
               <td colspan="4" style="padding-left:20px;">
-                <div class="card" style="padding:10px;" *ngIf="navbarServ.transcrService !== undefined">
+                <div *ngIf="navbarServ.transcrService !== undefined" class="card" style="padding:10px;">
                   <a (click)="tools.audioCutting.showConfigurator = !tools.audioCutting.showConfigurator"
                      class="show-configurator-link"
                   >
                     <ng-container *ngIf="tools.audioCutting.showConfigurator">
-                      <fa-icon style="color:gray;"
-                               [icon]="['fas', 'chevron-up']"></fa-icon>
+                      <fa-icon [icon]="['fas', 'chevron-up']"
+                               style="color:gray;"></fa-icon>
                       {{"tools.cut audio.hide configurator" | transloco}}
                     </ng-container>
                     <ng-container *ngIf="!tools.audioCutting.showConfigurator">
-                      <fa-icon style="color:gray;"
-                               [icon]="['fas', 'chevron-down']"></fa-icon>
+                      <fa-icon [icon]="['fas', 'chevron-down']"
+                               style="color:gray;"></fa-icon>
                       {{"tools.cut audio.show configurator" | transloco}}
                     </ng-container>
                   </a>
-                  <div class="configurator" [hidden]="!tools.audioCutting.showConfigurator">
+                  <div [hidden]="!tools.audioCutting.showConfigurator" class="configurator">
                     <app-naming-drag-and-drop #namingConvention
                                               [fileName]="navbarServ.transcrService.audioManager.ressource.name"
                                               [firstSegment]="navbarServ.transcrService.currentlevel.segments.get(0)"
@@ -139,46 +144,48 @@
 
                     <div class="form-control">
                       <span>{{'tools.cut audio.append meta files' | transloco}}: </span>
-                      <div class="form-check form-check-inline"
-                           *ngFor="let exportFormat of tools.audioCutting.exportFormats; let i = index;">
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox{{i}}"
-                               [value]="exportFormat.value"
-                               [(ngModel)]="tools.audioCutting.exportFormats[i].selected">
+                      <div *ngFor="let exportFormat of tools.audioCutting.exportFormats; let i = index;"
+                           class="form-check form-check-inline">
+                        <input [(ngModel)]="tools.audioCutting.exportFormats[i].selected" [value]="exportFormat.value"
+                               class="form-check-input"
+                               id="inlineCheckbox{{i}}"
+                               type="checkbox">
                         <label class="form-check-label"
                                for="inlineCheckbox{{i}}">{{exportFormat.label}}</label>
                       </div>
                     </div>
                   </div>
                   <div class="progress-area" style="text-align: center;">
-                    <button *ngIf="tools.audioCutting.status !== 'running'"
-                            class="btn btn-primary btn-raised" (click)="splitAudio()"
+                    <button (click)="splitAudio()"
+                            *ngIf="tools.audioCutting.status !== 'running'"
                             [disabled]="namingConvention.resultConvention.length === 1"
+                            class="btn btn-primary btn-raised"
                             style="max-width:200px;margin-top:20px;">{{'tools.cut audio.name' | transloco}}
                     </button>
-                    <button *ngIf="tools.audioCutting.status === 'running'"
-                            class="btn btn-danger btn-raised" (click)="stopAudioSplitting()"
+                    <button (click)="stopAudioSplitting()"
+                            *ngIf="tools.audioCutting.status === 'running'" class="btn btn-danger btn-raised"
                             style="max-width:200px;margin-top:20px;">{{'general.stop' | transloco}}
                     </button>
-                    <div class="mb-2" *ngIf="tools.audioCutting.status !== 'idle'">
-                      <progressbar [animate]="true" [value]="tools.audioCutting.progress"
-                                   [type]="tools.audioCutting.progressbarType">
+                    <div *ngIf="tools.audioCutting.status !== 'idle'" class="mb-2">
+                      <progressbar [animate]="true" [type]="tools.audioCutting.progressbarType"
+                                   [value]="tools.audioCutting.progress">
                         <b>
 
                           {{ tools.audioCutting.progress | number : '1.2-2'}}%
                         </b>
                       </progressbar>
-                      <div class="text-danger" style="padding:10px;"
-                           *ngIf="tools.audioCutting.status === 'failed'">{{tools.audioCutting.message}}</div>
+                      <div *ngIf="tools.audioCutting.status === 'failed'" class="text-danger"
+                           style="padding:10px;">{{tools.audioCutting.message}}</div>
                     </div>
                     <ng-container
                       *ngIf="tools.audioCutting.status !== 'idle' && tools.audioCutting.status !== 'finished' && tools.audioCutting.timeLeft > 0">
                       Time left: {{tools.audioCutting.timeLeft | timespan}}
                     </ng-container>
-                    <a style="margin-left:10px;"
-                       *ngIf="tools.audioCutting.result.url !== null"
-                       download="{{tools.audioCutting.result.filename}}"
+                    <a *ngIf="tools.audioCutting.result.url !== null"
                        [href]="tools.audioCutting.result.url"
-                       class="link">
+                       class="link"
+                       download="{{tools.audioCutting.result.filename}}"
+                       style="margin-left:10px;">
                       <fa-icon icon="save"></fa-icon>
                       {{'general.download' | transloco}}
                     </a>
@@ -191,7 +198,7 @@
         </table>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="close()">
+        <button (click)="close()" class="btn btn-primary" data-dismiss="modal" type="button">
           {{"general.close" | transloco}}
         </button>
       </div>

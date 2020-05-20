@@ -8,9 +8,16 @@ export enum IDBMode {
 
 export class IndexedDBManager {
 
+  private indexedDB: IDBFactory;
+  private idbkeyrange: IDBKeyRange;
+  private readonly dbname: string;
+  private readonly _idbtransaction: IDBTransaction;
+
   get idbtransaction(): IDBTransaction {
     return this._idbtransaction;
   }
+
+  private _db: IDBDatabase;
 
   get db(): IDBDatabase {
     return this._db;
@@ -36,14 +43,6 @@ export class IndexedDBManager {
         || (window as any).msIDBKeyRange;
     }
   }
-
-  private indexedDB: IDBFactory;
-  private idbkeyrange: IDBKeyRange;
-  private readonly dbname: string;
-
-  private readonly _idbtransaction: IDBTransaction;
-
-  private _db: IDBDatabase;
 
   /***
    * checks if browser supports indexedDB
@@ -83,7 +82,7 @@ export class IndexedDBManager {
         }
       }
     );
-  }
+  };
 
   public getAll = (storeName: string | IDBObjectStore, key: string | number): Promise<any[]> => {
     return new Promise<any>(
@@ -113,7 +112,7 @@ export class IndexedDBManager {
         }
       }
     );
-  }
+  };
 
   public save = (storeName: string | IDBObjectStore, key, data): Promise<any> => {
     return new Promise<any>(
@@ -136,7 +135,7 @@ export class IndexedDBManager {
         };
       }
     );
-  }
+  };
 
   public saveSequential = (storeName: string | IDBObjectStore, data: { key: string, value: any }[]): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
@@ -156,7 +155,7 @@ export class IndexedDBManager {
         wrapper(0);
       }
     );
-  }
+  };
 
   public remove = (storeName: string | IDBObjectStore, key: string | number): Promise<any> => {
     return new Promise<any>(
@@ -171,7 +170,7 @@ export class IndexedDBManager {
           reject(error);
         };
       });
-  }
+  };
 
   public clear = (storeName: string | IDBObjectStore): Promise<any> => {
     return new Promise<any>(
@@ -186,11 +185,11 @@ export class IndexedDBManager {
           reject(error);
         };
       });
-  }
+  };
 
   public close = () => {
     this.db.close();
-  }
+  };
 
   public saveArraySequential = (array: any[], storeName: string | IDBObjectStore, key: any): Promise<void> => {
     return new Promise<void>(
@@ -214,17 +213,7 @@ export class IndexedDBManager {
         wrapper(0);
       }
     );
-  }
-
-  private getObjectStore = (storeName: string, mode: IDBMode): IDBObjectStore => {
-    let modeStr: IDBTransactionMode = 'readonly';
-
-    if (mode === IDBMode.READWRITE) {
-      modeStr = 'readwrite';
-    }
-    const txn = this.db.transaction([storeName], modeStr);
-    return txn.objectStore(storeName);
-  }
+  };
 
   public open(version?: number): Observable<any> {
     const request = this.indexedDB.open(this.dbname, version);
@@ -249,4 +238,14 @@ export class IndexedDBManager {
       };
     });
   }
+
+  private getObjectStore = (storeName: string, mode: IDBMode): IDBObjectStore => {
+    let modeStr: IDBTransactionMode = 'readonly';
+
+    if (mode === IDBMode.READWRITE) {
+      modeStr = 'readwrite';
+    }
+    const txn = this.db.transaction([storeName], modeStr);
+    return txn.objectStore(storeName);
+  };
 }

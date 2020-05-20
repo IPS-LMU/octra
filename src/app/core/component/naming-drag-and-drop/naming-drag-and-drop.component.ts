@@ -10,11 +10,11 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import {isUnset} from '../../shared/Functions';
-import {Subject} from 'rxjs';
 import {DragulaService} from 'ng2-dragula';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {Segment} from 'octra-components';
+import {Subject} from 'rxjs';
+import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {isUnset} from '../../shared/Functions';
 
 @Component({
   selector: 'app-naming-drag-and-drop',
@@ -39,8 +39,22 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit, OnDest
   @Input() firstSegment: Segment;
 
   @Output() namingConventionchanged: Subject<string> = new Subject<string>();
-  public clicked = -1;
 
+  public clicked = -1;
+  public resultConvention = [
+    {
+      type: 'placeholder',
+      value: '<name>'
+    },
+    {
+      type: 'text',
+      value: '_'
+    },
+    {
+      type: 'placeholder',
+      value: '<sequNumber>'
+    }
+  ];
   private subcrManager = new SubscriptionManager();
 
   public get preview(): string {
@@ -80,21 +94,14 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit, OnDest
     return result;
   }
 
-  public resultConvention = [
-    {
-      type: 'placeholder',
-      value: '<name>'
-    },
-    {
-      type: 'text',
-      value: '_'
-    },
-    {
-      type: 'placeholder',
-      value: '<sequNumber>'
-    }
-  ];
+  public get namingConvention(): string {
+    let result = '';
 
+    for (let i = 0; i < this.resultConvention.length; i++) {
+      result += this.resultConvention[i].value;
+    }
+    return result;
+  }
 
   constructor(private dragulaService: DragulaService, private cd: ChangeDetectorRef) {
     this.dragulaService.createGroup('namingDragDrop', {
@@ -149,25 +156,6 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit, OnDest
     }
   }
 
-  private deselect() {
-    if (window.getSelection) {
-      if (window.getSelection().empty) {  // Chrome
-        window.getSelection().empty();
-      } else if (window.getSelection().removeAllRanges) {  // Firefox
-        window.getSelection().removeAllRanges();
-      }
-    }
-  }
-
-  public get namingConvention(): string {
-    let result = '';
-
-    for (let i = 0; i < this.resultConvention.length; i++) {
-      result += this.resultConvention[i].value;
-    }
-    return result;
-  }
-
   onKeyDown($event, text) {
     if ($event.code === 'Enter') {
       $event.preventDefault();
@@ -180,5 +168,15 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit, OnDest
   ngOnDestroy(): void {
     this.dragulaService.destroy('namingDragDrop');
     this.subcrManager.destroy();
+  }
+
+  private deselect() {
+    if (window.getSelection) {
+      if (window.getSelection().empty) {  // Chrome
+        window.getSelection().empty();
+      } else if (window.getSelection().removeAllRanges) {  // Firefox
+        window.getSelection().removeAllRanges();
+      }
+    }
   }
 }

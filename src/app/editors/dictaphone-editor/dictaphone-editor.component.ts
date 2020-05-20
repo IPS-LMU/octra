@@ -1,4 +1,7 @@
 import {AfterViewInit, Component, EventEmitter, OnChanges, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AudioChunk, AudioManager, AudioNavigationComponent, AudioplayerComponent, SampleUnit, Segment} from 'octra-components';
+import {TranscrEditorComponent} from '../../core/component/transcr-editor';
+import {SubscriptionManager} from '../../core/shared';
 
 import {
   AppStorageService,
@@ -8,13 +11,7 @@ import {
   TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
-import {SubscriptionManager} from '../../core/shared';
-import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {OCTRAEditor} from '../octra-editor';
-import {AudioNavigationComponent, AudioplayerComponent} from 'octra-components';
-import {AudioChunk, AudioManager} from 'octra-components';
-import {SampleUnit} from 'octra-components';
-import {Segment} from 'octra-components';
 
 @Component({
   selector: 'app-audioplayer-gui',
@@ -96,6 +93,9 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   }
 
   ngOnDestroy() {
+    this.audioManager.stopPlayback().catch(() => {
+      console.error(`could not stop audio on editor switched`);
+    });
     this.subscrmanager.destroy();
     this.keyMap.unregister('AP');
   }
@@ -221,7 +221,6 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
           segTexts[i + 1] = segTexts[i] + segTexts[i + 1];
           segTexts.splice(i, 1);
 
-
           --i;
         } else {
           start = samplesArray[i];
@@ -312,15 +311,6 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     } */
   }
 
-  private loadEditor() {
-    if (this.transcrService.currentlevel.segments.length > 0) {
-      this.editor.segments = this.transcrService.currentlevel.segments;
-    }
-    this.editor.Settings.height = 100;
-    this.editor.update();
-    this.oldRaw = this.editor.rawText;
-  }
-
   public afterFirstInitialization() {
     // ignore
   }
@@ -337,5 +327,14 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   onKeyUp() {
     this.appStorage.savingNeeded = true;
+  }
+
+  private loadEditor() {
+    if (this.transcrService.currentlevel.segments.length > 0) {
+      this.editor.segments = this.transcrService.currentlevel.segments;
+    }
+    this.editor.Settings.height = 100;
+    this.editor.update();
+    this.oldRaw = this.editor.rawText;
   }
 }

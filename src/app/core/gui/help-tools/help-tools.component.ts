@@ -1,6 +1,6 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {APIService, AppStorageService} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {APIService, AppStorageService} from '../../shared/service';
 
 @Component({
   selector: 'app-help-tools',

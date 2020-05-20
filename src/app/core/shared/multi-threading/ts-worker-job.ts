@@ -7,6 +7,29 @@ export enum TsWorkerStatus {
 }
 
 export class TsWorkerJob {
+  private static jobIDCounter = 0;
+  args: any[] = [];
+  private readonly _id: number;
+
+  get id(): number {
+    return this._id;
+  }
+
+  private _statistics = {
+    started: -1,
+    ended: -1
+  };
+
+  get statistics(): { ended: number; started: number } {
+    return this._statistics;
+  }
+
+  set statistics(value: { ended: number; started: number }) {
+    this._statistics = value;
+  }
+
+  private _result: any;
+
   get result(): any {
     return this._result;
   }
@@ -15,33 +38,11 @@ export class TsWorkerJob {
     this._result = value;
   }
 
-  set statistics(value: { ended: number; started: number }) {
-    this._statistics = value;
-  }
-
-  get statistics(): { ended: number; started: number } {
-    return this._statistics;
-  }
+  private _status: TsWorkerStatus = TsWorkerStatus.INITIALIZED;
 
   get status(): TsWorkerStatus {
     return this._status;
   }
-
-  get id(): number {
-    return this._id;
-  }
-
-  private static jobIDCounter = 0;
-  private _statistics = {
-    started: -1,
-    ended: -1
-  };
-
-  private readonly _id: number;
-  private _result: any;
-  private _status: TsWorkerStatus = TsWorkerStatus.INITIALIZED;
-
-  args: any[] = [];
 
   constructor(doFunction: (args: any[]) => Promise<any>, args: any[]) {
     this._id = ++TsWorkerJob.jobIDCounter;
@@ -56,7 +57,7 @@ export class TsWorkerJob {
     return new Promise<any>((resolve, reject) => {
       reject('not implemented');
     });
-  }
+  };
 
   /**
    * changes this job's status

@@ -13,6 +13,21 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
+import {
+  ASRQueueItemType,
+  AudioChunk,
+  AudioManager,
+  AudioNavigationComponent,
+  AudioRessource,
+  AudioSelection,
+  AudioViewerComponent,
+  SampleUnit,
+  Segment,
+  Segments
+} from 'octra-components';
+import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
+import {SubscriptionManager} from '../../../core/shared';
+import {isUnset} from '../../../core/shared/Functions';
 
 import {
   AppStorageService,
@@ -22,15 +37,7 @@ import {
   TranscriptionService,
   UserInteractionsService
 } from '../../../core/shared/service';
-import {SubscriptionManager} from '../../../core/shared';
-import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
-import {isUnset} from '../../../core/shared/Functions';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../../core/shared/service/asr.service';
-import {AudioNavigationComponent, AudioViewerComponent} from 'octra-components';
-import {AudioChunk, AudioManager} from 'octra-components';
-import {Segment, Segments} from 'octra-components';
-import {AudioRessource, AudioSelection, SampleUnit} from 'octra-components';
-import {ASRQueueItemType} from 'octra-components';
 
 @Component({
   selector: 'app-transcr-window',
@@ -39,13 +46,21 @@ import {ASRQueueItemType} from 'octra-components';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterViewInit, OnDestroy, OnChanges {
-  get loading(): boolean {
-    return this._loading;
-  }
-
-  get validationEnabled(): boolean {
-    return this._validationEnabled;
-  }
+  @ViewChild('loupe', {static: true}) loupe: AudioViewerComponent;
+  @ViewChild('editor', {static: true}) editor: TranscrEditorComponent;
+  @ViewChild('audionav', {static: true}) audionav: AudioNavigationComponent;
+  @ViewChild('window', {static: true}) window: ElementRef;
+  @ViewChild('main', {static: true}) main: ElementRef;
+  @Output() act: EventEmitter<string> = new EventEmitter<string>();
+  @Input() easymode = false;
+  @Input() audiochunk: AudioChunk;
+  @Input() segmentIndex: number;
+  private;
+  public;
+  private showWindow = false;
+  private subscrmanager: SubscriptionManager;
+  private tempSegments: Segments;
+  private oldRaw = '';
 
   @Output('shortcuttriggered')
   get shortcuttriggered(): EventEmitter<string> {
@@ -87,7 +102,33 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   private _validationEnabled = false;
+
+  get validationEnabled(): boolean {
+    return this._validationEnabled;
+  }
+
   private _loading = false;
+
+  get loading(): boolean {
+    return this._loading;
+  }
+
+  public get mainSize(): {
+    width: number,
+    height: number
+  } {
+    if (!isUnset(this.main)) {
+      return {
+        width: this.main.nativeElement.clientWidth,
+        height: this.main.nativeElement.clientHeight
+      };
+    } else {
+      return {
+        width: 0,
+        height: 0
+      };
+    }
+  }
 
   constructor(public keyMap: KeymappingService,
               public transcrService: TranscriptionService,
@@ -138,40 +179,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       () => {
       }));
   }
-
-  @ViewChild('loupe', {static: true}) loupe: AudioViewerComponent;
-  @ViewChild('editor', {static: true}) editor: TranscrEditorComponent;
-  @ViewChild('audionav', {static: true}) audionav: AudioNavigationComponent;
-  @ViewChild('window', {static: true}) window: ElementRef;
-  @ViewChild('main', {static: true}) main: ElementRef;
-
-  @Output() act: EventEmitter<string> = new EventEmitter<string>();
-  @Input() easymode = false;
-  @Input() audiochunk: AudioChunk;
-  @Input() segmentIndex: number;
-
-  public get mainSize(): {
-    width: number,
-    height: number
-  } {
-    if (!isUnset(this.main)) {
-      return {
-        width: this.main.nativeElement.clientWidth,
-        height: this.main.nativeElement.clientHeight
-      };
-    } else {
-      return {
-        width: 0,
-        height: 0
-      }
-    }
-  }
-
-  private showWindow = false;
-  private subscrmanager: SubscriptionManager;
-  private tempSegments: Segments;
-
-  private oldRaw = '';
 
   public doDirectionAction = (direction: string) => {
     this._loading = true;
@@ -237,7 +244,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           break;
       }
     }
-  }
+  };
 
   ngOnInit() {
     this._loading = false;
@@ -278,8 +285,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown));
   }
 
-  private
-
   setValidationEnabledToDefault() {
     this._validationEnabled = this.appStorage.usemode !== 'url'
       && (this.appStorage.usemode === 'demo' || this.settingsService.projectsettings.octra.validationEnabled);
@@ -299,7 +304,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           console.log(`_audiochunk change ok not null`);
           // audiochunk changed
           console.log(`_audiochunk changed ${current.status}`);
-          this.listenToAudioChunkStatusChanges()
+          this.listenToAudioChunkStatusChanges();
 
           this.setValidationEnabledToDefault();
 
@@ -330,8 +335,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   ngAfterContentInit() {
     this.act.emit('open');
   }
-
-  public
 
   close() {
     this.showWindow = false;
@@ -771,7 +774,6 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
           segTexts[i + 1] = segTexts[i] + segTexts[i + 1];
           segTexts.splice(i, 1);
 
-
           --i;
         } else {
           start = samplesArray[i];
@@ -793,13 +795,12 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     }
   }
 
-
   public highlight() {
     const html: string = this.editor.html.replace(/&nbsp;/g, ' ');
 
     const samplesArray: number[] = [];
     html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s?/g,
-      function (match, g1, g2) {
+      function(match, g1, g2) {
         samplesArray.push(Number(g1));
         return '';
       });

@@ -2,9 +2,9 @@ import {Injectable} from '@angular/core';
 
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs';
-import {AppStorageService} from '../service';
 import {AppInfo} from '../../../app.info';
 import {Functions} from '../Functions';
+import {AppStorageService} from '../service';
 
 @Injectable()
 export class TranscrEndGuard implements CanActivate {

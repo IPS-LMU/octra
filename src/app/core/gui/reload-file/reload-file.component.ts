@@ -1,13 +1,13 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {AppStorageService, AudioService, OIDBLevel, OIDBLink, TranscriptionService} from '../../shared/service';
+import {Router} from '@angular/router';
+import {TranslocoService} from '@ngneat/transloco';
+import {AppInfo} from '../../../app.info';
+import {ModalService} from '../../modals/modal.service';
+import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 import {SessionFile} from '../../obj/SessionFile';
 import {FileSize, Functions} from '../../shared/Functions';
-import {Router} from '@angular/router';
-import {ModalService} from '../../modals/modal.service';
-import {TranslocoService} from '@ngneat/transloco';
+import {AppStorageService, AudioService, OIDBLevel, OIDBLink, TranscriptionService} from '../../shared/service';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
-import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
-import {AppInfo} from '../../../app.info';
 
 @Component({
   selector: 'app-reload-file',
@@ -15,6 +15,9 @@ import {AppInfo} from '../../../app.info';
   styleUrls: ['./reload-file.component.css']
 })
 export class ReloadFileComponent implements OnInit {
+
+  @ViewChild('dropzone', {static: true}) dropzone: OctraDropzoneComponent;
+  private error = '';
 
   get sessionfile(): SessionFile {
     return this.appStorage.sessionfile;
@@ -28,12 +31,10 @@ export class ReloadFileComponent implements OnInit {
               private audioService: AudioService) {
   }
 
-  @ViewChild('dropzone', {static: true}) dropzone: OctraDropzoneComponent;
-  private error = '';
   abortTranscription = () => {
     this.transcrServ.endTranscription();
     Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
-  }
+  };
   newTranscription = () => {
     this.modService.show('transcriptionDelete').then((decision) => {
       if (decision === 'DELETE') {
@@ -79,7 +80,7 @@ export class ReloadFileComponent implements OnInit {
     }).catch((error) => {
       console.error(error);
     });
-  }
+  };
 
   onOfflineSubmit = () => {
     this.audioService.registerAudioManager(this.dropzone.audioManager);
@@ -90,10 +91,7 @@ export class ReloadFileComponent implements OnInit {
         }
       }
     );
-  }
-  private navigate = () => {
-    Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling);
-  }
+  };
 
   public isN(obj: any): boolean {
     return (obj === null || obj === undefined);
@@ -119,6 +117,10 @@ export class ReloadFileComponent implements OnInit {
       console.error(error);
     });
   }
+
+  private navigate = () => {
+    Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling);
+  };
 
   private showErrorMessage(err: string) {
     this.error = err;

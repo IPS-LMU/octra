@@ -1,15 +1,15 @@
 :host {
-    padding: 40px;
+  padding: 40px;
 }
 
 #measuredSize {
-    display: block;
-    text-align: center;
-    font-size: 3em;
+  display: block;
+  text-align: center;
+  font-size: 3em;
 }
 
 #lastResult,
 #status {
-    display: block;
-    text-align: center;
+  display: block;
+  text-align: center;
 }

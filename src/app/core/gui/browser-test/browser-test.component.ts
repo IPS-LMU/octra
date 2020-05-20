@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {CompatibilityService} from '../../shared/service/compatibility.service';
 import {BrowserInfo} from '../../shared';
+import {CompatibilityService} from '../../shared/service/compatibility.service';
 
 @Component({
   selector: 'app-browser-test',

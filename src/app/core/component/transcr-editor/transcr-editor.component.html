@@ -1,22 +1,22 @@
-<div class="transcr-editor" #transcrEditor [ngStyle]="{display: (visible) ? 'inherit' : 'none'}"
-     (change)="updateTextField()">
+<div #transcrEditor (change)="updateTextField()" [ngStyle]="{display: (visible) ? 'inherit' : 'none'}"
+     class="transcr-editor">
   <app-validation-popover #validationPopover
                           [ngStyle]="{
                                 'margin-left': popoversNew.validation.location.x + 'px',
                                 'margin-top': popoversNew.validation.location.y + 'px'
                             }"
   ></app-validation-popover>
-  <div id="asrOverlay" [ngClass]="{
+  <div (click)="onASROverlayClick()" [ngClass]="{
     'asr-running': asr.status === 'active'
   }" [ngStyle]="{
   'height': size.height + 'px',
   'width': size.width + 'px',
   'display': (asr.status === 'active')? 'block' : 'none'
-  }" (click)="onASROverlayClick()">
+  }" id="asrOverlay">
     <!--
     (asr.status === 'active' || asr.status === 'failed')? 'block' : 'none'
     -->
-    <p style="margin-top:50px;text-align: center;" *ngIf="asr.status === 'active'">
+    <p *ngIf="asr.status === 'active'" style="margin-top:50px;text-align: center;">
       {{"asr.asr running" | transloco}}
     </p>
   </div>

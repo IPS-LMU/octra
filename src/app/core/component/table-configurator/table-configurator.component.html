@@ -1,14 +1,15 @@
 <div style="margin-bottom: 10px">
   <div class="btn-group" dropdown>
-    <button dropdownToggle type="button" class="btn btn-secondary btn-raised btn-sm"
-            aria-controls="dropdown-basic" style="width:100%; margin-left:5px;">
+    <button aria-controls="dropdown-basic" class="btn btn-secondary btn-raised btn-sm" dropdownToggle
+            style="width:100%; margin-left:5px;" type="button">
       <fa-icon icon="plus"></fa-icon>
       {{"custom.table configurator.add column" | transloco}}
     </button>
-    <ul *dropdownMenu class="dropdown-menu"
-        role="menu" aria-labelledby="button-basic" style="cursor: pointer">
-      <li role="menuitem" class="dropdown-item" *ngFor="let colDef of remainingColDefs"
-          (click)="tableConfiguratorAddColumn(-1, colDef.type)"
+    <ul *dropdownMenu aria-labelledby="button-basic"
+        class="dropdown-menu" role="menu" style="cursor: pointer">
+      <li (click)="tableConfiguratorAddColumn(-1, colDef.type)" *ngFor="let colDef of remainingColDefs"
+          class="dropdown-item"
+          role="menuitem"
       >
         {{colDef.type}}
       </li>
@@ -16,24 +17,25 @@
   </div>
 
   <div class="settings">
-    <input type="checkbox" name="includeLines"
+    <input (ngModelChange)="onCheckboxChange()" [(ngModel)]="includeLineNumbers"
            id="includeLineNumbers"
-           [(ngModel)]="includeLineNumbers"
-           (ngModelChange)="onCheckboxChange()"/>
+           name="includeLines"
+           type="checkbox"/>
     <label for="includeLineNumbers"
            style="margin-left: 15px;">{{"custom.table configurator.include line numbers"| transloco}}</label>
   </div>
   <div class="settings">
     <label>{{"custom.table configurator.time format"| transloco}}: </label>
     <div class="btn-group" dropdown>
-      <button dropdownToggle type="button" class="btn btn-info btn-raised btn-sm"
-              aria-controls="dropdown-basic" style="width:150px; margin-left:5px;">
+      <button aria-controls="dropdown-basic" class="btn btn-info btn-raised btn-sm" dropdownToggle
+              style="width:150px; margin-left:5px;" type="button">
         {{tableOptions.timeFormat}}
       </button>
-      <ul *dropdownMenu class="dropdown-menu"
-          role="menu" aria-labelledby="button-basic" style="cursor: pointer">
-        <li role="menuitem" class="dropdown-item" *ngFor="let timeFormat of tableOptions.timeFormats"
-            (click)="onTimeFormatChange(timeFormat)"
+      <ul *dropdownMenu aria-labelledby="button-basic"
+          class="dropdown-menu" role="menu" style="cursor: pointer">
+        <li (click)="onTimeFormatChange(timeFormat)" *ngFor="let timeFormat of tableOptions.timeFormats"
+            class="dropdown-item"
+            role="menuitem"
         >
           {{timeFormat}}
         </li>
@@ -42,27 +44,27 @@
   </div>
 </div>
 
-<div class="easy-table" [ngStyle]="{
+<div [ngStyle]="{
 width: tableWidth + 'px'
-}">
-  <div class="inner" dragula="tableConfiguratorColumns"
-       [(dragulaModel)]="columns" (dragulaModelChange)="onDragulaModelChange($event)">
-    <div class="column" *ngFor="let column of columns; let i = index;">
+}" class="easy-table">
+  <div (dragulaModelChange)="onDragulaModelChange($event)" [(dragulaModel)]="columns"
+       class="inner" dragula="tableConfiguratorColumns">
+    <div *ngFor="let column of columns; let i = index;" class="column">
       <div class="grip">
         <fa-icon [icon]="['fas', 'grip-lines']"></fa-icon>
       </div>
-      <div class="delete-column" (click)="onDeleteColumnClick(i)">
+      <div (click)="onDeleteColumnClick(i)" class="delete-column">
         <fa-icon icon="times"></fa-icon>
       </div>
       <div class="header">
-        <div contenteditable="true" #title
+        <div #title (keydown)="onTitleKeyDown($event)"
+             (keyup)="onTitleKeyUp($event, title, i)"
              (mouseleave)="onTitleLeave(title, i)"
-             (keydown)="onTitleKeyDown($event)"
-             (keyup)="onTitleKeyUp($event, title, i)" class="title">
+             class="title" contenteditable="true">
           {{column.title}}
         </div>
       </div>
-      <div class="cell" *ngFor="let cell of columns[i].columnDefinition.cells">
+      <div *ngFor="let cell of columns[i].columnDefinition.cells" class="cell">
         {{cell.text | cliptext}}
       </div>
     </div>
@@ -77,14 +79,15 @@ width: tableWidth + 'px'
         <legend class="col-form-label col-sm-2 pt-0">{{"custom.table configurator.divider" | transloco}}:</legend>
         <div class="col-sm-10">
           <div class="btn-group" dropdown>
-            <button dropdownToggle type="button" class="btn btn-info btn-raised btn-sm"
-                    aria-controls="dropdown-basic" style="width:100%;">
+            <button aria-controls="dropdown-basic" class="btn btn-info btn-raised btn-sm" dropdownToggle
+                    style="width:100%;" type="button">
               {{tableOptions.divider.name}} ({{tableOptions.divider.value}})
             </button>
-            <ul id="dropdown-basic3" *dropdownMenu class="dropdown-menu"
-                role="menu" aria-labelledby="button-basic" style="cursor: pointer">
-              <li role="menuitem" class="dropdown-item" *ngFor="let divider of tableOptions.selection.dividers"
-                  (click)="onDividerClick(divider.value)"
+            <ul *dropdownMenu aria-labelledby="button-basic" class="dropdown-menu"
+                id="dropdown-basic3" role="menu" style="cursor: pointer">
+              <li (click)="onDividerClick(divider.value)" *ngFor="let divider of tableOptions.selection.dividers"
+                  class="dropdown-item"
+                  role="menuitem"
               >
                 {{divider.name}} ({{divider.value}})
               </li>
@@ -98,14 +101,15 @@ width: tableWidth + 'px'
         <legend class="col-form-label col-sm-2 pt-0">{{"general.File extension" | transloco}}:</legend>
         <div class="col-sm-10">
           <div class="btn-group" dropdown>
-            <button dropdownToggle type="button" class="btn btn-info btn-raised btn-sm"
-                    aria-controls="dropdown-basic" style="width:100%;">
+            <button aria-controls="dropdown-basic" class="btn btn-info btn-raised btn-sm" dropdownToggle
+                    style="width:100%;" type="button">
               {{tableOptions.fileExtension}}
             </button>
-            <ul *dropdownMenu class="dropdown-menu"
-                role="menu" aria-labelledby="button-basic" style="cursor: pointer">
-              <li role="menuitem" class="dropdown-item" *ngFor="let extension of tableOptions.selection.extension"
-                  (click)="onExtensionClick(extension)"
+            <ul *dropdownMenu aria-labelledby="button-basic"
+                class="dropdown-menu" role="menu" style="cursor: pointer">
+              <li (click)="onExtensionClick(extension)" *ngFor="let extension of tableOptions.selection.extension"
+                  class="dropdown-item"
+                  role="menuitem"
               >
                 {{extension}}
               </li>
@@ -117,8 +121,9 @@ width: tableWidth + 'px'
     <div class="form-group row">
       <div class="col-sm-12">
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="gridCheck1" name="addHeader"
-                 [(ngModel)]="tableOptions.addHeader" (ngModelChange)="onSomethingDone()">
+          <input (ngModelChange)="onSomethingDone()" [(ngModel)]="tableOptions.addHeader" class="form-check-input"
+                 id="gridCheck1"
+                 name="addHeader" type="checkbox">
           <label class="form-check-label" for="gridCheck1" style="font-size: 14px;">
             {{"custom.table configurator.add header" | transloco}}
           </label>
@@ -127,10 +132,10 @@ width: tableWidth + 'px'
     </div>
     <div class="form-group row">
       <div class="col-sm-10">
-        <button type="submit" class="btn btn-primary btn-raised" (click)="generateFile()"
-                [disabled]="this.columns.length < 1">{{"custom.table configurator.generate table" | transloco}}
+        <button (click)="generateFile()" [disabled]="this.columns.length < 1" class="btn btn-primary btn-raised"
+                type="submit">{{"custom.table configurator.generate table" | transloco}}
         </button>
-        <a [href]="this.resultURL" *ngIf="this.resultURL !== null" [download]="'test' + tableOptions.fileExtension"
+        <a *ngIf="this.resultURL !== null" [download]="'test' + tableOptions.fileExtension" [href]="this.resultURL"
            style="margin-left:10px;">{{"general.download" | transloco}}</a>
       </div>
     </div>

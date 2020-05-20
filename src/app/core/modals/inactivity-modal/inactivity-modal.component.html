@@ -1,25 +1,26 @@
-<div bsModal #modal="bs-modal" class="modal fade" [config]="config" tabindex="-1" role="dialog"
-     aria-labelledby="dialog-sizes-name1"
-     id="bugreport">
+<div #modal="bs-modal" [config]="config" aria-labelledby="dialog-sizes-name1" bsModal class="modal fade" id="bugreport"
+     role="dialog"
+     tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">{{"modal.inactivity.header" | transloco}}</h4>
       </div>
-      <div class="modal-body"
-           [innerHTML]="'modal.inactivity.body' | transloco:{value: (settService.appSettings.octra.inactivityNotice.showAfter+'')}">
+      <div
+        [innerHTML]="'modal.inactivity.body' | transloco:{value: (settService.appSettings.octra.inactivityNotice.showAfter+'')}"
+        class="modal-body">
       </div>
       <div class="modal-footer">
         <div class="btn-group-vertical w-100">
-          <button type="button" class="btn btn-primary btn-raised w-100" data-dismiss="modal"
-                  (click)="close('new')">
+          <button (click)="close('new')" class="btn btn-primary btn-raised w-100" data-dismiss="modal"
+                  type="button">
             {{"modal.inactivity.new" | transloco}}
           </button>
-          <button type="button" class="btn btn-secondary btn-raised w-100" data-dismiss="modal"
-                  (click)="close('continue')">
+          <button (click)="close('continue')" class="btn btn-secondary btn-raised w-100" data-dismiss="modal"
+                  type="button">
             {{"modal.inactivity.continue" | transloco}}
           </button>
-          <button type="button" class="btn btn-secondary w-100" data-dismiss="modal" (click)="close('quit')">
+          <button (click)="close('quit')" class="btn btn-secondary w-100" data-dismiss="modal" type="button">
             {{"modal.inactivity.quit" | transloco}}
           </button>
         </div>

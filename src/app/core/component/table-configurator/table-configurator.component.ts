@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
-import {isUnset} from '../../shared/Functions';
 import {Annotation, Level} from 'octra-components';
+import {isUnset} from '../../shared/Functions';
 
 export interface ColumnDefinition {
   type: string;
@@ -238,6 +238,20 @@ export class TableConfiguratorComponent implements OnInit {
     }
   ];
 
+  public get remainingColDefs(): ColumnDefinition[] {
+    const remaining: ColumnDefinition[] = [];
+
+    for (const colDef of this.columnDefinitions) {
+      if (this.columns.find((a) => {
+        return a.columnDefinition.type === colDef.type;
+      }) === undefined && colDef.type !== 'lineNumber') {
+        remaining.push(colDef);
+      }
+    }
+
+    return remaining;
+  }
+
   constructor(private sanitizer: DomSanitizer) {
   }
 
@@ -409,24 +423,12 @@ export class TableConfiguratorComponent implements OnInit {
     let result = (this.tableOptions.addHeader) ? header : '';
 
     for (let i = 0; i < textLines.length; i++) {
-      result += `${textLines[i].text}\n`
+      result += `${textLines[i].text}\n`;
     }
     result += '\n';
 
     const file = new File([result], 'test' + this.tableOptions.fileExtension);
     this.resultURL = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(file));
-  }
-
-  private getLevelNumber(): number {
-    if (!this.currentLevelID !== undefined) {
-      const result = (this.annotation.levels.findIndex((a) => {
-        return a.id === this.currentLevelID;
-      }));
-
-      return (result !== undefined) ? result : 0;
-    }
-
-    return 0;
   }
 
   onExtensionClick(extension) {
@@ -564,6 +566,23 @@ export class TableConfiguratorComponent implements OnInit {
     }
   }
 
+  public onTimeFormatChange(format: string) {
+    this.tableOptions.timeFormat = format;
+    this.onFormatClick(format);
+  }
+
+  private getLevelNumber(): number {
+    if (!this.currentLevelID !== undefined) {
+      const result = (this.annotation.levels.findIndex((a) => {
+        return a.id === this.currentLevelID;
+      }));
+
+      return (result !== undefined) ? result : 0;
+    }
+
+    return 0;
+  }
+
   private removeColumn(type: string) {
     const index = this.columns.findIndex((a) => {
       return a.columnDefinition.type === type;
@@ -572,24 +591,5 @@ export class TableConfiguratorComponent implements OnInit {
     if (index > -1) {
       this.columns.splice(index, 1);
     }
-  }
-
-  public onTimeFormatChange(format: string) {
-    this.tableOptions.timeFormat = format;
-    this.onFormatClick(format)
-  }
-
-  public get remainingColDefs(): ColumnDefinition[] {
-    const remaining: ColumnDefinition[] = [];
-
-    for (const colDef of this.columnDefinitions) {
-      if (this.columns.find((a) => {
-        return a.columnDefinition.type === colDef.type;
-      }) === undefined && colDef.type !== 'lineNumber') {
-        remaining.push(colDef);
-      }
-    }
-
-    return remaining;
   }
 }

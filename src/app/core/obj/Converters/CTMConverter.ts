@@ -1,6 +1,6 @@
-import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {Functions} from '../../shared/Functions';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
+import {Functions} from '../../shared/Functions';
+import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 
 export class CTMConverter extends Converter {
 
@@ -55,7 +55,6 @@ export class CTMConverter extends Converter {
 
       const content = file.content;
       const lines: string[] = content.split('\n');
-
 
       // check if filename is equal with audio file
       const filename = lines[0].substr(0, lines[0].indexOf(' '));

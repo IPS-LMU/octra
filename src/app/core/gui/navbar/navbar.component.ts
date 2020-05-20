@@ -1,16 +1,16 @@
 import {AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {AppStorageService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
-import {NavbarService} from './navbar.service';
 import {DomSanitizer} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
-import {AppInfo} from '../../../app.info';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {editorComponents} from '../../../editors/components';
-import {BugReportService, ConsoleType} from '../../shared/service/bug-report.service';
+import {AnnotJSONType, Level, Segments} from 'octra-components';
 import {environment} from '../../../../environments/environment';
-import {ModalService} from '../../modals/modal.service';
+import {AppInfo} from '../../../app.info';
+import {editorComponents} from '../../../editors/components';
 import {ExportFilesModalComponent} from '../../modals/export-files-modal/export-files-modal.component';
-import {Level, Segments, AnnotJSONType} from 'octra-components';
+import {ModalService} from '../../modals/modal.service';
+import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {AppStorageService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {BugReportService, ConsoleType} from '../../shared/service/bug-report.service';
+import {NavbarService} from './navbar.service';
 
 @Component({
   selector: 'app-navigation',
@@ -24,6 +24,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public test = 'ok';
   collapsed = true;
+  public secondsPerLine = '5';
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
   public get environment(): any {
@@ -66,8 +67,6 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
       return false;
     }).length > 0);
   }
-
-  public secondsPerLine = '5';
 
   constructor(public appStorage: AppStorageService,
               public navbarServ: NavbarService,

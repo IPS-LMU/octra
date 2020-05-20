@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {Router} from '@angular/router';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AsrService} from '../../shared/service/asr.service';
 
 @Component({

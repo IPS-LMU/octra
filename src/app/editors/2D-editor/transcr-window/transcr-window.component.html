@@ -1,29 +1,26 @@
-<div id="window" #window>
+<div #window id="window">
   <div class="window-nav-top">
-    <fa-icon icon="times" class="close" (click)="close();"></fa-icon>
+    <fa-icon (click)="close();" class="close" icon="times"></fa-icon>
   </div>
   <div #main>
-    <div class="tw-loading" [ngStyle]="{
+    <div *ngIf="loading" [ngStyle]="{
     width: mainSize.width + 'px',
     height: mainSize.height + 'px'
-    }" *ngIf="loading">
-      <div class="background" [ngStyle]="{
+    }" class="tw-loading">
+      <div [ngStyle]="{
     width: mainSize.width + 'px',
     height: mainSize.height + 'px'
-    }"></div>
-      <fa-icon icon="spinner" spin="spin" size="4x"></fa-icon>
+    }" class="background"></div>
+      <fa-icon icon="spinner" size="4x" spin="spin"></fa-icon>
     </div>
-    <app-asr-options [audioChunk]="audiochunk" [enabled]="editor.rawText === ''"
-                     *ngIf="settingsService.isASREnabled"></app-asr-options>
+    <app-asr-options *ngIf="settingsService.isASREnabled" [audioChunk]="audiochunk"
+                     [enabled]="editor.rawText === ''"></app-asr-options>
     <oco-audio-navigation #audionav
-                          [audioChunk]="audiochunk"
-                          [playbackRate]="appStorage.audioSpeed"
-                          [volume]="appStorage.audioVolume"
+                          (afterPlaybackRateChange)="afterSpeedChange($event)"
+                          (afterVolumeChange)="afterVolumeChange($event)"
                           (buttonClick)="onButtonClick($event)"
                           (keyup)="onKeyUp()"
-                          (afterVolumeChange)="afterVolumeChange($event)"
-                          (afterPlaybackRateChange)="afterSpeedChange($event)"
-                          [responsive]="settingsService.responsive.enabled"
+                          [audioChunk]="audiochunk"
                           [buttons]="{
                         play: {
                             label: ('general.play' | transloco),
@@ -51,29 +48,32 @@
                         }
                       }"
                           [easyMode]="easymode"
+                          [playbackRate]="appStorage.audioSpeed"
+                          [responsive]="settingsService.responsive.enabled"
+                          [volume]="appStorage.audioVolume"
 
     ></oco-audio-navigation>
-    <oco-audio-viewer #loupe id="loupe"
-                      [transcriptionLevel]="transcrService.currentlevel"
-                      (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
+    <oco-audio-viewer #loupe (shortcuttriggered)="onShortCutTriggered($event, 'loupe')"
                       [audioChunk]="audiochunk"
                       [isMultiLine]="false"
+                      [transcriptionLevel]="transcrService.currentlevel"
+                      id="loupe"
     ></oco-audio-viewer>
-    <app-transcr-editor #editor id="trancr"
-                        (markerInsert)="onMarkerInsert($event)"
-                        (markerClick)="onMarkerClick($event)"
-                        [markers]="transcrService.guidelines?.markers"
-                        [easymode]="easymode"
-                        [audiochunk]="audiochunk"
-                        (boundaryclicked)="onBoundaryClicked($event)"
+    <app-transcr-editor #editor (boundaryclicked)="onBoundaryClicked($event)"
                         (boundaryinserted)="onBoundaryInserted()"
+                        (markerClick)="onMarkerClick($event)"
+                        (markerInsert)="onMarkerInsert($event)"
                         (typing)="afterTyping($event)"
-                        [validationEnabled]="validationEnabled"
+                        [audiochunk]="audiochunk"
+                        [easymode]="easymode"
                         [height]="100"
+                        [markers]="transcrService.guidelines?.markers"
+                        [validationEnabled]="validationEnabled"
+                        id="trancr"
     ></app-transcr-editor>
     <div class="window-nav-bottom">
       <div class="row" role="group">
-        <button class="btn btn-info btn-raised col-md-4" (click)="save();doDirectionAction('left');">
+        <button (click)="save();doDirectionAction('left');" class="btn btn-info btn-raised col-md-4">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'d-lg-none': responsive && !easymode}">
                                 <fa-icon icon="save"></fa-icon> & <fa-icon icon="arrow-left"></fa-icon>
@@ -83,7 +83,7 @@
             {{"segments.previous" | transloco}}
                             </span>
         </button>
-        <button class="btn btn-info btn-raised col-md-4" (click)="save();close();">
+        <button (click)="save();close();" class="btn btn-info btn-raised col-md-4">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'d-lg-none': responsive && !easymode}">
                                 <fa-icon icon="save"></fa-icon>
@@ -92,9 +92,9 @@
                              {{"general.save" | transloco}} & {{"general.close" | transloco}}
                             </span>
         </button>
-        <button class="btn btn-info btn-raised col-md-4" (click)="save();doDirectionAction('right');"
-                *ngIf="hasSegmentBoundaries || (!isNextSegmentLastAndBreak(segmentIndex)
-                    && segmentIndex < transcrService.currentlevel.segments.length - 1)">
+        <button (click)="save();doDirectionAction('right');" *ngIf="hasSegmentBoundaries || (!isNextSegmentLastAndBreak(segmentIndex)
+                    && segmentIndex < transcrService.currentlevel.segments.length - 1)"
+                class="btn btn-info btn-raised col-md-4">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'d-lg-none': responsive && !easymode}">
                                 <fa-icon icon="save"></fa-icon> & <fa-icon icon="arrow-right"></fa-icon>
@@ -105,9 +105,9 @@
                             </span>
         </button>
         <!-- check if last segment ord if the next segment is a break -->
-        <button class="btn btn-info btn-raised col-md-4" (click)="save();close();openOverview();"
-                *ngIf="!hasSegmentBoundaries && (segmentIndex === transcrService.currentlevel.segments.length - 1
-                    || isNextSegmentLastAndBreak(segmentIndex))">
+        <button (click)="save();close();openOverview();" *ngIf="!hasSegmentBoundaries && (segmentIndex === transcrService.currentlevel.segments.length - 1
+                    || isNextSegmentLastAndBreak(segmentIndex))"
+                class="btn btn-info btn-raised col-md-4">
                             <span *ngIf="responsive || easymode"
                                   [ngClass]="{'d-lg-none': responsive && !easymode}">
                                 <fa-icon icon="save"></fa-icon> & <fa-icon icon="eye"></fa-icon>
@@ -120,4 +120,4 @@
     </div>
   </div>
 </div>
-<div id="black" (click)="close()"></div>
+<div (click)="close()" id="black"></div>

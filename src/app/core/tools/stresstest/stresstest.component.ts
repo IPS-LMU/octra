@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
+import {SessionStorage, SessionStorageService} from '@rars/ngx-webstorage';
 import {BrowserInfo} from '../../shared';
 import {Functions} from '../../shared/Functions';
-import {SessionStorage, SessionStorageService} from '@rars/ngx-webstorage';
 
 @Component({
   selector: 'app-stresstest',
@@ -13,15 +13,10 @@ import {SessionStorage, SessionStorageService} from '@rars/ngx-webstorage';
 export class StresstestComponent implements OnInit, OnDestroy {
 
   @SessionStorage('stresstest_js_result') lastResult;
-
-  constructor(private cd: ChangeDetectorRef, private sessionStorage: SessionStorageService) {
-  }
-
   public measured = 0;
+  public status = 'init';
   private sampleData: File;
   private arrayBuffer: ArrayBuffer;
-
-  public status = 'init';
 
   public get measuredString() {
     const size = Functions.getFileSize(this.measured);
@@ -43,6 +38,9 @@ export class StresstestComponent implements OnInit, OnDestroy {
 
   public get info(): any {
     return BrowserInfo;
+  }
+
+  constructor(private cd: ChangeDetectorRef, private sessionStorage: SessionStorageService) {
   }
 
   ngOnInit() {

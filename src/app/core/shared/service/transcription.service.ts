@@ -1,22 +1,21 @@
-import {EventEmitter, Injectable} from '@angular/core';
-import {Functions, isUnset} from '../Functions';
-import {StatisticElem} from '../../obj/statistics/StatisticElement';
-import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
-import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
-import {NavbarService} from '../../gui/navbar/navbar.service';
-import {AnnotJSONConverter, PartiturConverter, SubscriptionManager, TextConverter} from '../';
-import {FeedBackForm} from '../../obj/FeedbackForm/FeedBackForm';
-import {Converter, IFile} from '../../obj/Converters';
-import {OLog, OLogging} from '../../obj/Settings/logging';
-import {AppSettings, ProjectSettings} from '../../obj/Settings';
 import {HttpClient} from '@angular/common/http';
-import {AudioService} from './audio.service';
-import {AppStorageService, OIDBLevel} from './appstorage.service';
-import {UserInteractionsService} from './userInteractions.service';
-import {SettingsService} from './settings.service';
+import {EventEmitter, Injectable} from '@angular/core';
+import {Annotation, AudioManager, Level, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment, Segments} from 'octra-components';
+import {AnnotJSONConverter, PartiturConverter, SubscriptionManager, TextConverter} from '../';
 import {AppInfo} from '../../../app.info';
-import {Annotation, Level, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment, Segments} from 'octra-components';
-import {AudioManager} from 'octra-components';
+import {NavbarService} from '../../gui/navbar/navbar.service';
+import {Converter, IFile} from '../../obj/Converters';
+import {FeedBackForm} from '../../obj/FeedbackForm/FeedBackForm';
+import {AppSettings, ProjectSettings} from '../../obj/Settings';
+import {OLog, OLogging} from '../../obj/Settings/logging';
+import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
+import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
+import {StatisticElem} from '../../obj/statistics/StatisticElement';
+import {Functions, isUnset} from '../Functions';
+import {AppStorageService, OIDBLevel} from './appstorage.service';
+import {AudioService} from './audio.service';
+import {SettingsService} from './settings.service';
+import {UserInteractionsService} from './userInteractions.service';
 
 declare var validateAnnotation: ((string, any) => any);
 
@@ -24,6 +23,43 @@ declare var validateAnnotation: ((string, any) => any);
   providedIn: 'root'
 })
 export class TranscriptionService {
+  public tasksBeforeSend: Promise<any>[] = [];
+  public defaultFontSize = 14;
+  public dataloaded = new EventEmitter<any>();
+  public segmentrequested = new EventEmitter<number>();
+  public filename = '';
+  public levelchanged: EventEmitter<Level> = new EventEmitter<Level>();
+  private subscrmanager: SubscriptionManager;
+  private _segments: Segments;
+  private state = 'ANNOTATED';
+  private _audiomanager: AudioManager;
+
+  get audioManager(): AudioManager {
+    return this._audiomanager;
+  }
+
+  /*
+   set segments(value: Segments) {
+   this._segments = value;
+   }
+   */
+
+  public get currentlevel(): Level {
+    return this._annotation.levels[this._selectedlevel];
+  }
+
+  private _annotation: Annotation;
+
+  get annotation(): Annotation {
+    return this._annotation;
+  }
+
+  set annotation(value: Annotation) {
+    this._annotation = value;
+  }
+
+  private _guidelines: any;
+
   get guidelines(): any {
     return this._guidelines;
   }
@@ -32,13 +68,26 @@ export class TranscriptionService {
     this._guidelines = value;
   }
 
+  private _audiofile: OAudiofile;
+
   get audiofile(): OAudiofile {
     return this._audiofile;
   }
 
+  /*
+   get segments(): Segments {
+
+   return this._segments;
+   }
+   */
+
+  private _feedback: FeedBackForm;
+
   get feedback(): FeedBackForm {
     return this._feedback;
   }
+
+  private _breakMarker: any = null;
 
   get breakMarker(): any {
     return this._breakMarker;
@@ -47,6 +96,8 @@ export class TranscriptionService {
   set breakMarker(value: any) {
     this._breakMarker = value;
   }
+
+  private _selectedlevel = 0;
 
   get selectedlevel(): number {
     return this._selectedlevel;
@@ -62,30 +113,29 @@ export class TranscriptionService {
     this.levelchanged.emit(this._annotation.levels[this._selectedlevel]);
   }
 
+  private _statistic: any = {
+    transcribed: 0,
+    empty: 0,
+    pause: 0
+  };
+
   get statistic(): any {
     return this._statistic;
   }
 
-  get annotation(): Annotation {
-    return this._annotation;
+  private _validationArray: {
+    segment: number,
+    validation: any[]
+  }[] = [];
+
+  get validationArray(): { segment: number; validation: any[] }[] {
+    return this._validationArray;
   }
 
-  set annotation(value: Annotation) {
-    this._annotation = value;
-  }
+  private _transcriptValid = false;
 
-  /*
-   set segments(value: Segments) {
-   this._segments = value;
-   }
-   */
-
-  get audioManager(): AudioManager {
-    return this._audiomanager;
-  }
-
-  public get currentlevel(): Level {
-    return this._annotation.levels[this._selectedlevel];
+  get transcriptValid(): boolean {
+    return this._transcriptValid;
   }
 
   private get app_settings(): AppSettings {
@@ -95,8 +145,6 @@ export class TranscriptionService {
   private get projectsettings(): ProjectSettings {
     return this.settingsService.projectsettings;
   }
-
-  public tasksBeforeSend: Promise<any>[] = [];
 
   constructor(private audio: AudioService,
               private appStorage: AppStorageService,
@@ -114,58 +162,6 @@ export class TranscriptionService {
       }));
   }
 
-  get validationArray(): { segment: number; validation: any[] }[] {
-    return this._validationArray;
-  }
-
-  get transcriptValid(): boolean {
-    return this._transcriptValid;
-  }
-
-  public defaultFontSize = 14;
-
-  /*
-   get segments(): Segments {
-
-   return this._segments;
-   }
-   */
-
-  public dataloaded = new EventEmitter<any>();
-  public segmentrequested = new EventEmitter<number>();
-
-  public filename = '';
-  public levelchanged: EventEmitter<Level> = new EventEmitter<Level>();
-  private subscrmanager: SubscriptionManager;
-  private _segments: Segments;
-  private state = 'ANNOTATED';
-
-  private _annotation: Annotation;
-
-  private _guidelines: any;
-
-  private _audiofile: OAudiofile;
-
-  private _feedback: FeedBackForm;
-
-  private _breakMarker: any = null;
-
-  private _selectedlevel = 0;
-
-  private _statistic: any = {
-    transcribed: 0,
-    empty: 0,
-    pause: 0
-  };
-  private _audiomanager: AudioManager;
-
-  private _validationArray: {
-    segment: number,
-    validation: any[]
-  }[] = [];
-
-  private _transcriptValid = false;
-
   public saveSegments = () => {
     // make sure, that no saving overhead exist. After saving request wait 1 second
     if (!isUnset(this._annotation)
@@ -178,14 +174,14 @@ export class TranscriptionService {
     } else {
       console.error(new Error('can not save segments because annotation is null'));
     }
-  }
+  };
   /**
    * resets the parent object values. Call this function after transcription was saved
    */
   public endTranscription = (destroyaudio: boolean = true) => {
     this.audio.destroy(destroyaudio);
     this.destroy();
-  }
+  };
 
   public getSegmentFirstLevel(): number {
     for (let i = 0; this.annotation.levels.length; i++) {
@@ -306,19 +302,19 @@ export class TranscriptionService {
             }
 
             this.appStorage.overwriteAnnotation(newLevels).then(() => {
-              if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
-                this.appStorage.annotation[this._selectedlevel].level.items = [];
+                if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
+                  this.appStorage.annotation[this._selectedlevel].level.items = [];
 
-                if (!isUnset(this.appStorage.serverDataEntry) && !isUnset(this.appStorage.serverDataEntry.transcript) && this.appStorage.serverDataEntry.transcript.length > 0) {
-                  // import logs
-                  this.appStorage.logs = this.appStorage.serverDataEntry.logtext;
+                  if (!isUnset(this.appStorage.serverDataEntry) && !isUnset(this.appStorage.serverDataEntry.transcript) && this.appStorage.serverDataEntry.transcript.length > 0) {
+                    // import logs
+                    this.appStorage.logs = this.appStorage.serverDataEntry.logtext;
 
-                  // check if servertranscript's segment is empty
-                  if (this.appStorage.serverDataEntry.transcript.length === 1 && this.appStorage.serverDataEntry[0].text === '') {
-                    this.appStorage.annotation[this.selectedlevel].level.items.push(
-                      new OSegment(0, 0, this.audioManager.ressource.info.duration.samples,
-                        [new OLabel('OCTRA_1', this.appStorage.prompttext)])
-                    );
+                    // check if servertranscript's segment is empty
+                    if (this.appStorage.serverDataEntry.transcript.length === 1 && this.appStorage.serverDataEntry[0].text === '') {
+                      this.appStorage.annotation[this.selectedlevel].level.items.push(
+                        new OSegment(0, 0, this.audioManager.ressource.info.duration.samples,
+                          [new OLabel('OCTRA_1', this.appStorage.prompttext)])
+                      );
 
                       this.appStorage.changeAnnotationLevel(this._selectedlevel,
                         this.appStorage.annotation[this._selectedlevel].level)
@@ -355,18 +351,18 @@ export class TranscriptionService {
                             resolve2();
                           }
                         );
-                  }
-                } else if (!isUnset(this.appStorage.prompttext) && this.appStorage.prompttext !== ''
-                  && typeof this.appStorage.prompttext === 'string') {
-                  // prompt text available and server transcript is null
-                  // set prompt as new transcript
+                    }
+                  } else if (!isUnset(this.appStorage.prompttext) && this.appStorage.prompttext !== ''
+                    && typeof this.appStorage.prompttext === 'string') {
+                    // prompt text available and server transcript is null
+                    // set prompt as new transcript
 
-                  // check if prompttext ist a transcription format like AnnotJSON
-                  let converted: OAnnotJSON;
-                  for (const converter of AppInfo.converters) {
-                    if (converter instanceof AnnotJSONConverter || converter instanceof PartiturConverter) {
-                      const result = converter.import({
-                        name: this._audiofile.name,
+                    // check if prompttext ist a transcription format like AnnotJSON
+                    let converted: OAnnotJSON;
+                    for (const converter of AppInfo.converters) {
+                      if (converter instanceof AnnotJSONConverter || converter instanceof PartiturConverter) {
+                        const result = converter.import({
+                          name: this._audiofile.name,
                           content: this.appStorage.prompttext,
                           type: 'text',
                           encoding: 'utf8'
@@ -450,7 +446,6 @@ export class TranscriptionService {
               this._annotation.links.push(this.appStorage.annotationLinks[i].link);
             }
 
-
             this._feedback = FeedBackForm.fromAny(this.settingsService.projectsettings.feedback_form, this.appStorage.comment);
             this._feedback.importData(this.appStorage.feedback);
 
@@ -475,7 +470,7 @@ export class TranscriptionService {
             reject(Error('annotation object in appStorage is null'));
           }
           resolve();
-        })
+        });
       }
     );
   }

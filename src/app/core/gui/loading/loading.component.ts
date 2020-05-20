@@ -1,13 +1,13 @@
-import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
-import {TranslocoService} from '@ngneat/transloco';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {AppStorageService, AudioService, OIDBLevel, SettingsService, TranscriptionService} from '../../shared/service';
-import {ActivatedRoute, Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
-import {IFile, ImportResult} from '../../obj/Converters';
-import {AppInfo} from '../../../app.info';
-import {Functions, isUnset} from '../../shared/Functions';
+import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {TranslocoService} from '@ngneat/transloco';
 import {OAudiofile, OLevel} from 'octra-components';
+import {AppInfo} from '../../../app.info';
+import {IFile, ImportResult} from '../../obj/Converters';
+import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {Functions, isUnset} from '../../shared/Functions';
+import {AppStorageService, AudioService, OIDBLevel, SettingsService, TranscriptionService} from '../../shared/service';
 
 @Component({
   selector: 'app-loading',
@@ -17,12 +17,11 @@ import {OAudiofile, OLevel} from 'octra-components';
 export class LoadingComponent implements OnInit, OnDestroy {
   @Output() loaded: boolean;
   public text = '';
-
-  private subscrmanager: SubscriptionManager = new SubscriptionManager();
   public progress = 0;
   public audioLoadingProgress = 0;
   public state = '';
   public warning = '';
+  private subscrmanager: SubscriptionManager = new SubscriptionManager();
   private loadedchanged: EventEmitter<boolean> = new EventEmitter<boolean>();
   private loadedtable: any = {
     projectconfig: false,

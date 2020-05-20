@@ -1,9 +1,9 @@
 import {AfterViewInit, Component, ComponentFactoryResolver, OnDestroy, OnInit, SecurityContext, ViewChild} from '@angular/core';
-import {interval, Subscription} from 'rxjs';
-import {AlertEntry, AlertService} from '../../shared/service/alert.service';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
-import {DynComponentDirective} from '../../shared/directive/dyn-component.directive';
 import {fadeInOnEnterAnimation, fadeOutOnLeaveAnimation} from 'angular-animations';
+import {interval, Subscription} from 'rxjs';
+import {DynComponentDirective} from '../../shared/directive/dyn-component.directive';
+import {AlertEntry, AlertService} from '../../shared/service/alert.service';
 
 @Component({
   selector: 'app-alert',
@@ -67,6 +67,26 @@ export class AlertComponent implements OnInit, OnDestroy, AfterViewInit {
     }, 500);
   }
 
+  public validate(message: string): SafeHtml {
+    return this.sanitizer.sanitize(SecurityContext.HTML, message);
+  }
+
+  public afterComponentInitialized(item: {
+    id: number;
+    instance: any;
+  }) {
+    this.alertService.alertInitialized.emit({
+      id: item.id,
+      component: item.instance
+    });
+  }
+
+  afterComponentDestroyed(item: {
+    id: number
+  }) {
+    console.log(`alert with id ${item.id}`);
+  }
+
   private removeFromQueue(entry: AlertEntry) {
     let index = this.queue.findIndex((a) => {
       return a.id === entry.id;
@@ -87,25 +107,5 @@ export class AlertComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }, 500);
     }
-  }
-
-  public validate(message: string): SafeHtml {
-    return this.sanitizer.sanitize(SecurityContext.HTML, message);
-  }
-
-  public afterComponentInitialized(item: {
-    id: number;
-    instance: any;
-  }) {
-    this.alertService.alertInitialized.emit({
-      id: item.id,
-      component: item.instance
-    })
-  }
-
-  afterComponentDestroyed(item: {
-    id: number
-  }) {
-    console.log(`alert with id ${item.id}`)
   }
 }

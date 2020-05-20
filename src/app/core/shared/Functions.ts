@@ -1,6 +1,6 @@
-import {Observable, Subject} from 'rxjs';
 import {HttpClient, HttpEventType, HttpRequest, HttpResponse} from '@angular/common/http';
 import {NavigationExtras, Router} from '@angular/router';
+import {Observable, Subject} from 'rxjs';
 
 export interface FileSize {
   size: number;

@@ -1,3 +1,7 @@
+import {NavigationExtras} from '@angular/router';
+import {OggFormat, WavFormat} from 'octra-components';
+import {EmailBugReporter} from './core/obj/BugAPI/EmailBugReporter';
+import {MantisBugReporter} from './core/obj/BugAPI/MantisBugReporter';
 import {
   AnnotJSONConverter,
   BundleJSONConverter,
@@ -8,13 +12,9 @@ import {
   PraatTextgridConverter,
   TextConverter
 } from './core/obj/Converters';
-import {MantisBugReporter} from './core/obj/BugAPI/MantisBugReporter';
-import {EmailBugReporter} from './core/obj/BugAPI/EmailBugReporter';
-import {NavigationExtras} from '@angular/router';
 import {ELANConverter} from './core/obj/Converters/ELANConverter';
 import {SRTConverter} from './core/obj/Converters/SRTConverter';
 import {WebVTTConverter} from './core/obj/Converters/WebVTTConverter';
-import {OggFormat, WavFormat} from 'octra-components';
 
 declare var octraVersion: string;
 declare var octraLastUpdated: string;

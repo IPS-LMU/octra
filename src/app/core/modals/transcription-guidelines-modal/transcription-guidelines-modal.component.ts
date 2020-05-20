@@ -9,14 +9,14 @@ import {
   ViewChild,
   ViewEncapsulation
 } from '@angular/core';
-import {Subject} from 'rxjs';
-import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {BugReportService} from '../../shared/service/bug-report.service';
-import {TranslocoService} from '@ngneat/transloco';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
-import {isUnset} from '../../shared/Functions';
+import {TranslocoService} from '@ngneat/transloco';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
+import {Subject} from 'rxjs';
+import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {isUnset} from '../../shared/Functions';
+import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
+import {BugReportService} from '../../shared/service/bug-report.service';
 
 @Component({
   selector: 'app-transcription-guidelines-modal',
@@ -158,18 +158,6 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
     this.actionperformed.next();
   }
 
-  private unCollapseAll() {
-    this.collapsed = [];
-
-    for (let i = 0; i < this.guidelines.instructions.length; i++) {
-      const elem = [];
-      for (let j = 0; j < this.guidelines.instructions[i].entries.length; j++) {
-        elem.push(true);
-      }
-      this.collapsed.push(elem);
-    }
-  }
-
   toggle(group: number, entry: number) {
     this.collapsed[group][entry] = !this.collapsed[group][entry];
   }
@@ -234,5 +222,17 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
     }
 
     return '';
+  }
+
+  private unCollapseAll() {
+    this.collapsed = [];
+
+    for (let i = 0; i < this.guidelines.instructions.length; i++) {
+      const elem = [];
+      for (let j = 0; j < this.guidelines.instructions[i].entries.length; j++) {
+        elem.push(true);
+      }
+      this.collapsed.push(elem);
+    }
   }
 }

@@ -15,6 +15,32 @@ import {
   ViewChild
 } from '@angular/core';
 import {Router} from '@angular/router';
+import {TranslocoService} from '@ngneat/transloco';
+import {AudioManager, Level, PlayBackStatus} from 'octra-components';
+import {interval, throwError} from 'rxjs';
+import * as X2JS from 'x2js';
+import {AppInfo} from '../../../app.info';
+import {editorComponents} from '../../../editors/components';
+import {OCTRAEditor} from '../../../editors/octra-editor';
+import {InactivityModalComponent} from '../../modals/inactivity-modal/inactivity-modal.component';
+import {MissingPermissionsModalComponent} from '../../modals/missing-permissions/missing-permissions.component';
+import {ModalService} from '../../modals/modal.service';
+import {OverviewModalComponent} from '../../modals/overview-modal/overview-modal.component';
+import {GeneralShortcut} from '../../modals/shortcuts-modal/shortcuts-modal.component';
+import {
+  ModalEndAnswer,
+  TranscriptionDemoEndModalComponent
+} from '../../modals/transcription-demo-end/transcription-demo-end-modal.component';
+import {TranscriptionGuidelinesModalComponent} from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
+import {TranscriptionSendingModalComponent} from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
+import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
+import {IFile, PartiturConverter} from '../../obj/Converters';
+import {parseServerDataEntry} from '../../obj/data-entry';
+import {ProjectSettings} from '../../obj/Settings';
+
+import {BrowserInfo, SubscriptionManager} from '../../shared';
+import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
+import {Functions, isUnset} from '../../shared/Functions';
 
 import {
   AlertService,
@@ -26,37 +52,9 @@ import {
   TranscriptionService,
   UserInteractionsService
 } from '../../shared/service';
-
-import {BrowserInfo, SubscriptionManager} from '../../shared';
-import {TranslocoService} from '@ngneat/transloco';
-import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
-import {ProjectSettings} from '../../obj/Settings';
-import {editorComponents} from '../../../editors/components';
-import {IFile, PartiturConverter} from '../../obj/Converters';
-import {BugReportService} from '../../shared/service/bug-report.service';
-import * as X2JS from 'x2js';
-import {ModalService} from '../../modals/modal.service';
-import {interval, throwError} from 'rxjs';
-import {TranscriptionGuidelinesModalComponent} from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
-import {NavbarService} from '../navbar/navbar.service';
-import {OverviewModalComponent} from '../../modals/overview-modal/overview-modal.component';
-import {AppInfo} from '../../../app.info';
-import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
-import {TranscriptionSendingModalComponent} from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
-import {Functions, isUnset} from '../../shared/Functions';
-import {InactivityModalComponent} from '../../modals/inactivity-modal/inactivity-modal.component';
-import {
-  ModalEndAnswer,
-  TranscriptionDemoEndModalComponent
-} from '../../modals/transcription-demo-end/transcription-demo-end-modal.component';
-import {GeneralShortcut} from '../../modals/shortcuts-modal/shortcuts-modal.component';
 import {AsrService} from '../../shared/service/asr.service';
-import {parseServerDataEntry} from '../../obj/data-entry';
-import {OCTRAEditor} from '../../../editors/octra-editor';
-import {MissingPermissionsModalComponent} from '../../modals/missing-permissions/missing-permissions.component';
-import {PlayBackStatus} from 'octra-components';
-import {AudioManager} from 'octra-components';
-import {Level} from 'octra-components';
+import {BugReportService} from '../../shared/service/bug-report.service';
+import {NavbarService} from '../navbar/navbar.service';
 
 @Component({
   selector: 'app-transcription',
@@ -66,6 +64,29 @@ import {Level} from 'octra-components';
 })
 export class TranscriptionComponent implements OnInit,
   OnDestroy, AfterViewInit, AfterContentInit, OnChanges, AfterViewChecked, AfterContentChecked, AfterContentInit {
+
+  public generalShortcuts: GeneralShortcut[] = [];
+  public waitForSend = false;
+  // TODO change to ModalComponents!
+  @ViewChild('modalShortcuts', {static: true}) modalShortcuts: any;
+  @ViewChild('modalOverview', {static: true}) modalOverview: OverviewModalComponent;
+  @ViewChild('modalDemoEnd', {static: true}) modalDemoEnd: TranscriptionDemoEndModalComponent;
+  @ViewChild(LoadeditorDirective, {static: true}) appLoadeditor: LoadeditorDirective;
+  @ViewChild('modal', {static: true}) modal: any;
+  @ViewChild('transcrSendingModal', {static: true}) transcrSendingModal: TranscriptionSendingModalComponent;
+  @ViewChild('modalGuidelines', {static: true}) modalGuidelines: TranscriptionGuidelinesModalComponent;
+  @ViewChild('inactivityModal', {static: false}) inactivityModal: InactivityModalComponent;
+  @ViewChild('missingPermissionsModal', {static: false}) missingPermissionsModal: MissingPermissionsModalComponent;
+  public sendError = '';
+  public saving = '';
+  public interface = '';
+  public editorloaded = false;
+  user: number;
+  public platform = BrowserInfo.platform;
+  private subscrmanager: SubscriptionManager;
+  private sendOk = false;
+  private levelSubscriptionID = 0;
+  private audioManager: AudioManager;
 
   public get Interface(): string {
     return this.interface;
@@ -87,6 +108,8 @@ export class TranscriptionComponent implements OnInit,
     return this.settingsService.responsive.enabled;
   }
 
+  private _currentEditor: ComponentRef<Component>;
+
   get currentEditor(): ComponentRef<Component> {
     return this._currentEditor;
   }
@@ -94,10 +117,6 @@ export class TranscriptionComponent implements OnInit,
   private get appSettings() {
     return this.settingsService.appSettings;
   }
-
-  public generalShortcuts: GeneralShortcut[] = [];
-
-  public waitForSend = false;
 
   constructor(public router: Router,
               private _componentFactoryResolver: ComponentFactoryResolver,
@@ -172,7 +191,6 @@ export class TranscriptionComponent implements OnInit,
       }
     }));
 
-
     // TODO remove this case for later versions
     this.interface = (this.appStorage.Interface === 'Editor without signal display') ? 'Dictaphone Editor' : this.appStorage.Interface;
 
@@ -213,29 +231,6 @@ export class TranscriptionComponent implements OnInit,
       this.missingPermissionsModal.open();
     }));
   }
-
-  // TODO change to ModalComponents!
-  @ViewChild('modalShortcuts', {static: true}) modalShortcuts: any;
-  @ViewChild('modalOverview', {static: true}) modalOverview: OverviewModalComponent;
-  @ViewChild('modalDemoEnd', {static: true}) modalDemoEnd: TranscriptionDemoEndModalComponent;
-  @ViewChild(LoadeditorDirective, {static: true}) appLoadeditor: LoadeditorDirective;
-  @ViewChild('modal', {static: true}) modal: any;
-  @ViewChild('transcrSendingModal', {static: true}) transcrSendingModal: TranscriptionSendingModalComponent;
-  @ViewChild('modalGuidelines', {static: true}) modalGuidelines: TranscriptionGuidelinesModalComponent;
-  @ViewChild('inactivityModal', {static: false}) inactivityModal: InactivityModalComponent;
-  @ViewChild('missingPermissionsModal', {static: false}) missingPermissionsModal: MissingPermissionsModalComponent;
-
-  public sendError = '';
-  public saving = '';
-  public interface = '';
-  public editorloaded = false;
-  user: number;
-  public platform = BrowserInfo.platform;
-  private subscrmanager: SubscriptionManager;
-  private sendOk = false;
-  private levelSubscriptionID = 0;
-  private audioManager: AudioManager;
-  private _currentEditor: ComponentRef<Component>;
 
   abortTranscription = () => {
     if ((this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo')
@@ -283,12 +278,12 @@ export class TranscriptionComponent implements OnInit,
         console.error(error);
       });
     }
-  }
+  };
 
   onSendError = (error) => {
     this.sendError = error.message;
     return throwError(error);
-  }
+  };
 
   ngOnChanges(changes: SimpleChanges) {
   }
@@ -342,7 +337,6 @@ export class TranscriptionComponent implements OnInit,
       }
     ));
 
-
     this.subscrmanager.add(this.navbarServ.interfacechange.subscribe(
       (editor) => {
         this.changeEditor(editor);
@@ -355,7 +349,6 @@ export class TranscriptionComponent implements OnInit,
     }).catch((error) => {
       console.error(error);
     });
-
 
     this.subscrmanager.add(this.appStorage.saving.subscribe(
       (saving: string) => {
@@ -721,7 +714,6 @@ export class TranscriptionComponent implements OnInit,
         const jsonStr = JSON.stringify(json.data);
         this.appStorage.serverDataEntry = parseServerDataEntry(jsonStr);
 
-
         if (this.appStorage.serverDataEntry.hasOwnProperty('transcript')) {
           if (!Array.isArray(this.appStorage.serverDataEntry.transcript)) {
             console.log(`server transcript is not array, set []`);
@@ -846,7 +838,6 @@ export class TranscriptionComponent implements OnInit,
     const url = `${host}uploadFileMulti`;
 
     form.append('file0', new File([result.content], result.name, {type: 'text/plain'}));
-
 
     const xhr = new XMLHttpRequest();
     xhr.open('POST', url);

@@ -1,17 +1,30 @@
-import {TsWorkerJob, TsWorkerStatus} from './ts-worker-job';
 import {Subject} from 'rxjs';
+import {TsWorkerJob, TsWorkerStatus} from './ts-worker-job';
 
 export class TsWorker {
+  private static workerID = 1;
+  private readonly blobURL: string;
+  private worker: Worker;
+  private status: TsWorkerStatus = TsWorkerStatus.INITIALIZED;
+  private readonly _id: number;
+
+  get id(): number {
+    return this._id;
+  }
+
+  private _queue: TsWorkerJob[] = [];
+
   get queue(): TsWorkerJob[] {
     return this._queue;
   }
 
+  /**
+   * triggers whenever a job changed its status
+   */
+  private _jobstatuschange = new Subject<TsWorkerJob>();
+
   get jobstatuschange(): Subject<TsWorkerJob> {
     return this._jobstatuschange;
-  }
-
-  get id(): number {
-    return this._id;
   }
 
   constructor() {
@@ -25,65 +38,6 @@ export class TsWorker {
       }
     ));
     this.worker = new Worker(this.blobURL);
-  }
-
-  private static workerID = 1;
-  private readonly blobURL: string;
-  private worker: Worker;
-  private _queue: TsWorkerJob[] = [];
-  private status: TsWorkerStatus = TsWorkerStatus.INITIALIZED;
-
-  private readonly _id: number;
-
-  /**
-   * triggers whenever a job changed its status
-   */
-  private _jobstatuschange = new Subject<TsWorkerJob>();
-
-  /**
-   * runs a job. This function is called automatically
-   * @param job the job to run
-   */
-  private run = (job: TsWorkerJob): Promise<any> => {
-    return new Promise<any>(
-      (resolve, reject) => {
-        this.worker.onmessage = (ev: MessageEvent) => {
-          job.statistics.ended = Date.now();
-          this.status = ev.data.status;
-
-          if (ev.data.status === 'finished') {
-            this.removeJobByID(job.id);
-            resolve(ev.data.result);
-          } else if (ev.data.status === 'failed') {
-            this.removeJobByID(job.id);
-            reject(ev.data.message);
-          }
-        };
-
-        this.worker.onerror = (err) => {
-          this.status = TsWorkerStatus.FAILED;
-          this.removeJobByID(job.id);
-          reject(err);
-        };
-
-        job.statistics.started = Date.now();
-        this.worker.postMessage({
-          command: 'run',
-          args: [this.convertJobToObj(job)]
-        });
-      }
-    );
-  }
-
-  /**
-   * converts a job to an JSON object
-   */
-  private convertJobToObj(job: TsWorkerJob) {
-    return {
-      id: job.id,
-      args: job.args,
-      doFunction: job.doFunction.toString()
-    };
   }
 
   /**
@@ -183,6 +137,52 @@ export class TsWorker {
    */
   public destroy() {
     URL.revokeObjectURL(this.blobURL);
+  }
+
+  /**
+   * runs a job. This function is called automatically
+   * @param job the job to run
+   */
+  private run = (job: TsWorkerJob): Promise<any> => {
+    return new Promise<any>(
+      (resolve, reject) => {
+        this.worker.onmessage = (ev: MessageEvent) => {
+          job.statistics.ended = Date.now();
+          this.status = ev.data.status;
+
+          if (ev.data.status === 'finished') {
+            this.removeJobByID(job.id);
+            resolve(ev.data.result);
+          } else if (ev.data.status === 'failed') {
+            this.removeJobByID(job.id);
+            reject(ev.data.message);
+          }
+        };
+
+        this.worker.onerror = (err) => {
+          this.status = TsWorkerStatus.FAILED;
+          this.removeJobByID(job.id);
+          reject(err);
+        };
+
+        job.statistics.started = Date.now();
+        this.worker.postMessage({
+          command: 'run',
+          args: [this.convertJobToObj(job)]
+        });
+      }
+    );
+  };
+
+  /**
+   * converts a job to an JSON object
+   */
+  private convertJobToObj(job: TsWorkerJob) {
+    return {
+      id: job.id,
+      args: job.args,
+      doFunction: job.doFunction.toString()
+    };
   }
 
   /**

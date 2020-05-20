@@ -1,18 +1,15 @@
 <div id="overlay-transcr" style="position:relative">
   <app-transcr-window #window (act)="onWindowAction($event)" *ngIf="showWindow"
-                      [easymode]="appStorage.easymode"
                       [audiochunk]="audioChunkWindow"
+                      [easymode]="appStorage.easymode"
                       [segmentIndex]="selectedIndex"
   ></app-transcr-window>
   <oco-audio-navigation #audionav
-                        [audioChunk]="audioChunkLines"
-                        (buttonClick)="onButtonClick($event)"
-                        (afterVolumeChange)="afterVolumeChange($event)"
                         (afterPlaybackRateChange)="afterSpeedChange($event)"
+                        (afterVolumeChange)="afterVolumeChange($event)"
+                        (buttonClick)="onButtonClick($event)"
+                        [audioChunk]="audioChunkLines"
 
-                        [volume]="appStorage.audioVolume"
-                        [playbackRate]="appStorage.audioSpeed"
-                        [responsive]="settingsService.responsive.enabled"
                         [buttons]="{
                                 play: {
                                     label: ('general.play' | transloco),
@@ -40,11 +37,20 @@
                                 }
                               }"
                         [easyMode]="appStorage.easymode"
+                        [playbackRate]="appStorage.audioSpeed"
+                        [responsive]="settingsService.responsive.enabled"
+                        [volume]="appStorage.audioVolume"
   ></oco-audio-navigation>
   <div *ngIf="appStorage.showLoupe">
     <oco-audio-viewer #loupe
                       (mousemove)="onCircleLoupeMouseOver($event)"
+                      [audioChunk]="audioChunkLoupe"
+                      [breakMarker]="{
+                        code: '<P>'
+                      }"
                       [height]="miniloupe.size.height"
+                      [isMultiLine]="false"
+                      [name]="'loupe'"
                       [ngStyle]="{
         'width': miniloupe.size.width + 'px',
         'height': miniloupe.size.height + 'px',
@@ -56,30 +62,24 @@
         'visibility': (loupeHidden) ? 'hidden' : 'inherit',
         'flex': 'auto',
         'flex-direction': 'column'}"
-                      [audioChunk]="audioChunkLoupe"
-                      [transcriptionLevel]="transcrService.currentlevel"
                       [settings]="miniLoupeSettings"
-                      [isMultiLine]="false"
-                      [breakMarker]="{
-                        code: '<P>'
-                      }"
-                      [name]="'loupe'"
+                      [transcriptionLevel]="transcrService.currentlevel"
     ></oco-audio-viewer>
   </div>
-  <div id="lines-wrapper" #linesView>
-    <oco-audio-viewer #viewer id="special"
+  <div #linesView id="lines-wrapper">
+    <oco-audio-viewer #viewer (mousecursorchange)="onMouseOver($event);"
                       (segmententer)="onSegmentEntered($event)"
-                      (mousecursorchange)="onMouseOver($event);"
                       (shortcuttriggered)="onShortCutTriggered($event, 'multi-lines-viewer')"
                       [audioChunk]="audioChunkLines"
-                      [isMultiLine]="true"
                       [breakMarker]="{
                         code: '<P>'
                       }"
-                      style="height:400px; display: flex; flex: auto; flex-direction: column;"
-
                       [height]="linesViewHeight"
+                      [isMultiLine]="true"
                       [transcriptionLevel]="transcrService.currentlevel"
+
+                      id="special"
+                      style="height:400px; display: flex; flex: auto; flex-direction: column;"
     >
     </oco-audio-viewer>
   </div>

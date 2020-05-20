@@ -1,9 +1,9 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
+import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
+import {BrowserInfo} from '../../shared';
 import {AppStorageService, KeymappingService, SettingsService} from '../../shared/service';
 import {BugReportService} from '../../shared/service/bug-report.service';
-import {BrowserInfo} from '../../shared';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 
 export interface GeneralShortcut {
   label: string;

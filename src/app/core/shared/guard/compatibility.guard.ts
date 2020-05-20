@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs';
-import {CompatibilityService} from '../service/compatibility.service';
-import {SettingsService} from '../service';
 import {AppInfo} from '../../../app.info';
 import {Functions} from '../Functions';
+import {SettingsService} from '../service';
+import {CompatibilityService} from '../service/compatibility.service';
 
 @Injectable({
   providedIn: 'root'

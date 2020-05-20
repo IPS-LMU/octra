@@ -1,35 +1,22 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {StatisticElem} from '../../obj/statistics/StatisticElement';
+import {SampleUnit} from 'octra-components';
+import {OLog} from '../../obj/Settings/logging';
 import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
+import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {Functions, isUnset} from '../Functions';
-import {OLog} from '../../obj/Settings/logging';
-import {SampleUnit} from 'octra-components';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserInteractionsService {
-  set lastAction(value: number) {
-    this._lastAction = value;
-  }
-
-  get lastAction(): number {
-    return this._lastAction;
-  }
+  private _afteradd: EventEmitter<StatisticElem> = new EventEmitter<StatisticElem>();
 
   get afteradd(): EventEmitter<StatisticElem> {
     return this._afteradd;
   }
 
-  private _afteradd: EventEmitter<StatisticElem> = new EventEmitter<StatisticElem>();
-
   private _elements: StatisticElem[];
-
-  /**
-   * timestamp of lastAction
-   */
-  private _lastAction: number;
 
   get elements(): StatisticElem[] {
     return this._elements;
@@ -37,6 +24,19 @@ export class UserInteractionsService {
 
   set elements(value: StatisticElem[]) {
     this._elements = value;
+  }
+
+  /**
+   * timestamp of lastAction
+   */
+  private _lastAction: number;
+
+  get lastAction(): number {
+    return this._lastAction;
+  }
+
+  set lastAction(value: number) {
+    this._lastAction = value;
   }
 
   private _enabled = false;

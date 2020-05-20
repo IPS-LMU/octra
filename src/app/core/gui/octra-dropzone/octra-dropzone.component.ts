@@ -1,13 +1,12 @@
 import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AudioManager, OAnnotJSON, OAudiofile, OLabel, OSegment} from 'octra-components';
 import {AppInfo} from '../../../app.info';
-import {Converter, IFile, ImportResult} from '../../obj/Converters';
 import {DropZoneComponent} from '../../component/drop-zone';
+import {ModalService} from '../../modals/modal.service';
+import {Converter, IFile, ImportResult} from '../../obj/Converters';
 import {SessionFile} from '../../obj/SessionFile';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {ModalService} from '../../modals/modal.service';
 import {FileSize, Functions, isUnset} from '../../shared/Functions';
-import {AudioManager} from 'octra-components';
-import {OAnnotJSON, OAudiofile, OLabel, OSegment} from 'octra-components';
 
 interface FileProgress {
   status: 'progress' | 'valid' | 'invalid';
@@ -24,51 +23,49 @@ interface FileProgress {
 })
 export class OctraDropzoneComponent implements OnInit, OnDestroy {
 
+  @ViewChild('dropzone', {static: true}) dropzone: DropZoneComponent;
+  @Input() height = '250px';
+  private subscrmanager: SubscriptionManager = new SubscriptionManager();
+  private _audiomanager: AudioManager;
+  private readonly maxAudioFileSize = 400;
+
   get AppInfo(): AppInfo {
     return AppInfo;
-  }
-
-  public get files(): FileProgress[] {
-    return this._files;
-  }
-
-  get oaudiofile(): OAudiofile {
-    return this._oaudiofile;
-  }
-
-  get oannotation(): OAnnotJSON {
-    return this._oannotation;
-  }
-
-  get status(): string {
-    return this._status;
   }
 
   get audioManager(): AudioManager {
     return this._audiomanager;
   }
 
-  constructor(private modService: ModalService) {
-  }
-
-  @ViewChild('dropzone', {static: true}) dropzone: DropZoneComponent;
-  @Input() height = '250px';
-  private subscrmanager: SubscriptionManager = new SubscriptionManager();
-
   public _files: FileProgress[] = [];
+
+  public get files(): FileProgress[] {
+    return this._files;
+  }
 
   private _oaudiofile: OAudiofile;
 
+  get oaudiofile(): OAudiofile {
+    return this._oaudiofile;
+  }
+
   private _oannotation: OAnnotJSON;
+
+  get oannotation(): OAnnotJSON {
+    return this._oannotation;
+  }
 
   private _status: string;
 
-  private _audiomanager: AudioManager;
-
-  private readonly maxAudioFileSize = 400;
+  get status(): string {
+    return this._status;
+  }
 
   public get fileInput() {
     return this.dropzone.fileinput;
+  }
+
+  constructor(private modService: ModalService) {
   }
 
   public afterDrop = () => {
@@ -132,35 +129,13 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
         }
       }
     }
-  }
+  };
 
   ngOnInit() {
   }
 
   ngOnDestroy() {
     this.subscrmanager.destroy();
-  }
-
-  private loadImportFileData(extension: string = null) {
-    for (let j = 0; j < this.dropzone.files.length; j++) {
-      const importfile = this.dropzone.files[j];
-
-      if (isUnset(extension)) {
-        extension = importfile.name.substr(importfile.name.lastIndexOf('.'));
-      }
-
-      this.dropFile(extension, true, true);
-
-      const newfile: FileProgress = {
-        status: 'progress',
-        file: this.dropzone.files[j],
-        checked_converters: 0,
-        progress: 0,
-        error: ''
-      };
-      this._files.push(newfile);
-      this.isValidImportData(newfile);
-    }
   }
 
   public isValidImportData(file: FileProgress) {
@@ -303,6 +278,28 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
       setTimeout(() => {
         this.dropzone.clicklocked = false;
       }, 300);
+    }
+  }
+
+  private loadImportFileData(extension: string = null) {
+    for (let j = 0; j < this.dropzone.files.length; j++) {
+      const importfile = this.dropzone.files[j];
+
+      if (isUnset(extension)) {
+        extension = importfile.name.substr(importfile.name.lastIndexOf('.'));
+      }
+
+      this.dropFile(extension, true, true);
+
+      const newfile: FileProgress = {
+        status: 'progress',
+        file: this.dropzone.files[j],
+        checked_converters: 0,
+        progress: 0,
+        error: ''
+      };
+      this._files.push(newfile);
+      this.isValidImportData(newfile);
     }
   }
 

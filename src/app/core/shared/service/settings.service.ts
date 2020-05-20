@@ -1,22 +1,35 @@
+import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
+import {Params} from '@angular/router';
+import {TranslocoService} from '@ngneat/transloco';
+import {Observable, ReplaySubject, Subject, Subscription} from 'rxjs';
 
 import {SubscriptionManager} from '../';
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
-import {Observable, ReplaySubject, Subject, Subscription} from 'rxjs';
 import {Functions, isUnset} from '../Functions';
-import {HttpClient} from '@angular/common/http';
-import {APIService} from './api.service';
-import {TranslocoService} from '@ngneat/transloco';
 import {UpdateManager} from '../UpdateManager';
-import {ActivatedRoute, Params} from '@angular/router';
+import {APIService} from './api.service';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
-import {query} from '@angular/animations';
 
 declare var validateAnnotation: ((string, any) => any);
 
 @Injectable()
 export class SettingsService {
+  public dbloaded = new EventEmitter<any>();
+  public appsettingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
+  public projectsettingsloaded: EventEmitter<any> = new EventEmitter<any>();
+  public validationmethodloaded = new EventEmitter<void>();
+  public audioloaded: EventEmitter<any> = new EventEmitter<any>();
+  public guidelinesloaded = new EventEmitter<any>();
+  public audioloading = new Subject<number>();
+  private test: ReplaySubject<boolean> = new ReplaySubject<boolean>(1);
+  public settingsloaded: Observable<boolean> = this.test.asObservable();
+  private subscrmanager: SubscriptionManager;
+  private validation: any = {
+    app: false
+  };
+
   public get isASREnabled(): boolean {
     return (!isUnset(this.appSettings.octra.plugins.asr) &&
       !isUnset(this.appSettings.octra.plugins.asr.enabled)
@@ -45,17 +58,31 @@ export class SettingsService {
     }
   }
 
+  public get allloaded(): boolean {
+    return (
+      !(this.projectsettings === null || this.projectsettings === undefined)
+    );
+  }
+
+  private _projectsettings: ProjectSettings;
+
   get projectsettings(): ProjectSettings {
     return this._projectsettings;
   }
+
+  private _appSettings: AppSettings;
 
   get appSettings(): AppSettings {
     return this._appSettings;
   }
 
+  private _guidelines: any;
+
   get guidelines(): any {
     return this._guidelines;
   }
+
+  private _loaded = false;
 
   get loaded(): boolean {
     return this._loaded;
@@ -65,6 +92,8 @@ export class SettingsService {
     this._loaded = value;
   }
 
+  private _log = '';
+
   get log(): string {
     return this._log;
   }
@@ -73,23 +102,25 @@ export class SettingsService {
     this._log = value;
   }
 
+  private _filename: string;
+
   get filename(): string {
     return this._filename;
   }
+
+  private _validationmethod: (string, any) => any[] = null;
 
   get validationmethod(): (string, any) => any[] {
     return this._validationmethod;
   }
 
+  private _tidyUpMethod: (string, any) => string = null;
+
   get tidyUpMethod(): (string, any) => string {
     return this._tidyUpMethod;
   }
 
-  public get allloaded(): boolean {
-    return (
-      !(this.projectsettings === null || this.projectsettings === undefined)
-    );
-  }
+  private _isDBLoadded = false;
 
   get isDBLoadded(): boolean {
     return this._isDBLoadded;
@@ -99,39 +130,6 @@ export class SettingsService {
               private appStorage: AppStorageService, private api: APIService, private langService: TranslocoService) {
     this.subscrmanager = new SubscriptionManager();
   }
-
-  public dbloaded = new EventEmitter<any>();
-  public appsettingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
-  public projectsettingsloaded: EventEmitter<any> = new EventEmitter<any>();
-  public validationmethodloaded = new EventEmitter<void>();
-  public audioloaded: EventEmitter<any> = new EventEmitter<any>();
-  public guidelinesloaded = new EventEmitter<any>();
-  private test: ReplaySubject<boolean> = new ReplaySubject<boolean>(1);
-  public settingsloaded: Observable<boolean> = this.test.asObservable();
-  private subscrmanager: SubscriptionManager;
-  private validation: any = {
-    app: false
-  };
-
-  public audioloading = new Subject<number>();
-
-  private _projectsettings: ProjectSettings;
-
-  private _appSettings: AppSettings;
-
-  private _guidelines: any;
-
-  private _loaded = false;
-
-  private _log = '';
-
-  private _filename: string;
-
-  private _validationmethod: (string, any) => any[] = null;
-
-  private _tidyUpMethod: (string, any) => string = null;
-
-  private _isDBLoadded = false;
 
   public static queryParamsSet(queryParams: Params): boolean {
     return (
@@ -218,7 +216,6 @@ export class SettingsService {
             this.appStorage.LoggedIn = true;
           }
 
-
           if (this.validated) {
 
             // settings have been loaded
@@ -242,7 +239,7 @@ export class SettingsService {
       this.dbloaded.error(error);
       console.error(error.target.error);
     });
-  }
+  };
 
   public loadProjectSettings: () => Promise<void> = () => {
     return new Promise<void>((resolve, reject) => {
@@ -272,7 +269,7 @@ export class SettingsService {
         }
       );
     });
-  }
+  };
 
   public loadGuidelines = (language: string, url: string) => {
     this.loadSettings(
@@ -299,7 +296,7 @@ export class SettingsService {
         console.error(error);
       }
     );
-  }
+  };
   public loadValidationMethod: ((url: string) => Subscription) = (url: string) => {
     console.log('Load methods...');
     return Functions.uniqueHTTPRequest(this.http, false, {
@@ -331,7 +328,7 @@ export class SettingsService {
         this.validationmethodloaded.emit();
       }
     );
-  }
+  };
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
     console.log('Load audio file 2...');
     if ((this.appStorage.usemode === null || this.appStorage.usemode === undefined)) {
@@ -388,13 +385,7 @@ export class SettingsService {
         console.error('session file is null.');
       }
     }
-  }
-  private triggerSettingsLoaded = () => {
-    if (this.validated) {
-      this.loaded = true;
-      this.test.next(true);
-    }
-  }
+  };
 
   public loadApplicationSettings(queryParams: any): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -448,6 +439,43 @@ export class SettingsService {
     this._tidyUpMethod = null;
   }
 
+  /**
+   * checks jif the specific theme is active
+   */
+  public isTheme(theme: string) {
+    const selectedTheme = (
+      isUnset(this.projectsettings.octra)
+      || isUnset(this.projectsettings.octra.theme)
+    )
+      ? 'default' : this.projectsettings.octra.theme;
+
+    return (selectedTheme === theme);
+  }
+
+  public getAudioExample(language: string) {
+    if (!isUnset(this.appSettings.octra.audioExamples)) {
+      let example = this.appSettings.octra.audioExamples.find(
+        (a) => {
+          return a.language === language;
+        });
+
+      if (example === undefined) {
+        example = this.appSettings.octra.audioExamples[0];
+      }
+
+      return example;
+    }
+
+    return undefined;
+  }
+
+  private triggerSettingsLoaded = () => {
+    if (this.validated) {
+      this.loaded = true;
+      this.test.next(true);
+    }
+  };
+
   private loadSettings(messages: any, urls: any, filenames: any, onhttpreturn: (any) => void, onvalidated: () => void,
                        onerror: (error: string) => void) {
     if (
@@ -482,35 +510,5 @@ export class SettingsService {
     } else {
       throw new Error('parameters of loadSettings() are not correct.');
     }
-  }
-
-  /**
-   * checks jif the specific theme is active
-   */
-  public isTheme(theme: string) {
-    const selectedTheme = (
-      isUnset(this.projectsettings.octra)
-      || isUnset(this.projectsettings.octra.theme)
-    )
-      ? 'default' : this.projectsettings.octra.theme;
-
-    return (selectedTheme === theme);
-  }
-
-  public getAudioExample(language: string) {
-    if (!isUnset(this.appSettings.octra.audioExamples)) {
-      let example = this.appSettings.octra.audioExamples.find(
-        (a) => {
-          return a.language === language;
-        });
-
-      if (example === undefined) {
-        example = this.appSettings.octra.audioExamples[0];
-      }
-
-      return example;
-    }
-
-    return undefined;
   }
 }

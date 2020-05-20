@@ -1,16 +1,16 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {APIService, AppStorageService, SettingsService} from './core/shared/service';
-import {SubscriptionManager} from './core/obj/SubscriptionManager';
-import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
-import {AppInfo} from './app.info';
-import {environment} from '../environments/environment';
 import {ActivatedRoute, Router} from '@angular/router';
+import {TranslocoService} from '@ngneat/transloco';
+import {environment} from '../environments/environment';
+import {AppInfo} from './app.info';
 import {NavigationComponent} from './core/gui/navbar';
+import {ASRLanguage} from './core/obj/Settings';
+import {SubscriptionManager} from './core/obj/SubscriptionManager';
 import {isUnset} from './core/shared/Functions';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
+import {APIService, AppStorageService, SettingsService} from './core/shared/service';
 import {AsrService} from './core/shared/service/asr.service';
-import {ASRLanguage} from './core/obj/Settings';
-import {TranslocoService} from '@ngneat/transloco';
+import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
 
 @Component({
   selector: 'app-octra',
@@ -20,8 +20,9 @@ import {TranslocoService} from '@ngneat/transloco';
 
 export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
 
-  private subscrmanager: SubscriptionManager = new SubscriptionManager();
   @ViewChild('navigation', {static: true}) navigation: NavigationComponent;
+  private subscrmanager: SubscriptionManager = new SubscriptionManager();
+  private loggedIn = false;
 
   public get version(): string {
     return AppInfo.version;
@@ -34,8 +35,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
   public get isLoggedIn() {
     return this.loggedIn;
   }
-
-  private loggedIn = false;
 
   constructor(private api: APIService,
               private langService: TranslocoService,
@@ -53,7 +52,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       const serv = this.bugService;
       (() => {
         // tslint:disable-next-line:only-arrow-functions
-        console.log = function (message) {
+        console.log = function(message) {
           serv.addEntry(ConsoleType.LOG, message);
           oldLog.apply(console, arguments);
         };
@@ -63,7 +62,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       const oldError = console.error;
       (() => {
         // tslint:disable-next-line:only-arrow-functions
-        console.error = function (error, context) {
+        console.error = function(error, context) {
           let debug = '';
           let stack = '';
 
@@ -101,7 +100,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       const oldWarn = console.warn;
       (() => {
         // tslint:disable-next-line:only-arrow-functions
-        console.warn = function (message) {
+        console.warn = function(message) {
           serv.addEntry(ConsoleType.WARN, message);
           oldWarn.apply(console, arguments);
         };
@@ -163,7 +162,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
         this.appendTrackingCode(this.settingsService.appSettings.octra.tracking.active);
       }
 
-
     }).catch((error) => {
       console.error(error);
     });
@@ -207,22 +205,28 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
     });
   }
 
-  private getParameterByName(name, url = null) {
-    if (!url) url = document.location.href;
-    name = name.replace(/[\[\]]/g, '\\$&');
-    const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-      results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, ' '));
-  }
-
   queryParamsSet(route: ActivatedRoute): boolean {
     const params = this.route.snapshot.queryParams;
     return (
       params.hasOwnProperty('audio') &&
       params.hasOwnProperty('embedded')
     );
+  }
+
+  private getParameterByName(name, url = null) {
+    if (!url) {
+      url = document.location.href;
+    }
+    name = name.replace(/[\[\]]/g, '\\$&');
+    const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+      results = regex.exec(url);
+    if (!results) {
+      return null;
+    }
+    if (!results[2]) {
+      return '';
+    }
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
   }
 
   private setFixedWidth() {

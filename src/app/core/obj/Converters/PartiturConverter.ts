@@ -1,5 +1,5 @@
-import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 import {OAnnotJSON, OAudiofile, OItem, OLabel, OLevel, OSegment} from 'octra-components';
+import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 
 export class PartiturConverter extends Converter {
 

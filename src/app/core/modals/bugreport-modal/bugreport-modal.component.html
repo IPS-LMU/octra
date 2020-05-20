@@ -1,10 +1,11 @@
-<div bsModal #modal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1"
-     id="bugreport" (onHide)="hide()" (onShown)="onShown()" (onHidden)="onHidden()">
+<div #modal="bs-modal" (onHidden)="onHidden()" (onHide)="hide()" (onShown)="onShown()"
+     aria-labelledby="dialog-sizes-name1" bsModal
+     class="modal fade" id="bugreport" role="dialog" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 id="dialog-sizes-name1" class="modal-title pull-left">{{'bug report.give feedback' | transloco}}</h3>
-        <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+        <h3 class="modal-title pull-left" id="dialog-sizes-name1">{{'bug report.give feedback' | transloco}}</h3>
+        <button (click)="close()" aria-label="Close" class="close pull-right" type="button">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -12,43 +13,44 @@
         <p>
           {{"bug report.description" | transloco}}
         </p>
-        <div *ngIf="sendStatus === 'error'" class="alert alert-danger bugsent" [innerHTML]="'bug report.error' | transloco : {
+        <div *ngIf="sendStatus === 'error'" [innerHTML]="'bug report.error' | transloco : {
           email: '<a href=\'mailto:octra@phonetik.uni-muenchen.de?body=' + bgdescr +'\'>octra@phonetik.uni-muenchen.de</a>'
-        }"></div>
+        }" class="alert alert-danger bugsent"></div>
         <div *ngIf="sendStatus === 'success'"
              class="alert alert-success bugsent">{{'bug report.sent' | transloco}}</div>
 
         <form>
           <div class="form-row">
             <div class="col-6">
-              <div class="form-group" [ngClass]="{
+              <div [ngClass]="{
               'is-filled': userName !== ''
-              }">
-                <label for="inputName" class="bmd-label-floating">{{'general.name' | transloco}}</label>
-                <input type="text" [(ngModel)]="userName" name="name" class="form-control" id="inputName" email>
+              }" class="form-group">
+                <label class="bmd-label-floating" for="inputName">{{'general.name' | transloco}}</label>
+                <input [(ngModel)]="userName" class="form-control" email id="inputName" name="name" type="text">
               </div>
             </div>
             <div class="col-6">
-              <div class="form-group" [ngClass]="{
+              <div [ngClass]="{
               'is-filled': email !== ''
-              }">
-                <label for="inputEmail" class="bmd-label-floating">{{'general.email' |
+              }" class="form-group">
+                <label class="bmd-label-floating" for="inputEmail">{{'general.email' |
                   transloco}}</label>
 
-                <input [(ngModel)]="email" name="email" class="form-control" id="inputEmail"
-                       type="email" email>
+                <input [(ngModel)]="email" class="form-control" email id="inputEmail"
+                       name="email" type="email">
               </div>
             </div>
           </div>
           <div class="form-row">
             <div class="col-12">
               <div class="form-group" style="margin-top:-20px;margin-bottom:20px;">
-                <label for="bgDescr" class="bmd-label-floating">{{'general.description' |
+                <label class="bmd-label-floating" for="bgDescr">{{'general.description' |
                   transloco}}</label>
 
-                <textarea [(ngModel)]="bgdescr" name="bgdescr" class="form-control" rows="3" id="bgDescr"
-                          maxlength="1000" aria-describedby="descrHelp"></textarea>
-                <small id="descrHelp" class="form-text text-muted">(German or English)</small>
+                <textarea [(ngModel)]="bgdescr" aria-describedby="descrHelp" class="form-control" id="bgDescr"
+                          maxlength="1000"
+                          name="bgdescr" rows="3"></textarea>
+                <small class="form-text text-muted" id="descrHelp">(German or English)</small>
               </div>
             </div>
           </div>
@@ -59,20 +61,21 @@
                 <label>{{'general.screenshots' |
                   transloco}} (optional):</label><br/>
                 <div class="preview-images">
-                  <div *ngFor="let screenshot of screenshots; let i = index;"
-                       class="upload-screenshot" (click)="selectFileForUpload(uploadInput2)">
-                    <span class="cross rounded-circle" (click)="removeScreenshot(i)">X</span>
-                    <input #uploadInput2 type="file" name="upload" (change)="onFileChange($event)"
-                           style="display: none;" accept=".jpg, .png, .jpeg|image/*"/>
-                    <img class="preview-image"
-                         *ngIf="screenshot.previewURL !== ''"
-                         [src]="screenshot.previewURL"/>
+                  <div (click)="selectFileForUpload(uploadInput2)"
+                       *ngFor="let screenshot of screenshots; let i = index;" class="upload-screenshot">
+                    <span (click)="removeScreenshot(i)" class="cross rounded-circle">X</span>
+                    <input #uploadInput2 (change)="onFileChange($event)" accept=".jpg, .png, .jpeg|image/*"
+                           name="upload"
+                           style="display: none;" type="file"/>
+                    <img *ngIf="screenshot.previewURL !== ''"
+                         [src]="screenshot.previewURL"
+                         class="preview-image"/>
                   </div>
-                  <div *ngIf="screenshots.length < 4"
-                       class="upload-screenshot" (click)="selectFileForUpload(uploadInput)">
-                    <input #uploadInput type="file" name="upload" (change)="onFileChange($event)"
-                           style="display: none;"/>
-                    <fa-icon icon="plus" [size]="'2x'"></fa-icon>
+                  <div (click)="selectFileForUpload(uploadInput)"
+                       *ngIf="screenshots.length < 4" class="upload-screenshot">
+                    <input #uploadInput (change)="onFileChange($event)" name="upload" style="display: none;"
+                           type="file"/>
+                    <fa-icon [size]="'2x'" icon="plus"></fa-icon>
                   </div>
                 </div>
                 <div class="clearfix"></div>
@@ -85,17 +88,17 @@
               <div class="form-group" style="padding-top:0;margin-bottom: 0;">
                 <div class="checkbox">
                   <label>
-                    <input [(ngModel)]="sendProObj" name="sendpro" #sendpro type="checkbox"
-                           checked>
+                    <input #sendpro [(ngModel)]="sendProObj" checked name="sendpro"
+                           type="checkbox">
                     {{"bug report.send protocol" | transloco}}
                   </label>
                 </div>
               </div>
-              <div class="form-group" [hidden]="!sendpro.checked" style="padding-top:0;margin-top:0;">
+              <div [hidden]="!sendpro.checked" class="form-group" style="padding-top:0;margin-top:0;">
                 <span>{{'general.protocol' | transloco}}:</span>
-                <textarea class="form-control" #bgProtocol id="bgProtocol"
-                          [innerHTML]="(visible) ? bugService.getText(): ''"
-                          disabled>
+                <textarea #bgProtocol [innerHTML]="(visible) ? bugService.getText(): ''" class="form-control"
+                          disabled
+                          id="bgProtocol">
                 </textarea>
               </div>
             </div>
@@ -103,11 +106,11 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="close()">
+        <button (click)="close()" class="btn btn-secondary" type="button">
           {{"general.abort" | transloco}}
         </button>
-        <button type="button" class="btn btn-primary" (click)="sendBugReport();"
-                [disabled]="!isvalid || sendStatus === 'sending'">
+        <button (click)="sendBugReport();" [disabled]="!isvalid || sendStatus === 'sending'" class="btn btn-primary"
+                type="button">
           {{"bug report.give feedback" | transloco}}
         </button>
       </div>

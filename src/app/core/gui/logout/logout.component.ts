@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 
 import {Router} from '@angular/router';
-import {AppStorageService, SettingsService} from '../../shared/service';
 import {AppInfo} from '../../../app.info';
 import {Functions} from '../../shared/Functions';
+import {AppStorageService, SettingsService} from '../../shared/service';
 
 @Component({
 

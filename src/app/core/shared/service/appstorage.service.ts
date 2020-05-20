@@ -1,14 +1,13 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {SessionFile} from '../../obj/SessionFile';
-import {AppInfo} from '../../../app.info';
-import {IndexedDBManager} from '../../obj/IndexedDBManager';
 import {LocalStorageService, SessionStorage, SessionStorageService} from '@rars/ngx-webstorage';
-import {isUnset} from '../Functions';
+import {AudioManager, OLevel, OLink} from 'octra-components';
 import {Subject} from 'rxjs';
+import {AppInfo} from '../../../app.info';
 import {IDataEntry} from '../../obj/data-entry';
+import {IndexedDBManager} from '../../obj/IndexedDBManager';
+import {SessionFile} from '../../obj/SessionFile';
+import {isUnset} from '../Functions';
 import {ConsoleEntry} from './bug-report.service';
-import {AudioManager} from 'octra-components';
-import {OLevel, OLink} from 'octra-components';
 
 export interface IIDBLevel {
   id: number;
@@ -45,61 +44,25 @@ export class OIDBLink implements IIDBLink {
 
 @Injectable()
 export class AppStorageService {
-  get userProfile(): { userName: string; email: string } {
-    return this._userProfile;
-  }
-
-  set userProfile(value: { userName: string; email: string }) {
-    this._idb.save('options', 'userProfile', {value}).catch((err) => {
-      console.error(err);
-    });
-    this._userProfile = value;
-  }
-
-  set logs(value: any[]) {
-    this._idb.saveArraySequential(value, 'logs', 'timestamp').catch((err) => {
-      console.error(err);
-    });
-    this._logs = value;
-  }
-
-  set savingNeeded(value: boolean) {
-    this._savingNeeded = value;
-  }
-
-  get savingNeeded(): boolean {
-    return this._savingNeeded;
-  }
-
-  get isSaving(): boolean {
-    return this._isSaving;
-  }
-
-  get secondsPerLine(): number {
-    return this._secondsPerLine;
-  }
-
-  set secondsPerLine(value: number) {
-    this._secondsPerLine = value;
-    this.settingschange.next({
-      key: 'secondsPerLine',
-      value
-    });
-    this.idb.save('options', 'secondsPerLine', {value}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  get servercomment(): string {
-    return this._servercomment;
-  }
-
-  set servercomment(value: string) {
-    this._servercomment = value;
-    this.idb.save('options', 'servercomment', {value}).catch((err) => {
-      console.error(err);
-    });
-  }
+  // SESSION STORAGE
+  @SessionStorage('sessionKey') sessionKey: string;
+  @SessionStorage() _loggedIn: boolean;
+  @SessionStorage() logInTime: number; // timestamp
+  @SessionStorage('jobsLeft') jobsLeft: number;
+  public saving: EventEmitter<string> = new EventEmitter<string>();
+  public loginActivityChanged = new Subject<boolean>();
+  public settingschange = new Subject<{ key: string, value: any }>();
+  private _audioSettings = {
+    volume: 1,
+    speed: 1
+  };
+  private _interface: string = null;
+  // is user on the login page?
+  private login: boolean;
+  private _asr = {
+    selectedLanguage: null,
+    selectedService: null
+  };
 
   get Interface(): string {
     return this._interface;
@@ -108,151 +71,6 @@ export class AppStorageService {
   set Interface(newInterface: string) {
     this._interface = newInterface;
     this.idb.save('options', 'interface', {value: newInterface}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  get followplaycursor(): boolean {
-    return this._followplaycursor;
-  }
-
-  set followplaycursor(value: boolean) {
-    this._followplaycursor = value;
-  }
-
-  get agreement(): any {
-    return this._agreement;
-  }
-
-  set agreement(value: any) {
-    this._agreement = value;
-  }
-
-  get playonhover(): boolean {
-    return this._playonhover;
-  }
-
-  set playonhover(value: boolean) {
-    this._playonhover = value;
-  }
-
-  get reloaded(): boolean {
-    return this._reloaded;
-  }
-
-  set reloaded(value: boolean) {
-    this._reloaded = value;
-  }
-
-  get email(): string {
-    return this._email;
-  }
-
-  set email(value: string) {
-    this._email = value;
-  }
-
-  get idbloaded(): boolean {
-    return this._idbloaded;
-  }
-
-  get loaded(): EventEmitter<any> {
-    return this._loaded;
-  }
-
-  get idb(): IndexedDBManager {
-    return this._idb;
-  }
-
-  /* Getter/Setter SessionStorage */
-  get serverDataEntry(): IDataEntry {
-    return this._serverDataEntry;
-  }
-
-  set serverDataEntry(value: IDataEntry) {
-    this._serverDataEntry = value;
-  }
-
-  get submitted(): boolean {
-    return this._submitted;
-  }
-
-  set submitted(value: boolean) {
-    this._submitted = value;
-    this.idb.save('options', 'submitted', {value}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  get feedback(): any {
-    return this._feedback;
-  }
-
-  set feedback(value: any) {
-    this._feedback = value;
-    this._idb.save('options', 'feedback', {value}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  get logs(): any[] {
-    return this._logs;
-  }
-
-  get dataID(): number {
-    return this._dataID;
-  }
-
-  set dataID(value: number) {
-    this._dataID = value;
-    this.idb.save('options', 'dataID', {value}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  get audioURL(): string {
-    return this._audioURL;
-  }
-
-  set audioURL(value: string) {
-    this._audioURL = value;
-    if (this.usemode !== 'url') {
-      this.idb.save('options', 'audioURL', {value}).catch((err) => {
-        console.error(err);
-      });
-    }
-  }
-
-  get usemode(): 'online' | 'local' | 'url' | 'demo' {
-    return this._usemode;
-  }
-
-  set usemode(value: 'online' | 'local' | 'url' | 'demo') {
-    this._usemode = value;
-    this.idb.save('options', 'usemode', {value}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  get sessionfile(): SessionFile {
-    return SessionFile.fromAny(this._sessionfile);
-  }
-
-  set sessionfile(value: SessionFile) {
-    this._sessionfile = (!(value === null || value === undefined)) ? value.toAny() : null;
-    this.idb.save('options', 'sessionfile', {value: this._sessionfile})
-      .catch((err) => {
-        console.error(err);
-      });
-  }
-
-  get language(): string {
-    return this._language;
-  }
-
-  set language(value: string) {
-    this._language = value;
-    this.idb.save('options', 'language', {value}).catch((err) => {
       console.error(err);
     });
   }
@@ -279,58 +97,109 @@ export class AppStorageService {
     });
   }
 
-  /* Getter/Setter IDB Storage */
-  get version(): string {
-    return this._version;
+  get LoggedIn(): boolean {
+    return this._loggedIn;
   }
 
-  set version(value: string) {
-    this._version = value;
-    this._idb.save('options', 'version', {value}).catch((err) => {
+  set LoggedIn(value: boolean) {
+    this.loginActivityChanged.next(value);
+    this._loggedIn = value;
+  }
+
+  public get audioVolume(): number {
+    if (!isUnset(this._audioSettings) && !isUnset(this._audioSettings.volume)) {
+      return this._audioSettings.volume;
+    }
+    return 1;
+  }
+
+  public set audioVolume(value: number) {
+    this._audioSettings.volume = value;
+
+    this.idb.save('options', 'audioSettings', {value: this._audioSettings}).catch((err) => {
       console.error(err);
     });
   }
 
-  get logging(): boolean {
-    return this._logging;
+  public get audioSpeed(): number {
+    if (!isUnset(this._audioSettings) && !isUnset(this._audioSettings.speed)) {
+      return this._audioSettings.speed;
+    }
+    return 1;
   }
 
-  set logging(value: boolean) {
-    this._logging = value;
-    this._idb.save('options', 'logging', {value}).catch((err) => {
+  public set audioSpeed(value: number) {
+    this._audioSettings.speed = value;
+
+    this.idb.save('options', 'audioSettings', {value: this._audioSettings}).catch((err) => {
       console.error(err);
     });
   }
 
-  get showLoupe(): boolean {
-    return this._showLoupe;
+  private _savingNeeded = false;
+
+  get savingNeeded(): boolean {
+    return this._savingNeeded;
   }
 
-  set showLoupe(value: boolean) {
-    this._showLoupe = value;
-    this._idb.save('options', 'showLoupe', {value}).catch((err) => {
-      console.error(err);
-    });
+  set savingNeeded(value: boolean) {
+    this._savingNeeded = value;
   }
 
-  get prompttext(): string {
-    return this._prompttext;
+  private _isSaving = false;
+
+  get isSaving(): boolean {
+    return this._isSaving;
   }
 
-  set prompttext(value: string) {
-    this._prompttext = value;
-    this._idb.save('options', 'prompttext', {value}).catch((err) => {
-      console.error(err);
-    });
+  @SessionStorage('followplaycursor') private _followplaycursor: boolean;
+
+  get followplaycursor(): boolean {
+    return this._followplaycursor;
   }
 
-  get urlParams(): any {
-    return this._urlParams;
+  set followplaycursor(value: boolean) {
+    this._followplaycursor = value;
   }
 
-  set urlParams(value: any) {
-    this._urlParams = value;
+  // IDB STORAGE
+  private _idbloaded = false;
+
+  get idbloaded(): boolean {
+    return this._idbloaded;
   }
+
+  private _loaded = new EventEmitter();
+
+  get loaded(): EventEmitter<any> {
+    return this._loaded;
+  }
+
+  private _idb: IndexedDBManager;
+
+  get idb(): IndexedDBManager {
+    return this._idb;
+  }
+
+  private _sessionfile: any = null;
+
+  get sessionfile(): SessionFile {
+    return SessionFile.fromAny(this._sessionfile);
+  }
+
+  set sessionfile(value: SessionFile) {
+    this._sessionfile = (!(value === null || value === undefined)) ? value.toAny() : null;
+    this.idb.save('options', 'sessionfile', {value: this._sessionfile})
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
+  private _user: {
+    id: string,
+    project: string,
+    jobno: number
+  } = null;
 
   get user(): {
     id: string,
@@ -351,6 +220,234 @@ export class AppStorageService {
     });
   }
 
+  private _userProfile: {
+    userName: string,
+    email: string
+  } = {
+    userName: '',
+    email: ''
+  };
+
+  get userProfile(): { userName: string; email: string } {
+    return this._userProfile;
+  }
+
+  set userProfile(value: { userName: string; email: string }) {
+    this._idb.save('options', 'userProfile', {value}).catch((err) => {
+      console.error(err);
+    });
+    this._userProfile = value;
+  }
+
+  @SessionStorage('agreement') private _agreement: any;
+
+  get agreement(): any {
+    return this._agreement;
+  }
+
+  set agreement(value: any) {
+    this._agreement = value;
+  }
+
+  @SessionStorage('playonhover') private _playonhover: boolean;
+
+  get playonhover(): boolean {
+    return this._playonhover;
+  }
+
+  set playonhover(value: boolean) {
+    this._playonhover = value;
+  }
+
+  @SessionStorage('reloaded') private _reloaded: boolean;
+
+  get reloaded(): boolean {
+    return this._reloaded;
+  }
+
+  set reloaded(value: boolean) {
+    this._reloaded = value;
+  }
+
+  @SessionStorage('email') private _email: string;
+
+  get email(): string {
+    return this._email;
+  }
+
+  set email(value: string) {
+    this._email = value;
+  }
+
+  @SessionStorage('serverDataEntry') private _serverDataEntry: IDataEntry;
+
+  /* Getter/Setter SessionStorage */
+  get serverDataEntry(): IDataEntry {
+    return this._serverDataEntry;
+  }
+
+  set serverDataEntry(value: IDataEntry) {
+    this._serverDataEntry = value;
+  }
+
+  private _submitted: boolean = null;
+
+  get submitted(): boolean {
+    return this._submitted;
+  }
+
+  set submitted(value: boolean) {
+    this._submitted = value;
+    this.idb.save('options', 'submitted', {value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  private _feedback: any = null;
+
+  get feedback(): any {
+    return this._feedback;
+  }
+
+  set feedback(value: any) {
+    this._feedback = value;
+    this._idb.save('options', 'feedback', {value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  private _logs: any[] = [];
+
+  get logs(): any[] {
+    return this._logs;
+  }
+
+  set logs(value: any[]) {
+    this._idb.saveArraySequential(value, 'logs', 'timestamp').catch((err) => {
+      console.error(err);
+    });
+    this._logs = value;
+  }
+
+  private _dataID: number = null;
+
+  get dataID(): number {
+    return this._dataID;
+  }
+
+  set dataID(value: number) {
+    this._dataID = value;
+    this.idb.save('options', 'dataID', {value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  private _audioURL: string = null;
+
+  get audioURL(): string {
+    return this._audioURL;
+  }
+
+  set audioURL(value: string) {
+    this._audioURL = value;
+    if (this.usemode !== 'url') {
+      this.idb.save('options', 'audioURL', {value}).catch((err) => {
+        console.error(err);
+      });
+    }
+  }
+
+  private _usemode: 'local' | 'online' | 'url' | 'demo' = null;
+
+  get usemode(): 'online' | 'local' | 'url' | 'demo' {
+    return this._usemode;
+  }
+
+  set usemode(value: 'online' | 'local' | 'url' | 'demo') {
+    this._usemode = value;
+    this.idb.save('options', 'usemode', {value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  private _language = null;
+
+  get language(): string {
+    return this._language;
+  }
+
+  set language(value: string) {
+    this._language = value;
+    this.idb.save('options', 'language', {value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  private _version: string = null;
+
+  /* Getter/Setter IDB Storage */
+  get version(): string {
+    return this._version;
+  }
+
+  set version(value: string) {
+    this._version = value;
+    this._idb.save('options', 'version', {value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  private _logging = false;
+
+  get logging(): boolean {
+    return this._logging;
+  }
+
+  set logging(value: boolean) {
+    this._logging = value;
+    this._idb.save('options', 'logging', {value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  private _showLoupe = false;
+
+  get showLoupe(): boolean {
+    return this._showLoupe;
+  }
+
+  set showLoupe(value: boolean) {
+    this._showLoupe = value;
+    this._idb.save('options', 'showLoupe', {value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  private _prompttext = '';
+
+  get prompttext(): string {
+    return this._prompttext;
+  }
+
+  set prompttext(value: string) {
+    this._prompttext = value;
+    this._idb.save('options', 'prompttext', {value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  private _urlParams: any = {};
+
+  get urlParams(): any {
+    return this._urlParams;
+  }
+
+  set urlParams(value: any) {
+    this._urlParams = value;
+  }
+
+  private _easymode = false;
+
   get easymode(): boolean {
     return this._easymode;
   }
@@ -361,6 +458,8 @@ export class AppStorageService {
       console.error(err);
     });
   }
+
+  private _comment = '';
 
   get comment(): string {
     return this._comment;
@@ -373,136 +472,57 @@ export class AppStorageService {
     });
   }
 
+  private _servercomment = '';
+
+  get servercomment(): string {
+    return this._servercomment;
+  }
+
+  set servercomment(value: string) {
+    this._servercomment = value;
+    this.idb.save('options', 'servercomment', {value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  private _annotation: OIDBLevel[] = null;
+
   get annotation(): OIDBLevel[] {
     return this._annotation;
   }
+
+  private _annotationLinks: OIDBLink[] = null;
 
   get annotationLinks(): OIDBLink[] {
     return this._annotationLinks;
   }
 
+  private _levelcounter = 0;
+
   get levelcounter(): number {
     return this._levelcounter;
   }
 
-  get LoggedIn(): boolean {
-    return this._loggedIn;
+  private _secondsPerLine = 5;
+
+  get secondsPerLine(): number {
+    return this._secondsPerLine;
   }
 
-  set LoggedIn(value: boolean) {
-    this.loginActivityChanged.next(value);
-    this._loggedIn = value;
-  }
-
-  private _audioSettings = {
-    volume: 1,
-    speed: 1
-  };
-
-  public set audioVolume(value: number) {
-    this._audioSettings.volume = value;
-
-    this.idb.save('options', 'audioSettings', {value: this._audioSettings}).catch((err) => {
+  set secondsPerLine(value: number) {
+    this._secondsPerLine = value;
+    this.settingschange.next({
+      key: 'secondsPerLine',
+      value
+    });
+    this.idb.save('options', 'secondsPerLine', {value}).catch((err) => {
       console.error(err);
     });
   }
-
-  public get audioVolume(): number {
-    if (!isUnset(this._audioSettings) && !isUnset(this._audioSettings.volume)) {
-      return this._audioSettings.volume;
-    }
-    return 1;
-  }
-
-  public set audioSpeed(value: number) {
-    this._audioSettings.speed = value;
-
-    this.idb.save('options', 'audioSettings', {value: this._audioSettings}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  public get audioSpeed(): number {
-    if (!isUnset(this._audioSettings) && !isUnset(this._audioSettings.speed)) {
-      return this._audioSettings.speed;
-    }
-    return 1;
-  }
-
-  private _savingNeeded = false;
 
   constructor(public sessStr: SessionStorageService,
               public localStr: LocalStorageService) {
   }
-
-  // SESSION STORAGE
-  @SessionStorage('sessionKey') sessionKey: string;
-
-  @SessionStorage() _loggedIn: boolean;
-  @SessionStorage() logInTime: number; // timestamp
-  @SessionStorage('jobsLeft') jobsLeft: number;
-
-  public saving: EventEmitter<string> = new EventEmitter<string>();
-  private _isSaving = false;
-
-  private _interface: string = null;
-  // is user on the login page?
-  private login: boolean;
-
-  @SessionStorage('followplaycursor') private _followplaycursor: boolean;
-  // IDB STORAGE
-  private _idbloaded = false;
-  private _loaded = new EventEmitter();
-  private _idb: IndexedDBManager;
-  private _sessionfile: any = null;
-  private _user: {
-    id: string,
-    project: string,
-    jobno: number
-  } = null;
-
-  private _userProfile: {
-    userName: string,
-    email: string
-  } = {
-    userName: '',
-    email: ''
-  };
-
-  @SessionStorage('agreement') private _agreement: any;
-  @SessionStorage('playonhover') private _playonhover: boolean;
-  @SessionStorage('reloaded') private _reloaded: boolean;
-  @SessionStorage('email') private _email: string;
-  @SessionStorage('serverDataEntry') private _serverDataEntry: IDataEntry;
-
-  private _submitted: boolean = null;
-  private _feedback: any = null;
-  private _logs: any[] = [];
-  private _dataID: number = null;
-  private _audioURL: string = null;
-  private _usemode: 'local' | 'online' | 'url' | 'demo' = null;
-  private _language = null;
-  private _version: string = null;
-  private _logging = false;
-  private _showLoupe = false;
-  private _prompttext = '';
-  private _urlParams: any = {};
-  private _easymode = false;
-  private _comment = '';
-  private _servercomment = '';
-  private _annotation: OIDBLevel[] = null;
-  private _annotationLinks: OIDBLink[] = null;
-  private _levelcounter = 0;
-  private _asr = {
-    selectedLanguage: null,
-    selectedService: null
-  };
-
-
-  public loginActivityChanged = new Subject<boolean>();
-  private _secondsPerLine = 5;
-
-  public settingschange = new Subject<{ key: string, value: any }>();
 
   public beginLocalSession = (files: {
     status: string,
@@ -554,7 +574,7 @@ export class AppStorageService {
       new Date(file.lastModified),
       file.type
     );
-  }
+  };
   public overwriteAnnotation = (value: OIDBLevel[], saveToDB = true): Promise<any> => {
     return new Promise<any>((resolve, reject) => {
       if (saveToDB) {
@@ -594,7 +614,7 @@ export class AppStorageService {
         console.error(err);
       });
     });
-  }
+  };
 
   public overwriteLinks = (value: OIDBLink[]): Promise<any> => {
     return this.clearIDBTable('annotation_links')
@@ -605,43 +625,7 @@ export class AppStorageService {
       }).then(() => {
         return this._idb.saveArraySequential(value, 'annotation_links', 'id');
       });
-  }
-  private loadOptions = (variables: { attribute: string, key: string }[]): Promise<void> => {
-    return new Promise<void>(
-      (resolve, reject) => {
-        const promises: Promise<any>[] = [];
-        for (let i = 0; i < variables.length; i++) {
-          const variable = variables[i];
-
-          if (this['' + variable.attribute + ''] !== undefined) {
-            if (variable.hasOwnProperty('attribute') && variable.hasOwnProperty('key')) {
-              promises.push(this.loadOptionFromIDB(variable.key).then(
-                (result) => {
-                  if (!(result === null || result === undefined)) {
-                    this['' + variable.attribute + ''] = result;
-                  }
-                }
-              ));
-            } else {
-              console.error(Error('loadOptions: variables parameter must be of type {attribute:string, key:string}[]'));
-            }
-          } else {
-            console.error(Error(`session service needs an attribute called \'${variable.attribute}\'`));
-          }
-        }
-
-        // return when all operations have been finished
-        Promise.all(promises).then(
-          () => {
-            resolve();
-          },
-          (error) => {
-            reject(error);
-          }
-        );
-      }
-    );
-  }
+  };
 
   public setSessionData(member: any, dataID: number, audioURL: string, offline: boolean = false): { error: string } {
     if ((this._easymode === null || this._easymode === undefined)) {
@@ -936,7 +920,7 @@ export class AppStorageService {
           resolve();
         }, (err) => {
           subscr.unsubscribe();
-          reject(err)
+          reject(err);
         });
       } else {
         resolve();
@@ -1027,6 +1011,67 @@ export class AppStorageService {
     return null;
   }
 
+  public saveUser() {
+    this._idb.save('options', 'user', {value: this._user}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  public loadConsoleEntries(): Promise<ConsoleEntry[]> {
+    return new Promise<ConsoleEntry[]>((resolve, reject) => {
+      this._idb.get('options', 'console').then((entries) => {
+        resolve(entries as ConsoleEntry[]);
+      }).catch((error) => {
+        reject(error);
+      });
+    });
+  }
+
+  public saveConsoleEntries(entries: ConsoleEntry[]) {
+    if (!isUnset(this._idb)) {
+      this._idb.save('options', 'console', {value: entries}).catch((err) => {
+        console.error(err);
+      });
+    }
+  }
+
+  private loadOptions = (variables: { attribute: string, key: string }[]): Promise<void> => {
+    return new Promise<void>(
+      (resolve, reject) => {
+        const promises: Promise<any>[] = [];
+        for (let i = 0; i < variables.length; i++) {
+          const variable = variables[i];
+
+          if (this['' + variable.attribute + ''] !== undefined) {
+            if (variable.hasOwnProperty('attribute') && variable.hasOwnProperty('key')) {
+              promises.push(this.loadOptionFromIDB(variable.key).then(
+                (result) => {
+                  if (!(result === null || result === undefined)) {
+                    this['' + variable.attribute + ''] = result;
+                  }
+                }
+              ));
+            } else {
+              console.error(Error('loadOptions: variables parameter must be of type {attribute:string, key:string}[]'));
+            }
+          } else {
+            console.error(Error(`session service needs an attribute called \'${variable.attribute}\'`));
+          }
+        }
+
+        // return when all operations have been finished
+        Promise.all(promises).then(
+          () => {
+            resolve();
+          },
+          (error) => {
+            reject(error);
+          }
+        );
+      }
+    );
+  };
+
   /**
    * Sets sessionKey. Returns true on success, false on failure
    */
@@ -1069,29 +1114,5 @@ export class AppStorageService {
       });
     }
     return this._idb.clear(name);
-  }
-
-  public saveUser() {
-    this._idb.save('options', 'user', {value: this._user}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  public loadConsoleEntries(): Promise<ConsoleEntry[]> {
-    return new Promise<ConsoleEntry[]>((resolve, reject) => {
-      this._idb.get('options', 'console').then((entries) => {
-        resolve(entries as ConsoleEntry[]);
-      }).catch((error) => {
-        reject(error);
-      });
-    });
-  }
-
-  public saveConsoleEntries(entries: ConsoleEntry[]) {
-    if (!isUnset(this._idb)) {
-      this._idb.save('options', 'console', {value: entries}).catch((err) => {
-        console.error(err);
-      });
-    }
   }
 }

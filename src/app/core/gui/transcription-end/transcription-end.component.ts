@@ -1,11 +1,10 @@
 import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {AppStorageService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
-import {SubscriptionManager} from '../../shared';
-import {NavbarService} from '../navbar/navbar.service';
 import {AppInfo} from '../../../app.info';
+import {SubscriptionManager} from '../../shared';
 import {Functions} from '../../shared/Functions';
-
+import {AppStorageService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {NavbarService} from '../navbar/navbar.service';
 
 @Component({
   selector: 'app-transcription-submitted',

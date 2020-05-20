@@ -1,6 +1,6 @@
-import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {Functions} from '../../shared/Functions';
 import {ILevel, ISegment, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
+import {Functions} from '../../shared/Functions';
+import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 
 export class PraatTableConverter extends Converter {
 
@@ -65,7 +65,6 @@ export class PraatTableConverter extends Converter {
 
       const content = file.content;
       const lines: string[] = content.split('\n');
-
 
       // check if filename is equal with audio file
       const filename = file.name.substr(0, file.name.indexOf('.Table'));

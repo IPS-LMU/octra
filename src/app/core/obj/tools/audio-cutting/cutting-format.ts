@@ -80,7 +80,6 @@ export function getNewFileName(namingConvention: string, fileName: string, segme
   const maxDecimals = 4;
   const decimals = (segmentNumber + 1).toString().length;
 
-
   for (let i = 0; i < maxDecimals - decimals; i++) {
     leadingNull += '0';
   }

@@ -1,21 +1,21 @@
 import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {Router} from '@angular/router';
 import {NgForm} from '@angular/forms';
-import {LoginService} from './login.service';
-import {APIService, AppStorageService, AudioService, OIDBLevel, OIDBLink, SettingsService} from '../../shared/service';
-import {ComponentCanDeactivate} from './login.deactivateguard';
-import {SubscriptionManager} from '../../shared';
-import {SessionFile} from '../../obj/SessionFile';
+import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
-import {Converter} from '../../obj/Converters';
-import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
-import {ModalService} from '../../modals/modal.service';
-import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
-import {AppInfo} from '../../../app.info';
-import {FileSize, Functions, isUnset} from '../../shared/Functions';
 import {sha256} from 'js-sha256';
 import {Observable, throwError} from 'rxjs';
+import {AppInfo} from '../../../app.info';
+import {ModalService} from '../../modals/modal.service';
+import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
+import {Converter} from '../../obj/Converters';
 import {parseServerDataEntry} from '../../obj/data-entry';
+import {SessionFile} from '../../obj/SessionFile';
+import {SubscriptionManager} from '../../shared';
+import {FileSize, Functions, isUnset} from '../../shared/Functions';
+import {APIService, AppStorageService, AudioService, OIDBLevel, OIDBLink, SettingsService} from '../../shared/service';
+import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
+import {ComponentCanDeactivate} from './login.deactivateguard';
+import {LoginService} from './login.service';
 
 @Component({
   selector: 'app-login',
@@ -24,6 +24,26 @@ import {parseServerDataEntry} from '../../obj/data-entry';
   providers: [LoginService]
 })
 export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate, AfterViewInit {
+
+  @ViewChild('f', {static: false}) loginform: NgForm;
+  @ViewChild('dropzone', {static: true}) dropzone: OctraDropzoneComponent;
+  @ViewChild('agreement', {static: false}) agreement: ElementRef;
+  @ViewChild('localmode', {static: true}) localmode: ElementRef;
+  @ViewChild('onlinemode', {static: true}) onlinemode: ElementRef;
+  public validSize = false;
+  public agreementChecked = true;
+  public projects: string[] = [];
+  valid = false;
+  member = {
+    id: '',
+    agreement: '',
+    project: '',
+    jobno: '',
+    password: ''
+  };
+  err = '';
+  public apiStatus: 'init' | 'available' | 'unavailable' = 'init';
+  private subscrmanager: SubscriptionManager;
 
   get sessionfile(): SessionFile {
     return this.appStorage.sessionfile;
@@ -48,27 +68,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     this.subscrmanager = new SubscriptionManager();
   }
 
-  @ViewChild('f', {static: false}) loginform: NgForm;
-  @ViewChild('dropzone', {static: true}) dropzone: OctraDropzoneComponent;
-  @ViewChild('agreement', {static: false}) agreement: ElementRef;
-  @ViewChild('localmode', {static: true}) localmode: ElementRef;
-  @ViewChild('onlinemode', {static: true}) onlinemode: ElementRef;
-  public validSize = false;
-  public agreementChecked = true;
-  public projects: string[] = [];
-  valid = false;
-  member = {
-    id: '',
-    agreement: '',
-    project: '',
-    jobno: '',
-    password: ''
-  };
-  err = '';
-
-  public apiStatus: 'init' | 'available' | 'unavailable' = 'init';
-
-  private subscrmanager: SubscriptionManager;
   onOfflineSubmit = () => {
     if (this.appStorage.usemode !== 'demo' && !isUnset(this.appStorage.dataID) && typeof this.appStorage.dataID === 'number') {
       // last was online mode
@@ -132,7 +131,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         alert(error);
       });
     }
-  }
+  };
   newTranscription = () => {
     this.audioService.registerAudioManager(this.dropzone.audioManager);
 
@@ -169,10 +168,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         }
       }
     );
-  }
-  private navigate = (): void => {
-    Functions.navigateTo(this.router, ['user'], AppInfo.queryParamsHandling);
-  }
+  };
 
   ngOnInit() {
     if (this.settingsService.responsive.enabled === false) {
@@ -326,14 +322,14 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
                 });
               }
 
-                if (this.appStorage.usemode === 'online'
-                  && json.data.hasOwnProperty('prompttext')) {
-                  // get transcript data that already exists
-                  const prompt = json.data.prompttext;
-                  this.appStorage.prompttext = (prompt) ? prompt : '';
-                } else {
-                  this.appStorage.prompttext = '';
-                }
+              if (this.appStorage.usemode === 'online'
+                && json.data.hasOwnProperty('prompttext')) {
+                // get transcript data that already exists
+                const prompt = json.data.prompttext;
+                this.appStorage.prompttext = (prompt) ? prompt : '';
+              } else {
+                this.appStorage.prompttext = '';
+              }
 
               const res = this.appStorage.setSessionData(this.member, this.appStorage.dataID, this.appStorage.audioURL);
               if (res.error === '') {
@@ -459,6 +455,65 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     });
   }
 
+  public startDemo() {
+    const audioExample = this.settingsService.getAudioExample(this.langService.getActiveLang());
+
+    if (!isUnset(audioExample)) {
+      this.member.id = 'demo_user';
+      this.member.project = 'DemoProject';
+      this.member.jobno = '123';
+
+      // delete old data for fresh new session
+      this.appStorage.clearSession();
+      this.appStorage.clearLocalStorage().then(
+        () => {
+          this.appStorage.setSessionData(this.member, 21343134, audioExample.url);
+          this.appStorage.usemode = 'demo';
+          this.appStorage.prompttext = '';
+          this.appStorage.servercomment = audioExample.description;
+          this.appStorage.sessStr.store('jobsLeft', 1000);
+
+          this.navigate();
+        }
+      ).catch((err) => {
+        console.error(err);
+      });
+    }
+  }
+
+  public isPasswordCorrect(selectedProject, password) {
+    if (!isUnset(this.settingsService.appSettings.octra.allowed_projects)) {
+      const inputHash = sha256(password).toUpperCase();
+      const projectData = this.settingsService.appSettings.octra.allowed_projects.find((a) => {
+        return a.name === selectedProject;
+      });
+
+      if (!isUnset(projectData)) {
+        if (projectData.hasOwnProperty('password') && projectData.password !== '') {
+          return projectData.password.toUpperCase() === inputHash;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  passwordExists() {
+    if (!isUnset(this.settingsService.appSettings.octra.allowed_projects)) {
+      const projectData = this.settingsService.appSettings.octra.allowed_projects.find((a) => {
+        return a.name === this.member.project;
+      });
+
+      return (!isUnset(projectData) && projectData.hasOwnProperty('password')) && projectData.password !== '';
+    }
+
+    return false;
+  }
+
+  private navigate = (): void => {
+    Functions.navigateTo(this.router, ['user'], AppInfo.queryParamsHandling);
+  };
+
   private createNewSession(form: NgForm) {
     this.api.beginSession(this.member.project, this.member.id, Number(this.member.jobno)).then((json) => {
 
@@ -526,60 +581,5 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       alert('Server cannot be requested. Please check if you are online.');
       return throwError(error);
     });
-  }
-
-  public startDemo() {
-    const audioExample = this.settingsService.getAudioExample(this.langService.getActiveLang());
-
-    if (!isUnset(audioExample)) {
-      this.member.id = 'demo_user';
-      this.member.project = 'DemoProject';
-      this.member.jobno = '123';
-
-      // delete old data for fresh new session
-      this.appStorage.clearSession();
-      this.appStorage.clearLocalStorage().then(
-        () => {
-          this.appStorage.setSessionData(this.member, 21343134, audioExample.url);
-          this.appStorage.usemode = 'demo';
-          this.appStorage.prompttext = '';
-          this.appStorage.servercomment = audioExample.description;
-          this.appStorage.sessStr.store('jobsLeft', 1000);
-
-          this.navigate();
-        }
-      ).catch((err) => {
-        console.error(err);
-      });
-    }
-  }
-
-  public isPasswordCorrect(selectedProject, password) {
-    if (!isUnset(this.settingsService.appSettings.octra.allowed_projects)) {
-      const inputHash = sha256(password).toUpperCase();
-      const projectData = this.settingsService.appSettings.octra.allowed_projects.find((a) => {
-        return a.name === selectedProject;
-      });
-
-      if (!isUnset(projectData)) {
-        if (projectData.hasOwnProperty('password') && projectData.password !== '') {
-          return projectData.password.toUpperCase() === inputHash;
-        }
-      }
-    }
-
-    return true;
-  }
-
-  passwordExists() {
-    if (!isUnset(this.settingsService.appSettings.octra.allowed_projects)) {
-      const projectData = this.settingsService.appSettings.octra.allowed_projects.find((a) => {
-        return a.name === this.member.project;
-      });
-
-      return (!isUnset(projectData) && projectData.hasOwnProperty('password')) && projectData.password !== '';
-    }
-
-    return false;
   }
 }

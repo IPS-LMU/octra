@@ -1,7 +1,7 @@
-import {Injectable, SecurityContext} from '@angular/core';
-import {API} from '../../obj/API/api.interface';
-import {DomSanitizer} from '@angular/platform-browser';
 import {HttpClient} from '@angular/common/http';
+import {Injectable, SecurityContext} from '@angular/core';
+import {DomSanitizer} from '@angular/platform-browser';
+import {API} from '../../obj/API/api.interface';
 import {isUnset} from '../Functions';
 
 @Injectable()
@@ -242,5 +242,5 @@ export class APIService implements API {
         resolve();
       }
     });
-  }
+  };
 }

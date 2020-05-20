@@ -13,15 +13,13 @@ import {
   ViewChild
 } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
+import {AudioChunk, AudioSelection, PlayBackStatus, SampleUnit, Segment} from 'octra-components';
+import {TranscrEditorComponent} from '../../component/transcr-editor';
+import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
+import {SubscriptionManager} from '../../shared';
+import {isFunction, isUnset} from '../../shared/Functions';
 
 import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
-import {SubscriptionManager} from '../../shared';
-import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
-import {isFunction, isUnset} from '../../shared/Functions';
-import {TranscrEditorComponent} from '../../component/transcr-editor';
-import {AudioSelection, PlayBackStatus, SampleUnit} from 'octra-components';
-import {AudioChunk} from 'octra-components';
-import {Segment} from 'octra-components';
 
 declare var validateAnnotation: ((string, any) => any);
 
@@ -32,10 +30,6 @@ declare var validateAnnotation: ((string, any) => any);
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
-  get textEditor(): { selectedSegment: number; state: string, audiochunk: AudioChunk } {
-    return this._textEditor;
-  }
-
   public selectedError: any = '';
   public shownSegments: {
     transcription: {
@@ -43,18 +37,12 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       text: string
     }
   }[] = [];
-
   @Input() segments: Segment[];
   @Input() public showTranscriptionTable = true;
   public showLoading = true;
-
   @Output() segmentclicked: EventEmitter<number> = new EventEmitter<number>();
   @ViewChild('validationPopover', {static: true}) validationPopover: ValidationPopoverComponent;
   @ViewChild('transcrEditor', {static: false}) transcrEditor: TranscrEditorComponent;
-
-  private subscrmanager: SubscriptionManager;
-  private updating = false;
-  private errorY = 0;
   public playAllState: {
     state: 'started' | 'stopped',
     icon: 'play' | 'stop',
@@ -66,14 +54,10 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     currentSegment: -1,
     skipSilence: false
   };
-
   public playStateSegments: {
     state: 'started' | 'stopped',
     icon: 'play' | 'stop'
   }[] = [];
-
-  private _visible = false;
-
   public popovers = {
     validation: {
       location: {
@@ -91,6 +75,18 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     }
 
   };
+  private subscrmanager: SubscriptionManager;
+  private updating = false;
+  private errorY = 0;
+
+  private _visible = false;
+
+  @Input('visible') set visible(value: boolean) {
+    this._visible = value;
+    if (value) {
+      this.updateView();
+    }
+  }
 
   private _textEditor = {
     state: 'inactive',
@@ -98,11 +94,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     audiochunk: null
   };
 
-  @Input('visible') set visible(value: boolean) {
-    this._visible = value;
-    if (value) {
-      this.updateView();
-    }
+  get textEditor(): { selectedSegment: number; state: string, audiochunk: AudioChunk } {
+    return this._textEditor;
   }
 
   public get numberOfSegments(): number {
@@ -296,38 +289,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
   public onSegmentClicked(segnumber: number) {
     this.segmentclicked.emit(segnumber);
-  }
-
-  private updateSegments() {
-    this.playStateSegments = [];
-    if (this.transcrService.validationArray.length > 0 || this.appStorage.usemode === 'url' || !this.settingsService.projectsettings.octra.validationEnabled) {
-      if (!this.segments || !this.transcrService.guidelines) {
-        this.shownSegments = [];
-      }
-
-      this.showLoading = true;
-      let startTime = 0;
-      const result = [];
-
-      for (let i = 0; i < this.segments.length; i++) {
-        const segment = this.segments[i];
-
-        const obj = this.getShownSegment(startTime, segment.time.samples, segment.transcript, i);
-
-        result.push(obj);
-
-        startTime = segment.time.samples;
-
-        // set playState
-        this.playStateSegments.push({
-          state: 'stopped',
-          icon: 'play'
-        });
-      }
-
-      this.shownSegments = result;
-      this.showLoading = false;
-    }
   }
 
   getShownSegment(startSamples: number, endSamples: number, rawText: string, i: number): {
@@ -552,5 +513,37 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       }
       this.audio.audiomanagers[0].stopPlayback().then(resolve).catch(reject);
     });
+  }
+
+  private updateSegments() {
+    this.playStateSegments = [];
+    if (this.transcrService.validationArray.length > 0 || this.appStorage.usemode === 'url' || !this.settingsService.projectsettings.octra.validationEnabled) {
+      if (!this.segments || !this.transcrService.guidelines) {
+        this.shownSegments = [];
+      }
+
+      this.showLoading = true;
+      let startTime = 0;
+      const result = [];
+
+      for (let i = 0; i < this.segments.length; i++) {
+        const segment = this.segments[i];
+
+        const obj = this.getShownSegment(startTime, segment.time.samples, segment.transcript, i);
+
+        result.push(obj);
+
+        startTime = segment.time.samples;
+
+        // set playState
+        this.playStateSegments.push({
+          state: 'stopped',
+          icon: 'play'
+        });
+      }
+
+      this.shownSegments = result;
+      this.showLoading = false;
+    }
   }
 }

@@ -1,27 +1,27 @@
 :host {
-    max-width: 400px;
-    max-height: 100px;
-    position: absolute;
-    z-index: 100;
-    display: none;
+  max-width: 400px;
+  max-height: 100px;
+  position: absolute;
+  z-index: 100;
+  display: none;
 }
 
 .card {
-    border: 1px solid orangered;
+  border: 1px solid orangered;
 }
 
 .card-header {
-    background-color: red;
-    color: white;
-    font-weight: bold;
+  background-color: red;
+  color: white;
+  font-weight: bold;
 }
 
 .card-body, .card-header {
-    padding: 6px;
+  padding: 6px;
 }
 
 .card-body {
-    padding-bottom: 0;
-    margin-bottom: 6px;
-    overflow-y: auto;
+  padding-bottom: 0;
+  margin-bottom: 6px;
+  overflow-y: auto;
 }

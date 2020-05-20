@@ -1,25 +1,23 @@
-import {Injectable} from '@angular/core';
-import {ASRLanguage, ASRSettings} from '../../obj/Settings';
-import {SettingsService} from './settings.service';
-import {AppStorageService} from './appstorage.service';
-import {isUnset} from '../Functions';
 import {HttpClient} from '@angular/common/http';
-import * as X2JS from 'x2js';
-import {AudioService} from './audio.service';
-import {Subject} from 'rxjs';
-import {TranscriptionService} from './transcription.service';
+import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
-import {SampleUnit, WavFormat} from 'octra-components';
-import {AudioManager} from 'octra-components';
-import {FileInfo} from 'octra-components';
+import {AudioManager, FileInfo, SampleUnit, WavFormat} from 'octra-components';
+import {Subject} from 'rxjs';
+import * as X2JS from 'x2js';
+import {ASRLanguage, ASRSettings} from '../../obj/Settings';
+import {isUnset} from '../Functions';
+import {AppStorageService} from './appstorage.service';
+import {AudioService} from './audio.service';
+import {SettingsService} from './settings.service';
+import {TranscriptionService} from './transcription.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AsrService {
-  get queue(): ASRQueue {
-    return this._queue;
-  }
+  public static authURL = '';
+
+  private _selectedLanguage: ASRLanguage = null;
 
   get selectedLanguage(): ASRLanguage {
     return this._selectedLanguage;
@@ -36,9 +34,11 @@ export class AsrService {
     }
   }
 
-  public static authURL = '';
-  private _selectedLanguage: ASRLanguage = null;
   private _queue: ASRQueue;
+
+  get queue(): ASRQueue {
+    return this._queue;
+  }
 
   public get asrSettings(): ASRSettings {
     return this.settingsService.appSettings.octra.plugins.asr;
@@ -124,24 +124,18 @@ export class AsrService {
 }
 
 class ASRQueue {
-  get queue(): ASRQueueItem[] {
-    return this._queue;
-  }
+  private readonly _asrSettings: ASRSettings;
+  private readonly _httpClient: HttpClient;
+  private readonly _audiomanager: AudioManager;
+  private readonly _itemChange: Subject<ASRQueueItem>;
+  private readonly MAX_PARALLEL_ITEMS = 3;
 
   get itemChange(): Subject<ASRQueueItem> {
     return this._itemChange;
   }
 
-  get statistics(): { running: number; stopped: number; finished: number; failed: number } {
-    return this._statistics;
-  }
-
   get audioManager(): AudioManager {
     return this._audiomanager;
-  }
-
-  get status(): ASRProcessStatus {
-    return this._status;
   }
 
   get httpClient(): HttpClient {
@@ -153,12 +147,16 @@ class ASRQueue {
   }
 
   private _queue: ASRQueueItem[];
-  private readonly _asrSettings: ASRSettings;
-  private readonly _httpClient: HttpClient;
-  private _status: ASRProcessStatus;
-  private readonly _audiomanager: AudioManager;
 
-  private readonly _itemChange: Subject<ASRQueueItem>;
+  get queue(): ASRQueueItem[] {
+    return this._queue;
+  }
+
+  private _status: ASRProcessStatus;
+
+  get status(): ASRProcessStatus {
+    return this._status;
+  }
 
   private _statistics = {
     running: 0,
@@ -167,7 +165,9 @@ class ASRQueue {
     finished: 0
   };
 
-  private readonly MAX_PARALLEL_ITEMS = 3;
+  get statistics(): { running: number; stopped: number; finished: number; failed: number } {
+    return this._statistics;
+  }
 
   public get length(): number {
     return this._queue.length;
@@ -216,6 +216,20 @@ class ASRQueue {
   public start() {
     this._status = ASRProcessStatus.STARTED;
     this.startNext();
+  }
+
+  public getItemByTime(sampleStart: number, sampleLength: number): ASRQueueItem | undefined {
+    return this._queue.find((a) => {
+      return a.time.sampleStart === sampleStart && a.time.sampleLength === sampleLength;
+    });
+  }
+
+  public stop() {
+    this._status = ASRProcessStatus.STOPPED;
+  }
+
+  public destroy() {
+    this._itemChange.complete();
   }
 
   private startNext() {
@@ -287,12 +301,6 @@ class ASRQueue {
     });
   }
 
-  public getItemByTime(sampleStart: number, sampleLength: number): ASRQueueItem | undefined {
-    return this._queue.find((a) => {
-      return a.time.sampleStart === sampleStart && a.time.sampleLength === sampleLength;
-    });
-  }
-
   private updateStatistics(status: { old: ASRProcessStatus, new: ASRProcessStatus }) {
     switch (status.old) {
       case ASRProcessStatus.FAILED:
@@ -345,27 +353,26 @@ class ASRQueue {
       running: 0
     };
   }
-
-  public stop() {
-    this._status = ASRProcessStatus.STOPPED;
-  }
-
-  public destroy() {
-    this._itemChange.complete();
-  }
 }
 
 export class ASRQueueItem {
-  get transcriptInput(): string {
-    return this._transcriptInput;
-  }
+  private static counter = 1;
+  private readonly _id: number;
+  private readonly _time: {
+    sampleStart: number;
+    sampleLength: number;
+    browserSampleEnd: number;
+  };
+  private readonly _statusChange: Subject<{
+    old: ASRProcessStatus,
+    new: ASRProcessStatus
+  }>;
+  private parent: ASRQueue;
+  private readonly _selectedLanguage: ASRLanguage;
+  private readonly _type: ASRQueueItemType;
 
   get type(): ASRQueueItemType {
     return this._type;
-  }
-
-  get result(): string {
-    return this._result;
   }
 
   get selectedLanguage(): ASRLanguage {
@@ -379,10 +386,6 @@ export class ASRQueueItem {
     return this._statusChange;
   }
 
-  get status(): ASRProcessStatus {
-    return this._status;
-  }
-
   get time(): { sampleStart: number; sampleLength: number; browserSampleEnd: number } {
     return this._time;
   }
@@ -391,25 +394,23 @@ export class ASRQueueItem {
     return this._id;
   }
 
-  private static counter = 1;
-
-  private readonly _id: number;
-  private readonly _time: {
-    sampleStart: number;
-    sampleLength: number;
-    browserSampleEnd: number;
-  };
   private _transcriptInput = '';
 
+  get transcriptInput(): string {
+    return this._transcriptInput;
+  }
+
   private _status: ASRProcessStatus;
-  private readonly _statusChange: Subject<{
-    old: ASRProcessStatus,
-    new: ASRProcessStatus
-  }>;
-  private parent: ASRQueue;
-  private readonly _selectedLanguage: ASRLanguage;
+
+  get status(): ASRProcessStatus {
+    return this._status;
+  }
+
   private _result: string;
-  private readonly _type: ASRQueueItemType;
+
+  get result(): string {
+    return this._result;
+  }
 
   constructor(timeInterval: {
     sampleStart: number,
@@ -513,6 +514,167 @@ export class ASRQueueItem {
     this.changeStatus(ASRProcessStatus.STOPPED);
     this.statusChange.complete();
     return true;
+  }
+
+  public transcribeSignalWithASR(outFormat: string): Promise<{
+    audioURL: string,
+    transcriptURL: string
+  }> {
+    return new Promise<{
+      audioURL: string,
+      transcriptURL: string
+    }>((resolve, reject) => {
+      this.changeStatus(ASRProcessStatus.STARTED);
+      const audioManager = this.parent.audioManager;
+
+      // 1) cut signal
+      const format = new WavFormat();
+      format.init(audioManager.ressource.info.fullname, audioManager.ressource.arraybuffer);
+      format.cutAudioFile(audioManager.ressource.info.type, `OCTRA_ASRqueueItem_${this._id}`, audioManager.ressource.arraybuffer,
+        {
+          number: 1,
+          sampleStart: this.time.sampleStart,
+          sampleDur: this.time.sampleLength
+        }).then((file) => {
+        if (this._status !== ASRProcessStatus.STOPPED) {
+          // 2) upload signal
+          this.uploadFile(file, this.selectedLanguage).then((audioURL: string) => {
+            if (this._status !== ASRProcessStatus.STOPPED) {
+              // 3) signal audio url to ASR
+              this.callASR(this.selectedLanguage, audioURL, outFormat).then((asrResult) => {
+                if (this._status !== ASRProcessStatus.STOPPED) {
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    this._result = reader.result as string;
+
+                    // make sure that there are not any white spaces at the end or new lines
+                    this._result = this._result.replace(/\n/g, '').trim();
+
+                    resolve({
+                      audioURL,
+                      transcriptURL: asrResult.url
+                    });
+                  };
+
+                  reader.onerror = (error: any) => {
+                    this._result = 'Could not read result';
+                    this.changeStatus(ASRProcessStatus.FAILED);
+                    reject(error);
+                  };
+
+                  reader.readAsText(asrResult.file, 'utf-8');
+                }
+              }).catch((error) => {
+                this._result = error;
+                if (error.indexOf('quota') > -1) {
+                  this.changeStatus(ASRProcessStatus.NOQUOTA);
+                } else if (error.indexOf('0 Unknown Error') > -1) {
+                  this.changeStatus(ASRProcessStatus.NOAUTH);
+                } else {
+                  if (this.status !== ASRProcessStatus.NOAUTH) {
+                    this._result = error;
+                    this.changeStatus(ASRProcessStatus.FAILED);
+                  }
+                }
+                reject(error);
+              });
+            }
+          }).catch((error) => {
+            this._result = error;
+            this.changeStatus(ASRProcessStatus.FAILED);
+            reject(error);
+          });
+        }
+      }).catch((error) => {
+        this._result = error;
+        this.changeStatus(ASRProcessStatus.FAILED);
+        reject(error);
+      });
+    });
+  }
+
+  public processWithMAUSONLY(): Promise<{
+    file: File,
+    url: string
+  }> {
+    return new Promise<{
+      file: File,
+      url: string
+    }>((resolve, reject) => {
+      this.changeStatus(ASRProcessStatus.STARTED);
+      const audioManager = this.parent.audioManager;
+
+      // 1) cut signal
+      const format = new WavFormat();
+      format.init(audioManager.ressource.info.fullname, audioManager.ressource.arraybuffer);
+      format.cutAudioFile(audioManager.ressource.info.type, `OCTRA_ASRqueueItem_${this._id}`, audioManager.ressource.arraybuffer,
+        {
+          number: 1,
+          sampleStart: this.time.sampleStart,
+          sampleDur: this.time.sampleLength
+        }).then((file) => {
+        if (this._status !== ASRProcessStatus.STOPPED) {
+          // 2) upload signal
+          const promises: Promise<string>[] = [];
+          const transcriptFile = new File([this._transcriptInput], `OCTRA_ASRqueueItem_${this._id}.txt`, {type: 'text/plain'});
+          promises.push(this.uploadFile(transcriptFile, this.selectedLanguage));
+          promises.push(this.uploadFile(file, this.selectedLanguage));
+
+          Promise.all<string>(promises).then((values) => {
+            const transcriptURL = values[0];
+            const audioURL = values[1];
+
+            if (this._status !== ASRProcessStatus.STOPPED) {
+              // 3) signal audio url and transcriptURL to MAUS
+              this.callMAUS(this.selectedLanguage, audioURL, transcriptURL).then((resultMAUS) => {
+                if (this._status !== ASRProcessStatus.STOPPED) {
+
+                  const reader = new FileReader();
+
+                  reader.onload = () => {
+                    this._result = reader.result as string;
+
+                    // make sure that there are not any white spaces at the end or new lines
+                    this._result = this._result.replace(/\n/g, '').trim();
+
+                    resolve(resultMAUS);
+                  };
+
+                  reader.onerror = (error: any) => {
+                    this._result = 'Could not read result';
+                    this.changeStatus(ASRProcessStatus.FAILED);
+                    reject(error);
+                  };
+
+                  reader.readAsText(resultMAUS.file, 'utf-8');
+                }
+              }).catch((error) => {
+                this._result = error;
+                if (error.indexOf('quota') > -1) {
+                  this.changeStatus(ASRProcessStatus.NOQUOTA);
+                } else if (error.indexOf('0 Unknown Error') > -1) {
+                  this.changeStatus(ASRProcessStatus.NOAUTH);
+                } else {
+                  if (this.status !== ASRProcessStatus.NOAUTH) {
+                    this._result = error;
+                    this.changeStatus(ASRProcessStatus.FAILED);
+                  }
+                }
+                reject(error);
+              });
+            }
+          }).catch((error) => {
+            this._result = error;
+            this.changeStatus(ASRProcessStatus.FAILED);
+            reject(error);
+          });
+        }
+      }).catch((error) => {
+        this._result = error;
+        this.changeStatus(ASRProcessStatus.FAILED);
+        reject(error);
+      });
+    });
   }
 
   private uploadFile(file: File, language: ASRLanguage): Promise<string> {
@@ -643,169 +805,6 @@ export class ASRQueueItem {
           }
           reject(error.message);
         });
-    });
-  }
-
-  public transcribeSignalWithASR(outFormat: string): Promise<{
-    audioURL: string,
-    transcriptURL: string
-  }> {
-    return new Promise<{
-      audioURL: string,
-      transcriptURL: string
-    }>((resolve, reject) => {
-      this.changeStatus(ASRProcessStatus.STARTED);
-      const audioManager = this.parent.audioManager;
-
-      // 1) cut signal
-      const format = new WavFormat();
-      format.init(audioManager.ressource.info.fullname, audioManager.ressource.arraybuffer);
-      format.cutAudioFile(audioManager.ressource.info.type, `OCTRA_ASRqueueItem_${this._id}`, audioManager.ressource.arraybuffer,
-        {
-          number: 1,
-          sampleStart: this.time.sampleStart,
-          sampleDur: this.time.sampleLength
-        }).then((file) => {
-        if (this._status !== ASRProcessStatus.STOPPED) {
-          // 2) upload signal
-          this.uploadFile(file, this.selectedLanguage).then((audioURL: string) => {
-            if (this._status !== ASRProcessStatus.STOPPED) {
-              // 3) signal audio url to ASR
-              this.callASR(this.selectedLanguage, audioURL, outFormat).then((asrResult) => {
-                if (this._status !== ASRProcessStatus.STOPPED) {
-                  const reader = new FileReader();
-                  reader.onload = () => {
-                    this._result = reader.result as string;
-
-                    // make sure that there are not any white spaces at the end or new lines
-                    this._result = this._result.replace(/\n/g, '').trim();
-
-                    resolve({
-                      audioURL,
-                      transcriptURL: asrResult.url
-                    })
-                  };
-
-                  reader.onerror = (error: any) => {
-                    this._result = 'Could not read result';
-                    this.changeStatus(ASRProcessStatus.FAILED);
-                    reject(error);
-                  };
-
-                  reader.readAsText(asrResult.file, 'utf-8');
-                }
-              }).catch((error) => {
-                this._result = error;
-                if (error.indexOf('quota') > -1) {
-                  this.changeStatus(ASRProcessStatus.NOQUOTA);
-                } else if (error.indexOf('0 Unknown Error') > -1) {
-                  this.changeStatus(ASRProcessStatus.NOAUTH);
-                } else {
-                  if (this.status !== ASRProcessStatus.NOAUTH) {
-                    this._result = error;
-                    this.changeStatus(ASRProcessStatus.FAILED);
-                  }
-                }
-                reject(error);
-              });
-            }
-          }).catch((error) => {
-            this._result = error;
-            this.changeStatus(ASRProcessStatus.FAILED);
-            reject(error);
-          });
-        }
-      }).catch((error) => {
-        this._result = error;
-        this.changeStatus(ASRProcessStatus.FAILED);
-        reject(error);
-      });
-    });
-  }
-
-
-  public processWithMAUSONLY(): Promise<{
-    file: File,
-    url: string
-  }> {
-    return new Promise<{
-      file: File,
-      url: string
-    }>((resolve, reject) => {
-      this.changeStatus(ASRProcessStatus.STARTED);
-      const audioManager = this.parent.audioManager;
-
-      // 1) cut signal
-      const format = new WavFormat();
-      format.init(audioManager.ressource.info.fullname, audioManager.ressource.arraybuffer);
-      format.cutAudioFile(audioManager.ressource.info.type, `OCTRA_ASRqueueItem_${this._id}`, audioManager.ressource.arraybuffer,
-        {
-          number: 1,
-          sampleStart: this.time.sampleStart,
-          sampleDur: this.time.sampleLength
-        }).then((file) => {
-        if (this._status !== ASRProcessStatus.STOPPED) {
-          // 2) upload signal
-          const promises: Promise<string>[] = [];
-          const transcriptFile = new File([this._transcriptInput], `OCTRA_ASRqueueItem_${this._id}.txt`, {type: 'text/plain'});
-          promises.push(this.uploadFile(transcriptFile, this.selectedLanguage));
-          promises.push(this.uploadFile(file, this.selectedLanguage));
-
-          Promise.all<string>(promises).then((values) => {
-            const transcriptURL = values[0];
-            const audioURL = values[1];
-
-
-            if (this._status !== ASRProcessStatus.STOPPED) {
-              // 3) signal audio url and transcriptURL to MAUS
-              this.callMAUS(this.selectedLanguage, audioURL, transcriptURL).then((resultMAUS) => {
-                if (this._status !== ASRProcessStatus.STOPPED) {
-
-                  const reader = new FileReader();
-
-                  reader.onload = () => {
-                    this._result = reader.result as string;
-
-                    // make sure that there are not any white spaces at the end or new lines
-                    this._result = this._result.replace(/\n/g, '').trim();
-
-                    resolve(resultMAUS);
-                  };
-
-                  reader.onerror = (error: any) => {
-                    this._result = 'Could not read result';
-                    this.changeStatus(ASRProcessStatus.FAILED);
-                    reject(error);
-                  };
-
-                  reader.readAsText(resultMAUS.file, 'utf-8');
-                }
-              }).catch((error) => {
-                this._result = error;
-                if (error.indexOf('quota') > -1) {
-                  this.changeStatus(ASRProcessStatus.NOQUOTA);
-                } else if (error.indexOf('0 Unknown Error') > -1) {
-                  this.changeStatus(ASRProcessStatus.NOAUTH);
-                } else {
-                  if (this.status !== ASRProcessStatus.NOAUTH) {
-                    this._result = error;
-                    this.changeStatus(ASRProcessStatus.FAILED);
-                  }
-                }
-                reject(error);
-              });
-            }
-          }).catch((error) => {
-            this._result = error;
-            this.changeStatus(ASRProcessStatus.FAILED);
-            reject(error);
-          });
-        }
-      }).catch((error) => {
-        this._result = error;
-        this.changeStatus(ASRProcessStatus.FAILED);
-        reject(error);
-      });
     });
   }
 }

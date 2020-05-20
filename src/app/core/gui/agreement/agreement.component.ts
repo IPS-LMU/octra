@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {AppStorageService, SettingsService} from '../../shared/service';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
+import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {Functions} from '../../shared/Functions';
+import {AppStorageService, SettingsService} from '../../shared/service';
 
 @Component({
   selector: 'app-agreement',
@@ -23,7 +23,6 @@ export class AgreementComponent implements OnInit {
       Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling);
     }
   }
-
 
   ngOnInit() {
     console.log('agreement component called');

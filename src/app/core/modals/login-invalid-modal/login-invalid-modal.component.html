@@ -1,13 +1,13 @@
 <ng-template #modal>
-    <div class="modal-header">
-      <h4 class="modal-title">{{"modal.login.header" | transloco}}</h4>
-    </div>
-    <div class="modal-body">
-      {{"modal.login.text" | transloco}}
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-primary" (click)="close()">
-          {{"general.OK" | transloco}}
-        </button>
-    </div>
+  <div class="modal-header">
+    <h4 class="modal-title">{{"modal.login.header" | transloco}}</h4>
+  </div>
+  <div class="modal-body">
+    {{"modal.login.text" | transloco}}
+  </div>
+  <div class="modal-footer">
+    <button (click)="close()" class="btn btn-primary" type="button">
+      {{"general.OK" | transloco}}
+    </button>
+  </div>
 </ng-template>

@@ -1,18 +1,18 @@
 import {Injectable} from '@angular/core';
+import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {TsWorker} from './ts-worker';
 import {TsWorkerJob, TsWorkerStatus} from './ts-worker-job';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
 
 @Injectable()
 export class MultiThreadingService {
+  private numberOfThreads = 2;
+  private subscrManager: SubscriptionManager = new SubscriptionManager();
+
+  private _workers: TsWorker[] = [];
+
   get workers(): TsWorker[] {
     return this._workers;
   }
-
-  private numberOfThreads = 2;
-  private _workers: TsWorker[] = [];
-
-  private subscrManager: SubscriptionManager = new SubscriptionManager();
 
   constructor() {
     for (let i = 0; i < this.numberOfThreads; i++) {
@@ -50,6 +50,20 @@ export class MultiThreadingService {
     });
   }
 
+  public getStatistics(): string {
+    let result = '';
+    for (let i = 0; i < this.workers.length; i++) {
+      const worker = this.workers[i];
+      result += `----- worker id ${worker.id} ----\n` + `jobs: ${worker.queue.length}\n----\n`;
+    }
+
+    return result;
+  }
+
+  public destroy() {
+    this.subscrManager.destroy();
+  }
+
   private getBestWorker(): TsWorker {
     let foundWorker: TsWorker = null;
 
@@ -64,19 +78,5 @@ export class MultiThreadingService {
     }
 
     return foundWorker;
-  }
-
-  public getStatistics(): string {
-    let result = '';
-    for (let i = 0; i < this.workers.length; i++) {
-      const worker = this.workers[i];
-      result += `----- worker id ${worker.id} ----\n` + `jobs: ${worker.queue.length}\n----\n`;
-    }
-
-    return result;
-  }
-
-  public destroy() {
-    this.subscrManager.destroy();
   }
 }

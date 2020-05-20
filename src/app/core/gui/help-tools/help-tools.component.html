@@ -1,52 +1,52 @@
 <div class="container">
-    <h2>Help tools</h2>
-    <div class="row">
-        <div class="col-md-4 is-table-row">
-            <div class="card">
-                <div class="card-header">
-                    <button type="button" class="btn btn-success bmd-btn-fab bmd-btn-fab-sm">
-                        1
-                    </button>
-                    Refresh App
-                </div>
-                <div class="card-body">
-                    <p class="card-text">This tool forces the App to reload and refreshComputedData the browser
-                        cache.</p>
-                    <button class="btn btn-raised btn-primary col-12" (click)="refreshApp()"> Refresh app</button>
-                </div>
-            </div>
+  <h2>Help tools</h2>
+  <div class="row">
+    <div class="col-md-4 is-table-row">
+      <div class="card">
+        <div class="card-header">
+          <button class="btn btn-success bmd-btn-fab bmd-btn-fab-sm" type="button">
+            1
+          </button>
+          Refresh App
         </div>
-        <div class="col-md-4 is-table-row">
-            <div class="card">
-                <div class="card-header">
-                    <button type="button" class="btn btn-success bmd-btn-fab bmd-btn-fab-sm">
-                        2
-                    </button>
-                    Clear all Storage Data
-                </div>
-                <div class="card-body">
-                    <p class="card-text">This tool removes all local data including (transcript, logs and settings).</p>
-                    <button class="btn btn-raised btn-danger col-12" (click)="clearAllData()"> Clear all data
-                        permanently
-                    </button>
-                </div>
-            </div>
+        <div class="card-body">
+          <p class="card-text">This tool forces the App to reload and refreshComputedData the browser
+            cache.</p>
+          <button (click)="refreshApp()" class="btn btn-raised btn-primary col-12"> Refresh app</button>
         </div>
-        <div class="col-md-4 is-table-row">
-            <div class="card">
-                <div class="card-header">
-                    <button type="button" class="btn btn-success bmd-btn-fab bmd-btn-fab-sm">
-                        3
-                    </button>
-                    Stresstest
-                </div>
-                <div class="card-body">
-                    <p class="card-text">Test your browser's capabilities.</p>
-                    <a class="btn btn-raised btn-info w-100" [target]="'_blank'" [routerLink]="['/stresstest']"> Open
-                        Stresstest
-                    </a>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+    <div class="col-md-4 is-table-row">
+      <div class="card">
+        <div class="card-header">
+          <button class="btn btn-success bmd-btn-fab bmd-btn-fab-sm" type="button">
+            2
+          </button>
+          Clear all Storage Data
+        </div>
+        <div class="card-body">
+          <p class="card-text">This tool removes all local data including (transcript, logs and settings).</p>
+          <button (click)="clearAllData()" class="btn btn-raised btn-danger col-12"> Clear all data
+            permanently
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 is-table-row">
+      <div class="card">
+        <div class="card-header">
+          <button class="btn btn-success bmd-btn-fab bmd-btn-fab-sm" type="button">
+            3
+          </button>
+          Stresstest
+        </div>
+        <div class="card-body">
+          <p class="card-text">Test your browser's capabilities.</p>
+          <a [routerLink]="['/stresstest']" [target]="'_blank'" class="btn btn-raised btn-info w-100"> Open
+            Stresstest
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

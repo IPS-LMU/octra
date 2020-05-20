@@ -1,18 +1,18 @@
 <ng-template #modal>
-    <div class="modal-header">
-      <h4 class="modal-title">{{"modal.transcription.stop.header" | transloco}}?</h4>
+  <div class="modal-header">
+    <h4 class="modal-title">{{"modal.transcription.stop.header" | transloco}}?</h4>
+  </div>
+  <div class="modal-body">
+    <div [innerHTML]="'modal.transcription.stop.text' | transloco">
     </div>
-    <div class="modal-body">
-      <div [innerHTML]="'modal.transcription.stop.text' | transloco">
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="close('CONTINUE')">
-          {{"general.continue" | transloco}}
-        </button>
-        <button type="button" class="btn btn-primary"
-                (click)="close('QUIT');">
-          {{"general.quit" | transloco}}
-        </button>
-    </div>
+  </div>
+  <div class="modal-footer">
+    <button (click)="close('CONTINUE')" class="btn btn-default" data-dismiss="modal" type="button">
+      {{"general.continue" | transloco}}
+    </button>
+    <button (click)="close('QUIT');" class="btn btn-primary"
+            type="button">
+      {{"general.quit" | transloco}}
+    </button>
+  </div>
 </ng-template>

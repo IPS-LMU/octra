@@ -1,19 +1,19 @@
 <ng-template #modal>
-    <div class="modal-header">
-      <h4 class="modal-title">{{"modal.transcription.demoEnd.header" | transloco}}</h4>
-    </div>
-    <div class="modal-body" style="font-size:0.9em;">
-      <p [innerHTML]="languageService.translate('modal.transcription.demoEnd.text')" style="text-align: justify;"></p>
-        <p style="text-align: justify;">
-          {{"modal.transcription.demoEnd.exportText" | transloco}}
-        </p>
-        <img src="assets/img/exportScreenshot.png" alt="Export Screenshot" style="width:100%;"/>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary"
-                (click)="close('CANCEL')">{{"general.back" | transloco}}</button>
-      <button type="button" class="btn btn-secondary" (click)="close('QUIT')">{{"general.quit" | transloco}}</button>
-      <button type="button" class="btn btn-primary" (click)="close('CONTINUE')">{{"general.continue" | transloco}}
-        </button>
-    </div>
+  <div class="modal-header">
+    <h4 class="modal-title">{{"modal.transcription.demoEnd.header" | transloco}}</h4>
+  </div>
+  <div class="modal-body" style="font-size:0.9em;">
+    <p [innerHTML]="languageService.translate('modal.transcription.demoEnd.text')" style="text-align: justify;"></p>
+    <p style="text-align: justify;">
+      {{"modal.transcription.demoEnd.exportText" | transloco}}
+    </p>
+    <img alt="Export Screenshot" src="assets/img/exportScreenshot.png" style="width:100%;"/>
+  </div>
+  <div class="modal-footer">
+    <button (click)="close('CANCEL')" class="btn btn-secondary"
+            type="button">{{"general.back" | transloco}}</button>
+    <button (click)="close('QUIT')" class="btn btn-secondary" type="button">{{"general.quit" | transloco}}</button>
+    <button (click)="close('CONTINUE')" class="btn btn-primary" type="button">{{"general.continue" | transloco}}
+    </button>
+  </div>
 </ng-template>

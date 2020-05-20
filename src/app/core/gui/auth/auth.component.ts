@@ -1,8 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {AppStorageService} from '../../shared/service';
-import {NavbarService} from '../navbar/navbar.service';
 import {interval, Subscription} from 'rxjs';
+import {NavbarService} from '../navbar/navbar.service';
 
 @Component({
   selector: 'app-auth',
@@ -10,12 +9,13 @@ import {interval, Subscription} from 'rxjs';
   styleUrls: ['./auth.component.css']
 })
 export class AuthComponent implements OnInit, OnDestroy {
+  private interval: Subscription;
+
+  private _secondsToClose = 10;
+
   get secondsToClose(): number {
     return this._secondsToClose;
   }
-
-  private interval: Subscription;
-  private _secondsToClose = 10;
 
   constructor(private router: Router, private navbarService: NavbarService) {
     this.navbarService.showNavbar = false;

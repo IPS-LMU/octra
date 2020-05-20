@@ -1,16 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  ComponentFactoryResolver,
-  ComponentRef,
-  Directive,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  ViewContainerRef
-} from '@angular/core';
-import {AuthenticationNeededComponent} from '../../alerts/authentication-needed/authentication-needed.component';
+import {ComponentFactoryResolver, Directive, EventEmitter, Input, OnInit, Output, ViewContainerRef} from '@angular/core';
 
 @Directive({
   selector: '[appDynComponent]'

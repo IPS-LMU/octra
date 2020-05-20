@@ -7,25 +7,8 @@ import {DomSanitizer} from '@angular/platform-browser';
   styleUrls: ['./validation-popover.component.css']
 })
 export class ValidationPopoverComponent implements OnInit, AfterViewChecked {
-  public set title(value: string) {
-    this._title = value;
-  }
-
-  public get title(): string {
-    return this._title;
-    this.cd.markForCheck();
-    this.cd.detectChanges();
-  }
-
-  public get description(): string {
-    return this._description;
-  }
-
-  public set description(value: string) {
-    this._description = value;
-    this.cd.markForCheck();
-    this.cd.detectChanges();
-  }
+  @ViewChild('validationContainer', {static: true}) validationContainer: ElementRef;
+  public visible = false;
 
   public get sanitizedDescription(): string {
     return this.sanitizer.sanitize(SecurityContext.HTML, this._description);
@@ -37,11 +20,27 @@ export class ValidationPopoverComponent implements OnInit, AfterViewChecked {
 
   private _title = '';
 
+  public get title(): string {
+    return this._title;
+    this.cd.markForCheck();
+    this.cd.detectChanges();
+  }
+
+  public set title(value: string) {
+    this._title = value;
+  }
+
   public _description = '';
 
-  @ViewChild('validationContainer', {static: true}) validationContainer: ElementRef;
+  public get description(): string {
+    return this._description;
+  }
 
-  public visible = false;
+  public set description(value: string) {
+    this._description = value;
+    this.cd.markForCheck();
+    this.cd.detectChanges();
+  }
 
   public get height() {
     return this.validationContainer.nativeElement.offsetHeight;

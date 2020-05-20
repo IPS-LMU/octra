@@ -1,14 +1,14 @@
 import {Routes} from '@angular/router';
-import {TranscriptionComponent} from '../transcription';
-import {MembersAreaGuard} from './members-area.activateguard';
-import {TranscriptionEndComponent} from '../transcription-end';
 import {TranscrEndGuard} from '../../shared/guard';
-import {ReloadFileComponent} from '../reload-file';
-import {ReloadFileGuard} from '../reload-file/reload-file.activateguard';
-import {LoadingComponent} from '../loading';
 import {TranscActivateGuard} from '../../shared/guard/transcr.activateguard';
 import {AgreementComponent} from '../agreement/agreement.component';
 import {AuthComponent} from '../auth/auth.component';
+import {LoadingComponent} from '../loading';
+import {ReloadFileComponent} from '../reload-file';
+import {ReloadFileGuard} from '../reload-file/reload-file.activateguard';
+import {TranscriptionComponent} from '../transcription';
+import {TranscriptionEndComponent} from '../transcription-end';
+import {MembersAreaGuard} from './members-area.activateguard';
 
 export const MEMBER_ROUTES: Routes = [
   {path: 'load', component: LoadingComponent},

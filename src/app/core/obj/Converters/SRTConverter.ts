@@ -1,5 +1,5 @@
-import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
+import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 
 export class SRTConverter extends Converter {
 
@@ -164,5 +164,5 @@ export class SRTConverter extends Converter {
       result = '0' + result;
     }
     return result;
-  }
+  };
 }

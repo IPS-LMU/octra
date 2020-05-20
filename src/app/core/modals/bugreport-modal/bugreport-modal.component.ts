@@ -1,9 +1,9 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
-import {Subject} from 'rxjs';
-import {AppStorageService, SettingsService} from '../../shared/service';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {BugReportService} from '../../shared/service/bug-report.service';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
+import {Subject} from 'rxjs';
+import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {AppStorageService, SettingsService} from '../../shared/service';
+import {BugReportService} from '../../shared/service/bug-report.service';
 
 @Component({
   selector: 'app-bugreport-modal',
@@ -23,38 +23,35 @@ export class BugreportModalComponent implements OnInit {
     ignoreBackdropClick: false
   };
   @ViewChild('modal', {static: true}) modal: any;
-
-  protected data = null;
-  private actionperformed: Subject<void> = new Subject<void>();
-  private subscrmanager = new SubscriptionManager();
-
   public sendStatus: 'pending' | 'success' | 'error' | 'sending' = 'pending';
-
   public screenshots: {
     blob: File,
     previewURL: string
   }[] = [];
+  protected data = null;
+  private actionperformed: Subject<void> = new Subject<void>();
+  private subscrmanager = new SubscriptionManager();
 
   public get email(): string {
     return this.appStorage.userProfile.email;
-  }
-
-  public get userName(): string {
-    return this.appStorage.userProfile.userName;
   }
 
   public set email(value: string) {
     this.appStorage.userProfile = {
       userName: this.userName,
       email: value
-    }
+    };
+  }
+
+  public get userName(): string {
+    return this.appStorage.userProfile.userName;
   }
 
   public set userName(value: string) {
     this.appStorage.userProfile = {
       userName: value,
       email: this.email
-    }
+    };
   }
 
   public get isvalid(): boolean {

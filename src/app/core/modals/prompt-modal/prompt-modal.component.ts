@@ -1,10 +1,10 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
-import {Subject} from 'rxjs';
-import {AppStorageService, SettingsService} from '../../shared/service';
-import {AppInfo} from '../../../app.info';
-import {AnnotJSONConverter, PartiturConverter, TextConverter} from '../../obj/Converters';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {OAudiofile} from 'octra-components';
+import {Subject} from 'rxjs';
+import {AppInfo} from '../../../app.info';
+import {AnnotJSONConverter, PartiturConverter, TextConverter} from '../../obj/Converters';
+import {AppStorageService, SettingsService} from '../../shared/service';
 
 @Component({
   selector: 'app-prompt-modal',
@@ -23,9 +23,8 @@ export class PromptModalComponent implements OnInit {
     ignoreBackdropClick: false
   };
   @ViewChild('modal', {static: true}) modal: any;
-
-  protected data = null;
   public formatConverter;
+  protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
 
   constructor(private modalService: BsModalService, public appStorage: AppStorageService, private settService: SettingsService,
@@ -40,7 +39,7 @@ export class PromptModalComponent implements OnInit {
       let found = false;
       if (this.formatConverter === undefined) {
         for (const converter of AppInfo.converters) {
-          if(converter instanceof AnnotJSONConverter || converter instanceof PartiturConverter){
+          if (converter instanceof AnnotJSONConverter || converter instanceof PartiturConverter) {
             const result = converter.import({
               name: audiofile.name,
               content: this.appStorage.prompttext,
@@ -62,7 +61,6 @@ export class PromptModalComponent implements OnInit {
           this.formatConverter = null;
         }
       }
-
 
       this.modal.show(this.modal, this.config);
       this.visible = true;

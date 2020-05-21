@@ -10,7 +10,7 @@ import {Functions, isUnset} from '../../shared/Functions';
 import {AppStorageService, AudioService, OIDBLevel, SettingsService, TranscriptionService} from '../../shared/service';
 
 @Component({
-  selector: 'app-loading',
+  selector: 'octra-loading',
   templateUrl: './loading.component.html',
   styleUrls: ['./loading.component.css']
 })

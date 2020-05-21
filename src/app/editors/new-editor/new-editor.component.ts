@@ -11,7 +11,7 @@ import {LinearEditorComponent} from '../linear-editor';
 import {OCTRAEditor} from '../octra-editor';
 
 @Component({
-  selector: 'app-new-editor',
+  selector: 'octra-new-editor',
   templateUrl: './new-editor.component.html',
   styleUrls: ['./new-editor.component.css']
 })

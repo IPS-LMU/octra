@@ -35,7 +35,7 @@ import {
 import {OCTRAEditor} from '../octra-editor';
 
 @Component({
-  selector: 'app-signal-gui',
+  selector: 'octra-signal-gui',
   templateUrl: './linear-editor.component.html',
   styleUrls: ['./linear-editor.component.css']
 })

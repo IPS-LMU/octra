@@ -7,7 +7,7 @@ import {BugReportService} from '../../shared/service/bug-report.service';
 import {ModalService} from '../modal.service';
 
 @Component({
-  selector: 'app-octra-modal',
+  selector: 'octra-modal',
   templateUrl: './octra-modal.component.html',
   styleUrls: ['./octra-modal.component.css']
 })

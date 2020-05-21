@@ -15,7 +15,7 @@ export interface GeneralShortcut {
 }
 
 @Component({
-  selector: 'app-shortcuts-modal',
+  selector: 'octra-shortcuts-modal',
   templateUrl: './shortcuts-modal.component.html',
   styleUrls: ['./shortcuts-modal.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

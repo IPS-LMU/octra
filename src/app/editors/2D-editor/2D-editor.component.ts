@@ -48,7 +48,7 @@ import {OCTRAEditor} from '../octra-editor';
 import {TranscrWindowComponent} from './transcr-window';
 
 @Component({
-  selector: 'app-overlay-gui',
+  selector: 'octra-overlay-gui',
   templateUrl: './2D-editor.component.html',
   styleUrls: ['./2D-editor.component.css']
 })

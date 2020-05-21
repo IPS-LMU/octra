@@ -57,7 +57,7 @@ import {BugReportService} from '../../shared/service/bug-report.service';
 import {NavbarService} from '../navbar/navbar.service';
 
 @Component({
-  selector: 'app-transcription',
+  selector: 'octra-transcription',
   templateUrl: './transcription.component.html',
   styleUrls: ['./transcription.component.css'],
   providers: [AlertService]

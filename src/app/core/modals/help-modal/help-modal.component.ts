@@ -4,7 +4,7 @@ import {Subject} from 'rxjs';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 
 @Component({
-  selector: 'app-help-modal',
+  selector: 'octra-help-modal',
   templateUrl: './help-modal.component.html',
   styleUrls: ['./help-modal.component.css']
 })

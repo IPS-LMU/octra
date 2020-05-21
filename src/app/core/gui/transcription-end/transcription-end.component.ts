@@ -7,7 +7,7 @@ import {AppStorageService, SettingsService, TranscriptionService, UserInteractio
 import {NavbarService} from '../navbar/navbar.service';
 
 @Component({
-  selector: 'app-transcription-submitted',
+  selector: 'octra-transcription-submitted',
   templateUrl: './transcription-end.component.html',
   styleUrls: ['./transcription-end.component.css']
 })

@@ -5,7 +5,7 @@ import {SettingsService} from '../../shared/service';
 import {NavbarService} from '../navbar/navbar.service';
 
 @Component({
-  selector: 'app-news',
+  selector: 'octra-news',
   templateUrl: './news.component.html',
   styleUrls: ['./news.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

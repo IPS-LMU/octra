@@ -4,14 +4,22 @@
     "directive-selector": [
       true,
       "attribute",
-      "app",
+      "oco",
       "camelCase"
     ],
     "component-selector": [
       true,
       "element",
-      "app",
+      "octra",
       "kebab-case"
-    ]
+    ],
+    "variable-name": {
+      "options": [
+        "ban-keywords",
+        "check-format",
+        "allow-pascal-case",
+        "allow-leading-underscore"
+      ]
+    }
   }
 }

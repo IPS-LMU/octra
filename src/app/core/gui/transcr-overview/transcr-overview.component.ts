@@ -24,7 +24,7 @@ import {AppStorageService, AudioService, SettingsService, TranscriptionService, 
 declare var validateAnnotation: ((string, any) => any);
 
 @Component({
-  selector: 'app-transcr-overview',
+  selector: 'octra-transcr-overview',
   templateUrl: './transcr-overview.component.html',
   styleUrls: ['./transcr-overview.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

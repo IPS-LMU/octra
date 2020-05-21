@@ -6,7 +6,7 @@ import {AppStorageService, SettingsService} from '../../shared/service';
 import {BugReportService} from '../../shared/service/bug-report.service';
 
 @Component({
-  selector: 'app-bugreport-modal',
+  selector: 'octra-bugreport-modal',
   templateUrl: './bugreport-modal.component.html',
   styleUrls: ['./bugreport-modal.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

@@ -4,7 +4,7 @@ import {Subject} from 'rxjs';
 import {AppStorageService, SettingsService} from '../../shared/service';
 
 @Component({
-  selector: 'app-activity-timeout-modal',
+  selector: 'octra-activity-timeout-modal',
   templateUrl: './inactivity-modal.component.html',
   styleUrls: ['./inactivity-modal.component.css']
 })

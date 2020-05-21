@@ -7,7 +7,7 @@ import {AppStorageService, SettingsService} from '../../shared/service';
 import {BugReportService} from '../../shared/service/bug-report.service';
 
 @Component({
-  selector: 'app-supportedfiles-modal',
+  selector: 'octra-supportedfiles-modal',
   templateUrl: './supportedfiles-modal.component.html',
   styleUrls: ['./supportedfiles-modal.component.css']
 })

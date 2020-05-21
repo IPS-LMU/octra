@@ -4,7 +4,7 @@ import {SessionFile} from '../../obj/SessionFile';
 declare var window: any;
 
 @Component({
-  selector: 'app-drop-zone',
+  selector: 'octra-drop-zone',
   templateUrl: './drop-zone.component.html',
   styleUrls: ['./drop-zone.component.css']
 })

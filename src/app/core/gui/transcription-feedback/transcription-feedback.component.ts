@@ -4,7 +4,7 @@ import {TranslocoService} from '@ngneat/transloco';
 import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
 
 @Component({
-  selector: 'app-transcription-feedback',
+  selector: 'octra-transcription-feedback',
   templateUrl: './transcription-feedback.component.html',
   styleUrls: ['./transcription-feedback.component.css']
 })

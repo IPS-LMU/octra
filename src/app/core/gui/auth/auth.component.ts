@@ -4,7 +4,7 @@ import {interval, Subscription} from 'rxjs';
 import {NavbarService} from '../navbar/navbar.service';
 
 @Component({
-  selector: 'app-auth',
+  selector: 'octra-auth',
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css']
 })

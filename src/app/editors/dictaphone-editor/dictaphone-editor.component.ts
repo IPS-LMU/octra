@@ -14,7 +14,7 @@ import {
 import {OCTRAEditor} from '../octra-editor';
 
 @Component({
-  selector: 'app-audioplayer-gui',
+  selector: 'octra-audioplayer-gui',
   templateUrl: './dictaphone-editor.component.html',
   styleUrls: ['./dictaphone-editor.component.css']
 })

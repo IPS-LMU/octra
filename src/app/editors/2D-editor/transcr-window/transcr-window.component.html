@@ -13,8 +13,8 @@
     }" class="background"></div>
       <fa-icon icon="spinner" size="4x" spin="spin"></fa-icon>
     </div>
-    <app-asr-options *ngIf="settingsService.isASREnabled" [audioChunk]="audiochunk"
-                     [enabled]="editor.rawText === ''"></app-asr-options>
+    <octra-asr-options *ngIf="settingsService.isASREnabled" [audioChunk]="audiochunk"
+                       [enabled]="editor.rawText === ''"></octra-asr-options>
     <oco-audio-navigation #audionav
                           (afterPlaybackRateChange)="afterSpeedChange($event)"
                           (afterVolumeChange)="afterVolumeChange($event)"
@@ -59,18 +59,18 @@
                       [transcriptionLevel]="transcrService.currentlevel"
                       id="loupe"
     ></oco-audio-viewer>
-    <app-transcr-editor #editor (boundaryclicked)="onBoundaryClicked($event)"
-                        (boundaryinserted)="onBoundaryInserted()"
-                        (markerClick)="onMarkerClick($event)"
-                        (markerInsert)="onMarkerInsert($event)"
-                        (typing)="afterTyping($event)"
-                        [audiochunk]="audiochunk"
-                        [easymode]="easymode"
-                        [height]="100"
-                        [markers]="transcrService.guidelines?.markers"
-                        [validationEnabled]="validationEnabled"
-                        id="trancr"
-    ></app-transcr-editor>
+    <octra-transcr-editor #editor (boundaryclicked)="onBoundaryClicked($event)"
+                          (boundaryinserted)="onBoundaryInserted()"
+                          (markerClick)="onMarkerClick($event)"
+                          (markerInsert)="onMarkerInsert($event)"
+                          (typing)="afterTyping($event)"
+                          [audiochunk]="audiochunk"
+                          [easymode]="easymode"
+                          [height]="100"
+                          [markers]="transcrService.guidelines?.markers"
+                          [validationEnabled]="validationEnabled"
+                          id="trancr"
+    ></octra-transcr-editor>
     <div class="window-nav-bottom">
       <div class="row" role="group">
         <button (click)="save();doDirectionAction('left');" class="btn btn-info btn-raised col-md-4">

@@ -4,7 +4,7 @@ import {Subject} from 'rxjs';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 
 @Component({
-  selector: 'app-missing-permissions-modal',
+  selector: 'octra-missing-permissions-modal',
   templateUrl: './missing-permissions.component.html',
   styleUrls: ['./missing-permissions.component.css']
 })

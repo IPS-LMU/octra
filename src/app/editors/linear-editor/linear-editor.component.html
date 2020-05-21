@@ -103,15 +103,15 @@
        class="inner">
   </div>
 </div>
-<app-transcr-editor #transcr
-                    (keyup)="onKeyUp()"
-                    (markerClick)="onMarkerClick($event)"
-                    (markerInsert)="onMarkerInsert($event)"
-                    (typing)="onEditorTyping($event)"
-                    [audiochunk]="audioChunkDown"
-                    [easymode]="appStorage.easymode"
-                    [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
-                    [ngStyle]="{display: (segmentselected) ? 'inherit': 'none'}"
-                    [validationEnabled]="appStorage.usemode !== 'url' && (appStorage.usemode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
+<octra-transcr-editor #transcr
+                      (keyup)="onKeyUp()"
+                      (markerClick)="onMarkerClick($event)"
+                      (markerInsert)="onMarkerInsert($event)"
+                      (typing)="onEditorTyping($event)"
+                      [audiochunk]="audioChunkDown"
+                      [easymode]="appStorage.easymode"
+                      [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
+                      [ngStyle]="{display: (segmentselected) ? 'inherit': 'none'}"
+                      [validationEnabled]="appStorage.usemode !== 'url' && (appStorage.usemode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
 >
-</app-transcr-editor>
+</octra-transcr-editor>

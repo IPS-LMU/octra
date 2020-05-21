@@ -12,7 +12,7 @@ export enum ModalDeleteAnswer {
 }
 
 @Component({
-  selector: 'app-transcription-delete-modal',
+  selector: 'octra-transcription-delete-modal',
   templateUrl: './transcription-delete-modal.component.html',
   styleUrls: ['./transcription-delete-modal.component.css']
 })

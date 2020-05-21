@@ -33,11 +33,11 @@
     <i class="fa fa-spinner fa-spin" style="font-size:32px"></i>
   </div>
 </div>
-<app-validation-popover #validationPopover
-                        [ngStyle]="{
+<octra-validation-popover #validationPopover
+                          [ngStyle]="{
                                 'margin-left': popovers.validation.location.x + 'px',
                                 'margin-top': popovers.validation.location.y + 'px'
-                            }"></app-validation-popover>
+                            }"></octra-validation-popover>
 
 <table *ngIf="shownSegments.length > 0" [hidden]="!showTranscriptionTable" class="table table-bordered"
        id="transcription-table">
@@ -70,12 +70,12 @@
     <td (mouseleave)="onTextEditorLeave($event, i)"
         *ngIf="textEditor.state === 'active' && textEditor.selectedSegment === i; else editorNotActive">
       <div>
-        <app-transcr-editor #transcrEditor
-                            [audiochunk]="textEditor.audiochunk"
-                            [easymode]="true"
-                            [height]="60"
-                            [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
-        ></app-transcr-editor>
+        <octra-transcr-editor #transcrEditor
+                              [audiochunk]="textEditor.audiochunk"
+                              [easymode]="true"
+                              [height]="60"
+                              [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
+        ></octra-transcr-editor>
       </div>
     </td>
     <ng-template #editorNotActive>

@@ -15,7 +15,7 @@ import {isUnset} from '../../shared/Functions';
 import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 
 @Component({
-  selector: 'app-export-files-modal',
+  selector: 'octra-export-files-modal',
   templateUrl: './export-files-modal.component.html',
   styleUrls: ['./export-files-modal.component.css'],
   animations: [

@@ -3,7 +3,7 @@ import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
 
 @Component({
-  selector: 'app-error-modal',
+  selector: 'octra-error-modal',
   templateUrl: './error-modal.component.html',
   styleUrls: ['./error-modal.component.css']
 })

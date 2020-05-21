@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {AppStorageService} from '../../shared/service';
 
 @Component({
-  selector: 'app-fastbar',
+  selector: 'octra-fastbar',
   templateUrl: './taskbar.component.html',
   styleUrls: ['./taskbar.component.css']
 })

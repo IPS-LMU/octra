@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 
 @Component({
-  selector: 'app-features',
+  selector: 'octra-features',
   templateUrl: './features.component.html',
   styleUrls: ['./features.component.css']
 })

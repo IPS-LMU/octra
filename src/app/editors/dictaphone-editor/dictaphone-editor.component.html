@@ -38,17 +38,17 @@
 <oco-audioplayer #audioplayer
                  [audioChunk]="audiochunk"
 ></oco-audioplayer>
-<app-transcr-editor #transcr
-                    (boundaryclicked)="onBoundaryClicked($event)"
-                    (boundaryinserted)="onBoundaryInserted()"
-                    (keyup)="onKeyUp()"
-                    (markerClick)="onMarkerClick($event)"
-                    (markerInsert)="onMarkerInsert($event)"
-                    (selectionchanged)="onSelectionChanged($event)"
-                    (typing)="afterTyping($event);"
-                    [audiochunk]="audiochunk"
-                    [easymode]="appStorage.easymode"
-                    [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
-                    [validationEnabled]="appStorage.usemode !== 'url' && (appStorage.usemode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
+<octra-transcr-editor #transcr
+                      (boundaryclicked)="onBoundaryClicked($event)"
+                      (boundaryinserted)="onBoundaryInserted()"
+                      (keyup)="onKeyUp()"
+                      (markerClick)="onMarkerClick($event)"
+                      (markerInsert)="onMarkerInsert($event)"
+                      (selectionchanged)="onSelectionChanged($event)"
+                      (typing)="afterTyping($event);"
+                      [audiochunk]="audiochunk"
+                      [easymode]="appStorage.easymode"
+                      [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
+                      [validationEnabled]="appStorage.usemode !== 'url' && (appStorage.usemode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
 >
-</app-transcr-editor>
+</octra-transcr-editor>

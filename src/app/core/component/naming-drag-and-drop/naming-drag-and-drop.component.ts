@@ -17,7 +17,7 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {isUnset} from '../../shared/Functions';
 
 @Component({
-  selector: 'app-naming-drag-and-drop',
+  selector: 'octra-naming-drag-and-drop',
   templateUrl: './naming-drag-and-drop.component.html',
   styleUrls: ['./naming-drag-and-drop.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

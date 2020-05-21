@@ -9,7 +9,7 @@ import {AlertService, AppStorageService, SettingsService, TranscriptionService} 
 import {ASRQueueItemType, AsrService} from '../../shared/service/asr.service';
 
 @Component({
-  selector: 'app-asr-options',
+  selector: 'octra-asr-options',
   templateUrl: './asr-options.component.html',
   styleUrls: ['./asr-options.component.css']
 })

@@ -4,7 +4,7 @@ import {BrowserInfo} from '../../shared';
 import {Functions} from '../../shared/Functions';
 
 @Component({
-  selector: 'app-stresstest',
+  selector: 'octra-stresstest',
   templateUrl: './stresstest.component.html',
   styleUrls: ['./stresstest.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,

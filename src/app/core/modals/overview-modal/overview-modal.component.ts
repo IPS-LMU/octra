@@ -7,7 +7,7 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppStorageService, KeymappingService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 
 @Component({
-  selector: 'app-overview-modal',
+  selector: 'octra-overview-modal',
   templateUrl: './overview-modal.component.html',
   styleUrls: ['./overview-modal.component.css']
 })

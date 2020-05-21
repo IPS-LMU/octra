@@ -1,9 +1,9 @@
 <div id="overlay-transcr" style="position:relative">
-  <app-transcr-window #window (act)="onWindowAction($event)" *ngIf="showWindow"
-                      [audiochunk]="audioChunkWindow"
-                      [easymode]="appStorage.easymode"
-                      [segmentIndex]="selectedIndex"
-  ></app-transcr-window>
+  <octra-transcr-window #window (act)="onWindowAction($event)" *ngIf="showWindow"
+                        [audiochunk]="audioChunkWindow"
+                        [easymode]="appStorage.easymode"
+                        [segmentIndex]="selectedIndex"
+  ></octra-transcr-window>
   <oco-audio-navigation #audionav
                         (afterPlaybackRateChange)="afterSpeedChange($event)"
                         (afterVolumeChange)="afterVolumeChange($event)"

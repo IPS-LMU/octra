@@ -61,7 +61,7 @@
     "popper.js": "^1.16.1",
     "rxjs": "~6.5.5",
     "ssh2": "^0.8.9",
-    "summernote": "^0.8.17",
+    "summernote": "^0.8.18",
     "tslib": "^1.13.0",
     "video.js": "^7.7.6",
     "web-animations-js": "^2.3.2",

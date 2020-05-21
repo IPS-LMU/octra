@@ -1,21 +1,22 @@
-<app-alert #alert></app-alert>
-<app-transcription-send-modal #modal></app-transcription-send-modal>
-<app-transcription-sending-modal #transcrSendingModal [sendError]="sendError"></app-transcription-sending-modal>
-<app-overview-modal #modalOverview (transcriptionSend)="onSendNowClick()" id="overview"></app-overview-modal>
-<app-shortcuts-modal #modalShortcuts [editor]="Interface" [generalShortcuts]="generalShortcuts"></app-shortcuts-modal>
-<app-transcription-demo-end-modal #modalDemoEnd></app-transcription-demo-end-modal>
-<app-transcription-guidelines-modal #modalGuidelines
-                                    [guidelines]="transcrService.guidelines"></app-transcription-guidelines-modal>
-<app-activity-timeout-modal #inactivityModal *ngIf="settingsService.appSettings.octra.inactivityNotice !== undefined
-&& settingsService.appSettings.octra.inactivityNotice.showAfter !== undefined"></app-activity-timeout-modal>
-<app-missing-permissions-modal #missingPermissionsModal></app-missing-permissions-modal>
+<octra-alert #alert></octra-alert>
+<octra-transcription-send-modal #modal></octra-transcription-send-modal>
+<octra-transcription-sending-modal #transcrSendingModal [sendError]="sendError"></octra-transcription-sending-modal>
+<octra-overview-modal #modalOverview (transcriptionSend)="onSendNowClick()" id="overview"></octra-overview-modal>
+<octra-shortcuts-modal #modalShortcuts [editor]="Interface"
+                       [generalShortcuts]="generalShortcuts"></octra-shortcuts-modal>
+<octra-transcription-demo-end-modal #modalDemoEnd></octra-transcription-demo-end-modal>
+<octra-transcription-guidelines-modal #modalGuidelines
+                                      [guidelines]="transcrService.guidelines"></octra-transcription-guidelines-modal>
+<octra-activity-timeout-modal #inactivityModal *ngIf="settingsService.appSettings.octra.inactivityNotice !== undefined
+&& settingsService.appSettings.octra.inactivityNotice.showAfter !== undefined"></octra-activity-timeout-modal>
+<octra-missing-permissions-modal #missingPermissionsModal></octra-missing-permissions-modal>
 
 <div class="flex">
     <span id='saving'>
         <fa-icon *ngIf="saving === 'saving'" icon="save" style="color:#333333"></fa-icon>
         <fa-icon *ngIf="saving === 'error'" icon="save" style="color:red"></fa-icon>
     </span>
-  <app-fastbar
+  <octra-fastbar
     (guidelinesbtnclicked)="modalGuidelines.open()"
     (overviewbtnclicked)="modalOverview.open()"
 
@@ -27,7 +28,7 @@
             help: 'general.help' | transloco
             }"
     [responsive]="responsive"
-  ></app-fastbar>
+  ></octra-fastbar>
 
   <div class="flex">
     <div *ngIf="!editorloaded || waitForSend" id="editor-loading">

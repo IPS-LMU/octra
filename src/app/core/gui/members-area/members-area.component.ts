@@ -5,7 +5,7 @@ import {SettingsService, TranscriptionService, UserInteractionsService} from '..
 import {AsrService} from '../../shared/service/asr.service';
 
 @Component({
-  selector: 'app-members-area',
+  selector: 'octra-members-area',
   templateUrl: './members-area.component.html',
   styleUrls: ['./members-area.component.css'],
   providers: [UserInteractionsService, TranscriptionService, AsrService]

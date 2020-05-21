@@ -8,7 +8,7 @@ export enum TranscriptionStopModalAnswer {
 }
 
 @Component({
-  selector: 'app-transcription-stop-modal',
+  selector: 'octra-transcription-stop-modal',
   templateUrl: './transcription-stop-modal.component.html',
   styleUrls: ['./transcription-stop-modal.component.css']
 })

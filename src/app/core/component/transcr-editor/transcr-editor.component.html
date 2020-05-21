@@ -1,11 +1,11 @@
 <div #transcrEditor (change)="updateTextField()" [ngStyle]="{display: (visible) ? 'inherit' : 'none'}"
      class="transcr-editor">
-  <app-validation-popover #validationPopover
-                          [ngStyle]="{
+  <octra-validation-popover #validationPopover
+                            [ngStyle]="{
                                 'margin-left': popoversNew.validation.location.x + 'px',
                                 'margin-top': popoversNew.validation.location.y + 'px'
                             }"
-  ></app-validation-popover>
+  ></octra-validation-popover>
   <div (click)="onASROverlayClick()" [ngClass]="{
     'asr-running': asr.status === 'active'
   }" [ngStyle]="{

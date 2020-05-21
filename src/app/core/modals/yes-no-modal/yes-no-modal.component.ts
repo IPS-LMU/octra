@@ -3,7 +3,7 @@ import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
 
 @Component({
-  selector: 'app-yes-no-modal',
+  selector: 'octra-yes-no-modal',
   templateUrl: './yes-no-modal.component.html',
   styleUrls: ['./yes-no-modal.component.css']
 })

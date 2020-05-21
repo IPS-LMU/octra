@@ -1,7 +1,7 @@
 import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-authentication-needed',
+  selector: 'octra-authentication-needed',
   templateUrl: './authentication-needed.component.html',
   styleUrls: ['./authentication-needed.component.css']
 })

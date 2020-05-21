@@ -26,7 +26,7 @@ declare let lang: any;
 declare let document: any;
 
 @Component({
-  selector: 'app-transcr-editor',
+  selector: 'octra-transcr-editor',
   templateUrl: './transcr-editor.component.html',
   styleUrls: ['./transcr-editor.component.css'],
   providers: [TranscrEditorConfig]

@@ -18,7 +18,7 @@ import {ComponentCanDeactivate} from './login.deactivateguard';
 import {LoginService} from './login.service';
 
 @Component({
-  selector: 'app-login',
+  selector: 'octra-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
   providers: [LoginService]

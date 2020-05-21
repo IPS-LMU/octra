@@ -7,7 +7,7 @@ import {AnnotJSONConverter, PartiturConverter, TextConverter} from '../../obj/Co
 import {AppStorageService, SettingsService} from '../../shared/service';
 
 @Component({
-  selector: 'app-prompt-modal',
+  selector: 'octra-prompt-modal',
   templateUrl: './prompt-modal.component.html',
   styleUrls: ['./prompt-modal.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

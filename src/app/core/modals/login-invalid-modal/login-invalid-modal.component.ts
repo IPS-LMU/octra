@@ -3,7 +3,7 @@ import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
 
 @Component({
-  selector: 'app-login-invalid-modal',
+  selector: 'octra-login-invalid-modal',
   templateUrl: './login-invalid-modal.component.html',
   styleUrls: ['./login-invalid-modal.component.css']
 })

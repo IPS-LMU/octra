@@ -16,7 +16,7 @@ export interface ColumnFormat {
 }
 
 @Component({
-  selector: 'app-table-configurator',
+  selector: 'octra-table-configurator',
   templateUrl: './table-configurator.component.html',
   styleUrls: ['./table-configurator.component.css'],
   providers: []

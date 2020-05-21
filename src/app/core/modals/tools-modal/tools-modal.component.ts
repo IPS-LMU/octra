@@ -17,7 +17,7 @@ import {AppStorageService, AudioService, SettingsService, TranscriptionService, 
 declare var JSZip;
 
 @Component({
-  selector: 'app-tools-modal',
+  selector: 'octra-tools-modal',
   templateUrl: './tools-modal.component.html',
   styleUrls: ['./tools-modal.component.css'],
   animations: [

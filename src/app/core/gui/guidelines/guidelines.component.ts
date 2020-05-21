@@ -3,7 +3,7 @@ import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {SettingsService, TranscriptionService} from '../../shared/service';
 
 @Component({
-  selector: 'app-guidelines',
+  selector: 'octra-guidelines',
   templateUrl: './guidelines.component.html',
   styleUrls: ['./guidelines.component.css']
 })

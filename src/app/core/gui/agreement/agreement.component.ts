@@ -7,7 +7,7 @@ import {Functions} from '../../shared/Functions';
 import {AppStorageService, SettingsService} from '../../shared/service';
 
 @Component({
-  selector: 'app-agreement',
+  selector: 'octra-agreement',
   templateUrl: './agreement.component.html',
   styleUrls: ['./agreement.component.css']
 })

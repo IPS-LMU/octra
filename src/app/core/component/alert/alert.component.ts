@@ -6,7 +6,7 @@ import {DynComponentDirective} from '../../shared/directive/dyn-component.direct
 import {AlertEntry, AlertService} from '../../shared/service/alert.service';
 
 @Component({
-  selector: 'app-alert',
+  selector: 'octra-alert',
   templateUrl: './alert.component.html',
   styleUrls: ['./alert.component.css'],
   animations: [

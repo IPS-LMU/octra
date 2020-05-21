@@ -8,7 +8,7 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppStorageService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 
 @Component({
-  selector: 'app-statistics-modal',
+  selector: 'octra-statistics-modal',
   templateUrl: './statistics-modal.component.html',
   styleUrls: ['./statistics-modal.component.css']
 })

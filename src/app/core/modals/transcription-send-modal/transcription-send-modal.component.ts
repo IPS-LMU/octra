@@ -8,7 +8,7 @@ export enum ModalSendAnswer {
 }
 
 @Component({
-  selector: 'app-transcription-send-modal',
+  selector: 'octra-transcription-send-modal',
   templateUrl: './transcription-send-modal.component.html',
   styleUrls: ['./transcription-send-modal.component.css']
 })

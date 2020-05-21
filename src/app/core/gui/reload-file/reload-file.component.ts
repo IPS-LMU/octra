@@ -10,7 +10,7 @@ import {AppStorageService, AudioService, OIDBLevel, OIDBLink, TranscriptionServi
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
 
 @Component({
-  selector: 'app-reload-file',
+  selector: 'octra-reload-file',
   templateUrl: './reload-file.component.html',
   styleUrls: ['./reload-file.component.css']
 })

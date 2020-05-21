@@ -3,7 +3,7 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {APIService, AppStorageService} from '../../shared/service';
 
 @Component({
-  selector: 'app-help-tools',
+  selector: 'octra-help-tools',
   templateUrl: './help-tools.component.html',
   styleUrls: ['./help-tools.component.css']
 })

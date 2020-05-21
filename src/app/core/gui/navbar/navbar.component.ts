@@ -13,7 +13,7 @@ import {BugReportService, ConsoleType} from '../../shared/service/bug-report.ser
 import {NavbarService} from './navbar.service';
 
 @Component({
-  selector: 'app-navigation',
+  selector: 'octra-navigation',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })

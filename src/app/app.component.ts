@@ -4,7 +4,7 @@ import {TranslocoService} from '@ngneat/transloco';
 import {environment} from '../environments/environment';
 import {AppInfo} from './app.info';
 import {NavigationComponent} from './core/gui/navbar';
-import {ASRLanguage} from './core/obj/Settings';
+import {ASRLanguage} from './core/obj/Settings/app-settings';
 import {SubscriptionManager} from './core/obj/SubscriptionManager';
 import {isUnset} from './core/shared/Functions';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
@@ -13,7 +13,7 @@ import {AsrService} from './core/shared/service/asr.service';
 import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
 
 @Component({
-  selector: 'app-octra',
+  selector: 'octra-app',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.css']
 })

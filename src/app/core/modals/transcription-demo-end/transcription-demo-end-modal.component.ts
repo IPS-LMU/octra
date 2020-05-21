@@ -11,7 +11,7 @@ export enum ModalEndAnswer {
 }
 
 @Component({
-  selector: 'app-transcription-demo-end-modal',
+  selector: 'octra-transcription-demo-end-modal',
   templateUrl: './transcription-demo-end-modal.component.html',
   styleUrls: ['./transcription-demo-end-modal.component.css']
 })

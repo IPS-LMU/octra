@@ -7,7 +7,7 @@ import {AppStorageService, SettingsService} from '../../shared/service';
 
 @Component({
 
-  selector: 'app-login',
+  selector: 'octra-login',
   templateUrl: './logout.component.html',
   styleUrls: ['./logout.component.css']
 })

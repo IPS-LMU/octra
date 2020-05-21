@@ -137,10 +137,10 @@
                     </ng-container>
                   </a>
                   <div [hidden]="!tools.audioCutting.showConfigurator" class="configurator">
-                    <app-naming-drag-and-drop #namingConvention
-                                              [fileName]="navbarServ.transcrService.audioManager.ressource.name"
-                                              [firstSegment]="navbarServ.transcrService.currentlevel.segments.get(0)"
-                    ></app-naming-drag-and-drop>
+                    <octra-naming-drag-and-drop #namingConvention
+                                                [fileName]="navbarServ.transcrService.audioManager.ressource.name"
+                                                [firstSegment]="navbarServ.transcrService.currentlevel.segments.get(0)"
+                    ></octra-naming-drag-and-drop>
 
                     <div class="form-control">
                       <span>{{'tools.cut audio.append meta files' | transloco}}: </span>

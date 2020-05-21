@@ -4,7 +4,7 @@ import {BrowserInfo} from '../../shared';
 import {CompatibilityService} from '../../shared/service/compatibility.service';
 
 @Component({
-  selector: 'app-browser-test',
+  selector: 'octra-browser-test',
   templateUrl: './browser-test.component.html',
   styleUrls: ['./browser-test.component.css']
 })

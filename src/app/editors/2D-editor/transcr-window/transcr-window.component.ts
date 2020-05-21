@@ -40,7 +40,7 @@ import {
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../../core/shared/service/asr.service';
 
 @Component({
-  selector: 'app-transcr-window',
+  selector: 'octra-transcr-window',
   templateUrl: './transcr-window.component.html',
   styleUrls: ['./transcr-window.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

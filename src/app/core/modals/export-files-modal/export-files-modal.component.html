@@ -100,12 +100,12 @@
             <td></td>
             <td colspan="4" style="padding-left:20px;">
               <div *ngIf="navbarServ.transcrService !== undefined" class="card" style="padding:10px;">
-                <app-table-configurator #tableConfigurator
-                                        [annotation]="transcrService.annotation"
-                                        [columns]="tools.tableConfigurator.columns"
-                                        [currentLevelID]="transcrService.currentlevel.id"
-                                        [tableWidth]="content.offsetWidth - 100"
-                ></app-table-configurator>
+                <octra-table-configurator #tableConfigurator
+                                          [annotation]="transcrService.annotation"
+                                          [columns]="tools.tableConfigurator.columns"
+                                          [currentLevelID]="transcrService.currentlevel.id"
+                                          [tableWidth]="content.offsetWidth - 100"
+                ></octra-table-configurator>
               </div>
             </td>
           </tr>

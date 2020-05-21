@@ -17,21 +17,21 @@
                         'col-md-6 col-lg-9': appStorage.usemode === 'online' || this.appStorage.usemode === 'demo',
                         'col-12': appStorage.usemode !== 'online' && this.appStorage.usemode !== 'demo'
                     }" class="col-md-6" style="overflow: auto; max-height:1200px;border-right:1px solid lightgray;">
-            <app-transcr-overview
+            <octra-transcr-overview
               #overview
               (segmentclicked)="onSegmentInOverviewClicked($event)"
               [segments]="(transcrService.annotation !== null && transcrService.annotation !== undefined)
                               ? transcrService.annotation.levels[transcrService.selectedlevel].segments.segments: null"
               [visible]="visible">
-            </app-transcr-overview>
+            </octra-transcr-overview>
           </div>
           <div *ngIf="appStorage.usemode === 'online' || this.appStorage.usemode === 'demo'" class="col-md-6 col-lg-3"
                style="overflow: auto;max-height:1200px;">
             <h4>Feedback</h4>
-            <app-transcription-feedback #feedback
-                                        [feedbackData]="appStorage.feedback"
-                                        [showCommentFieldOnly]="settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('korbinian')">
-            </app-transcription-feedback>
+            <octra-transcription-feedback #feedback
+                                          [feedbackData]="appStorage.feedback"
+                                          [showCommentFieldOnly]="settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('korbinian')">
+            </octra-transcription-feedback>
 
             <p *ngIf="sendValidTranscriptOnly && !transcrService.transcriptValid"
                style="color:red; text-align: center">

@@ -17,7 +17,7 @@ interface FileProgress {
 }
 
 @Component({
-  selector: 'app-octra-dropzone',
+  selector: 'octra-dropzone',
   templateUrl: './octra-dropzone.component.html',
   styleUrls: ['./octra-dropzone.component.css']
 })

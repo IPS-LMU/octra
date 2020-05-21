@@ -3,7 +3,7 @@ import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
 
 @Component({
-  selector: 'app-transcription-sending-modal',
+  selector: 'octra-transcription-sending-modal',
   templateUrl: './transcription-sending-modal.component.html',
   styleUrls: ['./transcription-sending-modal.component.css']
 })

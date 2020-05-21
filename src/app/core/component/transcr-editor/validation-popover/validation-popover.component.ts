@@ -2,7 +2,7 @@ import {AfterViewChecked, ChangeDetectorRef, Component, ElementRef, HostListener
 import {DomSanitizer} from '@angular/platform-browser';
 
 @Component({
-  selector: 'app-validation-popover',
+  selector: 'octra-validation-popover',
   templateUrl: './validation-popover.component.html',
   styleUrls: ['./validation-popover.component.css']
 })

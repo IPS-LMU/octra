@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 
 @Component({
-  selector: 'app-error-occurred',
+  selector: 'octra-error-occurred',
   templateUrl: './error-occurred.component.html',
   styleUrls: ['./error-occurred.component.css']
 })

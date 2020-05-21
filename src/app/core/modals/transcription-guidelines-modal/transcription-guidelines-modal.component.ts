@@ -19,7 +19,7 @@ import {AppStorageService, SettingsService, TranscriptionService} from '../../sh
 import {BugReportService} from '../../shared/service/bug-report.service';
 
 @Component({
-  selector: 'app-transcription-guidelines-modal',
+  selector: 'octra-transcription-guidelines-modal',
   templateUrl: './transcription-guidelines-modal.component.html',
   styleUrls: ['./transcription-guidelines-modal.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,

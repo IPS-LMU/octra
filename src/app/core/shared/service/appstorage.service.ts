@@ -1,12 +1,11 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {LocalStorageService, SessionStorage, SessionStorageService} from '@rars/ngx-webstorage';
-import {AudioManager, OLevel, OLink} from 'octra-components';
+import {AudioManager, isUnset, OLevel, OLink} from 'octra-components';
 import {Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {IDataEntry} from '../../obj/data-entry';
 import {IndexedDBManager} from '../../obj/IndexedDBManager';
 import {SessionFile} from '../../obj/SessionFile';
-import {isUnset} from '../Functions';
 import {ConsoleEntry} from './bug-report.service';
 
 export interface IIDBLevel {
@@ -532,9 +531,9 @@ export class AppStorageService {
     if (!(files === null || files === undefined)) {
       // get audio file
       let audiofile;
-      for (let i = 0; i < files.length; i++) {
-        if (AudioManager.isValidAudioFileName(files[i].file.name, AppInfo.audioformats)) {
-          audiofile = files[i].file;
+      for (const file of files) {
+        if (AudioManager.isValidAudioFileName(file.file.name, AppInfo.audioformats)) {
+          audiofile = file.file;
           break;
         }
       }
@@ -565,7 +564,7 @@ export class AppStorageService {
         err('type not supported');
       }
     }
-  };
+  }
 
   public getSessionFile = (file: File) => {
     return new SessionFile(
@@ -574,7 +573,7 @@ export class AppStorageService {
       new Date(file.lastModified),
       file.type
     );
-  };
+  }
   public overwriteAnnotation = (value: OIDBLevel[], saveToDB = true): Promise<any> => {
     return new Promise<any>((resolve, reject) => {
       if (saveToDB) {
@@ -593,7 +592,7 @@ export class AppStorageService {
     }).then(() => {
       return new Promise<any>((resolve, reject2) => {
         if (saveToDB) {
-          this._idb.saveArraySequential(value, 'annotation_levels', 'id').then((r) => {
+          this._idb.saveArraySequential(value, 'annotation_levels', 'id').then(() => {
             resolve();
           }).catch((error) => {
             reject2(error);
@@ -605,16 +604,17 @@ export class AppStorageService {
         () => {
           let max = 0;
 
-          for (let i = 0; i < value.length; i++) {
-            max = Math.max(max, value[i].id);
+          for (const valueElem of value) {
+            max = Math.max(max, valueElem.id);
           }
+
           this._levelcounter = max;
         }
       ).catch((err) => {
         console.error(err);
       });
     });
-  };
+  }
 
   public overwriteLinks = (value: OIDBLink[]): Promise<any> => {
     return this.clearIDBTable('annotation_links')
@@ -625,7 +625,7 @@ export class AppStorageService {
       }).then(() => {
         return this._idb.saveArraySequential(value, 'annotation_links', 'id');
       });
-  };
+  }
 
   public setSessionData(member: any, dataID: number, audioURL: string, offline: boolean = false): { error: string } {
     if ((this._easymode === null || this._easymode === undefined)) {
@@ -758,7 +758,7 @@ export class AppStorageService {
 
   public saveLogItem(log: any) {
     if (!(log === null || log === undefined)) {
-      for (let attr in log) {
+      for (const attr in log) {
         if (log.hasOwnProperty(attr) && isUnset(log['' + attr])) {
           delete log['' + attr];
         }
@@ -1003,9 +1003,9 @@ export class AppStorageService {
   }
 
   public getLevelByID(id: number) {
-    for (let i = 0; i < this._annotation.length; i++) {
-      if (this._annotation[i].id === id) {
-        return this._annotation[i];
+    for (const level of this._annotation) {
+      if (level.id === id) {
+        return level;
       }
     }
     return null;
@@ -1039,9 +1039,7 @@ export class AppStorageService {
     return new Promise<void>(
       (resolve, reject) => {
         const promises: Promise<any>[] = [];
-        for (let i = 0; i < variables.length; i++) {
-          const variable = variables[i];
-
+        for (const variable of variables) {
           if (this['' + variable.attribute + ''] !== undefined) {
             if (variable.hasOwnProperty('attribute') && variable.hasOwnProperty('key')) {
               promises.push(this.loadOptionFromIDB(variable.key).then(
@@ -1070,7 +1068,7 @@ export class AppStorageService {
         );
       }
     );
-  };
+  }
 
   /**
    * Sets sessionKey. Returns true on success, false on failure

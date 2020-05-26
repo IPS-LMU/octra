@@ -1,5 +1,4 @@
-import {OAnnotJSON, OAudiofile, OEvent, OLabel, OLevel, OSegment} from 'octra-components';
-import {Functions} from '../../shared/Functions';
+import {Functions, OAnnotJSON, OAudiofile, OEvent, OLabel, OLevel, OSegment} from 'octra-components';
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 
 export class PraatTextgridConverter extends Converter {
@@ -23,11 +22,12 @@ export class PraatTextgridConverter extends Converter {
 
       let segLevels = 0;
 
-      for (let i = 0; i < annotation.levels.length; i++) {
-        if (annotation.levels[i].type === 'SEGMENT') {
+      for (const level of annotation.levels) {
+        if (level.type === 'SEGMENT') {
           segLevels++;
         }
       }
+
       const addHeader = (res: string) => {
         return res + `File type = "ooTextFile"\n` +
           `Object class = "TextGrid"\n` +
@@ -219,7 +219,7 @@ export class PraatTextgridConverter extends Converter {
                         }
                         i++;
 
-                        const number = Number(test[1]);
+                        const numberStr = Number(test[1]);
 
                         test = lines[i].match(/mark = "(.*)"/);
                         if ((test === null || test === undefined)) {
@@ -234,7 +234,7 @@ export class PraatTextgridConverter extends Converter {
 
                         const olabels: OLabel[] = [];
                         olabels.push((new OLabel(lvlName, mark)));
-                        const oevent = new OEvent(segNum, Math.round(number * audiofile.sampleRate), olabels);
+                        const oevent = new OEvent(segNum, Math.round(numberStr * audiofile.sampleRate), olabels);
                         olevel.items.push(oevent);
                       }
 

@@ -1,11 +1,10 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
-import {AudioManager, FileInfo, SampleUnit, WavFormat} from 'octra-components';
+import {AudioManager, FileInfo, isUnset, SampleUnit, WavFormat} from 'octra-components';
 import {Subject} from 'rxjs';
 import * as X2JS from 'x2js';
 import {ASRLanguage, ASRSettings} from '../../obj/Settings';
-import {isUnset} from '../Functions';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
 import {SettingsService} from './settings.service';
@@ -79,7 +78,7 @@ export class AsrService {
     this._queue.start();
   }
 
-  public addToQueue(timeInterval: { sampleStart: number, sampleLength: number, browserSampleEnd: number }, type: ASRQueueItemType, transcript = ''): ASRQueueItem {
+  public addToQueue(timeInterval: ASRTimeInterval, type: ASRQueueItemType, transcript = ''): ASRQueueItem {
     const item = new ASRQueueItem({
       sampleStart: timeInterval.sampleStart,
       sampleLength: timeInterval.sampleLength,
@@ -93,9 +92,8 @@ export class AsrService {
     // change status to STOPPED
     this._queue.stop();
 
-    for (let i = 0; i < this._queue.queue.length; i++) {
-      const item = this._queue.queue[i];
-      this.stopASROfItem(item);
+    for (const asrQueueItem of this._queue.queue) {
+      this.stopASROfItem(asrQueueItem);
     }
   }
 
@@ -412,11 +410,8 @@ export class ASRQueueItem {
     return this._result;
   }
 
-  constructor(timeInterval: {
-    sampleStart: number,
-    sampleLength: number,
-    browserSampleEnd: number
-  }, asrQueue: ASRQueue, selectedLanguage: ASRLanguage, type: ASRQueueItemType, transcriptInput = '') {
+  constructor(timeInterval: ASRTimeInterval, asrQueue: ASRQueue, selectedLanguage: ASRLanguage,
+              type: ASRQueueItemType, transcriptInput = '') {
     this._id = ASRQueueItem.counter++;
     this._time = {
       sampleStart: timeInterval.sampleStart,
@@ -458,9 +453,9 @@ export class ASRQueueItem {
       } else if (this._type === ASRQueueItemType.ASRMAUS) {
         console.log(`CALL ASR MAUS`);
         // call ASR and than MAUS
-        this.transcribeSignalWithASR('bpf').then((result) => {
+        this.transcribeSignalWithASR('bpf').then((asrResult) => {
 
-          this.callMAUS(this._selectedLanguage, result.audioURL, result.transcriptURL).then((result) => {
+          this.callMAUS(this._selectedLanguage, asrResult.audioURL, asrResult.transcriptURL).then((mausResult) => {
             const reader = new FileReader();
 
             reader.onerror = (error) => {
@@ -473,7 +468,7 @@ export class ASRQueueItem {
               this.changeStatus(ASRProcessStatus.FINISHED);
             };
 
-            reader.readAsText(result.file, 'utf-8');
+            reader.readAsText(mausResult.file, 'utf-8');
           }).catch((error) => {
             console.error(error);
 
@@ -699,9 +694,9 @@ export class ASRQueueItem {
         if (json.success === 'true') {
           // TODO set urls to results only
           // json attribute entry is an object
-          resolve(json.fileList.entry['value']);
+          resolve(json.fileList.entry.value);
         } else {
-          reject(json['message']);
+          reject(json.message);
         }
       };
       xhr.send(form);
@@ -765,7 +760,7 @@ export class ASRQueueItem {
       file: File,
       url: string
     }>((resolve, reject) => {
-      let mausURL = this.parent.asrSettings.calls[1].replace('{{host}}', languageObject.host)
+      const mausURL = this.parent.asrSettings.calls[1].replace('{{host}}', languageObject.host)
         .replace('{{audioURL}}', audioURL)
         .replace('{{transcriptURL}}', transcriptURL)
         .replace('{{asrType}}', languageObject.asr)
@@ -823,4 +818,10 @@ export enum ASRProcessStatus {
   NOAUTH = 'NOAUTH',
   FAILED = 'FAILED',
   FINISHED = 'FINISHED'
+}
+
+export interface ASRTimeInterval {
+  sampleStart: number;
+  sampleLength: number;
+  browserSampleEnd: number;
 }

@@ -25,10 +25,10 @@ export class WebVTTConverter extends Converter {
 
       let counter = 1;
       if (level.type === 'SEGMENT') {
-        for (let j = 0; j < level.items.length; j++) {
-          const transcript = level.items[j].labels[0].value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          const start = this.getTimeStringFromSamples(level.items[j].sampleStart, annotation.sampleRate);
-          const end = this.getTimeStringFromSamples(level.items[j].sampleStart + level.items[j].sampleDur, annotation.sampleRate);
+        for (const item of level.items) {
+          const transcript = item.labels[0].value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          const start = this.getTimeStringFromSamples(item.sampleStart, annotation.sampleRate);
+          const end = this.getTimeStringFromSamples(item.sampleStart + item.sampleDur, annotation.sampleRate);
 
           if (transcript !== '') {
             result += `${counter}\n`;
@@ -165,5 +165,5 @@ export class WebVTTConverter extends Converter {
       result = '0' + result;
     }
     return result;
-  };
+  }
 }

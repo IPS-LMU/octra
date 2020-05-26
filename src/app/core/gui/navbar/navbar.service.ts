@@ -1,6 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {AudioRessource} from 'octra-components';
-import {FileSize} from '../../shared/Functions';
+import {AudioRessource, FileSize} from 'octra-components';
 import {TranscriptionService, UserInteractionsService} from '../../shared/service';
 
 @Injectable()

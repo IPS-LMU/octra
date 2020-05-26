@@ -1,5 +1,4 @@
-import {ILevel, ISegment, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
-import {Functions} from '../../shared/Functions';
+import {Functions, ILevel, ISegment, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 
 export class PraatTableConverter extends Converter {
@@ -35,13 +34,11 @@ export class PraatTableConverter extends Converter {
     if (!(annotation === null || annotation === undefined)) {
       result = addHeader(result);
 
-      for (let i = 0; i < annotation.levels.length; i++) {
-        const level = annotation.levels[i];
+      for (const level of annotation.levels) {
         // export segments only
         if (level.type === 'SEGMENT') {
-          for (let j = 0; j < level.items.length; j++) {
-            const segment: ISegment = level.items[j] as ISegment;
-            result = addEntry(result, level, segment);
+          for (const segment of level.items) {
+            result = addEntry(result, level, segment as ISegment);
           }
         }
       }
@@ -87,8 +84,8 @@ export class PraatTableConverter extends Converter {
           }
         }
 
-        for (let t = 0; t < tiers.length; t++) {
-          const olevel = new OLevel(tiers[t], 'SEGMENT');
+        for (const tierElement of tiers) {
+          const olevel = new OLevel(tierElement, 'SEGMENT');
           let start = 0;
           let puffer = 0;
           let id = 1;
@@ -110,7 +107,7 @@ export class PraatTableConverter extends Converter {
               }
               const sampleRate = audiofile.sampleRate;
 
-              if (tier === tiers[t]) {
+              if (tier === tierElement) {
                 if (isNaN(tmin)) {
                   return null;
                 } else {

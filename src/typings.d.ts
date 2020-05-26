@@ -17,4 +17,3 @@ declare var navigator: Navigator;
 declare var document: Document;
 declare var Ajv: any;
 
-

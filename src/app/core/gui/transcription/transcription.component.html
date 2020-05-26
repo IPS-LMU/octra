@@ -34,7 +34,7 @@
     <div *ngIf="!editorloaded || waitForSend" id="editor-loading">
       <fa-icon [size]="'4x'" [spin]="true" icon="spinner" style="color:lightgray"></fa-icon>
     </div>
-    <ng-template appLoadeditor></ng-template>
+    <ng-template octraLoadeditor></ng-template>
   </div>
 
   <div *ngIf="(settingsService.isTheme('shortAudioFiles') || settingsService.isTheme('korbinian'))

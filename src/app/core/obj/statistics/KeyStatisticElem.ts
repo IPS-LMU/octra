@@ -52,10 +52,11 @@ export class KeyStatisticElem extends StatisticElem {
         if (elem.hasOwnProperty('value') || elem.hasOwnProperty('context') || elem.hasOwnProperty('timestamp')
           || elem.hasOwnProperty('type') || elem.hasOwnProperty('keyCode') || elem.hasOwnProperty('shiftPressed')
           || elem.hasOwnProperty('ctrlPressed') || elem.hasOwnProperty('altPressed') || elem.hasOwnProperty('char')
-          || elem.hasOwnProperty('playpos') || elem.hasOwnProperty('playerpos') || elem.hasOwnProperty('caretpos') || elem.hasOwnProperty('control')
+          || elem.hasOwnProperty('playpos') || elem.hasOwnProperty('playerpos') || elem.hasOwnProperty('caretpos')
+          || elem.hasOwnProperty('control')
         ) {
           if (attr === 'playerpos') {
-            result['playpos'] = elem[`${attr}`];
+            result.playpos = elem[`${attr}`];
           } else {
             result[`${attr}`] = elem[`${attr}`];
           }

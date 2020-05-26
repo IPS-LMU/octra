@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
+import {Functions} from 'octra-components';
 import {Observable} from 'rxjs';
 import {AppInfo} from '../../../app.info';
-import {Functions} from '../../shared/Functions';
 import {AppStorageService, SettingsService} from '../../shared/service';
 
 @Injectable()
@@ -20,7 +20,9 @@ export class ReloadFileGuard implements CanActivate {
       params.fragment = route.fragment;
       params.queryParams = route.queryParams;
 
-      Functions.navigateTo(this.router, ['/login'], params);
+      Functions.navigateTo(this.router, ['/login'], params).catch((error) => {
+        console.error(error);
+      });
       return false;
     } else {
       if ((this.settingsService.appSettings === null || this.settingsService.appSettings === undefined)) {

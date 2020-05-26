@@ -13,8 +13,8 @@ export class LoginService {
   }
 
   public checkLoginData(userName: string) {
-    for (let i = 0; i < this.dbData.length; i++) {
-      if (userName === this.dbData[i].name) {
+    for (const dbelement of this.dbData) {
+      if (userName === dbelement.name) {
         return true;
       }
     }

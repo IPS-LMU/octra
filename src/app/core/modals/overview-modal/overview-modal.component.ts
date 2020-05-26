@@ -153,7 +153,9 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
       if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
         this.feedback.saveFeedbackform();
       }
-      this.overview.stopPlayback();
+      this.overview.stopPlayback().catch((error) => {
+        console.error(error);
+      });
 
       if (fromModal) {
         this.uiService.addElementFromEvent('overview', {value: 'closed'},
@@ -171,7 +173,9 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
     if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
       this.feedback.saveFeedbackform();
     }
-    this.overview.stopPlayback();
+    this.overview.stopPlayback().catch((error) => {
+      console.error(error);
+    });
     this.transcriptionSend.emit();
   }
 

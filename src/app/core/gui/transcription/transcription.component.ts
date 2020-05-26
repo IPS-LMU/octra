@@ -16,7 +16,7 @@ import {
 } from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
-import {AudioManager, Level, PlayBackStatus} from 'octra-components';
+import {AudioManager, Functions, isUnset, Level, PlayBackStatus} from 'octra-components';
 import {interval, throwError} from 'rxjs';
 import * as X2JS from 'x2js';
 import {AppInfo} from '../../../app.info';
@@ -40,7 +40,6 @@ import {ProjectSettings} from '../../obj/Settings';
 
 import {BrowserInfo, SubscriptionManager} from '../../shared';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
-import {Functions, isUnset} from '../../shared/Functions';
 
 import {
   AlertService,
@@ -199,7 +198,9 @@ export class TranscriptionComponent implements OnInit,
           case('combinePhrases'):
             this.alertService.showAlert('success', this.langService.translate('tools.alerts.done', {
               value: toolName
-            }));
+            })).catch((error) => {
+              console.error(error);
+            });
             if (!isUnset(this.currentEditor) && !isUnset((this.currentEditor.instance as any).editor)) {
               (this._currentEditor.instance as any).update();
             }
@@ -228,7 +229,9 @@ export class TranscriptionComponent implements OnInit,
     }));
 
     this.subscrmanager.add(this.audio.missingPermission.subscribe(() => {
-      this.missingPermissionsModal.open();
+      this.missingPermissionsModal.open().catch((error) => {
+        console.error(error);
+      });
     }));
   }
 
@@ -272,18 +275,20 @@ export class TranscriptionComponent implements OnInit,
         if (answer === TranscriptionStopModalAnswer.QUIT) {
           this.transcrService.endTranscription();
 
-          Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
+          Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).catch((error) => {
+            console.error(error);
+          });
         }
       }).catch((error) => {
         console.error(error);
       });
     }
-  };
+  }
 
   onSendError = (error) => {
     this.sendError = error.message;
     return throwError(error);
-  };
+  }
 
   ngOnChanges(changes: SimpleChanges) {
   }
@@ -309,8 +314,7 @@ export class TranscriptionComponent implements OnInit,
       )
     );
 
-    for (let i = 0; i < this.transcrService.guidelines.markers.length; i++) {
-      const marker = this.transcrService.guidelines.markers[i];
+    for (const marker of this.transcrService.guidelines.markers) {
       if (marker.type === 'break') {
         this.transcrService.breakMarker = marker;
         break;
@@ -339,7 +343,9 @@ export class TranscriptionComponent implements OnInit,
 
     this.subscrmanager.add(this.navbarServ.interfacechange.subscribe(
       (editor) => {
-        this.changeEditor(editor);
+        this.changeEditor(editor).catch((error) => {
+          console.error(error);
+        });
       }
     ));
 
@@ -496,7 +502,9 @@ export class TranscriptionComponent implements OnInit,
       $event.preventDefault();
     } else if ($event.altKey && $event.which === 57) {
       if (!this.modalGuidelines.visible) {
-        this.modalGuidelines.open();
+        this.modalGuidelines.open().catch((error) => {
+          console.error(error);
+        });
       } else {
         this.modalGuidelines.close();
       }
@@ -505,7 +513,9 @@ export class TranscriptionComponent implements OnInit,
     if ($event.altKey && $event.which === 48) {
       if (!this.modalOverview.visible) {
         this.transcrService.analyse();
-        this.modalOverview.open();
+        this.modalOverview.open().catch((error) => {
+          console.error(error);
+        });
       } else {
         this.modalOverview.close();
       }
@@ -523,11 +533,11 @@ export class TranscriptionComponent implements OnInit,
         // fallback to last editor
         name = editorComponents[editorComponents.length - 1].name;
       }
-      for (let i = 0; i < editorComponents.length; i++) {
-        if (name === editorComponents[i].name) {
+      for (const editorComponent of editorComponents) {
+        if (name === editorComponent.name) {
           this.appStorage.Interface = name;
           this.interface = name;
-          comp = editorComponents[i].editor;
+          comp = editorComponent.editor;
           break;
         }
       }
@@ -559,7 +569,9 @@ export class TranscriptionComponent implements OnInit,
 
             if ((this.currentEditor.instance as any).hasOwnProperty('openModal')) {
               this.subscrmanager.add((this.currentEditor.instance as any).openModal.subscribe(() => {
-                this.modalOverview.open();
+                this.modalOverview.open().catch((error) => {
+                  console.error(error);
+                });
               }));
             }
 
@@ -599,7 +611,9 @@ export class TranscriptionComponent implements OnInit,
     const json: any = this.transcrService.exportDataToJSON();
 
     if (this.appStorage.usemode === 'online') {
-      this.transcrSendingModal.open();
+      this.transcrSendingModal.open().catch((error) => {
+        console.error(error);
+      });
       this.api.saveSession(json.transcript, json.project, json.annotator,
         json.jobno, json.id, json.status, json.comment, json.quality, json.log).then((result) => {
         if (result !== null) {
@@ -637,7 +651,9 @@ export class TranscriptionComponent implements OnInit,
             this.abortTranscription();
             break;
           case(ModalEndAnswer.CONTINUE):
-            this.transcrSendingModal.open();
+            this.transcrSendingModal.open().catch((error) => {
+              console.error(error);
+            });
             setTimeout(() => {
               // simulate nextTranscription
               this.transcrSendingModal.close();
@@ -687,7 +703,9 @@ export class TranscriptionComponent implements OnInit,
           || (validTranscriptOnly && !validTranscript)
         ) {
           this.waitForSend = false;
-          this.modalOverview.open();
+          this.modalOverview.open().catch((error) => {
+            console.error(error);
+          });
         } else {
           this.onSendNowClick();
         }
@@ -758,10 +776,14 @@ export class TranscriptionComponent implements OnInit,
           this.appStorage.jobsLeft = Number(json.message);
         }
 
-        Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling);
+        Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
+          console.error(error);
+        });
       } else {
         this.appStorage.submitted = true;
-        Functions.navigateTo(this.router, ['/user/transcr/end'], AppInfo.queryParamsHandling);
+        Functions.navigateTo(this.router, ['/user/transcr/end'], AppInfo.queryParamsHandling).catch((error) => {
+          console.error(error);
+        });
       }
     } else {
       console.error(`json array for transcription next is null`);

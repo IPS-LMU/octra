@@ -12,11 +12,10 @@ import {
   ViewChild
 } from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
-import {AudioChunk, AudioManager, SampleUnit, Segments, TimespanPipe} from 'octra-components';
+import {AudioChunk, AudioManager, Functions, isUnset, SampleUnit, Segments, TimespanPipe} from 'octra-components';
 import {isNumeric} from 'rxjs/internal-compatibility';
 
 import {BrowserInfo, KeyMapping, SubscriptionManager} from '../../shared';
-import {Functions, isUnset} from '../../shared/Functions';
 import {TranscriptionService} from '../../shared/service';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../shared/service/asr.service';
 import {TranscrEditorConfig} from './config';
@@ -185,9 +184,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     html = html.replace(/&nbsp;/g, ' ');
 
     // check for markers that are utf8 symbols
-    for (let i = 0; i < this.markers.length; i++) {
-      const marker = this.markers[i];
-
+    for (const marker of this.markers) {
       if (!isUnset(marker.icon) && marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0 && marker.icon.indexOf('.gif') < 0
         && marker.icon !== '' && marker.code !== '' && marker.icon !== marker.code
       ) {
@@ -221,8 +218,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         if (attr) {
           const markerCode = Functions.unEscapeHtml(attr);
 
-          for (let j = 0; j < this.markers.length; j++) {
-            const marker = this.markers[j];
+          for (const marker of this.markers) {
             if (markerCode === marker.code) {
               jQuery(elem).replaceWith(Functions.escapeHtml(markerCode));
               charCounter += markerCode.length;
@@ -282,7 +278,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     return rawText;
-  };
+  }
   /**
    * initializes the editor and the containing summernote editor
    */
@@ -413,7 +409,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       this.size.height = jQuery(this.transcrEditor.nativeElement).height();
       this.size.width = jQuery(this.transcrEditor.nativeElement).width();
     }
-  };
+  }
 
   onASRItemChange(item: ASRQueueItem) {
     if (!isUnset(item)) {
@@ -476,7 +472,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     }
     this.triggerTyping();
-  };
+  }
 
   /**
    * called when key pressed in editor
@@ -496,8 +492,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           this.boundaryinserted.emit(this.audiochunk.absolutePlayposition.samples);
           return;
         } else {
-          for (let i = 0; i < this.markers.length; i++) {
-            const marker: any = this.markers[i];
+          for (const marker of this.markers) {
             if (marker.shortcut[platform] === comboKey) {
               $event.preventDefault();
               this.insertMarker(marker.code, marker.icon);
@@ -508,7 +503,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
     }
-  };
+  }
   /**
    * called after key up in editor
    */
@@ -516,7 +511,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     // update rawText
     this.onkeyup.emit($event);
     this.triggerTyping();
-  };
+  }
 
   /**
    * set focus to the very last position of the editors text
@@ -549,7 +544,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     } else {
       func();
     }
-  };
+  }
 
   ngOnInit() {
     this.Settings.height = this.height;
@@ -856,9 +851,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   saveSelection() {
-    let sel;
-    let range = null;
-    let node = null;
+    let range;
 
     jQuery('sel-start').remove();
     jQuery('sel-end').remove();
@@ -930,8 +923,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * adds the comboKey to the list of disabled Keys
    */
   public addDisableKey(comboKey: string): boolean {
-    for (let i = 0; i < this.Settings.disabledKeys.length; i++) {
-      if (this.Settings.disabledKeys[i] === comboKey) {
+    for (const disabledKey of this.Settings.disabledKeys) {
+      if (disabledKey === comboKey) {
         return false;
       }
     }
@@ -964,9 +957,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     const regex2 = /{([0-9]+)}/g;
 
-    for (let i = 0; i < this.markers.length; i++) {
-      const marker = this.markers[i];
-
+    for (const marker of this.markers) {
       const replaceFunc = (x, g1, g2, g3) => {
         const s1 = (g1) ? g1 : '';
         const s3 = (g3) ? g3 : '';
@@ -1104,8 +1095,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * checks if the combokey is part of the configs disabledkeys
    */
   private isDisabledKey(comboKey: string): boolean {
-    for (let i = 0; i < this.Settings.disabledKeys.length; i++) {
-      if (this.Settings.disabledKeys[i] === comboKey) {
+    for (const disabledKey of this.Settings.disabledKeys) {
+      if (disabledKey === comboKey) {
         return true;
       }
     }
@@ -1127,7 +1118,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     } else if (!(jqueryObj.attr('data-errorcode') === null || jqueryObj.attr('data-errorcode') === undefined)) {
       this.onValidationErrorMouseOver(jqueryObj, event);
     }
-  };
+  }
 
   private onSegmentBoundaryMouseOver(jqueryObj: any, event: any) {
     const segPopover = jQuery('.seg-popover');
@@ -1222,16 +1213,9 @@ abstract class WrappedRange {
 
   /**
    * insert node at current cursor
-   *
-   * @param {Node} node
-   * @return {Node}
    */
   abstract insertNode(node: Node): Node;
 
-  /**
-   * @param {Boolean} isCollapseToStart
-   * @return {WrappedRange}
-   */
   abstract collapse(isCollapseToStart?: boolean): WrappedRange;
 
   // splitText on range
@@ -1245,28 +1229,22 @@ abstract class WrappedRange {
 
   /**
    * wrap inline nodes which children of body with paragraph
-   *
-   * @return {WrappedRange}
    */
   abstract wrapBodyInlineWithPara(): WrappedRange;
 
   // insert html at current cursor
-  abstract pasteHTML(markup)
+  abstract pasteHTML(markup);
 
   /**
    * returns text in range
-   *
-   * @return {String}
    */
   abstract toString(): string;
 
   /**
    * returns range for word before cursor
    *
-   * @param {Boolean} [findAfter] - find after cursor, default: false
-   * @return {WrappedRange}
    */
-  abstract getWordRange(findAfter?: boolean): WrappedRange
+  abstract getWordRange(findAfter?: boolean): WrappedRange;
 
   /**
    * returns range for words before cursor that match with a Regex
@@ -1275,18 +1253,14 @@ abstract class WrappedRange {
    *  range: 'hi @Peter Pan'
    *  regex: '/@[a-z ]+/i'
    *  return range: '@Peter Pan'
-   *
-   * @param {RegExp} [regex]
-   * @return {WrappedRange|null}
    */
-  abstract getWordsMatchRange(regex)
+  abstract getWordsMatchRange(regex);
 
   /**
    * returns a list of DOMRect objects representing the area of the screen occupied by the range.
    *
    * https://developer.mozilla.org/en-US/docs/Web/API/Range/getClientRects
    *
-   * @return {Rect[]}
    */
-  abstract getClientRects()
+  abstract getClientRects();
 }

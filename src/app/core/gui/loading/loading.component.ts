@@ -2,11 +2,10 @@ import {HttpClient} from '@angular/common/http';
 import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
-import {OAudiofile, OLevel} from 'octra-components';
+import {Functions, isUnset, OAudiofile, OLevel} from 'octra-components';
 import {AppInfo} from '../../../app.info';
 import {IFile, ImportResult} from '../../obj/Converters';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {Functions, isUnset} from '../../shared/Functions';
 import {AppStorageService, AudioService, OIDBLevel, SettingsService, TranscriptionService} from '../../shared/service';
 
 @Component({
@@ -142,8 +141,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
                     let importResult: ImportResult;
                     // find valid converter...
-                    for (let i = 0; i < AppInfo.converters.length; i++) {
-                      const converter = AppInfo.converters[i];
+                    for (const converter of AppInfo.converters) {
                       if (filename.indexOf(converter.extension) > -1) {
                         // test converter
                         const tempImportResult = converter.import(file, oAudioFile);
@@ -211,7 +209,9 @@ export class LoadingComponent implements OnInit, OnDestroy {
           } else {
             console.error('audio not loaded');
             if (this.appStorage.usemode === 'local') {
-              Functions.navigateTo(this.router, ['/user/transcr/reload-file'], AppInfo.queryParamsHandling);
+              Functions.navigateTo(this.router, ['/user/transcr/reload-file'], AppInfo.queryParamsHandling).catch((error) => {
+                console.error(error);
+              });
             }
           }
         }
@@ -236,13 +236,17 @@ export class LoadingComponent implements OnInit, OnDestroy {
                 )
                 && this.settService.projectsettings.agreement.enabled && this.appStorage.usemode === 'online') {
                 this.transcrService.load().then(() => {
-                  Functions.navigateTo(this.router, ['/user/agreement'], AppInfo.queryParamsHandling);
+                  Functions.navigateTo(this.router, ['/user/agreement'], AppInfo.queryParamsHandling).catch((error) => {
+                    console.error(error);
+                  });
                 }).catch((err) => {
                   console.error(err);
                 });
               } else {
                 this.transcrService.load().then(() => {
-                  Functions.navigateTo(this.router, ['/user/transcr'], AppInfo.queryParamsHandling);
+                  Functions.navigateTo(this.router, ['/user/transcr'], AppInfo.queryParamsHandling).catch((error) => {
+                    console.error(error);
+                  });
                 }).catch((err) => {
                   console.error(err);
                 });
@@ -283,12 +287,18 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
       if (this.appStorage.usemode !== 'url' && !this.appStorage.LoggedIn) {
         // not logged in, go back
-        Functions.navigateTo(this.router, ['/login'], AppInfo.queryParamsHandling);
+        Functions.navigateTo(this.router, ['/login'], AppInfo.queryParamsHandling).catch((error) => {
+          console.error(error);
+        });
       } else if (this.appStorage.LoggedIn) {
-        this.settService.loadProjectSettings();
+        this.settService.loadProjectSettings().catch((error) => {
+          console.error(error);
+        });
 
         if (this.appStorage.usemode === 'local' && this.audio.audiomanagers.length === 0) {
-          Functions.navigateTo(this.router, ['/user/transcr/reload-file'], AppInfo.queryParamsHandling);
+          Functions.navigateTo(this.router, ['/user/transcr/reload-file'], AppInfo.queryParamsHandling).catch((error) => {
+            console.error(error);
+          });
         } else {
           if (this.appStorage.usemode === 'url') {
             if (this.appStorage.usemode === 'url') {
@@ -326,6 +336,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
   goBack() {
     this.appStorage.clearSession();
-    Functions.navigateTo(this.router, ['/login'], AppInfo.queryParamsHandling);
+    Functions.navigateTo(this.router, ['/login'], AppInfo.queryParamsHandling).catch((error) => {
+      console.error(error);
+    });
   }
 }

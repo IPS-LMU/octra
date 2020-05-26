@@ -86,7 +86,9 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
       this.navbarServ.onclick.subscribe((name) => {
         switch (name) {
           case('export'):
-            this.modalexport.open();
+            this.modalexport.open().catch((error) => {
+              console.error(error);
+            });
             break;
         }
       })
@@ -183,8 +185,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     let index = levelNums;
 
     const nameexists = (newname: string) => {
-      for (let i = 0; i < this.transcrServ.annotation.levels.length; i++) {
-        const level = this.transcrServ.annotation.levels[i];
+      for (const level of this.transcrServ.annotation.levels) {
         if (level.name === newname) {
           return true;
         }

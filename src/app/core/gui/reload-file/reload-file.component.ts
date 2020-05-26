@@ -1,11 +1,11 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
+import {FileSize, Functions} from 'octra-components';
 import {AppInfo} from '../../../app.info';
 import {ModalService} from '../../modals/modal.service';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 import {SessionFile} from '../../obj/SessionFile';
-import {FileSize, Functions} from '../../shared/Functions';
 import {AppStorageService, AudioService, OIDBLevel, OIDBLink, TranscriptionService} from '../../shared/service';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
 
@@ -33,8 +33,11 @@ export class ReloadFileComponent implements OnInit {
 
   abortTranscription = () => {
     this.transcrServ.endTranscription();
-    Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
+    Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).catch((error) => {
+      console.error(error);
+    });
   };
+
   newTranscription = () => {
     this.modService.show('transcriptionDelete').then((decision) => {
       if (decision === 'DELETE') {
@@ -80,7 +83,7 @@ export class ReloadFileComponent implements OnInit {
     }).catch((error) => {
       console.error(error);
     });
-  };
+  }
 
   onOfflineSubmit = () => {
     this.audioService.registerAudioManager(this.dropzone.audioManager);
@@ -91,7 +94,7 @@ export class ReloadFileComponent implements OnInit {
         }
       }
     );
-  };
+  }
 
   public isN(obj: any): boolean {
     return (obj === null || obj === undefined);
@@ -119,13 +122,17 @@ export class ReloadFileComponent implements OnInit {
   }
 
   private navigate = () => {
-    Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling);
-  };
+    Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
+      console.error(error);
+    });
+  }
 
   private showErrorMessage(err: string) {
     this.error = err;
     this.modService.show('error', {
       text: err
+    }).catch((error) => {
+      console.error(error);
     });
   }
 }

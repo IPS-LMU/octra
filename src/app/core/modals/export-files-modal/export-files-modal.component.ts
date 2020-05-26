@@ -4,6 +4,7 @@ import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 import {DragulaService} from 'ng2-dragula';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
+import {isUnset} from 'octra-components';
 import {Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
@@ -11,7 +12,6 @@ import {TableConfiguratorComponent} from '../../component/table-configurator/tab
 import {NavbarService} from '../../gui/navbar/navbar.service';
 import {Converter, IFile} from '../../obj/Converters';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {isUnset} from '../../shared/Functions';
 import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 
 @Component({
@@ -116,7 +116,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    for (let i = 0; i < AppInfo.converters.length; i++) {
+    for (const converter of AppInfo.converters) {
       this.exportStates.push('inactive');
     }
   }
@@ -276,14 +276,14 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     }
 
     if (!isUnset(this.parentformat.uri)) {
-      const url = this.parentformat.uri['changingThisBreaksApplicationSecurity'];
+      const url = this.parentformat.uri.toString();
       window.URL.revokeObjectURL(url);
     }
   }
 
   private setParentFormatURI(url: string) {
     if (!isUnset(this.parentformat.uri)) {
-      window.URL.revokeObjectURL(this.parentformat.uri['changingThisBreaksApplicationSecurity']);
+      window.URL.revokeObjectURL(this.parentformat.uri.toString());
     }
     this.parentformat.uri = this.sanitize(url);
   }

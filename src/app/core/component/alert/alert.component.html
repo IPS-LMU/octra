@@ -14,7 +14,7 @@
           <ng-template (destroyed)="afterComponentDestroyed($event)" (initialized)="afterComponentInitialized($event)"
                        *ngIf="entry.component !== null"
                        [component]="entry.component"
-                       appDynComponent></ng-template>
+                       octraDynComponent></ng-template>
           <p *ngIf="entry.duration > -1">
             ({{"general.dismissed" | transloco:
             {

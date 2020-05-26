@@ -1,10 +1,9 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {SampleUnit} from 'octra-components';
+import {Functions, isUnset, SampleUnit} from 'octra-components';
 import {OLog} from '../../obj/Settings/logging';
 import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
-import {Functions, isUnset} from '../Functions';
 
 @Injectable({
   providedIn: 'root'
@@ -64,6 +63,7 @@ export class UserInteractionsService {
                              segment: {
                                start: number,
                                length: number
+                               // tslint:disable-next-line:align
                              }, targetName?: string) {
     this._lastAction = Date.now();
     const originalPlayerPos = (!isUnset(playpos)) ? playpos.samples : -1;
@@ -144,8 +144,7 @@ export class UserInteractionsService {
 
   public fromAnyArray(array: any[]) {
     // BUG all events are considered as MouseStatisticEvent!
-    for (let i = 0; i < array.length; i++) {
-      const elem = array[i];
+    for (const elem of array) {
       let newElem = null;
 
       newElem = MouseStatisticElem.fromAny(elem);
@@ -178,9 +177,7 @@ export class UserInteractionsService {
       type = MouseStatisticElem;
     }
 
-    for (let i = 0; i < this._elements.length; i++) {
-      const elem = this._elements[i];
-
+    for (const elem of this.elements) {
       if (elem instanceof type) {
         result.push(elem);
       }

@@ -51,9 +51,9 @@ export class KeyMapping {
    * gets the name of a special Key by number
    */
   public static getNameByCode(code: number): string {
-    for (let i = 0; i < this.table.length; i++) {
-      if (this.table[i].keyCode === code) {
-        return this.table[i].name;
+    for (const tableElement of this.table) {
+      if (tableElement.keyCode === code) {
+        return tableElement.name;
       }
     }
     return '';

@@ -1,7 +1,7 @@
 import {Directive, ViewContainerRef} from '@angular/core';
 
 @Directive({
-  selector: '[appLoadeditor]'
+  selector: '[octraLoadeditor]'
 })
 export class LoadeditorDirective {
 

@@ -86,9 +86,9 @@ export class KeymappingService {
   }
 
   public getShortcuts(identifier: string): any {
-    for (let i = 0; i < this.shortcuts.length; i++) {
-      if (this.shortcuts[i].identifier === identifier) {
-        return this.shortcuts[i].shortcuts;
+    for (const shortcut of this.shortcuts) {
+      if (shortcut.identifier === identifier) {
+        return shortcut.shortcuts;
       }
     }
 
@@ -117,12 +117,12 @@ export class KeymappingService {
     const combo = KeyMapping.getShortcutCombination($event);
     this._beforeKeyDown.emit({comboKey: combo, event: $event});
     this._onkeydown.emit({comboKey: combo, event: $event});
-  };
+  }
 
   private onKeyUp = ($event) => {
     const combo = KeyMapping.getShortcutCombination($event);
     this._onkeyup.emit({comboKey: combo, event: $event});
-  };
+  }
 
   private cloneShortcuts(shortcuts: any): any {
     const result: any = {};

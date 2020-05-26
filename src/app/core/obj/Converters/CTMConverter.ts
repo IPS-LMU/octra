@@ -1,5 +1,4 @@
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
-import {Functions} from '../../shared/Functions';
+import {Functions, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 
 export class CTMConverter extends Converter {
@@ -28,15 +27,14 @@ export class CTMConverter extends Converter {
     if (!(annotation === null || annotation === undefined)) {
       const level = annotation.levels[levelnum];
 
-      for (let j = 0; j < level.items.length; j++) {
-        const transcript = level.items[j].labels[0].value;
-        const start = Math.round((level.items[j].sampleStart / audiofile.sampleRate) * 100) / 100;
-        const duration = Math.round((level.items[j].sampleDur / audiofile.sampleRate) * 100) / 100;
+      for (const levelItem of level.items) {
+        const transcript = levelItem.labels[0].value;
+        const start = Math.round((levelItem.sampleStart / audiofile.sampleRate) * 100) / 100;
+        const duration = Math.round((levelItem.sampleDur / audiofile.sampleRate) * 100) / 100;
         result += `${annotation.name} 1 ${start} ${duration} ${transcript} 1.00\n`;
       }
 
       filename = annotation.name + this._extension;
-
     }
 
     return {

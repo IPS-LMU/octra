@@ -21,13 +21,13 @@ import {
   AudioRessource,
   AudioSelection,
   AudioViewerComponent,
+  isUnset,
   SampleUnit,
   Segment,
   Segments
 } from 'octra-components';
 import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
 import {SubscriptionManager} from '../../../core/shared';
-import {isUnset} from '../../../core/shared/Functions';
 
 import {
   AppStorageService,
@@ -204,7 +204,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }).then(() => {
       if (direction !== 'down') {
         this.goToSegment(direction).then(() => {
-          this.audiochunk.startPlayback();
+          this.audiochunk.startPlayback().catch((error) => {
+            console.error(error);
+          });
           this.cd.markForCheck();
           this.cd.detectChanges();
         }).catch((error) => {
@@ -328,7 +330,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     );
 
     setTimeout(() => {
-      this.audiochunk.startPlayback();
+      this.audiochunk.startPlayback().catch((error) => {
+        console.error(error);
+      });
     }, 500);
   }
 
@@ -406,7 +410,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
                   }
   ) {
     if (this.appStorage.logging) {
-      let segment = {
+      const segment = {
         start: -1,
         length: 0
       };
@@ -560,7 +564,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
                    :
                    string
   ) {
-    let segment = {
+    const segment = {
       start: -1,
       length: -1
     };
@@ -593,7 +597,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
   onMarkerClick(markerCode: string
   ) {
-    let segment = {
+    const segment = {
       start: -1,
       length: -1
     };
@@ -645,7 +649,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   }
 
   afterSpeedChange(event: { new_value: number, timestamp: number }) {
-    let segment = {
+    const segment = {
       start: -1,
       length: -1
     };
@@ -681,7 +685,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   }
 
   afterVolumeChange(event: { new_value: number, timestamp: number }) {
-    let segment = {
+    const segment = {
       start: -1,
       length: -1
     };
@@ -720,7 +724,9 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
         : this.audioManager.createSampleUnit(0);
       this.audiochunk.selection.end = this.tempSegments.get(i).time.clone();
       this.loupe.av.drawnSelection = this.audiochunk.selection;
-      this.audiochunk.startPlayback();
+      this.audiochunk.startPlayback().catch((error) => {
+        console.error(error);
+      });
     }
   }
 
@@ -799,8 +805,9 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     const html: string = this.editor.html.replace(/&nbsp;/g, ' ');
 
     const samplesArray: number[] = [];
-    html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s?/g,
-      function(match, g1, g2) {
+    html.replace(new RegExp('\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"' +
+      '[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s?', 'g'),
+      (match, g1, g2) => {
         samplesArray.push(Number(g1));
         return '';
       });

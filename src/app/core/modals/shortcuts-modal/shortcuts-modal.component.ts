@@ -10,7 +10,7 @@ export interface GeneralShortcut {
   combination: {
     mac: string;
     pc: string;
-  },
+  };
   focusonly: boolean;
 }
 

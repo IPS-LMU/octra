@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 
 import {Router} from '@angular/router';
+import {Functions} from 'octra-components';
 import {AppInfo} from '../../../app.info';
-import {Functions} from '../../shared/Functions';
 import {AppStorageService, SettingsService} from '../../shared/service';
 
 @Component({
@@ -28,7 +28,9 @@ export class LogoutComponent implements OnInit {
   ngOnInit() {
     this.settingsService.clearSettings();
     this.sessionService.endSession(() => {
-      Functions.navigateTo(this.router, ['login'], AppInfo.queryParamsHandling);
+      Functions.navigateTo(this.router, ['login'], AppInfo.queryParamsHandling).catch((error) => {
+        console.error(error);
+      });
     });
   }
 }

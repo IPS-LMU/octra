@@ -1,7 +1,7 @@
 import {ComponentFactoryResolver, Directive, EventEmitter, Input, OnInit, Output, ViewContainerRef} from '@angular/core';
 
 @Directive({
-  selector: '[appDynComponent]'
+  selector: '[octraDynComponent]'
 })
 export class DynComponentDirective implements OnInit {
   @Input() component: {

@@ -633,12 +633,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
           }
         }
-
-        // TODO update needed?
-        // this.viewer.update().catch((error) => {
-        //             console.error(`could not update GUI for multiline-viewer`);
-        //             console.error(error);
-        //           });
       } else {
         // open transcr window
         this.openSegment(segmentNumber);

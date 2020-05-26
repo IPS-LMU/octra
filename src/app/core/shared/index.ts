@@ -1,7 +1,6 @@
 export * from '../obj/APIData';
 export * from '../obj/APIResponse';
 export * from './BrowserInfo';
-export * from '../obj/KeyMapping';
 export * from '../obj/statistics/KeyStatisticElem';
 export * from '../obj/statistics/MouseStatisticElem';
 export * from '../obj/statistics/StatisticElement';

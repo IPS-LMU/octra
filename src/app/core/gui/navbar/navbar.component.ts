@@ -7,7 +7,7 @@ import {AppInfo} from '../../../app.info';
 import {editorComponents} from '../../../editors/components';
 import {ExportFilesModalComponent} from '../../modals/export-files-modal/export-files-modal.component';
 import {ModalService} from '../../modals/modal.service';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {SubscriptionManager} from 'octra-components';
 import {AppStorageService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {BugReportService, ConsoleType} from '../../shared/service/bug-report.service';
 import {NavbarService} from './navbar.service';

@@ -12,10 +12,10 @@ import {
   ViewChild
 } from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
-import {AudioChunk, AudioManager, Functions, isUnset, SampleUnit, Segments, TimespanPipe} from 'octra-components';
+import {AudioChunk, AudioManager, Functions, isUnset, SampleUnit, Segments, SubscriptionManager, TimespanPipe} from 'octra-components';
 import {isNumeric} from 'rxjs/internal-compatibility';
 
-import {BrowserInfo, KeyMapping, SubscriptionManager} from '../../shared';
+import {BrowserInfo, KeyMapping} from '../../shared';
 import {TranscriptionService} from '../../shared/service';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../shared/service/asr.service';
 import {TranscrEditorConfig} from './config';

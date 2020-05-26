@@ -24,10 +24,9 @@ import {
   isUnset,
   SampleUnit,
   Segment,
-  Segments
+  Segments, SubscriptionManager
 } from 'octra-components';
 import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
-import {SubscriptionManager} from '../../../core/shared';
 
 import {
   AppStorageService,

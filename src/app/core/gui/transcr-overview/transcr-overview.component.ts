@@ -13,10 +13,9 @@ import {
   ViewChild
 } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
-import {AudioChunk, AudioSelection, isFunction, isUnset, PlayBackStatus, SampleUnit, Segment} from 'octra-components';
+import {AudioChunk, AudioSelection, isFunction, isUnset, PlayBackStatus, SampleUnit, Segment, SubscriptionManager} from 'octra-components';
 import {TranscrEditorComponent} from '../../component/transcr-editor';
 import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
-import {SubscriptionManager} from '../../shared';
 
 import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 

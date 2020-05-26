@@ -3,7 +3,7 @@ import {NgForm} from '@angular/forms';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {sha256} from 'js-sha256';
-import {FileSize, Functions, isUnset} from 'octra-components';
+import {FileSize, Functions, isUnset, SubscriptionManager} from 'octra-components';
 import {Observable, throwError} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {ModalService} from '../../modals/modal.service';
@@ -11,7 +11,6 @@ import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcr
 import {Converter} from '../../obj/Converters';
 import {parseServerDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
-import {SubscriptionManager} from '../../shared';
 import {APIService, AppStorageService, AudioService, OIDBLevel, OIDBLink, SettingsService} from '../../shared/service';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
 import {ComponentCanDeactivate} from './login.deactivateguard';

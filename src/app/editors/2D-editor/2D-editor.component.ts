@@ -31,7 +31,7 @@ import {interval, Subscription} from 'rxjs';
 import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
 import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
 import {TranscrEditorComponent} from '../../core/component';
-import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
+import {SubscriptionManager} from 'octra-components';
 
 import {PraatTextgridConverter} from '../../core/shared';
 

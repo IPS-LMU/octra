@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {SubscriptionManager} from 'octra-components';
 import {TsWorker} from './ts-worker';
 import {TsWorkerJob, TsWorkerStatus} from './ts-worker-job';
 

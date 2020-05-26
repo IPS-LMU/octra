@@ -6,7 +6,7 @@ import {environment} from '../environments/environment';
 import {AppInfo} from './app.info';
 import {NavigationComponent} from './core/gui/navbar';
 import {ASRLanguage} from './core/obj/Settings';
-import {SubscriptionManager} from './core/obj/SubscriptionManager';
+import {SubscriptionManager} from 'octra-components';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
 import {APIService, AppStorageService, SettingsService} from './core/shared/service';
 import {AsrService} from './core/shared/service/asr.service';

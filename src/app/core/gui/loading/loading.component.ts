@@ -5,7 +5,7 @@ import {TranslocoService} from '@ngneat/transloco';
 import {Functions, isUnset, OAudiofile, OLevel} from 'octra-components';
 import {AppInfo} from '../../../app.info';
 import {IFile, ImportResult} from '../../obj/Converters';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {SubscriptionManager} from 'octra-components';
 import {AppStorageService, AudioService, OIDBLevel, SettingsService, TranscriptionService} from '../../shared/service';
 
 @Component({

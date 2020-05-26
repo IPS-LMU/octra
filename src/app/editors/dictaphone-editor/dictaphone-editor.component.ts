@@ -1,7 +1,14 @@
 import {AfterViewInit, Component, EventEmitter, OnChanges, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {AudioChunk, AudioManager, AudioNavigationComponent, AudioplayerComponent, SampleUnit, Segment} from 'octra-components';
+import {
+  AudioChunk,
+  AudioManager,
+  AudioNavigationComponent,
+  AudioplayerComponent,
+  SampleUnit,
+  Segment,
+  SubscriptionManager
+} from 'octra-components';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
-import {SubscriptionManager} from '../../core/shared';
 
 import {
   AppStorageService,

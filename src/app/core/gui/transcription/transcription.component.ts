@@ -16,7 +16,7 @@ import {
 } from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
-import {AudioManager, Functions, isUnset, Level, PlayBackStatus} from 'octra-components';
+import {AudioManager, Functions, isUnset, Level, PlayBackStatus, SubscriptionManager} from 'octra-components';
 import {interval, throwError} from 'rxjs';
 import * as X2JS from 'x2js';
 import {AppInfo} from '../../../app.info';
@@ -38,7 +38,7 @@ import {IFile, PartiturConverter} from '../../obj/Converters';
 import {parseServerDataEntry} from '../../obj/data-entry';
 import {ProjectSettings} from '../../obj/Settings';
 
-import {BrowserInfo, SubscriptionManager} from '../../shared';
+import {BrowserInfo} from '../../shared';
 import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 
 import {

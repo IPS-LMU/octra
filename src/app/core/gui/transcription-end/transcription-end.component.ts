@@ -1,8 +1,7 @@
 import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {Functions} from 'octra-components';
+import {Functions, SubscriptionManager} from 'octra-components';
 import {AppInfo} from '../../../app.info';
-import {SubscriptionManager} from '../../shared';
 import {AppStorageService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {NavbarService} from '../navbar/navbar.service';
 

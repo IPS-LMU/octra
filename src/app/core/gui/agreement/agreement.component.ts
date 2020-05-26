@@ -3,7 +3,7 @@ import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {Functions} from 'octra-components';
 import {AppInfo} from '../../../app.info';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {SubscriptionManager} from 'octra-components';
 import {AppStorageService, SettingsService} from '../../shared/service';
 
 @Component({

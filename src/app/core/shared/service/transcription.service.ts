@@ -11,9 +11,9 @@ import {
   OLabel,
   OLevel,
   OSegment,
-  Segments
+  Segments, SubscriptionManager
 } from 'octra-components';
-import {AnnotJSONConverter, PartiturConverter, SubscriptionManager, TextConverter} from '../';
+import {AnnotJSONConverter, PartiturConverter, TextConverter} from '../';
 import {AppInfo} from '../../../app.info';
 import {NavbarService} from '../../gui/navbar/navbar.service';
 import {Converter, IFile} from '../../obj/Converters';

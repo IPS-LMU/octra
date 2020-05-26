@@ -21,7 +21,7 @@ import {
   SampleUnit
 } from 'octra-components';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
-import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
+import {SubscriptionManager} from 'octra-components';
 import {BrowserInfo} from '../../core/shared';
 
 import {

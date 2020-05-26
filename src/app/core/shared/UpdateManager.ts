@@ -1,7 +1,6 @@
-import {isUnset, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
+import {isUnset, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment, SubscriptionManager} from 'octra-components';
 import {AppInfo} from '../../app.info';
 import {IndexedDBManager} from '../obj/IndexedDBManager';
-import {SubscriptionManager} from '../obj/SubscriptionManager';
 import {AppStorageService, OIDBLevel} from './service';
 
 export class UpdateManager {

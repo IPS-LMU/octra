@@ -13,7 +13,7 @@ import {
 import {DragulaService} from 'ng2-dragula';
 import {isUnset, Segment} from 'octra-components';
 import {Subject} from 'rxjs';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {SubscriptionManager} from 'octra-components';
 
 @Component({
   selector: 'octra-naming-drag-and-drop',

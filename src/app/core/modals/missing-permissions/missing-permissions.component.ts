@@ -1,7 +1,7 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {SubscriptionManager} from 'octra-components';
 
 @Component({
   selector: 'octra-missing-permissions-modal',

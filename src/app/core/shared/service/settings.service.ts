@@ -2,10 +2,9 @@ import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
 import {Params} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
-import {Functions, isUnset} from 'octra-components';
+import {Functions, isUnset, SubscriptionManager} from 'octra-components';
 import {Observable, ReplaySubject, Subject, Subscription} from 'rxjs';
 
-import {SubscriptionManager} from '../';
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
 import {UpdateManager} from '../UpdateManager';
 import {APIService} from './api.service';

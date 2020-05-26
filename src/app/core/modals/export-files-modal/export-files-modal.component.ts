@@ -11,7 +11,7 @@ import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/n
 import {TableConfiguratorComponent} from '../../component/table-configurator/table-configurator.component';
 import {NavbarService} from '../../gui/navbar/navbar.service';
 import {Converter, IFile} from '../../obj/Converters';
-import {SubscriptionManager} from '../../obj/SubscriptionManager';
+import {SubscriptionManager} from 'octra-components';
 import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 
 @Component({

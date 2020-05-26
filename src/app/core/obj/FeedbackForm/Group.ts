@@ -24,10 +24,9 @@ export class Group {
   }
 
   constructor(private _title: string, private _name: string, private _controls: Control[]) {
-
     // check if group is required
-    for (let i = 0; i < _controls.length; i++) {
-      if (_controls[i].required) {
+    for (const control of _controls) {
+      if (control.required) {
         this.required = true;
         break;
       }
@@ -38,8 +37,7 @@ export class Group {
     const controls: Control[] = [];
 
     let required = false;
-    for (let i = 0; i < group.controls.length; i++) {
-      const control = group.controls[i];
+    for (const control of group.controls) {
       controls.push(Control.fromAny(control));
       if (control.required) {
         required = true;
@@ -63,8 +61,7 @@ export class Group {
       controls: []
     };
 
-    for (let i = 0; i < this._controls.length; i++) {
-      const control = this._controls[i];
+    for (const control of this._controls) {
       result.controls.push(control.toAny());
     }
 

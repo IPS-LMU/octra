@@ -172,7 +172,7 @@ export class TsWorker {
         });
       }
     );
-  };
+  }
 
   /**
    * converts a job to an JSON object

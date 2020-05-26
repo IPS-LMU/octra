@@ -39,8 +39,7 @@ LBD:\n`;
 
       let ortCounter = 0;
 
-      for (let i = 0; i < annotation.levels[levelnum].items.length; i++) {
-        const item = annotation.levels[levelnum].items[i];
+      for (const item of annotation.levels[levelnum].items) {
         const words = item.labels[0].value.split(' ');
         ort = ort.concat(words);
         let trnLine = `TRN: ${item.sampleStart} ${item.sampleDur} `;
@@ -59,8 +58,9 @@ LBD:\n`;
       for (let i = 0; i < ort.length; i++) {
         content += `ORT: ${i} ${ort[i]}\n`;
       }
-      for (let i = 0; i < trn.length; i++) {
-        content += trn[i];
+
+      for (const trnElement of trn) {
+        content += trnElement;
       }
 
       result.file.content = content;
@@ -95,7 +95,8 @@ LBD:\n`;
 
           if (search[0] === 'SAM') {
             if (audiofile.sampleRate !== Number(columns[1])) {
-              console.error(`Sample Rate of audio file is not equal to the value from Partitur file! ${audiofile.sampleRate} !== ${columns[1]}`);
+              console.error(`Sample Rate of audio file is not equal to the value from Partitur` +
+                ` file! ${audiofile.sampleRate} !== ${columns[1]}`);
             }
           }
 

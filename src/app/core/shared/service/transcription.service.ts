@@ -1,6 +1,18 @@
 import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
-import {Annotation, AudioManager, Level, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment, Segments} from 'octra-components';
+import {
+  Annotation,
+  AudioManager,
+  Functions,
+  isUnset,
+  Level,
+  OAnnotJSON,
+  OAudiofile,
+  OLabel,
+  OLevel,
+  OSegment,
+  Segments
+} from 'octra-components';
 import {AnnotJSONConverter, PartiturConverter, SubscriptionManager, TextConverter} from '../';
 import {AppInfo} from '../../../app.info';
 import {NavbarService} from '../../gui/navbar/navbar.service';
@@ -11,7 +23,6 @@ import {OLog, OLogging} from '../../obj/Settings/logging';
 import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
-import {Functions, isUnset} from '../Functions';
 import {AppStorageService, OIDBLevel} from './appstorage.service';
 import {AudioService} from './audio.service';
 import {SettingsService} from './settings.service';
@@ -174,14 +185,14 @@ export class TranscriptionService {
     } else {
       console.error(new Error('can not save segments because annotation is null'));
     }
-  };
+  }
   /**
    * resets the parent object values. Call this function after transcription was saved
    */
   public endTranscription = (destroyaudio: boolean = true) => {
     this.audio.destroy(destroyaudio);
     this.destroy();
-  };
+  }
 
   public getSegmentFirstLevel(): number {
     for (let i = 0; this.annotation.levels.length; i++) {
@@ -305,7 +316,8 @@ export class TranscriptionService {
                 if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
                   this.appStorage.annotation[this._selectedlevel].level.items = [];
 
-                  if (!isUnset(this.appStorage.serverDataEntry) && !isUnset(this.appStorage.serverDataEntry.transcript) && this.appStorage.serverDataEntry.transcript.length > 0) {
+                  if (!isUnset(this.appStorage.serverDataEntry) && !isUnset(this.appStorage.serverDataEntry.transcript)
+                    && this.appStorage.serverDataEntry.transcript.length > 0) {
                     // import logs
                     this.appStorage.logs = this.appStorage.serverDataEntry.logtext;
 
@@ -436,14 +448,14 @@ export class TranscriptionService {
           if (!(this.appStorage.annotation === null || this.appStorage.annotation === undefined)) {
             // load levels
             console.log(this.appStorage.annotation);
-            for (let i = 0; i < this.appStorage.annotation.length; i++) {
-              const level: Level = Level.fromObj(this.appStorage.annotation[i],
+            for (const oidbLevel of this.appStorage.annotation) {
+              const level: Level = Level.fromObj(oidbLevel,
                 this._audiomanager.sampleRate, this._audiomanager.ressource.info.duration);
               this._annotation.levels.push(level);
             }
 
-            for (let i = 0; i < this.appStorage.annotationLinks.length; i++) {
-              this._annotation.links.push(this.appStorage.annotationLinks[i].link);
+            for (const annotationLink of this.appStorage.annotationLinks) {
+              this._annotation.links.push(annotationLink.link);
             }
 
             this._feedback = FeedBackForm.fromAny(this.settingsService.projectsettings.feedback_form, this.appStorage.comment);
@@ -456,7 +468,9 @@ export class TranscriptionService {
             }
 
             if (this.appStorage.logs === null) {
-              this.appStorage.clearLoggingData();
+              this.appStorage.clearLoggingData().catch((error) => {
+                console.error(error);
+              });
               this.uiService.elements = [];
               this.uiService.addElementFromEvent('octra', {value: AppInfo.version}, Date.now(), null, -1, null, null, 'version');
             } else {
@@ -501,9 +515,9 @@ export class TranscriptionService {
         data.quality = '';
       }
 
-      for (let i = 0; i < data.log.length; i++) {
-        if (data.log[i].type === 'transcription:segment_exited') {
-          data.log[i].value = JSON.stringify(data.log[i].value);
+      for (const logElement of data.log) {
+        if (logElement.type === 'transcription:segment_exited') {
+          logElement.value = JSON.stringify(logElement.value);
         }
       }
 
@@ -607,9 +621,7 @@ export class TranscriptionService {
     );
 
     if (uiElements) {
-      for (let i = 0; i < uiElements.length; i++) {
-        const elem = uiElements[i];
-
+      for (const elem of uiElements) {
         const newElem = new OLog(
           elem.timestamp,
           elem.type,
@@ -681,9 +693,7 @@ export class TranscriptionService {
         }
 
         // check if it's a marker
-        for (let i = 0; i < markers.length; i++) {
-          const marker = markers[i];
-
+        for (const marker of markers) {
           if (`${g1}${g2}${g3}` === marker.code) {
             return `[[[${g2}]]]`;
           }
@@ -709,9 +719,7 @@ export class TranscriptionService {
         }
       });
 
-      for (let i = 0; i < markers.length; i++) {
-        const marker = markers[i];
-
+      for (const marker of markers) {
         // replace {<number>} with boundary HTMLElement
         result = result.replace(/\s?{([0-9]+)}\s?/g, (x, g1) => {
           return ' <img src="assets/img/components/transcr-editor/boundary.png" ' +
@@ -768,36 +776,35 @@ export class TranscriptionService {
 
     if (validation.length > 0) {
       // prepare insertions
-      for (let i = 0; i < validation.length; i++) {
-
+      for (const validationElement of validation) {
         const foundMarker = markerPositions.find(
           (a) => {
-            return (validation[i].start > a.start && validation[i].start + validation[i].length < a.end);
+            return (validationElement.start > a.start && validationElement.start + validationElement.length < a.end);
           }
         );
 
         if (foundMarker === undefined) {
           let insertStart = insertions.find((val) => {
-            return val.start === validation[i].start;
+            return val.start === validationElement.start;
           });
 
           if ((insertStart === null || insertStart === undefined)) {
             insertStart = {
-              start: validation[i].start,
-              puffer: '[[[span class=\'val-error\' data-errorcode=\'' + validation[i].code + '\']]]'
+              start: validationElement.start,
+              puffer: '[[[span class=\'val-error\' data-errorcode=\'' + validationElement.code + '\']]]'
             };
             insertions.push(insertStart);
           } else {
-            insertStart.puffer += '[[[span class=\'val-error\' data-errorcode=\'' + validation[i].code + '\']]]';
+            insertStart.puffer += '[[[span class=\'val-error\' data-errorcode=\'' + validationElement.code + '\']]]';
           }
 
           let insertEnd = insertions.find((val) => {
-            return val.start === validation[i].start + validation[i].length;
+            return val.start === validationElement.start + validationElement.length;
           });
 
           if ((insertEnd === null || insertEnd === undefined)) {
             insertEnd = {
-              start: insertStart.start + validation[i].length,
+              start: insertStart.start + validationElement.length,
               puffer: ''
             };
             insertEnd.puffer = '[[[/span]]]';
@@ -821,12 +828,12 @@ export class TranscriptionService {
       });
 
       let puffer = '';
-      for (let key = 0; key < insertions.length; key++) {
+      for (const insertion of insertions) {
         const offset = puffer.length;
-        const pos = insertions[key].start;
+        const pos = insertion.start;
 
-        result = Functions.insertString(result, pos + offset, insertions[key].puffer);
-        puffer += insertions[key].puffer;
+        result = Functions.insertString(result, pos + offset, insertion.puffer);
+        puffer += insertion.puffer;
       }
     }
     return result;
@@ -836,12 +843,8 @@ export class TranscriptionService {
     if (!(this._guidelines.instructions === null || this._guidelines.instructions === undefined)) {
       const instructions = this._guidelines.instructions;
 
-      for (let i = 0; i < instructions.length; i++) {
-        const instruction = instructions[i];
-
-        for (let j = 0; j < instruction.entries.length; j++) {
-          const entry = instruction.entries[j];
-
+      for (const instruction of instructions) {
+        for (const entry of instructions.entries) {
           if (entry.code === code) {
             entry.description = entry.description.replace(/{{([^{}]+)}}/g, (g0, g1) => {
               return this.rawToHTML(g1).replace(/(<p>)|(<\/p>)/g, '');
@@ -891,8 +894,7 @@ export class TranscriptionService {
             return '>';
           });
 
-          for (let j = 0; j < this.guidelines.markers.length; j++) {
-            const marker = this.guidelines.markers[j];
+          for (const marker of this.guidelines.markers) {
             if (attr === marker.code) {
               return jQuery(elem).replaceWith(Functions.escapeHtml(attr));
             }

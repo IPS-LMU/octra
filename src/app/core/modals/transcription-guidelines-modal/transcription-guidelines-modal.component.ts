@@ -12,9 +12,9 @@ import {
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
+import {isUnset} from 'octra-components';
 import {Subject} from 'rxjs';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {isUnset} from '../../shared/Functions';
 import {AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
 import {BugReportService} from '../../shared/service/bug-report.service';
 
@@ -166,16 +166,14 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
     if (text !== '') {
       this.shownGuidelines.instructions = [];
 
-      for (let i = 0; i < this.guidelines.instructions.length; i++) {
-        const instruction = this.guidelines.instructions[i];
+      for (const instruction of this.guidelines.instructions) {
         if (instruction.group.indexOf(text) > -1) {
           this.shownGuidelines.instructions.push(instruction);
         } else {
           const instr = JSON.parse(JSON.stringify(instruction));
           instr.entries = [];
 
-          for (let e = 0; e < instruction.entries.length; e++) {
-            const entry = instruction.entries[e];
+          for (const entry of instruction.entries) {
             if (entry.title.indexOf(text) > -1
               || entry.description.indexOf(text) > -1
             ) {
@@ -227,9 +225,9 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
   private unCollapseAll() {
     this.collapsed = [];
 
-    for (let i = 0; i < this.guidelines.instructions.length; i++) {
+    for (const instruction of this.guidelines.instructions) {
       const elem = [];
-      for (let j = 0; j < this.guidelines.instructions[i].entries.length; j++) {
+      for (const entry of instruction.entries) {
         elem.push(true);
       }
       this.collapsed.push(elem);

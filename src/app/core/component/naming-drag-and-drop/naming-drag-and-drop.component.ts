@@ -11,10 +11,9 @@ import {
   ViewChild
 } from '@angular/core';
 import {DragulaService} from 'ng2-dragula';
-import {Segment} from 'octra-components';
+import {isUnset, Segment} from 'octra-components';
 import {Subject} from 'rxjs';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {isUnset} from '../../shared/Functions';
 
 @Component({
   selector: 'octra-naming-drag-and-drop',
@@ -60,8 +59,8 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit, OnDest
   public get preview(): string {
     let result = '';
     if (!isUnset(this.firstSegment)) {
-      for (let i = 0; i < this.resultConvention.length; i++) {
-        const item = this.resultConvention[i];
+      for (const resultConvention of this.resultConvention) {
+        const item = resultConvention;
         if (item.type === 'text') {
           result += item.value;
         } else if (item.type === 'placeholder') {
@@ -97,9 +96,10 @@ export class NamingDragAndDropComponent implements OnInit, AfterViewInit, OnDest
   public get namingConvention(): string {
     let result = '';
 
-    for (let i = 0; i < this.resultConvention.length; i++) {
-      result += this.resultConvention[i].value;
+    for (const resultConventionElement of this.resultConvention) {
+      result += resultConventionElement.value;
     }
+
     return result;
   }
 

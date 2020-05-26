@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 
 import {ActivatedRoute, ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
+import {Functions} from 'octra-components';
 import {Observable} from 'rxjs';
 import {AppInfo} from '../../../app.info';
-import {Functions} from '../../shared/Functions';
 import {AppStorageService, AudioService, SettingsService} from '../../shared/service';
 
 @Injectable()
@@ -22,7 +22,9 @@ export class MembersAreaGuard implements CanActivate {
       params.fragment = route.fragment;
       params.queryParams = route.queryParams;
 
-      Functions.navigateTo(this.router, ['/login'], params);
+      Functions.navigateTo(this.router, ['/login'], params).catch((error) => {
+        console.error(error);
+      });
       return false;
     } else if (this.appStorage.usemode === 'local') {
       if (this.audioService.audiomanagers.length === 0) {
@@ -31,7 +33,9 @@ export class MembersAreaGuard implements CanActivate {
         params.fragment = route.fragment;
         params.queryParams = route.queryParams;
 
-        Functions.navigateTo(this.router, ['/user/transcr/reload-file'], params);
+        Functions.navigateTo(this.router, ['/user/transcr/reload-file'], params).catch((error) => {
+          console.error(error);
+        });
         return false;
       }
     } else if (!this.settService.allloaded) {
@@ -39,7 +43,9 @@ export class MembersAreaGuard implements CanActivate {
       params.fragment = route.fragment;
       params.queryParams = route.queryParams;
 
-      Functions.navigateTo(this.router, ['/user/load'], params);
+      Functions.navigateTo(this.router, ['/user/load'], params).catch((error) => {
+        console.error(error);
+      });
       return false;
     }
 

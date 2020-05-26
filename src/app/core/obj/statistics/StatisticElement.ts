@@ -114,10 +114,11 @@ export class StatisticElem {
     for (const attr in elem) {
       if (elem.hasOwnProperty(attr)) {
         if (elem.hasOwnProperty('value') || elem.hasOwnProperty('context') || elem.hasOwnProperty('timestamp') ||
-          elem.hasOwnProperty('type') || elem.hasOwnProperty('playpos') || elem.hasOwnProperty('playerpos') || elem.hasOwnProperty('cursorpos')
+          elem.hasOwnProperty('type') || elem.hasOwnProperty('playpos') || elem.hasOwnProperty('playerpos') ||
+          elem.hasOwnProperty('cursorpos')
         ) {
           if (attr === 'playerpos') {
-            result['playpos'] = elem[`${attr}`];
+            result.playpos = elem[`${attr}`];
           } else {
             result[`${attr}`] = elem[`${attr}`];
           }

@@ -18,7 +18,9 @@ export class ALoginGuard implements CanActivate {
       params.fragment = route.fragment;
       params.queryParams = route.queryParams;
 
-      this.router.navigate(['/user/transcr'], params);
+      this.router.navigate(['/user/transcr'], params).catch((error) => {
+        console.error(error);
+      });
       return false;
     }
     return true;

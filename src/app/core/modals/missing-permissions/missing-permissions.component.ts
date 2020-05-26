@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
@@ -8,7 +8,7 @@ import {SubscriptionManager} from '../../obj/SubscriptionManager';
   templateUrl: './missing-permissions.component.html',
   styleUrls: ['./missing-permissions.component.css']
 })
-export class MissingPermissionsModalComponent implements OnInit {
+export class MissingPermissionsModalComponent implements OnInit, OnDestroy {
   modalRef: BsModalRef;
   public visible = false;
 

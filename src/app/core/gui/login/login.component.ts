@@ -3,6 +3,7 @@ import {NgForm} from '@angular/forms';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {sha256} from 'js-sha256';
+import {FileSize, Functions, isUnset} from 'octra-components';
 import {Observable, throwError} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {ModalService} from '../../modals/modal.service';
@@ -11,7 +12,6 @@ import {Converter} from '../../obj/Converters';
 import {parseServerDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
 import {SubscriptionManager} from '../../shared';
-import {FileSize, Functions, isUnset} from '../../shared/Functions';
 import {APIService, AppStorageService, AudioService, OIDBLevel, OIDBLink, SettingsService} from '../../shared/service';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
 import {ComponentCanDeactivate} from './login.deactivateguard';
@@ -131,7 +131,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         alert(error);
       });
     }
-  };
+  }
   newTranscription = () => {
     this.audioService.registerAudioManager(this.dropzone.audioManager);
 
@@ -164,11 +164,13 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         if (error === 'file not supported') {
           this.modService.show('error', {
             text: this.langService.translate('reload-file.file not supported', {type: ''})
+          }).catch((error2) => {
+            console.error(error2);
           });
         }
       }
     );
-  };
+  }
 
   ngOnInit() {
     if (this.settingsService.responsive.enabled === false) {
@@ -254,7 +256,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     let continueSession = false;
 
     if (!this.isPasswordCorrect(this.member.project, this.member.password)) {
-      this.modService.show('loginInvalid');
+      this.modService.show('loginInvalid').catch((error) => {
+        console.error(error);
+      });
     } else {
 
       if ((this.member.jobno === null || this.member.jobno === undefined) || this.member.jobno === '') {
@@ -338,12 +342,16 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
                 alert(res.error);
               }
             } else {
-              this.modService.show('loginInvalid');
+              this.modService.show('loginInvalid').catch((error) => {
+                console.error(error);
+              });
             }
           }
         }).catch((error) => {
           this.modService.show('error', {
             text: 'Server cannot be requested. Please check if you are online.'
+          }).catch((error2) => {
+            console.error(error2);
           });
           console.error(error);
         });
@@ -511,8 +519,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   private navigate = (): void => {
-    Functions.navigateTo(this.router, ['user'], AppInfo.queryParamsHandling);
-  };
+    Functions.navigateTo(this.router, ['user'], AppInfo.queryParamsHandling).catch((error) => {
+      console.error(error);
+    });
+  }
 
   private createNewSession(form: NgForm) {
     this.api.beginSession(this.member.project, this.member.id, Number(this.member.jobno)).then((json) => {
@@ -568,14 +578,18 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
             if (res.error === '') {
               this.navigate();
             } else {
-              this.modService.show('error', res.error);
+              this.modService.show('error', res.error).catch((error) => {
+                console.error(error);
+              });
             }
           }
         ).catch((err) => {
           console.error(err);
         });
       } else {
-        this.modService.show('loginInvalid');
+        this.modService.show('loginInvalid').catch((error) => {
+          console.error(error);
+        });
       }
     }).catch((error) => {
       alert('Server cannot be requested. Please check if you are online.');

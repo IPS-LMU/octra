@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
+import {Functions} from 'octra-components';
 import {AppInfo} from '../../../app.info';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {Functions} from '../../shared/Functions';
 import {AppStorageService, SettingsService} from '../../shared/service';
 
 @Component({
@@ -20,7 +20,10 @@ export class AgreementComponent implements OnInit {
               private langService: TranslocoService,
               private appStorage: AppStorageService) {
     if ((this.settService.projectsettings === null || this.settService.projectsettings === undefined)) {
-      Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling);
+      Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling)
+        .catch((error) => {
+          console.error(error);
+        });
     }
   }
 
@@ -47,7 +50,9 @@ export class AgreementComponent implements OnInit {
 
   logout() {
     this.settService.clearSettings();
-    Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling);
+    Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).catch((error) => {
+      console.error(error);
+    });
   }
 
   accept() {
@@ -56,6 +61,8 @@ export class AgreementComponent implements OnInit {
     }
     this.appStorage.agreement[this.appStorage.user.project] = true;
     this.appStorage.sessStr.store('agreement', this.appStorage.agreement);
-    Functions.navigateTo(this.router, ['/user/transcr'], AppInfo.queryParamsHandling);
+    Functions.navigateTo(this.router, ['/user/transcr'], AppInfo.queryParamsHandling).catch((error) => {
+      console.error(error);
+    });
   }
 }

@@ -2,12 +2,12 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
 import * as moment from 'moment';
+import {Functions, isUnset} from 'octra-components';
 import {Observable} from 'rxjs';
 import {isArray} from 'rxjs/internal-compatibility';
 import {AppInfo} from '../../../app.info';
 import {BugReporter} from '../../obj/BugAPI/BugReporter';
 import {BrowserInfo} from '../BrowserInfo';
-import {Functions, isUnset} from '../Functions';
 import {AppStorageService} from './appstorage.service';
 import {SettingsService} from './settings.service';
 import {TranscriptionService} from './transcription.service';
@@ -140,8 +140,7 @@ export class BugReportService {
     if (!isUnset(this.settService.appSettings)) {
       const bugreportSettings = this.settService.appSettings.octra.bugreport;
 
-      for (let i = 0; i < AppInfo.bugreporters.length; i++) {
-        const bugreporter = AppInfo.bugreporters[i];
+      for (const bugreporter of AppInfo.bugreporters) {
         if (bugreporter.name === bugreportSettings.name) {
           this.reporter = bugreporter;
         }

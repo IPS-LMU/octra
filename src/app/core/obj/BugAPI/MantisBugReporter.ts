@@ -77,11 +77,11 @@ export class MantisBugReporter extends BugReporter {
           result += attr + '\n';
           result += '---------\n';
 
-          for (let i = 0; i < pkg[attr].length; i++) {
-            if (typeof pkg[attr][i].message === 'string') {
-              result += '  ' + pkg[attr][i].type + '  ' + pkg[attr][i].message + '\n';
-            } else if (typeof pkg[attr][i].message === 'object') {
-              result += '  ' + pkg[attr][i].type + '\n' + JSON.stringify(pkg[attr][i].message, null, 2) + '\n';
+          for (const pkgElementElement of pkg[attr]) {
+            if (typeof pkgElementElement.message === 'string') {
+              result += '  ' + pkgElementElement.type + '  ' + pkgElementElement.message + '\n';
+            } else if (typeof pkgElementElement.message === 'object') {
+              result += '  ' + pkgElementElement.type + '\n' + JSON.stringify(pkgElementElement.message, null, 2) + '\n';
             }
           }
         }

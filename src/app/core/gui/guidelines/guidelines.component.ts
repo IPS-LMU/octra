@@ -90,9 +90,10 @@ export class GuidelinesComponent implements OnInit, OnChanges {
   private unCollapseAll() {
     this.collapsed = [];
 
-    for (let i = 0; i < this.guidelines.instructions.length; i++) {
+    for (const instruction of this.guidelines.instructions) {
       const elem = [];
-      for (let j = 0; j < this.guidelines.instructions[i].entries.length; j++) {
+
+      for (const entry of instruction.entries) {
         elem.push(true);
       }
       this.collapsed.push(elem);
@@ -103,18 +104,15 @@ export class GuidelinesComponent implements OnInit, OnChanges {
     if (text !== '') {
       this.shownGuidelines.instructions = [];
 
-      for (let i = 0; i < this.guidelines.instructions.length; i++) {
-        const instruction = this.guidelines.instructions[i];
+      for (const instruction of this.guidelines.instructions) {
         if (instruction.group.indexOf(text) > -1) {
           this.shownGuidelines.instructions.push(instruction);
         } else {
           const instr = JSON.parse(JSON.stringify(instruction));
           instr.entries = [];
 
-          for (let e = 0; e < instruction.entries.length; e++) {
-            const entry = instruction.entries[e];
-            if (entry.title.indexOf(text) > -1
-              || entry.description.indexOf(text) > -1
+          for (const entry of instruction.entries) {
+            if (entry.title.indexOf(text) > -1 || entry.description.indexOf(text) > -1
             ) {
               instr.entries.push(entry);
             }

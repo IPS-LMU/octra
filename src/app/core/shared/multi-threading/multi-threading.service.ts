@@ -52,8 +52,7 @@ export class MultiThreadingService {
 
   public getStatistics(): string {
     let result = '';
-    for (let i = 0; i < this.workers.length; i++) {
-      const worker = this.workers[i];
+    for (const worker of this.workers) {
       result += `----- worker id ${worker.id} ----\n` + `jobs: ${worker.queue.length}\n----\n`;
     }
 
@@ -67,9 +66,7 @@ export class MultiThreadingService {
   private getBestWorker(): TsWorker {
     let foundWorker: TsWorker = null;
 
-    for (let i = 0; i < this._workers.length; i++) {
-      const worker = this._workers[i];
-
+    for (const worker of this._workers) {
       if (foundWorker === null) {
         foundWorker = worker;
       } else if (worker.queue.length < foundWorker.queue.length) {

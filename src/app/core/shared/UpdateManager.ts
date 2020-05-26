@@ -1,9 +1,8 @@
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
+import {isUnset, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
 import {AppInfo} from '../../app.info';
 import {IndexedDBManager} from '../obj/IndexedDBManager';
 import {SubscriptionManager} from '../obj/SubscriptionManager';
-import {isUnset} from './Functions';
-import {AppStorageService, OIDBLevel} from './service/appstorage.service';
+import {AppStorageService, OIDBLevel} from './service';
 
 export class UpdateManager {
   private version = '';
@@ -42,7 +41,9 @@ export class UpdateManager {
               if (result.type === 'success') {
                 // database opened
                 console.log('IDB opened');
-                idbm.save('options', 'version', {value: AppInfo.version});
+                idbm.save('options', 'version', {value: AppInfo.version}).catch((error) => {
+                  console.error(error);
+                });
                 resolve(idbm);
               } else if (result.type === 'upgradeneeded') {
                 // database opened and needs upgrade/installation
@@ -51,7 +52,7 @@ export class UpdateManager {
 
                 // foreach step to the latest version you need to define the uprade
                 // procedure
-                new Promise<void>((resolve, reject) => {
+                new Promise<void>((resolve2, reject2) => {
                   if (version === 1) {
                     const optionsStore = idbm.db.createObjectStore('options', {keyPath: 'name'});
                     const logsStore = idbm.db.createObjectStore('logs', {keyPath: 'timestamp'});
@@ -136,7 +137,7 @@ export class UpdateManager {
                             // after an successful upgrade the success is automatically triggered
                           }).catch((err) => {
                             console.error(err);
-                            reject(err);
+                            reject2(err);
                           });
                         } else {
                           version++;
@@ -153,7 +154,7 @@ export class UpdateManager {
                           convertAnnotation();
                         }).catch((err) => {
                           console.error(err);
-                          reject(err);
+                          reject2(err);
                         });
                       } else {
                         convertAnnotation();
@@ -161,12 +162,12 @@ export class UpdateManager {
 
                       version = 2;
                       console.log(`updated to v2`);
-                      resolve();
+                      resolve2();
                     }).catch((err) => {
-                      reject(err);
+                      reject2(err);
                     });
                   } else {
-                    resolve();
+                    resolve2();
                   }
                 }).then(() => {
                   if (version === 2) {
@@ -179,16 +180,21 @@ export class UpdateManager {
                           idbm.save(options, 'usemode', {
                             name: 'usemode',
                             value: 'online'
+                          }).catch((error) => {
+                            console.error(error);
                           });
                         } else if (entry.value === true) {
                           idbm.save(options, 'usemode', {
                             name: 'usemode',
                             value: 'local'
+                          }).catch((error) => {
+                            console.error(error);
                           });
                         }
                       }
                     });
                     console.log(`updated to v3`);
+                    resolve();
                   }
                 }).catch((error) => {
                   console.error(error);

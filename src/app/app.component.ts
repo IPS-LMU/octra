@@ -1,12 +1,12 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
+import {isUnset} from 'octra-components';
 import {environment} from '../environments/environment';
 import {AppInfo} from './app.info';
 import {NavigationComponent} from './core/gui/navbar';
-import {ASRLanguage} from './core/obj/Settings/app-settings';
+import {ASRLanguage} from './core/obj/Settings';
 import {SubscriptionManager} from './core/obj/SubscriptionManager';
-import {isUnset} from './core/shared/Functions';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
 import {APIService, AppStorageService, SettingsService} from './core/shared/service';
 import {AsrService} from './core/shared/service/asr.service';
@@ -213,13 +213,13 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
     );
   }
 
-  private getParameterByName(name, url = null) {
+  private getParameterByName(name: string, url = null) {
     if (!url) {
       url = document.location.href;
     }
     name = name.replace(/[\[\]]/g, '\\$&');
-    const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-      results = regex.exec(url);
+    const regExp = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+    const results = regExp.exec(url);
     if (!results) {
       return null;
     }

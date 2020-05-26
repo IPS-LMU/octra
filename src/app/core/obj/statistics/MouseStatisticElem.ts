@@ -47,11 +47,11 @@ export class MouseStatisticElem extends StatisticElem {
     for (const attr in elem) {
       if (elem.hasOwnProperty(attr)) {
         if (elem.hasOwnProperty('value') || elem.hasOwnProperty('context') || elem.hasOwnProperty('timestamp')
-          || elem.hasOwnProperty('type') || elem.hasOwnProperty('playpos') || elem.hasOwnProperty('playerpos') || elem.hasOwnProperty('caretpos')
-          || elem.hasOwnProperty('segment')
+          || elem.hasOwnProperty('type') || elem.hasOwnProperty('playpos') || elem.hasOwnProperty('playerpos')
+          || elem.hasOwnProperty('caretpos') || elem.hasOwnProperty('segment')
         ) {
           if (attr === 'playerpos') {
-            result['playpos'] = elem[`${attr}`];
+            result.playpos = elem[`${attr}`];
           } else {
             result[`${attr}`] = elem[`${attr}`];
           }

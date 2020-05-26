@@ -1,5 +1,5 @@
+import {isUnset} from 'octra-components';
 import {Observable} from 'rxjs';
-import {isUnset} from '../shared/Functions';
 
 export enum IDBMode {
   READONLY,
@@ -152,7 +152,7 @@ export class IndexedDBManager {
           }
         };
 
-        wrapper(0);
+        return wrapper(0);
       }
     );
   };

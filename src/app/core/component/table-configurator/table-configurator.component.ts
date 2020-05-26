@@ -1,7 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
-import {Annotation, Level} from 'octra-components';
-import {isUnset} from '../../shared/Functions';
+import {Annotation, isUnset, Level} from 'octra-components';
 
 export interface ColumnDefinition {
   type: string;
@@ -40,7 +39,7 @@ export class TableConfiguratorComponent implements OnInit {
   @Input() options = {};
   @Input() currentLevelID;
   @Input() view: 'expert' | 'easy' = 'easy';
-  @Input() tableWidth: number = 300;
+  @Input() tableWidth = 300;
   resultURL: SafeResourceUrl = null;
 
   includeLineNumbers = false;
@@ -151,7 +150,7 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '01:30:02.234',
           formatFunction: (level: Level, segmentNumber: number, counter: number) => {
             // the value must be a unix timestamp
-            let segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.seconds : 0;
+            const segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.seconds : 0;
             const segment = level.segments.get(segmentNumber);
             return this.convertMilliSecondsIntoLegibleString(Math.round((segment.time.seconds - segmentStart) * 1000));
           },
@@ -163,7 +162,7 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '120345',
           formatFunction: (level: Level, segmentNumber: number, counter: number) => {
             // the value must be a unix timestamp
-            let segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.samples + 1 : 1;
+            const segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.samples + 1 : 1;
             return (level.segments.get(segmentNumber).time.samples - segmentStart) + '';
           }
         },
@@ -173,7 +172,7 @@ export class TableConfiguratorComponent implements OnInit {
           defaultValue: '23.4567',
           formatFunction: (level: Level, segmentNumber: number, counter: number) => {
             // the value must be a unix timestamp
-            let segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.seconds : 0;
+            const segmentStart = (segmentNumber > 0) ? level.segments.get(segmentNumber - 1).time.seconds : 0;
             return (level.segments.get(segmentNumber).time.seconds - segmentStart).toFixed(4) + '';
           }
         }
@@ -298,10 +297,10 @@ export class TableConfiguratorComponent implements OnInit {
     const secsIn = milliSecondsIn / 1000;
     let milliSecs: any = milliSecondsIn % 1000;
 
-    let hours: any = Math.floor(secsIn / 3600),
-      remainder: any = Math.floor(secsIn % 3600),
-      minutes: any = Math.floor(remainder / 60),
-      seconds: any = Math.floor(remainder % 60);
+    let hours: any = Math.floor(secsIn / 3600);
+    const remainder: any = Math.floor(secsIn % 3600);
+    let minutes: any = Math.floor(remainder / 60);
+    let seconds: any = Math.floor(remainder % 60);
 
     hours = (hours < 10) ? '0' + hours : hours;
     minutes = (minutes < 10) ? '0' + minutes : minutes;
@@ -315,8 +314,7 @@ export class TableConfiguratorComponent implements OnInit {
   }
 
   onFormatClick(format: string) {
-    for (let i = 0; i < this.columns.length; i++) {
-      const column = this.columns[i];
+    for (const column of this.columns) {
       if (
         column.columnDefinition.type === 'segmentStart' ||
         column.columnDefinition.type === 'segmentEnd' ||
@@ -343,13 +341,11 @@ export class TableConfiguratorComponent implements OnInit {
     let oldTitleIsType = false;
     let newTitleIsType = false;
 
-    for (let i = 0; i < this.columnDefinitions.length; i++) {
-      const definition = this.columnDefinitions[i];
-
-      if (definition.type === column.title) {
+    for (const columnDefinition of this.columnDefinitions) {
+      if (columnDefinition.type === column.title) {
         oldTitleIsType = true;
       }
-      if (definition.type === newTitle) {
+      if (columnDefinition.type === newTitle) {
         newTitleIsType = true;
       }
 
@@ -366,7 +362,7 @@ export class TableConfiguratorComponent implements OnInit {
 
   generateFile() {
     let header = '';
-    let textLines: {
+    const textLines: {
       text: string;
       samples: number
     }[] = [];
@@ -391,7 +387,7 @@ export class TableConfiguratorComponent implements OnInit {
 
     let counter = 0;
     const levelNum = this.getLevelNumber();
-    let startAt = (hasTierColumn) ? 0 : levelNum;
+    const startAt = (hasTierColumn) ? 0 : levelNum;
     for (let i = startAt; i < this.annotation.levels.length; i++) {
       const level = this.annotation.levels[i];
 
@@ -422,8 +418,8 @@ export class TableConfiguratorComponent implements OnInit {
 
     let result = (this.tableOptions.addHeader) ? header : '';
 
-    for (let i = 0; i < textLines.length; i++) {
-      result += `${textLines[i].text}\n`;
+    for (const textLine of textLines) {
+      result += `${textLine.text}\n`;
     }
     result += '\n';
 
@@ -444,15 +440,13 @@ export class TableConfiguratorComponent implements OnInit {
   }
 
   findNextUnusedColumnDefinition(): ColumnDefinition {
-    for (let i = 0; i < this.columnDefinitions.length; i++) {
-      const column = this.columnDefinitions[i];
-
+    for (const columnDefinition of this.columnDefinitions) {
       const alreadyUsed = this.columns.findIndex((a) => {
-        return a.columnDefinition.type === column.type;
+        return a.columnDefinition.type === columnDefinition.type;
       }) > -1;
 
       if (!alreadyUsed) {
-        return column;
+        return columnDefinition;
       }
     }
 
@@ -472,8 +466,8 @@ export class TableConfiguratorComponent implements OnInit {
   updateTableCells(index: number) {
     const def = this.columns[index].columnDefinition.selectedFormat;
     let hasTierColumn = false;
-    for (let k = 0; k < this.columns.length; k++) {
-      if (this.columns[k].columnDefinition.type === 'tier') {
+    for (const column of this.columns) {
+      if (column.columnDefinition.type === 'tier') {
         hasTierColumn = true;
         break;
       }
@@ -481,7 +475,7 @@ export class TableConfiguratorComponent implements OnInit {
 
     let counter = 1;
     const levelNum = this.getLevelNumber();
-    let startAt = (hasTierColumn) ? 0 : levelNum;
+    const startAt = (hasTierColumn) ? 0 : levelNum;
     this.columns[index].columnDefinition.cells = [];
 
     for (let i = startAt; i < this.annotation.levels.length; i++) {
@@ -490,7 +484,7 @@ export class TableConfiguratorComponent implements OnInit {
 
       for (let j = 0; j < level.segments.length; j++) {
         const segment = level.segments.get(j);
-        let text = def.formatFunction(level, j, counter);
+        const text = def.formatFunction(level, j, counter);
 
         this.columns[index].columnDefinition.cells.push({
           level: i,

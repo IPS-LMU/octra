@@ -1,7 +1,6 @@
 import * as moment from 'moment';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
+import {isUnset, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
 import * as X2JS from 'x2js';
-import {isUnset} from '../../shared/Functions';
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 
 export class ELANConverter extends Converter {
@@ -79,8 +78,7 @@ export class ELANConverter extends Converter {
         });
 
         // read annotation
-        for (let j = 0; j < level.items.length; j++) {
-          const segment = level.items[j];
+        for (const segment of level.items) {
           const miliseconds = Math.round((segment.sampleStart + segment.sampleDur) / annotation.sampleRate * 1000);
 
           // add time slot
@@ -138,13 +136,11 @@ export class ELANConverter extends Converter {
 
       if (!isUnset(timeUnit) && timeUnit === 'milliseconds') {
         let lastSample = 0;
-        for (let i = 0; i < jsonXML.ANNOTATION_DOCUMENT.TIER.length; i++) {
-          const tier = jsonXML.ANNOTATION_DOCUMENT.TIER[i];
+        for (const tier of jsonXML.ANNOTATION_DOCUMENT.TIER) {
           const level = new OLevel(tier._TIER_ID, 'SEGMENT', []);
 
           if (Array.isArray(tier.ANNOTATION)) {
-            for (let j = 0; j < tier.ANNOTATION.length; j++) {
-              const annotationElement = tier.ANNOTATION[j];
+            for (const annotationElement of tier.ANNOTATION) {
               const t1 = this.getSamplesFromTimeSlot(jsonXML, annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF1, audiofile.sampleRate);
               const t2 = this.getSamplesFromTimeSlot(jsonXML, annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF2, audiofile.sampleRate);
 
@@ -192,7 +188,6 @@ export class ELANConverter extends Converter {
           if (level.items.length > 0) {
             result.annotjson.levels.push(level);
           }
-
         }
       } else {
         result.error = 'The timeunits must be miliseconds';
@@ -203,9 +198,7 @@ export class ELANConverter extends Converter {
   }
 
   private getSamplesFromTimeSlot(obj: ELAN30Object, slotID: string, sampleRate: number) {
-    for (let i = 0; i < obj.ANNOTATION_DOCUMENT.TIME_ORDER.TIME_SLOT.length; i++) {
-      const timeorderElement = obj.ANNOTATION_DOCUMENT.TIME_ORDER.TIME_SLOT[i];
-
+    for (const timeorderElement of obj.ANNOTATION_DOCUMENT.TIME_ORDER.TIME_SLOT) {
       if (timeorderElement._TIME_SLOT_ID === slotID) {
         const miliseconds = timeorderElement._TIME_VALUE;
         return Math.round((miliseconds / 1000) * sampleRate);

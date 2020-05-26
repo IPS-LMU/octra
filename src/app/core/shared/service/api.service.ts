@@ -1,8 +1,8 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable, SecurityContext} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
+import {isUnset} from 'octra-components';
 import {API} from '../../obj/API/api.interface';
-import {isUnset} from '../Functions';
 
 @Injectable()
 export class APIService implements API {
@@ -242,5 +242,5 @@ export class APIService implements API {
         resolve();
       }
     });
-  };
+  }
 }

@@ -16,12 +16,13 @@ import {
   AudioSelection,
   AudioViewerComponent,
   AudioviewerConfig,
+  Functions,
+  isUnset,
   SampleUnit
 } from 'octra-components';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {SubscriptionManager} from '../../core/obj/SubscriptionManager';
 import {BrowserInfo} from '../../core/shared';
-import {Functions, isUnset} from '../../core/shared/Functions';
 
 import {
   AlertService,
@@ -147,7 +148,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         this.appStorage.saving.emit('success');
       }
     }
-  };
+  }
 
   ngOnInit() {
     this.audioManager = this.audio.audiomanagers[0];
@@ -202,7 +203,9 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
     this.subscrManager.add(this.signalDisplayTop.alerttriggered.subscribe(
       (result) => {
-        this.alertService.showAlert(result.type, result.message);
+        this.alertService.showAlert(result.type, result.message).catch((error) => {
+          console.error(error);
+        });
       }
     ));
 
@@ -312,7 +315,9 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   onAlertTriggered(result) {
-    this.alertService.showAlert(result.type, result.message);
+    this.alertService.showAlert(result.type, result.message).catch((error) => {
+      console.error(error);
+    });
   }
 
   onSegmentChange() {
@@ -339,7 +344,8 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       audioChunkHover.selection.end = this.signalDisplayTop.av.mouseCursor.add(
         this.audioManager.createSampleUnit(this.audioManager.sampleRate / 10)
       );
-      audioChunkHover.startPlayback(true);
+      audioChunkHover.startPlayback(true).catch((error) => {
+      });
     }
 
     // const a = this.viewer.getLocation();
@@ -350,7 +356,9 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     }
 
     this.mouseTimer = window.setTimeout(() => {
-      this.changeArea(this.audioChunkLoupe, this.signalDisplayTop, this.miniLoupeCoord, this.signalDisplayTop.av.mouseCursor.samples, this.signalDisplayTop.mouseCursor.location.x, this.factor);
+      const mouseCursorTime = this.signalDisplayTop.av.mouseCursor.samples;
+      const mouseCursorX = this.signalDisplayTop.mouseCursor.location.x;
+      this.changeArea(this.audioChunkLoupe, this.signalDisplayTop, this.miniLoupeCoord, mouseCursorTime, mouseCursorX, this.factor);
     }, 20);
   }
 
@@ -410,7 +418,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
           };
         }
 
-        let selection = {
+        const selection = {
           start: -1,
           length: 0
         };

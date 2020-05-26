@@ -60,11 +60,9 @@ export class TranscriptionFeedbackComponent implements OnInit {
   }
 
   public checkBoxChanged(groupName: string, checkb: string) {
-    for (let i = 0; i < this.transcrService.feedback.groups.length; i++) {
-      const group = this.transcrService.feedback.groups[i];
+    for (const group of this.transcrService.feedback.groups) {
       if (group.name === groupName) {
-        for (let j = 0; j < group.controls.length; j++) {
-          const control = group.controls[j];
+        for (const control of group.controls) {
           if (control.value === checkb) {
             control.custom.checked = ((control.custom.checked === null || control.custom.checked === undefined))
               ? true : !control.custom.checked;

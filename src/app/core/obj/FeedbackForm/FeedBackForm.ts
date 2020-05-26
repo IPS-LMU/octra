@@ -1,5 +1,4 @@
 import {isArray} from 'rxjs/internal-compatibility';
-import {Control} from './Control';
 import {Group} from './Group';
 
 export class FeedBackForm {
@@ -34,8 +33,7 @@ export class FeedBackForm {
 
     // init feedbackData
     let required = false;
-    for (let i = 0; i < feedbackData.length; i++) {
-      const group = feedbackData[i];
+    for (const group of feedbackData) {
       const groupObj = Group.fromAny(group);
 
       groups.push(groupObj);
@@ -57,10 +55,8 @@ export class FeedBackForm {
   public exportData(): any {
     const result: any = {};
 
-    for (let i = 0; i < this.groups.length; i++) {
-      const group = this.groups[i];
-      for (let j = 0; j < group.controls.length; j++) {
-        const control: Control = group.controls[j];
+    for (const group of this.groups) {
+      for (const control of group.controls) {
         if (control.type.type !== 'textarea') {
           if (control.type.type === 'radiobutton') {
             if (!(control.custom.checked === null || control.custom.checked === undefined)) {
@@ -88,6 +84,7 @@ export class FeedBackForm {
         }
       }
     }
+
     return result;
   }
 
@@ -98,8 +95,8 @@ export class FeedBackForm {
         const value = feedbackData[`${attr}`];
 
         if (isArray(value)) {
-          for (let i = 0; i < value.length; i++) {
-            this.setValueForControl(attr, value[i]);
+          for (const valueElement of value) {
+            this.setValueForControl(attr, valueElement);
           }
         } else {
           this.setValueForControl(attr, value);
@@ -113,10 +110,8 @@ export class FeedBackForm {
   public setValueForControl(name: string, value: string, custom?: any): boolean {
     let found = false;
 
-    for (let i = 0; i < this.groups.length; i++) {
-      const group = this.groups[i];
-      for (let j = 0; j < this.groups[i].controls.length; j++) {
-        const control: Control = this.groups[i].controls[j];
+    for (const group of this.groups) {
+      for (const control of group.controls) {
         if (group.name === name) {
           if (control.type.type === 'textarea') {
             control.value = value;

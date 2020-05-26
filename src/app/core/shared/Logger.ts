@@ -23,9 +23,7 @@ export class Logger {
 
   public output() {
     console.groupCollapsed(this.groupName);
-    for (let i = 0; i < this.entries.length; i++) {
-      const entry = this.entries[i];
-
+    for (const entry of this.entries) {
       switch (entry.type) {
         case('log'):
           console.log(entry.message);

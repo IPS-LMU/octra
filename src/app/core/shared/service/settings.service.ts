@@ -2,11 +2,11 @@ import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
 import {Params} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
+import {Functions, isUnset} from 'octra-components';
 import {Observable, ReplaySubject, Subject, Subscription} from 'rxjs';
 
 import {SubscriptionManager} from '../';
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
-import {Functions, isUnset} from '../Functions';
 import {UpdateManager} from '../UpdateManager';
 import {APIService} from './api.service';
 import {AppStorageService} from './appstorage.service';
@@ -33,7 +33,7 @@ export class SettingsService {
   public get isASREnabled(): boolean {
     return (!isUnset(this.appSettings.octra.plugins.asr) &&
       !isUnset(this.appSettings.octra.plugins.asr.enabled)
-      && this.appSettings.octra.plugins.asr.enabled == true
+      && this.appSettings.octra.plugins.asr.enabled === true
       && !isUnset(this.appSettings.octra.plugins.asr.calls)
       && this.appSettings.octra.plugins.asr.calls.length === 2
       && this.appSettings.octra.plugins.asr.calls[0] !== ''
@@ -108,15 +108,15 @@ export class SettingsService {
     return this._filename;
   }
 
-  private _validationmethod: (string, any) => any[] = null;
+  private _validationmethod: (str: string, obj: any) => any[] = null;
 
-  get validationmethod(): (string, any) => any[] {
+  get validationmethod(): (str: string, obj: any) => any[] {
     return this._validationmethod;
   }
 
-  private _tidyUpMethod: (string, any) => string = null;
+  private _tidyUpMethod: (str: string, obj: any) => string = null;
 
-  get tidyUpMethod(): (string, any) => string {
+  get tidyUpMethod(): (str: string, obj: any) => string {
     return this._tidyUpMethod;
   }
 
@@ -239,7 +239,7 @@ export class SettingsService {
       this.dbloaded.error(error);
       console.error(error.target.error);
     });
-  };
+  }
 
   public loadProjectSettings: () => Promise<void> = () => {
     return new Promise<void>((resolve, reject) => {
@@ -269,7 +269,7 @@ export class SettingsService {
         }
       );
     });
-  };
+  }
 
   public loadGuidelines = (language: string, url: string) => {
     this.loadSettings(
@@ -296,7 +296,7 @@ export class SettingsService {
         console.error(error);
       }
     );
-  };
+  }
   public loadValidationMethod: ((url: string) => Subscription) = (url: string) => {
     console.log('Load methods...');
     return Functions.uniqueHTTPRequest(this.http, false, {
@@ -328,7 +328,7 @@ export class SettingsService {
         this.validationmethodloaded.emit();
       }
     );
-  };
+  }
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
     console.log('Load audio file 2...');
     if ((this.appStorage.usemode === null || this.appStorage.usemode === undefined)) {
@@ -385,7 +385,7 @@ export class SettingsService {
         console.error('session file is null.');
       }
     }
-  };
+  }
 
   public loadApplicationSettings(queryParams: any): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -474,9 +474,9 @@ export class SettingsService {
       this.loaded = true;
       this.test.next(true);
     }
-  };
+  }
 
-  private loadSettings(messages: any, urls: any, filenames: any, onhttpreturn: (any) => void, onvalidated: () => void,
+  private loadSettings(messages: any, urls: any, filenames: any, onhttpreturn: (obj: any) => void, onvalidated: () => void,
                        onerror: (error: string) => void) {
     if (
       messages.hasOwnProperty('loading') &&

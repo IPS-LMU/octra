@@ -57,7 +57,7 @@ export class TsWorkerJob {
     return new Promise<any>((resolve, reject) => {
       reject('not implemented');
     });
-  };
+  }
 
   /**
    * changes this job's status

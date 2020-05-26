@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
+import {Functions} from 'octra-components';
 import {Observable} from 'rxjs';
 import {AppInfo} from '../../../app.info';
-import {Functions} from '../Functions';
 import {AppStorageService, SettingsService} from '../service';
 
 @Injectable()
@@ -23,7 +23,9 @@ export class TranscActivateGuard implements CanActivate {
         params.fragment = route.fragment;
         params.queryParams = route.queryParams;
 
-        Functions.navigateTo(this.router, ['/user/load'], params);
+        Functions.navigateTo(this.router, ['/user/load'], params).catch((error) => {
+          console.error(error);
+        });
         return false;
       }
     } else {
@@ -32,7 +34,9 @@ export class TranscActivateGuard implements CanActivate {
         params.fragment = route.fragment;
         params.queryParams = route.queryParams;
 
-        Functions.navigateTo(this.router, ['/user/transcr/reload-file'], params);
+        Functions.navigateTo(this.router, ['/user/transcr/reload-file'], params).catch((error) => {
+          console.error(error);
+        });
         return false;
       }
     }

@@ -1,10 +1,9 @@
 import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
-import {AudioManager} from 'octra-components';
+import {AudioManager, Functions, isUnset} from 'octra-components';
 import {Observable, Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
-import {Functions, isUnset} from '../Functions';
 
 @Injectable()
 export class AudioService {
@@ -83,7 +82,7 @@ export class AudioService {
     );
 
     return subj;
-  };
+  }
 
   public registerAudioManager(manager: AudioManager) {
     console.log(`register new audio manager`);
@@ -103,8 +102,8 @@ export class AudioService {
 
   public destroy(disconnect: boolean = true) {
     console.log(`destroy all!`);
-    for (let i = 0; i < this._audiomanagers.length; i++) {
-      this._audiomanagers[i].destroy(disconnect);
+    for (const audiomanager of this._audiomanagers) {
+      audiomanager.destroy(disconnect);
     }
     this._audiomanagers = [];
     this.subscrmanager.destroy();

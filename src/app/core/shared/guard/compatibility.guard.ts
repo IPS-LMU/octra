@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
+import {Functions} from 'octra-components';
 import {Observable} from 'rxjs';
 import {AppInfo} from '../../../app.info';
-import {Functions} from '../Functions';
 import {SettingsService} from '../service';
 import {CompatibilityService} from '../service/compatibility.service';
 
@@ -36,7 +36,9 @@ export class CompatibilityGuard implements CanActivate {
               params.fragment = next.fragment;
               params.queryParams = next.queryParams;
 
-              Functions.navigateTo(this.router, ['login'], params);
+              Functions.navigateTo(this.router, ['login'], params).catch((error) => {
+                console.error(error);
+              });
             }
             resolve(true);
           } else {
@@ -45,7 +47,9 @@ export class CompatibilityGuard implements CanActivate {
               params.fragment = next.fragment;
               params.queryParams = next.queryParams;
 
-              Functions.navigateTo(this.router, ['test'], params);
+              Functions.navigateTo(this.router, ['test'], params).catch((error) => {
+                console.error(error);
+              });
               resolve(result);
             } else {
               resolve(true);

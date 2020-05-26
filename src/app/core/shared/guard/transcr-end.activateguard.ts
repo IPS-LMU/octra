@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
+import {Functions} from 'octra-components';
 import {Observable} from 'rxjs';
 import {AppInfo} from '../../../app.info';
-import {Functions} from '../Functions';
 import {AppStorageService} from '../service';
 
 @Injectable()
@@ -15,7 +15,9 @@ export class TranscrEndGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
     if (!this.appStorage.submitted) {
-      Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling);
+      Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
+        console.error(error);
+      });
       return false;
     }
     return true;

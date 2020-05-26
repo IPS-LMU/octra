@@ -1,3 +1,5 @@
+import {SampleInterval} from 'octra-components';
+
 export interface ILogging {
   version: string;
   encoding: string; // Bsp.: "UTF-8"
@@ -16,14 +18,8 @@ export interface ILog {
   value: string | number | any;
   playpos: number; // Samples
   caretpos: number; // Position des Cursors im// Text (wird Caret genannt)
-  selection?: {
-    start: number;
-    length: number;
-  },
-  segment?: {
-    start: number;
-    length: number;
-  }
+  selection?: SampleInterval;
+  segment?: SampleInterval;
 }
 
 export class OLogging implements ILogging {
@@ -60,23 +56,11 @@ export class OLog implements ILog {
   value: string | number | any;
   playpos: number; // Samples
   caretpos: number; // Position des Cursors im Text (wird Caret genannt)
-  selection: {
-    start: number;
-    length: number
-  };
-  segment: {
-    start: number;
-    length: number
-  };
+  selection: SampleInterval;
+  segment: SampleInterval;
 
   constructor(timestamp: number, type: string, context: string, value: any, playpos: number, caretpos: number,
-              selection?: {
-                start: number;
-                length: number;
-              }, segment?: {
-      start: number;
-      length: number;
-    }) {
+              selection?: SampleInterval, segment?: SampleInterval) {
     this.timestamp = timestamp;
     this.type = type;
     this.context = context;

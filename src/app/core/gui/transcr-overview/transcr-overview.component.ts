@@ -13,11 +13,10 @@ import {
   ViewChild
 } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
-import {AudioChunk, AudioSelection, PlayBackStatus, SampleUnit, Segment} from 'octra-components';
+import {AudioChunk, AudioSelection, isFunction, isUnset, PlayBackStatus, SampleUnit, Segment} from 'octra-components';
 import {TranscrEditorComponent} from '../../component/transcr-editor';
 import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
 import {SubscriptionManager} from '../../shared';
-import {isFunction, isUnset} from '../../shared/Functions';
 
 import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 
@@ -119,8 +118,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
     if (this.shownSegments.length > 0) {
       let resultStr = '';
-      for (let i = 0; i < this.shownSegments.length; i++) {
-        resultStr += this.shownSegments[i].transcription.html;
+      for (const shownSegment of this.shownSegments) {
+        resultStr += shownSegment.transcription.html;
       }
 
       found = (resultStr.match(/<span class='val-error'/) || []).length;
@@ -238,7 +237,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       this.cd.detectChanges();
 
       this.transcrEditor.Settings.btnPopover = false;
-      this.transcrEditor.validationEnabled = this.appStorage.usemode !== 'url' && (this.appStorage.usemode === 'demo' || this.settingsService.projectsettings.octra.validationEnabled);
+      this.transcrEditor.validationEnabled = this.appStorage.usemode !== 'url' &&
+        (this.appStorage.usemode === 'demo' || this.settingsService.projectsettings.octra.validationEnabled);
       this.transcrEditor.initialize();
 
       this.transcrEditor.rawText = segment.transcript;
@@ -517,7 +517,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
   private updateSegments() {
     this.playStateSegments = [];
-    if (this.transcrService.validationArray.length > 0 || this.appStorage.usemode === 'url' || !this.settingsService.projectsettings.octra.validationEnabled) {
+    if (this.transcrService.validationArray.length > 0 || this.appStorage.usemode === 'url'
+      || !this.settingsService.projectsettings.octra.validationEnabled) {
       if (!this.segments || !this.transcrService.guidelines) {
         this.shownSegments = [];
       }

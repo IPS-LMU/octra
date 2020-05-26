@@ -32,9 +32,13 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
 
     if (this.appStorage.usemode === 'local' || this.appStorage.usemode === 'demo') {
       this.appStorage.clearAnnotationData().then(() => {
-        this.appStorage.clearOptions();
+        this.appStorage.clearOptions().catch((error) => {
+          console.error(error);
+        });
       }).then(() => {
-        this.appStorage.clearLoggingData();
+        this.appStorage.clearLoggingData().catch((error) => {
+          console.error(error);
+        });
       }).then(
         () => {
           alert('All cleared. The app will be reloaded.');
@@ -44,9 +48,13 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
     } else if (this.appStorage.usemode === 'online') {
       this.api.setOnlineSessionToFree(this.appStorage).then(() => {
         this.appStorage.clearAnnotationData().then(() => {
-          this.appStorage.clearLoggingData();
+          this.appStorage.clearLoggingData().catch((error) => {
+            console.error(error);
+          });
         }).then(() => {
-          this.appStorage.clearOptions();
+          this.appStorage.clearOptions().catch((error) => {
+            console.error(error);
+          });
         }).then(
           () => {
             alert('All cleared. The app will be reloaded.');
@@ -58,9 +66,13 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
       });
     } else if (this.appStorage.usemode === 'url') {
       this.appStorage.clearAnnotationData().then(() => {
-        this.appStorage.clearLoggingData();
+        this.appStorage.clearLoggingData().catch((error) => {
+          console.error(error);
+        });
       }).then(() => {
-        this.appStorage.clearOptions();
+        this.appStorage.clearOptions().catch((error) => {
+          console.error(error);
+        });
       }).then(
         () => {
           alert('All cleared. The app will be reloaded.');

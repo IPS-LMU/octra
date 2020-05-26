@@ -1,10 +1,9 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
 import {BsDropdownDirective} from 'ngx-bootstrap/dropdown';
-import {AudioChunk} from 'octra-components';
+import {AudioChunk, isUnset} from 'octra-components';
 import {AppInfo} from '../../../app.info';
 import {AppSettings, ASRLanguage} from '../../obj/Settings';
-import {isUnset} from '../../shared/Functions';
 import {AlertService, AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
 import {ASRQueueItemType, AsrService} from '../../shared/service/asr.service';
 
@@ -36,8 +35,7 @@ export class AsrOptionsComponent implements OnInit {
   constructor(public appStorage: AppStorageService, public settingsService: SettingsService,
               public asrService: AsrService, private transcrService: TranscriptionService,
               private alertService: AlertService, private langService: TranslocoService) {
-    for (let i = 0; i < this.appSettings.octra.plugins.asr.services.length; i++) {
-      const provider = this.appSettings.octra.plugins.asr.services[i];
+    for (const provider of this.appSettings.octra.plugins.asr.services) {
       this.serviceProviders['' + provider.provider] = provider;
     }
   }
@@ -67,7 +65,10 @@ export class AsrOptionsComponent implements OnInit {
     if (!isUnset(this.asrService.selectedLanguage)) {
       if (this.audioChunk.time.duration.seconds > 600) {
         // trigger alert, too big audio duration
-        this.alertService.showAlert('danger', this.langService.translate('asr.file too big').toString());
+        this.alertService.showAlert('danger', this.langService.translate('asr.file too big').toString())
+          .catch((error) => {
+            console.error(error);
+          });
       } else {
         const time = this.audioChunk.time.start.add(this.audioChunk.time.duration);
         const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(time);
@@ -110,7 +111,9 @@ export class AsrOptionsComponent implements OnInit {
           const sampleLength = segment.time.samples - sampleStart;
 
           if (sampleLength / this.transcrService.audioManager.sampleRate > 600) {
-            this.alertService.showAlert('danger', this.langService.translate('asr.file too big'));
+            this.alertService.showAlert('danger', this.langService.translate('asr.file too big')).catch((error) => {
+              console.error(error);
+            });
             segment.isBlockedBy = null;
           } else {
             if (segment.transcript.trim() === '' && segment.transcript.indexOf(this.transcrService.breakMarker.code) < 0) {

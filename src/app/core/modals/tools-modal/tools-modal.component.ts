@@ -4,14 +4,13 @@ import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
-import {Segment, WavFormat} from 'octra-components';
+import {isUnset, Segment, WavFormat} from 'octra-components';
 import {interval, Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
 import {NavbarService} from '../../gui/navbar/navbar.service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/cutting-format';
-import {isUnset} from '../../shared/Functions';
 import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 
 declare var JSZip;
@@ -169,7 +168,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
     }
 
     if (!isUnset(this.parentformat.uri)) {
-      const url = this.parentformat.uri['changingThisBreaksApplicationSecurity'];
+      const url = this.parentformat.uri.toString();
       window.URL.revokeObjectURL(url);
     }
   }

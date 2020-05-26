@@ -13,7 +13,8 @@ export class AlertService {
   constructor() {
   }
 
-  public showAlert(type: 'danger' | 'warning' | 'info' | 'success', data: string | any, unique: boolean = true, duration?: number): Promise<{
+  public showAlert(type: 'danger' | 'warning' | 'info' | 'success', data: string | any, unique: boolean = true, duration?: number)
+    : Promise<{
     id: number;
     component: any;
   }> {
@@ -70,11 +71,11 @@ export class AlertService {
 }
 
 export interface AlertSendObj {
-  type: 'danger' | 'warning' | 'info' | 'success',
-  id: number,
-  data: string | any,
-  duration: number,
-  unique: boolean
+  type: 'danger' | 'warning' | 'info' | 'success';
+  id: number;
+  data: string | any;
+  duration: number;
+  unique: boolean;
 }
 
 export interface AlertEntry {

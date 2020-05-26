@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {KeyMapping} from '../../obj/KeyMapping';
+import {KeyMapping} from 'octra-components';
 import {BrowserInfo} from '../BrowserInfo';
 
 @Injectable()

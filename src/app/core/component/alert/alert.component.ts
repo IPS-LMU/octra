@@ -27,8 +27,7 @@ export class AlertComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.alertService.queue;
   }
 
-  constructor(private alertService: AlertService, private sanitizer: DomSanitizer,
-              private _componentFactoryResolver: ComponentFactoryResolver) {
+  constructor(private alertService: AlertService, private sanitizer: DomSanitizer) {
     this.counter = interval(1000).subscribe(
       () => {
         for (const queueItem of this.alertService.queue) {

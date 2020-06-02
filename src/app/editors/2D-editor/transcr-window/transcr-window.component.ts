@@ -13,6 +13,10 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
+import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
+import {Segments} from '../../../core/obj/Annotation';
+import {BrowserAudioTime, BrowserSample, Segment, SubscriptionManager} from '../../../core/shared';
+import {isNullOrUndefined} from '../../../core/shared/Functions';
 
 import {
   AppStorageService,
@@ -22,16 +26,12 @@ import {
   TranscriptionService,
   UserInteractionsService
 } from '../../../core/shared/service';
-import {BrowserAudioTime, BrowserSample, Segment, SubscriptionManager} from '../../../core/shared';
-import {AudioRessource, AudioSelection} from '../../../media-components/obj/media/audio';
-import {Segments} from '../../../core/obj/Annotation';
-import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
-import {LoupeComponent} from '../../../media-components/components/audio/loupe';
-import {AudioNavigationComponent} from '../../../media-components/components/audio/audio-navigation';
-import {AudioChunk, AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
-import {isNullOrUndefined} from '../../../core/shared/Functions';
-import {AudioviewerConfig} from '../../../media-components/components/audio/audioviewer';
 import {ASRProcessStatus, ASRQueueItem, ASRQueueItemType, AsrService} from '../../../core/shared/service/asr.service';
+import {AudioNavigationComponent} from '../../../media-components/components/audio/audio-navigation';
+import {AudioviewerConfig} from '../../../media-components/components/audio/audioviewer';
+import {LoupeComponent} from '../../../media-components/components/audio/loupe';
+import {AudioRessource, AudioSelection} from '../../../media-components/obj/media/audio';
+import {AudioChunk, AudioManager} from '../../../media-components/obj/media/audio/AudioManager';
 
 @Component({
   selector: 'app-transcr-window',
@@ -179,7 +179,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this._loading = true;
     this.cd.markForCheck();
     this.cd.detectChanges();
-
 
     new Promise<void>((resolve) => {
       setTimeout(() => {
@@ -438,12 +437,12 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       if (direction === 'right' && this.segmentIndex < segmentsLength - 1) {
         startIndex = this.segmentIndex + 1;
         limitFunc = j => j < segmentsLength;
-        counterFunc = j => j++;
+        counterFunc = j => j + 1;
         appliedDirection = 'right';
       } else if (direction === 'left' && this.segmentIndex > 0) {
         startIndex = this.segmentIndex - 1;
         limitFunc = j => j >= 0;
-        counterFunc = j => j--;
+        counterFunc = j => j - 1;
         appliedDirection = 'left';
       }
 

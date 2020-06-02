@@ -24,7 +24,7 @@
                       (afterPlaybackRateChange)="afterSpeedChange($event)"
                       (afterVolumeChange)="afterVolumeChange($event)"
                       (buttonClick)="onButtonClick($event)"
-                      [audioChunk]="audioChunkTop"
+                      [audioChunk]="selectedAudioChunk"
                       [buttons]="{
                         play: {
                             label: ('general.play' | transloco),
@@ -66,7 +66,6 @@
                     (mouseleave)="miniLoupeHidden = true;"
                     (segmententer)="onSegmentEnter($event)"
                     (selchange)="onSelectionChanged($event)"
-                    (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_top', signalDisplayTop)"
                     [audioChunk]="audioChunkTop"
                     [breakMarker]="{
                         code: '<P>'
@@ -82,7 +81,6 @@
                   (click)="onLoupeClick($event)"
                   (mousedown)="onViewerMouseDown($event)"
                   (segmententer)="onLoupeSegmentEnter($event)"
-                  (shortcuttriggered)="onShortCutTriggered($event, 'signaldisplay_down', signalDisplayDown)"
                   *ngIf="audioChunkDown !== null && audioChunkDown !== undefined"
                   [audioChunk]="audioChunkDown"
                   [breakMarker]="{

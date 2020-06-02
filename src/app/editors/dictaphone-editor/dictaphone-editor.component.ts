@@ -4,6 +4,8 @@ import {
   AudioManager,
   AudioNavigationComponent,
   AudioplayerComponent,
+  BrowserInfo,
+  isUnset,
   SampleUnit,
   Segment,
   SubscriptionManager
@@ -13,7 +15,7 @@ import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {
   AppStorageService,
   AudioService,
-  KeymappingService,
+  KeymappingService, KeyMappingShortcutEvent,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
@@ -38,10 +40,46 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   public audiochunk: AudioChunk;
   public audioManager: AudioManager;
   private subscrmanager: SubscriptionManager;
-  private shortcuts: any;
   private boundaryselected = false;
 
   private oldRaw = '';
+
+  private shortcuts = {
+    play_pause: {
+      keys: {
+        mac: 'TAB',
+        pc: 'TAB'
+      },
+      title: 'play pause',
+      focusonly: false
+    },
+    stop: {
+      keys: {
+        mac: 'ESC',
+        pc: 'ESC'
+      },
+      title: 'stop playback',
+      focusonly: false
+    },
+    step_backward: {
+      keys: {
+        mac: 'SHIFT + BACKSPACE',
+        pc: 'SHIFT + BACKSPACE'
+      },
+      title: 'step backward',
+      focusonly: false
+    },
+    step_backwardtime: {
+      keys: {
+        mac: 'SHIFT + TAB',
+        pc: 'SHIFT + TAB'
+      },
+      title: 'step backward time',
+      focusonly: false
+    }
+  };
+
+  private shortcutsEnabled = true;
 
   public get settings() {
     return this.audioplayer.settings;
@@ -86,11 +124,17 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   ngOnInit() {
     this.audioManager = this.audio.audiomanagers[0];
     this.audiochunk = this.audioManager.mainchunk.clone();
-    // TODO important set shortcuts for keymapping service
-    // this.shortcuts = this.settings.shortcuts;
     this.editor.Settings.markers = this.transcrService.guidelines.markers.items;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.special_markers.boundary = true;
+
+    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onShortcutTriggered), 'shortcut');
+
+    this.audiochunk.statuschange.subscribe((status) => {
+      console.log(status);
+    });
+
+    this.keyMap.register('AP', this.shortcuts);
 
     DictaphoneEditorComponent.initialized.emit();
   }
@@ -149,10 +193,75 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     }
   }
 
-  onShortcutTriggered(event) {
-    event.value = `audio:${event.value}`;
-    this.uiService.addElementFromEvent('shortcut', event, Date.now(),
-      this.audioManager.playposition, this.editor.caretpos, null, null, 'texteditor');
+  onShortcutTriggered = ($event: KeyMappingShortcutEvent) => {
+    const triggerUIAction = (shortcutObj) => {
+      shortcutObj.value = `audio:${shortcutObj.value}`;
+      this.uiService.addElementFromEvent('shortcut', shortcutObj, Date.now(),
+        this.audioManager.playposition, this.editor.caretpos, null, null, 'texteditor');
+    };
+
+    if (this.shortcutsEnabled) {
+      const comboKey = $event.comboKey;
+
+      const platform = BrowserInfo.platform;
+      if (!isUnset(this.shortcuts)) {
+        let keyActive = false;
+        let a = 0;
+        for (const shortcut in this.shortcuts) {
+          if (this.shortcuts.hasOwnProperty(shortcut)) {
+            a++;
+            if (this.shortcuts.hasOwnProperty(shortcut)) {
+              if (this.shortcuts['' + shortcut + ''].keys['' + platform + ''] === comboKey) {
+                switch (shortcut) {
+                  case('play_pause'):
+                    triggerUIAction({shortcut: comboKey, value: shortcut});
+                    if (this.audiochunk.isPlaying) {
+                      this.audiochunk.pausePlayback();
+                    } else {
+                      this.audiochunk.startPlayback(false).catch((error) => {
+                        console.error(error);
+                      });
+                    }
+                    keyActive = true;
+                    break;
+                  case('stop'):
+                    triggerUIAction({shortcut: comboKey, value: shortcut});
+                    this.audiochunk.stopPlayback().catch((error) => {
+                      console.error(error);
+                    });
+                    keyActive = true;
+                    break;
+                  case('step_backward'):
+                    console.log(`step backward`);
+                    triggerUIAction({shortcut: comboKey, value: shortcut});
+                    this.audiochunk.stepBackward().catch((error) => {
+                      console.error(error);
+                    });
+                    keyActive = true;
+                    break;
+                  case('step_backwardtime'):
+                    console.log(`step backward time`);
+                    triggerUIAction({shortcut: comboKey, value: shortcut});
+                    this.audiochunk.stepBackwardTime(0.5).catch((error) => {
+                      console.error(error);
+                    });
+                    keyActive = true;
+                    break;
+                }
+              }
+
+              if (keyActive) {
+                break;
+              }
+            }
+          }
+        }
+
+        if (keyActive) {
+          $event.event.preventDefault();
+        }
+      }
+    }
   }
 
   onBoundaryClicked(samples: SampleUnit) {
@@ -323,13 +432,13 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   }
 
   public enableAllShortcuts() {
-    this.settings.shortcuts = this.keyMap.register('AP', this.settings.shortcuts);
-    this.audioplayer.enableShortcuts();
+    console.log(`enable all shortcuts!`);
+    this.shortcutsEnabled = true;
   }
 
   public disableAllShortcuts() {
-    this.keyMap.unregister('AP');
-    this.audioplayer.disableShortcuts();
+    console.log(`disable all shortcuts!`);
+    this.shortcutsEnabled = false;
   }
 
   onKeyUp() {

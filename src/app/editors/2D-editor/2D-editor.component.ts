@@ -25,21 +25,22 @@ import {
   OSegment,
   PlayBackStatus,
   SampleUnit,
-  Segment
+  Segment,
+  SubscriptionManager
 } from 'octra-components';
 import {interval, Subscription} from 'rxjs';
+import {AudioViewerShortcutEvent} from '../../../../../octra-components/projects/octra-components/src/lib/components/audio/audio-viewer';
 import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
 import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
 import {TranscrEditorComponent} from '../../core/component';
-import {SubscriptionManager} from 'octra-components';
 
-import {PraatTextgridConverter} from '../../core/shared';
+import {BrowserInfo, PraatTextgridConverter} from '../../core/shared';
 
 import {
   AlertService,
   AppStorageService,
   AudioService,
-  KeymappingService,
+  KeymappingService, KeyMappingShortcutEvent,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
@@ -127,6 +128,43 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     }
   };
 
+  private audioShortcuts = {
+    play_pause: {
+      keys: {
+        mac: 'TAB',
+        pc: 'TAB'
+      },
+      title: 'play pause',
+      focusonly: false
+    },
+    stop: {
+      keys: {
+        mac: 'ESC',
+        pc: 'ESC'
+      },
+      title: 'stop playback',
+      focusonly: false
+    },
+    step_backward: {
+      keys: {
+        mac: 'SHIFT + BACKSPACE',
+        pc: 'SHIFT + BACKSPACE'
+      },
+      title: 'step backward',
+      focusonly: false
+    },
+    step_backwardtime: {
+      keys: {
+        mac: 'SHIFT + TAB',
+        pc: 'SHIFT + TAB'
+      },
+      title: 'step backward time',
+      focusonly: false
+    }
+  };
+
+  private shortcutsEnabled = true;
+
   public get editor(): TranscrEditorComponent {
     if ((this.window === null || this.window === undefined)) {
       return null;
@@ -174,8 +212,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.audioManager = this.audio.audiomanagers[0];
     this.audioChunkLines = this.audioManager.mainchunk.clone();
     this.audioChunkWindow = this.audioManager.mainchunk.clone();
-    this.shortcuts = this.keyMap.register('2D-Editor', this.viewer.settings.shortcuts);
+    this.shortcuts = this.keyMap.register('2D-Editor', {...this.audioShortcuts, ...this.viewer.settings.shortcuts});
     this.keyMap.register('Transcription Window', this.windowShortcuts);
+    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onShortCutTriggered));
 
     this.viewer.settings.multiLine = true;
     this.viewer.settings.lineheight = 70;
@@ -572,7 +611,75 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.cd.detectChanges();
   }
 
-  onShortCutTriggered($event, type) {
+  onShortCutViewerTriggered($event: AudioViewerShortcutEvent) {
+    this.triggerUIAction($event);
+  }
+
+  onShortCutTriggered = ($event: KeyMappingShortcutEvent) => {
+    this.checkShortcutAction($event.comboKey, this.audioShortcuts).then((shortcut) => {
+      switch (shortcut) {
+        case('play_pause'):
+          this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+          if (this.audioChunkLines.isPlaying) {
+            this.audioChunkLines.pausePlayback();
+          } else {
+            this.audioChunkLines.startPlayback(false).catch((error) => {
+              console.error(error);
+            });
+          }
+          break;
+        case('stop'):
+          this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+          this.audioChunkLines.stopPlayback().catch((error) => {
+            console.error(error);
+          });
+          break;
+        case('step_backward'):
+          console.log(`step backward`);
+          this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+          this.audioChunkLines.stepBackward().catch((error) => {
+            console.error(error);
+          });
+          break;
+        case('step_backwardtime'):
+          console.log(`step backward time`);
+          this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+          this.audioChunkLines.stepBackwardTime(0.5).catch((error) => {
+            console.error(error);
+          });
+          break;
+      }
+      this.cd.detectChanges();
+      $event.event.preventDefault();
+    }).catch((error) => {
+      console.error(error);
+    });
+  }
+
+  private checkShortcutAction(comboKey: string, shortcuts: any) {
+    return new Promise<string>((resolve) => {
+
+      if (this.shortcutsEnabled) {
+        let foundShortcut = '';
+        const platform = BrowserInfo.platform;
+        if (!isUnset(shortcuts)) {
+          for (const shortcut in shortcuts) {
+            if (shortcuts.hasOwnProperty(shortcut)) {
+              const currentShortcut = shortcuts['' + shortcut + ''];
+
+              if (!isUnset(this.audioChunkLines) && currentShortcut.keys['' + platform + ''] === comboKey) {
+                foundShortcut = shortcut;
+                break;
+              }
+            }
+          }
+        }
+        resolve(foundShortcut);
+      }
+    });
+  }
+
+  private triggerUIAction($event: AudioViewerShortcutEvent) {
     if (($event.value === 'do_asr' || $event.value === 'cancel_asr'
       || $event.value === 'do_asr_maus' || $event.value === 'cancel_asr_maus'
       || $event.value === 'do_maus' || $event.value === 'cancel_maus'
@@ -658,8 +765,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       };
 
       if ($event.hasOwnProperty('selection') && !isUnset($event.selection)) {
-        selection.start = $event.selection.start;
-        selection.length = $event.selection.length;
+        selection.start = $event.selection.start.samples;
+        selection.length = $event.selection.duration.samples;
       } else {
         selection = null;
       }
@@ -678,18 +785,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
       this.appStorage.playonhover = !this.appStorage.playonhover;
     }
-
-    this.cd.detectChanges();
   }
 
-  afterSpeedChange(event
-                     :
-                     {
-                       new_value: number, timestamp
-                         :
-                         number
-                     }
-  ) {
+  afterSpeedChange(event: { new_value: number, timestamp: number }) {
     this.appStorage.audioSpeed = event.new_value;
 
     if (this.appStorage.logging) {
@@ -699,14 +797,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     }
   }
 
-  afterVolumeChange(event
-                      :
-                      {
-                        new_value: number, timestamp
-                          :
-                          number
-                      }
-  ) {
+  afterVolumeChange(event: { new_value: number, timestamp: number }) {
     this.appStorage.audioVolume = event.new_value;
 
     if (this.appStorage.logging) {
@@ -716,8 +807,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     }
   }
 
-  onButtonClick(event: { type: string, timestamp: number }
-  ) {
+  onButtonClick(event: { type: string, timestamp: number }) {
     this.selectedIndex = -1;
     if (this.appStorage.logging) {
       const caretpos = (!(this.editor === null || this.editor === undefined)) ? this.editor.caretpos : -1;
@@ -733,10 +823,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     }
   }
 
-  public openSegment(segnumber
-                       :
-                       number
-  ) {
+  public openSegment(segnumber: number) {
     this.onSegmentEntered({index: segnumber});
   }
 
@@ -778,15 +865,11 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   changeArea(loup: AudioViewerComponent, coord: {
     size: {
       width: number,
-      height
-        :
-        number
+      height: number
     },
     location: {
       x: number,
-      y
-        :
-        number
+      y: number
     }
   }, cursorTime: SampleUnit, factor: number) {
     const cursorLocation = this.viewer.mouseCursor;

@@ -213,16 +213,19 @@ export class TranscriptionComponent implements OnInit,
       }));
 
     this.subscrmanager.add(this.modService.showmodal.subscribe((event: { type: string, data, emitter: any }) => {
-
       if (!isUnset(this.currentEditor) && !isUnset((this.currentEditor.instance as any).editor)) {
         const editor = this._currentEditor.instance as OCTRAEditor;
+        console.log(`CALL disable all shortcuts!`);
         editor.disableAllShortcuts();
+      } else {
+        console.log(``);
       }
     }));
 
     this.subscrmanager.add(this.modService.closemodal.subscribe((event: { type: string }) => {
       if (!isUnset(this.currentEditor) && !isUnset((this.currentEditor.instance as any).editor)) {
         const editor = this._currentEditor.instance as OCTRAEditor;
+        console.log(`CALL enable all shortcuts!`);
         editor.enableAllShortcuts();
       }
 

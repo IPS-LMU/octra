@@ -26,6 +26,7 @@ import {
   Segment,
   Segments, SubscriptionManager
 } from 'octra-components';
+import {AudioViewerShortcutEvent} from 'octra-components';
 import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
 
 import {
@@ -62,7 +63,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   private oldRaw = '';
 
   @Output('shortcuttriggered')
-  get shortcuttriggered(): EventEmitter<string> {
+  get shortcuttriggered(): EventEmitter<AudioViewerShortcutEvent> {
     return this.loupe.shortcuttriggered;
   }
 
@@ -216,7 +217,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       }
       this._loading = false;
     });
-  };
+  }
 
   onKeyDown = ($event) => {
     if (!this.loading) {
@@ -245,7 +246,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           break;
       }
     }
-  };
+  }
 
   ngOnInit() {
     this._loading = false;
@@ -804,8 +805,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     const html: string = this.editor.html.replace(/&nbsp;/g, ' ');
 
     const samplesArray: number[] = [];
-    html.replace(new RegExp('\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"' +
-      '[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s?', 'g'),
+    html.replace(new RegExp('\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|\]">\s?', 'g'),
       (match, g1, g2) => {
         samplesArray.push(Number(g1));
         return '';

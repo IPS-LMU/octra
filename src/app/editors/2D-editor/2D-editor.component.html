@@ -69,7 +69,7 @@
   <div #linesView id="lines-wrapper">
     <oco-audio-viewer #viewer (mousecursorchange)="onMouseOver($event);"
                       (segmententer)="onSegmentEntered($event)"
-                      (shortcuttriggered)="onShortCutTriggered($event, 'multi-lines-viewer')"
+                      (shortcuttriggered)="onShortCutViewerTriggered($event)"
                       [audioChunk]="audioChunkLines"
                       [breakMarker]="{
                         code: '<P>'

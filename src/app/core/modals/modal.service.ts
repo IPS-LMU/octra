@@ -14,6 +14,8 @@ export class ModalService {
    */
   public show(type: string, data?: any): Promise<any> {
     return new Promise<void>((resolve, reject) => {
+      console.log(`show modal!`);
+      console.log(`type`);
       this.showmodal.emit({type, data, emitter: this.modalaction});
       const subscr = this.modalaction.subscribe((result) => {
           subscr.unsubscribe();

@@ -1,31 +1,31 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {KeyMapping} from 'octra-components';
+import {isUnset, KeyMapping} from 'octra-components';
 import {BrowserInfo} from '../BrowserInfo';
 
 @Injectable()
 export class KeymappingService {
   private shortcuts: any[] = [];
-  private readonly _beforeKeyDown: EventEmitter<any> = new EventEmitter<any>();
-  private readonly _onkeydown: EventEmitter<any>;
-  private readonly _onkeyup: EventEmitter<any>;
+  private readonly _beforeKeyDown = new EventEmitter<KeyMappingShortcutEvent>();
+  private readonly _onkeydown: EventEmitter<KeyMappingShortcutEvent>;
+  private readonly _onkeyup: EventEmitter<KeyMappingShortcutEvent>;
 
-  get onkeydown(): EventEmitter<any> {
+  get onkeydown(): EventEmitter<KeyMappingShortcutEvent> {
     return this._onkeydown;
   }
 
-  get onkeyup(): EventEmitter<any> {
+  get onkeyup(): EventEmitter<KeyMappingShortcutEvent> {
     return this._onkeyup;
   }
 
-  get beforeKeyDown(): EventEmitter<any> {
+  get beforeKeyDown(): EventEmitter<KeyMappingShortcutEvent> {
     return this._beforeKeyDown;
   }
 
   constructor() {
-    this._onkeydown = new EventEmitter<any>();
+    this._onkeydown = new EventEmitter<KeyMappingShortcutEvent>();
     window.onkeydown = this.onKeyDown;
 
-    this._onkeyup = new EventEmitter<any>();
+    this._onkeyup = new EventEmitter<KeyMappingShortcutEvent>();
     window.onkeyup = this.onKeyUp;
   }
 
@@ -101,7 +101,7 @@ export class KeymappingService {
   public getShortcut(identifier: string, key: string): string {
     const shortcuts = this.getShortcuts(identifier);
 
-    if (shortcuts) {
+    if (shortcuts && !isUnset(shortcuts[key])) {
       const platform = BrowserInfo.platform;
       if (shortcuts[key].keys[platform]) {
         let shortc = '[' + shortcuts[key].keys[platform] + ']';
@@ -164,4 +164,9 @@ export class Entry {
     this.key = key;
     this.value = value;
   }
+}
+
+export interface KeyMappingShortcutEvent {
+  comboKey: string;
+  event: KeyboardEvent;
 }

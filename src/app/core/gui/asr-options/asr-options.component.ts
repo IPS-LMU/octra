@@ -82,8 +82,7 @@ export class AsrOptionsComponent implements OnInit {
 
             this.asrService.addToQueue({
               sampleStart: this.audioChunk.time.start.samples,
-              sampleLength: this.audioChunk.time.duration.samples,
-              browserSampleEnd: this.audioChunk.time.start.add(this.audioChunk.time.duration).samples
+              sampleLength: this.audioChunk.time.duration.samples
             }, ASRQueueItemType.ASR);
             this.asrService.startASR();
           } else {
@@ -120,8 +119,7 @@ export class AsrOptionsComponent implements OnInit {
               // segment is empty and contains not a break
               segment.isBlockedBy = ASRQueueItemType.ASR;
               this.asrService.addToQueue({
-                sampleStart, sampleLength, browserSampleEnd:
-                segment.time.samples
+                sampleStart, sampleLength
               }, ASRQueueItemType.ASR);
             }
           }

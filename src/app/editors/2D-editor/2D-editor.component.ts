@@ -40,12 +40,13 @@ import {
   AlertService,
   AppStorageService,
   AudioService,
-  KeymappingService, KeyMappingShortcutEvent,
+  KeymappingService,
+  KeyMappingShortcutEvent,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
-import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../core/shared/service/asr.service';
+import {ASRProcessStatus, ASRQueueItem, AsrService, ASRTimeInterval} from '../../core/shared/service/asr.service';
 import {OCTRAEditor} from '../octra-editor';
 import {TranscrWindowComponent} from './transcr-window';
 
@@ -308,7 +309,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
         if (item.status !== ASRProcessStatus.IDLE) {
           // TODO important change to original sample!
-          const segmentBoundary = new SampleUnit(item.time.browserSampleEnd, this.audioManager.sampleRate);
+          const segmentBoundary = new SampleUnit(item.time.sampleStart + item.time.sampleLength, this.audioManager.sampleRate);
           const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentBoundary);
           if (segNumber > -1) {
             if (item.status !== ASRProcessStatus.STARTED) {
@@ -387,7 +388,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
                       if (!isUnset(wordsTier)) {
                         let counter = 0;
-                        const segmentEndBrowserTime = new SampleUnit(item.time.browserSampleEnd, this.audioManager.sampleRate);
+                        const segmentEndBrowserTime = new SampleUnit(item.time.sampleStart + item.time.sampleLength, this.audioManager.sampleRate);
                         let segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentEndBrowserTime);
 
                         if (segmentIndex < 0) {
@@ -650,7 +651,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           break;
       }
       this.cd.detectChanges();
-      $event.event.preventDefault();
+      if (shortcut !== '') {
+        $event.event.preventDefault();
+      }
     }).catch((error) => {
       console.error(error);
     });
@@ -702,13 +705,13 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                 length: segment.time.samples - sampleStart
               }, 'multi-lines-viewer');
 
-            const selection = {
+            const selection: ASRTimeInterval = {
               sampleStart,
-              sampleLength: segment.time.samples - sampleStart,
-              browserSampleEnd: segment.time.samples
+              sampleLength: segment.time.samples - sampleStart
             };
 
-            if (segment.isBlockedBy === null) {
+            console.log(`selection is ${sampleStart} to ${segment.time.samples}`);
+            if (isUnset(segment.isBlockedBy)) {
               if ($event.value === 'do_asr' || $event.value === 'do_asr_maus' || $event.value === 'do_maus') {
                 this.viewer.selectSegment(segmentNumber);
 

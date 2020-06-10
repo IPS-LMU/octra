@@ -75,15 +75,12 @@ export class AsrService {
   }
 
   public startASR() {
+    console.log(`sample rate ${this.audioService.audiomanagers[0].sampleRate}`);
     this._queue.start();
   }
 
   public addToQueue(timeInterval: ASRTimeInterval, type: ASRQueueItemType, transcript = ''): ASRQueueItem {
-    const item = new ASRQueueItem({
-      sampleStart: timeInterval.sampleStart,
-      sampleLength: timeInterval.sampleLength,
-      browserSampleEnd: timeInterval.browserSampleEnd
-    }, this.queue, this.selectedLanguage, type, transcript);
+    const item = new ASRQueueItem(timeInterval, this.queue, this.selectedLanguage, type, transcript);
     this.queue.add(item);
     return item;
   }
@@ -356,11 +353,7 @@ class ASRQueue {
 export class ASRQueueItem {
   private static counter = 1;
   private readonly _id: number;
-  private readonly _time: {
-    sampleStart: number;
-    sampleLength: number;
-    browserSampleEnd: number;
-  };
+  private readonly _time: ASRTimeInterval;
   private readonly _statusChange: Subject<{
     old: ASRProcessStatus,
     new: ASRProcessStatus
@@ -384,7 +377,7 @@ export class ASRQueueItem {
     return this._statusChange;
   }
 
-  get time(): { sampleStart: number; sampleLength: number; browserSampleEnd: number } {
+  get time(): ASRTimeInterval {
     return this._time;
   }
 
@@ -415,8 +408,7 @@ export class ASRQueueItem {
     this._id = ASRQueueItem.counter++;
     this._time = {
       sampleStart: timeInterval.sampleStart,
-      sampleLength: timeInterval.sampleLength,
-      browserSampleEnd: timeInterval.browserSampleEnd
+      sampleLength: timeInterval.sampleLength
     };
     this._status = ASRProcessStatus.IDLE;
     this._statusChange = new Subject<{
@@ -525,6 +517,7 @@ export class ASRQueueItem {
       // 1) cut signal
       const format = new WavFormat();
       format.init(audioManager.ressource.info.fullname, audioManager.ressource.arraybuffer);
+      console.log(`schneide von ${this.time.sampleStart} - ${this.time.sampleStart + this.time.sampleLength}`);
       format.cutAudioFile(audioManager.ressource.info.type, `OCTRA_ASRqueueItem_${this._id}`, audioManager.ressource.arraybuffer,
         {
           number: 1,
@@ -534,6 +527,7 @@ export class ASRQueueItem {
         if (this._status !== ASRProcessStatus.STOPPED) {
           // 2) upload signal
           this.uploadFile(file, this.selectedLanguage).then((audioURL: string) => {
+            console.log(`${audioURL}`);
             if (this._status !== ASRProcessStatus.STOPPED) {
               // 3) signal audio url to ASR
               this.callASR(this.selectedLanguage, audioURL, outFormat).then((asrResult) => {
@@ -823,5 +817,4 @@ export enum ASRProcessStatus {
 export interface ASRTimeInterval {
   sampleStart: number;
   sampleLength: number;
-  browserSampleEnd: number;
 }

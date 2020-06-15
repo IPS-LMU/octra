@@ -26,7 +26,6 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
   @Input() height = '250px';
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
   private _audiomanager: AudioManager;
-  private readonly maxAudioFileSize = 400;
 
   get AppInfo(): AppInfo {
     return AppInfo;
@@ -106,11 +105,11 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
         this._files.push(fileProcess);
 
         reader.onloadend = () => {
-          if (fileProcess.file.size <= this.maxAudioFileSize * 1024 * 1024) {
+          if (fileProcess.file.size <= AppInfo.maxAudioFileSize * 1024 * 1024) {
             this.decodeArrayBuffer((reader.result as ArrayBuffer), this._files.length - 1);
           } else {
             fileProcess.status = 'invalid';
-            fileProcess.error = `The file size is bigger than ${this.maxAudioFileSize} MB.`;
+            fileProcess.error = `The file size is bigger than ${AppInfo.maxAudioFileSize} MB.`;
           }
         };
         reader.onprogress = (e) => {

@@ -517,8 +517,7 @@ export class ASRQueueItem {
       // 1) cut signal
       const format = new WavFormat();
       format.init(audioManager.ressource.info.fullname, audioManager.ressource.arraybuffer);
-      console.log(`schneide von ${this.time.sampleStart} - ${this.time.sampleStart + this.time.sampleLength}`);
-      format.cutAudioFile(audioManager.ressource.info.type, `OCTRA_ASRqueueItem_${this._id}`, audioManager.ressource.arraybuffer,
+      format.cutAudioFile(`OCTRA_ASRqueueItem_${this._id}`, audioManager.ressource.arraybuffer,
         {
           number: 1,
           sampleStart: this.time.sampleStart,
@@ -596,7 +595,7 @@ export class ASRQueueItem {
       // 1) cut signal
       const format = new WavFormat();
       format.init(audioManager.ressource.info.fullname, audioManager.ressource.arraybuffer);
-      format.cutAudioFile(audioManager.ressource.info.type, `OCTRA_ASRqueueItem_${this._id}`, audioManager.ressource.arraybuffer,
+      format.cutAudioFile(`OCTRA_ASRqueueItem_${this._id}`, audioManager.ressource.arraybuffer,
         {
           number: 1,
           sampleStart: this.time.sampleStart,

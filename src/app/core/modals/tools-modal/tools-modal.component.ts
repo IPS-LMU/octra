@@ -4,12 +4,11 @@ import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
-import {isUnset, Segment, WavFormat} from 'octra-components';
+import {isUnset, Segment, SubscriptionManager, WavFormat} from 'octra-components';
 import {interval, Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
 import {NavbarService} from '../../gui/navbar/navbar.service';
-import {SubscriptionManager} from 'octra-components';
 import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/cutting-format';
 import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 
@@ -173,106 +172,8 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  public splitAudioAPI() {
-    const cutList = [];
-    let startSample = 0;
-    this.tools.audioCutting.progress = 0;
-    this.tools.audioCutting.progressbarType = 'info';
-    this.tools.audioCutting.result.url = null;
-
-    for (let i = 0; i < this.transcrService.currentlevel.segments.length; i++) {
-      const segment: Segment = this.transcrService.currentlevel.segments.get(i);
-      cutList.push({
-        sampleStart: startSample,
-        sampleDur: segment.time.samples - startSample
-      });
-      startSample = segment.time.samples;
-    }
-
-    const exportFormats = [];
-
-    if (this.tools.audioCutting.exportFormats[0].selected) {
-      exportFormats.push('json');
-    }
-    if (this.tools.audioCutting.exportFormats[1].selected) {
-      exportFormats.push('textTable');
-    }
-
-    const formData: FormData = new FormData();
-    const file = new File([this.audio.audiomanagers[0].ressource.arraybuffer], this.audio.audiomanagers[0].ressource.info.fullname,
-      {type: this.audio.audiomanagers[0].ressource.info.type});
-    formData.append('files', file, this.transcrService.audiofile.name);
-    formData.append('segments', JSON.stringify(cutList));
-    formData.append('cuttingOptions', JSON.stringify({
-      exportFormats,
-      namingConvention: this.namingConvention.namingConvention
-    }));
-
-    this.tools.audioCutting.status = 'started';
-    this.tools.audioCutting.subscriptionIDs[0] = this.subscrmanager.add(
-      this.httpClient.post(`${this.settService.appSettings.octra.plugins.audioCutter.url}/v1/cutAudio`, formData, {
-        headers: {
-          authorization: '7234rhuiweafauosijfaw89e77z23t'
-        }, responseType: 'json'
-      }).subscribe((result: any) => {
-        const hash = result.hash;
-        this.tools.audioCutting.subscriptionIDs[1] = this.subscrmanager.add(interval(500).subscribe(
-          () => {
-            this.httpClient.get(`${this.settService.appSettings.octra.plugins.audioCutter.url}/v1/tasks/${hash}`, {
-              headers: {
-                authorization: this.settService.appSettings.octra.plugins.audioCutter.authToken
-              }, responseType: 'json'
-            }).subscribe((result2: any) => {
-              this.tools.audioCutting.progress = ((!isUnset(result2.progress)) ? Math.round(result2.progress * 100) : 0);
-              this.tools.audioCutting.status = result2.status;
-
-              if (result2.status === 'finished') {
-                const url: string = result2.resultURL;
-                this.tools.audioCutting.result.url = url;
-                this.tools.audioCutting.result.filename = url.substring(url.lastIndexOf('/') + 1);
-                this.subscrmanager.removeById(this.tools.audioCutting.subscriptionIDs[1]);
-                this.tools.audioCutting.subscriptionIDs[1] = -1;
-              } else if (result2.status === 'failed') {
-                this.subscrmanager.removeById(this.tools.audioCutting.subscriptionIDs[1]);
-                this.tools.audioCutting.subscriptionIDs[1] = -1;
-              }
-
-              switch (result2.status) {
-                case ('finished'):
-                  this.tools.audioCutting.progressbarType = 'success';
-                  break;
-                case ('pending'):
-                  this.tools.audioCutting.progressbarType = 'info';
-                  break;
-                case ('failed'):
-                  this.tools.audioCutting.progressbarType = 'danger';
-                  this.tools.audioCutting.progress = 100;
-                  this.tools.audioCutting.status = 'failed';
-                  this.tools.audioCutting.message = (!isUnset(result2.message) && result2.message !== '') ? result2.message : '';
-                  break;
-              }
-            }, (e) => {
-              console.error(e);
-              this.subscrmanager.removeById(this.tools.audioCutting.subscriptionIDs[1]);
-              this.tools.audioCutting.subscriptionIDs[1] = -1;
-            });
-          }
-        ));
-      }, (err) => {
-        this.tools.audioCutting.progressbarType = 'danger';
-        this.tools.audioCutting.progress = 100;
-        this.tools.audioCutting.status = 'failed';
-        this.tools.audioCutting.message = 'API not available. Please send a message via the feedback form.';
-        console.error(err);
-      }));
-  }
-
   public splitAudio() {
-    if (this.tools.audioCutting.selectedMethod === 'client') {
-      this.splitAudioClient();
-    } else {
-      this.splitAudioAPI();
-    }
+    this.splitAudioClient();
   }
 
   public splitAudioClient() {
@@ -456,14 +357,14 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
     ));
 
     this.tools.audioCutting.status = 'running';
+    this.tools.audioCutting.wavFormat.status = 'running';
     this.tools.audioCutting.progressbarType = 'info';
 
     this.getDurationFactorForZipping().then((zipFactor) => {
       this.tools.audioCutting.zippingSpeed = zipFactor;
 
       cuttingStarted = Date.now();
-      this.tools.audioCutting.wavFormat.startAudioCutting(
-        this.transcrService.audioManager.ressource.info.type, this.namingConvention.namingConvention,
+      this.tools.audioCutting.wavFormat.cutAudioFileSequentially(this.namingConvention.namingConvention,
         this.transcrService.audioManager.ressource.arraybuffer, cutList);
     }).catch((err) => {
       console.error(err);

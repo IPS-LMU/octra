@@ -54,6 +54,8 @@ export class AppInfo {
 
   static readonly debugging = false;
 
+  static readonly maxAudioFileSize = 3000;
+
   public static readonly queryParamsHandling: NavigationExtras = {
     queryParamsHandling: '',
     preserveFragment: false

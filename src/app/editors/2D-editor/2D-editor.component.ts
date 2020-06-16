@@ -310,7 +310,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         if (item.status !== ASRProcessStatus.IDLE) {
           // TODO important change to original sample!
           const segmentBoundary = new SampleUnit(item.time.sampleStart + item.time.sampleLength, this.audioManager.sampleRate);
-          const segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentBoundary);
+          let segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentBoundary);
 
           if (segmentIndex > -1) {
             if (item.status !== ASRProcessStatus.STARTED) {
@@ -404,6 +404,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
                               if (counter === wordsTier.items.length - 1) {
                                 // the processed segment is now the very right one. Replace its content with the content of the last word item.
+                                segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentBoundary);
+
                                 this.transcrService.currentlevel.segments.segments[segmentIndex].transcript = readSegment.transcript;
                                 this.transcrService.currentlevel.segments.change(segmentIndex,
                                   this.transcrService.currentlevel.segments.segments[segmentIndex].clone()

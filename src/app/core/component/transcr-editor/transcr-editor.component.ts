@@ -438,17 +438,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         } else if (item.status === ASRProcessStatus.STOPPED) {
           this.asr.status = 'inactive';
         } else if (item.status === ASRProcessStatus.NOAUTH) {
-          this.asr.status = 'inactive';
+          this.asr.status = 'active';
         }
-
-        this.cd.markForCheck();
-        this.cd.detectChanges();
       }
-    } else {
-      this.asr.status = 'inactive';
-      this.asr.error = '';
-      this.asr.result = '';
     }
+
+    this.cd.markForCheck();
+    this.cd.detectChanges();
   }
 
   /**
@@ -1055,8 +1051,12 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   public onASROverlayClick() {
     if (!isUnset(this.asrService.selectedLanguage)) {
       const item = this.asrService.queue.getItemByTime(this.audiochunk.time.start.samples, this.audiochunk.time.duration.samples);
-      if (item !== undefined) {
+      if (!isUnset(item)) {
         this.asrService.stopASROfItem(item);
+        const segIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(this.audioManager.createSampleUnit(item.time.sampleStart + 1));
+        const segment = this.transcrService.currentlevel.segments.get(segIndex);
+        segment.isBlockedBy = null;
+        this.transcrService.currentlevel.segments.change(segIndex, segment);
       }
     } else {
       console.error(`could not stop ASR because segment number was not found.`);

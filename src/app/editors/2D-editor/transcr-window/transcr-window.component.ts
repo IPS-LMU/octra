@@ -21,12 +21,13 @@ import {
   AudioRessource,
   AudioSelection,
   AudioViewerComponent,
+  AudioViewerShortcutEvent,
   isUnset,
   SampleUnit,
   Segment,
-  Segments, SubscriptionManager
+  Segments,
+  SubscriptionManager
 } from 'octra-components';
-import {AudioViewerShortcutEvent} from 'octra-components';
 import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
 
 import {
@@ -166,8 +167,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           if (item.status === ASRProcessStatus.FINISHED && item.result !== null) {
             this.editor.rawText = item.result;
           }
-          // TODO update needed?
-          // this.loupe.update(false);
+
+          // TODO find a better solution
+          this.loupe.redraw();
 
           this.cd.markForCheck();
           this.cd.detectChanges();
@@ -204,9 +206,13 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }).then(() => {
       if (direction !== 'down') {
         this.goToSegment(direction).then(() => {
-          this.audiochunk.startPlayback().catch((error) => {
-            console.error(error);
-          });
+          const segment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
+
+          if (isUnset(segment?.isBlockedBy)) {
+            this.audiochunk.startPlayback().catch((error) => {
+              console.error(error);
+            });
+          }
           this.cd.markForCheck();
           this.cd.detectChanges();
         }).catch((error) => {
@@ -330,9 +336,13 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     );
 
     setTimeout(() => {
-      this.audiochunk.startPlayback().catch((error) => {
-        console.error(error);
-      });
+      const segment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
+
+      if (isUnset(segment.isBlockedBy)) {
+        this.audiochunk.startPlayback().catch((error) => {
+          console.error(error);
+        });
+      }
     }, 500);
   }
 

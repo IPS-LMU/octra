@@ -109,6 +109,7 @@ export class AsrService {
           segment.isBlockedBy = null;
         }
         item.stopProcessing();
+        this.queue.remove(item.id);
       } else {
         console.error(new Error(`could not find segment.`));
       }
@@ -243,6 +244,7 @@ class ASRQueue {
 
                 if (status.new !== ASRProcessStatus.STARTED && status.new !== ASRProcessStatus.NOAUTH
                   && status.old !== ASRProcessStatus.NOAUTH) {
+                  console.log(`status is ${status.new} -> remove id ${nextItem.id}`);
                   this.remove(nextItem.id);
                 }
                 this.updateStatistics(status);

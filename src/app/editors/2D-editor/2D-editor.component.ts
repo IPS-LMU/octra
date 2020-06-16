@@ -433,15 +433,11 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                     });
                     segment.isBlockedBy = null;
                     this.transcrService.currentlevel.segments.change(segmentIndex, segment);
+                  } else if (item.status === ASRProcessStatus.STOPPED) {
+                    // TODO find a better solution!
+                    this.viewer.redraw();
                   }
-
-                  // this.viewer.update(true);
                 }
-                // STOPPED status is ignored because OCTRA should do nothing
-
-                // update GUI
-                // TODO important update?
-                // this.viewer.update();
               } else {
                 console.error(`can't start ASR because segment not found!`);
               }

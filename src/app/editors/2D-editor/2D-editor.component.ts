@@ -310,10 +310,11 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         if (item.status !== ASRProcessStatus.IDLE) {
           // TODO important change to original sample!
           const segmentBoundary = new SampleUnit(item.time.sampleStart + item.time.sampleLength, this.audioManager.sampleRate);
-          const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentBoundary);
-          if (segNumber > -1) {
+          const segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentBoundary);
+
+          if (segmentIndex > -1) {
             if (item.status !== ASRProcessStatus.STARTED) {
-              let segment = this.transcrService.currentlevel.segments.get(segNumber);
+              let segment = this.transcrService.currentlevel.segments.get(segmentIndex);
 
               if (!isUnset(segment)) {
                 segment = segment.clone();
@@ -388,14 +389,12 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
                       if (!isUnset(wordsTier)) {
                         let counter = 0;
-                        const segmentEndBrowserTime = new SampleUnit(item.time.sampleStart + item.time.sampleLength, this.audioManager.sampleRate);
-                        let segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentEndBrowserTime);
 
                         if (segmentIndex < 0) {
                           console.error(`could not find segment to be precessed by ASRMAUS!`);
                         } else {
                           for (const wordItem of wordsTier.items) {
-                            if (wordItem.sampleStart + wordItem.sampleDur <= item.time.sampleStart + item.time.sampleLength) {
+                            if (item.time.sampleStart + wordItem.sampleStart + wordItem.sampleDur <= item.time.sampleStart + item.time.sampleLength) {
                               const readSegment = Segment.fromObj(
                                 new OSegment(1, wordItem.sampleStart, wordItem.sampleDur, wordItem.labels),
                                 this.audioManager.sampleRate);
@@ -404,8 +403,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                               }
 
                               if (counter === wordsTier.items.length - 1) {
-                                segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentEndBrowserTime);
-
                                 // the processed segment is now the very right one. Replace its content with the content of the last word item.
                                 this.transcrService.currentlevel.segments.segments[segmentIndex].transcript = readSegment.transcript;
                                 this.transcrService.currentlevel.segments.change(segmentIndex,
@@ -418,7 +415,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                               }
                             } else {
                               console.error(`wordItem samples are out of the correct boundaries.`);
-
                               // tslint:disable-next-line:max-line-length
                               console.error(`${wordItem.sampleStart} + ${wordItem.sampleDur} <= ${item.time.sampleStart} + ${item.time.sampleLength}`);
                             }
@@ -434,7 +430,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                       console.error(error);
                     });
                     segment.isBlockedBy = null;
-                    this.transcrService.currentlevel.segments.change(segNumber, segment);
+                    this.transcrService.currentlevel.segments.change(segmentIndex, segment);
                   }
 
                   // this.viewer.update(true);
@@ -687,7 +683,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       || $event.value === 'do_asr_maus' || $event.value === 'cancel_asr_maus'
       || $event.value === 'do_maus' || $event.value === 'cancel_maus'
     ) && $event.type === 'segment') {
-      const segmentNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(this.viewer.av.MouseClickPos);
+      // @ts-ignore
+      const timePosition: SampleUnit = (!isUnset($event.timePosition)) ? $event.timePosition : this.viewer.av.mouseCursor;
+
+      const segmentNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(timePosition);
 
       if (segmentNumber > -1) {
         if (!isUnset(this.asrService.selectedLanguage)) {

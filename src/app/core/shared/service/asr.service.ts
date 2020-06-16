@@ -445,7 +445,7 @@ export class ASRQueueItem {
       } else if (this._type === ASRQueueItemType.ASRMAUS) {
         console.log(`CALL ASR MAUS`);
         // call ASR and than MAUS
-        this.transcribeSignalWithASR('bpf').then((asrResult) => {
+        this.transcribeSignalWithASR('txt').then((asrResult) => {
 
           this.callMAUS(this._selectedLanguage, asrResult.audioURL, asrResult.transcriptURL).then((mausResult) => {
             const reader = new FileReader();

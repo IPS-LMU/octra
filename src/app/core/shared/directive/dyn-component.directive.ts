@@ -3,7 +3,7 @@ import {ComponentFactoryResolver, Directive, EventEmitter, Input, OnInit, Output
 @Directive({
   selector: '[octraDynComponent]'
 })
-export class DynComponentDirective implements OnInit {
+export class DynComponentDirective implements OnInit, OnDestroy {
   @Input() component: {
     id: number;
     class: any;
@@ -12,6 +12,8 @@ export class DynComponentDirective implements OnInit {
 
   @Output() initialized = new EventEmitter<{ id: number; instance: any; }>();
   @Output() destroyed = new EventEmitter<{ id: number; }>();
+
+  private subscrManager = new SubscriptionManager();
 
   constructor(public viewContainerRef: ViewContainerRef, private _componentFactoryResolver: ComponentFactoryResolver) {
   }
@@ -23,17 +25,26 @@ export class DynComponentDirective implements OnInit {
     viewContainerRef.clear();
 
     const comp = viewContainerRef.createComponent(componentFactory);
-    this.component.instance = comp.instance;
-    this.component.instance.initialized.subscribe(() => {
-      this.initialized.emit({
-        id: this.component.id,
-        instance: this.component.instance
-      });
-    });
-    this.component.instance.destroyed.subscribe(() => {
-      this.destroyed.emit({
-        id: this.component.id
-      });
-    });
+
+    if (!isUnset(comp) && !isUnset(comp.instance)) {
+      this.component.instance = comp.instance;
+      this.subscrManager.add(this.component.instance.initialized.subscribe(() => {
+        this.initialized.emit({
+          id: this.component.id,
+          instance: this.component.instance
+        });
+      }));
+      this.subscrManager.add(this.component.instance.destroyed.subscribe(() => {
+        this.destroyed.emit({
+          id: this.component.id
+        });
+      }));
+    } else {
+      console.error(`can't resolve component of alert: comp ${this.component.class}`);
+    }
+  }
+
+  ngOnDestroy() {
+    this.subscrManager.destroy();
   }
 }

@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {LocalStorageService, SessionStorage, SessionStorageService} from '@rars/ngx-webstorage';
+import {LocalStorageService, SessionStorage, SessionStorageService} from 'ngx-webstorage';
 import {AudioManager, isUnset, OLevel, OLink} from 'octra-components';
 import {Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
@@ -48,6 +48,7 @@ export class AppStorageService {
   @SessionStorage() _loggedIn: boolean;
   @SessionStorage() logInTime: number; // timestamp
   @SessionStorage('jobsLeft') jobsLeft: number;
+
   public saving: EventEmitter<string> = new EventEmitter<string>();
   public loginActivityChanged = new Subject<boolean>();
   public settingschange = new Subject<{ key: string, value: any }>();

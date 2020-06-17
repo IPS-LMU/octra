@@ -11,7 +11,6 @@ import {far} from '@fortawesome/free-regular-svg-icons';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {Translation, TRANSLOCO_CONFIG, TRANSLOCO_LOADER, translocoConfig, TranslocoLoader, TranslocoModule} from '@ngneat/transloco';
 // third-party
-import {Ng2Webstorage} from '@rars/ngx-webstorage';
 import {DragulaModule} from 'ng2-dragula';
 import {ButtonsModule} from 'ngx-bootstrap/buttons';
 import {CollapseModule} from 'ngx-bootstrap/collapse';
@@ -23,6 +22,7 @@ import {TooltipModule} from 'ngx-bootstrap/tooltip';
 import {OctraComponentsModule} from 'octra-components';
 import {environment} from '../environments/environment';
 
+import {NgxWebstorageModule} from 'ngx-webstorage';
 import {AppComponent} from './app.component';
 import {routing} from './app.routes';
 import {AuthenticationNeededComponent} from './core/alerts/authentication-needed/authentication-needed.component';
@@ -190,7 +190,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     FormsModule,
     HttpClientModule,
     OctraComponentsModule,
-    Ng2Webstorage.forRoot({
+    NgxWebstorageModule.forRoot({
       separator: '.',
       prefix: 'custom'
     }),

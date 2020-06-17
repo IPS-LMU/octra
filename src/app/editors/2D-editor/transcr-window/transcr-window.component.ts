@@ -477,12 +477,12 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
         if (direction === 'right' && this.segmentIndex < segmentsLength - 1) {
           startIndex = this.segmentIndex + 1;
           limitFunc = j => j < segmentsLength;
-          counterFunc = j => j++;
+          counterFunc = j => j + 1;
           appliedDirection = 'right';
         } else if (direction === 'left' && this.segmentIndex > 0) {
           startIndex = this.segmentIndex - 1;
           limitFunc = j => j >= 0;
-          counterFunc = j => j--;
+          counterFunc = j => j - 1;
           appliedDirection = 'left';
         }
 

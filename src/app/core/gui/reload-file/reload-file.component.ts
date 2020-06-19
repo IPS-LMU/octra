@@ -6,7 +6,8 @@ import {AppInfo} from '../../../app.info';
 import {ModalService} from '../../modals/modal.service';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 import {SessionFile} from '../../obj/SessionFile';
-import {AppStorageService, AudioService, OIDBLevel, OIDBLink, TranscriptionService} from '../../shared/service';
+import {AudioService, TranscriptionService} from '../../shared/service';
+import {AppStorageService, OIDBLevel, OIDBLink} from '../../shared/service/appstorage.service';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
 
 @Component({

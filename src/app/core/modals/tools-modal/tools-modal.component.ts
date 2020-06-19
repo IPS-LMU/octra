@@ -10,7 +10,8 @@ import {AppInfo} from '../../../app.info';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
 import {NavbarService} from '../../gui/navbar/navbar.service';
 import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/cutting-format';
-import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 
 declare var JSZip;
 

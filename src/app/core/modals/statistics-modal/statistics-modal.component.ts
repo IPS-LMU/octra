@@ -5,7 +5,8 @@ import {NavbarService} from '../../gui/navbar/navbar.service';
 import {TextConverter} from '../../obj/Converters';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {SubscriptionManager} from 'octra-components';
-import {AppStorageService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 
 @Component({
   selector: 'octra-statistics-modal',

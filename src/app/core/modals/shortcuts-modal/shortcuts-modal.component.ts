@@ -2,7 +2,8 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, Vi
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
 import {BrowserInfo} from '../../shared';
-import {AppStorageService, KeymappingService, SettingsService} from '../../shared/service';
+import {KeymappingService, SettingsService} from '../../shared/service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
 
 export interface GeneralShortcut {

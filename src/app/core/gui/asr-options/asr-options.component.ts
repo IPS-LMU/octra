@@ -4,7 +4,8 @@ import {BsDropdownDirective} from 'ngx-bootstrap/dropdown';
 import {AudioChunk, isUnset} from 'octra-components';
 import {AppInfo} from '../../../app.info';
 import {AppSettings, ASRLanguage} from '../../obj/Settings';
-import {AlertService, AppStorageService, SettingsService, TranscriptionService} from '../../shared/service';
+import {AlertService, SettingsService, TranscriptionService} from '../../shared/service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 import {ASRQueueItemType, AsrService} from '../../shared/service/asr.service';
 
 @Component({

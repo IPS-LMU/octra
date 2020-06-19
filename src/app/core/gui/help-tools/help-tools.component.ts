@@ -1,6 +1,7 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {SubscriptionManager} from 'octra-components';
-import {APIService, AppStorageService} from '../../shared/service';
+import {APIService} from '../../shared/service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 
 @Component({
   selector: 'octra-help-tools',

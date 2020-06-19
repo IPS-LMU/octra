@@ -4,7 +4,8 @@ import {ActivatedRoute, ActivatedRouteSnapshot, CanActivate, Router, RouterState
 import {Functions} from 'octra-components';
 import {Observable} from 'rxjs';
 import {AppInfo} from '../../../app.info';
-import {AppStorageService, AudioService, SettingsService} from '../../shared/service';
+import {AudioService, SettingsService} from '../../shared/service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 
 @Injectable()
 export class MembersAreaGuard implements CanActivate {

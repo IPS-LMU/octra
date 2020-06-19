@@ -4,7 +4,8 @@ import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '
 import {Functions} from 'octra-components';
 import {Observable} from 'rxjs';
 import {AppInfo} from '../../../app.info';
-import {AppStorageService, SettingsService} from '../service';
+import {SettingsService} from '../service';
+import {AppStorageService} from '../service/appstorage.service';
 
 @Injectable()
 export class TranscActivateGuard implements CanActivate {

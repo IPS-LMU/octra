@@ -31,13 +31,13 @@ import {
 import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
 
 import {
-  AppStorageService,
   AudioService,
   KeymappingService,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
 } from '../../../core/shared/service';
+import {AppStorageService} from '../../../core/shared/service/appstorage.service';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../../core/shared/service/asr.service';
 
 @Component({

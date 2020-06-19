@@ -1,12 +1,12 @@
 import {Component, EventEmitter, OnInit} from '@angular/core';
 import {
-  AppStorageService,
   AudioService,
   KeymappingService,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
+import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {LinearEditorComponent} from '../linear-editor';
 import {OCTRAEditor} from '../octra-editor';
 

@@ -13,13 +13,13 @@ import {
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 
 import {
-  AppStorageService,
   AudioService,
   KeymappingService, KeyMappingShortcutEvent,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
+import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {OCTRAEditor} from '../octra-editor';
 
 @Component({

@@ -38,7 +38,6 @@ import {BrowserInfo, PraatTextgridConverter} from '../../core/shared';
 
 import {
   AlertService,
-  AppStorageService,
   AudioService,
   KeymappingService,
   KeyMappingShortcutEvent,
@@ -46,6 +45,7 @@ import {
   TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
+import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {ASRProcessStatus, ASRQueueItem, AsrService, ASRTimeInterval} from '../../core/shared/service/asr.service';
 import {OCTRAEditor} from '../octra-editor';
 import {TranscrWindowComponent} from './transcr-window';

@@ -4,7 +4,8 @@ import {OAudiofile} from 'octra-components';
 import {Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {AnnotJSONConverter, PartiturConverter, TextConverter} from '../../obj/Converters';
-import {AppStorageService, SettingsService} from '../../shared/service';
+import {SettingsService} from '../../shared/service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 
 @Component({
   selector: 'octra-prompt-modal',

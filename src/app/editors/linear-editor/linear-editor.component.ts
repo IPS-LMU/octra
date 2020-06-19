@@ -26,7 +26,6 @@ import {BrowserInfo} from '../../core/shared';
 
 import {
   AlertService,
-  AppStorageService,
   AudioService,
   KeymappingService,
   KeyMappingShortcutEvent,
@@ -34,6 +33,7 @@ import {
   TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
+import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {OCTRAEditor} from '../octra-editor';
 
 @Component({

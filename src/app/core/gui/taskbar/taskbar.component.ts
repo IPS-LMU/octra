@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {AppStorageService} from '../../shared/service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 
 @Component({
   selector: 'octra-fastbar',

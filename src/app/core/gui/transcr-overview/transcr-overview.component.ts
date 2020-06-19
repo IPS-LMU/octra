@@ -17,7 +17,8 @@ import {AudioChunk, AudioSelection, isFunction, isUnset, PlayBackStatus, SampleU
 import {TranscrEditorComponent} from '../../component/transcr-editor';
 import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
 
-import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 
 declare var validateAnnotation: ((string, any) => any);
 

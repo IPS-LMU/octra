@@ -3,7 +3,7 @@ import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs';
 import {AppInfo} from '../../../app.info';
-import {AppStorageService} from '../../shared/service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 
 @Injectable()
 export class ALoginGuard implements CanActivate {

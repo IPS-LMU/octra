@@ -1,7 +1,8 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
-import {AppStorageService, SettingsService} from '../../shared/service';
+import {SettingsService} from '../../shared/service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 
 @Component({
   selector: 'octra-activity-timeout-modal',

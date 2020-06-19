@@ -4,7 +4,8 @@ import {Subject} from 'rxjs';
 import {TranscrOverviewComponent} from '../../gui/transcr-overview';
 import {TranscriptionFeedbackComponent} from '../../gui/transcription-feedback/transcription-feedback.component';
 import {SubscriptionManager} from 'octra-components';
-import {AppStorageService, KeymappingService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {KeymappingService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 
 @Component({
   selector: 'octra-overview-modal',

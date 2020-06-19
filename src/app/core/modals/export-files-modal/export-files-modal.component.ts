@@ -12,7 +12,8 @@ import {TableConfiguratorComponent} from '../../component/table-configurator/tab
 import {NavbarService} from '../../gui/navbar/navbar.service';
 import {Converter, IFile} from '../../obj/Converters';
 import {SubscriptionManager} from 'octra-components';
-import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 
 @Component({
   selector: 'octra-export-files-modal',

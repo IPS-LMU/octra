@@ -44,13 +44,13 @@ import {LoadeditorDirective} from '../../shared/directive/loadeditor.directive';
 import {
   AlertService,
   APIService,
-  AppStorageService,
   AudioService,
   KeymappingService,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
 } from '../../shared/service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 import {AsrService} from '../../shared/service/asr.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import {NavbarService} from '../navbar/navbar.service';

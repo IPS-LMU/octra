@@ -11,7 +11,8 @@ import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcr
 import {Converter} from '../../obj/Converters';
 import {parseServerDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
-import {APIService, AppStorageService, AudioService, OIDBLevel, OIDBLink, SettingsService} from '../../shared/service';
+import {APIService, AudioService, SettingsService} from '../../shared/service';
+import {AppStorageService, OIDBLevel, OIDBLink} from '../../shared/service/appstorage.service';
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
 import {ComponentCanDeactivate} from './login.deactivateguard';
 import {LoginService} from './login.service';

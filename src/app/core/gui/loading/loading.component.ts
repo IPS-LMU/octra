@@ -6,7 +6,8 @@ import {Functions, isUnset, OAudiofile, OLevel} from 'octra-components';
 import {AppInfo} from '../../../app.info';
 import {IFile, ImportResult} from '../../obj/Converters';
 import {SubscriptionManager} from 'octra-components';
-import {AppStorageService, AudioService, OIDBLevel, SettingsService, TranscriptionService} from '../../shared/service';
+import {AudioService, SettingsService, TranscriptionService} from '../../shared/service';
+import {AppStorageService, OIDBLevel} from '../../shared/service/appstorage.service';
 
 @Component({
   selector: 'octra-loading',

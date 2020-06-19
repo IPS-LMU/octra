@@ -8,7 +8,8 @@ import {NavigationComponent} from './core/gui/navbar';
 import {ASRLanguage} from './core/obj/Settings';
 import {SubscriptionManager} from 'octra-components';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
-import {APIService, AppStorageService, SettingsService} from './core/shared/service';
+import {APIService, SettingsService} from './core/shared/service';
+import {AppStorageService} from './core/shared/service/appstorage.service';
 import {AsrService} from './core/shared/service/asr.service';
 import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
 

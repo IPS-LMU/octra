@@ -91,7 +91,8 @@ import {ALoginGuard, DeALoginGuard, LogoutGuard, MembersAreaGuard, SettingsGuard
 import {TranscActivateGuard} from './core/shared/guard/transcr.activateguard';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
 
-import {APIService, AppStorageService, AudioService, KeymappingService, SettingsService} from './core/shared/service';
+import {APIService, AudioService, KeymappingService, SettingsService} from './core/shared/service';
+import {AppStorageService} from './core/shared/service/appstorage.service';
 import {BugReportService} from './core/shared/service/bug-report.service';
 import {CompatibilityService} from './core/shared/service/compatibility.service';
 import {StresstestComponent} from './core/tools/stresstest/stresstest.component';

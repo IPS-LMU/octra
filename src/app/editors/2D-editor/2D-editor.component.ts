@@ -228,6 +228,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.viewer.settings.showTimePerLine = true;
     this.viewer.settings.showTranscripts = true;
     this.viewer.settings.asr.enabled = this.settingsService.isASREnabled;
+    this.viewer.settings.showProgressBars = true;
     this.viewer.name = 'multiline viewer';
     this.viewer.height = this.linesViewHeight;
 
@@ -308,14 +309,16 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
     this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
         if (item.status !== ASRProcessStatus.IDLE) {
-          // TODO important change to original sample!
           const segmentBoundary = new SampleUnit(item.time.sampleStart + item.time.sampleLength, this.audioManager.sampleRate);
           let segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentBoundary);
 
           if (segmentIndex > -1) {
-            if (item.status !== ASRProcessStatus.STARTED) {
-              let segment = this.transcrService.currentlevel.segments.get(segmentIndex);
+            let segment = this.transcrService.currentlevel.segments.get(segmentIndex);
+            segment.progressInfo.progress = item.progress;
+            this.viewer.redrawOverlay();
+            console.log(`update progress of ${segmentIndex} = ${item.progress}`);
 
+            if (item.status !== ASRProcessStatus.STARTED && item.status !== ASRProcessStatus.RUNNING) {
               if (!isUnset(segment)) {
                 segment = segment.clone();
                 segment.isBlockedBy = null;
@@ -441,7 +444,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               } else {
                 console.error(`can't start ASR because segment not found!`);
               }
-            } else {
+            } else if (item.status === ASRProcessStatus.STARTED) {
               // item started
               this.uiService.addElementFromEvent(item.type.toLowerCase(), {
                 value: 'started'

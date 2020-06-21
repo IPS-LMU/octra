@@ -263,6 +263,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.special_markers.boundary = true;
     this.loupe.name = 'transcr-window viewer';
+    this.loupe.settings.margin.top = 5;
     this.loupe.settings.margin.bottom = 0;
     this.loupe.settings.justifySignalHeight = true;
     this.loupe.settings.boundaries.enabled = false;
@@ -271,6 +272,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.loupe.settings.shortcuts.set_break = null;
     this.loupe.settings.frame.color = '#222222';
     this.loupe.settings.roundValues = false;
+    this.loupe.settings.showTimePerLine = true;
+    this.loupe.settings.showProgressBars = true;
     this.loupe.av.drawnSelection = null;
 
     const segments = this.transcrService.currentlevel.segments;

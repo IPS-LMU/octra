@@ -363,6 +363,11 @@ export class ASRQueueItem {
   private parent: ASRQueue;
   private readonly _selectedLanguage: ASRLanguage;
   private readonly _type: ASRQueueItemType;
+  private _progress = 0;
+
+  get progress(): number {
+    return this._progress;
+  }
 
   get type(): ASRQueueItemType {
     return this._type;
@@ -424,7 +429,7 @@ export class ASRQueueItem {
   }
 
   public changeStatus(newStatus: ASRProcessStatus) {
-    if (this._status !== newStatus) {
+    if (this._status !== newStatus || newStatus === ASRProcessStatus.RUNNING) {
       const old = this._status;
       this._status = newStatus;
       this._statusChange.next({
@@ -439,6 +444,7 @@ export class ASRQueueItem {
       if (this._type === ASRQueueItemType.ASR) {
         console.log(`CALL ASR ONLY`);
         this.transcribeSignalWithASR('txt').then(() => {
+          this._progress = 1;
           this.changeStatus(ASRProcessStatus.FINISHED);
         }).catch((error) => {
           console.error(`ASR only failed`);
@@ -448,7 +454,7 @@ export class ASRQueueItem {
         console.log(`CALL ASR MAUS`);
         // call ASR and than MAUS
         this.transcribeSignalWithASR('txt').then((asrResult) => {
-
+          this.changeProgress(0.8);
           this.callMAUS(this._selectedLanguage, asrResult.audioURL, asrResult.transcriptURL).then((mausResult) => {
             const reader = new FileReader();
 
@@ -459,6 +465,7 @@ export class ASRQueueItem {
 
             reader.onload = () => {
               this._result = reader.result as string;
+              this._progress = 1;
               this.changeStatus(ASRProcessStatus.FINISHED);
             };
 
@@ -486,6 +493,7 @@ export class ASRQueueItem {
 
           reader.onload = () => {
             this._result = reader.result as string;
+            this._progress = 1;
             this.changeStatus(ASRProcessStatus.FINISHED);
           };
 
@@ -514,6 +522,7 @@ export class ASRQueueItem {
       transcriptURL: string
     }>((resolve, reject) => {
       this.changeStatus(ASRProcessStatus.STARTED);
+      this.changeProgress(0.1);
       const audioManager = this.parent.audioManager;
 
       // 1) cut signal
@@ -526,10 +535,12 @@ export class ASRQueueItem {
           sampleDur: this.time.sampleLength
         }).then((file) => {
         if (this._status !== ASRProcessStatus.STOPPED) {
+          this.changeProgress(0.2);
           // 2) upload signal
           this.uploadFile(file, this.selectedLanguage).then((audioURL: string) => {
             console.log(`${audioURL}`);
             if (this._status !== ASRProcessStatus.STOPPED) {
+              this.changeProgress(0.6);
               // 3) signal audio url to ASR
               this.callASR(this.selectedLanguage, audioURL, outFormat).then((asrResult) => {
                 if (this._status !== ASRProcessStatus.STOPPED) {
@@ -559,6 +570,7 @@ export class ASRQueueItem {
                 if (error.indexOf('quota') > -1) {
                   this.changeStatus(ASRProcessStatus.NOQUOTA);
                 } else if (error.indexOf('0 Unknown Error') > -1) {
+                  this._progress -= 0.1;
                   this.changeStatus(ASRProcessStatus.NOAUTH);
                 } else {
                   if (this.status !== ASRProcessStatus.NOAUTH) {
@@ -583,6 +595,11 @@ export class ASRQueueItem {
     });
   }
 
+  private changeProgress(progress: number) {
+    this._progress = progress;
+    this.changeStatus(ASRProcessStatus.RUNNING);
+  }
+
   public processWithMAUSONLY(): Promise<{
     file: File,
     url: string
@@ -592,6 +609,7 @@ export class ASRQueueItem {
       url: string
     }>((resolve, reject) => {
       this.changeStatus(ASRProcessStatus.STARTED);
+      this.changeProgress(0.1);
       const audioManager = this.parent.audioManager;
 
       // 1) cut signal
@@ -604,6 +622,7 @@ export class ASRQueueItem {
           sampleDur: this.time.sampleLength
         }).then((file) => {
         if (this._status !== ASRProcessStatus.STOPPED) {
+          this.changeProgress(0.2);
           // 2) upload signal
           const promises: Promise<string>[] = [];
           const transcriptFile = new File([this._transcriptInput], `OCTRA_ASRqueueItem_${this._id}.txt`, {type: 'text/plain'});
@@ -615,6 +634,7 @@ export class ASRQueueItem {
             const audioURL = values[1];
 
             if (this._status !== ASRProcessStatus.STOPPED) {
+              this.changeProgress(0.6);
               // 3) signal audio url and transcriptURL to MAUS
               this.callMAUS(this.selectedLanguage, audioURL, transcriptURL).then((resultMAUS) => {
                 if (this._status !== ASRProcessStatus.STOPPED) {
@@ -643,6 +663,7 @@ export class ASRQueueItem {
                 if (error.indexOf('quota') > -1) {
                   this.changeStatus(ASRProcessStatus.NOQUOTA);
                 } else if (error.indexOf('0 Unknown Error') > -1) {
+                  this._progress -= 0.1;
                   this.changeStatus(ASRProcessStatus.NOAUTH);
                 } else {
                   if (this.status !== ASRProcessStatus.NOAUTH) {
@@ -740,6 +761,7 @@ export class ASRQueueItem {
         },
         (error) => {
           if (error.message.indexOf('0 Unknown Error') > -1) {
+            this._progress -= 0.1;
             this.changeStatus(ASRProcessStatus.NOAUTH);
           }
           reject(`Authentication needed`);
@@ -791,6 +813,7 @@ export class ASRQueueItem {
           console.log(error.message);
           if (error.message.indexOf('0 Unknown Error') > -1) {
             AsrService.authURL = mausURL;
+            this._progress -= 0.1;
             this.changeStatus(ASRProcessStatus.NOAUTH);
           }
           reject(error.message);
@@ -808,6 +831,7 @@ export enum ASRQueueItemType {
 export enum ASRProcessStatus {
   IDLE = 'IDLE',
   STARTED = 'STARTED',
+  RUNNING = 'RUNNING',
   STOPPED = 'STOPPED',
   NOQUOTA = 'NOQUOTA',
   NOAUTH = 'NOAUTH',

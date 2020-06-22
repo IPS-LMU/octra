@@ -315,8 +315,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           if (segmentIndex > -1) {
             let segment = this.transcrService.currentlevel.segments.get(segmentIndex);
             segment.progressInfo.progress = item.progress;
+            segment.progressInfo.statusLabel = item.type;
             this.viewer.redrawOverlay();
-            console.log(`update progress of ${segmentIndex} = ${item.progress}`);
 
             if (item.status !== ASRProcessStatus.STARTED && item.status !== ASRProcessStatus.RUNNING) {
               if (!isUnset(segment)) {

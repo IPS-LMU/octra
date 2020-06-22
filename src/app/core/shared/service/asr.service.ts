@@ -241,20 +241,11 @@ class ASRQueue {
             });
             this._itemChange.next(nextItem);
             nextItem.statusChange.subscribe((status) => {
-
                 if (status.new !== ASRProcessStatus.STARTED && status.new !== ASRProcessStatus.NOAUTH
-                  && status.old !== ASRProcessStatus.NOAUTH) {
-                  console.log(`status is ${status.new} -> remove id ${nextItem.id}`);
+                  && status.old !== ASRProcessStatus.NOAUTH && status.new !== ASRProcessStatus.RUNNING) {
                   this.remove(nextItem.id);
                 }
                 this.updateStatistics(status);
-
-                if (status.new === ASRProcessStatus.NOAUTH) {
-                  if (this._statistics.running === 0) {
-                    // redirect via location href is important because it's not working otherwise!
-                    // no redirect, show alert only!
-                  }
-                }
 
                 this._itemChange.next(nextItem);
 
@@ -318,6 +309,13 @@ class ASRQueue {
       case ASRProcessStatus.NOQUOTA:
         this._statistics.stopped = Math.max(0, this._statistics.stopped - 1);
         break;
+    }
+
+    if (status.old === ASRProcessStatus.STARTED && status.new === ASRProcessStatus.RUNNING) {
+      // increment to fix decrementing running
+      this._statistics.running += 1;
+    } else if (status.old === ASRProcessStatus.RUNNING && status.new !== ASRProcessStatus.RUNNING) {
+      this._statistics.running = Math.max(0, this._statistics.running - 1);
     }
 
     switch (status.new) {

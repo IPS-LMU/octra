@@ -416,7 +416,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                               } else {
                                 const origTime = new SampleUnit(item.time.sampleStart + readSegment.time.samples,
                                   this.audioManager.sampleRate);
-                                this.transcrService.currentlevel.segments.add(origTime, readSegment.transcript);
+                                this.transcrService.currentlevel.segments.add(origTime, readSegment.transcript, false);
                               }
                             } else {
                               console.error(`wordItem samples are out of the correct boundaries.`);

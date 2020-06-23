@@ -410,9 +410,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                                 segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentBoundary);
 
                                 this.transcrService.currentlevel.segments.segments[segmentIndex].transcript = readSegment.transcript;
-                                this.transcrService.currentlevel.segments.change(segmentIndex,
-                                  this.transcrService.currentlevel.segments.segments[segmentIndex].clone()
-                                );
+                                this.transcrService.currentlevel.segments.segments[segmentIndex].isBlockedBy = null;
                               } else {
                                 const origTime = new SampleUnit(item.time.sampleStart + readSegment.time.samples,
                                   this.audioManager.sampleRate);
@@ -425,6 +423,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                             }
                             counter++;
                           }
+
+                          this.transcrService.currentlevel.segments.onsegmentchange.emit();
                         }
                       } else {
                         console.error(`word tier not found!`);

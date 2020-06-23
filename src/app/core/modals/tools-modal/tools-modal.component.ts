@@ -433,7 +433,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
     const isSilence = (segment: Segment) => {
       return ((segment.transcript.trim() === '' ||
         segment.transcript.trim() === this.transcrService.breakMarker.code ||
-        segment.transcript.trim() === '<p:>'));
+        segment.transcript.trim() === '<p:>' || segment.transcript.trim() === this.transcrService.breakMarker.code));
     };
 
     const countWords = (text: string) => {
@@ -447,9 +447,9 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
 
       let startPos = 0;
       if (i > 0) {
-        startPos = this.transcrService.currentlevel.segments.segments[i - 1].time.seconds;
+        startPos = this.transcrService.currentlevel.segments.segments[i - 1].time.unix;
       }
-      let duration = Math.round((segment.time.seconds - startPos) * 1000);
+      let duration = segment.time.unix - startPos;
       if (!isSilence(segment) || duration < minSilenceLength) {
         if (maxWords > 0 && wordCounter >= maxWords) {
           wordCounter = (isSilence(segment)) ? 0 : countWords(segment.transcript);
@@ -458,9 +458,9 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
             const lastSegment = this.transcrService.currentlevel.segments.segments[i - 1];
             startPos = 0;
             if (i > 1) {
-              startPos = this.transcrService.currentlevel.segments.segments[i - 2].time.seconds;
+              startPos = this.transcrService.currentlevel.segments.segments[i - 2].time.unix;
             }
-            duration = Math.round((lastSegment.time.seconds - startPos) * 1000);
+            duration = lastSegment.time.unix - startPos;
             if (!isSilence(lastSegment) || duration < minSilenceLength) {
               let lastSegmentText = lastSegment.transcript;
               let segmentText = segment.transcript;
@@ -476,8 +476,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
                 segmentText = '';
                 segment.transcript = `${lastSegmentText}`;
               }
-              this.transcrService.currentlevel.segments.segments.splice(i - 1, 1);
-              this.transcrService.saveSegments();
+              this.transcrService.currentlevel.segments.removeByIndex(i - 1, '', false);
               i--;
             }
           }
@@ -486,6 +485,9 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
     }
 
     this.close();
+    this.transcrService.currentlevel.segments.onsegmentchange.emit();
+    this.transcrService.saveSegments();
+
     setTimeout(() => {
       this.navbarServ.toolApplied.emit('combinePhrases');
     }, 1000);

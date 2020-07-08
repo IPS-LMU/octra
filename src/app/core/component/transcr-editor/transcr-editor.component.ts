@@ -18,12 +18,14 @@ import {
   Functions,
   isUnset,
   KeyMapping,
+  PlayBackStatus,
   SampleUnit,
   Segments,
   SubscriptionManager,
   TimespanPipe
 } from 'octra-components';
 import {isNumeric} from 'rxjs/internal-compatibility';
+import {timer} from 'rxjs/internal/observable/timer';
 
 import {BrowserInfo} from '../../shared';
 import {TranscriptionService} from '../../shared/service';
@@ -87,11 +89,27 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
   };
   private _lastAudioChunkID = -1;
-  private _settings: any;
+  private _settings: TranscrEditorConfig;
   private subscrmanager: SubscriptionManager;
   private init = 0;
   private summernoteUI: any = null;
   private lastkeypress = 0;
+
+  private highlightingRunning = false;
+  private lockHighlighting = false;
+  private lastHighlightedSegment = -1;
+
+  private _highlightingEnabled = true;
+  @Output() highlightingEnabledChange = new EventEmitter();
+
+  @Input() get highlightingEnabled() {
+    return this._highlightingEnabled;
+  }
+
+  set highlightingEnabled(value: boolean) {
+    this._highlightingEnabled = (!isUnset(value)) ? value : true;
+    this.highlightingEnabledChange.emit(value);
+  }
 
   public get summernote() {
     return this.textfield.summernote;
@@ -124,11 +142,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.rawText = result;
   }
 
-  get Settings(): any {
+  get Settings(): TranscrEditorConfig {
     return this._settings;
   }
 
-  set Settings(value: any) {
+  set Settings(value: TranscrEditorConfig) {
     this._settings = value;
   }
 
@@ -180,7 +198,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
               private transcrService: TranscriptionService,
               private asrService: AsrService) {
 
-    this._settings = new TranscrEditorConfig().settings;
+    this._settings = new TranscrEditorConfig();
     this.subscrmanager = new SubscriptionManager();
   }
 
@@ -207,6 +225,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     html = `<p>${html}</p>`;
     const dom = jQuery(html);
+
     let charCounter = 0;
 
     const textSelection = {
@@ -214,12 +233,23 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       end: -1
     };
 
+    jQuery(dom).find('span.highlighted').each((j, domElement) => {
+      if (!isUnset(jQuery(domElement).parent())) {
+        jQuery(domElement).contents().each((k, node) => {
+          jQuery(node).remove();
+          jQuery(domElement).before(node);
+        });
+        jQuery(domElement).remove();
+      } else {
+        console.error(`item parent is null!`);
+      }
+    });
+
     const replaceFunc = (i, elem) => {
+      const tagName = jQuery(elem).prop('tagName');
       if (jQuery(elem).contents() !== null && jQuery(elem).contents().length > 0) {
         jQuery.each(jQuery(elem).contents(), replaceFunc);
       } else {
-        const tagName = jQuery(elem).prop('tagName');
-
         let attr = jQuery(elem).attr('data-marker-code');
         if (elem.type === 'select-one') {
           const value = jQuery(elem).attr('data-value');
@@ -279,9 +309,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     this._textSelection = textSelection;
 
-    jQuery.each(dom.contents(), replaceFunc);
+    jQuery.each(dom, replaceFunc);
 
-    let rawText = dom.text();
+    let rawText = jQuery(dom).text();
 
     if (replaceEmptySpaces) {
       rawText = rawText.replace(/[\s ]+/g, ' ');
@@ -298,14 +328,18 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       this.summernoteUI = jQuery.summernote.ui;
       const navigation = this.initNavigation();
 
-      if (this.Settings.special_markers.boundary) {
+      if (this.Settings.specialMarkers.boundary) {
         const customArray = this.createCustomButtonsArray();
         navigation.buttons.boundary = customArray[0];
-        navigation.buttons.fontSizeUp = customArray[1];
-        navigation.buttons.fontSizeDown = customArray[2];
         navigation.str_array.push('boundary');
-        navigation.str_array.push('fontSizeDown');
+        navigation.buttons.fontSizeUp = customArray[1];
         navigation.str_array.push('fontSizeUp');
+        navigation.buttons.fontSizeDown = customArray[2];
+        navigation.str_array.push('fontSizeDown');
+        if (this._settings.highlightingEnabled) {
+          navigation.buttons.highlighting = customArray[3];
+          navigation.str_array.push('highlighting');
+        }
       }
 
       if (!isUnset(this.textfield)) {
@@ -491,7 +525,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       if (this.isDisabledKey(comboKey)) {
         $event.preventDefault();
       } else {
-        if (comboKey === 'ALT + S' && this.Settings.special_markers.boundary) {
+        if (comboKey === 'ALT + S' && this.Settings.specialMarkers.boundary) {
           // add boundary
           $event.preventDefault();
           this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
@@ -609,7 +643,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       buttons: {
         boundary: undefined,
         fontSizeUp: undefined,
-        fontSizeDown: undefined
+        fontSizeDown: undefined,
+        highlighting: undefined
       },
       str_array: []
     };
@@ -815,6 +850,36 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     result.push(fontSizeDown);
 
+    // create boundary button
+    const highlightingButton = () => {
+      const icon = (this.highlightingEnabled) ? '<img src=\'assets/img/components/transcr-editor/highlightingEnabled.jpg\' class=\'btn-icon highlight-button\' style=\'height:15px;\'/>'
+        : '<img src=\'assets/img/components/transcr-editor/highlightingDisbled.jpg\' class=\'btn-icon highlight-button\' style=\'height:15px;\'/>';
+      // create button
+      const btnJS = {
+        contents: icon,
+        tooltip: 'enable highlighting',
+        container: false,
+        click: () => {
+          if (this._highlightingEnabled) {
+            this.stopRecurringHighlight();
+            this.highlightingEnabled = false;
+            jQuery('.highlight-button').attr('src', 'assets/img/components/transcr-editor/highlightingDisbled.jpg');
+          } else {
+            this.highlightingEnabled = true;
+            jQuery('.highlight-button').attr('src', 'assets/img/components/transcr-editor/highlightingEnabled.jpg');
+            if (this.audiochunk.status === PlayBackStatus.PLAYING && this._settings.highlightingEnabled) {
+              this.startRecurringHighlight();
+            }
+          }
+        }
+      };
+      const button = jQuery.summernote.ui.button(btnJS);
+
+      return button.render();   // return button as jquery object
+    };
+
+    result.push(highlightingButton);
+
     return result;
   }
 
@@ -1009,6 +1074,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   public validate() {
     if (this.validationEnabled) {
+      this.lockHighlighting = true;
       this.saveSelection();
       this._rawText = this.getRawText(false);
 
@@ -1026,7 +1092,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         this._rawText = this.tidyUpRaw(this._rawText);
         this.textfield.summernote('code', code);
         this.restoreSelection();
+        this.lastHighlightedSegment--;
       }
+      this.lockHighlighting = false;
     } else {
       this._rawText = this.getRawText(false);
       this._rawText = this.tidyUpRaw(this._rawText);
@@ -1064,6 +1132,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private triggerTyping() {
+    // this.highlightingRunning = false;
     setTimeout(() => {
       if (Date.now() - this.lastkeypress >= 450 && this.lastkeypress > -1) {
         if (this._isTyping) {
@@ -1200,6 +1269,126 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     } else {
       console.error(`errorcode is null!`);
     }
+  }
+
+  public startRecurringHighlight() {
+    if (this.highlightingRunning) {
+      this.subscrmanager.removeByTag('highlight');
+      this.lockHighlighting = false;
+    }
+    if (this._highlightingEnabled && this._settings.highlightingEnabled) {
+      this.highlightingRunning = true;
+
+      const highlight = () => {
+        if (this.highlightingRunning) {
+          if (!this.lockHighlighting) {
+            this.highlightCurrentSegment(this.audiochunk.absolutePlayposition);
+          }
+          this.subscrmanager.add(timer(100).subscribe(() => {
+            highlight();
+          }), 'highlight');
+        } else {
+          this.removeHighlight();
+        }
+      };
+      highlight();
+    }
+  }
+
+  public stopRecurringHighlight() {
+    this.highlightingRunning = false;
+    this.lastHighlightedSegment = -1;
+  }
+
+  public highlightCurrentSegment(playPosition: SampleUnit) {
+    if (playPosition.samples === 0) {
+      playPosition = this.audioManager.createSampleUnit(1);
+    }
+    const segIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(playPosition);
+
+    if (segIndex > -1 && segIndex !== this.lastHighlightedSegment) {
+      this.saveSelection();
+      const segment = this.transcrService.currentlevel.segments.get(segIndex);
+
+      this.removeHighlight();
+
+      let dom = jQuery('.note-editable.card-block p');
+      if (dom.length === 0) {
+        dom = jQuery('.note-editable.card-block');
+      }
+
+      let currentSegIndex = 0;
+      let puffer = document.createElement('span');
+      jQuery(puffer).addClass('highlighted');
+
+      for (let i = 0; i < dom.contents().length; i++) {
+        const domElements = dom.contents();
+        const elem = domElements[i];
+
+        if (!isUnset(elem)) {
+          const tagName = jQuery(elem).prop('tagName');
+          const addElemToPuffer = () => {
+            if (currentSegIndex === segIndex && !isUnset(elem)) {
+              jQuery(elem).remove();
+              i--;
+              puffer.appendChild(elem);
+            }
+          };
+
+          if (!isUnset(tagName)) {
+            if (tagName.toLowerCase() === 'img') {
+              if (!isUnset(jQuery(elem).attr('data-samples'))) {
+                const segSamples = Number(jQuery(elem).attr('data-samples'));
+                const foundSegment = segment.time.samples;
+
+                if (segSamples === foundSegment) {
+                  if (puffer.childNodes.length > 0) {
+                    jQuery(elem).before(puffer);
+                  }
+                  this.restoreSelection();
+                  this.lastHighlightedSegment = currentSegIndex;
+                  puffer = document.createElement('span');
+                  break;
+                } else {
+                  puffer = document.createElement('span');
+                  jQuery(puffer).addClass('highlighted');
+                  currentSegIndex++;
+                }
+              } else {
+                addElemToPuffer();
+              }
+            } else {
+              addElemToPuffer();
+            }
+          } else {
+            addElemToPuffer();
+          }
+        } else {
+          console.error(`elem is undefined! puffer: ${jQuery(puffer).text()}`);
+        }
+      }
+
+      if (puffer.childNodes.length > 0) {
+        // puffer not added, last segment
+        dom.append(puffer);
+        this.lastHighlightedSegment = currentSegIndex;
+        this.restoreSelection();
+      }
+    }
+  }
+
+  private removeHighlight() {
+    jQuery('.highlighted').each((index, item) => {
+      if (!isUnset(jQuery(item).parent())) {
+        jQuery(item).contents().each((j, node) => {
+          jQuery(node).remove();
+          jQuery(item).before(node);
+        });
+        jQuery(item).remove();
+      } else {
+        console.error(`item parent is null!`);
+      }
+    });
   }
 
   private onValidationErrorMouseLeave() {

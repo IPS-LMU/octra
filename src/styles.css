@@ -379,3 +379,9 @@ star .column.ng-star-inserted.gu-mirror {
   padding: 0;
   background-color: whitesmoke;
 }
+
+.highlighted {
+  background-color: yellow;
+  border: 1px solid dimgray;
+  display: inline;
+}

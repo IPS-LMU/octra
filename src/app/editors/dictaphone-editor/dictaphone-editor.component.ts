@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, EventEmitter, OnChanges, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import {
   AudioChunk,
   AudioManager,
@@ -10,11 +10,13 @@ import {
   Segment,
   SubscriptionManager
 } from 'octra-components';
+import {PlayBackStatus} from '../../../../../octra-components/projects/octra-components/src/lib/obj/audio';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 
 import {
   AudioService,
-  KeymappingService, KeyMappingShortcutEvent,
+  KeymappingService,
+  KeyMappingShortcutEvent,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
@@ -41,6 +43,14 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   public audioManager: AudioManager;
   private subscrmanager: SubscriptionManager;
   private boundaryselected = false;
+
+  public get highlighting(): boolean {
+    return this.appStorage.highlightingEnabled;
+  }
+
+  public set highlighting(value: boolean) {
+    this.appStorage.highlightingEnabled = value;
+  }
 
   private oldRaw = '';
 
@@ -126,12 +136,17 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     this.audiochunk = this.audioManager.mainchunk.clone();
     this.editor.Settings.markers = this.transcrService.guidelines.markers.items;
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
-    this.editor.Settings.special_markers.boundary = true;
+    this.editor.Settings.specialMarkers.boundary = true;
+    this.editor.Settings.highlightingEnabled = true;
 
     this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onShortcutTriggered), 'shortcut');
 
     this.audiochunk.statuschange.subscribe((status) => {
-      console.log(status);
+      if (status === PlayBackStatus.PLAYING) {
+        this.editor.startRecurringHighlight();
+      } else {
+        this.editor.stopRecurringHighlight();
+      }
     });
 
     this.keyMap.register('AP', this.shortcuts);
@@ -151,7 +166,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     this.keyMap.unregister('AP');
   }
 
-  ngOnChanges(obj: any) {
+  ngOnChanges(obj: SimpleChanges) {
   }
 
   onButtonClick(event: { type: string, timestamp: number }) {

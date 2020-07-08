@@ -44,8 +44,7 @@
               "node_modules/jquery.caret/dist/jquery.caret.min.js",
               "node_modules/moment/min/moment.min.js",
               "node_modules/jszip/dist/jszip.min.js"
-            ],
-            "es5BrowserSupport": true
+            ]
           },
           "configurations": {
             "production": {
@@ -118,7 +117,11 @@
           "options": {
             "browserTarget": "octra:build",
             "port": 5321,
-            "vendorSourceMap": true
+            "sourceMap": {
+              "styles": true,
+              "scripts": true,
+              "vendor": true
+            }
           },
           "configurations": {
             "production": {

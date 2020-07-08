@@ -1,13 +1,12 @@
 export class TranscrEditorConfig {
-  public settings: any = {
-    markers: [],
-    // disabled shortcuts
-    disabledKeys: ['ENTER', 'SHIFT + ENTER', 'TAB', 'ALT + SHIFT + 1', 'ALT + SHIFT + 2', 'ALT + SHIFT + 3'],
-    height: 300,
-    responsive: false,
-    btnPopover: true,
-    special_markers: {
-      boundary: false
-    }
+  public markers = [];
+  // disabled shortcuts
+  public disabledKeys = ['ENTER', 'SHIFT + ENTER', 'TAB', 'ALT + SHIFT + 1', 'ALT + SHIFT + 2', 'ALT + SHIFT + 3'];
+  public height = 300;
+  public responsive = false;
+  public btnPopover = true;
+  public specialMarkers = {
+    boundary: false
   };
+  public highlightingEnabled = false;
 }

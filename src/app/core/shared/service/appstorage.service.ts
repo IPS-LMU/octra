@@ -520,6 +520,19 @@ export class AppStorageService {
     });
   }
 
+  private _highlightingEnabled = true;
+
+  get highlightingEnabled(): boolean {
+    return this._highlightingEnabled;
+  }
+
+  set highlightingEnabled(value: boolean) {
+    this._highlightingEnabled = value;
+    this.idb.save('options', 'highlightingEnabled', {value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
   constructor(public sessStr: SessionStorageService,
               public localStr: LocalStorageService) {
   }
@@ -864,6 +877,10 @@ export class AppStorageService {
         {
           attribute: '_asr',
           key: 'asr'
+        },
+        {
+          attribute: '_highlightingEnabled',
+          key: 'highlightingEnabled'
         }
       ]
     ).then(() => {

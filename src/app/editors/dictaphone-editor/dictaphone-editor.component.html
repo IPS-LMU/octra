@@ -50,5 +50,6 @@
                       [easymode]="appStorage.easymode"
                       [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
                       [validationEnabled]="appStorage.usemode !== 'url' && (appStorage.usemode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
+                      [(highlightingEnabled)]="highlighting"
 >
 </octra-transcr-editor>

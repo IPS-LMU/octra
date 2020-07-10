@@ -1346,6 +1346,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
                     jQuery(elem).before(puffer);
                   }
                   this.restoreSelection();
+                  this.initPopover();
                   this.lastHighlightedSegment = currentSegIndex;
                   puffer = document.createElement('span');
                   break;
@@ -1373,6 +1374,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         dom.append(puffer);
         this.lastHighlightedSegment = currentSegIndex;
         this.restoreSelection();
+        this.initPopover();
       }
     }
   }

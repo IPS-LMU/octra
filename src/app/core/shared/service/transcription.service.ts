@@ -11,8 +11,10 @@ import {
   OLabel,
   OLevel,
   OSegment,
-  Segments, SubscriptionManager
+  Segments,
+  SubscriptionManager
 } from 'octra-components';
+import {isArray} from 'rxjs/internal-compatibility';
 import {AnnotJSONConverter, PartiturConverter, TextConverter} from '../';
 import {AppInfo} from '../../../app.info';
 import {NavbarService} from '../../gui/navbar/navbar.service';
@@ -844,12 +846,14 @@ export class TranscriptionService {
       const instructions = this._guidelines.instructions;
 
       for (const instruction of instructions) {
-        for (const entry of instructions.entries) {
-          if (entry.code === code) {
-            entry.description = entry.description.replace(/{{([^{}]+)}}/g, (g0, g1) => {
-              return this.rawToHTML(g1).replace(/(<p>)|(<\/p>)/g, '');
-            });
-            return entry;
+        if (!isUnset(instruction.entries) && isArray(instruction.entries)) {
+          for (const entry of instruction.entries) {
+            if (entry.code === code) {
+              entry.description = entry.description.replace(/{{([^{}]+)}}/g, (g0, g1) => {
+                return this.rawToHTML(g1).replace(/(<p>)|(<\/p>)/g, '');
+              });
+              return entry;
+            }
           }
         }
       }

@@ -18,7 +18,6 @@ import {
   Functions,
   isUnset,
   KeyMapping,
-  PlayBackStatus,
   SampleUnit,
   Segments,
   SubscriptionManager,
@@ -33,7 +32,6 @@ import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../shared/service/a
 import {TranscrEditorConfig} from './config';
 import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
 
-declare let lang: any;
 declare let document: any;
 
 @Component({
@@ -371,7 +369,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             e.preventDefault();
             const bufferText = ((e.originalEvent || e).clipboardData || (window as any).clipboardData).getData('Text');
             let html = bufferText.replace(/(<p>)|(<\/p>)/g, '')
-              .replace(new RegExp('\\\[\\\|', 'g'), '{').replace(new RegExp('\\\|\\\]', 'g'), '}');
+              .replace(new RegExp('\\\[\\\|', 'g'), '{').replace(new RegExp('\\\|\]', 'g'), '}');
             html = Functions.unEscapeHtml(html);
             html = '<span>' + this.transcrService.rawToHTML(html) + '</span>';
             html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
@@ -452,6 +450,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       this.onASRItemChange(item);
       this.size.height = jQuery(this.transcrEditor.nativeElement).height();
       this.size.width = jQuery(this.transcrEditor.nativeElement).width();
+
+      if (this._settings.highlightingEnabled) {
+        this.startRecurringHighlight();
+      }
     }
   }
 
@@ -665,34 +667,34 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   createButton(marker): any {
     return () => {
       const platform = BrowserInfo.platform;
-      let icon = '';
+      let icon;
       if ((marker.icon === null || marker.icon === undefined) || marker.icon === '' ||
         marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0) {
         // text only or utf8 symbol
         icon = (!isUnset(marker.icon) && (marker.icon.indexOf('.png') < 0 || marker.icon.indexOf('.jpg') < 0)) ? marker.icon : '';
 
         if (!this.easymode) {
-          icon += ' ' + marker.button_text + '<span class=\'btn-shortcut\'>  ' +
-            '[' + marker.shortcut[platform] + ']</span>';
+          icon += `${marker.button_text}<span class='btn-shortcut'> ` +
+            `[${marker.shortcut[platform]}]</span>`;
           if (this.Settings.responsive) {
-            icon = ' ' + marker.button_text + '<span class=\'btn-shortcut d-none d-lg-inline\'>  ' +
-              '[' + marker.shortcut[platform] + ']</span>';
+            icon = `${marker.button_text}<span class='btn-shortcut d-none d-lg-inline'> ` +
+              `[${marker.shortcut[platform]}]</span>`;
           }
         } else {
           icon += ' ' + marker.button_text;
         }
       } else {
         if (!this.easymode) {
-          icon = '<img src=\'' + marker.icon + '\' class=\'btn-icon\'/> ' +
-            '<span class=\'btn-description\'>' + marker.button_text + '</span><span class=\'btn-shortcut\'> ' +
-            '[' + marker.shortcut[platform] + ']</span>';
+          icon = `<img src='${marker.icon}' class='btn-icon' alt='${marker.button_text}'/>` +
+            `<span class='btn-description'> ${marker.button_text}</span><span class='btn-shortcut'> ` +
+            `[${marker.shortcut[platform]}]</span>`;
           if (this.Settings.responsive) {
-            icon = '<img src=\'' + marker.icon + '\' class=\'btn-icon\'/> ' +
-              '<span class=\'btn-description d-none d-lg-inline\'>' + marker.button_text +
-              '</span><span class=\'btn-shortcut d-none d-lg-inline\'> [' + marker.shortcut[platform] + ']</span>';
+            icon = `<img src='${marker.icon}' class='btn-icon' alt='${marker.button_text}'/>` +
+              `<span class='btn-description d-none d-lg-inline'> ${marker.button_text}` +
+              `</span><span class='btn-shortcut d-none d-lg-inline'> [${marker.shortcut[platform]}]</span>`;
           }
         } else {
-          icon = '<img src=\'' + marker.icon + '\' class=\'btn-icon\'/>';
+          icon = `<img src='${marker.icon}' class='btn-icon' alt='${marker.button_text}'/>`;
         }
       }
       // create button
@@ -747,20 +749,20 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }, 200);
 
     // set popover for errors
-    jQuery('.val-error')
-      .off('mouseenter')
+    const valError = jQuery('.val-error');
+    valError.off('mouseenter')
       .off('mouseleave');
 
-    jQuery('.val-error').children()
+    valError.children()
       .off('mouseenter')
       .off('mouseleave');
 
     setTimeout(() => {
-      jQuery('.val-error')
+      valError
         .on('mouseenter', (event) => {
           this.onValidationErrorMouseOver(jQuery(event.target), event);
         })
-        .on('mouseleave', (event) => {
+        .on('mouseleave', () => {
           this.onValidationErrorMouseLeave();
         });
 
@@ -768,7 +770,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         .on('mouseenter', (event) => {
           this.onValidationErrorMouseOver(jQuery(event.target), event);
         })
-        .on('mouseleave', (event) => {
+        .on('mouseleave', () => {
           this.onValidationErrorMouseLeave();
         });
     }, 200);
@@ -781,19 +783,19 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     const boundaryBtn = () => {
       const boundaryLabel = this.langService.translate('special_markers.boundary.insert', {type: ''});
       const boundaryDescr = this.langService.translate('special_markers.boundary.description', {type: ''});
-      let icon = '';
+      let icon;
       if (!this.easymode) {
-        icon = '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon\'/> ' +
-          '<span class=\'btn-description\'>' + boundaryLabel + '</span><span class=\'btn-shortcut\'> ' +
-          '[ALT + S]</span>';
+        icon = `<img src='assets/img/components/transcr-editor/boundary.png' class='btn-icon' alt='boundary_img'/> ` +
+          `<span class='btn-description'>${boundaryLabel}</span><span class='btn-shortcut'> ` +
+          `[ALT + S]</span>`;
         if (this.Settings.responsive) {
-          icon = '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon\'/> ' +
-            '<span class=\'btn-description d-none d-md-inline\'>' + boundaryLabel + '</span>' +
-            '<span class=\'btn-shortcut d-none d-lg-inline\'> ' +
-            '[ALT + S]</span>';
+          icon = `<img src='assets/img/components/transcr-editor/boundary.png' class='btn-icon' alt='boundary_img'/> ` +
+            `<span class='btn-description d-none d-md-inline'>${boundaryLabel}</span>` +
+            `<span class='btn-shortcut d-none d-lg-inline'> ` +
+            `[ALT + S]</span>`;
         }
       } else {
-        icon = '<img src=\'assets/img/components/transcr-editor/boundary.png\' class=\'btn-icon\'/>';
+        icon = `<img src='assets/img/components/transcr-editor/boundary.png' class='btn-icon' alt='boundary_img'/>`;
       }
       // create button
       const btnJS = {
@@ -814,7 +816,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     // create boundary button
     const fontSizeUp = () => {
-      const icon = '<img src=\'assets/img/components/transcr-editor/increaseFont.png\' class=\'btn-icon\' style=\'height:18px;\'/>';
+      const icon = `<img src='assets/img/components/transcr-editor/increaseFont.png' class='btn-icon' style='height:18px;'/>`;
       // create button
       const btnJS = {
         contents: icon,
@@ -833,7 +835,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     // create boundary button
     const fontSizeDown = () => {
-      const icon = '<img src=\'assets/img/components/transcr-editor/decreaseFont.png\' class=\'btn-icon\' style=\'height:18px;\'/>';
+      const icon = `<img src=assets/img/components/transcr-editor/decreaseFont.png' class='btn-icon' style='height:18px;'/>`;
       // create button
       const btnJS = {
         contents: icon,
@@ -852,8 +854,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     // create boundary button
     const highlightingButton = () => {
-      const icon = (this.highlightingEnabled) ? '<img src=\'assets/img/components/transcr-editor/highlightingEnabled.jpg\' class=\'btn-icon highlight-button\' style=\'height:15px;\'/>'
-        : '<img src=\'assets/img/components/transcr-editor/highlightingDisbled.jpg\' class=\'btn-icon highlight-button\' style=\'height:15px;\'/>';
+      const icon = (this.highlightingEnabled) ? `<img src='assets/img/components/transcr-editor/highlightingEnabled.jpg'
+ class='btn-icon highlight-button' style='height:15px;'/>`
+        : `<img src='assets/img/components/transcr-editor/highlightingDisbled.jpg'
+ class='btn-icon highlight-button' style='height:15px;'/>`;
       // create button
       const btnJS = {
         contents: icon,
@@ -867,9 +871,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           } else {
             this.highlightingEnabled = true;
             jQuery('.highlight-button').attr('src', 'assets/img/components/transcr-editor/highlightingEnabled.jpg');
-            if (this.audiochunk.status === PlayBackStatus.PLAYING && this._settings.highlightingEnabled) {
-              this.startRecurringHighlight();
-            }
+            this.startRecurringHighlight();
           }
         }
       };
@@ -1111,7 +1113,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   @HostListener('window:resize', ['$event'])
-  onResize($event) {
+  onResize() {
     this.size.height = jQuery(this.transcrEditor.nativeElement).height();
     this.size.width = jQuery(this.transcrEditor.nativeElement).width();
   }
@@ -1121,7 +1123,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       const item = this.asrService.queue.getItemByTime(this.audiochunk.time.start.samples, this.audiochunk.time.duration.samples);
       if (!isUnset(item)) {
         this.asrService.stopASROfItem(item);
-        const segIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(this.audioManager.createSampleUnit(item.time.sampleStart + 1));
+        const segIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
+          this.audioManager.createSampleUnit(item.time.sampleStart + 1));
         const segment = this.transcrService.currentlevel.segments.get(segIndex);
         segment.isBlockedBy = null;
         this.transcrService.currentlevel.segments.change(segIndex, segment);
@@ -1248,13 +1251,14 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         this.cd.markForCheck();
         this.cd.detectChanges();
 
-        const editorPos = jQuery('.note-toolbar.card-header').offset();
+        const cardHeader = jQuery('.note-toolbar.card-header');
+        const editorPos = cardHeader.offset();
 
         let marginLeft = event.target.offsetLeft;
         const height = this.validationPopover.height;
 
         if (
-          this.validationPopover.width + marginLeft > jQuery('.note-toolbar.card-header').width()
+          this.validationPopover.width + marginLeft > cardHeader.width()
           && marginLeft - this.validationPopover.width > 0
         ) {
           marginLeft -= this.validationPopover.width;
@@ -1406,7 +1410,7 @@ abstract class WrappedRange {
   public readonly ec: Node;
   public readonly eo: number;
 
-  constructor(sc: Node, so: number, ec: Node, eo: number) {
+  constructor() {
   }
 
   // select update visible range

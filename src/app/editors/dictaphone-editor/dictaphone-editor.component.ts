@@ -1,4 +1,13 @@
-import {AfterViewInit, Component, EventEmitter, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import {
   AudioChunk,
   AudioManager,
@@ -10,7 +19,6 @@ import {
   Segment,
   SubscriptionManager
 } from 'octra-components';
-import {PlayBackStatus} from '../../../../../octra-components/projects/octra-components/src/lib/obj/audio';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 
 import {
@@ -141,14 +149,6 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
     this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onShortcutTriggered), 'shortcut');
 
-    this.audiochunk.statuschange.subscribe((status) => {
-      if (status === PlayBackStatus.PLAYING) {
-        this.editor.startRecurringHighlight();
-      } else {
-        this.editor.stopRecurringHighlight();
-      }
-    });
-
     this.keyMap.register('AP', this.shortcuts);
 
     DictaphoneEditorComponent.initialized.emit();
@@ -200,7 +200,6 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
       this.editor.updateRawText();
       this.saveTranscript();
-      this.highlight();
 
       if (this.oldRaw === this.editor.rawText) {
         this.appStorage.saving.emit('success');
@@ -296,12 +295,10 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
       }).then(() => {
         this.audiochunk.startpos = this.audioManager.createSampleUnit(start);
         this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(i).time.clone();
-        // this.audioplayer.update();
 
         this.audiochunk.startPlayback().then(() => {
           // set start pos and playback length to end of audio file
           this.audiochunk.startpos = this.audioManager.createSampleUnit(samples.samples);
-          // this.audioplayer.update();
         });
         this.boundaryselected = false;
       });
@@ -396,50 +393,9 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     }
   }
 
-  public highlight() {
-    /*
-    const html: string = this.editor.html.replace(/&nbsp;/g, ' ');
-
-    const samplesArray: number[] = [];
-    html.replace(/\s?<img src="assets\/img\/components\/transcr-editor\/boundary.png"[\s\w="-:;äüößÄÜÖ]*data-samples="([0-9]+)" alt="\[\|[0-9]+\|]">\s?/g,
-      (match, g1, g2) => {
-        samplesArray.push(Number(g1));
-        return '';
-      });
-
-    let start = 0;
-    for (let i = 0; i < samplesArray.length; i++) {
-      if (!(samplesArray[i] > start)) {
-        // mark boundary red
-        jQuery('.note-editable.panel-body img[data-samples]:eq(' + i + ')').css({
-          'background-color': 'red'
-        });
-      } else {
-        jQuery('.note-editable.panel-body img[data-samples]:eq(' + i + ')').css({
-          'background-color': 'white'
-        });
-        start = samplesArray[i];
-      }
-    }*/
-  }
-
   public update() {
     this.audiochunk.startpos = this.audiochunk.time.start;
-    // this.audioplayer.update();
     this.loadEditor();
-  }
-
-  public onSelectionChanged(caretpos) {
-    /*
-    if (!this.audiochunk.isPlaying) {
-      const seg_num = this.editor.getSegmentByCaretPos(caretpos);
-      if (seg_num > -1) {
-        const samples = (seg_num > 0) ? this.transcrService.currentlevel.segments.get(seg_num - 1).time.samples : 0;
-        this.audiochunk.startpos = new AudioTime(samples, this.audiochunk.audioManager.ressource.info.sampleRate);
-        this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(seg_num).time.clone();
-        this.audioplayer.update();
-      }
-    } */
   }
 
   public afterFirstInitialization() {

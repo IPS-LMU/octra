@@ -330,10 +330,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         const customArray = this.createCustomButtonsArray();
         navigation.buttons.boundary = customArray[0];
         navigation.str_array.push('boundary');
-        navigation.buttons.fontSizeUp = customArray[1];
-        navigation.str_array.push('fontSizeUp');
-        navigation.buttons.fontSizeDown = customArray[2];
-        navigation.str_array.push('fontSizeDown');
         if (this._settings.highlightingEnabled) {
           navigation.buttons.highlighting = customArray[3];
           navigation.str_array.push('highlighting');
@@ -644,8 +640,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     const result = {
       buttons: {
         boundary: undefined,
-        fontSizeUp: undefined,
-        fontSizeDown: undefined,
         highlighting: undefined
       },
       str_array: []
@@ -813,44 +807,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     };
 
     result.push(boundaryBtn);
-
-    // create boundary button
-    const fontSizeUp = () => {
-      const icon = `<img src='assets/img/components/transcr-editor/increaseFont.png' class='btn-icon' style='height:18px;'/>`;
-      // create button
-      const btnJS = {
-        contents: icon,
-        tooltip: 'increase font size',
-        container: false,
-        click: () => {
-          jQuery('.transcr-editor .note-editable.card-block').css('font-size', (++this.transcrService.defaultFontSize) + 'px');
-        }
-      };
-      const button = jQuery.summernote.ui.button(btnJS);
-
-      return button.render();   // return button as jquery object
-    };
-
-    result.push(fontSizeUp);
-
-    // create boundary button
-    const fontSizeDown = () => {
-      const icon = `<img src=assets/img/components/transcr-editor/decreaseFont.png' class='btn-icon' style='height:18px;'/>`;
-      // create button
-      const btnJS = {
-        contents: icon,
-        tooltip: 'decrease font size',
-        container: false,
-        click: () => {
-          jQuery('.transcr-editor .note-editable.card-block').css('font-size', (--this.transcrService.defaultFontSize) + 'px');
-        }
-      };
-      const button = jQuery.summernote.ui.button(btnJS);
-
-      return button.render();   // return button as jquery object
-    };
-
-    result.push(fontSizeDown);
 
     // create boundary button
     const highlightingButton = () => {

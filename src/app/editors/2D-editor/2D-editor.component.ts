@@ -68,16 +68,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   public showWindow = false;
   public loupeHidden = true;
   public selectedIndex: number;
-  public miniloupe: {
-    size: {
-      width: number,
-      height: number
-    },
-    location: {
-      x: number,
-      y: number
-    }
-  } = {
+  public miniloupe = {
     size: {
       width: 160,
       height: 160
@@ -87,6 +78,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       y: 0
     }
   };
+
   public audioManager: AudioManager;
   public audioChunkLines: AudioChunk;
   public audioChunkWindow: AudioChunk;
@@ -252,24 +244,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       }
     );
 
-    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(
-      (obj) => {
-        if (this.appStorage.showLoupe) {
-          const event = obj.event;
-
-          if (event.key === '+') {
-            this.factor = Math.min(20, this.factor + 1);
-            this.changeArea(this.loupe, this.miniloupe, this.viewer.av.mouseCursor, this.factor);
-          } else if (event.key === '-') {
-            if (this.factor > 3) {
-              this.factor = Math.max(1, this.factor - 1);
-              this.changeArea(this.loupe, this.miniloupe, this.viewer.av.mouseCursor, this.factor);
-            }
-          }
-        }
-      }
-    ));
-
     this.subscrmanager.add(this.audioChunkLines.statuschange.subscribe(
       (state: PlayBackStatus) => {
         if (state === PlayBackStatus.PLAYING) {
@@ -397,7 +371,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                           console.error(`could not find segment to be precessed by ASRMAUS!`);
                         } else {
                           for (const wordItem of wordsTier.items) {
-                            if (item.time.sampleStart + wordItem.sampleStart + wordItem.sampleDur <= item.time.sampleStart + item.time.sampleLength) {
+                            const itemEnd = item.time.sampleStart + item.time.sampleLength;
+                            if (item.time.sampleStart + wordItem.sampleStart + wordItem.sampleDur <= itemEnd) {
                               const readSegment = Segment.fromObj(
                                 new OSegment(1, wordItem.sampleStart, wordItem.sampleDur, wordItem.labels),
                                 this.audioManager.sampleRate);
@@ -597,15 +572,14 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     if (fullY < this.viewer.height) {
       // loupe is fully visible
       this.miniloupe.location.y = mouseEvent.offsetY + 20;
-      this.miniloupe.location.x = x;
     } else {
       // loupe out of the bottom border of view rectangle
       this.miniloupe.location.y = mouseEvent.offsetY - 20 - this.miniloupe.size.height;
-      this.miniloupe.location.x = x;
     }
+    this.miniloupe.location.x = x;
 
     this.loupeHidden = false;
-    this.changeArea(this.loupe, this.miniloupe, cursorTime, this.factor);
+    this.changeArea(this.loupe, cursorTime, this.factor);
     this.cd.detectChanges();
   }
 
@@ -647,6 +621,23 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           });
           break;
       }
+
+      if (this.appStorage.showLoupe) {
+        const event = $event.event;
+
+        if (event.key === '+') {
+          shortcut = '+';
+          this.factor = Math.min(20, this.factor + 1);
+          this.changeArea(this.loupe, this.viewer.av.mouseCursor, this.factor);
+        } else if (event.key === '-') {
+          if (this.factor > 3) {
+            shortcut = '-';
+            this.factor = Math.max(1, this.factor - 1);
+            this.changeArea(this.loupe, this.viewer.av.mouseCursor, this.factor);
+          }
+        }
+      }
+
       this.cd.detectChanges();
       if (shortcut !== '') {
         $event.event.preventDefault();
@@ -865,16 +856,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     }
   }
 
-  changeArea(loup: AudioViewerComponent, coord: {
-    size: {
-      width: number,
-      height: number
-    },
-    location: {
-      x: number,
-      y: number
-    }
-  }, cursorTime: SampleUnit, factor: number) {
+  changeArea(loup: AudioViewerComponent, cursorTime: SampleUnit, factor: number) {
     const cursorLocation = this.viewer.mouseCursor;
     if (cursorLocation && cursorTime) {
       const halfRate = Math.round(this.audioManager.sampleRate / factor);

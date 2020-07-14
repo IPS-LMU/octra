@@ -1,4 +1,4 @@
-<oco-audio-viewer #miniloupe *ngIf="appStorage.showLoupe" [audioChunk]="audioChunkLoupe"
+<oco-audio-viewer #miniloupeComponent *ngIf="appStorage.showLoupe" [audioChunk]="audioChunkLoupe"
                   [breakMarker]="{
                         code: '<P>'
                       }"
@@ -7,13 +7,13 @@
                   [name]="'loupe'"
                   [ngStyle]="{
 'position':'absolute',
-'margin-left':miniLoupeCoord.x + 'px',
-'margin-top':miniLoupeCoord.y + 'px',
+'margin-left':miniloupe.location.x + 'px',
+'margin-top':miniloupe.location.y + 'px',
 'width' : '160px',
 'height': '160px',
 'display': 'flex',
 'z-index':'900',
-'visibility': (miniLoupeHidden) ? 'hidden' : 'inherit',
+'visibility': (miniloupe.isHidden) ? 'hidden' : 'inherit',
 'flex': 'auto',
 'flex-direction': 'column'}"
                   [settings]="miniLoupeSettings"
@@ -62,8 +62,8 @@
 <div id="viewer">
   <oco-audio-viewer #signalDisplayTop (mousecursorchange)="onMouseOver($event)"
                     (mousedown)="onViewerMouseDown($event)"
-                    (mouseenter)="miniLoupeHidden = false;"
-                    (mouseleave)="miniLoupeHidden = true;"
+                    (mouseenter)="miniloupe.isHidden = false;"
+                    (mouseleave)="miniloupe.isHidden = true;"
                     (segmententer)="onSegmentEnter($event)"
                     (selchange)="onSelectionChanged($event)"
                     [audioChunk]="audioChunkTop"

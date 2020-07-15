@@ -131,6 +131,41 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
   }
 
+  private audioShortcuts = {
+    play_pause: {
+      keys: {
+        mac: 'TAB',
+        pc: 'TAB'
+      },
+      title: 'play pause',
+      focusonly: false
+    },
+    stop: {
+      keys: {
+        mac: 'ESC',
+        pc: 'ESC'
+      },
+      title: 'stop playback',
+      focusonly: false
+    },
+    step_backward: {
+      keys: {
+        mac: 'SHIFT + BACKSPACE',
+        pc: 'SHIFT + BACKSPACE'
+      },
+      title: 'step backward',
+      focusonly: false
+    },
+    step_backwardtime: {
+      keys: {
+        mac: 'SHIFT + TAB',
+        pc: 'SHIFT + TAB'
+      },
+      title: 'step backward time',
+      focusonly: false
+    }
+  };
+
   constructor(public keyMap: KeymappingService,
               public transcrService: TranscriptionService,
               public audio: AudioService,
@@ -225,32 +260,67 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     });
   }
 
-  onKeyDown = ($event) => {
+  onShortcutTriggered = ($event) => {
     if (!this.loading) {
-      switch ($event.comboKey) {
-        case ('ALT + ARROWRIGHT'):
-          $event.event.preventDefault();
-          if (this.hasSegmentBoundaries || (!this.isNextSegmentLastAndBreak(this.segmentIndex)
-            && this.segmentIndex < this.transcrService.currentlevel.segments.length - 1)) {
-            this.doDirectionAction('right');
-          } else {
-            this.save();
-            this.close();
-            this.act.emit('overview');
-          }
-          break;
-        case ('ALT + ARROWLEFT'):
-          $event.event.preventDefault();
-          this.doDirectionAction('left');
-          break;
-        case ('ALT + ARROWDOWN'):
-          $event.event.preventDefault();
-          this.doDirectionAction('down');
-          break;
-        case ('ESC'):
-          this.doDirectionAction('down');
-          break;
-      }
+      this.keyMap.checkShortcutAction($event.comboKey, this.audioShortcuts, true).then((shortcut) => {
+        switch (shortcut) {
+          case('play_pause'):
+            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            if (this.audiochunk.isPlaying) {
+              this.audiochunk.pausePlayback();
+            } else {
+              this.audiochunk.startPlayback(false).catch((error) => {
+                console.error(error);
+              });
+            }
+            break;
+          case('stop'):
+            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            this.audiochunk.stopPlayback().catch((error) => {
+              console.error(error);
+            });
+            break;
+          case('step_backward'):
+            console.log(`step backward`);
+            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            this.audiochunk.stepBackward().catch((error) => {
+              console.error(error);
+            });
+            break;
+          case('step_backwardtime'):
+            console.log(`step backward time`);
+            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            this.audiochunk.stepBackwardTime(0.5).catch((error) => {
+              console.error(error);
+            });
+            break;
+        }
+
+        switch ($event.comboKey) {
+          case ('ALT + ARROWRIGHT'):
+            $event.event.preventDefault();
+            if (this.hasSegmentBoundaries || (!this.isNextSegmentLastAndBreak(this.segmentIndex)
+              && this.segmentIndex < this.transcrService.currentlevel.segments.length - 1)) {
+              this.doDirectionAction('right');
+            } else {
+              this.save();
+              this.close();
+              this.act.emit('overview');
+            }
+            break;
+          case ('ALT + ARROWLEFT'):
+            $event.event.preventDefault();
+            this.doDirectionAction('left');
+            break;
+          case ('ALT + ARROWDOWN'):
+            $event.event.preventDefault();
+            this.doDirectionAction('down');
+            break;
+          case ('ESC'):
+            this.doDirectionAction('down');
+            break;
+        }
+      });
     }
   }
 
@@ -291,9 +361,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.cd.markForCheck();
     this.cd.detectChanges();
 
-    // TODO important update needed?
-    // this.loupe.update(true);
-    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onKeyDown));
+    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onShortcutTriggered));
   }
 
   setValidationEnabledToDefault() {
@@ -541,7 +609,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     this.editor.rawText = text;
   }
 
-  onShortCutTriggered($event, type) {
+  triggerUIAction($event: AudioViewerShortcutEvent) {
     const segment = {
       start: -1,
       length: 0
@@ -570,7 +638,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     }
 
     this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
-      this.audioManager.playposition, this.editor.caretpos, selection, segment, type);
+      this.audioManager.playposition, this.editor.caretpos, selection, segment, 'loupe');
   }
 
   onMarkerInsert(markerCode

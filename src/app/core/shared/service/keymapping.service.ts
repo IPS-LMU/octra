@@ -124,6 +124,29 @@ export class KeymappingService {
     this._onkeyup.emit({comboKey: combo, event: $event});
   }
 
+  public checkShortcutAction(comboKey: string, shortcuts: any, shortcutsEnabled: boolean) {
+    return new Promise<string>((resolve) => {
+
+      if (shortcutsEnabled) {
+        let foundShortcut = '';
+        const platform = BrowserInfo.platform;
+        if (!isUnset(shortcuts)) {
+          for (const shortcut in shortcuts) {
+            if (shortcuts.hasOwnProperty(shortcut)) {
+              const currentShortcut = shortcuts['' + shortcut + ''];
+
+              if (currentShortcut.keys['' + platform + ''] === comboKey) {
+                foundShortcut = shortcut;
+                break;
+              }
+            }
+          }
+        }
+        resolve(foundShortcut);
+      }
+    });
+  }
+
   private cloneShortcuts(shortcuts: any): any {
     const result: any = {};
     for (const elem in shortcuts) {

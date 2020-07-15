@@ -54,6 +54,7 @@ import {AppStorageService} from '../../shared/service/appstorage.service';
 import {AsrService} from '../../shared/service/asr.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import {NavbarService} from '../navbar/navbar.service';
+import {logger} from 'codelyzer/util/logger';
 
 @Component({
   selector: 'octra-transcription',
@@ -572,7 +573,12 @@ export class TranscriptionComponent implements OnInit,
 
             if ((this.currentEditor.instance as any).hasOwnProperty('openModal')) {
               this.subscrmanager.add((this.currentEditor.instance as any).openModal.subscribe(() => {
-                this.modalOverview.open().catch((error) => {
+                console.log(`overview opened!`);
+                (this.currentEditor.instance as any).disableAllShortcuts();
+                this.modalOverview.open().then(() => {
+                  console.log(`overview closed`);
+                  (this.currentEditor.instance as any).enableAllShortcuts();
+                }).catch((error) => {
                   console.error(error);
                 });
               }));

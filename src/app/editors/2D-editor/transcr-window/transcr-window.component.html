@@ -57,6 +57,7 @@
                       [audioChunk]="audiochunk"
                       [isMultiLine]="false"
                       [transcriptionLevel]="transcrService.currentlevel"
+                      (shortcuttriggered)="triggerUIAction($event)"
                       id="loupe"
     ></oco-audio-viewer>
     <octra-transcr-editor #editor (boundaryclicked)="onBoundaryClicked($event)"

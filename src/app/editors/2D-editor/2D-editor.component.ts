@@ -34,7 +34,7 @@ import {AuthenticationNeededComponent} from '../../core/alerts/authentication-ne
 import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
 import {TranscrEditorComponent} from '../../core/component';
 
-import {BrowserInfo, PraatTextgridConverter} from '../../core/shared';
+import {PraatTextgridConverter} from '../../core/shared';
 
 import {
   AlertService,
@@ -208,7 +208,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.shortcuts = this.keyMap.register('2D-Editor', {...this.audioShortcuts, ...this.viewer.settings.shortcuts});
     this.keyMap.register('Transcription Window', this.windowShortcuts);
     this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onShortCutTriggered));
-
     this.viewer.settings.multiLine = true;
     this.viewer.settings.lineheight = 70;
     this.viewer.settings.margin.top = 5;
@@ -381,7 +380,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                               }
 
                               if (counter === wordsTier.items.length - 1) {
-                                // the processed segment is now the very right one. Replace its content with the content of the last word item.
+                                // the processed segment is now the very right one. Replace its content with
+                                // the content of the last word item.
                                 segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentBoundary);
 
                                 this.transcrService.currentlevel.segments.segments[segmentIndex].transcript = readSegment.transcript;
@@ -484,6 +484,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
             : this.audioManager.createSampleUnit(0);
           this.selectedIndex = selected.index;
           this.audioChunkWindow = new AudioChunk(new AudioSelection(start, segment.time.clone()), this.audioManager);
+          this.shortcutsEnabled = false;
 
           this.viewer.settings.shortcutsEnabled = false;
           this.showWindow = true;
@@ -514,6 +515,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     if (state === 'close') {
       this.showWindow = false;
       this.viewer.settings.shortcutsEnabled = true;
+      this.shortcutsEnabled = true;
       this.selectedIndex = this.window.segmentIndex;
       this.viewer.selectSegment(this.selectedIndex);
 
@@ -526,6 +528,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
     } else if (state === 'open') {
     } else if (state === 'overview') {
+      this.shortcutsEnabled = false;
       this.openModal.emit('overview');
     }
   }
@@ -588,38 +591,42 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   onShortCutTriggered = ($event: KeyMappingShortcutEvent) => {
-    this.checkShortcutAction($event.comboKey, this.audioShortcuts).then((shortcut) => {
-      switch (shortcut) {
-        case('play_pause'):
-          this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
-          if (this.audioChunkLines.isPlaying) {
-            this.audioChunkLines.pausePlayback();
-          } else {
-            this.audioChunkLines.startPlayback(false).catch((error) => {
+    this.keyMap.checkShortcutAction($event.comboKey, this.audioShortcuts, this.shortcutsEnabled).then((shortcut) => {
+      if (!isUnset(this.audioChunkLines)) {
+        switch (shortcut) {
+          case('play_pause'):
+            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            if (this.audioChunkLines.isPlaying) {
+              this.audioChunkLines.pausePlayback();
+            } else {
+              this.audioChunkLines.startPlayback(false).catch((error) => {
+                console.error(error);
+              });
+            }
+            break;
+          case('stop'):
+            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            this.audioChunkLines.stopPlayback().catch((error) => {
               console.error(error);
             });
-          }
-          break;
-        case('stop'):
-          this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
-          this.audioChunkLines.stopPlayback().catch((error) => {
-            console.error(error);
-          });
-          break;
-        case('step_backward'):
-          console.log(`step backward`);
-          this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
-          this.audioChunkLines.stepBackward().catch((error) => {
-            console.error(error);
-          });
-          break;
-        case('step_backwardtime'):
-          console.log(`step backward time`);
-          this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
-          this.audioChunkLines.stepBackwardTime(0.5).catch((error) => {
-            console.error(error);
-          });
-          break;
+            break;
+          case('step_backward'):
+            console.log(`step backward`);
+            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            this.audioChunkLines.stepBackward().catch((error) => {
+              console.error(error);
+            });
+            break;
+          case('step_backwardtime'):
+            console.log(`step backward time`);
+            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            this.audioChunkLines.stepBackwardTime(0.5).catch((error) => {
+              console.error(error);
+            });
+            break;
+        }
+      } else {
+        shortcut = '';
       }
 
       if (this.appStorage.showLoupe) {
@@ -644,29 +651,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       }
     }).catch((error) => {
       console.error(error);
-    });
-  }
-
-  private checkShortcutAction(comboKey: string, shortcuts: any) {
-    return new Promise<string>((resolve) => {
-
-      if (this.shortcutsEnabled) {
-        let foundShortcut = '';
-        const platform = BrowserInfo.platform;
-        if (!isUnset(shortcuts)) {
-          for (const shortcut in shortcuts) {
-            if (shortcuts.hasOwnProperty(shortcut)) {
-              const currentShortcut = shortcuts['' + shortcut + ''];
-
-              if (!isUnset(this.audioChunkLines) && currentShortcut.keys['' + platform + ''] === comboKey) {
-                foundShortcut = shortcut;
-                break;
-              }
-            }
-          }
-        }
-        resolve(foundShortcut);
-      }
     });
   }
 
@@ -916,6 +900,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   public enableAllShortcuts() {
+    this.shortcutsEnabled = true;
     this.viewer.enableShortcuts();
     if (!isUnset(this.window) && !isUnset(this.window.loupe)) {
       this.window.loupe.enableShortcuts();
@@ -923,6 +908,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   public disableAllShortcuts() {
+    this.shortcutsEnabled = false;
     this.viewer.disableShortcuts();
     if (!isUnset(this.window) && !isUnset(this.window.loupe)) {
       this.window.loupe.disableShortcuts();

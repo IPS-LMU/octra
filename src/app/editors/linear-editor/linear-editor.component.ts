@@ -649,8 +649,6 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   public changeLoupePosition(mouseEvent: MouseEvent, cursorTime: SampleUnit) {
-
-    const fullY = mouseEvent.offsetY + 20 + this.miniloupe.size.height;
     const x = mouseEvent.offsetX - ((this.miniloupe.size.width - 10) / 2) - 2;
 
     // loupe is fully visible

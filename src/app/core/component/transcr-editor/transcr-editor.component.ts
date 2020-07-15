@@ -24,7 +24,7 @@ import {
   TimespanPipe
 } from 'octra-components';
 import {isNumeric} from 'rxjs/internal-compatibility';
-import {timer} from 'rxjs/internal/observable/timer';
+import {timer} from 'rxjs';
 
 import {BrowserInfo} from '../../shared';
 import {TranscriptionService} from '../../shared/service';

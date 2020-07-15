@@ -52,7 +52,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   public segmentselected = false;
   public loupeSettings: AudioviewerConfig;
   public miniloupe = {
-    component: AudioViewerComponent,
+    component: null,
     isHidden: true,
     size: {
       width: 160,

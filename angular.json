@@ -13,6 +13,17 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "js-sha256",
+              "x2js",
+              "konva",
+              "crossevent",
+              "contra/emitter",
+              "flat",
+              "dragula",
+              "querystring",
+              "crossvent"
+            ],
             "preserveSymlinks": true,
             "outputPath": "dist/octra",
             "index": "src/index.html",

@@ -559,11 +559,15 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     }
 
     if (this.appStorage.showLoupe) {
-      this.loupeHidden = false;
-      this.mouseTimer = window.setTimeout(() => {
-        this.changeLoupePosition($event.event, $event.time);
-        this.mousestate = 'ended';
-      }, 20);
+      if (this.viewer.audioChunk.time.duration.seconds !== this.viewer.av.mouseCursor.seconds) {
+        this.loupeHidden = false;
+        this.mouseTimer = window.setTimeout(() => {
+          this.changeLoupePosition($event.event, $event.time);
+          this.mousestate = 'ended';
+        }, 20);
+      } else {
+        this.loupeHidden = true;
+      }
     }
   }
 

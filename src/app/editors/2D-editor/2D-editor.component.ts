@@ -542,21 +542,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     }
     this.mousestate = 'moving';
 
-    if (!this.audioManager.isPlaying && this.appStorage.playonhover) {
-      // play audio on hover
-
-      // it's very important to use a seperate chunk for the hover playback!
-      const audioChunkHover = this.audioChunkLines.clone();
-      audioChunkHover.volume = 1;
-      audioChunkHover.playbackRate = 1;
-      audioChunkHover.selection.start = this.viewer.av.mouseCursor.clone();
-      audioChunkHover.selection.end = this.viewer.av.mouseCursor.add(
-        this.audioManager.createSampleUnit(this.audioManager.sampleRate / 10)
-      );
-      audioChunkHover.startPlayback(true).catch((error) => {
-        // ignore
-      });
-    }
+    this.doPlayOnHover(this.audioManager, this.appStorage.playonhover, this.audioChunkLines, this.viewer.av.mouseCursor);
 
     if (this.appStorage.showLoupe) {
       if (this.viewer.audioChunk.time.duration.seconds !== this.viewer.av.mouseCursor.seconds) {
@@ -586,8 +572,13 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.miniloupe.location.x = x;
 
     this.loupeHidden = false;
-    this.changeArea(this.loupe, cursorTime, this.factor);
-    this.cd.detectChanges();
+    this.changeArea(this.loupe, this.viewer, this.audioManager, this.audioChunkLoupe, cursorTime, this.factor)
+      .then((newLoupeChunk) => {
+        if (!isUnset(newLoupeChunk)) {
+          this.audioChunkLoupe = newLoupeChunk;
+        }
+        this.cd.detectChanges();
+      });
   }
 
   onShortCutViewerTriggered($event: AudioViewerShortcutEvent) {
@@ -638,22 +629,30 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       if (this.appStorage.showLoupe) {
         const event = $event.event;
 
-        if (event.key === '+') {
-          shortcut = '+';
-          this.factor = Math.min(20, this.factor + 1);
-          this.changeArea(this.loupe, this.viewer.av.mouseCursor, this.factor);
-        } else if (event.key === '-') {
-          if (this.factor > 3) {
-            shortcut = '-';
-            this.factor = Math.max(1, this.factor - 1);
-            this.changeArea(this.loupe, this.viewer.av.mouseCursor, this.factor);
+        if (event.key === '+' || event.key === '-') {
+          if (event.key === '+') {
+            shortcut = '+';
+            this.factor = Math.min(20, this.factor + 1);
+          } else if (event.key === '-') {
+            if (this.factor > 3) {
+              shortcut = '-';
+              this.factor = Math.max(1, this.factor - 1);
+            }
           }
+
+          this.changeArea(this.loupe, this.viewer, this.audioManager, this.audioChunkLoupe, this.viewer.av.mouseCursor, this.factor)
+            .then((newLoupeChunk) => {
+              if (!isUnset(newLoupeChunk)) {
+                this.audioChunkLoupe = newLoupeChunk;
+                this.cd.detectChanges();
+              }
+            });
         }
       }
 
-      this.cd.detectChanges();
       if (shortcut !== '') {
         $event.event.preventDefault();
+        this.cd.detectChanges();
       }
     }).catch((error) => {
       console.error(error);
@@ -846,38 +845,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     }
   }
 
-  changeArea(loup: AudioViewerComponent, cursorTime: SampleUnit, factor: number) {
-    const cursorLocation = this.viewer.mouseCursor;
-    if (cursorLocation && cursorTime) {
-      const halfRate = Math.round(this.audioManager.sampleRate / factor);
-      const start = (cursorTime.samples > halfRate)
-        ? this.audioManager.createSampleUnit(cursorTime.samples - halfRate)
-        : this.audioManager.createSampleUnit(0);
-
-      const end = (cursorTime.samples < this.audioManager.ressource.info.duration.samples - halfRate)
-        ? this.audioManager.createSampleUnit(cursorTime.samples + halfRate)
-        : this.audioManager.ressource.info.duration.clone();
-
-      loup.av.zoomY = factor;
-      if (start && end) {
-        this.audioChunkLoupe.destroy();
-        this.audioChunkLoupe = new AudioChunk(new AudioSelection(start, end), this.audioManager);
-      }
-    }
-    this.cd.detectChanges();
-  }
-
   afterFirstInitialization() {
-    const emptySegmentIndex = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
-      return a.transcript === '';
-    });
-    if (this.audioChunkLines.time.duration.seconds <= 35) {
-      if (emptySegmentIndex > -1) {
-        this.openSegment(emptySegmentIndex);
-      } else if (this.transcrService.currentlevel.segments.length === 1) {
-        this.openSegment(0);
-      }
-    }
+    this.checkIfSmallAudioChunk(this.audioChunkLines, this.transcrService.currentlevel);
     this.cd.detectChanges();
   }
 

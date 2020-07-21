@@ -1,7 +1,6 @@
 import {NavigationExtras} from '@angular/router';
 import {OggFormat, WavFormat} from 'octra-components';
 import {EmailBugReporter} from './core/obj/BugAPI/EmailBugReporter';
-import {MantisBugReporter} from './core/obj/BugAPI/MantisBugReporter';
 import {
   AnnotJSONConverter,
   BundleJSONConverter,
@@ -26,7 +25,6 @@ export class AppInfo {
   ];
 
   public static readonly bugreporters = [
-    new MantisBugReporter(),
     new EmailBugReporter()
   ];
 

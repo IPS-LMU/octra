@@ -385,20 +385,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
     this.miniloupe.component = this.signalDisplayTop;
 
-    if (!this.audioManager.isPlaying && this.appStorage.playonhover) {
-      // play audio on hover
-
-      // it's very important to use a seperate chunk for the hover playback!
-      const audioChunkHover = this.audioChunkTop.clone();
-      audioChunkHover.volume = 1;
-      audioChunkHover.playbackRate = 1;
-      audioChunkHover.selection.start = this.signalDisplayTop.av.mouseCursor.clone();
-      audioChunkHover.selection.end = this.signalDisplayTop.av.mouseCursor.add(
-        this.audioManager.createSampleUnit(this.audioManager.sampleRate / 10)
-      );
-      audioChunkHover.startPlayback(true).catch((error) => {
-      });
-    }
+    this.doPlayOnHover(this.audioManager, this.appStorage.playonhover, this.audioChunkTop, this.signalDisplayTop.av.mouseCursor);
 
     if (this.appStorage.showLoupe) {
       this.miniloupe.isHidden = false;
@@ -518,24 +505,27 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
         if (this.appStorage.showLoupe) {
           const event = $event.event;
-          if (!isUnset(this.miniloupe) && (this.signalDisplayTop.focused || this.signalDisplayDown.focused)) {
-            if (event.key === '+') {
-              keyActive = true;
-              this.factor = Math.min(12, this.factor + 1);
-              this.miniloupeComponent.av.zoomY = Math.max(1, this.factor);
-
-              if (this.signalDisplayTop.focused) {
-                this.changeArea(this.miniloupeComponent, this.signalDisplayTop.av.mouseCursor, this.factor);
-              }
-            } else if (event.key === '-') {
-              if (this.factor > 3) {
+          if (!isUnset(this.miniloupe) && this.signalDisplayTop.focused) {
+            if (event.key === '+' || event.key === '-') {
+              if (event.key === '+') {
                 keyActive = true;
-                this.factor = Math.max(1, this.factor - 1);
-                this.miniloupeComponent.av.zoomY = Math.max(4, this.factor);
-                if (this.signalDisplayTop.focused) {
-                  this.changeArea(this.miniloupeComponent, this.signalDisplayTop.av.mouseCursor, this.factor);
+                this.factor = Math.min(12, this.factor + 1);
+                this.miniloupeComponent.av.zoomY = Math.max(1, this.factor);
+              } else if (event.key === '-') {
+                if (this.factor > 3) {
+                  keyActive = true;
+                  this.factor = Math.max(1, this.factor - 1);
+                  this.miniloupeComponent.av.zoomY = Math.max(4, this.factor);
                 }
               }
+
+              this.changeArea(this.miniloupeComponent, this.signalDisplayTop, this.audioManager, this.audioChunkLoupe,
+                this.signalDisplayTop.av.mouseCursor, this.factor)
+                .then((newLoupeChunk) => {
+                  if (!isUnset(newLoupeChunk)) {
+                    this.audioChunkLoupe = newLoupeChunk;
+                  }
+                });
             }
           }
         }
@@ -662,7 +652,12 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.miniloupe.location.y = mouseEvent.offsetY + 60;
     this.miniloupe.location.x = x;
 
-    this.changeArea(this.miniloupeComponent, cursorTime, this.factor);
+    this.changeArea(this.miniloupeComponent, this.signalDisplayTop, this.audioManager, this.audioChunkLoupe, cursorTime, this.factor)
+      .then((newLoupeChunk) => {
+        if (!isUnset(newLoupeChunk)) {
+          this.audioChunkLoupe = newLoupeChunk;
+        }
+      });
     this.cd.detectChanges();
   }
 
@@ -726,16 +721,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   afterFirstInitialization() {
-    const emptySegmentIndex = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
-      return a.transcript === '';
-    });
-    if (this.audioChunkTop.time.duration.seconds <= 35) {
-      if (emptySegmentIndex > -1) {
-        this.openSegment(emptySegmentIndex);
-      } else if (this.transcrService.currentlevel.segments.length === 1) {
-        this.openSegment(0);
-      }
-    }
+    this.checkIfSmallAudioChunk(this.audioChunkTop, this.transcrService.currentlevel);
   }
 
   onKeyUp() {
@@ -753,26 +739,6 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.signalDisplayTop.disableShortcuts();
     if (!isUnset(this.signalDisplayDown)) {
       this.signalDisplayDown.disableShortcuts();
-    }
-  }
-
-  private changeArea(loup: AudioViewerComponent, cursorTime: SampleUnit, factor: number) {
-    const cursorLocation = this.signalDisplayTop.mouseCursor;
-    if (cursorLocation && cursorTime) {
-      const halfRate = Math.round(this.audioManager.sampleRate / factor);
-      const start = (cursorTime.samples > halfRate)
-        ? this.audioManager.createSampleUnit(cursorTime.samples - halfRate)
-        : this.audioManager.createSampleUnit(0);
-
-      const end = (cursorTime.samples < this.audioManager.ressource.info.duration.samples - halfRate)
-        ? this.audioManager.createSampleUnit(cursorTime.samples + halfRate)
-        : this.audioManager.ressource.info.duration.clone();
-
-      loup.av.zoomY = factor;
-      if (start && end) {
-        this.audioChunkLoupe.destroy();
-        this.audioChunkLoupe = new AudioChunk(new AudioSelection(start, end), this.audioManager);
-      }
     }
   }
 

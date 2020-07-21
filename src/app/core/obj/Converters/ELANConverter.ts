@@ -138,32 +138,7 @@ export class ELANConverter extends Converter {
         let lastSample = 0;
         for (const tier of jsonXML.ANNOTATION_DOCUMENT.TIER) {
           const level = new OLevel(tier._TIER_ID, 'SEGMENT', []);
-
-          if (Array.isArray(tier.ANNOTATION)) {
-            for (const annotationElement of tier.ANNOTATION) {
-              const t1 = this.getSamplesFromTimeSlot(jsonXML, annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF1, audiofile.sampleRate);
-              const t2 = this.getSamplesFromTimeSlot(jsonXML, annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF2, audiofile.sampleRate);
-
-              if (t1 < 0 || t2 < 0) {
-                result.error = 'Invalid time unit found';
-                return result;
-              } else {
-                if (t1 > lastSample) {
-                  // empty segment space before
-                  level.items.push(new OSegment(counter++, lastSample, t1 - lastSample, [
-                    new OLabel(tier._TIER_ID, '')]
-                  ));
-                }
-
-                // correct segment
-                level.items.push(new OSegment(counter++, t1, t2 - t1, [
-                  new OLabel(tier._TIER_ID, annotationElement.ALIGNABLE_ANNOTATION.ANNOTATION_VALUE)]
-                ));
-              }
-              lastSample = t2;
-            }
-          } else {
-            const annotationElement = tier.ANNOTATION as any;
+          const readTier = (annotationElement) => {
             const t1 = this.getSamplesFromTimeSlot(jsonXML, annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF1, audiofile.sampleRate);
             const t2 = this.getSamplesFromTimeSlot(jsonXML, annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF2, audiofile.sampleRate);
 
@@ -177,12 +152,21 @@ export class ELANConverter extends Converter {
                   new OLabel(tier._TIER_ID, '')]
                 ));
               }
+
               // correct segment
               level.items.push(new OSegment(counter++, t1, t2 - t1, [
                 new OLabel(tier._TIER_ID, annotationElement.ALIGNABLE_ANNOTATION.ANNOTATION_VALUE)]
               ));
             }
             lastSample = t2;
+          };
+
+          if (Array.isArray(tier.ANNOTATION)) {
+            for (const annotationElement of tier.ANNOTATION) {
+              readTier(annotationElement);
+            }
+          } else {
+            readTier(tier.ANNOTATION as any);
           }
 
           if (level.items.length > 0) {

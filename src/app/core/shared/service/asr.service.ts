@@ -453,56 +453,65 @@ export class ASRQueueItem {
         // call ASR and than MAUS
         this.transcribeSignalWithASR('txt').then((asrResult) => {
           this.changeProgress(0.8);
-          this.callMAUS(this._selectedLanguage, asrResult.audioURL, asrResult.transcriptURL).then((mausResult) => {
-            const reader = new FileReader();
-
-            reader.onerror = (error) => {
-              console.error(error);
-              this.changeStatus(ASRProcessStatus.FAILED);
-            };
-
-            reader.onload = () => {
-              this._result = reader.result as string;
-              this._progress = 1;
-              this.changeStatus(ASRProcessStatus.FINISHED);
-            };
-
-            reader.readAsText(mausResult.file, 'utf-8');
-          }).catch((error) => {
-            console.error(error);
-
-            if (this.status !== ASRProcessStatus.NOAUTH) {
-              this._result = error;
-              this.changeStatus(ASRProcessStatus.FAILED);
-            }
-          });
+          this.callMAUS(this._selectedLanguage, asrResult.audioURL, asrResult.transcriptURL)
+            .then(this.readMAUSResult).catch(this.onMAUSRequestError);
         }).catch((error) => {
           console.error(`ASR MAUS failed`);
           console.error(error);
         });
       } else if (this._type === ASRQueueItemType.MAUS) {
         console.log(`call MAUS only`);
-        this.processWithMAUSONLY().then((result) => {
-          const reader = new FileReader();
-          reader.onerror = (error) => {
-            console.error(error);
-            this.changeStatus(ASRProcessStatus.FAILED);
-          };
-
-          reader.onload = () => {
-            this._result = reader.result as string;
-            this._progress = 1;
-            this.changeStatus(ASRProcessStatus.FINISHED);
-          };
-
-          reader.readAsText(result.file, 'utf-8');
-        }).catch((error) => {
+        this.processWithMAUSONLY().then(this.readMAUSResult).catch((error) => {
           console.error(error);
         });
       }
       return true;
     }
     return false;
+  }
+
+  private readMAUSResult = (mausResult: {
+    file: File,
+    url: string
+  }) => {
+    this.readTextFromFile(mausResult.file).then((result) => {
+      this._result = result;
+
+      // make sure that there are not any white spaces at the end or new lines
+      this._result = this._result.replace(/\n/g, '').trim();
+
+      this._progress = 1;
+      this.changeStatus(ASRProcessStatus.FINISHED);
+    }).catch((error) => {
+      this._result = 'Could not read result';
+      console.error(error);
+      this.changeStatus(ASRProcessStatus.FAILED);
+    });
+  }
+
+  private readTextFromFile(file: File): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onerror = (error) => {
+        reject('reading result failed');
+      };
+
+      reader.onload = () => {
+        resolve(reader.result as string);
+      };
+
+      reader.readAsText(file, 'utf-8');
+    });
+  }
+
+  private onMAUSRequestError = (error) => {
+    console.error(error);
+
+    if (this.status !== ASRProcessStatus.NOAUTH) {
+      this._result = error;
+      this.changeStatus(ASRProcessStatus.FAILED);
+    }
   }
 
   public stopProcessing(): boolean {
@@ -542,10 +551,8 @@ export class ASRQueueItem {
               // 3) signal audio url to ASR
               this.callASR(this.selectedLanguage, audioURL, outFormat).then((asrResult) => {
                 if (this._status !== ASRProcessStatus.STOPPED) {
-                  const reader = new FileReader();
-                  reader.onload = () => {
-                    this._result = reader.result as string;
-
+                  this.readTextFromFile(asrResult.file).then((result) => {
+                    this._result = result;
                     // make sure that there are not any white spaces at the end or new lines
                     this._result = this._result.replace(/\n/g, '').trim();
 
@@ -553,29 +560,14 @@ export class ASRQueueItem {
                       audioURL,
                       transcriptURL: asrResult.url
                     });
-                  };
-
-                  reader.onerror = (error: any) => {
+                  }).catch((error) => {
                     this._result = 'Could not read result';
                     this.changeStatus(ASRProcessStatus.FAILED);
                     reject(error);
-                  };
-
-                  reader.readAsText(asrResult.file, 'utf-8');
+                  });
                 }
               }).catch((error) => {
-                this._result = error;
-                if (error.indexOf('quota') > -1) {
-                  this.changeStatus(ASRProcessStatus.NOQUOTA);
-                } else if (error.indexOf('0 Unknown Error') > -1) {
-                  this._progress -= 0.1;
-                  this.changeStatus(ASRProcessStatus.NOAUTH);
-                } else {
-                  if (this.status !== ASRProcessStatus.NOAUTH) {
-                    this._result = error;
-                    this.changeStatus(ASRProcessStatus.FAILED);
-                  }
-                }
+                this.checkErrorSituation(error);
                 reject(error);
               });
             }
@@ -636,39 +628,10 @@ export class ASRQueueItem {
               // 3) signal audio url and transcriptURL to MAUS
               this.callMAUS(this.selectedLanguage, audioURL, transcriptURL).then((resultMAUS) => {
                 if (this._status !== ASRProcessStatus.STOPPED) {
-
-                  const reader = new FileReader();
-
-                  reader.onload = () => {
-                    this._result = reader.result as string;
-
-                    // make sure that there are not any white spaces at the end or new lines
-                    this._result = this._result.replace(/\n/g, '').trim();
-
-                    resolve(resultMAUS);
-                  };
-
-                  reader.onerror = (error: any) => {
-                    this._result = 'Could not read result';
-                    this.changeStatus(ASRProcessStatus.FAILED);
-                    reject(error);
-                  };
-
-                  reader.readAsText(resultMAUS.file, 'utf-8');
+                  resolve(resultMAUS);
                 }
               }).catch((error) => {
-                this._result = error;
-                if (error.indexOf('quota') > -1) {
-                  this.changeStatus(ASRProcessStatus.NOQUOTA);
-                } else if (error.indexOf('0 Unknown Error') > -1) {
-                  this._progress -= 0.1;
-                  this.changeStatus(ASRProcessStatus.NOAUTH);
-                } else {
-                  if (this.status !== ASRProcessStatus.NOAUTH) {
-                    this._result = error;
-                    this.changeStatus(ASRProcessStatus.FAILED);
-                  }
-                }
+                this.checkErrorSituation(error);
                 reject(error);
               });
             }
@@ -737,25 +700,11 @@ export class ASRQueueItem {
         },
         responseType: 'text'
       }).subscribe((result: string) => {
-          // convert result to json
-          const x2js = new X2JS();
-          let json: any = x2js.xml2js(result);
-          json = json.WebServiceResponseLink;
-
-          if (json.success === 'true') {
-            const file = FileInfo.fromURL(json.downloadLink, `OCTRA_ASRqueueItem_${this._id}.txt`, 'text/plain');
-            file.updateContentFromURL(this.parent.httpClient).then(() => {
-              // add messages to protocol
-              resolve({
-                file: file.file,
-                url: json.downloadLink
-              });
-            }).catch((error) => {
-              reject(error);
-            });
-          } else {
-            reject(json.output);
-          }
+          this.extractResultData(result).then((data) => {
+            resolve(data);
+          }).catch((error) => {
+            reject(error);
+          });
         },
         (error) => {
           if (error.message.indexOf('0 Unknown Error') > -1) {
@@ -787,25 +736,11 @@ export class ASRQueueItem {
         },
         responseType: 'text'
       }).subscribe((result: string) => {
-          // convert result to json
-          const x2js = new X2JS();
-          let json: any = x2js.xml2js(result);
-          json = json.WebServiceResponseLink;
-
-          if (json.success === 'true') {
-            const file = FileInfo.fromURL(json.downloadLink, `OCTRA_ASRqueueItem_${this._id}.txt`, 'text/plain');
-            file.updateContentFromURL(this.parent.httpClient).then(() => {
-              // add messages to protocol
-              resolve({
-                file: file.file,
-                url: json.downloadLink
-              });
-            }).catch((error) => {
-              reject(error);
-            });
-          } else {
-            reject(json.output);
-          }
+          this.extractResultData(result).then((data) => {
+            resolve(data);
+          }).catch((error) => {
+            reject(error);
+          });
         },
         (error) => {
           console.log(error.message);
@@ -816,6 +751,45 @@ export class ASRQueueItem {
           }
           reject(error.message);
         });
+    });
+  }
+
+  private checkErrorSituation(error: string) {
+    this._result = error;
+    if (error.indexOf('quota') > -1) {
+      this.changeStatus(ASRProcessStatus.NOQUOTA);
+    } else if (error.indexOf('0 Unknown Error') > -1) {
+      this._progress -= 0.1;
+      this.changeStatus(ASRProcessStatus.NOAUTH);
+    } else {
+      if (this.status !== ASRProcessStatus.NOAUTH) {
+        this._result = error;
+        this.changeStatus(ASRProcessStatus.FAILED);
+      }
+    }
+  }
+
+  private extractResultData = (result: string): Promise<{ file: File, url: string }> => {
+    return new Promise<{ file: File, url: string }>((resolve, reject) => {
+      // convert result to json
+      const x2js = new X2JS();
+      let json: any = x2js.xml2js(result);
+      json = json.WebServiceResponseLink;
+
+      if (json.success === 'true') {
+        const file = FileInfo.fromURL(json.downloadLink, `OCTRA_ASRqueueItem_${this._id}.txt`, 'text/plain');
+        file.updateContentFromURL(this.parent.httpClient).then(() => {
+          // add messages to protocol
+          resolve({
+            file: file.file,
+            url: json.downloadLink
+          });
+        }).catch((error) => {
+          reject(error);
+        });
+      } else {
+        reject(json.output);
+      }
     });
   }
 }

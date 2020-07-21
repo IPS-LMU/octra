@@ -7,6 +7,7 @@ import {IDataEntry} from '../../obj/data-entry';
 import {IndexedDBManager} from '../../obj/IndexedDBManager';
 import {SessionFile} from '../../obj/SessionFile';
 import {ConsoleEntry} from './bug-report.service';
+import {FileProgress} from '../../obj/objects';
 
 export interface IIDBLevel {
   id: number;
@@ -537,11 +538,7 @@ export class AppStorageService {
               public localStr: LocalStorageService) {
   }
 
-  public beginLocalSession = (files: {
-    status: string,
-    file: File,
-    checked_converters: number
-  }[], keepData: boolean, navigate: () => void, err: (error: string) => void) => {
+  public beginLocalSession = (files: FileProgress[], keepData: boolean, navigate: () => void, err: (error: string) => void) => {
     if (!(files === null || files === undefined)) {
       // get audio file
       let audiofile;

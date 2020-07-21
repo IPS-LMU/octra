@@ -230,7 +230,9 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
                   case('play_pause'):
                     triggerUIAction({shortcut: comboKey, value: shortcut});
                     if (this.audiochunk.isPlaying) {
-                      this.audiochunk.pausePlayback();
+                      this.audiochunk.pausePlayback().catch((error) => {
+                        console.error(error);
+                      });
                     } else {
                       this.audiochunk.startPlayback(false).catch((error) => {
                         console.error(error);

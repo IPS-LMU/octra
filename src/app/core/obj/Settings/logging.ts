@@ -1,5 +1,3 @@
-import {SampleInterval} from 'octra-components';
-
 export interface ILogging {
   version: string;
   encoding: string; // Bsp.: "UTF-8"
@@ -9,6 +7,11 @@ export interface ILogging {
   duration: number;
   sampleRate: number;
   logs: ILog[];
+}
+
+export interface SampleInterval {
+  start: number;
+  length: number;
 }
 
 export interface ILog {

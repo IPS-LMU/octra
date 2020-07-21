@@ -40,11 +40,7 @@ export class StatisticsModalComponent implements OnInit {
   }
 
   public get isvalid(): boolean {
-    if (this.sendProObj || this.bgdescr !== '') {
-      return true;
-    } else {
-      return false;
-    }
+    return this.sendProObj || this.bgdescr !== '';
   }
 
   get UIElements(): StatisticElem[] {

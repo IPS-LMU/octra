@@ -25,6 +25,11 @@ export interface ConsoleEntry {
   message: string;
 }
 
+export interface BugReportCredentials {
+  auth_token: string;
+  url: string;
+}
+
 @Injectable()
 export class BugReportService {
   private reporter: BugReporter;
@@ -153,10 +158,10 @@ export class BugReportService {
     return '';
   }
 
-  sendReport(name: string, email: string, description: string, sendbugreport: boolean, credentials: {
-    auth_token: string,
-    url: string
-  }, screenshots: any[]): Observable<any> {
+  sendReport(
+    name: string, email: string, description: string, sendbugreport: boolean,
+    credentials: BugReportCredentials, screenshots: any[]
+  ): Observable<any> {
     const bugreportSettings = this.settService.appSettings.octra.bugreport;
 
     if (!(bugreportSettings === null || bugreportSettings === undefined) && bugreportSettings.enabled) {

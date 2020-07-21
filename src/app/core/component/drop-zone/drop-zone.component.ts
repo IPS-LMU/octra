@@ -51,8 +51,7 @@ export class DropZoneComponent implements OnInit {
     $event.preventDefault();
 
     if (this.fileAPIsupported) {
-      const files: FileList = $event.dataTransfer.files; // FileList object.
-      this._files = files;
+      this._files = $event.dataTransfer.files;
       this.afterdrop.emit(this._files);
     }
   }
@@ -64,8 +63,7 @@ export class DropZoneComponent implements OnInit {
   }
 
   onFileChange($event) {
-    const files: FileList = $event.target.files;
-    this._files = files;
+    this._files = $event.target.files;
     this.afterdrop.emit(this._files);
   }
 }

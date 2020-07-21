@@ -469,7 +469,9 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
                       this.selectedAudioChunk = currentAudioChunk;
                       this.triggerUIActionAfterShortcut({shortcut: comboKey, value: shortcut}, displayType);
                       if (currentAudioChunk.isPlaying) {
-                        currentAudioChunk.pausePlayback();
+                        currentAudioChunk.pausePlayback().catch((error) => {
+                          console.error(error);
+                        });
                       } else {
                         currentAudioChunk.startPlayback(false).catch((error) => {
                           console.error(error);
@@ -695,15 +697,17 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     new_value: number, timestamp: number
   }) {
     if (this.appStorage.logging) {
-      const segment = null;
+      let segment = null;
 
       if (this.segmentselected && this.selectedIndex > -1) {
         const annoSegment = this.transcrService.currentlevel.segments.get(this.selectedIndex);
-        segment.start = annoSegment.time.samples;
-        segment.length = (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
-          ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.samples
-          - annoSegment.time.samples
-          : this.audioManager.ressource.info.duration.samples - annoSegment.time.samples;
+        segment = {
+          start: annoSegment.time.samples,
+          length: (this.selectedIndex < this.transcrService.currentlevel.segments.length - 1)
+            ? this.transcrService.currentlevel.segments.get(this.selectedIndex + 1).time.samples
+            - annoSegment.time.samples
+            : this.audioManager.ressource.info.duration.samples - annoSegment.time.samples
+        };
       }
 
       this.uiService.addElementFromEvent('slider', event, event.timestamp, this.audioManager.playposition,

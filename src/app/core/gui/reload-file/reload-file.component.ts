@@ -37,7 +37,7 @@ export class ReloadFileComponent implements OnInit {
     Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).catch((error) => {
       console.error(error);
     });
-  };
+  }
 
   newTranscription = () => {
     this.modService.show('transcriptionDelete').then((decision) => {

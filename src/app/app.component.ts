@@ -121,7 +121,10 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       () => {
         if (!isUnset(this.appStorage.asrSelectedService) && !isUnset(this.appStorage.asrSelectedLanguage)) {
           // set asr settings
-          const lang: ASRLanguage = this.asrService.getLanguageByCode(this.appStorage.asrSelectedLanguage, this.appStorage.asrSelectedService);
+          const selectedLanguage = this.appStorage.asrSelectedLanguage;
+          const selectedService = this.appStorage.asrSelectedService;
+          const lang: ASRLanguage = this.asrService.getLanguageByCode(selectedLanguage, selectedService);
+
           if (!isUnset(lang)) {
             this.asrService.selectedLanguage = lang;
           } else {

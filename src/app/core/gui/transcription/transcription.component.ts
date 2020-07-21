@@ -810,7 +810,10 @@ export class TranscriptionComponent implements OnInit,
       this.appStorage.prompttext = '';
       this.appStorage.servercomment = audioExample.description;
 
-      Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling);
+      Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
+        console.error(`navigation failed`);
+        console.error(error);
+      });
     }
   }
 

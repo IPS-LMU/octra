@@ -267,7 +267,9 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           case('play_pause'):
             this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
             if (this.audiochunk.isPlaying) {
-              this.audiochunk.pausePlayback();
+              this.audiochunk.pausePlayback().catch((error) => {
+                console.error(error);
+              });
             } else {
               this.audiochunk.startPlayback(false).catch((error) => {
                 console.error(error);
@@ -374,22 +376,17 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       const previous: AudioChunk = obj.audiochunk.previousValue;
       const current: AudioChunk = obj.audiochunk.currentValue;
 
-      if (!isUnset(current)) {
-        if (((previous === null || previous === undefined) && !(current === null || current === undefined)) ||
-          (
-            current.time.start.samples !== previous.time.start.samples &&
-            current.time.end.samples !== previous.time.end.samples
-          )) {
-          console.log(`_audiochunk change ok not null`);
-          // audiochunk changed
-          console.log(`_audiochunk changed ${current.status}`);
-          this.listenToAudioChunkStatusChanges();
+      if ((isUnset(previous) && !isUnset(current)) ||
+        (
+          current.time.start.samples !== previous.time.start.samples &&
+          current.time.end.samples !== previous.time.end.samples
+        )) {
+        console.log(`_audiochunk change ok not null`);
+        // audiochunk changed
+        console.log(`_audiochunk changed ${current.status}`);
+        this.listenToAudioChunkStatusChanges();
 
-          this.setValidationEnabledToDefault();
-
-          // TODO important update needed?
-          // this.loupe.update();
-        }
+        this.setValidationEnabledToDefault();
       }
     }
   }
@@ -589,6 +586,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
         if (!isUnset(segment)) {
           this.editor.rawText = this.transcrService.currentlevel.segments.get(this.segmentIndex).transcript;
+          // noinspection JSObjectNullOrUndefined
           this.audiochunk = this.audioManager.createNewAudioChunk(new AudioSelection(begin, segment.time.clone()));
 
           // resolve only after the audio viewer is ready

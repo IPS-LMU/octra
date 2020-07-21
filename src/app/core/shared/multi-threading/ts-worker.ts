@@ -189,7 +189,7 @@ export class TsWorker {
    * the script for the inline web worker
    */
   private getWorkerScript(): string {
-    const result = `var job = null;
+    return `var job = null;
 var base = self;
 
 onmessage = (msg) => {
@@ -221,6 +221,5 @@ onmessage = (msg) => {
             break;
     }
 };`;
-    return result;
   }
 }

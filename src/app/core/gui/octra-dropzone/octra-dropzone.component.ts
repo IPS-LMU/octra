@@ -6,14 +6,7 @@ import {ModalService} from '../../modals/modal.service';
 import {Converter, IFile, ImportResult} from '../../obj/Converters';
 import {SessionFile} from '../../obj/SessionFile';
 import {SubscriptionManager} from 'octra-components';
-
-interface FileProgress {
-  status: 'progress' | 'valid' | 'invalid';
-  file: File;
-  checked_converters: number;
-  progress: number;
-  error: string;
-}
+import {FileProgress} from '../../obj/objects';
 
 @Component({
   selector: 'octra-dropzone',

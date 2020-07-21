@@ -601,7 +601,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           case('play_pause'):
             this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
             if (this.audioChunkLines.isPlaying) {
-              this.audioChunkLines.pausePlayback();
+              this.audioChunkLines.pausePlayback().catch((error) => {
+                console.error(error);
+              });
             } else {
               this.audioChunkLines.startPlayback(false).catch((error) => {
                 console.error(error);

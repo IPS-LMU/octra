@@ -313,7 +313,7 @@ footer {
   filter: alpha(opacity=20);
 }
 
-column.ng-star-inserted.gu-mirror .delete-column fa-icon {
+.column.ng-star-inserted.gu-mirror .delete-column fa-icon {
   color: gray;
 }
 
@@ -349,7 +349,7 @@ column.ng-star-inserted.gu-mirror .delete-column fa-icon {
   width: 100%;
 }
 
-star .column.ng-star-inserted.gu-mirror {
+.star .column.ng-star-inserted.gu-mirror {
   padding: 0;
   position: relative;
   border: 1px solid gray;

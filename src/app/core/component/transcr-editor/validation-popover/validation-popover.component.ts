@@ -22,8 +22,6 @@ export class ValidationPopoverComponent implements OnInit, AfterViewChecked {
 
   public get title(): string {
     return this._title;
-    this.cd.markForCheck();
-    this.cd.detectChanges();
   }
 
   public set title(value: string) {

@@ -1,7 +1,7 @@
 /***
  * Statistic Element Class
  */
-import {ILog} from '../Settings/logging';
+import {ILog, SampleInterval} from '../Settings/logging';
 
 export class StatisticElem {
   protected data: {
@@ -9,14 +9,8 @@ export class StatisticElem {
     type: string,
     context: string,
     value: any,
-    selection?: {
-      start: number;
-      length: number;
-    },
-    segment?: {
-      start: number;
-      length: number;
-    },
+    selection?: SampleInterval,
+    segment?: SampleInterval,
     playpos?: number;
     caretpos?: number;
   } = {
@@ -26,31 +20,19 @@ export class StatisticElem {
     value: null
   };
 
-  get selection(): {
-    start: number;
-    length: number;
-  } {
+  get selection(): SampleInterval {
     return this.data.selection;
   }
 
-  set selection(value: {
-    start: number;
-    length: number;
-  }) {
+  set selection(value: SampleInterval) {
     this.data.selection = value;
   }
 
-  get segment(): {
-    start: number;
-    length: number;
-  } {
+  get segment(): SampleInterval {
     return this.data.segment;
   }
 
-  set segment(value: {
-    start: number;
-    length: number;
-  }) {
+  set segment(value: SampleInterval) {
     this.data.segment = value;
   }
 
@@ -82,13 +64,10 @@ export class StatisticElem {
     return this.data.caretpos;
   }
 
-  constructor(type: string, context: string, value: any, timestamp: number, playpos: number, selection: {
-    start: number;
-    length: number;
-  }, segment: {
-    start: number;
-    length: number;
-  }) {
+  constructor(
+    type: string, context: string, value: any, timestamp: number, playpos: number, selection: SampleInterval,
+    segment: SampleInterval
+  ) {
     this.data.type = type;
     this.data.context = context;
     this.data.timestamp = timestamp;

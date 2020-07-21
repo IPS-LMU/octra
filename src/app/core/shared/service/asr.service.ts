@@ -478,7 +478,7 @@ export class ASRQueueItem {
       this._result = result;
 
       // make sure that there are not any white spaces at the end or new lines
-      this._result = this._result.replace(/\n/g, '').trim();
+      // this._result = this._result.replace(/\n/g, '').trim();
 
       this._progress = 1;
       this.changeStatus(ASRProcessStatus.FINISHED);

@@ -756,7 +756,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       };
     }
 
-    this.uiService.addElementFromEvent('slider_changed', event, event.timestamp,
+    this.uiService.addElementFromEvent('slider', event, event.timestamp,
       this.audioManager.playposition, this.editor.caretpos, selection, segment, 'audio_speed');
   }
 

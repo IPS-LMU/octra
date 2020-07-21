@@ -141,7 +141,7 @@ export class TranscriptionComponent implements OnInit,
     this.navbarServ.uiService = this.uiService;
 
     this.subscrmanager.add(this.audioManager.statechange.subscribe((state) => {
-        if (!this.audioManager.playOnHover && !this.modalOverview.visible) {
+        if (!appStorage.playonhover && !this.modalOverview.visible) {
           let caretpos = -1;
 
           if (!isUnset(this.currentEditor) && !isUnset((this.currentEditor.instance as any).editor)) {
@@ -149,12 +149,7 @@ export class TranscriptionComponent implements OnInit,
           }
 
           // make sure that events from playonhover are not logged
-          if (state !== PlayBackStatus.PLAYING && state !== PlayBackStatus.INITIALIZED && state !== PlayBackStatus.PREPARE) {
-            this.uiService.addElementFromEvent('audio',
-              {value: state.toLowerCase()}, Date.now(),
-              this.audioManager.playposition,
-              caretpos, null, null, this.appStorage.Interface);
-          }
+          this.uiService.logAudioEvent(this.appStorage.Interface, state, this.audioManager.playposition, caretpos, null, null);
         }
       },
       (error) => {

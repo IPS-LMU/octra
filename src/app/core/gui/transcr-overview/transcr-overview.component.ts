@@ -13,7 +13,15 @@ import {
   ViewChild
 } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
-import {AudioChunk, AudioSelection, isFunction, isUnset, PlayBackStatus, SampleUnit, Segment, SubscriptionManager} from 'octra-components';
+import {
+  AudioChunk,
+  AudioSelection,
+  isFunction,
+  isUnset,
+  SampleUnit,
+  Segment,
+  SubscriptionManager
+} from 'octra-components';
 import {TranscrEditorComponent} from '../../component/transcr-editor';
 import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
 
@@ -152,12 +160,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     this.subscrmanager.add(this.audio.audiomanagers[0].statechange.subscribe((state) => {
         if (this._visible) {
           // make sure that events from playonhover are not logged
-          if (state !== PlayBackStatus.PLAYING && state !== PlayBackStatus.INITIALIZED && state !== PlayBackStatus.PREPARE) {
-            this.uiService.addElementFromEvent('audio',
-              {value: state.toLowerCase()}, Date.now(),
-              this.audio.audiomanagers[0].playposition,
-              null, null, null, 'overview');
-          }
+          this.uiService.logAudioEvent('overview', state, this.audio.audiomanagers[0].playposition, null, null, null);
         }
       },
       (error) => {

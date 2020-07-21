@@ -35,6 +35,7 @@ import {
 } from '../../core/shared/service';
 import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {OCTRAEditor} from '../octra-editor';
+import {AudioViewerShortcutEvent} from '../../../../../octra-components/projects/octra-components/src/lib/components/audio/audio-viewer';
 
 @Component({
   selector: 'octra-signal-gui',
@@ -435,6 +436,10 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
   onTranscriptionChanged($event) {
     this.save();
+  }
+
+  onViewerShortcutTriggered($event: AudioViewerShortcutEvent, control: string) {
+    this.triggerUIActionAfterShortcut($event, control);
   }
 
   onShortcutTriggered = ($event: KeyMappingShortcutEvent) => {

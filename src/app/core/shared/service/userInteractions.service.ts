@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {Functions, isUnset, SampleUnit} from 'octra-components';
+import {Functions, isUnset, PlayBackStatus, SampleUnit} from 'octra-components';
 import {OLog} from '../../obj/Settings/logging';
 import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
@@ -130,6 +130,16 @@ export class UserInteractionsService {
           newElem.value = (elem as StatisticElem).value;
         }
       }
+    }
+  }
+
+  public logAudioEvent(context: string, state: PlayBackStatus, playposition: SampleUnit, caretpos: number,
+                       selection: { start: number, length: number }, segment: { start: number, length: number }) {
+    if (state !== PlayBackStatus.PLAYING && state !== PlayBackStatus.INITIALIZED && state !== PlayBackStatus.PREPARE) {
+      this.addElementFromEvent('audio',
+        {value: state.toLowerCase()}, Date.now(),
+        playposition,
+        caretpos, selection, segment, context);
     }
   }
 

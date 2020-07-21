@@ -474,11 +474,10 @@ export class TranscriptionService {
                 console.error(error);
               });
               this.uiService.elements = [];
-              this.uiService.addElementFromEvent('octra', {value: AppInfo.version}, Date.now(), null, -1, null, null, 'version');
             } else {
               this.uiService.fromAnyArray(this.appStorage.logs);
-              this.uiService.addElementFromEvent('octra', {value: AppInfo.version}, Date.now(), null, -1, null, null, 'version');
             }
+            this.uiService.addElementFromEvent('octra', {value: AppInfo.version}, Date.now(), null, -1, null, null, 'version');
 
             this.navbarServ.dataloaded = true;
             this.dataloaded.emit();

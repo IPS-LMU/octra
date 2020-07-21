@@ -66,6 +66,7 @@
                     (mouseleave)="miniloupe.isHidden = true;"
                     (segmententer)="onSegmentEnter($event)"
                     (selchange)="onSelectionChanged($event)"
+                    (shortcuttriggered)="onViewerShortcutTriggered($event, 'signaldisplay_top')"
                     [audioChunk]="audioChunkTop"
                     [breakMarker]="{
                         code: '<P>'
@@ -77,6 +78,7 @@
 </div>
 
 <oco-audio-viewer #signalDisplayDown
+                  (shortcuttriggered)="onViewerShortcutTriggered($event, 'signaldisplay_down')"
                   (alerttriggered)="onAlertTriggered($event)"
                   (click)="onLoupeClick($event)"
                   (mousedown)="onViewerMouseDown($event)"

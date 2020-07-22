@@ -346,6 +346,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.loupe.settings.roundValues = false;
     this.loupe.settings.showTimePerLine = true;
     this.loupe.settings.showProgressBars = true;
+    this.loupe.settings.multiLine = false;
     this.loupe.av.drawnSelection = null;
 
     const segments = this.transcrService.currentlevel.segments;

@@ -1182,7 +1182,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         cursor: 'pointer'
       });
       const timespan = new TimespanPipe();
-      const text = timespan.transform(time.unix, [1, 1, this.audiochunk.time.duration.unix]);
+      const text = timespan.transform(time.unix, {
+        showHour: true,
+        showMilliSeconds: true,
+        maxDuration: this.audiochunk.time.duration.unix
+      });
       segPopover.text(text);
     }
   }

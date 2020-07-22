@@ -41,4 +41,8 @@ export class NewEditorComponent extends OCTRAEditor implements OnInit {
   disableAllShortcuts() {
   }
 
+  openSegment(index: number) {
+    // only needed if an segment can be opened. For audio files smaller than 35 sec
+  }
+
 }

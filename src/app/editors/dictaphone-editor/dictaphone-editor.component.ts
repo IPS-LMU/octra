@@ -418,6 +418,10 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     this.appStorage.savingNeeded = true;
   }
 
+  openSegment(index: number) {
+    // ignore
+  }
+
   private loadEditor() {
     if (this.transcrService.currentlevel.segments.length > 0) {
       this.editor.segments = this.transcrService.currentlevel.segments;

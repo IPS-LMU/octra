@@ -56,8 +56,7 @@ export abstract class OCTRAEditor {
     });
   }
 
-  protected openSegment(index: number) {
-  }
+  abstract openSegment(index: number);
 
   protected checkIfSmallAudioChunk(audioChunk: AudioChunk, currentLevel: Level) {
     const emptySegmentIndex = currentLevel.segments.segments.findIndex((a) => {

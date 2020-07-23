@@ -1,5 +1,5 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {SubscriptionManager} from '@octra/components';
+import {SubscriptionManager} from '@octra/utilities';
 import {APIService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 

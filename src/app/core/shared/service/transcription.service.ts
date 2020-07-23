@@ -11,9 +11,9 @@ import {
   OLabel,
   OLevel,
   OSegment,
-  Segments,
-  SubscriptionManager
+  Segments
 } from '@octra/components';
+import {SubscriptionManager} from '@octra/utilities';
 import {isArray} from 'rxjs/internal-compatibility';
 import {AnnotJSONConverter, PartiturConverter, TextConverter} from '../';
 import {AppInfo} from '../../../app.info';

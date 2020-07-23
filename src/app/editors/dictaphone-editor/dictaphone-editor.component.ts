@@ -16,9 +16,9 @@ import {
   BrowserInfo,
   isUnset,
   SampleUnit,
-  Segment,
-  SubscriptionManager
+  Segment
 } from '@octra/components';
+import {SubscriptionManager} from '@octra/utilities';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 
 import {

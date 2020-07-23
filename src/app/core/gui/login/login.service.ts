@@ -1,6 +1,6 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {SubscriptionManager} from '@octra/components';
+import {SubscriptionManager} from '@octra/utilities';
 
 @Injectable()
 export class LoginService {

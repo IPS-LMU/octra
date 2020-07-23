@@ -25,9 +25,9 @@ import {
   OSegment,
   PlayBackStatus,
   SampleUnit,
-  Segment,
-  SubscriptionManager
+  Segment
 } from '@octra/components';
+import {SubscriptionManager} from '@octra/utilities';
 import {interval, Subscription} from 'rxjs';
 import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
 import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';

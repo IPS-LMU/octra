@@ -18,9 +18,9 @@ import {
   AudioviewerConfig, AudioViewerShortcutEvent,
   Functions,
   isUnset,
-  SampleUnit,
-  SubscriptionManager
+  SampleUnit
 } from '@octra/components';
+import {SubscriptionManager} from '@octra/utilities';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {BrowserInfo} from '../../core/shared';
 

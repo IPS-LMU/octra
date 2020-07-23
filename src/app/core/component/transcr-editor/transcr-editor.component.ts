@@ -20,7 +20,6 @@ import {
   KeyMapping,
   SampleUnit,
   Segments,
-  SubscriptionManager,
   TimespanPipe
 } from '@octra/components';
 import {isNumeric} from 'rxjs/internal-compatibility';
@@ -31,6 +30,7 @@ import {TranscriptionService} from '../../shared/service';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../shared/service/asr.service';
 import {TranscrEditorConfig} from './config';
 import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
+import {SubscriptionManager} from '@octra/utilities';
 
 declare let document: any;
 

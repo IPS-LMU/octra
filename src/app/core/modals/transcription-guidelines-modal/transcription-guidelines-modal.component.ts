@@ -14,7 +14,7 @@ import {TranslocoService} from '@ngneat/transloco';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {isUnset} from '@octra/components';
 import {Subject} from 'rxjs';
-import {SubscriptionManager} from '@octra/components';
+import {SubscriptionManager} from '@octra/utilities';
 import {SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService} from '../../shared/service/bug-report.service';

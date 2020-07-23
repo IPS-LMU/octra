@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {SubscriptionManager} from '@octra/components';
+import {SubscriptionManager} from '@octra/utilities';
 import {SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AsrService} from '../../shared/service/asr.service';
 

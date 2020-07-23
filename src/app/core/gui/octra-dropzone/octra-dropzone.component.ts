@@ -5,7 +5,7 @@ import {DropZoneComponent} from '../../component/drop-zone';
 import {ModalService} from '../../modals/modal.service';
 import {Converter, IFile, ImportResult} from '../../obj/Converters';
 import {SessionFile} from '../../obj/SessionFile';
-import {SubscriptionManager} from '@octra/components';
+import {SubscriptionManager} from '@octra/utilities';
 import {FileProgress} from '../../obj/objects';
 
 @Component({

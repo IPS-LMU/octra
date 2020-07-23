@@ -19,9 +19,9 @@ import {
   isFunction,
   isUnset,
   SampleUnit,
-  Segment,
-  SubscriptionManager
+  Segment
 } from '@octra/components';
+import {SubscriptionManager} from '@octra/utilities';
 import {TranscrEditorComponent} from '../../component/transcr-editor';
 import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
 

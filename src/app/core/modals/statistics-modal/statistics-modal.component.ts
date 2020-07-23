@@ -4,7 +4,7 @@ import {Subject} from 'rxjs';
 import {NavbarService} from '../../gui/navbar/navbar.service';
 import {TextConverter} from '../../obj/Converters';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
-import {SubscriptionManager} from '@octra/components';
+import {SubscriptionManager} from '@octra/utilities';
 import {TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 

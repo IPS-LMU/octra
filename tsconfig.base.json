@@ -1,0 +1,28 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es2017", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@octra/utilities": ["libs/utilities/src/index.ts"],
+      "@octra/annotation": ["libs/annotation/src/index.ts"],
+      "@octra/test-lib": ["libs/test-lib/src/index.ts"],
+      "@octra/media": ["libs/media/src/index.ts"],
+      "@octra/ui": ["libs/ui/src/index.ts"],
+      "@octra/components": ["libs/components/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

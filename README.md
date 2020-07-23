@@ -1,121 +1,98 @@
-<h1 align="center">OCTRA v1.4.x</h1>
+# Octra
 
-<p align="center">
-  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor3_1.png" alt="2D-Editor">
-  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor3_2.png" alt="2D-Editor">
-  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor2.png" alt="Linear Editor">
-  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor1.png" alt="Dictaphone Editor">
-  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/overview.png" alt="Linear Editor">
-  <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/export.png" alt="Dictaphone Editor">
-</p>
-<p align="center">
-<a href="https://clarin.phonetik.uni-muenchen.de/apps/octra/octra/features">
-  More information
-</a>
-</p>
+This project was generated using [Nx](https://nx.dev).
 
-This is a web-application for the orthographic transcription of audiofiles. For now, it uses three editors for the orthographic transcription:
+<p align="center"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
 
-* Dictaphone Editor: An typical, easy-to-use editor with just a texteditor and an audioplayer.
-* Linear-Editor: This editor shows two signaldisplays: One for the whole view of the signal and one as loupe. You can set boundaries and define segments.
-* 2D-Editor: This editor breaks the whole view of the signal to pieces and shows the pieces as lines one after one. Here you can set boundaries und define segments too.
+🔎 **Nx is a set of Extensible Dev Tools for Monorepos.**
 
-## User Manual
-You can find the manual for users here: [OCTRA Manual](https://www.phonetik.uni-muenchen.de/apps/octra/manual/1.4.0/)
+## Quick Start & Documentation
 
-## Features
-* Three different editors
-* Noise markers (placeholders) in the form of icons in text. Icons can be UTF-8 symbols, too.  
-* Auto-saving of the transcription progress to prevent data loss
-* Import/Export support for various file formats like AnnotJSON, Textgrid, Text, Table and more.
-* Validation using project specific guidelines. **New: text editor supports inline validation **
-* Shortcuts for faster transcriptions
-* Multi-Tiers support in local mode
-* Logging of user activities for further studies
-* Localization of the GUI
-* Customization with configuration files for the app, project, guidelines and validation methods.
-* Segment boundaries as markers in text
-* Overview window to see the whole transcript
-* Cutting audio files up to 300 MB
-* Visible transcripts in 2D-Editor
-* **New:** Costum table generator
-* **New:** ASR support for transcription and segmentation
+[Nx Documentation](https://nx.dev/angular)
 
+[10-minute video showing all Nx features](https://nx.dev/angular/getting-started/what-is-nx)
 
-## Remarks
-At the moment, OCTRA's online mode supports only one specific server database. That means, if you install OCTRA on your server, you can only use the local mode. We are working on supporting other servers.
+[Interactive Tutorial](https://nx.dev/angular/tutorial/01-create-application)
 
-## Production Use
+## Adding capabilities to your workspace
 
-### OCTRA website
+Nx supports many plugins which add capabilities for developing different types of applications and different tools.
 
-If you don't want to install OCTRA, you can use the latest release [here](https://www.phonetik.uni-muenchen.de/apps/octra/octra/).
+These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
 
-### Installation
-In a production environment you don't need to compile OCTRA again.
+Below are our core plugins:
 
-1. Download the latest release from the releases page.``
+- [Angular](https://angular.io)
+  - `ng add @nrwl/angular`
+- [React](https://reactjs.org)
+  - `ng add @nrwl/react`
+- Web (no framework frontends)
+  - `ng add @nrwl/web`
+- [Nest](https://nestjs.com)
+  - `ng add @nrwl/nest`
+- [Express](https://expressjs.com)
+  - `ng add @nrwl/express`
+- [Node](https://nodejs.org)
+  - `ng add @nrwl/node`
 
-2. Extract and Copy its content to your http-server. If you have already installed an older version of OCTRA, please notice to not override the old config folder. More information about upgrading can be found in the next section.
+There are also many [community plugins](https://nx.dev/nx-community) you could add.
 
-3. Before you can use OCTRA, duplicate and rename the `appconfig_sample.json` to `appconfig.json` in the config folder. Please make sure, that you offer all translation files for any language you defined in config.json.
+## Generate an application
 
-4. To make OCTRA work please change the 'database:name' entry in your appconfig.json. After the first launch a new local database with this name will be created.
+Run `ng g @nrwl/angular:app my-app` to generate an application.
 
-5. Please have a look on the projectconfig.json in the localmode folder. In this file you can change the settings of the local mode.
+> You can use any of the plugins above to generate applications as well.
 
-6. Change the baseref attribute in the index.html according to the url where your OCTRA installation is hosted.
+When using Nx, you can create multiple applications and libraries in the same workspace.
 
-7. Test if OCTRA works and check the webconsole if all works fine. If there are no errors you can use OCTRA.
+## Generate a library
 
-### Upgrade
+Run `ng g @nrwl/angular:lib my-lib` to generate a library.
 
-1. Duplicate and rename your octra directory (e.g. to 'octra_backup') on your server.
+> You can also use any of the plugins above to generate libraries as well.
 
-2. Download the new OCTRA release and upload the 'dist' folder to your server next to the backup and rename it to the same name like before (e.g. 'octra').
+Libraries are sharable across libraries and applications. They can be imported from `@octra/mylib`.
 
-3. Copy your old appconfig.json and localmode folder to the new config directory.
+## Development server
 
-4. Compare your appconfig.json with the new appconfig_samples.json file. If there are new entries, just copy and paste them to your appconfig.
+Run `ng serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
 
-5. Compare your projectconfig.json file with the new projectconfig.json file in the localmode folder.
+## Code scaffolding
 
-6. Change the baseref attribute in the index.html according to the url where your OCTRA installation is hosted.
+Run `ng g component my-component --project=my-app` to generate a new component.
 
-7. Test if OCTRA works and check the webconsole if all works fine. If there are no errors you can use OCTRA.
+## Build
 
+Run `ng build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
 
-## Development Use
-On the Development level OCTRA requires Node 6.9.0 or higher, together with NPM 3 or higher.
+## Running unit tests
 
-Then you can install OCTRA:
+Run `ng test my-app` to execute the unit tests via [Jest](https://jestjs.io).
 
-1. Clone the octra repository.
-2. Go to the octra directory via Terminal (or GitBash on Windows).
-3. Call `` npm install ``.
-4. Wait.
-5. Duplicate the file ``src/config/appconfig_sample.json`` and rename it to ``scr/config/appconfig.json``. In appconfig.json you can change the settings of your instance of OCTRA.
-6. After the installation you can call `` npm start `` to start the node server.
-7. After that please read the notice about the config files in the production use section
+Run `nx affected:test` to execute the unit tests affected by a change.
 
+## Running end-to-end tests
 
-## Documentation
+Run `ng e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
 
-* For users: [OCTRA manual](https://www.phonetik.uni-muenchen.de/apps/octra/manual/1.3.0/)
-* For project leaders/administrators: [Github Wiki](https://github.com/IPS-LMU/octra/wiki).
+Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
 
-## Contribution
+## Understand your workspace
 
-### Commit template
-For this project <a href="https://github.com/commitizen/cz-cli">commitizen</a> is used. If you want to contribute to this project you should make use of this tool to create commit messages important for the changelog (other commit messages will be ignored otherwise). For WebStorm or PHPStorm there is a <a href="https://plugins.jetbrains.com/plugin/9861-git-commit-template">Commit Template Plugin</a> to create these templates.
+Run `nx dep-graph` to see a diagram of the dependencies of your projects.
 
-For creating changelog automatically, <a href="https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-changelog-cli">conventional-changelog-cli</a> is used. To create changelogs you need to install conventional-changelog-cli globally as described on its github page. After installation you just need to run `npm run changelog` to create the changelog automatically.
+## Further help
 
-### Translation
-To translate OCTRA to a new language please visit https://www.phonetik.uni-muenchen.de/apps/octra/translation/start.php
+Visit the [Nx Documentation](https://nx.dev/angular) to learn more.
 
-If the language you would like translate to does not exist please send us an email to octra@phonetik.uni-muenchen.de
+## ☁ Nx Cloud
 
+### Computation Memoization in the Cloud
 
-### Affiliations
-[INSTITUTE OF PHONETICS AND SPEECH PROCESSING](http://www.en.phonetik.uni-muenchen.de/)
+<p align="center"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-cloud-card.png"></p>
+
+Nx Cloud pairs with Nx in order to enable you to build and test code more rapidly, by up to 10 times. Even teams that are new to Nx can connect to Nx Cloud and start saving time instantly.
+
+Teams using Nx gain the advantage of building full-stack applications with their preferred framework alongside Nx’s advanced code generation and project dependency graph, plus a unified experience for both frontend and backend developers.
+
+Visit [Nx Cloud](https://nx.app/) to learn more.

@@ -19,7 +19,7 @@ import {ModalModule} from 'ngx-bootstrap/modal';
 import {PopoverModule} from 'ngx-bootstrap/popover';
 import {ProgressbarModule} from 'ngx-bootstrap/progressbar';
 import {TooltipModule} from 'ngx-bootstrap/tooltip';
-import {OctraComponentsModule} from 'octra-components';
+import {OctraComponentsModule} from '@octra/components';
 import {environment} from '../environments/environment';
 
 import {NgxWebstorageModule} from 'ngx-webstorage';

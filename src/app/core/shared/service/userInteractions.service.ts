@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {Functions, isUnset, PlayBackStatus, SampleUnit} from 'octra-components';
+import {Functions, isUnset, PlayBackStatus, SampleUnit} from '@octra/components';
 import {OLog} from '../../obj/Settings/logging';
 import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';

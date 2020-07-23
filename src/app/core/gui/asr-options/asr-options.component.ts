@@ -1,7 +1,7 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
 import {BsDropdownDirective} from 'ngx-bootstrap/dropdown';
-import {AudioChunk, isUnset} from 'octra-components';
+import {AudioChunk, isUnset} from '@octra/components';
 import {AppInfo} from '../../../app.info';
 import {AppSettings, ASRLanguage} from '../../obj/Settings';
 import {AlertService, SettingsService, TranscriptionService} from '../../shared/service';

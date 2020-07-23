@@ -1,4 +1,4 @@
-import {isUnset} from 'octra-components';
+import {isUnset} from '@octra/components';
 import {Observable} from 'rxjs';
 
 export enum IDBMode {

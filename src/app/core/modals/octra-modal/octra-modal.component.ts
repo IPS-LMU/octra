@@ -1,7 +1,7 @@
 import {Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef} from 'ngx-bootstrap/modal';
 import {AppInfo} from '../../../app.info';
-import {SubscriptionManager} from 'octra-components';
+import {SubscriptionManager} from '@octra/components';
 import {APIService, SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService} from '../../shared/service/bug-report.service';

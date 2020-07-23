@@ -11,9 +11,9 @@ import {
   ViewChild
 } from '@angular/core';
 import {DragulaService} from 'ng2-dragula';
-import {isUnset, Segment} from 'octra-components';
+import {isUnset, Segment} from '@octra/components';
 import {Subject} from 'rxjs';
-import {SubscriptionManager} from 'octra-components';
+import {SubscriptionManager} from '@octra/components';
 
 @Component({
   selector: 'octra-naming-drag-and-drop',

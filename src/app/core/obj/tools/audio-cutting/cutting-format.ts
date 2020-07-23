@@ -1,5 +1,5 @@
 import * as moment from 'moment';
-import {AudioInfo} from 'octra-components';
+import {AudioInfo} from '@octra/components';
 
 abstract class CuttingFormat {
   public abstract exportList(cutList: Segment[], audioInfo: AudioInfo, fileName: string, nameConvention: string);

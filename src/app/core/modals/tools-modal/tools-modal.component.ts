@@ -4,7 +4,7 @@ import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
-import {isUnset, Segment, SubscriptionManager, WavFormat} from 'octra-components';
+import {isUnset, Segment, SubscriptionManager, WavFormat} from '@octra/components';
 import {interval, Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';

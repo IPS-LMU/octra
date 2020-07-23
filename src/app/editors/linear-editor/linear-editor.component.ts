@@ -15,12 +15,12 @@ import {
   AudioNavigationComponent,
   AudioSelection,
   AudioViewerComponent,
-  AudioviewerConfig,
+  AudioviewerConfig, AudioViewerShortcutEvent,
   Functions,
   isUnset,
   SampleUnit,
   SubscriptionManager
-} from 'octra-components';
+} from '@octra/components';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {BrowserInfo} from '../../core/shared';
 
@@ -35,7 +35,6 @@ import {
 } from '../../core/shared/service';
 import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {OCTRAEditor} from '../octra-editor';
-import {AudioViewerShortcutEvent} from '../../../../../octra-components/projects/octra-components/src/lib/components/audio/audio-viewer';
 
 @Component({
   selector: 'octra-signal-gui',

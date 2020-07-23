@@ -22,7 +22,7 @@ import {
   Segments,
   SubscriptionManager,
   TimespanPipe
-} from 'octra-components';
+} from '@octra/components';
 import {isNumeric} from 'rxjs/internal-compatibility';
 import {timer} from 'rxjs';
 

@@ -1,12 +1,12 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
-import {isUnset} from 'octra-components';
+import {isUnset} from '@octra/components';
 import {environment} from '../environments/environment';
 import {AppInfo} from './app.info';
 import {NavigationComponent} from './core/gui/navbar';
 import {ASRLanguage} from './core/obj/Settings';
-import {SubscriptionManager} from 'octra-components';
+import {SubscriptionManager} from '@octra/components';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
 import {APIService, SettingsService} from './core/shared/service';
 import {AppStorageService} from './core/shared/service/appstorage.service';

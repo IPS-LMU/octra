@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 
 import {Router} from '@angular/router';
-import {Functions} from 'octra-components';
+import {Functions} from '@octra/components';
 import {AppInfo} from '../../../app.info';
 import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';

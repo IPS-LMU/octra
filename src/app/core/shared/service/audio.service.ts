@@ -1,9 +1,9 @@
 import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
-import {AudioManager, Functions, isUnset} from 'octra-components';
+import {AudioManager, Functions, isUnset} from '@octra/components';
 import {Observable, Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
-import {SubscriptionManager} from 'octra-components';
+import {SubscriptionManager} from '@octra/components';
 
 @Injectable()
 export class AudioService {

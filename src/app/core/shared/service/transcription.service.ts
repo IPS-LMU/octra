@@ -13,7 +13,7 @@ import {
   OSegment,
   Segments,
   SubscriptionManager
-} from 'octra-components';
+} from '@octra/components';
 import {isArray} from 'rxjs/internal-compatibility';
 import {AnnotJSONConverter, PartiturConverter, TextConverter} from '../';
 import {AppInfo} from '../../../app.info';

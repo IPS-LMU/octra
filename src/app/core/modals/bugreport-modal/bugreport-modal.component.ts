@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
-import {SubscriptionManager} from 'octra-components';
+import {SubscriptionManager} from '@octra/components';
 import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService} from '../../shared/service/bug-report.service';

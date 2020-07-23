@@ -3,7 +3,7 @@ import {NgForm} from '@angular/forms';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {sha256} from 'js-sha256';
-import {FileSize, Functions, isUnset, SubscriptionManager} from 'octra-components';
+import {FileSize, Functions, isUnset, SubscriptionManager} from '@octra/components';
 import {Observable, throwError} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {ModalService} from '../../modals/modal.service';

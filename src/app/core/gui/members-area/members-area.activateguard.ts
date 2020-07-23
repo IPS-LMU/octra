@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 
 import {ActivatedRoute, ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
-import {Functions} from 'octra-components';
+import {Functions} from '@octra/components';
 import {Observable} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {AudioService, SettingsService} from '../../shared/service';

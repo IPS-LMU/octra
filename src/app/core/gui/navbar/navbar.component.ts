@@ -1,13 +1,13 @@
 import {AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
-import {AnnotJSONType, Level, Segments} from 'octra-components';
+import {AnnotJSONType, Level, Segments} from '@octra/components';
 import {environment} from '../../../../environments/environment';
 import {AppInfo} from '../../../app.info';
 import {editorComponents} from '../../../editors/components';
 import {ExportFilesModalComponent} from '../../modals/export-files-modal/export-files-modal.component';
 import {ModalService} from '../../modals/modal.service';
-import {SubscriptionManager} from 'octra-components';
+import {SubscriptionManager} from '@octra/components';
 import {SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService, ConsoleType} from '../../shared/service/bug-report.service';

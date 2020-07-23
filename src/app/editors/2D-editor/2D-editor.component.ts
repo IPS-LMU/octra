@@ -18,7 +18,7 @@ import {
   AudioNavigationComponent,
   AudioSelection,
   AudioViewerComponent,
-  AudioviewerConfig,
+  AudioviewerConfig, AudioViewerShortcutEvent,
   Functions,
   isUnset,
   OAudiofile,
@@ -27,9 +27,8 @@ import {
   SampleUnit,
   Segment,
   SubscriptionManager
-} from 'octra-components';
+} from '@octra/components';
 import {interval, Subscription} from 'rxjs';
-import {AudioViewerShortcutEvent} from '../../../../../octra-components/projects/octra-components/src/lib/components/audio/audio-viewer';
 import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
 import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
 import {TranscrEditorComponent} from '../../core/component';

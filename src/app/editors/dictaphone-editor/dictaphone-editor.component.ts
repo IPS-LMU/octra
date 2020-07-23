@@ -18,7 +18,7 @@ import {
   SampleUnit,
   Segment,
   SubscriptionManager
-} from 'octra-components';
+} from '@octra/components';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 
 import {

@@ -21,7 +21,7 @@ import {
   SampleUnit,
   Segment,
   SubscriptionManager
-} from 'octra-components';
+} from '@octra/components';
 import {TranscrEditorComponent} from '../../component/transcr-editor';
 import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
 

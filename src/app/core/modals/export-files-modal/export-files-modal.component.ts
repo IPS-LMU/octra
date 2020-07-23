@@ -4,14 +4,14 @@ import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 import {DragulaService} from 'ng2-dragula';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
-import {isUnset} from 'octra-components';
+import {isUnset} from '@octra/components';
 import {Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
 import {TableConfiguratorComponent} from '../../component/table-configurator/table-configurator.component';
 import {NavbarService} from '../../gui/navbar/navbar.service';
 import {Converter, IFile} from '../../obj/Converters';
-import {SubscriptionManager} from 'octra-components';
+import {SubscriptionManager} from '@octra/components';
 import {AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 

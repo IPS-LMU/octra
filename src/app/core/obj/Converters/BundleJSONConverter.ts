@@ -1,4 +1,4 @@
-import {Functions, IAnnotJSON, OAnnotJSON, OAudiofile} from 'octra-components';
+import {Functions, IAnnotJSON, OAnnotJSON, OAudiofile} from '@octra/components';
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 
 export interface Bundle {

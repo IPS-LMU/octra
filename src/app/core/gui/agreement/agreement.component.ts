@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
-import {Functions} from 'octra-components';
+import {Functions} from '@octra/components';
 import {AppInfo} from '../../../app.info';
-import {SubscriptionManager} from 'octra-components';
+import {SubscriptionManager} from '@octra/components';
 import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 

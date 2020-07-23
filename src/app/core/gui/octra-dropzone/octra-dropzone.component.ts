@@ -1,11 +1,11 @@
 import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {AudioManager, FileSize, Functions, isUnset, OAnnotJSON, OAudiofile, OLabel, OSegment} from 'octra-components';
+import {AudioManager, FileSize, Functions, isUnset, OAnnotJSON, OAudiofile, OLabel, OSegment} from '@octra/components';
 import {AppInfo} from '../../../app.info';
 import {DropZoneComponent} from '../../component/drop-zone';
 import {ModalService} from '../../modals/modal.service';
 import {Converter, IFile, ImportResult} from '../../obj/Converters';
 import {SessionFile} from '../../obj/SessionFile';
-import {SubscriptionManager} from 'octra-components';
+import {SubscriptionManager} from '@octra/components';
 import {FileProgress} from '../../obj/objects';
 
 @Component({

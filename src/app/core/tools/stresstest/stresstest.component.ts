@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {SessionStorage, SessionStorageService} from 'ngx-webstorage';
-import {Functions} from 'octra-components';
+import {Functions} from '@octra/components';
 import {BrowserInfo} from '../../shared';
 
 @Component({

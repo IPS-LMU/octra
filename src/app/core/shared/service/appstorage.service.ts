@@ -1,6 +1,6 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {LocalStorageService, SessionStorage, SessionStorageService} from 'ngx-webstorage';
-import {AudioManager, isUnset, OLevel, OLink} from 'octra-components';
+import {AudioManager, isUnset, OLevel, OLink} from '@octra/components';
 import {Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {IDataEntry} from '../../obj/data-entry';

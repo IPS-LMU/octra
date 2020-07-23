@@ -2,7 +2,7 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
 import * as moment from 'moment';
-import {Functions, isUnset} from 'octra-components';
+import {Functions, isUnset} from '@octra/components';
 import {Observable} from 'rxjs';
 import {isArray} from 'rxjs/internal-compatibility';
 import {AppInfo} from '../../../app.info';

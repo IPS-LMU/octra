@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
-import {FileSize, Functions} from 'octra-components';
+import {FileSize, Functions} from '@octra/components';
 import {AppInfo} from '../../../app.info';
 import {ModalService} from '../../modals/modal.service';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';

@@ -1,5 +1,5 @@
 import * as moment from 'moment';
-import {isUnset, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from 'octra-components';
+import {isUnset, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '@octra/components';
 import * as X2JS from 'x2js';
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 

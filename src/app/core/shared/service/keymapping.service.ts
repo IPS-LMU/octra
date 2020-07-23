@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {isUnset, KeyMapping} from 'octra-components';
+import {isUnset, KeyMapping} from '@octra/components';
 import {BrowserInfo} from '../BrowserInfo';
 
 @Injectable()

@@ -1,7 +1,7 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
-import {AudioManager, FileInfo, isUnset, SampleUnit, WavFormat} from 'octra-components';
+import {AudioManager, FileInfo, isUnset, SampleUnit, WavFormat} from '@octra/components';
 import {Subject} from 'rxjs';
 import * as X2JS from 'x2js';
 import {ASRLanguage, ASRSettings} from '../../obj/Settings';

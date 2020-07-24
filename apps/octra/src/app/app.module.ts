@@ -38,7 +38,7 @@ import { routing } from './app.routes';
 import { AuthenticationNeededComponent } from './core/alerts/authentication-needed/authentication-needed.component';
 import { ErrorOccurredComponent } from './core/alerts/error-occurred/error-occurred.component';
 // other
-import {AlertComponent, DropZoneComponent, OctraModalComponent} from './core/component';
+import {AlertComponent, DropZoneComponent} from './core/component';
 import { NamingDragAndDropComponent } from './core/tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import { TableConfiguratorComponent } from './core/tools/table-configurator/table-configurator.component';
 import { TranscrEditorComponent } from './core/component/transcr-editor';
@@ -49,7 +49,6 @@ import { AuthComponent } from './core/pages/auth/auth.component';
 import { BrowserTestComponent } from './core/pages/browser-test/browser-test.component';
 import { Error404Component } from './core/pages/error404';
 import { FeaturesComponent } from './core/pages/features';
-import { GuidelinesComponent } from './core/gui/guidelines/guidelines.component';
 import { HelpToolsComponent } from './core/pages/help-tools/';
 import { NavbarService } from './core/component/navbar/navbar.service';
 import { NewsComponent } from './core/pages/news/news.component';
@@ -124,6 +123,7 @@ import {TranscriptionComponent} from './core/pages/transcription';
 import {TranscriptionEndComponent} from './core/pages/transcription-end';
 import {TranscrOverviewComponent} from './core/component/transcr-overview';
 import {TranscrWindowComponent} from './editors/2D-editor/transcr-window';
+import {OctraModalComponent} from './core/modals/octra-modal';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -186,7 +186,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     OverviewModalComponent,
     ShortcutsModalComponent,
     TranscriptionGuidelinesModalComponent,
-    GuidelinesComponent,
     BrowserTestComponent,
     TranscriptionFeedbackComponent,
     InactivityModalComponent,

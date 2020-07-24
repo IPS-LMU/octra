@@ -1,11 +1,17 @@
 import {RouterModule, Routes} from '@angular/router';
 
-import {Error404Component, FeaturesComponent, HelpToolsComponent, LoginComponent, LogoutComponent, MembersAreaComponent} from './core/gui';
-import {BrowserTestComponent} from './core/pages/browser-test/browser-test.component';
-import {ALoginGuard} from './core/pages/login/login.activateguard';
-import {LogoutGuard} from './core/pages/logout/logout.guard';
-import {MEMBER_ROUTES} from './core/pages/members-area/members-area.routes';
-import {NewsComponent} from './core/pages/news/news.component';
+import {
+  BrowserTestComponent,
+  Error404Component,
+  FeaturesComponent,
+  HelpToolsComponent,
+  LogoutComponent,
+  MembersAreaComponent,
+  NewsComponent
+} from './core/pages';
+import {ALoginGuard, LoginComponent} from './core/pages/login';
+import {LogoutGuard} from './core/pages/logout';
+import {MEMBER_ROUTES} from './core/pages/members-area';
 import {SettingsGuard} from './core/shared/guard';
 import {CompatibilityGuard} from './core/shared/guard/compatibility.guard';
 import {StresstestComponent} from './core/tools/stresstest/stresstest.component';

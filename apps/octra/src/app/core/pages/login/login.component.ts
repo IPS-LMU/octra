@@ -21,7 +21,7 @@ import {parseServerDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
 import {APIService, AudioService, SettingsService} from '../../shared/service';
 import {AppStorageService, OIDBLevel, OIDBLink} from '../../shared/service/appstorage.service';
-import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
+import {OctraDropzoneComponent} from '../../component/octra-dropzone/octra-dropzone.component';
 import {ComponentCanDeactivate} from './login.deactivateguard';
 import {LoginService} from './login.service';
 import {Converter} from '@octra/annotation';

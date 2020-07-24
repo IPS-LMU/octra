@@ -3,7 +3,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
 import {isArray} from 'rxjs/internal-compatibility';
 import {AppInfo} from '../../../app.info';
-import {NavbarService} from '../../gui/navbar/navbar.service';
+import {NavbarService} from '../../component/navbar/navbar.service';
 import {FeedBackForm} from '../../obj/FeedbackForm/FeedBackForm';
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
 import {OLog, OLogging} from '../../obj/Settings/logging';

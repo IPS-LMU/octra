@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges,
 import {DomSanitizer} from '@angular/platform-browser';
 import {ProjectSettings} from '../../obj/Settings';
 import {SettingsService} from '../../shared/service';
-import {NavbarService} from '../navbar/navbar.service';
+import {NavbarService} from '../../component/navbar/navbar.service';
 
 @Component({
   selector: 'octra-news',

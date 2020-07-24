@@ -3,7 +3,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {environment} from '../environments/environment';
 import {AppInfo} from './app.info';
-import {NavigationComponent} from './core/gui/navbar';
+import {NavigationComponent} from './core/component/navbar';
 import {ASRLanguage} from './core/obj/Settings';
 import {isUnset, SubscriptionManager} from '@octra/utilities';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';

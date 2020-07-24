@@ -7,7 +7,7 @@ import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-moda
 import {SessionFile} from '../../obj/SessionFile';
 import {AudioService, TranscriptionService} from '../../shared/service';
 import {AppStorageService, OIDBLevel, OIDBLink} from '../../shared/service/appstorage.service';
-import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
+import {OctraDropzoneComponent} from '../../component/octra-dropzone/octra-dropzone.component';
 import {FileSize, Functions} from '@octra/utilities';
 
 @Component({

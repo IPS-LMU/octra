@@ -4,7 +4,7 @@ import {Functions, SubscriptionManager} from '@octra/utilities';
 import {AppInfo} from '../../../app.info';
 import {SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
-import {NavbarService} from '../navbar/navbar.service';
+import {NavbarService} from '../../component/navbar/navbar.service';
 
 @Component({
   selector: 'octra-transcription-submitted',

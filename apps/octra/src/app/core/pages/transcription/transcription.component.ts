@@ -52,7 +52,7 @@ import {
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {AsrService} from '../../shared/service/asr.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
-import {NavbarService} from '../navbar/navbar.service';
+import {NavbarService} from '../../component/navbar/navbar.service';
 import {IFile, Level, PartiturConverter} from '@octra/annotation';
 import {AudioManager} from '@octra/media';
 

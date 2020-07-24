@@ -1,8 +1,8 @@
 import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
-import {TranscrOverviewComponent} from '../../gui/transcr-overview';
-import {TranscriptionFeedbackComponent} from '../../gui/transcription-feedback/transcription-feedback.component';
+import {TranscrOverviewComponent} from '../../component/transcr-overview';
+import {TranscriptionFeedbackComponent} from '../../component/transcription-feedback/transcription-feedback.component';
 import {SubscriptionManager} from '@octra/utilities';
 import {KeymappingService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';

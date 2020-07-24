@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
-import {NavbarService} from '../../gui/navbar/navbar.service';
+import {NavbarService} from '../../component/navbar/navbar.service';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
 import {SubscriptionManager} from '@octra/utilities';
 import {TranscriptionService, UserInteractionsService} from '../../shared/service';

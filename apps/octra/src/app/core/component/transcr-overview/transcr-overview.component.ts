@@ -14,8 +14,8 @@ import {
 } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {isFunction, isUnset, SubscriptionManager} from '@octra/utilities';
-import {TranscrEditorComponent} from '../../component/transcr-editor';
-import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
+import {TranscrEditorComponent} from '../transcr-editor';
+import {ValidationPopoverComponent} from '../transcr-editor/validation-popover/validation-popover.component';
 
 import {AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';

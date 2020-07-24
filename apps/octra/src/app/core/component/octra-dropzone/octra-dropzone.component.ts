@@ -1,6 +1,6 @@
 import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {AppInfo} from '../../../app.info';
-import {DropZoneComponent} from '../../component/drop-zone';
+import {DropZoneComponent} from '../drop-zone';
 import {ModalService} from '../../modals/modal.service';
 import {SessionFile} from '../../obj/SessionFile';
 import {FileSize, Functions, isUnset, SubscriptionManager} from '@octra/utilities';

@@ -34,7 +34,6 @@ import {
 import {TranscriptionGuidelinesModalComponent} from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
 import {TranscriptionSendingModalComponent} from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
-import {IFile, PartiturConverter} from '../../obj/Converters';
 import {parseServerDataEntry} from '../../obj/data-entry';
 import {ProjectSettings} from '../../obj/Settings';
 
@@ -54,9 +53,8 @@ import {AppStorageService} from '../../shared/service/appstorage.service';
 import {AsrService} from '../../shared/service/asr.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import {NavbarService} from '../navbar/navbar.service';
-import {logger} from 'codelyzer/util/logger';
-import {AudioManager} from '../../../../../../../libs/media/src/lib/audio/audio-manager';
-import {Level} from '@octra/annotation';
+import {IFile, Level, PartiturConverter} from '@octra/annotation';
+import {AudioManager} from '@octra/media';
 
 @Component({
   selector: 'octra-transcription',

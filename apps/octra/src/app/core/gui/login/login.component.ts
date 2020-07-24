@@ -17,7 +17,6 @@ import {Observable, throwError} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {ModalService} from '../../modals/modal.service';
 import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
-import {Converter} from '../../obj/Converters';
 import {parseServerDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
 import {APIService, AudioService, SettingsService} from '../../shared/service';
@@ -25,6 +24,7 @@ import {AppStorageService, OIDBLevel, OIDBLink} from '../../shared/service/appst
 import {OctraDropzoneComponent} from '../octra-dropzone/octra-dropzone.component';
 import {ComponentCanDeactivate} from './login.deactivateguard';
 import {LoginService} from './login.service';
+import {Converter} from '@octra/annotation';
 
 @Component({
   selector: 'octra-login',

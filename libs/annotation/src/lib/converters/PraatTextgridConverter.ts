@@ -1,6 +1,6 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {OAnnotJSON, OAudiofile, OEvent, OLabel, OLevel, OSegment} from '@octra/annotation';
 import {Functions} from '@octra/utilities';
+import {OAnnotJSON, OAudiofile, OEvent, OLabel, OLevel, OSegment} from '../annotjson';
 
 export class PraatTextgridConverter extends Converter {
 

@@ -7,3 +7,6 @@ export * from './PartiturConverter';
 export * from './PraatTableConverter';
 export * from './PraatTextgridConverter';
 export * from './TextConverter';
+export * from './ELANConverter';
+export * from './WebVTTConverter';
+export * from './SRTConverter';

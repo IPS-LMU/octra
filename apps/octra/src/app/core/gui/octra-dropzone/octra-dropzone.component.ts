@@ -2,12 +2,11 @@ import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {AppInfo} from '../../../app.info';
 import {DropZoneComponent} from '../../component/drop-zone';
 import {ModalService} from '../../modals/modal.service';
-import {Converter, IFile, ImportResult} from '../../obj/Converters';
 import {SessionFile} from '../../obj/SessionFile';
 import {FileSize, Functions, isUnset, SubscriptionManager} from '@octra/utilities';
 import {FileProgress} from '../../obj/objects';
-import {AudioManager} from '../../../../../../../libs/media/src/lib/audio/audio-manager';
-import {OAnnotJSON, OAudiofile, OLabel, OSegment} from '@octra/annotation';
+import {Converter, IFile, ImportResult, OAnnotJSON, OAudiofile, OLabel, OSegment} from '@octra/annotation';
+import {AudioManager} from '@octra/media';
 
 @Component({
   selector: 'octra-dropzone',

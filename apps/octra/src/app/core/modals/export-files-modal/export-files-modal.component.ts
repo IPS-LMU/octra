@@ -9,10 +9,10 @@ import {AppInfo} from '../../../app.info';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
 import {TableConfiguratorComponent} from '../../component/table-configurator/table-configurator.component';
 import {NavbarService} from '../../gui/navbar/navbar.service';
-import {Converter, IFile} from '../../obj/Converters';
 import {isUnset, SubscriptionManager} from '@octra/utilities';
 import {AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
+import {Converter, IFile} from '@octra/annotation';
 
 @Component({
   selector: 'octra-export-files-modal',

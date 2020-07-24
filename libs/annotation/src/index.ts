@@ -6,3 +6,4 @@ export * from './lib/segment';
 export * from './lib/segments';
 export * from './lib/asr';
 export * from './lib/db-objects';
+export * from './lib/converters'

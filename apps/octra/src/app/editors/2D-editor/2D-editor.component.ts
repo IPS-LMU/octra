@@ -17,7 +17,6 @@ import {AuthenticationNeededComponent} from '../../core/alerts/authentication-ne
 import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
 import {TranscrEditorComponent} from '../../core/component';
 
-import {PraatTextgridConverter} from '../../core/shared';
 
 import {
   AlertService,
@@ -38,9 +37,8 @@ import {
   AudioviewerConfig,
   AudioViewerShortcutEvent
 } from '@octra/components';
-import {AudioSelection, PlayBackStatus, SampleUnit} from '@octra/media';
-import {ASRQueueItemType, OAudiofile, OSegment, Segment} from '@octra/annotation';
-import {AudioChunk, AudioManager} from '../../../../../../libs/media/src/lib/audio/audio-manager';
+import {AudioChunk, AudioManager, AudioSelection, PlayBackStatus, SampleUnit} from '@octra/media';
+import {ASRQueueItemType, OAudiofile, OSegment, PraatTextgridConverter, Segment} from '@octra/annotation';
 
 @Component({
   selector: 'octra-overlay-gui',

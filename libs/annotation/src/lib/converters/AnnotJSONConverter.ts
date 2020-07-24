@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {OAnnotJSON, OAudiofile} from '@octra/annotation';
+import {OAnnotJSON, OAudiofile} from '../annotjson';
 
 export class AnnotJSONConverter extends Converter {
 

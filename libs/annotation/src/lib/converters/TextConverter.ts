@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '@octra/annotation';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
 
 export class TextConverter extends Converter {
 
@@ -65,7 +65,7 @@ export class TextConverter extends Converter {
       const sampleRate = audiofile.sampleRate;
 
       const olabels: OLabel[] = [];
-      olabels.push((new OLabel('OCTRA_1', file.content)));
+      olabels.push(new OLabel('OCTRA_1', file.content));
       const osegment = new OSegment(
         1, 0, Math.round(audiofile.duration), olabels
       );

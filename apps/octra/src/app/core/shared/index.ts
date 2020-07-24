@@ -6,4 +6,3 @@ export * from '../obj/statistics/MouseStatisticElem';
 export * from '../obj/statistics/StatisticElement';
 export * from './Logger';
 export * from '../obj/SessionFile';
-export * from '../obj/Converters';

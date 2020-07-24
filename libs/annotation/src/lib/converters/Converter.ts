@@ -1,4 +1,4 @@
-import {OAnnotJSON, OAudiofile} from '@octra/annotation';
+import {OAnnotJSON, OAudiofile} from '../annotjson';
 
 export interface IFile {
   name: string;

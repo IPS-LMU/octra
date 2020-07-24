@@ -2,10 +2,8 @@ import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
 import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
 import {isArray} from 'rxjs/internal-compatibility';
-import {AnnotJSONConverter, PartiturConverter, TextConverter} from '../';
 import {AppInfo} from '../../../app.info';
 import {NavbarService} from '../../gui/navbar/navbar.service';
-import {Converter, IFile} from '../../obj/Converters';
 import {FeedBackForm} from '../../obj/FeedbackForm/FeedBackForm';
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
 import {OLog, OLogging} from '../../obj/Settings/logging';
@@ -16,7 +14,17 @@ import {AppStorageService, OIDBLevel} from './appstorage.service';
 import {AudioService} from './audio.service';
 import {SettingsService} from './settings.service';
 import {UserInteractionsService} from './userInteractions.service';
-import {Annotation, Level, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment, Segments} from '@octra/annotation';
+import {
+  Annotation,
+  AnnotJSONConverter, Converter, IFile,
+  Level,
+  OAnnotJSON,
+  OAudiofile,
+  OLabel,
+  OLevel,
+  OSegment, PartiturConverter,
+  Segments, TextConverter
+} from '@octra/annotation';
 import {AudioManager} from '@octra/media';
 
 declare var validateAnnotation: ((string, any) => any);

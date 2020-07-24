@@ -2,10 +2,9 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
-import {AnnotJSONConverter, PartiturConverter, TextConverter} from '../../obj/Converters';
 import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
-import {OAudiofile} from '@octra/annotation';
+import {AnnotJSONConverter, OAudiofile, PartiturConverter, TextConverter} from '@octra/annotation';
 
 @Component({
   selector: 'octra-prompt-modal',

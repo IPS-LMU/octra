@@ -1,6 +1,7 @@
 <h1 align="center">OCTRA v1.4.x</h1>
 
 <p align="center">
+This is the frontpage of the OCTRA app. If you are looking for OCTRA's custom libraries, click <a href="https://github.com/IPS-LMU/octra/tree/master/libs">here</a>
   <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor3_1.png" alt="2D-Editor">
   <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor3_2.png" alt="2D-Editor">
   <img style="margin:3px;border:1px solid lightgray;" width="215" height="250" src="https://www.phonetik.uni-muenchen.de/apps/octra/contents/1.3/img/features/editor2.png" alt="Linear Editor">

@@ -1,0 +1,18 @@
+<div class="panel" id="agreement">
+  <h2>{{"general.agreement" | transloco}}</h2>
+  <p [innerHTML]="toHTML(settService.projectsettings.agreement.text)">
+  </p>
+  <div id="bottom-nav">
+    <div aria-label="..." class="btn-group btn-group-justified" role="group">
+      <a (click)="logout()"
+         class="btn btn-default btn-raised">
+        <fa-icon [icon]="['fas', 'times-circle']"></fa-icon>
+        <span class=" d-none d-md-inline"> {{"general.quit" | transloco}}</span></a>
+      <a (click)="accept()"
+         class="btn btn-default btn-raised">
+        <span class=" d-none d-md-inline"> {{"general.continue" | transloco}}</span>
+        <fa-icon [icon]="['far', 'check-circle']"></fa-icon>
+      </a>
+    </div>
+  </div>
+</div>

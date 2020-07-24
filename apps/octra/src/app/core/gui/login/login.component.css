@@ -1,0 +1,64 @@
+h4 {
+  margin-top: 0;
+  text-align: center;
+  padding: 10px
+}
+
+#login {
+  display: flex;
+  flex-direction: column;
+  flex: auto;
+  background-color: white;
+}
+
+.login-submit,
+#offline-submit,
+.offline-delete-btn {
+  width: 100%;
+}
+
+/*noinspection ALL*/
+.ng-touched .ng-invalid {
+  border-bottom: 2px solid red;
+}
+
+#login-disabled {
+  border: 1px solid gray;
+  padding: 10px;
+  text-align: center;
+}
+
+.form-group {
+  margin: 0;
+}
+
+@media (min-width: 796px) {
+  #loginrow {
+    flex: auto;
+    display: flex;
+  }
+}
+
+footer {
+  margin-top: 20px;
+}
+
+footer .logo {
+  height: 40px;
+  margin-bottom: 10px;
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 200px;
+}
+
+.alert-success,
+h4,
+.alert-danger {
+  padding: 3px;
+}

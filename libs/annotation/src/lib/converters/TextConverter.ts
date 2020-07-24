@@ -1,0 +1,89 @@
+import {Converter, ExportResult, IFile, ImportResult} from './Converter';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
+
+export class TextConverter extends Converter {
+
+  public constructor() {
+    super();
+    this._application = 'Text Editor';
+    this._name = 'Plain Text';
+    this._extension = '.txt';
+    this._website.title = 'WebMaus';
+    this._website.url = 'https://clarin.phonetik.uni-muenchen.de/BASWebServices/#/services/WebMAUSBasic';
+    this._conversion.export = true;
+    this._conversion.import = true;
+    this._encoding = 'UTF-8';
+    this._multitiers = false;
+  }
+
+  public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
+    let result = '';
+    let filename = '';
+
+    if (!(levelnum === null || levelnum === undefined) && levelnum < annotation.levels.length) {
+      const level: OLevel = annotation.levels[levelnum];
+
+      if (level.type === 'SEGMENT') {
+        for (let j = 0; j < level.items.length; j++) {
+          const transcript = level.items[j].labels[0].value;
+
+          if (transcript !== '') {
+            result += transcript;
+            if (j < level.items.length - 1) {
+              result += ' ';
+            }
+          }
+        }
+        result += '\n';
+      }
+
+      filename = `${annotation.name}`;
+      if (annotation.levels.length > 1) {
+        filename += `-${level.name}`;
+      }
+      filename += `${this._extension}`;
+    } else {
+      console.error('TextConverter needs a level number');
+      return null;
+    }
+
+    return {
+      file: {
+        name: filename,
+        content: result,
+        encoding: 'UTF-8',
+        type: 'text/plain'
+      }
+    };
+  }
+
+  public import(file: IFile, audiofile: OAudiofile): ImportResult {
+    if (audiofile !== null && audiofile !== undefined) {
+      const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
+
+      const olevel = new OLevel('OCTRA_1', 'SEGMENT');
+      const sampleRate = audiofile.sampleRate;
+
+      const olabels: OLabel[] = [];
+      olabels.push(new OLabel('OCTRA_1', file.content));
+      const osegment = new OSegment(
+        1, 0, Math.round(audiofile.duration), olabels
+      );
+
+      olevel.items.push(osegment);
+      result.levels.push(olevel);
+
+      return {
+        annotjson: result,
+        audiofile: null,
+        error: ''
+      };
+    }
+
+    return {
+      annotjson: null,
+      audiofile: null,
+      error: 'Could not read text file beacuse audio file is undefined'
+    };
+  }
+}

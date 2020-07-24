@@ -1,0 +1,170 @@
+nav {
+  height: 28px;
+  padding: 0;
+  font-size: 0.8em;
+  background-color: #3f51b5;
+}
+
+nav .navbar-toggler-icon {
+  height: 18px;
+  border-color: white;
+}
+
+nav .navbar-toggler {
+  padding: 2px;
+}
+
+nav .navbar-collapse {
+  background-color: #3f51b5;
+}
+
+nav .navbar-brand {
+  margin-left: 7px;
+}
+
+nav .nav-link {
+  text-transform: none;
+}
+
+.navbar ul li a:hover {
+  cursor: pointer;
+}
+
+.navbar-nav > li > a, .navbar-brand {
+  padding-top: 4px !important;
+  padding-bottom: 0 !important;
+  vertical-align: middle;
+  line-height: inherit;
+  height: 30px;
+}
+
+.navbar {
+  min-height: 30px !important;
+  margin-bottom: 0;
+}
+
+.navbar .navbar-brand {
+  padding-top: 3px !important;
+  vertical-align: middle;
+  font-size: 1.3em;
+}
+
+.navbar .navbar-toggle {
+  padding: 0;
+}
+
+.navbar-icon {
+  color: white;
+  font-size: 100%;
+}
+
+.options-menu,
+.info-menu {
+  padding: 20px;
+  font-size: 0.7em;
+  min-width: 300px;
+}
+
+.info-menu {
+}
+
+.dropdown-menu.options-menu.show label,
+.dropdown-menu.info-menu.show span {
+  color: black;
+}
+
+.dropdown-menu h4 {
+  font-weight: bold;
+  font-size: 1.3em;
+  color: black;
+}
+
+.dropdown-menu.options-menu label,
+.dropdown-menu.info-menu label,
+.dropdown-menu.info-menu table tr td,
+.dropdown-menu.options-menu table tr td {
+  color: white;
+}
+
+.options-menu * {
+  border: none;
+  font-size: 1.1em;
+}
+
+.options-menu .table {
+  margin-bottom: 0;
+}
+
+.info-menu * {
+  border: none;
+  font-size: 11px;
+}
+
+.info-menu .table {
+  margin-bottom: 0;
+}
+
+#subnav {
+  padding: 3px;
+  text-align: center;
+  background-color: #bae6f3;
+  margin-bottom: 0;
+}
+
+#modalstatis .modal-dialog {
+  width: 100%;
+}
+
+.row.level-row {
+  border: 1px solid gray;
+  padding: 5px;
+}
+
+.row.level-row.selected,
+.row.level-row.selected * {
+  background-color: rgb(165, 250, 190);
+}
+
+.disabled {
+  opacity: 0.3;
+}
+
+.row.level-row .col-8 input[type="text"] {
+  padding: 3px;
+  width: 100%;
+}
+
+.row.level-row .col-8 .selected {
+  border: 1px solid lightgray;
+}
+
+.row.level-add-row {
+  margin-top: 5px;
+  border: 1px dashed gray;
+  text-align: center;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.row.level-row .col-2 {
+  padding-top: 5px;
+  text-align: center;
+  vertical-align: middle;
+  height: 100%;
+}
+
+.row.level-row div {
+  color: black;
+}
+
+@media (max-width: 765px) {
+  #subnav {
+    font-size: 0.8em;
+  }
+}
+
+.switch {
+  margin-top: -5px;
+  display: flex;
+}
+

@@ -1,0 +1,117 @@
+<octra-audio-viewer #miniloupeComponent *ngIf="appStorage.showLoupe" [audioChunk]="audioChunkLoupe"
+                  [breakMarker]="{
+                        code: '<P>'
+                      }"
+                  [height]="160"
+                  [isMultiLine]="false"
+                  [name]="'loupe'"
+                  [ngStyle]="{
+'position':'absolute',
+'margin-left':miniloupe.location.x + 'px',
+'margin-top':miniloupe.location.y + 'px',
+'width' : '160px',
+'height': '160px',
+'display': 'flex',
+'z-index':'900',
+'visibility': (miniloupe.isHidden) ? 'hidden' : 'inherit',
+'flex': 'auto',
+'flex-direction': 'column'}"
+                  [settings]="miniLoupeSettings"
+                  [transcriptionLevel]="transcrService.currentlevel"
+>
+</octra-audio-viewer>
+<octra-audio-navigation #nav
+                      (afterPlaybackRateChange)="afterSpeedChange($event)"
+                      (afterVolumeChange)="afterVolumeChange($event)"
+                      (buttonClick)="onButtonClick($event)"
+                      [audioChunk]="selectedAudioChunk"
+                      [buttons]="{
+                        play: {
+                            label: ('general.play' | transloco),
+                            shortcut: keyMap.getShortcut('AV', 'play_pause')
+                        },
+                        pause: {
+                            label: ('general.pause' | transloco),
+                            shortcut: keyMap.getShortcut('AV', 'play_pause')
+                        },
+                        stop: {
+                            label: ('general.stop' | transloco),
+                            shortcut: keyMap.getShortcut('AV', 'stop')
+                        },
+                        replay: {
+                            label: ('general.replay' | transloco),
+                            shortcut: ''
+                        },
+                        backward: {
+                            label: ('general.backward' | transloco),
+                            shortcut: keyMap.getShortcut('AV', 'step_backward')
+                        },
+                        backwardtime: {
+                            label: ('general.backwardtime' | transloco),
+                            shortcut: keyMap.getShortcut('overlay', 'step_backward')
+                        }
+                      }"
+                      [easyMode]="appStorage.easymode"
+
+                      [playbackRate]="appStorage.audioSpeed"
+                      [responsive]="settingsService.responsive.enabled"
+                      [volume]="appStorage.audioVolume"
+>
+
+</octra-audio-navigation>
+<div id="viewer">
+  <octra-audio-viewer #signalDisplayTop (mousecursorchange)="onMouseOver($event)"
+                    (mousedown)="onViewerMouseDown($event)"
+                    (mouseenter)="miniloupe.isHidden = false;"
+                    (mouseleave)="miniloupe.isHidden = true;"
+                    (segmententer)="onSegmentEnter($event)"
+                    (selchange)="onSelectionChanged($event)"
+                    (shortcuttriggered)="onViewerShortcutTriggered($event, 'signaldisplay_top')"
+                    [audioChunk]="audioChunkTop"
+                    [breakMarker]="{
+                        code: '<P>'
+                      }"
+                    [transcriptionLevel]="transcrService.currentlevel"
+                    style="height:80px;"
+  >
+  </octra-audio-viewer>
+</div>
+
+<octra-audio-viewer #signalDisplayDown
+                  (shortcuttriggered)="onViewerShortcutTriggered($event, 'signaldisplay_down')"
+                  (alerttriggered)="onAlertTriggered($event)"
+                  (click)="onLoupeClick($event)"
+                  (mousedown)="onViewerMouseDown($event)"
+                  (segmententer)="onLoupeSegmentEnter($event)"
+                  *ngIf="audioChunkDown !== null && audioChunkDown !== undefined"
+                  [audioChunk]="audioChunkDown"
+                  [breakMarker]="{
+                        code: '<P>'
+                      }"
+                  [name]="'downLoupe'"
+                  [settings]="loupeSettings"
+                  [transcriptionLevel]="transcrService.currentlevel"
+>
+</octra-audio-viewer>
+<div [hidden]="segmentselected" id="editor-placeholder">
+  <div *ngIf="!segmentselected && (audioChunkDown !== null && audioChunkDown !== undefined)"
+       [innerHTML]="'signal-gui.segment enter text' | transloco:{value: segmententer_shortc}"
+       class="inner">
+  </div>
+  <div *ngIf="!(audioChunkDown !== null && audioChunkDown !== undefined)"
+       [innerHTML]="'signal-gui.selection text' | transloco"
+       class="inner">
+  </div>
+</div>
+<octra-transcr-editor #transcr
+                      (keyup)="onKeyUp()"
+                      (markerClick)="onMarkerClick($event)"
+                      (markerInsert)="onMarkerInsert($event)"
+                      (typing)="onEditorTyping($event)"
+                      [audiochunk]="audioChunkDown"
+                      [easymode]="appStorage.easymode"
+                      [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
+                      [ngStyle]="{display: (segmentselected) ? 'inherit': 'none'}"
+                      [validationEnabled]="appStorage.usemode !== 'url' && (appStorage.usemode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
+>
+</octra-transcr-editor>

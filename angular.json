@@ -1,37 +1,65 @@
 {
-  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
-  "newProjectRoot": "projects",
   "projects": {
     "octra": {
       "projectType": "application",
       "schematics": {},
-      "root": "",
-      "sourceRoot": "src",
-      "prefix": "app",
+      "root": "apps/octra",
+      "sourceRoot": "apps/octra/src",
+      "prefix": "octra",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/octra",
-            "index": "src/index.html",
-            "main": "src/main.ts",
-            "polyfills": "src/polyfills.ts",
-            "tsConfig": "tsconfig.app.json",
+            "outputPath": "dist/apps/octra",
+            "index": "apps/octra/src/index.html",
+
+            "main": "apps/octra/src/main.ts",
+            "polyfills": "apps/octra/src/polyfills.ts",
+            "tsConfig": "apps/octra/tsconfig.app.json",
             "aot": true,
+            "preserveSymlinks": true,
+            "allowedCommonJsDependencies": [
+              "js-sha256",
+              "x2js",
+              "konva",
+              "crossevent",
+              "contra/emitter",
+              "flat",
+              "dragula",
+              "jquery",
+              "platform",
+              "global/document",
+              "videojs",
+              "ajv",
+              "querystring",
+              "crossvent",
+              "xmldom",
+              "videojs-vtt.js",
+              "@videojs/xhr",
+              "@babel/runtime/helpers/possibleConstructorReturn",
+              "@babel/runtime/helpers/construct",
+              "@babel/runtime/helpers/inherits",
+              "mux.js/lib/tools/mp4-inspector",
+              "mux.js/lib/tools/ts-inspector.js",
+              "mux.js/lib/mp4/probe",
+              "mux.js/lib/mp4/caption-parser",
+              "@videojs/vhs-utils/dist/resolve-url",
+              "@videojs/vhs-utils/dist/decode-b64-to-uint8-array"
+            ],
             "assets": [
-              "src/assets",
-              "src/config",
-              "src/media",
-              "src/LICENSE.txt"
+              "apps/octra/src/assets",
+              "apps/octra/src/config",
+              "apps/octra/src/media",
+              "apps/octra/src/LICENSE.txt"
             ],
             "styles": [
               "node_modules/summernote/dist/summernote-bs4.css",
               "node_modules/video.js/dist/video-js.min.css",
-              "src/styles.css"
+              "apps/octra/src/styles.css"
             ],
             "scripts": [
-              "src/assets/js/modernizr.js",
+              "apps/octra/src/assets/js/modernizr.js",
               "node_modules/jquery/dist/jquery.min.js",
               "node_modules/arrive/minified/arrive.min.js",
               "node_modules/popper.js/dist/umd/popper.js",
@@ -43,15 +71,14 @@
               "node_modules/jquery.caret/dist/jquery.caret.min.js",
               "node_modules/moment/min/moment.min.js",
               "node_modules/jszip/dist/jszip.min.js"
-            ],
-            "es5BrowserSupport": true
+            ]
           },
           "configurations": {
             "production": {
               "fileReplacements": [
                 {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
+                  "replace": "apps/octra/src/environments/environment.ts",
+                  "with": "apps/octra/src/environments/environment.prod.ts"
                 }
               ],
               "optimization": true,
@@ -59,15 +86,14 @@
               "sourceMap": false,
               "extractCss": true,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "4mb",
-                  "maximumError": "6mb"
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -77,36 +103,30 @@
               ]
             },
             "dev": {
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "fileReplacements": [
                 {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.dev.ts"
+                  "replace": "apps/octra/src/environments/environment.ts",
+                  "with": "apps/octra/src/environments/environment.dev.ts"
                 }
-              ]
-            },
-            "beta": {
+              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
               "extractCss": true,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
-              "fileReplacements": [
+              "budgets": [
                 {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.beta.ts"
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
                 }
               ]
             }
@@ -130,40 +150,37 @@
             "browserTarget": "octra:build"
           }
         },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "src/test.ts",
-            "polyfills": "src/polyfills.ts",
-            "tsConfig": "tsconfig.spec.json",
-            "karmaConfig": "karma.conf.js",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.css"
-            ],
-            "scripts": []
-          }
-        },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "tsconfig.app.json",
-              "tsconfig.spec.json",
-              "e2e/tsconfig.json"
+              "apps/octra/tsconfig.app.json",
+              "apps/octra/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**", "!apps/octra/**/*"]
           }
         },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
+        "test": {
+          "builder": "@nrwl/jest:jest",
           "options": {
-            "protractorConfig": "e2e/protractor.conf.js",
+            "jestConfig": "apps/octra/jest.config.js",
+            "tsConfig": "apps/octra/tsconfig.spec.json",
+            "passWithNoTests": true,
+            "setupFile": "apps/octra/src/test-setup.ts"
+          }
+        }
+      }
+    },
+    "octra-e2e": {
+      "root": "apps/octra-e2e",
+      "sourceRoot": "apps/octra-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/octra-e2e/cypress.json",
+            "tsConfig": "apps/octra-e2e/tsconfig.e2e.json",
             "devServerTarget": "octra:serve"
           },
           "configurations": {
@@ -171,8 +188,187 @@
               "devServerTarget": "octra:serve:production"
             }
           }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": ["apps/octra-e2e/tsconfig.e2e.json"],
+            "exclude": ["**/node_modules/**", "!apps/octra-e2e/**/*"]
+          }
         }
       }
+    },
+    "utilities": {
+      "projectType": "library",
+      "root": "libs/utilities",
+      "sourceRoot": "libs/utilities/src",
+      "prefix": "octra",
+      "architect": {
+        "build": {
+          "builder": "@nrwl/angular:package",
+          "options": {
+            "tsConfig": "libs/utilities/tsconfig.lib.json",
+            "project": "libs/utilities/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "libs/utilities/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/utilities/tsconfig.lib.json",
+              "libs/utilities/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/utilities/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/utilities/jest.config.js",
+            "tsConfig": "libs/utilities/tsconfig.spec.json",
+            "passWithNoTests": true,
+            "setupFile": "libs/utilities/src/test-setup.ts"
+          }
+        }
+      },
+      "schematics": {}
+    },
+    "annotation": {
+      "projectType": "library",
+      "root": "libs/annotation",
+      "sourceRoot": "libs/annotation/src",
+      "prefix": "octra",
+      "architect": {
+        "build": {
+          "builder": "@nrwl/angular:package",
+          "options": {
+            "tsConfig": "libs/annotation/tsconfig.lib.json",
+            "project": "libs/annotation/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "libs/annotation/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/annotation/tsconfig.lib.json",
+              "libs/annotation/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/annotation/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/annotation/jest.config.js",
+            "tsConfig": "libs/annotation/tsconfig.spec.json",
+            "passWithNoTests": true,
+            "setupFile": "libs/annotation/src/test-setup.ts"
+          }
+        }
+      },
+      "schematics": {}
+    },
+    "media": {
+      "projectType": "library",
+      "root": "libs/media",
+      "sourceRoot": "libs/media/src",
+      "prefix": "octra",
+      "architect": {
+        "build": {
+          "builder": "@nrwl/angular:package",
+          "options": {
+            "tsConfig": "libs/media/tsconfig.lib.json",
+            "project": "libs/media/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "libs/media/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/media/tsconf ig.lib.json",
+              "libs/media/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/media/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/media/jest.config.js",
+            "tsConfig": "libs/media/tsconfig.spec.json",
+            "passWithNoTests": true,
+            "setupFile": "libs/media/src/test-setup.ts"
+          }
+        }
+      },
+      "schematics": {}
+    },
+    "components": {
+      "projectType": "library",
+      "root": "libs/components",
+      "sourceRoot": "libs/components/src",
+      "prefix": "octra",
+      "architect": {
+        "build": {
+          "builder": "@nrwl/angular:package",
+          "options": {
+            "tsConfig": "libs/components/tsconfig.lib.json",
+            "project": "libs/components/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "libs/components/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/components/tsconfig.lib.json",
+              "libs/components/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/components/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/components/jest.config.js",
+            "tsConfig": "libs/components/tsconfig.spec.json",
+            "passWithNoTests": true,
+            "setupFile": "libs/components/src/test-setup.ts"
+          }
+        }
+      },
+      "schematics": {}
+    }
+  },
+  "cli": {
+    "defaultCollection": "@nrwl/angular"
+  },
+  "schematics": {
+    "@nrwl/angular:application": {
+      "unitTestRunner": "jest",
+      "e2eTestRunner": "cypress"
+    },
+    "@nrwl/angular:library": {
+      "unitTestRunner": "jest"
     }
   },
   "defaultProject": "octra"

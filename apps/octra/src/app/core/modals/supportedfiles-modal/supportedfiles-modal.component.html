@@ -1,0 +1,49 @@
+<div #modal="bs-modal" aria-labelledby="dialog-sizes-name1" bsModal class="modal fade" id="supportedfiles" role="dialog"
+     tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{'modal.supported.header' | transloco}}</h4>
+        <button (click)="close()" aria-label="Close" class="close pull-right" type="button">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h4>{{'modal.supported.audio files' | transloco}} (max. 300 MB):</h4>
+        <table class="table table-responsive table-striped">
+          <table>
+            <tr>
+              <td>
+                                <span *ngFor="let elem of AppInfo.audioformats; let i = index">
+                                    *{{elem.extension}}{{(i < AppInfo.audioformats.length - 1) ? ',' : ''}}
+                                </span>
+              </td>
+            </tr>
+          </table>
+        </table>
+        <h4>{{'modal.supported.file formats for import' | transloco}}:</h4>
+
+        <table class="table table-striped">
+          <tbody>
+          <ng-container *ngFor="let elem of AppInfo.converters">
+            <tr *ngIf="elem.conversion.import">
+              <td>{{elem.name}}</td>
+              <td>{{elem.application}}</td>
+              <td>*{{elem.extension}}</td>
+              <td>
+                <fa-icon *ngIf="elem.notice !== ''" [tooltip]="elem.notice"
+                         icon="info-circle"></fa-icon>
+              </td>
+            </tr>
+          </ng-container>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button (click)="close()" class="btn btn-primary" type="button">
+          {{"general.close" | transloco}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

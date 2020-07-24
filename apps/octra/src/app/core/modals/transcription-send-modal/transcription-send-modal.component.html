@@ -1,0 +1,13 @@
+<ng-template #modal>
+  <div class="modal-header">
+    <h4 class="modal-title">{{"modal.transcription.send.header" | transloco}}</h4>
+  </div>
+  <div class="modal-body">
+    {{"modal.transcription.send.text" | transloco}}
+  </div>
+  <div class="modal-footer">
+    <button (click)="close('CANCEL')" class="btn btn-primary" type="button">{{"general.abort" | transloco}}</button>
+    <button (click)="close('SEND')" class="btn btn-default" type="button">{{"general.send now" | transloco}}
+    </button>
+  </div>
+</ng-template>

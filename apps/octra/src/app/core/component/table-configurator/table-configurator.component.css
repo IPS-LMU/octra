@@ -1,0 +1,147 @@
+.easy-table .column .grip {
+  border-bottom: 1px solid lightgray;
+  padding: 3px;
+  vertical-align: middle;
+  /* width: 30px; */
+  text-align: center;
+  background-color: ghostwhite;
+  color: gray;
+  position: relative;
+}
+
+.easy-table .column .title {
+  display: block;
+  border: none;
+  border-bottom: 1px solid lightgray;
+  text-align: left;
+  padding: 5px;
+  cursor: text;
+  font-weight: bold;
+  width: 100%;
+}
+
+.easy-table .delete-column {
+  cursor: pointer;
+  position: absolute;
+  display: inline;
+  margin-right: 10px;
+  margin-top: 4px;
+  top: 0;
+  right: 0;
+}
+
+.easy-table .delete-column fa-icon {
+  color: gray;
+}
+
+.easy-table .delete-column fa-icon:hover {
+  color: red;
+}
+
+.dropdown-item {
+  font-size: 12px;
+  padding: 3px 3px 3px 10px;
+  min-height: 30px;
+}
+
+.dropdown-item.active {
+  background-color: whitesmoke;
+}
+
+.btn-group {
+  margin: 0;
+}
+
+.btn-info {
+  text-transform: initial;
+}
+
+.dropdown-menu {
+  margin-top: -5px;
+}
+
+.easy-table {
+  white-space: nowrap;
+  overflow: auto;
+  height: 300px;
+  background-color: whitesmoke;
+  padding: 10px;
+  border: 1px lightgray;
+}
+
+.table-options {
+  padding: 20px;
+}
+
+.table-options legend {
+  margin-top: 5px;
+}
+
+.easy-table .header {
+  font-weight: bold;
+}
+
+.easy-table .column .title {
+  display: block;
+  border: none;
+  border-bottom: 1px solid lightgray;
+  text-align: left;
+  padding: 5px;
+  cursor: text;
+  font-weight: bold;
+  width: 100%;
+}
+
+.easy-table .column {
+  padding: 0;
+  position: relative;
+  border-right: 1px solid gray;
+  border-top: 1px solid gray;
+  border-bottom: 1px solid gray;
+  border-collapse: collapse;
+  display: inline-grid;
+  white-space: nowrap;
+  color: rgba(0, 0, 0, 0.87);
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  cursor: move;
+  background: white;
+  font-size: 14px;
+  margin: 0;
+}
+
+.easy-table .column:first-of-type {
+  border-left: 1px solid gray;
+}
+
+.easy-table .cell {
+  border-bottom: 1px solid lightgray;
+  padding: 5px;
+  height: 35px;
+  background-color: white;
+}
+
+.easy-table .cell:last-of-type {
+  border-bottom: none;
+}
+
+#includeLineNumbers {
+  margin-right: 5px;
+  display: inline;
+  position: absolute;
+  margin-top: 11px;
+}
+
+.settings {
+  border: 1px solid lightgray;
+  background-color: whitesmoke;
+  padding: 8px;
+  display: inline;
+  border-radius: 3px;
+  margin-left: 5px;
+}
+
+.settings label {
+  font-size: 0.9em;
+}

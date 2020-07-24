@@ -1,0 +1,10 @@
+<ng-template #modal>
+  <div class="modal-body">
+    <p style="text-align:center;color:red;">{{(data) ? data.text : ""}}</p>
+  </div>
+  <div class="modal-footer">
+    <button (click)="close()" class="btn btn-default" data-dismiss="modal" type="button">
+      {{"general.OK" |transloco}}
+    </button>
+  </div>
+</ng-template>

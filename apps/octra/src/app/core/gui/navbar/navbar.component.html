@@ -1,0 +1,365 @@
+<octra-export-files-modal #modalexport [transcrService]="navbarServ.transcrService" [uiService]="navbarServ.uiService">
+</octra-export-files-modal>
+<octra-tools-modal #toolsModal [transcrService]="navbarServ.transcrService"
+                   [uiService]="navbarServ.uiService"></octra-tools-modal>
+<octra-statistics-modal #modalstatistics></octra-statistics-modal>
+<octra-prompt-modal #promptmodal></octra-prompt-modal>
+
+<nav *ngIf="navbarServ.showNavbar" class="navbar navbar-expand-md navbar-fixed-top navbar-dark" style="z-index:1000;">
+  <a [title]="'last update: ' + (AppInfo.lastUpdate | date:'dd.MM.yyyy H:mm z')" class="navbar-brand" href="#">OCTRA
+    v{{version}}
+    <ng-container
+      *ngIf="appStorage.usemode !== undefined && appStorage.usemode !== null">
+      ({{appStorage.usemode}})
+    </ng-container>
+  </a>
+  <div *ngIf="environment.dev_version" class="d-block d-md-none" style="color:red;"><b>in development</b></div>
+  <div *ngIf="environment.beta_version" class="d-block d-md-none" style="color:red;"><b>BETA</b></div>
+  <button aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
+          data-target="#navbarCollapse" data-toggle="collapse" type="button">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarCollapse">
+    <ul *ngIf="!appStorage.LoggedIn" class="navbar-nav mr-auto">
+      <li [routerLinkActive]="['active']" class="nav-item">
+        <a [queryParamsHandling]="'merge'" [routerLink]="['/login']" class="nav-link">{{'general.login' |
+          transloco}}</a>
+      </li>
+      <li [routerLinkActive]="['active']" class="nav-item">
+        <a [queryParamsHandling]="'merge'" [routerLink]="['/features']" class="nav-link">{{'general.features' |
+          transloco}}</a>
+      </li>
+      <li [routerLinkActive]="['active']" class="nav-item">
+        <a [queryParamsHandling]="'merge'" [routerLink]="['/news']" class="nav-link">{{'general.news' |
+          transloco}}</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.phonetik.uni-muenchen.de/apps/octra/manual/1.4.0/" target="_blank">
+          {{"general.manual"| transloco}}
+        </a>
+      </li>
+    </ul>
+    <ul *ngIf="appStorage.LoggedIn" class="navbar-nav mr-auto">
+      <ng-template [ngForOf]="editors" let-editor ngFor>
+        <li *ngIf="appStorage.LoggedIn && navbarServ.showInterfaces && interfaceActive(editor.name)"
+            [ngClass]="{
+                        'active': appStorage.Interface === editor.name
+                    }"
+            class="nav-item"
+        >
+          <a (mouseup)="setInterface(editor.name)" class="nav-link">
+            <fa-icon [icon]="['fas', editor.icon]"></fa-icon>
+            <span
+              class="d-none d-xl-inline"> {{editor.translate | transloco}}</span>
+          </a>
+        </li>
+      </ng-template>
+      <li *ngIf="appStorage.LoggedIn && navbarServ.showInterfaces && settService.appSettings.octra.showdetails"
+          class="nav-item">
+        <a (mouseup)="modalstatistics.open()" class="nav-link">
+          <fa-icon class="navbar-icon" icon="th-list"></fa-icon>
+          <span class="d-none d-xl-inline"> Statistics</span></a>
+      </li>
+    </ul>
+    <ul class="navbar-nav mt-2 mt-md-0">
+      <!--
+      tiersDropdown
+      -->
+      <li *ngIf="transcrServ !== undefined" [ngStyle]="{
+                'display': (!(navbarServ.dataloaded && appStorage.LoggedIn && (appStorage.usemode === 'local' || appStorage.usemode === 'url'))) ? 'none': 'inherit'
+                }" class="nav-item dropdown">
+        <a aria-expanded="false" aria-haspopup="true" class="nav-link" data-toggle="dropdown" href="#"
+           id="tiersDropdown"
+           role="button">
+          {{(transcrServ.currentlevel.name.length > 30) ? transcrServ.currentlevel.name.substr(0, 30) +
+          '...' : transcrServ.currentlevel.name}}
+          <fa-icon class="navbar-icon" icon="book"></fa-icon>
+        </a>
+        <div [ngClass]="{
+                        'collaps': collapsed
+                    }" aria-labelledby="tiersDropdown" class="dropdown-menu dropdown-menu-right options-menu">
+          <div *ngFor="let level of transcrServ.annotation.levels; let i = index;" [ngClass]="{
+                        selected: (transcrServ.selectedlevel === i)
+                        }"
+               class="row level-row"
+          >
+            <div (click)="selectLevel(i)" [ngClass]="{ disabled: (level.getTypeString() !== 'SEGMENT') }"
+                 class="col-2"
+                 style="cursor: pointer;">{{i + 1}}:
+            </div>
+            <div [ngClass]="{ disabled: (level.getTypeString() !== 'SEGMENT') }" class="col-7"><input
+              (blur)="onLevelNameLeave($event, i)"
+              (click)="onLevelNameClick($event)" maxlength="100"
+              type="text" value="{{level.name}}"/>
+            </div>
+            <div class="col-3">
+              <fa-icon (click)="onLevelRemoveClick(i, level.id)" icon="trash"
+                       style="cursor: pointer;"></fa-icon>
+              <fa-icon (click)="onLevelDuplicateClick(i, level.id)" *ngIf="level.type === annotJSONType.SEGMENT"
+                       [icon]="['fas', 'copy']"
+                       style="margin-left:3px;cursor:pointer;"></fa-icon>
+            </div>
+          </div>
+          <div (click)="onLevelAddClick()" class="row level-add-row">
+            <div class="col-12">
+              <fa-icon icon="plus"></fa-icon>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <!-- online mode counter -->
+      <li
+        *ngIf="(appStorage.LoggedIn && navbarServ.dataloaded && (appStorage.usemode === 'online' ||appStorage.usemode === 'demo'))"
+        class="nav-item">
+        <a class="nav-link">
+          {{appStorage.user.project}}: {{appStorage.jobsLeft}}
+        </a>
+      </li>
+
+      <!--
+      infoDropdown
+      -->
+      <li *ngIf="(appStorage.LoggedIn && navbarServ.dataloaded)" class="nav-item dropdown">
+        <a aria-expanded="false" aria-haspopup="true" class="nav-link" data-toggle="dropdown"
+           href="#" id="infoDropdown">
+          <fa-icon class="navbar-icon" icon="info-circle"></fa-icon>
+        </a>
+        <div aria-labelledby="infoDropdown" class="dropdown-menu dropdown-menu-right info-menu">
+          <table class="table">
+            <tr *ngIf="appStorage.usemode === 'online' ||appStorage.usemode === 'demo'">
+              <td><span>{{'general.project' |transloco}}:</span></td>
+              <td>
+                <span>{{appStorage.user.project}}</span>
+              </td>
+            </tr>
+            <tr>
+              <td><span>{{'general.name' | transloco}}:</span></td>
+              <td>
+                <span>{{navbarServ.ressource?.info.fullname}}</span>
+              </td>
+            </tr>
+            <tr>
+              <td><span>{{'general.duration' | transloco}}:</span></td>
+              <td>
+                                <span>{{navbarServ.ressource?.info.duration.unix |  timespan : {
+                                  showHour: true
+                                }
+                                  }}
+                                  (H:m:s)</span>
+              </td>
+            </tr>
+            <tr>
+              <td><span>{{'general.sampleRate' | transloco}}:</span></td>
+              <td>
+                <span>{{navbarServ.ressource?.info.sampleRate}}</span>
+              </td>
+            </tr>
+            <tr>
+              <td><span>{{'general.bitspersecond' | transloco}}:</span></td>
+              <td>
+                <span>{{navbarServ.ressource?.info.bitrate}} Bit/s</span>
+              </td>
+            </tr>
+            <tr>
+              <td><span>{{'general.filesize' | transloco}}:</span></td>
+              <td>
+                <span>{{navbarServ.filesize.size}} {{navbarServ.filesize.label}}</span>
+              </td>
+            </tr>
+            <tr *ngIf="appStorage.usemode === 'online' ||appStorage.usemode === 'demo'">
+              <td><span>{{'general.id' | transloco}}:</span></td>
+              <td>
+                <span>{{appStorage.dataID}}</span>
+              </td>
+            </tr>
+            <tr *ngIf="appStorage.usemode === 'online' || appStorage.usemode === 'demo'">
+              <td><span>{{'general.free jobs' | transloco}}:</span></td>
+              <td>
+                <span>{{appStorage.jobsLeft}}</span>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </li>
+      <li *ngIf="appStorage.LoggedIn && navbarServ.showExport" class="nav-item">
+        <a (mouseup)="toolsModal.open()" class="nav-link">
+          <fa-icon class="navbar-icon" icon="tools"></fa-icon>
+          <span class="d-md-none d-lg-inline"> {{"general.tools" | transloco}}</span>
+        </a>
+      </li>
+      <li *ngIf="appStorage.LoggedIn && navbarServ.showExport" class="nav-item">
+        <a (mouseup)="modalexport.open()" class="nav-link">
+          <fa-icon class="navbar-icon" icon="download"></fa-icon>
+          <span class="d-md-none d-lg-inline"> {{"general.export" | transloco}}</span>
+        </a>
+      </li>
+
+      <!--
+      optionsDropdown
+      -->
+      <li [ngStyle]="{
+                'display': (!(navbarServ.dataloaded && appStorage.LoggedIn)) ? 'none': 'inherit'
+                }" class="nav-item dropdown">
+        <a aria-expanded="false" aria-haspopup="true" class="nav-link" data-toggle="dropdown"
+           href="#" id="optionsDropdown">
+          <fa-icon icon="cog"></fa-icon>
+        </a>
+        <div aria-labelledby="optionsDropdown" class="dropdown-menu dropdown-menu-right options-menu">
+          <table class="table">
+            <tr>
+              <td><label for="easymode">{{"settings.easy mode" | transloco}}:</label></td>
+              <td>
+                <div class="switch">
+                  <label>
+                    <input (click)="toggleSettings('easymode')" [checked]="appStorage.easymode"
+                           id="easymode" type="checkbox">
+                  </label>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="playonhover">{{"settings.play on hover" | transloco}}:</label></td>
+              <td>
+                <div class="switch">
+                  <label>
+                    <input (click)="toggleSettings('playonhover')"
+                           [checked]="appStorage.playonhover"
+                           id="playonhover" type="checkbox">
+                  </label>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="playonhover">{{"settings.follow playcursor" | transloco}}:</label></td>
+              <td>
+                <div class="switch">
+                  <label>
+                    <input (click)="toggleSettings('followplaycursor')"
+                           [checked]="appStorage.followplaycursor"
+                           id="followplaycursor" type="checkbox">
+                  </label>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="playonhover">{{"settings.logging" | transloco}}:</label></td>
+              <td>
+                <div class="switch">
+                  <label>
+                    <input (click)="toggleSettings('logging')"
+                           [checked]="appStorage.logging"
+                           [disabled]="appStorage.usemode === 'online' || appStorage.usemode === 'demo'"
+                           id="logging" type="checkbox">
+                  </label>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="playonhover">{{"settings.show loupe" | transloco}}:</label></td>
+              <td>
+                <div class="switch">
+                  <label>
+                    <input (click)="toggleSettings('showLoupe')"
+                           [checked]="appStorage.showLoupe"
+                           id="show_loupe" type="checkbox">
+                  </label>
+                </div>
+              </td>
+            </tr>
+            <ng-container *ngIf="appStorage.Interface === '2D-Editor'">
+              <tr>
+                <td colspan="2">
+                  <hr style="border:1px solid lightgray;"/>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2"><label>{{"settings.seconds per line" | transloco}}:</label></td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <div class="btn-group">
+                    <button (click)="changeSecondsPerLine(5)" [(ngModel)]="secondsPerLine"
+                            btnRadio="5" class="btn btn-outline-secondary" role="button"
+                            tabindex="0">5
+                    </button>
+                    <button (click)="changeSecondsPerLine(10)" [(ngModel)]="secondsPerLine"
+                            btnRadio="10" class="btn btn-outline-secondary" role="button"
+                            tabindex="0">10
+                    </button>
+                    <button (click)="changeSecondsPerLine(15)" [(ngModel)]="secondsPerLine"
+                            btnRadio="15" class="btn btn-outline-secondary" role="button"
+                            tabindex="0">15
+                    </button>
+                    <button (click)="changeSecondsPerLine(20)" [(ngModel)]="secondsPerLine"
+                            btnRadio="20" class="btn btn-outline-secondary" role="button"
+                            tabindex="0">20
+                    </button>
+                    <button (click)="changeSecondsPerLine(60)" [(ngModel)]="secondsPerLine"
+                            btnRadio="60" class="btn btn-outline-secondary" role="button"
+                            tabindex="0">60
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </table>
+        </div>
+      </li>
+
+      <!--
+      Feedback
+      -->
+      <li
+        *ngIf="settService.appSettings !== undefined && settService.appSettings.octra.bugreport !== undefined && settService.appSettings.octra.bugreport.enabled"
+        class="nav-item">
+        <a (mouseup)="openBugReport()" class="nav-link">
+          <fa-icon [ngStyle]="{
+                            color: (errorsFound) ? 'red' : '#fcffba'
+                        }" class="navbar-icon" icon="question-circle"
+                   style="color:#fcffba"
+          ></fa-icon>
+          <ng-container *ngIf="!appStorage._loggedIn">
+            {{"general.feedback" | transloco}}
+          </ng-container>
+        </a>
+      </li>
+
+      <!--
+      languageDropdown
+      -->
+      <li class="nav-item dropdown active">
+        <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-toggle="dropdown"
+           href="#" id="navbarDropdownMenuLink">
+          {{langService.getActiveLang() | uppercase}} <span class="caret"></span>
+        </a>
+        <div aria-labelledby="navbarDropdownMenuLink" class="dropdown-menu dropdown-menu-right">
+          <ng-container *ngIf="settService.appSettings !== undefined">
+            <a (click)="changeLanguage(item)" *ngFor="let item of settService.appSettings.octra.languages;"
+               class="dropdown-item">
+              {{item | uppercase}}</a>
+          </ng-container>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>
+<div
+  *ngIf="appStorage.LoggedIn && (appStorage.usemode === 'online' || appStorage.usemode === 'demo') && navbarServ.dataloaded"
+  class="panel"
+  id="subnav">
+  <div class="row">
+    <div [ngClass]="{
+        'col-12 col-sm-9': appStorage.prompttext !== null && appStorage.prompttext !== undefined && appStorage.prompttext !== '',
+        'col-12': appStorage.prompttext !== null && appStorage.prompttext !== undefined && appStorage.prompttext === ''
+        }" class="col-12 col-sm-9" style="text-align: left;padding-left:20px;">
+      {{navbarServ.ressource?.info.fullname}}: <i>{{appStorage.servercomment}}</i>
+    </div>
+    <div *ngIf="appStorage.prompttext !== null && appStorage.prompttext !== undefined && appStorage.prompttext !== ''"
+         class="col-12 col-sm-3"
+         style="text-align: right;padding-right:20px;">
+      <a (click)="promptmodal.open(this.transcrServ.audiofile)"
+         style="cursor: pointer; color:#009688;">{{'general.prompt'| transloco}}</a>
+    </div>
+  </div>
+</div>

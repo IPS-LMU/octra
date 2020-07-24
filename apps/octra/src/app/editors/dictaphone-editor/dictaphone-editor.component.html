@@ -1,0 +1,54 @@
+<octra-audio-navigation #nav
+                      (afterPlaybackRateChange)="afterSpeedChange($event)"
+                      (afterVolumeChange)="afterVolumeChange($event)"
+                      (buttonClick)="onButtonClick($event)"
+                      [audioChunk]="audiochunk"
+                      [buttons]="{
+                        play: {
+                            label: ('general.play' | transloco),
+                            shortcut: keyMap.getShortcut('AP', 'play_pause')
+                        },
+                        pause: {
+                            label: ('general.pause' | transloco),
+                            shortcut: keyMap.getShortcut('AP', 'play_pause')
+                        },
+                        stop: {
+                            label: ('general.stop' | transloco),
+                            shortcut: keyMap.getShortcut('AP', 'stop')
+                        },
+                        replay: {
+                            label: ('general.replay' | transloco),
+                            shortcut: ''
+                        },
+                        backward: {
+                            label: ('general.backward' | transloco),
+                            shortcut: keyMap.getShortcut('AP', 'step_backward')
+                        },
+                        backwardtime: {
+                            label: ('general.backwardtime' | transloco),
+                            shortcut: keyMap.getShortcut('overlay', 'step_backward')
+                        }
+                      }"
+                      [easyMode]="appStorage.easymode"
+                      [playbackRate]="appStorage.audioSpeed"
+
+                      [responsive]="settingsService.responsive.enabled"
+                      [volume]="appStorage.audioVolume"
+></octra-audio-navigation>
+<octra-audioplayer #audioplayer
+                 [audioChunk]="audiochunk"
+></octra-audioplayer>
+<octra-transcr-editor #transcr
+                      (boundaryclicked)="onBoundaryClicked($event)"
+                      (boundaryinserted)="onBoundaryInserted()"
+                      (keyup)="onKeyUp()"
+                      (markerClick)="onMarkerClick($event)"
+                      (markerInsert)="onMarkerInsert($event)"
+                      (typing)="afterTyping($event);"
+                      [audiochunk]="audiochunk"
+                      [easymode]="appStorage.easymode"
+                      [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
+                      [validationEnabled]="appStorage.usemode !== 'url' && (appStorage.usemode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
+                      [(highlightingEnabled)]="highlighting"
+>
+</octra-transcr-editor>

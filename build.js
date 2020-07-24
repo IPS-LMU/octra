@@ -1,7 +1,7 @@
 const fs = require("fs");
 const {execSync, spawn} = require('child_process');
 
-const buildDir = "dist/octra/";
+const buildDir = "dist/apps/octra/";
 const targetFolder = "assets";
 let baseHref = "";
 let dev = "";
@@ -32,7 +32,9 @@ if (process.argv[4].indexOf("url=") > -1) {
 }
 
 console.log(`Building OCTRA with dev=${dev}, isUpdate=${isUpdate} for ${baseHref}`);
-const command = ['--max-old-space-size=12000', './node_modules/@angular/cli/bin/ng', 'build', '--prod', '-c', 'dev', '--base-href', baseHref];
+console.log(`Remove dist...`);
+execSync(`rm -rf "./${buildDir}"`);
+const command = ['--max-old-space-size=12000', './node_modules/@nrwl/cli/bin/nx', 'build', '--prod', '-c', 'dev', '--base-href', baseHref];
 
 if (dev === "") {
   command.splice(4, 2);
@@ -46,7 +48,6 @@ node.stdout.on('data', function (data) {
 node.stderr.on('data', function (data) {
   console.log(data.toString());
 });
-
 node.on('exit', function (code) {
   console.log('child process exited with code ' + code.toString());
   console.log(`Change index.html...`);
@@ -57,12 +58,15 @@ node.on('exit', function (code) {
   indexHTML = indexHTML.replace(/(scripts\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
   indexHTML = indexHTML.replace(/(polyfills-es5\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
   indexHTML = indexHTML.replace(/(polyfills-es2015\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
+  indexHTML = indexHTML.replace(/(polyfills\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
   indexHTML = indexHTML.replace(/(src=")(-es2015\.[0-9a-z]*\.js)/g, `${targetFolder}/$2`);
   indexHTML = indexHTML.replace(/(src=")(-es5\.[0-9a-z]*\.js)/g, `${targetFolder}/$2`);
   indexHTML = indexHTML.replace(/(main-es2015\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
   indexHTML = indexHTML.replace(/(main-es5\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
+  indexHTML = indexHTML.replace(/(main\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
   indexHTML = indexHTML.replace(/(runtime-es2015\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
   indexHTML = indexHTML.replace(/(runtime-es5\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
+  indexHTML = indexHTML.replace(/(runtime\.[0-9a-z]*\.js)/g, `${targetFolder}/$1`);
   indexHTML = indexHTML.replace(/(styles\.[0-9a-z]*\.css)/g, `${targetFolder}/$1`);
   indexHTML = indexHTML.replace(/(const octraLastUpdated = ").*(";)/g, `$1${timeNow}$2`);
   indexHTML = indexHTML.replace(/(const octraVersion = ").*(";)/g, `$1${version}$2`);
@@ -94,9 +98,9 @@ node.on('exit', function (code) {
   }
 
   if (!isUpdate) {
-    execSync(`mv "./${buildDir}/assets/.htaccess" "./${buildDir}/.htaccess"`);
+    execSync(`mv "./${buildDir}assets/.htaccess" "./${buildDir}.htaccess"`);
   } else {
-    execSync(`rm "./${buildDir}/assets/.htaccess"`);
+    execSync(`rm "./${buildDir}assets/.htaccess"`);
   }
 });
 

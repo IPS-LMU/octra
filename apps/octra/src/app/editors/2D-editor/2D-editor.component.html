@@ -1,0 +1,86 @@
+<div id="overlay-transcr" style="position:relative">
+  <octra-transcr-window #window (act)="onWindowAction($event)" *ngIf="showWindow"
+                        [audiochunk]="audioChunkWindow"
+                        [easymode]="appStorage.easymode"
+                        [segmentIndex]="selectedIndex"
+  ></octra-transcr-window>
+  <octra-audio-navigation #audionav
+                        (afterPlaybackRateChange)="afterSpeedChange($event)"
+                        (afterVolumeChange)="afterVolumeChange($event)"
+                        (buttonClick)="onButtonClick($event)"
+                        [audioChunk]="audioChunkLines"
+
+                        [buttons]="{
+                                play: {
+                                    label: ('general.play' | transloco),
+                                    shortcut: keyMap.getShortcut('overlay', 'play_pause')
+                                },
+                                pause: {
+                                    label: ('general.pause' | transloco),
+                                    shortcut: keyMap.getShortcut('overlay', 'play_pause')
+                                },
+                                stop: {
+                                    label: ('general.stop' | transloco),
+                                    shortcut: keyMap.getShortcut('overlay', 'stop')
+                                },
+                                replay: {
+                                    label: ('general.replay' | transloco),
+                                    shortcut: ''
+                                },
+                                backward: {
+                                    label: ('general.backward' | transloco),
+                                    shortcut: keyMap.getShortcut('overlay', 'step_backward')
+                                },
+                                backwardtime: {
+                                    label: ('general.backwardtime' | transloco),
+                                    shortcut: keyMap.getShortcut('overlay', 'step_backward')
+                                }
+                              }"
+                        [easyMode]="appStorage.easymode"
+                        [playbackRate]="appStorage.audioSpeed"
+                        [responsive]="settingsService.responsive.enabled"
+                        [volume]="appStorage.audioVolume"
+  ></octra-audio-navigation>
+  <div *ngIf="appStorage.showLoupe">
+    <octra-audio-viewer #loupe
+                      (mousemove)="onCircleLoupeMouseOver($event)"
+                      [audioChunk]="audioChunkLoupe"
+                      [breakMarker]="{
+                        code: '<P>'
+                      }"
+                      [height]="miniloupe.size.height"
+                      [isMultiLine]="false"
+                      [name]="'loupe'"
+                      [ngStyle]="{
+        'width': miniloupe.size.width + 'px',
+        'height': miniloupe.size.height + 'px',
+        'position':'absolute',
+        'margin-left':miniloupe.location.x + 'px',
+        'margin-top':miniloupe.location.y + 'px',
+        'z-index':'90',
+        'display': 'flex',
+        'visibility': (loupeHidden) ? 'hidden' : 'inherit',
+        'flex': 'auto',
+        'flex-direction': 'column'}"
+                      [settings]="miniLoupeSettings"
+                      [transcriptionLevel]="transcrService.currentlevel"
+    ></octra-audio-viewer>
+  </div>
+  <div #linesView id="lines-wrapper">
+    <octra-audio-viewer #viewer (mousecursorchange)="onMouseOver($event);"
+                      (segmententer)="onSegmentEntered($event)"
+                      (shortcuttriggered)="onShortCutViewerTriggered($event)"
+                      [audioChunk]="audioChunkLines"
+                      [breakMarker]="{
+                        code: '<P>'
+                      }"
+                      [height]="linesViewHeight"
+                      [isMultiLine]="true"
+                      [transcriptionLevel]="transcrService.currentlevel"
+
+                      id="special"
+                      style="height:400px; display: flex; flex: auto; flex-direction: column;"
+    >
+    </octra-audio-viewer>
+  </div>
+</div>

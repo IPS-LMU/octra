@@ -8,10 +8,8 @@ import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
 import {SettingsService} from './settings.service';
 import {TranscriptionService} from './transcription.service';
-import {isUnset} from '@octra/utilities';
-import {SampleUnit, WavFormat} from '@octra/media';
-import {AudioManager} from '../../../../../../../libs/media/src/lib/audio/audio-manager';
-import {FileInfo} from '@octra/components';
+import {FileInfo, isUnset} from '@octra/utilities';
+import {AudioManager, SampleUnit, WavFormat} from '@octra/media';
 
 @Injectable({
   providedIn: 'root'

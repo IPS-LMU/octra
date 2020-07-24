@@ -4,7 +4,7 @@
                         [easymode]="appStorage.easymode"
                         [segmentIndex]="selectedIndex"
   ></octra-transcr-window>
-  <oco-audio-navigation #audionav
+  <octra-audio-navigation #audionav
                         (afterPlaybackRateChange)="afterSpeedChange($event)"
                         (afterVolumeChange)="afterVolumeChange($event)"
                         (buttonClick)="onButtonClick($event)"
@@ -40,9 +40,9 @@
                         [playbackRate]="appStorage.audioSpeed"
                         [responsive]="settingsService.responsive.enabled"
                         [volume]="appStorage.audioVolume"
-  ></oco-audio-navigation>
+  ></octra-audio-navigation>
   <div *ngIf="appStorage.showLoupe">
-    <oco-audio-viewer #loupe
+    <octra-audio-viewer #loupe
                       (mousemove)="onCircleLoupeMouseOver($event)"
                       [audioChunk]="audioChunkLoupe"
                       [breakMarker]="{
@@ -64,10 +64,10 @@
         'flex-direction': 'column'}"
                       [settings]="miniLoupeSettings"
                       [transcriptionLevel]="transcrService.currentlevel"
-    ></oco-audio-viewer>
+    ></octra-audio-viewer>
   </div>
   <div #linesView id="lines-wrapper">
-    <oco-audio-viewer #viewer (mousecursorchange)="onMouseOver($event);"
+    <octra-audio-viewer #viewer (mousecursorchange)="onMouseOver($event);"
                       (segmententer)="onSegmentEntered($event)"
                       (shortcuttriggered)="onShortCutViewerTriggered($event)"
                       [audioChunk]="audioChunkLines"
@@ -81,6 +81,6 @@
                       id="special"
                       style="height:400px; display: flex; flex: auto; flex-direction: column;"
     >
-    </oco-audio-viewer>
+    </octra-audio-viewer>
   </div>
 </div>

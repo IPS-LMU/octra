@@ -1,5 +1,4 @@
-import {AudioTimeCalculator, SampleUnit} from '@octra/media';
-import {AudioChunk} from '../../../../media/src/lib/audio/audio-manager';
+import {AudioChunk, AudioTimeCalculator, SampleUnit} from '@octra/media';
 
 export class PlayCursor {
 

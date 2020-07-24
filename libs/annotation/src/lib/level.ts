@@ -1,7 +1,7 @@
 import {AnnotJSONType, ISegment, OEvent, OItem, OLevel} from './annotjson';
 import {Segments} from './segments';
-import {OIDBLevel} from '@octra/components';
 import {SampleUnit} from '@octra/media';
+import {OIDBLevel} from './db-objects';
 
 export class Level {
   public static counter = 1;

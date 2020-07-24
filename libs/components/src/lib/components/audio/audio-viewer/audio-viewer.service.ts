@@ -3,8 +3,7 @@ import {Subject} from 'rxjs';
 import {PlayCursor} from '../../../obj/play-cursor';
 import {AudioviewerConfig} from './audio-viewer.config';
 import {isUnset, MultiThreadingService, SubscriptionManager, TsWorkerJob} from '@octra/utilities';
-import {AudioSelection, AudioTimeCalculator, PlayBackStatus, SampleUnit} from '@octra/media';
-import {AudioChunk, AudioManager} from '../../../../../../media/src/lib/audio/audio-manager';
+import {AudioChunk, AudioManager, AudioSelection, AudioTimeCalculator, PlayBackStatus, SampleUnit} from '@octra/media';
 import {ASRQueueItemType, Level} from '@octra/annotation';
 
 @Injectable({

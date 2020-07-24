@@ -17,7 +17,7 @@ import {AudioService} from './audio.service';
 import {SettingsService} from './settings.service';
 import {UserInteractionsService} from './userInteractions.service';
 import {Annotation, Level, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment, Segments} from '@octra/annotation';
-import {AudioManager} from '../../../../../../../libs/media/src/lib/audio/audio-manager';
+import {AudioManager} from '@octra/media';
 
 declare var validateAnnotation: ((string, any) => any);
 

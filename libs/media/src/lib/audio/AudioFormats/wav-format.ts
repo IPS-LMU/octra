@@ -1,7 +1,7 @@
 import {Subject} from 'rxjs';
 import {AudioFormat} from './audio-format';
-import {NumeratedSegment} from '@octra/components';
 import {isUnset} from '@octra/utilities';
+import {NumeratedSegment} from '../../types';
 
 // http://soundfile.sapp.org/doc/WaveFormat/
 export class WavFormat extends AudioFormat {

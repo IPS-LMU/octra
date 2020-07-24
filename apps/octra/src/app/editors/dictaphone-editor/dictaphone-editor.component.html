@@ -1,4 +1,4 @@
-<oco-audio-navigation #nav
+<octra-audio-navigation #nav
                       (afterPlaybackRateChange)="afterSpeedChange($event)"
                       (afterVolumeChange)="afterVolumeChange($event)"
                       (buttonClick)="onButtonClick($event)"
@@ -34,10 +34,10 @@
 
                       [responsive]="settingsService.responsive.enabled"
                       [volume]="appStorage.audioVolume"
-></oco-audio-navigation>
-<oco-audioplayer #audioplayer
+></octra-audio-navigation>
+<octra-audioplayer #audioplayer
                  [audioChunk]="audiochunk"
-></oco-audioplayer>
+></octra-audioplayer>
 <octra-transcr-editor #transcr
                       (boundaryclicked)="onBoundaryClicked($event)"
                       (boundaryinserted)="onBoundaryInserted()"

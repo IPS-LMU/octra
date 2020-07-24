@@ -1,4 +1,4 @@
-<oco-audio-viewer #miniloupeComponent *ngIf="appStorage.showLoupe" [audioChunk]="audioChunkLoupe"
+<octra-audio-viewer #miniloupeComponent *ngIf="appStorage.showLoupe" [audioChunk]="audioChunkLoupe"
                   [breakMarker]="{
                         code: '<P>'
                       }"
@@ -19,8 +19,8 @@
                   [settings]="miniLoupeSettings"
                   [transcriptionLevel]="transcrService.currentlevel"
 >
-</oco-audio-viewer>
-<oco-audio-navigation #nav
+</octra-audio-viewer>
+<octra-audio-navigation #nav
                       (afterPlaybackRateChange)="afterSpeedChange($event)"
                       (afterVolumeChange)="afterVolumeChange($event)"
                       (buttonClick)="onButtonClick($event)"
@@ -58,9 +58,9 @@
                       [volume]="appStorage.audioVolume"
 >
 
-</oco-audio-navigation>
+</octra-audio-navigation>
 <div id="viewer">
-  <oco-audio-viewer #signalDisplayTop (mousecursorchange)="onMouseOver($event)"
+  <octra-audio-viewer #signalDisplayTop (mousecursorchange)="onMouseOver($event)"
                     (mousedown)="onViewerMouseDown($event)"
                     (mouseenter)="miniloupe.isHidden = false;"
                     (mouseleave)="miniloupe.isHidden = true;"
@@ -74,10 +74,10 @@
                     [transcriptionLevel]="transcrService.currentlevel"
                     style="height:80px;"
   >
-  </oco-audio-viewer>
+  </octra-audio-viewer>
 </div>
 
-<oco-audio-viewer #signalDisplayDown
+<octra-audio-viewer #signalDisplayDown
                   (shortcuttriggered)="onViewerShortcutTriggered($event, 'signaldisplay_down')"
                   (alerttriggered)="onAlertTriggered($event)"
                   (click)="onLoupeClick($event)"
@@ -92,7 +92,7 @@
                   [settings]="loupeSettings"
                   [transcriptionLevel]="transcrService.currentlevel"
 >
-</oco-audio-viewer>
+</octra-audio-viewer>
 <div [hidden]="segmentselected" id="editor-placeholder">
   <div *ngIf="!segmentselected && (audioChunkDown !== null && audioChunkDown !== undefined)"
        [innerHTML]="'signal-gui.segment enter text' | transloco:{value: segmententer_shortc}"

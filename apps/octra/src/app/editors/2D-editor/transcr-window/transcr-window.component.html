@@ -15,7 +15,7 @@
     </div>
     <octra-asr-options *ngIf="settingsService.isASREnabled" [audioChunk]="audiochunk"
                        [enabled]="editor.rawText === ''"></octra-asr-options>
-    <oco-audio-navigation #audionav
+    <octra-audio-navigation #audionav
                           (afterPlaybackRateChange)="afterSpeedChange($event)"
                           (afterVolumeChange)="afterVolumeChange($event)"
                           (buttonClick)="onButtonClick($event)"
@@ -52,13 +52,13 @@
                           [responsive]="settingsService.responsive.enabled"
                           [volume]="appStorage.audioVolume"
 
-    ></oco-audio-navigation>
-    <oco-audio-viewer #loupe
+    ></octra-audio-navigation>
+    <octra-audio-viewer #loupe
                       [audioChunk]="audiochunk"
                       [transcriptionLevel]="transcrService.currentlevel"
                       (shortcuttriggered)="triggerUIAction($event)"
                       id="loupe"
-    ></oco-audio-viewer>
+    ></octra-audio-viewer>
     <octra-transcr-editor #editor (boundaryclicked)="onBoundaryClicked($event)"
                           (boundaryinserted)="onBoundaryInserted()"
                           (markerClick)="onMarkerClick($event)"

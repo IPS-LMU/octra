@@ -5,3 +5,4 @@ export * from './lib/link';
 export * from './lib/segment';
 export * from './lib/segments';
 export * from './lib/asr';
+export * from './lib/db-objects';

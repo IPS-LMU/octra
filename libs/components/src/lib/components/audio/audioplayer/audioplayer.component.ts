@@ -3,8 +3,7 @@ import Konva from 'konva';
 import {Subscription} from 'rxjs';
 import {AudioplayerSettings} from './audioplayer-settings';
 import {isUnset, SubscriptionManager} from '@octra/utilities';
-import {AudioChunk} from '../../../../../../media/src/lib/audio/audio-manager';
-import {PlayBackStatus, SampleUnit} from '@octra/media';
+import {AudioChunk, PlayBackStatus, SampleUnit} from '@octra/media';
 
 @Component({
   selector: 'octra-audioplayer',

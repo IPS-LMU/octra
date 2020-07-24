@@ -61,10 +61,3 @@ export class Margin implements IMargin {
   constructor(public top: number, public right: number, public bottom: number, public left: number) {
   }
 }
-
-export interface NumeratedSegment {
-  number: number;
-  sampleStart: number;
-  sampleDur: number;
-}
-

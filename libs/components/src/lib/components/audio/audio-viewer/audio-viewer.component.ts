@@ -25,8 +25,7 @@ import Layer = Konva.Layer;
 import Vector2d = Konva.Vector2d;
 import {isUnset, SubscriptionManager} from '@octra/utilities';
 import {ASRQueueItemType, Level, Segment} from '@octra/annotation';
-import {AudioChunk, AudioManager} from '../../../../../../media/src/lib/audio/audio-manager';
-import {AudioSelection, PlayBackStatus, SampleUnit} from '@octra/media';
+import {AudioSelection, PlayBackStatus, SampleUnit, AudioChunk, AudioManager} from '@octra/media';
 
 @Component({
   selector: 'octra-audio-viewer',

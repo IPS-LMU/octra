@@ -1,4 +1,4 @@
-import {SourceType} from './audio';
+import {SourceType} from './types';
 
 export class MediaRessource {
   private source: SourceType;

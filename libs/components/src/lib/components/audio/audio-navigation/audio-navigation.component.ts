@@ -14,8 +14,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {isUnset, SubscriptionManager} from '@octra/utilities';
-import {AudioChunk} from '../../../../../../media/src/lib/audio/audio-manager';
-import {PlayBackStatus} from '@octra/media';
+import {AudioChunk, PlayBackStatus} from '@octra/media';
 
 export interface Buttons {
   play: {

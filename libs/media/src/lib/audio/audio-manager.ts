@@ -3,8 +3,11 @@ import {Subject, Subscription, timer} from 'rxjs'
 import {AudioDecoder} from './audio-decoder';
 import {AudioInfo} from './audio-info';
 import {AudioRessource} from './audio-ressource';
-import {AudioFormat, AudioSelection, PlayBackStatus, SampleUnit, SourceType, WavFormat} from './index';
+import {AudioFormat, WavFormat} from './AudioFormats';
 import {isUnset, SubscriptionManager} from '@octra/utilities';
+import {SampleUnit} from './audio-time';
+import {PlayBackStatus, SourceType} from '../types';
+import {AudioSelection} from './audio-selection';
 
 declare var window: any;
 

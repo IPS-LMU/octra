@@ -15,7 +15,7 @@ import {
 import Konva from 'konva';
 import {Context} from 'konva/types/Context';
 import {Subject} from 'rxjs';
-import {BrowserInfo, KeyMapping, Position, Size} from '../../../obj';
+import {KeyMapping, Position, Size} from '../../../obj';
 import {PlayCursor} from '../../../obj/play-cursor';
 import {TimespanPipe} from '../../../pipe';
 import {AudioviewerConfig} from './audio-viewer.config';
@@ -23,7 +23,7 @@ import {AudioViewerService} from './audio-viewer.service';
 import Group = Konva.Group;
 import Layer = Konva.Layer;
 import Vector2d = Konva.Vector2d;
-import {isUnset, SubscriptionManager} from '@octra/utilities';
+import {BrowserInfo, isUnset, SubscriptionManager} from '@octra/utilities';
 import {ASRQueueItemType, Level, Segment} from '@octra/annotation';
 import {AudioSelection, PlayBackStatus, SampleUnit, AudioChunk, AudioManager} from '@octra/media';
 

@@ -1,5 +1,5 @@
-import {isUnset} from '@octra/components';
 import {Observable} from 'rxjs';
+import {isUnset} from '@octra/utilities';
 
 export enum IDBMode {
   READONLY,

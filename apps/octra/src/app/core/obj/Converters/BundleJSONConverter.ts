@@ -1,5 +1,6 @@
-import {Functions, IAnnotJSON, OAnnotJSON, OAudiofile} from '@octra/components';
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
+import {IAnnotJSON, OAnnotJSON, OAudiofile} from '@octra/annotation';
+import {Functions} from '@octra/utilities';
 
 export interface Bundle {
   ssffFiles: {

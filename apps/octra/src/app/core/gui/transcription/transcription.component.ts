@@ -16,8 +16,7 @@ import {
 } from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
-import {AudioManager, Functions, isUnset, Level, PlayBackStatus} from '@octra/components';
-import {SubscriptionManager} from '@octra/utilities';
+import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
 import {interval, throwError} from 'rxjs';
 import * as X2JS from 'x2js';
 import {AppInfo} from '../../../app.info';
@@ -56,6 +55,8 @@ import {AsrService} from '../../shared/service/asr.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
 import {NavbarService} from '../navbar/navbar.service';
 import {logger} from 'codelyzer/util/logger';
+import {AudioManager} from '../../../../../../../libs/media/src/lib/audio/audio-manager';
+import {Level} from '@octra/annotation';
 
 @Component({
   selector: 'octra-transcription',

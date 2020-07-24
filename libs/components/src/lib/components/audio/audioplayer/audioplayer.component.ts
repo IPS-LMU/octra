@@ -1,11 +1,10 @@
 import {AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import Konva from 'konva';
 import {Subscription} from 'rxjs';
-import {isUnset} from '../../../functions';
-import {PlayBackStatus, SampleUnit} from '../../../obj/audio';
-import {AudioChunk} from '../../../obj/audio/audio-manager';
 import {AudioplayerSettings} from './audioplayer-settings';
-import {SubscriptionManager} from '@octra/utilities';
+import {isUnset, SubscriptionManager} from '@octra/utilities';
+import {AudioChunk} from '../../../../../../media/src/lib/audio/audio-manager';
+import {PlayBackStatus, SampleUnit} from '@octra/media';
 
 @Component({
   selector: 'octra-audioplayer',

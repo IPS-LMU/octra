@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
-import {Functions} from '@octra/components';
 import {Observable} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {SettingsService} from '../service';
 import {CompatibilityService} from '../service/compatibility.service';
+import {Functions} from '@octra/utilities';
 
 @Injectable({
   providedIn: 'root'

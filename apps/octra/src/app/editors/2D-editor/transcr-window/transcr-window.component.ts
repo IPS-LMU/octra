@@ -13,21 +13,7 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import {
-  ASRQueueItemType,
-  AudioChunk,
-  AudioManager,
-  AudioNavigationComponent,
-  AudioRessource,
-  AudioSelection,
-  AudioViewerComponent,
-  AudioViewerShortcutEvent,
-  isUnset,
-  SampleUnit,
-  Segment,
-  Segments
-} from '@octra/components';
-import {SubscriptionManager} from '@octra/utilities';
+import {isUnset, SubscriptionManager} from '@octra/utilities';
 import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
 
 import {
@@ -39,6 +25,10 @@ import {
 } from '../../../core/shared/service';
 import {AppStorageService} from '../../../core/shared/service/appstorage.service';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../../core/shared/service/asr.service';
+import {AudioChunk, AudioManager} from '../../../../../../../libs/media/src/lib/audio/audio-manager';
+import {AudioRessource, AudioSelection, SampleUnit} from '@octra/media';
+import {ASRQueueItemType, Segment, Segments} from '@octra/annotation';
+import {AudioNavigationComponent, AudioViewerComponent, AudioViewerShortcutEvent} from '@octra/components';
 
 @Component({
   selector: 'octra-transcr-window',

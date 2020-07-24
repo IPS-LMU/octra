@@ -8,17 +8,7 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import {
-  AudioChunk,
-  AudioManager,
-  AudioNavigationComponent,
-  AudioplayerComponent,
-  BrowserInfo,
-  isUnset,
-  SampleUnit,
-  Segment
-} from '@octra/components';
-import {SubscriptionManager} from '@octra/utilities';
+import {isUnset, SubscriptionManager} from '@octra/utilities';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 
 import {
@@ -31,6 +21,11 @@ import {
 } from '../../core/shared/service';
 import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {OCTRAEditor} from '../octra-editor';
+import {BrowserInfo} from '../../core/shared';
+import {SampleUnit} from '@octra/media';
+import {Segment} from '@octra/annotation';
+import {AudioNavigationComponent, AudioplayerComponent} from '@octra/components';
+import {AudioChunk, AudioManager} from '../../../../../../libs/media/src/lib/audio/audio-manager';
 
 @Component({
   selector: 'octra-audioplayer-gui',

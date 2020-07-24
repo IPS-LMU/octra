@@ -4,5 +4,4 @@ export * from './db-objects';
 export * from './fileInfo';
 export * from './key-mapping';
 export * from './line';
-export * from './media-ressource';
 export * from './objects';

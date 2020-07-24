@@ -9,18 +9,7 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import {
-  AudioChunk,
-  AudioManager,
-  AudioNavigationComponent,
-  AudioSelection,
-  AudioViewerComponent,
-  AudioviewerConfig, AudioViewerShortcutEvent,
-  Functions,
-  isUnset,
-  SampleUnit
-} from '@octra/components';
-import {SubscriptionManager} from '@octra/utilities';
+import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {BrowserInfo} from '../../core/shared';
 
@@ -35,6 +24,14 @@ import {
 } from '../../core/shared/service';
 import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {OCTRAEditor} from '../octra-editor';
+import {
+  AudioNavigationComponent,
+  AudioViewerComponent,
+  AudioviewerConfig,
+  AudioViewerShortcutEvent
+} from '@octra/components';
+import {AudioChunk, AudioManager} from '../../../../../../libs/media/src/lib/audio/audio-manager';
+import {AudioSelection, SampleUnit} from '@octra/media';
 
 @Component({
   selector: 'octra-signal-gui',

@@ -1,11 +1,11 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
-import {OAudiofile} from '@octra/components';
 import {Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {AnnotJSONConverter, PartiturConverter, TextConverter} from '../../obj/Converters';
 import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
+import {OAudiofile} from '@octra/annotation';
 
 @Component({
   selector: 'octra-prompt-modal',

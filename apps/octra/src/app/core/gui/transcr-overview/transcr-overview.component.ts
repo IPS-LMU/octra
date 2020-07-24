@@ -13,20 +13,15 @@ import {
   ViewChild
 } from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
-import {
-  AudioChunk,
-  AudioSelection,
-  isFunction,
-  isUnset,
-  SampleUnit,
-  Segment
-} from '@octra/components';
-import {SubscriptionManager} from '@octra/utilities';
+import {isFunction, isUnset, SubscriptionManager} from '@octra/utilities';
 import {TranscrEditorComponent} from '../../component/transcr-editor';
 import {ValidationPopoverComponent} from '../../component/transcr-editor/validation-popover/validation-popover.component';
 
 import {AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
+import {Segment} from '@octra/annotation';
+import {AudioChunk} from '../../../../../../../libs/media/src/lib/audio/audio-manager';
+import {AudioSelection, SampleUnit} from '@octra/media';
 
 declare var validateAnnotation: ((string, any) => any);
 declare var tidyUpAnnotation: ((string, any) => any);

@@ -95,7 +95,7 @@
             <div class="col-3">
               <fa-icon (click)="onLevelRemoveClick(i, level.id)" icon="trash"
                        style="cursor: pointer;"></fa-icon>
-              <fa-icon (click)="onLevelDuplicateClick(i, level.id)" *ngIf="level.type === AnnotJSONType.SEGMENT"
+              <fa-icon (click)="onLevelDuplicateClick(i, level.id)" *ngIf="level.type === annotJSONType.SEGMENT"
                        [icon]="['fas', 'copy']"
                        style="margin-left:3px;cursor:pointer;"></fa-icon>
             </div>

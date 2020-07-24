@@ -1,9 +1,8 @@
 import {Subject} from 'rxjs';
-import {isUnset} from '../../functions';
 import {AudioInfo} from './audio-info';
 import {SampleUnit} from './audio-time';
-import {AudioFormat, WavFormat} from './AudioFormats';
-import {SubscriptionManager, TsWorker, TsWorkerJob, TsWorkerStatus} from '@octra/utilities';
+import {AudioFormat, WavFormat} from './';
+import {isUnset, SubscriptionManager, TsWorker, TsWorkerJob, TsWorkerStatus} from '@octra/utilities';
 
 declare var window: any;
 

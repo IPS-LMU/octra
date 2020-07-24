@@ -2,12 +2,12 @@ import {HttpClient} from '@angular/common/http';
 import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
-import {Functions, isUnset, OAudiofile, OLevel} from '@octra/components';
 import {AppInfo} from '../../../app.info';
 import {IFile, ImportResult} from '../../obj/Converters';
-import {SubscriptionManager} from '@octra/utilities';
+import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
 import {AudioService, SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService, OIDBLevel} from '../../shared/service/appstorage.service';
+import {OAudiofile, OLevel} from '@octra/annotation';
 
 @Component({
   selector: 'octra-loading',

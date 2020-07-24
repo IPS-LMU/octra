@@ -13,13 +13,7 @@ import {
 } from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
 import {
-  AudioChunk,
-  AudioManager,
-  Functions,
-  isUnset,
   KeyMapping,
-  SampleUnit,
-  Segments,
   TimespanPipe
 } from '@octra/components';
 import {isNumeric} from 'rxjs/internal-compatibility';
@@ -30,7 +24,10 @@ import {TranscriptionService} from '../../shared/service';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../shared/service/asr.service';
 import {TranscrEditorConfig} from './config';
 import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
-import {SubscriptionManager} from '@octra/utilities';
+import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
+import {SampleUnit} from '@octra/media';
+import {AudioChunk, AudioManager} from '../../../../../../../libs/media/src/lib/audio/audio-manager';
+import {Segments} from '@octra/annotation';
 
 /// <reference path="../../../../../../node_modules/@types/summernote/index.d.ts" />
 declare var tidyUpAnnotation: ((string, any) => any);

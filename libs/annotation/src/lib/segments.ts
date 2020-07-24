@@ -1,8 +1,8 @@
 import {EventEmitter} from '@angular/core';
-import {isUnset} from '../../functions';
-import {SampleUnit} from '../audio';
 import {ISegment, OLabel, OSegment} from './annotjson';
 import {Segment} from './segment';
+import {SampleUnit} from '@octra/media';
+import {isUnset} from '@octra/utilities';
 
 export interface SegmentChangeEvent {
   type: 'remove' | 'change' | 'add';

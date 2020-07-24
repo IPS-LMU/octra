@@ -13,10 +13,9 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import {isUnset} from '../../../functions';
-import {PlayBackStatus} from '../../../obj/audio';
-import {AudioChunk} from '../../../obj/audio/audio-manager';
-import {SubscriptionManager} from '@octra/utilities';
+import {isUnset, SubscriptionManager} from '@octra/utilities';
+import {AudioChunk} from '../../../../../../media/src/lib/audio/audio-manager';
+import {PlayBackStatus} from '@octra/media';
 
 export interface Buttons {
   play: {

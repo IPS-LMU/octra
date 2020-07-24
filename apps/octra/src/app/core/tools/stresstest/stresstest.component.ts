@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {SessionStorage, SessionStorageService} from 'ngx-webstorage';
-import {Functions} from '@octra/components';
 import {BrowserInfo} from '../../shared';
+import {Functions} from '@octra/utilities';
 
 @Component({
   selector: 'octra-stresstest',

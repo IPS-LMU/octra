@@ -2,7 +2,6 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
 import * as moment from 'moment';
-import {Functions, isUnset} from '@octra/components';
 import {Observable} from 'rxjs';
 import {isArray} from 'rxjs/internal-compatibility';
 import {AppInfo} from '../../../app.info';
@@ -11,6 +10,7 @@ import {BrowserInfo} from '../BrowserInfo';
 import {AppStorageService} from './appstorage.service';
 import {SettingsService} from './settings.service';
 import {TranscriptionService} from './transcription.service';
+import {Functions, isUnset} from '@octra/utilities';
 
 export enum ConsoleType {
   LOG,

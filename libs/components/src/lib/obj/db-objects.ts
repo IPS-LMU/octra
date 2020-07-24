@@ -1,4 +1,4 @@
-import {OLevel, OLink} from './annotation';
+import {OLevel, OLink} from '@octra/annotation';
 
 export interface IIDBLevel {
   id: number;

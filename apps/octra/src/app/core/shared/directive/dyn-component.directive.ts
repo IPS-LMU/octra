@@ -8,8 +8,8 @@ import {
   Output,
   ViewContainerRef
 } from '@angular/core';
-import {isUnset} from '@octra/components';
-import {SubscriptionManager} from '@octra/utilities';
+
+import {isUnset, SubscriptionManager} from '@octra/utilities';
 
 @Directive({
   selector: '[octraDynComponent]'

@@ -1,7 +1,6 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
-import {AudioManager, FileInfo, isUnset, SampleUnit, WavFormat} from '@octra/components';
 import {Subject} from 'rxjs';
 import * as X2JS from 'x2js';
 import {ASRLanguage, ASRSettings} from '../../obj/Settings';
@@ -9,6 +8,10 @@ import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
 import {SettingsService} from './settings.service';
 import {TranscriptionService} from './transcription.service';
+import {isUnset} from '@octra/utilities';
+import {SampleUnit, WavFormat} from '@octra/media';
+import {AudioManager} from '../../../../../../../libs/media/src/lib/audio/audio-manager';
+import {FileInfo} from '@octra/components';
 
 @Injectable({
   providedIn: 'root'

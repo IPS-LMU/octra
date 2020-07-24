@@ -1,11 +1,10 @@
 import {EventEmitter} from '@angular/core';
-import {Subject, Subscription, timer} from 'rxjs';
-import {isUnset} from '../../functions';
+import {Subject, Subscription, timer} from 'rxjs'
 import {AudioDecoder} from './audio-decoder';
 import {AudioInfo} from './audio-info';
 import {AudioRessource} from './audio-ressource';
 import {AudioFormat, AudioSelection, PlayBackStatus, SampleUnit, SourceType, WavFormat} from './index';
-import {SubscriptionManager} from '@octra/utilities';
+import {isUnset, SubscriptionManager} from '@octra/utilities';
 
 declare var window: any;
 

@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
-import {Annotation, isUnset, Level} from '@octra/components';
+import {Annotation, Level} from '@octra/annotation';
+import {isUnset} from '@octra/utilities';
 
 export interface ColumnDefinition {
   type: string;

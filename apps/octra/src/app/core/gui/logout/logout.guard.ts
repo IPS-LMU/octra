@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
 
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
-import {Functions} from '@octra/components';
 import {Observable} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {AppStorageService} from '../../shared/service/appstorage.service';
+import {Functions} from '@octra/utilities';
 
 @Injectable()
 export class LogoutGuard implements CanActivate {

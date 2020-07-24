@@ -4,8 +4,7 @@ import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
-import {isUnset, Segment, WavFormat} from '@octra/components';
-import {SubscriptionManager} from '@octra/utilities';
+import {isUnset, SubscriptionManager} from '@octra/utilities';
 import {interval, Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {NamingDragAndDropComponent} from '../../component/naming-drag-and-drop/naming-drag-and-drop.component';
@@ -13,6 +12,8 @@ import {NavbarService} from '../../gui/navbar/navbar.service';
 import {JSONConverter, TextTableConverter} from '../../obj/tools/audio-cutting/cutting-format';
 import {AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
+import {Segment} from '@octra/annotation';
+import {WavFormat} from '@octra/media';
 
 declare var JSZip;
 

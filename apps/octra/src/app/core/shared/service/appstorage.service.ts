@@ -1,6 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {LocalStorageService, SessionStorage, SessionStorageService} from 'ngx-webstorage';
-import {AudioManager, isUnset, OLevel, OLink} from '@octra/components';
 import {Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {IDataEntry} from '../../obj/data-entry';
@@ -8,6 +7,9 @@ import {IndexedDBManager} from '../../obj/IndexedDBManager';
 import {SessionFile} from '../../obj/SessionFile';
 import {ConsoleEntry} from './bug-report.service';
 import {FileProgress} from '../../obj/objects';
+import {AudioManager} from '../../../../../../../libs/media/src/lib/audio/audio-manager';
+import {isUnset} from '@octra/utilities';
+import {OLevel, OLink} from '@octra/annotation';
 
 export interface IIDBLevel {
   id: number;

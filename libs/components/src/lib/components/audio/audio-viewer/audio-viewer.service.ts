@@ -1,12 +1,11 @@
 import {Injectable} from '@angular/core';
 import {Subject} from 'rxjs';
-import {isUnset} from '../../../functions';
-import {ASRQueueItemType, Level} from '../../../obj/annotation';
-import {AudioSelection, AudioTimeCalculator, PlayBackStatus, SampleUnit} from '../../../obj/audio';
-import {AudioChunk, AudioManager} from '../../../obj/audio/audio-manager';
 import {PlayCursor} from '../../../obj/play-cursor';
 import {AudioviewerConfig} from './audio-viewer.config';
-import {MultiThreadingService, SubscriptionManager, TsWorkerJob} from '@octra/utilities';
+import {isUnset, MultiThreadingService, SubscriptionManager, TsWorkerJob} from '@octra/utilities';
+import {AudioSelection, AudioTimeCalculator, PlayBackStatus, SampleUnit} from '@octra/media';
+import {AudioChunk, AudioManager} from '../../../../../../media/src/lib/audio/audio-manager';
+import {ASRQueueItemType, Level} from '@octra/annotation';
 
 @Injectable({
   providedIn: 'root'

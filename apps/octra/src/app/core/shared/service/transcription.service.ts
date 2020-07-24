@@ -1,19 +1,6 @@
 import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
-import {
-  Annotation,
-  AudioManager,
-  Functions,
-  isUnset,
-  Level,
-  OAnnotJSON,
-  OAudiofile,
-  OLabel,
-  OLevel,
-  OSegment,
-  Segments
-} from '@octra/components';
-import {SubscriptionManager} from '@octra/utilities';
+import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
 import {isArray} from 'rxjs/internal-compatibility';
 import {AnnotJSONConverter, PartiturConverter, TextConverter} from '../';
 import {AppInfo} from '../../../app.info';
@@ -29,6 +16,8 @@ import {AppStorageService, OIDBLevel} from './appstorage.service';
 import {AudioService} from './audio.service';
 import {SettingsService} from './settings.service';
 import {UserInteractionsService} from './userInteractions.service';
+import {Annotation, Level, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment, Segments} from '@octra/annotation';
+import {AudioManager} from '../../../../../../../libs/media/src/lib/audio/audio-manager';
 
 declare var validateAnnotation: ((string, any) => any);
 

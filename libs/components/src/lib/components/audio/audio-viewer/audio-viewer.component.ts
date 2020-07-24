@@ -15,12 +15,7 @@ import {
 import Konva from 'konva';
 import {Context} from 'konva/types/Context';
 import {Subject} from 'rxjs';
-import {isUnset} from '../../../functions';
 import {BrowserInfo, KeyMapping, Position, Size} from '../../../obj';
-import {ASRQueueItemType, Level, Segment} from '../../../obj/annotation';
-import {AudioSelection, PlayBackStatus} from '../../../obj/audio';
-import {AudioChunk, AudioManager} from '../../../obj/audio/audio-manager';
-import {SampleUnit} from '../../../obj/audio/audio-time';
 import {PlayCursor} from '../../../obj/play-cursor';
 import {TimespanPipe} from '../../../pipe';
 import {AudioviewerConfig} from './audio-viewer.config';
@@ -28,7 +23,10 @@ import {AudioViewerService} from './audio-viewer.service';
 import Group = Konva.Group;
 import Layer = Konva.Layer;
 import Vector2d = Konva.Vector2d;
-import {SubscriptionManager} from '@octra/utilities';
+import {isUnset, SubscriptionManager} from '@octra/utilities';
+import {ASRQueueItemType, Level, Segment} from '@octra/annotation';
+import {AudioChunk, AudioManager} from '../../../../../../media/src/lib/audio/audio-manager';
+import {AudioSelection, PlayBackStatus, SampleUnit} from '@octra/media';
 
 @Component({
   selector: 'octra-audio-viewer',

@@ -1,6 +1,6 @@
-import {SampleUnit} from '../audio';
 import {OSegment} from './annotjson';
 import {ASRQueueItemType} from './asr';
+import {SampleUnit} from '@octra/media';
 
 export class Segment {
   get progressInfo(): { progress: number; statusLabel: string } {

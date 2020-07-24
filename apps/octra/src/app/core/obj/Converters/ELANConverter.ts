@@ -1,7 +1,8 @@
 import * as moment from 'moment';
-import {isUnset, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '@octra/components';
 import * as X2JS from 'x2js';
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '@octra/annotation';
+import {isUnset} from '@octra/utilities';
 
 export class ELANConverter extends Converter {
 
@@ -21,7 +22,7 @@ export class ELANConverter extends Converter {
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
-    let result = '';
+    let result: string;
     let filename = '';
 
     const x2js = new X2JS();

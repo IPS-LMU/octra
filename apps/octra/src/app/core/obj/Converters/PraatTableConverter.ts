@@ -1,5 +1,6 @@
-import {Functions, ILevel, ISegment, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '@octra/components';
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
+import {ILevel, ISegment, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '@octra/annotation';
+import {Functions} from '@octra/utilities';
 
 export class PraatTableConverter extends Converter {
 

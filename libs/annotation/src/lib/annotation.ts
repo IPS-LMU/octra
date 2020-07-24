@@ -1,7 +1,7 @@
-import {SampleUnit} from '../audio';
 import {OAnnotJSON, OAudiofile} from './annotjson';
 import {Level} from './level';
 import {Link} from './link';
+import {SampleUnit} from '@octra/media';
 
 export class Annotation {
   private readonly _annotates: string;

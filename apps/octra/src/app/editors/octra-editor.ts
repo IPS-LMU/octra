@@ -1,4 +1,7 @@
-import {AudioChunk, AudioManager, AudioSelection, AudioViewerComponent, Level, SampleUnit} from '@octra/components';
+import {AudioChunk, AudioManager} from '../../../../../libs/media/src/lib/audio/audio-manager';
+import {AudioSelection, SampleUnit} from '@octra/media';
+import {AudioViewerComponent} from '@octra/components';
+import {Level} from '@octra/annotation';
 
 export abstract class OCTRAEditor {
   constructor() {

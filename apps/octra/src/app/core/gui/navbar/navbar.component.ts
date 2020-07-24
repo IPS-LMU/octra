@@ -1,7 +1,6 @@
 import {AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
-import {AnnotJSONType, Level, Segments} from '@octra/components';
 import {environment} from '../../../../environments/environment';
 import {AppInfo} from '../../../app.info';
 import {editorComponents} from '../../../editors/components';
@@ -12,6 +11,7 @@ import {SettingsService, TranscriptionService, UserInteractionsService} from '..
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService, ConsoleType} from '../../shared/service/bug-report.service';
 import {NavbarService} from './navbar.service';
+import {AnnotJSONType, Level, Segments} from '@octra/annotation';
 
 declare let jQuery: any;
 
@@ -54,7 +54,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     return editorComponents;
   }
 
-  get AnnotJSONType() {
+  get annotJSONType() {
     return AnnotJSONType;
   }
 

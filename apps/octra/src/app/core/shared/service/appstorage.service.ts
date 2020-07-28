@@ -7,9 +7,20 @@ import {IndexedDBManager} from '../../obj/IndexedDBManager';
 import {SessionFile} from '../../obj/SessionFile';
 import {ConsoleEntry} from './bug-report.service';
 import {FileProgress} from '../../obj/objects';
-import {AudioManager} from '../../../../../../../libs/media/src/lib/audio/audio-manager';
-import {isUnset} from '@octra/utilities';
+import {isUnset, SubscriptionManager} from '@octra/utilities';
 import {OLevel, OLink} from '@octra/annotation';
+import {LoginMode, OnlineSession, RootState} from '../../store';
+import {Store} from '@ngrx/store';
+import * as fromApplication from '../../store/application/';
+import * as fromASR from '../../store/asr/';
+import * as fromLogin from '../../store/login/';
+import {AudioManager} from '@octra/media';
+import * as fromApplicationActions from '../../store/application/application.actions';
+import * as fromLoginActions from '../../store/login/login.actions';
+import * as fromASRActions from '../../store/asr/asr.actions';
+import * as fromTranscriptionActions from '../../store/transcription/transcription.actions';
+import * as fromTranscription from '../../store/transcription';
+import {map} from 'rxjs/operators';
 
 export interface IIDBLevel {
   id: number;
@@ -46,116 +57,10 @@ export class OIDBLink implements IIDBLink {
 
 @Injectable()
 export class AppStorageService {
-  // SESSION STORAGE
-  @SessionStorage('sessionKey') sessionKey: string;
-  @SessionStorage() _loggedIn: boolean;
-  @SessionStorage() logInTime: number; // timestamp
-  @SessionStorage('jobsLeft') jobsLeft: number;
-
-  public saving: EventEmitter<string> = new EventEmitter<string>();
-  public loginActivityChanged = new Subject<boolean>();
-  public settingschange = new Subject<{ key: string, value: any }>();
-  private _audioSettings = {
-    volume: 1,
-    speed: 1
-  };
-  private _interface: string = null;
-  // is user on the login page?
-  private login: boolean;
-  private _asr = {
-    selectedLanguage: null,
-    selectedService: null
-  };
-
-  get Interface(): string {
-    return this._interface;
-  }
-
-  set Interface(newInterface: string) {
-    this._interface = newInterface;
-    this.idb.save('options', 'interface', {value: newInterface}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  get asrSelectedLanguage(): string {
-    return this._asr.selectedLanguage;
-  }
-
-  set asrSelectedLanguage(value: string) {
-    this._asr.selectedLanguage = value;
-    this.idb.save('options', 'asr', {value: this._asr}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  get asrSelectedService(): string {
-    return this._asr.selectedService;
-  }
-
-  set asrSelectedService(value: string) {
-    this._asr.selectedService = value;
-    this.idb.save('options', 'asr', {value: this._asr}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  get LoggedIn(): boolean {
-    return this._loggedIn;
-  }
-
-  set LoggedIn(value: boolean) {
-    this.loginActivityChanged.next(value);
-    this._loggedIn = value;
-  }
-
-  public get audioVolume(): number {
-    if (!isUnset(this._audioSettings) && !isUnset(this._audioSettings.volume)) {
-      return this._audioSettings.volume;
-    }
-    return 1;
-  }
-
-  public set audioVolume(value: number) {
-    this._audioSettings.volume = value;
-
-    this.idb.save('options', 'audioSettings', {value: this._audioSettings}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  public get audioSpeed(): number {
-    if (!isUnset(this._audioSettings) && !isUnset(this._audioSettings.speed)) {
-      return this._audioSettings.speed;
-    }
-    return 1;
-  }
-
-  public set audioSpeed(value: number) {
-    this._audioSettings.speed = value;
-
-    this.idb.save('options', 'audioSettings', {value: this._audioSettings}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  private _savingNeeded = false;
-
-  get savingNeeded(): boolean {
-    return this._savingNeeded;
-  }
 
   set savingNeeded(value: boolean) {
-    this._savingNeeded = value;
+    this.store.dispatch(fromTranscriptionActions.setSavingNeeded({savingNeeded: value}));
   }
-
-  private _isSaving = false;
-
-  get isSaving(): boolean {
-    return this._isSaving;
-  }
-
-  @SessionStorage('followplaycursor') private _followplaycursor: boolean;
 
   get followplaycursor(): boolean {
     return this._followplaycursor;
@@ -165,26 +70,17 @@ export class AppStorageService {
     this._followplaycursor = value;
   }
 
-  // IDB STORAGE
-  private _idbloaded = false;
-
   get idbloaded(): boolean {
     return this._idbloaded;
   }
-
-  private _loaded = new EventEmitter();
 
   get loaded(): EventEmitter<any> {
     return this._loaded;
   }
 
-  private _idb: IndexedDBManager;
-
   get idb(): IndexedDBManager {
     return this._idb;
   }
-
-  private _sessionfile: any = null;
 
   get sessionfile(): SessionFile {
     return SessionFile.fromAny(this._sessionfile);
@@ -198,38 +94,20 @@ export class AppStorageService {
       });
   }
 
-  private _user: {
-    id: string,
-    project: string,
-    jobno: number
-  } = null;
-
-  get user(): {
-    id: string,
-    project: string,
-    jobno: number
-  } {
-    return this._user;
+  public getOnlineSession(): Promise<OnlineSession> {
+    return this.store.select(fromLogin.selectOnlineSession).toPromise();
   }
 
-  set user(value: {
+  setUserData(value: {
     id: string,
     project: string,
-    jobno: number
+    jobNumber: number
   }) {
-    this._user = value;
-    this._idb.save('options', 'user', {value: this._user}).catch((err) => {
+    this.store.dispatch(fromLoginActions.setUserData(value));
+    this._idb.save('options', 'user', {value}).catch((err) => {
       console.error(err);
     });
   }
-
-  private _userProfile: {
-    userName: string,
-    email: string
-  } = {
-    userName: '',
-    email: ''
-  };
 
   get userProfile(): { userName: string; email: string } {
     return this._userProfile;
@@ -242,8 +120,6 @@ export class AppStorageService {
     this._userProfile = value;
   }
 
-  @SessionStorage('agreement') private _agreement: any;
-
   get agreement(): any {
     return this._agreement;
   }
@@ -251,8 +127,6 @@ export class AppStorageService {
   set agreement(value: any) {
     this._agreement = value;
   }
-
-  @SessionStorage('playonhover') private _playonhover: boolean;
 
   get playonhover(): boolean {
     return this._playonhover;
@@ -262,8 +136,6 @@ export class AppStorageService {
     this._playonhover = value;
   }
 
-  @SessionStorage('reloaded') private _reloaded: boolean;
-
   get reloaded(): boolean {
     return this._reloaded;
   }
@@ -271,8 +143,6 @@ export class AppStorageService {
   set reloaded(value: boolean) {
     this._reloaded = value;
   }
-
-  @SessionStorage('email') private _email: string;
 
   get email(): string {
     return this._email;
@@ -282,8 +152,6 @@ export class AppStorageService {
     this._email = value;
   }
 
-  @SessionStorage('serverDataEntry') private _serverDataEntry: IDataEntry;
-
   /* Getter/Setter SessionStorage */
   get serverDataEntry(): IDataEntry {
     return this._serverDataEntry;
@@ -292,8 +160,6 @@ export class AppStorageService {
   set serverDataEntry(value: IDataEntry) {
     this._serverDataEntry = value;
   }
-
-  private _submitted: boolean = null;
 
   get submitted(): boolean {
     return this._submitted;
@@ -306,8 +172,6 @@ export class AppStorageService {
     });
   }
 
-  private _feedback: any = null;
-
   get feedback(): any {
     return this._feedback;
   }
@@ -318,8 +182,6 @@ export class AppStorageService {
       console.error(err);
     });
   }
-
-  private _logs: any[] = [];
 
   get logs(): any[] {
     return this._logs;
@@ -332,8 +194,6 @@ export class AppStorageService {
     this._logs = value;
   }
 
-  private _dataID: number = null;
-
   get dataID(): number {
     return this._dataID;
   }
@@ -345,14 +205,8 @@ export class AppStorageService {
     });
   }
 
-  private _audioURL: string = null;
-
-  get audioURL(): string {
-    return this._audioURL;
-  }
-
   set audioURL(value: string) {
-    this._audioURL = value;
+    this.store.dispatch(fromLoginActions.setAudioURL({audioURL: value}));
     if (this.usemode !== 'url') {
       this.idb.save('options', 'audioURL', {value}).catch((err) => {
         console.error(err);
@@ -360,20 +214,13 @@ export class AppStorageService {
     }
   }
 
-  private _usemode: 'local' | 'online' | 'url' | 'demo' = null;
-
-  get usemode(): 'online' | 'local' | 'url' | 'demo' {
-    return this._usemode;
-  }
-
-  set usemode(value: 'online' | 'local' | 'url' | 'demo') {
+  set usemode(value: LoginMode) {
     this._usemode = value;
+    this.store.dispatch(fromLoginActions.setMode({mode: value}));
     this.idb.save('options', 'usemode', {value}).catch((err) => {
       console.error(err);
     });
   }
-
-  private _language = null;
 
   get language(): string {
     return this._language;
@@ -385,8 +232,6 @@ export class AppStorageService {
       console.error(err);
     });
   }
-
-  private _version: string = null;
 
   /* Getter/Setter IDB Storage */
   get version(): string {
@@ -400,8 +245,6 @@ export class AppStorageService {
     });
   }
 
-  private _logging = false;
-
   get logging(): boolean {
     return this._logging;
   }
@@ -412,8 +255,6 @@ export class AppStorageService {
       console.error(err);
     });
   }
-
-  private _showLoupe = false;
 
   get showLoupe(): boolean {
     return this._showLoupe;
@@ -426,8 +267,6 @@ export class AppStorageService {
     });
   }
 
-  private _prompttext = '';
-
   get prompttext(): string {
     return this._prompttext;
   }
@@ -439,8 +278,6 @@ export class AppStorageService {
     });
   }
 
-  private _urlParams: any = {};
-
   get urlParams(): any {
     return this._urlParams;
   }
@@ -448,8 +285,6 @@ export class AppStorageService {
   set urlParams(value: any) {
     this._urlParams = value;
   }
-
-  private _easymode = false;
 
   get easymode(): boolean {
     return this._easymode;
@@ -462,8 +297,6 @@ export class AppStorageService {
     });
   }
 
-  private _comment = '';
-
   get comment(): string {
     return this._comment;
   }
@@ -474,8 +307,6 @@ export class AppStorageService {
       console.error(err);
     });
   }
-
-  private _servercomment = '';
 
   get servercomment(): string {
     return this._servercomment;
@@ -488,25 +319,17 @@ export class AppStorageService {
     });
   }
 
-  private _annotation: OIDBLevel[] = null;
-
   get annotation(): OIDBLevel[] {
     return this._annotation;
   }
-
-  private _annotationLinks: OIDBLink[] = null;
 
   get annotationLinks(): OIDBLink[] {
     return this._annotationLinks;
   }
 
-  private _levelcounter = 0;
-
   get levelcounter(): number {
     return this._levelcounter;
   }
-
-  private _secondsPerLine = 5;
 
   get secondsPerLine(): number {
     return this._secondsPerLine;
@@ -523,8 +346,6 @@ export class AppStorageService {
     });
   }
 
-  private _highlightingEnabled = true;
-
   get highlightingEnabled(): boolean {
     return this._highlightingEnabled;
   }
@@ -537,46 +358,240 @@ export class AppStorageService {
   }
 
   constructor(public sessStr: SessionStorageService,
-              public localStr: LocalStorageService) {
+              public localStr: LocalStorageService,
+              private store: Store<RootState>) {
+    // TODO load data from DB and place it in store
+    // TODO listen to state changes and save it to the IndexedDB
+    // TODO make all properties private
+
+    this.setLoggedIn(this.sessStr.retrieve('_loggedIn'));
   }
 
-  public beginLocalSession = (files: FileProgress[], keepData: boolean, navigate: () => void, err: (error: string) => void) => {
-    if (!(files === null || files === undefined)) {
-      // get audio file
-      let audiofile;
-      for (const file of files) {
-        if (AudioManager.isValidAudioFileName(file.file.name, AppInfo.audioformats)) {
-          audiofile = file.file;
-          break;
-        }
+  // SESSION STORAGE
+  @SessionStorage() logInTime: number; // timestamp
+  @SessionStorage('jobsLeft') jobsLeft: number;
+
+  public saving: EventEmitter<string> = new EventEmitter<string>();
+  public loginActivityChanged = new Subject<boolean>();
+  public settingschange = new Subject<{ key: string, value: any }>();
+
+  // is user on the login page?
+  private login: boolean;
+
+  private subscrManager = new SubscriptionManager();
+
+  @SessionStorage('followplaycursor') private _followplaycursor: boolean;
+
+  // IDB STORAGE
+  private _idbloaded = false;
+
+  private _loaded = new EventEmitter();
+
+  private _idb: IndexedDBManager;
+
+  private _sessionfile: any = null;
+
+  private _userProfile: {
+    userName: string,
+    email: string
+  } = {
+    userName: '',
+    email: ''
+  };
+
+  @SessionStorage('agreement') private _agreement: any;
+
+  @SessionStorage('playonhover') private _playonhover: boolean;
+
+  @SessionStorage('reloaded') private _reloaded: boolean;
+
+  @SessionStorage('email') private _email: string;
+
+  @SessionStorage('serverDataEntry') private _serverDataEntry: IDataEntry;
+
+  private _submitted: boolean = null;
+
+  private _feedback: any = null;
+
+  private _logs: any[] = [];
+
+  private _dataID: number = null;
+
+  private _usemode: LoginMode = null;
+
+  private _language = null;
+
+  private _version: string = null;
+
+  private _logging = false;
+
+  private _showLoupe = false;
+
+  private _prompttext = '';
+
+  private _urlParams: any = {};
+
+  private _easymode = false;
+
+  private _comment = '';
+
+  private _servercomment = '';
+
+  private _annotation: OIDBLevel[] = null;
+
+  private _annotationLinks: OIDBLink[] = null;
+
+  private _levelcounter = 0;
+
+  private _secondsPerLine = 5;
+
+  private _highlightingEnabled = true;
+
+  async getASRSelectedLanguage(): Promise<string> {
+    return this.store.select(fromASR.selectSelectedLanguage).toPromise();
+  }
+
+  async setASRSelectedLanguage(value: string) {
+    this.store.dispatch(fromASRActions.setASRLanguage({selectedLanguage: value}));
+    const selectedService = await this.getASRSelectedService();
+    this.idb.save('options', 'asr', {
+      value: {
+        selectedLanguage: value,
+        selectedService: selectedService
       }
+    }).catch((err) => {
+      console.error(err);
+    });
+  }
 
-      const process = () => {
-        const res = this.setSessionData(null, null, null, true);
-        if (res.error === '') {
-          this.usemode = 'local';
-          this.sessionfile = this.getSessionFile(audiofile);
-          navigate();
-        } else {
-          err(res.error);
+  async getASRSelectedService(): Promise<string> {
+    return this.store.select(fromASR.selectSelectedService).toPromise();
+  }
+
+  async setASRSelectedService(value: string) {
+    this.store.dispatch(fromASRActions.setASRService({
+      selectedService: value
+    }));
+    const selectedLanguage = await this.getASRSelectedLanguage();
+    this.idb.save('options', 'asr', {
+      value: {
+        selectedLanguage: selectedLanguage,
+        selectedService: value
+      }
+    }).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  public async getAudioVolume(): Promise<number> {
+    return this.store.select(fromApplication.selectAudioVolume).toPromise();
+  }
+
+  public async setAudioVolume(value: number) {
+    const audioSpeed = await this.getAudioSpeed();
+    this.store.dispatch(fromApplicationActions.setAudioVolume({volume: value}));
+    this.idb.save('options', 'audioSettings', {
+      value: {
+        volume: value,
+        speed: audioSpeed
+      }
+    }).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  public async getAudioSpeed(): Promise<number> {
+    return this.store.select(fromApplication.selectAudioSpeed).toPromise();
+  }
+
+  public async setAudioSpeed(value: number) {
+    const audioVolume = await this.getAudioVolume();
+    this.store.dispatch(fromApplicationActions.setAudioSpeed({speed: value}));
+    this.idb.save('options', 'audioSettings', {
+      value: {
+        speed: value,
+        volume: audioVolume
+      }
+    }).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  getSavingNeeded(): Promise<boolean> {
+    return this.store.select(fromTranscription.selectSavingNeeded).toPromise();
+  }
+
+  async getIsSaving(): Promise<boolean> {
+    return this.store.select(fromTranscription.selectIsSaving).toPromise();
+  }
+
+  setIsSaving(value: boolean) {
+    this.store.dispatch(fromTranscriptionActions.setIsSaving({isSaving: value}));
+  }
+
+  async getAudioURL(): Promise<string> {
+    return this.store.select(fromLogin.selectOnlineSession).pipe(map(session => session.audioURL)).toPromise();
+  }
+
+  async getUseMode(): Promise<LoginMode> {
+    return this.store.select(fromLogin.selectMode).toPromise();
+  }
+
+  setLoggedIn(value: boolean) {
+    this.loginActivityChanged.next(value);
+  }
+
+  async getLoggedIn(): Promise<boolean> {
+    return this.store.select(fromLogin.selectLoggedIn).toPromise();
+  }
+
+  async getInterface(): Promise<string> {
+    return this.store.select(fromApplication.selectCurrentEditor).toPromise();
+  }
+
+  setInterface(newInterface: string) {
+    this.store.dispatch(fromApplicationActions.setCurrentEditor({currentEditor: newInterface}));
+    this.idb.save('options', 'interface', {value: newInterface}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  public beginLocalSession = async (files: FileProgress[], keepData: boolean) => {
+    return new Promise<void>(async (resolve, reject) => {
+      if (!isUnset(files)) {
+        // get audio file
+        let audiofile;
+        for (const file of files) {
+          if (AudioManager.isValidAudioFileName(file.file.name, AppInfo.audioformats)) {
+            audiofile = file.file;
+            break;
+          }
         }
-      };
 
-      if (!(audiofile === null || audiofile === undefined)) {
-        if (!keepData || (!(this._user === null || this._user === undefined) &&
-          !(this._user.id === null || this._user.id === undefined) && this._user.id !== '-1' && this._user.id !== '')) {
-          // last was online mode
-          this.clearSession();
-          this.clearLocalStorage().then(() => {
-            process();
+        const onlineSession = await this.store.select(fromLogin.selectOnlineSession);
+
+        const process = () => {
+          this.setSessionData(null, null, null, true).then(() => {
+            this.sessionfile = this.getSessionFile(audiofile);
+            resolve();
           });
+        };
+
+        if (!isUnset(audiofile)) {
+          if (!keepData || (!isUnset(onlineSession))) {
+            // last was online mode
+            this.clearSession();
+            this.clearLocalStorage().then(() => {
+              process();
+            });
+          } else {
+            process();
+          }
         } else {
-          process();
+          reject('type not supported');
         }
-      } else {
-        err('type not supported');
       }
-    }
+    });
   }
 
   public getSessionFile = (file: File) => {
@@ -640,54 +655,55 @@ export class AppStorageService {
       });
   }
 
-  public setSessionData(member: any, dataID: number, audioURL: string, offline: boolean = false): { error: string } {
-    if ((this._easymode === null || this._easymode === undefined)) {
-      this._easymode = false;
-    }
-    if (offline && ((member === null || member === undefined))) {
-      if ((this._interface === null || this._interface === undefined)) {
-        this._interface = '2D-Editor';
+  public setSessionData(member: any, dataID: number, audioURL: string, offline: boolean = false): Promise<void> {
+    return new Promise<void>(async (resolve) => {
+      if (isUnset(this._easymode)) {
+        this._easymode = false;
       }
-      this.setNewSessionKey();
-      this.usemode = 'local';
-      this.user = {
-        id: '-1',
-        project: '',
-        jobno: -1
-      };
-      this.login = true;
-      this._loggedIn = true;
 
-      return {error: ''};
-    }
+      const currentEditor = await this.getInterface();
 
-    if (!this.login && !offline && (!(member === null || member === undefined))) {
-      if ((this._interface === null || this._interface === undefined)) {
-        this._interface = '2D-Editor';
+      if (offline && (isUnset(member))) {
+
+        if (isUnset(currentEditor)) {
+          this.setInterface('2D-Editor');
+        }
+        this.setNewSessionKey();
+        this.usemode = LoginMode.LOCAL;
+        this.user = {
+          id: '-1',
+          project: '',
+          jobno: -1
+        };
+        this.login = true;
       }
-      this.setNewSessionKey();
 
-      this.dataID = dataID;
-      this._loggedIn = true;
-      this.sessStr.store('_loggedIn', this._loggedIn);
-      this.sessStr.store('interface', this._interface);
-      this.audioURL = audioURL;
-      this.user = {
-        id: member.id,
-        project: member.project,
-        jobno: member.jobno
-      };
-      this.usemode = 'online';
+      if (!this.login && !offline && (!isUnset(member))) {
+        if (isUnset(currentEditor)) {
+          this.setInterface('2D-Editor');
+        }
+        this.setNewSessionKey();
 
-      this.login = true;
-      return {error: ''};
-    }
+        this.dataID = dataID;
+        this.sessStr.store('_loggedIn', true);
+        this.sessStr.store('interface', currentEditor);
+        this.audioURL = audioURL;
+        this.user = {
+          id: member.id,
+          project: member.project,
+          jobno: member.jobno
+        };
+        this.usemode = LoginMode.ONLINE;
 
-    return {error: ''};
+        this.login = true;
+      }
+
+      resolve();
+    });
   }
 
   public clearSession(): boolean {
-    this._loggedIn = false;
+    this.store.dispatch(fromLoginActions.logout());
     this.login = false;
     this.audioURL = null;
 
@@ -699,7 +715,6 @@ export class AppStorageService {
 
   public clearLocalStorage(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this._loggedIn = false;
       this.login = false;
       this.dataID = null;
 
@@ -728,7 +743,7 @@ export class AppStorageService {
     // TODO why not url?
     if (this.usemode !== 'url') {
       if (key === 'annotation' || key === 'feedback') {
-        this._isSaving = true;
+        this.getIsSaving() = true;
         this.saving.emit('saving');
       }
 
@@ -924,6 +939,7 @@ export class AppStorageService {
       });
     }).then(
       () => {
+        this.observeStore();
         this._loaded.complete();
       }
     );
@@ -943,6 +959,14 @@ export class AppStorageService {
         resolve();
       }
     });
+  }
+
+  private observeStore() {
+    this.subscrManager.add(this.store.subscribe(
+      (state) => {
+        console.log(state);
+      }
+    ));
   }
 
   public clearAnnotationData(): Promise<any> {
@@ -1057,20 +1081,17 @@ export class AppStorageService {
       (resolve, reject) => {
         const promises: Promise<any>[] = [];
         for (const variable of variables) {
-          if (this['' + variable.attribute + ''] !== undefined) {
-            if (variable.hasOwnProperty('attribute') && variable.hasOwnProperty('key')) {
-              promises.push(this.loadOptionFromIDB(variable.key).then(
-                (result) => {
-                  if (!(result === null || result === undefined)) {
-                    this['' + variable.attribute + ''] = result;
-                  }
+          if (variable.hasOwnProperty('attribute') && variable.hasOwnProperty('key')) {
+            promises.push(this.loadOptionFromIDB(variable.key).then(
+              (result) => {
+                if (!(result === null || result === undefined)) {
+                  this['' + variable.attribute + ''] = result;
+                  this.saveOptionToStore(variable.attribute, result);
                 }
-              ));
-            } else {
-              console.error(Error('loadOptions: variables parameter must be of type {attribute:string, key:string}[]'));
-            }
+              }
+            ));
           } else {
-            console.error(Error(`session service needs an attribute called \'${variable.attribute}\'`));
+            console.error(Error('loadOptions: variables parameter must be of type {attribute:string, key:string}[]'));
           }
         }
 
@@ -1085,6 +1106,17 @@ export class AppStorageService {
         );
       }
     );
+  }
+
+  private saveOptionToStore(attribute: string, value: string) {
+    console.log(`save Option ${attribute} to store...`);
+    switch (attribute) {
+      case('_interface'):
+        this.store.dispatch(fromApplicationActions.setCurrentEditor({currentEditor: value}));
+        break;
+      default:
+        console.error(`can't find case for attribute ${attribute}`);
+    }
   }
 
   /**

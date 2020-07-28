@@ -11,6 +11,7 @@ import {APIService} from './api.service';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
 import * as Ajv from 'ajv';
+import {LoginMode} from '../../store';
 
 declare var validateAnnotation: ((string, any) => any);
 declare var tidyUpAnnotation: ((string, any) => any);
@@ -213,7 +214,7 @@ export class SettingsService {
 
           // if url mode, set it in options
           if (SettingsService.queryParamsSet(queryParams)) {
-            this.appStorage.usemode = 'url';
+            this.appStorage.usemode = LoginMode.URL;
             this.appStorage.LoggedIn = true;
           }
 

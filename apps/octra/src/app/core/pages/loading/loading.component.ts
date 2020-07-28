@@ -7,6 +7,7 @@ import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
 import {AudioService, SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService, OIDBLevel} from '../../shared/service/appstorage.service';
 import {IFile, ImportResult, OAudiofile, OLevel} from '@octra/annotation';
+import {LoginMode} from '../../store';
 
 @Component({
   selector: 'octra-loading',
@@ -274,14 +275,14 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
       if (this.appStorage.urlParams.hasOwnProperty('audio') && this.appStorage.urlParams.audio !== ''
         && !(this.appStorage.urlParams.audio === null || this.appStorage.urlParams.audio === undefined)) {
-        this.appStorage.usemode = 'url';
+        this.appStorage.usemode = LoginMode.URL;
         this.appStorage.LoggedIn = true;
       } else if (this.appStorage.usemode === 'url') {
         // url mode set, but no params => change mode
         console.warn(`use mode is url but no params found. Reset use mode.`);
-        this.appStorage.usemode = (!isUnset(this.appStorage.user) && !isUnset(this.appStorage.user.id) && this.appStorage.user.id !== ''
-          && ((this.appStorage.sessionfile === null || this.appStorage.sessionfile === undefined)))
-          ? 'online' : 'local';
+        this.appStorage.usemode = (!isUnset(this.appStorage.user) && !isUnset(this.appStorage.user.id) &&
+          this.appStorage.user.id !== '' && (isUnset(this.appStorage.sessionfile)))
+          ? LoginMode.ONLINE : LoginMode.LOCAL;
         this.appStorage.LoggedIn = false;
       }
 

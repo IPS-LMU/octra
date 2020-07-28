@@ -1,6 +1,9 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {SubscriptionManager} from '@octra/utilities';
+import {Store} from '@ngrx/store';
+import {URLParameters} from '../../store';
+import * as fromLoginActions from '../../store/login/login.actions';
 
 @Injectable()
 export class LoginService {
@@ -8,7 +11,7 @@ export class LoginService {
 
   private subscrmanager: SubscriptionManager;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private store: Store) {
     this.subscrmanager = new SubscriptionManager();
   }
 

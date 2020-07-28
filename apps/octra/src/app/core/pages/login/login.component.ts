@@ -24,13 +24,14 @@ import {AppStorageService, OIDBLevel, OIDBLink} from '../../shared/service/appst
 import {OctraDropzoneComponent} from '../../component/octra-dropzone/octra-dropzone.component';
 import {ComponentCanDeactivate} from './login.deactivateguard';
 import {LoginService} from './login.service';
-import {Converter} from '@octra/annotation';
+import {LoginStoreService} from '../../store/login/login-store.service';
+import {LoginMode} from '../../store';
 
 @Component({
   selector: 'octra-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
-  providers: [LoginService]
+  providers: [LoginService, LoginStoreService]
 })
 export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate, AfterViewInit {
 
@@ -73,7 +74,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               private settingsService: SettingsService,
               public modService: ModalService,
               private langService: TranslocoService,
-              private audioService: AudioService) {
+              private audioService: AudioService,
+              private loginStoreService: LoginStoreService) {
     this.subscrmanager = new SubscriptionManager();
   }
 
@@ -82,31 +84,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       // last was online mode
       this.api.setOnlineSessionToFree(this.appStorage).then(() => {
         this.audioService.registerAudioManager(this.dropzone.audioManager);
-        this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
-          if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
-            const newLevels: OIDBLevel[] = [];
-            for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
-              newLevels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
-            }
-
-            const newLinks: OIDBLink[] = [];
-            for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
-              newLinks.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
-            }
-
-            this.appStorage.overwriteAnnotation(newLevels).then(
-              () => {
-                return this.appStorage.overwriteLinks(newLinks);
-              }
-            ).then(() => {
-              this.navigate();
-            }).catch((err) => {
-              console.error(err);
-            });
-          } else {
-            this.navigate();
-          }
-        }, (error) => {
+        this.appStorage.beginLocalSession(this.dropzone.files, false, this.beforeNavigation, (error) => {
           alert(error);
         });
       }).catch((error) => {
@@ -114,61 +92,42 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       });
     } else {
       this.audioService.registerAudioManager(this.dropzone.audioManager);
-      this.appStorage.beginLocalSession(this.dropzone.files, true, () => {
-        if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
-          const newLevels: OIDBLevel[] = [];
-          for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
-            newLevels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
-          }
-
-          const newLinks: OIDBLink[] = [];
-          for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
-            newLinks.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
-          }
-
-          this.appStorage.overwriteAnnotation(newLevels).then(() => {
-            return this.appStorage.overwriteLinks(newLinks);
-          }).then(() => {
-            this.navigate();
-          }).catch((err) => {
-            console.error(err);
-          });
-        } else {
-          this.navigate();
-        }
-      }, (error) => {
+      this.appStorage.beginLocalSession(this.dropzone.files, true, this.beforeNavigation, (error) => {
         alert(error);
       });
     }
   }
+
+  private beforeNavigation = () => {
+    if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
+      const newLevels: OIDBLevel[] = [];
+      for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
+        newLevels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
+      }
+
+      const newLinks: OIDBLink[] = [];
+      for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
+        newLinks.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
+      }
+
+      this.appStorage.overwriteAnnotation(newLevels).then(
+        () => {
+          return this.appStorage.overwriteLinks(newLinks);
+        }
+      ).then(() => {
+        this.navigate();
+      }).catch((err) => {
+        console.error(err);
+      });
+    } else {
+      this.navigate();
+    }
+  }
+
   newTranscription = () => {
     this.audioService.registerAudioManager(this.dropzone.audioManager);
 
-    this.appStorage.beginLocalSession(this.dropzone.files, false, () => {
-        if (!(this.dropzone.oannotation === null || this.dropzone.oannotation === undefined)) {
-          const newLevels: OIDBLevel[] = [];
-          for (let i = 0; i < this.dropzone.oannotation.levels.length; i++) {
-            newLevels.push(new OIDBLevel(i + 1, this.dropzone.oannotation.levels[i], i));
-          }
-
-          const newLinks: OIDBLink[] = [];
-          for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
-            newLinks.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
-          }
-
-          this.appStorage.overwriteAnnotation(newLevels).then(
-            () => {
-              return this.appStorage.overwriteLinks(newLinks);
-            }
-          ).then(() => {
-            this.navigate();
-          }).catch((err) => {
-            console.error(err);
-          });
-        } else {
-          this.navigate();
-        }
-      },
+    this.appStorage.beginLocalSession(this.dropzone.files, false, this.beforeNavigation,
       (error) => {
         if (error === 'file not supported') {
           this.modService.show('error', {
@@ -234,7 +193,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       loaduser();
     }
 
-    new Promise<void>((resolve, reject) => {
+    new Promise<void>((resolve) => {
       if (this.settingsService.isDBLoadded) {
         resolve();
       } else {
@@ -259,7 +218,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     this.subscrmanager.destroy();
   }
 
-  onSubmit(form: NgForm) {
+  onOnlineSubmit(form: NgForm) {
     let newSession = false;
     let newSessionAfterOld = false;
     let continueSession = false;
@@ -344,12 +303,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
                 this.appStorage.prompttext = '';
               }
 
-              const res = this.appStorage.setSessionData(this.member, this.appStorage.dataID, this.appStorage.audioURL);
-              if (res.error === '') {
+              this.appStorage.setSessionData(this.member, this.appStorage.dataID, this.appStorage.audioURL).then(() => {
                 this.navigate();
-              } else {
-                alert(res.error);
-              }
+              });
             } else {
               this.modService.show('loginInvalid').catch((error) => {
                 console.error(error);
@@ -373,7 +329,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   @HostListener('window:resize', ['$event'])
-  onResize($event) {
+  onResize() {
     if (this.settingsService.responsive.enabled === false) {
       this.validSize = window.innerWidth >= this.settingsService.responsive.fixedwidth;
     } else {
@@ -400,20 +356,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     }
 
     return 'unknown';
-  }
-
-  getValidBrowsers(): string {
-    let result = '';
-
-    for (let i = 0; i < this.apc.octra.allowed_browsers.length; i++) {
-      const browser = this.apc.octra.allowed_browsers[i];
-      result += browser.name;
-      if (i < this.apc.octra.allowed_browsers.length - 1) {
-        result += ', ';
-      }
-    }
-
-    return result;
   }
 
   loadPojectsList() {
@@ -452,16 +394,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     });
   }
 
-  public selectProject(event: HTMLSelectElement) {
-    this.member.project = event.value;
-  }
-
-  public testFile(converter: Converter, file: File) {
-    const reader: FileReader = new FileReader();
-    reader.readAsText(file);
-    reader.readAsText(file, 'utf-8');
-  }
-
   onTranscriptionDelete() {
     this.modService.show('transcriptionDelete').then((answer: ModalDeleteAnswer) => {
       if (answer === ModalDeleteAnswer.DELETE) {
@@ -484,8 +416,9 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.appStorage.clearSession();
       this.appStorage.clearLocalStorage().then(
         () => {
+          this.loginStoreService.loginDemo(audioExample.url, audioExample.description);
           this.appStorage.setSessionData(this.member, 21343134, audioExample.url);
-          this.appStorage.usemode = 'demo';
+          this.appStorage.usemode = LoginMode.DEMO;
           this.appStorage.prompttext = '';
           this.appStorage.servercomment = audioExample.description;
           this.appStorage.sessStr.store('jobsLeft', 1000);
@@ -544,53 +477,49 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         this.appStorage.clearSession();
         this.appStorage.clearLocalStorage().then(
           () => {
-            const res = this.appStorage.setSessionData(this.member, json.data.id, json.data.url);
-
-            // get transcript data that already exists
-            const jsonStr = JSON.stringify(json.data);
-            this.appStorage.serverDataEntry = parseServerDataEntry(jsonStr);
-
-            if (isUnset(this.appStorage.serverDataEntry.transcript) ||
-              !Array.isArray(this.appStorage.serverDataEntry.transcript)) {
-              this.appStorage.serverDataEntry.transcript = [];
-            }
-
-            if (isUnset(this.appStorage.serverDataEntry.logtext) ||
-              !Array.isArray(this.appStorage.serverDataEntry.logtext)) {
-              this.appStorage.serverDataEntry.logtext = [];
-            }
-
-            if (this.appStorage.usemode === 'online' && this.appStorage.serverDataEntry.hasOwnProperty('prompttext')) {
+            this.appStorage.setSessionData(this.member, json.data.id, json.data.url).then(() => {
               // get transcript data that already exists
-              const prompt = this.appStorage.serverDataEntry.prompttext;
-              this.appStorage.prompttext = (prompt) ? prompt : '';
-            } else {
-              this.appStorage.prompttext = '';
-            }
+              const jsonStr = JSON.stringify(json.data);
+              this.appStorage.serverDataEntry = parseServerDataEntry(jsonStr);
 
-            if (this.appStorage.usemode === 'online' && this.appStorage.serverDataEntry.hasOwnProperty('comment')) {
-              // get transcript data that already exists
-              const comment = this.appStorage.serverDataEntry.comment;
-
-              if (comment) {
-                this.appStorage.servercomment = comment;
+              if (isUnset(this.appStorage.serverDataEntry.transcript) ||
+                !Array.isArray(this.appStorage.serverDataEntry.transcript)) {
+                this.appStorage.serverDataEntry.transcript = [];
               }
-            } else {
-              this.appStorage.servercomment = '';
-            }
 
-            if (json.hasOwnProperty('message')) {
-              const counter = (json.message === '') ? '0' : json.message;
-              this.appStorage.sessStr.store('jobsLeft', Number(counter));
-            }
+              if (isUnset(this.appStorage.serverDataEntry.logtext) ||
+                !Array.isArray(this.appStorage.serverDataEntry.logtext)) {
+                this.appStorage.serverDataEntry.logtext = [];
+              }
 
-            if (res.error === '') {
+              if (this.appStorage.usemode === 'online' && this.appStorage.serverDataEntry.hasOwnProperty('prompttext')) {
+                // get transcript data that already exists
+                const prompt = this.appStorage.serverDataEntry.prompttext;
+                this.appStorage.prompttext = (prompt) ? prompt : '';
+              } else {
+                this.appStorage.prompttext = '';
+              }
+
+              if (this.appStorage.usemode === 'online' && this.appStorage.serverDataEntry.hasOwnProperty('comment')) {
+                // get transcript data that already exists
+                const comment = this.appStorage.serverDataEntry.comment;
+
+                if (comment) {
+                  this.appStorage.servercomment = comment;
+                }
+              } else {
+                this.appStorage.servercomment = '';
+              }
+
+              if (json.hasOwnProperty('message')) {
+                const counter = (json.message === '') ? '0' : json.message;
+                this.appStorage.sessStr.store('jobsLeft', Number(counter));
+              }
+
               this.navigate();
-            } else {
-              this.modService.show('error', res.error).catch((error) => {
-                console.error(error);
-              });
-            }
+            }).catch((error) => {
+              console.error(error);
+            });
           }
         ).catch((err) => {
           console.error(err);

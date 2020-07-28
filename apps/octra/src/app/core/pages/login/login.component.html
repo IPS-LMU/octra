@@ -39,7 +39,7 @@
               </div>
             </ng-container>
           </div>
-          <form #f="ngForm" (ngSubmit)="onSubmit(f)" *ngIf="apiStatus === 'available'">
+          <form #f="ngForm" (ngSubmit)="onOnlineSubmit(f)" *ngIf="apiStatus === 'available'">
             <fieldset>
               <div class="form-group">
                 <label class="control-label" for="select111">

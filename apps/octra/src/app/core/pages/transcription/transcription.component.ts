@@ -140,7 +140,7 @@ export class TranscriptionComponent implements OnInit,
     this.navbarServ.transcrService = this.transcrService;
     this.navbarServ.uiService = this.uiService;
 
-    this.subscrmanager.add(this.audioManager.statechange.subscribe((state) => {
+    this.subscrmanager.add(this.audioManager.statechange.subscribe(async (state) => {
         if (!appStorage.playonhover && !this.modalOverview.visible) {
           let caretpos = -1;
 
@@ -149,14 +149,15 @@ export class TranscriptionComponent implements OnInit,
           }
 
           // make sure that events from playonhover are not logged
-          this.uiService.logAudioEvent(this.appStorage.Interface, state, this.audioManager.playposition, caretpos, null, null);
+          const currentEditorName = await this.appStorage.getInterface();
+          this.uiService.logAudioEvent(currentEditorName, state, this.audioManager.playposition, caretpos, null, null);
         }
       },
       (error) => {
         console.error(error);
       }));
 
-    this.subscrmanager.add(this.keyMap.onkeydown.subscribe((event) => {
+    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(async (event) => {
       if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
         if (['ALT + SHIFT + 1', 'ALT + SHIFT + 2', 'ALT + SHIFT + 3'].includes(event.comboKey)) {
           this.waitForSend = true;
@@ -185,9 +186,6 @@ export class TranscriptionComponent implements OnInit,
         }
       }
     }));
-
-    // TODO remove this case for later versions
-    this.interface = (this.appStorage.Interface === 'Editor without signal display') ? 'Dictaphone Editor' : this.appStorage.Interface;
 
     this.subscrmanager.add(this.navbarServ.toolApplied.subscribe((toolName: string) => {
         switch (toolName) {
@@ -471,12 +469,18 @@ export class TranscriptionComponent implements OnInit,
   }
 
   ngAfterViewInit() {
+
+  }
+
+  private async checkCurrentEditor() {
+    // TODO move this to another place
+    const currentEditor = await this.appStorage.getInterface();
     const found = this.projectsettings.interfaces.find((x) => {
-      return this.appStorage.Interface === x;
+      return currentEditor === x;
     });
 
-    if ((found === null || found === undefined)) {
-      this.appStorage.Interface = this.projectsettings.interfaces[0];
+    if (isUnset(found)) {
+      this.appStorage.setInterface(this.projectsettings.interfaces[0]);
     }
   }
 
@@ -534,7 +538,7 @@ export class TranscriptionComponent implements OnInit,
       }
       for (const editorComponent of editorComponents) {
         if (name === editorComponent.name) {
-          this.appStorage.Interface = name;
+          this.appStorage.setInterface(name);
           this.interface = name;
           comp = editorComponent.editor;
           break;

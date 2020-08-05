@@ -1,8 +1,20 @@
 import {createReducer, on} from '@ngrx/store';
 import * as TranscriptionActions from './transcription.actions';
-import {ASRState} from '../index';
+import {TranscriptionState} from '../index';
+import * as ApplicationActions from '../application/application.actions';
 
-export const initialState: ASRState = {};
+export const initialState: TranscriptionState = {
+  savingNeeded: false,
+  isSaving: false,
+  playOnHover: false,
+  followPlayCursor: false,
+  submitted: false,
+  audioSettings: {
+    volume: 1,
+    speed: 1
+  },
+  logs: []
+};
 
 export const reducer = createReducer(
   initialState,
@@ -13,6 +25,28 @@ export const reducer = createReducer(
   on(TranscriptionActions.setIsSaving, (state, {isSaving}) => ({
     ...state,
     isSaving
+  })),
+  on(TranscriptionActions.setPlayOnHover, (state, {playOnHover}) => ({
+    ...state,
+    playOnHover
+  })),
+  on(TranscriptionActions.setCurrentEditor, (state, {currentEditor}) => ({
+    ...state,
+    currentEditor
+  })),
+  on(TranscriptionActions.setAudioVolume, (state, {volume}) => ({
+    ...state,
+    audioSettings: {
+      ...state.audioSettings,
+      volume
+    }
+  })),
+  on(TranscriptionActions.setAudioSpeed, (state, {speed}) => ({
+    ...state,
+    audioSettings: {
+      ...state.audioSettings,
+      speed
+    }
   }))
 );
 

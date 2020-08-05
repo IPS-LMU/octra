@@ -1,3 +1,5 @@
+import {IDataEntry} from '../obj/data-entry';
+
 export enum LoginMode {
   URL = 'url',
   DEMO = 'demo',
@@ -21,7 +23,7 @@ export interface OnlineSession {
   promptText: string;
   serverComment: string;
   jobsLeft: number;
-  loggedIn: boolean;
+  serverDataEntry: IDataEntry;
 }
 
 export interface URLParameters {
@@ -35,7 +37,13 @@ export interface LoginState {
   mode?: LoginMode;
   files?: File[];
   onlineSession?: OnlineSession,
-  queryParams?: URLParameters
+  sessionFile?: {
+    type: string;
+    name: string;
+    size: number;
+  },
+  queryParams?: URLParameters,
+  loggedIn: boolean;
 }
 
 export interface ApplicationState {
@@ -44,10 +52,9 @@ export interface ApplicationState {
     progress: number;
     errors: string[]
   };
-  currentEditor?: string;
-  audioSettings: {
-    volume: number;
-    speed: number;
+  reloaded: boolean;
+  idb: {
+    loaded: boolean;
   }
 }
 
@@ -59,11 +66,28 @@ export interface ASRState {
 export interface TranscriptionState {
   savingNeeded: boolean;
   isSaving: boolean;
+  playOnHover: boolean;
+  followPlayCursor: boolean;
+  submitted: boolean;
+  currentEditor?: string;
+  audioSettings: {
+    volume: number;
+    speed: number;
+  },
+  logs: any[];
+}
+
+export interface FeedbackState {
+  user: {
+    name: string;
+    email: string;
+  }
 }
 
 export interface RootState {
   application: ApplicationState,
   login: LoginState,
   asr: ASRState,
-  transcription: TranscriptionState
+  transcription: TranscriptionState,
+  feedback: FeedbackState
 }

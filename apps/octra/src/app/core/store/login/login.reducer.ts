@@ -2,7 +2,9 @@ import {createReducer, on} from '@ngrx/store';
 import * as LoginActions from './login.actions';
 import {LoginMode, LoginState} from '../index';
 
-export const initialState: LoginState = {};
+export const initialState: LoginState = {
+  loggedIn: false
+};
 
 export const reducer = createReducer(
   initialState,
@@ -12,13 +14,15 @@ export const reducer = createReducer(
     onlineSession: {
       ...data,
       id: 'demo_user',
-      database: 'demo',
+      project: 'demo',
       jobNumber: -1,
       jobsLeft: 1000,
       dataID: 21343134,
       promptText: '',
-      loggedIn: true
-    }
+      serverDataEntry: null,
+      serverComment: ''
+    },
+    loggedIn: true
   })),
   on(LoginActions.loginLocal, (state, {files}) => ({
     ...state,
@@ -45,17 +49,17 @@ export const reducer = createReducer(
   on(LoginActions.logout, (state) => ({
     ...state,
     onlineSession: {
-      ...state.onlineSession,
-      loggedIn: false
-    }
+      ...state.onlineSession
+    },
+    loggedIn: false
   })),
   on(LoginActions.clearLocalSession, (state) => ({
     ...state,
     onlineSession: {
       ...state.onlineSession,
-      dataID: null,
-      loggedIn: false
-    }
+      dataID: null
+    },
+    loggedIn: false
   })),
   on(LoginActions.setAudioURL, (state, {audioURL}) => ({
     ...state,
@@ -70,6 +74,17 @@ export const reducer = createReducer(
       ...state.onlineSession,
       ...data
     }
+  })),
+  on(LoginActions.setServerDataEntry, (state, data) => ({
+    ...state,
+    onlineSession: {
+      ...state.onlineSession,
+      ...data
+    }
+  })),
+  on(LoginActions.setLoggedIn, (state, {loggedIn}) => ({
+    ...state,
+    loggedIn
   }))
 );
 

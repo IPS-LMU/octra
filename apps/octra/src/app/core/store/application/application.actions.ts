@@ -17,24 +17,17 @@ export const addError = createAction(
   }>()
 );
 
-export const setCurrentEditor = createAction(
-  `[${context}] Set current editor`,
+export const setReloaded = createAction(
+  `[${context}] Set reloaded`,
   props<{
-    currentEditor: string
+    reloaded: boolean;
   }>()
 );
 
-export const setAudioVolume = createAction(
-  `[${context}] Set volume`,
+export const setIDBLoaded = createAction(
+  `[${context}] Set idb loaded`,
   props<{
-    volume: number
-  }>()
-);
-
-export const setAudioSpeed = createAction(
-  `[${context}] Set speed`,
-  props<{
-    speed: number
+    loaded: boolean;
   }>()
 );
 

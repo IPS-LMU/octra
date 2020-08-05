@@ -8,9 +8,9 @@ export const initialState: ApplicationState = {
     progress: 0,
     errors: []
   },
-  audioSettings: {
-    volume: 1,
-    speed: 1
+  reloaded: false,
+  idb: {
+    loaded: false
   }
 };
 
@@ -37,24 +37,6 @@ export const reducer = createReducer(
     loading: {
       ...state.loading,
       status: LoadingStatus.FINISHED
-    }
-  })),
-  on(ApplicationActions.setCurrentEditor, (state, {currentEditor}) => ({
-    ...state,
-    currentEditor
-  })),
-  on(ApplicationActions.setAudioVolume, (state, {volume}) => ({
-    ...state,
-    audioSettings: {
-      ...state.audioSettings,
-      volume
-    }
-  })),
-  on(ApplicationActions.setAudioSpeed, (state, {speed}) => ({
-    ...state,
-    audioSettings: {
-      ...state.audioSettings,
-      speed
     }
   }))
 );

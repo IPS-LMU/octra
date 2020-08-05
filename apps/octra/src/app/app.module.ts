@@ -40,7 +40,7 @@ import {NamingDragAndDropComponent} from './core/tools/naming-drag-and-drop/nami
 import {TableConfiguratorComponent} from './core/tools/table-configurator/table-configurator.component';
 import {TranscrEditorComponent} from './core/component/transcr-editor';
 import {ValidationPopoverComponent} from './core/component/transcr-editor/validation-popover/validation-popover.component';
-import {AgreementComponent, AuthComponent, BrowserTestComponent, NewsComponent} from './core/pages';
+import {AuthComponent, BrowserTestComponent, NewsComponent} from './core/pages';
 import {AsrOptionsComponent} from './core/component/asr-options/asr-options.component';
 import {Error404Component} from './core/pages/error404';
 import {FeaturesComponent} from './core/pages/features';

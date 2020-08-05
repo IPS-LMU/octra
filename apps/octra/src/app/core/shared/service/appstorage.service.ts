@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {LocalStorageService, SessionStorage, SessionStorageService} from 'ngx-webstorage';
+import {LocalStorageService, SessionStorageService} from 'ngx-webstorage';
 import {Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {IDataEntry} from '../../obj/data-entry';
@@ -20,6 +20,8 @@ import * as fromLoginActions from '../../store/login/login.actions';
 import * as fromASRActions from '../../store/asr/asr.actions';
 import * as fromTranscriptionActions from '../../store/transcription/transcription.actions';
 import * as fromTranscription from '../../store/transcription';
+import * as fromFeedbackActions from '../../store/feedback/feedback.actions';
+import * as fromFeedback from '../../store/feedback';
 import {map} from 'rxjs/operators';
 
 export interface IIDBLevel {
@@ -57,21 +59,18 @@ export class OIDBLink implements IIDBLink {
 
 @Injectable()
 export class AppStorageService {
-
-  set savingNeeded(value: boolean) {
+  setSavingNeeded(value: boolean) {
     this.store.dispatch(fromTranscriptionActions.setSavingNeeded({savingNeeded: value}));
   }
 
-  get followplaycursor(): boolean {
-    return this._followplaycursor;
+  setFollowPlayCursor(value: boolean) {
+    this.store.dispatch(fromTranscriptionActions.setFollowPlayCursor({
+      followPlayCursor: value
+    }));
   }
 
-  set followplaycursor(value: boolean) {
-    this._followplaycursor = value;
-  }
-
-  get idbloaded(): boolean {
-    return this._idbloaded;
+  async getIDBloaded(): Promise<boolean> {
+    return this.store.select(fromApplication.selectIDBLoaded).toPromise();
   }
 
   get loaded(): EventEmitter<any> {
@@ -94,79 +93,29 @@ export class AppStorageService {
       });
   }
 
-  public getOnlineSession(): Promise<OnlineSession> {
-    return this.store.select(fromLogin.selectOnlineSession).toPromise();
-  }
-
-  setUserData(value: {
-    id: string,
-    project: string,
-    jobNumber: number
-  }) {
-    this.store.dispatch(fromLoginActions.setUserData(value));
-    this._idb.save('options', 'user', {value}).catch((err) => {
-      console.error(err);
-    });
-  }
-
-  get userProfile(): { userName: string; email: string } {
-    return this._userProfile;
-  }
-
-  set userProfile(value: { userName: string; email: string }) {
+  set userProfile(value: { name: string; email: string }) {
+    this.store.dispatch(fromFeedbackActions.setUserProfile({user: value}))
     this._idb.save('options', 'userProfile', {value}).catch((err) => {
       console.error(err);
     });
-    this._userProfile = value;
-  }
-
-  get agreement(): any {
-    return this._agreement;
-  }
-
-  set agreement(value: any) {
-    this._agreement = value;
-  }
-
-  get playonhover(): boolean {
-    return this._playonhover;
   }
 
   set playonhover(value: boolean) {
-    this._playonhover = value;
-  }
-
-  get reloaded(): boolean {
-    return this._reloaded;
+    this.store.dispatch(fromTranscriptionActions.setPlayOnHover({playOnHover: value}));
   }
 
   set reloaded(value: boolean) {
-    this._reloaded = value;
-  }
-
-  get email(): string {
-    return this._email;
-  }
-
-  set email(value: string) {
-    this._email = value;
-  }
-
-  /* Getter/Setter SessionStorage */
-  get serverDataEntry(): IDataEntry {
-    return this._serverDataEntry;
+    this.store.dispatch(fromApplicationActions.setReloaded({
+      reloaded: value
+    }));
   }
 
   set serverDataEntry(value: IDataEntry) {
-    this._serverDataEntry = value;
-  }
-
-  get submitted(): boolean {
-    return this._submitted;
+    this.store.dispatch(fromLoginActions.setServerDataEntry({serverDataEntry: value}));
   }
 
   set submitted(value: boolean) {
-    this._submitted = value;
+    this.store.dispatch(fromTranscriptionActions.setSubmitted({submitted: value}));
     this.idb.save('options', 'submitted', {value}).catch((err) => {
       console.error(err);
     });
@@ -181,17 +130,6 @@ export class AppStorageService {
     this._idb.save('options', 'feedback', {value}).catch((err) => {
       console.error(err);
     });
-  }
-
-  get logs(): any[] {
-    return this._logs;
-  }
-
-  set logs(value: any[]) {
-    this._idb.saveArraySequential(value, 'logs', 'timestamp').catch((err) => {
-      console.error(err);
-    });
-    this._logs = value;
   }
 
   get dataID(): number {
@@ -364,15 +302,41 @@ export class AppStorageService {
     // TODO listen to state changes and save it to the IndexedDB
     // TODO make all properties private
 
-    this.setLoggedIn(this.sessStr.retrieve('_loggedIn'));
+    this.store.dispatch(fromTranscriptionActions.setTranscriptionState({
+      savingNeeded: false,
+      isSaving: false,
+      playOnHover: this.sessStr.retrieve('playonhover'),
+      followPlayCursor: this.sessStr.retrieve('followplaycursor'),
+      submitted: false,
+      logs: [],
+      audioSettings: {
+        volume: 1,
+        speed: 1
+      }
+    }));
+
+    this.store.dispatch(fromLoginActions.setLoggedIn({
+      loggedIn: this.sessStr.retrieve('loggedIn')
+    }));
+    this.reloaded = this.sessStr.retrieve('reloaded');
+    this.serverDataEntry = this.sessStr.retrieve('serverDataEntry');
+
+    this.subscrManager.add(this.store.select(fromLogin.selectOnlineSession).subscribe((onlineSession) => {
+      this.sessStr.store('serverDataEntry', onlineSession.serverDataEntry);
+      this.sessStr.store('jobsLeft', onlineSession.jobsLeft);
+    }));
+    this.subscrManager.add(this.store.select(fromLogin.selectLoggedIn).subscribe((loggedIn) => {
+      this.sessStr.store('loggedIn', loggedIn);
+    }));
+    this.subscrManager.add(this.store.select(fromTranscription.selectPlayOnHover).subscribe((playOnHover) => {
+      this.sessStr.store('playonhover', playOnHover);
+    }));
+    this.subscrManager.add(this.store.select(fromApplication.selectReloaded).subscribe((reloaded) => {
+      this.sessStr.store('reloaded', reloaded);
+    }));
   }
 
-  // SESSION STORAGE
-  @SessionStorage() logInTime: number; // timestamp
-  @SessionStorage('jobsLeft') jobsLeft: number;
-
   public saving: EventEmitter<string> = new EventEmitter<string>();
-  public loginActivityChanged = new Subject<boolean>();
   public settingschange = new Subject<{ key: string, value: any }>();
 
   // is user on the login page?
@@ -380,41 +344,13 @@ export class AppStorageService {
 
   private subscrManager = new SubscriptionManager();
 
-  @SessionStorage('followplaycursor') private _followplaycursor: boolean;
-
-  // IDB STORAGE
-  private _idbloaded = false;
-
   private _loaded = new EventEmitter();
 
   private _idb: IndexedDBManager;
 
   private _sessionfile: any = null;
 
-  private _userProfile: {
-    userName: string,
-    email: string
-  } = {
-    userName: '',
-    email: ''
-  };
-
-  @SessionStorage('agreement') private _agreement: any;
-
-  @SessionStorage('playonhover') private _playonhover: boolean;
-
-  @SessionStorage('reloaded') private _reloaded: boolean;
-
-  @SessionStorage('email') private _email: string;
-
-  @SessionStorage('serverDataEntry') private _serverDataEntry: IDataEntry;
-
-  private _submitted: boolean = null;
-
   private _feedback: any = null;
-
-  private _logs: any[] = [];
-
   private _dataID: number = null;
 
   private _usemode: LoginMode = null;
@@ -446,6 +382,60 @@ export class AppStorageService {
   private _secondsPerLine = 5;
 
   private _highlightingEnabled = true;
+
+  async getFollowPlayCursor(): Promise<boolean> {
+    return this.store.select(fromTranscription.selectFollowPlayCursor).toPromise();
+  }
+
+  public getJobsLeft(): Promise<number> {
+    return this.store.select(fromLogin.selectJobsLeft).toPromise();
+  }
+
+  async getLogs(): Promise<any[]> {
+    return this.store.select(fromTranscription.selectLogs).toPromise();
+  }
+
+  public async getOnlineSession(): Promise<OnlineSession> {
+    return this.store.select(fromLogin.selectOnlineSession).toPromise();
+  }
+
+  setUserData(value: {
+    id: string,
+    project: string,
+    jobNumber: number
+  }) {
+    this.store.dispatch(fromLoginActions.setUserData(value));
+    this._idb.save('options', 'user', {value: value}).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  async getUserProfile(): Promise<{ name: string; email: string }> {
+    return this.store.select(fromFeedback.selectUserProfile).toPromise();
+  }
+
+  async getPlayonhover(): Promise<boolean> {
+    return this.store.select(fromTranscription.selectPlayOnHover).toPromise();
+  }
+
+  async getReloaded(): Promise<boolean> {
+    return this.store.select(fromApplication.selectReloaded).toPromise();
+  }
+
+  async getServerDataEntry(): Promise<IDataEntry> {
+    return this.store.select(fromLogin.selectServerDataEntry).toPromise();
+  }
+
+  async getSubmitted(): Promise<boolean> {
+    return this.store.select(fromTranscription.selectSubmitted).toPromise();
+  }
+
+  setLogs(value: any[]) {
+    this.store.dispatch(fromTranscriptionActions.setLogs({logs: value}));
+    this._idb.saveArraySequential(value, 'logs', 'timestamp').catch((err) => {
+      console.error(err);
+    });
+  }
 
   async getASRSelectedLanguage(): Promise<string> {
     return this.store.select(fromASR.selectSelectedLanguage).toPromise();
@@ -484,12 +474,12 @@ export class AppStorageService {
   }
 
   public async getAudioVolume(): Promise<number> {
-    return this.store.select(fromApplication.selectAudioVolume).toPromise();
+    return this.store.select(fromTranscription.selectAudioVolume).toPromise();
   }
 
   public async setAudioVolume(value: number) {
     const audioSpeed = await this.getAudioSpeed();
-    this.store.dispatch(fromApplicationActions.setAudioVolume({volume: value}));
+    this.store.dispatch(fromTranscriptionActions.setAudioVolume({volume: value}));
     this.idb.save('options', 'audioSettings', {
       value: {
         volume: value,
@@ -501,12 +491,12 @@ export class AppStorageService {
   }
 
   public async getAudioSpeed(): Promise<number> {
-    return this.store.select(fromApplication.selectAudioSpeed).toPromise();
+    return this.store.select(fromTranscription.selectAudioSpeed).toPromise();
   }
 
   public async setAudioSpeed(value: number) {
     const audioVolume = await this.getAudioVolume();
-    this.store.dispatch(fromApplicationActions.setAudioSpeed({speed: value}));
+    this.store.dispatch(fromTranscriptionActions.setAudioSpeed({speed: value}));
     this.idb.save('options', 'audioSettings', {
       value: {
         speed: value,
@@ -537,20 +527,16 @@ export class AppStorageService {
     return this.store.select(fromLogin.selectMode).toPromise();
   }
 
-  setLoggedIn(value: boolean) {
-    this.loginActivityChanged.next(value);
-  }
-
   async getLoggedIn(): Promise<boolean> {
     return this.store.select(fromLogin.selectLoggedIn).toPromise();
   }
 
   async getInterface(): Promise<string> {
-    return this.store.select(fromApplication.selectCurrentEditor).toPromise();
+    return this.store.select(fromTranscription.selectCurrentEditor).toPromise();
   }
 
   setInterface(newInterface: string) {
-    this.store.dispatch(fromApplicationActions.setCurrentEditor({currentEditor: newInterface}));
+    this.store.dispatch(fromTranscriptionActions.setCurrentEditor({currentEditor: newInterface}));
     this.idb.save('options', 'interface', {value: newInterface}).catch((err) => {
       console.error(err);
     });
@@ -602,6 +588,7 @@ export class AppStorageService {
       file.type
     );
   }
+
   public overwriteAnnotation = (value: OIDBLevel[], saveToDB = true): Promise<any> => {
     return new Promise<any>((resolve, reject) => {
       if (saveToDB) {
@@ -663,37 +650,35 @@ export class AppStorageService {
 
       const currentEditor = await this.getInterface();
 
-      if (offline && (isUnset(member))) {
-
-        if (isUnset(currentEditor)) {
-          this.setInterface('2D-Editor');
+      if (offline) {
+        if (isUnset(member)) {
+          if (isUnset(currentEditor)) {
+            this.setInterface('2D-Editor');
+          }
+          this.setNewSessionKey();
+          this.usemode = LoginMode.LOCAL;
+          this.setUserData({
+            id: '-1',
+            project: '',
+            jobNumber: -1
+          });
+          this.login = true;
         }
-        this.setNewSessionKey();
-        this.usemode = LoginMode.LOCAL;
-        this.user = {
-          id: '-1',
-          project: '',
-          jobno: -1
-        };
-        this.login = true;
-      }
-
-      if (!this.login && !offline && (!isUnset(member))) {
+      } else if (!this.login && !isUnset(member)) {
         if (isUnset(currentEditor)) {
           this.setInterface('2D-Editor');
         }
         this.setNewSessionKey();
 
         this.dataID = dataID;
-        this.sessStr.store('_loggedIn', true);
         this.sessStr.store('interface', currentEditor);
         this.audioURL = audioURL;
-        this.user = {
+        this.usemode = LoginMode.ONLINE;
+        this.setUserData({
           id: member.id,
           project: member.project,
-          jobno: member.jobno
-        };
-        this.usemode = LoginMode.ONLINE;
+          jobNumber: member.jobno
+        });
 
         this.login = true;
       }
@@ -743,7 +728,7 @@ export class AppStorageService {
     // TODO why not url?
     if (this.usemode !== 'url') {
       if (key === 'annotation' || key === 'feedback') {
-        this.getIsSaving() = true;
+        this.setIsSaving(true);
         this.saving.emit('saving');
       }
 
@@ -751,13 +736,13 @@ export class AppStorageService {
         case 'annotation':
           this.changeAnnotationLevel(value.num, value.level).then(
             () => {
-              this._isSaving = false;
-              this._savingNeeded = false;
+              this.setIsSaving(false);
+              this.savingNeeded = true;
               this.saving.emit('success');
             }
           ).catch((err) => {
-            this._isSaving = false;
-            this._savingNeeded = false;
+            this.setIsSaving(false);
+            this.savingNeeded = false;
             this.saving.emit('error');
             console.error(`error on saving`);
             console.error(err);
@@ -766,13 +751,13 @@ export class AppStorageService {
         case 'feedback':
           this._idb.save('options', 'feedback', {value}).then(
             () => {
-              this._isSaving = false;
-              this._savingNeeded = false;
+              this.setIsSaving(false);
+              this.savingNeeded = false;
               this.saving.emit('success');
             }
           ).catch((err) => {
-            this._isSaving = false;
-            this._savingNeeded = false;
+            this.setIsSaving(false);
+            this.savingNeeded = false;
             this.saving.emit('error');
             console.error(err);
           });

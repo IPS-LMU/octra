@@ -1,5 +1,6 @@
 import {createAction, props} from '@ngrx/store';
 import {LoginMode, OnlineSession, URLParameters} from '../index';
+import {IDataEntry} from '../../obj/data-entry';
 
 const context = 'Login';
 
@@ -55,5 +56,19 @@ export const setUserData = createAction(`[${context}] Set user data`,
 );
 
 export const clearLocalSession = createAction(`[${context}] Clear local session`);
+
+export const setServerDataEntry = createAction(
+  `[${context}] Set serverDataEntry`,
+  props<{
+    serverDataEntry: IDataEntry;
+  }>()
+);
+
+export const setLoggedIn = createAction(
+  `[${context}] Set loggedIn`,
+  props<{
+    loggedIn: boolean;
+  }>()
+);
 
 

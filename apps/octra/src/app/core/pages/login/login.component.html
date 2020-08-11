@@ -13,7 +13,7 @@
       </p>
       <section>
         <h4 [ngClass]="{
-                'alert-success': appStorage.usemode === 'online'
+                'alert-success': appStorage.useMode === 'online'
                 }">{{ 'login.online mode' | transloco}}</h4>
         <p style="text-align: center;">
           {{"login.online mode description" | transloco}}
@@ -85,12 +85,12 @@
                 />
               </div>
               <div class="form-group">
-                <button *ngIf="appStorage.usemode !== 'local'" [disabled]="!f.valid"
+                <button *ngIf="appStorage.useMode !== 'local'" [disabled]="!f.valid"
                         aria-describedby="submitButton"
                         class="btn btn-primary btn-raised login-submit"
                         name="login-submit">{{'general.login' | transloco}}
                 </button>
-                <button *ngIf="appStorage.usemode === 'local'"
+                <button *ngIf="appStorage.useMode === 'local'"
                         [disabled]="!f.valid"
                         aria-describedby="submitButton"
                         class="btn btn-raised btn-primary btn-danger login-submit"
@@ -106,14 +106,14 @@
     <div #localmode class="col-md-6 card" id='localmode' style="padding:40px;">
       <section>
         <h4 [ngClass]="{
-                'alert-success': appStorage.usemode === 'local'
+                'alert-success': appStorage.useMode === 'local'
                 }">{{'login.local mode' | transloco}}
         </h4>
         <p style="text-align: center;">
           {{"login.local mode description" | transloco}}
         </p>
         <div>
-          <div *ngIf="appStorage.usemode === 'local' && appStorage.sessionfile !== null"
+          <div *ngIf="appStorage.useMode === 'local' && appStorage.sessionfile !== null"
                [innerHTML]="'login.old file found' | transloco:{file_label: getDropzoneFileString(sessionfile)}"
                class="alert alert-warning">
           </div>
@@ -122,8 +122,8 @@
           </div>
           <button
             (click)="onOfflineSubmit()"
-            *ngIf="(appStorage.usemode === null || appStorage.usemode !== 'online') && (getFileStatus() != 'new' || appStorage.usemode === 'url')"
-            [disabled]="!(getFileStatus() == 'start' || appStorage.usemode === 'url')"
+            *ngIf="(appStorage.useMode === null || appStorage.useMode !== 'online') && (getFileStatus() != 'new' || appStorage.useMode === 'url')"
+            [disabled]="!(getFileStatus() == 'start' || appStorage.useMode === 'url')"
             class="btn btn-raised btn-primary"
             id="offline-submit"
             type="submit">
@@ -131,14 +131,14 @@
           </button>
           <button
             (click)="onTranscriptionDelete()"
-            *ngIf="appStorage.usemode === 'local' && (getFileStatus() == 'new' || getFileStatus() === 'start') else removeOldTranscription;"
+            *ngIf="appStorage.useMode === 'local' && (getFileStatus() == 'new' || getFileStatus() === 'start') else removeOldTranscription;"
             class="btn btn-raised btn-danger offline-delete-btn">
             {{'transcription.new' |transloco}}
           </button>
           <ng-template #removeOldTranscription>
             <button (click)="onOfflineSubmit()"
-                    *ngIf="(appStorage.usemode !== null && appStorage.usemode !== undefined) &&
-                    appStorage.usemode === 'online' && (getFileStatus() != 'new' || getFileStatus() != 'start')"
+                    *ngIf="(appStorage.useMode !== null && appStorage.useMode !== undefined) &&
+                    appStorage.useMode === 'online' && (getFileStatus() != 'new' || getFileStatus() != 'start')"
                     [disabled]="(getFileStatus() !== 'new' && getFileStatus() !== 'start')"
                     class="btn btn-raised btn-danger offline-delete-btn">{{'login.local and remove' |transloco}}</button>
           </ng-template>

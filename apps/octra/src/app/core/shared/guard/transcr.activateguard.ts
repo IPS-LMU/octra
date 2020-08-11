@@ -6,6 +6,7 @@ import {AppInfo} from '../../../app.info';
 import {SettingsService} from '../service';
 import {AppStorageService} from '../service/appstorage.service';
 import {Functions} from '@octra/utilities';
+import {LoginMode} from '../../store';
 
 @Injectable()
 export class TranscActivateGuard implements CanActivate {
@@ -17,7 +18,7 @@ export class TranscActivateGuard implements CanActivate {
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
-    if (this.appStorage.usemode !== 'local') {
+    if (this.appStorage.useMode !== LoginMode.LOCAL) {
       if (!this.settService.allloaded) {
 
         const params = AppInfo.queryParamsHandling;

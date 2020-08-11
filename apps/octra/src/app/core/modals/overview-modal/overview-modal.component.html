@@ -1,8 +1,8 @@
 <div #modal="bs-modal" aria-labelledby="dialog-sizes-name1" bsModal class="modal fade" id="bugreport" role="dialog"
      style="padding: 20px 0;/*noinspection CssInvalidPropertyValue*/overflow: -moz-hidde-unscrollable;" tabindex="-1">
   <div [ngStyle]="{
-        'max-width': (appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') ? '100%' : '750px;',
-        'display': (appStorage.usemode === 'online' ||  this.appStorage.usemode === 'demo') ? 'contents' : 'block'
+        'max-width': (appStorage.useMode === 'online' || this.appStorage.useMode === 'demo') ? '100%' : '750px;',
+        'display': (appStorage.useMode === 'online' ||  this.appStorage.useMode === 'demo') ? 'contents' : 'block'
     }" class="modal-dialog modal-lg flex" style="height:93%;display: contents;">
     <div class="modal-content flex" style="flex:auto;height:100%;">
       <div class="modal-header">
@@ -14,8 +14,8 @@
       <div class="modal-body flex" style="flex:auto; height:300px;">
         <div class="row" style="overflow: auto; flex:auto;">
           <div [ngClass]="{
-                        'col-md-6 col-lg-9': appStorage.usemode === 'online' || this.appStorage.usemode === 'demo',
-                        'col-12': appStorage.usemode !== 'online' && this.appStorage.usemode !== 'demo'
+                        'col-md-6 col-lg-9': appStorage.useMode === 'online' || this.appStorage.useMode === 'demo',
+                        'col-12': appStorage.useMode !== 'online' && this.appStorage.useMode !== 'demo'
                     }" class="col-md-6" style="overflow: auto; max-height:1200px;border-right:1px solid lightgray;">
             <octra-transcr-overview
               #overview
@@ -25,7 +25,7 @@
               [visible]="visible">
             </octra-transcr-overview>
           </div>
-          <div *ngIf="appStorage.usemode === 'online' || this.appStorage.usemode === 'demo'" class="col-md-6 col-lg-3"
+          <div *ngIf="appStorage.useMode === 'online' || this.appStorage.useMode === 'demo'" class="col-md-6 col-lg-3"
                style="overflow: auto;max-height:1200px;">
             <h4>Feedback</h4>
             <octra-transcription-feedback #feedback

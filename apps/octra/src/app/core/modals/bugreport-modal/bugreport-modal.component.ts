@@ -39,18 +39,18 @@ export class BugreportModalComponent implements OnInit {
 
   public set email(value: string) {
     this.appStorage.userProfile = {
-      userName: this.userName,
+      name: this.userName,
       email: value
     };
   }
 
   public get userName(): string {
-    return this.appStorage.userProfile.userName;
+    return this.appStorage.userProfile.name;
   }
 
   public set userName(value: string) {
     this.appStorage.userProfile = {
-      userName: value,
+      name: value,
       email: this.email
     };
   }
@@ -106,7 +106,10 @@ export class BugreportModalComponent implements OnInit {
   }
 
   sendBugReport() {
-    this.appStorage.email = this.email;
+    this.appStorage.userProfile = {
+      ...this.appStorage.userProfile,
+      email: this.email
+    };
 
     this.sendStatus = 'sending';
     this.subscrmanager.add(

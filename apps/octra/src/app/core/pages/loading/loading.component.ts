@@ -1,6 +1,6 @@
 import {HttpClient} from '@angular/common/http';
 import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {AppInfo} from '../../../app.info';
 import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
@@ -8,6 +8,8 @@ import {AudioService, SettingsService, TranscriptionService} from '../../shared/
 import {AppStorageService, OIDBLevel} from '../../shared/service/appstorage.service';
 import {IFile, ImportResult, OAudiofile, OLevel} from '@octra/annotation';
 import {LoginMode} from '../../store';
+import * as fromLoginActions from '../../store/login/login.actions';
+import {Store} from '@ngrx/store';
 
 @Component({
   selector: 'octra-loading',
@@ -37,7 +39,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
               private router: Router,
               private transcrService: TranscriptionService,
               private http: HttpClient,
-              private route: ActivatedRoute) {
+              private store: Store) {
   }
 
   ngOnInit() {
@@ -111,7 +113,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
         (result) => {
           if (result.status === 'success') {
             new Promise<void>((resolve, reject) => {
-              if (this.appStorage.usemode === 'url' && this.appStorage.urlParams.transcript !== null) {
+              if (this.appStorage.useMode === LoginMode.URL && this.appStorage.urlParams.transcript !== null) {
                 this.transcrService.defaultFontSize = 16;
 
                 // load transcript file via URL
@@ -181,7 +183,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                   }
                 );
               } else {
-                if (this.appStorage.usemode === 'url') {
+                if (this.appStorage.useMode === LoginMode.URL) {
                   // overwrite
                   this.transcrService.defaultFontSize = 16;
 
@@ -209,7 +211,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
             });
           } else {
             console.error('audio not loaded');
-            if (this.appStorage.usemode === 'local') {
+            if (this.appStorage.useMode === LoginMode.LOCAL) {
               Functions.navigateTo(this.router, ['/user/transcr/reload-file'], AppInfo.queryParamsHandling).catch((error) => {
                 console.error(error);
               });
@@ -229,37 +231,21 @@ export class LoadingComponent implements OnInit, OnDestroy {
             && this.loadedtable.audio
           ) {
             this.subscrmanager.removeById(id);
-            setTimeout(() => {
-              if (((this.appStorage.agreement === null || this.appStorage.agreement === undefined)
-                  || (this.appStorage.agreement[this.appStorage.user.project] === null
-                  || this.appStorage.agreement[this.appStorage.user.project] === undefined) ||
-                  !this.appStorage.agreement[this.appStorage.user.project]
-                )
-                && this.settService.projectsettings.agreement.enabled && this.appStorage.usemode === 'online') {
-                this.transcrService.load().then(() => {
-                  Functions.navigateTo(this.router, ['/user/agreement'], AppInfo.queryParamsHandling).catch((error) => {
-                    console.error(error);
-                  });
-                }).catch((err) => {
-                  console.error(err);
-                });
-              } else {
-                this.transcrService.load().then(() => {
-                  Functions.navigateTo(this.router, ['/user/transcr'], AppInfo.queryParamsHandling).catch((error) => {
-                    console.error(error);
-                  });
-                }).catch((err) => {
-                  console.error(err);
-                });
-              }
-            }, 500);
+
+            this.transcrService.load().then(() => {
+              Functions.navigateTo(this.router, ['/user/transcr'], AppInfo.queryParamsHandling).catch((error) => {
+                console.error(error);
+              });
+            }).catch((err) => {
+              console.error(err);
+            });
           }
         }
       )
     );
 
     new Promise<void>((resolve, reject) => {
-      if (!this.appStorage.idbloaded) {
+      if (!this.appStorage.idbLoaded) {
         this.subscrmanager.add(this.appStorage.loaded.subscribe(() => {
           },
           (error) => {
@@ -275,41 +261,49 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
       if (this.appStorage.urlParams.hasOwnProperty('audio') && this.appStorage.urlParams.audio !== ''
         && !(this.appStorage.urlParams.audio === null || this.appStorage.urlParams.audio === undefined)) {
-        this.appStorage.usemode = LoginMode.URL;
-        this.appStorage.LoggedIn = true;
-      } else if (this.appStorage.usemode === 'url') {
+        this.store.dispatch(fromLoginActions.loginURLParameters({
+          urlParams: this.appStorage.urlParams
+        }));
+      } else if (this.appStorage.useMode === LoginMode.URL) {
         // url mode set, but no params => change mode
         console.warn(`use mode is url but no params found. Reset use mode.`);
-        this.appStorage.usemode = (!isUnset(this.appStorage.user) && !isUnset(this.appStorage.user.id) &&
-          this.appStorage.user.id !== '' && (isUnset(this.appStorage.sessionfile)))
-          ? LoginMode.ONLINE : LoginMode.LOCAL;
-        this.appStorage.LoggedIn = false;
+        if (!isUnset(this.appStorage.onlineSession.id) && this.appStorage.onlineSession.id !== ''
+          && (isUnset(this.appStorage.sessionfile))) {
+          this.store.dispatch(fromLoginActions.setMode({
+            mode: LoginMode.ONLINE
+          }));
+        } else {
+          this.store.dispatch(fromLoginActions.setMode({
+            mode: LoginMode.LOCAL
+          }));
+        }
+        this.store.dispatch(fromLoginActions.logout());
       }
 
-      if (this.appStorage.usemode !== 'url' && !this.appStorage.LoggedIn) {
+      if (this.appStorage.useMode !== LoginMode.URL && !this.appStorage.loggedIn) {
         // not logged in, go back
         Functions.navigateTo(this.router, ['/login'], AppInfo.queryParamsHandling).catch((error) => {
           console.error(error);
         });
-      } else if (this.appStorage.LoggedIn) {
+      } else if (this.appStorage.loggedIn) {
         this.settService.loadProjectSettings().catch((error) => {
           console.error(error);
         });
 
-        if (this.appStorage.usemode === 'local' && this.audio.audiomanagers.length === 0) {
+        if (this.appStorage.useMode === LoginMode.LOCAL && this.audio.audiomanagers.length === 0) {
           Functions.navigateTo(this.router, ['/user/transcr/reload-file'], AppInfo.queryParamsHandling).catch((error) => {
             console.error(error);
           });
         } else {
-          if (this.appStorage.usemode === 'url') {
-            if (this.appStorage.usemode === 'url') {
-              this.state = 'Get transcript from URL...';
-              // set audio url from url params
-              this.appStorage.audioURL = decodeURI(this.appStorage.urlParams.audio);
-            }
+          if (this.appStorage.useMode === LoginMode.URL) {
+            this.state = 'Get transcript from URL...';
+            // set audio url from url params
+            this.store.dispatch(fromLoginActions.setAudioURL({
+              audioURL: decodeURI(this.appStorage.urlParams.audio)
+            }));
           }
 
-          console.log(`mode is ${this.appStorage.usemode} and audioSrc is ${this.appStorage.audioURL}`);
+          console.log(`mode is ${this.appStorage.useMode} and audioSrc is ${this.appStorage.audioURL}`);
 
           this.settService.audioloading.subscribe(
             (progress) => {
@@ -320,7 +314,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
           this.settService.loadAudioFile(this.audio);
         }
       } else {
-        console.warn(`special situation: loggedIn is null! usemode ${this.appStorage.usemode} url: ${this.appStorage.audioURL}`);
+        console.warn(`special situation: loggedIn is null! useMode ${this.appStorage.useMode} url: ${this.appStorage.audioURL}`);
       }
     }).catch((error) => {
       console.error(error);

@@ -1,7 +1,7 @@
 import {Component, EventEmitter, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef} from 'ngx-bootstrap/modal';
 import {AppInfo} from '../../../app.info';
-import {SubscriptionManager} from '@octra/utilities';
+import {isUnset, SubscriptionManager} from '@octra/utilities';
 import {APIService, SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
@@ -40,7 +40,7 @@ export class OctraModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.bgemail = (!(this.appStorage.email === null || this.appStorage.email === undefined)) ? this.appStorage.email : '';
+    this.bgemail = (!isUnset(this.appStorage.userProfile.email)) ? this.appStorage.userProfile.email : '';
     this._subscrmanager = new SubscriptionManager();
 
     this._subscrmanager.add(this.modService.showmodal.subscribe(

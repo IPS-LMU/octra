@@ -173,16 +173,8 @@ export class SettingsService {
 
     const umanager = new UpdateManager(this.appStorage);
     umanager.checkForUpdates(this.appSettings.octra.database.name).then((idb) => {
-
-      const audioURL = queryParams.audio;
       const transcriptURL = (queryParams.transcript !== undefined)
         ? queryParams.transcript : null;
-      const embedded = queryParams.embedded;
-
-      this.appStorage.urlParams.audio = audioURL;
-      this.appStorage.urlParams.transcript = transcriptURL;
-      this.appStorage.urlParams.embedded = (embedded === '1');
-      this.appStorage.urlParams.host = queryParams.host;
 
       // load from indexedDB
       this.appStorage.load(idb).then(
@@ -214,8 +206,7 @@ export class SettingsService {
 
           // if url mode, set it in options
           if (SettingsService.queryParamsSet(queryParams)) {
-            this.appStorage.usemode = LoginMode.URL;
-            this.appStorage.LoggedIn = true;
+            this.appStorage.setURLSession(queryParams.audio, transcriptURL, (queryParams.embedded === '1'), queryParams.host);
           }
 
           if (this.validated) {
@@ -333,14 +324,14 @@ export class SettingsService {
   }
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
     console.log('Load audio file 2...');
-    if ((this.appStorage.usemode === null || this.appStorage.usemode === undefined)) {
+    if (isUnset(this.appStorage.useMode)) {
       this._log += `An error occured. Please click on "Back" and try it again.`;
     }
-    if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url' || this.appStorage.usemode === 'demo') {
+    if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.URL || this.appStorage.useMode === LoginMode.DEMO) {
       // online, url or demo
       if (!(this.appStorage.audioURL === null || this.appStorage.audioURL === undefined)) {
         let src = '';
-        if (this.appStorage.usemode === 'online') {
+        if (this.appStorage.useMode === LoginMode.ONLINE) {
           src = this.appSettings.audio_server.url + this.appStorage.audioURL;
         } else {
           src = this.appStorage.audioURL;
@@ -373,7 +364,7 @@ export class SettingsService {
         console.error('audio src is null');
         this.audioloaded.emit({status: 'error'});
       }
-    } else if (this.appStorage.usemode === 'local') {
+    } else if (this.appStorage.useMode === LoginMode.LOCAL) {
       // local mode
       if (!(this.appStorage.sessionfile === null || this.appStorage.sessionfile === undefined)
         && !(this.appStorage.sessionfile.name === null || this.appStorage.sessionfile.name === undefined)) {

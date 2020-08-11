@@ -82,7 +82,7 @@ export class UpdateManager {
                         value: {value: this.appStorage.localStr.retrieve('audioURL')}
                       },
                       {
-                        key: 'usemode',
+                        key: 'useMode',
                         value: {value: this.appStorage.localStr.retrieve('offline')}
                       },
                       {
@@ -177,15 +177,15 @@ export class UpdateManager {
                     idbm.get(options, 'uselocalmode').then((entry) => {
                       if (!(entry === null || entry === undefined)) {
                         if (entry.value === false) {
-                          idbm.save(options, 'usemode', {
-                            name: 'usemode',
+                          idbm.save(options, 'useMode', {
+                            name: 'useMode',
                             value: 'online'
                           }).catch((error) => {
                             console.error(error);
                           });
                         } else if (entry.value === true) {
-                          idbm.save(options, 'usemode', {
-                            name: 'usemode',
+                          idbm.save(options, 'useMode', {
+                            name: 'useMode',
                             value: 'local'
                           }).catch((error) => {
                             console.error(error);

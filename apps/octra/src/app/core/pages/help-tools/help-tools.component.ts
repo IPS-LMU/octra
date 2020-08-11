@@ -1,7 +1,7 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {SubscriptionManager} from '@octra/utilities';
 import {APIService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
+import {LoginMode} from '../../store';
 
 @Component({
   selector: 'octra-help-tools',
@@ -10,8 +10,6 @@ import {AppStorageService} from '../../shared/service/appstorage.service';
 })
 export class HelpToolsComponent implements OnInit, OnDestroy {
   @ViewChild('canvas', {static: false}) canvas: ElementRef;
-
-  private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
   constructor(private appStorage: AppStorageService,
               private api: APIService) {
@@ -29,9 +27,9 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
   }
 
   clearAllData() {
-    this.appStorage._loggedIn = false;
+    this.appStorage.clearSession();
 
-    if (this.appStorage.usemode === 'local' || this.appStorage.usemode === 'demo') {
+    if (this.appStorage.useMode === LoginMode.LOCAL || this.appStorage.useMode === LoginMode.DEMO) {
       this.appStorage.clearAnnotationData().then(() => {
         this.appStorage.clearOptions().catch((error) => {
           console.error(error);
@@ -46,7 +44,7 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
           document.location.reload();
         }
       );
-    } else if (this.appStorage.usemode === 'online') {
+    } else if (this.appStorage.useMode === LoginMode.ONLINE) {
       this.api.setOnlineSessionToFree(this.appStorage).then(() => {
         this.appStorage.clearAnnotationData().then(() => {
           this.appStorage.clearLoggingData().catch((error) => {
@@ -65,7 +63,7 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
       }).catch((error) => {
         console.error(error);
       });
-    } else if (this.appStorage.usemode === 'url') {
+    } else if (this.appStorage.useMode === LoginMode.URL) {
       this.appStorage.clearAnnotationData().then(() => {
         this.appStorage.clearLoggingData().catch((error) => {
           console.error(error);

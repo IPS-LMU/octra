@@ -29,6 +29,7 @@ import {AudioChunk, AudioManager} from '../../../../../../../libs/media/src/lib/
 import {AudioRessource, AudioSelection, SampleUnit} from '@octra/media';
 import {ASRQueueItemType, Segment, Segments} from '@octra/annotation';
 import {AudioNavigationComponent, AudioViewerComponent, AudioViewerShortcutEvent} from '@octra/components';
+import {LoginMode} from '../../../core/store';
 
 @Component({
   selector: 'octra-transcr-window',
@@ -167,7 +168,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
     this.subscrmanager = new SubscriptionManager();
 
-    if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
+    if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
       this.subscrmanager.add(this.keyMap.beforeKeyDown.subscribe((event) => {
         if (event.comboKey === 'ALT + SHIFT + 1' ||
           event.comboKey === 'ALT + SHIFT + 2' ||
@@ -358,8 +359,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
   }
 
   setValidationEnabledToDefault() {
-    this._validationEnabled = this.appStorage.usemode !== 'url'
-      && (this.appStorage.usemode === 'demo' || this.settingsService.projectsettings.octra.validationEnabled);
+    this._validationEnabled = this.appStorage.useMode !== 'url'
+      && (this.appStorage.useMode === 'demo' || this.settingsService.projectsettings.octra.validationEnabled);
   }
 
   ngOnChanges(obj) {

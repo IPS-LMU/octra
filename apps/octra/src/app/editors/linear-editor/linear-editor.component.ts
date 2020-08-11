@@ -30,8 +30,8 @@ import {
   AudioviewerConfig,
   AudioViewerShortcutEvent
 } from '@octra/components';
-import {AudioChunk, AudioManager} from '../../../../../../libs/media/src/lib/audio/audio-manager';
-import {AudioSelection, SampleUnit} from '@octra/media';
+import {AudioChunk, AudioManager, AudioSelection, SampleUnit} from '@octra/media';
+import {LoginMode} from '../../core/store';
 
 @Component({
   selector: 'octra-signal-gui',
@@ -178,7 +178,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     super();
     this.subscrManager = new SubscriptionManager();
 
-    if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
+    if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
       this.subscrManager.add(this.keyMap.beforeKeyDown.subscribe((event) => {
         if (event.comboKey === 'ALT + SHIFT + 1' ||
           event.comboKey === 'ALT + SHIFT + 2' ||

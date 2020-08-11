@@ -17,21 +17,22 @@ import {Observable, throwError} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {ModalService} from '../../modals/modal.service';
 import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
-import {parseServerDataEntry} from '../../obj/data-entry';
+import {IDataEntry, parseServerDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
 import {APIService, AudioService, SettingsService} from '../../shared/service';
 import {AppStorageService, OIDBLevel, OIDBLink} from '../../shared/service/appstorage.service';
 import {OctraDropzoneComponent} from '../../component/octra-dropzone/octra-dropzone.component';
 import {ComponentCanDeactivate} from './login.deactivateguard';
 import {LoginService} from './login.service';
-import {LoginStoreService} from '../../store/login/login-store.service';
 import {LoginMode} from '../../store';
+import * as fromLoginActions from '../../store/login/login.actions';
+import {Store} from '@ngrx/store';
 
 @Component({
   selector: 'octra-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
-  providers: [LoginService, LoginStoreService]
+  providers: [LoginService]
 })
 export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate, AfterViewInit {
 
@@ -41,12 +42,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   @ViewChild('localmode', {static: true}) localmode: ElementRef;
   @ViewChild('onlinemode', {static: true}) onlinemode: ElementRef;
   public validSize = false;
-  public agreementChecked = true;
   public projects: string[] = [];
   valid = false;
   member = {
     id: '',
-    agreement: '',
     project: '',
     jobno: '',
     password: ''
@@ -75,16 +74,16 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               public modService: ModalService,
               private langService: TranslocoService,
               private audioService: AudioService,
-              private loginStoreService: LoginStoreService) {
+              private store: Store) {
     this.subscrmanager = new SubscriptionManager();
   }
 
   onOfflineSubmit = () => {
-    if (this.appStorage.usemode !== 'demo' && !isUnset(this.appStorage.dataID) && typeof this.appStorage.dataID === 'number') {
+    if (this.appStorage.useMode !== LoginMode.DEMO && !isUnset(this.appStorage.dataID) && typeof this.appStorage.dataID === 'number') {
       // last was online mode
       this.api.setOnlineSessionToFree(this.appStorage).then(() => {
         this.audioService.registerAudioManager(this.dropzone.audioManager);
-        this.appStorage.beginLocalSession(this.dropzone.files, false, this.beforeNavigation, (error) => {
+        this.appStorage.beginLocalSession(this.dropzone.files, false).then(this.beforeNavigation).catch((error) => {
           alert(error);
         });
       }).catch((error) => {
@@ -92,7 +91,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       });
     } else {
       this.audioService.registerAudioManager(this.dropzone.audioManager);
-      this.appStorage.beginLocalSession(this.dropzone.files, true, this.beforeNavigation, (error) => {
+      this.appStorage.beginLocalSession(this.dropzone.files, true).then(this.beforeNavigation).catch((error) => {
         alert(error);
       });
     }
@@ -127,17 +126,15 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   newTranscription = () => {
     this.audioService.registerAudioManager(this.dropzone.audioManager);
 
-    this.appStorage.beginLocalSession(this.dropzone.files, false, this.beforeNavigation,
-      (error) => {
-        if (error === 'file not supported') {
-          this.modService.show('error', {
-            text: this.langService.translate('reload-file.file not supported', {type: ''})
-          }).catch((error2) => {
-            console.error(error2);
-          });
-        }
+    this.appStorage.beginLocalSession(this.dropzone.files, false).then(this.beforeNavigation).catch((error) => {
+      if (error === 'file not supported') {
+        this.modService.show('error', {
+          text: this.langService.translate('reload-file.file not supported', {type: ''})
+        }).catch((error2) => {
+          console.error(error2);
+        });
       }
-    );
+    });
   }
 
   ngOnInit() {
@@ -148,38 +145,24 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     }
 
     const loaduser = () => {
-      if (this.appStorage.usemode !== 'demo') {
-        if (!isUnset(this.appStorage.user)) {
-          if (this.appStorage.user.id !== '-1') {
-            this.member.id = this.appStorage.user.id;
+      if (this.appStorage.useMode !== LoginMode.DEMO) {
+        if (!isUnset(this.appStorage.onlineSession)) {
+          if (this.appStorage.onlineSession.id !== '-1') {
+            this.member.id = this.appStorage.onlineSession.id;
           }
 
-          if (this.appStorage.user.hasOwnProperty('project')) {
-            this.member.project = this.appStorage.user.project;
-          }
+          this.member.project = this.appStorage.onlineSession.project;
 
-          if (this.appStorage.user.hasOwnProperty('jobno')
-            && this.appStorage.user.jobno !== null && this.appStorage.user.jobno > -1) {
-            this.member.jobno = this.appStorage.user.jobno.toString();
+          if (this.appStorage.onlineSession.jobNumber !== null && this.appStorage.onlineSession.jobNumber > -1) {
+            this.member.jobno = this.appStorage.onlineSession.jobNumber.toString();
           }
         }
       } else {
-        this.appStorage.usemode = null;
-        this.appStorage.dataID = null;
-        this.appStorage.user.id = '';
-        this.appStorage.user.jobno = -1;
-        this.appStorage.user.project = '';
-        this.member = {
-          id: '',
-          agreement: '',
-          project: '',
-          jobno: '',
-          password: ''
-        };
+        this.store.dispatch(fromLoginActions.clearOnlineSession());
       }
     };
 
-    if (!this.appStorage.idbloaded) {
+    if (!this.appStorage.idbLoaded) {
       this.subscrmanager.add(this.appStorage.loaded.subscribe(
         () => {
         },
@@ -242,15 +225,14 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           // last session was online session
           // check if credentials are available
           if (
-            !(this.appStorage.user.project === null || this.appStorage.user.project === undefined) &&
-            !(this.appStorage.user.jobno === null || this.appStorage.user.jobno === undefined) &&
-            !(this.appStorage.user.id === null || this.appStorage.user.id === undefined)
+            !isUnset(this.appStorage.onlineSession.project) && !isUnset(this.appStorage.onlineSession.jobNumber) &&
+            !isUnset(this.appStorage.onlineSession.id)
           ) {
             // check if credentials are the same like before
             if (
-              this.appStorage.user.id === this.member.id &&
-              Number(this.appStorage.user.jobno) === Number(this.member.jobno) &&
-              this.appStorage.user.project === this.member.project
+              this.appStorage.onlineSession.id === this.member.id &&
+              Number(this.appStorage.onlineSession.jobNumber) === Number(this.member.jobno) &&
+              this.appStorage.onlineSession.project === this.member.project
             ) {
               continueSession = true;
             } else {
@@ -264,46 +246,58 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
       if (newSessionAfterOld) {
         this.api.setOnlineSessionToFree(this.appStorage).then(() => {
-          this.createNewSession(form);
+          this.createNewOnlineSession(form);
         }).catch((error) => {
           console.error(error);
         });
       }
 
       if (newSession) {
-        this.createNewSession(form);
+        this.createNewOnlineSession(form);
       } else if (continueSession) {
         this.api.fetchAnnotation(this.appStorage.dataID).then((json) => {
           if (isUnset(json.data)) {
             // job doesn't exist anymore
-            this.createNewSession(form);
+            this.createNewOnlineSession(form);
           } else {
             // continue job
+            const data = json.data as IDataEntry;
+            let jobsLeft = -1;
             if (json.hasOwnProperty('message')) {
               const counter = (json.message === '') ? '0' : json.message;
-              this.appStorage.sessStr.store('jobsLeft', Number(counter));
+              jobsLeft = Number(counter);
             }
 
-            if (form.valid && this.agreementChecked
-              && json.message !== '0'
-            ) {
-              if (this.appStorage.sessionfile !== null) {
-                // last was offline mode
-                this.appStorage.clearLocalStorage().catch((err) => {
-                  console.error(err);
-                });
-              }
+            if (form.valid && json.message !== '0') {
+              const p = new Promise<void>((resolve) => {
+                if (this.appStorage.sessionfile !== null) {
+                  // last was offline mode
+                  this.appStorage.clearLocalStorage().then(() => {
+                    resolve();
+                  }).catch((err) => {
+                    console.error(err);
+                  });
+                } else {
+                  resolve();
+                }
+              }).then(() => {
+                let prompt = '';
+                let serverComment = '';
+                if (this.appStorage.useMode === LoginMode.ONLINE
+                  && data.hasOwnProperty('prompttext')) {
+                  // get transcript data that already exists
+                  prompt = data.prompttext;
+                  prompt = (prompt) ? prompt : '';
+                }
+                if (this.appStorage.useMode === LoginMode.ONLINE
+                  && data.hasOwnProperty('comment')) {
+                  // get transcript data that already exists
+                  serverComment = data.comment;
+                  serverComment = (serverComment) ? serverComment : '';
+                }
 
-              if (this.appStorage.usemode === 'online'
-                && json.data.hasOwnProperty('prompttext')) {
-                // get transcript data that already exists
-                const prompt = json.data.prompttext;
-                this.appStorage.prompttext = (prompt) ? prompt : '';
-              } else {
-                this.appStorage.prompttext = '';
-              }
+                this.appStorage.setOnlineSession(this.member, this.appStorage.dataID, this.appStorage.audioURL, prompt, serverComment, jobsLeft)
 
-              this.appStorage.setSessionData(this.member, this.appStorage.dataID, this.appStorage.audioURL).then(() => {
                 this.navigate();
               });
             } else {
@@ -373,16 +367,16 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
             }) > -1);
           });
         }
-        if (!(this.appStorage.user === null || this.appStorage.user === undefined) &&
-          !(this.appStorage.user.project === null || this.appStorage.user.project === undefined) && this.appStorage.user.project !== '') {
+        if (!isUnset(this.appStorage.onlineSession) &&
+          !isUnset(this.appStorage.onlineSession.project) && this.appStorage.onlineSession.project !== '') {
 
           const found = this.projects.find(
             (x) => {
-              return x === this.appStorage.user.project;
+              return x === this.appStorage.onlineSession.project;
             });
-          if ((found === null || found === undefined)) {
+          if (isUnset(found)) {
             // make sure that old project is in list
-            this.projects.push(this.appStorage.user.project);
+            this.projects.push(this.appStorage.onlineSession.project);
           }
         }
       }
@@ -416,13 +410,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.appStorage.clearSession();
       this.appStorage.clearLocalStorage().then(
         () => {
-          this.loginStoreService.loginDemo(audioExample.url, audioExample.description);
-          this.appStorage.setSessionData(this.member, 21343134, audioExample.url);
-          this.appStorage.usemode = LoginMode.DEMO;
-          this.appStorage.prompttext = '';
-          this.appStorage.servercomment = audioExample.description;
-          this.appStorage.sessStr.store('jobsLeft', 1000);
-
+          this.appStorage.setDemoSession(audioExample.url, audioExample.description, 1000);
           this.navigate();
         }
       ).catch((err) => {
@@ -466,60 +454,55 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     });
   }
 
-  private createNewSession(form: NgForm) {
+  private createNewOnlineSession(form: NgForm) {
     this.api.beginSession(this.member.project, this.member.id, Number(this.member.jobno)).then((json) => {
-
-      if (form.valid && this.agreementChecked
-        && json.message !== '0'
-      ) {
+      const data = json.data as IDataEntry;
+      if (form.valid && json.message !== '0') {
 
         // delete old data for fresh new session
         this.appStorage.clearSession();
         this.appStorage.clearLocalStorage().then(
           () => {
-            this.appStorage.setSessionData(this.member, json.data.id, json.data.url).then(() => {
+            // get transcript data that already exists
+            const jsonStr = JSON.stringify(data);
+            this.appStorage.serverDataEntry = parseServerDataEntry(jsonStr);
+
+            if (isUnset(this.appStorage.serverDataEntry.transcript) ||
+              !Array.isArray(this.appStorage.serverDataEntry.transcript)) {
+              this.appStorage.serverDataEntry = {
+                ...this.appStorage.serverDataEntry,
+                transcript: []
+              };
+            }
+
+            if (isUnset(this.appStorage.serverDataEntry.logtext) ||
+              !Array.isArray(this.appStorage.serverDataEntry.logtext)) {
+              this.appStorage.serverDataEntry = {
+                ...this.appStorage.serverDataEntry,
+                logtext: []
+              };
+            }
+            let prompt = '';
+            let serverComment = '';
+            let jobsLeft = -1;
+
+            if (this.appStorage.serverDataEntry.hasOwnProperty('prompttext')) {
               // get transcript data that already exists
-              const jsonStr = JSON.stringify(json.data);
-              this.appStorage.serverDataEntry = parseServerDataEntry(jsonStr);
+              prompt = this.appStorage.serverDataEntry.prompttext;
+              prompt = (prompt) ? prompt : '';
+            }
+            if (this.appStorage.serverDataEntry.hasOwnProperty('comment')) {
+              // get transcript data that already exists
+              serverComment = this.appStorage.serverDataEntry.comment;
+              serverComment = (serverComment) ? serverComment : '';
+            }
+            if (json.hasOwnProperty('message')) {
+              const counter = (json.message === '') ? '0' : json.message;
+              jobsLeft = Number(counter);
+            }
 
-              if (isUnset(this.appStorage.serverDataEntry.transcript) ||
-                !Array.isArray(this.appStorage.serverDataEntry.transcript)) {
-                this.appStorage.serverDataEntry.transcript = [];
-              }
-
-              if (isUnset(this.appStorage.serverDataEntry.logtext) ||
-                !Array.isArray(this.appStorage.serverDataEntry.logtext)) {
-                this.appStorage.serverDataEntry.logtext = [];
-              }
-
-              if (this.appStorage.usemode === 'online' && this.appStorage.serverDataEntry.hasOwnProperty('prompttext')) {
-                // get transcript data that already exists
-                const prompt = this.appStorage.serverDataEntry.prompttext;
-                this.appStorage.prompttext = (prompt) ? prompt : '';
-              } else {
-                this.appStorage.prompttext = '';
-              }
-
-              if (this.appStorage.usemode === 'online' && this.appStorage.serverDataEntry.hasOwnProperty('comment')) {
-                // get transcript data that already exists
-                const comment = this.appStorage.serverDataEntry.comment;
-
-                if (comment) {
-                  this.appStorage.servercomment = comment;
-                }
-              } else {
-                this.appStorage.servercomment = '';
-              }
-
-              if (json.hasOwnProperty('message')) {
-                const counter = (json.message === '') ? '0' : json.message;
-                this.appStorage.sessStr.store('jobsLeft', Number(counter));
-              }
-
-              this.navigate();
-            }).catch((error) => {
-              console.error(error);
-            });
+            this.appStorage.setOnlineSession(this.member, data.id, data.url, prompt, serverComment, jobsLeft);
+            this.navigate();
           }
         ).catch((err) => {
           console.error(err);

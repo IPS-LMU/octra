@@ -20,8 +20,8 @@ import {ValidationPopoverComponent} from '../transcr-editor/validation-popover/v
 import {AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {Segment} from '@octra/annotation';
-import {AudioChunk} from '../../../../../../../libs/media/src/lib/audio/audio-manager';
-import {AudioSelection, SampleUnit} from '@octra/media';
+import {AudioChunk, AudioSelection, SampleUnit} from '@octra/media';
+import {LoginMode} from '../../store';
 
 declare var validateAnnotation: ((string, any) => any);
 declare var tidyUpAnnotation: ((string, any) => any);
@@ -237,8 +237,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       this.cd.detectChanges();
 
       this.transcrEditor.Settings.btnPopover = false;
-      this.transcrEditor.validationEnabled = this.appStorage.usemode !== 'url' &&
-        (this.appStorage.usemode === 'demo' || this.settingsService.projectsettings.octra.validationEnabled);
+      this.transcrEditor.validationEnabled = this.appStorage.useMode !== LoginMode.URL &&
+        (this.appStorage.useMode === LoginMode.DEMO || this.settingsService.projectsettings.octra.validationEnabled);
       this.transcrEditor.initialize();
 
       this.transcrEditor.rawText = segment.transcript;
@@ -310,7 +310,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
       validation: ''
     };
 
-    if (this.appStorage.usemode !== 'url') {
+    if (this.appStorage.useMode !== LoginMode.URL) {
       if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function'
         && !isUnset(this.transcrService.validationArray[i])) {
         obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
@@ -517,7 +517,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
 
   private updateSegments() {
     this.playStateSegments = [];
-    if (this.transcrService.validationArray.length > 0 || this.appStorage.usemode === 'url'
+    if (this.transcrService.validationArray.length > 0 || this.appStorage.useMode === LoginMode.URL
       || !this.settingsService.projectsettings.octra.validationEnabled) {
       if (!this.segments || !this.transcrService.guidelines) {
         this.shownSegments = [];

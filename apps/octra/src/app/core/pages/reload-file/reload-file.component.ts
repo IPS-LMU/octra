@@ -70,13 +70,11 @@ export class ReloadFileComponent implements OnInit {
           }
         }).then(() => {
           this.audioService.registerAudioManager(this.dropzone.audioManager);
-          this.appStorage.beginLocalSession(this.dropzone.files, keepData, this.navigate,
-            (error) => {
-              if (error === 'file not supported') {
-                this.showErrorMessage(this.langService.translate('reload-file.file not supported', {type: ''}));
-              }
+          this.appStorage.beginLocalSession(this.dropzone.files, keepData).then(this.navigate).catch((error) => {
+            if (error === 'file not supported') {
+              this.showErrorMessage(this.langService.translate('reload-file.file not supported', {type: ''}));
             }
-          );
+          });
         });
       } else {
         // do nothing because abort
@@ -88,13 +86,11 @@ export class ReloadFileComponent implements OnInit {
 
   onOfflineSubmit = () => {
     this.audioService.registerAudioManager(this.dropzone.audioManager);
-    this.appStorage.beginLocalSession(this.dropzone.files, true, this.navigate,
-      (error) => {
-        if (error === 'file not supported') {
-          this.showErrorMessage(this.langService.translate('reload-file.file not supported', {type: ''}));
-        }
+    this.appStorage.beginLocalSession(this.dropzone.files, true).then(this.navigate).catch((error) => {
+      if (error === 'file not supported') {
+        this.showErrorMessage(this.langService.translate('reload-file.file not supported', {type: ''}));
       }
-    );
+    });
   }
 
   public isN(obj: any): boolean {

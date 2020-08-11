@@ -9,8 +9,8 @@
   <a [title]="'last update: ' + (AppInfo.lastUpdate | date:'dd.MM.yyyy H:mm z')" class="navbar-brand" href="#">OCTRA
     v{{version}}
     <ng-container
-      *ngIf="appStorage.usemode !== undefined && appStorage.usemode !== null">
-      ({{appStorage.usemode}})
+      *ngIf="appStorage.useMode !== undefined && appStorage.useMode !== null">
+      ({{appStorage.useMode}})
     </ng-container>
   </a>
   <div *ngIf="environment.dev_version" class="d-block d-md-none" style="color:red;"><b>in development</b></div>
@@ -20,7 +20,7 @@
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarCollapse">
-    <ul *ngIf="!appStorage.LoggedIn" class="navbar-nav mr-auto">
+    <ul *ngIf="!appStorage.loggedIn" class="navbar-nav mr-auto">
       <li [routerLinkActive]="['active']" class="nav-item">
         <a [queryParamsHandling]="'merge'" [routerLink]="['/login']" class="nav-link">{{'general.login' |
           transloco}}</a>
@@ -39,11 +39,11 @@
         </a>
       </li>
     </ul>
-    <ul *ngIf="appStorage.LoggedIn" class="navbar-nav mr-auto">
+    <ul *ngIf="appStorage.loggedIn" class="navbar-nav mr-auto">
       <ng-template [ngForOf]="editors" let-editor ngFor>
-        <li *ngIf="appStorage.LoggedIn && navbarServ.showInterfaces && interfaceActive(editor.name)"
+        <li *ngIf="appStorage.loggedIn && navbarServ.showInterfaces && interfaceActive(editor.name)"
             [ngClass]="{
-                        'active': appStorage.Interface === editor.name
+                        'active': appStorage.interface === editor.name
                     }"
             class="nav-item"
         >
@@ -54,7 +54,7 @@
           </a>
         </li>
       </ng-template>
-      <li *ngIf="appStorage.LoggedIn && navbarServ.showInterfaces && settService.appSettings.octra.showdetails"
+      <li *ngIf="appStorage.loggedIn && navbarServ.showInterfaces && settService.appSettings.octra.showdetails"
           class="nav-item">
         <a (mouseup)="modalstatistics.open()" class="nav-link">
           <fa-icon class="navbar-icon" icon="th-list"></fa-icon>
@@ -66,7 +66,7 @@
       tiersDropdown
       -->
       <li *ngIf="transcrServ !== undefined" [ngStyle]="{
-                'display': (!(navbarServ.dataloaded && appStorage.LoggedIn && (appStorage.usemode === 'local' || appStorage.usemode === 'url'))) ? 'none': 'inherit'
+                'display': (!(navbarServ.dataloaded && appStorage.loggedIn && (appStorage.useMode === 'local' || appStorage.useMode === 'url'))) ? 'none': 'inherit'
                 }" class="nav-item dropdown">
         <a aria-expanded="false" aria-haspopup="true" class="nav-link" data-toggle="dropdown" href="#"
            id="tiersDropdown"
@@ -110,27 +110,27 @@
 
       <!-- online mode counter -->
       <li
-        *ngIf="(appStorage.LoggedIn && navbarServ.dataloaded && (appStorage.usemode === 'online' ||appStorage.usemode === 'demo'))"
+        *ngIf="(appStorage.loggedIn && navbarServ.dataloaded && (appStorage.useMode === 'online' ||appStorage.useMode === 'demo'))"
         class="nav-item">
         <a class="nav-link">
-          {{appStorage.user.project}}: {{appStorage.jobsLeft}}
+          {{appStorage.onlineSession.project}}: {{appStorage.jobsLeft}}
         </a>
       </li>
 
       <!--
       infoDropdown
       -->
-      <li *ngIf="(appStorage.LoggedIn && navbarServ.dataloaded)" class="nav-item dropdown">
+      <li *ngIf="(appStorage.loggedIn && navbarServ.dataloaded)" class="nav-item dropdown">
         <a aria-expanded="false" aria-haspopup="true" class="nav-link" data-toggle="dropdown"
            href="#" id="infoDropdown">
           <fa-icon class="navbar-icon" icon="info-circle"></fa-icon>
         </a>
         <div aria-labelledby="infoDropdown" class="dropdown-menu dropdown-menu-right info-menu">
           <table class="table">
-            <tr *ngIf="appStorage.usemode === 'online' ||appStorage.usemode === 'demo'">
+            <tr *ngIf="appStorage.useMode === 'online' ||appStorage.useMode === 'demo'">
               <td><span>{{'general.project' |transloco}}:</span></td>
               <td>
-                <span>{{appStorage.user.project}}</span>
+                <span>{{appStorage.onlineSession.project}}</span>
               </td>
             </tr>
             <tr>
@@ -167,13 +167,13 @@
                 <span>{{navbarServ.filesize.size}} {{navbarServ.filesize.label}}</span>
               </td>
             </tr>
-            <tr *ngIf="appStorage.usemode === 'online' ||appStorage.usemode === 'demo'">
+            <tr *ngIf="appStorage.useMode === 'online' ||appStorage.useMode === 'demo'">
               <td><span>{{'general.id' | transloco}}:</span></td>
               <td>
                 <span>{{appStorage.dataID}}</span>
               </td>
             </tr>
-            <tr *ngIf="appStorage.usemode === 'online' || appStorage.usemode === 'demo'">
+            <tr *ngIf="appStorage.useMode === 'online' || appStorage.useMode === 'demo'">
               <td><span>{{'general.free jobs' | transloco}}:</span></td>
               <td>
                 <span>{{appStorage.jobsLeft}}</span>
@@ -182,13 +182,13 @@
           </table>
         </div>
       </li>
-      <li *ngIf="appStorage.LoggedIn && navbarServ.showExport" class="nav-item">
+      <li *ngIf="appStorage.loggedIn && navbarServ.showExport" class="nav-item">
         <a (mouseup)="toolsModal.open()" class="nav-link">
           <fa-icon class="navbar-icon" icon="tools"></fa-icon>
           <span class="d-md-none d-lg-inline"> {{"general.tools" | transloco}}</span>
         </a>
       </li>
-      <li *ngIf="appStorage.LoggedIn && navbarServ.showExport" class="nav-item">
+      <li *ngIf="appStorage.loggedIn && navbarServ.showExport" class="nav-item">
         <a (mouseup)="modalexport.open()" class="nav-link">
           <fa-icon class="navbar-icon" icon="download"></fa-icon>
           <span class="d-md-none d-lg-inline"> {{"general.export" | transloco}}</span>
@@ -199,7 +199,7 @@
       optionsDropdown
       -->
       <li [ngStyle]="{
-                'display': (!(navbarServ.dataloaded && appStorage.LoggedIn)) ? 'none': 'inherit'
+                'display': (!(navbarServ.dataloaded && appStorage.loggedIn)) ? 'none': 'inherit'
                 }" class="nav-item dropdown">
         <a aria-expanded="false" aria-haspopup="true" class="nav-link" data-toggle="dropdown"
            href="#" id="optionsDropdown">
@@ -236,7 +236,7 @@
                 <div class="switch">
                   <label>
                     <input (click)="toggleSettings('followplaycursor')"
-                           [checked]="appStorage.followplaycursor"
+                           [checked]="appStorage.followPlayCursor"
                            id="followplaycursor" type="checkbox">
                   </label>
                 </div>
@@ -249,7 +249,7 @@
                   <label>
                     <input (click)="toggleSettings('logging')"
                            [checked]="appStorage.logging"
-                           [disabled]="appStorage.usemode === 'online' || appStorage.usemode === 'demo'"
+                           [disabled]="appStorage.useMode === 'online' || appStorage.useMode === 'demo'"
                            id="logging" type="checkbox">
                   </label>
                 </div>
@@ -267,7 +267,7 @@
                 </div>
               </td>
             </tr>
-            <ng-container *ngIf="appStorage.Interface === '2D-Editor'">
+            <ng-container *ngIf="appStorage.onlineSession === '2D-Editor'">
               <tr>
                 <td colspan="2">
                   <hr style="border:1px solid lightgray;"/>
@@ -319,7 +319,7 @@
                         }" class="navbar-icon" icon="question-circle"
                    style="color:#fcffba"
           ></fa-icon>
-          <ng-container *ngIf="!appStorage._loggedIn">
+          <ng-container *ngIf="!appStorage.loggedIn">
             {{"general.feedback" | transloco}}
           </ng-container>
         </a>
@@ -345,7 +345,7 @@
   </div>
 </nav>
 <div
-  *ngIf="appStorage.LoggedIn && (appStorage.usemode === 'online' || appStorage.usemode === 'demo') && navbarServ.dataloaded"
+  *ngIf="appStorage.loggedIn && (appStorage.useMode === 'online' || appStorage.useMode === 'demo') && navbarServ.dataloaded"
   class="panel"
   id="subnav">
   <div class="row">

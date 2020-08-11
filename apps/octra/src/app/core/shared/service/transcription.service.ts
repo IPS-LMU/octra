@@ -16,16 +16,21 @@ import {SettingsService} from './settings.service';
 import {UserInteractionsService} from './userInteractions.service';
 import {
   Annotation,
-  AnnotJSONConverter, Converter, IFile,
+  AnnotJSONConverter,
+  Converter,
+  IFile,
   Level,
   OAnnotJSON,
   OAudiofile,
   OLabel,
   OLevel,
-  OSegment, PartiturConverter,
-  Segments, TextConverter
+  OSegment,
+  PartiturConverter,
+  Segments,
+  TextConverter
 } from '@octra/annotation';
 import {AudioManager} from '@octra/media';
+import {LoginMode} from '../../store';
 
 declare var validateAnnotation: ((string, any) => any);
 
@@ -258,15 +263,15 @@ export class TranscriptionService {
       this._audiofile.sampleRate = this._audiomanager.ressource.info.sampleRate;
       this._audiofile.duration = this._audiomanager.ressource.info.duration.samples;
       this._audiofile.size = this._audiomanager.ressource.info.size;
-      this._audiofile.url = (this.appStorage.usemode === 'online')
+      this._audiofile.url = (this.appStorage.useMode === LoginMode.ONLINE)
         ? `${this.app_settings.audio_server.url}${this.appStorage.audioURL}` : '';
 
-      this._audiofile.url = (this.appStorage.usemode === 'demo')
+      this._audiofile.url = (this.appStorage.useMode === LoginMode.DEMO)
         ? `${this.appStorage.audioURL}` : this._audiofile.url;
       this._audiofile.type = this._audiomanager.ressource.info.type;
 
       // overwrite logging option using projectconfig
-      if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
+      if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
         this.appStorage.logging = this.settingsService.projectsettings.logging.forced;
       }
       this.uiService.enabled = this.appStorage.logging;
@@ -312,13 +317,13 @@ export class TranscriptionService {
             }
 
             this.appStorage.overwriteAnnotation(newLevels).then(() => {
-                if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'url') {
+                if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.URL) {
                   this.appStorage.annotation[this._selectedlevel].level.items = [];
 
                   if (!isUnset(this.appStorage.serverDataEntry) && !isUnset(this.appStorage.serverDataEntry.transcript)
                     && this.appStorage.serverDataEntry.transcript.length > 0) {
                     // import logs
-                    this.appStorage.logs = this.appStorage.serverDataEntry.logtext;
+                    this.appStorage.setLogs(this.appStorage.serverDataEntry.logtext);
 
                     // check if servertranscript's segment is empty
                     if (this.appStorage.serverDataEntry.transcript.length === 1 && this.appStorage.serverDataEntry[0].text === '') {
@@ -494,14 +499,14 @@ export class TranscriptionService {
       const logData: OLogging = this.extractUI(this.uiService.elements);
 
       data = {
-        project: ((this.appStorage.user.project === null || this.appStorage.user.project === undefined))
-          ? 'NOT AVAILABLE' : this.appStorage.user.project,
-        annotator: ((this.appStorage.user.id === null || this.appStorage.user.id === undefined))
-          ? 'NOT AVAILABLE' : this.appStorage.user.id,
+        project: (isUnset(this.appStorage.onlineSession.project))
+          ? 'NOT AVAILABLE' : this.appStorage.onlineSession.project,
+        annotator: (isUnset(this.appStorage.onlineSession.id))
+          ? 'NOT AVAILABLE' : this.appStorage.onlineSession.id,
         transcript: null,
         comment: this._feedback.comment,
-        jobno: ((this.appStorage.user.jobno === null || this.appStorage.user.jobno === undefined))
-          ? 'NOT AVAILABLE' : this.appStorage.user.jobno,
+        jobno: (isUnset(this.appStorage.onlineSession.jobNumber))
+          ? 'NOT AVAILABLE' : this.appStorage.onlineSession.jobNumber,
         quality: (this.settingsService.isTheme('shortAudioFiles'))
           ? this.appStorage.feedback : JSON.stringify(this._feedback.exportData()),
         status: 'ANNOTATED',
@@ -609,8 +614,8 @@ export class TranscriptionService {
     const result: OLogging = new OLogging(
       '1.0',
       'UTF-8',
-      ((this.appStorage.user.project === null || this.appStorage.user.project === undefined) || this.appStorage.user.project === '')
-        ? 'local' : this.appStorage.user.project,
+      (isUnset(this.appStorage.onlineSession.project))
+        ? 'local' : this.appStorage.onlineSession.project,
       now.toUTCString(),
       this._annotation.audiofile.name,
       this._annotation.audiofile.sampleRate,
@@ -912,7 +917,7 @@ export class TranscriptionService {
   public validateAll() {
     this._validationArray = [];
 
-    if (this.appStorage.usemode !== 'url' && (this.appStorage.usemode === 'demo'
+    if (this.appStorage.useMode !== LoginMode.URL && (this.appStorage.useMode === LoginMode.DEMO
       || this.settingsService.projectsettings.octra.validationEnabled)) {
       let invalid = false;
 

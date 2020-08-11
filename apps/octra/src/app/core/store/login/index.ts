@@ -7,4 +7,5 @@ export const selectJobsLeft = pipe(selectOnlineSession, (state) => state.jobsLef
 export const selectCurrentMode = pipe(selectLogin, state => state.mode);
 export const selectMode = pipe(selectLogin, (state) => state.mode);
 export const selectLoggedIn = pipe(selectLogin, (state) => state.loggedIn);
+export const selectSessionFile = pipe(selectLogin, (state) => state.sessionFile);
 export const selectServerDataEntry = pipe(selectOnlineSession, state => state.serverDataEntry);

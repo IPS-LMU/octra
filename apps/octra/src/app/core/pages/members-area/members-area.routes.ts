@@ -1,7 +1,6 @@
 import {Routes} from '@angular/router';
 import {TranscrEndGuard} from '../../shared/guard';
 import {TranscActivateGuard} from '../../shared/guard/transcr.activateguard';
-import {AgreementComponent} from '../agreement/agreement.component';
 import {AuthComponent} from '../auth/auth.component';
 import {LoadingComponent} from '../loading';
 import {ReloadFileComponent} from '../reload-file';
@@ -12,7 +11,6 @@ import {MembersAreaGuard} from './members-area.activateguard';
 
 export const MEMBER_ROUTES: Routes = [
   {path: 'load', component: LoadingComponent},
-  {path: 'agreement', component: AgreementComponent, canActivate: [MembersAreaGuard]},
   {
     path: 'transcr',
     component: TranscriptionComponent,

@@ -1,7 +1,6 @@
 import {createReducer, on} from '@ngrx/store';
 import * as TranscriptionActions from './transcription.actions';
 import {TranscriptionState} from '../index';
-import * as ApplicationActions from '../application/application.actions';
 
 export const initialState: TranscriptionState = {
   savingNeeded: false,
@@ -13,7 +12,13 @@ export const initialState: TranscriptionState = {
     volume: 1,
     speed: 1
   },
-  logs: []
+  feedback: null,
+  logs: [],
+  logging: false,
+  showLoupe: false,
+  easyMode: false,
+  secondsPerLine: 5,
+  highlightingEnabled: false
 };
 
 export const reducer = createReducer(
@@ -47,6 +52,30 @@ export const reducer = createReducer(
       ...state.audioSettings,
       speed
     }
+  })),
+  on(TranscriptionActions.setLogging, (state, {logging}) => ({
+    ...state,
+    logging
+  })),
+  on(TranscriptionActions.setShowLoupe, (state, {showLoupe}) => ({
+    ...state,
+    showLoupe
+  })),
+  on(TranscriptionActions.setEasyMode, (state, {easyMode}) => ({
+    ...state,
+    easyMode
+  })),
+  on(TranscriptionActions.setSecondsPerLine, (state, {secondsPerLine}) => ({
+    ...state,
+    secondsPerLine
+  })),
+  on(TranscriptionActions.setHighlightingEnabled, (state, {highlightingEnabled}) => ({
+    ...state,
+    highlightingEnabled
+  })),
+  on(TranscriptionActions.setFeedback, (state, {feedback}) => ({
+    ...state,
+    feedback
   }))
 );
 

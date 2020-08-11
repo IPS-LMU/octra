@@ -15,6 +15,7 @@ export const loginDemo = createAction(`[${context}] Login Demo`,
   props<{
     audioURL: string;
     serverComment: string;
+    jobsLeft: number;
   }>());
 
 export const loginLocal = createAction(
@@ -56,6 +57,7 @@ export const setUserData = createAction(`[${context}] Set user data`,
 );
 
 export const clearLocalSession = createAction(`[${context}] Clear local session`);
+export const clearOnlineSession = createAction(`[${context}] Clear online session`);
 
 export const setServerDataEntry = createAction(
   `[${context}] Set serverDataEntry`,
@@ -68,6 +70,38 @@ export const setLoggedIn = createAction(
   `[${context}] Set loggedIn`,
   props<{
     loggedIn: boolean;
+  }>()
+);
+
+export const setSessionFile = createAction(
+  `[${context}] Set SessionFile`,
+  props<{
+    sessionFile: {
+      type: string;
+      name: string;
+      size: number;
+    };
+  }>()
+);
+
+export const setComment = createAction(
+  `[${context}] Set user comment`,
+  props<{
+    comment: string;
+  }>()
+);
+
+export const setPromptText = createAction(
+  `[${context}] Set promptText`,
+  props<{
+    promptText: string;
+  }>()
+);
+
+export const setServerComment = createAction(
+  `[${context}] Set serverComment`,
+  props<{
+    serverComment: string;
   }>()
 );
 

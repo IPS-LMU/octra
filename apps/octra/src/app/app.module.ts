@@ -113,6 +113,7 @@ import * as fromLogin from './core/store/login/login.reducer';
 import * as fromApplication from './core/store/application/application.reducer';
 import * as fromASR from './core/store/asr/asr.reducer';
 import * as fromTranscription from './core/store/transcription/transcription.reducer';
+import * as fromUser from './core/store/user/user.reducer';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -135,7 +136,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
 
 @NgModule({
   declarations: [
-    AgreementComponent,
     AlertComponent,
     AppComponent,
     DropZoneComponent,
@@ -222,7 +222,8 @@ export class TranslocoHttpLoader implements TranslocoLoader {
         login: fromLogin.reducer,
         application: fromApplication.reducer,
         asr: fromASR.reducer,
-        transcription: fromTranscription.reducer
+        transcription: fromTranscription.reducer,
+        user: fromUser.reducer
       },
       {
         metaReducers: !environment.production ? [] : [],

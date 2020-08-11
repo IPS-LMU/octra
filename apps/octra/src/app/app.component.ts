@@ -23,7 +23,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
 
   @ViewChild('navigation', {static: true}) navigation: NavigationComponent;
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
-  private loggedIn = false;
 
   public get version(): string {
     return AppInfo.version;
@@ -31,10 +30,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
 
   public get environment(): any {
     return environment;
-  }
-
-  public get isLoggedIn() {
-    return this.loggedIn;
   }
 
   constructor(private api: APIService,
@@ -177,12 +172,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
           break;
       }
     });
-
-    this.subscrmanager.add(this.appStorage.loginActivityChanged.subscribe(
-      (a) => {
-        this.loggedIn = a;
-      }
-    ));
   }
 
   ngAfterViewInit() {

@@ -34,7 +34,7 @@ import {
 import {TranscriptionGuidelinesModalComponent} from '../../modals/transcription-guidelines-modal/transcription-guidelines-modal.component';
 import {TranscriptionSendingModalComponent} from '../../modals/transcription-sending-modal/transcription-sending-modal.component';
 import {TranscriptionStopModalAnswer} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
-import {parseServerDataEntry} from '../../obj/data-entry';
+import {IDataEntry, parseServerDataEntry} from '../../obj/data-entry';
 import {ProjectSettings} from '../../obj/Settings';
 
 import {BrowserInfo} from '../../shared';
@@ -55,6 +55,7 @@ import {BugReportService} from '../../shared/service/bug-report.service';
 import {NavbarService} from '../../component/navbar/navbar.service';
 import {IFile, Level, PartiturConverter} from '@octra/annotation';
 import {AudioManager} from '@octra/media';
+import {LoginMode} from '../../store';
 
 @Component({
   selector: 'octra-transcription',
@@ -149,7 +150,7 @@ export class TranscriptionComponent implements OnInit,
           }
 
           // make sure that events from playonhover are not logged
-          const currentEditorName = await this.appStorage.getInterface();
+          const currentEditorName = this.appStorage.interface;
           this.uiService.logAudioEvent(currentEditorName, state, this.audioManager.playposition, caretpos, null, null);
         }
       },
@@ -158,7 +159,7 @@ export class TranscriptionComponent implements OnInit,
       }));
 
     this.subscrmanager.add(this.keyMap.onkeydown.subscribe(async (event) => {
-      if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
+      if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
         if (['ALT + SHIFT + 1', 'ALT + SHIFT + 2', 'ALT + SHIFT + 3'].includes(event.comboKey)) {
           this.waitForSend = true;
 
@@ -233,7 +234,7 @@ export class TranscriptionComponent implements OnInit,
   }
 
   abortTranscription = () => {
-    if ((this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo')
+    if ((this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO)
       && !isUnset(this.settingsService.projectsettings.octra)
       && !isUnset(this.settingsService.projectsettings.octra.theme)
       && this.settingsService.isTheme('shortAudioFiles')) {
@@ -241,14 +242,12 @@ export class TranscriptionComponent implements OnInit,
 
       this.transcrService.endTranscription();
 
-      if (this.appStorage.usemode !== 'demo') {
+      if (this.appStorage.useMode !== LoginMode.DEMO) {
         this.api.setOnlineSessionToFree(this.appStorage).then(() => {
           Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).then(() => {
             this.appStorage.clearSession();
 
-            this.appStorage.clearLocalStorage().then(() => {
-              this.appStorage.saveUser();
-            }).catch((error) => {
+            this.appStorage.clearLocalStorage().catch((error) => {
               console.error(error);
             });
           });
@@ -257,9 +256,7 @@ export class TranscriptionComponent implements OnInit,
         });
       } else {
         // is demo mode
-        this.appStorage.user.id = '';
-        this.appStorage.user.jobno = -1;
-        this.appStorage.user.project = '';
+        this.appStorage.clearSession();
         Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).then(() => {
           this.appStorage.clearSession();
           this.appStorage.clearLocalStorage().catch((error) => {
@@ -396,7 +393,7 @@ export class TranscriptionComponent implements OnInit,
       }
     ));
 
-    if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
+    if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
       if (!isUnset(this.settingsService.appSettings.octra.inactivityNotice)
         && !isUnset(this.settingsService.appSettings.octra.inactivityNotice.showAfter)
         && this.settingsService.appSettings.octra.inactivityNotice.showAfter > 0) {
@@ -430,8 +427,8 @@ export class TranscriptionComponent implements OnInit,
 
     this.bugService.init(this.transcrService);
 
-    if (this.appStorage.usemode === 'online') {
-      console.log(`opened job ${this.appStorage.dataID} in project ${this.appStorage.user.project}`);
+    if (this.appStorage.useMode === LoginMode.ONLINE) {
+      console.log(`opened job ${this.appStorage.dataID} in project ${this.appStorage.onlineSession?.project}`);
     }
 
     this.asrService.init();
@@ -474,13 +471,13 @@ export class TranscriptionComponent implements OnInit,
 
   private async checkCurrentEditor() {
     // TODO move this to another place
-    const currentEditor = await this.appStorage.getInterface();
+    const currentEditor = this.appStorage.interface;
     const found = this.projectsettings.interfaces.find((x) => {
       return currentEditor === x;
     });
 
     if (isUnset(found)) {
-      this.appStorage.setInterface(this.projectsettings.interfaces[0]);
+      this.appStorage.interface = this.projectsettings.interfaces[0];
     }
   }
 
@@ -538,7 +535,7 @@ export class TranscriptionComponent implements OnInit,
       }
       for (const editorComponent of editorComponents) {
         if (name === editorComponent.name) {
-          this.appStorage.setInterface(name);
+          this.appStorage.interface = name;
           this.interface = name;
           comp = editorComponent.editor;
           break;
@@ -618,7 +615,7 @@ export class TranscriptionComponent implements OnInit,
 
     const json: any = this.transcrService.exportDataToJSON();
 
-    if (this.appStorage.usemode === 'online') {
+    if (this.appStorage.useMode === LoginMode.ONLINE) {
       this.transcrSendingModal.open().catch((error) => {
         console.error(error);
       });
@@ -643,7 +640,7 @@ export class TranscriptionComponent implements OnInit,
       }).catch((error) => {
         this.onSendError(error);
       });
-    } else if (this.appStorage.usemode === 'demo') {
+    } else if (this.appStorage.useMode === LoginMode.DEMO) {
       // only if opened
       this.modalOverview.close();
 
@@ -725,17 +722,9 @@ export class TranscriptionComponent implements OnInit,
     this.transcrService.endTranscription(false);
     this.clearData();
 
-    if (!(json === null || json === undefined)) {
-      if (json.data && json.data.hasOwnProperty('url') && json.data.hasOwnProperty('id')) {
-        // transcription available
-        this.appStorage.audioURL = json.data.url;
-        this.appStorage.dataID = json.data.id;
-
-        // change number of remaining jobs
-        if (json.hasOwnProperty('message')) {
-          this.appStorage.jobsLeft = Number(json.message);
-        }
-
+    if (!isUnset(json)) {
+      const data = json.data as IDataEntry;
+      if (data && data.hasOwnProperty('url') && data.hasOwnProperty('id')) {
         // get transcript data that already exists
         const jsonStr = JSON.stringify(json.data);
         this.appStorage.serverDataEntry = parseServerDataEntry(jsonStr);
@@ -743,55 +732,55 @@ export class TranscriptionComponent implements OnInit,
         if (this.appStorage.serverDataEntry.hasOwnProperty('transcript')) {
           if (!Array.isArray(this.appStorage.serverDataEntry.transcript)) {
             console.log(`server transcript is not array, set []`);
-            this.appStorage.serverDataEntry.transcript = [];
+            this.appStorage.serverDataEntry = {
+              ...this.appStorage.serverDataEntry,
+              transcript: []
+            }
           } else {
             console.log(`seervertranscript is array`);
           }
         } else {
           console.log(`no server transcript`);
-          // this.appStorage.serverDataEntry.transcript
         }
 
         if (isUnset(this.appStorage.serverDataEntry.logtext) ||
           !Array.isArray(this.appStorage.serverDataEntry.logtext)) {
-          this.appStorage.serverDataEntry.logtext = [];
+          this.appStorage.serverDataEntry = {
+            ...this.appStorage.serverDataEntry,
+            logtext: []
+          };
         }
 
-        if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('prompttext')) {
+        let promptText = '';
+        if (this.appStorage.useMode === LoginMode.ONLINE && data.hasOwnProperty('prompttext') && data.prompttext !== '') {
           // get transcript data that already exists
-          if (json.data.hasOwnProperty('prompttext')) {
-            const prompt = json.data.prompttext;
-            this.appStorage.prompttext = (prompt) ? prompt : '';
-          }
-        } else {
-          this.appStorage.prompttext = '';
+          promptText = json.data.prompttext;
         }
 
-        if (this.appStorage.usemode === 'online' && json.data.hasOwnProperty('comment') || json.data.hasOwnProperty('comment')) {
+        let serverComment = '';
+        if (this.appStorage.useMode === LoginMode.ONLINE && data.hasOwnProperty('comment') && data.comment !== '') {
           // get transcript data that already exists
-          if (json.data.hasOwnProperty('comment')) {
-            const comment = json.data.comment;
-
-            if (comment) {
-              this.appStorage.servercomment = comment;
-            }
-          }
-        } else {
-          this.appStorage.servercomment = '';
+          serverComment = data.comment;
         }
 
+        let jobsLeft = 0;
         if (json.hasOwnProperty('message') && typeof (json.message) === 'number') {
-          this.appStorage.jobsLeft = Number(json.message);
+          jobsLeft = Number(json.message);
         }
+
+        this.appStorage.setOnlineSession({
+          id: this.appStorage.onlineSession.id,
+          project: this.appStorage.onlineSession.project,
+          password: this.appStorage.onlineSession.password,
+          jobno: this.appStorage.onlineSession.jobNumber
+        }, data.id, data.url, promptText, serverComment, jobsLeft);
 
         Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
           console.error(error);
         });
       } else {
-        this.appStorage.submitted = true;
-        Functions.navigateTo(this.router, ['/user/transcr/end'], AppInfo.queryParamsHandling).catch((error) => {
-          console.error(error);
-        });
+        console.error(`can't read next segment because audioURL or id is undefined!`);
+        console.log(json);
       }
     } else {
       console.error(`json array for transcription next is null`);
@@ -806,13 +795,7 @@ export class TranscriptionComponent implements OnInit,
 
     if (!isUnset(audioExample)) {
       // transcription available
-      this.appStorage.audioURL = audioExample.url;
-      this.appStorage.dataID = 1232342;
-
-      // change number of remaining jobs
-      this.appStorage.jobsLeft--;
-      this.appStorage.prompttext = '';
-      this.appStorage.servercomment = audioExample.description;
+      this.appStorage.setDemoSession(audioExample.url, audioExample.description, this.appStorage.jobsLeft - 1);
 
       Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
         console.error(`navigation failed`);
@@ -823,10 +806,10 @@ export class TranscriptionComponent implements OnInit,
 
   closeTranscriptionAndGetNew() {
     // close current session
-    if (this.appStorage.usemode === 'online') {
-      this.api.closeSession(this.appStorage.user.id, this.appStorage.dataID, this.appStorage.servercomment).then(() => {
+    if (this.appStorage.useMode === LoginMode.ONLINE) {
+      this.api.closeSession(this.appStorage.onlineSession.id, this.appStorage.dataID, this.appStorage.servercomment).then(() => {
         // begin new session
-        this.api.beginSession(this.appStorage.user.project, this.appStorage.user.id, this.appStorage.user.jobno).then((json) => {
+        this.api.beginSession(this.appStorage.onlineSession.project, this.appStorage.onlineSession.id, this.appStorage.onlineSession.jobNumber).then((json) => {
           // new session
           this.nextTranscription(json);
         }).catch((error) => {
@@ -835,7 +818,7 @@ export class TranscriptionComponent implements OnInit,
       }).catch((error) => {
         console.error(error);
       });
-    } else if (this.appStorage.usemode === 'demo') {
+    } else if (this.appStorage.useMode === LoginMode.DEMO) {
       this.reloadDemo();
     }
   }

@@ -1,6 +1,7 @@
 import {createReducer, on} from '@ngrx/store';
 import * as LoginActions from './login.actions';
 import {LoginMode, LoginState} from '../index';
+import * as TranscriptionActions from '../transcription/transcription.actions';
 
 export const initialState: LoginState = {
   loggedIn: false
@@ -12,7 +13,6 @@ export const reducer = createReducer(
     ...state,
     mode: LoginMode.DEMO,
     onlineSession: {
-      ...data,
       id: 'demo_user',
       project: 'demo',
       jobNumber: -1,
@@ -20,7 +20,9 @@ export const reducer = createReducer(
       dataID: 21343134,
       promptText: '',
       serverDataEntry: null,
-      serverComment: ''
+      comment: '',
+      password: '',
+      ...data,
     },
     loggedIn: true
   })),
@@ -55,10 +57,14 @@ export const reducer = createReducer(
   })),
   on(LoginActions.clearLocalSession, (state) => ({
     ...state,
-    onlineSession: {
-      ...state.onlineSession,
-      dataID: null
-    },
+    sessionFile: undefined,
+    queryParams: undefined,
+    files: [],
+    loggedIn: false
+  })),
+  on(LoginActions.clearOnlineSession, (state) => ({
+    ...state,
+    onlineSession: undefined,
     loggedIn: false
   })),
   on(LoginActions.setAudioURL, (state, {audioURL}) => ({
@@ -85,6 +91,31 @@ export const reducer = createReducer(
   on(LoginActions.setLoggedIn, (state, {loggedIn}) => ({
     ...state,
     loggedIn
+  })),
+  on(LoginActions.setSessionFile, (state, {sessionFile}) => ({
+    ...state,
+    sessionFile
+  })),
+  on(LoginActions.setComment, (state, {comment}) => ({
+    ...state,
+    onlineSession: {
+      ...state.onlineSession,
+      comment
+    }
+  })),
+  on(LoginActions.setPromptText, (state, {promptText}) => ({
+    ...state,
+    onlineSession: {
+      ...state.onlineSession,
+      promptText
+    }
+  })),
+  on(LoginActions.setServerComment, (state, {serverComment}) => ({
+    ...state,
+    onlineSession: {
+      ...state.onlineSession,
+      serverComment
+    }
   }))
 );
 

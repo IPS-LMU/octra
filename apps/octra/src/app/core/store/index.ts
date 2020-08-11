@@ -24,12 +24,14 @@ export interface OnlineSession {
   serverComment: string;
   jobsLeft: number;
   serverDataEntry: IDataEntry;
+  comment: string;
+  password: string;
 }
 
 export interface URLParameters {
   audio: string;
   transcript: string;
-  embedded: string;
+  embedded: boolean;
   host: string;
 }
 
@@ -55,7 +57,9 @@ export interface ApplicationState {
   reloaded: boolean;
   idb: {
     loaded: boolean;
-  }
+  },
+  language: string;
+  version: string;
 }
 
 export interface ASRState {
@@ -70,18 +74,22 @@ export interface TranscriptionState {
   followPlayCursor: boolean;
   submitted: boolean;
   currentEditor?: string;
+  showLoupe: boolean;
   audioSettings: {
     volume: number;
     speed: number;
   },
+  feedback: any;
   logs: any[];
+  logging: boolean;
+  easyMode: boolean;
+  secondsPerLine: number;
+  highlightingEnabled: boolean;
 }
 
-export interface FeedbackState {
-  user: {
-    name: string;
-    email: string;
-  }
+export interface UserState {
+  name: string;
+  email: string;
 }
 
 export interface RootState {
@@ -89,5 +97,5 @@ export interface RootState {
   login: LoginState,
   asr: ASRState,
   transcription: TranscriptionState,
-  feedback: FeedbackState
+  user: UserState
 }

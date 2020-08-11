@@ -11,7 +11,9 @@ export const initialState: ApplicationState = {
   reloaded: false,
   idb: {
     loaded: false
-  }
+  },
+  language: 'en',
+  version: '1.0.0'
 };
 
 export const reducer = createReducer(
@@ -38,6 +40,14 @@ export const reducer = createReducer(
       ...state.loading,
       status: LoadingStatus.FINISHED
     }
+  })),
+  on(ApplicationActions.setAppLanguage, (state, {language}) => ({
+    ...state,
+    language
+  })),
+  on(ApplicationActions.setAppVersion, (state, {version}) => ({
+    ...state,
+    version
   }))
 );
 

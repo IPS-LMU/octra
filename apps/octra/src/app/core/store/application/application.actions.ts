@@ -31,3 +31,17 @@ export const setIDBLoaded = createAction(
   }>()
 );
 
+export const setAppLanguage = createAction(
+  `[${context}] Set app language`,
+  props<{
+    language: string;
+  }>()
+);
+
+export const setAppVersion = createAction(
+  `[${context}] Set app version`,
+  props<{
+    version: string;
+  }>()
+);
+

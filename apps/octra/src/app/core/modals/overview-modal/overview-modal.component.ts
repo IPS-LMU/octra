@@ -6,6 +6,7 @@ import {TranscriptionFeedbackComponent} from '../../component/transcription-feed
 import {SubscriptionManager} from '@octra/utilities';
 import {KeymappingService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
+import {LoginMode} from '../../store';
 
 @Component({
   selector: 'octra-overview-modal',
@@ -114,13 +115,13 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
         }));
       }
 
-      if (validate && this.appStorage.usemode !== 'url') {
+      if (validate && this.appStorage.useMode !== LoginMode.URL) {
         this.transcrService.validateAll();
       }
 
       this.visible = true;
 
-      if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
+      if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
         this.feedback.feedbackData = (this.appStorage.feedback === null) ? {} : this.appStorage.feedback;
       }
 
@@ -151,7 +152,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
         this.shortcutID = -1;
       }
 
-      if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
+      if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
         this.feedback.saveFeedbackform();
       }
       this.overview.stopPlayback().catch((error) => {
@@ -171,7 +172,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
   }
 
   sendTranscription() {
-    if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
+    if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
       this.feedback.saveFeedbackform();
     }
     this.overview.stopPlayback().catch((error) => {

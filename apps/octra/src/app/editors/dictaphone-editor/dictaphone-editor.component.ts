@@ -119,7 +119,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     super();
     this.subscrmanager = new SubscriptionManager();
 
-    if (this.appStorage.usemode === 'online' || this.appStorage.usemode === 'demo') {
+    if (this.appStorage.useMode === 'online' || this.appStorage.useMode === 'demo') {
       this.subscrmanager.add(this.keyMap.beforeKeyDown.subscribe((event) => {
         if (event.comboKey === 'ALT + SHIFT + 1' ||
           event.comboKey === 'ALT + SHIFT + 2' ||

@@ -71,3 +71,45 @@ export const setAudioSpeed = createAction(
     speed: number
   }>()
 );
+
+export const setLogging = createAction(
+  `[${context}] Set logging`,
+  props<{
+    logging: boolean;
+  }>()
+);
+
+export const setShowLoupe = createAction(
+  `[${context}] Set showLoupe`,
+  props<{
+    showLoupe: boolean;
+  }>()
+);
+
+export const setEasyMode = createAction(
+  `[${context}] Set easy mode`,
+  props<{
+    easyMode: boolean;
+  }>()
+);
+
+export const setSecondsPerLine = createAction(
+  `[${context}] Set seconds per line`,
+  props<{
+    secondsPerLine: number;
+  }>()
+);
+
+export const setHighlightingEnabled = createAction(
+  `[${context}] Set highlightingEnabled`,
+  props<{
+    highlightingEnabled: boolean;
+  }>()
+);
+
+export const setFeedback = createAction(
+  `[${context}] Set feedback`,
+  props<{
+    feedback: any;
+  }>()
+);

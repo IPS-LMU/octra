@@ -8,7 +8,6 @@ export * from './reload-file';
 export * from './error404';
 export * from './help-tools';
 export * from './features';
-export * from './agreement';
 export * from './auth';
 export * from './browser-test';
 export * from './news';

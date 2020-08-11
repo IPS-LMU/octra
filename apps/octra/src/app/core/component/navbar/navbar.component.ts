@@ -107,7 +107,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   setInterface(newInterface: string) {
-    this.appStorage.setInterface(newInterface);
+    this.appStorage.interface = newInterface;
     this.navbarServ.interfacechange.emit(newInterface);
   }
 

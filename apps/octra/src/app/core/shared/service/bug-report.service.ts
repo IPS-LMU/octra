@@ -11,6 +11,7 @@ import {AppStorageService} from './appstorage.service';
 import {SettingsService} from './settings.service';
 import {TranscriptionService} from './transcription.service';
 import {Functions, isUnset} from '@octra/utilities';
+import {LoginMode} from '../../store';
 
 export enum ConsoleType {
   LOG,
@@ -91,8 +92,8 @@ export class BugReportService {
       octra: {
         version: AppInfo.version,
         language: this.langService.getActiveLang(),
-        signed_in: this.appStorage.LoggedIn,
-        usemode: this.appStorage.usemode,
+        signed_in: this.appStorage.loggedIn,
+        useMode: this.appStorage.useMode,
         url: window.location.href,
         lastUpdated: AppInfo.lastUpdate,
         project: null,
@@ -119,9 +120,9 @@ export class BugReportService {
       entries: this._console
     };
 
-    if (this.appStorage.usemode === 'online') {
-      result.octra.project = this.appStorage.user.project;
-      result.octra.user = this.appStorage.user.id;
+    if (this.appStorage.useMode === LoginMode.ONLINE) {
+      result.octra.project = this.appStorage.onlineSession.project;
+      result.octra.user = this.appStorage.onlineSession.id;
       result.octra.jobID = this.appStorage.dataID;
     }
 

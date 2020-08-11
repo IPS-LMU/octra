@@ -6,6 +6,7 @@ import {AppInfo} from '../../../app.info';
 import {AudioService, SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {Functions} from '@octra/utilities';
+import {LoginMode} from '../../store';
 
 @Injectable()
 export class MembersAreaGuard implements CanActivate {
@@ -18,7 +19,7 @@ export class MembersAreaGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
 
-    if (this.appStorage.LoggedIn !== true) {
+    if (this.appStorage.loggedIn !== true) {
       const params = AppInfo.queryParamsHandling;
       params.fragment = route.fragment;
       params.queryParams = route.queryParams;
@@ -27,7 +28,7 @@ export class MembersAreaGuard implements CanActivate {
         console.error(error);
       });
       return false;
-    } else if (this.appStorage.usemode === 'local') {
+    } else if (this.appStorage.useMode === LoginMode.LOCAL) {
       if (this.audioService.audiomanagers.length === 0) {
         // navigate to reload-file
         const params = AppInfo.queryParamsHandling;

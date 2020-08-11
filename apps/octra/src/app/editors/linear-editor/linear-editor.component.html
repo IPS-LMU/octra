@@ -112,6 +112,6 @@
                       [easymode]="appStorage.easymode"
                       [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
                       [ngStyle]="{display: (segmentselected) ? 'inherit': 'none'}"
-                      [validationEnabled]="appStorage.usemode !== 'url' && (appStorage.usemode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
+                      [validationEnabled]="appStorage.useMode !== 'url' && (appStorage.useMode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
 >
 </octra-transcr-editor>

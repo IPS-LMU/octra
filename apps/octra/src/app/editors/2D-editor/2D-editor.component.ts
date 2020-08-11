@@ -236,8 +236,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.subscrmanager.add(this.audioChunkLines.statuschange.subscribe(
       (state: PlayBackStatus) => {
         if (state === PlayBackStatus.PLAYING) {
-          if (!(this.appStorage.followplaycursor === null || this.appStorage.followplaycursor === undefined)
-            && this.appStorage.followplaycursor === true) {
+          if (!isUnset(this.appStorage.followPlayCursor) && this.appStorage.followPlayCursor === true) {
 
             if (this.scrolltimer !== null) {
               this.scrolltimer.unsubscribe();

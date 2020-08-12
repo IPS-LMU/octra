@@ -59,13 +59,11 @@ export const reducer = createReducer(
     ...state,
     sessionFile: undefined,
     queryParams: undefined,
-    files: [],
-    loggedIn: false
+    files: []
   })),
   on(LoginActions.clearOnlineSession, (state) => ({
     ...state,
-    onlineSession: undefined,
-    loggedIn: false
+    onlineSession: undefined
   })),
   on(LoginActions.setAudioURL, (state, {audioURL}) => ({
     ...state,
@@ -115,6 +113,13 @@ export const reducer = createReducer(
     onlineSession: {
       ...state.onlineSession,
       serverComment
+    }
+  })),
+  on(LoginActions.setJobsLeft, (state, {jobsLeft}) => ({
+    ...state,
+    onlineSession: {
+      ...state.onlineSession,
+      jobsLeft
     }
   }))
 );

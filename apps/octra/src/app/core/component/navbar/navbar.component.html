@@ -113,7 +113,7 @@
         *ngIf="(appStorage.loggedIn && navbarServ.dataloaded && (appStorage.useMode === 'online' ||appStorage.useMode === 'demo'))"
         class="nav-item">
         <a class="nav-link">
-          {{appStorage.onlineSession.project}}: {{appStorage.jobsLeft}}
+          {{appStorage.onlineSession?.project}}: {{appStorage.jobsLeft}}
         </a>
       </li>
 
@@ -130,7 +130,7 @@
             <tr *ngIf="appStorage.useMode === 'online' ||appStorage.useMode === 'demo'">
               <td><span>{{'general.project' |transloco}}:</span></td>
               <td>
-                <span>{{appStorage.onlineSession.project}}</span>
+                <span>{{appStorage.onlineSession?.project}}</span>
               </td>
             </tr>
             <tr>
@@ -267,7 +267,7 @@
                 </div>
               </td>
             </tr>
-            <ng-container *ngIf="appStorage.onlineSession === '2D-Editor'">
+            <ng-container *ngIf="appStorage.interface === '2D-Editor'">
               <tr>
                 <td colspan="2">
                   <hr style="border:1px solid lightgray;"/>

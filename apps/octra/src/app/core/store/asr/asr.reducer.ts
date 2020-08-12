@@ -9,6 +9,10 @@ export const reducer = createReducer(
   on(ASRActions.setASRLanguage, (state, {selectedLanguage}) => ({
     ...state,
     selectedLanguage
+  })),
+  on(ASRActions.setASRService, (state, {selectedService}) => ({
+    ...state,
+    selectedService
   }))
 );
 

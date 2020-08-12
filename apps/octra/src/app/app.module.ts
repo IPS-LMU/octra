@@ -233,6 +233,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
         }
       }
     ),
+    StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
     EffectsModule.forRoot([]),
     !environment.production ? StoreDevtoolsModule.instrument() : []
   ],

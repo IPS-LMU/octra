@@ -87,6 +87,8 @@ export class AppStorageService {
 
   set userProfile(value: { name: string; email: string }) {
     this.store.dispatch(fromUserActions.setUserProfile(value));
+    console.log(`save userProfile...`);
+    console.log(value);
     this._idb.save('options', 'userProfile', {value}).catch((err) => {
       console.error(err);
     });
@@ -178,7 +180,7 @@ export class AppStorageService {
   }
 
   get prompttext(): string {
-    return this._snapshot.login.onlineSession.promptText;
+    return this._snapshot.login.onlineSession?.promptText;
   }
 
   get urlParams(): any {
@@ -199,7 +201,7 @@ export class AppStorageService {
   }
 
   get comment(): string {
-    return this._snapshot.login.onlineSession.comment;
+    return this._snapshot.login.onlineSession?.comment;
   }
 
   set comment(value: string) {
@@ -212,7 +214,7 @@ export class AppStorageService {
   }
 
   get servercomment(): string {
-    return this._snapshot.login.onlineSession.serverComment;
+    return this._snapshot.login.onlineSession?.serverComment;
   }
 
   get annotation(): OIDBLevel[] {
@@ -260,15 +262,13 @@ export class AppStorageService {
   constructor(public sessStr: SessionStorageService,
               public localStr: LocalStorageService,
               private store: Store<RootState>) {
-    // TODO load data from DB and place it in store
-    // TODO listen to state changes and save it to the IndexedDB
-    // TODO make all properties private
-
     this.store.dispatch(fromTranscriptionActions.setTranscriptionState({
       ...fromTranscriptionReducer.initialState,
       playOnHover: this.sessStr.retrieve('playonhover'),
       followPlayCursor: this.sessStr.retrieve('followplaycursor')
     }));
+
+    this.store.dispatch(fromLoginActions.setJobsLeft({jobsLeft: this.sessStr.retrieve('jobsLeft')}));
 
     this.store.dispatch(fromLoginActions.setLoggedIn({
       loggedIn: this.sessStr.retrieve('loggedIn')
@@ -277,20 +277,41 @@ export class AppStorageService {
     this.serverDataEntry = this.sessStr.retrieve('serverDataEntry');
 
     this.subscrManager.add(this.store.select(fromLogin.selectOnlineSession).subscribe((onlineSession) => {
-      this.sessStr.store('serverDataEntry', onlineSession.serverDataEntry);
-      this.sessStr.store('jobsLeft', onlineSession.jobsLeft);
+      if (!isUnset(onlineSession)) {
+        if (onlineSession.hasOwnProperty('serverDataEntry')) {
+          this.sessStr.store('serverDataEntry', onlineSession.serverDataEntry);
+        }
+        if (onlineSession.hasOwnProperty('jobsLeft')) {
+          this.sessStr.store('jobsLeft', onlineSession.jobsLeft);
+        }
 
-      if (!isUnset(this._idb)) {
-        this.idb.save('options', 'dataID', {value: onlineSession.dataID}).catch((err) => {
-          console.error(err);
-        });
+        if (!isUnset(this._idb)) {
+          this.idb.save('options', 'dataID', {value: onlineSession.dataID}).catch((err) => {
+            console.error(err);
+          });
 
-        this._idb.save('options', 'prompttext', {value: onlineSession.promptText}).catch((err) => {
-          console.error(err);
-        });
+          this._idb.save('options', 'prompttext', {value: onlineSession.promptText}).catch((err) => {
+            console.error(err);
+          });
+
+          this._idb.save('options', 'audioURL', {value: onlineSession.audioURL}).catch((err) => {
+            console.error(err);
+          });
+
+          this._idb.save('options', 'user', {
+            value: {
+              id: onlineSession.id,
+              jobno: onlineSession.jobNumber,
+              project: onlineSession.project
+            }
+          }).catch((err) => {
+            console.error(err);
+          });
+        }
       }
     }));
     this.subscrManager.add(this.store.select(fromLogin.selectLoggedIn).subscribe((loggedIn) => {
+      console.log(`saveLoggedIn: ${loggedIn}`);
       this.sessStr.store('loggedIn', loggedIn);
     }));
     this.subscrManager.add(this.store.select(fromTranscription.selectPlayOnHover).subscribe((playOnHover) => {
@@ -363,17 +384,6 @@ export class AppStorageService {
 
   get onlineSession(): OnlineSession {
     return this._snapshot.login.onlineSession;
-  }
-
-  setUserData(value: {
-    id: string,
-    project: string,
-    jobNumber: number
-  }) {
-    this.store.dispatch(fromLoginActions.setUserData(value));
-    this._idb.save('options', 'user', {value: value}).catch((err) => {
-      console.error(err);
-    });
   }
 
   get userProfile(): { name: string; email: string } {
@@ -482,7 +492,7 @@ export class AppStorageService {
   }
 
   get audioURL(): string {
-    return this._snapshot.login.onlineSession.audioURL;
+    return this._snapshot.login.onlineSession?.audioURL;
   }
 
   get useMode(): LoginMode {
@@ -687,7 +697,6 @@ export class AppStorageService {
   }
 
   public clearSession(): boolean {
-    this.store.dispatch(fromLoginActions.logout());
     this.login = false;
     this.store.dispatch(fromLoginActions.clearOnlineSession());
 
@@ -734,7 +743,7 @@ export class AppStorageService {
           this.changeAnnotationLevel(value.num, value.level).then(
             () => {
               this.isSaving = false;
-              this.savingNeeded = true;
+              this.savingNeeded = false;
               this.saving.emit('success');
             }
           ).catch((err) => {
@@ -782,10 +791,14 @@ export class AppStorageService {
     }
   }
 
-  // TODO make this method return a Promise
-  public endSession(navigate: () => void) {
-    this.clearSession();
-    navigate();
+  public endSession(): Promise<void> {
+    return new Promise<void>((resolve) => {
+      this.clearSession();
+      this.clearLocalStorage().catch((error) => {
+        console.error(error);
+      });
+      resolve();
+    });
   }
 
   public load(idb: IndexedDBManager): Promise<void> {
@@ -1185,10 +1198,10 @@ export class AppStorageService {
 
         break;
       case('_asr'):
-        if(value.hasOwnProperty("selectedLanguage")) {
+        if (value.hasOwnProperty('selectedLanguage')) {
           this.store.dispatch(fromASRActions.setASRLanguage({selectedLanguage: value.selectedLanguage}));
         }
-        if(value.hasOwnProperty("selectedService")) {
+        if (value.hasOwnProperty('selectedService')) {
           this.store.dispatch(fromASRActions.setASRService({selectedService: value.selectedService}));
         }
         break;

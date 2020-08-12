@@ -14,6 +14,7 @@ export class ALoginGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
     if (this.appStorage.loggedIn === true) {
+      console.log(`IS LOGGED IN!`);
       const params = AppInfo.queryParamsHandling;
       params.fragment = route.fragment;
       params.queryParams = route.queryParams;
@@ -22,6 +23,8 @@ export class ALoginGuard implements CanActivate {
         console.error(error);
       });
       return false;
+    } else {
+      console.log(`IS NOT LOGGED IN!`);
     }
     return true;
   }

@@ -258,9 +258,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
         resolve();
       }
     }).then(() => {
-
-      if (this.appStorage.urlParams.hasOwnProperty('audio') && this.appStorage.urlParams.audio !== ''
-        && !(this.appStorage.urlParams.audio === null || this.appStorage.urlParams.audio === undefined)) {
+      if (!isUnset(this.appStorage.urlParams) && this.appStorage.urlParams.hasOwnProperty('audio') && this.appStorage.urlParams.audio !== ''
+        && !isUnset(this.appStorage.urlParams.audio)) {
         this.store.dispatch(fromLoginActions.loginURLParameters({
           urlParams: this.appStorage.urlParams
         }));

@@ -119,6 +119,15 @@ export class TranscriptionComponent implements OnInit,
     return this.settingsService.appSettings;
   }
 
+  set comment(value: string) {
+    this.transcrService.feedback.comment = value;
+    this.appStorage.comment = value;
+  }
+
+  get comment(): string {
+    return this.transcrService.feedback.comment;
+  }
+
   constructor(public router: Router,
               private _componentFactoryResolver: ComponentFactoryResolver,
               public audio: AudioService,
@@ -245,23 +254,14 @@ export class TranscriptionComponent implements OnInit,
       if (this.appStorage.useMode !== LoginMode.DEMO) {
         this.api.setOnlineSessionToFree(this.appStorage).then(() => {
           Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).then(() => {
-            this.appStorage.clearSession();
-
-            this.appStorage.clearLocalStorage().catch((error) => {
-              console.error(error);
-            });
           });
         }).catch((error) => {
           console.error(error);
         });
       } else {
         // is demo mode
-        this.appStorage.clearSession();
+        console.log(`logout DEMO`);
         Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).then(() => {
-          this.appStorage.clearSession();
-          this.appStorage.clearLocalStorage().catch((error) => {
-            console.error(error);
-          });
         });
       }
     } else {

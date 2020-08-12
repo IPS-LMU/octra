@@ -105,4 +105,11 @@ export const setServerComment = createAction(
   }>()
 );
 
+export const setJobsLeft = createAction(
+  `[${context}] Set jobsLeft`,
+  props<{
+    jobsLeft: number;
+  }>()
+);
+
 

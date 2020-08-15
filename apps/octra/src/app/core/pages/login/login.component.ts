@@ -332,8 +332,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   getDropzoneFileString(file: File | SessionFile) {
-    const fsize: FileSize = Functions.getFileSize(file.size);
-    return `${file.name} (${(Math.round(fsize.size * 100) / 100)} ${fsize.label})`;
+    if (!isUnset(file)) {
+      const fsize: FileSize = Functions.getFileSize(file.size);
+      return `${file.name} (${(Math.round(fsize.size * 100) / 100)} ${fsize.label})`;
+    }
   }
 
   getFileStatus(): string {

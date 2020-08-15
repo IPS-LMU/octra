@@ -1,6 +1,7 @@
 import {createAction, props} from '@ngrx/store';
 import {LoginMode, OnlineSession, URLParameters} from '../index';
 import {IDataEntry} from '../../obj/data-entry';
+import {SessionFile} from '../../obj/SessionFile';
 
 const context = 'Login';
 
@@ -21,7 +22,8 @@ export const loginDemo = createAction(`[${context}] Login Demo`,
 export const loginLocal = createAction(
   `[${context}] Login Local`,
   props<{
-    files: File[]
+    files: File[],
+    sessionFile: SessionFile
   }>()
 );
 
@@ -76,11 +78,7 @@ export const setLoggedIn = createAction(
 export const setSessionFile = createAction(
   `[${context}] Set SessionFile`,
   props<{
-    sessionFile: {
-      type: string;
-      name: string;
-      size: number;
-    };
+    sessionFile: SessionFile
   }>()
 );
 

@@ -26,10 +26,11 @@ export const reducer = createReducer(
     },
     loggedIn: true
   })),
-  on(LoginActions.loginLocal, (state, {files}) => ({
+  on(LoginActions.loginLocal, (state, {files, sessionFile}) => ({
     ...state,
     mode: LoginMode.LOCAL,
     loggedIn: true,
+    sessionFile,
     files
   })),
   on(LoginActions.loginURLParameters, (state, {urlParams}) => ({
@@ -57,7 +58,6 @@ export const reducer = createReducer(
   })),
   on(LoginActions.clearLocalSession, (state) => ({
     ...state,
-    sessionFile: undefined,
     queryParams: undefined,
     files: []
   })),

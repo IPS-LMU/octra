@@ -1,4 +1,5 @@
 import {IDataEntry} from '../obj/data-entry';
+import {SessionFile} from '../obj/SessionFile';
 
 export enum LoginMode {
   URL = 'url',
@@ -39,11 +40,7 @@ export interface LoginState {
   mode?: LoginMode;
   files?: File[];
   onlineSession?: OnlineSession,
-  sessionFile?: {
-    type: string;
-    name: string;
-    size: number;
-  },
+  sessionFile?: SessionFile,
   queryParams?: URLParameters,
   loggedIn: boolean;
 }

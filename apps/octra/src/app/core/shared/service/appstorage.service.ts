@@ -74,15 +74,7 @@ export class AppStorageService {
   }
 
   get sessionfile(): SessionFile {
-    return SessionFile.fromAny(this._sessionfile);
-  }
-
-  set sessionfile(value: SessionFile) {
-    this._sessionfile = (!(value === null || value === undefined)) ? value.toAny() : null;
-    this.idb.save('options', 'sessionfile', {value: this._sessionfile})
-      .catch((err) => {
-        console.error(err);
-      });
+    return this._snapshot.login.sessionFile;
   }
 
   set userProfile(value: { name: string; email: string }) {
@@ -116,11 +108,11 @@ export class AppStorageService {
   }
 
   get feedback(): any {
-    return this._feedback;
+    return this._snapshot.transcription.feedback;
   }
 
   set feedback(value: any) {
-    this._feedback = value;
+    this.store.dispatch(fromTranscriptionActions.setFeedback({feedback: value}));
     this._idb.save('options', 'feedback', {value}).catch((err) => {
       console.error(err);
     });
@@ -332,6 +324,18 @@ export class AppStorageService {
       console.log(`RootState changed!`);
       this._snapshot = state;
     }));
+    this.subscrManager.add(this.store.select(fromLogin.selectSessionFile).subscribe((sessionFile) => {
+      const sessionFileAny = (!isUnset(sessionFile)) ? sessionFile.toAny() : null;
+
+      if (!isUnset(this.idb)) {
+        console.log(`SAVE SESSION FILE!`);
+        console.log(sessionFile);
+        this.idb.save('options', 'sessionfile', {value: sessionFileAny})
+          .catch((err) => {
+            console.error(err);
+          });
+      }
+    }));
   }
 
   public saving: EventEmitter<string> = new EventEmitter<string>();
@@ -345,10 +349,6 @@ export class AppStorageService {
   private _loaded = new EventEmitter();
 
   private _idb: IndexedDBManager;
-
-  private _sessionfile: any = null;
-
-  private _feedback: any = null;
 
   private _annotation: OIDBLevel[] = null;
   private _annotationLinks: OIDBLink[] = null;
@@ -529,9 +529,9 @@ export class AppStorageService {
         const onlineSession = this._snapshot.login.onlineSession;
 
         const loginLocal = () => {
-          this.setLocalSession(files.map((a) => {
-            return a.file
-          }), this.getSessionFile(audiofile));
+
+          const storeFiles = files.map(a => (a.file));
+          this.setLocalSession(storeFiles, this.getSessionFile(audiofile));
           resolve();
         };
 
@@ -653,9 +653,7 @@ export class AppStorageService {
       this.interface = '2D-Editor';
     }
 
-    this.store.dispatch(fromLoginActions.loginLocal({
-      files
-    }));
+    this.store.dispatch(fromLoginActions.loginLocal({files, sessionFile}));
     this.login = true;
   }
 
@@ -715,7 +713,6 @@ export class AppStorageService {
       promises.push(this.idb.save('options', 'comment', {value: ''}));
       promises.push(this.idb.save('options', 'audioURL', {value: null}));
       promises.push(this.idb.save('options', 'dataID', {value: null}));
-      promises.push(this.idb.save('options', 'sessionfile', {value: null}));
       promises.push(this.clearLoggingData());
 
       this.clearAnnotationData().then(
@@ -1134,7 +1131,10 @@ export class AppStorageService {
         this.store.dispatch(fromApplicationActions.setAppLanguage({language: value}));
         break;
       case('_sessionfile'):
-        this.store.dispatch(fromLoginActions.setSessionFile({sessionFile: value}));
+        const sessionFile = SessionFile.fromAny(value);
+        if (!isUnset(sessionFile)) {
+          this.store.dispatch(fromLoginActions.setSessionFile({sessionFile}));
+        }
         break;
       case('_usemode'):
         this.store.dispatch(fromLoginActions.setMode({mode: value}));

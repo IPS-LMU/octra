@@ -366,8 +366,7 @@ export class SettingsService {
       }
     } else if (this.appStorage.useMode === LoginMode.LOCAL) {
       // local mode
-      if (!(this.appStorage.sessionfile === null || this.appStorage.sessionfile === undefined)
-        && !(this.appStorage.sessionfile.name === null || this.appStorage.sessionfile.name === undefined)) {
+      if (!isUnset(this.appStorage.sessionfile)) {
         this._filename = this.appStorage.sessionfile.name;
         this._filename = this._filename.substr(0, this._filename.lastIndexOf('.'));
 

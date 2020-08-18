@@ -18,6 +18,11 @@ export const initialState: TranscriptionState = {
   showLoupe: false,
   easyMode: false,
   secondsPerLine: 5,
+  annotation: {
+    levels: [],
+    links: [],
+    levelCounter: 0
+  },
   highlightingEnabled: false
 };
 
@@ -76,6 +81,78 @@ export const reducer = createReducer(
   on(TranscriptionActions.setFeedback, (state, {feedback}) => ({
     ...state,
     feedback
-  }))
+  })),
+  on(TranscriptionActions.setAnnotation, (state, {annotation}) => ({
+    ...state,
+    annotation
+  })),
+  on(TranscriptionActions.setAnnotationLevels, (state, {levels}) => ({
+    ...state,
+    annotation: {
+      ...state.annotation,
+      levels
+    }
+  })),
+  on(TranscriptionActions.setAnnotationLinks, (state, {links}) => ({
+    ...state,
+    annotation: {
+      ...state.annotation,
+      links
+    }
+  })),
+  on(TranscriptionActions.clearAnnotation, (state) => ({
+    ...state,
+    annotation: {
+      levels: [],
+      links: [],
+      levelCounter: 0
+    }
+  })),
+  on(TranscriptionActions.changeAnnotationLevel, (state, {level, index}) => {
+    const result = state;
+
+    if (index > -1 && index < result.annotation.levels.length) {
+      result.annotation.levels[index].level = level;
+    } else {
+      console.error(`can't change level because index not valid.`);
+    }
+
+    return result;
+  }),
+  on(TranscriptionActions.addAnnotationLevel, (state, level) =>
+    ({
+      ...state,
+      annotation: {
+        ...state.annotation,
+        levels: [
+          ...state.annotation.levels,
+          level
+        ]
+      }
+    })),
+  on(TranscriptionActions.removeAnnotationLevel, (state, {id}) => {
+    const result = state;
+
+    if (id > -1) {
+      const index = result.annotation.levels.findIndex((a) => (a.id === id));
+      if (index > -1) {
+        result.annotation.levels.splice(index, 1);
+      } else {
+        console.error(`can't remove level because index not valid.`);
+      }
+    } else {
+      console.error(`can't remove level because id not valid.`);
+    }
+
+    return result;
+  }),
+  on(TranscriptionActions.setLevelCounter, (state, {levelCounter}) =>
+    ({
+      ...state,
+      annotation: {
+        ...state.annotation,
+        levelCounter: levelCounter
+      }
+    }))
 );
 

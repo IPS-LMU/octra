@@ -10,7 +10,7 @@ import {OLog, OLogging} from '../../obj/Settings/logging';
 import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
-import {AppStorageService, OIDBLevel} from './appstorage.service';
+import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
 import {SettingsService} from './settings.service';
 import {UserInteractionsService} from './userInteractions.service';
@@ -21,7 +21,7 @@ import {
   IFile,
   Level,
   OAnnotJSON,
-  OAudiofile,
+  OAudiofile, OIDBLevel,
   OLabel,
   OLevel,
   OSegment,
@@ -309,7 +309,7 @@ export class TranscriptionService {
     return new Promise<void>(
       (resolve, reject) => {
         new Promise<void>((resolve2) => {
-          if (isUnset(this.appStorage.annotation) || this.appStorage.annotation.length === 0) {
+          if (isUnset(this.appStorage.annotationLevels) || this.appStorage.annotationLevels.length === 0) {
             const newLevels = [];
             const levels = this.createNewAnnotation().levels;
             for (let i = 0; i < levels.length; i++) {
@@ -318,7 +318,7 @@ export class TranscriptionService {
 
             this.appStorage.overwriteAnnotation(newLevels).then(() => {
                 if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.URL) {
-                  this.appStorage.annotation[this._selectedlevel].level.items = [];
+                  this.appStorage.annotationLevels[this._selectedlevel].level.items = [];
 
                   if (!isUnset(this.appStorage.serverDataEntry) && !isUnset(this.appStorage.serverDataEntry.transcript)
                     && this.appStorage.serverDataEntry.transcript.length > 0) {
@@ -327,13 +327,13 @@ export class TranscriptionService {
 
                     // check if servertranscript's segment is empty
                     if (this.appStorage.serverDataEntry.transcript.length === 1 && this.appStorage.serverDataEntry[0].text === '') {
-                      this.appStorage.annotation[this.selectedlevel].level.items.push(
+                      this.appStorage.annotationLevels[this.selectedlevel].level.items.push(
                         new OSegment(0, 0, this.audioManager.ressource.info.duration.samples,
                           [new OLabel('OCTRA_1', this.appStorage.prompttext)])
                       );
 
                       this.appStorage.changeAnnotationLevel(this._selectedlevel,
-                        this.appStorage.annotation[this._selectedlevel].level)
+                        this.appStorage.annotationLevels[this._selectedlevel].level)
                         .then(() => {
                           resolve2();
                         })
@@ -346,17 +346,17 @@ export class TranscriptionService {
                         );
                     } else {
                       console.log(`read serverData entry...`);
-                      this.appStorage.annotation[this._selectedlevel].level.items = [];
+                      this.appStorage.annotationLevels[this._selectedlevel].level.items = [];
                       for (let i = 0; i < this.appStorage.serverDataEntry.transcript.length; i++) {
                         const segT = this.appStorage.serverDataEntry.transcript[i];
 
                         const oseg = new OSegment(i, segT.start, segT.length, [new OLabel('OCTRA_1', segT.text)]);
-                        this.appStorage.annotation[this.selectedlevel].level.items.push(oseg);
+                        this.appStorage.annotationLevels[this.selectedlevel].level.items.push(oseg);
                       }
                       console.log(`read serverData read with ${this.appStorage.serverDataEntry.transcript.length} items...`);
 
                       this.appStorage.changeAnnotationLevel(this._selectedlevel,
-                        this.appStorage.annotation[this._selectedlevel].level)
+                        this.appStorage.annotationLevels[this._selectedlevel].level)
                         .then(() => {
                           resolve2();
                         })
@@ -395,13 +395,13 @@ export class TranscriptionService {
                     }
 
                     if (converted === undefined) {
-                      this.appStorage.annotation[this.selectedlevel].level.items.push(
+                      this.appStorage.annotationLevels[this.selectedlevel].level.items.push(
                         new OSegment(0, 0, this.audioManager.ressource.info.duration.samples,
                           [new OLabel('OCTRA_1', this.appStorage.prompttext)])
                       );
 
                       this.appStorage.changeAnnotationLevel(this._selectedlevel,
-                        this.appStorage.annotation[this._selectedlevel].level)
+                        this.appStorage.annotationLevels[this._selectedlevel].level)
                         .then(() => {
                           resolve2();
                         })
@@ -416,8 +416,8 @@ export class TranscriptionService {
                       // use imported annotJSON
                       const promises: Promise<any>[] = [];
                       for (let i = 0; i < converted.levels.length; i++) {
-                        if (i >= this.appStorage.annotation.length) {
-                          this.appStorage.annotation.push(new OIDBLevel(i + 1, converted.levels[i], i));
+                        if (i >= this.appStorage.annotationLevels.length) {
+                          this.appStorage.annotationLevels.push(new OIDBLevel(i + 1, converted.levels[i], i));
                         } else {
                           promises.push(this.appStorage.changeAnnotationLevel(i, converted.levels[i]));
                         }
@@ -449,10 +449,10 @@ export class TranscriptionService {
 
           this._annotation = new Annotation(annotates, this._audiofile);
 
-          if (!(this.appStorage.annotation === null || this.appStorage.annotation === undefined)) {
+          if (!(this.appStorage.annotationLevels === null || this.appStorage.annotationLevels === undefined)) {
             // load levels
-            console.log(this.appStorage.annotation);
-            for (const oidbLevel of this.appStorage.annotation) {
+            console.log(this.appStorage.annotationLevels);
+            for (const oidbLevel of this.appStorage.annotationLevels) {
               const level: Level = Level.fromObj(oidbLevel,
                 this._audiomanager.sampleRate, this._audiomanager.ressource.info.duration);
               this._annotation.levels.push(level);

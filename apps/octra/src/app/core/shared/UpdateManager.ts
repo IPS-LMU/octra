@@ -1,8 +1,8 @@
 import {isUnset, SubscriptionManager} from '@octra/utilities';
 import {AppInfo} from '../../app.info';
 import {IndexedDBManager} from '../obj/IndexedDBManager';
-import {AppStorageService, OIDBLevel} from './service/appstorage.service';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '@octra/annotation';
+import {AppStorageService} from './service/appstorage.service';
+import {OAnnotJSON, OAudiofile, OIDBLevel, OLabel, OLevel, OSegment} from '@octra/annotation';
 
 export class UpdateManager {
   private version = '';

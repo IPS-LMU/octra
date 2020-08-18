@@ -114,6 +114,7 @@ import * as fromApplication from './core/store/application/application.reducer';
 import * as fromASR from './core/store/asr/asr.reducer';
 import * as fromTranscription from './core/store/transcription/transcription.reducer';
 import * as fromUser from './core/store/user/user.reducer';
+import { IDBEffects } from './core/store/idb/idb-effects.service';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -234,8 +235,9 @@ export class TranslocoHttpLoader implements TranslocoLoader {
       }
     ),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
-    EffectsModule.forRoot([]),
-    !environment.production ? StoreDevtoolsModule.instrument() : []
+    EffectsModule.forRoot([IDBEffects]),
+    !environment.production ? StoreDevtoolsModule.instrument() : [],
+    EffectsModule.forFeature([])
   ],
   bootstrap: [AppComponent],
   providers: [

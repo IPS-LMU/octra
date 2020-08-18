@@ -5,8 +5,8 @@ import {TranslocoService} from '@ngneat/transloco';
 import {AppInfo} from '../../../app.info';
 import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
 import {AudioService, SettingsService, TranscriptionService} from '../../shared/service';
-import {AppStorageService, OIDBLevel} from '../../shared/service/appstorage.service';
-import {IFile, ImportResult, OAudiofile, OLevel} from '@octra/annotation';
+import {AppStorageService} from '../../shared/service/appstorage.service';
+import {IFile, ImportResult, OAudiofile, OIDBLevel, OLevel} from '@octra/annotation';
 import {LoginMode} from '../../store';
 import * as fromLoginActions from '../../store/login/login.actions';
 import {Store} from '@ngrx/store';
@@ -72,7 +72,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
           const found = projectsettings.languages.find((x) => {
             return x === language;
           });
-          if ((found === null || found === undefined)) {
+          if (isUnset(found)) {
             // fall back to first defined language
             language = projectsettings.languages[0];
           }

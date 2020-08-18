@@ -1,5 +1,6 @@
 import {IDataEntry} from '../obj/data-entry';
 import {SessionFile} from '../obj/SessionFile';
+import {OIDBLevel, OIDBLink} from '@octra/annotation';
 
 export enum LoginMode {
   URL = 'url',
@@ -64,6 +65,12 @@ export interface ASRState {
   selectedService?: string;
 }
 
+export interface AnnotationState {
+  levels: OIDBLevel[];
+  links: OIDBLink[];
+  levelCounter: number;
+}
+
 export interface TranscriptionState {
   savingNeeded: boolean;
   isSaving: boolean;
@@ -77,6 +84,7 @@ export interface TranscriptionState {
     speed: number;
   },
   feedback: any;
+  annotation: AnnotationState;
   logs: any[];
   logging: boolean;
   easyMode: boolean;

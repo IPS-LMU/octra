@@ -11,4 +11,5 @@ export const selectAudioVolume = pipe(selectTranscription, (state) => state.audi
 export const selectAudioSpeed = pipe(selectTranscription, (state) => state.audioSettings.speed);
 export const selectFollowPlayCursor = pipe(selectTranscription, (state) => state.followPlayCursor);
 export const selectLogs = pipe(selectTranscription, (state) => state.logs);
-
+export const selectAnnotation = pipe(selectTranscription, (state) => state.annotation);
+export const selectAnnotationLevels = pipe(selectAnnotation, (state) => state.levels);

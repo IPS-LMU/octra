@@ -20,12 +20,12 @@ import {PlayCursor} from '../../../obj/play-cursor';
 import {TimespanPipe} from '../../../pipe';
 import {AudioviewerConfig} from './audio-viewer.config';
 import {AudioViewerService} from './audio-viewer.service';
+import {BrowserInfo, isUnset, SubscriptionManager} from '@octra/utilities';
+import {ASRQueueItemType, Level, Segment} from '@octra/annotation';
+import {AudioChunk, AudioManager, AudioSelection, PlayBackStatus, SampleUnit} from '@octra/media';
 import Group = Konva.Group;
 import Layer = Konva.Layer;
 import Vector2d = Konva.Vector2d;
-import {BrowserInfo, isUnset, SubscriptionManager} from '@octra/utilities';
-import {ASRQueueItemType, Level, Segment} from '@octra/annotation';
-import {AudioSelection, PlayBackStatus, SampleUnit, AudioChunk, AudioManager} from '@octra/media';
 
 @Component({
   selector: 'octra-audio-viewer',
@@ -376,33 +376,41 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
           radius: circleWidth / 2
         };
       }
-      if (this.settings.multiLine) {
-        let lineWidth = this.av.innerWidth;
-        const numOfLines = Math.ceil(this.av.AudioPxWidth / lineWidth);
 
-        let y = 0;
-        for (let i = 0; i < numOfLines - 1; i++) {
-          const line = this.createLine(new Size(lineWidth, this.settings.lineheight), new Position(this.settings.margin.left, y), i);
-          this.layers.background.add(line);
-          y += this.settings.lineheight + this.settings.margin.top;
-          this.canvasElements.lastLine = line;
-        }
-        // add last line
-        lineWidth = this.av.AudioPxWidth % lineWidth;
-        if (lineWidth > 0) {
-          const line = this.createLine(
-            new Size(lineWidth, this.settings.lineheight), new Position(this.settings.margin.left, y),
-            numOfLines - 1);
-          this.layers.background.add(line);
-          this.canvasElements.lastLine = line;
-        }
-
-      } else {
+      const addSingleLineOnly = () => {
         const line = this.createLine(
           new Size(this.av.innerWidth, this.settings.lineheight),
           new Position(this.settings.margin.left, 0), 0);
         this.layers.background.add(line);
         this.canvasElements.lastLine = line;
+      };
+
+      if (this.settings.multiLine) {
+        let lineWidth = this.av.innerWidth;
+        const numOfLines = Math.ceil(this.av.AudioPxWidth / lineWidth);
+
+        let y = 0;
+        if (numOfLines > 1) {
+          for (let i = 0; i < numOfLines - 1; i++) {
+            const line = this.createLine(new Size(lineWidth, this.settings.lineheight), new Position(this.settings.margin.left, y), i);
+            this.layers.background.add(line);
+            y += this.settings.lineheight + this.settings.margin.top;
+            this.canvasElements.lastLine = line;
+          }
+          // add last line
+          lineWidth = this.av.AudioPxWidth % lineWidth;
+          if (lineWidth > 0) {
+            const line = this.createLine(
+              new Size(lineWidth, this.settings.lineheight), new Position(this.settings.margin.left, y),
+              numOfLines - 1);
+            this.layers.background.add(line);
+            this.canvasElements.lastLine = line;
+          }
+        } else {
+          addSingleLineOnly();
+        }
+      } else {
+        addSingleLineOnly();
       }
 
       this.createSegmentsForCanvas();

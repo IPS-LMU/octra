@@ -1,5 +1,6 @@
 import {createAction, props} from '@ngrx/store';
-import {TranscriptionState} from '../index';
+import {AnnotationState, TranscriptionState} from '../index';
+import {OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
 
 const context = 'Transcription';
 
@@ -111,5 +112,57 @@ export const setFeedback = createAction(
   `[${context}] Set feedback`,
   props<{
     feedback: any;
+  }>()
+);
+
+export const setAnnotation = createAction(
+  `[${context}] Set annotation`,
+  props<{
+    annotation: AnnotationState;
+  }>()
+);
+
+export const setAnnotationLevels = createAction(
+  `[${context}] Set annotationLevels`,
+  props<{
+    levels: OIDBLevel[];
+  }>()
+);
+
+export const setAnnotationLinks = createAction(
+  `[${context}] Set annotationLinks`,
+  props<{
+    links: OIDBLink[];
+  }>()
+);
+
+export const clearAnnotation = createAction(
+  `[${context}] Clear annotation`
+);
+
+export const changeAnnotationLevel = createAction(
+  `[ANNOTATION] Change Annotation Level`,
+  props<{
+    index: number,
+    level: OLevel
+  }>()
+);
+
+export const addAnnotationLevel = createAction(
+  `[ANNOTATION] Add Annotation Level`,
+  props<OIDBLevel>()
+);
+
+export const removeAnnotationLevel = createAction(
+  `[ANNOTATION] Remove Annotation Level`,
+  props<{
+    id: number
+  }>()
+);
+
+export const setLevelCounter = createAction(
+  `[ANNOTATION] Set Level Counter`,
+  props<{
+    levelCounter: number
   }>()
 );

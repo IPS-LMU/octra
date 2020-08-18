@@ -20,13 +20,14 @@ import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcr
 import {IDataEntry, parseServerDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
 import {APIService, AudioService, SettingsService} from '../../shared/service';
-import {AppStorageService, OIDBLevel, OIDBLink} from '../../shared/service/appstorage.service';
+import {AppStorageService} from '../../shared/service/appstorage.service';
 import {OctraDropzoneComponent} from '../../component/octra-dropzone/octra-dropzone.component';
 import {ComponentCanDeactivate} from './login.deactivateguard';
 import {LoginService} from './login.service';
 import {LoginMode} from '../../store';
 import * as fromLoginActions from '../../store/login/login.actions';
 import {Store} from '@ngrx/store';
+import {OIDBLevel, OIDBLink} from '@octra/annotation';
 
 @Component({
   selector: 'octra-login',

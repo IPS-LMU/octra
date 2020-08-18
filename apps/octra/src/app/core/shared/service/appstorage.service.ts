@@ -8,7 +8,7 @@ import {SessionFile} from '../../obj/SessionFile';
 import {ConsoleEntry} from './bug-report.service';
 import {FileProgress} from '../../obj/objects';
 import {isUnset, SubscriptionManager} from '@octra/utilities';
-import {OLevel, OLink} from '@octra/annotation';
+import {IIDBLink, OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
 import {LoginMode, OnlineSession, RootState} from '../../store';
 import {Store} from '@ngrx/store';
 import * as fromApplication from '../../store/application/';
@@ -21,39 +21,8 @@ import * as fromTranscriptionActions from '../../store/transcription/transcripti
 import * as fromTranscriptionReducer from '../../store/transcription/transcription.reducer';
 import * as fromTranscription from '../../store/transcription';
 import * as fromUserActions from '../../store/user/user.actions';
-
-export interface IIDBLevel {
-  id: number;
-  level: OLevel;
-  sortorder: number;
-}
-
-export interface IIDBLink {
-  id: number;
-  link: OLink;
-}
-
-export class OIDBLevel implements IIDBLevel {
-  id: number;
-  level: OLevel;
-  sortorder: number;
-
-  constructor(id: number, level: OLevel, sortorder: number) {
-    this.id = id;
-    this.level = level;
-    this.sortorder = sortorder;
-  }
-}
-
-export class OIDBLink implements IIDBLink {
-  id: number;
-  link: OLink;
-
-  constructor(id: number, link: OLink) {
-    this.id = id;
-    this.link = link;
-  }
-}
+import * as fromIDBActions from '../../store/idb/idb.actions'
+import {Actions} from '@ngrx/effects';
 
 @Injectable()
 export class AppStorageService {
@@ -209,16 +178,20 @@ export class AppStorageService {
     return this._snapshot.login.onlineSession?.serverComment;
   }
 
-  get annotation(): OIDBLevel[] {
-    return this._annotation;
+  get annotationLevels(): OIDBLevel[] {
+    return this._snapshot.transcription.annotation.levels;
   }
 
   get annotationLinks(): OIDBLink[] {
-    return this._annotationLinks;
+    return this._snapshot.transcription.annotation.links;
   }
 
   get levelcounter(): number {
-    return this._levelcounter;
+    return this._snapshot.transcription.annotation.levelCounter;
+  }
+
+  set levelcounter(value: number) {
+    this.store.dispatch(fromTranscriptionActions.setLevelCounter({levelCounter: value}));
   }
 
   get secondsPerLine(): number {
@@ -253,88 +226,96 @@ export class AppStorageService {
 
   constructor(public sessStr: SessionStorageService,
               public localStr: LocalStorageService,
-              private store: Store<RootState>) {
-    this.store.dispatch(fromTranscriptionActions.setTranscriptionState({
-      ...fromTranscriptionReducer.initialState,
-      playOnHover: this.sessStr.retrieve('playonhover'),
-      followPlayCursor: this.sessStr.retrieve('followplaycursor')
-    }));
+              private store: Store<RootState>,
+              private actions: Actions) {
+    this.subscrManager.add(actions.subscribe((action) => {
+      if (action.type === '@ngrx/effects/init') {
+        this.store.dispatch(fromTranscriptionActions.setTranscriptionState({
+          ...fromTranscriptionReducer.initialState,
+          playOnHover: this.sessStr.retrieve('playonhover'),
+          followPlayCursor: this.sessStr.retrieve('followplaycursor')
+        }));
 
-    this.store.dispatch(fromLoginActions.setJobsLeft({jobsLeft: this.sessStr.retrieve('jobsLeft')}));
+        this.store.dispatch(fromLoginActions.setJobsLeft({jobsLeft: this.sessStr.retrieve('jobsLeft')}));
 
-    this.store.dispatch(fromLoginActions.setLoggedIn({
-      loggedIn: this.sessStr.retrieve('loggedIn')
-    }));
-    this.reloaded = this.sessStr.retrieve('reloaded');
-    this.serverDataEntry = this.sessStr.retrieve('serverDataEntry');
+        this.store.dispatch(fromIDBActions.loadIDB());
 
-    this.subscrManager.add(this.store.select(fromLogin.selectOnlineSession).subscribe((onlineSession) => {
-      if (!isUnset(onlineSession)) {
-        if (onlineSession.hasOwnProperty('serverDataEntry')) {
-          this.sessStr.store('serverDataEntry', onlineSession.serverDataEntry);
-        }
-        if (onlineSession.hasOwnProperty('jobsLeft')) {
-          this.sessStr.store('jobsLeft', onlineSession.jobsLeft);
-        }
+        this.store.dispatch(fromLoginActions.setLoggedIn({
+          loggedIn: this.sessStr.retrieve('loggedIn')
+        }));
+        this.reloaded = this.sessStr.retrieve('reloaded');
+        this.serverDataEntry = this.sessStr.retrieve('serverDataEntry');
 
-        if (!isUnset(this._idb)) {
-          this.idb.save('options', 'dataID', {value: onlineSession.dataID}).catch((err) => {
-            console.error(err);
-          });
-
-          this._idb.save('options', 'prompttext', {value: onlineSession.promptText}).catch((err) => {
-            console.error(err);
-          });
-
-          this._idb.save('options', 'audioURL', {value: onlineSession.audioURL}).catch((err) => {
-            console.error(err);
-          });
-
-          this._idb.save('options', 'user', {
-            value: {
-              id: onlineSession.id,
-              jobno: onlineSession.jobNumber,
-              project: onlineSession.project
+        this.subscrManager.add(this.store.select(fromLogin.selectOnlineSession).subscribe((onlineSession) => {
+          if (!isUnset(onlineSession)) {
+            if (onlineSession.hasOwnProperty('serverDataEntry')) {
+              this.sessStr.store('serverDataEntry', onlineSession.serverDataEntry);
             }
-          }).catch((err) => {
-            console.error(err);
-          });
-        }
+            if (onlineSession.hasOwnProperty('jobsLeft')) {
+              this.sessStr.store('jobsLeft', onlineSession.jobsLeft);
+            }
+
+            if (!isUnset(this._idb)) {
+              this.idb.save('options', 'dataID', {value: onlineSession.dataID}).catch((err) => {
+                console.error(err);
+              });
+
+              this._idb.save('options', 'prompttext', {value: onlineSession.promptText}).catch((err) => {
+                console.error(err);
+              });
+
+              this._idb.save('options', 'audioURL', {value: onlineSession.audioURL}).catch((err) => {
+                console.error(err);
+              });
+
+              this._idb.save('options', 'user', {
+                value: {
+                  id: onlineSession.id,
+                  jobno: onlineSession.jobNumber,
+                  project: onlineSession.project
+                }
+              }).catch((err) => {
+                console.error(err);
+              });
+            }
+          }
+        }));
+        this.subscrManager.add(this.store.select(fromLogin.selectLoggedIn).subscribe((loggedIn) => {
+          console.log(`saveLoggedIn: ${loggedIn}`);
+          this.sessStr.store('loggedIn', loggedIn);
+        }));
+        this.subscrManager.add(this.store.select(fromTranscription.selectPlayOnHover).subscribe((playOnHover) => {
+          this.sessStr.store('playonhover', playOnHover);
+        }));
+        this.subscrManager.add(this.store.select(fromApplication.selectReloaded).subscribe((reloaded) => {
+          this.sessStr.store('reloaded', reloaded);
+        }));
+
+        this.subscrManager.add(this.store.select(fromLogin.selectMode).subscribe((mode) => {
+          if (!isUnset(this.idb)) {
+            this.idb.save('options', 'useMode', {value: mode}).catch((err) => {
+              console.error(err);
+            });
+          }
+        }));
+
+        this.subscrManager.add(this.store.select(fromLogin.selectSessionFile).subscribe((sessionFile) => {
+          const sessionFileAny = (!isUnset(sessionFile)) ? sessionFile.toAny() : null;
+
+          if (!isUnset(this.idb)) {
+            console.log(`SAVE SESSION FILE!`);
+            console.log(sessionFile);
+            this.idb.save('options', 'sessionfile', {value: sessionFileAny})
+              .catch((err) => {
+                console.error(err);
+              });
+          }
+        }));
       }
-    }));
-    this.subscrManager.add(this.store.select(fromLogin.selectLoggedIn).subscribe((loggedIn) => {
-      console.log(`saveLoggedIn: ${loggedIn}`);
-      this.sessStr.store('loggedIn', loggedIn);
-    }));
-    this.subscrManager.add(this.store.select(fromTranscription.selectPlayOnHover).subscribe((playOnHover) => {
-      this.sessStr.store('playonhover', playOnHover);
-    }));
-    this.subscrManager.add(this.store.select(fromApplication.selectReloaded).subscribe((reloaded) => {
-      this.sessStr.store('reloaded', reloaded);
     }));
 
-    this.subscrManager.add(this.store.select(fromLogin.selectMode).subscribe((mode) => {
-      if (!isUnset(this.idb)) {
-        this.idb.save('options', 'useMode', {value: mode}).catch((err) => {
-          console.error(err);
-        });
-      }
-    }));
     this.subscrManager.add(this.store.subscribe((state: RootState) => {
-      console.log(`RootState changed!`);
       this._snapshot = state;
-    }));
-    this.subscrManager.add(this.store.select(fromLogin.selectSessionFile).subscribe((sessionFile) => {
-      const sessionFileAny = (!isUnset(sessionFile)) ? sessionFile.toAny() : null;
-
-      if (!isUnset(this.idb)) {
-        console.log(`SAVE SESSION FILE!`);
-        console.log(sessionFile);
-        this.idb.save('options', 'sessionfile', {value: sessionFileAny})
-          .catch((err) => {
-            console.error(err);
-          });
-      }
     }));
   }
 
@@ -349,10 +330,6 @@ export class AppStorageService {
   private _loaded = new EventEmitter();
 
   private _idb: IndexedDBManager;
-
-  private _annotation: OIDBLevel[] = null;
-  private _annotationLinks: OIDBLink[] = null;
-  private _levelcounter = 0;
 
   private _snapshot: RootState;
 
@@ -573,7 +550,7 @@ export class AppStorageService {
         resolve();
       }
     }).then(() => {
-      this._annotation = value;
+      this.store.dispatch(fromTranscriptionActions.setAnnotationLevels({levels: value}));
     }).catch((err) => {
       console.error(err);
     }).then(() => {
@@ -595,7 +572,9 @@ export class AppStorageService {
             max = Math.max(max, valueElem.id);
           }
 
-          this._levelcounter = max;
+          this.store.dispatch(fromTranscriptionActions.setLevelCounter({
+            levelCounter: max
+          }));
         }
       ).catch((err) => {
         console.error(err);
@@ -606,7 +585,7 @@ export class AppStorageService {
   public overwriteLinks = (value: OIDBLink[]): Promise<any> => {
     return this.clearIDBTable('annotation_links')
       .then(() => {
-        this._annotationLinks = value;
+        this.store.dispatch(fromTranscriptionActions.setAnnotationLinks({links: value}));
       }).catch((err) => {
         console.error(err);
       }).then(() => {
@@ -897,11 +876,11 @@ export class AppStorageService {
       });
     }).then(() => {
       idb.getAll('annotation_levels', 'id').then((levels: any[]) => {
-        this._annotation = [];
+        const annotationLevels = [];
         let max = 0;
         for (let i = 0; i < levels.length; i++) {
           if (!levels[i].hasOwnProperty('id')) {
-            this._annotation.push(
+            annotationLevels.push(
               {
                 id: i + 1,
                 level: levels[i],
@@ -910,22 +889,24 @@ export class AppStorageService {
             );
             max = Math.max(i + 1, max);
           } else {
-            this._annotation.push(levels[i]);
+            annotationLevels.push(levels[i]);
             max = Math.max(levels[i].id, max);
           }
         }
-        this._levelcounter = max;
+        this.store.dispatch(fromTranscriptionActions.setLevelCounter({
+          levelCounter: max
+        }));
       });
     }).then(() => {
       idb.getAll('annotation_links', 'id').then((links: IIDBLink[]) => {
-        this._annotationLinks = [];
+        const annotationLinks = [];
         for (let i = 0; i < links.length; i++) {
           if (!links[i].hasOwnProperty('id')) {
-            this._annotationLinks.push(
+            annotationLinks.push(
               new OIDBLink(i + 1, links[i].link)
             );
           } else {
-            this._annotationLinks.push(links[i]);
+            annotationLinks.push(links[i]);
           }
         }
       });
@@ -962,7 +943,7 @@ export class AppStorageService {
   }
 
   public clearAnnotationData(): Promise<any> {
-    this._annotation = null;
+    this.store.dispatch(fromTranscriptionActions.clearAnnotation());
     return this.clearIDBTable('annotation_levels').then(
       () => {
         return this.clearIDBTable('annotation_links');
@@ -974,13 +955,19 @@ export class AppStorageService {
   }
 
   public changeAnnotationLevel(tiernum: number, level: OLevel): Promise<any> {
-    if (!isUnset(this._annotation)) {
-      if (!(level === null || level === undefined)) {
-        if (this._annotation.length > tiernum) {
-          const id = this._annotation[tiernum].id;
+    if (!isUnset(this.annotationLevels)) {
+      if (!isUnset(level)) {
+        if (this.annotationLevels.length > tiernum) {
+          const changedLevel = this.annotationLevels[tiernum];
+          const id = changedLevel.id;
 
-          this._annotation[tiernum].level = level;
-          return this.idb.save('annotation_levels', id, this._annotation[tiernum]);
+          this.store.dispatch(fromTranscriptionActions.changeAnnotationLevel({
+            level,
+            index: tiernum
+          }));
+          changedLevel.level = level;
+
+          return this.idb.save('annotation_levels', id, changedLevel);
         } else {
           return new Promise((resolve, reject) => {
             reject(new Error('number of level that should be changed is invalid'));
@@ -999,14 +986,18 @@ export class AppStorageService {
   }
 
   public addAnnotationLevel(level: OLevel): Promise<any> {
-    if (!(level === null || level === undefined)) {
-      this._annotation.push({
-        id: ++this._levelcounter,
+    if (!isUnset(level)) {
+      const newID = this.levelcounter + 1;
+      this.levelcounter = newID;
+
+      this.store.dispatch(fromTranscriptionActions.addAnnotationLevel({
+        id: newID,
         level,
-        sortorder: this._annotation.length
-      });
-      return this.idb.save('annotation_levels', this._levelcounter, {
-        id: this._levelcounter,
+        sortorder: this.annotationLevels.length
+      }));
+
+      return this.idb.save('annotation_levels', newID, {
+        id: newID,
         level
       });
     } else {
@@ -1016,13 +1007,11 @@ export class AppStorageService {
     }
   }
 
-  public removeAnnotationLevel(num: number, id: number): Promise<any> {
-    if (!(name === null || name === undefined) && num < this._annotation.length) {
-      return this.idb.remove('annotation_levels', id).then(
-        () => {
-          this._annotation.splice(num, 1);
-        }
-      );
+  public removeAnnotationLevel(id: number): Promise<any> {
+    if (id > -1) {
+      this.store.dispatch(fromTranscriptionActions.removeAnnotationLevel({
+        id
+      }));
     } else {
       return new Promise((resolve, reject2) => {
         reject2(new Error('level is undefined or null'));
@@ -1038,7 +1027,7 @@ export class AppStorageService {
   }
 
   public getLevelByID(id: number) {
-    for (const level of this._annotation) {
+    for (const level of this.annotationLevels) {
       if (level.id === id) {
         return level;
       }

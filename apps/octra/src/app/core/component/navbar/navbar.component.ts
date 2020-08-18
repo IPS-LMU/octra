@@ -107,7 +107,6 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   setInterface(newInterface: string) {
-    this.appStorage.interface = newInterface;
     this.navbarServ.interfacechange.emit(newInterface);
   }
 
@@ -222,7 +221,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     }).then((answer) => {
       if (answer === 'yes') {
         if (this.transcrServ.annotation.levels.length > 1) {
-          this.appStorage.removeAnnotationLevel(tiernum, id).catch((err) => {
+          this.appStorage.removeAnnotationLevel(id).catch((err) => {
             console.error(err);
           }).then(() => {
             // update value for annoation object in transcr service

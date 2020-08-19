@@ -12,6 +12,9 @@ import {AppStorageService} from './core/shared/service/appstorage.service';
 import {AsrService} from './core/shared/service/asr.service';
 import {BugReportService, ConsoleType} from './core/shared/service/bug-report.service';
 import * as jQuery from 'jquery';
+import * as fromApplication from './core/store/application'
+import * as fromTranscription from './core/store/transcription'
+import {Store} from '@ngrx/store';
 
 @Component({
   selector: 'octra-app',
@@ -40,7 +43,8 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
               private router: Router,
               private route: ActivatedRoute,
               private multiThreading: MultiThreadingService,
-              private asrService: AsrService) {
+              private asrService: AsrService,
+              private store: Store) {
 
     // overwrite console.log
     if (!AppInfo.debugging) {
@@ -112,7 +116,7 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
       embedded: this.getParameterByName('embedded')
     };
 
-    this.subscrmanager.add(this.settingsService.dbloaded.subscribe(
+    this.subscrmanager.add(this.store.select(fromApplication.selectIDBLoaded).subscribe(
       () => {
         if (!isUnset(this.appStorage.asrSelectedService) && !isUnset(this.appStorage.asrSelectedLanguage)) {
           // set asr settings
@@ -127,20 +131,12 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
           }
         }
 
-        this.appStorage.loadConsoleEntries().then((dbEntry: any) => {
-          if (!isUnset(dbEntry) && dbEntry.hasOwnProperty('value')) {
-            this.bugService.addEntriesFromDB(dbEntry.value);
-          } else {
-            this.bugService.addEntriesFromDB(null);
-          }
-        }).catch((error) => {
-          console.error(error);
-        });
+        this.bugService.addEntriesFromDB(this.appStorage.consoleEntries);
       }
     ));
 
     // after project settings loaded
-    this.subscrmanager.add(this.settingsService.projectsettingsloaded.subscribe(
+    this.subscrmanager.add(this.store.select(fromTranscription.selectProjectConfig).subscribe(
       () => {
         if (!this.settingsService.responsive.enabled) {
           this.setFixedWidth();

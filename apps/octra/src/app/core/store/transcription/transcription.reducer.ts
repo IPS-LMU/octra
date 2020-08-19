@@ -1,6 +1,8 @@
 import {createReducer, on} from '@ngrx/store';
 import * as TranscriptionActions from './transcription.actions';
-import {TranscriptionState} from '../index';
+import * as fromConfigurationActions from '../configuration/configuration.actions';
+import * as fromIDBActions from '../idb/idb.actions';
+import {RootState, TranscriptionState} from '../index';
 
 export const initialState: TranscriptionState = {
   savingNeeded: false,
@@ -44,19 +46,20 @@ export const reducer = createReducer(
     ...state,
     currentEditor
   })),
-  on(TranscriptionActions.setAudioVolume, (state, {volume}) => ({
+  on(TranscriptionActions.setAudioSettings, (state, data) => ({
     ...state,
     audioSettings: {
       ...state.audioSettings,
-      volume
+      ...data
     }
   })),
-  on(TranscriptionActions.setAudioSpeed, (state, {speed}) => ({
+  on(TranscriptionActions.addLog, (state, {log}) => ({
     ...state,
-    audioSettings: {
-      ...state.audioSettings,
-      speed
-    }
+    logs: [...state.logs, log]
+  })),
+  on(TranscriptionActions.setLogs, (state, {logs}) => ({
+    ...state,
+    logs
   })),
   on(TranscriptionActions.setLogging, (state, {logging}) => ({
     ...state,
@@ -86,6 +89,10 @@ export const reducer = createReducer(
     ...state,
     annotation
   })),
+  on(TranscriptionActions.setSubmitted, (state, {submitted}) => ({
+    ...state,
+    submitted
+  })),
   on(TranscriptionActions.setAnnotationLevels, (state, {levels}) => ({
     ...state,
     annotation: {
@@ -108,8 +115,17 @@ export const reducer = createReducer(
       levelCounter: 0
     }
   })),
-  on(TranscriptionActions.changeAnnotationLevel, (state, {level, index}) => {
-    const result = state;
+  on(TranscriptionActions.overwriteAnnotation, (state, {annotation}) => ({
+    ...state,
+    annotation
+  })),
+  on(TranscriptionActions.clearLogs, (state) => ({
+    ...state,
+    logs: []
+  })),
+  on(TranscriptionActions.changeAnnotationLevel, (state, {level, id}) => {
+    const result: TranscriptionState = state;
+    const index = state.annotation.levels.findIndex(a => a.id === id);
 
     if (index > -1 && index < result.annotation.levels.length) {
       result.annotation.levels[index].level = level;
@@ -153,6 +169,86 @@ export const reducer = createReducer(
         ...state.annotation,
         levelCounter: levelCounter
       }
+    })),
+  on(fromConfigurationActions.projectConfigurationLoaded, (state, {projectConfig}) =>
+    ({
+      ...state,
+      projectConfig
+    })),
+  on(fromIDBActions.loadOptionsSuccess, (state, {variables}) => {
+    let result = state;
+
+    for (const variable of variables) {
+      result = saveOptionToStore(state, variable.name, variable.value);
+    }
+
+    return result;
+  }),
+  on(fromIDBActions.loadAnnotationLevelsSuccess, (state, {levels, levelCounter}) =>
+    ({
+      ...state,
+      annotation: {
+        ...state.annotation,
+        levels,
+        levelCounter
+      }
     }))
 );
 
+function saveOptionToStore(state: TranscriptionState, attribute: string, value: any): TranscriptionState {
+  console.log(`save Option ${attribute} to store with value "${JSON.stringify(value)}"...`);
+  switch (attribute) {
+    case('_submitted'):
+      return {
+        ...state,
+        submitted: value
+      };
+    case('_easymode'):
+      return {
+        ...state,
+        easyMode: value
+      };
+    case('_feedback'):
+      return {
+        ...state,
+        feedback: value
+      }
+    case('_interface'):
+      return {
+        ...state,
+        currentEditor: value
+      }
+    case('_logging'):
+      return {
+        ...state,
+        logging: value
+      }
+    case('_showLoupe'):
+      return {
+        ...state,
+        showLoupe: value
+      }
+    case('_secondsPerLine'):
+      return {
+        ...state,
+        secondsPerLine: value
+      }
+    case('_audioSettings'):
+      return {
+        ...state,
+        audioSettings: {
+          volume: value.volume,
+          speed: value.speed
+        }
+      };
+    case('_highlightingEnabled'):
+      return {
+        ...state,
+        highlightingEnabled: value
+      }
+    default:
+      console.error(`can't find case for attribute ${attribute}`);
+  }
+
+  return state;
+}

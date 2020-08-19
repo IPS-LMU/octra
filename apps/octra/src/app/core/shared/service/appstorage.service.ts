@@ -3,26 +3,22 @@ import {LocalStorageService, SessionStorageService} from 'ngx-webstorage';
 import {Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {IDataEntry} from '../../obj/data-entry';
-import {IndexedDBManager} from '../../obj/IndexedDBManager';
 import {SessionFile} from '../../obj/SessionFile';
-import {ConsoleEntry} from './bug-report.service';
 import {FileProgress} from '../../obj/objects';
 import {isUnset, SubscriptionManager} from '@octra/utilities';
-import {IIDBLink, OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
+import {OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
 import {LoginMode, OnlineSession, RootState} from '../../store';
 import {Store} from '@ngrx/store';
-import * as fromApplication from '../../store/application/';
-import * as fromLogin from '../../store/login/';
 import {AudioManager} from '@octra/media';
 import * as fromApplicationActions from '../../store/application/application.actions';
 import * as fromLoginActions from '../../store/login/login.actions';
 import * as fromASRActions from '../../store/asr/asr.actions';
 import * as fromTranscriptionActions from '../../store/transcription/transcription.actions';
 import * as fromTranscriptionReducer from '../../store/transcription/transcription.reducer';
-import * as fromTranscription from '../../store/transcription';
 import * as fromUserActions from '../../store/user/user.actions';
 import * as fromIDBActions from '../../store/idb/idb.actions'
 import {Actions} from '@ngrx/effects';
+import {ConsoleEntry} from './bug-report.service';
 
 @Injectable()
 export class AppStorageService {
@@ -38,21 +34,12 @@ export class AppStorageService {
     return this._loaded;
   }
 
-  get idb(): IndexedDBManager {
-    return this._idb;
-  }
-
   get sessionfile(): SessionFile {
     return this._snapshot.login.sessionFile;
   }
 
   set userProfile(value: { name: string; email: string }) {
     this.store.dispatch(fromUserActions.setUserProfile(value));
-    console.log(`save userProfile...`);
-    console.log(value);
-    this._idb.save('options', 'userProfile', {value}).catch((err) => {
-      console.error(err);
-    });
   }
 
   set playonhover(value: boolean) {
@@ -71,9 +58,6 @@ export class AppStorageService {
 
   set submitted(value: boolean) {
     this.store.dispatch(fromTranscriptionActions.setSubmitted({submitted: value}));
-    this.idb.save('options', 'submitted', {value}).catch((err) => {
-      console.error(err);
-    });
   }
 
   get feedback(): any {
@@ -82,9 +66,6 @@ export class AppStorageService {
 
   set feedback(value: any) {
     this.store.dispatch(fromTranscriptionActions.setFeedback({feedback: value}));
-    this._idb.save('options', 'feedback', {value}).catch((err) => {
-      console.error(err);
-    });
   }
 
   get dataID(): number {
@@ -97,9 +78,6 @@ export class AppStorageService {
 
   set language(value: string) {
     this.store.dispatch(fromApplicationActions.setAppLanguage({language: value}));
-    this.idb.save('options', 'language', {value}).catch((err) => {
-      console.error(err);
-    });
   }
 
   /* Getter/Setter IDB Storage */
@@ -109,9 +87,6 @@ export class AppStorageService {
 
   set version(value: string) {
     this.store.dispatch(fromApplicationActions.setAppVersion({version: value}));
-    this._idb.save('options', 'version', {value}).catch((err) => {
-      console.error(err);
-    });
   }
 
   get logging(): boolean {
@@ -122,22 +97,26 @@ export class AppStorageService {
     this.store.dispatch(fromTranscriptionActions.setLogging({
       logging: value
     }));
-    this._idb.save('options', 'logging', {value}).catch((err) => {
-      console.error(err);
-    });
   }
 
   get showLoupe(): boolean {
     return this._snapshot.transcription.showLoupe;
   }
 
+  get consoleEntries(): ConsoleEntry[] {
+    return this._snapshot.application.consoleEntries;
+  }
+
+  set consoleEntries(consoleEntries: ConsoleEntry[]) {
+    this.store.dispatch(fromApplicationActions.setConsoleEntries({
+      consoleEntries
+    }))
+  }
+
   set showLoupe(value: boolean) {
     this.store.dispatch(fromTranscriptionActions.setShowLoupe({
       showLoupe: value
     }));
-    this._idb.save('options', 'showLoupe', {value}).catch((err) => {
-      console.error(err);
-    });
   }
 
   get prompttext(): string {
@@ -156,9 +135,6 @@ export class AppStorageService {
     this.store.dispatch(fromTranscriptionActions.setEasyMode({
       easyMode: value
     }));
-    this.idb.save('options', 'easymode', {value}).catch((err) => {
-      console.error(err);
-    });
   }
 
   get comment(): string {
@@ -169,9 +145,6 @@ export class AppStorageService {
     this.store.dispatch(fromLoginActions.setComment({
       comment: value
     }));
-    this._idb.save('options', 'comment', {value}).catch((err) => {
-      console.error(err);
-    });
   }
 
   get servercomment(): string {
@@ -206,9 +179,6 @@ export class AppStorageService {
       key: 'secondsPerLine',
       value
     });
-    this.idb.save('options', 'secondsPerLine', {value}).catch((err) => {
-      console.error(err);
-    });
   }
 
   get highlightingEnabled(): boolean {
@@ -219,9 +189,6 @@ export class AppStorageService {
     this.store.dispatch(fromTranscriptionActions.setHighlightingEnabled({
       highlightingEnabled: value
     }));
-    this.idb.save('options', 'highlightingEnabled', {value}).catch((err) => {
-      console.error(err);
-    });
   }
 
   constructor(public sessStr: SessionStorageService,
@@ -245,72 +212,6 @@ export class AppStorageService {
         }));
         this.reloaded = this.sessStr.retrieve('reloaded');
         this.serverDataEntry = this.sessStr.retrieve('serverDataEntry');
-
-        this.subscrManager.add(this.store.select(fromLogin.selectOnlineSession).subscribe((onlineSession) => {
-          if (!isUnset(onlineSession)) {
-            if (onlineSession.hasOwnProperty('serverDataEntry')) {
-              this.sessStr.store('serverDataEntry', onlineSession.serverDataEntry);
-            }
-            if (onlineSession.hasOwnProperty('jobsLeft')) {
-              this.sessStr.store('jobsLeft', onlineSession.jobsLeft);
-            }
-
-            if (!isUnset(this._idb)) {
-              this.idb.save('options', 'dataID', {value: onlineSession.dataID}).catch((err) => {
-                console.error(err);
-              });
-
-              this._idb.save('options', 'prompttext', {value: onlineSession.promptText}).catch((err) => {
-                console.error(err);
-              });
-
-              this._idb.save('options', 'audioURL', {value: onlineSession.audioURL}).catch((err) => {
-                console.error(err);
-              });
-
-              this._idb.save('options', 'user', {
-                value: {
-                  id: onlineSession.id,
-                  jobno: onlineSession.jobNumber,
-                  project: onlineSession.project
-                }
-              }).catch((err) => {
-                console.error(err);
-              });
-            }
-          }
-        }));
-        this.subscrManager.add(this.store.select(fromLogin.selectLoggedIn).subscribe((loggedIn) => {
-          console.log(`saveLoggedIn: ${loggedIn}`);
-          this.sessStr.store('loggedIn', loggedIn);
-        }));
-        this.subscrManager.add(this.store.select(fromTranscription.selectPlayOnHover).subscribe((playOnHover) => {
-          this.sessStr.store('playonhover', playOnHover);
-        }));
-        this.subscrManager.add(this.store.select(fromApplication.selectReloaded).subscribe((reloaded) => {
-          this.sessStr.store('reloaded', reloaded);
-        }));
-
-        this.subscrManager.add(this.store.select(fromLogin.selectMode).subscribe((mode) => {
-          if (!isUnset(this.idb)) {
-            this.idb.save('options', 'useMode', {value: mode}).catch((err) => {
-              console.error(err);
-            });
-          }
-        }));
-
-        this.subscrManager.add(this.store.select(fromLogin.selectSessionFile).subscribe((sessionFile) => {
-          const sessionFileAny = (!isUnset(sessionFile)) ? sessionFile.toAny() : null;
-
-          if (!isUnset(this.idb)) {
-            console.log(`SAVE SESSION FILE!`);
-            console.log(sessionFile);
-            this.idb.save('options', 'sessionfile', {value: sessionFileAny})
-              .catch((err) => {
-                console.error(err);
-              });
-          }
-        }));
       }
     }));
 
@@ -328,8 +229,6 @@ export class AppStorageService {
   private subscrManager = new SubscriptionManager();
 
   private _loaded = new EventEmitter();
-
-  private _idb: IndexedDBManager;
 
   private _snapshot: RootState;
 
@@ -385,9 +284,6 @@ export class AppStorageService {
 
   setLogs(value: any[]) {
     this.store.dispatch(fromTranscriptionActions.setLogs({logs: value}));
-    this._idb.saveArraySequential(value, 'logs', 'timestamp').catch((err) => {
-      console.error(err);
-    });
   }
 
   get asrSelectedLanguage(): string {
@@ -395,15 +291,10 @@ export class AppStorageService {
   }
 
   set asrSelectedLanguage(value: string) {
-    this.store.dispatch(fromASRActions.setASRLanguage({selectedLanguage: value}));
-    this.idb.save('options', 'asr', {
-      value: {
-        selectedLanguage: value,
-        selectedService: this.asrSelectedService
-      }
-    }).catch((err) => {
-      console.error(err);
-    });
+    this.store.dispatch(fromASRActions.setASRSettings({
+      selectedLanguage: value,
+      selectedService: this.asrSelectedService
+    }));
   }
 
   get asrSelectedService(): string {
@@ -411,17 +302,10 @@ export class AppStorageService {
   }
 
   set asrSelectedService(value: string) {
-    this.store.dispatch(fromASRActions.setASRService({
+    this.store.dispatch(fromASRActions.setASRSettings({
+      selectedLanguage: this.asrSelectedLanguage,
       selectedService: value
     }));
-    this.idb.save('options', 'asr', {
-      value: {
-        selectedLanguage: this.asrSelectedLanguage,
-        selectedService: value
-      }
-    }).catch((err) => {
-      console.error(err);
-    });
   }
 
   public get audioVolume(): number {
@@ -429,15 +313,10 @@ export class AppStorageService {
   }
 
   public set audioVolume(value: number) {
-    this.store.dispatch(fromTranscriptionActions.setAudioVolume({volume: value}));
-    this.idb.save('options', 'audioSettings', {
-      value: {
-        volume: value,
-        speed: this.audioSpeed
-      }
-    }).catch((err) => {
-      console.error(err);
-    });
+    this.store.dispatch(fromTranscriptionActions.setAudioSettings({
+      volume: value,
+      speed: this.audioSpeed
+    }));
   }
 
   public get audioSpeed(): number {
@@ -445,15 +324,10 @@ export class AppStorageService {
   }
 
   public set audioSpeed(value: number) {
-    this.store.dispatch(fromTranscriptionActions.setAudioSpeed({speed: value}));
-    this.idb.save('options', 'audioSettings', {
-      value: {
-        speed: value,
-        volume: this.audioVolume
-      }
-    }).catch((err) => {
-      console.error(err);
-    });
+    this.store.dispatch(fromTranscriptionActions.setAudioSettings({
+      speed: value,
+      volume: this.audioVolume
+    }));
   }
 
   get savingNeeded(): boolean {
@@ -486,9 +360,6 @@ export class AppStorageService {
 
   set interface(newInterface: string) {
     this.store.dispatch(fromTranscriptionActions.setCurrentEditor({currentEditor: newInterface}));
-    this.idb.save('options', 'interface', {value: newInterface}).catch((err) => {
-      console.error(err);
-    });
   }
 
   public beginLocalSession = async (files: FileProgress[], keepData: boolean) => {
@@ -516,9 +387,9 @@ export class AppStorageService {
           if (!keepData || (!isUnset(onlineSession))) {
             // last was online mode
             this.clearSession();
-            this.clearLocalStorage().then(() => {
-              loginLocal();
-            });
+            this.clearLocalStorage();
+            // TODO waiting?
+            loginLocal();
           } else {
             loginLocal();
           }
@@ -538,59 +409,32 @@ export class AppStorageService {
     );
   }
 
-  public overwriteAnnotation = (value: OIDBLevel[], saveToDB = true): Promise<any> => {
+  public overwriteAnnotation = (levels: OIDBLevel[], links: OIDBLink[], saveToDB = true): Promise<any> => {
     return new Promise<any>((resolve, reject) => {
       if (saveToDB) {
-        this.clearAnnotationData().then(() => {
-          resolve();
-        }).catch((error) => {
-          reject(error);
-        });
-      } else {
-        resolve();
-      }
-    }).then(() => {
-      this.store.dispatch(fromTranscriptionActions.setAnnotationLevels({levels: value}));
-    }).catch((err) => {
-      console.error(err);
-    }).then(() => {
-      return new Promise<any>((resolve, reject2) => {
-        if (saveToDB) {
-          this._idb.saveArraySequential(value, 'annotation_levels', 'id').then(() => {
-            resolve();
-          }).catch((error) => {
-            reject2(error);
-          });
-        } else {
-          resolve();
+        let max = 0;
+
+        for (const valueElem of levels) {
+          max = Math.max(max, valueElem.id);
         }
-      }).then(
-        () => {
-          let max = 0;
 
-          for (const valueElem of value) {
-            max = Math.max(max, valueElem.id);
-          }
-
-          this.store.dispatch(fromTranscriptionActions.setLevelCounter({
+        this.store.dispatch(fromTranscriptionActions.overwriteAnnotation({
+          annotation: {
+            levels,
+            links,
             levelCounter: max
-          }));
-        }
-      ).catch((err) => {
-        console.error(err);
-      });
+          }
+        }));
+      }
+
+      resolve();
     });
   }
 
-  public overwriteLinks = (value: OIDBLink[]): Promise<any> => {
-    return this.clearIDBTable('annotation_links')
-      .then(() => {
-        this.store.dispatch(fromTranscriptionActions.setAnnotationLinks({links: value}));
-      }).catch((err) => {
-        console.error(err);
-      }).then(() => {
-        return this._idb.saveArraySequential(value, 'annotation_links', 'id');
-      });
+  public overwriteLinks = (value: OIDBLink[]) => {
+    this.store.dispatch(fromTranscriptionActions.overwriteLinks({
+      links: value
+    }));
   }
 
   setOnlineSession(member: any, dataID: number, audioURL: string, promptText: string, serverComment: string, jobsLeft: number) {
@@ -646,10 +490,20 @@ export class AppStorageService {
     }
 
     this.store.dispatch(fromLoginActions.loginDemo({
-      audioURL,
-      serverComment,
-      jobsLeft
-    }))
+      onlineSession: {
+        id: 'demo_user',
+        project: 'demo',
+        jobNumber: -1,
+        dataID: 21343134,
+        promptText: '',
+        serverDataEntry: null,
+        comment: '',
+        password: '',
+        audioURL,
+        serverComment,
+        jobsLeft
+      }
+    }));
     this.login = true;
   }
 
@@ -681,29 +535,10 @@ export class AppStorageService {
     return (isUnset(this.sessStr.retrieve('member_id')));
   }
 
-  public clearLocalStorage(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.login = false;
-      this.store.dispatch(fromLoginActions.clearLocalSession());
-
-      const promises: Promise<any>[] = [];
-      promises.push(this.idb.save('options', 'user', {value: null}));
-      promises.push(this.idb.save('options', 'feedback', {value: null}));
-      promises.push(this.idb.save('options', 'comment', {value: ''}));
-      promises.push(this.idb.save('options', 'audioURL', {value: null}));
-      promises.push(this.idb.save('options', 'dataID', {value: null}));
-      promises.push(this.clearLoggingData());
-
-      this.clearAnnotationData().then(
-        () => {
-          Promise.all(promises).then(() => {
-            resolve();
-          }).catch((error) => {
-            reject(error);
-          });
-        }
-      );
-    });
+  public clearLocalStorage() {
+    this.login = false;
+    this.store.dispatch(fromTranscriptionActions.clearAnnotation());
+    this.store.dispatch(fromLoginActions.clearLocalSession());
   }
 
   public save(key: string, value: any): boolean {
@@ -716,33 +551,38 @@ export class AppStorageService {
 
       switch (key) {
         case 'annotation':
-          this.changeAnnotationLevel(value.num, value.level).then(
-            () => {
-              this.isSaving = false;
-              this.savingNeeded = false;
-              this.saving.emit('success');
-            }
-          ).catch((err) => {
+          this.changeAnnotationLevel(value.num, value.level);
+          // TODO wait until finished!
+          /*.then(
+          () => {
             this.isSaving = false;
             this.savingNeeded = false;
-            this.saving.emit('error');
-            console.error(`error on saving`);
-            console.error(err);
-          });
+            this.saving.emit('success');
+          }
+        ).catch((err) => {
+          this.isSaving = false;
+          this.savingNeeded = false;
+          this.saving.emit('error');
+          console.error(`error on saving`);
+          console.error(err);
+        });*/
           break;
         case 'feedback':
-          this._idb.save('options', 'feedback', {value}).then(
-            () => {
-              this.isSaving = false;
-              this.savingNeeded = false;
-              this.saving.emit('success');
-            }
-          ).catch((err) => {
-            this.isSaving = false;
+          this.store.dispatch(fromTranscriptionActions.setFeedback({
+            feedback: value
+          }));
+
+          this.isSaving = false;
+          this.savingNeeded = false;
+          this.saving.emit('success');
+
+          // TODO onError
+          /*
+          this.isSaving = false;
             this.savingNeeded = false;
             this.saving.emit('error');
             console.error(err);
-          });
+           */
           break;
         default:
           return false; // if key not found return false
@@ -752,16 +592,16 @@ export class AppStorageService {
   }
 
   public saveLogItem(log: any) {
-    if (!(log === null || log === undefined)) {
+    if (!isUnset(log)) {
       for (const attr in log) {
         if (log.hasOwnProperty(attr) && isUnset(log['' + attr])) {
           delete log['' + attr];
         }
       }
 
-      this._idb.save('logs', log.timestamp, log).catch((err) => {
-        console.error(err);
-      });
+      this.store.dispatch(fromTranscriptionActions.addLog({
+        log: log
+      }));
     } else {
       console.error('Can\'t save log because it is null.');
     }
@@ -769,153 +609,11 @@ export class AppStorageService {
 
   public endSession(): Promise<void> {
     return new Promise<void>((resolve) => {
+      // TODO wait until cleaned!
       this.clearSession();
-      this.clearLocalStorage().catch((error) => {
-        console.error(error);
-      });
+      this.clearLocalStorage();
       resolve();
     });
-  }
-
-  public load(idb: IndexedDBManager): Promise<void> {
-    console.log('load from indexedDB');
-    this._idb = idb;
-
-    return this.loadOptions(
-      [
-        {
-          attribute: '_submitted',
-          key: 'submitted'
-        },
-        {
-          attribute: '_version',
-          key: 'version'
-        },
-        {
-          attribute: '_easymode',
-          key: 'easymode'
-        },
-        {
-          attribute: '_audioURL',
-          key: 'audioURL'
-        },
-        {
-          attribute: '_comment',
-          key: 'comment'
-        },
-        {
-          attribute: '_dataID',
-          key: 'dataID'
-        },
-        {
-          attribute: '_feedback',
-          key: 'feedback'
-        },
-        {
-          attribute: '_language',
-          key: 'language'
-        },
-        {
-          attribute: '_sessionfile',
-          key: 'sessionfile'
-        },
-        {
-          attribute: '_usemode',
-          key: 'useMode'
-        },
-        {
-          attribute: '_user',
-          key: 'user'
-        },
-        {
-          attribute: '_userProfile',
-          key: 'userProfile'
-        },
-        {
-          attribute: '_interface',
-          key: 'interface'
-        },
-        {
-          attribute: '_logging',
-          key: 'logging'
-        },
-        {
-          attribute: '_showLoupe',
-          key: 'showLoupe'
-        },
-        {
-          attribute: '_prompttext',
-          key: 'prompttext'
-        },
-        {
-          attribute: '_servercomment',
-          key: 'servercomment'
-        },
-        {
-          attribute: '_secondsPerLine',
-          key: 'secondsPerLine'
-        },
-        {
-          attribute: '_audioSettings',
-          key: 'audioSettings'
-        },
-        {
-          attribute: '_asr',
-          key: 'asr'
-        },
-        {
-          attribute: '_highlightingEnabled',
-          key: 'highlightingEnabled'
-        }
-      ]
-    ).then(() => {
-      idb.getAll('logs', 'timestamp').then((logs) => {
-        this.store.dispatch(fromTranscriptionActions.setLogs({
-          logs
-        }));
-      });
-    }).then(() => {
-      idb.getAll('annotation_levels', 'id').then((levels: any[]) => {
-        const annotationLevels = [];
-        let max = 0;
-        for (let i = 0; i < levels.length; i++) {
-          if (!levels[i].hasOwnProperty('id')) {
-            annotationLevels.push(
-              {
-                id: i + 1,
-                level: levels[i],
-                sortorder: i
-              }
-            );
-            max = Math.max(i + 1, max);
-          } else {
-            annotationLevels.push(levels[i]);
-            max = Math.max(levels[i].id, max);
-          }
-        }
-        this.store.dispatch(fromTranscriptionActions.setLevelCounter({
-          levelCounter: max
-        }));
-      });
-    }).then(() => {
-      idb.getAll('annotation_links', 'id').then((links: IIDBLink[]) => {
-        const annotationLinks = [];
-        for (let i = 0; i < links.length; i++) {
-          if (!links[i].hasOwnProperty('id')) {
-            annotationLinks.push(
-              new OIDBLink(i + 1, links[i].link)
-            );
-          } else {
-            annotationLinks.push(links[i]);
-          }
-        }
-      });
-    }).then(
-      () => {
-        this.observeStore();
-        this._loaded.complete();
-      }
-    );
   }
 
   public afterSaving(): Promise<void> {
@@ -942,19 +640,7 @@ export class AppStorageService {
     ));
   }
 
-  public clearAnnotationData(): Promise<any> {
-    this.store.dispatch(fromTranscriptionActions.clearAnnotation());
-    return this.clearIDBTable('annotation_levels').then(
-      () => {
-        return this.clearIDBTable('annotation_links');
-      });
-  }
-
-  public clearOptions(): Promise<any> {
-    return this.clearIDBTable('options');
-  }
-
-  public changeAnnotationLevel(tiernum: number, level: OLevel): Promise<any> {
+  public changeAnnotationLevel(tiernum: number, level: OLevel) {
     if (!isUnset(this.annotationLevels)) {
       if (!isUnset(level)) {
         if (this.annotationLevels.length > tiernum) {
@@ -963,25 +649,17 @@ export class AppStorageService {
 
           this.store.dispatch(fromTranscriptionActions.changeAnnotationLevel({
             level,
-            index: tiernum
+            id,
+            sortorder: tiernum
           }));
-          changedLevel.level = level;
-
-          return this.idb.save('annotation_levels', id, changedLevel);
         } else {
-          return new Promise((resolve, reject) => {
-            reject(new Error('number of level that should be changed is invalid'));
-          });
+          console.error('number of level that should be changed is invalid');
         }
       } else {
-        return new Promise((resolve, reject) => {
-          reject(new Error('level is undefined or null'));
-        });
+        console.error(new Error('level is undefined or null'));
       }
     } else {
-      return new Promise((resolve, reject) => {
-        reject(new Error('annotation object is undefined or null'));
-      });
+      console.error('annotation object is undefined or null');
     }
   }
 
@@ -995,11 +673,6 @@ export class AppStorageService {
         level,
         sortorder: this.annotationLevels.length
       }));
-
-      return this.idb.save('annotation_levels', newID, {
-        id: newID,
-        level
-      });
     } else {
       return new Promise((resolve, reject2) => {
         reject2(new Error('level is undefined or null'));
@@ -1019,11 +692,8 @@ export class AppStorageService {
     }
   }
 
-  public clearLoggingData(): Promise<any> {
-    this.store.dispatch(fromTranscriptionActions.setLogs({
-      logs: []
-    }));
-    return this.clearIDBTable('logs');
+  public clearLoggingData() {
+    this.store.dispatch(fromTranscriptionActions.clearLogs());
   }
 
   public getLevelByID(id: number) {
@@ -1033,208 +703,5 @@ export class AppStorageService {
       }
     }
     return null;
-  }
-
-  public loadConsoleEntries(): Promise<ConsoleEntry[]> {
-    return new Promise<ConsoleEntry[]>((resolve, reject) => {
-      this._idb.get('options', 'console').then((entries) => {
-        resolve(entries as ConsoleEntry[]);
-      }).catch((error) => {
-        reject(error);
-      });
-    });
-  }
-
-  public saveConsoleEntries(entries: ConsoleEntry[]) {
-    if (!isUnset(this._idb)) {
-      this._idb.save('options', 'console', {value: entries}).catch((err) => {
-        console.error(err);
-      });
-    }
-  }
-
-  private loadOptions = (variables: { attribute: string, key: string }[]): Promise<void> => {
-    return new Promise<void>(
-      (resolve, reject) => {
-        const promises: Promise<any>[] = [];
-        for (const variable of variables) {
-          if (variable.hasOwnProperty('attribute') && variable.hasOwnProperty('key')) {
-            promises.push(this.loadOptionFromIDB(variable.key).then(
-              (result) => {
-                if (!(result === null || result === undefined)) {
-                  this['' + variable.attribute + ''] = result;
-                  this.saveOptionToStore(variable.attribute, result);
-                }
-              }
-            ));
-          } else {
-            console.error(Error('loadOptions: variables parameter must be of type {attribute:string, key:string}[]'));
-          }
-        }
-
-        // return when all operations have been finished
-        Promise.all(promises).then(
-          () => {
-            resolve();
-          },
-          (error) => {
-            reject(error);
-          }
-        );
-      }
-    );
-  }
-
-  private saveOptionToStore(attribute: string, value: any) {
-    console.log(`save Option ${attribute} to store with value "${JSON.stringify(value)}"...`);
-    switch (attribute) {
-      case('_submitted'):
-        this.store.dispatch(fromTranscriptionActions.setSubmitted({submitted: value}));
-        break;
-      case('_version'):
-        this.store.dispatch(fromApplicationActions.setAppVersion({version: value}));
-        break;
-      case('_easymode'):
-        this.store.dispatch(fromTranscriptionActions.setEasyMode({easyMode: value}));
-        break;
-      case('_audioURL'):
-        this.store.dispatch(fromLoginActions.setAudioURL({audioURL: value}));
-        break;
-      case('_comment'):
-        this.store.dispatch(fromLoginActions.setComment({comment: value}));
-        break;
-      case('_dataID'):
-        this.store.dispatch(fromLoginActions.setUserData({
-          project: this.onlineSession.project,
-          id: value,
-          jobNumber: this.onlineSession.jobNumber
-        }));
-        break;
-      case('_feedback'):
-        this.store.dispatch(fromTranscriptionActions.setFeedback(value));
-        break;
-      case('_interface'):
-        this.store.dispatch(fromTranscriptionActions.setCurrentEditor({currentEditor: value}));
-        break;
-      case('_language'):
-        this.store.dispatch(fromApplicationActions.setAppLanguage({language: value}));
-        break;
-      case('_sessionfile'):
-        const sessionFile = SessionFile.fromAny(value);
-        if (!isUnset(sessionFile)) {
-          this.store.dispatch(fromLoginActions.setSessionFile({sessionFile}));
-        }
-        break;
-      case('_usemode'):
-        this.store.dispatch(fromLoginActions.setMode({mode: value}));
-        break;
-      case('_user'):
-        const onlineSessionData = {
-          jobNumber: -1,
-          id: '',
-          project: ''
-        };
-
-        if (value.hasOwnProperty('id')) {
-          onlineSessionData.id = value.id;
-        }
-        if (value.hasOwnProperty('jobno')) {
-          onlineSessionData.jobNumber = value.jobno;
-        }
-
-        if (value.hasOwnProperty('project')) {
-          onlineSessionData.project = value.project;
-        }
-        this.store.dispatch(fromLoginActions.setUserData({...onlineSessionData}));
-        break;
-      case('_userProfile'):
-        const userProfile = {
-          name: '',
-          email: ''
-        };
-
-        if (value.hasOwnProperty('name')) {
-          userProfile.name = value.name;
-        }
-        if (value.hasOwnProperty('email')) {
-          userProfile.email = value.email;
-        }
-
-        this.store.dispatch(fromUserActions.setUserProfile(userProfile));
-        break;
-      case('_logging'):
-        this.store.dispatch(fromTranscriptionActions.setLogging({logging: value}));
-        break;
-      case('_showLoupe'):
-        this.store.dispatch(fromTranscriptionActions.setShowLoupe({showLoupe: value}));
-        break;
-      case('_prompttext'):
-        this.store.dispatch(fromLoginActions.setPromptText({promptText: value}));
-        break;
-      case('_servercomment'):
-        this.store.dispatch(fromLoginActions.setServerComment({serverComment: value}));
-        break;
-      case('_secondsPerLine'):
-        this.store.dispatch(fromTranscriptionActions.setSecondsPerLine({secondsPerLine: value}));
-        break;
-      case('_audioSettings'):
-        if (value.hasOwnProperty('volume')) {
-          this.store.dispatch(fromTranscriptionActions.setAudioVolume({volume: value.volume}));
-        }
-        if (value.hasOwnProperty('speed')) {
-          this.store.dispatch(fromTranscriptionActions.setAudioSpeed({speed: value.speed}));
-        }
-
-        break;
-      case('_asr'):
-        if (value.hasOwnProperty('selectedLanguage')) {
-          this.store.dispatch(fromASRActions.setASRLanguage({selectedLanguage: value.selectedLanguage}));
-        }
-        if (value.hasOwnProperty('selectedService')) {
-          this.store.dispatch(fromASRActions.setASRService({selectedService: value.selectedService}));
-        }
-        break;
-      case('_highlightingEnabled'):
-        this.store.dispatch(fromTranscriptionActions.setHighlightingEnabled({highlightingEnabled: value}));
-        break;
-      default:
-        console.error(`can't find case for attribute ${attribute}`);
-    }
-  }
-
-  /**
-   * loads the option by its key and sets its variable.
-   * Notice: the variable is defined by '_' before the key string
-   */
-  private loadOptionFromIDB(key: string): Promise<any> {
-    return new Promise<any>(
-      (resolve, reject) => {
-        if (!(this._idb === null || this._idb === undefined)) {
-          if (typeof key === 'string') {
-            this._idb.get('options', key).then(
-              (result) => {
-                const resObj = (!(result === null || result === undefined)) ? result.value : null;
-                resolve(resObj);
-              }
-            ).catch((err) => {
-              reject(err);
-            });
-          } else {
-            reject(Error('loadOptionFromIDB: method needs key of type string'));
-          }
-        } else {
-          reject(Error('loadOptionFromIDB: idb is null'));
-        }
-      }
-    );
-  }
-
-  private clearIDBTable(name: string): Promise<any> {
-    if (this._idb === undefined) {
-      return new Promise<any>((resolve) => {
-        resolve();
-      });
-    }
-    return this._idb.clear(name);
   }
 }

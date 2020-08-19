@@ -1,6 +1,7 @@
 import {IDataEntry} from '../obj/data-entry';
 import {SessionFile} from '../obj/SessionFile';
 import {OIDBLevel, OIDBLink} from '@octra/annotation';
+import {ConsoleEntry} from '../shared/service/bug-report.service';
 
 export enum LoginMode {
   URL = 'url',
@@ -58,6 +59,8 @@ export interface ApplicationState {
   },
   language: string;
   version: string;
+  appConfiguration: boolean;
+  consoleEntries: ConsoleEntry[];
 }
 
 export interface ASRState {
@@ -85,11 +88,13 @@ export interface TranscriptionState {
   },
   feedback: any;
   annotation: AnnotationState;
+  guidelines?: any;
   logs: any[];
   logging: boolean;
   easyMode: boolean;
   secondsPerLine: number;
   highlightingEnabled: boolean;
+  projectConfig?: any;
 }
 
 export interface UserState {

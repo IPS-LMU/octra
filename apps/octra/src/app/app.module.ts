@@ -114,7 +114,9 @@ import * as fromApplication from './core/store/application/application.reducer';
 import * as fromASR from './core/store/asr/asr.reducer';
 import * as fromTranscription from './core/store/transcription/transcription.reducer';
 import * as fromUser from './core/store/user/user.reducer';
-import { IDBEffects } from './core/store/idb/idb-effects.service';
+import {IDBEffects} from './core/store/idb/idb-effects.service';
+import {IDBService} from './core/shared/service/idb.service';
+import {ConfigurationEffects} from './core/store/transcription/configuration.effects';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -234,8 +236,8 @@ export class TranslocoHttpLoader implements TranslocoLoader {
         }
       }
     ),
-    StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
-    EffectsModule.forRoot([IDBEffects]),
+    StoreDevtoolsModule.instrument({maxAge: 25, logOnly: environment.production}),
+    EffectsModule.forRoot([ConfigurationEffects, IDBEffects]),
     !environment.production ? StoreDevtoolsModule.instrument() : [],
     EffectsModule.forFeature([])
   ],
@@ -252,6 +254,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     NavbarService,
     ReloadFileGuard,
     AppStorageService,
+    IDBService,
     TranscActivateGuard,
     SettingsGuard,
     SettingsService,

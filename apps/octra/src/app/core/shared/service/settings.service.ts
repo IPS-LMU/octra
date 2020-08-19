@@ -12,21 +12,18 @@ import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
 import * as Ajv from 'ajv';
 import {LoginMode} from '../../store';
+import * as fromApplication from  '../../store/application';
+import * as fromApplicationActions from  '../../store/application/application.actions';
+import * as fromConfigurationActions from  '../../store/configuration/configuration.actions';
 
 declare var validateAnnotation: ((string, any) => any);
 declare var tidyUpAnnotation: ((string, any) => any);
 
 @Injectable()
 export class SettingsService {
-  public dbloaded = new EventEmitter<any>();
-  public appsettingsloaded: EventEmitter<boolean> = new EventEmitter<boolean>();
-  public projectsettingsloaded: EventEmitter<any> = new EventEmitter<any>();
   public validationmethodloaded = new EventEmitter<void>();
   public audioloaded: EventEmitter<any> = new EventEmitter<any>();
-  public guidelinesloaded = new EventEmitter<any>();
   public audioloading = new Subject<number>();
-  private test: ReplaySubject<boolean> = new ReplaySubject<boolean>(1);
-  public settingsloaded: Observable<boolean> = this.test.asObservable();
   private subscrmanager: SubscriptionManager;
   private validation: any = {
     app: false
@@ -129,7 +126,10 @@ export class SettingsService {
   }
 
   constructor(private http: HttpClient,
-              private appStorage: AppStorageService, private api: APIService, private langService: TranslocoService) {
+              private appStorage: AppStorageService,
+              private api: APIService,
+              private langService: TranslocoService,
+              private store) {
     this.subscrmanager = new SubscriptionManager();
   }
 
@@ -138,27 +138,6 @@ export class SettingsService {
       !isUnset(queryParams.audio) &&
       !isUnset(queryParams.embedded)
     );
-  }
-
-  public static validateJSON(filename: string, json: any, schema: any): boolean {
-    if (!(json === null || json === undefined) && !(schema === null || schema === undefined)) {
-      const ajv = new Ajv(); // options can be passed, e.g. {allErrors: true}
-      const validate = ajv.compile(schema);
-      const valid = validate(json);
-      if (!valid) {
-        for (const err in validate.errors) {
-          if (validate.errors.hasOwnProperty(err)) {
-            const errObj: any = (validate.errors['' + err + '']);
-            if (errObj.hasOwnProperty('dataPath') && !(errObj.dataPath === null || errObj.dataPath === undefined)) {
-              console.error(`JSON Validation Error (${filename}): ${errObj.dataPath} ${errObj.message}`);
-            }
-          }
-        }
-      } else {
-        return true;
-      }
-    }
-    return false;
   }
 
   public loadDB = (queryParams: Params) => {
@@ -231,36 +210,6 @@ export class SettingsService {
     }).catch((error) => {
       this.dbloaded.error(error);
       console.error(error.target.error);
-    });
-  }
-
-  public loadProjectSettings: () => Promise<void> = () => {
-    return new Promise<void>((resolve, reject) => {
-      this.loadSettings(
-        {
-          loading: 'Load project settings...'
-        },
-        {
-          json: './config/localmode/projectconfig.json',
-          schema: './assets/schemata/projectconfig.schema.json'
-        },
-        {
-          json: 'projectconfig.json',
-          schema: 'projectconfig.schema.json'
-        },
-        (result: ProjectSettings) => {
-          this._projectsettings = result;
-        },
-        () => {
-          console.log('Projectconfig loaded.');
-          resolve();
-          this.projectsettingsloaded.emit(this._projectsettings);
-        },
-        (error) => {
-          console.error(error);
-          reject(error);
-        }
-      );
     });
   }
 
@@ -380,9 +329,11 @@ export class SettingsService {
   }
 
   public loadApplicationSettings(queryParams: any): Promise<void> {
+    this.store.dispatch(fromConfigurationActions.loadAppConfiguration());
+    const subject = this.store.selected
     return new Promise<void>((resolve, reject) => {
       this.subscrmanager.add(
-        this.appsettingsloaded.subscribe(this.triggerSettingsLoaded)
+        this.store.select(fromApplication.selectAppSettingsLoaded).subscribe(this.triggerSettingsLoaded)
       );
 
       this.loadSettings(
@@ -403,9 +354,6 @@ export class SettingsService {
         () => {
           console.log('AppSettings loaded.');
           this.validation.app = true;
-
-          this.appsettingsloaded.emit(true);
-          // App settings loaded
 
           // settings finally loaded
           resolve();
@@ -464,43 +412,6 @@ export class SettingsService {
   private triggerSettingsLoaded = () => {
     if (this.validated) {
       this.loaded = true;
-      this.test.next(true);
-    }
-  }
-
-  private loadSettings(messages: any, urls: any, filenames: any, onhttpreturn: (obj: any) => void, onvalidated: () => void,
-                       onerror: (error: string) => void) {
-    if (
-      messages.hasOwnProperty('loading') &&
-      urls.hasOwnProperty('json') && urls.hasOwnProperty('schema') &&
-      filenames.hasOwnProperty('json') && filenames.hasOwnProperty('schema')
-    ) {
-      this.subscrmanager.add(Functions.uniqueHTTPRequest(this.http, false, null, urls.json, null).subscribe(
-        (appsettings: AppSettings) => {
-          onhttpreturn(appsettings);
-
-          this.subscrmanager.add(Functions.uniqueHTTPRequest(this.http, false, null, urls.schema, null).subscribe(
-            (schema) => {
-              console.log(filenames.json + ' schema file loaded');
-
-              const validationOK = SettingsService.validateJSON(filenames.json, appsettings, schema);
-
-              if (validationOK) {
-                onvalidated();
-              }
-            },
-            () => {
-              console.error(filenames.schema + ' could not be loaded!');
-            }
-          ));
-        },
-        (error) => {
-          onerror(error);
-          this._log += 'Loading ' + filenames.json + ' failed<br/>';
-        }
-      ));
-    } else {
-      throw new Error('parameters of loadSettings() are not correct.');
     }
   }
 }

@@ -14,9 +14,7 @@ export const loginOnline = createAction(
 
 export const loginDemo = createAction(`[${context}] Login Demo`,
   props<{
-    audioURL: string;
-    serverComment: string;
-    jobsLeft: number;
+    onlineSession: OnlineSession
   }>());
 
 export const loginLocal = createAction(

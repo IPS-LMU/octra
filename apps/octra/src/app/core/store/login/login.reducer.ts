@@ -1,7 +1,8 @@
 import {createReducer, on} from '@ngrx/store';
 import * as LoginActions from './login.actions';
 import {LoginMode, LoginState} from '../index';
-import * as TranscriptionActions from '../transcription/transcription.actions';
+import * as fromIDBActions from '../idb/idb.actions';
+import {SessionFile} from '../../obj/SessionFile';
 
 export const initialState: LoginState = {
   loggedIn: false
@@ -9,22 +10,11 @@ export const initialState: LoginState = {
 
 export const reducer = createReducer(
   initialState,
-  on(LoginActions.loginDemo, (state, data) => ({
+  on(LoginActions.loginDemo, (state, {onlineSession}) => ({
     ...state,
     mode: LoginMode.DEMO,
-    onlineSession: {
-      id: 'demo_user',
-      project: 'demo',
-      jobNumber: -1,
-      jobsLeft: 1000,
-      dataID: 21343134,
-      promptText: '',
-      serverDataEntry: null,
-      comment: '',
-      password: '',
-      ...data,
-    },
-    loggedIn: true
+    loggedIn: true,
+    onlineSession,
   })),
   on(LoginActions.loginLocal, (state, {files, sessionFile}) => ({
     ...state,
@@ -121,6 +111,102 @@ export const reducer = createReducer(
       ...state.onlineSession,
       jobsLeft
     }
-  }))
-);
+  })),
+  on(fromIDBActions.loadOptionsSuccess, (state, {variables}) => {
+      let result = state;
+
+      for (const variable of variables) {
+        result = saveOptionToStore(state, variable.name, variable.value);
+      }
+
+      return result;
+    }
+  ));
+
+function saveOptionToStore(state: LoginState, attribute: string, value: any): LoginState {
+  console.log(`save Option ${attribute} to store with value "${JSON.stringify(value)}"...`);
+  switch (attribute) {
+    case('_audioURL'):
+      return {
+        ...state,
+        onlineSession: {
+          ...state.onlineSession,
+          audioURL: value
+        }
+      };
+    case('_comment'):
+      return {
+        ...state,
+        onlineSession: {
+          ...state.onlineSession,
+          comment: value
+        }
+      };
+    case('_dataID'):
+      return {
+        ...state,
+        onlineSession: {
+          ...state.onlineSession,
+          dataID: value
+        }
+      };
+    case('_sessionfile'):
+      const sessionFile = SessionFile.fromAny(value);
+
+      return {
+        ...state,
+        sessionFile
+      };
+    case('_usemode'):
+      return {
+        ...state,
+        mode: value
+      };
+    case('_user'):
+      const onlineSessionData = {
+        jobNumber: -1,
+        id: '',
+        project: ''
+      };
+
+      if (value.hasOwnProperty('id')) {
+        onlineSessionData.id = value.id;
+      }
+      if (value.hasOwnProperty('jobno')) {
+        onlineSessionData.jobNumber = value.jobno;
+      }
+
+      if (value.hasOwnProperty('project')) {
+        onlineSessionData.project = value.project;
+      }
+
+      return {
+        ...state,
+        onlineSession: {
+          ...state.onlineSession,
+          ...onlineSessionData
+        }
+      };
+    case('_prompttext'):
+      return {
+        ...state,
+        onlineSession: {
+          ...state.onlineSession,
+          promptText: value
+        }
+      };
+    case('_servercomment'):
+      return {
+        ...state,
+        onlineSession: {
+          ...state.onlineSession,
+          serverComment: value
+        }
+      };
+    default:
+      console.error(`can't find case for attribute ${attribute}`);
+  }
+
+  return state;
+}
 

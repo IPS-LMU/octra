@@ -13,3 +13,4 @@ export const selectFollowPlayCursor = pipe(selectTranscription, (state) => state
 export const selectLogs = pipe(selectTranscription, (state) => state.logs);
 export const selectAnnotation = pipe(selectTranscription, (state) => state.annotation);
 export const selectAnnotationLevels = pipe(selectAnnotation, (state) => state.levels);
+export const selectProjectConfig = pipe(selectTranscription, (state) => state.projectConfig);

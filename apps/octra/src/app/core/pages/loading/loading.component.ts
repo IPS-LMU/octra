@@ -9,6 +9,7 @@ import {AppStorageService} from '../../shared/service/appstorage.service';
 import {IFile, ImportResult, OAudiofile, OIDBLevel, OLevel} from '@octra/annotation';
 import {LoginMode} from '../../store';
 import * as fromLoginActions from '../../store/login/login.actions';
+import * as fromTranscriptionActions from '../../store/transcription/transcription.actions';
 import {Store} from '@ngrx/store';
 
 @Component({
@@ -285,9 +286,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
           console.error(error);
         });
       } else if (this.appStorage.loggedIn) {
-        this.settService.loadProjectSettings().catch((error) => {
-          console.error(error);
-        });
+        this.store.dispatch(fromTranscriptionActions.loadProjectConfiguration());
 
         if (this.appStorage.useMode === LoginMode.LOCAL && this.audio.audiomanagers.length === 0) {
           Functions.navigateTo(this.router, ['/user/transcr/reload-file'], AppInfo.queryParamsHandling).catch((error) => {

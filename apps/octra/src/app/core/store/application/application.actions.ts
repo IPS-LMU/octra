@@ -1,4 +1,5 @@
 import {createAction, props} from '@ngrx/store';
+import {ConsoleEntry} from '../../shared/service/bug-report.service';
 
 const context = 'Application';
 
@@ -44,4 +45,23 @@ export const setAppVersion = createAction(
     version: string;
   }>()
 );
+
+export const setConsoleEntries = createAction(
+  `[${context}] Set Console Entries`,
+  props<{
+    consoleEntries: ConsoleEntry[];
+  }>()
+);
+
+export const consoleEntriesLoadSuccess = createAction(
+  `[IDB] Console Entries Load Success`
+);
+
+export const consoleEntriesLoadFailed = createAction(
+  `[IDB] Console Entries Load Failed`,
+  props<{
+    error: string;
+  }>()
+);
+
 

@@ -32,6 +32,13 @@ export const setSubmitted = createAction(
   }>()
 );
 
+export const addLog = createAction(
+  `[${context}] add log`,
+  props<{
+    log: any;
+  }>()
+);
+
 export const setLogs = createAction(
   `[${context}] set submitted`,
   props<{
@@ -59,17 +66,11 @@ export const setCurrentEditor = createAction(
   }>()
 );
 
-export const setAudioVolume = createAction(
+export const setAudioSettings = createAction(
   `[${context}] Set volume`,
   props<{
-    volume: number
-  }>()
-);
-
-export const setAudioSpeed = createAction(
-  `[${context}] Set speed`,
-  props<{
-    speed: number
+    volume: number;
+    speed: number;
   }>()
 );
 
@@ -140,11 +141,30 @@ export const clearAnnotation = createAction(
   `[${context}] Clear annotation`
 );
 
+export const overwriteAnnotation = createAction(
+  `[${context}] Overwrite annotation`,
+  props<{
+    annotation: AnnotationState
+  }>()
+);
+
+export const overwriteLinks = createAction(
+  `[${context}] Overwrite links`,
+  props<{
+    links: OIDBLink[]
+  }>()
+);
+
+export const clearLogs = createAction(
+  `[${context}] Clear logs`
+);
+
 export const changeAnnotationLevel = createAction(
   `[ANNOTATION] Change Annotation Level`,
   props<{
-    index: number,
-    level: OLevel
+    id: number;
+    level: OLevel;
+    sortorder: number;
   }>()
 );
 

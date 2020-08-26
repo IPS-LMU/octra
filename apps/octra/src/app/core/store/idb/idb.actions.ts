@@ -1,11 +1,8 @@
 import {createAction, props} from '@ngrx/store';
 import {ConsoleEntry} from '../../shared/service/bug-report.service';
+import {OIDBLink} from '@octra/annotation';
 
 const context = 'IDB';
-
-export const loadIDB = createAction(
-  `[${context}] Load IDB`
-);
 
 export const loadOptionsSuccess = createAction(
   `[${context}] Load Options Success`,
@@ -30,6 +27,20 @@ export const loadLogsSuccess = createAction(
 
 export const loadLogsFailed = createAction(
   `[${context}] Load Logs Failed`,
+  props<{
+    error: string
+  }>()
+);
+
+export const loadAnnotationLinksSuccess = createAction(
+  `[${context}] Load AnnotationLinks Success`,
+  props<{
+    links: OIDBLink[]
+  }>()
+);
+
+export const loadAnnotationLinksFailed = createAction(
+  `[${context}] Load AnnotationLinks Failed`,
   props<{
     error: string
   }>()
@@ -70,6 +81,21 @@ export const clearLogsSuccess = createAction(
 
 export const clearLogsFailed = createAction(
   `[${context}] Clear Logs Failed`,
+  props<{
+    error: string
+  }>()
+);
+
+export const clearAllOptions = createAction(
+  `[${context}] Clear All Options`
+);
+
+export const clearAllOptionsSuccess = createAction(
+  `[${context}] Clear All Options Success`
+);
+
+export const clearAllOptionsFailed = createAction(
+  `[${context}] Clear All Options Failed`,
   props<{
     error: string
   }>()
@@ -119,12 +145,12 @@ export const saveAppLanguageFailed = createAction(
   }>()
 );
 
-export const saveAppVersionSuccess = createAction(
-  `[${context}] Save App Version Success`
+export const saveIDBVersionSuccess = createAction(
+  `[${context}] Save IDB Version Success`
 );
 
-export const saveAppVersionFailed = createAction(
-  `[${context}] Save App Version Failed`,
+export const saveIDBVersionFailed = createAction(
+  `[${context}] Save IDB Version Failed`,
   props<{
     error: string
   }>()
@@ -219,33 +245,55 @@ export const saveOnlineSessionFailed = createAction(
 );
 
 export const saveLoggedInSuccess = createAction(
-  `[${context}] Save LoggedIn Success`
+  `[SessionStore] Save LoggedIn Success`
 );
 
 export const saveLoggedInFailed = createAction(
-  `[${context}] Save LoggedIn Failed`,
+  `[SessionStore] Save LoggedIn Failed`,
   props<{
     error: string
   }>()
 );
 
 export const savePlayOnHoverSuccess = createAction(
-  `[${context}] Save PlayOnHover Success`
+  `[SessionStore] Save PlayOnHover Success`
 );
 
 export const savePlayOnHoverFailed = createAction(
-  `[${context}] Save PlayOnHover Failed`,
+  `[SessionStore] Save PlayOnHover Failed`,
+  props<{
+    error: string
+  }>()
+);
+
+export const saveFollowPlayCursorSuccess = createAction(
+  `[SessionStore] Save FollowPlayCursor Success`
+);
+
+export const saveFollowPlayCursorFailed = createAction(
+  `[SessionStore] Save FollowPlayCursor Failed`,
   props<{
     error: string
   }>()
 );
 
 export const saveAppReloadedSuccess = createAction(
-  `[${context}] Save AppReloaded Success`
+  `[SessionStore] Save AppReloaded Success`
 );
 
 export const saveAppReloadedFailed = createAction(
-  `[${context}] Save AppReloaded Failed`,
+  `[SessionStore] Save AppReloaded Failed`,
+  props<{
+    error: string
+  }>()
+);
+
+export const saveServerDataEntrySuccess = createAction(
+  `[SessionStore] Save ServerDataEntry Success`
+);
+
+export const saveServerDataEntryFailed = createAction(
+  `[SessionStore] Save ServerDataEntry Failed`,
   props<{
     error: string
   }>()

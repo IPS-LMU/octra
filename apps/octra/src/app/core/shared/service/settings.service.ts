@@ -3,31 +3,25 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {Params} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
-import {Observable, ReplaySubject, Subject, Subscription} from 'rxjs';
+import {Subject} from 'rxjs';
 
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
-import {UpdateManager} from '../UpdateManager';
 import {APIService} from './api.service';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
-import * as Ajv from 'ajv';
 import {LoginMode} from '../../store';
-import * as fromApplication from  '../../store/application';
-import * as fromApplicationActions from  '../../store/application/application.actions';
-import * as fromConfigurationActions from  '../../store/configuration/configuration.actions';
+import * as fromApplication from '../../store/application';
+import * as ConfigurationActions from '../../store/configuration/configuration.actions';
+import * as TranscriptionActions from '../../store/transcription/transcription.actions';
+import {Store} from '@ngrx/store';
 
-declare var validateAnnotation: ((string, any) => any);
-declare var tidyUpAnnotation: ((string, any) => any);
-
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class SettingsService {
-  public validationmethodloaded = new EventEmitter<void>();
   public audioloaded: EventEmitter<any> = new EventEmitter<any>();
   public audioloading = new Subject<number>();
   private subscrmanager: SubscriptionManager;
-  private validation: any = {
-    app: false
-  };
 
   public get isASREnabled(): boolean {
     return (!isUnset(this.appSettings.octra.plugins.asr) &&
@@ -40,20 +34,18 @@ export class SettingsService {
     );
   }
 
-  get validated(): boolean {
-    return this.validation.app;
-  }
-
   get responsive(): {
     enabled: boolean,
     fixedwidth: number
   } {
-    if (!(this.projectsettings === null || this.projectsettings === undefined)
-      && !(this.projectsettings.responsive === null || this.projectsettings.responsive === undefined)) {
+    if (!isUnset(this.projectsettings)
+      && !isUnset(this.projectsettings.responsive)) {
       return this.projectsettings.responsive;
-
     } else {
-      return this.appSettings.octra.responsive;
+      return (!isUnset(this.appSettings?.octra.responsive)) ? this.appSettings?.octra.responsive : {
+        enabled: true,
+        fixedwidth: 1079
+      };
     }
   }
 
@@ -63,22 +55,16 @@ export class SettingsService {
     );
   }
 
-  private _projectsettings: ProjectSettings;
-
   get projectsettings(): ProjectSettings {
-    return this._projectsettings;
+    return this.appStorage.snapshot.transcription.projectConfig;
   }
-
-  private _appSettings: AppSettings;
 
   get appSettings(): AppSettings {
-    return this._appSettings;
+    return this.appStorage.snapshot.application.appConfiguration;
   }
 
-  private _guidelines: any;
-
   get guidelines(): any {
-    return this._guidelines;
+    return this.appStorage.snapshot.transcription.guidelines;
   }
 
   private _loaded = false;
@@ -107,16 +93,12 @@ export class SettingsService {
     return this._filename;
   }
 
-  private _validationmethod: (str: string, obj: any) => any[] = null;
-
   get validationmethod(): (str: string, obj: any) => any[] {
-    return this._validationmethod;
+    return this.appStorage.snapshot.transcription.methods.validate;
   }
 
-  private _tidyUpMethod: (str: string, obj: any) => string = null;
-
   get tidyUpMethod(): (str: string, obj: any) => string {
-    return this._tidyUpMethod;
+    return this.appStorage.snapshot.transcription.methods.tidyUp;
   }
 
   private _isDBLoadded = false;
@@ -129,7 +111,7 @@ export class SettingsService {
               private appStorage: AppStorageService,
               private api: APIService,
               private langService: TranslocoService,
-              private store) {
+              private store: Store) {
     this.subscrmanager = new SubscriptionManager();
   }
 
@@ -150,127 +132,54 @@ export class SettingsService {
       console.log('appRoute has no params');
     }
 
-    const umanager = new UpdateManager(this.appStorage);
-    umanager.checkForUpdates(this.appSettings.octra.database.name).then((idb) => {
-      const transcriptURL = (queryParams.transcript !== undefined)
-        ? queryParams.transcript : null;
 
-      // load from indexedDB
-      this.appStorage.load(idb).then(
-        () => {
-          // define languages
-          const languages = this.appSettings.octra.languages;
-          // @ts-ignore
-          const browserLang = navigator.language || navigator.userLanguage;
+    const transcriptURL = (queryParams.transcript !== undefined)
+      ? queryParams.transcript : null;
 
-          // check if browser language is available in translations
-          if ((this.appStorage.language === null || this.appStorage.language === undefined) || this.appStorage.language === '') {
-            if ((this.appSettings.octra.languages.find((value) => {
-              return value === browserLang;
-            })) !== undefined) {
-              this.langService.setActiveLang(browserLang);
-            } else {
-              // use first language defined as default language
-              this.langService.setActiveLang(languages[0]);
-            }
-          } else {
-            if ((this.appSettings.octra.languages.find((value) => {
-              return value === this.appStorage.language;
-            })) !== undefined) {
-              this.langService.setActiveLang(this.appStorage.language);
-            } else {
-              this.langService.setActiveLang(languages[0]);
-            }
-          }
+    Functions.afterTrue(this.store.select(fromApplication.selectIDBLoaded)).then(() => {
+      console.log(`selectIDBLoaded is true!`);
+      // define languages
+      const languages = this.appSettings.octra.languages;
+      // @ts-ignore
+      const browserLang = navigator.language || navigator.userLanguage;
 
-          // if url mode, set it in options
-          if (SettingsService.queryParamsSet(queryParams)) {
-            this.appStorage.setURLSession(queryParams.audio, transcriptURL, (queryParams.embedded === '1'), queryParams.host);
-          }
-
-          if (this.validated) {
-
-            // settings have been loaded
-            if ((this.appSettings === null || this.appSettings === undefined)) {
-              throw new Error('config.json does not exist');
-            } else {
-              if (this.validated) {
-                this.api.init(this.appSettings.audio_server.url + 'WebTranscribe');
-              }
-            }
-          }
-          umanager.destroy();
-          this._isDBLoadded = true;
-          this.dbloaded.emit();
+      // check if browser language is available in translations
+      if ((this.appStorage.language === null || this.appStorage.language === undefined) || this.appStorage.language === '') {
+        if ((this.appSettings.octra.languages.find((value) => {
+          return value === browserLang;
+        })) !== undefined) {
+          this.langService.setActiveLang(browserLang);
+        } else {
+          // use first language defined as default language
+          this.langService.setActiveLang(languages[0]);
         }
-      ).catch((error) => {
-        this.dbloaded.error(error);
-        console.error(error);
-      });
+      } else {
+        if ((this.appSettings.octra.languages.find((value) => {
+          return value === this.appStorage.language;
+        })) !== undefined) {
+          this.langService.setActiveLang(this.appStorage.language);
+        } else {
+          this.langService.setActiveLang(languages[0]);
+        }
+      }
+
+      // if url mode, set it in options
+      if (SettingsService.queryParamsSet(queryParams)) {
+        this.appStorage.setURLSession(queryParams.audio, transcriptURL, (queryParams.embedded === '1'), queryParams.host);
+      }
+
+      // settings have been loaded
+      if ((this.appSettings === null || this.appSettings === undefined)) {
+        throw new Error('config.json does not exist');
+      } else {
+        this.api.init(this.appSettings.audio_server.url + 'WebTranscribe');
+      }
+      this._isDBLoadded = true;
     }).catch((error) => {
-      this.dbloaded.error(error);
-      console.error(error.target.error);
+      console.error(error);
     });
   }
 
-  public loadGuidelines = (language: string, url: string) => {
-    this.loadSettings(
-      {
-        loading: 'Load guidelines (' + language + ')...'
-      },
-      {
-        json: url,
-        schema: './assets/schemata/guidelines.schema.json'
-      },
-      {
-        json: 'guidelines_' + language + '.json',
-        schema: 'guidelines.schema.json'
-      },
-      (result) => {
-        this._guidelines = result;
-      },
-      () => {
-        console.log('Guidelines loaded.');
-        this.loadValidationMethod(this._guidelines.meta.validation_url);
-        this.guidelinesloaded.emit(this._guidelines);
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
-  }
-  public loadValidationMethod: ((url: string) => Subscription) = (url: string) => {
-    console.log('Load methods...');
-    return Functions.uniqueHTTPRequest(this.http, false, {
-      responseType: 'text'
-    }, url, null).subscribe(
-      () => {
-        const js = document.createElement('script');
-
-        js.type = 'text/javascript';
-        js.src = url;
-        js.id = 'validationJS';
-        js.onload = () => {
-          if (
-            (typeof validateAnnotation !== 'undefined') && typeof validateAnnotation === 'function' &&
-            (typeof tidyUpAnnotation !== 'undefined') && typeof tidyUpAnnotation === 'function'
-          ) {
-            this._validationmethod = validateAnnotation;
-            this._tidyUpMethod = tidyUpAnnotation;
-            console.log('Methods loaded.');
-            this.validationmethodloaded.emit();
-          } else {
-            this._log += 'Loading functions failed [Error: S02]';
-          }
-        };
-        document.body.appendChild(js);
-      },
-      () => {
-        console.error('Loading functions failed [Error: S01]');
-        this.validationmethodloaded.emit();
-      }
-    );
-  }
   public loadAudioFile: ((audioService: AudioService) => void) = (audioService: AudioService) => {
     console.log('Load audio file 2...');
     if (isUnset(this.appStorage.useMode)) {
@@ -329,42 +238,22 @@ export class SettingsService {
   }
 
   public loadApplicationSettings(queryParams: any): Promise<void> {
-    this.store.dispatch(fromConfigurationActions.loadAppConfiguration());
-    const subject = this.store.selected
+    this.store.dispatch(ConfigurationActions.loadAppConfiguration());
     return new Promise<void>((resolve, reject) => {
-      this.subscrmanager.add(
-        this.store.select(fromApplication.selectAppSettingsLoaded).subscribe(this.triggerSettingsLoaded)
-      );
-
-      this.loadSettings(
-        {
-          loading: 'Load application settings...'
-        },
-        {
-          json: './config/appconfig.json',
-          schema: './assets/schemata/appconfig.schema.json'
-        },
-        {
-          json: 'appconfig.json',
-          schema: 'appconfig.schema.json'
-        },
-        (result: AppSettings) => {
-          this._appSettings = result;
-        },
-        () => {
+      const subscr = this.store.select(fromApplication.selectAppSettings).subscribe((appConfig) => {
+        if (!isUnset(appConfig)) {
+          subscr.unsubscribe();
           console.log('AppSettings loaded.');
-          this.validation.app = true;
 
           // settings finally loaded
           resolve();
 
           this.loadDB(queryParams);
-        },
-        (error) => {
-          console.error(error);
-          reject();
+          this.triggerSettingsLoaded();
         }
-      );
+      }, (error) => {
+        reject(error);
+      });
     });
   }
 
@@ -373,10 +262,7 @@ export class SettingsService {
   }
 
   public clearSettings() {
-    this._guidelines = null;
-    this._projectsettings = null;
-    this._validationmethod = null;
-    this._tidyUpMethod = null;
+    this.store.dispatch(TranscriptionActions.clearSettings());
   }
 
   /**
@@ -409,9 +295,14 @@ export class SettingsService {
     return undefined;
   }
 
+
+  public loadGuidelines = () => {
+    this.store.dispatch(ConfigurationActions.loadGuidelines({
+      projectConfig: this.projectsettings
+    }));
+  }
+
   private triggerSettingsLoaded = () => {
-    if (this.validated) {
-      this.loaded = true;
-    }
+    this.loaded = true;
   }
 }

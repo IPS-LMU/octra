@@ -1,8 +1,7 @@
 import {createReducer, on} from '@ngrx/store';
 import * as ApplicationActions from './application.actions';
-import * as fromApplicationActions from './application.actions';
-import * as fromConfigurationActions from '../configuration/configuration.actions';
-import * as fromIDBActions from '../idb/idb.actions';
+import * as ConfigurationActions from '../configuration/configuration.actions';
+import * as IDBActions from '../idb/idb.actions';
 import {ApplicationState, LoadingStatus} from '../index';
 
 export const initialState: ApplicationState = {
@@ -13,11 +12,11 @@ export const initialState: ApplicationState = {
   },
   reloaded: false,
   idb: {
-    loaded: false
+    loaded: false,
+    version: '1.0.0'
   },
   language: 'en',
-  version: '1.0.0',
-  appConfiguration: false,
+  appConfiguration: undefined,
   consoleEntries: []
 };
 
@@ -39,13 +38,6 @@ export const reducer = createReducer(
       errors: [...state.loading.errors, error]
     }
   })),
-  on(ApplicationActions.setIDBLoaded, (state, {loaded}) => ({
-    ...state,
-    idb: {
-      ...state,
-      loaded
-    }
-  })),
   on(ApplicationActions.setReloaded, (state, {reloaded}) => ({
     ...state,
     reloaded
@@ -61,37 +53,77 @@ export const reducer = createReducer(
     ...state,
     language
   })),
-  on(ApplicationActions.setAppVersion, (state, {version}) => ({
+  on(ApplicationActions.setDBVersion, (state, {version}) => ({
     ...state,
     version
   })),
-  on(fromConfigurationActions.appConfigurationLoadSuccess, (state) => ({
+  on(ConfigurationActions.appConfigurationLoadSuccess, (state) => ({
     ...state,
     appSettingsLoaded: true
   })),
-  on(fromApplicationActions.setConsoleEntries, (state, {consoleEntries}) => ({
+  on(ApplicationActions.setConsoleEntries, (state, {consoleEntries}) => ({
     ...state,
     consoleEntries
   })),
-  on(fromIDBActions.loadOptionsSuccess, (state, {variables}) => {
+  on(IDBActions.loadOptionsSuccess, (state, {variables}) => {
     let result = state;
 
     for (const variable of variables) {
-      result = saveOptionToStore(state, variable.name, variable.value);
+      result = saveOptionToStore(result, variable.name, variable.value);
     }
 
+    console.log(`Options saved in application new State is`);
+    console.log(result);
     return result;
-  })
+  }),
+  on(ConfigurationActions.appConfigurationLoadSuccess, (state, {appConfiguration}) => ({
+    ...state,
+    loading: {
+      ...state.loading,
+      progress: state.loading.progress + 25
+    },
+    appConfiguration
+  })),
+  on(ConfigurationActions.loadGuidelinesSuccess, (state) => ({
+    ...state,
+    loading: {
+      ...state.loading,
+      progress: state.loading.progress + 25
+    }
+  })),
+  on(ConfigurationActions.projectConfigurationLoaded, (state) => ({
+    ...state,
+    loading: {
+      ...state.loading,
+      progress: state.loading.progress + 25
+    }
+  })),
+  on(ConfigurationActions.loadMethodsSuccess, (state) => ({
+    ...state,
+    loading: {
+      ...state.loading,
+      progress: state.loading.progress + 25
+    }
+  })),
+  on(IDBActions.loadAnnotationLinksSuccess, (state) => ({
+    ...state,
+    idb: {
+      ...state.idb,
+      loaded: true
+    }
+  }))
 );
 
 
 function saveOptionToStore(state: ApplicationState, attribute: string, value: any): ApplicationState {
-  console.log(`save Option ${attribute} to store with value "${JSON.stringify(value)}"...`);
   switch (attribute) {
     case('_version'):
       return {
         ...state,
-        version: value
+        idb: {
+          ...state.idb,
+          version: value
+        }
       };
     case('_language'):
       return {
@@ -99,7 +131,6 @@ function saveOptionToStore(state: ApplicationState, attribute: string, value: an
         language: value
       };
     default:
-      console.error(`can't find case for attribute ${attribute}`);
       return state;
   }
 }

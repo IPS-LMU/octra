@@ -21,7 +21,9 @@ import {
   IFile,
   Level,
   OAnnotJSON,
-  OAudiofile, OIDBLevel,
+  OAudiofile,
+  OIDBLevel,
+  OIDBLink,
   OLabel,
   OLevel,
   OSegment,
@@ -310,13 +312,19 @@ export class TranscriptionService {
       (resolve, reject) => {
         new Promise<void>((resolve2) => {
           if (isUnset(this.appStorage.annotationLevels) || this.appStorage.annotationLevels.length === 0) {
-            const newLevels = [];
-            const levels = this.createNewAnnotation().levels;
+            const newLevels: OIDBLevel[] = [];
+            const newLinks: OIDBLink[] = [];
+            const newAnnotJSON = this.createNewAnnotation();
+            const levels = newAnnotJSON.levels;
             for (let i = 0; i < levels.length; i++) {
               newLevels.push(new OIDBLevel(i + 1, levels[i], i));
             }
 
-            this.appStorage.overwriteAnnotation(newLevels).then(() => {
+            for (let i = 0; i < newAnnotJSON.links.length; i++) {
+              newLinks.push(new OIDBLink(i + 1, newAnnotJSON.links[i]));
+            }
+
+            this.appStorage.overwriteAnnotation(newLevels, newLinks).then(() => {
                 if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.URL) {
                   this.appStorage.annotationLevels[this._selectedlevel].level.items = [];
 
@@ -333,17 +341,8 @@ export class TranscriptionService {
                       );
 
                       this.appStorage.changeAnnotationLevel(this._selectedlevel,
-                        this.appStorage.annotationLevels[this._selectedlevel].level)
-                        .then(() => {
-                          resolve2();
-                        })
-                        .catch(
-                          (err) => {
-                            console.error(`error on overwriting annotation`);
-                            console.error(err);
-                            resolve2();
-                          }
-                        );
+                        this.appStorage.annotationLevels[this._selectedlevel].level);
+                      resolve2();
                     } else {
                       console.log(`read serverData entry...`);
                       this.appStorage.annotationLevels[this._selectedlevel].level.items = [];
@@ -357,16 +356,7 @@ export class TranscriptionService {
 
                       this.appStorage.changeAnnotationLevel(this._selectedlevel,
                         this.appStorage.annotationLevels[this._selectedlevel].level)
-                        .then(() => {
-                          resolve2();
-                        })
-                        .catch(
-                          (err) => {
-                            console.error(`error on overwriting annotation`);
-                            console.error(err);
-                            resolve2();
-                          }
-                        );
+                      resolve2();
                     }
                   } else if (!isUnset(this.appStorage.prompttext) && this.appStorage.prompttext !== ''
                     && typeof this.appStorage.prompttext === 'string') {
@@ -402,33 +392,19 @@ export class TranscriptionService {
 
                       this.appStorage.changeAnnotationLevel(this._selectedlevel,
                         this.appStorage.annotationLevels[this._selectedlevel].level)
-                        .then(() => {
-                          resolve2();
-                        })
-                        .catch(
-                          (err) => {
-                            console.error(`error on overwriting annotation`);
-                            console.error(err);
-                            resolve2();
-                          }
-                        );
+                      resolve2();
                     } else {
                       // use imported annotJSON
                       const promises: Promise<any>[] = [];
                       for (let i = 0; i < converted.levels.length; i++) {
                         if (i >= this.appStorage.annotationLevels.length) {
-                          this.appStorage.annotationLevels.push(new OIDBLevel(i + 1, converted.levels[i], i));
+                          this.appStorage.addAnnotationLevel(converted.levels[i]);
                         } else {
-                          promises.push(this.appStorage.changeAnnotationLevel(i, converted.levels[i]));
+                          this.appStorage.changeAnnotationLevel(i, converted.levels[i]);
                         }
                       }
 
-                      Promise.all(promises).then(() => {
-                        resolve2();
-                      }).catch((error) => {
-                        console.error(error);
-                        resolve2();
-                      });
+                      resolve2();
                     }
                   } else {
                     resolve2();
@@ -472,9 +448,7 @@ export class TranscriptionService {
             }
 
             if (this.appStorage.logs === null) {
-              this.appStorage.clearLoggingData().catch((error) => {
-                console.error(error);
-              });
+              this.appStorage.clearLoggingData();
               this.uiService.elements = [];
             } else {
               this.uiService.fromAnyArray(this.appStorage.logs);

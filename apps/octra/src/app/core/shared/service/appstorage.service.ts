@@ -10,24 +10,21 @@ import {OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
 import {LoginMode, OnlineSession, RootState} from '../../store';
 import {Store} from '@ngrx/store';
 import {AudioManager} from '@octra/media';
-import * as fromApplicationActions from '../../store/application/application.actions';
-import * as fromLoginActions from '../../store/login/login.actions';
-import * as fromASRActions from '../../store/asr/asr.actions';
-import * as fromTranscriptionActions from '../../store/transcription/transcription.actions';
+import * as ApplicationActions from '../../store/application/application.actions';
+import * as LoginActions from '../../store/login/login.actions';
+import * as ASRActions from '../../store/asr/asr.actions';
+import * as TranscriptionActions from '../../store/transcription/transcription.actions';
 import * as fromTranscriptionReducer from '../../store/transcription/transcription.reducer';
-import * as fromUserActions from '../../store/user/user.actions';
-import * as fromIDBActions from '../../store/idb/idb.actions'
-import {Actions} from '@ngrx/effects';
+import * as UserActions from '../../store/user/user.actions';
+import {act, Actions} from '@ngrx/effects';
 import {ConsoleEntry} from './bug-report.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AppStorageService {
   get snapshot(): RootState {
     return this._snapshot;
-  }
-
-  set snapshot(value: RootState) {
-    this._snapshot = value;
   }
 
   get loaded(): EventEmitter<any> {
@@ -39,25 +36,25 @@ export class AppStorageService {
   }
 
   set userProfile(value: { name: string; email: string }) {
-    this.store.dispatch(fromUserActions.setUserProfile(value));
+    this.store.dispatch(UserActions.setUserProfile(value));
   }
 
   set playonhover(value: boolean) {
-    this.store.dispatch(fromTranscriptionActions.setPlayOnHover({playOnHover: value}));
+    this.store.dispatch(TranscriptionActions.setPlayOnHover({playOnHover: value}));
   }
 
   set reloaded(value: boolean) {
-    this.store.dispatch(fromApplicationActions.setReloaded({
+    this.store.dispatch(ApplicationActions.setReloaded({
       reloaded: value
     }));
   }
 
   set serverDataEntry(value: IDataEntry) {
-    this.store.dispatch(fromLoginActions.setServerDataEntry({serverDataEntry: value}));
+    this.store.dispatch(LoginActions.setServerDataEntry({serverDataEntry: value}));
   }
 
   set submitted(value: boolean) {
-    this.store.dispatch(fromTranscriptionActions.setSubmitted({submitted: value}));
+    this.store.dispatch(TranscriptionActions.setSubmitted({submitted: value}));
   }
 
   get feedback(): any {
@@ -65,7 +62,7 @@ export class AppStorageService {
   }
 
   set feedback(value: any) {
-    this.store.dispatch(fromTranscriptionActions.setFeedback({feedback: value}));
+    this.store.dispatch(TranscriptionActions.setFeedback({feedback: value}));
   }
 
   get dataID(): number {
@@ -77,16 +74,16 @@ export class AppStorageService {
   }
 
   set language(value: string) {
-    this.store.dispatch(fromApplicationActions.setAppLanguage({language: value}));
+    this.store.dispatch(ApplicationActions.setAppLanguage({language: value}));
   }
 
   /* Getter/Setter IDB Storage */
-  get version(): string {
-    return this._snapshot.application.version;
+  get dbVersion(): string {
+    return this._snapshot.application.idb.version;
   }
 
-  set version(value: string) {
-    this.store.dispatch(fromApplicationActions.setAppVersion({version: value}));
+  set dbVersion(value: string) {
+    this.store.dispatch(ApplicationActions.setDBVersion({version: value}));
   }
 
   get logging(): boolean {
@@ -94,7 +91,7 @@ export class AppStorageService {
   }
 
   set logging(value: boolean) {
-    this.store.dispatch(fromTranscriptionActions.setLogging({
+    this.store.dispatch(TranscriptionActions.setLogging({
       logging: value
     }));
   }
@@ -108,13 +105,13 @@ export class AppStorageService {
   }
 
   set consoleEntries(consoleEntries: ConsoleEntry[]) {
-    this.store.dispatch(fromApplicationActions.setConsoleEntries({
+    this.store.dispatch(ApplicationActions.setConsoleEntries({
       consoleEntries
     }))
   }
 
   set showLoupe(value: boolean) {
-    this.store.dispatch(fromTranscriptionActions.setShowLoupe({
+    this.store.dispatch(TranscriptionActions.setShowLoupe({
       showLoupe: value
     }));
   }
@@ -132,7 +129,7 @@ export class AppStorageService {
   }
 
   set easymode(value: boolean) {
-    this.store.dispatch(fromTranscriptionActions.setEasyMode({
+    this.store.dispatch(TranscriptionActions.setEasyMode({
       easyMode: value
     }));
   }
@@ -142,7 +139,7 @@ export class AppStorageService {
   }
 
   set comment(value: string) {
-    this.store.dispatch(fromLoginActions.setComment({
+    this.store.dispatch(LoginActions.setComment({
       comment: value
     }));
   }
@@ -164,7 +161,7 @@ export class AppStorageService {
   }
 
   set levelcounter(value: number) {
-    this.store.dispatch(fromTranscriptionActions.setLevelCounter({levelCounter: value}));
+    this.store.dispatch(TranscriptionActions.setLevelCounter({levelCounter: value}));
   }
 
   get secondsPerLine(): number {
@@ -172,7 +169,7 @@ export class AppStorageService {
   }
 
   set secondsPerLine(value: number) {
-    this.store.dispatch(fromTranscriptionActions.setSecondsPerLine({
+    this.store.dispatch(TranscriptionActions.setSecondsPerLine({
       secondsPerLine: value
     }));
     this.settingschange.next({
@@ -186,7 +183,7 @@ export class AppStorageService {
   }
 
   set highlightingEnabled(value: boolean) {
-    this.store.dispatch(fromTranscriptionActions.setHighlightingEnabled({
+    this.store.dispatch(TranscriptionActions.setHighlightingEnabled({
       highlightingEnabled: value
     }));
   }
@@ -196,18 +193,17 @@ export class AppStorageService {
               private store: Store<RootState>,
               private actions: Actions) {
     this.subscrManager.add(actions.subscribe((action) => {
+      console.log(`Action: ${action.type}`);
       if (action.type === '@ngrx/effects/init') {
-        this.store.dispatch(fromTranscriptionActions.setTranscriptionState({
+        this.store.dispatch(TranscriptionActions.setTranscriptionState({
           ...fromTranscriptionReducer.initialState,
           playOnHover: this.sessStr.retrieve('playonhover'),
           followPlayCursor: this.sessStr.retrieve('followplaycursor')
         }));
 
-        this.store.dispatch(fromLoginActions.setJobsLeft({jobsLeft: this.sessStr.retrieve('jobsLeft')}));
+        this.store.dispatch(LoginActions.setJobsLeft({jobsLeft: this.sessStr.retrieve('jobsLeft')}));
 
-        this.store.dispatch(fromIDBActions.loadIDB());
-
-        this.store.dispatch(fromLoginActions.setLoggedIn({
+        this.store.dispatch(LoginActions.setLoggedIn({
           loggedIn: this.sessStr.retrieve('loggedIn')
         }));
         this.reloaded = this.sessStr.retrieve('reloaded');
@@ -233,11 +229,11 @@ export class AppStorageService {
   private _snapshot: RootState;
 
   set savingNeeded(value: boolean) {
-    this.store.dispatch(fromTranscriptionActions.setSavingNeeded({savingNeeded: value}));
+    this.store.dispatch(TranscriptionActions.setSavingNeeded({savingNeeded: value}));
   }
 
   set followPlayCursor(value: boolean) {
-    this.store.dispatch(fromTranscriptionActions.setFollowPlayCursor({
+    this.store.dispatch(TranscriptionActions.setFollowPlayCursor({
       followPlayCursor: value
     }));
   }
@@ -283,7 +279,7 @@ export class AppStorageService {
   }
 
   setLogs(value: any[]) {
-    this.store.dispatch(fromTranscriptionActions.setLogs({logs: value}));
+    this.store.dispatch(TranscriptionActions.setLogs({logs: value}));
   }
 
   get asrSelectedLanguage(): string {
@@ -291,7 +287,7 @@ export class AppStorageService {
   }
 
   set asrSelectedLanguage(value: string) {
-    this.store.dispatch(fromASRActions.setASRSettings({
+    this.store.dispatch(ASRActions.setASRSettings({
       selectedLanguage: value,
       selectedService: this.asrSelectedService
     }));
@@ -302,7 +298,7 @@ export class AppStorageService {
   }
 
   set asrSelectedService(value: string) {
-    this.store.dispatch(fromASRActions.setASRSettings({
+    this.store.dispatch(ASRActions.setASRSettings({
       selectedLanguage: this.asrSelectedLanguage,
       selectedService: value
     }));
@@ -313,7 +309,7 @@ export class AppStorageService {
   }
 
   public set audioVolume(value: number) {
-    this.store.dispatch(fromTranscriptionActions.setAudioSettings({
+    this.store.dispatch(TranscriptionActions.setAudioSettings({
       volume: value,
       speed: this.audioSpeed
     }));
@@ -324,7 +320,7 @@ export class AppStorageService {
   }
 
   public set audioSpeed(value: number) {
-    this.store.dispatch(fromTranscriptionActions.setAudioSettings({
+    this.store.dispatch(TranscriptionActions.setAudioSettings({
       speed: value,
       volume: this.audioVolume
     }));
@@ -339,7 +335,7 @@ export class AppStorageService {
   }
 
   set isSaving(value: boolean) {
-    this.store.dispatch(fromTranscriptionActions.setIsSaving({isSaving: value}));
+    this.store.dispatch(TranscriptionActions.setIsSaving({isSaving: value}));
   }
 
   get audioURL(): string {
@@ -359,7 +355,7 @@ export class AppStorageService {
   }
 
   set interface(newInterface: string) {
-    this.store.dispatch(fromTranscriptionActions.setCurrentEditor({currentEditor: newInterface}));
+    this.store.dispatch(TranscriptionActions.setCurrentEditor({currentEditor: newInterface}));
   }
 
   public beginLocalSession = async (files: FileProgress[], keepData: boolean) => {
@@ -418,12 +414,13 @@ export class AppStorageService {
           max = Math.max(max, valueElem.id);
         }
 
-        this.store.dispatch(fromTranscriptionActions.overwriteAnnotation({
+        this.store.dispatch(TranscriptionActions.overwriteAnnotation({
           annotation: {
             levels,
             links,
             levelCounter: max
-          }
+          },
+          saveToDB
         }));
       }
 
@@ -432,7 +429,7 @@ export class AppStorageService {
   }
 
   public overwriteLinks = (value: OIDBLink[]) => {
-    this.store.dispatch(fromTranscriptionActions.overwriteLinks({
+    this.store.dispatch(TranscriptionActions.overwriteLinks({
       links: value
     }));
   }
@@ -447,7 +444,7 @@ export class AppStorageService {
     }
 
     if (!this.login && !isUnset(member)) {
-      this.store.dispatch(fromLoginActions.loginOnline({
+      this.store.dispatch(LoginActions.loginOnline({
         onlineSession: {
           dataID,
           audioURL,
@@ -476,7 +473,7 @@ export class AppStorageService {
       this.interface = '2D-Editor';
     }
 
-    this.store.dispatch(fromLoginActions.loginLocal({files, sessionFile}));
+    this.store.dispatch(LoginActions.loginLocal({files, sessionFile}));
     this.login = true;
   }
 
@@ -489,7 +486,7 @@ export class AppStorageService {
       this.interface = '2D-Editor';
     }
 
-    this.store.dispatch(fromLoginActions.loginDemo({
+    this.store.dispatch(LoginActions.loginDemo({
       onlineSession: {
         id: 'demo_user',
         project: 'demo',
@@ -516,7 +513,7 @@ export class AppStorageService {
       this.interface = '2D-Editor';
     }
 
-    this.store.dispatch(fromLoginActions.loginURLParameters({
+    this.store.dispatch(LoginActions.loginURLParameters({
       urlParams: {
         audio,
         transcript,
@@ -529,7 +526,7 @@ export class AppStorageService {
 
   public clearSession(): boolean {
     this.login = false;
-    this.store.dispatch(fromLoginActions.clearOnlineSession());
+    this.store.dispatch(LoginActions.clearOnlineSession());
 
     this.sessStr.clear();
     return (isUnset(this.sessStr.retrieve('member_id')));
@@ -537,8 +534,8 @@ export class AppStorageService {
 
   public clearLocalStorage() {
     this.login = false;
-    this.store.dispatch(fromTranscriptionActions.clearAnnotation());
-    this.store.dispatch(fromLoginActions.clearLocalSession());
+    this.store.dispatch(TranscriptionActions.clearAnnotation());
+    this.store.dispatch(LoginActions.clearLocalSession());
   }
 
   public save(key: string, value: any): boolean {
@@ -568,7 +565,7 @@ export class AppStorageService {
         });*/
           break;
         case 'feedback':
-          this.store.dispatch(fromTranscriptionActions.setFeedback({
+          this.store.dispatch(TranscriptionActions.setFeedback({
             feedback: value
           }));
 
@@ -599,7 +596,7 @@ export class AppStorageService {
         }
       }
 
-      this.store.dispatch(fromTranscriptionActions.addLog({
+      this.store.dispatch(TranscriptionActions.addLog({
         log: log
       }));
     } else {
@@ -632,14 +629,6 @@ export class AppStorageService {
     });
   }
 
-  private observeStore() {
-    this.subscrManager.add(this.store.subscribe(
-      (state) => {
-        console.log(state);
-      }
-    ));
-  }
-
   public changeAnnotationLevel(tiernum: number, level: OLevel) {
     if (!isUnset(this.annotationLevels)) {
       if (!isUnset(level)) {
@@ -647,7 +636,7 @@ export class AppStorageService {
           const changedLevel = this.annotationLevels[tiernum];
           const id = changedLevel.id;
 
-          this.store.dispatch(fromTranscriptionActions.changeAnnotationLevel({
+          this.store.dispatch(TranscriptionActions.changeAnnotationLevel({
             level,
             id,
             sortorder: tiernum
@@ -663,26 +652,24 @@ export class AppStorageService {
     }
   }
 
-  public addAnnotationLevel(level: OLevel): Promise<any> {
+  public addAnnotationLevel(level: OLevel) {
     if (!isUnset(level)) {
       const newID = this.levelcounter + 1;
       this.levelcounter = newID;
 
-      this.store.dispatch(fromTranscriptionActions.addAnnotationLevel({
+      this.store.dispatch(TranscriptionActions.addAnnotationLevel({
         id: newID,
         level,
         sortorder: this.annotationLevels.length
       }));
     } else {
-      return new Promise((resolve, reject2) => {
-        reject2(new Error('level is undefined or null'));
-      });
+      console.error('level is undefined or null');
     }
   }
 
   public removeAnnotationLevel(id: number): Promise<any> {
     if (id > -1) {
-      this.store.dispatch(fromTranscriptionActions.removeAnnotationLevel({
+      this.store.dispatch(TranscriptionActions.removeAnnotationLevel({
         id
       }));
     } else {
@@ -693,7 +680,7 @@ export class AppStorageService {
   }
 
   public clearLoggingData() {
-    this.store.dispatch(fromTranscriptionActions.clearLogs());
+    this.store.dispatch(TranscriptionActions.clearLogs());
   }
 
   public getLevelByID(id: number) {
@@ -703,5 +690,9 @@ export class AppStorageService {
       }
     }
     return null;
+  }
+
+  public clearAnnotation() {
+    this.store.dispatch(TranscriptionActions.clearAnnotation());
   }
 }

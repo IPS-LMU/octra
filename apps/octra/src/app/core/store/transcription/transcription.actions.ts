@@ -144,7 +144,8 @@ export const clearAnnotation = createAction(
 export const overwriteAnnotation = createAction(
   `[${context}] Overwrite annotation`,
   props<{
-    annotation: AnnotationState
+    annotation: AnnotationState,
+    saveToDB: boolean
   }>()
 );
 
@@ -185,4 +186,15 @@ export const setLevelCounter = createAction(
   props<{
     levelCounter: number
   }>()
+);
+
+export const setAudioLoaded = createAction(
+  `[Transcription] Set Audio Loaded`,
+  props<{
+    loaded: boolean;
+  }>()
+);
+
+export const clearSettings = createAction(
+  `[Configuration] Clear Settings`
 );

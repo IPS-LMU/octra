@@ -1,18 +1,22 @@
 import {Injectable} from '@angular/core';
 
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
-import {Observable} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
-import {Functions} from '@octra/utilities';
+import * as fromApplication from '../../store/application';
+import * as fromTranscription from '../../store/transcription';
+import {Functions, isUnset} from '@octra/utilities';
+import {Store} from '@ngrx/store';
 
 @Injectable()
 export class ReloadFileGuard implements CanActivate {
 
   constructor(private appStorage: AppStorageService,
               private router: Router,
-              private settingsService: SettingsService) {
+              private settingsService: SettingsService,
+              private store: Store) {
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
@@ -26,11 +30,13 @@ export class ReloadFileGuard implements CanActivate {
       });
       return false;
     } else {
-      if ((this.settingsService.appSettings === null || this.settingsService.appSettings === undefined)) {
-        return this.settingsService.settingsloaded;
-      } else {
-        return this.settingsService.validated;
-      }
+      const subject = new Subject<boolean>();
+      this.store.select(fromTranscription.selectProjectConfig).subscribe((projectConfig)=>{
+        if(!isUnset(projectConfig)){
+          subject.next(true);
+          subject.complete();
+        }
+      });
     }
   }
 }

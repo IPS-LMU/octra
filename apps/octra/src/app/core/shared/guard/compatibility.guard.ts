@@ -5,12 +5,17 @@ import {AppInfo} from '../../../app.info';
 import {SettingsService} from '../service';
 import {CompatibilityService} from '../service/compatibility.service';
 import {Functions} from '@octra/utilities';
+import * as fromApplication from '../../store/application';
+import {Store} from '@ngrx/store';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CompatibilityGuard implements CanActivate {
-  constructor(private router: Router, private compatibility: CompatibilityService, private settingsService: SettingsService) {
+  constructor(private router: Router,
+              private compatibility: CompatibilityService,
+              private settingsService: SettingsService,
+              private store: Store) {
 
   }
 
@@ -23,9 +28,8 @@ export class CompatibilityGuard implements CanActivate {
         if (!(this.settingsService.appSettings === null || this.settingsService.appSettings === undefined)) {
           resolve2();
         } else {
-          const subscr = this.settingsService.appsettingsloaded.subscribe(() => {
-            resolve2();
-            subscr.unsubscribe();
+          Functions.afterDefined(this.store.select(fromApplication.selectAppSettings)).then(resolve2).catch((error) => {
+            console.error(error);
           });
         }
       }).then(() => {

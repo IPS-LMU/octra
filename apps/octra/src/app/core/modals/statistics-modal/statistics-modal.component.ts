@@ -78,9 +78,7 @@ export class StatisticsModalComponent implements OnInit {
 
   clearElements() {
     this.uiService.clear();
-    this.appStorage.clearLoggingData().catch((err) => {
-      console.error(err);
-    });
+    this.appStorage.clearLoggingData();
   }
 
   getText() {

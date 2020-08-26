@@ -1,7 +1,7 @@
 import {createReducer, on} from '@ngrx/store';
 import {UserState} from '../index';
 import * as fromFeedbackActions from './user.actions';
-import * as fromIDBActions from '../idb/idb.actions';
+import * as IDBActions from '../idb/idb.actions';
 
 export const initialState: UserState = {
   name: '',
@@ -16,11 +16,11 @@ export const reducer = createReducer(
       ...user
     }
   }),
-  on(fromIDBActions.loadOptionsSuccess, (state, {variables}) => {
+  on(IDBActions.loadOptionsSuccess, (state, {variables}) => {
       let result = state;
 
       for (const variable of variables) {
-        result = saveOptionToStore(state, variable.name, variable.value);
+        result = saveOptionToStore(result, variable.name, variable.value);
       }
 
       return result;
@@ -28,7 +28,6 @@ export const reducer = createReducer(
   ));
 
 function saveOptionToStore(state: UserState, attribute: string, value: any): UserState {
-  console.log(`save Option ${attribute} to store with value "${JSON.stringify(value)}"...`);
   switch (attribute) {
     case('_userProfile'):
       const userProfile = {
@@ -44,10 +43,9 @@ function saveOptionToStore(state: UserState, attribute: string, value: any): Use
       }
 
       return {
+        ...state,
         ...userProfile
       };
-    default:
-      console.error(`can't find case for attribute ${attribute}`);
   }
 
   return state;

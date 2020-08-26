@@ -300,13 +300,15 @@ export class TranscriptionComponent implements OnInit,
     this.transcrService.guidelines = this.settingsService.guidelines;
 
     // reload guidelines
+    /*
     this.subscrmanager.add(
+
       this.settingsService.guidelinesloaded.subscribe(
         (guidelines) => {
           this.transcrService.guidelines = guidelines;
         }
       )
-    );
+    ); */
 
     for (const marker of this.transcrService.guidelines.markers) {
       if (marker.type === 'break') {
@@ -320,18 +322,8 @@ export class TranscriptionComponent implements OnInit,
 
     // load guidelines on language change
     this.subscrmanager.add(this.langService.langChanges$.subscribe(
-      (lang: string) => {
-        const found = this.settingsService.projectsettings.languages.find(
-          x => {
-            return x === lang;
-          }
-        );
-        if ((found === null || found === undefined)) {
-          // lang not in project config, fall back to first defined
-          lang = this.settingsService.projectsettings.languages[0];
-        }
-
-        this.settingsService.loadGuidelines(lang, './config/localmode/guidelines/guidelines_' + lang + '.json');
+      () => {
+        this.settingsService.loadGuidelines();
       }
     ));
 
@@ -825,14 +817,10 @@ export class TranscriptionComponent implements OnInit,
 
   clearData() {
     this.appStorage.submitted = false;
-    this.appStorage.clearAnnotationData().catch((err) => {
-      console.error(err);
-    });
+    this.appStorage.clearAnnotation();
     this.appStorage.feedback = {};
     this.appStorage.comment = '';
-    this.appStorage.clearLoggingData().catch((err) => {
-      console.error(err);
-    });
+    this.appStorage.clearLoggingData();
     this.uiService.elements = [];
     this.settingsService.clearSettings();
   }

@@ -25,13 +25,6 @@ export const setReloaded = createAction(
   }>()
 );
 
-export const setIDBLoaded = createAction(
-  `[${context}] Set idb loaded`,
-  props<{
-    loaded: boolean;
-  }>()
-);
-
 export const setAppLanguage = createAction(
   `[${context}] Set app language`,
   props<{
@@ -39,8 +32,8 @@ export const setAppLanguage = createAction(
   }>()
 );
 
-export const setAppVersion = createAction(
-  `[${context}] Set app version`,
+export const setDBVersion = createAction(
+  `[${context}] Set IDB Version`,
   props<{
     version: string;
   }>()

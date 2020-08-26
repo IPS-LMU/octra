@@ -1,164 +1,47 @@
 import {Injectable} from '@angular/core';
 import {ConsoleEntry} from './bug-report.service';
 import {isUnset} from '@octra/utilities';
-import * as fromTranscriptionActions from '../../store/transcription/transcription.actions';
+import * as TranscriptionActions from '../../store/transcription/transcription.actions';
 import {IndexedDBManager} from '../../obj/IndexedDBManager';
-import {IIDBLink, OIDBLevel, OIDBLink} from '@octra/annotation';
+import {OIDBLevel, OIDBLink} from '@octra/annotation';
 import {Subject} from 'rxjs';
+import {Store} from '@ngrx/store';
+import {AppInfo} from '../../../app.info';
 
 @Injectable({
   providedIn: 'root'
 })
 export class IDBService {
   private idb: IndexedDBManager;
+  private _isReady = false;
 
-  constructor() {
+  public get isReady(): boolean {
+    return this._isReady;
   }
 
-  public initialize(dbName: string) {
-    this.idb = new IndexedDBManager(dbName);
+  constructor(private store: Store) {
   }
 
-  public load(): Promise<void> {
-    return this.loadOptions(
-      [
-        {
-          attribute: '_submitted',
-          key: 'submitted'
-        },
-        {
-          attribute: '_version',
-          key: 'version'
-        },
-        {
-          attribute: '_easymode',
-          key: 'easymode'
-        },
-        {
-          attribute: '_audioURL',
-          key: 'audioURL'
-        },
-        {
-          attribute: '_comment',
-          key: 'comment'
-        },
-        {
-          attribute: '_dataID',
-          key: 'dataID'
-        },
-        {
-          attribute: '_feedback',
-          key: 'feedback'
-        },
-        {
-          attribute: '_language',
-          key: 'language'
-        },
-        {
-          attribute: '_sessionfile',
-          key: 'sessionfile'
-        },
-        {
-          attribute: '_usemode',
-          key: 'useMode'
-        },
-        {
-          attribute: '_user',
-          key: 'user'
-        },
-        {
-          attribute: '_userProfile',
-          key: 'userProfile'
-        },
-        {
-          attribute: '_interface',
-          key: 'interface'
-        },
-        {
-          attribute: '_logging',
-          key: 'logging'
-        },
-        {
-          attribute: '_showLoupe',
-          key: 'showLoupe'
-        },
-        {
-          attribute: '_prompttext',
-          key: 'prompttext'
-        },
-        {
-          attribute: '_servercomment',
-          key: 'servercomment'
-        },
-        {
-          attribute: '_secondsPerLine',
-          key: 'secondsPerLine'
-        },
-        {
-          attribute: '_audioSettings',
-          key: 'audioSettings'
-        },
-        {
-          attribute: '_asr',
-          key: 'asr'
-        },
-        {
-          attribute: '_highlightingEnabled',
-          key: 'highlightingEnabled'
-        }
-      ]
-    ).then(() => {
-      idb.getAll('logs', 'timestamp').then((logs) => {
-        this.store.dispatch(fromTranscriptionActions.setLogs({
-          logs
-        }));
+  public initialize(dbName: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      new Promise<string>((resolve2, reject2) => {
+        this.loadOptionFromIDB('version').then((result) => {
+          resolve2(result.value);
+        }).catch(() => {
+          resolve2(undefined);
+        });
+      }).then((dbVersion) => {
+        this.checkForUpdates(dbName, dbVersion).then((newIDB) => {
+          this.idb = newIDB;
+          this._isReady = true;
+          resolve();
+        }).catch(resolve);
       });
-    }).then(() => {
-      idb.getAll('annotation_levels', 'id').then((levels: any[]) => {
-        const annotationLevels = [];
-        let max = 0;
-        for (let i = 0; i < levels.length; i++) {
-          if (!levels[i].hasOwnProperty('id')) {
-            annotationLevels.push(
-              {
-                id: i + 1,
-                level: levels[i],
-                sortorder: i
-              }
-            );
-            max = Math.max(i + 1, max);
-          } else {
-            annotationLevels.push(levels[i]);
-            max = Math.max(levels[i].id, max);
-          }
-        }
-        this.store.dispatch(fromTranscriptionActions.setLevelCounter({
-          levelCounter: max
-        }));
-      });
-    }).then(() => {
-      idb.getAll('annotation_links', 'id').then((links: IIDBLink[]) => {
-        const annotationLinks = [];
-        for (let i = 0; i < links.length; i++) {
-          if (!links[i].hasOwnProperty('id')) {
-            annotationLinks.push(
-              new OIDBLink(i + 1, links[i].link)
-            );
-          } else {
-            annotationLinks.push(links[i]);
-          }
-        }
-      });
-    }).then(
-      () => {
-        this.observeStore();
-        this._loaded.complete();
-      }
-    );
+    });
   }
 
   public clearAnnotationData(): Promise<any> {
-    this.store.dispatch(fromTranscriptionActions.clearAnnotation());
+    this.store.dispatch(TranscriptionActions.clearAnnotation());
     return this.clearIDBTable('annotation_levels').then(
       () => {
         return this.clearIDBTable('annotation_links');
@@ -227,6 +110,10 @@ export class IDBService {
     return this.idb.getAll('annotation_levels', 'id');
   }
 
+  public loadAnnotationLinks() {
+    return this.idb.getAll('annotation_links', 'id');
+  }
+
   /**
    * loads the option by its key and sets its variable.
    * Notice: the variable is defined by '_' before the key string
@@ -270,9 +157,16 @@ export class IDBService {
   }
 
   public saveOption(key: string, value: any) {
-    return this.idb.save('options', key, {value}).catch((err) => {
-      console.error(err);
-    });
+    if (this.isReady) {
+      return this.idb.save('options', key, {value}).catch((err) => {
+        console.error(err);
+      });
+    } else {
+      return new Promise<void>((resolve, reject) => {
+        console.error(new Error(`can't save option ${key}, because idb is not ready.`));
+        reject(new Error(`can't save option ${key}, because idb is not ready.`));
+      });
+    }
   }
 
   public saveLogs(logs: any[]) {
@@ -304,5 +198,101 @@ export class IDBService {
 
   public clearLoggingData(): Promise<any> {
     return this.clearIDBTable('logs');
+  }
+
+
+  public checkForUpdates(dbname: string, dbVersion: string): Promise<IndexedDBManager> {
+    return new Promise<IndexedDBManager>(
+      (resolve, reject) => {
+        const appversion = AppInfo.version;
+
+        const continueCheck = () => {
+          if (isUnset(dbVersion)) {
+            console.log('update...');
+            console.log(appversion);
+            console.log(dbVersion);
+          }
+
+          // incremental IDB upgrade: It is very important to make sure, that the database can
+          // be upgrade from any version to the latest version
+          const idbm = new IndexedDBManager(dbname);
+          idbm.open(3).subscribe(
+            (result) => {
+              console.log('open db');
+              console.log(result.type);
+              if (result.type === 'success') {
+                // database opened
+                console.log('IDB opened');
+                idbm.save('options', 'version', {value: AppInfo.version}).catch((error) => {
+                  console.error(error);
+                });
+                resolve(idbm);
+              } else if (result.type === 'upgradeneeded') {
+                // database opened and needs upgrade/installation
+                console.log(`IDB needs upgrade from v${result.oldVersion} to v${result.newVersion}...`);
+                const oldVersion = result.oldVersion;
+
+                // foreach step to the latest version you need to define the uprade
+                // procedure
+                new Promise<void>((resolve2, reject2) => {
+                  if (oldVersion === 2) {
+                    const transaction = result.target.transaction;
+                    const options = transaction.objectStore('options');
+
+                    idbm.get(options, 'uselocalmode').then((entry) => {
+                      if (!(entry === null || entry === undefined)) {
+                        if (entry.value === false) {
+                          idbm.save(options, 'useMode', {
+                            name: 'useMode',
+                            value: 'online'
+                          }).catch((error) => {
+                            console.error(error);
+                          });
+                        } else if (entry.value === true) {
+                          idbm.save(options, 'useMode', {
+                            name: 'useMode',
+                            value: 'local'
+                          }).catch((error) => {
+                            console.error(error);
+                          });
+                        }
+                      }
+                    });
+                    console.log(`updated to v3`);
+                    resolve();
+                  }
+                });
+              }
+            },
+            (error) => {
+              reject(error);
+            });
+        };
+
+        // check if version entry in IDB exists
+        const idb = new IndexedDBManager(dbname);
+        idb.open().subscribe(
+          () => {
+            // database opened
+            console.log('get version');
+            idb.get('options', 'version').then((version) => {
+              if (version !== null && version.hasOwnProperty('value')) {
+                dbVersion = version.value;
+                idb.close();
+                continueCheck();
+              }
+            }).catch(() => {
+              console.log('version empty');
+              idb.close();
+              continueCheck();
+            });
+          },
+          (err) => {
+            // IDB does not exist
+            continueCheck();
+          }
+        )
+      }
+    );
   }
 }

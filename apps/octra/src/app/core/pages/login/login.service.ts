@@ -3,7 +3,7 @@ import {Injectable} from '@angular/core';
 import {SubscriptionManager} from '@octra/utilities';
 import {Store} from '@ngrx/store';
 import {URLParameters} from '../../store';
-import * as fromLoginActions from '../../store/login/login.actions';
+import * as LoginActions from '../../store/login/login.actions';
 
 @Injectable()
 export class LoginService {

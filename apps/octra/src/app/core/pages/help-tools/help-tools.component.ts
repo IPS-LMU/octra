@@ -2,6 +2,9 @@ import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core
 import {APIService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {LoginMode} from '../../store';
+import {Store} from '@ngrx/store';
+import * as TranscriptionActions from '../../store/transcription/transcription.actions'
+import * as IDBActions from '../../store/idb/idb.actions'
 
 @Component({
   selector: 'octra-help-tools',
@@ -12,7 +15,8 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
   @ViewChild('canvas', {static: false}) canvas: ElementRef;
 
   constructor(private appStorage: AppStorageService,
-              private api: APIService) {
+              private api: APIService,
+              private store: Store) {
   }
 
   ngOnInit() {
@@ -29,55 +33,25 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
   clearAllData() {
     this.appStorage.clearSession();
 
-    if (this.appStorage.useMode === LoginMode.LOCAL || this.appStorage.useMode === LoginMode.DEMO) {
-      this.appStorage.clearAnnotationData().then(() => {
-        this.appStorage.clearOptions().catch((error) => {
-          console.error(error);
-        });
-      }).then(() => {
-        this.appStorage.clearLoggingData().catch((error) => {
-          console.error(error);
-        });
-      }).then(
-        () => {
-          alert('All cleared. The app will be reloaded.');
-          document.location.reload();
-        }
-      );
+    const clearAll = () => {
+      this.store.dispatch(TranscriptionActions.clearAnnotation());
+      this.store.dispatch(IDBActions.clearAllOptions());
+      this.appStorage.clearLoggingData();
+
+      setTimeout(() => {
+        alert('All cleared. The app will be reloaded.');
+        document.location.reload();
+      }, 3000);
+    };
+
+    if (this.appStorage.useMode === LoginMode.LOCAL || this.appStorage.useMode === LoginMode.DEMO || this.appStorage.useMode === LoginMode.URL) {
+      clearAll();
     } else if (this.appStorage.useMode === LoginMode.ONLINE) {
       this.api.setOnlineSessionToFree(this.appStorage).then(() => {
-        this.appStorage.clearAnnotationData().then(() => {
-          this.appStorage.clearLoggingData().catch((error) => {
-            console.error(error);
-          });
-        }).then(() => {
-          this.appStorage.clearOptions().catch((error) => {
-            console.error(error);
-          });
-        }).then(
-          () => {
-            alert('All cleared. The app will be reloaded.');
-            document.location.reload();
-          }
-        );
+        clearAll();
       }).catch((error) => {
         console.error(error);
       });
-    } else if (this.appStorage.useMode === LoginMode.URL) {
-      this.appStorage.clearAnnotationData().then(() => {
-        this.appStorage.clearLoggingData().catch((error) => {
-          console.error(error);
-        });
-      }).then(() => {
-        this.appStorage.clearOptions().catch((error) => {
-          console.error(error);
-        });
-      }).then(
-        () => {
-          alert('All cleared. The app will be reloaded.');
-          document.location.reload();
-        }
-      );
     }
   }
 }

@@ -168,14 +168,9 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
       level.name = event.target.value.replace(' ', '_');
       this.appStorage.changeAnnotationLevel(tiernum,
         level.getObj(this.transcrServ.audioManager.ressource.info.duration)
-      )
-        .catch((err) => {
-          console.error(`error on leaving level name`);
-          console.error(err);
-        }).then(() => {
-        // update value for annoation object in transcr service
-        this.transcrServ.annotation.levels[tiernum].name = event.target.value.replace(' ', '_');
-      });
+      );
+      // update value for annoation object in transcr service
+      this.transcrServ.annotation.levels[tiernum].name = event.target.value.replace(' ', '_');
     } else {
       event.target.value = this.transcrServ.annotation.levels[tiernum].name;
     }
@@ -204,15 +199,8 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
       new Segments(this.transcrServ.audioManager.ressource.info.sampleRate, [],
         this.transcrServ.audioManager.ressource.info.duration));
     this.appStorage.addAnnotationLevel(
-      newlevel.getObj(this.transcrServ.audioManager.ressource.info.duration))
-      .then(
-        () => {
-          // update value for annoation object in transc servcie
-          this.transcrServ.annotation.levels.push(newlevel);
-        }
-      ).catch((err) => {
-      console.error(err);
-    });
+      newlevel.getObj(this.transcrServ.audioManager.ressource.info.duration));
+    this.transcrServ.annotation.levels.push(newlevel);
   }
 
   onLevelRemoveClick(tiernum: number, id: number) {
@@ -244,14 +232,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     const newlevel = this.transcrServ.annotation.levels[tiernum].clone();
     this.appStorage.addAnnotationLevel(
       newlevel.getObj(this.transcrServ.audioManager.ressource.info.duration))
-      .then(
-        () => {
-          // update value for annoation object in transc servcie
-          this.transcrServ.annotation.levels.push(newlevel);
-        }
-      ).catch((err) => {
-      console.error(err);
-    });
+    this.transcrServ.annotation.levels.push(newlevel);
   }
 
   public selectLevel(tiernum: number) {

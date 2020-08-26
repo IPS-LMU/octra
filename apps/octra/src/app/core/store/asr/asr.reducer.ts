@@ -1,7 +1,7 @@
 import {createReducer, on} from '@ngrx/store';
 import * as ASRActions from './asr.actions';
 import {ASRState} from '../index';
-import * as fromIDBActions from '../idb/idb.actions';
+import * as IDBActions from '../idb/idb.actions';
 
 export const initialState: ASRState = {};
 
@@ -11,11 +11,11 @@ export const reducer = createReducer(
     ...state,
     ...data
   })),
-  on(fromIDBActions.loadOptionsSuccess, (state, {variables}) => {
+  on(IDBActions.loadOptionsSuccess, (state, {variables}) => {
       let result = state;
 
       for (const variable of variables) {
-        result = saveOptionToStore(state, variable.name, variable.value);
+        result = saveOptionToStore(result, variable.name, variable.value);
       }
 
       return result;
@@ -23,7 +23,6 @@ export const reducer = createReducer(
   ));
 
 function saveOptionToStore(state: ASRState, attribute: string, value: any): ASRState {
-  console.log(`save Option ${attribute} to store with value "${JSON.stringify(value)}"...`);
   switch (attribute) {
     case('_asr'):
       return {
@@ -31,7 +30,8 @@ function saveOptionToStore(state: ASRState, attribute: string, value: any): ASRS
         selectedLanguage: (value.hasOwnProperty('selectedLanguage')) ? value.selectedLanguage: null,
         selectedService: (value.hasOwnProperty('selectedService')) ? value.selectedService : null
       };
+
     default:
-      console.error(`can't find case for attribute ${attribute}`);
+      return state;
   }
 }

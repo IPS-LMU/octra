@@ -6,7 +6,7 @@ import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {Functions} from '@octra/utilities';
 import {Store} from '@ngrx/store';
-import * as fromLoginActions from '../../store/login/login.actions';
+import * as LoginActions from '../../store/login/login.actions';
 
 @Component({
 
@@ -32,7 +32,7 @@ export class LogoutComponent implements OnInit {
   ngOnInit() {
     this.settingsService.clearSettings();
     this.appStorage.endSession().then(() => {
-      this.store.dispatch(fromLoginActions.logout());
+      this.store.dispatch(LoginActions.logout());
       Functions.navigateTo(this.router, ['login'], AppInfo.queryParamsHandling).catch((error) => {
         console.error(error);
       });

@@ -56,16 +56,10 @@ export class ReloadFileComponent implements OnInit {
             for (let i = 0; i < this.dropzone.oannotation.links.length; i++) {
               newLinks.push(new OIDBLink(i + 1, this.dropzone.oannotation.links[i]));
             }
-            this.appStorage.overwriteAnnotation(newLevels).then(
-              () => {
-                return this.appStorage.overwriteLinks(newLinks);
-              }
-            ).then(() => {
-              keepData = true;
-              resolve();
-            }).catch((err) => {
-              console.error(err);
-            });
+            this.appStorage.overwriteAnnotation(newLevels, newLinks);
+
+            keepData = true;
+            resolve();
           } else {
             resolve();
           }

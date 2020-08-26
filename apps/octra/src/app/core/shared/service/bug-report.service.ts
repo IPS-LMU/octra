@@ -61,9 +61,7 @@ export class BugReportService {
     };
 
     this._console.push(consoleItem);
-    if (this.fromDBLoaded) {
-      this.appStorage.saveConsoleEntries(this._console);
-    }
+    this.appStorage.consoleEntries = this._console;
   }
 
   public clear() {
@@ -83,7 +81,7 @@ export class BugReportService {
         message: '--- AFTER RELOAD ---'
       }], this._console);
     }
-    this.appStorage.saveConsoleEntries(this._console);
+    this.appStorage.consoleEntries = this._console;
     this.fromDBLoaded = true;
   }
 

@@ -1,7 +1,7 @@
 import {createReducer, on} from '@ngrx/store';
 import * as LoginActions from './login.actions';
 import {LoginMode, LoginState} from '../index';
-import * as fromIDBActions from '../idb/idb.actions';
+import * as IDBActions from '../idb/idb.actions';
 import {SessionFile} from '../../obj/SessionFile';
 
 export const initialState: LoginState = {
@@ -112,11 +112,11 @@ export const reducer = createReducer(
       jobsLeft
     }
   })),
-  on(fromIDBActions.loadOptionsSuccess, (state, {variables}) => {
+  on(IDBActions.loadOptionsSuccess, (state, {variables}) => {
       let result = state;
 
       for (const variable of variables) {
-        result = saveOptionToStore(state, variable.name, variable.value);
+        result = saveOptionToStore(result, variable.name, variable.value);
       }
 
       return result;
@@ -124,7 +124,6 @@ export const reducer = createReducer(
   ));
 
 function saveOptionToStore(state: LoginState, attribute: string, value: any): LoginState {
-  console.log(`save Option ${attribute} to store with value "${JSON.stringify(value)}"...`);
   switch (attribute) {
     case('_audioURL'):
       return {
@@ -203,8 +202,6 @@ function saveOptionToStore(state: LoginState, attribute: string, value: any): Lo
           serverComment: value
         }
       };
-    default:
-      console.error(`can't find case for attribute ${attribute}`);
   }
 
   return state;

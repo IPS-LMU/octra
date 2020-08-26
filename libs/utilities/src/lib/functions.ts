@@ -251,4 +251,42 @@ export class Functions {
     }
     return result;
   }
+
+  public static afterTrue(observable: Observable<boolean>): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      const subscription = observable.subscribe(
+        (value) => {
+          if (value === true) {
+            subscription.unsubscribe();
+            resolve();
+          }
+        },
+        (error) => {
+          reject(error);
+        },
+        () => {
+          reject('comnpleted!');
+        }
+      )
+    });
+  }
+
+  public static afterDefined(observable: Observable<any>): Promise<any> {
+    return new Promise<void>((resolve, reject) => {
+      const subscription = observable.subscribe(
+        (value) => {
+          if (!isUnset(value)) {
+            subscription.unsubscribe();
+            resolve(value);
+          }
+        },
+        (error) => {
+          reject(error);
+        },
+        () => {
+          reject('comnpleted!');
+        }
+      )
+    });
+  }
 }

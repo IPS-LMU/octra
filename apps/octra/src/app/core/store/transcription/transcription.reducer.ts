@@ -1,8 +1,8 @@
 import {createReducer, on} from '@ngrx/store';
 import * as TranscriptionActions from './transcription.actions';
-import * as fromConfigurationActions from '../configuration/configuration.actions';
-import * as fromIDBActions from '../idb/idb.actions';
-import {RootState, TranscriptionState} from '../index';
+import * as ConfigurationActions from '../configuration/configuration.actions';
+import * as IDBActions from '../idb/idb.actions';
+import {TranscriptionState} from '../index';
 
 export const initialState: TranscriptionState = {
   savingNeeded: false,
@@ -10,6 +10,9 @@ export const initialState: TranscriptionState = {
   playOnHover: false,
   followPlayCursor: false,
   submitted: false,
+  audio: {
+    loaded: false
+  },
   audioSettings: {
     volume: 1,
     speed: 1
@@ -107,6 +110,7 @@ export const reducer = createReducer(
       links
     }
   })),
+  on(TranscriptionActions.setTranscriptionState, (state, newState) => (newState)),
   on(TranscriptionActions.clearAnnotation, (state) => ({
     ...state,
     annotation: {
@@ -170,21 +174,25 @@ export const reducer = createReducer(
         levelCounter: levelCounter
       }
     })),
-  on(fromConfigurationActions.projectConfigurationLoaded, (state, {projectConfig}) =>
+  on(ConfigurationActions.projectConfigurationLoaded, (state, {projectConfig}) =>
     ({
       ...state,
       projectConfig
     })),
-  on(fromIDBActions.loadOptionsSuccess, (state, {variables}) => {
+  on(ConfigurationActions.loadGuidelinesSuccess, (state, {guidelines}) => ({
+    ...state,
+    guidelines
+  })),
+  on(IDBActions.loadOptionsSuccess, (state, {variables}) => {
     let result = state;
 
     for (const variable of variables) {
-      result = saveOptionToStore(state, variable.name, variable.value);
+      result = saveOptionToStore(result, variable.name, variable.value);
     }
 
     return result;
   }),
-  on(fromIDBActions.loadAnnotationLevelsSuccess, (state, {levels, levelCounter}) =>
+  on(IDBActions.loadAnnotationLevelsSuccess, (state, {levels, levelCounter}) =>
     ({
       ...state,
       annotation: {
@@ -192,11 +200,33 @@ export const reducer = createReducer(
         levels,
         levelCounter
       }
+    })),
+  on(IDBActions.loadAnnotationLinksSuccess, (state, {links}) =>
+    ({
+      ...state,
+      annotation: {
+        ...state.annotation,
+        links
+      }
+    })),
+  on(ConfigurationActions.loadMethodsSuccess, (state, methods) =>
+    ({
+      ...state,
+      methods
+    })),
+  on(TranscriptionActions.clearSettings, (state) =>
+    ({
+      ...state,
+      guidelines: undefined,
+      projectConfig: undefined,
+      methods: {
+        validate: undefined,
+        tidyUp: undefined
+      }
     }))
 );
 
 function saveOptionToStore(state: TranscriptionState, attribute: string, value: any): TranscriptionState {
-  console.log(`save Option ${attribute} to store with value "${JSON.stringify(value)}"...`);
   switch (attribute) {
     case('_submitted'):
       return {
@@ -246,8 +276,6 @@ function saveOptionToStore(state: TranscriptionState, attribute: string, value: 
         ...state,
         highlightingEnabled: value
       }
-    default:
-      console.error(`can't find case for attribute ${attribute}`);
   }
 
   return state;

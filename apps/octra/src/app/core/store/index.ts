@@ -2,6 +2,7 @@ import {IDataEntry} from '../obj/data-entry';
 import {SessionFile} from '../obj/SessionFile';
 import {OIDBLevel, OIDBLink} from '@octra/annotation';
 import {ConsoleEntry} from '../shared/service/bug-report.service';
+import {AppSettings, ProjectSettings} from '../obj/Settings';
 
 export enum LoginMode {
   URL = 'url',
@@ -56,10 +57,10 @@ export interface ApplicationState {
   reloaded: boolean;
   idb: {
     loaded: boolean;
+    version?: string;
   },
   language: string;
-  version: string;
-  appConfiguration: boolean;
+  appConfiguration: AppSettings;
   consoleEntries: ConsoleEntry[];
 }
 
@@ -82,6 +83,9 @@ export interface TranscriptionState {
   submitted: boolean;
   currentEditor?: string;
   showLoupe: boolean;
+  audio: {
+    loaded: boolean;
+  }
   audioSettings: {
     volume: number;
     speed: number;
@@ -94,7 +98,11 @@ export interface TranscriptionState {
   easyMode: boolean;
   secondsPerLine: number;
   highlightingEnabled: boolean;
-  projectConfig?: any;
+  projectConfig?: ProjectSettings;
+  methods?: {
+    validate: (string, any) => any;
+    tidyUp: (string, any) => any;
+  }
 }
 
 export interface UserState {

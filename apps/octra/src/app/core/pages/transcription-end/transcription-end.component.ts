@@ -42,9 +42,7 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
     this.tranService.endTranscription();
 
     this.clearData();
-    this.appStorage.clearLocalStorage().catch((error) => {
-      console.error(error);
-    });
+    this.appStorage.clearLocalStorage();
 
     Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).catch((error) => {
       console.error(error);
@@ -53,17 +51,9 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
 
   clearData() {
     this.appStorage.submitted = false;
-    this.appStorage.clearAnnotationData().catch((err) => {
-      console.error(err);
-    });
-
-    this.appStorage.idb.save('options', 'feedback', {value: null}).catch((err) => {
-      console.error(err);
-    });
+    this.appStorage.clearAnnotation();
     this.appStorage.comment = '';
-    this.appStorage.clearLoggingData().catch((err) => {
-      console.error(err);
-    });
+    this.appStorage.clearLoggingData();
     this.uiService.elements = [];
     this.settService.clearSettings();
   }

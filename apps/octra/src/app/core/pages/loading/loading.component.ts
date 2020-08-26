@@ -1,16 +1,19 @@
 import {HttpClient} from '@angular/common/http';
-import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, OnDestroy, OnInit, Output} from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {AppInfo} from '../../../app.info';
 import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
 import {AudioService, SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
-import {IFile, ImportResult, OAudiofile, OIDBLevel, OLevel} from '@octra/annotation';
+import {IFile, ImportResult, OAudiofile, OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
 import {LoginMode} from '../../store';
-import * as fromLoginActions from '../../store/login/login.actions';
-import * as fromTranscriptionActions from '../../store/transcription/transcription.actions';
+import * as LoginActions from '../../store/login/login.actions';
+import * as fromApplication from '../../store/application/';
+import * as TranscriptionActions from '../../store/transcription/transcription.actions';
+import * as fromTranscription from '../../store/transcription';
 import {Store} from '@ngrx/store';
+import {Actions} from '@ngrx/effects';
 
 @Component({
   selector: 'octra-loading',
@@ -20,18 +23,10 @@ import {Store} from '@ngrx/store';
 export class LoadingComponent implements OnInit, OnDestroy {
   @Output() loaded: boolean;
   public text = '';
-  public progress = 0;
   public audioLoadingProgress = 0;
   public state = '';
   public warning = '';
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
-  private loadedchanged: EventEmitter<boolean> = new EventEmitter<boolean>();
-  private loadedtable: any = {
-    projectconfig: false,
-    guidelines: false,
-    methods: false,
-    audio: false
-  };
 
   constructor(private langService: TranslocoService,
               public settService: SettingsService,
@@ -40,73 +35,15 @@ export class LoadingComponent implements OnInit, OnDestroy {
               private router: Router,
               private transcrService: TranscriptionService,
               private http: HttpClient,
-              private store: Store) {
+              private store: Store,
+              private actions: Actions) {
   }
 
   ngOnInit() {
-    new Promise<void>((resolve, reject) => {
-      if (this.settService.isDBLoadded) {
-        resolve();
-      } else {
-        this.subscrmanager.add(this.settService.dbloaded.subscribe(
-          () => {
-            resolve();
-          }));
+    this.langService.selectTranslate('general.please wait').subscribe(
+      (translation) => {
+        this.text = translation + '... ';
       }
-    }).then(() => {
-      this.langService.selectTranslate('general.please wait').subscribe(
-        (translation) => {
-          this.text = translation + '... ';
-        }
-      );
-    }).catch((error) => {
-    });
-
-    this.subscrmanager.add(
-      this.settService.projectsettingsloaded.subscribe(
-        (projectsettings) => {
-          this.loadedtable.projectconfig = true;
-          this.progress += 25;
-          this.state = 'Project configuration loaded';
-          let language = this.langService.getActiveLang();
-
-          const found = projectsettings.languages.find((x) => {
-            return x === language;
-          });
-          if (isUnset(found)) {
-            // fall back to first defined language
-            language = projectsettings.languages[0];
-          }
-          this.settService.loadGuidelines(this.appStorage.language, './config/localmode/guidelines/guidelines_' + language + '.json');
-
-          this.loadedchanged.emit(false);
-        }
-      )
-    );
-
-    this.subscrmanager.add(
-      this.settService.guidelinesloaded.subscribe(
-        () => {
-          this.loadedtable.guidelines = true;
-          this.progress += 25;
-          this.state = 'Guidelines loaded';
-          this.loadedchanged.emit(false);
-        }
-      )
-    );
-
-    this.subscrmanager.add(
-      this.settService.validationmethodloaded.subscribe(
-        () => {
-          this.loadedtable.methods = true;
-          this.progress += 25;
-          this.state = 'Methods loaded';
-          if (!this.loadedtable.audio) {
-            this.state = 'Load Audio...';
-          }
-          this.loadedchanged.emit(false);
-        }
-      )
     );
 
     this.subscrmanager.add(
@@ -163,11 +100,15 @@ export class LoadingComponent implements OnInit, OnDestroy {
                       && !(importResult.annotjson === null || importResult.annotjson === undefined)) {
                       // conversion successfully finished
                       const newLevels: OIDBLevel[] = [];
+                      const newLinks: OIDBLink[] = [];
                       for (let i = 0; i < importResult.annotjson.levels.length; i++) {
                         newLevels.push(new OIDBLevel(i + 1, importResult.annotjson.levels[i], i));
                       }
+                      for (let i = 0; i < importResult.annotjson.links.length; i++) {
+                        newLinks.push(new OIDBLink(i + 1, importResult.annotjson.links[i]));
+                      }
 
-                      this.appStorage.overwriteAnnotation(newLevels, false).then(
+                      this.appStorage.overwriteAnnotation(newLevels, newLinks, false).then(
                         () => {
                           resolve();
                         }
@@ -191,7 +132,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
                   const newLevels: OIDBLevel[] = [];
                   newLevels.push(new OIDBLevel(1, new OLevel('OCTRA_1', 'SEGMENT'), 1));
 
-                  this.appStorage.overwriteAnnotation(newLevels, false).then(
+                  this.appStorage.overwriteAnnotation(newLevels, [], false).then(
                     () => {
                       resolve();
                     }
@@ -203,10 +144,10 @@ export class LoadingComponent implements OnInit, OnDestroy {
                 }
               }
             }).then(() => {
-              this.loadedtable.audio = true;
               this.state = 'Audio loaded';
-
-              this.loadedchanged.emit(false);
+              this.store.dispatch(TranscriptionActions.setAudioLoaded({
+                loaded: true
+              }));
             }).catch((error) => {
               console.error(error);
             });
@@ -222,46 +163,10 @@ export class LoadingComponent implements OnInit, OnDestroy {
       )
     );
 
-    const id = this.subscrmanager.add(
-      this.loadedchanged.subscribe(
-        () => {
-          if (
-            this.loadedtable.guidelines
-            && this.loadedtable.projectconfig
-            && this.loadedtable.methods
-            && this.loadedtable.audio
-          ) {
-            this.subscrmanager.removeById(id);
-
-            this.transcrService.load().then(() => {
-              Functions.navigateTo(this.router, ['/user/transcr'], AppInfo.queryParamsHandling).catch((error) => {
-                console.error(error);
-              });
-            }).catch((err) => {
-              console.error(err);
-            });
-          }
-        }
-      )
-    );
-
-    new Promise<void>((resolve, reject) => {
-      if (!this.appStorage.idbLoaded) {
-        this.subscrmanager.add(this.appStorage.loaded.subscribe(() => {
-          },
-          (error) => {
-            reject(error);
-          },
-          () => {
-            resolve();
-          }));
-      } else {
-        resolve();
-      }
-    }).then(() => {
+    Functions.afterTrue(this.store.select(fromApplication.selectIDBLoaded)).then(() => {
       if (!isUnset(this.appStorage.urlParams) && this.appStorage.urlParams.hasOwnProperty('audio') && this.appStorage.urlParams.audio !== ''
         && !isUnset(this.appStorage.urlParams.audio)) {
-        this.store.dispatch(fromLoginActions.loginURLParameters({
+        this.store.dispatch(LoginActions.loginURLParameters({
           urlParams: this.appStorage.urlParams
         }));
       } else if (this.appStorage.useMode === LoginMode.URL) {
@@ -269,15 +174,15 @@ export class LoadingComponent implements OnInit, OnDestroy {
         console.warn(`use mode is url but no params found. Reset use mode.`);
         if (!isUnset(this.appStorage.onlineSession.id) && this.appStorage.onlineSession.id !== ''
           && (isUnset(this.appStorage.sessionfile))) {
-          this.store.dispatch(fromLoginActions.setMode({
+          this.store.dispatch(LoginActions.setMode({
             mode: LoginMode.ONLINE
           }));
         } else {
-          this.store.dispatch(fromLoginActions.setMode({
+          this.store.dispatch(LoginActions.setMode({
             mode: LoginMode.LOCAL
           }));
         }
-        this.store.dispatch(fromLoginActions.logout());
+        this.store.dispatch(LoginActions.logout());
       }
 
       if (this.appStorage.useMode !== LoginMode.URL && !this.appStorage.loggedIn) {
@@ -286,8 +191,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
           console.error(error);
         });
       } else if (this.appStorage.loggedIn) {
-        this.store.dispatch(fromTranscriptionActions.loadProjectConfiguration());
-
         if (this.appStorage.useMode === LoginMode.LOCAL && this.audio.audiomanagers.length === 0) {
           Functions.navigateTo(this.router, ['/user/transcr/reload-file'], AppInfo.queryParamsHandling).catch((error) => {
             console.error(error);
@@ -296,7 +199,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
           if (this.appStorage.useMode === LoginMode.URL) {
             this.state = 'Get transcript from URL...';
             // set audio url from url params
-            this.store.dispatch(fromLoginActions.setAudioURL({
+            this.store.dispatch(LoginActions.setAudioURL({
               audioURL: decodeURI(this.appStorage.urlParams.audio)
             }));
           }
@@ -314,6 +217,25 @@ export class LoadingComponent implements OnInit, OnDestroy {
       } else {
         console.warn(`special situation: loggedIn is null! useMode ${this.appStorage.useMode} url: ${this.appStorage.audioURL}`);
       }
+    }).catch((error) => {
+      console.error(error);
+    });
+
+    // do navigation after all is loaded
+    const promises: Promise<any>[] = [];
+    promises.push(Functions.afterDefined(this.store.select(fromTranscription.selectGuideLines)));
+    promises.push(Functions.afterDefined(this.store.select(fromTranscription.selectProjectConfig)));
+    promises.push(Functions.afterDefined(this.store.select(fromTranscription.selectMethods)));
+    promises.push(Functions.afterTrue(this.store.select(fromTranscription.selectAudioLoaded)));
+
+    Promise.all(promises).then(() => {
+      this.transcrService.load().then(() => {
+        Functions.navigateTo(this.router, ['/user/transcr'], AppInfo.queryParamsHandling).catch((error) => {
+          console.error(error);
+        });
+      }).catch((err) => {
+        console.error(err);
+      });
     }).catch((error) => {
       console.error(error);
     });

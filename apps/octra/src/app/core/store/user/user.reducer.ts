@@ -2,6 +2,7 @@ import {createReducer, on} from '@ngrx/store';
 import {UserState} from '../index';
 import * as fromFeedbackActions from './user.actions';
 import * as IDBActions from '../idb/idb.actions';
+import {isUnset} from '@octra/utilities';
 
 export const initialState: UserState = {
   name: '',
@@ -29,17 +30,19 @@ export const reducer = createReducer(
 
 function saveOptionToStore(state: UserState, attribute: string, value: any): UserState {
   switch (attribute) {
-    case('_userProfile'):
+    case('userProfile'):
       const userProfile = {
         name: '',
         email: ''
       };
 
-      if (value.hasOwnProperty('name')) {
-        userProfile.name = value.name;
-      }
-      if (value.hasOwnProperty('email')) {
-        userProfile.email = value.email;
+      if (!isUnset(value)) {
+        if (value.hasOwnProperty('name')) {
+          userProfile.name = value.name;
+        }
+        if (value.hasOwnProperty('email')) {
+          userProfile.email = value.email;
+        }
       }
 
       return {

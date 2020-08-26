@@ -57,7 +57,7 @@ export interface ApplicationState {
   reloaded: boolean;
   idb: {
     loaded: boolean;
-    version?: string;
+    version?: number;
   },
   language: string;
   appConfiguration: AppSettings;

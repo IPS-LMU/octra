@@ -35,7 +35,9 @@ export class IDBService {
           this.idb = newIDB;
           this._isReady = true;
           resolve();
-        }).catch(resolve);
+        }).catch((error) => {
+          reject(error);
+        });
       });
     });
   }
@@ -85,7 +87,7 @@ export class IDBService {
       if (variable.hasOwnProperty('attribute') && variable.hasOwnProperty('key')) {
         promises.push(this.loadOptionFromIDB(variable.key));
       } else {
-        console.error(Error('loadOptions: variables parameter must be of type {attribute:string, key:string}[]'));
+        console.error(new Error('loadOptions: variables parameter must be of type {attribute:string, key:string}[]'));
       }
     }
 
@@ -95,6 +97,7 @@ export class IDBService {
         subject.next(values);
       },
       (error) => {
+        console.error(error);
         subject.error(error);
       }
     );
@@ -138,13 +141,16 @@ export class IDBService {
                 );
               }
             ).catch((err) => {
+              console.error(err);
               reject(err);
             });
           } else {
-            reject(Error('loadOptionFromIDB: method needs key of type string'));
+            console.error('loadOptionFromIDB: method needs key of type string');
+            reject(new Error('loadOptionFromIDB: method needs key of type string'));
           }
         } else {
-          reject(Error('loadOptionFromIDB: idb is null'));
+          console.error('loadOptionFromIDB: idb is null');
+          reject(new Error('loadOptionFromIDB: idb is null'));
         }
       }
     );
@@ -220,47 +226,32 @@ export class IDBService {
             (result) => {
               console.log('open db');
               console.log(result.type);
+
               if (result.type === 'success') {
                 // database opened
                 console.log('IDB opened');
-                idbm.save('options', 'version', {value: AppInfo.version}).catch((error) => {
+                idbm.save('options', 'version', {value: 3}).catch((error) => {
                   console.error(error);
                 });
                 resolve(idbm);
               } else if (result.type === 'upgradeneeded') {
                 // database opened and needs upgrade/installation
                 console.log(`IDB needs upgrade from v${result.oldVersion} to v${result.newVersion}...`);
-                const oldVersion = result.oldVersion;
+                let oldVersion = result.oldVersion;
 
                 // foreach step to the latest version you need to define the uprade
                 // procedure
-                new Promise<void>((resolve2, reject2) => {
-                  if (oldVersion === 2) {
-                    const transaction = result.target.transaction;
-                    const options = transaction.objectStore('options');
-
-                    idbm.get(options, 'uselocalmode').then((entry) => {
-                      if (!(entry === null || entry === undefined)) {
-                        if (entry.value === false) {
-                          idbm.save(options, 'useMode', {
-                            name: 'useMode',
-                            value: 'online'
-                          }).catch((error) => {
-                            console.error(error);
-                          });
-                        } else if (entry.value === true) {
-                          idbm.save(options, 'useMode', {
-                            name: 'useMode',
-                            value: 'local'
-                          }).catch((error) => {
-                            console.error(error);
-                          });
-                        }
-                      }
-                    });
-                    console.log(`updated to v3`);
-                    resolve();
-                  }
+                this.doUpgradeToV2(oldVersion, idbm).then(() => {
+                  oldVersion = 2;
+                  this.doUpgradeToV3(oldVersion, result.target.transaction, idbm).then(() => {
+                    oldVersion = 3;
+                    console.log(`continue...`);
+                    console.log(idbm);
+                  }).catch((error) => {
+                    reject(error);
+                  });
+                }).catch((error) => {
+                  reject(error);
                 });
               }
             },
@@ -294,5 +285,107 @@ export class IDBService {
         )
       }
     );
+  }
+
+  private doUpgradeToV2(oldVersion: number, idbm: IndexedDBManager) {
+    console.log(`upgrade from ${oldVersion} to 2...`);
+    const optionsStore = idbm.db.createObjectStore('options', {keyPath: 'name'});
+    const logsStore = idbm.db.createObjectStore('logs', {keyPath: 'timestamp'});
+    const annoLevelsStore = idbm.db.createObjectStore('annotation_levels', {keyPath: 'id'});
+    const annoLinksStore = idbm.db.createObjectStore('annotation_links', {keyPath: 'id'});
+
+    // options for version 1
+    return idbm.saveSequential(optionsStore, [
+      {
+        key: 'easymode',
+        value: {value: false}
+      },
+      {
+        key: 'submitted',
+        value: {value: false}
+      },
+      {
+        key: 'feedback',
+        value: {value: null}
+      },
+      {
+        key: 'dataID',
+        value: {value: null}
+      },
+      {
+        key: 'audioURL',
+        value: {value: null}
+      },
+      {
+        key: 'usemode',
+        value: {value: null}
+      },
+      {
+        key: 'interface',
+        value: {value: '2D-Editor'}
+      },
+      {
+        key: 'sessionfile',
+        value: {value: null}
+      },
+      {
+        key: 'language',
+        value: {value: 'en'}
+      },
+      {
+        key: 'version',
+        value: {value: 1}
+      },
+      {
+        key: 'comment',
+        value: {value: ''}
+      },
+      {
+        key: 'user',
+        value: {
+          value: {
+            id: '',
+            project: '',
+            jobno: -1
+          }
+        }
+      }
+    ]);
+  }
+
+  private doUpgradeToV3(oldVersion: number, transaction: IDBTransaction, idbm: IndexedDBManager) {
+    return new Promise<void>((resolve, reject) => {
+      if (oldVersion === 2) {
+        console.log(`upgrade from ${oldVersion} to 3...`);
+        const options = transaction.objectStore('options');
+
+        idbm.get(options, 'uselocalmode').then((entry) => {
+          if (!(entry === null || entry === undefined)) {
+            if (entry.value === false) {
+              idbm.save(options, 'usemode', {
+                name: 'usemode',
+                value: 'online'
+              }).catch((error) => {
+                console.error(error);
+              });
+            } else if (entry.value === true) {
+              idbm.save(options, 'usemode', {
+                name: 'usemode',
+                value: 'local'
+              }).catch((error) => {
+                console.error(error);
+              });
+            }
+          }
+          console.log(`updated to v3`);
+          resolve();
+        }).catch((error) => {
+          console.error(error);
+          resolve();
+        })
+      } else {
+        resolve();
+      }
+    });
   }
 }

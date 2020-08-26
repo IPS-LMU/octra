@@ -20,6 +20,7 @@ export class SettingsGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     const subject = new Subject<boolean>();
+
     const promises: Promise<void>[] = [];
     promises.push(Functions.afterTrue(this.store.select(fromApplication.selectIDBLoaded)));
     promises.push(Functions.afterDefined(this.store.select(fromApplication.selectAppSettings)));

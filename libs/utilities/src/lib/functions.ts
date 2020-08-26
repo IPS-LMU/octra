@@ -257,7 +257,9 @@ export class Functions {
       const subscription = observable.subscribe(
         (value) => {
           if (value === true) {
-            subscription.unsubscribe();
+            try {
+              subscription.unsubscribe();
+            } catch (e) {}
             resolve();
           }
         },
@@ -276,7 +278,9 @@ export class Functions {
       const subscription = observable.subscribe(
         (value) => {
           if (!isUnset(value)) {
-            subscription.unsubscribe();
+            try {
+              subscription.unsubscribe();
+            } catch (e) {}
             resolve(value);
           }
         },

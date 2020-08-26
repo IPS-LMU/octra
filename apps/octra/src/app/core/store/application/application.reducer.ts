@@ -13,7 +13,7 @@ export const initialState: ApplicationState = {
   reloaded: false,
   idb: {
     loaded: false,
-    version: '1.0.0'
+    version: 1
   },
   language: 'en',
   appConfiguration: undefined,
@@ -72,6 +72,7 @@ export const reducer = createReducer(
       result = saveOptionToStore(result, variable.name, variable.value);
     }
 
+    console.log(variables);
     console.log(`Options saved in application new State is`);
     console.log(result);
     return result;
@@ -117,7 +118,7 @@ export const reducer = createReducer(
 
 function saveOptionToStore(state: ApplicationState, attribute: string, value: any): ApplicationState {
   switch (attribute) {
-    case('_version'):
+    case('version'):
       return {
         ...state,
         idb: {
@@ -125,7 +126,8 @@ function saveOptionToStore(state: ApplicationState, attribute: string, value: an
           version: value
         }
       };
-    case('_language'):
+    case('language'):
+      console.log(`set LANGUAGE to ${value}`);
       return {
         ...state,
         language: value

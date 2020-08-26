@@ -35,7 +35,7 @@ export const setAppLanguage = createAction(
 export const setDBVersion = createAction(
   `[${context}] Set IDB Version`,
   props<{
-    version: string;
+    version: number;
   }>()
 );
 

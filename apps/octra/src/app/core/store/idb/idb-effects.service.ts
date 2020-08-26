@@ -68,7 +68,7 @@ export class IDBEffects {
             },
             {
               attribute: '_usemode',
-              key: 'useMode'
+              key: 'usemode'
             },
             {
               attribute: '_user',
@@ -130,7 +130,6 @@ export class IDBEffects {
       }).catch((error) => {
         console.error(error);
       });
-
 
       return subject;
     })
@@ -553,6 +552,7 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
+      this.sessStr.store('loggedIn', true);
       this.saveOnlineSession(LoginMode.DEMO, action.onlineSession).then(() => {
         subject.next(IDBActions.saveDemoSessionSuccess());
       }).catch((error) => {
@@ -570,6 +570,7 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
+      this.sessStr.store('loggedIn', true);
       this.saveOnlineSession(LoginMode.ONLINE, action.onlineSession).then(() => {
         subject.next(IDBActions.saveOnlineSessionSuccess());
       }).catch((error) => {
@@ -586,7 +587,7 @@ export class IDBEffects {
     ofType(LoginActions.loginLocal),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
-
+      this.sessStr.store('loggedIn', true);
       this.idbService.saveOption('sessionfile', action.sessionFile.toAny()).then(() => {
         subject.next(IDBActions.saveLocalSessionSuccess());
       }).catch((error) => {
@@ -594,28 +595,6 @@ export class IDBEffects {
           error
         }));
       });
-
-      return subject;
-    })
-  ));
-
-  saveLoggedIn$ = createEffect(() => this.actions$.pipe(
-    ofType(LoginActions.setLoggedIn),
-    exhaustMap((action) => {
-      const subject = new Subject<Action>();
-
-      try {
-        this.sessStr.store('loggedIn', action.loggedIn);
-        setTimeout(() => {
-          subject.next(IDBActions.saveLoggedInSuccess());
-        }, 200);
-      } catch (error) {
-        setTimeout(() => {
-          subject.next(IDBActions.saveLoggedInFailed({
-            error
-          }));
-        }, 200);
-      }
 
       return subject;
     })
@@ -891,14 +870,14 @@ export class IDBEffects {
     promises.push(this.idbService.saveOption('dataID', onlineSession.dataID));
     promises.push(this.idbService.saveOption('prompttext', onlineSession.promptText));
     promises.push(this.idbService.saveOption('audioURL', onlineSession.audioURL));
-    promises.push(this.idbService.saveOption('serverDataEntry', onlineSession.serverDataEntry));
-    promises.push(this.idbService.saveOption('useMode', mode));
+    promises.push(this.idbService.saveOption('usemode', mode));
     promises.push(this.idbService.saveOption('user', {
       id: onlineSession.id,
       jobno: onlineSession.jobNumber,
       project: onlineSession.project
     }));
     this.sessStr.store('jobsLeft', onlineSession.jobsLeft);
+    this.sessStr.store('serverDataEntry', onlineSession.serverDataEntry);
 
     return Promise.all(promises);
   }

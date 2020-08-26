@@ -78,12 +78,8 @@ export class AppStorageService {
   }
 
   /* Getter/Setter IDB Storage */
-  get dbVersion(): string {
+  get dbVersion(): number {
     return this._snapshot.application.idb.version;
-  }
-
-  set dbVersion(value: string) {
-    this.store.dispatch(ApplicationActions.setDBVersion({version: value}));
   }
 
   get logging(): boolean {

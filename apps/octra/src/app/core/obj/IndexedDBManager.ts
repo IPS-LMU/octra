@@ -67,19 +67,22 @@ export class IndexedDBManager {
   public get = (storeName: string | IDBObjectStore, key: string | number): Promise<any> => {
     return new Promise<any>(
       (resolve, reject) => {
-        const store = (typeof storeName !== 'string') ? storeName : this.getObjectStore(storeName, IDBMode.READONLY);
-        if (key !== null && key !== undefined) {
-          const request: IDBRequest = store.get(key);
-          request.onsuccess = (idbrequest: any) => {
-            resolve(idbrequest.target.result);
-          };
+        this.getStore(storeName, IDBMode.READONLY).then((store) => {
+          if (key !== null && key !== undefined) {
+            const request: IDBRequest = store.get(key);
+            request.onsuccess = (idbrequest: any) => {
+              resolve(idbrequest.target.result);
+            };
 
-          request.onerror = (error: any) => {
-            reject(error);
-          };
-        } else {
-          reject(new Error('key not defined'));
-        }
+            request.onerror = (error: any) => {
+              reject(error);
+            };
+          } else {
+            reject(new Error('key not defined'));
+          }
+        }).catch((error) => {
+          reject(error);
+        });
       }
     );
   }
@@ -88,51 +91,70 @@ export class IndexedDBManager {
     return new Promise<any>(
       (resolve, reject) => {
         const result = [];
-        const store = (typeof storeName !== 'string') ? storeName : this.getObjectStore(storeName, IDBMode.READONLY);
-        if (key !== null && key !== undefined) {
-          const cursorRequest = store.openCursor();
+        this.getStore(storeName, IDBMode.READONLY).then((store) => {
+          if (key !== null && key !== undefined) {
+            const cursorRequest = store.openCursor();
 
-          cursorRequest.onsuccess = (event: any) => {
-            const cursor = event.target.result;
+            cursorRequest.onsuccess = (event: any) => {
+              const cursor = event.target.result;
 
-            if (cursor) {
-              const value = cursor.value;
-              result.push(value);
-              cursor.continue();
-            } else {
-              resolve(result);
-            }
-          };
+              if (cursor) {
+                const value = cursor.value;
+                result.push(value);
+                cursor.continue();
+              } else {
+                resolve(result);
+              }
+            };
 
-          cursorRequest.onerror = (error: any) => {
-            reject(error);
-          };
-        } else {
-          reject(new Error('key not defined'));
-        }
+            cursorRequest.onerror = (error: any) => {
+              reject(error);
+            };
+          } else {
+            reject(new Error('key not defined'));
+          }
+        }).catch((error) => {
+          reject(error);
+        });
       }
     );
+  }
+
+  private getStore(store: string | IDBObjectStore, mode: IDBMode): Promise<IDBObjectStore> {
+    return new Promise<any>((resolve, reject) => {
+      if ((typeof store !== 'string')) {
+        resolve(store);
+      } else {
+        this.getObjectStore(store, mode).then((storeIDB) => {
+          resolve(storeIDB)
+        }).catch((error) => {
+          reject(error);
+        });
+      }
+    })
   }
 
   public save = (storeName: string | IDBObjectStore, key, data): Promise<any> => {
     return new Promise<any>(
       (resolve, reject) => {
-        const store = (typeof storeName !== 'string') ? storeName : this.getObjectStore(storeName, IDBMode.READWRITE);
-
+        this.getStore(storeName, IDBMode.READWRITE).then((store) => {
+          // make sure that key is in data object
+          if (!data.hasOwnProperty(store.keyPath)) {
+            data['' + store.keyPath + ''] = key;
+          }
+          const request = key ? store.put(data) : store.add(data);
+          request.onsuccess = (result: any) => {
+            resolve(result);
+          };
+          request.onerror = (error: any) => {
+            reject(error);
+          };
+        }).catch((error) => {
+          console.error(error);
+        });
         if (data === null || data === undefined) {
           data = {};
         }
-        // make sure that key is in data object
-        if (!data.hasOwnProperty(store.keyPath)) {
-          data['' + store.keyPath + ''] = key;
-        }
-        const request = key ? store.put(data) : store.add(data);
-        request.onsuccess = (result: any) => {
-          resolve(result);
-        };
-        request.onerror = (error: any) => {
-          reject(error);
-        };
       }
     );
   }
@@ -160,30 +182,36 @@ export class IndexedDBManager {
   public remove = (storeName: string | IDBObjectStore, key: string | number): Promise<any> => {
     return new Promise<any>(
       (resolve, reject) => {
-        const store = (typeof storeName !== 'string') ? storeName : this.getObjectStore(storeName, IDBMode.READWRITE);
-        const request = store.delete(key);
-        request.onsuccess = (result: any) => {
-          resolve(result);
-        };
+        this.getStore(storeName, IDBMode.READWRITE).then((store) => {
+          const request = store.delete(key);
+          request.onsuccess = (result: any) => {
+            resolve(result);
+          };
 
-        request.onerror = (error: any) => {
+          request.onerror = (error: any) => {
+            reject(error);
+          };
+        }).catch((error) => {
           reject(error);
-        };
+        });
       });
   }
 
   public clear = (storeName: string | IDBObjectStore): Promise<any> => {
     return new Promise<any>(
       (resolve, reject) => {
-        const store = (typeof storeName !== 'string') ? storeName : this.getObjectStore(storeName, IDBMode.READWRITE);
-        const request = store.clear();
-        request.onsuccess = (result: any) => {
-          resolve(result);
-        };
+        this.getStore(storeName, IDBMode.READWRITE).then((store) => {
+          const request = store.clear();
+          request.onsuccess = (result: any) => {
+            resolve(result);
+          };
 
-        request.onerror = (error: any) => {
+          request.onerror = (error: any) => {
+            reject(error);
+          };
+        }).catch((error) => {
           reject(error);
-        };
+        });
       });
   }
 
@@ -194,23 +222,25 @@ export class IndexedDBManager {
   public saveArraySequential = (array: any[], storeName: string | IDBObjectStore, key: any): Promise<void> => {
     return new Promise<void>(
       (resolve, reject) => {
-        const store = (typeof storeName !== 'string') ? storeName : this.getObjectStore(storeName, IDBMode.READWRITE);
-
-        const wrapper = (acc: number) => {
-          if (acc < array.length) {
-            const value = (typeof key === 'string') ? array[acc]['' + key + ''] : array[acc][key];
-            this.save(store, value, array[acc]).then(
-              () => {
-                wrapper(++acc);
-              }
-            ).catch((err) => {
-              reject(err);
-            });
-          } else {
-            resolve();
-          }
-        };
-        wrapper(0);
+        this.getStore(storeName, IDBMode.READWRITE).then((store) => {
+          const wrapper = (acc: number) => {
+            if (acc < array.length) {
+              const value = (typeof key === 'string') ? array[acc]['' + key + ''] : array[acc][key];
+              this.save(store, value, array[acc]).then(
+                () => {
+                  wrapper(++acc);
+                }
+              ).catch((err) => {
+                reject(err);
+              });
+            } else {
+              resolve();
+            }
+          };
+          wrapper(0);
+        }).catch((error) => {
+          console.error(error);
+        });
       }
     );
   }
@@ -239,13 +269,18 @@ export class IndexedDBManager {
     });
   }
 
-  private getObjectStore = (storeName: string, mode: IDBMode): IDBObjectStore => {
-    let modeStr: IDBTransactionMode = 'readonly';
+  private getObjectStore = (storeName: string, mode: IDBMode): Promise<IDBObjectStore> => {
+    return new Promise<IDBObjectStore>((resolve, reject) => {
+      let modeStr: IDBTransactionMode = 'readonly';
 
-    if (mode === IDBMode.READWRITE) {
-      modeStr = 'readwrite';
-    }
-    const txn = this.db.transaction([storeName], modeStr);
-    return txn.objectStore(storeName);
+      if (mode === IDBMode.READWRITE) {
+        modeStr = 'readwrite';
+      }
+      const txn = this.db.transaction([storeName], modeStr);
+      txn.onerror = (error) => {
+        reject(error);
+      }
+      resolve(txn.objectStore(storeName));
+    });
   }
 }

@@ -2,6 +2,7 @@ import {createReducer, on} from '@ngrx/store';
 import * as ASRActions from './asr.actions';
 import {ASRState} from '../index';
 import * as IDBActions from '../idb/idb.actions';
+import {isUnset} from '@octra/utilities';
 
 export const initialState: ASRState = {};
 
@@ -24,11 +25,11 @@ export const reducer = createReducer(
 
 function saveOptionToStore(state: ASRState, attribute: string, value: any): ASRState {
   switch (attribute) {
-    case('_asr'):
+    case('asr'):
       return {
         ...state,
-        selectedLanguage: (value.hasOwnProperty('selectedLanguage')) ? value.selectedLanguage: null,
-        selectedService: (value.hasOwnProperty('selectedService')) ? value.selectedService : null
+        selectedLanguage: (!isUnset(value) && value.hasOwnProperty('selectedLanguage')) ? value.selectedLanguage: null,
+        selectedService: (!isUnset(value) && value.hasOwnProperty('selectedService')) ? value.selectedService : null
       };
 
     default:

@@ -3,6 +3,7 @@ import * as LoginActions from './login.actions';
 import {LoginMode, LoginState} from '../index';
 import * as IDBActions from '../idb/idb.actions';
 import {SessionFile} from '../../obj/SessionFile';
+import {isUnset} from '@octra/utilities';
 
 export const initialState: LoginState = {
   loggedIn: false
@@ -14,7 +15,7 @@ export const reducer = createReducer(
     ...state,
     mode: LoginMode.DEMO,
     loggedIn: true,
-    onlineSession,
+    onlineSession
   })),
   on(LoginActions.loginLocal, (state, {files, sessionFile}) => ({
     ...state,
@@ -125,7 +126,7 @@ export const reducer = createReducer(
 
 function saveOptionToStore(state: LoginState, attribute: string, value: any): LoginState {
   switch (attribute) {
-    case('_audioURL'):
+    case('audioURL'):
       return {
         ...state,
         onlineSession: {
@@ -133,7 +134,7 @@ function saveOptionToStore(state: LoginState, attribute: string, value: any): Lo
           audioURL: value
         }
       };
-    case('_comment'):
+    case('comment'):
       return {
         ...state,
         onlineSession: {
@@ -141,7 +142,7 @@ function saveOptionToStore(state: LoginState, attribute: string, value: any): Lo
           comment: value
         }
       };
-    case('_dataID'):
+    case('dataID'):
       return {
         ...state,
         onlineSession: {
@@ -149,34 +150,36 @@ function saveOptionToStore(state: LoginState, attribute: string, value: any): Lo
           dataID: value
         }
       };
-    case('_sessionfile'):
+    case('sessionfile'):
       const sessionFile = SessionFile.fromAny(value);
 
       return {
         ...state,
         sessionFile
       };
-    case('_usemode'):
+    case('usemode'):
       return {
         ...state,
         mode: value
       };
-    case('_user'):
+    case('user'):
       const onlineSessionData = {
         jobNumber: -1,
         id: '',
         project: ''
       };
 
-      if (value.hasOwnProperty('id')) {
-        onlineSessionData.id = value.id;
-      }
-      if (value.hasOwnProperty('jobno')) {
-        onlineSessionData.jobNumber = value.jobno;
-      }
+      if (!isUnset(value)) {
+        if (value.hasOwnProperty('id')) {
+          onlineSessionData.id = value.id;
+        }
+        if (value.hasOwnProperty('jobno')) {
+          onlineSessionData.jobNumber = value.jobno;
+        }
 
-      if (value.hasOwnProperty('project')) {
-        onlineSessionData.project = value.project;
+        if (value.hasOwnProperty('project')) {
+          onlineSessionData.project = value.project;
+        }
       }
 
       return {
@@ -186,7 +189,7 @@ function saveOptionToStore(state: LoginState, attribute: string, value: any): Lo
           ...onlineSessionData
         }
       };
-    case('_prompttext'):
+    case('prompttext'):
       return {
         ...state,
         onlineSession: {
@@ -194,7 +197,7 @@ function saveOptionToStore(state: LoginState, attribute: string, value: any): Lo
           promptText: value
         }
       };
-    case('_servercomment'):
+    case('servercomment'):
       return {
         ...state,
         onlineSession: {

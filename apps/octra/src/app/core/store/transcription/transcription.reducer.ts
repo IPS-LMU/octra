@@ -3,6 +3,7 @@ import * as TranscriptionActions from './transcription.actions';
 import * as ConfigurationActions from '../configuration/configuration.actions';
 import * as IDBActions from '../idb/idb.actions';
 import {TranscriptionState} from '../index';
+import {isUnset} from '@octra/utilities';
 
 export const initialState: TranscriptionState = {
   savingNeeded: false,
@@ -228,50 +229,50 @@ export const reducer = createReducer(
 
 function saveOptionToStore(state: TranscriptionState, attribute: string, value: any): TranscriptionState {
   switch (attribute) {
-    case('_submitted'):
+    case('submitted'):
       return {
         ...state,
         submitted: value
       };
-    case('_easymode'):
+    case('easymode'):
       return {
         ...state,
         easyMode: value
       };
-    case('_feedback'):
+    case('feedback'):
       return {
         ...state,
         feedback: value
       }
-    case('_interface'):
+    case('interface'):
       return {
         ...state,
         currentEditor: value
       }
-    case('_logging'):
+    case('logging'):
       return {
         ...state,
         logging: value
       }
-    case('_showLoupe'):
+    case('showLoupe'):
       return {
         ...state,
         showLoupe: value
       }
-    case('_secondsPerLine'):
+    case('secondsPerLine'):
       return {
         ...state,
         secondsPerLine: value
       }
-    case('_audioSettings'):
+    case('audioSettings'):
       return {
         ...state,
         audioSettings: {
-          volume: value.volume,
-          speed: value.speed
+          volume: (!isUnset(value)) ? value.volume : 1,
+          speed: (!isUnset(value)) ? value.speed : 1
         }
       };
-    case('_highlightingEnabled'):
+    case('highlightingEnabled'):
       return {
         ...state,
         highlightingEnabled: value

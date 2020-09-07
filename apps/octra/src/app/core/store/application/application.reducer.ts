@@ -3,6 +3,7 @@ import * as ApplicationActions from './application.actions';
 import * as ConfigurationActions from '../configuration/configuration.actions';
 import * as IDBActions from '../idb/idb.actions';
 import {ApplicationState, LoadingStatus} from '../index';
+import {isUnset} from '@octra/utilities';
 
 export const initialState: ApplicationState = {
   loading: {
@@ -127,10 +128,9 @@ function saveOptionToStore(state: ApplicationState, attribute: string, value: an
         }
       };
     case('language'):
-      console.log(`set LANGUAGE to ${value}`);
       return {
         ...state,
-        language: value
+        language: (!isUnset(value)) ? value : 'en'
       };
     default:
       return state;

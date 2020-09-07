@@ -168,7 +168,9 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
       level.name = event.target.value.replace(' ', '_');
       this.appStorage.changeAnnotationLevel(tiernum,
         level.getObj(this.transcrServ.audioManager.ressource.info.duration)
-      );
+      ).catch((error) => {
+        console.error(error);
+      });
       // update value for annoation object in transcr service
       this.transcrServ.annotation.levels[tiernum].name = event.target.value.replace(' ', '_');
     } else {
@@ -199,8 +201,12 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
       new Segments(this.transcrServ.audioManager.ressource.info.sampleRate, [],
         this.transcrServ.audioManager.ressource.info.duration));
     this.appStorage.addAnnotationLevel(
-      newlevel.getObj(this.transcrServ.audioManager.ressource.info.duration));
-    this.transcrServ.annotation.levels.push(newlevel);
+      newlevel.getObj(this.transcrServ.audioManager.ressource.info.duration))
+      .then(() => {
+        this.transcrServ.annotation.levels.push(newlevel);
+      }).catch((error) => {
+      console.error(error);
+    });
   }
 
   onLevelRemoveClick(tiernum: number, id: number) {
@@ -232,7 +238,11 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     const newlevel = this.transcrServ.annotation.levels[tiernum].clone();
     this.appStorage.addAnnotationLevel(
       newlevel.getObj(this.transcrServ.audioManager.ressource.info.duration))
-    this.transcrServ.annotation.levels.push(newlevel);
+      .then(() => {
+        this.transcrServ.annotation.levels.push(newlevel);
+      }).catch((error) => {
+      console.error(error);
+    });
   }
 
   public selectLevel(tiernum: number) {

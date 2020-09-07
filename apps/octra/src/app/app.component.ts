@@ -46,6 +46,16 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
               private asrService: AsrService,
               private store: Store) {
 
+    this.router.events.subscribe((event: any) => {
+        if (event.hasOwnProperty('url')) {
+          console.log(`route to page: ${event?.url}`);
+        } else if (event.hasOwnProperty('snapshot')) {
+          console.log(`route to guard: ${event.snapshot.url}, component: ${event.snapshot.component?.name}`);
+          console.log(event.snapshot);
+        }
+      }
+    );
+
     // overwrite console.log
     if (!AppInfo.debugging) {
       const oldLog = console.log;

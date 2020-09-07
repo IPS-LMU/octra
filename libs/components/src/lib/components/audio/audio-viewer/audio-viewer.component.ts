@@ -244,7 +244,12 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   public getPixelPerSecond(secondsPerLine: number) {
-    return (this.av.innerWidth / secondsPerLine);
+    if (!isUnset(secondsPerLine)) {
+      return (this.av.innerWidth / secondsPerLine);
+    } else {
+      console.error(`secondsPerLine is null or undefined!`);
+    }
+    return (this.av.innerWidth / 5);
   }
 
   ngOnDestroy(): void {

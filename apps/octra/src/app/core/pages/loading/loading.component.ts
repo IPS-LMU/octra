@@ -223,9 +223,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
     // do navigation after all is loaded
     const promises: Promise<any>[] = [];
-    promises.push(Functions.afterDefined(this.store.select(fromTranscription.selectGuideLines)));
-    promises.push(Functions.afterDefined(this.store.select(fromTranscription.selectProjectConfig)));
-    promises.push(Functions.afterDefined(this.store.select(fromTranscription.selectMethods)));
     promises.push(Functions.afterTrue(this.store.select(fromTranscription.selectAudioLoaded)));
 
     Promise.all(promises).then(() => {

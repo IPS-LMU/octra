@@ -62,6 +62,9 @@ export class TranscriptionService {
    */
 
   public get currentlevel(): Level {
+    if (isUnset(this._selectedlevel) || this._selectedlevel < 0) {
+      return this._annotation.levels[0]
+    }
     return this._annotation.levels[this._selectedlevel];
   }
 
@@ -71,18 +74,8 @@ export class TranscriptionService {
     return this._annotation;
   }
 
-  set annotation(value: Annotation) {
-    this._annotation = value;
-  }
-
-  private _guidelines: any;
-
   get guidelines(): any {
-    return this._guidelines;
-  }
-
-  set guidelines(value: any) {
-    this._guidelines = value;
+    return this.appStorage.snapshot.transcription.guidelines;
   }
 
   private _audiofile: OAudiofile;
@@ -126,7 +119,6 @@ export class TranscriptionService {
     } else {
       this._selectedlevel = this.getSegmentFirstLevel();
     }
-
     this.levelchanged.emit(this._annotation.levels[this._selectedlevel]);
   }
 
@@ -210,7 +202,7 @@ export class TranscriptionService {
   }
 
   public validate(rawText: string): any {
-    const results = validateAnnotation(rawText, this._guidelines);
+    const results = validateAnnotation(rawText, this.guidelines);
 
     // check if selection is in the raw text
     const sPos = rawText.indexOf('[[[sel-start/]]]');
@@ -326,8 +318,6 @@ export class TranscriptionService {
 
             this.appStorage.overwriteAnnotation(newLevels, newLinks).then(() => {
                 if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.URL) {
-                  this.appStorage.annotationLevels[this._selectedlevel].level.items = [];
-
                   if (!isUnset(this.appStorage.serverDataEntry) && !isUnset(this.appStorage.serverDataEntry.transcript)
                     && this.appStorage.serverDataEntry.transcript.length > 0) {
                     // import logs
@@ -341,8 +331,11 @@ export class TranscriptionService {
                       );
 
                       this.appStorage.changeAnnotationLevel(this._selectedlevel,
-                        this.appStorage.annotationLevels[this._selectedlevel].level);
-                      resolve2();
+                        this.appStorage.annotationLevels[this._selectedlevel].level).then(() => {
+                        resolve2();
+                      }).catch(() => {
+                        resolve2();
+                      });
                     } else {
                       console.log(`read serverData entry...`);
                       this.appStorage.annotationLevels[this._selectedlevel].level.items = [];
@@ -355,8 +348,11 @@ export class TranscriptionService {
                       console.log(`read serverData read with ${this.appStorage.serverDataEntry.transcript.length} items...`);
 
                       this.appStorage.changeAnnotationLevel(this._selectedlevel,
-                        this.appStorage.annotationLevels[this._selectedlevel].level)
-                      resolve2();
+                        this.appStorage.annotationLevels[this._selectedlevel].level).then(() => {
+                        resolve2();
+                      }).catch(() => {
+                        resolve2();
+                      });
                     }
                   } else if (!isUnset(this.appStorage.prompttext) && this.appStorage.prompttext !== ''
                     && typeof this.appStorage.prompttext === 'string') {
@@ -391,20 +387,27 @@ export class TranscriptionService {
                       );
 
                       this.appStorage.changeAnnotationLevel(this._selectedlevel,
-                        this.appStorage.annotationLevels[this._selectedlevel].level)
-                      resolve2();
+                        this.appStorage.annotationLevels[this._selectedlevel].level).then(() => {
+                        resolve2();
+                      }).catch(() => {
+                        resolve2();
+                      });
                     } else {
                       // use imported annotJSON
                       const promises: Promise<any>[] = [];
                       for (let i = 0; i < converted.levels.length; i++) {
                         if (i >= this.appStorage.annotationLevels.length) {
-                          this.appStorage.addAnnotationLevel(converted.levels[i]);
+                          promises.push(this.appStorage.addAnnotationLevel(converted.levels[i]));
                         } else {
-                          this.appStorage.changeAnnotationLevel(i, converted.levels[i]);
+                          promises.push(this.appStorage.changeAnnotationLevel(i, converted.levels[i]));
                         }
                       }
 
-                      resolve2();
+                      Promise.all(promises).then(() => {
+                        resolve2();
+                      }).catch((error) => {
+                        resolve2();
+                      });
                     }
                   } else {
                     resolve2();
@@ -455,7 +458,7 @@ export class TranscriptionService {
             }
             this.uiService.addElementFromEvent('octra', {value: AppInfo.version}, Date.now(), null, -1, null, null, 'version');
 
-            this.navbarServ.dataloaded = true;
+            // this.navbarServ.dataloaded = true;
             this.dataloaded.emit();
           } else {
             reject(Error('annotation object in appStorage is null'));
@@ -542,7 +545,6 @@ export class TranscriptionService {
 
     // set data to null
     this._segments = null;
-    this._guidelines = null;
     this.filename = '';
 
     this._feedback = null;
@@ -657,7 +659,7 @@ export class TranscriptionService {
       result = result.replace(/\r?\n/g, ' '); // .replace(/</g, "&lt;").replace(/>/g, "&gt;");
       // replace markers with no wrap
 
-      const markers = this._guidelines.markers;
+      const markers = this.guidelines.markers;
       // replace all tags that are not markers
       result = result.replace(new RegExp('(<\/?)?([^<>]+)(>)', 'g'), (g0, g1, g2, g3) => {
         g1 = (g1 === undefined) ? '' : g1;
@@ -817,8 +819,8 @@ export class TranscriptionService {
   }
 
   public getErrorDetails(code: string): any {
-    if (!(this._guidelines.instructions === null || this._guidelines.instructions === undefined)) {
-      const instructions = this._guidelines.instructions;
+    if (!(this.guidelines.instructions === null || this.guidelines.instructions === undefined)) {
+      const instructions = this.guidelines.instructions;
 
       for (const instruction of instructions) {
         if (!isUnset(instruction.entries) && isArray(instruction.entries)) {
@@ -926,11 +928,11 @@ export class TranscriptionService {
   public getMarkerPositions(rawText: string): { start: number; end: number }[] {
     const result = [];
     let regexStr = '';
-    for (let i = 0; i < this._guidelines.markers.length; i++) {
-      const marker = this._guidelines.markers[i];
+    for (let i = 0; i < this.guidelines.markers.length; i++) {
+      const marker = this.guidelines.markers[i];
       regexStr += `(${Functions.escapeRegex(marker.code)})`;
 
-      if (i < this._guidelines.markers.length - 1) {
+      if (i < this.guidelines.markers.length - 1) {
         regexStr += '|';
       }
     }

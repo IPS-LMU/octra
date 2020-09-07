@@ -5,9 +5,6 @@ import {Observable, Subject} from 'rxjs';
 import {SettingsService} from '../service';
 import {AppStorageService} from '../service/appstorage.service';
 import {Store} from '@ngrx/store';
-import * as fromApplication from '../../store/application';
-import * as fromTranscription from '../../store/transcription';
-import {Functions} from '@octra/utilities';
 
 @Injectable()
 export class SettingsGuard implements CanActivate {
@@ -21,14 +18,7 @@ export class SettingsGuard implements CanActivate {
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     const subject = new Subject<boolean>();
 
-    const promises: Promise<void>[] = [];
-    promises.push(Functions.afterTrue(this.store.select(fromApplication.selectIDBLoaded)));
-    promises.push(Functions.afterDefined(this.store.select(fromApplication.selectAppSettings)));
-    promises.push(Functions.afterDefined(this.store.select(fromTranscription.selectProjectConfig)));
-    promises.push(Functions.afterDefined(this.store.select(fromTranscription.selectGuideLines)));
-    promises.push(Functions.afterDefined(this.store.select(fromTranscription.selectMethods)));
-
-    Promise.all(promises).then(() => {
+    this.settingsService.allLoaded().then(() => {
       console.log(`All Loaded!`);
       subject.next(true);
       subject.complete();

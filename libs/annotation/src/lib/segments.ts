@@ -38,10 +38,12 @@ export class Segments {
 
       for (const segment of segments) {
         // divide samples through sampleRateFactor in order to get decodedValue
-        segment.sampleDur = Math.round(segment.sampleDur);
-        segment.sampleStart = Math.round(segment.sampleStart);
 
-        const newSegment = Segment.fromObj(segment, sampleRate);
+        const newSegment = Segment.fromObj({
+          ...segment,
+          sampleDur: Math.round(segment.sampleDur),
+          sampleStart: Math.round(segment.sampleStart)
+        }, sampleRate);
 
         this._segments.push(newSegment);
       }

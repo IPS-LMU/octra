@@ -60,11 +60,13 @@ export class AudioService {
           this.subscrmanager.add(AudioManager.decodeAudio(filename, 'audio/wav', event.result, AppInfo.audioformats).subscribe(
             (result) => {
               if (!isUnset(result.audioManager)) {
-                subj.next(1);
-                subj.complete();
                 // finished
+                console.log(`REGISTER AUDIOMANAGER`);
                 this.registerAudioManager(result.audioManager);
                 this.afterloaded.emit({status: 'success'});
+
+                subj.next(1);
+                subj.complete();
 
                 callback({});
               } else {

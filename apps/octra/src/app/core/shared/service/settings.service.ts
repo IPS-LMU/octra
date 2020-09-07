@@ -14,13 +14,19 @@ import * as fromApplication from '../../store/application';
 import * as ConfigurationActions from '../../store/configuration/configuration.actions';
 import * as TranscriptionActions from '../../store/transcription/transcription.actions';
 import {Store} from '@ngrx/store';
+import * as fromTranscription from '../../store/transcription';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SettingsService {
+  get isAudioLoaded(): boolean {
+    return this._isAudioLoaded;
+  }
+
   public audioloaded: EventEmitter<any> = new EventEmitter<any>();
   public audioloading = new Subject<number>();
+  private _isAudioLoaded = false;
   private subscrmanager: SubscriptionManager;
 
   public get isASREnabled(): boolean {
@@ -49,7 +55,7 @@ export class SettingsService {
     }
   }
 
-  public get allloaded(): boolean {
+  public get isAllLoaded(): boolean {
     return (
       !(this.projectsettings === null || this.projectsettings === undefined)
     );
@@ -144,7 +150,7 @@ export class SettingsService {
       const browserLang = navigator.language || navigator.userLanguage;
 
       // check if browser language is available in translations
-      if ((this.appStorage.language === null || this.appStorage.language === undefined) || this.appStorage.language === '') {
+      if (isUnset(this.appStorage.language) || this.appStorage.language === '') {
         if ((this.appSettings.octra.languages.find((value) => {
           return value === browserLang;
         })) !== undefined) {
@@ -201,14 +207,15 @@ export class SettingsService {
           this._filename = this._filename.substr(this._filename.indexOf('src=') + 4);
         }
 
+        this._isAudioLoaded = false;
         audioService.loadAudio(src, () => {
-
           this.audioloaded.emit({status: 'success'});
         }).subscribe(
           (progress) => {
             this.audioloading.next(progress);
 
             if (progress === 1) {
+              this._isAudioLoaded = true;
               this.audioloading.complete();
             }
           },
@@ -304,5 +311,16 @@ export class SettingsService {
 
   private triggerSettingsLoaded = () => {
     this.loaded = true;
+  }
+
+  public allLoaded() {
+    const promises: Promise<void>[] = [];
+    promises.push(Functions.afterTrue(this.store.select(fromApplication.selectIDBLoaded)));
+    promises.push(Functions.afterDefined(this.store.select(fromApplication.selectAppSettings)));
+    promises.push(Functions.afterDefined(this.store.select(fromTranscription.selectProjectConfig)));
+    promises.push(Functions.afterDefined(this.store.select(fromTranscription.selectGuideLines)));
+    promises.push(Functions.afterDefined(this.store.select(fromTranscription.selectMethods)));
+
+    return Promise.all(promises);
   }
 }

@@ -18,29 +18,21 @@ export class TranscActivateGuard implements CanActivate {
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
-    if (this.appStorage.useMode !== LoginMode.LOCAL) {
-      if (!this.settService.allloaded) {
+    if (!this.settService.isAudioLoaded) {
+      const params = AppInfo.queryParamsHandling;
+      params.fragment = route.fragment;
+      params.queryParams = route.queryParams;
 
-        const params = AppInfo.queryParamsHandling;
-        params.fragment = route.fragment;
-        params.queryParams = route.queryParams;
-
+      if (this.appStorage.useMode !== LoginMode.LOCAL) {
         Functions.navigateTo(this.router, ['/user/load'], params).catch((error) => {
           console.error(error);
         });
-        return false;
-      }
-    } else {
-      if (!this.settService.allloaded) {
-        const params = AppInfo.queryParamsHandling;
-        params.fragment = route.fragment;
-        params.queryParams = route.queryParams;
-
+      } else {
         Functions.navigateTo(this.router, ['/user/transcr/reload-file'], params).catch((error) => {
           console.error(error);
         });
-        return false;
       }
+      return false;
     }
     return true;
   }

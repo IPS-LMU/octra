@@ -5,7 +5,7 @@ import {AppInfo} from '../../../app.info';
 import {IDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
 import {FileProgress} from '../../obj/objects';
-import {isUnset, SubscriptionManager} from '@octra/utilities';
+import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
 import {OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
 import {LoginMode, OnlineSession, RootState} from '../../store';
 import {Store} from '@ngrx/store';
@@ -16,7 +16,8 @@ import * as ASRActions from '../../store/asr/asr.actions';
 import * as TranscriptionActions from '../../store/transcription/transcription.actions';
 import * as fromTranscriptionReducer from '../../store/transcription/transcription.reducer';
 import * as UserActions from '../../store/user/user.actions';
-import {act, Actions} from '@ngrx/effects';
+import * as IDBActions from '../../store/idb/idb.actions';
+import {Actions} from '@ngrx/effects';
 import {ConsoleEntry} from './bug-report.service';
 
 @Injectable({
@@ -410,6 +411,16 @@ export class AppStorageService {
           max = Math.max(max, valueElem.id);
         }
 
+        const subscr = this.actions.subscribe((a) => {
+          if (a.type === IDBActions.overwriteAnnotationSuccess.type) {
+            resolve();
+            subscr.unsubscribe();
+          } else if (a.type === IDBActions.overwriteAnnotationFailed.type) {
+            reject((a as any).error);
+            subscr.unsubscribe();
+          }
+        });
+
         this.store.dispatch(TranscriptionActions.overwriteAnnotation({
           annotation: {
             levels,
@@ -419,8 +430,6 @@ export class AppStorageService {
           saveToDB
         }));
       }
-
-      resolve();
     });
   }
 
@@ -544,38 +553,36 @@ export class AppStorageService {
 
       switch (key) {
         case 'annotation':
-          this.changeAnnotationLevel(value.num, value.level);
-          // TODO wait until finished!
-          /*.then(
-          () => {
+          this.changeAnnotationLevel(value.num, value.level).then(
+            () => {
+              this.isSaving = false;
+              this.savingNeeded = false;
+              this.saving.emit('success');
+            }
+          ).catch((err) => {
+            this.isSaving = false;
+            this.savingNeeded = false;
+            this.saving.emit('error');
+            console.error(`error on saving`);
+            console.error(err);
+          });
+          break;
+        case 'feedback':
+          Functions.waitTillResultRetrieved(this.actions, IDBActions.saveTranscriptionFeedbackSuccess, IDBActions.saveTranscriptionFeedbackFailed)
+            .then(() => {
+              this.isSaving = false;
+              this.savingNeeded = false;
+              this.saving.emit('success');
+            }).catch((error) => {
+            console.error(error);
             this.isSaving = false;
             this.savingNeeded = false;
             this.saving.emit('success');
-          }
-        ).catch((err) => {
-          this.isSaving = false;
-          this.savingNeeded = false;
-          this.saving.emit('error');
-          console.error(`error on saving`);
-          console.error(err);
-        });*/
-          break;
-        case 'feedback':
+          });
           this.store.dispatch(TranscriptionActions.setFeedback({
             feedback: value
           }));
 
-          this.isSaving = false;
-          this.savingNeeded = false;
-          this.saving.emit('success');
-
-          // TODO onError
-          /*
-          this.isSaving = false;
-            this.savingNeeded = false;
-            this.saving.emit('error');
-            console.error(err);
-           */
           break;
         default:
           return false; // if key not found return false
@@ -625,42 +632,62 @@ export class AppStorageService {
     });
   }
 
-  public changeAnnotationLevel(tiernum: number, level: OLevel) {
-    if (!isUnset(this.annotationLevels)) {
-      if (!isUnset(level)) {
-        if (this.annotationLevels.length > tiernum) {
-          const changedLevel = this.annotationLevels[tiernum];
-          const id = changedLevel.id;
+  public changeAnnotationLevel(tiernum: number, level: OLevel): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (!isUnset(this.annotationLevels)) {
+        if (!isUnset(level)) {
+          if (this.annotationLevels.length > tiernum) {
+            const changedLevel = this.annotationLevels[tiernum];
+            const id = changedLevel.id;
 
-          this.store.dispatch(TranscriptionActions.changeAnnotationLevel({
-            level,
-            id,
-            sortorder: tiernum
-          }));
+            Functions.waitTillResultRetrieved(this.actions, IDBActions.saveAnnotationLevelSuccess, IDBActions.saveAnnotationLevelFailed)
+              .then(() => {
+                resolve();
+              })
+              .catch((error) => {
+                reject(error);
+              });
+
+            this.store.dispatch(TranscriptionActions.changeAnnotationLevel({
+              level,
+              id,
+              sortorder: tiernum
+            }));
+          } else {
+            reject('number of level that should be changed is invalid');
+          }
         } else {
-          console.error('number of level that should be changed is invalid');
+          reject(new Error('level is undefined or null'));
         }
       } else {
-        console.error(new Error('level is undefined or null'));
+        reject('annotation object is undefined or null');
       }
-    } else {
-      console.error('annotation object is undefined or null');
-    }
+    });
   }
 
   public addAnnotationLevel(level: OLevel) {
-    if (!isUnset(level)) {
-      const newID = this.levelcounter + 1;
-      this.levelcounter = newID;
+    return new Promise<void>((resolve, reject) => {
+      if (!isUnset(level)) {
+        const newID = this.levelcounter + 1;
+        this.levelcounter = newID;
 
-      this.store.dispatch(TranscriptionActions.addAnnotationLevel({
-        id: newID,
-        level,
-        sortorder: this.annotationLevels.length
-      }));
-    } else {
-      console.error('level is undefined or null');
-    }
+        Functions.waitTillResultRetrieved(this.actions, IDBActions.addAnnotationLevelSuccess, IDBActions.addAnnotationLevelFailed)
+          .then(() => {
+            resolve();
+          })
+          .catch((error) => {
+            reject(error);
+          });
+
+        this.store.dispatch(TranscriptionActions.addAnnotationLevel({
+          id: newID,
+          level,
+          sortorder: this.annotationLevels.length
+        }));
+      } else {
+        console.error('level is undefined or null');
+      }
+    });
   }
 
   public removeAnnotationLevel(id: number): Promise<any> {

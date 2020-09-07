@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {ConsoleEntry} from './bug-report.service';
 import {isUnset} from '@octra/utilities';
-import * as TranscriptionActions from '../../store/transcription/transcription.actions';
 import {IndexedDBManager} from '../../obj/IndexedDBManager';
 import {OIDBLevel, OIDBLink} from '@octra/annotation';
 import {Subject} from 'rxjs';
@@ -43,7 +42,6 @@ export class IDBService {
   }
 
   public clearAnnotationData(): Promise<any> {
-    this.store.dispatch(TranscriptionActions.clearAnnotation());
     return this.clearIDBTable('annotation_levels').then(
       () => {
         return this.clearIDBTable('annotation_links');
@@ -351,6 +349,10 @@ export class IDBService {
         }
       }
     ]);
+  }
+
+  public remove(store: IDBObjectStore | string, key: string | number) {
+    return this.idb.remove(store, key);
   }
 
   private doUpgradeToV3(oldVersion: number, transaction: IDBTransaction, idbm: IndexedDBManager) {

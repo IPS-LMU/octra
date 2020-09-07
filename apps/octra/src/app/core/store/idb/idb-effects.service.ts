@@ -142,12 +142,14 @@ export class IDBEffects {
 
       this.idbService.loadLogs().then((logs) => {
         subject.next(IDBActions.loadLogsSuccess({
-          logs
+          logs: logs.map(a => a.value)
         }));
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.loadLogsFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -163,18 +165,20 @@ export class IDBEffects {
         const annotationLevels = [];
         let max = 0;
         for (let i = 0; i < levels.length; i++) {
-          if (!levels[i].hasOwnProperty('id')) {
-            annotationLevels.push(
-              {
-                id: i + 1,
-                level: levels[i],
-                sortorder: i
-              }
-            );
-            max = Math.max(i + 1, max);
-          } else {
-            annotationLevels.push(levels[i]);
-            max = Math.max(levels[i].id, max);
+          if (levels[i].hasOwnProperty('value')) {
+            if (!levels[i].value.hasOwnProperty('id')) {
+              annotationLevels.push(
+                {
+                  id: i + 1,
+                  level: levels[i].value.level,
+                  sortorder: i
+                }
+              );
+              max = Math.max(i + 1, max);
+            } else {
+              annotationLevels.push(levels[i].value);
+              max = Math.max(levels[i].value.id, max);
+            }
           }
         }
 
@@ -182,10 +186,12 @@ export class IDBEffects {
           levels: annotationLevels,
           levelCounter: max
         }));
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.loadAnnotationLevelsFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -200,22 +206,26 @@ export class IDBEffects {
       this.idbService.loadAnnotationLinks().then((links) => {
         const annotationLinks = [];
         for (let i = 0; i < links.length; i++) {
-          if (!links[i].hasOwnProperty('id')) {
-            annotationLinks.push(
-              new OIDBLink(i + 1, links[i].link)
-            );
-          } else {
-            annotationLinks.push(links[i]);
+          if (links[i].hasOwnProperty('value')) {
+            if (!links[i].value.hasOwnProperty('id')) {
+              annotationLinks.push(
+                new OIDBLink(i + 1, links[i].value.link)
+              );
+            } else {
+              annotationLinks.push(links[i].value);
+            }
           }
         }
 
         subject.next(IDBActions.loadAnnotationLinksSuccess({
           links: annotationLinks
         }));
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.loadAnnotationLinksFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -231,10 +241,12 @@ export class IDBEffects {
 
       this.idbService.clearLoggingData().then(() => {
         subject.next(IDBActions.clearLogsSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.clearLogsFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -248,10 +260,12 @@ export class IDBEffects {
 
       this.idbService.clearOptions().then(() => {
         subject.next(IDBActions.clearAllOptionsSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.clearAllOptionsFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -265,10 +279,12 @@ export class IDBEffects {
 
       this.idbService.clearAnnotationData().then(() => {
         subject.next(IDBActions.clearAnnotationSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.clearAnnotationFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -278,40 +294,38 @@ export class IDBEffects {
   overwriteAnnotation$ = createEffect(() => this.actions$.pipe(
     ofType(TranscriptionActions.overwriteAnnotation),
     exhaustMap((action) => {
-      const subject = new Subject<Action>();
+        const subject = new Subject<Action>();
 
-      if (action.saveToDB) {
-        this.idbService.clearAnnotationData().then(() => {
-          this.idbService.saveAnnotationLevels(action.annotation.levels).then(() => {
-            this.idbService.clearIDBTable('annotation_links').then(() => {
+        if (action.saveToDB) {
+          this.idbService.clearAnnotationData().then(() => {
+            this.idbService.saveAnnotationLevels(action.annotation.levels).then(() => {
               this.idbService.saveAnnotationLinks(action.annotation.links).then(() => {
                 subject.next(IDBActions.overwriteAnnotationSuccess());
+                subject.complete();
               }).catch((error) => {
                 subject.next(IDBActions.overwriteAnnotationFailed({
                   error
                 }));
+                subject.complete();
               });
             }).catch((error) => {
               subject.next(IDBActions.overwriteAnnotationFailed({
                 error
               }));
+              subject.complete();
             });
           }).catch((error) => {
             subject.next(IDBActions.overwriteAnnotationFailed({
               error
             }));
+            subject.complete();
           });
-        }).catch((error) => {
-          subject.next(IDBActions.overwriteAnnotationFailed({
-            error
-          }));
-        });
-      } else {
-        subject.complete();
+        } else {
+          subject.complete();
+        }
+        return subject;
       }
-      return subject;
-    })
-  ));
+    )));
 
   overwriteAnnotationLinks$ = createEffect(() => this.actions$.pipe(
     ofType(TranscriptionActions.overwriteLinks),
@@ -321,15 +335,18 @@ export class IDBEffects {
       this.idbService.clearIDBTable('annotation_links').then(() => {
         this.idbService.saveAnnotationLinks(action.links).then(() => {
           subject.next(IDBActions.overwriteAnnotationLinksSuccess());
+          subject.complete();
         }).catch((error) => {
           subject.next(IDBActions.overwriteAnnotationLinksFailed({
             error
           }));
+          subject.complete();
         });
       }).catch((error) => {
         subject.next(IDBActions.overwriteAnnotationLinksFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -350,6 +367,7 @@ export class IDBEffects {
 
       Promise.all(promises).then(() => {
         subject.next(IDBActions.overwriteAnnotationLinksSuccess());
+        subject.complete();
       }).catch((error) => {
         console.error(error);
       });
@@ -365,10 +383,12 @@ export class IDBEffects {
 
       this.idbService.saveOption('userProfile', {name: action.name, email: action.email}).then(() => {
         subject.next(IDBActions.saveUserProfileSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveUserProfileFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -382,10 +402,12 @@ export class IDBEffects {
 
       this.idbService.saveOption('submitted', action.submitted).then(() => {
         subject.next(IDBActions.saveTranscriptionSubmittedSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveTranscriptionSubmittedFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -399,10 +421,12 @@ export class IDBEffects {
 
       this.idbService.saveOption('feedback', action.feedback).then(() => {
         subject.next(IDBActions.saveTranscriptionFeedbackSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveTranscriptionFeedbackFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -416,10 +440,12 @@ export class IDBEffects {
 
       this.idbService.saveOption('language', action.language).then(() => {
         subject.next(IDBActions.saveAppLanguageSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveAppLanguageFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -433,10 +459,12 @@ export class IDBEffects {
 
       this.idbService.saveOption('version', action.version).then(() => {
         subject.next(IDBActions.saveIDBVersionSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveIDBVersionFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -450,10 +478,12 @@ export class IDBEffects {
 
       this.idbService.saveOption('logging', action.logging).then(() => {
         subject.next(IDBActions.saveTranscriptionLoggingSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveTranscriptionLoggingFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -467,10 +497,12 @@ export class IDBEffects {
 
       this.idbService.saveOption('showLoupe', action.showLoupe).then(() => {
         subject.next(IDBActions.saveShowLoupeSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveShowLoupeFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -484,10 +516,12 @@ export class IDBEffects {
 
       this.idbService.saveOption('easymode', action.easyMode).then(() => {
         subject.next(IDBActions.saveEasyModeSucess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveEasyModeFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -501,10 +535,12 @@ export class IDBEffects {
 
       this.idbService.saveOption('comment', action.comment).then(() => {
         subject.next(IDBActions.saveTranscriptionCommentSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveTranscriptionCommentFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -519,10 +555,12 @@ export class IDBEffects {
       if (this.idbService.isReady) {
         this.idbService.saveOption('secondsPerLine', action.secondsPerLine).then(() => {
           subject.next(IDBActions.saveSecondsPerLineSuccess());
+          subject.complete();
         }).catch((error) => {
           subject.next(IDBActions.saveSecondsPerLineFailed({
             error
           }));
+          subject.complete();
         });
       }
 
@@ -537,10 +575,12 @@ export class IDBEffects {
 
       this.idbService.saveOption('highlightingEnabled', action.highlightingEnabled).then(() => {
         subject.next(IDBActions.saveHighlightingEnabledSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveHighlightingEnabledFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -555,10 +595,12 @@ export class IDBEffects {
       this.sessStr.store('loggedIn', true);
       this.saveOnlineSession(LoginMode.DEMO, action.onlineSession).then(() => {
         subject.next(IDBActions.saveDemoSessionSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveDemoSessionFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -573,10 +615,12 @@ export class IDBEffects {
       this.sessStr.store('loggedIn', true);
       this.saveOnlineSession(LoginMode.ONLINE, action.onlineSession).then(() => {
         subject.next(IDBActions.saveOnlineSessionSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveOnlineSessionFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -590,10 +634,12 @@ export class IDBEffects {
       this.sessStr.store('loggedIn', true);
       this.idbService.saveOption('sessionfile', action.sessionFile.toAny()).then(() => {
         subject.next(IDBActions.saveLocalSessionSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveLocalSessionFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -609,12 +655,14 @@ export class IDBEffects {
         this.sessStr.store('playonhover', action.playOnHover);
         setTimeout(() => {
           subject.next(IDBActions.saveFollowPlayCursorSuccess());
+          subject.complete();
         }, 200);
       } catch (error) {
         setTimeout(() => {
           subject.next(IDBActions.saveFollowPlayCursorFailed({
             error
           }));
+          subject.complete();
         }, 200);
       }
 
@@ -631,6 +679,7 @@ export class IDBEffects {
         this.sessStr.store('followplaycursor', action.followPlayCursor);
         setTimeout(() => {
           subject.next(IDBActions.saveFollowPlayCursorSuccess());
+          subject.complete();
         }, 200);
 
       } catch (error) {
@@ -638,6 +687,7 @@ export class IDBEffects {
           subject.next(IDBActions.saveFollowPlayCursorFailed({
             error
           }));
+          subject.complete();
         }, 200);
       }
 
@@ -654,6 +704,7 @@ export class IDBEffects {
         this.sessStr.store('reloaded', action.reloaded);
         setTimeout(() => {
           subject.next(IDBActions.saveAppReloadedSuccess());
+          subject.complete();
         }, 200);
 
       } catch (error) {
@@ -661,6 +712,7 @@ export class IDBEffects {
           subject.next(IDBActions.saveAppReloadedFailed({
             error
           }));
+          subject.complete();
         }, 200);
       }
 
@@ -677,6 +729,7 @@ export class IDBEffects {
         this.sessStr.store('serverDataEntry', action.serverDataEntry);
         setTimeout(() => {
           subject.next(IDBActions.saveServerDataEntrySuccess());
+          subject.complete();
         }, 200);
 
       } catch (error) {
@@ -684,6 +737,7 @@ export class IDBEffects {
           subject.next(IDBActions.saveServerDataEntryFailed({
             error
           }));
+          subject.complete();
         }, 200);
       }
 
@@ -698,10 +752,12 @@ export class IDBEffects {
 
       this.idbService.saveLogs(action.logs).then(() => {
         subject.next(IDBActions.saveLogsSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveLogsFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -718,10 +774,12 @@ export class IDBEffects {
         selectedService: action.selectedService
       }).then(() => {
         subject.next(IDBActions.saveASRSettingsSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveASRSettingsFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -738,10 +796,12 @@ export class IDBEffects {
         speed: action.speed
       }).then(() => {
         subject.next(IDBActions.saveAudioSettingsSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveAudioSettingsFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -755,10 +815,12 @@ export class IDBEffects {
 
       this.idbService.saveOption('interface', action.currentEditor).then(() => {
         subject.next(IDBActions.saveCurrentEditorSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveCurrentEditorFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -772,10 +834,12 @@ export class IDBEffects {
 
       this.idbService.save('logs', action.log.timestamp, action.log).then(() => {
         subject.next(IDBActions.saveLogSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.saveLogFailed({
           error
         }));
+        subject.complete();
       });
 
       return subject;
@@ -787,13 +851,17 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
+      console.log(`save annotation level...`);
       this.idbService.save('annotation_levels', action.id, {
         id: action.id,
         level: action.level,
         sortorder: action.sortorder
       }).then(() => {
+        console.log(`saved annotation level success`);
         subject.next(IDBActions.saveAnnotationLevelSuccess());
+        subject.complete();
       }).catch((error) => {
+        console.error(error);
         subject.next(IDBActions.saveAnnotationLevelFailed({
           error
         }));
@@ -814,10 +882,30 @@ export class IDBEffects {
         sortorder: action.sortorder
       }).then(() => {
         subject.next(IDBActions.addAnnotationLevelSuccess());
+        subject.complete();
       }).catch((error) => {
         subject.next(IDBActions.addAnnotationLevelFailed({
           error
         }));
+      });
+
+      return subject;
+    })
+  ));
+
+  removeAnnotationLevel$ = createEffect(() => this.actions$.pipe(
+    ofType(TranscriptionActions.removeAnnotationLevel),
+    exhaustMap((action) => {
+      const subject = new Subject<Action>();
+
+      this.idbService.remove('annotation_levels', action.id).then(() => {
+        subject.next(IDBActions.removeAnnotationLevelSuccess());
+        subject.complete();
+      }).catch((error) => {
+        subject.next(IDBActions.removeAnnotationLevelFailed({
+          error
+        }));
+        subject.complete();
       });
 
       return subject;
@@ -886,6 +974,14 @@ export class IDBEffects {
               private appStorage: AppStorageService,
               private idbService: IDBService,
               private sessStr: SessionStorageService) {
+
+    // TODO add this as effect
+    actions$.subscribe((action) => {
+      if (action.type.toLocaleLowerCase().indexOf('failed') > -1) {
+        const errorMessage = (action as any).error;
+        console.error(`${action.type}: ${errorMessage}`);
+      }
+    });
   }
 
 }

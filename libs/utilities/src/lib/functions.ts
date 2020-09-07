@@ -1,6 +1,8 @@
 import {HttpClient, HttpEventType, HttpRequest, HttpResponse} from '@angular/common/http';
 import {NavigationExtras, Router} from '@angular/router';
 import {Observable, Subject} from 'rxjs';
+import {Action} from '@ngrx/store';
+import {Actions} from '@ngrx/effects';
 
 declare var jQuery: any;
 
@@ -239,7 +241,12 @@ export class Functions {
   }
 
   public static navigateTo(router: Router, commands: any[], navigationExtras?: NavigationExtras): Promise<boolean> {
-    return router.navigate(commands, navigationExtras);
+    console.log(`navigate to ${commands[0]}`);
+    return new Promise<boolean>((resolve) => {
+      setTimeout(() => {
+        router.navigate(commands, navigationExtras).then(resolve);
+      }, 200);
+    });
   }
 
   public static fileListToArray(fileList: FileList): File[] {
@@ -259,7 +266,8 @@ export class Functions {
           if (value === true) {
             try {
               subscription.unsubscribe();
-            } catch (e) {}
+            } catch (e) {
+            }
             resolve();
           }
         },
@@ -280,7 +288,8 @@ export class Functions {
           if (!isUnset(value)) {
             try {
               subscription.unsubscribe();
-            } catch (e) {}
+            } catch (e) {
+            }
             resolve(value);
           }
         },
@@ -291,6 +300,20 @@ export class Functions {
           reject('comnpleted!');
         }
       )
+    });
+  }
+
+  public static waitTillResultRetrieved(actions: Actions, success: Action, failure: Action) {
+    return new Promise((resolve, reject) => {
+      const subscr = actions.subscribe((action: Action) => {
+        if (action.type === success.type) {
+          subscr.unsubscribe();
+          resolve();
+        } else if (action.type === failure.type) {
+          subscr.unsubscribe();
+          reject(`${(failure as any).error}`);
+        }
+      });
     });
   }
 }

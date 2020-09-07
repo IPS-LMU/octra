@@ -21,7 +21,7 @@
               #overview
               (segmentclicked)="onSegmentInOverviewClicked($event)"
               [segments]="(transcrService.annotation !== null && transcrService.annotation !== undefined)
-                              ? transcrService.annotation.levels[transcrService.selectedlevel].segments.segments: null"
+                              ? transcrService.currentlevel?.segments?.segments: null"
               [visible]="visible">
             </octra-transcr-overview>
           </div>

@@ -431,6 +431,17 @@ export const addAnnotationLevelFailed = createAction(
   }>()
 );
 
+export const removeAnnotationLevelSuccess = createAction(
+  `[${context}] Remove AnnotationLevel Success`
+);
+
+export const removeAnnotationLevelFailed = createAction(
+  `[${context}] Remove AnnotationLevel Failed`,
+  props<{
+    error: string
+  }>()
+);
+
 export const saveConsoleEntriesSuccess = createAction(
   `[${context}] Save ConsoleEntries Success`
 );

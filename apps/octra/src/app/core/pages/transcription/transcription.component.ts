@@ -294,22 +294,6 @@ export class TranscriptionComponent implements OnInit,
     console.log(`init transcription component`);
     this.navbarServ.interfaces = this.projectsettings.interfaces;
 
-    // because of the loading data before through the loading component you can be sure the audio was loaded
-    // correctly
-
-    this.transcrService.guidelines = this.settingsService.guidelines;
-
-    // reload guidelines
-    /*
-    this.subscrmanager.add(
-
-      this.settingsService.guidelinesloaded.subscribe(
-        (guidelines) => {
-          this.transcrService.guidelines = guidelines;
-        }
-      )
-    ); */
-
     for (const marker of this.transcrService.guidelines.markers) {
       if (marker.type === 'break') {
         this.transcrService.breakMarker = marker;
@@ -335,12 +319,23 @@ export class TranscriptionComponent implements OnInit,
       }
     ));
 
+    this.bugService.init(this.transcrService);
+
+    if (this.appStorage.useMode === LoginMode.ONLINE) {
+      console.log(`opened job ${this.appStorage.dataID} in project ${this.appStorage.onlineSession?.project}`);
+    }
+
+    this.asrService.init();
+
     // first change
     this.changeEditor(this.interface).then(() => {
       (this._currentEditor.instance as any).afterFirstInitialization();
     }).catch((error) => {
       console.error(error);
     });
+
+    // because of the loading data before through the loading component you can be sure the audio was loaded
+    // correctly
 
     this.subscrmanager.add(this.appStorage.saving.subscribe(
       (saving: string) => {
@@ -358,7 +353,7 @@ export class TranscriptionComponent implements OnInit,
 
     this.navbarServ.showExport = this.settingsService.projectsettings.navigation.export;
 
-    if (!(this.transcrService.annotation === null || this.transcrService.annotation === undefined)) {
+    if (!isUnset(this.transcrService.annotation)) {
       this.levelSubscriptionID = this.subscrmanager.add(
         this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
       );
@@ -417,14 +412,6 @@ export class TranscriptionComponent implements OnInit,
       }
     }
 
-    this.bugService.init(this.transcrService);
-
-    if (this.appStorage.useMode === LoginMode.ONLINE) {
-      console.log(`opened job ${this.appStorage.dataID} in project ${this.appStorage.onlineSession?.project}`);
-    }
-
-    this.asrService.init();
-
     // set general shortcuts
     this.generalShortcuts.push({
       label: 'feedback and send 1',
@@ -458,7 +445,6 @@ export class TranscriptionComponent implements OnInit,
   }
 
   ngAfterViewInit() {
-
   }
 
   private async checkCurrentEditor() {

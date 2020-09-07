@@ -4,6 +4,7 @@ import * as ConfigurationActions from '../configuration/configuration.actions';
 import * as IDBActions from '../idb/idb.actions';
 import {TranscriptionState} from '../index';
 import {isUnset} from '@octra/utilities';
+import {OIDBLevel} from '@octra/annotation';
 
 export const initialState: TranscriptionState = {
   savingNeeded: false,
@@ -129,16 +130,28 @@ export const reducer = createReducer(
     logs: []
   })),
   on(TranscriptionActions.changeAnnotationLevel, (state, {level, id}) => {
-    const result: TranscriptionState = state;
-    const index = state.annotation.levels.findIndex(a => a.id === id);
+    const annotationLevels = state.annotation.levels;
+    const index = annotationLevels.findIndex(a => a.id === id);
 
-    if (index > -1 && index < result.annotation.levels.length) {
-      result.annotation.levels[index].level = level;
+    if (index > -1 && index < annotationLevels.length) {
+      const levelObj = annotationLevels[index];
+
+      return {
+        ...state,
+        annotation: {
+          ...state.annotation,
+          levels: [
+            ...state.annotation.levels.slice(0, index),
+            new OIDBLevel(levelObj.id, level, levelObj.sortorder),
+            ...state.annotation.levels.slice(index + 1)
+          ]
+        }
+      };
     } else {
       console.error(`can't change level because index not valid.`);
     }
 
-    return result;
+    return state;
   }),
   on(TranscriptionActions.addAnnotationLevel, (state, level) =>
     ({
@@ -158,6 +171,16 @@ export const reducer = createReducer(
       const index = result.annotation.levels.findIndex((a) => (a.id === id));
       if (index > -1) {
         result.annotation.levels.splice(index, 1);
+        return {
+          ...state,
+          annotation: {
+            ...state.annotation,
+            levels: [
+              ...state.annotation.levels.slice(0, index),
+              ...state.annotation.levels.slice(index + 1)
+            ]
+          }
+        }
       } else {
         console.error(`can't remove level because index not valid.`);
       }
@@ -165,7 +188,7 @@ export const reducer = createReducer(
       console.error(`can't remove level because id not valid.`);
     }
 
-    return result;
+    return state;
   }),
   on(TranscriptionActions.setLevelCounter, (state, {levelCounter}) =>
     ({
@@ -175,6 +198,15 @@ export const reducer = createReducer(
         levelCounter: levelCounter
       }
     })),
+  on(IDBActions.loadLogsSuccess, (state, {logs}) => {
+    return {
+      ...state,
+      annotation: {
+        ...state.annotation
+      },
+      logs
+    };
+  }),
   on(ConfigurationActions.projectConfigurationLoaded, (state, {projectConfig}) =>
     ({
       ...state,
@@ -215,6 +247,14 @@ export const reducer = createReducer(
       ...state,
       methods
     })),
+  on(TranscriptionActions.setAudioLoaded, (state, {loaded}) =>
+    ({
+      ...state,
+      audio: {
+        ...state.audio,
+        loaded
+      }
+    })),
   on(TranscriptionActions.clearSettings, (state) =>
     ({
       ...state,
@@ -232,12 +272,12 @@ function saveOptionToStore(state: TranscriptionState, attribute: string, value: 
     case('submitted'):
       return {
         ...state,
-        submitted: value
+        submitted: (!isUnset(value)) ? value : false
       };
     case('easymode'):
       return {
         ...state,
-        easyMode: value
+        easyMode: (!isUnset(value)) ? value : false
       };
     case('feedback'):
       return {
@@ -247,22 +287,22 @@ function saveOptionToStore(state: TranscriptionState, attribute: string, value: 
     case('interface'):
       return {
         ...state,
-        currentEditor: value
+        currentEditor: (!isUnset(value)) ? value : '2D-Editor'
       }
     case('logging'):
       return {
         ...state,
-        logging: value
+        logging: (!isUnset(value)) ? value : true
       }
     case('showLoupe'):
       return {
         ...state,
-        showLoupe: value
+        showLoupe: (!isUnset(value)) ? value : false
       }
     case('secondsPerLine'):
       return {
         ...state,
-        secondsPerLine: value
+        secondsPerLine: (!isUnset(value)) ? value : 5
       }
     case('audioSettings'):
       return {
@@ -275,7 +315,7 @@ function saveOptionToStore(state: TranscriptionState, attribute: string, value: 
     case('highlightingEnabled'):
       return {
         ...state,
-        highlightingEnabled: value
+        highlightingEnabled: (!isUnset(value)) ? value : false
       }
   }
 

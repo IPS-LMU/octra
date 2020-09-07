@@ -14,7 +14,7 @@ export const MEMBER_ROUTES: Routes = [
   {
     path: 'transcr',
     component: TranscriptionComponent,
-    canActivate: [TranscActivateGuard, MembersAreaGuard]
+    canActivate: [MembersAreaGuard, TranscActivateGuard]
   },
   {
     path: 'transcr/end',

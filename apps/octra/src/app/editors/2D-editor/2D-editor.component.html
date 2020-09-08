@@ -5,12 +5,12 @@
                         [segmentIndex]="selectedIndex"
   ></octra-transcr-window>
   <octra-audio-navigation #audionav
-                        (afterPlaybackRateChange)="afterSpeedChange($event)"
-                        (afterVolumeChange)="afterVolumeChange($event)"
-                        (buttonClick)="onButtonClick($event)"
-                        [audioChunk]="audioChunkLines"
+                          (afterPlaybackRateChange)="afterSpeedChange($event)"
+                          (afterVolumeChange)="afterVolumeChange($event)"
+                          (buttonClick)="onButtonClick($event)"
+                          [audioChunk]="audioChunkLines"
 
-                        [buttons]="{
+                          [buttons]="{
                                 play: {
                                     label: ('general.play' | transloco),
                                     shortcut: keyMap.getShortcut('overlay', 'play_pause')
@@ -36,22 +36,21 @@
                                     shortcut: keyMap.getShortcut('overlay', 'step_backward')
                                 }
                               }"
-                        [easyMode]="appStorage.easymode"
-                        [playbackRate]="appStorage.audioSpeed"
-                        [responsive]="settingsService.responsive.enabled"
-                        [volume]="appStorage.audioVolume"
+                          [easyMode]="appStorage.easymode"
+                          [playbackRate]="appStorage.audioSpeed"
+                          [responsive]="settingsService.responsive.enabled"
+                          [volume]="appStorage.audioVolume"
   ></octra-audio-navigation>
   <div *ngIf="appStorage.showLoupe">
     <octra-audio-viewer #loupe
-                      (mousemove)="onCircleLoupeMouseOver($event)"
-                      [audioChunk]="audioChunkLoupe"
-                      [breakMarker]="{
+                        (mousemove)="onCircleLoupeMouseOver($event)"
+                        [audioChunk]="audioChunkLoupe"
+                        [breakMarker]="{
                         code: '<P>'
                       }"
-                      [height]="miniloupe.size.height"
-                      [isMultiLine]="false"
-                      [name]="'loupe'"
-                      [ngStyle]="{
+                        [isMultiLine]="false"
+                        [name]="'loupe'"
+                        [ngStyle]="{
         'width': miniloupe.size.width + 'px',
         'height': miniloupe.size.height + 'px',
         'position':'absolute',
@@ -62,25 +61,22 @@
         'visibility': (loupeHidden) ? 'hidden' : 'inherit',
         'flex': 'auto',
         'flex-direction': 'column'}"
-                      [settings]="miniLoupeSettings"
-                      [transcriptionLevel]="transcrService.currentlevel"
+                        [settings]="miniLoupeSettings"
+                        [transcriptionLevel]="transcrService.currentlevel"
     ></octra-audio-viewer>
   </div>
-  <div #linesView id="lines-wrapper">
-    <octra-audio-viewer #viewer (mousecursorchange)="onMouseOver($event);"
+  <octra-audio-viewer #viewer (mousecursorchange)="onMouseOver($event);"
                       (segmententer)="onSegmentEntered($event)"
                       (shortcuttriggered)="onShortCutViewerTriggered($event)"
                       [audioChunk]="audioChunkLines"
                       [breakMarker]="{
                         code: '<P>'
                       }"
-                      [height]="linesViewHeight"
                       [isMultiLine]="true"
                       [transcriptionLevel]="transcrService.currentlevel"
 
                       id="special"
                       style="height:400px; display: flex; flex: auto; flex-direction: column;"
-    >
-    </octra-audio-viewer>
-  </div>
+  >
+  </octra-audio-viewer>
 </div>

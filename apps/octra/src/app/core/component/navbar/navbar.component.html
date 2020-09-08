@@ -199,7 +199,7 @@
       optionsDropdown
       -->
       <li [ngStyle]="{
-                'display': (!(navbarServ.dataloaded && appStorage.loggedIn)) ? 'none': 'inherit'
+                'display': (!(settService.isAudioLoaded && appStorage.loggedIn)) ? 'none': 'inherit'
                 }" class="nav-item dropdown">
         <a aria-expanded="false" aria-haspopup="true" class="nav-link" data-toggle="dropdown"
            href="#" id="optionsDropdown">

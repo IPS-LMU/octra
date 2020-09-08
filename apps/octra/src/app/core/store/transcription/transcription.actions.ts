@@ -40,7 +40,7 @@ export const addLog = createAction(
 );
 
 export const setLogs = createAction(
-  `[${context}] set submitted`,
+  `[${context}] set logs`,
   props<{
     logs: any[];
   }>()

@@ -94,10 +94,14 @@ export const reducer = createReducer(
     ...state,
     annotation
   })),
-  on(TranscriptionActions.setSubmitted, (state, {submitted}) => ({
-    ...state,
-    submitted
-  })),
+  on(TranscriptionActions.setSubmitted, (state, {submitted}) => {
+    console.log(`reduce submitted...`);
+    console.log(state);
+    return {
+      ...state,
+      submitted
+    }
+  }),
   on(TranscriptionActions.setAnnotationLevels, (state, {levels}) => ({
     ...state,
     annotation: {
@@ -112,7 +116,7 @@ export const reducer = createReducer(
       links
     }
   })),
-  on(TranscriptionActions.setTranscriptionState, (state, newState) => (newState)),
+  on(TranscriptionActions.setTranscriptionState, (state, newState) => ({...state, ...newState})),
   on(TranscriptionActions.clearAnnotation, (state) => ({
     ...state,
     annotation: {

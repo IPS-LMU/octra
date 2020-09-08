@@ -2,7 +2,6 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
-  ElementRef,
   EventEmitter,
   HostListener,
   OnDestroy,
@@ -50,7 +49,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   public static editorname = '2D-Editor';
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('viewer', {static: true}) viewer: AudioViewerComponent;
-  @ViewChild('linesView', {static: true}) linesView: ElementRef;
   @ViewChild('window', {static: false}) window: TranscrWindowComponent;
   @ViewChild('loupe', {static: false}) loupe: AudioViewerComponent;
   @ViewChild('audionav', {static: true}) audionav: AudioNavigationComponent;
@@ -167,13 +165,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     return this.settingsService.projectsettings;
   }
 
-  public get linesViewHeight(): number {
-    if (!isUnset(this.linesView) && !isUnset(this.linesView.nativeElement)) {
-      return this.linesView.nativeElement.clientHeight;
-    }
-    return 0;
-  }
-
   constructor(public transcrService: TranscriptionService,
               public keyMap: KeymappingService,
               public audio: AudioService,
@@ -186,7 +177,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               private langService: TranslocoService) {
     super();
     this.miniLoupeSettings = new AudioviewerConfig();
-
     this.subscrmanager = new SubscriptionManager();
   }
 
@@ -211,7 +201,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.viewer.settings.asr.enabled = this.settingsService.isASREnabled;
     this.viewer.settings.showProgressBars = true;
     this.viewer.name = 'multiline viewer';
-    this.viewer.height = this.linesViewHeight;
 
     this.viewer.secondsPerLine = this.appStorage.secondsPerLine;
 
@@ -438,9 +427,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     if (this.scrolltimer !== null) {
       this.scrolltimer.unsubscribe();
     }
-  }
 
-  ngAfterViewInit() {
     this.subscrmanager.add(
       this.transcrService.segmentrequested.subscribe(
         (segnumber: number) => {
@@ -448,14 +435,15 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         }
       )
     );
+  }
 
+  ngAfterViewInit() {
     if (this.appStorage.showLoupe) {
       this.loupe.av.zoomY = this.factor;
     }
     const subscr = this.viewer.onInitialized.subscribe(
       () => {
         subscr.unsubscribe();
-        this.viewer.height = this.linesViewHeight;
         TwoDEditorComponent.initialized.emit();
       }, () => {
       }, () => {

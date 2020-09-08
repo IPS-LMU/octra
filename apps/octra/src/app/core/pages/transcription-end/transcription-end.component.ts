@@ -55,6 +55,5 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
     this.appStorage.comment = '';
     this.appStorage.clearLoggingData();
     this.uiService.elements = [];
-    this.settService.clearSettings();
   }
 }

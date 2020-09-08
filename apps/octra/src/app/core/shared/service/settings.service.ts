@@ -12,7 +12,6 @@ import {AudioService} from './audio.service';
 import {LoginMode} from '../../store';
 import * as fromApplication from '../../store/application';
 import * as ConfigurationActions from '../../store/configuration/configuration.actions';
-import * as TranscriptionActions from '../../store/transcription/transcription.actions';
 import {Store} from '@ngrx/store';
 import * as fromTranscription from '../../store/transcription';
 
@@ -266,10 +265,6 @@ export class SettingsService {
 
   public destroy() {
     this.subscrmanager.destroy();
-  }
-
-  public clearSettings() {
-    this.store.dispatch(TranscriptionActions.clearSettings());
   }
 
   /**

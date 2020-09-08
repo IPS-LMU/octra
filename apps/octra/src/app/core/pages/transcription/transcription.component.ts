@@ -768,7 +768,6 @@ export class TranscriptionComponent implements OnInit,
   reloadDemo() {
     this.transcrService.endTranscription(false);
     this.clearData();
-
     const audioExample = this.settingsService.getAudioExample(this.langService.getActiveLang());
 
     if (!isUnset(audioExample)) {
@@ -808,7 +807,7 @@ export class TranscriptionComponent implements OnInit,
     this.appStorage.comment = '';
     this.appStorage.clearLoggingData();
     this.uiService.elements = [];
-    this.settingsService.clearSettings();
+    this.appStorage.audioLoaded = false;
   }
 
   public onSaveTranscriptionButtonClicked() {

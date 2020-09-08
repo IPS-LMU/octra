@@ -30,7 +30,6 @@ export class LogoutComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.settingsService.clearSettings();
     this.appStorage.endSession().then(() => {
       this.store.dispatch(LoginActions.logout());
       Functions.navigateTo(this.router, ['login'], AppInfo.queryParamsHandling).catch((error) => {

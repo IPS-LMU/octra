@@ -276,6 +276,8 @@ export class AppStorageService {
   }
 
   setLogs(value: any[]) {
+    console.log(`SET LOGS`);
+    console.log(value);
     this.store.dispatch(TranscriptionActions.setLogs({logs: value}));
   }
 
@@ -287,6 +289,12 @@ export class AppStorageService {
     this.store.dispatch(ASRActions.setASRSettings({
       selectedLanguage: value,
       selectedService: this.asrSelectedService
+    }));
+  }
+
+  set audioLoaded(loaded: boolean) {
+    this.store.dispatch(TranscriptionActions.setAudioLoaded({
+      loaded
     }));
   }
 

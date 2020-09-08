@@ -224,16 +224,21 @@ export class IndexedDBManager {
       (resolve, reject) => {
         this.getStore(storeName, IDBMode.READWRITE).then((store) => {
           const wrapper = (acc: number) => {
-            if (acc < array.length) {
-              const value = (typeof key === 'string') ? array[acc]['' + key + ''] : array[acc][key];
-              this.save(store, value, array[acc]).then(
-                () => {
-                  wrapper(++acc);
-                }
-              ).catch((err) => {
-                reject(err);
-              });
+            if (!isUnset(array)) {
+              if (acc < array.length) {
+                const value = (typeof key === 'string') ? array[acc]['' + key + ''] : array[acc][key];
+                this.save(store, value, array[acc]).then(
+                  () => {
+                    wrapper(++acc);
+                  }
+                ).catch((err) => {
+                  reject(err);
+                });
+              } else {
+                resolve();
+              }
             } else {
+              console.error(new Error(`array is undefined or null for store ${storeName}, key: ${key}`));
               resolve();
             }
           };

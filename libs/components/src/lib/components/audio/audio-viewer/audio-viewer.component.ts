@@ -97,14 +97,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     return this.konvaContainer.nativeElement.clientHeight;
   }
 
-  @Input()
-  public set height(value: number) {
-    if (!isUnset(this.stage)) {
-      this.stage.height(value);
-      this.initializeView();
-    }
-  }
-
   public get getPlayHeadX(): number {
     return 0;
   }
@@ -216,6 +208,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   ngOnInit() {
+    this.init();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -240,7 +233,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   ngAfterViewInit(): void {
-    this.init();
   }
 
   public getPixelPerSecond(secondsPerLine: number) {
@@ -363,6 +355,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   public initializeView() {
     if (!isUnset(this._transcriptionLevel)) {
+      this.stage.height(this.height);
 
       this.onInitialized.next();
       for (const attr in this.layers) {

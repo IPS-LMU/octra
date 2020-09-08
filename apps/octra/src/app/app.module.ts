@@ -117,6 +117,7 @@ import * as fromUser from './core/store/user/user.reducer';
 import {IDBEffects} from './core/store/idb/idb-effects.service';
 import {IDBService} from './core/shared/service/idb.service';
 import {ConfigurationEffects} from './core/store/transcription/configuration.effects';
+import {fab} from '@fortawesome/free-brands-svg-icons';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -277,6 +278,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
 })
 export class AppModule {
   constructor(library: FaIconLibrary) {
-    library.addIconPacks(fas, far);
+    library.addIconPacks(fas, far, fab);
   }
 }

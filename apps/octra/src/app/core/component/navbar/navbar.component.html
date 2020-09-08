@@ -38,6 +38,12 @@
           {{"general.manual"| transloco}}
         </a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/IPS-LMU/octra" target="_blank">
+          <fa-icon [icon]="['fab', 'github']"></fa-icon>
+          Github
+        </a>
+      </li>
     </ul>
     <ul *ngIf="appStorage.loggedIn" class="navbar-nav mr-auto">
       <ng-template [ngForOf]="editors" let-editor ngFor>

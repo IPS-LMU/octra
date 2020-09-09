@@ -42,9 +42,6 @@ export const reducer = createReducer(
   })),
   on(LoginActions.logout, (state) => ({
     ...state,
-    onlineSession: {
-      ...state.onlineSession
-    },
     loggedIn: false
   })),
   on(LoginActions.clearLocalSession, (state) => ({

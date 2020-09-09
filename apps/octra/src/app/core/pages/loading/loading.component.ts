@@ -248,6 +248,8 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
   goBack() {
     this.appStorage.clearSession();
+    this.appStorage.clearLocalStorage();
+    this.appStorage.logout();
     Functions.navigateTo(this.router, ['/login'], AppInfo.queryParamsHandling).catch((error) => {
       console.error(error);
     });

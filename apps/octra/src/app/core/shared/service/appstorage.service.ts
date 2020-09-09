@@ -292,6 +292,10 @@ export class AppStorageService {
     }));
   }
 
+  get audioLoaded() {
+    return this._snapshot.transcription.audio.loaded;
+  }
+
   set audioLoaded(loaded: boolean) {
     this.store.dispatch(TranscriptionActions.setAudioLoaded({
       loaded
@@ -385,7 +389,7 @@ export class AppStorageService {
         };
 
         if (!isUnset(audiofile)) {
-          if (!keepData || (!isUnset(onlineSession))) {
+          if (!keepData || (!isUnset(onlineSession) && !isUnset(onlineSession.dataID))) {
             // last was online mode
             this.clearSession();
             this.clearLocalStorage();
@@ -725,5 +729,9 @@ export class AppStorageService {
 
   public clearAnnotation() {
     this.store.dispatch(TranscriptionActions.clearAnnotation());
+  }
+
+  public logout() {
+    this.store.dispatch(LoginActions.logout());
   }
 }

@@ -632,7 +632,12 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
       this.sessStr.store('loggedIn', true);
-      this.idbService.saveOption('sessionfile', action.sessionFile.toAny()).then(() => {
+
+      const promises: Promise<any>[] = [];
+      promises.push(this.idbService.saveOption('usemode', LoginMode.LOCAL));
+      promises.push(this.idbService.saveOption('sessionfile', action.sessionFile.toAny()));
+
+      Promise.all(promises).then(() => {
         subject.next(IDBActions.saveLocalSessionSuccess());
         subject.complete();
       }).catch((error) => {

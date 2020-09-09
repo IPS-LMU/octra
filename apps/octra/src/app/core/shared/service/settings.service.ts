@@ -19,13 +19,8 @@ import * as fromTranscription from '../../store/transcription';
   providedIn: 'root'
 })
 export class SettingsService {
-  get isAudioLoaded(): boolean {
-    return this._isAudioLoaded;
-  }
-
   public audioloaded: EventEmitter<any> = new EventEmitter<any>();
   public audioloading = new Subject<number>();
-  private _isAudioLoaded = false;
   private subscrmanager: SubscriptionManager;
 
   public get isASREnabled(): boolean {
@@ -206,7 +201,6 @@ export class SettingsService {
           this._filename = this._filename.substr(this._filename.indexOf('src=') + 4);
         }
 
-        this._isAudioLoaded = false;
         audioService.loadAudio(src, () => {
           this.audioloaded.emit({status: 'success'});
         }).subscribe(
@@ -214,7 +208,6 @@ export class SettingsService {
             this.audioloading.next(progress);
 
             if (progress === 1) {
-              this._isAudioLoaded = true;
               this.audioloading.complete();
             }
           },

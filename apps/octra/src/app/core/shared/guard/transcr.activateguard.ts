@@ -3,7 +3,6 @@ import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs';
 import {AppInfo} from '../../../app.info';
-import {SettingsService} from '../service';
 import {AppStorageService} from '../service/appstorage.service';
 import {Functions} from '@octra/utilities';
 import {LoginMode} from '../../store';
@@ -12,13 +11,12 @@ import {LoginMode} from '../../store';
 export class TranscActivateGuard implements CanActivate {
 
   constructor(private appStorage: AppStorageService,
-              private router: Router,
-              private settService: SettingsService) {
+              private router: Router) {
 
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
-    if (!this.settService.isAudioLoaded) {
+    if (!this.appStorage.audioLoaded) {
       const params = AppInfo.queryParamsHandling;
       params.fragment = route.fragment;
       params.queryParams = route.queryParams;
@@ -28,6 +26,7 @@ export class TranscActivateGuard implements CanActivate {
           console.error(error);
         });
       } else {
+        this.appStorage.logout();
         Functions.navigateTo(this.router, ['/user/transcr/reload-file'], params).catch((error) => {
           console.error(error);
         });

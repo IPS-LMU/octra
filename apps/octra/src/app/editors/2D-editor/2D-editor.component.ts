@@ -869,6 +869,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
   @HostListener('window:resize', ['$event'])
   onResize($event) {
-    this.viewer.height = this.linesViewHeight;
+    // this.viewer.height = this.linesViewHeight;
   }
 }

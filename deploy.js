@@ -1,9 +1,9 @@
 const fs = require("fs");
 
 const path = require('path');
-const node_ssh = require('node-ssh');
+const {NodeSSH} = require('node-ssh');
 const process = require('process');
-ssh = new node_ssh();
+const ssh = new NodeSSH();
 
 const configText = fs.readFileSync("./deploy.config.json", {
   encoding: "utf8"

@@ -122,6 +122,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   newTranscription = () => {
     this.audioService.registerAudioManager(this.dropzone.audioManager);
 
+    this.appStorage.clearAnnotation();
+    this.appStorage.clearLoggingData();
     this.appStorage.beginLocalSession(this.dropzone.files, false).then(this.beforeNavigation).catch((error) => {
       if (error === 'file not supported') {
         this.modService.show('error', {

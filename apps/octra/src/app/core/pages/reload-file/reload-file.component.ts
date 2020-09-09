@@ -61,10 +61,12 @@ export class ReloadFileComponent implements OnInit {
             keepData = true;
             resolve();
           } else {
+            this.appStorage.clearAnnotation();
             resolve();
           }
         }).then(() => {
           this.audioService.registerAudioManager(this.dropzone.audioManager);
+          this.appStorage.clearLoggingData();
           this.appStorage.beginLocalSession(this.dropzone.files, keepData).then(this.navigate).catch((error) => {
             if (error === 'file not supported') {
               this.showErrorMessage(this.langService.translate('reload-file.file not supported', {type: ''}));

@@ -26,7 +26,6 @@ export class TranscActivateGuard implements CanActivate {
           console.error(error);
         });
       } else {
-        this.appStorage.logout();
         Functions.navigateTo(this.router, ['/user/transcr/reload-file'], params).catch((error) => {
           console.error(error);
         });

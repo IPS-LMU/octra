@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
-import {Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
@@ -20,7 +19,7 @@ export class ReloadFileGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
-      if (this.appStorage.loggedIn) {
+      if (!this.appStorage.loggedIn) {
         const params = AppInfo.queryParamsHandling;
         params.fragment = route.fragment;
         params.queryParams = route.queryParams;
@@ -30,7 +29,6 @@ export class ReloadFileGuard implements CanActivate {
         });
         resolve(false);
       } else {
-        const subject = new Subject<boolean>();
         Functions.afterDefined(this.store.select(fromTranscription.selectProjectConfig)).then(() => {
           resolve(true);
         });

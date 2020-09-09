@@ -551,7 +551,7 @@ export class AppStorageService {
 
   public clearLocalStorage() {
     this.login = false;
-    this.store.dispatch(TranscriptionActions.clearAnnotation());
+    // this.store.dispatch(TranscriptionActions.clearAnnotation());
     this.store.dispatch(LoginActions.clearLocalSession());
   }
 
@@ -624,6 +624,7 @@ export class AppStorageService {
       // TODO wait until cleaned!
       this.clearSession();
       this.clearLocalStorage();
+      this.logout();
       resolve();
     });
   }

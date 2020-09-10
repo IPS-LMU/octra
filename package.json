@@ -49,7 +49,7 @@
     "@nrwl/angular": "10.1.0",
     "@nrwl/schematics": "^8.12.11",
     "arrive": "~2.4.1",
-    "rxjs": "~6.5.5",
+    "rxjs": "~6.6.3",
     "tslib": "^2.0.0",
     "x2js": "^3.4.0",
     "zone.js": "^0.10.2",

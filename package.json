@@ -86,8 +86,8 @@
     "video.js": "^7.8.4"
   },
   "devDependencies": {
-    "@angular-devkit/build-ng-packagr": "~0.1000.8",
-    "@angular/cli": "~10.0.0",
+    "@angular-devkit/build-ng-packagr": "~0.1001.1",
+    "@angular/cli": "~10.1.1",
     "@nrwl/workspace": "10.1.0",
     "@types/node": "~8.9.4",
     "dotenv": "6.2.0",
@@ -100,7 +100,7 @@
     "@ngrx/store-devtools": "^10.0.0",
     "@angular/compiler-cli": "^10.0.0",
     "@angular/language-service": "^10.0.0",
-    "@angular-devkit/build-angular": "~0.1000.0",
+    "@angular-devkit/build-angular": "~0.1001.1",
     "codelyzer": "~5.0.1",
     "jest-preset-angular": "8.2.1",
     "@nrwl/jest": "10.1.0",

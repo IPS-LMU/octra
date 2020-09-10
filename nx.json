@@ -27,15 +27,17 @@
     },
     "octra-e2e": {
       "tags": [],
-      "implicitDependencies": ["octra"]
+      "implicitDependencies": [
+        "octra"
+      ]
     },
     "utilities": {
       "tags": []
     },
-    "annotation": {
+    "media": {
       "tags": []
     },
-    "media": {
+    "annotation": {
       "tags": []
     },
     "components": {

@@ -16,12 +16,18 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@octra/utilities": ["libs/utilities/src/index.ts"],
-      "@octra/annotation": ["libs/annotation/src/index.ts"],
-      "@octra/test-lib": ["libs/test-lib/src/index.ts"],
-      "@octra/media": ["libs/media/src/index.ts"],
-      "@octra/ui": ["libs/ui/src/index.ts"],
-      "@octra/components": ["libs/components/src/index.ts"]
+      "@octra/utilities": [
+        "libs/utilities/src/index.ts"
+      ],
+      "@octra/media": [
+        "libs/media/src/index.ts"
+      ],
+      "@octra/annotation": [
+        "libs/annotation/src/index.ts"
+      ],
+      "@octra/components": [
+        "libs/components/src/index.ts"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]

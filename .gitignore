@@ -39,5 +39,4 @@ testem.log
 Thumbs.db
 /deployment/
 /doc/
-/libs/annotation/
 /deploy.config.json

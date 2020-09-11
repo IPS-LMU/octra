@@ -61,13 +61,25 @@
         "depConstraints": [
           {
             "sourceTag": "*",
-            "onlyDependOnLibsWithTags": ["*"]
+            "onlyDependOnLibsWithTags": [
+              "*"
+            ]
           }
         ]
       }
     ],
-    "directive-selector": [true, "attribute", "app", "camelCase"],
-    "component-selector": [true, "element", "app", "kebab-case"],
+    "directive-selector": [
+      true,
+      "attribute",
+      "octra",
+      "camelCase"
+    ],
+    "component-selector": [
+      true,
+      "element",
+      "octra",
+      "kebab-case"
+    ],
     "no-conflicting-lifecycle": true,
     "no-host-metadata-property": true,
     "no-input-rename": true,

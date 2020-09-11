@@ -105,7 +105,8 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "octra:build"
+            "browserTarget": "octra:build",
+            "port": 5321
           },
           "configurations": {
             "production": {

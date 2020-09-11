@@ -25,8 +25,7 @@ import {
 } from '../../../core/shared/service';
 import {AppStorageService} from '../../../core/shared/service/appstorage.service';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../../core/shared/service/asr.service';
-import {AudioChunk, AudioManager} from '../../../../../../../libs/media/src/lib/audio/audio-manager';
-import {AudioRessource, AudioSelection, SampleUnit} from '@octra/media';
+import {AudioChunk, AudioManager, AudioRessource, AudioSelection, SampleUnit} from '@octra/media';
 import {ASRQueueItemType, Segment, Segments} from '@octra/annotation';
 import {AudioNavigationComponent, AudioViewerComponent, AudioViewerShortcutEvent} from '@octra/components';
 import {LoginMode} from '../../../core/store';

@@ -1,5 +1,4 @@
-import {AudioChunk, AudioManager} from '../../../../../libs/media/src/lib/audio/audio-manager';
-import {AudioSelection, SampleUnit} from '@octra/media';
+import {AudioChunk, AudioManager, AudioSelection, SampleUnit} from '@octra/media';
 import {AudioViewerComponent} from '@octra/components';
 import {Level} from '@octra/annotation';
 

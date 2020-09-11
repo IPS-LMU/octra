@@ -12,10 +12,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
-import {
-  KeyMapping,
-  TimespanPipe
-} from '@octra/components';
+import {KeyMapping, TimespanPipe} from '@octra/components';
 import {isNumeric} from 'rxjs/internal-compatibility';
 import {timer} from 'rxjs';
 
@@ -25,8 +22,7 @@ import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../shared/service/a
 import {TranscrEditorConfig} from './config';
 import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
 import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
-import {SampleUnit} from '@octra/media';
-import {AudioChunk, AudioManager} from '../../../../../../../libs/media/src/lib/audio/audio-manager';
+import {AudioChunk, AudioManager, SampleUnit} from '@octra/media';
 import {Segments} from '@octra/annotation';
 
 /// <reference path="../../../../../../node_modules/@types/summernote/index.d.ts" />

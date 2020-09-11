@@ -208,7 +208,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
           this.settService.audioloading.subscribe(
             (progress) => {
-              this.audioLoadingProgress = progress * 25;
+              this.audioLoadingProgress = progress * 100;
             }
           );
 

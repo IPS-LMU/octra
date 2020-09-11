@@ -22,10 +22,9 @@ import {
 import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {OCTRAEditor} from '../octra-editor';
 import {BrowserInfo} from '../../core/shared';
-import {SampleUnit} from '@octra/media';
+import {AudioChunk, AudioManager, SampleUnit} from '@octra/media';
 import {Segment} from '@octra/annotation';
 import {AudioNavigationComponent, AudioplayerComponent} from '@octra/components';
-import {AudioChunk, AudioManager} from '../../../../../../libs/media/src/lib/audio/audio-manager';
 
 @Component({
   selector: 'octra-audioplayer-gui',

@@ -6,8 +6,8 @@ import {AppSettings, ASRLanguage} from '../../obj/Settings';
 import {AlertService, SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {ASRQueueItemType, AsrService} from '../../shared/service/asr.service';
-import {AudioChunk} from '../../../../../../../libs/media/src/lib/audio/audio-manager';
 import {isUnset} from '@octra/utilities';
+import {AudioChunk} from '@octra/media';
 
 @Component({
   selector: 'octra-asr-options',

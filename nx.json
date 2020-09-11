@@ -31,9 +31,6 @@
         "octra"
       ]
     },
-    "utilities": {
-      "tags": []
-    },
     "media": {
       "tags": []
     },
@@ -41,6 +38,9 @@
       "tags": []
     },
     "components": {
+      "tags": []
+    },
+    "utilities": {
       "tags": []
     }
   }

@@ -2,8 +2,22 @@
   "name": "@octra/components",
   "version": "0.0.1",
   "peerDependencies": {
-    "@angular/common": "^10.0.14",
-    "@angular/core": "^10.0.14"
+    "@angular/common": "^10.0.0",
+    "@angular/forms": "^10.0.0",
+    "@angular/platform-browser": "^10.0.0",
+    "@angular/core": "^10.0.0",
+    "@angular/router": "^10.0.0",
+    "@octra/annotation": "^0.0.1",
+    "@octra/utilities": "^0.0.1",
+    "@fortawesome/angular-fontawesome": "^0.7.0",
+    "@fortawesome/fontawesome-common-types": "^0.2.30",
+    "@fortawesome/fontawesome-free": "^5.14.0",
+    "@fortawesome/fontawesome-svg-core": "^1.2.30",
+    "@fortawesome/free-brands-svg-icons": "^5.14.0",
+    "@fortawesome/free-regular-svg-icons": "^5.14.0",
+    "@fortawesome/free-solid-svg-icons": "^5.14.0",
+    "@octra/media": "^0.0.1",
+    "rxjs": "~6.6.3"
   },
   "dependencies": {
     "tslib": "^2.0.0"

@@ -2,10 +2,10 @@
   "name": "@octra/utilities",
   "version": "0.0.1",
   "peerDependencies": {
-    "@angular/common": "^10.0.14",
-    "@angular/core": "^10.0.14"
-  },
-  "dependencies": {
-    "tslib": "^2.0.0"
+    "@angular/common": "^10.0.0",
+    "@angular/core": "^10.0.0",
+    "@angular/router": "^10.0.0",
+    "moment": "~2.27.0",
+    "rxjs": "~6.6.3"
   }
 }

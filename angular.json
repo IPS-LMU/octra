@@ -168,23 +168,11 @@
       }
     },
     "utilities": {
-      "projectType": "library",
       "root": "libs/utilities",
       "sourceRoot": "libs/utilities/src",
-      "prefix": "octra",
+      "projectType": "library",
+      "schematics": {},
       "architect": {
-        "build": {
-          "builder": "@nrwl/angular:package",
-          "options": {
-            "tsConfig": "libs/utilities/tsconfig.lib.json",
-            "project": "libs/utilities/ng-package.json"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "libs/utilities/tsconfig.lib.prod.json"
-            }
-          }
-        },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
@@ -192,7 +180,10 @@
               "libs/utilities/tsconfig.lib.json",
               "libs/utilities/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**", "!libs/utilities/**/*"]
+            "exclude": [
+              "**/node_modules/**",
+              "!libs/utilities/**/*"
+            ]
           }
         },
         "test": {
@@ -200,31 +191,29 @@
           "options": {
             "jestConfig": "libs/utilities/jest.config.js",
             "tsConfig": "libs/utilities/tsconfig.spec.json",
-            "passWithNoTests": true,
-            "setupFile": "libs/utilities/src/test-setup.ts"
-          }
-        }
-      },
-      "schematics": {}
-    },
-    "media": {
-      "projectType": "library",
-      "root": "libs/media",
-      "sourceRoot": "libs/media/src",
-      "prefix": "octra",
-      "architect": {
-        "build": {
-          "builder": "@nrwl/angular:package",
-          "options": {
-            "tsConfig": "libs/media/tsconfig.lib.json",
-            "project": "libs/media/ng-package.json"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "libs/media/tsconfig.lib.prod.json"
-            }
+            "passWithNoTests": true
           }
         },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "options": {
+            "outputPath": "dist/libs/utilities",
+            "tsConfig": "libs/utilities/tsconfig.lib.json",
+            "packageJson": "libs/utilities/package.json",
+            "main": "libs/utilities/src/index.ts",
+            "assets": [
+              "libs/utilities/*.md"
+            ]
+          }
+        }
+      }
+    },
+    "media": {
+      "root": "libs/media",
+      "sourceRoot": "libs/media/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
@@ -243,31 +232,29 @@
           "options": {
             "jestConfig": "libs/media/jest.config.js",
             "tsConfig": "libs/media/tsconfig.spec.json",
-            "passWithNoTests": true,
-            "setupFile": "libs/media/src/test-setup.ts"
-          }
-        }
-      },
-      "schematics": {}
-    },
-    "annotation": {
-      "projectType": "library",
-      "root": "libs/annotation",
-      "sourceRoot": "libs/annotation/src",
-      "prefix": "octra",
-      "architect": {
-        "build": {
-          "builder": "@nrwl/angular:package",
-          "options": {
-            "tsConfig": "libs/annotation/tsconfig.lib.json",
-            "project": "libs/annotation/ng-package.json"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "libs/annotation/tsconfig.lib.prod.json"
-            }
+            "passWithNoTests": true
           }
         },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "options": {
+            "outputPath": "dist/libs/media",
+            "tsConfig": "libs/media/tsconfig.lib.json",
+            "packageJson": "libs/media/package.json",
+            "main": "libs/media/src/index.ts",
+            "assets": [
+              "libs/media/*.md"
+            ]
+          }
+        }
+      }
+    },
+    "annotation": {
+      "root": "libs/annotation",
+      "sourceRoot": "libs/annotation/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
@@ -286,12 +273,22 @@
           "options": {
             "jestConfig": "libs/annotation/jest.config.js",
             "tsConfig": "libs/annotation/tsconfig.spec.json",
-            "passWithNoTests": true,
-            "setupFile": "libs/annotation/src/test-setup.ts"
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "options": {
+            "outputPath": "dist/libs/annotation",
+            "tsConfig": "libs/annotation/tsconfig.lib.json",
+            "packageJson": "libs/annotation/package.json",
+            "main": "libs/annotation/src/index.ts",
+            "assets": [
+              "libs/annotation/*.md"
+            ]
           }
         }
-      },
-      "schematics": {}
+      }
     },
     "components": {
       "projectType": "library",

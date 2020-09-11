@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {Functions} from '@octra/utilities';
+import {contains, Functions} from '@octra/utilities';
 import {IAnnotJSON, OAnnotJSON, OAudiofile} from '../annotjson';
 
 export interface Bundle {
@@ -81,7 +81,7 @@ export class BundleJSONConverter extends Converter {
       const audioResult: OAudiofile = new OAudiofile();
       audioResult.name = annotation.name + annotation.annotates.substr(annotation.annotates.lastIndexOf('.'));
 
-      if (Functions.contains(audioResult.name, '.wav') || Functions.contains(audioResult.name, '.ogg')) {
+      if (contains(audioResult.name, '.wav') || contains(audioResult.name, '.ogg')) {
         audioResult.size = buffer.byteLength;
         audioResult.sampleRate = annotation.sampleRate;
         audioResult.arraybuffer = buffer;

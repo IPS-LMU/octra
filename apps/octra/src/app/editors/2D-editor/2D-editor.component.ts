@@ -10,7 +10,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
-import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
+import {contains, Functions, isUnset, SubscriptionManager} from '@octra/utilities';
 import {interval, Subscription} from 'rxjs';
 import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
 import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
@@ -712,10 +712,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
     if ($event.value === null || !(
       // cursor move by keyboard events are note saved because this would be too much
-      Functions.contains($event.value, 'cursor') ||
-      Functions.contains($event.value, 'segment_enter') ||
-      Functions.contains($event.value, 'playonhover') ||
-      Functions.contains($event.value, 'asr')
+      contains($event.value, 'cursor') ||
+      contains($event.value, 'segment_enter') ||
+      contains($event.value, 'playonhover') ||
+      contains($event.value, 'asr')
     )) {
       $event.value = `${$event.type}:${$event.value}`;
 
@@ -742,7 +742,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
         playPosition, caretpos, selection, null, 'multi-lines-viewer');
 
-    } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
+    } else if ($event.value !== null && contains($event.value, 'playonhover')) {
       this.appStorage.playonhover = !this.appStorage.playonhover;
     }
   }

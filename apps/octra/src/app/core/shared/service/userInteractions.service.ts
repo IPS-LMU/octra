@@ -3,7 +3,7 @@ import {OLog} from '../../obj/Settings/logging';
 import {KeyStatisticElem} from '../../obj/statistics/KeyStatisticElem';
 import {MouseStatisticElem} from '../../obj/statistics/MouseStatisticElem';
 import {StatisticElem} from '../../obj/statistics/StatisticElement';
-import {Functions, isUnset} from '@octra/utilities';
+import {contains, isUnset} from '@octra/utilities';
 import {PlayBackStatus, SampleUnit} from '@octra/media';
 
 @Injectable({
@@ -89,7 +89,7 @@ export class UserInteractionsService {
         name = targetName;
       }
       let elem = null;
-      if (Functions.contains(type, 'key') || Functions.contains(type, 'shortcut')) {
+      if (contains(type, 'key') || contains(type, 'shortcut')) {
         elem = new KeyStatisticElem(
           type,
           name,
@@ -100,10 +100,10 @@ export class UserInteractionsService {
           selection,
           segment
         );
-      } else if (Functions.contains(type, 'mouse')) {
+      } else if (contains(type, 'mouse')) {
         elem = new MouseStatisticElem(type, name, event.value, timestamp, originalPlayerPos, caretpos,
           selection, segment);
-      } else if (Functions.contains(type, 'slider')) {
+      } else if (contains(type, 'slider')) {
         elem = new MouseStatisticElem(type, name, event.new_value, timestamp, originalPlayerPos, caretpos,
           selection, segment);
       } else {

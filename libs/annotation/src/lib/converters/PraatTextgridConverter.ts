@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {Functions} from '@octra/utilities';
+import {contains} from '@octra/utilities';
 import {OAnnotJSON, OAudiofile, OEvent, OLabel, OLevel, OSegment} from '../annotjson';
 
 export class PraatTextgridConverter extends Converter {
@@ -97,8 +97,8 @@ export class PraatTextgridConverter extends Converter {
         // check if header is first
         if (lines.length > 14) {
           if (
-            Functions.contains(lines[0], 'File type = "ooTextFile"')
-            && Functions.contains(lines[1], 'Object class = "TextGrid"')) {
+            contains(lines[0], 'File type = "ooTextFile"')
+            && contains(lines[1], 'Object class = "TextGrid"')) {
             // is TextGrid
 
             let lvlNum = 0;

@@ -9,7 +9,7 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
+import {contains, isUnset, SubscriptionManager} from '@octra/utilities';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {BrowserInfo} from '../../core/shared';
 
@@ -539,10 +539,10 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       if (
         $event.value === null || !(
           // cursor move by keyboard events are note saved because this would be too much
-          Functions.contains($event.value, 'cursor') ||
+          contains($event.value, 'cursor') ||
           // disable logging for user test phase, because it would be too much
-          Functions.contains($event.value, 'segment_enter') ||
-          Functions.contains($event.value, 'playonhover')
+          contains($event.value, 'segment_enter') ||
+          contains($event.value, 'playonhover')
         )
       ) {
         const caretpos = this.editor.caretpos;
@@ -578,7 +578,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         }
 
         this.uiService.addElementFromEvent('shortcut', $event, Date.now(), playPosition, caretpos, selection, segment, control);
-      } else if ($event.value !== null && Functions.contains($event.value, 'playonhover')) {
+      } else if ($event.value !== null && contains($event.value, 'playonhover')) {
         this.appStorage.playonhover = !this.appStorage.playonhover;
       }
     }

@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {Functions} from '@octra/utilities';
+import {contains} from '@octra/utilities';
 import {ILevel, ISegment, OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
 
 export class PraatTableConverter extends Converter {
@@ -67,7 +67,7 @@ export class PraatTableConverter extends Converter {
       // check if filename is equal with audio file
       const filename = file.name.substr(0, file.name.indexOf('.Table'));
 
-      if (Functions.contains(audiofile.name, filename)) {
+      if (contains(audiofile.name, filename)) {
         const tiers: string[] = [];
         // get tiers
         for (let i = 1; i < lines.length; i++) {

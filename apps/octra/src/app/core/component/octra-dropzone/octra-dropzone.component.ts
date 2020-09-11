@@ -3,7 +3,7 @@ import {AppInfo} from '../../../app.info';
 import {DropZoneComponent} from '../drop-zone';
 import {ModalService} from '../../modals/modal.service';
 import {SessionFile} from '../../obj/SessionFile';
-import {FileSize, Functions, isUnset, SubscriptionManager} from '@octra/utilities';
+import {contains, FileSize, Functions, isUnset, SubscriptionManager} from '@octra/utilities';
 import {FileProgress} from '../../obj/objects';
 import {Converter, IFile, ImportResult, OAnnotJSON, OAudiofile, OLabel, OSegment} from '@octra/annotation';
 import {AudioManager} from '@octra/media';
@@ -134,7 +134,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
     if (!isUnset(this._oaudiofile)) {
       for (let i = 0; i < AppInfo.converters.length; i++) {
         const converter: Converter = AppInfo.converters[i];
-        if (Functions.contains(file.file.name.toLowerCase(), AppInfo.converters[i].extension.toLowerCase())) {
+        if (contains(file.file.name.toLowerCase(), AppInfo.converters[i].extension.toLowerCase())) {
           if (converter.conversion.import) {
 
             const reader: FileReader = new FileReader();
@@ -259,7 +259,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
   onDeleteEntry(entry: string) {
     if (!(entry === null || entry === undefined)) {
       this.dropFile(entry);
-      if (Functions.contains(entry, '.wav') || Functions.contains(entry, '.ogg')) {
+      if (contains(entry, '.wav') || contains(entry, '.ogg')) {
         this._oaudiofile = null;
         AudioManager.stopDecoding();
         this.resetFormatFileProgresses();
@@ -397,23 +397,23 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
       }));
   }
 
-  private dropFile(filename: string, contains: boolean = false, containsnot: boolean = false): boolean {
+  private dropFile(filename: string, containsTrue: boolean = false, containsnot: boolean = false): boolean {
     for (let i = 0; i < this.files.length; i++) {
       const file = this.files[i].file;
 
-      if ((!contains && filename === file.name)) {
-        if (Functions.contains(file.name, filename)) {
+      if ((!containsTrue && filename === file.name)) {
+        if (contains(file.name, filename)) {
           this.files.splice(i, 1);
           return true;
         }
-      } else if (contains) {
+      } else if (containsTrue) {
         if (!containsnot) {
-          if (Functions.contains(file.name, filename)) {
+          if (contains(file.name, filename)) {
             this.files.splice(i, 1);
             return true;
           }
         } else {
-          if (!Functions.contains(file.name, filename)) {
+          if (!contains(file.name, filename)) {
             this.files.splice(i, 1);
             return true;
           }

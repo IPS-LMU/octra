@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {Functions} from '@octra/utilities';
+import {contains} from '@octra/utilities';
 import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
 
 export class CTMConverter extends Converter {
@@ -58,7 +58,7 @@ export class CTMConverter extends Converter {
       // check if filename is equal with audio file
       const filename = lines[0].substr(0, lines[0].indexOf(' '));
 
-      if (Functions.contains(file.name, filename) && Functions.contains(audiofile.name, filename)) {
+      if (contains(file.name, filename) && contains(audiofile.name, filename)) {
         const olevel = new OLevel('Tier_1', 'SEGMENT');
 
         let start = 0;

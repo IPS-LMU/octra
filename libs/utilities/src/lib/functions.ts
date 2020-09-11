@@ -19,6 +19,20 @@ export function isFunction(value: any) {
   return typeof value === 'function';
 }
 
+export function contains(haystack: string, needle: string): boolean {
+  return haystack.indexOf(needle) !== -1;
+}
+
+export function base64ToArrayBuffer(base64): ArrayBuffer {
+  const binaryString = window.atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return (bytes.buffer as ArrayBuffer);
+}
+
 export class Functions {
   public static scrollTo(y: number, target?: string) {
     setTimeout(() => {
@@ -49,10 +63,6 @@ export class Functions {
     }
 
     return result;
-  }
-
-  public static contains(haystack: string, needle: string): boolean {
-    return haystack.indexOf(needle) !== -1;
   }
 
   public static placeAtEnd(element: HTMLElement) {

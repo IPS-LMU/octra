@@ -2,7 +2,7 @@ import {Subject} from 'rxjs';
 import {AudioInfo} from './audio-info';
 import {SampleUnit} from './audio-time';
 import {isUnset, SubscriptionManager, TsWorker, TsWorkerJob, TsWorkerStatus} from '@octra/utilities';
-import {AudioFormat, WavFormat} from './';
+import {AudioFormat, WavFormat} from './AudioFormats';
 
 declare var window: any;
 

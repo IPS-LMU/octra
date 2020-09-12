@@ -17,19 +17,15 @@
     "baseUrl": ".",
     "paths": {
       "@octra/utilities": [
-        "dist/libs/utilities",
         "libs/utilities/src/index.ts"
       ],
       "@octra/media": [
-        "dist/libs/media",
         "libs/media/src/index.ts"
       ],
       "@octra/annotation": [
-        "dist/libs/annotation",
         "libs/annotation/src/index.ts"
       ],
       "@octra/components": [
-        "dist/libs/components",
         "libs/components/src/index.ts"
       ]
     }

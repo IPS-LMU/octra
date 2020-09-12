@@ -1,15 +1,15 @@
-import { Injectable } from '@angular/core';
-import {Functions} from '../../../../../../../libs/utilities/src';
-import {AppSettings} from '../../obj/Settings';
+import {Injectable} from '@angular/core';
 import * as Ajv from 'ajv';
 import {HttpClient} from '@angular/common/http';
+import {Functions} from '@octra/utilities';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConfigurationService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
   private validateJSON(filename: string, json: any, schema: any): boolean {
     if (!(json === null || json === undefined) && !(schema === null || schema === undefined)) {
@@ -33,7 +33,7 @@ export class ConfigurationService {
   }
 
   public loadSettings(messages: any, urls: any, filenames: any, onvalidated: (obj: any) => void,
-                       onerror: (error: string) => void) {
+                      onerror: (error: string) => void) {
     if (
       messages.hasOwnProperty('loading') &&
       urls.hasOwnProperty('json') && urls.hasOwnProperty('schema') &&

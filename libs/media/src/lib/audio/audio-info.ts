@@ -30,7 +30,7 @@ export class AudioInfo extends FileInfo {
     return this._sampleRate;
   }
 
-  constructor(filename: string, type: string, size: number, sampleRate: number, durationSamples: number, originalSampleRate: number,
+  constructor(filename: string, type: string, size: number, sampleRate: number, durationSamples: number,
               channels: number, bitrate: number) {
     super(filename, type, size);
     this._sampleRate = sampleRate;

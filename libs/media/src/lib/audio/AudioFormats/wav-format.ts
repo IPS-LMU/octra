@@ -340,4 +340,44 @@ export class WavFormat extends AudioFormat {
   private getFileFromBufferPart(data: Uint8Array | Uint16Array, filename: string): File {
     return new File([this.getFileDataView(data)], filename, {type: 'audio/wav'});
   }
+
+  public splitChannelsToFiles(filename: string, type: string, buffer: ArrayBuffer): File[] {
+    const result = [];
+
+    // one block contains one sample of each channel
+    // eg. blockAlign = 4 Byte => 2 * 8 Channel1 + 2 * 8 Channel2 = 32Bit = 4 Byte
+
+    if (this.isValid(buffer)) {
+      const channelData: Uint8Array[] = [];
+      const u8array = new Uint8Array(buffer);
+
+      for (let i = 0; i < this._channels; i++) {
+        channelData.push(new Uint8Array((u8array.length - 44) / this._channels));
+      }
+
+      let pointer = 0;
+      for (let i = 44; i < u8array.length; i++) {
+        try {
+          for (let j = 0; j < this._channels; j++) {
+            const subArray = u8array.slice(i, i + (this.blockAlign / this._channels));
+            channelData[j].set(subArray, pointer);
+            i += this.blockAlign / this._channels;
+          }
+          i--;
+          pointer += this.blockAlign / this._channels;
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      for (let i = 0; i < channelData.length; i++) {
+        const file = this.getFileFromBufferPart(channelData[i], filename + '_' + (i + 1));
+        result.push(file);
+      }
+    } else {
+      console.error('no valid wav format!');
+    }
+
+    return result;
+  }
 }

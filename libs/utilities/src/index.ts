@@ -8,4 +8,5 @@ export * from './lib/worker/multi-threading.service';
 export * from './lib/functions';
 export * from './lib/dataInfo';
 export * from './lib/fileInfo';
+export * from './lib/directory-info';
 export * from './lib/browser-info';

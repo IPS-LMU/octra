@@ -1,6 +1,7 @@
 import {HttpClient} from '@angular/common/http';
 import {unescape} from 'querystring';
 import {DataInfo} from './dataInfo';
+import {isUnset} from './functions';
 
 export class FileInfo extends DataInfo {
   /**
@@ -61,8 +62,16 @@ export class FileInfo extends DataInfo {
     this._extension = str2;
   }
 
-  public constructor(fullname: string, type: string, size: number, file?: File) {
+  public get createdAt(): number {
+    return this._createdAt;
+  }
+
+  private readonly _createdAt: number = 0;
+
+  public constructor(fullname: string, type: string, size: number, file?: File, createdAt?: number) {
     super(FileInfo.extractFileName(fullname).name, type, size);
+    this._createdAt = (isUnset(createdAt)) ? 0 : createdAt;
+
     const extraction = FileInfo.extractFileName(fullname);
     if (!(extraction === null || extraction === undefined)) {
       this._extension = extraction.extension;
@@ -76,15 +85,15 @@ export class FileInfo extends DataInfo {
     return new FileInfo(file.name, file.type, file.size, file);
   }
 
-  public static fromURL(url: string, name: string = null, type: string) {
-    let fullName;
-    if (!(name === null || name === undefined)) {
+  public static fromURL(url: string, name: string = null, type: string, createdAt = 0) {
+    let fullname = '';
+    if (name != null) {
       const extension = url.substr(url.lastIndexOf('.') + 1);
-      fullName = name + '.' + extension;
+      fullname = name + '.' + extension;
     } else {
-      fullName = url.substr(url.lastIndexOf('/') + 1);
+      fullname = url.substr(url.lastIndexOf('/') + 1);
     }
-    const result = new FileInfo(fullName, type, 0);
+    const result = new FileInfo(fullname, type, 0, undefined, createdAt);
     result.url = url;
 
     return result;

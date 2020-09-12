@@ -204,8 +204,7 @@ export class AudioManager {
         const result = new AudioManager(audioinfo, audioformat.sampleRate);
 
         audioinfo = new AudioInfo(filename, type, bufferLength, audioformat.sampleRate,
-          audioformat.sampleRate * audioformat.duration / audioformat.sampleRate,
-          audioformat.sampleRate, audioformat.channels, audioinfo.bitrate);
+          audioformat.sampleRate * audioformat.duration / audioformat.sampleRate, audioformat.channels, audioinfo.bitrate);
 
         audioinfo.file = new File([buffer], filename, {type: 'audio/wav'});
         result.setRessource(new AudioRessource(filename, SourceType.ArrayBuffer,

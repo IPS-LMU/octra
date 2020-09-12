@@ -3,7 +3,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
-import {AudioManager} from '../../../../../../../libs/media/src/lib/audio/audio-manager';
+import {AudioManager} from '@octra/media';
 
 @Injectable()
 export class AudioService {

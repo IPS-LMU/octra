@@ -183,7 +183,8 @@ function saveOptionToStore(state: LoginState, attribute: string, value: any): Lo
       const onlineSessionData = {
         jobNumber: -1,
         id: '',
-        project: ''
+        project: '',
+        password: ''
       };
 
       if (!isUnset(value)) {
@@ -203,7 +204,7 @@ function saveOptionToStore(state: LoginState, attribute: string, value: any): Lo
         ...state,
         onlineSession: {
           ...state.onlineSession,
-          ...onlineSessionData
+          loginData: onlineSessionData
         }
       };
     case('prompttext'):

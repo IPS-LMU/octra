@@ -72,7 +72,7 @@
       tiersDropdown
       -->
       <li *ngIf="transcrServ !== undefined" [ngStyle]="{
-                'display': (!(navbarServ.dataloaded && appStorage.loggedIn && (appStorage.useMode === 'local' || appStorage.useMode === 'url'))) ? 'none': 'inherit'
+                'display': (!(appStorage.loggedIn && (appStorage.useMode === 'local' || appStorage.useMode === 'url'))) ? 'none': 'inherit'
                 }" class="nav-item dropdown">
         <a aria-expanded="false" aria-haspopup="true" class="nav-link" data-toggle="dropdown" href="#"
            id="tiersDropdown"
@@ -119,7 +119,7 @@
         *ngIf="(appStorage.loggedIn && (appStorage.useMode === 'online' ||appStorage.useMode === 'demo'))"
         class="nav-item">
         <a class="nav-link">
-          {{appStorage.onlineSession?.project}}: {{appStorage.jobsLeft}}
+          {{appStorage.onlineSession?.loginData?.project}}: {{appStorage.jobsLeft}}
         </a>
       </li>
 
@@ -136,7 +136,7 @@
             <tr *ngIf="appStorage.useMode === 'online' ||appStorage.useMode === 'demo'">
               <td><span>{{'general.project' |transloco}}:</span></td>
               <td>
-                <span>{{appStorage.onlineSession?.project}}</span>
+                <span>{{appStorage.onlineSession?.loginData?.project}}</span>
               </td>
             </tr>
             <tr>

@@ -788,11 +788,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   public update() {
-    // TODO important update needed?
-    // this.viewer.update().catch((error) => {
-    //       console.error(`could not update GUI for multiline-viewer`);
-    //       console.error(error);
-    //     });
     this.audioChunkLines.startpos = this.audioChunkLines.time.start.clone();
   }
 

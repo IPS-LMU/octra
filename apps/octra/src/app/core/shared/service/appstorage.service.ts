@@ -19,6 +19,7 @@ import * as UserActions from '../../store/user/user.actions';
 import * as IDBActions from '../../store/idb/idb.actions';
 import {Actions} from '@ngrx/effects';
 import {ConsoleEntry} from './bug-report.service';
+import {Router} from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -67,7 +68,7 @@ export class AppStorageService {
   }
 
   get dataID(): number {
-    return this._snapshot.login.onlineSession?.dataID;
+    return this._snapshot.login.onlineSession?.sessionData?.dataID;
   }
 
   get language(): string {
@@ -114,7 +115,7 @@ export class AppStorageService {
   }
 
   get prompttext(): string {
-    return this._snapshot.login.onlineSession?.promptText;
+    return this._snapshot.login.onlineSession?.sessionData?.promptText;
   }
 
   get urlParams(): any {
@@ -132,7 +133,7 @@ export class AppStorageService {
   }
 
   get comment(): string {
-    return this._snapshot.login.onlineSession?.comment;
+    return this._snapshot.login.onlineSession?.sessionData?.comment;
   }
 
   set comment(value: string) {
@@ -142,7 +143,7 @@ export class AppStorageService {
   }
 
   get servercomment(): string {
-    return this._snapshot.login.onlineSession?.serverComment;
+    return this._snapshot.login.onlineSession?.sessionData?.serverComment;
   }
 
   get annotationLevels(): OIDBLevel[] {
@@ -188,7 +189,8 @@ export class AppStorageService {
   constructor(public sessStr: SessionStorageService,
               public localStr: LocalStorageService,
               private store: Store<RootState>,
-              private actions: Actions) {
+              private actions: Actions,
+              private router: Router) {
     this.subscrManager.add(actions.subscribe((action) => {
       console.log(`Action: ${action.type}`);
       if (action.type === '@ngrx/effects/init') {
@@ -244,7 +246,7 @@ export class AppStorageService {
   }
 
   get jobsLeft(): number {
-    return this._snapshot.login.onlineSession?.jobsLeft;
+    return this._snapshot.login.onlineSession?.sessionData.jobsLeft;
   }
 
   get logs(): any[] {
@@ -268,7 +270,7 @@ export class AppStorageService {
   }
 
   get serverDataEntry(): IDataEntry {
-    return this._snapshot.login.onlineSession.serverDataEntry;
+    return this._snapshot.login.onlineSession.sessionData?.serverDataEntry;
   }
 
   get submitted(): boolean {
@@ -348,7 +350,7 @@ export class AppStorageService {
   }
 
   get audioURL(): string {
-    return this._snapshot.login.onlineSession?.audioURL;
+    return this._snapshot.login.onlineSession?.sessionData?.audioURL;
   }
 
   get useMode(): LoginMode {
@@ -389,9 +391,9 @@ export class AppStorageService {
         };
 
         if (!isUnset(audiofile)) {
-          if (!keepData || (!isUnset(onlineSession) && !isUnset(onlineSession.dataID))) {
+          if (!keepData || (!isUnset(onlineSession) && !isUnset(onlineSession.sessionData?.dataID))) {
             // last was online mode
-            this.clearSession();
+            this.clearOnlineSession();
             this.clearLocalStorage();
             // TODO waiting?
             loginLocal();
@@ -463,17 +465,22 @@ export class AppStorageService {
     if (!this.login && !isUnset(member)) {
       this.store.dispatch(LoginActions.loginOnline({
         onlineSession: {
-          dataID,
-          audioURL,
-          id: member.id,
-          project: member.project,
-          jobNumber: member.jobno,
-          promptText,
-          serverComment,
-          jobsLeft,
-          serverDataEntry: null,
-          comment: '',
-          password: member.password
+          loginData: {
+            id: member.id,
+            project: member.project,
+            jobNumber: member.jobno,
+            password: member.password
+          },
+          sessionData: {
+            dataID,
+            audioURL,
+
+            promptText,
+            serverComment,
+            jobsLeft,
+            serverDataEntry: null,
+            comment: ''
+          }
         }
       }));
 
@@ -505,17 +512,21 @@ export class AppStorageService {
 
     this.store.dispatch(LoginActions.loginDemo({
       onlineSession: {
-        id: 'demo_user',
-        project: 'demo',
-        jobNumber: -1,
-        dataID: 21343134,
-        promptText: '',
-        serverDataEntry: null,
-        comment: '',
-        password: '',
-        audioURL,
-        serverComment,
-        jobsLeft
+        loginData: {
+          id: 'demo_user',
+          project: 'demo',
+          jobNumber: -1,
+          password: ''
+        },
+        sessionData: {
+          dataID: 21343134,
+          promptText: '',
+          serverDataEntry: null,
+          comment: '',
+          audioURL,
+          serverComment,
+          jobsLeft
+        }
       }
     }));
     this.login = true;
@@ -541,7 +552,7 @@ export class AppStorageService {
     this.login = true;
   }
 
-  public clearSession(): boolean {
+  public clearOnlineSession(): boolean {
     this.login = false;
     this.store.dispatch(LoginActions.clearOnlineSession());
 
@@ -551,7 +562,6 @@ export class AppStorageService {
 
   public clearLocalStorage() {
     this.login = false;
-    // this.store.dispatch(TranscriptionActions.clearAnnotation());
     this.store.dispatch(LoginActions.clearLocalSession());
   }
 
@@ -622,9 +632,8 @@ export class AppStorageService {
   public endSession(): Promise<void> {
     return new Promise<void>((resolve) => {
       // TODO wait until cleaned!
-      this.clearSession();
+      this.clearOnlineSession();
       this.clearLocalStorage();
-      this.logout();
       resolve();
     });
   }
@@ -715,7 +724,7 @@ export class AppStorageService {
     }
   }
 
-  public clearLoggingData() {
+  public clearLoggingDataPermanently() {
     this.store.dispatch(TranscriptionActions.clearLogs());
   }
 
@@ -728,11 +737,16 @@ export class AppStorageService {
     return null;
   }
 
-  public clearAnnotation() {
-    this.store.dispatch(TranscriptionActions.clearAnnotation());
+  public logout() {
+    this.endSession().then(() => {
+      this.store.dispatch(LoginActions.logout());
+      Functions.navigateTo(this.router, ['login'], AppInfo.queryParamsHandling).catch((error) => {
+        console.error(error);
+      });
+    });
   }
 
-  public logout() {
-    this.store.dispatch(LoginActions.logout());
+  public clearAnnotationPermanently() {
+    this.store.dispatch(TranscriptionActions.clearAnnotation());
   }
 }

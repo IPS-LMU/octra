@@ -960,17 +960,17 @@ export class IDBEffects {
   private saveOnlineSession(mode: LoginMode, onlineSession: OnlineSession) {
     const promises: Promise<void>[] = [];
 
-    promises.push(this.idbService.saveOption('dataID', onlineSession.dataID));
-    promises.push(this.idbService.saveOption('prompttext', onlineSession.promptText));
-    promises.push(this.idbService.saveOption('audioURL', onlineSession.audioURL));
+    promises.push(this.idbService.saveOption('dataID', onlineSession.sessionData.dataID));
+    promises.push(this.idbService.saveOption('prompttext', onlineSession.sessionData.promptText));
+    promises.push(this.idbService.saveOption('audioURL', onlineSession.sessionData.audioURL));
     promises.push(this.idbService.saveOption('usemode', mode));
     promises.push(this.idbService.saveOption('user', {
-      id: onlineSession.id,
-      jobno: onlineSession.jobNumber,
-      project: onlineSession.project
+      id: onlineSession.loginData.id,
+      jobno: onlineSession.loginData.jobNumber,
+      project: onlineSession.loginData.project
     }));
-    this.sessStr.store('jobsLeft', onlineSession.jobsLeft);
-    this.sessStr.store('serverDataEntry', onlineSession.serverDataEntry);
+    this.sessStr.store('jobsLeft', onlineSession.sessionData.jobsLeft);
+    this.sessStr.store('serverDataEntry', onlineSession.sessionData.serverDataEntry);
 
     return Promise.all(promises);
   }

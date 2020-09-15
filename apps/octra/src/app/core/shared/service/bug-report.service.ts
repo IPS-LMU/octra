@@ -119,8 +119,8 @@ export class BugReportService {
     };
 
     if (this.appStorage.useMode === LoginMode.ONLINE) {
-      result.octra.project = this.appStorage.onlineSession.project;
-      result.octra.user = this.appStorage.onlineSession.id;
+      result.octra.project = this.appStorage.onlineSession.loginData.project;
+      result.octra.user = this.appStorage.onlineSession.loginData.id;
       result.octra.jobID = this.appStorage.dataID;
     }
 

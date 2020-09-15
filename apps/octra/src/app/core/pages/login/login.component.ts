@@ -122,8 +122,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   newTranscription = () => {
     this.audioService.registerAudioManager(this.dropzone.audioManager);
 
-    this.appStorage.clearAnnotation();
-    this.appStorage.clearLoggingData();
+    this.appStorage.clearAnnotationPermanently();
+    this.appStorage.clearLoggingDataPermanently();
     this.appStorage.beginLocalSession(this.dropzone.files, false).then(this.beforeNavigation).catch((error) => {
       if (error === 'file not supported') {
         this.modService.show('error', {
@@ -145,14 +145,14 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
     const loaduser = () => {
       if (this.appStorage.useMode !== LoginMode.DEMO) {
         if (!isUnset(this.appStorage.onlineSession)) {
-          if (this.appStorage.onlineSession.id !== '-1') {
-            this.member.id = this.appStorage.onlineSession.id;
+          if (this.appStorage.onlineSession.loginData.id !== '-1') {
+            this.member.id = this.appStorage.onlineSession.loginData.id;
           }
 
-          this.member.project = this.appStorage.onlineSession.project;
+          this.member.project = this.appStorage.onlineSession.loginData.project;
 
-          if (this.appStorage.onlineSession.jobNumber !== null && this.appStorage.onlineSession.jobNumber > -1) {
-            this.member.jobno = this.appStorage.onlineSession.jobNumber.toString();
+          if (this.appStorage.onlineSession.loginData.jobNumber !== null && this.appStorage.onlineSession.loginData.jobNumber > -1) {
+            this.member.jobno = this.appStorage.onlineSession.loginData.jobNumber.toString();
           }
         }
       } else {
@@ -212,14 +212,14 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           // last session was online session
           // check if credentials are available
           if (
-            !isUnset(this.appStorage.onlineSession.project) && !isUnset(this.appStorage.onlineSession.jobNumber) &&
-            !isUnset(this.appStorage.onlineSession.id)
+            !isUnset(this.appStorage.onlineSession.loginData.project) && !isUnset(this.appStorage.onlineSession.loginData.jobNumber) &&
+            !isUnset(this.appStorage.onlineSession.loginData.id)
           ) {
             // check if credentials are the same like before
             if (
-              this.appStorage.onlineSession.id === this.member.id &&
-              Number(this.appStorage.onlineSession.jobNumber) === Number(this.member.jobno) &&
-              this.appStorage.onlineSession.project === this.member.project
+              this.appStorage.onlineSession.loginData.id === this.member.id &&
+              Number(this.appStorage.onlineSession.loginData.jobNumber) === Number(this.member.jobno) &&
+              this.appStorage.onlineSession.loginData.project === this.member.project
             ) {
               continueSession = true;
             } else {
@@ -353,15 +353,15 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           });
         }
         if (!isUnset(this.appStorage.onlineSession) &&
-          !isUnset(this.appStorage.onlineSession.project) && this.appStorage.onlineSession.project !== '') {
+          !isUnset(this.appStorage.onlineSession.loginData.project) && this.appStorage.onlineSession.loginData.project !== '') {
 
           const found = this.projects.find(
             (x) => {
-              return x === this.appStorage.onlineSession.project;
+              return x === this.appStorage.onlineSession.loginData.project;
             });
           if (isUnset(found)) {
             // make sure that old project is in list
-            this.projects.push(this.appStorage.onlineSession.project);
+            this.projects.push(this.appStorage.onlineSession.loginData.project);
           }
         }
       }
@@ -392,7 +392,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.member.jobno = '123';
 
       // delete old data for fresh new session
-      this.appStorage.clearSession();
+      this.appStorage.clearOnlineSession();
       this.appStorage.clearLocalStorage();
       this.appStorage.setDemoSession(audioExample.url, audioExample.description, 1000);
       this.navigate();
@@ -439,7 +439,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       const data = json.data as IDataEntry;
       if (form.valid && json.message !== '0') {
         // delete old data for fresh new session
-        this.appStorage.clearSession();
+        this.appStorage.clearOnlineSession();
         this.appStorage.clearLocalStorage();
 
         // get transcript data that already exists

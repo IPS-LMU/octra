@@ -76,14 +76,7 @@ import {ClipTextPipe} from './core/shared/clip-text.pipe';
 import {DynComponentDirective} from './core/shared/directive/dyn-component.directive';
 import {LoadeditorDirective} from './core/shared/directive/loadeditor.directive';
 
-import {
-  ALoginGuard,
-  DeALoginGuard,
-  LogoutGuard,
-  MembersAreaGuard,
-  SettingsGuard,
-  TranscrEndGuard
-} from './core/shared/guard';
+import {ALoginGuard, DeALoginGuard, MembersAreaGuard, SettingsGuard, TranscrEndGuard} from './core/shared/guard';
 import {TranscActivateGuard} from './core/shared/guard/transcr.activateguard';
 import {MultiThreadingService} from './core/shared/multi-threading/multi-threading.service';
 
@@ -100,7 +93,6 @@ import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {FastbarComponent} from './core/component/taskbar';
 import {LoadingComponent} from './core/pages/loading';
 import {LoginComponent} from './core/pages/login';
-import {LogoutComponent} from './core/pages/logout';
 import {MembersAreaComponent} from './core/pages/members-area';
 import {NavigationComponent} from './core/component/navbar';
 import {ReloadFileComponent} from './core/pages/reload-file';
@@ -151,7 +143,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     LoadeditorDirective,
     LoadingComponent,
     LoginComponent,
-    LogoutComponent,
     MembersAreaComponent,
     NavigationComponent,
     NewEditorComponent,
@@ -249,7 +240,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     AudioService,
     DeALoginGuard,
     KeymappingService,
-    LogoutGuard,
     MembersAreaGuard,
     ModalService,
     NavbarService,

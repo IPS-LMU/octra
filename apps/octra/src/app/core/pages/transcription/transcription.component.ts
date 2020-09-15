@@ -253,25 +253,21 @@ export class TranscriptionComponent implements OnInit,
 
       if (this.appStorage.useMode !== LoginMode.DEMO) {
         this.api.setOnlineSessionToFree(this.appStorage).then(() => {
-          Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).then(() => {
-          });
+          this.clearDataPermanently();
+          this.appStorage.logout();
         }).catch((error) => {
           console.error(error);
         });
       } else {
         // is demo mode
-        console.log(`logout DEMO`);
-        Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).then(() => {
-        });
+        this.clearDataPermanently();
+        this.appStorage.logout();
       }
     } else {
       this.modService.show('transcriptionStop').then((answer: TranscriptionStopModalAnswer) => {
         if (answer === TranscriptionStopModalAnswer.QUIT) {
           this.transcrService.endTranscription();
-
-          Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).catch((error) => {
-            console.error(error);
-          });
+          this.appStorage.logout();
         }
       }).catch((error) => {
         console.error(error);
@@ -322,7 +318,7 @@ export class TranscriptionComponent implements OnInit,
     this.bugService.init(this.transcrService);
 
     if (this.appStorage.useMode === LoginMode.ONLINE) {
-      console.log(`opened job ${this.appStorage.dataID} in project ${this.appStorage.onlineSession?.project}`);
+      console.log(`opened job ${this.appStorage.dataID} in project ${this.appStorage.onlineSession?.loginData?.project}`);
     }
 
     this.asrService.init();
@@ -698,7 +694,7 @@ export class TranscriptionComponent implements OnInit,
 
   nextTranscription(json: any) {
     this.transcrService.endTranscription(false);
-    this.clearData();
+    this.clearDataPermanently();
 
     if (!isUnset(json)) {
       const data = json.data as IDataEntry;
@@ -747,10 +743,10 @@ export class TranscriptionComponent implements OnInit,
         }
 
         this.appStorage.setOnlineSession({
-          id: this.appStorage.onlineSession.id,
-          project: this.appStorage.onlineSession.project,
-          password: this.appStorage.onlineSession.password,
-          jobno: this.appStorage.onlineSession.jobNumber
+          id: this.appStorage.onlineSession.loginData.id,
+          project: this.appStorage.onlineSession.loginData.project,
+          password: this.appStorage.onlineSession.loginData.password,
+          jobno: this.appStorage.onlineSession.loginData.jobNumber
         }, data.id, data.url, promptText, serverComment, jobsLeft);
 
         Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
@@ -767,7 +763,7 @@ export class TranscriptionComponent implements OnInit,
 
   reloadDemo() {
     this.transcrService.endTranscription(false);
-    this.clearData();
+    this.clearDataPermanently();
     const audioExample = this.settingsService.getAudioExample(this.langService.getActiveLang());
 
     if (!isUnset(audioExample)) {
@@ -784,9 +780,9 @@ export class TranscriptionComponent implements OnInit,
   closeTranscriptionAndGetNew() {
     // close current session
     if (this.appStorage.useMode === LoginMode.ONLINE) {
-      this.api.closeSession(this.appStorage.onlineSession.id, this.appStorage.dataID, this.appStorage.servercomment).then(() => {
+      this.api.closeSession(this.appStorage.onlineSession.loginData.id, this.appStorage.dataID, this.appStorage.servercomment).then(() => {
         // begin new session
-        this.api.beginSession(this.appStorage.onlineSession.project, this.appStorage.onlineSession.id, this.appStorage.onlineSession.jobNumber).then((json) => {
+        this.api.beginSession(this.appStorage.onlineSession.loginData.project, this.appStorage.onlineSession.loginData.id, this.appStorage.onlineSession.loginData.jobNumber).then((json) => {
           // new session
           this.nextTranscription(json);
         }).catch((error) => {
@@ -800,12 +796,12 @@ export class TranscriptionComponent implements OnInit,
     }
   }
 
-  clearData() {
+  clearDataPermanently() {
     this.appStorage.submitted = false;
-    this.appStorage.clearAnnotation();
+    this.appStorage.clearAnnotationPermanently();
     this.appStorage.feedback = {};
     this.appStorage.comment = '';
-    this.appStorage.clearLoggingData();
+    this.appStorage.clearLoggingDataPermanently();
     this.uiService.elements = [];
     this.appStorage.audioLoaded = false;
   }

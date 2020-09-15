@@ -1,6 +1,5 @@
 export * from './loading';
 export * from './login';
-export * from './logout';
 export * from './members-area';
 export * from './transcription';
 export * from './transcription-end';

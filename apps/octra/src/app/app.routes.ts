@@ -5,12 +5,10 @@ import {
   Error404Component,
   FeaturesComponent,
   HelpToolsComponent,
-  LogoutComponent,
   MembersAreaComponent,
   NewsComponent
 } from './core/pages';
 import {ALoginGuard, LoginComponent} from './core/pages/login';
-import {LogoutGuard} from './core/pages/logout';
 import {MEMBER_ROUTES} from './core/pages/members-area';
 import {SettingsGuard} from './core/shared/guard';
 import {CompatibilityGuard} from './core/shared/guard/compatibility.guard';
@@ -23,7 +21,6 @@ const APP_ROUTES: Routes = [
   {path: '404', component: Error404Component},
   {path: 'news', component: NewsComponent, canActivate: [SettingsGuard]},
   {path: 'features', component: FeaturesComponent, canActivate: [SettingsGuard]},
-  {path: 'logout', component: LogoutComponent, canActivate: [SettingsGuard, LogoutGuard]},
   {
     path: 'user',
     component: MembersAreaComponent,

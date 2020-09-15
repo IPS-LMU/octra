@@ -19,17 +19,21 @@ export enum LoadingStatus {
 }
 
 export interface OnlineSession {
-  id: string;
-  project: string;
-  jobNumber: number;
-  dataID: number;
-  audioURL: string;
-  promptText: string;
-  serverComment: string;
-  jobsLeft: number;
-  serverDataEntry: IDataEntry;
-  comment: string;
-  password: string;
+  loginData: {
+    id: string;
+    project: string;
+    jobNumber: number;
+    password: string;
+  },
+  sessionData?: {
+    dataID: number;
+    audioURL: string;
+    promptText: string;
+    serverComment: string;
+    jobsLeft: number;
+    serverDataEntry: IDataEntry;
+    comment: string;
+  }
 }
 
 export interface URLParameters {
@@ -42,7 +46,7 @@ export interface URLParameters {
 export interface LoginState {
   mode?: LoginMode;
   files?: File[];
-  onlineSession?: OnlineSession,
+  onlineSession: OnlineSession,
   sessionFile?: SessionFile,
   queryParams?: URLParameters,
   loggedIn: boolean;

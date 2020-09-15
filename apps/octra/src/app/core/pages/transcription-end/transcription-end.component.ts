@@ -1,7 +1,6 @@
 import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {Functions, SubscriptionManager} from '@octra/utilities';
-import {AppInfo} from '../../../app.info';
+import {SubscriptionManager} from '@octra/utilities';
 import {SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {NavbarService} from '../../component/navbar/navbar.service';
@@ -44,16 +43,14 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
     this.clearData();
     this.appStorage.clearLocalStorage();
 
-    Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).catch((error) => {
-      console.error(error);
-    });
+    this.appStorage.logout();
   }
 
   clearData() {
     this.appStorage.submitted = false;
-    this.appStorage.clearAnnotation();
+    this.appStorage.clearAnnotationPermanently();
     this.appStorage.comment = '';
-    this.appStorage.clearLoggingData();
+    this.appStorage.clearLoggingDataPermanently();
     this.uiService.elements = [];
   }
 }

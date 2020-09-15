@@ -248,39 +248,43 @@ export class TranscriptionService {
    */
   public load(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this._audiomanager = this.audio.audiomanagers[0];
+      if (this.audio.audiomanagers.length > 0) {
+        this._audiomanager = this.audio.audiomanagers[0];
 
-      this.filename = this._audiomanager.ressource.name;
+        this.filename = this._audiomanager.ressource.name;
 
-      this._audiofile = new OAudiofile();
-      this._audiofile.name = this._audiomanager.ressource.info.fullname;
-      this._audiofile.sampleRate = this._audiomanager.ressource.info.sampleRate;
-      this._audiofile.duration = this._audiomanager.ressource.info.duration.samples;
-      this._audiofile.size = this._audiomanager.ressource.info.size;
-      this._audiofile.url = (this.appStorage.useMode === LoginMode.ONLINE)
-        ? `${this.app_settings.audio_server.url}${this.appStorage.audioURL}` : '';
+        this._audiofile = new OAudiofile();
+        this._audiofile.name = this._audiomanager.ressource.info.fullname;
+        this._audiofile.sampleRate = this._audiomanager.ressource.info.sampleRate;
+        this._audiofile.duration = this._audiomanager.ressource.info.duration.samples;
+        this._audiofile.size = this._audiomanager.ressource.info.size;
+        this._audiofile.url = (this.appStorage.useMode === LoginMode.ONLINE)
+          ? `${this.app_settings.audio_server.url}${this.appStorage.audioURL}` : '';
 
-      this._audiofile.url = (this.appStorage.useMode === LoginMode.DEMO)
-        ? `${this.appStorage.audioURL}` : this._audiofile.url;
-      this._audiofile.type = this._audiomanager.ressource.info.type;
+        this._audiofile.url = (this.appStorage.useMode === LoginMode.DEMO)
+          ? `${this.appStorage.audioURL}` : this._audiofile.url;
+        this._audiofile.type = this._audiomanager.ressource.info.type;
 
-      // overwrite logging option using projectconfig
-      if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
-        this.appStorage.logging = this.settingsService.projectsettings.logging.forced;
-      }
-      this.uiService.enabled = this.appStorage.logging;
-
-      this.loadSegments().then(
-        () => {
-          this.selectedlevel = 0;
-          this.navbarServ.ressource = this._audiomanager.ressource;
-          this.navbarServ.filesize = Functions.getFileSize(this._audiomanager.ressource.size);
-
-          resolve();
+        // overwrite logging option using projectconfig
+        if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
+          this.appStorage.logging = this.settingsService.projectsettings.logging.forced;
         }
-      ).catch((err) => {
-        reject(err);
-      });
+        this.uiService.enabled = this.appStorage.logging;
+
+        this.loadSegments().then(
+          () => {
+            this.selectedlevel = 0;
+            this.navbarServ.ressource = this._audiomanager.ressource;
+            this.navbarServ.filesize = Functions.getFileSize(this._audiomanager.ressource.size);
+
+            resolve();
+          }
+        ).catch((err) => {
+          reject(err);
+        });
+      } else {
+        console.error(`no audio managers`);
+      }
     });
   }
 
@@ -451,7 +455,7 @@ export class TranscriptionService {
             }
 
             if (this.appStorage.logs === null) {
-              this.appStorage.clearLoggingData();
+              this.appStorage.clearLoggingDataPermanently();
               this.uiService.elements = [];
             } else {
               this.uiService.fromAnyArray(this.appStorage.logs);
@@ -476,14 +480,14 @@ export class TranscriptionService {
       const logData: OLogging = this.extractUI(this.uiService.elements);
 
       data = {
-        project: (isUnset(this.appStorage.onlineSession.project))
-          ? 'NOT AVAILABLE' : this.appStorage.onlineSession.project,
-        annotator: (isUnset(this.appStorage.onlineSession.id))
-          ? 'NOT AVAILABLE' : this.appStorage.onlineSession.id,
+        project: (isUnset(this.appStorage.onlineSession.loginData.project))
+          ? 'NOT AVAILABLE' : this.appStorage.onlineSession.loginData.project,
+        annotator: (isUnset(this.appStorage.onlineSession.loginData.id))
+          ? 'NOT AVAILABLE' : this.appStorage.onlineSession.loginData.id,
         transcript: null,
         comment: this._feedback.comment,
-        jobno: (isUnset(this.appStorage.onlineSession.jobNumber))
-          ? 'NOT AVAILABLE' : this.appStorage.onlineSession.jobNumber,
+        jobno: (isUnset(this.appStorage.onlineSession.loginData.jobNumber))
+          ? 'NOT AVAILABLE' : this.appStorage.onlineSession.loginData.jobNumber,
         quality: (this.settingsService.isTheme('shortAudioFiles'))
           ? this.appStorage.feedback : JSON.stringify(this._feedback.exportData()),
         status: 'ANNOTATED',
@@ -590,8 +594,8 @@ export class TranscriptionService {
     const result: OLogging = new OLogging(
       '1.0',
       'UTF-8',
-      (isUnset(this.appStorage.onlineSession.project))
-        ? 'local' : this.appStorage.onlineSession.project,
+      (isUnset(this.appStorage.onlineSession.loginData.project))
+        ? 'local' : this.appStorage.onlineSession.loginData.project,
       now.toUTCString(),
       this._annotation.audiofile.name,
       this._annotation.audiofile.sampleRate,

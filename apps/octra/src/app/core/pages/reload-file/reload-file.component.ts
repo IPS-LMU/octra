@@ -35,9 +35,7 @@ export class ReloadFileComponent implements OnInit {
 
   abortTranscription = () => {
     this.transcrServ.endTranscription();
-    Functions.navigateTo(this.router, ['/logout'], AppInfo.queryParamsHandling).catch((error) => {
-      console.error(error);
-    });
+    this.appStorage.logout();
   }
 
   newTranscription = () => {
@@ -61,12 +59,12 @@ export class ReloadFileComponent implements OnInit {
             keepData = true;
             resolve();
           } else {
-            this.appStorage.clearAnnotation();
+            this.appStorage.clearAnnotationPermanently();
             resolve();
           }
         }).then(() => {
           this.audioService.registerAudioManager(this.dropzone.audioManager);
-          this.appStorage.clearLoggingData();
+          this.appStorage.clearLoggingDataPermanently();
           this.appStorage.beginLocalSession(this.dropzone.files, keepData).then(this.navigate).catch((error) => {
             if (error === 'file not supported') {
               this.showErrorMessage(this.langService.translate('reload-file.file not supported', {type: ''}));

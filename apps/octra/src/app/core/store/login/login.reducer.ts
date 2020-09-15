@@ -6,6 +6,14 @@ import {SessionFile} from '../../obj/SessionFile';
 import {isUnset} from '@octra/utilities';
 
 export const initialState: LoginState = {
+  onlineSession: {
+    loginData: {
+      id: '',
+      project: '',
+      jobNumber: -1,
+      password: ''
+    }
+  },
   loggedIn: false
 };
 
@@ -51,7 +59,10 @@ export const reducer = createReducer(
   })),
   on(LoginActions.clearOnlineSession, (state) => ({
     ...state,
-    onlineSession: undefined
+    onlineSession: {
+      ...state.onlineSession,
+      sessionData: undefined
+    }
   })),
   on(LoginActions.setAudioURL, (state, {audioURL}) => ({
     ...state,
@@ -128,7 +139,10 @@ function saveOptionToStore(state: LoginState, attribute: string, value: any): Lo
         ...state,
         onlineSession: {
           ...state.onlineSession,
-          audioURL: value
+          sessionData: {
+            ...state.onlineSession.sessionData,
+            audioURL: value
+          }
         }
       };
     case('comment'):
@@ -136,7 +150,10 @@ function saveOptionToStore(state: LoginState, attribute: string, value: any): Lo
         ...state,
         onlineSession: {
           ...state.onlineSession,
-          comment: value
+          sessionData: {
+            ...state.onlineSession.sessionData,
+            comment: value
+          }
         }
       };
     case('dataID'):
@@ -144,7 +161,10 @@ function saveOptionToStore(state: LoginState, attribute: string, value: any): Lo
         ...state,
         onlineSession: {
           ...state.onlineSession,
-          dataID: value
+          sessionData: {
+            ...state.onlineSession.sessionData,
+            dataID: value
+          }
         }
       };
     case('sessionfile'):
@@ -191,7 +211,10 @@ function saveOptionToStore(state: LoginState, attribute: string, value: any): Lo
         ...state,
         onlineSession: {
           ...state.onlineSession,
-          promptText: value
+          sessionData: {
+            ...state.onlineSession.sessionData,
+            promptText: value
+          }
         }
       };
     case('servercomment'):
@@ -199,7 +222,10 @@ function saveOptionToStore(state: LoginState, attribute: string, value: any): Lo
         ...state,
         onlineSession: {
           ...state.onlineSession,
-          serverComment: value
+          sessionData: {
+            ...state.onlineSession.sessionData,
+            serverComment: value
+          }
         }
       };
   }

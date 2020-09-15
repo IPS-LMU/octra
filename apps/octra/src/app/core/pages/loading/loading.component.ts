@@ -172,7 +172,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
       } else if (this.appStorage.useMode === LoginMode.URL) {
         // url mode set, but no params => change mode
         console.warn(`use mode is url but no params found. Reset use mode.`);
-        if (!isUnset(this.appStorage.onlineSession.id) && this.appStorage.onlineSession.id !== ''
+        if (!isUnset(this.appStorage.onlineSession.loginData.id) && this.appStorage.onlineSession.loginData.id !== ''
           && (isUnset(this.appStorage.sessionfile))) {
           this.store.dispatch(LoginActions.setMode({
             mode: LoginMode.ONLINE
@@ -247,7 +247,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    this.appStorage.clearSession();
+    this.appStorage.clearOnlineSession();
     this.appStorage.clearLocalStorage();
     this.appStorage.logout();
     Functions.navigateTo(this.router, ['/login'], AppInfo.queryParamsHandling).catch((error) => {

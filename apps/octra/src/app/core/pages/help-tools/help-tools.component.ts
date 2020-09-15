@@ -31,12 +31,12 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
   }
 
   clearAllData() {
-    this.appStorage.clearSession();
+    this.appStorage.clearOnlineSession();
 
     const clearAll = () => {
       this.store.dispatch(TranscriptionActions.clearAnnotation());
       this.store.dispatch(IDBActions.clearAllOptions());
-      this.appStorage.clearLoggingData();
+      this.appStorage.clearLoggingDataPermanently();
 
       setTimeout(() => {
         alert('All cleared. The app will be reloaded.');

@@ -78,7 +78,7 @@ export class StatisticsModalComponent implements OnInit {
 
   clearElements() {
     this.uiService.clear();
-    this.appStorage.clearLoggingData();
+    this.appStorage.clearLoggingDataPermanently();
   }
 
   getText() {

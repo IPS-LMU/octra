@@ -116,7 +116,7 @@
 
       <!-- online mode counter -->
       <li
-        *ngIf="(appStorage.loggedIn && navbarServ.dataloaded && (appStorage.useMode === 'online' ||appStorage.useMode === 'demo'))"
+        *ngIf="(appStorage.loggedIn && (appStorage.useMode === 'online' ||appStorage.useMode === 'demo'))"
         class="nav-item">
         <a class="nav-link">
           {{appStorage.onlineSession?.project}}: {{appStorage.jobsLeft}}
@@ -126,7 +126,7 @@
       <!--
       infoDropdown
       -->
-      <li *ngIf="(appStorage.loggedIn && navbarServ.dataloaded)" class="nav-item dropdown">
+      <li *ngIf="appStorage.loggedIn && navbarServ.filesize !== undefined" class="nav-item dropdown">
         <a aria-expanded="false" aria-haspopup="true" class="nav-link" data-toggle="dropdown"
            href="#" id="infoDropdown">
           <fa-icon class="navbar-icon" icon="info-circle"></fa-icon>
@@ -188,13 +188,13 @@
           </table>
         </div>
       </li>
-      <li *ngIf="appStorage.loggedIn && navbarServ.showExport" class="nav-item">
+      <li *ngIf="appStorage.loggedIn && appStorage.audioLoaded && navbarServ.showExport" class="nav-item">
         <a (mouseup)="toolsModal.open()" class="nav-link">
           <fa-icon class="navbar-icon" icon="tools"></fa-icon>
           <span class="d-md-none d-lg-inline"> {{"general.tools" | transloco}}</span>
         </a>
       </li>
-      <li *ngIf="appStorage.loggedIn && navbarServ.showExport" class="nav-item">
+      <li *ngIf="appStorage.loggedIn && appStorage.audioLoaded && navbarServ.showExport" class="nav-item">
         <a (mouseup)="modalexport.open()" class="nav-link">
           <fa-icon class="navbar-icon" icon="download"></fa-icon>
           <span class="d-md-none d-lg-inline"> {{"general.export" | transloco}}</span>

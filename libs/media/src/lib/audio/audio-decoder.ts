@@ -145,7 +145,6 @@ export class AudioDecoder {
               });
           } else {
             // decode chunked
-
             this.format.extractDataFromArray(sampleStart.samples, sampleDur.samples, this.uint8Array, 0).then((result) => {
               const job = new TsWorkerJob(this.getChannelData, [result, sampleDur.samples]);
               this.addJobToWorker(sampleStart.samples, sampleDur.samples, job);
@@ -166,7 +165,7 @@ export class AudioDecoder {
                   this.getChunkedChannelData(sampleStart.add(sampleDur), durationUnit).catch((error) => {
                     console.error(error);
                   });
-                }, 0);
+                }, 10);
               } else {
                 this.onChannelDataCalculate.complete();
               }

@@ -302,15 +302,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   afterLevelUpdated() {
     if (!isUnset(this._transcriptionLevel)) {
       console.log(`LEVEL updated ${this._transcriptionLevel.segments.length}`);
-      this.av.updateLevel(this._transcriptionLevel);
+
+      if (!isUnset(this.audioChunk) && !isUnset(this.av.audioTCalculator)) {
+        this.refreshLevel()
+      }
       this.subscrManager.removeByTag(`segmentchange`);
       this.subscrManager.add(this._transcriptionLevel.segments.onsegmentchange.subscribe(() => {
-          // TODO replace this with costum function
-          console.log(`SEGMENT CHANGE in audio viewer!`);
-          this.av.updateLevel(this._transcriptionLevel);
-          this.createSegmentsForCanvas();
-          this.layers.overlay.batchDraw();
-          this.layers.boundaries.batchDraw();
+          this.refreshLevel();
         },
         (error) => {
           console.error(error);
@@ -977,7 +975,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       numOfLines = 1;
     }
 
-    if (this._transcriptionLevel.segments.length > 0) {
+    if (this._transcriptionLevel.segments.length > 0 && !isUnset(this.audioChunk)) {
       let root: Konva.Group | Konva.Layer = this.layers.overlay;
 
       if (this.settings.cropping === 'circle') {
@@ -1644,7 +1642,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
               switch (shortc) {
                 case('set_boundary'):
                   if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
-                    let segments = this._transcriptionLevel.segments;
+                    let segments;
                     const result = this.av.addSegment();
                     segments = this.av.currentTranscriptionLevel.segments;
                     if (result !== null && result.msg !== null) {
@@ -2100,6 +2098,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   public redrawOverlay() {
     this.layers.overlay.batchDraw();
+  }
+
+  private refreshLevel() {
+    this.av.updateLevel(this._transcriptionLevel);
+    this.createSegmentsForCanvas();
+    this.layers.overlay.batchDraw();
+    this.layers.boundaries.batchDraw();
   }
 
   private drawTextLabel(context: Context, text: string, lineNum1: number, lineNum2: number, segmentEnd: SampleUnit, beginTime: SampleUnit,

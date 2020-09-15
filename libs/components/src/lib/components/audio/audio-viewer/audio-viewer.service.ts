@@ -23,7 +23,6 @@ export class AudioViewerService {
   protected hZoom = 0;
   protected audioChunk: AudioChunk;
   private subscrManager: SubscriptionManager = new SubscriptionManager();
-  private level: Level;
 
   private _currentTranscriptionLevel: Level;
 
@@ -224,7 +223,7 @@ export class AudioViewerService {
   }
 
   public updateLevel(level: Level) {
-    this.level = level;
+    this._currentTranscriptionLevel = level;
   }
 
   /**

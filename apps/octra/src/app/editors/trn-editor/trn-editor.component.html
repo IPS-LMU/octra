@@ -1,0 +1,61 @@
+<octra-audio-navigation
+  [buttons]="{
+                        play: {
+                            label: ('general.play' | transloco),
+                            shortcut: keyMap.getShortcut('AP', 'play_pause')
+                        },
+                        pause: {
+                            label: ('general.pause' | transloco),
+                            shortcut: keyMap.getShortcut('AP', 'play_pause')
+                        },
+                        stop: {
+                            label: ('general.stop' | transloco),
+                            shortcut: keyMap.getShortcut('AP', 'stop')
+                        },
+                        replay: {
+                            label: ('general.replay' | transloco),
+                            shortcut: ''
+                        },
+                        backward: {
+                            label: ('general.backward' | transloco),
+                            shortcut: keyMap.getShortcut('AP', 'step_backward')
+                        },
+                        backwardtime: {
+                            label: ('general.backwardtime' | transloco),
+                            shortcut: keyMap.getShortcut('overlay', 'step_backward')
+                        }
+                      }"
+  [easyMode]="appStorage.easymode"
+  [playbackRate]="appStorage.audioSpeed"
+
+  [responsive]="settingsService.responsive.enabled"
+  [volume]="appStorage.audioVolume"
+></octra-audio-navigation>
+<table class="table table-bordered bg-white">
+  <thead>
+  <tr>
+    <th>Time</th>
+    <th style="vertical-align: middle;">Speaker</th>
+    <th>Transcript</th>
+    <th style="text-align: center; vertical-align: middle;"></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let ">
+    <td class="time-column">
+      00:00:00 - 00:00:00
+    </td>
+    <td class="speaker-column">
+      Speaker1
+    </td>
+    <td class="transcript-column">
+      Lorem ipsum dolor sit amet, consectetur adipisicing elit. A accusantium aliquid dignissimos ducimus, enim et iste
+      labore libero minima, necessitatibus neque nesciunt omnis porro quisquam recusandae temporibus ullam veritatis
+      voluptatum.
+    </td>
+    <td class="control-column">
+      <fa-icon [icon]="['fas', 'play']"></fa-icon>
+    </td>
+  </tr>
+  </tbody>
+</table>

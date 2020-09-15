@@ -85,7 +85,7 @@ import {AppStorageService} from './core/shared/service/appstorage.service';
 import {BugReportService} from './core/shared/service/bug-report.service';
 import {CompatibilityService} from './core/shared/service/compatibility.service';
 import {StresstestComponent} from './core/tools/stresstest/stresstest.component';
-import {DictaphoneEditorComponent, LinearEditorComponent, TwoDEditorComponent} from './editors';
+import {DictaphoneEditorComponent, LinearEditorComponent, TrnEditorComponent, TwoDEditorComponent} from './editors';
 import {NewEditorComponent} from './editors/new-editor/new-editor.component';
 import {StoreModule} from '@ngrx/store';
 import {EffectsModule} from '@ngrx/effects';
@@ -114,7 +114,8 @@ import {fab} from '@fortawesome/free-brands-svg-icons';
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
   TwoDEditorComponent,
-  LinearEditorComponent
+  LinearEditorComponent,
+  TrnEditorComponent
 ];
 
 export const ALERTS: any[] = [AuthenticationNeededComponent];

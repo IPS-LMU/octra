@@ -2,3 +2,34 @@
 .control-column {
   vertical-align: middle;
 }
+
+.control-column {
+  text-align: center;
+}
+
+.label-column {
+  min-width: 80px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+td.fitwidth {
+  width: 1px;
+  white-space: nowrap;
+}
+
+.active-column {
+  text-align: center;
+}
+
+.time-column {
+  vertical-align: middle;
+}
+
+.viewer {
+  height: 60px;
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  background-color: white;
+}

@@ -27,34 +27,97 @@
                       }"
   [easyMode]="appStorage.easymode"
   [playbackRate]="appStorage.audioSpeed"
-
+  [audioChunk]="textEditor.audiochunk"
   [responsive]="settingsService.responsive.enabled"
   [volume]="appStorage.audioVolume"
 ></octra-audio-navigation>
-<table class="table table-bordered bg-white">
+<octra-validation-popover #validationPopover
+                          [ngStyle]="{
+                                'margin-left': popovers.validation.location.x + 'px',
+                                'margin-top': popovers.validation.location.y + 'px'
+                            }"></octra-validation-popover>
+<table class="table table-bordered bg-white" id="table-head">
   <thead>
   <tr>
-    <th>Time</th>
-    <th style="vertical-align: middle;">Speaker</th>
+    <th></th>
+    <th style="text-align: center;">Time</th>
+    <th style="vertical-align: middle;text-align: center;">Label</th>
     <th>Transcript</th>
     <th style="text-align: center; vertical-align: middle;"></th>
   </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let ">
-    <td class="time-column">
-      00:00:00 - 00:00:00
+  <tr *ngFor="let segment of shownSegments; let i = index;" class="segment-row">
+    <td class="active-column fitwidth">
+      <fa-icon *ngIf="i === 1" [icon]="['fas', 'circle']" style="color:green;font-size: 10px;"></fa-icon>
     </td>
-    <td class="speaker-column">
-      Speaker1
+    <td class="time-column fitwidth" [ngClass]="{
+    'alert-success': segment.transcription.text !== '' && segment.transcription.text !== transcrService.breakMarker.code,
+    'alert-info': segment.transcription.text === transcrService.breakMarker.code,
+    'alert-danger': segment.transcription.text === ''
+  }">
+      {{getStartPoint(i) | timespan: {
+      showMilliSeconds: true,
+      showHour: true
+    }
+      }}
     </td>
-    <td class="transcript-column">
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit. A accusantium aliquid dignissimos ducimus, enim et iste
-      labore libero minima, necessitatibus neque nesciunt omnis porro quisquam recusandae temporibus ullam veritatis
-      voluptatum.
+    <td class="label-column fitwidth" [ngClass]="{
+    'alert-success': segment.transcription.text !== '' && segment.transcription.text !== transcrService.breakMarker.code,
+    'alert-info': segment.transcription.text === transcrService.breakMarker.code,
+    'alert-danger': segment.transcription.text === ''
+  }" #labelCol (mouseleave)="onLabelMouseLeave(labelCol, i)" (mouseenter)="onLabelMouseEnter(labelCol)">
+      {{segment.label}}
     </td>
-    <td class="control-column">
+
+    <td class="transcript-column"
+        *ngIf="textEditor.state === 'active' && textEditor.selectedSegment === i; else editorNotActive"
+        [ngClass]="{
+    'alert-success': segment.transcription.text !== '' && segment.transcription.text !== transcrService.breakMarker.code,
+    'alert-info': segment.transcription.text === transcrService.breakMarker.code,
+    'alert-danger': segment.transcription.text === ''
+  }">
+      <octra-audio-viewer *ngIf="!showSignalDisplay" class="viewer" #viewer [settings]="audioViewerSettings"
+                          [audioChunk]="textEditor.audiochunk"
+                          [isMultiLine]="false" [transcriptionLevel]="transcrService.currentlevel"
+      >
+      </octra-audio-viewer>
+      <octra-transcr-editor #transcrEditor
+                            (onkeyup)="onKeyUp($event, i)"
+                            [audiochunk]="textEditor.audiochunk"
+                            [height]="60"
+                            [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
+      ></octra-transcr-editor>
+    </td>
+    <ng-template #editorNotActive>
+      <td (mousedown)="onMouseOver($event, i); onMouseDown($event, i);" (mousemove)="onMouseOver($event, i)"
+          [innerHTML]="sanitizeHTML(segment.transcription.html)" class="transcript-column" [ngClass]="{
+    'alert-success': segment.transcription.text !== '' && segment.transcription.text !== transcrService.breakMarker.code,
+    'alert-info': segment.transcription.text === transcrService.breakMarker.code,
+    'alert-danger': segment.transcription.text === ''
+  }"></td>
+    </ng-template>
+
+    <td class="control-column" style="width:100px;" [ngClass]="{
+    'alert-success': segment.transcription.text !== '' && segment.transcription.text !== transcrService.breakMarker.code,
+    'alert-info': segment.transcription.text === transcrService.breakMarker.code,
+    'alert-danger': segment.transcription.text === ''
+  }">
       <fa-icon [icon]="['fas', 'play']"></fa-icon>
+    </td>
+  </tr>
+  <tr>
+    <td class="active-column fitwidth">
+    </td>
+    <td class="time-column fitwidth">
+      {{ audioChunk.time.duration.unix| timespan: {
+      showMilliSeconds: true,
+      showHour: true
+    }
+      }}
+    </td>
+    <td class="transcript-column" colspan="3" style="text-align: center;">
+      <hr/>
     </td>
   </tr>
   </tbody>

@@ -829,11 +829,12 @@ export class TranscriptionService {
       for (const instruction of instructions) {
         if (!isUnset(instruction.entries) && isArray(instruction.entries)) {
           for (const entry of instruction.entries) {
-            if (entry.code === code) {
-              entry.description = entry.description.replace(/{{([^{}]+)}}/g, (g0, g1) => {
+            const newEntry = {...entry};
+            if (newEntry.code === code) {
+              newEntry.description = newEntry.description.replace(/{{([^{}]+)}}/g, (g0, g1) => {
                 return this.rawToHTML(g1).replace(/(<p>)|(<\/p>)/g, '');
               });
-              return entry;
+              return newEntry;
             }
           }
         }

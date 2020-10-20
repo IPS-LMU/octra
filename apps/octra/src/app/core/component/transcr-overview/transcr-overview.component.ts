@@ -283,6 +283,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, AfterViewIni
     this.updateSegments();
     this.transcrService.analyse();
 
+    this.updateSegments();
     this.cd.markForCheck();
     this.cd.detectChanges();
   }

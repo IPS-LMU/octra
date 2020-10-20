@@ -448,20 +448,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         this.editor.updateRawText();
         segment.transcript = this.editor.rawText;
         segment.isBlockedBy = this.transcrService.currentlevel.segments.get(this.segmentIndex).isBlockedBy;
-        const result = this.transcrService.currentlevel.segments.change(this.segmentIndex, segment);
-
-        const startSample = (this.segmentIndex > 0)
-          ? this.transcrService.currentlevel.segments.get(this.segmentIndex - 1).time.samples
-          : 0;
-
-        let selection = null;
-        if (this.loupe.av.drawnSelection.start.samples >= startSample
-          && this.loupe.av.drawnSelection.end.samples <= segment.time.samples) {
-          selection = {
-            start: this.loupe.av.drawnSelection.start.samples,
-            length: this.loupe.av.drawnSelection.duration.samples
-          };
-        }
+        this.transcrService.currentlevel.segments.change(this.segmentIndex, segment);
       }
     } else {
       const isNull = isUnset(this.transcrService.currentlevel.segments);

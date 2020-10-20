@@ -330,14 +330,15 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   onResize() {
-    clearTimeout(this.resizingTimer);
-    this.resizingTimer = setTimeout(() => {
+    return new Promise<void>((resolve, reject) => {
       const playpos = this.audioChunk.absolutePlayposition.clone();
       const drawnSelection = this.av.drawnSelection.clone();
       this.stage.width(this.width);
+      this.stage.height(this.height);
       this.av.initialize(this.width - (this.settings.margin.left + this.settings.margin.right), this.audioChunk, this._transcriptionLevel);
       this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
       this.av.initializeSettings().then(() => {
+        console.log(`initSettings ok`);
         if (!this.audioChunk.isPlaying) {
           this.audioChunk.absolutePlayposition = playpos.clone();
         }
@@ -346,9 +347,10 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         this.createSegmentsForCanvas();
         this.updatePlayCursor();
         this.stage.batchDraw();
-      }).catch(() => {
-      });
-    }, 200);
+        console.log(`resolve onResize`);
+        resolve();
+      }).catch(reject);
+    });
   }
 
   public initializeView() {
@@ -469,7 +471,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       }
     }
 
-    this.layers.scrollBars.find('#scrollBar')[0].x(this.av.innerWidth + this.settings.margin.left);
+    const scrollbars = this.layers.scrollBars.find('#scrollBar');
+    if (scrollbars.length > 1) {
+      scrollbars[0].x(this.av.innerWidth + this.settings.margin.left);
+    }
+
     this.drawWholeSelection();
   }
 
@@ -518,7 +524,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       if (startTime.samples >= this.audioChunk.time.start.samples
         && segment.time.samples <= (this.audioChunk.time.end.samples + 1)) {
         const absX = this.av.audioTCalculator.samplestoAbsX(this._transcriptionLevel.segments.get(segIndex).time);
-        let begin = new Segment(this.audioManager.createSampleUnit(0));
+        let begin = this._transcriptionLevel.createSegment(this.audioManager.createSampleUnit(0));
         if (segIndex > 0) {
           begin = this._transcriptionLevel.segments.get(segIndex - 1);
         }
@@ -589,10 +595,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     this._deactivateShortcuts = true;
   }
 
-  private init() {
+  public init() {
     this.widthOnInit = this.width;
     this.styles.height = this.height;
     this.drawnSegmentIDs = [];
+    this.subscrManager.removeByTag('resize');
 
     if (!this.settings.multiLine) {
       this.settings.lineheight = this.height - this.settings.margin.top - this.settings.margin.bottom;
@@ -653,9 +660,20 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     container.removeEventListener('mouseenter', this.onMouseEnter);
     container.addEventListener('mouseenter', this.onMouseEnter);
 
+    let resizing = false;
     window.onresize = () => {
-      this.onResize();
-    };
+      if (!resizing) {
+        resizing = true;
+        this.onResize().then(() => {
+          console.log(`resized!`);
+          resizing = false;
+        }).catch((error) => {
+          console.error(error);
+        });
+      } else {
+        console.log(`no resizing!`);
+      }
+    }
   }
 
   private createCropContainer(id?: string): Group {
@@ -1734,7 +1752,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                           this.selchange.emit(this.audioChunk.selection);
                           this.drawWholeSelection();
 
-                          let begin = new Segment(this.audioManager.createSampleUnit(0));
+                          let begin = this._transcriptionLevel.createSegment(this.audioManager.createSampleUnit(0));
                           if (segmentI > 0) {
                             begin = this._transcriptionLevel.segments.get(segmentI - 1);
                           }

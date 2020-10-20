@@ -493,9 +493,9 @@ export class AudioViewerService {
         if (segm1 === null && segm2 === null || (segm1 === segm2 || (segm1.transcript === '' && segm2.transcript === ''))) {
           if (this.drawnSelection.start.samples > 0) {
             // prevent setting boundary if first sample selected
-            this._currentTranscriptionLevel.segments.add(this._drawnSelection.start);
+            this._currentTranscriptionLevel.addSegment(this._drawnSelection.start);
           }
-          this._currentTranscriptionLevel.segments.add(this.drawnSelection.end);
+          this._currentTranscriptionLevel.addSegment(this.drawnSelection.end);
           return {
             type: 'add',
             seg_samples: this.drawnSelection.start.samples,
@@ -530,7 +530,7 @@ export class AudioViewerService {
             transcript = '';
           }
         }
-        this._currentTranscriptionLevel.segments.add(this.audioManager.createSampleUnit(Math.round(absXTime)));
+        this._currentTranscriptionLevel.addSegment(this.audioManager.createSampleUnit(Math.round(absXTime)));
         segment = this._currentTranscriptionLevel.segments.BetweenWhichSegment(absXTime);
         segment.transcript = transcript;
         return {
@@ -704,18 +704,23 @@ export class AudioViewerService {
    * after Channel was initialzed
    */
   private afterChannelInititialized(calculateZoom: boolean = true): Promise<void> {
-    return this.refreshComputedData()
-      .then(() => {
-        if (calculateZoom) {
-          this.calculateZoom(this._settings.lineheight, this.AudioPxWidth, this._minmaxarray);
-        }
-        this.audioChunk.absolutePlayposition = this.audioChunk.time.start.clone();
-        this.channelInitialized.next();
-        this.channelInitialized.complete();
-      })
-      .catch((err) => {
-        console.error(err);
-        this.channelInitialized.error(err);
-      });
+    return new Promise<void>((resolve, reject) => {
+      this.refreshComputedData()
+        .then(() => {
+          if (calculateZoom) {
+            this.calculateZoom(this._settings.lineheight, this.AudioPxWidth, this._minmaxarray);
+          }
+          this.audioChunk.absolutePlayposition = this.audioChunk.time.start.clone();
+          this.channelInitialized.next();
+          this.channelInitialized.complete();
+          console.log(`resolved!`);
+          resolve();
+        })
+        .catch((err) => {
+          console.error(err);
+          this.channelInitialized.error(err);
+          reject(err);
+        });
+    });
   }
 }

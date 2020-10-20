@@ -12,3 +12,9 @@
   height: 100%;
   outline: none;
 }
+
+#konvaContainer canvas {
+  max-width: 100% !important;
+  height: auto;
+  border: 2px solid black;
+}

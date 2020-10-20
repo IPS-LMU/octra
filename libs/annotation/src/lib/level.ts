@@ -2,6 +2,7 @@ import {AnnotJSONType, ISegment, OEvent, OItem, OLevel} from './annotjson';
 import {Segments} from './segments';
 import {SampleUnit} from '@octra/media';
 import {OIDBLevel} from './db-objects';
+import {Segment} from './segment';
 
 export class Level {
   public static counter = 1;
@@ -58,7 +59,7 @@ export class Level {
     console.log(`${lastSample.seconds}`);
     if (entry.level.type === 'SEGMENT') {
       const segmentEntries: ISegment[] = entry.level.items as ISegment[];
-      segments = new Segments(sampleRate, segmentEntries, lastSample);
+      segments = new Segments(sampleRate, entry.level.name, segmentEntries, lastSample);
     } else if (entry.level.type === 'ITEM') {
       items = entry.level.items;
     } else if (entry.level.type === 'EVENT') {
@@ -94,6 +95,15 @@ export class Level {
       case(AnnotJSONType.SEGMENT):
         return 'SEGMENT';
     }
+  }
+
+  public addSegment(time: SampleUnit, label = '', transcript: string = null, triggerChange = true) {
+    const newLabel = (label !== '') ? label : this._name;
+    this.segments.add(time, newLabel, transcript, triggerChange);
+  }
+
+  public createSegment(time: SampleUnit, transcript = '') {
+    return new Segment(time, this._name, transcript);
   }
 
   public clone(): Level {

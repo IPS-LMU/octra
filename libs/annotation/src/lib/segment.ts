@@ -1,19 +1,37 @@
 import {OSegment} from './annotjson';
 import {ASRQueueItemType} from './asr';
 import {SampleUnit} from '@octra/media';
+import {isUnset} from '@octra/utilities';
 
 export class Segment {
-  get progressInfo(): { progress: number; statusLabel: string } {
-    return this._progressInfo;
+  get time(): SampleUnit {
+    return this._time;
   }
 
-  set progressInfo(value: { progress: number; statusLabel: string }) {
-    this._progressInfo = value;
+  set time(value: SampleUnit) {
+    this._time = value;
+  }
+
+  get speakerLabel(): string {
+    return this._speakerLabel;
+  }
+
+  set speakerLabel(value: string) {
+    this._speakerLabel = value;
   }
 
   private static counter = 1;
-
   private readonly _id: number;
+
+  constructor(time: SampleUnit, speakerLabel: string, transcript = '') {
+    this._time = time;
+    this._speakerLabel = speakerLabel;
+    this._transcript = transcript;
+    this._id = Segment.counter++;
+  }
+
+  private _speakerLabel = 'NOLABEL';
+  private _time: SampleUnit;
 
   /**
    * this id is for internal use only!
@@ -60,31 +78,36 @@ export class Segment {
     progress: 0
   };
 
-  constructor(public time: SampleUnit, transcript = '') {
-    this._transcript = transcript;
-    this._id = Segment.counter++;
+  get progressInfo(): { progress: number; statusLabel: string } {
+    return this._progressInfo;
+  }
+
+  set progressInfo(value: { progress: number; statusLabel: string }) {
+    this._progressInfo = value;
   }
 
   /**
    * converts an object to a Segment. The conversion goes from original -> browser samples.
    */
-  public static fromObj(obj: OSegment, sampleRate: number): Segment {
-    if (obj) {
-      const seg = new Segment(new SampleUnit(obj.sampleStart + obj.sampleDur, sampleRate));
+  public static fromObj(levelName: string, oSegment: OSegment, sampleRate: number): Segment {
+    if (!isUnset(oSegment)) {
+      let speakerLabel = 'NONE';
 
-      if (obj.labels[0].value) {
-        seg._transcript = obj.labels[0].value;
+      if (!isUnset(oSegment.labels) && oSegment.labels.length > 1) {
+        const foundLabel = oSegment.labels.find(a => a.name.toLowerCase() === 'speaker');
+        speakerLabel = (!isUnset(foundLabel) ? foundLabel.value : 'NONE')
       }
 
-      return seg;
+      const transcriptLabel = oSegment.labels.find(a => a.name === levelName);
+      const transcript = !isUnset(transcriptLabel) ? transcriptLabel.value : '';
+
+      return new Segment(new SampleUnit(oSegment.sampleStart + oSegment.sampleDur, sampleRate), speakerLabel, transcript);
     }
 
     return null;
   }
 
   public clone(): Segment {
-    const seg = new Segment(this.time.clone());
-    seg.transcript = this.transcript;
-    return seg;
+    return new Segment(this.time.clone(), this.speakerLabel, this.transcript);
   }
 }

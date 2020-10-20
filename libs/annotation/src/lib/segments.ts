@@ -27,19 +27,19 @@ export class Segments {
     this._segments = value;
   }
 
-  constructor(private sampleRate, segments: ISegment[], lastSampleUnit: SampleUnit) {
+  constructor(private sampleRate, private levelName: string, segments: ISegment[], lastSampleUnit: SampleUnit) {
     this._segments = [];
     console.log(`LAST SAMPLE is ${lastSampleUnit.seconds}`);
 
     if (segments !== null) {
       if (segments.length === 0) {
-        this._segments.push(new Segment(lastSampleUnit));
+        this._segments.push(new Segment(lastSampleUnit, ''));
       }
 
       for (const segment of segments) {
         // divide samples through sampleRateFactor in order to get decodedValue
 
-        const newSegment = Segment.fromObj({
+        const newSegment = Segment.fromObj(levelName, {
           ...segment,
           sampleDur: Math.round(segment.sampleDur),
           sampleStart: Math.round(segment.sampleStart)
@@ -53,8 +53,8 @@ export class Segments {
   /**
    * adds new Segment
    */
-  public add(time: SampleUnit, transcript: string = null, triggerChange = true): boolean {
-    const newSegment: Segment = new Segment(time);
+  public add(time: SampleUnit, label: string, transcript: string = null, triggerChange = true): boolean {
+    const newSegment: Segment = new Segment(time, label);
 
     if (!(transcript === null || transcript === undefined)) {
       newSegment.transcript = transcript;
@@ -139,14 +139,17 @@ export class Segments {
     if (i > -1 && !isUnset(this._segments[i])) {
       const old = {
         samples: this._segments[i].time.samples,
-        transcript: this._segments[i].transcript
+        transcript: this._segments[i].transcript,
+        label: this._segments[i].speakerLabel
       };
 
       this._segments[i].time = segment.time.clone();
+      this._segments[i].speakerLabel = segment.speakerLabel;
       this._segments[i].transcript = segment.transcript;
       this._segments[i].isBlockedBy = segment.isBlockedBy;
 
-      if (old.samples !== segment.time.samples || old.transcript !== segment.transcript) {
+      if (old.samples !== segment.time.samples || old.transcript !== segment.transcript
+        || old.label !== segment.speakerLabel) {
         this.onsegmentchange.emit({
           type: 'change',
           oldNum: i,
@@ -279,14 +282,16 @@ export class Segments {
   /**
    * returns an array of normal segment objects with original values.
    */
-  public getObj(labelname: string, lastOriginalSample: number): OSegment[] {
+  public getObj(levelName: string, lastOriginalSample: number): OSegment[] {
     const result: OSegment[] = [];
 
     let start = 0;
     for (let i = 0; i < this._segments.length; i++) {
       const segment = this._segments[i];
       const labels: OLabel[] = [];
-      labels.push(new OLabel(labelname, segment.transcript));
+
+      labels.push(new OLabel('Speaker', segment.speakerLabel));
+      labels.push(new OLabel(levelName, segment.transcript));
 
       let annotSegment = null;
       if (i < this._segments.length - 1) {
@@ -303,7 +308,7 @@ export class Segments {
   }
 
   public clone(): Segments {
-    const result = new Segments(this.sampleRate, null, this.segments[this.length - 1].time);
+    const result = new Segments(this.sampleRate, this.levelName, null, this.segments[this.length - 1].time);
     for (const segment of this.segments) {
       result.add(segment.time, segment.transcript);
     }

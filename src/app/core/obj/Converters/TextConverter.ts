@@ -6,7 +6,7 @@ export class TextConverter extends Converter {
 
   public options = {
     showTimestampSamples: false,
-    showTimestampString: true
+    showTimestampString: false
   };
 
   public constructor() {

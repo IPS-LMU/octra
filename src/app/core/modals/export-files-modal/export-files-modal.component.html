@@ -49,10 +49,10 @@
               <tr [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave] *ngIf="exportStates[i] === 'active'">
                 <td></td>
                 <td colspan="4" style="padding-left:20px;">
-                  <div class="tier-selection" style="margin-bottom:10px;">
+                  <div class="tier-selection" style="margin-bottom:10px;"
+                       *ngIf="navbarServ.transcrService !== undefined && !converter.multitiers && transcrService.annotation.levels.length > 1">
                     <span style="margin-left:10px;">{{"general.select one tier" | transloco}}: </span>
                     <select #val
-                            *ngIf="navbarServ.transcrService !== undefined && !converter.multitiers && transcrService.annotation.levels.length > 1"
                             [(ngModel)]="selectedLevel"
                             (change)="onSelectionChange(converter, val.value)" style="padding: 5px 10px;">
                       <option *ngFor="let level of navbarServ.transcrService.annotation.levels; let l = index;"

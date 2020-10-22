@@ -205,10 +205,10 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
                             }
 
                             const last = level.items[level.items.length - 1];
-                            if (last.sampleStart + last.sampleDur <= this._oaudiofile.duration) {
+                            if (last.sampleStart + last.sampleDur < this._oaudiofile.duration - 1) {
                               level.items.push(new OSegment(last.id + 1, last.sampleStart + last.sampleDur, this._oaudiofile.duration - (last.sampleStart + last.sampleDur),
                                 [new OLabel(level.name, '')]));
-                            } else {
+                            } else if (last.sampleStart + last.sampleDur > this._oaudiofile.duration) {
                               console.error(`Import Error, last sample of result is bigger than the audio file's duration`);
                             }
                           }

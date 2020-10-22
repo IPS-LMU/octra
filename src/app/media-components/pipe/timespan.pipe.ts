@@ -48,7 +48,7 @@ export class TimespanPipe implements PipeTransform {
     const hours: string = (options[0] && (!options[1] || (options[1] && this.Hours > 0))) ? this.formatNumber(this.Hours, 2) + ':' : '';
 
     result += hours + minutes + ':' + seconds;
-    if (options[1]) {
+    if (options[2]) {
       result += '.' + miliSeconds;
     }
 

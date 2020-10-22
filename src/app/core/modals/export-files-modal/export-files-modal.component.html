@@ -49,14 +49,62 @@
               <tr [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave] *ngIf="exportStates[i] === 'active'">
                 <td></td>
                 <td colspan="4" style="padding-left:20px;">
-                  <select #val
-                          *ngIf="navbarServ.transcrService !== undefined && !converter.multitiers && transcrService.annotation.levels.length > 1"
-                          (change)="onSelectionChange(converter, val.value)">
-                    <option value="">{{"general.select one tier" | transloco}}</option>
-                    <option *ngFor="let level of navbarServ.transcrService.annotation.levels; let l = index;"
-                            value="{{l}}">{{level.name}}
-                    </option>
-                  </select>
+                  <div class="tier-selection" style="margin-bottom:10px;">
+                    <span style="margin-left:10px;">{{"general.select one tier" | transloco}}: </span>
+                    <select #val
+                            *ngIf="navbarServ.transcrService !== undefined && !converter.multitiers && transcrService.annotation.levels.length > 1"
+                            [(ngModel)]="selectedLevel"
+                            (change)="onSelectionChange(converter, val.value)" style="padding: 5px 10px;">
+                      <option *ngFor="let level of navbarServ.transcrService.annotation.levels; let l = index;"
+                              value="{{l}}">{{level.name}}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="options" *ngIf="converter.options !== undefined">
+                    <span style="font-weight: bold;">{{"general.Options" | transloco}}:</span>
+                    <div *ngIf="converter.name === 'Plain text'" class="timestamp-options">
+                      <table>
+                        <tbody>
+                        <tr class="option">
+                          <td style="vertical-align: top;">
+                            <input type="checkbox" id="timestamp-option-string" name="showTimestampString"
+                                   (ngModelChange)="onPlaintextTimestampOptionChanged(converter)"
+                                   [(ngModel)]="converter.options.showTimestampString">
+                          </td>
+                          <td style="line-height: 0.9;">
+                            <label
+                              for="timestamp-option-string"> {{"export.options.add timestamps" | transloco}}</label><br/>
+                            <code>
+                              This is an example <⏱="00:00:03.222"/> of a transcript with timestamps.
+                            </code>
+                          </td>
+                        </tr>
+                        <tr class="option">
+                          <td style="vertical-align: top;">
+                            <input type="checkbox" id="timestamp-option-samples" name="showTimestampString"
+                                   [(ngModel)]="converter.options.showTimestampSamples"
+                                   (ngModelChange)="onPlaintextTimestampOptionChanged(converter)"
+                            >
+                          </td>
+                          <td style="line-height: 0.9;">
+                            <label
+                              for="timestamp-option-samples"> {{"export.options.add samplepoints" | transloco}}</label><br/>
+                            <code>
+                              This is an example <📌="379736"/> of a transcript with timestamps.
+                            </code>
+                          </td>
+                        </tr>
+                        </tbody>
+                      </table>
+                      <p style="margin-top:20px; font-size: 0.9em;">
+                        {{"export.options.timestamp notice" | transloco}}<br/>
+                        <code>
+                          This is an example <⏱="00:00:03.222" 📌="379736"/> of a transcript with timestamps.
+                        </code>
+                      </p>
+                    </div>
+                  </div>
 
                   <a style="margin-left:10px;"
                      *ngIf="preparing.name === converter.name && !preparing.preparing"

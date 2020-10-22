@@ -1,6 +1,12 @@
 import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap';
-import {AppStorageService, AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {
+  AppStorageService,
+  AudioService,
+  SettingsService,
+  TranscriptionService,
+  UserInteractionsService
+} from '../../shared/service';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {AppInfo} from '../../../app.info';
 import {Converter, IFile} from '../../obj/Converters';
@@ -100,6 +106,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();
+  public selectedLevel = 0;
 
   constructor(private sanitizer: DomSanitizer,
               public navbarServ: NavbarService,
@@ -287,5 +294,9 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
       const url = this.parentformat.uri['changingThisBreaksApplicationSecurity'];
       window.URL.revokeObjectURL(url);
     }
+  }
+
+  onPlaintextTimestampOptionChanged(converter: Converter) {
+    this.updateParentFormat(converter, this.selectedLevel);
   }
 }

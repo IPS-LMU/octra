@@ -95,7 +95,8 @@
     "im authenticated": "Ich bin authentifiziert!",
     "dismissed": "verschwindet in {{value}}s",
     "Send feedback": "Feedback senden",
-    "reload": "NEU LADEN"
+    "reload": "NEU LADEN",
+    "Options": "Optionen"
   },
   "bug report": {
     "give feedback": "Feedback geben",
@@ -350,6 +351,11 @@
   "export": {
     "meta data": {
       "description": "Lade die Daten herunter, die während deiner Transkription aufgezeichnet wurden. (Nur verfügbar, wenn die Protokollierung in den Einstellungen aktiviert wurde)."
+    },
+    "options": {
+      "add timestamps": "Trenne Segmente durch Zeitstempel im lesbaren Format (HH:MM:SS.s)",
+      "add samplepoints": "Trenne Segmente durch Zeitstempel im Sample-Format (z.B. 123456)",
+      "timestamp notice": "Wenn Du beide Optionen aktivierst, werden beide Formate eingefügt:"
     }
   }
 }

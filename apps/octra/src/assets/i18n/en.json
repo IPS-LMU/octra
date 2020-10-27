@@ -95,7 +95,8 @@
     "im authenticated": "I'm authenticated!",
     "dismissed": "dismissed in {{value}}s",
     "Send feedback": "Send feedback",
-    "reload": "reload"
+    "reload": "reload",
+    "Options": "Options"
   },
   "bug report": {
     "give feedback": "Give feedback",
@@ -350,6 +351,11 @@
   "export": {
     "meta data": {
       "description": "Download the meta data that was logged while your transcription progress. (Only available when logging was enabled in the settings menu)."
+    },
+    "options": {
+      "add timestamps": "Separate segments by readable timestamps (HH:MM:SS.s)",
+      "add samplepoints": "Separate segments by sample points (e.g. 123456)",
+      "timestamp notice": "If you check both options, both time formats will be inserted:"
     }
   }
 }

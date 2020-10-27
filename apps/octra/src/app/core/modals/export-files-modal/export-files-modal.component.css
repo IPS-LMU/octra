@@ -18,3 +18,21 @@ h5 {
   background-color: rgb(242, 242, 242);
 }
 
+.options {
+  margin-left: 10px;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid lightgray;
+}
+
+.options table tbody tr td {
+  border: none;
+}
+
+.options .option td {
+  vertical-align: top;
+}
+
+.options .option label {
+  font-size: 0.9em;
+}

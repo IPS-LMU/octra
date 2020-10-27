@@ -1,16 +1,16 @@
-import {HttpClient} from '@angular/common/http';
 import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
-import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
-import {DragulaService} from 'ng2-dragula';
-import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
-import {Subject} from 'rxjs';
+import {AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppInfo} from '../../../app.info';
+import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
+import {HttpClient} from '@angular/common/http';
+import {Subject} from 'rxjs';
+import {DragulaService} from 'ng2-dragula';
+import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
+import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {NamingDragAndDropComponent} from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import {TableConfiguratorComponent} from '../../tools/table-configurator/table-configurator.component';
-import {NavbarService} from '../../component/navbar/navbar.service';
 import {isUnset, SubscriptionManager} from '@octra/utilities';
-import {AudioService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
+import {NavbarService} from '../../component/navbar/navbar.service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {Converter, IFile} from '@octra/annotation';
 
@@ -100,6 +100,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   protected data = null;
   private actionperformed: Subject<void> = new Subject<void>();
   private subscrmanager = new SubscriptionManager();
+  public selectedLevel = 0;
 
   constructor(private sanitizer: DomSanitizer,
               public navbarServ: NavbarService,
@@ -181,6 +182,13 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
         this.exportStates[index] = 'active';
       }
     }
+  }
+
+  private setParentFormatURI(url: string) {
+    if (!isUnset(this.parentformat.uri)) {
+      window.URL.revokeObjectURL(this.parentformat.uri['changingThisBreaksApplicationSecurity']);
+    }
+    this.parentformat.uri = this.sanitize(url);
   }
 
   onSelectionChange(converter: Converter, value: any) {
@@ -281,10 +289,7 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  private setParentFormatURI(url: string) {
-    if (!isUnset(this.parentformat.uri)) {
-      window.URL.revokeObjectURL(this.parentformat.uri.toString());
-    }
-    this.parentformat.uri = this.sanitize(url);
+  onPlaintextTimestampOptionChanged(converter: Converter) {
+    this.updateParentFormat(converter, this.selectedLevel);
   }
 }

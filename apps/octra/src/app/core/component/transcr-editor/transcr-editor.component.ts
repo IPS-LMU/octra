@@ -12,7 +12,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
-import {KeyMapping, TimespanPipe} from '@octra/components';
+import {KeyMapping} from '@octra/components';
 import {isNumeric} from 'rxjs/internal-compatibility';
 import {timer} from 'rxjs';
 
@@ -23,7 +23,7 @@ import {TranscrEditorConfig} from './config';
 import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
 import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
 import {AudioChunk, AudioManager, SampleUnit} from '@octra/media';
-import {Segments} from '@octra/annotation';
+import {Segments, TimespanPipe} from '@octra/annotation';
 
 /// <reference path="../../../../../../node_modules/@types/summernote/index.d.ts" />
 declare var tidyUpAnnotation: ((string, any) => any);

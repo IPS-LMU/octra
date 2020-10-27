@@ -1,15 +1,14 @@
-<div #modal="bs-modal" (onHidden)="onHidden()" aria-labelledby="dialog-sizes-name1" bsModal class="modal fade"
-     id="supportedfiles"
-     role="dialog" tabindex="-1">
+<div bsModal #modal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1"
+     id="supportedfiles" (onHidden)="onHidden()">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">{{"general.export data" | transloco}}</h4>
-        <button (click)="close()" aria-label="Close" class="close pull-right" type="button">
+        <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div #content class="modal-body" id="export-table">
+      <div class="modal-body" id="export-table" #content>
         <table class="table">
           <thead>
           <tr>
@@ -23,15 +22,15 @@
           <ng-container *ngFor="let converter of converters; let i = index;">
             <tr *ngIf="converter.conversion.export" class="top-tr">
               <td (click)="onLineClick(converter, i)">
-                <fa-icon [icon]="['fas', ((exportStates[i] === 'active') ? 'chevron-up' : 'chevron-down')]"
-                         style="color:gray;"></fa-icon>
+                <fa-icon style="color:gray;"
+                         [icon]="['fas', ((exportStates[i] === 'active') ? 'chevron-up' : 'chevron-down')]"></fa-icon>
               </td>
               <td (click)="onLineClick(converter, i)">
                 <a #a>
                   {{converter.name}} (*{{converter.extension}})
                 </a>
-                <fa-icon *ngIf="preparing.name === converter.name && preparing.preparing" [spin]="true"
-                         icon="spinner"></fa-icon>
+                <fa-icon icon="spinner" [spin]="true"
+                         *ngIf="preparing.name === converter.name && preparing.preparing"></fa-icon>
               </td>
               <td (click)="onLineClick(converter, i)">
                 {{converter.application}}
@@ -42,27 +41,75 @@
                 </a>
               </td>
               <td (click)="onLineClick(converter, i)">
-                <fa-icon *ngIf="converter.notice !== ''" [tooltip]="converter.notice"
-                         icon="info-circle"></fa-icon>
+                <fa-icon *ngIf="converter.notice !== ''" icon="info-circle"
+                         [tooltip]="converter.notice"></fa-icon>
               </td>
             </tr>
             <ng-container *ngIf="converter.conversion.export">
-              <tr *ngIf="exportStates[i] === 'active'" [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave]>
+              <tr [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave] *ngIf="exportStates[i] === 'active'">
                 <td></td>
                 <td colspan="4" style="padding-left:20px;">
-                  <select #val
-                          (change)="onSelectionChange(converter, val.value)"
-                          *ngIf="navbarServ.transcrService !== undefined && !converter.multitiers && transcrService.annotation.levels.length > 1">
-                    <option value="">{{"general.select one tier" | transloco}}</option>
-                    <option *ngFor="let level of navbarServ.transcrService.annotation.levels; let l = index;"
-                            value="{{l}}">{{level.name}}
-                    </option>
-                  </select>
+                  <div class="tier-selection" style="margin-bottom:10px;"
+                       *ngIf="navbarServ.transcrService !== undefined && !converter.multitiers && transcrService.annotation.levels.length > 1">
+                    <span style="margin-left:10px;">{{"general.select one tier" | transloco}}: </span>
+                    <select #val
+                            [(ngModel)]="selectedLevel"
+                            (change)="onSelectionChange(converter, val.value)" style="padding: 5px 10px;">
+                      <option *ngFor="let level of navbarServ.transcrService.annotation.levels; let l = index;"
+                              value="{{l}}">{{level.name}}
+                      </option>
+                    </select>
+                  </div>
 
-                  <a (click)="onDownloadClick(i)"
+                  <div class="options" *ngIf="converter.options !== undefined">
+                    <span style="font-weight: bold;">{{"general.Options" | transloco}}:</span>
+                    <div *ngIf="converter.name === 'Plain text'" class="timestamp-options">
+                      <table>
+                        <tbody>
+                        <tr class="option">
+                          <td style="vertical-align: top;">
+                            <input type="checkbox" id="timestamp-option-string" name="showTimestampString"
+                                   (ngModelChange)="onPlaintextTimestampOptionChanged(converter)"
+                                   [(ngModel)]="converter.options.showTimestampString">
+                          </td>
+                          <td style="line-height: 0.9;">
+                            <label
+                              for="timestamp-option-string"> {{"export.options.add timestamps" | transloco}}</label><br/>
+                            <code>
+                              This is an example &lt;ts="00:00:03.222"/> of a transcript with timestamps.
+                            </code>
+                          </td>
+                        </tr>
+                        <tr class="option">
+                          <td style="vertical-align: top;">
+                            <input type="checkbox" id="timestamp-option-samples" name="showTimestampString"
+                                   [(ngModel)]="converter.options.showTimestampSamples"
+                                   (ngModelChange)="onPlaintextTimestampOptionChanged(converter)"
+                            >
+                          </td>
+                          <td style="line-height: 0.9;">
+                            <label
+                              for="timestamp-option-samples"> {{"export.options.add samplepoints" | transloco}}</label><br/>
+                            <code>
+                              This is an example &lt;sp="379736"/> of a transcript with timestamps.
+                            </code>
+                          </td>
+                        </tr>
+                        </tbody>
+                      </table>
+                      <p style="margin-top:20px; font-size: 0.9em;">
+                        {{"export.options.timestamp notice" | transloco}}<br/>
+                        <code>
+                          This is an example &lt;ts="00:00:03.222" sp="379736"/> of a transcript with timestamps.
+                        </code>
+                      </p>
+                    </div>
+                  </div>
+
+                  <a style="margin-left:10px;"
                      *ngIf="preparing.name === converter.name && !preparing.preparing"
-                     [href]="parentformat.uri" class="link"
-                     download="{{parentformat.download}}" style="margin-left:10px;">
+                     download="{{parentformat.download}}" [href]="parentformat.uri"
+                     class="link" (click)="onDownloadClick(i)">
                     <fa-icon icon="save"></fa-icon>
                     Download
                   </a>
@@ -86,8 +133,8 @@
           <tbody>
           <tr>
             <td (click)="tools.tableConfigurator.opened = !tools.tableConfigurator.opened">
-              <fa-icon [icon]="['fas', ((tools.tableConfigurator.opened) ? 'chevron-up' : 'chevron-down')]"
-                       style="color:gray;"></fa-icon>
+              <fa-icon style="color:gray;"
+                       [icon]="['fas', ((tools.tableConfigurator.opened) ? 'chevron-up' : 'chevron-down')]"></fa-icon>
             </td>
             <td (click)="tools.tableConfigurator.opened = !tools.tableConfigurator.opened">
               <a #a>
@@ -96,16 +143,16 @@
             </td>
             <td colspan="3">{{'custom.table configurator.description' | transloco}}</td>
           </tr>
-          <tr *ngIf="tools.tableConfigurator.opened" [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave]>
+          <tr [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave] *ngIf="tools.tableConfigurator.opened">
             <td></td>
             <td colspan="4" style="padding-left:20px;">
-              <div *ngIf="navbarServ.transcrService !== undefined" class="card" style="padding:10px;">
-                <octra-table-configurator #tableConfigurator
-                                          [annotation]="transcrService.annotation"
-                                          [columns]="tools.tableConfigurator.columns"
-                                          [currentLevelID]="transcrService.currentlevel.id"
-                                          [tableWidth]="content.offsetWidth - 100"
-                ></octra-table-configurator>
+              <div class="card" style="padding:10px;" *ngIf="navbarServ.transcrService !== undefined">
+                <app-table-configurator [columns]="tools.tableConfigurator.columns"
+                                        [annotation]="transcrService.annotation"
+                                        [currentLevelID]="transcrService.currentlevel.id"
+                                        [tableWidth]="content.offsetWidth - 100"
+                                        #tableConfigurator
+                ></app-table-configurator>
               </div>
             </td>
           </tr>
@@ -126,8 +173,8 @@
           <tbody>
           <tr>
             <td (click)="getProtocol()">
-              <fa-icon [icon]="['fas', ((preparing.name === 'Protocol') ? 'chevron-up' : 'chevron-down')]"
-                       style="color:gray;"></fa-icon>
+              <fa-icon style="color:gray;"
+                       [icon]="['fas', ((preparing.name === 'Protocol') ? 'chevron-up' : 'chevron-down')]"></fa-icon>
             </td>
             <td (click)="getProtocol()">
               <a #a>
@@ -136,13 +183,13 @@
             </td>
             <td colspan="3">{{'export.meta data.description' | transloco}}</td>
           </tr>
-          <tr *ngIf="preparing.name === 'Protocol'" [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave]>
+          <tr [@fadeInExpandOnEnter] [@fadeOutCollapseOnLeave] *ngIf="preparing.name === 'Protocol'">
             <td></td>
             <td colspan="4">
-              <i *ngIf="preparing.name === 'Protocol' && preparing.preparing" class="fa fa-spinner fa-spin"></i>
+              <i class="fa fa-spinner fa-spin" *ngIf="preparing.name === 'Protocol' && preparing.preparing"></i>
               <a *ngIf="preparing.name === 'Protocol' && !preparing.preparing"
-                 [href]="parentformat.uri" class="link"
-                 download="{{parentformat.download}}">
+                 download="{{parentformat.download}}" [href]="parentformat.uri"
+                 class="link">
                 <fa-icon icon="save"></fa-icon>
                 Download
               </a>
@@ -152,7 +199,7 @@
         </table>
       </div>
       <div class="modal-footer">
-        <button (click)="close()" class="btn btn-primary" data-dismiss="modal" type="button">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="close()">
           {{"general.close" | transloco}}
         </button>
       </div>

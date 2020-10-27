@@ -73,6 +73,7 @@ export abstract class Converter {
   }
 
   protected _multitiers = true;
+  public options: any;
 
   get multitiers(): boolean {
     return this._multitiers;

@@ -162,9 +162,7 @@
           "builder": "@nrwl/jest:jest",
           "options": {
             "jestConfig": "apps/octra/jest.config.js",
-            "tsConfig": "apps/octra/tsconfig.spec.json",
-            "passWithNoTests": true,
-            "setupFile": "apps/octra/src/test-setup.ts"
+            "passWithNoTests": true
           }
         }
       }
@@ -219,7 +217,6 @@
           "builder": "@nrwl/jest:jest",
           "options": {
             "jestConfig": "libs/utilities/jest.config.js",
-            "tsConfig": "libs/utilities/tsconfig.spec.json",
             "passWithNoTests": true
           }
         },
@@ -260,7 +257,6 @@
           "builder": "@nrwl/jest:jest",
           "options": {
             "jestConfig": "libs/media/jest.config.js",
-            "tsConfig": "libs/media/tsconfig.spec.json",
             "passWithNoTests": true
           }
         },
@@ -301,7 +297,6 @@
           "builder": "@nrwl/jest:jest",
           "options": {
             "jestConfig": "libs/annotation/jest.config.js",
-            "tsConfig": "libs/annotation/tsconfig.spec.json",
             "passWithNoTests": true
           }
         },
@@ -329,7 +324,8 @@
           "builder": "@nrwl/angular:package",
           "options": {
             "tsConfig": "libs/components/tsconfig.lib.json",
-            "project": "libs/components/ng-package.json"
+            "project": "libs/components/ng-package.json",
+            "buildableProjectDepsInPackageJsonType": "dependencies"
           },
           "configurations": {
             "production": {
@@ -351,9 +347,7 @@
           "builder": "@nrwl/jest:jest",
           "options": {
             "jestConfig": "libs/components/jest.config.js",
-            "tsConfig": "libs/components/tsconfig.spec.json",
-            "passWithNoTests": true,
-            "setupFile": "libs/components/src/test-setup.ts"
+            "passWithNoTests": true
           }
         }
       },

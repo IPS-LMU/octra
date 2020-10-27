@@ -42,11 +42,11 @@ export class TextConverter extends Converter {
               result += ` <`;
               if (this.options.showTimestampString) {
                 const endTime = new TimespanPipe().transform(unixTimestamp, [true, false, true]);
-                result += `⏱="${endTime}"`;
+                result += `ts="${endTime}"`;
               }
               if (this.options.showTimestampSamples) {
                 result += (this.options.showTimestampString) ? ' ' : '';
-                result += `📌="${sampleEnd}"`;
+                result += `sp="${sampleEnd}"`;
               }
               result += `/> `
             } else {
@@ -85,10 +85,10 @@ export class TextConverter extends Converter {
       const olevel = new OLevel('OCTRA_1', 'SEGMENT');
       const samplerate = audiofile.samplerate;
 
-      if (file.content.indexOf('<⏱') > -1 || file.content.indexOf('<📌') > -1) {
+      if (file.content.indexOf('<ts') > -1 || file.content.indexOf('<sp') > -1) {
         // segments available
-        const regexSplit = /<(?:(?:⏱|📌)="(?:(?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")(?: ?(?:⏱|📌)="(?:(?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")? *\/>/g
-        const regexExtract = new RegExp(/<(?:(?:(⏱|📌))="((?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")(?: ?(?:(⏱|📌))="((?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")?(?= *\/>)/g);
+        const regexSplit = /<(?:(?:(?:(?:ts)|(?:sp))="(?:(?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")(?: ?(?:(?:(?:ts)|(?:sp)))="(?:(?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")?(?= *\/>))/g
+        const regexExtract = new RegExp(/<(?:(?:((?:ts)|(?:sp))="((?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")(?: ?(?:((?:ts)|(?:sp)))="((?:[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{1,3})|[0-9]+)")?(?= *\/>))/g);
         const transcripts = file.content.split(regexSplit);
         let match = regexExtract.exec(file.content);
         let i = 0;
@@ -100,7 +100,7 @@ export class TextConverter extends Converter {
           while (match !== null) {
             const olabels: OLabel[] = [];
             let samplePoint = 0;
-            const samplePointIndex = match.findIndex(a => a === '📌');
+            const samplePointIndex = match.findIndex(a => a === 'sp');
 
             if (samplePointIndex > -1 && samplePointIndex + 1 < match.length) {
               // use sample point

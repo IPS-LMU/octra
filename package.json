@@ -95,7 +95,7 @@
     "@nrwl/cypress": "10.3.1",
     "@nrwl/jest": "10.3.1",
     "@nrwl/node": "10.3.1",
-    "@nrwl/workspace": "^10.3.1",
+    "@nrwl/workspace": "10.3.1",
     "@types/jest": "26.0.8",
     "@types/node": "~8.9.4",
     "codelyzer": "~5.0.1",

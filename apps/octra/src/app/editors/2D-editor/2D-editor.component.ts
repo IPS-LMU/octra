@@ -350,7 +350,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                           for (const wordItem of wordsTier.items) {
                             const itemEnd = item.time.sampleStart + item.time.sampleLength;
                             if (item.time.sampleStart + wordItem.sampleStart + wordItem.sampleDur <= itemEnd) {
-                              const readSegment = Segment.fromObj(
+                              const readSegment = Segment.fromObj(this.transcrService.currentlevel.name,
                                 new OSegment(1, wordItem.sampleStart, wordItem.sampleDur, wordItem.labels),
                                 this.audioManager.sampleRate);
                               if (readSegment.transcript === '<p:>' || readSegment.transcript === '') {

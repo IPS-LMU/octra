@@ -9,7 +9,7 @@
     "nx": "nx",
     "start": "npm run modernizr && nx serve",
     "build": "ng build",
-    "build-release": " node ./build.js dev=false isUpdate=false url=/",
+    "build-release": "node ./build.js dev=false isUpdate=false url=/",
     "build-dev": "node ./build.js dev=true isUpdate=true url=/apps/octra/octra-dev/",
     "build-prod": "node ./build.js dev=false isUpdate=true url=/apps/octra/octra/",
     "test": "ng test",

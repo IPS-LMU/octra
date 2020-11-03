@@ -128,6 +128,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     this.audioManager = this.audio.audiomanagers[0];
     this.audioChunk = this.audioManager.mainchunk.clone();
 
+    this.transcrService.validateAll();
     this.updateSegments();
     this.cd.markForCheck();
     this.cd.detectChanges();
@@ -151,19 +152,22 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     // only needed if an segment can be opened. For audio files smaller than 35 sec
   }
 
-  onLabelMouseLeave(labelCol: HTMLTableCellElement, index: number) {
-    const newLabel = labelCol.innerText;
-    const segment = this.transcrService.currentlevel.segments.get(index).clone();
-    segment.speakerLabel = newLabel;
-    this.transcrService.currentlevel.segments.change(index, segment);
-    labelCol.contentEditable = 'false';
+  onLabelKeyDown($event: KeyboardEvent, labelCol: HTMLTableCellElement, index: number) {
+    if ($event.code === 'Enter') {
+      $event.preventDefault();
+      const newLabel = labelCol.innerText;
+      const segment = this.transcrService.currentlevel.segments.get(index).clone();
+      segment.speakerLabel = newLabel;
+      this.transcrService.currentlevel.segments.change(index, segment);
+      labelCol.contentEditable = 'false';
+    }
   }
 
-  onLabelMouseEnter(labelCol: HTMLTableCellElement) {
+  onLabelMouseDown(labelCol: HTMLTableCellElement) {
     labelCol.contentEditable = 'true';
   }
 
-  onMouseOver($event, rowNumber) {
+  onTranscriptCellMouseOver($event, rowNumber) {
     if (this.textEditor.state === 'inactive') {
       let target = jQuery($event.target);
       if (target.is('.val-error') || target.parent().is('.val-error')) {
@@ -195,7 +199,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
             this.cd.detectChanges();
 
             this.popovers.validation.location.y = headHeight + marginTop - this.validationPopover.height;
-            this.popovers.validation.location.x = $event.offsetX - 24;
+            this.popovers.validation.location.x = $event.offsetX - 10;
             this.popovers.validation.mouse.enter = true;
             this.cd.markForCheck();
             this.cd.detectChanges();
@@ -211,8 +215,14 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     }
   }
 
-  onMouseDown($event, i) {
-    if (this.textEditor.state === 'inactive') {
+  onTranscriptCellMouseDown($event, i) {
+    new Promise<void>((resolve) => {
+      if (this.textEditor.state !== 'inactive') {
+        this.closeTextEditor().then(resolve);
+      } else {
+        resolve();
+      }
+    }).then(() => {
       this.textEditor.state = 'active';
       this.textEditor.selectedSegment = i;
       this.showSignalDisplay = true;
@@ -245,7 +255,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
       this.transcrEditor.rawText = segment.transcript;
 
       this.transcrEditor.focus();
-    }
+    });
   }
 
   sanitizeHTML(str: string): SafeHtml {
@@ -356,6 +366,9 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
           length: segment.time.samples - startSample
         }, 'overview'); */
       }, 1000);
+    } else if ($event.code === 'Escape') {
+      // close without saving
+      this.closeTextEditor();
     }
   }
 
@@ -363,6 +376,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     const segStart = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
       this._textEditor.audiochunk.time.start.add(new SampleUnit(20, this.audioManager.sampleRate))
     );
+    const currentSegment = this.transcrService.currentlevel.segments.get(segStart);
 
     this.tempSegments = this.transcrService.currentlevel.segments.clone();
 
@@ -400,7 +414,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
 
     for (let i = 0; i < segTexts.length - 1; i++) {
       this.tempSegments.add(
-        this.audioManager.createSampleUnit(samplesArray[i]), segTexts[i]
+        this.audioManager.createSampleUnit(samplesArray[i]), currentSegment.speakerLabel, segTexts[i]
       );
     }
 
@@ -459,5 +473,20 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       }
     }, 60);
     this.lastResizing = Date.now();
+  }
+
+  closeTextEditor() {
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        this.textEditor.state = 'inactive';
+        this.textEditor.selectedSegment = -1;
+
+        this.audioManager.removeChunk(this.textEditor.audiochunk);
+        this.textEditor.audiochunk = null;
+        this.cd.markForCheck();
+        this.cd.detectChanges();
+        resolve();
+      }, 1000);
+    });
   }
 }

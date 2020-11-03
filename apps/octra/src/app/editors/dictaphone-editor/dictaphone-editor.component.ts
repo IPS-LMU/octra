@@ -372,9 +372,9 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
       } else {
         // add new segments
         if (i === segTexts.length - 1) {
-          this.transcrService.currentlevel.segments.add(this.audiochunk.time.end.clone(), newRaw);
+          this.transcrService.currentlevel.segments.add(this.audiochunk.time.end.clone(), this.transcrService.currentlevel.name, newRaw);
         } else {
-          this.transcrService.currentlevel.segments.add(this.audioManager.createSampleUnit(samplesArray[i]), newRaw);
+          this.transcrService.currentlevel.segments.add(this.audioManager.createSampleUnit(samplesArray[i]), this.transcrService.currentlevel.name, newRaw);
         }
       }
     }

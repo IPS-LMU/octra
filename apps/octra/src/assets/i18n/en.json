@@ -96,7 +96,9 @@
     "dismissed": "dismissed in {{value}}s",
     "Send feedback": "Send feedback",
     "reload": "reload",
-    "Options": "Options"
+    "Options": "Options",
+    "time": "Time",
+    "speaker": "Speaker"
   },
   "bug report": {
     "give feedback": "Give feedback",

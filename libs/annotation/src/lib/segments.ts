@@ -56,7 +56,7 @@ export class Segments {
   public add(time: SampleUnit, label: string, transcript: string = null, triggerChange = true): boolean {
     const newSegment: Segment = new Segment(time, label);
 
-    if (!(transcript === null || transcript === undefined)) {
+    if (!isUnset(transcript)) {
       newSegment.transcript = transcript;
     }
 
@@ -310,7 +310,7 @@ export class Segments {
   public clone(): Segments {
     const result = new Segments(this.sampleRate, this.levelName, null, this.segments[this.length - 1].time);
     for (const segment of this.segments) {
-      result.add(segment.time, segment.transcript);
+      result.add(segment.time, segment.speakerLabel, segment.transcript);
     }
     return result;
   }

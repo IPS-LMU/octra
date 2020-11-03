@@ -810,6 +810,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     const segStart = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
       this.audiochunk.time.start.add(new SampleUnit(20, this.audioManager.sampleRate))
     );
+    const currentSegment = this.transcrService.currentlevel.segments.get(segStart);
 
     this.tempSegments = this.transcrService.currentlevel.segments.clone();
     const html = this.editor.getRawText();
@@ -846,7 +847,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
     for (let i = 0; i < segTexts.length - 1; i++) {
       this.tempSegments.add(
-        this.audioManager.createSampleUnit(samplesArray[i]), segTexts[i]
+        this.audioManager.createSampleUnit(samplesArray[i]), currentSegment.speakerLabel, segTexts[i]
       );
     }
 

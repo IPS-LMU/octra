@@ -96,7 +96,9 @@
     "dismissed": "verschwindet in {{value}}s",
     "Send feedback": "Feedback senden",
     "reload": "NEU LADEN",
-    "Options": "Optionen"
+    "Options": "Optionen",
+    "time": "Zeit",
+    "speaker": "Sprecher"
   },
   "bug report": {
     "give feedback": "Feedback geben",

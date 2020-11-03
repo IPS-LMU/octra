@@ -21,13 +21,11 @@ import {AudioNavigationComponent} from './components/audio/audio-navigation';
 import {AudioViewerComponent} from './components/audio/audio-viewer';
 import {AudioplayerComponent} from './components/audio/audioplayer';
 import {LeadingNullPipe, ProcentPipe} from './pipe';
-import {TimespanPipe} from '@octra/annotation';
 
 @NgModule({
   declarations: [
     AudioplayerComponent,
     AudioNavigationComponent,
-    TimespanPipe,
     ProcentPipe,
     AudioViewerComponent,
     LeadingNullPipe
@@ -45,8 +43,7 @@ import {TimespanPipe} from '@octra/annotation';
     AudioplayerComponent,
     AudioViewerComponent,
     ProcentPipe,
-    LeadingNullPipe,
-    TimespanPipe
+    LeadingNullPipe
   ]
 })
 export class OctraComponentsModule {

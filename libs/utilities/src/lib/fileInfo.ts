@@ -1,7 +1,7 @@
-import {HttpClient} from '@angular/common/http';
 import {unescape} from 'querystring';
 import {DataInfo} from './dataInfo';
 import {isUnset} from './functions';
+import {HttpClient} from '@angular/common/http';
 
 export class FileInfo extends DataInfo {
   /**

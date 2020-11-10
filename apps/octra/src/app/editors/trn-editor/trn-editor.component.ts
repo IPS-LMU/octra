@@ -22,7 +22,7 @@ import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {LoginMode} from '../../core/store';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {ValidationPopoverComponent} from '../../core/component/transcr-editor/validation-popover/validation-popover.component';
-import {isUnset} from '@octra/utilities';
+import {isUnset, SubscriptionManager} from '@octra/utilities';
 import {AudioViewerComponent, AudioviewerConfig} from '@octra/components';
 import {Segments} from '@octra/annotation';
 
@@ -49,11 +49,16 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
               private sanitizer: DomSanitizer,
               private cd: ChangeDetectorRef) {
     super();
+    this.subscrManager = new SubscriptionManager();
   }
 
   public static editorname = 'TRN-Editor';
 
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
+
+  private lastMouseOver = 0;
+
+  private subscrManager: SubscriptionManager;
   public showSignalDisplay = false;
   public lastResizing = 0;
 
@@ -98,7 +103,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
   public shownSegments: {
     label: string;
     transcription: {
-      html: string,
+      safeHTML: SafeHtml,
       text: string
     }
   }[] = [];
@@ -124,6 +129,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     this.audioViewerSettings.showTimePerLine = true;
     this.audioViewerSettings.showProgressBars = true;
     this.audioViewerSettings.multiLine = false;
+    this.audioViewerSettings.lineheight = 200;
     // this.audioViewerSettings.av.drawnSelection = null;
     this.audioManager = this.audio.audiomanagers[0];
     this.audioChunk = this.audioManager.mainchunk.clone();
@@ -167,9 +173,12 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     labelCol.contentEditable = 'true';
   }
 
-  onTranscriptCellMouseOver($event, rowNumber) {
+  onTranscriptCellMouseOver($event, rowNumber, scrollContainer: HTMLDivElement) {
+    this.lastMouseOver = Date.now();
+    let target = jQuery($event.target);
+
+
     if (this.textEditor.state === 'inactive') {
-      let target = jQuery($event.target);
       if (target.is('.val-error') || target.parent().is('.val-error')) {
         if (!this.popovers.validation.mouse.enter) {
           if (!target.is('.val-error')) {
@@ -182,9 +191,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
             const elem = jQuery(jQuery('.segment-row').get(i));
             marginTop += elem.outerHeight();
           }
-
-          marginTop += target.position().top;
-
+          marginTop -= scrollContainer.scrollTop;
           const headHeight = jQuery('#table-head').outerHeight();
 
           const errorcode = target.attr('data-errorcode');
@@ -195,11 +202,11 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
             this.validationPopover.show();
             this.validationPopover.description = this.selectedError.description;
             this.validationPopover.title = this.selectedError.title;
+
+            this.popovers.validation.location.y = headHeight + marginTop - this.validationPopover.height + target.position().top;
             this.cd.markForCheck();
             this.cd.detectChanges();
-
-            this.popovers.validation.location.y = headHeight + marginTop - this.validationPopover.height;
-            this.popovers.validation.location.x = $event.offsetX - 10;
+            this.popovers.validation.location.x = $event.offsetX;
             this.popovers.validation.mouse.enter = true;
             this.cd.markForCheck();
             this.cd.detectChanges();
@@ -209,9 +216,13 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
         this.selectedError = null;
         this.popovers.validation.mouse.enter = false;
         this.validationPopover.hide();
+        this.cd.markForCheck();
+        this.cd.detectChanges();
       }
     } else {
       this.popovers.validation.visible = false;
+      this.cd.markForCheck();
+      this.cd.detectChanges();
     }
   }
 
@@ -296,7 +307,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     label: string,
     transcription: {
       text: string,
-      html: string
+      safeHTML: SafeHtml
     },
     validation: string
   } {
@@ -306,28 +317,29 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
       label,
       transcription: {
         text: rawText,
-        html: rawText
+        safeHTML: null
       },
       validation: ''
     };
 
+    let html = rawText;
     if (this.appStorage.useMode !== LoginMode.URL) {
       if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function'
         && !isUnset(this.transcrService.validationArray[i])) {
-        obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
+        html = this.transcrService.underlineTextRed(obj.transcription.text,
           this.transcrService.validationArray[i].validation);
       }
 
-      obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
-      obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
+      html = this.transcrService.rawToHTML(html);
+      html = html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
         if (g1 === '[[[') {
           return '<';
         }
         return '>';
       });
     } else {
-      obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
-      obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
+      html = this.transcrService.rawToHTML(html);
+      html = html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
         if (g1 === '[[[') {
           return '<';
         }
@@ -335,37 +347,40 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
       });
     }
 
-    obj.transcription.html = obj.transcription.html.replace(/(<p>)|(<\/p>)/g, '');
+    html = html.replace(/(<p>)|(<\/p>)/g, '');
+    obj.transcription.safeHTML = this.sanitizeHTML(html);
     return obj;
   }
 
   onKeyUp($event: KeyboardEvent, i: number) {
     if ($event.code === 'Enter') {
-      setTimeout(() => {
-        this.save();
-        this.transcrService.validateAll();
-        this.transcrService.saveSegments();
+      this.transcrEditor.waitForValidationFinished().then(() => {
+        setTimeout(() => {
+          this.save();
+          this.transcrService.validateAll();
+          this.transcrService.saveSegments();
 
-        this.textEditor.state = 'inactive';
-        this.textEditor.selectedSegment = -1;
+          this.textEditor.state = 'inactive';
+          this.textEditor.selectedSegment = -1;
 
-        this.audioManager.removeChunk(this.textEditor.audiochunk);
-        this.textEditor.audiochunk = null;
+          this.audioManager.removeChunk(this.textEditor.audiochunk);
+          this.textEditor.audiochunk = null;
 
-        this.updateSegments();
-        this.cd.markForCheck();
-        this.cd.detectChanges();
+          this.updateSegments();
+          this.cd.markForCheck();
+          this.cd.detectChanges();
 
-        const startSample = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.samples : 0;
+          const startSample = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.samples : 0;
 
-        /*
-        this.uiService.addElementFromEvent('segment', {
-          value: 'updated'
-        }, Date.now(), null, null, null, {
-          start: startSample,
-          length: segment.time.samples - startSample
-        }, 'overview'); */
-      }, 1000);
+          /*
+          this.uiService.addElementFromEvent('segment', {
+            value: 'updated'
+          }, Date.now(), null, null, null, {
+            start: startSample,
+            length: segment.time.samples - startSample
+          }, 'overview'); */
+        }, 500);
+      });
     } else if ($event.code === 'Escape') {
       // close without saving
       this.closeTextEditor();

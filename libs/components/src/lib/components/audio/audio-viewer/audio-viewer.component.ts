@@ -34,79 +34,6 @@ import Vector2d = Konva.Vector2d;
 })
 export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
 
-  get transcriptionLevel(): Level {
-    return this._transcriptionLevel;
-  }
-
-  @Input() set transcriptionLevel(value: Level) {
-    this._transcriptionLevel = value;
-  }
-
-  @Input() set isMultiLine(value: boolean) {
-    this.settings.multiLine = value;
-    this.init();
-  }
-
-  public get mouseCursor(): {
-    location: Vector2d,
-    size: {
-      height: number;
-      width: number;
-    }
-  } {
-    if (isUnset(this.canvasElements.mouseCaret)) {
-      return {
-        location: {
-          x: 0, y: 0
-        },
-        size: {
-          width: 0, height: 0
-        }
-      };
-    } else {
-      return {
-        location: this.canvasElements.mouseCaret.position(),
-        size: this.canvasElements.mouseCaret.size()
-      };
-    }
-  }
-
-  get focused(): boolean {
-    return this._focused;
-  }
-
-  public get settings(): AudioviewerConfig {
-    return this.av.settings;
-  }
-
-  @Input()
-  public set settings(value: AudioviewerConfig) {
-    this.av.settings = value;
-  }
-
-  public get audioManager(): AudioManager {
-    return this.audioChunk.audioManager;
-  }
-
-  public get width(): number {
-    return this.konvaContainer.nativeElement.offsetWidth;
-  }
-
-  public get height(): number {
-    return this.konvaContainer.nativeElement.clientHeight;
-  }
-
-  public get getPlayHeadX(): number {
-    return 0;
-  }
-
-  get AudioPxWidth(): number {
-    return this.av.AudioPxWidth;
-  }
-
-  constructor(public av: AudioViewerService, private renderer: Renderer2) {
-  }
-
   @Input() audioChunk: AudioChunk;
   @Input() public name = '';
   @Input() breakMarker: any;
@@ -120,7 +47,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     time: SampleUnit
   }>();
   @ViewChild('konvaContainer', {static: true}) konvaContainer: ElementRef;
-
   public updating = false;
   // EVENTS
   public onInitialized = new Subject<void>();
@@ -187,7 +113,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     scrollbarSelector: null,
     lastLine: null
   };
-
   private resizingTimer: any;
   private grid = {
     verticalLines: 3,
@@ -195,12 +120,84 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   };
   private widthOnInit;
   private deactivateShortcuts = false;
+  private drawnSegmentIDs: number[] = [];
+
+  constructor(public av: AudioViewerService, private renderer: Renderer2) {
+  }
+
+  @Input() set isMultiLine(value: boolean) {
+    this.settings.multiLine = value;
+    this.init();
+  }
+
+  public get mouseCursor(): {
+    location: Vector2d,
+    size: {
+      height: number;
+      width: number;
+    }
+  } {
+    if (isUnset(this.canvasElements.mouseCaret)) {
+      return {
+        location: {
+          x: 0, y: 0
+        },
+        size: {
+          width: 0, height: 0
+        }
+      };
+    } else {
+      return {
+        location: this.canvasElements.mouseCaret.position(),
+        size: this.canvasElements.mouseCaret.size()
+      };
+    }
+  }
+
+  public get settings(): AudioviewerConfig {
+    return this.av.settings;
+  }
+
+  @Input()
+  public set settings(value: AudioviewerConfig) {
+    this.av.settings = value;
+  }
+
+  public get audioManager(): AudioManager {
+    return this.audioChunk.audioManager;
+  }
+
+  public get width(): number {
+    return this.konvaContainer.nativeElement.offsetWidth;
+  }
+
+  public get height(): number {
+    return this.konvaContainer.nativeElement.clientHeight;
+  }
+
+  public get getPlayHeadX(): number {
+    return 0;
+  }
+
+  get AudioPxWidth(): number {
+    return this.av.AudioPxWidth;
+  }
 
   private _transcriptionLevel: Level;
 
+  get transcriptionLevel(): Level {
+    return this._transcriptionLevel;
+  }
+
+  @Input() set transcriptionLevel(value: Level) {
+    this._transcriptionLevel = value;
+  }
+
   private _focused = false;
 
-  private drawnSegmentIDs: number[] = [];
+  get focused(): boolean {
+    return this._focused;
+  }
 
   private static afterSettingsUpdated() {
     console.log(`settings were updated!`);
@@ -300,7 +297,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   afterLevelUpdated() {
     if (!isUnset(this._transcriptionLevel)) {
-      console.log(`LEVEL updated ${this._transcriptionLevel.segments.length}`);
 
       if (!isUnset(this.audioChunk) && !isUnset(this.av.audioTCalculator)) {
         this.refreshLevel()
@@ -613,18 +609,18 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     this.layers = {
       background: new Konva.Layer({
         id: 'backgroundLayer',
-        hitGraphEnabled: false
+        listening: false
       }),
       overlay: new Konva.Layer({
         id: 'overlayLayer',
-        hitGraphEnabled: false
+        listening: false
       }),
       boundaries: new Konva.Layer({
         id: 'boundariesLayer'
       }),
       playhead: new Konva.Layer({
         id: 'playheadLayer',
-        hitGraphEnabled: false
+        listening: false
       }),
       scrollBars: new Konva.Layer({
         id: 'scrollBars'
@@ -673,6 +669,14 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         console.log(`no resizing!`);
       }
     }
+  }
+
+  public redraw() {
+    this.stage.batchDraw();
+  }
+
+  public redrawOverlay() {
+    this.layers.overlay.batchDraw();
   }
 
   private createCropContainer(id?: string): Group {
@@ -2107,14 +2111,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
     group.add(caret);
     return group;
-  }
-
-  public redraw() {
-    this.stage.batchDraw();
-  }
-
-  public redrawOverlay() {
-    this.layers.overlay.batchDraw();
   }
 
   private refreshLevel() {

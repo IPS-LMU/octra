@@ -93,6 +93,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   private lockHighlighting = false;
   private lastHighlightedSegment = -1;
 
+  private isValidating = false;
+  private validationFinish = new EventEmitter();
+
   private _highlightingEnabled = true;
   @Output() highlightingEnabledChange = new EventEmitter();
 
@@ -546,7 +549,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   onKeyUpSummernote = ($event) => {
     // update rawText
     this.onkeyup.emit($event);
-    this.triggerTyping();
+    this.triggerTyping($event.code !== 'Enter');
   }
 
   /**
@@ -721,7 +724,16 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       .off('mouseover')
       .off('mouseleave');
 
-    setTimeout(() => {
+    // set popover for errors
+    const valError = jQuery('.val-error');
+    valError.off('mouseenter')
+      .off('mouseleave');
+
+    valError.children()
+      .off('mouseenter')
+      .off('mouseleave');
+
+    this.waitForValidationFinished().then(() => {
       jQuery('.btn-icon-text[data-samples]')
         .on('click', (event) => {
           const jqueryobj = jQuery(event.target);
@@ -739,18 +751,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             display: 'none'
           });
         });
-    }, 200);
 
-    // set popover for errors
-    const valError = jQuery('.val-error');
-    valError.off('mouseenter')
-      .off('mouseleave');
 
-    valError.children()
-      .off('mouseenter')
-      .off('mouseleave');
-
-    setTimeout(() => {
       valError
         .on('mouseenter', (event) => {
           this.onValidationErrorMouseOver(jQuery(event.target), event);
@@ -766,7 +768,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         .on('mouseleave', () => {
           this.onValidationErrorMouseLeave();
         });
-    }, 200);
+    });
   }
 
   createCustomButtonsArray(): any[] {
@@ -1034,27 +1036,32 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   public validate() {
     if (this.validationEnabled) {
-      this.lockHighlighting = true;
-      this.saveSelection();
-      this._rawText = this.getRawText(false);
+      if (!this.isValidating) {
+        this.isValidating = true;
+        this.lockHighlighting = true;
+        this.saveSelection();
+        this._rawText = this.getRawText(false);
 
-      if (this._rawText !== '') {
-        // insert selection placeholders
-        const startMarker = '[[[sel-start]]][[[/sel-start]]]';
-        const endMarker = '[[[sel-end]]][[[/sel-end]]]';
-        let code = Functions.insertString(this._rawText, this._textSelection.start, startMarker);
-        code = Functions.insertString(code, this._textSelection.end + startMarker.length, endMarker);
+        if (this._rawText !== '') {
+          // insert selection placeholders
+          const startMarker = '[[[sel-start]]][[[/sel-start]]]';
+          const endMarker = '[[[sel-end]]][[[/sel-end]]]';
+          let code = Functions.insertString(this._rawText, this._textSelection.start, startMarker);
+          code = Functions.insertString(code, this._textSelection.end + startMarker.length, endMarker);
 
-        code = this.transcrService.underlineTextRed(code, this.transcrService.validate(code));
-        code = this.transcrService.rawToHTML(code);
-        code = code.replace(/([\s ]+)(<sel-start><\/sel-start><sel-end><\/sel-end><\/p>)?$/g, '&nbsp;$2');
+          code = this.transcrService.underlineTextRed(code, this.transcrService.validate(code));
+          code = this.transcrService.rawToHTML(code);
+          code = code.replace(/([\s ]+)(<sel-start><\/sel-start><sel-end><\/sel-end><\/p>)?$/g, '&nbsp;$2');
 
-        this._rawText = this.tidyUpRaw(this._rawText);
-        this.textfield.summernote('code', code);
-        this.restoreSelection();
-        this.lastHighlightedSegment--;
+          this._rawText = this.tidyUpRaw(this._rawText);
+          this.textfield.summernote('code', code);
+          this.restoreSelection();
+          this.lastHighlightedSegment--;
+        }
+        this.lockHighlighting = false;
+        this.isValidating = false;
+        this.validationFinish.emit();
       }
-      this.lockHighlighting = false;
     } else {
       this._rawText = this.getRawText(false);
       this._rawText = this.tidyUpRaw(this._rawText);
@@ -1092,7 +1099,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  private triggerTyping() {
+  private triggerTyping(doValidation = true) {
     // this.highlightingRunning = false;
     setTimeout(() => {
       if (Date.now() - this.lastkeypress >= 450 && this.lastkeypress > -1) {
@@ -1101,8 +1108,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             this._isTyping = false;
             this.typing.emit('stopped');
 
-            this.validate();
-            this.initPopover();
+
+            if (doValidation) {
+              this.validate();
+              this.initPopover();
+            }
             this.lastkeypress = -1;
           } else {
             // ignore typing stop after audioChunk was changed
@@ -1214,7 +1224,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         this.cd.detectChanges();
 
         const cardHeader = jQuery('.note-toolbar.card-header');
-        const editorPos = cardHeader.offset();
+        const editor = jQuery('.note-editor.note-frame.card');
 
         let marginLeft = event.target.offsetLeft;
         const height = this.validationPopover.height;
@@ -1230,7 +1240,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           }
         }
 
-        this.changeValidationPopoverLocation(marginLeft, (jQueryObj.offset().top - editorPos.top - height));
+        this.changeValidationPopoverLocation(marginLeft, (cardHeader.height() + jQueryObj.position().top - height));
       }
     } else {
       console.error(`errorcode is null!`);
@@ -1361,6 +1371,22 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   private onValidationErrorMouseLeave() {
     this.validationPopover.hide();
+  }
+
+  public waitForValidationFinished(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (this.validationEnabled) {
+        if (this.isValidating) {
+          this.subscrmanager.add(this.validationFinish.subscribe(() => {
+            resolve();
+          }));
+        } else {
+          resolve();
+        }
+      } else {
+        resolve();
+      }
+    });
   }
 }
 

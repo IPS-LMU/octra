@@ -1,5 +1,6 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
 import {OAnnotJSON, OAudiofile, OItem, OLabel, OLevel, OSegment} from '../annotjson';
+import {isUnset} from '@octra/utilities';
 
 export class PartiturConverter extends Converter {
 
@@ -19,7 +20,11 @@ export class PartiturConverter extends Converter {
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
-
+    if (isUnset(annotation)) {
+      // annotation is null;
+      console.error('BASPartitur Converter annotation is null');
+      return null;
+    }
     if (!(levelnum === null || levelnum === undefined)) {
       const result: ExportResult = {
         file: {

@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {contains} from '@octra/utilities';
+import {contains, isUnset} from '@octra/utilities';
 import {OAnnotJSON, OAudiofile, OEvent, OLabel, OLevel, OSegment} from '../annotjson';
 
 export class PraatTextgridConverter extends Converter {
@@ -82,9 +82,10 @@ export class PraatTextgridConverter extends Converter {
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
-    if (audiofile !== null && audiofile !== undefined) {
+    if (!isUnset(audiofile)) {
       const name = audiofile.name.substr(0, audiofile.name.lastIndexOf('.'));
-      if (name === file.name.substr(0, file.name.lastIndexOf('.'))) {
+      const fileName = (file.name.indexOf('.') > -1) ? file.name.substr(0, file.name.lastIndexOf('.')) : file.name
+      if (name === fileName) {
         const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
 
         let content = file.content;
@@ -109,7 +110,6 @@ export class PraatTextgridConverter extends Converter {
               for (let i = 8; i < lines.length; i++) {
                 lvlNum++;
                 if (lines[i] !== '') {
-
                   const level = '    ';
                   if (lines[i] === level + `item [${lvlNum}]:`) {
                     i++;
@@ -263,9 +263,33 @@ export class PraatTextgridConverter extends Converter {
               audiofile: null,
               error: ''
             };
+          } else {
+            return {
+              annotjson: null,
+              audiofile: null,
+              error: 'invalid Textgrid Header'
+            };
           }
+        } else {
+          return {
+            annotjson: null,
+            audiofile: null,
+            error: 'Textgrid has less than 14 lines.'
+          };
         }
+      } else {
+        return {
+          annotjson: null,
+          audiofile: null,
+          error: `names do not match.`
+        };
       }
+    } else {
+      return {
+        annotjson: null,
+        audiofile: null,
+        error: 'audiofile is null.'
+      };
     }
 
     return {

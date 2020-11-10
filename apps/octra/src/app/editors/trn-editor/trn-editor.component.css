@@ -34,3 +34,18 @@ td.fitwidth {
   flex-direction: column;
   background-color: white;
 }
+
+:host {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  height: 300px;
+}
+
+#scroll-container {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  height: 300px;
+  overflow-y: auto;
+}

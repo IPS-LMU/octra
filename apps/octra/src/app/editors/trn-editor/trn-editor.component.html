@@ -1,5 +1,4 @@
 <div id="scroll-container" #scrollContainer>
-
   <octra-validation-popover #validationPopover
                             [ngStyle]="{
                                 'margin-left': popovers.validation.location.x + 'px',
@@ -9,54 +8,64 @@
   <table class="table table-bordered bg-white">
     <thead>
     <tr id="table-head">
-    <th></th>
-    <th style="text-align: center;">{{"general.time" | transloco}}</th>
-    <th style="vertical-align: middle;text-align: center;">{{"general.speaker" | transloco}}</th>
-    <th>{{"general.transcript" | transloco}}</th>
-    <th style="text-align: center; vertical-align: middle;"></th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr *ngFor="let segment of shownSegments; let i = index;" class="segment-row">
-    <td class="active-column fitwidth">
-      <fa-icon *ngIf="i === textEditor.selectedSegment; else checkExclamation;" [icon]="['fas', 'circle']"
-               style="color:green;font-size: 10px;"></fa-icon>
-      <ng-template #checkExclamation>
-        <fa-icon [icon]="['fas', 'exclamation-triangle']" [ngStyle]="{
+      <th></th>
+      <th style="vertical-align: middle;text-align: center;">{{"general.time" | transloco}}</th>
+      <th style="vertical-align: middle;text-align: center;">{{"general.speaker" | transloco}}</th>
+      <th style="vertical-align: middle;text-align: center;">{{"general.transcript" | transloco}}</th>
+      <th style="text-align: center; vertical-align: middle;">
+        <fa-icon (click)="togglePlayAll()" [icon]="['fas', playAllState.icon]"></fa-icon>
+        <input (click)="toggleSkipCheckbox()" [checked]="playAllState.skipSilence" id="skip-silence-checkbox"
+               type="checkbox">
+        <label for="skip-silence-checkbox">{{"general.skip silence" | transloco}}</label>
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let segment of shownSegments; let i = index;" class="segment-row">
+      <td class="active-column fitwidth">
+        <fa-icon *ngIf="i === textEditor.selectedSegment; else checkExclamation;" [icon]="['fas', 'circle']"
+                 style="color:green;font-size: 10px;"></fa-icon>
+        <ng-template #checkExclamation>
+          <fa-icon [icon]="['fas', 'exclamation-triangle']" [ngStyle]="{
                   'color': 'red',
                   'display': ((segment.transcription.safeHTML.toString().indexOf('<span class=\'val-error\'') > -1) ? 'normal': 'none')}"
-                 class="segment-warning">
-        </fa-icon>
-      </ng-template>
-    </td>
-    <td class="time-column fitwidth" [ngClass]="{
+                   class="segment-warning">
+          </fa-icon>
+        </ng-template>
+      </td>
+      <td class="time-column fitwidth" [ngClass]="{
     'alert-success': segment.transcription.text !== '' && segment.transcription.text !== transcrService.breakMarker.code,
     'alert-info': segment.transcription.text === transcrService.breakMarker.code,
-    'alert-danger': segment.transcription.text === ''
+    'alert-danger': segment.transcription.text === '',
+    'active-playback': i === playAllState.currentSegment
   }">
-      {{getStartPoint(i) | timespan: {
-      showMilliSeconds: true,
-      showHour: true
-    }
-      }}
-    </td>
-    <td class="label-column fitwidth" [ngClass]="{
+        {{getStartPoint(i) | timespan: {
+        showMilliSeconds: true,
+        showHour: true
+      }
+        }}
+      </td>
+      <td class="label-column fitwidth" [ngClass]="{
     'alert-success': segment.transcription.text !== '' && segment.transcription.text !== transcrService.breakMarker.code,
     'alert-info': segment.transcription.text === transcrService.breakMarker.code,
-    'alert-danger': segment.transcription.text === ''
-  }" #labelCol (keydown)="onLabelKeyDown($event, labelCol, i)" (mousedown)="onLabelMouseDown(labelCol)">
-      {{segment.label}}
-    </td>
+    'alert-danger': segment.transcription.text === '',
+    'active-playback': i === playAllState.currentSegment
+  }" #labelCol (keyup)="onLabelKeyUp(labelCol)" (keydown)="onLabelKeyDown($event, labelCol, i)"
+          (mousedown)="onLabelMouseDown(labelCol, i)">
+        {{segment.label}}
+      </td>
 
-    <td class="transcript-column"
-        *ngIf="textEditor.state === 'active' && textEditor.selectedSegment === i; else editorNotActive"
-        [ngClass]="{
+      <td class="transcript-column"
+          *ngIf="textEditor.state === 'active' && textEditor.selectedSegment === i; else editorNotActive"
+          [ngClass]="{
     'alert-success': segment.transcription.text !== '' && segment.transcription.text !== transcrService.breakMarker.code,
     'alert-info': segment.transcription.text === transcrService.breakMarker.code,
-    'alert-danger': segment.transcription.text === ''
+    'alert-danger': segment.transcription.text === '',
+    'active-playback': i === playAllState.currentSegment
   }">
-      <octra-audio-navigation
-        [buttons]="{
+        <div id="transcription-panel">
+          <octra-audio-navigation
+            [buttons]="{
                         play: {
                             label: ('general.play' | transloco),
                             shortcut: keyMap.getShortcut('AP', 'play_pause')
@@ -82,57 +91,68 @@
                             shortcut: keyMap.getShortcut('overlay', 'step_backward')
                         }
                       }"
-        [easyMode]="appStorage.easymode"
-        [playbackRate]="appStorage.audioSpeed"
-        [audioChunk]="textEditor.audiochunk"
-        [responsive]="settingsService.responsive.enabled"
-        [volume]="appStorage.audioVolume"
-      ></octra-audio-navigation>
-      <octra-audio-viewer *ngIf="!showSignalDisplay" class="viewer" #viewer [settings]="audioViewerSettings"
-                          [audioChunk]="textEditor.audiochunk"
-                          [isMultiLine]="false" [transcriptionLevel]="transcrService.currentlevel"
-                          style="height:50px;"
-      >
-      </octra-audio-viewer>
-      <octra-transcr-editor #transcrEditor
-                            (onkeyup)="onKeyUp($event, i)"
-                            [audiochunk]="textEditor.audiochunk"
-                            [height]="60"
-                            [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
-      ></octra-transcr-editor>
-    </td>
-    <ng-template #editorNotActive>
-      <td (mousedown)="onTranscriptCellMouseOver($event, i, scrollContainer); onTranscriptCellMouseDown($event, i);"
-          (mousemove)="onTranscriptCellMouseOver($event, i, scrollContainer)"
-          [innerHTML]="segment.transcription.safeHTML" class="transcript-column" [ngClass]="{
+            [easyMode]="appStorage.easymode"
+            [playbackRate]="appStorage.audioSpeed"
+            [audioChunk]="textEditor.audiochunk"
+            [responsive]="settingsService.responsive.enabled"
+            [volume]="appStorage.audioVolume"
+          ></octra-audio-navigation>
+          <octra-audio-viewer *ngIf="!showSignalDisplay" class="viewer" #viewer [settings]="audioViewerSettings"
+                              [audioChunk]="textEditor.audiochunk"
+                              [isMultiLine]="false" [transcriptionLevel]="transcrService.currentlevel"
+                              style="height:50px;"
+          >
+          </octra-audio-viewer>
+          <octra-transcr-editor #transcrEditor
+                                (onkeyup)="onKeyUp($event, i)"
+                                [audiochunk]="textEditor.audiochunk"
+                                [height]="60"
+                                [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
+          ></octra-transcr-editor>
+          <button class="btn btn-sm btn-primary btn-info btn-raised w-50" (click)="navigateBetweenCells('up', i)">
+            <fa-icon [icon]="['fas', 'arrow-up']"></fa-icon>
+            SAVE & UP
+          </button>
+          <button class="btn btn-sm btn-primary btn-info btn-raised w-50" (click)="navigateBetweenCells('down', i)">
+            <fa-icon [icon]="['fas', 'arrow-down']"></fa-icon>
+            SAVE & DOWN
+          </button>
+        </div>
+      </td>
+      <ng-template #editorNotActive>
+        <td (mousedown)="onTranscriptCellMouseOver($event, i, scrollContainer); onTranscriptCellMouseDown($event, i);"
+            (mousemove)="onTranscriptCellMouseOver($event, i, scrollContainer)"
+            [innerHTML]="segment.transcription.safeHTML" class="transcript-column" [ngClass]="{
     'alert-success': segment.transcription.text !== '' && segment.transcription.text !== transcrService.breakMarker.code,
     'alert-info': segment.transcription.text === transcrService.breakMarker.code,
-    'alert-danger': segment.transcription.text === ''
+    'alert-danger': segment.transcription.text === '',
+    'active-playback': i === playAllState.currentSegment
   }"></td>
-    </ng-template>
+      </ng-template>
 
-    <td class="control-column" style="width:100px;" [ngClass]="{
+      <td class="control-column" style="width:100px;" [ngClass]="{
     'alert-success': segment.transcription.text !== '' && segment.transcription.text !== transcrService.breakMarker.code,
     'alert-info': segment.transcription.text === transcrService.breakMarker.code,
-    'alert-danger': segment.transcription.text === ''
+    'alert-danger': segment.transcription.text === '',
+    'active-playback': i === playAllState.currentSegment
   }">
-      <fa-icon [icon]="['fas', 'play']"></fa-icon>
-    </td>
-  </tr>
-  <tr>
-    <td class="active-column fitwidth">
-    </td>
-    <td class="time-column fitwidth">
-      {{ audioChunk.time.duration.unix| timespan: {
-      showMilliSeconds: true,
-      showHour: true
-    }
-      }}
-    </td>
-    <td class="transcript-column" colspan="3" style="text-align: center;">
-      <hr/>
-    </td>
-  </tr>
-  </tbody>
+        <fa-icon (click)="playSelectedSegment(i)" [icon]="['fas', playStateSegments[i].icon]"></fa-icon>
+      </td>
+    </tr>
+    <tr>
+      <td class="active-column fitwidth">
+      </td>
+      <td class="time-column fitwidth">
+        {{ audioChunk.time.duration.unix| timespan: {
+        showMilliSeconds: true,
+        showHour: true
+      }
+        }}
+      </td>
+      <td class="transcript-column" colspan="3" style="text-align: center;">
+        <hr/>
+      </td>
+    </tr>
+    </tbody>
   </table>
 </div>

@@ -33,6 +33,14 @@ export function base64ToArrayBuffer(base64): ArrayBuffer {
   return (bytes.buffer as ArrayBuffer);
 }
 
+export function selectAllTextOfNode(el: any) {
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
 export class Functions {
   public static scrollTo(y: number, target?: string) {
     setTimeout(() => {

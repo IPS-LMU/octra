@@ -49,3 +49,13 @@ td.fitwidth {
   height: 300px;
   overflow-y: auto;
 }
+
+.active-playback {
+  background-color: yellow;
+  border-top: 3px solid black;
+  border-bottom: 3px solid black;
+}
+
+#transcription-panel {
+  background-color: white;
+}

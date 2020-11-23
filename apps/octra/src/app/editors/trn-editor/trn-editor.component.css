@@ -59,3 +59,8 @@ td.fitwidth {
 #transcription-panel {
   background-color: white;
 }
+
+.ng-fa-icon[ng-reflect-icon="fas,play"]:hover,
+.ng-fa-icon[ng-reflect-icon="fas,stop"]:hover {
+  cursor: pointer;
+}

@@ -141,7 +141,7 @@
     "simple editor": "Dictaphone Editor",
     "linear editor": "Linear Editor",
     "2D editor": "2D-Editor",
-    "TRN editor": "TRN-Editor"
+    "TRN-editor": "TRN-Editor"
   },
   "modal": {
     "transcription": {
@@ -203,7 +203,13 @@
       "feedback and send 3": "Send transcription with three stars",
       "do asr": "Apply ASR on selected segment",
       "do asr maus": "Apply ASR & MAUS segmentation on the selected segment",
-      "do maus only": "Apply word-alignment on the selected segment using MAUS"
+      "do maus only": "Apply word-alignment on the selected segment using MAUS",
+      "TRN-Editor": "Shortcuts of the TRN-Editor",
+      "TRN-Editor texteditor": "Shortcuts of the Texteditor",
+      "save and next cell": "Save and go to the next cell",
+      "save and under cell": "Save and go to one cell under the current one",
+      "save and previous cell": "Save and go to the previous cell",
+      "save and upper cell": "Save and go to one cell over the current one"
     },
     "inactivity": {
       "header": "Longer absence detected",

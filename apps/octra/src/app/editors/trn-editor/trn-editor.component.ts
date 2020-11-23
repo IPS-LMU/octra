@@ -62,6 +62,84 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
   public showSignalDisplay = false;
   public lastResizing = 0;
 
+  private shortcuts = {
+    enter: {
+      keys: {
+        mac: 'ENTER',
+        pc: 'ENTER'
+      },
+      title: 'save and next cell',
+      focusonly: true
+    },
+    up: {
+      keys: {
+        mac: 'ALT + ARROWUP',
+        pc: 'ALT + ARROWUP'
+      },
+      title: 'save and upper cell',
+      focusonly: false
+    },
+    right: {
+      keys: {
+        mac: 'ALT + ARROWRIGHT',
+        pc: 'ALT + ARROWRIGHT'
+      },
+      title: 'save and next cell',
+      focusonly: false
+    },
+    down: {
+      keys: {
+        mac: 'ALT + ARROWDOWN',
+        pc: 'ALT + ARROWDOWN'
+      },
+      title: 'save and under cell',
+      focusonly: false
+    },
+    left: {
+      keys: {
+        mac: 'ALT + ARROWLEFT',
+        pc: 'ALT + ARROWLEFT'
+      },
+      title: 'save and previous cell',
+      focusonly: false
+    }
+  }
+
+  private audioShortcuts = {
+    play_pause: {
+      keys: {
+        mac: 'TAB',
+        pc: 'TAB'
+      },
+      title: 'play pause',
+      focusonly: true
+    },
+    stop: {
+      keys: {
+        mac: 'ESC',
+        pc: 'ESC'
+      },
+      title: 'stop playback',
+      focusonly: true
+    },
+    step_backward: {
+      keys: {
+        mac: 'SHIFT + BACKSPACE',
+        pc: 'SHIFT + BACKSPACE'
+      },
+      title: 'step backward',
+      focusonly: true
+    },
+    step_backwardtime: {
+      keys: {
+        mac: 'SHIFT + TAB',
+        pc: 'SHIFT + TAB'
+      },
+      title: 'step backward time',
+      focusonly: true
+    }
+  };
+
   @ViewChild('transcrEditor', {static: false}) transcrEditor: TranscrEditorComponent;
   @ViewChild('viewer', {static: false}) viewer: AudioViewerComponent;
   @ViewChild('validationPopover', {static: true}) validationPopover: ValidationPopoverComponent;
@@ -91,7 +169,6 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
         enter: false
       }
     }
-
   };
 
   public selectedError: any = '';
@@ -123,42 +200,6 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     icon: 'play' | 'stop'
   }[] = [];
 
-
-  private audioShortcuts = {
-    play_pause: {
-      keys: {
-        mac: 'TAB',
-        pc: 'TAB'
-      },
-      title: 'play pause',
-      focusonly: false
-    },
-    stop: {
-      keys: {
-        mac: 'ESC',
-        pc: 'ESC'
-      },
-      title: 'stop playback',
-      focusonly: false
-    },
-    step_backward: {
-      keys: {
-        mac: 'SHIFT + BACKSPACE',
-        pc: 'SHIFT + BACKSPACE'
-      },
-      title: 'step backward',
-      focusonly: false
-    },
-    step_backwardtime: {
-      keys: {
-        mac: 'SHIFT + TAB',
-        pc: 'SHIFT + TAB'
-      },
-      title: 'step backward time',
-      focusonly: false
-    }
-  };
-
   private selectedCell = {
     labelText: '',
     row: 0,
@@ -169,6 +210,9 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
   }
 
   ngOnInit() {
+    this.keyMap.register('TRN-Editor', {...this.shortcuts});
+    this.keyMap.register('TRN-Editor texteditor', this.audioShortcuts);
+
     this.audioViewerSettings = new AudioviewerConfig();
     // this..name = 'transcr-window viewer';
     this.audioViewerSettings.margin.top = 5;
@@ -242,7 +286,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
   onLabelMouseDown(labelCol: HTMLTableCellElement, rowNumber: number) {
     labelCol.contentEditable = 'true';
     this.selectedCell = {
-      ...this.selectedCell,
+      labelText: labelCol.innerText,
       row: rowNumber,
       column: 1
     };
@@ -901,24 +945,71 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   }
 
   onShortcutTriggered = ($event) => {
-    this.keyMap.checkShortcutAction($event.comboKey, this.audioShortcuts, true).then((shortcut) => {
-      switch ($event.comboKey) {
-        case ('ALT + ARROWUP'):
-          $event.event.preventDefault();
-          this.navigateBetweenCells('up', Math.max(0, this.selectedCell.row));
-          break;
-        case ('ALT + ARROWRIGHT'):
-          $event.event.preventDefault();
-          this.navigateBetweenCells('right', this.selectedCell.row);
-          break;
-        case ('ALT + ARROWDOWN'):
-          $event.event.preventDefault();
-          this.navigateBetweenCells('down', Math.min(this.transcrService.currentlevel.segments.length, this.selectedCell.row));
-          break;
-        case ('ALT + ARROWLEFT'):
-          $event.event.preventDefault();
-          this.navigateBetweenCells('left', this.selectedCell.row);
-          break;
+    this.keyMap.checkShortcutAction($event.comboKey, {...this.shortcuts, ...this.audioShortcuts}, true).then((shortcut) => {
+      const triggerUIAction = (shortcutObj, caretPos: number = -1) => {
+        shortcutObj.value = `audio:${shortcutObj.value}`;
+        this.uiService.addElementFromEvent('shortcut', shortcutObj, Date.now(),
+          this.audioManager.playposition, caretPos, null, null, 'texteditor');
+      };
+
+      if (shortcut !== '') {
+        switch (shortcut) {
+          case ('enter'):
+            // ignore. This event is catched by the labelKeyDown event handler
+            break;
+          case ('up'):
+            $event.event.preventDefault();
+            this.navigateBetweenCells('up', Math.max(0, this.selectedCell.row));
+            break;
+          case ('right'):
+            $event.event.preventDefault();
+            this.navigateBetweenCells('right', this.selectedCell.row);
+            break;
+          case ('down'):
+            $event.event.preventDefault();
+            this.navigateBetweenCells('down', Math.min(this.transcrService.currentlevel.segments.length, this.selectedCell.row));
+            break;
+          case ('left'):
+            $event.event.preventDefault();
+            this.navigateBetweenCells('left', this.selectedCell.row);
+            break;
+          case('play_pause'):
+            $event.event.preventDefault();
+            triggerUIAction({shortcut: $event.comboKey, value: shortcut});
+            if (this._textEditor.audiochunk.isPlaying) {
+              this._textEditor.audiochunk.pausePlayback().catch((error) => {
+                console.error(error);
+              });
+            } else {
+              this._textEditor.audiochunk.startPlayback(false).catch((error) => {
+                console.error(error);
+              });
+            }
+            break;
+          case('stop'):
+            $event.event.preventDefault();
+            triggerUIAction({shortcut: $event.comboKey, value: shortcut});
+            this._textEditor.audiochunk.stopPlayback().catch((error) => {
+              console.error(error);
+            });
+            break;
+          case('step_backward'):
+            $event.event.preventDefault();
+            console.log(`step backward`);
+            triggerUIAction({shortcut: $event.comboKey, value: shortcut});
+            this._textEditor.audiochunk.stepBackward().catch((error) => {
+              console.error(error);
+            });
+            break;
+          case('step_backwardtime'):
+            $event.event.preventDefault();
+            console.log(`step backward time`);
+            triggerUIAction({shortcut: $event.comboKey, value: shortcut});
+            this._textEditor.audiochunk.stepBackwardTime(0.5).catch((error) => {
+              console.error(error);
+            });
+            break;
+        }
       }
     });
   }

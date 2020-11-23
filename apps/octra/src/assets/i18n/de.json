@@ -203,7 +203,13 @@
       "feedback and send 3": "Transcription mit drei Sternen senden",
       "do asr": "Selektiertes Segment von ASR verarbeiten lassen",
       "do asr maus": "Selektiertes Segment von ASR & MAUS segmentieren lassen",
-      "do maus only": "Selektiertes Segment mit MAUS verarbeiten (Wort-Segmentierung)"
+      "do maus only": "Selektiertes Segment mit MAUS verarbeiten (Wort-Segmentierung)",
+      "TRN-Editor": "Tastenkombinationen des TRN-Editors",
+      "TRN-Editor texteditor": "Tastenkürzel des Texteditors",
+      "save and next cell": "Speichern und zur nächsten Zelle",
+      "save and under cell": "Speichern und eine Zelle nach unten",
+      "save and previous cell": "Speichern und zur vorherigen Zelle",
+      "save and upper cell": "Speichern und eine Zelle nach oben"
     },
     "inactivity": {
       "header": "Längere Inaktivität entdeckt",

@@ -323,9 +323,8 @@ export class AudioManager {
           .then(() => {
             this._playbackEndChecker = timer(Math.round(audioSelection.duration.unix / playbackRate)).subscribe(() => {
               this.endPlayBack();
+              setTimeout(resolve, 100);
             });
-
-            resolve();
           })
           .catch((error) => {
             this._playbackEndChecker.unsubscribe();

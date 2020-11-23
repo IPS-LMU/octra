@@ -299,6 +299,8 @@ export class TranscriptionComponent implements OnInit,
 
     // this.transcrService.annotation.audiofile.sampleRate = this.audioManager.ressource.info.sampleRate;
     this.navbarServ.showInterfaces = this.settingsService.projectsettings.navigation.interfaces;
+    this.checkCurrentEditor();
+    this.interface = this.appStorage.interface;
 
     // load guidelines on language change
     this.subscrmanager.add(this.langService.langChanges$.subscribe(

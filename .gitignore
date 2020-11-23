@@ -40,4 +40,4 @@ Thumbs.db
 /deployment/
 /doc/
 /deploy.config.json
-!/extern/
+/extern/

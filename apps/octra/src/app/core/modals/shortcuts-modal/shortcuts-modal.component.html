@@ -17,9 +17,10 @@
               <tbody>
               <tr *ngFor="let entry of keyMap.getEntryList('AP')">
                 <td>{{"modal.shortcuts." + entry.value.title | transloco}}</td>
-                <td>{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly"
-                                                         class="focus-info">({{"general.on focus only" | transloco}}
-                  )</span>
+                <td>
+                  <octra-shortcut [shortcut]="entry.value.keys[platform]"></octra-shortcut>
+                  <span *ngIf="entry.value.focusonly" class="focus-info">({{"general.on focus only" | transloco}}
+                    )</span>
                 </td>
               </tr>
               </tbody>
@@ -34,9 +35,10 @@
               <tbody>
               <tr *ngFor="let entry of keyMap.getEntryList('AV')">
                 <td>{{"modal.shortcuts." + entry.value.title | transloco}}</td>
-                <td>{{entry.value.keys[platform]}} <span
-                  *ngIf="(entry.value !== null && entry.value.focusonly)"
-                  class="focus-info">({{"general.on focus only" | transloco}})</span>
+                <td>
+                  <octra-shortcut [shortcut]="entry.value.keys[platform]"></octra-shortcut>
+                  <span *ngIf="(entry.value !== null && entry.value.focusonly)"
+                        class="focus-info">({{"general.on focus only" | transloco}})</span>
                 </td>
               </tr>
               </tbody>
@@ -49,7 +51,7 @@
               <tr *ngFor="let entry of keyMap.getEntryList('Loupe')">
                 <td>{{"modal.shortcuts." + entry.value.title |transloco}}</td>
                 <td>
-                  {{entry.value.keys[platform]}}
+                  <octra-shortcut [shortcut]="entry.value.keys[platform]"></octra-shortcut>
                   <span *ngIf="(entry.value !== null && entry.value.focusonly)"
                         class="focus-info">({{"general.on focus only" | transloco}})</span>
                 </td>
@@ -65,9 +67,11 @@
               <tbody>
               <tr *ngFor="let entry of keyMap.getEntryList('2D-Editor')">
                 <td>{{"modal.shortcuts." + entry.value.title | transloco}}</td>
-                <td>{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly"
-                                                         class="focus-info">({{"general.on focus only" | transloco}}
-                  )</span>
+                <td>
+                  <octra-shortcut [shortcut]="entry.value.keys[platform]"></octra-shortcut>
+                  <span *ngIf="entry.value.focusonly"
+                        class="focus-info">({{"general.on focus only" | transloco}}
+                    )</span>
                 </td>
               </tr>
               </tbody>
@@ -79,9 +83,11 @@
               <tbody>
               <tr *ngFor="let entry of keyMap.getEntryList('Transcription Window')">
                 <td>{{"modal.shortcuts." + entry.value.title | transloco}}</td>
-                <td>{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly"
-                                                         class="focus-info">({{"general.on focus only" | transloco}}
-                  )</span>
+                <td>
+                  <octra-shortcut [shortcut]="entry.value.keys[platform]"></octra-shortcut>
+                  <span *ngIf="entry.value.focusonly"
+                        class="focus-info">({{"general.on focus only" | transloco}}
+                    )</span>
                 </td>
               </tr>
               </tbody>
@@ -96,9 +102,11 @@
               <tbody>
               <tr *ngFor="let entry of keyMap.getEntryList('TRN-Editor')">
                 <td>{{"modal.shortcuts." + entry.value.title | transloco}}</td>
-                <td>{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly"
-                                                         class="focus-info">({{"general.on focus only" | transloco}}
-                  )</span>
+                <td>
+                  <octra-shortcut [shortcut]="entry.value.keys[platform]"></octra-shortcut>
+                  <span *ngIf="entry.value.focusonly"
+                        class="focus-info">({{"general.on focus only" | transloco}}
+                    )</span>
                 </td>
               </tr>
               </tbody>
@@ -109,9 +117,11 @@
                 <tbody>
                 <tr *ngFor="let entry of keyMap.getEntryList('TRN-Editor texteditor')">
                   <td style="width:50%;">{{"modal.shortcuts." + entry.value.title | transloco}}</td>
-                  <td style="width:50%;">{{entry.value.keys[platform]}} <span *ngIf="entry.value.focusonly"
-                                                                              class="focus-info">({{"general.on focus only" | transloco}}
-                    )</span>
+                  <td style="width:50%;">
+                    <octra-shortcut [shortcut]="entry.value.keys[platform]"></octra-shortcut>
+                    <span *ngIf="entry.value.focusonly"
+                          class="focus-info">({{"general.on focus only" | transloco}}
+                      )</span>
                   </td>
                 </tr>
                 </tbody>
@@ -127,9 +137,11 @@
               <tbody>
               <tr *ngFor="let entry of generalShortcuts">
                 <td>{{"modal.shortcuts." + entry.label | transloco}}</td>
-                <td>{{entry.combination[platform]}} <span *ngIf="entry.focusonly"
-                                                          class="focus-info">({{"general.on focus only" | transloco}}
-                  )</span>
+                <td>
+                  <octra-shortcut [shortcut]="entry.combination[platform]"></octra-shortcut>
+                  <span *ngIf="entry.focusonly"
+                        class="focus-info">({{"general.on focus only" | transloco}}
+                    )</span>
                 </td>
               </tr>
               </tbody>

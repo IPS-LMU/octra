@@ -1,0 +1,35 @@
+:host {
+  display: inline-block;
+  margin-left: 5px;
+}
+
+:host .dark,
+:host .light,
+:host .separator {
+  padding: 5px;
+  border-radius: 3px;
+  text-align: center;
+  vertical-align: middle;
+  display: inline-block;
+  min-width: 30px;
+  margin-right: 5px;
+}
+
+:host .dark {
+  background-color: black;
+  color: white;
+}
+
+:host .light {
+  background-color: white;
+  color: black;
+  border: 1px solid gray;
+}
+
+:host .separator {
+  border: none;
+  min-width: auto;
+  padding: 5px 0;
+  color: black;
+  background-color: unset;
+}

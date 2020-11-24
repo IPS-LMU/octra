@@ -1,3 +1,4 @@
 table tbody td {
   width: 50%;
+  vertical-align: middle;
 }

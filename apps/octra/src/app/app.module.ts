@@ -110,6 +110,7 @@ import {IDBEffects} from './core/store/idb/idb-effects.service';
 import {IDBService} from './core/shared/service/idb.service';
 import {ConfigurationEffects} from './core/store/transcription/configuration.effects';
 import {fab} from '@fortawesome/free-brands-svg-icons';
+import {ShortcutComponent} from './core/shortcut/shortcut.component';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -188,7 +189,8 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     ALERTS,
     DynComponentDirective,
     ErrorOccurredComponent,
-    MissingPermissionsModalComponent
+    MissingPermissionsModalComponent,
+    ShortcutComponent
   ],
   imports: [
     BrowserModule,

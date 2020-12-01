@@ -25,6 +25,7 @@ td.fitwidth {
 
 .time-column {
   vertical-align: middle;
+  cursor: pointer;
 }
 
 .viewer {
@@ -63,4 +64,56 @@ td.fitwidth {
 .ng-fa-icon[ng-reflect-icon="fas,play"]:hover,
 .ng-fa-icon[ng-reflect-icon="fas,stop"]:hover {
   cursor: pointer;
+}
+
+.segment-selected td {
+  background-color: #1e1ea2;
+  color: white;
+}
+
+#actionsDropdown {
+  padding: 5px;
+  font-size: 0.8em;
+}
+
+.sub-header {
+  background-color: whitesmoke;
+}
+
+.dropdown-menu {
+  min-width: 200px;
+}
+
+.dropdown-menu table {
+  width: 100%;
+}
+
+.dropdown-menu table tbody tr td {
+  border: none;
+}
+
+.dropdown-row {
+  padding: 3px 10px 3px 10px;
+}
+
+.dropdown-row:hover {
+  background-color: lightskyblue;
+  cursor: pointer;
+}
+
+.dropdown-row td {
+  font-weight: normal;
+  font-size: 0.8em;
+  min-height: 20px;
+  padding: 10px;
+}
+
+.dropdown-icon {
+  padding-left: 15px !important;
+  vertical-align: middle;
+}
+
+.dropdown-option {
+  padding-left: 0 !important;
+  padding-right: 15px !important;
 }

@@ -13,8 +13,7 @@ export class DropZoneComponent implements OnInit {
   innerhtml = '';
   @Input() height = 'auto';
   public clicklocked = false;
-  @Output()
-  public afterdrop: EventEmitter<FileList> = new EventEmitter<FileList>();
+  @Output() public afterdrop: EventEmitter<FileList> = new EventEmitter<FileList>();
   @ViewChild('fileinput', {static: true}) public fileinput: ElementRef;
   private fileAPIsupported = false;
 

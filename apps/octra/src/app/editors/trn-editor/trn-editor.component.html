@@ -1,4 +1,7 @@
 <div id="scroll-container" #scrollContainer>
+  <octra-context-menu #contextMenu [x]="contextMenuProperties.x" [y]="contextMenuProperties.y"
+                      [actions]="contextMenuProperties.actions"
+  ></octra-context-menu>
   <octra-validation-popover #validationPopover
                             [ngStyle]="{
                                 'margin-left': popovers.validation.location.x + 'px',
@@ -10,7 +13,7 @@
     <tr id="table-head">
       <th></th>
       <th style="vertical-align: middle;text-align: center;">{{"general.time" | transloco}}</th>
-      <th style="vertical-align: middle;text-align: center;">{{"general.speaker" | transloco}}</th>
+      <th style="vertical-align: middle;text-align: center;">{{"general.speaker" | transloco}}<br/></th>
       <th style="vertical-align: middle;text-align: center;">{{"general.transcript" | transloco}}</th>
       <th style="text-align: center; vertical-align: middle;">
         <fa-icon (click)="togglePlayAll()" [icon]="['fas', playAllState.icon]" style="margin-right: 5px;"></fa-icon>
@@ -19,9 +22,38 @@
         <label for="skip-silence-checkbox">{{"general.skip silence" | transloco}}</label>
       </th>
     </tr>
+    <tr class="sub-header">
+      <td></td>
+      <td></td>
+      <td>
+        <div class="dropdown">
+          <button class="btn btn-primary btn-sm btn-outline-info dropdown-toggle" type="button" id="actionsDropdown"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Actions
+          </button>
+          <div class="dropdown-menu" aria-labelledby="actionsDropdown">
+            <table>
+              <tbody>
+              <tr (click)="mergeAllWithSameLabel()" class="dropdown-row">
+                <td class="dropdown-icon">
+                  <fa-icon [icon]="['fas', 'object-group']"></fa-icon>
+                </td>
+                <td class="dropdown-option">{{"trn-editor.speaker-actions.merge segments by speaker" | transloco}}</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </td>
+      <td></td>
+      <td></td>
+    </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let segment of shownSegments; let i = index;" class="segment-row">
+    <tr *ngFor="let segment of shownSegments; let i = index;" class="segment-row"
+        [ngClass]="{
+      'segment-selected': segment.isSelected
+    }">
       <td class="active-column fitwidth">
         <fa-icon *ngIf="i === textEditor.selectedSegment; else checkExclamation;" [icon]="['fas', 'circle']"
                  style="color:green;font-size: 10px;"></fa-icon>
@@ -38,7 +70,7 @@
     'alert-info': segment.transcription.text === transcrService.breakMarker.code,
     'alert-danger': segment.transcription.text === '',
     'active-playback': i === playAllState.currentSegment
-  }">
+  }" (click)="onTimestampMouseDown(i)" (contextmenu)="onContextMenuClick($event)">
         {{getStartPoint(i) | timespan: {
         showMilliSeconds: true,
         showHour: true
@@ -51,7 +83,7 @@
     'alert-danger': segment.transcription.text === '',
     'active-playback': i === playAllState.currentSegment
   }" #labelCol (keyup)="onLabelKeyUp(labelCol)" (keydown)="onLabelKeyDown($event, labelCol, i)"
-          (mousedown)="onLabelMouseDown(labelCol, i)">
+          (mousedown)="onSpeakerLabelMouseDown(labelCol, i)">
         {{segment.label}}
       </td>
 

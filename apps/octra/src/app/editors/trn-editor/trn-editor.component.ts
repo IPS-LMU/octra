@@ -9,6 +9,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {
+  AlertService,
   AudioService,
   KeymappingService,
   SettingsService,
@@ -25,6 +26,8 @@ import {ValidationPopoverComponent} from '../../core/component/transcr-editor/va
 import {isUnset, selectAllTextOfNode, SubscriptionManager} from '@octra/utilities';
 import {AudioViewerComponent, AudioviewerConfig} from '@octra/components';
 import {Segment, Segments} from '@octra/annotation';
+import {ContextMenuComponent} from '../../core/component/context-menu/context-menu.component';
+import {TranslocoService} from '@ngneat/transloco';
 
 declare var validateAnnotation: any;
 
@@ -47,21 +50,62 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
               public settingsService: SettingsService,
               public appStorage: AppStorageService,
               private sanitizer: DomSanitizer,
-              private cd: ChangeDetectorRef) {
+              private cd: ChangeDetectorRef,
+              private alertService: AlertService,
+              private translocoService: TranslocoService) {
     super();
     this.subscrManager = new SubscriptionManager();
   }
 
   public static editorname = 'TRN-Editor';
-
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
-
-  private lastMouseOver = 0;
-
-  private subscrManager: SubscriptionManager;
   public showSignalDisplay = false;
   public lastResizing = 0;
+  @ViewChild('transcrEditor', {static: false}) transcrEditor: TranscrEditorComponent;
+  @ViewChild('viewer', {static: false}) viewer: AudioViewerComponent;
+  @ViewChild('validationPopover', {static: true}) validationPopover: ValidationPopoverComponent;
+  @ViewChild('contextMenu', {static: false}) contextMenu: ContextMenuComponent;
 
+  public audioChunk: AudioChunk;
+  audioViewerSettings: AudioviewerConfig;
+  public popovers = {
+    validation: {
+      location: {
+        x: 0,
+        y: 0
+      },
+      visible: false,
+      currentGuideline: {
+        description: '',
+        title: ''
+      },
+      mouse: {
+        enter: false
+      }
+    }
+  };
+
+  public selectedError: any = '';
+  public shownSegments: ShownSegment[] = [];
+
+  public playAllState: {
+    state: 'started' | 'stopped',
+    icon: 'play' | 'stop',
+    currentSegment: number,
+    skipSilence: boolean
+  } = {
+    state: 'stopped',
+    icon: 'play',
+    currentSegment: -1,
+    skipSilence: false
+  };
+
+  public playStateSegments: {
+    state: 'started' | 'stopped',
+    icon: 'play' | 'stop'
+  }[] = [];
+  private lastMouseOver = 0;
+  private subscrManager: SubscriptionManager;
   private shortcuts = {
     enter: {
       keys: {
@@ -104,7 +148,6 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
       focusonly: false
     }
   }
-
   private audioShortcuts = {
     play_pause: {
       keys: {
@@ -140,12 +183,13 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     }
   };
 
-  @ViewChild('transcrEditor', {static: false}) transcrEditor: TranscrEditorComponent;
-  @ViewChild('viewer', {static: false}) viewer: AudioViewerComponent;
-  @ViewChild('validationPopover', {static: true}) validationPopover: ValidationPopoverComponent;
-  public audioChunk: AudioChunk;
-
-  audioViewerSettings: AudioviewerConfig;
+  private audioManager: AudioManager;
+  private tempSegments: Segments;
+  private selectedCell = {
+    labelText: '',
+    row: 0,
+    column: 1
+  }
 
   private _textEditor = {
     state: 'inactive',
@@ -154,56 +198,57 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     audiochunk: null
   };
 
-  public popovers = {
-    validation: {
-      location: {
-        x: 0,
-        y: 0
-      },
-      visible: false,
-      currentGuideline: {
-        description: '',
-        title: ''
-      },
-      mouse: {
-        enter: false
+  contextMenuProperties = {
+    x: 0,
+    y: 0,
+    actions: []
+  };
+
+  mergeAllWithSameLabel = () => {
+    let intervals: {
+      start: number,
+      length: number
+    }[] = [
+      {
+        start: 0,
+        length: 0
+      }
+    ]
+
+    let intervalCounter = 0;
+
+    for (let i = 1; i < this.transcrService.currentlevel.segments.segments.length; i++) {
+      const segment = this.transcrService.currentlevel.segments.segments[i];
+      const previousSegment = this.transcrService.currentlevel.segments.segments[i - 1];
+
+      if (segment.speakerLabel === previousSegment.speakerLabel) {
+        intervals[intervalCounter].length++;
+      } else {
+        intervals.push({
+          start: i,
+          length: 0
+        });
+        intervalCounter++;
       }
     }
-  };
 
-  public selectedError: any = '';
-  public shownSegments: {
-    label: string;
-    transcription: {
-      safeHTML: SafeHtml,
-      text: string
+    intervals = intervals.filter(a => a.length > 0);
+    console.log(intervals);
+    for (let j = intervals.length - 1; j > -1; j--) {
+      const interval = intervals[j];
+      this.transcrService.currentlevel.segments.combineSegments(
+        interval.start, interval.start + interval.length, this.transcrService.breakMarker.code);
+
+      for (let i = interval.start + interval.length - 1; i > interval.start - 1; i--) {
+        console.log(`remove boundary at row ${i} (${interval.start} - ${interval.start + interval.length})`);
+      }
     }
-  }[] = [];
+    this.transcrService.validateAll();
+    this.updateSegments();
+    this.cd.markForCheck();
+    this.cd.detectChanges();
 
-  private audioManager: AudioManager;
-  private tempSegments: Segments;
-
-  public playAllState: {
-    state: 'started' | 'stopped',
-    icon: 'play' | 'stop',
-    currentSegment: number,
-    skipSilence: boolean
-  } = {
-    state: 'stopped',
-    icon: 'play',
-    currentSegment: -1,
-    skipSilence: false
-  };
-
-  public playStateSegments: {
-    state: 'started' | 'stopped',
-    icon: 'play' | 'stop'
-  }[] = [];
-
-  private selectedCell = {
-    labelText: '',
-    row: 0,
-    column: 1
+    this.alertService.showAlert('success', this.translocoService.translate('alerts.combine segments successful'));
   }
 
   ngAfterViewInit() {
@@ -276,20 +321,35 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     this.selectedCell.labelText = labelCol.innerText;
   }
 
-  private saveNewLabel(index: number, newLabel: string) {
-    console.log(`save label for ${index}: ${newLabel}`);
-    const segment = this.transcrService.currentlevel.segments.get(index).clone();
-    segment.speakerLabel = newLabel;
-    this.transcrService.currentlevel.segments.change(index, segment);
-  }
-
-  onLabelMouseDown(labelCol: HTMLTableCellElement, rowNumber: number) {
+  onSpeakerLabelMouseDown(labelCol: HTMLTableCellElement, rowNumber: number) {
+    this.deselectAllRows();
     labelCol.contentEditable = 'true';
     this.selectedCell = {
       labelText: labelCol.innerText,
       row: rowNumber,
       column: 1
     };
+  }
+
+  onTimestampMouseDown(rowNumber: number) {
+    // de-/select row
+    if (this._textEditor.state !== 'active') {
+      const shownSegment = this.shownSegments[rowNumber];
+      shownSegment.isSelected = !shownSegment.isSelected;
+    }
+  }
+
+  onContextMenuClick($event: MouseEvent) {
+    $event.preventDefault();
+    this.contextMenuProperties.x = $event.clientX;
+    this.contextMenuProperties.y = $event.pageY - 80;
+
+    if (!isUnset(this.contextMenu)) {
+      this.contextMenu.showMenue();
+    }
+
+    this.cd.markForCheck();
+    this.cd.detectChanges();
   }
 
   onTranscriptCellMouseOver($event, rowNumber, scrollContainer: HTMLDivElement) {
@@ -346,73 +406,10 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
   }
 
   onTranscriptCellMouseDown($event, i) {
+    this.deselectAllRows();
     this.closeTextEditor().then(() => {
       this.openTranscrEditor(i);
     });
-  }
-
-  private openTranscrEditor(segmentIndex: number) {
-    if (!this._textEditor.openingBlocked) {
-      this._textEditor.openingBlocked = true;
-
-      const overallTime = Date.now();
-      this.textEditor.state = 'active';
-      this.textEditor.selectedSegment = segmentIndex;
-      this.showSignalDisplay = true;
-      this.cd.markForCheck();
-      this.cd.detectChanges();
-
-      let started = 0;
-
-      const segments = this.transcrService.currentlevel.segments.segments;
-      this.tempSegments = this.transcrService.currentlevel.segments.clone();
-      const segment = segments[segmentIndex];
-      const segmentStart = (segmentIndex > 0) ? segments[segmentIndex - 1].time : this.transcrService.audioManager.createSampleUnit(0);
-      const audiochunk = new AudioChunk(new AudioSelection(segmentStart, segment.time), this.audioManager);
-
-      this.audioManager.addChunk(audiochunk);
-      this.textEditor.audiochunk = audiochunk;
-      this.showSignalDisplay = false;
-      started = Date.now();
-      this.cd.markForCheck();
-      this.cd.detectChanges();
-      console.log(`detected Changes ended: ${Date.now() - started}ms`);
-
-      this.subscrManager.add(
-        this.transcrEditor.loaded.subscribe(() => {
-          this.subscrManager.removeByTag('openingBlocked');
-          this._textEditor.openingBlocked = false;
-          this.transcrEditor.focus();
-        }), 'openingBlocked');
-
-      this.transcrEditor.Settings.btnPopover = false;
-      this.transcrEditor.Settings.specialMarkers.boundary = true;
-      this.transcrEditor.Settings.markers = this.transcrService.guidelines.markers.items;
-
-      this.transcrEditor.validationEnabled = this.appStorage.useMode !== LoginMode.URL &&
-        (this.appStorage.useMode === LoginMode.DEMO || this.settingsService.projectsettings.octra.validationEnabled);
-      started = Date.now();
-      this.transcrEditor.initialize();
-      console.log(`init transccrEditor ended: ${Date.now() - started}ms`);
-
-      started = Date.now();
-      this.cd.markForCheck();
-      this.cd.detectChanges();
-      console.log(`detected Changes ended: ${Date.now() - started}ms`);
-
-      started = Date.now();
-      this.transcrEditor.rawText = segment.transcript;
-      console.log(`set rawtext ended: ${Date.now() - started}ms`);
-
-      this.selectedCell = {
-        labelText: '',
-        row: segmentIndex,
-        column: 2
-      };
-      console.log(`openTranscrEditor ended: ${Date.now() - overallTime}ms`);
-    } else {
-      console.error(`can't open texteditor because it's blocked!`);
-    }
   }
 
   focusOnNextSpeakerLabel(segmentNumber: number) {
@@ -437,56 +434,21 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     return this.sanitizer.bypassSecurityTrustHtml(str);
   }
 
-  private updateSegments() {
-    this.playStateSegments = [];
-    const segments = this.transcrService.currentlevel.segments.segments;
-    this.shownSegments = [];
-
-    let startTime = 0;
-    const result = [];
-
-    for (let i = 0; i < segments.length; i++) {
-      const segment = segments[i];
-
-      const obj = this.getShownSegment(startTime, segment.time.samples, segment.speakerLabel, segment.transcript, i);
-
-      result.push(obj);
-
-      startTime = segment.time.samples;
-
-      // set playState
-      this.playStateSegments.push({
-        state: 'stopped',
-        icon: 'play'
-      });
-    }
-
-    this.shownSegments = result;
-  }
-
-
-  getShownSegment(startSamples: number, endSamples: number, label: string, rawText: string, i: number): {
-    start: number,
-    end: number,
-    label: string,
-    transcription: {
-      text: string,
-      safeHTML: SafeHtml
-    },
-    validation: string
-  } {
-    const obj = {
+  getShownSegment(startSamples: number, segment: Segment, i: number): ShownSegment {
+    const obj: ShownSegment = {
       start: startSamples,
-      end: endSamples,
-      label,
+      end: segment.time.samples,
+      label: segment.speakerLabel,
+      id: segment.id,
+      isSelected: false,
       transcription: {
-        text: rawText,
+        text: segment.transcript,
         safeHTML: null
       },
       validation: ''
     };
 
-    let html = rawText;
+    let html = segment.transcript;
     if (this.appStorage.useMode !== LoginMode.URL) {
       if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function'
         && !isUnset(this.transcrService.validationArray[i])) {
@@ -513,6 +475,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
 
     html = html.replace(/(<p>)|(<\/p>)/g, '');
     obj.transcription.safeHTML = this.sanitizeHTML(html);
+
     return obj;
   }
 
@@ -577,18 +540,6 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     });
   }
 
-  private waitForTranscrEditor() {
-    return new Promise<void>((resolve, reject) => {
-      if (!isUnset(this.transcrEditor)) {
-        this.transcrEditor.waitForValidationFinished().then(() => {
-          resolve();
-        });
-      } else {
-        resolve();
-      }
-    });
-  }
-
   updateTempSegments() {
     const segStart = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(
       this._textEditor.audiochunk.time.start.add(new SampleUnit(20, this.audioManager.sampleRate))
@@ -642,7 +593,6 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
       this.tempSegments.get(segStart + segTexts.length - 1).transcript = segTexts[segTexts.length - 1];
     }
   }
-
 
   save() {
     this.updateTempSegments();
@@ -974,43 +924,185 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
             this.navigateBetweenCells('left', this.selectedCell.row);
             break;
           case('play_pause'):
-            $event.event.preventDefault();
-            triggerUIAction({shortcut: $event.comboKey, value: shortcut});
-            if (this._textEditor.audiochunk.isPlaying) {
-              this._textEditor.audiochunk.pausePlayback().catch((error) => {
-                console.error(error);
-              });
-            } else {
-              this._textEditor.audiochunk.startPlayback(false).catch((error) => {
+            if (this._textEditor.state === 'active') {
+              $event.event.preventDefault();
+              triggerUIAction({shortcut: $event.comboKey, value: shortcut});
+              if (this._textEditor.audiochunk.isPlaying) {
+                this._textEditor.audiochunk.pausePlayback().catch((error) => {
+                  console.error(error);
+                });
+              } else {
+                this._textEditor.audiochunk.startPlayback(false).catch((error) => {
+                  console.error(error);
+                });
+              }
+            }
+            break;
+          case('stop'):
+            if (this._textEditor.state === 'active') {
+              $event.event.preventDefault();
+              triggerUIAction({shortcut: $event.comboKey, value: shortcut});
+              this._textEditor.audiochunk.stopPlayback().catch((error) => {
                 console.error(error);
               });
             }
             break;
-          case('stop'):
-            $event.event.preventDefault();
-            triggerUIAction({shortcut: $event.comboKey, value: shortcut});
-            this._textEditor.audiochunk.stopPlayback().catch((error) => {
-              console.error(error);
-            });
-            break;
           case('step_backward'):
-            $event.event.preventDefault();
-            console.log(`step backward`);
-            triggerUIAction({shortcut: $event.comboKey, value: shortcut});
-            this._textEditor.audiochunk.stepBackward().catch((error) => {
-              console.error(error);
-            });
+            if (this._textEditor.state === 'active') {
+              $event.event.preventDefault();
+              triggerUIAction({shortcut: $event.comboKey, value: shortcut});
+              this._textEditor.audiochunk.stepBackward().catch((error) => {
+                console.error(error);
+              });
+            }
             break;
           case('step_backwardtime'):
-            $event.event.preventDefault();
-            console.log(`step backward time`);
-            triggerUIAction({shortcut: $event.comboKey, value: shortcut});
-            this._textEditor.audiochunk.stepBackwardTime(0.5).catch((error) => {
-              console.error(error);
-            });
+            if (this._textEditor.state === 'active') {
+              $event.event.preventDefault();
+              triggerUIAction({shortcut: $event.comboKey, value: shortcut});
+              this._textEditor.audiochunk.stepBackwardTime(0.5).catch((error) => {
+                console.error(error);
+              });
+            }
             break;
         }
       }
     });
   }
+
+  private saveNewLabel(index: number, newLabel: string) {
+    const segment = this.transcrService.currentlevel.segments.get(index).clone();
+    segment.speakerLabel = newLabel;
+    this.transcrService.currentlevel.segments.change(index, segment);
+  }
+
+  private openTranscrEditor(segmentIndex: number) {
+    if (!this._textEditor.openingBlocked) {
+      this._textEditor.openingBlocked = true;
+
+      const overallTime = Date.now();
+      this.textEditor.state = 'active';
+      this.textEditor.selectedSegment = segmentIndex;
+      this.showSignalDisplay = true;
+      this.cd.markForCheck();
+      this.cd.detectChanges();
+
+      let started = 0;
+
+      const segments = this.transcrService.currentlevel.segments.segments;
+      this.tempSegments = this.transcrService.currentlevel.segments.clone();
+      const segment = segments[segmentIndex];
+      const segmentStart = (segmentIndex > 0) ? segments[segmentIndex - 1].time : this.transcrService.audioManager.createSampleUnit(0);
+      const audiochunk = new AudioChunk(new AudioSelection(segmentStart, segment.time), this.audioManager);
+
+      this.audioManager.addChunk(audiochunk);
+      this.textEditor.audiochunk = audiochunk;
+      this.showSignalDisplay = false;
+      started = Date.now();
+      this.cd.markForCheck();
+      this.cd.detectChanges();
+      console.log(`detected Changes ended: ${Date.now() - started}ms`);
+
+      this.subscrManager.add(
+        this.transcrEditor.loaded.subscribe(() => {
+          this.subscrManager.removeByTag('openingBlocked');
+          this._textEditor.openingBlocked = false;
+          this.transcrEditor.focus();
+        }), 'openingBlocked');
+
+      this.transcrEditor.Settings.btnPopover = false;
+      this.transcrEditor.Settings.specialMarkers.boundary = true;
+      this.transcrEditor.Settings.markers = this.transcrService.guidelines.markers.items;
+
+      this.transcrEditor.validationEnabled = this.appStorage.useMode !== LoginMode.URL &&
+        (this.appStorage.useMode === LoginMode.DEMO || this.settingsService.projectsettings.octra.validationEnabled);
+      started = Date.now();
+      this.transcrEditor.initialize();
+      console.log(`init transccrEditor ended: ${Date.now() - started}ms`);
+
+      started = Date.now();
+      this.cd.markForCheck();
+      this.cd.detectChanges();
+      console.log(`detected Changes ended: ${Date.now() - started}ms`);
+
+      started = Date.now();
+      this.transcrEditor.rawText = segment.transcript;
+      console.log(`set rawtext ended: ${Date.now() - started}ms`);
+
+      this.selectedCell = {
+        labelText: '',
+        row: segmentIndex,
+        column: 2
+      };
+      console.log(`openTranscrEditor ended: ${Date.now() - overallTime}ms`);
+    } else {
+      console.error(`can't open texteditor because it's blocked!`);
+    }
+  }
+
+  private updateSegments() {
+    this.playStateSegments = [];
+    const segments = this.transcrService.currentlevel.segments.segments;
+    const oldShownSegments = [...this.shownSegments];
+    this.shownSegments = [];
+
+    let startTime = 0;
+    const result: ShownSegment[] = [];
+
+    for (let i = 0; i < segments.length; i++) {
+      const segment = segments[i];
+      const obj = this.getShownSegment(startTime, segment, i);
+      const foundOldShownSegmentIndex = oldShownSegments.findIndex(a => a.id === segment.id);
+      obj.isSelected = (foundOldShownSegmentIndex > -1) ? oldShownSegments[foundOldShownSegmentIndex].isSelected : false;
+
+      result.push(obj);
+
+      startTime = segment.time.samples;
+
+      // set playState
+      this.playStateSegments.push({
+        state: 'stopped',
+        icon: 'play'
+      });
+    }
+
+    this.shownSegments = result;
+  }
+
+  private waitForTranscrEditor() {
+    return new Promise<void>((resolve, reject) => {
+      if (!isUnset(this.transcrEditor)) {
+        this.transcrEditor.waitForValidationFinished().then(() => {
+          resolve();
+        });
+      } else {
+        resolve();
+      }
+    });
+  }
+
+  private deselectAllRows() {
+    for (const shownSegment of this.shownSegments) {
+      shownSegment.isSelected = false;
+    }
+  }
+
+  private selectAllRows() {
+    for (const shownSegment of this.shownSegments) {
+      shownSegment.isSelected = true;
+    }
+  }
+}
+
+interface ShownSegment {
+  start: number;
+  end: number;
+  label: string;
+  id: number;
+  isSelected: boolean;
+  transcription: {
+    text: string;
+    safeHTML: SafeHtml;
+  },
+  validation: string;
 }

@@ -111,6 +111,7 @@ import {IDBService} from './core/shared/service/idb.service';
 import {ConfigurationEffects} from './core/store/transcription/configuration.effects';
 import {fab} from '@fortawesome/free-brands-svg-icons';
 import {ShortcutComponent} from './core/shortcut/shortcut.component';
+import {ContextMenuComponent} from './core/component/context-menu/context-menu.component';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -190,7 +191,8 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     DynComponentDirective,
     ErrorOccurredComponent,
     MissingPermissionsModalComponent,
-    ShortcutComponent
+    ShortcutComponent,
+    ContextMenuComponent
   ],
   imports: [
     BrowserModule,
@@ -213,7 +215,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     PopoverModule.forRoot(),
     TranslocoModule,
     DragulaModule.forRoot(),
-
     TooltipModule.forRoot(),
     StoreModule.forRoot(
       {

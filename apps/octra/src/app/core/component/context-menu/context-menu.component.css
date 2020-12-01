@@ -1,0 +1,37 @@
+#context-menu {
+  background-color: white;
+  border: 1px solid gray;
+  border-radius: 3px;
+  font-size: 0.8em;
+  box-shadow: 0 0 5px grey;
+}
+
+:host {
+  position: absolute;
+}
+
+table {
+  border-top: 1px solid lightgray;
+  border-collapse: collapse;
+}
+
+tbody tr td {
+  padding: 3px 0;
+  border-bottom: 1px solid lightgray;
+}
+
+tbody tr:hover {
+  background-color: lightskyblue;
+  cursor: pointer;
+}
+
+tbody tr .icon-column {
+  padding-left: 20px;
+  padding-right: 3px;
+  user-select: none;
+}
+
+tbody tr .action-column {
+  padding-right: 20px;
+  user-select: none;
+}

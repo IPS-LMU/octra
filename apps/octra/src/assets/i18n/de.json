@@ -351,6 +351,7 @@
   },
   "alerts": {
     "authentication needed": "Authentifiziere Dich, damit Du Features wie die automatische Spracherkennung Wort-Segmentierung verwenden kannst. Nach einem Klick auf \"Authentifizieren\" erscheint ein separates Fenster. Falls sich kein Fenster öffnet, stelle sicher, dass dein Browser Popups für diese Seite erlaubt."
+    "combine segments successful": "Das Kombinieren von Segmenten mit gleichen Sprecher-Label war erfolgreich."
   },
   "authentication": {
     "you are authenticated": "Du bist authentifiziert!",
@@ -365,6 +366,11 @@
       "add timestamps": "Trenne Segmente durch Zeitstempel im lesbaren Format (HH:MM:SS.s)",
       "add samplepoints": "Trenne Segmente durch Zeitstempel im Sample-Format (z.B. 123456)",
       "timestamp notice": "Wenn Du beide Optionen aktivierst, werden beide Formate eingefügt:"
+    }
+  },
+  "trn-editor": {
+    "speaker-actions": {
+      "merge segments by speaker": "Führe Segmente mit gleichem Sprecher-Label zusammen"
     }
   }
 }

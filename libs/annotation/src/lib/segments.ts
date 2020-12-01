@@ -99,20 +99,26 @@ export class Segments {
     }
   }
 
-  public removeByIndex(index: number, breakmarker: string, triggerChange = true) {
+  /***
+   * removes a boundary and concatenates the transcripts of its neighbour.
+   * @param index index of the boundary
+   * @param breakMarker the break marker
+   * @param triggerChange shall the change event be triggered?
+   */
+  public removeByIndex(index: number, breakMarker: string, triggerChange = true) {
     if (index > -1 && index < this.segments.length) {
       const segment = this.segments[index];
-      if (index < this.segments.length - 1 && !isUnset(breakmarker) && breakmarker !== '') {
+      if (index < this.segments.length - 1 && !isUnset(breakMarker) && breakMarker !== '') {
         const nextSegment = this.segments[index + 1];
         const transcription: string = this.segments[index].transcript;
-        if (nextSegment.transcript !== breakmarker && transcription !== breakmarker) {
+        if (nextSegment.transcript !== breakMarker && transcription !== breakMarker) {
           // concat transcripts
           if (nextSegment.transcript !== '' && transcription !== '') {
             nextSegment.transcript = transcription + ' ' + nextSegment.transcript;
           } else if (nextSegment.transcript === '' && transcription !== '') {
             nextSegment.transcript = transcription;
           }
-        } else if (nextSegment.transcript === breakmarker) {
+        } else if (nextSegment.transcript === breakMarker) {
           // delete pause
           nextSegment.transcript = transcription;
         }
@@ -333,5 +339,16 @@ export class Segments {
         --i;
       }
     }
+  }
+
+  public combineSegments(segmentIndexStart: number, segmentIndexEnd: number, breakMarker: string) {
+    for (let i = segmentIndexStart; i < segmentIndexEnd; i++) {
+      this.removeByIndex(i, breakMarker, false);
+      i--;
+      segmentIndexEnd--;
+    }
+
+    // trigger change
+    this.onsegmentchange.emit(null);
   }
 }

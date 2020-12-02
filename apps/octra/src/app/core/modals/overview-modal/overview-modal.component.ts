@@ -1,12 +1,15 @@
-import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
-import {TranscrOverviewComponent} from '../../component/transcr-overview';
 import {TranscriptionFeedbackComponent} from '../../component/transcription-feedback/transcription-feedback.component';
-import {SubscriptionManager} from '@octra/utilities';
+import {isFunction, isUnset, SubscriptionManager} from '@octra/utilities';
 import {KeymappingService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {LoginMode} from '../../store';
+import {NavbarService} from '../../component/navbar/navbar.service';
+
+declare var validateAnnotation: ((string, any) => any);
+declare var tidyUpAnnotation: ((string, any) => any);
 
 @Component({
   selector: 'octra-overview-modal',
@@ -26,7 +29,6 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
 
   @ViewChild('modal', {static: true}) modal: any;
   @ViewChild('feedback', {static: false}) feedback: TranscriptionFeedbackComponent;
-  @ViewChild('overview', {static: true}) overview: TranscrOverviewComponent;
   @Output() transcriptionSend = new EventEmitter<void>();
 
   protected data = null;
@@ -49,12 +51,24 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
     );
   }
 
+  public selectedError: any = '';
+  public shownSegments: {
+    transcription: {
+      html: string,
+      text: string
+    }
+  }[] = [];
+
+  public trnEditorswitch = new EventEmitter<void>();
+
   constructor(public transcrService: TranscriptionService,
               public ms: BsModalService,
               public settingsService: SettingsService,
               public appStorage: AppStorageService,
               private keyService: KeymappingService,
-              private uiService: UserInteractionsService) {
+              private uiService: UserInteractionsService,
+              private cd: ChangeDetectorRef,
+              private navbarService: NavbarService) {
   }
 
   ngOnInit() {
@@ -137,6 +151,8 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
 
       this.uiService.addElementFromEvent('overview', {value: 'opened'},
         Date.now(), null, null, null, null, 'overview');
+
+      this.updateView();
     });
   }
 
@@ -155,9 +171,6 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
       if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
         this.feedback.saveFeedbackform();
       }
-      this.overview.stopPlayback().catch((error) => {
-        console.error(error);
-      });
 
       if (fromModal) {
         this.uiService.addElementFromEvent('overview', {value: 'closed'},
@@ -175,9 +188,6 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
     if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
       this.feedback.saveFeedbackform();
     }
-    this.overview.stopPlayback().catch((error) => {
-      console.error(error);
-    });
     this.transcriptionSend.emit();
   }
 
@@ -215,5 +225,126 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
     if (this.sendValidTranscriptOnly && this.transcrService.transcriptValid || !this.sendValidTranscriptOnly) {
       this.sendTranscription();
     }
+  }
+
+  public get numberOfSegments(): number {
+    return (this.transcrService.currentlevel.segments) ? this.transcrService.currentlevel.segments.length : 0;
+  }
+
+  public get transcrSegments(): number {
+    return (this.transcrService.currentlevel.segments) ? this.transcrService.statistic.transcribed : 0;
+  }
+
+  public get pauseSegments(): number {
+    return (this.transcrService.currentlevel.segments) ? this.transcrService.statistic.pause : 0;
+  }
+
+  public get emptySegments(): number {
+    return (this.transcrService.currentlevel.segments) ? this.transcrService.statistic.empty : 0;
+  }
+
+  public get foundErrors(): number {
+    let found = 0;
+
+    if (this.shownSegments.length > 0) {
+      let resultStr = '';
+      for (const shownSegment of this.shownSegments) {
+        resultStr += shownSegment.transcription.html;
+      }
+
+      found = (resultStr.match(/<span class='val-error'/) || []).length;
+    }
+
+    return found;
+  }
+
+  public get validationFound() {
+    return ((typeof validateAnnotation !== 'undefined') && isFunction(validateAnnotation) &&
+      (typeof tidyUpAnnotation !== 'undefined') && isFunction(tidyUpAnnotation));
+  }
+
+  updateView() {
+    console.log(`update View!`);
+    this.updateSegments();
+    this.transcrService.analyse();
+
+    this.cd.markForCheck();
+    this.cd.detectChanges();
+  }
+
+  getShownSegment(startSamples: number, endSamples: number, rawText: string, i: number): {
+    start: number,
+    end: number,
+    transcription: {
+      text: string,
+      html: string
+    },
+    validation: string
+  } {
+    const obj = {
+      start: startSamples,
+      end: endSamples,
+      transcription: {
+        text: rawText,
+        html: rawText
+      },
+      validation: ''
+    };
+
+    if (this.appStorage.useMode !== LoginMode.URL) {
+      if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function'
+        && !isUnset(this.transcrService.validationArray[i])) {
+        obj.transcription.html = this.transcrService.underlineTextRed(obj.transcription.text,
+          this.transcrService.validationArray[i].validation);
+      }
+
+      obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
+      obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
+        if (g1 === '[[[') {
+          return '<';
+        }
+        return '>';
+      });
+    } else {
+      obj.transcription.html = this.transcrService.rawToHTML(obj.transcription.html);
+      obj.transcription.html = obj.transcription.html.replace(/((?:\[\[\[)|(?:]]]))/g, (g0, g1) => {
+        if (g1 === '[[[') {
+          return '<';
+        }
+        return '>';
+      });
+    }
+
+    obj.transcription.html = obj.transcription.html.replace(/(<p>)|(<\/p>)/g, '');
+    return obj;
+  }
+
+  private updateSegments() {
+    if (this.transcrService.validationArray.length > 0 || this.appStorage.useMode === LoginMode.URL
+      || !this.settingsService.projectsettings.octra.validationEnabled) {
+      if (!this.transcrService.currentlevel.segments || !this.transcrService.guidelines) {
+        this.shownSegments = [];
+      }
+
+      let startTime = 0;
+      const result = [];
+
+      for (let i = 0; i < this.transcrService.currentlevel.segments.length; i++) {
+        const segment = this.transcrService.currentlevel.segments.segments[i];
+
+        const obj = this.getShownSegment(startTime, segment.time.samples, segment.transcript, i);
+
+        result.push(obj);
+
+        startTime = segment.time.samples;
+      }
+
+      this.shownSegments = result;
+    }
+  }
+
+  switchToTRNEditor($event) {
+    this.navbarService.interfacechange.emit('TRN-Editor');
+    this.close(false);
   }
 }

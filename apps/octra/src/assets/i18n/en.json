@@ -98,7 +98,8 @@
     "reload": "reload",
     "Options": "Options",
     "time": "Time",
-    "speaker": "Speaker"
+    "speaker": "Speaker",
+    "switch to": "Switch to {{editor}}"
   },
   "bug report": {
     "give feedback": "Give feedback",
@@ -225,6 +226,9 @@
       "step2": "Click on the button next to 'Autoplay'.",
       "step3": "Click on \"Allow Audio and Video\".",
       "step4": "Click on the \"RELOAD\" button below."
+    },
+    "overview": {
+      "check transcription": "Switch to TRN-Editor and check your transcript."
     }
   },
   "login": {

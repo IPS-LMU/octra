@@ -17,13 +17,43 @@
                         'col-md-6 col-lg-9': appStorage.useMode === 'online' || this.appStorage.useMode === 'demo',
                         'col-12': appStorage.useMode !== 'online' && this.appStorage.useMode !== 'demo'
                     }" class="col-md-6" style="overflow: auto; max-height:1200px;border-right:1px solid lightgray;">
-            <octra-transcr-overview
-              #overview
-              (segmentclicked)="onSegmentInOverviewClicked($event)"
-              [segments]="(transcrService.annotation !== null && transcrService.annotation !== undefined)
-                              ? transcrService.currentlevel?.segments?.segments: null"
-              [visible]="visible">
-            </octra-transcr-overview>
+            <h4>{{"general.statistics" | transloco}}</h4>
+
+            <table class="table table-bordered" id="statistics">
+              <thead>
+              <tr>
+                <th>{{"segments.total" | transloco}}</th>
+                <th>{{"segments.transcribed" | transloco}}</th>
+                <th>{{"segments.with breaks" | transloco}}</th>
+                <th>{{"segments.not transcribed" | transloco}}</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td class="alert-default">{{numberOfSegments}}</td>
+                <td class="alert-success">{{transcrSegments}}</td>
+                <td class="alert-info">{{pauseSegments}}</td>
+                <td class="alert-danger"><b><u>{{emptySegments}}</u></b></td>
+              </tr>
+              </tbody>
+            </table>
+            <p [hidden]="shownSegments.length === 0" style="text-align: center">
+              <ng-container *ngIf="validationFound">
+        <span *ngIf="foundErrors === 0"
+              class="text-success found-errors">{{"general.no errors found" | transloco}}</span>
+                <div *ngIf="foundErrors > 0">
+                  <div class="text-danger found-errors">
+                    {{"general.errors found" | transloco : {errors: foundErrors + ''} }}<br/>
+                    {{"modal.overview.check transcription" | transloco}}
+                  </div>
+                  <button class="btn btn-primary btn-raised"
+                          (click)="switchToTRNEditor($event)">{{"general.switch to" | transloco:{
+                    editor: 'interfaces.TRN editor' | transloco
+                  } }}</button>
+                </div>
+              </ng-container>
+              <span *ngIf="!validationFound">No validation methods found</span>
+            </p>
           </div>
           <div *ngIf="appStorage.useMode === 'online' || this.appStorage.useMode === 'demo'" class="col-md-6 col-lg-3"
                style="overflow: auto;max-height:1200px;">

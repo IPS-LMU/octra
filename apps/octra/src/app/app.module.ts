@@ -98,7 +98,6 @@ import {NavigationComponent} from './core/component/navbar';
 import {ReloadFileComponent} from './core/pages/reload-file';
 import {TranscriptionComponent} from './core/pages/transcription';
 import {TranscriptionEndComponent} from './core/pages/transcription-end';
-import {TranscrOverviewComponent} from './core/component/transcr-overview';
 import {TranscrWindowComponent} from './editors/2D-editor/transcr-window';
 import {OctraModalComponent} from './core/modals/octra-modal';
 import * as fromLogin from './core/store/login/login.reducer';
@@ -156,7 +155,6 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     TranscrEditorComponent,
     TranscriptionComponent,
     TranscriptionEndComponent,
-    TranscrOverviewComponent,
     TranscrWindowComponent,
     Error404Component,
     YesNoModalComponent,

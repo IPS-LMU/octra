@@ -209,7 +209,8 @@
       "save and next cell": "Speichern und zur nächsten Zelle",
       "save and under cell": "Speichern und eine Zelle nach unten",
       "save and previous cell": "Speichern und zur vorherigen Zelle",
-      "save and upper cell": "Speichern und eine Zelle nach oben"
+      "save and upper cell": "Speichern und eine Zelle nach oben",
+      "switch to": "Wechsle zu {{editor}}"
     },
     "inactivity": {
       "header": "Längere Inaktivität entdeckt",
@@ -225,6 +226,9 @@
       "step2": "Klicke auf die Schaltfläche rechts von \"Autoplay\".",
       "step3": "Klicke aud \"Audio und Video erlauben\".",
       "step4": "Klicke auf die \"NEU LADEN\" Schaltfläche unter diesem Schritt."
+    },
+    "overview": {
+      "check transcription": "Wechsle zu dem TRN-Editor und überprüfe dein Transkript."
     }
   },
   "login": {

@@ -77,7 +77,7 @@ export class FileInfo extends DataInfo {
       this._extension = extraction.extension;
       this._file = file;
     } else {
-      throw Error('could not extract file name.');
+      throw new Error(`could not extract file name: fullname ${fullname}`);
     }
   }
 

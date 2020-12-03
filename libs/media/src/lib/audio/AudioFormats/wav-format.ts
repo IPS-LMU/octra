@@ -106,7 +106,7 @@ export class WavFormat extends AudioFormat {
 
         console.log(`cut audio file`);
         this.extractDataFromArray(segment.sampleStart, segment.sampleDur, u8array).then((data: Uint8Array | Uint16Array) => {
-          resolve(this.getFileFromBufferPart(data, filename));
+          resolve(this.getFileFromBufferPart(data, this._channels, filename));
         }).catch((error) => {
           reject(error);
         });
@@ -116,9 +116,9 @@ export class WavFormat extends AudioFormat {
     });
   }
 
-  public getFileDataView(data: Uint8Array | Uint16Array): ArrayBuffer {
+  public getFileDataView(data: Uint8Array | Uint16Array, channels: number): ArrayBuffer {
     // creates a mono data view
-    const blockAlign = this._channels * this._bitsPerSample / 8;
+    const blockAlign = channels * this._bitsPerSample / 8;
     const subChunk2Size = data.length * blockAlign;
 
     const buffer = new ArrayBuffer(44 + data.byteLength);
@@ -137,7 +137,7 @@ export class WavFormat extends AudioFormat {
     /* sample format (raw) */
     dataView.setUint16(20, 1, true);
     /* channel count */
-    dataView.setUint16(22, this._channels, true);
+    dataView.setUint16(22, channels, true);
     /* sample rate */
     dataView.setUint32(24, this._sampleRate, true);
     /* byte rate (sample rate * block align) */
@@ -190,7 +190,7 @@ export class WavFormat extends AudioFormat {
           return Math.round(segment.sampleStart / this.sampleRate * 1000) / 1000;
       }
       return g1;
-    }) + extension;
+    });
   }
 
   /***
@@ -208,7 +208,7 @@ export class WavFormat extends AudioFormat {
 
       // one block contains one sample of each channel
       // eg. blockAlign = 4 Byte => 2 * 8 Channel1 + 2 * 8 Channel2 = 32Bit = 4 Byte
-      const channels = (selectedChannel) ? 1 : this._channels;
+      const channels = (!isUnset(selectedChannel)) ? 1 : this._channels;
       const blockAlign = (this._bitsPerSample / 8) * channels;
 
       let start = sampleStart * blockAlign;
@@ -237,13 +237,32 @@ export class WavFormat extends AudioFormat {
           resolve(result);
         } else {
           // get data from selected channel only
-          let j = 0;
-          startPos = (selectedChannel > 0) ? startPos + 1 : startPos;
-          for (let i = startPos; i < endPos; i++) {
-            result[j] = convertedData[i];
-            i++;
-            j++;
+
+          const channelData: (Uint8Array | Uint16Array)[] = [];
+          let dataStart = 44;
+          for (let i = 0; i < this._channels; i++) {
+            if (this._bitsPerSample === 16) {
+              dataStart = 22;
+              channelData.push(new Uint16Array(Math.round(dataStart + dataChunkLength)));
+            } else {
+              channelData.push(new Uint8Array(Math.round(dataStart + dataChunkLength)));
+            }
           }
+
+          let pointer = 0;
+          for (let i = startPos; i < endPos * this._channels; i++) {
+            try {
+              for (let j = 0; j < this._channels; j++) {
+                channelData[j][dataStart + pointer] = convertedData[dataStart + i + j];
+              }
+              i++;
+              pointer++;
+            } catch (e) {
+              reject(e);
+            }
+          }
+
+          result = channelData[selectedChannel];
           resolve(result);
         }
       } else {
@@ -337,47 +356,39 @@ export class WavFormat extends AudioFormat {
     }
   }
 
-  private getFileFromBufferPart(data: Uint8Array | Uint16Array, filename: string): File {
-    return new File([this.getFileDataView(data)], filename, {type: 'audio/wav'});
+  private getFileFromBufferPart(data: Uint8Array | Uint16Array, channels: number, filename: string): File {
+    return new File([this.getFileDataView(data, channels)], `${filename}.wav`, {type: 'audio/wav'});
   }
 
-  public splitChannelsToFiles(filename: string, type: string, buffer: ArrayBuffer): File[] {
-    const result = [];
+  public splitChannelsToFiles(filename: string, type: string, buffer: ArrayBuffer): Promise<File[]> {
+    return new Promise<File[]>((resolve, reject) => {
+      const result = [];
 
-    // one block contains one sample of each channel
-    // eg. blockAlign = 4 Byte => 2 * 8 Channel1 + 2 * 8 Channel2 = 32Bit = 4 Byte
+      if (this.isValid(buffer)) {
+        if (this._channels > 1) {
+          const u8array = new Uint8Array(buffer);
 
-    if (this.isValid(buffer)) {
-      const channelData: Uint8Array[] = [];
-      const u8array = new Uint8Array(buffer);
+          const promises: Promise<Uint8Array | Uint16Array>[] = [];
+          promises.push(this.extractDataFromArray(0, this._duration, u8array, 0));
+          promises.push(this.extractDataFromArray(0, this._duration, u8array, 1));
 
-      for (let i = 0; i < this._channels; i++) {
-        channelData.push(new Uint8Array((u8array.length - 44) / this._channels));
-      }
-
-      let pointer = 0;
-      for (let i = 44; i < u8array.length; i++) {
-        try {
-          for (let j = 0; j < this._channels; j++) {
-            const subArray = u8array.slice(i, i + (this.blockAlign / this._channels));
-            channelData[j].set(subArray, pointer);
-            i += this.blockAlign / this._channels;
-          }
-          i--;
-          pointer += this.blockAlign / this._channels;
-        } catch (e) {
-          console.error(e);
+          Promise.all(promises).then((extracts) => {
+            for (let i = 0; i < extracts.length; i++) {
+              const extract = extracts[i];
+              result.push(this.getFileFromBufferPart(extract, 1, `${filename}_${i + 1}`));
+            }
+            resolve(result);
+          }).catch((error) => {
+            reject(error);
+          });
+        } else {
+          reject(`can't split audio file because it contains one channel only.`);
         }
+      } else {
+        reject('no valid wav format!');
       }
 
-      for (let i = 0; i < channelData.length; i++) {
-        const file = this.getFileFromBufferPart(channelData[i], filename + '_' + (i + 1));
-        result.push(file);
-      }
-    } else {
-      console.error('no valid wav format!');
-    }
-
-    return result;
+      return result;
+    });
   }
 }

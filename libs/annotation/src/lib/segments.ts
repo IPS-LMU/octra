@@ -105,19 +105,20 @@ export class Segments {
    * @param breakMarker the break marker
    * @param triggerChange shall the change event be triggered?
    */
-  public removeByIndex(index: number, breakMarker: string, triggerChange = true) {
+  public removeByIndex(index: number, breakMarker: string, triggerChange = true, mergeTranscripts = true) {
     if (index > -1 && index < this.segments.length) {
       const segment = this.segments[index];
       if (index < this.segments.length - 1 && !isUnset(breakMarker) && breakMarker !== '') {
         const nextSegment = this.segments[index + 1];
         const transcription: string = this.segments[index].transcript;
-        if (nextSegment.transcript !== breakMarker && transcription !== breakMarker) {
+        if (nextSegment.transcript !== breakMarker && transcription !== breakMarker && mergeTranscripts) {
           // concat transcripts
           if (nextSegment.transcript !== '' && transcription !== '') {
             nextSegment.transcript = transcription + ' ' + nextSegment.transcript;
           } else if (nextSegment.transcript === '' && transcription !== '') {
             nextSegment.transcript = transcription;
           }
+          nextSegment.speakerLabel = segment.speakerLabel;
         } else if (nextSegment.transcript === breakMarker) {
           // delete pause
           nextSegment.transcript = transcription;

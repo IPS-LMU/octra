@@ -26,7 +26,7 @@ import {ValidationPopoverComponent} from '../../core/component/transcr-editor/va
 import {isUnset, selectAllTextOfNode, SubscriptionManager} from '@octra/utilities';
 import {AudioViewerComponent, AudioviewerConfig} from '@octra/components';
 import {Segment, Segments} from '@octra/annotation';
-import {ContextMenuComponent} from '../../core/component/context-menu/context-menu.component';
+import {ContextMenuAction, ContextMenuComponent} from '../../core/component/context-menu/context-menu.component';
 import {TranslocoService} from '@ngneat/transloco';
 
 declare var validateAnnotation: any;
@@ -198,7 +198,11 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     audiochunk: null
   };
 
-  contextMenuProperties = {
+  contextMenuProperties: {
+    x: number;
+    y: number;
+    actions: ContextMenuAction[]
+  } = {
     x: 0,
     y: 0,
     actions: []
@@ -283,6 +287,109 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     this.cd.detectChanges();
     TrnEditorComponent.initialized.emit();
     this.subscrManager.add(this.keyMap.onkeydown.subscribe(this.onShortcutTriggered));
+
+    this.contextMenuProperties.actions.push(
+      {
+        name: 'merge selected Lines',
+        status: 'active',
+        icon: ['fas', 'object-group'],
+        label: 'Merge selected segments (ignore speaker labels)',
+        func: this.mergeSelectedLinesContextMenu
+      },
+      {
+        name: 'remove transcripts of selected Lines',
+        status: 'active',
+        icon: ['fas', 'eraser'],
+        label: 'Remove transcripts of selected segments (keep boundaries)',
+        func: this.removeTranscriptsOfSelectedLinesContextMenu
+      },
+      {
+        name: 'remove selected lines completely',
+        status: 'active',
+        icon: ['fas', 'trash'],
+        label: 'Remove selected segments completely (remove transcript & merge)',
+        func: this.removeSelectedLinesCompletelyContextMenu
+      }
+    );
+  }
+
+  mergeSelectedLinesContextMenu = () => {
+    let intervals: {
+      start: number,
+      length: number
+    }[] = [
+      {
+        start: 0,
+        length: 0
+      }
+    ]
+
+    let intervalCounter = 0;
+    let previousI = -1;
+
+    for (let i = 0; i < this.shownSegments.length; i++) {
+      const shownSegment = this.shownSegments[i];
+
+      if (shownSegment.isSelected) {
+        if (intervalCounter === 0 && previousI < 0) {
+          previousI = i;
+        }
+
+        if (previousI > -1 && previousI === i - 1 && intervalCounter < intervals.length) {
+          intervals[intervalCounter].length++;
+        } else {
+          intervals.push({
+            start: i,
+            length: 0
+          });
+          intervalCounter++;
+        }
+
+        previousI = i;
+      } else {
+        previousI = -1;
+      }
+    }
+
+    intervals = intervals.filter(a => a.length > 0);
+    console.log(intervals);
+    for (let j = intervals.length - 1; j > -1; j--) {
+      const interval = intervals[j];
+      this.transcrService.currentlevel.segments.combineSegments(
+        interval.start, interval.start + interval.length, this.transcrService.breakMarker.code);
+
+      for (let i = interval.start + interval.length - 1; i > interval.start - 1; i--) {
+        console.log(`remove boundary at row ${i} (${interval.start} - ${interval.start + interval.length})`);
+      }
+    }
+    this.transcrService.validateAll();
+    this.updateSegments();
+    this.cd.markForCheck();
+    this.cd.detectChanges();
+
+    this.alertService.showAlert('success', this.translocoService.translate('alerts.combine segments ignore speakerlabel successful'));
+  }
+
+  removeTranscriptsOfSelectedLinesContextMenu = () => {
+    for (let i = 0; i < this.shownSegments.length; i++) {
+      const shownSegment = this.shownSegments[i];
+      if (shownSegment.isSelected) {
+        this.changeTranscriptOfSegment(i, '');
+        shownSegment.isSelected = false;
+      }
+    }
+  }
+
+  removeSelectedLinesCompletelyContextMenu = () => {
+    for (let i = 0; i < this.shownSegments.length; i++) {
+      const shownSegment = this.shownSegments[i];
+      if (shownSegment.isSelected) {
+        this.transcrService.currentlevel.segments.removeByIndex(i, this.transcrService.breakMarker.code, false, false);
+        this.shownSegments.splice(i, 1);
+        i--;
+      }
+    }
+    this.transcrService.currentlevel.segments.onsegmentchange.emit(null);
   }
 
   afterFirstInitialization() {
@@ -452,8 +559,10 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     if (this.appStorage.useMode !== LoginMode.URL) {
       if (typeof validateAnnotation !== 'undefined' && typeof validateAnnotation === 'function'
         && !isUnset(this.transcrService.validationArray[i])) {
-        html = this.transcrService.underlineTextRed(obj.transcription.text,
-          this.transcrService.validationArray[i].validation);
+        if (obj.transcription.text !== '') {
+          html = this.transcrService.underlineTextRed(obj.transcription.text,
+            this.transcrService.validationArray[i].validation);
+        }
       }
 
       html = this.transcrService.rawToHTML(html);
@@ -1091,6 +1200,15 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     for (const shownSegment of this.shownSegments) {
       shownSegment.isSelected = true;
     }
+  }
+
+  private changeTranscriptOfSegment(index: number, rawTranscript: string) {
+    const segment = this.transcrService.currentlevel.segments.get(index).clone();
+    segment.transcript = rawTranscript;
+    this.transcrService.currentlevel.segments.change(index, segment);
+
+    const newSegment = this.getShownSegment(this.shownSegments[index].start, segment, index);
+    this.shownSegments[index].transcription = newSegment.transcription;
   }
 }
 

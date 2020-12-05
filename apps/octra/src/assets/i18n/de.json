@@ -355,7 +355,8 @@
   },
   "alerts": {
     "authentication needed": "Authentifiziere Dich, damit Du Features wie die automatische Spracherkennung Wort-Segmentierung verwenden kannst. Nach einem Klick auf \"Authentifizieren\" erscheint ein separates Fenster. Falls sich kein Fenster öffnet, stelle sicher, dass dein Browser Popups für diese Seite erlaubt."
-    "combine segments successful": "Das Kombinieren von Segmenten mit gleichen Sprecher-Label war erfolgreich."
+    "combine segments successful": "Das Kombinieren von Segmenten mit gleichen Sprecher-Label war erfolgreich.",
+    "combine segments ignore speakerlabel successful": "Das Kombinieren von Segmenten unabhängig vom Sprecher-Label war erfolgreich."
   },
   "authentication": {
     "you are authenticated": "Du bist authentifiziert!",

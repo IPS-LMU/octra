@@ -20,13 +20,7 @@ export class ContextMenuComponent implements OnInit {
   @Input() x = 0;
   @Input() y = 0;
 
-  @Input() actions: {
-    name: string,
-    status: 'active' | 'inactive',
-    icon: [string, string],
-    label: string,
-    func: () => void
-  }[] = [];
+  @Input() actions: ContextMenuAction[] = [];
 
   constructor() {
   }
@@ -58,4 +52,12 @@ export class ContextMenuComponent implements OnInit {
       this.actions[index].status = status;
     }
   }
+}
+
+export interface ContextMenuAction {
+  name: string,
+  status: 'active' | 'inactive',
+  icon: [string, string],
+  label: string,
+  func: () => void
 }

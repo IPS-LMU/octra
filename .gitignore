@@ -42,3 +42,4 @@ Thumbs.db
 /deploy.config.json
 /extern/
 
+/apps/octra/src/config/appconfig.json

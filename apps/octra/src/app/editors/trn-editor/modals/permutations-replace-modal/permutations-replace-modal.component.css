@@ -1,0 +1,8 @@
+table tbody tr td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.modal-content .modal-footer {
+  padding-right: 24px;
+}

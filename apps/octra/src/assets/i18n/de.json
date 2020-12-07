@@ -375,7 +375,14 @@
   },
   "trn-editor": {
     "speaker-actions": {
-      "merge segments by speaker": "Führe Segmente mit gleichem Sprecher-Label zusammen"
+      "merge segments by speaker": "Führe Segmente mit gleichem Sprecher-Label zusammen",
+      "permutations replace": "Ersetze Permutationen"
+    },
+    "modals": {
+      "permutations replace": {
+        "description": "Diese Aktion kann nicht rückgängig gemacht werden.",
+        "replace permutations": "Permutationen ersetzen"
+      }
     }
   }
 }

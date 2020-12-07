@@ -111,6 +111,7 @@ import {ConfigurationEffects} from './core/store/transcription/configuration.eff
 import {fab} from '@fortawesome/free-brands-svg-icons';
 import {ShortcutComponent} from './core/shortcut/shortcut.component';
 import {ContextMenuComponent} from './core/component/context-menu/context-menu.component';
+import {PermutationsReplaceModalComponent} from './editors/trn-editor/modals/permutations-replace-modal/permutations-replace-modal.component';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -190,7 +191,8 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     ErrorOccurredComponent,
     MissingPermissionsModalComponent,
     ShortcutComponent,
-    ContextMenuComponent
+    ContextMenuComponent,
+    PermutationsReplaceModalComponent
   ],
   imports: [
     BrowserModule,

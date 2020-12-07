@@ -1,3 +1,4 @@
+<octra-permutations-replace #permutationsReplace></octra-permutations-replace>
 <div id="scroll-container" #scrollContainer>
   <octra-context-menu #contextMenu [x]="contextMenuProperties.x" [y]="contextMenuProperties.y"
                       [actions]="contextMenuProperties.actions"
@@ -39,6 +40,12 @@
                   <fa-icon [icon]="['fas', 'object-group']"></fa-icon>
                 </td>
                 <td class="dropdown-option">{{"trn-editor.speaker-actions.merge segments by speaker" | transloco}}</td>
+              </tr>
+              <tr (click)="openPermutationsReplaceModal()" class="dropdown-row">
+                <td class="dropdown-icon">
+                  <fa-icon [icon]="['fas', 'exchange-alt']"></fa-icon>
+                </td>
+                <td class="dropdown-option">{{"trn-editor.speaker-actions.permutations replace" | transloco}}</td>
               </tr>
               </tbody>
             </table>

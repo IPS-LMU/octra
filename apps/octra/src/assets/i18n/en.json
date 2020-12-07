@@ -375,7 +375,14 @@
   },
   "trn-editor": {
     "speaker-actions": {
-      "merge segments by speaker": "Merge segments with same speaker label"
+      "merge segments by speaker": "Merge segments with same speaker label",
+      "permutations replace": "Replace Permutations"
+    },
+    "modals": {
+      "permutations replace": {
+        "description": "Be careful: You cannot redo this action after it was applied.",
+        "replace permutations": "Replace Permutations"
+      }
     }
   }
 }

@@ -28,6 +28,7 @@ import {AudioViewerComponent, AudioviewerConfig} from '@octra/components';
 import {Segment, Segments} from '@octra/annotation';
 import {ContextMenuAction, ContextMenuComponent} from '../../core/component/context-menu/context-menu.component';
 import {TranslocoService} from '@ngneat/transloco';
+import {PermutationsReplaceModalComponent} from './modals/permutations-replace-modal/permutations-replace-modal.component';
 
 declare var validateAnnotation: any;
 
@@ -66,6 +67,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
   @ViewChild('viewer', {static: false}) viewer: AudioViewerComponent;
   @ViewChild('validationPopover', {static: true}) validationPopover: ValidationPopoverComponent;
   @ViewChild('contextMenu', {static: false}) contextMenu: ContextMenuComponent;
+  @ViewChild('permutationsReplace', {static: true}) permutationsReplace: PermutationsReplaceModalComponent;
 
   public audioChunk: AudioChunk;
   audioViewerSettings: AudioviewerConfig;
@@ -1273,6 +1275,10 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     } else {
       this.deselectAllRows();
     }
+  }
+
+  openPermutationsReplaceModal() {
+    this.permutationsReplace.open();
   }
 }
 

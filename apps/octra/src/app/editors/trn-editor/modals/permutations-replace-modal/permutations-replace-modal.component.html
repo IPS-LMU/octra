@@ -1,0 +1,58 @@
+<div #modal="bs-modal" (onHidden)="onHidden()" aria-labelledby="dialog-sizes-name1" bsModal class="modal fade"
+     id="supportedfiles"
+     role="dialog" tabindex="-1">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">{{"trn-editor.modals.permutations replace.replace permutations" | transloco}}</h4>
+        <button (click)="close()" aria-label="Close" class="close pull-right" type="button">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div #content class="modal-body">
+        <p>
+          {{"trn-editor.modals.permutations replace.description" | transloco}}
+        </p>
+
+        <table class="table table-striped w-100">
+          <tbody>
+          <tr *ngFor="let speaker of listOfSpeakers">
+            <td>{{speaker}}</td>
+            <td>
+              <fa-icon [icon]="['fas', 'long-arrow-alt-right']"></fa-icon>
+            </td>
+            <td>
+              <div class="btn-group" dropdown>
+                <button id="button-basic" dropdownToggle type="button"
+                        class="btn btn-sm btn-outline-dark rounded dropdown-toggle"
+                        aria-controls="dropdown-basic">
+                  {{speaker}} <span class="caret"></span>
+                </button>
+                <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu"
+                    role="menu" aria-labelledby="button-basic">
+                  <li *ngFor="let otherSpeaker of getSpeakerListWithout(speaker)" role="menuitem">
+                    <a class="dropdown-item" href="#">{{otherSpeaker}}</a>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <div class="w-50 text-left">
+          <button (click)="close()" class="btn btn-secondary btn-raised" data-dismiss="modal" type="button">
+            {{"general.abort" | transloco}}
+          </button>
+        </div>
+        <div class="w-50 text-right">
+          <button (click)="close()" class="btn btn-primary btn-raised" data-dismiss="modal" type="button">
+            {{"trn-editor.modals.permutations replace.replace permutations" | transloco}}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

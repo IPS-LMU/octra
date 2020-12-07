@@ -10,6 +10,15 @@ export class KeymappingService {
   private readonly _onkeydown: EventEmitter<KeyMappingShortcutEvent>;
   private readonly _onkeyup: EventEmitter<KeyMappingShortcutEvent>;
 
+  private _pressedMetaKeys = {
+    ctrl: false,
+    cmd: false
+  }
+
+  get pressedMetaKeys() {
+    return this._pressedMetaKeys;
+  }
+
   get onkeydown(): EventEmitter<KeyMappingShortcutEvent> {
     return this._onkeydown;
   }
@@ -116,12 +125,28 @@ export class KeymappingService {
 
   private onKeyDown = ($event) => {
     const combo = KeyMapping.getShortcutCombination($event);
+
+    if (combo === 'CMD') {
+      this._pressedMetaKeys.cmd = true;
+    }
+    if (combo === 'CTRL') {
+      this._pressedMetaKeys.ctrl = true;
+    }
+
     this._beforeKeyDown.emit({comboKey: combo, event: $event});
     this._onkeydown.emit({comboKey: combo, event: $event});
   }
 
   private onKeyUp = ($event) => {
     const combo = KeyMapping.getShortcutCombination($event);
+
+    if (combo === 'CMD') {
+      this._pressedMetaKeys.cmd = false;
+    }
+    if (combo === 'CTRL') {
+      this._pressedMetaKeys.ctrl = false;
+    }
+
     this._onkeyup.emit({comboKey: combo, event: $event});
   }
 

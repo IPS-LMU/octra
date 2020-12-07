@@ -32,6 +32,6 @@ export const editorComponents: {
     name: TrnEditorComponent.editorname,
     editor: TrnEditorComponent,
     translate: 'interfaces.TRN editor',
-    icon: 'align-justify'
+    icon: 'table'
   }
 ];

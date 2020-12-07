@@ -32,7 +32,7 @@ export class ContextMenuComponent implements OnInit {
     this.isVisible = false;
   }
 
-  public showMenue() {
+  public showMenu() {
     this.isVisible = true;
   }
 

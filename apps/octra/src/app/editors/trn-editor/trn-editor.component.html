@@ -54,7 +54,7 @@
         [ngClass]="{
       'segment-selected': segment.isSelected
     }">
-      <td class="active-column fitwidth">
+      <td class="active-column fitwidth" (click)="onTableLineClick($event, i)">
         <fa-icon *ngIf="i === textEditor.selectedSegment; else checkExclamation;" [icon]="['fas', 'circle']"
                  style="color:green;font-size: 10px;"></fa-icon>
         <ng-template #checkExclamation>
@@ -70,7 +70,7 @@
     'alert-info': segment.transcription.text === transcrService.breakMarker.code,
     'alert-danger': segment.transcription.text === '',
     'active-playback': i === playAllState.currentSegment
-  }" (click)="onTimestampMouseDown(i)" (contextmenu)="onContextMenuClick($event)">
+  }" (click)="onTimestampMouseDown($event, i)" (contextmenu)="onContextMenuClick($event)">
         {{getStartPoint(i) | timespan: {
         showMilliSeconds: true,
         showHour: true
@@ -83,7 +83,7 @@
     'alert-danger': segment.transcription.text === '',
     'active-playback': i === playAllState.currentSegment
   }" #labelCol (keyup)="onLabelKeyUp(labelCol)" (keydown)="onLabelKeyDown($event, labelCol, i)"
-          (mousedown)="onSpeakerLabelMouseDown(labelCol, i)">
+          (mousedown)="onSpeakerLabelMouseDown($event, labelCol, i)">
         {{segment.label}}
       </td>
 
@@ -167,7 +167,7 @@
     'alert-info': segment.transcription.text === transcrService.breakMarker.code,
     'alert-danger': segment.transcription.text === '',
     'active-playback': i === playAllState.currentSegment
-  }">
+  }" (click)="onTableLineClick($event, i)">
         <fa-icon (click)="playSelectedSegment(i)" [icon]="['fas', playStateSegments[i].icon]"></fa-icon>
       </td>
     </tr>

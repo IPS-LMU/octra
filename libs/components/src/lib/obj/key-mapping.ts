@@ -6,10 +6,8 @@ export class KeyMapping {
     {
       name: 'ALT',
       keyCode: 18
-    }, {
-      name: 'META',
-      keyCode: -1
-    }, {
+    },
+    {
       name: 'CTRL',
       keyCode: 17
     }, {
@@ -40,9 +38,18 @@ export class KeyMapping {
     }, {
       name: 'ARROWRIGHT',
       keyCode: 39
-    }, {
+    },
+    {
       name: 'ARROWDOWN',
       keyCode: 40
+    },
+    {
+      name: 'CMD',
+      keyCode: 91
+    },
+    {
+      name: 'CMD',
+      keyCode: 93
     }
   ];
 
@@ -88,14 +95,16 @@ export class KeyMapping {
     if (ctrl) {
       comboKey = 'CTRL';
     }
+
+    if (meta) {
+      comboKey = 'CMD';
+    }
+
     if (alt) {
       comboKey += (comboKey !== '') ? ' + ' : '';
       comboKey += 'ALT';
     }
-    if (meta) {
-      comboKey += (comboKey !== '') ? ' + ' : '';
-      comboKey += 'META';
-    }
+
     if (shift) {
       comboKey += (comboKey !== '') ? ' + ' : '';
       comboKey += 'SHIFT';

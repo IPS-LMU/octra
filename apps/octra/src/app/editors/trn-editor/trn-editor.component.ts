@@ -61,6 +61,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
   public showSignalDisplay = false;
   public lastResizing = 0;
+
   @ViewChild('transcrEditor', {static: false}) transcrEditor: TranscrEditorComponent;
   @ViewChild('viewer', {static: false}) viewer: AudioViewerComponent;
   @ViewChild('validationPopover', {static: true}) validationPopover: ValidationPopoverComponent;
@@ -147,7 +148,27 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
       title: 'save and previous cell',
       focusonly: false
     }
-  }
+  };
+
+  private tableShortcuts = {
+    select_all: {
+      keys: {
+        mac: 'CMD + A',
+        pc: 'CTRL + A'
+      },
+      title: 'select all segments',
+      focusonly: false
+    },
+    remove_selected: {
+      keys: {
+        mac: 'CMD + BACKSPACE',
+        pc: 'CTRL + BACKSPACE'
+      },
+      title: 'remove selected completely',
+      focusonly: false
+    }
+  };
+
   private audioShortcuts = {
     play_pause: {
       keys: {
@@ -260,6 +281,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
 
   ngOnInit() {
     this.keyMap.register('TRN-Editor', {...this.shortcuts});
+    this.keyMap.register('TRN-Editor table', this.tableShortcuts);
     this.keyMap.register('TRN-Editor texteditor', this.audioShortcuts);
 
     this.audioViewerSettings = new AudioviewerConfig();
@@ -308,7 +330,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
         status: 'active',
         icon: ['fas', 'trash'],
         label: 'Remove selected segments completely (remove transcript & merge)',
-        func: this.removeSelectedLinesCompletelyContextMenu
+        func: this.removeSelectedLines
       }
     );
   }
@@ -380,16 +402,24 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     }
   }
 
-  removeSelectedLinesCompletelyContextMenu = () => {
-    for (let i = 0; i < this.shownSegments.length; i++) {
-      const shownSegment = this.shownSegments[i];
-      if (shownSegment.isSelected) {
-        this.transcrService.currentlevel.segments.removeByIndex(i, this.transcrService.breakMarker.code, false, false);
-        this.shownSegments.splice(i, 1);
-        i--;
+  removeSelectedLines = () => {
+    if (this.shownSegments.length > 1) {
+      for (let i = 0; i < this.shownSegments.length; i++) {
+        const shownSegment = this.shownSegments[i];
+        if (shownSegment.isSelected) {
+          if (this.shownSegments.length > 1) {
+            const oldSegmentEnd = this.transcrService.currentlevel.segments.segments[i].time.clone();
+            this.transcrService.currentlevel.segments.removeByIndex(i, this.transcrService.breakMarker.code, false, false);
+            if (i > 0) {
+              this.transcrService.currentlevel.segments.segments[i - 1].time = oldSegmentEnd;
+            }
+            this.shownSegments.splice(i, 1);
+            i--;
+          }
+        }
       }
+      this.transcrService.currentlevel.segments.onsegmentchange.emit(null);
     }
-    this.transcrService.currentlevel.segments.onsegmentchange.emit(null);
   }
 
   afterFirstInitialization() {
@@ -428,21 +458,23 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     this.selectedCell.labelText = labelCol.innerText;
   }
 
-  onSpeakerLabelMouseDown(labelCol: HTMLTableCellElement, rowNumber: number) {
-    this.deselectAllRows();
-    labelCol.contentEditable = 'true';
-    this.selectedCell = {
-      labelText: labelCol.innerText,
-      row: rowNumber,
-      column: 1
-    };
+  onSpeakerLabelMouseDown($event, labelCol: HTMLTableCellElement, rowNumber: number) {
+    if (!(this.keyMap.pressedMetaKeys.ctrl || this.keyMap.pressedMetaKeys.cmd)) {
+      labelCol.contentEditable = 'true';
+      this.selectedCell = {
+        labelText: labelCol.innerText,
+        row: rowNumber,
+        column: 1
+      };
+    } else {
+      this.onTableLineClick($event, rowNumber);
+    }
   }
 
-  onTimestampMouseDown(rowNumber: number) {
+  onTimestampMouseDown($event, rowNumber: number) {
     // de-/select row
     if (this._textEditor.state !== 'active') {
-      const shownSegment = this.shownSegments[rowNumber];
-      shownSegment.isSelected = !shownSegment.isSelected;
+      this.onTableLineClick($event, rowNumber);
     }
   }
 
@@ -451,8 +483,10 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     this.contextMenuProperties.x = $event.clientX;
     this.contextMenuProperties.y = $event.pageY - 80;
 
-    if (!isUnset(this.contextMenu)) {
-      this.contextMenu.showMenue();
+    const isAnySegmentSelected = this.shownSegments.findIndex(a => a.isSelected) > -1;
+
+    if (!isUnset(this.contextMenu) && isAnySegmentSelected) {
+      this.contextMenu.showMenu();
     }
 
     this.cd.markForCheck();
@@ -513,10 +547,15 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
   }
 
   onTranscriptCellMouseDown($event, i) {
-    this.deselectAllRows();
-    this.closeTextEditor().then(() => {
-      this.openTranscrEditor(i);
-    });
+    if (this.keyMap.pressedMetaKeys.cmd || this.keyMap.pressedMetaKeys.ctrl) {
+      this.onTableLineClick($event, i);
+    } else {
+      this.deselectAllRows();
+
+      this.closeTextEditor().then(() => {
+        this.openTranscrEditor(i);
+      });
+    }
   }
 
   focusOnNextSpeakerLabel(segmentNumber: number) {
@@ -1004,7 +1043,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   }
 
   onShortcutTriggered = ($event) => {
-    this.keyMap.checkShortcutAction($event.comboKey, {...this.shortcuts, ...this.audioShortcuts}, true).then((shortcut) => {
+    this.keyMap.checkShortcutAction($event.comboKey, {...this.shortcuts, ...this.audioShortcuts, ...this.tableShortcuts}, true).then((shortcut) => {
       const triggerUIAction = (shortcutObj, caretPos: number = -1) => {
         shortcutObj.value = `audio:${shortcutObj.value}`;
         this.uiService.addElementFromEvent('shortcut', shortcutObj, Date.now(),
@@ -1072,6 +1111,25 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
               this._textEditor.audiochunk.stepBackwardTime(0.5).catch((error) => {
                 console.error(error);
               });
+            }
+            break;
+          case('select_all'):
+            if (this._textEditor.state !== 'active') {
+              $event.event.preventDefault();
+              for (const shownSegment of this.shownSegments) {
+                shownSegment.isSelected = true;
+              }
+              this.cd.markForCheck();
+              this.cd.detectChanges();
+            }
+            break;
+          case('remove_selected'):
+            if (this._textEditor.state !== 'active') {
+              $event.event.preventDefault();
+
+              this.removeSelectedLines();
+              this.cd.markForCheck();
+              this.cd.detectChanges();
             }
             break;
         }
@@ -1196,12 +1254,6 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     }
   }
 
-  private selectAllRows() {
-    for (const shownSegment of this.shownSegments) {
-      shownSegment.isSelected = true;
-    }
-  }
-
   private changeTranscriptOfSegment(index: number, rawTranscript: string) {
     const segment = this.transcrService.currentlevel.segments.get(index).clone();
     segment.transcript = rawTranscript;
@@ -1209,6 +1261,18 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
     const newSegment = this.getShownSegment(this.shownSegments[index].start, segment, index);
     this.shownSegments[index].transcription = newSegment.transcription;
+  }
+
+  onTableLineClick($event, rowNumber: number) {
+    const selectedSegment = this.shownSegments[rowNumber];
+    if (this.keyMap.pressedMetaKeys.cmd || this.keyMap.pressedMetaKeys.ctrl) {
+      // de- select line
+      selectedSegment.isSelected = !selectedSegment.isSelected;
+      this.cd.markForCheck();
+      this.cd.detectChanges();
+    } else {
+      this.deselectAllRows();
+    }
   }
 }
 

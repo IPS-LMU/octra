@@ -1,11 +1,10 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {BrowserInfo} from '../BrowserInfo';
-import {isUnset} from '@octra/utilities';
-import {KeyMapping} from '@octra/components';
+import {isUnset, Shortcut, ShortcutGroup, ShortcutManager} from '@octra/utilities';
 
 @Injectable()
 export class KeymappingService {
-  private shortcuts: any[] = [];
+  private shortcutsManager: ShortcutManager;
   private readonly _beforeKeyDown = new EventEmitter<KeyMappingShortcutEvent>();
   private readonly _onkeydown: EventEmitter<KeyMappingShortcutEvent>;
   private readonly _onkeyup: EventEmitter<KeyMappingShortcutEvent>;
@@ -32,6 +31,7 @@ export class KeymappingService {
   }
 
   constructor() {
+    this.shortcutsManager = new ShortcutManager();
     this._onkeydown = new EventEmitter<KeyMappingShortcutEvent>();
     window.onkeydown = this.onKeyDown;
 
@@ -68,41 +68,23 @@ export class KeymappingService {
     return [];
   }
 
-  public register(identifier: string, shortcuts: any): any {
-    if (!this.getShortcuts(identifier)) {
-      this.shortcuts.push({
-        identifier,
-        shortcuts: this.cloneShortcuts(shortcuts)
-      });
-    }
-    // TODO
-    return this.getShortcuts(identifier);
+  public register(shortcutGroup: ShortcutGroup): ShortcutGroup {
+    this.shortcutsManager.registerShortcutGroup(shortcutGroup);
+    return this.shortcutsManager.getShortcutGroup(shortcutGroup.name);
   }
 
   public unregister(identifier: string) {
-    if (this.shortcuts.length > 0) {
-      let j = -1;
-      for (let i = 0; i < this.shortcuts.length; i++) {
-        if (this.shortcuts[i].identifier === identifier) {
-          j = i;
-          break;
-        }
-      }
-
-      if (j > 0) {
-        this.shortcuts.splice(j, 1);
-      }
-    }
+    this.shortcutsManager.unregisterShortcutGroup(identifier);
   }
 
-  public getShortcuts(identifier: string): any {
-    for (const shortcut of this.shortcuts) {
-      if (shortcut.identifier === identifier) {
-        return shortcut.shortcuts;
-      }
+  public getShortcuts(identifier: string): Shortcut[] {
+    const shortcutGroup = this.shortcutsManager.getShortcutGroup(identifier);
+
+    if (!isUnset(shortcutGroup)) {
+      return shortcutGroup.items;
     }
 
-    return null;
+    return [];
   }
 
   /**
@@ -124,30 +106,22 @@ export class KeymappingService {
   }
 
   private onKeyDown = ($event) => {
-    const combo = KeyMapping.getShortcutCombination($event);
+    this.shortcutsManager.checkKeyEvent($event).then((shortcutInfo) => {
+      console.log(`combo: ${shortcutInfo.shortcut}`);
 
-    if (combo === 'CMD') {
-      this._pressedMetaKeys.cmd = true;
-    }
-    if (combo === 'CTRL') {
-      this._pressedMetaKeys.ctrl = true;
-    }
-
-    this._beforeKeyDown.emit({comboKey: combo, event: $event});
-    this._onkeydown.emit({comboKey: combo, event: $event});
+      this._beforeKeyDown.emit({...shortcutInfo, event: $event});
+      this._onkeydown.emit({...shortcutInfo, event: $event});
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   private onKeyUp = ($event) => {
-    const combo = KeyMapping.getShortcutCombination($event);
-
-    if (combo === 'CMD') {
-      this._pressedMetaKeys.cmd = false;
-    }
-    if (combo === 'CTRL') {
-      this._pressedMetaKeys.ctrl = false;
-    }
-
-    this._onkeyup.emit({comboKey: combo, event: $event});
+    this.shortcutsManager.checkKeyEvent($event).then((shortcutInfo) => {
+      this._onkeyup.emit({...shortcutInfo, event: $event});
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   public checkShortcutAction(comboKey: string, shortcuts: any, shortcutsEnabled: boolean) {
@@ -216,6 +190,8 @@ export class Entry {
 }
 
 export interface KeyMappingShortcutEvent {
-  comboKey: string;
+  shortcut: string;
+  platform: string;
+  shortcutName: string;
   event: KeyboardEvent;
 }

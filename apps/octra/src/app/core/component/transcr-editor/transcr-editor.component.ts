@@ -12,7 +12,6 @@ import {
   ViewChild
 } from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
-import {KeyMapping} from '@octra/components';
 import {isNumeric} from 'rxjs/internal-compatibility';
 import {timer} from 'rxjs';
 
@@ -21,7 +20,7 @@ import {TranscriptionService} from '../../shared/service';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../shared/service/asr.service';
 import {TranscrEditorConfig} from './config';
 import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
-import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
+import {Functions, isUnset, ShortcutGroup, ShortcutManager, SubscriptionManager} from '@octra/utilities';
 import {AudioChunk, AudioManager, SampleUnit} from '@octra/media';
 import {Segments, TimespanPipe} from '@octra/annotation';
 
@@ -52,8 +51,12 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Input() playposition: SampleUnit;
   @Input() audiochunk: AudioChunk;
   @Input() validationEnabled = false;
+
   @ViewChild('validationPopover', {static: true}) validationPopover: ValidationPopoverComponent;
   @ViewChild('transcrEditor', {static: true}) transcrEditor: ElementRef;
+
+  private shortcutsManager: ShortcutManager;
+
   public textfield: any = null;
   public focused = false;
   public asr = {
@@ -118,6 +121,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
     // @ts-ignore
     return jQuery('.note-editable:eq(0)').caret('pos');
+  }
+
+  private shortcuts: ShortcutGroup = {
+    name: 'texteditor',
+    items: []
   }
 
   get audioManager(): AudioManager {
@@ -195,7 +203,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
               private langService: TranslocoService,
               private transcrService: TranscriptionService,
               private asrService: AsrService) {
-
+    this.shortcutsManager = new ShortcutManager();
     this._settings = new TranscrEditorConfig();
     this.subscrmanager = new SubscriptionManager();
   }
@@ -322,6 +330,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    */
   public initialize = () => {
     if (!isUnset(this.audiochunk)) {
+      this.initializeShortcuts();
+      this.shortcutsManager.unregisterShortcutGroup('texteditor');
+      this.shortcutsManager.registerShortcutGroup(this.shortcuts);
 
       // @ts-ignore
       this.summernoteUI = jQuery.summernote.ui;
@@ -517,36 +528,40 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * called when key pressed in editor
    */
   onKeyDownSummernote = ($event) => {
-    const comboKey = KeyMapping.getShortcutCombination($event);
-    const platform = BrowserInfo.platform;
+    this.shortcutsManager.checkKeyEvent($event).then((shortcutInfo) => {
+      const comboKey = shortcutInfo.shortcut;
 
-    if (comboKey !== '') {
-      if (this.isDisabledKey(comboKey)) {
-        $event.preventDefault();
-      } else {
-        if (comboKey === 'ALT + S' && this.Settings.specialMarkers.boundary) {
-          // add boundary
+      if (comboKey !== '') {
+        if (this.isDisabledKey(comboKey)) {
           $event.preventDefault();
-          this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
-          this.boundaryinserted.emit(this.audiochunk.absolutePlayposition.samples);
-          return;
         } else {
-          for (const marker of this.markers) {
-            if (marker.shortcut[platform] === comboKey) {
-              $event.preventDefault();
-              this.insertMarker(marker.code, marker.icon);
-              this.markerInsert.emit(marker.name);
-              return;
+          if (comboKey === 'ALT + S' && this.Settings.specialMarkers.boundary) {
+            // add boundary
+            this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
+            this.boundaryinserted.emit(this.audiochunk.absolutePlayposition.samples);
+            return;
+          } else {
+            for (const marker of this.markers) {
+              if (marker.shortcut[shortcutInfo.platform] === comboKey) {
+                $event.preventDefault();
+                this.insertMarker(marker.code, marker.icon);
+                this.markerInsert.emit(marker.name);
+                return;
+              }
             }
           }
         }
       }
-    }
+    }).catch((error) => {
+      console.error(error);
+    });
   }
   /**
    * called after key up in editor
    */
   onKeyUpSummernote = ($event) => {
+    this.shortcutsManager.checkKeyEvent($event);
+
     // update rawText
     this.onkeyup.emit($event);
     this.triggerTyping($event.code !== 'Enter');
@@ -1387,6 +1402,32 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         resolve();
       }
     });
+  }
+
+  private initializeShortcuts() {
+    this.shortcuts.items = [];
+    this.shortcuts.items.push(
+      {
+        name: 'add-boundary',
+        keys: {
+          mac: 'ALT + S',
+          pc: 'ALT + S'
+        },
+        title: 'add boundary',
+        focusonly: true
+      }
+    );
+
+    for (const marker of this.markers) {
+      this.shortcuts.items.push(
+        {
+          name: marker.name,
+          keys: marker.shortcut,
+          focusonly: true,
+          title: marker.button_text
+        }
+      )
+    }
   }
 }
 

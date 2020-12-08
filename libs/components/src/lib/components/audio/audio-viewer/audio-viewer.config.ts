@@ -1,3 +1,5 @@
+import {ShortcutGroup} from '@octra/utilities';
+
 export class AudioviewerConfig {
   public multiLine = false;
   public pixelPerSec = 50; // only relevant for multiline
@@ -94,95 +96,109 @@ export class AudioviewerConfig {
   // SHORTCUTS
   // SHORTCUTS sheme= KeyMapping [+ <char or charCode>]
   public shortcutsEnabled = true;
-  public shortcuts = {
-    set_boundary: {
-      keys: {
-        mac: 'S',
-        pc: 'S'
+  public shortcuts: ShortcutGroup = {
+    name: 'audioviewer',
+    items: [
+      {
+        name: 'set_boundary',
+        keys: {
+          mac: 'S',
+          pc: 'S'
+        },
+        focusonly: true,
+        title: 'set segment'
       },
-      focusonly: true,
-      title: 'set segment'
-    },
-    set_break: {
-      keys: {
-        mac: 'A',
-        pc: 'A'
+      {
+        name: 'set_break',
+        keys: {
+          mac: 'A',
+          pc: 'A'
+        },
+        focusonly: true,
+        title: 'set break'
       },
-      focusonly: true,
-      title: 'set break'
-    },
-    play_selection: {
-      keys: {
-        mac: 'C',
-        pc: 'C'
+      {
+        name: 'play_selection',
+        keys: {
+          mac: 'C',
+          pc: 'C'
+        },
+        focusonly: true,
+        title: 'play selection'
       },
-      focusonly: true,
-      title: 'play selection'
-    },
-    segment_enter: {
-      keys: {
-        mac: 'ENTER',
-        pc: 'ENTER'
+      {
+        name: 'segment_enter',
+        keys: {
+          mac: 'ENTER',
+          pc: 'ENTER'
+        },
+        focusonly: true,
+        title: 'transcribe segment'
       },
-      focusonly: true,
-      title: 'transcribe segment'
-    },
-    cursor_left: {
-      keys: {
-        mac: 'ARROWLEFT',
-        pc: 'ARROWLEFT'
+      {
+        name: 'cursor_left',
+        keys: {
+          mac: 'ARROWLEFT',
+          pc: 'ARROWLEFT'
+        },
+        focusonly: true,
+        title: 'move cursor left'
       },
-      focusonly: true,
-      title: 'move cursor left'
-    },
-    cursor_right: {
-      keys: {
-        mac: 'ARROWRIGHT',
-        pc: 'ARROWRIGHT'
+      {
+        name: 'cursor_right',
+        keys: {
+          mac: 'ARROWRIGHT',
+          pc: 'ARROWRIGHT'
+        },
+        focusonly: true,
+        title: 'move cursor right'
       },
-      focusonly: true,
-      title: 'move cursor right'
-    },
-    playonhover: {
-      keys: {
-        mac: 'H',
-        pc: 'H'
+      {
+        name: 'playonhover',
+        keys: {
+          mac: 'H',
+          pc: 'H'
+        },
+        focusonly: true,
+        title: 'play audio on hover'
       },
-      focusonly: true,
-      title: 'play audio on hover'
-    },
-    delete_boundaries: {
-      keys: {
-        mac: 'D',
-        pc: 'D'
+      {
+        name: 'delete_boundaries',
+        keys: {
+          mac: 'D',
+          pc: 'D'
+        },
+        focusonly: true,
+        title: 'delete boundaries'
       },
-      focusonly: true,
-      title: 'delete boundaries'
-    },
-    do_asr: {
-      keys: {
-        mac: 'R',
-        pc: 'R'
+      {
+        name: 'do_asr',
+        keys: {
+          mac: 'R',
+          pc: 'R'
+        },
+        focusonly: true,
+        title: 'do asr'
       },
-      focusonly: true,
-      title: 'do asr'
-    },
-    do_asr_maus: {
-      keys: {
-        mac: 'M',
-        pc: 'M'
+      {
+        name: 'do_asr_maus',
+        keys: {
+          mac: 'M',
+          pc: 'M'
+        },
+        focusonly: true,
+        title: 'do asr maus'
       },
-      focusonly: true,
-      title: 'do asr maus'
-    },
-    do_maus: {
-      keys: {
-        mac: 'W',
-        pc: 'W'
-      },
-      focusonly: true,
-      title: 'do maus only'
-    }
+      {
+        name: 'do_asr_maus',
+        keys: {
+          mac: 'W',
+          pc: 'W'
+        },
+        focusonly: true,
+        title: 'do maus only'
+      }
+    ]
   };
 
   public disabledKeys = ['SHIFT + SPACE'];

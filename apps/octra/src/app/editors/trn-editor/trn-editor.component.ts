@@ -1278,7 +1278,17 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   }
 
   openPermutationsReplaceModal() {
-    this.permutationsReplace.open();
+    this.permutationsReplace.open().then((action) => {
+      if (action === 'replaced') {
+        this.updateSegments();
+        this.cd.markForCheck();
+        this.cd.detectChanges();
+
+        this.alertService.showAlert('success', 'finished');
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 }
 

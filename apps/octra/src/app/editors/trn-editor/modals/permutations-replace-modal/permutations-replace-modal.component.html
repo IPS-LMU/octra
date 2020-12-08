@@ -14,24 +14,24 @@
           {{"trn-editor.modals.permutations replace.description" | transloco}}
         </p>
 
-        <table class="table table-striped w-100">
+        <table class="table table-striped table-sm w-100">
           <tbody>
-          <tr *ngFor="let speaker of listOfSpeakers">
-            <td>{{speaker}}</td>
-            <td>
+          <tr *ngFor="let speaker of listOfSpeakers; let i = index;">
+            <td class="leftcolumn">{{speaker.name}}</td>
+            <td style="width:60px;">
               <fa-icon [icon]="['fas', 'long-arrow-alt-right']"></fa-icon>
             </td>
-            <td>
+            <td class="rightcolumn">
               <div class="btn-group" dropdown>
-                <button id="button-basic" dropdownToggle type="button"
+                <button dropdownToggle type="button"
                         class="btn btn-sm btn-outline-dark rounded dropdown-toggle"
                         aria-controls="dropdown-basic">
-                  {{speaker}} <span class="caret"></span>
+                  {{speaker.replaceWith}} <span class="caret"></span>
                 </button>
-                <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu"
-                    role="menu" aria-labelledby="button-basic">
-                  <li *ngFor="let otherSpeaker of getSpeakerListWithout(speaker)" role="menuitem">
-                    <a class="dropdown-item" href="#">{{otherSpeaker}}</a>
+                <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu">
+                  <li *ngFor="let otherSpeaker of getSpeakerListWithout(speaker.replaceWith)" role="menuitem"
+                      (click)="setReplacement(i, otherSpeaker.name)" style="cursor:pointer;">
+                    <span class="dropdown-item" href="#">{{otherSpeaker.name}}</span>
                   </li>
                 </ul>
               </div>
@@ -47,7 +47,7 @@
           </button>
         </div>
         <div class="w-50 text-right">
-          <button (click)="close()" class="btn btn-primary btn-raised" data-dismiss="modal" type="button">
+          <button (click)="replaceSpeakers()" class="btn btn-primary btn-raised" data-dismiss="modal" type="button">
             {{"trn-editor.modals.permutations replace.replace permutations" | transloco}}
           </button>
         </div>

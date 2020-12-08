@@ -1,8 +1,28 @@
+table {
+  display: flex;
+}
+
+table tbody,
+table tbody tr {
+  width: 100%;
+}
+
 table tbody tr td {
   text-align: center;
   vertical-align: middle;
+  width: 50%;
+}
+
+table tbody tr .leftcolumn,
+table tbody tr .rightcolumn {
+  flex: 1;
 }
 
 .modal-content .modal-footer {
   padding-right: 24px;
+}
+
+.dropdown-item {
+  font-size: 0.9em;
+  min-height: 1rem;
 }

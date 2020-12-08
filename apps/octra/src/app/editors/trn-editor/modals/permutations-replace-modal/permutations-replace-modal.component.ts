@@ -17,10 +17,13 @@ export class PermutationsReplaceModalComponent implements OnInit, OnDestroy, Aft
   @ViewChild('content', {static: false}) contentElement: ElementRef;
 
   protected data = null;
-  private actionperformed: Subject<void> = new Subject<void>();
+  private actionperformed: Subject<string> = new Subject<string>();
   private subscrmanager = new SubscriptionManager();
 
-  listOfSpeakers: string[] = [];
+  listOfSpeakers: {
+    name: string;
+    replaceWith: string;
+  }[] = [];
 
   constructor(private transcrService: TranscriptionService) {
   }
@@ -34,16 +37,27 @@ export class PermutationsReplaceModalComponent implements OnInit, OnDestroy, Aft
   private readListOfSpeakers() {
     const result = [];
     for (const segment of this.transcrService.currentlevel.segments.segments) {
-      if (result.findIndex(a => a === segment.speakerLabel) < 0) {
-        result.push(segment.speakerLabel);
+      if (result.findIndex(a => a.name === segment.speakerLabel) < 0) {
+        result.push({
+          name: segment.speakerLabel,
+          replaceWith: segment.speakerLabel
+        });
       }
     }
-    result.sort();
+    result.sort((a, b) => {
+      if (a.name > b.name) {
+        return 1;
+      } else if (a.name < b.name) {
+        return -1;
+      }
+
+      return 0;
+    });
     this.listOfSpeakers = result;
   }
 
-  public open(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
+  public open(): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
       this.beforeModalOpened();
       this.modal.show(this.modal);
       this.visible = true;
@@ -63,7 +77,6 @@ export class PermutationsReplaceModalComponent implements OnInit, OnDestroy, Aft
 
   public close() {
     this.modal.hide();
-
     this.actionperformed.next();
   }
 
@@ -72,7 +85,7 @@ export class PermutationsReplaceModalComponent implements OnInit, OnDestroy, Aft
   }
 
   getSpeakerListWithout(exceptSpeaker: string) {
-    return this.listOfSpeakers.filter(a => a !== exceptSpeaker);
+    return this.listOfSpeakers.filter(a => a.name !== exceptSpeaker);
   }
 
   ngOnDestroy() {
@@ -82,5 +95,25 @@ export class PermutationsReplaceModalComponent implements OnInit, OnDestroy, Aft
   onHidden() {
     this.visible = false;
     this.subscrmanager.destroy();
+  }
+
+  setReplacement(i: number, replacement: string) {
+    this.listOfSpeakers[i].replaceWith = replacement;
+  }
+
+  replaceSpeakers() {
+    for (const segment of this.transcrService.currentlevel.segments.segments) {
+      for (const speakerObj of this.listOfSpeakers) {
+        if (segment.speakerLabel === speakerObj.name) {
+          segment.speakerLabel = speakerObj.replaceWith;
+          break;
+        }
+      }
+    }
+
+    // trigger saving
+    this.transcrService.currentlevel.segments.onsegmentchange.emit(null);
+    this.modal.hide();
+    this.actionperformed.next('replaced');
   }
 }

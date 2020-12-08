@@ -206,11 +206,14 @@
       "do maus only": "Selektiertes Segment mit MAUS verarbeiten (Wort-Segmentierung)",
       "TRN-Editor": "Tastenkombinationen des TRN-Editors",
       "TRN-Editor texteditor": "Tastenkürzel des Texteditors",
+      "TRN-Editor table": "Tastenkürzel für die Tabelle",
       "save and next cell": "Speichern und zur nächsten Zelle",
       "save and under cell": "Speichern und eine Zelle nach unten",
       "save and previous cell": "Speichern und zur vorherigen Zelle",
       "save and upper cell": "Speichern und eine Zelle nach oben",
-      "switch to": "Wechsle zu {{editor}}"
+      "switch to": "Wechsle zu {{editor}}",
+      "select all segments": "Alle Segmente markieren",
+      "remove selected completely": "Ausgewählte Segmnente vollständig löschen"
     },
     "inactivity": {
       "header": "Längere Inaktivität entdeckt",
@@ -354,7 +357,7 @@
     "error": "Es ist ein Fehler aufgetreten. Sende uns bitte ein kurzes Feedback, damit der Fehler behoben werden kann."
   },
   "alerts": {
-    "authentication needed": "Authentifiziere Dich, damit Du Features wie die automatische Spracherkennung Wort-Segmentierung verwenden kannst. Nach einem Klick auf \"Authentifizieren\" erscheint ein separates Fenster. Falls sich kein Fenster öffnet, stelle sicher, dass dein Browser Popups für diese Seite erlaubt."
+    "authentication needed": "Authentifiziere Dich, damit Du Features wie die automatische Spracherkennung Wort-Segmentierung verwenden kannst. Nach einem Klick auf \"Authentifizieren\" erscheint ein separates Fenster. Falls sich kein Fenster öffnet, stelle sicher, dass dein Browser Popups für diese Seite erlaubt.",
     "combine segments successful": "Das Kombinieren von Segmenten mit gleichen Sprecher-Label war erfolgreich.",
     "combine segments ignore speakerlabel successful": "Das Kombinieren von Segmenten unabhängig vom Sprecher-Label war erfolgreich."
   },

@@ -207,10 +207,13 @@
       "do maus only": "Apply word-alignment on the selected segment using MAUS",
       "TRN-Editor": "Shortcuts of the TRN-Editor",
       "TRN-Editor texteditor": "Shortcuts of the Texteditor",
+      "TRN-Editor table": "Shortcuts for the table",
       "save and next cell": "Save and go to the next cell",
       "save and under cell": "Save and go to one cell under the current one",
       "save and previous cell": "Save and go to the previous cell",
-      "save and upper cell": "Save and go to one cell over the current one"
+      "save and upper cell": "Save and go to one cell over the current one",
+      "select all segments": "Select all segments",
+      "remove selected completely": "Remove selected segments completely"
     },
     "inactivity": {
       "header": "Longer absence detected",

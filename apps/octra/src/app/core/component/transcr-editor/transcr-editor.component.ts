@@ -529,24 +529,26 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    */
   onKeyDownSummernote = ($event) => {
     this.shortcutsManager.checkKeyEvent($event).then((shortcutInfo) => {
-      const comboKey = shortcutInfo.shortcut;
+      if (!isUnset(shortcutInfo)) {
+        const comboKey = shortcutInfo.shortcut;
 
-      if (comboKey !== '') {
-        if (this.isDisabledKey(comboKey)) {
-          $event.preventDefault();
-        } else {
-          if (comboKey === 'ALT + S' && this.Settings.specialMarkers.boundary) {
-            // add boundary
-            this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
-            this.boundaryinserted.emit(this.audiochunk.absolutePlayposition.samples);
-            return;
+        if (comboKey !== '') {
+          if (this.isDisabledKey(comboKey)) {
+            $event.preventDefault();
           } else {
-            for (const marker of this.markers) {
-              if (marker.shortcut[shortcutInfo.platform] === comboKey) {
-                $event.preventDefault();
-                this.insertMarker(marker.code, marker.icon);
-                this.markerInsert.emit(marker.name);
-                return;
+            if (comboKey === 'ALT + S' && this.Settings.specialMarkers.boundary) {
+              // add boundary
+              this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
+              this.boundaryinserted.emit(this.audiochunk.absolutePlayposition.samples);
+              return;
+            } else {
+              for (const marker of this.markers) {
+                if (marker.shortcut[shortcutInfo.platform] === comboKey) {
+                  $event.preventDefault();
+                  this.insertMarker(marker.code, marker.icon);
+                  this.markerInsert.emit(marker.name);
+                  return;
+                }
               }
             }
           }
@@ -560,11 +562,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * called after key up in editor
    */
   onKeyUpSummernote = ($event) => {
-    this.shortcutsManager.checkKeyEvent($event);
-
-    // update rawText
-    this.onkeyup.emit($event);
-    this.triggerTyping($event.code !== 'Enter');
+    this.shortcutsManager.checkKeyEvent($event).then(() => {
+      // update rawText
+      this.onkeyup.emit($event);
+      this.triggerTyping($event.code !== 'Enter');
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   /**
@@ -866,35 +870,31 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     element.setAttribute('data-samples', this.audiochunk.absolutePlayposition.samples.toString());
     element.setAttribute('alt', '[|' + this.audiochunk.absolutePlayposition.samples.toString() + '|]');
 
-    this.textfield.summernote('editor.insertText', ' ');
-    this.triggerTyping();
-
     // timeout needed to fix summernote
+    // this.textfield.summernote('editor.insertText', ' ');
+    this.textfield.summernote('editor.insertNode', element);
+    this.textfield.summernote('editor.insertText', ' ');
+
     setTimeout(() => {
-      this.textfield.summernote('editor.insertNode', element);
-      this.textfield.summernote('editor.insertText', ' ');
-
       // set popover
-      setTimeout(() => {
-        jQuery(element).on('click', (event) => {
-          const jqueryobj = jQuery(event.target);
-          const samples = jqueryobj.attr('data-samples');
+      jQuery(element).on('click', (event) => {
+        const jqueryobj = jQuery(event.target);
+        const samples = jqueryobj.attr('data-samples');
 
-          if (isNumeric(samples)) {
-            this.boundaryclicked.emit(new SampleUnit(Number(samples), this.audioManager.sampleRate));
-          }
+        if (isNumeric(samples)) {
+          this.boundaryclicked.emit(new SampleUnit(Number(samples), this.audioManager.sampleRate));
+        }
+      })
+        .on('mouseover', (event) => {
+          this.onTextMouseOver(event);
         })
-          .on('mouseover', (event) => {
-            this.onTextMouseOver(event);
-          })
-          .on('mouseleave', () => {
-            jQuery('.seg-popover').css({
-              display: 'none'
-            });
+        .on('mouseleave', () => {
+          jQuery('.seg-popover').css({
+            display: 'none'
           });
-      }, 200);
+        });
       this.triggerTyping();
-    }, 100);
+    }, 200);
   }
 
   saveSelection() {

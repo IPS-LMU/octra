@@ -140,12 +140,15 @@ export class ShortcutManager {
               shortcutName,
               shortcut
             });
+          } else {
+            resolve(null);
           }
         } else if (event.type === 'keyup') {
           if (event.keyCode === this._pressedKey.code) {
             this._pressedKey.code = -1;
             this._pressedKey.name = '';
           }
+
         }
       } else {
         resolve(null);

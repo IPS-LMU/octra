@@ -107,10 +107,12 @@ export class KeymappingService {
 
   private onKeyDown = ($event) => {
     this.shortcutsManager.checkKeyEvent($event).then((shortcutInfo) => {
-      console.log(`combo: ${shortcutInfo.shortcut}`);
+      if (!isUnset(shortcutInfo)) {
+        console.log(`combo: ${shortcutInfo.shortcut}`);
 
-      this._beforeKeyDown.emit({...shortcutInfo, event: $event});
-      this._onkeydown.emit({...shortcutInfo, event: $event});
+        this._beforeKeyDown.emit({...shortcutInfo, event: $event});
+        this._onkeydown.emit({...shortcutInfo, event: $event});
+      }
     }).catch((error) => {
       console.error(error);
     });
@@ -118,6 +120,7 @@ export class KeymappingService {
 
   private onKeyUp = ($event) => {
     this.shortcutsManager.checkKeyEvent($event).then((shortcutInfo) => {
+      console.log(`ON KEY UP TRIGGERED ${shortcutInfo.shortcut}`);
       this._onkeyup.emit({...shortcutInfo, event: $event});
     }).catch((error) => {
       console.error(error);

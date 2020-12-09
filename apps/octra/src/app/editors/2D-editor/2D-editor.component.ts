@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
 import {contains, Functions, isUnset, SubscriptionManager} from '@octra/utilities';
-import {interval, Subscription} from 'rxjs';
+import {interval, Subscription, timer} from 'rxjs';
 import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
 import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
 import {TranscrEditorComponent} from '../../core/component';
@@ -77,7 +77,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   private subscrmanager: SubscriptionManager;
   private mousestate = 'initiliazied';
   private intervalID = null;
-  private mouseTimer;
   private factor = 8;
   private scrolltimer: Subscription = null;
   private shortcuts: any = {};
@@ -514,9 +513,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     event: MouseEvent | null
     time: SampleUnit
   }) {
-    if (!(this.mouseTimer === null || this.mouseTimer === undefined)) {
-      window.clearTimeout(this.mouseTimer);
-    }
+    this.subscrmanager.removeByTag('mouseTimer');
     this.mousestate = 'moving';
 
     this.doPlayOnHover(this.audioManager, this.appStorage.playonhover, this.audioChunkLines, this.viewer.av.mouseCursor);
@@ -524,10 +521,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     if (this.appStorage.showLoupe) {
       if (this.viewer.audioChunk.time.duration.seconds !== this.viewer.av.mouseCursor.seconds) {
         this.loupeHidden = false;
-        this.mouseTimer = window.setTimeout(() => {
+        this.subscrmanager.add(timer(20).subscribe(() => {
           this.changeLoupePosition($event.event, $event.time);
           this.mousestate = 'ended';
-        }, 20);
+        }), 'mouseTimer');
       } else {
         this.loupeHidden = true;
       }

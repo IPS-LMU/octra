@@ -1,14 +1,14 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
-import {Subject} from 'rxjs';
+import {Subject, timer} from 'rxjs';
 import * as X2JS from 'x2js';
 import {ASRLanguage, ASRSettings} from '../../obj/Settings';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
 import {SettingsService} from './settings.service';
 import {TranscriptionService} from './transcription.service';
-import {FileInfo, isUnset} from '@octra/utilities';
+import {FileInfo, isUnset, SubscriptionManager} from '@octra/utilities';
 import {AudioManager, SampleUnit, WavFormat} from '@octra/media';
 
 @Injectable({
@@ -126,6 +126,7 @@ class ASRQueue {
   private readonly _audiomanager: AudioManager;
   private readonly _itemChange: Subject<ASRQueueItem>;
   private readonly MAX_PARALLEL_ITEMS = 3;
+  private subscrManager = new SubscriptionManager();
 
   get itemChange(): Subject<ASRQueueItem> {
     return this._itemChange;
@@ -250,28 +251,28 @@ class ASRQueue {
 
                 this._itemChange.next(nextItem);
 
-                setTimeout(() => {
+                this.subscrManager.add(timer(1000).subscribe(() => {
                   this.startNext();
-                }, 1000);
+                }));
               },
               (error) => {
                 console.error(error);
-                setTimeout(() => {
+                this.subscrManager.add(timer(1000).subscribe(() => {
                   this.startNext();
-                }, 1000);
+                }));
               },
               () => {
-                setTimeout(() => {
+                this.subscrManager.add(timer(1000).subscribe(() => {
                   this.startNext();
-                }, 1000);
+                }));
               });
           } else {
             // ignore
           }
 
-          setTimeout(() => {
+          this.subscrManager.add(timer(1000).subscribe(() => {
             this.startNext();
-          }, 1000);
+          }));
         } else {
           // no free items left, check if something running
           if (this._queue.find((a) => {

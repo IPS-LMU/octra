@@ -1,6 +1,16 @@
-import {AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import Konva from 'konva';
-import {Subscription} from 'rxjs';
+import {Subscription, timer} from 'rxjs';
 import {AudioplayerSettings} from './audioplayer-settings';
 import {isUnset, SubscriptionManager} from '@octra/utilities';
 import {AudioChunk, PlayBackStatus, SampleUnit} from '@octra/media';
@@ -323,11 +333,11 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
     if (this.audioChunk.status === PlayBackStatus.PLAYING) {
       this.audioChunk.stopPlayback().then(() => {
         this.setPlayPosition(xCoord);
-        setTimeout(() => {
+        this.subscrmanager.add(timer(200).subscribe(() => {
           this.audioChunk.startPlayback().catch((error) => {
             console.error(error);
           });
-        }, 200);
+        }));
       }).catch((error) => {
         console.error(error);
       });

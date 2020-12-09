@@ -1,4 +1,4 @@
-import {Subject} from 'rxjs';
+import {Subject, timer} from 'rxjs';
 import {AudioInfo} from './audio-info';
 import {SampleUnit} from './audio-time';
 import {isUnset, SubscriptionManager, TsWorker, TsWorkerJob, TsWorkerStatus} from '@octra/utilities';
@@ -154,7 +154,7 @@ export class AudioDecoder {
 
             if (sampleStart.samples + sampleDur.samples < this.audioInfo.duration.samples) {
               if (!this.stopDecoding) {
-                setTimeout(() => {
+                this.subscrmanager.add(timer(10).subscribe(() => {
                   let sampleDur2 = Math.min(sampleDur.samples,
                     this.audioInfo.duration.samples - sampleStart.samples - sampleDur.samples);
 
@@ -165,7 +165,7 @@ export class AudioDecoder {
                   this.getChunkedChannelData(sampleStart.add(sampleDur), durationUnit).catch((error) => {
                     console.error(error);
                   });
-                }, 10);
+                }));
               } else {
                 this.onChannelDataCalculate.complete();
               }

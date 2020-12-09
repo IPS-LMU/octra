@@ -17,7 +17,7 @@ import {
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
-import {interval, throwError} from 'rxjs';
+import {interval, throwError, timer} from 'rxjs';
 import * as X2JS from 'x2js';
 import {AppInfo} from '../../../app.info';
 import {editorComponents} from '../../../editors/components';
@@ -342,9 +342,9 @@ export class TranscriptionComponent implements OnInit,
         } else if (saving === 'error') {
           this.saving = 'error';
         } else if (saving === 'success') {
-          setTimeout(() => {
+          this.subscrmanager.add(timer(200).subscribe(() => {
             this.saving = 'success';
-          }, 200);
+          }));
         }
       }
     ));
@@ -532,7 +532,7 @@ export class TranscriptionComponent implements OnInit,
         if (!(this.appLoadeditor === null || this.appLoadeditor === undefined)) {
           const componentFactory = this._componentFactoryResolver.resolveComponentFactory(comp);
 
-          setTimeout(() => {
+          this.subscrmanager.add(timer(20).subscribe(() => {
             const viewContainerRef = this.appLoadeditor.viewContainerRef;
             viewContainerRef.clear();
 
@@ -561,7 +561,7 @@ export class TranscriptionComponent implements OnInit,
             console.log(`opened ${name}`);
 
             this.cd.detectChanges();
-          }, 20);
+          }));
 
         } else {
           reject('ERROR appLoadeditor is null');
@@ -601,7 +601,7 @@ export class TranscriptionComponent implements OnInit,
           this.unsubscribeSubscriptionsForThisAnnotation();
           this.appStorage.submitted = true;
 
-          setTimeout(() => {
+          this.subscrmanager.add(timer(500).subscribe(() => {
             this.waitForSend = false;
             this.transcrSendingModal.close();
 
@@ -609,7 +609,7 @@ export class TranscriptionComponent implements OnInit,
             this.modalOverview.close();
 
             this.nextTranscription(result);
-          }, 500);
+          }));
         } else {
           this.sendError = this.langService.translate('send error');
         }
@@ -635,11 +635,11 @@ export class TranscriptionComponent implements OnInit,
             this.transcrSendingModal.open().catch((error) => {
               console.error(error);
             });
-            setTimeout(() => {
+            this.subscrmanager.add(timer(1000).subscribe(() => {
               // simulate nextTranscription
               this.transcrSendingModal.close();
               this.reloadDemo();
-            }, 1000);
+            }));
             break;
         }
       }).catch((error) => {

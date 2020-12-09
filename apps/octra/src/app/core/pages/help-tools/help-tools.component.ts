@@ -5,6 +5,8 @@ import {LoginMode} from '../../store';
 import {Store} from '@ngrx/store';
 import * as TranscriptionActions from '../../store/transcription/transcription.actions'
 import * as IDBActions from '../../store/idb/idb.actions'
+import {SubscriptionManager} from '@octra/utilities';
+import {timer} from 'rxjs';
 
 @Component({
   selector: 'octra-help-tools',
@@ -13,6 +15,8 @@ import * as IDBActions from '../../store/idb/idb.actions'
 })
 export class HelpToolsComponent implements OnInit, OnDestroy {
   @ViewChild('canvas', {static: false}) canvas: ElementRef;
+
+  private subscrManager = new SubscriptionManager();
 
   constructor(private appStorage: AppStorageService,
               private api: APIService,
@@ -38,10 +42,10 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
       this.store.dispatch(IDBActions.clearAllOptions());
       this.appStorage.clearLoggingDataPermanently();
 
-      setTimeout(() => {
+      this.subscrManager.add(timer(3000).subscribe(() => {
         alert('All cleared. The app will be reloaded.');
         document.location.reload();
-      }, 3000);
+      }));
     };
 
     if (this.appStorage.useMode === LoginMode.LOCAL || this.appStorage.useMode === LoginMode.DEMO || this.appStorage.useMode === LoginMode.URL) {

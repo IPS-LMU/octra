@@ -32,6 +32,7 @@ import {
 } from '@octra/components';
 import {AudioChunk, AudioManager, AudioSelection, SampleUnit} from '@octra/media';
 import {LoginMode} from '../../core/store';
+import {timer} from 'rxjs';
 
 @Component({
   selector: 'octra-signal-gui',
@@ -71,7 +72,6 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   private subscrManager: SubscriptionManager;
   private saving = false;
   private factor = 6;
-  private mouseTimer = null;
   private platform = BrowserInfo.platform;
   private selectedIndex: number;
 
@@ -217,13 +217,6 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
       this.editor.updateRawText();
       this.save();
-      setTimeout(() => {
-        if (!isUnset(this.signalDisplayDown)) {
-          // this.loupe.update(false);
-        } else {
-          console.error(`can't update loupe after typing because it's undefined!`);
-        }
-      }, 200);
 
       if (this.oldRaw === this.editor.rawText) {
         this.appStorage.saving.emit('success');
@@ -272,10 +265,10 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.subscrManager.add(this.transcrService.currentlevel.segments.onsegmentchange.subscribe(
       ($event) => {
         if (!this.saving) {
-          setTimeout(() => {
+          this.subscrManager.add(timer(1000).subscribe(() => {
             this.saving = true;
             this.onSegmentChange();
-          }, 1000);
+          }));
         }
       }
     ));
@@ -375,9 +368,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   onMouseOver($event: {
     event: MouseEvent | null, time: SampleUnit
   }) {
-    if (!(this.mouseTimer === null || this.mouseTimer === undefined)) {
-      window.clearTimeout(this.mouseTimer);
-    }
+    this.subscrManager.removeByTag('mouseTimer');
 
     this.miniloupe.component = this.signalDisplayTop;
 
@@ -385,10 +376,10 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
     if (this.appStorage.showLoupe) {
       this.miniloupe.isHidden = false;
-      this.mouseTimer = window.setTimeout(() => {
+      this.subscrManager.add(timer(20).subscribe(() => {
         this.changeLoupePosition($event.event, $event.time);
         this.mousestate = 'ended';
-      }, 20);
+      }), 'mouseTimer');
     }
   }
 

@@ -5,7 +5,7 @@ import {TranslocoService} from '@ngneat/transloco';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {isUnset, SubscriptionManager} from '@octra/utilities';
-import {interval, Subject} from 'rxjs';
+import {interval, Subject, timer} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {NamingDragAndDropComponent} from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import {NavbarService} from '../../component/navbar/navbar.service';
@@ -490,8 +490,8 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
     this.transcrService.currentlevel.segments.onsegmentchange.emit();
     this.transcrService.saveSegments();
 
-    setTimeout(() => {
+    this.subscrmanager.add(timer(1000).subscribe(() => {
       this.navbarServ.toolApplied.emit('combinePhrases');
-    }, 1000);
+    }));
   }
 }

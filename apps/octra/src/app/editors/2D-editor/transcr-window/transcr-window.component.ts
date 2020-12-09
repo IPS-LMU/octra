@@ -29,6 +29,7 @@ import {AudioChunk, AudioManager, AudioRessource, AudioSelection, SampleUnit} fr
 import {ASRQueueItemType, Segment, Segments} from '@octra/annotation';
 import {AudioNavigationComponent, AudioViewerComponent, AudioViewerShortcutEvent} from '@octra/components';
 import {LoginMode} from '../../../core/store';
+import {timer} from 'rxjs';
 
 @Component({
   selector: 'octra-transcr-window',
@@ -214,7 +215,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
     new Promise<void>((resolve) => {
       // timeout to show loading status correctly
-      setTimeout(() => {
+      this.subscrmanager.add(timer().subscribe(() => {
         this._validationEnabled = false;
         this.editor.updateRawText();
         this.save();
@@ -227,7 +228,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         } else {
           resolve();
         }
-      }, 50);
+      }));
     }).then(() => {
       if (direction !== 'down') {
         this.goToSegment(direction).then(() => {
@@ -394,7 +395,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       this.audioManager.createSampleUnit(0)
     );
 
-    setTimeout(() => {
+    this.subscrmanager.add(timer(500).subscribe(() => {
       const segment = this.transcrService.currentlevel.segments.get(this.segmentIndex);
 
       if (isUnset(segment.isBlockedBy)) {
@@ -402,7 +403,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           console.error(error);
         });
       }
-    }, 500);
+    }));
   }
 
   ngAfterContentInit() {

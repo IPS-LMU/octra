@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
-import {Subject} from 'rxjs';
+import {Subject, timer} from 'rxjs';
 import {SubscriptionManager} from '@octra/utilities';
 import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
@@ -123,10 +123,10 @@ export class BugreportModalComponent implements OnInit {
           this.update();
           console.log('Bugreport sent');
 
-          setTimeout(() => {
+          this.subscrmanager.add(timer(2000).subscribe(() => {
             this.bgdescr = '';
             this.modal.hide();
-          }, 2000);
+          }));
         },
         (error) => {
           console.error(error);

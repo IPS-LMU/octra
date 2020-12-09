@@ -29,6 +29,7 @@ import {Segment, Segments} from '@octra/annotation';
 import {ContextMenuAction, ContextMenuComponent} from '../../core/component/context-menu/context-menu.component';
 import {TranslocoService} from '@ngneat/transloco';
 import {PermutationsReplaceModalComponent} from './modals/permutations-replace-modal/permutations-replace-modal.component';
+import {timer} from 'rxjs';
 
 declare var validateAnnotation: any;
 
@@ -644,9 +645,9 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     } else if ($event.code === 'Escape') {
       // close without saving
       this._textEditor.audiochunk.stopPlayback();
-      setTimeout(() => {
+      this.subscrManager.add(timer(1000).subscribe(() => {
         this.closeTextEditor();
-      }, 1000);
+      }));
     }
   }
 
@@ -783,13 +784,13 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       this.cd.detectChanges();
     }
 
-    setTimeout(() => {
+    this.subscrManager.add(timer(60).subscribe(() => {
       if (Date.now() - this.lastResizing > 50) {
         this.showSignalDisplay = false;
         this.cd.markForCheck();
         this.cd.detectChanges();
       }
-    }, 60);
+    }));
     this.lastResizing = Date.now();
   }
 

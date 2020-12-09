@@ -575,11 +575,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     };
 
     if (later) {
-      setTimeout(
-        () => {
-          func();
-        }, 300
-      );
+      this.subscrmanager.add(timer(300).subscribe(() => {
+        func();
+      }));
     } else {
       func();
     }
@@ -855,12 +853,12 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.triggerTyping();
 
     // timeout needed to fix summernote
-    setTimeout(() => {
+    this.subscrmanager.add(timer(100).subscribe(() => {
       this.textfield.summernote('editor.insertNode', element);
       this.textfield.summernote('editor.insertText', ' ');
 
       // set popover
-      setTimeout(() => {
+      this.subscrmanager.add(timer(200).subscribe(() => {
         jQuery(element).on('click', (event) => {
           const jqueryobj = jQuery(event.target);
           const samples = jqueryobj.attr('data-samples');
@@ -877,9 +875,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
               display: 'none'
             });
           });
-      }, 200);
+      }));
       this.triggerTyping();
-    }, 100);
+    }));
   }
 
   saveSelection() {
@@ -1101,7 +1099,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   private triggerTyping(doValidation = true) {
     // this.highlightingRunning = false;
-    setTimeout(() => {
+    this.subscrmanager.add(timer(500).subscribe(() => {
       if (Date.now() - this.lastkeypress >= 450 && this.lastkeypress > -1) {
         if (this._isTyping) {
           if (this.audiochunk.id === this._lastAudioChunkID) {
@@ -1120,7 +1118,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           }
         }
       }
-    }, 500);
+    }));
 
     if (!this._isTyping) {
       this.typing.emit('started');

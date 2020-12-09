@@ -24,6 +24,8 @@ export class AudioManager {
     sampleDur: SampleUnit
   }>();
 
+  private subscrManager: SubscriptionManager;
+
   // events
   public afterdecoded: EventEmitter<AudioRessource> = new EventEmitter<AudioRessource>();
   public afterloaded: EventEmitter<any> = new EventEmitter<any>();
@@ -143,6 +145,7 @@ export class AudioManager {
   constructor(audioinfo: AudioInfo, sampleRate: number) {
     this._id = ++AudioManager.counter;
     this._audio = new Audio();
+    this.subscrManager = new SubscriptionManager();
     this._audio.autoplay = false;
     this._audio.defaultPlaybackRate = 1;
     this._audio.defaultMuted = false;
@@ -323,7 +326,9 @@ export class AudioManager {
           .then(() => {
             this._playbackEndChecker = timer(Math.round(audioSelection.duration.unix / playbackRate)).subscribe(() => {
               this.endPlayBack();
-              setTimeout(resolve, 100);
+              this.subscrManager.add(timer(100).subscribe(() => {
+                resolve();
+              }));
             });
           })
           .catch((error) => {
@@ -456,6 +461,7 @@ export class AudioManager {
           );
       }
     }
+    this.subscrManager.destroy();
   }
 
   public createSampleUnit(sample: number): SampleUnit {
@@ -583,7 +589,7 @@ export class AudioChunk {
   private static _counter = 0;
   public statuschange: EventEmitter<PlayBackStatus> = new EventEmitter<PlayBackStatus>();
   private readonly _audioManger: AudioManager;
-  private subscrmanager: SubscriptionManager = new SubscriptionManager();
+  private subscrManager: SubscriptionManager = new SubscriptionManager();
   private _playposition: SampleUnit;
 
   get audioManager(): AudioManager {
@@ -779,7 +785,9 @@ export class AudioChunk {
           resolve2();
         } else {
           this._audioManger.pausePlayback().then(() => {
-            setTimeout(resolve2, 500);
+            this.subscrManager.add(timer(500).subscribe(() => {
+              resolve2();
+            }));
           }).catch((error) => {
             reject2(error);
           });
@@ -795,10 +803,10 @@ export class AudioChunk {
 
         this._lastplayedpos = this._playposition.clone();
 
-        const id = this.subscrmanager.add(this.audioManager.statechange.subscribe(
+        const id = this.subscrManager.add(this.audioManager.statechange.subscribe(
           (state: PlayBackStatus) => {
             if (state === PlayBackStatus.STOPPED || state === PlayBackStatus.PAUSED || state === PlayBackStatus.ENDED) {
-              this.subscrmanager.removeById(id);
+              this.subscrManager.removeById(id);
             }
 
             if (state === PlayBackStatus.STOPPED) {
@@ -817,7 +825,7 @@ export class AudioChunk {
               if (this._replay) {
                 this.setState(state);
                 return new Promise<void>((resolve2, reject2) => {
-                  setTimeout(() => {
+                  this.subscrManager.add(timer(200).subscribe(() => {
                     this.startPlayback(playOnHover).then(() => {
                       resolve2();
                     })
@@ -825,7 +833,7 @@ export class AudioChunk {
                         console.error(error);
                         reject2(error);
                       });
-                  }, 200);
+                  }));
                 });
               } else {
                 this.setState(state);
@@ -940,7 +948,7 @@ export class AudioChunk {
   }
 
   public destroy() {
-    this.subscrmanager.destroy();
+    this.subscrManager.destroy();
   }
 
   public toggleReplay() {

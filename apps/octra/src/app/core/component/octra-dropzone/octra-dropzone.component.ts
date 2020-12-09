@@ -270,9 +270,9 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
       this.dropzone.clicklocked = true;
       // make sure, that event click does not trigger
 
-      setTimeout(() => {
+      this.subscrmanager.add(timer(300).subscribe(() => {
         this.dropzone.clicklocked = false;
-      }, 300);
+      }));
     }
   }
 

@@ -3,7 +3,7 @@ import {AudioService, SettingsService, TranscriptionService, UserInteractionsSer
 import {AppInfo} from '../../../app.info';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {HttpClient} from '@angular/common/http';
-import {Subject} from 'rxjs';
+import {Subject, timer} from 'rxjs';
 import {DragulaService} from 'ng2-dragula';
 import {fadeInExpandOnEnterAnimation, fadeOutCollapseOnLeaveAnimation} from 'angular-animations';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
@@ -208,26 +208,28 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
         name: converter.name,
         preparing: true
       };
-      setTimeout(() => {
-        if (converter.name === 'Bundle') {
-          // only this converter needs an array buffer
-          this.navbarServ.transcrService.audiofile.arraybuffer = this.transcrService.audioManager.ressource.arraybuffer;
+      this.subscrmanager.add(timer(300).subscribe(
+        () => {
+          if (converter.name === 'Bundle') {
+            // only this converter needs an array buffer
+            this.navbarServ.transcrService.audiofile.arraybuffer = this.transcrService.audioManager.ressource.arraybuffer;
+          }
+
+          const result: IFile = converter.export(oannotjson, this.navbarServ.transcrService.audiofile, levelnum).file;
+
+          this.parentformat.download = result.name;
+
+          if (this.parentformat.uri !== null) {
+            window.URL.revokeObjectURL(this.parentformat.uri.toString());
+          }
+          const test = new File([result.content], result.name);
+          this.setParentFormatURI(window.URL.createObjectURL(test));
+          this.preparing = {
+            name: converter.name,
+            preparing: false
+          };
         }
-
-        const result: IFile = converter.export(oannotjson, this.navbarServ.transcrService.audiofile, levelnum).file;
-
-        this.parentformat.download = result.name;
-
-        if (this.parentformat.uri !== null) {
-          window.URL.revokeObjectURL(this.parentformat.uri.toString());
-        }
-        const test = new File([result.content], result.name);
-        this.setParentFormatURI(window.URL.createObjectURL(test));
-        this.preparing = {
-          name: converter.name,
-          preparing: false
-        };
-      }, 300);
+      ));
     }
   }
 
@@ -254,9 +256,9 @@ export class ExportFilesModalComponent implements OnInit, OnDestroy {
   }
 
   onDownloadClick(i: number) {
-    setTimeout(() => {
+    this.subscrmanager.add(timer(500).subscribe(() => {
       this.exportStates[i] = 'inactive';
-    }, 500);
+    }));
   }
 
   ngOnDestroy() {

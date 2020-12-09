@@ -12,7 +12,7 @@ import {
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
-import {Subject} from 'rxjs';
+import {Subject, timer} from 'rxjs';
 import {isUnset, SubscriptionManager} from '@octra/utilities';
 import {SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
@@ -61,9 +61,9 @@ export class TranscriptionGuidelinesModalComponent implements OnInit, OnChanges 
     }
     if (($event.guidelines.previousValue === null || $event.guidelines.previousValue === undefined) &&
       !($event.guidelines.currentValue === null || $event.guidelines.currentValue === undefined)) {
-      setTimeout(() => {
+      this.subscrmanager.add(timer(1000).subscribe(() => {
         this.initVideoPlayers();
-      }, 1000);
+      }));
     }
   }
 

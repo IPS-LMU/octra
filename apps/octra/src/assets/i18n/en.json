@@ -99,7 +99,8 @@
     "Options": "Options",
     "time": "Time",
     "speaker": "Speaker",
-    "switch to": "Switch to {{editor}}"
+    "switch to": "Switch to {{editor}}",
+    "actions": "Actions"
   },
   "bug report": {
     "give feedback": "Give feedback",
@@ -208,6 +209,7 @@
       "TRN-Editor": "Shortcuts of the TRN-Editor",
       "TRN-Editor texteditor": "Shortcuts of the Texteditor",
       "TRN-Editor table": "Shortcuts for the table",
+      "save cell": "Save cell",
       "save and next cell": "Save and go to the next cell",
       "save and under cell": "Save and go to one cell under the current one",
       "save and previous cell": "Save and go to the previous cell",
@@ -386,6 +388,11 @@
         "description": "Be careful: You cannot redo this action after it was applied.",
         "replace permutations": "Replace Permutations"
       }
+    },
+    "context menu": {
+      "merge selected lines": "Merge selected segments (ignore speaker labels)",
+      "remove transcripts of selected lines": "Remove transcripts of selected segments (keep boundaries)",
+      "remove selected lines completely": "Remove selected segments completely (remove transcript & merge)"
     }
   }
 }

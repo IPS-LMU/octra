@@ -26,3 +26,7 @@ table tbody tr .rightcolumn {
   font-size: 0.9em;
   min-height: 1rem;
 }
+
+button {
+  text-transform: none;
+}

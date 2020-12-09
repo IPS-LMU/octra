@@ -91,11 +91,11 @@ export class Segment {
    */
   public static fromObj(levelName: string, oSegment: OSegment, sampleRate: number): Segment {
     if (!isUnset(oSegment)) {
-      let speakerLabel = 'NONE';
+      let speakerLabel = '';
 
       if (!isUnset(oSegment.labels) && oSegment.labels.length > 1) {
         const foundLabel = oSegment.labels.find(a => a.name.toLowerCase() === 'speaker');
-        speakerLabel = (!isUnset(foundLabel) ? foundLabel.value : 'NONE')
+        speakerLabel = (!isUnset(foundLabel) ? foundLabel.value : '')
       }
 
       const transcriptLabel = oSegment.labels.find(a => a.name === levelName);

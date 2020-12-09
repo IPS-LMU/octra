@@ -115,7 +115,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
         mac: 'ENTER',
         pc: 'ENTER'
       },
-      title: 'save and next cell',
+      title: 'save cell',
       focusonly: true
     },
     up: {
@@ -214,7 +214,12 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     column: 1
   }
 
-  private _textEditor = {
+  private _textEditor: {
+    state: 'active' | 'inactive',
+    selectedSegment: number,
+    openingBlocked: boolean,
+    audiochunk: AudioChunk
+  } = {
     state: 'inactive',
     selectedSegment: -1,
     openingBlocked: false,
@@ -314,24 +319,24 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
 
     this.contextMenuProperties.actions.push(
       {
-        name: 'merge selected Lines',
+        name: 'merge selected lines',
         status: 'active',
         icon: ['fas', 'object-group'],
-        label: 'Merge selected segments (ignore speaker labels)',
+        label: this.translocoService.translate('trn-editor.context menu.merge selected lines'),
         func: this.mergeSelectedLinesContextMenu
       },
       {
-        name: 'remove transcripts of selected Lines',
+        name: 'remove transcripts of selected lines',
         status: 'active',
         icon: ['fas', 'eraser'],
-        label: 'Remove transcripts of selected segments (keep boundaries)',
+        label: this.translocoService.translate('trn-editor.context menu.remove transcripts of selected lines'),
         func: this.removeTranscriptsOfSelectedLinesContextMenu
       },
       {
         name: 'remove selected lines completely',
         status: 'active',
         icon: ['fas', 'trash'],
-        label: 'Remove selected segments completely (remove transcript & merge)',
+        label: this.translocoService.translate('trn-editor.context menu.remove selected lines completely'),
         func: this.removeSelectedLines
       }
     );
@@ -446,10 +451,6 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
       $event.preventDefault();
       this.saveNewLabel(index, labelCol.innerText);
       labelCol.contentEditable = 'false';
-
-      setTimeout(() => {
-        this.openTranscrEditor(index);
-      }, 200);
     } else if ($event.code === 'Tab') {
       // ignore keys
       $event.preventDefault();
@@ -632,10 +633,6 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
   onKeyUp($event: KeyboardEvent, i: number) {
     if ($event.code === 'Enter') {
       this.saveAndCloseTranscrEditor().then(() => {
-        this.focusOnNextSpeakerLabel(i);
-
-        const startSample = (i > 0) ? this.transcrService.currentlevel.segments.get(i - 1).time.samples : 0;
-
         /*
         this.uiService.addElementFromEvent('segment', {
           value: 'updated'
@@ -646,7 +643,10 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
       });
     } else if ($event.code === 'Escape') {
       // close without saving
-      this.closeTextEditor();
+      this._textEditor.audiochunk.stopPlayback();
+      setTimeout(() => {
+        this.closeTextEditor();
+      }, 1000);
     }
   }
 
@@ -655,6 +655,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
       if (this.textEditor.state === 'inactive') {
         resolve();
       } else {
+        this._textEditor.audiochunk.stopPlayback();
         let started = Date.now();
         const overallTime = started;
 

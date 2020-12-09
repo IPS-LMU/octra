@@ -98,7 +98,8 @@
     "reload": "NEU LADEN",
     "Options": "Optionen",
     "time": "Zeit",
-    "speaker": "Sprecher"
+    "speaker": "Sprecher",
+    "actions": "Aktionen"
   },
   "bug report": {
     "give feedback": "Feedback geben",
@@ -207,6 +208,7 @@
       "TRN-Editor": "Tastenkombinationen des TRN-Editors",
       "TRN-Editor texteditor": "Tastenkürzel des Texteditors",
       "TRN-Editor table": "Tastenkürzel für die Tabelle",
+      "save cell": "Zelle speichern",
       "save and next cell": "Speichern und zur nächsten Zelle",
       "save and under cell": "Speichern und eine Zelle nach unten",
       "save and previous cell": "Speichern und zur vorherigen Zelle",
@@ -386,6 +388,11 @@
         "description": "Diese Aktion kann nicht rückgängig gemacht werden.",
         "replace permutations": "Permutationen ersetzen"
       }
+    },
+    "context menu": {
+      "merge selected lines": "Führe ausgewählte Segmente zusammen (ignoriere Sprecher-Label)",
+      "remove transcripts of selected lines": "Entferne Transkriptionen ausgewählter Segmente (behalte Segmentgrenzen bei)",
+      "remove selected lines completely": "Entferne ausgewählte Segmente vollständig (entferne Transkripte & führe zusammen)"
     }
   }
 }

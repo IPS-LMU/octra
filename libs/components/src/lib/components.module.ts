@@ -35,6 +35,7 @@ import {TimespanPipe} from '@octra/annotation';
   imports: [
     CommonModule,
     FormsModule,
+    FontAwesomeModule,
     HttpClientModule,
     BrowserAnimationsModule,
     FontAwesomeModule,

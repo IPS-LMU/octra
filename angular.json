@@ -82,7 +82,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "extractLicenses": true,
               "vendorChunk": false,
@@ -110,7 +109,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "extractLicenses": true,
               "vendorChunk": false,
@@ -128,7 +126,10 @@
                 }
               ]
             }
-          }
+          },
+          "outputs": [
+            "{options.outputPath}"
+          ]
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -155,7 +156,10 @@
               "apps/octra/tsconfig.app.json",
               "apps/octra/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**", "!apps/octra/**/*"]
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/octra/**/*"
+            ]
           }
         },
         "test": {
@@ -163,7 +167,10 @@
           "options": {
             "jestConfig": "apps/octra/jest.config.js",
             "passWithNoTests": true
-          }
+          },
+          "outputs": [
+            "coverage/apps/octra"
+          ]
         }
       }
     },
@@ -188,8 +195,13 @@
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": ["apps/octra-e2e/tsconfig.e2e.json"],
-            "exclude": ["**/node_modules/**", "!apps/octra-e2e/**/*"]
+            "tsConfig": [
+              "apps/octra-e2e/tsconfig.e2e.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/octra-e2e/**/*"
+            ]
           }
         }
       }
@@ -218,7 +230,10 @@
           "options": {
             "jestConfig": "libs/utilities/jest.config.js",
             "passWithNoTests": true
-          }
+          },
+          "outputs": [
+            "coverage/libs/utilities"
+          ]
         },
         "build": {
           "builder": "@nrwl/node:package",
@@ -230,7 +245,10 @@
             "assets": [
               "libs/utilities/*.md"
             ]
-          }
+          },
+          "outputs": [
+            "{options.outputPath}"
+          ]
         }
       }
     },
@@ -258,7 +276,10 @@
           "options": {
             "jestConfig": "libs/media/jest.config.js",
             "passWithNoTests": true
-          }
+          },
+          "outputs": [
+            "coverage/libs/media"
+          ]
         },
         "build": {
           "builder": "@nrwl/node:package",
@@ -270,7 +291,10 @@
             "assets": [
               "libs/media/*.md"
             ]
-          }
+          },
+          "outputs": [
+            "{options.outputPath}"
+          ]
         }
       }
     },
@@ -298,7 +322,10 @@
           "options": {
             "jestConfig": "libs/annotation/jest.config.js",
             "passWithNoTests": true
-          }
+          },
+          "outputs": [
+            "coverage/libs/annotation"
+          ]
         },
         "build": {
           "builder": "@nrwl/node:package",
@@ -310,7 +337,10 @@
             "assets": [
               "libs/annotation/*.md"
             ]
-          }
+          },
+          "outputs": [
+            "{options.outputPath}"
+          ]
         }
       }
     },
@@ -340,7 +370,10 @@
               "libs/components/tsconfig.lib.json",
               "libs/components/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**", "!libs/components/**/*"]
+            "exclude": [
+              "**/node_modules/**",
+              "!libs/components/**/*"
+            ]
           }
         },
         "test": {
@@ -348,7 +381,10 @@
           "options": {
             "jestConfig": "libs/components/jest.config.js",
             "passWithNoTests": true
-          }
+          },
+          "outputs": [
+            "coverage/libs/components"
+          ]
         }
       },
       "schematics": {}

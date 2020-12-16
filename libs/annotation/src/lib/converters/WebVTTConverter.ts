@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../Annotation';
+import {OAnnotJSON, OAudiofile, OLabel, OLevel, OSegment} from '../annotjson';
 
 export class WebVTTConverter extends Converter {
 
@@ -62,7 +62,7 @@ export class WebVTTConverter extends Converter {
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile !== null && audiofile !== undefined) {
-      const result = new OAnnotJSON(audiofile.name, audiofile.samplerate);
+      const result = new OAnnotJSON(audiofile.name, audiofile.sampleRate);
       result.levels.push(new OLevel(`OCTRA_1`, 'SEGMENT'));
 
       const content = file.content;
@@ -87,15 +87,15 @@ export class WebVTTConverter extends Converter {
             for (const cue of cues) {
               const regex = new RegExp('([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}) -->' +
                 ' ([0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}).*', 'g');
-              let matches = regex.exec(cue);
+              const matches = regex.exec(cue);
 
               let lastEnd = 0;
               if (matches !== null) {
                 const cueWithoutTimestamp = cue.substr(matches.index + matches[0].length);
                 const linesOfCue = cueWithoutTimestamp.split(/\n/g).filter(a => a.trim() !== '');
 
-                const timeStart = this.getSamplesFromTimeString(matches[1], audiofile.samplerate);
-                const timeEnd = this.getSamplesFromTimeString(matches[2], audiofile.samplerate);
+                const timeStart = this.getSamplesFromTimeString(matches[1], audiofile.sampleRate);
+                const timeEnd = this.getSamplesFromTimeString(matches[2], audiofile.sampleRate);
                 let escapedTranscript = '';
                 if (timeStart > -1 && timeEnd > -1 && timeStart < audiofile.duration && timeEnd < audiofile.duration) {
                   for (let i = 0; i < linesOfCue.length; i++) {

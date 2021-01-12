@@ -4,7 +4,7 @@ import {isUnset, Shortcut, ShortcutEvent, ShortcutGroup, ShortcutManager} from '
 
 @Injectable()
 export class KeymappingService {
-  private shortcutsManager: ShortcutManager;
+  private readonly shortcutsManager: ShortcutManager;
   private readonly _beforeShortcutTriggered = new EventEmitter<ShortcutEvent>();
   private readonly _onShortcutTriggered: EventEmitter<ShortcutEvent>;
 
@@ -124,35 +124,4 @@ export class KeymappingService {
       }
     });
   }
-
-  private cloneShortcuts(shortcuts: any): any {
-    const result: any = {};
-    for (const elem in shortcuts) {
-      if (shortcuts.hasOwnProperty(elem)) {
-        result['' + elem + ''] = {
-          keys: {
-            mac: shortcuts[elem].keys.mac,
-            pc: shortcuts[elem].keys.pc
-          },
-          title: shortcuts[elem].title,
-          focusonly: shortcuts[elem].focusonly
-        };
-      }
-    }
-
-    return result;
-  }
-
-  /*private getRegist(combo:string):string{
-   for(let i = 0; i < this.shortcuts.length; i++){
-   let shortcuts = this.getEntryList(this.shortcuts[i].identifier);
-   for(let j = 0; j < shortcuts.length; j++){
-   if(shortcuts[j].value.keys.mac === combo){
-   return this.shortcuts[i].identifier;
-   }
-   }
-   }
-
-   return null;
-   }*/
 }

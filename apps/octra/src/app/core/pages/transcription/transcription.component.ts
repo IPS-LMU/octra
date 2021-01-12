@@ -16,7 +16,7 @@ import {
 } from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
-import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
+import {Functions, isUnset, ShortcutGroup, ShortcutManager, SubscriptionManager} from '@octra/utilities';
 import {interval, throwError} from 'rxjs';
 import * as X2JS from 'x2js';
 import {AppInfo} from '../../../app.info';
@@ -26,7 +26,6 @@ import {InactivityModalComponent} from '../../modals/inactivity-modal/inactivity
 import {MissingPermissionsModalComponent} from '../../modals/missing-permissions/missing-permissions.component';
 import {ModalService} from '../../modals/modal.service';
 import {OverviewModalComponent} from '../../modals/overview-modal/overview-modal.component';
-import {GeneralShortcut} from '../../modals/shortcuts-modal/shortcuts-modal.component';
 import {
   ModalEndAnswer,
   TranscriptionDemoEndModalComponent
@@ -66,10 +65,9 @@ import {LoginMode} from '../../store';
 export class TranscriptionComponent implements OnInit,
   OnDestroy, AfterViewInit, AfterContentInit, OnChanges, AfterViewChecked, AfterContentChecked, AfterContentInit {
 
-  public generalShortcuts: GeneralShortcut[] = [];
   public waitForSend = false;
   // TODO change to ModalComponents!
-  @ViewChild('modalShortcuts', {static: true}) modalShortcuts: any;
+  @ViewChild('modalShortcutsDialogue', {static: true}) modalShortcutsDialogue: any;
   @ViewChild('modalOverview', {static: true}) modalOverview: OverviewModalComponent;
   @ViewChild('modalDemoEnd', {static: true}) modalDemoEnd: TranscriptionDemoEndModalComponent;
   @ViewChild(LoadeditorDirective, {static: true}) appLoadeditor: LoadeditorDirective;
@@ -78,6 +76,7 @@ export class TranscriptionComponent implements OnInit,
   @ViewChild('modalGuidelines', {static: true}) modalGuidelines: TranscriptionGuidelinesModalComponent;
   @ViewChild('inactivityModal', {static: false}) inactivityModal: InactivityModalComponent;
   @ViewChild('missingPermissionsModal', {static: false}) missingPermissionsModal: MissingPermissionsModalComponent;
+
   public sendError = '';
   public saving = '';
   public interface = '';
@@ -88,6 +87,74 @@ export class TranscriptionComponent implements OnInit,
   private sendOk = false;
   private levelSubscriptionID = 0;
   private audioManager: AudioManager;
+
+  private shortcutManager: ShortcutManager;
+
+  private modalShortcuts: ShortcutGroup = {
+    name: 'modal shortcuts',
+    items: [
+      {
+        name: 'shortcuts',
+        title: 'shortcuts',
+        focusonly: false,
+        keys: {
+          mac: 'ALT + 8',
+          pc: 'ALT + 8'
+        }
+      },
+      {
+        name: 'guidelines',
+        title: 'guidelines',
+        focusonly: false,
+        keys: {
+          mac: 'ALT + 9',
+          pc: 'ALT + 9'
+        }
+      },
+      {
+        name: 'overview',
+        title: 'overview',
+        focusonly: false,
+        keys: {
+          mac: 'ALT + 0',
+          pc: 'ALT + 0'
+        }
+      }
+    ]
+  };
+
+  public generalShortcuts: ShortcutGroup = {
+    name: 'general shortcuts',
+    items: [
+      {
+        name: 'feedback1',
+        title: 'feedback and send 1',
+        focusonly: false,
+        keys: {
+          mac: 'SHIFT + ALT + 1',
+          pc: 'SHIFT + ALT + 1'
+        }
+      },
+      {
+        name: 'feedback2',
+        title: 'feedback and send 2',
+        focusonly: false,
+        keys: {
+          mac: 'SHIFT + ALT + 2',
+          pc: 'SHIFT + ALT + 2'
+        }
+      },
+      {
+        name: 'feedback3',
+        title: 'feedback and send 3',
+        focusonly: false,
+        keys: {
+          mac: 'SHIFT + ALT + 3',
+          pc: 'SHIFT + ALT + 3'
+        }
+      }
+    ]
+  }
 
   public get Interface(): string {
     return this.interface;
@@ -150,6 +217,9 @@ export class TranscriptionComponent implements OnInit,
     this.navbarServ.transcrService = this.transcrService;
     this.navbarServ.uiService = this.uiService;
 
+    this.shortcutManager = new ShortcutManager();
+    this.shortcutManager.registerShortcutGroup(this.modalShortcuts);
+
     this.subscrmanager.add(this.audioManager.statechange.subscribe(async (state) => {
         if (!appStorage.playonhover && !this.modalOverview.visible) {
           let caretpos = -1;
@@ -167,24 +237,24 @@ export class TranscriptionComponent implements OnInit,
         console.error(error);
       }));
 
-    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(async (event) => {
+    this.subscrmanager.add(this.keyMap.onShortcutTriggered.subscribe((event) => {
       if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
-        if (['ALT + SHIFT + 1', 'ALT + SHIFT + 2', 'ALT + SHIFT + 3'].includes(event.comboKey)) {
+        if (['SHIFT + ALT + 1', 'SHIFT + ALT + 2', 'SHIFT + ALT + 3'].includes(event.shortcut)) {
           this.waitForSend = true;
 
           this.appStorage.afterSaving().then(() => {
             this.waitForSend = false;
-            if (event.comboKey === 'ALT + SHIFT + 1') {
+            if (event.shortcut === 'SHIFT + ALT + 1') {
               this.sendTranscriptionForShortAudioFiles('bad');
               this.uiService.addElementFromEvent('shortcut', {
                 value: 'send_transcription:1'
               }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, this.interface);
-            } else if (event.comboKey === 'ALT + SHIFT + 2') {
+            } else if (event.shortcut === 'SHIFT + ALT + 2') {
               this.sendTranscriptionForShortAudioFiles('middle');
               this.uiService.addElementFromEvent('shortcut', {
                 value: 'send_transcription:2'
               }, Date.now(), this.audio.audiomanagers[0].playposition, -1, null, null, this.interface);
-            } else if (event.comboKey === 'ALT + SHIFT + 3') {
+            } else if (event.shortcut === 'SHIFT + ALT + 3') {
               this.sendTranscriptionForShortAudioFiles('good');
               this.uiService.addElementFromEvent('shortcut', {
                 value: 'send_transcription:3'
@@ -289,6 +359,8 @@ export class TranscriptionComponent implements OnInit,
   ngOnInit() {
     console.log(`init transcription component`);
     this.navbarServ.interfaces = this.projectsettings.interfaces;
+
+    this.keyMap.registerGeneralShortcutGroup(this.generalShortcuts);
 
     for (const marker of this.transcrService.guidelines.markers) {
       if (marker.type === 'break') {
@@ -410,34 +482,6 @@ export class TranscriptionComponent implements OnInit,
       }
     }
 
-    // set general shortcuts
-    this.generalShortcuts.push({
-      label: 'feedback and send 1',
-      focusonly: false,
-      combination: {
-        mac: 'SHIFT + ALT + 1',
-        pc: 'SHIFT + ALT + 1'
-      }
-    });
-
-    this.generalShortcuts.push({
-      label: 'feedback and send 2',
-      focusonly: false,
-      combination: {
-        mac: 'SHIFT + ALT + 2',
-        pc: 'SHIFT + ALT + 2'
-      }
-    });
-
-    this.generalShortcuts.push({
-      label: 'feedback and send 3',
-      focusonly: false,
-      combination: {
-        mac: 'SHIFT + ALT + 3',
-        pc: 'SHIFT + ALT + 3'
-      }
-    });
-
     this.cd.markForCheck();
     this.cd.detectChanges();
   }
@@ -468,35 +512,60 @@ export class TranscriptionComponent implements OnInit,
   }
 
   @HostListener('window:keydown', ['$event'])
+  onKeyDown($event) {
+    this.shortcutManager.checkKeyEvent($event, 'transcr component').catch((e) => {
+      console.error(e);
+    });
+  }
+
+  @HostListener('window:keyup', ['$event'])
   onKeyUp($event) {
-    if ($event.altKey && $event.which === 56) {
-      if (!this.modalShortcuts.visible) {
-        this.modalShortcuts.open();
-      } else {
-        this.modalShortcuts.close();
+    this.shortcutManager.checkKeyEvent($event, 'transcr component').then((shortcutInfo) => {
+      if (!isUnset(shortcutInfo)) {
+        switch (shortcutInfo.shortcutName) {
+          case ('shortcuts'):
+            if (!this.modalShortcutsDialogue.visible) {
+              this.modalShortcutsDialogue.open();
+            } else {
+              this.modalShortcutsDialogue.close();
+            }
+            break;
+          case('guidelines'):
+            if (!this.modalGuidelines.visible) {
+              this.modalGuidelines.open().catch((error) => {
+                console.error(error);
+              });
+            } else {
+              this.modalGuidelines.close();
+            }
+            break;
+          case('overview'):
+            if (!this.modalOverview.visible) {
+              this.transcrService.analyse();
+              this.modalOverview.open().catch((error) => {
+                console.error(error);
+              });
+            } else {
+              this.modalOverview.close();
+            }
+            break;
+        }
+
+
+        if ($event.altKey && $event.which === 56) {
+          $event.preventDefault();
+        } else if ($event.altKey && $event.which === 57) {
+
+          $event.preventDefault();
+        }
+        if ($event.altKey && $event.which === 48) {
+
+          $event.preventDefault();
+        }
       }
-      $event.preventDefault();
-    } else if ($event.altKey && $event.which === 57) {
-      if (!this.modalGuidelines.visible) {
-        this.modalGuidelines.open().catch((error) => {
-          console.error(error);
-        });
-      } else {
-        this.modalGuidelines.close();
-      }
-      $event.preventDefault();
-    }
-    if ($event.altKey && $event.which === 48) {
-      if (!this.modalOverview.visible) {
-        this.transcrService.analyse();
-        this.modalOverview.open().catch((error) => {
-          console.error(error);
-        });
-      } else {
-        this.modalOverview.close();
-      }
-      $event.preventDefault();
-    }
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   changeEditor(name: string): Promise<void> {

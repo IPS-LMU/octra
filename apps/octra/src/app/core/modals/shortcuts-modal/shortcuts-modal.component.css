@@ -2,3 +2,7 @@ table tbody td {
   width: 50%;
   vertical-align: middle;
 }
+
+.shortcut-group {
+  margin-bottom: 40px;
+}

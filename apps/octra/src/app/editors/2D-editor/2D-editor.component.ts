@@ -10,7 +10,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
-import {contains, Functions, isUnset, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
+import {contains, Functions, isUnset, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
 import {interval, Subscription} from 'rxjs';
 import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
 import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
@@ -21,7 +21,6 @@ import {
   AlertService,
   AudioService,
   KeymappingService,
-  KeyMappingShortcutEvent,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
@@ -83,7 +82,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   private shortcuts: any = {};
   private authWindow: Window = null;
   private windowShortcuts: ShortcutGroup = {
-    name: 'Transcription Window',
+    name: 'transcription window',
     items: [
       {
         name: 'jump_left',
@@ -203,7 +202,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       items: [...this.audioShortcuts.items, ...this.viewer.settings.shortcuts.items]
     });
     this.keyMap.register(this.windowShortcuts);
-    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onShortCutTriggered));
+    this.subscrmanager.add(this.keyMap.onShortcutTriggered.subscribe(this.onShortCutTriggered));
     this.viewer.settings.multiLine = true;
     this.viewer.settings.lineheight = 70;
     this.viewer.settings.margin.top = 5;
@@ -451,6 +450,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         }
       )
     );
+
+    this.keyMap.unregisterAll();
   }
 
   ngAfterViewInit() {
@@ -578,12 +579,13 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.triggerUIAction($event);
   }
 
-  onShortCutTriggered = ($event: KeyMappingShortcutEvent) => {
-    this.keyMap.checkShortcutAction($event.comboKey, this.audioShortcuts, this.shortcutsEnabled).then((shortcut) => {
+  onShortCutTriggered = ($event: ShortcutEvent) => {
+    this.keyMap.checkShortcutAction($event.shortcut, this.audioShortcuts, this.shortcutsEnabled).then((shortcut) => {
       if (!isUnset(this.audioChunkLines)) {
+
         switch (shortcut) {
           case('play_pause'):
-            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
             if (this.audioChunkLines.isPlaying) {
               this.audioChunkLines.pausePlayback().catch((error) => {
                 console.error(error);
@@ -595,21 +597,21 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
             }
             break;
           case('stop'):
-            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
             this.audioChunkLines.stopPlayback().catch((error) => {
               console.error(error);
             });
             break;
           case('step_backward'):
             console.log(`step backward`);
-            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
             this.audioChunkLines.stepBackward().catch((error) => {
               console.error(error);
             });
             break;
           case('step_backwardtime'):
             console.log(`step backward time`);
-            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
             this.audioChunkLines.stepBackwardTime(0.5).catch((error) => {
               console.error(error);
             });

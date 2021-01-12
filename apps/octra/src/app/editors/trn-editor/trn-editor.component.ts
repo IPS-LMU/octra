@@ -5,6 +5,7 @@ import {
   Component,
   EventEmitter,
   HostListener,
+  OnDestroy,
   OnInit,
   ViewChild
 } from '@angular/core';
@@ -38,7 +39,7 @@ declare var validateAnnotation: any;
   styleUrls: ['./trn-editor.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit {
+export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy {
 
   get textEditor(): { selectedSegment: number; state: string, openingBlocked: boolean, audiochunk: AudioChunk } {
     return this._textEditor;
@@ -330,7 +331,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     this.cd.markForCheck();
     this.cd.detectChanges();
     TrnEditorComponent.initialized.emit();
-    this.subscrManager.add(this.keyMap.onkeydown.subscribe(this.onShortcutTriggered));
+    this.subscrManager.add(this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered));
 
     this.contextMenuProperties.actions.push(
       {
@@ -1310,6 +1311,11 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     }).catch((error) => {
       console.error(error);
     });
+  }
+
+  ngOnDestroy() {
+    this.subscrManager.destroy();
+    this.keyMap.unregisterAll();
   }
 }
 

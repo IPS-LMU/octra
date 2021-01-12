@@ -18,7 +18,7 @@ import {Subject} from 'rxjs';
 import {PlayCursor} from '../../../obj/play-cursor';
 import {AudioviewerConfig} from './audio-viewer.config';
 import {AudioViewerService} from './audio-viewer.service';
-import {BrowserInfo, isUnset, ShortcutManager, SubscriptionManager} from '@octra/utilities';
+import {isUnset, ShortcutEvent, ShortcutGroup, ShortcutManager, SubscriptionManager} from '@octra/utilities';
 import {ASRQueueItemType, Level, Segment, TimespanPipe} from '@octra/annotation';
 import {AudioChunk, AudioManager, AudioSelection, PlayBackStatus, SampleUnit} from '@octra/media';
 import {Position, Size} from '../../../obj';
@@ -96,7 +96,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     scrollBars: Konva.Layer
   };
   private subscrManager = new SubscriptionManager();
-  private _deactivateShortcuts = false;
   private animation: {
     playHead: Konva.Animation
   } = {
@@ -115,13 +114,12 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     scrollbarSelector: null,
     lastLine: null
   };
-  private resizingTimer: any;
+
   private grid = {
     verticalLines: 3,
     horizontalLines: 2
   };
   private widthOnInit;
-  private deactivateShortcuts = false;
   private drawnSegmentIDs: number[] = [];
 
   constructor(public av: AudioViewerService, private renderer: Renderer2) {
@@ -248,6 +246,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     this.stage.destroy();
 
     this.konvaContainer.nativeElement.removeEventListener('keydown', this.onKeyDown);
+    this.konvaContainer.nativeElement.removeEventListener('keyup', this.onKeyUp);
     this.konvaContainer.nativeElement.removeEventListener('mouseleave', this.onMouseLeave);
     this.konvaContainer.nativeElement.removeEventListener('mouseenter', this.onMouseEnter);
     this.konvaContainer.nativeElement.removeEventListener('mousemove', this.onMouseMove);
@@ -586,11 +585,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   public enableShortcuts() {
-    this._deactivateShortcuts = false;
+    this.shortcutsManager.registerShortcutGroup(this.settings.shortcuts);
   }
 
   public disableShortcuts() {
-    this._deactivateShortcuts = true;
+    this.shortcutsManager.clearShortcuts();
   }
 
   public init() {
@@ -652,7 +651,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     // also stage will be in focus on its click
     container.focus();
     container.removeEventListener('keydown', this.onKeyDown);
-    container.addEventListener('keydown', this.onKeyDown);
+    container.addEventListener('keyup', this.onKeyUp);
     container.removeEventListener('mouseleave', this.onMouseLeave);
     container.addEventListener('mouseleave', this.onMouseLeave);
     container.removeEventListener('mouseenter', this.onMouseEnter);
@@ -672,6 +671,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         console.log(`no resizing!`);
       }
     }
+
+    this.shortcutsManager.clearShortcuts();
+    this.shortcutsManager.registerShortcutGroup(this.settings.shortcuts);
   }
 
   public redraw() {
@@ -1643,395 +1645,368 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   private onKeyDown = (event: KeyboardEvent) => {
-    this.shortcutsManager.checkKeyEvent(event).then((shortcutInfo) => {
+    this.shortcutsManager.checkKeyEvent(event, 'audioviewer').catch(e => console.error(e));
+  }
+
+  private onKeyUp = (event: KeyboardEvent) => {
+    this.shortcutsManager.checkKeyEvent(event, 'audioviewer').then((shortcutInfo: ShortcutEvent) => {
       if (!isUnset(shortcutInfo)) {
         const comboKey = shortcutInfo.shortcut;
 
         this.av.shiftPressed = comboKey === 'SHIFT';
 
-        if (this.settings.shortcutsEnabled && !this.deactivateShortcuts) {
-          const platform = BrowserInfo.platform;
+        if (this.settings.shortcutsEnabled) {
 
           if (this._focused && this.isDisabledKey(comboKey)) {
             // key pressed is disabled by config
             event.preventDefault();
-          }
+          } else {
+            const shortcutName = shortcutInfo.shortcutName;
+            const focuscheck = (shortcutInfo.onFocusOnly === false
+              || (shortcutInfo.onFocusOnly === this._focused));
 
-          if (this.settings.shortcuts) {
-            let keyActive = false;
-            for (const shortc in this.settings.shortcuts) {
-              if (this.settings.shortcuts.hasOwnProperty(shortc)) {
-                const shortcut = this.settings.shortcuts['' + shortc + ''];
-                const focuscheck = (!(shortcut === null || shortcut === undefined)) && (shortcut.focusonly === false
-                  || (shortcut.focusonly === this._focused));
-
-                if (focuscheck && this.settings.shortcuts['' + shortc + ''].keys['' + platform + ''] === comboKey) {
-                  switch (shortc) {
-                    case('set_boundary'):
-                      if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
-                        let segments;
-                        const result = this.av.addSegment();
-                        segments = this.av.currentTranscriptionLevel.segments;
-                        if (result !== null && result.msg !== null) {
-                          if (result.type === 'remove' && result.seg_ID > -1) {
-                            this.removeSegmentFromCanvas(result.seg_ID);
-                          }
-                          if (result.msg.text && result.msg.text !== '') {
-                            this.alerttriggered.emit({
-                              type: result.msg.type,
-                              message: result.msg.text
-                            });
-                          } else if (result.type !== null) {
-                            this.shortcuttriggered.emit({
-                              shortcut: comboKey,
-                              value: result.type,
-                              type: 'boundary',
-                              timePosition: this.audioManager.createSampleUnit(result.seg_samples)
-                            });
-                          }
-
-                          if (result.seg_samples > -1 && result.seg_ID > -1) {
-                            const num = segments.getNumberByID(result.seg_ID);
-                            const startSegment = Math.max(num - 1, 0);
-                            const endSegment = (num < segments.length - 2) ? num + 1 : segments.length - 1;
-
-                            this.createSegmentsForCanvas(startSegment, endSegment);
-                            this.layers.overlay.draw();
-                            this.layers.boundaries.draw();
-                          }
-                        }
-                        keyActive = true;
+            if (focuscheck) {
+              switch (shortcutName) {
+                case('set_boundary'):
+                  if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
+                    let segments;
+                    const result = this.av.addSegment();
+                    segments = this.av.currentTranscriptionLevel.segments;
+                    if (result !== null && result.msg !== null) {
+                      if (result.type === 'remove' && result.seg_ID > -1) {
+                        this.removeSegmentFromCanvas(result.seg_ID);
                       }
-                      break;
-                    case('set_break'):
-                      if (this.settings.boundaries.enabled && this._focused) {
-                        const xSamples = this.av.mouseCursor.clone();
-
-                        if (xSamples !== null) {
-                          const segmentI = this._transcriptionLevel.segments.getSegmentBySamplePosition(xSamples);
-                          const segment = this._transcriptionLevel.segments.get(segmentI);
-
-                          if (segmentI > -1 && !isUnset(segment) && isUnset(segment.isBlockedBy)) {
-                            if (segment.transcript !== this.breakMarker.code) {
-                              segment.transcript = this.breakMarker.code;
-                              this.shortcuttriggered.emit({
-                                shortcut: comboKey,
-                                value: 'set_break',
-                                type: 'segment',
-                                timePosition: xSamples.clone()
-                              });
-                            } else {
-                              segment.transcript = '';
-                              this.shortcuttriggered.emit({
-                                shortcut: comboKey,
-                                value: 'remove_break',
-                                type: 'segment',
-                                timePosition: xSamples.clone()
-                              });
-                            }
-
-                            // replace with costum function
-                            // this.updateSegments();
-                            this._transcriptionLevel.segments.onsegmentchange.emit();
-                          }
-                        }
-
-                        keyActive = true;
-                      }
-                      break;
-                    case('play_selection'):
-                      if (this._focused) {
-                        const xSamples = this.av.mouseCursor.clone();
-
-                        const boundarySelect = this.av.getSegmentSelection(this.av.mouseCursor.samples);
-                        if (boundarySelect) {
-                          const segmentI = this._transcriptionLevel.segments.getSegmentBySamplePosition(
-                            xSamples);
-                          if (segmentI > -1) {
-                            const segment = this._transcriptionLevel.segments.get(segmentI);
-                            const startTime = this._transcriptionLevel.segments.getStartTime(segmentI);
-                            // make shure, that segments boundaries are visible
-                            if (startTime.samples >= this.audioChunk.time.start.samples &&
-                              segment.time.samples <= (this.audioChunk.time.end.samples + 1)) {
-                              const absX = this.av.audioTCalculator.samplestoAbsX(
-                                this._transcriptionLevel.segments.get(segmentI).time
-                              );
-                              this.audioChunk.selection = boundarySelect.clone();
-                              this.av.drawnSelection = boundarySelect.clone();
-                              this.selchange.emit(this.audioChunk.selection);
-                              this.drawWholeSelection();
-
-                              let begin = this._transcriptionLevel.createSegment(this.audioManager.createSampleUnit(0));
-                              if (segmentI > 0) {
-                                begin = this._transcriptionLevel.segments.get(segmentI - 1);
-                              }
-                              const beginX = this.av.audioTCalculator.samplestoAbsX(begin.time);
-
-                              const posY1 = (this.av.innerWidth < this.AudioPxWidth)
-                                ? Math.floor((beginX / this.av.innerWidth) + 1) *
-                                (this.settings.lineheight + this.settings.margin.bottom) - this.settings.margin.bottom
-                                : 0;
-
-                              const posY2 = (this.av.innerWidth < this.AudioPxWidth)
-                                ? Math.floor((absX / this.av.innerWidth) + 1) *
-                                (this.settings.lineheight + this.settings.margin.bottom) - this.settings.margin.bottom
-                                : 0;
-
-                              if (xSamples.samples >= this.audioChunk.selection.start.samples
-                                && xSamples.samples <= this.audioChunk.selection.end.samples) {
-                                this.audioChunk.absolutePlayposition = this.audioChunk.selection.start.clone();
-                                this.changePlayCursorSamples(this.audioChunk.selection.start);
-                                this.updatePlayCursor();
-
-                                this.shortcuttriggered.emit({
-                                  shortcut: comboKey,
-                                  value: shortc,
-                                  type: 'audio',
-                                  timePosition: xSamples.clone(),
-                                  selection: boundarySelect.clone()
-                                });
-
-                                this.audioChunk.stopPlayback().then(() => {
-                                  // after stopping start audio playback
-                                  this.audioChunk.selection = boundarySelect.clone();
-                                  this.playSelection(this.afterAudioEnded);
-                                });
-                              }
-
-                              if (!this.settings.multiLine) {
-                                this.segmententer.emit({
-                                  index: segmentI,
-                                  pos: {Y1: posY1, Y2: posY2}
-                                });
-                              }
-                            } else {
-                              // TODO check this case again!
-                              this.alerttriggered.emit({
-                                type: 'error',
-                                message: 'segment invisible'
-                              });
-                            }
-                          }
-                        }
-                        keyActive = true;
-                      }
-                      break;
-                    case('delete_boundaries'):
-                      if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
-                        let start = null;
-                        let end = null;
-                        if (this._transcriptionLevel.segments.length > 0) {
-
-                          this.shortcuttriggered.emit({
-                            shortcut: comboKey,
-                            value: shortc,
-                            type: 'audio',
-                            timePosition: this.av.mouseCursor.clone(),
-                            selection: this.av.drawnSelection.clone()
-                          });
-
-                          for (let i = 0; i < this._transcriptionLevel.segments.length; i++) {
-                            const segment = this._transcriptionLevel.segments.get(i);
-
-                            if (segment.time.samples >= this.av.drawnSelection.start.samples
-                              && segment.time.samples <= this.av.drawnSelection.end.samples
-                              && i < this._transcriptionLevel.segments.length - 1
-                            ) {
-                              this._transcriptionLevel.segments.removeByIndex(i, this.breakMarker.code, false);
-                              this.removeSegmentFromCanvas(segment.id);
-                              i--;
-                              if (start === null) {
-                                start = i;
-                              }
-                              end = i;
-                            } else if (this.av.drawnSelection.end.samples < segment.time.samples) {
-                              break;
-                            }
-                          }
-                        }
-
-                        if (start !== null && end !== null) {
-                          this.av.drawnSelection.start = this.audioManager.createSampleUnit(0);
-                          this.av.drawnSelection.end = this.av.drawnSelection.start.clone();
-                          this.transcriptionLevel.segments.onsegmentchange.emit();
-                        }
-                        keyActive = true;
-                      }
-                      break;
-                    case('segment_enter'):
-                      if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
+                      if (result.msg.text && result.msg.text !== '') {
+                        this.alerttriggered.emit({
+                          type: result.msg.type,
+                          message: result.msg.text
+                        });
+                      } else if (result.type !== null) {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
-                          value: shortc,
+                          value: result.type,
+                          type: 'boundary',
+                          timePosition: this.audioManager.createSampleUnit(result.seg_samples)
+                        });
+                      }
+
+                      if (result.seg_samples > -1 && result.seg_ID > -1) {
+                        const num = segments.getNumberByID(result.seg_ID);
+                        const startSegment = Math.max(num - 1, 0);
+                        const endSegment = (num < segments.length - 2) ? num + 1 : segments.length - 1;
+
+                        this.createSegmentsForCanvas(startSegment, endSegment);
+                        this.layers.overlay.draw();
+                        this.layers.boundaries.draw();
+                      }
+                    }
+                  }
+                  break;
+                case('set_break'):
+                  if (this.settings.boundaries.enabled && this._focused) {
+                    const xSamples = this.av.mouseCursor.clone();
+
+                    if (xSamples !== null) {
+                      const segmentI = this._transcriptionLevel.segments.getSegmentBySamplePosition(xSamples);
+                      const segment = this._transcriptionLevel.segments.get(segmentI);
+
+                      if (segmentI > -1 && !isUnset(segment) && isUnset(segment.isBlockedBy)) {
+                        if (segment.transcript !== this.breakMarker.code) {
+                          segment.transcript = this.breakMarker.code;
+                          this.shortcuttriggered.emit({
+                            shortcut: comboKey,
+                            value: 'set_break',
+                            type: 'segment',
+                            timePosition: xSamples.clone()
+                          });
+                        } else {
+                          segment.transcript = '';
+                          this.shortcuttriggered.emit({
+                            shortcut: comboKey,
+                            value: 'remove_break',
+                            type: 'segment',
+                            timePosition: xSamples.clone()
+                          });
+                        }
+
+                        // replace with costum function
+                        // this.updateSegments();
+                        this._transcriptionLevel.segments.onsegmentchange.emit();
+                      }
+                    }
+                  }
+                  break;
+                case('play_selection'):
+                  if (this._focused) {
+                    const xSamples = this.av.mouseCursor.clone();
+
+                    const boundarySelect = this.av.getSegmentSelection(this.av.mouseCursor.samples);
+                    if (boundarySelect) {
+                      const segmentI = this._transcriptionLevel.segments.getSegmentBySamplePosition(
+                        xSamples);
+                      if (segmentI > -1) {
+                        const segment = this._transcriptionLevel.segments.get(segmentI);
+                        const startTime = this._transcriptionLevel.segments.getStartTime(segmentI);
+                        // make shure, that segments boundaries are visible
+                        if (startTime.samples >= this.audioChunk.time.start.samples &&
+                          segment.time.samples <= (this.audioChunk.time.end.samples + 1)) {
+                          const absX = this.av.audioTCalculator.samplestoAbsX(
+                            this._transcriptionLevel.segments.get(segmentI).time
+                          );
+                          this.audioChunk.selection = boundarySelect.clone();
+                          this.av.drawnSelection = boundarySelect.clone();
+                          this.selchange.emit(this.audioChunk.selection);
+                          this.drawWholeSelection();
+
+                          let begin = this._transcriptionLevel.createSegment(this.audioManager.createSampleUnit(0));
+                          if (segmentI > 0) {
+                            begin = this._transcriptionLevel.segments.get(segmentI - 1);
+                          }
+                          const beginX = this.av.audioTCalculator.samplestoAbsX(begin.time);
+
+                          const posY1 = (this.av.innerWidth < this.AudioPxWidth)
+                            ? Math.floor((beginX / this.av.innerWidth) + 1) *
+                            (this.settings.lineheight + this.settings.margin.bottom) - this.settings.margin.bottom
+                            : 0;
+
+                          const posY2 = (this.av.innerWidth < this.AudioPxWidth)
+                            ? Math.floor((absX / this.av.innerWidth) + 1) *
+                            (this.settings.lineheight + this.settings.margin.bottom) - this.settings.margin.bottom
+                            : 0;
+
+                          if (xSamples.samples >= this.audioChunk.selection.start.samples
+                            && xSamples.samples <= this.audioChunk.selection.end.samples) {
+                            this.audioChunk.absolutePlayposition = this.audioChunk.selection.start.clone();
+                            this.changePlayCursorSamples(this.audioChunk.selection.start);
+                            this.updatePlayCursor();
+
+                            this.shortcuttriggered.emit({
+                              shortcut: comboKey,
+                              value: shortcutName,
+                              type: 'audio',
+                              timePosition: xSamples.clone(),
+                              selection: boundarySelect.clone()
+                            });
+
+                            this.audioChunk.stopPlayback().then(() => {
+                              // after stopping start audio playback
+                              this.audioChunk.selection = boundarySelect.clone();
+                              this.playSelection(this.afterAudioEnded);
+                            });
+                          }
+
+                          if (!this.settings.multiLine) {
+                            this.segmententer.emit({
+                              index: segmentI,
+                              pos: {Y1: posY1, Y2: posY2}
+                            });
+                          }
+                        } else {
+                          // TODO check this case again!
+                          this.alerttriggered.emit({
+                            type: 'error',
+                            message: 'segment invisible'
+                          });
+                        }
+                      }
+                    }
+                  }
+                  break;
+                case('delete_boundaries'):
+                  if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
+                    let start = null;
+                    let end = null;
+                    if (this._transcriptionLevel.segments.length > 0) {
+
+                      this.shortcuttriggered.emit({
+                        shortcut: comboKey,
+                        value: shortcutName,
+                        type: 'audio',
+                        timePosition: this.av.mouseCursor.clone(),
+                        selection: this.av.drawnSelection.clone()
+                      });
+
+                      for (let i = 0; i < this._transcriptionLevel.segments.length; i++) {
+                        const segment = this._transcriptionLevel.segments.get(i);
+
+                        if (segment.time.samples >= this.av.drawnSelection.start.samples
+                          && segment.time.samples <= this.av.drawnSelection.end.samples
+                          && i < this._transcriptionLevel.segments.length - 1
+                        ) {
+                          this._transcriptionLevel.segments.removeByIndex(i, this.breakMarker.code, false);
+                          this.removeSegmentFromCanvas(segment.id);
+                          i--;
+                          if (start === null) {
+                            start = i;
+                          }
+                          end = i;
+                        } else if (this.av.drawnSelection.end.samples < segment.time.samples) {
+                          break;
+                        }
+                      }
+                    }
+
+                    if (start !== null && end !== null) {
+                      this.av.drawnSelection.start = this.audioManager.createSampleUnit(0);
+                      this.av.drawnSelection.end = this.av.drawnSelection.start.clone();
+                      this.transcriptionLevel.segments.onsegmentchange.emit();
+                    }
+                  }
+                  break;
+                case('segment_enter'):
+                  if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
+                    this.shortcuttriggered.emit({
+                      shortcut: comboKey,
+                      value: shortcutName,
+                      type: 'segment',
+                      timePosition: this.av.mouseCursor.clone()
+                    });
+
+                    const segInde = this._transcriptionLevel.segments.getSegmentBySamplePosition(
+                      this.av.mouseCursor
+                    );
+                    this.selectSegment(segInde,
+                      (posY1, posY2) => {
+                        this._focused = false;
+                        this.drawWholeSelection();
+                        this.stage.draw();
+                        this.segmententer.emit({
+                          index: segInde,
+                          pos: {Y1: posY1, Y2: posY2}
+                        });
+                      },
+                      () => {
+                        this.alerttriggered.emit({
+                          type: 'error',
+                          message: 'segment invisible'
+                        });
+                      });
+                  }
+                  break;
+                case('cursor_left'):
+                  if (this._focused) {
+                    // move cursor to left
+                    this.shortcuttriggered.emit({
+                      shortcut: comboKey,
+                      value: shortcutName,
+                      type: 'mouse',
+                      timePosition: this.av.mouseCursor.clone()
+                    });
+                    this.av.moveCursor('left', this.settings.stepWidthRatio * this.audioManager.sampleRate);
+                    this.changeMouseCursorSamples(this.av.mouseCursor);
+                    this.mousecursorchange.emit({
+                      event: null,
+                      time: this.av.mouseCursor
+                    });
+                  }
+                  break;
+                case('cursor_right'):
+                  if (this._focused) {
+                    // move cursor to right
+                    this.shortcuttriggered.emit({
+                      shortcut: comboKey,
+                      value: shortcutName,
+                      type: 'mouse',
+                      timePosition: this.av.mouseCursor.clone()
+                    });
+
+                    this.av.moveCursor('right', this.settings.stepWidthRatio * this.audioManager.sampleRate);
+                    this.changeMouseCursorSamples(this.av.mouseCursor);
+                    this.mousecursorchange.emit({
+                      event: null,
+                      time: this.av.mouseCursor
+                    });
+                  }
+                  break;
+                case('playonhover'):
+                  if (this._focused && !this.settings.boundaries.readonly) {
+                    // move cursor to right
+                    this.shortcuttriggered.emit({
+                      shortcut: comboKey,
+                      value: shortcutName,
+                      type: 'option',
+                      timePosition: this.av.mouseCursor.clone()
+                    });
+                  }
+                  break;
+
+                case('do_asr'):
+                  if (this.settings.boundaries.enabled && this.focused && this.settings.asr.enabled) {
+                    const segmentI = this.transcriptionLevel.segments.getSegmentBySamplePosition(this.av.mouseCursor);
+                    const segment = this.transcriptionLevel.segments.get(segmentI);
+
+                    if (segmentI > -1) {
+                      if (isUnset(segment.isBlockedBy)) {
+                        this.shortcuttriggered.emit({
+                          shortcut: comboKey,
+                          value: 'do_asr',
                           type: 'segment',
                           timePosition: this.av.mouseCursor.clone()
                         });
-
-                        const segInde = this._transcriptionLevel.segments.getSegmentBySamplePosition(
-                          this.av.mouseCursor
-                        );
-                        this.selectSegment(segInde,
-                          (posY1, posY2) => {
-                            this._focused = false;
-                            this.drawWholeSelection();
-                            this.stage.draw();
-                            this.segmententer.emit({
-                              index: segInde,
-                              pos: {Y1: posY1, Y2: posY2}
-                            });
-                          },
-                          () => {
-                            this.alerttriggered.emit({
-                              type: 'error',
-                              message: 'segment invisible'
-                            });
-                          });
-
-                        keyActive = true;
-                      }
-                      break;
-                    case('cursor_left'):
-                      if (this._focused) {
-                        // move cursor to left
+                      } else {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
-                          value: shortc,
-                          type: 'mouse',
+                          value: 'cancel_asr',
+                          type: 'segment',
                           timePosition: this.av.mouseCursor.clone()
                         });
-                        this.av.moveCursor('left', this.settings.stepWidthRatio * this.audioManager.sampleRate);
-                        this.changeMouseCursorSamples(this.av.mouseCursor);
-                        this.mousecursorchange.emit({
-                          event: null,
-                          time: this.av.mouseCursor
-                        });
-                        keyActive = true;
                       }
-                      break;
-                    case('cursor_right'):
-                      if (this._focused) {
-                        // move cursor to right
-                        this.shortcuttriggered.emit({
-                          shortcut: comboKey,
-                          value: shortc,
-                          type: 'mouse',
-                          timePosition: this.av.mouseCursor.clone()
-                        });
-
-                        this.av.moveCursor('right', this.settings.stepWidthRatio * this.audioManager.sampleRate);
-                        this.changeMouseCursorSamples(this.av.mouseCursor);
-                        this.mousecursorchange.emit({
-                          event: null,
-                          time: this.av.mouseCursor
-                        });
-                        keyActive = true;
-                      }
-                      break;
-                    case('playonhover'):
-                      if (this._focused && !this.settings.boundaries.readonly) {
-                        // move cursor to right
-                        this.shortcuttriggered.emit({
-                          shortcut: comboKey,
-                          value: shortc,
-                          type: 'option',
-                          timePosition: this.av.mouseCursor.clone()
-                        });
-                        keyActive = true;
-                      }
-                      break;
-
-                    case('do_asr'):
-                      if (this.settings.boundaries.enabled && this.focused && this.settings.asr.enabled) {
-                        const segmentI = this.transcriptionLevel.segments.getSegmentBySamplePosition(this.av.mouseCursor);
-                        const segment = this.transcriptionLevel.segments.get(segmentI);
-
-                        if (segmentI > -1) {
-                          if (isUnset(segment.isBlockedBy)) {
-                            this.shortcuttriggered.emit({
-                              shortcut: comboKey,
-                              value: 'do_asr',
-                              type: 'segment',
-                              timePosition: this.av.mouseCursor.clone()
-                            });
-                          } else {
-                            this.shortcuttriggered.emit({
-                              shortcut: comboKey,
-                              value: 'cancel_asr',
-                              type: 'segment',
-                              timePosition: this.av.mouseCursor.clone()
-                            });
-                          }
-                          this.transcriptionLevel.segments.onsegmentchange.emit();
-                        }
-
-                        keyActive = true;
-                      }
-                      break;
-                    case('do_asr_maus'):
-                      if (this.settings.boundaries.enabled && this.settings.asr.enabled) {
-                        const segmentI = this.transcriptionLevel.segments.getSegmentBySamplePosition(this.av.mouseCursor);
-                        const segment = this.transcriptionLevel.segments.get(segmentI);
-
-                        if (segmentI > -1) {
-                          if (isUnset(segment.isBlockedBy)) {
-                            this.shortcuttriggered.emit({
-                              shortcut: comboKey,
-                              value: 'do_asr_maus',
-                              type: 'segment',
-                              timePosition: this.av.mouseCursor.clone()
-                            });
-                          } else {
-                            this.shortcuttriggered.emit({
-                              shortcut: comboKey,
-                              value: 'cancel_asr_maus',
-                              type: 'segment',
-                              timePosition: this.av.mouseCursor.clone()
-                            });
-                          }
-                          this.transcriptionLevel.segments.onsegmentchange.emit();
-                        }
-                        keyActive = true;
-                      }
-                      break;
-
-                    case('do_maus'):
-                      if (this.settings.boundaries.enabled && this.settings.asr.enabled) {
-                        const segmentI = this.transcriptionLevel.segments.getSegmentBySamplePosition(this.av.mouseCursor);
-                        const segment = this.transcriptionLevel.segments.get(segmentI);
-
-                        if (segmentI > -1) {
-                          if (isUnset(segment.isBlockedBy)) {
-                            this.shortcuttriggered.emit({
-                              shortcut: comboKey,
-                              value: 'do_maus',
-                              type: 'segment',
-                              timePosition: this.av.mouseCursor.clone()
-                            });
-                          } else {
-                            this.shortcuttriggered.emit({
-                              shortcut: comboKey,
-                              value: 'cancel_maus',
-                              type: 'segment',
-                              timePosition: this.av.mouseCursor.clone()
-                            });
-                          }
-                          this.transcriptionLevel.segments.onsegmentchange.emit();
-                        }
-
-                        keyActive = true;
-                      }
-                      break;
+                      this.transcriptionLevel.segments.onsegmentchange.emit();
+                    }
                   }
+                  break;
+                case('do_asr_maus'):
+                  if (this.settings.boundaries.enabled && this.settings.asr.enabled) {
+                    const segmentI = this.transcriptionLevel.segments.getSegmentBySamplePosition(this.av.mouseCursor);
+                    const segment = this.transcriptionLevel.segments.get(segmentI);
 
-                  if (keyActive) {
-                    break;
+                    if (segmentI > -1) {
+                      if (isUnset(segment.isBlockedBy)) {
+                        this.shortcuttriggered.emit({
+                          shortcut: comboKey,
+                          value: 'do_asr_maus',
+                          type: 'segment',
+                          timePosition: this.av.mouseCursor.clone()
+                        });
+                      } else {
+                        this.shortcuttriggered.emit({
+                          shortcut: comboKey,
+                          value: 'cancel_asr_maus',
+                          type: 'segment',
+                          timePosition: this.av.mouseCursor.clone()
+                        });
+                      }
+                      this.transcriptionLevel.segments.onsegmentchange.emit();
+                    }
                   }
-                }
+                  break;
+
+                case('do_maus'):
+                  if (this.settings.boundaries.enabled && this.settings.asr.enabled) {
+                    const segmentI = this.transcriptionLevel.segments.getSegmentBySamplePosition(this.av.mouseCursor);
+                    const segment = this.transcriptionLevel.segments.get(segmentI);
+
+                    if (segmentI > -1) {
+                      if (isUnset(segment.isBlockedBy)) {
+                        this.shortcuttriggered.emit({
+                          shortcut: comboKey,
+                          value: 'do_maus',
+                          type: 'segment',
+                          timePosition: this.av.mouseCursor.clone()
+                        });
+                      } else {
+                        this.shortcuttriggered.emit({
+                          shortcut: comboKey,
+                          value: 'cancel_maus',
+                          type: 'segment',
+                          timePosition: this.av.mouseCursor.clone()
+                        });
+                      }
+                      this.transcriptionLevel.segments.onsegmentchange.emit();
+                    }
+                  }
+                  break;
               }
-            }
-
-            if (keyActive) {
-              event.preventDefault();
             }
           }
         }
@@ -2128,6 +2103,18 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     this.createSegmentsForCanvas();
     this.layers.overlay.batchDraw();
     this.layers.boundaries.batchDraw();
+  }
+
+  /**
+   * use this function in order to update shortcuts.
+   * @param shortcuts
+   */
+  public updateShortcuts(shortcuts: ShortcutGroup) {
+    this.settings.shortcuts = shortcuts;
+    if (this.shortcutsManager.shortcuts.length > 1) {
+      this.shortcutsManager.clearShortcuts();
+      this.shortcutsManager.registerShortcutGroup(shortcuts);
+    }
   }
 
   private drawTextLabel(context: Context, text: string, lineNum1: number, lineNum2: number, segmentEnd: SampleUnit, beginTime: SampleUnit,

@@ -8,13 +8,12 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import {ShortcutGroup, SubscriptionManager} from '@octra/utilities';
+import {ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 
 import {
   AudioService,
   KeymappingService,
-  KeyMappingShortcutEvent,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
@@ -56,7 +55,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   private oldRaw = '';
 
   private shortcuts: ShortcutGroup = {
-    name: 'AP',
+    name: 'audioplayer',
     items: [
       {
         name: 'play_pause',
@@ -125,10 +124,10 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     this.subscrmanager = new SubscriptionManager();
 
     if (this.appStorage.useMode === 'online' || this.appStorage.useMode === 'demo') {
-      this.subscrmanager.add(this.keyMap.beforeKeyDown.subscribe((event) => {
-        if (event.comboKey === 'ALT + SHIFT + 1' ||
-          event.comboKey === 'ALT + SHIFT + 2' ||
-          event.comboKey === 'ALT + SHIFT + 3') {
+      this.subscrmanager.add(this.keyMap.beforeShortcutTriggered.subscribe((event: ShortcutEvent) => {
+        if (event.shortcut === 'SHIFT + ALT + 1' ||
+          event.shortcut === 'SHIFT + ALT + 2' ||
+          event.shortcut === 'SHIFT + ALT + 3') {
           this.transcrService.tasksBeforeSend.push(new Promise<void>((resolve) => {
             this.appStorage.afterSaving().then(() => {
               resolve();
@@ -147,7 +146,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     this.editor.Settings.specialMarkers.boundary = true;
     this.editor.Settings.highlightingEnabled = true;
 
-    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onShortcutTriggered), 'shortcut');
+    this.subscrmanager.add(this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered), 'shortcut');
 
     this.keyMap.register(this.shortcuts);
 
@@ -163,7 +162,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
       console.error(`could not stop audio on editor switched`);
     });
     this.subscrmanager.destroy();
-    this.keyMap.unregister('AP');
+    this.keyMap.unregisterAll();
   }
 
   ngOnChanges(obj: SimpleChanges) {
@@ -207,7 +206,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     }
   }
 
-  onShortcutTriggered = ($event: KeyMappingShortcutEvent) => {
+  onShortcutTriggered = ($event: ShortcutEvent) => {
     const triggerUIAction = (shortcutObj) => {
       shortcutObj.value = `audio:${shortcutObj.value}`;
       this.uiService.addElementFromEvent('shortcut', shortcutObj, Date.now(),

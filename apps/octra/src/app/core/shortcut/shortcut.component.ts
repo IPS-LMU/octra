@@ -34,8 +34,8 @@ export class ShortcutComponent implements OnInit {
   }
 
 
-  private replaceWithUTF8Symbols(comboKey: string) {
-    let result = comboKey;
+  private replaceWithUTF8Symbols(keyString: string) {
+    let result = keyString;
 
     const regex = new RegExp(/((?:ARROW(?:(?:UP)|(?:DOWN)|(?:LEFT)|(?:RIGHT)))|(?:STRG)|(?:CMD)|(?:ENTER)|(?:BACKSPACE)|(?:TAB)|(?:ESC)|(?:ALT)|(?:SHIFT))/g);
 

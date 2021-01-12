@@ -524,35 +524,24 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     this.triggerTyping();
   }
 
+  private isMarker(shortcut) {
+    if (!isUnset(this.markers)) {
+      const platform = BrowserInfo.platform;
+      return (this.markers.findIndex(a => a.shortcut[platform] === shortcut) > -1 || (shortcut === 'ALT + S' && this.Settings.specialMarkers.boundary));
+    }
+
+    return false;
+  }
+
   /**
    * called when key pressed in editor
    */
   onKeyDownSummernote = ($event) => {
-    this.shortcutsManager.checkKeyEvent($event).then((shortcutInfo) => {
-      if (!isUnset(shortcutInfo)) {
-        const comboKey = shortcutInfo.shortcut;
+    this.shortcutsManager.checkKeyEvent($event, 'summernote').then((shortcutInfo) => {
+      const comboKey = this.shortcutsManager.getShorcutCombination($event);
 
-        if (comboKey !== '') {
-          if (this.isDisabledKey(comboKey)) {
-            $event.preventDefault();
-          } else {
-            if (comboKey === 'ALT + S' && this.Settings.specialMarkers.boundary) {
-              // add boundary
-              this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
-              this.boundaryinserted.emit(this.audiochunk.absolutePlayposition.samples);
-              return;
-            } else {
-              for (const marker of this.markers) {
-                if (marker.shortcut[shortcutInfo.platform] === comboKey) {
-                  $event.preventDefault();
-                  this.insertMarker(marker.code, marker.icon);
-                  this.markerInsert.emit(marker.name);
-                  return;
-                }
-              }
-            }
-          }
-        }
+      if (this.isDisabledKey(comboKey) || this.isMarker(comboKey)) {
+        $event.preventDefault();
       }
     }).catch((error) => {
       console.error(error);
@@ -562,7 +551,26 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * called after key up in editor
    */
   onKeyUpSummernote = ($event) => {
-    this.shortcutsManager.checkKeyEvent($event).then(() => {
+    console.log(this.shortcutsManager.shortcuts);
+    this.shortcutsManager.checkKeyEvent($event, 'summernote').then((shortcutInfo) => {
+      if (!isUnset(shortcutInfo)) {
+        if (shortcutInfo.shortcut === 'ALT + S' && this.Settings.specialMarkers.boundary) {
+          // add boundary
+          this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
+          this.boundaryinserted.emit(this.audiochunk.absolutePlayposition.samples);
+          return;
+        } else {
+          for (const marker of this.markers) {
+            if (marker.shortcut[shortcutInfo.platform] === shortcutInfo.shortcut) {
+              $event.preventDefault();
+              this.insertMarker(marker.code, marker.icon);
+              this.markerInsert.emit(marker.name);
+              return;
+            }
+          }
+        }
+      }
+
       // update rawText
       this.onkeyup.emit($event);
       this.triggerTyping($event.code !== 'Enter');

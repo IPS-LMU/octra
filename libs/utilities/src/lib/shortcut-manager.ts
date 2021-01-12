@@ -1,6 +1,14 @@
 import {BrowserInfo} from './browser-info';
 import {isUnset} from './functions';
 
+export interface ShortcutEvent {
+  shortcut: string;
+  platform: string;
+  shortcutName: string;
+  onFocusOnly: boolean;
+  event: KeyboardEvent;
+}
+
 export interface KeyMappingEntry {
   name: string;
   keyCode: number;
@@ -22,7 +30,16 @@ export interface ShortcutGroup {
 }
 
 export class ShortcutManager {
-  private shortcuts: ShortcutGroup[];
+  get shortcuts(): ShortcutGroup[] {
+    return this._shortcuts;
+  }
+
+  private _shortcuts: ShortcutGroup[];
+
+  public generalShortcuts: ShortcutGroup = {
+    name: 'general shortcuts',
+    items: []
+  }
 
   private keyMappingTable: KeyMappingEntry[] = [
     {
@@ -88,67 +105,63 @@ export class ShortcutManager {
   ];
 
   constructor() {
-    this.shortcuts = [];
+    this._shortcuts = [];
   }
+
+  private ignoreKeyUps = false;
 
   public shortcutsEnabled = true;
 
-  private _pressedKey = {
-    code: -1,
-    name: ''
-  };
-
-  get pressedKey(): { code: number; name: string } {
-    return this._pressedKey;
-  }
-
   public getShortcutGroup(name: string) {
-    return this.shortcuts.find(a => a.name === name);
+    return this._shortcuts.find(a => a.name === name);
   }
 
   public registerShortcutGroup(shortcutGroup: ShortcutGroup) {
-    if (this.shortcuts.findIndex(a => a.name === shortcutGroup.name) < 0) {
-      this.shortcuts.push(shortcutGroup);
+    if (this._shortcuts.findIndex(a => a.name === shortcutGroup.name) < 0) {
+      this._shortcuts.push(shortcutGroup);
     }
   }
 
   public unregisterShortcutGroup(groupName: string) {
-    this.shortcuts = this.shortcuts.filter(a => a.name !== groupName);
+    this._shortcuts = this._shortcuts.filter(a => a.name !== groupName);
   }
 
   public clearShortcuts() {
-    this.shortcuts = [];
+    this._shortcuts = [];
   }
 
-  public checkKeyEvent(event: KeyboardEvent): Promise<{ shortcutName: string, platform: string, shortcut: string }> {
-    return new Promise<{ shortcutName: string, shortcut: string, platform: string }>((resolve) => {
+  public checkKeyEvent(event: KeyboardEvent, source: string): Promise<ShortcutEvent> {
+    return new Promise<ShortcutEvent>((resolve) => {
       if (this.shortcutsEnabled) {
         if (event.type === 'keydown') {
+          this.ignoreKeyUps = false;
+          resolve(null);
+        } else if (event.type === 'keyup' && !this.ignoreKeyUps) {
           const shortcut = this.getShorcutCombination(event);
+          const shortcutObj = this.getCommand(shortcut, BrowserInfo.platform);
 
-          if (this._pressedKey.code < 0) {
-            this._pressedKey.code = event.keyCode;
-            this._pressedKey.name = this.getNameByCode(event.keyCode);
-          }
-
-          const shortcutName = this.getCommand(shortcut, BrowserInfo.platform);
-
-          if (!isUnset(shortcutName)) {
+          if (!isUnset(shortcutObj)) {
             event.preventDefault();
+
+            if (shortcut.indexOf('+') > -1) {
+              this.ignoreKeyUps = true;
+            } else {
+              this.ignoreKeyUps = false;
+            }
+
             resolve({
               platform: BrowserInfo.platform,
-              shortcutName,
-              shortcut
+              shortcutName: shortcutObj.name,
+              onFocusOnly: shortcutObj.focusonly,
+              shortcut,
+              event
             });
+
           } else {
             resolve(null);
           }
-        } else if (event.type === 'keyup') {
-          if (event.keyCode === this._pressedKey.code) {
-            this._pressedKey.code = -1;
-            this._pressedKey.name = '';
-          }
-
+        } else {
+          resolve(null);
         }
       } else {
         resolve(null);
@@ -156,13 +169,21 @@ export class ShortcutManager {
     });
   }
 
-  private getCommand(shortcut: string, platform: 'mac' | 'pc') {
-    for (const shortcutGroup of this.shortcuts) {
+  private getCommand(shortcut: string, platform: 'mac' | 'pc'): Shortcut {
+    for (const shortcutGroup of this._shortcuts) {
       const elem = shortcutGroup.items.find(a => a.keys[platform] === shortcut);
       if (!isUnset(elem)) {
-        return elem.name;
+        return elem;
       }
     }
+
+    // look for general shortcut
+    const generalShortcutElem = this.generalShortcuts.items.find(a => a.keys[platform] === shortcut);
+
+    if (!isUnset(generalShortcutElem)) {
+      return generalShortcutElem;
+    }
+
     return null;
   }
 
@@ -179,7 +200,7 @@ export class ShortcutManager {
     return '';
   }
 
-  private getShorcutCombination(event: KeyboardEvent) {
+  public getShorcutCombination(event: KeyboardEvent) {
     const keycode = event.which; // which has better browser compatibility
     const alt = event.altKey;
     const ctrl = event.ctrlKey;
@@ -199,36 +220,32 @@ export class ShortcutManager {
       name = 'CTRL';
     }
 
-    let isCombination = false;
     let comboKey = '';
 
-    // only one kombination permitted
-    if (alt && !(ctrl || shift)) {
-      isCombination = true;
-    } else if (ctrl && !(alt || shift)) {
-      isCombination = true;
-    } else if (shift && !(alt || ctrl)) {
-      isCombination = true;
-    }
-
-    if (this._pressedKey.code > -1) {
-      isCombination = true;
-    }
-
-    if (isCombination) {
-      if (alt) {
-        comboKey = 'ALT';
-      } else if (ctrl) {
-        comboKey = 'CTRL';
-      } else if (shift) {
+    if (alt || ctrl || shift) {
+      if (shift) {
         comboKey = 'SHIFT';
-      } else {
-        comboKey = this.getNameByCode(this._pressedKey.code);
       }
+
+      if (alt) {
+        if (comboKey !== '') {
+          comboKey += ' + ';
+        }
+        comboKey += 'ALT';
+      }
+
+      if (ctrl) {
+        if (comboKey !== '') {
+          comboKey += ' + ';
+        }
+        comboKey += 'CTRL';
+      }
+    } else {
+      comboKey = this.getNameByCode(event.keyCode);
     }
 
     // if name == comboKey, only one special Key pressed
-    if (name !== comboKey) {
+    if (comboKey.indexOf(name) < 0) {
       if (comboKey !== '') {
         comboKey += ' + ';
       }

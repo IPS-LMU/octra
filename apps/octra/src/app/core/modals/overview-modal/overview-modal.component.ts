@@ -2,7 +2,7 @@ import {ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output, V
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Subject} from 'rxjs';
 import {TranscriptionFeedbackComponent} from '../../component/transcription-feedback/transcription-feedback.component';
-import {isFunction, isUnset, SubscriptionManager} from '@octra/utilities';
+import {isFunction, isUnset, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
 import {KeymappingService, SettingsService, TranscriptionService, UserInteractionsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {LoginMode} from '../../store';
@@ -94,37 +94,97 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
     return new Promise<void>((resolve, reject) => {
       this.modal.show(this.modal, this.config);
 
+      this.keyService.unregister('overview');
+
+      const shortcuts: ShortcutGroup = {
+        name: 'overview',
+        items: []
+      };
       if (this.settingsService.isTheme('shortAudioFiles')) {
-        this.shortcutID = this.subscrmanager.add(this.keyService.onkeyup.subscribe((keyObj: any) => {
-          switch (keyObj.comboKey) {
-            case('CTRL + 1'):
-              this.sendTranscriptionForShortAudioFiles('good');
-              break;
-            case('CTRL + 2'):
-              this.sendTranscriptionForShortAudioFiles('middle');
-              break;
-            case('CTRL + 3'):
-              this.sendTranscriptionForShortAudioFiles('bad');
-              break;
+        shortcuts.items = [
+          {
+            name: 'good',
+            title: 'good',
+            keys: {
+              mac: 'CTRL + 1',
+              pc: 'CTRL + 1'
+            },
+            focusonly: false
+          },
+          {
+            name: 'middle',
+            title: 'middle',
+            keys: {
+              mac: 'CTRL + 2',
+              pc: 'CTRL + 2'
+            },
+            focusonly: false
+          },
+          {
+            name: 'bad',
+            title: 'bad',
+            keys: {
+              mac: 'CTRL + 3',
+              pc: 'CTRL + 3'
+            },
+            focusonly: false
+          }
+        ];
+
+        this.keyService.register(shortcuts);
+
+        this.shortcutID = this.subscrmanager.add(this.keyService.onShortcutTriggered.subscribe((keyObj: ShortcutEvent) => {
+          if (!isUnset(keyObj)) {
+            this.sendTranscriptionForShortAudioFiles(keyObj.shortcutName as any);
           }
         }));
       }
 
       if (this.settingsService.isTheme('korbinian')) {
-        this.shortcutID = this.subscrmanager.add(this.keyService.onkeyup.subscribe((keyObj: any) => {
-          switch (keyObj.comboKey) {
-            case('CTRL + 1'):
-              this.sendTranscriptionForKorbinian('NO');
-              break;
-            case('CTRL + 2'):
-              this.sendTranscriptionForKorbinian('VE');
-              break;
-            case('CTRL + 3'):
-              this.sendTranscriptionForKorbinian('EE');
-              break;
-            case('CTRL + 4'):
-              this.sendTranscriptionForKorbinian('AN');
-              break;
+        shortcuts.items = [
+          {
+            name: 'NO',
+            title: 'NO',
+            keys: {
+              mac: 'CTRL + 1',
+              pc: 'CTRL + 1'
+            },
+            focusonly: false
+          },
+          {
+            name: 'VE',
+            title: 'VE',
+            keys: {
+              mac: 'CTRL + 2',
+              pc: 'CTRL + 2'
+            },
+            focusonly: false
+          },
+          {
+            name: 'EE',
+            title: 'EE',
+            keys: {
+              mac: 'CTRL + 3',
+              pc: 'CTRL + 3'
+            },
+            focusonly: false
+          },
+          {
+            name: 'AN',
+            title: 'AN',
+            keys: {
+              mac: 'CTRL + 4',
+              pc: 'CTRL + 4'
+            },
+            focusonly: false
+          }
+        ];
+
+        this.keyService.register(shortcuts);
+
+        this.shortcutID = this.subscrmanager.add(this.keyService.onShortcutTriggered.subscribe((keyObj: ShortcutEvent) => {
+          if (!isUnset(keyObj)) {
+            this.sendTranscriptionForKorbinian(keyObj.shortcutName as any);
           }
         }));
       }

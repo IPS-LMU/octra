@@ -5,6 +5,7 @@ import {
   Component,
   EventEmitter,
   HostListener,
+  OnDestroy,
   OnInit,
   ViewChild
 } from '@angular/core';
@@ -23,7 +24,7 @@ import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {LoginMode} from '../../core/store';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {ValidationPopoverComponent} from '../../core/component/transcr-editor/validation-popover/validation-popover.component';
-import {isUnset, selectAllTextOfNode, SubscriptionManager} from '@octra/utilities';
+import {isUnset, selectAllTextOfNode, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
 import {AudioViewerComponent, AudioviewerConfig} from '@octra/components';
 import {Segment, Segments} from '@octra/annotation';
 import {ContextMenuAction, ContextMenuComponent} from '../../core/component/context-menu/context-menu.component';
@@ -39,7 +40,7 @@ declare var validateAnnotation: any;
   styleUrls: ['./trn-editor.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit {
+export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy {
 
   get textEditor(): { selectedSegment: number; state: string, openingBlocked: boolean, audiochunk: AudioChunk } {
     return this._textEditor;
@@ -110,101 +111,122 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
   }[] = [];
   private lastMouseOver = 0;
   private subscrManager: SubscriptionManager;
-  private shortcuts = {
-    enter: {
-      keys: {
-        mac: 'ENTER',
-        pc: 'ENTER'
+
+  private shortcuts: ShortcutGroup = {
+    name: 'TRN-Editor',
+    items: [
+      {
+        name: 'enter',
+        keys: {
+          mac: 'ENTER',
+          pc: 'ENTER'
+        },
+        title: 'save and next cell',
+        focusonly: true
       },
-      title: 'save cell',
-      focusonly: true
-    },
-    up: {
-      keys: {
-        mac: 'ALT + ARROWUP',
-        pc: 'ALT + ARROWUP'
+      {
+        name: 'up',
+        keys: {
+          mac: 'ALT + ARROWUP',
+          pc: 'ALT + ARROWUP'
+        },
+        title: 'save and upper cell',
+        focusonly: false
       },
-      title: 'save and upper cell',
-      focusonly: false
-    },
-    right: {
-      keys: {
-        mac: 'ALT + ARROWRIGHT',
-        pc: 'ALT + ARROWRIGHT'
+      {
+        name: 'right',
+        keys: {
+          mac: 'ALT + ARROWRIGHT',
+          pc: 'ALT + ARROWRIGHT'
+        },
+        title: 'save and next cell',
+        focusonly: false
       },
-      title: 'save and next cell',
-      focusonly: false
-    },
-    down: {
-      keys: {
-        mac: 'ALT + ARROWDOWN',
-        pc: 'ALT + ARROWDOWN'
+      {
+        name: 'down',
+        keys: {
+          mac: 'ALT + ARROWDOWN',
+          pc: 'ALT + ARROWDOWN'
+        },
+        title: 'save and under cell',
+        focusonly: false
       },
-      title: 'save and under cell',
-      focusonly: false
-    },
-    left: {
-      keys: {
-        mac: 'ALT + ARROWLEFT',
-        pc: 'ALT + ARROWLEFT'
+      {
+        name: 'left',
+        keys: {
+          mac: 'ALT + ARROWLEFT',
+          pc: 'ALT + ARROWLEFT'
+        },
+        title: 'save and previous cell',
+        focusonly: false
+      }
+    ]
+  }
+
+  private tableShortcuts: ShortcutGroup = {
+    name: 'TRN-Editor table',
+    items: [
+      {
+        name: 'select_all',
+        keys: {
+          mac: 'CMD + A',
+          pc: 'CTRL + A'
+        },
+        title: 'select all segments',
+        focusonly: false
       },
-      title: 'save and previous cell',
-      focusonly: false
-    }
+      {
+        name: 'remove_selected',
+        keys: {
+          mac: 'CMD + BACKSPACE',
+          pc: 'CTRL + BACKSPACE'
+        },
+        title: 'remove selected completely',
+        focusonly: false
+      }
+    ]
   };
 
-  private tableShortcuts = {
-    select_all: {
-      keys: {
-        mac: 'CMD + A',
-        pc: 'CTRL + A'
+  private audioShortcuts: ShortcutGroup = {
+    name: 'TRN-Editor texteditor',
+    items: [
+      {
+        name: 'play_pause',
+        keys: {
+          mac: 'TAB',
+          pc: 'TAB'
+        },
+        title: 'play pause',
+        focusonly: true
       },
-      title: 'select all segments',
-      focusonly: false
-    },
-    remove_selected: {
-      keys: {
-        mac: 'CMD + BACKSPACE',
-        pc: 'CTRL + BACKSPACE'
+      {
+        name: 'stop',
+        keys: {
+          mac: 'ESC',
+          pc: 'ESC'
+        },
+        title: 'stop playback',
+        focusonly: true
       },
-      title: 'remove selected completely',
-      focusonly: false
-    }
-  };
-
-  private audioShortcuts = {
-    play_pause: {
-      keys: {
-        mac: 'TAB',
-        pc: 'TAB'
+      {
+        name: 'step_backward',
+        keys: {
+          mac: 'SHIFT + BACKSPACE',
+          pc: 'SHIFT + BACKSPACE'
+        },
+        title: 'step backward',
+        focusonly: true
       },
-      title: 'play pause',
-      focusonly: true
-    },
-    stop: {
-      keys: {
-        mac: 'ESC',
-        pc: 'ESC'
-      },
-      title: 'stop playback',
-      focusonly: true
-    },
-    step_backward: {
-      keys: {
-        mac: 'SHIFT + BACKSPACE',
-        pc: 'SHIFT + BACKSPACE'
-      },
-      title: 'step backward',
-      focusonly: true
-    },
-    step_backwardtime: {
-      keys: {
-        mac: 'SHIFT + TAB',
-        pc: 'SHIFT + TAB'
-      },
-      title: 'step backward time',
-      focusonly: true
-    }
+      {
+        name: 'step_backwardtime',
+        keys: {
+          mac: 'SHIFT + TAB',
+          pc: 'SHIFT + TAB'
+        },
+        title: 'step backward time',
+        focusonly: true
+      }
+    ]
   };
 
   private audioManager: AudioManager;
@@ -288,9 +310,9 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
   }
 
   ngOnInit() {
-    this.keyMap.register('TRN-Editor', {...this.shortcuts});
-    this.keyMap.register('TRN-Editor table', this.tableShortcuts);
-    this.keyMap.register('TRN-Editor texteditor', this.audioShortcuts);
+    this.keyMap.register(this.shortcuts);
+    this.keyMap.register(this.tableShortcuts);
+    this.keyMap.register(this.audioShortcuts);
 
     this.audioViewerSettings = new AudioviewerConfig();
     // this..name = 'transcr-window viewer';
@@ -300,7 +322,6 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     this.audioViewerSettings.boundaries.enabled = false;
     this.audioViewerSettings.boundaries.readonly = true;
     this.audioViewerSettings.selection.enabled = true;
-    this.audioViewerSettings.shortcuts.set_break = null;
     this.audioViewerSettings.frame.color = '#222222';
     this.audioViewerSettings.roundValues = false;
     this.audioViewerSettings.showTimePerLine = true;
@@ -316,7 +337,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     this.cd.markForCheck();
     this.cd.detectChanges();
     TrnEditorComponent.initialized.emit();
-    this.subscrManager.add(this.keyMap.onkeydown.subscribe(this.onShortcutTriggered));
+    this.subscrManager.add(this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered));
 
     this.contextMenuProperties.actions.push(
       {
@@ -1269,6 +1290,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
   onTableLineClick($event, rowNumber: number) {
     const selectedSegment = this.shownSegments[rowNumber];
+    console.log(this.keyMap.pressedMetaKeys);
     if (this.keyMap.pressedMetaKeys.cmd || this.keyMap.pressedMetaKeys.ctrl) {
       // de- select line
       selectedSegment.isSelected = !selectedSegment.isSelected;
@@ -1291,6 +1313,11 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     }).catch((error) => {
       console.error(error);
     });
+  }
+
+  ngOnDestroy() {
+    this.subscrManager.destroy();
+    this.keyMap.unregisterAll();
   }
 }
 

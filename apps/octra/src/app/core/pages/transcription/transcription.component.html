@@ -2,8 +2,7 @@
 <octra-transcription-send-modal #modal></octra-transcription-send-modal>
 <octra-transcription-sending-modal #transcrSendingModal [sendError]="sendError"></octra-transcription-sending-modal>
 <octra-overview-modal #modalOverview (transcriptionSend)="onSendNowClick()" id="overview"></octra-overview-modal>
-<octra-shortcuts-modal #modalShortcuts [editor]="Interface"
-                       [generalShortcuts]="generalShortcuts"></octra-shortcuts-modal>
+<octra-shortcuts-modal #modalShortcutsDialogue [editor]="Interface"></octra-shortcuts-modal>
 <octra-transcription-demo-end-modal #modalDemoEnd></octra-transcription-demo-end-modal>
 <octra-transcription-guidelines-modal #modalGuidelines
                                       [guidelines]="transcrService.guidelines"></octra-transcription-guidelines-modal>
@@ -20,7 +19,7 @@
     (guidelinesbtnclicked)="modalGuidelines.open()"
     (overviewbtnclicked)="modalOverview.open()"
 
-    (shortcutbtnclicked)="modalShortcuts.open()"
+    (shortcutbtnclicked)="modalShortcutsDialogue.open()"
     [buttonLabels]="{
             shortcuts: 'general.shortcuts' | transloco,
             guidelines: 'general.guidelines' | transloco,

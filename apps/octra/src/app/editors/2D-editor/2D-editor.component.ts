@@ -10,8 +10,8 @@ import {
   ViewChild
 } from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
-import {contains, Functions, isUnset, SubscriptionManager} from '@octra/utilities';
-import {interval, Subscription, timer} from 'rxjs';
+import {contains, Functions, isUnset, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
+import {interval, Subscription} from 'rxjs';
 import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
 import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
 import {TranscrEditorComponent} from '../../core/component';
@@ -21,7 +21,6 @@ import {
   AlertService,
   AudioService,
   KeymappingService,
-  KeyMappingShortcutEvent,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
@@ -81,66 +80,79 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   private scrolltimer: Subscription = null;
   private shortcuts: any = {};
   private authWindow: Window = null;
-  private windowShortcuts = {
-    jump_left: {
-      keys: {
-        mac: 'ALT + ARROWLEFT',
-        pc: 'ALT + ARROWLEFT'
+  private windowShortcuts: ShortcutGroup = {
+    name: 'transcription window',
+    items: [
+      {
+        name: 'jump_left',
+        keys: {
+          mac: 'ALT + ARROWLEFT',
+          pc: 'ALT + ARROWLEFT'
+        },
+        focusonly: false,
+        title: 'jump_last_segment'
       },
-      focusonly: false,
-      title: 'jump_last_segment'
-    },
-    jump_right: {
-      keys: {
-        mac: 'ALT + ARROWRIGHT',
-        pc: 'ALT + ARROWRIGHT'
+      {
+        name: 'jump_right',
+        keys: {
+          mac: 'ALT + ARROWRIGHT',
+          pc: 'ALT + ARROWRIGHT'
+        },
+        focusonly: false,
+        title: 'jump_next_segment'
       },
-      focusonly: false,
-      title: 'jump_next_segment'
-    },
-    close_save: {
-      keys: {
-        mac: 'ALT + ARROWDOWN',
-        pc: 'ALT + ARROWDOWN'
-      },
-      focusonly: false,
-      title: 'close_save'
-    }
+      {
+        name: 'close_save',
+        keys: {
+          mac: 'ALT + ARROWDOWN',
+          pc: 'ALT + ARROWDOWN'
+        },
+        focusonly: false,
+        title: 'close_save'
+      }
+    ]
   };
 
-  private audioShortcuts = {
-    play_pause: {
-      keys: {
-        mac: 'TAB',
-        pc: 'TAB'
+  private audioShortcuts: ShortcutGroup = {
+    name: '2D-Editor',
+    items: [
+      {
+        name: 'play_pause',
+        keys: {
+          mac: 'TAB',
+          pc: 'TAB'
+        },
+        title: 'play pause',
+        focusonly: false
       },
-      title: 'play pause',
-      focusonly: false
-    },
-    stop: {
-      keys: {
-        mac: 'ESC',
-        pc: 'ESC'
+      {
+        name: 'stop',
+        keys: {
+          mac: 'ESC',
+          pc: 'ESC'
+        },
+        title: 'stop playback',
+        focusonly: false
       },
-      title: 'stop playback',
-      focusonly: false
-    },
-    step_backward: {
-      keys: {
-        mac: 'SHIFT + BACKSPACE',
-        pc: 'SHIFT + BACKSPACE'
+      {
+        name: 'step_backward',
+        keys: {
+          mac: 'SHIFT + BACKSPACE',
+          pc: 'SHIFT + BACKSPACE'
+        },
+        title: 'step backward',
+        focusonly: false
       },
-      title: 'step backward',
-      focusonly: false
-    },
-    step_backwardtime: {
-      keys: {
-        mac: 'SHIFT + TAB',
-        pc: 'SHIFT + TAB'
-      },
-      title: 'step backward time',
-      focusonly: false
-    }
+      {
+        name: 'step_backwardtime',
+        keys: {
+          mac: 'SHIFT + TAB',
+          pc: 'SHIFT + TAB'
+        },
+        title: 'step backward time',
+        focusonly: false
+      }
+    ]
   };
 
   private shortcutsEnabled = true;
@@ -184,9 +196,12 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.audioManager = this.audio.audiomanagers[0];
     this.audioChunkLines = this.audioManager.mainchunk.clone();
     this.audioChunkWindow = this.audioManager.mainchunk.clone();
-    this.shortcuts = this.keyMap.register('2D-Editor', {...this.audioShortcuts, ...this.viewer.settings.shortcuts});
-    this.keyMap.register('Transcription Window', this.windowShortcuts);
-    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onShortCutTriggered));
+    this.shortcuts = this.keyMap.register({
+      name: '2D-Editor',
+      items: [...this.audioShortcuts.items, ...this.viewer.settings.shortcuts.items]
+    });
+    this.keyMap.register(this.windowShortcuts);
+    this.subscrmanager.add(this.keyMap.onShortcutTriggered.subscribe(this.onShortCutTriggered));
     this.viewer.settings.multiLine = true;
     this.viewer.settings.lineheight = 70;
     this.viewer.settings.margin.top = 5;
@@ -434,6 +449,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         }
       )
     );
+
+    this.keyMap.unregisterAll();
   }
 
   ngAfterViewInit() {
@@ -559,12 +576,13 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.triggerUIAction($event);
   }
 
-  onShortCutTriggered = ($event: KeyMappingShortcutEvent) => {
-    this.keyMap.checkShortcutAction($event.comboKey, this.audioShortcuts, this.shortcutsEnabled).then((shortcut) => {
+  onShortCutTriggered = ($event: ShortcutEvent) => {
+    this.keyMap.checkShortcutAction($event.shortcut, this.audioShortcuts, this.shortcutsEnabled).then((shortcut) => {
       if (!isUnset(this.audioChunkLines)) {
+
         switch (shortcut) {
           case('play_pause'):
-            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
             if (this.audioChunkLines.isPlaying) {
               this.audioChunkLines.pausePlayback().catch((error) => {
                 console.error(error);
@@ -576,21 +594,21 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
             }
             break;
           case('stop'):
-            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
             this.audioChunkLines.stopPlayback().catch((error) => {
               console.error(error);
             });
             break;
           case('step_backward'):
             console.log(`step backward`);
-            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
             this.audioChunkLines.stepBackward().catch((error) => {
               console.error(error);
             });
             break;
           case('step_backwardtime'):
             console.log(`step backward time`);
-            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
             this.audioChunkLines.stepBackwardTime(0.5).catch((error) => {
               console.error(error);
             });

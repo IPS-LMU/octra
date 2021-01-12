@@ -1,41 +1,46 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {BrowserInfo} from '../BrowserInfo';
-import {isUnset} from '@octra/utilities';
-import {KeyMapping} from '@octra/components';
+import {isUnset, Shortcut, ShortcutEvent, ShortcutGroup, ShortcutManager} from '@octra/utilities';
 
 @Injectable()
 export class KeymappingService {
-  private shortcuts: any[] = [];
-  private readonly _beforeKeyDown = new EventEmitter<KeyMappingShortcutEvent>();
-  private readonly _onkeydown: EventEmitter<KeyMappingShortcutEvent>;
-  private readonly _onkeyup: EventEmitter<KeyMappingShortcutEvent>;
+  private shortcutsManager: ShortcutManager;
+  private readonly _beforeShortcutTriggered = new EventEmitter<ShortcutEvent>();
+  private readonly _onShortcutTriggered: EventEmitter<ShortcutEvent>;
+
+  public get shortcutGroups(): ShortcutGroup[] {
+    if (isUnset(this.shortcutsManager)) {
+      return [];
+    }
+
+    return this.shortcutsManager.shortcuts;
+  }
 
   private _pressedMetaKeys = {
     ctrl: false,
     cmd: false
   }
 
+  public get generalShortcuts(): ShortcutGroup {
+    return this.shortcutsManager.generalShortcuts;
+  }
+
   get pressedMetaKeys() {
     return this._pressedMetaKeys;
   }
 
-  get onkeydown(): EventEmitter<KeyMappingShortcutEvent> {
-    return this._onkeydown;
+  get onShortcutTriggered(): EventEmitter<ShortcutEvent> {
+    return this._onShortcutTriggered;
   }
 
-  get onkeyup(): EventEmitter<KeyMappingShortcutEvent> {
-    return this._onkeyup;
-  }
-
-  get beforeKeyDown(): EventEmitter<KeyMappingShortcutEvent> {
-    return this._beforeKeyDown;
+  get beforeShortcutTriggered(): EventEmitter<ShortcutEvent> {
+    return this._beforeShortcutTriggered;
   }
 
   constructor() {
-    this._onkeydown = new EventEmitter<KeyMappingShortcutEvent>();
+    this.shortcutsManager = new ShortcutManager();
+    this._onShortcutTriggered = new EventEmitter<ShortcutEvent>();
     window.onkeydown = this.onKeyDown;
-
-    this._onkeyup = new EventEmitter<KeyMappingShortcutEvent>();
     window.onkeyup = this.onKeyUp;
   }
 
@@ -68,41 +73,31 @@ export class KeymappingService {
     return [];
   }
 
-  public register(identifier: string, shortcuts: any): any {
-    if (!this.getShortcuts(identifier)) {
-      this.shortcuts.push({
-        identifier,
-        shortcuts: this.cloneShortcuts(shortcuts)
-      });
-    }
-    // TODO
-    return this.getShortcuts(identifier);
+  public register(shortcutGroup: ShortcutGroup): ShortcutGroup {
+    this.shortcutsManager.registerShortcutGroup(shortcutGroup);
+    return this.shortcutsManager.getShortcutGroup(shortcutGroup.name);
+  }
+
+  public registerGeneralShortcutGroup(shortcutGroup: ShortcutGroup) {
+    this.shortcutsManager.generalShortcuts = shortcutGroup;
   }
 
   public unregister(identifier: string) {
-    if (this.shortcuts.length > 0) {
-      let j = -1;
-      for (let i = 0; i < this.shortcuts.length; i++) {
-        if (this.shortcuts[i].identifier === identifier) {
-          j = i;
-          break;
-        }
-      }
-
-      if (j > 0) {
-        this.shortcuts.splice(j, 1);
-      }
-    }
+    this.shortcutsManager.unregisterShortcutGroup(identifier);
   }
 
-  public getShortcuts(identifier: string): any {
-    for (const shortcut of this.shortcuts) {
-      if (shortcut.identifier === identifier) {
-        return shortcut.shortcuts;
-      }
+  public unregisterAll() {
+    this.shortcutsManager.clearShortcuts();
+  }
+
+  public getShortcuts(identifier: string): Shortcut[] {
+    const shortcutGroup = this.shortcutsManager.getShortcutGroup(identifier);
+
+    if (!isUnset(shortcutGroup)) {
+      return shortcutGroup.items;
     }
 
-    return null;
+    return [];
   }
 
   /**
@@ -123,52 +118,38 @@ export class KeymappingService {
     return '';
   }
 
-  private onKeyDown = ($event) => {
-    const combo = KeyMapping.getShortcutCombination($event);
-
-    if (combo === 'CMD') {
-      this._pressedMetaKeys.cmd = true;
-    }
-    if (combo === 'CTRL') {
-      this._pressedMetaKeys.ctrl = true;
-    }
-
-    this._beforeKeyDown.emit({comboKey: combo, event: $event});
-    this._onkeydown.emit({comboKey: combo, event: $event});
+  private onKeyDown = ($event: KeyboardEvent) => {
+    this.shortcutsManager.checkKeyEvent($event, 'service').then((shortcutInfo: ShortcutEvent) => {
+      if (!isUnset(shortcutInfo)) {
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   private onKeyUp = ($event) => {
-    const combo = KeyMapping.getShortcutCombination($event);
-
-    if (combo === 'CMD') {
-      this._pressedMetaKeys.cmd = false;
-    }
-    if (combo === 'CTRL') {
-      this._pressedMetaKeys.ctrl = false;
-    }
-
-    this._onkeyup.emit({comboKey: combo, event: $event});
+    this.shortcutsManager.checkKeyEvent($event, 'service').then((shortcutInfo) => {
+      if (!isUnset(shortcutInfo)) {
+        this._beforeShortcutTriggered.emit({...shortcutInfo, event: $event});
+        this._onShortcutTriggered.emit({...shortcutInfo, event: $event});
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
-  public checkShortcutAction(comboKey: string, shortcuts: any, shortcutsEnabled: boolean) {
+  public checkShortcutAction(shortcut: string, shortcutGroup: ShortcutGroup, shortcutsEnabled: boolean) {
     return new Promise<string>((resolve) => {
 
       if (shortcutsEnabled) {
-        let foundShortcut = '';
         const platform = BrowserInfo.platform;
-        if (!isUnset(shortcuts)) {
-          for (const shortcut in shortcuts) {
-            if (shortcuts.hasOwnProperty(shortcut)) {
-              const currentShortcut = shortcuts['' + shortcut + ''];
+        if (!isUnset(shortcutGroup)) {
+          const foundShortcut = shortcutGroup.items.find(a => a.keys['' + platform] === shortcut);
 
-              if (currentShortcut.keys['' + platform + ''] === comboKey) {
-                foundShortcut = shortcut;
-                break;
-              }
-            }
+          if (!isUnset(foundShortcut)) {
+            resolve(foundShortcut.name);
           }
         }
-        resolve(foundShortcut);
       }
     });
   }
@@ -213,9 +194,4 @@ export class Entry {
     this.key = key;
     this.value = value;
   }
-}
-
-export interface KeyMappingShortcutEvent {
-  comboKey: string;
-  event: KeyboardEvent;
 }

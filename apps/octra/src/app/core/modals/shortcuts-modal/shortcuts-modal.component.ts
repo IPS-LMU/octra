@@ -6,15 +6,6 @@ import {KeymappingService, SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService} from '../../shared/service/bug-report.service';
 
-export interface GeneralShortcut {
-  label: string;
-  combination: {
-    mac: string;
-    pc: string;
-  };
-  focusonly: boolean;
-}
-
 @Component({
   selector: 'octra-shortcuts-modal',
   templateUrl: './shortcuts-modal.component.html',
@@ -25,8 +16,6 @@ export class ShortcutsModalComponent implements OnInit {
   modalRef: BsModalRef;
   public visible = false;
   @Input() editor = '';
-
-  @Input() public generalShortcuts: GeneralShortcut[] = [];
 
   config: ModalOptions = {
     keyboard: false,

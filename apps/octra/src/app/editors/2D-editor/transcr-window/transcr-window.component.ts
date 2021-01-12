@@ -13,7 +13,7 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import {isUnset, SubscriptionManager} from '@octra/utilities';
+import {isUnset, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
 import {TranscrEditorComponent} from '../../../core/component/transcr-editor';
 
 import {
@@ -122,39 +122,46 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     }
   }
 
-  private audioShortcuts = {
-    play_pause: {
-      keys: {
-        mac: 'TAB',
-        pc: 'TAB'
+  private audioShortcuts: ShortcutGroup = {
+    name: '',
+    items: [
+      {
+        name: 'play_pause',
+        keys: {
+          mac: 'TAB',
+          pc: 'TAB'
+        },
+        title: 'play pause',
+        focusonly: false
       },
-      title: 'play pause',
-      focusonly: false
-    },
-    stop: {
-      keys: {
-        mac: 'ESC',
-        pc: 'ESC'
+      {
+        name: 'stop',
+        keys: {
+          mac: 'ESC',
+          pc: 'ESC'
+        },
+        title: 'stop playback',
+        focusonly: false
       },
-      title: 'stop playback',
-      focusonly: false
-    },
-    step_backward: {
-      keys: {
-        mac: 'SHIFT + BACKSPACE',
-        pc: 'SHIFT + BACKSPACE'
+      {
+        name: 'step_backward',
+        keys: {
+          mac: 'SHIFT + BACKSPACE',
+          pc: 'SHIFT + BACKSPACE'
+        },
+        title: 'step backward',
+        focusonly: false
       },
-      title: 'step backward',
-      focusonly: false
-    },
-    step_backwardtime: {
-      keys: {
-        mac: 'SHIFT + TAB',
-        pc: 'SHIFT + TAB'
-      },
-      title: 'step backward time',
-      focusonly: false
-    }
+      {
+        name: 'step_backwardtime',
+        keys: {
+          mac: 'SHIFT + TAB',
+          pc: 'SHIFT + TAB'
+        },
+        title: 'step backward time',
+        focusonly: false
+      }
+    ]
   };
 
   constructor(public keyMap: KeymappingService,
@@ -169,10 +176,10 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.subscrmanager = new SubscriptionManager();
 
     if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
-      this.subscrmanager.add(this.keyMap.beforeKeyDown.subscribe((event) => {
-        if (event.comboKey === 'ALT + SHIFT + 1' ||
-          event.comboKey === 'ALT + SHIFT + 2' ||
-          event.comboKey === 'ALT + SHIFT + 3') {
+      this.subscrmanager.add(this.keyMap.beforeShortcutTriggered.subscribe((event: ShortcutEvent) => {
+        if (event.shortcut === 'SHIFT + ALT + 1' ||
+          event.shortcut === 'SHIFT + ALT + 2' ||
+          event.shortcut === 'SHIFT + ALT + 3') {
           this.transcrService.tasksBeforeSend.push(new Promise<void>((resolve) => {
             this.save();
 
@@ -251,12 +258,12 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     });
   }
 
-  onShortcutTriggered = ($event) => {
+  onShortcutTriggered = ($event: ShortcutEvent) => {
     if (!this.loading) {
-      this.keyMap.checkShortcutAction($event.comboKey, this.audioShortcuts, true).then((shortcut) => {
+      this.keyMap.checkShortcutAction($event.shortcut, this.audioShortcuts, true).then((shortcut) => {
         switch (shortcut) {
           case('play_pause'):
-            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
             if (this.audiochunk.isPlaying) {
               this.audiochunk.pausePlayback().catch((error) => {
                 console.error(error);
@@ -268,28 +275,28 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
             }
             break;
           case('stop'):
-            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
             this.audiochunk.stopPlayback().catch((error) => {
               console.error(error);
             });
             break;
           case('step_backward'):
             console.log(`step backward`);
-            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
             this.audiochunk.stepBackward().catch((error) => {
               console.error(error);
             });
             break;
           case('step_backwardtime'):
             console.log(`step backward time`);
-            this.triggerUIAction({shortcut: $event.comboKey, value: shortcut, type: 'audio'});
+            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
             this.audiochunk.stepBackwardTime(0.5).catch((error) => {
               console.error(error);
             });
             break;
         }
 
-        switch ($event.comboKey) {
+        switch ($event.shortcut) {
           case ('ALT + ARROWRIGHT'):
             $event.event.preventDefault();
             if (this.hasSegmentBoundaries || (!this.isNextSegmentLastAndBreak(this.segmentIndex)
@@ -332,7 +339,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.loupe.settings.boundaries.enabled = false;
     this.loupe.settings.boundaries.readonly = true;
     this.loupe.settings.selection.enabled = true;
-    this.loupe.settings.shortcuts.set_break = null;
     this.loupe.settings.frame.color = '#222222';
     this.loupe.settings.roundValues = false;
     this.loupe.settings.showTimePerLine = true;
@@ -355,7 +361,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     this.cd.markForCheck();
     this.cd.detectChanges();
 
-    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onShortcutTriggered));
+    this.subscrmanager.add(this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered));
   }
 
   setValidationEnabledToDefault() {

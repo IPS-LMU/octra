@@ -8,20 +8,18 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import {isUnset, SubscriptionManager} from '@octra/utilities';
+import {ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 
 import {
   AudioService,
   KeymappingService,
-  KeyMappingShortcutEvent,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
 } from '../../core/shared/service';
 import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {OCTRAEditor} from '../octra-editor';
-import {BrowserInfo} from '../../core/shared';
 import {AudioChunk, AudioManager, SampleUnit} from '@octra/media';
 import {Segment} from '@octra/annotation';
 import {AudioNavigationComponent, AudioplayerComponent} from '@octra/components';
@@ -56,39 +54,46 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   private oldRaw = '';
 
-  private shortcuts = {
-    play_pause: {
-      keys: {
-        mac: 'TAB',
-        pc: 'TAB'
+  private shortcuts: ShortcutGroup = {
+    name: 'audioplayer',
+    items: [
+      {
+        name: 'play_pause',
+        keys: {
+          mac: 'TAB',
+          pc: 'TAB'
+        },
+        title: 'play pause',
+        focusonly: false
       },
-      title: 'play pause',
-      focusonly: false
-    },
-    stop: {
-      keys: {
-        mac: 'ESC',
-        pc: 'ESC'
+      {
+        name: 'stop',
+        keys: {
+          mac: 'ESC',
+          pc: 'ESC'
+        },
+        title: 'stop playback',
+        focusonly: false
       },
-      title: 'stop playback',
-      focusonly: false
-    },
-    step_backward: {
-      keys: {
-        mac: 'SHIFT + BACKSPACE',
-        pc: 'SHIFT + BACKSPACE'
+      {
+        name: 'step_backward',
+        keys: {
+          mac: 'SHIFT + BACKSPACE',
+          pc: 'SHIFT + BACKSPACE'
+        },
+        title: 'step backward',
+        focusonly: false
       },
-      title: 'step backward',
-      focusonly: false
-    },
-    step_backwardtime: {
-      keys: {
-        mac: 'SHIFT + TAB',
-        pc: 'SHIFT + TAB'
-      },
-      title: 'step backward time',
-      focusonly: false
-    }
+      {
+        name: 'step_backwardtime',
+        keys: {
+          mac: 'SHIFT + TAB',
+          pc: 'SHIFT + TAB'
+        },
+        title: 'step backward time',
+        focusonly: false
+      }
+    ]
   };
 
   private shortcutsEnabled = true;
@@ -119,10 +124,10 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     this.subscrmanager = new SubscriptionManager();
 
     if (this.appStorage.useMode === 'online' || this.appStorage.useMode === 'demo') {
-      this.subscrmanager.add(this.keyMap.beforeKeyDown.subscribe((event) => {
-        if (event.comboKey === 'ALT + SHIFT + 1' ||
-          event.comboKey === 'ALT + SHIFT + 2' ||
-          event.comboKey === 'ALT + SHIFT + 3') {
+      this.subscrmanager.add(this.keyMap.beforeShortcutTriggered.subscribe((event: ShortcutEvent) => {
+        if (event.shortcut === 'SHIFT + ALT + 1' ||
+          event.shortcut === 'SHIFT + ALT + 2' ||
+          event.shortcut === 'SHIFT + ALT + 3') {
           this.transcrService.tasksBeforeSend.push(new Promise<void>((resolve) => {
             this.appStorage.afterSaving().then(() => {
               resolve();
@@ -141,9 +146,9 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     this.editor.Settings.specialMarkers.boundary = true;
     this.editor.Settings.highlightingEnabled = true;
 
-    this.subscrmanager.add(this.keyMap.onkeydown.subscribe(this.onShortcutTriggered), 'shortcut');
+    this.subscrmanager.add(this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered), 'shortcut');
 
-    this.keyMap.register('AP', this.shortcuts);
+    this.keyMap.register(this.shortcuts);
 
     DictaphoneEditorComponent.initialized.emit();
   }
@@ -157,7 +162,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
       console.error(`could not stop audio on editor switched`);
     });
     this.subscrmanager.destroy();
-    this.keyMap.unregister('AP');
+    this.keyMap.unregisterAll();
   }
 
   ngOnChanges(obj: SimpleChanges) {
@@ -201,7 +206,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     }
   }
 
-  onShortcutTriggered = ($event: KeyMappingShortcutEvent) => {
+  onShortcutTriggered = ($event: ShortcutEvent) => {
     const triggerUIAction = (shortcutObj) => {
       shortcutObj.value = `audio:${shortcutObj.value}`;
       this.uiService.addElementFromEvent('shortcut', shortcutObj, Date.now(),
@@ -209,67 +214,39 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     };
 
     if (this.shortcutsEnabled) {
-      const comboKey = $event.comboKey;
-
-      const platform = BrowserInfo.platform;
-      if (!isUnset(this.shortcuts)) {
-        let keyActive = false;
-        let a = 0;
-        for (const shortcut in this.shortcuts) {
-          if (this.shortcuts.hasOwnProperty(shortcut)) {
-            a++;
-            if (this.shortcuts.hasOwnProperty(shortcut)) {
-              if (this.shortcuts['' + shortcut + ''].keys['' + platform + ''] === comboKey) {
-                switch (shortcut) {
-                  case('play_pause'):
-                    triggerUIAction({shortcut: comboKey, value: shortcut});
-                    if (this.audiochunk.isPlaying) {
-                      this.audiochunk.pausePlayback().catch((error) => {
-                        console.error(error);
-                      });
-                    } else {
-                      this.audiochunk.startPlayback(false).catch((error) => {
-                        console.error(error);
-                      });
-                    }
-                    keyActive = true;
-                    break;
-                  case('stop'):
-                    triggerUIAction({shortcut: comboKey, value: shortcut});
-                    this.audiochunk.stopPlayback().catch((error) => {
-                      console.error(error);
-                    });
-                    keyActive = true;
-                    break;
-                  case('step_backward'):
-                    console.log(`step backward`);
-                    triggerUIAction({shortcut: comboKey, value: shortcut});
-                    this.audiochunk.stepBackward().catch((error) => {
-                      console.error(error);
-                    });
-                    keyActive = true;
-                    break;
-                  case('step_backwardtime'):
-                    console.log(`step backward time`);
-                    triggerUIAction({shortcut: comboKey, value: shortcut});
-                    this.audiochunk.stepBackwardTime(0.5).catch((error) => {
-                      console.error(error);
-                    });
-                    keyActive = true;
-                    break;
-                }
-              }
-
-              if (keyActive) {
-                break;
-              }
-            }
+      switch ($event.shortcutName) {
+        case('play_pause'):
+          triggerUIAction({shortcut: $event.shortcutName, value: $event.shortcut});
+          if (this.audiochunk.isPlaying) {
+            this.audiochunk.pausePlayback().catch((error) => {
+              console.error(error);
+            });
+          } else {
+            this.audiochunk.startPlayback(false).catch((error) => {
+              console.error(error);
+            });
           }
-        }
-
-        if (keyActive) {
-          $event.event.preventDefault();
-        }
+          break;
+        case('stop'):
+          triggerUIAction({shortcut: $event.shortcutName, value: $event.shortcut});
+          this.audiochunk.stopPlayback().catch((error) => {
+            console.error(error);
+          });
+          break;
+        case('step_backward'):
+          console.log(`step backward`);
+          triggerUIAction({shortcut: $event.shortcutName, value: $event.shortcut});
+          this.audiochunk.stepBackward().catch((error) => {
+            console.error(error);
+          });
+          break;
+        case('step_backwardtime'):
+          console.log(`step backward time`);
+          triggerUIAction({shortcut: $event.shortcutName, value: $event.shortcut});
+          this.audiochunk.stepBackwardTime(0.5).catch((error) => {
+            console.error(error);
+          });
+          break;
       }
     }
   }

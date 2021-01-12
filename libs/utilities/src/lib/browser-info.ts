@@ -1,7 +1,7 @@
 declare var platform: any;
 
 export class BrowserInfo {
-  public static get platform(): string {
+  public static get platform(): 'mac' | 'pc' {
     if (platform.os.family && platform.os.family === 'OS X') {
       return 'mac';
     } else {

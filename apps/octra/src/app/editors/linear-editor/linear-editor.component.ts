@@ -9,7 +9,7 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import {contains, isUnset, SubscriptionManager} from '@octra/utilities';
+import {contains, isUnset, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
 import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {BrowserInfo} from '../../core/shared';
 
@@ -17,7 +17,6 @@ import {
   AlertService,
   AudioService,
   KeymappingService,
-  KeyMappingShortcutEvent,
   SettingsService,
   TranscriptionService,
   UserInteractionsService
@@ -78,73 +77,87 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   private mousestate = 'initiliazied';
 
   private audioShortcutsTopDisplay = {
-    play_pause: {
-      keys: {
-        mac: 'TAB',
-        pc: 'TAB'
+    name: 'AV',
+    items: [
+      {
+        name: 'play_pause',
+        keys: {
+          mac: 'TAB',
+          pc: 'TAB'
+        },
+        title: 'play pause',
+        focusonly: false
       },
-      title: 'play pause',
-      focusonly: false
-    },
-    stop: {
-      keys: {
-        mac: 'ESC',
-        pc: 'ESC'
+      {
+        name: 'stop',
+        keys: {
+          mac: 'ESC',
+          pc: 'ESC'
+        },
+        title: 'stop playback',
+        focusonly: false
       },
-      title: 'stop playback',
-      focusonly: false
-    },
-    step_backward: {
-      keys: {
-        mac: 'SHIFT + BACKSPACE',
-        pc: 'SHIFT + BACKSPACE'
+      {
+        name: 'step_backward',
+        keys: {
+          mac: 'SHIFT + BACKSPACE',
+          pc: 'SHIFT + BACKSPACE'
+        },
+        title: 'step backward',
+        focusonly: false
       },
-      title: 'step backward',
-      focusonly: false
-    },
-    step_backwardtime: {
-      keys: {
-        mac: 'SHIFT + TAB',
-        pc: 'SHIFT + TAB'
-      },
-      title: 'step backward time',
-      focusonly: false
-    }
+      {
+        name: 'step_backwardtime',
+        keys: {
+          mac: 'SHIFT + TAB',
+          pc: 'SHIFT + TAB'
+        },
+        title: 'step backward time',
+        focusonly: false
+      }
+    ]
   };
 
-  private audioShortcutsBottomDisplay = {
-    play_pause: {
-      keys: {
-        mac: 'SHIFT + SPACE',
-        pc: 'SHIFT + SPACE'
+  private audioShortcutsBottomDisplay: ShortcutGroup = {
+    name: 'Loupe',
+    items: [
+      {
+        name: 'play_pause',
+        keys: {
+          mac: 'SHIFT + SPACE',
+          pc: 'SHIFT + SPACE'
+        },
+        title: 'play pause',
+        focusonly: false
       },
-      title: 'play pause',
-      focusonly: false
-    },
-    stop: {
-      keys: {
-        mac: 'ESC',
-        pc: 'ESC'
+      {
+        name: 'stop',
+        keys: {
+          mac: 'ESC',
+          pc: 'ESC'
+        },
+        title: 'stop playback',
+        focusonly: false
       },
-      title: 'stop playback',
-      focusonly: false
-    },
-    step_backward: {
-      keys: {
-        mac: 'SHIFT + ENTER',
-        pc: 'SHIFT + ENTER'
+      {
+        name: 'step_backward',
+        keys: {
+          mac: 'SHIFT + ENTER',
+          pc: 'SHIFT + ENTER'
+        },
+        title: 'step backward',
+        focusonly: false
       },
-      title: 'step backward',
-      focusonly: false
-    },
-    step_backwardtime: {
-      keys: {
-        mac: 'SHIFT + ´',
-        pc: 'SHIFT + ´'
-      },
-      title: 'step backward time',
-      focusonly: false
-    }
+      {
+        name: 'step_backwardtime',
+        keys: {
+          mac: 'SHIFT + ´',
+          pc: 'SHIFT + ´'
+        },
+        title: 'step backward time',
+        focusonly: false
+      }
+    ]
   };
 
   public get app_settings(): any {
@@ -156,7 +169,11 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   get segmententer_shortc(): string {
-    return (this.signalDisplayTop.settings) ? this.signalDisplayTop.settings.shortcuts.segment_enter.keys[this.platform] : '';
+    const segmentEnterShortcut = this.signalDisplayTop.settings.shortcuts.items.find(a => a.name === 'segment_enter');
+    if (!isUnset(segmentEnterShortcut) && !isUnset(this.signalDisplayTop.settings)) {
+      return segmentEnterShortcut.keys[this.platform]
+    }
+    return '';
   }
 
   private _miniLoupeSettings: AudioviewerConfig;
@@ -179,10 +196,10 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.subscrManager = new SubscriptionManager();
 
     if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
-      this.subscrManager.add(this.keyMap.beforeKeyDown.subscribe((event) => {
-        if (event.comboKey === 'ALT + SHIFT + 1' ||
-          event.comboKey === 'ALT + SHIFT + 2' ||
-          event.comboKey === 'ALT + SHIFT + 3') {
+      this.subscrManager.add(this.keyMap.beforeShortcutTriggered.subscribe((event: ShortcutEvent) => {
+        if (event.shortcut === 'SHIFT + ALT + 1' ||
+          event.shortcut === 'SHIFT + ALT + 2' ||
+          event.shortcut === 'SHIFT + ALT + 3') {
 
           this.transcrService.tasksBeforeSend.push(new Promise<void>((resolve) => {
             if (!isUnset(this.audioChunkDown) && this.segmentselected && this.selectedIndex > -1) {
@@ -230,7 +247,10 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.audioChunkLoupe = this.audioManager.mainchunk.clone();
     this.selectedAudioChunk = this.audioChunkTop;
 
-    this.keyMap.register('AV', {...this.audioShortcutsTopDisplay, ...this.signalDisplayTop.settings.shortcuts});
+    this.keyMap.register({
+      name: 'top signaldisplay',
+      items: [...this.audioShortcutsTopDisplay.items, ...this.signalDisplayTop.settings.shortcuts.items]
+    });
     this.signalDisplayTop.settings.shortcutsEnabled = true;
     this.signalDisplayTop.settings.boundaries.enabled = true;
     this.signalDisplayTop.settings.boundaries.readonly = false;
@@ -240,7 +260,10 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.signalDisplayTop.settings.margin.top = 5;
 
     this.loupeSettings = new AudioviewerConfig();
-    this.keyMap.register('Loupe', {...this.audioShortcutsBottomDisplay, ...this.loupeSettings.shortcuts});
+    this.keyMap.register({
+      name: 'down signaldisplay',
+      items: [...this.audioShortcutsBottomDisplay.items, ...this.loupeSettings.shortcuts.items]
+    });
     this.loupeSettings.justifySignalHeight = true;
     this.loupeSettings.roundValues = false;
     this.loupeSettings.boundaries.enabled = true;
@@ -281,7 +304,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       }
     ));
 
-    this.subscrManager.add(this.keyMap.onkeydown.subscribe(this.onShortcutTriggered), 'shortcut');
+    this.subscrManager.add(this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered), 'shortcut');
 
     this.cd.markForCheck();
     this.cd.detectChanges();
@@ -299,8 +322,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       console.error(`could not stop audio on editor switched`);
     });
     this.subscrManager.destroy();
-    this.keyMap.unregister('AV');
-    this.keyMap.unregister('Loupe');
+    this.keyMap.unregisterAll();
   }
 
   onButtonClick(event: {
@@ -416,9 +438,9 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.triggerUIActionAfterShortcut($event, control);
   }
 
-  onShortcutTriggered = ($event: KeyMappingShortcutEvent) => {
+  onShortcutTriggered = ($event: ShortcutEvent) => {
     if (this.shortcutsEnabled) {
-      const comboKey = $event.comboKey;
+      const comboKey = $event.shortcut;
 
       const platform = BrowserInfo.platform;
       if (!isUnset(this.audioShortcutsTopDisplay) && !isUnset(this.audioShortcutsBottomDisplay)) {

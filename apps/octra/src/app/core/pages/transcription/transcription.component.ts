@@ -17,7 +17,7 @@ import {
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {Functions, isUnset, ShortcutGroup, ShortcutManager, SubscriptionManager} from '@octra/utilities';
-import {interval, throwError} from 'rxjs';
+import {interval, throwError, timer} from 'rxjs';
 import * as X2JS from 'x2js';
 import {AppInfo} from '../../../app.info';
 import {editorComponents} from '../../../editors/components';

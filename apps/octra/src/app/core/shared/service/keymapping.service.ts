@@ -44,35 +44,6 @@ export class KeymappingService {
     window.onkeyup = this.onKeyUp;
   }
 
-  public getEntryList(name: string): Entry[] {
-    const list = this.getShortcuts(name);
-
-    if (list) {
-      let i = 0;
-      for (const entry in list) {
-        if (list.hasOwnProperty(entry)) {
-          i++;
-        }
-      }
-
-      if (i > 0) {
-        const result: Entry[] = [];
-
-        for (const entry in list) {
-          if (!(list[entry] === null || list[entry] === undefined) && list.hasOwnProperty(entry)) {
-            const val = list[entry];
-            result.push(new Entry(entry, val));
-          }
-        }
-
-        return result;
-      } else {
-        console.error(`no shortcuts found!`);
-      }
-    }
-    return [];
-  }
-
   public register(shortcutGroup: ShortcutGroup): ShortcutGroup {
     this.shortcutsManager.registerShortcutGroup(shortcutGroup);
     return this.shortcutsManager.getShortcutGroup(shortcutGroup.name);
@@ -184,14 +155,4 @@ export class KeymappingService {
 
    return null;
    }*/
-}
-
-export class Entry {
-  public key: string;
-  public value: any;
-
-  constructor(key: string, value: any) {
-    this.key = key;
-    this.value = value;
-  }
 }

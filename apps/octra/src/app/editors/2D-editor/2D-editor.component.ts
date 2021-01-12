@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
 import {contains, Functions, isUnset, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
-import {interval, Subscription} from 'rxjs';
+import {interval, Subscription, timer} from 'rxjs';
 import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
 import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
 import {TranscrEditorComponent} from '../../core/component';

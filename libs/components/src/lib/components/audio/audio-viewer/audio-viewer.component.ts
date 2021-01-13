@@ -651,6 +651,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     // also stage will be in focus on its click
     container.focus();
     container.removeEventListener('keydown', this.onKeyDown);
+    container.addEventListener('keydown', this.onKeyDown);
+    container.removeEventListener('keyup', this.onKeyUp);
     container.addEventListener('keyup', this.onKeyUp);
     container.removeEventListener('mouseleave', this.onMouseLeave);
     container.addEventListener('mouseleave', this.onMouseLeave);
@@ -1645,11 +1647,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   private onKeyDown = (event: KeyboardEvent) => {
-    this.shortcutsManager.checkKeyEvent(event, 'audioviewer').catch(e => console.error(e));
-  }
-
-  private onKeyUp = (event: KeyboardEvent) => {
-    this.shortcutsManager.checkKeyEvent(event, 'audioviewer').then((shortcutInfo: ShortcutEvent) => {
+    this.shortcutsManager.checkKeyEvent(event, Date.now()).then((shortcutInfo) => {
       if (!isUnset(shortcutInfo)) {
         const comboKey = shortcutInfo.shortcut;
 
@@ -1686,7 +1684,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                           shortcut: comboKey,
                           value: result.type,
                           type: 'boundary',
-                          timePosition: this.audioManager.createSampleUnit(result.seg_samples)
+                          timePosition: this.audioManager.createSampleUnit(result.seg_samples),
+                          timestamp: shortcutInfo.timestamp
                         });
                       }
 
@@ -1717,7 +1716,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                             shortcut: comboKey,
                             value: 'set_break',
                             type: 'segment',
-                            timePosition: xSamples.clone()
+                            timePosition: xSamples.clone(),
+                            timestamp: shortcutInfo.timestamp
                           });
                         } else {
                           segment.transcript = '';
@@ -1725,7 +1725,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                             shortcut: comboKey,
                             value: 'remove_break',
                             type: 'segment',
-                            timePosition: xSamples.clone()
+                            timePosition: xSamples.clone(),
+                            timestamp: shortcutInfo.timestamp
                           });
                         }
 
@@ -1785,7 +1786,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                               value: shortcutName,
                               type: 'audio',
                               timePosition: xSamples.clone(),
-                              selection: boundarySelect.clone()
+                              selection: boundarySelect.clone(),
+                              timestamp: shortcutInfo.timestamp
                             });
 
                             this.audioChunk.stopPlayback().then(() => {
@@ -1823,7 +1825,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                         value: shortcutName,
                         type: 'audio',
                         timePosition: this.av.mouseCursor.clone(),
-                        selection: this.av.drawnSelection.clone()
+                        selection: this.av.drawnSelection.clone(),
+                        timestamp: shortcutInfo.timestamp
                       });
 
                       for (let i = 0; i < this._transcriptionLevel.segments.length; i++) {
@@ -1859,7 +1862,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       shortcut: comboKey,
                       value: shortcutName,
                       type: 'segment',
-                      timePosition: this.av.mouseCursor.clone()
+                      timePosition: this.av.mouseCursor.clone(),
+                      timestamp: shortcutInfo.timestamp
                     });
 
                     const segInde = this._transcriptionLevel.segments.getSegmentBySamplePosition(
@@ -1890,7 +1894,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       shortcut: comboKey,
                       value: shortcutName,
                       type: 'mouse',
-                      timePosition: this.av.mouseCursor.clone()
+                      timePosition: this.av.mouseCursor.clone(),
+                      timestamp: shortcutInfo.timestamp
                     });
                     this.av.moveCursor('left', this.settings.stepWidthRatio * this.audioManager.sampleRate);
                     this.changeMouseCursorSamples(this.av.mouseCursor);
@@ -1907,7 +1912,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       shortcut: comboKey,
                       value: shortcutName,
                       type: 'mouse',
-                      timePosition: this.av.mouseCursor.clone()
+                      timePosition: this.av.mouseCursor.clone(),
+                      timestamp: shortcutInfo.timestamp
                     });
 
                     this.av.moveCursor('right', this.settings.stepWidthRatio * this.audioManager.sampleRate);
@@ -1925,7 +1931,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       shortcut: comboKey,
                       value: shortcutName,
                       type: 'option',
-                      timePosition: this.av.mouseCursor.clone()
+                      timePosition: this.av.mouseCursor.clone(),
+                      timestamp: shortcutInfo.timestamp
                     });
                   }
                   break;
@@ -1941,14 +1948,16 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                           shortcut: comboKey,
                           value: 'do_asr',
                           type: 'segment',
-                          timePosition: this.av.mouseCursor.clone()
+                          timePosition: this.av.mouseCursor.clone(),
+                          timestamp: shortcutInfo.timestamp
                         });
                       } else {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
                           value: 'cancel_asr',
                           type: 'segment',
-                          timePosition: this.av.mouseCursor.clone()
+                          timePosition: this.av.mouseCursor.clone(),
+                          timestamp: shortcutInfo.timestamp
                         });
                       }
                       this.transcriptionLevel.segments.onsegmentchange.emit();
@@ -1966,14 +1975,16 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                           shortcut: comboKey,
                           value: 'do_asr_maus',
                           type: 'segment',
-                          timePosition: this.av.mouseCursor.clone()
+                          timePosition: this.av.mouseCursor.clone(),
+                          timestamp: shortcutInfo.timestamp
                         });
                       } else {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
                           value: 'cancel_asr_maus',
                           type: 'segment',
-                          timePosition: this.av.mouseCursor.clone()
+                          timePosition: this.av.mouseCursor.clone(),
+                          timestamp: shortcutInfo.timestamp
                         });
                       }
                       this.transcriptionLevel.segments.onsegmentchange.emit();
@@ -1992,14 +2003,16 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                           shortcut: comboKey,
                           value: 'do_maus',
                           type: 'segment',
-                          timePosition: this.av.mouseCursor.clone()
+                          timePosition: this.av.mouseCursor.clone(),
+                          timestamp: shortcutInfo.timestamp
                         });
                       } else {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
                           value: 'cancel_maus',
                           type: 'segment',
-                          timePosition: this.av.mouseCursor.clone()
+                          timePosition: this.av.mouseCursor.clone(),
+                          timestamp: shortcutInfo.timestamp
                         });
                       }
                       this.transcriptionLevel.segments.onsegmentchange.emit();
@@ -2011,6 +2024,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
           }
         }
       }
+    }).catch(e => console.error(e));
+  }
+
+  private onKeyUp = (event: KeyboardEvent) => {
+    this.shortcutsManager.checkKeyEvent(event, Date.now()).then((shortcutInfo: ShortcutEvent) => {
     }).catch((error) => {
       console.error(error);
     });
@@ -2265,4 +2283,5 @@ export interface AudioViewerShortcutEvent {
   type: string;
   timePosition?: SampleUnit;
   selection?: AudioSelection;
+  timestamp: number;
 }

@@ -5,8 +5,10 @@ export interface ShortcutEvent {
   shortcut: string;
   platform: string;
   shortcutName: string;
+  shortcutGroupName: string;
   onFocusOnly: boolean;
   event: KeyboardEvent;
+  timestamp: number;
 }
 
 export interface KeyMappingEntry {
@@ -30,15 +32,26 @@ export interface ShortcutGroup {
 }
 
 export class ShortcutManager {
+  get pressedKeys(): { other: number; ctrl: boolean; shift: boolean; alt: boolean; cmd: boolean } {
+    return this._pressedKeys;
+  }
+
   get shortcuts(): ShortcutGroup[] {
     return this._shortcuts;
   }
 
   private _shortcuts: ShortcutGroup[];
-
   public generalShortcuts: ShortcutGroup = {
     name: 'general shortcuts',
     items: []
+  }
+
+  private _pressedKeys = {
+    alt: false,
+    cmd: false,
+    ctrl: false,
+    shift: false,
+    other: -1
   }
 
   private keyMappingTable: KeyMappingEntry[] = [
@@ -108,8 +121,6 @@ export class ShortcutManager {
     this._shortcuts = [];
   }
 
-  private ignoreKeyUps = false;
-
   public shortcutsEnabled = true;
 
   public getShortcutGroup(name: string) {
@@ -130,37 +141,45 @@ export class ShortcutManager {
     this._shortcuts = [];
   }
 
-  public checkKeyEvent(event: KeyboardEvent, source: string): Promise<ShortcutEvent> {
+  public checkKeyEvent(event: KeyboardEvent, timestamp: number): Promise<ShortcutEvent> {
     return new Promise<ShortcutEvent>((resolve) => {
+      const keyCode = this.getKeyCode(event);
+
       if (this.shortcutsEnabled) {
         if (event.type === 'keydown') {
-          this.ignoreKeyUps = false;
-          resolve(null);
-        } else if (event.type === 'keyup' && !this.ignoreKeyUps) {
-          const shortcut = this.getShorcutCombination(event);
-          const shortcutObj = this.getCommand(shortcut, BrowserInfo.platform);
+          if (keyCode !== this._pressedKeys.other) {
+            // run shortcut check
+            const shortcut = this.getShorcutCombination(event);
+            const commandObj = this.getCommand(shortcut, BrowserInfo.platform);
 
-          if (!isUnset(shortcutObj)) {
-            event.preventDefault();
+            this.checkPressedKey(event);
 
-            if (shortcut.indexOf('+') > -1) {
-              this.ignoreKeyUps = true;
+            if (!isUnset(commandObj)) {
+              event.preventDefault();
+
+              resolve({
+                platform: BrowserInfo.platform,
+                shortcutName: commandObj.shortcut.name,
+                shortcutGroupName: commandObj.groupName,
+                onFocusOnly: commandObj.shortcut.focusonly,
+                shortcut,
+                event,
+                timestamp
+              });
+
             } else {
-              this.ignoreKeyUps = false;
+              resolve(null);
             }
-
-            resolve({
-              platform: BrowserInfo.platform,
-              shortcutName: shortcutObj.name,
-              onFocusOnly: shortcutObj.focusonly,
-              shortcut,
-              event
-            });
-
           } else {
             resolve(null);
           }
+        } else if (event.type === 'keyup') {
+          this.checkPressedKey(event);
+          resolve(null);
         } else {
+          this.checkPressedKey(event);
+
+          console.log(this._pressedKeys);
           resolve(null);
         }
       } else {
@@ -169,11 +188,17 @@ export class ShortcutManager {
     });
   }
 
-  private getCommand(shortcut: string, platform: 'mac' | 'pc'): Shortcut {
+  private getCommand(shortcut: string, platform: 'mac' | 'pc'): {
+    shortcut: Shortcut,
+    groupName: string
+  } {
     for (const shortcutGroup of this._shortcuts) {
       const elem = shortcutGroup.items.find(a => a.keys[platform] === shortcut);
       if (!isUnset(elem)) {
-        return elem;
+        return {
+          shortcut: elem,
+          groupName: shortcutGroup.name
+        };
       }
     }
 
@@ -181,7 +206,10 @@ export class ShortcutManager {
     const generalShortcutElem = this.generalShortcuts.items.find(a => a.keys[platform] === shortcut);
 
     if (!isUnset(generalShortcutElem)) {
-      return generalShortcutElem;
+      return {
+        shortcut: generalShortcutElem,
+        groupName: this.generalShortcuts.name
+      };
     }
 
     return null;
@@ -201,15 +229,15 @@ export class ShortcutManager {
   }
 
   public getShorcutCombination(event: KeyboardEvent) {
-    const keycode = event.which; // which has better browser compatibility
-    const alt = event.altKey;
-    const ctrl = event.ctrlKey;
-    const meta = event.metaKey;
-    const shift = event.shiftKey;
+    const keyCode = this.getKeyCode(event);
+    const alt = this._pressedKeys.alt;
+    const ctrl = this._pressedKeys.ctrl;
+    const cmd = this._pressedKeys.cmd;
+    const shift = this._pressedKeys.shift;
 
-    let name = this.getNameByCode(keycode);
-    if (name === '' && !(event.which === null || event.which === undefined)) {
-      name = String.fromCharCode(event.which).toUpperCase();
+    let name = this.getNameByCode(keyCode);
+    if (name === '' && keyCode > -1) {
+      name = String.fromCharCode(keyCode).toUpperCase();
     }
 
     if (!name) {
@@ -222,7 +250,7 @@ export class ShortcutManager {
 
     let comboKey = '';
 
-    if (alt || ctrl || shift) {
+    if (alt || ctrl || shift || cmd) {
       if (shift) {
         comboKey = 'SHIFT';
       }
@@ -240,24 +268,68 @@ export class ShortcutManager {
         }
         comboKey += 'CTRL';
       }
+
+      if (cmd) {
+        if (comboKey !== '') {
+          comboKey += ' + ';
+        }
+        comboKey += 'CMD';
+      }
     } else {
-      comboKey = this.getNameByCode(event.keyCode);
+      comboKey = this.getNameByCode(keyCode);
     }
 
     // if name == comboKey, only one special Key pressed
-    if (comboKey.indexOf(name) < 0) {
+    const keys = comboKey.split(' + ').filter(a => a !== null && a !== '');
+    if (keys.find(a => a === name) === undefined) {
+      if (name === 'A') {
+        const ok = 2;
+      }
       if (comboKey !== '') {
         comboKey += ' + ';
       }
 
-      if (event.key !== '' && name !== '') {
+      if (name !== '') {
         if (name.length === 1) {
           // keyName is normal char
-          name = String.fromCharCode(keycode);
+          name = String.fromCharCode(keyCode);
         }
         comboKey += name;
       }
     }
     return comboKey;
+  }
+
+  private getKeyCode(event: KeyboardEvent): number {
+    if (event.which !== undefined) {
+      return event.which;
+    }
+    if (event.keyCode !== undefined) {
+      return event.keyCode;
+    }
+
+    return -1;
+  }
+
+  private checkPressedKey(event: KeyboardEvent) {
+    const keyName = this.getNameByCode(this.getKeyCode(event));
+    const valueToSet = event.type === 'keydown';
+
+    switch (keyName) {
+      case ('ALT'):
+        this._pressedKeys.alt = valueToSet;
+        break;
+      case ('SHIFT'):
+        this._pressedKeys.shift = valueToSet;
+        break;
+      case ('CTRL'):
+        this._pressedKeys.ctrl = valueToSet;
+        break;
+      case ('CMD'):
+        this._pressedKeys.cmd = valueToSet;
+        break;
+    }
+
+    this._pressedKeys.other = (valueToSet) ? this.getKeyCode(event) : -1;
   }
 }

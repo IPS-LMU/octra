@@ -209,7 +209,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   onShortcutTriggered = ($event: ShortcutEvent) => {
     const triggerUIAction = (shortcutObj) => {
       shortcutObj.value = `audio:${shortcutObj.value}`;
-      this.uiService.addElementFromEvent('shortcut', shortcutObj, Date.now(),
+      this.uiService.addElementFromEvent('shortcut', shortcutObj, $event.timestamp,
         this.audioManager.playposition, this.editor.caretpos, null, null, 'texteditor');
     };
 

@@ -513,14 +513,7 @@ export class TranscriptionComponent implements OnInit,
 
   @HostListener('window:keydown', ['$event'])
   onKeyDown($event) {
-    this.shortcutManager.checkKeyEvent($event, 'transcr component').catch((e) => {
-      console.error(e);
-    });
-  }
-
-  @HostListener('window:keyup', ['$event'])
-  onKeyUp($event) {
-    this.shortcutManager.checkKeyEvent($event, 'transcr component').then((shortcutInfo) => {
+    this.shortcutManager.checkKeyEvent($event, Date.now()).then((shortcutInfo) => {
       if (!isUnset(shortcutInfo)) {
         switch (shortcutInfo.shortcutName) {
           case ('shortcuts'):
@@ -550,19 +543,15 @@ export class TranscriptionComponent implements OnInit,
             }
             break;
         }
-
-
-        if ($event.altKey && $event.which === 56) {
-          $event.preventDefault();
-        } else if ($event.altKey && $event.which === 57) {
-
-          $event.preventDefault();
-        }
-        if ($event.altKey && $event.which === 48) {
-
-          $event.preventDefault();
-        }
       }
+    }).catch((e) => {
+      console.error(e);
+    });
+  }
+
+  @HostListener('window:keyup', ['$event'])
+  onKeyUp($event) {
+    this.shortcutManager.checkKeyEvent($event, Date.now()).then((shortcutInfo) => {
     }).catch((error) => {
       console.error(error);
     });

@@ -582,7 +582,12 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
         switch (shortcut) {
           case('play_pause'):
-            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
+            this.triggerUIAction({
+              shortcut: $event.shortcut,
+              value: shortcut,
+              type: 'audio',
+              timestamp: $event.timestamp
+            });
             if (this.audioChunkLines.isPlaying) {
               this.audioChunkLines.pausePlayback().catch((error) => {
                 console.error(error);
@@ -594,21 +599,36 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
             }
             break;
           case('stop'):
-            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
+            this.triggerUIAction({
+              shortcut: $event.shortcut,
+              value: shortcut,
+              type: 'audio',
+              timestamp: $event.timestamp
+            });
             this.audioChunkLines.stopPlayback().catch((error) => {
               console.error(error);
             });
             break;
           case('step_backward'):
             console.log(`step backward`);
-            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
+            this.triggerUIAction({
+              shortcut: $event.shortcut,
+              value: shortcut,
+              type: 'audio',
+              timestamp: $event.timestamp
+            });
             this.audioChunkLines.stepBackward().catch((error) => {
               console.error(error);
             });
             break;
           case('step_backwardtime'):
             console.log(`step backward time`);
-            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
+            this.triggerUIAction({
+              shortcut: $event.shortcut,
+              value: shortcut,
+              type: 'audio',
+              timestamp: $event.timestamp
+            });
             this.audioChunkLines.stepBackwardTime(0.5).catch((error) => {
               console.error(error);
             });
@@ -671,7 +691,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               ? this.transcrService.currentlevel.segments.get(segmentNumber - 1).time.samples
               : 0;
 
-            this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
+            this.uiService.addElementFromEvent('shortcut', $event, $event.timestamp,
               this.audioManager.playposition, -1, null, {
                 start: sampleStart,
                 length: segment.time.samples - sampleStart
@@ -754,7 +774,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         }
       }
 
-      this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
+      this.uiService.addElementFromEvent('shortcut', $event, $event.timestamp,
         playPosition, caretpos, selection, null, 'multi-lines-viewer');
 
     } else if ($event.value !== null && contains($event.value, 'playonhover')) {

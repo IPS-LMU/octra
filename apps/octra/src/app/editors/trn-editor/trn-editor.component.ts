@@ -24,7 +24,7 @@ import {TranscrEditorComponent} from '../../core/component/transcr-editor';
 import {LoginMode} from '../../core/store';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {ValidationPopoverComponent} from '../../core/component/transcr-editor/validation-popover/validation-popover.component';
-import {isUnset, selectAllTextOfNode, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
+import {isUnset, selectAllTextOfNode, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
 import {AudioViewerComponent, AudioviewerConfig} from '@octra/components';
 import {Segment, Segments} from '@octra/annotation';
 import {ContextMenuAction, ContextMenuComponent} from '../../core/component/context-menu/context-menu.component';
@@ -484,7 +484,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
   }
 
   onSpeakerLabelMouseDown($event, labelCol: HTMLTableCellElement, rowNumber: number) {
-    if (!(this.keyMap.pressedMetaKeys.ctrl || this.keyMap.pressedMetaKeys.cmd)) {
+    if (!(this.keyMap.pressedKeys.ctrl || this.keyMap.pressedKeys.cmd)) {
       labelCol.contentEditable = 'true';
       this.selectedCell = {
         labelText: labelCol.innerText,
@@ -572,7 +572,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
   }
 
   onTranscriptCellMouseDown($event, i) {
-    if (this.keyMap.pressedMetaKeys.cmd || this.keyMap.pressedMetaKeys.ctrl) {
+    if (this.keyMap.pressedKeys.cmd || this.keyMap.pressedKeys.ctrl) {
       this.onTableLineClick($event, i);
     } else {
       this.deselectAllRows();
@@ -1067,99 +1067,99 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     });
   }
 
-  onShortcutTriggered = ($event) => {
-    this.keyMap.checkShortcutAction($event.comboKey, {...this.shortcuts, ...this.audioShortcuts, ...this.tableShortcuts}, true).then((shortcut) => {
-      const triggerUIAction = (shortcutObj, caretPos: number = -1) => {
-        shortcutObj.value = `audio:${shortcutObj.value}`;
-        this.uiService.addElementFromEvent('shortcut', shortcutObj, Date.now(),
-          this.audioManager.playposition, caretPos, null, null, 'texteditor');
-      };
+  onShortcutTriggered = ($event: ShortcutEvent) => {
 
-      if (shortcut !== '') {
-        switch (shortcut) {
-          case ('enter'):
-            // ignore. This event is catched by the labelKeyDown event handler
-            break;
-          case ('up'):
-            $event.event.preventDefault();
-            this.navigateBetweenCells('up', Math.max(0, this.selectedCell.row));
-            break;
-          case ('right'):
-            $event.event.preventDefault();
-            this.navigateBetweenCells('right', this.selectedCell.row);
-            break;
-          case ('down'):
-            $event.event.preventDefault();
-            this.navigateBetweenCells('down', Math.min(this.transcrService.currentlevel.segments.length, this.selectedCell.row));
-            break;
-          case ('left'):
-            $event.event.preventDefault();
-            this.navigateBetweenCells('left', this.selectedCell.row);
-            break;
-          case('play_pause'):
-            if (this._textEditor.state === 'active') {
-              $event.event.preventDefault();
-              triggerUIAction({shortcut: $event.comboKey, value: shortcut});
-              if (this._textEditor.audiochunk.isPlaying) {
-                this._textEditor.audiochunk.pausePlayback().catch((error) => {
-                  console.error(error);
-                });
-              } else {
-                this._textEditor.audiochunk.startPlayback(false).catch((error) => {
-                  console.error(error);
-                });
-              }
-            }
-            break;
-          case('stop'):
-            if (this._textEditor.state === 'active') {
-              $event.event.preventDefault();
-              triggerUIAction({shortcut: $event.comboKey, value: shortcut});
-              this._textEditor.audiochunk.stopPlayback().catch((error) => {
-                console.error(error);
-              });
-            }
-            break;
-          case('step_backward'):
-            if (this._textEditor.state === 'active') {
-              $event.event.preventDefault();
-              triggerUIAction({shortcut: $event.comboKey, value: shortcut});
-              this._textEditor.audiochunk.stepBackward().catch((error) => {
-                console.error(error);
-              });
-            }
-            break;
-          case('step_backwardtime'):
-            if (this._textEditor.state === 'active') {
-              $event.event.preventDefault();
-              triggerUIAction({shortcut: $event.comboKey, value: shortcut});
-              this._textEditor.audiochunk.stepBackwardTime(0.5).catch((error) => {
-                console.error(error);
-              });
-            }
-            break;
-          case('select_all'):
-            if (this._textEditor.state !== 'active') {
-              $event.event.preventDefault();
-              for (const shownSegment of this.shownSegments) {
-                shownSegment.isSelected = true;
-              }
-              this.cd.markForCheck();
-              this.cd.detectChanges();
-            }
-            break;
-          case('remove_selected'):
-            if (this._textEditor.state !== 'active') {
-              $event.event.preventDefault();
+    const triggerUIAction = (shortcutObj, caretPos: number = -1) => {
+      shortcutObj.value = `audio:${shortcutObj.value}`;
+      this.uiService.addElementFromEvent('shortcut', shortcutObj, Date.now(),
+        this.audioManager.playposition, caretPos, null, null, 'texteditor');
+    };
 
-              this.removeSelectedLines();
-              this.cd.markForCheck();
-              this.cd.detectChanges();
+    const shortcutName = $event.shortcutName;
+    if (shortcutName !== '') {
+      switch (shortcutName) {
+        case ('enter'):
+          // ignore. This event is catched by the labelKeyDown event handler
+          break;
+        case ('up'):
+          $event.event.preventDefault();
+          this.navigateBetweenCells('up', Math.max(0, this.selectedCell.row));
+          break;
+        case ('right'):
+          $event.event.preventDefault();
+          this.navigateBetweenCells('right', this.selectedCell.row);
+          break;
+        case ('down'):
+          $event.event.preventDefault();
+          this.navigateBetweenCells('down', Math.min(this.transcrService.currentlevel.segments.length, this.selectedCell.row));
+          break;
+        case ('left'):
+          $event.event.preventDefault();
+          this.navigateBetweenCells('left', this.selectedCell.row);
+          break;
+        case('play_pause'):
+          if (this._textEditor.state === 'active') {
+            $event.event.preventDefault();
+            triggerUIAction({shortcut: $event.shortcut, value: shortcutName});
+            if (this._textEditor.audiochunk.isPlaying) {
+              this._textEditor.audiochunk.pausePlayback().catch((error) => {
+                console.error(error);
+              });
+            } else {
+              this._textEditor.audiochunk.startPlayback(false).catch((error) => {
+                console.error(error);
+              });
             }
-            break;
-        }
+          }
+          break;
+        case('stop'):
+          if (this._textEditor.state === 'active') {
+            $event.event.preventDefault();
+            triggerUIAction({shortcut: $event.shortcut, value: shortcutName});
+            this._textEditor.audiochunk.stopPlayback().catch((error) => {
+              console.error(error);
+            });
+          }
+          break;
+        case('step_backward'):
+          if (this._textEditor.state === 'active') {
+            $event.event.preventDefault();
+            triggerUIAction({shortcut: $event.shortcut, value: shortcutName});
+            this._textEditor.audiochunk.stepBackward().catch((error) => {
+              console.error(error);
+            });
+          }
+          break;
+        case('step_backwardtime'):
+          if (this._textEditor.state === 'active') {
+            $event.event.preventDefault();
+            triggerUIAction({shortcut: $event.shortcut, value: shortcutName});
+            this._textEditor.audiochunk.stepBackwardTime(0.5).catch((error) => {
+              console.error(error);
+            });
+          }
+          break;
+        case('select_all'):
+          if (this._textEditor.state !== 'active') {
+            $event.event.preventDefault();
+            for (const shownSegment of this.shownSegments) {
+              shownSegment.isSelected = true;
+            }
+            this.cd.markForCheck();
+            this.cd.detectChanges();
+          }
+          break;
+        case('remove_selected'):
+          if (this._textEditor.state !== 'active') {
+            $event.event.preventDefault();
+
+            this.removeSelectedLines();
+            this.cd.markForCheck();
+            this.cd.detectChanges();
+          }
+          break;
       }
-    });
+    }
   }
 
   private saveNewLabel(index: number, newLabel: string) {
@@ -1290,8 +1290,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
 
   onTableLineClick($event, rowNumber: number) {
     const selectedSegment = this.shownSegments[rowNumber];
-    console.log(this.keyMap.pressedMetaKeys);
-    if (this.keyMap.pressedMetaKeys.cmd || this.keyMap.pressedMetaKeys.ctrl) {
+    if (this.keyMap.pressedKeys.cmd || this.keyMap.pressedKeys.ctrl) {
       // de- select line
       selectedSegment.isSelected = !selectedSegment.isSelected;
       this.cd.markForCheck();

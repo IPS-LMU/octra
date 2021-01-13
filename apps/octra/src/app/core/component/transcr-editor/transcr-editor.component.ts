@@ -537,22 +537,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * called when key pressed in editor
    */
   onKeyDownSummernote = ($event) => {
-    this.shortcutsManager.checkKeyEvent($event, 'summernote').then((shortcutInfo) => {
+    this.shortcutsManager.checkKeyEvent($event, Date.now()).then((shortcutInfo) => {
       const comboKey = this.shortcutsManager.getShorcutCombination($event);
 
-      if (this.isDisabledKey(comboKey) || this.isMarker(comboKey)) {
-        $event.preventDefault();
-      }
-    }).catch((error) => {
-      console.error(error);
-    });
-  }
-  /**
-   * called after key up in editor
-   */
-  onKeyUpSummernote = ($event) => {
-    console.log(this.shortcutsManager.shortcuts);
-    this.shortcutsManager.checkKeyEvent($event, 'summernote').then((shortcutInfo) => {
       if (!isUnset(shortcutInfo)) {
         if (shortcutInfo.shortcut === 'ALT + S' && this.Settings.specialMarkers.boundary) {
           // add boundary
@@ -569,9 +556,18 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             }
           }
         }
+      } else if (this.isDisabledKey(comboKey) || this.isMarker(comboKey)) {
+        $event.preventDefault();
       }
-
-      // update rawText
+    }).catch((error) => {
+      console.error(error);
+    });
+  }
+  /**
+   * called after key up in editor
+   */
+  onKeyUpSummernote = ($event) => {
+    this.shortcutsManager.checkKeyEvent($event, Date.now()).then((shortcutInfo) => {
       this.onkeyup.emit($event);
       this.triggerTyping($event.code !== 'Enter');
     }).catch((error) => {

@@ -16,17 +16,12 @@ export class KeymappingService {
     return this.shortcutsManager.shortcuts;
   }
 
-  private _pressedMetaKeys = {
-    ctrl: false,
-    cmd: false
+  public get pressedKeys() {
+    return this.shortcutsManager.pressedKeys;
   }
 
   public get generalShortcuts(): ShortcutGroup {
     return this.shortcutsManager.generalShortcuts;
-  }
-
-  get pressedMetaKeys() {
-    return this._pressedMetaKeys;
   }
 
   get onShortcutTriggered(): EventEmitter<ShortcutEvent> {
@@ -90,8 +85,10 @@ export class KeymappingService {
   }
 
   private onKeyDown = ($event: KeyboardEvent) => {
-    this.shortcutsManager.checkKeyEvent($event, 'service').then((shortcutInfo: ShortcutEvent) => {
+    this.shortcutsManager.checkKeyEvent($event, Date.now()).then((shortcutInfo: ShortcutEvent) => {
       if (!isUnset(shortcutInfo)) {
+        this._beforeShortcutTriggered.emit({...shortcutInfo, event: $event});
+        this._onShortcutTriggered.emit({...shortcutInfo, event: $event});
       }
     }).catch((error) => {
       console.error(error);
@@ -99,12 +96,7 @@ export class KeymappingService {
   }
 
   private onKeyUp = ($event) => {
-    this.shortcutsManager.checkKeyEvent($event, 'service').then((shortcutInfo) => {
-      if (!isUnset(shortcutInfo)) {
-        this._beforeShortcutTriggered.emit({...shortcutInfo, event: $event});
-        this._onShortcutTriggered.emit({...shortcutInfo, event: $event});
-      }
-    }).catch((error) => {
+    this.shortcutsManager.checkKeyEvent($event, Date.now()).catch((error) => {
       console.error(error);
     });
   }

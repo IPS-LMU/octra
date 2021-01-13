@@ -77,7 +77,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   private mousestate = 'initiliazied';
 
   private audioShortcutsTopDisplay = {
-    name: 'AV',
+    name: 'signaldisplay_top',
     items: [
       {
         name: 'play_pause',
@@ -119,7 +119,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   };
 
   private audioShortcutsBottomDisplay: ShortcutGroup = {
-    name: 'Loupe',
+    name: 'signaldisplay_down',
     items: [
       {
         name: 'play_pause',
@@ -248,7 +248,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.selectedAudioChunk = this.audioChunkTop;
 
     this.keyMap.register({
-      name: 'top signaldisplay',
+      name: 'signaldisplay_top',
       items: [...this.audioShortcutsTopDisplay.items, ...this.signalDisplayTop.settings.shortcuts.items]
     });
     this.signalDisplayTop.settings.shortcutsEnabled = true;
@@ -261,7 +261,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
     this.loupeSettings = new AudioviewerConfig();
     this.keyMap.register({
-      name: 'down signaldisplay',
+      name: 'signaldisplay_down',
       items: [...this.audioShortcutsBottomDisplay.items, ...this.loupeSettings.shortcuts.items]
     });
     this.loupeSettings.justifySignalHeight = true;
@@ -435,80 +435,65 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   onViewerShortcutTriggered($event: AudioViewerShortcutEvent, control: string) {
-    this.triggerUIActionAfterShortcut($event, control);
+    this.triggerUIActionAfterShortcut($event, control, $event.timestamp);
   }
 
   onShortcutTriggered = ($event: ShortcutEvent) => {
     if (this.shortcutsEnabled) {
       const comboKey = $event.shortcut;
 
-      const platform = BrowserInfo.platform;
       if (!isUnset(this.audioShortcutsTopDisplay) && !isUnset(this.audioShortcutsBottomDisplay)) {
-        const shortcuts = {
-          signaldisplay_top: this.audioShortcutsTopDisplay,
-          signaldisplay_down: this.audioShortcutsBottomDisplay
-        };
-
-        let keyActive = false;
-        let a = 0;
-
-        for (const displayType in shortcuts) {
-          if (shortcuts.hasOwnProperty(displayType) && !isUnset(shortcuts[displayType])) {
-            for (const shortcut in shortcuts['' + displayType]) {
-              if (shortcuts['' + displayType].hasOwnProperty(shortcut)) {
-                const currentShortcut = shortcuts['' + displayType]['' + shortcut + ''];
-                const currentAudioChunk = (displayType === 'signaldisplay_top') ? this.audioChunkTop : this.audioChunkDown;
-                a++;
-                if (!isUnset(currentAudioChunk) && currentShortcut.keys['' + platform + ''] === comboKey) {
-                  switch (shortcut) {
-                    case('play_pause'):
-                      this.selectedAudioChunk = currentAudioChunk;
-                      this.triggerUIActionAfterShortcut({shortcut: comboKey, value: shortcut}, displayType);
-                      if (currentAudioChunk.isPlaying) {
-                        currentAudioChunk.pausePlayback().catch((error) => {
-                          console.error(error);
-                        });
-                      } else {
-                        currentAudioChunk.startPlayback(false).catch((error) => {
-                          console.error(error);
-                        });
-                      }
-                      keyActive = true;
-                      break;
-                    case('stop'):
-                      this.selectedAudioChunk = currentAudioChunk;
-                      this.triggerUIActionAfterShortcut({shortcut: comboKey, value: shortcut}, displayType);
-                      currentAudioChunk.stopPlayback().catch((error) => {
-                        console.error(error);
-                      });
-                      keyActive = true;
-                      break;
-                    case('step_backward'):
-                      this.selectedAudioChunk = currentAudioChunk;
-                      console.log(`step backward`);
-                      this.triggerUIActionAfterShortcut({shortcut: comboKey, value: shortcut}, displayType);
-                      currentAudioChunk.stepBackward().catch((error) => {
-                        console.error(error);
-                      });
-                      keyActive = true;
-                      break;
-                    case('step_backwardtime'):
-                      this.selectedAudioChunk = currentAudioChunk;
-                      console.log(`step backward time`);
-                      this.triggerUIActionAfterShortcut({shortcut: comboKey, value: shortcut}, displayType);
-                      currentAudioChunk.stepBackwardTime(0.5).catch((error) => {
-                        console.error(error);
-                      });
-                      keyActive = true;
-                      break;
-                  }
-                }
-
-                if (keyActive) {
-                  break;
-                }
+        const currentAudioChunk = ($event.shortcutGroupName === 'signaldisplay_top') ? this.audioChunkTop : this.audioChunkDown;
+        if (!isUnset(currentAudioChunk)) {
+          switch ($event.shortcutName) {
+            case('play_pause'):
+              this.selectedAudioChunk = currentAudioChunk;
+              this.triggerUIActionAfterShortcut({
+                shortcut: comboKey,
+                value: $event.shortcutName
+              }, $event.shortcutGroupName, $event.timestamp);
+              if (currentAudioChunk.isPlaying) {
+                currentAudioChunk.pausePlayback().catch((error) => {
+                  console.error(error);
+                });
+              } else {
+                currentAudioChunk.startPlayback(false).catch((error) => {
+                  console.error(error);
+                });
               }
-            }
+              break;
+            case('stop'):
+              this.selectedAudioChunk = currentAudioChunk;
+              this.triggerUIActionAfterShortcut({
+                shortcut: comboKey,
+                value: $event.shortcutName
+              }, $event.shortcutGroupName, $event.timestamp);
+              currentAudioChunk.stopPlayback().catch((error) => {
+                console.error(error);
+              });
+              break;
+            case('step_backward'):
+              this.selectedAudioChunk = currentAudioChunk;
+              console.log(`step backward`);
+              this.triggerUIActionAfterShortcut({
+                shortcut: comboKey,
+                value: $event.shortcutName
+              }, $event.shortcutGroupName, $event.timestamp);
+              currentAudioChunk.stepBackward().catch((error) => {
+                console.error(error);
+              });
+              break;
+            case('step_backwardtime'):
+              this.selectedAudioChunk = currentAudioChunk;
+              console.log(`step backward time`);
+              this.triggerUIActionAfterShortcut({
+                shortcut: comboKey,
+                value: $event.shortcutName
+              }, $event.shortcutGroupName, $event.timestamp);
+              currentAudioChunk.stepBackwardTime(0.5).catch((error) => {
+                console.error(error);
+              });
+              break;
           }
         }
 
@@ -517,12 +502,10 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
           if (!isUnset(this.miniloupe) && this.signalDisplayTop.focused) {
             if (event.key === '+' || event.key === '-') {
               if (event.key === '+') {
-                keyActive = true;
                 this.factor = Math.min(12, this.factor + 1);
                 this.miniloupeComponent.av.zoomY = Math.max(1, this.factor);
               } else if (event.key === '-') {
                 if (this.factor > 3) {
-                  keyActive = true;
                   this.factor = Math.max(1, this.factor - 1);
                   this.miniloupeComponent.av.zoomY = Math.max(4, this.factor);
                 }
@@ -538,15 +521,11 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
             }
           }
         }
-
-        if (keyActive) {
-          $event.event.preventDefault();
-        }
       }
     }
   }
 
-  private triggerUIActionAfterShortcut($event, control: string) {
+  private triggerUIActionAfterShortcut($event, control: string, timestamp: number) {
     const component: AudioViewerComponent = (control === 'signaldisplay_top') ? this.signalDisplayTop : this.signalDisplayDown;
     if (this.appStorage.logging) {
       if (
@@ -590,7 +569,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
           }
         }
 
-        this.uiService.addElementFromEvent('shortcut', $event, Date.now(), playPosition, caretpos, selection, segment, control);
+        this.uiService.addElementFromEvent('shortcut', $event, timestamp, playPosition, caretpos, selection, segment, control);
       } else if ($event.value !== null && contains($event.value, 'playonhover')) {
         this.appStorage.playonhover = !this.appStorage.playonhover;
       }

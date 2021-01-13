@@ -263,7 +263,12 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       this.keyMap.checkShortcutAction($event.shortcut, this.audioShortcuts, true).then((shortcut) => {
         switch (shortcut) {
           case('play_pause'):
-            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
+            this.triggerUIAction({
+              shortcut: $event.shortcut,
+              value: shortcut,
+              type: 'audio',
+              timestamp: $event.timestamp
+            });
             if (this.audiochunk.isPlaying) {
               this.audiochunk.pausePlayback().catch((error) => {
                 console.error(error);
@@ -275,21 +280,36 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
             }
             break;
           case('stop'):
-            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
+            this.triggerUIAction({
+              shortcut: $event.shortcut,
+              value: shortcut,
+              type: 'audio',
+              timestamp: $event.timestamp
+            });
             this.audiochunk.stopPlayback().catch((error) => {
               console.error(error);
             });
             break;
           case('step_backward'):
             console.log(`step backward`);
-            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
+            this.triggerUIAction({
+              shortcut: $event.shortcut,
+              value: shortcut,
+              type: 'audio',
+              timestamp: $event.timestamp
+            });
             this.audiochunk.stepBackward().catch((error) => {
               console.error(error);
             });
             break;
           case('step_backwardtime'):
             console.log(`step backward time`);
-            this.triggerUIAction({shortcut: $event.shortcut, value: shortcut, type: 'audio'});
+            this.triggerUIAction({
+              shortcut: $event.shortcut,
+              value: shortcut,
+              type: 'audio',
+              timestamp: $event.timestamp
+            });
             this.audiochunk.stepBackwardTime(0.5).catch((error) => {
               console.error(error);
             });
@@ -620,7 +640,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       };
     }
 
-    this.uiService.addElementFromEvent('shortcut', $event, Date.now(),
+    this.uiService.addElementFromEvent('shortcut', $event, $event.timestamp,
       this.audioManager.playposition, this.editor.caretpos, selection, segment, 'loupe');
   }
 

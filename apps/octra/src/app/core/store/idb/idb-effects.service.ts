@@ -16,6 +16,9 @@ import {LoginMode, OnlineSession} from '../index';
 import {isUnset} from '@octra/utilities';
 import {OIDBLink} from '@octra/annotation';
 import {SessionStorageService} from 'ngx-webstorage';
+import {PromiseExtended} from 'dexie';
+import {IIDBLevel} from '../../shared/octra-database';
+import {ConsoleEntry} from '../../shared/service/bug-report.service';
 
 
 @Injectable({
@@ -75,10 +78,6 @@ export class IDBEffects {
               key: 'user'
             },
             {
-              attribute: '_userProfile',
-              key: 'userProfile'
-            },
-            {
               attribute: '_interface',
               key: 'interface'
             },
@@ -105,10 +104,6 @@ export class IDBEffects {
             {
               attribute: '_audioSettings',
               key: 'audioSettings'
-            },
-            {
-              attribute: '_asr',
-              key: 'asr'
             },
             {
               attribute: '_highlightingEnabled',
@@ -160,25 +155,22 @@ export class IDBEffects {
     ofType(IDBActions.loadLogsSuccess),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
-
-      this.idbService.loadAnnotationLevels().then((levels) => {
+      this.idbService.loadAnnotationLevels().then((levels: IIDBLevel[]) => {
         const annotationLevels = [];
         let max = 0;
         for (let i = 0; i < levels.length; i++) {
-          if (levels[i].hasOwnProperty('value')) {
-            if (!levels[i].value.hasOwnProperty('id')) {
-              annotationLevels.push(
-                {
-                  id: i + 1,
-                  level: levels[i].value.level,
-                  sortorder: i
-                }
-              );
-              max = Math.max(i + 1, max);
-            } else {
-              annotationLevels.push(levels[i].value);
-              max = Math.max(levels[i].value.id, max);
-            }
+          if (!levels[i].hasOwnProperty('id')) {
+            annotationLevels.push(
+              {
+                id: i + 1,
+                level: levels[i].level,
+                sortorder: i
+              }
+            );
+            max = Math.max(i + 1, max);
+          } else {
+            annotationLevels.push(levels[i]);
+            max = Math.max(levels[i].id, max);
           }
         }
 
@@ -206,14 +198,12 @@ export class IDBEffects {
       this.idbService.loadAnnotationLinks().then((links) => {
         const annotationLinks = [];
         for (let i = 0; i < links.length; i++) {
-          if (links[i].hasOwnProperty('value')) {
-            if (!links[i].value.hasOwnProperty('id')) {
-              annotationLinks.push(
-                new OIDBLink(i + 1, links[i].value.link)
-              );
-            } else {
-              annotationLinks.push(links[i].value);
-            }
+          if (!links[i].hasOwnProperty('id')) {
+            annotationLinks.push(
+              new OIDBLink(i + 1, links[i].link)
+            );
+          } else {
+            annotationLinks.push(links[i]);
           }
         }
 
@@ -358,7 +348,7 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      const promises: Promise<void>[] = [];
+      const promises: PromiseExtended<string>[] = [];
       promises.push(this.idbService.saveOption('user', null));
       promises.push(this.idbService.saveOption('feedback', null));
       promises.push(this.idbService.saveOption('comment', ''));
@@ -837,7 +827,7 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.idbService.save('logs', action.log.timestamp, action.log).then(() => {
+      this.idbService.saveLog(action.log, action.log.timestamp).then(() => {
         subject.next(IDBActions.saveLogSuccess());
         subject.complete();
       }).catch((error) => {
@@ -857,11 +847,11 @@ export class IDBEffects {
       const subject = new Subject<Action>();
 
       console.log(`save annotation level...`);
-      this.idbService.save('annotation_levels', action.id, {
+      this.idbService.saveAnnotationLevel({
         id: action.id,
         level: action.level,
         sortorder: action.sortorder
-      }).then(() => {
+      }, action.id).then(() => {
         console.log(`saved annotation level success`);
         subject.next(IDBActions.saveAnnotationLevelSuccess());
         subject.complete();
@@ -881,11 +871,11 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.idbService.save('annotation_levels', action.id, {
+      this.idbService.saveAnnotationLevel({
         id: action.id,
         level: action.level,
         sortorder: action.sortorder
-      }).then(() => {
+      }, action.id).then(() => {
         subject.next(IDBActions.addAnnotationLevelSuccess());
         subject.complete();
       }).catch((error) => {
@@ -922,18 +912,20 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.idbService.loadConsoleEntries().then((dbEntry: any) => {
-        if (!isUnset(dbEntry) && dbEntry.hasOwnProperty('value')) {
+      this.idbService.loadConsoleEntries().then((dbEntries: ConsoleEntry[]) => {
+        if (!isUnset(dbEntries)) {
           subject.next(IDBActions.loadConsoleEntriesSuccess({
-            consoleEntries: dbEntry.value
+            consoleEntries: dbEntries
           }));
         } else {
           subject.next(IDBActions.loadConsoleEntriesSuccess({
             consoleEntries: []
           }));
         }
-      }).catch((error) => {
-        console.error(error);
+      }).catch(() => {
+        subject.next(IDBActions.loadConsoleEntriesSuccess({
+          consoleEntries: []
+        }));
       });
 
       return subject;
@@ -958,7 +950,7 @@ export class IDBEffects {
   ));
 
   private saveOnlineSession(mode: LoginMode, onlineSession: OnlineSession) {
-    const promises: Promise<void>[] = [];
+    const promises: PromiseExtended<string>[] = [];
 
     promises.push(this.idbService.saveOption('dataID', onlineSession.sessionData.dataID));
     promises.push(this.idbService.saveOption('prompttext', onlineSession.sessionData.promptText));

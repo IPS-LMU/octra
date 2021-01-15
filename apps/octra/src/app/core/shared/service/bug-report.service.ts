@@ -69,7 +69,7 @@ export class BugReportService {
   }
 
   public addEntriesFromDB(entries: ConsoleEntry[]) {
-    if (!isUnset(entries) && isArray(entries)) {
+    if (!isUnset(entries) && isArray(entries) && entries.length > 0) {
       if (entries.length > 50) {
         // crop down to 100 items
         entries = entries.slice(-50);

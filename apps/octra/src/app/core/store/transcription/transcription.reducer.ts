@@ -169,12 +169,9 @@ export const reducer = createReducer(
       }
     })),
   on(TranscriptionActions.removeAnnotationLevel, (state, {id}) => {
-    const result = state;
-
     if (id > -1) {
-      const index = result.annotation.levels.findIndex((a) => (a.id === id));
+      const index = state.annotation.levels.findIndex((a) => (a.id === id));
       if (index > -1) {
-        result.annotation.levels.splice(index, 1);
         return {
           ...state,
           annotation: {

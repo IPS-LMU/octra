@@ -712,13 +712,16 @@ export class AppStorageService {
     });
   }
 
-  public removeAnnotationLevel(id: number): Promise<any> {
+  public removeAnnotationLevel(id: number): Promise<void> {
     if (id > -1) {
       this.store.dispatch(TranscriptionActions.removeAnnotationLevel({
         id
       }));
+      return new Promise<void>((resolve) => {
+        resolve();
+      });
     } else {
-      return new Promise((resolve, reject2) => {
+      return new Promise<void>((resolve, reject2) => {
         reject2(new Error('level is undefined or null'));
       });
     }

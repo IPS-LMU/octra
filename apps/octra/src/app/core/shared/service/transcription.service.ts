@@ -434,7 +434,6 @@ export class TranscriptionService {
 
           if (!(this.appStorage.annotationLevels === null || this.appStorage.annotationLevels === undefined)) {
             // load levels
-            console.log(this.appStorage.annotationLevels);
             for (const oidbLevel of this.appStorage.annotationLevels) {
               const level: Level = Level.fromObj(oidbLevel,
                 this._audiomanager.sampleRate, this._audiomanager.ressource.info.duration);
@@ -924,8 +923,6 @@ export class TranscriptionService {
       }
       this._transcriptValid = !invalid;
     } else {
-      console.log(this.settingsService.projectsettings.octra.validationEnabled);
-      console.log(`validationEnabled is disabled`);
       this._transcriptValid = true;
     }
   }

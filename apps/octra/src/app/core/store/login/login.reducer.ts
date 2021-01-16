@@ -125,7 +125,9 @@ export const reducer = createReducer(
       let result = state;
 
       for (const variable of variables) {
-        result = saveOptionToStore(result, variable.name, variable.value);
+        if (!isUnset(variable)) {
+          result = saveOptionToStore(result, variable.name, variable.value);
+        }
       }
 
       return result;

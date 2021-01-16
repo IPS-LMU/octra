@@ -28,7 +28,7 @@ function saveOptionToStore(state: ASRState, attribute: string, value: any): ASRS
     case('asr'):
       return {
         ...state,
-        selectedLanguage: (!isUnset(value) && value.hasOwnProperty('selectedLanguage')) ? value.selectedLanguage: null,
+        selectedLanguage: (!isUnset(value) && value.hasOwnProperty('selectedLanguage')) ? value.selectedLanguage : null,
         selectedService: (!isUnset(value) && value.hasOwnProperty('selectedService')) ? value.selectedService : null
       };
 

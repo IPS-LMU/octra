@@ -60,8 +60,13 @@ export class BugReportService {
       message
     };
 
-    this._console.push(consoleItem);
-    this.appStorage.consoleEntries = this._console;
+    if (!isUnset(this._console) && !isUnset(consoleItem)) {
+      this._console = [
+        ...this._console,
+        consoleItem
+      ];
+      this.appStorage.consoleEntries = this._console;
+    }
   }
 
   public clear() {

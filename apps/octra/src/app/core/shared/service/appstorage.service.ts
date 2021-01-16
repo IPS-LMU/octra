@@ -192,7 +192,6 @@ export class AppStorageService {
               private actions: Actions,
               private router: Router) {
     this.subscrManager.add(actions.subscribe((action) => {
-      console.log(`Action: ${action.type}`);
       if (action.type === '@ngrx/effects/init') {
         this.store.dispatch(TranscriptionActions.setTranscriptionState({
           ...fromTranscriptionReducer.initialState,
@@ -278,8 +277,6 @@ export class AppStorageService {
   }
 
   setLogs(value: any[]) {
-    console.log(`SET LOGS`);
-    console.log(value);
     this.store.dispatch(TranscriptionActions.setLogs({logs: value}));
   }
 

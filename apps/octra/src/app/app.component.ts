@@ -51,7 +51,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
           console.log(`route to page: ${event?.url}`);
         } else if (event.hasOwnProperty('snapshot')) {
           console.log(`route to guard: ${event.snapshot.url}, component: ${event.snapshot.component?.name}`);
-          console.log(event.snapshot);
         }
       }
     );

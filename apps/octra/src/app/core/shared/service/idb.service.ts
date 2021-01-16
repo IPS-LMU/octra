@@ -3,6 +3,7 @@ import {ConsoleEntry} from './bug-report.service';
 import {OIDBLevel, OIDBLink} from '@octra/annotation';
 import {Subject} from 'rxjs';
 import {IIDBLevel, IIDBLink, IOption, OctraDatabase} from '../octra-database';
+import {isUnset} from '@octra/utilities';
 
 
 @Injectable({
@@ -71,7 +72,11 @@ export class IDBService {
   public loadConsoleEntries(): Promise<ConsoleEntry[]> {
     return new Promise<ConsoleEntry[]>((resolve, reject) => {
       this.database.options.get('console').then((entry) => {
-        resolve(entry.value as ConsoleEntry[]);
+        if (!isUnset(entry)) {
+          resolve(entry.value as ConsoleEntry[]);
+        } else {
+          resolve([]);
+        }
       }).catch((error) => {
         reject(error);
       });
@@ -100,9 +105,8 @@ export class IDBService {
     }[]>();
 
     const keys = variables.map(a => a.key);
-    console.log(`get keys ${keys.join(',')}`);
     this.database.options.bulkGet(keys).then((values) => {
-      subject.next(values);
+      subject.next(values.filter(a => !isUnset(a)));
     }).catch((error) => {
       console.error(error);
       subject.error(error);
@@ -119,7 +123,9 @@ export class IDBService {
       const logs: any[] = [];
 
       this.database.logs.each((item) => {
-        logs.push(item.value)
+        if (!isUnset(item)) {
+          logs.push(item.value);
+        }
       }).then(() => {
         resolve(logs);
       }).catch((error) => {
@@ -136,7 +142,9 @@ export class IDBService {
       const levels: IIDBLevel[] = [];
 
       this.database.annotation_levels.each((item) => {
-        levels.push(item.value)
+        if (!isUnset(item)) {
+          levels.push(item.value)
+        }
       }).then(() => {
         resolve(levels);
       }).catch((error) => {
@@ -153,7 +161,9 @@ export class IDBService {
       const links: IIDBLink[] = [];
 
       this.database.annotation_links.each((item) => {
-        links.push(item);
+        if (!isUnset(item)) {
+          links.push(item);
+        }
       }).then(() => {
         resolve(links);
       }).catch((error) => {

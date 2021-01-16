@@ -73,9 +73,6 @@ export const reducer = createReducer(
       result = saveOptionToStore(result, variable.name, variable.value);
     }
 
-    console.log(variables);
-    console.log(`Options saved in application new State is`);
-    console.log(result);
     return result;
   }),
   on(ConfigurationActions.appConfigurationLoadSuccess, (state, {appConfiguration}) => ({

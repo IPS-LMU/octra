@@ -541,6 +541,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       const comboKey = this.shortcutsManager.getShorcutCombination($event);
 
       if (!isUnset(shortcutInfo)) {
+        $event.preventDefault();
         if (shortcutInfo.shortcut === 'ALT + S' && this.Settings.specialMarkers.boundary) {
           // add boundary
           this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
@@ -568,6 +569,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    */
   onKeyUpSummernote = ($event) => {
     this.shortcutsManager.checkKeyEvent($event, Date.now()).then((shortcutInfo) => {
+      if (!isUnset(shortcutInfo)) {
+        $event.preventDefault();
+      }
+
       this.onkeyup.emit($event);
       this.triggerTyping($event.code !== 'Enter');
     }).catch((error) => {

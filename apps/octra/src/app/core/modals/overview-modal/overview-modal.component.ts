@@ -135,6 +135,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
 
         this.shortcutID = this.subscrmanager.add(this.keyService.onShortcutTriggered.subscribe((keyObj: ShortcutEvent) => {
           if (!isUnset(keyObj)) {
+            keyObj.event.preventDefault();
             this.sendTranscriptionForShortAudioFiles(keyObj.shortcutName as any);
           }
         }));
@@ -184,6 +185,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
 
         this.shortcutID = this.subscrmanager.add(this.keyService.onShortcutTriggered.subscribe((keyObj: ShortcutEvent) => {
           if (!isUnset(keyObj)) {
+            keyObj.event.preventDefault();
             this.sendTranscriptionForKorbinian(keyObj.shortcutName as any);
           }
         }));

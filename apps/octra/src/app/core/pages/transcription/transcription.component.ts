@@ -240,6 +240,7 @@ export class TranscriptionComponent implements OnInit,
     this.subscrmanager.add(this.keyMap.onShortcutTriggered.subscribe((event) => {
       if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.DEMO) {
         if (['SHIFT + ALT + 1', 'SHIFT + ALT + 2', 'SHIFT + ALT + 3'].includes(event.shortcut)) {
+          event.event.preventDefault();
           this.waitForSend = true;
 
           this.appStorage.afterSaving().then(() => {
@@ -515,6 +516,8 @@ export class TranscriptionComponent implements OnInit,
   onKeyDown($event) {
     this.shortcutManager.checkKeyEvent($event, Date.now()).then((shortcutInfo) => {
       if (!isUnset(shortcutInfo)) {
+        $event.preventDefault();
+
         switch (shortcutInfo.shortcutName) {
           case ('shortcuts'):
             if (!this.modalShortcutsDialogue.visible) {

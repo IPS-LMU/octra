@@ -155,8 +155,6 @@ export class ShortcutManager {
             this.checkPressedKey(event);
 
             if (!isUnset(commandObj)) {
-              event.preventDefault();
-
               resolve({
                 platform: BrowserInfo.platform,
                 shortcutName: commandObj.shortcut.name,

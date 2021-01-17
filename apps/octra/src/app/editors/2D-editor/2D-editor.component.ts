@@ -577,98 +577,89 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   onShortCutTriggered = ($event: ShortcutEvent) => {
-    this.keyMap.checkShortcutAction($event.shortcut, this.audioShortcuts, this.shortcutsEnabled).then((shortcut) => {
-      if (!isUnset(this.audioChunkLines)) {
-
-        switch (shortcut) {
-          case('play_pause'):
-            this.triggerUIAction({
-              shortcut: $event.shortcut,
-              value: shortcut,
-              type: 'audio',
-              timestamp: $event.timestamp
-            });
-            if (this.audioChunkLines.isPlaying) {
-              this.audioChunkLines.pausePlayback().catch((error) => {
-                console.error(error);
-              });
-            } else {
-              this.audioChunkLines.startPlayback(false).catch((error) => {
-                console.error(error);
-              });
-            }
-            break;
-          case('stop'):
-            this.triggerUIAction({
-              shortcut: $event.shortcut,
-              value: shortcut,
-              type: 'audio',
-              timestamp: $event.timestamp
-            });
-            this.audioChunkLines.stopPlayback().catch((error) => {
+    if (!isUnset(this.audioChunkLines)) {
+      switch ($event.shortcutName) {
+        case('play_pause'):
+          this.triggerUIAction({
+            shortcut: $event.shortcut,
+            value: $event.shortcutName,
+            type: 'audio',
+            timestamp: $event.timestamp
+          });
+          if (this.audioChunkLines.isPlaying) {
+            this.audioChunkLines.pausePlayback().catch((error) => {
               console.error(error);
             });
-            break;
-          case('step_backward'):
-            console.log(`step backward`);
-            this.triggerUIAction({
-              shortcut: $event.shortcut,
-              value: shortcut,
-              type: 'audio',
-              timestamp: $event.timestamp
-            });
-            this.audioChunkLines.stepBackward().catch((error) => {
+          } else {
+            this.audioChunkLines.startPlayback(false).catch((error) => {
               console.error(error);
             });
-            break;
-          case('step_backwardtime'):
-            console.log(`step backward time`);
-            this.triggerUIAction({
-              shortcut: $event.shortcut,
-              value: shortcut,
-              type: 'audio',
-              timestamp: $event.timestamp
-            });
-            this.audioChunkLines.stepBackwardTime(0.5).catch((error) => {
-              console.error(error);
-            });
-            break;
-        }
-      } else {
-        shortcut = '';
-      }
-
-      if (this.appStorage.showLoupe) {
-        const event = $event.event;
-
-        if (event.key === '+' || event.key === '-') {
-          if (event.key === '+') {
-            shortcut = '+';
-            this.factor = Math.min(20, this.factor + 1);
-          } else if (event.key === '-') {
-            if (this.factor > 3) {
-              shortcut = '-';
-              this.factor = Math.max(1, this.factor - 1);
-            }
           }
+          break;
+        case('stop'):
+          this.triggerUIAction({
+            shortcut: $event.shortcut,
+            value: $event.shortcutName,
+            type: 'audio',
+            timestamp: $event.timestamp
+          });
+          this.audioChunkLines.stopPlayback().catch((error) => {
+            console.error(error);
+          });
+          break;
+        case('step_backward'):
+          console.log(`step backward`);
+          this.triggerUIAction({
+            shortcut: $event.shortcut,
+            value: $event.shortcutName,
+            type: 'audio',
+            timestamp: $event.timestamp
+          });
+          this.audioChunkLines.stepBackward().catch((error) => {
+            console.error(error);
+          });
+          break;
+        case('step_backwardtime'):
+          console.log(`step backward time`);
+          this.triggerUIAction({
+            shortcut: $event.shortcut,
+            value: $event.shortcutName,
+            type: 'audio',
+            timestamp: $event.timestamp
+          });
+          this.audioChunkLines.stepBackwardTime(0.5).catch((error) => {
+            console.error(error);
+          });
+          break;
+      }
+    }
 
-          this.changeArea(this.loupe, this.viewer, this.audioManager, this.audioChunkLoupe, this.viewer.av.mouseCursor, this.factor)
-            .then((newLoupeChunk) => {
-              if (!isUnset(newLoupeChunk)) {
-                this.audioChunkLoupe = newLoupeChunk;
-                this.cd.detectChanges();
-              }
-            });
+    if (this.appStorage.showLoupe) {
+      const event = $event.event;
+
+      if (event.key === '+' || event.key === '-') {
+        if (event.key === '+') {
+          this.factor = Math.min(20, this.factor + 1);
+        } else if (event.key === '-') {
+          if (this.factor > 3) {
+            this.factor = Math.max(1, this.factor - 1);
+          }
         }
-      }
 
-      if (shortcut !== '') {
-        $event.event.preventDefault();
-        this.cd.detectChanges();
+        this.changeArea(this.loupe, this.viewer, this.audioManager, this.audioChunkLoupe, this.viewer.av.mouseCursor, this.factor)
+          .then((newLoupeChunk) => {
+            if (!isUnset(newLoupeChunk)) {
+              this.audioChunkLoupe = newLoupeChunk;
+              this.cd.detectChanges();
+            }
+          });
       }
-    }).catch((error) => {
-      console.error(error);
-    });
+    }
+
+    if (!isUnset($event)) {
+      $event.event.preventDefault();
+      this.cd.detectChanges();
+    }
   }
 
   private triggerUIAction($event: AudioViewerShortcutEvent) {

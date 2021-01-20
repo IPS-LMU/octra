@@ -1,8 +1,8 @@
 import {createReducer, on} from '@ngrx/store';
-import * as LoginActions from './login.actions';
 import {LoginMode, LoginState} from '../index';
-import * as IDBActions from '../idb/idb.actions';
 import {SessionFile} from '../../obj/SessionFile';
+import {LoginActions} from './login.actions';
+import {IDBActions} from '../idb/idb.actions';
 import {isUnset} from '@octra/utilities';
 
 export const initialState: LoginState = {

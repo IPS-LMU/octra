@@ -8,12 +8,12 @@ import {AudioService, SettingsService, TranscriptionService} from '../../shared/
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {IFile, ImportResult, OAudiofile, OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
 import {LoginMode} from '../../store';
-import * as LoginActions from '../../store/login/login.actions';
-import * as fromApplication from '../../store/application/';
-import * as TranscriptionActions from '../../store/transcription/transcription.actions';
 import * as fromTranscription from '../../store/transcription';
+import * as fromApplication from '../../store/application';
 import {Store} from '@ngrx/store';
 import {Actions} from '@ngrx/effects';
+import {TranscriptionActions} from '../../store/transcription/transcription.actions';
+import {LoginActions} from '../../store/login/login.actions';
 
 @Component({
   selector: 'octra-loading',

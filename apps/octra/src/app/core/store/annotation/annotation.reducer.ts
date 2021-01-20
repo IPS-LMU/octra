@@ -1,0 +1,103 @@
+import {on} from '@ngrx/store';
+import {AnnotationState} from '../index';
+import {OIDBLevel} from '@octra/annotation';
+import {undoRedo} from 'ngrx-wieder';
+import {AnnotationActions} from './annotation.actions';
+import {IDBActions} from '../idb/idb.actions';
+
+export const initialState: AnnotationState = {
+  levels: [],
+  links: [],
+  levelCounter: 0
+};
+
+// initialize ngrx-wieder with custom config
+const {createUndoRedoReducer} = undoRedo({
+  allowedActionTypes: [
+    AnnotationActions.changeAnnotationLevel.type,
+    AnnotationActions.addAnnotationLevel.type,
+    AnnotationActions.removeAnnotationLevel.type
+  ]
+})
+
+export const reducer = createUndoRedoReducer(
+  initialState,
+  on(AnnotationActions.setLevelCounter, (state, {levelCounter}) =>
+    ({
+      ...state,
+      levelCounter: levelCounter
+    })),
+  on(AnnotationActions.setAnnotation, (state, {annotation}) => ({
+    ...state,
+    annotation
+  })),
+  on(AnnotationActions.clearAnnotation, (state) => ({
+    levels: [],
+    links: [],
+    levelCounter: 0
+  })),
+  on(AnnotationActions.overwriteAnnotation, (state, {annotation}) => ({
+    ...state,
+    ...annotation
+  })),
+  on(AnnotationActions.changeAnnotationLevel, (state, {level, id}) => {
+    const annotationLevels = state.levels;
+    const index = annotationLevels.findIndex(a => a.id === id);
+
+    if (index > -1 && index < annotationLevels.length) {
+      const levelObj = annotationLevels[index];
+
+      return {
+        ...state,
+        levels: [
+          ...state.levels.slice(0, index),
+          new OIDBLevel(levelObj.id, level, levelObj.sortorder),
+          ...state.levels.slice(index + 1)
+        ]
+      };
+    } else {
+      console.error(`can't change level because index not valid.`);
+    }
+
+    return state;
+  }),
+  on(AnnotationActions.addAnnotationLevel, (state, level) =>
+    ({
+      ...state,
+      levels: [
+        ...state.levels,
+        level
+      ]
+    })),
+  on(AnnotationActions.removeAnnotationLevel, (state, {id}) => {
+    if (id > -1) {
+      const index = state.levels.findIndex((a) => (a.id === id));
+      if (index > -1) {
+        return {
+          ...state,
+          levels: [
+            ...state.levels.slice(0, index),
+            ...state.levels.slice(index + 1)
+          ]
+        }
+      } else {
+        console.error(`can't remove level because index not valid.`);
+      }
+    } else {
+      console.error(`can't remove level because id not valid.`);
+    }
+
+    return state;
+  }),
+  on(IDBActions.loadAnnotationLevelsSuccess, (state, {levels, levelCounter}) =>
+    ({
+      ...state,
+      levels,
+      levelCounter
+    })),
+  on(IDBActions.loadAnnotationLinksSuccess, (state, {links}) =>
+    ({
+      ...state,
+      links
+    }))
+);

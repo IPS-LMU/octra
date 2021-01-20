@@ -1,12 +1,9 @@
-import {on} from '@ngrx/store';
-import * as TranscriptionActions from './transcription.actions';
-import {addAnnotationLevel, changeAnnotationLevel, removeAnnotationLevel} from './transcription.actions';
-import * as ConfigurationActions from '../configuration/configuration.actions';
-import * as IDBActions from '../idb/idb.actions';
+import {createReducer, on} from '@ngrx/store';
 import {TranscriptionState} from '../index';
 import {isUnset} from '@octra/utilities';
-import {OIDBLevel} from '@octra/annotation';
-import {undoRedo} from 'ngrx-wieder';
+import {TranscriptionActions} from './transcription.actions';
+import {IDBActions} from '../idb/idb.actions';
+import {ConfigurationActions} from '../configuration/configuration.actions';
 
 export const initialState: TranscriptionState = {
   savingNeeded: false,
@@ -27,24 +24,10 @@ export const initialState: TranscriptionState = {
   showLoupe: false,
   easyMode: false,
   secondsPerLine: 5,
-  annotation: {
-    levels: [],
-    links: [],
-    levelCounter: 0
-  },
   highlightingEnabled: false
 };
 
-// initialize ngrx-wieder with custom config
-const {createUndoRedoReducer} = undoRedo({
-  allowedActionTypes: [
-    changeAnnotationLevel.type,
-    addAnnotationLevel.type,
-    removeAnnotationLevel.type
-  ]
-})
-
-export const reducer = createUndoRedoReducer(
+export const reducer = createReducer(
   initialState,
   on(TranscriptionActions.setSavingNeeded, (state, {savingNeeded}) => ({
     ...state,
@@ -101,10 +84,6 @@ export const reducer = createUndoRedoReducer(
     ...state,
     feedback
   })),
-  on(TranscriptionActions.setAnnotation, (state, {annotation}) => ({
-    ...state,
-    annotation
-  })),
   on(TranscriptionActions.setSubmitted, (state, {submitted}) => {
     console.log(`reduce submitted...`);
     console.log(state);
@@ -114,94 +93,13 @@ export const reducer = createUndoRedoReducer(
     }
   }),
   on(TranscriptionActions.setTranscriptionState, (state, newState) => ({...state, ...newState})),
-  on(TranscriptionActions.clearAnnotation, (state) => ({
-    ...state,
-    annotation: {
-      levels: [],
-      links: [],
-      levelCounter: 0
-    }
-  })),
-  on(TranscriptionActions.overwriteAnnotation, (state, {annotation}) => ({
-    ...state,
-    annotation
-  })),
   on(TranscriptionActions.clearLogs, (state) => ({
     ...state,
     logs: []
   })),
-  on(TranscriptionActions.changeAnnotationLevel, (state, {level, id}) => {
-    const annotationLevels = state.annotation.levels;
-    const index = annotationLevels.findIndex(a => a.id === id);
-
-    if (index > -1 && index < annotationLevels.length) {
-      const levelObj = annotationLevels[index];
-
-      return {
-        ...state,
-        annotation: {
-          ...state.annotation,
-          levels: [
-            ...state.annotation.levels.slice(0, index),
-            new OIDBLevel(levelObj.id, level, levelObj.sortorder),
-            ...state.annotation.levels.slice(index + 1)
-          ]
-        }
-      };
-    } else {
-      console.error(`can't change level because index not valid.`);
-    }
-
-    return state;
-  }),
-  on(TranscriptionActions.addAnnotationLevel, (state, level) =>
-    ({
-      ...state,
-      annotation: {
-        ...state.annotation,
-        levels: [
-          ...state.annotation.levels,
-          level
-        ]
-      }
-    })),
-  on(TranscriptionActions.removeAnnotationLevel, (state, {id}) => {
-    if (id > -1) {
-      const index = state.annotation.levels.findIndex((a) => (a.id === id));
-      if (index > -1) {
-        return {
-          ...state,
-          annotation: {
-            ...state.annotation,
-            levels: [
-              ...state.annotation.levels.slice(0, index),
-              ...state.annotation.levels.slice(index + 1)
-            ]
-          }
-        }
-      } else {
-        console.error(`can't remove level because index not valid.`);
-      }
-    } else {
-      console.error(`can't remove level because id not valid.`);
-    }
-
-    return state;
-  }),
-  on(TranscriptionActions.setLevelCounter, (state, {levelCounter}) =>
-    ({
-      ...state,
-      annotation: {
-        ...state.annotation,
-        levelCounter: levelCounter
-      }
-    })),
   on(IDBActions.loadLogsSuccess, (state, {logs}) => {
     return {
       ...state,
-      annotation: {
-        ...state.annotation
-      },
       logs
     };
   }),
@@ -223,23 +121,6 @@ export const reducer = createUndoRedoReducer(
 
     return result;
   }),
-  on(IDBActions.loadAnnotationLevelsSuccess, (state, {levels, levelCounter}) =>
-    ({
-      ...state,
-      annotation: {
-        ...state.annotation,
-        levels,
-        levelCounter
-      }
-    })),
-  on(IDBActions.loadAnnotationLinksSuccess, (state, {links}) =>
-    ({
-      ...state,
-      annotation: {
-        ...state.annotation,
-        links
-      }
-    })),
   on(ConfigurationActions.loadMethodsSuccess, (state, methods) =>
     ({
       ...state,

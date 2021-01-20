@@ -10,16 +10,17 @@ import {OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
 import {LoginMode, OnlineSession, RootState} from '../../store';
 import {Store} from '@ngrx/store';
 import {AudioManager} from '@octra/media';
-import * as ApplicationActions from '../../store/application/application.actions';
-import * as LoginActions from '../../store/login/login.actions';
-import * as ASRActions from '../../store/asr/asr.actions';
-import * as TranscriptionActions from '../../store/transcription/transcription.actions';
-import * as fromTranscriptionReducer from '../../store/transcription/transcription.reducer';
-import * as UserActions from '../../store/user/user.actions';
-import * as IDBActions from '../../store/idb/idb.actions';
 import {Actions} from '@ngrx/effects';
 import {ConsoleEntry} from './bug-report.service';
 import {Router} from '@angular/router';
+import {AnnotationActions} from '../../store/annotation/annotation.actions';
+import {UserActions} from '../../store/user/user.actions';
+import {TranscriptionActions} from '../../store/transcription/transcription.actions';
+import {ApplicationActions} from '../../store/application/application.actions';
+import {LoginActions} from '../../store/login/login.actions';
+import {ASRActions} from '../../store/asr/asr.actions';
+import {IDBActions} from '../../store/idb/idb.actions';
+import * as fromTranscriptionReducer from '../../store/transcription/transcription.reducer';
 
 @Injectable({
   providedIn: 'root'
@@ -147,19 +148,19 @@ export class AppStorageService {
   }
 
   get annotationLevels(): OIDBLevel[] {
-    return this._snapshot.transcription.annotation.levels;
+    return this._snapshot.annotation.levels;
   }
 
   get annotationLinks(): OIDBLink[] {
-    return this._snapshot.transcription.annotation.links;
+    return this._snapshot.annotation.links;
   }
 
   get levelcounter(): number {
-    return this._snapshot.transcription.annotation.levelCounter;
+    return this._snapshot.annotation.levelCounter;
   }
 
   set levelcounter(value: number) {
-    this.store.dispatch(TranscriptionActions.setLevelCounter({levelCounter: value}));
+    this.store.dispatch(AnnotationActions.setLevelCounter({levelCounter: value}));
   }
 
   get secondsPerLine(): number {
@@ -432,7 +433,7 @@ export class AppStorageService {
           }
         });
 
-        this.store.dispatch(TranscriptionActions.overwriteAnnotation({
+        this.store.dispatch(AnnotationActions.overwriteAnnotation({
           annotation: {
             levels,
             links,
@@ -445,7 +446,7 @@ export class AppStorageService {
   }
 
   public overwriteLinks = (value: OIDBLink[]) => {
-    this.store.dispatch(TranscriptionActions.overwriteLinks({
+    this.store.dispatch(AnnotationActions.overwriteLinks({
       links: value
     }));
   }
@@ -667,7 +668,7 @@ export class AppStorageService {
                 reject(error);
               });
 
-            this.store.dispatch(TranscriptionActions.changeAnnotationLevel({
+            this.store.dispatch(AnnotationActions.changeAnnotationLevel({
               level,
               id,
               sortorder: tiernum
@@ -698,7 +699,7 @@ export class AppStorageService {
             reject(error);
           });
 
-        this.store.dispatch(TranscriptionActions.addAnnotationLevel({
+        this.store.dispatch(AnnotationActions.addAnnotationLevel({
           id: newID,
           level,
           sortorder: this.annotationLevels.length
@@ -711,7 +712,7 @@ export class AppStorageService {
 
   public removeAnnotationLevel(id: number): Promise<void> {
     if (id > -1) {
-      this.store.dispatch(TranscriptionActions.removeAnnotationLevel({
+      this.store.dispatch(AnnotationActions.removeAnnotationLevel({
         id
       }));
       return new Promise<void>((resolve) => {
@@ -747,6 +748,6 @@ export class AppStorageService {
   }
 
   public clearAnnotationPermanently() {
-    this.store.dispatch(TranscriptionActions.clearAnnotation());
+    this.store.dispatch(AnnotationActions.clearAnnotation());
   }
 }

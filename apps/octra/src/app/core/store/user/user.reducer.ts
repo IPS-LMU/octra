@@ -1,8 +1,8 @@
 import {createReducer, on} from '@ngrx/store';
 import {UserState} from '../index';
-import * as fromFeedbackActions from './user.actions';
-import * as IDBActions from '../idb/idb.actions';
 import {isUnset} from '@octra/utilities';
+import {UserActions} from './user.actions';
+import {IDBActions} from '../idb/idb.actions';
 
 export const initialState: UserState = {
   name: '',
@@ -11,7 +11,7 @@ export const initialState: UserState = {
 
 export const reducer = createReducer(
   initialState,
-  on(fromFeedbackActions.setUserProfile, (state, user) => {
+  on(UserActions.setUserProfile, (state, user) => {
     return {
       ...state,
       ...user

@@ -1,9 +1,9 @@
 import {createReducer, on} from '@ngrx/store';
-import * as ApplicationActions from './application.actions';
-import * as ConfigurationActions from '../configuration/configuration.actions';
-import * as IDBActions from '../idb/idb.actions';
 import {ApplicationState, LoadingStatus} from '../index';
 import {isUnset} from '@octra/utilities';
+import {ApplicationActions} from './application.actions';
+import {ConfigurationActions} from '../configuration/configuration.actions';
+import {IDBActions} from '../idb/idb.actions';
 
 export const initialState: ApplicationState = {
   loading: {

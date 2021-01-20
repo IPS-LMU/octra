@@ -95,7 +95,6 @@ export interface TranscriptionState {
     speed: number;
   },
   feedback: any;
-  annotation: AnnotationState;
   guidelines?: any;
   logs: any[];
   logging: boolean;
@@ -119,5 +118,6 @@ export interface RootState {
   login: LoginState,
   asr: ASRState,
   transcription: TranscriptionState,
+  annotation: AnnotationState,
   user: UserState
 }

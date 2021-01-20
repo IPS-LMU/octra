@@ -432,7 +432,7 @@ export class TranscriptionService {
 
           this._annotation = new Annotation(annotates, this._audiofile);
 
-          if (!(this.appStorage.annotationLevels === null || this.appStorage.annotationLevels === undefined)) {
+          if (!isUnset(this.appStorage.annotationLevels)) {
             // load levels
             for (const oidbLevel of this.appStorage.annotationLevels) {
               const level: Level = Level.fromObj(oidbLevel,

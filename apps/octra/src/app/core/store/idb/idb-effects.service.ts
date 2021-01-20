@@ -1,17 +1,10 @@
 import {Injectable} from '@angular/core';
 import {Actions, createEffect, ofType} from '@ngrx/effects';
 import {AppStorageService} from '../../shared/service/appstorage.service';
-import * as ConfigurationActions from '../configuration/configuration.actions';
-import * as IDBActions from './idb.actions';
 import {exhaustMap, map, withLatestFrom} from 'rxjs/operators';
 import {Subject} from 'rxjs';
 import {Action, Store} from '@ngrx/store';
 import {IDBService} from '../../shared/service/idb.service';
-import * as TranscriptionActions from '../transcription/transcription.actions';
-import * as UserActions from '../user/user.actions';
-import * as ApplicationActions from '../application/application.actions';
-import * as LoginActions from '../login/login.actions';
-import * as ASRActions from '../asr/asr.actions';
 import {ApplicationState, LoginMode, OnlineSession} from '../index';
 import {isUnset} from '@octra/utilities';
 import {OIDBLink} from '@octra/annotation';
@@ -19,6 +12,14 @@ import {SessionStorageService} from 'ngx-webstorage';
 import {PromiseExtended} from 'dexie';
 import {IIDBLevel} from '../../shared/octra-database';
 import {ConsoleEntry} from '../../shared/service/bug-report.service';
+import {AnnotationActions} from '../annotation/annotation.actions';
+import {IDBActions} from './idb.actions';
+import {ConfigurationActions} from '../configuration/configuration.actions';
+import {ApplicationActions} from '../application/application.actions';
+import {ASRActions} from '../asr/asr.actions';
+import {TranscriptionActions} from '../transcription/transcription.actions';
+import {LoginActions} from '../login/login.actions';
+import {UserActions} from '../user/user.actions';
 
 
 @Injectable({
@@ -295,7 +296,7 @@ export class IDBEffects {
   ))
 
   clearAnnotation$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.clearAnnotation),
+    ofType(AnnotationActions.clearAnnotation),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -314,17 +315,17 @@ export class IDBEffects {
   ));
 
   overwriteAnnotation$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.overwriteAnnotation),
+    ofType(AnnotationActions.overwriteAnnotation),
     exhaustMap((action) => {
-        const subject = new Subject<Action>();
+      const subject = new Subject<Action>();
 
-        if (action.saveToDB) {
-          this.idbService.clearAnnotationData().then(() => {
-            this.idbService.saveAnnotationLevels(action.annotation.levels).then(() => {
-              this.idbService.saveAnnotationLinks(action.annotation.links).then(() => {
-                subject.next(IDBActions.overwriteAnnotationSuccess());
-                subject.complete();
-              }).catch((error) => {
+      if (action.saveToDB) {
+        this.idbService.clearAnnotationData().then(() => {
+          this.idbService.saveAnnotationLevels(action.annotation.levels).then(() => {
+            this.idbService.saveAnnotationLinks(action.annotation.links).then(() => {
+              subject.next(IDBActions.overwriteAnnotationSuccess());
+              subject.complete();
+            }).catch((error) => {
                 subject.next(IDBActions.overwriteAnnotationFailed({
                   error
                 }));
@@ -350,7 +351,7 @@ export class IDBEffects {
     )));
 
   overwriteAnnotationLinks$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.overwriteLinks),
+    ofType(AnnotationActions.overwriteLinks),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -874,7 +875,7 @@ export class IDBEffects {
   ));
 
   saveAnnotationLevel$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.changeAnnotationLevel),
+    ofType(AnnotationActions.changeAnnotationLevel),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -899,7 +900,7 @@ export class IDBEffects {
   ));
 
   addAnnotationLevel$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.addAnnotationLevel),
+    ofType(AnnotationActions.addAnnotationLevel),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -921,7 +922,7 @@ export class IDBEffects {
   ));
 
   removeAnnotationLevel$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.removeAnnotationLevel),
+    ofType(AnnotationActions.removeAnnotationLevel),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 

@@ -10,10 +10,10 @@ import {APIService} from './api.service';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
 import {LoginMode} from '../../store';
-import * as fromApplication from '../../store/application';
-import * as ConfigurationActions from '../../store/configuration/configuration.actions';
 import {Store} from '@ngrx/store';
 import * as fromTranscription from '../../store/transcription';
+import * as fromApplication from '../../store/application';
+import {ConfigurationActions} from '../../store/configuration/configuration.actions';
 
 @Injectable({
   providedIn: 'root'

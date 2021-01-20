@@ -3,10 +3,10 @@ import {APIService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {LoginMode} from '../../store';
 import {Store} from '@ngrx/store';
-import * as TranscriptionActions from '../../store/transcription/transcription.actions'
-import * as IDBActions from '../../store/idb/idb.actions'
 import {SubscriptionManager} from '@octra/utilities';
 import {timer} from 'rxjs';
+import {AnnotationActions} from '../../store/annotation/annotation.actions';
+import {IDBActions} from '../../store/idb/idb.actions';
 
 @Component({
   selector: 'octra-help-tools',
@@ -38,7 +38,7 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
     this.appStorage.clearOnlineSession();
 
     const clearAll = () => {
-      this.store.dispatch(TranscriptionActions.clearAnnotation());
+      this.store.dispatch(AnnotationActions.clearAnnotation());
       this.store.dispatch(IDBActions.clearAllOptions());
       this.appStorage.clearLoggingDataPermanently();
 

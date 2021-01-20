@@ -15,7 +15,6 @@ import {interval, Subscription, timer} from 'rxjs';
 import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
 import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
 import {TranscrEditorComponent} from '../../core/component';
-import * as IDBActions from '../../core/store/idb/idb.actions';
 
 
 import {
@@ -40,6 +39,7 @@ import {AudioChunk, AudioManager, AudioSelection, PlayBackStatus, SampleUnit} fr
 import {ASRQueueItemType, OAudiofile, OSegment, PraatTextgridConverter, Segment} from '@octra/annotation';
 import {ApplicationState} from '../../core/store';
 import {Store} from '@ngrx/store';
+import {IDBActions} from '../../core/store/idb/idb.actions';
 
 @Component({
   selector: 'octra-overlay-gui',

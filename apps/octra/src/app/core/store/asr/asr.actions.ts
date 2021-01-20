@@ -2,10 +2,12 @@ import {createAction, props} from '@ngrx/store';
 
 const context = 'ASR';
 
-export const setASRSettings = createAction(
-  `[${context}] Set ASR Settings`,
-  props<{
-    selectedLanguage: string;
-    selectedService: string;
-  }>()
-);
+export class ASRActions {
+  public static setASRSettings = createAction(
+    `[${context}] Set ASR Settings`,
+    props<{
+      selectedLanguage: string;
+      selectedService: string;
+    }>()
+  );
+}

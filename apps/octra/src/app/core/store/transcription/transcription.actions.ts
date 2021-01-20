@@ -123,20 +123,6 @@ export const setAnnotation = createAction(
   }>()
 );
 
-export const setAnnotationLevels = createAction(
-  `[${context}] Set annotationLevels`,
-  props<{
-    levels: OIDBLevel[];
-  }>()
-);
-
-export const setAnnotationLinks = createAction(
-  `[${context}] Set annotationLinks`,
-  props<{
-    links: OIDBLink[];
-  }>()
-);
-
 export const clearAnnotation = createAction(
   `[${context}] Clear annotation`
 );

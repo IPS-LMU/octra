@@ -15,6 +15,7 @@ import {interval, Subscription, timer} from 'rxjs';
 import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
 import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
 import {TranscrEditorComponent} from '../../core/component';
+import * as IDBActions from '../../core/store/idb/idb.actions';
 
 
 import {
@@ -37,6 +38,8 @@ import {
 } from '@octra/components';
 import {AudioChunk, AudioManager, AudioSelection, PlayBackStatus, SampleUnit} from '@octra/media';
 import {ASRQueueItemType, OAudiofile, OSegment, PraatTextgridConverter, Segment} from '@octra/annotation';
+import {ApplicationState} from '../../core/store';
+import {Store} from '@ngrx/store';
 
 @Component({
   selector: 'octra-overlay-gui',
@@ -185,7 +188,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               public appStorage: AppStorageService,
               private asrService: AsrService,
               private cd: ChangeDetectorRef,
-              private langService: TranslocoService) {
+              private langService: TranslocoService,
+              private store: Store<ApplicationState>) {
     super();
     this.miniLoupeSettings = new AudioviewerConfig();
     this.subscrmanager = new SubscriptionManager();
@@ -891,5 +895,15 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   @HostListener('window:resize', ['$event'])
   onResize($event) {
     // this.viewer.height = this.linesViewHeight;
+  }
+
+  undo() {
+    console.log(`test undo...`);
+    this.store.dispatch(IDBActions.undo())
+  }
+
+  redo() {
+    console.log(`test redo...`);
+    this.store.dispatch(IDBActions.redo())
   }
 }

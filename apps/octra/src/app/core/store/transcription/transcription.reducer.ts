@@ -1,10 +1,12 @@
-import {createReducer, on} from '@ngrx/store';
+import {on} from '@ngrx/store';
 import * as TranscriptionActions from './transcription.actions';
+import {addAnnotationLevel, changeAnnotationLevel, removeAnnotationLevel} from './transcription.actions';
 import * as ConfigurationActions from '../configuration/configuration.actions';
 import * as IDBActions from '../idb/idb.actions';
 import {TranscriptionState} from '../index';
 import {isUnset} from '@octra/utilities';
 import {OIDBLevel} from '@octra/annotation';
+import {undoRedo} from 'ngrx-wieder';
 
 export const initialState: TranscriptionState = {
   savingNeeded: false,
@@ -33,7 +35,16 @@ export const initialState: TranscriptionState = {
   highlightingEnabled: false
 };
 
-export const reducer = createReducer(
+// initialize ngrx-wieder with custom config
+const {createUndoRedoReducer} = undoRedo({
+  allowedActionTypes: [
+    changeAnnotationLevel.type,
+    addAnnotationLevel.type,
+    removeAnnotationLevel.type
+  ]
+})
+
+export const reducer = createUndoRedoReducer(
   initialState,
   on(TranscriptionActions.setSavingNeeded, (state, {savingNeeded}) => ({
     ...state,
@@ -102,20 +113,6 @@ export const reducer = createReducer(
       submitted
     }
   }),
-  on(TranscriptionActions.setAnnotationLevels, (state, {levels}) => ({
-    ...state,
-    annotation: {
-      ...state.annotation,
-      levels
-    }
-  })),
-  on(TranscriptionActions.setAnnotationLinks, (state, {links}) => ({
-    ...state,
-    annotation: {
-      ...state.annotation,
-      links
-    }
-  })),
   on(TranscriptionActions.setTranscriptionState, (state, newState) => ({...state, ...newState})),
   on(TranscriptionActions.clearAnnotation, (state) => ({
     ...state,

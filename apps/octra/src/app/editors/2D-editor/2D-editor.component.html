@@ -4,6 +4,8 @@
                         [easymode]="appStorage.easymode"
                         [segmentIndex]="selectedIndex"
   ></octra-transcr-window>
+  <button (click)="undo()">test undo</button>
+  <button (click)="redo()">test redo</button>
   <octra-audio-navigation #audionav
                           (afterPlaybackRateChange)="afterSpeedChange($event)"
                           (afterVolumeChange)="afterVolumeChange($event)"

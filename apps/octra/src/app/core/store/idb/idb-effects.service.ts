@@ -3,16 +3,16 @@ import {Actions, createEffect, ofType} from '@ngrx/effects';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import * as ConfigurationActions from '../configuration/configuration.actions';
 import * as IDBActions from './idb.actions';
-import {exhaustMap} from 'rxjs/operators';
+import {exhaustMap, map, withLatestFrom} from 'rxjs/operators';
 import {Subject} from 'rxjs';
-import {Action} from '@ngrx/store';
+import {Action, Store} from '@ngrx/store';
 import {IDBService} from '../../shared/service/idb.service';
 import * as TranscriptionActions from '../transcription/transcription.actions';
 import * as UserActions from '../user/user.actions';
 import * as ApplicationActions from '../application/application.actions';
 import * as LoginActions from '../login/login.actions';
 import * as ASRActions from '../asr/asr.actions';
-import {LoginMode, OnlineSession} from '../index';
+import {ApplicationState, LoginMode, OnlineSession} from '../index';
 import {isUnset} from '@octra/utilities';
 import {OIDBLink} from '@octra/annotation';
 import {SessionStorageService} from 'ngx-webstorage';
@@ -25,6 +25,38 @@ import {ConsoleEntry} from '../../shared/service/bug-report.service';
   providedIn: 'root'
 })
 export class IDBEffects {
+  checkUndo$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(IDBActions.undo),
+      withLatestFrom(this.store),
+      map(([actionData, appState]: [Action, ApplicationState]) => {
+
+        console.log('did undo');
+        console.log(appState);
+
+        // code for saving to the database
+
+        return IDBActions.undoSuccess();
+      })
+    )
+  );
+
+  checkRedo = createEffect(() =>
+    this.actions$.pipe(
+      ofType(IDBActions.redo),
+      withLatestFrom(this.store),
+      map(([actionData, appState]: [Action, ApplicationState]) => {
+
+        console.log('did redo');
+        console.log(appState);
+
+        // code for saving to the database
+
+        return IDBActions.redoSuccess();
+      })
+    )
+  );
+
   loadOptions$ = createEffect(() => this.actions$.pipe(
     ofType(ConfigurationActions.appConfigurationLoadSuccess),
     exhaustMap((action) => {
@@ -970,7 +1002,8 @@ export class IDBEffects {
   constructor(private actions$: Actions,
               private appStorage: AppStorageService,
               private idbService: IDBService,
-              private sessStr: SessionStorageService) {
+              private sessStr: SessionStorageService,
+              private store: Store<ApplicationState>) {
 
     // TODO add this as effect
     actions$.subscribe((action) => {

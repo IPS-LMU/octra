@@ -4,6 +4,22 @@ import {OIDBLink} from '@octra/annotation';
 
 const context = 'IDB';
 
+export const undo = createAction(
+  `UNDO`
+);
+
+export const redo = createAction(
+  `REDO`
+);
+
+export const undoSuccess = createAction(
+  `UNDO SUCCESS`
+);
+
+export const redoSuccess = createAction(
+  `REDO SUCCESS`
+);
+
 export const loadOptionsSuccess = createAction(
   `[${context}] Load Options Success`,
   props<{

@@ -191,8 +191,8 @@
       "move cursor left": "Move cursor to the left",
       "move cursor right": "Move cursor to the right",
       "audioplayer": "Audioplayer shortcuts",
-      "top signaldisplay": "Shortcuts of the signal display on the top",
-      "down signaldisplay": "Shortcuts of the signal display on the bottom",
+      "signaldisplay_top": "Shortcuts of the signal display on the top",
+      "signaldisplay_down": "Shortcuts of the signal display on the bottom",
       "2D-Editor": "Shortcuts of the 2D-Editor",
       "transcription window": "Transcription window",
       "play audio on hover": "Play audio on hover",
@@ -216,7 +216,9 @@
       "save and previous cell": "Save and go to the previous cell",
       "save and upper cell": "Save and go to one cell over the current one",
       "select all segments": "Select all segments",
-      "remove selected completely": "Remove selected segments completely"
+      "remove selected completely": "Remove selected segments completely",
+      "undo": "Undo last action",
+      "redo": "Redo last action"
     },
     "inactivity": {
       "header": "Longer absence detected",

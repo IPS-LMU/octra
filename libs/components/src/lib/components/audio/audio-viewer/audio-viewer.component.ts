@@ -1665,7 +1665,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
             if (focuscheck) {
               switch (shortcutName) {
                 case('undo'):
-                  if (this._focused) {
+                  if (this.settings.boundaries.enabled && this._focused && !this.settings.boundaries.readonly) {
                     this.shortcuttriggered.emit({
                       shortcut: comboKey,
                       shortcutName,
@@ -1677,7 +1677,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   }
                   break;
                 case('redo'):
-                  if (this._focused) {
+                  if (this.settings.boundaries.enabled && this._focused && !this.settings.boundaries.readonly) {
                     this.shortcuttriggered.emit({
                       shortcut: comboKey,
                       shortcutName,

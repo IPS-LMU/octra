@@ -487,7 +487,7 @@ export class ToolsModalComponent implements OnInit, OnDestroy {
     }
 
     this.close();
-    this.transcrService.currentlevel.segments.onsegmentchange.emit();
+    this.transcrService.currentLevelSegmentChange.emit();
     this.transcrService.saveSegments();
 
     this.subscrmanager.add(timer(1000).subscribe(() => {

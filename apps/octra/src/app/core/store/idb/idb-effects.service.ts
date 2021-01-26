@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
 import {Actions, createEffect, ofType} from '@ngrx/effects';
 import {AppStorageService} from '../../shared/service/appstorage.service';
-import {exhaustMap, map, withLatestFrom} from 'rxjs/operators';
+import {exhaustMap, mergeMap, withLatestFrom} from 'rxjs/operators';
 import {Subject} from 'rxjs';
 import {Action, Store} from '@ngrx/store';
 import {IDBService} from '../../shared/service/idb.service';
-import {ApplicationState, LoginMode, OnlineSession} from '../index';
+import {LoginMode, OnlineSession, RootState} from '../index';
 import {isUnset} from '@octra/utilities';
 import {OIDBLink} from '@octra/annotation';
 import {SessionStorageService} from 'ngx-webstorage';
@@ -26,34 +26,51 @@ import {UserActions} from '../user/user.actions';
   providedIn: 'root'
 })
 export class IDBEffects {
-  checkUndo$ = createEffect(() =>
+  saveAfterUndo$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(IDBActions.undo),
+      ofType(ApplicationActions.undo),
       withLatestFrom(this.store),
-      map(([actionData, appState]: [Action, ApplicationState]) => {
-
-        console.log('did undo');
-        console.log(appState);
-
+      mergeMap(([actionData, appState]: [Action, RootState]) => {
+        const subject = new Subject<Action>();
         // code for saving to the database
+        console.log(`save after undo`);
+        Promise.all([
+          this.idbService.saveAnnotationLevels(appState.annotation.levels),
+          this.idbService.saveAnnotationLinks(appState.annotation.links)
+        ]).then(() => {
+          subject.next(ApplicationActions.undoSuccess());
+        }).catch((error) => {
+          subject.next(ApplicationActions.undoFailed({
+            error
+          }));
+        });
 
-        return IDBActions.undoSuccess();
+        return subject;
       })
     )
   );
 
-  checkRedo = createEffect(() =>
+  saveAfterRedo = createEffect(() =>
     this.actions$.pipe(
-      ofType(IDBActions.redo),
+      ofType(ApplicationActions.redo),
       withLatestFrom(this.store),
-      map(([actionData, appState]: [Action, ApplicationState]) => {
-
-        console.log('did redo');
-        console.log(appState);
-
+      mergeMap(([actionData, appState]: [Action, RootState]) => {
+        const subject = new Subject<Action>();
         // code for saving to the database
+        console.log(`save after redo`);
 
-        return IDBActions.redoSuccess();
+        Promise.all([
+          this.idbService.saveAnnotationLevels(appState.annotation.levels),
+          this.idbService.saveAnnotationLinks(appState.annotation.links)
+        ]).then(() => {
+          subject.next(ApplicationActions.redoSuccess());
+        }).catch((error) => {
+          subject.next(ApplicationActions.redoFailed({
+            error
+          }));
+        });
+
+        return subject;
       })
     )
   );
@@ -326,16 +343,16 @@ export class IDBEffects {
               subject.next(IDBActions.overwriteAnnotationSuccess());
               subject.complete();
             }).catch((error) => {
-                subject.next(IDBActions.overwriteAnnotationFailed({
-                  error
-                }));
-                subject.complete();
-              });
-            }).catch((error) => {
               subject.next(IDBActions.overwriteAnnotationFailed({
                 error
               }));
               subject.complete();
+            });
+          }).catch((error) => {
+            subject.next(IDBActions.overwriteAnnotationFailed({
+              error
+            }));
+            subject.complete();
             });
           }).catch((error) => {
             subject.next(IDBActions.overwriteAnnotationFailed({
@@ -1004,7 +1021,7 @@ export class IDBEffects {
               private appStorage: AppStorageService,
               private idbService: IDBService,
               private sessStr: SessionStorageService,
-              private store: Store<ApplicationState>) {
+              private store: Store<RootState>) {
 
     // TODO add this as effect
     actions$.subscribe((action) => {

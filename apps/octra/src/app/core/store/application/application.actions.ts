@@ -4,6 +4,36 @@ import {ConsoleEntry} from '../../shared/service/bug-report.service';
 const context = 'Application';
 
 export class ApplicationActions {
+  public static undo = createAction(
+    `UNDO`
+  );
+
+  public static redo = createAction(
+    `REDO`
+  );
+
+  public static undoSuccess = createAction(
+    `UNDO SUCCESS`
+  );
+
+  public static undoFailed = createAction(
+    `UNDO FAILED`,
+    props<{
+      error: string;
+    }>()
+  );
+
+  public static redoSuccess = createAction(
+    `REDO SUCCESS`
+  );
+
+  public static redoFailed = createAction(
+    `REDO FAILED`,
+    props<{
+      error: string;
+    }>()
+  );
+
   public static finishLoading = createAction(`[${context}] Finish Loading`);
   public static load = createAction(
     `[${context}] Load`,

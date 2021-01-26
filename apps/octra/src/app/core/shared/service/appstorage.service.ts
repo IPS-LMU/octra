@@ -1,13 +1,13 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {LocalStorageService, SessionStorageService} from 'ngx-webstorage';
-import {Subject} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {IDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
 import {FileProgress} from '../../obj/objects';
 import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
 import {OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
-import {LoginMode, OnlineSession, RootState} from '../../store';
+import {AnnotationState, LoginMode, OnlineSession, RootState} from '../../store';
 import {Store} from '@ngrx/store';
 import {AudioManager} from '@octra/media';
 import {Actions} from '@ngrx/effects';
@@ -21,6 +21,7 @@ import {LoginActions} from '../../store/login/login.actions';
 import {ASRActions} from '../../store/asr/asr.actions';
 import {IDBActions} from '../../store/idb/idb.actions';
 import * as fromTranscriptionReducer from '../../store/transcription/transcription.reducer';
+import * as fromAnnotation from '../../store/annotation';
 
 @Injectable({
   providedIn: 'root'
@@ -44,6 +45,14 @@ export class AppStorageService {
 
   set playonhover(value: boolean) {
     this.store.dispatch(TranscriptionActions.setPlayOnHover({playOnHover: value}));
+  }
+
+  public get annotationChanged(): Observable<AnnotationState> {
+    const subject = new Subject<AnnotationState>();
+    this.store.select(fromAnnotation.selectAnnotation).subscribe((state) => {
+      subject.next(state);
+    });
+    return subject;
   }
 
   set reloaded(value: boolean) {
@@ -192,6 +201,10 @@ export class AppStorageService {
               private store: Store<RootState>,
               private actions: Actions,
               private router: Router) {
+    this.subscrManager.add(this.store.subscribe((state: RootState) => {
+      this._snapshot = state;
+    }));
+
     this.subscrManager.add(actions.subscribe((action) => {
       if (action.type === '@ngrx/effects/init') {
         this.store.dispatch(TranscriptionActions.setTranscriptionState({
@@ -208,10 +221,6 @@ export class AppStorageService {
         this.reloaded = this.sessStr.retrieve('reloaded');
         this.serverDataEntry = this.sessStr.retrieve('serverDataEntry');
       }
-    }));
-
-    this.subscrManager.add(this.store.subscribe((state: RootState) => {
-      this._snapshot = state;
     }));
   }
 
@@ -745,6 +754,14 @@ export class AppStorageService {
         console.error(error);
       });
     });
+  }
+
+  public undo() {
+    this.store.dispatch(ApplicationActions.undo());
+  }
+
+  public redo() {
+    this.store.dispatch(ApplicationActions.redo());
   }
 
   public clearAnnotationPermanently() {

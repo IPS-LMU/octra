@@ -112,7 +112,7 @@ export class PermutationsReplaceModalComponent implements OnInit, OnDestroy, Aft
     }
 
     // trigger saving
-    this.transcrService.currentlevel.segments.onsegmentchange.emit(null);
+    this.transcrService.currentLevelSegmentChange.emit(null);
     this.modal.hide();
     this.actionperformed.next('replaced');
   }

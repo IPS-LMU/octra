@@ -11,7 +11,7 @@ export interface SegmentChangeEvent {
 }
 
 export class Segments {
-  public onsegmentchange: EventEmitter<SegmentChangeEvent> = new EventEmitter<SegmentChangeEvent>();
+  public onsegmentchange: EventEmitter<SegmentChangeEvent>;
 
   get length(): number {
     return this._segments.length;
@@ -29,6 +29,7 @@ export class Segments {
 
   constructor(private sampleRate, private levelName: string, segments: ISegment[], lastSampleUnit: SampleUnit) {
     this._segments = [];
+    this.onsegmentchange = new EventEmitter<SegmentChangeEvent>();
     console.log(`LAST SAMPLE is ${lastSampleUnit.seconds}`);
 
     if (segments !== null) {

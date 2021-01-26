@@ -299,7 +299,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   afterLevelUpdated() {
     if (!isUnset(this._transcriptionLevel)) {
-
       if (!isUnset(this.audioChunk) && !isUnset(this.av.audioTCalculator)) {
         this.refreshLevel()
       }
@@ -1665,6 +1664,30 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
             if (focuscheck) {
               switch (shortcutName) {
+                case('undo'):
+                  if (this._focused) {
+                    this.shortcuttriggered.emit({
+                      shortcut: comboKey,
+                      shortcutName,
+                      value: null,
+                      type: 'application',
+                      timePosition: this.av.mouseCursor.clone(),
+                      timestamp: shortcutInfo.timestamp
+                    });
+                  }
+                  break;
+                case('redo'):
+                  if (this._focused) {
+                    this.shortcuttriggered.emit({
+                      shortcut: comboKey,
+                      shortcutName,
+                      value: null,
+                      type: 'application',
+                      timePosition: this.av.mouseCursor.clone(),
+                      timestamp: shortcutInfo.timestamp
+                    });
+                  }
+                  break;
                 case('set_boundary'):
                   if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
                     let segments;
@@ -1682,6 +1705,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       } else if (result.type !== null) {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
+                          shortcutName,
                           value: result.type,
                           type: 'boundary',
                           timePosition: this.audioManager.createSampleUnit(result.seg_samples),
@@ -1714,6 +1738,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                           segment.transcript = this.breakMarker.code;
                           this.shortcuttriggered.emit({
                             shortcut: comboKey,
+                            shortcutName,
                             value: 'set_break',
                             type: 'segment',
                             timePosition: xSamples.clone(),
@@ -1723,6 +1748,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                           segment.transcript = '';
                           this.shortcuttriggered.emit({
                             shortcut: comboKey,
+                            shortcutName,
                             value: 'remove_break',
                             type: 'segment',
                             timePosition: xSamples.clone(),
@@ -1783,6 +1809,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
                             this.shortcuttriggered.emit({
                               shortcut: comboKey,
+                              shortcutName,
                               value: shortcutName,
                               type: 'audio',
                               timePosition: xSamples.clone(),
@@ -1822,6 +1849,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
                       this.shortcuttriggered.emit({
                         shortcut: comboKey,
+                        shortcutName,
                         value: shortcutName,
                         type: 'audio',
                         timePosition: this.av.mouseCursor.clone(),
@@ -1860,6 +1888,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
                     this.shortcuttriggered.emit({
                       shortcut: comboKey,
+                      shortcutName,
                       value: shortcutName,
                       type: 'segment',
                       timePosition: this.av.mouseCursor.clone(),
@@ -1892,6 +1921,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                     // move cursor to left
                     this.shortcuttriggered.emit({
                       shortcut: comboKey,
+                      shortcutName,
                       value: shortcutName,
                       type: 'mouse',
                       timePosition: this.av.mouseCursor.clone(),
@@ -1910,6 +1940,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                     // move cursor to right
                     this.shortcuttriggered.emit({
                       shortcut: comboKey,
+                      shortcutName,
                       value: shortcutName,
                       type: 'mouse',
                       timePosition: this.av.mouseCursor.clone(),
@@ -1929,6 +1960,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                     // move cursor to right
                     this.shortcuttriggered.emit({
                       shortcut: comboKey,
+                      shortcutName,
                       value: shortcutName,
                       type: 'option',
                       timePosition: this.av.mouseCursor.clone(),
@@ -1946,6 +1978,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       if (isUnset(segment.isBlockedBy)) {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
+                          shortcutName,
                           value: 'do_asr',
                           type: 'segment',
                           timePosition: this.av.mouseCursor.clone(),
@@ -1954,6 +1987,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       } else {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
+                          shortcutName,
                           value: 'cancel_asr',
                           type: 'segment',
                           timePosition: this.av.mouseCursor.clone(),
@@ -1973,6 +2007,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       if (isUnset(segment.isBlockedBy)) {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
+                          shortcutName,
                           value: 'do_asr_maus',
                           type: 'segment',
                           timePosition: this.av.mouseCursor.clone(),
@@ -1981,6 +2016,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       } else {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
+                          shortcutName,
                           value: 'cancel_asr_maus',
                           type: 'segment',
                           timePosition: this.av.mouseCursor.clone(),
@@ -2001,6 +2037,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       if (isUnset(segment.isBlockedBy)) {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
+                          shortcutName,
                           value: 'do_maus',
                           type: 'segment',
                           timePosition: this.av.mouseCursor.clone(),
@@ -2009,6 +2046,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       } else {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
+                          shortcutName,
                           value: 'cancel_maus',
                           type: 'segment',
                           timePosition: this.av.mouseCursor.clone(),
@@ -2279,6 +2317,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
 export interface AudioViewerShortcutEvent {
   shortcut: string;
+  shortcutName: string;
   value: string;
   type: string;
   timePosition?: SampleUnit;

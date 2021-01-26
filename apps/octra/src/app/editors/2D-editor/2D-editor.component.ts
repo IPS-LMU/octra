@@ -39,7 +39,6 @@ import {AudioChunk, AudioManager, AudioSelection, PlayBackStatus, SampleUnit} fr
 import {ASRQueueItemType, OAudiofile, OSegment, PraatTextgridConverter, Segment} from '@octra/annotation';
 import {ApplicationState} from '../../core/store';
 import {Store} from '@ngrx/store';
-import {IDBActions} from '../../core/store/idb/idb.actions';
 
 @Component({
   selector: 'octra-overlay-gui',
@@ -395,7 +394,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                             counter++;
                           }
 
-                          this.transcrService.currentlevel.segments.onsegmentchange.emit();
+                          this.transcrService.currentLevelSegmentChange.emit();
                         }
                       } else {
                         console.error(`word tier not found!`);
@@ -433,6 +432,12 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       },
       () => {
       }));
+
+    this.subscrmanager.add(this.transcrService.annotationChanged.subscribe(() => {
+      console.log(`annotation changed by annoChanged:`);
+      console.log(this.transcrService.currentlevel);
+      this.viewer.redraw();
+    }));
   }
 
   ngOnDestroy() {
@@ -553,7 +558,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   public changeLoupePosition(mouseEvent: MouseEvent, cursorTime: SampleUnit) {
-
     const fullY = mouseEvent.offsetY + 20 + this.miniloupe.size.height;
     const x = mouseEvent.offsetX - ((this.miniloupe.size.width - 10) / 2) - 2;
 
@@ -578,6 +582,12 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
   onShortCutViewerTriggered($event: AudioViewerShortcutEvent) {
     this.triggerUIAction($event);
+
+    if ($event.shortcutName === 'undo') {
+      this.appStorage.undo();
+    } else if ($event.shortcutName === 'redo') {
+      this.appStorage.redo();
+    }
   }
 
   onShortCutTriggered = ($event: ShortcutEvent) => {
@@ -586,6 +596,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         case('play_pause'):
           this.triggerUIAction({
             shortcut: $event.shortcut,
+            shortcutName: $event.shortcutName,
             value: $event.shortcutName,
             type: 'audio',
             timestamp: $event.timestamp
@@ -603,6 +614,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         case('stop'):
           this.triggerUIAction({
             shortcut: $event.shortcut,
+            shortcutName: $event.shortcutName,
             value: $event.shortcutName,
             type: 'audio',
             timestamp: $event.timestamp
@@ -615,6 +627,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           console.log(`step backward`);
           this.triggerUIAction({
             shortcut: $event.shortcut,
+            shortcutName: $event.shortcutName,
             value: $event.shortcutName,
             type: 'audio',
             timestamp: $event.timestamp
@@ -627,6 +640,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           console.log(`step backward time`);
           this.triggerUIAction({
             shortcut: $event.shortcut,
+            shortcutName: $event.shortcutName,
             value: $event.shortcutName,
             type: 'audio',
             timestamp: $event.timestamp
@@ -895,15 +909,5 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   @HostListener('window:resize', ['$event'])
   onResize($event) {
     // this.viewer.height = this.linesViewHeight;
-  }
-
-  undo() {
-    console.log(`test undo...`);
-    this.store.dispatch(IDBActions.undo())
-  }
-
-  redo() {
-    console.log(`test redo...`);
-    this.store.dispatch(IDBActions.redo())
   }
 }

@@ -436,6 +436,12 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
   onViewerShortcutTriggered($event: AudioViewerShortcutEvent, control: string) {
     this.triggerUIActionAfterShortcut($event, control, $event.timestamp);
+
+    if ($event.shortcutName === 'undo') {
+      this.appStorage.undo();
+    } else if ($event.shortcutName === 'redo') {
+      this.appStorage.redo();
+    }
   }
 
   onShortcutTriggered = ($event: ShortcutEvent) => {

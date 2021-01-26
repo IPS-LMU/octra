@@ -488,7 +488,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           this.audioChunkWindow = new AudioChunk(new AudioSelection(start, segment.time.clone()), this.audioManager);
           this.shortcutsEnabled = false;
 
-          this.viewer.settings.shortcutsEnabled = false;
+          this.viewer.disableShortcuts();
           this.showWindow = true;
 
           this.uiService.addElementFromEvent('segment', {
@@ -516,7 +516,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   onWindowAction(state) {
     if (state === 'close') {
       this.showWindow = false;
-      this.viewer.settings.shortcutsEnabled = true;
+      this.viewer.enableShortcuts();
       this.shortcutsEnabled = true;
       this.selectedIndex = this.window.segmentIndex;
       this.viewer.selectSegment(this.selectedIndex);
@@ -591,92 +591,100 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   onShortCutTriggered = ($event: ShortcutEvent) => {
-    if (!isUnset(this.audioChunkLines)) {
-      switch ($event.shortcutName) {
-        case('play_pause'):
-          this.triggerUIAction({
-            shortcut: $event.shortcut,
-            shortcutName: $event.shortcutName,
-            value: $event.shortcutName,
-            type: 'audio',
-            timestamp: $event.timestamp
-          });
-          if (this.audioChunkLines.isPlaying) {
-            this.audioChunkLines.pausePlayback().catch((error) => {
+    if (this.shortcutsEnabled) {
+      if (!isUnset(this.audioChunkLines)) {
+        let shortcutTriggered = false;
+        switch ($event.shortcutName) {
+          case('play_pause'):
+            this.triggerUIAction({
+              shortcut: $event.shortcut,
+              shortcutName: $event.shortcutName,
+              value: $event.shortcutName,
+              type: 'audio',
+              timestamp: $event.timestamp
+            });
+            if (this.audioChunkLines.isPlaying) {
+              this.audioChunkLines.pausePlayback().catch((error) => {
+                console.error(error);
+              });
+            } else {
+              this.audioChunkLines.startPlayback(false).catch((error) => {
+                console.error(error);
+              });
+            }
+            shortcutTriggered = true;
+            break;
+          case('stop'):
+            this.triggerUIAction({
+              shortcut: $event.shortcut,
+              shortcutName: $event.shortcutName,
+              value: $event.shortcutName,
+              type: 'audio',
+              timestamp: $event.timestamp
+            });
+            this.audioChunkLines.stopPlayback().catch((error) => {
               console.error(error);
             });
-          } else {
-            this.audioChunkLines.startPlayback(false).catch((error) => {
+            shortcutTriggered = true;
+            break;
+          case('step_backward'):
+            console.log(`step backward`);
+            this.triggerUIAction({
+              shortcut: $event.shortcut,
+              shortcutName: $event.shortcutName,
+              value: $event.shortcutName,
+              type: 'audio',
+              timestamp: $event.timestamp
+            });
+            this.audioChunkLines.stepBackward().catch((error) => {
               console.error(error);
             });
-          }
-          break;
-        case('stop'):
-          this.triggerUIAction({
-            shortcut: $event.shortcut,
-            shortcutName: $event.shortcutName,
-            value: $event.shortcutName,
-            type: 'audio',
-            timestamp: $event.timestamp
-          });
-          this.audioChunkLines.stopPlayback().catch((error) => {
-            console.error(error);
-          });
-          break;
-        case('step_backward'):
-          console.log(`step backward`);
-          this.triggerUIAction({
-            shortcut: $event.shortcut,
-            shortcutName: $event.shortcutName,
-            value: $event.shortcutName,
-            type: 'audio',
-            timestamp: $event.timestamp
-          });
-          this.audioChunkLines.stepBackward().catch((error) => {
-            console.error(error);
-          });
-          break;
-        case('step_backwardtime'):
-          console.log(`step backward time`);
-          this.triggerUIAction({
-            shortcut: $event.shortcut,
-            shortcutName: $event.shortcutName,
-            value: $event.shortcutName,
-            type: 'audio',
-            timestamp: $event.timestamp
-          });
-          this.audioChunkLines.stepBackwardTime(0.5).catch((error) => {
-            console.error(error);
-          });
-          break;
-      }
-    }
-
-    if (this.appStorage.showLoupe) {
-      const event = $event.event;
-
-      if (event.key === '+' || event.key === '-') {
-        if (event.key === '+') {
-          this.factor = Math.min(20, this.factor + 1);
-        } else if (event.key === '-') {
-          if (this.factor > 3) {
-            this.factor = Math.max(1, this.factor - 1);
-          }
+            break;
+          case('step_backwardtime'):
+            console.log(`step backward time`);
+            this.triggerUIAction({
+              shortcut: $event.shortcut,
+              shortcutName: $event.shortcutName,
+              value: $event.shortcutName,
+              type: 'audio',
+              timestamp: $event.timestamp
+            });
+            this.audioChunkLines.stepBackwardTime(0.5).catch((error) => {
+              console.error(error);
+            });
+            shortcutTriggered = true;
+            break;
         }
 
-        this.changeArea(this.loupe, this.viewer, this.audioManager, this.audioChunkLoupe, this.viewer.av.mouseCursor, this.factor)
-          .then((newLoupeChunk) => {
-            if (!isUnset(newLoupeChunk)) {
-              this.audioChunkLoupe = newLoupeChunk;
-              this.cd.detectChanges();
-            }
-          });
+        if (shortcutTriggered) {
+          $event.event.preventDefault();
+          this.cd.detectChanges();
+        }
       }
-    }
 
-    if (!isUnset($event)) {
-      $event.event.preventDefault();
-      this.cd.detectChanges();
+      if (this.appStorage.showLoupe) {
+        const event = $event.event;
+
+        if (event.key === '+' || event.key === '-') {
+          if (event.key === '+') {
+            this.factor = Math.min(20, this.factor + 1);
+          } else if (event.key === '-') {
+            if (this.factor > 3) {
+              this.factor = Math.max(1, this.factor - 1);
+            }
+          }
+
+          this.changeArea(this.loupe, this.viewer, this.audioManager, this.audioChunkLoupe, this.viewer.av.mouseCursor, this.factor)
+            .then((newLoupeChunk) => {
+              if (!isUnset(newLoupeChunk)) {
+                this.audioChunkLoupe = newLoupeChunk;
+                this.cd.detectChanges();
+              }
+            });
+
+          $event.event.preventDefault();
+        }
+      }
     }
   }
 

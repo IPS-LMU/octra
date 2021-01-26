@@ -12,6 +12,10 @@ export class ApplicationActions {
     `REDO`
   );
 
+  public static clear = createAction(
+    `CLEAR`
+  );
+
   public static undoSuccess = createAction(
     `UNDO SUCCESS`
   );

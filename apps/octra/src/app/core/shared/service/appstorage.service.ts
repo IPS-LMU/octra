@@ -749,6 +749,7 @@ export class AppStorageService {
 
   public logout() {
     this.endSession().then(() => {
+      this.clearHistory();
       this.store.dispatch(LoginActions.logout());
       Functions.navigateTo(this.router, ['login'], AppInfo.queryParamsHandling).catch((error) => {
         console.error(error);
@@ -762,6 +763,10 @@ export class AppStorageService {
 
   public redo() {
     this.store.dispatch(ApplicationActions.redo());
+  }
+
+  public clearHistory() {
+    this.store.dispatch(ApplicationActions.clear());
   }
 
   public clearAnnotationPermanently() {

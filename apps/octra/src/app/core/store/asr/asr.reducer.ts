@@ -16,14 +16,14 @@ export const reducer = createReducer(
       let result = state;
 
       for (const variable of variables) {
-        result = saveOptionToStore(result, variable.name, variable.value);
+        result = writeOptionToStore(result, variable.name, variable.value);
       }
 
       return result;
     }
   ));
 
-function saveOptionToStore(state: ASRState, attribute: string, value: any): ASRState {
+function writeOptionToStore(state: ASRState, attribute: string, value: any): ASRState {
   switch (attribute) {
     case('asr'):
       return {

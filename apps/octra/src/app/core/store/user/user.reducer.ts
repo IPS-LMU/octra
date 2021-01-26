@@ -21,14 +21,14 @@ export const reducer = createReducer(
       let result = state;
 
       for (const variable of variables) {
-        result = saveOptionToStore(result, variable.name, variable.value);
+        result = writeOptionToStore(result, variable.name, variable.value);
       }
 
       return result;
     }
   ));
 
-function saveOptionToStore(state: UserState, attribute: string, value: any): UserState {
+function writeOptionToStore(state: UserState, attribute: string, value: any): UserState {
   switch (attribute) {
     case('userProfile'):
       const userProfile = {

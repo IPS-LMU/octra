@@ -70,7 +70,7 @@ export const reducer = createReducer(
     let result = state;
 
     for (const variable of variables) {
-      result = saveOptionToStore(result, variable.name, variable.value);
+      result = writeOptionToStore(result, variable.name, variable.value);
     }
 
     return result;
@@ -114,7 +114,7 @@ export const reducer = createReducer(
 );
 
 
-function saveOptionToStore(state: ApplicationState, attribute: string, value: any): ApplicationState {
+function writeOptionToStore(state: ApplicationState, attribute: string, value: any): ApplicationState {
   switch (attribute) {
     case('version'):
       return {

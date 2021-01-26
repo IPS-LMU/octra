@@ -116,7 +116,7 @@ export const reducer = createReducer(
     let result = state;
 
     for (const variable of variables) {
-      result = saveOptionToStore(result, variable.name, variable.value);
+      result = writeOptionToStore(result, variable.name, variable.value);
     }
 
     return result;
@@ -146,7 +146,7 @@ export const reducer = createReducer(
     }))
 );
 
-function saveOptionToStore(state: TranscriptionState, attribute: string, value: any): TranscriptionState {
+function writeOptionToStore(state: TranscriptionState, attribute: string, value: any): TranscriptionState {
   switch (attribute) {
     case('submitted'):
       return {

@@ -26,6 +26,8 @@ export class AsrService {
   set selectedLanguage(value: ASRLanguage) {
     this._selectedLanguage = value;
     if (!isUnset(value)) {
+      console.log(`SAVE ASR`);
+      console.log(value);
       this.appStorage.asrSelectedLanguage = value.code;
       this.appStorage.asrSelectedService = value.asr;
     } else {

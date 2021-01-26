@@ -126,7 +126,7 @@ export const reducer = createReducer(
 
       for (const variable of variables) {
         if (!isUnset(variable)) {
-          result = saveOptionToStore(result, variable.name, variable.value);
+          result = writeOptionToStore(result, variable.name, variable.value);
         }
       }
 
@@ -134,7 +134,7 @@ export const reducer = createReducer(
     }
   ));
 
-function saveOptionToStore(state: LoginState, attribute: string, value: any): LoginState {
+function writeOptionToStore(state: LoginState, attribute: string, value: any): LoginState {
   switch (attribute) {
     case('audioURL'):
       return {

@@ -158,6 +158,10 @@ export class IDBEffects {
             {
               attribute: '_highlightingEnabled',
               key: 'highlightingEnabled'
+            },
+            {
+              attribute: '_asr',
+              key: 'asr'
             }
           ]
         ).subscribe(
@@ -811,7 +815,7 @@ export class IDBEffects {
 
   saveASRLanguage$ = createEffect(() => this.actions$.pipe(
     ofType(ASRActions.setASRSettings),
-    exhaustMap((action) => {
+    mergeMap((action) => {
       const subject = new Subject<Action>();
 
       this.idbService.saveOption('asr', {

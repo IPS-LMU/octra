@@ -213,6 +213,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       this.afterChunkUpdated();
     }
     if (changes.hasOwnProperty('transcriptionLevel') && changes.transcriptionLevel.currentValue !== null) {
+      console.log(`level updated by directive`);
+      console.trace();
       this.afterLevelUpdated();
     }
 
@@ -300,10 +302,12 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   afterLevelUpdated() {
     if (!isUnset(this._transcriptionLevel)) {
       if (!isUnset(this.audioChunk) && !isUnset(this.av.audioTCalculator)) {
+        console.log(`refresh level after level updated`);
         this.refreshLevel()
       }
       this.subscrManager.removeByTag(`segmentchange`);
       this.subscrManager.add(this._transcriptionLevel.segments.onsegmentchange.subscribe(() => {
+          console.log(`refresh level on segmentchange ${this.name}`);
           this.refreshLevel();
         },
         (error) => {
@@ -407,6 +411,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         addSingleLineOnly();
       }
 
+      console.log(`init view ${this.name}`);
       this.createSegmentsForCanvas();
 
       this.canvasElements.playHead = this.createLinePlayCursor();
@@ -1020,6 +1025,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         this.audioChunk.time.start, this.audioChunk.time.end
       );
 
+      console.log(`segments ${this.name}: `);
+      console.log(this._transcriptionLevel.segments.segments.find(a => !isUnset(a.isBlockedBy)));
       const boundariesToDraw: {
         x: number,
         y: number,
@@ -1071,6 +1078,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
             height: segmentHeight,
             transformsEnabled: 'position',
             sceneFunc: (context: any, shape) => {
+              console.log(`REDRAW OVERLAY!`);
               const absY = lineNum1 * (this.settings.lineheight + this.settings.margin.top);
               for (let j = lineNum1; j <= lineNum2; j++) {
                 const localY = j * (this.settings.lineheight + this.settings.margin.top);
@@ -1136,6 +1144,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   } else {
                     if (segment.isBlockedBy === ASRQueueItemType.ASR) {
                       // blocked by ASR
+                      console.log(`FILL WITH ASR COLOR`);
                       context.fillStyle = 'rgba(255,191,0,0.5)';
                     } else if (segment.isBlockedBy === ASRQueueItemType.ASRMAUS) {
                       context.fillStyle = 'rgba(179,10,179,0.5)';
@@ -2156,6 +2165,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   private refreshLevel() {
     this.av.updateLevel(this._transcriptionLevel);
+    console.log(`refresh level ${this.name}`);
     this.createSegmentsForCanvas();
     this.layers.overlay.batchDraw();
     this.layers.boundaries.batchDraw();

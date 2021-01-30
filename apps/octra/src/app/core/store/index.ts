@@ -1,6 +1,6 @@
 import {IDataEntry} from '../obj/data-entry';
 import {SessionFile} from '../obj/SessionFile';
-import {OIDBLevel, OIDBLink} from '@octra/annotation';
+import {Level, OIDBLevel, OIDBLink} from '@octra/annotation';
 import {ConsoleEntry} from '../shared/service/bug-report.service';
 import {AppSettings, ProjectSettings} from '../obj/Settings';
 
@@ -120,4 +120,8 @@ export interface RootState {
   transcription: TranscriptionState,
   annotation: AnnotationState,
   user: UserState
+}
+
+export class AnnotationLevel extends Level {
+
 }

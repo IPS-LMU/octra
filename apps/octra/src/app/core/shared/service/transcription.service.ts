@@ -289,6 +289,7 @@ export class TranscriptionService {
 
             this.subscrmanager.removeByTag('idbAnnotationChange');
             this.subscrmanager.add(this.appStorage.annotationChanged.subscribe((state) => {
+              // TODO PROBLEM HERE
               this.updateAnnotation(state.levels, state.links);
             }), 'idbAnnotationChange');
             resolve();
@@ -480,6 +481,8 @@ export class TranscriptionService {
 
   private updateAnnotation(levels: OIDBLevel[], links: OIDBLink[]) {
     // load levels
+    console.log(`UPDATE ANNOTATION`);
+    console.log(levels);
     this._annotation = new Annotation(this._annotation.annotates, this._annotation.audiofile, []);
 
     for (const oidbLevel of levels) {
@@ -496,6 +499,7 @@ export class TranscriptionService {
     this.subscrmanager.add(this.currentlevel.segments.onsegmentchange.subscribe((event) => {
       this._currentLevelSegmentChange.emit(event);
     }), 'segmentchange');
+
     this.annotationChanged.emit();
   }
 

@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   EventEmitter,
@@ -43,17 +44,20 @@ import {Store} from '@ngrx/store';
 @Component({
   selector: 'octra-overlay-gui',
   templateUrl: './2D-editor.component.html',
-  styleUrls: ['./2D-editor.component.css']
+  styleUrls: ['./2D-editor.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy {
 
   public static editorname = '2D-Editor';
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
+
   @ViewChild('viewer', {static: true}) viewer: AudioViewerComponent;
   @ViewChild('window', {static: false}) window: TranscrWindowComponent;
   @ViewChild('loupe', {static: false}) loupe: AudioViewerComponent;
   @ViewChild('audionav', {static: true}) audionav: AudioNavigationComponent;
   @Output() public openModal = new EventEmitter();
+
   public showWindow = false;
   public loupeHidden = true;
   public selectedIndex: number;
@@ -276,20 +280,22 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     ));
 
     this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
+        console.log(`item ${item.id} change ${item.status}`);
+        console.log(item);
         if (item.status !== ASRProcessStatus.IDLE) {
           const segmentBoundary = new SampleUnit(item.time.sampleStart + item.time.sampleLength, this.audioManager.sampleRate);
           let segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentBoundary);
 
           if (segmentIndex > -1) {
             let segment = this.transcrService.currentlevel.segments.get(segmentIndex);
-            segment.progressInfo.progress = item.progress;
-            segment.progressInfo.statusLabel = item.type;
+            // segment.progressInfo.progress = item.progress;
+            // segment.progressInfo.statusLabel = item.type;
             this.viewer.redrawOverlay();
 
             if (item.status !== ASRProcessStatus.STARTED && item.status !== ASRProcessStatus.RUNNING) {
               if (!isUnset(segment)) {
-                segment = segment.clone();
-                segment.isBlockedBy = null;
+                // segment = segment.clone();
+                // segment.isBlockedBy = null;
 
                 if (item.status === ASRProcessStatus.NOQUOTA) {
                   this.alertService.showAlert('danger', this.langService.translate('asr.no quota')).catch((error) => {
@@ -302,6 +308,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                     length: item.time.sampleLength
                   }, 'automation');
                 } else if (item.status === ASRProcessStatus.NOAUTH) {
+                  console.log(`NO AUTH`);
                   this.uiService.addElementFromEvent(item.type.toLowerCase(), {
                     value: 'no_auth'
                   }, Date.now(), null, null, null, {
@@ -328,13 +335,13 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                       length: item.time.sampleLength
                     }, 'automation');
                     if (item.type === ASRQueueItemType.ASR) {
-                      segment.transcript = item.result.replace(/(<\/p>)/g, '');
+                      // segment.transcript = item.result.replace(/(<\/p>)/g, '');
 
                       const index = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
                         return a.time.samples === segment.time.samples;
                       });
                       if (index > -1) {
-                        this.transcrService.currentlevel.segments.change(index, segment);
+                        // this.transcrService.currentlevel.segments.change(index, segment);
                       }
                     } else if (item.type === ASRQueueItemType.ASRMAUS || item.type === ASRQueueItemType.MAUS) {
                       const converter = new PraatTextgridConverter();
@@ -371,7 +378,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                                 new OSegment(1, wordItem.sampleStart, wordItem.sampleDur, wordItem.labels),
                                 this.audioManager.sampleRate);
                               if (readSegment.transcript === '<p:>' || readSegment.transcript === '') {
-                                readSegment.transcript = this.transcrService.breakMarker.code;
+                                // readSegment.transcript = this.transcrService.breakMarker.code;
                               }
 
                               if (counter === wordsTier.items.length - 1) {
@@ -404,7 +411,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                     this.alertService.showAlert('danger', ErrorOccurredComponent, true, -1).catch((error) => {
                       console.error(error);
                     });
-                    segment.isBlockedBy = null;
+                    // segment.isBlockedBy = null;
                     this.transcrService.currentlevel.segments.change(segmentIndex, segment);
                   } else if (item.status === ASRProcessStatus.STOPPED) {
                     // TODO find a better solution!
@@ -725,6 +732,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                 this.viewer.selectSegment(segmentNumber);
 
                 if ($event.value === 'do_asr') {
+                  console.log(`IS BLOCKED BY SET TO SEGMENT ${segment.id}`);
                   this.asrService.addToQueue(selection, ASRQueueItemType.ASR);
                   segment.isBlockedBy = ASRQueueItemType.ASR;
                 } else if ($event.value === 'do_asr_maus') {

@@ -45,7 +45,6 @@ export class AppComponent implements OnDestroy, OnInit, AfterViewInit {
               private multiThreading: MultiThreadingService,
               private asrService: AsrService,
               private store: Store) {
-
     this.router.events.subscribe((event: any) => {
         if (event.hasOwnProperty('url')) {
           console.log(`route to page: ${event?.url}`);

@@ -1,6 +1,5 @@
 import {on} from '@ngrx/store';
 import {AnnotationState} from '../index';
-import {OIDBLevel} from '@octra/annotation';
 import {undoRedo} from 'ngrx-wieder';
 import {AnnotationActions} from './annotation.actions';
 import {IDBActions} from '../idb/idb.actions';
@@ -40,18 +39,18 @@ export const reducer = createUndoRedoReducer(
     ...state,
     ...annotation
   })),
-  on(AnnotationActions.changeAnnotationLevel, (state, {level, id}) => {
+  on(AnnotationActions.changeAnnotationLevel, (state: AnnotationState, {level, id}) => {
     const annotationLevels = state.levels;
     const index = annotationLevels.findIndex(a => a.id === id);
 
     if (index > -1 && index < annotationLevels.length) {
-      const levelObj = annotationLevels[index];
-
       return {
         ...state,
         levels: [
           ...state.levels.slice(0, index),
-          new OIDBLevel(levelObj.id, level, levelObj.sortorder),
+          {
+            ...level
+          },
           ...state.levels.slice(index + 1)
         ]
       };

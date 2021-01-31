@@ -1,6 +1,7 @@
 import {createAction, props} from '@ngrx/store';
 import {ConsoleEntry} from '../../shared/service/bug-report.service';
 import {OIDBLink} from '@octra/annotation';
+import {AnnotationStateLevel} from '../index';
 
 const context = 'IDB';
 
@@ -50,7 +51,7 @@ export class IDBActions {
   public static loadAnnotationLevelsSuccess = createAction(
     `[${context}] Load Annotation Levels Success`,
     props<{
-      levels: any;
+      levels: AnnotationStateLevel[];
       levelCounter: number;
     }>()
   );

@@ -1,9 +1,10 @@
 import {Injectable} from '@angular/core';
 import {ConsoleEntry} from './bug-report.service';
-import {OIDBLevel, OIDBLink} from '@octra/annotation';
+import {OIDBLink, OLevel} from '@octra/annotation';
 import {Subject} from 'rxjs';
 import {IIDBLevel, IIDBLink, IOption, OctraDatabase} from '../octra-database';
 import {isUnset} from '@octra/utilities';
+import {AnnotationStateLevel} from '../../store';
 
 
 @Injectable({
@@ -218,11 +219,15 @@ export class IDBService {
    * saves all annotation levels.
    * @param levels
    */
-  public saveAnnotationLevels(levels: OIDBLevel[]) {
-    return this.database.annotation_levels.bulkPut(levels.map(a => {
+  public saveAnnotationLevels(levels: AnnotationStateLevel[]) {
+    return this.database.annotation_levels.bulkPut(levels.map((a, i) => {
       return {
         id: a.id,
-        value: a
+        value: {
+          id: a.id,
+          level: new OLevel(a.name, a.type, a.items),
+          sortorder: i
+        }
       }
     }));
   }

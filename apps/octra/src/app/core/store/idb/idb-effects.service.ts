@@ -5,7 +5,14 @@ import {exhaustMap, mergeMap, withLatestFrom} from 'rxjs/operators';
 import {Subject} from 'rxjs';
 import {Action, Store} from '@ngrx/store';
 import {IDBService} from '../../shared/service/idb.service';
-import {LoginMode, OnlineSession, RootState} from '../index';
+import {
+  AnnotationStateLevel,
+  convertFromOIDLevel,
+  convertToOIDBLevel,
+  LoginMode,
+  OnlineSession,
+  RootState
+} from '../index';
 import {isUnset} from '@octra/utilities';
 import {OIDBLink} from '@octra/annotation';
 import {SessionStorageService} from 'ngx-webstorage';
@@ -210,22 +217,18 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
       this.idbService.loadAnnotationLevels().then((levels: IIDBLevel[]) => {
-        const annotationLevels = [];
+        const annotationLevels: AnnotationStateLevel[] = [];
         let max = 0;
         for (let i = 0; i < levels.length; i++) {
+          const annotationStateLevel = convertFromOIDLevel(levels[i]);
+
           if (!levels[i].hasOwnProperty('id')) {
-            annotationLevels.push(
-              {
-                id: i + 1,
-                level: levels[i].level,
-                sortorder: i
-              }
-            );
-            max = Math.max(i + 1, max);
-          } else {
-            annotationLevels.push(levels[i]);
-            max = Math.max(levels[i].id, max);
+            // TODO this could lead to an error!
+            annotationStateLevel.id = i + 1;
           }
+
+          annotationLevels.push(annotationStateLevel);
+          max = Math.max(annotationStateLevel.id, max)
         }
 
         subject.next(IDBActions.loadAnnotationLevelsSuccess({
@@ -357,16 +360,16 @@ export class IDBEffects {
               error
             }));
             subject.complete();
-            });
-          }).catch((error) => {
-            subject.next(IDBActions.overwriteAnnotationFailed({
-              error
-            }));
-            subject.complete();
           });
-        } else {
+        }).catch((error) => {
+          subject.next(IDBActions.overwriteAnnotationFailed({
+            error
+          }));
           subject.complete();
-        }
+        });
+      } else {
+        subject.complete();
+      }
         return subject;
       }
     )));
@@ -901,11 +904,7 @@ export class IDBEffects {
       const subject = new Subject<Action>();
 
       console.log(`save annotation level...`);
-      this.idbService.saveAnnotationLevel({
-        id: action.id,
-        level: action.level,
-        sortorder: action.sortorder
-      }, action.id).then(() => {
+      this.idbService.saveAnnotationLevel(convertToOIDBLevel(action.level, action.sortorder), action.id).then(() => {
         console.log(`saved annotation level success`);
         subject.next(IDBActions.saveAnnotationLevelSuccess());
         subject.complete();

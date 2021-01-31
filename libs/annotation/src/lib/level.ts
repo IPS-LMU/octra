@@ -1,4 +1,4 @@
-import {AnnotJSONType, ISegment, OEvent, OItem, OLevel} from './annotjson';
+import {AnnotationLevelType, ISegment, OEvent, OItem, OLevel} from './annotjson';
 import {Segments} from './segments';
 import {SampleUnit} from '@octra/media';
 import {OIDBLevel} from './db-objects';
@@ -9,7 +9,7 @@ export class Level {
   public segments: Segments;
   public items: OItem[];
   public events: OEvent[];
-  private readonly _type: AnnotJSONType;
+  private readonly _type: AnnotationLevelType;
   private readonly _id: number;
 
   private _name: string;
@@ -22,7 +22,7 @@ export class Level {
     this._name = value;
   }
 
-  get type(): AnnotJSONType {
+  get type(): AnnotationLevelType {
     return this._type;
   }
 
@@ -35,13 +35,13 @@ export class Level {
     this._id = id;
     switch (type) {
       case('EVENT'):
-        this._type = AnnotJSONType.EVENT;
+        this._type = AnnotationLevelType.EVENT;
         break;
       case('ITEM'):
-        this._type = AnnotJSONType.ITEM;
+        this._type = AnnotationLevelType.ITEM;
         break;
       case('SEGMENT'):
-        this._type = AnnotJSONType.SEGMENT;
+        this._type = AnnotationLevelType.SEGMENT;
         break;
     }
 
@@ -75,11 +75,11 @@ export class Level {
 
   public getObj(lastOriginalBoundary: SampleUnit): OLevel {
     let result: OLevel = null;
-    if (this._type === AnnotJSONType.SEGMENT) {
+    if (this._type === AnnotationLevelType.SEGMENT) {
       result = new OLevel(this._name, this.getTypeString(), this.segments.getObj(this._name, lastOriginalBoundary.samples));
-    } else if (this._type === AnnotJSONType.ITEM) {
+    } else if (this._type === AnnotationLevelType.ITEM) {
       result = new OLevel(this._name, this.getTypeString(), this.items);
-    } else if (this._type === AnnotJSONType.EVENT) {
+    } else if (this._type === AnnotationLevelType.EVENT) {
       result = new OLevel(this._name, this.getTypeString(), this.events);
     }
     this._type.toString();
@@ -87,14 +87,7 @@ export class Level {
   }
 
   public getTypeString() {
-    switch (this._type) {
-      case(AnnotJSONType.EVENT):
-        return 'EVENT';
-      case(AnnotJSONType.ITEM):
-        return 'ITEM';
-      case(AnnotJSONType.SEGMENT):
-        return 'SEGMENT';
-    }
+    return this._type;
   }
 
   public addSegment(time: SampleUnit, label = '', transcript: string = null, triggerChange = true) {

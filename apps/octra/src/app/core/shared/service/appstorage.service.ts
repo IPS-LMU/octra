@@ -7,7 +7,14 @@ import {SessionFile} from '../../obj/SessionFile';
 import {FileProgress} from '../../obj/objects';
 import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
 import {OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
-import {AnnotationState, LoginMode, OnlineSession, RootState} from '../../store';
+import {
+  AnnotationState,
+  AnnotationStateLevel,
+  convertFromOIDLevel,
+  LoginMode,
+  OnlineSession,
+  RootState
+} from '../../store';
 import {Store} from '@ngrx/store';
 import {AudioManager} from '@octra/media';
 import {Actions} from '@ngrx/effects';
@@ -156,7 +163,7 @@ export class AppStorageService {
     return this._snapshot.login.onlineSession?.sessionData?.serverComment;
   }
 
-  get annotationLevels(): OIDBLevel[] {
+  get annotationLevels(): AnnotationStateLevel[] {
     return this._snapshot.annotation.levels;
   }
 
@@ -444,7 +451,9 @@ export class AppStorageService {
 
         this.store.dispatch(AnnotationActions.overwriteAnnotation({
           annotation: {
-            levels,
+            levels: (levels.map((a) => {
+              return convertFromOIDLevel(a);
+            }) as AnnotationStateLevel[]),
             links,
             levelCounter: max
           },
@@ -661,7 +670,9 @@ export class AppStorageService {
     });
   }
 
-  public changeAnnotationLevel(tiernum: number, level: OLevel): Promise<void> {
+  public changeAnnotationLevel(tiernum: number, level: AnnotationStateLevel): Promise<void> {
+    console.log(`CHANGE ANNOTATION LEVEL`);
+    console.log(level);
     return new Promise<void>((resolve, reject) => {
       if (!isUnset(this.annotationLevels)) {
         if (!isUnset(level)) {

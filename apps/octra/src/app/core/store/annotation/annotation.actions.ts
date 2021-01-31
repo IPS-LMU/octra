@@ -1,6 +1,6 @@
 import {createAction, props} from '@ngrx/store';
-import {AnnotationState} from '../index';
-import {OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
+import {AnnotationState, AnnotationStateLevel} from '../index';
+import {OIDBLevel, OIDBLink} from '@octra/annotation';
 
 const context = 'Annotation';
 
@@ -35,7 +35,7 @@ export class AnnotationActions {
     `[${context}] Change Annotation Level`,
     props<{
       id: number;
-      level: OLevel;
+      level: AnnotationStateLevel;
       sortorder: number;
     }>()
   );

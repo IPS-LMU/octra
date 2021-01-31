@@ -357,5 +357,9 @@
       "add samplepoints": "Separate segments by sample points (e.g. 123456)",
       "timestamp notice": "If you check both options, both time formats will be inserted:"
     }
+  },
+  "maintenance": {
+    "banner": "From <b>{{start}}</b> until <b>{{end}}</b> (expected) a maintenance is going to run.<br/>In this time OCTRA is not available. Please make sure that you don't use OCTRA in this time.",
+    "in app": "From <b>{{start}}</b> until <b>{{end}}</b> (expected) a maintenance is going to run. <b>Please quit OCTRA 15 minutes before the maintenance begins.</b>"
   }
 }

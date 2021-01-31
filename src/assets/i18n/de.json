@@ -357,5 +357,9 @@
       "add samplepoints": "Trenne Segmente durch Zeitstempel im Sample-Format (z.B. 123456)",
       "timestamp notice": "Wenn Du beide Optionen aktivierst, werden beide Formate eingefügt:"
     }
+  },
+  "maintenance": {
+    "banner": "Von <b>{{start}} Uhr</b> bis vorraussichtlich <b>{{end}} Uhr</b> wird eine Wartung durchgeführt.<br/>In dieser Zeit ist OCTRA nicht erreichbar. Stelle bitte sicher, dass Du während dieser Zeit OCTRA nicht verwendest.",
+    "in app": "Von <b>{{start}} Uhr</b> bis vorraussichtlich <b>{{end}} Uhr</b> wird eine Wartung durchgeführt. <b>Bitte beende OCTRA 15 Minuten vorher</b>."
   }
 }

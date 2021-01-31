@@ -25,7 +25,14 @@ import {routing} from './app.routes';
 
 import {APIService, AppStorageService, AudioService, KeymappingService, SettingsService} from './core/shared/service';
 
-import {ALoginGuard, DeALoginGuard, LogoutGuard, MembersAreaGuard, SettingsGuard, TranscrEndGuard} from './core/shared/guard';
+import {
+  ALoginGuard,
+  DeALoginGuard,
+  LogoutGuard,
+  MembersAreaGuard,
+  SettingsGuard,
+  TranscrEndGuard
+} from './core/shared/guard';
 
 import {AppComponent} from './app.component';
 
@@ -123,7 +130,14 @@ import {StresstestComponent} from './core/tools/stresstest/stresstest.component'
 import {TranscriptionDemoEndModalComponent} from './core/modals/transcription-demo-end/transcription-demo-end-modal.component';
 import {AsrOptionsComponent} from './core/gui/asr-options/asr-options.component';
 import {environment} from '../environments/environment';
-import {Translation, TRANSLOCO_CONFIG, TRANSLOCO_LOADER, translocoConfig, TranslocoLoader, TranslocoModule} from '@ngneat/transloco';
+import {
+  Translation,
+  TRANSLOCO_CONFIG,
+  TRANSLOCO_LOADER,
+  translocoConfig,
+  TranslocoLoader,
+  TranslocoModule
+} from '@ngneat/transloco';
 import {DragulaModule} from 'ng2-dragula';
 import {TableConfiguratorComponent} from './core/component/table-configurator/table-configurator.component';
 import {ClipTextPipe} from './core/shared/clip-text.pipe';
@@ -136,6 +150,7 @@ import {AuthenticationNeededComponent} from './core/alerts/authentication-needed
 import {DynComponentDirective} from './core/shared/directive/dyn-component.directive';
 import {ErrorOccurredComponent} from './core/alerts/error-occurred/error-occurred.component';
 import {MissingPermissionsModalComponent} from './core/modals/missing-permissions/missing-permissions.component';
+import {MaintenanceModule} from './core/component/maintenance/maintenance.module';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -244,7 +259,8 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     PopoverModule.forRoot(),
     TranslocoModule,
     DragulaModule.forRoot(),
-    TooltipModule.forRoot()
+    TooltipModule.forRoot(),
+    MaintenanceModule
   ],
   bootstrap: [
     AppComponent

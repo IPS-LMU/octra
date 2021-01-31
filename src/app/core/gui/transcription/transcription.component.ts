@@ -297,6 +297,10 @@ export class TranscriptionComponent implements OnInit,
   }
 
   ngOnInit() {
+    this.subscrmanager.add(this.transcrService.alertTriggered.subscribe((alertConfig) => {
+      this.alertService.showAlert(alertConfig.type, alertConfig.data, alertConfig.unique, alertConfig.duration);
+    }));
+
     console.log(`init transcription component`);
     this.navbarServ.interfaces = this.projectsettings.interfaces;
 

@@ -1,4 +1,13 @@
-import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import {Router} from '@angular/router';
 import {NgForm} from '@angular/forms';
 import {LoginService} from './login.service';
@@ -41,7 +50,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               public appStorage: AppStorageService,
               private api: APIService,
               private cd: ChangeDetectorRef,
-              private settingsService: SettingsService,
+              public settingsService: SettingsService,
               public modService: ModalService,
               private langService: TranslocoService,
               private audioService: AudioService) {

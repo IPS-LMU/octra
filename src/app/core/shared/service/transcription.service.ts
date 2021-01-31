@@ -17,6 +17,10 @@ import {AppStorageService, OIDBLevel} from './appstorage.service';
 import {UserInteractionsService} from './userInteractions.service';
 import {SettingsService} from './settings.service';
 import {AppInfo} from '../../../app.info';
+import {MaintenanceAPI} from '../../component/maintenance/maintenance-api';
+import * as moment from 'moment';
+import {interval, Subject, Subscription, timer} from 'rxjs';
+import {TranslocoService} from '@ngneat/transloco';
 
 declare var validateAnnotation: ((string, any) => any);
 
@@ -97,13 +101,21 @@ export class TranscriptionService {
   }
 
   public tasksBeforeSend: Promise<any>[] = [];
+  public alertTriggered: Subject<{
+    type: 'danger' | 'warning' | 'info' | 'success', data: string | any, unique: boolean, duration?: number
+  }>;
+
+  private maintenanceChecker: Subscription;
 
   constructor(private audio: AudioService,
               private appStorage: AppStorageService,
               private uiService: UserInteractionsService,
               private navbarServ: NavbarService,
               private settingsService: SettingsService,
+              private langService: TranslocoService,
               private http: HttpClient) {
+    this.alertTriggered = new Subject<{ type: 'danger' | 'warning' | 'info' | 'success', data: string | any, unique: boolean, duration?: number }>();
+
     this.subscrmanager = new SubscriptionManager();
 
     this.subscrmanager.add(
@@ -112,6 +124,51 @@ export class TranscriptionService {
           this.appStorage.saveLogItem(elem.getDataClone());
         }
       }));
+
+    if (!isNullOrUndefined(this.settingsService.appSettings) &&
+      this.settingsService.appSettings.octra.hasOwnProperty('maintenanceNotification') &&
+      this.settingsService.appSettings.octra.maintenanceNotification.active === 'active') {
+      const maintenanceAPI = new MaintenanceAPI(this.settingsService.appSettings.octra.maintenanceNotification.apiURL, this.http);
+
+      maintenanceAPI.readMaintenanceNotifications(24).then((notification) => {
+        // only check in interval if there is a pending maintenance in the next 24 hours
+        if (!isNullOrUndefined(notification)) {
+          const readNotification = () => {
+            // notify after 15 minutes one hour before the maintenance begins
+            maintenanceAPI.readMaintenanceNotifications(1).then((notification2) => {
+              console.log(`check for maintenance notification...`);
+              if (!isNullOrUndefined(notification2)) {
+                moment.locale(this.appStorage.language);
+                this.alertTriggered.next({
+                  type: 'warning',
+                  data: '⚠️ ' + this.langService.translate('maintenance.in app', {
+                    start: moment(notification.begin).format('L LT'),
+                    end: moment(notification.end).format('L LT')
+                  }),
+                  unique: true,
+                  duration: 60
+                });
+              } else {
+                this.subscrmanager.removeByTag('maintenance');
+              }
+            }).catch(() => {
+              // ignore
+            });
+          }
+          this.subscrmanager.add(timer(5000).subscribe(() => {
+            readNotification();
+          }));
+
+          if (!isNullOrUndefined(this.maintenanceChecker)) {
+            this.maintenanceChecker.unsubscribe();
+          }
+          // run each 15 minutes
+          this.maintenanceChecker = interval(15 * 60000).subscribe(readNotification);
+        }
+      }).catch(() => {
+        // ignore
+      });
+    }
   }
 
   get validationArray(): { segment: number; validation: any[] }[] {

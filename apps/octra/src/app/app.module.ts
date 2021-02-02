@@ -112,6 +112,7 @@ import {fab} from '@fortawesome/free-brands-svg-icons';
 import {ShortcutComponent} from './core/shortcut/shortcut.component';
 import {ContextMenuComponent} from './core/component/context-menu/context-menu.component';
 import {PermutationsReplaceModalComponent} from './editors/trn-editor/modals/permutations-replace-modal/permutations-replace-modal.component';
+import {MaintenanceModule} from './core/component/maintenance/maintenance.module';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -235,7 +236,8 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     StoreDevtoolsModule.instrument({maxAge: 25, logOnly: environment.production}),
     EffectsModule.forRoot([ConfigurationEffects, IDBEffects]),
     !environment.production ? StoreDevtoolsModule.instrument() : [],
-    EffectsModule.forFeature([])
+    EffectsModule.forFeature([]),
+    MaintenanceModule
   ],
   bootstrap: [AppComponent],
   providers: [

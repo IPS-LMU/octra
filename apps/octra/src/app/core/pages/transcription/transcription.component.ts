@@ -358,6 +358,10 @@ export class TranscriptionComponent implements OnInit,
   }
 
   ngOnInit() {
+    this.subscrmanager.add(this.transcrService.alertTriggered.subscribe((alertConfig) => {
+      this.alertService.showAlert(alertConfig.type, alertConfig.data, alertConfig.unique, alertConfig.duration);
+    }));
+
     console.log(`init transcription component`);
     this.navbarServ.interfaces = this.projectsettings.interfaces;
 
@@ -393,7 +397,7 @@ export class TranscriptionComponent implements OnInit,
     this.bugService.init(this.transcrService);
 
     if (this.appStorage.useMode === LoginMode.ONLINE) {
-      console.log(`opened job ${this.appStorage.dataID} in project ${this.appStorage.onlineSession?.loginData?.project}`);
+      // console.log(`opened job ${this.appStorage.dataID} in project ${this.appStorage.onlineSession?.loginData?.project}`);
     }
 
     this.asrService.init();

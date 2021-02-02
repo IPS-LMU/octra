@@ -49,6 +49,10 @@ export interface AppSettings {
     }[],
     'inactivityNotice': {
       'showAfter': number;
+    },
+    'maintenanceNotification': {
+      active: string;
+      apiURL: string;
     }
   };
 }

@@ -1,0 +1,11 @@
+<div class="alert alert-warning">
+  <div>
+    <fa-icon [icon]="['fas', 'exclamation-triangle']" size="2x"></fa-icon>
+    <p [innerHTML]="'maintenance.banner' | transloco:
+    {
+      start: parsedNotification?.begin,
+      end: parsedNotification?.end
+    }">
+    </p>
+  </div>
+</div>

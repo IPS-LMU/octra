@@ -1,6 +1,12 @@
 <div class="section" id="login">
-  <div class="ro">
+  <div class="row">
     <div class="col-12" style="text-align: center;">
+      <maint-banner
+        *ngIf="settingsService.appSettings.octra.maintenanceNotification !== undefined &&
+        settingsService.appSettings.octra.maintenanceNotification.active === 'active'"
+        [serverURL]="settingsService.appSettings.octra.maintenanceNotification.apiURL"
+        [language]="appStorage.language"></maint-banner>
+
       <p style="padding-top:10px;margin-bottom:10px;">
         <a (click)="startDemo()" fragment="" routerLink>{{"login.demo"| transloco}}</a>
       </p>

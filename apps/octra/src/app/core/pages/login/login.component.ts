@@ -72,7 +72,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               public appStorage: AppStorageService,
               private api: APIService,
               private cd: ChangeDetectorRef,
-              private settingsService: SettingsService,
+              public settingsService: SettingsService,
               public modService: ModalService,
               private langService: TranslocoService,
               private audioService: AudioService,

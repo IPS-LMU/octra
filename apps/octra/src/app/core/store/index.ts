@@ -14,6 +14,7 @@ import {
 import {ConsoleEntry} from '../shared/service/bug-report.service';
 import {AppSettings, ProjectSettings} from '../obj/Settings';
 import {SampleUnit} from '@octra/media';
+import {isUnset} from '@octra/utilities';
 
 export enum LoginMode {
   URL = 'url',
@@ -153,18 +154,28 @@ export function convertToLevelObject(stateLevel: AnnotationStateLevel, sampleRat
 
   // change further attributes
   for (const item of stateLevel.items) {
-    console.log(`passiert heir wass????`);
     if (stateLevel.type === AnnotationLevelType.SEGMENT) {
       const segment = item as AnnotationStateSegment;
-      level.segments.getByID(segment.id).isBlockedBy = ASRQueueItemType.ASR;
+      const annoSegment = level.segments.getByID(segment.id)
+
+      if (!isUnset(annoSegment)) {
+        annoSegment.isBlockedBy = segment.isBlockedBy;
+      } else {
+        console.error(`annoSegment with id ${segment.id} is undefined!`);
+        console.log(level);
+        console.log(stateLevel.items);
+      }
     }
   }
+
+  console.log(`convertToLevelObject:`);
+  console.log(level);
 
   return level;
 }
 
 export function convertToOIDBLevel(stateLevel: AnnotationStateLevel, sortorder: number): OIDBLevel {
-  return {
+  const result = {
     id: stateLevel.id,
     sortorder,
     level: new OLevel(stateLevel.name, stateLevel.type, stateLevel.items.map((a) => {
@@ -176,12 +187,16 @@ export function convertToOIDBLevel(stateLevel: AnnotationStateLevel, sortorder: 
       }
     }))
   };
+  console.log(`convertToOIDBLevel:`);
+  console.log(result);
+
+  return result;
 }
 
 export function convertFromLevelObject(level: Level, lastOriginalBoundary: SampleUnit): AnnotationStateLevel {
   const oLevel = level.getObj(lastOriginalBoundary);
 
-  return {
+  const result = {
     id: level.id,
     name: level.name,
     type: level.type,
@@ -196,13 +211,22 @@ export function convertFromLevelObject(level: Level, lastOriginalBoundary: Sampl
       }
     })
   }
+
+  console.log(`convertFromLevelObject:`);
+  console.log(result);
+  return result;
 }
 
 export function convertFromOIDLevel(oidbLevel: OIDBLevel): AnnotationStateLevel {
-  return {
+  const result = {
     id: oidbLevel.id,
     name: oidbLevel.level.name,
     type: oidbLevel.level.type,
     items: oidbLevel.level.items
-  }
+  };
+
+  console.log(`convertFromOIDLevel:`);
+  console.log(result);
+
+  return result;
 }

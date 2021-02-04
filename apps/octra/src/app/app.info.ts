@@ -2,11 +2,17 @@ import {NavigationExtras} from '@angular/router';
 import {EmailBugReporter} from './core/obj/BugAPI/EmailBugReporter';
 import {OggFormat, WavFormat} from '@octra/media';
 import {
-  AnnotJSONConverter, BundleJSONConverter,
+  AnnotJSONConverter,
+  BundleJSONConverter,
   Converter,
-  CTMConverter, ELANConverter, PartiturConverter,
+  CTMConverter,
+  ELANConverter,
+  PartiturConverter,
   PraatTableConverter,
-  PraatTextgridConverter, SRTConverter, TextConverter, WebVTTConverter
+  PraatTextgridConverter,
+  SRTConverter,
+  TextConverter,
+  WebVTTConverter
 } from '@octra/annotation';
 
 declare var octraVersion: string;
@@ -44,7 +50,7 @@ export class AppInfo {
   static readonly lastUpdate = octraLastUpdated;
   static readonly manualURL = 'https://clarin.phonetik.uni-muenchen.de/apps/octra/manual/1.4.0/en/';
 
-  static readonly debugging = true;
+  static readonly debugging = false;
 
   static readonly maxAudioFileSize = 3000;
 

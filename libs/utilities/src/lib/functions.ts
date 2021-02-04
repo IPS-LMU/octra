@@ -41,6 +41,10 @@ export function selectAllTextOfNode(el: any) {
   sel.addRange(range);
 }
 
+export function checkArray(array: any[]) {
+  return array.findIndex(a => isUnset(a)) < 0;
+}
+
 export class Functions {
   public static scrollTo(y: number, target?: string) {
     setTimeout(() => {

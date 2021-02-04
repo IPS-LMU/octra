@@ -33,7 +33,7 @@ import {
   TextConverter
 } from '@octra/annotation';
 import {AudioManager} from '@octra/media';
-import {AnnotationStateLevel, convertFromLevelObject, LoginMode} from '../../store';
+import {AnnotationStateLevel, convertFromLevelObject, convertToLevelObject, LoginMode} from '../../store';
 
 declare var validateAnnotation: ((string, any) => any);
 
@@ -488,22 +488,27 @@ export class TranscriptionService {
 
   private updateAnnotation(levels: AnnotationStateLevel[], links: OIDBLink[]) {
     // load levels
+    // TODO CHECK HERE!!!!
     console.log(`UPDATE ANNOTATION`);
     console.log(levels);
     this._annotation = new Annotation(this._annotation.annotates, this._annotation.audiofile, []);
 
-    let i = 0;
-    for (const oidbLevel of levels) {
-      const level: Level = Level.fromObj(new OIDBLevel(oidbLevel.id,
-        new OLevel(oidbLevel.name, oidbLevel.type, oidbLevel.items), i),
-        this._audiomanager.ressource.info.sampleRate, this._audiomanager.ressource.info.duration.clone());
+    console.log(`check.... ${levels.length}`);
+    for (const annotationStateLevel of levels) {
+      console.log(`in loop!`);
+      const level = convertToLevelObject(annotationStateLevel,
+        this.audioManager.sampleRate, this.audioManager.ressource.info.duration.clone());
+      console.log(`CHECK LEVEL`);
+      console.log(level);
       this._annotation.levels.push(level);
-      i++;
     }
 
     for (const annotationLink of links) {
       this._annotation.links.push(annotationLink.link);
     }
+
+    console.log(`NEW ANNOTATION IS:`);
+    console.log(this._annotation);
 
     this.subscrmanager.removeByTag('segmentchange');
     this.subscrmanager.add(this.currentlevel.segments.onsegmentchange.subscribe((event) => {

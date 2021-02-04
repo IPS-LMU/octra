@@ -290,19 +290,19 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
   }
 
   public get numberOfSegments(): number {
-    return (this.transcrService.currentlevel.segments) ? this.transcrService.currentlevel.segments.length : 0;
+    return (!isUnset(this.transcrService.currentlevel) && this.transcrService.currentlevel.segments) ? this.transcrService.currentlevel.segments.length : 0;
   }
 
   public get transcrSegments(): number {
-    return (this.transcrService.currentlevel.segments) ? this.transcrService.statistic.transcribed : 0;
+    return (!isUnset(this.transcrService.currentlevel) && this.transcrService.currentlevel.segments) ? this.transcrService.statistic.transcribed : 0;
   }
 
   public get pauseSegments(): number {
-    return (this.transcrService.currentlevel.segments) ? this.transcrService.statistic.pause : 0;
+    return (!isUnset(this.transcrService.currentlevel) && this.transcrService.currentlevel.segments) ? this.transcrService.statistic.pause : 0;
   }
 
   public get emptySegments(): number {
-    return (this.transcrService.currentlevel.segments) ? this.transcrService.statistic.empty : 0;
+    return (!isUnset(this.transcrService.currentlevel) && this.transcrService.currentlevel.segments) ? this.transcrService.statistic.empty : 0;
   }
 
   public get foundErrors(): number {

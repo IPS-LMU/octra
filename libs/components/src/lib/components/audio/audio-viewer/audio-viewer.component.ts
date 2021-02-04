@@ -214,7 +214,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     }
     if (changes.hasOwnProperty('transcriptionLevel') && changes.transcriptionLevel.currentValue !== null) {
       console.log(`level updated by directive`);
-      console.trace();
       this.afterLevelUpdated();
     }
 

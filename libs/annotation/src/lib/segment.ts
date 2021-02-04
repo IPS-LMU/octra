@@ -23,11 +23,17 @@ export class Segment {
   private static counter = 1;
   private readonly _id: number;
 
-  constructor(time: SampleUnit, speakerLabel: string, transcript = '') {
+  constructor(time: SampleUnit, speakerLabel: string, transcript = '', id: number = null) {
     this._time = time;
     this._speakerLabel = speakerLabel;
     this._transcript = transcript;
-    this._id = Segment.counter++;
+
+    if (id === null || id === undefined && id > 0) {
+      this._id = Segment.counter++;
+    } else {
+      this._id = id;
+      Segment.counter = Math.max(id + 1, Segment.counter);
+    }
   }
 
   private _speakerLabel = 'NOLABEL';
@@ -101,7 +107,9 @@ export class Segment {
       const transcriptLabel = oSegment.labels.find(a => a.name === levelName);
       const transcript = !isUnset(transcriptLabel) ? transcriptLabel.value : '';
 
-      return new Segment(new SampleUnit(oSegment.sampleStart + oSegment.sampleDur, sampleRate), speakerLabel, transcript);
+      return new Segment(
+        new SampleUnit(oSegment.sampleStart + oSegment.sampleDur, sampleRate),
+        speakerLabel, transcript, oSegment.id);
     }
 
     return null;

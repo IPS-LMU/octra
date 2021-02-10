@@ -45,16 +45,18 @@ export class PraatTableConverter extends Converter {
       }
 
       filename = annotation.name + this._extension;
+
+      return {
+        file: {
+          name: filename,
+          content: result,
+          encoding: 'UTF-8',
+          type: 'text/plain'
+        }
+      };
     }
 
-    return {
-      file: {
-        name: filename,
-        content: result,
-        encoding: 'UTF-8',
-        type: 'text/plain'
-      }
-    };
+    return null;
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {

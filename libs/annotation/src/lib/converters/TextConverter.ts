@@ -23,62 +23,66 @@ export class TextConverter extends Converter {
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
-    let result = '';
-    let filename = '';
+    if (!(annotation === null || annotation === undefined)) {
 
-    if (!(levelnum === null || levelnum === undefined) && levelnum < annotation.levels.length) {
-      const level: OLevel = annotation.levels[levelnum];
+      let result = '';
+      let filename = '';
 
-      if (level.type === 'SEGMENT') {
-        for (let j = 0; j < level.items.length; j++) {
-          const transcript = level.items[j].labels[0].value;
+      if (!(levelnum === null || levelnum === undefined) && levelnum < annotation.levels.length) {
+        const level: OLevel = annotation.levels[levelnum];
 
-          result += transcript;
-          if (j < level.items.length - 1) {
-            const sampleEnd = level.items[j].sampleStart + level.items[j].sampleDur;
-            const unixTimestamp = Math.ceil(sampleEnd * 1000 / audiofile.sampleRate);
+        if (level.type === 'SEGMENT') {
+          for (let j = 0; j < level.items.length; j++) {
+            const transcript = level.items[j].labels[0].value;
 
-            if (this.options && (this.options.showTimestampString || this.options.showTimestampSamples)) {
-              result += ` <`;
-              if (this.options.showTimestampString) {
-                const endTime = new TimespanPipe().transform(unixTimestamp, {
-                  showHour: true,
-                  showMilliSeconds: true
-                });
-                result += `ts="${endTime}"`;
+            result += transcript;
+            if (j < level.items.length - 1) {
+              const sampleEnd = level.items[j].sampleStart + level.items[j].sampleDur;
+              const unixTimestamp = Math.ceil(sampleEnd * 1000 / audiofile.sampleRate);
+
+              if (this.options && (this.options.showTimestampString || this.options.showTimestampSamples)) {
+                result += ` <`;
+                if (this.options.showTimestampString) {
+                  const endTime = new TimespanPipe().transform(unixTimestamp, {
+                    showHour: true,
+                    showMilliSeconds: true
+                  });
+                  result += `ts="${endTime}"`;
+                }
+                if (this.options.showTimestampSamples) {
+                  result += (this.options.showTimestampString) ? ' ' : '';
+                  result += `sp="${sampleEnd}"`;
+                }
+                result += `/> `
+              } else {
+                result += ' ';
               }
-              if (this.options.showTimestampSamples) {
-                result += (this.options.showTimestampString) ? ' ' : '';
-                result += `sp="${sampleEnd}"`;
-              }
-              result += `/> `
-            } else {
-              result += ' ';
             }
           }
+          result += '';
         }
-        result += '';
+
+        filename = `${annotation.name}`;
+        if (annotation.levels.length > 1) {
+          filename += `-${level.name}`;
+        }
+        filename += `${this._extension}`;
+      } else {
+        console.error('TextConverter needs a level number');
+        return null;
       }
 
-      filename = `${annotation.name}`;
-      if (annotation.levels.length > 1) {
-        filename += `-${level.name}`;
-      }
-      filename += `${this._extension}`;
-    } else {
-      console.error('TextConverter needs a level number');
-      return null;
+      result = result.replace(/\s+/g, ' ');
+      return {
+        file: {
+          name: filename,
+          content: result,
+          encoding: 'UTF-8',
+          type: 'text/plain'
+        }
+      };
     }
-
-    result = result.replace(/\s+/g, ' ');
-    return {
-      file: {
-        name: filename,
-        content: result,
-        encoding: 'UTF-8',
-        type: 'text/plain'
-      }
-    };
+    return null;
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {

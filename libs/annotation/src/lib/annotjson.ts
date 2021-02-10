@@ -78,7 +78,7 @@ export class OAnnotJSON implements IAnnotJSON {
     }
   }
 }
-
+// TODO add extension and use name without it
 export class OAudiofile implements IAudioFile {
   name: string;
   // need type attribute

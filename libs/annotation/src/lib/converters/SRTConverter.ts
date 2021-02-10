@@ -42,49 +42,54 @@ export class SRTConverter extends Converter {
     } else {
       console.error(`invalid sample rate`);
     }
+    return -1;
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
-    let result = '';
-    let filename = '';
+    if (!(annotation === null || annotation === undefined)) {
+      let result = '';
+      let filename = '';
 
-    if (!(levelnum === null || levelnum === undefined) && levelnum < annotation.levels.length) {
-      const level: OLevel = annotation.levels[levelnum];
+      if (!(levelnum === null || levelnum === undefined) && levelnum < annotation.levels.length) {
+        const level: OLevel = annotation.levels[levelnum];
 
-      let counter = 1;
-      if (level.type === 'SEGMENT') {
-        for (const item of level.items) {
-          const transcript = item.labels[0].value;
-          const start = this.getTimeStringFromSamples(item.sampleStart, annotation.sampleRate);
-          const end = this.getTimeStringFromSamples(item.sampleStart + item.sampleDur, annotation.sampleRate);
+        let counter = 1;
+        if (level.type === 'SEGMENT') {
+          for (const item of level.items) {
+            const transcript = item.labels[0].value;
+            const start = this.getTimeStringFromSamples(item.sampleStart, annotation.sampleRate);
+            const end = this.getTimeStringFromSamples(item.sampleStart + item.sampleDur, annotation.sampleRate);
 
-          if (transcript !== '') {
-            result += `${counter}\n`;
-            result += `${start} --> ${end}\n`;
-            result += `${transcript}\n\n`;
-            counter++;
+            if (transcript !== '') {
+              result += `${counter}\n`;
+              result += `${start} --> ${end}\n`;
+              result += `${transcript}\n\n`;
+              counter++;
+            }
           }
         }
+
+        filename = `${annotation.name}`;
+        if (annotation.levels.length > 1) {
+          filename += `-${level.name}`;
+        }
+        filename += `${this._extension}`;
+      } else {
+        console.error('SRTConverter needs a level number');
+        return null;
       }
 
-      filename = `${annotation.name}`;
-      if (annotation.levels.length > 1) {
-        filename += `-${level.name}`;
-      }
-      filename += `${this._extension}`;
-    } else {
-      console.error('SRTConverter needs a level number');
-      return null;
+      return {
+        file: {
+          name: filename,
+          content: result,
+          encoding: 'UTF-8',
+          type: 'text/plain'
+        }
+      };
     }
-
-    return {
-      file: {
-        name: filename,
-        content: result,
-        encoding: 'UTF-8',
-        type: 'text/plain'
-      }
-    };
+    console.error(`annotation file is null`);
+    return null;
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
@@ -107,17 +112,18 @@ export class SRTConverter extends Converter {
           const timeEnd = SRTConverter.getSamplesFromTimeString(matches[3], audiofile.sampleRate);
           const segmentContent = matches[4].replace(/(\n|\s)+$/g, '');
 
-          if (timeStart > lastEnd) {
-            // add additional segment
+          if (timeStart > -1 && timeEnd > -1) {
+            if (timeStart > lastEnd) {
+              // add additional segment
+              olevel.items.push(new OSegment(
+                counterID++, lastEnd, timeStart - lastEnd, [new OLabel('OCTRA_1', '')]
+              ));
+            }
+
             olevel.items.push(new OSegment(
-              counterID++, lastEnd, timeStart - lastEnd, [new OLabel('OCTRA_1', '')]
+              counterID++, timeStart, timeEnd - timeStart, [new OLabel('OCTRA_1', segmentContent)]
             ));
           }
-
-          olevel.items.push(new OSegment(
-            counterID++, timeStart, timeEnd - timeStart, [new OLabel('OCTRA_1', segmentContent)]
-          ));
-
           matches = regex.exec(content);
           lastEnd = timeEnd;
         }

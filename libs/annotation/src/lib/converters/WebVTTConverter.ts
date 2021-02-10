@@ -18,46 +18,49 @@ export class WebVTTConverter extends Converter {
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
-    let result = 'WEBVTT\n\n';
-    let filename = '';
+    if (!(annotation === undefined || annotation === null)) {
+      let result = 'WEBVTT\n\n';
+      let filename = '';
 
-    if (!(levelnum === null || levelnum === undefined) && levelnum < annotation.levels.length) {
-      const level: OLevel = annotation.levels[levelnum];
+      if (!(levelnum === null || levelnum === undefined) && levelnum < annotation.levels.length) {
+        const level: OLevel = annotation.levels[levelnum];
 
-      let counter = 1;
-      if (level.type === 'SEGMENT') {
-        for (let j = 0; j < level.items.length; j++) {
-          const transcript = level.items[j].labels[0].value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          const start = this.getTimeStringFromSamples(level.items[j].sampleStart, annotation.sampleRate);
-          const end = this.getTimeStringFromSamples(level.items[j].sampleStart + level.items[j].sampleDur, annotation.sampleRate);
+        let counter = 1;
+        if (level.type === 'SEGMENT') {
+          for (let j = 0; j < level.items.length; j++) {
+            const transcript = level.items[j].labels[0].value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            const start = this.getTimeStringFromSamples(level.items[j].sampleStart, annotation.sampleRate);
+            const end = this.getTimeStringFromSamples(level.items[j].sampleStart + level.items[j].sampleDur, annotation.sampleRate);
 
-          if (transcript !== '') {
-            result += `${counter}\n`;
-            result += `${start} --> ${end}\n`;
-            result += `${transcript}\n\n`;
-            counter++;
+            if (transcript !== '') {
+              result += `${counter}\n`;
+              result += `${start} --> ${end}\n`;
+              result += `${transcript}\n\n`;
+              counter++;
+            }
           }
         }
+
+        filename = `${annotation.name}`;
+        if (annotation.levels.length > 1) {
+          filename += `-${level.name}`;
+        }
+        filename += `${this._extension}`;
+      } else {
+        console.error('SRTConverter needs a level number');
+        return null;
       }
 
-      filename = `${annotation.name}`;
-      if (annotation.levels.length > 1) {
-        filename += `-${level.name}`;
-      }
-      filename += `${this._extension}`;
-    } else {
-      console.error('SRTConverter needs a level number');
-      return null;
+      return {
+        file: {
+          name: filename,
+          content: result,
+          encoding: 'UTF-8',
+          type: 'text/plain'
+        }
+      };
     }
-
-    return {
-      file: {
-        name: filename,
-        content: result,
-        encoding: 'UTF-8',
-        type: 'text/plain'
-      }
-    };
+    return null;
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {

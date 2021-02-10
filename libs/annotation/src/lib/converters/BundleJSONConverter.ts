@@ -47,16 +47,18 @@ export class BundleJSONConverter extends Converter {
       };
       result = JSON.stringify(bundle, null, 2);
       filename = annotation.name + this._extension;
+
+      return {
+        file: {
+          name: filename,
+          content: result,
+          encoding: 'UTF-8',
+          type: 'application/json'
+        }
+      };
     }
 
-    return {
-      file: {
-        name: filename,
-        content: result,
-        encoding: 'UTF-8',
-        type: 'application/json'
-      }
-    };
+    return null;
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {

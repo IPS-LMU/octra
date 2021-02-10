@@ -79,6 +79,7 @@ export class PraatTextgridConverter extends Converter {
         }
       };
     }
+    return null;
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
@@ -281,7 +282,7 @@ export class PraatTextgridConverter extends Converter {
         return {
           annotjson: null,
           audiofile: null,
-          error: `names do not match.`
+          error: `names of audio file and TextGrid file do not match.`
         };
       }
     } else {

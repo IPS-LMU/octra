@@ -47,7 +47,7 @@ export class MaintenanceBannerComponent implements OnInit, OnChanges {
 
   private parseNotification() {
     if (this.notification) {
-      moment.locale(this.language);
+      moment.locale((this.language !== null && this.language !== undefined) ? this.language : 'en');
       const notification = {
         ...this.notification
       };

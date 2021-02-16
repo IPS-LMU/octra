@@ -419,7 +419,9 @@ export class TranscriptionService {
                       const promises: Promise<any>[] = [];
                       for (let i = 0; i < converted.levels.length; i++) {
                         if (i >= this.appStorage.annotationLevels.length) {
-                          promises.push(this.appStorage.addAnnotationLevel(converted.levels[i]));
+                          promises.push(this.appStorage.addAnnotationLevel(
+                            new OIDBLevel(-1, converted.levels[i], i)
+                          ));
                         } else {
                           promises.push(this.appStorage.changeAnnotationLevel(i, {
                             id: null,

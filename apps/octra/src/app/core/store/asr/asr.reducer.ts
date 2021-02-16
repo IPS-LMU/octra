@@ -8,11 +8,11 @@ export const initialState: ASRState = {};
 
 export const reducer = createReducer(
   initialState,
-  on(ASRActions.setASRSettings, (state, data) => ({
+  on(ASRActions.setASRSettings, (state: ASRState, data) => ({
     ...state,
     ...data
   })),
-  on(IDBActions.loadOptionsSuccess, (state, {variables}) => {
+  on(IDBActions.loadOptionsSuccess, (state: ASRState, {variables}) => {
       let result = state;
 
       for (const variable of variables) {

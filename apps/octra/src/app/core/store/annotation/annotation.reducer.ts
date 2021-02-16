@@ -21,21 +21,21 @@ const {createUndoRedoReducer} = undoRedo({
 
 export const reducer = createUndoRedoReducer(
   initialState,
-  on(AnnotationActions.setLevelCounter, (state, {levelCounter}) =>
+  on(AnnotationActions.setLevelCounter, (state: AnnotationState, {levelCounter}) =>
     ({
       ...state,
       levelCounter: levelCounter
     })),
-  on(AnnotationActions.setAnnotation, (state, {annotation}) => ({
+  on(AnnotationActions.setAnnotation, (state: AnnotationState, {annotation}) => ({
     ...state,
     annotation
   })),
-  on(AnnotationActions.clearAnnotation, (state) => ({
+  on(AnnotationActions.clearAnnotation, () => ({
     levels: [],
     links: [],
     levelCounter: 0
   })),
-  on(AnnotationActions.overwriteAnnotation, (state, {annotation}) => ({
+  on(AnnotationActions.overwriteAnnotation, (state: AnnotationState, {annotation}) => ({
     ...state,
     ...annotation
   })),
@@ -60,7 +60,7 @@ export const reducer = createUndoRedoReducer(
 
     return state;
   }),
-  on(AnnotationActions.addAnnotationLevel, (state, level) =>
+  on(AnnotationActions.addAnnotationLevel, (state: AnnotationState, {level}) =>
     ({
       ...state,
       levels: [
@@ -68,7 +68,7 @@ export const reducer = createUndoRedoReducer(
         level
       ]
     })),
-  on(AnnotationActions.removeAnnotationLevel, (state, {id}) => {
+  on(AnnotationActions.removeAnnotationLevel, (state: AnnotationState, {id}) => {
     if (id > -1) {
       const index = state.levels.findIndex((a) => (a.id === id));
       if (index > -1) {
@@ -88,13 +88,13 @@ export const reducer = createUndoRedoReducer(
 
     return state;
   }),
-  on(IDBActions.loadAnnotationLevelsSuccess, (state, {levels, levelCounter}) =>
+  on(IDBActions.loadAnnotationLevelsSuccess, (state: AnnotationState, {levels, levelCounter}) =>
     ({
       ...state,
       levels,
       levelCounter
     })),
-  on(IDBActions.loadAnnotationLinksSuccess, (state, {links}) =>
+  on(IDBActions.loadAnnotationLinksSuccess, (state: AnnotationState, {links}) =>
     ({
       ...state,
       links

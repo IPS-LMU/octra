@@ -11,13 +11,13 @@ export const initialState: UserState = {
 
 export const reducer = createReducer(
   initialState,
-  on(UserActions.setUserProfile, (state, user) => {
+  on(UserActions.setUserProfile, (state: UserState, user) => {
     return {
       ...state,
       ...user
     }
   }),
-  on(IDBActions.loadOptionsSuccess, (state, {variables}) => {
+  on(IDBActions.loadOptionsSuccess, (state: UserState, {variables}) => {
       let result = state;
 
       for (const variable of variables) {

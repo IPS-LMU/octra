@@ -19,109 +19,109 @@ export const initialState: LoginState = {
 
 export const reducer = createReducer(
   initialState,
-  on(LoginActions.loginDemo, (state, {onlineSession}) => ({
+  on(LoginActions.loginDemo, (state: LoginState, {onlineSession}) => ({
     ...state,
     mode: LoginMode.DEMO,
     loggedIn: true,
     onlineSession
   })),
-  on(LoginActions.loginLocal, (state, {files, sessionFile}) => ({
+  on(LoginActions.loginLocal, (state: LoginState, {files, sessionFile}) => ({
     ...state,
     mode: LoginMode.LOCAL,
     loggedIn: true,
     sessionFile,
     files
   })),
-  on(LoginActions.loginURLParameters, (state, {urlParams}) => ({
+  on(LoginActions.loginURLParameters, (state: LoginState, {urlParams}) => ({
     ...state,
     mode: LoginMode.URL,
     loggedIn: true,
     urlParams
   })),
-  on(LoginActions.loginOnline, (state, {onlineSession}) => ({
+  on(LoginActions.loginOnline, (state: LoginState, {onlineSession}) => ({
     ...state,
     mode: LoginMode.ONLINE,
     loggedIn: true,
     onlineSession
   })),
-  on(LoginActions.setMode, (state, {mode}) => ({
+  on(LoginActions.setMode, (state: LoginState, {mode}) => ({
     ...state,
     mode
   })),
-  on(LoginActions.logout, (state) => ({
+  on(LoginActions.logout, (state: LoginState) => ({
     ...state,
     loggedIn: false
   })),
-  on(LoginActions.clearLocalSession, (state) => ({
+  on(LoginActions.clearLocalSession, (state: LoginState) => ({
     ...state,
     queryParams: undefined,
     files: []
   })),
-  on(LoginActions.clearOnlineSession, (state) => ({
+  on(LoginActions.clearOnlineSession, (state: LoginState) => ({
     ...state,
     onlineSession: {
       ...state.onlineSession,
       sessionData: undefined
     }
   })),
-  on(LoginActions.setAudioURL, (state, {audioURL}) => ({
+  on(LoginActions.setAudioURL, (state: LoginState, {audioURL}) => ({
     ...state,
     onlineSession: {
       ...state.onlineSession,
       audioURL
     }
   })),
-  on(LoginActions.setUserData, (state, data) => ({
+  on(LoginActions.setUserData, (state: LoginState, data) => ({
     ...state,
     onlineSession: {
       ...state.onlineSession,
       ...data
     }
   })),
-  on(LoginActions.setServerDataEntry, (state, data) => ({
+  on(LoginActions.setServerDataEntry, (state: LoginState, data) => ({
     ...state,
     onlineSession: {
       ...state.onlineSession,
       ...data
     }
   })),
-  on(LoginActions.setLoggedIn, (state, {loggedIn}) => ({
+  on(LoginActions.setLoggedIn, (state: LoginState, {loggedIn}) => ({
     ...state,
     loggedIn
   })),
-  on(LoginActions.setSessionFile, (state, {sessionFile}) => ({
+  on(LoginActions.setSessionFile, (state: LoginState, {sessionFile}) => ({
     ...state,
     sessionFile
   })),
-  on(LoginActions.setComment, (state, {comment}) => ({
+  on(LoginActions.setComment, (state: LoginState, {comment}) => ({
     ...state,
     onlineSession: {
       ...state.onlineSession,
       comment
     }
   })),
-  on(LoginActions.setPromptText, (state, {promptText}) => ({
+  on(LoginActions.setPromptText, (state: LoginState, {promptText}) => ({
     ...state,
     onlineSession: {
       ...state.onlineSession,
       promptText
     }
   })),
-  on(LoginActions.setServerComment, (state, {serverComment}) => ({
+  on(LoginActions.setServerComment, (state: LoginState, {serverComment}) => ({
     ...state,
     onlineSession: {
       ...state.onlineSession,
       serverComment
     }
   })),
-  on(LoginActions.setJobsLeft, (state, {jobsLeft}) => ({
+  on(LoginActions.setJobsLeft, (state: LoginState, {jobsLeft}) => ({
     ...state,
     onlineSession: {
       ...state.onlineSession,
       jobsLeft
     }
   })),
-  on(IDBActions.loadOptionsSuccess, (state, {variables}) => {
+  on(IDBActions.loadOptionsSuccess, (state: LoginState, {variables}) => {
       let result = state;
 
       for (const variable of variables) {

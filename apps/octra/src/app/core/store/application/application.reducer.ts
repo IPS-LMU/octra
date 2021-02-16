@@ -23,7 +23,7 @@ export const initialState: ApplicationState = {
 
 export const reducer = createReducer(
   initialState,
-  on(ApplicationActions.load, (state, {progress}) => ({
+  on(ApplicationActions.load, (state: ApplicationState, {progress}) => ({
     ...state,
     loading: {
       ...state.loading,
@@ -31,7 +31,7 @@ export const reducer = createReducer(
       progress
     }
   })),
-  on(ApplicationActions.addError, (state, {error}) => ({
+  on(ApplicationActions.addError, (state: ApplicationState, {error}) => ({
     ...state,
     loading: {
       ...state.loading,
@@ -39,34 +39,34 @@ export const reducer = createReducer(
       errors: [...state.loading.errors, error]
     }
   })),
-  on(ApplicationActions.setReloaded, (state, {reloaded}) => ({
+  on(ApplicationActions.setReloaded, (state: ApplicationState, {reloaded}) => ({
     ...state,
     reloaded
   })),
-  on(ApplicationActions.finishLoading, (state) => ({
+  on(ApplicationActions.finishLoading, (state: ApplicationState) => ({
     ...state,
     loading: {
       ...state.loading,
       status: LoadingStatus.FINISHED
     }
   })),
-  on(ApplicationActions.setAppLanguage, (state, {language}) => ({
+  on(ApplicationActions.setAppLanguage, (state: ApplicationState, {language}) => ({
     ...state,
     language
   })),
-  on(ApplicationActions.setDBVersion, (state, {version}) => ({
+  on(ApplicationActions.setDBVersion, (state: ApplicationState, {version}) => ({
     ...state,
     version
   })),
-  on(ConfigurationActions.appConfigurationLoadSuccess, (state) => ({
+  on(ConfigurationActions.appConfigurationLoadSuccess, (state: ApplicationState) => ({
     ...state,
     appSettingsLoaded: true
   })),
-  on(ApplicationActions.setConsoleEntries, (state, {consoleEntries}) => ({
+  on(ApplicationActions.setConsoleEntries, (state: ApplicationState, {consoleEntries}) => ({
     ...state,
     consoleEntries
   })),
-  on(IDBActions.loadOptionsSuccess, (state, {variables}) => {
+  on(IDBActions.loadOptionsSuccess, (state: ApplicationState, {variables}) => {
     let result = state;
 
     for (const variable of variables) {
@@ -75,7 +75,7 @@ export const reducer = createReducer(
 
     return result;
   }),
-  on(ConfigurationActions.appConfigurationLoadSuccess, (state, {appConfiguration}) => ({
+  on(ConfigurationActions.appConfigurationLoadSuccess, (state: ApplicationState, {appConfiguration}) => ({
     ...state,
     loading: {
       ...state.loading,
@@ -83,28 +83,28 @@ export const reducer = createReducer(
     },
     appConfiguration
   })),
-  on(ConfigurationActions.loadGuidelinesSuccess, (state) => ({
+  on(ConfigurationActions.loadGuidelinesSuccess, (state: ApplicationState) => ({
     ...state,
     loading: {
       ...state.loading,
       progress: state.loading.progress + 25
     }
   })),
-  on(ConfigurationActions.projectConfigurationLoaded, (state) => ({
+  on(ConfigurationActions.projectConfigurationLoaded, (state: ApplicationState) => ({
     ...state,
     loading: {
       ...state.loading,
       progress: state.loading.progress + 25
     }
   })),
-  on(ConfigurationActions.loadMethodsSuccess, (state) => ({
+  on(ConfigurationActions.loadMethodsSuccess, (state: ApplicationState) => ({
     ...state,
     loading: {
       ...state.loading,
       progress: state.loading.progress + 25
     }
   })),
-  on(IDBActions.loadAnnotationLinksSuccess, (state) => ({
+  on(IDBActions.loadAnnotationLinksSuccess, (state: ApplicationState) => ({
     ...state,
     idb: {
       ...state.idb,

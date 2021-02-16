@@ -6,7 +6,7 @@ import {IDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
 import {FileProgress} from '../../obj/objects';
 import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
-import {OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
+import {Level, OIDBLevel, OIDBLink} from '@octra/annotation';
 import {
   AnnotationState,
   AnnotationStateLevel,
@@ -169,14 +169,6 @@ export class AppStorageService {
 
   get annotationLinks(): OIDBLink[] {
     return this._snapshot.annotation.links;
-  }
-
-  get levelcounter(): number {
-    return this._snapshot.annotation.levelCounter;
-  }
-
-  set levelcounter(value: number) {
-    this.store.dispatch(AnnotationActions.setLevelCounter({levelCounter: value}));
   }
 
   get secondsPerLine(): number {
@@ -705,11 +697,10 @@ export class AppStorageService {
     });
   }
 
-  public addAnnotationLevel(level: OLevel) {
+  public addAnnotationLevel(level: OIDBLevel) {
     return new Promise<void>((resolve, reject) => {
       if (!isUnset(level)) {
-        const newID = this.levelcounter + 1;
-        this.levelcounter = newID;
+        level.id = ++Level.counter;
 
         Functions.waitTillResultRetrieved(this.actions, IDBActions.addAnnotationLevelSuccess, IDBActions.addAnnotationLevelFailed)
           .then(() => {
@@ -720,9 +711,7 @@ export class AppStorageService {
           });
 
         this.store.dispatch(AnnotationActions.addAnnotationLevel({
-          id: newID,
-          level,
-          sortorder: this.annotationLevels.length
+          level: convertFromOIDLevel(level)
         }));
       } else {
         console.error('level is undefined or null');

@@ -341,14 +341,20 @@ export class IDBEffects {
   overwriteAnnotation$ = createEffect(() => this.actions$.pipe(
     ofType(AnnotationActions.overwriteAnnotation),
     exhaustMap((action) => {
-      const subject = new Subject<Action>();
+        const subject = new Subject<Action>();
 
-      if (action.saveToDB) {
-        this.idbService.clearAnnotationData().then(() => {
-          this.idbService.saveAnnotationLevels(action.annotation.levels).then(() => {
-            this.idbService.saveAnnotationLinks(action.annotation.links).then(() => {
-              subject.next(IDBActions.overwriteAnnotationSuccess());
-              subject.complete();
+        if (action.saveToDB) {
+          this.idbService.clearAnnotationData().then(() => {
+            this.idbService.saveAnnotationLevels(action.annotation.levels).then(() => {
+              this.idbService.saveAnnotationLinks(action.annotation.links).then(() => {
+                subject.next(IDBActions.overwriteAnnotationSuccess());
+                subject.complete();
+              }).catch((error) => {
+                subject.next(IDBActions.overwriteAnnotationFailed({
+                  error
+                }));
+                subject.complete();
+              });
             }).catch((error) => {
               subject.next(IDBActions.overwriteAnnotationFailed({
                 error
@@ -361,15 +367,9 @@ export class IDBEffects {
             }));
             subject.complete();
           });
-        }).catch((error) => {
-          subject.next(IDBActions.overwriteAnnotationFailed({
-            error
-          }));
+        } else {
           subject.complete();
-        });
-      } else {
-        subject.complete();
-      }
+        }
         return subject;
       }
     )));
@@ -924,14 +924,11 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.idbService.saveAnnotationLevel({
-        id: action.id,
-        level: action.level,
-        sortorder: action.sortorder
-      }, action.id).then(() => {
-        subject.next(IDBActions.addAnnotationLevelSuccess());
-        subject.complete();
-      }).catch((error) => {
+      this.idbService.saveAnnotationLevel(convertToOIDBLevel(action.level, action.level.id), action.level.id)
+        .then(() => {
+          subject.next(IDBActions.addAnnotationLevelSuccess());
+          subject.complete();
+        }).catch((error) => {
         subject.next(IDBActions.addAnnotationLevelFailed({
           error
         }));

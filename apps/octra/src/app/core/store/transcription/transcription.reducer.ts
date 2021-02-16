@@ -29,62 +29,62 @@ export const initialState: TranscriptionState = {
 
 export const reducer = createReducer(
   initialState,
-  on(TranscriptionActions.setSavingNeeded, (state, {savingNeeded}) => ({
+  on(TranscriptionActions.setSavingNeeded, (state: TranscriptionState, {savingNeeded}) => ({
     ...state,
     savingNeeded
   })),
-  on(TranscriptionActions.setIsSaving, (state, {isSaving}) => ({
+  on(TranscriptionActions.setIsSaving, (state: TranscriptionState, {isSaving}) => ({
     ...state,
     isSaving
   })),
-  on(TranscriptionActions.setPlayOnHover, (state, {playOnHover}) => ({
+  on(TranscriptionActions.setPlayOnHover, (state: TranscriptionState, {playOnHover}) => ({
     ...state,
     playOnHover
   })),
-  on(TranscriptionActions.setCurrentEditor, (state, {currentEditor}) => ({
+  on(TranscriptionActions.setCurrentEditor, (state: TranscriptionState, {currentEditor}) => ({
     ...state,
     currentEditor
   })),
-  on(TranscriptionActions.setAudioSettings, (state, data) => ({
+  on(TranscriptionActions.setAudioSettings, (state: TranscriptionState, data) => ({
     ...state,
     audioSettings: {
       ...state.audioSettings,
       ...data
     }
   })),
-  on(TranscriptionActions.addLog, (state, {log}) => ({
+  on(TranscriptionActions.addLog, (state: TranscriptionState, {log}) => ({
     ...state,
     logs: [...state.logs, log]
   })),
-  on(TranscriptionActions.setLogs, (state, {logs}) => ({
+  on(TranscriptionActions.setLogs, (state: TranscriptionState, {logs}) => ({
     ...state,
     logs
   })),
-  on(TranscriptionActions.setLogging, (state, {logging}) => ({
+  on(TranscriptionActions.setLogging, (state: TranscriptionState, {logging}) => ({
     ...state,
     logging
   })),
-  on(TranscriptionActions.setShowLoupe, (state, {showLoupe}) => ({
+  on(TranscriptionActions.setShowLoupe, (state: TranscriptionState, {showLoupe}) => ({
     ...state,
     showLoupe
   })),
-  on(TranscriptionActions.setEasyMode, (state, {easyMode}) => ({
+  on(TranscriptionActions.setEasyMode, (state: TranscriptionState, {easyMode}) => ({
     ...state,
     easyMode
   })),
-  on(TranscriptionActions.setSecondsPerLine, (state, {secondsPerLine}) => ({
+  on(TranscriptionActions.setSecondsPerLine, (state: TranscriptionState, {secondsPerLine}) => ({
     ...state,
     secondsPerLine
   })),
-  on(TranscriptionActions.setHighlightingEnabled, (state, {highlightingEnabled}) => ({
+  on(TranscriptionActions.setHighlightingEnabled, (state: TranscriptionState, {highlightingEnabled}) => ({
     ...state,
     highlightingEnabled
   })),
-  on(TranscriptionActions.setFeedback, (state, {feedback}) => ({
+  on(TranscriptionActions.setFeedback, (state: TranscriptionState, {feedback}) => ({
     ...state,
     feedback
   })),
-  on(TranscriptionActions.setSubmitted, (state, {submitted}) => {
+  on(TranscriptionActions.setSubmitted, (state: TranscriptionState, {submitted}) => {
     console.log(`reduce submitted...`);
     console.log(state);
     return {
@@ -92,27 +92,27 @@ export const reducer = createReducer(
       submitted
     }
   }),
-  on(TranscriptionActions.setTranscriptionState, (state, newState) => ({...state, ...newState})),
+  on(TranscriptionActions.setTranscriptionState, (state: TranscriptionState, newState) => ({...state, ...newState})),
   on(TranscriptionActions.clearLogs, (state) => ({
     ...state,
     logs: []
   })),
-  on(IDBActions.loadLogsSuccess, (state, {logs}) => {
+  on(IDBActions.loadLogsSuccess, (state: TranscriptionState, {logs}) => {
     return {
       ...state,
       logs
     };
   }),
-  on(ConfigurationActions.projectConfigurationLoaded, (state, {projectConfig}) =>
+  on(ConfigurationActions.projectConfigurationLoaded, (state: TranscriptionState, {projectConfig}) =>
     ({
       ...state,
       projectConfig
     })),
-  on(ConfigurationActions.loadGuidelinesSuccess, (state, {guidelines}) => ({
+  on(ConfigurationActions.loadGuidelinesSuccess, (state: TranscriptionState, {guidelines}) => ({
     ...state,
     guidelines
   })),
-  on(IDBActions.loadOptionsSuccess, (state, {variables}) => {
+  on(IDBActions.loadOptionsSuccess, (state: TranscriptionState, {variables}) => {
     let result = state;
 
     for (const variable of variables) {
@@ -121,12 +121,12 @@ export const reducer = createReducer(
 
     return result;
   }),
-  on(ConfigurationActions.loadMethodsSuccess, (state, methods) =>
+  on(ConfigurationActions.loadMethodsSuccess, (state: TranscriptionState, methods) =>
     ({
       ...state,
       methods
     })),
-  on(TranscriptionActions.setAudioLoaded, (state, {loaded}) =>
+  on(TranscriptionActions.setAudioLoaded, (state: TranscriptionState, {loaded}) =>
     ({
       ...state,
       audio: {

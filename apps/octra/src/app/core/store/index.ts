@@ -143,9 +143,11 @@ export interface AnnotationStateLevel {
 
 export class AnnotationStateSegment extends OSegment {
   public isBlockedBy: ASRQueueItemType;
+  public progressInfo: { progress: number; statusLabel: string }
 }
 
-export function convertToLevelObject(stateLevel: AnnotationStateLevel, sampleRate: number, lastSample: SampleUnit): Level {
+export function
+convertToLevelObject(stateLevel: AnnotationStateLevel, sampleRate: number, lastSample: SampleUnit): Level {
   const level = Level.fromObj({
     id: stateLevel.id,
     sortorder: null,
@@ -160,6 +162,14 @@ export function convertToLevelObject(stateLevel: AnnotationStateLevel, sampleRat
 
       if (!isUnset(annoSegment)) {
         annoSegment.isBlockedBy = segment.isBlockedBy;
+        if (!isUnset(segment.progressInfo)) {
+          annoSegment.progressInfo = segment.progressInfo;
+        } else {
+          annoSegment.progressInfo = {
+            statusLabel: 'ASR',
+            progress: 0
+          };
+        }
       } else {
         console.error(`annoSegment with id ${segment.id} is undefined!`);
         console.log(level);
@@ -167,9 +177,6 @@ export function convertToLevelObject(stateLevel: AnnotationStateLevel, sampleRat
       }
     }
   }
-
-  console.log(`convertToLevelObject:`);
-  console.log(level);
 
   return level;
 }
@@ -187,8 +194,6 @@ export function convertToOIDBLevel(stateLevel: AnnotationStateLevel, sortorder: 
       }
     }))
   };
-  console.log(`convertToOIDBLevel:`);
-  console.log(result);
 
   return result;
 }
@@ -202,9 +207,11 @@ export function convertFromLevelObject(level: Level, lastOriginalBoundary: Sampl
     type: level.type,
     items: oLevel.items.map((a, i) => {
       if (level.type === AnnotationLevelType.SEGMENT) {
+        const segment = level.segments.get(i);
         return {
           ...a,
-          isBlockedBy: level.segments.get(i).isBlockedBy
+          isBlockedBy: segment.isBlockedBy,
+          progressInfo: segment.progressInfo
         }
       } else {
         return a;
@@ -212,8 +219,6 @@ export function convertFromLevelObject(level: Level, lastOriginalBoundary: Sampl
     })
   }
 
-  console.log(`convertFromLevelObject:`);
-  console.log(result);
   return result;
 }
 
@@ -224,9 +229,6 @@ export function convertFromOIDLevel(oidbLevel: OIDBLevel): AnnotationStateLevel 
     type: oidbLevel.level.type,
     items: oidbLevel.level.items
   };
-
-  console.log(`convertFromOIDLevel:`);
-  console.log(result);
 
   return result;
 }

@@ -332,7 +332,6 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
   private decodeArrayBuffer(buffer: ArrayBuffer,
                             fileProcessIndex: number,
                             checkimport = true) {
-    console.log(`decode ArrayBuffer!`);
     const fileProcess = this._files[fileProcessIndex];
     fileProcess.progress = 0.5;
     this.checkState();
@@ -349,7 +348,6 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
             // not finished
           } else {
             // finished, get result
-            console.log(`finished`);
             if (!(this._audiomanager === null || this._audiomanager === undefined)) {
               this._audiomanager.destroy();
               this._audiomanager = null;

@@ -663,8 +663,6 @@ export class AppStorageService {
   }
 
   public changeAnnotationLevel(tiernum: number, level: AnnotationStateLevel): Promise<void> {
-    console.log(`CHANGE ANNOTATION LEVEL`);
-    console.log(level);
     return new Promise<void>((resolve, reject) => {
       if (!isUnset(this.annotationLevels)) {
         if (!isUnset(level)) {

@@ -33,6 +33,82 @@ import Vector2d = Konva.Vector2d;
   providers: [AudioViewerService]
 })
 export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+  // Ways to improve performance
+  // 1. Use differs on transcriptionLevel, perhaps IterableDiffers and segments
+
+  constructor(public av: AudioViewerService, private renderer: Renderer2) {
+    this.shortcutsManager = new ShortcutManager();
+  }
+
+  @Input() set isMultiLine(value: boolean) {
+    this.settings.multiLine = value;
+    this.init();
+  }
+
+  public get mouseCursor(): {
+    location: Vector2d,
+    size: {
+      height: number;
+      width: number;
+    }
+  } {
+    if (isUnset(this.canvasElements.mouseCaret)) {
+      return {
+        location: {
+          x: 0, y: 0
+        },
+        size: {
+          width: 0, height: 0
+        }
+      };
+    } else {
+      return {
+        location: this.canvasElements.mouseCaret.position(),
+        size: this.canvasElements.mouseCaret.size()
+      };
+    }
+  }
+
+  public get settings(): AudioviewerConfig {
+    return this.av.settings;
+  }
+
+  @Input()
+  public set settings(value: AudioviewerConfig) {
+    this.av.settings = value;
+  }
+
+  public get audioManager(): AudioManager {
+    return this.audioChunk.audioManager;
+  }
+
+  public get width(): number {
+    return this.konvaContainer.nativeElement.offsetWidth;
+  }
+
+  public get height(): number {
+    return this.konvaContainer.nativeElement.clientHeight;
+  }
+
+  public get getPlayHeadX(): number {
+    return 0;
+  }
+
+  get AudioPxWidth(): number {
+    return this.av.AudioPxWidth;
+  }
+
+  get transcriptionLevel(): Level {
+    return this._transcriptionLevel;
+  }
+
+  @Input() set transcriptionLevel(value: Level) {
+    this._transcriptionLevel = value;
+  }
+
+  get focused(): boolean {
+    return this._focused;
+  }
 
   @Input() audioChunk: AudioChunk;
   @Input() public name = '';
@@ -122,83 +198,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   private widthOnInit;
   private drawnSegmentIDs: number[] = [];
 
-  constructor(public av: AudioViewerService, private renderer: Renderer2) {
-    this.shortcutsManager = new ShortcutManager();
-  }
-
-  @Input() set isMultiLine(value: boolean) {
-    this.settings.multiLine = value;
-    this.init();
-  }
-
-  public get mouseCursor(): {
-    location: Vector2d,
-    size: {
-      height: number;
-      width: number;
-    }
-  } {
-    if (isUnset(this.canvasElements.mouseCaret)) {
-      return {
-        location: {
-          x: 0, y: 0
-        },
-        size: {
-          width: 0, height: 0
-        }
-      };
-    } else {
-      return {
-        location: this.canvasElements.mouseCaret.position(),
-        size: this.canvasElements.mouseCaret.size()
-      };
-    }
-  }
-
-  public get settings(): AudioviewerConfig {
-    return this.av.settings;
-  }
-
-  @Input()
-  public set settings(value: AudioviewerConfig) {
-    this.av.settings = value;
-  }
-
-  public get audioManager(): AudioManager {
-    return this.audioChunk.audioManager;
-  }
-
-  public get width(): number {
-    return this.konvaContainer.nativeElement.offsetWidth;
-  }
-
-  public get height(): number {
-    return this.konvaContainer.nativeElement.clientHeight;
-  }
-
-  public get getPlayHeadX(): number {
-    return 0;
-  }
-
-  get AudioPxWidth(): number {
-    return this.av.AudioPxWidth;
-  }
-
   private _transcriptionLevel: Level;
 
-  get transcriptionLevel(): Level {
-    return this._transcriptionLevel;
-  }
-
-  @Input() set transcriptionLevel(value: Level) {
-    this._transcriptionLevel = value;
-  }
-
   private _focused = false;
-
-  get focused(): boolean {
-    return this._focused;
-  }
 
   private static afterSettingsUpdated() {
     console.log(`settings were updated!`);
@@ -1167,7 +1169,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
                       const progressWidth = w - timeStampsWidth - 20;
 
-                      if (progressWidth > 10) {
+                      if (progressWidth > 10 && !isUnset(segment.progressInfo)) {
                         const progressStart = x + 10 + ((x === 0) ? timestampWidth : 0);
                         const textPosition = Math.round(progressStart + progressWidth / 2);
                         const loadedPixels = Math.round(progressWidth * segment.progressInfo.progress);
@@ -1702,9 +1704,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                     const result = this.av.addSegment();
                     segments = this.av.currentTranscriptionLevel.segments;
                     if (result !== null && result.msg !== null) {
-                      if (result.type === 'remove' && result.seg_ID > -1) {
-                        this.removeSegmentFromCanvas(result.seg_ID);
-                      }
                       if (result.msg.text && result.msg.text !== '') {
                         this.alerttriggered.emit({
                           type: result.msg.type,
@@ -1719,16 +1718,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                           timePosition: this.audioManager.createSampleUnit(result.seg_samples),
                           timestamp: shortcutInfo.timestamp
                         });
-                      }
-
-                      if (result.seg_samples > -1 && result.seg_ID > -1) {
-                        const num = segments.getNumberByID(result.seg_ID);
-                        const startSegment = Math.max(num - 1, 0);
-                        const endSegment = (num < segments.length - 2) ? num + 1 : segments.length - 1;
-
-                        this.createSegmentsForCanvas(startSegment, endSegment);
-                        this.layers.overlay.draw();
-                        this.layers.boundaries.draw();
                       }
                     }
                   }
@@ -1765,7 +1754,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                         }
 
                         // replace with costum function
-                        // this.updateSegments();
                         this._transcriptionLevel.segments.onsegmentchange.emit();
                       }
                     }
@@ -1873,7 +1861,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                           && i < this._transcriptionLevel.segments.length - 1
                         ) {
                           this._transcriptionLevel.segments.removeByIndex(i, this.breakMarker.code, false);
-                          this.removeSegmentFromCanvas(segment.id);
                           i--;
                           if (start === null) {
                             start = i;
@@ -2162,7 +2149,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     return group;
   }
 
-  private refreshLevel() {
+  public refreshLevel() {
     this.av.updateLevel(this._transcriptionLevel);
     console.log(`refresh level ${this.name}`);
     this.createSegmentsForCanvas();

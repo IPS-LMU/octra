@@ -50,7 +50,7 @@ export class AppInfo {
   static readonly lastUpdate = octraLastUpdated;
   static readonly manualURL = 'https://clarin.phonetik.uni-muenchen.de/apps/octra/manual/1.4.0/en/';
 
-  static readonly debugging = false;
+  static readonly debugging = true;
 
   static readonly maxAudioFileSize = 3000;
 

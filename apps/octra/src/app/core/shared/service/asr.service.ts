@@ -26,8 +26,6 @@ export class AsrService {
   set selectedLanguage(value: ASRLanguage) {
     this._selectedLanguage = value;
     if (!isUnset(value)) {
-      console.log(`SAVE ASR`);
-      console.log(value);
       this.appStorage.asrSelectedLanguage = value.code;
       this.appStorage.asrSelectedService = value.asr;
     } else {
@@ -78,7 +76,6 @@ export class AsrService {
   }
 
   public startASR() {
-    console.log(`sample rate ${this.audioService.audiomanagers[0].sampleRate}`);
     this._queue.start();
   }
 
@@ -444,27 +441,22 @@ export class ASRQueueItem {
   public startProcessing(): boolean {
     if (this.status !== ASRProcessStatus.STARTED) {
       if (this._type === ASRQueueItemType.ASR) {
-        console.log(`CALL ASR ONLY`);
         this.transcribeSignalWithASR('txt').then(() => {
           this._progress = 1;
           this.changeStatus(ASRProcessStatus.FINISHED);
         }).catch((error) => {
-          console.error(`ASR only failed`);
           console.error(error);
         });
       } else if (this._type === ASRQueueItemType.ASRMAUS) {
-        console.log(`CALL ASR MAUS`);
         // call ASR and than MAUS
         this.transcribeSignalWithASR('txt').then((asrResult) => {
           this.changeProgress(0.8);
           this.callMAUS(this._selectedLanguage, asrResult.audioURL, asrResult.transcriptURL)
             .then(this.readMAUSResult).catch(this.onMAUSRequestError);
         }).catch((error) => {
-          console.error(`ASR MAUS failed`);
           console.error(error);
         });
       } else if (this._type === ASRQueueItemType.MAUS) {
-        console.log(`call MAUS only`);
         this.processWithMAUSONLY().then(this.readMAUSResult).catch((error) => {
           console.error(error);
         });
@@ -480,11 +472,8 @@ export class ASRQueueItem {
   }) => {
     this.readTextFromFile(mausResult.file).then((result) => {
       this._result = result;
-
-      // make sure that there are not any white spaces at the end or new lines
-      // this._result = this._result.replace(/\n/g, '').trim();
-
       this._progress = 1;
+
       this.changeStatus(ASRProcessStatus.FINISHED);
     }).catch((error) => {
       this._result = 'Could not read result';
@@ -549,7 +538,6 @@ export class ASRQueueItem {
           this.changeProgress(0.2);
           // 2) upload signal
           this.uploadFile(file, this.selectedLanguage).then((audioURL: string) => {
-            console.log(`${audioURL}`);
             if (this._status !== ASRProcessStatus.STOPPED) {
               this.changeProgress(0.6);
               // 3) signal audio url to ASR
@@ -747,7 +735,7 @@ export class ASRQueueItem {
           });
         },
         (error) => {
-          console.log(error.message);
+          console.error(error.message);
           if (error.message.indexOf('0 Unknown Error') > -1) {
             AsrService.authURL = mausURL;
             this._progress -= 0.1;

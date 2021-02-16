@@ -182,7 +182,6 @@ export class TranscriptionService {
 
   public saveSegments = () => {
     // make sure, that no saving overhead exist. After saving request wait 1 second
-    console.log(`save??`);
     if (!isUnset(this._annotation)
       && this._annotation.levels.length > 0
       && !isUnset(this._annotation.levels[this._selectedlevel])) {
@@ -323,7 +322,6 @@ export class TranscriptionService {
   public loadSegments(): Promise<void> {
     return new Promise<void>(
       (resolve, reject) => {
-        console.log(`LOAD SEGMENTS IN TRANSCR SERVICE!`);
         new Promise<void>((resolve2) => {
           if (isUnset(this.appStorage.annotationLevels) || this.appStorage.annotationLevels.length === 0) {
             const newLevels: OIDBLevel[] = [];
@@ -359,7 +357,6 @@ export class TranscriptionService {
                         resolve2();
                       });
                     } else {
-                      console.log(`read serverData entry...`);
                       this.appStorage.annotationLevels[this._selectedlevel].items = [];
                       for (let i = 0; i < this.appStorage.serverDataEntry.transcript.length; i++) {
                         const segT = this.appStorage.serverDataEntry.transcript[i];
@@ -367,7 +364,6 @@ export class TranscriptionService {
                         const oseg = new OSegment(i, segT.start, segT.length, [new OLabel('OCTRA_1', segT.text)]);
                         this.appStorage.annotationLevels[this.selectedlevel].items.push(oseg);
                       }
-                      console.log(`read serverData read with ${this.appStorage.serverDataEntry.transcript.length} items...`);
 
                       this.appStorage.changeAnnotationLevel(this._selectedlevel,
                         this.appStorage.annotationLevels[this._selectedlevel]).then(() => {
@@ -490,27 +486,17 @@ export class TranscriptionService {
 
   private updateAnnotation(levels: AnnotationStateLevel[], links: OIDBLink[]) {
     // load levels
-    // TODO CHECK HERE!!!!
-    console.log(`UPDATE ANNOTATION`);
-    console.log(levels);
     this._annotation = new Annotation(this._annotation.annotates, this._annotation.audiofile, []);
 
-    console.log(`check.... ${levels.length}`);
     for (const annotationStateLevel of levels) {
-      console.log(`in loop!`);
       const level = convertToLevelObject(annotationStateLevel,
         this.audioManager.sampleRate, this.audioManager.ressource.info.duration.clone());
-      console.log(`CHECK LEVEL`);
-      console.log(level);
       this._annotation.levels.push(level);
     }
 
     for (const annotationLink of links) {
       this._annotation.links.push(annotationLink.link);
     }
-
-    console.log(`NEW ANNOTATION IS:`);
-    console.log(this._annotation);
 
     this.subscrmanager.removeByTag('segmentchange');
     this.subscrmanager.add(this.currentlevel.segments.onsegmentchange.subscribe((event) => {

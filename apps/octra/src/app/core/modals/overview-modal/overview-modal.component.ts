@@ -326,7 +326,6 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
   }
 
   updateView() {
-    console.log(`update View!`);
     this.updateSegments();
     this.transcrService.analyse();
 

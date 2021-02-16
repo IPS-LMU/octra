@@ -204,8 +204,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
             }));
           }
 
-          console.log(`mode is ${this.appStorage.useMode} and audioSrc is ${this.appStorage.audioURL}`);
-
           this.settService.audioloading.subscribe(
             (progress) => {
               this.audioLoadingProgress = progress * 100;

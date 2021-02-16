@@ -85,8 +85,6 @@ export const reducer = createReducer(
     feedback
   })),
   on(TranscriptionActions.setSubmitted, (state: TranscriptionState, {submitted}) => {
-    console.log(`reduce submitted...`);
-    console.log(state);
     return {
       ...state,
       submitted

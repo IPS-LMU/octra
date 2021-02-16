@@ -235,13 +235,21 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
     this.audioChunkLoupe = this.audioManager.mainchunk.clone();
 
-    this.viewer.alerttriggered.subscribe(
+    this.subscrmanager.add(this.viewer.alerttriggered.subscribe(
       (result) => {
         this.alertService.showAlert(result.type, result.message).catch((error) => {
           console.error(error);
         });
       }
-    );
+    ));
+
+    this.subscrmanager.add(this.transcrService.annotationChanged.subscribe(() => {
+      this.cd.markForCheck();
+    }));
+
+    this.subscrmanager.add(this.transcrService.currentLevelSegmentChange.subscribe(() => {
+      this.cd.markForCheck();
+    }));
 
     this.subscrmanager.add(this.audioChunkLines.statuschange.subscribe(
       (state: PlayBackStatus) => {
@@ -280,22 +288,22 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     ));
 
     this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
-        console.log(`item ${item.id} change ${item.status}`);
-        console.log(item);
         if (item.status !== ASRProcessStatus.IDLE) {
           const segmentBoundary = new SampleUnit(item.time.sampleStart + item.time.sampleLength, this.audioManager.sampleRate);
           let segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentBoundary);
 
           if (segmentIndex > -1) {
             let segment = this.transcrService.currentlevel.segments.get(segmentIndex);
-            // segment.progressInfo.progress = item.progress;
-            // segment.progressInfo.statusLabel = item.type;
-            this.viewer.redrawOverlay();
+            segment.progressInfo = {
+              progress: item.progress,
+              statusLabel: item.type
+            };
+            this.viewer.redraw();
 
             if (item.status !== ASRProcessStatus.STARTED && item.status !== ASRProcessStatus.RUNNING) {
               if (!isUnset(segment)) {
-                // segment = segment.clone();
-                // segment.isBlockedBy = null;
+                segment = segment.clone();
+                segment.isBlockedBy = null;
 
                 if (item.status === ASRProcessStatus.NOQUOTA) {
                   this.alertService.showAlert('danger', this.langService.translate('asr.no quota')).catch((error) => {
@@ -327,7 +335,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                     }));
                   });
                 } else {
-                  if (item.status === ASRProcessStatus.FINISHED && item.result !== '') {
+                  if (item.status === ASRProcessStatus.FINISHED) {
                     this.uiService.addElementFromEvent(item.type.toLowerCase(), {
                       value: 'finished'
                     }, Date.now(), null, null, null, {
@@ -335,13 +343,13 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                       length: item.time.sampleLength
                     }, 'automation');
                     if (item.type === ASRQueueItemType.ASR) {
-                      // segment.transcript = item.result.replace(/(<\/p>)/g, '');
+                      segment.transcript = item.result.replace(/(<\/p>)/g, '');
 
                       const index = this.transcrService.currentlevel.segments.segments.findIndex((a) => {
                         return a.time.samples === segment.time.samples;
                       });
                       if (index > -1) {
-                        // this.transcrService.currentlevel.segments.change(index, segment);
+                        this.transcrService.currentlevel.segments.change(index, segment);
                       }
                     } else if (item.type === ASRQueueItemType.ASRMAUS || item.type === ASRQueueItemType.MAUS) {
                       const converter = new PraatTextgridConverter();
@@ -378,7 +386,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                                 new OSegment(1, wordItem.sampleStart, wordItem.sampleDur, wordItem.labels),
                                 this.audioManager.sampleRate);
                               if (readSegment.transcript === '<p:>' || readSegment.transcript === '') {
-                                // readSegment.transcript = this.transcrService.breakMarker.code;
+                                readSegment.transcript = this.transcrService.breakMarker.code;
                               }
 
                               if (counter === wordsTier.items.length - 1) {
@@ -411,11 +419,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                     this.alertService.showAlert('danger', ErrorOccurredComponent, true, -1).catch((error) => {
                       console.error(error);
                     });
-                    // segment.isBlockedBy = null;
+                    segment.isBlockedBy = null;
                     this.transcrService.currentlevel.segments.change(segmentIndex, segment);
                   } else if (item.status === ASRProcessStatus.STOPPED) {
-                    // TODO find a better solution!
-                    this.viewer.redraw();
+                    this.cd.markForCheck();
                   }
                 }
               } else {
@@ -439,12 +446,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       },
       () => {
       }));
-
-    this.subscrmanager.add(this.transcrService.annotationChanged.subscribe(() => {
-      console.log(`annotation changed by annoChanged:`);
-      console.log(this.transcrService.currentlevel);
-      this.viewer.redraw();
-    }));
   }
 
   ngOnDestroy() {
@@ -726,13 +727,11 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               sampleLength: segment.time.samples - sampleStart
             };
 
-            console.log(`selection is ${sampleStart} to ${segment.time.samples}`);
             if (isUnset(segment.isBlockedBy)) {
               if ($event.value === 'do_asr' || $event.value === 'do_asr_maus' || $event.value === 'do_maus') {
                 this.viewer.selectSegment(segmentNumber);
 
                 if ($event.value === 'do_asr') {
-                  console.log(`IS BLOCKED BY SET TO SEGMENT ${segment.id}`);
                   this.asrService.addToQueue(selection, ASRQueueItemType.ASR);
                   segment.isBlockedBy = ASRQueueItemType.ASR;
                 } else if ($event.value === 'do_asr_maus') {

@@ -208,7 +208,7 @@ export class AudioviewerConfig {
         title: 'do asr maus'
       },
       {
-        name: 'do_asr_maus',
+        name: 'do_maus',
         keys: {
           mac: 'W',
           pc: 'W'

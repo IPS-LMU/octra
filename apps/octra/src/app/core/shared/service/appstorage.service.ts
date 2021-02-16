@@ -34,6 +34,10 @@ import * as fromAnnotation from '../../store/annotation';
   providedIn: 'root'
 })
 export class AppStorageService {
+  get undoRedoDisabled(): boolean {
+    return this._undoRedoDisabled;
+  }
+
   get snapshot(): RootState {
     return this._snapshot;
   }
@@ -194,6 +198,8 @@ export class AppStorageService {
       highlightingEnabled: value
     }));
   }
+
+  private _undoRedoDisabled = false;
 
   constructor(public sessStr: SessionStorageService,
               public localStr: LocalStorageService,
@@ -756,11 +762,27 @@ export class AppStorageService {
   }
 
   public undo() {
-    this.store.dispatch(ApplicationActions.undo());
+    if (!this._undoRedoDisabled) {
+      this.store.dispatch(ApplicationActions.undo());
+    }
+  }
+
+  public disableUndoRedo() {
+    this._undoRedoDisabled = true;
+    this.clearHistory();
+  }
+
+  public enableUndoRedo() {
+    if (this._undoRedoDisabled) {
+      this.clearHistory();
+      this._undoRedoDisabled = false;
+    }
   }
 
   public redo() {
-    this.store.dispatch(ApplicationActions.redo());
+    if (!this._undoRedoDisabled) {
+      this.store.dispatch(ApplicationActions.redo());
+    }
   }
 
   public clearHistory() {

@@ -288,6 +288,14 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     ));
 
     this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
+        const checkUndoRedo = () => {
+          if (this.asrService.queue.statistics.running === 0) {
+            this.appStorage.enableUndoRedo();
+          } else {
+            this.appStorage.disableUndoRedo();
+          }
+        };
+
         if (item.status !== ASRProcessStatus.IDLE) {
           const segmentBoundary = new SampleUnit(item.time.sampleStart + item.time.sampleLength, this.audioManager.sampleRate);
           let segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentBoundary);
@@ -441,6 +449,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
             console.error(new Error(`couldn't find segment number`));
           }
         }
+        checkUndoRedo();
       },
       (error) => {
       },
@@ -591,10 +600,15 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   onShortCutViewerTriggered($event: AudioViewerShortcutEvent) {
     this.triggerUIAction($event);
 
-    if ($event.shortcutName === 'undo') {
-      this.appStorage.undo();
-    } else if ($event.shortcutName === 'redo') {
-      this.appStorage.redo();
+    if ($event.shortcutName === 'undo' || $event.shortcutName === 'redo') {
+      if (this.appStorage.undoRedoDisabled) {
+        this.alertService.showAlert('danger', this.langService.translate('alerts.undo deactivated'));
+      }
+      if ($event.shortcutName === 'undo') {
+        this.appStorage.undo();
+      } else if ($event.shortcutName === 'redo') {
+        this.appStorage.redo();
+      }
     }
   }
 

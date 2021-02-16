@@ -364,7 +364,8 @@
   "alerts": {
     "authentication needed": "Please authenticate in order to use features like ASR or word-alignment. After you clicked on \"Authenticate\" a separate window opens. If no window opens, make sure to have popups enabled in your browser.",
     "combine segments successful": "Segments with the same speaker label were combined successfully.",
-    "combine segments ignore speakerlabel successful": "Segments were combined successfully regardless of speaker labels."
+    "combine segments ignore speakerlabel successful": "Segments were combined successfully regardless of speaker labels.",
+    "undo deactivated": "You can't apply undo & redo at the moment."
   },
   "authentication": {
     "you are authenticated": "You are authenticated!",

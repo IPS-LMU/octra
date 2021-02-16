@@ -104,6 +104,7 @@ import * as fromLogin from './core/store/login/login.reducer';
 import * as fromApplication from './core/store/application/application.reducer';
 import * as fromASR from './core/store/asr/asr.reducer';
 import * as fromTranscription from './core/store/transcription/transcription.reducer';
+import * as fromAnnotation from './core/store/annotation/annotation.reducer';
 import * as fromUser from './core/store/user/user.reducer';
 import {IDBEffects} from './core/store/idb/idb-effects.service';
 import {IDBService} from './core/shared/service/idb.service';
@@ -223,6 +224,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
         application: fromApplication.reducer,
         asr: fromASR.reducer,
         transcription: fromTranscription.reducer,
+        annotation: fromAnnotation.reducer,
         user: fromUser.reducer
       },
       {

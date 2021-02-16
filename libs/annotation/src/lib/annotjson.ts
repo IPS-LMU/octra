@@ -8,7 +8,7 @@ export interface IAnnotJSON {
 
 export interface ILevel {
   name: string;
-  type: string;
+  type: AnnotationLevelType;
   items: IItem[];
 }
 
@@ -95,7 +95,7 @@ export class OAudiofile implements IAudioFile {
 
 export class OLevel implements ILevel {
   name = '';
-  type = '';
+  type;
   items: IItem[];
 
   constructor(name: string, type: string, items?: IItem[]) {
@@ -163,8 +163,8 @@ export class OLink implements ILink {
   }
 }
 
-export enum AnnotJSONType {
-  ITEM,
-  EVENT,
-  SEGMENT
+export enum AnnotationLevelType {
+  ITEM = 'ITEM',
+  EVENT = 'EVENT',
+  SEGMENT = 'SEGMENT'
 }

@@ -33,6 +33,82 @@ import Vector2d = Konva.Vector2d;
   providers: [AudioViewerService]
 })
 export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+  // Ways to improve performance
+  // 1. Use differs on transcriptionLevel, perhaps IterableDiffers and segments
+
+  constructor(public av: AudioViewerService, private renderer: Renderer2) {
+    this.shortcutsManager = new ShortcutManager();
+  }
+
+  @Input() set isMultiLine(value: boolean) {
+    this.settings.multiLine = value;
+    this.init();
+  }
+
+  public get mouseCursor(): {
+    location: Vector2d,
+    size: {
+      height: number;
+      width: number;
+    }
+  } {
+    if (isUnset(this.canvasElements.mouseCaret)) {
+      return {
+        location: {
+          x: 0, y: 0
+        },
+        size: {
+          width: 0, height: 0
+        }
+      };
+    } else {
+      return {
+        location: this.canvasElements.mouseCaret.position(),
+        size: this.canvasElements.mouseCaret.size()
+      };
+    }
+  }
+
+  public get settings(): AudioviewerConfig {
+    return this.av.settings;
+  }
+
+  @Input()
+  public set settings(value: AudioviewerConfig) {
+    this.av.settings = value;
+  }
+
+  public get audioManager(): AudioManager {
+    return this.audioChunk.audioManager;
+  }
+
+  public get width(): number {
+    return this.konvaContainer.nativeElement.offsetWidth;
+  }
+
+  public get height(): number {
+    return this.konvaContainer.nativeElement.clientHeight;
+  }
+
+  public get getPlayHeadX(): number {
+    return 0;
+  }
+
+  get AudioPxWidth(): number {
+    return this.av.AudioPxWidth;
+  }
+
+  get transcriptionLevel(): Level {
+    return this._transcriptionLevel;
+  }
+
+  @Input() set transcriptionLevel(value: Level) {
+    this._transcriptionLevel = value;
+  }
+
+  get focused(): boolean {
+    return this._focused;
+  }
 
   @Input() audioChunk: AudioChunk;
   @Input() public name = '';
@@ -122,83 +198,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   private widthOnInit;
   private drawnSegmentIDs: number[] = [];
 
-  constructor(public av: AudioViewerService, private renderer: Renderer2) {
-    this.shortcutsManager = new ShortcutManager();
-  }
-
-  @Input() set isMultiLine(value: boolean) {
-    this.settings.multiLine = value;
-    this.init();
-  }
-
-  public get mouseCursor(): {
-    location: Vector2d,
-    size: {
-      height: number;
-      width: number;
-    }
-  } {
-    if (isUnset(this.canvasElements.mouseCaret)) {
-      return {
-        location: {
-          x: 0, y: 0
-        },
-        size: {
-          width: 0, height: 0
-        }
-      };
-    } else {
-      return {
-        location: this.canvasElements.mouseCaret.position(),
-        size: this.canvasElements.mouseCaret.size()
-      };
-    }
-  }
-
-  public get settings(): AudioviewerConfig {
-    return this.av.settings;
-  }
-
-  @Input()
-  public set settings(value: AudioviewerConfig) {
-    this.av.settings = value;
-  }
-
-  public get audioManager(): AudioManager {
-    return this.audioChunk.audioManager;
-  }
-
-  public get width(): number {
-    return this.konvaContainer.nativeElement.offsetWidth;
-  }
-
-  public get height(): number {
-    return this.konvaContainer.nativeElement.clientHeight;
-  }
-
-  public get getPlayHeadX(): number {
-    return 0;
-  }
-
-  get AudioPxWidth(): number {
-    return this.av.AudioPxWidth;
-  }
-
   private _transcriptionLevel: Level;
 
-  get transcriptionLevel(): Level {
-    return this._transcriptionLevel;
-  }
-
-  @Input() set transcriptionLevel(value: Level) {
-    this._transcriptionLevel = value;
-  }
-
   private _focused = false;
-
-  get focused(): boolean {
-    return this._focused;
-  }
 
   private static afterSettingsUpdated() {
     console.log(`settings were updated!`);
@@ -213,6 +215,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       this.afterChunkUpdated();
     }
     if (changes.hasOwnProperty('transcriptionLevel') && changes.transcriptionLevel.currentValue !== null) {
+      console.log(`level updated by directive`);
       this.afterLevelUpdated();
     }
 
@@ -299,12 +302,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   afterLevelUpdated() {
     if (!isUnset(this._transcriptionLevel)) {
-
       if (!isUnset(this.audioChunk) && !isUnset(this.av.audioTCalculator)) {
+        console.log(`refresh level after level updated`);
         this.refreshLevel()
       }
       this.subscrManager.removeByTag(`segmentchange`);
       this.subscrManager.add(this._transcriptionLevel.segments.onsegmentchange.subscribe(() => {
+          console.log(`refresh level on segmentchange ${this.name}`);
           this.refreshLevel();
         },
         (error) => {
@@ -408,6 +412,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         addSingleLineOnly();
       }
 
+      console.log(`init view ${this.name}`);
       this.createSegmentsForCanvas();
 
       this.canvasElements.playHead = this.createLinePlayCursor();
@@ -1021,6 +1026,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         this.audioChunk.time.start, this.audioChunk.time.end
       );
 
+      console.log(`segments ${this.name}: `);
+      console.log(this._transcriptionLevel.segments.segments.find(a => !isUnset(a.isBlockedBy)));
       const boundariesToDraw: {
         x: number,
         y: number,
@@ -1072,6 +1079,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
             height: segmentHeight,
             transformsEnabled: 'position',
             sceneFunc: (context: any, shape) => {
+              console.log(`REDRAW OVERLAY!`);
               const absY = lineNum1 * (this.settings.lineheight + this.settings.margin.top);
               for (let j = lineNum1; j <= lineNum2; j++) {
                 const localY = j * (this.settings.lineheight + this.settings.margin.top);
@@ -1137,6 +1145,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   } else {
                     if (segment.isBlockedBy === ASRQueueItemType.ASR) {
                       // blocked by ASR
+                      console.log(`FILL WITH ASR COLOR`);
                       context.fillStyle = 'rgba(255,191,0,0.5)';
                     } else if (segment.isBlockedBy === ASRQueueItemType.ASRMAUS) {
                       context.fillStyle = 'rgba(179,10,179,0.5)';
@@ -1160,7 +1169,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
                       const progressWidth = w - timeStampsWidth - 20;
 
-                      if (progressWidth > 10) {
+                      if (progressWidth > 10 && !isUnset(segment.progressInfo)) {
                         const progressStart = x + 10 + ((x === 0) ? timestampWidth : 0);
                         const textPosition = Math.round(progressStart + progressWidth / 2);
                         const loadedPixels = Math.round(progressWidth * segment.progressInfo.progress);
@@ -1665,15 +1674,36 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
             if (focuscheck) {
               switch (shortcutName) {
+                case('undo'):
+                  if (this.settings.boundaries.enabled && this._focused && !this.settings.boundaries.readonly) {
+                    this.shortcuttriggered.emit({
+                      shortcut: comboKey,
+                      shortcutName,
+                      value: null,
+                      type: 'application',
+                      timePosition: this.av.mouseCursor.clone(),
+                      timestamp: shortcutInfo.timestamp
+                    });
+                  }
+                  break;
+                case('redo'):
+                  if (this.settings.boundaries.enabled && this._focused && !this.settings.boundaries.readonly) {
+                    this.shortcuttriggered.emit({
+                      shortcut: comboKey,
+                      shortcutName,
+                      value: null,
+                      type: 'application',
+                      timePosition: this.av.mouseCursor.clone(),
+                      timestamp: shortcutInfo.timestamp
+                    });
+                  }
+                  break;
                 case('set_boundary'):
                   if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
                     let segments;
                     const result = this.av.addSegment();
                     segments = this.av.currentTranscriptionLevel.segments;
                     if (result !== null && result.msg !== null) {
-                      if (result.type === 'remove' && result.seg_ID > -1) {
-                        this.removeSegmentFromCanvas(result.seg_ID);
-                      }
                       if (result.msg.text && result.msg.text !== '') {
                         this.alerttriggered.emit({
                           type: result.msg.type,
@@ -1682,21 +1712,12 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       } else if (result.type !== null) {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
+                          shortcutName,
                           value: result.type,
                           type: 'boundary',
                           timePosition: this.audioManager.createSampleUnit(result.seg_samples),
                           timestamp: shortcutInfo.timestamp
                         });
-                      }
-
-                      if (result.seg_samples > -1 && result.seg_ID > -1) {
-                        const num = segments.getNumberByID(result.seg_ID);
-                        const startSegment = Math.max(num - 1, 0);
-                        const endSegment = (num < segments.length - 2) ? num + 1 : segments.length - 1;
-
-                        this.createSegmentsForCanvas(startSegment, endSegment);
-                        this.layers.overlay.draw();
-                        this.layers.boundaries.draw();
                       }
                     }
                   }
@@ -1714,6 +1735,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                           segment.transcript = this.breakMarker.code;
                           this.shortcuttriggered.emit({
                             shortcut: comboKey,
+                            shortcutName,
                             value: 'set_break',
                             type: 'segment',
                             timePosition: xSamples.clone(),
@@ -1723,6 +1745,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                           segment.transcript = '';
                           this.shortcuttriggered.emit({
                             shortcut: comboKey,
+                            shortcutName,
                             value: 'remove_break',
                             type: 'segment',
                             timePosition: xSamples.clone(),
@@ -1731,7 +1754,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                         }
 
                         // replace with costum function
-                        // this.updateSegments();
                         this._transcriptionLevel.segments.onsegmentchange.emit();
                       }
                     }
@@ -1783,6 +1805,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
                             this.shortcuttriggered.emit({
                               shortcut: comboKey,
+                              shortcutName,
                               value: shortcutName,
                               type: 'audio',
                               timePosition: xSamples.clone(),
@@ -1822,6 +1845,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
                       this.shortcuttriggered.emit({
                         shortcut: comboKey,
+                        shortcutName,
                         value: shortcutName,
                         type: 'audio',
                         timePosition: this.av.mouseCursor.clone(),
@@ -1837,7 +1861,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                           && i < this._transcriptionLevel.segments.length - 1
                         ) {
                           this._transcriptionLevel.segments.removeByIndex(i, this.breakMarker.code, false);
-                          this.removeSegmentFromCanvas(segment.id);
                           i--;
                           if (start === null) {
                             start = i;
@@ -1860,6 +1883,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                   if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
                     this.shortcuttriggered.emit({
                       shortcut: comboKey,
+                      shortcutName,
                       value: shortcutName,
                       type: 'segment',
                       timePosition: this.av.mouseCursor.clone(),
@@ -1892,6 +1916,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                     // move cursor to left
                     this.shortcuttriggered.emit({
                       shortcut: comboKey,
+                      shortcutName,
                       value: shortcutName,
                       type: 'mouse',
                       timePosition: this.av.mouseCursor.clone(),
@@ -1910,6 +1935,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                     // move cursor to right
                     this.shortcuttriggered.emit({
                       shortcut: comboKey,
+                      shortcutName,
                       value: shortcutName,
                       type: 'mouse',
                       timePosition: this.av.mouseCursor.clone(),
@@ -1929,6 +1955,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                     // move cursor to right
                     this.shortcuttriggered.emit({
                       shortcut: comboKey,
+                      shortcutName,
                       value: shortcutName,
                       type: 'option',
                       timePosition: this.av.mouseCursor.clone(),
@@ -1946,6 +1973,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       if (isUnset(segment.isBlockedBy)) {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
+                          shortcutName,
                           value: 'do_asr',
                           type: 'segment',
                           timePosition: this.av.mouseCursor.clone(),
@@ -1954,6 +1982,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       } else {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
+                          shortcutName,
                           value: 'cancel_asr',
                           type: 'segment',
                           timePosition: this.av.mouseCursor.clone(),
@@ -1973,6 +2002,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       if (isUnset(segment.isBlockedBy)) {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
+                          shortcutName,
                           value: 'do_asr_maus',
                           type: 'segment',
                           timePosition: this.av.mouseCursor.clone(),
@@ -1981,6 +2011,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       } else {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
+                          shortcutName,
                           value: 'cancel_asr_maus',
                           type: 'segment',
                           timePosition: this.av.mouseCursor.clone(),
@@ -2001,6 +2032,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       if (isUnset(segment.isBlockedBy)) {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
+                          shortcutName,
                           value: 'do_maus',
                           type: 'segment',
                           timePosition: this.av.mouseCursor.clone(),
@@ -2009,6 +2041,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                       } else {
                         this.shortcuttriggered.emit({
                           shortcut: comboKey,
+                          shortcutName,
                           value: 'cancel_maus',
                           type: 'segment',
                           timePosition: this.av.mouseCursor.clone(),
@@ -2116,8 +2149,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     return group;
   }
 
-  private refreshLevel() {
+  public refreshLevel() {
     this.av.updateLevel(this._transcriptionLevel);
+    console.log(`refresh level ${this.name}`);
     this.createSegmentsForCanvas();
     this.layers.overlay.batchDraw();
     this.layers.boundaries.batchDraw();
@@ -2279,6 +2313,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
 export interface AudioViewerShortcutEvent {
   shortcut: string;
+  shortcutName: string;
   value: string;
   type: string;
   timePosition?: SampleUnit;

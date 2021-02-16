@@ -11,7 +11,7 @@ import {SettingsService, TranscriptionService, UserInteractionsService} from '..
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {BugReportService, ConsoleType} from '../../shared/service/bug-report.service';
 import {NavbarService} from './navbar.service';
-import {AnnotJSONType, Level, Segments} from '@octra/annotation';
+import {AnnotationLevelType, Level, OIDBLevel, Segments} from '@octra/annotation';
 
 declare let jQuery: any;
 
@@ -55,7 +55,7 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   get annotJSONType() {
-    return AnnotJSONType;
+    return AnnotationLevelType;
   }
 
   public get errorsFound(): boolean {
@@ -166,9 +166,12 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     if (event.target.value !== null && event.target.value !== '') {
       const level = this.transcrServ.annotation.levels[tiernum];
       level.name = event.target.value.replace(' ', '_');
-      this.appStorage.changeAnnotationLevel(tiernum,
-        level.getObj(this.transcrServ.audioManager.ressource.info.duration)
-      ).catch((error) => {
+      this.appStorage.changeAnnotationLevel(tiernum, {
+        id: level.id,
+        name: level.name,
+        type: level.type,
+        items: level.segments.getObj(level.name, this.transcrServ.audioManager.ressource.info.duration.samples)
+      }).catch((error) => {
         console.error(error);
       });
       // update value for annoation object in transcr service
@@ -197,14 +200,15 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
       levelname = `OCTRA_${index + 1}`;
     }
 
-    const newlevel = new Level(this.appStorage.levelcounter + 1, levelname, 'SEGMENT',
+    const newlevel = new Level(-1, levelname, 'SEGMENT',
       new Segments(this.transcrServ.audioManager.ressource.info.sampleRate, levelname, [],
         this.transcrServ.audioManager.ressource.info.duration));
-    this.appStorage.addAnnotationLevel(
-      newlevel.getObj(this.transcrServ.audioManager.ressource.info.duration))
-      .then(() => {
-        this.transcrServ.annotation.levels.push(newlevel);
-      }).catch((error) => {
+    this.appStorage.addAnnotationLevel(new OIDBLevel(-1,
+      newlevel.getObj(this.transcrServ.audioManager.ressource.info.duration.clone()),
+      this.transcrServ.annotation.levels.length
+    )).then(() => {
+      this.transcrServ.annotation.levels.push(newlevel);
+    }).catch((error) => {
       console.error(error);
     });
   }
@@ -235,11 +239,13 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onLevelDuplicateClick(tiernum: number, id: number) {
-    const newlevel = this.transcrServ.annotation.levels[tiernum].clone();
-    this.appStorage.addAnnotationLevel(
-      newlevel.getObj(this.transcrServ.audioManager.ressource.info.duration))
+    const newlevel = this.transcrServ.annotation.levels[
+      tiernum].getObj(this.transcrServ.audioManager.ressource.info.duration.clone()
+    );
+    this.appStorage.addAnnotationLevel(new OIDBLevel(-1, newlevel, this.transcrServ.annotation.levels.length))
       .then(() => {
-        this.transcrServ.annotation.levels.push(newlevel);
+        // TODO if store change took effect
+        // this.transcrServ.annotation.levels.push(newlevel);
       }).catch((error) => {
       console.error(error);
     });

@@ -2,11 +2,17 @@ import {NavigationExtras} from '@angular/router';
 import {EmailBugReporter} from './core/obj/BugAPI/EmailBugReporter';
 import {OggFormat, WavFormat} from '@octra/media';
 import {
-  AnnotJSONConverter, BundleJSONConverter,
+  AnnotJSONConverter,
+  BundleJSONConverter,
   Converter,
-  CTMConverter, ELANConverter, PartiturConverter,
+  CTMConverter,
+  ELANConverter,
+  PartiturConverter,
   PraatTableConverter,
-  PraatTextgridConverter, SRTConverter, TextConverter, WebVTTConverter
+  PraatTextgridConverter,
+  SRTConverter,
+  TextConverter,
+  WebVTTConverter
 } from '@octra/annotation';
 
 declare var octraVersion: string;

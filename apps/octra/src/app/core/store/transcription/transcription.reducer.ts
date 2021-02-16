@@ -1,10 +1,9 @@
 import {createReducer, on} from '@ngrx/store';
-import * as TranscriptionActions from './transcription.actions';
-import * as ConfigurationActions from '../configuration/configuration.actions';
-import * as IDBActions from '../idb/idb.actions';
 import {TranscriptionState} from '../index';
 import {isUnset} from '@octra/utilities';
-import {OIDBLevel} from '@octra/annotation';
+import {TranscriptionActions} from './transcription.actions';
+import {IDBActions} from '../idb/idb.actions';
+import {ConfigurationActions} from '../configuration/configuration.actions';
 
 export const initialState: TranscriptionState = {
   savingNeeded: false,
@@ -25,230 +24,107 @@ export const initialState: TranscriptionState = {
   showLoupe: false,
   easyMode: false,
   secondsPerLine: 5,
-  annotation: {
-    levels: [],
-    links: [],
-    levelCounter: 0
-  },
   highlightingEnabled: false
 };
 
 export const reducer = createReducer(
   initialState,
-  on(TranscriptionActions.setSavingNeeded, (state, {savingNeeded}) => ({
+  on(TranscriptionActions.setSavingNeeded, (state: TranscriptionState, {savingNeeded}) => ({
     ...state,
     savingNeeded
   })),
-  on(TranscriptionActions.setIsSaving, (state, {isSaving}) => ({
+  on(TranscriptionActions.setIsSaving, (state: TranscriptionState, {isSaving}) => ({
     ...state,
     isSaving
   })),
-  on(TranscriptionActions.setPlayOnHover, (state, {playOnHover}) => ({
+  on(TranscriptionActions.setPlayOnHover, (state: TranscriptionState, {playOnHover}) => ({
     ...state,
     playOnHover
   })),
-  on(TranscriptionActions.setCurrentEditor, (state, {currentEditor}) => ({
+  on(TranscriptionActions.setCurrentEditor, (state: TranscriptionState, {currentEditor}) => ({
     ...state,
     currentEditor
   })),
-  on(TranscriptionActions.setAudioSettings, (state, data) => ({
+  on(TranscriptionActions.setAudioSettings, (state: TranscriptionState, data) => ({
     ...state,
     audioSettings: {
       ...state.audioSettings,
       ...data
     }
   })),
-  on(TranscriptionActions.addLog, (state, {log}) => ({
+  on(TranscriptionActions.addLog, (state: TranscriptionState, {log}) => ({
     ...state,
     logs: [...state.logs, log]
   })),
-  on(TranscriptionActions.setLogs, (state, {logs}) => ({
+  on(TranscriptionActions.setLogs, (state: TranscriptionState, {logs}) => ({
     ...state,
     logs
   })),
-  on(TranscriptionActions.setLogging, (state, {logging}) => ({
+  on(TranscriptionActions.setLogging, (state: TranscriptionState, {logging}) => ({
     ...state,
     logging
   })),
-  on(TranscriptionActions.setShowLoupe, (state, {showLoupe}) => ({
+  on(TranscriptionActions.setShowLoupe, (state: TranscriptionState, {showLoupe}) => ({
     ...state,
     showLoupe
   })),
-  on(TranscriptionActions.setEasyMode, (state, {easyMode}) => ({
+  on(TranscriptionActions.setEasyMode, (state: TranscriptionState, {easyMode}) => ({
     ...state,
     easyMode
   })),
-  on(TranscriptionActions.setSecondsPerLine, (state, {secondsPerLine}) => ({
+  on(TranscriptionActions.setSecondsPerLine, (state: TranscriptionState, {secondsPerLine}) => ({
     ...state,
     secondsPerLine
   })),
-  on(TranscriptionActions.setHighlightingEnabled, (state, {highlightingEnabled}) => ({
+  on(TranscriptionActions.setHighlightingEnabled, (state: TranscriptionState, {highlightingEnabled}) => ({
     ...state,
     highlightingEnabled
   })),
-  on(TranscriptionActions.setFeedback, (state, {feedback}) => ({
+  on(TranscriptionActions.setFeedback, (state: TranscriptionState, {feedback}) => ({
     ...state,
     feedback
   })),
-  on(TranscriptionActions.setAnnotation, (state, {annotation}) => ({
-    ...state,
-    annotation
-  })),
-  on(TranscriptionActions.setSubmitted, (state, {submitted}) => {
-    console.log(`reduce submitted...`);
-    console.log(state);
+  on(TranscriptionActions.setSubmitted, (state: TranscriptionState, {submitted}) => {
     return {
       ...state,
       submitted
     }
   }),
-  on(TranscriptionActions.setAnnotationLevels, (state, {levels}) => ({
-    ...state,
-    annotation: {
-      ...state.annotation,
-      levels
-    }
-  })),
-  on(TranscriptionActions.setAnnotationLinks, (state, {links}) => ({
-    ...state,
-    annotation: {
-      ...state.annotation,
-      links
-    }
-  })),
-  on(TranscriptionActions.setTranscriptionState, (state, newState) => ({...state, ...newState})),
-  on(TranscriptionActions.clearAnnotation, (state) => ({
-    ...state,
-    annotation: {
-      levels: [],
-      links: [],
-      levelCounter: 0
-    }
-  })),
-  on(TranscriptionActions.overwriteAnnotation, (state, {annotation}) => ({
-    ...state,
-    annotation
-  })),
+  on(TranscriptionActions.setTranscriptionState, (state: TranscriptionState, newState) => ({...state, ...newState})),
   on(TranscriptionActions.clearLogs, (state) => ({
     ...state,
     logs: []
   })),
-  on(TranscriptionActions.changeAnnotationLevel, (state, {level, id}) => {
-    const annotationLevels = state.annotation.levels;
-    const index = annotationLevels.findIndex(a => a.id === id);
-
-    if (index > -1 && index < annotationLevels.length) {
-      const levelObj = annotationLevels[index];
-
-      return {
-        ...state,
-        annotation: {
-          ...state.annotation,
-          levels: [
-            ...state.annotation.levels.slice(0, index),
-            new OIDBLevel(levelObj.id, level, levelObj.sortorder),
-            ...state.annotation.levels.slice(index + 1)
-          ]
-        }
-      };
-    } else {
-      console.error(`can't change level because index not valid.`);
-    }
-
-    return state;
-  }),
-  on(TranscriptionActions.addAnnotationLevel, (state, level) =>
-    ({
-      ...state,
-      annotation: {
-        ...state.annotation,
-        levels: [
-          ...state.annotation.levels,
-          level
-        ]
-      }
-    })),
-  on(TranscriptionActions.removeAnnotationLevel, (state, {id}) => {
-    if (id > -1) {
-      const index = state.annotation.levels.findIndex((a) => (a.id === id));
-      if (index > -1) {
-        return {
-          ...state,
-          annotation: {
-            ...state.annotation,
-            levels: [
-              ...state.annotation.levels.slice(0, index),
-              ...state.annotation.levels.slice(index + 1)
-            ]
-          }
-        }
-      } else {
-        console.error(`can't remove level because index not valid.`);
-      }
-    } else {
-      console.error(`can't remove level because id not valid.`);
-    }
-
-    return state;
-  }),
-  on(TranscriptionActions.setLevelCounter, (state, {levelCounter}) =>
-    ({
-      ...state,
-      annotation: {
-        ...state.annotation,
-        levelCounter: levelCounter
-      }
-    })),
-  on(IDBActions.loadLogsSuccess, (state, {logs}) => {
+  on(IDBActions.loadLogsSuccess, (state: TranscriptionState, {logs}) => {
     return {
       ...state,
-      annotation: {
-        ...state.annotation
-      },
       logs
     };
   }),
-  on(ConfigurationActions.projectConfigurationLoaded, (state, {projectConfig}) =>
+  on(ConfigurationActions.projectConfigurationLoaded, (state: TranscriptionState, {projectConfig}) =>
     ({
       ...state,
       projectConfig
     })),
-  on(ConfigurationActions.loadGuidelinesSuccess, (state, {guidelines}) => ({
+  on(ConfigurationActions.loadGuidelinesSuccess, (state: TranscriptionState, {guidelines}) => ({
     ...state,
     guidelines
   })),
-  on(IDBActions.loadOptionsSuccess, (state, {variables}) => {
+  on(IDBActions.loadOptionsSuccess, (state: TranscriptionState, {variables}) => {
     let result = state;
 
     for (const variable of variables) {
-      result = saveOptionToStore(result, variable.name, variable.value);
+      result = writeOptionToStore(result, variable.name, variable.value);
     }
 
     return result;
   }),
-  on(IDBActions.loadAnnotationLevelsSuccess, (state, {levels, levelCounter}) =>
-    ({
-      ...state,
-      annotation: {
-        ...state.annotation,
-        levels,
-        levelCounter
-      }
-    })),
-  on(IDBActions.loadAnnotationLinksSuccess, (state, {links}) =>
-    ({
-      ...state,
-      annotation: {
-        ...state.annotation,
-        links
-      }
-    })),
-  on(ConfigurationActions.loadMethodsSuccess, (state, methods) =>
+  on(ConfigurationActions.loadMethodsSuccess, (state: TranscriptionState, methods) =>
     ({
       ...state,
       methods
     })),
-  on(TranscriptionActions.setAudioLoaded, (state, {loaded}) =>
+  on(TranscriptionActions.setAudioLoaded, (state: TranscriptionState, {loaded}) =>
     ({
       ...state,
       audio: {
@@ -268,7 +144,7 @@ export const reducer = createReducer(
     }))
 );
 
-function saveOptionToStore(state: TranscriptionState, attribute: string, value: any): TranscriptionState {
+function writeOptionToStore(state: TranscriptionState, attribute: string, value: any): TranscriptionState {
   switch (attribute) {
     case('submitted'):
       return {

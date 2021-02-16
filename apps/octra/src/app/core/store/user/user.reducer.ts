@@ -1,8 +1,8 @@
 import {createReducer, on} from '@ngrx/store';
 import {UserState} from '../index';
-import * as fromFeedbackActions from './user.actions';
-import * as IDBActions from '../idb/idb.actions';
 import {isUnset} from '@octra/utilities';
+import {UserActions} from './user.actions';
+import {IDBActions} from '../idb/idb.actions';
 
 export const initialState: UserState = {
   name: '',
@@ -11,24 +11,24 @@ export const initialState: UserState = {
 
 export const reducer = createReducer(
   initialState,
-  on(fromFeedbackActions.setUserProfile, (state, user) => {
+  on(UserActions.setUserProfile, (state: UserState, user) => {
     return {
       ...state,
       ...user
     }
   }),
-  on(IDBActions.loadOptionsSuccess, (state, {variables}) => {
+  on(IDBActions.loadOptionsSuccess, (state: UserState, {variables}) => {
       let result = state;
 
       for (const variable of variables) {
-        result = saveOptionToStore(result, variable.name, variable.value);
+        result = writeOptionToStore(result, variable.name, variable.value);
       }
 
       return result;
     }
   ));
 
-function saveOptionToStore(state: UserState, attribute: string, value: any): UserState {
+function writeOptionToStore(state: UserState, attribute: string, value: any): UserState {
   switch (attribute) {
     case('userProfile'):
       const userProfile = {

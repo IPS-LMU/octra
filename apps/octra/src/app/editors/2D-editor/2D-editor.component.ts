@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   EventEmitter,
@@ -37,21 +38,26 @@ import {
 } from '@octra/components';
 import {AudioChunk, AudioManager, AudioSelection, PlayBackStatus, SampleUnit} from '@octra/media';
 import {ASRQueueItemType, OAudiofile, OSegment, PraatTextgridConverter, Segment} from '@octra/annotation';
+import {ApplicationState} from '../../core/store';
+import {Store} from '@ngrx/store';
 
 @Component({
   selector: 'octra-overlay-gui',
   templateUrl: './2D-editor.component.html',
-  styleUrls: ['./2D-editor.component.css']
+  styleUrls: ['./2D-editor.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy {
 
   public static editorname = '2D-Editor';
   public static initialized: EventEmitter<void> = new EventEmitter<void>();
+
   @ViewChild('viewer', {static: true}) viewer: AudioViewerComponent;
   @ViewChild('window', {static: false}) window: TranscrWindowComponent;
   @ViewChild('loupe', {static: false}) loupe: AudioViewerComponent;
   @ViewChild('audionav', {static: true}) audionav: AudioNavigationComponent;
   @Output() public openModal = new EventEmitter();
+
   public showWindow = false;
   public loupeHidden = true;
   public selectedIndex: number;
@@ -185,7 +191,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               public appStorage: AppStorageService,
               private asrService: AsrService,
               private cd: ChangeDetectorRef,
-              private langService: TranslocoService) {
+              private langService: TranslocoService,
+              private store: Store<ApplicationState>) {
     super();
     this.miniLoupeSettings = new AudioviewerConfig();
     this.subscrmanager = new SubscriptionManager();
@@ -228,13 +235,21 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
     this.audioChunkLoupe = this.audioManager.mainchunk.clone();
 
-    this.viewer.alerttriggered.subscribe(
+    this.subscrmanager.add(this.viewer.alerttriggered.subscribe(
       (result) => {
         this.alertService.showAlert(result.type, result.message).catch((error) => {
           console.error(error);
         });
       }
-    );
+    ));
+
+    this.subscrmanager.add(this.transcrService.annotationChanged.subscribe(() => {
+      this.cd.markForCheck();
+    }));
+
+    this.subscrmanager.add(this.transcrService.currentLevelSegmentChange.subscribe(() => {
+      this.cd.markForCheck();
+    }));
 
     this.subscrmanager.add(this.audioChunkLines.statuschange.subscribe(
       (state: PlayBackStatus) => {
@@ -273,15 +288,25 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     ));
 
     this.subscrmanager.add(this.asrService.queue.itemChange.subscribe((item: ASRQueueItem) => {
+        const checkUndoRedo = () => {
+          if (this.asrService.queue.statistics.running === 0) {
+            this.appStorage.enableUndoRedo();
+          } else {
+            this.appStorage.disableUndoRedo();
+          }
+        };
+
         if (item.status !== ASRProcessStatus.IDLE) {
           const segmentBoundary = new SampleUnit(item.time.sampleStart + item.time.sampleLength, this.audioManager.sampleRate);
           let segmentIndex = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(segmentBoundary);
 
           if (segmentIndex > -1) {
             let segment = this.transcrService.currentlevel.segments.get(segmentIndex);
-            segment.progressInfo.progress = item.progress;
-            segment.progressInfo.statusLabel = item.type;
-            this.viewer.redrawOverlay();
+            segment.progressInfo = {
+              progress: item.progress,
+              statusLabel: item.type
+            };
+            this.viewer.redraw();
 
             if (item.status !== ASRProcessStatus.STARTED && item.status !== ASRProcessStatus.RUNNING) {
               if (!isUnset(segment)) {
@@ -299,6 +324,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                     length: item.time.sampleLength
                   }, 'automation');
                 } else if (item.status === ASRProcessStatus.NOAUTH) {
+                  console.log(`NO AUTH`);
                   this.uiService.addElementFromEvent(item.type.toLowerCase(), {
                     value: 'no_auth'
                   }, Date.now(), null, null, null, {
@@ -317,7 +343,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                     }));
                   });
                 } else {
-                  if (item.status === ASRProcessStatus.FINISHED && item.result !== '') {
+                  if (item.status === ASRProcessStatus.FINISHED) {
                     this.uiService.addElementFromEvent(item.type.toLowerCase(), {
                       value: 'finished'
                     }, Date.now(), null, null, null, {
@@ -391,7 +417,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                             counter++;
                           }
 
-                          this.transcrService.currentlevel.segments.onsegmentchange.emit();
+                          this.transcrService.currentLevelSegmentChange.emit();
                         }
                       } else {
                         console.error(`word tier not found!`);
@@ -404,8 +430,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                     segment.isBlockedBy = null;
                     this.transcrService.currentlevel.segments.change(segmentIndex, segment);
                   } else if (item.status === ASRProcessStatus.STOPPED) {
-                    // TODO find a better solution!
-                    this.viewer.redraw();
+                    this.cd.markForCheck();
                   }
                 }
               } else {
@@ -424,6 +449,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
             console.error(new Error(`couldn't find segment number`));
           }
         }
+        checkUndoRedo();
       },
       (error) => {
       },
@@ -479,7 +505,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           this.audioChunkWindow = new AudioChunk(new AudioSelection(start, segment.time.clone()), this.audioManager);
           this.shortcutsEnabled = false;
 
-          this.viewer.settings.shortcutsEnabled = false;
+          this.viewer.disableShortcuts();
           this.showWindow = true;
 
           this.uiService.addElementFromEvent('segment', {
@@ -507,7 +533,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   onWindowAction(state) {
     if (state === 'close') {
       this.showWindow = false;
-      this.viewer.settings.shortcutsEnabled = true;
+      this.viewer.enableShortcuts();
       this.shortcutsEnabled = true;
       this.selectedIndex = this.window.segmentIndex;
       this.viewer.selectSegment(this.selectedIndex);
@@ -549,7 +575,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   public changeLoupePosition(mouseEvent: MouseEvent, cursorTime: SampleUnit) {
-
     const fullY = mouseEvent.offsetY + 20 + this.miniloupe.size.height;
     const x = mouseEvent.offsetX - ((this.miniloupe.size.width - 10) / 2) - 2;
 
@@ -574,91 +599,114 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
   onShortCutViewerTriggered($event: AudioViewerShortcutEvent) {
     this.triggerUIAction($event);
+
+    if ($event.shortcutName === 'undo' || $event.shortcutName === 'redo') {
+      if (this.appStorage.undoRedoDisabled) {
+        this.alertService.showAlert('danger', this.langService.translate('alerts.undo deactivated'));
+      }
+      if ($event.shortcutName === 'undo') {
+        this.appStorage.undo();
+      } else if ($event.shortcutName === 'redo') {
+        this.appStorage.redo();
+      }
+    }
   }
 
   onShortCutTriggered = ($event: ShortcutEvent) => {
-    if (!isUnset(this.audioChunkLines)) {
-      switch ($event.shortcutName) {
-        case('play_pause'):
-          this.triggerUIAction({
-            shortcut: $event.shortcut,
-            value: $event.shortcutName,
-            type: 'audio',
-            timestamp: $event.timestamp
-          });
-          if (this.audioChunkLines.isPlaying) {
-            this.audioChunkLines.pausePlayback().catch((error) => {
+    if (this.shortcutsEnabled) {
+      if (!isUnset(this.audioChunkLines)) {
+        let shortcutTriggered = false;
+        switch ($event.shortcutName) {
+          case('play_pause'):
+            this.triggerUIAction({
+              shortcut: $event.shortcut,
+              shortcutName: $event.shortcutName,
+              value: $event.shortcutName,
+              type: 'audio',
+              timestamp: $event.timestamp
+            });
+            if (this.audioChunkLines.isPlaying) {
+              this.audioChunkLines.pausePlayback().catch((error) => {
+                console.error(error);
+              });
+            } else {
+              this.audioChunkLines.startPlayback(false).catch((error) => {
+                console.error(error);
+              });
+            }
+            shortcutTriggered = true;
+            break;
+          case('stop'):
+            this.triggerUIAction({
+              shortcut: $event.shortcut,
+              shortcutName: $event.shortcutName,
+              value: $event.shortcutName,
+              type: 'audio',
+              timestamp: $event.timestamp
+            });
+            this.audioChunkLines.stopPlayback().catch((error) => {
               console.error(error);
             });
-          } else {
-            this.audioChunkLines.startPlayback(false).catch((error) => {
+            shortcutTriggered = true;
+            break;
+          case('step_backward'):
+            console.log(`step backward`);
+            this.triggerUIAction({
+              shortcut: $event.shortcut,
+              shortcutName: $event.shortcutName,
+              value: $event.shortcutName,
+              type: 'audio',
+              timestamp: $event.timestamp
+            });
+            this.audioChunkLines.stepBackward().catch((error) => {
               console.error(error);
             });
-          }
-          break;
-        case('stop'):
-          this.triggerUIAction({
-            shortcut: $event.shortcut,
-            value: $event.shortcutName,
-            type: 'audio',
-            timestamp: $event.timestamp
-          });
-          this.audioChunkLines.stopPlayback().catch((error) => {
-            console.error(error);
-          });
-          break;
-        case('step_backward'):
-          console.log(`step backward`);
-          this.triggerUIAction({
-            shortcut: $event.shortcut,
-            value: $event.shortcutName,
-            type: 'audio',
-            timestamp: $event.timestamp
-          });
-          this.audioChunkLines.stepBackward().catch((error) => {
-            console.error(error);
-          });
-          break;
-        case('step_backwardtime'):
-          console.log(`step backward time`);
-          this.triggerUIAction({
-            shortcut: $event.shortcut,
-            value: $event.shortcutName,
-            type: 'audio',
-            timestamp: $event.timestamp
-          });
-          this.audioChunkLines.stepBackwardTime(0.5).catch((error) => {
-            console.error(error);
-          });
-          break;
-      }
-    }
-
-    if (this.appStorage.showLoupe) {
-      const event = $event.event;
-
-      if (event.key === '+' || event.key === '-') {
-        if (event.key === '+') {
-          this.factor = Math.min(20, this.factor + 1);
-        } else if (event.key === '-') {
-          if (this.factor > 3) {
-            this.factor = Math.max(1, this.factor - 1);
-          }
+            break;
+          case('step_backwardtime'):
+            console.log(`step backward time`);
+            this.triggerUIAction({
+              shortcut: $event.shortcut,
+              shortcutName: $event.shortcutName,
+              value: $event.shortcutName,
+              type: 'audio',
+              timestamp: $event.timestamp
+            });
+            this.audioChunkLines.stepBackwardTime(0.5).catch((error) => {
+              console.error(error);
+            });
+            shortcutTriggered = true;
+            break;
         }
 
-        this.changeArea(this.loupe, this.viewer, this.audioManager, this.audioChunkLoupe, this.viewer.av.mouseCursor, this.factor)
-          .then((newLoupeChunk) => {
-            if (!isUnset(newLoupeChunk)) {
-              this.audioChunkLoupe = newLoupeChunk;
-              this.cd.detectChanges();
-            }
-          });
+        if (shortcutTriggered) {
+          $event.event.preventDefault();
+          this.cd.detectChanges();
+        }
       }
-    }
 
-    if (!isUnset($event)) {
-      $event.event.preventDefault();
-      this.cd.detectChanges();
+      if (this.appStorage.showLoupe) {
+        const event = $event.event;
+
+        if (event.key === '+' || event.key === '-') {
+          if (event.key === '+') {
+            this.factor = Math.min(20, this.factor + 1);
+          } else if (event.key === '-') {
+            if (this.factor > 3) {
+              this.factor = Math.max(1, this.factor - 1);
+            }
+          }
+
+          this.changeArea(this.loupe, this.viewer, this.audioManager, this.audioChunkLoupe, this.viewer.av.mouseCursor, this.factor)
+            .then((newLoupeChunk) => {
+              if (!isUnset(newLoupeChunk)) {
+                this.audioChunkLoupe = newLoupeChunk;
+                this.cd.detectChanges();
+              }
+            });
+
+          $event.event.preventDefault();
+        }
+      }
     }
   }
 
@@ -693,7 +741,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
               sampleLength: segment.time.samples - sampleStart
             };
 
-            console.log(`selection is ${sampleStart} to ${segment.time.samples}`);
             if (isUnset(segment.isBlockedBy)) {
               if ($event.value === 'do_asr' || $event.value === 'do_asr_maus' || $event.value === 'do_maus') {
                 this.viewer.selectSegment(segmentNumber);

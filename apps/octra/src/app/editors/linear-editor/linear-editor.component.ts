@@ -285,7 +285,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.editor.Settings.responsive = this.settingsService.responsive.enabled;
     this.editor.Settings.disabledKeys.push('SHIFT + SPACE');
 
-    this.subscrManager.add(this.transcrService.currentlevel.segments.onsegmentchange.subscribe(
+    this.subscrManager.add(this.transcrService.currentLevelSegmentChange.subscribe(
       ($event) => {
         if (!this.saving) {
           this.subscrManager.add(timer(1000).subscribe(() => {
@@ -436,6 +436,12 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
   onViewerShortcutTriggered($event: AudioViewerShortcutEvent, control: string) {
     this.triggerUIActionAfterShortcut($event, control, $event.timestamp);
+
+    if ($event.shortcutName === 'undo') {
+      this.appStorage.undo();
+    } else if ($event.shortcutName === 'redo') {
+      this.appStorage.redo();
+    }
   }
 
   onShortcutTriggered = ($event: ShortcutEvent) => {

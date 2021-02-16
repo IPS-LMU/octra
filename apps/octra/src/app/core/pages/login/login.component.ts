@@ -25,10 +25,10 @@ import {OctraDropzoneComponent} from '../../component/octra-dropzone/octra-dropz
 import {ComponentCanDeactivate} from './login.deactivateguard';
 import {LoginService} from './login.service';
 import {LoginMode} from '../../store';
-import * as LoginActions from '../../store/login/login.actions';
 import * as fromApplication from '../../store/application/';
 import {Store} from '@ngrx/store';
 import {OIDBLevel, OIDBLink} from '@octra/annotation';
+import {LoginActions} from '../../store/login/login.actions';
 
 @Component({
   selector: 'octra-login',

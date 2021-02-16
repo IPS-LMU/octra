@@ -76,7 +76,6 @@ export class AsrOptionsComponent implements OnInit {
         const segNumber = this.transcrService.currentlevel.segments.getSegmentBySamplePosition(time);
 
         if (segNumber > -1) {
-          console.log(`SEGNUMBER = ${segNumber} browser sample is ${time.samples}`);
           const segment = this.transcrService.currentlevel.segments.get(segNumber);
 
           if (!isUnset(segment)) {

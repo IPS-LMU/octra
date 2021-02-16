@@ -100,6 +100,24 @@ export class AudioviewerConfig {
     name: 'audioviewer',
     items: [
       {
+        name: 'undo',
+        keys: {
+          mac: 'CMD + Z',
+          pc: 'CTRL + Z'
+        },
+        focusonly: true,
+        title: 'undo'
+      },
+      {
+        name: 'redo',
+        keys: {
+          mac: 'SHIFT + CMD + Z',
+          pc: 'CTRL + Y'
+        },
+        focusonly: true,
+        title: 'redo'
+      },
+      {
         name: 'set_boundary',
         keys: {
           mac: 'S',
@@ -190,7 +208,7 @@ export class AudioviewerConfig {
         title: 'do asr maus'
       },
       {
-        name: 'do_asr_maus',
+        name: 'do_maus',
         keys: {
           mac: 'W',
           pc: 'W'

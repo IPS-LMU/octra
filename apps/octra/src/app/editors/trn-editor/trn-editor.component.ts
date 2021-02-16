@@ -447,7 +447,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
           }
         }
       }
-      this.transcrService.currentlevel.segments.onsegmentchange.emit(null);
+      this.transcrService.currentLevelSegmentChange.emit(null);
     }
   }
 
@@ -776,7 +776,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
       if (this.transcrEditor.html.indexOf('<img src="assets/img/components/transcr-editor/boundary.png"') > -1) {
         // boundaries were inserted
         this.transcrService.currentlevel.segments.segments = this.tempSegments.segments;
-        this.transcrService.currentlevel.segments.onsegmentchange.emit(null);
+        this.transcrService.currentLevelSegmentChange.emit(null);
       } else {
         // no boundaries inserted
         const segment = this.transcrService.currentlevel.segments.get(segmentIndex).clone();

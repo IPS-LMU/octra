@@ -147,27 +147,24 @@ export class ShortcutManager {
 
       if (this.shortcutsEnabled) {
         if (event.type === 'keydown') {
-          if (keyCode !== this._pressedKeys.other) {
-            // run shortcut check
-            const shortcut = this.getShorcutCombination(event);
-            const commandObj = this.getCommand(shortcut, BrowserInfo.platform);
+          // run shortcut check
+          const shortcut = this.getShorcutCombination(event);
+          console.log(shortcut);
+          const commandObj = this.getCommand(shortcut, BrowserInfo.platform);
 
-            this.checkPressedKey(event);
+          this.checkPressedKey(event);
 
-            if (!isUnset(commandObj)) {
-              resolve({
-                platform: BrowserInfo.platform,
-                shortcutName: commandObj.shortcut.name,
-                shortcutGroupName: commandObj.groupName,
-                onFocusOnly: commandObj.shortcut.focusonly,
-                shortcut,
-                event,
-                timestamp
-              });
+          if (!isUnset(commandObj)) {
+            resolve({
+              platform: BrowserInfo.platform,
+              shortcutName: commandObj.shortcut.name,
+              shortcutGroupName: commandObj.groupName,
+              onFocusOnly: commandObj.shortcut.focusonly,
+              shortcut,
+              event,
+              timestamp
+            });
 
-            } else {
-              resolve(null);
-            }
           } else {
             resolve(null);
           }
@@ -217,12 +214,26 @@ export class ShortcutManager {
    *
    * gets the name of a special Key by number
    */
-  private getNameByCode(code: number): string {
-    for (const elem of this.keyMappingTable) {
-      if (elem.keyCode === code) {
-        return elem.name;
+  private getNameByEvent(event: KeyboardEvent): string {
+    const code = this.getKeyCode(event);
+
+    if (code > -1) {
+      if (BrowserInfo.platform === 'mac') {
+        if (BrowserInfo.browser.toLowerCase().indexOf('firefox') > -1) {
+          // Firefox
+          if (code === 224 && (event.code === 'OSLeft' || event.code === 'OSRight')) {
+            return 'CMD';
+          }
+        }
+      }
+
+      for (const elem of this.keyMappingTable) {
+        if (elem.keyCode === code) {
+          return elem.name;
+        }
       }
     }
+
     return '';
   }
 
@@ -233,7 +244,7 @@ export class ShortcutManager {
     const cmd = this._pressedKeys.cmd;
     const shift = this._pressedKeys.shift;
 
-    let name = this.getNameByCode(keyCode);
+    let name = this.getNameByEvent(event);
     if (name === '' && keyCode > -1) {
       name = String.fromCharCode(keyCode).toUpperCase();
     }
@@ -274,7 +285,7 @@ export class ShortcutManager {
         comboKey += 'CMD';
       }
     } else {
-      comboKey = this.getNameByCode(keyCode);
+      comboKey = this.getNameByEvent(event);
     }
 
     // if name == comboKey, only one special Key pressed
@@ -310,7 +321,7 @@ export class ShortcutManager {
   }
 
   private checkPressedKey(event: KeyboardEvent) {
-    const keyName = this.getNameByCode(this.getKeyCode(event));
+    const keyName = this.getNameByEvent(event);
     const valueToSet = event.type === 'keydown';
 
     switch (keyName) {

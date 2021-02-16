@@ -264,6 +264,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         case('play_pause'):
           this.triggerUIAction({
             shortcut: $event.shortcut,
+            shortcutName: $event.shortcutName,
             value: $event.shortcutName,
             type: 'audio',
             timestamp: $event.timestamp
@@ -281,6 +282,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         case('stop'):
           this.triggerUIAction({
             shortcut: $event.shortcut,
+            shortcutName: $event.shortcutName,
             value: $event.shortcutName,
             type: 'audio',
             timestamp: $event.timestamp
@@ -293,6 +295,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           console.log(`step backward`);
           this.triggerUIAction({
             shortcut: $event.shortcut,
+            shortcutName: $event.shortcutName,
             value: $event.shortcutName,
             type: 'audio',
             timestamp: $event.timestamp
@@ -305,6 +308,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           console.log(`step backward time`);
           this.triggerUIAction({
             shortcut: $event.shortcut,
+            shortcutName: $event.shortcutName,
             value: $event.shortcutName,
             type: 'audio',
             timestamp: $event.timestamp
@@ -457,7 +461,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       if (this.editor.html.indexOf('<img src="assets/img/components/transcr-editor/boundary.png"') > -1) {
         // boundaries were inserted
         this.transcrService.currentlevel.segments.segments = this.tempSegments.segments;
-        this.transcrService.currentlevel.segments.onsegmentchange.emit(null);
+        this.transcrService.currentLevelSegmentChange.emit(null);
       } else {
         // no boundaries inserted
         const segment = this.transcrService.currentlevel.segments.get(this.segmentIndex).clone();

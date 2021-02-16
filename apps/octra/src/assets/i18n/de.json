@@ -190,8 +190,8 @@
       "move cursor left": "Cursor nach links bewegen",
       "move cursor right": "Cursor nach rechts bewegen",
       "audioplayer": "Tastenkombinationen des Audioplayers",
-      "top signaldisplay": "Tastenkombinationen des oberen Signaldsiplays",
-      "down signaldisplay": "Tastenkombinationen des unteren Signaldsiplays",
+      "signaldisplay_top": "Tastenkombinationen des oberen Signaldsiplays",
+      "signaldisplay_down": "Tastenkombinationen des unteren Signaldsiplays",
       "2D-Editor": "Tastenkombinationen des 2D-Editors",
       "transcription window": "Transkriptionsfenster",
       "play audio on hover": "Audio mit Mausbewegung abspielen",
@@ -216,7 +216,9 @@
       "save and upper cell": "Speichern und eine Zelle nach oben",
       "switch to": "Wechsle zu {{editor}}",
       "select all segments": "Alle Segmente markieren",
-      "remove selected completely": "Ausgewählte Segmnente vollständig löschen"
+      "remove selected completely": "Ausgewählte Segmnente vollständig löschen",
+      "undo": "Letzte Aktion rückgängig machen",
+      "redo": "Letzte Aktion wiederholen"
     },
     "inactivity": {
       "header": "Längere Inaktivität entdeckt",
@@ -362,7 +364,8 @@
   "alerts": {
     "authentication needed": "Authentifiziere Dich, damit Du Features wie die automatische Spracherkennung Wort-Segmentierung verwenden kannst. Nach einem Klick auf \"Authentifizieren\" erscheint ein separates Fenster. Falls sich kein Fenster öffnet, stelle sicher, dass dein Browser Popups für diese Seite erlaubt.",
     "combine segments successful": "Das Kombinieren von Segmenten mit gleichen Sprecher-Label war erfolgreich.",
-    "combine segments ignore speakerlabel successful": "Das Kombinieren von Segmenten unabhängig vom Sprecher-Label war erfolgreich."
+    "combine segments ignore speakerlabel successful": "Das Kombinieren von Segmenten unabhängig vom Sprecher-Label war erfolgreich.",
+    "undo deactivated": "Du kannst aktuell Aktionen nicht rückgängig machen oder wiederholen."
   },
   "authentication": {
     "you are authenticated": "Du bist authentifiziert!",

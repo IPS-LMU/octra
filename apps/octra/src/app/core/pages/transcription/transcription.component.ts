@@ -430,12 +430,12 @@ export class TranscriptionComponent implements OnInit,
 
     if (!isUnset(this.transcrService.annotation)) {
       this.levelSubscriptionID = this.subscrmanager.add(
-        this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
+        this.transcrService.currentLevelSegmentChange.subscribe(this.transcrService.saveSegments)
       );
     } else {
       this.subscrmanager.add(this.transcrService.dataloaded.subscribe(() => {
         this.levelSubscriptionID = this.subscrmanager.add(
-          this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
+          this.transcrService.currentLevelSegmentChange.subscribe(this.transcrService.saveSegments)
         );
       }));
     }
@@ -447,7 +447,7 @@ export class TranscriptionComponent implements OnInit,
         // important: subscribe to level changes in order to save proceedings
         this.subscrmanager.removeById(this.levelSubscriptionID);
         this.levelSubscriptionID = this.subscrmanager.add(
-          this.transcrService.currentlevel.segments.onsegmentchange.subscribe(this.transcrService.saveSegments)
+          this.transcrService.currentLevelSegmentChange.subscribe(this.transcrService.saveSegments)
         );
         this.uiService.addElementFromEvent('level', {value: 'changed'}, Date.now(),
           this.audioManager.createSampleUnit(0),

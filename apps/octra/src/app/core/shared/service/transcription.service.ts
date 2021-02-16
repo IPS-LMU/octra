@@ -28,13 +28,12 @@ import {
   OLevel,
   OSegment,
   PartiturConverter,
+  SegmentChangeEvent,
   Segments,
   TextConverter
 } from '@octra/annotation';
 import {AudioManager} from '@octra/media';
-import {LoginMode} from '../../store';
-import {interval, Subject, Subscription, timer} from 'rxjs';
-import {MaintenanceAPI} from '../../component/maintenance/maintenance-api';
+import {AnnotationStateLevel, convertFromLevelObject, convertToLevelObject, LoginMode} from '../../store';
 import {TranslocoService} from '@ngneat/transloco';
 import * as moment from 'moment';
 
@@ -44,16 +43,22 @@ declare var validateAnnotation: ((string, any) => any);
   providedIn: 'root'
 })
 export class TranscriptionService {
+  get currentLevelSegmentChange(): EventEmitter<SegmentChangeEvent> {
+    return this._currentLevelSegmentChange;
+  }
+
   public tasksBeforeSend: Promise<any>[] = [];
   public defaultFontSize = 14;
   public dataloaded = new EventEmitter<any>();
   public segmentrequested = new EventEmitter<number>();
   public filename = '';
   public levelchanged: EventEmitter<Level> = new EventEmitter<Level>();
+  public annotationChanged: EventEmitter<void> = new EventEmitter<void>();
   private subscrmanager: SubscriptionManager;
   private _segments: Segments;
   private state = 'ANNOTATED';
   private _audiomanager: AudioManager;
+  private _currentLevelSegmentChange = new EventEmitter<SegmentChangeEvent>();
   public alertTriggered: Subject<{
     type: 'danger' | 'warning' | 'info' | 'success', data: string | any, unique: boolean, duration?: number
   }>;
@@ -71,7 +76,7 @@ export class TranscriptionService {
 
   public get currentlevel(): Level {
     if (isUnset(this._selectedlevel) || this._selectedlevel < 0) {
-      return this._annotation.levels[0]
+      return this._annotation.levels[0];
     }
     return this._annotation.levels[this._selectedlevel];
   }
@@ -180,6 +185,7 @@ export class TranscriptionService {
         }
       }));
 
+    this._currentLevelSegmentChange = new EventEmitter<SegmentChangeEvent>();
     if (!isUnset(this.settingsService.appSettings) &&
       this.settingsService.appSettings.octra.hasOwnProperty('maintenanceNotification') &&
       this.settingsService.appSettings.octra.maintenanceNotification.active === 'active') {
@@ -231,9 +237,11 @@ export class TranscriptionService {
     if (!isUnset(this._annotation)
       && this._annotation.levels.length > 0
       && !isUnset(this._annotation.levels[this._selectedlevel])) {
+      const level = this._annotation.levels[this._selectedlevel];
+
       this.appStorage.save('annotation', {
         num: this._selectedlevel,
-        level: this._annotation.levels[this._selectedlevel].getObj(this.audioManager.ressource.info.duration)
+        level: convertFromLevelObject(level, this._audiomanager.ressource.info.duration)
       });
     } else {
       console.error(new Error('can not save segments because annotation is null'));
@@ -332,6 +340,11 @@ export class TranscriptionService {
             this.navbarServ.ressource = this._audiomanager.ressource;
             this.navbarServ.filesize = Functions.getFileSize(this._audiomanager.ressource.size);
 
+            this.subscrmanager.removeByTag('idbAnnotationChange');
+            this.subscrmanager.add(this.appStorage.annotationChanged.subscribe((state) => {
+              // TODO PROBLEM HERE
+              this.updateAnnotation(state.levels, state.links);
+            }), 'idbAnnotationChange');
             resolve();
           }
         ).catch((err) => {
@@ -384,30 +397,28 @@ export class TranscriptionService {
 
                     // check if servertranscript's segment is empty
                     if (this.appStorage.serverDataEntry.transcript.length === 1 && this.appStorage.serverDataEntry[0].text === '') {
-                      this.appStorage.annotationLevels[this.selectedlevel].level.items.push(
+                      this.appStorage.annotationLevels[this.selectedlevel].items.push(
                         new OSegment(0, 0, this.audioManager.ressource.info.duration.samples,
                           [new OLabel('OCTRA_1', this.appStorage.prompttext)])
                       );
 
                       this.appStorage.changeAnnotationLevel(this._selectedlevel,
-                        this.appStorage.annotationLevels[this._selectedlevel].level).then(() => {
+                        this.appStorage.annotationLevels[this._selectedlevel]).then(() => {
                         resolve2();
                       }).catch(() => {
                         resolve2();
                       });
                     } else {
-                      console.log(`read serverData entry...`);
-                      this.appStorage.annotationLevels[this._selectedlevel].level.items = [];
+                      this.appStorage.annotationLevels[this._selectedlevel].items = [];
                       for (let i = 0; i < this.appStorage.serverDataEntry.transcript.length; i++) {
                         const segT = this.appStorage.serverDataEntry.transcript[i];
 
                         const oseg = new OSegment(i, segT.start, segT.length, [new OLabel('OCTRA_1', segT.text)]);
-                        this.appStorage.annotationLevels[this.selectedlevel].level.items.push(oseg);
+                        this.appStorage.annotationLevels[this.selectedlevel].items.push(oseg);
                       }
-                      console.log(`read serverData read with ${this.appStorage.serverDataEntry.transcript.length} items...`);
 
                       this.appStorage.changeAnnotationLevel(this._selectedlevel,
-                        this.appStorage.annotationLevels[this._selectedlevel].level).then(() => {
+                        this.appStorage.annotationLevels[this._selectedlevel]).then(() => {
                         resolve2();
                       }).catch(() => {
                         resolve2();
@@ -440,13 +451,13 @@ export class TranscriptionService {
                     }
 
                     if (converted === undefined) {
-                      this.appStorage.annotationLevels[this.selectedlevel].level.items.push(
+                      this.appStorage.annotationLevels[this.selectedlevel].items.push(
                         new OSegment(0, 0, this.audioManager.ressource.info.duration.samples,
                           [new OLabel('OCTRA_1', this.appStorage.prompttext)])
                       );
 
                       this.appStorage.changeAnnotationLevel(this._selectedlevel,
-                        this.appStorage.annotationLevels[this._selectedlevel].level).then(() => {
+                        this.appStorage.annotationLevels[this._selectedlevel]).then(() => {
                         resolve2();
                       }).catch(() => {
                         resolve2();
@@ -456,9 +467,16 @@ export class TranscriptionService {
                       const promises: Promise<any>[] = [];
                       for (let i = 0; i < converted.levels.length; i++) {
                         if (i >= this.appStorage.annotationLevels.length) {
-                          promises.push(this.appStorage.addAnnotationLevel(converted.levels[i]));
+                          promises.push(this.appStorage.addAnnotationLevel(
+                            new OIDBLevel(-1, converted.levels[i], i)
+                          ));
                         } else {
-                          promises.push(this.appStorage.changeAnnotationLevel(i, converted.levels[i]));
+                          promises.push(this.appStorage.changeAnnotationLevel(i, {
+                            id: null,
+                            name: converted.levels[i].name,
+                            type: converted.levels[i].type,
+                            items: converted.levels[i].items
+                          }));
                         }
                       }
 
@@ -487,17 +505,8 @@ export class TranscriptionService {
 
           this._annotation = new Annotation(annotates, this._audiofile);
 
-          if (!(this.appStorage.annotationLevels === null || this.appStorage.annotationLevels === undefined)) {
-            // load levels
-            for (const oidbLevel of this.appStorage.annotationLevels) {
-              const level: Level = Level.fromObj(oidbLevel,
-                this._audiomanager.sampleRate, this._audiomanager.ressource.info.duration);
-              this._annotation.levels.push(level);
-            }
-
-            for (const annotationLink of this.appStorage.annotationLinks) {
-              this._annotation.links.push(annotationLink.link);
-            }
+          if (!isUnset(this.appStorage.annotationLevels)) {
+            this.updateAnnotation(this.appStorage.annotationLevels, this.appStorage.annotationLinks);
 
             this._feedback = FeedBackForm.fromAny(this.settingsService.projectsettings.feedback_form, this.appStorage.comment);
             this._feedback.importData(this.appStorage.feedback);
@@ -525,6 +534,28 @@ export class TranscriptionService {
         });
       }
     );
+  }
+
+  private updateAnnotation(levels: AnnotationStateLevel[], links: OIDBLink[]) {
+    // load levels
+    this._annotation = new Annotation(this._annotation.annotates, this._annotation.audiofile, []);
+
+    for (const annotationStateLevel of levels) {
+      const level = convertToLevelObject(annotationStateLevel,
+        this.audioManager.sampleRate, this.audioManager.ressource.info.duration.clone());
+      this._annotation.levels.push(level);
+    }
+
+    for (const annotationLink of links) {
+      this._annotation.links.push(annotationLink.link);
+    }
+
+    this.subscrmanager.removeByTag('segmentchange');
+    this.subscrmanager.add(this.currentlevel.segments.onsegmentchange.subscribe((event) => {
+      this._currentLevelSegmentChange.emit(event);
+    }), 'segmentchange');
+
+    this.annotationChanged.emit();
   }
 
   public exportDataToJSON(): any {

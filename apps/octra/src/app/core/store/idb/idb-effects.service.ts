@@ -1,30 +1,87 @@
 import {Injectable} from '@angular/core';
 import {Actions, createEffect, ofType} from '@ngrx/effects';
 import {AppStorageService} from '../../shared/service/appstorage.service';
-import * as ConfigurationActions from '../configuration/configuration.actions';
-import * as IDBActions from './idb.actions';
-import {exhaustMap} from 'rxjs/operators';
+import {exhaustMap, mergeMap, withLatestFrom} from 'rxjs/operators';
 import {Subject} from 'rxjs';
-import {Action} from '@ngrx/store';
+import {Action, Store} from '@ngrx/store';
 import {IDBService} from '../../shared/service/idb.service';
-import * as TranscriptionActions from '../transcription/transcription.actions';
-import * as UserActions from '../user/user.actions';
-import * as ApplicationActions from '../application/application.actions';
-import * as LoginActions from '../login/login.actions';
-import * as ASRActions from '../asr/asr.actions';
-import {LoginMode, OnlineSession} from '../index';
+import {
+  AnnotationStateLevel,
+  convertFromOIDLevel,
+  convertToOIDBLevel,
+  LoginMode,
+  OnlineSession,
+  RootState
+} from '../index';
 import {isUnset} from '@octra/utilities';
 import {OIDBLink} from '@octra/annotation';
 import {SessionStorageService} from 'ngx-webstorage';
 import {PromiseExtended} from 'dexie';
 import {IIDBLevel} from '../../shared/octra-database';
 import {ConsoleEntry} from '../../shared/service/bug-report.service';
+import {AnnotationActions} from '../annotation/annotation.actions';
+import {IDBActions} from './idb.actions';
+import {ConfigurationActions} from '../configuration/configuration.actions';
+import {ApplicationActions} from '../application/application.actions';
+import {ASRActions} from '../asr/asr.actions';
+import {TranscriptionActions} from '../transcription/transcription.actions';
+import {LoginActions} from '../login/login.actions';
+import {UserActions} from '../user/user.actions';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class IDBEffects {
+  saveAfterUndo$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ApplicationActions.undo),
+      withLatestFrom(this.store),
+      mergeMap(([actionData, appState]: [Action, RootState]) => {
+        const subject = new Subject<Action>();
+        // code for saving to the database
+        console.log(`save after undo`);
+        Promise.all([
+          this.idbService.saveAnnotationLevels(appState.annotation.levels),
+          this.idbService.saveAnnotationLinks(appState.annotation.links)
+        ]).then(() => {
+          subject.next(ApplicationActions.undoSuccess());
+        }).catch((error) => {
+          subject.next(ApplicationActions.undoFailed({
+            error
+          }));
+        });
+
+        return subject;
+      })
+    )
+  );
+
+  saveAfterRedo = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ApplicationActions.redo),
+      withLatestFrom(this.store),
+      mergeMap(([actionData, appState]: [Action, RootState]) => {
+        const subject = new Subject<Action>();
+        // code for saving to the database
+        console.log(`save after redo`);
+
+        Promise.all([
+          this.idbService.saveAnnotationLevels(appState.annotation.levels),
+          this.idbService.saveAnnotationLinks(appState.annotation.links)
+        ]).then(() => {
+          subject.next(ApplicationActions.redoSuccess());
+        }).catch((error) => {
+          subject.next(ApplicationActions.redoFailed({
+            error
+          }));
+        });
+
+        return subject;
+      })
+    )
+  );
+
   loadOptions$ = createEffect(() => this.actions$.pipe(
     ofType(ConfigurationActions.appConfigurationLoadSuccess),
     exhaustMap((action) => {
@@ -108,6 +165,10 @@ export class IDBEffects {
             {
               attribute: '_highlightingEnabled',
               key: 'highlightingEnabled'
+            },
+            {
+              attribute: '_asr',
+              key: 'asr'
             }
           ]
         ).subscribe(
@@ -156,22 +217,18 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
       this.idbService.loadAnnotationLevels().then((levels: IIDBLevel[]) => {
-        const annotationLevels = [];
+        const annotationLevels: AnnotationStateLevel[] = [];
         let max = 0;
         for (let i = 0; i < levels.length; i++) {
+          const annotationStateLevel = convertFromOIDLevel(levels[i]);
+
           if (!levels[i].hasOwnProperty('id')) {
-            annotationLevels.push(
-              {
-                id: i + 1,
-                level: levels[i].level,
-                sortorder: i
-              }
-            );
-            max = Math.max(i + 1, max);
-          } else {
-            annotationLevels.push(levels[i]);
-            max = Math.max(levels[i].id, max);
+            // TODO this could lead to an error!
+            annotationStateLevel.id = i + 1;
           }
+
+          annotationLevels.push(annotationStateLevel);
+          max = Math.max(annotationStateLevel.id, max)
         }
 
         subject.next(IDBActions.loadAnnotationLevelsSuccess({
@@ -263,7 +320,7 @@ export class IDBEffects {
   ))
 
   clearAnnotation$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.clearAnnotation),
+    ofType(AnnotationActions.clearAnnotation),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -282,7 +339,7 @@ export class IDBEffects {
   ));
 
   overwriteAnnotation$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.overwriteAnnotation),
+    ofType(AnnotationActions.overwriteAnnotation),
     exhaustMap((action) => {
         const subject = new Subject<Action>();
 
@@ -318,7 +375,7 @@ export class IDBEffects {
     )));
 
   overwriteAnnotationLinks$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.overwriteLinks),
+    ofType(AnnotationActions.overwriteLinks),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -761,7 +818,7 @@ export class IDBEffects {
 
   saveASRLanguage$ = createEffect(() => this.actions$.pipe(
     ofType(ASRActions.setASRSettings),
-    exhaustMap((action) => {
+    mergeMap((action) => {
       const subject = new Subject<Action>();
 
       this.idbService.saveOption('asr', {
@@ -842,16 +899,12 @@ export class IDBEffects {
   ));
 
   saveAnnotationLevel$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.changeAnnotationLevel),
+    ofType(AnnotationActions.changeAnnotationLevel),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
       console.log(`save annotation level...`);
-      this.idbService.saveAnnotationLevel({
-        id: action.id,
-        level: action.level,
-        sortorder: action.sortorder
-      }, action.id).then(() => {
+      this.idbService.saveAnnotationLevel(convertToOIDBLevel(action.level, action.sortorder), action.id).then(() => {
         console.log(`saved annotation level success`);
         subject.next(IDBActions.saveAnnotationLevelSuccess());
         subject.complete();
@@ -867,18 +920,15 @@ export class IDBEffects {
   ));
 
   addAnnotationLevel$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.addAnnotationLevel),
+    ofType(AnnotationActions.addAnnotationLevel),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.idbService.saveAnnotationLevel({
-        id: action.id,
-        level: action.level,
-        sortorder: action.sortorder
-      }, action.id).then(() => {
-        subject.next(IDBActions.addAnnotationLevelSuccess());
-        subject.complete();
-      }).catch((error) => {
+      this.idbService.saveAnnotationLevel(convertToOIDBLevel(action.level, action.level.id), action.level.id)
+        .then(() => {
+          subject.next(IDBActions.addAnnotationLevelSuccess());
+          subject.complete();
+        }).catch((error) => {
         subject.next(IDBActions.addAnnotationLevelFailed({
           error
         }));
@@ -889,7 +939,7 @@ export class IDBEffects {
   ));
 
   removeAnnotationLevel$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.removeAnnotationLevel),
+    ofType(AnnotationActions.removeAnnotationLevel),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -970,7 +1020,8 @@ export class IDBEffects {
   constructor(private actions$: Actions,
               private appStorage: AppStorageService,
               private idbService: IDBService,
-              private sessStr: SessionStorageService) {
+              private sessStr: SessionStorageService,
+              private store: Store<RootState>) {
 
     // TODO add this as effect
     actions$.subscribe((action) => {

@@ -1,30 +1,43 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {LocalStorageService, SessionStorageService} from 'ngx-webstorage';
-import {Subject} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {IDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
 import {FileProgress} from '../../obj/objects';
 import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
-import {OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
-import {LoginMode, OnlineSession, RootState} from '../../store';
+import {Level, OIDBLevel, OIDBLink} from '@octra/annotation';
+import {
+  AnnotationState,
+  AnnotationStateLevel,
+  convertFromOIDLevel,
+  LoginMode,
+  OnlineSession,
+  RootState
+} from '../../store';
 import {Store} from '@ngrx/store';
 import {AudioManager} from '@octra/media';
-import * as ApplicationActions from '../../store/application/application.actions';
-import * as LoginActions from '../../store/login/login.actions';
-import * as ASRActions from '../../store/asr/asr.actions';
-import * as TranscriptionActions from '../../store/transcription/transcription.actions';
-import * as fromTranscriptionReducer from '../../store/transcription/transcription.reducer';
-import * as UserActions from '../../store/user/user.actions';
-import * as IDBActions from '../../store/idb/idb.actions';
 import {Actions} from '@ngrx/effects';
 import {ConsoleEntry} from './bug-report.service';
 import {Router} from '@angular/router';
+import {AnnotationActions} from '../../store/annotation/annotation.actions';
+import {UserActions} from '../../store/user/user.actions';
+import {TranscriptionActions} from '../../store/transcription/transcription.actions';
+import {ApplicationActions} from '../../store/application/application.actions';
+import {LoginActions} from '../../store/login/login.actions';
+import {ASRActions} from '../../store/asr/asr.actions';
+import {IDBActions} from '../../store/idb/idb.actions';
+import * as fromTranscriptionReducer from '../../store/transcription/transcription.reducer';
+import * as fromAnnotation from '../../store/annotation';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppStorageService {
+  get undoRedoDisabled(): boolean {
+    return this._undoRedoDisabled;
+  }
+
   get snapshot(): RootState {
     return this._snapshot;
   }
@@ -43,6 +56,14 @@ export class AppStorageService {
 
   set playonhover(value: boolean) {
     this.store.dispatch(TranscriptionActions.setPlayOnHover({playOnHover: value}));
+  }
+
+  public get annotationChanged(): Observable<AnnotationState> {
+    const subject = new Subject<AnnotationState>();
+    this.store.select(fromAnnotation.selectAnnotation).subscribe((state) => {
+      subject.next(state);
+    });
+    return subject;
   }
 
   set reloaded(value: boolean) {
@@ -146,20 +167,12 @@ export class AppStorageService {
     return this._snapshot.login.onlineSession?.sessionData?.serverComment;
   }
 
-  get annotationLevels(): OIDBLevel[] {
-    return this._snapshot.transcription.annotation.levels;
+  get annotationLevels(): AnnotationStateLevel[] {
+    return this._snapshot.annotation.levels;
   }
 
   get annotationLinks(): OIDBLink[] {
-    return this._snapshot.transcription.annotation.links;
-  }
-
-  get levelcounter(): number {
-    return this._snapshot.transcription.annotation.levelCounter;
-  }
-
-  set levelcounter(value: number) {
-    this.store.dispatch(TranscriptionActions.setLevelCounter({levelCounter: value}));
+    return this._snapshot.annotation.links;
   }
 
   get secondsPerLine(): number {
@@ -186,11 +199,17 @@ export class AppStorageService {
     }));
   }
 
+  private _undoRedoDisabled = false;
+
   constructor(public sessStr: SessionStorageService,
               public localStr: LocalStorageService,
               private store: Store<RootState>,
               private actions: Actions,
               private router: Router) {
+    this.subscrManager.add(this.store.subscribe((state: RootState) => {
+      this._snapshot = state;
+    }));
+
     this.subscrManager.add(actions.subscribe((action) => {
       if (action.type === '@ngrx/effects/init') {
         this.store.dispatch(TranscriptionActions.setTranscriptionState({
@@ -207,10 +226,6 @@ export class AppStorageService {
         this.reloaded = this.sessStr.retrieve('reloaded');
         this.serverDataEntry = this.sessStr.retrieve('serverDataEntry');
       }
-    }));
-
-    this.subscrManager.add(this.store.subscribe((state: RootState) => {
-      this._snapshot = state;
     }));
   }
 
@@ -432,9 +447,11 @@ export class AppStorageService {
           }
         });
 
-        this.store.dispatch(TranscriptionActions.overwriteAnnotation({
+        this.store.dispatch(AnnotationActions.overwriteAnnotation({
           annotation: {
-            levels,
+            levels: (levels.map((a) => {
+              return convertFromOIDLevel(a);
+            }) as AnnotationStateLevel[]),
             links,
             levelCounter: max
           },
@@ -445,7 +462,7 @@ export class AppStorageService {
   }
 
   public overwriteLinks = (value: OIDBLink[]) => {
-    this.store.dispatch(TranscriptionActions.overwriteLinks({
+    this.store.dispatch(AnnotationActions.overwriteLinks({
       links: value
     }));
   }
@@ -651,7 +668,7 @@ export class AppStorageService {
     });
   }
 
-  public changeAnnotationLevel(tiernum: number, level: OLevel): Promise<void> {
+  public changeAnnotationLevel(tiernum: number, level: AnnotationStateLevel): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (!isUnset(this.annotationLevels)) {
         if (!isUnset(level)) {
@@ -667,7 +684,7 @@ export class AppStorageService {
                 reject(error);
               });
 
-            this.store.dispatch(TranscriptionActions.changeAnnotationLevel({
+            this.store.dispatch(AnnotationActions.changeAnnotationLevel({
               level,
               id,
               sortorder: tiernum
@@ -684,11 +701,10 @@ export class AppStorageService {
     });
   }
 
-  public addAnnotationLevel(level: OLevel) {
+  public addAnnotationLevel(level: OIDBLevel) {
     return new Promise<void>((resolve, reject) => {
       if (!isUnset(level)) {
-        const newID = this.levelcounter + 1;
-        this.levelcounter = newID;
+        level.id = ++Level.counter;
 
         Functions.waitTillResultRetrieved(this.actions, IDBActions.addAnnotationLevelSuccess, IDBActions.addAnnotationLevelFailed)
           .then(() => {
@@ -698,10 +714,8 @@ export class AppStorageService {
             reject(error);
           });
 
-        this.store.dispatch(TranscriptionActions.addAnnotationLevel({
-          id: newID,
-          level,
-          sortorder: this.annotationLevels.length
+        this.store.dispatch(AnnotationActions.addAnnotationLevel({
+          level: convertFromOIDLevel(level)
         }));
       } else {
         console.error('level is undefined or null');
@@ -711,7 +725,7 @@ export class AppStorageService {
 
   public removeAnnotationLevel(id: number): Promise<void> {
     if (id > -1) {
-      this.store.dispatch(TranscriptionActions.removeAnnotationLevel({
+      this.store.dispatch(AnnotationActions.removeAnnotationLevel({
         id
       }));
       return new Promise<void>((resolve) => {
@@ -739,6 +753,7 @@ export class AppStorageService {
 
   public logout() {
     this.endSession().then(() => {
+      this.clearHistory();
       this.store.dispatch(LoginActions.logout());
       Functions.navigateTo(this.router, ['login'], AppInfo.queryParamsHandling).catch((error) => {
         console.error(error);
@@ -746,7 +761,35 @@ export class AppStorageService {
     });
   }
 
+  public undo() {
+    if (!this._undoRedoDisabled) {
+      this.store.dispatch(ApplicationActions.undo());
+    }
+  }
+
+  public disableUndoRedo() {
+    this._undoRedoDisabled = true;
+    this.clearHistory();
+  }
+
+  public enableUndoRedo() {
+    if (this._undoRedoDisabled) {
+      this.clearHistory();
+      this._undoRedoDisabled = false;
+    }
+  }
+
+  public redo() {
+    if (!this._undoRedoDisabled) {
+      this.store.dispatch(ApplicationActions.redo());
+    }
+  }
+
+  public clearHistory() {
+    this.store.dispatch(ApplicationActions.clear());
+  }
+
   public clearAnnotationPermanently() {
-    this.store.dispatch(TranscriptionActions.clearAnnotation());
+    this.store.dispatch(AnnotationActions.clearAnnotation());
   }
 }

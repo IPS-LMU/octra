@@ -779,7 +779,7 @@ export class ASRQueueItem {
       json = json.WebServiceResponseLink;
 
       if (json.success === 'true') {
-        const file = FileInfo.fromURL(json.downloadLink, `OCTRA_ASRqueueItem_${this._id}.txt`, 'text/plain');
+        const file = FileInfo.fromURL(json.downloadLink, 'text/plain', `OCTRA_ASRqueueItem_${this._id}.txt`);
         file.updateContentFromURL(this.parent.httpClient).then(() => {
           // add messages to protocol
           resolve({

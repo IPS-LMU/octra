@@ -84,7 +84,7 @@ export class FileInfo extends DataInfo {
     return new FileInfo(file.name, file.type, file.size, file);
   }
 
-  public static fromURL(url: string, name: string = null, type: string, createdAt = 0) {
+  public static fromURL(url: string, type: string, name: string = null, createdAt = 0) {
     let fullname = '';
     if (name != null) {
       const extension = url.substr(url.lastIndexOf('.') + 1);

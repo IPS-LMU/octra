@@ -25,10 +25,10 @@ import {UserActions} from '../../store/user/user.actions';
 import {TranscriptionActions} from '../../store/transcription/transcription.actions';
 import {ApplicationActions} from '../../store/application/application.actions';
 import {LoginActions} from '../../store/login/login.actions';
-import {ASRActions} from '../../store/asr/asr.actions';
 import {IDBActions} from '../../store/idb/idb.actions';
 import * as fromTranscriptionReducer from '../../store/transcription/transcription.reducer';
 import * as fromAnnotation from '../../store/annotation';
+import {ASRActions} from '../../store/asr/asr.actions';
 
 @Injectable({
   providedIn: 'root'

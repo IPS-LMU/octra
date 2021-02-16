@@ -36,6 +36,8 @@ import {AudioManager} from '@octra/media';
 import {AnnotationStateLevel, convertFromLevelObject, convertToLevelObject, LoginMode} from '../../store';
 import {TranslocoService} from '@ngneat/transloco';
 import * as moment from 'moment';
+import {interval, Subject, Subscription, timer} from 'rxjs';
+import {MaintenanceAPI} from '../../component/maintenance/maintenance-api';
 
 declare var validateAnnotation: ((string, any) => any);
 

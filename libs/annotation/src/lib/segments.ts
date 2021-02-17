@@ -30,7 +30,6 @@ export class Segments {
   constructor(private sampleRate, private levelName: string, segments: ISegment[], lastSampleUnit: SampleUnit) {
     this._segments = [];
     this.onsegmentchange = new EventEmitter<SegmentChangeEvent>();
-    console.log(`LAST SAMPLE is ${lastSampleUnit.seconds}`);
 
     if (segments !== null) {
       if (segments.length === 0) {

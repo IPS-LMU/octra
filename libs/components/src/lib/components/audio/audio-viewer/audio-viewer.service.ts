@@ -713,7 +713,6 @@ export class AudioViewerService {
           this.audioChunk.absolutePlayposition = this.audioChunk.time.start.clone();
           this.channelInitialized.next();
           this.channelInitialized.complete();
-          console.log(`resolved!`);
           resolve();
         })
         .catch((err) => {

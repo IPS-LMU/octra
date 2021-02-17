@@ -493,7 +493,6 @@ export class AudioManager {
         }
       },
       (error) => {
-        console.log(`catched 3`);
         this.onChannelDataChange.error(error);
         result.error(error);
       },

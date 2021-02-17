@@ -149,7 +149,6 @@ export class ShortcutManager {
         if (event.type === 'keydown') {
           // run shortcut check
           const shortcut = this.getShorcutCombination(event);
-          console.log(shortcut);
           const commandObj = this.getCommand(shortcut, BrowserInfo.platform);
 
           this.checkPressedKey(event);
@@ -173,8 +172,6 @@ export class ShortcutManager {
           resolve(null);
         } else {
           this.checkPressedKey(event);
-
-          console.log(this._pressedKeys);
           resolve(null);
         }
       } else {

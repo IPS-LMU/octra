@@ -70,7 +70,6 @@ export class WavFormat extends AudioFormat {
           finishedSegments: pointer + 1,
           file
         });
-        console.log(`finished segment ${pointer}`);
 
         if (pointer < segments.length - 1) {
           // continue
@@ -78,15 +77,12 @@ export class WavFormat extends AudioFormat {
           // const freeSpace = window.performance.memory.totalJSHeapSize - window.performance.memory.usedJSHeapSize;
           // console.log(`${freeSpace / 1024 / 1024} MB left.`);
           if (this.status === 'running') {
-            console.log(`continue cutting`);
             setTimeout(() => this.cutAudioFileSequentially(namingConvention, buffer, segments, ++pointer), 200);
           } else {
             this.status = 'stopped';
-            console.log(`stopped cutting`);
           }
         } else {
           // stop
-          console.log(`stop cutting`);
           this.onaudiocut.complete();
         }
       }).catch((error) => {
@@ -104,7 +100,6 @@ export class WavFormat extends AudioFormat {
       if (this.isValid(buffer)) {
         const u8array = new Uint8Array(buffer);
 
-        console.log(`cut audio file`);
         this.extractDataFromArray(segment.sampleStart, segment.sampleDur, u8array).then((data: Uint8Array | Uint16Array) => {
           resolve(this.getFileFromBufferPart(data, this._channels, filename));
         }).catch((error) => {

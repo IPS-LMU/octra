@@ -15,6 +15,7 @@ import {BrowserInfo} from '../../core/shared';
 
 import {
   AlertService,
+  AlertType,
   AudioService,
   KeymappingService,
   SettingsService,
@@ -298,7 +299,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
     this.subscrManager.add(this.signalDisplayTop.alerttriggered.subscribe(
       (result) => {
-        this.alertService.showAlert(result.type, result.message).catch((error) => {
+        this.alertService.showAlert(result.type as AlertType, result.message).catch((error) => {
           console.error(error);
         });
       }

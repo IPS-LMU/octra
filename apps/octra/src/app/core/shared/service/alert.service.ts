@@ -1,5 +1,7 @@
 import {EventEmitter, Injectable} from '@angular/core';
 
+export type AlertType = 'danger' | 'warning' | 'info' | 'success';
+
 @Injectable()
 export class AlertService {
   public alertInitialized = new EventEmitter<{
@@ -13,7 +15,7 @@ export class AlertService {
   constructor() {
   }
 
-  public showAlert(type: 'danger' | 'warning' | 'info' | 'success', data: string | any, unique: boolean = true, duration?: number)
+  public showAlert(type: AlertType, data: string | any, unique: boolean = true, duration?: number)
     : Promise<{
     id: number;
     component: any;

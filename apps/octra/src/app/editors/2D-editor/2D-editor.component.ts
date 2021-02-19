@@ -20,6 +20,7 @@ import {TranscrEditorComponent} from '../../core/component';
 
 import {
   AlertService,
+  AlertType,
   AudioService,
   KeymappingService,
   SettingsService,
@@ -237,7 +238,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
     this.subscrmanager.add(this.viewer.alerttriggered.subscribe(
       (result) => {
-        this.alertService.showAlert(result.type, result.message).catch((error) => {
+        this.alertService.showAlert(result.type as AlertType, result.message).catch((error) => {
           console.error(error);
         });
       }

@@ -168,6 +168,22 @@ export class Segments {
     return false;
   }
 
+  /***
+   * overwrites all segments, including the last one with the newSegments array. Makes sure that last segment has correct right boundary.
+   * @param newSegments array of segments to set
+   * @param lastBoundary the most right boundary (= audio duration)
+   */
+  public overwriteAllWith(newSegments: Segment[], lastBoundary: SampleUnit) {
+    this._segments = newSegments;
+    const lastSegment = this._segments[this._segments.length - 1];
+    lastSegment.time = lastBoundary.clone();
+    this.onsegmentchange.emit({
+      type: 'change',
+      oldNum: -1,
+      oldID: -1
+    });
+  }
+
   /**
    * sorts the segments by time in samples
    */

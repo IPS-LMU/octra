@@ -79,6 +79,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
   private audioShortcutsTopDisplay = {
     name: 'signaldisplay_top',
+    enabled: true,
     items: [
       {
         name: 'play_pause',
@@ -121,6 +122,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
   private audioShortcutsBottomDisplay: ShortcutGroup = {
     name: 'signaldisplay_down',
+    enabled: true,
     items: [
       {
         name: 'play_pause',
@@ -249,9 +251,17 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.selectedAudioChunk = this.audioChunkTop;
 
     this.keyMap.register({
-      name: 'signaldisplay_top',
-      items: [...this.audioShortcutsTopDisplay.items, ...this.signalDisplayTop.settings.shortcuts.items]
+      name: 'signaldisplay_top_audio',
+      enabled: true,
+      items: [...this.audioShortcutsTopDisplay.items]
     });
+
+    this.keyMap.register({
+      name: 'signaldisplay_top',
+      enabled: true,
+      items: [...this.signalDisplayTop.settings.shortcuts.items]
+    });
+
     this.signalDisplayTop.settings.shortcutsEnabled = true;
     this.signalDisplayTop.settings.boundaries.enabled = true;
     this.signalDisplayTop.settings.boundaries.readonly = false;
@@ -262,8 +272,14 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
     this.loupeSettings = new AudioviewerConfig();
     this.keyMap.register({
+      name: 'signaldisplay_down_audio',
+      enabled: true,
+      items: [...this.audioShortcutsBottomDisplay.items]
+    });
+    this.keyMap.register({
       name: 'signaldisplay_down',
-      items: [...this.audioShortcutsBottomDisplay.items, ...this.loupeSettings.shortcuts.items]
+      enabled: true,
+      items: [...this.loupeSettings.shortcuts.items]
     });
     this.loupeSettings.justifySignalHeight = true;
     this.loupeSettings.roundValues = false;
@@ -409,7 +425,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   onSegmentEnter($event) {
     this.selectSegment($event.index).then((selection: AudioSelection) => {
       this.audioChunkDown = new AudioChunk(selection, this.audioManager);
-      this.editor.focus(true);
+      this.editor.focus(true, true);
     });
 
     if (this.appStorage.logging) {
@@ -427,7 +443,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.selectSegment($event.index).then((selection: AudioSelection) => {
       this.audioChunkDown.selection = selection.clone();
       this.audioChunkDown.absolutePlayposition = selection.start.clone();
-      this.editor.focus(true);
+      this.editor.focus(true, true);
     });
   }
 
@@ -445,12 +461,13 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     }
   }
 
+  // TODO Redo undo not working in linear editor?
   onShortcutTriggered = ($event: ShortcutEvent) => {
     if (this.shortcutsEnabled) {
       const comboKey = $event.shortcut;
 
       if (!isUnset(this.audioShortcutsTopDisplay) && !isUnset(this.audioShortcutsBottomDisplay)) {
-        const currentAudioChunk = ($event.shortcutGroupName === 'signaldisplay_top') ? this.audioChunkTop : this.audioChunkDown;
+        const currentAudioChunk = ($event.shortcutGroupName === 'signaldisplay_top_audio') ? this.audioChunkTop : this.audioChunkDown;
         if (!isUnset(currentAudioChunk)) {
           switch ($event.shortcutName) {
             case('play_pause'):
@@ -766,5 +783,13 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         this.cd.detectChanges();
       }
     }
+  }
+
+  public onAudioViewerMouseLeave(keyGroup: 'signaldisplay_top' | 'signaldisplay_down') {
+    this.keyMap.shortcutsManager.disableShortcutGroup(keyGroup);
+  }
+
+  public onAudioViewerMouseEnter(keyGroup: 'signaldisplay_top' | 'signaldisplay_down') {
+    this.keyMap.shortcutsManager.enableShortcutGroup(keyGroup);
   }
 }

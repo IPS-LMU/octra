@@ -92,6 +92,7 @@ export class TranscriptionComponent implements OnInit,
 
   private modalShortcuts: ShortcutGroup = {
     name: 'modal shortcuts',
+    enabled: true,
     items: [
       {
         name: 'shortcuts',
@@ -125,6 +126,7 @@ export class TranscriptionComponent implements OnInit,
 
   public generalShortcuts: ShortcutGroup = {
     name: 'general shortcuts',
+    enabled: true,
     items: [
       {
         name: 'feedback1',
@@ -518,50 +520,44 @@ export class TranscriptionComponent implements OnInit,
 
   @HostListener('window:keydown', ['$event'])
   onKeyDown($event) {
-    this.shortcutManager.checkKeyEvent($event, Date.now()).then((shortcutInfo) => {
-      if (!isUnset(shortcutInfo)) {
-        $event.preventDefault();
+    const shortcutInfo = this.shortcutManager.checkKeyEvent($event, Date.now());
+    if (!isUnset(shortcutInfo)) {
+      $event.preventDefault();
 
-        switch (shortcutInfo.shortcutName) {
-          case ('shortcuts'):
-            if (!this.modalShortcutsDialogue.visible) {
-              this.modalShortcutsDialogue.open();
-            } else {
-              this.modalShortcutsDialogue.close();
-            }
-            break;
-          case('guidelines'):
-            if (!this.modalGuidelines.visible) {
-              this.modalGuidelines.open().catch((error) => {
-                console.error(error);
-              });
-            } else {
-              this.modalGuidelines.close();
-            }
-            break;
-          case('overview'):
-            if (!this.modalOverview.visible) {
-              this.transcrService.analyse();
-              this.modalOverview.open().catch((error) => {
-                console.error(error);
-              });
-            } else {
-              this.modalOverview.close();
-            }
-            break;
-        }
+      switch (shortcutInfo.shortcutName) {
+        case ('shortcuts'):
+          if (!this.modalShortcutsDialogue.visible) {
+            this.modalShortcutsDialogue.open();
+          } else {
+            this.modalShortcutsDialogue.close();
+          }
+          break;
+        case('guidelines'):
+          if (!this.modalGuidelines.visible) {
+            this.modalGuidelines.open().catch((error) => {
+              console.error(error);
+            });
+          } else {
+            this.modalGuidelines.close();
+          }
+          break;
+        case('overview'):
+          if (!this.modalOverview.visible) {
+            this.transcrService.analyse();
+            this.modalOverview.open().catch((error) => {
+              console.error(error);
+            });
+          } else {
+            this.modalOverview.close();
+          }
+          break;
       }
-    }).catch((e) => {
-      console.error(e);
-    });
+    }
   }
 
   @HostListener('window:keyup', ['$event'])
   onKeyUp($event) {
-    this.shortcutManager.checkKeyEvent($event, Date.now()).then((shortcutInfo) => {
-    }).catch((error) => {
-      console.error(error);
-    });
+    this.shortcutManager.checkKeyEvent($event, Date.now());
   }
 
   changeEditor(name: string): Promise<void> {
@@ -610,10 +606,8 @@ export class TranscriptionComponent implements OnInit,
 
             if ((this.currentEditor.instance as any).hasOwnProperty('openModal')) {
               this.subscrmanager.add((this.currentEditor.instance as any).openModal.subscribe(() => {
-                console.log(`overview opened!`);
                 (this.currentEditor.instance as any).disableAllShortcuts();
                 this.modalOverview.open().then(() => {
-                  console.log(`overview closed`);
                   (this.currentEditor.instance as any).enableAllShortcuts();
                 }).catch((error) => {
                   console.error(error);

@@ -89,6 +89,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   private authWindow: Window = null;
   private windowShortcuts: ShortcutGroup = {
     name: 'transcription window',
+    enabled: true,
     items: [
       {
         name: 'jump_left',
@@ -122,6 +123,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
   private audioShortcuts: ShortcutGroup = {
     name: '2D-Editor',
+    enabled: true,
     items: [
       {
         name: 'play_pause',
@@ -206,6 +208,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     this.audioChunkWindow = this.audioManager.mainchunk.clone();
     this.shortcuts = this.keyMap.register({
       name: '2D-Editor',
+      enabled: true,
       items: [...this.audioShortcuts.items, ...this.viewer.settings.shortcuts.items]
     });
     this.keyMap.register(this.windowShortcuts);

@@ -199,7 +199,6 @@ export class TranscriptionService {
           const readNotification = () => {
             // notify after 15 minutes one hour before the maintenance begins
             maintenanceAPI.readMaintenanceNotifications(1).then((notification2) => {
-              console.log(`check for maintenance notification...`);
               if (!isUnset(notification2)) {
                 moment.locale(this.appStorage.language);
                 this.alertTriggered.next({
@@ -239,7 +238,7 @@ export class TranscriptionService {
     if (!isUnset(this._annotation)
       && this._annotation.levels.length > 0
       && !isUnset(this._annotation.levels[this._selectedlevel])) {
-      const level = this._annotation.levels[this._selectedlevel];
+      const level = this.currentlevel;
 
       this.appStorage.save('annotation', {
         num: this._selectedlevel,

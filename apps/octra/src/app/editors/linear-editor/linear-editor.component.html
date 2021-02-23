@@ -1,10 +1,10 @@
 <octra-audio-viewer #miniloupeComponent *ngIf="appStorage.showLoupe" [audioChunk]="audioChunkLoupe"
-                  [breakMarker]="{
+                    [breakMarker]="{
                         code: '<P>'
                       }"
-                  [isMultiLine]="false"
-                  [name]="'loupe'"
-                  [ngStyle]="{
+                    [isMultiLine]="false"
+                    [name]="'loupe'"
+                    [ngStyle]="{
 'position':'absolute',
 'margin-left':miniloupe.location.x + 'px',
 'margin-top':miniloupe.location.y + 'px',
@@ -15,16 +15,16 @@
 'visibility': (miniloupe.isHidden) ? 'hidden' : 'inherit',
 'flex': 'auto',
 'flex-direction': 'column'}"
-                  [settings]="miniLoupeSettings"
-                  [transcriptionLevel]="transcrService.currentlevel"
+                    [settings]="miniLoupeSettings"
+                    [transcriptionLevel]="transcrService.currentlevel"
 >
 </octra-audio-viewer>
 <octra-audio-navigation #nav
-                      (afterPlaybackRateChange)="afterSpeedChange($event)"
-                      (afterVolumeChange)="afterVolumeChange($event)"
-                      (buttonClick)="onButtonClick($event)"
-                      [audioChunk]="selectedAudioChunk"
-                      [buttons]="{
+                        (afterPlaybackRateChange)="afterSpeedChange($event)"
+                        (afterVolumeChange)="afterVolumeChange($event)"
+                        (buttonClick)="onButtonClick($event)"
+                        [audioChunk]="selectedAudioChunk"
+                        [buttons]="{
                         play: {
                             label: ('general.play' | transloco),
                             shortcut: keyMap.getShortcut('AV', 'play_pause')
@@ -50,46 +50,48 @@
                             shortcut: keyMap.getShortcut('overlay', 'step_backward')
                         }
                       }"
-                      [easyMode]="appStorage.easymode"
+                        [easyMode]="appStorage.easymode"
 
-                      [playbackRate]="appStorage.audioSpeed"
-                      [responsive]="settingsService.responsive.enabled"
-                      [volume]="appStorage.audioVolume"
+                        [playbackRate]="appStorage.audioSpeed"
+                        [responsive]="settingsService.responsive.enabled"
+                        [volume]="appStorage.audioVolume"
 >
 
 </octra-audio-navigation>
 <div id="viewer">
   <octra-audio-viewer #signalDisplayTop (mousecursorchange)="onMouseOver($event)"
-                    (mousedown)="onViewerMouseDown($event)"
-                    (mouseenter)="miniloupe.isHidden = false;"
-                    (mouseleave)="miniloupe.isHidden = true;"
-                    (segmententer)="onSegmentEnter($event)"
-                    (selchange)="onSelectionChanged($event)"
-                    (shortcuttriggered)="onViewerShortcutTriggered($event, 'signaldisplay_top')"
-                    [audioChunk]="audioChunkTop"
-                    [breakMarker]="{
+                      (mousedown)="onViewerMouseDown($event)"
+                      (mouseenter)="miniloupe.isHidden = false;onAudioViewerMouseEnter('signaldisplay_top')"
+                      (mouseleave)="miniloupe.isHidden = true;onAudioViewerMouseLeave('signaldisplay_top')"
+                      (segmententer)="onSegmentEnter($event)"
+                      (selchange)="onSelectionChanged($event)"
+                      (shortcuttriggered)="onViewerShortcutTriggered($event, 'signaldisplay_top')"
+                      [audioChunk]="audioChunkTop"
+                      [breakMarker]="{
                         code: '<P>'
                       }"
-                    [transcriptionLevel]="transcrService.currentlevel"
-                    style="height:80px;"
+                      [transcriptionLevel]="transcrService.currentlevel"
+                      style="height:80px;"
   >
   </octra-audio-viewer>
 </div>
 
 <octra-audio-viewer #signalDisplayDown
-                  (shortcuttriggered)="onViewerShortcutTriggered($event, 'signaldisplay_down')"
-                  (alerttriggered)="onAlertTriggered($event)"
-                  (click)="onLoupeClick($event)"
-                  (mousedown)="onViewerMouseDown($event)"
-                  (segmententer)="onLoupeSegmentEnter($event)"
-                  *ngIf="audioChunkDown !== null && audioChunkDown !== undefined"
-                  [audioChunk]="audioChunkDown"
-                  [breakMarker]="{
+                    (shortcuttriggered)="onViewerShortcutTriggered($event, 'signaldisplay_down')"
+                    (alerttriggered)="onAlertTriggered($event)"
+                    (click)="onLoupeClick($event)"
+                    (mousedown)="onViewerMouseDown($event)"
+                    (segmententer)="onLoupeSegmentEnter($event)"
+                    (mouseleave)="onAudioViewerMouseLeave('signaldisplay_down')"
+                    (mouseenter)="onAudioViewerMouseEnter('signaldisplay_down')"
+                    *ngIf="audioChunkDown !== null && audioChunkDown !== undefined"
+                    [audioChunk]="audioChunkDown"
+                    [breakMarker]="{
                         code: '<P>'
                       }"
-                  [name]="'downLoupe'"
-                  [settings]="loupeSettings"
-                  [transcriptionLevel]="transcrService.currentlevel"
+                    [name]="'downLoupe'"
+                    [settings]="loupeSettings"
+                    [transcriptionLevel]="transcrService.currentlevel"
 >
 </octra-audio-viewer>
 <div [hidden]="segmentselected" id="editor-placeholder">
@@ -112,5 +114,6 @@
                       [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
                       [ngStyle]="{display: (segmentselected) ? 'inherit': 'none'}"
                       [validationEnabled]="appStorage.useMode !== 'url' && (appStorage.useMode === 'demo' || settingsService.projectsettings.octra.validationEnabled)"
+                      [externalShortcutManager]="keyMap.shortcutsManager"
 >
 </octra-transcr-editor>

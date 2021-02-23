@@ -98,6 +98,7 @@ export class OverviewModalComponent implements OnInit, OnDestroy {
 
       const shortcuts: ShortcutGroup = {
         name: 'overview',
+        enabled: true,
         items: []
       };
       if (this.settingsService.isTheme('shortAudioFiles')) {

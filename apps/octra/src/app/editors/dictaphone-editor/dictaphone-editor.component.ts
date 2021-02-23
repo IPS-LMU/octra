@@ -56,6 +56,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   private shortcuts: ShortcutGroup = {
     name: 'audioplayer',
+    enabled: true,
     items: [
       {
         name: 'play_pause',
@@ -147,7 +148,6 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     this.editor.Settings.highlightingEnabled = true;
 
     this.subscrmanager.add(this.keyMap.onShortcutTriggered.subscribe(this.onShortcutTriggered), 'shortcut');
-
     this.keyMap.register(this.shortcuts);
 
     DictaphoneEditorComponent.initialized.emit();
@@ -229,7 +229,8 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
           break;
         case('stop'):
           triggerUIAction({shortcut: $event.shortcutName, value: $event.shortcut});
-          this.audiochunk.stopPlayback().catch((error) => {
+          this.audiochunk.stopPlayback().then(() => {
+          }).catch((error) => {
             console.error(error);
           });
           break;
@@ -333,37 +334,15 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
       return a.replace(/(^\s+)|(\s+$)/g, '');
     });
 
-    let annoSegLength = this.transcrService.currentlevel.segments.length;
+    const segments: Segment[] = [];
     for (let i = 0; i < segTexts.length; i++) {
-      const newRaw = segTexts[i];
+      const time = (i < samplesArray.length) ? new SampleUnit(samplesArray[i], this.audioManager.sampleRate)
+        : this.audioManager.ressource.info.duration;
 
-      if (i < annoSegLength) {
-        // probably overwrite old files
-        const segment: Segment = this.transcrService.currentlevel.segments.get(i).clone();
-        segment.transcript = newRaw;
-        if (i < segTexts.length - 1) {
-          segment.time = this.audioManager.createSampleUnit(samplesArray[i]);
-        }
-
-        this.transcrService.currentlevel.segments.change(i, segment);
-      } else {
-        // add new segments
-        if (i === segTexts.length - 1) {
-          this.transcrService.currentlevel.segments.add(this.audiochunk.time.end.clone(), this.transcrService.currentlevel.name, newRaw);
-        } else {
-          this.transcrService.currentlevel.segments.add(this.audioManager.createSampleUnit(samplesArray[i]), this.transcrService.currentlevel.name, newRaw);
-        }
-      }
+      const segment = new Segment(time, '', segTexts[i]);
+      segments.push(segment);
     }
-
-    annoSegLength = this.transcrService.currentlevel.segments.length;
-    if (annoSegLength > segTexts.length) {
-      // remove left segments
-      this.transcrService.currentlevel.segments.segments.splice(segTexts.length, (annoSegLength - segTexts.length));
-      // because last segment was removed
-      const seg = this.transcrService.currentlevel.segments.get(segTexts.length - 1);
-      seg.time = this.audiochunk.time.end.clone();
-    }
+    this.transcrService.currentlevel.segments.overwriteAllWith(segments, this.audioManager.ressource.info.duration);
   }
 
   public update() {
@@ -389,6 +368,20 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     this.appStorage.savingNeeded = true;
   }
 
+  onTranscrEditorRedoUndo(type: 'undo' | 'redo') {
+    this.subscrmanager.removeByTag('annochange');
+    this.subscrmanager.add(this.appStorage.annotationChanged.subscribe(() => {
+      this.subscrmanager.removeByTag('annochange');
+      this.loadEditor();
+    }), 'annochange');
+
+    if (type === 'undo') {
+      this.appStorage.undo();
+    } else if (type === 'redo') {
+      this.appStorage.redo();
+    }
+  }
+
   openSegment(index: number) {
     // ignore
   }
@@ -398,7 +391,6 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
       this.editor.segments = this.transcrService.currentlevel.segments;
     }
     this.editor.Settings.height = 100;
-    this.editor.update();
     this.oldRaw = this.editor.rawText;
   }
 }

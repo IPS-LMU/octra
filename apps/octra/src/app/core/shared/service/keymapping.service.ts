@@ -4,24 +4,28 @@ import {isUnset, Shortcut, ShortcutEvent, ShortcutGroup, ShortcutManager} from '
 
 @Injectable()
 export class KeymappingService {
-  private readonly shortcutsManager: ShortcutManager;
+  private readonly _shortcutsManager: ShortcutManager;
   private readonly _beforeShortcutTriggered = new EventEmitter<ShortcutEvent>();
   private readonly _onShortcutTriggered: EventEmitter<ShortcutEvent>;
 
+  public get shortcutsManager(): ShortcutManager {
+    return this._shortcutsManager;
+  }
+
   public get shortcutGroups(): ShortcutGroup[] {
-    if (isUnset(this.shortcutsManager)) {
+    if (isUnset(this._shortcutsManager)) {
       return [];
     }
 
-    return this.shortcutsManager.shortcuts;
+    return this._shortcutsManager.shortcuts;
   }
 
   public get pressedKeys() {
-    return this.shortcutsManager.pressedKeys;
+    return this._shortcutsManager.pressedKeys;
   }
 
   public get generalShortcuts(): ShortcutGroup {
-    return this.shortcutsManager.generalShortcuts;
+    return this._shortcutsManager.generalShortcuts;
   }
 
   get onShortcutTriggered(): EventEmitter<ShortcutEvent> {
@@ -33,31 +37,31 @@ export class KeymappingService {
   }
 
   constructor() {
-    this.shortcutsManager = new ShortcutManager();
+    this._shortcutsManager = new ShortcutManager();
     this._onShortcutTriggered = new EventEmitter<ShortcutEvent>();
     window.onkeydown = this.onKeyDown;
     window.onkeyup = this.onKeyUp;
   }
 
   public register(shortcutGroup: ShortcutGroup): ShortcutGroup {
-    this.shortcutsManager.registerShortcutGroup(shortcutGroup);
-    return this.shortcutsManager.getShortcutGroup(shortcutGroup.name);
+    this._shortcutsManager.registerShortcutGroup(shortcutGroup);
+    return this._shortcutsManager.getShortcutGroup(shortcutGroup.name);
   }
 
   public registerGeneralShortcutGroup(shortcutGroup: ShortcutGroup) {
-    this.shortcutsManager.generalShortcuts = shortcutGroup;
+    this._shortcutsManager.generalShortcuts = shortcutGroup;
   }
 
   public unregister(identifier: string) {
-    this.shortcutsManager.unregisterShortcutGroup(identifier);
+    this._shortcutsManager.unregisterShortcutGroup(identifier);
   }
 
   public unregisterAll() {
-    this.shortcutsManager.clearShortcuts();
+    this._shortcutsManager.clearShortcuts();
   }
 
   public getShortcuts(identifier: string): Shortcut[] {
-    const shortcutGroup = this.shortcutsManager.getShortcutGroup(identifier);
+    const shortcutGroup = this._shortcutsManager.getShortcutGroup(identifier);
 
     if (!isUnset(shortcutGroup)) {
       return shortcutGroup.items;
@@ -85,25 +89,19 @@ export class KeymappingService {
   }
 
   private onKeyDown = ($event: KeyboardEvent) => {
-    this.shortcutsManager.checkKeyEvent($event, Date.now()).then((shortcutInfo: ShortcutEvent) => {
-      if (!isUnset(shortcutInfo)) {
-        this._beforeShortcutTriggered.emit({...shortcutInfo, event: $event});
-        this._onShortcutTriggered.emit({...shortcutInfo, event: $event});
-      }
-    }).catch((error) => {
-      console.error(error);
-    });
+    const shortcutInfo = this._shortcutsManager.checkKeyEvent($event, Date.now());
+    if (!isUnset(shortcutInfo)) {
+      this._beforeShortcutTriggered.emit({...shortcutInfo, event: $event});
+      this._onShortcutTriggered.emit({...shortcutInfo, event: $event});
+    }
   }
 
   private onKeyUp = ($event) => {
-    this.shortcutsManager.checkKeyEvent($event, Date.now()).catch((error) => {
-      console.error(error);
-    });
+    this._shortcutsManager.checkKeyEvent($event, Date.now());
   }
 
   public checkShortcutAction(shortcut: string, shortcutGroup: ShortcutGroup, shortcutsEnabled: boolean) {
     return new Promise<string>((resolve) => {
-
       if (shortcutsEnabled) {
         const platform = BrowserInfo.platform;
         if (!isUnset(shortcutGroup)) {

@@ -114,6 +114,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
 
   private shortcuts: ShortcutGroup = {
     name: 'TRN-Editor',
+    enabled: true,
     items: [
       {
         name: 'enter',
@@ -165,6 +166,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
 
   private tableShortcuts: ShortcutGroup = {
     name: 'TRN-Editor table',
+    enabled: true,
     items: [
       {
         name: 'select_all',
@@ -189,6 +191,7 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
 
   private audioShortcuts: ShortcutGroup = {
     name: 'TRN-Editor texteditor',
+    enabled: true,
     items: [
       {
         name: 'play_pause',

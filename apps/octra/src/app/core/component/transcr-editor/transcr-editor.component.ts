@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   ChangeDetectorRef,
   Component,
   ElementRef,
@@ -35,12 +36,12 @@ declare let document: any;
   styleUrls: ['./transcr-editor.component.css'],
   providers: [TranscrEditorConfig]
 })
-export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
+export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, AfterViewInit {
   @Output() loaded: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() onkeyup: EventEmitter<any> = new EventEmitter<any>();
   @Output() markerInsert: EventEmitter<string> = new EventEmitter<string>();
   @Output() markerClick: EventEmitter<string> = new EventEmitter<string>();
-  @Output() typing: EventEmitter<string> = new EventEmitter<string>();
+  @Output() typing = new EventEmitter<string>();
   @Output() boundaryclicked: EventEmitter<SampleUnit> = new EventEmitter<SampleUnit>();
   @Output() boundaryinserted: EventEmitter<number> = new EventEmitter<number>();
   @Output() selectionchanged: EventEmitter<number> = new EventEmitter<number>();
@@ -51,10 +52,14 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Input() playposition: SampleUnit;
   @Input() audiochunk: AudioChunk;
   @Input() validationEnabled = false;
+  @Input() externalShortcutManager: ShortcutManager;
+  @Output() onRedoUndo = new EventEmitter<'undo' | 'redo'>();
 
   @ViewChild('validationPopover', {static: true}) validationPopover: ValidationPopoverComponent;
   @ViewChild('transcrEditor', {static: true}) transcrEditor: ElementRef;
+  @ViewChild('textfield', {static: true}) textfieldRef: ElementRef;
 
+  private internalTyping: EventEmitter<string> = new EventEmitter<string>();
   private shortcutsManager: ShortcutManager;
 
   public textfield: any = null;
@@ -120,11 +125,12 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       return -1;
     }
     // @ts-ignore
-    return jQuery('.note-editable:eq(0)').caret('pos');
+    return jQuery(this.transcrEditor.nativeElement).find('.note-editable:eq(0)').caret('pos');
   }
 
   private shortcuts: ShortcutGroup = {
     name: 'texteditor',
+    enabled: true,
     items: []
   }
 
@@ -144,7 +150,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       }
     }
 
-    jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
     this.rawText = result;
   }
 
@@ -182,7 +187,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   set rawText(value: string) {
-    jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
+    this.resetFontSize();
     this._rawText = this.tidyUpRaw(value);
 
     if (!isUnset(this.textfield)) {
@@ -277,8 +282,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           charCounter += text.length;
           jQuery(elem).text(text);
         } else if (tagName.toLowerCase() === 'img') {
-          if (!(jQuery(elem).attr('data-samples') === null || jQuery(elem).attr('data-samples') === undefined)) {
-            // TODO check if this is working
+          if (!isUnset(jQuery(elem).attr('data-samples'))) {
             const boundaryText = `{${jQuery(elem).attr('data-samples')}}`;
             const textnode = document.createTextNode(boundaryText);
             jQuery(elem).before(textnode);
@@ -350,9 +354,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
       if (!isUnset(this.textfield)) {
         this.textfield.summernote('destroy');
+        this.textfield = null;
       }
 
-      this.textfield = jQuery('.textfield');
+      this.textfield = jQuery(this.textfieldRef.nativeElement);
       this.textfield.summernote({
         height: this.Settings.height,
         focus: false,
@@ -368,7 +373,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         toolbar: [
           ['default', navigation.str_array]
         ],
-        shortcuts: false,
+        shortcuts: true,
         buttons: navigation.buttons,
         callbacks: {
           onKeydown: this.onKeyDownSummernote,
@@ -386,18 +391,24 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
               this.textfield.summernote('editor.insertNode', htmlObj[0]);
             } else {
               this.textfield.summernote('code', html);
-              this.focus(true);
+              this.focus(true, true);
             }
-            this.updateTextField();
-            this.initPopover();
           },
           onChange: () => {
             this.init++;
 
             if (this.init === 1) {
-              this.focus(true);
+              this.focus(true, true);
             } else if (this.init > 1) {
-              // this.restoreSelection();
+              this.subscrmanager.removeByTag('typing_change');
+              this.subscrmanager.add(this.internalTyping.subscribe((status) => {
+                if (status === 'stopped') {
+                  this.validate();
+                  this.initPopover();
+                }
+
+                this.typing.emit(status);
+              }), 'typing_change');
             }
           },
           onBlur: () => {
@@ -444,7 +455,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
       this.popovers.validationError.insertBefore('.note-editing-area');
 
-      jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
       this.rawText = this._rawText;
       this.loaded.emit(true);
 
@@ -537,16 +547,22 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    * called when key pressed in editor
    */
   onKeyDownSummernote = ($event) => {
-    this.shortcutsManager.checkKeyEvent($event, Date.now()).then((shortcutInfo) => {
-      const comboKey = this.shortcutsManager.getShorcutCombination($event);
-
-      if (!isUnset(shortcutInfo)) {
-        $event.preventDefault();
-        if (shortcutInfo.shortcut === 'ALT + S' && this.Settings.specialMarkers.boundary) {
-          // add boundary
-          this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
-          this.boundaryinserted.emit(this.audiochunk.absolutePlayposition.samples);
-          return;
+    const shortcutInfo = this.shortcutsManager.checkKeyEvent($event, Date.now());
+    if (!isUnset(shortcutInfo)) {
+      $event.preventDefault();
+      if (shortcutInfo.shortcut === 'ALT + S' && this.Settings.specialMarkers.boundary) {
+        // add boundary
+        this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
+        this.boundaryinserted.emit(this.audiochunk.absolutePlayposition.samples);
+        return;
+      } else {
+        if (shortcutInfo.shortcutName === 'undo' || shortcutInfo.shortcutName === 'redo') {
+          if (shortcutInfo.shortcutName === 'undo') {
+            this.textfield.summernote('undo');
+          } else {
+            this.textfield.summernote('redo');
+          }
+          this.triggerTyping();
         } else {
           for (const marker of this.markers) {
             if (marker.shortcut[shortcutInfo.platform] === shortcutInfo.shortcut) {
@@ -557,44 +573,57 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             }
           }
         }
-      } else if (this.isDisabledKey(comboKey) || this.isMarker(comboKey)) {
-        $event.preventDefault();
       }
-    }).catch((error) => {
-      console.error(error);
-    });
+    } else {
+      const externalShortcutInfo = this.externalShortcutManager.getCommandByEvent($event);
+      if (!isUnset(externalShortcutInfo)) {
+
+        $event.preventDefault();
+      } else {
+        this.triggerTyping();
+      }
+    }
   }
   /**
    * called after key up in editor
    */
   onKeyUpSummernote = ($event) => {
-    this.shortcutsManager.checkKeyEvent($event, Date.now()).then((shortcutInfo) => {
-      if (!isUnset(shortcutInfo)) {
-        $event.preventDefault();
-      }
+    const shortcutInfo = this.shortcutsManager.checkKeyEvent($event, Date.now());
+    if (!isUnset(shortcutInfo)) {
+      $event.preventDefault();
+    } else if (!isUnset(this.externalShortcutManager)) {
+      const externalShortcutCommand = this.externalShortcutManager.getCommandByEvent($event);
 
+      if (!isUnset(externalShortcutCommand)) {
+        $event.preventDefault();
+      } else {
+        this.onkeyup.emit($event);
+      }
+    } else {
       this.onkeyup.emit($event);
-      this.triggerTyping($event.code !== 'Enter');
-    }).catch((error) => {
-      console.error(error);
-    });
+    }
   }
 
   /**
    * set focus to the very last position of the editors text
    */
-  public focus = (later: boolean = false) => {
+  public focus = (atEnd: boolean = true, later: boolean = false) => {
     const func = () => {
       try {
         if (this.rawText !== '' && this.html !== '<p><br/></p>') {
+          const nodeEditable = jQuery(this.transcrEditor.nativeElement).find('.note-editable');
           if (this.html.indexOf('<p>') === 0) {
-            Functions.placeAtEnd(jQuery('.note-editable').find('p')[0]);
+            Functions.placeAtEnd(nodeEditable.find('p')[0]);
           } else {
-            Functions.placeAtEnd(jQuery('.note-editable')[0]);
+            Functions.placeAtEnd(nodeEditable[0]);
           }
         }
         if (!isUnset(this.textfield)) {
-          this.textfield.summernote('focus');
+          if (atEnd) {
+            this.textfield.summernote('focus');
+          } else {
+            this.restoreSelection();
+          }
         }
       } catch (exception) {
         // ignore errors
@@ -612,6 +641,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit() {
+  }
+
+  ngAfterViewInit() {
     this.Settings.height = this.height;
     if (!isUnset(this.audiochunk)) {
       this._lastAudioChunkID = this.audiochunk.id;
@@ -630,20 +662,19 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnChanges(obj) {
     let renew = false;
-    if (!(obj.markers === null || obj.markers === undefined) && obj.markers.previousValue !== obj.markers.currentValue) {
+    if (!(obj.markers === null || obj.markers === undefined) && obj.markers.previousValue !== obj.markers.currentValue
+      && !obj.markers.firstChange) {
       renew = true;
     }
-    if (!(obj.easymode === null || obj.easymode === undefined) && obj.easymode.previousValue !== obj.easymode.currentValue) {
+    if (!(obj.easymode === null || obj.easymode === undefined) && obj.easymode.previousValue !== obj.easymode.currentValue
+      && !obj.easymode.firstChange) {
       renew = true;
     }
-    if (!isUnset(obj.audiochunk) && !isUnset(obj.audiochunk.currentValue)) {
+    if (!isUnset(obj.audiochunk) && !isUnset(obj.audiochunk.currentValue) && !obj.audiochunk.firstChange) {
       renew = true;
     }
 
     if (renew) {
-      if (!isUnset(this.textfield)) {
-        this.textfield.summernote('destroy');
-      }
       this.initialize();
       this.initPopover();
     }
@@ -651,12 +682,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnDestroy() {
     this.destroy();
-    jQuery('.note-editable.panel-body img').off('click');
+    jQuery(this.transcrEditor.nativeElement).find('.note-editable.panel-body img').off('click');
   }
 
   public update() {
     this.destroy();
     this.initialize();
+    this.cd.markForCheck();
     this.cd.detectChanges();
   }
 
@@ -726,9 +758,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         click: () => {
           // invoke insertText method with 'hello' on editor module.
           this.insertMarker(marker.code, marker.icon);
-          this.validate();
           this.markerClick.emit(marker.name);
-          this.initPopover();
         }
       };
       // @ts-ignore
@@ -745,13 +775,13 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     // set popover for boundaries
-    jQuery('.btn-icon-text[data-samples]')
+    jQuery(this.transcrEditor.nativeElement).find('.btn-icon-text[data-samples]')
       .off('click')
       .off('mouseover')
       .off('mouseleave');
 
     // set popover for errors
-    const valError = jQuery('.val-error');
+    const valError = jQuery(this.transcrEditor.nativeElement).find('.val-error');
     valError.off('mouseenter')
       .off('mouseleave');
 
@@ -760,7 +790,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
       .off('mouseleave');
 
     this.waitForValidationFinished().then(() => {
-      jQuery('.btn-icon-text[data-samples]')
+      jQuery(this.transcrEditor.nativeElement).find('.btn-icon-text[data-samples]')
         .on('click', (event) => {
           const jqueryobj = jQuery(event.target);
           const samples = jqueryobj.attr('data-samples');
@@ -773,7 +803,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           this.onSegmentBoundaryMouseOver(jQuery(event.target), event);
         })
         .on('mouseleave', () => {
-          jQuery('.seg-popover').css({
+          jQuery(this.transcrEditor.nativeElement).find('.seg-popover').css({
             display: 'none'
           });
         });
@@ -787,7 +817,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           this.onValidationErrorMouseLeave();
         });
 
-      jQuery('.val-error').children()
+      jQuery(this.transcrEditor.nativeElement).find('.val-error').children()
         .on('mouseenter', (event) => {
           this.onValidationErrorMouseOver(jQuery(event.target), event);
         })
@@ -851,10 +881,12 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
           if (this._highlightingEnabled) {
             this.stopRecurringHighlight();
             this.highlightingEnabled = false;
-            jQuery('.highlight-button').attr('src', 'assets/img/components/transcr-editor/highlightingDisbled.jpg');
+            jQuery(this.transcrEditor.nativeElement).find('.highlight-button')
+              .attr('src', 'assets/img/components/transcr-editor/highlightingDisbled.jpg');
           } else {
             this.highlightingEnabled = true;
-            jQuery('.highlight-button').attr('src', 'assets/img/components/transcr-editor/highlightingEnabled.jpg');
+            jQuery(this.transcrEditor.nativeElement).find('.highlight-button')
+              .attr('src', 'assets/img/components/transcr-editor/highlightingEnabled.jpg');
             this.startRecurringHighlight();
           }
         }
@@ -896,7 +928,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
             this.onTextMouseOver(event);
           })
           .on('mouseleave', () => {
-            jQuery('.seg-popover').css({
+            jQuery(this.transcrEditor.nativeElement).find('.seg-popover').css({
               display: 'none'
             });
           });
@@ -908,8 +940,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   saveSelection() {
     let range;
 
-    jQuery('sel-start').remove();
-    jQuery('sel-end').remove();
+    jQuery(this.transcrEditor.nativeElement).find('sel-start').remove();
+    jQuery(this.transcrEditor.nativeElement).find('sel-end').remove();
 
     // @ts-ignore
     range = jQuery.summernote.range;
@@ -960,9 +992,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         sel.removeAllRanges();
         sel.addRange(range);
 
-        // TODO change to specific textfield!
-        jQuery('sel-start').remove();
-        jQuery('sel-end').remove();
+        jQuery(this.transcrEditor.nativeElement).find('sel-start').remove();
+        jQuery(this.transcrEditor.nativeElement).find('sel-end').remove();
       }
     }
   }
@@ -972,36 +1003,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
    */
   updateTextField() {
     this._rawText = this.tidyUpRaw(this.getRawText());
-    jQuery('.transcr-editor .note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
-  }
-
-  /**
-   * adds the comboKey to the list of disabled Keys
-   */
-  public addDisableKey(comboKey: string): boolean {
-    for (const disabledKey of this.Settings.disabledKeys) {
-      if (disabledKey === comboKey) {
-        return false;
-      }
-    }
-    this.Settings.disabledKeys.push(comboKey);
-    return true;
-  }
-
-  /**
-   * removes the combokey of list of disabled keys
-   */
-  public removeDisableKey(comboKey: string): boolean {
-    let j = -1;
-    for (let i = 0; i < this.Settings.disabledKeys.length; i++) {
-      if (this.Settings.disabledKeys[i] === comboKey) {
-        j = i;
-        return true;
-      }
-    }
-    this.Settings.disabledKeys.splice(j, 1);
-
-    return (j > -1);
+    jQuery(this.transcrEditor.nativeElement).find('.note-editable.card-block').css('font-size', this.transcrService.defaultFontSize + 'px');
   }
 
   public convertEntitiesToString(str: string) {
@@ -1122,20 +1124,15 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  private triggerTyping(doValidation = true) {
+  private triggerTyping() {
     // this.highlightingRunning = false;
     this.subscrmanager.add(timer(500).subscribe(() => {
       if (Date.now() - this.lastkeypress >= 450 && this.lastkeypress > -1) {
         if (this._isTyping) {
           if (this.audiochunk.id === this._lastAudioChunkID) {
             this._isTyping = false;
-            this.typing.emit('stopped');
+            this.internalTyping.emit('stopped');
 
-
-            if (doValidation) {
-              this.validate();
-              this.initPopover();
-            }
             this.lastkeypress = -1;
           } else {
             // ignore typing stop after audioChunk was changed
@@ -1146,7 +1143,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
     }));
 
     if (!this._isTyping) {
-      this.typing.emit('started');
+      this.internalTyping.emit('started');
     }
     this._isTyping = true;
     this.lastkeypress = Date.now();
@@ -1158,22 +1155,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   private destroy() {
     if (!isUnset(this.textfield)) {
       this.textfield.summernote('destroy');
+      this.textfield = null;
     }
     // delete tooltip overlays
-    jQuery('.tooltip').remove();
+    jQuery(this.transcrEditor.nativeElement).find('.tooltip').remove();
     this.subscrmanager.destroy();
-  }
-
-  /**
-   * checks if the combokey is part of the configs disabledkeys
-   */
-  private isDisabledKey(comboKey: string): boolean {
-    for (const disabledKey of this.Settings.disabledKeys) {
-      if (disabledKey === comboKey) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**
@@ -1194,10 +1180,10 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private onSegmentBoundaryMouseOver(jqueryObj: any, event: any) {
-    const segPopover = jQuery('.seg-popover');
+    const segPopover = jQuery(this.transcrEditor.nativeElement).find('.seg-popover');
     const width = segPopover.width();
     const height = segPopover.height();
-    const editorPos = jQuery('.note-toolbar').offset();
+    const editorPos = jQuery(this.transcrEditor.nativeElement).find('.note-toolbar').offset();
     const segSamples = jqueryObj.attr('data-samples');
 
     if (!(segSamples === null || segSamples === undefined) && Functions.isNumber(segSamples)) {
@@ -1246,8 +1232,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         this.cd.markForCheck();
         this.cd.detectChanges();
 
-        const cardHeader = jQuery('.note-toolbar.card-header');
-        const editor = jQuery('.note-editor.note-frame.card');
+        const cardHeader = jQuery(this.transcrEditor.nativeElement).find('.note-toolbar.card-header');
+        const editor = jQuery(this.transcrEditor.nativeElement).find('.note-editor.note-frame.card');
 
         let marginLeft = event.target.offsetLeft;
         const height = this.validationPopover.height;
@@ -1311,9 +1297,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
 
       this.removeHighlight();
 
-      let dom = jQuery('.note-editable.card-block p');
+      let dom = jQuery(this.transcrEditor.nativeElement).find('.note-editable.card-block p');
       if (dom.length === 0) {
-        dom = jQuery('.note-editable.card-block');
+        dom = jQuery(this.transcrEditor.nativeElement).find('.note-editable.card-block');
       }
 
       let currentSegIndex = 0;
@@ -1379,7 +1365,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private removeHighlight() {
-    jQuery('.highlighted').each((index, item) => {
+    jQuery(this.transcrEditor.nativeElement).find('.highlighted').each((index, item) => {
       if (!isUnset(jQuery(item).parent())) {
         jQuery(item).contents().each((j, node) => {
           jQuery(node).remove();
@@ -1436,6 +1422,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges {
         }
       )
     }
+  }
+
+  private resetFontSize() {
+    jQuery(this.transcrEditor.nativeElement).find('.note-editable.card-block')
+      .css('font-size', this.transcrService.defaultFontSize + 'px');
   }
 }
 

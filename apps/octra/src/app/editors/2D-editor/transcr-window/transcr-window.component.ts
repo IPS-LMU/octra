@@ -124,6 +124,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
   private audioShortcuts: ShortcutGroup = {
     name: '',
+    enabled: true,
     items: [
       {
         name: 'play_pause',
@@ -339,7 +340,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
   ngOnInit() {
     this._loading = false;
-    console.log(`INIT TRANSCR WINDOW!`);
     this.setValidationEnabledToDefault();
 
     this.editor.Settings.markers = this.transcrService.guidelines.markers;
@@ -392,9 +392,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
           current.time.start.samples !== previous.time.start.samples &&
           current.time.end.samples !== previous.time.end.samples
         )) {
-        console.log(`_audiochunk change ok not null`);
         // audiochunk changed
-        console.log(`_audiochunk changed ${current.status}`);
         this.listenToAudioChunkStatusChanges();
 
         this.setValidationEnabledToDefault();
@@ -472,8 +470,6 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
       }
     } else {
       const isNull = isUnset(this.transcrService.currentlevel.segments);
-      console.log(`could not save segment. segment index=${this.segmentIndex},
-segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
     }
   }
 
@@ -714,8 +710,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
   }
 
   listenToAudioChunkStatusChanges() {
-    const res = this.subscrmanager.removeByTag('audiochunkStatus');
-    console.log(`deleted: ${res}`);
+    this.subscrmanager.removeByTag('audiochunkStatus');
     this.subscrmanager.add(this.audiochunk.statuschange.subscribe((status) => {
       this.cd.markForCheck();
       this.cd.detectChanges();

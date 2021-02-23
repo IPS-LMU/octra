@@ -568,7 +568,6 @@ export class AudioManager {
     if (this._state === PlayBackStatus.PLAYING) {
       // audio ended normally
       this.changeState(PlayBackStatus.ENDED);
-      this.playposition = this.createSampleUnit(0);
     }
 
     this.gainNode.disconnect();

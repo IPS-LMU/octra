@@ -268,7 +268,7 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
   private onPlaybackEnded() {
     const playHead = this.canvasElements.playHead;
     this.animation.playHead.stop();
-    playHead.x(this._settings.slider.margin.left - this._settings.playHead.width / 2);
+    playHead.x(this.getPlayHeadX);
     this.stage.draw();
   }
 
@@ -344,6 +344,11 @@ export class AudioplayerComponent implements OnInit, AfterViewInit, OnChanges, O
     } else {
       this.setPlayPosition(xCoord);
     }
+  }
+
+  public update() {
+    this.canvasElements.playHead.x(this.getPlayHeadX);
+    this.stage.draw();
   }
 
   private setPlayPosition = (xCoord: number) => {

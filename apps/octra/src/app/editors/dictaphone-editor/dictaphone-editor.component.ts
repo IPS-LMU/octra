@@ -271,8 +271,9 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
         this.audiochunk.selection.end = this.transcrService.currentlevel.segments.get(i).time.clone();
 
         this.audiochunk.startPlayback().then(() => {
-          // set start pos and playback length to end of audio file
-          this.audiochunk.startpos = this.audioManager.createSampleUnit(samples.samples);
+          // set start pos to selected boundary
+          this.audiochunk.startpos = samples.clone();
+          this.audioplayer.update();
         });
         this.boundaryselected = false;
       });

@@ -18,7 +18,7 @@ import {Subject} from 'rxjs';
 import {PlayCursor} from '../../../obj/play-cursor';
 import {AudioviewerConfig} from './audio-viewer.config';
 import {AudioViewerService} from './audio-viewer.service';
-import {isUnset, ShortcutEvent, ShortcutGroup, ShortcutManager, SubscriptionManager} from '@octra/utilities';
+import {isUnset, ShortcutGroup, ShortcutManager, SubscriptionManager} from '@octra/utilities';
 import {ASRQueueItemType, Level, Segment, TimespanPipe} from '@octra/annotation';
 import {AudioChunk, AudioManager, AudioSelection, PlayBackStatus, SampleUnit} from '@octra/media';
 import {Position, Size} from '../../../obj';
@@ -355,7 +355,6 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       for (const attr in this.layers) {
         if (this.layers.hasOwnProperty(attr)) {
           this.layers['' + attr].removeChildren();
-          this.audioManager.createSampleUnit(0);
         }
       }
 
@@ -466,7 +465,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
     }
 
     const scrollbars = this.layers.scrollBars.find('#scrollBar');
-    if (scrollbars.length > 1) {
+    if (scrollbars.length > 0) {
       scrollbars[0].x(this.av.innerWidth + this.settings.margin.left);
     }
 
@@ -1641,415 +1640,412 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   private onKeyDown = (event: KeyboardEvent) => {
-    this.shortcutsManager.checkKeyEvent(event, Date.now()).then((shortcutInfo) => {
-      if (!isUnset(shortcutInfo)) {
-        const comboKey = shortcutInfo.shortcut;
+    const shortcutInfo = this.shortcutsManager.checkKeyEvent(event, Date.now());
 
-        this.av.shiftPressed = comboKey === 'SHIFT';
+    if (!isUnset(shortcutInfo)) {
+      const comboKey = shortcutInfo.shortcut;
 
-        if (this.settings.shortcutsEnabled) {
+      this.av.shiftPressed = comboKey === 'SHIFT';
 
-          if (this._focused && this.isDisabledKey(comboKey)) {
-            // key pressed is disabled by config
-            event.preventDefault();
-          } else {
-            const shortcutName = shortcutInfo.shortcutName;
-            const focuscheck = (shortcutInfo.onFocusOnly === false
-              || (shortcutInfo.onFocusOnly === this._focused));
+      if (this.settings.shortcutsEnabled) {
 
-            if (focuscheck) {
-              switch (shortcutName) {
-                case('undo'):
-                  if (this.settings.boundaries.enabled && this._focused && !this.settings.boundaries.readonly) {
-                    this.shortcuttriggered.emit({
-                      shortcut: comboKey,
-                      shortcutName,
-                      value: null,
-                      type: 'application',
-                      timePosition: this.av.mouseCursor.clone(),
-                      timestamp: shortcutInfo.timestamp
-                    });
-                  }
-                  break;
-                case('redo'):
-                  if (this.settings.boundaries.enabled && this._focused && !this.settings.boundaries.readonly) {
-                    this.shortcuttriggered.emit({
-                      shortcut: comboKey,
-                      shortcutName,
-                      value: null,
-                      type: 'application',
-                      timePosition: this.av.mouseCursor.clone(),
-                      timestamp: shortcutInfo.timestamp
-                    });
-                  }
-                  break;
-                case('set_boundary'):
-                  if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
-                    let segments;
-                    const result = this.av.addSegment();
-                    segments = this.av.currentTranscriptionLevel.segments;
-                    if (result !== null && result.msg !== null) {
-                      if (result.msg.text && result.msg.text !== '') {
-                        this.alerttriggered.emit({
-                          type: result.msg.type,
-                          message: result.msg.text
-                        });
-                      } else if (result.type !== null) {
-                        this.shortcuttriggered.emit({
-                          shortcut: comboKey,
-                          shortcutName,
-                          value: result.type,
-                          type: 'boundary',
-                          timePosition: this.audioManager.createSampleUnit(result.seg_samples),
-                          timestamp: shortcutInfo.timestamp
-                        });
-                      }
-                    }
-                  }
-                  break;
-                case('set_break'):
-                  if (this.settings.boundaries.enabled && this._focused) {
-                    const xSamples = this.av.mouseCursor.clone();
+        if (this._focused && this.isDisabledKey(comboKey)) {
+          // key pressed is disabled by config
+          event.preventDefault();
+        } else {
+          const shortcutName = shortcutInfo.shortcutName;
+          const focuscheck = (shortcutInfo.onFocusOnly === false
+            || (shortcutInfo.onFocusOnly === this._focused));
 
-                    if (xSamples !== null) {
-                      const segmentI = this._transcriptionLevel.segments.getSegmentBySamplePosition(xSamples);
-                      const segment = this._transcriptionLevel.segments.get(segmentI);
-
-                      if (segmentI > -1 && !isUnset(segment) && isUnset(segment.isBlockedBy)) {
-                        if (segment.transcript !== this.breakMarker.code) {
-                          segment.transcript = this.breakMarker.code;
-                          this.shortcuttriggered.emit({
-                            shortcut: comboKey,
-                            shortcutName,
-                            value: 'set_break',
-                            type: 'segment',
-                            timePosition: xSamples.clone(),
-                            timestamp: shortcutInfo.timestamp
-                          });
-                        } else {
-                          segment.transcript = '';
-                          this.shortcuttriggered.emit({
-                            shortcut: comboKey,
-                            shortcutName,
-                            value: 'remove_break',
-                            type: 'segment',
-                            timePosition: xSamples.clone(),
-                            timestamp: shortcutInfo.timestamp
-                          });
-                        }
-
-                        // replace with costum function
-                        this._transcriptionLevel.segments.onsegmentchange.emit();
-                      }
-                    }
-                  }
-                  break;
-                case('play_selection'):
-                  if (this._focused) {
-                    const xSamples = this.av.mouseCursor.clone();
-
-                    const boundarySelect = this.av.getSegmentSelection(this.av.mouseCursor.samples);
-                    if (boundarySelect) {
-                      const segmentI = this._transcriptionLevel.segments.getSegmentBySamplePosition(
-                        xSamples);
-                      if (segmentI > -1) {
-                        const segment = this._transcriptionLevel.segments.get(segmentI);
-                        const startTime = this._transcriptionLevel.segments.getStartTime(segmentI);
-                        // make shure, that segments boundaries are visible
-                        if (startTime.samples >= this.audioChunk.time.start.samples &&
-                          segment.time.samples <= (this.audioChunk.time.end.samples + 1)) {
-                          const absX = this.av.audioTCalculator.samplestoAbsX(
-                            this._transcriptionLevel.segments.get(segmentI).time
-                          );
-                          this.audioChunk.selection = boundarySelect.clone();
-                          this.av.drawnSelection = boundarySelect.clone();
-                          this.selchange.emit(this.audioChunk.selection);
-                          this.drawWholeSelection();
-
-                          let begin = this._transcriptionLevel.createSegment(this.audioManager.createSampleUnit(0));
-                          if (segmentI > 0) {
-                            begin = this._transcriptionLevel.segments.get(segmentI - 1);
-                          }
-                          const beginX = this.av.audioTCalculator.samplestoAbsX(begin.time);
-
-                          const posY1 = (this.av.innerWidth < this.AudioPxWidth)
-                            ? Math.floor((beginX / this.av.innerWidth) + 1) *
-                            (this.settings.lineheight + this.settings.margin.bottom) - this.settings.margin.bottom
-                            : 0;
-
-                          const posY2 = (this.av.innerWidth < this.AudioPxWidth)
-                            ? Math.floor((absX / this.av.innerWidth) + 1) *
-                            (this.settings.lineheight + this.settings.margin.bottom) - this.settings.margin.bottom
-                            : 0;
-
-                          if (xSamples.samples >= this.audioChunk.selection.start.samples
-                            && xSamples.samples <= this.audioChunk.selection.end.samples) {
-                            this.audioChunk.absolutePlayposition = this.audioChunk.selection.start.clone();
-                            this.changePlayCursorSamples(this.audioChunk.selection.start);
-                            this.updatePlayCursor();
-
-                            this.shortcuttriggered.emit({
-                              shortcut: comboKey,
-                              shortcutName,
-                              value: shortcutName,
-                              type: 'audio',
-                              timePosition: xSamples.clone(),
-                              selection: boundarySelect.clone(),
-                              timestamp: shortcutInfo.timestamp
-                            });
-
-                            this.audioChunk.stopPlayback().then(() => {
-                              // after stopping start audio playback
-                              this.audioChunk.selection = boundarySelect.clone();
-                              this.playSelection(this.afterAudioEnded);
-                            });
-                          }
-
-                          if (!this.settings.multiLine) {
-                            this.segmententer.emit({
-                              index: segmentI,
-                              pos: {Y1: posY1, Y2: posY2}
-                            });
-                          }
-                        } else {
-                          // TODO check this case again!
-                          this.alerttriggered.emit({
-                            type: 'error',
-                            message: 'segment invisible'
-                          });
-                        }
-                      }
-                    }
-                  }
-                  break;
-                case('delete_boundaries'):
-                  if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
-                    let start = null;
-                    let end = null;
-                    if (this._transcriptionLevel.segments.length > 0) {
-
+          if (focuscheck) {
+            switch (shortcutName) {
+              case('undo'):
+                if (this.settings.boundaries.enabled && this._focused && !this.settings.boundaries.readonly) {
+                  this.shortcuttriggered.emit({
+                    shortcut: comboKey,
+                    shortcutName,
+                    value: null,
+                    type: 'application',
+                    timePosition: this.av.mouseCursor.clone(),
+                    timestamp: shortcutInfo.timestamp
+                  });
+                }
+                break;
+              case('redo'):
+                if (this.settings.boundaries.enabled && this._focused && !this.settings.boundaries.readonly) {
+                  this.shortcuttriggered.emit({
+                    shortcut: comboKey,
+                    shortcutName,
+                    value: null,
+                    type: 'application',
+                    timePosition: this.av.mouseCursor.clone(),
+                    timestamp: shortcutInfo.timestamp
+                  });
+                }
+                break;
+              case('set_boundary'):
+                if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
+                  let segments;
+                  const result = this.av.addSegment();
+                  segments = this.av.currentTranscriptionLevel.segments;
+                  if (result !== null && result.msg !== null) {
+                    if (result.msg.text && result.msg.text !== '') {
+                      this.alerttriggered.emit({
+                        type: result.msg.type,
+                        message: result.msg.text
+                      });
+                    } else if (result.type !== null) {
                       this.shortcuttriggered.emit({
                         shortcut: comboKey,
                         shortcutName,
-                        value: shortcutName,
-                        type: 'audio',
-                        timePosition: this.av.mouseCursor.clone(),
-                        selection: this.av.drawnSelection.clone(),
+                        value: result.type,
+                        type: 'boundary',
+                        timePosition: this.audioManager.createSampleUnit(result.seg_samples),
                         timestamp: shortcutInfo.timestamp
                       });
-
-                      for (let i = 0; i < this._transcriptionLevel.segments.length; i++) {
-                        const segment = this._transcriptionLevel.segments.get(i);
-
-                        if (segment.time.samples >= this.av.drawnSelection.start.samples
-                          && segment.time.samples <= this.av.drawnSelection.end.samples
-                          && i < this._transcriptionLevel.segments.length - 1
-                        ) {
-                          this._transcriptionLevel.segments.removeByIndex(i, this.breakMarker.code, false);
-                          i--;
-                          if (start === null) {
-                            start = i;
-                          }
-                          end = i;
-                        } else if (this.av.drawnSelection.end.samples < segment.time.samples) {
-                          break;
-                        }
-                      }
-                    }
-
-                    if (start !== null && end !== null) {
-                      this.av.drawnSelection.start = this.audioManager.createSampleUnit(0);
-                      this.av.drawnSelection.end = this.av.drawnSelection.start.clone();
-                      this.transcriptionLevel.segments.onsegmentchange.emit();
                     }
                   }
-                  break;
-                case('segment_enter'):
-                  if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
-                    this.shortcuttriggered.emit({
-                      shortcut: comboKey,
-                      shortcutName,
-                      value: shortcutName,
-                      type: 'segment',
-                      timePosition: this.av.mouseCursor.clone(),
-                      timestamp: shortcutInfo.timestamp
-                    });
+                }
+                break;
+              case('set_break'):
+                if (this.settings.boundaries.enabled && this._focused) {
+                  const xSamples = this.av.mouseCursor.clone();
 
-                    const segInde = this._transcriptionLevel.segments.getSegmentBySamplePosition(
-                      this.av.mouseCursor
-                    );
-                    this.selectSegment(segInde,
-                      (posY1, posY2) => {
-                        this._focused = false;
-                        this.drawWholeSelection();
-                        this.stage.draw();
-                        this.segmententer.emit({
-                          index: segInde,
-                          pos: {Y1: posY1, Y2: posY2}
+                  if (xSamples !== null) {
+                    const segmentI = this._transcriptionLevel.segments.getSegmentBySamplePosition(xSamples);
+                    const segment = this._transcriptionLevel.segments.get(segmentI);
+
+                    if (segmentI > -1 && !isUnset(segment) && isUnset(segment.isBlockedBy)) {
+                      if (segment.transcript !== this.breakMarker.code) {
+                        segment.transcript = this.breakMarker.code;
+                        this.shortcuttriggered.emit({
+                          shortcut: comboKey,
+                          shortcutName,
+                          value: 'set_break',
+                          type: 'segment',
+                          timePosition: xSamples.clone(),
+                          timestamp: shortcutInfo.timestamp
                         });
-                      },
-                      () => {
+                      } else {
+                        segment.transcript = '';
+                        this.shortcuttriggered.emit({
+                          shortcut: comboKey,
+                          shortcutName,
+                          value: 'remove_break',
+                          type: 'segment',
+                          timePosition: xSamples.clone(),
+                          timestamp: shortcutInfo.timestamp
+                        });
+                      }
+
+                      // replace with costum function
+                      this._transcriptionLevel.segments.onsegmentchange.emit();
+                    }
+                  }
+                }
+                break;
+              case('play_selection'):
+                if (this._focused) {
+                  const xSamples = this.av.mouseCursor.clone();
+
+                  const boundarySelect = this.av.getSegmentSelection(this.av.mouseCursor.samples);
+                  if (boundarySelect) {
+                    const segmentI = this._transcriptionLevel.segments.getSegmentBySamplePosition(
+                      xSamples);
+                    if (segmentI > -1) {
+                      const segment = this._transcriptionLevel.segments.get(segmentI);
+                      const startTime = this._transcriptionLevel.segments.getStartTime(segmentI);
+                      // make shure, that segments boundaries are visible
+                      if (startTime.samples >= this.audioChunk.time.start.samples &&
+                        segment.time.samples <= (this.audioChunk.time.end.samples + 1)) {
+                        const absX = this.av.audioTCalculator.samplestoAbsX(
+                          this._transcriptionLevel.segments.get(segmentI).time
+                        );
+                        this.audioChunk.selection = boundarySelect.clone();
+                        this.av.drawnSelection = boundarySelect.clone();
+                        this.selchange.emit(this.audioChunk.selection);
+                        this.drawWholeSelection();
+
+                        let begin = this._transcriptionLevel.createSegment(this.audioManager.createSampleUnit(0));
+                        if (segmentI > 0) {
+                          begin = this._transcriptionLevel.segments.get(segmentI - 1);
+                        }
+                        const beginX = this.av.audioTCalculator.samplestoAbsX(begin.time);
+
+                        const posY1 = (this.av.innerWidth < this.AudioPxWidth)
+                          ? Math.floor((beginX / this.av.innerWidth) + 1) *
+                          (this.settings.lineheight + this.settings.margin.bottom) - this.settings.margin.bottom
+                          : 0;
+
+                        const posY2 = (this.av.innerWidth < this.AudioPxWidth)
+                          ? Math.floor((absX / this.av.innerWidth) + 1) *
+                          (this.settings.lineheight + this.settings.margin.bottom) - this.settings.margin.bottom
+                          : 0;
+
+                        if (xSamples.samples >= this.audioChunk.selection.start.samples
+                          && xSamples.samples <= this.audioChunk.selection.end.samples) {
+                          this.audioChunk.absolutePlayposition = this.audioChunk.selection.start.clone();
+                          this.changePlayCursorSamples(this.audioChunk.selection.start);
+                          this.updatePlayCursor();
+
+                          this.shortcuttriggered.emit({
+                            shortcut: comboKey,
+                            shortcutName,
+                            value: shortcutName,
+                            type: 'audio',
+                            timePosition: xSamples.clone(),
+                            selection: boundarySelect.clone(),
+                            timestamp: shortcutInfo.timestamp
+                          });
+
+                          this.audioChunk.stopPlayback().then(() => {
+                            // after stopping start audio playback
+                            this.audioChunk.selection = boundarySelect.clone();
+                            this.playSelection(this.afterAudioEnded);
+                          });
+                        }
+
+                        if (!this.settings.multiLine) {
+                          this.segmententer.emit({
+                            index: segmentI,
+                            pos: {Y1: posY1, Y2: posY2}
+                          });
+                        }
+                      } else {
+                        // TODO check this case again!
                         this.alerttriggered.emit({
                           type: 'error',
                           message: 'segment invisible'
                         });
+                      }
+                    }
+                  }
+                }
+                break;
+              case('delete_boundaries'):
+                if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
+                  let start = null;
+                  let end = null;
+                  if (this._transcriptionLevel.segments.length > 0) {
+
+                    this.shortcuttriggered.emit({
+                      shortcut: comboKey,
+                      shortcutName,
+                      value: shortcutName,
+                      type: 'audio',
+                      timePosition: this.av.mouseCursor.clone(),
+                      selection: this.av.drawnSelection.clone(),
+                      timestamp: shortcutInfo.timestamp
+                    });
+
+                    for (let i = 0; i < this._transcriptionLevel.segments.length; i++) {
+                      const segment = this._transcriptionLevel.segments.get(i);
+
+                      if (segment.time.samples >= this.av.drawnSelection.start.samples
+                        && segment.time.samples <= this.av.drawnSelection.end.samples
+                        && i < this._transcriptionLevel.segments.length - 1
+                      ) {
+                        this._transcriptionLevel.segments.removeByIndex(i, this.breakMarker.code, false);
+                        i--;
+                        if (start === null) {
+                          start = i;
+                        }
+                        end = i;
+                      } else if (this.av.drawnSelection.end.samples < segment.time.samples) {
+                        break;
+                      }
+                    }
+                  }
+
+                  if (start !== null && end !== null) {
+                    this.av.drawnSelection.start = this.audioManager.createSampleUnit(0);
+                    this.av.drawnSelection.end = this.av.drawnSelection.start.clone();
+                    this.transcriptionLevel.segments.onsegmentchange.emit();
+                  }
+                }
+                break;
+              case('segment_enter'):
+                if (this.settings.boundaries.enabled && !this.settings.boundaries.readonly && this._focused) {
+                  this.shortcuttriggered.emit({
+                    shortcut: comboKey,
+                    shortcutName,
+                    value: shortcutName,
+                    type: 'segment',
+                    timePosition: this.av.mouseCursor.clone(),
+                    timestamp: shortcutInfo.timestamp
+                  });
+
+                  const segInde = this._transcriptionLevel.segments.getSegmentBySamplePosition(
+                    this.av.mouseCursor
+                  );
+                  this.selectSegment(segInde,
+                    (posY1, posY2) => {
+                      this._focused = false;
+                      this.drawWholeSelection();
+                      this.stage.draw();
+                      this.segmententer.emit({
+                        index: segInde,
+                        pos: {Y1: posY1, Y2: posY2}
                       });
-                  }
-                  break;
-                case('cursor_left'):
-                  if (this._focused) {
-                    // move cursor to left
-                    this.shortcuttriggered.emit({
-                      shortcut: comboKey,
-                      shortcutName,
-                      value: shortcutName,
-                      type: 'mouse',
-                      timePosition: this.av.mouseCursor.clone(),
-                      timestamp: shortcutInfo.timestamp
+                    },
+                    () => {
+                      this.alerttriggered.emit({
+                        type: 'error',
+                        message: 'segment invisible'
+                      });
                     });
-                    this.av.moveCursor('left', this.settings.stepWidthRatio * this.audioManager.sampleRate);
-                    this.changeMouseCursorSamples(this.av.mouseCursor);
-                    this.mousecursorchange.emit({
-                      event: null,
-                      time: this.av.mouseCursor
-                    });
-                  }
-                  break;
-                case('cursor_right'):
-                  if (this._focused) {
-                    // move cursor to right
-                    this.shortcuttriggered.emit({
-                      shortcut: comboKey,
-                      shortcutName,
-                      value: shortcutName,
-                      type: 'mouse',
-                      timePosition: this.av.mouseCursor.clone(),
-                      timestamp: shortcutInfo.timestamp
-                    });
+                }
+                break;
+              case('cursor_left'):
+                if (this._focused) {
+                  // move cursor to left
+                  this.shortcuttriggered.emit({
+                    shortcut: comboKey,
+                    shortcutName,
+                    value: shortcutName,
+                    type: 'mouse',
+                    timePosition: this.av.mouseCursor.clone(),
+                    timestamp: shortcutInfo.timestamp
+                  });
+                  this.av.moveCursor('left', this.settings.stepWidthRatio * this.audioManager.sampleRate);
+                  this.changeMouseCursorSamples(this.av.mouseCursor);
+                  this.mousecursorchange.emit({
+                    event: null,
+                    time: this.av.mouseCursor
+                  });
+                }
+                break;
+              case('cursor_right'):
+                if (this._focused) {
+                  // move cursor to right
+                  this.shortcuttriggered.emit({
+                    shortcut: comboKey,
+                    shortcutName,
+                    value: shortcutName,
+                    type: 'mouse',
+                    timePosition: this.av.mouseCursor.clone(),
+                    timestamp: shortcutInfo.timestamp
+                  });
 
-                    this.av.moveCursor('right', this.settings.stepWidthRatio * this.audioManager.sampleRate);
-                    this.changeMouseCursorSamples(this.av.mouseCursor);
-                    this.mousecursorchange.emit({
-                      event: null,
-                      time: this.av.mouseCursor
-                    });
-                  }
-                  break;
-                case('playonhover'):
-                  if (this._focused && !this.settings.boundaries.readonly) {
-                    // move cursor to right
-                    this.shortcuttriggered.emit({
-                      shortcut: comboKey,
-                      shortcutName,
-                      value: shortcutName,
-                      type: 'option',
-                      timePosition: this.av.mouseCursor.clone(),
-                      timestamp: shortcutInfo.timestamp
-                    });
-                  }
-                  break;
+                  this.av.moveCursor('right', this.settings.stepWidthRatio * this.audioManager.sampleRate);
+                  this.changeMouseCursorSamples(this.av.mouseCursor);
+                  this.mousecursorchange.emit({
+                    event: null,
+                    time: this.av.mouseCursor
+                  });
+                }
+                break;
+              case('playonhover'):
+                if (this._focused && !this.settings.boundaries.readonly) {
+                  // move cursor to right
+                  this.shortcuttriggered.emit({
+                    shortcut: comboKey,
+                    shortcutName,
+                    value: shortcutName,
+                    type: 'option',
+                    timePosition: this.av.mouseCursor.clone(),
+                    timestamp: shortcutInfo.timestamp
+                  });
+                }
+                break;
 
-                case('do_asr'):
-                  if (this.settings.boundaries.enabled && this.focused && this.settings.asr.enabled) {
-                    const segmentI = this.transcriptionLevel.segments.getSegmentBySamplePosition(this.av.mouseCursor);
-                    const segment = this.transcriptionLevel.segments.get(segmentI);
+              case('do_asr'):
+                if (this.settings.boundaries.enabled && this.focused && this.settings.asr.enabled) {
+                  const segmentI = this.transcriptionLevel.segments.getSegmentBySamplePosition(this.av.mouseCursor);
+                  const segment = this.transcriptionLevel.segments.get(segmentI);
 
-                    if (segmentI > -1) {
-                      if (isUnset(segment.isBlockedBy)) {
-                        this.shortcuttriggered.emit({
-                          shortcut: comboKey,
-                          shortcutName,
-                          value: 'do_asr',
-                          type: 'segment',
-                          timePosition: this.av.mouseCursor.clone(),
-                          timestamp: shortcutInfo.timestamp
-                        });
-                      } else {
-                        this.shortcuttriggered.emit({
-                          shortcut: comboKey,
-                          shortcutName,
-                          value: 'cancel_asr',
-                          type: 'segment',
-                          timePosition: this.av.mouseCursor.clone(),
-                          timestamp: shortcutInfo.timestamp
-                        });
-                      }
-                      this.transcriptionLevel.segments.onsegmentchange.emit();
+                  if (segmentI > -1) {
+                    if (isUnset(segment.isBlockedBy)) {
+                      this.shortcuttriggered.emit({
+                        shortcut: comboKey,
+                        shortcutName,
+                        value: 'do_asr',
+                        type: 'segment',
+                        timePosition: this.av.mouseCursor.clone(),
+                        timestamp: shortcutInfo.timestamp
+                      });
+                    } else {
+                      this.shortcuttriggered.emit({
+                        shortcut: comboKey,
+                        shortcutName,
+                        value: 'cancel_asr',
+                        type: 'segment',
+                        timePosition: this.av.mouseCursor.clone(),
+                        timestamp: shortcutInfo.timestamp
+                      });
                     }
+                    this.transcriptionLevel.segments.onsegmentchange.emit();
                   }
-                  break;
-                case('do_asr_maus'):
-                  if (this.settings.boundaries.enabled && this.settings.asr.enabled) {
-                    const segmentI = this.transcriptionLevel.segments.getSegmentBySamplePosition(this.av.mouseCursor);
-                    const segment = this.transcriptionLevel.segments.get(segmentI);
+                }
+                break;
+              case('do_asr_maus'):
+                if (this.settings.boundaries.enabled && this.settings.asr.enabled) {
+                  const segmentI = this.transcriptionLevel.segments.getSegmentBySamplePosition(this.av.mouseCursor);
+                  const segment = this.transcriptionLevel.segments.get(segmentI);
 
-                    if (segmentI > -1) {
-                      if (isUnset(segment.isBlockedBy)) {
-                        this.shortcuttriggered.emit({
-                          shortcut: comboKey,
-                          shortcutName,
-                          value: 'do_asr_maus',
-                          type: 'segment',
-                          timePosition: this.av.mouseCursor.clone(),
-                          timestamp: shortcutInfo.timestamp
-                        });
-                      } else {
-                        this.shortcuttriggered.emit({
-                          shortcut: comboKey,
-                          shortcutName,
-                          value: 'cancel_asr_maus',
-                          type: 'segment',
-                          timePosition: this.av.mouseCursor.clone(),
-                          timestamp: shortcutInfo.timestamp
-                        });
-                      }
-                      this.transcriptionLevel.segments.onsegmentchange.emit();
+                  if (segmentI > -1) {
+                    if (isUnset(segment.isBlockedBy)) {
+                      this.shortcuttriggered.emit({
+                        shortcut: comboKey,
+                        shortcutName,
+                        value: 'do_asr_maus',
+                        type: 'segment',
+                        timePosition: this.av.mouseCursor.clone(),
+                        timestamp: shortcutInfo.timestamp
+                      });
+                    } else {
+                      this.shortcuttriggered.emit({
+                        shortcut: comboKey,
+                        shortcutName,
+                        value: 'cancel_asr_maus',
+                        type: 'segment',
+                        timePosition: this.av.mouseCursor.clone(),
+                        timestamp: shortcutInfo.timestamp
+                      });
                     }
+                    this.transcriptionLevel.segments.onsegmentchange.emit();
                   }
-                  break;
+                }
+                break;
 
-                case('do_maus'):
-                  if (this.settings.boundaries.enabled && this.settings.asr.enabled) {
-                    const segmentI = this.transcriptionLevel.segments.getSegmentBySamplePosition(this.av.mouseCursor);
-                    const segment = this.transcriptionLevel.segments.get(segmentI);
+              case('do_maus'):
+                if (this.settings.boundaries.enabled && this.settings.asr.enabled) {
+                  const segmentI = this.transcriptionLevel.segments.getSegmentBySamplePosition(this.av.mouseCursor);
+                  const segment = this.transcriptionLevel.segments.get(segmentI);
 
-                    if (segmentI > -1) {
-                      if (isUnset(segment.isBlockedBy)) {
-                        this.shortcuttriggered.emit({
-                          shortcut: comboKey,
-                          shortcutName,
-                          value: 'do_maus',
-                          type: 'segment',
-                          timePosition: this.av.mouseCursor.clone(),
-                          timestamp: shortcutInfo.timestamp
-                        });
-                      } else {
-                        this.shortcuttriggered.emit({
-                          shortcut: comboKey,
-                          shortcutName,
-                          value: 'cancel_maus',
-                          type: 'segment',
-                          timePosition: this.av.mouseCursor.clone(),
-                          timestamp: shortcutInfo.timestamp
-                        });
-                      }
-                      this.transcriptionLevel.segments.onsegmentchange.emit();
+                  if (segmentI > -1) {
+                    if (isUnset(segment.isBlockedBy)) {
+                      this.shortcuttriggered.emit({
+                        shortcut: comboKey,
+                        shortcutName,
+                        value: 'do_maus',
+                        type: 'segment',
+                        timePosition: this.av.mouseCursor.clone(),
+                        timestamp: shortcutInfo.timestamp
+                      });
+                    } else {
+                      this.shortcuttriggered.emit({
+                        shortcut: comboKey,
+                        shortcutName,
+                        value: 'cancel_maus',
+                        type: 'segment',
+                        timePosition: this.av.mouseCursor.clone(),
+                        timestamp: shortcutInfo.timestamp
+                      });
                     }
+                    this.transcriptionLevel.segments.onsegmentchange.emit();
                   }
-                  break;
-              }
+                }
+                break;
             }
           }
         }
       }
-    }).catch(e => console.error(e));
+    }
   }
 
   private onKeyUp = (event: KeyboardEvent) => {
-    this.shortcutsManager.checkKeyEvent(event, Date.now()).then((shortcutInfo: ShortcutEvent) => {
-    }).catch((error) => {
-      console.error(error);
-    });
+    this.shortcutsManager.checkKeyEvent(event, Date.now());
   }
 
   /**

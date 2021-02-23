@@ -98,6 +98,7 @@ export class AudioviewerConfig {
   public shortcutsEnabled = true;
   public shortcuts: ShortcutGroup = {
     name: 'audioviewer',
+    enabled: true,
     items: [
       {
         name: 'undo',

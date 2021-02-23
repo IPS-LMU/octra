@@ -27,6 +27,7 @@ export interface Shortcut {
 }
 
 export interface ShortcutGroup {
+  enabled: boolean;
   name: string;
   items: Shortcut[];
 }
@@ -43,6 +44,7 @@ export class ShortcutManager {
   private _shortcuts: ShortcutGroup[];
   public generalShortcuts: ShortcutGroup = {
     name: 'general shortcuts',
+    enabled: true,
     items: []
   }
 
@@ -141,43 +143,50 @@ export class ShortcutManager {
     this._shortcuts = [];
   }
 
-  public checkKeyEvent(event: KeyboardEvent, timestamp: number): Promise<ShortcutEvent> {
-    return new Promise<ShortcutEvent>((resolve) => {
-      const keyCode = this.getKeyCode(event);
+  public checkKeyEvent(event: KeyboardEvent, timestamp: number, checkPressKey = true): ShortcutEvent {
+    if (this.shortcutsEnabled) {
+      if (event.type === 'keydown') {
+        // run shortcut check
+        const shortcut = this.getShorcutCombination(event);
+        const commandObj = this.getCommand(shortcut, BrowserInfo.platform);
 
-      if (this.shortcutsEnabled) {
-        if (event.type === 'keydown') {
-          // run shortcut check
-          const shortcut = this.getShorcutCombination(event);
-          const commandObj = this.getCommand(shortcut, BrowserInfo.platform);
-
+        if (checkPressKey) {
           this.checkPressedKey(event);
-
-          if (!isUnset(commandObj)) {
-            resolve({
-              platform: BrowserInfo.platform,
-              shortcutName: commandObj.shortcut.name,
-              shortcutGroupName: commandObj.groupName,
-              onFocusOnly: commandObj.shortcut.focusonly,
-              shortcut,
-              event,
-              timestamp
-            });
-
-          } else {
-            resolve(null);
-          }
-        } else if (event.type === 'keyup') {
-          this.checkPressedKey(event);
-          resolve(null);
-        } else {
-          this.checkPressedKey(event);
-          resolve(null);
         }
+
+        if (!isUnset(commandObj)) {
+          return {
+            platform: BrowserInfo.platform,
+            shortcutName: commandObj.shortcut.name,
+            shortcutGroupName: commandObj.groupName,
+            onFocusOnly: commandObj.shortcut.focusonly,
+            shortcut,
+            event,
+            timestamp
+          };
+
+        } else {
+          return null;
+        }
+      } else if (event.type === 'keyup') {
+        if (checkPressKey) {
+          this.checkPressedKey(event);
+        }
+        return null;
       } else {
-        resolve(null);
+        if (checkPressKey) {
+          this.checkPressedKey(event);
+        }
+        return null;
       }
-    });
+    } else {
+      return null;
+    }
+  }
+
+  public getCommandByEvent(event: KeyboardEvent) {
+    const shortcut = this.getShorcutCombination(event);
+    return this.getCommand(shortcut, BrowserInfo.platform);
   }
 
   private getCommand(shortcut: string, platform: 'mac' | 'pc'): {
@@ -187,10 +196,14 @@ export class ShortcutManager {
     for (const shortcutGroup of this._shortcuts) {
       const elem = shortcutGroup.items.find(a => a.keys[platform] === shortcut);
       if (!isUnset(elem)) {
-        return {
-          shortcut: elem,
-          groupName: shortcutGroup.name
-        };
+        if (shortcutGroup.enabled) {
+          return {
+            shortcut: elem,
+            groupName: shortcutGroup.name
+          };
+        } else {
+          return null;
+        }
       }
     }
 
@@ -337,5 +350,21 @@ export class ShortcutManager {
     }
 
     this._pressedKeys.other = (valueToSet) ? this.getKeyCode(event) : -1;
+  }
+
+  public enableShortcutGroup(name: string) {
+    const group = this.shortcuts.find(a => a.name === name);
+
+    if (!isUnset(group)) {
+      group.enabled = true;
+    }
+  }
+
+  public disableShortcutGroup(name: string) {
+    const group = this.shortcuts.find(a => a.name === name);
+
+    if (!isUnset(group)) {
+      group.enabled = false;
+    }
   }
 }

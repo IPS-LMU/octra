@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {TranslocoService} from '@ngneat/transloco';
 import {environment} from '../../../../environments/environment';
@@ -23,10 +23,11 @@ declare let jQuery: any;
 export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChild('modalexport', {static: true}) modalexport: ExportFilesModalComponent;
+  @ViewChild('tiersDropdown', {static: false}) tiersDropdown: ElementRef;
+  @ViewChild('tiersDropdownUp', {static: false}) tiersDropdownUp: ElementRef;
   @Input() version: string;
 
   public test = 'ok';
-  collapsed = true;
   public secondsPerLine = '5';
   private subscrmanager: SubscriptionManager = new SubscriptionManager();
 
@@ -144,10 +145,6 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  onOptionsOpened() {
-    this.collapsed = true;
-  }
-
   public openBugReport() {
     this.modService.show('bugreport').then(() => {
       window.location.hash = '';
@@ -206,14 +203,13 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
     this.appStorage.addAnnotationLevel(new OIDBLevel(-1,
       newlevel.getObj(this.transcrServ.audioManager.ressource.info.duration.clone()),
       this.transcrServ.annotation.levels.length
-    )).then(() => {
-      this.transcrServ.annotation.levels.push(newlevel);
-    }).catch((error) => {
+    )).catch((error) => {
       console.error(error);
     });
   }
 
   onLevelRemoveClick(tiernum: number, id: number) {
+    jQuery(this.tiersDropdown.nativeElement).addClass('show');
     this.modService.show('yesno', {
       text: 'The Tier will be deleted permanently. Are you sure?'
     }).then((answer) => {
@@ -221,17 +217,8 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
         if (this.transcrServ.annotation.levels.length > 1) {
           this.appStorage.removeAnnotationLevel(id).catch((err) => {
             console.error(err);
-          }).then(() => {
-            // update value for annoation object in transcr service
-            this.transcrServ.annotation.levels.splice(tiernum, 1);
-            if (tiernum <= this.transcrServ.selectedlevel) {
-              this.transcrServ.selectedlevel = tiernum - 1;
-            }
           });
         }
-        this.collapsed = false;
-      } else {
-        this.collapsed = false;
       }
     }).catch((error) => {
       console.error(error);
@@ -243,12 +230,10 @@ export class NavigationComponent implements OnInit, OnDestroy, AfterViewInit {
       tiernum].getObj(this.transcrServ.audioManager.ressource.info.duration.clone()
     );
     this.appStorage.addAnnotationLevel(new OIDBLevel(-1, newlevel, this.transcrServ.annotation.levels.length))
-      .then(() => {
-        // TODO if store change took effect
-        // this.transcrServ.annotation.levels.push(newlevel);
-      }).catch((error) => {
-      console.error(error);
-    });
+      .catch((error) => {
+        console.error(error);
+      });
+    jQuery(this.tiersDropdown.nativeElement).addClass('show');
   }
 
   public selectLevel(tiernum: number) {

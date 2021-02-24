@@ -6,7 +6,7 @@ import {AppInfo} from '../../../app.info';
 import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
 import {AudioService, SettingsService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
-import {IFile, ImportResult, OAudiofile, OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
+import {IFile, ImportResult, Level, OAudiofile, OIDBLevel, OIDBLink, OLevel} from '@octra/annotation';
 import {LoginMode} from '../../store';
 import * as fromTranscription from '../../store/transcription';
 import * as fromApplication from '../../store/application';
@@ -164,6 +164,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
     );
 
     Functions.afterTrue(this.store.select(fromApplication.selectIDBLoaded)).then(() => {
+      Level.counter = this.appStorage.snapshot.annotation.levelCounter;
       if (!isUnset(this.appStorage.urlParams) && this.appStorage.urlParams.hasOwnProperty('audio') && this.appStorage.urlParams.audio !== ''
         && !isUnset(this.appStorage.urlParams.audio)) {
         this.store.dispatch(LoginActions.loginURLParameters({

@@ -223,7 +223,6 @@ export class IDBEffects {
           const annotationStateLevel = convertFromOIDLevel(levels[i]);
 
           if (!levels[i].hasOwnProperty('id')) {
-            // TODO this could lead to an error!
             annotationStateLevel.id = i + 1;
           }
 
@@ -903,9 +902,7 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      console.log(`save annotation level...`);
-      this.idbService.saveAnnotationLevel(convertToOIDBLevel(action.level, action.sortorder), action.id).then(() => {
-        console.log(`saved annotation level success`);
+      this.idbService.saveAnnotationLevel(convertToOIDBLevel(action.level, action.sortorder)).then(() => {
         subject.next(IDBActions.saveAnnotationLevelSuccess());
         subject.complete();
       }).catch((error) => {
@@ -924,7 +921,7 @@ export class IDBEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      this.idbService.saveAnnotationLevel(convertToOIDBLevel(action.level, action.level.id), action.level.id)
+      this.idbService.addAnnotationLevel(convertToOIDBLevel(action.level, action.level.id))
         .then(() => {
           subject.next(IDBActions.addAnnotationLevelSuccess());
           subject.complete();

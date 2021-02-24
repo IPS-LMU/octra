@@ -208,11 +208,22 @@ export class IDBService {
    * @param level
    * @param id
    */
-  public saveAnnotationLevel(level: IIDBLevel, id: number) {
+  public saveAnnotationLevel(level: IIDBLevel) {
     return this.database.annotation_levels.put({
-      id,
+      id: level.id,
       value: level
-    }, id);
+    }, level.id);
+  }
+
+  /***
+   * adds annotation level
+   * @param level
+   */
+  public addAnnotationLevel(level: IIDBLevel) {
+    return this.database.annotation_levels.add({
+      id: level.id,
+      value: level
+    });
   }
 
   /**
@@ -238,6 +249,14 @@ export class IDBService {
    */
   public saveAnnotationLink(link: OIDBLink) {
     return this.database.annotation_links.put(link, link.id);
+  }
+
+  /**
+   * adds one annotation link
+   * @param link
+   */
+  public addAnnotationLink(link: OIDBLink) {
+    return this.database.annotation_links.add(link, link.id);
   }
 
   /**

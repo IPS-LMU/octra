@@ -39,9 +39,9 @@ export const reducer = createUndoRedoReducer(
     ...state,
     ...annotation
   })),
-  on(AnnotationActions.changeAnnotationLevel, (state: AnnotationState, {level, id}) => {
+  on(AnnotationActions.changeAnnotationLevel, (state: AnnotationState, {level}) => {
     const annotationLevels = state.levels;
-    const index = annotationLevels.findIndex(a => a.id === id);
+    const index = annotationLevels.findIndex(a => a.id === level.id);
 
     if (index > -1 && index < annotationLevels.length) {
       return {

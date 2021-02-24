@@ -251,6 +251,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       this.cd.markForCheck();
     }));
 
+    this.subscrmanager.add(this.transcrService.levelchanged.subscribe(() => {
+      this.cd.markForCheck();
+    }));
+
     this.subscrmanager.add(this.transcrService.currentLevelSegmentChange.subscribe(() => {
       this.cd.markForCheck();
     }));

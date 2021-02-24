@@ -135,6 +135,7 @@ export class TranscriptionService {
       this._selectedlevel = this.getSegmentFirstLevel();
     }
     this.levelchanged.emit(this._annotation.levels[this._selectedlevel]);
+    this.listenForSegmentChanges();
   }
 
   private _statistic: any = {
@@ -343,7 +344,6 @@ export class TranscriptionService {
 
             this.subscrmanager.removeByTag('idbAnnotationChange');
             this.subscrmanager.add(this.appStorage.annotationChanged.subscribe((state) => {
-              // TODO PROBLEM HERE
               this.updateAnnotation(state.levels, state.links);
             }), 'idbAnnotationChange');
             resolve();
@@ -551,12 +551,15 @@ export class TranscriptionService {
       this._annotation.links.push(annotationLink.link);
     }
 
+    this.listenForSegmentChanges();
+    this.annotationChanged.emit();
+  }
+
+  private listenForSegmentChanges() {
     this.subscrmanager.removeByTag('segmentchange');
     this.subscrmanager.add(this.currentlevel.segments.onsegmentchange.subscribe((event) => {
       this._currentLevelSegmentChange.emit(event);
     }), 'segmentchange');
-
-    this.annotationChanged.emit();
   }
 
   public exportDataToJSON(): any {

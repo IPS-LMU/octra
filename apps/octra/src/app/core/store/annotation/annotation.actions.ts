@@ -34,7 +34,6 @@ export class AnnotationActions {
   public static changeAnnotationLevel = createAction(
     `[${context}] Change Annotation Level`,
     props<{
-      id: number;
       level: AnnotationStateLevel;
       sortorder: number;
     }>()

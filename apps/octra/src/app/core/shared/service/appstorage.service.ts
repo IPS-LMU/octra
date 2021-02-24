@@ -686,7 +686,6 @@ export class AppStorageService {
 
             this.store.dispatch(AnnotationActions.changeAnnotationLevel({
               level,
-              id,
               sortorder: tiernum
             }));
           } else {

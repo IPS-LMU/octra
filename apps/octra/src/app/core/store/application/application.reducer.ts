@@ -23,14 +23,6 @@ export const initialState: ApplicationState = {
 
 export const reducer = createReducer(
   initialState,
-  on(ApplicationActions.load, (state: ApplicationState, {progress}) => ({
-    ...state,
-    loading: {
-      ...state.loading,
-      status: LoadingStatus.LOADING,
-      progress
-    }
-  })),
   on(ApplicationActions.addError, (state: ApplicationState, {error}) => ({
     ...state,
     loading: {
@@ -79,6 +71,7 @@ export const reducer = createReducer(
     ...state,
     loading: {
       ...state.loading,
+      status: (state.loading.progress === 75) ? LoadingStatus.FINISHED : LoadingStatus.LOADING,
       progress: state.loading.progress + 25
     },
     appConfiguration
@@ -87,6 +80,7 @@ export const reducer = createReducer(
     ...state,
     loading: {
       ...state.loading,
+      status: (state.loading.progress === 75) ? LoadingStatus.FINISHED : LoadingStatus.LOADING,
       progress: state.loading.progress + 25
     }
   })),
@@ -94,6 +88,7 @@ export const reducer = createReducer(
     ...state,
     loading: {
       ...state.loading,
+      status: (state.loading.progress === 75) ? LoadingStatus.FINISHED : LoadingStatus.LOADING,
       progress: state.loading.progress + 25
     }
   })),
@@ -101,6 +96,7 @@ export const reducer = createReducer(
     ...state,
     loading: {
       ...state.loading,
+      status: (state.loading.progress === 75) ? LoadingStatus.FINISHED : LoadingStatus.LOADING,
       progress: state.loading.progress + 25
     }
   })),

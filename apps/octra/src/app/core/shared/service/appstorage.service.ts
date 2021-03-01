@@ -11,6 +11,7 @@ import {
   AnnotationState,
   AnnotationStateLevel,
   convertFromOIDLevel,
+  LoadingStatus,
   LoginMode,
   OnlineSession,
   RootState
@@ -179,6 +180,10 @@ export class AppStorageService {
     return this._snapshot.transcription.secondsPerLine;
   }
 
+  get loadingStatus(): LoadingStatus {
+    return this._snapshot?.application?.loading?.status;
+  }
+
   set secondsPerLine(value: number) {
     this.store.dispatch(TranscriptionActions.setSecondsPerLine({
       secondsPerLine: value
@@ -231,9 +236,6 @@ export class AppStorageService {
 
   public saving: EventEmitter<string> = new EventEmitter<string>();
   public settingschange = new Subject<{ key: string, value: any }>();
-
-  // is user on the login page?
-  private login: boolean;
 
   private subscrManager = new SubscriptionManager();
 
@@ -476,7 +478,7 @@ export class AppStorageService {
       this.interface = '2D-Editor';
     }
 
-    if (!this.login && !isUnset(member)) {
+    if (!isUnset(member)) {
       this.store.dispatch(LoginActions.loginOnline({
         onlineSession: {
           loginData: {
@@ -488,7 +490,6 @@ export class AppStorageService {
           sessionData: {
             dataID,
             audioURL,
-
             promptText,
             serverComment,
             jobsLeft,
@@ -497,8 +498,6 @@ export class AppStorageService {
           }
         }
       }));
-
-      this.login = true;
     }
   }
 
@@ -512,7 +511,6 @@ export class AppStorageService {
     }
 
     this.store.dispatch(LoginActions.loginLocal({files, sessionFile}));
-    this.login = true;
   }
 
   setDemoSession(audioURL: string, serverComment: string, jobsLeft: number) {
@@ -543,7 +541,6 @@ export class AppStorageService {
         }
       }
     }));
-    this.login = true;
   }
 
   setURLSession(audio: string, transcript: string, embedded: boolean, host: string) {
@@ -562,12 +559,10 @@ export class AppStorageService {
         embedded,
         host
       }
-    }))
-    this.login = true;
+    }));
   }
 
   public clearOnlineSession(): boolean {
-    this.login = false;
     this.store.dispatch(LoginActions.clearOnlineSession());
 
     this.sessStr.clear();
@@ -575,7 +570,6 @@ export class AppStorageService {
   }
 
   public clearLocalStorage() {
-    this.login = false;
     this.store.dispatch(LoginActions.clearLocalSession());
   }
 
@@ -750,10 +744,12 @@ export class AppStorageService {
     return null;
   }
 
-  public logout() {
+  public logout(removeAnnotation = false) {
     this.endSession().then(() => {
       this.clearHistory();
-      this.store.dispatch(LoginActions.logout());
+      this.store.dispatch(LoginActions.logout({
+        removeAnnotation
+      }));
       Functions.navigateTo(this.router, ['login'], AppInfo.queryParamsHandling).catch((error) => {
         console.error(error);
       });

@@ -78,11 +78,14 @@ export const reducer = createReducer(
       ...data
     }
   })),
-  on(LoginActions.setServerDataEntry, (state: LoginState, data) => ({
+  on(LoginActions.setServerDataEntry, (state: LoginState, {serverDataEntry}) => ({
     ...state,
     onlineSession: {
       ...state.onlineSession,
-      ...data
+      sessionData: {
+        ...state.onlineSession.sessionData,
+        serverDataEntry
+      }
     }
   })),
   on(LoginActions.setLoggedIn, (state: LoginState, {loggedIn}) => ({

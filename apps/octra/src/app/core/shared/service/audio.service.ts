@@ -36,7 +36,7 @@ export class AudioService {
    *
    * audio data; for longer data, a MediaElementAudioSourceNode should be used.
    */
-  public loadAudio: (url: string, callback: () => void) => Subject<any>
+  public loadAudio: (url: string) => Subject<any>
     = (url: string, callback: any = () => {
   }) => {
     this._loaded = false;
@@ -67,8 +67,6 @@ export class AudioService {
 
                 subj.next(1);
                 subj.complete();
-
-                callback({});
               } else {
                 subj.next(0.5 + 0.5 * result.decodeProgress);
               }

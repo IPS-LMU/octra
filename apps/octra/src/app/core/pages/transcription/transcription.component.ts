@@ -16,7 +16,14 @@ import {
 } from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
-import {Functions, isUnset, ShortcutGroup, ShortcutManager, SubscriptionManager} from '@octra/utilities';
+import {
+  Functions,
+  hasPropertyTree,
+  isUnset,
+  ShortcutGroup,
+  ShortcutManager,
+  SubscriptionManager
+} from '@octra/utilities';
 import {interval, throwError, timer} from 'rxjs';
 import * as X2JS from 'x2js';
 import {AppInfo} from '../../../app.info';
@@ -327,14 +334,14 @@ export class TranscriptionComponent implements OnInit,
       if (this.appStorage.useMode !== LoginMode.DEMO) {
         this.api.setOnlineSessionToFree(this.appStorage).then(() => {
           this.clearDataPermanently();
-          this.appStorage.logout();
+          this.appStorage.logout(true);
         }).catch((error) => {
           console.error(error);
         });
       } else {
         // is demo mode
         this.clearDataPermanently();
-        this.appStorage.logout();
+        this.appStorage.logout(true);
       }
     } else {
       this.modService.show('transcriptionStop').then((answer: TranscriptionStopModalAnswer) => {
@@ -762,13 +769,13 @@ export class TranscriptionComponent implements OnInit,
       if (data && data.hasOwnProperty('url') && data.hasOwnProperty('id')) {
         // get transcript data that already exists
         const jsonStr = JSON.stringify(json.data);
-        this.appStorage.serverDataEntry = parseServerDataEntry(jsonStr);
+        let serverDataEntry = parseServerDataEntry(jsonStr);
 
-        if (this.appStorage.serverDataEntry.hasOwnProperty('transcript')) {
-          if (!Array.isArray(this.appStorage.serverDataEntry.transcript)) {
+        if (hasPropertyTree(serverDataEntry, 'transcript')) {
+          if (!Array.isArray(serverDataEntry.transcript)) {
             console.log(`server transcript is not array, set []`);
-            this.appStorage.serverDataEntry = {
-              ...this.appStorage.serverDataEntry,
+            serverDataEntry = {
+              ...serverDataEntry,
               transcript: []
             }
           } else {
@@ -778,10 +785,10 @@ export class TranscriptionComponent implements OnInit,
           console.log(`no server transcript`);
         }
 
-        if (isUnset(this.appStorage.serverDataEntry.logtext) ||
-          !Array.isArray(this.appStorage.serverDataEntry.logtext)) {
-          this.appStorage.serverDataEntry = {
-            ...this.appStorage.serverDataEntry,
+        if (!hasPropertyTree(serverDataEntry, 'logtext') ||
+          !Array.isArray(serverDataEntry.logtext)) {
+          serverDataEntry = {
+            ...serverDataEntry,
             logtext: []
           };
         }
@@ -802,6 +809,8 @@ export class TranscriptionComponent implements OnInit,
         if (json.hasOwnProperty('message') && typeof (json.message) === 'number') {
           jobsLeft = Number(json.message);
         }
+
+        this.appStorage.serverDataEntry = serverDataEntry;
 
         this.appStorage.setOnlineSession({
           id: this.appStorage.onlineSession.loginData.id,

@@ -183,7 +183,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
             mode: LoginMode.LOCAL
           }));
         }
-        this.store.dispatch(LoginActions.logout());
+        this.store.dispatch(LoginActions.logout({removeAnnotation: true}));
       }
 
       if (this.appStorage.useMode !== LoginMode.URL && !this.appStorage.loggedIn) {

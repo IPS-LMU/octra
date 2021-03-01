@@ -4,6 +4,7 @@ import {isUnset} from '@octra/utilities';
 import {TranscriptionActions} from './transcription.actions';
 import {IDBActions} from '../idb/idb.actions';
 import {ConfigurationActions} from '../configuration/configuration.actions';
+import {LoginActions} from '../login/login.actions';
 
 export const initialState: TranscriptionState = {
   savingNeeded: false,
@@ -124,14 +125,34 @@ export const reducer = createReducer(
       ...state,
       methods
     })),
-  on(TranscriptionActions.setAudioLoaded, (state: TranscriptionState, {loaded}) =>
-    ({
-      ...state,
-      audio: {
-        ...state.audio,
-        loaded
+  on(TranscriptionActions.setAudioLoaded, (state: TranscriptionState, {loaded}) => {
+      return {
+        ...state,
+        audio: {
+          ...state.audio,
+          loaded
+        }
       }
-    })),
+    }
+  ),
+  on(LoginActions.clearLocalSession, (state: TranscriptionState) => {
+      return {
+        ...initialState,
+        guidelines: state.guidelines,
+        projectConfig: state.projectConfig,
+        methods: state.methods
+      };
+    }
+  ),
+  on(LoginActions.clearOnlineSession, (state: TranscriptionState) => {
+      return {
+        ...initialState,
+        guidelines: state.guidelines,
+        projectConfig: state.projectConfig,
+        methods: state.methods
+      }
+    }
+  ),
   on(TranscriptionActions.clearSettings, (state) =>
     ({
       ...state,

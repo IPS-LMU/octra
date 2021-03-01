@@ -349,7 +349,7 @@
   </div>
 </nav>
 <div
-  *ngIf="appStorage.loggedIn && (appStorage.useMode === 'online' || appStorage.useMode === 'demo') && navbarServ.dataloaded"
+  *ngIf="appStorage.loggedIn && (appStorage.useMode === 'online' || appStorage.useMode === 'demo') && appStorage.audioLoaded"
   class="panel"
   id="subnav">
   <div class="row">

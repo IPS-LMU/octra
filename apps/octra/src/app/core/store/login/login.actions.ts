@@ -34,7 +34,10 @@ export class LoginActions {
   );
 
   public static logout = createAction(
-    `[${context}] Logout`
+    `[${context}] Logout`,
+    props<{
+      removeAnnotation: boolean;
+    }>()
   );
 
   public static setMode = createAction(`[${context}] Set Mode`,

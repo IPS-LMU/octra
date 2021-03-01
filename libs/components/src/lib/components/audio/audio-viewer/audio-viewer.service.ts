@@ -339,11 +339,12 @@ export class AudioViewerService {
     y: number
   } {
     const lineNum = Math.floor(absX / this._innerWidth);
+    let x = this.settings.margin.left - this.settings.playcursor.width / 2 + absX - lineNum * this._innerWidth;
+    x = (isNaN(x)) ? 0 : x;
+    let y = lineNum * (this._settings.lineheight + this.settings.margin.top);
+    y = (isNaN(y)) ? 0 : y;
 
-    return {
-      x: this.settings.margin.left - this.settings.playcursor.width / 2 + absX - lineNum * this._innerWidth,
-      y: lineNum * (this._settings.lineheight + this.settings.margin.top)
-    };
+    return {x, y};
   }
 
   /**
@@ -530,9 +531,8 @@ export class AudioViewerService {
             transcript = '';
           }
         }
-        this._currentTranscriptionLevel.addSegment(this.audioManager.createSampleUnit(Math.round(absXTime)));
-        segment = this._currentTranscriptionLevel.segments.BetweenWhichSegment(absXTime);
-        segment.transcript = transcript;
+        this._currentTranscriptionLevel.addSegment(this.audioManager.createSampleUnit(Math.round(absXTime)), '', transcript);
+
         return {
           type: 'add',
           seg_samples: absXTime,

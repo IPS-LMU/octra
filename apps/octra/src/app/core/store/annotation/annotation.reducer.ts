@@ -3,6 +3,7 @@ import {AnnotationState} from '../index';
 import {undoRedo} from 'ngrx-wieder';
 import {AnnotationActions} from './annotation.actions';
 import {IDBActions} from '../idb/idb.actions';
+import {LoginActions} from '../login/login.actions';
 
 export const initialState: AnnotationState = {
   levels: [],
@@ -34,6 +35,13 @@ export const reducer = createUndoRedoReducer(
     levels: [],
     links: [],
     levelCounter: 0
+  })),
+  on(LoginActions.logout, ((state, {removeAnnotation}) => {
+    if (removeAnnotation) return initialState;
+    return state;
+  })),
+  on(LoginActions.loginDemo, (() => {
+    return initialState;
   })),
   on(AnnotationActions.overwriteAnnotation, (state: AnnotationState, {annotation}) => ({
     ...state,

@@ -201,9 +201,7 @@ export class SettingsService {
           this._filename = this._filename.substr(this._filename.indexOf('src=') + 4);
         }
 
-        audioService.loadAudio(src, () => {
-          this.audioloaded.emit({status: 'success'});
-        }).subscribe(
+        audioService.loadAudio(src).subscribe(
           (progress) => {
             this.audioloading.next(progress);
 
@@ -214,6 +212,9 @@ export class SettingsService {
           (err) => {
             this._log = 'Loading audio file failed<br/>';
             console.error(err);
+          },
+          () => {
+            this.audioloaded.emit({status: 'success'});
           }
         );
       } else {

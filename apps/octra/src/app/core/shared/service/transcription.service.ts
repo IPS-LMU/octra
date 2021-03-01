@@ -353,6 +353,7 @@ export class TranscriptionService {
         });
       } else {
         console.error(`no audio managers`);
+        alert('an error occured. Please reload this page');
       }
     });
   }
@@ -389,110 +390,74 @@ export class TranscriptionService {
               newLinks.push(new OIDBLink(i + 1, newAnnotJSON.links[i]));
             }
 
-            this.appStorage.overwriteAnnotation(newLevels, newLinks).then(() => {
-                if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.URL) {
-                  if (!isUnset(this.appStorage.serverDataEntry) && !isUnset(this.appStorage.serverDataEntry.transcript)
-                    && this.appStorage.serverDataEntry.transcript.length > 0) {
-                    // import logs
-                    this.appStorage.setLogs(this.appStorage.serverDataEntry.logtext);
 
-                    // check if servertranscript's segment is empty
-                    if (this.appStorage.serverDataEntry.transcript.length === 1 && this.appStorage.serverDataEntry[0].text === '') {
-                      this.appStorage.annotationLevels[this.selectedlevel].items.push(
-                        new OSegment(0, 0, this.audioManager.ressource.info.duration.samples,
-                          [new OLabel('OCTRA_1', this.appStorage.prompttext)])
-                      );
+            if (this.appStorage.useMode === LoginMode.ONLINE || this.appStorage.useMode === LoginMode.URL) {
+              if (!isUnset(this.appStorage.serverDataEntry) && !isUnset(this.appStorage.serverDataEntry.transcript)
+                && this.appStorage.serverDataEntry.transcript.length > 0) {
+                // import logs
+                this.appStorage.setLogs(this.appStorage.serverDataEntry.logtext);
 
-                      this.appStorage.changeAnnotationLevel(this._selectedlevel,
-                        this.appStorage.annotationLevels[this._selectedlevel]).then(() => {
-                        resolve2();
-                      }).catch(() => {
-                        resolve2();
-                      });
-                    } else {
-                      this.appStorage.annotationLevels[this._selectedlevel].items = [];
-                      for (let i = 0; i < this.appStorage.serverDataEntry.transcript.length; i++) {
-                        const segT = this.appStorage.serverDataEntry.transcript[i];
-
-                        const oseg = new OSegment(i, segT.start, segT.length, [new OLabel('OCTRA_1', segT.text)]);
-                        this.appStorage.annotationLevels[this.selectedlevel].items.push(oseg);
-                      }
-
-                      this.appStorage.changeAnnotationLevel(this._selectedlevel,
-                        this.appStorage.annotationLevels[this._selectedlevel]).then(() => {
-                        resolve2();
-                      }).catch(() => {
-                        resolve2();
-                      });
-                    }
-                  } else if (!isUnset(this.appStorage.prompttext) && this.appStorage.prompttext !== ''
-                    && typeof this.appStorage.prompttext === 'string') {
-                    // prompt text available and server transcript is null
-                    // set prompt as new transcript
-
-                    // check if prompttext ist a transcription format like AnnotJSON
-                    let converted: OAnnotJSON;
-                    for (const converter of AppInfo.converters) {
-                      if (converter instanceof AnnotJSONConverter || converter instanceof PartiturConverter) {
-                        const result = converter.import({
-                          name: this._audiofile.name,
-                          content: this.appStorage.prompttext,
-                          type: 'text',
-                          encoding: 'utf8'
-                        }, this._audiofile);
-
-                        if (result !== null && result !== undefined
-                          && result.annotjson !== null && result.annotjson.levels.length > 0
-                          && result.annotjson.levels[0] !== null
-                          && !(converter instanceof TextConverter)) {
-                          converted = result.annotjson;
-                          break;
-                        }
-                      }
-                    }
-
-                    if (converted === undefined) {
-                      this.appStorage.annotationLevels[this.selectedlevel].items.push(
-                        new OSegment(0, 0, this.audioManager.ressource.info.duration.samples,
-                          [new OLabel('OCTRA_1', this.appStorage.prompttext)])
-                      );
-
-                      this.appStorage.changeAnnotationLevel(this._selectedlevel,
-                        this.appStorage.annotationLevels[this._selectedlevel]).then(() => {
-                        resolve2();
-                      }).catch(() => {
-                        resolve2();
-                      });
-                    } else {
-                      // use imported annotJSON
-                      const promises: Promise<any>[] = [];
-                      for (let i = 0; i < converted.levels.length; i++) {
-                        if (i >= this.appStorage.annotationLevels.length) {
-                          promises.push(this.appStorage.addAnnotationLevel(
-                            new OIDBLevel(-1, converted.levels[i], i)
-                          ));
-                        } else {
-                          promises.push(this.appStorage.changeAnnotationLevel(i, {
-                            id: null,
-                            name: converted.levels[i].name,
-                            type: converted.levels[i].type,
-                            items: converted.levels[i].items
-                          }));
-                        }
-                      }
-
-                      Promise.all(promises).then(() => {
-                        resolve2();
-                      }).catch((error) => {
-                        resolve2();
-                      });
-                    }
-                  } else {
-                    resolve2();
-                  }
+                // check if servertranscript's segment is empty
+                if (this.appStorage.serverDataEntry.transcript.length === 1 && this.appStorage.serverDataEntry[0].text === '') {
+                  newLevels[0].level.items[0].labels[0].value = this.appStorage.prompttext;
                 } else {
-                  resolve2();
+                  // import servertranscript
+                  newLevels[0].level.items = [];
+                  for (let i = 0; i < this.appStorage.serverDataEntry.transcript.length; i++) {
+                    const segT = this.appStorage.serverDataEntry.transcript[i];
+
+                    const oseg = new OSegment(i, segT.start, segT.length, [new OLabel('OCTRA_1', segT.text)]);
+                    newLevels[0].level.items.push(oseg);
+                  }
                 }
+              } else if (!isUnset(this.appStorage.prompttext) && this.appStorage.prompttext !== ''
+                && typeof this.appStorage.prompttext === 'string') {
+                // prompt text available and server transcript is null
+                // set prompt as new transcript
+
+                // check if prompttext ist a transcription format like AnnotJSON
+                let converted: OAnnotJSON;
+                for (const converter of AppInfo.converters) {
+                  if (converter instanceof AnnotJSONConverter || converter instanceof PartiturConverter) {
+                    const result = converter.import({
+                      name: this._audiofile.name,
+                      content: this.appStorage.prompttext,
+                      type: 'text',
+                      encoding: 'utf8'
+                    }, this._audiofile);
+
+                    if (result !== null && result !== undefined
+                      && result.annotjson !== null && result.annotjson.levels.length > 0
+                      && result.annotjson.levels[0] !== null
+                      && !(converter instanceof TextConverter)) {
+                      converted = result.annotjson;
+                      break;
+                    }
+                  }
+                }
+
+                if (converted === undefined) {
+                  // prompttext is raw text
+                  console.log(`import prompttext!`);
+                  console.log(newLevels);
+                  newLevels[0].level.items[0].labels[0] = new OLabel('OCTRA_1', this.appStorage.prompttext);
+                } else {
+                  // use imported annotJSON
+                  for (let i = 0; i < converted.levels.length; i++) {
+                    if (i >= newLevels.length) {
+                      newLevels.push(new OIDBLevel(i + 1, converted.levels[i], i));
+                    } else {
+                      newLevels[i].level.name = converted.levels[i].name;
+                      newLevels[i].level.type = converted.levels[i].type;
+                      newLevels[i].level.items = converted.levels[i].items;
+                    }
+                  }
+                }
+              }
+            }
+
+            this.appStorage.overwriteAnnotation(newLevels, newLinks).then(() => {
+                resolve2();
               }
             ).catch((err) => {
               console.error(err);

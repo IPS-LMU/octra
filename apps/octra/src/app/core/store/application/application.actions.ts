@@ -39,12 +39,6 @@ export class ApplicationActions {
   );
 
   public static finishLoading = createAction(`[${context}] Finish Loading`);
-  public static load = createAction(
-    `[${context}] Load`,
-    props<{
-      progress: number;
-    }>()
-  );
 
   public static addError = createAction(
     `[${context}] Add Error`,

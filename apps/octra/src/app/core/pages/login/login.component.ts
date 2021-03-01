@@ -12,8 +12,8 @@ import {NgForm} from '@angular/forms';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {sha256} from 'js-sha256';
-import {FileSize, Functions, isUnset, SubscriptionManager} from '@octra/utilities';
-import {Observable, throwError} from 'rxjs';
+import {FileSize, Functions, hasPropertyTree, isUnset, SubscriptionManager} from '@octra/utilities';
+import {Observable} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {ModalService} from '../../modals/modal.service';
 import {ModalDeleteAnswer} from '../../modals/transcription-delete-modal/transcription-delete-modal.component';
@@ -442,43 +442,46 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         this.appStorage.clearOnlineSession();
         this.appStorage.clearLocalStorage();
 
-        // get transcript data that already exists
-        const jsonStr = JSON.stringify(data);
-        this.appStorage.serverDataEntry = parseServerDataEntry(jsonStr);
-
-        if (isUnset(this.appStorage.serverDataEntry.transcript) ||
-          !Array.isArray(this.appStorage.serverDataEntry.transcript)) {
-          this.appStorage.serverDataEntry = {
-            ...this.appStorage.serverDataEntry,
-            transcript: []
-          };
-        }
-
-        if (isUnset(this.appStorage.serverDataEntry.logtext) ||
-          !Array.isArray(this.appStorage.serverDataEntry.logtext)) {
-          this.appStorage.serverDataEntry = {
-            ...this.appStorage.serverDataEntry,
-            logtext: []
-          };
-        }
         let prompt = '';
         let serverComment = '';
         let jobsLeft = -1;
 
-        if (this.appStorage.serverDataEntry.hasOwnProperty('prompttext')) {
+        // get transcript data that already exists
+        const jsonStr = JSON.stringify(data);
+        let serverDataEntry = parseServerDataEntry(jsonStr);
+
+        if (hasPropertyTree(serverDataEntry, 'prompttext')) {
           // get transcript data that already exists
-          prompt = this.appStorage.serverDataEntry.prompttext;
+          prompt = serverDataEntry.prompttext;
           prompt = (prompt) ? prompt : '';
         }
-        if (this.appStorage.serverDataEntry.hasOwnProperty('comment')) {
+        if (hasPropertyTree(serverDataEntry, 'comment')) {
           // get transcript data that already exists
-          serverComment = this.appStorage.serverDataEntry.comment;
+          serverComment = serverDataEntry.comment;
           serverComment = (serverComment) ? serverComment : '';
         }
         if (json.hasOwnProperty('message')) {
           const counter = (json.message === '') ? '0' : json.message;
           jobsLeft = Number(counter);
         }
+
+        if (!hasPropertyTree(serverDataEntry, 'transcript') ||
+          !Array.isArray(serverDataEntry.transcript)) {
+          serverDataEntry = {
+            ...serverDataEntry,
+            transcript: []
+          };
+        }
+
+        if (!hasPropertyTree(serverDataEntry, 'logtext') ||
+          !Array.isArray(this.appStorage.serverDataEntry.logtext)) {
+          serverDataEntry = {
+            ...serverDataEntry,
+            logtext: []
+          };
+        }
+        // beware, this.appStorage.serverDataEntry is aync!
+        this.appStorage.serverDataEntry = serverDataEntry;
 
         this.appStorage.setOnlineSession(this.member, data.id, data.url, prompt, serverComment, jobsLeft);
         this.navigate();
@@ -489,7 +492,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       }
     }).catch((error) => {
       alert('Server cannot be requested. Please check if you are online.');
-      return throwError(error);
+      console.error(error);
     });
   }
 }

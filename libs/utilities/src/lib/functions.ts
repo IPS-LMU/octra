@@ -23,6 +23,25 @@ export function contains(haystack: string, needle: string): boolean {
   return haystack.indexOf(needle) !== -1;
 }
 
+export function hasPropertyTree(obj: any, treeString: string): boolean {
+  if (!isUnset(obj)) {
+    const properties = treeString.split('.').filter(a => !isUnset(a) && a.trim() !== '');
+    let pointer = obj;
+
+    for (let i = 0; i < properties.length; i++) {
+      const property = properties[i];
+      if (!pointer.hasOwnProperty(property) || isUnset(pointer[property])) {
+        return false;
+      }
+      pointer = pointer[property];
+    }
+
+    return true;
+  } else {
+    return false;
+  }
+}
+
 export function base64ToArrayBuffer(base64): ArrayBuffer {
   const binaryString = window.atob(base64);
   const len = binaryString.length;

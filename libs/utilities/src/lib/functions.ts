@@ -64,297 +64,286 @@ export function checkArray(array: any[]) {
   return array.findIndex(a => isUnset(a)) < 0;
 }
 
-export class Functions {
-  public static scrollTo(y: number, target?: string) {
-    setTimeout(() => {
-      if ((target === null || target === undefined)) {
-        jQuery('html, body').scrollTop(y);
-      } else {
-        jQuery(target).scrollTop(y);
-      }
-    }, 200);
-  }
 
-  public static isNumber(str: string): boolean {
-    const res = parseInt(str, 10);
-    return !isNaN(res);
-  }
-
-  public static equalProperties(elem: any, elem2: any) {
-    let result = false;
-
-    for (const el in elem) {
-      if (elem.hasOwnProperty(el)) {
-        const propStr = '' + el + '';
-        result = true;
-        if (!(propStr in elem2)) {
-          return false;
-        }
-      }
-    }
-
-    return result;
-  }
-
-  public static placeAtEnd(element: HTMLElement) {
-    try {
-      element.focus();
-      const bodyInput: any = document.body as any;
-      if (jQuery(element).text() !== '') {
-        if (typeof window.getSelection !== 'undefined'
-          && typeof document.createRange !== 'undefined'
-        ) {
-          // get range
-          const txtRange = document.createRange();
-          txtRange.selectNodeContents(element);
-          // set range to end
-          txtRange.collapse(false);
-
-          // get selection of the element
-          const selection = window.getSelection();
-          selection.removeAllRanges();
-          // set previous created range to the element
-          selection.addRange(txtRange);
-        } else if (bodyInput.createTextRange !== 'undefined') {
-          // fix for IE and older Opera Browsers
-
-          // create range from body
-          const txtRange = bodyInput.createTextRange();
-          txtRange.moveToElementText(element);
-          // set selection to end
-          txtRange.collapse(false);
-          txtRange.select();
-        }
-      }
-    } catch (ex) {
-      console.error(ex);
-      // ignore
-    }
-  }
-
-  public static escapeRegex(regexStr: string) {
-    // escape special chars in regex
-    return regexStr.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-  }
-
-  public static getFileSize(bytes: number): FileSize {
-    const result: FileSize = {
-      size: 0,
-      label: ''
-    };
-
-    if ((bytes / 1000) < 1) {
-      // take bytes
-      result.size = bytes;
-      result.label = 'B';
-    } else if (bytes / (1000 * 1000) < 1) {
-      // take kilobytes
-      result.size = bytes / 1000;
-      result.label = 'KB';
-    } else if (bytes / (1000 * 1000 * 1000) < 1) {
-      // take megabyte
-      result.size = bytes / 1000 / 1000;
-      result.label = 'MB';
-    } else if (bytes / (1000 * 1000 * 1000 * 1000) < 1) {
-      // take gigabytes
-
-      result.size = bytes / 1000 / 1000 / 1000;
-      result.label = 'GB';
-    }
-
-    result.size = Math.round(result.size * 1000) / 1000;
-
-    return result;
-  }
-
-  public static escapeHtml(text: string): string {
-    // TODO improve code!
-
-    return text
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
-
-  public static unEscapeHtml(text: string): string {
-    // TODO improve code!
-
-    return text
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&#039;/g, '\'');
-  }
-
-  public static insertString(input: string, pos: number, insertion: string): string {
-    let result = input;
-
-    if (pos <= input.length) {
-      result = result.substring(0, pos) + insertion + result.substring(pos);
+export function scrollTo(y: number, target?: string) {
+  setTimeout(() => {
+    if ((target === null || target === undefined)) {
+      jQuery('html, body').scrollTop(y);
     } else {
-      throw new Error('String cannot be inserted at position ' + pos);
+      jQuery(target).scrollTop(y);
     }
+  }, 200);
+}
 
-    return result;
+export function isNumber(str: string): boolean {
+  const res = parseInt(str, 10);
+  return !isNaN(res);
+}
+
+export function equalProperties(elem: any, elem2: any) {
+  let result = false;
+
+  for (const el in elem) {
+    if (elem.hasOwnProperty(el)) {
+      const propStr = '' + el + '';
+      result = true;
+      if (!(propStr in elem2)) {
+        return false;
+      }
+    }
   }
 
-  public static uniqueHTTPRequest(http: HttpClient, post: boolean = false, requestOptions: any,
+  return result;
+}
+
+export function placeAtEnd(element: HTMLElement) {
+  try {
+    element.focus();
+    const bodyInput: any = document.body as any;
+    if (jQuery(element).text() !== '') {
+      if (typeof window.getSelection !== 'undefined'
+        && typeof document.createRange !== 'undefined'
+      ) {
+        // get range
+        const txtRange = document.createRange();
+        txtRange.selectNodeContents(element);
+        // set range to end
+        txtRange.collapse(false);
+
+        // get selection of the element
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        // set previous created range to the element
+        selection.addRange(txtRange);
+      } else if (bodyInput.createTextRange !== 'undefined') {
+        // fix for IE and older Opera Browsers
+
+        // create range from body
+        const txtRange = bodyInput.createTextRange();
+        txtRange.moveToElementText(element);
+        // set selection to end
+        txtRange.collapse(false);
+        txtRange.select();
+      }
+    }
+  } catch (ex) {
+    console.error(ex);
+    // ignore
+  }
+}
+
+export function escapeRegex(regexStr: string) {
+  // escape special chars in regex
+  return regexStr.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+export function getFileSize(bytes: number): FileSize {
+  const result: FileSize = {
+    size: 0,
+    label: ''
+  };
+
+  if ((bytes / 1000) < 1) {
+    // take bytes
+    result.size = bytes;
+    result.label = 'B';
+  } else if (bytes / (1000 * 1000) < 1) {
+    // take kilobytes
+    result.size = bytes / 1000;
+    result.label = 'KB';
+  } else if (bytes / (1000 * 1000 * 1000) < 1) {
+    // take megabyte
+    result.size = bytes / 1000 / 1000;
+    result.label = 'MB';
+  } else if (bytes / (1000 * 1000 * 1000 * 1000) < 1) {
+    // take gigabytes
+
+    result.size = bytes / 1000 / 1000 / 1000;
+    result.label = 'GB';
+  }
+
+  result.size = Math.round(result.size * 1000) / 1000;
+
+  return result;
+}
+
+export function escapeHtml(text: string): string {
+  // TODO improve code!
+
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+export function unEscapeHtml(text: string): string {
+  // TODO improve code!
+
+  return text
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, '\'');
+}
+
+export function insertString(input: string, pos: number, insertion: string): string {
+  let result = input;
+
+  if (pos <= input.length) {
+    result = result.substring(0, pos) + insertion + result.substring(pos);
+  } else {
+    throw new Error('String cannot be inserted at position ' + pos);
+  }
+
+  return result;
+}
+
+export function uniqueHTTPRequest(http: HttpClient, post: boolean = false, requestOptions: any,
                                   url: string, body: any): Observable<any> {
-    if (!post) {
-      const options = (!(requestOptions === null || requestOptions === undefined)) ? requestOptions : {};
+  if (!post) {
+    const options = (!(requestOptions === null || requestOptions === undefined)) ? requestOptions : {};
 
-      if (!options.hasOwnProperty('params')) {
-        options.params = {};
-      }
-
-      const d = Date.now();
-      options.params.v = d.toString();
-      return http.get(url, options);
-    } else {
-      return http.post(url, body, requestOptions);
+    if (!options.hasOwnProperty('params')) {
+      options.params = {};
     }
+
+    const d = Date.now();
+    options.params.v = d.toString();
+    return http.get(url, options);
+  } else {
+    return http.post(url, body, requestOptions);
   }
+}
 
-  public static downloadFile(http: HttpClient, url: string): Subject<{
-    progress: number,
-    result: any
-  }> {
-    const subj: Subject<any> = new Subject<any>();
+export function downloadFile(http: HttpClient, url: string): Subject<{
+  progress: number,
+  result: any
+}> {
+  const subj: Subject<any> = new Subject<any>();
 
-    const req = new HttpRequest('GET', url, {
-      reportProgress: true,
-      responseType: 'arraybuffer'
+  const req = new HttpRequest('GET', url, {
+    reportProgress: true,
+    responseType: 'arraybuffer'
+  });
+
+  http.request(req).subscribe(event => {
+      if (event.type === HttpEventType.DownloadProgress) {
+        subj.next({
+          progress: event.loaded / event.total,
+          result: null
+        });
+      } else if (event instanceof HttpResponse) {
+        subj.next({
+          progress: 1,
+          result: event.body
+        });
+        subj.complete();
+      }
+    },
+    error => {
+      subj.error(error);
     });
 
-    http.request(req).subscribe(event => {
-        if (event.type === HttpEventType.DownloadProgress) {
-          subj.next({
-            progress: event.loaded / event.total,
-            result: null
-          });
-        } else if (event instanceof HttpResponse) {
-          subj.next({
-            progress: 1,
-            result: event.body
-          });
-          subj.complete();
+  return subj;
+}
+
+export function setCursor(node, pos) {
+
+  node = (typeof node === 'string' || node instanceof String) ? document.getElementById('' + node + '') : node;
+
+  if (!node) {
+    return false;
+  } else if (node.createTextRange) {
+    const textRange = node.createTextRange();
+    textRange.collapse(true);
+    textRange.moveEnd(pos);
+    textRange.moveStart(pos);
+    textRange.select();
+    return true;
+  } else if (node.setSelectionRange) {
+    node.setSelectionRange(pos, pos);
+    return true;
+  }
+
+  return false;
+}
+
+export function navigateTo(router: Router, commands: any[], navigationExtras?: NavigationExtras): Promise<boolean> {
+  console.log(`navigate to ${commands[0]}`);
+  return new Promise<boolean>((resolve) => {
+    setTimeout(() => {
+      router.navigate(commands, navigationExtras).then(resolve);
+    }, 200);
+  });
+}
+
+export function fileListToArray(fileList: FileList): File[] {
+  const result = [];
+
+  // tslint:disable-next-line:prefer-for-of
+  for (let i = 0; i < fileList.length; i++) {
+    result.push(fileList[i]);
+  }
+  return result;
+}
+
+export function afterTrue(observable: Observable<boolean>): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    const subscription = observable.subscribe(
+      (value) => {
+        if (value === true) {
+          try {
+            subscription.unsubscribe();
+          } catch (e) {
+          }
+          resolve();
         }
       },
-      error => {
-        subj.error(error);
-      });
+      (error) => {
+        reject(error);
+      },
+      () => {
+        reject('comnpleted!');
+      }
+    )
+  });
+}
 
-    return subj;
-  }
-
-  public static setCursor(node, pos) {
-
-    node = (typeof node === 'string' || node instanceof String) ? document.getElementById('' + node + '') : node;
-
-    if (!node) {
-      return false;
-    } else if (node.createTextRange) {
-      const textRange = node.createTextRange();
-      textRange.collapse(true);
-      textRange.moveEnd(pos);
-      textRange.moveStart(pos);
-      textRange.select();
-      return true;
-    } else if (node.setSelectionRange) {
-      node.setSelectionRange(pos, pos);
-      return true;
-    }
-
-    return false;
-  }
-
-  public static base64ToArrayBuffer(base64): ArrayBuffer {
-    const binaryString = window.atob(base64);
-    const len = binaryString.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    return (bytes.buffer as ArrayBuffer);
-  }
-
-  public static navigateTo(router: Router, commands: any[], navigationExtras?: NavigationExtras): Promise<boolean> {
-    console.log(`navigate to ${commands[0]}`);
-    return new Promise<boolean>((resolve) => {
-      setTimeout(() => {
-        router.navigate(commands, navigationExtras).then(resolve);
-      }, 200);
-    });
-  }
-
-  public static fileListToArray(fileList: FileList): File[] {
-    const result = [];
-
-    // tslint:disable-next-line:prefer-for-of
-    for (let i = 0; i < fileList.length; i++) {
-      result.push(fileList[i]);
-    }
-    return result;
-  }
-
-  public static afterTrue(observable: Observable<boolean>): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      const subscription = observable.subscribe(
-        (value) => {
-          if (value === true) {
-            try {
-              subscription.unsubscribe();
-            } catch (e) {
-            }
-            resolve();
+export function afterDefined(observable: Observable<any>): Promise<any> {
+  return new Promise<void>((resolve, reject) => {
+    const subscription = observable.subscribe(
+      (value) => {
+        if (!isUnset(value)) {
+          try {
+            subscription.unsubscribe();
+          } catch (e) {
           }
-        },
-        (error) => {
-          reject(error);
-        },
-        () => {
-          reject('comnpleted!');
+          resolve(value);
         }
-      )
-    });
-  }
+      },
+      (error) => {
+        reject(error);
+      },
+      () => {
+        reject('comnpleted!');
+      }
+    )
+  });
+}
 
-  public static afterDefined(observable: Observable<any>): Promise<any> {
-    return new Promise<void>((resolve, reject) => {
-      const subscription = observable.subscribe(
-        (value) => {
-          if (!isUnset(value)) {
-            try {
-              subscription.unsubscribe();
-            } catch (e) {
-            }
-            resolve(value);
-          }
-        },
-        (error) => {
-          reject(error);
-        },
-        () => {
-          reject('comnpleted!');
-        }
-      )
+export function waitTillResultRetrieved(actions: Actions, success: Action, failure: Action) {
+  return new Promise((resolve, reject) => {
+    const subscr = actions.subscribe((action: Action) => {
+      if (action.type === success.type) {
+        subscr.unsubscribe();
+        resolve();
+      } else if (action.type === failure.type) {
+        subscr.unsubscribe();
+        reject(`${(failure as any).error}`);
+      }
     });
-  }
-
-  public static waitTillResultRetrieved(actions: Actions, success: Action, failure: Action) {
-    return new Promise((resolve, reject) => {
-      const subscr = actions.subscribe((action: Action) => {
-        if (action.type === success.type) {
-          subscr.unsubscribe();
-          resolve();
-        } else if (action.type === failure.type) {
-          subscr.unsubscribe();
-          reject(`${(failure as any).error}`);
-        }
-      });
-    });
-  }
+  });
 }

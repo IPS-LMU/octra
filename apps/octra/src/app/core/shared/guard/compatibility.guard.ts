@@ -4,9 +4,9 @@ import {Observable} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {SettingsService} from '../service';
 import {CompatibilityService} from '../service/compatibility.service';
-import {Functions} from '@octra/utilities';
 import * as fromApplication from '../../store/application';
 import {Store} from '@ngrx/store';
+import {afterDefined, navigateTo} from '@octra/utilities';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +28,7 @@ export class CompatibilityGuard implements CanActivate {
         if (!(this.settingsService.appSettings === null || this.settingsService.appSettings === undefined)) {
           resolve2();
         } else {
-          Functions.afterDefined(this.store.select(fromApplication.selectAppSettings)).then(resolve2).catch((error) => {
+          afterDefined(this.store.select(fromApplication.selectAppSettings)).then(resolve2).catch((error) => {
             console.error(error);
           });
         }
@@ -40,7 +40,7 @@ export class CompatibilityGuard implements CanActivate {
               params.fragment = next.fragment;
               params.queryParams = next.queryParams;
 
-              Functions.navigateTo(this.router, ['login'], params).catch((error) => {
+              navigateTo(this.router, ['login'], params).catch((error) => {
                 console.error(error);
               });
             }
@@ -51,7 +51,7 @@ export class CompatibilityGuard implements CanActivate {
               params.fragment = next.fragment;
               params.queryParams = next.queryParams;
 
-              Functions.navigateTo(this.router, ['test'], params).catch((error) => {
+              navigateTo(this.router, ['test'], params).catch((error) => {
                 console.error(error);
               });
               resolve(result);

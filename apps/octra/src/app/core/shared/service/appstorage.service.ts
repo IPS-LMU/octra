@@ -5,7 +5,7 @@ import {AppInfo} from '../../../app.info';
 import {IDataEntry} from '../../obj/data-entry';
 import {SessionFile} from '../../obj/SessionFile';
 import {FileProgress} from '../../obj/objects';
-import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
+import {isUnset, navigateTo, SubscriptionManager, waitTillResultRetrieved} from '@octra/utilities';
 import {Level, OIDBLevel, OIDBLink} from '@octra/annotation';
 import {
   AnnotationState,
@@ -598,7 +598,7 @@ export class AppStorageService {
           });
           break;
         case 'feedback':
-          Functions.waitTillResultRetrieved(this.actions, IDBActions.saveTranscriptionFeedbackSuccess, IDBActions.saveTranscriptionFeedbackFailed)
+          waitTillResultRetrieved(this.actions, IDBActions.saveTranscriptionFeedbackSuccess, IDBActions.saveTranscriptionFeedbackFailed)
             .then(() => {
               this.isSaving = false;
               this.savingNeeded = false;
@@ -670,7 +670,7 @@ export class AppStorageService {
             const changedLevel = this.annotationLevels[tiernum];
             const id = changedLevel.id;
 
-            Functions.waitTillResultRetrieved(this.actions, IDBActions.saveAnnotationLevelSuccess, IDBActions.saveAnnotationLevelFailed)
+            waitTillResultRetrieved(this.actions, IDBActions.saveAnnotationLevelSuccess, IDBActions.saveAnnotationLevelFailed)
               .then(() => {
                 resolve();
               })
@@ -699,7 +699,7 @@ export class AppStorageService {
       if (!isUnset(level)) {
         level.id = ++Level.counter;
 
-        Functions.waitTillResultRetrieved(this.actions, IDBActions.addAnnotationLevelSuccess, IDBActions.addAnnotationLevelFailed)
+        waitTillResultRetrieved(this.actions, IDBActions.addAnnotationLevelSuccess, IDBActions.addAnnotationLevelFailed)
           .then(() => {
             resolve();
           })
@@ -750,7 +750,7 @@ export class AppStorageService {
       this.store.dispatch(LoginActions.logout({
         removeAnnotation
       }));
-      Functions.navigateTo(this.router, ['login'], AppInfo.queryParamsHandling).catch((error) => {
+      navigateTo(this.router, ['login'], AppInfo.queryParamsHandling).catch((error) => {
         console.error(error);
       });
     });

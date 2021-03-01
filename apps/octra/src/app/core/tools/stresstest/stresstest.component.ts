@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {SessionStorage, SessionStorageService} from 'ngx-webstorage';
 import {BrowserInfo} from '../../shared';
-import {Functions} from '@octra/utilities';
+import {getFileSize} from '@octra/utilities';
 
 @Component({
   selector: 'octra-stresstest',
@@ -19,20 +19,20 @@ export class StresstestComponent implements OnInit, OnDestroy {
   private arrayBuffer: ArrayBuffer;
 
   public get measuredString() {
-    const size = Functions.getFileSize(this.measured);
+    const size = getFileSize(this.measured);
     return `${size.size} ${size.label}`;
   }
 
   public get performance() {
     return {
-      heapSizeLimit: Functions.getFileSize((window.performance as any).memory.jsHeapSizeLimit),
-      totalHeapSize: Functions.getFileSize((window.performance as any).memory.totalJSHeapSize),
-      heapSizeUsed: Functions.getFileSize((window.performance as any).memory.usedJSHeapSize)
+      heapSizeLimit: getFileSize((window.performance as any).memory.jsHeapSizeLimit),
+      totalHeapSize: getFileSize((window.performance as any).memory.totalJSHeapSize),
+      heapSizeUsed: getFileSize((window.performance as any).memory.usedJSHeapSize)
     };
   }
 
   public get lastResultString() {
-    const size = Functions.getFileSize(this.lastResult);
+    const size = getFileSize(this.lastResult);
     return `${size.size} ${size.label}`;
   }
 

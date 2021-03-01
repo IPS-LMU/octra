@@ -5,7 +5,7 @@ import {Subject} from 'rxjs';
 import {Action} from '@ngrx/store';
 import {ConfigurationService} from '../../shared/service/configuration.service';
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
-import {Functions, isUnset} from '@octra/utilities';
+import {isUnset, uniqueHTTPRequest} from '@octra/utilities';
 import {HttpClient} from '@angular/common/http';
 import {TranslocoService} from '@ngneat/transloco';
 import {ConfigurationActions} from '../configuration/configuration.actions';
@@ -130,7 +130,7 @@ export class ConfigurationEffects {
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      Functions.uniqueHTTPRequest(this.http, false, {
+      uniqueHTTPRequest(this.http, false, {
         responseType: 'text'
       }, action.guidelines.meta.validation_url, null).subscribe(
         () => {

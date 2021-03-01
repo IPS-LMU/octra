@@ -17,9 +17,9 @@ import {
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {
-  Functions,
   hasPropertyTree,
   isUnset,
+  navigateTo,
   ShortcutGroup,
   ShortcutManager,
   SubscriptionManager
@@ -819,7 +819,7 @@ export class TranscriptionComponent implements OnInit,
           jobno: this.appStorage.onlineSession.loginData.jobNumber
         }, data.id, data.url, promptText, serverComment, jobsLeft);
 
-        Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
+        navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
           console.error(error);
         });
       } else {
@@ -840,7 +840,7 @@ export class TranscriptionComponent implements OnInit,
       // transcription available
       this.appStorage.setDemoSession(audioExample.url, audioExample.description, this.appStorage.jobsLeft - 1);
 
-      Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
+      navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
         console.error(`navigation failed`);
         console.error(error);
       });

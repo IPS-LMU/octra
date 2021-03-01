@@ -1,6 +1,6 @@
 import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
-import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
+import {escapeHtml, escapeRegex, getFileSize, insertString, isUnset, SubscriptionManager} from '@octra/utilities';
 import {isArray} from 'rxjs/internal-compatibility';
 import {AppInfo} from '../../../app.info';
 import {NavbarService} from '../../component/navbar/navbar.service';
@@ -340,7 +340,7 @@ export class TranscriptionService {
           () => {
             this.selectedlevel = 0;
             this.navbarServ.ressource = this._audiomanager.ressource;
-            this.navbarServ.filesize = Functions.getFileSize(this._audiomanager.ressource.size);
+            this.navbarServ.filesize = getFileSize(this._audiomanager.ressource.size);
 
             this.subscrmanager.removeByTag('idbAnnotationChange');
             this.subscrmanager.add(this.appStorage.annotationChanged.subscribe((state) => {
@@ -765,7 +765,7 @@ export class TranscriptionService {
         });
 
         // replace markers
-        const regex = new RegExp('(\s)*(' + Functions.escapeRegex(marker.code) + ')(\s)*', 'g');
+        const regex = new RegExp('(\s)*(' + escapeRegex(marker.code) + ')(\s)*', 'g');
         result = result.replace(regex, (x, g1, g2, g3) => {
           const s1 = (g1) ? g1 : '';
           const s3 = (g3) ? g3 : '';
@@ -869,7 +869,7 @@ export class TranscriptionService {
         const offset = puffer.length;
         const pos = insertion.start;
 
-        result = Functions.insertString(result, pos + offset, insertion.puffer);
+        result = insertString(result, pos + offset, insertion.puffer);
         puffer += insertion.puffer;
       }
     }
@@ -936,7 +936,7 @@ export class TranscriptionService {
 
           for (const marker of this.guidelines.markers) {
             if (attr === marker.code) {
-              return jQuery(elem).replaceWith(Functions.escapeHtml(attr));
+              return jQuery(elem).replaceWith(escapeHtml(attr));
             }
           }
         } else if (jQuery(elem).attr('class') !== 'val-error') {
@@ -987,7 +987,7 @@ export class TranscriptionService {
     let regexStr = '';
     for (let i = 0; i < this.guidelines.markers.length; i++) {
       const marker = this.guidelines.markers[i];
-      regexStr += `(${Functions.escapeRegex(marker.code)})`;
+      regexStr += `(${escapeRegex(marker.code)})`;
 
       if (i < this.guidelines.markers.length - 1) {
         regexStr += '|';

@@ -11,7 +11,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {TranslocoService} from '@ngneat/transloco';
-import {contains, Functions, isUnset, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
+import {contains, isUnset, scrollTo, ShortcutEvent, ShortcutGroup, SubscriptionManager} from '@octra/utilities';
 import {interval, Subscription, timer} from 'rxjs';
 import {AuthenticationNeededComponent} from '../../core/alerts/authentication-needed/authentication-needed.component';
 import {ErrorOccurredComponent} from '../../core/alerts/error-occurred/error-occurred.component';
@@ -551,7 +551,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
       let y = Math.floor(absx / this.viewer.av.innerWidth) * this.viewer.settings.lineheight;
       y += 10 + (Math.floor(absx / this.viewer.av.innerWidth) * this.viewer.settings.margin.bottom);
-      Functions.scrollTo(y, '#special');
+      scrollTo(y, '#special');
 
     } else if (state === 'open') {
     } else if (state === 'overview') {

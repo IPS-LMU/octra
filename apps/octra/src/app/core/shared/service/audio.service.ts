@@ -2,7 +2,7 @@ import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {AppInfo} from '../../../app.info';
-import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
+import {downloadFile, isUnset, SubscriptionManager} from '@octra/utilities';
 import {AudioManager} from '@octra/media';
 
 @Injectable()
@@ -43,7 +43,7 @@ export class AudioService {
 
     const subj = new Subject<number>();
 
-    Functions.downloadFile(this.http, url).subscribe(
+    downloadFile(this.http, url).subscribe(
       (event) => {
         subj.next(0.5 * event.progress);
         if (event.progress === 1 && event.result) {

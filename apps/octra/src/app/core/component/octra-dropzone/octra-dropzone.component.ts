@@ -3,7 +3,7 @@ import {AppInfo} from '../../../app.info';
 import {DropZoneComponent} from '../drop-zone';
 import {ModalService} from '../../modals/modal.service';
 import {SessionFile} from '../../obj/SessionFile';
-import {contains, FileSize, Functions, isUnset, SubscriptionManager} from '@octra/utilities';
+import {contains, fileListToArray, FileSize, getFileSize, isUnset, SubscriptionManager} from '@octra/utilities';
 import {FileProgress} from '../../obj/objects';
 import {Converter, IFile, ImportResult, OAnnotJSON, OAudiofile, OLabel, OSegment} from '@octra/annotation';
 import {AudioManager} from '@octra/media';
@@ -62,7 +62,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
 
   public afterDrop = () => {
     this._oannotation = null;
-    const files = Functions.fileListToArray(this.dropzone.files);
+    const files = fileListToArray(this.dropzone.files);
     for (const file of files) {
       const fileProcess: FileProgress = {
         status: 'progress',
@@ -247,7 +247,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
   }
 
   getDropzoneFileString(file: File | SessionFile) {
-    const fsize: FileSize = Functions.getFileSize(file.size);
+    const fsize: FileSize = getFileSize(file.size);
     return `${file.name} (${(Math.round(fsize.size * 100) / 100)} ${fsize.label})`;
   }
 
@@ -277,7 +277,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
   }
 
   private loadImportFileData(extension: string = null) {
-    const files = Functions.fileListToArray(this.dropzone.files);
+    const files = fileListToArray(this.dropzone.files);
 
     for (const importfile of files) {
       if (isUnset(extension)) {
@@ -366,7 +366,7 @@ export class OctraDropzoneComponent implements OnInit, OnDestroy {
 
             if (checkimport) {
               // load import data
-              const files = Functions.fileListToArray(this.dropzone.files);
+              const files = fileListToArray(this.dropzone.files);
               for (const importfile of files) {
                 if (!AudioManager.isValidAudioFileName(importfile.name, AppInfo.audioformats)) {
                   this.dropFile(importfile.name);

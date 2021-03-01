@@ -10,7 +10,7 @@ import {BrowserInfo} from '../BrowserInfo';
 import {AppStorageService} from './appstorage.service';
 import {SettingsService} from './settings.service';
 import {TranscriptionService} from './transcription.service';
-import {Functions, isUnset} from '@octra/utilities';
+import {getFileSize, isUnset} from '@octra/utilities';
 import {LoginMode} from '../../store';
 
 export enum ConsoleType {
@@ -130,7 +130,7 @@ export class BugReportService {
     }
 
     if (!(this.transcrService === null || this.transcrService === undefined)) {
-      const file = Functions.getFileSize(this.transcrService.audiofile.size);
+      const file = getFileSize(this.transcrService.audiofile.size);
       result.octra.audiofile_size = file.size + ' ' + file.label;
       result.octra.audiofile_duration = this.transcrService.audioManager.ressource.info.duration.seconds;
       result.octra.audiofile_samplerate = this.transcrService.audiofile.sampleRate;

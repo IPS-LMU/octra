@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import * as Ajv from 'ajv';
 import {HttpClient} from '@angular/common/http';
-import {Functions} from '@octra/utilities';
+import {uniqueHTTPRequest} from '@octra/utilities';
 
 @Injectable({
   providedIn: 'root'
@@ -39,9 +39,9 @@ export class ConfigurationService {
       urls.hasOwnProperty('json') && urls.hasOwnProperty('schema') &&
       filenames.hasOwnProperty('json') && filenames.hasOwnProperty('schema')
     ) {
-      Functions.uniqueHTTPRequest(this.http, false, null, urls.json, null).subscribe(
+      uniqueHTTPRequest(this.http, false, null, urls.json, null).subscribe(
         (settings: any) => {
-          Functions.uniqueHTTPRequest(this.http, false, null, urls.schema, null).subscribe(
+          uniqueHTTPRequest(this.http, false, null, urls.schema, null).subscribe(
             (schema) => {
               console.log(filenames.json + ' schema file loaded');
 

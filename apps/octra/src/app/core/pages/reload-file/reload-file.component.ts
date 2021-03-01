@@ -8,7 +8,7 @@ import {SessionFile} from '../../obj/SessionFile';
 import {AudioService, TranscriptionService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import {OctraDropzoneComponent} from '../../component/octra-dropzone/octra-dropzone.component';
-import {FileSize, Functions} from '@octra/utilities';
+import {FileSize, getFileSize, navigateTo} from '@octra/utilities';
 import {OIDBLevel, OIDBLink} from '@octra/annotation';
 
 @Component({
@@ -97,7 +97,7 @@ export class ReloadFileComponent implements OnInit {
 
   getDropzoneFileString(file: File | SessionFile) {
     if (!(file === null || file === undefined)) {
-      const fsize: FileSize = Functions.getFileSize(file.size);
+      const fsize: FileSize = getFileSize(file.size);
       return `${file.name} (${(Math.round(fsize.size * 100) / 100)} ${fsize.label})`;
     }
     return '[FILE UNDEFINED]';
@@ -114,7 +114,7 @@ export class ReloadFileComponent implements OnInit {
   }
 
   private navigate = () => {
-    Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
+    navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
       console.error(error);
     });
   }

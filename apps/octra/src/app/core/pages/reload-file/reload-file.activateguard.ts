@@ -5,8 +5,8 @@ import {AppInfo} from '../../../app.info';
 import {SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
 import * as fromTranscription from '../../store/transcription';
-import {Functions} from '@octra/utilities';
 import {Store} from '@ngrx/store';
+import {afterDefined, navigateTo} from '@octra/utilities';
 
 @Injectable()
 export class ReloadFileGuard implements CanActivate {
@@ -24,12 +24,12 @@ export class ReloadFileGuard implements CanActivate {
         params.fragment = route.fragment;
         params.queryParams = route.queryParams;
 
-        Functions.navigateTo(this.router, ['/login'], params).catch((error) => {
+        navigateTo(this.router, ['/login'], params).catch((error) => {
           console.error(error);
         });
         resolve(false);
       } else {
-        Functions.afterDefined(this.store.select(fromTranscription.selectProjectConfig)).then(() => {
+        afterDefined(this.store.select(fromTranscription.selectProjectConfig)).then(() => {
           resolve(true);
         });
       }

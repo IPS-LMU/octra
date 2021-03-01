@@ -4,7 +4,7 @@ import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '
 import {Observable} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {AppStorageService} from '../service/appstorage.service';
-import {Functions} from '@octra/utilities';
+import {navigateTo} from '@octra/utilities';
 
 @Injectable()
 export class TranscrEndGuard implements CanActivate {
@@ -15,7 +15,7 @@ export class TranscrEndGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
     if (!this.appStorage.submitted) {
-      Functions.navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
+      navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
         console.error(error);
       });
       return false;

@@ -5,7 +5,7 @@ import {Observable} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {AudioService, SettingsService} from '../../shared/service';
 import {AppStorageService} from '../../shared/service/appstorage.service';
-import {Functions} from '@octra/utilities';
+import {navigateTo} from '@octra/utilities';
 
 @Injectable()
 export class MembersAreaGuard implements CanActivate {
@@ -22,7 +22,7 @@ export class MembersAreaGuard implements CanActivate {
       params.fragment = route.fragment;
       params.queryParams = route.queryParams;
 
-      Functions.navigateTo(this.router, ['/login'], params).catch((error) => {
+      navigateTo(this.router, ['/login'], params).catch((error) => {
         console.error(error);
       });
       return false;

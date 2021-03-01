@@ -21,7 +21,18 @@ import {TranscriptionService} from '../../shared/service';
 import {ASRProcessStatus, ASRQueueItem, AsrService} from '../../shared/service/asr.service';
 import {TranscrEditorConfig} from './config';
 import {ValidationPopoverComponent} from './validation-popover/validation-popover.component';
-import {Functions, isUnset, ShortcutGroup, ShortcutManager, SubscriptionManager} from '@octra/utilities';
+import {
+  escapeHtml,
+  escapeRegex,
+  insertString,
+  isNumber,
+  isUnset,
+  placeAtEnd,
+  ShortcutGroup,
+  ShortcutManager,
+  SubscriptionManager,
+  unEscapeHtml
+} from '@octra/utilities';
 import {AudioChunk, AudioManager, SampleUnit} from '@octra/media';
 import {Segments, TimespanPipe} from '@octra/annotation';
 
@@ -267,11 +278,11 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
           attr += '=' + value;
         }
         if (attr) {
-          const markerCode = Functions.unEscapeHtml(attr);
+          const markerCode = unEscapeHtml(attr);
 
           for (const marker of this.markers) {
             if (markerCode === marker.code) {
-              jQuery(elem).replaceWith(Functions.escapeHtml(markerCode));
+              jQuery(elem).replaceWith(escapeHtml(markerCode));
               charCounter += markerCode.length;
               break;
             }
@@ -383,7 +394,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
             const bufferText = ((e.originalEvent || e).clipboardData || (window as any).clipboardData).getData('Text');
             let html = bufferText.replace(/(<p>)|(<\/p>)/g, '')
               .replace(new RegExp('\\\[\\\|', 'g'), '{').replace(new RegExp('\\\|\]', 'g'), '}');
-            html = Functions.unEscapeHtml(html);
+            html = unEscapeHtml(html);
             html = '<span>' + this.transcrService.rawToHTML(html) + '</span>';
             html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
             const htmlObj = jQuery(html);
@@ -613,9 +624,9 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
         if (this.rawText !== '' && this.html !== '<p><br/></p>') {
           const nodeEditable = jQuery(this.transcrEditor.nativeElement).find('.note-editable');
           if (this.html.indexOf('<p>') === 0) {
-            Functions.placeAtEnd(nodeEditable.find('p')[0]);
+            placeAtEnd(nodeEditable.find('p')[0]);
           } else {
-            Functions.placeAtEnd(nodeEditable[0]);
+            placeAtEnd(nodeEditable[0]);
           }
         }
         if (!isUnset(this.textfield)) {
@@ -1022,7 +1033,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
         return s1 + 'X' + s3;
       };
 
-      const regex = new RegExp('(\\s)*(' + Functions.escapeRegex(marker.code) + ')(\\s)*', 'g');
+      const regex = new RegExp('(\\s)*(' + escapeRegex(marker.code) + ')(\\s)*', 'g');
 
       rawtext = rawtext.replace(regex, replaceFunc);
     }
@@ -1071,8 +1082,8 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
           // insert selection placeholders
           const startMarker = '[[[sel-start]]][[[/sel-start]]]';
           const endMarker = '[[[sel-end]]][[[/sel-end]]]';
-          let code = Functions.insertString(this._rawText, this._textSelection.start, startMarker);
-          code = Functions.insertString(code, this._textSelection.end + startMarker.length, endMarker);
+          let code = insertString(this._rawText, this._textSelection.start, startMarker);
+          code = insertString(code, this._textSelection.end + startMarker.length, endMarker);
 
           code = this.transcrService.underlineTextRed(code, this.transcrService.validate(code));
           code = this.transcrService.rawToHTML(code);
@@ -1186,7 +1197,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
     const editorPos = jQuery(this.transcrEditor.nativeElement).find('.note-toolbar').offset();
     const segSamples = jqueryObj.attr('data-samples');
 
-    if (!(segSamples === null || segSamples === undefined) && Functions.isNumber(segSamples)) {
+    if (!(segSamples === null || segSamples === undefined) && isNumber(segSamples)) {
       const samples = Number(segSamples);
       const time = new SampleUnit(samples, this.audioManager.sampleRate);
 

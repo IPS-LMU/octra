@@ -2,7 +2,7 @@ import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
 import {Params} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
-import {Functions, isUnset, SubscriptionManager} from '@octra/utilities';
+import {afterDefined, afterTrue, isUnset, SubscriptionManager} from '@octra/utilities';
 import {Subject} from 'rxjs';
 
 import {AppSettings, ProjectSettings} from '../../obj/Settings';
@@ -136,7 +136,7 @@ export class SettingsService {
     const transcriptURL = (queryParams.transcript !== undefined)
       ? queryParams.transcript : null;
 
-    Functions.afterTrue(this.store.select(fromApplication.selectIDBLoaded)).then(() => {
+    afterTrue(this.store.select(fromApplication.selectIDBLoaded)).then(() => {
       console.log(`selectIDBLoaded is true!`);
       // define languages
       const languages = this.appSettings.octra.languages;
@@ -304,11 +304,11 @@ export class SettingsService {
 
   public allLoaded() {
     const promises: Promise<void>[] = [];
-    promises.push(Functions.afterTrue(this.store.select(fromApplication.selectIDBLoaded)));
-    promises.push(Functions.afterDefined(this.store.select(fromApplication.selectAppSettings)));
-    promises.push(Functions.afterDefined(this.store.select(fromTranscription.selectProjectConfig)));
-    promises.push(Functions.afterDefined(this.store.select(fromTranscription.selectGuideLines)));
-    promises.push(Functions.afterDefined(this.store.select(fromTranscription.selectMethods)));
+    promises.push(afterTrue(this.store.select(fromApplication.selectIDBLoaded)));
+    promises.push(afterDefined(this.store.select(fromApplication.selectAppSettings)));
+    promises.push(afterDefined(this.store.select(fromTranscription.selectProjectConfig)));
+    promises.push(afterDefined(this.store.select(fromTranscription.selectGuideLines)));
+    promises.push(afterDefined(this.store.select(fromTranscription.selectMethods)));
 
     return Promise.all(promises);
   }

@@ -1,5 +1,5 @@
 import {Converter, ExportResult, IFile, ImportResult} from './Converter';
-import {contains, Functions} from '@octra/utilities';
+import {base64ToArrayBuffer, contains} from '@octra/utilities';
 import {IAnnotJSON, OAnnotJSON, OAudiofile} from '../annotjson';
 
 export interface Bundle {
@@ -78,7 +78,7 @@ export class BundleJSONConverter extends Converter {
       && json.hasOwnProperty('annotation')) {
       const data = json.mediaFile.data;
       const annotation: IAnnotJSON = json.annotation;
-      const buffer = Functions.base64ToArrayBuffer(data);
+      const buffer = base64ToArrayBuffer(data);
 
       const audioResult: OAudiofile = new OAudiofile();
       audioResult.name = annotation.name + annotation.annotates.substr(annotation.annotates.lastIndexOf('.'));

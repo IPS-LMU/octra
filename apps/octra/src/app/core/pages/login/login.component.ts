@@ -12,7 +12,7 @@ import {NgForm} from '@angular/forms';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
 import {sha256} from 'js-sha256';
-import {FileSize, Functions, hasPropertyTree, isUnset, SubscriptionManager} from '@octra/utilities';
+import {FileSize, getFileSize, hasPropertyTree, isUnset, navigateTo, SubscriptionManager} from '@octra/utilities';
 import {Observable} from 'rxjs';
 import {AppInfo} from '../../../app.info';
 import {ModalService} from '../../modals/modal.service';
@@ -316,7 +316,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
   getDropzoneFileString(file: File | SessionFile) {
     if (!isUnset(file)) {
-      const fsize: FileSize = Functions.getFileSize(file.size);
+      const fsize: FileSize = getFileSize(file.size);
       return `${file.name} (${(Math.round(fsize.size * 100) / 100)} ${fsize.label})`;
     }
   }
@@ -429,7 +429,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
   }
 
   private navigate = (): void => {
-    Functions.navigateTo(this.router, ['user'], AppInfo.queryParamsHandling).catch((error) => {
+    navigateTo(this.router, ['user'], AppInfo.queryParamsHandling).catch((error) => {
       console.error(error);
     });
   }

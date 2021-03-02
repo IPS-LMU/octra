@@ -382,14 +382,16 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
         let y = 0;
         if (numOfLines > 1) {
+          let drawnWidth = 0;
           for (let i = 0; i < numOfLines - 1; i++) {
             const line = this.createLine(new Size(lineWidth, this.settings.lineheight), new Position(this.settings.margin.left, y), i);
             this.layers.background.add(line);
             y += this.settings.lineheight + this.settings.margin.top;
             this.canvasElements.lastLine = line;
+            drawnWidth += lineWidth;
           }
           // add last line
-          lineWidth = this.av.AudioPxWidth % lineWidth;
+          lineWidth = this.av.AudioPxWidth - drawnWidth;
           if (lineWidth > 0) {
             const line = this.createLine(
               new Size(lineWidth, this.settings.lineheight), new Position(this.settings.margin.left, y),
@@ -1608,8 +1610,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       const tempLine = this.getLineNumber(event.layerX, event.layerY + Math.abs(this.layers.background.y()));
       this.hoveredLine = (tempLine > -1) ? tempLine : this.hoveredLine;
       const maxLines = Math.ceil(this.AudioPxWidth / this.av.innerWidth);
+      const restAbsX = this.hoveredLine * this.av.innerWidth;
       const lineWidth = (this.hoveredLine === maxLines - 1 && maxLines > 1)
-        ? this.av.AudioPxWidth % this.av.innerWidth : this.av.innerWidth;
+        ? this.av.AudioPxWidth - restAbsX : this.av.innerWidth;
       const layerX = Math.min(event.layerX, lineWidth);
       const absXPos = Math.min(this.hoveredLine * this.av.innerWidth + layerX, this.av.AudioPxWidth);
 

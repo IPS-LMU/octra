@@ -28,7 +28,6 @@ import {LoginMode} from '../../store';
 import * as fromApplication from '../../store/application/';
 import {Store} from '@ngrx/store';
 import {OIDBLevel, OIDBLink} from '@octra/annotation';
-import {LoginActions} from '../../store/login/login.actions';
 import {Actions} from '@ngrx/effects';
 
 @Component({
@@ -158,7 +157,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           }
         }
       } else {
-        this.store.dispatch(LoginActions.clearOnlineSession());
+        this.appStorage.clearOnlineSession();
+        this.appStorage.clearAnnotationPermanently();
       }
     };
 

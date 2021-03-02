@@ -21,7 +21,7 @@ import {
 import {AppStorageService} from '../../core/shared/service/appstorage.service';
 import {OCTRAEditor} from '../octra-editor';
 import {AudioChunk, AudioManager, SampleUnit} from '@octra/media';
-import {Segment} from '@octra/annotation';
+import {Segment, Segments} from '@octra/annotation';
 import {AudioNavigationComponent, AudioplayerComponent} from '@octra/components';
 
 @Component({
@@ -47,6 +47,8 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   public get highlighting(): boolean {
     return this.appStorage.highlightingEnabled;
   }
+
+  public segments: Segments = null;
 
   public set highlighting(value: boolean) {
     this.appStorage.highlightingEnabled = value;
@@ -389,7 +391,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
   private loadEditor() {
     if (this.transcrService.currentlevel.segments.length > 0) {
-      this.editor.segments = this.transcrService.currentlevel.segments;
+      this.segments = this.transcrService.currentlevel.segments;
     }
     this.editor.Settings.height = 100;
     this.oldRaw = this.editor.rawText;

@@ -144,6 +144,7 @@
           </octra-audio-viewer>
           <octra-transcr-editor #transcrEditor
                                 (onkeyup)="onKeyUp($event, i)"
+                                [transcript]="textEditor.transcript"
                                 [audiochunk]="textEditor.audiochunk"
                                 [height]="60"
                                 [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"

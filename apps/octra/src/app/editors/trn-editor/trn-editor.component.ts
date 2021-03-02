@@ -42,7 +42,7 @@ declare var validateAnnotation: any;
 })
 export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OnDestroy {
 
-  get textEditor(): { selectedSegment: number; state: string, openingBlocked: boolean, audiochunk: AudioChunk } {
+  get textEditor(): Texteditor {
     return this._textEditor;
   }
 
@@ -240,16 +240,12 @@ export class TrnEditorComponent extends OCTRAEditor implements OnInit, AfterView
     column: 1
   }
 
-  private _textEditor: {
-    state: 'active' | 'inactive',
-    selectedSegment: number,
-    openingBlocked: boolean,
-    audiochunk: AudioChunk
-  } = {
+  private _textEditor: Texteditor = {
     state: 'inactive',
     selectedSegment: -1,
     openingBlocked: false,
-    audiochunk: null
+    audiochunk: null,
+    transcript: ''
   };
 
   contextMenuProperties: {
@@ -1202,7 +1198,9 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
         this.transcrEditor.loaded.subscribe(() => {
           this.subscrManager.removeByTag('openingBlocked');
           this._textEditor.openingBlocked = false;
-          this.transcrEditor.focus();
+          this.transcrEditor.focus().catch((error) => {
+            console.error(error);
+          });
         }), 'openingBlocked');
 
       this.transcrEditor.Settings.btnPopover = false;
@@ -1221,7 +1219,7 @@ segments=${isNull}, ${this.transcrService.currentlevel.segments.length}`);
       console.log(`detected Changes ended: ${Date.now() - started}ms`);
 
       started = Date.now();
-      this.transcrEditor.rawText = segment.transcript;
+      this._textEditor.transcript = segment.transcript;
       console.log(`set rawtext ended: ${Date.now() - started}ms`);
 
       this.selectedCell = {
@@ -1334,4 +1332,12 @@ interface ShownSegment {
     safeHTML: SafeHtml;
   },
   validation: string;
+}
+
+interface Texteditor {
+  state: 'active' | 'inactive',
+  selectedSegment: number,
+  openingBlocked: boolean,
+  audiochunk: AudioChunk,
+  transcript: string,
 }

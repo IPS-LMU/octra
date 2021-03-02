@@ -110,6 +110,7 @@
                       (markerInsert)="onMarkerInsert($event)"
                       (typing)="onEditorTyping($event)"
                       [audiochunk]="audioChunkDown"
+                      [transcript]="transcript"
                       [easymode]="appStorage.easymode"
                       [markers]="(transcrService.guidelines !== null) ? transcrService.guidelines.markers : null"
                       [ngStyle]="{display: (segmentselected) ? 'inherit': 'none'}"

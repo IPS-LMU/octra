@@ -165,6 +165,8 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
     ]
   };
 
+  public transcript = '';
+
   constructor(public keyMap: KeymappingService,
               public transcrService: TranscriptionService,
               public audio: AudioService,
@@ -199,7 +201,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         if (item.time.sampleStart === this.audiochunk.time.start.samples
           && item.time.sampleLength === this.audiochunk.time.duration.samples) {
           if (item.status === ASRProcessStatus.FINISHED && item.result !== null) {
-            this.editor.rawText = item.result;
+            this.transcript = item.result;
           }
 
           // TODO find a better solution
@@ -223,7 +225,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
     new Promise<void>((resolve) => {
       // timeout to show loading status correctly
-      this.subscrmanager.add(timer().subscribe(() => {
+      this.subscrmanager.add(timer(0).subscribe(() => {
         this._validationEnabled = false;
         this.editor.updateRawText();
         this.save();
@@ -361,15 +363,11 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
 
     const segments = this.transcrService.currentlevel.segments;
     this.tempSegments = segments.clone();
-    this.subscrmanager.add(this.editor.loaded.subscribe(
-      () => {
-        if (this.segmentIndex > -1 && this.transcrService.currentlevel.segments &&
-          this.segmentIndex < this.transcrService.currentlevel.segments.length) {
-          this.editor_rawText(this.transcrService.currentlevel.segments.get(this.segmentIndex).transcript);
-        }
-        this.subscrmanager.removeByTag('editor');
-      }
-    ), 'editor');
+    this.subscrmanager.removeByTag('editor');
+    if (this.segmentIndex > -1 && this.transcrService.currentlevel.segments &&
+      this.segmentIndex < this.transcrService.currentlevel.segments.length) {
+      this.transcript = this.transcrService.currentlevel.segments.get(this.segmentIndex).transcript;
+    }
 
     this.cd.markForCheck();
     this.cd.detectChanges();
@@ -579,7 +577,7 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
         }
 
         if (!isUnset(segment)) {
-          this.editor.rawText = this.transcrService.currentlevel.segments.get(this.segmentIndex).transcript;
+          this.transcript = this.transcrService.currentlevel.segments.get(this.segmentIndex).transcript;
           // noinspection JSObjectNullOrUndefined
           this.audiochunk = this.audioManager.createNewAudioChunk(new AudioSelection(begin, segment.time.clone()));
 
@@ -589,16 +587,12 @@ export class TranscrWindowComponent implements OnInit, AfterContentInit, AfterVi
             resolve();
           });
         } else {
-          reject(new Error('can\'t got to segment, because it\'s null'));
+          resolve();
         }
       } else {
         resolve();
       }
     });
-  }
-
-  public editor_rawText(text: string) {
-    this.editor.rawText = text;
   }
 
   triggerUIAction($event: AudioViewerShortcutEvent) {

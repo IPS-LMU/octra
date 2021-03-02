@@ -64,6 +64,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
   @Input() audiochunk: AudioChunk;
   @Input() validationEnabled = false;
   @Input() externalShortcutManager: ShortcutManager;
+  // tslint:disable-next-line:no-output-on-prefix
   @Output() onRedoUndo = new EventEmitter<'undo' | 'redo'>();
 
   @ViewChild('validationPopover', {static: true}) validationPopover: ValidationPopoverComponent;
@@ -149,20 +150,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
     return this.audiochunk.audioManager;
   }
 
-  set segments(segments: Segments) {
-    let result = '';
-
-    for (let i = 0; i < segments.length; i++) {
-      const seg = segments.get(i);
-      result += seg.transcript;
-
-      if (i < segments.length - 1) {
-        result += `{${segments.get(i).time.samples}}`;
-      }
-    }
-
-    this.rawText = result;
-  }
+  @Input() segments: Segments = null;
 
   get Settings(): TranscrEditorConfig {
     return this._settings;
@@ -197,23 +185,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
     return this._rawText;
   }
 
-  set rawText(value: string) {
-    this.resetFontSize();
-    this._rawText = this.tidyUpRaw(value);
-
-    if (!isUnset(this.textfield)) {
-      this.init = 0;
-      const html = this.transcrService.rawToHTML(value);
-      this.textfield.summernote('code', html);
-      this.validate();
-      this.initPopover();
-    }
-    this.asr = {
-      status: 'inactive',
-      result: '',
-      error: ''
-    };
-  }
+  @Input() public transcript = '';
 
   constructor(private cd: ChangeDetectorRef,
               private langService: TranslocoService,
@@ -402,14 +374,15 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
               this.textfield.summernote('editor.insertNode', htmlObj[0]);
             } else {
               this.textfield.summernote('code', html);
-              this.focus(true, true);
+              this.focus(true, true).catch((error) => {
+                console.error(error);
+              });
             }
           },
           onChange: () => {
             this.init++;
 
             if (this.init === 1) {
-              this.focus(true, true);
             } else if (this.init > 1) {
               this.subscrmanager.removeByTag('typing_change');
               this.subscrmanager.add(this.internalTyping.subscribe((status) => {
@@ -430,6 +403,21 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
           },
           onMouseup: () => {
             this.selectionchanged.emit(this.caretpos);
+          },
+          onInit: () => {
+            // fix additional <p><br/></p>
+            this.subscrmanager.add(timer(100).subscribe(() => {
+              if (isUnset(this.segments) || this.segments.length === 0) {
+                this.setTranscript(this.transcript);
+              } else {
+                this.setSegments(this.segments);
+              }
+              this.focus(true, true).then(() => {
+                this.loaded.emit(true);
+              }).catch((error) => {
+                console.error(error);
+              });
+            }));
           }
         }
       });
@@ -465,9 +453,6 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
         });
 
       this.popovers.validationError.insertBefore('.note-editing-area');
-
-      this.rawText = this._rawText;
-      this.loaded.emit(true);
 
       this.asr.status = 'inactive';
       this.asr.error = '';
@@ -619,36 +604,39 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
    * set focus to the very last position of the editors text
    */
   public focus = (atEnd: boolean = true, later: boolean = false) => {
-    const func = () => {
-      try {
-        if (this.rawText !== '' && this.html !== '<p><br/></p>') {
-          const nodeEditable = jQuery(this.transcrEditor.nativeElement).find('.note-editable');
-          if (this.html.indexOf('<p>') === 0) {
-            placeAtEnd(nodeEditable.find('p')[0]);
-          } else {
-            placeAtEnd(nodeEditable[0]);
+    return new Promise<void>((resolve, reject) => {
+      const func = () => {
+        try {
+          if (this.rawText !== '' && this.html !== '<p></p>') {
+            const nodeEditable = jQuery(this.transcrEditor.nativeElement).find('.note-editable');
+            if (this.html.indexOf('<p>') === 0) {
+              placeAtEnd(nodeEditable.find('p')[0]);
+            } else {
+              placeAtEnd(nodeEditable[0]);
+            }
           }
-        }
-        if (!isUnset(this.textfield)) {
-          if (atEnd) {
-            this.textfield.summernote('focus');
-          } else {
-            this.restoreSelection();
+          if (!isUnset(this.textfield)) {
+            if (atEnd) {
+              this.textfield.summernote('focus');
+            } else {
+              this.restoreSelection();
+            }
           }
+          resolve();
+        } catch (exception) {
+          // ignore errors
+          reject(exception);
         }
-      } catch (exception) {
-        // ignore errors
-        console.error(exception);
-      }
-    };
+      };
 
-    if (later) {
-      this.subscrmanager.add(timer(300).subscribe(() => {
+      if (later) {
+        this.subscrmanager.add(timer(300).subscribe(() => {
+          func();
+        }));
+      } else {
         func();
-      }));
-    } else {
-      func();
-    }
+      }
+    });
   }
 
   ngOnInit() {
@@ -683,6 +671,14 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
     }
     if (!isUnset(obj.audiochunk) && !isUnset(obj.audiochunk.currentValue) && !obj.audiochunk.firstChange) {
       renew = true;
+    }
+
+    if (!isUnset(obj.transcript) && !isUnset(obj.transcript.currentValue) && !obj.transcript.firstChange) {
+      this.setTranscript(obj.transcript.currentValue);
+    }
+
+    if (!isUnset(obj.segments) && !isUnset(obj.segments.currentValue) && !obj.segments.firstChange) {
+      this.setSegments(obj.segments);
     }
 
     if (renew) {
@@ -1090,6 +1086,7 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
           code = code.replace(/([\s ]+)(<sel-start><\/sel-start><sel-end><\/sel-end><\/p>)?$/g, '&nbsp;$2');
 
           this._rawText = this.tidyUpRaw(this._rawText);
+
           this.textfield.summernote('code', code);
           this.restoreSelection();
           this.lastHighlightedSegment--;
@@ -1106,6 +1103,40 @@ export class TranscrEditorComponent implements OnInit, OnDestroy, OnChanges, Aft
 
   public updateRawText() {
     this._rawText = this.tidyUpRaw(this.getRawText());
+  }
+
+  private setTranscript(rawText: string) {
+    this.resetFontSize();
+    this._rawText = this.tidyUpRaw(rawText);
+
+    // set cursor at the end after focus
+    this.init = 0;
+
+    const html = this.transcrService.rawToHTML(rawText);
+    this.textfield.summernote('code', html);
+    this.validate();
+    this.initPopover();
+
+    this.asr = {
+      status: 'inactive',
+      result: '',
+      error: ''
+    };
+  }
+
+  private setSegments(segments: Segments) {
+    let result = '';
+
+    for (let i = 0; i < segments.length; i++) {
+      const seg = segments.get(i);
+      result += seg.transcript;
+
+      if (i < segments.length - 1) {
+        result += `{${segments.get(i).time.samples}}`;
+      }
+    }
+
+    this.setTranscript(result);
   }
 
   public changeValidationPopoverLocation(x: number, y: number) {

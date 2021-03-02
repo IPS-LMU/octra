@@ -60,6 +60,7 @@
                       id="loupe"
     ></octra-audio-viewer>
     <octra-transcr-editor #editor (boundaryclicked)="onBoundaryClicked($event)"
+                          [transcript]="transcript"
                           (boundaryinserted)="onBoundaryInserted()"
                           (markerClick)="onMarkerClick($event)"
                           (markerInsert)="onMarkerInsert($event)"

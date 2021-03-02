@@ -163,6 +163,8 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     ]
   };
 
+  public transcript = '';
+
   public get app_settings(): any {
     return this.settingsService.appSettings;
   }
@@ -425,7 +427,9 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   onSegmentEnter($event) {
     this.selectSegment($event.index).then((selection: AudioSelection) => {
       this.audioChunkDown = new AudioChunk(selection, this.audioManager);
-      this.editor.focus(true, true);
+      this.editor.focus(true, true).catch((error) => {
+        console.error(error);
+      });
     });
 
     if (this.appStorage.logging) {
@@ -443,7 +447,9 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.selectSegment($event.index).then((selection: AudioSelection) => {
       this.audioChunkDown.selection = selection.clone();
       this.audioChunkDown.absolutePlayposition = selection.start.clone();
-      this.editor.focus(true, true);
+      this.editor.focus(true, true).catch((error) => {
+        console.error(error);
+      });
     });
   }
 
@@ -758,7 +764,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     return new Promise<AudioSelection>(
       (resolve) => {
         const segment = this.transcrService.currentlevel.segments.get(index);
-        this.editor.rawText = segment.transcript;
+        this.transcript = segment.transcript;
         this.selectedIndex = index;
         this.segmentselected = true;
         let start = this.audioManager.createSampleUnit(0);

@@ -408,7 +408,7 @@ export class AppStorageService {
           if (!keepData || (!isUnset(onlineSession) && !isUnset(onlineSession.sessionData?.dataID))) {
             // last was online mode
             this.clearOnlineSession();
-            this.clearLocalStorage();
+            this.clearLocalSession();
             // TODO waiting?
             loginLocal();
           } else {
@@ -569,7 +569,7 @@ export class AppStorageService {
     return (isUnset(this.sessStr.retrieve('member_id')));
   }
 
-  public clearLocalStorage() {
+  public clearLocalSession() {
     this.store.dispatch(LoginActions.clearLocalSession());
   }
 
@@ -641,7 +641,7 @@ export class AppStorageService {
     return new Promise<void>((resolve) => {
       // TODO wait until cleaned!
       this.clearOnlineSession();
-      this.clearLocalStorage();
+      this.clearLocalSession();
       resolve();
     });
   }

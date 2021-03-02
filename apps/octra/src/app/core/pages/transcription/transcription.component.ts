@@ -806,8 +806,9 @@ export class TranscriptionComponent implements OnInit,
         }
 
         let jobsLeft = 0;
-        if (json.hasOwnProperty('message') && typeof (json.message) === 'number') {
-          jobsLeft = Number(json.message);
+        if (json.hasOwnProperty('message')) {
+          const counter = (json.message === '') ? '0' : json.message;
+          jobsLeft = Number(counter);
         }
 
         this.appStorage.serverDataEntry = serverDataEntry;

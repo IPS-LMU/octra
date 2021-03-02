@@ -389,12 +389,12 @@ export class IDBActions {
     }>()
   );
 
-  public static clearLocalStorageSuccess = createAction(
-    `[${context}] Clear LocalStorage Success`
+  public static clearLocalSessionSuccess = createAction(
+    `[${context}] Clear LocalSession Success`
   );
 
-  public static clearLocalStorageFailed = createAction(
-    `[${context}] Clear LocalStorage Failed`,
+  public static clearLocalSessionFailed = createAction(
+    `[${context}] Clear LocalSession Failed`,
     props<{
       error: string
     }>()

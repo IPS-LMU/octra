@@ -41,7 +41,7 @@ export class TranscriptionEndComponent implements OnInit, OnDestroy, AfterViewIn
     this.tranService.endTranscription();
 
     this.clearData();
-    this.appStorage.clearLocalStorage();
+    this.appStorage.clearLocalSession();
     this.appStorage.logout(true);
   }
 

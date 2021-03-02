@@ -29,6 +29,7 @@ import * as fromApplication from '../../store/application/';
 import {Store} from '@ngrx/store';
 import {OIDBLevel, OIDBLink} from '@octra/annotation';
 import {LoginActions} from '../../store/login/login.actions';
+import {Actions} from '@ngrx/effects';
 
 @Component({
   selector: 'octra-login',
@@ -76,7 +77,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               public modService: ModalService,
               private langService: TranslocoService,
               private audioService: AudioService,
-              private store: Store) {
+              private store: Store,
+              private actions: Actions) {
     this.subscrmanager = new SubscriptionManager();
   }
 
@@ -259,7 +261,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               const p = new Promise<void>((resolve) => {
                 if (this.appStorage.sessionfile !== null) {
                   // last was offline mode
-                  this.appStorage.clearLocalStorage();
+                  this.appStorage.clearLocalSession();
                 } else {
                   resolve();
                 }
@@ -393,7 +395,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
 
       // delete old data for fresh new session
       this.appStorage.clearOnlineSession();
-      this.appStorage.clearLocalStorage();
+      this.appStorage.clearLocalSession();
       this.appStorage.setDemoSession(audioExample.url, audioExample.description, 1000);
       this.navigate();
     }
@@ -440,7 +442,8 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       if (form.valid && json.message !== '0') {
         // delete old data for fresh new session
         this.appStorage.clearOnlineSession();
-        this.appStorage.clearLocalStorage();
+        this.appStorage.clearLocalSession();
+        this.appStorage.clearAnnotationPermanently();
 
         let prompt = '';
         let serverComment = '';

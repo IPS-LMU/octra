@@ -399,7 +399,7 @@ export class IDBEffects {
     })
   ));
 
-  clearLocalStorage$ = createEffect(() => this.actions$.pipe(
+  clearLocalSession$ = createEffect(() => this.actions$.pipe(
     ofType(LoginActions.clearLocalSession),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
@@ -412,10 +412,13 @@ export class IDBEffects {
       promises.push(this.idbService.saveOption('dataID', null));
 
       Promise.all(promises).then(() => {
-        subject.next(IDBActions.overwriteAnnotationLinksSuccess());
+        subject.next(IDBActions.clearLocalSessionSuccess());
         subject.complete();
       }).catch((error) => {
-        console.error(error);
+        subject.next(IDBActions.clearLocalSessionFailed({
+          error
+        }));
+        subject.complete();
       });
 
       return subject;

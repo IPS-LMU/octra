@@ -283,7 +283,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
         }
       }).then(() => {
         const innerWidth = this.width - (this.settings.margin.left + this.settings.margin.right);
-
+        console.log(`INIT AUDIOV`);
         this.av.initialize(innerWidth, this.audioChunk, this._transcriptionLevel);
         this.settings.pixelPerSec = this.getPixelPerSecond(this.secondsPerLine);
 
@@ -300,9 +300,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
   afterLevelUpdated() {
     if (!isUnset(this._transcriptionLevel)) {
-      if (!isUnset(this.audioChunk) && !isUnset(this.av.audioTCalculator)) {
-        this.refreshLevel()
-      }
+      this.refreshLevel()
       this.subscrManager.removeByTag(`segmentchange`);
       this.subscrManager.add(this._transcriptionLevel.segments.onsegmentchange.subscribe(() => {
           this.refreshLevel();
@@ -689,11 +687,15 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   private onPlaybackStarted() {
-    this.animation.playHead.start();
+    if (!isUnset(this.animation.playHead)) {
+      this.animation.playHead.start();
+    }
   }
 
   private onPlaybackPaused() {
-    this.animation.playHead.stop();
+    if(!isUnset(this.animation.playHead)) {
+      this.animation.playHead.stop();
+    }
   }
 
   private onAudioChunkStatusChanged = (status: PlayBackStatus) => {
@@ -2134,10 +2136,13 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   public refreshLevel() {
-    this.av.updateLevel(this._transcriptionLevel);
-    this.createSegmentsForCanvas();
-    this.layers.overlay.batchDraw();
-    this.layers.boundaries.batchDraw();
+    if (!isUnset(this.audioChunk) && !isUnset(this.av.audioTCalculator)) {
+      this.av.updateLevel(this._transcriptionLevel);
+      this.layers.overlay.batchDraw();
+      this.layers.boundaries.batchDraw();
+    } else {
+      console.error(new Error("can't refresh level"));
+    }
   }
 
   /**

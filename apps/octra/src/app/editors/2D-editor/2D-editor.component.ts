@@ -780,14 +780,14 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           } else {
 
           }
+        } else {
+          // open transcr window
+          this.openSegment(segmentNumber);
+          this.alertService.showAlert('warning', this.langService.translate('asr.no asr selected').toString())
+            .catch((error) => {
+              console.error(error);
+            });
         }
-      } else {
-        // open transcr window
-        this.openSegment(segmentNumber);
-        this.alertService.showAlert('warning', this.langService.translate('asr.no asr selected').toString())
-          .catch((error) => {
-            console.error(error);
-          });
       }
     }
 

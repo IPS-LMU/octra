@@ -19,8 +19,8 @@ export interface ILog {
   type: string;
   context: string; // Ziel der Aktion/betroffenes Control
   value: string | number | any;
-  playpos: number; // Samples
-  caretpos: number; // Position des Cursors im// Text (wird Caret genannt)
+  playpos?: number; // Samples
+  caretpos?: number; // Position des Cursors im// Text (wird Caret genannt)
   selection?: SampleInterval;
   segment?: SampleInterval;
 }

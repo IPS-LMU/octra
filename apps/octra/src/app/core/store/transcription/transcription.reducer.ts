@@ -89,7 +89,7 @@ export const reducer = createReducer(
     return {
       ...state,
       submitted
-    }
+    };
   }),
   on(TranscriptionActions.setTranscriptionState, (state: TranscriptionState, newState) => ({...state, ...newState})),
   on(TranscriptionActions.clearLogs, (state) => ({
@@ -132,10 +132,31 @@ export const reducer = createReducer(
           ...state.audio,
           loaded
         }
-      }
+      };
     }
   ),
-  on(LoginActions.clearLocalSession, (state: TranscriptionState) => {
+  on(LoginActions.logout, (state: TranscriptionState, {clearSession}) => {
+      if (clearSession) {
+        return {
+          ...initialState,
+          guidelines: state.guidelines,
+          projectConfig: state.projectConfig,
+          methods: state.methods
+        };
+      }
+
+      return {
+        ...state,
+        savingNeeded: false,
+        isSaving: false,
+        submitted: false,
+        audio: {
+          loaded: false
+        }
+      };
+    }
+  ),
+  on(LoginActions.loginDemo, (state: TranscriptionState) => {
       return {
         ...initialState,
         guidelines: state.guidelines,
@@ -144,15 +165,63 @@ export const reducer = createReducer(
       };
     }
   ),
-  on(LoginActions.clearOnlineSession, (state: TranscriptionState) => {
+  on(LoginActions.loginURLParameters, (state: TranscriptionState) => {
       return {
         ...initialState,
         guidelines: state.guidelines,
         projectConfig: state.projectConfig,
         methods: state.methods
-      }
+      };
     }
   ),
+  on(LoginActions.loginLocal, (state: TranscriptionState, {removeData}) => {
+    if (removeData) {
+      return {
+        ...initialState,
+        guidelines: state.guidelines,
+        projectConfig: state.projectConfig,
+        methods: state.methods
+      };
+    }
+
+    return {
+      ...state,
+      savingNeeded: false,
+      isSaving: false,
+      submitted: false,
+      audio: {
+        loaded: false
+      }
+    };
+  }),
+  on(LoginActions.loginOnline, (state: TranscriptionState, {removeData}) => {
+    if (removeData) {
+      return {
+        ...initialState,
+        guidelines: state.guidelines,
+        projectConfig: state.projectConfig,
+        methods: state.methods
+      };
+    }
+
+    return {
+      ...state,
+      savingNeeded: false,
+      isSaving: false,
+      submitted: false,
+      audio: {
+        loaded: false
+      }
+    };
+    }
+  ),
+  on(LoginActions.clearWholeSession, (state: TranscriptionState) =>
+    ({
+      ...initialState,
+      guidelines: state.guidelines,
+      projectConfig: state.projectConfig,
+      methods: state.methods
+    })),
   on(TranscriptionActions.clearSettings, (state) =>
     ({
       ...state,
@@ -181,27 +250,27 @@ function writeOptionToStore(state: TranscriptionState, attribute: string, value:
       return {
         ...state,
         feedback: value
-      }
+      };
     case('interface'):
       return {
         ...state,
         currentEditor: (!isUnset(value)) ? value : '2D-Editor'
-      }
+      };
     case('logging'):
       return {
         ...state,
         logging: (!isUnset(value)) ? value : true
-      }
+      };
     case('showLoupe'):
       return {
         ...state,
         showLoupe: (!isUnset(value)) ? value : false
-      }
+      };
     case('secondsPerLine'):
       return {
         ...state,
         secondsPerLine: (!isUnset(value)) ? value : 5
-      }
+      };
     case('audioSettings'):
       return {
         ...state,
@@ -214,7 +283,7 @@ function writeOptionToStore(state: TranscriptionState, attribute: string, value:
       return {
         ...state,
         highlightingEnabled: (!isUnset(value)) ? value : false
-      }
+      };
   }
 
   return state;

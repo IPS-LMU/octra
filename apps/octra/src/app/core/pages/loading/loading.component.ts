@@ -183,7 +183,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
             mode: LoginMode.LOCAL
           }));
         }
-        this.store.dispatch(LoginActions.logout({removeAnnotation: true}));
+        this.store.dispatch(LoginActions.logout({clearSession: true}));
       }
 
       if (this.appStorage.useMode !== LoginMode.URL && !this.appStorage.loggedIn) {
@@ -246,8 +246,6 @@ export class LoadingComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    this.appStorage.clearOnlineSession();
-    this.appStorage.clearLocalSession();
     this.appStorage.logout();
     navigateTo(this.router, ['/login'], AppInfo.queryParamsHandling).catch((error) => {
       console.error(error);

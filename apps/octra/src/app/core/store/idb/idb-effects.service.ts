@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Actions, createEffect, ofType} from '@ngrx/effects';
 import {AppStorageService} from '../../shared/service/appstorage.service';
-import {exhaustMap, mergeMap, withLatestFrom} from 'rxjs/operators';
-import {Subject} from 'rxjs';
+import {exhaustMap, filter, mergeMap, withLatestFrom} from 'rxjs/operators';
+import {Subject, timer} from 'rxjs';
 import {Action, Store} from '@ngrx/store';
 import {IDBService} from '../../shared/service/idb.service';
 import {
@@ -182,7 +182,7 @@ export class IDBEffects {
             }));
             subject.complete();
           }
-        )
+        );
       }).catch((error) => {
         console.error(error);
       });
@@ -227,7 +227,7 @@ export class IDBEffects {
           }
 
           annotationLevels.push(annotationStateLevel);
-          max = Math.max(annotationStateLevel.id, max)
+          max = Math.max(annotationStateLevel.id, max);
         }
 
         subject.next(IDBActions.loadAnnotationLevelsSuccess({
@@ -281,7 +281,7 @@ export class IDBEffects {
   // TODO add loadAnnotationLinks
 
   clearLogs$ = createEffect(() => this.actions$.pipe(
-    ofType(TranscriptionActions.clearLogs),
+    filter(a => a.type === TranscriptionActions.clearLogs.type || a.type === LoginActions.clearWholeSession.type),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -297,10 +297,10 @@ export class IDBEffects {
 
       return subject;
     })
-  ))
+  ));
 
   clearAllOptions$ = createEffect(() => this.actions$.pipe(
-    ofType(IDBActions.clearAllOptions),
+    filter(a => a.type === IDBActions.clearAllOptions.type || a.type === LoginActions.clearWholeSession.type),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
@@ -316,23 +316,29 @@ export class IDBEffects {
 
       return subject;
     })
-  ))
+  ));
 
   clearAnnotation$ = createEffect(() => this.actions$.pipe(
-    ofType(AnnotationActions.clearAnnotation),
+    filter(action => action.type === AnnotationActions.clearAnnotation.type
+      || action.type === LoginActions.clearWholeSession.type || action.type === LoginActions.logout.type),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
+      if(!action.hasOwnProperty("clearSession") || (action as any).clearSession){
+        this.idbService.clearAnnotationData().then(() => {
+          subject.next(IDBActions.clearAnnotationSuccess());
+          subject.complete();
+        }).catch((error) => {
+          subject.next(IDBActions.clearAnnotationFailed({
+            error
+          }));
+          subject.complete();
+        });
 
-      this.idbService.clearAnnotationData().then(() => {
-        subject.next(IDBActions.clearAnnotationSuccess());
-        subject.complete();
-      }).catch((error) => {
-        subject.next(IDBActions.clearAnnotationFailed({
-          error
-        }));
-        subject.complete();
-      });
-
+      } else {
+        timer(10).subscribe(()=>{
+          subject.complete();
+        })
+      }
       return subject;
     })
   ));
@@ -399,27 +405,36 @@ export class IDBEffects {
     })
   ));
 
-  clearLocalSession$ = createEffect(() => this.actions$.pipe(
-    ofType(LoginActions.clearLocalSession),
+  logoutSession$ = createEffect(() => this.actions$.pipe(
+    ofType(LoginActions.logout),
     exhaustMap((action) => {
       const subject = new Subject<Action>();
 
-      const promises: PromiseExtended<string>[] = [];
-      promises.push(this.idbService.saveOption('user', null));
-      promises.push(this.idbService.saveOption('feedback', null));
-      promises.push(this.idbService.saveOption('comment', ''));
-      promises.push(this.idbService.saveOption('audioURL', null));
-      promises.push(this.idbService.saveOption('dataID', null));
+      this.sessStr.store("loggedIn", false);
+      if (action.clearSession) {
+        const promises: PromiseExtended<string>[] = [];
+        promises.push(this.idbService.saveOption('user', null));
+        promises.push(this.idbService.saveOption('feedback', null));
+        promises.push(this.idbService.saveOption('comment', ''));
+        promises.push(this.idbService.saveOption('audioURL', null));
+        promises.push(this.idbService.saveOption('dataID', null));
 
-      Promise.all(promises).then(() => {
-        subject.next(IDBActions.clearLocalSessionSuccess());
-        subject.complete();
-      }).catch((error) => {
-        subject.next(IDBActions.clearLocalSessionFailed({
-          error
-        }));
-        subject.complete();
-      });
+        Promise.all(promises).then(() => {
+          subject.next(IDBActions.logoutSessionSuccess());
+          subject.complete();
+        }).catch((error) => {
+          subject.next(IDBActions.logoutSessionFailed({
+            error
+          }));
+          subject.complete();
+        });
+
+      } else {
+        timer(100).subscribe(() => {
+          subject.next(IDBActions.logoutSessionSuccess());
+          subject.complete();
+        });
+      }
 
       return subject;
     })
@@ -798,7 +813,6 @@ export class IDBEffects {
       return subject;
     })
   ));
-
   saveLogs$ = createEffect(() => this.actions$.pipe(
     ofType(TranscriptionActions.setLogs),
     exhaustMap((action) => {

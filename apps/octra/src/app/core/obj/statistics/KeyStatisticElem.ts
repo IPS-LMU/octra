@@ -1,4 +1,5 @@
 import {StatisticElem} from './StatisticElement';
+import {ILog, SampleInterval} from '../Settings/logging';
 
 /***
  * Statistic Element Class
@@ -35,7 +36,7 @@ export class KeyStatisticElem extends StatisticElem {
     };
   }
 
-  public static fromAny(elem: any): KeyStatisticElem {
+  public static fromAny(elem: ILog): KeyStatisticElem {
     const result = {
       value: null,
       context: null,

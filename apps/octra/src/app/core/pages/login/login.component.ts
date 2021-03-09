@@ -157,9 +157,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
           }
         }
       } else {
-        this.appStorage.clearOnlineSession();
-        this.appStorage.clearAnnotationPermanently();
-      }
+        this.appStorage.clearWholeSession();
     };
 
     if (!this.appStorage.idbLoaded) {
@@ -258,33 +256,26 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
             }
 
             if (form.valid && json.message !== '0') {
-              const p = new Promise<void>((resolve) => {
-                if (this.appStorage.sessionfile !== null) {
-                  // last was offline mode
-                  this.appStorage.clearLocalSession();
-                } else {
-                  resolve();
-                }
-              }).then(() => {
-                let prompt = '';
-                let serverComment = '';
-                if (this.appStorage.useMode === LoginMode.ONLINE
-                  && data.hasOwnProperty('prompttext')) {
-                  // get transcript data that already exists
-                  prompt = data.prompttext;
-                  prompt = (prompt) ? prompt : '';
-                }
-                if (this.appStorage.useMode === LoginMode.ONLINE
-                  && data.hasOwnProperty('comment')) {
-                  // get transcript data that already exists
-                  serverComment = data.comment;
-                  serverComment = (serverComment) ? serverComment : '';
-                }
+              let prompt = '';
+              let serverComment = '';
+              if (this.appStorage.useMode === LoginMode.ONLINE
+                && data.hasOwnProperty('prompttext')) {
+                // get transcript data that already exists
+                prompt = data.prompttext;
+                prompt = (prompt) ? prompt : '';
+              }
+              if (this.appStorage.useMode === LoginMode.ONLINE
+                && data.hasOwnProperty('comment')) {
+                // get transcript data that already exists
+                serverComment = data.comment;
+                serverComment = (serverComment) ? serverComment : '';
+              }
 
-                this.appStorage.setOnlineSession(this.member, this.appStorage.dataID, this.appStorage.audioURL, prompt, serverComment, jobsLeft)
+              this.appStorage.setOnlineSession(
+                this.member, this.appStorage.dataID, this.appStorage.audioURL, prompt, serverComment, jobsLeft, false
+              )
 
-                this.navigate();
-              });
+              this.navigate();
             } else {
               this.modService.show('loginInvalid').catch((error) => {
                 console.error(error);
@@ -394,8 +385,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       this.member.jobno = '123';
 
       // delete old data for fresh new session
-      this.appStorage.clearOnlineSession();
-      this.appStorage.clearLocalSession();
       this.appStorage.setDemoSession(audioExample.url, audioExample.description, 1000);
       this.navigate();
     }
@@ -441,8 +430,6 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
       const data = json.data as IDataEntry;
       if (form.valid && json.message !== '0') {
         // delete old data for fresh new session
-        this.appStorage.clearOnlineSession();
-        this.appStorage.clearLocalSession();
         this.appStorage.clearAnnotationPermanently();
 
         let prompt = '';
@@ -486,7 +473,7 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         // beware, this.appStorage.serverDataEntry is aync!
         this.appStorage.serverDataEntry = serverDataEntry;
 
-        this.appStorage.setOnlineSession(this.member, data.id, data.url, prompt, serverComment, jobsLeft);
+        this.appStorage.setOnlineSession(this.member, data.id, data.url, prompt, serverComment, jobsLeft, true);
         this.navigate();
       } else {
         this.modService.show('loginInvalid').catch((error) => {

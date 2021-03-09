@@ -36,12 +36,30 @@ export const reducer = createUndoRedoReducer(
     links: [],
     levelCounter: 0
   })),
-  on(LoginActions.logout, ((state, {removeAnnotation}) => {
-    if (removeAnnotation) return initialState;
+  on(LoginActions.logout, ((state, {clearSession}) => {
+    if (clearSession) return initialState;
     return state;
+  })),
+  on(LoginActions.clearWholeSession, (() => {
+    return initialState;
   })),
   on(LoginActions.loginDemo, (() => {
     return initialState;
+  })),
+  on(LoginActions.loginURLParameters, (() => {
+    return initialState;
+  })),
+  on(LoginActions.loginLocal, ((state: AnnotationState, {removeData}) => {
+    if(removeData){
+      return initialState;
+    }
+    return state;
+  })),
+  on(LoginActions.loginOnline, ((state: AnnotationState, {removeData}) => {
+    if(removeData) {
+      return initialState;
+    }
+    return state;
   })),
   on(AnnotationActions.overwriteAnnotation, (state: AnnotationState, {annotation}) => ({
     ...state,

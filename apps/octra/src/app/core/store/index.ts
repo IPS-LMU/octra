@@ -15,6 +15,7 @@ import {ConsoleEntry} from '../shared/service/bug-report.service';
 import {AppSettings, ProjectSettings} from '../obj/Settings';
 import {SampleUnit} from '@octra/media';
 import {isUnset} from '@octra/utilities';
+import {ILog} from '../obj/Settings/logging';
 
 export enum LoginMode {
   URL = 'url',
@@ -108,15 +109,15 @@ export interface TranscriptionState {
   },
   feedback: any;
   guidelines?: any;
-  logs: any[];
+  logs: ILog[];
   logging: boolean;
   easyMode: boolean;
   secondsPerLine: number;
   highlightingEnabled: boolean;
   projectConfig?: ProjectSettings;
   methods?: {
-    validate: (string, any) => any;
-    tidyUp: (string, any) => any;
+    validate: ((string, any) => any);
+    tidyUp: ((string, any) => any);
   }
 }
 

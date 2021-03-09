@@ -389,12 +389,12 @@ export class IDBActions {
     }>()
   );
 
-  public static clearLocalSessionSuccess = createAction(
-    `[${context}] Clear LocalSession Success`
+  public static logoutSessionSuccess = createAction(
+    `[${context}] Logout Session Success`
   );
 
-  public static clearLocalSessionFailed = createAction(
-    `[${context}] Clear LocalSession Failed`,
+  public static logoutSessionFailed = createAction(
+    `[${context}] Logout Session Failed`,
     props<{
       error: string
     }>()

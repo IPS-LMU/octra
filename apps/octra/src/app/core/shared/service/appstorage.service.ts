@@ -30,6 +30,7 @@ import {IDBActions} from '../../store/idb/idb.actions';
 import * as fromTranscriptionReducer from '../../store/transcription/transcription.reducer';
 import * as fromAnnotation from '../../store/annotation';
 import {ASRActions} from '../../store/asr/asr.actions';
+import {ILog} from '../../obj/Settings/logging';
 
 @Injectable({
   providedIn: 'root'
@@ -127,7 +128,7 @@ export class AppStorageService {
   set consoleEntries(consoleEntries: ConsoleEntry[]) {
     this.store.dispatch(ApplicationActions.setConsoleEntries({
       consoleEntries
-    }))
+    }));
   }
 
   set showLoupe(value: boolean) {
@@ -397,29 +398,19 @@ export class AppStorageService {
 
         const onlineSession = this._snapshot.login.onlineSession;
 
-        const loginLocal = () => {
-
-          const storeFiles = files.map(a => (a.file));
-          this.setLocalSession(storeFiles, this.getSessionFile(audiofile));
-          resolve();
-        };
 
         if (!isUnset(audiofile)) {
-          if (!keepData || (!isUnset(onlineSession) && !isUnset(onlineSession.sessionData?.dataID))) {
-            // last was online mode
-            this.clearOnlineSession();
-            this.clearLocalSession();
-            // TODO waiting?
-            loginLocal();
-          } else {
-            loginLocal();
-          }
+          const removeData = (!keepData || (!isUnset(onlineSession) && !isUnset(onlineSession.sessionData?.dataID)));
+
+          const storeFiles = files.map(a => (a.file));
+          this.setLocalSession(storeFiles, this.getSessionFile(audiofile), removeData);
+          resolve();
         } else {
           reject('file not supported');
         }
       }
     });
-  }
+  };
 
   public getSessionFile = (file: File) => {
     return new SessionFile(
@@ -428,7 +419,7 @@ export class AppStorageService {
       new Date(file.lastModified),
       file.type
     );
-  }
+  };
 
   public overwriteAnnotation = (levels: OIDBLevel[], links: OIDBLink[], saveToDB = true): Promise<any> => {
     return new Promise<any>((resolve, reject) => {
@@ -461,15 +452,15 @@ export class AppStorageService {
         }));
       }
     });
-  }
+  };
 
   public overwriteLinks = (value: OIDBLink[]) => {
     this.store.dispatch(AnnotationActions.overwriteLinks({
       links: value
     }));
-  }
+  };
 
-  setOnlineSession(member: any, dataID: number, audioURL: string, promptText: string, serverComment: string, jobsLeft: number) {
+  setOnlineSession(member: any, dataID: number, audioURL: string, promptText: string, serverComment: string, jobsLeft: number, removeData: boolean) {
     if (isUnset(this.easymode)) {
       this.easymode = false;
     }
@@ -496,12 +487,13 @@ export class AppStorageService {
             serverDataEntry: null,
             comment: ''
           }
-        }
+        },
+        removeData
       }));
     }
   }
 
-  setLocalSession(files: File[], sessionFile: SessionFile) {
+  setLocalSession(files: File[], sessionFile: SessionFile, removeData: boolean) {
     if (isUnset(this.easymode)) {
       this.easymode = false;
     }
@@ -510,7 +502,7 @@ export class AppStorageService {
       this.interface = '2D-Editor';
     }
 
-    this.store.dispatch(LoginActions.loginLocal({files, sessionFile}));
+    this.store.dispatch(LoginActions.loginLocal({files, sessionFile, removeData}));
   }
 
   setDemoSession(audioURL: string, serverComment: string, jobsLeft: number) {
@@ -562,17 +554,6 @@ export class AppStorageService {
     }));
   }
 
-  public clearOnlineSession(): boolean {
-    this.store.dispatch(LoginActions.clearOnlineSession());
-
-    this.sessStr.clear();
-    return (isUnset(this.sessStr.retrieve('member_id')));
-  }
-
-  public clearLocalSession() {
-    this.store.dispatch(LoginActions.clearLocalSession());
-  }
-
   public save(key: string, value: any): boolean {
     // TODO why not url?
     if (this.useMode !== LoginMode.URL) {
@@ -621,7 +602,7 @@ export class AppStorageService {
     return true;
   }
 
-  public saveLogItem(log: any) {
+  public saveLogItem(log: ILog) {
     if (!isUnset(log)) {
       for (const attr in log) {
         if (log.hasOwnProperty(attr) && isUnset(log['' + attr])) {
@@ -635,15 +616,6 @@ export class AppStorageService {
     } else {
       console.error('Can\'t save log because it is null.');
     }
-  }
-
-  public endSession(): Promise<void> {
-    return new Promise<void>((resolve) => {
-      // TODO wait until cleaned!
-      this.clearOnlineSession();
-      this.clearLocalSession();
-      resolve();
-    });
   }
 
   public afterSaving(): Promise<void> {
@@ -744,15 +716,13 @@ export class AppStorageService {
     return null;
   }
 
-  public logout(removeAnnotation = false) {
-    this.endSession().then(() => {
-      this.clearHistory();
-      this.store.dispatch(LoginActions.logout({
-        removeAnnotation
-      }));
-      navigateTo(this.router, ['login'], AppInfo.queryParamsHandling).catch((error) => {
-        console.error(error);
-      });
+  public logout(clearSession = false) {
+    this.store.dispatch(LoginActions.logout({
+      clearSession
+    }));
+    // TODO WAIT?
+    navigateTo(this.router, ['login'], AppInfo.queryParamsHandling).catch((error) => {
+      console.error(error);
     });
   }
 
@@ -786,5 +756,9 @@ export class AppStorageService {
 
   public clearAnnotationPermanently() {
     this.store.dispatch(AnnotationActions.clearAnnotation());
+  }
+
+  public clearWholeSession() {
+    this.store.dispatch(LoginActions.clearWholeSession());
   }
 }

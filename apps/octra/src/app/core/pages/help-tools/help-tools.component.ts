@@ -35,13 +35,9 @@ export class HelpToolsComponent implements OnInit, OnDestroy {
   }
 
   clearAllData() {
-    this.appStorage.clearOnlineSession();
+    this.appStorage.clearWholeSession();
 
     const clearAll = () => {
-      this.store.dispatch(AnnotationActions.clearAnnotation());
-      this.store.dispatch(IDBActions.clearAllOptions());
-      this.appStorage.clearLoggingDataPermanently();
-
       this.subscrManager.add(timer(3000).subscribe(() => {
         alert('All cleared. The app will be reloaded.');
         document.location.reload();

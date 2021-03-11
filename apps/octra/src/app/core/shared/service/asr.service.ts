@@ -188,7 +188,7 @@ class ASRQueue {
     if (!found) {
       this._queue.push(queueItem);
     } else {
-      console.error(Error('QueueItem with id ' + queueItem.id + ' already added!'));
+      console.error(new Error('QueueItem with id ' + queueItem.id + ' already added!'));
     }
   }
 

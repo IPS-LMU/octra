@@ -37,7 +37,7 @@ export class DynComponentDirective implements OnInit, OnDestroy {
 
     const comp = viewContainerRef.createComponent(componentFactory);
 
-    if (!isUnset(comp) && !isUnset(comp.instance)) {
+    if (!isUnset(comp) && !isUnset(comp.instance) && !isUnset((comp.instance as any).initialized)) {
       this.component.instance = comp.instance;
       this.subscrManager.add(this.component.instance.initialized.subscribe(() => {
         this.initialized.emit({

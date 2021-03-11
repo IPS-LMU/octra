@@ -616,10 +616,10 @@ export class AppStorageService {
                 }
               ));
             } else {
-              console.error(Error('loadOptions: variables parameter must be of type {attribute:string, key:string}[]'));
+              console.error(new Error('loadOptions: variables parameter must be of type {attribute:string, key:string}[]'));
             }
           } else {
-            console.error(Error(`session service needs an attribute called \'${variable.attribute}\'`));
+            console.error(new Error(`session service needs an attribute called \'${variable.attribute}\'`));
           }
         }
 

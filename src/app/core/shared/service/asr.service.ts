@@ -194,7 +194,7 @@ class ASRQueue {
     if (!found) {
       this._queue.push(queueItem);
     } else {
-      console.error(Error('QueueItem with id ' + queueItem.id + ' already added!'));
+      console.error(new Error('QueueItem with id ' + queueItem.id + ' already added!'));
     }
   }
 
@@ -206,7 +206,7 @@ class ASRQueue {
     if (index > -1) {
       this._queue.splice(index, 1);
     } else {
-      console.error(`queueItem with id ${id} does not exist and can't be removed.`);
+      console.error(new Error(`queueItem with id ${id} does not exist and can't be removed.`));
     }
   }
 

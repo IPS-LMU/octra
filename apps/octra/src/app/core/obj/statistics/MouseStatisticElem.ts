@@ -1,4 +1,5 @@
 import {StatisticElem} from './StatisticElement';
+import {ILog} from '../Settings/logging';
 
 /***
  * Statistic Element Class
@@ -32,7 +33,7 @@ export class MouseStatisticElem extends StatisticElem {
     };
   }
 
-  public static fromAny(elem: any): MouseStatisticElem {
+  public static fromAny(elem: ILog): MouseStatisticElem {
     const result = {
       value: null,
       context: null,

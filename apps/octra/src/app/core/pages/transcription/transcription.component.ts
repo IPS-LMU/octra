@@ -163,7 +163,7 @@ export class TranscriptionComponent implements OnInit,
         }
       }
     ]
-  }
+  };
 
   public get Interface(): string {
     return this.interface;
@@ -333,32 +333,29 @@ export class TranscriptionComponent implements OnInit,
 
       if (this.appStorage.useMode !== LoginMode.DEMO) {
         this.api.setOnlineSessionToFree(this.appStorage).then(() => {
-          this.clearDataPermanently();
-          this.appStorage.logout(true);
+          this.logout(true);
         }).catch((error) => {
           console.error(error);
         });
       } else {
         // is demo mode
-        this.clearDataPermanently();
-        this.appStorage.logout(true);
+        this.logout(true);
       }
     } else {
       this.modService.show('transcriptionStop').then((answer: TranscriptionStopModalAnswer) => {
         if (answer === TranscriptionStopModalAnswer.QUIT) {
-          this.transcrService.endTranscription();
-          this.appStorage.logout();
+          this.logout(false);
         }
       }).catch((error) => {
         console.error(error);
       });
     }
-  }
+  };
 
   onSendError = (error) => {
     this.sendError = error.message;
     return throwError(error);
-  }
+  };
 
   ngOnChanges(changes: SimpleChanges) {
   }
@@ -762,7 +759,6 @@ export class TranscriptionComponent implements OnInit,
 
   nextTranscription(json: any) {
     this.transcrService.endTranscription(false);
-    this.clearDataPermanently();
 
     if (!isUnset(json)) {
       const data = json.data as IDataEntry;
@@ -777,7 +773,7 @@ export class TranscriptionComponent implements OnInit,
             serverDataEntry = {
               ...serverDataEntry,
               transcript: []
-            }
+            };
           } else {
             console.log(`seervertranscript is array`);
           }
@@ -818,7 +814,7 @@ export class TranscriptionComponent implements OnInit,
           project: this.appStorage.onlineSession.loginData.project,
           password: this.appStorage.onlineSession.loginData.password,
           jobno: this.appStorage.onlineSession.loginData.jobNumber
-        }, data.id, data.url, promptText, serverComment, jobsLeft);
+        }, data.id, data.url, promptText, serverComment, jobsLeft, true);
 
         navigateTo(this.router, ['/user/load'], AppInfo.queryParamsHandling).catch((error) => {
           console.error(error);
@@ -868,13 +864,13 @@ export class TranscriptionComponent implements OnInit,
   }
 
   clearDataPermanently() {
-    this.appStorage.submitted = false;
-    this.appStorage.clearAnnotationPermanently();
-    this.appStorage.feedback = {};
-    this.appStorage.comment = '';
-    this.appStorage.clearLoggingDataPermanently();
+    this.appStorage.submitted = false; // ok
+    this.appStorage.clearAnnotationPermanently(); // ok
+    this.appStorage.feedback = {}; // ok
+    this.appStorage.comment = ''; // ok
+    this.appStorage.clearLoggingDataPermanently(); // ok
     this.uiService.elements = [];
-    this.appStorage.audioLoaded = false;
+    this.appStorage.audioLoaded = false; // ok
   }
 
   public onSaveTranscriptionButtonClicked() {
@@ -977,6 +973,14 @@ export class TranscriptionComponent implements OnInit,
       this.subscrmanager.removeById(this.levelSubscriptionID);
       this.levelSubscriptionID = 0;
     }
+  }
+
+  private logout(clearSession: boolean) {
+    this.transcrService.endTranscription(true);
+    if (clearSession) {
+      this.uiService.elements = [];
+    }
+    this.appStorage.logout(clearSession);
   }
 
 }

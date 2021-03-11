@@ -9,7 +9,8 @@ export class LoginActions {
   public static loginOnline = createAction(
     `[${context}] Login Online`,
     props<{
-      onlineSession: OnlineSession
+      onlineSession: OnlineSession,
+      removeData: boolean
     }>()
   );
 
@@ -22,7 +23,8 @@ export class LoginActions {
     `[${context}] Login Local`,
     props<{
       files: File[],
-      sessionFile: SessionFile
+      sessionFile: SessionFile,
+      removeData: boolean
     }>()
   );
 
@@ -36,8 +38,28 @@ export class LoginActions {
   public static logout = createAction(
     `[${context}] Logout`,
     props<{
-      removeAnnotation: boolean;
+      clearSession: boolean;
     }>()
+  );
+
+  public static clearSessionStorageSuccess = createAction(
+    `[${context}] Clear Session Storage Success`,
+  );
+
+  public static clearSessionStorageFailed = createAction(
+    `[${context}] Clear Session Storage Failed`,
+  );
+
+  public static clearWholeSession = createAction(
+    `[${context}] Clear whole session`,
+  );
+
+  public static clearWholeSessionSuccess = createAction(
+    `[${context}] Clear whole session success`,
+  );
+
+  public static clearWholeSessionFailed = createAction(
+    `[${context}] Clear whole session failed`,
   );
 
   public static setMode = createAction(`[${context}] Set Mode`,
@@ -59,9 +81,6 @@ export class LoginActions {
       jobNumber: number;
     }>()
   );
-
-  public static clearLocalSession = createAction(`[${context}] Clear local session`);
-  public static clearOnlineSession = createAction(`[${context}] Clear online session`);
 
   public static setServerDataEntry = createAction(
     `[${context}] Set serverDataEntry`,

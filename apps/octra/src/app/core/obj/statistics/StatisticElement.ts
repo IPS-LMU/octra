@@ -4,16 +4,7 @@
 import {ILog, SampleInterval} from '../Settings/logging';
 
 export class StatisticElem {
-  protected data: {
-    timestamp: number,
-    type: string,
-    context: string,
-    value: any,
-    selection?: SampleInterval,
-    segment?: SampleInterval,
-    playpos?: number;
-    caretpos?: number;
-  } = {
+  protected data: ILog = {
     timestamp: null,
     type: null,
     context: null,
@@ -79,7 +70,7 @@ export class StatisticElem {
     this.data.segment = segment;
   }
 
-  public static fromAny(elem: any): StatisticElem {
+  public static fromAny(elem: ILog): StatisticElem {
     const result = {
       value: null,
       context: null,
@@ -117,6 +108,8 @@ export class StatisticElem {
   }
 
   public getDataClone(): ILog {
-    return JSON.parse(JSON.stringify(this.data));
+    return {
+      ...this.data
+    };
   }
 }

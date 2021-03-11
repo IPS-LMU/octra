@@ -23,11 +23,14 @@ export const reducer = createReducer(
     ...state,
     mode: LoginMode.DEMO,
     loggedIn: true,
+    sessionFile: undefined,
+    files: undefined,
     onlineSession
   })),
   on(LoginActions.loginLocal, (state: LoginState, {files, sessionFile}) => ({
     ...state,
     mode: LoginMode.LOCAL,
+    onlineSession: initialState.onlineSession,
     loggedIn: true,
     sessionFile,
     files
@@ -35,34 +38,46 @@ export const reducer = createReducer(
   on(LoginActions.loginURLParameters, (state: LoginState, {urlParams}) => ({
     ...state,
     mode: LoginMode.URL,
+    onlineSession: initialState.onlineSession,
     loggedIn: true,
+    sessionFile: undefined,
+    files: undefined,
     urlParams
   })),
   on(LoginActions.loginOnline, (state: LoginState, {onlineSession}) => ({
     ...state,
     mode: LoginMode.ONLINE,
     loggedIn: true,
-    onlineSession
+    onlineSession,
+    sessionFile: undefined,
+    files: undefined
   })),
   on(LoginActions.setMode, (state: LoginState, {mode}) => ({
     ...state,
     mode
   })),
-  on(LoginActions.logout, (state: LoginState) => ({
-    ...state,
-    loggedIn: false
-  })),
-  on(LoginActions.clearLocalSession, (state: LoginState) => ({
-    ...state,
-    queryParams: undefined,
-    files: []
-  })),
-  on(LoginActions.clearOnlineSession, (state: LoginState) => ({
-    ...state,
-    onlineSession: {
-      ...state.onlineSession,
-      sessionData: undefined
+  on(LoginActions.logout, (state: LoginState, {clearSession}) => {
+    let result = {
+      ...state,
+      queryParams: undefined,
+      files: [],
+      loggedIn: false
+    };
+
+    if(clearSession) {
+      result = {
+        ...result,
+        onlineSession: {
+          ...result.onlineSession,
+          sessionData: undefined
+        }
+      }
     }
+
+    return result;
+  }),
+  on(LoginActions.clearWholeSession, () => ({
+    ...initialState
   })),
   on(LoginActions.setAudioURL, (state: LoginState, {audioURL}) => ({
     ...state,

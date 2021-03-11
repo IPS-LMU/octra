@@ -1,5 +1,6 @@
 import {createAction, props} from '@ngrx/store';
 import {TranscriptionState} from '../index';
+import {ILog} from '../../obj/Settings/logging';
 
 const context = 'Transcription';
 
@@ -35,7 +36,7 @@ export class TranscriptionActions {
   public static addLog = createAction(
     `[${context}] add log`,
     props<{
-      log: any;
+      log: ILog;
     }>()
   );
 

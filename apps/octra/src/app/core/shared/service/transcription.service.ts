@@ -249,8 +249,10 @@ export class TranscriptionService {
       console.error(new Error('can not save segments because annotation is null'));
     }
   }
-  /**
-   * resets the parent object values. Call this function after transcription was saved
+
+  /***
+   * destroys audio service and transcr service. Call this after quit.
+   * @param destroyaudio
    */
   public endTranscription = (destroyaudio: boolean = true) => {
     this.audio.destroy(destroyaudio);

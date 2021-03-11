@@ -1,13 +1,4 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  HostListener,
-  OnDestroy,
-  OnInit,
-  ViewChild
-} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {Router} from '@angular/router';
 import {TranslocoService} from '@ngneat/transloco';
@@ -36,8 +27,7 @@ import {Actions} from '@ngrx/effects';
   styleUrls: ['./login.component.css'],
   providers: [LoginService]
 })
-export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate, AfterViewInit {
-
+export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate, OnDestroy {
   @ViewChild('f', {static: false}) loginform: NgForm;
   @ViewChild('dropzone', {static: true}) dropzone: OctraDropzoneComponent;
   @ViewChild('agreement', {static: false}) agreement: ElementRef;
@@ -79,6 +69,10 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
               private store: Store,
               private actions: Actions) {
     this.subscrmanager = new SubscriptionManager();
+  }
+
+  ngOnDestroy() {
+    this.subscrmanager.destroy();
   }
 
   onOfflineSubmit = () => {
@@ -158,34 +152,28 @@ export class LoginComponent implements OnInit, OnDestroy, ComponentCanDeactivate
         }
       } else {
         this.appStorage.clearWholeSession();
-    };
-
-    if (!this.appStorage.idbLoaded) {
-      this.subscrmanager.add(this.appStorage.loaded.subscribe(
-        () => {
-        },
-        () => {
-        },
-        () => {
-          loaduser();
-        })
-      );
-    } else {
-      loaduser();
-    }
-
-    this.subscrmanager.add(this.store.select(fromApplication.selectIDBLoaded).subscribe((idbLoaded) => {
-      if (idbLoaded) {
-        this.loadPojectsList();
       }
-    }));
-  }
 
-  ngAfterViewInit() {
-  }
+      if (!this.appStorage.idbLoaded) {
+        this.subscrmanager.add(this.appStorage.loaded.subscribe(
+          () => {
+          },
+          () => {
+          },
+          () => {
+            loaduser();
+          })
+        );
+      } else {
+        loaduser();
+      }
 
-  ngOnDestroy() {
-    this.subscrmanager.destroy();
+      this.subscrmanager.add(this.store.select(fromApplication.selectIDBLoaded).subscribe((idbLoaded) => {
+        if (idbLoaded) {
+          this.loadPojectsList();
+        }
+      }));
+    }
   }
 
   onOnlineSubmit(form: NgForm) {

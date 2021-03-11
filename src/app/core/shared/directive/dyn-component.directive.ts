@@ -1,4 +1,13 @@
-import {ComponentFactoryResolver, Directive, EventEmitter, Input, OnDestroy, OnInit, Output, ViewContainerRef} from '@angular/core';
+import {
+  ComponentFactoryResolver,
+  Directive,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewContainerRef
+} from '@angular/core';
 import {SubscriptionManager} from '../../obj/SubscriptionManager';
 import {isNullOrUndefined} from '../Functions';
 
@@ -28,7 +37,10 @@ export class DynComponentDirective implements OnInit, OnDestroy {
 
     const comp = viewContainerRef.createComponent(componentFactory);
 
-    if (!isNullOrUndefined(comp) && !isNullOrUndefined(comp.instance)) {
+    if (
+      !isNullOrUndefined(comp) && !isNullOrUndefined(comp.instance) &&
+      !isNullOrUndefined((comp.instance as any).initialized)
+    ) {
       this.component.instance = comp.instance;
       this.subscrManager.add(this.component.instance.initialized.subscribe(() => {
         this.initialized.emit({

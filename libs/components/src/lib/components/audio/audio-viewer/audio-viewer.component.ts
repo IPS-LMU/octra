@@ -303,7 +303,9 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
       this.refreshLevel()
       this.subscrManager.removeByTag(`segmentchange`);
       this.subscrManager.add(this._transcriptionLevel.segments.onsegmentchange.subscribe(() => {
-          this.refreshLevel();
+          // TODO do we need this?
+          // console.log(`refresh after segment change`);
+          // this.refreshLevel();
         },
         (error) => {
           console.error(error);
@@ -693,7 +695,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   }
 
   private onPlaybackPaused() {
-    if(!isUnset(this.animation.playHead)) {
+    if (!isUnset(this.animation.playHead)) {
       this.animation.playHead.stop();
     }
   }
@@ -1064,6 +1066,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
             transformsEnabled: 'position',
             sceneFunc: (context: any, shape) => {
               const absY = lineNum1 * (this.settings.lineheight + this.settings.margin.top);
+              const sceneSegment = this._transcriptionLevel.segments.getByID(segment.id);
+              if (isUnset(sceneSegment)) {
+                console.error(`scenceSegment is null!`);
+              }
+
               for (let j = lineNum1; j <= lineNum2; j++) {
                 const localY = j * (this.settings.lineheight + this.settings.margin.top);
 
@@ -1116,28 +1123,28 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
                     w = lineWidth - select.start;
                   }
 
-                  if (isUnset(segment.isBlockedBy)) {
-                    if (segment.transcript === '') {
+                  if (isUnset(sceneSegment.isBlockedBy)) {
+                    if (sceneSegment.transcript === '') {
                       context.fillStyle = 'rgba(255,0,0,0.2)';
                     } else if (!isUnset(this.breakMarker) && segment.transcript === this.breakMarker.code) {
                       context.fillStyle = 'rgba(0,0,255,0.2)';
-                    } else if (segment.transcript !== '') {
+                    } else if (sceneSegment.transcript !== '') {
                       context.fillStyle = 'rgba(0,128,0,0.2)';
                     }
                     context.fillRect(x, localY, w, h);
                   } else {
                     let progressBarFillColor = '';
                     let progressBarForeColor = '';
-                    if (segment.isBlockedBy === ASRQueueItemType.ASR) {
+                    if (sceneSegment.isBlockedBy === ASRQueueItemType.ASR) {
                       // blocked by ASR
                       context.fillStyle = 'rgba(255,191,0,0.5)';
                       progressBarFillColor = 'rgba(221,167,14,0.8)';
                       progressBarForeColor = 'black';
-                    } else if (segment.isBlockedBy === ASRQueueItemType.ASRMAUS) {
+                    } else if (sceneSegment.isBlockedBy === ASRQueueItemType.ASRMAUS) {
                       context.fillStyle = 'rgba(179,10,179,0.5)';
                       progressBarFillColor = 'rgba(179,10,179,0.8)';
                       progressBarForeColor = 'white';
-                    } else if (segment.isBlockedBy === ASRQueueItemType.MAUS) {
+                    } else if (sceneSegment.isBlockedBy === ASRQueueItemType.MAUS) {
                       context.fillStyle = 'rgba(26,229,160,0.5)';
                       progressBarFillColor = 'rgba(17,176,122,0.8)';
                       progressBarForeColor = 'white';
@@ -1159,16 +1166,16 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
 
                       const progressWidth = w - timeStampsWidth - 20;
 
-                      if (progressWidth > 10 && !isUnset(segment.progressInfo)) {
+                      if (progressWidth > 10 && !isUnset(sceneSegment.progressInfo)) {
                         const progressStart = x + 10 + ((x === 0) ? timestampWidth : 0);
                         const textPosition = Math.round(progressStart + progressWidth / 2);
-                        const loadedPixels = Math.round(progressWidth * segment.progressInfo.progress);
+                        const loadedPixels = Math.round(progressWidth * sceneSegment.progressInfo.progress);
 
                         this.drawRoundedRect(context, progressStart, localY + 3, 15, progressWidth, 5, 'transparent', progressBarFillColor);
                         this.drawRoundedRect(context, progressStart, localY + 3, 15, loadedPixels, 5, progressBarFillColor);
 
                         if (progressWidth > 100) {
-                          const progressString = `${segment.progressInfo.statusLabel} ${segment.progressInfo.progress * 100}%`;
+                          const progressString = `${sceneSegment.progressInfo.statusLabel} ${sceneSegment.progressInfo.progress * 100}%`;
                           context.fillStyle = (progressStart + loadedPixels > textPosition && progressBarForeColor === 'white') ? 'white' : 'black';
                           context.fillText(progressString, textPosition, localY + 14);
                         }
@@ -1243,7 +1250,8 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
               y: 0,
               transformsEnabled: 'position',
               sceneFunc: (context) => {
-                lastI = this.drawTextLabel(context, segment.transcript, lineNum1, lineNum2, segmentEnd,
+                const sceneSegment = this._transcriptionLevel.segments.getByID(segment.id);
+                lastI = this.drawTextLabel(context, sceneSegment.transcript, lineNum1, lineNum2, segmentEnd,
                   beginTime, lastI, segmentHeight, numOfLines, absX, segments, i);
               }
             });
@@ -2138,10 +2146,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, AfterViewInit, O
   public refreshLevel() {
     if (!isUnset(this.audioChunk) && !isUnset(this.av.audioTCalculator)) {
       this.av.updateLevel(this._transcriptionLevel);
+      this.createSegmentsForCanvas();
       this.layers.overlay.batchDraw();
       this.layers.boundaries.batchDraw();
     } else {
-      console.error(new Error("can't refresh level"));
+      console.error(new Error('can\'t refresh level'));
     }
   }
 

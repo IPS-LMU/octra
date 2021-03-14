@@ -432,11 +432,25 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
                       }
                     }
                   } else if (item.status === ASRProcessStatus.FAILED) {
-                    this.alertService.showAlert('danger', ErrorOccurredComponent, true, -1).catch((error) => {
-                      console.error(error);
-                    });
-                    segment.isBlockedBy = null;
-                    this.transcrService.currentlevel.segments.change(segmentIndex, segment);
+                    if (item.result.indexOf('[Error]') === 0) {
+                      const errorMessage = item.result.replace('[Error] ', '');
+                      const translatedError = this.langService.translate(`asr.${errorMessage}`, {
+                        asrProvider: item.selectedLanguage.asr,
+                        maxDuration: item.selectedASRInfo.maxSignalDuration,
+                        maxSignalSize: item.selectedASRInfo.maxSignalSize
+                      });
+                      this.alertService.showAlert('danger', translatedError, true, 30).catch((error) => {
+                        console.error(error);
+                      });
+                    } else {
+                      this.alertService.showAlert('danger', ErrorOccurredComponent, true, -1).catch((error) => {
+                        console.error(error);
+                      });
+                    }
+                    console.error(item.result);
+                    this.transcrService.currentlevel.segments.segments[segmentIndex].isBlockedBy = null;
+                    this.transcrService.currentLevelSegmentChange.emit();
+                    this.cd.markForCheck();
                   } else if (item.status === ASRProcessStatus.STOPPED) {
                     this.cd.markForCheck();
                   }

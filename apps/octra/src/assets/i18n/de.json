@@ -359,7 +359,9 @@
     "no quota": "Es ist keine Kontingente mehr verfügbar. Bitte nutze einen anderen ASR Provider.",
     "no auth": "Um weiter zu transkribieren ist eine erneute Authentifizierung notwendig. <a href='{{url}}'>Klicke hier um dich</a> zu authentifizieren.",
     "maus empty text": "Das ausgewählte Segment enthält keinen Text oder der Text enthält weniger als zwei Wörter.",
-    "error": "Es ist ein Fehler aufgetreten. Sende uns bitte ein kurzes Feedback, damit der Fehler behoben werden kann."
+    "error": "Es ist ein Fehler aufgetreten. Sende uns bitte ein kurzes Feedback, damit der Fehler behoben werden kann.",
+    "max duration exceeded": "Um das Segment mit {{asrProvider}} verarbeiten zu lassen, muss es eine Länge von weniger als {{maxDuration}} Sekunden haben. Kürze das Segment oder wähle einen anderen ASR Provider.",
+    "max signal size exceeded": "Die Dateigröße des gewählten Segments ist zu groß. Kürze das Segment oder wähle einen anderen ASR Provider."
   },
   "alerts": {
     "authentication needed": "Authentifiziere Dich, damit Du Features wie die automatische Spracherkennung Wort-Segmentierung verwenden kannst. Nach einem Klick auf \"Authentifizieren\" erscheint ein separates Fenster. Falls sich kein Fenster öffnet, stelle sicher, dass dein Browser Popups für diese Seite erlaubt.",

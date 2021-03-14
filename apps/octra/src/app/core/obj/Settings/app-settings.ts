@@ -67,6 +67,11 @@ export interface ASRLanguage {
 
 export interface ASRService {
   provider: string;
+  basName?: string;
+  maxSignalDuration?: number;
+  maxSignalSize?: number;
+  quotaPerMonth?: number;
+  knownIssues?: string;
   type: string;
   termsURL: string;
   dataStoragePolicy: string;
@@ -79,4 +84,5 @@ export interface ASRSettings {
   calls: string[];
   services: ASRService[];
   languages: ASRLanguage[];
+  asrInfoURL?: string;
 }

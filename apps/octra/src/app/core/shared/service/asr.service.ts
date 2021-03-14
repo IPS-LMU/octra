@@ -3,7 +3,7 @@ import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
 import {Subject, timer} from 'rxjs';
 import * as X2JS from 'x2js';
-import {ASRLanguage, ASRSettings} from '../../obj/Settings';
+import {ASRLanguage, ASRService, ASRSettings} from '../../obj/Settings';
 import {AppStorageService} from './appstorage.service';
 import {AudioService} from './audio.service';
 import {SettingsService} from './settings.service';
@@ -80,7 +80,9 @@ export class AsrService {
   }
 
   public addToQueue(timeInterval: ASRTimeInterval, type: ASRQueueItemType, transcript = ''): ASRQueueItem {
-    const item = new ASRQueueItem(timeInterval, this.queue, this.selectedLanguage, type, transcript);
+    const asrInfo = this.asrSettings.services.find(a => this.selectedLanguage.asr === a.provider);
+
+    const item = new ASRQueueItem(timeInterval, this.queue, this.selectedLanguage, asrInfo, this.audioService.audiomanagers[0].sampleRate, type, transcript);
     this.queue.add(item);
     return item;
   }
@@ -352,6 +354,10 @@ class ASRQueue {
 }
 
 export class ASRQueueItem {
+  get selectedASRInfo(): ASRService {
+    return this._selectedASRInfo;
+  }
+
   private static counter = 1;
   private readonly _id: number;
   private readonly _time: ASRTimeInterval;
@@ -361,6 +367,7 @@ export class ASRQueueItem {
   }>;
   private parent: ASRQueue;
   private readonly _selectedLanguage: ASRLanguage;
+  private readonly _selectedASRInfo: ASRService;
   private readonly _type: ASRQueueItemType;
   private _progress = 0;
 
@@ -409,8 +416,10 @@ export class ASRQueueItem {
     return this._result;
   }
 
-  constructor(timeInterval: ASRTimeInterval, asrQueue: ASRQueue, selectedLanguage: ASRLanguage,
-              type: ASRQueueItemType, transcriptInput = '') {
+  private sampleRate: number;
+
+  constructor(timeInterval: ASRTimeInterval, asrQueue: ASRQueue, selectedLanguage: ASRLanguage, asrInfo: ASRService,
+              sampleRate: number, type: ASRQueueItemType, transcriptInput = '') {
     this._id = ASRQueueItem.counter++;
     this._time = {
       sampleStart: timeInterval.sampleStart,
@@ -423,8 +432,10 @@ export class ASRQueueItem {
     }>();
     this.parent = asrQueue;
     this._selectedLanguage = selectedLanguage;
+    this._selectedASRInfo = asrInfo;
     this._type = type;
     this._transcriptInput = transcriptInput;
+    this.sampleRate = sampleRate;
   }
 
   public changeStatus(newStatus: ASRProcessStatus) {
@@ -536,38 +547,45 @@ export class ASRQueueItem {
         }).then((file) => {
         if (this._status !== ASRProcessStatus.STOPPED) {
           this.changeProgress(0.2);
-          // 2) upload signal
-          this.uploadFile(file, this.selectedLanguage).then((audioURL: string) => {
-            if (this._status !== ASRProcessStatus.STOPPED) {
-              this.changeProgress(0.6);
-              // 3) signal audio url to ASR
-              this.callASR(this.selectedLanguage, audioURL, outFormat).then((asrResult) => {
-                if (this._status !== ASRProcessStatus.STOPPED) {
-                  this.readTextFromFile(asrResult.file).then((result) => {
-                    this._result = result;
-                    // make sure that there are not any white spaces at the end or new lines
-                    this._result = this._result.replace(/\n/g, '').trim();
+          const serviceRequirementsError = this.fitsServiceRequirements(file);
+          if (serviceRequirementsError === '') {
+            // 2) upload signal
+            this.uploadFile(file, this.selectedLanguage).then((audioURL: string) => {
+              if (this._status !== ASRProcessStatus.STOPPED) {
+                this.changeProgress(0.6);
+                // 3) signal audio url to ASR
+                this.callASR(this.selectedLanguage, audioURL, outFormat).then((asrResult) => {
+                  if (this._status !== ASRProcessStatus.STOPPED) {
+                    this.readTextFromFile(asrResult.file).then((result) => {
+                      this._result = result;
+                      // make sure that there are not any white spaces at the end or new lines
+                      this._result = this._result.replace(/\n/g, '').trim();
 
-                    resolve({
-                      audioURL,
-                      transcriptURL: asrResult.url
+                      resolve({
+                        audioURL,
+                        transcriptURL: asrResult.url
+                      });
+                    }).catch((error) => {
+                      this._result = 'Could not read result';
+                      this.changeStatus(ASRProcessStatus.FAILED);
+                      reject(error);
                     });
-                  }).catch((error) => {
-                    this._result = 'Could not read result';
-                    this.changeStatus(ASRProcessStatus.FAILED);
-                    reject(error);
-                  });
-                }
-              }).catch((error) => {
-                this.checkErrorSituation(error);
-                reject(error);
-              });
-            }
-          }).catch((error) => {
-            this._result = error;
+                  }
+                }).catch((error) => {
+                  this.checkErrorSituation(error);
+                  reject(error);
+                });
+              }
+            }).catch((error) => {
+              this._result = error;
+              this.changeStatus(ASRProcessStatus.FAILED);
+              reject(error);
+            });
+          } else {
+            this._result = serviceRequirementsError;
             this.changeStatus(ASRProcessStatus.FAILED);
-            reject(error);
-          });
+            reject(serviceRequirementsError);
+          }
         }
       }).catch((error) => {
         this._result = error;
@@ -605,33 +623,42 @@ export class ASRQueueItem {
         }).then((file) => {
         if (this._status !== ASRProcessStatus.STOPPED) {
           this.changeProgress(0.2);
-          // 2) upload signal
-          const promises: Promise<string>[] = [];
-          const transcriptFile = new File([this._transcriptInput], `OCTRA_ASRqueueItem_${this._id}.txt`, {type: 'text/plain'});
-          promises.push(this.uploadFile(transcriptFile, this.selectedLanguage));
-          promises.push(this.uploadFile(file, this.selectedLanguage));
 
-          Promise.all<string>(promises).then((values) => {
-            const transcriptURL = values[0];
-            const audioURL = values[1];
 
-            if (this._status !== ASRProcessStatus.STOPPED) {
-              this.changeProgress(0.6);
-              // 3) signal audio url and transcriptURL to MAUS
-              this.callMAUS(this.selectedLanguage, audioURL, transcriptURL).then((resultMAUS) => {
-                if (this._status !== ASRProcessStatus.STOPPED) {
-                  resolve(resultMAUS);
-                }
-              }).catch((error) => {
-                this.checkErrorSituation(error);
-                reject(error);
-              });
-            }
-          }).catch((error) => {
-            this._result = error;
+          const serviceRequirementsError = this.fitsServiceRequirements(file);
+          if (serviceRequirementsError === '') {
+            // 2) upload signal
+            const promises: Promise<string>[] = [];
+            const transcriptFile = new File([this._transcriptInput], `OCTRA_ASRqueueItem_${this._id}.txt`, {type: 'text/plain'});
+            promises.push(this.uploadFile(transcriptFile, this.selectedLanguage));
+            promises.push(this.uploadFile(file, this.selectedLanguage));
+
+            Promise.all<string>(promises).then((values) => {
+              const transcriptURL = values[0];
+              const audioURL = values[1];
+
+              if (this._status !== ASRProcessStatus.STOPPED) {
+                this.changeProgress(0.6);
+                // 3) signal audio url and transcriptURL to MAUS
+                this.callMAUS(this.selectedLanguage, audioURL, transcriptURL).then((resultMAUS) => {
+                  if (this._status !== ASRProcessStatus.STOPPED) {
+                    resolve(resultMAUS);
+                  }
+                }).catch((error) => {
+                  this.checkErrorSituation(error);
+                  reject(error);
+                });
+              }
+            }).catch((error) => {
+              this._result = error;
+              this.changeStatus(ASRProcessStatus.FAILED);
+              reject(error);
+            });
+          } else {
+            this._result = serviceRequirementsError;
             this.changeStatus(ASRProcessStatus.FAILED);
-            reject(error);
-          });
+            reject(serviceRequirementsError);
+          }
         }
       }).catch((error) => {
         this._result = error;
@@ -639,6 +666,23 @@ export class ASRQueueItem {
         reject(error);
       });
     });
+  }
+
+  private fitsServiceRequirements(file: File): string {
+    if (!isUnset(this._selectedASRInfo)) {
+      if (!isUnset(this._selectedASRInfo.maxSignalDuration)) {
+        if (this.time.sampleLength / this.sampleRate > this._selectedASRInfo.maxSignalDuration) {
+          return '[Error] max duration exceeded';
+        }
+      }
+      if (!isUnset(this._selectedASRInfo.maxSignalSize)) {
+        if (file.size / 1000 / 1000 > this._selectedASRInfo.maxSignalSize) {
+          return '[Error] max signal size exceeded';
+        }
+      }
+    }
+
+    return '';
   }
 
   private uploadFile(file: File, language: ASRLanguage): Promise<string> {

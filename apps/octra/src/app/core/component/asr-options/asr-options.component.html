@@ -58,7 +58,9 @@
                    [outsideClick]="true"
                    [popover]="asrDescription" [src]="serviceProviders[lang.asr]?.logoURL" class="logo"
                    popoverTitle="Service Information"
-                   triggers="focus">
+                   container="#asr-bar"
+                   triggers="focus"
+              >
               <ng-template #asrDescription>
                 <table class="table table-sm table-borderless">
                   <tbody>
@@ -68,6 +70,22 @@
                     </td>
                     <td>
                       {{serviceProviders[lang.asr]?.dataStoragePolicy}}
+                    </td>
+                  </tr>
+                  <tr *ngIf="serviceProviders[lang.asr].maxSignalDuration !== undefined">
+                    <td>
+                      <fa-icon icon="exclamation-triangle"></fa-icon>
+                    </td>
+                    <td>
+                      max audio duration: {{serviceProviders[lang.asr].maxSignalDuration}} seconds
+                    </td>
+                  </tr>
+                  <tr *ngIf="serviceProviders[lang.asr].maxSignalSize !== undefined">
+                    <td>
+                      <fa-icon icon="exclamation-triangle"></fa-icon>
+                    </td>
+                    <td>
+                      max file size: {{serviceProviders[lang.asr].maxSignalSize}} MB
                     </td>
                   </tr>
                   <tr>

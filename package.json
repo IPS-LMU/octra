@@ -32,7 +32,8 @@
     "help": "nx help",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "modernizr": "modernizr -d apps/octra/src/assets/js/modernizr.js -c ./apps/octra/src/modernizr.json",
-    "workspace-generator": "nx workspace-generator"
+    "workspace-generator": "nx workspace-generator",
+    "update-browserlist": "npx browserslist@latest --update-db"
   },
   "private": true,
   "dependencies": {

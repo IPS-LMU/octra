@@ -16,6 +16,7 @@ import {AppSettings, ProjectSettings} from '../obj/Settings';
 import {SampleUnit} from '@octra/media';
 import {isUnset} from '@octra/utilities';
 import {ILog} from '../obj/Settings/logging';
+import {Histories, UndoRedoState} from 'ngrx-wieder';
 
 export enum LoginMode {
   URL = 'url',
@@ -86,10 +87,11 @@ export interface ASRState {
   selectedService?: string;
 }
 
-export interface AnnotationState {
+export interface AnnotationState extends UndoRedoState {
   levels: AnnotationStateLevel[];
   links: OIDBLink[];
   levelCounter: number;
+  histories: Histories;
 }
 
 export interface TranscriptionState {

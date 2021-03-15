@@ -446,7 +446,8 @@ export class AppStorageService {
               return convertFromOIDLevel(a);
             }) as AnnotationStateLevel[]),
             links,
-            levelCounter: max
+            levelCounter: max,
+            histories: null // will ne ignored
           },
           saveToDB
         }));

@@ -8,7 +8,8 @@ import {LoginActions} from '../login/login.actions';
 export const initialState: AnnotationState = {
   levels: [],
   links: [],
-  levelCounter: 0
+  levelCounter: 0,
+  histories: {}
 };
 
 // initialize ngrx-wieder with custom config
@@ -50,20 +51,22 @@ export const reducer = createUndoRedoReducer(
     return initialState;
   })),
   on(LoginActions.loginLocal, ((state: AnnotationState, {removeData}) => {
-    if(removeData){
+    if (removeData) {
       return initialState;
     }
     return state;
   })),
   on(LoginActions.loginOnline, ((state: AnnotationState, {removeData}) => {
-    if(removeData) {
+    if (removeData) {
       return initialState;
     }
     return state;
   })),
   on(AnnotationActions.overwriteAnnotation, (state: AnnotationState, {annotation}) => ({
     ...state,
-    ...annotation
+    levels: annotation.levels,
+    links: annotation.links,
+    levelCounter: annotation.levelCounter
   })),
   on(AnnotationActions.changeAnnotationLevel, (state: AnnotationState, {level}) => {
     const annotationLevels = state.levels;

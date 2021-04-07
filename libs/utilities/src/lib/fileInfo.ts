@@ -1,6 +1,5 @@
 import {DataInfo} from './dataInfo';
 import {isUnset} from './functions';
-import {HttpClient} from '@angular/common/http';
 
 export class FileInfo extends DataInfo {
   /**
@@ -205,7 +204,7 @@ export class FileInfo extends DataInfo {
     });
   }
 
-  public updateContentFromURL(httpClient: HttpClient): Promise<void> {
+  public updateContentFromURL(httpClient: any): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this._url !== undefined && this._url !== null) {
         httpClient.get(this._url, {responseType: 'text'}).subscribe(

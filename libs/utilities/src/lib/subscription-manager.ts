@@ -1,10 +1,8 @@
-import {Subscription} from 'rxjs';
-
-export class SubscriptionManager {
+export class SubscriptionManager<T> {
   private subscriptions: {
     id: number,
     tag: string,
-    subscription: Subscription
+    subscription: T
   }[];
 
   private counter: number;
@@ -20,7 +18,7 @@ export class SubscriptionManager {
    * @param tag optional tag
    * @returns number
    */
-  public add(subscription: Subscription, tag?: string): number {
+  public add(subscription: T, tag?: string): number {
     this.subscriptions.push(
       {
         id: ++this.counter,
@@ -37,7 +35,7 @@ export class SubscriptionManager {
   public destroy() {
     if (!(this.subscriptions === null || this.subscriptions === undefined)) {
       for (const elem of this.subscriptions) {
-        elem.subscription.unsubscribe();
+        (elem.subscription as any).unsubscribe();
       }
       this.subscriptions = [];
     }
@@ -52,7 +50,7 @@ export class SubscriptionManager {
       const element = this.subscriptions[i];
 
       if (element.id === id) {
-        element.subscription.unsubscribe();
+        (element.subscription as any).unsubscribe();
         this.subscriptions.splice(i, 1);
         return true;
       }
@@ -70,7 +68,7 @@ export class SubscriptionManager {
       const element = this.subscriptions[i];
 
       if (element.tag === tag) {
-        element.subscription.unsubscribe();
+        (element.subscription as any).unsubscribe();
         this.subscriptions.splice(i, 1);
         removed = true;
       }

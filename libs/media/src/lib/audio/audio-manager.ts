@@ -24,7 +24,7 @@ export class AudioManager {
     sampleDur: SampleUnit
   }>();
 
-  private subscrManager: SubscriptionManager;
+  private subscrManager: SubscriptionManager<Subscription>;
 
   // events
   public afterdecoded: EventEmitter<AudioRessource> = new EventEmitter<AudioRessource>();
@@ -587,7 +587,7 @@ export class AudioChunk {
   private static _counter = 0;
   public statuschange: EventEmitter<PlayBackStatus> = new EventEmitter<PlayBackStatus>();
   private readonly _audioManger: AudioManager;
-  private subscrManager: SubscriptionManager = new SubscriptionManager();
+  private subscrManager = new SubscriptionManager<Subscription>();
   private _playposition: SampleUnit;
 
   get audioManager(): AudioManager {

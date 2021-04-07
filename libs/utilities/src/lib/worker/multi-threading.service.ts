@@ -2,13 +2,14 @@ import {Injectable} from '@angular/core';
 import {SubscriptionManager} from '../subscription-manager';
 import {TsWorker} from './ts-worker';
 import {TsWorkerJob, TsWorkerStatus} from './ts-worker-job';
+import {Subscription} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MultiThreadingService {
   private numberOfThreads = 2;
-  private subscrManager: SubscriptionManager = new SubscriptionManager();
+  private subscrManager = new SubscriptionManager<Subscription>();
 
   private _workers: TsWorker[] = [];
 

@@ -114,6 +114,7 @@ import {ShortcutComponent} from './core/shortcut/shortcut.component';
 import {ContextMenuComponent} from './core/component/context-menu/context-menu.component';
 import {PermutationsReplaceModalComponent} from './editors/trn-editor/modals/permutations-replace-modal/permutations-replace-modal.component';
 import {MaintenanceModule} from './core/component/maintenance/maintenance.module';
+import {ProtectedModalComponent} from './core/modals/protected-modal/protected-modal.component';
 
 export const EDITORS: any[] = [
   DictaphoneEditorComponent,
@@ -162,6 +163,7 @@ export class TranslocoHttpLoader implements TranslocoLoader {
     Error404Component,
     YesNoModalComponent,
     BugreportModalComponent,
+    ProtectedModalComponent,
     SupportedFilesModalComponent,
     TranscriptionDeleteModalComponent,
     TranscriptionStopModalComponent,

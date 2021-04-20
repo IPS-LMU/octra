@@ -759,7 +759,15 @@ export class AppStorageService {
     this.store.dispatch(AnnotationActions.clearAnnotation());
   }
 
-  public clearWholeSession() {
+  public clearWholeSession(): Promise<void[]> {
+    const promises: Promise<void>[] = [];
+    promises.push(
+      waitTillResultRetrieved(this.actions, IDBActions.clearAllOptionsSuccess, IDBActions.clearAllOptionsFailed),
+      waitTillResultRetrieved(this.actions, IDBActions.clearLogsSuccess, IDBActions.clearLogsFailed),
+      waitTillResultRetrieved(this.actions, IDBActions.clearAnnotationSuccess, IDBActions.clearAnnotationFailed)
+    );
     this.store.dispatch(LoginActions.clearWholeSession());
+
+    return Promise.all(promises);
   }
 }
